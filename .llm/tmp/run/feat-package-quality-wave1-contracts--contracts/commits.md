@@ -24,3 +24,4 @@ Format:
 - 2b638df: refactor(config): rename saga input helpers
 - d60f43c: docs(config): export saga group input and document config types
 - fbcfee5: docs(config): fix merge subpath public types
+- 0ac2d8b: docs(config): harden plugin schema public docs

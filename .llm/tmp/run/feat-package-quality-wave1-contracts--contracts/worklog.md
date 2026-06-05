@@ -206,6 +206,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 14 | Gate | `deno doc --lint src/merge/mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 15 | Implement | Added JSDoc to plugin schema interfaces and replaced public `z.ZodType` annotations with a local `PluginSettingsSchema<T>` parse/safeParse contract. |
 | 2026-06-06 | 15 | Gate | `deno doc --lint src/schema/plugins/mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 16 | Implement | Added config docs recipes for merge contributions and plugin schemas plus `docs/advanced/extending.md`. |
+| 2026-06-06 | 16 | Gate | `Get-ChildItem docs -Recurse -File` listed 7 config docs files including recipes and advanced pages. |
 
 ## Decisions
 
