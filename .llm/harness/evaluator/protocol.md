@@ -1,5 +1,9 @@
 # Evaluator Protocol
 
+This protocol governs **IMPL-EVAL**, the **final** evaluator pass. The
+Plan-Gate's **PLAN-EVAL** is a separate, earlier pass governed by
+`plan-protocol.md`. Both passes are separate sessions.
+
 The evaluator is a separate session from the generator. Its job is to verify the
 approved plan against the changed state, not to continue implementation.
 
@@ -21,17 +25,19 @@ approved plan against the changed state, not to continue implementation.
 ## Operating Rules
 
 1. Evaluate against the approved plan and archetype gates.
-2. Verify the Design checkpoint exists in `worklog.md` and commit slices follow
+2. Verify the Plan-Gate passed before implementation began (`plan-eval.md` =
+   `PASS`). If implementation started without it, record a process failure.
+3. Verify the Design checkpoint exists in `worklog.md` and commit slices follow
    it. Missing design evidence is a finding.
-3. Verify each commit slice has its named gate passing.
-4. Check the Concept of Done (run-loop § 2 + archetype profile) for each slice.
-5. Run or manually verify the applicable gates independently.
-6. Treat missing evidence as a finding.
-7. Name doctrine violations by AP code when possible.
-8. Use `FAIL_DEBT` when the only blocking issue is unrecorded or malformed
+4. Verify each commit slice has its named gate passing.
+5. Check the Concept of Done (run-loop § 5 + archetype profile) for each slice.
+6. Run or manually verify the applicable gates independently.
+7. Treat missing evidence as a finding.
+8. Name doctrine violations by AP code when possible.
+9. Use `FAIL_DEBT` when the only blocking issue is unrecorded or malformed
    architecture debt.
-9. Use `FAIL_RESCOPE` when the plan is materially wrong, not merely incomplete.
-10. Do not fix implementation except for minimal read-only validation commands.
+10. Use `FAIL_RESCOPE` when the plan is materially wrong, not merely incomplete.
+11. Do not fix implementation except for minimal read-only validation commands.
 
 ## Output
 

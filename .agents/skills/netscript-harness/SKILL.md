@@ -25,6 +25,7 @@ On activation, read:
 4. `.llm/harness/archetypes/README.md`
 5. selected `ARCHETYPE-*` profile and any `SCOPE-*` overlays
 6. `.llm/harness/gates/archetype-gate-matrix.md`
+7. `gates/plan-gate.md` and `evaluator/plan-protocol.md`
 
 For package/plugin work, also use `.claude/skills/netscript-doctrine/SKILL.md`.
 
@@ -65,10 +66,12 @@ Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from
 
 | File | Purpose |
 |------|---------|
+| `research.md` | deep findings, re-baseline of carried-in plans |
 | `plan.md` | approved scope, archetype, gates, debt implications |
 | `implement.md` | generator prompt when needed |
 | `worklog.md` | implementation evidence and gate results |
-| `evaluate.md` | separate evaluator verdict |
+| `plan-eval.md` | PLAN-EVAL verdict (separate session, before implementation) |
+| `evaluate.md` | IMPL-EVAL verdict (separate session, after implementation) |
 | `context-pack.md` | resumable summary |
 | `drift.md` | append-only drift log |
 | `commits.md` | append-only commit list |
@@ -99,8 +102,16 @@ When external docs or examples matter:
 
 ## 7. Evaluator Separation
 
-The evaluator must be a separate session.
+There are **two** separate-session evaluator passes.
 
+**PLAN-EVAL** (before implementation):
+- Reads `evaluator/plan-protocol.md` + `gates/plan-gate.md`.
+- Reads `research.md`, `plan.md`, and the `## Design` section.
+- Writes `plan-eval.md`.
+- Emits `PASS` or `FAIL_PLAN`.
+- Two `FAIL_PLAN` cycles, then escalate.
+
+**IMPL-EVAL** (final pass, after implementation):
 - Generator writes `worklog.md`, `context-pack.md`, `drift.md`, and
   `commits.md`.
 - Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog,
@@ -152,7 +163,8 @@ User says "use harness"
   -> package/plugin? select ARCHETYPE-* and load netscript-doctrine
   -> frontend/service/docs? apply SCOPE-* overlay
   -> two or more phase groups? read workflow/supervisor.md + escalation.md, keep phase-registry.md
-  -> read gate matrix
+  -> read gate matrix + plan-gate.md
+  -> plan committed? run PLAN-EVAL (separate session); no slice before PASS
   -> update run artifacts while working
   -> commit tracking required? append commits.md after every commit
   -> discovered violation not fixed? update arch-debt.md
