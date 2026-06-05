@@ -218,6 +218,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 20 | Gate | `deno check mod.ts` passed; extra `deno check transform.ts` passed for the moved subpath; helper-directory scan found no `helpers/` directory under `packages/contracts`. |
 | 2026-06-06 | 21 | Implement | Exported `ContractSchema`, `ContractObjectSchema`, `BaseContractProcedure`, and transitive `ContractParseResult` from the `./crud` and/or `./query` subpath barrels so public signatures have complete docs. |
 | 2026-06-06 | 21 | Gate | `deno doc --lint crud.ts query.ts transform.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 22 | Implement | Added `packages/contracts/docs/getting-started.md` and linked it from the contracts docs index. |
+| 2026-06-06 | 22 | Gate | `Get-ChildItem docs -Recurse -File` listed 6 contracts docs files including `docs/getting-started.md`. |
 
 ## Decisions
 
