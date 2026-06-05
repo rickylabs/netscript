@@ -13,6 +13,13 @@ Use `PASS` when all are true:
 - no unrecorded doctrine violation was introduced or deepened,
 - docs and run artifacts are updated enough for resume.
 
+## FAIL_PLAN
+
+`FAIL_PLAN` is emitted only by PLAN-EVAL at the Plan-Gate. The plan is
+incomplete or unsound (an unchecked `gates/plan-gate.md` box). Returns the run
+to Plan & Design; no implementation slice may be committed. Two `FAIL_PLAN`
+cycles, then escalate to the user.
+
 ## FAIL_FIX
 
 Use `FAIL_FIX` when the plan remains valid but the implementation or docs need
