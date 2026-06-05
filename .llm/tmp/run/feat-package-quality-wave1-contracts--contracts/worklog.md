@@ -188,6 +188,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 5 | Gate | `deno doc --lint mod.ts` passed; `Get-ChildItem src -Recurse -File \| Select-String -Pattern 'console\\.'` returned 0 matches. |
 | 2026-06-06 | 6 | Implement | Added runtime-config package description, license, standard local tasks, and publish include/exclude config to `deno.json`. |
 | 2026-06-06 | 6 | Gate | `deno publish --dry-run --allow-dirty` passed with 0 slow-type errors and published `deno.json`, `mod.ts`, and `src/**/*.ts`. |
+| 2026-06-06 | 7 | Implement | Added `packages/runtime-config/README.md` covering install, mental model, file layout, APIs, permissions, examples, diagnostics, and stability. |
+| 2026-06-06 | 7 | Gate | `(Get-Content README.md).Count` returned 346 lines, satisfying the README >= 150 LOC gate. |
 
 ## Decisions
 
