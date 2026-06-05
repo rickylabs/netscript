@@ -11,3 +11,4 @@ Format:
 ## Log
 
 - 187f862: plan(wave1): research + plan & design for config, contracts, runtime-config
+- d0be0ad: refactor(runtime-config): scaffold domain types

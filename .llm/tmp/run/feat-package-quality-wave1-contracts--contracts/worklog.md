@@ -178,6 +178,8 @@ A new developer adding a config schema section:
 | — | — | PLAN-EVAL | `PASS` (adjusted). Evaluator added F-14 and F-17 to the gate set. |
 | 2026-06-06 | 1 | Implement | Added `packages/runtime-config/src/domain/types.ts` with documented runtime override types and finite runtime/topic constants. |
 | 2026-06-06 | 1 | Gate | `deno doc --lint src/domain/types.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 2 | Implement | Added `packages/runtime-config/src/application/loader.ts` with the runtime directory resolver, pointer parsing, config loader, and accessor functions extracted from `mod.ts`. |
+| 2026-06-06 | 2 | Gate | `deno check src/application/loader.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 
