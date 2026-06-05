@@ -4,11 +4,11 @@
 
 - Axioms: A1, A2, A6, A7, A8, A9, A14.
 - Primary sections:
-  - `doctrine/02-public-surface.md`
-  - `doctrine/04-modules-and-helpers.md`
-  - `doctrine/05-folder-structure.md`
-  - `doctrine/06-archetypes.md#archetype-1--small-contract`
-  - `doctrine/09-anti-patterns-and-fitness-functions.md`
+  - `docs/architecture/doctrine/02-public-surface.md`
+  - `docs/architecture/doctrine/04-modules-and-helpers.md`
+  - `docs/architecture/doctrine/05-folder-structure.md`
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-2, AP-7, AP-9, AP-13, AP-14, AP-15, AP-16, AP-20.
 - Fitness functions: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15.
 
@@ -18,12 +18,12 @@ Use this profile for packages whose value is a clear public contract: types, sch
 identifiers, parse/validation helpers, and small invariants. If the work introduces adapters,
 runtime lifecycle, state, or a fluent API as the main product, select a larger archetype.
 
-Current examples are listed in `doctrine/06-archetypes.md` under "Archetype assignments for current
+Current examples are listed in `docs/architecture/doctrine/06-archetypes.md` under "Archetype assignments for current
 packages."
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `doctrine/06-archetypes.md#archetype-1--small-contract`. The review
+Use the canonical shape in `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`. The review
 question is not whether every folder exists; it is whether the package stayed small and avoided
 invented layers.
 
@@ -36,8 +36,8 @@ invented layers.
 
 1. This profile.
 2. `../gates/archetype-gate-matrix.md`.
-3. `doctrine/06-archetypes.md#archetype-1--small-contract`.
-4. `doctrine/02-public-surface.md`.
+3. `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`.
+4. `docs/architecture/doctrine/02-public-surface.md`.
 5. The package README, `mod.ts`, `deno.json`, and tests.
 6. Relevant debt entries in `../debt/arch-debt.md`.
 

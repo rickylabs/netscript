@@ -22,18 +22,18 @@ it.
 
 ## Doctrine Primary Files
 
-| File                                                                                             | Use                                                      |
-| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/01-thesis-and-axioms.md`                   | Thesis and A1-A14                                        |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/02-public-surface.md`                      | Public exports, `mod.ts`, README and JSR surface         |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/03-base-and-derived-classes.md`            | Stub-only bases, inheritance limits                      |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/04-modules-and-helpers.md`                 | Helpers, adapters, Web Platform and `@std/*` first       |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/05-folder-structure.md`                    | Role vocabulary, layering, file shape                    |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/06-archetypes.md`                          | Six package archetypes and selection order               |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/07-composition-and-extension.md`           | Composition roots, constructor injection, extension axes |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/08-runtime-state-failure.md`               | Stateful runtime, supervision, cancellation, failure     |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/09-anti-patterns-and-fitness-functions.md` | AP-1..AP-20 and F-1..F-15                                |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/10-codebase-verdict-and-handoff.md`        | Current verdict per package and debt seed                |
+| File                                                                   | Use                                                      |
+| ---------------------------------------------------------------------- | -------------------------------------------------------- |
+| `docs/architecture/doctrine/01-thesis-and-axioms.md`                   | Thesis and A1-A14                                        |
+| `docs/architecture/doctrine/02-public-surface.md`                      | Public exports, `mod.ts`, README and JSR surface         |
+| `docs/architecture/doctrine/03-base-and-derived-classes.md`            | Stub-only bases, inheritance limits                      |
+| `docs/architecture/doctrine/04-modules-and-helpers.md`                 | Helpers, adapters, Web Platform and `@std/*` first       |
+| `docs/architecture/doctrine/05-folder-structure.md`                    | Role vocabulary, layering, file shape                    |
+| `docs/architecture/doctrine/06-archetypes.md`                          | Six package archetypes and selection order               |
+| `docs/architecture/doctrine/07-composition-and-extension.md`           | Composition roots, constructor injection, extension axes |
+| `docs/architecture/doctrine/08-runtime-state-failure.md`               | Stateful runtime, supervision, cancellation, failure     |
+| `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` | AP-1..AP-20 and F-1..F-15                                |
+| `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`        | Current verdict per package and debt seed                |
 
 ## Axiom Digest
 

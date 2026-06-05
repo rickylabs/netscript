@@ -1,7 +1,7 @@
 # Anti-Pattern Catalog
 
 Quick evaluator reference. Doctrine source:
-`.llm/research/architecture-doctrine-docs-v2/doctrine/09-anti-patterns-and-fitness-functions.md#anti-pattern-catalog`.
+`docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md#anti-pattern-catalog`.
 
 | AP    | Summary                                              | Typical evidence                                                            |
 | ----- | ---------------------------------------------------- | --------------------------------------------------------------------------- |

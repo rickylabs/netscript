@@ -6,7 +6,7 @@ Architecture Doctrine.
 
 Authoritative doctrine:
 
-- `.llm/research/architecture-doctrine-docs-v2/doctrine/`
+- `docs/architecture/doctrine/`
 
 Do not copy doctrine passages into harness files. Harness files point to the doctrine and explain
 how an agent uses it during a run.

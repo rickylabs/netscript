@@ -12,74 +12,92 @@ description: >
 This skill coordinates harness-mode runs. The authoritative harness docs live under `.llm/harness/`;
 this skill tells you what to load and in what order.
 
-## 1. Activation
+## When to Use
 
-The harness activates on any prompt containing `use harness` or an equivalent request for a
-harnessed run.
+- The user says `use harness` or asks for a harnessed run.
+- Selecting archetypes, scope overlays, or gate sets.
+- Tracking run artifacts, commits, or drift.
+- Understanding evaluator protocol (PLAN-EVAL or IMPL-EVAL).
+- Deciding where a lesson or doctrine update should live.
 
-On activation, read:
+## When Not to Use
 
-1. `.llm/harness/workflow/activation.md`
-2. `.llm/harness/workflow/run-loop.md`
-3. `.llm/tmp/run/<run-id>/context-pack.md` if resuming
-4. `.llm/harness/archetypes/README.md`
-5. selected `ARCHETYPE-*` profile and any `SCOPE-*` overlays
-6. `.llm/harness/gates/archetype-gate-matrix.md`
-7. `.llm/harness/gates/plan-gate.md` and `.llm/harness/evaluator/plan-protocol.md`
+- For package/plugin architecture decisions — use `netscript-doctrine`.
+- For JSR readiness audits — use `jsr-audit`.
+- For frontend/framework-specific questions — use `deno-fresh` or the relevant domain skill.
 
-For package/plugin work, also use `.claude/skills/netscript-doctrine/SKILL.md`.
+## Key Concepts
 
-For a **supervisor run** (two or more capability-scoped phase groups), also read
-`.llm/harness/workflow/supervisor.md` and `.llm/harness/workflow/escalation.md`, and track the
-groups in `phase-registry.md`.
+| Concept           | Meaning                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| **8-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Close. |
+| **PLAN-EVAL**     | First evaluator pass, before implementation. Hard stop.                                 |
+| **IMPL-EVAL**     | Final evaluator pass, after implementation.                                             |
+| **Plan-Gate**     | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                               |
+| **Archetype**     | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                          |
+| **Scope overlay** | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                               |
+| **Run artifact**  | File in `.llm/tmp/run/<run-id>/` that preserves state across sessions.                  |
+| **Debt**          | Recorded in `.llm/harness/debt/arch-debt.md`.                                           |
 
-## 2. From Prompt Profile to v2 Profile
+## Workflow
 
-The user may still write `profile: package`, `profile: docs`, or similar. In v2 that field is an
-intent hint, not the final profile.
+1. Read `workflow/activation.md` and `workflow/run-loop.md`.
+2. If resuming, read `.llm/tmp/run/<run-id>/context-pack.md`.
+3. Identify the target surface and select archetype + overlays.
+4. Read `gates/archetype-gate-matrix.md` and `gates/plan-gate.md`.
+5. Scaffold run artifacts from `templates/`.
+6. Produce `research.md`, then `plan.md` with locked decisions.
+7. Record Design checkpoint in `worklog.md`.
+8. **Run PLAN-EVAL (separate session). No implementation before PASS.**
+9. Implement one commit slice at a time; append `commits.md` after each.
+10. Run gates; record results in `worklog.md`.
+11. **Run IMPL-EVAL (separate session).**
+12. Close: update `context-pack.md`, `arch-debt.md`, and promote lessons if warranted.
 
-| User hint                  | v2 selection                                                |
-| -------------------------- | ----------------------------------------------------------- |
-| `package`                  | identify `ARCHETYPE-1` through `ARCHETYPE-6`                |
-| `plugin`                   | normally `ARCHETYPE-5`, unless sibling packages also change |
-| `frontend`                 | affected archetype(s) plus `SCOPE-frontend.md`              |
-| `service`                  | affected archetype(s) plus `SCOPE-service.md`               |
-| `docs` or `knowledge-base` | `SCOPE-docs.md` plus any described archetypes               |
+## Common Pitfalls
 
-If no package/plugin is touched, an overlay-only run is valid.
+- **Skipping Plan & Design** — The Plan-Gate is a hard stop. Implementation before PLAN-EVAL `PASS`
+  is a process failure.
+- **Self-evaluation** — The evaluator must be a separate session. The generator does not
+  self-certify.
+- **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
+- **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
 
-## 3. Run ID
+## What NetScript doesn't do yet
 
-`<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
+> **Status: draft — pending user approval before becoming mandatory.**
 
-Example:
+- **Automated fitness gate scripts** — Phase A; most gates are manual or `PENDING_SCRIPT`.
+  Workaround: manual evidence in `worklog.md`.
+- **Parallel group execution** — Supervisor runs launch groups sequentially. Workaround: design
+  groups to be independent; merge order matters.
+- **Automatic archetype detection** — The agent must select the archetype manually. Workaround: use
+  the decision tree in `archetypes/README.md`.
+- **Real-time drift monitoring** — Drift is logged manually in `drift.md`. Workaround: append after
+  significant steps.
 
-```text
-feat/frontend-rfc-implementation -> feat-frontend-rfc-implementation--package-kv-refactor
-```
-
-## 4. Run Artifacts
+## Run Artifacts
 
 Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from `.llm/harness/templates/`.
 
-| File                | Purpose                                                        |
-| ------------------- | -------------------------------------------------------------- |
-| `research.md`       | deep findings, re-baseline of carried-in plans                 |
-| `plan.md`           | approved scope, archetype, gates, debt implications            |
-| `implement.md`      | generator prompt when needed                                   |
-| `worklog.md`        | implementation evidence and gate results                       |
-| `plan-eval.md`      | PLAN-EVAL verdict (separate session, before implementation)    |
-| `evaluate.md`       | IMPL-EVAL verdict (separate session, after implementation)     |
-| `context-pack.md`   | resumable summary                                              |
-| `drift.md`          | append-only drift log                                          |
-| `commits.md`        | append-only commit list                                        |
-| `phase-registry.md` | supervisor runs only: phase-group map + live status (template) |
+| File                | Purpose                                                     |
+| ------------------- | ----------------------------------------------------------- |
+| `research.md`       | deep findings, re-baseline of carried-in plans              |
+| `plan.md`           | approved scope, archetype, gates, debt implications         |
+| `implement.md`      | generator prompt when needed                                |
+| `worklog.md`        | implementation evidence and gate results                    |
+| `plan-eval.md`      | PLAN-EVAL verdict (separate session, before implementation) |
+| `evaluate.md`       | IMPL-EVAL verdict (separate session, after implementation)  |
+| `context-pack.md`   | resumable summary                                           |
+| `drift.md`          | append-only drift log                                       |
+| `commits.md`        | append-only commit list                                     |
+| `phase-registry.md` | supervisor runs only: phase-group map + live status         |
 
 Append `commits.md` immediately after every commit. Supervisor runs additionally keep
 `phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group agent
 with `templates/agent-briefing.md`.
 
-## 5. `.llm/tmp` Path Caveat
+## `.llm/tmp` Path Caveat
 
 Some search/index tools may skip or lag on `.llm/tmp/`. Verify run paths with a direct filesystem
 listing when needed:
@@ -88,7 +106,7 @@ listing when needed:
 dir /s /b ".llm\tmp\run\<id>" 2>&1
 ```
 
-## 6. Resource Aggregation
+## Resource Aggregation
 
 When external docs or examples matter:
 
@@ -98,7 +116,7 @@ When external docs or examples matter:
 4. save useful extracts to `.llm/tmp/docs/<source>-<topic>.md`,
 5. cite the extract in the run artifact.
 
-## 7. Evaluator Separation
+## Evaluator Separation
 
 There are **two** separate-session evaluator passes.
 
@@ -118,7 +136,7 @@ There are **two** separate-session evaluator passes.
 - Evaluator writes `evaluate.md` with `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
 - Eval loop limit is two failures before escalation.
 
-## 8. Commit Tracking
+## Commit Tracking
 
 When a run requires commits:
 
@@ -133,21 +151,21 @@ Commit log format:
 - <commit-sha>: <commit message>
 ```
 
-## 9. Rescoping
+## Rescoping
 
 Rescope when the real work is materially larger than the approved plan or when the selected
 archetype is wrong. Confirm with the user before expanding scope.
 
 Record rescope evidence in `drift.md` with severity `significant` or `architectural`.
 
-## 10. Where Lessons Belong
+## Where Lessons Belong
 
 | Content type                                  | Destination                          |
 | --------------------------------------------- | ------------------------------------ |
 | Generic run mechanics                         | `.llm/harness/workflow/`             |
 | Archetype-specific gates or false-done states | `.llm/harness/archetypes/`           |
 | Stable repeated cross-run lessons             | `.llm/harness/lessons/`              |
-| Package/plugin doctrine navigation            | `.claude/skills/netscript-doctrine/` |
+| Package/plugin doctrine navigation            | `.agents/skills/netscript-doctrine/` |
 | Deep domain expertise                         | a focused skill                      |
 | Deferred doctrine violations                  | `.llm/harness/debt/arch-debt.md`     |
 
@@ -167,3 +185,28 @@ User says "use harness"
   -> discovered violation not fixed? update arch-debt.md
   -> evaluator is separate session
 ```
+
+## Reference Files
+
+| File                                            | Load when                   |
+| ----------------------------------------------- | --------------------------- |
+| `.llm/harness/workflow/activation.md`           | Every harness run           |
+| `.llm/harness/workflow/run-loop.md`             | Every harness run           |
+| `.llm/harness/workflow/supervisor.md`           | Multi-group supervisor runs |
+| `.llm/harness/gates/plan-gate.md`               | Plan-Gate checklist         |
+| `.llm/harness/evaluator/plan-protocol.md`       | PLAN-EVAL instructions      |
+| `.llm/harness/evaluator/protocol.md`            | IMPL-EVAL instructions      |
+| `.llm/harness/evaluator/verdict-definitions.md` | Verdict meanings            |
+| `.llm/harness/gates/archetype-gate-matrix.md`   | Gate selection              |
+| `.llm/harness/archetypes/README.md`             | Archetype selection         |
+| `.llm/harness/templates/`                       | Run artifact scaffolding    |
+| `.llm/harness/debt/arch-debt.md`                | Debt registry               |
+
+## Checklist
+
+- [ ] `workflow/activation.md` and `workflow/run-loop.md` were read.
+- [ ] Archetype and overlays are selected and justified.
+- [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
+- [ ] PLAN-EVAL returned `PASS` before any implementation slice.
+- [ ] Commits are appended to `commits.md` immediately after creation.
+- [ ] IMPL-EVAL is a separate session from the generator.

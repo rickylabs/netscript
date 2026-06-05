@@ -4,11 +4,11 @@
 
 - Axioms: A1, A2, A4, A5, A8, A9, A10, A11, A12, A13, A14.
 - Primary sections:
-  - `doctrine/03-base-and-derived-classes.md`
-  - `doctrine/05-folder-structure.md`
-  - `doctrine/06-archetypes.md#archetype-3--runtimebehavior`
-  - `doctrine/08-runtime-state-failure.md`
-  - `doctrine/09-anti-patterns-and-fitness-functions.md`
+  - `docs/architecture/doctrine/03-base-and-derived-classes.md`
+  - `docs/architecture/doctrine/05-folder-structure.md`
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-3--runtimebehavior`
+  - `docs/architecture/doctrine/08-runtime-state-failure.md`
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-3, AP-4, AP-5, AP-6, AP-8, AP-10, AP-11, AP-12, AP-13, AP-16, AP-17,
   AP-19, AP-20.
 - Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-13, F-14,
@@ -20,11 +20,11 @@ Use this profile when the package owns long-running behavior: workers, triggers,
 runtimes, supervisors, dispatch loops, retry, delivery, or stateful lifecycle.
 
 Sagas use this profile with the state-machine specialization described in
-`doctrine/08-runtime-state-failure.md`.
+`docs/architecture/doctrine/08-runtime-state-failure.md`.
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `doctrine/06-archetypes.md#archetype-3--runtimebehavior`. The package
+Use the canonical shape in `docs/architecture/doctrine/06-archetypes.md#archetype-3--runtimebehavior`. The package
 needs named state, lifecycle, ports, runtime/application split, diagnostics, and tests that prove
 cancellation and failure behavior.
 
@@ -36,9 +36,9 @@ cancellation and failure behavior.
 
 ## Read First
 
-1. `doctrine/06-archetypes.md#archetype-3--runtimebehavior`.
-2. `doctrine/08-runtime-state-failure.md`.
-3. `doctrine/03-base-and-derived-classes.md` if classes or inheritance change.
+1. `docs/architecture/doctrine/06-archetypes.md#archetype-3--runtimebehavior`.
+2. `docs/architecture/doctrine/08-runtime-state-failure.md`.
+3. `docs/architecture/doctrine/03-base-and-derived-classes.md` if classes or inheritance change.
 4. The runtime README, definitions/builders, state model, runner, supervisor, adapters, and
    diagnostics.
 5. Existing tests around retries, cancellation, delivery, and errors.

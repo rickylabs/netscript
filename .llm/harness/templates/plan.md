@@ -19,7 +19,7 @@ archetypes could apply.>
 ## Current Doctrine Verdict
 
 <Verdict and headline action from
-`.llm/research/architecture-doctrine-docs-v2/doctrine/10-codebase-verdict-and-handoff.md`. Use N/A
+`docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`. Use N/A
 for consumer-only work.>
 
 ## Axioms in Play
