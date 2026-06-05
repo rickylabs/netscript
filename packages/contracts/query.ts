@@ -11,6 +11,6 @@
  * @module
  */
 
-export * from './helpers/paginated-query.ts';
+export * from './src/application/paginated-query.ts';
 export * from './schemas/filters.ts';
 export * from './schemas/pagination.ts';

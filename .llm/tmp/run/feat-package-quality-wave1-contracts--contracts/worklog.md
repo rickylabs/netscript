@@ -212,6 +212,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 17 | Gate | `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'` found the marker. |
 | 2026-06-06 | 18 | Implement | Ran the config gate sweep and fixed sweep findings: stale workspace-member test expectations, unversioned test imports, `console.` examples, explicit public `z.ZodType` annotations, `types.ts` LOC, and `src/domain` folder cardinality by splitting config types and grouping schemas under `src/domain/schemas/`. |
 | 2026-06-06 | 18 | Gate | Config sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. Publish dry run reported the known non-failing `unanalyzable-dynamic-import` warning for `loader.ts`. |
+| 2026-06-06 | 19 | Implement | Moved `packages/contracts/helpers/paginated-query.ts` to `src/application/paginated-query.ts` and updated `query.ts` to re-export the new role-based module. |
+| 2026-06-06 | 19 | Gate | `deno check mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 
