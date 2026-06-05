@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "runtimeRegistryGenerator": {
+    "command": "src/cli/generate-runtime-registries.ts",
+    "args": ["--profile", "scaffold"]
+  },
+  "backgroundSampleRules": [
+    {
+      "workspace": "workers",
+      "managed": [
+        { "prefix": "jobs/" },
+        { "prefix": "tasks/" }
+      ],
+      "keep": [
+        "jobs/job-tools.ts",
+        "jobs/example-job.ts",
+        "jobs/health-check.ts",
+        "jobs/process-webhook-payload.ts",
+        "jobs/send-welcome-email.ts",
+        "tasks/system-diagnostics.ps1",
+        "tasks/validate-data.ts"
+      ]
+    }
+  ],
+  "runtimeRegistries": [
+    {
+      "kind": "workers-job",
+      "dir": "workers/jobs",
+      "registryPath": ".netscript/generated/plugin-workers/jobs.registry.ts",
+      "fileSuffixes": [".ts"],
+      "exclude": ["_registry.ts", "job-tools.ts", "mod.ts", "types.ts"],
+      "registryKey": "id",
+      "varPrefix": "job",
+      "typeImport": {
+        "name": "JobHandler",
+        "from": "@netscript/plugin-workers-core/runtime"
+      },
+      "mapValueType": "JobHandler<any>",
+      "preamble": ["// deno-lint-ignore-file no-explicit-any"],
+      "profiles": {
+        "scaffold": {
+          "include": ["example-job.ts", "health-check.ts"],
+          "includeWhenPresent": [
+            {
+              "dir": "sagas",
+              "files": ["send-welcome-email.ts", "process-payment-webhook.ts"]
+            },
+            {
+              "dir": "plugins/triggers",
+              "files": ["process-webhook-payload.ts"]
+            }
+          ]
+        }
+      },
+      "pluginDirs": [
+        {
+          "dir": "plugins/workers/jobs",
+          "importPrefix": "../../plugins/workers/jobs",
+          "label": "plugins/workers/jobs/",
+          "pluginId": "workers",
+          "varPrefix": "workersPlugin",
+          "exclude": ["job-tools.ts"]
+        },
+        {
+          "dir": "plugins/triggers/jobs",
+          "importPrefix": "../../plugins/triggers/jobs",
+          "label": "plugins/triggers/jobs/",
+          "pluginId": "triggers",
+          "varPrefix": "triggersPlugin",
+          "exclude": ["job-tools.ts"]
+        }
+      ]
+    }
+  ]
+}

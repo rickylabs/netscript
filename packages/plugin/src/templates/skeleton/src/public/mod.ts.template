@@ -1,0 +1,10 @@
+/**
+ * @module {{pluginName}}/public
+ *
+ * Public runtime helpers for {{pluginName}}.
+ */
+
+/** Describe the scaffolded plugin package. */
+export function describe{{ClassName}}Plugin(): string {
+  return '{{pluginName}}';
+}

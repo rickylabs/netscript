@@ -1,0 +1,6 @@
+import { assertEquals } from '@std/assert';
+import manifest from '../../mod.ts';
+
+Deno.test('README manifest example imports the plugin', () => {
+  assertEquals(manifest.name, '{{pluginName}}');
+});

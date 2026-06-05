@@ -1,0 +1,5 @@
+import { defineWorkflow } from '@netscript/plugin-workers-core';
+
+export const {{exportName}} = defineWorkflow('{{id}}')
+  .sleep('{{id}}-start', 1000)
+  .build();

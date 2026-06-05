@@ -1,0 +1,17 @@
+---
+description: Keep CLI features vertically sliced and effects at injected edges.
+globs:
+  - "packages/cli/**"
+alwaysApply: false
+---
+
+# CLI Tooling
+
+- Treat CLI work as Archetype 6 from `docs/architecture/doctrine/06-archetypes.md`.
+- Keep command features vertically sliced: command, input, use case, and helpers live together when
+  they describe one user-facing command.
+- Presentation parses and renders only. Filesystem, process, network, and platform effects belong
+  behind injected ports or adapters, as required by `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`.
+- Composition roots wire command groups and dependencies; they should reference feature commands
+  rather than contain inline command bodies.
+- Use `tools/fitness/check-cli-*.ts` gates when available before merging CLI structure changes.

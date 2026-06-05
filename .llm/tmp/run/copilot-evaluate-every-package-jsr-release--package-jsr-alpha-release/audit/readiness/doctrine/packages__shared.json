@@ -1,0 +1,46 @@
+{
+  "root": "packages/shared",
+  "pkg": "shared",
+  "totals": {
+    "fail": 1,
+    "warn": 4,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A1",
+      "level": "FAIL",
+      "message": "mod.ts must lead with `@module` JSDoc block (Public Types First)",
+      "path": "mod.ts"
+    },
+    {
+      "ref": "A3",
+      "level": "WARN",
+      "message": "README has only 1 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path"
+    },
+    {
+      "ref": "AP-7/F-DOCT-4",
+      "level": "WARN",
+      "message": "forbidden folder name 'utils' — split into domain/, application/, or adapters/ aligned to a real concern",
+      "path": "utils"
+    },
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 1113 lines (cap 500) — split into smaller single-reason files",
+      "path": "utils/datetime.ts"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "utils/datetime.ts",
+      "line": 1061
+    }
+  ]
+}

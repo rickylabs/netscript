@@ -1,0 +1,26 @@
+{{__slot0__}}import { defineConfig } from {{__slot1__}};
+
+export default defineConfig({
+  name: '{{__slot2__}}',
+  version: '{{__slot3__}}',
+  paths: {
+    services: '{{__slot4__}}',
+    apps: '{{__slot5__}}',
+    contracts: '{{__slot6__}}',
+    plugins: '{{__slot7__}}',
+  },
+  logging: {
+    level: '{{__slot8__}}',
+    format: '{{__slot9__}}',
+  },
+  aspire: {
+    appHost: '{{__slot10__}}',
+  },
+  databases: {
+    config: [],
+  },
+  plugins: [],
+  gateway: { enabled: false },
+  sdk: {},
+  deploy: {},
+});

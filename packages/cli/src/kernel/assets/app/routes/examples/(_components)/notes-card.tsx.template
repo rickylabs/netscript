@@ -1,0 +1,16 @@
+import { Card } from '@app/components/ui/mod.ts';
+
+export function ServiceExampleNotesCard() {
+  return (
+    <Card>
+      <Card.Header>
+        <Card.Title>What this demonstrates</Card.Title>
+      </Card.Header>
+      <Card.Body class='ns-stack ns-stack--sm text-sm text-ns-muted-fg'>
+        <p>Route-local loaders own data prefetch and dehydration.</p>
+        <p>Client islands focus on interactivity and cache transitions.</p>
+        <p>Deferred partial-backed layers keep secondary server views out of the island bundle.</p>
+      </Card.Body>
+    </Card>
+  );
+}

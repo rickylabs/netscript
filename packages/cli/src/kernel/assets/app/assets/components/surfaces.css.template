@@ -1,0 +1,59 @@
+.ns-card {
+  border-radius: var(--ns-radius-xl);
+  border: 1px solid var(--ns-border-hover);
+  overflow: hidden;
+  background: var(--ns-card);
+  color: var(--ns-card-fg);
+  box-shadow: var(--ns-shadow-xs);
+}
+
+.ns-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-5) var(--ns-space-6);
+  border-bottom: 1px solid var(--ns-border);
+}
+
+.ns-card__title {
+  font-size: var(--ns-text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ns-card__description {
+  font-size: var(--ns-text-sm);
+  line-height: 1.55;
+  color: var(--ns-muted-fg);
+}
+
+.ns-card__body {
+  padding: var(--ns-space-5) var(--ns-space-6);
+}
+
+.ns-card__footer {
+  padding: var(--ns-space-4) var(--ns-space-6);
+  border-top: 1px solid var(--ns-border);
+  background: color-mix(in srgb, var(--ns-card) 78%, var(--ns-surface));
+}
+
+.ns-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-1);
+  font-family: var(--ns-font-mono);
+  font-size: 0.67rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--ns-space-0-5) var(--ns-space-2);
+  border-radius: var(--ns-radius-sm);
+  white-space: nowrap;
+}
+
+.ns-badge--primary {
+  color: var(--ns-primary);
+  background: var(--ns-primary-subtle);
+  border: 1px solid var(--ns-primary-border);
+}

@@ -1,0 +1,42 @@
+import { Card } from '@app/components/ui/mod.ts';
+import type { ServiceSummaryPanelProps } from '../(_shared)/service-showcase.ts';
+
+export function ServiceSummaryPanel(props: ServiceSummaryPanelProps) {
+  return (
+    <div class='grid gap-3 sm:grid-cols-2'>
+      <SummaryStat label='Total records' value={String(props.total)} />
+      <SummaryStat label='Active' value={String(props.active)} />
+      <SummaryStat label='Draft' value={String(props.draft)} />
+      <SummaryStat label='Archived' value={String(props.archived)} />
+      <div class='sm:col-span-2 rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3'>
+        <p class='text-[0.68rem] uppercase tracking-[0.18em] text-ns-muted-fg'>Snapshot</p>
+        <p class='mt-2 text-sm font-semibold text-ns-fg'>
+          Deferred partial refreshed {props.updatedAtLabel}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export function ServiceSummarySkeleton() {
+  return (
+    <div class='grid gap-3 sm:grid-cols-2'>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <Card key={index}>
+          <Card.Body>
+            <div class='h-16 animate-pulse rounded-2xl bg-ns-surface-raised/30' />
+          </Card.Body>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function SummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3'>
+      <p class='text-[0.68rem] uppercase tracking-[0.18em] text-ns-muted-fg'>{label}</p>
+      <p class='mt-2 text-sm font-semibold text-ns-fg'>{value}</p>
+    </div>
+  );
+}

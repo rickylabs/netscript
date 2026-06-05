@@ -1,0 +1,61 @@
+import { Button, Card } from '@app/components/ui/mod.ts';
+
+interface ServiceExampleHeroProps {
+  readonly serviceName: string;
+  readonly examplesHref: string;
+}
+
+export function ServiceExampleHero({ serviceName, examplesHref }: ServiceExampleHeroProps) {
+  return (
+    <Card class='overflow-hidden'>
+      <div class='grid gap-6 px-6 py-7 sm:px-8 lg:grid-cols-[minmax(0,1.7fr)_320px]'>
+        <div class='ns-stack ns-stack--md'>
+          <div class='flex flex-wrap items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ns-muted-fg'>
+            <span class='rounded-full border border-ns-border bg-ns-surface px-3 py-1'>
+              QueryIsland
+            </span>
+            <span class='rounded-full border border-ns-border bg-ns-surface px-3 py-1'>
+              Optimistic mutation
+            </span>
+            <span class='rounded-full border border-ns-border bg-ns-surface px-3 py-1'>
+              Defer / partial
+            </span>
+          </div>
+
+          <div class='ns-stack ns-stack--sm'>
+            <h1 class='text-3xl font-semibold tracking-tight text-ns-fg sm:text-4xl'>
+              {{serviceName | pascalCase}} showcase route
+            </h1>
+            <p class='max-w-[60ch] text-sm leading-7 text-ns-muted-fg sm:text-base'>
+              This scaffolded route mirrors the stronger NetScript frontend composition patterns
+              already used in the Playground: route-local loaders, logical page layers, typed
+              mutations, and server-owned partial seams composed through a dedicated page layout.
+            </p>
+          </div>
+
+          <div class='ns-status-bar flex-wrap'>
+            <span class='ns-status-indicator'>Service: {serviceName}</span>
+            <span class='ns-status-sep'>·</span>
+            <span>SSR query prefetch</span>
+            <span class='ns-status-sep'>·</span>
+            <span>Shared cache lifecycle</span>
+          </div>
+        </div>
+
+        <div class='ns-stack ns-stack--sm rounded-3xl border border-ns-border bg-ns-surface-raised/20 px-5 py-5'>
+          <p class='text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ns-muted-fg'>
+            Route seams
+          </p>
+          <p class='text-sm text-ns-muted-fg'>
+            The route follows the plugin-style folder convention: page files stay thin, page
+            structure lives in `(_components)/page-layout.tsx`, and each layer owns one slice of
+            UI plus its own loader and cache behavior.
+          </p>
+          <Button type='link' href={examplesHref} variant='outline'>
+            Back to examples
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}

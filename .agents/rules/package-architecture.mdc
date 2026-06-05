@@ -1,0 +1,23 @@
+---
+description: Keep package and plugin structure aligned to NetScript doctrine.
+globs:
+  - "packages/**/*.ts"
+  - "packages/**/deno.json"
+  - "plugins/**/*.ts"
+  - "plugins/**/deno.json"
+alwaysApply: false
+---
+
+# Package Architecture
+
+- Pick the smallest matching package archetype from `docs/architecture/doctrine/06-archetypes.md`
+  before changing package or plugin structure.
+- Keep folder roles aligned to `docs/architecture/doctrine/05-folder-structure.md`: `domain/`,
+  `ports/`, `application/`, `adapters/`, `runtime/`, `presentation/`, `testing/`, `tests/`, and
+  `examples/` have specific meanings.
+- Preserve dependency direction from `docs/architecture/doctrine/05-folder-structure.md`: domain has
+  no package implementation imports; application does not import adapters; presentation stays thin.
+- Avoid doctrine anti-patterns listed in `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`,
+  especially monolithic files, hidden globals, generic `utils`/`helpers`/`common` folders, and
+  side effects outside edge files.
+- Run or extend `tools/fitness/*` when a change touches an enforced architectural rule.

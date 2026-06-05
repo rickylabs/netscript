@@ -1,0 +1,62 @@
+{
+  "pkg": {
+    "name": "@netscript/plugin-streams",
+    "version": "0.1.0",
+    "description": "NetScript plugin that runs a Durable Streams development server.",
+    "root": "plugins/streams"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./services": "./services/src/main.ts"
+  },
+  "files": {
+    "total": 2,
+    "loc": 257,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 2519
+      },
+      {
+        "path": "services/src/main.ts",
+        "bytes": 4898
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 19,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./services": true
+    },
+    "descriptionLen": 64
+  },
+  "surface": {
+    ".": {
+      "exported": [],
+      "rawCount": 0
+    },
+    "./services": {
+      "exported": [],
+      "rawCount": 0
+    }
+  },
+  "tests": {
+    "fileCount": 0,
+    "files": []
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-3 readme",
+      "level": "WARN",
+      "message": "README.md is only 19 lines; enterprise bar is ≥150 lines"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

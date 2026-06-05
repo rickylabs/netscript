@@ -1,0 +1,44 @@
+/**
+ * Host-owned plugin service context bootstrap.
+ *
+ * Generated plugin services load this module through
+ * NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE so plugin packages stay free of
+ * static workspace imports.
+ */
+
+import type { PluginServiceContext } from '@netscript/plugin/sdk';
+import { createPluginLogger } from '@netscript/plugin/loader';
+import { getKv } from '@netscript/kv';
+import { baseContract } from '@netscript/shared';
+import { v1 } from '../../contracts/versions/v1/mod.ts';
+
+type DatabaseModule = {
+  readonly db?: {
+    getClient(): Promise<unknown>;
+  };
+};
+
+async function getDatabaseClient(): Promise<unknown> {
+  const databaseModule = await import('../../database/mod.ts') as DatabaseModule;
+  if (!databaseModule.db?.getClient) {
+    throw new Error('database/mod.ts does not export a db.getClient() accessor.');
+  }
+  return databaseModule.db.getClient();
+}
+
+export async function createPluginServiceContext(
+  pluginName: string,
+): Promise<PluginServiceContext> {
+  return {
+    db: {
+      getClient: getDatabaseClient,
+    },
+    contracts: {
+      base: baseContract,
+      versions: { v1 },
+    },
+    kv: await getKv(),
+    logger: createPluginLogger(pluginName),
+    env: Deno.env.toObject(),
+  };
+}

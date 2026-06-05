@@ -1,0 +1,567 @@
+Checking for slow types in the public API...
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:63:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0mexport const JobFiltersSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:71:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m71 | [0mexport const ExecutionFiltersSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:78:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m78 | [0mexport const TaskFiltersSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:89:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m89 | [0mexport const JobCreateInputSchema = JobEditableSchema.extend({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:95:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m95 | [0mexport const JobUpdateInputSchema = JobEditableSchema.partial();
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:98:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m98 | [0mexport const JobUpdateWithIdSchema = JobEditableSchema.partial().extend({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:103:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m103 | [0mexport const JobTriggerInputSchema = JobTriggerEventSchema.pick({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:131:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m131 | [0mexport const workersContract = {
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/contracts/workers.contract.ts[0m[0m[33m:363:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m363 | [0mexport const workersContractV1 = implement(workersContract);
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/helpers/cron.ts[0m[0m[33m:69:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m69 | [0mexport const cron = {
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/helpers/permissions.ts[0m[0m[33m:56:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m56 | [0mexport const permissions = {
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/streams/schema.ts[0m[0m[33m:14:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0mexport const WorkerExecutionSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/streams/schema.ts[0m[0m[33m:36:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0mexport const WorkerJobSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/streams/schema.ts[0m[0m[33m:54:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0mexport const workersStreamSchema = defineStreamSchema({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:32:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0mexport const JobSourceSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:50:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0mexport const JobExecutionTypeSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:64:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m64 | [0mexport const ExecutionStatusSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:79:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m79 | [0mexport const TriggerTypeSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:101:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m101 | [0mexport const JobEditableSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:155:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m155 | [0mexport const JobSystemSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:213:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m213 | [0mexport const JobDefinitionSchema = JobEditableSchema.extend(JobSystemSchema.shape);
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:223:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m223 | [0mexport const JobResponseSchema = JobEditableSchema.extend(
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:242:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m242 | [0mexport const JobMessageSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:285:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m285 | [0mexport const TaskMessageSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:326:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m326 | [0mexport const ExecutionRecordSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:395:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m395 | [0mexport const ExecutionResponseBaseSchema = ExecutionRecordSchema.omit({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:410:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m410 | [0mexport const ExecutionResponseSchema = ExecutionResponseBaseSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:424:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m424 | [0mexport const JobTriggerEventSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:455:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m455 | [0mexport const JobCompletionEventSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:490:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m490 | [0mexport const RegisterJobInputSchema = JobDefinitionSchema.omit({ id: true }).extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:507:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m507 | [0mexport const PluginJobContributionSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/job.ts[0m[0m[33m:759:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m759 | [0mexport const SSEEventSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:31:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m31 | [0mexport const TaskTypeSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:46:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m46 | [0mexport const TaskStatusSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:61:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m61 | [0mexport const TaskSourceSchema = z.enum([
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:82:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m82 | [0mexport const TaskPermissionsInputSchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:105:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m105 | [0mexport const TaskPermissionsSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:134:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m134 | [0mexport const TaskEditableSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:188:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m188 | [0mexport const TaskSystemSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:242:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m242 | [0mexport const TaskDefinitionSchema = TaskEditableSchema.extend(TaskSystemSchema.shape);
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:252:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m252 | [0mexport const TaskResponseSchema = TaskEditableSchema.extend(
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:270:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m270 | [0mexport const TaskResultSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:317:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m317 | [0mexport const TaskExecutionOptionsSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:358:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m358 | [0mexport const RegisterTaskInputSchema = TaskDefinitionSchema.omit({ id: true }).extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:372:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m372 | [0mexport const PythonTaskConfigSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:386:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m386 | [0mexport const DotNetTaskConfigSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:400:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m400 | [0mexport const ShellTaskConfigSchema = z.object({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/types/task.ts[0m[0m[33m:412:14[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m412 | [0mexport const ExtendedTaskDefinitionSchema = TaskDefinitionSchema.extend({
+   [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-license][0m: [0m[1mmissing license field or file[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/deno.json[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: add a "license" field. Alternatively, add a LICENSE file to the package and ensure it is not ignored from being published
+
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/missing-license
+
+[0m[1m[31merror[relative-package-import][0m: [0m[1minvalid relative import from the '@netscript/workers' package into the '@netscript/plugin-workers' package[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/presets/start-workers.ts[0m[0m[33m:414:46[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m414 | [0m  const { Scheduler, Worker } = await import('../../../plugins/workers/mod.ts');
+   [0m[38;5;12m | [0m                                             [0m[1m[31m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [0m[1m[31mthe specifier[0m
+   [0m[38;5;12m | [0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: replace the relative import with a bare specifier that imports from the other package by name and optionally an export (ex. "@netscript/plugin-workers")
+
+  [0m[38;5;12minfo[0m: importing modules in another package using a relative import won't work once the packages are published
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/relative-package-import
+
+[0m[1m[33mwarning[unanalyzable-dynamic-import][0m: [0m[1munable to analyze dynamic import[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/workers/pool/job-worker-runtime.ts[0m[0m[33m:255:35[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m255 | [0m            module = await import(moduleUrl);
+   [0m[38;5;12m | [0m                                  [0m[1m[33m^^^^^^^^^[0m [0m[1m[33mthe unanalyzable dynamic import[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: after publishing this package, imports from the local import map / package.json do not work
+  [0m[38;5;12minfo[0m: dynamic imports that can not be analyzed at publish time will not be rewritten automatically
+  [0m[38;5;12minfo[0m: make sure the dynamic import is resolvable at runtime without an import map / package.json
+
+This package contains errors for slow types. Fixing these errors will:
+
+  1. Significantly improve your package users' type checking performance.
+  2. Improve the automatic documentation generation.
+  3. Enable automatic .d.ts generation for Node.js.
+
+Don't want to bother? You can choose to skip this step by
+providing the --allow-slow-types flag.
+
+[0m[1m[31merror[0m: Found 50 problems

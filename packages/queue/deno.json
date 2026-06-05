@@ -1,0 +1,44 @@
+{
+  "name": "@netscript/queue",
+  "version": "0.0.1-alpha.0",
+  "description": "Provider-agnostic message queue abstraction wrapping Fedify adapters for Deno KV, Redis, and RabbitMQ.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./adapters/deno-kv": "./adapters/deno-kv.adapter.ts",
+    "./adapters/redis": "./adapters/redis.adapter.ts",
+    "./adapters/amqp": "./adapters/amqp.adapter.ts",
+    "./adapters/kv-polling": "./adapters/kv-polling.adapter.ts",
+    "./types": "./interfaces/mod.ts",
+    "./errors": "./interfaces/errors.ts",
+    "./validation": "./utils/mod.ts"
+  },
+  "tasks": {
+    "check": "deno check ./mod.ts ./interfaces/mod.ts ./interfaces/errors.ts ./utils/mod.ts ./adapters/deno-kv.adapter.ts ./adapters/redis.adapter.ts ./adapters/amqp.adapter.ts ./adapters/kv-polling.adapter.ts",
+    "test": "deno test ./tests/"
+  },
+  "imports": {
+    "@fedify/fedify": "jsr:@fedify/fedify@^1.5.0",
+    "@fedify/denokv": "jsr:@fedify/denokv@^1.0.0",
+    "@fedify/redis": "jsr:@fedify/redis@^1.0.0",
+    "@fedify/amqp": "jsr:@fedify/amqp@^1.0.0",
+    "@netscript/kv": "../kv/mod.ts",
+    "zod": "npm:zod@^4.3.6",
+    "ioredis": "npm:ioredis@^5.4.1",
+    "amqplib": "npm:amqplib@^0.10.4",
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/async": "jsr:@std/async@^1"
+  },
+  "publish": {
+    "include": [
+      "**/*.ts",
+      "deno.json",
+      "README.md"
+    ],
+    "exclude": [
+      "tests/",
+      "**/*_test.ts",
+      "**/*.test.ts"
+    ]
+  }
+}

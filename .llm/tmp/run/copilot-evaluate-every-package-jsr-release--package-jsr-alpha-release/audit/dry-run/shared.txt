@@ -1,0 +1,25 @@
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+[0m[1m[31merror[missing-explicit-type][0m: [0m[1mmissing explicit type in the public API[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript-start/netscript-start/packages/shared/utils/zod/schemas.ts[0m[0m[33m:98:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m98 | [0mexport const IdQuerySchema = z.object({
+  [0m[38;5;12m | [0m             [0m[1m[31m^^^^^^^^^^^^^[0m [0m[1m[31mthis symbol is missing an explicit type[0m
+  [0m[38;5;12m | [0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: add an explicit type annotation to the symbol
+
+  [0m[38;5;12minfo[0m: all symbols in the public API must have an explicit type
+  [0m[38;5;12mdocs[0m: https://jsr.io/go/slow-type-missing-explicit-type
+
+This package contains errors for slow types. Fixing these errors will:
+
+  1. Significantly improve your package users' type checking performance.
+  2. Improve the automatic documentation generation.
+  3. Enable automatic .d.ts generation for Node.js.
+
+Don't want to bother? You can choose to skip this step by
+providing the --allow-slow-types flag.
+
+[0m[1m[31merror[0m: Found 35 problems

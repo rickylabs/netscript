@@ -1,0 +1,290 @@
+{
+  "pkg": {
+    "name": "@netscript/workers",
+    "version": "0.1.0",
+    "root": "packages/workers"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./types": "./types.ts",
+    "./presets": "./presets/mod.ts",
+    "./streams/server": "./streams/server.ts",
+    "./streams/schema": "./streams/schema.ts",
+    "./contracts": "./contracts/mod.ts"
+  },
+  "files": {
+    "total": 44,
+    "loc": 13106,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 7035
+      },
+      {
+        "path": "types.ts",
+        "bytes": 2443
+      },
+      {
+        "path": "presets/mod.ts",
+        "bytes": 386
+      },
+      {
+        "path": "streams/server.ts",
+        "bytes": 264
+      },
+      {
+        "path": "streams/schema.ts",
+        "bytes": 2035
+      },
+      {
+        "path": "contracts/mod.ts",
+        "bytes": 1828
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": false,
+    "readmeLines": 0,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./types": true,
+      "./presets": true,
+      "./streams/server": true,
+      "./streams/schema": true,
+      "./contracts": true
+    },
+    "descriptionLen": 0
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "BaseRegistry",
+        "DEFAULT_TOPIC",
+        "Day",
+        "DayOfWeek",
+        "DotNetTaskConfigSchema",
+        "ExecutionResponseSchema",
+        "ExecutionState",
+        "ExecutionStatusSchema",
+        "ExtendedTaskDefinitionSchema",
+        "JOB_STATE_CHANNEL",
+        "JobCompletionEventSchema",
+        "JobDefinitionSchema",
+        "JobExecutionTypeSchema",
+        "JobResponseSchema",
+        "JobSystemSchema",
+        "JobTriggerEventSchema",
+        "PluginJobContributionSchema",
+        "PythonTaskConfigSchema",
+        "RegisterJobInputSchema",
+        "RegisterTaskInputSchema",
+        "SSEEventSchema",
+        "ShellTaskConfigSchema",
+        "ShutdownManager",
+        "TaskDefinitionSchema",
+        "TaskExecutionOptionsSchema",
+        "TaskExecutor",
+        "TaskMessageSchema",
+        "TaskPermissionsSchema",
+        "TaskResponseSchema",
+        "TaskSourceSchema",
+        "TaskStatusSchema",
+        "TaskSystemSchema",
+        "TriggerTypeSchema",
+        "WorkflowBuilder",
+        "WorkflowExecutor",
+        "WorkflowKvKeys",
+        "createWorkerPool",
+        "defineDenoTask",
+        "defineJob",
+        "defineOnDemandJob",
+        "definePowerShellTask",
+        "definePythonTask",
+        "defineScheduledJob",
+        "defineShellTask",
+        "defineTask",
+        "getExecutionState",
+        "getJobRegistry",
+        "getShutdownManager",
+        "getTaskExecutor",
+        "getTaskRegistry",
+        "getWorkflowState",
+        "isCronExpression",
+        "isJobHandler",
+        "isPermissionPreset",
+        "jobFailure",
+        "jobSuccess",
+        "mergePermissions",
+        "resetExecutionState",
+        "resetJobRegistry",
+        "resetShutdownManager",
+        "resetTaskExecutor",
+        "resetTaskRegistry",
+        "resetWorkflowExecutor",
+        "runWorkflow",
+        "sendWorkflowEvent",
+        "startCombined",
+        "startScheduler",
+        "startWorker",
+        "startWorkers",
+        "startWorkersCombined"
+      ],
+      "rawCount": 70
+    },
+    "./types": {
+      "exported": [
+        "DEFAULT_TOPIC",
+        "DotNetTaskConfigSchema",
+        "ExecutionRecordSchema",
+        "ExecutionResponseSchema",
+        "ExecutionStatusSchema",
+        "ExtendedTaskDefinitionSchema",
+        "JobCompletionEventSchema",
+        "JobDefinitionSchema",
+        "JobEditableSchema",
+        "JobExecutionTypeSchema",
+        "JobKvKeys",
+        "JobMessageSchema",
+        "JobResponseSchema",
+        "JobSourceSchema",
+        "JobSystemSchema",
+        "JobTriggerEventSchema",
+        "PluginJobContributionSchema",
+        "PythonTaskConfigSchema",
+        "RegisterJobInputSchema",
+        "RegisterTaskInputSchema",
+        "SSEEventSchema",
+        "SSEEventTypes",
+        "ShellTaskConfigSchema",
+        "TaskDefinitionSchema",
+        "TaskEditableSchema",
+        "TaskExecutionOptionsSchema",
+        "TaskMessageSchema",
+        "TaskPermissionsInputSchema",
+        "TaskPermissionsSchema",
+        "TaskResponseSchema",
+        "TaskResultSchema",
+        "TaskSourceSchema",
+        "TaskStatusSchema",
+        "TaskSystemSchema",
+        "TaskTypeSchema",
+        "TriggerTypeSchema"
+      ],
+      "rawCount": 36
+    },
+    "./presets": {
+      "exported": [
+        "startCombined",
+        "startScheduler",
+        "startWorker",
+        "startWorkers",
+        "startWorkersCombined"
+      ],
+      "rawCount": 5
+    },
+    "./streams/server": {
+      "exported": [
+        "WorkerExecutionSchema",
+        "WorkerJobSchema",
+        "getWorkersStreamProducer",
+        "publishJobToStream",
+        "startWorkersStreamMirror",
+        "workersStreamSchema"
+      ],
+      "rawCount": 6
+    },
+    "./streams/schema": {
+      "exported": [
+        "WorkerExecution",
+        "WorkerExecutionSchema",
+        "WorkerJob",
+        "WorkerJobSchema",
+        "workersStreamSchema"
+      ],
+      "rawCount": 5
+    },
+    "./contracts": {
+      "exported": [
+        "DEFAULT_TOPIC",
+        "ExecutionFiltersSchema",
+        "ExecutionRecordResponseSchema",
+        "ExecutionRecordSchema",
+        "ExecutionResponseSchema",
+        "JobCompletionEventSchema",
+        "JobCreateInputSchema",
+        "JobDefinitionResponseSchema",
+        "JobDefinitionSchema",
+        "JobEditableSchema",
+        "JobExecutionTypeSchema",
+        "JobFiltersSchema",
+        "JobKvKeys",
+        "JobMessageSchema",
+        "JobResponseSchema",
+        "JobSourceSchema",
+        "JobSystemSchema",
+        "JobTriggerEventSchema",
+        "JobTriggerInputSchema",
+        "JobUpdateInputSchema",
+        "JobUpdateWithIdSchema",
+        "PluginJobContributionSchema",
+        "RegisterJobInputSchema",
+        "RegisterTaskInputSchema",
+        "SSEEventSchema",
+        "SSEEventTypes",
+        "TaskDefinitionResponseSchema",
+        "TaskDefinitionSchema",
+        "TaskEditableSchema",
+        "TaskExecutionOptionsSchema",
+        "TaskFiltersSchema",
+        "TaskMessageSchema",
+        "TaskPermissionsSchema",
+        "TaskResponseSchema",
+        "TaskResultSchema",
+        "TaskSourceSchema",
+        "TaskStatusSchema",
+        "TaskSystemSchema",
+        "TaskTypeSchema",
+        "TriggerTypeSchema",
+        "workersContract",
+        "workersContractV1"
+      ],
+      "rawCount": 42
+    }
+  },
+  "tests": {
+    "fileCount": 1,
+    "files": [
+      "core/execution-state_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-3 readme",
+      "level": "FAIL",
+      "message": "README.md missing"
+    },
+    {
+      "gate": "F-JSR-4 description",
+      "level": "FAIL",
+      "message": "deno.json lacks `description` (used by JSR discoverability)"
+    },
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "helpers"
+    },
+    {
+      "gate": "F-DOCT-5 cardinality",
+      "level": "WARN",
+      "message": "directory has 16 immediate children; doctrine cap is 12",
+      "path": ""
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "name": "@netscript/plugin",
+  "version": "0.0.1-alpha.0",
+  "description": "Plugin manifest, validation, discovery, and host-context contracts for NetScript.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./abstracts": "./src/abstracts/mod.ts",
+    "./config": "./src/config/mod.ts",
+    "./cli": "./src/cli/mod.ts",
+    "./loader": "./loader.ts",
+    "./sdk": "./src/sdk/mod.ts",
+    "./testing": "./src/testing/mod.ts",
+    "./templates": "./src/templates/mod.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/path": "jsr:@std/path@^1.0.0",
+    "zod": "npm:zod@^4.3.6",
+    "@standard-schema/spec": "npm:@standard-schema/spec@^1.1.0"
+  },
+  "tasks": {
+    "check": "deno check --unstable-kv mod.ts",
+    "test": "deno test --allow-all",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "deno.json",
+      "loader.ts",
+      "mod.ts",
+      "src/**/*.ts",
+      "src/templates/**/*.template",
+      "docs/**/*.md"
+    ],
+    "exclude": [
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "recommended"
+      ]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true
+  }
+}

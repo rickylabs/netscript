@@ -1,0 +1,178 @@
+{
+  "pkg": {
+    "name": "@netscript/queue",
+    "version": "0.1.0",
+    "description": "Provider-agnostic message queue abstraction wrapping Fedify adapters for Deno KV, Redis, and RabbitMQ.",
+    "root": "packages/queue"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./adapters/deno-kv": "./adapters/deno-kv.adapter.ts",
+    "./adapters/redis": "./adapters/redis.adapter.ts",
+    "./adapters/amqp": "./adapters/amqp.adapter.ts",
+    "./adapters/kv-polling": "./adapters/kv-polling.adapter.ts",
+    "./types": "./interfaces/mod.ts",
+    "./errors": "./interfaces/errors.ts",
+    "./validation": "./utils/mod.ts"
+  },
+  "files": {
+    "total": 25,
+    "loc": 3559,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 2616
+      },
+      {
+        "path": "adapters/deno-kv.adapter.ts",
+        "bytes": 6582
+      },
+      {
+        "path": "adapters/redis.adapter.ts",
+        "bytes": 5510
+      },
+      {
+        "path": "adapters/amqp.adapter.ts",
+        "bytes": 5589
+      },
+      {
+        "path": "adapters/kv-polling.adapter.ts",
+        "bytes": 20397
+      },
+      {
+        "path": "interfaces/mod.ts",
+        "bytes": 590
+      },
+      {
+        "path": "interfaces/errors.ts",
+        "bytes": 4143
+      },
+      {
+        "path": "utils/mod.ts",
+        "bytes": 241
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 252,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./adapters/deno-kv": true,
+      "./adapters/redis": true,
+      "./adapters/amqp": true,
+      "./adapters/kv-polling": true,
+      "./types": true,
+      "./errors": true,
+      "./validation": true
+    },
+    "descriptionLen": 102
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "QueueConfigurationError",
+        "QueueConnectionError",
+        "QueueError",
+        "QueueErrorCode",
+        "QueueHandlerError",
+        "QueueProvider",
+        "QueueValidationError",
+        "createParallelQueue",
+        "createQueue",
+        "createTypedQueue",
+        "safeValidate",
+        "validateOrThrow",
+        "withValidation"
+      ],
+      "rawCount": 13
+    },
+    "./adapters/deno-kv": {
+      "exported": [
+        "DenoKvAdapter",
+        "DenoKvAdapterOptions"
+      ],
+      "rawCount": 2
+    },
+    "./adapters/redis": {
+      "exported": [
+        "RedisAdapter"
+      ],
+      "rawCount": 1
+    },
+    "./adapters/amqp": {
+      "exported": [
+        "AmqpAdapter"
+      ],
+      "rawCount": 1
+    },
+    "./adapters/kv-polling": {
+      "exported": [
+        "KvPollingAdapter",
+        "KvPollingAdapterOptions"
+      ],
+      "rawCount": 2
+    },
+    "./types": {
+      "exported": [
+        "QueueConfigurationError",
+        "QueueConnectionError",
+        "QueueError",
+        "QueueErrorCode",
+        "QueueHandlerError",
+        "QueueProvider",
+        "QueueValidationError"
+      ],
+      "rawCount": 7
+    },
+    "./errors": {
+      "exported": [
+        "QueueConfigurationError",
+        "QueueConnectionError",
+        "QueueError",
+        "QueueErrorCode",
+        "QueueHandlerError",
+        "QueueValidationError"
+      ],
+      "rawCount": 6
+    },
+    "./validation": {
+      "exported": [
+        "safeValidate",
+        "validateOrThrow",
+        "withValidation"
+      ],
+      "rawCount": 3
+    }
+  },
+  "tests": {
+    "fileCount": 5,
+    "files": [
+      "tests/typed-queue_test.ts",
+      "tests/options_test.ts",
+      "tests/errors_test.ts",
+      "tests/validation_test.ts",
+      "tests/envelope_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'utils' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "utils"
+    },
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'interfaces' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "interfaces"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

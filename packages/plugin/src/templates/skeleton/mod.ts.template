@@ -1,0 +1,44 @@
+/**
+ * @module {{pluginName}}
+ *
+ * {{pluginName}} is a NetScript plugin package scaffolded by the public CLI.
+ *
+ * The root module exposes only the plugin manifest. CLI commands, Aspire
+ * contributions, scaffolding helpers, testing fixtures, and e2e gates live on
+ * dedicated subpaths declared in `deno.json`.
+ *
+ * Replace the TODO fields before publishing:
+ *
+ * 1. Write a specific package description.
+ * 2. Fill the author field.
+ * 3. Uncomment only the contribution axes this plugin actually owns.
+ * 4. Keep exported symbols documented.
+ * 5. Run `deno task publish:dry-run`.
+ *
+ * @example Install the plugin
+ * ```bash
+ * netscript plugin add {{pluginName}}
+ * ```
+ *
+ * @example Run the plugin CLI
+ * ```bash
+ * deno dx jsr:{{pluginName}}/cli --help
+ * ```
+ *
+ * @example Import the manifest
+ * ```ts
+ * import { plugin } from "{{pluginName}}";
+ *
+ * console.log(plugin.name);
+ * ```
+ */
+
+import { definePlugin } from '@netscript/plugin';
+
+/** Scaffolded plugin manifest. */
+export const plugin = definePlugin('{{pluginName}}', '0.0.1-alpha.0')
+  .withDescription('TODO: replace with a plugin description under 250 characters ending with a period.')
+  .withLicense('MIT')
+  .withAuthor('TODO: your name or organization')
+  .withE2e([{ name: '{{pluginBaseName}}.smoke', command: 'deno test --allow-all tests/' }])
+  .build();

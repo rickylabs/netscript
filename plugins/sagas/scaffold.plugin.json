@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "provider": {
+    "kind": "saga",
+    "displayName": "Saga Orchestrator",
+    "category": "background-processor",
+    "portRangeKey": "INFRA_PLUGIN",
+    "defaultPermissions": ["--unstable-kv", "--allow-all"],
+    "watchFlag": "--watch",
+    "defaultEntrypoint": "bin/combined.ts",
+    "defaultServiceEntrypoint": "services/src/main.ts",
+    "defaultRequiresDb": true,
+    "defaultRequiresKv": true,
+    "pluginType": "background-processor",
+    "supportsConcurrency": true,
+    "concurrencyEnvVar": "SAGA_CONCURRENCY",
+    "defaultConcurrency": 2,
+    "defaultTelemetry": true,
+    "infrastructureRequires": ["kv"],
+    "infrastructureOptionalDeps": ["db"]
+  },
+  "officialSource": {
+    "canonicalName": "sagas",
+    "pluginDir": "sagas",
+    "backgroundDir": "sagas",
+    "serviceEntrypoint": "services/src/main.ts",
+    "backgroundEntrypoint": "bin/combined.ts",
+    "serviceConfigKey": "sagas-api",
+    "servicePort": 8092,
+    "backgroundPort": 8092,
+    "dependencies": ["streams"],
+    "requiresDb": true,
+    "requiresKv": true,
+    "permissions": ["--unstable-kv", "--allow-all"],
+    "pluginReferences": ["workers-api"]
+  }
+}

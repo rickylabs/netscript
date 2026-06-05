@@ -1,0 +1,125 @@
+{{__slot0__}}
+
+import { resolve } from 'node:path';
+import type { DistributedApplicationBuilder } from '{{__slot1__}}';
+import type { NetScriptConfig } from '{{__slot2__}}';
+import type { InfrastructureContext } from './register-infrastructure.ts';
+
+interface DbCliTarget {
+  readonly configKey: string;
+  readonly resourceKey: string;
+  readonly databaseName: string;
+  readonly envKey: string;
+  readonly engine: string;
+  readonly taskSuffix: string;
+  readonly workdir: string;
+  readonly resource: unknown;
+}
+
+/**
+ * Short-circuit normal AppHost startup when invoked for a database CLI operation.
+ *
+ * @param builder - Aspire distributed application builder.
+ * @param config - Parsed NetScript config.
+ * @param infrastructure - Registered infrastructure resources.
+ * @param appHostDir - Absolute project root.
+ * @returns true when DB CLI mode handled the invocation.
+ */
+export async function tryHandleDbCliMode(
+  builder: DistributedApplicationBuilder,
+  config: NetScriptConfig,
+  infrastructure: InfrastructureContext,
+  appHostDir: string,
+): Promise<boolean> {
+  const configuration = await builder.getConfiguration();
+  const operation = await readValue(
+    configuration,
+    'prisma-operation',
+    'NETSCRIPT_PRISMA_OPERATION',
+  );
+  if (!operation) {
+    return false;
+  }
+
+  const targets = resolveTargets(
+    await readValue(
+      configuration,
+      'prisma-target',
+      'NETSCRIPT_PRISMA_TARGET',
+    ) ?? config.PrimaryDatabase ?? undefined,
+    appHostDir,
+    infrastructure,
+  );
+
+  const migrationName = await readValue(
+    configuration,
+    'prisma-name',
+    'NETSCRIPT_PRISMA_NAME',
+  );
+
+  for (const target of targets) {
+    const taskName = `db:${operation}:${target.taskSuffix}`;
+    let resource = await builder.addExecutable(
+      `prisma-${operation}-${target.configKey}`,
+      'deno',
+      target.workdir,
+      ['task', taskName],
+    );
+
+    if (target.engine === 'Sqlite') {
+      const sqliteUrl = `file:./${target.databaseName}`;
+      resource = await resource
+        .withEnvironment('DATABASE_URL', sqliteUrl)
+        .withEnvironment(target.envKey, sqliteUrl);
+    }
+
+    if (target.resource) {
+      resource = await resource
+        .withEnvironment('DATABASE_URL', target.resource)
+        .withEnvironment(target.envKey, target.resource)
+        .withReference(target.resource)
+        .waitFor(target.resource);
+    }
+
+    if (migrationName) {
+      resource = await resource.withEnvironment('PRISMA_MIGRATION_NAME', migrationName);
+    }
+  }
+
+  return true;
+}
+
+function resolveTargets(
+  requested: string | undefined,
+  appHostDir: string,
+  infrastructure: InfrastructureContext,
+): DbCliTarget[] {
+  const targets: Record<string, DbCliTarget> = {
+{{__slot3__}}
+  };
+  const values = Object.values(targets);
+  if (requested === 'all') {
+    return values;
+  }
+  if (!requested && values.length === 1) {
+    return values;
+  }
+  const match = values.find((target) =>
+    target.configKey === requested || target.databaseName === requested
+  );
+  if (!match) {
+    throw new Error(`Unknown database target: ${requested ?? '(default)'}`);
+  }
+  return [match];
+}
+
+async function readValue(
+  configuration: {
+    readonly getConfigValue: (key: string) => string | Promise<string | undefined> | undefined;
+  },
+  key: string,
+  envName: string,
+): Promise<string | undefined> {
+  const configured = await configuration.getConfigValue(key);
+  return configured ?? process.env[envName];
+}

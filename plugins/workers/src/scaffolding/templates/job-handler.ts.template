@@ -1,0 +1,10 @@
+import { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
+
+export const {{exportName}} = defineJobHandler(async (context) => {
+  const payload = (context as { readonly payload?: unknown }).payload;
+
+  return createSuccessResult({
+    jobId: '{{id}}',
+    payload,
+  });
+});

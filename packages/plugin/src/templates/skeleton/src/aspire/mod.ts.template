@@ -1,0 +1,7 @@
+/**
+ * @module {{pluginName}}/aspire
+ *
+ * Aspire contribution entrypoint for {{pluginName}}.
+ */
+
+export { {{ClassName}}AspireContribution } from './{{plugin-name}}-contribution.ts';

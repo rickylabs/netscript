@@ -1,0 +1,23 @@
+import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';
+import { Card } from '@app/components/ui/mod.ts';
+import ServiceShowcaseLab from '../(_islands)/ServiceShowcaseLab.tsx';
+import { loadServiceShowcaseData } from '../(_shared)/service-showcase.ts';
+
+type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
+
+export function ServiceExampleLabPanel(props: Props) {
+  return (
+    <Card>
+      <Card.Header>
+        <Card.Title>Typed query lab</Card.Title>
+        <Card.Description>
+          The list is prefetched on the server, hydrated into the shared island QueryClient, and
+          then mutated optimistically from the browser with the same typed contract surface.
+        </Card.Description>
+      </Card.Header>
+      <Card.Body>
+        <ServiceShowcaseLab {...props} />
+      </Card.Body>
+    </Card>
+  );
+}

@@ -1,0 +1,25 @@
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/meta.json
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5_meta.json
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/mod.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/config.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/context.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/filter.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/formatter.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/level.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/logger.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/record.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/sink.ts
+[0m[32mDownload[0m https://jsr.io/@logtape/logtape/2.0.5/src/util.ts
+Checking for slow types in the public API...
+[0m[1m[32mSimulating publish[0m of [0m[38;5;245m@netscript/logger@0.1.0[0m with files:
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/README.md (7.18KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/config.ts (3.35KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/constants.ts (411B)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/creators.ts (3.85KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/deno.json (811B)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/middleware.ts (6.7KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/mod.ts (1.25KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/orpc-plugin.ts (12.49KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/orpc.ts (528B)
+   file:///home/runner/work/netscript-start/netscript-start/packages/logger/types.ts (1.21KB)
+[0m[32mSuccess[0m Dry run complete

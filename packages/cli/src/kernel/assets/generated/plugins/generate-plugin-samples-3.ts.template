@@ -1,0 +1,98 @@
+/**
+ * {{__slot0__}} sample onboarding saga.
+ *
+ * Mirrors the NetScript saga pattern with a minimal event-driven workflow.
+ */
+
+import { defineSaga, sagaComplete } from '@netscript/plugin-sagas-core';
+import type {
+  CascadedMessage,
+  SagaCorrelationKey,
+  SagaMessage,
+  SagaState,
+} from '@netscript/plugin-sagas-core/domain';
+
+type SampleOnboardingMessage =
+  | {
+    type: 'SampleOnboardingStarted';
+    payload: {
+      correlationId: string;
+      subject: string;
+    };
+  }
+  | {
+    type: 'SampleOnboardingCompleted';
+    payload: {
+      correlationId: string;
+    };
+  };
+
+type PayloadOf<TMessage extends SampleOnboardingMessage> = TMessage['payload'];
+type SampleOnboardingStarted = Extract<
+  SampleOnboardingMessage,
+  { type: 'SampleOnboardingStarted' }
+>;
+type SampleOnboardingCompleted = Extract<
+  SampleOnboardingMessage,
+  { type: 'SampleOnboardingCompleted' }
+>;
+
+interface SampleOnboardingState extends SagaState {
+  correlationId: string;
+  subject: string;
+  status: 'idle' | 'started' | 'completed';
+}
+
+const initialSampleOnboardingState: SampleOnboardingState = {
+  correlationId: '',
+  subject: '',
+  status: 'idle',
+};
+
+function setSagaState<TState>(
+  saga: { state: TState },
+  nextState: TState,
+  cascaded: readonly CascadedMessage[] = [],
+): readonly CascadedMessage[] {
+  saga.state = nextState;
+  return cascaded;
+}
+
+function correlateByPayloadCorrelationId(message: SagaMessage): SagaCorrelationKey | undefined {
+  const payload = message.payload;
+  if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+    return message.correlationKey;
+  }
+  const correlationId = payload.correlationId;
+  return typeof correlationId === 'string' && correlationId.length > 0
+    ? correlationId as SagaCorrelationKey
+    : message.correlationKey;
+}
+
+export const sampleOnboardingSaga = defineSaga('{{__slot1__}}SampleOnboarding')
+  .state(initialSampleOnboardingState)
+  .correlate(correlateByPayloadCorrelationId)
+  .on<'SampleOnboardingStarted', PayloadOf<SampleOnboardingStarted>>(
+    'SampleOnboardingStarted',
+    (saga, event) =>
+      setSagaState(saga, {
+        correlationId: event.payload.correlationId,
+        subject: event.payload.subject,
+        status: 'started',
+      }),
+  )
+  .on<'SampleOnboardingCompleted', PayloadOf<SampleOnboardingCompleted>>(
+    'SampleOnboardingCompleted',
+    (saga, event) => {
+      const nextState: SampleOnboardingState = {
+        ...saga.state,
+        correlationId: event.payload.correlationId,
+        status: 'completed',
+      };
+      saga.state = nextState;
+      return [sagaComplete(nextState)];
+    },
+  )
+  .build();
+
+export default sampleOnboardingSaga;

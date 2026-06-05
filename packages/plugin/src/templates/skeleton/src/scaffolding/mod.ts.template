@@ -1,0 +1,10 @@
+/**
+ * @module {{pluginName}}/scaffolding
+ *
+ * Scaffolding helpers for {{pluginName}}.
+ */
+
+/** Return scaffold template names owned by this plugin. */
+export function create{{ClassName}}ScaffoldTemplates(): readonly string[] {
+  return [];
+}

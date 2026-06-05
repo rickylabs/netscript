@@ -1,0 +1,10 @@
+/** Aspire contribution placeholder for {{pluginName}}. */
+export class {{ClassName}}AspireContribution {
+  /** Plugin package name. */
+  readonly pluginName = '{{pluginName}}';
+
+  /** Return resources contributed by this plugin. */
+  contribute(): readonly [] {
+    return [];
+  }
+}

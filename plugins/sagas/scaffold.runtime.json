@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "runtimeRegistryGenerator": {
+    "command": "src/cli/generate-runtime-registries.ts",
+    "args": ["--profile", "scaffold"]
+  },
+  "backgroundSampleRules": [
+    {
+      "workspace": "sagas",
+      "managed": [
+        { "suffix": "-saga.ts" }
+      ],
+      "keep": ["user-registration-saga.ts"]
+    }
+  ],
+  "runtimeRegistries": [
+    {
+      "kind": "map",
+      "dir": "sagas",
+      "registryPath": ".netscript/generated/plugin-sagas/sagas.registry.ts",
+      "fileSuffixes": ["-saga.ts"],
+      "exclude": ["_registry.ts", "mod.ts", "types.ts"],
+      "registryKey": "id",
+      "varPrefix": "saga",
+      "typeImport": {
+        "name": "SagaDefinition",
+        "from": "@netscript/plugin-sagas-core/domain"
+      }
+    }
+  ]
+}

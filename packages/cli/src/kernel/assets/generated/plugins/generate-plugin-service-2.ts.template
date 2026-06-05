@@ -1,0 +1,31 @@
+/**
+ * {{__slot0__}} router stub.
+ *
+ * Keeps the generated service runnable while leaving real procedures for the
+ * plugin author to implement.
+ */
+
+import { os } from '@orpc/server';
+import { v1 } from '{{__slot1__}}';
+
+const startTime = Date.now();
+
+export const {{__slot2__}}V1 = {
+  status: v1.{{__slot3__}}.status.handler(async () => ({
+    status: 'ready' as const,
+    plugin: '{{__slot4__}}',
+    kind: '{{__slot5__}}' as const,
+    version: '0.1.0',
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: Math.floor((Date.now() - startTime) / 1000),
+  })),
+};
+
+export const router = os.router({
+  v1: os.prefix('/v1').router({
+    // deno-lint-ignore no-explicit-any
+    {{__slot6__}}: {{__slot7__}}V1 as any,
+  }),
+});
+
+export type Router = typeof router;

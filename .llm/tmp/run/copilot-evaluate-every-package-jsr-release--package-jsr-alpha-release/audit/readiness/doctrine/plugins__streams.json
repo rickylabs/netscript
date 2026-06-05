@@ -1,0 +1,34 @@
+{
+  "root": "plugins/streams",
+  "pkg": "streams",
+  "totals": {
+    "fail": 0,
+    "warn": 3,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A3",
+      "level": "WARN",
+      "message": "README has only 0 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    },
+    {
+      "ref": "A13",
+      "level": "WARN",
+      "message": "Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead",
+      "path": "services/src/main.ts"
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "mod.ts",
+      "line": 96
+    }
+  ]
+}

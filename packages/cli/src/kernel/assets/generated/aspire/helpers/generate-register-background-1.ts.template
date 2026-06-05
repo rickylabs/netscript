@@ -1,0 +1,51 @@
+{{__slot0__}}
+
+import type { DistributedApplicationBuilder } from '{{__slot1__}}';
+import type { NetScriptConfig } from '{{__slot2__}}';
+import type { InfrastructureContext } from './register-infrastructure.ts';
+import {
+  buildDatabaseUriEnvKey,
+  buildOtelEnvVars,
+  extractDependencies,
+  extractPluginReferences,
+  extractServiceReferences,
+  resolvePermissions,
+  resolveWorkspacePath,
+} from '{{__slot3__}}';
+
+type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+
+/**
+ * Registers background processors (workers, sagas, triggers, benchmark)
+ * with the Aspire SDK builder.
+ *
+ * Each processor is registered via `addExecutable()` from the Aspire SDK.
+ * Telemetry-enabled entries receive 3 OTEL env vars (`denoApp`
+ * mode); telemetry-disabled entries receive explicit opt-out vars.
+ *
+ * Background processors do not cross-reference each other, so no two-pass
+ * registration is needed.
+ *
+ * @param builder - The Aspire distributed application builder
+ * @param config - Parsed NetScript configuration
+ * @param infrastructure - Infrastructure context with database/cache resources
+ * @param services - Map of registered service resources (for endpoint-based env var wiring)
+ * @param plugins - Map of registered plugin resources (for endpoint-based env var wiring)
+ * @param appHostDir - Absolute path to the AppHost directory
+ * @returns Map of registered background processor resources keyed by name
+ */
+export async function registerBackgroundProcessors(
+  builder: DistributedApplicationBuilder,
+  config: NetScriptConfig,
+  infrastructure: InfrastructureContext,
+  services: Map<string, ExecutableResource>,
+  plugins: Map<string, ExecutableResource>,
+  appHostDir: string,
+): Promise<Map<string, ExecutableResource>> {
+  const backgroundProcessors = new Map<string, ExecutableResource>();
+  const databaseEnvKey = buildDatabaseUriEnvKey(config);
+
+{{__slot4__}}
+
+  return backgroundProcessors;
+}

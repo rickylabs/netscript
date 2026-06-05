@@ -1,0 +1,39 @@
+/**
+ * Package specifiers for scaffold import maps.
+ */
+export const SCAFFOLD_PACKAGES = {
+  NETSCRIPT_CONFIG: '@netscript/config',
+  NETSCRIPT_SERVICE: '@netscript/service',
+  NETSCRIPT_PLUGIN: '@netscript/plugin',
+  NETSCRIPT_SHARED: '@netscript/shared',
+  NETSCRIPT_SDK: '@netscript/sdk',
+  NETSCRIPT_LOGGER: '@netscript/logger',
+  NETSCRIPT_LOGGER_MIDDLEWARE: '@netscript/logger/middleware',
+  NETSCRIPT_LOGGER_ORPC: '@netscript/logger/orpc',
+  NETSCRIPT_TELEMETRY: '@netscript/telemetry',
+  NETSCRIPT_DATABASE: '@netscript/database',
+  NETSCRIPT_DATABASE_SCRIPTS: '@netscript/database/scripts',
+  NETSCRIPT_DATABASE_TRACING: '@netscript/database/tracing',
+  NETSCRIPT_WORKERS: '@netscript/plugin-workers-core',
+  NETSCRIPT_PLUGIN_SAGAS_CORE: '@netscript/plugin-sagas-core',
+  NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN: '@netscript/plugin-sagas-core/domain',
+  NETSCRIPT_PRISMA_ADAPTER_MYSQL: '@netscript/prisma-adapter-mysql',
+  NETSCRIPT_SDK_CLIENT: '@netscript/sdk/client',
+  NETSCRIPT_SDK_QUERY: '@netscript/sdk/query',
+  NETSCRIPT_SDK_QUERY_CLIENT: '@netscript/sdk/query-client',
+  STD_PATH: '@std/path',
+  STD_FS: '@std/fs',
+  STD_ASSERT: '@std/assert',
+  NETSCRIPT_ASPIRE: '@netscript/aspire',
+  NETSCRIPT_FRESH: '@netscript/fresh',
+  NETSCRIPT_FRESH_BUILDERS: '@netscript/fresh/builders',
+  NETSCRIPT_FRESH_QUERY: '@netscript/fresh/query',
+  NETSCRIPT_FRESH_ROUTE: '@netscript/fresh/route',
+  NETSCRIPT_FRESH_SERVER: '@netscript/fresh/server',
+  NETSCRIPT_FRESH_VITE: '@netscript/fresh/vite',
+  NETSCRIPT_KV: '@netscript/kv',
+  NETSCRIPT_FRESH_UI: '@netscript/fresh-ui',
+  ZOD: 'zod',
+} as const;
+
+export type ScaffoldPackageKey = keyof typeof SCAFFOLD_PACKAGES;

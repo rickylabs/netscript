@@ -1,0 +1,92 @@
+{
+  "pkg": {
+    "name": "@netscript/kv",
+    "version": "0.1.0",
+    "description": "Reactive key-value abstraction for Redis, Deno KV, and in-memory backends.",
+    "root": "packages/kv"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./redis": "./redis.ts",
+    "./kvdex": "./kvdex.ts"
+  },
+  "files": {
+    "total": 26,
+    "loc": 5945,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 893
+      },
+      {
+        "path": "redis.ts",
+        "bytes": 1800
+      },
+      {
+        "path": "kvdex.ts",
+        "bytes": 878
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 156,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./redis": true,
+      "./kvdex": true
+    },
+    "descriptionLen": 74
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "DenoKvAdapter",
+        "MemoryKvAdapter",
+        "closeKv",
+        "getActiveProvider",
+        "getKv",
+        "getKvPath",
+        "getRawKv",
+        "getRedisConnectionFromEnv",
+        "isKvInitialized",
+        "isWatchable",
+        "resetKv"
+      ],
+      "rawCount": 11
+    },
+    "./redis": {
+      "exported": [
+        "RedisKvAdapter"
+      ],
+      "rawCount": 1
+    },
+    "./kvdex": {
+      "exported": [
+        "WatchableKvBridge",
+        "collection",
+        "createNetscriptDb",
+        "kvdex",
+        "model"
+      ],
+      "rawCount": 5
+    }
+  },
+  "tests": {
+    "fileCount": 5,
+    "files": [
+      "tests/memory.adapter_test.ts",
+      "tests/shared_test.ts",
+      "tests/bridge_test.ts",
+      "tests/auto-detect_test.ts",
+      "tests/keys_test.ts"
+    ]
+  },
+  "gates": [],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "pkg": {
+    "name": "@netscript/runtime-config",
+    "version": "0.1.0",
+    "root": "packages/runtime-config"
+  },
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "files": {
+    "total": 1,
+    "loc": 416,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 13387
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": false,
+    "readmeLines": 0,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true
+    },
+    "descriptionLen": 0
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "FeatureFlag",
+        "JobOverride",
+        "RuntimeConfig",
+        "RuntimeTask",
+        "SagaOverride",
+        "TriggerOverride",
+        "getJobOverride",
+        "getRuntimeTask",
+        "getSagaOverride",
+        "getTriggerOverride",
+        "isFeatureEnabled",
+        "loadRuntimeConfig",
+        "logRuntimeConfigSummary",
+        "watchRuntimeConfig"
+      ],
+      "rawCount": 14
+    }
+  },
+  "tests": {
+    "fileCount": 0,
+    "files": []
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-3 readme",
+      "level": "FAIL",
+      "message": "README.md missing"
+    },
+    {
+      "gate": "F-JSR-4 description",
+      "level": "FAIL",
+      "message": "deno.json lacks `description` (used by JSR discoverability)"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

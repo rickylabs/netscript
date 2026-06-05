@@ -1,0 +1,67 @@
+{
+  "root": "plugins/triggers",
+  "pkg": "triggers",
+  "totals": {
+    "fail": 0,
+    "warn": 7,
+    "info": 2
+  },
+  "findings": [
+    {
+      "ref": "A3",
+      "level": "WARN",
+      "message": "README has only 0 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    },
+    {
+      "ref": "A12",
+      "level": "INFO",
+      "message": "package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md"
+    },
+    {
+      "ref": "A13",
+      "level": "WARN",
+      "message": "Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead",
+      "path": "test-webhooks-e2e.ts"
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "mod.ts",
+      "line": 87
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "jobs/staged-cleanup.ts",
+      "line": 27
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "jobs/file-relay.ts",
+      "line": 47
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "jobs/file-import.ts",
+      "line": 65
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "services/src/main.ts",
+      "line": 39
+    }
+  ]
+}

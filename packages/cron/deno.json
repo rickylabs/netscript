@@ -1,0 +1,38 @@
+{
+  "name": "@netscript/cron",
+  "version": "0.0.1-alpha.0",
+  "description": "Runtime-agnostic cron scheduling abstraction for Deno applications.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./adapters": "./adapters/mod.ts",
+    "./types": "./interfaces/types.ts"
+  },
+  "tasks": {
+    "check": "deno check ./mod.ts ./adapters/mod.ts ./interfaces/mod.ts",
+    "test": "deno test ./tests/"
+  },
+  "imports": {
+    "@std/async": "jsr:@std/async@^1",
+    "@std/assert": "jsr:@std/assert@^1"
+  },
+  "publish": {
+    "include": [
+      "**/*.ts",
+      "deno.json",
+      "README.md"
+    ],
+    "exclude": [
+      "tests/",
+      "**/*_test.ts",
+      "**/*.test.ts"
+    ]
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "deno.ns",
+      "deno.unstable"
+    ]
+  }
+}

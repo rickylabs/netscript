@@ -1,0 +1,148 @@
+// Sagas Plugin Prisma Schema
+// This schema defines the database tables for the sagas plugin.
+// Saga state is stored in Postgres for persistence and querying via PrismaSagaStore.
+
+// ============================================================================
+// SAGA INSTANCE
+// ============================================================================
+
+/// Saga instance state - stored in Postgres for durable saga execution
+/// This is the required schema for @saga-bus/store-prisma PrismaSagaStore
+model SagaInstance {
+  /// Unique saga instance identifier (UUID)
+  id            String   @db.VarChar(100)
+
+  /// Name of the saga definition (e.g., 'OrderSaga', 'PaymentSaga')
+  sagaName      String   @map("saga_name") @db.VarChar(100)
+
+  /// Correlation ID for message routing and lookup
+  correlationId String   @map("correlation_id") @db.VarChar(100)
+
+  /// Version for optimistic concurrency control
+  version       Int      @default(1)
+
+  /// Whether the saga has completed (terminal state)
+  isCompleted   Boolean  @default(false) @map("is_completed")
+
+  /// The saga state as JSON (contains all saga-specific data)
+  state         Json
+
+  /// Record timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Composite primary key required by saga-bus store-prisma
+  @@id([sagaName, id], name: "sagaName_id")
+
+  // Index for correlation ID lookups (message routing)
+  @@index([sagaName, correlationId])
+
+  // Index for completed saga cleanup
+  @@index([sagaName, isCompleted])
+
+  // Index for updated timestamp (cleanup queries)
+  @@index([updatedAt])
+
+  @@map("saga_instances")
+}
+
+// ============================================================================
+// SAGA DEFINITION (Optional - for dynamic saga registration)
+// ============================================================================
+
+/// Saga definition metadata - tracks registered sagas
+/// Note: Saga definitions from code are loaded at startup, this is for dynamic registration
+model SagaDefinition {
+  /// Unique saga name (e.g., 'OrderSaga')
+  name          String   @id @db.VarChar(100)
+
+  /// Human-readable display name
+  displayName   String   @map("display_name") @db.VarChar(255)
+
+  /// Saga description
+  description   String?  @db.Text
+
+  /// Group/category for organization
+  groupName     String?  @map("group_name") @db.VarChar(100)
+
+  /// Where this saga is defined: code, plugin, database
+  source        String   @default("code") @db.VarChar(20)
+
+  /// Plugin ID that registered this saga (if source is 'plugin')
+  pluginId      String?  @map("plugin_id") @db.VarChar(100)
+
+  /// Message types this saga handles (JSON array)
+  handledTypes  Json?    @map("handled_types")
+
+  /// Initial state factory type/config (JSON)
+  initialState  Json?    @map("initial_state")
+
+  /// Whether the saga is enabled
+  enabled       Boolean  @default(true)
+
+  /// Tags for categorization
+  tags          String[] @default([])
+
+  /// Additional metadata (JSON)
+  metadata      Json?
+
+  /// Record timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([source])
+  @@index([groupName])
+  @@index([enabled])
+  @@index([tags])
+  @@map("saga_definitions")
+}
+
+// ============================================================================
+// SAGA EXECUTION HISTORY (Optional - for analytics and debugging)
+// ============================================================================
+
+/// Saga execution history - archived saga state transitions for debugging
+model SagaExecutionHistory {
+  /// Unique history entry ID
+  id              String   @id @default(uuid()) @db.Uuid
+
+  /// Saga name
+  sagaName        String   @map("saga_name") @db.VarChar(100)
+
+  /// Saga instance ID
+  sagaId          String   @map("saga_id") @db.VarChar(100)
+
+  /// Correlation ID
+  correlationId   String   @map("correlation_id") @db.VarChar(100)
+
+  /// Message type that triggered this transition
+  messageType     String   @map("message_type") @db.VarChar(100)
+
+  /// Message ID
+  messageId       String?  @map("message_id") @db.VarChar(100)
+
+  /// State before the transition (JSON)
+  previousState   Json?    @map("previous_state")
+
+  /// State after the transition (JSON)
+  newState        Json     @map("new_state")
+
+  /// Transition outcome: success, error, compensated
+  outcome         String   @db.VarChar(20)
+
+  /// Error message if outcome is error
+  error           String?  @db.Text
+
+  /// Duration of handler execution in milliseconds
+  duration        Int?
+
+  /// Timestamp of the transition
+  transitionAt    DateTime @default(now()) @map("transition_at")
+
+  @@index([sagaName, sagaId])
+  @@index([sagaName, correlationId])
+  @@index([transitionAt])
+  @@index([outcome])
+  @@map("saga_execution_history")
+}
+

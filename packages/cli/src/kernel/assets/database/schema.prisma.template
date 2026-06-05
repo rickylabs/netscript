@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./.generated"
+  runtime  = "deno"
+}
+
+generator zod {
+  provider = "prisma-zod-generator"
+  output   = "./.generated/zod"
+  config   = "./zod-generator.config.json"
+}
+
+datasource db {
+  provider = "{{prismaProvider}}"
+}
+
+model ExampleRecord {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

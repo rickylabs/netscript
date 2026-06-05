@@ -1,0 +1,55 @@
+/**
+ * {{__slot0__}} service entrypoint.
+ *
+ * Generated plugin services use the PR #71 host-boundary pattern:
+ * the host creates PluginServiceContext and the plugin only consumes it.
+ */
+
+import type { PluginServiceContext } from '@netscript/plugin/sdk';
+import { createService } from '@netscript/service';
+import { router } from './router.ts';
+{{__slot1__}}
+type PluginServiceBootstrap = {
+  createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
+};
+
+export default async function create{{__slot2__}}Service(
+  ctx: PluginServiceContext,
+): Promise<void> {
+  const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '{{__slot3__}}');
+{{__slot4__}}
+  const builder = createService(router, {
+    name: '{{__slot5__}}',
+    version: '0.1.0',
+    port,
+  })
+    .withCors()
+    .withLogger()
+    .withOpenAPI({
+      title: '{{__slot6__}} API',
+      description: 'Generated {{__slot7__}} plugin service for {{__slot8__}}',
+    })
+    .withDocs()
+    .withRPC({ traceContext: true })
+    .withHealth()
+    .withServiceInfo();
+{{__slot9__}}
+  await builder.serve();
+}
+
+async function load{{__slot10__}}ServiceContext(): Promise<PluginServiceContext> {
+  const bootstrapModule = Deno.env.get('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE');
+  if (!bootstrapModule) {
+    throw new Error(
+      'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE is required to start {{__slot11__}} service directly.',
+    );
+  }
+
+  const { createPluginServiceContext } = await import(bootstrapModule) as PluginServiceBootstrap;
+  return createPluginServiceContext('{{__slot12__}}');
+}
+
+if (import.meta.main) {
+  const ctx = await load{{__slot13__}}ServiceContext();
+  await create{{__slot14__}}Service(ctx);
+}

@@ -1,0 +1,187 @@
+import { useSignal } from '@preact/signals';
+import { useRef } from 'preact/hooks';
+import type { InferDefinePageLayerLoaderProps } from '@netscript/fresh/builders';
+import {
+  getIslandQueryClient,
+  hydrateFromDehydrated,
+  QueryIsland,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@netscript/fresh/query';
+import { Button } from '@app/components/ui/mod.ts';
+import {
+  exampleServiceListInvalidation,
+  exampleServiceName,
+  exampleServiceQueries,
+} from '@app/lib/example-service.ts';
+import {
+  formatServiceTimestamp,
+  loadServiceShowcaseData,
+} from '../(_shared)/service-showcase.ts';
+
+type Props = NonNullable<InferDefinePageLayerLoaderProps<typeof loadServiceShowcaseData>>;
+type ServiceListData = NonNullable<Props['initialList']>;
+type MutationContext = { previous?: ServiceListData };
+
+const NEXT_STATUS_BY_STATE = {
+  draft: 'active',
+  active: 'archived',
+  archived: 'draft',
+} as const;
+
+function ServiceShowcaseLabInner(props: Props) {
+  const islandQueryClient = getIslandQueryClient();
+  const hydratedRef = useRef(false);
+  const statusMessage = useSignal<string | null>(null);
+
+  if (!hydratedRef.current && props.dehydratedState) {
+    hydrateFromDehydrated(islandQueryClient, props.dehydratedState);
+    hydratedRef.current = true;
+  }
+
+  const queryClient = useQueryClient();
+  const currentKey = exampleServiceQueries.list.clientKey(props.input);
+  const currentState = queryClient.getQueryState<ServiceListData>(currentKey);
+  const {
+    data,
+    isPending,
+    isRefetching,
+    refetch,
+  } = useQuery({
+    ...exampleServiceQueries.list.queryOptions(props.input),
+    initialData: props.initialList,
+    initialDataUpdatedAt: props.cachedAt,
+    staleTime: 15_000,
+  });
+
+  const statusMutation = useMutation({
+    ...exampleServiceQueries.updateStatus.mutationOptions(),
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: currentKey });
+      const previous = queryClient.getQueryData<ServiceListData>(currentKey);
+
+      if (previous) {
+        queryClient.setQueryData<ServiceListData>(currentKey, {
+          ...previous,
+          items: previous.items.map((item) =>
+            item.id === variables.id ? { ...item, status: variables.status } : item
+          ),
+        });
+      }
+
+      statusMessage.value = `Optimistically moved record #${variables.id} to ${variables.status}.`;
+      return { previous } satisfies MutationContext;
+    },
+    onError: (_error, variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(currentKey, context.previous);
+      }
+
+      statusMessage.value =
+        `Update for record #${variables.id} failed and the cached list rolled back.`;
+    },
+    onSuccess: (item) => {
+      statusMessage.value = `Server confirmed ${item.name} is now ${item.status}.`;
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries(exampleServiceListInvalidation);
+    },
+  });
+
+  const items = data?.items ?? props.initialList.items;
+
+  return (
+    <div class='ns-stack ns-stack--md'>
+      <div class='grid gap-3 md:grid-cols-4'>
+        <StatCard label='Hydration' value={hydratedRef.current ? 'warm cache' : 'pending'} />
+        <StatCard label='List state' value={currentState?.status ?? 'missing'} />
+        <StatCard label='Rows' value={String(items.length)} />
+        <StatCard
+          label='Cached at'
+          value={props.cachedAt ? formatServiceTimestamp(props.cachedAt) : 'server prefetched'}
+        />
+      </div>
+
+      <div class='flex flex-wrap items-center gap-3'>
+        <Button
+          type='button'
+          variant='outline'
+          loading={isPending || isRefetching}
+          onClick={() => void refetch()}
+        >
+          {isRefetching ? 'Refreshing list' : `Refresh ${exampleServiceName}`}
+        </Button>
+        <Button
+          type='button'
+          variant='secondary'
+          onClick={() => void queryClient.invalidateQueries(exampleServiceListInvalidation)}
+        >
+          Invalidate list cache
+        </Button>
+      </div>
+
+      {statusMessage.value
+        ? (
+          <p class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3 text-sm text-ns-muted-fg'>
+            {statusMessage.value}
+          </p>
+        )
+        : null}
+
+      <ul class='ns-stack ns-stack--sm'>
+        {items.map((item) => {
+          const nextStatus = NEXT_STATUS_BY_STATE[item.status];
+
+          return (
+            <li
+              key={item.id}
+              class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 p-4'
+            >
+              <div class='flex flex-wrap items-start justify-between gap-4'>
+                <div class='ns-stack ns-stack--xs'>
+                  <div class='flex flex-wrap items-center gap-2'>
+                    <p class='text-sm font-semibold text-ns-fg'>{item.name}</p>
+                    <span class='rounded-full border border-ns-border px-2 py-1 text-[0.68rem] uppercase tracking-[0.16em] text-ns-muted-fg'>
+                      {item.status}
+                    </span>
+                  </div>
+                  <p class='text-sm text-ns-muted-fg'>{item.summary}</p>
+                  <p class='text-xs text-ns-muted-fg'>
+                    Created {formatServiceTimestamp(item.createdAt)}
+                  </p>
+                </div>
+
+                <Button
+                  type='button'
+                  disabled={statusMutation.isPending}
+                  loading={statusMutation.isPending}
+                  onClick={() => void statusMutation.mutate({ id: item.id, status: nextStatus })}
+                >
+                  Advance to {nextStatus}
+                </Button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div class='rounded-2xl border border-ns-border bg-ns-surface-raised/20 px-4 py-3'>
+      <p class='text-[0.68rem] uppercase tracking-[0.18em] text-ns-muted-fg'>{label}</p>
+      <p class='mt-2 text-sm font-semibold text-ns-fg'>{value}</p>
+    </div>
+  );
+}
+
+export default function ServiceShowcaseLab(props: Props) {
+  return (
+    <QueryIsland>
+      <ServiceShowcaseLabInner {...props} />
+    </QueryIsland>
+  );
+}

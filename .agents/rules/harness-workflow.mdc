@@ -1,0 +1,22 @@
+---
+description: Use Harness v2 for substantial NetScript work.
+globs:
+  - ".llm/**"
+  - "packages/**"
+  - "plugins/**"
+  - "tools/fitness/**"
+alwaysApply: true
+---
+
+# Harness Workflow
+
+- Start substantial work from `.llm/harness/workflow/activation.md`; keep run artifacts under
+  `.llm/tmp/run/<run-id>/`.
+- Use `.llm/harness/workflow/run-loop.md` for the design checkpoint, implementation loop,
+  validation notes, and handoff.
+- For multi-branch work, follow `.llm/harness/workflow/supervisor.md`: each group gets its own
+  branch, nested run directory, separate evaluator, and `--no-ff` merge.
+- Use `.llm/harness/workflow/escalation.md` when scope changes, a gate cannot run, or accepted
+  debt is required.
+- Record architecture debt with `.llm/harness/templates/debt-entry.md`; do not hide doctrine
+  violations in prose-only docs.

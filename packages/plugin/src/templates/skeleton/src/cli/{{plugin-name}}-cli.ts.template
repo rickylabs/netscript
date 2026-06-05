@@ -1,0 +1,16 @@
+import { PluginCli } from '@netscript/plugin/cli';
+import type { PluginCliCommand } from '@netscript/plugin/cli';
+
+/** CLI command group for {{pluginName}}. */
+export class {{ClassName}}Cli extends PluginCli {
+  /** Plugin CLI name. */
+  readonly name = '{{pluginBaseName}}';
+
+  /** Plugin CLI description. */
+  readonly description = '{{pluginName}} CLI.';
+
+  /** Return plugin-owned commands. */
+  commands(): readonly PluginCliCommand[] {
+    return [];
+  }
+}

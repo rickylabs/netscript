@@ -1,0 +1,29 @@
+{
+  "name": "@netscript/runtime-config",
+  "version": "0.0.1-alpha.0",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "imports": {
+    "@std/path": "jsr:@std/path@^1.0.0"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "recommended"
+      ]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true
+  }
+}

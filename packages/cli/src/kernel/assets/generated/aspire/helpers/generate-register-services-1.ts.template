@@ -1,0 +1,48 @@
+{{__slot0__}}
+
+import type { DistributedApplicationBuilder } from '{{__slot1__}}';
+import type { NetScriptConfig } from '{{__slot2__}}';
+import type { InfrastructureContext } from './register-infrastructure.ts';
+import {
+  buildDatabaseUriEnvKey,
+  buildOtelEnvVars,
+  resolvePermissions,
+  resolveWorkspacePath,
+} from '{{__slot3__}}';
+
+type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+
+/**
+ * Registers services with the Aspire SDK builder using a two-pass approach.
+ *
+ * - Pass 1: Create all service resources via `addExecutable()` with resolved
+ *   permissions, working directory, HTTP endpoint, OTEL telemetry (3 vars
+ *   via `denoApp` mode), and infrastructure dependencies.
+ * - Pass 2: Wire `ServiceReferences` via `getEndpoint('http')` +
+ *   `withEnvironment()` using the Aspire service-discovery env var
+ *   convention (`services__{name}__http__0`) to avoid forward-reference
+ *   issues where service A references service B but B hasn't been created yet.
+ *
+ * @param builder - The Aspire distributed application builder
+ * @param config - Parsed NetScript configuration
+ * @param infrastructure - Infrastructure context with database/cache resources
+ * @param appHostDir - Absolute path to the AppHost directory
+ * @returns Map of registered service resources keyed by name
+ */
+export async function registerServices(
+  builder: DistributedApplicationBuilder,
+  config: NetScriptConfig,
+  infrastructure: InfrastructureContext,
+  appHostDir: string,
+): Promise<Map<string, ExecutableResource>> {
+  const services = new Map<string, ExecutableResource>();
+  const databaseEnvKey = buildDatabaseUriEnvKey(config);
+
+  // --- Pass 1: Create all service resources ---
+{{__slot4__}}
+
+  // --- Pass 2: Wire cross-references ---
+{{__slot5__}}
+
+  return services;
+}

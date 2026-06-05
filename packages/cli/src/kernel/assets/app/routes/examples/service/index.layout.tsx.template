@@ -1,0 +1,15 @@
+import { serviceExamplePageHooks } from './index.tsx';
+import { ServiceExamplePageLayout } from './(_components)/page-layout.tsx';
+
+export function ServiceExampleRouteLayout() {
+  const slots = serviceExamplePageHooks.useSlots();
+
+  return (
+    <ServiceExamplePageLayout
+      hero={slots.hero()}
+      lab={slots.lab()}
+      summary={slots.summary()}
+      notes={slots.notes()}
+    />
+  );
+}

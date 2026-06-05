@@ -1,0 +1,459 @@
+/**
+ * Fix Zod Imports Script
+ *
+ * Post-processes generated Zod schemas for Deno + browser compatibility:
+ * 1. Add .ts extensions to relative imports (Deno requires explicit extensions)
+ * 2. Fix circular self-references using z.lazy()
+ * 3. Convert getter patterns to Zod field definitions (prisma-zod-generator#377)
+ * 4. Fix isValidDecimalInput type signatures for .refine() compatibility
+ * 5. Replace z.instanceof(Prisma.Decimal) with duck-typing (prisma-zod-generator#367)
+ *
+ * For patching the Prisma client itself (client.ts → client.server.ts),
+ * use `patchPrismaClient` from `./patch-prisma-client.ts` instead.
+ *
+ * Usage:
+ *   import { fixZodImports, runFixZodImports } from '@netscript/database/scripts';
+ *   await runFixZodImports('./schema/.generated/zod');
+ *
+ * @module
+ */
+
+import { walk } from 'jsr:@std/fs@1/walk';
+import { dirname, join } from 'jsr:@std/path@1';
+
+// Helper function to generate the duck-typing Decimal schema
+const DECIMAL_SCHEMA_HELPER = `
+/**
+ * Duck-typing validator for Decimal-like values.
+ * Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367
+ * z.instanceof() fails across module boundaries, so we use duck-typing instead.
+ */
+const isDecimalLike = (v: unknown): boolean => {
+  if (v === null || v === undefined) return false;
+  if (typeof v === 'number' || typeof v === 'string') return true;
+  if (typeof v === 'object') {
+    const obj = v as Record<string, unknown>;
+    return 'd' in obj && 'e' in obj && 's' in obj && 'toFixed' in obj && typeof obj.toFixed === 'function';
+  }
+  return false;
+};
+`.trim();
+
+export interface FixZodImportsOptions {
+  verbose?: boolean;
+  fixDecimalImports?: boolean;
+}
+
+export interface FixZodImportsResult {
+  filesFixed: number;
+  importsFixed: number;
+  decimalFilesFixed: number;
+  decimalImportsFixed: number;
+}
+
+/**
+ * Fix relative imports in generated Zod files by adding .ts extensions
+ * and optionally fix Decimal imports for browser compatibility.
+ *
+ * @param zodOutputDir - Path to the generated Zod schema directory
+ * @param options - Configuration options
+ */
+export async function fixZodImports(
+  zodOutputDir: string,
+  options: FixZodImportsOptions = {},
+): Promise<FixZodImportsResult> {
+  const {
+    verbose = true,
+    fixDecimalImports = true,
+  } = options;
+  const log = verbose ? console.log.bind(console) : () => {};
+
+  const result: FixZodImportsResult = {
+    filesFixed: 0,
+    importsFixed: 0,
+    decimalFilesFixed: 0,
+    decimalImportsFixed: 0,
+  };
+
+  log('🔧 Fixing generated Zod schemas for Deno compatibility...');
+  log(`   Directory: ${zodOutputDir}`);
+  log('');
+
+  // ============================================================================
+  // PHASE 1: Add .ts extensions to relative imports
+  // ============================================================================
+
+  log('📦 Phase 1: Adding .ts extensions to relative imports...');
+
+  // Regex to match relative imports without .ts extension
+  const RELATIVE_IMPORT_REGEX = /(from\s+['"])(\.\.?\/[^'"]+)(['"])/g;
+
+  for await (const entry of walk(zodOutputDir, { exts: ['.ts'] })) {
+    if (!entry.isFile) continue;
+
+    const content = await Deno.readTextFile(entry.path);
+    const fileDir = dirname(entry.path);
+    let newContent = content;
+    let fileImportsFixed = 0;
+
+    newContent = content.replace(
+      RELATIVE_IMPORT_REGEX,
+      (match: string, prefix: string, path: string, suffix: string) => {
+        if (path.endsWith('.ts')) return match;
+
+        const resolvedPath = join(fileDir, path);
+        const indexPath = join(resolvedPath, 'index.ts');
+
+        try {
+          Deno.statSync(indexPath);
+          fileImportsFixed++;
+          return `${prefix}${path}/index.ts${suffix}`;
+        } catch {
+          fileImportsFixed++;
+          return `${prefix}${path}.ts${suffix}`;
+        }
+      },
+    );
+
+    if (fileImportsFixed > 0) {
+      await Deno.writeTextFile(entry.path, newContent);
+      result.filesFixed++;
+      result.importsFixed += fileImportsFixed;
+    }
+  }
+
+  log(`   ✅ Fixed ${result.importsFixed} imports across ${result.filesFixed} files`);
+
+  // ============================================================================
+  // PHASE 1.5: Cleanup stray semicolons from previous runs
+  // ============================================================================
+
+  let cleanupFilesFixed = 0;
+
+  for await (const entry of walk(zodOutputDir, { exts: ['.ts'] })) {
+    if (!entry.isFile) continue;
+
+    const content = await Deno.readTextFile(entry.path);
+
+    if (/^;\n/m.test(content) || /\n;\n/.test(content)) {
+      let newContent = content;
+      newContent = newContent.replace(/^;\n/gm, '');
+      newContent = newContent.replace(/\n;\n/g, '\n');
+      newContent = newContent.replace(/\n{3,}/g, '\n\n');
+
+      if (newContent !== content) {
+        await Deno.writeTextFile(entry.path, newContent);
+        cleanupFilesFixed++;
+      }
+    }
+  }
+
+  if (cleanupFilesFixed > 0) {
+    log(`   🧹 Cleaned up stray semicolons in ${cleanupFilesFixed} files`);
+  }
+
+  // ============================================================================
+  // PHASE 1.6: Fix circular references in all schemas with self-references
+  // ============================================================================
+
+  log('');
+  log('🔄 Phase 1.6: Fixing circular references in schemas...');
+
+  let circularRefFilesFixed = 0;
+
+  for await (const entry of walk(zodOutputDir, { exts: ['.ts'] })) {
+    if (!entry.isFile) continue;
+
+    let content = await Deno.readTextFile(entry.path);
+    let modified = false;
+
+    // Find the export statement to get the schema name
+    const exportMatch = content.match(/export const (\w+ObjectSchema):/);
+    if (!exportMatch) continue;
+
+    const schemaName = exportMatch[1];
+
+    // Check if the schema references itself (self-referential schema)
+    const selfRefRegex = new RegExp(`\\b${schemaName}\\b`, 'g');
+    const matches = content.match(selfRefRegex);
+
+    // If there are more than one reference (the export itself + at least one usage), it's self-referential
+    if (matches && matches.length > 1) {
+      // Replace direct references with z.lazy() wrapped versions in makeSchema
+      // But only inside the makeSchema function, not in the export statement
+      const makeSchemaMatch = content.match(
+        /const makeSchema = \(\) => (z\.object\(\{[\s\S]*?\}\))\.strict\(\);/,
+      );
+      if (makeSchemaMatch) {
+        const originalMakeSchema = makeSchemaMatch[0];
+        const schemaBody = makeSchemaMatch[1];
+
+        // Replace self-references with z.lazy() in the schema body
+        const fixedSchemaBody = schemaBody.replace(
+          new RegExp(`\\b${schemaName}\\b`, 'g'),
+          `z.lazy(() => ${schemaName})`,
+        );
+
+        if (fixedSchemaBody !== schemaBody) {
+          const fixedMakeSchema = originalMakeSchema.replace(schemaBody, fixedSchemaBody);
+          content = content.replace(originalMakeSchema, fixedMakeSchema);
+          modified = true;
+        }
+      }
+    }
+
+    if (modified) {
+      await Deno.writeTextFile(entry.path, content);
+      circularRefFilesFixed++;
+    }
+  }
+
+  log(`   ✅ Fixed circular references in ${circularRefFilesFixed} files`);
+
+  // ============================================================================
+  // PHASE 1.7: Fix getter pattern with .optional() (prisma-zod-generator#377)
+  // Converts: get field(){ return SchemaName.optional(); }
+  // To: field: z.optional(z.lazy(() => SchemaName))
+  // ============================================================================
+
+  log('');
+  log('🔄 Phase 1.7: Fixing getter patterns with .optional()...');
+
+  let getterFilesFixed = 0;
+  let getterPatternsFixed = 0;
+
+  // Pattern to match getter with .optional(): get fieldName(){ return SchemaName.optional(); }
+  const GETTER_OPTIONAL_PATTERN = /get\s+(\w+)\(\)\s*\{\s*return\s+(\w+)\.optional\(\);\s*\}/g;
+
+  // Pattern to match getter with .array().optional(): get fieldName(){ return SchemaName.array().optional(); }
+  const GETTER_ARRAY_OPTIONAL_PATTERN =
+    /get\s+(\w+)\(\)\s*\{\s*return\s+(\w+)\.array\(\)\.optional\(\);\s*\}/g;
+
+  // Pattern to match plain getter: get fieldName(){ return SchemaName; }
+  const GETTER_PLAIN_PATTERN = /get\s+(\w+)\(\)\s*\{\s*return\s+(\w+);\s*\}/g;
+
+  for await (const entry of walk(zodOutputDir, { exts: ['.ts'] })) {
+    if (!entry.isFile) continue;
+
+    let content = await Deno.readTextFile(entry.path);
+    let modified = false;
+    let filePatternCount = 0;
+
+    // Fix getter with .array().optional() first (more specific pattern)
+    const arrayOptionalMatches = content.matchAll(
+      new RegExp(GETTER_ARRAY_OPTIONAL_PATTERN.source, 'g'),
+    );
+    for (const match of arrayOptionalMatches) {
+      const [fullMatch, fieldName, schemaName] = match;
+      const replacement = `${fieldName}: z.optional(z.array(z.lazy(() => ${schemaName})))`;
+      content = content.replace(fullMatch, replacement);
+      modified = true;
+      filePatternCount++;
+    }
+
+    // Fix getter with .optional()
+    const optionalMatches = content.matchAll(new RegExp(GETTER_OPTIONAL_PATTERN.source, 'g'));
+    for (const match of optionalMatches) {
+      const [fullMatch, fieldName, schemaName] = match;
+      const replacement = `${fieldName}: z.optional(z.lazy(() => ${schemaName}))`;
+      content = content.replace(fullMatch, replacement);
+      modified = true;
+      filePatternCount++;
+    }
+
+    // Fix plain getter (no .optional())
+    const plainMatches = content.matchAll(new RegExp(GETTER_PLAIN_PATTERN.source, 'g'));
+    for (const match of plainMatches) {
+      const [fullMatch, fieldName, schemaName] = match;
+      const replacement = `${fieldName}: z.lazy(() => ${schemaName})`;
+      content = content.replace(fullMatch, replacement);
+      modified = true;
+      filePatternCount++;
+    }
+
+    if (modified) {
+      await Deno.writeTextFile(entry.path, content);
+      getterFilesFixed++;
+      getterPatternsFixed += filePatternCount;
+    }
+  }
+
+  log(`   ✅ Fixed ${getterPatternsFixed} getter patterns in ${getterFilesFixed} files`);
+
+  // ============================================================================
+  // PHASE 1.8: Fix isValidDecimalInput type signature for .refine() compatibility
+  // ============================================================================
+  // The generated isValidDecimalInput function has a typed parameter, but .refine()
+  // passes `unknown`. We need to change the parameter type to `unknown`.
+
+  log('');
+  log('🔧 Phase 1.8: Fixing isValidDecimalInput type signatures...');
+
+  let decimalInputFilesFixed = 0;
+
+  // Pattern to match the generated typed isValidDecimalInput function signature.
+  // Keep this whitespace-tolerant because prisma-zod-generator formatting varies.
+  const TYPED_DECIMAL_INPUT_REGEX =
+    /const isValidDecimalInput = \([\s\S]*?\)\s*:\s*v is[\s\S]*?=>\s*\{/g;
+
+  const FIXED_DECIMAL_INPUT = `const isValidDecimalInput = (
+  v: unknown,
+): v is string | number | { d: number[]; e: number; s: number; toFixed: (dp?: number) => string } => {`;
+
+  for await (const entry of walk(zodOutputDir, { exts: ['.ts'] })) {
+    if (!entry.isFile) continue;
+
+    let content = await Deno.readTextFile(entry.path);
+
+    if (TYPED_DECIMAL_INPUT_REGEX.test(content)) {
+      TYPED_DECIMAL_INPUT_REGEX.lastIndex = 0;
+      const newContent = content.replace(TYPED_DECIMAL_INPUT_REGEX, FIXED_DECIMAL_INPUT);
+
+      // Also need to add null check for 'in' operator
+      const fixedContent = newContent.replace(
+        /\(typeof v === 'object' &&\s*'d' in v/g,
+        "(typeof v === 'object' &&\n      v !== null &&\n      'd' in v",
+      );
+
+      if (fixedContent !== content) {
+        await Deno.writeTextFile(entry.path, fixedContent);
+        decimalInputFilesFixed++;
+      }
+    }
+  }
+
+  log(`   ✅ Fixed isValidDecimalInput in ${decimalInputFilesFixed} files`);
+
+  // ============================================================================
+  // PHASE 2: Fix Decimal imports (prisma-zod-generator#367)
+  // ============================================================================
+
+  if (fixDecimalImports) {
+    log('');
+    log('💰 Phase 2: Fixing Decimal imports for browser compatibility...');
+    log('   Workaround for: https://github.com/omar-dulaimi/prisma-zod-generator/issues/367');
+
+    const PRISMA_IMPORT_REGEX = /import\s*\{\s*Prisma\s*\}\s*from\s*['"][^'"]+client\.ts['"];?\n?/g;
+    const PRISMA_DECIMAL_INSTANCEOF_REGEX = /z\.instanceof\(Prisma\.Decimal/g;
+    const PRISMA_DECIMAL_IMPORT_REGEX =
+      /import\s*\{\s*Decimal\s+as\s+PrismaDecimal\s*\}\s*from\s*['"][^'"]+prismaNamespaceBrowser\.ts['"];?\n?/g;
+    const PRISMA_DECIMAL_INSTANCEOF_V2_REGEX = /z\.instanceof\(PrismaDecimal/g;
+
+    for await (const entry of walk(zodOutputDir, { exts: ['.ts'] })) {
+      if (!entry.isFile) continue;
+
+      let content = await Deno.readTextFile(entry.path);
+      let modified = false;
+
+      const hasPrismaDecimal = PRISMA_DECIMAL_INSTANCEOF_REGEX.test(content);
+      const hasPrismaDecimalV2 = PRISMA_DECIMAL_INSTANCEOF_V2_REGEX.test(content);
+
+      PRISMA_DECIMAL_INSTANCEOF_REGEX.lastIndex = 0;
+      PRISMA_DECIMAL_INSTANCEOF_V2_REGEX.lastIndex = 0;
+
+      if (hasPrismaDecimal || hasPrismaDecimalV2) {
+        const beforePrismaImport = content;
+        content = content.replace(PRISMA_IMPORT_REGEX, '');
+        if (content !== beforePrismaImport) modified = true;
+
+        const beforePrismaDecimalImport = content;
+        content = content.replace(PRISMA_DECIMAL_IMPORT_REGEX, '');
+        if (content !== beforePrismaDecimalImport) modified = true;
+
+        if (!content.includes('isDecimalLike')) {
+          const lastImportMatch = [...content.matchAll(/^import\s.+;?\n/gm)].pop();
+          const insertIndex = lastImportMatch
+            ? (lastImportMatch.index ?? 0) + lastImportMatch[0].length
+            : 0;
+
+          content = content.slice(0, insertIndex) +
+            '\n' + DECIMAL_SCHEMA_HELPER + '\n\n' +
+            content.slice(insertIndex);
+          modified = true;
+        }
+
+        const beforeReplace = content;
+
+        content = content.replace(
+          /z\.instanceof\(Prisma\.Decimal,\s*\{\s*message:\s*("[^"]+"|'[^']+')\s*,?\s*\}\)/g,
+          (_: string, message: string) => `z.custom(isDecimalLike, { message: ${message} })`,
+        );
+
+        content = content.replace(
+          /z\.instanceof\(PrismaDecimal,\s*\{\s*message:\s*("[^"]+"|'[^']+')\s*,?\s*\}\)/g,
+          (_: string, message: string) => `z.custom(isDecimalLike, { message: ${message} })`,
+        );
+
+        content = content.replace(
+          /z\.instanceof\(Prisma\.Decimal\)/g,
+          'z.custom(isDecimalLike)',
+        );
+
+        content = content.replace(
+          /z\.instanceof\(PrismaDecimal\)/g,
+          'z.custom(isDecimalLike)',
+        );
+
+        content = content.replace(
+          /v\s+instanceof\s+Prisma\.Decimal/g,
+          'isDecimalLike(v)',
+        );
+
+        content = content.replace(
+          /z\.ZodType<Prisma\.DecimalJsLike>/g,
+          'z.ZodType<{ d: number[]; e: number; s: number; toFixed: (dp?: number) => string }>',
+        );
+
+        content = content.replace(
+          /Prisma\.DecimalJsLike/g,
+          '{ d: number[]; e: number; s: number; toFixed: (dp?: number) => string }',
+        );
+
+        content = content.replace(
+          /z\.ZodType<Prisma\.\w+>/g,
+          'z.ZodType<unknown>',
+        );
+
+        if (content !== beforeReplace) {
+          modified = true;
+          result.decimalImportsFixed++;
+        }
+
+        if (modified) {
+          content = content.replace(/^;\n/gm, '');
+          content = content.replace(/\n;\n/g, '\n');
+          content = content.replace(/\n{3,}/g, '\n\n');
+          content = content.replace(/^\n+/, '');
+
+          await Deno.writeTextFile(entry.path, content);
+          result.decimalFilesFixed++;
+        }
+      }
+    }
+
+    log(
+      `   ✅ Fixed ${result.decimalImportsFixed} Decimal references across ${result.decimalFilesFixed} files`,
+    );
+  }
+
+  log('');
+  log('🎉 All fixes applied successfully!');
+  log('');
+
+  return result;
+}
+
+/**
+ * CLI runner for fix-zod-imports
+ * Call this from your database-specific script
+ */
+export async function runFixZodImports(
+  zodOutputDir: string,
+  options: FixZodImportsOptions = {},
+): Promise<void> {
+  const result = await fixZodImports(zodOutputDir, options);
+
+  if (result.filesFixed === 0 && result.decimalFilesFixed === 0) {
+    console.log('ℹ️  No files needed fixing');
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@netscript/prisma-adapter-mysql",
+  "version": "0.0.1-alpha.0",
+  "exports": "./src/mod.ts",
+  "imports": {
+    "@prisma/driver-adapter-utils": "npm:@prisma/driver-adapter-utils@^7.4.2",
+    "mysql": "npm:mysql2@^3.22.3"
+  },
+  "tasks": {
+    "check": "deno check src/mod.ts",
+    "test": "deno test --allow-net --allow-env"
+  },
+  "compilerOptions": {
+    "skipLibCheck": true
+  }
+}

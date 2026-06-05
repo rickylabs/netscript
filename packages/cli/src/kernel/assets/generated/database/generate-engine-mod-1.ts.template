@@ -1,0 +1,71 @@
+/**
+ * {{__slot0__}} database module.
+ *
+ * @module
+ */
+
+import { enablePrismaTracing } from '@netscript/database/tracing';
+{{__slot1__}}
+import { PrismaClient as {{__slot2__}} } from './schema/.generated/{{__slot3__}}';
+
+if (Deno.env.get('OTEL_DENO') === 'true') {
+  enablePrismaTracing();
+}
+
+let client: {{__slot4__}} | null = null;
+
+function getClientSync(): {{__slot5__}} {
+  if (!client) {
+{{__slot6__}}
+  }
+  return client;
+}
+
+/** Get the {{__slot7__}} Prisma client. */
+export function {{__slot8__}}(): Promise<{{__slot9__}}> {
+  return Promise.resolve(getClientSync());
+}
+
+/** Unified database facade for this workspace. */
+export const db = {
+  get {{__slot10__}}(): {{__slot11__}} {
+    return getClientSync();
+  },
+
+  get client(): {{__slot12__}} {
+    return getClientSync();
+  },
+
+  getClient(): Promise<{{__slot13__}}> {
+    return Promise.resolve(getClientSync());
+  },
+
+  async disconnect(): Promise<void> {
+    if (client) {
+      await client.$disconnect();
+      client = null;
+    }
+  },
+
+  async healthCheck(): Promise<Record<string, boolean>> {
+    try {
+      await getClientSync().$queryRawUnsafe('{{__slot14__}}');
+      return { {{__slot15__}}: true };
+    } catch {
+      return { {{__slot16__}}: false };
+    }
+  },
+};
+
+{{__slot17__}}
+
+export * from './schema/.generated/{{__slot18__}}';
+
+/** Database client map for typed service contexts. */
+export type DB = {
+  readonly {{__slot19__}}: {{__slot20__}};
+  readonly client: {{__slot21__}};
+};
+
+export { {{__slot22__}} };
+export default db;

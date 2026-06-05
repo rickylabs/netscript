@@ -1,0 +1,20 @@
+/**
+ * @module contracts/versions/v1
+ *
+ * Version 1 contract definitions.
+ *
+ * Each service exposes its surface through this aggregate so that
+ * generated clients and service routers reference `v1.<service>...`
+ * without knowing how the contract file is laid out.
+ */
+
+{{imports}}
+
+export {
+{{exports}}
+};
+{{typeExports}}
+
+export const v1 = {
+{{aggregateEntries}}
+};

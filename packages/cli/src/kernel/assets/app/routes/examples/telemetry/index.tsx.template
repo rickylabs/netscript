@@ -1,0 +1,32 @@
+import { TelemetryView } from './(_components)/telemetry-view.tsx';
+import { fetchDashboardTraces, fireWebhookTrace } from './(_shared)/telemetry-trace.ts';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+
+export const telemetryPage = definePage()
+  .withRoute(appRoutes.telemetryExample)
+  .withTelemetry({ enabled: true, spanName: 'scaffold.examples.telemetry' })
+  .withMeta(() => ({
+    title: '{{name}} — telemetry traces',
+    description: 'Live Aspire Dashboard trace explorer with E2E webhook trigger.',
+  }))
+  .withHandler('POST', async () => {
+    const result = await fireWebhookTrace();
+    const status = result.ok ? 'fired' : 'error';
+    await new Promise((r) => setTimeout(r, 1500));
+    return new Response(null, {
+      status: 303,
+      headers: { Location: `/examples/telemetry?webhook=${status}` },
+    });
+  })
+  .withLayer('content', TelemetryView, {
+    loader: async () => ({
+      data: await fetchDashboardTraces(),
+      examplesHref: appRoutes.examples.href(),
+    }),
+  })
+  .withLayout((slots) => slots.content())
+  .build();
+
+export const { default: page } = telemetryPage;
+export { page as default };

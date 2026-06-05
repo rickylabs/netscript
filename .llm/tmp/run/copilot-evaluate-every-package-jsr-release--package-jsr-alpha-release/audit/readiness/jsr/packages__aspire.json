@@ -1,0 +1,212 @@
+{
+  "pkg": {
+    "name": "@netscript/aspire",
+    "version": "0.1.0",
+    "description": "Config parsing, type exports, and SDK-agnostic helpers for Aspire TypeScript AppHost",
+    "root": "packages/aspire"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./config": "./config.ts",
+    "./schema": "./schema.ts",
+    "./types": "./types.ts",
+    "./constants": "./constants.ts",
+    "./helpers": "./helpers/mod.ts"
+  },
+  "files": {
+    "total": 15,
+    "loc": 1909,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 3914
+      },
+      {
+        "path": "config.ts",
+        "bytes": 13841
+      },
+      {
+        "path": "schema.ts",
+        "bytes": 1796
+      },
+      {
+        "path": "types.ts",
+        "bytes": 5294
+      },
+      {
+        "path": "constants.ts",
+        "bytes": 5105
+      },
+      {
+        "path": "helpers/mod.ts",
+        "bytes": 1136
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 312,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./config": true,
+      "./schema": true,
+      "./types": true,
+      "./constants": true,
+      "./helpers": true
+    },
+    "descriptionLen": 84
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "AppEntrySchema",
+        "AppSettingsSchema",
+        "AppTypeSchema",
+        "BackgroundProcessorEntrySchema",
+        "CONFIG_KEYS",
+        "CONFIG_SECTIONS",
+        "CacheEngineSchema",
+        "CacheEntrySchema",
+        "DASHBOARD_ENV_VARS",
+        "DEFAULT_PERMISSIONS",
+        "DatabaseEngineSchema",
+        "DatabaseEntrySchema",
+        "DenoDefaultsSchema",
+        "NetScriptConfigSchema",
+        "OTEL_DEFAULTS",
+        "OTEL_ENV_VARS",
+        "OtelConfigSchema",
+        "PluginEntrySchema",
+        "RESOURCE_DEFAULTS",
+        "ResourceModeSchema",
+        "ServiceEntrySchema",
+        "ToolEntrySchema",
+        "buildOtelEnvVars",
+        "buildViteEnvVarName",
+        "extractDependencies",
+        "extractPluginReferences",
+        "extractServiceReferences",
+        "generateAppSettingsJsonSchema",
+        "parseAppSettings",
+        "resolveDataPath",
+        "resolvePermissions",
+        "resolveWorkdir",
+        "resolveWorkspacePath"
+      ],
+      "rawCount": 33
+    },
+    "./config": {
+      "exported": [
+        "AppEntrySchema",
+        "AppSettingsSchema",
+        "AppTypeSchema",
+        "BackgroundProcessorEntrySchema",
+        "CacheEngineSchema",
+        "CacheEntrySchema",
+        "DatabaseEngineSchema",
+        "DatabaseEntrySchema",
+        "DefaultsSchema",
+        "DenoDefaultsSchema",
+        "NetScriptConfigSchema",
+        "OtelConfigSchema",
+        "ParseOptions",
+        "ParseResult",
+        "PluginEntrySchema",
+        "ResourceModeSchema",
+        "ServiceEntrySchema",
+        "ToolEntrySchema",
+        "parseAppSettings"
+      ],
+      "rawCount": 19
+    },
+    "./schema": {
+      "exported": [
+        "generateAppSettingsJsonSchema"
+      ],
+      "rawCount": 1
+    },
+    "./types": {
+      "exported": [
+        "AppEntry",
+        "AppEntryOf",
+        "AppSettings",
+        "AppType",
+        "BackgroundProcessorEntry",
+        "BackgroundProcessorEntryOf",
+        "CacheEngine",
+        "CacheEntry",
+        "CacheEntryOf",
+        "DatabaseEngine",
+        "DatabaseEntry",
+        "DatabaseEntryOf",
+        "DenoDefaults",
+        "KnownApps",
+        "KnownBackgroundProcessors",
+        "KnownCaches",
+        "KnownDatabases",
+        "KnownPlugins",
+        "KnownServices",
+        "NetScriptConfig",
+        "OtelConfig",
+        "PluginEntry",
+        "PluginEntryOf",
+        "ResourceDependencies",
+        "ResourceMode",
+        "ServiceEntry",
+        "ServiceEntryOf",
+        "ToolEntry"
+      ],
+      "rawCount": 28
+    },
+    "./constants": {
+      "exported": [
+        "CONFIG_KEYS",
+        "CONFIG_SECTIONS",
+        "DASHBOARD_ENV_VARS",
+        "DEFAULT_PERMISSIONS",
+        "OTEL_DEFAULTS",
+        "OTEL_ENV_VARS",
+        "RESOURCE_DEFAULTS"
+      ],
+      "rawCount": 7
+    },
+    "./helpers": {
+      "exported": [
+        "DASHBOARD_ENV_VARS",
+        "buildOtelEnvVars",
+        "buildViteEnvVarName",
+        "extractDependencies",
+        "extractPluginReferences",
+        "extractServiceReferences",
+        "resolveDataPath",
+        "resolvePermissions",
+        "resolveWorkdir",
+        "resolveWorkspacePath"
+      ],
+      "rawCount": 10
+    }
+  },
+  "tests": {
+    "fileCount": 4,
+    "files": [
+      "tests/types_test.ts",
+      "tests/helpers_test.ts",
+      "tests/config_test.ts",
+      "tests/schema_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-DOCT-4 vocabulary",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' (utils/helpers/common/lib/interfaces) — needs migration plan + debt entry",
+      "path": "helpers"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

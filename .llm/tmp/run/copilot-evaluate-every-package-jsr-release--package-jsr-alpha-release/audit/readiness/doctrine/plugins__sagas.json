@@ -1,0 +1,46 @@
+{
+  "root": "plugins/sagas",
+  "pkg": "sagas",
+  "totals": {
+    "fail": 0,
+    "warn": 4,
+    "info": 2
+  },
+  "findings": [
+    {
+      "ref": "A3",
+      "level": "WARN",
+      "message": "README has only 0 TS code fences — needs ≥ 2 (basic + advanced) for the 80% path"
+    },
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 742 lines (cap 500) — split into smaller single-reason files",
+      "path": "services/src/routers/v1.ts"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    },
+    {
+      "ref": "A12",
+      "level": "INFO",
+      "message": "package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md"
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "mod.ts",
+      "line": 103
+    },
+    {
+      "ref": "AP-19",
+      "level": "WARN",
+      "message": "`export default` — JSR penalises (no auto-doc); use named exports",
+      "path": "services/src/main.ts",
+      "line": 35
+    }
+  ]
+}

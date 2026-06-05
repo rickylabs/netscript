@@ -1,0 +1,8 @@
+var builder = DistributedApplication.CreateBuilder(args);
+
+builder.AddDenoApp("{{appName}}", "main.ts", permissionFlags: ["--allow-all"])
+    .WithWorkingDirectory(Path.Combine(builder.AppHostDirectory, "..", "..", "apps", "{{appName}}"))
+    .WithHttpEndpoint(port: {{appPort}}, env: "PORT")
+    .WithExternalHttpEndpoints();
+
+builder.Build().Run();
