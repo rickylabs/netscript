@@ -1,0 +1,22 @@
+{
+  "root": "packages/aspire",
+  "pkg": "aspire",
+  "totals": {
+    "fail": 0,
+    "warn": 1,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "AP-7/F-DOCT-4",
+      "level": "WARN",
+      "message": "forbidden folder name 'helpers' — split into domain/, application/, or adapters/ aligned to a real concern",
+      "path": "helpers"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "root": "packages/telemetry",
+  "pkg": "telemetry",
+  "totals": {
+    "fail": 1,
+    "warn": 34,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '0.1.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.strict",
+      "level": "FAIL",
+      "message": "deno.json compilerOptions.strict must be true"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 16 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'contextWithSpan' uses non-standard prefix 'context' — consult STANDARDS § 4.1",
+      "path": "src/context/helpers.ts",
+      "line": 11
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'injectContext' uses non-standard prefix 'inject' — consult STANDARDS § 4.1",
+      "path": "src/context/w3c.ts",
+      "line": 64
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractContext' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/context/w3c.ts",
+      "line": 101
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractFromTraceContext' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/context/w3c.ts",
+      "line": 132
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractJobTraceContext' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/context/job.ts",
+      "line": 21
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'TelemetryConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/config/constants.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'resetConfig' uses non-standard prefix 'reset' — consult STANDARDS § 4.1",
+      "path": "src/config/singleton.ts",
+      "line": 13
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'describeTelemetryConfig' uses non-standard prefix 'describe' — consult STANDARDS § 4.1",
+      "path": "src/config/environment.ts",
+      "line": 78
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'traceSSEEvent' uses non-standard prefix 'trace' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/sse.ts",
+      "line": 294
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractTraceContextFromRecord' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/sse.ts",
+      "line": 378
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateSSEClientId' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/sse.ts",
+      "line": 418
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'recordSSEMetrics' uses non-standard prefix 'record' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/sse.ts",
+      "line": 427
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'traceJobExecution' uses non-standard prefix 'trace' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/worker.ts",
+      "line": 182
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addJobStepEvent' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/worker.ts",
+      "line": 484
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'recordJobProgress' uses non-standard prefix 'record' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/worker.ts",
+      "line": 501
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'recordWorkerMetrics' uses non-standard prefix 'record' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/worker.ts",
+      "line": 528
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'TracedWorkerConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "src/instrumentation/worker.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'injectTraceContextToHeaders' uses non-standard prefix 'inject' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/saga.ts",
+      "line": 241
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractTraceContextFromHeaders' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/saga.ts",
+      "line": 250
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'prepareTracedHeaders' uses non-standard prefix 'prepare' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/saga.ts",
+      "line": 527
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractHttpTraceHeaders' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/saga.ts",
+      "line": 575
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'traceSchedulerTick' uses non-standard prefix 'trace' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/scheduler.ts",
+      "line": 179
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'traceJobDispatch' uses non-standard prefix 'trace' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/scheduler.ts",
+      "line": 329
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'recordCronJobRun' uses non-standard prefix 'record' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/scheduler.ts",
+      "line": 488
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'recordSchedulerReload' uses non-standard prefix 'record' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/scheduler.ts",
+      "line": 516
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'traceQueue' uses non-standard prefix 'trace' — consult STANDARDS § 4.1",
+      "path": "src/instrumentation/queue.ts",
+      "line": 358
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addSpanEvent' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/core/span-utils.ts",
+      "line": 18
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'spanName' uses non-standard prefix 'span' — consult STANDARDS § 4.1",
+      "path": "src/attributes/spans.ts",
+      "line": 29
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'addEvent' uses non-standard prefix 'add' — consult STANDARDS § 4.1",
+      "path": "src/orpc/handler-context.ts",
+      "line": 227
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractInputKeys' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "src/orpc/_utils.ts",
+      "line": 8
+    },
+    {
+      "ref": "NS-S-6.sections",
+      "level": "WARN",
+      "message": "README missing 9/12 mandated sections (Overview, Quickstart, Mental model, API, Recipes, Configuration, Testing, Observability, Architecture, Stability, Compatibility, License)"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

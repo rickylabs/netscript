@@ -1,0 +1,181 @@
+{
+  "root": "packages/database",
+  "pkg": "database",
+  "totals": {
+    "fail": 6,
+    "warn": 21,
+    "info": 2
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.license",
+      "level": "FAIL",
+      "message": "deno.json `license` field missing (must be `MIT` for alpha)"
+    },
+    {
+      "ref": "NS-S-1.description",
+      "level": "FAIL",
+      "message": "deno.json `description` missing"
+    },
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '1.0.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.publish-include",
+      "level": "FAIL",
+      "message": "deno.json `publish.include` missing — `deno publish` ships everything by default and that leaks tests/scratch"
+    },
+    {
+      "ref": "NS-S-1.publish-exclude",
+      "level": "WARN",
+      "message": "deno.json `publish.exclude` should explicitly drop `**/*_test.ts`, `tests/`, `examples/`"
+    },
+    {
+      "ref": "NS-S-1.strict",
+      "level": "FAIL",
+      "message": "deno.json compilerOptions.strict must be true"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.size",
+      "level": "WARN",
+      "message": "mod.ts is 265 lines; convention cap is 200 — split into sub-entrypoints"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 108 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateZodSchemas' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "scripts/generate-zod.ts",
+      "line": 33
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateZodSchemasCli' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "scripts/generate-zod.ts",
+      "line": 79
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'patchPrismaClient' uses non-standard prefix 'patch' — consult STANDARDS § 4.1",
+      "path": "scripts/patch-prisma-client.ts",
+      "line": 58
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'fixZodImports' uses non-standard prefix 'fix' — consult STANDARDS § 4.1",
+      "path": "scripts/fix-zod-imports.ts",
+      "line": 61
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'enableInstrumentation' uses non-standard prefix 'enable' — consult STANDARDS § 4.1",
+      "path": "mod.ts",
+      "line": 53
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'MssqlAdapterConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "adapters/mssql.adapter.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'MysqlAdapterConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "adapters/mysql.adapter.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SharedDatabaseConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "interfaces/database-client.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'enablePrismaTracing' uses non-standard prefix 'enable' — consult STANDARDS § 4.1",
+      "path": "prisma-tracing.ts",
+      "line": 229
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'disablePrismaTracing' uses non-standard prefix 'disable' — consult STANDARDS § 4.1",
+      "path": "prisma-tracing.ts",
+      "line": 241
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'PrismaTracingConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "prisma-tracing.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'sqlJsonExtension' uses non-standard prefix 'sql' — consult STANDARDS § 4.1",
+      "path": "extensions/sql-json.extension.ts",
+      "line": 496
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'mssqlJsonExtension' uses non-standard prefix 'mssql' — consult STANDARDS § 4.1",
+      "path": "extensions/sql-json.extension.ts",
+      "line": 518
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'mysqlJsonExtension' uses non-standard prefix 'mysql' — consult STANDARDS § 4.1",
+      "path": "extensions/sql-json.extension.ts",
+      "line": 528
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'JsonFieldConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "extensions/sql-json.extension.ts"
+    },
+    {
+      "ref": "NS-S-6",
+      "level": "FAIL",
+      "message": "README.md missing"
+    },
+    {
+      "ref": "NS-S-8.coverage",
+      "level": "FAIL",
+      "message": "no tests/ directory and no inline *_test.ts files — every package needs meaningful tests"
+    },
+    {
+      "ref": "NS-S-9.logger",
+      "level": "WARN",
+      "message": "package owns runtime/adapters but does not import @netscript/logger"
+    },
+    {
+      "ref": "NS-S-9.telemetry",
+      "level": "INFO",
+      "message": "package owns runtime/adapters but does not import @netscript/telemetry — verify spans/metrics emitted"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

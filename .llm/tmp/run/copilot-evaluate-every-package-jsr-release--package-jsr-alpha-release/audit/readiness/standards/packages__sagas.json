@@ -1,0 +1,179 @@
+{
+  "root": "packages/sagas",
+  "pkg": "sagas",
+  "totals": {
+    "fail": 5,
+    "warn": 21,
+    "info": 3
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.license",
+      "level": "FAIL",
+      "message": "deno.json `license` field missing (must be `MIT` for alpha)"
+    },
+    {
+      "ref": "NS-S-1.description",
+      "level": "FAIL",
+      "message": "deno.json `description` missing"
+    },
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '0.1.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.publish-include",
+      "level": "FAIL",
+      "message": "deno.json `publish.include` missing — `deno publish` ships everything by default and that leaks tests/scratch"
+    },
+    {
+      "ref": "NS-S-1.publish-exclude",
+      "level": "WARN",
+      "message": "deno.json `publish.exclude` should explicitly drop `**/*_test.ts`, `tests/`, `examples/`"
+    },
+    {
+      "ref": "NS-S-1.strict",
+      "level": "FAIL",
+      "message": "deno.json compilerOptions.strict must be true"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 49 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-3.sections",
+      "level": "INFO",
+      "message": "mod.ts lacks section comment headers — recommended for navigability"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'resetSagaRegistry' uses non-standard prefix 'reset' — consult STANDARDS § 4.1",
+      "path": "registry/saga-registry.ts",
+      "line": 420
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'triggerJob' uses non-standard prefix 'trigger' — consult STANDARDS § 4.1",
+      "path": "integration/workers-client.ts",
+      "line": 115
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'triggerJobSafe' uses non-standard prefix 'trigger' — consult STANDARDS § 4.1",
+      "path": "integration/workers-client.ts",
+      "line": 180
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'triggerTask' uses non-standard prefix 'trigger' — consult STANDARDS § 4.1",
+      "path": "integration/workers-client.ts",
+      "line": 235
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'triggerTaskSafe' uses non-standard prefix 'trigger' — consult STANDARDS § 4.1",
+      "path": "integration/workers-client.ts",
+      "line": 289
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'resetSagaBus' uses non-standard prefix 'reset' — consult STANDARDS § 4.1",
+      "path": "factory/create-saga-bus.ts",
+      "line": 582
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'continueWith' uses non-standard prefix 'continue' — consult STANDARDS § 4.1",
+      "path": "helpers/mod.ts",
+      "line": 221
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'completeWith' uses non-standard prefix 'complete' — consult STANDARDS § 4.1",
+      "path": "helpers/mod.ts",
+      "line": 228
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaTimeoutConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types/saga.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaRetryConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types/saga.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types/config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaScalingConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types/config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaRetentionConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types/config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaGroupConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types/config.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagasConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types/config.ts"
+    },
+    {
+      "ref": "NS-S-6.sections",
+      "level": "WARN",
+      "message": "README missing 9/12 mandated sections (Overview, Quickstart, Mental model, API, Recipes, Configuration, Testing, Observability, Architecture, Stability, Compatibility, License)"
+    },
+    {
+      "ref": "NS-S-8.coverage",
+      "level": "FAIL",
+      "message": "no tests/ directory and no inline *_test.ts files — every package needs meaningful tests"
+    },
+    {
+      "ref": "NS-S-9.logger",
+      "level": "WARN",
+      "message": "package owns runtime/adapters but does not import @netscript/logger"
+    },
+    {
+      "ref": "NS-S-9.telemetry",
+      "level": "INFO",
+      "message": "package owns runtime/adapters but does not import @netscript/telemetry — verify spans/metrics emitted"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

@@ -1,0 +1,422 @@
+{
+  "root": "packages/fresh",
+  "pkg": "fresh",
+  "totals": {
+    "fail": 1,
+    "warn": 60,
+    "info": 2
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '1.0.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.strict",
+      "level": "FAIL",
+      "message": "deno.json compilerOptions.strict must be true"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 23 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-3.sections",
+      "level": "INFO",
+      "message": "mod.ts lacks section comment headers — recommended for navigability"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'discoverNetScriptRoutes' uses non-standard prefix 'discover' — consult STANDARDS § 4.1",
+      "path": "route/manifest.ts",
+      "line": 327
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'bindRoutePattern' uses non-standard prefix 'bind' — consult STANDARDS § 4.1",
+      "path": "route/mod.ts",
+      "line": 631
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'enumPathParamSchema' uses non-standard prefix 'enum' — consult STANDARDS § 4.1",
+      "path": "route/mod.ts",
+      "line": 675
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'fallback' uses non-standard prefix 'fallback' — consult STANDARDS § 4.1",
+      "path": "route/mod.ts",
+      "line": 721
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'paginationSearchSchema' uses non-standard prefix 'pagination' — consult STANDARDS § 4.1",
+      "path": "route/mod.ts",
+      "line": 737
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RouteHrefArgs' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "route/mod.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'PairedRouteHrefArgs' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "route/mod.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'enumPathParamSchema' uses non-standard prefix 'enum' — consult STANDARDS § 4.1",
+      "path": "route/contract.ts",
+      "line": 279
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'pairRouteTargets' uses non-standard prefix 'pair' — consult STANDARDS § 4.1",
+      "path": "route/contract.ts",
+      "line": 444
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'bindRoutePattern' uses non-standard prefix 'bind' — consult STANDARDS § 4.1",
+      "path": "route/contract.ts",
+      "line": 524
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'classifyErrorType' uses non-standard prefix 'classify' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 57
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractErrorData' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 139
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'errorHandler' uses non-standard prefix 'error' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 228
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'errorHandler' uses non-standard prefix 'error' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 236
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'errorHandler' uses non-standard prefix 'error' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 243
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractData' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 322
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractDataWithFallback' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 344
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractErrorWithFallback' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 364
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'safeParseData' uses non-standard prefix 'safe' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 387
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'safeParseDataWithFallback' uses non-standard prefix 'safe' — consult STANDARDS § 4.1",
+      "path": "error/handler.ts",
+      "line": 406
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'minCachedAt' uses non-standard prefix 'min' — consult STANDARDS § 4.1",
+      "path": "utils/cache-entry.ts",
+      "line": 18
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'projectCachedItemFromList' uses non-standard prefix 'project' — consult STANDARDS § 4.1",
+      "path": "utils/cache-entry.ts",
+      "line": 28
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'minCachedAt' uses non-standard prefix 'min' — consult STANDARDS § 4.1",
+      "path": "utils/mod.ts",
+      "line": 40
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'projectCachedItemFromList' uses non-standard prefix 'project' — consult STANDARDS § 4.1",
+      "path": "utils/mod.ts",
+      "line": 49
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'PartialRouteConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/mod.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'PageTelemetryConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/mod.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'PageLayerConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/mod.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'PageFormConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/mod.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RuntimePageConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/define-page/internal.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'HasPathParams' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/define-page/types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DefinePageTelemetryConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/define-page/types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DefinePageWithPathParams' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/define-page/types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DefinePageWithSearchParams' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/define-page/types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DefinePageWithParams' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/define-page/types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DefinePageLayerConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "builders/define-page/types.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'searchParamsToInput' uses non-standard prefix 'search' — consult STANDARDS § 4.1",
+      "path": "builders/define-page/search-params.ts",
+      "line": 27
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'fallback' uses non-standard prefix 'fallback' — consult STANDARDS § 4.1",
+      "path": "builders/define-page/search-params.ts",
+      "line": 125
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'paginationSearchSchema' uses non-standard prefix 'pagination' — consult STANDARDS § 4.1",
+      "path": "builders/define-page/search-params.ts",
+      "line": 132
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'submitIntent' uses non-standard prefix 'submit' — consult STANDARDS § 4.1",
+      "path": "form/intent.ts",
+      "line": 30
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'collectionIntent' uses non-standard prefix 'collection' — consult STANDARDS § 4.1",
+      "path": "form/intent.ts",
+      "line": 35
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'firstFieldError' uses non-standard prefix 'first' — consult STANDARDS § 4.1",
+      "path": "form/errors.ts",
+      "line": 76
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'replyFor' uses non-standard prefix 'reply' — consult STANDARDS § 4.1",
+      "path": "form/reply.ts",
+      "line": 121
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'extractCollectionKeys' uses non-standard prefix 'extract' — consult STANDARDS § 4.1",
+      "path": "form/collection-keys.ts",
+      "line": 5
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'omitCollectionKeyFields' uses non-standard prefix 'omit' — consult STANDARDS § 4.1",
+      "path": "form/collection-keys.ts",
+      "line": 11
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateSubmissionId' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "form/idempotency.ts",
+      "line": 14
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'generateCsrfToken' uses non-standard prefix 'generate' — consult STANDARDS § 4.1",
+      "path": "form/csrf.ts",
+      "line": 23
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'verifyCsrfToken' uses non-standard prefix 'verify' — consult STANDARDS § 4.1",
+      "path": "form/csrf.ts",
+      "line": 33
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'FormConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "form/config.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'assignFormPathValue' uses non-standard prefix 'assign' — consult STANDARDS § 4.1",
+      "path": "form/pipeline.ts",
+      "line": 99
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'formDataToRawValues' uses non-standard prefix 'form' — consult STANDARDS § 4.1",
+      "path": "form/pipeline.ts",
+      "line": 193
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'dehydrateQueryClient' uses non-standard prefix 'dehydrate' — consult STANDARDS § 4.1",
+      "path": "query/hydration.ts",
+      "line": 26
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'hydrateFromDehydrated' uses non-standard prefix 'hydrate' — consult STANDARDS § 4.1",
+      "path": "query/hydration.ts",
+      "line": 39
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'resetIslandQueryClient' uses non-standard prefix 'reset' — consult STANDARDS § 4.1",
+      "path": "query/query-client.ts",
+      "line": 57
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'decideDeferClientAction' uses non-standard prefix 'decide' — consult STANDARDS § 4.1",
+      "path": "defer/policy.ts",
+      "line": 143
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'resolvedPromise' uses non-standard prefix 'resolved' — consult STANDARDS § 4.1",
+      "path": "hooks/use-promise.ts",
+      "line": 46
+    },
+    {
+      "ref": "NS-S-6.sections",
+      "level": "WARN",
+      "message": "README missing 11/12 mandated sections (Overview, Quickstart, Mental model, API, Recipes, Configuration, Testing, Observability, Architecture, Stability, Compatibility, License)"
+    },
+    {
+      "ref": "NS-S-8.location",
+      "level": "WARN",
+      "message": "12 inline *_test.ts files outside tests/ — consolidate under tests/<layer>/"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

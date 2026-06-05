@@ -1,0 +1,25 @@
+[0m[32mDownload[0m https://jsr.io/@std/async/meta.json
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0_meta.json
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/mod.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/abortable.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/deadline.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/debounce.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/delay.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/mux_async_iterator.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/pool.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/tee.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/retry.ts
+[0m[32mDownload[0m https://jsr.io/@std/async/1.2.0/_util.ts
+Checking for slow types in the public API...
+[0m[1m[32mSimulating publish[0m of [0m[38;5;245m@netscript/cron@0.1.0[0m with files:
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/README.md (5.24KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/adapters/_shared.ts (4.32KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/adapters/deno.adapter.ts (7.99KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/adapters/memory.adapter.ts (10.71KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/adapters/mod.ts (769B)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/deno.json (712B)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/interfaces/mod.ts (889B)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/interfaces/scheduler.ts (4.08KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/interfaces/types.ts (6.07KB)
+   file:///home/runner/work/netscript-start/netscript-start/packages/cron/mod.ts (5.84KB)
+[0m[32mSuccess[0m Dry run complete

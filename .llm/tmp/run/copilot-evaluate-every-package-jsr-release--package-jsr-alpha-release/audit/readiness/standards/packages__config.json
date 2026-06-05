@@ -1,0 +1,220 @@
+{
+  "root": "packages/config",
+  "pkg": "config",
+  "totals": {
+    "fail": 5,
+    "warn": 30,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.license",
+      "level": "FAIL",
+      "message": "deno.json `license` field missing (must be `MIT` for alpha)"
+    },
+    {
+      "ref": "NS-S-1.description",
+      "level": "FAIL",
+      "message": "deno.json `description` missing"
+    },
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '0.1.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.publish-include",
+      "level": "FAIL",
+      "message": "deno.json `publish.include` missing — `deno publish` ships everything by default and that leaks tests/scratch"
+    },
+    {
+      "ref": "NS-S-1.publish-exclude",
+      "level": "WARN",
+      "message": "deno.json `publish.exclude` should explicitly drop `**/*_test.ts`, `tests/`, `examples/`"
+    },
+    {
+      "ref": "NS-S-1.strict",
+      "level": "FAIL",
+      "message": "deno.json compilerOptions.strict must be true"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 71 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'findWorkspaceRoot' uses non-standard prefix 'find' — consult STANDARDS § 4.1",
+      "path": "workspace.ts",
+      "line": 61
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'discoverWorkspace' uses non-standard prefix 'discover' — consult STANDARDS § 4.1",
+      "path": "workspace.ts",
+      "line": 79
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'findMember' uses non-standard prefix 'find' — consult STANDARDS § 4.1",
+      "path": "workspace.ts",
+      "line": 128
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'NetScriptConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'LoggingConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'PathsConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ServiceConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'AppConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DatabaseConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'JobConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'ScalingConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'TopicRetentionConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'WorkersConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaRetryConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaTimeoutConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaScalingConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagaRetentionConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'SagasConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'TriggerDefinitionConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'WebhookConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'TriggersConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'WindowsDeployConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'DeployConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "types.ts"
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'NetScriptConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "schema.ts"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'clearConfigCache' uses non-standard prefix 'clear' — consult STANDARDS § 4.1",
+      "path": "loader.ts",
+      "line": 163
+    },
+    {
+      "ref": "NS-S-6",
+      "level": "FAIL",
+      "message": "README.md missing"
+    },
+    {
+      "ref": "NS-S-8.location",
+      "level": "WARN",
+      "message": "1 inline *_test.ts files outside tests/ — consolidate under tests/<layer>/"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

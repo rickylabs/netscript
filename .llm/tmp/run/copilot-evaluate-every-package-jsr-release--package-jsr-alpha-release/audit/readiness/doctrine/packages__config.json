@@ -1,0 +1,22 @@
+{
+  "root": "packages/config",
+  "pkg": "config",
+  "totals": {
+    "fail": 0,
+    "warn": 1,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A8/AP-9",
+      "level": "WARN",
+      "message": "file is 946 lines (cap 500) — split into smaller single-reason files",
+      "path": "schema.ts"
+    },
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    }
+  ]
+}

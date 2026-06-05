@@ -1,0 +1,79 @@
+{
+  "root": "packages/runtime-config",
+  "pkg": "runtime-config",
+  "totals": {
+    "fail": 5,
+    "warn": 7,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "NS-S-1.license",
+      "level": "FAIL",
+      "message": "deno.json `license` field missing (must be `MIT` for alpha)"
+    },
+    {
+      "ref": "NS-S-1.description",
+      "level": "FAIL",
+      "message": "deno.json `description` missing"
+    },
+    {
+      "ref": "NS-S-1.version",
+      "level": "WARN",
+      "message": "version is '0.1.0'; alpha cadence requires '0.0.1-alpha.0'"
+    },
+    {
+      "ref": "NS-S-1.publish-include",
+      "level": "FAIL",
+      "message": "deno.json `publish.include` missing — `deno publish` ships everything by default and that leaks tests/scratch"
+    },
+    {
+      "ref": "NS-S-1.publish-exclude",
+      "level": "WARN",
+      "message": "deno.json `publish.exclude` should explicitly drop `**/*_test.ts`, `tests/`, `examples/`"
+    },
+    {
+      "ref": "NS-S-1.task",
+      "level": "WARN",
+      "message": "deno.json `tasks` missing `publish:dry-run` shortcut"
+    },
+    {
+      "ref": "NS-S-3.size",
+      "level": "WARN",
+      "message": "mod.ts is 416 lines; convention cap is 200 — split into sub-entrypoints"
+    },
+    {
+      "ref": "NS-S-3.barrel-only",
+      "level": "WARN",
+      "message": "mod.ts has 216 non-export/non-comment lines — barrels must be export-only"
+    },
+    {
+      "ref": "NS-S-4.fn-prefix",
+      "level": "WARN",
+      "message": "exported function 'watchRuntimeConfig' uses non-standard prefix 'watch' — consult STANDARDS § 4.1",
+      "path": "mod.ts",
+      "line": 322
+    },
+    {
+      "ref": "NS-S-4.types",
+      "level": "WARN",
+      "message": "type 'RuntimeConfig' uses non-standard suffix — convention is <Function>Options / <Noun>Spec",
+      "path": "mod.ts"
+    },
+    {
+      "ref": "NS-S-6",
+      "level": "FAIL",
+      "message": "README.md missing"
+    },
+    {
+      "ref": "NS-S-8.coverage",
+      "level": "FAIL",
+      "message": "no tests/ directory and no inline *_test.ts files — every package needs meaningful tests"
+    },
+    {
+      "ref": "NS-S-10",
+      "level": "INFO",
+      "message": "mod.ts does not export an `inspect<Noun>()` diagnostic — recommended discoverability axis"
+    }
+  ]
+}

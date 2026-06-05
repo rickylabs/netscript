@@ -1,0 +1,16 @@
+{
+  "root": "packages/watchers",
+  "pkg": "watchers",
+  "totals": {
+    "fail": 0,
+    "warn": 0,
+    "info": 1
+  },
+  "findings": [
+    {
+      "ref": "A9",
+      "level": "INFO",
+      "message": "docs/architecture.md missing — required when public symbols > 25"
+    }
+  ]
+}

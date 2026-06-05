@@ -1,0 +1,73 @@
+{
+  "pkg": {
+    "name": "@netscript/watchers",
+    "version": "0.1.0",
+    "root": "packages/watchers"
+  },
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "files": {
+    "total": 13,
+    "loc": 1621,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 2612
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": false,
+    "readmeLines": 0,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true
+    },
+    "descriptionLen": 0
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "AccessFailureTracker",
+        "DedupFilter",
+        "FileWatcher",
+        "GlobFilter",
+        "HybridStrategy",
+        "NativeStrategy",
+        "PollingStrategy",
+        "StabilityFilter",
+        "computeContentHash",
+        "createWatcher",
+        "safeReadFile",
+        "safeStat"
+      ],
+      "rawCount": 12
+    }
+  },
+  "tests": {
+    "fileCount": 3,
+    "files": [
+      "filters/dedup_test.ts",
+      "filters/glob_test.ts",
+      "filters/stability_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-3 readme",
+      "level": "FAIL",
+      "message": "README.md missing"
+    },
+    {
+      "gate": "F-JSR-4 description",
+      "level": "FAIL",
+      "message": "deno.json lacks `description` (used by JSR discoverability)"
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}

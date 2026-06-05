@@ -1,0 +1,103 @@
+{
+  "pkg": {
+    "name": "@netscript/logger",
+    "version": "0.1.0",
+    "description": "Structured logging for NetScript services, packages, workers, and Hono/oRPC integrations.",
+    "root": "packages/logger"
+  },
+  "exports": {
+    ".": "./mod.ts",
+    "./middleware": "./middleware.ts",
+    "./orpc": "./orpc.ts"
+  },
+  "files": {
+    "total": 11,
+    "loc": 1214,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 1273
+      },
+      {
+        "path": "middleware.ts",
+        "bytes": 6839
+      },
+      {
+        "path": "orpc.ts",
+        "bytes": 519
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 203,
+    "hasDocsFolder": false,
+    "moduleTagOnEntries": {
+      ".": true,
+      "./middleware": true,
+      "./orpc": true
+    },
+    "descriptionLen": 89
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "configure",
+        "configureLogging",
+        "createChildLogger",
+        "createJobLogger",
+        "createLogger",
+        "createPackageLogger",
+        "createServiceLogger",
+        "createWorkerLogger",
+        "ensureLogging",
+        "getConsoleSink",
+        "getLogger",
+        "isLoggingConfigured",
+        "markConfigured",
+        "resetLogging",
+        "withContext"
+      ],
+      "rawCount": 15
+    },
+    "./middleware": {
+      "exported": [
+        "LoggerContextVariables",
+        "LoggerMiddleware",
+        "LoggerMiddlewareContext",
+        "LoggerMiddlewareEnv",
+        "LoggerMiddlewareNext",
+        "LoggerMiddlewareOptions",
+        "LoggerMiddlewareRequest",
+        "LoggerMiddlewareResponse",
+        "injectLogger",
+        "injectRequestId",
+        "loggerMiddleware",
+        "requestLoggerMiddleware"
+      ],
+      "rawCount": 12
+    },
+    "./orpc": {
+      "exported": [
+        "LoggingPlugin",
+        "createLoggerContext",
+        "createLoggingPlugin"
+      ],
+      "rawCount": 3
+    }
+  },
+  "tests": {
+    "fileCount": 3,
+    "files": [
+      "tests/creators_test.ts",
+      "tests/middleware_test.ts",
+      "tests/config_test.ts"
+    ]
+  },
+  "gates": [],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [],
+    "rawTail": "skipped"
+  }
+}
