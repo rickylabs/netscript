@@ -202,6 +202,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 12 | Gate | `deno doc --lint mod.ts` initially cleared the private-type-ref but remained blocked by the known slice 13 `types.ts` JSDoc errors; see `drift.md`. |
 | 2026-06-06 | 13 | Implement | Added JSDoc to the remaining exported `types.ts` interface properties in `SdkConfig`, `NetScriptConfig`, and `NetScriptConfigInput`. |
 | 2026-06-06 | 13 | Gate | `deno doc --lint mod.ts` passed after slices 12 and 13 were both present; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 14 | Implement | Exported merge subpath contribution entry types, `NetScriptConfig`, and the referenced config type family; documented `PartialConfig` properties. |
+| 2026-06-06 | 14 | Gate | `deno doc --lint src/merge/mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 

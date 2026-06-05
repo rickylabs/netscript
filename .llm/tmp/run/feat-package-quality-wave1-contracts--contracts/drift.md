@@ -44,3 +44,17 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Action:** combine the implementation evidence for slices 12 and 13, then continue with slice
   14 in order.
 - **Evidence:** `worklog.md` progress rows for slices 12 and 13.
+
+## 2026-06-06 — Config merge subpath type exports
+
+- **What:** Slice 14 planned to export `DatabaseEntry`, `ServiceContributionEntry`, and
+  `AppContributionEntry`, but `mergePartialConfig()` also publicly names `NetScriptConfig`.
+- **Source:** `deno doc --lint src/merge/mod.ts`.
+- **Expected:** Exporting the three contribution entry types is enough.
+- **Actual:** Exporting `NetScriptConfig` makes its referenced config section types public through
+  the `./merge` subpath too, so the subpath must export the config type family used by
+  `NetScriptConfig`.
+- **Severity:** minor
+- **Action:** export the referenced config types from `src/merge/mod.ts`; keep runtime behavior
+  unchanged.
+- **Evidence:** `deno doc --lint src/merge/mod.ts` passed after expanding the type exports.

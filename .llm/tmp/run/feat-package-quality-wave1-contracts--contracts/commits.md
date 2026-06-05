@@ -22,3 +22,4 @@ Format:
 - 7b83766: test(runtime-config): cover loader accessors and summary
 - a8a7caf: test(runtime-config): complete package gate sweep
 - 2b638df: refactor(config): rename saga input helpers
+- d60f43c: docs(config): export saga group input and document config types
