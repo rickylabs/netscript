@@ -27,3 +27,4 @@ Format:
 - fd8259b: feat(contracts): consolidate shared foundation package
 - 41c170c: chore(contracts): refresh workspace lock
 - 25c850a: fix(cli): restore scaffold e2e readiness
+- b7b5426: chore(harness): record cli e2e validation
