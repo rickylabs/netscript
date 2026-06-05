@@ -6,7 +6,24 @@ version: 1.0.0
 
 # JSR Publishing Audit
 
-Comprehensive audit guide for JSR (JavaScript Registry) compliance and scoring optimization.
+Comprehensive audit guide for JSR (JavaScript Registry) compliance and scoring
+optimization. This skill is a **required Plan-Gate input** for package/plugin
+waves — apply it to the planned public surface before slicing.
+
+## When to Use
+
+- Auditing a package for JSR readiness.
+- Preparing a package for JSR publishing.
+- Reviewing JSR config (`deno.json` or `jsr.json`).
+- Checking for slow types before publish.
+- Verifying documentation quality for JSR score.
+
+## When Not to Use
+
+- For package architecture decisions — use `netscript-doctrine`.
+- For harness run orchestration — use `netscript-harness`.
+- For non-JSR publishing (npm-only, private registries) — this skill is
+  JSR-specific.
 
 ---
 
@@ -17,7 +34,8 @@ JSR assigns packages a quality score from 0-100%, displayed with color coding:
 - **Orange**: 60-90%
 - **Green**: 90%+ (target this)
 
-The score directly influences search ranking. View any package's breakdown at `jsr.io/@scope/package/score`.
+The score directly influences search ranking. View any package's breakdown at
+`jsr.io/@scope/package/score`.
 
 ### The 9 Scoring Factors
 
@@ -33,7 +51,8 @@ The score directly influences search ranking. View any package's breakdown at `j
 | **Compatibility** | At least one runtime marked compatible | Low |
 | | At least two runtimes compatible | Low |
 
-**Key insight**: Documentation carries the heaviest weight. Comprehensive JSDoc + README + `@module` tags will score higher than perfect types with minimal docs.
+**Key insight**: Documentation carries the heaviest weight. Comprehensive JSDoc +
+README + `@module` tags will score higher than perfect types with minimal docs.
 
 ---
 
@@ -211,7 +230,9 @@ Run dry-run again. Only these should appear:
 
 ## Fixing Slow Types
 
-Slow types are exports without explicit type annotations. They prevent JSR from generating `.d.ts` files efficiently and degrade npm compatibility by 1.5-2x slower type checking.
+Slow types are exports without explicit type annotations. They prevent JSR from
+generating `.d.ts` files efficiently and degrade npm compatibility by 1.5-2x
+slower type checking.
 
 ### Function Return Types
 
@@ -261,7 +282,8 @@ deno publish --dry-run
 deno doc --lint
 ```
 
-**Note**: TypeScript 5.5's `isolatedDeclarations` mode produces code that automatically satisfies JSR's no-slow-types requirement.
+**Note**: TypeScript 5.5's `isolatedDeclarations` mode produces code that
+automatically satisfies JSR's no-slow-types requirement.
 
 ---
 
@@ -294,6 +316,7 @@ For packages with multiple exports:
 ```
 
 Users import as:
+
 ```typescript
 import { main } from "@scope/pkg";
 import { OpenAI } from "@scope/pkg/providers";
@@ -425,3 +448,18 @@ deno publish
 - **JSX publishing**: Not supported
 - **HTTP imports**: Prohibited
 - **Complex inference**: Libraries like Zod/ArkType may require `--allow-slow-types`
+
+---
+
+## What NetScript doesn't do yet
+
+> **Status: draft — pending user approval before becoming mandatory.**
+
+- **Automated JSR score monitoring** — No CI gate enforces a minimum score.
+  Workaround: manual audit before publish.
+- **Cross-package JSR workspace publishing** — Each package publishes
+  independently. Workaround: publish in dependency order.
+- **JSR badge generation** — No automated badge for README. Workaround: manual
+  badge from `jsr.io`.
+- **Private JSR packages** — Not yet available. Workaround: public scoped
+  packages with internal documentation. Tracked by JSR.
