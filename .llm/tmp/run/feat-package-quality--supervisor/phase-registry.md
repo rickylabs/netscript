@@ -36,7 +36,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave0-foundation` |
+| Group branch | `feat/package-quality-wave0-foundation` |
 | Nested run ID | `feat-package-quality-wave0-foundation--<suffix>` |
 | Units | `@netscript/shared` |
 | Archetype(s) | A1 — small-contract |
@@ -73,7 +73,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave1-contracts` |
+| Group branch | `feat/package-quality-wave1-contracts` |
 | Nested run ID | `feat-package-quality-wave1-contracts--<suffix>` |
 | Units | `@netscript/runtime-config`, `@netscript/config`, `@netscript/contracts` |
 | Archetype(s) | A1 — small-contract (config/contracts are A1/A4 hybrids — see nested docs) |
@@ -104,7 +104,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave2-adapters` |
+| Group branch | `feat/package-quality-wave2-adapters` |
 | Nested run ID | `feat-package-quality-wave2-adapters--<suffix>` |
 | Units | `@netscript/logger`, `@netscript/telemetry`, `@netscript/aspire`, `@netscript/kv`, `@netscript/database`, `@netscript/prisma-adapter-mysql`, `@netscript/queue`, `@netscript/cron` |
 | Archetype(s) | A2 — integration |
@@ -139,7 +139,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave3-plugin` |
+| Group branch | `feat/package-quality-wave3-plugin` |
 | Nested run ID | `feat-package-quality-wave3-plugin--<suffix>` |
 | Units | `@netscript/plugin` |
 | Archetype(s) | A4 — dsl-builder (plugin host) |
@@ -170,7 +170,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave4-runtimes` |
+| Group branch | `feat/package-quality-wave4-runtimes` |
 | Nested run ID | `feat-package-quality-wave4-runtimes--<suffix>` |
 | Units | `@netscript/plugin-streams-core`, `@netscript/plugin-workers-core`, `@netscript/plugin-sagas-core`, `@netscript/plugin-triggers-core`, `@netscript/watchers`, `@netscript/plugin-streams`, `@netscript/plugin-workers`, `@netscript/plugin-sagas`, `@netscript/plugin-triggers` |
 | Archetype(s) | A1/A4 (`*-core`), A3 (`watchers`), A5 (`plugins/*`) |
@@ -205,7 +205,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave5-apps` |
+| Group branch | `feat/package-quality-wave5-apps` |
 | Nested run ID | `feat-package-quality-wave5-apps--<suffix>` |
 | Units | `@netscript/sdk`, `@netscript/service`, `@netscript/fresh`, `@netscript/fresh-ui` |
 | Archetype(s) | A4 — dsl/app |
@@ -236,7 +236,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave6-cli` |
+| Group branch | `feat/package-quality-wave6-cli` |
 | Nested run ID | `feat-package-quality-wave6-cli--<suffix>` |
 | Units | `@netscript/cli` |
 | Archetype(s) | A6 — cli-tooling |

@@ -85,7 +85,7 @@ The waves are the proven grain (Foundation-first, like PR #96's Group A). Each i
 one reviewable sub-PR with its own Design checkpoint + separate evaluator pass.
 Per-package detail lives in the nested canonical run — cite it, do not duplicate.
 
-- **Wave 0 — Foundation** (`feat/package-quality/wave0-foundation`): `@netscript/shared`.
+- **Wave 0 — Foundation** (`feat/package-quality-wave0-foundation`): `@netscript/shared`.
 - **Wave 1 — Contracts & schemas (A1)**: `@netscript/runtime-config`,
   `@netscript/config`, `@netscript/contracts`.
 - **Wave 2 — Integration adapters (A2)**: `@netscript/logger`,
