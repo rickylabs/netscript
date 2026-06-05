@@ -37,10 +37,10 @@ sub-PR + evaluator pass).
 | Field | Value |
 |-------|-------|
 | Group branch | `feat/package-quality-wave0-foundation` |
-| Nested run ID | `feat-package-quality-wave0-foundation--<suffix>` |
+| Nested run ID | `feat-package-quality-wave0-foundation--shared` |
 | Units | `@netscript/shared` |
 | Archetype(s) | A1 — small-contract |
-| Status | `planned` |
+| Status | `active` (worktree + draft PR #3) |
 | Merge commit | — |
 
 ### Pre-conditions
@@ -269,7 +269,7 @@ sub-PR + evaluator pass).
 
 | Wave | Status | Depends on | Units | Merge commit |
 |------|--------|-----------|-------|--------------|
-| 0 — Foundation | `planned` | none | shared | — |
+| 0 — Foundation | `active` | none | shared | — |
 | 1 — Contracts & schemas | `planned` | 0 | runtime-config, config, contracts | — |
 | 2 — Integration adapters | `planned` | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron | — |
 | 3 — Plugin runner | `planned` | 2 | plugin | — |
