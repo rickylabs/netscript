@@ -72,6 +72,23 @@ export default PrismaClient;
 `;
 }
 
+function generateClearSeededPrismaClient(): string {
+  return `/**
+ * Remove the seeded Prisma client placeholder before real Prisma generation.
+ *
+ * @module
+ */
+
+try {
+  await Deno.remove(new URL('../schema/.generated/client.server.ts', import.meta.url));
+} catch (error) {
+  if (!(error instanceof Deno.errors.NotFound)) {
+    throw error;
+  }
+}
+`;
+}
+
 /** Creates database workspaces using the existing scaffold adapter contracts. */
 export class DatabaseScaffolder {
   /**
@@ -194,6 +211,7 @@ export class DatabaseScaffolder {
       join(scriptsDir, 'migrate.ts'),
       await this.templateAdapter.render(migrateTemplate, templateVars),
     );
+    await write(join(scriptsDir, 'clear-seeded-client.ts'), generateClearSeededPrismaClient());
 
     if (provider.capabilities.hasZodGeneration) {
       const zodGeneratorConfig = await this.templateAdapter.render(

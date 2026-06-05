@@ -30,6 +30,7 @@ export function generateDatabaseDenoJson(
 ): string {
   const imports = resolveNetScriptImports(options.importMode, options.localBase);
   const scriptTasks = [
+    'deno task db:clear-seeded-client',
     'deno run -A npm:prisma@^7.4.2 generate --generator client --config prisma.config.ts',
   ];
   if (provider.capabilities.hasZodGeneration) {
@@ -41,6 +42,8 @@ export function generateDatabaseDenoJson(
     'db:generate': scriptTasks.join(' && '),
     [`db:generate:${provider.engine}`]: 'deno task db:generate',
     'db:generate:all': 'deno task db:generate',
+    'db:clear-seeded-client':
+      'deno run --allow-write=schema/.generated/client.server.ts scripts/clear-seeded-client.ts',
     'db:init': 'deno run -A scripts/migrate.ts --name=init',
     [`db:init:${provider.engine}`]: 'deno task db:init',
     'db:init:all': 'deno task db:init',
