@@ -10,4 +10,4 @@ Format:
 
 ## Log
 
-- (no commits yet — plan & design phase)
+- 187f862: plan(wave1): research + plan & design for config, contracts, runtime-config

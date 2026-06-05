@@ -175,6 +175,7 @@ A new developer adding a config schema section:
 |------|-------|------|-------|
 | — | — | Research | Re-baselined all three units against current tree. Real slow-type count = 0 for all. |
 | — | — | Plan & Design | Locked 8 decisions, 27 commit slices, archetype = 1 for all three. |
+| — | — | PLAN-EVAL | `PASS` (adjusted). Evaluator added F-14 and F-17 to the gate set. |
 
 ## Decisions
 

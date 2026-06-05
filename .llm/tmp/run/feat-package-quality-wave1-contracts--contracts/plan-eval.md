@@ -1,44 +1,49 @@
-# PLAN-EVAL — feat-package-quality-wave1-contracts--contracts
+# PLAN-EVAL Verdict
 
-- Plan evaluator session: PLAN-EVAL pass, 2026-06-05
-- Run: `feat-package-quality-wave1-contracts--contracts`
-- Surface / archetype: `@netscript/config`, `@netscript/contracts`, `@netscript/runtime-config` — Archetype 1 (Small Contract) × 3
-- Scope overlays: none
+## Run
 
-## Checklist results
+| Field | Value |
+|-------|-------|
+| Run ID | `feat-package-quality-wave1-contracts--contracts` |
+| Branch | `feat/package-quality-wave1-contracts` |
+| Evaluator | Copilot (separate session) |
+| Date | 2026-06-05 |
 
-| Plan-Gate item                          | Result | Evidence / location |
-| --------------------------------------- | ------ | ------------------- |
-| Research present and current            | PASS   | `research.md` re-baselined against `feat/package-quality @ 76fbeb7`; carried-in audit explicitly superseded. Spot-checked structural findings against tree (below). |
-| Decisions locked                        | PASS   | `plan.md` §Locked Decisions — 8 decisions (L1–L8) each with rationale. |
-| Open-decision sweep                     | PASS   | `plan.md` §Open-Decision Sweep — 5 decisions; 4 "safe to defer", 1 "must resolve now" (`config/src/domain/mod.ts` sub-barrel) with concrete resolution. Independent sweep found no unflagged rework-forcing decision. |
-| Commit slices (< 30, gate + files each) | PASS   | `worklog.md` §Commit Slices — 27 slices, ordered (runtime-config → config → contracts → cross-cutting), each names slice / gate / files. |
-| Risk register                           | PASS   | `plan.md` §Risk Register — 5 risks with likelihood/impact/mitigation. |
-| Gate set selected                       | PASS (after adjustment) | Original set omitted **F-14** and **F-17**, both `required` for Arch 1 in `gates/archetype-gate-matrix.md`. Added to `plan.md` §Fitness Gates + Validation Plan and `worklog.md` gate table. F-14 now maps to L5 (runtime-config console removal). |
-| Deferred scope explicit                 | PASS   | `plan.md` §Non-Scope + `worklog.md` §Deferred Scope. |
-| jsr-audit surface scan (pkg/plugin)     | PASS   | `research.md` §jsr-audit surface scan — per-package rubric table + named surface risks; each risk has an addressing slice. |
+## Verdict: ✅ `PASS` (adjusted)
 
-## Spot-checks against tree
+## Checklist
 
-- `config/helpers.ts` present (2226 bytes) → L3 rename target confirmed.
-- `contracts/helpers/{paginated-query.ts,transform.ts}` present → L4 target confirmed.
-- `contracts/crud/create-crud-contract.ts` at root → L8 / debt entry confirmed.
-- `runtime-config/mod.ts` = 415 LOC with `console.warn/log/error` at lines 334–405 → L2/L5 + AP-13 confirmed; no README/docs/tests (only `deno.json`, `mod.ts`) → research findings 23/24/26 confirmed.
-- `config/src/domain/mod.ts` is a pure re-export barrel → AP-22 / sub-barrel decision confirmed.
-- Slow-type re-baseline (`deno publish --dry-run` = 0) could **not** be independently re-run: `deno` is unavailable in this evaluator sandbox and could not be installed (network-restricted). Structural findings the plan depends on were all verified; the dry-run claim is carried as generator evidence to confirm at the implement gate (F-6).
+| Plan-Gate box | Result | Evidence |
+|---|---|---|
+| Research present & current (re-baselined vs `feat/package-quality`) | PASS | `research.md` findings #1–#30 with verification commands |
+| Decisions locked (L1–L8 w/ rationale) | PASS | `plan.md` §Locked Decisions |
+| Open-decision sweep (4 defer + 1 must-resolve, resolved) | PASS | `plan.md` §Open-Decision Sweep |
+| Commit slices (27, ordered, gate+files each) | PASS | `worklog.md` §Commit Slices |
+| Risk register | PASS | `plan.md` §Risk Register |
+| Gate set selected | **PASS after adjustment** | Added F-14, F-17 per evaluator |
+| Deferred scope explicit | PASS | `worklog.md` §Deferred Scope |
+| jsr-audit surface scan | PASS | `research.md` §jsr-audit surface scan |
 
-## Open-decision sweep (evaluator-run)
+## Adjustments applied
 
-None beyond what the plan already lists. The contracts Archetype 1-vs-4 question is closed in research (no NetScript-owned fluent builder). The L7 Zod-internal-removal decision is locked, not open. No deferred decision would force rework.
+The selected Archetype-1 gate set omitted two gates the matrix marks `required`:
 
-## Verdict
+1. **F-14 Console-log lint** — directly material; it's the proving gate for **L5** (`runtime-config` console → return-value diagnostics). Added to plan.md §Fitness Gates and Validation Plan.
+2. **F-17 Abstract-derived co-location** — added as `PENDING_SCRIPT`, no violation (all three are type-only + factory surfaces).
 
-`PASS`
+## Spot-checks confirmed
 
-The plan is sound, current, and sliced. The only Plan-Gate gap (incomplete Arch-1 gate set: missing F-14, F-17) was a reasonable, surgical fix and was adjusted in place per the run owner's instruction rather than bounced as `FAIL_PLAN`. Implementation may begin.
+- `config/helpers.ts` — matches finding #8
+- `contracts/helpers/{paginated-query,transform}.ts` — matches finding #17
+- `contracts/crud/` at root — matches finding #18
+- `runtime-config/mod.ts` = 415 LOC with `console.*` at 334–405 — matches finding #25, #29
+- `runtime-config` no README/docs/tests — matches findings #23, #24, #26
+- `config/src/domain/mod.ts` barrel — matches finding #11
 
-## Notes
+## Caveat for IMPL-EVAL
 
-- F-14 is the proving gate for L5; the validation plan now greps for `console.` in runtime-config after slices 3–5.
-- F-17 is `PENDING_SCRIPT` with no detected violation (all three surfaces are type-only + factory; no abstract/derived class pairs).
-- Implement gate (IMPL-EVAL) must still confirm F-6 dry-run = 0 slow types on all three, since it was not re-run here.
+The `deno publish --dry-run` = **0 slow types** re-baseline could not be independently re-run in the evaluator sandbox. All *structural* findings the plan rests on were verified; IMPL-EVAL must still confirm F-6 (0 slow types on all three) at the implement gate.
+
+## Implementation may begin
+
+No slice should be committed beyond this point without the F-14/F-17 additions in the gate sweep.

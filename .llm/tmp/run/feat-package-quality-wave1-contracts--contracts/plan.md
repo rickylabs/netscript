@@ -153,6 +153,8 @@ From `gates/archetype-gate-matrix.md` for Archetype 1:
 | F-14 Console-log lint | yes | No `console.*` in published non-presentation code. Proves L5 (`runtime-config` console → return-value diagnostics). `grep -rn "console\." packages/*/mod.ts packages/*/src` returns 0 after slices 3–5. |
 | F-15 Re-export-upstream lint | yes | No `export * from 'npm:...'` or `jsr:...` except `@netscript/*` and `@std/*`. |
 | F-16 Folder-cardinality lint | yes | ≤ 12 immediate children per directory; ≤ 4 nesting levels from `src/`. |
+| F-14 Console-log lint | yes | `grep -r "console\." packages/runtime-config/src/` = 0 hits after slice 5. Proving gate for L5. |
+| F-17 Abstract-derived co-location | yes | `PENDING_SCRIPT` — no violation (all three are type-only + factory surfaces). |
 | F-17 Abstract-derived co-location | yes | No abstract/derived class pairs in any of the three Small Contracts (type-only + factory surfaces). Manual review; `PENDING_SCRIPT` with no detected violation. |
 | F-18 Sub-barrel lint | yes | `config/src/domain/mod.ts` justified with `arch:barrel-ok`. |
 | Static gates | yes | `deno check` passes; `deno lint` passes; `deno fmt --check` passes. |
@@ -183,6 +185,8 @@ From `gates/archetype-gate-matrix.md` for Archetype 1:
 | 8 | Static | `deno lint` | 0 errors |
 | 9 | Static | `deno fmt --check` | 0 errors |
 | 10 | Consumer | `cd packages/cli && deno check` | 0 errors (after all three units) |
+| 11 | F-14 | `grep -r "console\." packages/runtime-config/src/` | 0 hits |
+| 12 | F-17 | Visual inspection of `src/` folders | No abstract-derived violations |
 
 ## Dependencies
 
