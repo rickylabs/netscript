@@ -1,0 +1,234 @@
+# Worklog: Wave 1 — Contracts & schemas
+
+## Run Metadata
+
+| Field          | Value                          |
+| -------------- | ------------------------------ |
+| Run ID         | `feat-package-quality-wave1-contracts--contracts` |
+| Branch         | `feat/package-quality-wave1-contracts` |
+| Archetype      | 1 — Small Contract             |
+| Scope overlays | none                           |
+
+## Design
+
+### Public Surface
+
+#### `@netscript/config`
+
+Root (`mod.ts`):
+- `defineConfig(config)` — authoring entrypoint
+- `defineConfigAsync(factory)` — async authoring entrypoint
+- `loadConfig(options?)` — runtime loader
+- `initConfig()` — cached init
+- `getConfig()` — cached accessor
+- `isConfigLoaded()`, `clearConfigCache()` — cache management
+- `getEnv(name)`, `hasEnv(name)`, `resolveEnv(def)`, `getMode()`, `isDev()`, `isProd()`, `isTest()` — environment helpers
+- `discoverWorkspace()`, `findWorkspaceRoot()`, `findMember()`, `getMemberEntrypoint()` — workspace discovery
+- `inspectConfig(config)` — diagnostics
+- `defineSagas(config)` — saga config authoring (from renamed `saga-inputs.ts`)
+- Types: `NetScriptConfig`, `NetScriptConfigInput`, `AppConfig`, `AspireConfig`, `DatabaseConfig`, `DatabasesConfig`, `DeployConfig`, `EnvDef`, `GatewayConfig`, `LoadConfigOptions`, `LoggingConfig`, `PathsConfig`, `PermissionConfig`, `PermissionValue`, `ResolvedEnvType`, `RuntimeConfigPathEntry`, `RuntimeConfigSection`, `SagaDefinition`, `SagaGroup`, `SagasConfig`, `SagaRetentionConfig`, `SagaRetryConfig`, `SagaScalingConfig`, `SagaStoreProvider`, `SagaTimeoutConfig`, `SagaTransportProvider`, `SdkConfig`, `ServiceConfig`, `TriggerDefinitionConfig`, `TriggerGroup`, `TriggerRetentionConfig`, `TriggerScalingConfig`, `TriggersConfig`, `WebhookConfig`, `WindowsDeployConfig`, `WorkspaceMap`, `WorkspaceMember`, `WorkspaceMemberType`, `SagaDefinitionInput`, `SagaGroupInput`, `SagasConfigInput`, `InspectionReport`
+
+Subpaths:
+- `./merge` — `mergePartialConfig()`, `PartialConfig`
+- `./paths` — `SCAFFOLD_DIRS`, `SCAFFOLD_FILES`, `PERMISSIONS`
+- `./schema/plugins` — `installedVersionSchema`, `pluginEntrySchema`, `backgroundProcessorSchema`, `serviceSchema`, and inferred types
+
+#### `@netscript/contracts`
+
+Root (`mod.ts`):
+- `baseContract` — oRPC base contract primitive
+- `boundedString()`, `nonNegativeInt()`, `nonNegativeNumber()`, `paginationLimit()`, `paginationOffset()`, `positiveInt()`, `positiveNumber()`, `stringToInt()`, `stringToNumber()` — Zod helper factories
+- `COMMON_ERROR_CODES`, `DEFAULT_INTEGER_MAX`, `DEFAULT_PAGINATION_LIMIT`, `DEFAULT_PAGINATION_LIMIT_MAX`, `DEFAULT_PAGINATION_OFFSET` — constants
+- `getResourceType()`, `notFound()` — error helpers
+- `SuccessSchema`, `ForbiddenErrorSchema`, `NotFoundErrorSchema`, `RateLimitErrorSchema`, `ServiceUnavailableErrorSchema`, `UnauthorizedErrorSchema`, `ValidationErrorSchema`, `OffsetPaginationInputSchema`, `OffsetPaginationMetaSchema`, `OffsetPaginationQuerySchema`, `CursorPaginationInputSchema`, `CursorPaginationMetaSchema`, `CursorPaginationQuerySchema` — schemas
+- `inspectContracts()` — diagnostics
+- Types: `BaseContract`, `BaseContractOutputBuilder`, `BaseContractProcedure`, `BaseContractRouteBuilder`, `BaseContractRouteOptions`, `BoundedStringSchemaOptions`, `DefaultedIntegerSchemaOptions`, `IntegerSchemaOptions`, `StringSchemaOptions`, `ContractDefaultableSchema`, `ContractNumberSchema`, `ContractObjectSchema`, `ContractParseResult`, `ContractSchema`, `ContractStringSchema`, `CursorPaginationInput`, `CursorPaginationMeta`, `CursorPaginationQuery`, `ErrorResult`, `ForbiddenError`, `NotFoundError`, `NotFoundOptions`, `OffsetPaginationInput`, `OffsetPaginationMeta`, `OffsetPaginationQuery`, `OkResult`, `RateLimitError`, `Result`, `ServiceUnavailableError`, `SuccessResponse`, `UnauthorizedError`, `ValidationError`, `ContractsInspectionTarget`, `InspectionReport`, `InspectionStatus`
+
+Subpaths:
+- `./crud` — `createCrudContract()`, `createReadOnlyContract()`, `createListOnlyContract()`, `CrudContractOptions`, `CrudContractOperation`
+- `./query` — `paginatedQuery()`, `FilterOperatorSchema`, `FilterConditionSchema`, `FiltersSchema`, `SearchInputSchema`, `PaginationInputSchema`, `OffsetPaginationInputSchema`, `CursorPaginationInputSchema`, `PaginationOutputSchema`, `CursorPaginationOutputSchema`, `createPaginatedOutput()`, `createCursorPaginatedOutput()`
+- `./transform` — `createTransformer()`, `TransformFn`
+
+#### `@netscript/runtime-config`
+
+Root (`mod.ts`):
+- `loadRuntimeConfig()` — load overrides from disk
+- `isFeatureEnabled(config, flagId, defaultValue?)` — feature flag check
+- `getJobOverride(config, jobId)` — job override accessor
+- `getSagaOverride(config, sagaId)` — saga override accessor
+- `getTriggerOverride(config, triggerId)` — trigger override accessor
+- `getRuntimeTask(config, taskId)` — task definition accessor
+- `watchRuntimeConfig(onChange, options?)` — hot-reload watcher
+- `summarizeRuntimeConfig(config, prefix?)` — structured summary (replaces console-based `logRuntimeConfigSummary`)
+- Types: `JobOverride`, `SagaOverride`, `TriggerOverride`, `FeatureFlag`, `RuntimeTask`, `RuntimeConfig`, `RuntimeConfigSummary`
+
+### Domain Vocabulary
+
+- `NetScriptConfig` — fully validated project configuration
+- `NetScriptConfigInput` — authoring form accepted by `defineConfig`
+- `PartialConfig` — plugin contribution fragment
+- `RuntimeConfig` — hot-reloadable runtime overrides (jobs, sagas, triggers, features, tasks)
+- `JobOverride` / `SagaOverride` / `TriggerOverride` — per-ID runtime override shapes
+- `FeatureFlag` — boolean + rollout percentage flag
+- `RuntimeTask` — task definition with runtime and entrypoint
+- `ContractSchema<T>` / `ContractObjectSchema<T>` — branded Zod schema types
+- `BaseContractProcedure` — oRPC procedure shape
+- `Result<T, E>` — discriminated union for expected failures
+- `CrudContractOperation` — named CRUD operation type
+
+### Ports
+
+None for this wave. All three packages are Small Contract; they do not own ports/adapters.
+
+`runtime-config` uses `Deno.readTextFile`, `Deno.watchFs`, and `Deno.env.get` at the file-system edge. These are platform primitives, not ports. If a second backend (e.g. Redis-backed runtime config) is added later, a `RuntimeConfigStorePort` would be introduced.
+
+### Constants
+
+- `RUNTIME_CONFIG_TOPICS` — `['jobs', 'sagas', 'triggers', 'features', 'tasks']` as const array
+- `DEFAULT_DEBOUNCE_MS` — `300` (watcher debounce)
+- `POINTER_FILE_NAME` — `'current'`
+- `COMMON_ERROR_CODES` — from contracts domain
+- `DEFAULT_PAGINATION_LIMIT` / `DEFAULT_PAGINATION_LIMIT_MAX` / `DEFAULT_PAGINATION_OFFSET` — from contracts domain
+
+### Commit Slices
+
+Ordered by dependency (runtime-config first — it has no downstream consumers in this wave; then config; then contracts). Each slice names what it proves, the gate that proves it, and the files it touches.
+
+#### `@netscript/runtime-config` (slices 1–10)
+
+| # | Slice | Gate | Files |
+|---|-------|------|-------|
+| 1 | Scaffold `src/domain/types.ts` with JSDoc | `deno doc --lint src/domain/types.ts` | `src/domain/types.ts` (new) |
+| 2 | Scaffold `src/application/loader.ts` (extract from mod.ts) | `deno check src/application/loader.ts` | `src/application/loader.ts` (new) |
+| 3 | Scaffold `src/application/watcher.ts` (extract watch logic, remove console) | `deno check src/application/watcher.ts` | `src/application/watcher.ts` (new) |
+| 4 | Scaffold `src/diagnostics/summary.ts` (replace console-based summary) | `deno check src/diagnostics/summary.ts` | `src/diagnostics/summary.ts` (new) |
+| 5 | Rewrite root `mod.ts` as thin barrel | `deno doc --lint mod.ts` | `mod.ts` (rewrite) |
+| 6 | Add `deno.json` standard tasks + description + publish config | `deno publish --dry-run` | `deno.json` (update) |
+| 7 | Write README.md (≥ 150 LOC) | `wc -l README.md` | `README.md` (new) |
+| 8 | Scaffold `/docs` per STANDARDS § 7 | `find docs -type f` | `docs/README.md`, `docs/architecture.md`, `docs/concepts.md`, `docs/getting-started.md`, `docs/recipes/basic-usage.md`, `docs/recipes/testing.md`, `docs/advanced/extending.md` (new) |
+| 9 | Add tests for loader, accessors, summary | `deno test --allow-all` | `tests/loader_test.ts`, `tests/accessors_test.ts`, `tests/summary_test.ts` (new) |
+| 10 | Runtime-config gate sweep | All F-* gates | Run full validation plan |
+
+#### `@netscript/config` (slices 11–18)
+
+| # | Slice | Gate | Files |
+|---|-------|------|-------|
+| 11 | Rename `helpers.ts` → `src/domain/saga-inputs.ts`, update imports | `deno check mod.ts` | `helpers.ts` → `src/domain/saga-inputs.ts`, `src/public/mod.ts`, `mod.ts` |
+| 12 | Fix `private-type-ref` on `SagaGroupInput` | `deno doc --lint mod.ts` | `src/domain/saga-inputs.ts`, `src/public/mod.ts` |
+| 13 | Add JSDoc to `types.ts` interface properties | `deno doc --lint mod.ts` | `types.ts` |
+| 14 | Fix `private-type-ref` in `src/merge/mod.ts` | `deno doc --lint src/merge/mod.ts` | `src/merge/mod.ts` |
+| 15 | Fix `missing-jsdoc` in `src/schema/plugins/mod.ts` + Zod internal leak | `deno doc --lint src/schema/plugins/mod.ts` | `src/schema/plugins/mod.ts` |
+| 16 | Expand `/docs` with `recipes/` and `advanced/` | `find docs -type f` | `docs/recipes/merge-config.md`, `docs/recipes/plugin-schemas.md`, `docs/advanced/extending.md` (new) |
+| 17 | Add `arch:barrel-ok` to `src/domain/mod.ts` | `grep arch:barrel-ok src/domain/mod.ts` | `src/domain/mod.ts` |
+| 18 | Config gate sweep | All F-* gates | Run full validation plan |
+
+#### `@netscript/contracts` (slices 19–24)
+
+| # | Slice | Gate | Files |
+|---|-------|------|-------|
+| 19 | Move `helpers/paginated-query.ts` → `src/application/paginated-query.ts` | `deno check mod.ts` | `helpers/paginated-query.ts` → `src/application/paginated-query.ts`, `query.ts`, `src/public/mod.ts` |
+| 20 | Move `helpers/transform.ts` → `src/application/transform-helpers.ts` | `deno check mod.ts` | `helpers/transform.ts` → `src/application/transform-helpers.ts`, `transform.ts`, `src/public/mod.ts` |
+| 21 | Export `ContractSchema`, `ContractObjectSchema`, `BaseContractProcedure` from public surface | `deno doc --lint crud.ts query.ts transform.ts` | `src/public/mod.ts`, `src/application/contract-primitives.ts` |
+| 22 | Add `getting-started.md` to `/docs` | `find docs -type f` | `docs/getting-started.md` (new) |
+| 23 | Add `advanced/extending.md` to `/docs` | `find docs -type f` | `docs/advanced/extending.md` (new) |
+| 24 | Contracts gate sweep | All F-* gates | Run full validation plan |
+
+#### Cross-cutting (slices 25–27)
+
+| # | Slice | Gate | Files |
+|---|-------|------|-------|
+| 25 | Consumer validation: `deno check` on CLI | `cd packages/cli && deno check` | No file changes; validation only |
+| 26 | Consumer validation: `deno check` on plugins | `cd plugins/sagas && deno check` + `cd plugins/workers && deno check` | No file changes; validation only |
+| 27 | Final workspace gate: `deno publish --dry-run` all three | Per-package dry-run | Validation only |
+
+**Total slices: 27** (< 30 ✓)
+
+### Deferred Scope
+
+- `./testing` subpath for any package — no consumer needs it today.
+- `runtime-config` watcher integration test with real `Deno.watchFs` — too flaky for CI; unit-test the loader logic only.
+- `contracts` `./builders` subpath — only if a NetScript-defined fluent builder is added later.
+- Auto-generated `reference/` pages — future `.llm/tools/generate-reference.ts` handles this.
+- `config` dynamic import rewrite — the `unanalyzable-dynamic-import` warning is non-blocking and would require a significant loader refactor.
+
+### Contributor Path
+
+A new developer adding a runtime config topic (e.g. `webhooks`):
+
+1. Open `packages/runtime-config/src/domain/types.ts` — add `WebhookOverride` interface.
+2. Open `packages/runtime-config/src/application/loader.ts` — add the topic file read in `loadRuntimeConfig`.
+3. Open `packages/runtime-config/mod.ts` — export the new type and accessor.
+4. Add test in `tests/loader_test.ts` — assert the new topic loads.
+5. Run `deno test --allow-all` and `deno doc --lint mod.ts`.
+
+A new developer adding a config schema section:
+
+1. Open `packages/config/src/domain/` — create `<section>-schema.ts` with Zod schema.
+2. Open `packages/config/src/domain/mod.ts` — re-export the new schema.
+3. Open `packages/config/types.ts` — add the corresponding TypeScript interface.
+4. Open `packages/config/src/public/mod.ts` — export the schema and type.
+5. Run `deno doc --lint mod.ts` and `deno test --allow-all`.
+
+## Progress Log
+
+| Time | Slice | Step | Notes |
+|------|-------|------|-------|
+| — | — | Research | Re-baselined all three units against current tree. Real slow-type count = 0 for all. |
+| — | — | Plan & Design | Locked 8 decisions, 27 commit slices, archetype = 1 for all three. |
+
+## Decisions
+
+| Decision | Reason | Source |
+|----------|--------|--------|
+| Archetype 1 for all three | Value is type clarity, not runtime behavior | doctrine/06-archetypes.md |
+| Split `runtime-config/mod.ts` | Mixes domain/application/presentation in one file | A8, doctrine/10 verdict |
+| Rename `helpers.ts` / `helpers/` | Generic folder names hide real concerns | AP-16 |
+| Export referenced types for `private-type-ref` | `deno doc --lint` requires public types for public signatures | F-5 |
+| Remove Zod internal from public signatures | Prevents breakage on Zod version bumps | jsr-audit rubric |
+| Replace console with return-value diagnostics | AP-13 violation; callers should control output | doctrine/09 |
+
+## Drift
+
+| Drift | Severity | Logged in drift.md |
+|-------|----------|-------------------|
+| None yet | — | — |
+
+## Gate Results
+
+### Static Gates
+
+| Gate | Command or check | Result | Notes |
+|------|-----------------|--------|-------|
+| `deno check` | `deno check mod.ts` | NOT_RUN | Will run per slice |
+| `deno lint` | `deno lint` | NOT_RUN | Will run per slice |
+| `deno fmt --check` | `deno fmt --check` | NOT_RUN | Will run per slice |
+
+### Fitness Gates
+
+| Gate | Result | Evidence | Notes |
+|------|--------|----------|-------|
+| F-1 File-size lint | PENDING_SCRIPT | Manual check: all files < 500 LOC | `runtime-config` split addresses this |
+| F-5 Public surface audit | PENDING_SCRIPT | `deno doc --lint` per entrypoint | Will run after each slice |
+| F-6 JSR publishability | PASS | `deno publish --dry-run` = 0 slow types | Already true for all three |
+| F-7 Doc-score gate | PENDING_SCRIPT | README + docs + JSDoc | In progress |
+| F-10 Test-shape audit | PENDING_SCRIPT | Tests exist / will be added | `runtime-config` needs tests |
+| F-11 Forbidden-folder lint | PENDING_SCRIPT | No `helpers/` after renames | Will verify after slices 11, 19, 20 |
+| F-12 Naming-convention lint | PENDING_SCRIPT | Manual review | No violations detected |
+| F-15 Re-export-upstream lint | PENDING_SCRIPT | No upstream re-exports | Will verify |
+| F-16 Folder-cardinality lint | PENDING_SCRIPT | ≤ 12 children per dir | Will verify |
+| F-18 Sub-barrel lint | PENDING_SCRIPT | `arch:barrel-ok` on domain mod.ts | Slice 17 |
+
+### Consumer Gates
+
+| Consumer | Result | Evidence | Notes |
+|----------|--------|----------|-------|
+| `packages/cli` | NOT_RUN | `deno check` | Slice 25 |
+| `plugins/sagas` | NOT_RUN | `deno check` | Slice 26 |
+| `plugins/workers` | NOT_RUN | `deno check` | Slice 26 |
+
+## Handoff Notes
+
+- Evaluator should inspect `runtime-config` split first — it is the largest structural change.
+- Verify `deno doc --lint` is clean on ALL entrypoints (root + every subpath) before approving.
+- Check that no `helpers/` folder remains after slices 11, 19, 20.
+- Confirm `runtime-config` has tests before final gate.

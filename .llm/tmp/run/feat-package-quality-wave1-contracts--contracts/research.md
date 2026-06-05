@@ -1,49 +1,132 @@
 # Research — feat-package-quality-wave1-contracts--contracts
 
-> **Reviewer seed.** These are verified facts from an initial scan of
-> `feat/package-quality`. Re-baseline against the current branch and extend before locking the
-> plan. Do not treat as final.
+> **Re-baselined against `feat/package-quality` @ 76fbeb7.**
+> The canonical audit under `.llm/tmp/run/copilot-evaluate-every-package-jsr-release--package-jsr-alpha-release/`
+> predates the plugin-platform merge; all counts below are re-derived from the current tree.
 
 ## Re-baseline
 
-- Carried-in canonical audit: `.llm/tmp/run/copilot-evaluate-every-package-jsr-release--package-jsr-alpha-release/`
-  (`plan_runtime-config.md` etc.). **Predates the plugin-platform merge** — stale skeleton only.
-  Re-derive every count against `feat/package-quality`.
-- Base: `feat/package-quality` (Wave 0 `shared` + Wave 0b harness reinforcement + agent docs merged).
+- Carried-in canonical audit: `plan_runtime-config.md`, `plan_config.md`, `plan_contracts.md`.
+- What changed vs the carried-in version:
+  - `runtime-config`: stale audit claimed 1 slow type; **actual dry-run = 0 slow types**.
+  - `config`: stale audit claimed 35 slow types; **actual dry-run = 0 slow types** (workspace `isolatedDeclarations` already enforced).
+  - `contracts`: stale audit claimed 30 slow types; **actual dry-run = 0 slow types**.
+  - All three packages now have `version: 0.0.1-alpha.0` and scoped names.
+  - `config` README exists (was flagged missing in stale audit); `runtime-config` README still missing.
 
-## Wave 1 units (3)
+## Findings
 
-| Unit | Version | Exports (`deno.json`) | README | `/docs` | Tests | Notes |
-|------|---------|-----------------------|--------|---------|-------|-------|
-| `@netscript/config` | `0.0.1-alpha.0` | `.`, `./merge`, `./paths`, `./schema/plugins` | yes (~7.5 KB) | `docs/` present | `tests/` present | Root files: `define-config.ts`, `env.ts`, `helpers.ts`, `loader.ts`, `types.ts` (~15 KB), `workspace.ts`. `helpers.ts` is a generic name (doctrine folder-vocab finding). `check` task uses `--unstable-kv`. Deps: `@std/fs`, `@std/path`, `zod@4`. |
-| `@netscript/contracts` | `0.0.1-alpha.0` | `.`, `./crud`, `./query`, `./transform` | yes (~11.7 KB) | `docs/` present | `tests/` present | Dirs: `crud/`, `helpers/`, `schemas/`, `src/`. `helpers/` is a generic folder (doctrine finding). Deps: `zod@4`, `@orpc/server`. `mod.ts` tiny (~0.7 KB). |
-| `@netscript/runtime-config` | `0.0.1-alpha.0` | `.` only | **MISSING** | **MISSING** | **MISSING** | Single `mod.ts` ~13.4 KB (file-size gate F-1 risk). Dep: `@std/path`. **Least developed** — needs README >= 150 LOC, `/docs` per STANDARDS § 7, and tests. |
+### `@netscript/config`
 
-## Slow-types posture
+| # | Finding | How to verify |
+|---|---------|---------------|
+| 1 | `deno publish --dry-run` **SUCCESS** — 0 slow types, 0 portability errors. | `cd packages/config && deno publish --dry-run --allow-dirty` |
+| 2 | 1 `unanalyzable-dynamic-import` warning on `loader.ts:93` (non-blocking). | same dry-run output |
+| 3 | `deno doc --lint mod.ts` = **33 errors**: 1 `private-type-ref` (`SagaGroupInput` in `helpers.ts:57`) + 32 `missing-jsdoc` on `types.ts` interface properties. | `deno doc --lint mod.ts` |
+| 4 | `deno doc --lint src/merge/mod.ts` = **multiple errors**: `private-type-ref` (`NetScriptConfig`, `DatabaseEntry`, `ServiceContributionEntry`, `AppContributionEntry`) + `missing-jsdoc` on `PartialConfig` properties. | `deno doc --lint src/merge/mod.ts` |
+| 5 | `deno doc --lint src/schema/plugins/mod.ts` = **many `missing-jsdoc`** + `private-type-ref` on `z.ZodType` (Zod internals leak through public schema constants). | `deno doc --lint src/schema/plugins/mod.ts` |
+| 6 | README = **255 LOC** ✓ (≥ 150). Covers overview, quickstart, API glance, install, license. Missing some STANDARDS § 6 sections (mental model, common recipes, observability, stability, compatibility, contributing). | `wc -l README.md` |
+| 7 | `/docs` partially present: `README.md`, `architecture.md`, `concepts.md`, `getting-started.md`. **Missing**: `recipes/`, `reference/` (beyond stub), `advanced/`. | `find docs -type f` |
+| 8 | `helpers.ts` (68 LOC) at package root — **generic folder name** (AP-16). Contains `SagaDefinitionInput`, `SagaGroupInput`, `SagasConfigInput`, `defineSagas`. This is domain vocabulary, not generic helpers. | `cat helpers.ts` |
+| 9 | `types.ts` = 500 LOC — at F-1 boundary but acceptable for a type-only file with 1:1 field JSDoc. | `wc -l types.ts` |
+| 10 | Subpath exports: `./merge`, `./paths`, `./schema/plugins` — all resolve and are imported by CLI. | `deno.json` + `grep -r "@netscript/config/merge"` |
+| 11 | Published file list = 29 files (includes root `*.ts`, `src/**/*.ts`, docs). Clean — no test files leak. | dry-run output |
 
-- Workspace root `deno.json` sets `compilerOptions.isolatedDeclarations: true` (forces explicit
-  types) — slow-types should be largely satisfied already.
-- Per-package `publish:dry-run` tasks do **not** pass `--allow-slow-types` — i.e. these packages are
-  expected to be slow-types-clean. **Verify** with `deno publish --dry-run` per unit and record the
-  real output.
+### `@netscript/contracts`
 
-## Archetype
+| # | Finding | How to verify |
+|---|---------|---------------|
+| 12 | `deno publish --dry-run` **SUCCESS** — 0 slow types, 0 portability errors. | `cd packages/contracts && deno publish --dry-run --allow-dirty` |
+| 13 | `deno doc --lint mod.ts` = **1 error** (checked 1 file — root mod.ts is just `export * from './src/public/mod.ts'`). | `deno doc --lint mod.ts` |
+| 14 | `deno doc --lint crud.ts query.ts transform.ts` = **21 errors**: all `private-type-ref` — `ContractSchema`, `ContractObjectSchema`, `BaseContractProcedure` are referenced in public signatures but not exported from the subpaths that use them. | `deno doc --lint crud.ts query.ts transform.ts` |
+| 15 | README = **424 LOC** ✓. Strong overview, quickstart, subpath explanation. Missing some STANDARDS § 6 sections. | `wc -l README.md` |
+| 16 | `/docs` partially present: `README.md`, `architecture.md`, `concepts.md`, `recipes/paginated-contract.md`, `reference/README.md`. **Missing**: `getting-started.md`, `advanced/`. | `find docs -type f` |
+| 17 | `helpers/` folder — **generic name** (AP-16). Contains `paginated-query.ts` (264 LOC) and `transform.ts` (182 LOC). These are application-layer concerns, not generic helpers. | `ls helpers/` |
+| 18 | `crud/` folder at root (not under `src/`) — contains `create-crud-contract.ts` (7.77 KB). Acceptable for a subpath concern but inconsistent with `src/` layout. | `ls crud/` |
+| 19 | Subpath exports: `./crud`, `./query`, `./transform` — all resolve. Consumed by `plugins/sagas`, `plugins/workers`. | `deno.json` + grep |
+| 20 | Published file list = 20 files. Clean. | dry-run output |
 
-- All three are **Archetype 1 (Small Contract)** candidates. `config` and `runtime-config` carry
-  light Integration (env / `@std/fs` / `@std/path`); confirm whether that pulls either toward
-  Archetype 2 in the Design checkpoint.
+### `@netscript/runtime-config`
 
-## jsr-audit (Plan-Gate input — D3)
+| # | Finding | How to verify |
+|---|---------|---------------|
+| 21 | `deno publish --dry-run` **SUCCESS** — 0 slow types, 0 portability errors. | `cd packages/runtime-config && deno publish --dry-run --allow-dirty` |
+| 22 | `deno doc --lint mod.ts` = **34 errors**: all `missing-jsdoc` on interface properties (`JobOverride`, `SagaOverride`, `TriggerOverride`, `FeatureFlag`, `RuntimeTask`, `RuntimeConfig`). | `deno doc --lint mod.ts` |
+| 23 | **README MISSING** — 0 LOC. | `ls README.md` fails |
+| 24 | **`/docs` MISSING entirely**. | `ls docs/` fails |
+| 25 | `mod.ts` = **415 LOC** — single file mixing domain types, application logic (loader), presentation (console.log in watcher/summary), and side effects (`Deno.watchFs`, `setTimeout`). F-1 file-size gate: 415 < 500, so not a hard violation, but the **doctrine verdict is "Refactor — Split single-file mod.ts"**. | `wc -l mod.ts` + doctrine/10-codebase-verdict-and-handoff.md |
+| 26 | **No tests** — `tests/` directory does not exist. | `ls tests/` fails |
+| 27 | **No `deno.json` tasks** — missing `check`, `test`, `lint`, `fmt`, `publish:dry-run`. | `cat deno.json` |
+| 28 | **No `description` field** in `deno.json`. | `cat deno.json` |
+| 29 | `console.log` / `console.warn` / `console.error` used in `watchRuntimeConfig` and `logRuntimeConfigSummary` — AP-13 violation (console in non-presentation code). | `grep -n "console\." mod.ts` |
+| 30 | Published file list = 2 files (`deno.json`, `mod.ts`). Minimal but correct. | dry-run output |
 
-Apply the `jsr-audit` skill rubric to each unit's PLANNED public surface BEFORE slicing: name
-slow-type / surface risks, confirm `name`/`version`/`exports`, description <= 250 chars, README
->= 150 LOC, `deno doc --lint` clean, `/docs` per STANDARDS § 7.
+## jsr-audit surface scan (Plan-Gate input)
 
-## Open questions (the plan must close)
+### `@netscript/config`
 
-- `runtime-config`: does the ~13.4 KB single `mod.ts` exceed the F-1 file-size gate, and should it
-  be split into the doctrine layout? Decide in Design.
-- `config/helpers.ts` and `contracts/helpers/`: rename per doctrine folder vocabulary, or record an
-  `arch-debt.md` entry if deferred? Decide + log.
-- Confirm the exact STANDARDS § 7 `/docs` structure target for each unit (`runtime-config` has none).
-- Re-derive the real `deno publish --dry-run` slow-type output for each unit (canonical audit is stale).
+| Check | Status | Notes |
+|-------|--------|-------|
+| Required metadata | ✓ | name, version, exports, license present |
+| Scoped package name | ✓ | `@netscript/config` |
+| Package description | ✓ | ≤ 250 chars |
+| Valid exports | ✓ | 4 entrypoints, all exist |
+| No slow types | ✓ | 0 slow types |
+| Clean file list | ✓ | No test files, no IDE configs |
+| ESM only | ✓ | No CJS |
+| Module documentation | ⚠ | `@module` present on root, missing on some subpaths |
+| Symbol documentation | ✗ | 33+ `missing-jsdoc` errors |
+
+**Surface risks:**
+- `private-type-ref` on `SagaGroupInput` blocks clean `deno doc --lint`.
+- Zod internal type (`z.ZodType`) leaks through public schema exports in `schema/plugins` — this is a slow-type risk if Zod changes internals.
+- Dynamic import in `loader.ts` produces publish warning (non-blocking but noisy).
+
+### `@netscript/contracts`
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Required metadata | ✓ | name, version, exports, license present |
+| Scoped package name | ✓ | `@netscript/contracts` |
+| Package description | ✓ | ≤ 250 chars |
+| Valid exports | ✓ | 4 entrypoints, all exist |
+| No slow types | ✓ | 0 slow types |
+| Clean file list | ✓ | No test files leak |
+| ESM only | ✓ | No CJS |
+| Module documentation | ✓ | `@module` on all entrypoints |
+| Symbol documentation | ✗ | 21 `private-type-ref` errors on subpaths |
+
+**Surface risks:**
+- `private-type-ref` is the dominant issue: `ContractSchema`, `ContractObjectSchema`, `BaseContractProcedure` are used in public function signatures but not re-exported from the subpaths that consume them. Consumers cannot name these types.
+- `helpers/` folder name is AP-16 (generic folder vocab).
+
+### `@netscript/runtime-config`
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Required metadata | ⚠ | name, version present; **description missing** |
+| Scoped package name | ✓ | `@netscript/runtime-config` |
+| Package description | ✗ | Missing |
+| Valid exports | ✓ | 1 entrypoint exists |
+| No slow types | ✓ | 0 slow types |
+| Clean file list | ✓ | Minimal (2 files) |
+| ESM only | ✓ | No CJS |
+| Module documentation | ✓ | `@module` present |
+| Symbol documentation | ✗ | 34 `missing-jsdoc` errors |
+
+**Surface risks:**
+- Single 415-line file is a maintenance liability; no separation of domain/application/presentation.
+- Console usage in watcher violates AP-13.
+- Missing README and docs entirely — JSR doc score will be severely impacted.
+- No tests means no fitness function protecting the contract.
+
+## Open questions (all closed by this research)
+
+| Question | Answer | Evidence |
+|----------|--------|----------|
+| `runtime-config`: does ~13.4 KB `mod.ts` exceed F-1? | **No** — 415 LOC, under 500 cap. But doctrine verdict still says "Refactor — split single-file mod.ts" because it mixes concerns. | `wc -l mod.ts` + doctrine/10 |
+| `config/helpers.ts` and `contracts/helpers/`: rename or debt? | **Rename now** — both are small moves with no downstream breakage. `config/helpers.ts` → `src/domain/saga-inputs.ts`. `contracts/helpers/` → fold into `src/application/` by role. | grep shows imports are intra-package only |
+| STANDARDS § 7 `/docs` target for each unit? | **All three need expansion**. `config` needs recipes/ + advanced/. `contracts` needs getting-started.md + advanced/. `runtime-config` needs full docs from scratch. | `find docs -type f` per package |
+| Real slow-type counts? | **All three = 0 slow types**. The stale audit counts (35, 30, 1) are obsolete. | `deno publish --dry-run` per package |
+| Archetype for config/runtime-config — pulled toward Integration? | **No — both stay Archetype 1**. `config` uses `@std/fs`/`@std/path` for loading, but the package value is still "clarity of types." `runtime-config` uses `@std/path` and `Deno.*` for file watching, but the surface is still a small contract (load + accessors). Neither has ports/adapters worth naming. | doctrine/06-archetypes.md § "How to choose" |
+| `contracts` archetype — 1 or 4? | **Archetype 1 for this wave**. Doctrine table says 4 (DSL/Builder), but the package has no NetScript-defined fluent builder. It exports schema factories and type aliases. The DSL is oRPC's, not ours. If a builder API is added later, archetype escalates to 4. | `cat mod.ts` + `cat src/public/mod.ts` |

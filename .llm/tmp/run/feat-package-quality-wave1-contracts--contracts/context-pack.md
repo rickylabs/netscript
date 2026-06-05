@@ -5,30 +5,49 @@
 | Run ID | `feat-package-quality-wave1-contracts--contracts` |
 | Branch | `feat/package-quality-wave1-contracts` |
 | Base | `feat/package-quality` (Wave 0 `shared` + Wave 0b harness/docs merged) |
-| Phase | Research / Plan & Design (not started) |
+| Phase | **Plan & Design — READY FOR REVIEW** |
 | Units | `@netscript/config`, `@netscript/contracts`, `@netscript/runtime-config` |
-| Archetype | 1 — Small Contract (confirm per unit) |
+| Archetype | 1 — Small Contract (all three) |
 | Scope overlay | none (package wave) |
 
 ## Goal
 
-Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-types**,
-`deno doc --lint` clean, README >= 150 LOC, `/docs` per STANDARDS § 7, archetype gate matrix
-green per unit. **S1 STOPS at publish-clean dry-run — do NOT publish.**
+Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-types**, `deno doc --lint` clean, README ≥ 150 LOC, `/docs` per STANDARDS § 7, archetype gate matrix green per unit. **S1 STOPS at publish-clean dry-run — do NOT publish.**
 
 ## Status
 
-Branch + run dir scaffolded by the reviewer. `research.md` is a **reviewer seed** — verify against
-the current tree and extend. `plan.md` / `worklog.md` / `drift.md` / `commits.md` to be scaffolded
-by the generator from `.llm/harness/templates/`.
+- [x] `research.md` — re-baselined with REAL dry-run numbers (0 slow types all three)
+- [x] `plan.md` — locked decisions, open-decision sweep, risk register, gate set selected
+- [x] `worklog.md` — Design checkpoint with public surface, domain vocabulary, 27 commit slices
+- [x] `drift.md` — re-baseline drift logged
+- [x] `commits.md` — scaffolded (no commits yet)
+- [ ] `plan-eval.md` — pending PLAN-EVAL session
 
-## Operating reminders (harness v2, 8-phase)
+## Key findings (re-baselined)
 
-- Run loop is now **8 phases** with a **Plan-Gate**. Do NOT commit an implementation slice before
-  **PLAN-EVAL** returns `PASS` (separate session). See `.llm/harness/workflow/run-loop.md` § 4 and
-  `.llm/harness/gates/plan-gate.md`.
-- `jsr-audit` is a **Plan-Gate checklist item** for this package wave — apply its rubric to the
-  PLANNED public surface before slicing.
-- The canonical audit under `.llm/tmp/run/copilot-evaluate-every-package-jsr-release--package-jsr-alpha-release/`
-  is a **stale skeleton** (predates the plugin-platform merge) — re-baseline, do not trust counts.
-- Doctrine now lives at `docs/architecture/doctrine/` (not `.llm/research/...`).
+| Unit | Slow types | `deno doc --lint` | README LOC | `/docs` | Tests |
+|------|-----------:|------------------:|-----------:|---------|-------|
+| `@netscript/config` | **0** | 33 errors | 255 ✓ | partial | exists |
+| `@netscript/contracts` | **0** | 21 errors | 424 ✓ | partial | exists |
+| `@netscript/runtime-config` | **0** | 34 errors | **0** ✗ | **missing** ✗ | **missing** ✗ |
+
+## Locked decisions (8)
+
+1. All three stay Archetype 1.
+2. `runtime-config/mod.ts` splits into `src/domain/`, `src/application/`, `src/diagnostics/`.
+3. `config/helpers.ts` → `src/domain/saga-inputs.ts`.
+4. `contracts/helpers/` → `src/application/` by role.
+5. `runtime-config` console usage → structured diagnostics (return values).
+6. Fix `private-type-ref` by exporting referenced types.
+7. Remove Zod internal (`z.ZodType`) from public signatures.
+8. Keep `crud/` at package root (subpath export stability).
+
+## Commit slices
+
+27 slices ordered by dependency: runtime-config (1–10), config (11–18), contracts (19–24), cross-cutting (25–27).
+
+## Operating reminders
+
+- **Plan-Gate is a hard stop.** No implementation slice before PLAN-EVAL returns `PASS`.
+- PLAN-EVAL is a **separate session**.
+- `jsr-audit` rubric applied to planned surface; risks named.
