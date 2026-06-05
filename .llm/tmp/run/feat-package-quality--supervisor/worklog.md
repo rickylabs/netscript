@@ -25,13 +25,14 @@ authority is the nested canonical run
 - [x] `plan.md` + `phase-registry.md` scaffolded and reconciled to the 27-unit surface.
 - [x] Canonical S1 run + master program run carried into `.llm/tmp/run/`.
 - [x] `docs/architecture/{STANDARDS,PUBLIC-SURFACE-PATTERNS,DOCS-STRUCTURE,doctrine}` present.
+- [x] `.worktrees/` gitignored on `main`; S1 worktree `.worktrees/package-quality` created.
 - [ ] **Wave 0 baseline re-audit not yet run** — first task for the implementation agent.
 
 ## Progress Log
 
 | Time | Wave | Step | Notes |
 |------|------|------|-------|
-| hand-off | — | scaffold | Supervisor `plan.md` + `phase-registry.md` prepared; run artifacts seeded; awaiting Wave 0 launch |
+| hand-off | — | scaffold | Supervisor `plan.md` + `phase-registry.md` prepared; run artifacts seeded; `.worktrees/` infra ready; awaiting Wave 0 launch |
 
 ## Decisions
 
@@ -45,6 +46,17 @@ authority is the nested canonical run
 
 Per wave, recorded in each wave's nested `worklog.md`. None run at the supervisor
 level yet.
+
+## Worktree layout (parallelization)
+
+The primary tree (`.genesis/netscript`) stays on `main` as the coordination
+baseline; `.worktrees/` is gitignored. Each active branch gets its own worktree
+under `.worktrees/<name>`:
+
+- This S1 supervisor branch: `.worktrees/package-quality` (already created).
+- Each wave: `git worktree add .worktrees/<wave> feat/package-quality/<wave>`
+  (e.g. `.worktrees/wave0-foundation`). Independent waves can run in parallel
+  worktrees; base-sync `main` → branch → wave first (`supervisor.md` § 5).
 
 ## Handoff Notes
 
