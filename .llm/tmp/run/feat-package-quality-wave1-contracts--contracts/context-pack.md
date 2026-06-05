@@ -25,6 +25,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 1 — `runtime-config` domain types scaffolded; `deno doc --lint src/domain/types.ts` passed.
 - [x] Slice 2 — `runtime-config` loader extracted; `deno check src/application/loader.ts` passed.
 - [x] Slice 3 — `runtime-config` watcher extracted with no `console.*` in `src/`; `deno check src/application/watcher.ts` passed.
+- [x] Slice 4 — `runtime-config` structured summary added; `deno check src/diagnostics/summary.ts` passed.
 
 ## Key findings (re-baselined)
 

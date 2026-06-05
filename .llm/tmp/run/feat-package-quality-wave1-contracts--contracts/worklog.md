@@ -182,6 +182,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 2 | Gate | `deno check src/application/loader.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 3 | Implement | Added `packages/runtime-config/src/application/watcher.ts` with debounced reloads and no package-level console emission. |
 | 2026-06-06 | 3 | Gate | `deno check src/application/watcher.ts` passed; `Get-ChildItem src -Recurse -File \| Select-String -Pattern 'console\\.'` returned 0 matches. |
+| 2026-06-06 | 4 | Implement | Added `packages/runtime-config/src/diagnostics/summary.ts` with `summarizeRuntimeConfig()` and typed structured summary data. |
+| 2026-06-06 | 4 | Gate | `deno check src/diagnostics/summary.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 
