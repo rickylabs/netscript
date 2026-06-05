@@ -115,19 +115,6 @@ migration plan and debt entry explicitly cover them.
 - **Ignoring debt registry** — New violations must be recorded with a closing gate and owner.
   Unrecorded violations are `FAIL_DEBT`.
 
-## What NetScript doesn't do yet
-
-> **Status: draft — pending user approval before becoming mandatory.**
-
-- **Private JSR packages** — Not yet available. Workaround: use public packages with scoped names
-  and internal documentation. Tracked by JSR.
-- **Automated fitness gate scripts** — Phase A; gates are run manually or reported as
-  `PENDING_SCRIPT`. Workaround: manual evidence in `worklog.md`.
-- **Cross-package refactoring assistant** — No automated tool renames symbols across packages.
-  Workaround: `grep` + manual refactor.
-- **Visual architecture diagram generation** — No tool generates diagrams from the doctrine.
-  Workaround: maintain diagrams manually in `docs/`.
-
 ## Reference Files
 
 | File                                                                   | Load when                                   |

@@ -63,19 +63,6 @@ this skill tells you what to load and in what order.
 - **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
 - **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
 
-## What NetScript doesn't do yet
-
-> **Status: draft — pending user approval before becoming mandatory.**
-
-- **Automated fitness gate scripts** — Phase A; most gates are manual or `PENDING_SCRIPT`.
-  Workaround: manual evidence in `worklog.md`.
-- **Parallel group execution** — Supervisor runs launch groups sequentially. Workaround: design
-  groups to be independent; merge order matters.
-- **Automatic archetype detection** — The agent must select the archetype manually. Workaround: use
-  the decision tree in `archetypes/README.md`.
-- **Real-time drift monitoring** — Drift is logged manually in `drift.md`. Workaround: append after
-  significant steps.
-
 ## Run Artifacts
 
 Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from `.llm/harness/templates/`.
