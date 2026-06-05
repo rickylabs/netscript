@@ -213,3 +213,16 @@ or current-state documentation.
 - **Evidence:** `packages/contracts/deno.json`, `packages/contracts/mod.ts`,
   `packages/contracts/{crud,query,transform}.ts`, plugin `deno.json` import maps, CLI scaffold
   resolvers.
+
+## 2026-06-05 — Tracked workspace lockfile expansion
+
+- **What:** The evaluator baseline introduced a tracked root `deno.lock`; the post-rebase
+  `deno task check` expanded it with the current workspace graph.
+- **Source:** Full branch validation after migrating `@netscript/shared` consumers to
+  `@netscript/contracts`.
+- **Expected:** Original Wave 0 package plan did not account for a tracked root lockfile.
+- **Actual:** `deno.lock` must be refreshed with the migrated workspace graph to keep validation
+  reproducible from a clean checkout.
+- **Severity:** low
+- **Action:** accept
+- **Evidence:** `deno task check` passed after lockfile refresh.
