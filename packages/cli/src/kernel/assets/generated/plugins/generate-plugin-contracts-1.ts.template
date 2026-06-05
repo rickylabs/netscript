@@ -1,0 +1,32 @@
+/**
+ * {{__slot0__}} plugin contract — Version 1
+ *
+ * Shared API surface for the {{__slot1__}} plugin.
+ */
+
+import { implement } from '@orpc/server';
+import { baseContract } from '@netscript/shared';
+import { z } from 'zod';
+
+export const {{__slot2__}}StatusSchemaV1 = z.object({
+  status: z.enum(['ready']).describe('Plugin readiness state'),
+  plugin: z.string().describe('Plugin name'),
+  kind: z.literal('{{__slot3__}}').describe('Plugin kind'),
+  version: z.string().describe('Plugin version'),
+  timestamp: z.string().datetime().describe('ISO timestamp'),
+  uptimeSeconds: z.number().int().nonnegative().describe('Process uptime in seconds'),
+});
+
+export type {{__slot4__}}StatusV1 = z.infer<typeof {{__slot5__}}StatusSchemaV1>;
+
+export const {{__slot6__}}Contract = {
+  status: baseContract
+    .route({ method: 'GET', path: '/{{__slot7__}}/status' })
+    .output({{__slot8__}}StatusSchemaV1),
+};
+
+export const {{__slot9__}}ContractV1 = implement({{__slot10__}}Contract);
+
+export const v1 = {
+  {{__slot11__}}: {{__slot12__}}ContractV1,
+};

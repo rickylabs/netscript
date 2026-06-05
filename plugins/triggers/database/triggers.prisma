@@ -1,0 +1,95 @@
+// Triggers Plugin Prisma Schema
+// This schema defines the database tables for the triggers plugin.
+// Phase 2: Minimal stub for plugin manifest. Full event persistence in Phase 5.
+
+// ============================================================================
+// TRIGGER EVENT
+// ============================================================================
+
+/// Trigger event persistence — records fired trigger events for audit and replay.
+/// Phase 2 creates the schema; Phase 5 fully implements event storage.
+model TriggerEvent {
+  /// Unique event identifier (UUID)
+  id          String   @id @default(uuid()) @db.Uuid
+
+  /// ID of the trigger that fired
+  triggerId   String   @map("trigger_id") @db.VarChar(100)
+
+  /// Trigger type (file, webhook, cron, etc.)
+  triggerType String   @map("trigger_type") @db.VarChar(50)
+
+  /// Event status (detected, processing, completed, failed)
+  status      String   @db.VarChar(20)
+
+  /// Event payload (file path, webhook body, etc.)
+  payload     Json?
+
+  /// Content hash for deduplication
+  contentHash String?  @map("content_hash") @db.VarChar(64)
+
+  /// Action results (JSON array of ActionResult)
+  actionResults Json?  @map("action_results")
+
+  /// Error message if status is failed
+  error       String?  @db.Text
+
+  /// Record timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([triggerId])
+  @@index([status])
+  @@index([triggerType])
+  @@index([createdAt])
+  @@index([triggerId, status])
+  @@map("trigger_events")
+}
+
+// ============================================================================
+// TRIGGER DEFINITION (Optional — for runtime-created triggers)
+// ============================================================================
+
+/// Trigger definition metadata — tracks triggers registered via API.
+/// Code-defined triggers are loaded at startup; this is for dynamic registration.
+model TriggerDefinition {
+  /// Unique trigger identifier (kebab-case)
+  id          String   @id @db.VarChar(100)
+
+  /// Human-readable display name
+  name        String   @db.VarChar(255)
+
+  /// Trigger description
+  description String?  @db.Text
+
+  /// Trigger type (file, webhook, cron, etc.)
+  type        String   @db.VarChar(50)
+
+  /// Whether the trigger is active
+  enabled     Boolean  @default(true)
+
+  /// Topic grouping (mirrors worker topics)
+  topic       String   @default("default") @db.VarChar(100)
+
+  /// Tags for categorization
+  tags        String[] @default([])
+
+  /// Where this trigger is defined: code, api, config
+  source      String   @default("code") @db.VarChar(20)
+
+  /// Full trigger configuration (JSON)
+  config      Json?
+
+  /// Additional metadata (JSON)
+  metadata    Json?
+
+  /// Record timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([type])
+  @@index([enabled])
+  @@index([topic])
+  @@index([source])
+  @@index([tags])
+  @@map("trigger_definitions")
+}

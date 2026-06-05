@@ -1,0 +1,272 @@
+// Workers Plugin Prisma Schema
+// This schema defines the database tables for the workers plugin.
+// Job definitions are stored in Postgres for persistence and querying.
+// Note: Execution records remain in KV for real-time performance.
+
+// ============================================================================
+// JOB DEFINITION
+// ============================================================================
+
+/// Job definition - stored in Postgres for persistence
+/// This tracks registered jobs, their configuration, and source information.
+model JobDefinition {
+  /// Unique job identifier (e.g., 'export-data', 'analytics-cleanup')
+  id          String   @id @db.VarChar(100)
+
+  /// Human-readable name
+  name        String   @db.VarChar(255)
+
+  /// Job description
+  description String?  @db.Text
+
+  /// Where this job definition comes from: local, plugin, database, remote
+  source      String   @default("database") @db.VarChar(20)
+
+  /// Plugin ID that registered this job (if source is 'plugin')
+  pluginId    String?  @map("plugin_id") @db.VarChar(100)
+
+  /// How this job should be executed: deno, task, wrapper
+  executionType String @default("deno") @map("execution_type") @db.VarChar(20)
+
+  /// Path to the job entrypoint script (for deno execution)
+  entrypoint  String?  @db.VarChar(500)
+
+  /// Remote URL for the script (for remote source)
+  sourceUrl   String?  @map("source_url") @db.VarChar(1000)
+
+  /// Import map URL for Deno
+  importMapUrl String? @map("import_map_url") @db.VarChar(1000)
+
+  /// Allowed hosts for dynamic imports (JSON array)
+  allowedImportHosts Json? @map("allowed_import_hosts")
+
+  /// Task ID to execute (for task execution type)
+  taskId      String?  @map("task_id") @db.VarChar(100)
+
+  /// Task type if using inline task (not referencing registered task)
+  taskType    String?  @map("task_type") @db.VarChar(20)
+
+  /// Wrapper type name (for wrapper execution type)
+  wrapperType String?  @map("wrapper_type") @db.VarChar(50)
+
+  /// Wrapper configuration object (JSON)
+  wrapperConfig Json?  @map("wrapper_config")
+
+  /// Cron schedule expression
+  schedule    String?  @db.VarChar(100)
+
+  /// Timezone for schedule (IANA timezone)
+  timezone    String   @default("UTC") @db.VarChar(50)
+
+  /// Execution timeout in milliseconds
+  timeout     Int      @default(300000)
+
+  /// Maximum retry attempts
+  maxRetries  Int      @default(3) @map("max_retries")
+
+  /// Retry delay in milliseconds
+  retryDelay  Int      @default(1000) @map("retry_delay")
+
+  /// Maximum concurrent executions (0 = unlimited)
+  maxConcurrency Int   @default(1) @map("max_concurrency")
+
+  /// Whether the job is enabled
+  enabled     Boolean  @default(true)
+
+  /// Deno permissions for job execution (JSON)
+  permissions Json?
+
+  /// Tags for categorization
+  tags        String[] @default([])
+
+  /// Additional metadata (JSON)
+  metadata    Json?
+
+  /// Cryptographic signature for remote scripts (JSON)
+  signature   Json?
+
+  /// Record timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  tasks       TaskDefinition[]
+
+  @@index([source])
+  @@index([pluginId])
+  @@index([enabled])
+  @@index([schedule])
+  @@index([tags])
+  @@map("job_definitions")
+}
+
+// ============================================================================
+// TASK DEFINITION
+// ============================================================================
+
+/// Task definition - executable unit that can be referenced by jobs
+/// Supports multiple runtime types (Deno, Python, .NET, shell, etc.)
+model TaskDefinition {
+  /// Unique task identifier
+  id          String   @id @db.VarChar(100)
+
+  /// Human-readable name
+  name        String   @db.VarChar(255)
+
+  /// Task description
+  description String?  @db.Text
+
+  /// Execution type: deno, python, dotnet, cmd, powershell, shell, executable
+  type        String   @db.VarChar(20)
+
+  /// Source type: local, plugin, remote, inline, shared
+  source      String   @default("local") @db.VarChar(20)
+
+  /// Path to the script/executable
+  entrypoint  String   @db.VarChar(500)
+
+  /// Remote URL for remote source tasks
+  sourceUrl   String?  @map("source_url") @db.VarChar(1000)
+
+  /// Import map URL for Deno tasks
+  importMapUrl String? @map("import_map_url") @db.VarChar(1000)
+
+  /// Command line arguments (JSON array)
+  args        Json?
+
+  /// Working directory (supports UNC paths)
+  cwd         String?  @db.VarChar(500)
+
+  /// Environment variables (JSON object)
+  env         Json?
+
+  /// Execution timeout in milliseconds
+  timeout     Int      @default(300000)
+
+  /// Deno permissions for Deno tasks (JSON)
+  permissions Json?
+
+  /// Plugin ID that registered this task (if plugin source)
+  pluginId    String?  @map("plugin_id") @db.VarChar(100)
+
+  /// Inline script content (for inline source)
+  inlineScript String? @map("inline_script") @db.Text
+
+  /// Runtime-specific configuration (JSON) - python, dotnet, shell configs
+  runtimeConfig Json?  @map("runtime_config")
+
+  /// Tags for categorization
+  tags        String[] @default([])
+
+  /// Additional metadata (JSON)
+  metadata    Json?
+
+  /// Record timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  jobId       String?  @map("job_id") @db.VarChar(100)
+  job         JobDefinition? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([source])
+  @@index([pluginId])
+  @@index([tags])
+  @@map("task_definitions")
+}
+
+// ============================================================================
+// WRAPPER TYPE REGISTRATION
+// ============================================================================
+
+/// Registered wrapper types - enables custom execution patterns
+model WrapperType {
+  /// Wrapper type identifier (e.g., 'default', 'etl', 'conditional')
+  type        String   @id @db.VarChar(50)
+
+  /// Human-readable name
+  name        String   @db.VarChar(255)
+
+  /// Wrapper description
+  description String?  @db.Text
+
+  /// Path to wrapper implementation module
+  entrypoint  String?  @db.VarChar(500)
+
+  /// Plugin ID that registered this wrapper
+  pluginId    String?  @map("plugin_id") @db.VarChar(100)
+
+  /// Whether this is a built-in wrapper type
+  builtIn     Boolean  @default(false) @map("built_in")
+
+  /// Record timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([pluginId])
+  @@map("wrapper_types")
+}
+
+// ============================================================================
+// JOB EXECUTION HISTORY (Optional - for long-term analytics)
+// ============================================================================
+
+/// Job execution history - archived from KV for long-term storage
+/// Note: Active executions stay in KV for real-time performance
+model JobExecutionHistory {
+  /// Unique execution ID
+  id           String   @id @db.Uuid
+
+  /// Job identifier
+  jobId        String   @map("job_id") @db.VarChar(100)
+
+  /// Final execution status
+  status       String   @db.VarChar(20)
+
+  /// What triggered this execution
+  triggeredBy  String   @map("triggered_by") @db.VarChar(20)
+
+  /// When the execution was triggered
+  triggeredAt  DateTime @map("triggered_at")
+
+  /// When execution started
+  startedAt    DateTime? @map("started_at")
+
+  /// When execution completed
+  completedAt  DateTime? @map("completed_at")
+
+  /// Process exit code
+  exitCode     Int?     @map("exit_code")
+
+  /// Execution duration in milliseconds
+  duration     Int?
+
+  /// Error message if failed
+  error        String?  @db.Text
+
+  /// Result data from the job (JSON)
+  result       Json?
+
+  /// Worker ID that processed this job
+  workerId     String?  @map("worker_id") @db.VarChar(100)
+
+  /// Retry attempt number
+  attempt      Int      @default(0)
+
+  /// Original payload (JSON)
+  payload      Json?
+
+  /// Correlation ID for tracing
+  correlationId String? @map("correlation_id") @db.VarChar(100)
+
+  /// Record created timestamp (when archived)
+  archivedAt   DateTime @default(now()) @map("archived_at")
+
+  @@index([jobId])
+  @@index([status])
+  @@index([triggeredAt])
+  @@index([completedAt])
+  @@index([correlationId])
+  @@map("job_execution_history")
+}

@@ -1,0 +1,241 @@
+# {{pluginName}}
+
+NetScript plugin package for {{pluginBaseName}} capabilities.
+
+## Overview
+
+`{{pluginName}}` is a scaffolded NetScript plugin.
+
+Replace this overview with the problem your plugin solves.
+
+Keep the first paragraph short enough for JSR search results.
+
+The package starts with empty contribution hooks.
+
+Add only the axes your plugin owns.
+
+The root module exports a manifest created with `definePlugin`.
+
+The CLI subpath exposes a `PluginCli` subclass.
+
+The Aspire subpath exposes an Aspire contribution.
+
+The e2e subpath exposes gate factories.
+
+The testing subpath exposes test fixtures.
+
+## Quickstart
+
+Install the plugin into a NetScript project:
+
+```bash
+netscript plugin add {{pluginName}}
+```
+
+Run the plugin CLI:
+
+```bash
+deno dx jsr:{{pluginName}}/cli --help
+```
+
+Check the package before publishing:
+
+```bash
+deno task check
+deno task test
+deno task publish:dry-run
+```
+
+## Mental model
+
+Plugins contribute capabilities through a manifest.
+
+The host reads `netscript.config.ts`.
+
+The host resolves each plugin manifest.
+
+The host merges contribution axes.
+
+The host runs the walker.
+
+The walker emits generated registries.
+
+Generated registries live under `.netscript/generated`.
+
+User code stays in normal project folders.
+
+The plugin package owns plugin semantics.
+
+The framework owns host wiring.
+
+## API
+
+The root entrypoint exports the manifest.
+
+`./cli` runs the plugin command tree.
+
+`./scaffolding` is reserved for item scaffolding helpers.
+
+`./e2e` returns plugin e2e gates.
+
+`./aspire` contributes Aspire resources.
+
+`./testing` contains fixtures for downstream tests.
+
+## Recipes
+
+Add a new CLI command by editing `src/cli/{{plugin-name}}-cli.ts`.
+
+Add an Aspire resource by editing `src/aspire/{{plugin-name}}-contribution.ts`.
+
+Add an e2e gate by editing `src/e2e/mod.ts`.
+
+Add test fixtures under `src/testing/mod.ts`.
+
+Keep package examples small and runnable.
+
+Avoid re-exporting upstream libraries.
+
+## Configuration
+
+Configuration belongs in project config or runtime config topics.
+
+Do not read environment variables at module load time.
+
+Document every required environment variable here.
+
+Document every required permission here.
+
+Use explicit defaults in the manifest.
+
+Use typed runtime config topics when the plugin has operator-managed settings.
+
+## Testing
+
+Run the unit tests:
+
+```bash
+deno task test
+```
+
+Run type checks:
+
+```bash
+deno task check
+```
+
+Run publish validation:
+
+```bash
+deno task publish:dry-run
+```
+
+Tests should assert semantic output.
+
+Avoid large string snapshots.
+
+Keep readme examples imported by `tests/_fixtures/readme-examples_test.ts`.
+
+## Observability
+
+Declare telemetry spans in the manifest when the plugin emits spans.
+
+Use framework telemetry ports instead of direct global instrumentation.
+
+Keep health checks explicit.
+
+Document operational signals here.
+
+Document expected logs here.
+
+Document dashboards here.
+
+## Architecture
+
+This package follows the NetScript plugin package archetype.
+
+The manifest is the public contract.
+
+The CLI is a thin command adapter.
+
+The Aspire contribution is a composition adapter.
+
+The e2e gates are verification adapters.
+
+Testing fixtures are isolated from runtime code.
+
+Generated code is not committed by the plugin package.
+
+## Stability
+
+This scaffold starts at `0.0.1-alpha.0`.
+
+Alpha releases may change minor contracts.
+
+Document breaking changes in a changelog before publishing.
+
+Keep the root manifest stable for consumers.
+
+Prefer additive contribution axes.
+
+## Compatibility
+
+The package targets Deno 2.x.
+
+The package publishes to JSR.
+
+The package is ESM-only.
+
+The package should not depend on Node globals.
+
+Use `jsr:` and `npm:` specifiers only through `deno.json`.
+
+## Required permissions
+
+List every Deno permission required by runtime entrypoints.
+
+Example:
+
+```text
+--allow-read
+--allow-env
+--allow-net
+```
+
+Remove permissions that do not apply.
+
+## Publishing
+
+Before publishing, replace every TODO marker.
+
+Run `deno fmt`.
+
+Run `deno lint`.
+
+Run `deno task check`.
+
+Run `deno task test`.
+
+Run `deno task publish:dry-run`.
+
+Confirm the dry-run file list is intentional.
+
+Confirm there are zero slow types.
+
+## Troubleshooting
+
+If dispatch fails, run the CLI subpath directly.
+
+If the host cannot resolve the plugin, check the package name.
+
+If publish fails, inspect the export map.
+
+If tests fail, start with the readme fixture test.
+
+If generated registries look stale, run `netscript plugin sync`.
+
+## License
+
+MIT.
+
+Replace this section if your plugin uses a different compatible license.

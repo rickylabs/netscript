@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "runtimeRegistryGenerator": {
+    "command": "src/cli/generate-runtime-registries.ts",
+    "args": ["--profile", "scaffold"]
+  },
+  "backgroundSampleRules": [
+    {
+      "workspace": "triggers",
+      "managed": [
+        { "suffix": ".ts", "without": "/" }
+      ],
+      "keep": [
+        "_jobs.ts",
+        "mod.ts",
+        "file-watcher-diagnostics.ts",
+        "generic-webhook.ts",
+        "webhook-validate-data.ts"
+      ],
+      "runtimeDirectories": [".data/incoming/diagnostics"]
+    }
+  ],
+  "runtimeRegistries": [
+    {
+      "kind": "map",
+      "dir": "triggers",
+      "registryPath": ".netscript/generated/plugin-triggers/triggers.registry.ts",
+      "fileSuffixes": [".ts"],
+      "exclude": ["_jobs.ts", "_registry.ts", "mod.ts", "types.ts", "csv-import-trigger.ts"],
+      "registryKey": "id",
+      "varPrefix": "trigger",
+      "typeImport": {
+        "name": "TriggerDefinition",
+        "from": "@netscript/plugin-triggers-core/domain"
+      }
+    }
+  ]
+}

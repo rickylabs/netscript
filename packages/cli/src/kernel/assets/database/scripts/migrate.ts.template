@@ -1,0 +1,11 @@
+/**
+ * Thin wrapper around @netscript/database Prisma migration handling.
+ *
+ * @module
+ */
+
+import { runMigrationCli } from '@netscript/database/scripts';
+
+if (import.meta.main) {
+  await runMigrationCli({ provider: '{{engine}}' });
+}

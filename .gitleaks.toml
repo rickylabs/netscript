@@ -1,0 +1,5 @@
+[allowlist]
+description = "NetScript test fixture identifiers"
+regexes = [
+  '''compensating-1'''
+]

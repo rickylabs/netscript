@@ -1,0 +1,18 @@
+/**
+ * @module {{pluginName}}/e2e
+ *
+ * E2E gate entrypoint for {{pluginName}}.
+ */
+
+/** E2E gate descriptor for {{pluginName}}. */
+export interface {{ClassName}}E2eGate {
+  /** Stable gate identifier. */
+  readonly id: string;
+  /** Human-readable gate title. */
+  readonly title: string;
+}
+
+/** Create E2E gates for {{pluginName}}. */
+export function create{{ClassName}}E2eGates(): readonly {{ClassName}}E2eGate[] {
+  return [];
+}

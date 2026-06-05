@@ -1,0 +1,19 @@
+// Plugin database schema contribution: {{__slot0__}}
+//
+// This file declares the database models this plugin needs.
+// To use these models:
+//   1. Keep this file as the plugin-local source of truth.
+//   2. The CLI copies it to database/<engine>/schema/plugins/{{__slot1__}}/{{__slot2__}}.prisma.
+//   3. Run: netscript db migrate --name add-{{__slot3__}}-models
+//   4. Run: netscript db generate
+//
+// NetScript-generated tables must use the ns_ prefix and snake_case names.
+
+model {{__slot4__}}Record {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("{{__slot5__}}")
+}

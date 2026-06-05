@@ -1,0 +1,48 @@
+{
+  "name": "@netscript/telemetry",
+  "version": "0.0.1-alpha.0",
+  "description": "OpenTelemetry tracing primitives and NetScript instrumentation for jobs, queues, RPC, and SSE.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./config": "./config.ts",
+    "./tracer": "./tracer.ts",
+    "./context": "./context.ts",
+    "./attributes": "./attributes.ts",
+    "./instrumentation": "./instrumentation.ts",
+    "./registry": "./src/runtime/mod.ts",
+    "./orpc": "./orpc.ts"
+  },
+  "tasks": {
+    "check": "deno check ./mod.ts ./config.ts ./tracer.ts ./context.ts ./attributes.ts ./instrumentation.ts ./orpc.ts",
+    "test": "deno test --allow-env ./tests/",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "imports": {
+    "@opentelemetry/api": "npm:@opentelemetry/api@^1.9.0",
+    "@std/assert": "jsr:@std/assert@^1",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.5"
+  },
+  "publish": {
+    "include": [
+      "**/*.ts",
+      "deno.json",
+      "README.md",
+      "docs/**/*.md"
+    ],
+    "exclude": [
+      "tests/",
+      "**/*_test.ts",
+      "**/*.test.ts",
+      ".pending-extraction/"
+    ]
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "deno.ns"
+    ],
+    "strict": true,
+    "noUncheckedIndexedAccess": true
+  }
+}

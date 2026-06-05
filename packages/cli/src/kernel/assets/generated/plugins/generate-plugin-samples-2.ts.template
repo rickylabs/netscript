@@ -1,0 +1,47 @@
+/**
+ * {{__slot0__}} sample Deno task.
+ *
+ * The workers package can execute this file as a task contribution. It reads
+ * TASK_PAYLOAD from the environment and writes a JSON result to stdout.
+ */
+
+interface TaskPayload {
+  readonly data?: Record<string, unknown>;
+  readonly required?: readonly string[];
+}
+
+function readPayload(): TaskPayload {
+  const raw = Deno.env.get('TASK_PAYLOAD');
+  if (!raw) {
+    return {};
+  }
+
+  const parsed: unknown = JSON.parse(raw);
+  if (parsed !== null && typeof parsed === 'object') {
+    return parsed as TaskPayload;
+  }
+
+  return {};
+}
+
+function validatePayload(payload: TaskPayload): Record<string, unknown> {
+  const data = payload.data ?? {};
+  const required = payload.required ?? [];
+  const missing = required.filter((key) => !(key in data));
+
+  return {
+    plugin: '{{__slot1__}}',
+    valid: missing.length === 0,
+    missing,
+    keys: Object.keys(data),
+    timestamp: new Date().toISOString(),
+  };
+}
+
+if (import.meta.main) {
+  const result = validatePayload(readPayload());
+  console.log(JSON.stringify(result));
+  if (result.valid !== true) {
+    throw new Error('Task payload failed validation.');
+  }
+}

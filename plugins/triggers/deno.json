@@ -1,0 +1,78 @@
+{
+  "name": "@netscript/plugin-triggers",
+  "version": "0.0.1-alpha.0",
+  "description": "NetScript plugin for trigger ingress, scheduling, file watching, and trigger runtime APIs.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./aspire": "./src/aspire/mod.ts",
+    "./cli": "./src/cli/composition/main.ts",
+    "./public": "./src/public/mod.ts",
+    "./plugin": "./src/plugin/mod.ts",
+    "./runtime": "./src/runtime/mod.ts",
+    "./scaffolding": "./src/scaffolding/mod.ts",
+    "./services": "./services/src/main.ts",
+    "./streams": "./streams/mod.ts",
+    "./streams/server": "./streams/server.ts"
+  },
+  "imports": {
+    "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
+    "@netscript/cron": "../../packages/cron/mod.ts",
+    "@netscript/plugin": "../../packages/plugin/mod.ts",
+    "@netscript/plugin-sagas-core": "../../packages/plugin-sagas-core/mod.ts",
+    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+    "@netscript/plugin-triggers-core": "../../packages/plugin-triggers-core/mod.ts",
+    "@netscript/plugin-triggers-core/adapters": "../../packages/plugin-triggers-core/src/adapters/mod.ts",
+    "@netscript/plugin-triggers-core/contracts/v1": "../../packages/plugin-triggers-core/src/contracts/v1/mod.ts",
+    "@netscript/plugin-triggers-core/domain": "../../packages/plugin-triggers-core/src/domain/mod.ts",
+    "@netscript/plugin-triggers-core/ports": "../../packages/plugin-triggers-core/src/ports/mod.ts",
+    "@netscript/plugin-triggers-core/runtime": "../../packages/plugin-triggers-core/src/runtime/mod.ts",
+    "@netscript/plugin-triggers-core/telemetry": "../../packages/plugin-triggers-core/src/telemetry/mod.ts",
+    "@netscript/plugin-triggers-core/testing": "../../packages/plugin-triggers-core/src/testing/mod.ts",
+    "@netscript/plugin-workers-core": "../../packages/plugin-workers-core/mod.ts",
+    "@netscript/plugin-workers-core/runtime": "../../packages/plugin-workers-core/src/runtime/mod.ts",
+    "@netscript/queue": "../../packages/queue/mod.ts",
+    "@netscript/service": "../../packages/service/mod.ts",
+    "@netscript/shared": "../../packages/shared/mod.ts",
+    "@netscript/telemetry/tracer": "../../packages/telemetry/tracer.ts",
+    "@netscript/watchers": "../../packages/watchers/mod.ts",
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/path": "jsr:@std/path@^1.0.0",
+    "@durable-streams/state": "npm:@durable-streams/state@^0.2.3",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
+    "@orpc/server": "npm:@orpc/server@^1.13.5",
+    "hono": "jsr:@hono/hono@^4",
+    "zod": "npm:zod@^4.3.6"
+  },
+  "tasks": {
+    "check": "deno check --unstable-kv mod.ts",
+    "test": "deno test --allow-all --unstable-kv",
+    "dev": "deno run --unstable-kv --allow-net --allow-env --allow-read --watch services/src/main.ts",
+    "start": "deno run --unstable-kv --allow-net --allow-env --allow-read services/src/main.ts",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "deno.json",
+      "scaffold.plugin.json",
+      "scaffold.runtime.json",
+      "mod.ts",
+      "src/**/*.ts",
+      "contracts/**/*.ts",
+      "services/**/*.ts",
+      "streams/**/*.ts",
+      "database/**/*.prisma"
+    ],
+    "exclude": [
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}

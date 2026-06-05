@@ -1,0 +1,61 @@
+{
+  "name": "@netscript/plugin-sagas-core",
+  "version": "0.0.1-alpha.0",
+  "description": "Saga DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript sagas plugins.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./builders": "./src/builders/mod.ts",
+    "./domain": "./src/domain/mod.ts",
+    "./ports": "./src/ports/mod.ts",
+    "./runtime": "./src/runtime/mod.ts",
+    "./adapters": "./src/adapters/mod.ts",
+    "./transports": "./src/transports/mod.ts",
+    "./stores": "./src/stores/mod.ts",
+    "./middleware": "./src/middleware/mod.ts",
+    "./integration/workers": "./src/integration/workers/mod.ts",
+    "./integration/publisher": "./src/integration/publisher/mod.ts",
+    "./telemetry": "./src/telemetry/mod.ts",
+    "./config": "./src/config/mod.ts",
+    "./contracts/v1": "./src/contracts/v1/mod.ts",
+    "./streams": "./src/streams/mod.ts",
+    "./presets": "./src/presets/mod.ts",
+    "./abstracts": "./src/abstracts/mod.ts",
+    "./testing": "./src/testing/mod.ts",
+    "./agent": "./src/agent/mod.ts"
+  },
+  "imports": {
+    "@saga-bus/core": "npm:@saga-bus/core@^0.2.2",
+    "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
+    "@netscript/plugin-workers-core": "../plugin-workers-core/mod.ts",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
+    "@orpc/server": "npm:@orpc/server@^1.13.5",
+    "@std/assert": "jsr:@std/assert@^1",
+    "hono": "jsr:@hono/hono@^4",
+    "ioredis": "npm:ioredis@^5.4.1",
+    "zod": "npm:zod@^4.3.6"
+  },
+  "tasks": {
+    "check": "deno check --unstable-kv mod.ts",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "deno.json",
+      "mod.ts",
+      "src/**/*.ts",
+      "docs/**/*.md"
+    ],
+    "exclude": [
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}

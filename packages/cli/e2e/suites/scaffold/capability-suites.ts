@@ -1,0 +1,155 @@
+import { defineCliE2eSuite } from '../../src/application/builders/define-cli-e2e-suite.ts';
+import {
+  GATE,
+  type GateId,
+  SCAFFOLD,
+  SCAFFOLD_TITLE,
+  type SuiteId,
+} from '../../src/domain/cli-surface.ts';
+import type { RunOptions } from '../../src/domain/run-context.ts';
+import type { SuiteDefinition } from '../../src/domain/suite-definition.ts';
+
+/** Built-in scaffold capability suite shape. */
+export interface ScaffoldCapabilitySuite {
+  readonly id: SuiteId;
+  readonly title: string;
+  readonly gates: readonly GateId[];
+}
+
+const SERVICE_GATES = [
+  GATE.PREFLIGHT_DENO,
+  GATE.SCAFFOLD_INIT,
+  GATE.SERVICE_LIST,
+  GATE.GENERATED_SERVICE_CHECK,
+] as const;
+
+const CONTRACT_GATES = [
+  GATE.PREFLIGHT_DENO,
+  GATE.SCAFFOLD_INIT,
+  GATE.CONTRACT_LIST,
+  GATE.GENERATED_CONTRACTS_CHECK,
+] as const;
+
+const INFRASTRUCTURE_GATES = [
+  GATE.PREFLIGHT_DENO,
+  GATE.SCAFFOLD_INIT,
+  GATE.DATABASE_INIT,
+  GATE.DATABASE_GENERATE,
+  GATE.DATABASE_SEED,
+  GATE.GENERATED_INFRASTRUCTURE_CHECK,
+] as const;
+
+const RUNTIME_GATES = [
+  GATE.PREFLIGHT_ASPIRE,
+  GATE.RUNTIME_ASPIRE_RESTORE,
+  GATE.RUNTIME_ASPIRE_START,
+  GATE.RUNTIME_WAIT_POSTGRES,
+  GATE.RUNTIME_WAIT_GARNET,
+  GATE.RUNTIME_WAIT_WORKERS_API,
+  GATE.RUNTIME_WAIT_WORKERS,
+  GATE.RUNTIME_WAIT_SAGAS_API,
+  GATE.RUNTIME_WAIT_SAGAS,
+  GATE.RUNTIME_WAIT_TRIGGERS_API,
+  GATE.RUNTIME_WAIT_TRIGGERS,
+  GATE.RUNTIME_ASPIRE_DESCRIBE,
+  GATE.BEHAVIOR_WORKERS_HEALTH,
+  GATE.BEHAVIOR_SAGAS_HEALTH,
+  GATE.CLEANUP_ASPIRE_STOP,
+] as const;
+
+const PLUGIN_GATES = [
+  GATE.PREFLIGHT_DENO,
+  GATE.SCAFFOLD_INIT,
+  'scaffold.plugin.worker',
+  'scaffold.plugin.saga',
+  'scaffold.plugin.trigger',
+  'scaffold.plugin.stream',
+  GATE.SCAFFOLD_PLUGIN_LIST,
+  GATE.GENERATED_PLUGINS_CHECK,
+  GATE.BEHAVIOR_PLUGINS_HEALTH,
+] as const;
+
+/** Scaffold capability suites exposed by the CLI. */
+export const scaffoldCapabilitySuites: readonly ScaffoldCapabilitySuite[] = [
+  {
+    id: SCAFFOLD.SERVICE,
+    title: SCAFFOLD_TITLE.SERVICE,
+    gates: SERVICE_GATES,
+  },
+  {
+    id: SCAFFOLD.CONTRACTS,
+    title: SCAFFOLD_TITLE.CONTRACTS,
+    gates: CONTRACT_GATES,
+  },
+  {
+    id: SCAFFOLD.INFRASTRUCTURE,
+    title: SCAFFOLD_TITLE.INFRASTRUCTURE,
+    gates: INFRASTRUCTURE_GATES,
+  },
+  {
+    id: SCAFFOLD.PLUGIN,
+    title: SCAFFOLD_TITLE.PLUGIN,
+    gates: PLUGIN_GATES,
+  },
+  {
+    id: SCAFFOLD.RUNTIME,
+    title: SCAFFOLD_TITLE.RUNTIME,
+    gates: RUNTIME_GATES,
+  },
+];
+
+/** Build one scaffold capability smoke suite. */
+export function createScaffoldCapabilitySuite(
+  capability: ScaffoldCapabilitySuite,
+  overrides: Partial<RunOptions> = {},
+): SuiteDefinition {
+  const suite = defineCliE2eSuite()
+    .withId(capability.id)
+    .withTitle(capability.title)
+    .withWorkspace((workspace) => {
+      let next = workspace;
+      if (overrides.repoRoot) next = next.withRepoRoot(overrides.repoRoot);
+      if (overrides.cliEntrypoint) next = next.withCliEntrypoint(overrides.cliEntrypoint);
+      if (overrides.smokeRoot) next = next.withSmokeRoot(overrides.smokeRoot);
+      if (overrides.projectName) next = next.withProjectName(overrides.projectName);
+      if (overrides.cleanup !== undefined) next = next.withCleanup(overrides.cleanup);
+      return next;
+    })
+    .withScaffold((scaffold) =>
+      scaffold.withOfficialPluginSuite((plugins) => {
+        let next = plugins.withSamples(overrides.samples ?? true);
+        if (overrides.plugins) {
+          next = next.withSamples(overrides.samples ?? true);
+          for (const kind of overrides.plugins) next = next.withOfficial(kind);
+        }
+        return next;
+      })
+    )
+    .withReporting((reporting) => {
+      let next = reporting;
+      if (overrides.format === 'pretty') next = next.withPretty();
+      if (overrides.format === 'json') next = next.withJson();
+      if (overrides.format === 'ndjson') next = next.withNdjson();
+      if (overrides.reportPath) next = next.withReport(overrides.reportPath);
+      if (overrides.logFile) next = next.withLogFile(overrides.logFile);
+      return next;
+    })
+    .build();
+
+  if (capability.gates.length === 0) return suite;
+
+  const selected = new Set<GateId>(capability.gates);
+  return {
+    ...suite,
+    gates: suite.gates.filter((gate) => selected.has(gate.id)),
+  };
+}
+
+/** Build the official plugin scaffold smoke suite. */
+export function createScaffoldPluginsSuite(
+  overrides: Partial<RunOptions> = {},
+): SuiteDefinition {
+  const capability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.PLUGIN);
+  if (!capability) throw new Error('scaffold.plugins suite is not registered.');
+  return createScaffoldCapabilitySuite(capability, overrides);
+}

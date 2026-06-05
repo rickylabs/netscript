@@ -1,0 +1,27 @@
+import { createServiceClient } from '@netscript/sdk/client';
+import { createQueryFactories } from '@netscript/sdk/query';
+import { bridgeInvalidation } from '@netscript/sdk/query-client';
+import {
+  {{serviceName | pascalCase}}ContractV1,
+} from '@{{name}}/contracts';
+
+export const exampleServiceName = '{{serviceName}}';
+export const exampleServiceRouterName = '{{serviceName | camelCase}}';
+export const exampleServiceContract = {{serviceName | pascalCase}}ContractV1;
+export const exampleServiceListInvalidation = bridgeInvalidation(
+  exampleServiceRouterName,
+  'list',
+);
+
+export const exampleServiceClient = createServiceClient<typeof exampleServiceContract>({
+  contract: exampleServiceContract,
+  serviceName: exampleServiceName,
+  routerName: exampleServiceRouterName,
+});
+
+export const exampleServiceQueries = createQueryFactories({
+  service: {
+    contract: exampleServiceContract,
+    client: exampleServiceClient,
+  },
+}).service;

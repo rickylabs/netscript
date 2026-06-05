@@ -1,0 +1,45 @@
+import { exampleServiceName } from '@app/lib/example-service.ts';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+import { ServiceExampleHero } from './(_components)/hero.tsx';
+import { ServiceExampleLabPanel } from './(_components)/lab-panel.tsx';
+import { ServiceExampleNotesCard } from './(_components)/notes-card.tsx';
+import { ServiceExampleSummaryCard } from './(_components)/summary-card.tsx';
+import { ServiceExampleRouteLayout } from './index.layout.tsx';
+import {
+  loadServiceShowcaseData,
+  loadServiceShowcaseSummary,
+} from './(_shared)/service-showcase.ts';
+
+export const serviceExamplePage = definePage()
+  .withRoute(appRoutes.serviceExample)
+  .withPolicy('balanced')
+  .withTelemetry({ enabled: true, spanName: 'scaffold.examples.{{serviceName | camelCase}}' })
+  .withMeta(() => ({
+    title: '{{name}} — {{serviceName}} example',
+    description:
+      `Scaffolded NetScript showcase route backed by the ${exampleServiceName} service.`,
+  }))
+  .withLayer('hero', ServiceExampleHero, () => ({
+    serviceName: exampleServiceName,
+    examplesHref: appRoutes.examples.href(),
+  }))
+  .withLayer('lab', ServiceExampleLabPanel, {
+    loader: loadServiceShowcaseData,
+  })
+  .withLayer('summary', ServiceExampleSummaryCard, {
+    delivery: 'defer',
+    loader: loadServiceShowcaseSummary,
+    partial: () => '/partials/examples/{{serviceName}}/summary',
+    partialName: '{{serviceName}}-summary',
+    staleTime: 15_000,
+    staleReloadMode: 'background',
+    fallback: <div class='grid gap-3 sm:grid-cols-2'><div class='sm:col-span-2 h-32 animate-pulse rounded-2xl border border-ns-border bg-ns-surface/50' /></div>,
+  })
+  .withLayer('notes', ServiceExampleNotesCard, () => ({}))
+  .withLayout(() => <ServiceExampleRouteLayout />)
+  .build();
+
+export type ServiceExamplePage = typeof serviceExamplePage;
+export const { hooks: serviceExamplePageHooks, default: page } = serviceExamplePage;
+export { page as default };

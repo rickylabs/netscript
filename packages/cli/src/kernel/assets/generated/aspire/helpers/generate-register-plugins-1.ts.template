@@ -1,0 +1,50 @@
+{{__slot0__}}
+
+import type { DistributedApplicationBuilder } from '{{__slot1__}}';
+import type { NetScriptConfig } from '{{__slot2__}}';
+import type { InfrastructureContext } from './register-infrastructure.ts';
+import {
+  buildDatabaseUriEnvKey,
+  buildOtelEnvVars,
+  resolvePermissions,
+  resolveWorkspacePath,
+} from '{{__slot3__}}';
+
+type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutable']>;
+
+/**
+ * Registers plugins with the Aspire SDK builder using a two-pass approach.
+ *
+ * - Pass 1: Create all plugin resources via `addExecutable()` with resolved
+ *   permissions, working directory, HTTP endpoint, OTEL telemetry (3 vars
+ *   via `denoApp` mode), infrastructure dependencies, and service references
+ *   via endpoint env vars (`getEndpoint('http')` + `withEnvironment()`).
+ * - Pass 2: Wire `PluginReferences` (plugin→plugin) via endpoint env vars
+ *   (`getEndpoint('http')` + `withEnvironment()`) to avoid forward-reference
+ *   issues.
+ *
+ * @param builder - The Aspire distributed application builder
+ * @param config - Parsed NetScript configuration
+ * @param infrastructure - Infrastructure context with database/cache resources
+ * @param services - Map of registered service resources (for endpoint env vars)
+ * @param appHostDir - Absolute path to the AppHost directory
+ * @returns Map of registered plugin resources keyed by name
+ */
+export async function registerPlugins(
+  builder: DistributedApplicationBuilder,
+  config: NetScriptConfig,
+  infrastructure: InfrastructureContext,
+  services: Map<string, ExecutableResource>,
+  appHostDir: string,
+): Promise<Map<string, ExecutableResource>> {
+  const plugins = new Map<string, ExecutableResource>();
+  const databaseEnvKey = buildDatabaseUriEnvKey(config);
+
+  // --- Pass 1: Create all plugin resources ---
+{{__slot4__}}
+
+  // --- Pass 2: Wire plugin→plugin cross-references ---
+{{__slot5__}}
+
+  return plugins;
+}

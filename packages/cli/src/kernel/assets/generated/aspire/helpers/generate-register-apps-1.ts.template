@@ -1,0 +1,60 @@
+{{__slot0__}}
+
+import type { DistributedApplicationBuilder } from '{{__slot1__}}';
+import type { NetScriptConfig } from '{{__slot2__}}';
+import type { InfrastructureContext } from './register-infrastructure.ts';
+import {
+  buildOtelEnvVars,
+  buildViteEnvVarName,
+  extractDependencies,
+  extractPluginReferences,
+  extractServiceReferences,
+  resolveWorkspacePath,
+} from '{{__slot3__}}';
+
+interface EndpointProvider {
+  getEndpoint(protocol: string): Promise<string | undefined> | string | undefined;
+}
+
+async function getResourceEndpoint(resource: unknown, protocol: string): Promise<string | undefined> {
+  if (!resource || typeof resource !== 'object' || !('getEndpoint' in resource)) {
+    return undefined;
+  }
+  return await (resource as EndpointProvider).getEndpoint(protocol);
+}
+
+/**
+ * Registers application resources (web apps, Tauri desktop apps, and tasks)
+ * with the Aspire SDK builder.
+ *
+ * - `app` type: registered via `addExecutable()` with VITE env var injection
+ *   for service discovery (full, shorthand, and server-side formats).
+ * - `tauri` type: registered via `addExecutable()` with optional remote
+ *   app reference.
+ * - `task` type: registered via `addExecutable()` with simple config.
+ *
+ * All types receive OTEL telemetry (full executable env set), optional
+ * HTTP endpoint binding, and optional KV cache dependency injection.
+ *
+ * @param builder - The Aspire distributed application builder
+ * @param config - Parsed NetScript configuration
+ * @param infrastructure - Infrastructure context with database/cache resources
+ * @param services - Map of registered service resources (for endpoint-based env var wiring and VITE injection)
+ * @param plugins - Map of registered plugin resources (for endpoint-based env var wiring and VITE injection)
+ * @param appHostDir - Absolute path to the AppHost directory
+ * @returns Map of registered app resources keyed by name
+ */
+export async function registerApps(
+  builder: DistributedApplicationBuilder,
+  config: NetScriptConfig,
+  infrastructure: InfrastructureContext,
+  services: Map<string, unknown>,
+  plugins: Map<string, unknown>,
+  appHostDir: string,
+): Promise<Map<string, unknown>> {
+  const apps = new Map<string, unknown>();
+
+{{__slot4__}}
+
+  return apps;
+}

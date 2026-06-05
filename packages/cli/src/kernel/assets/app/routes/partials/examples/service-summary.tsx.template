@@ -1,0 +1,14 @@
+import { defineStatsPartial } from '@netscript/fresh/builders';
+import { ServiceSummaryPanel } from '@app/routes/examples/{{serviceName}}/(_components)/summary-panel.tsx';
+import { loadServiceShowcaseSummary } from '@app/routes/examples/{{serviceName}}/(_shared)/service-showcase.ts';
+
+const route = defineStatsPartial({
+  name: '{{serviceName}}-summary',
+  query: loadServiceShowcaseSummary,
+  component: ServiceSummaryPanel,
+  errorTitle: '{{serviceName}} summary unavailable',
+});
+
+export const config = route.config;
+
+export default route.page;

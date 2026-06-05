@@ -1,0 +1,44 @@
+/**
+ * @module @netscript/plugin
+ *
+ * Plugin definition DSL and diagnostics for NetScript plugin packages.
+ *
+ * The root entrypoint is the plugin authoring contract. Host tooling, CLI
+ * integration, SDK discovery, adapters, and fixtures live on subpaths:
+ * `@netscript/plugin/config`, `@netscript/plugin/cli`,
+ * `@netscript/plugin/sdk`, and `@netscript/plugin/testing`.
+ *
+ * @example Define a plugin
+ * ```ts
+ * import { definePlugin, inspectPlugin } from "@netscript/plugin";
+ *
+ * const plugin = definePlugin("@example/plugin", "0.0.1-alpha.0").build();
+ *
+ * console.log(inspectPlugin(plugin).summary);
+ * ```
+ */
+
+export { definePlugin } from './src/config/mod.ts';
+export type {
+  BackgroundProcessorContribution,
+  ContractVersionContribution,
+  DbSchemaContribution,
+  E2eContribution,
+  MigrationContribution,
+  PluginBuilder,
+  PluginContributions,
+  PluginDependencies,
+  PluginLifecycleHooks,
+  PluginManifest,
+  PluginMetadata,
+  PluginType,
+  RuntimeConfigTopicContribution,
+  ServiceContribution,
+  StreamTopicContribution,
+  TelemetryContribution,
+} from './src/config/mod.ts';
+export type { PluginContext, PluginLogger } from './src/domain/mod.ts';
+export { DuplicatePluginError, PluginError, PluginValidationError } from './src/domain/mod.ts';
+export { PluginContribution } from './src/abstracts/mod.ts';
+export { inspectPlugin } from './src/diagnostics/inspect-plugin.ts';
+export type { InspectionReport } from './src/diagnostics/inspect-plugin.ts';

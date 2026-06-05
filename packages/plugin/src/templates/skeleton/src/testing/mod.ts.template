@@ -1,0 +1,10 @@
+/**
+ * @module {{pluginName}}/testing
+ *
+ * Testing helpers for {{pluginName}}.
+ */
+
+/** Create a minimal fixture for {{pluginName}} tests. */
+export function create{{ClassName}}Fixture(): Readonly<Record<string, string>> {
+  return { pluginName: '{{pluginName}}' };
+}

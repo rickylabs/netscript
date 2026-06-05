@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "provider": {
+    "kind": "worker",
+    "displayName": "Background Worker",
+    "category": "background-processor",
+    "portRangeKey": "INFRA_PLUGIN",
+    "defaultPermissions": [
+      "--unstable-kv",
+      "--allow-net",
+      "--allow-env",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run"
+    ],
+    "watchFlag": "--watch",
+    "defaultEntrypoint": "bin/combined.ts",
+    "defaultServiceEntrypoint": "services/src/main.ts",
+    "defaultRequiresDb": true,
+    "defaultRequiresKv": true,
+    "pluginType": "background-processor",
+    "supportsConcurrency": true,
+    "concurrencyEnvVar": "WORKER_CONCURRENCY",
+    "defaultConcurrency": 2,
+    "defaultTelemetry": true,
+    "infrastructureRequires": ["kv"],
+    "infrastructureOptionalDeps": ["db"]
+  },
+  "officialSource": {
+    "canonicalName": "workers",
+    "pluginDir": "workers",
+    "backgroundDir": "workers",
+    "serviceEntrypoint": "services/src/main.ts",
+    "backgroundEntrypoint": "bin/combined.ts",
+    "serviceConfigKey": "workers-api",
+    "servicePort": 8091,
+    "backgroundPort": 8091,
+    "dependencies": ["streams"],
+    "requiresDb": true,
+    "requiresKv": true,
+    "permissions": [
+      "--unstable-kv",
+      "--allow-net",
+      "--allow-env",
+      "--allow-read",
+      "--allow-write",
+      "--allow-run"
+    ],
+    "pluginReferences": []
+  }
+}

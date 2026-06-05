@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "provider": {
+    "kind": "stream",
+    "displayName": "Durable Streams",
+    "category": "plugin",
+    "portRangeKey": "PLUGIN_API",
+    "defaultPermissions": [
+      "--allow-net",
+      "--allow-env",
+      "--allow-read",
+      "--allow-write",
+      "--allow-sys",
+      "--allow-ffi"
+    ],
+    "watchFlag": "--watch",
+    "defaultEntrypoint": "services/src/main.ts",
+    "defaultServiceEntrypoint": "services/src/main.ts",
+    "defaultRequiresDb": false,
+    "defaultRequiresKv": false,
+    "pluginType": "utility",
+    "supportsConcurrency": false,
+    "concurrencyEnvVar": null,
+    "defaultConcurrency": null,
+    "defaultTelemetry": true,
+    "infrastructureRequires": [],
+    "infrastructureOptionalDeps": []
+  },
+  "officialSource": {
+    "canonicalName": "streams",
+    "pluginDir": "streams",
+    "serviceEntrypoint": "services/src/main.ts",
+    "serviceConfigKey": "streams",
+    "servicePort": 4437,
+    "backgroundPort": 4437,
+    "requiresDb": false,
+    "requiresKv": false,
+    "permissions": [
+      "--allow-net",
+      "--allow-env",
+      "--allow-read",
+      "--allow-write",
+      "--allow-sys",
+      "--allow-ffi"
+    ]
+  }
+}

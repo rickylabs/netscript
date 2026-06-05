@@ -1,0 +1,102 @@
+.ns-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ns-space-2);
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-sm);
+  font-weight: 500;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--ns-radius-md);
+  padding: var(--ns-space-2) var(--ns-space-4);
+  cursor: pointer;
+  transition:
+    background var(--ns-ease-normal),
+    border-color var(--ns-ease-normal),
+    color var(--ns-ease-normal),
+    box-shadow var(--ns-ease-normal);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.ns-btn:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+}
+
+.ns-btn:disabled,
+.ns-btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.ns-btn--primary {
+  background: var(--ns-primary);
+  color: var(--ns-primary-fg);
+  border-color: var(--ns-primary);
+}
+
+.ns-btn--primary:hover {
+  background: var(--ns-primary-hover);
+}
+
+.ns-btn--secondary {
+  background: var(--ns-secondary-subtle);
+  color: var(--ns-secondary);
+  border-color: var(--ns-secondary-border);
+}
+
+.ns-btn--secondary:hover {
+  background: rgba(144, 152, 166, 0.12);
+  border-color: rgba(144, 152, 166, 0.22);
+}
+
+.ns-btn--ghost {
+  background: transparent;
+  color: var(--ns-muted-fg);
+}
+
+.ns-btn--ghost:hover {
+  background: rgba(235, 228, 210, 0.04);
+  color: var(--ns-fg);
+}
+
+.ns-btn--outline {
+  background: transparent;
+  color: var(--ns-fg);
+  border-color: var(--ns-border-hover);
+}
+
+.ns-btn--outline:hover {
+  background: rgba(235, 228, 210, 0.04);
+  border-color: var(--ns-border-strong);
+}
+
+.ns-btn--destructive {
+  background: var(--ns-destructive);
+  color: var(--ns-destructive-fg);
+  border-color: var(--ns-destructive);
+}
+
+.ns-btn--destructive:hover {
+  background: var(--ns-red-6);
+}
+
+.ns-btn--sm {
+  font-size: var(--ns-text-xs);
+  padding: var(--ns-space-1-5) var(--ns-space-3);
+  border-radius: var(--ns-radius-sm);
+}
+
+.ns-btn--lg {
+  font-size: var(--ns-text-base);
+  padding: var(--ns-space-3) var(--ns-space-6);
+  border-radius: var(--ns-radius-lg);
+}
+
+.ns-btn--icon {
+  padding: var(--ns-space-2);
+  aspect-ratio: 1;
+}

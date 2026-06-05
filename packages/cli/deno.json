@@ -1,0 +1,71 @@
+{
+  "name": "@netscript/cli",
+  "version": "0.0.1-alpha.0",
+  "description": "Public and maintainer command-line tooling for NetScript workspaces.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./scaffolding": "./scaffolding.ts",
+    "./testing": "./testing.ts"
+  },
+  "tasks": {
+    "dev": "deno run --allow-all bin/netscript.ts",
+    "build": "deno compile --allow-all --target=x86_64-pc-windows-msvc --output=../../.deploy/windows/scripts/deploy-cli bin/netscript.ts",
+    "build:cli": "deno compile --allow-all --target=x86_64-pc-windows-msvc --output=../../.deploy/windows/bin/netscript-cli bin/netscript.ts",
+    "install": "deno install --allow-all --name=netscript bin/netscript.ts",
+    "check": "deno check --unstable-kv bin/netscript.ts bin/netscript-dev.ts mod.ts maintainer.ts scaffolding.ts testing.ts",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty --no-check=remote",
+    "test": "deno test --allow-all"
+  },
+  "imports": {
+    "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.7",
+    "@std/cli": "jsr:@std/cli@^1.0.0",
+    "@std/fmt": "jsr:@std/fmt@^1.0.0",
+    "@std/fs": "jsr:@std/fs@^1.0.0",
+    "@std/path": "jsr:@std/path@^1.0.0",
+    "@std/json": "jsr:@std/json@^1.0.0",
+    "@std/async": "jsr:@std/async@^1.0.0",
+    "@std/collections": "jsr:@std/collections@^1.0.0",
+    "@std/text": "jsr:@std/text@^1.0.0",
+    "@std/net": "jsr:@std/net@^1.0.0",
+    "@std/semver": "jsr:@std/semver@^1.0.0",
+    "@cliffy/prompt": "jsr:@cliffy/prompt@^1.0.0",
+    "@david/dax": "jsr:@david/dax@^0.43.0",
+    "zod": "npm:zod@^4.3.6",
+    "@netscript/aspire": "../aspire/mod.ts",
+    "@netscript/config": "../config/mod.ts",
+    "@netscript/plugin": "../plugin/mod.ts",
+    "@netscript/logger": "../logger/mod.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "lib": [
+      "deno.ns",
+      "deno.unstable",
+      "dom"
+    ]
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "docs/**/*.md",
+      "deno.json",
+      "bin/netscript.ts",
+      "mod.ts",
+      "scaffolding.ts",
+      "testing.ts",
+      "src/**/*.ts",
+      "src/**/*.template"
+    ],
+    "exclude": [
+      "bin/netscript-dev.ts",
+      "maintainer.ts",
+      "e2e/",
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/__snapshots__/**"
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{{__slot0__}}
+
+import { resolve } from 'node:path';
+import { parseAppSettings } from '{{__slot1__}}';
+import type { DistributedApplicationBuilder } from '{{__slot2__}}';
+import { configureDashboard } from '{{__slot3__}}';
+import { registerInfrastructure } from '{{__slot4__}}';
+import { tryHandleDbCliMode } from '{{__slot5__}}';
+import { registerServices } from '{{__slot6__}}';
+import { registerPlugins } from '{{__slot7__}}';
+import { registerBackgroundProcessors } from '{{__slot8__}}';
+import { registerApps } from '{{__slot9__}}';
+import { registerTools } from '{{__slot10__}}';
+
+/**
+ * Creates and configures a NetScript AppHost by parsing the project
+ * configuration and registering all resources with the Aspire SDK builder.
+ *
+ * Registration order follows C# NuGet semantics:
+ * 1. Dashboard OTLP endpoint configuration
+ * 2. Infrastructure (databases + caches)
+ * 3. DB CLI short-circuit mode
+ * 4. Services (two-pass with cross-reference wiring)
+ * 5. Plugins (two-pass with plugin→plugin + plugin→service refs)
+ * 6. Background processors (workers, sagas, triggers)
+ * 7. Applications (web apps, Tauri desktop, task apps)
+ * 8. Development tools (Prisma Studio, etc.)
+ *
+ * @param builder - The Aspire distributed application builder
+ * @param configPath - Path to appsettings.json
+ */
+export async function createNetScriptAppHost(
+  builder: DistributedApplicationBuilder,
+  configPath: string,
+): Promise<void> {
+  const { config } = await parseAppSettings(configPath);
+  // apphost.ts lives under `aspire/` to keep the Node.js package graph
+  // isolated from the Deno workspace root. Workspace paths declared in
+  // appsettings.json (services, apps, plugins, workers) are relative to the
+  // project root — which is one level up from `builder.appHostDirectory`.
+  const appHostDir = resolve(await builder.appHostDirectory.get(), '..');
+
+  // 1. Configure dashboard OTLP endpoint
+  configureDashboard(config);
+
+  // 2. Register infrastructure (databases + caches)
+  const infrastructure = await registerInfrastructure(builder, config, appHostDir);
+
+  // 3. DB CLI mode — short-circuit if active
+  if (await tryHandleDbCliMode(builder, config, infrastructure, appHostDir)) {
+    return;
+  }
+
+  // 4. Register services (two-pass: create all, then wire cross-refs)
+  const services = await registerServices(builder, config, infrastructure, appHostDir);
+
+  // 5. Register plugins (two-pass: create all, then wire plugin→plugin refs)
+  const plugins = await registerPlugins(builder, config, infrastructure, services, appHostDir);
+
+  // 6. Register background processors
+  await registerBackgroundProcessors(builder, config, infrastructure, services, plugins, appHostDir);
+
+  // 7. Register applications
+  await registerApps(builder, config, infrastructure, services, plugins, appHostDir);
+
+  // 8. Register development tools
+  await registerTools(builder, config, infrastructure, appHostDir);
+}

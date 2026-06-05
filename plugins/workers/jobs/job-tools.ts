@@ -1,0 +1,33 @@
+import type { JobHandlerContext } from '@netscript/plugin-workers-core';
+
+type Span = {
+  setAttribute(name: string, value: unknown): void;
+  addEvent(name: string, attributes?: Record<string, unknown>): void;
+};
+
+const noopSpan: Span = {
+  setAttribute: () => {},
+  addEvent: () => {},
+};
+
+/** Local job runtime tools for migrated plugin jobs. */
+export function createJobTools(ctx: JobHandlerContext) {
+  return {
+    log: {
+      info: console.log,
+      warn: console.warn,
+      error: console.error,
+      debug: console.log,
+    },
+    progress: (percent: number, message?: string) => ctx.reportProgress?.(percent, message),
+    trace: {
+      addEvent: (_name: string, _attributes?: Record<string, unknown>) => {},
+      recordProgress: (_current: number, _total: number, _unit?: string) => {},
+      withChildSpan: <T>(_name: string, fn: (span: Span) => Promise<T>) => fn(noopSpan),
+    },
+    traceContext: {
+      traceparent: ctx.traceparent,
+      tracestate: ctx.tracestate,
+    },
+  };
+}

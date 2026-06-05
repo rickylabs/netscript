@@ -1,0 +1,83 @@
+import type { DatabaseScaffoldResult } from '../../kernel/domain/db-engine.ts';
+import type {
+  PluginDbDetectionResult,
+  PluginKind,
+  PluginKindProvider,
+  PluginScaffoldResult,
+  PluginSchemaCopyResult,
+} from '../../kernel/domain/plugin-kind.ts';
+
+/** User request for adding one starter plugin workspace. */
+export interface PluginAddRequest {
+  /** Raw plugin kind received from the command surface. */
+  readonly kind: string;
+
+  /** Plugin workspace and config key. */
+  readonly pluginName: string;
+
+  /** Optional service port override. */
+  readonly port?: number;
+
+  /** Service config keys the plugin depends on. */
+  readonly serviceReferences: readonly string[];
+
+  /** Plugin config keys the plugin depends on. */
+  readonly pluginReferences: readonly string[];
+
+  /** Database engine or configured database key to target. */
+  readonly db?: string;
+
+  /** Whether database wiring should be skipped. */
+  readonly noDb: boolean;
+
+  /** Whether starter samples should be generated. */
+  readonly includeSamples: boolean;
+
+  /** Absolute project root. */
+  readonly projectRoot: string;
+
+  /** Whether existing generated files may be overwritten. */
+  readonly overwrite: boolean;
+}
+
+/** Planned plugin addition with workspace metadata resolved. */
+export interface PluginAddPlan extends Omit<PluginAddRequest, 'kind'> {
+  /** Plugin kind identifier. */
+  readonly kind: PluginKind;
+
+  /** Provider metadata for the selected plugin kind. */
+  readonly provider: PluginKindProvider;
+
+  /** Project name used in generated package metadata. */
+  readonly projectName: string;
+
+  /** Resolved database intent for this plugin. */
+  readonly dbDetection: PluginDbDetectionResult;
+}
+
+/** Files and resources produced while rendering the plugin workspace. */
+export interface PluginRenderResult {
+  /** Result of starter plugin scaffolding. */
+  readonly plugin: PluginScaffoldResult;
+
+  /** Number of plugin registry files initialized. */
+  readonly registryFilesCreated: number;
+
+  /** Whether plugin service context bootstrap was written. */
+  readonly wroteServiceContext: boolean;
+
+  /** Database workspace scaffold result when the plugin required a new database. */
+  readonly provisionedDatabase: DatabaseScaffoldResult | null;
+}
+
+/** Result of the public add-plugin application flow. */
+export interface AddPluginResult extends PluginRenderResult {
+  /** Whether a shared cache resource was added. */
+  readonly provisionedCache: boolean;
+
+  /** Schema contribution copies made into the active database workspace. */
+  readonly schemaCopies: readonly PluginSchemaCopyResult[];
+
+  /** AppHost helper files regenerated after config mutation. */
+  readonly helperFiles: readonly string[];
+}

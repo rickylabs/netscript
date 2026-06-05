@@ -1,0 +1,14 @@
+/**
+ * Thin wrapper around @netscript/database Prisma client patching.
+ *
+ * @module
+ */
+
+import { runPatchPrismaClient } from '@netscript/database/scripts';
+
+const GENERATED_DIR = new URL('../schema/.generated', import.meta.url).pathname
+  .replace(/^\/([A-Z]:)/, '$1');
+
+if (import.meta.main) {
+  await runPatchPrismaClient(GENERATED_DIR);
+}

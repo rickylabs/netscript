@@ -1,0 +1,64 @@
+import { createContext } from 'preact';
+import type { ComponentChildren } from 'preact';
+import { useContext } from 'preact/hooks';
+import { requireFreshUiContext } from '../_internal/context-error.ts';
+import type {
+  TooltipArrowProps,
+  TooltipArrowTipProps,
+  TooltipContentProps,
+  TooltipPositionerProps,
+  TooltipRootProps,
+  TooltipTriggerProps,
+  UseTooltipReturn,
+} from './tooltip.types.ts';
+import { useTooltip } from './use-tooltip.ts';
+
+const TooltipContext = createContext<UseTooltipReturn | null>(null);
+
+function useTooltipContext(partName: string): UseTooltipReturn {
+  return requireFreshUiContext(useContext(TooltipContext), partName, 'Tooltip.Root');
+}
+
+function withChildren(children: ComponentChildren) {
+  return children;
+}
+
+function TooltipRoot({ children, ...options }: TooltipRootProps): unknown {
+  const tooltip = useTooltip(options);
+  return <TooltipContext.Provider value={tooltip}>{children}</TooltipContext.Provider>;
+}
+
+function TooltipTrigger({ children, ...props }: TooltipTriggerProps): unknown {
+  const tooltip = useTooltipContext('Tooltip.Trigger');
+  return <button {...tooltip.getTriggerProps(props)}>{withChildren(children)}</button>;
+}
+
+function TooltipPositioner({ children, ...props }: TooltipPositionerProps): unknown {
+  const tooltip = useTooltipContext('Tooltip.Positioner');
+  return <div {...tooltip.getPositionerProps(props)}>{withChildren(children)}</div>;
+}
+
+function TooltipContent({ children, ...props }: TooltipContentProps): unknown {
+  const tooltip = useTooltipContext('Tooltip.Content');
+  return <div {...tooltip.getContentProps(props)}>{withChildren(children)}</div>;
+}
+
+function TooltipArrow({ children, ...props }: TooltipArrowProps): unknown {
+  const tooltip = useTooltipContext('Tooltip.Arrow');
+  return <div {...tooltip.getArrowProps(props)}>{withChildren(children)}</div>;
+}
+
+function TooltipArrowTip({ children, ...props }: TooltipArrowTipProps): unknown {
+  const tooltip = useTooltipContext('Tooltip.ArrowTip');
+  return <div {...tooltip.getArrowTipProps(props)}>{withChildren(children)}</div>;
+}
+
+/** Compound tooltip namespace with root and positioning subcomponents. */
+export const Tooltip = {
+  Arrow: TooltipArrow,
+  ArrowTip: TooltipArrowTip,
+  Content: TooltipContent,
+  Positioner: TooltipPositioner,
+  Root: TooltipRoot,
+  Trigger: TooltipTrigger,
+};

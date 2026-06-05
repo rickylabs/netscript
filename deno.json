@@ -1,0 +1,58 @@
+{
+  "version": "0.0.1-alpha.0",
+  "workspace": [
+    "packages/*",
+    "packages/cli/e2e",
+    "plugins/*",
+    "examples/*",
+    "apps/*"
+  ],
+  "unstable": [
+    "kv",
+    "temporal",
+    "tsgo",
+    "worker-options",
+    "raw-imports"
+  ],
+  "tasks": {
+    "check": "deno check --unstable-kv ./packages ./plugins",
+    "test": "deno test --allow-all",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty",
+    "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
+    "fmt": "deno fmt",
+    "lint": "deno lint",
+    "arch:check": "deno run --allow-read tools/fitness/check-doctrine.ts"
+  },
+  "imports": {},
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "isolatedDeclarations": true,
+    "lib": [
+      "dom",
+      "deno.ns",
+      "deno.unstable"
+    ]
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "recommended",
+        "jsr"
+      ],
+      "include": [
+        "no-process-global",
+        "no-node-globals"
+      ]
+    }
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true
+  },
+  "publish": false
+}

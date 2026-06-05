@@ -1,0 +1,165 @@
+import { getServiceUrl } from '@netscript/sdk';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export interface TelemetrySpan {
+  readonly traceId: string;
+  readonly spanId: string;
+  readonly parentSpanId: string;
+  readonly name: string;
+  readonly service: string;
+  readonly kind: number;
+  readonly durationMs: number;
+}
+
+export interface TelemetryTrace {
+  readonly traceId: string;
+  readonly services: readonly string[];
+  readonly spans: readonly TelemetrySpan[];
+  readonly isCrossService: boolean;
+}
+
+export interface TelemetryTraceData {
+  readonly traces: readonly TelemetryTrace[];
+  readonly totalSpans: number;
+  readonly dashboardUrl: string;
+  readonly error?: string;
+}
+
+export interface WebhookFireResult {
+  readonly ok: boolean;
+  readonly status?: number;
+  readonly error?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Dashboard API helpers
+// ---------------------------------------------------------------------------
+
+interface OtlpSpan {
+  name: string;
+  kind: number;
+  traceId: string;
+  spanId: string;
+  parentSpanId: string;
+  startTimeUnixNano: string;
+  endTimeUnixNano: string;
+}
+
+interface OtlpScopeSpans {
+  spans: OtlpSpan[];
+}
+
+interface OtlpResource {
+  attributes: { key: string; value: { stringValue?: string } }[];
+}
+
+interface OtlpResourceSpans {
+  scopeSpans: OtlpScopeSpans[];
+  resource: OtlpResource;
+}
+
+interface DashboardTraceResponse {
+  data: { resourceSpans: OtlpResourceSpans[] };
+  totalCount: number;
+}
+
+function getDashboardBaseUrl(): string {
+  const port = Deno.env.get('ASPIRE_DASHBOARD_PORT') ?? '18888';
+  return `https://localhost:${port}`;
+}
+
+function getServiceName(resource: OtlpResource): string {
+  return (
+    resource.attributes.find((a) => a.key === 'service.name')?.value
+      .stringValue ?? 'unknown'
+  );
+}
+
+function nanoDuration(start: string, end: string): number {
+  return Math.round((Number(BigInt(end) - BigInt(start)) / 1_000_000));
+}
+
+export async function fetchDashboardTraces(): Promise<TelemetryTraceData> {
+  const baseUrl = getDashboardBaseUrl();
+  const url = `${baseUrl}/api/telemetry/traces`;
+
+  try {
+    const resp = await fetch(url, {
+      headers: { Accept: 'application/json' },
+    });
+    if (!resp.ok) {
+      return { traces: [], totalSpans: 0, dashboardUrl: baseUrl, error: `Dashboard API ${resp.status}` };
+    }
+
+    const body = (await resp.json()) as DashboardTraceResponse;
+    const rs = body.data.resourceSpans;
+
+    const allSpans: TelemetrySpan[] = [];
+    for (const r of rs) {
+      const svc = getServiceName(r.resource);
+      for (const ss of r.scopeSpans) {
+        for (const span of ss.spans) {
+          allSpans.push({
+            traceId: span.traceId,
+            spanId: span.spanId,
+            parentSpanId: span.parentSpanId,
+            name: span.name,
+            service: svc,
+            kind: span.kind,
+            durationMs: nanoDuration(span.startTimeUnixNano, span.endTimeUnixNano),
+          });
+        }
+      }
+    }
+
+    const byTrace = new Map<string, TelemetrySpan[]>();
+    for (const s of allSpans) {
+      const arr = byTrace.get(s.traceId) ?? [];
+      arr.push(s);
+      byTrace.set(s.traceId, arr);
+    }
+
+    const traces: TelemetryTrace[] = [...byTrace.entries()]
+      .map(([traceId, spans]) => {
+        const services = [...new Set(spans.map((s) => s.service))];
+        return {
+          traceId,
+          services,
+          spans,
+          isCrossService: services.length > 1,
+        };
+      })
+      .sort((a, b) => b.spans.length - a.spans.length)
+      .slice(0, 20);
+
+    return { traces, totalSpans: allSpans.length, dashboardUrl: baseUrl };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { traces: [], totalSpans: 0, dashboardUrl: baseUrl, error: msg };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Webhook trigger
+// ---------------------------------------------------------------------------
+
+export async function fireWebhookTrace(): Promise<WebhookFireResult> {
+  try {
+    const triggersUrl = getServiceUrl('triggers-api', 'http');
+    const webhookUrl = `${triggersUrl}/api/v1/webhooks/inbound/generic`;
+    const resp = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'telemetry-page-trace',
+        timestamp: new Date().toISOString(),
+      }),
+    });
+    return { ok: resp.ok, status: resp.status };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}

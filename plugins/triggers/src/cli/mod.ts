@@ -1,0 +1,33 @@
+/**
+ * @module @netscript/plugin-triggers/cli
+ *
+ * Mounted CLI command group for the triggers plugin.
+ */
+
+export { TriggersCli } from './triggers-cli.ts';
+export { LocalProjectFiles, resolveProjectRoot } from './adapters/local-project-files.ts';
+export type { ProjectFileEntry, ProjectFiles } from './adapters/local-project-files.ts';
+export { LocalTriggersCliBackend } from './triggers-cli-backend.ts';
+export type { LocalTriggersCliBackendOptions } from './triggers-cli-backend.ts';
+export {
+  AddFileWatchCommand,
+  AddScheduledCommand,
+  AddWebhookCommand,
+  DisableTriggerCommand,
+  EnableTriggerCommand,
+  FireTriggerCommand,
+  ListTriggersCommand,
+  PreviewScheduleCommand,
+  StaticTriggersCliBackend,
+  TestTriggerCommand,
+  TriggersCliCommand,
+} from './commands.ts';
+export { TRIGGERS_CLI_COMMANDS } from './command-types.ts';
+export type {
+  TriggersCliBackend,
+  TriggersCliCategory,
+  TriggersCliCommandDefinition,
+  TriggersCliCommandName,
+  TriggersCliFlagDefinition,
+} from './command-types.ts';
+export { TRIGGERS_PLUGIN_ID, TRIGGERS_PLUGIN_VERSION } from '../constants.ts';

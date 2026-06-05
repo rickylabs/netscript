@@ -1,0 +1,14 @@
+/**
+ * Thin wrapper around @netscript/database Zod generation.
+ *
+ * @module
+ */
+
+import { generateZodSchemasCli } from '@netscript/database/scripts';
+
+const ZOD_OUTPUT_DIR = new URL('../schema/.generated/zod', import.meta.url).pathname
+  .replace(/^\/([A-Z]:)/, '$1');
+
+if (import.meta.main) {
+  await generateZodSchemasCli({ zodOutputDir: ZOD_OUTPUT_DIR });
+}

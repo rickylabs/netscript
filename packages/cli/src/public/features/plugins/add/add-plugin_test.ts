@@ -1,0 +1,107 @@
+import { describe, it } from 'jsr:@std/testing@^1/bdd';
+import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
+
+import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
+import { Scaffolder } from '../../../../kernel/adapters/scaffold/scaffolder.ts';
+import { StringTemplateAdapter } from '../../../../kernel/adapters/scaffold/template-adapter.ts';
+import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
+import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
+import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
+import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
+import { addPlugin } from './add-plugin.ts';
+import { planPluginAdd } from './plan-plugin-add.ts';
+
+describe('public add plugin flow', () => {
+  it('plans a starter plugin request from project metadata', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+
+    const plan = await planPluginAdd({
+      kind: 'api',
+      pluginName: 'payments',
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: false,
+      includeSamples: true,
+      projectRoot: '/workspace/alpha',
+      overwrite: false,
+    }, {
+      fs,
+      registry: new PluginKindRegistry(),
+    });
+
+    assertEquals(plan.kind, 'api');
+    assertEquals(plan.projectName, 'alpha-app');
+    assertEquals(plan.dbDetection.requiresDb, false);
+  });
+
+  it('writes starter plugin files with JSR imports and updates workspace config', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const registry = new PluginKindRegistry();
+
+    const result = await addPlugin({
+      kind: 'api',
+      pluginName: 'payments',
+      serviceReferences: ['users'],
+      pluginReferences: [],
+      noDb: true,
+      includeSamples: false,
+      projectRoot: '/workspace/alpha',
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter,
+      registry,
+      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+      workspaceMutator: new PluginWorkspaceMutator(fs),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.ts']),
+    });
+
+    const pluginDenoJson = JSON.parse(
+      await fs.readFile('/workspace/alpha/plugins/payments/deno.json'),
+    );
+    const appsettings = JSON.parse(await fs.readFile('/workspace/alpha/appsettings.json'));
+    const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
+
+    assertStringIncludes(pluginDenoJson.imports['@netscript/plugin'], 'jsr:@netscript/plugin');
+    assertEquals(appsettings.NetScript.Plugins.payments.ServiceReferences, ['users']);
+    assertEquals(rootDenoJson.workspace.includes('./plugins/*'), true);
+    assertFalse(await fs.exists('/workspace/alpha/plugins/registry.ts'));
+    assertEquals(result.helperFiles.length, 1);
+  });
+});
+
+async function writeProjectFiles(fs: MemoryFileSystemAdapter): Promise<void> {
+  await fs.writeFile(
+    '/workspace/alpha/appsettings.json',
+    JSON.stringify(
+      {
+        NetScript: {
+          Name: 'alpha-app',
+          Services: {
+            users: {
+              Enabled: true,
+              Runtime: 'deno',
+              Port: 3001,
+              Entrypoint: 'src/main.ts',
+              Workdir: 'services/users',
+            },
+          },
+          Plugins: {},
+          BackgroundProcessors: {},
+        },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+  await fs.writeFile(
+    '/workspace/alpha/deno.json',
+    JSON.stringify({ workspace: ['apps/web'] }, null, 2) + '\n',
+  );
+}

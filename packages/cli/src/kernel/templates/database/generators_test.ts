@@ -1,0 +1,127 @@
+/**
+ * @module templates/database/generators_test
+ */
+
+import { describe, it } from 'jsr:@std/testing@^1/bdd';
+import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+
+import { DbEngineRegistry } from '../../application/registries/db-engine-registry.ts';
+import { generateDatabaseDenoJson } from './generate-db-deno-json.ts';
+import { generateDatabaseFacadeMod } from './generate-db-mod.ts';
+import { generateEngineMod } from './generate-engine-mod.ts';
+import { generatePrismaConfig } from './generate-prisma-config.ts';
+
+describe('database template generators', () => {
+  const registry = new DbEngineRegistry();
+
+  it('generates engine-specific Deno tasks and imports', () => {
+    const postgres = registry.get('postgres');
+    const config = JSON.parse(
+      generateDatabaseDenoJson(postgres, {
+        projectName: 'alpha-app',
+        importMode: 'local',
+        localBase: '../..',
+      }),
+    );
+
+    assertEquals(config.name, '@alpha-app/database-postgres');
+    assertEquals(config.tasks['db:generate:postgres'], 'deno task db:generate');
+    assertEquals(
+      config.tasks['db:generate'],
+      'deno run -A npm:prisma@^7.4.2 generate --generator client --config prisma.config.ts && deno run -A scripts/generate-zod.ts && deno run -A scripts/fix-zod-imports.ts',
+    );
+    assertEquals(config.tasks['db:init'], 'deno run -A scripts/migrate.ts --name=init');
+    assertEquals(config.tasks['db:migrate'], 'deno run -A scripts/migrate.ts');
+    assertEquals(
+      config.imports['@netscript/database/scripts'],
+      '../../packages/database/scripts/mod.ts',
+    );
+    assertEquals(config.imports['@prisma/adapter-pg'], 'npm:@prisma/adapter-pg@^7.4.2');
+  });
+
+  it('includes patch-client and fix-zod tasks for sqlite', () => {
+    const sqlite = registry.get('sqlite');
+    const config = JSON.parse(
+      generateDatabaseDenoJson(sqlite, {
+        projectName: 'alpha-app',
+        importMode: 'jsr',
+      }),
+    );
+
+    assertEquals(config.tasks['db:status:sqlite'], 'deno task db:status');
+    assertEquals(config.tasks['db:patch-client'], 'deno run -A scripts/patch-prisma-client.ts');
+    assertEquals(config.imports['@prisma/adapter-pg'], undefined);
+  });
+
+  it('generates zod and patch-client tasks for mysql', () => {
+    const mysql = registry.get('mysql');
+    const config = JSON.parse(
+      generateDatabaseDenoJson(mysql, {
+        projectName: 'alpha-app',
+        importMode: 'jsr',
+      }),
+    );
+
+    assertStringIncludes(config.tasks['db:generate'], 'scripts/generate-zod.ts');
+    assertStringIncludes(config.tasks['db:generate'], 'scripts/fix-zod-imports.ts');
+    assertEquals(
+      config.tasks['db:zod'],
+      'deno run -A scripts/generate-zod.ts',
+    );
+    assertEquals(config.tasks['db:patch-client'], 'deno run -A scripts/patch-prisma-client.ts');
+  });
+
+  it('generates zod and patch-client tasks for mssql', () => {
+    const mssql = registry.get('mssql');
+    const config = JSON.parse(
+      generateDatabaseDenoJson(mssql, {
+        projectName: 'alpha-app',
+        importMode: 'jsr',
+      }),
+    );
+
+    assertStringIncludes(config.tasks['db:generate'], 'scripts/generate-zod.ts');
+    assertEquals(
+      config.tasks['db:zod'],
+      'deno run -A scripts/generate-zod.ts',
+    );
+    assertEquals(config.tasks['db:patch-client'], 'deno run -A scripts/patch-prisma-client.ts');
+  });
+
+  it('generates Prisma config with Aspire env key and sqlite fallback URL', () => {
+    const sqlite = registry.get('sqlite');
+    const output = generatePrismaConfig(sqlite, {
+      configKey: 'primary-db',
+      databaseName: 'alpha_app.db',
+    });
+
+    assertStringIncludes(output, "Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL')");
+    assertStringIncludes(output, "'file:./alpha_app.db'");
+    assertStringIncludes(output, 'const databaseUrl = resolveDatabaseUrl(');
+    assertStringIncludes(
+      output,
+      'function normalizeDatabaseUrl(provider: string, value: string): string',
+    );
+    assertStringIncludes(output, "schema: 'schema'");
+  });
+
+  it('generates engine modules with adapter setup where required', () => {
+    const mssql = registry.get('mssql');
+    const output = generateEngineMod(mssql, { configKey: 'sql-server' });
+
+    assertStringIncludes(output, "import { PrismaMssql } from '@prisma/adapter-mssql'");
+    assertStringIncludes(output, "resolveConnectionString('mssql', 'SQL_SERVER_URI')");
+    assertStringIncludes(output, "Deno.env.set('SQL_SERVER_URI', connectionString);");
+    assertStringIncludes(output, "Deno.env.set('DATABASE_URL', connectionString);");
+    assertStringIncludes(output, 'export function getMssql()');
+    assertStringIncludes(output, 'readonly mssql: MssqlClient');
+  });
+
+  it('generates the root database facade for the selected engine', () => {
+    const mysql = registry.get('mysql');
+    const output = generateDatabaseFacadeMod(mysql);
+
+    assertStringIncludes(output, "export * from './mysql/mod.ts'");
+    assertStringIncludes(output, "export { default } from './mysql/mod.ts'");
+  });
+});

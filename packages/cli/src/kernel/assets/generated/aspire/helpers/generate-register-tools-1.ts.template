@@ -1,0 +1,99 @@
+{{__slot0__}}
+
+import type { DistributedApplicationBuilder } from '{{__slot1__}}';
+import type { NetScriptConfig } from '{{__slot2__}}';
+import type { InfrastructureContext } from './register-infrastructure.ts';
+import { buildDatabaseUriEnvKey, resolveWorkspacePath } from '{{__slot3__}}';
+
+type ToolResource = Awaited<ReturnType<DistributedApplicationBuilder['addExecutable']>>;
+
+/**
+ * Registers development tools (e.g., Prisma Studio) with the Aspire SDK
+ * builder via `addExecutable()`.
+ *
+ * Tools are simple `deno task` wrappers and are NOT registered with
+ * `addDenoApp()`. Each tool resolves to:
+ * ```ts
+ * builder.addExecutable(name, 'deno', workdir, ['task', taskName]);
+ * ```
+ *
+ * Tools may depend on a specific named database or fall back to the
+ * primary database from the infrastructure context.
+ *
+ * @param builder - The Aspire distributed application builder
+ * @param config - Parsed NetScript configuration
+ * @param infrastructure - Infrastructure context with database/cache resources
+ * @returns Resolves when all tools are registered
+ */
+export async function registerTools(
+  builder: DistributedApplicationBuilder,
+  config: NetScriptConfig,
+  infrastructure: InfrastructureContext,
+  appHostDir: string,
+): Promise<void> {
+{{__slot4__}}
+}
+
+async function attachToolDatabase(
+  resource: ToolResource,
+  config: NetScriptConfig,
+  infrastructure: InfrastructureContext,
+  databaseKey?: string,
+): Promise<ToolResource> {
+  const resolvedKey = databaseKey || config.PrimaryDatabase;
+  if (!resolvedKey) {
+    return resource;
+  }
+
+  const databaseConfig = config.Databases[resolvedKey];
+  if (databaseConfig?.Engine === 'Sqlite') {
+    const sqliteUrl = `file:./${databaseConfig.DatabaseName ?? `${resolvedKey}.db`}`;
+    return await resource.withEnvironment('DATABASE_URL', sqliteUrl);
+  }
+
+  const databaseResource = infrastructure.databases.get(resolvedKey) ?? infrastructure.primaryDatabase;
+  if (!databaseResource) {
+    return resource;
+  }
+
+  let databaseBinding = resource.withEnvironmentConnectionString('DATABASE_URL', databaseResource);
+  const databaseEnvKey = buildDatabaseUriEnvKey(config);
+  if (databaseEnvKey) {
+    databaseBinding = databaseBinding.withEnvironmentConnectionString(databaseEnvKey, databaseResource);
+  }
+
+  return await databaseBinding.withReference(databaseResource).waitFor(databaseResource);
+}
+
+function resolvePrismaStudioWorkdir(
+  appHostDir: string,
+  config: NetScriptConfig,
+  databaseKey?: string,
+): string {
+  const resolvedKey = databaseKey || config.PrimaryDatabase;
+  if (!resolvedKey) {
+    return resolveWorkspacePath(appHostDir, '{{__slot5__}}/prisma-studio');
+  }
+
+  const databaseConfig = config.Databases[resolvedKey];
+  if (!databaseConfig?.Engine) {
+    return resolveWorkspacePath(appHostDir, '{{__slot6__}}/prisma-studio');
+  }
+
+  return resolveWorkspacePath(appHostDir, `database/${toolEngineDir(databaseConfig.Engine)}`);
+}
+
+function toolEngineDir(engine: string): string {
+  switch (engine) {
+    case 'Postgres':
+      return 'postgres';
+    case 'Mysql':
+      return 'mysql';
+    case 'Mssql':
+      return 'mssql';
+    case 'Sqlite':
+      return 'sqlite';
+    default:
+      return engine.toLowerCase();
+  }
+}

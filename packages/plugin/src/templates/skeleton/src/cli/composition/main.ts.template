@@ -1,0 +1,10 @@
+import { mountPluginCli } from '@netscript/plugin/cli';
+import { {{ClassName}}Cli } from '../{{plugin-name}}-cli.ts';
+
+/** Mounted command definitions for {{pluginName}}. */
+export const commands = mountPluginCli([new {{ClassName}}Cli()]);
+
+if (import.meta.main) {
+  const names = commands.map((command) => command.name).join(', ') || 'no commands';
+  console.log('{{pluginName}} CLI: ' + names);
+}

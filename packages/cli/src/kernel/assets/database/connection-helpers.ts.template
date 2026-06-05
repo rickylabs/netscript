@@ -1,0 +1,133 @@
+
+function resolveConnectionString(provider: string, envKey: string): string | undefined {
+  const rawValue = Deno.env.get(envKey) ?? Deno.env.get('DATABASE_URL');
+  if (!rawValue) {
+    return undefined;
+  }
+
+  return normalizeDatabaseUrl(provider, rawValue);
+}
+
+function normalizeDatabaseUrl(provider: string, value: string): string {
+  const trimmed = value.trim();
+  switch (provider) {
+    case 'postgres':
+      return normalizePostgresUrl(trimmed);
+    case 'mysql':
+      return normalizeMysqlUrl(trimmed);
+    case 'mssql':
+      return normalizeMssqlUrl(trimmed);
+    default:
+      return trimmed;
+  }
+}
+
+function normalizePostgresUrl(value: string): string {
+  if (/^(postgres|postgresql):\/\//i.test(value)) {
+    return value;
+  }
+
+  const parts = parseConnectionParts(value);
+  const username = encodeURIComponent(
+    readConnectionPart(parts, ['username', 'user id', 'uid'], 'postgres'),
+  );
+  const password = encodeURIComponent(readConnectionPart(parts, ['password', 'pwd'], ''));
+  const host = readConnectionPart(parts, ['host', 'server'], 'localhost');
+  const port = readConnectionPart(parts, ['port'], '5432');
+  const database = readConnectionPart(parts, ['database'], 'postgres');
+  return `postgres://${username}:${password}@${host}:${port}/${database}`;
+}
+
+function normalizeMysqlUrl(value: string): string {
+  if (/^mysql:\/\//i.test(value)) {
+    return value;
+  }
+
+  const parts = parseConnectionParts(value);
+  const username = encodeURIComponent(
+    readConnectionPart(parts, ['user', 'user id', 'uid'], 'root'),
+  );
+  const password = encodeURIComponent(readConnectionPart(parts, ['password', 'pwd'], ''));
+  const host = readConnectionPart(parts, ['server', 'host'], 'localhost');
+  const port = readConnectionPart(parts, ['port'], '3306');
+  const database = readConnectionPart(parts, ['database'], 'mysql');
+  return `mysql://${username}:${password}@${host}:${port}/${database}`;
+}
+
+function normalizeMssqlUrl(value: string): string {
+  if (/^sqlserver:\/\//i.test(value)) {
+    return value;
+  }
+  if (/^mssql:\/\//i.test(value)) {
+    return `sqlserver://${value.slice('mssql://'.length)}`;
+  }
+
+  const parts = parseConnectionParts(value);
+  const endpoint = parseSqlServerEndpoint(
+    readConnectionPart(parts, ['server', 'data source'], 'localhost,1433'),
+  );
+  const database = encodeURIComponent(
+    readConnectionPart(parts, ['database', 'initial catalog'], 'master'),
+  );
+  const username = encodeURIComponent(
+    readConnectionPart(parts, ['user', 'user id', 'uid'], 'sa'),
+  );
+  const password = encodeURIComponent(readConnectionPart(parts, ['password', 'pwd'], ''));
+  const options = buildSqlServerOptions(parts);
+  return `sqlserver://${endpoint.host}:${endpoint.port};database=${database};user=${username};password=${password}${options}`;
+}
+
+function buildSqlServerOptions(parts: Record<string, string>): string {
+  const options: string[] = [];
+  const encrypt = parts['encrypt'];
+  if (encrypt) {
+    options.push(`encrypt=${encodeURIComponent(encrypt.toLowerCase())}`);
+  }
+  const trustServerCertificate = parts['trustservercertificate'];
+  if (trustServerCertificate) {
+    options.push(
+      `trustServerCertificate=${encodeURIComponent(trustServerCertificate.toLowerCase())}`,
+    );
+  }
+  return options.length > 0 ? `;${options.join(';')}` : '';
+}
+
+function parseSqlServerEndpoint(value: string): { host: string; port: string } {
+  const trimmed = value.replace(/^tcp:/i, '');
+  const [host = 'localhost', port = '1433'] = trimmed.split(',', 2);
+  return { host: host.trim(), port: port.trim() || '1433' };
+}
+
+function parseConnectionParts(value: string): Record<string, string> {
+  const parts: Record<string, string> = {};
+  for (const segment of value.split(';')) {
+    const trimmed = segment.trim();
+    if (!trimmed) {
+      continue;
+    }
+
+    const separatorIndex = trimmed.indexOf('=');
+    if (separatorIndex < 0) {
+      continue;
+    }
+
+    const key = trimmed.slice(0, separatorIndex).trim().toLowerCase();
+    const partValue = trimmed.slice(separatorIndex + 1).trim();
+    parts[key] = partValue;
+  }
+  return parts;
+}
+
+function readConnectionPart(
+  parts: Record<string, string>,
+  keys: readonly string[],
+  fallback: string,
+): string {
+  for (const key of keys) {
+    const value = parts[key];
+    if (value) {
+      return value;
+    }
+  }
+  return fallback;
+}

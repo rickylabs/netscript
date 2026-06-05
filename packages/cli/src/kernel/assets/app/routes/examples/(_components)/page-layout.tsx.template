@@ -1,0 +1,31 @@
+import type { ComponentChildren } from 'preact';
+
+interface ServiceExamplePageLayoutProps {
+  readonly hero: ComponentChildren;
+  readonly lab: ComponentChildren;
+  readonly summary: ComponentChildren;
+  readonly notes: ComponentChildren;
+}
+
+export function ServiceExamplePageLayout(
+  { hero, lab, summary, notes }: ServiceExamplePageLayoutProps,
+) {
+  return (
+    <div class='min-h-[calc(100vh-52px)] bg-ns-bg text-ns-fg'>
+      <section class='ns-shell ns-section'>
+        <div class='ns-stack ns-stack--lg'>
+          {hero}
+
+          <div class='grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_320px]'>
+            {lab}
+
+            <div class='ns-stack ns-stack--md'>
+              {summary}
+              {notes}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

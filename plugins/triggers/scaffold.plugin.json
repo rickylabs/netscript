@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "provider": {
+    "kind": "trigger",
+    "displayName": "Trigger Processor",
+    "category": "background-processor",
+    "portRangeKey": "INFRA_PLUGIN",
+    "defaultPermissions": ["--unstable-kv", "--allow-all"],
+    "watchFlag": "--watch",
+    "defaultEntrypoint": "src/runtime/trigger-processor.ts",
+    "defaultServiceEntrypoint": "services/src/main.ts",
+    "defaultRequiresDb": true,
+    "defaultRequiresKv": true,
+    "pluginType": "background-processor",
+    "supportsConcurrency": true,
+    "concurrencyEnvVar": "TRIGGER_CONCURRENCY",
+    "defaultConcurrency": 10,
+    "defaultTelemetry": true,
+    "infrastructureRequires": ["kv"],
+    "infrastructureOptionalDeps": ["db"]
+  },
+  "officialSource": {
+    "canonicalName": "triggers",
+    "pluginDir": "triggers",
+    "backgroundDir": "triggers",
+    "serviceEntrypoint": "services/src/main.ts",
+    "backgroundEntrypoint": "src/runtime/trigger-processor.ts",
+    "serviceConfigKey": "triggers-api",
+    "servicePort": 8093,
+    "backgroundPort": 8093,
+    "dependencies": ["streams"],
+    "pluginReferences": ["workers-api"]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "@netscript/sdk",
+  "version": "0.0.1-alpha.0",
+  "description": "Service discovery, oRPC clients, and cache-backed query factories for NetScript.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./adapters": "./adapters/mod.ts",
+    "./cache": "./cache/mod.ts",
+    "./client": "./client/mod.ts",
+    "./collections": "./collections/mod.ts",
+    "./discovery": "./discovery/mod.ts",
+    "./interfaces": "./interfaces/mod.ts",
+    "./openapi": "./openapi/mod.ts",
+    "./query": "./query/mod.ts",
+    "./query-client": "./query-client/mod.ts",
+    "./streams": "./streams.ts",
+    "./telemetry": "./telemetry/mod.ts"
+  },
+  "imports": {
+    "@netscript/kv": "../kv/mod.ts",
+    "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
+    "@netscript/telemetry": "../telemetry/mod.ts",
+    "@standard-schema/spec": "npm:@standard-schema/spec@^1.1.0",
+    "@orpc/client": "npm:@orpc/client@^1.13.5",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
+    "@orpc/openapi": "npm:@orpc/openapi@^1.13.5",
+    "@orpc/server": "npm:@orpc/server@^1.13.5",
+    "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.13.5",
+    "@orpc/zod": "npm:@orpc/zod@^1.13.5",
+    "@tanstack/db": "npm:@tanstack/db@^0.6.1",
+    "@tanstack/query-core": "npm:@tanstack/query-core@^5.75.5",
+    "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@^1.0.32"
+  },
+  "publish": {
+    "include": [
+      "**/*.ts",
+      "deno.json",
+      "README.md"
+    ],
+    "exclude": [
+      "**/*_test.ts",
+      "**/*.test.ts"
+    ]
+  }
+}

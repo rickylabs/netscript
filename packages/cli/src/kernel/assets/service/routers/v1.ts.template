@@ -1,0 +1,81 @@
+/**
+ * {{serviceName | pascalCase}} router — seeded example handlers for v1.
+ *
+ * Step 5 intentionally returns stable in-memory records so the generated
+ * frontend can prove the FE → service contract before the database scaffold
+ * lands in later rollout steps.
+ */
+
+import { v1, type {{serviceName | pascalCase}}ListItemV1 } from '@{{projectName}}/contracts';
+
+const NEXT_STATUS_BY_STATE: Record<
+  {{serviceName | pascalCase}}ListItemV1['status'],
+  {{serviceName | pascalCase}}ListItemV1['status']
+> = {
+  draft: 'active',
+  active: 'archived',
+  archived: 'draft',
+};
+
+let seededRecords: {{serviceName | pascalCase}}ListItemV1[] = [
+  {
+    id: 1,
+    name: 'Launch checklist',
+    summary: 'Tracks the first release milestones for the scaffolded service.',
+    status: 'active',
+    createdAt: '2026-04-21T08:00:00.000Z',
+  },
+  {
+    id: 2,
+    name: 'Integration handshake',
+    summary: 'Verifies the frontend route can hydrate from the generated service.',
+    status: 'draft',
+    createdAt: '2026-04-20T12:30:00.000Z',
+  },
+  {
+    id: 3,
+    name: 'Telemetry follow-up',
+    summary: 'Reserved for the later rollout step that wires end-to-end tracing.',
+    status: 'archived',
+    createdAt: '2026-04-19T15:45:00.000Z',
+  },
+];
+
+export const {{serviceName | pascalCase}}V1 = {
+  list: v1.{{serviceName | camelCase}}.list.handler(async ({ input }) => {
+    const search = input.search?.trim().toLowerCase();
+    const filtered = search
+      ? seededRecords.filter((record) =>
+        record.name.toLowerCase().includes(search)
+      )
+      : [...seededRecords];
+    const items = filtered.slice(input.offset, input.offset + input.limit);
+
+    return {
+      items,
+      total: filtered.length,
+      limit: input.limit,
+      offset: input.offset,
+      hasMore: input.offset + input.limit < filtered.length,
+    };
+  }),
+  updateStatus: v1.{{serviceName | camelCase}}.updateStatus.handler(async ({ input }) => {
+    const record = seededRecords.find((entry) => entry.id === input.id);
+
+    if (!record) {
+      throw new Error(`{{serviceName}} record ${input.id} not found`);
+    }
+
+    const nextStatus = input.status;
+    record.status = nextStatus;
+    record.summary = nextStatus === 'archived'
+      ? 'Archived after the optimistic showcase mutation completed.'
+      : nextStatus === 'active'
+      ? 'Re-activated through the scaffolded optimistic update flow.'
+      : 'Moved back into draft to demonstrate typed mutation rollbacks.';
+
+    return {
+      ...record,
+    };
+  }),
+};

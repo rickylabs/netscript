@@ -1,0 +1,34 @@
+# {{pluginName}} Architecture
+
+## Archetype
+
+This package follows the NetScript plugin package archetype.
+
+## Axioms
+
+- Public types are designed first.
+- Composition is preferred over inheritance.
+- Extension axes are named in the manifest.
+- Generated registries are emitted by the host walker.
+- Tests act as package fitness functions.
+
+## Structure
+
+```text
+{{pluginBaseName}} manifest
+  -> cli subpath
+  -> aspire subpath
+  -> e2e subpath
+  -> testing subpath
+```
+
+## Contribution axes
+
+Start with no runtime contribution axes.
+
+Add only the axes this plugin owns.
+
+## Operational notes
+
+Document required permissions, services, databases, telemetry, and runtime
+configuration before publishing.

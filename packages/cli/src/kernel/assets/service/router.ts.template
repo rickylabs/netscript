@@ -1,0 +1,29 @@
+/**
+ * {{serviceName | pascalCase}} router
+ *
+ * Aggregates version routers into a single router shape for the oRPC
+ * server. Add new versions (`v2`, `v3`, …) alongside `v1` as the API
+ * evolves; existing clients keep talking to their pinned version.
+ *
+ * The generated showcase keeps `health` under the service namespace because
+ * the validated Step 5 contract baseline already owns that path at
+ * `v1.{{serviceName | camelCase}}.health`.
+ *
+ * @see https://orpc.unnoq.com/docs/router
+ */
+
+import { health } from './routers/health.ts';
+import { {{serviceName | pascalCase}}V1 } from './routers/v1.ts';
+
+export const v1 = {
+  {{serviceName | camelCase}}: {
+    ...{{serviceName | pascalCase}}V1,
+    health,
+  },
+};
+
+export const router = {
+  v1,
+};
+
+export type Router = typeof router;

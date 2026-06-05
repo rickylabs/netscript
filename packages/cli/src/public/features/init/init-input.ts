@@ -1,0 +1,20 @@
+import type { DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
+import type { EditorChoice } from '../../../kernel/domain/scaffold/workspace-config.ts';
+
+/** Parsed options accepted by the public `init` command. */
+export interface InitCommandInput {
+  readonly appName?: string;
+  readonly db?: DbEngineChoice | string;
+  readonly service?: boolean;
+  readonly serviceName?: string;
+  readonly servicePort?: number;
+  readonly editor?: EditorChoice | string;
+  readonly aspire?: boolean;
+  readonly legacyAspire?: boolean;
+  readonly git?: boolean;
+  readonly force?: boolean;
+  readonly ci?: boolean;
+  readonly yes?: boolean;
+  readonly path?: string;
+  readonly dryRun?: boolean;
+}

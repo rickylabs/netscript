@@ -1,0 +1,83 @@
+{
+  "name": "@netscript/plugin-sagas",
+  "version": "0.0.1-alpha.0",
+  "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./public": "./src/public/mod.ts",
+    "./plugin": "./src/plugin/mod.ts",
+    "./cli": "./src/cli/mod.ts",
+    "./scaffolding": "./src/scaffolding/mod.ts",
+    "./e2e": "./src/e2e/mod.ts",
+    "./aspire": "./src/aspire/mod.ts",
+    "./runtime": "./src/runtime/mod.ts",
+    "./contracts": "./contracts/v1/mod.ts",
+    "./services": "./services/src/main.ts",
+    "./streams": "./streams/mod.ts",
+    "./streams/server": "./streams/server.ts"
+  },
+  "imports": {
+    "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
+    "@netscript/fresh/streams": "../../packages/fresh/streams/mod.ts",
+    "@netscript/plugin-streams": "../streams/mod.ts",
+    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+    "@netscript/plugin-workers": "../workers/mod.ts",
+    "@netscript/plugin": "../../packages/plugin/mod.ts",
+    "@netscript/plugin-sagas-core/domain": "../../packages/plugin-sagas-core/src/domain/mod.ts",
+    "@netscript/plugin-sagas-core/integration/publisher": "../../packages/plugin-sagas-core/src/integration/publisher/mod.ts",
+    "@netscript/plugin-sagas-core/runtime": "../../packages/plugin-sagas-core/src/runtime/mod.ts",
+    "@netscript/plugin-sagas-core/streams": "../../packages/plugin-sagas-core/src/streams/mod.ts",
+    "@netscript/kv": "../../packages/kv/mod.ts",
+    "@netscript/queue": "../../packages/queue/mod.ts",
+    "@netscript/telemetry": "../../packages/telemetry/mod.ts",
+    "@netscript/telemetry/context": "../../packages/telemetry/context.ts",
+    "@netscript/service": "../../packages/service/mod.ts",
+    "@netscript/shared": "../../packages/shared/mod.ts",
+    "@shared/utils": "../../packages/shared/utils/mod.ts",
+    "@std/async": "jsr:@std/async@^1",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
+    "@orpc/server": "npm:@orpc/server@^1.13.5",
+    "@orpc/openapi": "npm:@orpc/openapi@^1.13.5",
+    "@orpc/zod": "npm:@orpc/zod@^1.13.5",
+    "hono": "jsr:@hono/hono@^4",
+    "@hono/hono": "jsr:@hono/hono@^4",
+    "zod": "npm:zod@^4.3.6",
+    "@tanstack/db": "npm:@tanstack/db@^0.6.1",
+    "@durable-streams/client": "npm:@durable-streams/client@^0.2.3",
+    "@durable-streams/state": "npm:@durable-streams/state@^0.2.3"
+  },
+  "tasks": {
+    "check": "deno check mod.ts services/src/main.ts",
+    "test": "deno test --allow-all",
+    "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
+    "test:api": "deno run --allow-net --allow-env test-api.ts"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "docs/**/*.md",
+      "deno.json",
+      "scaffold.plugin.json",
+      "scaffold.runtime.json",
+      "mod.ts",
+      "src/**/*.ts",
+      "contracts/**/*.ts",
+      "services/**/*.ts",
+      "streams/**/*.ts",
+      "database/**/*.prisma",
+      "bin/**/*.ts"
+    ],
+    "exclude": [
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}

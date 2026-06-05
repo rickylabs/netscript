@@ -1,0 +1,118 @@
+import { Button, Card } from '@app/components/ui/mod.ts';
+import type { TelemetryTraceData, TelemetryTrace, TelemetrySpan } from '../(_shared)/telemetry-trace.ts';
+
+interface TelemetryViewProps {
+  readonly data: TelemetryTraceData;
+  readonly examplesHref: string;
+}
+
+function SpanRow({ span }: { span: TelemetrySpan }) {
+  return (
+    <tr class='border-b border-ns-border/50 text-xs'>
+      <td class='px-3 py-2 font-mono text-ns-fg'>{span.name}</td>
+      <td class='px-3 py-2 text-ns-muted-fg'>{span.service}</td>
+      <td class='px-3 py-2 text-right font-mono text-ns-muted-fg'>{span.durationMs}ms</td>
+      <td class='px-3 py-2 font-mono text-ns-muted-fg/70'>{span.spanId.substring(0, 8)}</td>
+      <td class='px-3 py-2 font-mono text-ns-muted-fg/70'>
+        {span.parentSpanId ? span.parentSpanId.substring(0, 8) : '—'}
+      </td>
+    </tr>
+  );
+}
+
+function TraceCard({ trace }: { trace: TelemetryTrace }) {
+  return (
+    <Card>
+      <Card.Header>
+        <div class='flex items-center justify-between'>
+          <Card.Title>
+            <span class='font-mono text-sm'>{trace.traceId.substring(0, 16)}…</span>
+          </Card.Title>
+          {trace.isCrossService && (
+            <span class='rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-600'>
+              cross-service
+            </span>
+          )}
+        </div>
+        <Card.Description>
+          {trace.spans.length} spans across {trace.services.join(', ')}
+        </Card.Description>
+      </Card.Header>
+      <Card.Body>
+        <div class='overflow-x-auto'>
+          <table class='w-full text-left'>
+            <thead>
+              <tr class='border-b border-ns-border text-xs font-medium uppercase tracking-wider text-ns-muted-fg'>
+                <th class='px-3 py-2'>Span</th>
+                <th class='px-3 py-2'>Service</th>
+                <th class='px-3 py-2 text-right'>Duration</th>
+                <th class='px-3 py-2'>Span ID</th>
+                <th class='px-3 py-2'>Parent</th>
+              </tr>
+            </thead>
+            <tbody>
+              {trace.spans.map((span) => <SpanRow span={span} />)}
+            </tbody>
+          </table>
+        </div>
+      </Card.Body>
+    </Card>
+  );
+}
+
+export function TelemetryView({ data, examplesHref }: TelemetryViewProps) {
+  return (
+    <div class='min-h-[calc(100vh-52px)] bg-ns-bg text-ns-fg'>
+      <section class='ns-shell ns-section'>
+        <div class='ns-stack ns-stack--md'>
+          <div class='ns-stack ns-stack--xs'>
+            <div class='flex items-center gap-3'>
+              <Button type='link' href={examplesHref} variant='ghost' size='sm'>
+                &larr; Examples
+              </Button>
+            </div>
+            <span class='ns-badge ns-badge--secondary w-fit'>Telemetry</span>
+            <h1 class='text-3xl font-semibold text-ns-fg sm:text-4xl'>
+              Aspire Dashboard traces
+            </h1>
+            <p class='max-w-3xl text-sm leading-7 text-ns-muted-fg sm:text-base'>
+              Live traces from the Aspire Dashboard telemetry API. Fire a webhook to generate
+              a cross-service trace chain (trigger &rarr; queue &rarr; worker &rarr; job), then
+              refresh to see spans appear below.
+            </p>
+          </div>
+
+          <div class='flex flex-wrap items-center gap-4'>
+            <form method='POST'>
+              <Button type='submit' variant='primary' size='sm'>
+                Fire webhook trace
+              </Button>
+            </form>
+            <Button type='link' href={data.dashboardUrl} variant='outline' size='sm'>
+              Open Dashboard
+            </Button>
+            <span class='text-xs text-ns-muted-fg'>
+              {data.totalSpans} total spans &middot; {data.traces.length} traces shown
+            </span>
+          </div>
+
+          {data.error && (
+            <div class='rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-3 text-sm text-red-400'>
+              Dashboard API error: {data.error}
+            </div>
+          )}
+
+          {data.traces.length === 0 && !data.error && (
+            <div class='rounded-lg border border-ns-border bg-ns-surface/60 px-4 py-8 text-center text-sm text-ns-muted-fg'>
+              No traces captured yet. Fire a webhook or trigger service calls to generate telemetry.
+            </div>
+          )}
+
+          <div class='ns-stack ns-stack--sm'>
+            {data.traces.map((trace) => <TraceCard trace={trace} />)}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,0 +1,33 @@
+/**
+ * `/health` route — minimal liveness endpoint for the {{appName}} app.
+ *
+ * Returns JSON when the `Accept` header prefers it (probes, Aspire
+ * health-checks) and a tiny HTML page in the browser.
+ */
+import HealthView from './(_components)/health-view.tsx';
+import { buildPayload, toHealthRouteData } from './(_shared)/health.ts';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+
+export const healthPage = definePage()
+  .withRoute(appRoutes.health)
+  .withMeta(() => ({
+    title: '{{name}} — health',
+    description: 'Liveness route for the {{appName}} app.',
+  }))
+  .withLayer('panel', HealthView, (ctx) => toHealthRouteData(ctx.data) ?? { payload: buildPayload() })
+  .withLayout((slots) => slots.panel())
+  .withHandler('GET', (ctx) => {
+    const accept = ctx.req.headers.get('accept') ?? '';
+    const payload = buildPayload('{{appName}}');
+
+    if (accept.includes('application/json') && !accept.includes('text/html')) {
+      return Response.json(payload);
+    }
+
+    return { data: { payload } };
+  })
+  .build();
+
+export const { handler, default: page } = healthPage;
+export { page as default };

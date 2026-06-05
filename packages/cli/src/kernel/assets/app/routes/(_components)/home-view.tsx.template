@@ -1,0 +1,93 @@
+import { Button, Card } from '@app/components/ui/mod.ts';
+import ThemeToggle from '@app/islands/ThemeToggle.tsx';
+
+interface RouteCard {
+  readonly title: string;
+  readonly href: string;
+  readonly description: string;
+  readonly cta: string;
+}
+
+interface HomeViewProps {
+  readonly projectName: string;
+  readonly appName: string;
+  readonly routes: readonly RouteCard[];
+  readonly nextSteps: readonly string[];
+}
+
+export default function HomeView({ projectName, appName, routes, nextSteps }: HomeViewProps) {
+  return (
+    <div class='min-h-[calc(100vh-52px)] bg-ns-bg text-ns-fg'>
+      <section class='ns-shell ns-section ns-section--lg'>
+        <div class='ns-stack ns-stack--sm'>
+          <span class='ns-badge ns-badge--primary w-fit'>definePage scaffold</span>
+          <h1 class='text-4xl font-semibold text-ns-fg sm:text-5xl'>{projectName}</h1>
+          <p class='max-w-3xl text-sm leading-7 text-ns-muted-fg sm:text-base'>
+            The starter app now uses the same builder seam the framework is standardizing around:
+            typed route definitions, shared layout chrome, and example landing pages ready for the
+            next rollout steps.
+          </p>
+        </div>
+
+        <div class='ns-grid'>
+          {routes.map((route) => (
+            <Card key={route.href} interactive>
+              <Card.Header>
+                <Card.Title>{route.title}</Card.Title>
+                <Card.Description>{route.description}</Card.Description>
+              </Card.Header>
+              <Card.Body class='ns-stack ns-stack--sm text-sm text-ns-muted-fg'>
+                <p>{route.href}</p>
+                <Button type='link' href={route.href} variant='ghost' class='w-fit px-0'>
+                  {route.cta}
+                </Button>
+              </Card.Body>
+            </Card>
+          ))}
+
+          <Card interactive>
+            <Card.Header class='flex items-start justify-between gap-4'>
+              <div class='ns-stack ns-stack--xs'>
+                <Card.Title>Theme</Card.Title>
+                <Card.Description>
+                  The scaffold still ships a hydrated island so light and dark mode can be checked
+                  on the builder-backed routes from the first load.
+                </Card.Description>
+              </div>
+              <ThemeToggle />
+            </Card.Header>
+            <Card.Body class='text-sm leading-6 text-ns-muted-fg'>
+              The same theme seed powers the shared layout chrome, copied UI seams, and every
+              example page under <code>/examples</code>.
+            </Card.Body>
+          </Card>
+
+          <Card interactive>
+            <Card.Header>
+              <Card.Title>Next steps</Card.Title>
+              <Card.Description>
+                This starter now has the scaffold shape needed for the upcoming service and
+                telemetry demos.
+              </Card.Description>
+            </Card.Header>
+            <Card.Body>
+              <ul class='ml-5 space-y-2 text-sm leading-6 text-ns-muted-fg'>
+                {nextSteps.map((step) => <li key={step}>{step}</li>)}
+              </ul>
+            </Card.Body>
+          </Card>
+        </div>
+
+        <div class='ns-inline-notice ns-inline-notice--info'>
+          <div class='ns-inline-notice__body'>
+            <p class='ns-inline-notice__title'>Scaffold route surface</p>
+            <p class='ns-inline-notice__description'>
+              <code>{appName}</code> now boots with `definePage()` routes, `define.layout()`
+              chrome, copied UI seams, and an examples landing page ready for Step 5 and Step 10.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,0 +1,54 @@
+{
+  "name": "@netscript/plugin-streams",
+  "version": "0.0.1-alpha.0",
+  "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./cli": "./src/cli/composition/main.ts",
+    "./scaffolding": "./src/scaffolding/mod.ts",
+    "./e2e": "./src/e2e/mod.ts",
+    "./aspire": "./src/aspire/mod.ts"
+  },
+  "imports": {
+    "@netscript/plugin": "../../packages/plugin/mod.ts",
+    "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
+    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+    "@netscript/service": "../../packages/service/mod.ts",
+    "@netscript/telemetry": "../../packages/telemetry/mod.ts",
+    "@durable-streams/client": "npm:@durable-streams/client@^0.2.3",
+    "@std/net": "jsr:@std/net@^1.0.0",
+    "@durable-streams/server": "npm:@durable-streams/server@^0.2.3",
+    "@standard-schema/spec": "npm:@standard-schema/spec@^1.1.0",
+    "hono": "npm:hono@^4.10.6"
+  },
+  "tasks": {
+    "check": "deno check --unstable-kv mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts services/src/main.ts",
+    "dev": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi --watch services/src/main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi services/src/main.ts",
+    "streams:e2e": "deno run --allow-net --allow-env src/e2e/probes/health.ts && deno run --allow-all src/e2e/probes/publish.ts && deno run --allow-net --allow-env src/e2e/probes/subscribe.ts",
+    "test": "deno test --allow-all",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "deno.json",
+      "scaffold.plugin.json",
+      "mod.ts",
+      "src/**/*.ts",
+      "docs/**/*.md",
+      "services/**/*.ts"
+    ],
+    "exclude": [
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/test_utils/**"
+    ]
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}

@@ -1,0 +1,21 @@
+/**
+ * {{__slot0__}} combined runtime stub.
+ *
+ * Replace this placeholder with the plugin's real background processor logic.
+ */
+
+async function main(): Promise<void> {
+  const concurrency = Deno.env.get('{{__slot1__}}') ?? '{{__slot2__}}';
+
+  console.log('[{{__slot3__}}] {{__slot4__}} runtime started');
+  console.log('[{{__slot5__}}] Concurrency:', concurrency);
+  console.log('[{{__slot6__}}] Replace bin/combined.ts with the real processor runtime.');
+
+  await new Promise<void>((_resolve) => {
+    setInterval(() => {}, 60_000);
+  });
+}
+
+if (import.meta.main) {
+  await main();
+}

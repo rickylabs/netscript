@@ -1,0 +1,81 @@
+/**
+ * {{__slot0__}} sample health-check job.
+ *
+ * Mirrors the main repo plugin job pattern with a small, safe handler that can
+ * be triggered after the worker runtime is running.
+ */
+
+import {
+  createFailureResult,
+  createSuccessResult,
+  defineJobHandler,
+} from '@netscript/plugin-workers-core';
+import { z } from 'zod';
+
+const HealthCheckPayloadSchema = z.object({
+  verbose: z.boolean().default(false),
+});
+
+interface HealthCheck {
+  name: string;
+  status: 'pass' | 'fail';
+  duration: number;
+  message: string;
+}
+
+const handler = defineJobHandler(async (ctx) => {
+  HealthCheckPayloadSchema.parse(ctx.payload ?? {});
+  const startTime = performance.now();
+  const checks: HealthCheck[] = [];
+
+  console.info('Starting {{__slot2__}} sample health check');
+
+  await ctx.reportProgress?.(33, 'Checking runtime context');
+  checks.push({
+    name: 'context',
+    status: 'pass',
+    duration: performance.now() - startTime,
+    message: `Job context available: ${ctx.id}`,
+  });
+
+  await ctx.reportProgress?.(66, 'Checking filesystem access');
+  const fsStart = performance.now();
+  try {
+    const entries: string[] = [];
+    for await (const entry of Deno.readDir('.')) {
+      entries.push(entry.name);
+      if (entries.length >= 3) break;
+    }
+    checks.push({
+      name: 'filesystem',
+      status: 'pass',
+      duration: performance.now() - fsStart,
+      message: `Read ${entries.length} workspace entries`,
+    });
+  } catch (error) {
+    checks.push({
+      name: 'filesystem',
+      status: 'fail',
+      duration: performance.now() - fsStart,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  await ctx.reportProgress?.(100, 'Complete');
+  const failed = checks.filter((check) => check.status === 'fail');
+  const result = {
+    plugin: '{{__slot4__}}',
+    status: failed.length === 0 ? 'healthy' : 'unhealthy',
+    checks,
+    totalDuration: performance.now() - startTime,
+    timestamp: new Date().toISOString(),
+  };
+
+  return failed.length === 0
+    ? createSuccessResult(result)
+    : createFailureResult(
+      `Sample health check failed: ${failed.map((check) => check.name).join(', ')}`,
+    );
+});
+
+export default Object.assign(handler, { id: '{{__slot1__}}-health-check' });

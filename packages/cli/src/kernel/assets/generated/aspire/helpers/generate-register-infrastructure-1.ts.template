@@ -1,0 +1,52 @@
+{{__slot0__}}
+
+import type { DistributedApplicationBuilder, EndpointReference } from '{{__slot1__}}';
+import { ContainerLifetime } from '{{__slot2__}}';
+import { resolveDataPath } from '{{__slot3__}}';
+import type { NetScriptConfig } from '{{__slot4__}}';
+
+type AspireResource = Parameters<ReturnType<DistributedApplicationBuilder['addExecutable']>['withReference']>[0];
+type CacheContainerResource = Awaited<ReturnType<DistributedApplicationBuilder['addContainer']>>;
+type CacheResource = AspireResource | CacheContainerResource;
+
+/** Infrastructure context carrying database and cache resources for downstream registration. */
+export interface InfrastructureContext {
+  readonly databases: Map<string, AspireResource>;
+  readonly caches: Map<string, CacheResource>;
+  readonly cacheEndpoints: Map<string, EndpointReference>;
+  readonly primaryDatabase: AspireResource | null;
+  readonly primaryCache: CacheResource | null;
+  readonly primaryCacheEndpoint: EndpointReference | null;
+}
+
+/**
+ * Registers databases and caches with the Aspire SDK builder.
+ * Resolves primary database and primary cache from config.
+ *
+ * @param builder - The Aspire distributed application builder
+ * @param config - Parsed NetScript configuration
+ * @param appHostDir - Absolute path to the AppHost directory
+ * @returns Infrastructure context with resource maps and primary references
+ */
+export async function registerInfrastructure(
+  builder: DistributedApplicationBuilder,
+  config: NetScriptConfig,
+  appHostDir: string,
+): Promise<InfrastructureContext> {
+  const databases = new Map<string, AspireResource>();
+  const caches = new Map<string, CacheResource>();
+  const cacheEndpoints = new Map<string, EndpointReference>();
+
+  // --- Databases ---
+{{__slot5__}}
+
+  // --- Caches ---
+{{__slot6__}}
+
+  // --- Primary Resolution ---
+{{__slot7__}}
+{{__slot8__}}
+{{__slot9__}}
+
+  return { databases, caches, cacheEndpoints, primaryDatabase, primaryCache, primaryCacheEndpoint };
+}
