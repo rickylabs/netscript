@@ -72,6 +72,16 @@ To add a new skill: create a folder under `.agents/skills/<name>/`, write
 |------|-------|------|-------|
 | 2026-06-05 | Setup | Branch + run dir created | `feat/package-quality-wave0b-docs` |
 | 2026-06-05 | Plan | research.md + plan.md written | Re-baseline complete |
+| 2026-06-05 | PLAN-EVAL | Group B dogfood | PASS (first true separate session) |
+| 2026-06-05 | B1 | `.agents/docs/README.md` | First draft (thin index) |
+| 2026-06-05 | B2 | `.agents/skills/README.md` + `DEVELOPING.md` | Skills cluster scaffold |
+| 2026-06-05 | B3-B7 | Skills standardized | First pass oversimplified jsr-audit |
+| 2026-06-05 | Review fix | `.agents/docs/README.md` | Rewritten to Prisma bar |
+| 2026-06-05 | Review fix | `jsr-audit` SKILL | Restored all 427 original lines |
+| 2026-06-05 | Review fix | `netscript-doctrine` | Restored Archetypes, Axioms, Layering, Folder Vocab |
+| 2026-06-05 | Review fix | `netscript-harness` | Restored Run Artifacts, Evaluator Separation, Decision Tree |
+| 2026-06-05 | Review fix | `deno-fresh` | Preserved all 886 lines, added D4 + Checklist |
+| 2026-06-05 | Validation | deno fmt + cross-reference + index consistency | All passed |
 
 ## Decisions
 
@@ -93,9 +103,9 @@ To add a new skill: create a folder under `.agents/skills/<name>/`, write
 
 | Gate | Command or check | Result | Notes |
 |------|------------------|--------|-------|
-| Cross-reference integrity | Manual path resolution | NOT_RUN | Will run post-implementation |
-| Skill index consistency | Table vs filesystem | NOT_RUN | Will run post-implementation |
-| Format | `deno fmt` | NOT_RUN | Will run post-implementation |
+| Cross-reference integrity | Manual path resolution | PASS | 22/22 links resolve |
+| Skill index consistency | Table vs filesystem | PASS | 5 skills in table match filesystem |
+| Format | `deno fmt` | PASS | 9 files formatted, no errors |
 
 ### Fitness Gates
 
