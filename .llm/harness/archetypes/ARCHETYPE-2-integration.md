@@ -9,23 +9,21 @@
   - `doctrine/06-archetypes.md#archetype-2--integration`
   - `doctrine/07-composition-and-extension.md`
   - `doctrine/09-anti-patterns-and-fitness-functions.md`
-- Anti-patterns: AP-1, AP-2, AP-3, AP-4, AP-5, AP-7, AP-8, AP-9, AP-11,
-  AP-13, AP-14, AP-16, AP-17, AP-19, AP-20.
-- Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10,
-  F-11, F-12, F-14, F-15.
+- Anti-patterns: AP-1, AP-2, AP-3, AP-4, AP-5, AP-7, AP-8, AP-9, AP-11, AP-13, AP-14, AP-16, AP-17,
+  AP-19, AP-20.
+- Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-14, F-15.
 
 ## When This Archetype Applies
 
-Use this profile for packages that integrate with an external system: database,
-queue, KV, cron, Aspire, telemetry, logging, or another system boundary. The
-package owns a small port only when the package has a real external dependency
-axis or more than one credible adapter.
+Use this profile for packages that integrate with an external system: database, queue, KV, cron,
+Aspire, telemetry, logging, or another system boundary. The package owns a small port only when the
+package has a real external dependency axis or more than one credible adapter.
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `doctrine/06-archetypes.md#archetype-2--integration`.
-The important boundary is package-owned ports plus named adapters. A one-adapter
-package does not invent a port unless the doctrine criteria are met.
+Use the canonical shape in `doctrine/06-archetypes.md#archetype-2--integration`. The important
+boundary is package-owned ports plus named adapters. A one-adapter package does not invent a port
+unless the doctrine criteria are met.
 
 ## Skills to Activate
 
@@ -44,13 +42,12 @@ package does not invent a port unless the doctrine criteria are met.
 
 ## Required Gates in Order
 
-1. Static gates: package/slice checks, `fmt --check`, lint, doc lint, publish
-   dry-run when package scope.
+1. Static gates: package/slice checks, `fmt --check`, lint, doc lint, publish dry-run when package
+   scope.
 2. Fitness gates: F-1 through F-12 as listed above, plus F-14 and F-15.
-3. Runtime gates: optional, required when the adapter is exercised against a
-   real backend or Aspire resource.
-4. Consumer gates: required when ports, adapter names, exports, or defaults
-   change.
+3. Runtime gates: optional, required when the adapter is exercised against a real backend or Aspire
+   resource.
+4. Consumer gates: required when ports, adapter names, exports, or defaults change.
 
 ## Anti-Patterns to Watch For
 
@@ -77,8 +74,8 @@ package does not invent a port unless the doctrine criteria are met.
 
 ## Design Checkpoint Expectations
 
-The design checkpoint names the external system, the port shape, the adapter
-set, the composition root, required permissions, and consumer import impact.
+The design checkpoint names the external system, the port shape, the adapter set, the composition
+root, required permissions, and consumer import impact.
 
 The design section in `worklog.md` must include:
 
@@ -99,5 +96,5 @@ Beyond the universal slice checklist in `workflow/run-loop.md`:
 
 ## Historical Notes
 
-Integration packages drift when helpers hide technology differences. Prefer two
-small adapters with obvious names over one configurable helper with flags.
+Integration packages drift when helpers hide technology differences. Prefer two small adapters with
+obvious names over one configurable helper with flags.

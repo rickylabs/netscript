@@ -19,3 +19,5 @@ Format:
 - 6a797bc: feat(harness): update SKILL and IMPL-EVAL protocol for dual evaluator passes
 - f2d818b: feat(harness): add lesson and update indices to 8-phase model
 - 7fcf3e3: style(harness): deno fmt on all changed markdown
+- 3f33c44: docs(wave0b): record validation results and updated context pack
+- 8d6bade: eval(wave0b): IMPL-EVAL verdict PASS for harness reinforcement

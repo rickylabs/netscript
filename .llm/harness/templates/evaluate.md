@@ -10,7 +10,7 @@ Fill this template during evaluation. Allowed result values: `PASS`, `FAIL`, `N/
 | -------------- | ------------------------------ |
 | Run ID         | `<run-id>`                     |
 | Target         | `<target>`                     |
-| Archetype      | `<N - name                     |
+| Archetype      | `<N - name or N/A>`            |
 | Scope overlays | `<frontend/service/docs/none>` |
 | Evaluator      | `<session/date>`               |
 

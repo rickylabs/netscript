@@ -6,7 +6,7 @@
 | -------------- | ------------------------------ |
 | Run ID         | `<run-id>`                     |
 | Branch         | `<branch>`                     |
-| Archetype      | `<N - name                     |
+| Archetype      | `<N - name or N/A>`            |
 | Scope overlays | `<frontend/service/docs/none>` |
 
 ## Design

@@ -25,7 +25,7 @@ On activation, read:
 4. `.llm/harness/archetypes/README.md`
 5. selected `ARCHETYPE-*` profile and any `SCOPE-*` overlays
 6. `.llm/harness/gates/archetype-gate-matrix.md`
-7. `gates/plan-gate.md` and `evaluator/plan-protocol.md`
+7. `.llm/harness/gates/plan-gate.md` and `.llm/harness/evaluator/plan-protocol.md`
 
 For package/plugin work, also use `.claude/skills/netscript-doctrine/SKILL.md`.
 

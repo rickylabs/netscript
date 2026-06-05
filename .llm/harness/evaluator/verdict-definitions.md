@@ -53,9 +53,10 @@ implementation.
 
 ## Choosing Between Verdicts
 
-| Condition                                     | Verdict        |
-| --------------------------------------------- | -------------- |
-| Code/docs incomplete, plan valid              | `FAIL_FIX`     |
-| Plan/archetype/scope invalid                  | `FAIL_RESCOPE` |
-| Only debt registry is blocking                | `FAIL_DEBT`    |
-| All applicable gates and debt rules satisfied | `PASS`         |
+| Condition                                                    | Verdict        |
+| ------------------------------------------------------------ | -------------- |
+| Plan incomplete or unsound at the Plan-Gate (PLAN-EVAL only) | `FAIL_PLAN`    |
+| Code/docs incomplete, plan valid                             | `FAIL_FIX`     |
+| Plan/archetype/scope invalid                                 | `FAIL_RESCOPE` |
+| Only debt registry is blocking                               | `FAIL_DEBT`    |
+| All applicable gates and debt rules satisfied                | `PASS`         |

@@ -12,9 +12,9 @@
 
 ## Current State
 
-All 7 commit slices (A1–A7) implemented. Validation complete: deno fmt clean,
-17/17 cross-references resolve, self-consistency table passes. Ready for
-IMPL-EVAL and draft PR.
+Review findings F1–F5 fixed. Validation re-run: deno fmt clean (61 files),
+20/20 cross-references resolve, self-consistency passes including all F4-swept
+files. Ready for reviewer re-evaluation.
 
 ## Completed
 
@@ -25,14 +25,13 @@ IMPL-EVAL and draft PR.
 
 ## In Progress
 
-- Plan & Design — READY FOR REVIEW.
+- F1–F5 review fixes committed and pushed.
 
 ## Next Steps
 
-1. PLAN-EVAL (separate session) on plan + design.
-2. If PASS, implement slices A1–A7.
-3. Run validation gates.
-4. IMPL-EVAL (separate session).
+1. Reviewer re-evaluates PR #4.
+2. On approval, reviewer merges.
+3. Then Group B (`feat/package-quality-wave0b-docs`) can begin.
 
 ## Key Decisions
 
@@ -52,7 +51,7 @@ IMPL-EVAL and draft PR.
 
 | Gate family | Current status | Evidence |
 |-------------|----------------|----------|
-| Static | NOT_RUN | Pending implementation |
+| Static | PASS | deno fmt clean, 20/20 cross-references, self-consistency |
 | Fitness | N/A | No package/plugin work |
 | Runtime | N/A | No runtime changes |
 | Consumer | N/A | No export changes |
@@ -77,3 +76,5 @@ IMPL-EVAL and draft PR.
 - 6a797bc: feat(harness): update SKILL and IMPL-EVAL protocol for dual evaluator passes
 - f2d818b: feat(harness): add lesson and update indices to 8-phase model
 - 7fcf3e3: style(harness): deno fmt on all changed markdown
+- 3f33c44: docs(wave0b): record validation results and updated context pack
+- 8d6bade: eval(wave0b): IMPL-EVAL verdict PASS for harness reinforcement

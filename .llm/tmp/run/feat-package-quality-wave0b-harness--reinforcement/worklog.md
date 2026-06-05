@@ -79,6 +79,7 @@ template under `templates/`, and update `README.md` + `DOCTRINE-REF.md` indices.
 | 2026-06-05 | A6 | SKILL.md + evaluator/protocol.md | Dual evaluator passes documented |
 | 2026-06-05 | A7 | lesson + README/DOCTRINE-REF | Indices updated to 8-phase model |
 | 2026-06-05 | Validation | deno fmt + cross-reference + self-consistency | All passed |
+| 2026-06-05 | F1–F5 | Review findings fixed | See below |
 
 ## Decisions
 
@@ -100,9 +101,9 @@ template under `templates/`, and update `README.md` + `DOCTRINE-REF.md` indices.
 
 | Gate | Command or check | Result | Notes |
 |------|------------------|--------|-------|
-| Cross-reference integrity | Manual path resolution | PASS | 17 referenced paths all resolve to real files |
-| Self-consistency | Table comparison | PASS | 8 phases, 2 evaluators, new artifacts agree across all files |
-| Format | `deno fmt` | PASS | 15 files formatted, no errors |
+| Cross-reference integrity | Manual path resolution | PASS | 20 referenced paths all resolve to real files |
+| Self-consistency | Table comparison | PASS | 8 phases, 2 evaluators, new artifacts agree across all files (including F4-swept files) |
+| Format | `deno fmt` | PASS | 61 files formatted, no errors |
 
 ### Fitness Gates
 
@@ -116,9 +117,19 @@ N/A.
 
 N/A.
 
+## F1–F5 Fix Record
+
+| Finding | File(s) | Fix |
+|---------|---------|-----|
+| F1 | `.agents/skills/netscript-harness/SKILL.md` | Added `.llm/harness/` prefix to item 7 |
+| F2 | `.llm/harness/evaluator/verdict-definitions.md` | Added `FAIL_PLAN` as first row in verdict table |
+| F3 | `templates/evaluate.md`, `templates/worklog.md` | Replaced literal `\|` with `or` in Archetype metadata row |
+| F4 | `lessons/scope.md`, `templates/implement.md`, `templates/agent-briefing.md`, `templates/phase-registry.md`, `templates/context-pack.md`, `templates/plan.md` | Updated stale § 2a/§ 2b/Execute refs to § 3b/§ 5; added dual-evaluator language; fixed literal pipe in Archetype rows |
+| F5 | `templates/plan.md` | Added Locked Decisions, Open-Decision Sweep, Risk Register sections |
+
 ## Handoff Notes
 
 - Evaluator should verify every path referenced by new/edited files resolves to
   a real file.
 - Verify 8-phase model is consistent across activation.md, run-loop.md,
-  supervisor.md, SKILL.md, README.md, DOCTRINE-REF.md.
+  supervisor.md, SKILL.md, README.md, DOCTRINE-REF.md, and all F4-swept files.
