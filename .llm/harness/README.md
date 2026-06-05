@@ -1,38 +1,38 @@
 # NetScript Harness v2
 
-Harness v2 is the agent operating system for doctrine-aware work in this
-repo. It keeps the v1 separation of planner, generator, and evaluator, but the
-run shape is now derived from the NetScript Architecture Doctrine.
+Harness v2 is the agent operating system for doctrine-aware work in this repo. It keeps the v1
+separation of planner, generator, and evaluator, but the run shape is now derived from the NetScript
+Architecture Doctrine.
 
 Authoritative doctrine:
 
 - `.llm/research/architecture-doctrine-docs-v2/doctrine/`
 
-Do not copy doctrine passages into harness files. Harness files point to the
-doctrine and explain how an agent uses it during a run.
+Do not copy doctrine passages into harness files. Harness files point to the doctrine and explain
+how an agent uses it during a run.
 
 ## Start Here
 
 1. Read `workflow/activation.md`.
 2. Read `workflow/run-loop.md` (especially § 3b Design checkpoint and § 4 Plan-Gate).
 3. Select an archetype with `archetypes/README.md`.
-4. Read the matching `archetypes/ARCHETYPE-*.md` (including its Design
-   Checkpoint Expectations and Concept of Done sections).
+4. Read the matching `archetypes/ARCHETYPE-*.md` (including its Design Checkpoint Expectations and
+   Concept of Done sections).
 5. Apply a scope overlay when the work is frontend, service, or docs.
 6. Read `gates/archetype-gate-matrix.md`.
 7. Use the matching artifact template from `templates/`.
 
 ## Folder Contract
 
-| Folder | Concern |
-|--------|---------|
-| `workflow/` | Run mechanics: activation, loop, retrieval, commits, circuit breakers |
-| `archetypes/` | Doctrine archetype profiles plus scope overlays |
-| `gates/` | Static, fitness, runtime, and consumer gate definitions |
-| `evaluator/` | Separate evaluator-session protocol and verdict definitions |
-| `templates/` | Canonical run artifact templates |
-| `lessons/` | Stable cross-run lessons promoted after repetition |
-| `debt/` | Persistent architecture debt registry and rules |
+| Folder        | Concern                                                               |
+| ------------- | --------------------------------------------------------------------- |
+| `workflow/`   | Run mechanics: activation, loop, retrieval, commits, circuit breakers |
+| `archetypes/` | Doctrine archetype profiles plus scope overlays                       |
+| `gates/`      | Static, fitness, runtime, and consumer gate definitions               |
+| `evaluator/`  | Separate evaluator-session protocol and verdict definitions           |
+| `templates/`  | Canonical run artifact templates                                      |
+| `lessons/`    | Stable cross-run lessons promoted after repetition                    |
+| `debt/`       | Persistent architecture debt registry and rules                       |
 
 ## Core Contract
 
@@ -47,8 +47,7 @@ doctrine and explain how an agent uses it during a run.
 
 ## Run Artifacts
 
-Run artifacts live under `.llm/tmp/run/<run-id>/` and use the templates in
-`templates/`:
+Run artifacts live under `.llm/tmp/run/<run-id>/` and use the templates in `templates/`:
 
 - `research.md`
 - `plan.md`

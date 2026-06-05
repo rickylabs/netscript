@@ -9,8 +9,8 @@
 
 ## Findings
 
-| # | Finding | How to verify |
-|---|---------|---------------|
+| # | Finding                    | How to verify         |
+| - | -------------------------- | --------------------- |
 | 1 | <fact the plan depends on> | <command / file:line> |
 
 ## jsr-audit surface scan (package/plugin waves)

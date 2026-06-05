@@ -12,8 +12,9 @@
 
 ## Current State
 
-Plan & Design artifacts written. Ready for Plan-Gate (PLAN-EVAL) before
-implementation.
+Plan & Design artifacts committed. Plan-Gate consistency review in progress.
+Group A creates the Plan-Gate, so its own PLAN-EVAL is a consistency review
+(not a separate session) due to chicken-and-egg.
 
 ## Completed
 
@@ -67,4 +68,4 @@ implementation.
 
 ## Commits
 
-- None yet.
+- b8d9c9a: plan(wave0b): Plan & Design artifacts for harness reinforcement

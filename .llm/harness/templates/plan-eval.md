@@ -7,16 +7,16 @@
 
 ## Checklist results
 
-| Plan-Gate item | Result | Evidence / location |
-|----------------|--------|---------------------|
-| Research present and current | PASS / FAIL | |
-| Decisions locked | PASS / FAIL | |
-| Open-decision sweep | PASS / FAIL | |
-| Commit slices (< 30, gate + files each) | PASS / FAIL | |
-| Risk register | PASS / FAIL | |
-| Gate set selected | PASS / FAIL | |
-| Deferred scope explicit | PASS / FAIL | |
-| jsr-audit surface scan (pkg/plugin) | PASS / FAIL / N/A | |
+| Plan-Gate item                          | Result            | Evidence / location |
+| --------------------------------------- | ----------------- | ------------------- |
+| Research present and current            | PASS / FAIL       |                     |
+| Decisions locked                        | PASS / FAIL       |                     |
+| Open-decision sweep                     | PASS / FAIL       |                     |
+| Commit slices (< 30, gate + files each) | PASS / FAIL       |                     |
+| Risk register                           | PASS / FAIL       |                     |
+| Gate set selected                       | PASS / FAIL       |                     |
+| Deferred scope explicit                 | PASS / FAIL       |                     |
+| jsr-audit surface scan (pkg/plugin)     | PASS / FAIL / N/A |                     |
 
 ## Open-decision sweep (evaluator-run)
 
