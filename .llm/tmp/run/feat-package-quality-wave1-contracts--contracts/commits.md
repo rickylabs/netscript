@@ -14,3 +14,4 @@ Format:
 - d0be0ad: refactor(runtime-config): scaffold domain types
 - 31b1464: refactor(runtime-config): extract loader application module
 - 617e7d4: refactor(runtime-config): extract watcher application module
+- 23e1480: feat(runtime-config): add structured config summary
