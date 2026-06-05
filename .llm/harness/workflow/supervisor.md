@@ -51,18 +51,28 @@ git checkout feat/<supervisor>
 git pull
 git checkout -b feat/<supervisor>/<group>
 
-# 2. Create the group worktree
-git checkout feat/<supervisor>
-git worktree add worktree/<group> feat/<supervisor>/<group>
+# 2. Create the group worktree under the gitignored .worktrees/ root
+git worktree add .worktrees/<group> feat/<supervisor>/<group>
 
 # 3. Scaffold the group's nested harness run dir from templates/
 #    .llm/tmp/run/<supervisor>-<group>--<suffix>/
+
+# 4. Push the group branch and open a DRAFT sub-PR against the integration branch
+git push -u origin feat/<supervisor>/<group>
+#    base = feat/<supervisor>, head = feat/<supervisor>/<group>
 ```
+
+**Every phase group is its own draft PR against the integration branch**
+(`feat/<supervisor>/<group>` → `feat/<supervisor>`), exactly like the PR #96
+group sub-PRs (#86–#95) and the S0 supervisor (PR #98). All actual implementation
+— each package refactor — happens **only** in the group's worktree on its own
+branch, never directly on the integration branch.
 
 Brief the group agent with `templates/agent-briefing.md`. The group agent then
 runs the normal `run-loop.md` (Design checkpoint → sliced implementation →
 gates), produces its run artifacts, and hands off to a **separate evaluator
-session**.
+session**. On `PASS`, the integration owner merges the draft sub-PR `--no-ff`
+(§ 3) and it closes.
 
 ## 3. Merge protocol
 
