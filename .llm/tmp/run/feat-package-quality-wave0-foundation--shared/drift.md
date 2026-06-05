@@ -198,3 +198,18 @@ or current-state documentation.
 | `plugins/workers/worker/queue-consumer.ts` | new Date=1, toISOString=1 | 119 | Prefer Temporal.Instant/ZonedDateTime directly; keep local Date only at storage/API compatibility boundaries. |
 | `plugins/workers/worker/scheduler.ts` | new Date=1, toISOString=1 | 308 | Prefer Temporal.Instant/ZonedDateTime directly; keep local Date only at storage/API compatibility boundaries. |
 | `plugins/workers/worker/worker.ts` | Date.now=2 | 263, 266 | Introduce package-owned Clock/Scheduler port; use Temporal.Instant/Duration in the implementation, not @netscript/shared. |
+
+## 2026-06-05 — Post-evaluator package name rescope
+
+- **What:** The unit began as `@netscript/shared`, but final JSR audit and user review selected
+  `@netscript/contracts` as the public package name.
+- **Source:** User-approved package layout: root contracts vocabulary plus `/crud`, `/query`, and
+  `/transform` subexports.
+- **Expected:** Earlier Wave 0 plan and run artifacts target `packages/shared`.
+- **Actual:** `packages/shared` was removed after consumers and CLI import generators were migrated
+  to `@netscript/contracts`.
+- **Severity:** significant
+- **Action:** accept
+- **Evidence:** `packages/contracts/deno.json`, `packages/contracts/mod.ts`,
+  `packages/contracts/{crud,query,transform}.ts`, plugin `deno.json` import maps, CLI scaffold
+  resolvers.

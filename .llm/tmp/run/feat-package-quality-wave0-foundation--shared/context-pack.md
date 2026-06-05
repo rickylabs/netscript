@@ -99,3 +99,20 @@ check` pass.
 - Added the complete STANDARDS §7 docs skeleton and frontmatter for `packages/shared/docs`.
 - Reconciled commit tracking with current branch ancestry.
 - Updated architecture debt to close the datetime monolith/helper portion while retaining residual unpublished `utils/` compatibility debt.
+## Post-Evaluator Addendum
+
+The final package name is now `@netscript/contracts`, not `@netscript/shared`.
+
+Implemented after evaluator PASS:
+
+- migrated the shared foundation root into `packages/contracts/src/**`;
+- made `packages/contracts/mod.ts` barrel-only;
+- added `packages/contracts/crud.ts`, `query.ts`, and `transform.ts`;
+- preserved richer helper APIs behind the requested subexports;
+- migrated plugin imports from `@netscript/shared` and `@shared/utils` to `@netscript/contracts`;
+- migrated CLI public JSR resolver, maintainer local resolver, scaffold package constants, generated
+  plugin deno.json imports, and copy-official-plugin rewrite tests;
+- removed `packages/shared`.
+
+Final verification is green for JSR dry run, doc lint, package standards, package tests, focused CLI
+tests, and `deno task check`.

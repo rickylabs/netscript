@@ -1,5 +1,5 @@
 import { DEFAULT_TOPIC, type JobMessage } from '@netscript/plugin-workers-core/runtime';
-import { notFound } from '@shared/utils';
+import { notFound } from '@netscript/contracts';
 import { getJobQueue, getWorkersRuntime, router } from './router-context.ts';
 
 export const jobHandlers = {

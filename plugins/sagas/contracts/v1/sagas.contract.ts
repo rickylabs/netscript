@@ -12,13 +12,13 @@ import { z } from 'zod';
 import { oc } from '@orpc/contract';
 import type { ContractProcedure, ErrorMap, Meta, Schema } from '@orpc/server';
 import { eventIterator } from '@orpc/server';
-import { baseContract } from '@netscript/shared';
 import {
+  baseContract,
   nonNegativeInt,
   OffsetPaginationQuerySchema,
   paginationLimit,
   paginationOffset,
-} from '@shared/utils';
+} from '@netscript/contracts';
 
 // ============================================================================
 // SAGA DEFINITION SCHEMAS

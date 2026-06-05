@@ -38,7 +38,7 @@ Deno.test('copyOfficialPlugin copies plugin and background source workspaces', a
         '@netscript/plugin': '../../packages/plugin/mod.ts',
         '@netscript/plugin-workers-core/contracts':
           '../../packages/plugin-workers-core/src/contracts/v1/mod.ts',
-        '@shared/utils': '../../packages/shared/utils/mod.ts',
+        '@netscript/contracts': '../../packages/contracts/mod.ts',
       },
     }),
   );
@@ -148,7 +148,7 @@ Deno.test('copyOfficialPlugin copies plugin and background source workspaces', a
     pluginDenoJson.imports['@netscript/plugin-workers-core/contracts'],
     'jsr:@netscript/plugin-workers-core@^1.0.0/contracts',
   );
-  assertEquals(pluginDenoJson.imports['@shared/utils'], 'jsr:@netscript/shared@^1.0.0/utils');
+  assertEquals(pluginDenoJson.imports['@netscript/contracts'], 'jsr:@netscript/contracts@^1.0.0');
 
   const workerDenoJson = JSON.parse(
     await Deno.readTextFile(join(targetPath, 'workers/deno.json')),

@@ -41,6 +41,20 @@ export interface Transformer<TInput, TOutput> {
   optional: (input: TInput | null | undefined) => TOutput | null;
 }
 
+/** Curried factory returned by pick-transformer creation. */
+export type PickTransformerFactory<T extends Record<string, unknown>> = <
+  K extends keyof T,
+>(
+  ...keys: K[]
+) => Transformer<T, Pick<T, K>>;
+
+/** Curried factory returned by omit-transformer creation. */
+export type OmitTransformerFactory<T extends Record<string, unknown>> = <
+  K extends keyof T,
+>(
+  ...keys: K[]
+) => Transformer<T, Omit<T, K>>;
+
 // ============================================================================
 // TRANSFORMER FACTORY
 // ============================================================================
@@ -65,7 +79,7 @@ export interface Transformer<TInput, TOutput> {
  * ```
  */
 export function createTransformer<TInput, TOutput>(
-  transform: TransformFn<TInput, TOutput>
+  transform: TransformFn<TInput, TOutput>,
 ): Transformer<TInput, TOutput> {
   return {
     one: (input: TInput): TOutput => transform(input),
@@ -89,7 +103,9 @@ export function createTransformer<TInput, TOutput>(
  * // { id: 1, name: 'John', email: 'john@example.com' }
  * ```
  */
-export function createPickTransformer<T extends Record<string, unknown>>() {
+export function createPickTransformer<T extends Record<string, unknown>>(): PickTransformerFactory<
+  T
+> {
   return <K extends keyof T>(...keys: K[]): Transformer<T, Pick<T, K>> => {
     return createTransformer((input: T) => {
       const result = {} as Pick<T, K>;
@@ -111,7 +127,9 @@ export function createPickTransformer<T extends Record<string, unknown>>() {
  * // { id: 1, name: 'John', email: 'john@example.com' } (no password/secretKey)
  * ```
  */
-export function createOmitTransformer<T extends Record<string, unknown>>() {
+export function createOmitTransformer<T extends Record<string, unknown>>(): OmitTransformerFactory<
+  T
+> {
   return <K extends keyof T>(...keys: K[]): Transformer<T, Omit<T, K>> => {
     const keysSet = new Set(keys);
     return createTransformer((input: T) => {
@@ -140,18 +158,20 @@ export function createOmitTransformer<T extends Record<string, unknown>>() {
  */
 export function composeTransformers<A, B, C>(
   t1: TransformFn<A, B>,
-  t2: TransformFn<B, C>
+  t2: TransformFn<B, C>,
 ): Transformer<A, C>;
+/** Compose three transform functions into one transformer. */
 export function composeTransformers<A, B, C, D>(
   t1: TransformFn<A, B>,
   t2: TransformFn<B, C>,
-  t3: TransformFn<C, D>
+  t3: TransformFn<C, D>,
 ): Transformer<A, D>;
+/** Compose four transform functions into one transformer. */
 export function composeTransformers<A, B, C, D, E>(
   t1: TransformFn<A, B>,
   t2: TransformFn<B, C>,
   t3: TransformFn<C, D>,
-  t4: TransformFn<D, E>
+  t4: TransformFn<D, E>,
 ): Transformer<A, E>;
 // deno-lint-ignore no-explicit-any
 export function composeTransformers(...transforms: TransformFn<any, any>[]): Transformer<any, any> {

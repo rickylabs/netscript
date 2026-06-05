@@ -165,3 +165,30 @@ To add a new shared primitive, add its explicit public data type and schema to `
 | STANDARDS §7 docs tree | PASS | Added frontmatter and required docs pages: `getting-started.md`, `recipes/{basic-usage,testing,observability}.md`, `reference/{functions,classes,types,errors}.md`, and `advanced/{extending,migration,internals}.md`. |
 | Commit/debt artifacts | PASS | Reconciled `commits.md` with current branch ancestry and updated shared datetime debt to partially closed for AP-1/AP-2, leaving residual unpublished `utils/` compatibility deferred. |
 | Docs validation | PASS | `deno fmt --check packages/shared/docs .llm/harness/debt/arch-debt.md .llm/tmp/run/feat-package-quality-wave0-foundation--shared/commits.md`; `cd packages/shared && deno publish --dry-run --allow-dirty`. |
+## Post-Evaluator Rename Addendum
+
+After evaluator PASS, the package-name audit concluded that `@netscript/shared` described an
+internal implementation role instead of the public responsibility. The approved decision is to
+publish the foundation vocabulary through `@netscript/contracts`:
+
+- `@netscript/contracts` owns the root base contract, common errors, pagination schemas, result
+  types, schema primitive facades, helper factories, and diagnostics.
+- `@netscript/contracts/crud` owns the CRUD contract generator.
+- `@netscript/contracts/query` owns pagination query helpers and filter helpers.
+- `@netscript/contracts/transform` owns transform helpers.
+
+The post-evaluator implementation migrated the prior shared foundation files into
+`packages/contracts/src/**`, converted `packages/contracts/mod.ts` to a barrel-only root, added
+explicit subexport entrypoints, migrated plugin and CLI consumers, and removed `packages/shared`.
+
+### Post-Evaluator Gates
+
+| Gate | Command | Result | Notes |
+|------|---------|--------|-------|
+| Contracts check | `deno check mod.ts crud.ts query.ts transform.ts` in `packages/contracts` | PASS | Entry points typecheck. |
+| JSR dry run | `deno publish --dry-run --allow-dirty` in `packages/contracts` | PASS | 0 slow-types; simulated publish includes root and named subexports. |
+| Doc lint | `deno doc --lint packages/contracts/mod.ts packages/contracts/crud.ts packages/contracts/query.ts packages/contracts/transform.ts` | PASS | Checked 4 entrypoints clean. |
+| Standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/contracts --text` | PASS | `FAIL=0`; warnings are naming/test-location/info only. |
+| Package tests | `deno test --allow-all packages/contracts` | PASS | 2 tests pass. |
+| Workspace check | `deno task check` | PASS | Packages and plugins typecheck with contracts imports. |
+| CLI focused tests | `deno test --allow-all packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts` | PASS | Public and maintainer import-map rewrites verified. |

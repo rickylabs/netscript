@@ -9,7 +9,7 @@
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createPluginLogger } from '@netscript/plugin/loader';
 import { getKv } from '@netscript/kv';
-import { baseContract } from '@netscript/shared';
+import { baseContract } from '@netscript/contracts';
 import { v1 } from '../../contracts/versions/v1/mod.ts';
 
 type DatabaseModule = {
