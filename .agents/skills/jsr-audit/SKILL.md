@@ -6,9 +6,9 @@ version: 1.0.0
 
 # JSR Publishing Audit
 
-Comprehensive audit guide for JSR (JavaScript Registry) compliance and scoring
-optimization. This skill is a **required Plan-Gate input** for package/plugin
-waves — apply it to the planned public surface before slicing.
+Comprehensive audit guide for JSR (JavaScript Registry) compliance and scoring optimization. This
+skill is a **required Plan-Gate input** for package/plugin waves — apply it to the planned public
+surface before slicing.
 
 ## When to Use
 
@@ -22,14 +22,14 @@ waves — apply it to the planned public surface before slicing.
 
 - For package architecture decisions — use `netscript-doctrine`.
 - For harness run orchestration — use `netscript-harness`.
-- For non-JSR publishing (npm-only, private registries) — this skill is
-  JSR-specific.
+- For non-JSR publishing (npm-only, private registries) — this skill is JSR-specific.
 
 ---
 
 ## Understanding the JSR Score
 
 JSR assigns packages a quality score from 0-100%, displayed with color coding:
+
 - **Red**: Below 60%
 - **Orange**: 60-90%
 - **Green**: 90%+ (target this)
@@ -39,36 +39,36 @@ The score directly influences search ranking. View any package's breakdown at
 
 ### The 9 Scoring Factors
 
-| Category | Factor | Impact |
-|----------|--------|--------|
-| **Documentation** | Has README or module doc | High |
-| | Has examples in README/module doc | High |
-| | Has module docs in all entrypoints | High |
-| | Has docs for most symbols | High |
-| **Best Practices** | No slow types | Medium |
-| | Has provenance (SLSA attestation) | Medium |
-| **Discoverability** | Has description (≤250 chars) | Low |
-| **Compatibility** | At least one runtime marked compatible | Low |
-| | At least two runtimes compatible | Low |
+| Category            | Factor                                 | Impact |
+| ------------------- | -------------------------------------- | ------ |
+| **Documentation**   | Has README or module doc               | High   |
+|                     | Has examples in README/module doc      | High   |
+|                     | Has module docs in all entrypoints     | High   |
+|                     | Has docs for most symbols              | High   |
+| **Best Practices**  | No slow types                          | Medium |
+|                     | Has provenance (SLSA attestation)      | Medium |
+| **Discoverability** | Has description (≤250 chars)           | Low    |
+| **Compatibility**   | At least one runtime marked compatible | Low    |
+|                     | At least two runtimes compatible       | Low    |
 
-**Key insight**: Documentation carries the heaviest weight. Comprehensive JSDoc +
-README + `@module` tags will score higher than perfect types with minimal docs.
+**Key insight**: Documentation carries the heaviest weight. Comprehensive JSDoc + README + `@module`
+tags will score higher than perfect types with minimal docs.
 
 ---
 
 ## Audit Checklist
 
-| Check | Command/Location | What to Look For |
-|-------|------------------|------------------|
-| Required metadata | `deno.json` | `name`, `version`, `exports` fields |
-| Scoped package name | `name` field | Format: `@scope/package-name` |
-| Package description | `description` field | ≤250 characters for discoverability |
-| Valid exports | `exports` field | Entry points exist and are correct |
-| No slow types | `deno publish --dry-run` | No slow type warnings |
-| Clean file list | `deno publish --dry-run` | Only intended files included |
-| ESM only | Source files | No CommonJS (`module.exports`, `require()`) |
-| Module documentation | Entry point files | `@module` JSDoc tag present |
-| Symbol documentation | Exported symbols | JSDoc with `@param`, `@returns`, `@example` |
+| Check                | Command/Location         | What to Look For                            |
+| -------------------- | ------------------------ | ------------------------------------------- |
+| Required metadata    | `deno.json`              | `name`, `version`, `exports` fields         |
+| Scoped package name  | `name` field             | Format: `@scope/package-name`               |
+| Package description  | `description` field      | ≤250 characters for discoverability         |
+| Valid exports        | `exports` field          | Entry points exist and are correct          |
+| No slow types        | `deno publish --dry-run` | No slow type warnings                       |
+| Clean file list      | `deno publish --dry-run` | Only intended files included                |
+| ESM only             | Source files             | No CommonJS (`module.exports`, `require()`) |
+| Module documentation | Entry point files        | `@module` JSDoc tag present                 |
+| Symbol documentation | Exported symbols         | JSDoc with `@param`, `@returns`, `@example` |
 
 ---
 
@@ -88,11 +88,13 @@ Read `deno.json` (or `jsr.json`) and verify:
 ```
 
 **Package name rules:**
+
 - Must start with `@scope/`
 - Lowercase letters, numbers, hyphens only
 - 2-40 characters (excluding scope)
 
 **Config file choice:**
+
 - Deno projects: Use `deno.json`
 - Node/Bun/other: Use `jsr.json`
 - Never split config between both files
@@ -111,6 +113,7 @@ Check all entry points exist:
 ```
 
 For each entry point, confirm:
+
 - File exists at specified path
 - Exports are properly defined
 - Type annotations are explicit (no slow types)
@@ -120,7 +123,7 @@ For each entry point, confirm:
 
 **Module-level documentation** (top of entry points):
 
-```typescript
+````typescript
 /**
  * A module providing string utilities for common transformations.
  *
@@ -132,11 +135,11 @@ For each entry point, confirm:
  *
  * @module
  */
-```
+````
 
 **Symbol documentation**:
 
-```typescript
+````typescript
 /**
  * Converts a string to camelCase format.
  *
@@ -152,9 +155,10 @@ For each entry point, confirm:
 export function camelCase(input: string): string {
   // ...
 }
-```
+````
 
 **JSDoc tags reference:**
+
 - `@param name - description` - Document parameters
 - `@returns description` - Document return value
 - `@example` - Runnable code examples (use triple backticks)
@@ -171,6 +175,7 @@ deno publish --dry-run --allow-dirty
 ```
 
 This reveals:
+
 - **Slow types**: Exports without explicit type annotations
 - **File list**: Everything that would be published
 - **Metadata errors**: Invalid name, version, etc.
@@ -180,6 +185,7 @@ This reveals:
 Review dry-run output for files that should NOT be published:
 
 **Common offenders:**
+
 - `.claude/`, `.zed/`, `.vscode/` - IDE settings
 - `.github/`, `.gitlab/` - CI/CD configs
 - `.mise.toml`, `.tool-versions` - Local tooling
@@ -213,6 +219,7 @@ Use `include` (whitelist) + `exclude` (filter):
 ```
 
 **Why both?**
+
 - `include` whitelists only intended files
 - `exclude` filters test files from `src/**/*.ts` glob
 - `exclude` takes precedence when both match
@@ -220,6 +227,7 @@ Use `include` (whitelist) + `exclude` (filter):
 ### Step 7: Verify Clean Output
 
 Run dry-run again. Only these should appear:
+
 - `LICENSE`
 - `README.md`
 - `deno.json`
@@ -230,21 +238,20 @@ Run dry-run again. Only these should appear:
 
 ## Fixing Slow Types
 
-Slow types are exports without explicit type annotations. They prevent JSR from
-generating `.d.ts` files efficiently and degrade npm compatibility by 1.5-2x
-slower type checking.
+Slow types are exports without explicit type annotations. They prevent JSR from generating `.d.ts`
+files efficiently and degrade npm compatibility by 1.5-2x slower type checking.
 
 ### Function Return Types
 
 ```typescript
 // SLOW - inferred return type
 export function greet(name: string) {
-  return "Hello, " + name + "!";
+  return 'Hello, ' + name + '!';
 }
 
 // FIXED - explicit return type
 export function greet(name: string): string {
-  return "Hello, " + name + "!";
+  return 'Hello, ' + name + '!';
 }
 ```
 
@@ -282,8 +289,8 @@ deno publish --dry-run
 deno doc --lint
 ```
 
-**Note**: TypeScript 5.5's `isolatedDeclarations` mode produces code that
-automatically satisfies JSR's no-slow-types requirement.
+**Note**: TypeScript 5.5's `isolatedDeclarations` mode produces code that automatically satisfies
+JSR's no-slow-types requirement.
 
 ---
 
@@ -291,13 +298,13 @@ automatically satisfies JSR's no-slow-types requirement.
 
 JSR enforces ESM-only architecture:
 
-| Prohibited | Alternative |
-|------------|-------------|
-| `require()` | `import` |
-| `module.exports` | `export` |
-| `declare global` | Module-scoped types |
-| `declare module` | Module-scoped types |
-| HTTP imports | `jsr:`, `npm:`, `node:` specifiers only |
+| Prohibited       | Alternative                             |
+| ---------------- | --------------------------------------- |
+| `require()`      | `import`                                |
+| `module.exports` | `export`                                |
+| `declare global` | Module-scoped types                     |
+| `declare module` | Module-scoped types                     |
+| HTTP imports     | `jsr:`, `npm:`, `node:` specifiers only |
 
 ---
 
@@ -318,9 +325,9 @@ For packages with multiple exports:
 Users import as:
 
 ```typescript
-import { main } from "@scope/pkg";
-import { OpenAI } from "@scope/pkg/providers";
-import { helper } from "@scope/pkg/utils";
+import { main } from '@scope/pkg';
+import { OpenAI } from '@scope/pkg/providers';
+import { helper } from '@scope/pkg/utils';
 ```
 
 Each entry point should have its own `@module` JSDoc tag.
@@ -341,6 +348,7 @@ Declare in `imports`:
 ```
 
 Supported specifiers:
+
 - `jsr:@scope/pkg@version` - JSR packages
 - `npm:package@version` - npm packages
 - `node:module` - Node.js built-ins
@@ -362,7 +370,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write  # Required for OIDC and provenance
+      id-token: write # Required for OIDC and provenance
 
     steps:
       - uses: actions/checkout@v5
@@ -373,6 +381,7 @@ jobs:
 ```
 
 **Requirements for provenance:**
+
 1. Link package to GitHub repo in JSR settings
 2. Include `id-token: write` permission
 3. Provenance generated automatically
@@ -388,31 +397,35 @@ After completing the audit:
 ```markdown
 ## JSR Publishing Audit Results
 
-| Check | Status |
-|-------|--------|
-| Required metadata | ✓ / ✗ |
-| Scoped package name | ✓ / ✗ |
-| Package description | ✓ / ✗ |
-| Valid exports | ✓ / ✗ |
-| No slow types | ✓ / ✗ |
-| Clean file list | ✓ / ✗ |
-| ESM only | ✓ / ✗ |
-| Module documentation | ✓ / ✗ |
-| Symbol documentation | ✓ / ✗ |
+| Check                | Status |
+| -------------------- | ------ |
+| Required metadata    | ✓ / ✗  |
+| Scoped package name  | ✓ / ✗  |
+| Package description  | ✓ / ✗  |
+| Valid exports        | ✓ / ✗  |
+| No slow types        | ✓ / ✗  |
+| Clean file list      | ✓ / ✗  |
+| ESM only             | ✓ / ✗  |
+| Module documentation | ✓ / ✗  |
+| Symbol documentation | ✓ / ✗  |
 
 ### Estimated Score Impact
+
 - Documentation: X/4 factors
 - Best Practices: X/2 factors
 - Discoverability: X/1 factors
 - Compatibility: X/2 factors
 
 ### Files Published
+
 [List from dry-run]
 
 ### Issues Found
+
 [List any problems]
 
 ### Recommendations
+
 [Suggested fixes prioritized by score impact]
 ```
 
@@ -455,11 +468,10 @@ deno publish
 
 > **Status: draft — pending user approval before becoming mandatory.**
 
-- **Automated JSR score monitoring** — No CI gate enforces a minimum score.
-  Workaround: manual audit before publish.
-- **Cross-package JSR workspace publishing** — Each package publishes
-  independently. Workaround: publish in dependency order.
-- **JSR badge generation** — No automated badge for README. Workaround: manual
-  badge from `jsr.io`.
-- **Private JSR packages** — Not yet available. Workaround: public scoped
-  packages with internal documentation. Tracked by JSR.
+- **Automated JSR score monitoring** — No CI gate enforces a minimum score. Workaround: manual audit
+  before publish.
+- **Cross-package JSR workspace publishing** — Each package publishes independently. Workaround:
+  publish in dependency order.
+- **JSR badge generation** — No automated badge for README. Workaround: manual badge from `jsr.io`.
+- **Private JSR packages** — Not yet available. Workaround: public scoped packages with internal
+  documentation. Tracked by JSR.
