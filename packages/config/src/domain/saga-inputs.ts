@@ -1,5 +1,5 @@
 /**
- * @module @netscript/config/helpers
+ * @module @netscript/config
  *
  * Type-safe identity helpers for split NetScript config modules.
  */
@@ -11,7 +11,7 @@ import type {
   SagaScalingConfig,
   SagasConfig,
   SagaTimeoutConfig,
-} from './types.ts';
+} from '../../types.ts';
 
 /** Authoring form for a saga definition before schema defaults are applied. */
 export interface SagaDefinitionInput {

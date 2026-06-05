@@ -20,3 +20,4 @@ Format:
 - 45a276b: docs(runtime-config): add package README
 - df8d087: docs(runtime-config): scaffold package docs
 - 7b83766: test(runtime-config): cover loader accessors and summary
+- a8a7caf: test(runtime-config): complete package gate sweep

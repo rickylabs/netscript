@@ -33,6 +33,18 @@ Seeded from
   maintainer command graph; `deno task arch:check` enforces public/maintainer isolation.
 - **Gate:** F-1, F-5, F-10
 
+## packages/config — AP-16 root helpers.ts
+
+- **Reason:** Root `helpers.ts` held saga authoring input types behind a generic helper name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slice 11 renamed `helpers.ts` to
+  `src/domain/saga-inputs.ts` and kept the public `defineSagas`/input type exports stable through
+  `src/public/mod.ts`.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.

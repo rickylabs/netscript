@@ -196,6 +196,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 9 | Gate | `deno test --allow-all` passed: 8 tests, 0 failed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 10 | Implement | Ran runtime-config gate sweep and fixed lint/format findings from the new tests/docs plus removed `console.` from the root module example. |
 | 2026-06-06 | 10 | Gate | Runtime-config sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-8/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. |
+| 2026-06-06 | 11 | Implement | Renamed `packages/config/helpers.ts` to `src/domain/saga-inputs.ts` and updated `src/public/mod.ts` exports without changing the root API. |
+| 2026-06-06 | 11 | Gate | `deno check mod.ts` passed; helper-name scans found no remaining `helpers.ts` file or `src/helpers` directory in `packages/config`. |
 
 ## Decisions
 
