@@ -93,3 +93,9 @@ check` pass.
 - Added a drift registry for date/time migration opportunities across `packages/**` and `plugins/**`; guidance prefers direct Temporal or package-owned clock/scheduler ports over a shared datetime wrapper.
 - Validated targeted shared gates with Deno 2.8.2 from the `deno` npm package because the sandbox had no system `deno`.
 - Environment caveat: package standards and workspace check are blocked by sandbox DNS failure for `jsr.io`, not by local shared code errors.
+
+## 2026-06-05 Evaluator Fix Context
+
+- Added the complete STANDARDS §7 docs skeleton and frontmatter for `packages/shared/docs`.
+- Reconciled commit tracking with current branch ancestry.
+- Updated architecture debt to close the datetime monolith/helper portion while retaining residual unpublished `utils/` compatibility debt.

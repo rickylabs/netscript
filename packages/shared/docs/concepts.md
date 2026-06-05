@@ -1,3 +1,10 @@
+---
+title: Shared Concepts
+description: Domain vocabulary for schemas, contract procedures, pagination, and diagnostics.
+package: '@netscript/shared'
+order: 3
+---
+
 # Concepts
 
 `@netscript/shared` is a vocabulary package.
@@ -15,8 +22,8 @@ part of the NetScript public contract.
 
 `SharedObjectSchema` extends `SharedSchema` with `extend()`.
 
-This is enough for consumers that need to compose endpoint-specific filters with the shared
-pagination query schema.
+The extension shape accepts only shared schema values. That lets TypeScript reject non-schema values
+before Zod performs the runtime extension.
 
 ## Shared procedure
 

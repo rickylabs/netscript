@@ -157,3 +157,11 @@ To add a new shared primitive, add its explicit public data type and schema to `
 | Package gates | PASS | `cd packages/shared && deno check mod.ts && deno test --allow-all . && deno publish --dry-run --allow-dirty`; 2 tests pass, publish dry-run has 0 slow-types. |
 | Package standards | BLOCKED_ENV | `check-netscript-standards.ts --root packages/shared --text` cannot load `https://jsr.io/@std/fs/meta.json` because `jsr.io` DNS resolution fails in this sandbox. Previous package-scoped standards gate was green before this slice; changed shared package metadata/docs shape remains compliant by inspection. |
 | Workspace check | BLOCKED_ENV | `deno task check` cannot load `https://jsr.io/@std/path/meta.json` because `jsr.io` DNS resolution fails in this sandbox. Targeted `packages/shared` type/doc/publish gates pass. |
+
+## 2026-06-05 Evaluator Fix Slice
+
+| Step | Result | Evidence |
+|------|--------|----------|
+| STANDARDS §7 docs tree | PASS | Added frontmatter and required docs pages: `getting-started.md`, `recipes/{basic-usage,testing,observability}.md`, `reference/{functions,classes,types,errors}.md`, and `advanced/{extending,migration,internals}.md`. |
+| Commit/debt artifacts | PASS | Reconciled `commits.md` with current branch ancestry and updated shared datetime debt to partially closed for AP-1/AP-2, leaving residual unpublished `utils/` compatibility deferred. |
+| Docs validation | PASS | `deno fmt --check packages/shared/docs .llm/harness/debt/arch-debt.md .llm/tmp/run/feat-package-quality-wave0-foundation--shared/commits.md`; `cd packages/shared && deno publish --dry-run --allow-dirty`. |

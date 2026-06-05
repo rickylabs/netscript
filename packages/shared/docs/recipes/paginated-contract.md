@@ -1,3 +1,10 @@
+---
+title: Paginated Contract Recipe
+description: Add offset pagination input and response metadata to a list endpoint.
+package: '@netscript/shared'
+order: 11
+---
+
 # Paginated Contract
 
 Use `OffsetPaginationQuerySchema` for list endpoints that accept `limit` and `offset`.

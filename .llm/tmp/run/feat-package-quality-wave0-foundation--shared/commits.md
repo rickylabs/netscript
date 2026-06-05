@@ -10,7 +10,7 @@ Format:
 
 ## Log
 
-- 27b4bf3: chore(shared): record wave0 design baseline
 - 2639d4e: feat(shared): publish foundation contract surface
-
+- 37b935c: chore(shared): record foundation commit log
 - cc3b8f0: fix(shared): address review and remove datetime anti-helper
+- 633bc43: chore(shared): record review fix commit
