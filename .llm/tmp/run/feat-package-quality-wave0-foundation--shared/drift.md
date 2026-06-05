@@ -243,18 +243,3 @@ or current-state documentation.
 - **Evidence:** Full final pass exited 0 for `scaffold.service`, `scaffold.contracts`,
   `scaffold.infrastructure`, `scaffold.plugins`, and `scaffold.runtime`; focused CLI tests and
   `deno task check` also passed.
-
-## 2026-06-05 — Prior Claude knowledge pack migrated into agent docs
-
-- **What:** The current worktree had `.agents/skills` and `.agents/rules`, but was missing the
-  prior repo's `.claude` knowledge-base documents and Aspire operational skill.
-- **Source:** Ancestor folder `C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.claude`.
-- **Expected:** Production agent context should live under `.agents`, not under a Claude-specific
-  folder outside this worktree.
-- **Actual:** Migrated the reusable markdown knowledge pack into `.agents/knowledge-base`, added
-  `.agents/skills/aspire`, and rewrote stale `.claude`, old doctrine-path, and pre-contracts-package
-  references during migration.
-- **Severity:** significant
-- **Action:** fixed
-- **Evidence:** `.agents/knowledge-base/README.md`, `.agents/knowledge-base/01..12*.md`,
-  `.agents/skills/aspire/SKILL.md`, and corrected `.agents/skills/netscript-*` paths.
