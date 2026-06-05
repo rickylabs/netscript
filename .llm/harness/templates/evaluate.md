@@ -18,6 +18,7 @@ values: `CLEAR`, `VIOLATION`, `DEBT_ACCEPTED`, `N/A`.
 
 | Check | Result | Evidence |
 |-------|--------|----------|
+| Plan-Gate passed before implementation | `<PASS/FAIL>` | `<plan-eval.md verdict>` |
 | Design section exists in worklog | `<PASS/FAIL>` | `<section heading found>` |
 | Commit slices match design plan | `<PASS/FAIL>` | `<slice count and order>` |
 | Each slice has a passing gate | `<PASS/FAIL>` | `<gate evidence per slice>` |

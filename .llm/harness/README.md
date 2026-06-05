@@ -14,7 +14,7 @@ doctrine and explain how an agent uses it during a run.
 ## Start Here
 
 1. Read `workflow/activation.md`.
-2. Read `workflow/run-loop.md` (especially § 2a Design Checkpoint).
+2. Read `workflow/run-loop.md` (especially § 3b Design checkpoint and § 4 Plan-Gate).
 3. Select an archetype with `archetypes/README.md`.
 4. Read the matching `archetypes/ARCHETYPE-*.md` (including its Design
    Checkpoint Expectations and Concept of Done sections).
@@ -50,10 +50,12 @@ doctrine and explain how an agent uses it during a run.
 Run artifacts live under `.llm/tmp/run/<run-id>/` and use the templates in
 `templates/`:
 
+- `research.md`
 - `plan.md`
-- `implement.md`
+- `implement.md` (when the run phase needs it)
 - `worklog.md` (with mandatory `## Design` section)
-- `evaluate.md`
+- `plan-eval.md` (PLAN-EVAL verdict)
+- `evaluate.md` (IMPL-EVAL verdict)
 - `context-pack.md`
 - `drift.md`
 - `commits.md`

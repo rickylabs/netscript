@@ -12,7 +12,7 @@
 ## Design
 
 Record this section before creating implementation files. See
-`workflow/run-loop.md` § 2a for the full requirement.
+`workflow/run-loop.md` § 3b for the full requirement.
 
 ### Public Surface
 

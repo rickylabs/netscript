@@ -4,7 +4,23 @@ Harness v2 is derived from the NetScript Architecture Doctrine. The doctrine is
 the source of truth for `packages/` and `plugins/`; the harness is the run-time
 operating model that makes agents apply it.
 
-## Primary Files
+## Harness Files
+
+| File | Use |
+|------|-----|
+| `.llm/harness/workflow/activation.md` | Bootstrap reading list and mandatory artifacts |
+| `.llm/harness/workflow/run-loop.md` | 8-phase run loop (Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Close) |
+| `.llm/harness/workflow/supervisor.md` | Multi-group supervisor runs |
+| `.llm/harness/gates/archetype-gate-matrix.md` | Required gates per archetype |
+| `.llm/harness/gates/plan-gate.md` | Plan-Gate checklist (PLAN-EVAL) |
+| `.llm/harness/evaluator/plan-protocol.md` | PLAN-EVAL operating instructions |
+| `.llm/harness/evaluator/protocol.md` | IMPL-EVAL operating instructions |
+| `.llm/harness/evaluator/verdict-definitions.md` | Verdict meanings (`PASS`, `FAIL_PLAN`, `FAIL_FIX`, `FAIL_RESCOPE`, `FAIL_DEBT`) |
+| `.llm/harness/templates/plan-eval.md` | PLAN-EVAL verdict template |
+| `.llm/harness/templates/research.md` | Research artifact template |
+| `.llm/harness/lessons/plan-gate-design-as-gate.md` | Lesson: Design must be a gate |
+
+## Doctrine Primary Files
 
 | File | Use |
 |------|-----|
