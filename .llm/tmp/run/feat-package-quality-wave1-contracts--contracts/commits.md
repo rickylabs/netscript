@@ -18,3 +18,4 @@ Format:
 - f59f9ef: refactor(runtime-config): expose thin public barrel
 - f413fde: chore(runtime-config): add package tasks and publish config
 - 45a276b: docs(runtime-config): add package README
+- df8d087: docs(runtime-config): scaffold package docs

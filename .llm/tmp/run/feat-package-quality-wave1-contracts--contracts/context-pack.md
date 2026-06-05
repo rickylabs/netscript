@@ -30,6 +30,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 6 — `runtime-config` `deno.json` metadata/tasks/publish config added; `deno publish --dry-run --allow-dirty` passed.
 - [x] Slice 7 — `runtime-config` README added; line-count gate returned 346 lines.
 - [x] Slice 8 — `runtime-config` docs scaffold added; docs file-list gate returned 8 files.
+- [x] Slice 9 — `runtime-config` tests added; `deno test --allow-all` passed with 8 tests.
 
 ## Key findings (re-baselined)
 

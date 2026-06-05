@@ -192,6 +192,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 7 | Gate | `(Get-Content README.md).Count` returned 346 lines, satisfying the README >= 150 LOC gate. |
 | 2026-06-06 | 8 | Implement | Added runtime-config docs pages for overview, architecture, concepts, getting started, basic usage, testing, reference index, and extending. |
 | 2026-06-06 | 8 | Gate | `Get-ChildItem docs -Recurse -File` listed 8 docs files under README, architecture, concepts, getting-started, recipes, reference, and advanced. |
+| 2026-06-06 | 9 | Implement | Added runtime-config tests for loader defaults/topic loading/plain pointers, accessors, feature flag fallback, and structured summaries. |
+| 2026-06-06 | 9 | Gate | `deno test --allow-all` passed: 8 tests, 0 failed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 
