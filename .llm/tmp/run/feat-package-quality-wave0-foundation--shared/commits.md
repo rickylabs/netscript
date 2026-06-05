@@ -14,3 +14,5 @@ Format:
 - 37b935c: chore(shared): record foundation commit log
 - cc3b8f0: fix(shared): address review and remove datetime anti-helper
 - 633bc43: chore(shared): record review fix commit
+
+- 9c64021: docs(shared): complete standards docs tree
