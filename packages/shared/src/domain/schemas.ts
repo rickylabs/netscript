@@ -7,7 +7,7 @@ import {
 } from './constants.ts';
 import type { SharedObjectSchema, SharedSchema } from './schema-types.ts';
 
-type ZodObjectSchema = ReturnType<typeof z.object>;
+type UntypedZodObjectSchema = ReturnType<typeof z.object>;
 
 /** Offset-based pagination input for request bodies. */
 export type OffsetPaginationInput = Readonly<{
@@ -89,31 +89,31 @@ export type ServiceUnavailableError = Readonly<{
   reason?: string;
 }>;
 
-const notFoundErrorSchema: ZodObjectSchema = z.object({
+const notFoundErrorSchema: UntypedZodObjectSchema = z.object({
   resourceType: z.string().describe('Type of resource'),
   resourceId: z.union([z.string(), z.number()]).describe('Resource identifier'),
 });
 
-const validationErrorSchema: ZodObjectSchema = z.object({
+const validationErrorSchema: UntypedZodObjectSchema = z.object({
   formErrors: z.array(z.string()).describe('Form-level errors'),
   fieldErrors: z.record(z.string(), z.array(z.string()).optional()).describe('Field-level errors'),
 });
 
-const unauthorizedErrorSchema: ZodObjectSchema = z.object({
+const unauthorizedErrorSchema: UntypedZodObjectSchema = z.object({
   reason: z.enum(['missing_token', 'invalid_token', 'expired_token']).optional(),
 });
 
-const forbiddenErrorSchema: ZodObjectSchema = z.object({
+const forbiddenErrorSchema: UntypedZodObjectSchema = z.object({
   requiredRole: z.string().optional().describe('Required role for this action'),
   userRole: z.string().optional().describe('Current user role'),
 });
 
-const rateLimitErrorSchema: ZodObjectSchema = z.object({
+const rateLimitErrorSchema: UntypedZodObjectSchema = z.object({
   retryAfter: z.number().int().min(1).describe('Seconds to wait before retrying'),
   limit: z.number().int().describe('Rate limit threshold'),
 });
 
-const serviceUnavailableErrorSchema: ZodObjectSchema = z.object({
+const serviceUnavailableErrorSchema: UntypedZodObjectSchema = z.object({
   retryAfter: z.number().int().min(1).optional().describe('Seconds to wait before retrying'),
   reason: z.string().optional().describe('Why the service is unavailable'),
 });

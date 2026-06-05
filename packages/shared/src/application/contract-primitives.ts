@@ -9,7 +9,7 @@ import {
 } from '../domain/schemas.ts';
 import type { SharedSchema } from '../domain/schema-types.ts';
 
-type CommonErrorMap = Parameters<typeof os.errors>[0];
+type OrpcErrorMap = Parameters<typeof os.errors>[0];
 
 const commonErrorMap = {
   NOT_FOUND: {
@@ -42,7 +42,7 @@ const commonErrorMap = {
     message: 'Service temporarily unavailable',
     data: serviceUnavailableErrorSchema,
   },
-} as const satisfies CommonErrorMap;
+} as const satisfies OrpcErrorMap;
 
 /** HTTP route options accepted by the shared oRPC base contract. */
 export type BaseContractRouteOptions = Readonly<{
