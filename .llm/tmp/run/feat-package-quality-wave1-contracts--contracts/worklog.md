@@ -186,6 +186,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 4 | Gate | `deno check src/diagnostics/summary.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 5 | Implement | Rewrote `packages/runtime-config/mod.ts` as a documented thin barrel over domain, application, and diagnostics modules. |
 | 2026-06-06 | 5 | Gate | `deno doc --lint mod.ts` passed; `Get-ChildItem src -Recurse -File \| Select-String -Pattern 'console\\.'` returned 0 matches. |
+| 2026-06-06 | 6 | Implement | Added runtime-config package description, license, standard local tasks, and publish include/exclude config to `deno.json`. |
+| 2026-06-06 | 6 | Gate | `deno publish --dry-run --allow-dirty` passed with 0 slow-type errors and published `deno.json`, `mod.ts`, and `src/**/*.ts`. |
 
 ## Decisions
 

@@ -15,3 +15,4 @@ Format:
 - 31b1464: refactor(runtime-config): extract loader application module
 - 617e7d4: refactor(runtime-config): extract watcher application module
 - 23e1480: feat(runtime-config): add structured config summary
+- f59f9ef: refactor(runtime-config): expose thin public barrel

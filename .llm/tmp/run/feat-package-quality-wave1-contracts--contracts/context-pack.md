@@ -27,6 +27,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 3 — `runtime-config` watcher extracted with no `console.*` in `src/`; `deno check src/application/watcher.ts` passed.
 - [x] Slice 4 — `runtime-config` structured summary added; `deno check src/diagnostics/summary.ts` passed.
 - [x] Slice 5 — `runtime-config` root barrel rewritten; `deno doc --lint mod.ts` passed.
+- [x] Slice 6 — `runtime-config` `deno.json` metadata/tasks/publish config added; `deno publish --dry-run --allow-dirty` passed.
 
 ## Key findings (re-baselined)
 
