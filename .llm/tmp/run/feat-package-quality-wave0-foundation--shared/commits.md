@@ -11,3 +11,4 @@ Format:
 ## Log
 
 - 27b4bf3: chore(shared): record wave0 design baseline
+- 2639d4e: feat(shared): publish foundation contract surface
