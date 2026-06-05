@@ -1,7 +1,7 @@
 # Retrieval Order
 
-Use the narrowest source that can answer the question. Prefer existing run
-artifacts and repo-native sources before broad scans or web searches.
+Use the narrowest source that can answer the question. Prefer existing run artifacts and repo-native
+sources before broad scans or web searches.
 
 ## Existing Run
 
@@ -11,8 +11,8 @@ artifacts and repo-native sources before broad scans or web searches.
 4. `.llm/tmp/run/<run-id>/drift.md`
 5. `.llm/tmp/run/<run-id>/commits.md`
 
-For `.llm/tmp/` paths, verify with direct filesystem listing if an index/search
-tool misses the directory.
+For `.llm/tmp/` paths, verify with direct filesystem listing if an index/search tool misses the
+directory.
 
 ## Doctrine and Harness
 
@@ -29,18 +29,16 @@ tool misses the directory.
 3. Focused shell search.
 4. Surgical file reads.
 
-Prefer `deno doc` for public `@netscript/*` package surfaces before reading
-source implementation.
+Prefer `deno doc` for public `@netscript/*` package surfaces before reading source implementation.
 
 ## Dependency Docs
 
 1. `.resources/deps-docs/`
 2. run-local extracts in `.llm/tmp/docs/`
 3. official upstream docs via docs/browser tooling
-4. web search only when repo and curated docs are insufficient or freshness is
-   required
+4. web search only when repo and curated docs are insufficient or freshness is required
 
 ## Knowledge Base
 
-Use `.claude/` for descriptive current-state context. Use the doctrine for
-prescriptive package/plugin rules.
+Use `.claude/` for descriptive current-state context. Use the doctrine for prescriptive
+package/plugin rules.
