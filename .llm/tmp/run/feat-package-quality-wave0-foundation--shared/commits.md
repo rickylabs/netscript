@@ -28,3 +28,4 @@ Format:
 - 41c170c: chore(contracts): refresh workspace lock
 - 25c850a: fix(cli): restore scaffold e2e readiness
 - b7b5426: chore(harness): record cli e2e validation
+- 1f40bc7: docs(agents): migrate prior knowledge base
