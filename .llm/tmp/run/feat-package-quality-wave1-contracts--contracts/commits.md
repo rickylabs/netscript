@@ -17,3 +17,4 @@ Format:
 - 23e1480: feat(runtime-config): add structured config summary
 - f59f9ef: refactor(runtime-config): expose thin public barrel
 - f413fde: chore(runtime-config): add package tasks and publish config
+- 45a276b: docs(runtime-config): add package README
