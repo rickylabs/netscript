@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Logging configuration schema.
  */
-export const LoggingConfigSchema: z.ZodType<any> = z
+export const LoggingConfigSchema = z
   .object({
     /** Minimum log level */
     level: z.enum(['debug', 'info', 'warn', 'error']).default('info'),

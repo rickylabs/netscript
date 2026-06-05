@@ -73,3 +73,18 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Action:** expose schema constants as `PluginSettingsSchema<T>`; runtime values remain Zod
   schemas.
 - **Evidence:** `deno doc --lint src/schema/plugins/mod.ts` passed.
+
+## 2026-06-06 — Config sweep static and cardinality cleanup
+
+- **What:** Slice 18's full sweep surfaced several pre-existing static-gate issues not itemized as
+  standalone config slices: stale workspace test expectations, unversioned `@std/assert` imports in
+  tests, `console.` in public examples, explicit `z.ZodType` annotations in exported domain schema
+  constants, `types.ts` over 500 LOC, and `src/domain` over the 12-child cardinality limit.
+- **Source:** `deno test --allow-all`, `deno lint`, manual F-1/F-14/F-16 scans.
+- **Expected:** Slice 18 would mostly verify already-completed fixes.
+- **Actual:** The sweep required cleanup to make the package satisfy the whole Archetype-1 gate set.
+- **Severity:** minor
+- **Action:** fixed in slice 18 by updating workspace tests/imports/examples, using inferred schema
+  constant types, splitting public config types into section/root modules, and grouping schema files
+  under `src/domain/schemas/`.
+- **Evidence:** Config slice 18 sweep in `worklog.md`.

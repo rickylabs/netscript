@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Aspire orchestration configuration schema.
  */
-export const AspireConfigSchema: z.ZodType<any> = z
+export const AspireConfigSchema = z
   .object({
     /** Path to AppHost project */
     appHost: z.string().default('./dotnet/AppHost'),

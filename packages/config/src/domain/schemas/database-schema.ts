@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Database configuration schema.
  */
-export const DatabaseConfigSchema: z.ZodType<any> = z.object({
+export const DatabaseConfigSchema = z.object({
   /** Optional name to identify this database (e.g., 'netscript', 'mdb') */
   name: z.string().optional(),
   /** Database provider type */

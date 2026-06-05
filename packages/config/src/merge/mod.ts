@@ -52,22 +52,26 @@ type ServiceEntry = NonNullable<NetScriptConfig['services']>[string];
 type AppEntry = NonNullable<NetScriptConfig['apps']>[string];
 
 /** Service config entry accepted in plugin contribution fragments. */
-export type ServiceContributionEntry = Omit<
-  NonNullable<NetScriptConfig['services']>[string],
-  'runtime'
-> & {
-  /** Optional service runtime; defaults to `deno` during merge. */
-  readonly runtime?: NonNullable<NetScriptConfig['services']>[string]['runtime'];
-};
+export type ServiceContributionEntry =
+  & Omit<
+    NonNullable<NetScriptConfig['services']>[string],
+    'runtime'
+  >
+  & {
+    /** Optional service runtime; defaults to `deno` during merge. */
+    readonly runtime?: NonNullable<NetScriptConfig['services']>[string]['runtime'];
+  };
 
 /** Application config entry accepted in plugin contribution fragments. */
-export type AppContributionEntry = Omit<
-  NonNullable<NetScriptConfig['apps']>[string],
-  'runtime'
-> & {
-  /** Optional application runtime; defaults to `deno` during merge. */
-  readonly runtime?: NonNullable<NetScriptConfig['apps']>[string]['runtime'];
-};
+export type AppContributionEntry =
+  & Omit<
+    NonNullable<NetScriptConfig['apps']>[string],
+    'runtime'
+  >
+  & {
+    /** Optional application runtime; defaults to `deno` during merge. */
+    readonly runtime?: NonNullable<NetScriptConfig['apps']>[string]['runtime'];
+  };
 
 /** Partial NetScript config fragment contributed by a plugin manifest. */
 export interface PartialConfig {

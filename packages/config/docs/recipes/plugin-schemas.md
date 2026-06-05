@@ -21,5 +21,5 @@ const entry = pluginEntrySchema.parse({
 
 The schema applies defaults for runtime, entrypoint, enablement, and dependency flags.
 
-Background processors use `backgroundProcessorEntrySchema` and default to
-`bin/combined.ts` as their entrypoint.
+Background processors use `backgroundProcessorEntrySchema` and default to `bin/combined.ts` as their
+entrypoint.

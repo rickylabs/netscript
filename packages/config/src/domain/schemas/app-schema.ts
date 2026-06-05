@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Frontend/app configuration schema.
  */
-export const AppConfigSchema: z.ZodType<any> = z.object({
+export const AppConfigSchema = z.object({
   /** App runtime type */
   runtime: z.enum(['deno', 'node', 'tauri']).default('deno'),
   /** Port to listen on */

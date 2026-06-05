@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Supports both simple boolean flags and granular string array patterns.
  * Aligned with the workers runtime permission object shape.
  */
-export const PermissionsSchema: z.ZodType<any> = z
+export const PermissionsSchema = z
   .object({
     /** Allow network access (true = all, string[] = specific hosts) */
     net: z.union([z.boolean(), z.array(z.string())]).optional(),

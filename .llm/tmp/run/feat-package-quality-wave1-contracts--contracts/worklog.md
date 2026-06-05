@@ -210,6 +210,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 16 | Gate | `Get-ChildItem docs -Recurse -File` listed 7 config docs files including recipes and advanced pages. |
 | 2026-06-06 | 17 | Implement | Added `arch:barrel-ok` justification to `packages/config/src/domain/mod.ts` and recorded accepted sub-barrel debt. |
 | 2026-06-06 | 17 | Gate | `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'` found the marker. |
+| 2026-06-06 | 18 | Implement | Ran the config gate sweep and fixed sweep findings: stale workspace-member test expectations, unversioned test imports, `console.` examples, explicit public `z.ZodType` annotations, `types.ts` LOC, and `src/domain` folder cardinality by splitting config types and grouping schemas under `src/domain/schemas/`. |
+| 2026-06-06 | 18 | Gate | Config sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. Publish dry run reported the known non-failing `unanalyzable-dynamic-import` warning for `loader.ts`. |
 
 ## Decisions
 
@@ -226,7 +228,10 @@ A new developer adding a config schema section:
 
 | Drift | Severity | Logged in drift.md |
 |-------|----------|-------------------|
-| None yet | — | — |
+| Config slices 12-13 gate dependency | minor | yes |
+| Config merge subpath type exports | minor | yes |
+| Config plugin schema public annotation | minor | yes |
+| Config sweep static/cardinality cleanup | minor | yes |
 
 ## Gate Results
 
@@ -284,6 +289,27 @@ A new developer adding a config schema section:
 | F-16 cardinality | PASS | No `src/` directory has more than 12 immediate children |
 | F-17 abstract-derived | PASS | No abstract classes or `extends` relationships in `src/` |
 | F-18 sub-barrel | PASS | No `src/**/mod.ts` sub-barrels |
+
+### Config Slice 18 Sweep
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| Static check | PASS | `deno check mod.ts` |
+| Lint | PASS | `deno lint` |
+| Format | PASS | `deno fmt --check` |
+| F-5 / F-7 doc lint | PASS | `deno doc --lint mod.ts src/merge/mod.ts src/schema/plugins/mod.ts` |
+| F-6 publishability | PASS | `deno publish --dry-run --allow-dirty` = 0 slow-type errors; known `unanalyzable-dynamic-import` warning only |
+| F-7 README | PASS | `(Get-Content README.md).Count` = 255 |
+| F-7 docs | PASS | `Get-ChildItem docs -Recurse -File` = 7 docs files |
+| F-10 tests | PASS | `deno test --allow-all` = 10 passed, 0 failed |
+| F-1 file size | PASS | No non-test `.ts` file > 500 LOC; `types.ts` split into section/root type modules |
+| F-11 forbidden folders | PASS | No `utils`, `helpers`, `common`, `lib`, or `interfaces` under `src/` |
+| F-12 naming | PASS | No exported `I*`, `*_T`, or `*Impl` declarations by case-sensitive scan |
+| F-14 console/Zod public annotation scan | PASS | No `console.` or `z.ZodType` in `mod.ts` or `src/` |
+| F-15 upstream re-export | PASS | No upstream `npm:`, `jsr:`, `@std`, or `@orpc` re-exports |
+| F-16 cardinality | PASS | No `src/` directory has more than 12 immediate children after grouping domain schemas |
+| F-17 abstract-derived | PASS | No abstract classes or class `extends` relationships in `src/` |
+| F-18 sub-barrel | PASS | `src/domain/mod.ts` has `arch:barrel-ok` |
 
 ## Handoff Notes
 

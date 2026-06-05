@@ -4,7 +4,7 @@ import { z } from 'zod';
  * Windows-specific deployment configuration.
  * Consumed by `netscript deploy build` and `netscript deploy install`.
  */
-export const WindowsDeployConfigSchema: z.ZodType<any> = z
+export const WindowsDeployConfigSchema = z
   .object({
     // ── Service management ──────────────────────────────────────────────────
     /** Path to servy-cli.exe. Default: 'C:\\Program Files\\Servy\\servy-cli.exe' */
@@ -108,7 +108,7 @@ export const WindowsDeployConfigSchema: z.ZodType<any> = z
  * Top-level deploy configuration section.
  * Supports multiple deployment targets (windows, future: linux, docker, k8s).
  */
-export const DeployConfigSchema: z.ZodType<any> = z
+export const DeployConfigSchema = z
   .object({
     /** Windows Services deployment via Servy */
     windows: WindowsDeployConfigSchema,

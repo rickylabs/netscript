@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { SagasConfig, TriggersConfig } from '../../../types.ts';
 
 import { AppConfigSchema } from './app-schema.ts';
 
@@ -20,10 +21,20 @@ import { SdkConfigSchema } from './sdk-schema.ts';
 
 import { ServiceConfigSchema } from './service-schema.ts';
 
+const SagasConfigSectionSchema = z
+  .unknown()
+  .optional()
+  .transform((value) => value as SagasConfig | undefined);
+
+const TriggersConfigSectionSchema = z
+  .unknown()
+  .optional()
+  .transform((value) => value as TriggersConfig | undefined);
+
 /**
  * Main NetScript configuration schema.
  */
-export const NetScriptConfigSchema: z.ZodType<any> = z.object({
+export const NetScriptConfigSchema = z.object({
   /** Project name */
   name: z.string(),
   /** Project version */
@@ -44,9 +55,9 @@ export const NetScriptConfigSchema: z.ZodType<any> = z.object({
   /** Frontend/app configurations */
   apps: z.record(z.string(), AppConfigSchema).optional(),
   /** Plugin-owned sagas configuration. Saga-specific validation lives in plugin-sagas-core. */
-  sagas: z.unknown().optional(),
+  sagas: SagasConfigSectionSchema,
   /** Plugin-owned triggers configuration. Trigger-specific validation lives in plugin-triggers-core. */
-  triggers: z.unknown().optional(),
+  triggers: TriggersConfigSectionSchema,
   /** Gateway configuration */
   gateway: GatewayConfigSchema,
   /** SDK generation configuration */

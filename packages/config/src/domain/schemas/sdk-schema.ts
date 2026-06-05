@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * SDK generation configuration schema.
  */
-export const SdkConfigSchema: z.ZodType<any> = z
+export const SdkConfigSchema = z
   .object({
     /** TypeScript SDK configuration */
     typescript: z

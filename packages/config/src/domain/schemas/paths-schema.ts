@@ -17,7 +17,7 @@ const DEFAULT_PATHS_CONFIG = {
   deploy: '.deploy/windows',
 } as const;
 
-export const PathsConfigSchema: z.ZodType<any> = z
+export const PathsConfigSchema = z
   .object({
     services: z.string().default(DEFAULT_PATHS_CONFIG.services),
     packages: z.string().default(DEFAULT_PATHS_CONFIG.packages),

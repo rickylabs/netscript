@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Service configuration schema.
  */
-export const ServiceConfigSchema: z.ZodType<any> = z.object({
+export const ServiceConfigSchema = z.object({
   /** Service runtime type */
   runtime: z.enum(['deno', 'node', 'dotnet']).default('deno'),
   /** Port to listen on */

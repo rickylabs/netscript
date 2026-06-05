@@ -205,5 +205,5 @@ export const pluginEntrySchema: PluginSettingsSchema<PluginEntry> = z.object(plu
  * });
  * ```
  */
-export const backgroundProcessorEntrySchema: PluginSettingsSchema<BackgroundProcessorEntry> =
-  z.object(backgroundProcessorEntryFields);
+export const backgroundProcessorEntrySchema: PluginSettingsSchema<BackgroundProcessorEntry> = z
+  .object(backgroundProcessorEntryFields);

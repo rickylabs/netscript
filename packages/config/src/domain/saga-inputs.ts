@@ -5,7 +5,6 @@
  */
 
 import type {
-  SagaDefinition,
   SagaRetentionConfig,
   SagaRetryConfig,
   SagaScalingConfig,

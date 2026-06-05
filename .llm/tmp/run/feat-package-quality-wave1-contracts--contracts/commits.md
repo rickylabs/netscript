@@ -26,3 +26,4 @@ Format:
 - fbcfee5: docs(config): fix merge subpath public types
 - 0ac2d8b: docs(config): harden plugin schema public docs
 - 43e51b4: docs(config): add recipes and advanced guide
+- 3c10baa: docs(config): justify domain barrel

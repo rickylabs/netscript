@@ -3,7 +3,7 @@ import { z } from 'zod';
 /**
  * Gateway configuration schema.
  */
-export const GatewayConfigSchema: z.ZodType<any> = z
+export const GatewayConfigSchema = z
   .object({
     /** Whether gateway is enabled */
     enabled: z.boolean().default(true),
