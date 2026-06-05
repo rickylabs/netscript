@@ -180,6 +180,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 1 | Gate | `deno doc --lint src/domain/types.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 2 | Implement | Added `packages/runtime-config/src/application/loader.ts` with the runtime directory resolver, pointer parsing, config loader, and accessor functions extracted from `mod.ts`. |
 | 2026-06-06 | 2 | Gate | `deno check src/application/loader.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 3 | Implement | Added `packages/runtime-config/src/application/watcher.ts` with debounced reloads and no package-level console emission. |
+| 2026-06-06 | 3 | Gate | `deno check src/application/watcher.ts` passed; `Get-ChildItem src -Recurse -File \| Select-String -Pattern 'console\\.'` returned 0 matches. |
 
 ## Decisions
 

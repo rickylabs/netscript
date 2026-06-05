@@ -24,6 +24,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] `plan-eval.md` — **PLAN-EVAL PASS** (Arch-1 gate set adjusted: added F-14 Console-log, F-17 Abstract-derived co-location)
 - [x] Slice 1 — `runtime-config` domain types scaffolded; `deno doc --lint src/domain/types.ts` passed.
 - [x] Slice 2 — `runtime-config` loader extracted; `deno check src/application/loader.ts` passed.
+- [x] Slice 3 — `runtime-config` watcher extracted with no `console.*` in `src/`; `deno check src/application/watcher.ts` passed.
 
 ## Key findings (re-baselined)
 
