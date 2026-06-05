@@ -16,3 +16,5 @@ Format:
 - 633bc43: chore(shared): record review fix commit
 
 - 9c64021: docs(shared): complete standards docs tree
+
+- 6019c3d: fix(shared): tighten review follow-ups
