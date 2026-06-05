@@ -12,3 +12,5 @@ Format:
 
 - 27b4bf3: chore(shared): record wave0 design baseline
 - 2639d4e: feat(shared): publish foundation contract surface
+
+- cc3b8f0: fix(shared): address review and remove datetime anti-helper
