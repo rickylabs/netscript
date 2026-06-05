@@ -24,7 +24,7 @@ export type SharedDefaultableSchema<TOutput> =
 export type SharedObjectSchema<TOutput = unknown> =
   & SharedSchema<TOutput>
   & Readonly<{
-    extend(shape: Readonly<Record<string, unknown>>): SharedObjectSchema<unknown>;
+    extend(shape: Readonly<Record<string, SharedSchema<unknown>>>): SharedObjectSchema<unknown>;
   }>;
 
 /** Shared number schema contract. */

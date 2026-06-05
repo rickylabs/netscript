@@ -145,3 +145,15 @@ To add a new shared primitive, add its explicit public data type and schema to `
 ## Handoff Notes
 
 - Evaluator should inspect the published export map first: `./utils` is intentionally removed from package exports, while the physical legacy folder remains as unpublished workspace compatibility for later-wave consumers.
+
+## 2026-06-05 Review Fix Slice
+
+| Step | Result | Evidence |
+|------|--------|----------|
+| Augment review fixes | PASS | Removed unchecked `commonErrorMap as never`, made `SharedObjectSchema.extend()` schema-only, used pagination constants in schemas, corrected README quickstart pagination output, and added `getResourceType()` fallback tests. |
+| Temporal stable refactor | PASS | Deleted unpublished `utils/datetime.ts` anti-helper and removed the `datetime.ts` export from `packages/shared/utils/mod.ts`; no replacement shared datetime wrapper added. |
+| Broad date/time scan | PASS | Drift registry now lists every `packages/**` and `plugins/**` TypeScript file with `Temporal`, `Date.now`, `new Date`, `toISOString`, `getTime`, `setTimeout`, `clearTimeout`, or `Intl.DateTimeFormat` usage. |
+| Format/lint/doc | PASS | `deno fmt --check packages/shared/mod.ts packages/shared/src packages/shared/README.md packages/shared/docs packages/shared/utils/mod.ts packages/shared/utils/zod/mod.ts`; `deno lint packages/shared/mod.ts packages/shared/src`; `deno doc --lint packages/shared/mod.ts`. |
+| Package gates | PASS | `cd packages/shared && deno check mod.ts && deno test --allow-all . && deno publish --dry-run --allow-dirty`; 2 tests pass, publish dry-run has 0 slow-types. |
+| Package standards | BLOCKED_ENV | `check-netscript-standards.ts --root packages/shared --text` cannot load `https://jsr.io/@std/fs/meta.json` because `jsr.io` DNS resolution fails in this sandbox. Previous package-scoped standards gate was green before this slice; changed shared package metadata/docs shape remains compliant by inspection. |
+| Workspace check | BLOCKED_ENV | `deno task check` cannot load `https://jsr.io/@std/path/meta.json` because `jsr.io` DNS resolution fails in this sandbox. Targeted `packages/shared` type/doc/publish gates pass. |

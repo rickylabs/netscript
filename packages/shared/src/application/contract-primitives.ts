@@ -1,55 +1,56 @@
 import { os } from '@orpc/server';
 import {
-  ForbiddenErrorSchema,
-  NotFoundErrorSchema,
-  RateLimitErrorSchema,
-  ServiceUnavailableErrorSchema,
-  UnauthorizedErrorSchema,
-  ValidationErrorSchema,
+  forbiddenErrorSchema,
+  notFoundErrorSchema,
+  rateLimitErrorSchema,
+  serviceUnavailableErrorSchema,
+  unauthorizedErrorSchema,
+  validationErrorSchema,
 } from '../domain/schemas.ts';
 import type { SharedSchema } from '../domain/schema-types.ts';
+
+type CommonErrorMap = Parameters<typeof os.errors>[0];
 
 const commonErrorMap = {
   NOT_FOUND: {
     status: 404,
     message: 'Resource not found',
-    data: NotFoundErrorSchema,
+    data: notFoundErrorSchema,
   },
   VALIDATION_ERROR: {
     status: 422,
     message: 'Validation failed',
-    data: ValidationErrorSchema,
+    data: validationErrorSchema,
   },
   UNAUTHORIZED: {
     status: 401,
     message: 'Authentication required',
-    data: UnauthorizedErrorSchema,
+    data: unauthorizedErrorSchema,
   },
   FORBIDDEN: {
     status: 403,
     message: 'Access denied',
-    data: ForbiddenErrorSchema,
+    data: forbiddenErrorSchema,
   },
   RATE_LIMITED: {
     status: 429,
     message: 'Too many requests',
-    data: RateLimitErrorSchema,
+    data: rateLimitErrorSchema,
   },
   SERVICE_UNAVAILABLE: {
     status: 503,
     message: 'Service temporarily unavailable',
-    data: ServiceUnavailableErrorSchema,
+    data: serviceUnavailableErrorSchema,
   },
-} as const;
+} as const satisfies CommonErrorMap;
 
 /** HTTP route options accepted by the shared oRPC base contract. */
 export type BaseContractRouteOptions = Readonly<{
-  method: string;
+  method: 'HEAD' | 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   path: string;
 }>;
 
 /** Opaque procedure returned by oRPC after contract composition. */
-// deno-lint-ignore no-explicit-any
 export type BaseContractProcedure = Readonly<{
   /** oRPC procedure marker used by implementers and routers. */
   // deno-lint-ignore no-explicit-any
@@ -79,6 +80,4 @@ export type BaseContract = Readonly<{
 }>;
 
 /** Common oRPC contract primitive with NetScript's shared error map applied. */
-export const baseContract: BaseContract = os.errors(
-  commonErrorMap as never,
-) as unknown as BaseContract;
+export const baseContract: BaseContract = os.errors(commonErrorMap) as BaseContract;

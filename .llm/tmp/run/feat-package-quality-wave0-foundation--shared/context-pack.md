@@ -85,3 +85,11 @@ check` pass.
 ## Commits
 
 - `27b4bf3`: `chore(shared): record wave0 design baseline`
+
+## 2026-06-05 Post-review Fix Context
+
+- Addressed all five Augment findings in the shared published surface.
+- Removed the unpublished `utils/datetime.ts` anti-helper now that Temporal is stable in the target Deno runtime.
+- Added a drift registry for date/time migration opportunities across `packages/**` and `plugins/**`; guidance prefers direct Temporal or package-owned clock/scheduler ports over a shared datetime wrapper.
+- Validated targeted shared gates with Deno 2.8.2 from the `deno` npm package because the sandbox had no system `deno`.
+- Environment caveat: package standards and workspace check are blocked by sandbox DNS failure for `jsr.io`, not by local shared code errors.

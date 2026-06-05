@@ -37,7 +37,11 @@ deno add jsr:@netscript/shared
 Use the root entry point for all published imports:
 
 ```ts
-import { baseContract, OffsetPaginationQuerySchema, SuccessSchema } from '@netscript/shared';
+import {
+  baseContract,
+  OffsetPaginationMetaSchema,
+  OffsetPaginationQuerySchema,
+} from '@netscript/shared';
 import { z } from 'zod';
 
 export const listItems = baseContract
@@ -45,7 +49,7 @@ export const listItems = baseContract
   .input(OffsetPaginationQuerySchema)
   .output(z.object({
     items: z.array(z.unknown()),
-    meta: SuccessSchema,
+    pagination: OffsetPaginationMetaSchema,
   }));
 ```
 

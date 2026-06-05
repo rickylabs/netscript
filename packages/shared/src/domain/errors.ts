@@ -1,5 +1,8 @@
 import type { NotFoundError } from './schemas.ts';
 
+const DEFAULT_RESOURCE_TYPE = 'resource';
+const VERSION_SEGMENT_PATTERN = /^v\d+$/i;
+
 /** Options for throwing a shared `NOT_FOUND` oRPC error. */
 export type NotFoundOptions = Readonly<{
   /** oRPC errors object from a handler context. */
@@ -23,10 +26,13 @@ type NotFoundErrorContainer = Readonly<{
 
 /** Resolves a singular resource name from an oRPC handler path. */
 export function getResourceType(options: { path?: readonly string[] }): string {
-  const firstSegment = options.path?.[0] ?? '';
-  const pathSegment = firstSegment.startsWith('v') ? options.path?.[1] ?? '' : firstSegment;
+  const pathSegment =
+    options.path?.find((segment) => segment.length > 0 && !VERSION_SEGMENT_PATTERN.test(segment)) ??
+      DEFAULT_RESOURCE_TYPE;
 
-  return pathSegment.endsWith('s') ? pathSegment.slice(0, -1) : pathSegment;
+  return pathSegment.length > 1 && pathSegment.endsWith('s')
+    ? pathSegment.slice(0, -1)
+    : pathSegment;
 }
 
 /** Throws the shared `NOT_FOUND` oRPC error with inferred resource context. */
