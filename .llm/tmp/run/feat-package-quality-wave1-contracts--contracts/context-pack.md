@@ -41,6 +41,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 18 — config gate sweep passed after static cleanup, type split, and domain schema grouping; publish dry run remained at 0 slow types.
 - [x] Slice 19 — contracts paginated-query helper moved to `src/application`; `deno check mod.ts` passed.
 - [x] Slice 20 — contracts transform helper moved to `src/application`; `deno check mod.ts` and `deno check transform.ts` passed; `helpers/` removed.
+- [x] Slice 21 — contracts subpaths exported schema/procedure public types; `deno doc --lint crud.ts query.ts transform.ts` passed.
 
 ## Key findings (re-baselined)
 

@@ -29,3 +29,4 @@ Format:
 - 3c10baa: docs(config): justify domain barrel
 - 68f6d6d: test(config): complete package gate sweep
 - aab8d2f: refactor(contracts): move paginated query helper
+- 5062e76: refactor(contracts): move transform helpers

@@ -11,6 +11,11 @@
  * @module
  */
 
+export type {
+  ContractObjectSchema,
+  ContractParseResult,
+  ContractSchema,
+} from './src/domain/schema-types.ts';
 export * from './src/application/paginated-query.ts';
 export * from './schemas/filters.ts';
 export * from './schemas/pagination.ts';

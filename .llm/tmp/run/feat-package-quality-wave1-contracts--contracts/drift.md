@@ -88,3 +88,16 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
   constant types, splitting public config types into section/root modules, and grouping schema files
   under `src/domain/schemas/`.
 - **Evidence:** Config slice 18 sweep in `worklog.md`.
+
+## 2026-06-06 — Contracts subpath transitive schema type export
+
+- **What:** Slice 21 named `ContractSchema`, `ContractObjectSchema`, and `BaseContractProcedure`
+  as required public exports, but once those types were exported through `./crud` and `./query`,
+  `ContractSchema` publicly referenced `ContractParseResult`.
+- **Source:** `deno doc --lint crud.ts query.ts transform.ts`.
+- **Expected:** The three planned exports were sufficient.
+- **Actual:** The transitive parse-result type also had to be public on the affected subpaths.
+- **Severity:** minor
+- **Action:** export `ContractParseResult` from `crud.ts` and `query.ts` with the schema type
+  contracts.
+- **Evidence:** `deno doc --lint crud.ts query.ts transform.ts` passed.
