@@ -25,3 +25,4 @@ Format:
 - fe9370d: Address Temporal codec validation feedback
 - f4a35eb: Simplify Temporal codec tests
 - fd8259b: feat(contracts): consolidate shared foundation package
+- 41c170c: chore(contracts): refresh workspace lock
