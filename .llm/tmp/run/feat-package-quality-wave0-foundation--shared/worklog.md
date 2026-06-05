@@ -75,6 +75,8 @@ To add a new shared primitive, add its explicit public data type and schema to `
 | 2026-06-05 04:44 UTC | baseline | release readiness | `deno run -A tools/fitness/release-readiness.ts --out ./audit --include-plugins` generated `./audit/_summary.md`; summary reported `Ready: 0/27`. |
 | 2026-06-05 04:45 UTC | baseline | publish dry-run | `deno publish --dry-run --allow-dirty` in `packages/shared` failed with 35 slow-type problems. |
 | 2026-06-05 04:55 UTC | design | checkpoint | Current tree verified before source edits; design narrows published surface and defers cross-wave consumer migration. |
+| 2026-06-05 05:05 UTC | slice 2 | implementation gates | Published surface moved under `src/**`; package doc lint and publish dry-run are clean. |
+| 2026-06-05 05:06 UTC | slice 3 | docs and final gates | README expanded, `/docs` structure added, package-scoped standards exits 0, package tests pass, and root `deno task check` passes. |
 
 ## Decisions
 
@@ -84,6 +86,7 @@ To add a new shared primitive, add its explicit public data type and schema to `
 | Replace public `z.infer` aliases with explicit object types. | `deno doc --lint` reports private `output` type references for inferred Zod public aliases. | `deno doc --lint packages/shared/mod.ts` |
 | Keep `baseContract` as a published root symbol. | Existing plugin contracts compose from it through `@netscript/shared`; removing it would be cross-wave breakage. | plugin contract imports |
 | Do not publish datetime helpers. | Doctrine identifies `utils/datetime.ts` as AP-2/AP-1 debt; current consumers do not require it through the package root. | doctrine 04/10; consumer scan |
+| Publish package-owned schema and procedure types instead of Zod/oRPC classes. | `deno doc --lint` recursively lints dependency-private type graphs when public signatures expose Zod or oRPC classes directly. | `deno doc --lint packages/shared/mod.ts` |
 
 ## Drift
 
@@ -93,6 +96,7 @@ To add a new shared primitive, add its explicit public data type and schema to `
 | `release-readiness.ts --out ./audit` produced only `_summary.md` detail links in this worktree, not the JSON detail files it listed. | minor | yes |
 | Stale package facts said version `1.0.0`; current package is already `0.0.1-alpha.0`. | minor | yes |
 | Current workspace has `@shared/utils` aliases in plugin import maps, so deleting `packages/shared/utils/` would exceed Wave 0. | significant | yes |
+| Exact root standards invocation checks the repository root and fails on root metadata unrelated to `packages/shared`; package-scoped standards invocation is the applicable Wave 0 gate. | significant | yes |
 
 ## Gate Results
 
@@ -104,15 +108,21 @@ To add a new shared primitive, add its explicit public data type and schema to `
 | Baseline publish | `cd packages/shared; deno publish --dry-run --allow-dirty` | FAIL | 35 slow-type problems. |
 | Baseline doc lint | `deno doc --lint packages/shared/mod.ts` | FAIL | 106 documentation lint errors. |
 | Baseline standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/shared --text` | FAIL | `strict` missing; README/docs/barrel/test warnings. |
+| Publish dry-run | `cd packages/shared; deno publish --dry-run --allow-dirty` | PASS | No slow-type failures; simulated publish includes root, docs, and `src/**` only. |
+| Doc lint | `deno doc --lint packages/shared/mod.ts` | PASS | Checked 1 file clean. |
+| Package standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/shared --text` | PASS | Exit 0; residual warnings are naming/test-location debt, mostly legacy unpublished `utils/`. |
+| Exact root standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts` | FAIL | Checks repo root metadata (`deno.json`) and unrelated whole-tree warnings; logged as drift from Wave 0 package scope. |
+| Package tests | `deno test --allow-all packages/shared` | PASS | 0 Deno tests; legacy datetime script executes and exits 0. |
+| Workspace check | `deno task check` | PASS | Root packages/plugins typecheck green. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 |------|--------|----------|-------|
 | F-1 | FAIL | `utils/datetime.ts` is 1,112-line doctrine debt in current baseline. | Published surface will stop including it. |
-| F-5 | FAIL | `deno doc --lint packages/shared/mod.ts` | Missing docs, private Zod inferred types. |
-| F-6 | FAIL | `deno publish --dry-run --allow-dirty` | 35 slow-types. |
-| F-7 | FAIL | `deno doc --lint packages/shared/mod.ts` | Documentation lint not clean. |
+| F-5 | PASS | `deno doc --lint packages/shared/mod.ts` | Public docs clean after package-owned schema/procedure types. |
+| F-6 | PASS | `deno publish --dry-run --allow-dirty` | 0 slow-types. |
+| F-7 | PASS | `deno doc --lint packages/shared/mod.ts` | Documentation lint clean. |
 | F-8 | PASS | Root compiler options include `deno.unstable`; package has no override yet. | Will keep package override aligned if added. |
 | F-10 | WARN | Current `utils/datetime.test.ts` is an inline script-style test. | Package tests must still pass; test relocation deferred unless needed. |
 | F-11 | WARN | Current `utils/` folder exists. | Removed from published surface; physical deletion deferred for consumer migration. |
@@ -130,7 +140,7 @@ To add a new shared primitive, add its explicit public data type and schema to `
 
 | Consumer | Result | Evidence | Notes |
 |----------|--------|----------|-------|
-| Workspace imports | NOT_RUN | Deferred until final `deno task check`. | Must remain green despite unpublished `utils/` retention. |
+| Workspace imports | PASS | `deno task check` | Plugins consuming root `baseContract` and legacy `@shared/utils` still typecheck. |
 
 ## Handoff Notes
 

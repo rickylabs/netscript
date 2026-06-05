@@ -4,24 +4,45 @@
   "description": "Shared schemas, contract primitives, Zod helpers, and typed error utilities for NetScript packages.",
   "license": "MIT",
   "exports": {
-    ".": "./mod.ts",
-    "./utils": "./utils/mod.ts"
+    ".": "./mod.ts"
   },
   "imports": {
     "@orpc/server": "npm:@orpc/server@^1.13.5",
     "zod": "npm:zod@^4.3.6"
   },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "lib": [
+      "dom",
+      "deno.ns",
+      "deno.unstable"
+    ]
+  },
   "publish": {
     "include": [
       "README.md",
+      "docs/**/*.md",
       "deno.json",
       "mod.ts",
-      "contracts.ts",
-      "utils/**/*.ts"
+      "src/**/*.ts"
     ],
     "exclude": [
+      "utils/**",
       "**/*.test.ts",
+      "**/*_test.ts",
+      "tests/**",
+      "examples/**",
       "**/test_utils/**"
     ]
+  },
+  "tasks": {
+    "check": "deno check mod.ts",
+    "test": "deno test --allow-all",
+    "lint": "deno lint",
+    "fmt": "deno fmt --check",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
   }
 }

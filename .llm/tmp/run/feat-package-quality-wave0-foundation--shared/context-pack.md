@@ -12,10 +12,10 @@
 
 ## Current State
 
-Baseline reading and re-audit are complete. `@netscript/shared` currently fails publish dry-run with
-35 slow-type problems and fails doc lint with 106 errors. The current package is already
-`0.0.1-alpha.0`, but it still publishes `./utils`, exposes inferred Zod public aliases, has a short
-README, and lacks `/docs`.
+Implementation and docs are complete for `packages/shared`. The published surface is root-only,
+barrel-only, backed by `src/**`, and excludes the legacy `utils/` folder from the JSR publish set.
+Package doc lint, publish dry-run, package tests, package-scoped standards, and root `deno task
+check` pass.
 
 ## Completed
 
@@ -24,17 +24,21 @@ README, and lacks `/docs`.
 - Ran `deno publish --dry-run --allow-dirty` in `packages/shared`.
 - Verified current consumers of `@netscript/shared` and `@shared/utils`.
 - Recorded Design checkpoint before implementation edits.
+- Moved the published surface into `src/domain`, `src/application`, `src/diagnostics`, and
+  `src/public`.
+- Replaced public dependency class signatures with package-owned schema/procedure types.
+- Added README and package `/docs` structure.
+- Ran final gates.
 
 ## In Progress
 
-- Slice 1 commit: harness artifact creation and design checkpoint.
+- Ready to commit implementation/docs slice and update PR #3.
 
 ## Next Steps
 
-1. Commit Slice 1 and comment on PR #3.
-2. Implement the narrowed published surface under `packages/shared/src/**`.
-3. Run slice gates and commit Slice 2.
-4. Add README and docs structure, then run full gates.
+1. Commit implementation/docs slice.
+2. Push branch.
+3. Comment on PR #3 with slice summary and gates.
 
 ## Key Decisions
 
@@ -52,19 +56,26 @@ README, and lacks `/docs`.
 | `.llm/tmp/run/feat-package-quality-wave0-foundation--shared/context-pack.md` | new | Resumable run state. |
 | `.llm/tmp/run/feat-package-quality-wave0-foundation--shared/drift.md` | new | Drift log. |
 | `.llm/tmp/run/feat-package-quality-wave0-foundation--shared/commits.md` | new | Commit tracker. |
+| `packages/shared/mod.ts` | modified | Root barrel-only public entry. |
+| `packages/shared/deno.json` | modified | Root-only exports, strict compiler options, publish include/exclude. |
+| `packages/shared/src/**` | new | Published implementation split. |
+| `packages/shared/README.md` | modified | Mandated docs sections and examples. |
+| `packages/shared/docs/**` | new | Package docs structure. |
+| `packages/shared/contracts.ts` | deleted | Stale published-surface predecessor replaced by `src/**`. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 |-------------|----------------|----------|
-| Static | baseline failing | publish dry-run 35 slow-types; doc lint 106 errors; standards 1 fail |
-| Fitness | baseline failing/warn | F-5/F-6/F-7 fail; F-11 warn due legacy `utils/` |
+| Static | passing | publish dry-run 0 slow-types; doc lint clean; package standards exits 0 |
+| Fitness | passing with residual warnings | naming/test-location warnings remain for legacy unpublished `utils/` |
 | Runtime | n/a | A1 small contract |
-| Consumer | pending | final `deno task check` required |
+| Consumer | passing | `deno task check` green |
 
 ## Open Questions
 
-- Whether the evaluator will accept retaining the physical unpublished `utils/` folder for later-wave consumer migration. This is logged as significant drift rather than silently treated as done.
+- Evaluator should confirm acceptance of retaining the physical unpublished `utils/` folder for later-wave consumer migration.
+- Evaluator should note that exact root standards command without `--root` fails on repository-root metadata outside Wave 0, while package-scoped standards passes.
 
 ## Drift and Debt
 
@@ -73,4 +84,4 @@ README, and lacks `/docs`.
 
 ## Commits
 
-- Pending.
+- `27b4bf3`: `chore(shared): record wave0 design baseline`

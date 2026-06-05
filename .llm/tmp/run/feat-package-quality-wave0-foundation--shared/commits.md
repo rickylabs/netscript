@@ -10,3 +10,4 @@ Format:
 
 ## Log
 
+- 27b4bf3: chore(shared): record wave0 design baseline

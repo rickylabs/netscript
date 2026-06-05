@@ -42,3 +42,13 @@ or current-state documentation.
 - **Severity:** significant
 - **Action:** defer
 - **Evidence:** `plugins/sagas/deno.json`, `plugins/workers/deno.json`, imports of `notFound` from `@shared/utils`.
+
+## 2026-06-05 — Exact root standards command is broader than Wave 0 package scope
+
+- **What:** `deno run --allow-read tools/fitness/check-netscript-standards.ts` without `--root packages/shared` checks the repository root and fails on root `deno.json` package metadata plus unrelated whole-tree warnings.
+- **Source:** Final gate run after package implementation.
+- **Expected:** The Wave 0 gate describes README, `/docs`, `mod.ts`, and export-map readiness for `packages/shared`.
+- **Actual:** The package-scoped command exits 0 for `packages/shared`; the root command fails on non-package root metadata outside the Wave 0 surface.
+- **Severity:** significant
+- **Action:** accept
+- **Evidence:** package-scoped command: `FAIL=0`; root command: `FAIL=4` for root `deno.json` license, description, publish include, and root export map.
