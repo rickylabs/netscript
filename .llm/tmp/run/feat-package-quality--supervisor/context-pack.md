@@ -36,7 +36,7 @@ gate matrix green per unit.
    --out .llm/tmp/run/feat-package-quality--supervisor/audit --include-plugins`;
    log the delta vs the 2026-05 inventory in `drift.md`.
 2. Launch **Wave 0** (`@netscript/shared`) per `supervisor.md` § 2: branch
-   `feat/package-quality/wave0-foundation`, nested sub-run, Design checkpoint,
+   `feat/package-quality-wave0-foundation`, nested sub-run, Design checkpoint,
    slices, gates, **separate evaluator**, merge `--no-ff`.
 3. Proceed Wave 1 → Wave 6 in order; never start a wave before the prior is `merged`.
 
