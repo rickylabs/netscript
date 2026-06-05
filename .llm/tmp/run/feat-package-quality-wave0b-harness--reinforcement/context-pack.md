@@ -12,9 +12,9 @@
 
 ## Current State
 
-Plan & Design artifacts committed. Plan-Gate consistency review in progress.
-Group A creates the Plan-Gate, so its own PLAN-EVAL is a consistency review
-(not a separate session) due to chicken-and-egg.
+All 7 commit slices (A1–A7) implemented. Validation complete: deno fmt clean,
+17/17 cross-references resolve, self-consistency table passes. Ready for
+IMPL-EVAL and draft PR.
 
 ## Completed
 
@@ -69,3 +69,11 @@ Group A creates the Plan-Gate, so its own PLAN-EVAL is a consistency review
 ## Commits
 
 - b8d9c9a: plan(wave0b): Plan & Design artifacts for harness reinforcement
+- e54a74c: feat(harness): rewrite run-loop.md to 8-phase model with Plan-Gate
+- ab7eb38: feat(harness): add Plan-Gate definition and checklist
+- 2ecdcd0: feat(harness): add PLAN-EVAL protocol and FAIL_PLAN verdict
+- 51df61d: feat(harness): add plan-eval and research templates
+- 3ddf79a: feat(harness): update activation and supervisor for Plan-Gate
+- 6a797bc: feat(harness): update SKILL and IMPL-EVAL protocol for dual evaluator passes
+- f2d818b: feat(harness): add lesson and update indices to 8-phase model
+- 7fcf3e3: style(harness): deno fmt on all changed markdown

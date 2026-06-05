@@ -71,6 +71,14 @@ template under `templates/`, and update `README.md` + `DOCTRINE-REF.md` indices.
 |------|-------|------|-------|
 | 2026-06-05 | Setup | Branch + run dir created | `feat/package-quality-wave0b-harness` |
 | 2026-06-05 | Plan | research.md + plan.md written | Re-baseline complete; divergences recorded |
+| 2026-06-05 | A1 | run-loop.md rewritten | 8-phase model committed |
+| 2026-06-05 | A2 | plan-gate.md added | Plan-Gate definition committed |
+| 2026-06-05 | A3 | plan-protocol.md + verdict-definitions.md | FAIL_PLAN added; PLAN-EVAL protocol committed |
+| 2026-06-05 | A4 | plan-eval.md + research.md templates | New templates committed |
+| 2026-06-05 | A5 | activation.md + supervisor.md | Plan-Gate references added |
+| 2026-06-05 | A6 | SKILL.md + evaluator/protocol.md | Dual evaluator passes documented |
+| 2026-06-05 | A7 | lesson + README/DOCTRINE-REF | Indices updated to 8-phase model |
+| 2026-06-05 | Validation | deno fmt + cross-reference + self-consistency | All passed |
 
 ## Decisions
 
@@ -92,9 +100,9 @@ template under `templates/`, and update `README.md` + `DOCTRINE-REF.md` indices.
 
 | Gate | Command or check | Result | Notes |
 |------|------------------|--------|-------|
-| Cross-reference integrity | Manual path resolution | NOT_RUN | Will run post-implementation |
-| Self-consistency | Table comparison | NOT_RUN | Will run post-implementation |
-| Format | `deno fmt` | NOT_RUN | Will run post-implementation |
+| Cross-reference integrity | Manual path resolution | PASS | 17 referenced paths all resolve to real files |
+| Self-consistency | Table comparison | PASS | 8 phases, 2 evaluators, new artifacts agree across all files |
+| Format | `deno fmt` | PASS | 15 files formatted, no errors |
 
 ### Fitness Gates
 
