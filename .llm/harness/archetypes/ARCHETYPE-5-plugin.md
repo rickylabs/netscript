@@ -4,11 +4,11 @@
 
 - Axioms: A1, A2, A5, A7, A8, A9, A10, A11, A12, A13, A14.
 - Primary sections:
-  - `doctrine/05-folder-structure.md`
-  - `doctrine/06-archetypes.md#archetype-5--plugin-package`
-  - `doctrine/07-composition-and-extension.md#plugin-discovery-and-loading`
-  - `doctrine/08-runtime-state-failure.md` when plugin contributes runtime work
-  - `doctrine/09-anti-patterns-and-fitness-functions.md`
+  - `docs/architecture/doctrine/05-folder-structure.md`
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`
+  - `docs/architecture/doctrine/07-composition-and-extension.md#plugin-discovery-and-loading`
+  - `docs/architecture/doctrine/08-runtime-state-failure.md` when plugin contributes runtime work
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-3, AP-8, AP-9, AP-10, AP-11, AP-13, AP-14, AP-16, AP-19, AP-20.
 - Fitness functions: F-1, F-3, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-13 when runtime
   declarations require it, F-14, F-15.
@@ -20,7 +20,7 @@ database/schema pieces, jobs, sagas, triggers, streams, or verification to the N
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `doctrine/06-archetypes.md#archetype-5--plugin-package`. The package
+Use the canonical shape in `docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`. The package
 reuses sibling package contracts instead of redefining them and exposes explicit service/background
 entrypoints.
 
@@ -32,8 +32,8 @@ entrypoints.
 
 ## Read First
 
-1. `doctrine/06-archetypes.md#archetype-5--plugin-package`.
-2. `doctrine/07-composition-and-extension.md#plugin-discovery-and-loading`.
+1. `docs/architecture/doctrine/06-archetypes.md#archetype-5--plugin-package`.
+2. `docs/architecture/doctrine/07-composition-and-extension.md#plugin-discovery-and-loading`.
 3. Sibling package contracts the plugin re-exports or consumes.
 4. Plugin `contracts.ts`, `mod.ts`, `deno.json`, verification file, services, database files, and
    runtime declarations.

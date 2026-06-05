@@ -47,26 +47,34 @@ package structure. It is organized around three concerns:
 
 ```
 packages/
-  shared/          # Foundation types, schemas, invariants
-  config/          # Configuration management
-  cron/            # Job scheduling
-  database/        # Database abstractions
-  queue/           # Message queuing
-  kv/              # Key-value storage
-  telemetry/       # Observability
-  triggers/        # Event triggers
-  workers/         # Background workers
-  sagas/           # Long-running workflows
-  fresh/           # Fresh framework integration
-  service/         # Service runtime
-  plugin/          # Plugin SDK
-  cli/             # Command-line interface
-  aspire/          # .NET Aspire integration
-  runtime-config/  # Runtime configuration
+  shared/                # Foundation types, schemas, invariants
+  contracts/             # Contract primitives, schemas, CRUD/query/transform helpers
+  config/                # Typed project configuration schemas and loaders
+  runtime-config/        # Runtime configuration resolution
+  logger/                # Logging
+  telemetry/             # OpenTelemetry instrumentation
+  aspire/                # .NET Aspire integration
+  kv/                    # Key-value storage
+  database/              # Database ports and adapters
+  prisma-adapter-mysql/  # Prisma MySQL adapter
+  queue/                 # Message queuing
+  cron/                  # Job scheduling
+  plugin/                # Plugin runner and authoring SDK
+  plugin-streams-core/   # Streams plugin core
+  plugin-workers-core/   # Workers plugin core
+  plugin-sagas-core/     # Sagas plugin core
+  plugin-triggers-core/  # Triggers plugin core
+  watchers/              # Resource watchers
+  sdk/                   # SDK surface
+  service/               # Service runtime
+  fresh/                 # Fresh 2.x framework integration
+  fresh-ui/              # Fresh UI components
+  cli/                   # Command-line interface
 plugins/
-  triggers/        # Trigger plugin
-  workers/         # Worker plugin
-  ...
+  streams/               # Streams plugin
+  workers/               # Workers plugin
+  sagas/                 # Sagas plugin
+  triggers/              # Triggers plugin
 docs/
   architecture/    # Public-facing architecture docs and doctrine
 .agents/
@@ -79,21 +87,22 @@ docs/
 
 ### Subsystems Index
 
-| Subsystem         | Doc                   | What it covers                             |
-| ----------------- | --------------------- | ------------------------------------------ |
-| Data Contract     | `packages/shared/`    | Foundation types and schemas               |
-| Configuration     | `packages/config/`    | Schema-driven config with validation       |
-| Scheduling        | `packages/cron/`      | Cron expression parsing and job scheduling |
-| Database          | `packages/database/`  | Database ports, adapters, and migrations   |
-| Queuing           | `packages/queue/`     | Message queue abstractions                 |
-| KV Store          | `packages/kv/`        | Key-value storage with TTL and namespacing |
-| Telemetry         | `packages/telemetry/` | OpenTelemetry instrumentation              |
-| Triggers          | `packages/triggers/`  | Event-driven trigger system                |
-| Workers           | `packages/workers/`   | Background job execution                   |
-| Sagas             | `packages/sagas/`     | Durable workflow orchestration             |
-| Fresh Integration | `packages/fresh/`     | Fresh 2.x framework bindings               |
-| CLI               | `packages/cli/`       | Command-line scaffolding and tooling       |
-| Plugin SDK        | `packages/plugin/`    | Plugin authoring SDK                       |
+| Subsystem         | Path                       | What it covers                             |
+| ----------------- | -------------------------- | ------------------------------------------ |
+| Foundation        | `packages/shared/`         | Foundation types, schemas, invariants      |
+| Contracts         | `packages/contracts/`      | Contract primitives, CRUD/query/transform  |
+| Configuration     | `packages/config/`         | Schema-driven config with validation       |
+| Runtime config    | `packages/runtime-config/` | Runtime configuration resolution           |
+| Logging           | `packages/logger/`         | Structured logging                         |
+| Telemetry         | `packages/telemetry/`      | OpenTelemetry instrumentation              |
+| KV store          | `packages/kv/`             | Key-value storage with TTL and namespacing |
+| Database          | `packages/database/`       | Database ports and adapters                |
+| Queuing           | `packages/queue/`          | Message queue abstractions                 |
+| Scheduling        | `packages/cron/`           | Cron expression parsing and job scheduling |
+| Plugin SDK        | `packages/plugin/`         | Plugin runner and authoring SDK            |
+| Plugin cores      | `packages/plugin-*-core/`  | Streams, workers, sagas, triggers cores    |
+| CLI               | `packages/cli/`            | Command-line scaffolding and tooling       |
+| Fresh integration | `packages/fresh/`          | Fresh 2.x framework bindings               |
 
 ---
 
@@ -111,8 +120,8 @@ docs/
 deno fmt
 deno lint
 
-# Type check affected packages
-deno check packages/**/*.ts
+# Type check all packages and plugins
+deno task check
 
 # Run tests
 deno task test
@@ -153,25 +162,25 @@ See `.agents/skills/README.md` for the full scope table.
 
 ## Working with AI Agents
 
-| Doc                                                        | Why you'd read this                                   |
-| ---------------------------------------------------------- | ----------------------------------------------------- |
-| [Harness Activation](.llm/harness/workflow/activation.md)  | Bootstrap reading list and mandatory artifacts.       |
-| [Run Loop](.llm/harness/workflow/run-loop.md)              | The 8-phase model with Plan-Gate and dual evaluators. |
-| [Plan-Gate](.llm/harness/gates/plan-gate.md)               | Checklist for the PLAN-EVAL pass.                     |
-| [Supervisor Workflow](.llm/harness/workflow/supervisor.md) | Multi-group supervisor runs.                          |
-| [Skill Authoring](.agents/skills/DEVELOPING.md)            | How to write a new skill.                             |
+| Doc                                                              | Why you'd read this                                   |
+| ---------------------------------------------------------------- | ----------------------------------------------------- |
+| [Harness Activation](../../.llm/harness/workflow/activation.md)  | Bootstrap reading list and mandatory artifacts.       |
+| [Run Loop](../../.llm/harness/workflow/run-loop.md)              | The 8-phase model with Plan-Gate and dual evaluators. |
+| [Plan-Gate](../../.llm/harness/gates/plan-gate.md)               | Checklist for the PLAN-EVAL pass.                     |
+| [Supervisor Workflow](../../.llm/harness/workflow/supervisor.md) | Multi-group supervisor runs.                          |
+| [Skill Authoring](../skills/DEVELOPING.md)                       | How to write a new skill.                             |
 
 ---
 
 ## Reference
 
-| Doc                                                                     | Why you'd read this                                                                  |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [Architecture Doctrine](docs/architecture/doctrine/)                    | The 10-file specification (A1–A14, archetypes, AP-1..AP-20, F-1..F-18).              |
-| [Public Surface Patterns](docs/architecture/PUBLIC-SURFACE-PATTERNS.md) | How to design exports, `mod.ts`, and READMEs for JSR.                                |
-| [Agent Rules](.agents/rules/)                                           | `.mdc` rule files for CLI, architecture, public surface, JSR, platform, and harness. |
-| [Archetype Gate Matrix](.llm/harness/gates/archetype-gate-matrix.md)    | Required gates per archetype.                                                        |
-| [Architecture Debt](.llm/harness/debt/arch-debt.md)                     | Persistent debt entries with owners and closing gates.                               |
+| Doc                                                                           | Why you'd read this                                                                  |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [Architecture Doctrine](../../docs/architecture/doctrine/)                    | The 10-file specification (A1–A14, archetypes, AP-1..AP-20, F-1..F-18).              |
+| [Public Surface Patterns](../../docs/architecture/PUBLIC-SURFACE-PATTERNS.md) | How to design exports, `mod.ts`, and READMEs for JSR.                                |
+| [Agent Rules](../rules/)                                                      | `.mdc` rule files for CLI, architecture, public surface, JSR, platform, and harness. |
+| [Archetype Gate Matrix](../../.llm/harness/gates/archetype-gate-matrix.md)    | Required gates per archetype.                                                        |
+| [Architecture Debt](../../.llm/harness/debt/arch-debt.md)                     | Persistent debt entries with owners and closing gates.                               |
 
 ---
 

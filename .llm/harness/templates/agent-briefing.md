@@ -26,7 +26,7 @@ You are implementing Phase Group <X> (<name>) of the <supervisor> supervisor run
 
 ### Harness mode
 Use harness. Read workflow/activation.md + workflow/run-loop.md.
-For package/plugin work also load .claude/skills/netscript-doctrine/SKILL.md and
+For package/plugin work also load .agents/skills/netscript-doctrine/SKILL.md and
 select your archetype from archetypes/README.md; apply scope overlays; read
 gates/archetype-gate-matrix.md and debt/arch-debt.md.
 

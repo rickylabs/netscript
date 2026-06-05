@@ -1,7 +1,7 @@
 # Architecture Debt Registry
 
 Seeded from
-`.llm/research/architecture-doctrine-docs-v2/doctrine/10-codebase-verdict-and-handoff.md` on
+`docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on
 2026-04-29. Entries track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts.
 `Keep` and `Defer` verdicts are not seeded here.
 

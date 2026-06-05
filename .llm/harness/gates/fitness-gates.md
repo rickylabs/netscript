@@ -1,7 +1,7 @@
 # Fitness Gates
 
 Fitness gates are the executable form of the doctrine. Doctrine source:
-`.llm/research/architecture-doctrine-docs-v2/doctrine/09-anti-patterns-and-fitness-functions.md`.
+`docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`.
 
 Phase A does not implement scripts. This file defines the run contract, expected script names, and
 evaluator reporting shape.

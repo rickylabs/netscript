@@ -130,22 +130,22 @@ migration plan and debt entry explicitly cover them.
 
 ## Reference Files
 
-| File                                                                                             | Load when                                   |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------- |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/01-thesis-and-axioms.md`                   | Starting any doctrine-aware run             |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/02-public-surface.md`                      | Exports, `mod.ts`, README, JSR docs         |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/03-base-and-derived-classes.md`            | Classes, inheritance, runners               |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/04-modules-and-helpers.md`                 | Helpers, adapters, `@std/*`, Web Platform   |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/05-folder-structure.md`                    | Folder shape, layering, naming              |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/06-archetypes.md`                          | Archetype selection                         |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/07-composition-and-extension.md`           | Composition root, DI, extension axes        |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/08-runtime-state-failure.md`               | Stateful runtimes, sagas, workers, triggers |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/09-anti-patterns-and-fitness-functions.md` | AP catalog and F gates                      |
-| `.llm/research/architecture-doctrine-docs-v2/doctrine/10-codebase-verdict-and-handoff.md`        | Current verdicts and remediation priorities |
-| `.llm/harness/archetypes/README.md`                                                              | Run-time archetype decision tree            |
-| `.llm/harness/gates/archetype-gate-matrix.md`                                                    | Required gates per archetype                |
-| `.llm/harness/evaluator/anti-pattern-catalog.md`                                                 | Evaluator wording for AP findings           |
-| `.llm/harness/debt/arch-debt.md`                                                                 | Persistent architecture debt registry       |
+| File                                                                   | Load when                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------- |
+| `docs/architecture/doctrine/01-thesis-and-axioms.md`                   | Starting any doctrine-aware run             |
+| `docs/architecture/doctrine/02-public-surface.md`                      | Exports, `mod.ts`, README, JSR docs         |
+| `docs/architecture/doctrine/03-base-and-derived-classes.md`            | Classes, inheritance, runners               |
+| `docs/architecture/doctrine/04-modules-and-helpers.md`                 | Helpers, adapters, `@std/*`, Web Platform   |
+| `docs/architecture/doctrine/05-folder-structure.md`                    | Folder shape, layering, naming              |
+| `docs/architecture/doctrine/06-archetypes.md`                          | Archetype selection                         |
+| `docs/architecture/doctrine/07-composition-and-extension.md`           | Composition root, DI, extension axes        |
+| `docs/architecture/doctrine/08-runtime-state-failure.md`               | Stateful runtimes, sagas, workers, triggers |
+| `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md` | AP catalog and F gates                      |
+| `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`        | Current verdicts and remediation priorities |
+| `.llm/harness/archetypes/README.md`                                    | Run-time archetype decision tree            |
+| `.llm/harness/gates/archetype-gate-matrix.md`                          | Required gates per archetype                |
+| `.llm/harness/evaluator/anti-pattern-catalog.md`                       | Evaluator wording for AP findings           |
+| `.llm/harness/debt/arch-debt.md`                                       | Persistent architecture debt registry       |
 
 ## Checklist
 

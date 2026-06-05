@@ -18,6 +18,10 @@ operate this codebase end-to-end without re-deriving the API from documentation 
 | `deno-fresh`          | Frontend development with Fresh 2.x, Preact, and Tailwind CSS in Deno.                          | active |
 | `netscript-standards` | **LEGACY** — Superseded by `netscript-doctrine`. Do not use for new work.                       | legacy |
 
+> **Not yet in this repo.** These skills exist in the broader NetScript toolkit but are not present
+> in this repository yet — do not assume their guidance is loadable here: `deno-expert`,
+> `frontend-design`, `ux-patterns`, `tailwind`, `web-design`, `aspire`, `rtk`.
+
 ---
 
 ## Router

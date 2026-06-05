@@ -13,7 +13,7 @@ implementation slice, and the full **IMPL-EVAL** at Evaluate. The Plan-Gate is a
 2. Select the smallest doctrine archetype that fits.
 3. Apply any scope overlay for frontend, service, or docs work.
 4. Read `debt/arch-debt.md` for relevant open debt.
-5. Read the current doctrine verdict in `doctrine/10-codebase-verdict-and-handoff.md`.
+5. Read the current doctrine verdict in `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`.
 6. Seed `plan.md`.
 
 ## 2. Research

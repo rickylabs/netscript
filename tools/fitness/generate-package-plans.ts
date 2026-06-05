@@ -358,7 +358,7 @@ ${namingMap(pkg, jsr)}
 ## 9. References
 
 - PLAN.md — wave ${wave}, archetype ${arch.name}
-- doctrine — \`.llm/research/architecture-doctrine-docs-v2/doctrine/\`
+- doctrine — \`docs/architecture/doctrine/\`
 - standards — \`${HARMON}/STANDARDS.md\`
 - patterns — \`${HARMON}/PUBLIC-SURFACE-PATTERNS.md\`
 - docs spec — \`${HARMON}/DOCS-STRUCTURE.md\`

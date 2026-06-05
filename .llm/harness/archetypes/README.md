@@ -4,7 +4,7 @@ Archetype profiles replace v1 task-category profiles for package and plugin work
 archetype defines the validation shape; scope overlays add frontend, service, or docs-specific
 checks.
 
-Doctrine source: `.llm/research/architecture-doctrine-docs-v2/doctrine/06-archetypes.md`.
+Doctrine source: `docs/architecture/doctrine/06-archetypes.md`.
 
 ## Decision Order
 

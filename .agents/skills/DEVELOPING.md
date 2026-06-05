@@ -81,7 +81,8 @@ Example shape:
 ```markdown
 ## What NetScript doesn't do yet
 
-- **Feature X** — Not implemented. Workaround: use Y. Route to `prisma-next-feedback` for tracking.
+- **Feature X** — Not implemented. Workaround: use Y. Track via a GitHub issue (or
+  `.llm/harness/debt/arch-debt.md` for framework-level gaps).
 ```
 
 ### 9. Reference Files

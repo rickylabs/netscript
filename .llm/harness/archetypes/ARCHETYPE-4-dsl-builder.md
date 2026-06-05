@@ -4,11 +4,11 @@
 
 - Axioms: A1, A2, A3, A6, A8, A9, A10, A11, A14.
 - Primary sections:
-  - `doctrine/02-public-surface.md`
-  - `doctrine/05-folder-structure.md`
-  - `doctrine/06-archetypes.md#archetype-4--public-dsl--builder`
-  - `doctrine/07-composition-and-extension.md`
-  - `doctrine/09-anti-patterns-and-fitness-functions.md`
+  - `docs/architecture/doctrine/02-public-surface.md`
+  - `docs/architecture/doctrine/05-folder-structure.md`
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-4--public-dsl--builder`
+  - `docs/architecture/doctrine/07-composition-and-extension.md`
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-2, AP-7, AP-8, AP-9, AP-11, AP-13, AP-14, AP-15, AP-16, AP-19, AP-20.
 - Fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-14, F-15.
 
@@ -20,7 +20,7 @@ materializes a long-running runtime, add the relevant runtime gates.
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `doctrine/06-archetypes.md#archetype-4--public-dsl--builder`. The builder
+Use the canonical shape in `docs/architecture/doctrine/06-archetypes.md#archetype-4--public-dsl--builder`. The builder
 must be split by concern: entry function, builder class, state, validation, definition factory, and
 runtime only when needed.
 
@@ -32,9 +32,9 @@ runtime only when needed.
 
 ## Read First
 
-1. `doctrine/06-archetypes.md#archetype-4--public-dsl--builder`.
-2. `doctrine/02-public-surface.md`.
-3. `doctrine/07-composition-and-extension.md`.
+1. `docs/architecture/doctrine/06-archetypes.md#archetype-4--public-dsl--builder`.
+2. `docs/architecture/doctrine/02-public-surface.md`.
+3. `docs/architecture/doctrine/07-composition-and-extension.md`.
 4. The README quick start, `mod.ts`, builders, definition types, and tests.
 5. Consumers that call the builder chain.
 6. Relevant debt entries.

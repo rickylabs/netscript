@@ -14,7 +14,7 @@ This skill has been superseded by the doctrine-aligned skill:
 
 Authoritative sources now live at:
 
-- `.llm/research/architecture-doctrine-docs-v2/doctrine/`
+- `docs/architecture/doctrine/`
 - `.llm/harness/archetypes/`
 - `.llm/harness/gates/`
 - `.llm/harness/debt/arch-debt.md`
