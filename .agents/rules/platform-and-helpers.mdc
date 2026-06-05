@@ -1,0 +1,19 @@
+---
+description: Prefer Deno, Web Platform, and @std primitives before adding helpers.
+globs:
+  - "packages/**/*.ts"
+  - "plugins/**/*.ts"
+alwaysApply: false
+---
+
+# Platform And Helpers
+
+- Before adding a helper, check `docs/architecture/doctrine/04-modules-and-helpers.md` for the
+  justification bar and the `@std/*` lookup table.
+- A helper must introduce a real test seam, encode NetScript-specific policy, hide stable non-trivial
+  computation, or remove a frequent identical multi-line pattern.
+- Do not wrap `Deno.*`, Web Platform, or `@std/*` primitives just to rename them.
+- Async package paths that cross IO or time should accept an `AbortSignal` where the doctrine's port
+  and adapter rules call for cancellation.
+- Published code should emit structured diagnostics through ports or reporters; reserve `console.*`
+  for CLI presentation and examples.

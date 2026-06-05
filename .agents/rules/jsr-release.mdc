@@ -1,0 +1,23 @@
+---
+description: Preserve JSR readiness and alpha release invariants.
+globs:
+  - "packages/**/deno.json"
+  - "packages/**/mod.ts"
+  - "packages/**/README.md"
+  - "plugins/**/deno.json"
+  - "plugins/**/mod.ts"
+  - "plugins/**/README.md"
+alwaysApply: false
+---
+
+# JSR Release
+
+- Keep every publishable member on lockstep `0.0.1-alpha.0` until the release program advances it;
+  see `docs/architecture/STANDARDS.md`.
+- Each package `deno.json` needs JSR audit metadata, explicit exports, and explicit publish
+  include/exclude lists as described in `docs/architecture/STANDARDS.md`.
+- `deno publish --dry-run --allow-dirty` is the release-resolution gate; slow-type cleanup is a
+  package remediation task, not a reason to weaken metadata.
+- Public docs and examples are part of the package contract; keep examples compiling and avoid
+  private workspace paths in published surfaces.
+- Use `.agents/skills/jsr-audit/SKILL.md` for JSR readiness reviews.

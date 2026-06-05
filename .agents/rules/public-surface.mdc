@@ -1,0 +1,24 @@
+---
+description: Treat every published NetScript surface as a JSR-facing contract.
+globs:
+  - "packages/*/mod.ts"
+  - "packages/*/README.md"
+  - "packages/*/deno.json"
+  - "plugins/*/mod.ts"
+  - "plugins/*/README.md"
+  - "plugins/*/deno.json"
+alwaysApply: false
+---
+
+# Public Surface
+
+- Design public types and the README quick start before implementation, following
+  `docs/architecture/doctrine/02-public-surface.md`.
+- Keep `mod.ts` as a named-export manifest with no logic; split large surfaces into subpath exports
+  instead of widening the root entrypoint.
+- Use the naming and `deno.json` standards in `docs/architecture/STANDARDS.md`, including lockstep
+  versioning and explicit publish include/exclude lists.
+- Choose API shapes from `docs/architecture/PUBLIC-SURFACE-PATTERNS.md`: function family, builder,
+  abstract base plus concrete default, DSL, or registry.
+- Do not re-export upstream packages or test fakes from the root surface; use documented subpaths
+  such as `./testing` when callers should import them.
