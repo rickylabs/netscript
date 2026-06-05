@@ -5,7 +5,7 @@
  */
 
 import { implement } from '@orpc/server';
-import { baseContract } from '@netscript/shared';
+import { baseContract } from '@netscript/contracts';
 import { z } from 'zod';
 
 const startTime = Date.now();

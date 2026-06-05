@@ -40,7 +40,15 @@ const INFRASTRUCTURE_GATES = [
 ] as const;
 
 const RUNTIME_GATES = [
+  GATE.PREFLIGHT_DENO,
   GATE.PREFLIGHT_ASPIRE,
+  GATE.SCAFFOLD_INIT,
+  'scaffold.plugin.worker',
+  'scaffold.plugin.saga',
+  'scaffold.plugin.trigger',
+  'scaffold.plugin.stream',
+  GATE.SCAFFOLD_PLUGIN_LIST,
+  GATE.GENERATED_PLUGINS_CHECK,
   GATE.RUNTIME_ASPIRE_RESTORE,
   GATE.RUNTIME_ASPIRE_START,
   GATE.RUNTIME_WAIT_POSTGRES,

@@ -26,10 +26,12 @@ describe('database template generators', () => {
 
     assertEquals(config.name, '@alpha-app/database-postgres');
     assertEquals(config.tasks['db:generate:postgres'], 'deno task db:generate');
+    assertStringIncludes(config.tasks['db:generate'], 'deno task db:clear-seeded-client');
     assertEquals(
-      config.tasks['db:generate'],
-      'deno run -A npm:prisma@^7.4.2 generate --generator client --config prisma.config.ts && deno run -A scripts/generate-zod.ts && deno run -A scripts/fix-zod-imports.ts',
+      config.tasks['db:clear-seeded-client'],
+      'deno run --allow-write=schema/.generated/client.server.ts scripts/clear-seeded-client.ts',
     );
+    assertStringIncludes(config.tasks['db:generate'], 'npm:prisma@^7.4.2 generate');
     assertEquals(config.tasks['db:init'], 'deno run -A scripts/migrate.ts --name=init');
     assertEquals(config.tasks['db:migrate'], 'deno run -A scripts/migrate.ts');
     assertEquals(

@@ -20,7 +20,7 @@
  * @module
  */
 
-import type { PaginationInput, PaginatedResult, PaginationOutput } from '../schemas/pagination.ts';
+import type { PaginatedResult, PaginationInput, PaginationOutput } from '../schemas/pagination.ts';
 
 // ============================================================================
 // TYPES
@@ -30,8 +30,10 @@ import type { PaginationInput, PaginatedResult, PaginationOutput } from '../sche
  * Prisma model delegate type (simplified).
  * Matches the structure of Prisma's model delegates.
  */
-interface PrismaModelDelegate {
+export interface PrismaModelDelegate {
+  /** Find many records using Prisma-compatible arguments. */
   findMany: (args?: unknown) => Promise<unknown[]>;
+  /** Count records using a Prisma-compatible where clause. */
   count: (args?: { where?: unknown }) => Promise<number>;
 }
 
@@ -67,7 +69,7 @@ export interface PaginatedQueryOptions extends Partial<PaginationInput> {
  */
 export async function paginatedQuery<T>(
   model: PrismaModelDelegate,
-  options: PaginatedQueryOptions = {}
+  options: PaginatedQueryOptions = {},
 ): Promise<PaginatedResult<T>> {
   const { page = 1, limit = 10, sortBy, sortOrder = 'desc', where = {}, include, select } = options;
 
@@ -147,7 +149,7 @@ export interface OffsetPaginatedQueryOptions {
  */
 export async function offsetPaginatedQuery<T>(
   model: PrismaModelDelegate,
-  options: OffsetPaginatedQueryOptions = {}
+  options: OffsetPaginatedQueryOptions = {},
 ): Promise<{ data: T[]; total: number; hasMore: boolean }> {
   const { offset = 0, limit = 10, sortBy, sortOrder = 'desc', where = {}, include, select } =
     options;
@@ -215,7 +217,7 @@ export interface CursorPaginatedQueryOptions {
  */
 export async function cursorPaginatedQuery<T extends { id: string | number }>(
   model: PrismaModelDelegate,
-  options: CursorPaginatedQueryOptions = {}
+  options: CursorPaginatedQueryOptions = {},
 ): Promise<{ data: T[]; nextCursor: string | null; hasMore: boolean }> {
   const {
     cursor,

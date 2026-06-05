@@ -226,8 +226,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
-- **Gate:** F-1, F-2, F-11
+- **Status:** partially closed 2026-06-05 — `utils/datetime.ts` was deleted in Wave 0 and the
+  published surface remains free of generic datetime helpers. Residual unpublished `utils/`
+  compatibility for `@shared/utils` consumers is tracked in the Wave 0 drift registry until later
+  plugin waves migrate those imports.
+- **Gate:** F-1 and F-2 closed for datetime; F-11 remains deferred for residual unpublished `utils/`
+  compatibility
 
 ## plugins/triggers — doctrine verdict Refactor
 

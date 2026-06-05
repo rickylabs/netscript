@@ -7,7 +7,7 @@ const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG]: 'packages/config/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: 'packages/service/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN]: 'packages/plugin/mod.ts',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_SHARED]: 'packages/shared/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_CONTRACTS]: 'packages/contracts/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: 'packages/sdk/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT]: 'packages/sdk/client/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_QUERY]: 'packages/sdk/query/mod.ts',

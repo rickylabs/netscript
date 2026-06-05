@@ -17,7 +17,7 @@ import {
 } from '../../../contracts/v1/mod.ts';
 import { getKv } from '@netscript/kv';
 import { collection, createNetscriptDb, type KvObject, model } from '@netscript/kv/kvdex';
-import { notFound } from '@shared/utils';
+import { notFound } from '@netscript/contracts';
 import { getTraceContext } from '@netscript/telemetry/context';
 import { z } from 'zod';
 import { getSagaMetadata, listSagaMetadata, type SagaMetadata } from '../saga-registry.ts';

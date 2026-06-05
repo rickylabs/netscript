@@ -18,7 +18,7 @@ const LOCAL_PACKAGES = [
   'runtime-config',
   'sdk',
   'service',
-  'shared',
+  'contracts',
   'plugin-workers-core',
   'plugin-streams-core',
   'plugin-triggers-core',
