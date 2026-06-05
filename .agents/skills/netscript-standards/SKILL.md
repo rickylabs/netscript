@@ -10,14 +10,13 @@ description: >
 
 This skill has been superseded by the doctrine-aligned skill:
 
-- `.claude/skills/netscript-doctrine/SKILL.md`
+- `.agents/skills/netscript-doctrine/SKILL.md`
 
 Authoritative sources now live at:
 
-- `.llm/research/architecture-doctrine-docs-v2/doctrine/`
+- `docs/architecture/doctrine/`
 - `.llm/harness/archetypes/`
 - `.llm/harness/gates/`
 - `.llm/harness/debt/arch-debt.md`
 
-Do not use this file as a source of standards. Load `netscript-doctrine`
-instead.
+Do not use this file as a source of standards. Load `netscript-doctrine` instead.
