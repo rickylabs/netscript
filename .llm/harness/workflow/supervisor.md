@@ -27,7 +27,7 @@ single command or file. Single-surface changes use the normal `run-loop.md`.
   - **`phase-registry.md`** from `templates/phase-registry.md` — the group map,
     ordering, and live status;
   - `final-pr-handoff.md` + `escalations/` — produced as groups merge.
-- **Each phase group**: branch `feat/<supervisor>/<group>`, a worktree, and a
+- **Each phase group**: branch `feat/<supervisor>-<group>`, a worktree, and a
   nested run dir `<supervisor>-<group>--<suffix>/` with the standard run
   artifacts (its own Design checkpoint + evaluator pass).
 
@@ -49,24 +49,29 @@ Before launching a phase group:
 # 1. From the integration worktree, branch the group off the integration branch
 git checkout feat/<supervisor>
 git pull
-git checkout -b feat/<supervisor>/<group>
+git checkout -b feat/<supervisor>-<group>
 
 # 2. Create the group worktree under the gitignored .worktrees/ root
-git worktree add .worktrees/<group> feat/<supervisor>/<group>
+git worktree add .worktrees/<group> feat/<supervisor>-<group>
 
 # 3. Scaffold the group's nested harness run dir from templates/
 #    .llm/tmp/run/<supervisor>-<group>--<suffix>/
 
 # 4. Push the group branch and open a DRAFT sub-PR against the integration branch
-git push -u origin feat/<supervisor>/<group>
-#    base = feat/<supervisor>, head = feat/<supervisor>/<group>
+git push -u origin feat/<supervisor>-<group>
+#    base = feat/<supervisor>, head = feat/<supervisor>-<group>
 ```
 
 **Every phase group is its own draft PR against the integration branch**
-(`feat/<supervisor>/<group>` → `feat/<supervisor>`), exactly like the PR #96
+(`feat/<supervisor>-<group>` → `feat/<supervisor>`), exactly like the PR #96
 group sub-PRs (#86–#95) and the S0 supervisor (PR #98). All actual implementation
 — each package refactor — happens **only** in the group's worktree on its own
 branch, never directly on the integration branch.
+
+> **Branch naming.** Git cannot create `feat/<supervisor>/<group>` while the
+> branch `feat/<supervisor>` exists (ref dir/file conflict), so a group hangs off
+> the integration name with a **hyphen**: `feat/<supervisor>-<group>` (S0 used
+> `feat/repo-genesis-genesis`). The worktree dir may keep the short `<group>` name.
 
 Brief the group agent with `templates/agent-briefing.md`. The group agent then
 runs the normal `run-loop.md` (Design checkpoint → sliced implementation →
@@ -83,7 +88,7 @@ After a group's evaluator returns `PASS`:
 2. **Merge (preserve history):**
    ```bash
    git checkout feat/<supervisor>
-   git merge feat/<supervisor>/<group> --no-ff \
+   git merge feat/<supervisor>-<group> --no-ff \
      -m "merge(supervisor): <group> (<phases>)"
    ```
    On conflict: **stop, do not force-resolve.** Take the group version for
