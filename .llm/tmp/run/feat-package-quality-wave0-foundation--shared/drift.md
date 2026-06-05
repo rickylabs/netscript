@@ -226,3 +226,20 @@ or current-state documentation.
 - **Severity:** low
 - **Action:** accept
 - **Evidence:** `deno task check` passed after lockfile refresh.
+
+## 2026-06-05 — CLI E2E merge-readiness fixes after contracts migration
+
+- **What:** The full CLI E2E suite exposed post-migration integration blockers outside the original
+  package-only Wave 0 plan.
+- **Source:** `deno task e2e:cli run scaffold.service`, `scaffold.infrastructure`, and
+  `scaffold.runtime` after the `@netscript/shared` to `@netscript/contracts` consolidation.
+- **Expected:** Package migration plus earlier gates would leave generated scaffold workspaces ready.
+- **Actual:** Maintainer scaffold package copying still referenced the removed `packages/shared`;
+  Prisma 7 refused to generate into the seeded non-client `schema/.generated` placeholder; and the
+  runtime E2E capability suite started Aspire without first scaffolding the plugin workspace it
+  depends on.
+- **Severity:** significant
+- **Action:** fixed
+- **Evidence:** Full final pass exited 0 for `scaffold.service`, `scaffold.contracts`,
+  `scaffold.infrastructure`, `scaffold.plugins`, and `scaffold.runtime`; focused CLI tests and
+  `deno task check` also passed.
