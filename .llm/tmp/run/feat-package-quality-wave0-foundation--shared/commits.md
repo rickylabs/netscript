@@ -18,3 +18,5 @@ Format:
 - 9c64021: docs(shared): complete standards docs tree
 
 - 6019c3d: fix(shared): tighten review follow-ups
+
+- 3d44fe9: chore(shared): record cleanup commit
