@@ -1,7 +1,7 @@
 ---
 title: Extending Runtime Config
 description: Extension axes for adding runtime override topics and fields.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 30
 ---
 

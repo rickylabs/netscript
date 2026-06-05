@@ -194,6 +194,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 8 | Gate | `Get-ChildItem docs -Recurse -File` listed 8 docs files under README, architecture, concepts, getting-started, recipes, reference, and advanced. |
 | 2026-06-06 | 9 | Implement | Added runtime-config tests for loader defaults/topic loading/plain pointers, accessors, feature flag fallback, and structured summaries. |
 | 2026-06-06 | 9 | Gate | `deno test --allow-all` passed: 8 tests, 0 failed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 10 | Implement | Ran runtime-config gate sweep and fixed lint/format findings from the new tests/docs plus removed `console.` from the root module example. |
+| 2026-06-06 | 10 | Gate | Runtime-config sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-8/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. |
 
 ## Decisions
 
@@ -246,6 +248,28 @@ A new developer adding a config schema section:
 | `packages/cli` | NOT_RUN | `deno check` | Slice 25 |
 | `plugins/sagas` | NOT_RUN | `deno check` | Slice 26 |
 | `plugins/workers` | NOT_RUN | `deno check` | Slice 26 |
+
+### Runtime-config Slice 10 Sweep
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| Static check | PASS | `deno check mod.ts` |
+| Lint | PASS | `deno lint` |
+| Format | PASS | `deno fmt --check` |
+| F-5 / F-7 doc lint | PASS | `deno doc --lint mod.ts` |
+| F-6 publishability | PASS | `deno publish --dry-run --allow-dirty` = 0 slow-type errors |
+| F-7 README | PASS | `(Get-Content README.md).Count` = 339 |
+| F-7 docs | PASS | `Get-ChildItem docs -Recurse -File` = 8 docs files |
+| F-10 tests | PASS | `deno test --allow-all` = 8 passed, 0 failed |
+| F-1 file size | PASS | No `.ts` or `.md` file > 500 LOC |
+| F-8 workspace lib | PASS | Root `deno.json` includes `deno.ns` and `deno.unstable` |
+| F-11 forbidden folders | PASS | No `utils`, `helpers`, `common`, `lib`, or `interfaces` under `src/` |
+| F-12 naming | PASS | No exported `I*`, `*_T`, or `*Impl` declarations |
+| F-14 console | PASS | No `console.` in `mod.ts` or `src/` |
+| F-15 upstream re-export | PASS | No upstream `npm:`, `jsr:`, `@std`, or `@orpc` re-exports |
+| F-16 cardinality | PASS | No `src/` directory has more than 12 immediate children |
+| F-17 abstract-derived | PASS | No abstract classes or `extends` relationships in `src/` |
+| F-18 sub-barrel | PASS | No `src/**/mod.ts` sub-barrels |
 
 ## Handoff Notes
 

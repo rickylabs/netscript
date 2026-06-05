@@ -1,8 +1,8 @@
-import { assertEquals } from 'jsr:@std/assert';
-import { summarizeRuntimeConfig, type RuntimeConfig } from '../mod.ts';
+import { assertEquals } from 'jsr:@std/assert@^1';
+import { type RuntimeConfig, summarizeRuntimeConfig } from '../mod.ts';
 
 Deno.test('summarizeRuntimeConfig: returns structured disabled override summary', async () => {
-  await withRuntimeDir(async (dir) => {
+  await withRuntimeDir((dir) => {
     const config: RuntimeConfig = {
       jobs: [{ id: 'cleanup', enabled: false }],
       sagas: [{ id: 'registration', enabled: false }],
@@ -34,7 +34,7 @@ Deno.test('summarizeRuntimeConfig: returns structured disabled override summary'
 });
 
 Deno.test('summarizeRuntimeConfig: includes only source message for empty config', async () => {
-  await withRuntimeDir(async (dir) => {
+  await withRuntimeDir((dir) => {
     const summary = summarizeRuntimeConfig({
       jobs: [],
       sagas: [],
@@ -47,7 +47,7 @@ Deno.test('summarizeRuntimeConfig: includes only source message for empty config
   });
 });
 
-async function withRuntimeDir(test: (dir: string) => Promise<void>): Promise<void> {
+async function withRuntimeDir(test: (dir: string) => void | Promise<void>): Promise<void> {
   const previous = Deno.env.get('NETSCRIPT_RUNTIME_CONFIG_DIR');
   const dir = await Deno.makeTempDir();
   Deno.env.set('NETSCRIPT_RUNTIME_CONFIG_DIR', dir);

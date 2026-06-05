@@ -1,7 +1,7 @@
 ---
 title: Runtime Config Basic Usage
 description: Common loader and accessor patterns for runtime overrides.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 10
 ---
 
@@ -10,11 +10,7 @@ order: 10
 Load once at startup:
 
 ```ts
-import {
-  getRuntimeTask,
-  isFeatureEnabled,
-  loadRuntimeConfig,
-} from '@netscript/runtime-config';
+import { getRuntimeTask, isFeatureEnabled, loadRuntimeConfig } from '@netscript/runtime-config';
 
 const config = await loadRuntimeConfig();
 

@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert';
+import { assertEquals } from 'jsr:@std/assert@^1';
 import { dirname, join } from '@std/path';
 import { loadRuntimeConfig } from '../mod.ts';
 

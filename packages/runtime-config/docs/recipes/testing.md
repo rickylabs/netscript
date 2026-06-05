@@ -1,7 +1,7 @@
 ---
 title: Testing Runtime Config
 description: Test pattern for temporary runtime config directories.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 11
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Runtime Config
 description: Documentation entrypoint for @netscript/runtime-config.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 0
 ---
 

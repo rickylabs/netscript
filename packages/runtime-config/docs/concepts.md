@@ -1,7 +1,7 @@
 ---
 title: Runtime Config Concepts
 description: Glossary and invariants for runtime override loading.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 2
 ---
 

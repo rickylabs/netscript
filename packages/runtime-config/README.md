@@ -29,8 +29,8 @@ import { loadRuntimeConfig } from '@netscript/runtime-config';
 
 `@netscript/runtime-config` answers one question:
 
-Can a deployed NetScript process load and reload operational overrides without changing its
-compiled code?
+Can a deployed NetScript process load and reload operational overrides without changing its compiled
+code?
 
 The answer is a `RuntimeConfig` snapshot:
 
@@ -40,13 +40,13 @@ const config = await loadRuntimeConfig();
 
 The snapshot contains five topics:
 
-| Topic | File directory | Shape |
-| ----- | -------------- | ----- |
-| Jobs | `runtime/jobs/` | `JobOverride[]` |
-| Sagas | `runtime/sagas/` | `SagaOverride[]` |
+| Topic    | File directory      | Shape               |
+| -------- | ------------------- | ------------------- |
+| Jobs     | `runtime/jobs/`     | `JobOverride[]`     |
+| Sagas    | `runtime/sagas/`    | `SagaOverride[]`    |
 | Triggers | `runtime/triggers/` | `TriggerOverride[]` |
-| Features | `runtime/features/` | `FeatureFlag[]` |
-| Tasks | `runtime/tasks/` | `RuntimeTask[]` |
+| Features | `runtime/features/` | `FeatureFlag[]`     |
+| Tasks    | `runtime/tasks/`    | `RuntimeTask[]`     |
 
 ## Runtime Directory Resolution
 
@@ -89,11 +89,7 @@ features/v1.0.0.json
 ## Quick Start
 
 ```ts
-import {
-  getJobOverride,
-  isFeatureEnabled,
-  loadRuntimeConfig,
-} from '@netscript/runtime-config';
+import { getJobOverride, isFeatureEnabled, loadRuntimeConfig } from '@netscript/runtime-config';
 
 const config = await loadRuntimeConfig();
 
@@ -137,10 +133,7 @@ messages.
 Use `summarizeRuntimeConfig()` to get caller-owned diagnostics.
 
 ```ts
-import {
-  loadRuntimeConfig,
-  summarizeRuntimeConfig,
-} from '@netscript/runtime-config';
+import { loadRuntimeConfig, summarizeRuntimeConfig } from '@netscript/runtime-config';
 
 const config = await loadRuntimeConfig();
 const summary = summarizeRuntimeConfig(config, '[workers]');
@@ -162,40 +155,40 @@ summary.triggerPathOverrides;
 
 ## Public Functions
 
-| Function | Purpose |
-| -------- | ------- |
-| `loadRuntimeConfig()` | Load the active runtime override snapshot. |
-| `isFeatureEnabled(config, flagId, defaultValue?)` | Resolve a feature flag with a default fallback. |
-| `getJobOverride(config, jobId)` | Find a job override by ID. |
-| `getSagaOverride(config, sagaId)` | Find a saga override by ID. |
-| `getTriggerOverride(config, triggerId)` | Find a trigger override by ID. |
-| `getRuntimeTask(config, taskId)` | Find a runtime task definition by ID. |
-| `watchRuntimeConfig(onChange, options?)` | Watch runtime config files and call the consumer on reload. |
-| `summarizeRuntimeConfig(config, prefix?)` | Return structured diagnostics for the snapshot. |
+| Function                                          | Purpose                                                     |
+| ------------------------------------------------- | ----------------------------------------------------------- |
+| `loadRuntimeConfig()`                             | Load the active runtime override snapshot.                  |
+| `isFeatureEnabled(config, flagId, defaultValue?)` | Resolve a feature flag with a default fallback.             |
+| `getJobOverride(config, jobId)`                   | Find a job override by ID.                                  |
+| `getSagaOverride(config, sagaId)`                 | Find a saga override by ID.                                 |
+| `getTriggerOverride(config, triggerId)`           | Find a trigger override by ID.                              |
+| `getRuntimeTask(config, taskId)`                  | Find a runtime task definition by ID.                       |
+| `watchRuntimeConfig(onChange, options?)`          | Watch runtime config files and call the consumer on reload. |
+| `summarizeRuntimeConfig(config, prefix?)`         | Return structured diagnostics for the snapshot.             |
 
 ## Public Types
 
-| Type | Meaning |
-| ---- | ------- |
-| `RuntimeConfig` | Complete loaded snapshot. |
-| `JobOverride` | Job-level runtime override. |
-| `SagaOverride` | Saga-level runtime override. |
-| `TriggerOverride` | Trigger-level runtime override. |
-| `FeatureFlag` | Runtime feature flag. |
-| `RuntimeTask` | Task definition provided at runtime. |
-| `RuntimeConfigSummary` | Structured diagnostic summary. |
-| `RuntimeTaskRuntime` | Supported task execution runtime. |
-| `RuntimeConfigTopic` | Supported runtime config topic name. |
+| Type                   | Meaning                              |
+| ---------------------- | ------------------------------------ |
+| `RuntimeConfig`        | Complete loaded snapshot.            |
+| `JobOverride`          | Job-level runtime override.          |
+| `SagaOverride`         | Saga-level runtime override.         |
+| `TriggerOverride`      | Trigger-level runtime override.      |
+| `FeatureFlag`          | Runtime feature flag.                |
+| `RuntimeTask`          | Task definition provided at runtime. |
+| `RuntimeConfigSummary` | Structured diagnostic summary.       |
+| `RuntimeTaskRuntime`   | Supported task execution runtime.    |
+| `RuntimeConfigTopic`   | Supported runtime config topic name. |
 
 ## Permissions
 
 The loader and watcher use Deno runtime APIs.
 
-| Permission | Needed for |
-| ---------- | ---------- |
-| `--allow-env=NETSCRIPT_RUNTIME_CONFIG_DIR,NETSCRIPT_TASKS_DIR` | Runtime directory discovery. |
-| `--allow-read=<runtime-dir>` | Reading the pointer and topic JSON files. |
-| `--allow-read=<runtime-dir>` | Watching the directory with `Deno.watchFs()`. |
+| Permission                                                     | Needed for                                    |
+| -------------------------------------------------------------- | --------------------------------------------- |
+| `--allow-env=NETSCRIPT_RUNTIME_CONFIG_DIR,NETSCRIPT_TASKS_DIR` | Runtime directory discovery.                  |
+| `--allow-read=<runtime-dir>`                                   | Reading the pointer and topic JSON files.     |
+| `--allow-read=<runtime-dir>`                                   | Watching the directory with `Deno.watchFs()`. |
 
 Development tests use `--allow-all` in this repository because temporary directories and environment
 variables are created inside the test process.

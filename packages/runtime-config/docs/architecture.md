@@ -1,7 +1,7 @@
 ---
 title: Runtime Config Architecture
 description: Archetype, layering, and boundaries for @netscript/runtime-config.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 1
 ---
 

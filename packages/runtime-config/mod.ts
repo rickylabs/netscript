@@ -17,7 +17,7 @@
  * const enabled = isFeatureEnabled(config, 'worker-rollout', false);
  * const summary = summarizeRuntimeConfig(config);
  *
- * console.log(enabled, summary.messages);
+ * await publishRuntimeStatus({ enabled, messages: summary.messages });
  * ```
  *
  * @module
@@ -33,10 +33,7 @@ export type {
   SagaOverride,
   TriggerOverride,
 } from './src/domain/types.ts';
-export {
-  RUNTIME_CONFIG_TOPICS,
-  RUNTIME_TASK_RUNTIMES,
-} from './src/domain/types.ts';
+export { RUNTIME_CONFIG_TOPICS, RUNTIME_TASK_RUNTIMES } from './src/domain/types.ts';
 export {
   getJobOverride,
   getRuntimeTask,

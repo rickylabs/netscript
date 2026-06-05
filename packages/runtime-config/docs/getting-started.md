@@ -1,7 +1,7 @@
 ---
 title: Getting Started With Runtime Config
 description: Ten-minute first run guide for @netscript/runtime-config.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 3
 ---
 

@@ -16,6 +16,11 @@ Seeded from
   feature slices, kernel adapters, template assets, binary edges, and executable CLI fitness gates
   now cover the former monoliths.
 - **Gate:** F-1, F-5, F-6, F-7
+- **Wave 1 closure evidence:** `feat-package-quality-wave1-contracts--contracts` slice 10 split
+  `packages/runtime-config/mod.ts` into `src/domain/types.ts`, `src/application/loader.ts`,
+  `src/application/watcher.ts`, and `src/diagnostics/summary.ts`; `deno check`, `deno doc --lint`,
+  `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, and
+  `deno fmt --check` pass for the package.
 
 ## packages/config — AP-1 / doctrine verdict Refactor (schema.ts 945 LOC)
 

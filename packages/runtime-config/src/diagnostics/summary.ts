@@ -101,9 +101,7 @@ function formatSummaryMessages(summary: RuntimeConfigSummary): string[] {
 
   for (const override of summary.triggerPathOverrides) {
     messages.push(
-      `${summary.prefix} Trigger '${override.id}' paths overridden: ${
-        override.paths.join('; ')
-      }`,
+      `${summary.prefix} Trigger '${override.id}' paths overridden: ${override.paths.join('; ')}`,
     );
   }
 

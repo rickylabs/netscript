@@ -1,7 +1,7 @@
 ---
 title: Runtime Config Reference
 description: Reference index for @netscript/runtime-config public exports.
-package: "@netscript/runtime-config"
+package: '@netscript/runtime-config'
 order: 20
 ---
 
