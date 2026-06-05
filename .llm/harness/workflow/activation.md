@@ -15,8 +15,10 @@ a harness run.
 5. Read `archetypes/README.md` and the chosen profile (including its
    **Design Checkpoint Expectations** and **Concept of Done** sections).
 6. Read `gates/archetype-gate-matrix.md`.
-7. Instantiate or update the run artifacts from `templates/`.
-8. For a **supervisor / multi-group run** (two or more phase groups), also read
+7. Read `gates/plan-gate.md` and `evaluator/plan-protocol.md`. The Plan-Gate is
+   a hard stop before any implementation slice.
+8. Instantiate or update the run artifacts from `templates/`.
+9. For a **supervisor / multi-group run** (two or more phase groups), also read
    `workflow/supervisor.md` and `workflow/escalation.md`, and instantiate
    `phase-registry.md` from `templates/`.
 
@@ -47,13 +49,16 @@ docs must describe.
 
 Every run directory contains:
 
+- `research.md`
 - `plan.md`
 - `worklog.md` (must include a `## Design` section before implementation)
 - `context-pack.md`
 - `drift.md`
 - `commits.md`
 
-`implement.md` and `evaluate.md` are used when the run phase needs them.
+`implement.md` is used when the run phase needs it.
+`plan-eval.md` (PLAN-EVAL) and `evaluate.md` (IMPL-EVAL) are the two
+evaluator verdicts; each is written in a separate session.
 
 Supervisor (multi-group) runs additionally contain `phase-registry.md` (from
 `templates/phase-registry.md`), `final-pr-handoff.md`, and an `escalations/`

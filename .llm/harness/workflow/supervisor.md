@@ -42,6 +42,8 @@ Before launching a phase group:
 - [ ] `drift.md` reviewed — no unresolved `architectural` drift blocking the
       next group.
 - [ ] `phase-registry.md` updated with the new group's status → `active`.
+- [ ] The group will run its own Plan-Gate (PLAN-EVAL) before implementation
+      — see `run-loop.md` § 4.
 
 ## 2. Group launch protocol
 
@@ -74,8 +76,10 @@ branch, never directly on the integration branch.
 > `feat/repo-genesis-genesis`). The worktree dir may keep the short `<group>` name.
 
 Brief the group agent with `templates/agent-briefing.md`. The group agent then
-runs the normal `run-loop.md` (Design checkpoint → sliced implementation →
-gates), produces its run artifacts, and hands off to a **separate evaluator
+runs the normal `run-loop.md`
+(Research -> Plan & Design -> Plan-Gate/PLAN-EVAL -> sliced implementation ->
+gates) and may not commit an implementation slice before PLAN-EVAL returns
+`PASS`. It produces its run artifacts and hands off to a **separate evaluator
 session**. On `PASS`, the integration owner merges the draft sub-PR `--no-ff`
 (§ 3) and it closes.
 
@@ -83,8 +87,9 @@ session**. On `PASS`, the integration owner merges the draft sub-PR `--no-ff`
 
 After a group's evaluator returns `PASS`:
 
-1. **Pre-merge** — verify the integration branch is current and the group's
-   `evaluate.md` shows `PASS`.
+1. **Pre-merge** — verify the integration branch is current, confirm the group
+   ran the Plan-Gate (`plan-eval.md` = `PASS`) before implementation, and
+   `evaluate.md` = `PASS`.
 2. **Merge (preserve history):**
    ```bash
    git checkout feat/<supervisor>
