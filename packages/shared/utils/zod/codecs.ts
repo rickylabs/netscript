@@ -98,54 +98,61 @@ export const numberToBigInt = z.codec(z.int(), z.bigint(), {
 });
 
 /**
- * Converts ISO datetime strings to JavaScript `Date` objects.
+ * Converts ISO datetime strings to Temporal `Instant` values.
  *
  * **Use case**: API responses, database timestamps
  *
  * @example
  * ```ts
- * const schema = isoDatetimeToDate();
- * schema.decode("2024-01-15T10:30:00.000Z"); // => Date object
- * schema.encode(new Date("2024-01-15")); // => "2024-01-15T00:00:00.000Z"
+ * const schema = isoDatetimeToInstant();
+ * schema.decode("2024-01-15T10:30:00.000Z"); // => Temporal.Instant
+ * schema.encode(Temporal.Instant.from("2024-01-15T00:00:00.000Z"));
+ * // => "2024-01-15T00:00:00Z"
  * ```
  */
-export const isoDatetimeToDate = z.codec(z.iso.datetime(), z.date(), {
-  decode: (isoString) => new Date(isoString),
-  encode: (date) => date.toISOString(),
-});
+export const isoDatetimeToInstant = z.codec(
+  z.iso.datetime(),
+  z.instanceof(Temporal.Instant),
+  {
+    decode: (isoString) => Temporal.Instant.from(isoString),
+    encode: (instant) => instant.toString(),
+  },
+);
 
 /**
- * Converts Unix timestamps (seconds since epoch) to JavaScript `Date` objects.
+ * Converts Unix timestamps (seconds since epoch) to Temporal `Instant` values.
  *
  * **Use case**: Unix timestamps from APIs, databases
  *
  * @example
  * ```ts
- * const schema = epochSecondsToDate();
- * schema.decode(1705314600); // => Date object
- * schema.encode(new Date()); // => Unix timestamp in seconds
+ * const schema = epochSecondsToInstant();
+ * schema.decode(1705314600); // => Temporal.Instant
+ * schema.encode(Temporal.Instant.from("2024-01-15T10:30:00Z"));
+ * // => Unix timestamp in seconds
  * ```
  */
-export const epochSecondsToDate = z.codec(z.int().min(0), z.date(), {
-  decode: (seconds) => new Date(seconds * 1000),
-  encode: (date) => Math.floor(date.getTime() / 1000),
+export const epochSecondsToInstant = z.codec(z.int().min(0), z.instanceof(Temporal.Instant), {
+  decode: (seconds) => Temporal.Instant.fromEpochMilliseconds(seconds * 1000),
+  encode: (instant) => Math.floor(instant.epochMilliseconds / 1000),
 });
 
 /**
- * Converts Unix timestamps (milliseconds since epoch) to JavaScript `Date` objects.
+ * Converts Unix timestamps (milliseconds since epoch) to Temporal `Instant` values.
  *
  * **Use case**: JavaScript timestamps, some APIs
  *
  * @example
  * ```ts
- * const schema = epochMillisToDate();
- * schema.decode(1705314600000); // => Date object
- * schema.encode(new Date()); // => Unix timestamp in milliseconds
+ * const schema = epochMillisToInstant();
+ * schema.decode(1705314600000); // => Temporal.Instant
+ * schema.encode(Temporal.Instant.from("2024-01-15T10:30:00Z"));
+ * // => Unix timestamp in milliseconds
  * ```
  */
-export const epochMillisToDate = z.codec(z.int().min(0), z.date(), {
-  decode: (millis) => new Date(millis),
-  encode: (date) => date.getTime(),
+export const epochMillisToInstant = z.codec(z.int().min(0), z.instanceof(Temporal.Instant), {
+  decode: (millis) => Temporal.Instant.fromEpochMilliseconds(millis),
+  encode: (instant) => instant.epochMilliseconds,
 });
 
 /**
