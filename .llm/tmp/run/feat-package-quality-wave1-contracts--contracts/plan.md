@@ -150,8 +150,10 @@ From `gates/archetype-gate-matrix.md` for Archetype 1:
 | F-10 Test-shape audit | yes | No test file > 500 LOC; tests exist for all three packages. |
 | F-11 Forbidden-folder lint | yes | No `utils/`, `helpers/`, `common/`, `lib/`, `interfaces/` under `src/`. |
 | F-12 Naming-convention lint | yes | No `I*` prefixes, `*_T` suffixes, `*Impl` classes. |
+| F-14 Console-log lint | yes | No `console.*` in published non-presentation code. Proves L5 (`runtime-config` console → return-value diagnostics). `grep -rn "console\." packages/*/mod.ts packages/*/src` returns 0 after slices 3–5. |
 | F-15 Re-export-upstream lint | yes | No `export * from 'npm:...'` or `jsr:...` except `@netscript/*` and `@std/*`. |
 | F-16 Folder-cardinality lint | yes | ≤ 12 immediate children per directory; ≤ 4 nesting levels from `src/`. |
+| F-17 Abstract-derived co-location | yes | No abstract/derived class pairs in any of the three Small Contracts (type-only + factory surfaces). Manual review; `PENDING_SCRIPT` with no detected violation. |
 | F-18 Sub-barrel lint | yes | `config/src/domain/mod.ts` justified with `arch:barrel-ok`. |
 | Static gates | yes | `deno check` passes; `deno lint` passes; `deno fmt --check` passes. |
 | Consumer import validation | yes | `deno check` on CLI + plugins after changes. |
@@ -176,6 +178,7 @@ From `gates/archetype-gate-matrix.md` for Archetype 1:
 | 4 | F-7 | `wc -l README.md` | ≥ 150 |
 | 5 | F-7 | `find docs -type f` | Matches STANDARDS § 7 structure |
 | 6 | F-10 | `deno test --allow-all` | Passes |
+| 6.5 | F-14 | `grep -rn "console\." mod.ts src/` | 0 matches (runtime-config) |
 | 7 | Static | `deno check mod.ts` | 0 errors |
 | 8 | Static | `deno lint` | 0 errors |
 | 9 | Static | `deno fmt --check` | 0 errors |

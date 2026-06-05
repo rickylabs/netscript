@@ -21,3 +21,13 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** minor
 - **Action:** accept — locked in plan.md L1.
 - **Evidence:** `plan.md` § Archetype.
+
+## 2026-06-05 — PLAN-EVAL gate-set adjustment
+
+- **What:** The plan's selected Archetype-1 fitness gate set omitted **F-14 (Console-log lint)** and **F-17 (Abstract-derived co-location)**, both marked `required` for Arch 1 in `gates/archetype-gate-matrix.md`.
+- **Source:** PLAN-EVAL checklist walk vs. `.llm/harness/gates/archetype-gate-matrix.md`.
+- **Expected:** Gate set lists every `required` Arch-1 gate.
+- **Actual:** F-14 and F-17 missing; F-14 is materially relevant because L5 removes `runtime-config` console usage and F-14 is its proving gate.
+- **Severity:** minor
+- **Action:** adjust — added F-14 (mapped to L5) and F-17 (PENDING_SCRIPT, no violation) to `plan.md` §Fitness Gates + Validation Plan and `worklog.md` gate table. Plan-Gate "Gate set selected" box now satisfied; verdict PASS.
+- **Evidence:** `plan-eval.md`, `plan.md` §Fitness Gates.

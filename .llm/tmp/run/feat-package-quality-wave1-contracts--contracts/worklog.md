@@ -214,8 +214,10 @@ A new developer adding a config schema section:
 | F-10 Test-shape audit | PENDING_SCRIPT | Tests exist / will be added | `runtime-config` needs tests |
 | F-11 Forbidden-folder lint | PENDING_SCRIPT | No `helpers/` after renames | Will verify after slices 11, 19, 20 |
 | F-12 Naming-convention lint | PENDING_SCRIPT | Manual review | No violations detected |
+| F-14 Console-log lint | PENDING_SCRIPT | `grep -rn "console\." mod.ts src/` after slices 3–5 | runtime-config console usage removed by L5 |
 | F-15 Re-export-upstream lint | PENDING_SCRIPT | No upstream re-exports | Will verify |
 | F-16 Folder-cardinality lint | PENDING_SCRIPT | ≤ 12 children per dir | Will verify |
+| F-17 Abstract-derived co-location | PENDING_SCRIPT | No abstract/derived class pairs | Type-only/factory surfaces; no violation |
 | F-18 Sub-barrel lint | PENDING_SCRIPT | `arch:barrel-ok` on domain mod.ts | Slice 17 |
 
 ### Consumer Gates

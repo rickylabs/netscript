@@ -5,7 +5,7 @@
 | Run ID | `feat-package-quality-wave1-contracts--contracts` |
 | Branch | `feat/package-quality-wave1-contracts` |
 | Base | `feat/package-quality` (Wave 0 `shared` + Wave 0b harness/docs merged) |
-| Phase | **Plan & Design — READY FOR REVIEW** |
+| Phase | **Plan & Design — PLAN-EVAL PASS (adjusted)** |
 | Units | `@netscript/config`, `@netscript/contracts`, `@netscript/runtime-config` |
 | Archetype | 1 — Small Contract (all three) |
 | Scope overlay | none (package wave) |
@@ -21,7 +21,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] `worklog.md` — Design checkpoint with public surface, domain vocabulary, 27 commit slices
 - [x] `drift.md` — re-baseline drift logged
 - [x] `commits.md` — scaffolded (no commits yet)
-- [ ] `plan-eval.md` — pending PLAN-EVAL session
+- [x] `plan-eval.md` — **PLAN-EVAL PASS** (Arch-1 gate set adjusted: added F-14 Console-log, F-17 Abstract-derived co-location)
 
 ## Key findings (re-baselined)
 
