@@ -204,6 +204,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 13 | Gate | `deno doc --lint mod.ts` passed after slices 12 and 13 were both present; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 14 | Implement | Exported merge subpath contribution entry types, `NetScriptConfig`, and the referenced config type family; documented `PartialConfig` properties. |
 | 2026-06-06 | 14 | Gate | `deno doc --lint src/merge/mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 15 | Implement | Added JSDoc to plugin schema interfaces and replaced public `z.ZodType` annotations with a local `PluginSettingsSchema<T>` parse/safeParse contract. |
+| 2026-06-06 | 15 | Gate | `deno doc --lint src/schema/plugins/mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 

@@ -35,6 +35,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 11 — `config/helpers.ts` renamed to `src/domain/saga-inputs.ts`; `deno check mod.ts` passed.
 - [x] Slices 12-13 — `SagaGroupInput` exported and remaining `types.ts` JSDoc added; `deno doc --lint mod.ts` passed.
 - [x] Slice 14 — config merge subpath private-type-ref fixed; `deno doc --lint src/merge/mod.ts` passed.
+- [x] Slice 15 — config plugin schemas documented and Zod internal public type leak removed; `deno doc --lint src/schema/plugins/mod.ts` passed.
 
 ## Key findings (re-baselined)
 

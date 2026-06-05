@@ -58,3 +58,18 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Action:** export the referenced config types from `src/merge/mod.ts`; keep runtime behavior
   unchanged.
 - **Evidence:** `deno doc --lint src/merge/mod.ts` passed after expanding the type exports.
+
+## 2026-06-06 — Config plugin schema public annotation
+
+- **What:** Slice 15 planned to remove `z.ZodType` public annotations by using inferred schema
+  types.
+- **Source:** `deno doc --lint src/schema/plugins/mod.ts`.
+- **Expected:** Removing explicit `z.ZodType` annotations is enough.
+- **Actual:** Doc-lint requires explicit types for exported schema constants, and
+  `ReturnType<typeof z.object<...>>` still leaks private Zod internals. A local
+  `PluginSettingsSchema<T>` parse/safeParse contract keeps the public surface documented without
+  naming Zod internals.
+- **Severity:** minor
+- **Action:** expose schema constants as `PluginSettingsSchema<T>`; runtime values remain Zod
+  schemas.
+- **Evidence:** `deno doc --lint src/schema/plugins/mod.ts` passed.
