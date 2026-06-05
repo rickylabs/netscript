@@ -22,6 +22,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] `drift.md` — re-baseline drift logged
 - [x] `commits.md` — scaffolded (no commits yet)
 - [x] `plan-eval.md` — **PLAN-EVAL PASS** (Arch-1 gate set adjusted: added F-14 Console-log, F-17 Abstract-derived co-location)
+- [x] Slice 1 — `runtime-config` domain types scaffolded; `deno doc --lint src/domain/types.ts` passed.
 
 ## Key findings (re-baselined)
 

@@ -176,6 +176,8 @@ A new developer adding a config schema section:
 | — | — | Research | Re-baselined all three units against current tree. Real slow-type count = 0 for all. |
 | — | — | Plan & Design | Locked 8 decisions, 27 commit slices, archetype = 1 for all three. |
 | — | — | PLAN-EVAL | `PASS` (adjusted). Evaluator added F-14 and F-17 to the gate set. |
+| 2026-06-06 | 1 | Implement | Added `packages/runtime-config/src/domain/types.ts` with documented runtime override types and finite runtime/topic constants. |
+| 2026-06-06 | 1 | Gate | `deno doc --lint src/domain/types.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 
