@@ -1,8 +1,4 @@
-import {
-  epochMillisToInstant,
-  epochSecondsToInstant,
-  isoDatetimeToInstant,
-} from './codecs.ts';
+import { epochMillisToInstant, epochSecondsToInstant, isoDatetimeToInstant } from './codecs.ts';
 
 function assertEquals<T>(actual: T, expected: T): void {
   if (actual !== expected) {

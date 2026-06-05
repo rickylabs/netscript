@@ -13,6 +13,8 @@ import { z } from 'zod';
 // The browser runtime exports the same Decimal class without heavy server dependencies.
 import { Decimal } from 'npm:@prisma/client@^7.3.0/runtime/index-browser';
 
+type Codec<Input, Output> = z.ZodCodec<z.ZodType<Input>, z.ZodType<Output>>;
+
 /**
  * Converts string representations of numbers to JavaScript `number` type.
  *
@@ -75,7 +77,7 @@ export function stringToInt<T extends z.ZodNumber | z.ZodDefault<z.ZodNumber>>(
  * schema.encode(12345n); // => "12345"
  * ```
  */
-export const stringToBigInt = z.codec(z.string(), z.bigint(), {
+export const stringToBigInt: Codec<string, bigint> = z.codec(z.string(), z.bigint(), {
   decode: (str) => BigInt(str),
   encode: (bigint) => bigint.toString(),
 });
@@ -92,7 +94,7 @@ export const stringToBigInt = z.codec(z.string(), z.bigint(), {
  * schema.encode(42n); // => 42
  * ```
  */
-export const numberToBigInt = z.codec(z.int(), z.bigint(), {
+export const numberToBigInt: Codec<number, bigint> = z.codec(z.int(), z.bigint(), {
   decode: (num) => BigInt(num),
   encode: (bigint) => Number(bigint),
 });
@@ -110,7 +112,7 @@ export const numberToBigInt = z.codec(z.int(), z.bigint(), {
  * // => "2024-01-15T00:00:00Z"
  * ```
  */
-export const isoDatetimeToInstant = z.codec(
+export const isoDatetimeToInstant: Codec<string, Temporal.Instant> = z.codec(
   z.iso.datetime(),
   z.instanceof(Temporal.Instant),
   {
@@ -132,10 +134,14 @@ export const isoDatetimeToInstant = z.codec(
  * // => Unix timestamp in seconds
  * ```
  */
-export const epochSecondsToInstant = z.codec(z.int().min(0), z.instanceof(Temporal.Instant), {
-  decode: (seconds) => Temporal.Instant.fromEpochMilliseconds(seconds * 1000),
-  encode: (instant) => Math.floor(instant.epochMilliseconds / 1000),
-});
+export const epochSecondsToInstant: Codec<number, Temporal.Instant> = z.codec(
+  z.int().min(0),
+  z.instanceof(Temporal.Instant),
+  {
+    decode: (seconds) => Temporal.Instant.fromEpochMilliseconds(seconds * 1000),
+    encode: (instant) => Math.floor(instant.epochMilliseconds / 1000),
+  },
+);
 
 /**
  * Converts Unix timestamps (milliseconds since epoch) to Temporal `Instant` values.
@@ -150,10 +156,14 @@ export const epochSecondsToInstant = z.codec(z.int().min(0), z.instanceof(Tempor
  * // => Unix timestamp in milliseconds
  * ```
  */
-export const epochMillisToInstant = z.codec(z.int().min(0), z.instanceof(Temporal.Instant), {
-  decode: (millis) => Temporal.Instant.fromEpochMilliseconds(millis),
-  encode: (instant) => instant.epochMilliseconds,
-});
+export const epochMillisToInstant: Codec<number, Temporal.Instant> = z.codec(
+  z.int().min(0),
+  z.instanceof(Temporal.Instant),
+  {
+    decode: (millis) => Temporal.Instant.fromEpochMilliseconds(millis),
+    encode: (instant) => instant.epochMilliseconds,
+  },
+);
 
 /**
  * Parses JSON strings into structured data and serializes back to JSON.
@@ -167,7 +177,7 @@ export const epochMillisToInstant = z.codec(z.int().min(0), z.instanceof(Tempora
  * schema.encode({ name: "Bob", age: 25 }); // => '{"name":"Bob","age":25}'
  * ```
  */
-export const jsonCodec = <T extends z.core.$ZodType>(schema: T) =>
+export const jsonCodec = <T extends z.core.$ZodType>(schema: T): z.ZodCodec<z.ZodString, T> =>
   z.codec(z.string(), schema, {
     decode: (jsonString, ctx) => {
       try {
@@ -198,10 +208,14 @@ export const jsonCodec = <T extends z.core.$ZodType>(schema: T) =>
  * schema.encode(bytes); // => "Hello, 世界!"
  * ```
  */
-export const utf8ToBytes = z.codec(z.string(), z.instanceof(Uint8Array), {
-  decode: (str) => new TextEncoder().encode(str),
-  encode: (bytes) => new TextDecoder().decode(bytes),
-});
+export const utf8ToBytes: Codec<string, Uint8Array> = z.codec(
+  z.string(),
+  z.instanceof(Uint8Array),
+  {
+    decode: (str) => new TextEncoder().encode(str),
+    encode: (bytes) => new TextDecoder().decode(bytes),
+  },
+);
 
 /**
  * Converts `Uint8Array` byte arrays to UTF-8 strings.
@@ -215,10 +229,14 @@ export const utf8ToBytes = z.codec(z.string(), z.instanceof(Uint8Array), {
  * schema.encode("Hello, 世界!"); // => Uint8Array
  * ```
  */
-export const bytesToUtf8 = z.codec(z.instanceof(Uint8Array), z.string(), {
-  decode: (bytes) => new TextDecoder().decode(bytes),
-  encode: (str) => new TextEncoder().encode(str),
-});
+export const bytesToUtf8: Codec<Uint8Array, string> = z.codec(
+  z.instanceof(Uint8Array),
+  z.string(),
+  {
+    decode: (bytes) => new TextDecoder().decode(bytes),
+    encode: (str) => new TextEncoder().encode(str),
+  },
+);
 
 /**
  * Converts base64 strings to `Uint8Array` byte arrays and vice versa.
@@ -232,10 +250,14 @@ export const bytesToUtf8 = z.codec(z.instanceof(Uint8Array), z.string(), {
  * schema.encode(bytes); // => "SGVsbG8="
  * ```
  */
-export const base64ToBytes = z.codec(z.base64(), z.instanceof(Uint8Array), {
-  decode: (base64String) => z.util.base64ToUint8Array(base64String),
-  encode: (bytes) => z.util.uint8ArrayToBase64(bytes),
-});
+export const base64ToBytes: Codec<string, Uint8Array> = z.codec(
+  z.base64(),
+  z.instanceof(Uint8Array),
+  {
+    decode: (base64String) => z.util.base64ToUint8Array(base64String),
+    encode: (bytes) => z.util.uint8ArrayToBase64(bytes),
+  },
+);
 
 /**
  * Converts base64url strings (URL-safe base64) to `Uint8Array` byte arrays.
@@ -249,10 +271,14 @@ export const base64ToBytes = z.codec(z.base64(), z.instanceof(Uint8Array), {
  * schema.encode(bytes); // => "SGVsbG8"
  * ```
  */
-export const base64urlToBytes = z.codec(z.base64url(), z.instanceof(Uint8Array), {
-  decode: (base64urlString) => z.util.base64urlToUint8Array(base64urlString),
-  encode: (bytes) => z.util.uint8ArrayToBase64url(bytes),
-});
+export const base64urlToBytes: Codec<string, Uint8Array> = z.codec(
+  z.base64url(),
+  z.instanceof(Uint8Array),
+  {
+    decode: (base64urlString) => z.util.base64urlToUint8Array(base64urlString),
+    encode: (bytes) => z.util.uint8ArrayToBase64url(bytes),
+  },
+);
 
 /**
  * Converts hexadecimal strings to `Uint8Array` byte arrays and vice versa.
@@ -266,7 +292,7 @@ export const base64urlToBytes = z.codec(z.base64url(), z.instanceof(Uint8Array),
  * schema.encode(bytes); // => "48656c6c6f"
  * ```
  */
-export const hexToBytes = z.codec(z.hex(), z.instanceof(Uint8Array), {
+export const hexToBytes: Codec<string, Uint8Array> = z.codec(z.hex(), z.instanceof(Uint8Array), {
   decode: (hexString) => z.util.hexToUint8Array(hexString),
   encode: (bytes) => z.util.uint8ArrayToHex(bytes),
 });
@@ -283,7 +309,7 @@ export const hexToBytes = z.codec(z.hex(), z.instanceof(Uint8Array), {
  * schema.encode(new URL("https://example.com")); // => "https://example.com/"
  * ```
  */
-export const stringToURL = z.codec(z.url(), z.instanceof(URL), {
+export const stringToURL: Codec<string, URL> = z.codec(z.url(), z.instanceof(URL), {
   decode: (urlString) => new URL(urlString),
   encode: (url) => url.href,
 });
@@ -300,7 +326,7 @@ export const stringToURL = z.codec(z.url(), z.instanceof(URL), {
  * schema.encode(url); // => "https://api.example.com/v1"
  * ```
  */
-export const stringToHttpURL = z.codec(z.httpUrl(), z.instanceof(URL), {
+export const stringToHttpURL: Codec<string, URL> = z.codec(z.httpUrl(), z.instanceof(URL), {
   decode: (urlString) => new URL(urlString),
   encode: (url) => url.href,
 });
@@ -317,7 +343,7 @@ export const stringToHttpURL = z.codec(z.httpUrl(), z.instanceof(URL), {
  * schema.encode("Hello World!"); // => "Hello%20World!"
  * ```
  */
-export const uriComponent = z.codec(z.string(), z.string(), {
+export const uriComponent: Codec<string, string> = z.codec(z.string(), z.string(), {
   decode: (encodedString) => decodeURIComponent(encodedString),
   encode: (decodedString) => encodeURIComponent(decodedString),
 });
@@ -330,9 +356,11 @@ export const uriComponent = z.codec(z.string(), z.string(), {
  * Duck-typing validator for Decimal-like values (Prisma.Decimal).
  * Checks for the internal structure of decimal.js objects.
  */
+type DecimalLike = { d: number[]; e: number; s: number; toFixed: (dp?: number) => string };
+
 const isDecimalLike = (
   v: unknown,
-): v is { d: number[]; e: number; s: number; toFixed: (dp?: number) => string } => {
+): v is DecimalLike => {
   if (v === null || v === undefined) return false;
   if (typeof v !== 'object') return false;
   const obj = v as Record<string, unknown>;
@@ -347,7 +375,7 @@ const isDecimalLike = (
 const decimalInputSchema = z.union([
   z.number(),
   z.string().regex(/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/),
-  z.custom(isDecimalLike),
+  z.custom<DecimalLike>(isDecimalLike),
 ]);
 
 /**
@@ -362,15 +390,19 @@ const decimalInputSchema = z.union([
  * priceSchema.encode(19.99); // => "19.99" (string for precision)
  * ```
  */
-export const decimalToNumber = z.codec(decimalInputSchema, z.number(), {
-  decode: (value) => {
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') return Number.parseFloat(value);
-    if (isDecimalLike(value)) return Number(value.toFixed(10));
-    return 0;
+export const decimalToNumber: Codec<number | string | DecimalLike, number> = z.codec(
+  decimalInputSchema,
+  z.number(),
+  {
+    decode: (value) => {
+      if (typeof value === 'number') return value;
+      if (typeof value === 'string') return Number.parseFloat(value);
+      if (isDecimalLike(value)) return Number(value.toFixed(10));
+      return 0;
+    },
+    encode: (num) => num.toString(),
   },
-  encode: (num) => num.toString(),
-});
+);
 
 /**
  * Type-safe helper to convert a Decimal-like value to number.

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:@durable-streams/client@~0.2.3": "0.2.6",
+    "npm:@durable-streams/client@~0.2.3": "0.2.3",
     "npm:@durable-streams/server@~0.2.3": "0.2.3_@tanstack+db@0.6.7__typescript@6.0.3_typescript@6.0.3",
     "npm:@durable-streams/state@~0.2.3": "0.2.3_@tanstack+db@0.6.7__typescript@6.0.3_typescript@6.0.3",
     "npm:@opentelemetry/api@^1.9.0": "1.9.1",
@@ -15,6 +15,7 @@
     "npm:@preact/signals@^2.5.0": "2.9.1_preact@10.29.2",
     "npm:@prisma/adapter-mssql@^7.4.2": "7.8.0_@azure+core-client@1.10.2",
     "npm:@prisma/adapter-pg@^7.4.2": "7.8.0",
+    "npm:@prisma/client@^7.3.0": "7.8.0_typescript@6.0.3",
     "npm:@prisma/client@^7.4.2": "7.8.0_typescript@6.0.3",
     "npm:@prisma/driver-adapter-utils@^7.4.2": "7.8.0",
     "npm:@prisma/instrumentation-contract@^7.4.2": "7.8.0_@opentelemetry+api@1.9.1",
@@ -203,18 +204,10 @@
       ],
       "bin": true
     },
-    "@durable-streams/client@0.2.6": {
-      "integrity": "sha512-uHKKbWpsKLhFMeGjG0PgM6LXE3oEIi7FHKlJZkmYGxcqd4Yjjd/QEvnQnDzteRP4Av1uJVM8qjTL7kfKsgeS/w==",
-      "dependencies": [
-        "@microsoft/fetch-event-source",
-        "fastq"
-      ],
-      "bin": true
-    },
     "@durable-streams/server@0.2.3_@tanstack+db@0.6.7__typescript@6.0.3_typescript@6.0.3": {
       "integrity": "sha512-hZoEnbQAR6/jVgCmzqbv60qgwvnB3tXqOl2XmkUJxkri1CdIV1WHvfmTDJrPG459P8jkYDGhM7+uNJEkB2ZsMw==",
       "dependencies": [
-        "@durable-streams/client@0.2.3",
+        "@durable-streams/client",
         "@durable-streams/state",
         "@neophi/sieve-cache",
         "lmdb"
@@ -223,7 +216,7 @@
     "@durable-streams/state@0.2.3_@tanstack+db@0.6.7__typescript@6.0.3_typescript@6.0.3": {
       "integrity": "sha512-zUKXKr4bKX+ajqfX30JvIRmmWfDWbXvAkVU7pq60r00ySxOIN8P3KtuoE2rAS1UlPpfy3yxCuw+ikWJ7SCu7/g==",
       "dependencies": [
-        "@durable-streams/client@0.2.3",
+        "@durable-streams/client",
         "@standard-schema/spec",
         "@tanstack/db"
       ],
