@@ -1,40 +1,31 @@
 import { epochMillisToInstant, epochSecondsToInstant, isoDatetimeToInstant } from './codecs.ts';
 
-function assertEquals<T>(actual: T, expected: T): void {
-  if (actual !== expected) {
-    throw new Error(`Expected ${expected}, received ${actual}`);
-  }
-}
-
-function assertInstanceOf<T>(
-  actual: unknown,
-  expected: new (...args: never[]) => T,
-): asserts actual is T {
-  if (!(actual instanceof expected)) {
-    throw new Error(`Expected ${actual} to be an instance of ${expected.name}`);
-  }
-}
-
 Deno.test('isoDatetimeToInstant decodes and encodes Temporal instants', () => {
   const instant = isoDatetimeToInstant.decode('2024-01-15T10:30:00.000Z');
 
-  assertInstanceOf(instant, Temporal.Instant);
-  assertEquals(instant.toString(), '2024-01-15T10:30:00Z');
-  assertEquals(isoDatetimeToInstant.encode(instant), '2024-01-15T10:30:00Z');
+  if (!(instant instanceof Temporal.Instant)) throw new Error('Expected Temporal.Instant');
+  if (instant.toString() !== '2024-01-15T10:30:00Z') throw new Error('Unexpected ISO instant');
+  if (isoDatetimeToInstant.encode(instant) !== '2024-01-15T10:30:00Z') {
+    throw new Error('Unexpected encoded ISO instant');
+  }
 });
 
 Deno.test('epochSecondsToInstant decodes and encodes Temporal instants', () => {
   const instant = epochSecondsToInstant.decode(1705314600);
 
-  assertInstanceOf(instant, Temporal.Instant);
-  assertEquals(instant.toString(), '2024-01-15T10:30:00Z');
-  assertEquals(epochSecondsToInstant.encode(instant), 1705314600);
+  if (!(instant instanceof Temporal.Instant)) throw new Error('Expected Temporal.Instant');
+  if (instant.toString() !== '2024-01-15T10:30:00Z') throw new Error('Unexpected epoch instant');
+  if (epochSecondsToInstant.encode(instant) !== 1705314600) {
+    throw new Error('Unexpected encoded epoch seconds');
+  }
 });
 
 Deno.test('epochMillisToInstant decodes and encodes Temporal instants', () => {
   const instant = epochMillisToInstant.decode(1705314600000);
 
-  assertInstanceOf(instant, Temporal.Instant);
-  assertEquals(instant.toString(), '2024-01-15T10:30:00Z');
-  assertEquals(epochMillisToInstant.encode(instant), 1705314600000);
+  if (!(instant instanceof Temporal.Instant)) throw new Error('Expected Temporal.Instant');
+  if (instant.toString() !== '2024-01-15T10:30:00Z') throw new Error('Unexpected epoch instant');
+  if (epochMillisToInstant.encode(instant) !== 1705314600000) {
+    throw new Error('Unexpected encoded epoch milliseconds');
+  }
 });
