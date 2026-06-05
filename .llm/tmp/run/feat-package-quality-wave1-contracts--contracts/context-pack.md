@@ -33,6 +33,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 9 — `runtime-config` tests added; `deno test --allow-all` passed with 8 tests.
 - [x] Slice 10 — `runtime-config` gate sweep passed after lint/format/example fixes; current README line count is 339.
 - [x] Slice 11 — `config/helpers.ts` renamed to `src/domain/saga-inputs.ts`; `deno check mod.ts` passed.
+- [x] Slices 12-13 — `SagaGroupInput` exported and remaining `types.ts` JSDoc added; `deno doc --lint mod.ts` passed.
 
 ## Key findings (re-baselined)
 

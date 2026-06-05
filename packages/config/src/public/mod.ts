@@ -1,6 +1,10 @@
 export { defineConfig, defineConfigAsync } from '../../define-config.ts';
 export { defineSagas } from '../domain/saga-inputs.ts';
-export type { SagaDefinitionInput, SagasConfigInput } from '../domain/saga-inputs.ts';
+export type {
+  SagaDefinitionInput,
+  SagaGroupInput,
+  SagasConfigInput,
+} from '../domain/saga-inputs.ts';
 export {
   clearConfigCache,
   getConfig,

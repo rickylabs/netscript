@@ -63,7 +63,7 @@ export {
 
 // Builders
 export { defineSagas } from './src/public/mod.ts';
-export type { SagaDefinitionInput, SagasConfigInput } from './src/public/mod.ts';
+export type { SagaDefinitionInput, SagaGroupInput, SagasConfigInput } from './src/public/mod.ts';
 
 // Adapters
 export {

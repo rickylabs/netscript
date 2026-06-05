@@ -198,6 +198,10 @@ A new developer adding a config schema section:
 | 2026-06-06 | 10 | Gate | Runtime-config sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-8/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. |
 | 2026-06-06 | 11 | Implement | Renamed `packages/config/helpers.ts` to `src/domain/saga-inputs.ts` and updated `src/public/mod.ts` exports without changing the root API. |
 | 2026-06-06 | 11 | Gate | `deno check mod.ts` passed; helper-name scans found no remaining `helpers.ts` file or `src/helpers` directory in `packages/config`. |
+| 2026-06-06 | 12 | Implement | Exported `SagaGroupInput` from `packages/config/src/public/mod.ts` and the root `mod.ts`, fixing the private-type-ref path for saga group inputs. |
+| 2026-06-06 | 12 | Gate | `deno doc --lint mod.ts` initially cleared the private-type-ref but remained blocked by the known slice 13 `types.ts` JSDoc errors; see `drift.md`. |
+| 2026-06-06 | 13 | Implement | Added JSDoc to the remaining exported `types.ts` interface properties in `SdkConfig`, `NetScriptConfig`, and `NetScriptConfigInput`. |
+| 2026-06-06 | 13 | Gate | `deno doc --lint mod.ts` passed after slices 12 and 13 were both present; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 

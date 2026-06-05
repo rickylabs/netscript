@@ -31,3 +31,16 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** minor
 - **Action:** adjust — added F-14 (mapped to L5) and F-17 (PENDING_SCRIPT, no violation) to `plan.md` §Fitness Gates + Validation Plan and `worklog.md` gate table. Plan-Gate "Gate set selected" box now satisfied; verdict PASS.
 - **Evidence:** `plan-eval.md`, `plan.md` §Fitness Gates.
+
+## 2026-06-06 — Config slices 12-13 gate dependency
+
+- **What:** Slice 12 exports `SagaGroupInput` and names `deno doc --lint mod.ts` as its gate, but
+  that gate still fails on the known 32 `types.ts` property JSDoc errors assigned to slice 13.
+- **Source:** `deno doc --lint mod.ts` after exporting `SagaGroupInput`.
+- **Expected:** Slice 12 gate passes after the private-type-ref export fix.
+- **Actual:** The private-type-ref issue is fixed, but doc-lint remains blocked until slice 13 adds
+  the missing JSDoc. The only honest green gate is after slices 12 and 13 are both present.
+- **Severity:** minor
+- **Action:** combine the implementation evidence for slices 12 and 13, then continue with slice
+  14 in order.
+- **Evidence:** `worklog.md` progress rows for slices 12 and 13.
