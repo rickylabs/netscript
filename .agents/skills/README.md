@@ -47,10 +47,8 @@ Every skill follows the same shape:
 5. **Key Concepts** — The vocabulary an agent needs to reason about this domain.
 6. **Workflow** — The typical sequence of actions when this skill is active.
 7. **Common Pitfalls** — Mistakes LLMs commonly make in this domain.
-8. **What NetScript doesn't do yet** — _(draft — pending user approval)_ Features the framework does
-   not implement, with workarounds.
-9. **Reference Files** — Canonical files this skill points to.
-10. **Checklist** — Quick verification steps before handing off.
+8. **Reference Files** — Canonical files this skill points to.
+9. **Checklist** — Quick verification steps before handing off.
 
 See [`DEVELOPING.md`](DEVELOPING.md) for the full authoring guide.
 

@@ -947,21 +947,6 @@ If the tool misses anything:
 
 ---
 
-## What NetScript does not do yet
-
-> **Status: draft — pending user approval before becoming mandatory.**
-
-- **Fresh 1.x support** — Fresh 1.x is deprecated; only Fresh 2.x patterns are supported.
-  Workaround: migrate using `deno run -Ar jsr:@fresh/update`.
-- **React/Vue/Svelte/Angular integration** — This skill is Fresh/Preact only. Workaround: use the
-  relevant framework docs and tooling.
-- **Mobile app development** — Fresh is web-only. Workaround: use React Native, Flutter, or similar
-  for mobile.
-- **Server-side rendering outside Fresh** — No standalone SSR utilities. Use Fresh built-in SSR or
-  Preact `render-to-string` directly.
-
----
-
 ## Checklist
 
 - [ ] Fresh 2.x stable imports are used (`from "fresh"`, not `$fresh`).

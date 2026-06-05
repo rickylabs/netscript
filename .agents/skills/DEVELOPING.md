@@ -63,33 +63,11 @@ The typical sequence of actions when this skill is active. Numbered list, not pr
 Mistakes LLMs commonly make in this domain. Each pitfall names the mistake, why it happens, and how
 to avoid it.
 
-### 8. What NetScript doesn't do yet
-
-**Status: draft — pending user approval before becoming mandatory.**
-
-This section names features the framework does not implement, along with:
-
-- the workaround available today,
-- the skill or doc to route the request to,
-- a note that the feature is tracked (or not yet tracked).
-
-This prevents agents from confabulating plausible-looking API calls against something that does not
-exist.
-
-Example shape:
-
-```markdown
-## What NetScript doesn't do yet
-
-- **Feature X** — Not implemented. Workaround: use Y. Track via a GitHub issue (or
-  `.llm/harness/debt/arch-debt.md` for framework-level gaps).
-```
-
-### 9. Reference Files
+### 8. Reference Files
 
 Canonical files this skill points to. Use a table with "Load when" column.
 
-### 10. Checklist
+### 9. Checklist
 
 Quick verification steps before handing off. 3–5 items.
 
@@ -120,7 +98,7 @@ Do not version skills independently of the repo.
 
 Before committing a new skill:
 
-- [ ] Follows the 10-section shape above.
+- [ ] Follows the 9-section shape above.
 - [ ] Has a specific, non-vague `description` in YAML frontmatter.
 - [ ] Includes "When Not to Use" boundaries.
 - [ ] All referenced files exist in the repo.
