@@ -208,6 +208,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 15 | Gate | `deno doc --lint src/schema/plugins/mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 16 | Implement | Added config docs recipes for merge contributions and plugin schemas plus `docs/advanced/extending.md`. |
 | 2026-06-06 | 16 | Gate | `Get-ChildItem docs -Recurse -File` listed 7 config docs files including recipes and advanced pages. |
+| 2026-06-06 | 17 | Implement | Added `arch:barrel-ok` justification to `packages/config/src/domain/mod.ts` and recorded accepted sub-barrel debt. |
+| 2026-06-06 | 17 | Gate | `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'` found the marker. |
 
 ## Decisions
 

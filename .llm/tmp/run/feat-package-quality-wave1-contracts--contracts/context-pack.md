@@ -37,6 +37,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 14 — config merge subpath private-type-ref fixed; `deno doc --lint src/merge/mod.ts` passed.
 - [x] Slice 15 — config plugin schemas documented and Zod internal public type leak removed; `deno doc --lint src/schema/plugins/mod.ts` passed.
 - [x] Slice 16 — config docs recipes and advanced page added; docs file-list gate returned 7 files.
+- [x] Slice 17 — config domain barrel marked with `arch:barrel-ok`; grep gate passed.
 
 ## Key findings (re-baselined)
 

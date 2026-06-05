@@ -45,6 +45,17 @@ Seeded from
   `src/public/mod.ts`.
 - **Gate:** F-11, AP-16, `deno check mod.ts`
 
+## packages/config/src/domain/mod.ts — justified domain barrel
+
+- **Reason:** `src/domain/mod.ts` is a sub-barrel, but it intentionally curates the domain schema
+  surface consumed by `src/public/mod.ts` and future docs/reference generation.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when generated reference tooling can crawl individual schema modules.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — slice 17 added `arch:barrel-ok` justification in the file.
+- **Gate:** F-18, `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'`
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.

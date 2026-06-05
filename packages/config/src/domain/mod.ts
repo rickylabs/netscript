@@ -1,6 +1,7 @@
 /**
  * Domain schema exports for NetScript configuration.
  */
+// arch:barrel-ok This curated domain schema surface is imported by src/public/mod.ts and docs generation.
 export * from './logging-schema.ts';
 export * from './aspire-schema.ts';
 export * from './permissions-schema.ts';

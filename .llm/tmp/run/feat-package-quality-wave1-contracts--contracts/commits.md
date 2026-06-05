@@ -25,3 +25,4 @@ Format:
 - d60f43c: docs(config): export saga group input and document config types
 - fbcfee5: docs(config): fix merge subpath public types
 - 0ac2d8b: docs(config): harden plugin schema public docs
+- 43e51b4: docs(config): add recipes and advanced guide
