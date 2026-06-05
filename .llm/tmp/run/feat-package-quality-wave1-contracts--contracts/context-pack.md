@@ -40,6 +40,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 17 — config domain barrel marked with `arch:barrel-ok`; grep gate passed.
 - [x] Slice 18 — config gate sweep passed after static cleanup, type split, and domain schema grouping; publish dry run remained at 0 slow types.
 - [x] Slice 19 — contracts paginated-query helper moved to `src/application`; `deno check mod.ts` passed.
+- [x] Slice 20 — contracts transform helper moved to `src/application`; `deno check mod.ts` and `deno check transform.ts` passed; `helpers/` removed.
 
 ## Key findings (re-baselined)
 

@@ -214,6 +214,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 18 | Gate | Config sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. Publish dry run reported the known non-failing `unanalyzable-dynamic-import` warning for `loader.ts`. |
 | 2026-06-06 | 19 | Implement | Moved `packages/contracts/helpers/paginated-query.ts` to `src/application/paginated-query.ts` and updated `query.ts` to re-export the new role-based module. |
 | 2026-06-06 | 19 | Gate | `deno check mod.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 20 | Implement | Moved `packages/contracts/helpers/transform.ts` to `src/application/transform-helpers.ts`, updated `transform.ts`, and removed the empty `helpers/` directory. |
+| 2026-06-06 | 20 | Gate | `deno check mod.ts` passed; extra `deno check transform.ts` passed for the moved subpath; helper-directory scan found no `helpers/` directory under `packages/contracts`. |
 
 ## Decisions
 

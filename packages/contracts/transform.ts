@@ -14,4 +14,4 @@
  * @module
  */
 
-export * from './helpers/transform.ts';
+export * from './src/application/transform-helpers.ts';

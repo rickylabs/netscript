@@ -28,3 +28,4 @@ Format:
 - 43e51b4: docs(config): add recipes and advanced guide
 - 3c10baa: docs(config): justify domain barrel
 - 68f6d6d: test(config): complete package gate sweep
+- aab8d2f: refactor(contracts): move paginated query helper
