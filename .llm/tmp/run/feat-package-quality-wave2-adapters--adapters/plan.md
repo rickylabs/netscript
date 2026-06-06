@@ -91,7 +91,12 @@ Per `archetypes/ARCHETYPE-2-integration.md` + `gates/archetype-gate-matrix.md`:
 - `deno doc --lint <entrypoints>`
 - `deno publish --dry-run --allow-dirty` (0 slow types)
 
-### Fitness gates (F-1..F-12 + F-14 + F-15)
+### Fitness gates (F-1..F-12, F-14, F-15, F-16, F-17, F-18; F-13 n/a)
+
+Per `gates/archetype-gate-matrix.md` (source of truth), Arch 2 requires the full universal
+F-\* family except F-13 (saga/runtime invariants, n/a for A2). F-16/F-17/F-18 are listed in the
+matrix but not yet in `archetypes/ARCHETYPE-2-integration.md`'s fitness line — the matrix governs.
+
 | Gate | How verified |
 |------|--------------|
 | F-1 File-size lint | `tools/fitness/release-readiness.ts` or manual check |
@@ -108,6 +113,9 @@ Per `archetypes/ARCHETYPE-2-integration.md` + `gates/archetype-gate-matrix.md`:
 | F-12 Naming-convention lint | Adapters named by technology (`deno-kv`, `redis`, `postgres`) |
 | F-14 Console-log lint | No `console.log` outside `diagnostics/` |
 | F-15 Re-export-upstream lint | Re-exports have explicit types; no naked `export * from 'npm:...'` |
+| F-16 Folder-cardinality lint | Each folder (`ports/`, `adapters/`, `application/`, `testing/`) holds ≥2 siblings or is justified; verified during each rename slice (kv 2b-1/2, queue 2c-1, cron 2c-10) |
+| F-17 Abstract-derived co-location | Port contract and its adapters live under the same package; `./testing` in-memory adapters co-located with the port they satisfy |
+| F-18 Sub-barrel lint | `mod.ts` barrels re-export only their own subtree; no cross-folder sub-barrels introduced by the renames/`./testing` additions |
 
 ### Consumer gates (required for renames)
 - `deno check` on `packages/cli` after database/queue/cron/aspire changes
@@ -156,7 +164,7 @@ Target: ~22 slices. Branch: `feat/package-quality-wave2-adapters-2b`.
 
 | # | Slice | Gate | Files |
 |---|-------|------|-------|
-| 1 | kv: rename `bridges/` → `adapters/`, `core/` → `application/` | F-3, F-11 | `packages/kv/bridges/*` → `packages/kv/adapters/*`, `packages/kv/core/*` → `packages/kv/application/*` |
+| 1 | kv: consolidate `bridges/` into existing `adapters/`, rename `core/` → `application/` (note: `adapters/` already exists — merge bridge files in, do not overwrite) | F-3, F-11, F-16 | `packages/kv/bridges/*` → `packages/kv/adapters/*`, `packages/kv/core/*` → `packages/kv/application/*` |
 | 2 | kv: update all internal imports after rename | F-3, static | `packages/kv/**/*.ts` |
 | 3 | kv: scaffold `/docs` (overview + architecture + recipes) | F-7 | `packages/kv/docs/**/*.md` |
 | 4 | kv: move `ARCHITECTURE.md` content into `docs/architecture.md` | F-7 | `packages/kv/docs/architecture.md` |
