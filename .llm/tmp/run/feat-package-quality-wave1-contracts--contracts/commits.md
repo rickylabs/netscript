@@ -36,3 +36,4 @@ Format:
 - b066da6: test(contracts): complete package gate sweep
 - f4cbd3c: test(workspace): validate cli consumer
 - cdff7f0: test(workspace): validate plugin consumers
+- ad0b232: test(workspace): verify final package publish dry runs

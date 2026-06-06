@@ -373,11 +373,11 @@ export * from './src/public/mod.ts';
 The implementation split is:
 
 - `src/domain/` for constants, schema types, data schemas, results, and error data helpers.
-- `src/application/` for Zod-backed helper factories and the oRPC base contract primitive.
+- `src/application/` for Zod-backed helper factories, the oRPC base contract primitive, and
+  query/transform helper implementations.
 - `src/diagnostics/` for inspection reports.
 - `src/public/` for the package barrel.
 - `crud/` for CRUD contract generators.
-- `helpers/` for query and transform helper implementations.
 - `schemas/` for richer query helper schemas.
 
 This package follows the A1 small-contract root archetype with named subexports for richer APIs:
