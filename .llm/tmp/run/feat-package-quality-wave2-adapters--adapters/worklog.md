@@ -152,3 +152,18 @@ To add a new adapter to an A2 unit:
 - `telemetry` instrumentation extraction to plugin packages.
 - `kv` `bridge_test.ts` god-file split (AP-1 debt).
 - Deep Prisma type wrappers for `database` and `prisma-adapter-mysql` doc-lint (may become debt).
+
+## Implementation Log — Sub-wave 2a
+
+| Slice | Status | Evidence |
+|-------|--------|----------|
+| 1 logger `/docs` scaffold | PASS | Added `packages/logger/docs/{README,architecture,concepts,getting-started}.md`, recipe pages, and `reference/README.md` with required frontmatter. `deno publish --dry-run --allow-dirty` includes `docs/**/*.md` and ended `Success Dry run complete`. |
+| 2 logger package tasks | PASS | Added `lint`, `fmt`, and `publish:dry-run` tasks to `packages/logger/deno.json`. `deno lint` checked 12 files; `deno fmt --check deno.json README.md docs tests/_fixtures/docs-examples_test.ts` checked 13 files. |
+| 3 logger docs doctest | PASS | Added `packages/logger/tests/_fixtures/docs-examples_test.ts`. `deno test --allow-env ./tests/` passed 11 tests, including 6 docs-example tests. `deno doc --lint ./mod.ts ./middleware.ts ./orpc.ts` checked 3 files; `deno publish --dry-run --allow-dirty` stayed at 0 slow types. Commit: `29bf0bf`. |
+| 4 telemetry doc-lint re-baseline | ESCALATED | Root-only `deno doc --lint ./mod.ts` reports 2 errors, matching the locked plan. Full export sweep across every `deno.json` entrypoint reports 168 doc-lint errors, which changes the slice shape. See `drift.md` § Implementation drift. |
+
+### Sub-wave 2a Gate Notes
+
+- Logger F-6/F-7/F-10/static gates are green for slices 1-3.
+- Telemetry F-7 is blocked on scope clarification because the locked plan's two-error fix is not
+  sufficient for the required full export sweep.
