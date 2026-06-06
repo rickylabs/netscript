@@ -6,39 +6,46 @@
 |-------|-------|
 | Run ID | `feat-package-quality--supervisor` |
 | Branch | `feat/package-quality` (off `main`) |
-| Current phase | `plan` (scaffolded; awaiting Wave 0 launch) |
+| Current phase | `implement` (Waves 0, 0b, 1 `merged`; Wave 2 in Plan & Design — draft PR #8) |
 | Archetype | per wave (A1–A6) + `SCOPE-docs.md` |
 | Scope overlays | `SCOPE-docs.md` |
 
 ## Current State
 
-S1 runs in the public repo `rickylabs/netscript`. S0 is merged to `main`
-(`9aced47`). This branch (`feat/package-quality`) carries the prepared S1
-supervisor scaffold and the run artifacts. No wave has started yet. The goal is
-to bring all **27 publishable units** (23 packages + 4 plugins, all
-`0.0.1-alpha.0`) to the alpha bar: `deno publish --dry-run` with **0 slow-types**,
-`deno doc --lint` clean, README ≥ 150 LOC, `/docs` per STANDARDS § 7, archetype
-gate matrix green per unit.
+S1 runs in the public repo `rickylabs/netscript` off `feat/package-quality`
+(@ `4c57867`). **Waves 0, 0b, and 1 are `merged`; Wave 2 is `active` (Plan &
+Design, draft PR #8).** Goal unchanged: bring all **27 publishable units** to the
+alpha bar (`deno publish --dry-run` 0 slow-types, `deno doc --lint` clean,
+README ≥ 150 LOC, `/docs` per STANDARDS § 7, archetype matrix green).
+
+Progress: **4 / 27 units merged** (`shared`; `runtime-config`, `config`,
+`contracts`). Wave 2 covers the next **8** A2 adapter units.
 
 ## Completed
 
-- S1 supervisor `plan.md` + `phase-registry.md` (7 waves, reconciled to 27 units).
-- Carried the master program run + the canonical package-jsr run into this repo.
-- Seeded `worklog.md`, `drift.md` (reconciliation entry), `commits.md`.
+- Supervisor scaffold (`plan.md`, `phase-registry.md`, 7 waves → 27 units).
+- **Wave 0** (`@netscript/shared`) merged — PR #3 / `eb8ae44`.
+- **Wave 0b** (inserted) merged — harness two-gate model + `.agents` docs/skills
+  (PR #4 `82ad2a2`, PR #5 `d5d8e5f`, D4 drop `76fbeb7`).
+- **Wave 1** (contracts & schemas) merged — PR #7 / `4c57867`; all 3 units 0 slow
+  types; e2e:cli `41/0/0`.
 
 ## In Progress
 
-- None. Clean hand-off boundary; Wave 0 not yet launched.
+- **Wave 2 — Integration adapters** (logger, telemetry, aspire, kv, database,
+  prisma-adapter-mysql, queue, cron). Reviewer-staged: branch+worktree
+  `wave2-adapters`, nested run `feat-package-quality-wave2-adapters--adapters`
+  (seeded `research.md` + `context-pack.md`), draft **PR #8**. Agent doing
+  Research → Plan & Design; **stops at PLAN-EVAL**.
 
 ## Next Steps
 
-1. **Wave 0 baseline re-audit**: `deno run -A tools/fitness/release-readiness.ts
-   --out .llm/tmp/run/feat-package-quality--supervisor/audit --include-plugins`;
-   log the delta vs the 2026-05 inventory in `drift.md`.
-2. Launch **Wave 0** (`@netscript/shared`) per `supervisor.md` § 2: branch
-   `feat/package-quality-wave0-foundation`, nested sub-run, Design checkpoint,
-   slices, gates, **separate evaluator**, merge `--no-ff`.
-3. Proceed Wave 1 → Wave 6 in order; never start a wave before the prior is `merged`.
+1. Wave 2 agent runs the `MEASURE-FIRST` re-baseline, resolves OQ-1 (sub-wave
+   split) + OQ-2..OQ-7, writes `plan.md` + `worklog.md` Design checkpoint.
+2. **Separate-session PLAN-EVAL** against `gates/plan-gate.md` — verify full A2
+   matrix + `< 30`-slice budget. No slice before `PASS`.
+3. On `PASS`: implement Wave 2 slices (per the sub-wave decision) → IMPL-EVAL → merge.
+4. Proceed Wave 3 → Wave 6 in order; never start a wave before the prior is `merged`.
 
 ## Key Decisions
 
@@ -61,10 +68,10 @@ gate matrix green per unit.
 
 | Gate family | Current status | Evidence |
 |-------------|----------------|----------|
-| Static | PENDING | Wave 0 baseline re-audit not yet run |
-| Fitness | PENDING | per-wave |
-| Runtime | N/A | S1 is not a runtime run (Aspire E2E is S4) |
-| Consumer | PENDING | proven as each wave's dependents re-check |
+| Static | GREEN through Wave 1 | per-wave nested `worklog.md`; Wave 1 all 0 slow types |
+| Fitness | GREEN through Wave 1 | A1 matrix per Wave 1 nested run |
+| Runtime | N/A | S1 is not a runtime run (Aspire E2E is S4); `e2e:cli` used as merge-readiness gate |
+| Consumer | GREEN through Wave 1 | Wave 1 re-checked `cli`, `plugins/sagas`, `plugins/workers` |
 
 ## Open Questions
 

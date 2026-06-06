@@ -20,6 +20,36 @@ current-state documentation.
 - **Evidence:** `phase-registry.md` Summary Table (1+3+8+1+9+4+1 = 27);
   `harmonisation/PR84-COMPATIBILITY.md`.
 
+## 2026-06-06 — Supervisor bookkeeping caught up to reality (Waves 0–1 merged, 2 staged)
+
+- **What:** The supervisor `worklog`/`context-pack`/`phase-registry`/`commits` were
+  frozen at "scaffolded, awaiting Wave 0 launch" while Waves 0, 0b, and 1 had in fact
+  merged and Wave 2 had been staged.
+- **Source:** `git log --merges origin/feat/package-quality`; draft PR #8.
+- **Action:** accept — updated all four supervisor docs to current status. No code change.
+- **Severity:** minor (bookkeeping only).
+
+## 2026-06-05 — Wave 0b inserted (not in the original 7-wave map)
+
+- **What:** A harness-reinforcement + agent-docs group (Wave 0b) was inserted between
+  Wave 0 and Wave 1; it ships no publishable unit.
+- **Source:** PRs #4/#5/#6; `lessons/plan-gate-design-as-gate.md`.
+- **Expected:** the registry's 7 publishable waves (0–6).
+- **Actual:** an 8th, non-publishable group (0b) that made Plan & Design a gated
+  deliverable (two-gate PLAN/IMPL-EVAL) after Wave 0 skipped it. Unit count unchanged (27).
+- **Severity:** significant (process), zero surface impact.
+- **Action:** accept — recorded as `Wave 0b` in `phase-registry.md`.
+
+## 2026-06-06 — Wave 2 sizing risk vs the Plan-Gate slice cap
+
+- **What:** Wave 2 has 8 units; Wave 1 used 27 slices for 3. At that density Wave 2
+  exceeds the Plan-Gate `< 30` slice cap.
+- **Source:** `…/feat-package-quality-wave2-adapters--adapters/research.md` OQ-1.
+- **Action:** fix — Wave 2 plan agent must resolve OQ-1 (recommended: sub-wave split
+  2a/2b/2c). May change the registry's single-group assumption for Wave 2; escalate per
+  `supervisor.md` § 4 if so.
+- **Severity:** significant (planning).
+
 ## 2026-06-05 — Stale slow-type counts must be re-measured
 
 - **What:** The 2026-05 readiness numbers predate the platform rewrite.

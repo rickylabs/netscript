@@ -36,7 +36,7 @@ ci`) runs in parallel and is **not** an S1 blocker.
 | Runs in | `rickylabs/netscript` (the public producer repo) |
 | Integration branch | `feat/package-quality` |
 | Base branch | `feat/repo-genesis` (genesis branch; rebase onto `main` if new-repo PR #1 merges first) |
-| Phase | `plan` |
+| Phase | `implement` (Waves 0, 0b, 1 `merged`; Wave 2 in Plan & Design — PR #8) |
 | Archetype | per package — **ARCHETYPE-1..6** as the nested run assigns; `SCOPE-docs.md` for README/`docs/` work |
 | Scope overlays | `SCOPE-docs.md` |
 | Phase groups | Wave 0..Wave 6 (7 groups — see `phase-registry.md`) |
