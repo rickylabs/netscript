@@ -20,4 +20,8 @@ Format:
 - `d5d8e5f`: Merge PR #5 — Wave 0b·B `.agents/docs` + skills cluster
 - `76fbeb7`: merge(wave1) base-sync (drop rejected D4 capability-gap section; PR #6)
 - `4c57867`: Merge PR #7 — Wave 1 contracts & schemas (runtime-config, config, contracts)
-- (pending): Wave 2 — Integration adapters (draft PR #8; in Plan & Design)
+- (pending): Wave 2 — Integration adapters (PR #8). Plan & Design + PLAN-EVAL on branch `feat/package-quality-wave2-adapters`:
+  - `971fd4a`: PLAN-EVAL cycle 1 `FAIL_PLAN` (judged pre-plan staging state)
+  - `1933bce`: Wave 2 research, plan, and design checkpoint (generator)
+  - (on branch): PLAN-EVAL cycle 2 `PASS` (gate set +F-16/17/18; kv slice clarified)
+  - sub-PRs `…-2a` / `…-2b` / `…-2c` → `feat/package-quality` to follow per sub-wave

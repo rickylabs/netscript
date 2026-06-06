@@ -129,8 +129,25 @@ sub-PR + evaluator pass).
 | Nested run ID | `feat-package-quality-wave2-adapters--<suffix>` |
 | Units | `@netscript/logger`, `@netscript/telemetry`, `@netscript/aspire`, `@netscript/kv`, `@netscript/database`, `@netscript/prisma-adapter-mysql`, `@netscript/queue`, `@netscript/cron` |
 | Archetype(s) | A2 — integration |
-| Status | `active` (staged — draft PR #8; Research + Plan & Design in progress) |
+| Status | `active` — **PLAN-EVAL `PASS`** (cycle 2, 2026-06-07); implementing sub-wave **2a** next. See `escalations/wave2-subwave-split.md`. |
 | Merge commit | — |
+
+### Sub-wave structure (OQ-1 resolved; PLAN-EVAL PASS — Option A)
+
+Wave 2 split into three ordered sub-groups (2a→2b→2c), each `< 30` slices, each its
+own branch + sub-PR into `feat/package-quality`, each its own IMPL-EVAL. Forced order:
+kv→logger (2b after 2a), queue→kv (2c after 2b). PLAN-EVAL routing = **Option A**
+(1 PLAN-EVAL over the combined plan — done, `PASS`; + 3 IMPL-EVALs).
+
+| Sub-wave | Units | Branch | Slices | Status |
+|----------|-------|--------|--------|--------|
+| 2a — observability/host | logger, telemetry, aspire | `feat/package-quality-wave2-adapters-2a` | 10 | next (impl handoff ready) |
+| 2b — data | kv, database, prisma-adapter-mysql | `feat/package-quality-wave2-adapters-2b` | 23 | blocked on 2a merge |
+| 2c — messaging | queue, cron | `feat/package-quality-wave2-adapters-2c` | 17 | blocked on 2b merge |
+
+The original single-group draft **PR #8** (parent `feat/package-quality-wave2-adapters`,
+holds the plan + run artifacts) is superseded for code by the three sub-PRs; sub-wave
+branches fork off the parent so they inherit the plan.
 
 ### Pre-conditions
 
@@ -296,7 +313,7 @@ sub-PR + evaluator pass).
 | 0 — Foundation | `merged` | none | shared | `eb8ae44` (PR #3) |
 | 0b — Harness reinforcement (inserted) | `merged` | 0 | none (harness + `.agents/`) | `82ad2a2`,`d5d8e5f`,`76fbeb7` |
 | 1 — Contracts & schemas | `merged` | 0 | runtime-config, config, contracts | `4c57867` (PR #7) |
-| 2 — Integration adapters | `active` | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron | — (draft PR #8) |
+| 2 — Integration adapters | `active` (PLAN-EVAL `PASS`; impl 2a next) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | — (sub-PRs pending) |
 | 3 — Plugin runner | `planned` | 2 | plugin | — |
 | 4 — Runtimes & plugins | `planned` | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
 | 5 — Application surfaces | `planned` | 4 | sdk, service, fresh, fresh-ui | — |
@@ -310,4 +327,4 @@ Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 |------|-----------------|--------|-------|
 | 2026-06-04 | `main` | merged | Pre-wave syncs into `feat/package-quality` (`a7796a0` ignore .worktrees, `44e3b8e` sub-PR rule, `734421c` branch naming) |
 | 2026-06-05 | `feat/package-quality` | merged | Wave 1 base-sync `76fbeb7` (also dropped the rejected D4 capability-gap skill section) |
-| — | — | — | Sync base into `feat/package-quality` before Wave 2 implementation begins; log here (see `supervisor.md` § 5) |
+| 2026-06-07 | `feat/package-quality` → `feat/package-quality-wave2-adapters` | merged | Pre-implementation base-sync (supervisor.md § 5): brings the new `.github/workflows/copilot-setup-steps.yml` (cloud-agent env: Deno 2.x + .NET 10 + Aspire CLI + Docker) + supervisor PLAN-EVAL-PASS docs onto the Wave 2 branch before sub-wave 2a starts. `main` unchanged since `4c57867`. |

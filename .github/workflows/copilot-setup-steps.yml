@@ -1,0 +1,78 @@
+# Copilot cloud agent environment bootstrap.
+#
+# GitHub runs the job named EXACTLY `copilot-setup-steps` before each Copilot
+# cloud-agent session, with FULL network access. The agent session that follows
+# is firewalled to the repo's custom allowlist
+# (api.nuget.org, dl.deno.land, jsr.io, registry.npmjs.org, mcr.microsoft.com,
+#  docker.io, registry-1.docker.io, production.cloudflare.docker.com).
+# => Pre-warm every cache here so the firewalled session can run the S1 eval /
+#    audit-fix passes (deno publish --dry-run, deno doc --lint, deno task check,
+#    deno task e2e:cli) without a local agent.
+#
+# Toolchain pinned to this repo's reality:
+#   - Deno 2.x  (deno.json uses unstable: kv, temporal, tsgo, worker-options, raw-imports)
+#   - .NET SDK 10.x  (CLI scaffold AppHost/ServiceDefaults target net10.0)
+#   - Aspire CLI via aspire.dev install script (NOT `dotnet workload install aspire`,
+#     which was removed after Aspire 8 — Aspire ships as a standalone CLI now)
+#   - Docker (pre-installed on ubuntu-latest; AppHost resources need the engine)
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # clone + view the repo
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Deno (primary toolchain) ---
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      # --- .NET SDK 10 (Aspire AppHost / ServiceDefaults target net10.0) ---
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      # --- Aspire CLI (standalone install script; adds $HOME/.aspire/bin to PATH) ---
+      - name: Install Aspire CLI
+        run: |
+          curl -fsSL https://aspire.dev/install.sh | bash
+          echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Aspire CLI
+        run: |
+          export PATH="$HOME/.aspire/bin:$PATH"
+          aspire --version
+
+      # --- Docker (AppHost container resources; engine is pre-installed) ---
+      - name: Verify Docker
+        run: |
+          docker --version
+          docker compose version
+
+      # --- Pre-flight cache warming (full network is only available HERE) ---
+      - name: Warm Deno dependency cache
+        run: |
+          deno --version
+          # Resolve + cache all workspace deps (jsr: + npm:) from the lockfile.
+          deno install || echo "deno install non-fatal during setup"
+
+      - name: Warm .NET / NuGet (Aspire SDK packages)
+        run: |
+          # The e2e:cli scaffold restores Aspire.AppHost.Sdk +
+          # CommunityToolkit.Aspire.Hosting.Deno from NuGet at build time.
+          # api.nuget.org is on the agent allowlist, but pre-fetch the workload
+          # SDK refs now to keep the firewalled session fast.
+          dotnet nuget locals all --list || true
+          dotnet workload list || true
