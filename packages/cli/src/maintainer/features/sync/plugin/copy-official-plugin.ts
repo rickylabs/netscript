@@ -131,6 +131,7 @@ export async function copyOfficialPlugin(
       projectName: options.projectName,
       importMode: options.importMode,
       workspacePackageName: `@${options.projectName}/${source.backgroundDir}`,
+      localProjectRoot: '..',
     });
     directoriesCreated.push(
       ...await ensureBackgroundRuntimeDirs(

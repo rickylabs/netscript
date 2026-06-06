@@ -243,6 +243,71 @@ Deno.test('copyOfficialPlugin copies plugin and background source workspaces', a
   assertEquals(await exists(join(targetPath, 'triggers/.data/incoming/diagnostics')), true);
 });
 
+Deno.test('copyOfficialPlugin rewrites fallback plugin source imports for top-level background workspaces', async () => {
+  const sourceRoot = await Deno.makeTempDir();
+  const targetPath = await Deno.makeTempDir();
+
+  await writeSourceFile(sourceRoot, 'packages/cli/bin/netscript.ts', 'export {};\n');
+  await writeOfficialPluginRuntimeManifests(sourceRoot);
+  await writeOfficialPluginManifests(sourceRoot);
+  await writeSourceFile(sourceRoot, 'plugins/streams/mod.ts', 'export default {};\n');
+  await writeSourceFile(
+    sourceRoot,
+    'plugins/streams/deno.json',
+    JSON.stringify({
+      name: '@netscript/plugin-streams',
+      imports: {
+        '@netscript/plugin': '../../packages/plugin/mod.ts',
+      },
+    }),
+  );
+  await writeSourceFile(sourceRoot, 'plugins/workers/mod.ts', 'export default {};\n');
+  await writeSourceFile(
+    sourceRoot,
+    'plugins/workers/deno.json',
+    JSON.stringify({
+      name: '@netscript/plugin-workers',
+      imports: {
+        '@netscript/plugin': '../../packages/plugin/mod.ts',
+        '@netscript/plugin-streams': '../streams/mod.ts',
+        '@netscript/plugin-workers-core/runtime':
+          '../../packages/plugin-workers-core/src/runtime/mod.ts',
+      },
+    }),
+  );
+  await writeSourceFile(
+    sourceRoot,
+    'plugins/workers/jobs/health-check.ts',
+    "export default { id: 'health-check' };\n",
+  );
+  await writeSourceFile(
+    sourceRoot,
+    'plugins/workers/jobs/job-tools.ts',
+    'export function createJobTools() { return {}; }\n',
+  );
+
+  await copyOfficialPlugin({
+    sourceRoot,
+    targetPath,
+    projectName: 'sample-app',
+    kind: 'worker',
+    pluginName: 'workers',
+    importMode: 'local',
+    force: false,
+  });
+
+  const workerDenoJson = JSON.parse(
+    await Deno.readTextFile(join(targetPath, 'workers/deno.json')),
+  ) as { name: string; imports: Record<string, string> };
+  assertEquals(workerDenoJson.name, '@sample-app/workers');
+  assertEquals(workerDenoJson.imports['@netscript/plugin'], '../packages/plugin/mod.ts');
+  assertEquals(workerDenoJson.imports['@netscript/plugin-streams'], '../plugins/streams/mod.ts');
+  assertEquals(
+    workerDenoJson.imports['@netscript/plugin-workers-core/runtime'],
+    '../packages/plugin-workers-core/src/runtime/mod.ts',
+  );
+});
+
 Deno.test('official plugin import rewrite converts local package paths to JSR specifiers', () => {
   assertEquals(
     _internal.rewritePackagePathToJsr('../../packages/plugin-workers-core/src/streams/mod.ts'),

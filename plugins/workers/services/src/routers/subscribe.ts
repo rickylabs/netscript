@@ -8,7 +8,7 @@ import {
 import { getKv } from '@netscript/kv';
 import { getWorkersRuntime, router } from './router-context.ts';
 
-export const subscribeHandlers = {
+export const subscribeHandlers: Record<string, unknown> = {
   subscribe: router.subscribe.handler(async function* (
     { input, lastEventId, signal, context },
   ) {

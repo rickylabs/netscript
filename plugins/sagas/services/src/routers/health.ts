@@ -74,7 +74,7 @@ const healthContractV1 = implement(healthContract);
 // HEALTH HANDLERS
 // ============================================================================
 
-export const health = {
+export const health: Record<string, unknown> = {
   /**
    * Liveness probe - always returns OK if process is running
    */

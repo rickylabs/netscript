@@ -20,7 +20,7 @@ export interface MarketplacePublishCommandDependencies {
 /** Create the public marketplace publish stub command. */
 export function createMarketplacePublishCommand(
   dependencies: MarketplacePublishCommandDependencies = {},
-): Command {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('publish')

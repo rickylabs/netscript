@@ -2,11 +2,15 @@
   "version": "5",
   "specifiers": {
     "jsr:@cliffy/ansi@1.0.1": "1.0.1",
+    "jsr:@cliffy/command@1.0.0": "1.0.0",
     "jsr:@cliffy/command@^1.0.0-rc.7": "1.0.1",
+    "jsr:@cliffy/flags@1.0.0": "1.0.0",
     "jsr:@cliffy/flags@1.0.1": "1.0.1",
+    "jsr:@cliffy/internal@1.0.0": "1.0.0",
     "jsr:@cliffy/internal@1.0.1": "1.0.1",
     "jsr:@cliffy/keycode@1.0.1": "1.0.1",
     "jsr:@cliffy/prompt@1": "1.0.1",
+    "jsr:@cliffy/table@1.0.0": "1.0.0",
     "jsr:@cliffy/table@1.0.1": "1.0.1",
     "jsr:@david/console-static-text@0.3": "0.3.4",
     "jsr:@david/dax@0.43": "0.43.2",
@@ -99,6 +103,7 @@
     "npm:es-toolkit@^1.30.0": "1.46.1",
     "npm:hono@4": "4.12.23",
     "npm:hono@^4.10.6": "4.12.23",
+    "npm:ioredis@5.4.1": "5.4.1",
     "npm:ioredis@^5.4.1": "5.11.1",
     "npm:ioredis@^5.6.1": "5.11.1",
     "npm:json-canon@^1.0.1": "1.0.1",
@@ -122,27 +127,47 @@
     "@cliffy/ansi@1.0.1": {
       "integrity": "46be51d0993a916dbed68564a6630dc1a742ebb0247744e04bc17e85d72f5bed",
       "dependencies": [
-        "jsr:@cliffy/internal",
+        "jsr:@cliffy/internal@1.0.1",
         "jsr:@std/encoding",
         "jsr:@std/io@~0.225.3"
+      ]
+    },
+    "@cliffy/command@1.0.0": {
+      "integrity": "c52a241ea68857fcdaff4f3173eb404f8017d7bc35553b6f533c592b89dde7d2",
+      "dependencies": [
+        "jsr:@cliffy/flags@1.0.0",
+        "jsr:@cliffy/internal@1.0.0",
+        "jsr:@cliffy/table@1.0.0",
+        "jsr:@std/fmt@^1.0.9",
+        "jsr:@std/text@^1.0.17"
       ]
     },
     "@cliffy/command@1.0.1": {
       "integrity": "0172d9c7d8aeb26b8f4f44ffa833247e4fbab707e258ee271e10a2a2f87b531d",
       "dependencies": [
-        "jsr:@cliffy/flags",
-        "jsr:@cliffy/internal",
-        "jsr:@cliffy/table",
+        "jsr:@cliffy/flags@1.0.1",
+        "jsr:@cliffy/internal@1.0.1",
+        "jsr:@cliffy/table@1.0.1",
         "jsr:@std/fmt@^1.0.9",
+        "jsr:@std/text@^1.0.17"
+      ]
+    },
+    "@cliffy/flags@1.0.0": {
+      "integrity": "8b57698adc644da8f90422d58976362d41a4ebca39c312ca1c101585d0148feb",
+      "dependencies": [
+        "jsr:@cliffy/internal@1.0.0",
         "jsr:@std/text@^1.0.17"
       ]
     },
     "@cliffy/flags@1.0.1": {
       "integrity": "468dcf65acb33b51ecb2e232c30603209c528b1d1bd9e065921b57fcb342cb01",
       "dependencies": [
-        "jsr:@cliffy/internal",
+        "jsr:@cliffy/internal@1.0.1",
         "jsr:@std/text@^1.0.17"
       ]
+    },
+    "@cliffy/internal@1.0.0": {
+      "integrity": "1e17ccbcd5420093c0a93e5b3827bbdc9abac5195bacf187edc44665e54bdde6"
     },
     "@cliffy/internal@1.0.1": {
       "integrity": "9e2bba59ad559b790f09c57219c727a69f0179ebabc07f1bf9db25232b606760"
@@ -154,13 +179,19 @@
       "integrity": "717265ab9a2ad2a3c06d2a090bb3068f1a5a5efd6ea3c6da9ea09274f74830cd",
       "dependencies": [
         "jsr:@cliffy/ansi",
-        "jsr:@cliffy/internal",
+        "jsr:@cliffy/internal@1.0.1",
         "jsr:@cliffy/keycode",
         "jsr:@std/assert@^1.0.19",
         "jsr:@std/fmt@^1.0.9",
         "jsr:@std/io@~0.225.3",
         "jsr:@std/path@^1.1.4",
         "jsr:@std/text@^1.0.17"
+      ]
+    },
+    "@cliffy/table@1.0.0": {
+      "integrity": "3fdaa9e1ef1ea62022108adabd826932bdea8dd05497079896febcd41322907f",
+      "dependencies": [
+        "jsr:@std/fmt@^1.0.9"
       ]
     },
     "@cliffy/table@1.0.1": {
@@ -1440,6 +1471,20 @@
         "standard-as-callback"
       ]
     },
+    "ioredis@5.4.1": {
+      "integrity": "sha512-2YZsvl7jopIa1gaePkeMtd9rAcSjOOjPtpcLlOeusyO+XH2SK5ZcT+UCrElPP+WVIInh2TzeI4XW9ENaSLVVHA==",
+      "dependencies": [
+        "@ioredis/commands",
+        "cluster-key-slot",
+        "debug",
+        "denque",
+        "lodash.defaults",
+        "lodash.isarguments",
+        "redis-errors",
+        "redis-parser",
+        "standard-as-callback"
+      ]
+    },
     "is-docker@3.0.0": {
       "integrity": "sha512-eljcgEDlEns/7AXFosB5K/2nCM4P7FQPkGc/DWLy5rmFEWvZayGrik1d9/QIY5nJ4f9YsVvBkA6kJpHn9rISdQ==",
       "bin": true
@@ -1533,8 +1578,14 @@
       "scripts": true,
       "bin": true
     },
+    "lodash.defaults@4.2.0": {
+      "integrity": "sha512-qjxPLHd3r5DnsdGacqOMU6pb/avJzdh9tFX2ymgoZE27BmjXrNy/y4LoaiTeAb+O3gL8AfpJGtqfX/ae2leYYQ=="
+    },
     "lodash.includes@4.3.0": {
       "integrity": "sha512-W3Bx6mdkRTGtlJISOvVD/lbqjTlPPUDTMnlXZFnVwi9NKJ6tiAk6LVdlhZMm17VZisqhKcgzpO5Wz91PCt5b0w=="
+    },
+    "lodash.isarguments@3.1.0": {
+      "integrity": "sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg=="
     },
     "lodash.isboolean@3.0.3": {
       "integrity": "sha512-Bz5mupy2SVbPHURB98VAcw+aHh4vRV5IPNhILUCsOzRmsTmSQ17jIuqopAentWoehktxGd9e/hbIXq980/1QJg=="

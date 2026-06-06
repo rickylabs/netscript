@@ -5,6 +5,7 @@ import {
   type TaskDefinition,
   type TaskExecutionOptions,
 } from '@netscript/plugin-workers-core/runtime';
+import { toFileUrl } from '@std/path';
 import type { WorkerDispatchContext, WorkerJobResult } from './worker-options.ts';
 
 /** Execute a worker job with the correct runtime strategy. */
@@ -65,7 +66,7 @@ function resolveDenoEntrypoint(
 ): string {
   const jobEntrypoint = jobDef.entrypoint ?? './index.ts';
   if (jobEntrypoint.startsWith('/') || jobEntrypoint.match(/^[A-Za-z]:[/\\]/)) {
-    return jobEntrypoint.replace(/\\/g, '/');
+    return toLocalModuleSpecifier(jobEntrypoint);
   }
 
   const cwd = Deno.cwd();
@@ -86,7 +87,7 @@ function resolveDenoEntrypoint(
       ? `${projectRoot}/${jobEntrypoint.slice(2)}`
       : `${projectRoot}/${jobEntrypoint}`;
     console.log(`[Worker ${context.workerId}] Plugin job resolved to: ${entrypoint}`);
-    return entrypoint.replace(/\\/g, '/');
+    return toLocalModuleSpecifier(entrypoint);
   }
 
   let resolvedJobsDir = context.jobsDir;
@@ -99,7 +100,18 @@ function resolveDenoEntrypoint(
   const entrypoint = jobEntrypoint.startsWith('./')
     ? `${resolvedJobsDir}/${jobEntrypoint.slice(2)}`
     : `${resolvedJobsDir}/${jobEntrypoint}`;
-  return entrypoint.replace(/\\/g, '/');
+  return toLocalModuleSpecifier(entrypoint);
+}
+
+function toLocalModuleSpecifier(pathOrSpecifier: string): string {
+  const normalized = pathOrSpecifier.replace(/\\/g, '/');
+  if (/^(?:blob|data|file|https?|jsr|npm):/.test(normalized)) {
+    return normalized;
+  }
+  if (normalized.startsWith('/') || /^[A-Za-z]:\//.test(normalized)) {
+    return toFileUrl(normalized).href;
+  }
+  return normalized;
 }
 
 async function executePolyglotTask(

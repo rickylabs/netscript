@@ -1,12 +1,11 @@
 /**
  * Redis Queue Adapter
  *
- * Wraps Fedify's RedisMessageQueue for NetScript integration.
+ * Uses Redis LIST operations for NetScript queue integration.
  *
  * @module
  */
 
-import { RedisMessageQueue } from '@fedify/redis';
 import { Redis } from 'ioredis';
 import type {
   EnqueueOptions,
@@ -20,12 +19,25 @@ import { createEnvelope, createMessageContext, isMessageEnvelope } from './_enve
 function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, unknown> {
   return {
     ...userOptions,
-    maxRetriesPerRequest: 3,
-    enableReadyCheck: true,
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
     connectTimeout: 10000,
     keepAlive: 30000,
     lazyConnect: false,
   };
+}
+
+const DEFAULT_BLOCK_TIMEOUT_SECONDS = 1;
+const DEFAULT_DELAYED_POLL_MS = 1_000;
+
+interface RedisQueueClients {
+  readonly commands: Redis;
+  readonly blocking: Redis;
+}
+
+interface DelayedQueueEntry {
+  readonly queueKey: string;
+  readonly envelope: string;
 }
 
 /**
@@ -34,41 +46,36 @@ function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, 
  * @template T - Message payload type
  */
 export class RedisAdapter<T = unknown> implements MessageQueue<T> {
-  private readonly queue: RedisMessageQueue;
   private listening = false;
   private abortController?: AbortController;
+  private clients: RedisQueueClients | null = null;
+  private delayedTimer?: ReturnType<typeof setInterval>;
 
   readonly nativeRetrial = true;
 
   constructor(
     private readonly url: string,
     private readonly queueName = 'default',
-    private readonly options?: Record<string, unknown>,
+    private readonly options: Record<string, unknown> | undefined = undefined,
   ) {
-    try {
-      const redisOptions = getRedisOptions(options);
-      const createRedis = () => new Redis(url, redisOptions);
-      this.queue = new RedisMessageQueue(createRedis, {
-        queueKey: `netscript:queue:${this.queueName}`,
-        channelKey: `netscript:channel:${this.queueName}`,
-        workerId: crypto.randomUUID(),
-      });
-    } catch (error) {
-      throw new QueueConnectionError(
-        `Failed to initialize Redis queue: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-        error instanceof Error ? error : undefined,
-      );
-    }
   }
 
   async enqueue(message: T, options?: EnqueueOptions): Promise<void> {
     try {
       const envelope = createEnvelope(message, options);
-      await this.queue.enqueue(envelope, {
-        delay: options?.delay ? Temporal.Duration.from({ milliseconds: options.delay }) : undefined,
-      });
+      const encoded = JSON.stringify(envelope);
+      const clients = this.ensureClients();
+
+      if (options?.delay && options.delay > 0) {
+        await clients.commands.zadd(
+          this.delayedKey,
+          Date.now() + options.delay,
+          JSON.stringify({ queueKey: this.queueKey, envelope: encoded }),
+        );
+        return;
+      }
+
+      await clients.commands.lpush(this.queueKey, encoded);
     } catch (error) {
       throw new QueueError(
         `Failed to enqueue message: ${error instanceof Error ? error.message : String(error)}`,
@@ -110,42 +117,32 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
 
     this.listening = true;
     this.abortController = new AbortController();
+    const clients = this.ensureClients();
+    this.startDelayedProcessor();
 
     const signal = options?.signal;
     if (signal) {
       signal.addEventListener('abort', () => {
         this.abortController?.abort();
+        this.clients?.blocking.disconnect();
       });
     }
 
     try {
-      await this.queue.listen(async (rawMessage) => {
-        let payload: T;
-        let headers: Record<string, string> = {};
-        let messageId: string;
-        let enqueuedAt: Date;
-        let deliveryCount: number;
-
-        if (isMessageEnvelope<T>(rawMessage)) {
-          payload = rawMessage.payload;
-          headers = rawMessage.headers;
-          messageId = rawMessage.messageId;
-          enqueuedAt = new Date(rawMessage.enqueuedAt);
-          deliveryCount = rawMessage.deliveryCount + 1;
-        } else {
-          payload = rawMessage as T;
-          messageId = crypto.randomUUID();
-          enqueuedAt = new Date();
-          deliveryCount = 1;
+      while (!this.abortController.signal.aborted) {
+        const encoded = await clients.blocking.brpoplpush(
+          this.queueKey,
+          this.processingKey,
+          DEFAULT_BLOCK_TIMEOUT_SECONDS,
+        );
+        if (!encoded) {
+          continue;
         }
 
-        await handler(
-          payload,
-          this.createContext(messageId, enqueuedAt, headers, deliveryCount),
-        );
-      }, { signal: this.abortController.signal });
+        await this.handleEncodedMessage(encoded, handler);
+      }
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (this.abortController.signal.aborted || isExpectedStopError(error)) {
         return;
       }
       throw new QueueError(
@@ -157,6 +154,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
         },
       );
     } finally {
+      this.stopDelayedProcessor();
       this.listening = false;
     }
   }
@@ -168,7 +166,106 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
 
     this.abortController?.abort();
     this.listening = false;
+    this.stopDelayedProcessor();
+    this.clients?.blocking.disconnect();
     await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
+  private ensureClients(): RedisQueueClients {
+    if (this.clients) {
+      return this.clients;
+    }
+
+    try {
+      const redisOptions = getRedisOptions(this.options);
+      this.clients = {
+        commands: new Redis(this.url, redisOptions),
+        blocking: new Redis(this.url, redisOptions),
+      };
+      return this.clients;
+    } catch (error) {
+      throw new QueueConnectionError(
+        `Failed to initialize Redis queue: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        error instanceof Error ? error : undefined,
+      );
+    }
+  }
+
+  private async handleEncodedMessage(
+    encoded: string,
+    handler: (message: T, context: MessageContext) => Promise<void>,
+  ): Promise<void> {
+    let payload: T;
+    let headers: Record<string, string> = {};
+    let messageId: string;
+    let enqueuedAt: Date;
+    let deliveryCount: number;
+
+    const rawMessage = JSON.parse(encoded) as unknown;
+    if (isMessageEnvelope<T>(rawMessage)) {
+      payload = rawMessage.payload;
+      headers = rawMessage.headers;
+      messageId = rawMessage.messageId;
+      enqueuedAt = new Date(rawMessage.enqueuedAt);
+      deliveryCount = rawMessage.deliveryCount + 1;
+    } else {
+      payload = rawMessage as T;
+      messageId = crypto.randomUUID();
+      enqueuedAt = new Date();
+      deliveryCount = 1;
+    }
+
+    let settled = false;
+    const context = this.createContext(
+      messageId,
+      enqueuedAt,
+      headers,
+      deliveryCount,
+      encoded,
+      () => settled = true,
+    );
+
+    try {
+      await handler(payload, context);
+      if (!settled) {
+        await context.ack();
+      }
+    } catch (error) {
+      if (!settled) {
+        await context.nack({ requeue: true });
+      }
+      throw error;
+    }
+  }
+
+  private startDelayedProcessor(): void {
+    if (this.delayedTimer) {
+      return;
+    }
+    this.delayedTimer = setInterval(
+      () => void this.moveDueDelayedMessages(),
+      DEFAULT_DELAYED_POLL_MS,
+    );
+  }
+
+  private stopDelayedProcessor(): void {
+    if (!this.delayedTimer) {
+      return;
+    }
+    clearInterval(this.delayedTimer);
+    this.delayedTimer = undefined;
+  }
+
+  private async moveDueDelayedMessages(): Promise<void> {
+    const clients = this.ensureClients();
+    const entries = await clients.commands.zrangebyscore(this.delayedKey, '-inf', Date.now());
+    for (const entry of entries) {
+      const parsed = JSON.parse(entry) as DelayedQueueEntry;
+      await clients.commands.lpush(parsed.queueKey, parsed.envelope);
+      await clients.commands.zrem(this.delayedKey, entry);
+    }
   }
 
   private createContext(
@@ -176,14 +273,46 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     enqueuedAt: Date,
     headers: Record<string, string>,
     deliveryCount: number,
+    encoded: string,
+    markSettled: () => void,
   ): MessageContext {
     return createMessageContext(
       messageId,
       enqueuedAt,
       headers,
       deliveryCount,
-      async () => {},
-      async () => {},
+      async () => {
+        await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
+        markSettled();
+      },
+      async (options) => {
+        await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
+        if (options?.requeue ?? true) {
+          await this.ensureClients().commands.lpush(this.queueKey, encoded);
+        }
+        markSettled();
+      },
     );
   }
+
+  private get queueKey(): string {
+    return `netscript:queue:${this.queueName}`;
+  }
+
+  private get processingKey(): string {
+    return `netscript:processing:${this.queueName}`;
+  }
+
+  private get delayedKey(): string {
+    return `netscript:delayed:${this.queueName}`;
+  }
+}
+
+function isExpectedStopError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  return error.name === 'AbortError' ||
+    error.message.includes('Connection is closed') ||
+    error.message.includes('Connection is disconnected');
 }

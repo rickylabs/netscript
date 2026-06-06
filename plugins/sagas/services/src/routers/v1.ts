@@ -280,7 +280,7 @@ function mapSagaToResponse(
 // SAGA DEFINITIONS HANDLERS
 // ============================================================================
 
-export const sagasV1 = {
+export const sagasV1: Record<string, unknown> = {
   /**
    * List all registered saga definitions with optional filtering
    */

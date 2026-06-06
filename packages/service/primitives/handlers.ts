@@ -130,7 +130,11 @@ export function createRPCPlugins(config: RPCHandlerConfig): StandardHandlerPlugi
  * });
  * ```
  */
-export function createRPCHandler<T extends AnyRouter>(router: T, config?: RPCHandlerConfig) {
+// deno-lint-ignore no-explicit-any
+export function createRPCHandler<T extends AnyRouter>(
+  router: T,
+  config?: RPCHandlerConfig,
+): any {
   const plugins = createRPCPlugins(config ?? {});
   return new RPCHandler(router, { plugins });
 }
@@ -153,7 +157,11 @@ export function createRPCHandler<T extends AnyRouter>(router: T, config?: RPCHan
  * });
  * ```
  */
-export function createOpenAPIHandler<T extends AnyRouter>(router: T, config?: RPCHandlerConfig) {
+// deno-lint-ignore no-explicit-any
+export function createOpenAPIHandler<T extends AnyRouter>(
+  router: T,
+  config?: RPCHandlerConfig,
+): any {
   const plugins = [...createRPCPlugins(config ?? {}), new ZodSmartCoercionPlugin()];
   return new OpenAPIHandler(router, { plugins });
 }

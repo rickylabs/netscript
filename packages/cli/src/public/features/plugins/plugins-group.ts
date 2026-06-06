@@ -15,7 +15,9 @@ import type { PublicCommandDependencies } from '../root/public-command-dependenc
 const CONCRETE_VERBS = new Set<FrameworkVerb>(['sync', 'info', 'update', 'remove', 'doctor']);
 
 /** Create the public plugin command group. */
-export function createPluginCommand(dependencies: PublicCommandDependencies) {
+export function createPluginCommand(
+  dependencies: PublicCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   const command = new Command()
     .name('plugin')
     .description('Manage NetScript plugins')

@@ -29,7 +29,6 @@
       "transform.ts",
       "src/**/*.ts",
       "crud/**/*.ts",
-      "helpers/**/*.ts",
       "schemas/**/*.ts"
     ],
     "exclude": [

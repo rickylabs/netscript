@@ -153,7 +153,6 @@ export function createCrudContract<
   const idInputSchema = z.object({ id: idSchema as unknown as z.ZodTypeAny });
 
   // Build contract object
-  // deno-lint-ignore no-explicit-any
   const contract: Record<string, CrudContractOperation> = {};
 
   // List operation

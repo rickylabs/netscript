@@ -1,3 +1,4 @@
+import { Command } from '@cliffy/command';
 /**
  * @module public/features/db/studio/studio-db-command
  */
@@ -15,6 +16,8 @@ export class StudioDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db studio` command. */
-export function createDbStudioCommand(dependencies: DbOperationCommandDependencies) {
+export function createDbStudioCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new StudioDbCommand(dependencies).define();
 }

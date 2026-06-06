@@ -29,7 +29,7 @@ import {
   servyLifecycleArgs,
 } from '../../../../kernel/adapters/deploy/shared.ts';
 
-export const startCommand = new Command()
+export const startCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('start')
   .description('Start registered services via Servy (requires admin)')
   .arguments('[service:string]')

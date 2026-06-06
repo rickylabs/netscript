@@ -36,15 +36,20 @@ export function commandGate(
   };
 }
 
-/** Create an HTTP gate definition for a fixed health-check URL. */
-export function httpGate(id: GateId, title: string, url: string): HttpGateDefinition {
+/** Create an HTTP gate definition for a fixed local runtime URL. */
+export function httpGate(
+  id: GateId,
+  title: string,
+  url: string,
+  method: 'GET' | 'POST' = 'GET',
+): HttpGateDefinition {
   return {
     id,
     title,
     phase: GATE_PHASE.BEHAVIOR,
     kind: 'http',
     critical: true,
-    method: 'GET',
+    method,
     url: () => url,
   };
 }

@@ -17,3 +17,9 @@
  */
 
 export * from './crud/create-crud-contract.ts';
+export type { BaseContractProcedure } from './src/application/contract-primitives.ts';
+export type {
+  ContractObjectSchema,
+  ContractParseResult,
+  ContractSchema,
+} from './src/domain/schema-types.ts';

@@ -5,7 +5,7 @@ type JobRetentionConfig = Readonly<{
   dbRetentionDays: number;
 }>;
 
-export const adminHandlers = {
+export const adminHandlers: Record<string, unknown> = {
   cleanup: router.cleanup.handler(() => {
     return {
       deleted: [],

@@ -8,11 +8,19 @@ export async function rewriteCopiedDenoJsons(options: {
   readonly projectName: string;
   readonly importMode: PackageSourceMode;
   readonly workspacePackageName: string | null;
+  readonly localProjectRoot?: string;
 }): Promise<void> {
   for await (const entry of Deno.readDir(options.root)) {
     const path = join(options.root, entry.name);
     if (entry.isDirectory) {
-      await rewriteCopiedDenoJsons({ ...options, root: path, workspacePackageName: null });
+      await rewriteCopiedDenoJsons({
+        ...options,
+        root: path,
+        workspacePackageName: null,
+        localProjectRoot: options.localProjectRoot
+          ? toPosixPath(join('..', options.localProjectRoot))
+          : undefined,
+      });
       continue;
     }
 
@@ -30,7 +38,7 @@ export async function rewriteCopiedDenoJsons(options: {
     }
 
     if (raw.imports) {
-      raw.imports = rewriteImports(raw.imports, options.importMode);
+      raw.imports = rewriteImports(raw.imports, options.importMode, options.localProjectRoot);
     }
 
     await Deno.writeTextFile(path, JSON.stringify(raw, null, 2) + '\n');
@@ -40,17 +48,49 @@ export async function rewriteCopiedDenoJsons(options: {
 function rewriteImports(
   imports: Record<string, string>,
   importMode: PackageSourceMode,
+  localProjectRoot?: string,
 ): Record<string, string> {
+  const localImports = localProjectRoot
+    ? Object.fromEntries(
+      Object.entries(imports).map(([specifier, target]) => [
+        specifier,
+        rewriteLocalProjectPath(target, localProjectRoot) ?? target,
+      ]),
+    )
+    : imports;
+
   if (importMode === 'local') {
-    return imports;
+    return localImports;
   }
 
   return Object.fromEntries(
-    Object.entries(imports).map(([specifier, target]) => [
+    Object.entries(localImports).map(([specifier, target]) => [
       specifier,
       rewritePackagePathToJsr(target) ?? target,
     ]),
   );
+}
+
+const OFFICIAL_PLUGIN_DIRS = new Set(['sagas', 'streams', 'triggers', 'workers']);
+
+function rewriteLocalProjectPath(target: string, localProjectRoot: string): string | null {
+  const normalized = target.replaceAll('\\', '/');
+  const packageMatch = /^(\.\.\/)+packages\/(?<rest>.+)$/.exec(normalized);
+  if (packageMatch?.groups?.rest) {
+    return `${localProjectRoot}/packages/${packageMatch.groups.rest}`;
+  }
+
+  const pluginMatch = /^(\.\.\/)+(?<plugin>[^/]+)(?<rest>\/.*)?$/.exec(normalized);
+  const plugin = pluginMatch?.groups?.plugin;
+  if (!plugin || !OFFICIAL_PLUGIN_DIRS.has(plugin)) {
+    return null;
+  }
+
+  return `${localProjectRoot}/plugins/${plugin}${pluginMatch?.groups?.rest ?? ''}`;
+}
+
+function toPosixPath(path: string): string {
+  return path.replaceAll('\\', '/');
 }
 
 export function rewritePackagePathToJsr(target: string): string | null {

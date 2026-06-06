@@ -1,7 +1,10 @@
 import { join } from '@std/path';
 import { DEFAULT_SERVICE_PREFIX } from '../../../../kernel/constants/windows.ts';
 import { Pipeline } from '../../../../kernel/application/abstracts/pipeline.ts';
-import { PipelineStep } from '../../../../kernel/application/abstracts/pipeline-step.ts';
+import {
+  PipelineStep,
+  type PipelineStepInspection,
+} from '../../../../kernel/application/abstracts/pipeline-step.ts';
 import type {
   ResolvedServiceManifest,
   ServiceManifestPort,
@@ -53,7 +56,7 @@ export class InstallServiceDeployStep
     super();
   }
 
-  inspect(input: InstallServiceDeployRequest) {
+  inspect(input: InstallServiceDeployRequest): PipelineStepInspection {
     return {
       id: this.id,
       label: 'Install Windows services',

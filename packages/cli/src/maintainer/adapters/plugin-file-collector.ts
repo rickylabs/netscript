@@ -1,7 +1,10 @@
 import { walk } from '@std/fs';
 import { join, relative } from '@std/path';
 
-import { copyDirectoryFiltered } from '../../kernel/adapters/scaffold/directory-copier.ts';
+import {
+  copyDirectoryFiltered,
+  type CopyDirectoryFilteredResult,
+} from '../../kernel/adapters/scaffold/directory-copier.ts';
 import { SCAFFOLD_DIRS } from '../../kernel/constants/scaffold/scaffold-dirs.ts';
 
 const SCAFFOLD_RUNTIME_MANIFEST = 'scaffold.runtime.json';
@@ -49,7 +52,7 @@ export async function copyPluginDirectory(
   targetPath: string,
   pluginDir: string,
   force: boolean,
-) {
+): Promise<CopyDirectoryFilteredResult> {
   return await copyDirectoryFiltered({
     source: join(sourceRoot, SCAFFOLD_DIRS.PLUGINS, pluginDir),
     dest: join(targetPath, SCAFFOLD_DIRS.PLUGINS, pluginDir),
@@ -64,8 +67,8 @@ export async function copyWorkspaceDirectory(
   targetPath: string,
   workspaceDir: string,
   force: boolean,
-  sourceWorkspaceDir = workspaceDir,
-) {
+  sourceWorkspaceDir: string = workspaceDir,
+): Promise<CopyDirectoryFilteredResult> {
   return await copyDirectoryFiltered({
     source: join(sourceRoot, sourceWorkspaceDir),
     dest: join(targetPath, workspaceDir),

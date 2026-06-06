@@ -7,7 +7,7 @@
 import type { PluginKindProvider } from '../../../domain/plugin-kind.ts';
 
 /** Immutable scaffolding defaults for HTTP API plugins. */
-export const apiKindProvider = Object.freeze(
+export const apiKindProvider: PluginKindProvider = Object.freeze(
   {
     kind: 'api',
     displayName: 'API Plugin',
