@@ -38,3 +38,4 @@ Format:
 - cdff7f0: test(workspace): validate plugin consumers
 - ad0b232: test(workspace): verify final package publish dry runs
 - 936209a: docs(agents): clarify full cli e2e command
+- f6bf743: test(cli): restore full scaffold runtime e2e
