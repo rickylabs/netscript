@@ -126,8 +126,12 @@ deno task check
 # Run tests
 deno task test
 
-# Run CLI E2E tests (expensive — run before merge)
-deno task e2e:cli
+# Discover available CLI E2E suites and gates
+deno task e2e:cli suites
+deno task e2e:cli gates scaffold.plugins
+
+# Run the full CLI E2E smoke before merge
+deno task e2e:cli run scaffold.plugins --cleanup --format pretty
 ```
 
 ### Working with the harness
