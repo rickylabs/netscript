@@ -5,4 +5,4 @@
 
 | # | Commit | Subject | Gate proven |
 |---|--------|---------|-------------|
-| — | — | (no commits yet — Research + Plan & Design phase) | — |
+| 1 | `1933bce` | docs(plan): Wave 2 research, plan, and design checkpoint | Plan-Gate input (research.md, plan.md, worklog.md, drift.md) |
