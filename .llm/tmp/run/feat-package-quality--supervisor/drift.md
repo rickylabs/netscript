@@ -49,6 +49,44 @@ current-state documentation.
   2a/2b/2c). May change the registry's single-group assumption for Wave 2; escalate per
   `supervisor.md` § 4 if so.
 - **Severity:** significant (planning).
+- **Resolution (2026-06-07):** RESOLVED → promoted to escalation. The Wave 2 generator
+  resolved OQ-1 by splitting into 2a (logger·telemetry·aspire, 10 slices) / 2b
+  (kv·database·prisma-adapter-mysql, 23 slices) / 2c (queue·cron, 17 slices) — each
+  `< 30`, ordered 2a→2b→2c. This changes the registry's single-group assumption →
+  recorded in `escalations/wave2-subwave-split.md`; user brief pending on PLAN-EVAL
+  routing (see entry below).
+
+## 2026-06-07 — Wave 2 Plan & Design complete; sub-wave split promoted (group-structure change)
+
+- **What:** Wave 2 generator finished Plan & Design (Design checkpoint complete, all
+  7 OQs resolved, full A2 matrix selected, real dynamic re-baseline done). The locked
+  plan splits Wave 2 into three sub-groups (2a/2b/2c), each with its own branch + PR +
+  evaluator pass — a dependency-graph / group-ordering change vs the single-group
+  Wave 2 in the registry.
+- **Source:** `…/feat-package-quality-wave2-adapters--adapters/{plan.md,worklog.md,drift.md}`.
+- **Action:** brief user (escalation.md § 3 answers 2–4 = yes). Do NOT begin
+  implementation until (a) user accepts the sub-wave structure + PLAN-EVAL routing and
+  (b) PLAN-EVAL returns `PASS` in a separate session. Supervisor does not run PLAN-EVAL.
+- **Severity:** significant (group structure / process).
+- **Evidence:** `escalations/wave2-subwave-split.md`.
+- **Re-baseline note (promoted from wave drift):** carried-in 2026-05 counts were stale
+  as expected (L-rebaseline held). Real numbers: logger/kv already clean; telemetry 2
+  doc-lint; aspire 20 doc-lint; database 1 slow-type + 22 doc-lint + from-scratch;
+  prisma-adapter-mysql 14 doc-lint; queue 19 doc-lint; cron 5 doc-lint.
+
+## 2026-06-07 — PLAN-EVAL PASS; ARCHETYPE-2 gate list lags the gate matrix (doc drift)
+
+- **What:** Wave 2 PLAN-EVAL cycle 2 returned `PASS`. In doing so the evaluator found the
+  plan's A2 fitness set stopped at F-15, and added F-16/F-17/F-18 in place (instruction #10).
+  Root cause: `archetypes/ARCHETYPE-2-integration.md`'s gate list disagrees with
+  `gates/archetype-gate-matrix.md`, which marks F-16/F-17/F-18 `required` for Arch 2.
+- **Source:** PR #8 PLAN-EVAL PASS comment (4640656448); `gates/archetype-gate-matrix.md` rows 32–34.
+- **Action:** **the matrix governs.** Two outcomes: (1) reinforces **L-full-matrix** — every
+  future generator prompt must select the gate set from the *matrix*, not an archetype doc's
+  prose list; (2) cross-cutting doc-drift to fix so Waves 3–6 don't re-inherit a stale list —
+  reconcile `ARCHETYPE-2-integration.md` (and spot-check the other ARCHETYPE-*.md gate lists)
+  against the matrix, or file a debt entry. Carried as a standing supervisor item.
+- **Severity:** significant (would silently under-gate future waves if unaddressed).
 
 ## 2026-06-05 — Stale slow-type counts must be re-measured
 
