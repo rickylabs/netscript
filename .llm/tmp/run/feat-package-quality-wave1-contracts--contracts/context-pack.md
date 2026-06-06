@@ -46,6 +46,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 23 — contracts `docs/advanced/extending.md` added and linked; docs file-list gate passed.
 - [x] Slice 24 — contracts gate sweep passed; helpers AP-16 debt closed and root `crud/` accepted debt recorded.
 - [x] Slice 25 — `packages/cli` consumer `deno check` passed with 0 errors.
+- [x] Slice 26 — `plugins/sagas` and `plugins/workers` consumer `deno check` passed with 0 errors.
 
 ## Key findings (re-baselined)
 

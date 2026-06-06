@@ -225,6 +225,7 @@ A new developer adding a config schema section:
 | 2026-06-06 | 24 | Implement | Ran the contracts gate sweep, removed a stale lint ignore, normalized package formatting, removed the stale `helpers/**/*.ts` publish include, marked `src/public/mod.ts` with `arch:barrel-ok`, and updated architecture debt for the closed helpers directory plus accepted root `crud/` layout. |
 | 2026-06-06 | 24 | Gate | Contracts sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. |
 | 2026-06-06 | 25 | Gate | `cd packages/cli && deno check` passed with 0 errors; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 26 | Gate | `cd plugins/sagas && deno check` and `cd plugins/workers && deno check` both passed with 0 errors; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 
 ## Decisions
 
