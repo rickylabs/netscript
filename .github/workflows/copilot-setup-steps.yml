@@ -53,6 +53,7 @@ jobs:
         run: |
           set -euo pipefail
           aspire_version="13.4.2"
+          # This commit is the target of the v13.4.2 Aspire release tag.
           installer_url="https://raw.githubusercontent.com/dotnet/aspire/d7d0b6759ce4b936c76bc4775814d27db560dd6d/eng/scripts/get-aspire-cli.sh"
           installer_sha256="df1247d87f6e5ca83e71abf55f78bca1bd9a421a3f2f0fd5481f153fc958632a"
           installer="$(mktemp)"
@@ -80,11 +81,16 @@ jobs:
           set -euo pipefail
           deno --version
           # Resolve + cache package/plugin source dependencies (jsr: + npm:).
-          if [[ ! -d packages || ! -d plugins ]]; then
-            echo "::warning::Expected packages/ and plugins/ directories were not found; skipping Deno cache warm-up."
+          deno_source_dirs=(packages plugins)
+          missing_dirs=()
+          for dir in "${deno_source_dirs[@]}"; do
+            [[ -d "$dir" ]] || missing_dirs+=("$dir")
+          done
+          if ((${#missing_dirs[@]})); then
+            echo "::warning::Expected Deno source directories missing (${missing_dirs[*]}); skipping cache warm-up."
             exit 0
           fi
-          mapfile -d '' deno_sources < <(find packages plugins -type f \( -name '*.ts' -o -name '*.tsx' \) -print0)
+          mapfile -d '' deno_sources < <(find "${deno_source_dirs[@]}" -type f \( -name '*.ts' -o -name '*.tsx' \) -print0)
           if ((${#deno_sources[@]})); then
             # Batch files to stay comfortably below shell command-line length limits.
             if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
