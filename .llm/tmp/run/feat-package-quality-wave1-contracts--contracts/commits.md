@@ -31,3 +31,4 @@ Format:
 - aab8d2f: refactor(contracts): move paginated query helper
 - 5062e76: refactor(contracts): move transform helpers
 - df7a919: docs(contracts): export subpath schema types
+- ec09969: docs(contracts): add getting started guide

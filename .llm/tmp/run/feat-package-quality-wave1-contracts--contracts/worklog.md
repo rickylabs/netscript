@@ -220,6 +220,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 21 | Gate | `deno doc --lint crud.ts query.ts transform.ts` passed; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 22 | Implement | Added `packages/contracts/docs/getting-started.md` and linked it from the contracts docs index. |
 | 2026-06-06 | 22 | Gate | `Get-ChildItem docs -Recurse -File` listed 6 contracts docs files including `docs/getting-started.md`. |
+| 2026-06-06 | 23 | Implement | Added `packages/contracts/docs/advanced/extending.md` and linked it from the contracts docs index. |
+| 2026-06-06 | 23 | Gate | `Get-ChildItem docs -Recurse -File` listed 7 contracts docs files including `docs/advanced/extending.md`. |
 
 ## Decisions
 

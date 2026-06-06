@@ -43,6 +43,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 20 — contracts transform helper moved to `src/application`; `deno check mod.ts` and `deno check transform.ts` passed; `helpers/` removed.
 - [x] Slice 21 — contracts subpaths exported schema/procedure public types; `deno doc --lint crud.ts query.ts transform.ts` passed.
 - [x] Slice 22 — contracts `docs/getting-started.md` added and linked; docs file-list gate passed.
+- [x] Slice 23 — contracts `docs/advanced/extending.md` added and linked; docs file-list gate passed.
 
 ## Key findings (re-baselined)
 
