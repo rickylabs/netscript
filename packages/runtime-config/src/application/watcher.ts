@@ -26,7 +26,17 @@ export function watchRuntimeConfig(
       const watcher = Deno.watchFs(dir, { recursive: true });
 
       if (signal) {
-        signal.addEventListener('abort', () => watcher.close(), { once: true });
+        signal.addEventListener(
+          'abort',
+          () => {
+            if (debounceTimer !== null) {
+              clearTimeout(debounceTimer);
+              debounceTimer = null;
+            }
+            watcher.close();
+          },
+          { once: true },
+        );
       }
 
       for await (const event of watcher) {
@@ -53,9 +63,15 @@ export function watchRuntimeConfig(
 }
 
 function isRuntimeConfigChange(event: Deno.FsEvent, dir: string): boolean {
-  if (event.kind !== 'modify' && event.kind !== 'create' && event.kind !== 'remove') {
+  if (
+    event.kind !== 'modify' &&
+    event.kind !== 'create' &&
+    event.kind !== 'remove'
+  ) {
     return false;
   }
 
-  return event.paths.some((path) => path.endsWith('.json') || path.startsWith(dir));
+  return event.paths.some(
+    (path) => path.endsWith('.json') || path.startsWith(dir),
+  );
 }
