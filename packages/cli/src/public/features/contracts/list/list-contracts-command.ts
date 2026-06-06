@@ -24,7 +24,7 @@ async function resolveProjectRoot(pathFlag: string | undefined): Promise<string>
 }
 
 /** `netscript contract list` command. */
-export const contractListCommand = new Command()
+export const contractListCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('list')
   .description('List contracts in the current NetScript workspace')
   .option('--version <version:string>', 'Contract version to inspect', {

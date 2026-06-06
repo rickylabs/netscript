@@ -52,6 +52,6 @@ export class InstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
 /** Create the public `deploy install` command. */
 export function createDeployInstallCommand(
   dependencies: DeployInstallCommandDependencies,
-) {
+) : Command<any, any, any, any, any, any, any, any> {
   return new InstallDeployCommand(dependencies).define();
 }

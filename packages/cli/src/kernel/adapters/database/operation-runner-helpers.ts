@@ -12,7 +12,7 @@ interface AspireAppHostStatus {
   readonly resources?: readonly AspireResourceStatus[];
 }
 
-export const TERMINAL_RESOURCE_STATES = new Set([
+export const TERMINAL_RESOURCE_STATES: ReadonlySet<string> = new Set([
   'Exited',
   'Failed',
   'Finished',

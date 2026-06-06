@@ -4,7 +4,7 @@ import { createMarketplacePublishCommand } from './publish/marketplace-publish-c
 import { createMarketplaceSearchCommand } from './search/marketplace-search-command.ts';
 
 /** Create the public marketplace command group. */
-export function createMarketplaceCommand() {
+export function createMarketplaceCommand() : Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('marketplace')
     .description('Discover and publish NetScript plugins')

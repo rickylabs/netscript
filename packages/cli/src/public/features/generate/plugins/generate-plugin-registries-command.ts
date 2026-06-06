@@ -87,7 +87,7 @@ export class GeneratePluginRegistriesCommand extends CliCommand<AnyCliffyCommand
 /** Create the public `generate plugins` command. */
 export function createGeneratePluginRegistriesCommand(
   dependencies: GeneratePluginRegistriesCommandDependencies,
-) {
+) : Command<any, any, any, any, any, any, any, any> {
   return new GeneratePluginRegistriesCommand(dependencies).define();
 }
 

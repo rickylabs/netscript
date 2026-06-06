@@ -44,6 +44,6 @@ export class InitDbCommand extends CliCommand<AnyCliffyCommand> {
 }
 
 /** Create the public `db init` command. */
-export function createDbInitCommand(dependencies: DbOperationCommandDependencies) {
+export function createDbInitCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
   return new InitDbCommand(dependencies).define();
 }

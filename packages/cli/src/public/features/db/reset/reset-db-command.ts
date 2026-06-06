@@ -1,3 +1,4 @@
+import { Command } from '@cliffy/command';
 /**
  * @module public/features/db/reset/reset-db-command
  */
@@ -15,6 +16,6 @@ export class ResetDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db reset` command. */
-export function createDbResetCommand(dependencies: DbOperationCommandDependencies) {
+export function createDbResetCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
   return new ResetDbCommand(dependencies).define();
 }

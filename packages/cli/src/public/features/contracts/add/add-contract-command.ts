@@ -61,7 +61,7 @@ async function readProjectName(projectRoot: string, fs: DenoFileSystem): Promise
 }
 
 /** `netscript contract add` command. */
-export const contractAddCommand = new Command()
+export const contractAddCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('add')
   .description('Add a v1 contract to an existing NetScript workspace')
   .arguments('<name:string>')

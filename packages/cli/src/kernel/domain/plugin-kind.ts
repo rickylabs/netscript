@@ -36,10 +36,10 @@ export type ScaffoldedPluginType = Extract<
 export type PluginInfrastructureDependency = 'kv' | 'db' | 'cache';
 
 /** Maps Aspire registration categories to appsettings config sections. */
-export const PLUGIN_CONFIG_SECTION_MAP = {
+export const PLUGIN_CONFIG_SECTION_MAP: Record<PluginCategory, PluginConfigSection> = {
   plugin: 'Plugins',
   'background-processor': 'BackgroundProcessors',
-} as const satisfies Record<PluginCategory, PluginConfigSection>;
+} as const;
 
 /**
  * Immutable per-kind scaffolding knowledge.

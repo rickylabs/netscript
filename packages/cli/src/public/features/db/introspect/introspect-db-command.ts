@@ -1,3 +1,4 @@
+import { Command } from '@cliffy/command';
 /**
  * @module public/features/db/introspect/introspect-db-command
  */
@@ -15,6 +16,6 @@ export class IntrospectDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db introspect` command. */
-export function createDbIntrospectCommand(dependencies: DbOperationCommandDependencies) {
+export function createDbIntrospectCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
   return new IntrospectDbCommand(dependencies).define();
 }

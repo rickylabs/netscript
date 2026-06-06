@@ -1,7 +1,9 @@
 import { TEMPLATE_KEYS, type TemplateKey } from '../../assets/manifest.ts';
 import { readTemplateAsset } from '../templates/template-asset.ts';
 
-const APP_TEMPLATE_URLS = {
+type TemplateUrlMap = Readonly<Record<string, TemplateKey>>;
+
+const APP_TEMPLATE_URLS: TemplateUrlMap = {
   appActionsCssTemplate: TEMPLATE_KEYS.appAssetsComponentsActions,
   appAppTemplate: TEMPLATE_KEYS.appRoutesApp,
   appClientTemplate: TEMPLATE_KEYS.appClient,
@@ -27,7 +29,7 @@ const APP_TEMPLATE_URLS = {
   appUtilsTemplate: TEMPLATE_KEYS.appUtils,
 } as const;
 
-const EXAMPLE_SERVICE_APP_TEMPLATE_URLS = {
+const EXAMPLE_SERVICE_APP_TEMPLATE_URLS: TemplateUrlMap = {
   appExampleServiceHeroTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsHero,
   appExampleServiceLabPanelTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsLabPanel,
   appExampleServiceNotesCardTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsNotesCard,
@@ -45,7 +47,7 @@ const EXAMPLE_SERVICE_APP_TEMPLATE_URLS = {
   appTelemetryExampleSharedTemplate: TEMPLATE_KEYS.appRoutesExamplesTelemetrySharedTelemetryTrace,
 } as const;
 
-const LEGACY_ASPIRE_TEMPLATE_URLS = {
+const LEGACY_ASPIRE_TEMPLATE_URLS: TemplateUrlMap = {
   apphostCsprojTemplate: TEMPLATE_KEYS.aspireApphost,
   extensionsCsTemplate: TEMPLATE_KEYS.aspireExtensions,
   launchSettingsTemplate: TEMPLATE_KEYS.aspireLaunchsettings,
@@ -54,11 +56,11 @@ const LEGACY_ASPIRE_TEMPLATE_URLS = {
   telemetryDefaultsCsTemplate: TEMPLATE_KEYS.aspireNetscripttelemetrydefaults,
 } as const;
 
-const ROOT_TEMPLATE_URLS = {
+const ROOT_TEMPLATE_URLS: TemplateUrlMap = {
   gitignoreTemplate: TEMPLATE_KEYS.workspaceGitignore,
 } as const;
 
-const ASPIRE_HELPER_TEMPLATE_URLS = {
+const ASPIRE_HELPER_TEMPLATE_URLS: TemplateUrlMap = {
   apphostTemplate: TEMPLATE_KEYS.aspireHelpersApphost,
   aspireCompatTemplate: TEMPLATE_KEYS.aspireHelpersAspireCompat,
   configureDashboardTemplate: TEMPLATE_KEYS.aspireHelpersConfigureDashboard,

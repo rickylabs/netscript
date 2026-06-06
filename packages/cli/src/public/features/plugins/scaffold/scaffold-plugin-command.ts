@@ -39,7 +39,7 @@ export interface PluginScaffoldCommandInput {
 }
 
 /** Create the public `plugin scaffold` command. */
-export function createPluginScaffoldCommand(dependencies: PluginScaffoldCommandDependencies) {
+export function createPluginScaffoldCommand(dependencies: PluginScaffoldCommandDependencies): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('scaffold')

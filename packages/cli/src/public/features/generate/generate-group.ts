@@ -5,7 +5,7 @@ import { createGenerateRuntimeSchemasCommand } from './runtime-schemas/generate-
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public code-generation command group. */
-export function createGenerateCommand(dependencies: PublicCommandDependencies) {
+export function createGenerateCommand(dependencies: PublicCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('generate')
     .description('Code generation commands')

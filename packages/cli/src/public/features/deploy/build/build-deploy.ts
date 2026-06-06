@@ -1,7 +1,10 @@
 import type { BuildResult } from '../../../../kernel/domain/deploy/compile-target.ts';
 import type { ResolvedConfig } from '../../../../kernel/domain/resolved-config.ts';
 import { Pipeline } from '../../../../kernel/application/abstracts/pipeline.ts';
-import { PipelineStep } from '../../../../kernel/application/abstracts/pipeline-step.ts';
+import {
+  PipelineStep,
+  type PipelineStepInspection,
+} from '../../../../kernel/application/abstracts/pipeline-step.ts';
 
 /** Public deployment build options. */
 export interface BuildDeployOptions {
@@ -77,7 +80,7 @@ export class BuildDeployStep extends PipelineStep<BuildDeployRequest, BuildResul
     super();
   }
 
-  inspect(input: BuildDeployRequest) {
+  inspect(input: BuildDeployRequest): PipelineStepInspection {
     return {
       id: this.id,
       label: 'Build Windows deployment artifacts',

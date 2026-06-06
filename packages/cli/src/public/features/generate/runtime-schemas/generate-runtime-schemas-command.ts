@@ -70,6 +70,6 @@ export class GenerateRuntimeSchemasCommand extends CliCommand<AnyCliffyCommand> 
 /** Create the public `generate runtime-schemas` command. */
 export function createGenerateRuntimeSchemasCommand(
   dependencies: GenerateRuntimeSchemasCommandDependencies,
-) {
+) : Command<any, any, any, any, any, any, any, any> {
   return new GenerateRuntimeSchemasCommand(dependencies).define();
 }

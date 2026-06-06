@@ -18,7 +18,7 @@ import {
 export type UpdatePluginCommandDependencies = Omit<PluginVerbCommandDependencies, 'verb'>;
 
 /** Create the public `plugin update` command. */
-export function createUpdatePluginCommand(dependencies: UpdatePluginCommandDependencies): Command {
+export function createUpdatePluginCommand(dependencies: UpdatePluginCommandDependencies): Command<any, any, any, any, any, any, any, any> {
   return createPluginVerbCommand({
     ...dependencies,
     verb: 'update',

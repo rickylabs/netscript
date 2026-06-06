@@ -18,7 +18,7 @@ import { exists } from '@std/fs';
 import { WindowsRequiredError } from '../../../../kernel/domain/errors.ts';
 import { OPTION_DEFAULTS, resolveManifest } from '../../../../kernel/adapters/deploy/shared.ts';
 
-export const logsCommand = new Command()
+export const logsCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('logs')
   .description('Show recent logs for a service')
   .arguments('<service:string>')

@@ -5,7 +5,7 @@ import type { ManifestResolverPort } from './ports/manifest-resolver-port.ts';
 
 /** In-memory manifest resolver used by tests and alpha SDK stubs. */
 export class MemoryManifestResolver implements ManifestResolverPort {
-  constructor(private readonly manifest?: PluginManifest) {}
+  constructor(private readonly manifest: PluginManifest | undefined = undefined) {}
 
   async resolve(_spec: string): Promise<PluginManifest | undefined> {
     return this.manifest;
@@ -38,7 +38,7 @@ export class ModuleManifestResolver implements ManifestResolverPort {
   }
 }
 
-const MODULE_EXTENSIONS = ['.ts', '.tsx', '.mts', '.js', '.jsx', '.mjs', '.cjs'];
+const MODULE_EXTENSIONS: readonly string[] = ['.ts', '.tsx', '.mts', '.js', '.jsx', '.mjs', '.cjs'];
 
 function hasModuleExtension(path: string): boolean {
   return MODULE_EXTENSIONS.some((extension) => path.endsWith(extension));

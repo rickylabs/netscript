@@ -8,7 +8,7 @@ import { createPublicCommandDependencies } from '../../public/features/root/publ
 import { createPublicCli } from '../../public/composition/create-public-cli.ts';
 
 /** Compose the local contributor CLI from maintainer and public command trees. */
-export function composeLocalContributorCommandTree(host: MaintainerCliHost): Command {
+export function composeLocalContributorCommandTree(host: MaintainerCliHost): Command<any, any, any, any, any, any, any, any> {
   const maintainerCli = createMaintainerCli(host) as Command;
   const publicCli = createPublicCli(host) as Command;
   const publicDependencies = createPublicCommandDependencies(host);
