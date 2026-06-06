@@ -15,11 +15,14 @@
 #   - Aspire CLI via aspire.dev install script (NOT `dotnet workload install aspire`,
 #     which was removed after Aspire 8 — Aspire ships as a standalone CLI now)
 #   - Docker (pre-installed on ubuntu-latest; AppHost resources need the engine)
-name: "Copilot Setup Steps"
+name: 'Copilot Setup Steps'
 
 on:
   workflow_dispatch:
   push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
     paths:
       - .github/workflows/copilot-setup-steps.yml
 
@@ -30,7 +33,7 @@ jobs:
       contents: read # clone + view the repo
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # --- Deno (primary toolchain) ---
       - name: Setup Deno
@@ -40,9 +43,9 @@ jobs:
 
       # --- .NET SDK 10 (Aspire AppHost / ServiceDefaults target net10.0) ---
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: "10.0.x"
+          dotnet-version: '10.0.x'
 
       # --- Aspire CLI (standalone install script; adds $HOME/.aspire/bin to PATH) ---
       - name: Install Aspire CLI
