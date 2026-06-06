@@ -5,7 +5,7 @@
 | Run ID | `feat-package-quality-wave1-contracts--contracts` |
 | Branch | `feat/package-quality-wave1-contracts` |
 | Base | `feat/package-quality` (Wave 0 `shared` + Wave 0b harness/docs merged) |
-| Phase | **Implementation complete — ready for separate IMPL-EVAL** |
+| Phase | **IMPL-EVAL complete → `FAIL_FIX`** (returns to generator for one fix) |
 | Units | `@netscript/config`, `@netscript/contracts`, `@netscript/runtime-config` |
 | Archetype | 1 — Small Contract (all three) |
 | Scope overlay | none (package wave) |
@@ -75,5 +75,15 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 ## Operating reminders
 
 - Implementation has completed through slice 27.
-- Hand off to a separate IMPL-EVAL session per `.llm/harness/evaluator/protocol.md`.
-- Do not self-evaluate in this implementation session.
+- **IMPL-EVAL verdict: `FAIL_FIX`** (`evaluate.md`). One required gate fails: `@netscript/config`
+  publishes the `./paths` subpath but `deno doc --lint src/paths/mod.ts` reports 28 `missing-jsdoc`
+  errors. The config doc-lint sweep only covered `mod.ts`, `src/merge/mod.ts`, and
+  `src/schema/plugins/mod.ts` and skipped `./paths`. F-5/F-7 are not clean on all config
+  entrypoints.
+- Fix: add JSDoc to the exported members of `packages/config/src/paths/mod.ts`, then re-run
+  `deno doc --lint` over all four config entrypoints (`mod.ts src/merge/mod.ts src/paths/mod.ts
+  src/schema/plugins/mod.ts`).
+- F-6 publish dry-run, F-10 tests, and consumer `deno check` were NOT independently re-run: the
+  evaluator sandbox cannot reach `jsr.io`/`registry.npmjs.org`. Re-confirm on a networked runner
+  before publish.
+- This is eval cycle 1 of 2. Do not self-evaluate in the implementation session.
