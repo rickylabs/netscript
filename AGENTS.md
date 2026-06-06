@@ -42,7 +42,11 @@ Preferred order:
 
 1. Relevant MCP server or repo-native tool.
 2. Reusable Deno scripts in `.llm/tools/` or `tools/`.
-3. Focused shell commands.
+3. Focused shell commands — **prefix read-heavy `git`/`gh`/`grep`/`ls`/`docker`
+   commands with `rtk`** to cut output tokens 60–90% (e.g. `rtk git status`,
+   `rtk git diff`, `rtk grep <pattern>`); use `rtk proxy <cmd>` for `deno task`
+   runs. See `.agents/skills/rtk`. `rtk` preserves command semantics and exit
+   codes — do not use it for interactive commands, MCP calls, or file I/O.
 4. Web search only when repo context is insufficient or freshness is required.
 
 Use checked-in Deno scripts instead of complex one-off PowerShell when the logic is reusable.
@@ -53,6 +57,10 @@ Temporary scratch/output belongs in `.llm/tmp/`; reusable helper scripts belong 
 
 Run the smallest validation that proves the change. For targeted `deno check` commands that touch
 workspace code, include `--unstable-kv`.
+
+Wrap `deno task` validation runs in `rtk proxy` to keep logs tracked and
+compressed (e.g. `rtk proxy deno task check`), and prefix git inspection between
+slices with `rtk` (`rtk git status`, `rtk git diff`). See `.agents/skills/rtk`.
 
 Common commands:
 

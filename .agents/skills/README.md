@@ -16,11 +16,12 @@ operate this codebase end-to-end without re-deriving the API from documentation 
 | `netscript-harness`   | **CORE** — Orchestrate harness-mode runs (8-phase model, Plan-Gate, dual evaluators).           | active |
 | `jsr-audit`           | **CORE** — Audit packages for JSR readiness. Required Plan-Gate input for package/plugin waves. | active |
 | `deno-fresh`          | Frontend development with Fresh 2.x, Preact, and Tailwind CSS in Deno.                          | active |
+| `rtk`                 | Token-saving CLI proxy. Prefix read-heavy git/gh/grep/ls/docker commands with `rtk`; `rtk proxy` for `deno task`. | active |
 | `netscript-standards` | **LEGACY** — Superseded by `netscript-doctrine`. Do not use for new work.                       | legacy |
 
 > **Not yet in this repo.** These skills exist in the broader NetScript toolkit but are not present
 > in this repository yet — do not assume their guidance is loadable here: `deno-expert`,
-> `frontend-design`, `ux-patterns`, `tailwind`, `web-design`, `aspire`, `rtk`.
+> `frontend-design`, `ux-patterns`, `tailwind`, `web-design`, `aspire`.
 
 ---
 
@@ -32,6 +33,7 @@ If a prompt is vague, route it to the narrowest skill that fits:
 - `use harness` or run orchestration → `netscript-harness`
 - JSR readiness or publish audit → `jsr-audit`
 - Fresh/Deno frontend → `deno-fresh`
+- Read-heavy git/gh/grep/ls/docker output, or tracking `deno task` runs → `rtk`
 - Anything else → ask for clarification rather than guess
 
 ---
