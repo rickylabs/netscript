@@ -56,6 +56,29 @@ Seeded from
 - **Status:** open, DEBT_ACCEPTED — slice 17 added `arch:barrel-ok` justification in the file.
 - **Gate:** F-18, `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'`
 
+## packages/contracts — AP-16 helpers directory
+
+- **Reason:** Root `helpers/` held query and transform helpers behind a generic folder name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slices 19 and 20 moved `paginated-query.ts` and
+  `transform.ts` into `src/application/` as role-named modules and removed the `helpers/`
+  directory.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
+## packages/contracts/crud — accepted root subpath layout
+
+- **Reason:** `crud/` remains at the package root to preserve the established `./crud` subpath
+  export and avoid broad downstream import churn during S1.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when subpath exports can move without consumer breakage.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — locked decision L8 keeps `contracts/crud/` at package root.
+- **Gate:** F-5/F-6 remain green for `@netscript/contracts`; consumer validation in slices 25-27.
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.

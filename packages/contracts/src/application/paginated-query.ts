@@ -20,7 +20,11 @@
  * @module
  */
 
-import type { PaginatedResult, PaginationInput, PaginationOutput } from '../../schemas/pagination.ts';
+import type {
+  PaginatedResult,
+  PaginationInput,
+  PaginationOutput,
+} from '../../schemas/pagination.ts';
 
 // ============================================================================
 // TYPES

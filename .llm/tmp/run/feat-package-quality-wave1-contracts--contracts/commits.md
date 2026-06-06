@@ -32,3 +32,4 @@ Format:
 - 5062e76: refactor(contracts): move transform helpers
 - df7a919: docs(contracts): export subpath schema types
 - ec09969: docs(contracts): add getting started guide
+- eb545ca: docs(contracts): add advanced extending guide

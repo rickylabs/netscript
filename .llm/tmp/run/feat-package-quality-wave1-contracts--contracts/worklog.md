@@ -222,6 +222,8 @@ A new developer adding a config schema section:
 | 2026-06-06 | 22 | Gate | `Get-ChildItem docs -Recurse -File` listed 6 contracts docs files including `docs/getting-started.md`. |
 | 2026-06-06 | 23 | Implement | Added `packages/contracts/docs/advanced/extending.md` and linked it from the contracts docs index. |
 | 2026-06-06 | 23 | Gate | `Get-ChildItem docs -Recurse -File` listed 7 contracts docs files including `docs/advanced/extending.md`. |
+| 2026-06-06 | 24 | Implement | Ran the contracts gate sweep, removed a stale lint ignore, normalized package formatting, removed the stale `helpers/**/*.ts` publish include, marked `src/public/mod.ts` with `arch:barrel-ok`, and updated architecture debt for the closed helpers directory plus accepted root `crud/` layout. |
+| 2026-06-06 | 24 | Gate | Contracts sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. |
 
 ## Decisions
 
@@ -243,6 +245,7 @@ A new developer adding a config schema section:
 | Config plugin schema public annotation | minor | yes |
 | Config sweep static/cardinality cleanup | minor | yes |
 | Contracts subpath transitive schema type export | minor | yes |
+| Contracts root `crud/` layout accepted debt | minor | arch-debt.md |
 
 ## Gate Results
 
@@ -321,6 +324,27 @@ A new developer adding a config schema section:
 | F-16 cardinality | PASS | No `src/` directory has more than 12 immediate children after grouping domain schemas |
 | F-17 abstract-derived | PASS | No abstract classes or class `extends` relationships in `src/` |
 | F-18 sub-barrel | PASS | `src/domain/mod.ts` has `arch:barrel-ok` |
+
+### Contracts Slice 24 Sweep
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| Static check | PASS | `deno check mod.ts crud.ts query.ts transform.ts` |
+| Lint | PASS | `deno lint` |
+| Format | PASS | `deno fmt --check` |
+| F-5 / F-7 doc lint | PASS | `deno doc --lint mod.ts crud.ts query.ts transform.ts` |
+| F-6 publishability | PASS | `deno publish --dry-run --allow-dirty` = 0 slow-type errors |
+| F-7 README | PASS | `(Get-Content README.md).Count` = 424 |
+| F-7 docs | PASS | `Get-ChildItem docs -Recurse -File` = 7 docs files |
+| F-10 tests | PASS | `deno test --allow-all` = 4 passed, 0 failed |
+| F-1 file size | PASS | No non-test `.ts` file > 500 LOC |
+| F-11 forbidden folders | PASS | No `utils`, `helpers`, `common`, `lib`, or `interfaces` directory under the package |
+| F-12 naming | PASS | No exported `I*`, `*_T`, or `*Impl` declarations by case-sensitive scan |
+| F-14 console | PASS | No `console.` in published TypeScript sources |
+| F-15 upstream re-export | PASS | No upstream `npm:`, `jsr:`, `@std`, or `@orpc` re-exports |
+| F-16 cardinality | PASS | No `src/` directory has more than 12 immediate children |
+| F-17 abstract-derived | PASS | No abstract classes or class `extends` relationships in `src/`, `crud/`, or `schemas/` |
+| F-18 sub-barrel | PASS | `src/public/mod.ts` has `arch:barrel-ok`; root `crud/` layout recorded as accepted debt |
 
 ## Handoff Notes
 

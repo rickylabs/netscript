@@ -1,8 +1,8 @@
 # Getting Started
 
-Use `@netscript/contracts` as the shared vocabulary for service and plugin contract boundaries.
-The root export contains the base oRPC contract, standard response schemas, pagination contracts,
-result helpers, and schema helper factories.
+Use `@netscript/contracts` as the shared vocabulary for service and plugin contract boundaries. The
+root export contains the base oRPC contract, standard response schemas, pagination contracts, result
+helpers, and schema helper factories.
 
 ## Install
 
