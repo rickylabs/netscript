@@ -53,14 +53,17 @@ jobs:
         run: |
           set -euo pipefail
           aspire_version="13.4.2"
-          # This commit is the target of the v13.4.2 Aspire release tag.
+          # This commit in dotnet/aspire is the target of the v13.4.2 release tag.
           installer_url="https://raw.githubusercontent.com/dotnet/aspire/d7d0b6759ce4b936c76bc4775814d27db560dd6d/eng/scripts/get-aspire-cli.sh"
           installer_sha256="df1247d87f6e5ca83e71abf55f78bca1bd9a421a3f2f0fd5481f153fc958632a"
           installer="$(mktemp)"
           trap 'rm -f "$installer"' EXIT
           curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 \
             --output "$installer" "$installer_url"
-          echo "$installer_sha256  $installer" | sha256sum --check --status
+          if ! echo "$installer_sha256  $installer" | sha256sum --check; then
+            echo "::error::Aspire installer hash verification failed for $installer_url"
+            exit 1
+          fi
           bash "$installer" --version "$aspire_version" --install-path "$HOME/.aspire/bin" --skip-path
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
@@ -87,14 +90,14 @@ jobs:
             [[ -d "$dir" ]] || missing_dirs+=("$dir")
           done
           if ((${#missing_dirs[@]})); then
-            echo "::warning::Expected Deno source directories missing (${missing_dirs[*]}); skipping cache warm-up."
+            echo "::warning::Expected Deno source directories missing (${missing_dirs[*]}); skipping Deno cache warming."
             exit 0
           fi
-          mapfile -d '' deno_sources < <(find "${deno_source_dirs[@]}" -type f \( -name '*.ts' -o -name '*.tsx' \) -print0)
+          mapfile -d '' deno_sources < <(find "${deno_source_dirs[@]}" -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \) -print0)
           if ((${#deno_sources[@]})); then
             # Batch files to stay comfortably below shell command-line length limits.
             if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
-              echo "::warning::Deno cache warm-up failed. Non-fatal, but may affect firewalled sessions."
+              echo "::warning::Deno cache warming failed. Non-fatal, but may affect firewalled sessions."
             fi
           fi
 
