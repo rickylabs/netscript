@@ -59,7 +59,9 @@ export interface ErrorContext {
  * Logger interface - allows custom logger injection
  */
 export interface ErrorLogger {
+  /** Log an error-level context. */
   error(context: ErrorContext): void;
+  /** Log a warning-level context. */
   warn?(context: ErrorContext): void;
 }
 
@@ -315,6 +317,9 @@ export class ErrorHandlingPlugin {
    */
   order = 900;
 
+  /**
+   * Create an oRPC error handling plugin.
+   */
   constructor(options: ErrorHandlingPluginOptions = {}) {
     this.options = {
       serviceName: options.serviceName ?? 'unknown',

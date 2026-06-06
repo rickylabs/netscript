@@ -1,3 +1,6 @@
+/**
+ * Semantic messaging attribute names used by queue instrumentation.
+ */
 export const MessagingAttributes = {
   SYSTEM: 'messaging.system',
   DESTINATION_NAME: 'messaging.destination.name',
@@ -11,6 +14,9 @@ export const MessagingAttributes = {
   DLQ: 'messaging.destination.dlq',
 } as const;
 
+/**
+ * Messaging operation names used on queue spans.
+ */
 export const MessagingOperations = {
   PUBLISH: 'publish',
   RECEIVE: 'receive',
@@ -20,6 +26,9 @@ export const MessagingOperations = {
   SETTLE: 'settle',
 } as const;
 
+/**
+ * Messaging system names supported by NetScript queue instrumentation.
+ */
 export const MessagingSystems = {
   DENO_KV_QUEUE: 'deno-kv-queue',
   DENO_KV_POLLING: 'deno-kv-polling',

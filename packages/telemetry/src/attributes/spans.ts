@@ -1,3 +1,6 @@
+/**
+ * Standard span names used by NetScript telemetry instrumentation.
+ */
 export const SpanNames = {
   SCHEDULER_TICK: 'scheduler.tick',
   SCHEDULER_DISPATCH: 'scheduler.dispatch',
@@ -26,6 +29,9 @@ export const SpanNames = {
   TRIGGER_LIFECYCLE: 'trigger.lifecycle',
 } as const;
 
+/**
+ * Join a base span name with an optional suffix.
+ */
 export function spanName(base: string, suffix?: string): string {
   return suffix ? `${base}.${suffix}` : base;
 }

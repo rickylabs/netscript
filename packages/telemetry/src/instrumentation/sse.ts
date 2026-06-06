@@ -7,14 +7,17 @@
  * @module
  */
 
-import { type Attributes, type Context, type Span, SpanKind } from '@opentelemetry/api';
 import {
   addSpanEvent,
+  type Attributes,
+  type Context,
   createSpan,
   getActiveSpan,
   getSSETracer,
   setSpanError,
   setSpanOk,
+  type Span,
+  SpanKind,
   withSpan,
 } from '../core/mod.ts';
 import { type SerializedTraceContext } from '../context/mod.ts';
