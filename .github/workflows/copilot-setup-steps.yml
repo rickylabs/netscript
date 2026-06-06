@@ -88,7 +88,7 @@ jobs:
           if ((${#deno_sources[@]})); then
             # Batch files to stay comfortably below shell command-line length limits.
             if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
-              echo "::warning::Deno cache warm-up did not complete. This is non-fatal for Copilot startup; investigate if later firewalled sessions still need missing JSR/npm downloads."
+              echo "::warning::Deno cache warm-up failed. Non-fatal, but may affect firewalled sessions."
             fi
           fi
 
