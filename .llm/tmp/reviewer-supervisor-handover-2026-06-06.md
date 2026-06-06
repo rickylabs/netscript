@@ -1,73 +1,82 @@
-# Reviewer/Supervisor Handover — S1 Package Quality (as of 2026-06-06)
+# S1 Package-Quality — Supervisor Context Brief (2026-06-06)
 
-> Maximum-context brief for the next **supervisor session** on
-> `feat/package-quality`. Written by the outgoing reviewer/supervisor. Pairs with
-> the copy-pasteable prompt the user holds. Read this once, then operate from
-> `.llm/tmp/run/feat-package-quality--supervisor/` going forward.
+> Max-context brief for the **supervisor session** that owns `feat/package-quality`.
+> The supervisor **supervises** — it does not implement, and it does not run wave
+> gates or evaluator passes. Read this once, then operate from
+> `.llm/tmp/run/feat-package-quality--supervisor/`.
 
 ---
 
-## 1. What this program is
+## 1. Where this came from (the migration framing)
 
-**S1 — Package Quality** is one of seven supervisor tracks in the NetScript public
-release program. S1's job: bring all **27 publishable units** (23 packages +
-4 plugins, all `0.0.1-alpha.0`) to the alpha bar —
+The NetScript foundation was built in a **concrete implementation workspace**
+(`netscript-start`) — a repo whose job was to let us iterate fast on the framework,
+plugins, CLI, and Aspire orchestration with a real running app.
+
+That foundation has now been **migrated into the production repo**
+(`rickylabs/netscript`). The production repo's job is different: it is preparing
+**full JSR readiness for the first public release**. It is not an iteration
+sandbox — every change is judged against publishability.
+
+**S1 — Package Quality** is the release-program track that brings all **27
+publishable units** (23 packages + 4 plugins, all `0.0.1-alpha.0`) to that bar:
 `deno publish --dry-run` **0 slow-types**, `deno doc --lint` clean, README ≥ 150
-LOC, `/docs` per STANDARDS § 7, archetype gate matrix green per unit. **S1 stops
-at publish-clean dry-run** — no publishing, no version bumps, no OIDC (those are
-S2/S3).
+LOC, `/docs` per STANDARDS § 7, archetype gate matrix green per unit. **S1 stops at
+publish-clean dry-run** — no publishing, no version bumps, no OIDC (those are later
+tracks).
 
-Authority chain (nest, never rewrite):
-- Program: `.llm/tmp/run/master--public-release-program/RELEASE-PROGRAM.md`
-- Supervisor: `.llm/tmp/run/feat-package-quality--supervisor/` (`plan.md`, `phase-registry.md`, `worklog.md`, `context-pack.md`, `drift.md`, `commits.md`)
-- Per-package canonical (STALE counts): `.llm/tmp/run/copilot-evaluate-every-package-jsr-release--package-jsr-alpha-release/`
-- Harness: `.llm/harness/` (workflow, archetypes, gates, evaluator, lessons)
+## 2. What the supervisor IS (and is NOT)
 
-## 2. Repo + worktree topology (important — non-obvious)
+**The supervisor owns the big picture of `feat/package-quality`** — the integration
+branch that combines the work of every wave. It is the only role that sees the
+whole 27-unit surface at once.
 
-- GitHub repo: **`rickylabs/netscript`**. Integration/"supervisor" branch:
-  **`feat/package-quality`** (there is no branch literally named "supervisor").
-- The working checkout is **nested**: from the Zed project root the netscript repo
-  lives at `worktrees/repo-genesis/.genesis/netscript/`. The terminal tool only
-  lets you `cd` to the project root, so drive git with **`git -C <path>`**.
-- Worktrees under `…/netscript/.worktrees/`:
-  | Worktree | Branch | State |
-  |----------|--------|-------|
-  | (main) | `feat/package-quality` | supervisor branch, HEAD `7bca2d8` |
-  | `wave0-foundation` | `feat/package-quality-wave0-foundation` | merged |
-  | `wave1-contracts` | `feat/package-quality-wave1-contracts` | merged |
-  | `wave2-adapters` | `feat/package-quality-wave2-adapters` | **active — agent running** |
-- A separate, unrelated repo (`netscript-start`) is checked out at the Zed root
-  (`test-app`). Do **not** do S1 work there.
+The supervisor's job:
+- **Sequence the waves** (foundation-first; never start wave N+1 before wave N is
+  `merged`) and keep `phase-registry.md` the single source of truth for status.
+- **Stage each wave**: create the group branch + nested run, seed `research.md` +
+  `context-pack.md` (structural re-baseline + accumulated lessons), open the draft
+  PR, and **produce the generator prompt** the wave agent will run.
+- **Hand off to separate sessions** for everything gate-shaped: the generator
+  implements, and **independent evaluator sessions** run PLAN-EVAL and IMPL-EVAL.
+- **Integrate** passing waves into the supervisor branch and keep the supervisor
+  docs current.
+- **Run a retro after every wave** (see § 3).
 
-## 3. The operating model (what "being the supervisor" means here)
+The supervisor is **NOT**:
+- an implementer (it never writes package code),
+- an evaluator (it **never runs PLAN-EVAL, IMPL-EVAL, or any wave fitness/gate
+  check** — those happen in the wave run and in separate evaluator sessions),
+- a re-deriver of per-package plans (it nests the canonical run, never rewrites it).
 
-The harness uses an **8-phase run loop** with a **two-gate / dual-evaluator** model
-(added in Wave 0b, see `.llm/harness/lessons/plan-gate-design-as-gate.md`):
+If you find yourself running `deno publish --dry-run`, `deno doc --lint`, a fitness
+gate, or scoring a plan/implementation — **stop**: that is a wave or evaluator
+session's job, not the supervisor's.
 
-Bootstrap → Research → Plan & Design → **PLAN-EVAL (hard stop)** → Implement →
-Gate → **IMPL-EVAL** → Close.
+## 3. The after-each-wave retro (this is the heart of supervising)
 
-The supervisor does NOT implement packages. Per wave, the supervisor:
-1. **Stages** the wave: base-sync `feat/package-quality`, create the group branch
-   `feat/package-quality-wave<N>-<suffix>` + worktree `.worktrees/wave<N>-<suffix>`,
-   create the nested run dir `.llm/tmp/run/feat-package-quality-wave<N>-<suffix>--<suffix>/`,
-   and **seed `research.md` + `context-pack.md`** (structural re-baseline + lessons),
-   then open a **draft PR** and hand the prompt to a generator agent.
-2. When the generator finishes Plan & Design, runs **PLAN-EVAL in a SEPARATE
-   session** against `.llm/harness/gates/plan-gate.md` — verdict `PASS` /
-   `FAIL_PLAN`. No implementation slice may be committed before `PASS`.
-3. After implementation, runs **IMPL-EVAL in a SEPARATE session** (full gate set +
-   `jsr-audit` + `deno task e2e:cli` merge-readiness).
-4. On pass, merges `--no-ff`, updates the supervisor docs (status table, base-sync
-   log, worklog, commits), and stages the next wave. Foundation-first: never start
-   wave N+1 before wave N is `merged`.
+When a wave merges, before staging the next one, the supervisor does a retro that
+makes the *next* wave better:
 
-Non-negotiables: **re-baseline before trusting any carried-in count**; **disjoint
-write scope per wave**; **alpha = no back-compat shims**; **evaluator ≠ generator
-session**.
+1. **Drift promotion.** Read the merged wave's `drift.md` + `arch-debt.md`. For each
+   leftover item decide: (a) it belongs to an **upcoming wave** → record it on the
+   supervisor branch (`phase-registry.md` "Inherited debt" of the target wave) so
+   that wave inherits it; (b) it is **cross-cutting / bigger than any wave** →
+   promote it to the supervisor branch as its own line, or spin a **separate new
+   run** for it; (c) it is closed → note closure. Nothing leftover should silently
+   die inside a finished wave's run dir.
+2. **Learning capture.** Distill what the wave taught (review findings, PLAN-EVAL
+   adjustments, sizing reality, gate gaps) into durable lessons — append to the
+   supervisor `worklog.md` Decisions/Lessons and, when a lesson is reusable across
+   waves, into `.llm/harness/lessons/`.
+3. **Prompt improvement.** Fold those lessons into the **generator prompt and seed
+   templates** for the next wave, so each wave starts stronger than the last. The
+   prompt is a living artifact, not a constant.
+4. **Status + base-sync.** Update `phase-registry.md` (status table, cards, Base-Sync
+   Log), `worklog.md`, `context-pack.md`, `commits.md`; base-sync the integration
+   branch forward and log it.
 
-## 4. What's done since Wave 0 (current truth)
+## 4. What's done so far (current truth)
 
 | Wave | Units | Status | Merge |
 |------|-------|--------|-------|
@@ -77,71 +86,59 @@ session**.
 | 2 — Integration adapters | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron | **active** | — (draft PR #8) |
 | 3–6 | plugin / runtimes / apps / cli | planned | — |
 
-**4 / 27 units merged.** Supervisor docs were frozen at "awaiting Wave 0" and were
-brought fully current on `feat/package-quality` (commit `529006e`).
+**4 / 27 units merged.** The supervisor docs are current as of today. The harness
+itself runs an 8-phase loop with a two-gate model (PLAN-EVAL before code, IMPL-EVAL
+after) — both in **separate** sessions from the generator; Wave 0b introduced this
+after Wave 0 skipped a gated Plan & Design.
 
-## 5. Wave 1 review lessons (carry into every future wave)
+## 5. Accumulated lessons (fold into every future generator prompt)
 
-- **R-1/R-2** — plan defensive I/O guards + abort/cleanup **with tests** (Wave 1's
-  watcher leaked unhandled rejections + late timer fires; review-driven, not planned).
-- **R-3** — no unsafe zod coercion (`z.unknown().transform(v => v as X)` shipped fake validation).
-- **R-4** — runnable docs: `jsr:` specifiers + `tests/_fixtures/docs-examples_test.ts` doctests (DOCS-STRUCTURE).
-- **R-5** — JSDoc examples must cite real exported symbols.
-- **R-6** — `deno task e2e:cli` is the merge-readiness gate; make it an explicit final slice.
-- **R-7** — select the FULL archetype matrix up front (Wave 1's plan under-selected gates; PLAN-EVAL had to add F-14/F-17).
-- **Sizing** — Wave 1 = 27 slices for 3 units. The Plan-Gate caps slices at **< 30**, so larger waves must split into sub-waves.
+- **L-sizing** — the Plan-Gate caps slices at **< 30**. Wave 1 = 27 slices for 3
+  units; any larger wave must split into sub-waves up front.
+- **L-rebaseline** — never trust carried-in counts. The generator re-measures
+  slow-types/doc-lint as Research step 1 (Wave 1's stale audit said 35/30/1; real
+  was 0/0/0).
+- **L-full-matrix** — make the generator select the FULL archetype gate matrix +
+  consumer gates in the plan; Wave 1 under-selected and PLAN-EVAL had to add F-14/F-17.
+- **L-defensive-io** — plan I/O guards + abort/cleanup **with tests** (Wave 1's
+  watcher leaked unhandled rejections + late timer fires; found in review, not planned).
+- **L-no-coercion** — forbid unsafe zod casts (`z.unknown().transform(v => v as X)`).
+- **L-runnable-docs** — `jsr:` specifiers + `tests/_fixtures/docs-examples_test.ts`
+  doctests; JSDoc examples cite real exported symbols.
+- **L-e2e** — `deno task e2e:cli` is the merge-readiness gate; make it an explicit
+  final slice, run by the wave/evaluator, not the supervisor.
+- **L-no-backcompat** — alpha = delete legacy / rename, never alias.
 
-## 6. Wave 2 status (the live one) — what I staged
+## 6. The live wave — Wave 2 (Integration adapters)
 
-- Branch + worktree `wave2-adapters`; nested run
-  `.llm/tmp/run/feat-package-quality-wave2-adapters--adapters/` seeded with a
-  reviewer **structural** re-baseline of all 8 units (`research.md`) + `context-pack.md`
-  (+ `drift.md`/`commits.md` scaffolds). Draft **PR #8** open.
-- Dynamic gates (slow-types, doc-lint) are marked **`MEASURE-FIRST`** — I could not
-  run deno from the staging sandbox; the generator runs them as Research step 1.
-- **The gating decision is OQ-1 (slice budget):** 8 units blow the < 30 cap.
-  Reviewer recommendation = **split into sub-waves** (2a logger·telemetry·aspire /
-  2b kv·database·prisma-adapter-mysql / 2c queue·cron). The generator must resolve
-  this before slicing and escalate per `supervisor.md` § 4 if it changes the
-  registry's single-group assumption.
-- Per-unit headlines: `database` is from-scratch (no README/docs/tests/metadata —
-  the wave's "runtime-config"); `prisma-adapter-mysql` README < 150 + `skipLibCheck`;
-  `database`/`queue`/`cron` carry `interfaces/` (AP-17 → `ports/`); aspire has a
-  redundant `./helpers` alias to drop; `telemetry`/`aspire` are verify-only.
-- **The generator agent is RUNNING right now** in `.worktrees/wave2-adapters`
-  (producing `plan.md`, `worklog.md`, an `audit/` re-baseline). Do **not** stomp its
-  uncommitted work. When it hands back, your first job is the **separate-session
-  PLAN-EVAL**.
+- Staged: group branch + nested run `feat-package-quality-wave2-adapters--adapters`,
+  draft **PR #8**, seeded `research.md` (structural re-baseline of all 8 units) +
+  `context-pack.md`. Dynamic gates marked `MEASURE-FIRST` for the generator.
+- **A generator agent is currently running** the Research + Plan & Design phase. The
+  supervisor does **not** intervene in its run and does **not** evaluate it.
+- The gating open decision is **OQ-1 (slice budget)**: 8 units exceed the < 30 cap →
+  recommended sub-wave split (2a logger·telemetry·aspire / 2b kv·database·
+  prisma-adapter-mysql / 2c queue·cron).
+- Per-unit headlines: `database` is from-scratch (no README/docs/tests/metadata);
+  `prisma-adapter-mysql` README < 150 + `skipLibCheck`; `database`/`queue`/`cron`
+  carry `interfaces/` (AP-17 → `ports/`); aspire has a redundant `./helpers` alias;
+  `telemetry`/`aspire` are verify-only.
 
-## 7. Tooling note (new)
+## 7. Supervisor's next actions
 
-`rtk` is now a registered skill (`.agents/skills/rtk/`) and AGENTS.md instructs
-prefixing read-heavy `git`/`gh`/`grep`/`ls`/`docker` with `rtk` and wrapping
-`deno task` runs in `rtk proxy` (60–90% fewer output tokens). Already merged into
-the Wave 2 branch so the generator can use it. Use it yourself for git inspection.
+1. **Wait for the Wave 2 generator to finish Plan & Design**, then route the plan to
+   an **independent PLAN-EVAL session** (you do not run it). Track the handoff in
+   `worklog.md`.
+2. On PLAN-EVAL `PASS`: let the wave implement → route to an **independent IMPL-EVAL
+   session** → integrate on pass.
+3. **Run the § 3 retro**, then stage Wave 3 (`@netscript/plugin`) with an improved
+   generator prompt.
 
-## 8. Standing items / open loops
+## 8. Operating invariants
 
-1. **Wave 2 PLAN-EVAL** is the immediate next action when the generator hands back.
-2. Base-sync `feat/package-quality` into the Wave 2 branch again right before
-   implementation begins (I already merged the latest into it for the rtk skill;
-   re-check before the implement phase). Log syncs in the registry Base-Sync Log.
-3. No supervisor-wide `release-readiness.ts` audit dir has been populated; each wave
-   re-baselines its own units instead. Either run the sweep or formally accept the
-   per-wave pattern in `worklog.md`.
-4. Waves 3–6 remain `planned`; stage them one at a time, foundation-first.
-
-## 9. How I worked (so you can continue identically)
-
-- Reviewed each merged PR (read PR body, reviews, inline comments) to extract
-  "what went well / what needed attention," then folded the lessons into the next
-  wave's seed `research.md` + `context-pack.md`.
-- Staged the next wave end-to-end (branch, worktree, run dir, seeds, draft PR) so a
-  generator agent can start with a hot context pack instead of cold repo reads.
-- Ran PLAN-EVAL/IMPL-EVAL as **separate sessions**, adjusting in place when the
-  surface of change was reasonable rather than bouncing the whole plan.
-- Kept the supervisor docs (`phase-registry.md` status table + cards + base-sync
-  log, `worklog.md` progress/decisions, `context-pack.md`, `commits.md`, `drift.md`)
-  current after every state change, and committed them to `feat/package-quality`.
-- Used `git -C <nested path>` for all git ops; committed with
-  `-c core.hooksPath=/dev/null` to avoid local hook interference.
+- Nest the canonical per-package run; never rewrite it.
+- Evaluator session ≠ generator session ≠ supervisor session.
+- Disjoint write scope per wave; foundation-first ordering.
+- Re-baseline before trusting counts; alpha = no back-compat shims.
+- Keep `phase-registry.md` the live status source; promote leftover drift, don't
+  bury it; S1 stops at publish-clean dry-run.
