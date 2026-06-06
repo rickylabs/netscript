@@ -71,6 +71,25 @@ Deno.test('loadRuntimeConfig: derives conventional topic files from plain pointe
   });
 });
 
+Deno.test('loadRuntimeConfig: returns empty defaults when JSON pointer paths are malformed', async () => {
+  await withRuntimeDir(async (dir) => {
+    await writeJson(join(dir, 'current'), {
+      version: '1.0.0',
+      jobs: 123,
+    });
+
+    const config = await loadRuntimeConfig();
+
+    assertEquals(config, {
+      jobs: [],
+      sagas: [],
+      triggers: [],
+      features: [],
+      tasks: [],
+    });
+  });
+});
+
 async function withRuntimeDir(test: (dir: string) => Promise<void>): Promise<void> {
   const previous = Deno.env.get('NETSCRIPT_RUNTIME_CONFIG_DIR');
   const dir = await Deno.makeTempDir();

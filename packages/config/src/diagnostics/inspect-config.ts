@@ -23,7 +23,7 @@ export interface InspectionReport {
  * import { inspectConfig } from "@netscript/config";
  *
  * const report = inspectConfig({ name: "app", version: "1.0.0" });
- * await publishConfigSummary(report.summary);
+ * const summary = report.summary;
  * ```
  */
 export function inspectConfig(target: Partial<NetScriptConfig> | string): InspectionReport {

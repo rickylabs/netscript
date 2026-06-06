@@ -38,11 +38,11 @@ export function watchRuntimeConfig(
 
         debounceTimer = setTimeout(async () => {
           debounceTimer = null;
-          const config = await loadRuntimeConfig();
           try {
+            const config = await loadRuntimeConfig();
             await onChange(config);
           } catch {
-            // Watch callbacks are owned by the consumer; presentation code decides how to report.
+            // Watch reloads and callbacks are owned by the consumer; presentation code decides how to report.
           }
         }, DEFAULT_DEBOUNCE_MS);
       }

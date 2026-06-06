@@ -1,6 +1,4 @@
 import { z } from 'zod';
-import type { SagasConfig, TriggersConfig } from '../../../types.ts';
-
 import { AppConfigSchema } from './app-schema.ts';
 
 import { AspireConfigSchema } from './aspire-schema.ts';
@@ -21,15 +19,104 @@ import { SdkConfigSchema } from './sdk-schema.ts';
 
 import { ServiceConfigSchema } from './service-schema.ts';
 
+const SagaRetryConfigSchema = z.object({
+  maxAttempts: z.number(),
+  initialDelay: z.number(),
+  maxDelay: z.number(),
+  backoffMultiplier: z.number(),
+  jitter: z.boolean(),
+});
+
+const SagaTimeoutConfigSchema = z.object({
+  completionTimeout: z.number().optional(),
+  minTimeout: z.number(),
+  maxTimeout: z.number(),
+});
+
+const SagaDefinitionSchema = z.object({
+  id: z.string(),
+  topic: z.string().optional(),
+  name: z.string(),
+  description: z.string().optional(),
+  entrypoint: z.string(),
+  enabled: z.boolean().default(true),
+  retry: SagaRetryConfigSchema.optional(),
+  timeout: SagaTimeoutConfigSchema.optional(),
+  tags: z.array(z.string()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+const SagaScalingConfigSchema = z.object({
+  concurrency: z.number(),
+  mode: z.enum(['combined', 'distributed']),
+});
+
+const SagaRetentionConfigSchema = z.object({
+  activeDays: z.number(),
+  completedDays: z.number(),
+  archiveToDb: z.boolean(),
+});
+
+const SagaGroupSchema = z.object({
+  topic: z.string(),
+  scaling: SagaScalingConfigSchema.optional(),
+  retention: SagaRetentionConfigSchema.optional(),
+  sagas: z.array(SagaDefinitionSchema).default([]),
+});
+
 const SagasConfigSectionSchema = z
-  .unknown()
-  .optional()
-  .transform((value) => value as SagasConfig | undefined);
+  .object({
+    sagasDir: z.string().default('sagas'),
+    transportProvider: z.enum(['auto', 'redis', 'rabbitmq', 'inmemory']).default('auto'),
+    storeProvider: z.enum(['auto', 'redis', 'postgres', 'inmemory']).default('auto'),
+    concurrency: z.number().default(1),
+    retry: SagaRetryConfigSchema.optional(),
+    timeout: SagaTimeoutConfigSchema.optional(),
+    sagas: z.array(SagaDefinitionSchema).default([]),
+    groups: z.array(SagaGroupSchema).default([]),
+    enabled: z.boolean().default(true),
+  })
+  .optional();
+
+const TriggerDefinitionSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(['file', 'webhook', 'cron', 'manual']).default('webhook'),
+  enabled: z.boolean().default(true),
+  entrypoint: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+});
+
+const TriggerScalingConfigSchema = z.object({
+  concurrency: z.number(),
+});
+
+const TriggerRetentionConfigSchema = z.object({
+  kvDays: z.number(),
+  dbDays: z.number(),
+});
+
+const TriggerGroupSchema = z.object({
+  topic: z.string(),
+  scaling: TriggerScalingConfigSchema.default({ concurrency: 10 }),
+  retention: TriggerRetentionConfigSchema.default({ kvDays: 7, dbDays: 90 }),
+  triggers: z.array(TriggerDefinitionSchema).default([]),
+});
+
+const WebhookConfigSchema = z.object({
+  enabled: z.boolean().default(false),
+  basePath: z.string().default('/api/v1/webhooks'),
+  rateLimitPerMinute: z.number().default(60),
+});
 
 const TriggersConfigSectionSchema = z
-  .unknown()
-  .optional()
-  .transform((value) => value as TriggersConfig | undefined);
+  .object({
+    triggersDir: z.string().default('triggers'),
+    groups: z.array(TriggerGroupSchema).default([]),
+    webhooks: WebhookConfigSchema.optional(),
+    enabled: z.boolean().default(true),
+  })
+  .optional();
 
 /**
  * Main NetScript configuration schema.

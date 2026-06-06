@@ -53,8 +53,8 @@ async function readPointerFile(path: string): Promise<VersionPointer | null> {
   if (!text) return null;
 
   try {
-    const parsed = JSON.parse(text) as VersionPointer;
-    if (parsed && typeof parsed === 'object') {
+    const parsed = JSON.parse(text) as unknown;
+    if (isVersionPointer(parsed)) {
       return parsed;
     }
   } catch {
@@ -75,6 +75,15 @@ async function readPointerFile(path: string): Promise<VersionPointer | null> {
     triggers: `triggers/${versionFile}`,
     features: `features/${versionFile}`,
   };
+}
+
+function isVersionPointer(value: unknown): value is VersionPointer {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+
+  const pointer = value as Record<string, unknown>;
+  return ['version', 'jobs', 'sagas', 'tasks', 'triggers', 'features'].every((key) =>
+    pointer[key] === undefined || typeof pointer[key] === 'string'
+  );
 }
 
 /**

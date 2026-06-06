@@ -41,7 +41,7 @@
  *
  * const config = await initConfig();
  * const report = inspectConfig(config);
- * await publishConfigSummary(report.summary);
+ * const summary = report.summary;
  * ```
  *
  * @see README.md
