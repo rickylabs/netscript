@@ -83,7 +83,7 @@ jobs:
           mapfile -d '' deno_sources < <(find packages plugins -type f \( -name '*.ts' -o -name '*.tsx' \) -print0)
           if ((${#deno_sources[@]})); then
             if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
-              echo "::warning::Deno cache warm-up attempted but did not complete; continuing with any dependencies already cached."
+              echo "::warning::Deno cache warm-up did not complete. This is non-fatal for Copilot startup; investigate if later firewalled sessions still need missing JSR/npm downloads."
             fi
           fi
 
