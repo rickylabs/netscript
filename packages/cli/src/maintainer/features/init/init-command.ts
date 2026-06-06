@@ -45,7 +45,7 @@ function parseEditor(raw: string | undefined): EditorChoice | undefined {
 /** Create the maintainer `init` command. */
 export function createMaintainerInitCommand(
   dependencies: MaintainerInitCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('init')

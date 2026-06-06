@@ -77,6 +77,8 @@ export class BuildDeployCommand extends DeployStepCommand<AnyCliffyCommand> {
 }
 
 /** Create the public `deploy build` command. */
-export function createDeployBuildCommand(dependencies: DeployBuildCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDeployBuildCommand(
+  dependencies: DeployBuildCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new BuildDeployCommand(dependencies).define();
 }

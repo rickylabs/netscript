@@ -16,6 +16,8 @@ export class StatusDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db status` command. */
-export function createDbStatusCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDbStatusCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new StatusDbCommand(dependencies).define();
 }

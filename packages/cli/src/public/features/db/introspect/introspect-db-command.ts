@@ -16,6 +16,8 @@ export class IntrospectDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db introspect` command. */
-export function createDbIntrospectCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDbIntrospectCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new IntrospectDbCommand(dependencies).define();
 }

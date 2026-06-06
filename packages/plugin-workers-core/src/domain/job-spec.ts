@@ -184,7 +184,11 @@ export type PluginJobContribution = z.infer<typeof PluginJobContributionSchema>;
 
 /** KV key factories used by the worker system. */
 export interface JobKvKeyFactories {
-  readonly execution: (topic: string, jobId: string, executionId: string) => readonly Deno.KvKeyPart[];
+  readonly execution: (
+    topic: string,
+    jobId: string,
+    executionId: string,
+  ) => readonly Deno.KvKeyPart[];
   readonly byTopic: (topic: string) => readonly Deno.KvKeyPart[];
   readonly byJob: (topic: string, jobId: string) => readonly Deno.KvKeyPart[];
   readonly allExecutions: () => readonly Deno.KvKeyPart[];
@@ -204,7 +208,11 @@ export interface JobKvKeyFactories {
   readonly jobDefinition: (jobId: string) => readonly Deno.KvKeyPart[];
   readonly taskDefinition: (taskId: string) => readonly Deno.KvKeyPart[];
   readonly allTasks: () => readonly Deno.KvKeyPart[];
-  readonly byStatus: (status: string, concept: string, executionId: string) => readonly Deno.KvKeyPart[];
+  readonly byStatus: (
+    status: string,
+    concept: string,
+    executionId: string,
+  ) => readonly Deno.KvKeyPart[];
   readonly byStatusPrefix: (status: string, concept: string) => readonly Deno.KvKeyPart[];
   readonly byStatusAllPrefix: (status: string) => readonly Deno.KvKeyPart[];
   readonly byCorrelation: (correlationId: string, executionId: string) => readonly Deno.KvKeyPart[];
@@ -232,7 +240,8 @@ export const JobKvKeys: JobKvKeyFactories = {
   allJobs: (): readonly Deno.KvKeyPart[] => ['jobs'] as const,
   stats: (topic: string, jobId: string): readonly Deno.KvKeyPart[] =>
     ['stats', topic, jobId] as const,
-  jobDefinition: (jobId: string): readonly Deno.KvKeyPart[] => ['jobs', DEFAULT_TOPIC, jobId] as const,
+  jobDefinition: (jobId: string): readonly Deno.KvKeyPart[] =>
+    ['jobs', DEFAULT_TOPIC, jobId] as const,
   taskDefinition: (taskId: string): readonly Deno.KvKeyPart[] => ['tasks', taskId] as const,
   allTasks: (): readonly Deno.KvKeyPart[] => ['tasks'] as const,
   byStatus: (status: string, concept: string, executionId: string): readonly Deno.KvKeyPart[] =>

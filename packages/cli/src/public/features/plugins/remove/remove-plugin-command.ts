@@ -36,7 +36,9 @@ export interface RemovePluginCommandInput {
 }
 
 /** Create the public `plugin remove` command. */
-export function createRemovePluginCommand(dependencies: RemovePluginCommandDependencies): Command<any, any, any, any, any, any, any, any> {
+export function createRemovePluginCommand(
+  dependencies: RemovePluginCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('remove')

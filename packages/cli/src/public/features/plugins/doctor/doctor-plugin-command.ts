@@ -30,7 +30,9 @@ export interface DoctorPluginCommandInput {
 }
 
 /** Create the public `plugin doctor` command. */
-export function createDoctorPluginCommand(dependencies: DoctorPluginCommandDependencies): Command<any, any, any, any, any, any, any, any> {
+export function createDoctorPluginCommand(
+  dependencies: DoctorPluginCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('doctor')

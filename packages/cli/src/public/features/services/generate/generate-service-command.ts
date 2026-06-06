@@ -19,7 +19,7 @@ export interface ServiceGenerateCommandDependencies {
 /** Create the public `service generate` command. */
 export function createServiceGenerateCommand(
   dependencies: ServiceGenerateCommandDependencies,
-) : Command<any, any, any, any, any, any, any, any> {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('generate')

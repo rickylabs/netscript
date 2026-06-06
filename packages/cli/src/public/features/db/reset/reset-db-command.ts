@@ -16,6 +16,8 @@ export class ResetDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db reset` command. */
-export function createDbResetCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDbResetCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new ResetDbCommand(dependencies).define();
 }

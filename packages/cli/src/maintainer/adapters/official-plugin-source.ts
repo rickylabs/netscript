@@ -155,7 +155,7 @@ export async function canCopyOfficialPlugin(
 
 /** Find a monorepo root that contains plugin-owned scaffold manifests. */
 export async function findOfficialPluginSourceRoot(
-  startDir = dirname(fromFileUrl(import.meta.url)),
+  startDir: string = dirname(fromFileUrl(import.meta.url)),
 ): Promise<string | null> {
   let current = startDir;
 
@@ -280,7 +280,7 @@ async function hasOfficialPluginSources(sourceRoot: string): Promise<boolean> {
   );
 }
 
-export const _internal = {
+export const _internal: Record<string, unknown> = {
   basename,
   discoverOfficialPluginSources,
   readPluginManifestEntries,

@@ -22,7 +22,7 @@ export interface ServiceAddCommandDependencies {
 /** Create the public `service add` command. */
 export function createServiceAddCommand(
   dependencies: ServiceAddCommandDependencies,
-) : Command<any, any, any, any, any, any, any, any> {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('add')

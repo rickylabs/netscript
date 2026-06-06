@@ -16,6 +16,8 @@ export class GenerateDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db generate` command. */
-export function createDbGenerateCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDbGenerateCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new GenerateDbCommand(dependencies).define();
 }

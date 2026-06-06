@@ -16,6 +16,8 @@ export class SeedDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db seed` command. */
-export function createDbSeedCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDbSeedCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new SeedDbCommand(dependencies).define();
 }

@@ -52,6 +52,6 @@ export class UninstallDeployCommand extends DeployStepCommand<AnyCliffyCommand> 
 /** Create the public `deploy uninstall` command. */
 export function createDeployUninstallCommand(
   dependencies: DeployUninstallCommandDependencies,
-) : Command<any, any, any, any, any, any, any, any> {
+): Command<any, any, any, any, any, any, any, any> {
   return new UninstallDeployCommand(dependencies).define();
 }

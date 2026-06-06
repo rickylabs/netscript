@@ -6,7 +6,9 @@ import { serviceListCommand } from './list/list-services-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public service command group. */
-export function createServiceCommand(dependencies: PublicCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createServiceCommand(
+  dependencies: PublicCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('service')
     .description('Manage NetScript services')

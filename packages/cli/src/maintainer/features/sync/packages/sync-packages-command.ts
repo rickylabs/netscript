@@ -34,7 +34,7 @@ function parseDbEngines(raw: string | undefined): readonly DbEngine[] | undefine
 /** Create the maintainer `sync packages` command. */
 export function createSyncPackagesCommand(
   dependencies: SyncPackagesCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('packages')

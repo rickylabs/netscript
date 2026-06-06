@@ -28,7 +28,7 @@ function parseFormat(raw: string | undefined): 'pretty' | 'json' | 'ndjson' | un
 /** Create the maintainer `test scaffold` command. */
 export function createTestScaffoldCommand(
   dependencies: TestScaffoldCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('scaffold')

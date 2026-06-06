@@ -35,7 +35,9 @@ function editor(raw: string | undefined): EditorChoice | undefined {
 }
 
 /** Create the public `init` command. */
-export function createInitCommand(dependencies: InitCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createInitCommand(
+  dependencies: InitCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('init')
     .description('Scaffold a new NetScript workspace')

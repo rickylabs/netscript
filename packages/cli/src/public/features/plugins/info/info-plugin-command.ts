@@ -18,7 +18,9 @@ import {
 export type InfoPluginCommandDependencies = Omit<PluginVerbCommandDependencies, 'verb'>;
 
 /** Create the public `plugin info` command. */
-export function createInfoPluginCommand(dependencies: InfoPluginCommandDependencies): Command<any, any, any, any, any, any, any, any> {
+export function createInfoPluginCommand(
+  dependencies: InfoPluginCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return createPluginVerbCommand({
     ...dependencies,
     verb: 'info',

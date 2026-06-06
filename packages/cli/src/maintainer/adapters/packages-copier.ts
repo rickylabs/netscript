@@ -146,7 +146,7 @@ export function createPackageCopier(): PackageCopierPort {
 }
 
 /** Unused; retained to expose {@link relative} for tests in future slices. */
-export const _internal = { relative };
+export const _internal: Record<string, unknown> = { relative };
 
 async function addWorkspaceMembers(
   targetPath: string,

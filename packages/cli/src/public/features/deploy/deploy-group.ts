@@ -14,7 +14,9 @@ import { upgradeCommand } from './upgrade/upgrade-deploy-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public deploy command group. */
-export function createDeployCommand(dependencies: PublicCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDeployCommand(
+  dependencies: PublicCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('deploy')
     .description('Build and manage NetScript Windows Service deployments')

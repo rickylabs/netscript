@@ -44,6 +44,8 @@ export class MigrateDbCommand extends CliCommand<AnyCliffyCommand> {
 }
 
 /** Create the public `db migrate` command. */
-export function createDbMigrateCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDbMigrateCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new MigrateDbCommand(dependencies).define();
 }

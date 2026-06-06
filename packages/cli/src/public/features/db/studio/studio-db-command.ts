@@ -16,6 +16,8 @@ export class StudioDbCommand extends DbOperationCommand {
 }
 
 /** Create the public `db studio` command. */
-export function createDbStudioCommand(dependencies: DbOperationCommandDependencies) : Command<any, any, any, any, any, any, any, any> {
+export function createDbStudioCommand(
+  dependencies: DbOperationCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new StudioDbCommand(dependencies).define();
 }

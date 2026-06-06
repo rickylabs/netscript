@@ -31,6 +31,6 @@ export const LOCAL_PACKAGE_PATHS = {
 export type LocalPackageName = keyof typeof LOCAL_PACKAGE_PATHS;
 
 /** Engine-specific local packages copied only for selected database engines. */
-export const ENGINE_LOCAL_PACKAGE_PATHS = {
+export const ENGINE_LOCAL_PACKAGE_PATHS: Record<string, readonly string[]> = {
   mysql: ['packages/prisma-adapter-mysql'],
 } as const satisfies Readonly<Record<string, readonly string[]>>;

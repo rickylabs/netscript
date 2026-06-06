@@ -201,7 +201,7 @@ function rewritePluginDenoJsons(
   });
 }
 
-export const _internal = {
+export const _internal: Record<string, unknown> = {
   rewritePackagePathToJsr,
   toJsrSubpath,
   basename,
