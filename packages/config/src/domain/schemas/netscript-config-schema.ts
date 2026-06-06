@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { NetScriptConfig } from '../config-root-types.ts';
 import { AppConfigSchema } from './app-schema.ts';
 
 import { AspireConfigSchema } from './aspire-schema.ts';
@@ -121,7 +122,7 @@ const TriggersConfigSectionSchema = z
 /**
  * Main NetScript configuration schema.
  */
-export const NetScriptConfigSchema = z.object({
+export const NetScriptConfigSchema: z.ZodType<NetScriptConfig> = z.object({
   /** Project name */
   name: z.string(),
   /** Project version */

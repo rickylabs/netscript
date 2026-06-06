@@ -10,8 +10,31 @@ import type {
   SagasConfig,
   SdkConfig,
   ServiceConfig,
+  TriggerDefinitionConfig,
+  TriggerGroup,
   TriggersConfig,
 } from './config-section-types.ts';
+import type { SagasConfigInput } from './saga-inputs.ts';
+
+/** Authoring form for a trigger definition before schema defaults are applied. */
+export type TriggerDefinitionConfigInput =
+  & Partial<Omit<TriggerDefinitionConfig, 'id' | 'name'>>
+  & Pick<TriggerDefinitionConfig, 'id' | 'name'>;
+
+/** Authoring form for a trigger group before schema defaults are applied. */
+export type TriggerGroupInput =
+  & Partial<Omit<TriggerGroup, 'topic' | 'triggers'>>
+  & Pick<TriggerGroup, 'topic'>
+  & {
+    /** Trigger definitions in this group. */
+    triggers?: readonly TriggerDefinitionConfigInput[];
+  };
+
+/** Authoring form for trigger config before schema defaults are applied. */
+export interface TriggersConfigInput extends Partial<Omit<TriggersConfig, 'groups'>> {
+  /** Trigger groups organized by topic. */
+  groups?: readonly TriggerGroupInput[];
+}
 
 /** Fully validated NetScript configuration. */
 export interface NetScriptConfig {
@@ -70,9 +93,9 @@ export interface NetScriptConfigInput {
   /** Application authoring configuration by app name. */
   apps?: Record<string, Partial<AppConfig> & Pick<AppConfig, 'port'>>;
   /** Partial saga configuration. */
-  sagas?: Partial<SagasConfig>;
+  sagas?: SagasConfigInput;
   /** Partial trigger configuration. */
-  triggers?: Partial<TriggersConfig>;
+  triggers?: TriggersConfigInput;
   /** Partial gateway configuration. */
   gateway?: Partial<GatewayConfig>;
   /** Partial SDK generation configuration. */

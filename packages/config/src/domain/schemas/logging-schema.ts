@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import type { LoggingConfig } from '../config-section-types.ts';
 
 /**
  * Logging configuration schema.
  */
-export const LoggingConfigSchema = z
+export const LoggingConfigSchema: z.ZodType<LoggingConfig | undefined> = z
   .object({
     /** Minimum log level */
     level: z.enum(['debug', 'info', 'warn', 'error']).default('info'),

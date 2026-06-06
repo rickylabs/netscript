@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import type { DatabaseConfig } from '../config-section-types.ts';
 
 /**
  * Database configuration schema.
  */
-export const DatabaseConfigSchema = z.object({
+export const DatabaseConfigSchema: z.ZodType<DatabaseConfig> = z.object({
   /** Optional name to identify this database (e.g., 'netscript', 'mdb') */
   name: z.string().optional(),
   /** Database provider type */

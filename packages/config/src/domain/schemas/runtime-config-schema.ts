@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import type { RuntimeConfigPathEntry, RuntimeConfigSection } from '../config-section-types.ts';
 
 /**
  * Runtime schema generation/config output path entry.
  */
-export const RuntimeConfigPathEntrySchema = z.object({
+export const RuntimeConfigPathEntrySchema: z.ZodType<RuntimeConfigPathEntry> = z.object({
   /** Output JSON Schema path for a runtime topic */
   schemaPath: z.string(),
   /** Directory containing operator-managed runtime config files */
@@ -13,7 +14,7 @@ export const RuntimeConfigPathEntrySchema = z.object({
 /**
  * Runtime schema generation configuration.
  */
-export const RuntimeConfigSectionSchema = z
+export const RuntimeConfigSectionSchema: z.ZodType<RuntimeConfigSection | undefined> = z
   .object({
     /** Per-topic schema/config path mapping used by runtime schema generation */
     paths: z.record(z.string(), RuntimeConfigPathEntrySchema).optional(),

@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import type { SdkConfig } from '../config-section-types.ts';
 
 /**
  * SDK generation configuration schema.
  */
-export const SdkConfigSchema = z
+export const SdkConfigSchema: z.ZodType<SdkConfig | undefined> = z
   .object({
     /** TypeScript SDK configuration */
     typescript: z

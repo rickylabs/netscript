@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { PathsConfig } from '../config-section-types.ts';
 
 /**
  * Project path conventions used by the CLI and generators.
@@ -17,7 +18,7 @@ const DEFAULT_PATHS_CONFIG = {
   deploy: '.deploy/windows',
 } as const;
 
-export const PathsConfigSchema = z
+export const PathsConfigSchema: z.ZodType<PathsConfig> = z
   .object({
     services: z.string().default(DEFAULT_PATHS_CONFIG.services),
     packages: z.string().default(DEFAULT_PATHS_CONFIG.packages),

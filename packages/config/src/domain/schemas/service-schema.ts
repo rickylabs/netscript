@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import type { ServiceConfig } from '../config-section-types.ts';
 
 /**
  * Service configuration schema.
  */
-export const ServiceConfigSchema = z.object({
+export const ServiceConfigSchema: z.ZodType<ServiceConfig> = z.object({
   /** Service runtime type */
   runtime: z.enum(['deno', 'node', 'dotnet']).default('deno'),
   /** Port to listen on */

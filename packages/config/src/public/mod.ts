@@ -67,10 +67,13 @@ export type {
   SdkConfig,
   ServiceConfig,
   TriggerDefinitionConfig,
+  TriggerDefinitionConfigInput,
   TriggerGroup,
+  TriggerGroupInput,
   TriggerRetentionConfig,
   TriggerScalingConfig,
   TriggersConfig,
+  TriggersConfigInput,
   WebhookConfig,
   WindowsDeployConfig,
 } from '../../types.ts';

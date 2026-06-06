@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import type { AppConfig } from '../config-section-types.ts';
 
 /**
  * Frontend/app configuration schema.
  */
-export const AppConfigSchema = z.object({
+export const AppConfigSchema: z.ZodType<AppConfig> = z.object({
   /** App runtime type */
   runtime: z.enum(['deno', 'node', 'tauri']).default('deno'),
   /** Port to listen on */
