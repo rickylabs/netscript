@@ -75,15 +75,13 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 ## Operating reminders
 
 - Implementation has completed through slice 27.
-- **IMPL-EVAL verdict: `FAIL_FIX`** (`evaluate.md`). One required gate fails: `@netscript/config`
-  publishes the `./paths` subpath but `deno doc --lint src/paths/mod.ts` reports 28 `missing-jsdoc`
-  errors. The config doc-lint sweep only covered `mod.ts`, `src/merge/mod.ts`, and
-  `src/schema/plugins/mod.ts` and skipped `./paths`. F-5/F-7 are not clean on all config
-  entrypoints.
-- Fix: add JSDoc to the exported members of `packages/config/src/paths/mod.ts`, then re-run
-  `deno doc --lint` over all four config entrypoints (`mod.ts src/merge/mod.ts src/paths/mod.ts
-  src/schema/plugins/mod.ts`).
-- F-6 publish dry-run, F-10 tests, and consumer `deno check` were NOT independently re-run: the
-  evaluator sandbox cannot reach `jsr.io`/`registry.npmjs.org`. Re-confirm on a networked runner
-  before publish.
-- This is eval cycle 1 of 2. Do not self-evaluate in the implementation session.
+- **IMPL-EVAL verdict: `FAIL_FIX`** (`evaluate.md`) was addressed before the post-review CLI E2E
+  pass. The config `./paths` doc-lint gap was fixed and committed before this handoff.
+- Post-review CLI E2E gap is closed: bare `deno task e2e:cli` now runs the full
+  `scaffold.runtime` merge-readiness suite with cleanup instead of the narrow plugin scaffold
+  smoke. The suite scaffolds a project, initializes/generates/seeds the DB, launches Aspire,
+  adds plugins, validates generated checks, exercises worker/saga/trigger runtime endpoints, checks
+  plugin doctor, verifies OTEL trace linkage, and cleans up apphost/Docker resources.
+- Full CLI E2E evidence: `deno task e2e:cli` returned PASS with `passed=41 failed=0 skipped=0`.
+  `docker ps` was empty afterward, and `aspire ps` reported no running apphost.
+- Do not self-evaluate in the implementation session. Hand off to a separate IMPL-EVAL session.

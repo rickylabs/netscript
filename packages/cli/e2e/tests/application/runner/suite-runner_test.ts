@@ -12,8 +12,12 @@ import type {
 import type { HttpClient, HttpRequest, HttpResult } from '../../../src/ports/http-client.ts';
 import type { Reporter } from '../../../src/ports/reporter.ts';
 import { createSuiteRunner } from '../../../src/application/runner/suite-runner.ts';
-import { GATE } from '../../../src/domain/cli-surface.ts';
-import { createScaffoldPluginsSuite } from '../../../suites/scaffold/capability-suites.ts';
+import { GATE, SCAFFOLD } from '../../../src/domain/cli-surface.ts';
+import type { RunOptions } from '../../../src/domain/run-context.ts';
+import {
+  createScaffoldCapabilitySuite,
+  scaffoldCapabilitySuites,
+} from '../../../suites/scaffold/capability-suites.ts';
 
 Deno.test('suite runner emits a failed report and prunes only created Docker resources', async () => {
   const commands: CommandRequest[] = [];
@@ -35,7 +39,7 @@ Deno.test('suite runner emits a failed report and prunes only created Docker res
     'master-b',
     'suite-c',
   ]);
-  const suite = createScaffoldPluginsSuite({
+  const suite = createScaffoldRuntimeSuite({
     repoRoot: '.',
     projectName: 'runner-test',
     cleanup: true,
@@ -71,7 +75,7 @@ Deno.test('suite runner skips cleanup phase when cleanup is disabled', async () 
     },
   };
   const cleaner = new FakeDockerCleaner(['master-a'], ['master-a']);
-  const suite = createScaffoldPluginsSuite({
+  const suite = createScaffoldRuntimeSuite({
     repoRoot: '.',
     projectName: 'runner-no-cleanup-test',
     cleanup: false,
@@ -107,7 +111,7 @@ Deno.test('suite runner cleans up after a targeted non-cleanup gate when cleanup
     },
   };
   const cleaner = new FakeDockerCleaner(['master-a'], ['master-a']);
-  const suite = createScaffoldPluginsSuite({
+  const suite = createScaffoldRuntimeSuite({
     repoRoot: '.',
     projectName: 'runner-target-cleanup-test',
     cleanup: true,
@@ -144,7 +148,7 @@ Deno.test('suite runner can target cleanup gate without suite cleanup enabled', 
     },
   };
   const cleaner = new FakeDockerCleaner(['master-a'], ['master-a']);
-  const suite = createScaffoldPluginsSuite({
+  const suite = createScaffoldRuntimeSuite({
     repoRoot: '.',
     projectName: 'runner-target-explicit-cleanup-test',
     cleanup: false,
@@ -174,6 +178,12 @@ class FakeClock implements Clock {
     this.#time += 1;
     return this.#time;
   }
+}
+
+function createScaffoldRuntimeSuite(overrides: Partial<RunOptions>) {
+  const capability = scaffoldCapabilitySuites.find((suite) => suite.id === SCAFFOLD.RUNTIME);
+  if (!capability) throw new Error('scaffold.runtime suite is not registered.');
+  return createScaffoldCapabilitySuite(capability, overrides);
 }
 
 class NullReporter implements Reporter {

@@ -37,10 +37,26 @@ Deno.test('plugin suite includes all official plugin and generated-check gates',
   ]);
 });
 
-Deno.test('runtime suite excludes scaffold and database gates', () => {
+Deno.test('runtime suite includes full scaffold, database, runtime, and behavior gates', () => {
   const runtime = resolveSuite(SCAFFOLD.RUNTIME);
-  assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_INIT), false);
-  assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_INIT), false);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.SCAFFOLD_INIT), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_INIT), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_GENERATE), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_SEED), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_CHECK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_ASPIRE_START), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_WORKERS_JOBS), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_WORKERS_SEED), true);
+  assertEquals(
+    runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB),
+    true,
+  );
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_SAGAS_HEALTH), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_SAGAS_LIST), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_TRIGGERS_HEALTH), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_TRIGGERS_WEBHOOK), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_TRIGGERS_EVENTS), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
 });

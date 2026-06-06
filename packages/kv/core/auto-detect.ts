@@ -12,6 +12,8 @@ const REDIS_CONNECTION_STRING_KEYS = [
   'ConnectionStrings__garnet',
 ] as const;
 const REDIS_SERVICE_DISCOVERY_KEYS = [
+  'REDIS_TCP',
+  'GARNET_TCP',
   'services__redis__tcp__0',
   'services__redis__http__0',
   'services__redis__0',

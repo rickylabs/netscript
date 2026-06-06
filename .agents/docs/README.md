@@ -128,10 +128,13 @@ deno task test
 
 # Discover available CLI E2E suites and gates
 deno task e2e:cli suites
-deno task e2e:cli gates scaffold.plugins
+deno task e2e:cli gates scaffold.runtime
 
 # Run the full CLI E2E smoke before merge
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli
+
+# Debug the explicit full suite with readable output
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 ```
 
 ### Working with the harness

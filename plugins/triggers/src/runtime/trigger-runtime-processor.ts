@@ -15,6 +15,7 @@ import type {
 } from '@netscript/plugin-triggers-core/ports';
 import { createTriggerProcessor } from '@netscript/plugin-triggers-core/runtime';
 import { TriggerSpanNames } from '@netscript/plugin-triggers-core/telemetry';
+import { traceJobDispatch } from '@netscript/telemetry/instrumentation';
 import { getTracer, withSpan } from '@netscript/telemetry/tracer';
 import {
   KvTriggerDlqStore,
@@ -112,14 +113,37 @@ async function enqueueWorkerJob(
     correlationId: event.id,
   };
 
-  await queue.enqueue(message, {
-    priority: message.priority,
-    deduplicationId: action.options.idempotencyKey ?? event.idempotencyKey ?? event.id,
-    headers: {
-      'trigger-id': String(definition.id),
-      'trigger-event-id': String(event.id),
+  await traceJobDispatch(
+    {
+      job: {
+        id: action.jobId,
+        name: action.job.name,
+        entrypoint: action.job.entrypoint,
+      },
+      triggeredBy: 'event',
+      queueName: 'jobs',
+      priority: message.priority,
+      payload: message.payload,
     },
-  });
+    async (headers) => {
+      await queue.enqueue(
+        {
+          ...message,
+          traceparent: headers.traceparent,
+          tracestate: headers.tracestate,
+        },
+        {
+          priority: message.priority,
+          deduplicationId: action.options.idempotencyKey ?? event.idempotencyKey ?? event.id,
+          headers: {
+            ...headers,
+            'trigger-id': String(definition.id),
+            'trigger-event-id': String(event.id),
+          },
+        },
+      );
+    },
+  );
 }
 
 function normalizePayload(payload: unknown): Record<string, unknown> | undefined {

@@ -131,6 +131,7 @@ export async function copyOfficialPlugin(
       projectName: options.projectName,
       importMode: options.importMode,
       workspacePackageName: `@${options.projectName}/${source.backgroundDir}`,
+      localProjectRoot: '..',
     });
     directoriesCreated.push(
       ...await ensureBackgroundRuntimeDirs(
@@ -201,7 +202,7 @@ function rewritePluginDenoJsons(
   });
 }
 
-export const _internal: Record<string, unknown> = {
+export const _internal = {
   rewritePackagePathToJsr,
   toJsrSubpath,
   basename,

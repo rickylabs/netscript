@@ -37,3 +37,4 @@ Format:
 - f4cbd3c: test(workspace): validate cli consumer
 - cdff7f0: test(workspace): validate plugin consumers
 - ad0b232: test(workspace): verify final package publish dry runs
+- 936209a: docs(agents): clarify full cli e2e command

@@ -365,3 +365,18 @@ A new developer adding a config schema section:
 - Confirm `runtime-config` has tests before final gate.
 - Implementation completed through slice 27. Hand off to a separate IMPL-EVAL session; do not use
   this implementation session as the evaluator.
+
+## Post-review CLI E2E Fix
+
+Reviewer feedback found that the bare CLI E2E gate still exercised only a narrow plugin scaffold
+suite. The runner now maps bare `deno task e2e:cli` to the full `scaffold.runtime` suite with
+cleanup, and the documentation/tooling has been updated to make that merge-readiness contract
+explicit.
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| Unit/static follow-up | PASS | `deno check --unstable-kv packages/cli/e2e/mod.ts packages/cli/e2e/cli.ts packages/telemetry/src/instrumentation/queue.ts packages/queue/adapters/redis.adapter.ts packages/kv/core/auto-detect.ts plugins/workers/bin/runtime.ts plugins/workers/worker/job-execution.ts plugins/workers/worker/worker.ts plugins/triggers/src/runtime/trigger-runtime-processor.ts` |
+| Focused tests | PASS | `deno test --allow-all packages/cli/e2e/tests packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts` = 21 passed |
+| KV auto-detect tests | PASS | `deno test --allow-env packages/kv/tests/auto-detect_test.ts` = 2 passed |
+| Full CLI E2E | PASS | `deno task e2e:cli` = `passed=41 failed=0 skipped=0` |
+| Cleanup check | PASS | `docker ps` returned no containers; `aspire ps` reported no running apphost |
