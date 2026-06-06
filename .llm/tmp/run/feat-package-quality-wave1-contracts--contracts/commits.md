@@ -33,3 +33,4 @@ Format:
 - df7a919: docs(contracts): export subpath schema types
 - ec09969: docs(contracts): add getting started guide
 - eb545ca: docs(contracts): add advanced extending guide
+- b066da6: test(contracts): complete package gate sweep
