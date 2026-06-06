@@ -226,6 +226,7 @@ A new developer adding a config schema section:
 | 2026-06-06 | 24 | Gate | Contracts sweep passed: `deno check`, `deno doc --lint`, `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, `deno fmt --check`, README/docs gates, and manual F-1/F-11/F-12/F-14/F-15/F-16/F-17/F-18 scans. |
 | 2026-06-06 | 25 | Gate | `cd packages/cli && deno check` passed with 0 errors; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
 | 2026-06-06 | 26 | Gate | `cd plugins/sagas && deno check` and `cd plugins/workers && deno check` both passed with 0 errors; Deno reported unrelated workspace-config warnings from `examples/playground/deno.json`. |
+| 2026-06-06 | 27 | Gate | Final publish dry run passed for `packages/runtime-config`, `packages/config`, and `packages/contracts`: all three completed `deno publish --dry-run --allow-dirty` with 0 slow-type errors. `packages/config` retained the known non-failing `unanalyzable-dynamic-import` warning for `loader.ts`. |
 
 ## Decisions
 
@@ -280,9 +281,9 @@ A new developer adding a config schema section:
 
 | Consumer | Result | Evidence | Notes |
 |----------|--------|----------|-------|
-| `packages/cli` | NOT_RUN | `deno check` | Slice 25 |
-| `plugins/sagas` | NOT_RUN | `deno check` | Slice 26 |
-| `plugins/workers` | NOT_RUN | `deno check` | Slice 26 |
+| `packages/cli` | PASS | `deno check` | Slice 25, 0 errors |
+| `plugins/sagas` | PASS | `deno check` | Slice 26, 0 errors |
+| `plugins/workers` | PASS | `deno check` | Slice 26, 0 errors |
 
 ### Runtime-config Slice 10 Sweep
 
@@ -348,9 +349,19 @@ A new developer adding a config schema section:
 | F-17 abstract-derived | PASS | No abstract classes or class `extends` relationships in `src/`, `crud/`, or `schemas/` |
 | F-18 sub-barrel | PASS | `src/public/mod.ts` has `arch:barrel-ok`; root `crud/` layout recorded as accepted debt |
 
+### Final Slice 27 Publish Sweep
+
+| Package | Result | Evidence |
+|---------|--------|----------|
+| `@netscript/runtime-config` | PASS | `deno publish --dry-run --allow-dirty` completed with 0 slow-type errors |
+| `@netscript/config` | PASS | `deno publish --dry-run --allow-dirty` completed with 0 slow-type errors; known dynamic-import warning only |
+| `@netscript/contracts` | PASS | `deno publish --dry-run --allow-dirty` completed with 0 slow-type errors |
+
 ## Handoff Notes
 
 - Evaluator should inspect `runtime-config` split first — it is the largest structural change.
 - Verify `deno doc --lint` is clean on ALL entrypoints (root + every subpath) before approving.
 - Check that no `helpers/` folder remains after slices 11, 19, 20.
 - Confirm `runtime-config` has tests before final gate.
+- Implementation completed through slice 27. Hand off to a separate IMPL-EVAL session; do not use
+  this implementation session as the evaluator.

@@ -5,7 +5,7 @@
 | Run ID | `feat-package-quality-wave1-contracts--contracts` |
 | Branch | `feat/package-quality-wave1-contracts` |
 | Base | `feat/package-quality` (Wave 0 `shared` + Wave 0b harness/docs merged) |
-| Phase | **Plan & Design — PLAN-EVAL PASS (adjusted)** |
+| Phase | **Implementation complete — ready for separate IMPL-EVAL** |
 | Units | `@netscript/config`, `@netscript/contracts`, `@netscript/runtime-config` |
 | Archetype | 1 — Small Contract (all three) |
 | Scope overlay | none (package wave) |
@@ -47,6 +47,7 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 - [x] Slice 24 — contracts gate sweep passed; helpers AP-16 debt closed and root `crud/` accepted debt recorded.
 - [x] Slice 25 — `packages/cli` consumer `deno check` passed with 0 errors.
 - [x] Slice 26 — `plugins/sagas` and `plugins/workers` consumer `deno check` passed with 0 errors.
+- [x] Slice 27 — final publish dry run passed for `runtime-config`, `config`, and `contracts` with 0 slow-type errors.
 
 ## Key findings (re-baselined)
 
@@ -73,6 +74,6 @@ Bring the 3 units to the S1 alpha bar: `deno publish --dry-run` with **0 slow-ty
 
 ## Operating reminders
 
-- **Plan-Gate is a hard stop.** No implementation slice before PLAN-EVAL returns `PASS`.
-- PLAN-EVAL is a **separate session**.
-- `jsr-audit` rubric applied to planned surface; risks named.
+- Implementation has completed through slice 27.
+- Hand off to a separate IMPL-EVAL session per `.llm/harness/evaluator/protocol.md`.
+- Do not self-evaluate in this implementation session.
