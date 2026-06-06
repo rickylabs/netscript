@@ -36,7 +36,7 @@ export const DEFAULT_REDIS_NAMESPACE = 'kv';
  */
 export function keyToRedisKey(
   key: KvKey,
-  namespace = DEFAULT_REDIS_NAMESPACE,
+  namespace: string = DEFAULT_REDIS_NAMESPACE,
 ): string {
   let result = namespace;
   for (let i = 0; i < key.length; i++) {
@@ -71,7 +71,7 @@ export function keyToRedisKey(
  */
 export function redisKeyToKey(
   redisKey: string,
-  namespace = DEFAULT_REDIS_NAMESPACE,
+  namespace: string = DEFAULT_REDIS_NAMESPACE,
 ): KvKey {
   const offset = namespace.length + 1;
   if (

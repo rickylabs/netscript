@@ -183,37 +183,72 @@ export const PluginJobContributionSchema: z.ZodObject<typeof PluginJobContributi
 export type PluginJobContribution = z.infer<typeof PluginJobContributionSchema>;
 
 /** KV key factories used by the worker system. */
-export const JobKvKeys = {
-  execution: (topic: string, jobId: string, executionId: string) =>
+export interface JobKvKeyFactories {
+  readonly execution: (topic: string, jobId: string, executionId: string) => readonly Deno.KvKeyPart[];
+  readonly byTopic: (topic: string) => readonly Deno.KvKeyPart[];
+  readonly byJob: (topic: string, jobId: string) => readonly Deno.KvKeyPart[];
+  readonly allExecutions: () => readonly Deno.KvKeyPart[];
+  readonly taskExecution: (
+    topic: string,
+    taskId: string,
+    executionId: string,
+  ) => readonly Deno.KvKeyPart[];
+  readonly taskByTopic: (topic: string) => readonly Deno.KvKeyPart[];
+  readonly taskByTask: (topic: string, taskId: string) => readonly Deno.KvKeyPart[];
+  readonly allTaskExecutions: () => readonly Deno.KvKeyPart[];
+  readonly allConceptExecutions: () => readonly Deno.KvKeyPart[];
+  readonly job: (topic: string, jobId: string) => readonly Deno.KvKeyPart[];
+  readonly jobsByTopic: (topic: string) => readonly Deno.KvKeyPart[];
+  readonly allJobs: () => readonly Deno.KvKeyPart[];
+  readonly stats: (topic: string, jobId: string) => readonly Deno.KvKeyPart[];
+  readonly jobDefinition: (jobId: string) => readonly Deno.KvKeyPart[];
+  readonly taskDefinition: (taskId: string) => readonly Deno.KvKeyPart[];
+  readonly allTasks: () => readonly Deno.KvKeyPart[];
+  readonly byStatus: (status: string, concept: string, executionId: string) => readonly Deno.KvKeyPart[];
+  readonly byStatusPrefix: (status: string, concept: string) => readonly Deno.KvKeyPart[];
+  readonly byStatusAllPrefix: (status: string) => readonly Deno.KvKeyPart[];
+  readonly byCorrelation: (correlationId: string, executionId: string) => readonly Deno.KvKeyPart[];
+  readonly byCorrelationPrefix: (correlationId: string) => readonly Deno.KvKeyPart[];
+  readonly statusCount: (concept: string, status: string) => readonly Deno.KvKeyPart[];
+  readonly statusCountPrefix: (concept: string) => readonly Deno.KvKeyPart[];
+}
+
+export const JobKvKeys: JobKvKeyFactories = {
+  execution: (topic: string, jobId: string, executionId: string): readonly Deno.KvKeyPart[] =>
     ['executions', 'job', topic, jobId, executionId] as const,
-  byTopic: (topic: string) => ['executions', 'job', topic] as const,
-  byJob: (topic: string, jobId: string) => ['executions', 'job', topic, jobId] as const,
-  allExecutions: () => ['executions', 'job'] as const,
-  taskExecution: (topic: string, taskId: string, executionId: string) =>
+  byTopic: (topic: string): readonly Deno.KvKeyPart[] => ['executions', 'job', topic] as const,
+  byJob: (topic: string, jobId: string): readonly Deno.KvKeyPart[] =>
+    ['executions', 'job', topic, jobId] as const,
+  allExecutions: (): readonly Deno.KvKeyPart[] => ['executions', 'job'] as const,
+  taskExecution: (topic: string, taskId: string, executionId: string): readonly Deno.KvKeyPart[] =>
     ['executions', 'task', topic, taskId, executionId] as const,
-  taskByTopic: (topic: string) => ['executions', 'task', topic] as const,
-  taskByTask: (topic: string, taskId: string) => ['executions', 'task', topic, taskId] as const,
-  allTaskExecutions: () => ['executions', 'task'] as const,
-  allConceptExecutions: () => ['executions'] as const,
-  job: (topic: string, jobId: string) => ['jobs', topic, jobId] as const,
-  jobsByTopic: (topic: string) => ['jobs', topic] as const,
-  allJobs: () => ['jobs'] as const,
-  stats: (topic: string, jobId: string) => ['stats', topic, jobId] as const,
-  jobDefinition: (jobId: string) => ['jobs', DEFAULT_TOPIC, jobId] as const,
-  taskDefinition: (taskId: string) => ['tasks', taskId] as const,
-  allTasks: () => ['tasks'] as const,
-  byStatus: (status: string, concept: string, executionId: string) =>
+  taskByTopic: (topic: string): readonly Deno.KvKeyPart[] => ['executions', 'task', topic] as const,
+  taskByTask: (topic: string, taskId: string): readonly Deno.KvKeyPart[] =>
+    ['executions', 'task', topic, taskId] as const,
+  allTaskExecutions: (): readonly Deno.KvKeyPart[] => ['executions', 'task'] as const,
+  allConceptExecutions: (): readonly Deno.KvKeyPart[] => ['executions'] as const,
+  job: (topic: string, jobId: string): readonly Deno.KvKeyPart[] => ['jobs', topic, jobId] as const,
+  jobsByTopic: (topic: string): readonly Deno.KvKeyPart[] => ['jobs', topic] as const,
+  allJobs: (): readonly Deno.KvKeyPart[] => ['jobs'] as const,
+  stats: (topic: string, jobId: string): readonly Deno.KvKeyPart[] =>
+    ['stats', topic, jobId] as const,
+  jobDefinition: (jobId: string): readonly Deno.KvKeyPart[] => ['jobs', DEFAULT_TOPIC, jobId] as const,
+  taskDefinition: (taskId: string): readonly Deno.KvKeyPart[] => ['tasks', taskId] as const,
+  allTasks: (): readonly Deno.KvKeyPart[] => ['tasks'] as const,
+  byStatus: (status: string, concept: string, executionId: string): readonly Deno.KvKeyPart[] =>
     ['executions', 'by-status', status, concept, executionId] as const,
-  byStatusPrefix: (status: string, concept: string) =>
+  byStatusPrefix: (status: string, concept: string): readonly Deno.KvKeyPart[] =>
     ['executions', 'by-status', status, concept] as const,
-  byStatusAllPrefix: (status: string) => ['executions', 'by-status', status] as const,
-  byCorrelation: (correlationId: string, executionId: string) =>
+  byStatusAllPrefix: (status: string): readonly Deno.KvKeyPart[] =>
+    ['executions', 'by-status', status] as const,
+  byCorrelation: (correlationId: string, executionId: string): readonly Deno.KvKeyPart[] =>
     ['executions', 'by-correlation', correlationId, executionId] as const,
-  byCorrelationPrefix: (correlationId: string) =>
+  byCorrelationPrefix: (correlationId: string): readonly Deno.KvKeyPart[] =>
     ['executions', 'by-correlation', correlationId] as const,
-  statusCount: (concept: string, status: string) =>
+  statusCount: (concept: string, status: string): readonly Deno.KvKeyPart[] =>
     ['executions', 'counts', concept, status] as const,
-  statusCountPrefix: (concept: string) => ['executions', 'counts', concept] as const,
+  statusCountPrefix: (concept: string): readonly Deno.KvKeyPart[] =>
+    ['executions', 'counts', concept] as const,
 } as const;
 
 /** SSE event names for real-time worker updates. */

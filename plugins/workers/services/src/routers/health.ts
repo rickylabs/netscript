@@ -37,7 +37,7 @@ const healthContractV1 = implement(healthContract);
 // HEALTH CHECK HANDLERS
 // ============================================================================
 
-export const health = {
+export const health: Record<string, unknown> = {
   /**
    * Health check endpoint - for testing oRPC connectivity
    */

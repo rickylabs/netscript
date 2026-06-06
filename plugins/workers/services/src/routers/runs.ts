@@ -11,7 +11,7 @@ type ExecutionStatus =
   | 'cancelled'
   | 'timeout';
 
-export const executionHandlers = {
+export const executionHandlers: Record<string, unknown> = {
   listExecutions: router.listExecutions.handler(async ({ input, context }) => {
     const { limit, jobId, status, topic } = input;
     const { executionState: state, jobRegistry: registry } = getWorkersRuntime(context);

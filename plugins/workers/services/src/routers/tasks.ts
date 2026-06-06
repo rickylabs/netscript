@@ -6,7 +6,7 @@ import {
 import { notFound } from '@netscript/contracts';
 import { getTaskQueue, getWorkersRuntime, router } from './router-context.ts';
 
-export const taskHandlers = {
+export const taskHandlers: Record<string, unknown> = {
   listTasks: router.listTasks.handler(async ({ input, context }) => {
     const { limit, type, source, pluginId } = input;
     const { taskRegistry: registry } = getWorkersRuntime(context);

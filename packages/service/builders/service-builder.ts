@@ -111,7 +111,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - CORS configuration options (from hono/cors)
    */
-  withCors(options?: Parameters<typeof cors>[0]) {
+  withCors(options?: Parameters<typeof cors>[0]): this {
     this.app.use('*', cors(options ?? { origin: '*' }));
     return this;
   }
@@ -127,7 +127,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - Logger middleware configuration
    */
-  withLogger(options?: LoggerMiddlewareOptions) {
+  withLogger(options?: LoggerMiddlewareOptions): this {
     this.loggerEnabled = true;
     this.app.use('*', loggerMiddleware(this.config.name, options));
     return this;
@@ -155,7 +155,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    * });
    * ```
    */
-  withDatabase(db: AnyDbContext, healthCheckDb?: Database) {
+  withDatabase(db: AnyDbContext, healthCheckDb?: Database): this {
     // Store database reference for context injection
     this.database = db;
 
@@ -182,7 +182,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param check - Health check definition
    */
-  addHealthCheck(check: HealthCheck) {
+  addHealthCheck(check: HealthCheck): this {
     this.healthChecks.push(check);
     return this;
   }
@@ -192,7 +192,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param check - Async function returning true if ready
    */
-  addReadinessCheck(check: () => Promise<boolean>) {
+  addReadinessCheck(check: () => Promise<boolean>): this {
     this.readinessChecks.push(check);
     return this;
   }
@@ -202,7 +202,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - OpenAPI configuration
    */
-  withOpenAPI(options?: { title?: string; description?: string }) {
+  withOpenAPI(options?: { title?: string; description?: string }): this {
     if (this.openApiConfigured) return this;
     this.openApiConfigured = true;
 
@@ -222,7 +222,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - Scalar docs configuration
    */
-  withDocs(options?: { specUrl?: string }) {
+  withDocs(options?: { specUrl?: string }): this {
     if (this.docsConfigured) return this;
     this.docsConfigured = true;
 
@@ -253,7 +253,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    */
   withRPC(
     options?: { rpcPath?: string; apiPath?: string; debug?: boolean; traceContext?: boolean },
-  ) {
+  ): this {
     if (this.rpcConfigured) return this;
     this.rpcConfigured = true;
 
@@ -337,7 +337,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *   .withRPC()
    * ```
    */
-  withContext(factory: ContextFactory) {
+  withContext(factory: ContextFactory): this {
     this.contextFactory = factory;
     return this;
   }
@@ -360,7 +360,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *   .serve()
    * ```
    */
-  onStartup(hook: () => Promise<void>) {
+  onStartup(hook: () => Promise<void>): this {
     this.startupHooks.push(hook);
     return this;
   }
@@ -374,7 +374,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - Health check configuration
    */
-  withHealth(options?: { checks?: HealthCheck[]; includeDetails?: boolean }) {
+  withHealth(options?: { checks?: HealthCheck[]; includeDetails?: boolean }): this {
     if (this.healthConfigured) return this;
     this.healthConfigured = true;
 
@@ -401,7 +401,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param middleware - Hono middleware handler
    */
-  use(middleware: MiddlewareHandler) {
+  use(middleware: MiddlewareHandler): this {
     this.app.use('*', middleware);
     return this;
   }
@@ -414,7 +414,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    * @param handler - Route handler
    */
   // deno-lint-ignore no-explicit-any
-  route(method: 'get' | 'post' | 'put' | 'delete' | 'patch', path: string, handler: any) {
+  route(method: 'get' | 'post' | 'put' | 'delete' | 'patch', path: string, handler: any): this {
     this.app[method](path, handler);
     return this;
   }
@@ -422,7 +422,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
   /**
    * Configures the service root endpoint with service info.
    */
-  withServiceInfo() {
+  withServiceInfo(): this {
     this.app.get('/', (c: Context) =>
       c.json({
         service: this.config.name,

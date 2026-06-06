@@ -43,7 +43,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   constructor(
     private readonly url: string,
     private readonly queueName = 'default',
-    private readonly options?: Record<string, unknown>,
+    private readonly options: Record<string, unknown> | undefined = undefined,
   ) {
     try {
       const redisOptions = getRedisOptions(options);

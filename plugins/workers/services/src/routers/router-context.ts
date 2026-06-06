@@ -18,7 +18,11 @@ export type WorkersRequestContext = {
   workers: WorkersServiceRuntime;
 };
 
-export const router = workersContractV1.$context<WorkersRequestContext>();
+type WorkersRouterContext = ReturnType<typeof workersContractV1.$context<WorkersRequestContext>>;
+
+const workersRouter: WorkersRouterContext = workersContractV1.$context<WorkersRequestContext>();
+
+export const router: typeof workersRouter = workersRouter;
 
 export function getWorkersRuntime(context: unknown): WorkersServiceRuntime {
   const runtime = (context as Partial<WorkersRequestContext>).workers;
@@ -31,14 +35,14 @@ export function getWorkersRuntime(context: unknown): WorkersServiceRuntime {
 let jobQueue: ReturnType<typeof createQueue<JobMessage>> | null = null;
 let taskQueue: ReturnType<typeof createQueue<TaskMessage>> | null = null;
 
-export function getJobQueue() {
+export function getJobQueue(): ReturnType<typeof createQueue<JobMessage>> {
   if (!jobQueue) {
     jobQueue = createQueue<JobMessage>('jobs');
   }
   return jobQueue;
 }
 
-export function getTaskQueue() {
+export function getTaskQueue(): ReturnType<typeof createQueue<TaskMessage>> {
   if (!taskQueue) {
     taskQueue = createQueue<TaskMessage>('tasks');
   }
