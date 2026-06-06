@@ -12,8 +12,8 @@
 # Toolchain pinned to this repo's reality:
 #   - Deno 2.x  (deno.json uses unstable: kv, temporal, tsgo, worker-options, raw-imports)
 #   - .NET SDK 10.x  (CLI scaffold AppHost/ServiceDefaults target net10.0)
-#   - Aspire CLI via aspire.dev install script (NOT `dotnet workload install aspire`,
-#     which was removed after Aspire 8 — Aspire ships as a standalone CLI now)
+#   - Aspire CLI via the official install script, pinned to a release + script hash
+#     (NOT `dotnet workload install aspire`, which was removed after Aspire 8)
 #   - Docker (pre-installed on ubuntu-latest; AppHost resources need the engine)
 name: 'Copilot Setup Steps'
 
@@ -40,6 +40,7 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+          cache-hash: ${{ hashFiles('**/deno.json') }}
 
       # --- .NET SDK 10 (Aspire AppHost / ServiceDefaults target net10.0) ---
       - name: Setup .NET SDK
@@ -50,7 +51,16 @@ jobs:
       # --- Aspire CLI (standalone install script; adds $HOME/.aspire/bin to PATH) ---
       - name: Install Aspire CLI
         run: |
-          curl -fsSL https://aspire.dev/install.sh | bash
+          set -euo pipefail
+          aspire_version="13.4.2"
+          installer_url="https://raw.githubusercontent.com/dotnet/aspire/d7d0b6759ce4b936c76bc4775814d27db560dd6d/eng/scripts/get-aspire-cli.sh"
+          installer_sha256="df1247d87f6e5ca83e71abf55f78bca1bd9a421a3f2f0fd5481f153fc958632a"
+          installer="$(mktemp)"
+          trap 'rm -f "$installer"' EXIT
+          curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 \
+            --output "$installer" "$installer_url"
+          echo "$installer_sha256  $installer" | sha256sum --check --status
+          bash "$installer" --version "$aspire_version" --install-path "$HOME/.aspire/bin" --skip-path
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Verify Aspire CLI
@@ -67,9 +77,15 @@ jobs:
       # --- Pre-flight cache warming (full network is only available HERE) ---
       - name: Warm Deno dependency cache
         run: |
+          set -euo pipefail
           deno --version
-          # Resolve + cache all workspace deps (jsr: + npm:) from the lockfile.
-          deno install || echo "deno install non-fatal during setup"
+          # Resolve + cache package/plugin source dependencies (jsr: + npm:).
+          mapfile -d '' deno_sources < <(find packages plugins -type f \( -name '*.ts' -o -name '*.tsx' \) -print0)
+          if ((${#deno_sources[@]})); then
+            if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
+              echo "::warning::Deno cache warm-up attempted but did not complete; continuing with any dependencies already cached."
+            fi
+          fi
 
       - name: Warm .NET / NuGet (Aspire SDK packages)
         run: |
