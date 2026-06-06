@@ -80,8 +80,13 @@ jobs:
           set -euo pipefail
           deno --version
           # Resolve + cache package/plugin source dependencies (jsr: + npm:).
+          if [[ ! -d packages || ! -d plugins ]]; then
+            echo "::warning::Expected packages/ and plugins/ directories were not found; skipping Deno cache warm-up."
+            exit 0
+          fi
           mapfile -d '' deno_sources < <(find packages plugins -type f \( -name '*.ts' -o -name '*.tsx' \) -print0)
           if ((${#deno_sources[@]})); then
+            # Batch files to stay comfortably below shell command-line length limits.
             if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
               echo "::warning::Deno cache warm-up did not complete. This is non-fatal for Copilot startup; investigate if later firewalled sessions still need missing JSR/npm downloads."
             fi
