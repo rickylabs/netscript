@@ -6,9 +6,9 @@
  * because one Deno process can walk the tree once and handle all matching in-process.
  *
  * Examples:
- * - deno run --allow-read .llm/tools/find-lines.ts --root apps/playground --contains @app/
+ * - deno run --allow-read .llm/tools/find-lines.ts --root packages/cli/src --contains @netscript/
  * - deno run --allow-read .llm/tools/find-lines.ts --root packages/fresh --regex define(ListPage|DetailPage|FormPage)
- * - deno run --allow-read .llm/tools/find-lines.ts --root apps/playground --contains ../ --ext .ts,.tsx,.css
+ * - deno run --allow-read .llm/tools/find-lines.ts --root packages/cli/src --contains ../ --ext .ts,.tsx
  */
 
 interface Options {

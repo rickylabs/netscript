@@ -39,3 +39,4 @@ Format:
 - ad0b232: test(workspace): verify final package publish dry runs
 - 936209a: docs(agents): clarify full cli e2e command
 - f6bf743: test(cli): restore full scaffold runtime e2e
+- b96ba0d: docs(agents): port durable claude guidance

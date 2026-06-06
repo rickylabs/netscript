@@ -6,7 +6,7 @@
  *
  * Examples:
  * - deno run --allow-read .llm/tools/find-symbol-usages.ts --root packages/fresh --symbol definePage
- * - deno run --allow-read .llm/tools/find-symbol-usages.ts --root apps/playground --symbol defineFormPage --symbol defineListPage
+ * - deno run --allow-read .llm/tools/find-symbol-usages.ts --root packages/cli/src --symbol defineCommand
  * - deno run --allow-read .llm/tools/find-symbol-usages.ts --root packages/fresh --symbol createListPage --substring
  */
 

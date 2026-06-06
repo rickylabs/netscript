@@ -16,7 +16,6 @@ import { syncTemplates } from '../../sync/templates/sync-templates.ts';
 import { DEFAULT_BRANCH, DEFAULT_REMOTE } from './release-eject-constants.ts';
 import { initializeGitRepository } from './release-eject-git.ts';
 import {
-  markExamplesNonPublishable,
   removeScaffoldOnlyRoots,
   resetMemberVersions,
   writeProducerRootFiles,
@@ -143,9 +142,6 @@ export async function releaseEject(
     ...await resetMemberVersions(request.targetPath, dependencies.fs),
   ];
 
-  await scaffoldPlaygroundExample(sourceRoot, request.targetPath, dependencies.process);
-  await markExamplesNonPublishable(request.targetPath, dependencies.fs);
-
   const gitCommit = request.noGit ? null : await initializeGitRepository({
     targetPath: request.targetPath,
     process: dependencies.process,
@@ -249,30 +245,4 @@ async function syncOfficialPlugins(options: {
     results.push({ kind, name: result.pluginName });
   }
   return results;
-}
-
-async function scaffoldPlaygroundExample(
-  sourceRoot: string,
-  targetPath: string,
-  process: ProcessPort,
-): Promise<void> {
-  const result = await process.exec('deno', [
-    'run',
-    '--allow-all',
-    join(sourceRoot, 'packages/cli/bin/netscript.ts'),
-    'init',
-    'playground',
-    '--path',
-    join(targetPath, 'examples'),
-    '--force',
-    '--ci',
-    '--yes',
-    '--no-git',
-    '--no-aspire',
-    '--db',
-    'none',
-  ], { cwd: sourceRoot });
-  if (result.code !== 0) {
-    throw new Error(result.stderr || result.stdout || 'examples/playground scaffold failed.');
-  }
 }

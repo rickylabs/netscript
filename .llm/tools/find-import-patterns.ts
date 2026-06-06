@@ -6,9 +6,9 @@
  * quoting problems around paths like `(dashboard)` or `[id]`.
  *
  * Examples:
- * - deno run --allow-read .llm/tools/find-import-patterns.ts --root apps/playground
- * - deno run --allow-read .llm/tools/find-import-patterns.ts --root apps/playground --legacy-alias @old/
- * - deno run --allow-read .llm/tools/find-import-patterns.ts --root apps/playground --include-sibling
+ * - deno run --allow-read .llm/tools/find-import-patterns.ts --root packages/cli/src
+ * - deno run --allow-read .llm/tools/find-import-patterns.ts --root packages/cli/src --legacy-alias @old/
+ * - deno run --allow-read .llm/tools/find-import-patterns.ts --root packages/cli/src --include-sibling
  */
 
 interface Options {

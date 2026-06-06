@@ -8,7 +8,7 @@
  * Examples:
  * - deno run --allow-read .llm/tools/list-exports.ts --root packages/fresh
  * - deno run --allow-read .llm/tools/list-exports.ts --root packages/fresh --name define
- * - deno run --allow-read .llm/tools/list-exports.ts --root apps/playground/routes --name handler
+ * - deno run --allow-read .llm/tools/list-exports.ts --root packages/cli/src --name handler
  */
 
 interface Options {
