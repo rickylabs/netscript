@@ -23,9 +23,9 @@ import type {
   ScheduledJob,
   ScheduleOptions,
   SchedulerEventMap,
-} from '../interfaces/types.ts';
-import { isValidCronExpression, parseCronExpression } from '../interfaces/types.ts';
-import type { CronScheduler, JobEventListener, SchedulerEvent } from '../interfaces/scheduler.ts';
+} from '../ports/types.ts';
+import { isValidCronExpression, parseCronExpression } from '../ports/types.ts';
+import type { CronScheduler, JobEventListener, SchedulerEvent } from '../ports/scheduler.ts';
 import { createLifecycleEvent, emitSchedulerEvent, executeScheduledJob } from './_shared.ts';
 
 /**

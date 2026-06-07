@@ -1,7 +1,7 @@
 /**
- * Cron Interfaces - Barrel Export
+ * Cron Ports - Barrel Export
  *
- * Re-exports all interfaces and types for the @netscript/cron package.
+ * Re-exports all ports and types for the @netscript/cron package.
  *
  * @module
  */
@@ -30,7 +30,7 @@ export type {
 export { CronPresets, CronProviders, isValidCronExpression, parseCronExpression } from './types.ts';
 
 // ============================================================================
-// INTERFACES
+// PORTS
 // ============================================================================
 
 export type { CronScheduler, JobEventListener, SchedulerEvent } from './scheduler.ts';

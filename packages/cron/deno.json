@@ -6,10 +6,10 @@
   "exports": {
     ".": "./mod.ts",
     "./adapters": "./adapters/mod.ts",
-    "./types": "./interfaces/types.ts"
+    "./ports": "./ports/mod.ts"
   },
   "tasks": {
-    "check": "deno check ./mod.ts ./adapters/mod.ts ./interfaces/mod.ts",
+    "check": "deno check ./mod.ts ./adapters/mod.ts ./ports/mod.ts",
     "test": "deno test ./tests/"
   },
   "imports": {

@@ -86,8 +86,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** closed 2026-05-01 — CLI permission expectations are documented in
-  `packages/cli/docs/permissions.md` and linked from `packages/cli/README.md`.
+- **Status:** closed 2026-06-07 — corrected during Wave 2c after the previous
+  2026-05-01 closure note was found to reference unrelated CLI permission
+  documentation while `packages/cron/interfaces/` still existed. Real evidence:
+  `packages/cron/interfaces/` was renamed to `packages/cron/ports/`, the public
+  `./types` export was replaced with `./ports`, and `tasks.check` now checks
+  `ports/mod.ts`.
 - **Gate:** F-3, F-11
 
 ## packages/database — AP-17 / doctrine verdict Refactor

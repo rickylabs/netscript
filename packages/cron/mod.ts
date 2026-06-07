@@ -53,8 +53,8 @@
 
 import { DenoCronAdapter } from './adapters/deno.adapter.ts';
 import { MemoryCronAdapter } from './adapters/memory.adapter.ts';
-import type { CronProvider } from './interfaces/types.ts';
-import type { CronScheduler } from './interfaces/scheduler.ts';
+import type { CronProvider } from './ports/types.ts';
+import type { CronScheduler } from './ports/scheduler.ts';
 
 // ============================================================================
 // FACTORY FUNCTION
@@ -211,15 +211,15 @@ export type {
   ScheduledJob,
   ScheduleOptions,
   SchedulerEventMap,
-} from './interfaces/types.ts';
+} from './ports/types.ts';
 
 export {
   CronPresets,
   CronProviders,
   isValidCronExpression,
   parseCronExpression,
-} from './interfaces/types.ts';
+} from './ports/types.ts';
 
-export type { CronScheduler, JobEventListener, SchedulerEvent } from './interfaces/scheduler.ts';
+export type { CronScheduler, JobEventListener, SchedulerEvent } from './ports/scheduler.ts';
 
 // ============================================================================

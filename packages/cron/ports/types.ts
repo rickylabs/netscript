@@ -170,7 +170,7 @@ export interface SchedulerEventMap {
 export type KnownCronProvider = 'deno' | 'node' | 'memory' | 'temporal';
 
 /** Cron provider identifier. Built-in providers are runtime-validated by createScheduler(). */
-export type CronProvider = KnownCronProvider | (string & {});
+export type CronProvider = KnownCronProvider | (string & Record<never, never>);
 
 /** Canonical provider identifier registry shape. */
 export type CronProviderRegistry = Readonly<
