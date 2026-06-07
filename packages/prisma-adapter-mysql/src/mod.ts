@@ -37,12 +37,16 @@
  * @module
  */
 
-export {
-  inferCapabilities,
-  PrismaMySql,
-  PrismaMySqlAdapter,
-  PrismaMySqlAdapterFactory,
-} from "./adapter.ts";
+export { inferCapabilities, PrismaMySql, PrismaMySqlAdapterFactory } from './adapter.ts';
+
+export type {
+  PrismaMySqlConnectedAdapter,
+  PrismaMySqlConnectionInfo,
+  PrismaMySqlIsolationLevel,
+  PrismaMySqlQuery,
+  PrismaMySqlResultSet,
+  PrismaMySqlTransactionAdapter,
+} from './adapter.ts';
 
 export type {
   DenoMySqlClient,
@@ -51,8 +55,4 @@ export type {
   MySqlCapabilities,
   MySqlConnectionConfig,
   PrismaMySqlOptions,
-} from "./types.ts";
-
-export { mapArg, mapColumnType, mapRow } from "./conversion.ts";
-
-export { convertDriverError, mapDriverError } from "./errors.ts";
+} from './types.ts';

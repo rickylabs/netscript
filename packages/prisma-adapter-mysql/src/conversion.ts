@@ -5,12 +5,8 @@
  * deno_mysql driver which returns data in a different format.
  */
 
-import type {
-  ArgType,
-  ColumnType,
-  ResultValue,
-} from "@prisma/driver-adapter-utils";
-import { ColumnTypeEnum } from "@prisma/driver-adapter-utils";
+import type { ArgType, ColumnType, ResultValue } from '@prisma/driver-adapter-utils';
+import { ColumnTypeEnum } from '@prisma/driver-adapter-utils';
 
 /**
  * MySQL column type constants.
@@ -155,8 +151,6 @@ export function mapColumnType(field: MySqlFieldInfo): ColumnType {
       return ColumnTypeEnum.Int32;
 
     default:
-      // Log warning for unknown types but don't crash
-      console.warn(`Unknown MySQL column type: ${fieldType}, defaulting to Text`);
       return ColumnTypeEnum.Text;
   }
 }
@@ -173,29 +167,29 @@ export function mapArg<A>(
   }
 
   // Handle BigInt conversion from string
-  if (typeof arg === "string" && argType.scalarType === "bigint") {
+  if (typeof arg === 'string' && argType.scalarType === 'bigint') {
     return BigInt(arg);
   }
 
   // Handle datetime string conversion
-  if (typeof arg === "string" && argType.scalarType === "datetime") {
+  if (typeof arg === 'string' && argType.scalarType === 'datetime') {
     arg = new Date(arg) as unknown as A;
   }
 
   // Handle Date formatting based on database type
   if (arg instanceof Date) {
     const dbType = argType.dbType as string;
-    if (dbType === "TIME" || dbType === "TIME2") {
+    if (dbType === 'TIME' || dbType === 'TIME2') {
       return formatTime(arg);
     }
-    if (dbType === "DATE" || dbType === "NEWDATE") {
+    if (dbType === 'DATE' || dbType === 'NEWDATE') {
       return formatDate(arg);
     }
     return formatDateTime(arg);
   }
 
   // Handle bytes conversion from base64 string
-  if (typeof arg === "string" && argType.scalarType === "bytes") {
+  if (typeof arg === 'string' && argType.scalarType === 'bytes') {
     return base64ToUint8Array(arg);
   }
 
@@ -235,11 +229,11 @@ export function mapRow(
       case MySqlColumnType.DATETIME:
       case MySqlColumnType.DATETIME2:
         if (value instanceof Date) {
-          return value.toISOString().replace(/(\.000)?Z$/, "+00:00");
+          return value.toISOString().replace(/(\.000)?Z$/, '+00:00');
         }
-        if (typeof value === "string") {
+        if (typeof value === 'string') {
           // Parse and reformat the date string
-          return new Date(`${value}Z`).toISOString().replace(/(\.000)?Z$/, "+00:00");
+          return new Date(`${value}Z`).toISOString().replace(/(\.000)?Z$/, '+00:00');
         }
         break;
 
@@ -259,7 +253,7 @@ export function mapRow(
     }
 
     // Handle BigInt
-    if (typeof value === "bigint") {
+    if (typeof value === 'bigint') {
       return value.toString();
     }
 
@@ -285,45 +279,45 @@ export function rowToArray(
 // Date formatting utilities
 
 function formatDateTime(date: Date): string {
-  const pad = (n: number, z = 2) => String(n).padStart(z, "0");
+  const pad = (n: number, z = 2) => String(n).padStart(z, '0');
   const ms = date.getUTCMilliseconds();
   return (
     pad(date.getUTCFullYear(), 4) +
-    "-" +
+    '-' +
     pad(date.getUTCMonth() + 1) +
-    "-" +
+    '-' +
     pad(date.getUTCDate()) +
-    " " +
+    ' ' +
     pad(date.getUTCHours()) +
-    ":" +
+    ':' +
     pad(date.getUTCMinutes()) +
-    ":" +
+    ':' +
     pad(date.getUTCSeconds()) +
-    (ms ? "." + String(ms).padStart(3, "0") : "")
+    (ms ? '.' + String(ms).padStart(3, '0') : '')
   );
 }
 
 function formatDate(date: Date): string {
-  const pad = (n: number, z = 2) => String(n).padStart(z, "0");
+  const pad = (n: number, z = 2) => String(n).padStart(z, '0');
   return (
     pad(date.getUTCFullYear(), 4) +
-    "-" +
+    '-' +
     pad(date.getUTCMonth() + 1) +
-    "-" +
+    '-' +
     pad(date.getUTCDate())
   );
 }
 
 function formatTime(date: Date): string {
-  const pad = (n: number, z = 2) => String(n).padStart(z, "0");
+  const pad = (n: number, z = 2) => String(n).padStart(z, '0');
   const ms = date.getUTCMilliseconds();
   return (
     pad(date.getUTCHours()) +
-    ":" +
+    ':' +
     pad(date.getUTCMinutes()) +
-    ":" +
+    ':' +
     pad(date.getUTCSeconds()) +
-    (ms ? "." + String(ms).padStart(3, "0") : "")
+    (ms ? '.' + String(ms).padStart(3, '0') : '')
   );
 }
 
@@ -339,7 +333,7 @@ function base64ToUint8Array(base64: string): Uint8Array {
 }
 
 function uint8ArrayToBase64(bytes: Uint8Array): string {
-  let binary = "";
+  let binary = '';
   for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
