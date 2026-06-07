@@ -168,5 +168,6 @@ archetype gate matrix in `.llm/harness/gates/archetype-gate-matrix.md`.
   - `listen()` now exits without polling when passed an already-aborted signal.
   - `wait()` now removes its abort listener when the timeout fires, avoiding listener accumulation in idle loops.
 - Added `packages/queue/tests/memory-queue_test.ts` covering those edge cases.
+- Follow-up `7057351` replaced the regression test's local delay helper with `@std/async`.
 - Also typed the V8-only `Error.captureStackTrace` hook in `packages/queue/ports/errors.ts`; the new regression test exposed the standard `ErrorConstructor` typing gap.
 - Validation from `packages/queue`: `deno task fmt --check`, `deno task lint`, `deno task check --unstable-kv`, targeted memory queue tests (3 passed), full queue tests (19 passed), and `deno doc --lint testing/mod.ts testing/memory-queue.ts ports/errors.ts`.
