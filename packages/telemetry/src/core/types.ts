@@ -9,9 +9,9 @@ export type AttributeValue =
   | string
   | number
   | boolean
-  | Array<string | null | undefined>
-  | Array<number | null | undefined>
-  | Array<boolean | null | undefined>;
+  | string[]
+  | number[]
+  | boolean[];
 
 /**
  * Attribute bag attached to spans and events.

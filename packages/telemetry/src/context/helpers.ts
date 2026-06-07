@@ -1,6 +1,28 @@
 import { context, type Span as OtelSpan, trace } from '@opentelemetry/api';
 import type { Context, Span } from '../core/mod.ts';
 
+function assertOtelSpan(span: Span): asserts span is Span & OtelSpan {
+  for (
+    const method of [
+      'spanContext',
+      'setAttribute',
+      'setAttributes',
+      'addEvent',
+      'addLink',
+      'addLinks',
+      'setStatus',
+      'updateName',
+      'isRecording',
+      'recordException',
+      'end',
+    ] as const
+  ) {
+    if (typeof span[method] !== 'function') {
+      throw new TypeError(`Telemetry span is missing OpenTelemetry method '${method}'`);
+    }
+  }
+}
+
 /**
  * Run a synchronous function inside the supplied telemetry context.
  */
@@ -19,7 +41,8 @@ export async function withContextAsync<T>(ctx: Context, fn: () => Promise<T>): P
  * Return a context containing the supplied span.
  */
 export function contextWithSpan(span: Span, parentContext?: Context): Context {
-  return trace.setSpan(parentContext ?? context.active(), span as OtelSpan);
+  assertOtelSpan(span);
+  return trace.setSpan(parentContext ?? context.active(), span);
 }
 
 /**

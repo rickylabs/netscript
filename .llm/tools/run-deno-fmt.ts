@@ -171,8 +171,22 @@ function normalizePath(path: string): string {
   return path.replace(/\\/g, '/');
 }
 
+function isAbsolutePath(path: string): boolean {
+  return path.startsWith('/') || path.startsWith('\\\\') || /^[A-Za-z]:[\\/]/.test(path);
+}
+
+function resolveFromCwd(cwd: string, path: string): string {
+  if (isAbsolutePath(path)) return path;
+  return `${cwd.replace(/[/\\]+$/, '')}/${path}`;
+}
+
 function relativePath(cwd: string, path: string): string {
-  return normalizePath(path.startsWith(cwd) ? path.slice(cwd.length).replace(/^[/\\]/, '') : path);
+  const normalizedCwd = normalizePath(cwd).replace(/\/+$/, '');
+  const normalizedPath = normalizePath(path);
+  if (normalizedPath === normalizedCwd) return '';
+  return normalizedPath.startsWith(`${normalizedCwd}/`)
+    ? normalizedPath.slice(normalizedCwd.length + 1)
+    : normalizedPath;
 }
 
 function hasSelectedExtension(path: string, extensions: Set<string>): boolean {
@@ -191,7 +205,8 @@ function matchesFilters(path: string, options: Options): boolean {
 }
 
 async function collectRoot(root: string, options: Options, output: Set<string>): Promise<void> {
-  const absolute = await Deno.realPath(root).catch(() => root);
+  const target = resolveFromCwd(options.cwd, root);
+  const absolute = await Deno.realPath(target).catch(() => target);
   const info = await Deno.stat(absolute);
 
   if (info.isFile) {
@@ -222,7 +237,8 @@ async function collectFiles(options: Options): Promise<string[]> {
   }
 
   for (const file of options.files) {
-    const relative = relativePath(options.cwd, await Deno.realPath(file).catch(() => file));
+    const target = resolveFromCwd(options.cwd, file);
+    const relative = relativePath(options.cwd, await Deno.realPath(target).catch(() => target));
     if (matchesFilters(relative, options)) output.add(relative);
   }
 
@@ -289,6 +305,9 @@ function parseFindings(results: BatchResult[]): FormatFinding[] {
 async function main(): Promise<void> {
   const options = parseArgs(Deno.args);
   if (!options) return;
+  options.cwd = await Deno.realPath(options.cwd).catch(() =>
+    resolveFromCwd(Deno.cwd(), options.cwd)
+  );
 
   const files = await collectFiles(options);
   const batches = chunk(files, options.batchSize);
