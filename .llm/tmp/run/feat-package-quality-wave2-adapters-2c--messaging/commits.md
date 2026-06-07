@@ -19,3 +19,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 12 | `c832c4a` | docs(cron): clear public doc lint | S11 |
 | 13 | `ef1dc87` | feat(cron): add testing entrypoint | S12 |
 | 14 | `6dc7dfa` | test(cron): cover scheduler cleanup | S13 |
+| 15 | `d9db0f8` | chore(cron): add package quality tasks | S14 |
