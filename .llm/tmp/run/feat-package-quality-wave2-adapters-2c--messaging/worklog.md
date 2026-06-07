@@ -12,6 +12,7 @@ Base: `feat/package-quality-wave2-adapters` @ `55f6108`
 | 2026-06-07 | Plan & Design | generator | Locked 17-slice plan. Real re-baseline: queue 35 doc-lint errors, cron 16. Cron `./testing` reuses `MemoryCronAdapter`. See `plan.md` + `research.md`. |
 | 2026-06-07 | PLAN-EVAL | evaluator | **PASS.** Separate session (@copilot/claude-opus-4.8). All 8 Plan-Gate boxes satisfied. Spot-checked cron `scheduler.ts` doc-lint = 7 ✓, zero subpath consumers ✓, F-11 allows `internal/` ✓. Applied minor refinements directly (slice 2/10 export+task enumeration; AP-16 scope note; AP-17 registry-correction note). See `plan-eval.md`. |
 | 2026-06-07 | Implement | generator | Slice 1 complete: `packages/queue/interfaces/` renamed to `ports/`, `utils/` renamed to `validation/`, and AP-16 closed with the PLAN-EVAL scope note that `internal/` is F-11-allowed. F-11/F-16 manual evidence: `ports/` has 4 files; `validation/` has 2 files. Static package checks are intentionally transient until slices 2-3 retarget exports and imports. |
+| 2026-06-07 | Implement | generator | Slice 2 complete: `packages/queue/deno.json` retargeted exports from `./types` to `./ports`, `./errors` to `./ports/errors.ts`, `./validation` to `./validation/mod.ts`, and `tasks.check` to the renamed entrypoints. Static package checks remain transient until slice 3 retargets source imports. |
 | | Gate | generator | (pending) Static + fitness + consumer + e2e:cli (final slice). |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
