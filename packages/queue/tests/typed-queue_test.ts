@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 import { z } from 'zod';
 import { createTypedQueue } from '../factory/create-typed-queue.ts';
-import { QueueProvider, QueueValidationError } from '../interfaces/mod.ts';
+import { QueueProvider, QueueValidationError } from '../ports/mod.ts';
 
 Deno.test('createTypedQueue exposes the schema and native retrial flag', () => {
   const schema = z.object({ id: z.string() });

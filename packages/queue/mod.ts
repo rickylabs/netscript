@@ -64,14 +64,14 @@ export type {
   ListenOptions,
   MessageContext,
   MessageQueue,
-} from './interfaces/message-queue.ts';
+} from './ports/message-queue.ts';
 
 export {
   type QueueConnectionOptions,
   type QueueOptions,
   QueueProvider,
   type TypedQueueOptions,
-} from './interfaces/options.ts';
+} from './ports/options.ts';
 
 // ============================================================================
 // ERROR TYPES
@@ -84,7 +84,7 @@ export {
   QueueErrorCode,
   QueueHandlerError,
   QueueValidationError,
-} from './interfaces/errors.ts';
+} from './ports/errors.ts';
 
 // ============================================================================
 // UTILITIES
@@ -96,4 +96,4 @@ export {
   type ValidationResult,
   type ValidationSchema,
   withValidation,
-} from './utils/mod.ts';
+} from './validation/mod.ts';

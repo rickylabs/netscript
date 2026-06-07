@@ -14,13 +14,13 @@ import { getServiceUrl, isServiceAvailable } from '@netscript/sdk/discovery';
 import { getRedisConnectionFromEnv } from '@netscript/kv';
 import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
 import { KvPollingAdapter } from '../adapters/kv-polling.adapter.ts';
-import type { MessageQueue } from '../interfaces/message-queue.ts';
+import type { MessageQueue } from '../ports/message-queue.ts';
 import {
   QueueConfigurationError,
   QueueConnectionError,
   type QueueOptions,
   QueueProvider,
-} from '../interfaces/mod.ts';
+} from '../ports/mod.ts';
 import { isTelemetryEnabled } from '@netscript/telemetry/config';
 import { traceQueue } from '@netscript/telemetry/instrumentation';
 

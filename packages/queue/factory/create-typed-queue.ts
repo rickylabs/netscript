@@ -12,9 +12,9 @@ import type {
   ListenOptions,
   MessageContext,
   MessageQueue,
-} from '../interfaces/message-queue.ts';
-import { QueueValidationError, type TypedQueueOptions } from '../interfaces/mod.ts';
-import type { ValidationSchema } from '../utils/validation.ts';
+} from '../ports/message-queue.ts';
+import { QueueValidationError, type TypedQueueOptions } from '../ports/mod.ts';
+import type { ValidationSchema } from '../validation/validation.ts';
 import { createQueue } from './create-queue.ts';
 
 /**

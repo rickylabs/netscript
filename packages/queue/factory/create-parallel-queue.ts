@@ -11,10 +11,10 @@
  * @module
  */
 
-import type { MessageQueue } from '../interfaces/message-queue.ts';
+import type { MessageQueue } from '../ports/message-queue.ts';
 import { wrapWithParallel } from '../internal/parallel-queue.ts';
 import { createQueue } from './create-queue.ts';
-import type { QueueOptions } from '../interfaces/options.ts';
+import type { QueueOptions } from '../ports/options.ts';
 
 /**
  * Options for creating a parallel queue.

@@ -7,13 +7,8 @@
  */
 
 import { DenoKvMessageQueue } from '@fedify/denokv';
-import type {
-  EnqueueOptions,
-  ListenOptions,
-  MessageContext,
-  MessageQueue,
-} from '../interfaces/mod.ts';
-import { QueueConnectionError, QueueError, QueueErrorCode } from '../interfaces/mod.ts';
+import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
 import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
 
 /**

@@ -18,13 +18,8 @@
 
 import { delay } from '@std/async/delay';
 import { getKv, type KvKey, type WatchableKv } from '@netscript/kv';
-import type {
-  EnqueueOptions,
-  ListenOptions,
-  MessageContext,
-  MessageQueue,
-} from '../interfaces/mod.ts';
-import { QueueError, QueueErrorCode } from '../interfaces/mod.ts';
+import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import { QueueError, QueueErrorCode } from '../ports/mod.ts';
 
 /**
  * Internal message structure stored in KV
