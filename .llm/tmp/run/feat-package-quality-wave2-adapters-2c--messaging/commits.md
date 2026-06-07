@@ -26,3 +26,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 19 | `af471cf` | fix(queue): harden memory testing adapter | Augment feedback |
 | 20 | `7057351` | test(queue): use std async delay | Validation follow-up |
 | 21 | `d9f570f` | fix(queue): index pending memory items | Validation follow-up |
+| 22 | `4c788b0` | fix(queue): clarify memory requeue state | Validation follow-up |
