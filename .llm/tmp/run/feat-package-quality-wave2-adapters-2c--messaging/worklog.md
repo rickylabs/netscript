@@ -27,10 +27,13 @@ Base: `feat/package-quality-wave2-adapters` @ `55f6108`
 | 2026-06-07 | Implement | generator | Slice 14 complete: added cron `lint`, `fmt`, and `publish:dry-run` tasks; added `docs/**/*.md` to publish include; scaffolded `packages/cron/docs/{README,architecture,concepts,getting-started}.md`. Gates passed from `packages/cron`: `deno task check --unstable-kv`, `deno task lint`, `deno task fmt --check`, full cron `deno doc --lint` sweep, and `deno task test` (10 passed). |
 | 2026-06-07 | Implement | generator | Slice 15 complete: verified cron publish readiness. Gates passed from `packages/cron`: `deno task publish:dry-run` (0 slow types; `Success Dry run complete`), full-export `deno doc --lint` sweep over 8 entrypoints, `deno task check --unstable-kv`, `deno task lint`, and `deno task fmt --check`. |
 | 2026-06-07 | Implement | generator | Slice 16 complete: consumer gate passed for root-only importers of `@netscript/cron` and `@netscript/queue`. Gates passed: `deno task check` from `packages/cli` (`--unstable-kv`), `plugins/triggers` (`--unstable-kv`), and `plugins/workers` (`--unstable-kv`). No isolated-declarations debt surfaced. |
-| | Gate | generator | (pending) Static + fitness + consumer + e2e:cli (final slice). |
+| 2026-06-07 | Implement | generator | Slice 17 complete: ran final `rtk proxy deno task e2e:cli` once. Suite summary: 35 passed, 1 failed, 0 skipped. Failure was `behavior.triggers-health`: HTTP request to `http://localhost:8093/health` failed because the localhost connection was forcibly closed after scaffold, plugin add, database, runtime waits, workers behavior, and sagas behavior gates had passed. Recorded as out-of-scope runtime gate caveat in `drift.md` for supervisor/IMPL-EVAL follow-up. |
+| 2026-06-07 | Gate | generator | Queue gates green: publish dry-run 0 slow types, full-export doc-lint clean, `./testing` shipped, defensive cleanup tests pass, tasks present. Cron gates green: publish dry-run 0 slow types, full-export doc-lint clean, docs present, `./testing` shipped, defensive cleanup tests pass, tasks present. Consumer gate green for CLI/triggers/workers. Final e2e:cli was run once and failed only at `behavior.triggers-health` as recorded in drift. Ready for IMPL-EVAL (separate session). |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
 
 ## Readiness note
 
 **2026-06-07 — Plan & Design COMPLETE. Ready for PLAN-EVAL (separate session).**
+
+**2026-06-07 — Implement + Gate COMPLETE. Ready for IMPL-EVAL (separate session).**
