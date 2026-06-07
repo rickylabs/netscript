@@ -17,3 +17,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 10 | `60878e7` | chore(queue): verify publish readiness | S9 |
 | 11 | `7a99b6b` | refactor(cron): rename ports folder | S10 |
 | 12 | `c832c4a` | docs(cron): clear public doc lint | S11 |
+| 13 | `ef1dc87` | feat(cron): add testing entrypoint | S12 |
