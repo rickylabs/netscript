@@ -160,10 +160,12 @@ To add a new adapter to an A2 unit:
 | 1 logger `/docs` scaffold | PASS | Added `packages/logger/docs/{README,architecture,concepts,getting-started}.md`, recipe pages, and `reference/README.md` with required frontmatter. `deno publish --dry-run --allow-dirty` includes `docs/**/*.md` and ended `Success Dry run complete`. |
 | 2 logger package tasks | PASS | Added `lint`, `fmt`, and `publish:dry-run` tasks to `packages/logger/deno.json`. `deno lint` checked 12 files; `deno fmt --check deno.json README.md docs tests/_fixtures/docs-examples_test.ts` checked 13 files. |
 | 3 logger docs doctest | PASS | Added `packages/logger/tests/_fixtures/docs-examples_test.ts`. `deno test --allow-env ./tests/` passed 11 tests, including 6 docs-example tests. `deno doc --lint ./mod.ts ./middleware.ts ./orpc.ts` checked 3 files; `deno publish --dry-run --allow-dirty` stayed at 0 slow types. Commit: `29bf0bf`. |
-| 4 telemetry doc-lint re-baseline | ESCALATED | Root-only `deno doc --lint ./mod.ts` reports 2 errors, matching the locked plan. Full export sweep across every `deno.json` entrypoint reports 168 doc-lint errors, which changes the slice shape. See `drift.md` § Implementation drift. |
-
-### Sub-wave 2a Gate Notes
-
-- Logger F-6/F-7/F-10/static gates are green for slices 1-3.
-- Telemetry F-7 is blocked on scope clarification because the locked plan's two-error fix is not
-  sufficient for the required full export sweep.
+| 4 telemetry doc-lint re-baseline | RESOLVED | Escalation raised then resolved: root-only `deno doc --lint ./mod.ts` showed 2 errors; the required full-export sweep (`./mod.ts ./config.ts ./tracer.ts ./context.ts ./attributes.ts ./instrumentation.ts ./src/runtime/mod.ts ./orpc.ts`) showed 168. Fixed by adding local documented public contracts (spans/tracers/contexts/attributes/options/links/status/trace-state), replacing OTEL type leakage with local exported contracts, and adding missing JSDoc. Commit: `966a746`. |
+| 5 telemetry docs parity | PASS | `/docs` tree present (README, architecture, concepts, getting-started, recipes, reference); README 233 lines. Commit: `966a746`. |
+| 6 telemetry publish/doc-lint verify | PASS | Full-export `deno doc --lint` clean (`Checked 8 files`); `deno publish --dry-run --allow-dirty` `Success Dry run complete`, 0 slow types; `deno check` on all 8 entrypoints clean; `deno test --allow-all ./tests/` 12 passed. Commit: `966a746`. |
+| 7 aspire schema doc-lint | PASS | Replaced Zod-inferred public schema types with explicit documented contracts + local schema facades; added missing public docs/re-export annotations. Full-export `deno doc --lint` clean (`Checked 8 files`). Commit: `37665e2`. |
+| 8 aspire drop `./helpers` | PASS | `./helpers` removed from `packages/aspire/deno.json` exports; zero external consumers (grep `@netscript/aspire/helpers` across packages/plugins → none). README import guidance updated to `./application`. Commit: `37665e2`. |
+| 9 aspire publish/doc-lint verify | PASS | `deno publish --dry-run --allow-dirty` `Success Dry run complete`, 0 slow types; `deno check --unstable-kv` on all 8 entrypoints clean; `deno test --allow-all tests/` 18 passed (49 steps). README 369 lines. Commit: `37665e2`. |
+| 10 2a consumer gate | PASS | Only public-surface change in 2a is aspire `./helpers` removal; grep confirms zero consumers. logger/telemetry made no breaking surface changes. |
+| logger README threshold | PASS | logger README ≥150 lines (203). Commit: `5394902`. |
+| IMPL-EVAL lint corrections | PASS | telemetry `verbatim-module-syntax` (sse.ts, error-plugin.ts) → type-only imports (`df5be37`); aspire `no-unversioned-import` test specifiers pinned to `@std/assert` import map (`32d8894`). `deno lint` now clean for logger (12), telemetry (59), aspire (45). |

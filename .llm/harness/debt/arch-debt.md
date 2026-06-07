@@ -388,7 +388,10 @@ Seeded from
 - **Linked plan:** `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/plan.md` and
   `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/drift.md`.
 - **Created:** 2026-05-08
-- **Status:** open, DEBT_ACCEPTED for Foundation alpha only.
+- **Status:** closed 2026-06-07 — Wave 2a slice 8 (`37665e2`) removed the `./helpers` export from
+  `packages/aspire/deno.json`; grep for `@netscript/aspire/helpers` across `packages/` and
+  `plugins/` returns zero consumers. F-5 (public surface matches export map), F-7 (doc-lint clean on
+  all 8 entrypoints), F-11 (no `helpers/` folder) verified by IMPL-EVAL.
 - **Gate:** F-5, F-7, F-11, F-18
 
 ## runtime — Aspire OTEL CLI Dashboard API discovery fails (`aspire-otel-cli-discovery`)
