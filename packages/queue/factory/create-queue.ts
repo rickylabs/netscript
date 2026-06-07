@@ -14,7 +14,7 @@ import { getServiceUrl, isServiceAvailable } from '@netscript/sdk/discovery';
 import { getRedisConnectionFromEnv } from '@netscript/kv';
 import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
 import { KvPollingAdapter } from '../adapters/kv-polling.adapter.ts';
-import type { MessageQueue } from '../ports/message-queue.ts';
+import type { MessageQueue } from '../ports/mod.ts';
 import {
   QueueConfigurationError,
   QueueConnectionError,
@@ -23,6 +23,17 @@ import {
 } from '../ports/mod.ts';
 import { isTelemetryEnabled } from '@netscript/telemetry/config';
 import { traceQueue } from '@netscript/telemetry/instrumentation';
+
+export type {
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  QueueConnectionOptions,
+  QueueOptions,
+  QueueProvider,
+  TypedQueueOptions,
+} from '../ports/mod.ts';
 
 /**
  * Get the messaging system name for tracing based on the queue provider.

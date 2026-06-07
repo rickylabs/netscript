@@ -21,6 +21,22 @@ import { getKv, type KvKey, type WatchableKv } from '@netscript/kv';
 import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 import { QueueError, QueueErrorCode } from '../ports/mod.ts';
 
+export type {
+  AtomicCheck,
+  AtomicMutation,
+  AtomicResult,
+  KvEntry,
+  KvKey,
+  KvListOptions,
+  KvSetOptions,
+  KvStore,
+  WatchableKv,
+  WatchEvent,
+  WatchOptions,
+  WatchPrefixOptions,
+} from '@netscript/kv';
+export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+
 /**
  * Internal message structure stored in KV
  */
@@ -178,6 +194,11 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
    */
   readonly nativeRetrial = false;
 
+  /**
+   * Create a polling KV queue adapter.
+   *
+   * @param options - Adapter configuration and optional caller-owned KV instance.
+   */
   constructor(options: KvPollingAdapterOptions = {}) {
     this.queueName = options.queueName ?? 'default';
     this.pollInterval = options.pollInterval ?? 1000;

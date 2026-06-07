@@ -29,6 +29,7 @@
 |------|----------|------|----------|--------|
 | 2026-06-07 | note | Slice 1 rename split creates a planned transient static-check failure | The locked slice order separates queue folder renames (S1), export/task retargeting (S2), and internal import retargeting (S3). After S1 alone, `deno.json`, package imports, and tests still reference `interfaces/` and `utils/`. | Kept S1 scoped to `git mv` plus AP-16 debt closure. Static package checks are deferred to S2/S3 where the locked plan resolves the references; final gate must be green. |
 | 2026-06-07 | note | queue folder vocabulary remediated | `packages/queue/interfaces/` moved to `packages/queue/ports/`; `packages/queue/utils/` moved to `packages/queue/validation/`. `ports/` contains 4 files and `validation/` contains 2 files. | AP-16 closed in `.llm/harness/debt/arch-debt.md` with `internal/` retained as F-11-allowed. |
+| 2026-06-07 | note | Slice 4 full-export sweep found additional adapter JSDoc gaps | Hotspot runs matched the plan, but the combined full-export sweep also reported missing JSDoc on `redis.adapter.ts` and `amqp.adapter.ts` class members. | Treated as in-scope F-7 cleanup in S4; both adapters now document public and Deno-reported private class members. |
 
 ## Decisions / renames
 

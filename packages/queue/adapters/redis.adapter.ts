@@ -11,6 +11,8 @@ import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from
 import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
 import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
 
+export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+
 function getRedisOptions(userOptions?: Record<string, unknown>): Record<string, unknown> {
   return {
     ...userOptions,
@@ -46,8 +48,18 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private clients: RedisQueueClients | null = null;
   private delayedTimer?: ReturnType<typeof setInterval>;
 
+  /**
+   * Redis supports native retry-style redelivery through the processing list.
+   */
   readonly nativeRetrial = true;
 
+  /**
+   * Create a Redis queue adapter.
+   *
+   * @param url - Redis connection URL.
+   * @param queueName - Queue name used in Redis keys.
+   * @param options - Additional ioredis options merged with queue defaults.
+   */
   constructor(
     private readonly url: string,
     private readonly queueName = 'default',
@@ -55,6 +67,12 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   ) {
   }
 
+  /**
+   * Enqueue one message into Redis or the delayed sorted set.
+   *
+   * @param message - Message payload to enqueue.
+   * @param options - Optional delay and metadata settings.
+   */
   async enqueue(message: T, options?: EnqueueOptions): Promise<void> {
     try {
       const envelope = createEnvelope(message, options);
@@ -83,6 +101,12 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Enqueue messages in small parallel batches.
+   *
+   * @param messages - Message payloads to enqueue.
+   * @param options - Optional delay and metadata settings applied to each message.
+   */
   async enqueueMany(messages: T[], options?: EnqueueOptions): Promise<void> {
     try {
       const batchSize = 10;
@@ -102,6 +126,12 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Listen for messages using Redis blocking pop-push semantics.
+   *
+   * @param handler - Async callback invoked for each decoded message.
+   * @param options - Listener cancellation and concurrency settings.
+   */
   async listen(
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
@@ -154,6 +184,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Stop the listener, delayed processor, and blocking Redis client.
+   */
   async stop(): Promise<void> {
     if (!this.listening) {
       return;
@@ -166,6 +199,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
+  /**
+   * Return or initialize the command and blocking Redis clients.
+   */
   private ensureClients(): RedisQueueClients {
     if (this.clients) {
       return this.clients;
@@ -188,6 +224,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Decode one Redis message and settle it around the handler call.
+   */
   private async handleEncodedMessage(
     encoded: string,
     handler: (message: T, context: MessageContext) => Promise<void>,
@@ -235,6 +274,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Start polling delayed messages into the ready queue.
+   */
   private startDelayedProcessor(): void {
     if (this.delayedTimer) {
       return;
@@ -245,6 +287,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     );
   }
 
+  /**
+   * Stop the delayed-message polling timer.
+   */
   private stopDelayedProcessor(): void {
     if (!this.delayedTimer) {
       return;
@@ -253,6 +298,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     this.delayedTimer = undefined;
   }
 
+  /**
+   * Move due delayed messages from the sorted set into the ready list.
+   */
   private async moveDueDelayedMessages(): Promise<void> {
     const clients = this.ensureClients();
     const entries = await clients.commands.zrangebyscore(this.delayedKey, '-inf', Date.now());
@@ -263,6 +311,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Build the queue context passed to Redis message handlers.
+   */
   private createContext(
     messageId: string,
     enqueuedAt: Date,
@@ -290,14 +341,23 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     );
   }
 
+  /**
+   * Redis key for ready messages.
+   */
   private get queueKey(): string {
     return `netscript:queue:${this.queueName}`;
   }
 
+  /**
+   * Redis key for claimed messages.
+   */
   private get processingKey(): string {
     return `netscript:processing:${this.queueName}`;
   }
 
+  /**
+   * Redis key for delayed messages.
+   */
   private get delayedKey(): string {
     return `netscript:delayed:${this.queueName}`;
   }
