@@ -16,7 +16,7 @@
 
 import { delay } from '@std/async';
 import { createPackageLogger } from '@netscript/logger';
-import { generateVersionstamp, keyHasPrefix, keyToString } from '../core/keys.ts';
+import { generateVersionstamp, keyHasPrefix, keyToString } from '../application/keys.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
 import type {

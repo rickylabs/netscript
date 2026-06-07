@@ -16,11 +16,11 @@
 import { kvdex } from '@olli/kvdex';
 import { MapKv } from '@olli/kvdex/kv/map';
 import { createPackageLogger } from '@netscript/logger';
-import { getActiveProvider, getKv, getRawKv } from '../core/shared.ts';
+import { getActiveProvider, getKv, getRawKv } from '../application/shared.ts';
 import { WatchableKvBridge } from './denokv-bridge.ts';
 
-import type { KvProvider } from '../core/shared.ts';
-export type { KvProvider } from '../core/shared.ts';
+import type { KvProvider } from '../application/shared.ts';
+export type { KvProvider } from '../application/shared.ts';
 
 const logger = createPackageLogger('kv:kvdex');
 

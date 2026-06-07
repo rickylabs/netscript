@@ -19,8 +19,7 @@ import type {
   DatabaseAdapter,
   DatabaseConnectionOptions,
   DatabaseConnectionStatus,
-  IsolationLevel,
-} from '../interfaces/database-client.ts';
+} from '../ports/database-client.ts';
 
 // ============================================================================
 // MYSQL ADAPTER CONFIG TYPE
@@ -47,7 +46,9 @@ export interface MysqlAdapterConfig {
   timeout?: number;
   /** TLS configuration */
   tls?: {
-    mode?: "disabled" | "verify_identity";
+    /** TLS verification mode. */
+    mode?: 'disabled' | 'verify_identity';
+    /** CA certificates used for TLS verification. */
     caCerts?: string[];
   };
 }
@@ -64,6 +65,16 @@ export interface MysqlConnectionOptions extends DatabaseConnectionOptions {
   connectionLimit?: number;
   /** Enable multi-statements */
   multipleStatements?: boolean;
+}
+
+/**
+ * Public structural type returned by MySQL driver adapter factories.
+ */
+export interface MysqlDriverAdapter {
+  /** Database provider identity. */
+  readonly provider?: string;
+  /** Open a Prisma driver connection. */
+  connect(): Promise<unknown>;
 }
 
 // ============================================================================
@@ -195,7 +206,6 @@ export function getMysqlConfig(connectionStringEnvVar = 'MYSQLDB_URI'): MysqlAda
   // Try structured env vars first
   const structuredConfig = getMysqlConfigFromEnv();
   if (structuredConfig) {
-    console.log(`📡 MySQL config from env: ${structuredConfig.hostname}:${structuredConfig.port ?? 3306}/${structuredConfig.db}`);
     return structuredConfig;
   }
 
@@ -209,7 +219,6 @@ export function getMysqlConfig(connectionStringEnvVar = 'MYSQLDB_URI'): MysqlAda
   }
 
   const parsedConfig = parseMysqlConnectionString(connectionString);
-  console.log(`📡 MySQL config from URI: ${parsedConfig.hostname}:${parsedConfig.port ?? 3306}/${parsedConfig.db}`);
   return parsedConfig;
 }
 
@@ -230,12 +239,12 @@ export function buildMysqlConnectionString(parts: {
   const { hostname, port = 3306, db, username, password, ssl } = parts;
   const encodedPassword = password ? encodeURIComponent(password) : '';
   const auth = password ? `${username}:${encodedPassword}@` : `${username}@`;
-  
+
   const params: string[] = [];
   if (ssl) params.push('ssl=true');
-  
+
   const queryString = params.length > 0 ? `?${params.join('&')}` : '';
-  
+
   return `mysql://${auth}${hostname}:${port}/${db}${queryString}`;
 }
 
@@ -269,20 +278,28 @@ export function buildMysqlConnectionString(parts: {
  * const client = new PrismaClient({ adapter: adapter.getDriverAdapter() });
  * ```
  */
-export class MysqlAdapter<TClient extends {
-  $connect(): Promise<void>;
-  $disconnect(): Promise<void>;
-  $queryRaw: unknown;
-  $executeRaw: unknown;
-  $executeRawUnsafe: unknown;
-}> implements DatabaseAdapter<TClient> {
+export class MysqlAdapter<
+  TClient extends {
+    $connect(): Promise<void>;
+    $disconnect(): Promise<void>;
+    $queryRaw: unknown;
+    $executeRaw: unknown;
+    $executeRawUnsafe: unknown;
+  },
+> implements DatabaseAdapter<TClient> {
+  /** Database provider identity for status reporting. */
   readonly provider = 'mysql' as const;
 
   private client: TClient | null = null;
-  private driverAdapter: PrismaMySql | null = null;
+  private driverAdapter: MysqlDriverAdapter | null = null;
   private readonly options: MysqlConnectionOptions;
   private lastConnected?: Date;
 
+  /**
+   * Create a MySQL adapter from connection options.
+   *
+   * @param options - MySQL connection options.
+   */
   constructor(options: MysqlConnectionOptions) {
     this.options = options;
   }
@@ -290,10 +307,10 @@ export class MysqlAdapter<TClient extends {
   /**
    * Get the Prisma driver adapter for use in client initialization
    */
-  getDriverAdapter(): PrismaMySql {
+  getDriverAdapter(): MysqlDriverAdapter {
     if (!this.driverAdapter) {
       const config = this.buildAdapterConfig();
-      this.driverAdapter = new PrismaMySql(config);
+      this.driverAdapter = new PrismaMySql(config) as MysqlDriverAdapter;
     }
     return this.driverAdapter;
   }
@@ -351,6 +368,7 @@ export class MysqlAdapter<TClient extends {
     this.client = client;
   }
 
+  /** Return the configured Prisma client instance. */
   getClient(): TClient {
     if (!this.client) {
       throw new Error(
@@ -360,6 +378,7 @@ export class MysqlAdapter<TClient extends {
     return this.client;
   }
 
+  /** Open the configured Prisma client connection. */
   async connect(): Promise<void> {
     if (!this.client) {
       throw new Error('MySQL client not set. Call setClient() first.');
@@ -368,12 +387,14 @@ export class MysqlAdapter<TClient extends {
     this.lastConnected = new Date();
   }
 
+  /** Close the configured Prisma client connection. */
   async disconnect(): Promise<void> {
     if (this.client) {
       await this.client.$disconnect();
     }
   }
 
+  /** Probe the database connection with a lightweight query. */
   async healthCheck(): Promise<boolean> {
     try {
       const client = this.getClient();
@@ -388,6 +409,7 @@ export class MysqlAdapter<TClient extends {
     }
   }
 
+  /** Return a status snapshot for the current database connection. */
   async getStatus(): Promise<DatabaseConnectionStatus> {
     const healthy = await this.healthCheck();
     return {
@@ -400,6 +422,7 @@ export class MysqlAdapter<TClient extends {
     };
   }
 
+  /** Execute a raw query through the configured Prisma client. */
   executeRaw<T = unknown>(query: string, ...params: unknown[]): Promise<T> {
     const client = this.getClient();
     const $queryRaw = client.$queryRaw as (
@@ -409,6 +432,7 @@ export class MysqlAdapter<TClient extends {
     return $queryRaw(query as unknown as TemplateStringsArray, ...params);
   }
 
+  /** Execute an unsafe raw command through the configured Prisma client. */
   executeRawUnsafe<T = unknown>(query: string, ...params: unknown[]): Promise<T> {
     const client = this.getClient();
     const $executeRawUnsafe = client.$executeRawUnsafe as (
@@ -453,12 +477,14 @@ export class MysqlAdapter<TClient extends {
 /**
  * Create a MySQL adapter
  */
-export function createMysqlAdapter<TClient extends {
-  $connect(): Promise<void>;
-  $disconnect(): Promise<void>;
-  $queryRaw: unknown;
-  $executeRaw: unknown;
-  $executeRawUnsafe: unknown;
-}>(options: MysqlConnectionOptions): MysqlAdapter<TClient> {
+export function createMysqlAdapter<
+  TClient extends {
+    $connect(): Promise<void>;
+    $disconnect(): Promise<void>;
+    $queryRaw: unknown;
+    $executeRaw: unknown;
+    $executeRawUnsafe: unknown;
+  },
+>(options: MysqlConnectionOptions): MysqlAdapter<TClient> {
   return new MysqlAdapter<TClient>(options);
 }

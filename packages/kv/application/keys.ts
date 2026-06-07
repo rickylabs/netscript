@@ -8,9 +8,9 @@
  * @module
  */
 
-import { monotonicUlid } from "@std/ulid";
+import { monotonicUlid } from '@std/ulid';
 
-import type { KvKey } from "../types/common.ts";
+import type { KvKey } from '../types/common.ts';
 
 /**
  * Serialize a {@linkcode KvKey} to a deterministic string for `Map` lookups

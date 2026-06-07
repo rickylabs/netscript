@@ -10,7 +10,7 @@
  */
 
 import { createPackageLogger } from '@netscript/logger';
-import { generateVersionstamp } from '../core/keys.ts';
+import { generateVersionstamp } from '../application/keys.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
 import type { AtomicCheck, KvKey, KvListOptions } from '../types/common.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
