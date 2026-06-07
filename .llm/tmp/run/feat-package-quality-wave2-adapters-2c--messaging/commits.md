@@ -25,3 +25,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 18 | `d3294de` | chore(2c): record e2e gate result | S17 |
 | 19 | `af471cf` | fix(queue): harden memory testing adapter | Augment feedback |
 | 20 | `7057351` | test(queue): use std async delay | Validation follow-up |
+| 21 | `d9f570f` | fix(queue): index pending memory items | Validation follow-up |
