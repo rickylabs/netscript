@@ -5,5 +5,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | # | SHA | Subject | Slice(s) |
 |---|-----|---------|----------|
 | seed | (this commit) | chore(2c): seed Wave 2c messaging run docs | — |
-
-(append one row per implementation commit)
+| 1 | `83d408d` | Add Wave 2c research and locked plan artifacts | Research + Plan & Design |
