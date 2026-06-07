@@ -18,7 +18,9 @@ function assertOtelSpan(span: Span): asserts span is Span & OtelSpan {
     ] as const
   ) {
     if (typeof span[method] !== 'function') {
-      throw new TypeError(`Telemetry span is missing OpenTelemetry method '${method}'`);
+      throw new TypeError(
+        `Expected an OpenTelemetry-compatible span before adding it to context; missing method '${method}'`,
+      );
     }
   }
 }

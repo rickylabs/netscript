@@ -171,8 +171,12 @@ function normalizePath(path: string): string {
   return path.replace(/\\/g, '/');
 }
 
+function hasWindowsDrivePrefix(path: string): boolean {
+  return /^[A-Za-z]:[\\/]/.test(path);
+}
+
 function isAbsolutePath(path: string): boolean {
-  return path.startsWith('/') || path.startsWith('\\\\') || /^[A-Za-z]:[\\/]/.test(path);
+  return path.startsWith('/') || path.startsWith('\\\\') || hasWindowsDrivePrefix(path);
 }
 
 function resolveFromCwd(cwd: string, path: string): string {
