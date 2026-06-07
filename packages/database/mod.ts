@@ -32,7 +32,6 @@
  * @module
  */
 
-import { PrismaPg } from '@prisma/adapter-pg';
 import { enablePrismaTracing } from './prisma-tracing.ts';
 
 // ============================================================================
@@ -54,11 +53,8 @@ export function enableInstrumentation(): boolean {
   if (Deno.env.get('OTEL_DENO') === 'true') {
     try {
       enablePrismaTracing();
-      console.log('🔭 Prisma instrumentation enabled');
       return true;
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      console.warn('⚠️ Prisma instrumentation failed:', message);
+    } catch {
       return false;
     }
   }
@@ -78,7 +74,7 @@ export type {
   IsolationLevel,
   SharedDatabaseConfig,
   TransactionOptions,
-} from './interfaces/mod.ts';
+} from './ports/mod.ts';
 
 // ============================================================================
 // ADAPTER EXPORTS
@@ -107,7 +103,7 @@ export { jsonUtils, mssqlJsonExtension, registerJsonFields } from './extensions/
 // TRANSACTION HELPERS
 // ============================================================================
 
-import type { TransactionOptions } from './interfaces/mod.ts';
+import type { TransactionOptions } from './ports/mod.ts';
 
 /**
  * Execute operations within a transaction
@@ -253,12 +249,9 @@ export function buildMssqlConnectionString(parts: {
 }
 
 /**
+ * Backward-compatible alias for PostgreSQL connection string construction.
+ *
  * @deprecated Use buildPostgresConnectionString instead
  */
-export const buildConnectionString = buildPostgresConnectionString;
-
-// ============================================================================
-// RE-EXPORTS
-// ============================================================================
-
-export { PrismaPg };
+export const buildConnectionString: typeof buildPostgresConnectionString =
+  buildPostgresConnectionString;
