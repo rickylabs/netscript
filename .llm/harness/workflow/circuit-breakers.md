@@ -1,7 +1,6 @@
 # Circuit Breakers
 
-Circuit breakers prevent false progress. They apply to planner, generator, and
-evaluator sessions.
+Circuit breakers prevent false progress. They apply to planner, generator, and evaluator sessions.
 
 ## Stuck Rule
 
@@ -22,22 +21,21 @@ Pause and ask the user before continuing when:
 - resolving the issue requires new fitness-function scripts in Phase A,
 - the current doctrine and implementation reality materially disagree.
 
-Record the reason in `drift.md` with severity `significant` or
-`architectural`.
+Record the reason in `drift.md` with severity `significant` or `architectural`.
 
 ## Context Waste
 
-Stop rereading broad files when the needed facts are already known. Summarize
-the facts into `context-pack.md` or `worklog.md`, then use focused reads.
+Stop rereading broad files when the needed facts are already known. Summarize the facts into
+`context-pack.md` or `worklog.md`, then use focused reads.
 
 ## Evaluation Loop Limit
 
-The evaluator may return at most two `FAIL_FIX` results for the same run before
-the next session escalates. After the second failure, the issue is likely a bad
-plan, hidden scope, or missing doctrine decision.
+The evaluator may return at most two `FAIL_FIX` results for the same run before the next session
+escalates. After the second failure, the issue is likely a bad plan, hidden scope, or missing
+doctrine decision.
 
 ## Debt Pressure Release
 
-If a violation is real but out of scope, do not hide it and do not expand the
-run silently. Create or update a debt entry using `templates/debt-entry.md` and
-let the evaluator decide whether the entry is sufficient.
+If a violation is real but out of scope, do not hide it and do not expand the run silently. Create
+or update a debt entry using `templates/debt-entry.md` and let the evaluator decide whether the
+entry is sufficient.

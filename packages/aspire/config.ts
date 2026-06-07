@@ -18,166 +18,301 @@
 
 import { z } from 'zod';
 
-type DatabaseEngine = 'Postgres' | 'Mssql' | 'Mysql' | 'Sqlite';
-type CacheEngine = 'Redis' | 'Garnet';
-type ResourceMode = 'Container' | 'External';
-type AppType = 'app' | 'tauri' | 'task';
+/** Public parser contract exposed by Aspire schema constants. */
+export interface AspireSchema<Output> {
+  /** Structural metadata consumed by Zod inference utilities. */
+  readonly _zod: {
+    /** Schema input type. */
+    readonly input: unknown;
+    /** Schema output type. */
+    readonly output: Output;
+  };
+  /** Parse and validate unknown input into the schema output type. */
+  parse(data: unknown): Output;
+  /** Parse unknown input without throwing on validation failure. */
+  safeParse(data: unknown): AspireSafeParseResult<Output>;
+}
 
-interface OtelConfig {
+/** Successful result from `AspireSchema.safeParse`. */
+export interface AspireSafeParseSuccess<Output> {
+  /** Whether parsing succeeded. */
+  readonly success: true;
+  /** Parsed output value. */
+  readonly data: Output;
+}
+
+/** Failed result from `AspireSchema.safeParse`. */
+export interface AspireSafeParseFailure {
+  /** Whether parsing succeeded. */
+  readonly success: false;
+  /** Validation error object from the underlying schema engine. */
+  readonly error: unknown;
+}
+
+/** Result from `AspireSchema.safeParse`. */
+export type AspireSafeParseResult<Output> =
+  | AspireSafeParseSuccess<Output>
+  | AspireSafeParseFailure;
+
+/** Database engine variants supported by Aspire hosting integrations. */
+export type DatabaseEngine = 'Postgres' | 'Mssql' | 'Mysql' | 'Sqlite';
+/** Cache engine variants supported by Aspire hosting integrations. */
+export type CacheEngine = 'Redis' | 'Garnet';
+/** Resource provisioning mode for managed resources. */
+export type ResourceMode = 'Container' | 'External';
+/** Application entry variants supported by the AppHost config. */
+export type AppType = 'app' | 'tauri' | 'task';
+
+/** OpenTelemetry endpoint configuration. */
+export interface OtelConfig {
+  /** OTLP HTTP endpoint URL. */
   HttpEndpoint: string;
+  /** OTLP protocol name. */
   Protocol: string;
 }
 
-interface DenoDefaults {
+/** Global Deno runtime defaults. */
+export interface DenoDefaults {
+  /** Default Deno permission flags. */
   Permissions: string[];
+  /** Whether Deno watch mode is enabled by default. */
   WatchMode: boolean;
 }
 
-interface DefaultsConfig {
+/** Defaults section wrapper. */
+export interface DefaultsConfig {
+  /** Deno runtime defaults. */
   Deno: DenoDefaults;
 }
 
-interface BaseEntry {
+/** Common fields shared by resource entries. */
+export interface BaseEntry {
+  /** Whether the resource should be included in AppHost composition. */
   Enabled: boolean;
+  /** Optional human-readable resource description. */
   Description?: string;
+  /** Optional Deno permission flags for the resource. */
   Permissions?: string[];
 }
 
-interface ReferenceEntry {
+/** Reference fields for resources that can depend on services or plugins. */
+export interface ReferenceEntry {
+  /** Service resource names referenced by this entry. */
   ServiceReferences?: string[];
+  /** Plugin resource names referenced by this entry. */
   PluginReferences?: string[];
 }
 
-interface ServiceEntry extends BaseEntry, ReferenceEntry {
+/** Backend service resource entry. */
+export interface ServiceEntry extends BaseEntry, ReferenceEntry {
+  /** Runtime used to launch the service. */
   Runtime: string;
+  /** TCP port exposed by the service. */
   Port: number;
+  /** Service entrypoint path. */
   Entrypoint: string;
+  /** Service working directory. */
   Workdir?: string;
+  /** Legacy service dependency names merged into service references. */
   DependsOn?: string[];
 }
 
-interface AppEntry extends BaseEntry, ReferenceEntry {
+/** Frontend, desktop, or task application entry. */
+export interface AppEntry extends BaseEntry, ReferenceEntry {
+  /** Runtime used to launch the app. */
   Runtime: string;
+  /** App variant. */
   Type: AppType;
+  /** Whether Deno watch mode is enabled for the app. */
   WatchMode: boolean;
+  /** Optional prebuild command. */
   Prebuild?: string;
+  /** App working directory. */
   Workdir?: string;
+  /** Optional remote URL for externally hosted apps. */
   Remote?: string;
+  /** TCP port exposed by the app. */
   Port?: number;
+  /** Deno task name for task apps. */
   TaskName?: string;
+  /** Whether the app requires Deno KV access. */
   RequiresKv: boolean;
 }
 
-interface PluginEntry extends BaseEntry, ReferenceEntry {
+/** Plugin service resource entry. */
+export interface PluginEntry extends BaseEntry, ReferenceEntry {
+  /** Runtime used to launch the plugin. */
   Runtime: string;
+  /** TCP port exposed by the plugin. */
   Port: number;
+  /** Plugin entrypoint path. */
   Entrypoint: string;
+  /** Plugin working directory. */
   Workdir?: string;
+  /** Whether the plugin requires Deno KV access. */
   RequiresKv: boolean;
+  /** Whether the plugin requires database access. */
   RequiresDb: boolean;
 }
 
-interface BackgroundProcessorEntry extends BaseEntry, ReferenceEntry {
+/** Background processor resource entry. */
+export interface BackgroundProcessorEntry extends BaseEntry, ReferenceEntry {
+  /** Runtime used to launch the processor. */
   Runtime: string;
+  /** Processor working directory. */
   Workdir?: string;
+  /** Processor entrypoint path. */
   Entrypoint: string;
+  /** Optional concurrency value. */
   Concurrency?: number;
+  /** Optional environment variable that supplies concurrency. */
   ConcurrencyEnvVar?: string;
+  /** Whether telemetry is enabled for the processor. */
   Telemetry: boolean;
+  /** Whether Deno watch mode is enabled for the processor. */
   WatchMode: boolean;
+  /** Directories watched when watch mode is enabled. */
   WatchDirs?: string[];
+  /** Whether the processor requires database access. */
   RequiresDb: boolean;
+  /** Whether the processor requires Deno KV access. */
   RequiresKv: boolean;
 }
 
-interface DatabaseEntry extends BaseEntry {
+/** Database resource entry. */
+export interface DatabaseEntry extends BaseEntry {
+  /** Database engine. */
   Engine: DatabaseEngine;
+  /** Resource provisioning mode. */
   Mode: ResourceMode;
+  /** Optional container image tag. */
   ImageTag?: string;
+  /** Database name. */
   DatabaseName?: string;
+  /** Persistent data path. */
   DataPath?: string;
+  /** TCP port exposed by the database. */
   Port?: number;
+  /** Whether the database should use persistent storage. */
   Persistent: boolean;
 }
 
-interface CacheEntry extends BaseEntry {
+/** Cache resource entry. */
+export interface CacheEntry extends BaseEntry {
+  /** Cache engine. */
   Engine: CacheEngine;
+  /** Resource provisioning mode. */
   Mode: ResourceMode;
+  /** Optional container image tag. */
   ImageTag?: string;
+  /** TCP port exposed by the cache. */
   Port?: number;
+  /** Persistent data path. */
   DataPath?: string;
 }
 
-interface ToolEntry extends BaseEntry {
+/** Development tool entry. */
+export interface ToolEntry extends BaseEntry {
+  /** Deno task name for the tool. */
   TaskName?: string;
+  /** Database resource used by the tool. */
   Database?: string;
 }
 
-interface NetScriptConfig {
+/** Root NetScript configuration section. */
+export interface NetScriptConfig {
+  /** Application name. */
   Name: string;
+  /** Application version. */
   Version: string;
+  /** Optional Aspire project path. */
   AspireProject?: string;
+  /** Primary database resource name. */
   PrimaryDatabase?: string;
+  /** Primary cache resource name. */
   PrimaryCache?: string;
+  /** OpenTelemetry configuration. */
   Otel: OtelConfig;
+  /** Global defaults. */
   Defaults: DefaultsConfig;
+  /** Backend service entries keyed by resource name. */
   Services: Record<string, ServiceEntry>;
+  /** App entries keyed by resource name. */
   Apps: Record<string, AppEntry>;
+  /** Plugin entries keyed by resource name. */
   Plugins: Record<string, PluginEntry>;
+  /** Background processor entries keyed by resource name. */
   BackgroundProcessors: Record<string, BackgroundProcessorEntry>;
+  /** Database entries keyed by resource name. */
   Databases: Record<string, DatabaseEntry>;
+  /** Cache entries keyed by resource name. */
   Cache: Record<string, CacheEntry>;
+  /** Tool entries keyed by resource name. */
   Tools: Record<string, ToolEntry>;
 }
 
-interface LoggingConfig {
+/** ASP.NET Core logging configuration. */
+export interface LoggingConfig {
+  /** Log levels keyed by category. */
   LogLevel?: Record<string, string>;
 }
 
-interface AppSettings {
+/** Top-level appsettings.json structure. */
+export interface AppSettings {
+  /** Optional JSON schema URL. */
   $schema?: string;
+  /** ASP.NET Core logging configuration. */
   Logging?: LoggingConfig;
+  /** NetScript AppHost configuration. */
   NetScript: NetScriptConfig;
 }
 
 // --- Enum Schemas ---
 
 /** Database engine variants supported by Aspire hosting integrations. */
-export const DatabaseEngineSchema: z.ZodType<DatabaseEngine> = z
-  .enum(['Postgres', 'Mssql', 'Mysql', 'Sqlite'])
-  .meta({ title: 'DatabaseEngine', description: 'Supported database engine types' });
+const DatabaseEngineZod = z.enum(['Postgres', 'Mssql', 'Mysql', 'Sqlite']).meta({
+  title: 'DatabaseEngine',
+  description: 'Supported database engine types',
+});
+/** Database engine schema. */
+export const DatabaseEngineSchema: AspireSchema<DatabaseEngine> = DatabaseEngineZod;
 
 /** Cache engine variants supported by Aspire hosting integrations. */
-export const CacheEngineSchema: z.ZodType<CacheEngine> = z
-  .enum(['Redis', 'Garnet'])
-  .meta({ title: 'CacheEngine', description: 'Supported cache engine types' });
+const CacheEngineZod = z.enum(['Redis', 'Garnet']).meta({
+  title: 'CacheEngine',
+  description: 'Supported cache engine types',
+});
+/** Cache engine schema. */
+export const CacheEngineSchema: AspireSchema<CacheEngine> = CacheEngineZod;
 
 /** Resource provisioning mode. */
-export const ResourceModeSchema: z.ZodType<ResourceMode> = z
-  .enum(['Container', 'External'])
-  .meta({
-    title: 'ResourceMode',
-    description: 'Resource provisioning mode: Container (managed) or External (pre-existing)',
-  });
+const ResourceModeZod = z.enum(['Container', 'External']).meta({
+  title: 'ResourceMode',
+  description: 'Resource provisioning mode: Container (managed) or External (pre-existing)',
+});
+/** Resource provisioning mode schema. */
+export const ResourceModeSchema: AspireSchema<ResourceMode> = ResourceModeZod;
 
 /** Application type variants for the Apps section. */
-export const AppTypeSchema: z.ZodType<AppType> = z
-  .enum(['app', 'tauri', 'task'])
-  .meta({
-    title: 'AppType',
-    description: 'Application type: app (web), tauri (desktop), or task (deno task)',
-  });
+const AppTypeZod = z.enum(['app', 'tauri', 'task']).meta({
+  title: 'AppType',
+  description: 'Application type: app (web), tauri (desktop), or task (deno task)',
+});
+/** Application type schema. */
+export const AppTypeSchema: AspireSchema<AppType> = AppTypeZod;
 
 // --- Component Schemas ---
 
 /** OpenTelemetry endpoint configuration. */
-export const OtelConfigSchema: z.ZodType<OtelConfig> = z.object({
+const OtelConfigZod = z.object({
   HttpEndpoint: z.string().default('http://localhost:4318'),
   Protocol: z.string().default('http/protobuf'),
 }).meta({ title: 'OtelConfig', description: 'OpenTelemetry exporter configuration' });
+/** OpenTelemetry endpoint configuration schema. */
+export const OtelConfigSchema: AspireSchema<OtelConfig> = OtelConfigZod;
 
 /** Global Deno runtime defaults. */
-export const DenoDefaultsSchema: z.ZodType<DenoDefaults> = z.object({
+const DenoDefaultsZod = z.object({
   Permissions: z.array(z.string()).default([
     '--allow-net',
     '--allow-env',
@@ -189,14 +324,18 @@ export const DenoDefaultsSchema: z.ZodType<DenoDefaults> = z.object({
   title: 'DenoDefaults',
   description: 'Default Deno runtime configuration applied to all resources',
 });
+/** Global Deno runtime defaults schema. */
+export const DenoDefaultsSchema: AspireSchema<DenoDefaults> = DenoDefaultsZod;
 
 /** Defaults section wrapper. */
-export const DefaultsSchema: z.ZodType<DefaultsConfig> = z.object({
-  Deno: DenoDefaultsSchema.default(() => ({
+const DefaultsZod = z.object({
+  Deno: DenoDefaultsZod.default(() => ({
     Permissions: ['--allow-net', '--allow-env', '--allow-read', '--allow-sys'],
     WatchMode: false,
   })),
 }).meta({ title: 'Defaults', description: 'Global default configuration' });
+/** Defaults section schema. */
+export const DefaultsSchema: AspireSchema<DefaultsConfig> = DefaultsZod;
 
 // --- Entry Schemas ---
 
@@ -214,7 +353,7 @@ const ReferenceFields = {
 } as const satisfies z.ZodRawShape;
 
 /** Service entry configuration. */
-export const ServiceEntrySchema: z.ZodType<ServiceEntry> = z.object({
+const ServiceEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
   Runtime: z.string().default('deno'),
@@ -223,13 +362,15 @@ export const ServiceEntrySchema: z.ZodType<ServiceEntry> = z.object({
   Workdir: z.string().optional(),
   DependsOn: z.array(z.string()).optional(),
 }).meta({ title: 'ServiceEntry', description: 'Configuration for a backend service resource' });
+/** Service entry schema. */
+export const ServiceEntrySchema: AspireSchema<ServiceEntry> = ServiceEntryZod;
 
 /** Application entry configuration. */
-export const AppEntrySchema: z.ZodType<AppEntry> = z.object({
+const AppEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
   Runtime: z.string().default('deno'),
-  Type: AppTypeSchema.default('app'),
+  Type: AppTypeZod.default('app'),
   WatchMode: z.boolean().default(false),
   Prebuild: z.string().optional(),
   Workdir: z.string().optional(),
@@ -241,9 +382,11 @@ export const AppEntrySchema: z.ZodType<AppEntry> = z.object({
   title: 'AppEntry',
   description: 'Configuration for a frontend or desktop application resource',
 });
+/** Application entry schema. */
+export const AppEntrySchema: AspireSchema<AppEntry> = AppEntryZod;
 
 /** Plugin entry configuration. */
-export const PluginEntrySchema: z.ZodType<PluginEntry> = z.object({
+const PluginEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
   Runtime: z.string().default('deno'),
@@ -253,9 +396,11 @@ export const PluginEntrySchema: z.ZodType<PluginEntry> = z.object({
   RequiresKv: z.boolean().default(false),
   RequiresDb: z.boolean().default(false),
 }).meta({ title: 'PluginEntry', description: 'Configuration for a plugin service resource' });
+/** Plugin entry schema. */
+export const PluginEntrySchema: AspireSchema<PluginEntry> = PluginEntryZod;
 
 /** Background processor entry configuration. */
-export const BackgroundProcessorEntrySchema: z.ZodType<BackgroundProcessorEntry> = z.object({
+const BackgroundProcessorEntryZod = z.object({
   ...BaseEntryFields,
   ...ReferenceFields,
   Runtime: z.string().default('deno'),
@@ -272,63 +417,74 @@ export const BackgroundProcessorEntrySchema: z.ZodType<BackgroundProcessorEntry>
   title: 'BackgroundProcessorEntry',
   description: 'Configuration for a background processor (worker, saga, trigger)',
 });
+/** Background processor entry schema. */
+export const BackgroundProcessorEntrySchema: AspireSchema<BackgroundProcessorEntry> =
+  BackgroundProcessorEntryZod;
 
 /** Database entry configuration. */
-export const DatabaseEntrySchema: z.ZodType<DatabaseEntry> = z.object({
+const DatabaseEntryZod = z.object({
   ...BaseEntryFields,
-  Engine: DatabaseEngineSchema,
-  Mode: ResourceModeSchema.default('Container'),
+  Engine: DatabaseEngineZod,
+  Mode: ResourceModeZod.default('Container'),
   ImageTag: z.string().optional(),
   DatabaseName: z.string().optional(),
   DataPath: z.string().optional(),
   Port: z.number().int().positive().optional(),
   Persistent: z.boolean().default(false),
 }).meta({ title: 'DatabaseEntry', description: 'Configuration for a database resource' });
+/** Database entry schema. */
+export const DatabaseEntrySchema: AspireSchema<DatabaseEntry> = DatabaseEntryZod;
 
 /** Cache entry configuration. */
-export const CacheEntrySchema: z.ZodType<CacheEntry> = z.object({
+const CacheEntryZod = z.object({
   ...BaseEntryFields,
-  Engine: CacheEngineSchema.default('Garnet'),
-  Mode: ResourceModeSchema.default('Container'),
+  Engine: CacheEngineZod.default('Garnet'),
+  Mode: ResourceModeZod.default('Container'),
   ImageTag: z.string().optional(),
   Port: z.number().int().positive().optional(),
   DataPath: z.string().optional(),
 }).meta({ title: 'CacheEntry', description: 'Configuration for a cache resource' });
+/** Cache entry schema. */
+export const CacheEntrySchema: AspireSchema<CacheEntry> = CacheEntryZod;
 
 /** Prisma Studio tool configuration. */
-export const ToolEntrySchema: z.ZodType<ToolEntry> = z.object({
+const ToolEntryZod = z.object({
   ...BaseEntryFields,
   TaskName: z.string().optional(),
   Database: z.string().optional(),
 }).meta({ title: 'ToolEntry', description: 'Configuration for a development tool' });
+/** Development tool entry schema. */
+export const ToolEntrySchema: AspireSchema<ToolEntry> = ToolEntryZod;
 
 // --- Root Configuration Schemas ---
 
 /** Root NetScript configuration section from `appsettings.json`. */
-export const NetScriptConfigSchema: z.ZodType<NetScriptConfig> = z.object({
+const NetScriptConfigZod = z.object({
   Name: z.string(),
   Version: z.string().default('1.0.0'),
   AspireProject: z.string().optional(),
   PrimaryDatabase: z.string().optional(),
   PrimaryCache: z.string().optional(),
-  Otel: OtelConfigSchema.default(() => ({
+  Otel: OtelConfigZod.default(() => ({
     HttpEndpoint: 'http://localhost:4318',
     Protocol: 'http/protobuf',
   })),
-  Defaults: DefaultsSchema.default(() => ({
+  Defaults: DefaultsZod.default(() => ({
     Deno: {
       Permissions: ['--allow-net', '--allow-env', '--allow-read', '--allow-sys'],
       WatchMode: false,
     },
   })),
-  Services: z.record(z.string(), ServiceEntrySchema).default({}),
-  Apps: z.record(z.string(), AppEntrySchema).default({}),
-  Plugins: z.record(z.string(), PluginEntrySchema).default({}),
-  BackgroundProcessors: z.record(z.string(), BackgroundProcessorEntrySchema).default({}),
-  Databases: z.record(z.string(), DatabaseEntrySchema).default({}),
-  Cache: z.record(z.string(), CacheEntrySchema).default({}),
-  Tools: z.record(z.string(), ToolEntrySchema).default({}),
+  Services: z.record(z.string(), ServiceEntryZod).default({}),
+  Apps: z.record(z.string(), AppEntryZod).default({}),
+  Plugins: z.record(z.string(), PluginEntryZod).default({}),
+  BackgroundProcessors: z.record(z.string(), BackgroundProcessorEntryZod).default({}),
+  Databases: z.record(z.string(), DatabaseEntryZod).default({}),
+  Cache: z.record(z.string(), CacheEntryZod).default({}),
+  Tools: z.record(z.string(), ToolEntryZod).default({}),
 }).meta({ title: 'NetScriptConfig', description: 'Root NetScript application configuration' });
+/** Root NetScript configuration schema. */
+export const NetScriptConfigSchema: AspireSchema<NetScriptConfig> = NetScriptConfigZod;
 
 /** ASP.NET Core log level configuration. */
 const LogLevelSchema: z.ZodType<Record<string, string> | undefined> = z.record(
@@ -342,15 +498,17 @@ const LoggingSchema: z.ZodType<LoggingConfig | undefined> = z.object({
 }).optional();
 
 /** Top-level `appsettings.json` structure. */
-export const AppSettingsSchema: z.ZodType<AppSettings> = z.object({
+const AppSettingsZod = z.object({
   $schema: z.string().optional(),
   Logging: LoggingSchema,
-  NetScript: NetScriptConfigSchema,
+  NetScript: NetScriptConfigZod,
 }).meta({
   title: 'AppSettings',
   description:
     'Full appsettings.json structure including ASP.NET Core logging and NetScript configuration',
 });
+/** Top-level appsettings.json schema. */
+export const AppSettingsSchema: AspireSchema<AppSettings> = AppSettingsZod;
 
 // --- Parser ---
 
@@ -514,7 +672,7 @@ export async function parseAppSettings(
 ): Promise<ParseResult<NetScriptConfig>> {
   const text = await Deno.readTextFile(filePath);
   const json = JSON.parse(text);
-  const parsed = AppSettingsSchema.parse(json);
+  const parsed = AppSettingsZod.parse(json);
   const config = resolveDefaults(parsed.NetScript);
   const warnings = validateCrossReferences(config);
 

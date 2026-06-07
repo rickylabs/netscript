@@ -36,12 +36,12 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave0-foundation` |
-| Nested run ID | `feat-package-quality-wave0-foundation--<suffix>` |
+| Group branch | `feat/package-quality-wave0-foundation` |
+| Nested run ID | `feat-package-quality-wave0-foundation--shared` |
 | Units | `@netscript/shared` |
 | Archetype(s) | A1 — small-contract |
-| Status | `planned` |
-| Merge commit | — |
+| Status | `merged` (PR #3) |
+| Merge commit | `eb8ae44` |
 
 ### Pre-conditions
 
@@ -69,16 +69,36 @@ sub-PR + evaluator pass).
 
 - Foundation-first: no other wave starts until Wave 0 is `merged`. It also fixes the run-wide baseline numbers everything downstream trusts.
 
+## Wave 0b — Harness reinforcement + agent docs (inserted)
+
+| Field | Value |
+|-------|-------|
+| Group branches | `feat/package-quality-wave0b-harness`, `feat/package-quality-wave0b-docs` |
+| Units | none (harness + `.agents/` tooling, not a publishable unit) |
+| Status | `merged` (PR #4 harness, PR #5 docs/skills, PR #6 D4 removal) |
+| Merge commits | `82ad2a2` (0b-A harness), `d5d8e5f` (0b-B docs), `76fbeb7` (base-sync / D4 drop) |
+
+### Why it exists (not in the original 7-wave map)
+
+- Wave 0 skipped Plan & Design because the Design checkpoint was an evidence
+  section in `worklog.md`, not a gated deliverable. 0b-A rewrote the run loop to
+  **8 phases** and added the **two-gate / dual-evaluator** model (PLAN-EVAL before
+  code, IMPL-EVAL after), `gates/plan-gate.md`, `evaluator/plan-protocol.md`, and
+  shifted `jsr-audit` left. 0b-B built `.agents/docs` + skills cluster and fixed
+  repo-wide reference drift (doctrine path, `.claude/skills`, layout confabulation).
+- This group is the reason every wave from 1 onward runs a separate-session
+  PLAN-EVAL hard stop. See `lessons/plan-gate-design-as-gate.md`.
+
 ## Wave 1 — Contracts & schemas (A1)
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave1-contracts` |
+| Group branch | `feat/package-quality-wave1-contracts` |
 | Nested run ID | `feat-package-quality-wave1-contracts--<suffix>` |
 | Units | `@netscript/runtime-config`, `@netscript/config`, `@netscript/contracts` |
 | Archetype(s) | A1 — small-contract (config/contracts are A1/A4 hybrids — see nested docs) |
-| Status | `planned` |
-| Merge commit | — |
+| Status | `merged` (PR #7) |
+| Merge commit | `4c57867` |
 
 ### Pre-conditions
 
@@ -99,17 +119,35 @@ sub-PR + evaluator pass).
 ### Notes
 
 - Pure type/schema packages most of the tree depends on; align `defineContract` with the platform `definePlugin`/`defineTrigger` shapes per nested `plan_contracts.md`.
+- **Outcome:** all 3 units re-baselined to **0 slow types** (stale audit claimed 35/30/1 — wrong). 27 slices. PLAN-EVAL `PASS` (adjusted: added F-14 console-log + F-17 co-location the Arch-1 plan had under-selected). IMPL-EVAL returned `FAIL_FIX` (config `./paths` doc-lint gap), fixed before merge. Full `deno task e2e:cli` PASS `41/0/0`. Nested run: `feat-package-quality-wave1-contracts--contracts`.
 
 ## Wave 2 — Integration adapters (A2)
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave2-adapters` |
+| Group branch | `feat/package-quality-wave2-adapters` |
 | Nested run ID | `feat-package-quality-wave2-adapters--<suffix>` |
 | Units | `@netscript/logger`, `@netscript/telemetry`, `@netscript/aspire`, `@netscript/kv`, `@netscript/database`, `@netscript/prisma-adapter-mysql`, `@netscript/queue`, `@netscript/cron` |
 | Archetype(s) | A2 — integration |
-| Status | `planned` |
+| Status | `active` — **PLAN-EVAL `PASS`** (cycle 2, 2026-06-07); implementing sub-wave **2a** next. See `escalations/wave2-subwave-split.md`. |
 | Merge commit | — |
+
+### Sub-wave structure (OQ-1 resolved; PLAN-EVAL PASS — Option A)
+
+Wave 2 split into three ordered sub-groups (2a→2b→2c), each `< 30` slices, each its
+own branch + sub-PR into `feat/package-quality`, each its own IMPL-EVAL. Forced order:
+kv→logger (2b after 2a), queue→kv (2c after 2b). PLAN-EVAL routing = **Option A**
+(1 PLAN-EVAL over the combined plan — done, `PASS`; + 3 IMPL-EVALs).
+
+| Sub-wave | Units | Branch | Slices | Status |
+|----------|-------|--------|--------|--------|
+| 2a — observability/host | logger, telemetry, aspire | `feat/package-quality-wave2-adapters-2a` | 10 | next (impl handoff ready) |
+| 2b — data | kv, database, prisma-adapter-mysql | `feat/package-quality-wave2-adapters-2b` | 23 | blocked on 2a merge |
+| 2c — messaging | queue, cron | `feat/package-quality-wave2-adapters-2c` | 17 | blocked on 2b merge |
+
+The original single-group draft **PR #8** (parent `feat/package-quality-wave2-adapters`,
+holds the plan + run artifacts) is superseded for code by the three sub-PRs; sub-wave
+branches fork off the parent so they inherit the plan.
 
 ### Pre-conditions
 
@@ -134,12 +172,15 @@ sub-PR + evaluator pass).
 ### Notes
 
 - Implement in the dependency order in the nested PLAN (logger → telemetry → aspire → kv → database → prisma-adapter-mysql → queue → cron).
+- **Staged (reviewer):** branch `feat/package-quality-wave2-adapters` + worktree `.worktrees/wave2-adapters` + nested run `feat-package-quality-wave2-adapters--adapters` (seeded `research.md` + `context-pack.md`) + draft PR #8. Structural re-baseline done; dynamic gates marked `MEASURE-FIRST`.
+- **Open scope decision (OQ-1):** Wave 1 used 27 slices for 3 units; 8 units will exceed the Plan-Gate `< 30` cap → likely **sub-wave split** (2a logger·telemetry·aspire / 2b kv·database·prisma-adapter-mysql / 2c queue·cron). If split, this changes the single-group assumption — escalate per `supervisor.md` § 4.
+- **Per-unit headlines:** `database` is from-scratch (no README/docs/tests/metadata — the wave's `runtime-config`); `prisma-adapter-mysql` README < 150 + `skipLibCheck`; `database`/`queue`/`cron` carry `interfaces/` (AP-17); aspire has a redundant `./helpers` alias to drop; `telemetry`/`aspire` look verify-only.
 
 ## Wave 3 — Plugin runner
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave3-plugin` |
+| Group branch | `feat/package-quality-wave3-plugin` |
 | Nested run ID | `feat-package-quality-wave3-plugin--<suffix>` |
 | Units | `@netscript/plugin` |
 | Archetype(s) | A4 — dsl-builder (plugin host) |
@@ -170,7 +211,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave4-runtimes` |
+| Group branch | `feat/package-quality-wave4-runtimes` |
 | Nested run ID | `feat-package-quality-wave4-runtimes--<suffix>` |
 | Units | `@netscript/plugin-streams-core`, `@netscript/plugin-workers-core`, `@netscript/plugin-sagas-core`, `@netscript/plugin-triggers-core`, `@netscript/watchers`, `@netscript/plugin-streams`, `@netscript/plugin-workers`, `@netscript/plugin-sagas`, `@netscript/plugin-triggers` |
 | Archetype(s) | A1/A4 (`*-core`), A3 (`watchers`), A5 (`plugins/*`) |
@@ -205,7 +246,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave5-apps` |
+| Group branch | `feat/package-quality-wave5-apps` |
 | Nested run ID | `feat-package-quality-wave5-apps--<suffix>` |
 | Units | `@netscript/sdk`, `@netscript/service`, `@netscript/fresh`, `@netscript/fresh-ui` |
 | Archetype(s) | A4 — dsl/app |
@@ -236,7 +277,7 @@ sub-PR + evaluator pass).
 
 | Field | Value |
 |-------|-------|
-| Group branch | `feat/package-quality/wave6-cli` |
+| Group branch | `feat/package-quality-wave6-cli` |
 | Nested run ID | `feat-package-quality-wave6-cli--<suffix>` |
 | Units | `@netscript/cli` |
 | Archetype(s) | A6 — cli-tooling |
@@ -269,9 +310,10 @@ sub-PR + evaluator pass).
 
 | Wave | Status | Depends on | Units | Merge commit |
 |------|--------|-----------|-------|--------------|
-| 0 — Foundation | `planned` | none | shared | — |
-| 1 — Contracts & schemas | `planned` | 0 | runtime-config, config, contracts | — |
-| 2 — Integration adapters | `planned` | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron | — |
+| 0 — Foundation | `merged` | none | shared | `eb8ae44` (PR #3) |
+| 0b — Harness reinforcement (inserted) | `merged` | 0 | none (harness + `.agents/`) | `82ad2a2`,`d5d8e5f`,`76fbeb7` |
+| 1 — Contracts & schemas | `merged` | 0 | runtime-config, config, contracts | `4c57867` (PR #7) |
+| 2 — Integration adapters | `active` (PLAN-EVAL `PASS`; impl 2a next) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | — (sub-PRs pending) |
 | 3 — Plugin runner | `planned` | 2 | plugin | — |
 | 4 — Runtimes & plugins | `planned` | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
 | 5 — Application surfaces | `planned` | 4 | sdk, service, fresh, fresh-ui | — |
@@ -283,4 +325,6 @@ Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 
 | Date | Base sha merged | Result | Notes |
 |------|-----------------|--------|-------|
-| — | — | — | (sync base into `feat/package-quality` before each wave; see `supervisor.md` § 5) |
+| 2026-06-04 | `main` | merged | Pre-wave syncs into `feat/package-quality` (`a7796a0` ignore .worktrees, `44e3b8e` sub-PR rule, `734421c` branch naming) |
+| 2026-06-05 | `feat/package-quality` | merged | Wave 1 base-sync `76fbeb7` (also dropped the rejected D4 capability-gap skill section) |
+| 2026-06-07 | `feat/package-quality` → `feat/package-quality-wave2-adapters` | merged | Pre-implementation base-sync (supervisor.md § 5): brings the new `.github/workflows/copilot-setup-steps.yml` (cloud-agent env: Deno 2.x + .NET 10 + Aspire CLI + Docker) + supervisor PLAN-EVAL-PASS docs onto the Wave 2 branch before sub-wave 2a starts. `main` unchanged since `4c57867`. |

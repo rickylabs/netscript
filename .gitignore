@@ -7,3 +7,5 @@ dist/
 
 # Local git worktrees for parallel harness supervisor/wave runs
 .worktrees/
+
+.llm/tmp/cli-e2e/

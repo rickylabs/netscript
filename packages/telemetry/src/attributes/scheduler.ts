@@ -1,3 +1,6 @@
+/**
+ * Semantic scheduler attribute names used by scheduler instrumentation.
+ */
 export const SchedulerAttributes = {
   SCHEDULER_CRON: 'scheduler.cron',
   SCHEDULER_NEXT_RUN: 'scheduler.next_run',

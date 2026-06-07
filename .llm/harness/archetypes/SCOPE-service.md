@@ -1,13 +1,12 @@
 # Scope Overlay — Service
 
-Use this overlay for `services/`, background services, API handlers, Aspire
-resource wiring, database integration, or service-to-service contract work.
+Use this overlay for `services/`, background services, API handlers, Aspire resource wiring,
+database integration, or service-to-service contract work.
 
 ## Doctrine Boundary
 
-Services consume the doctrine-owned packages and plugins. If service work
-changes `packages/`, `plugins/`, contracts, or public builders, apply the
-affected archetype profile first.
+Services consume the doctrine-owned packages and plugins. If service work changes `packages/`,
+`plugins/`, contracts, or public builders, apply the affected archetype profile first.
 
 ## Additional Read First
 
@@ -19,13 +18,13 @@ affected archetype profile first.
 
 ## Additional Gates
 
-| Gate | Requirement |
-|------|-------------|
-| Contract check | Affected contract/schema/client types pass |
-| Service check | Narrowest service slice typecheck passes |
-| Runtime health | Aspire resources are running/healthy when runtime behavior changes |
-| Trace/log review | No new startup errors, request failures, or hidden retries |
-| Consumer check | Frontend/background/plugin consumers still compile or run |
+| Gate             | Requirement                                                        |
+| ---------------- | ------------------------------------------------------------------ |
+| Contract check   | Affected contract/schema/client types pass                         |
+| Service check    | Narrowest service slice typecheck passes                           |
+| Runtime health   | Aspire resources are running/healthy when runtime behavior changes |
+| Trace/log review | No new startup errors, request failures, or hidden retries         |
+| Consumer check   | Frontend/background/plugin consumers still compile or run          |
 
 ## False-Done States
 

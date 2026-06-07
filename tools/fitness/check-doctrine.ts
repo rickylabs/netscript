@@ -3,7 +3,7 @@
  * Doctrine readiness evaluator.
  *
  * Evaluates a package against the Architecture Doctrine
- * (.llm/research/architecture-doctrine-docs-v2/doctrine/) — axioms A1..A14
+ * (docs/architecture/doctrine/) — axioms A1..A14
  * and anti-patterns AP-1..AP-30 — at the granularity that can be checked
  * mechanically.
  *

@@ -1,3 +1,5 @@
+// Register Redis/Garnet KV adapter before createWorkersServiceRuntime() calls getKv().
+import '@netscript/kv/redis';
 import { createDefaultTaskExecutor } from '@netscript/plugin-workers-core/executor';
 import type { RegisterJobInput, StaticJobRegistry } from '@netscript/plugin-workers-core/runtime';
 import { createWorkersServiceRuntime } from '../services/src/service-runtime.ts';

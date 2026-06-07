@@ -1,12 +1,11 @@
 # Scope Overlay — Docs
 
-Use this overlay for RFCs, README files, knowledge-base pages, harness docs,
-run artifacts, and doctrine-facing documentation.
+Use this overlay for RFCs, README files, knowledge-base pages, harness docs, run artifacts, and
+doctrine-facing documentation.
 
 ## Doctrine Boundary
 
-Docs may describe either current state or doctrine target state. Keep those
-separate:
+Docs may describe either current state or doctrine target state. Keep those separate:
 
 - `.claude/` describes current repo reality and points to doctrine status.
 - doctrine files define package/plugin target rules.
@@ -22,13 +21,13 @@ separate:
 
 ## Additional Gates
 
-| Gate | Requirement |
-|------|-------------|
-| Source alignment | Every prescriptive claim points to doctrine, RFC, or code |
+| Gate             | Requirement                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| Source alignment | Every prescriptive claim points to doctrine, RFC, or code       |
 | Scope separation | Current-state docs do not silently become target-state doctrine |
-| Link integrity | Referenced local paths exist |
-| Terminology | Names match doctrine and `.claude/09-glossary.md` |
-| Drift log | Material mismatch is recorded in run `drift.md` |
+| Link integrity   | Referenced local paths exist                                    |
+| Terminology      | Names match doctrine and `.claude/09-glossary.md`               |
+| Drift log        | Material mismatch is recorded in run `drift.md`                 |
 
 ## False-Done States
 

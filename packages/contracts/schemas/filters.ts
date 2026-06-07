@@ -18,6 +18,7 @@
  */
 
 import { z } from 'zod';
+import type { ContractObjectSchema, ContractSchema } from '../src/domain/schema-types.ts';
 
 // ============================================================================
 // FILTER SCHEMAS
@@ -26,7 +27,7 @@ import { z } from 'zod';
 /**
  * Available filter operators.
  */
-export const FilterOperatorSchema = z.enum([
+export const FilterOperatorSchema: ContractSchema<FilterOperator> = z.enum([
   'equals',
   'not',
   'contains',
@@ -40,43 +41,79 @@ export const FilterOperatorSchema = z.enum([
   'notIn',
   'isNull',
   'isNotNull',
-]);
+]) as unknown as ContractSchema<FilterOperator>;
 
 /**
  * Single filter condition schema.
  */
-export const FilterConditionSchema = z.object({
+const filterConditionSchema = z.object({
   /** Field name to filter on */
   field: z.string(),
   /** Filter operator */
-  operator: FilterOperatorSchema,
+  operator: FilterOperatorSchema as unknown as z.ZodType<FilterOperator>,
   /** Value to compare against (not needed for isNull/isNotNull) */
   value: z.unknown().optional(),
 });
 
 /**
+ * Single filter condition schema.
+ */
+export const FilterConditionSchema: ContractObjectSchema<FilterCondition> =
+  filterConditionSchema as unknown as ContractObjectSchema<FilterCondition>;
+
+/**
  * Array of filter conditions.
  */
-export const FiltersSchema = z.array(FilterConditionSchema);
+const filtersSchema = z.array(filterConditionSchema);
+
+/**
+ * Array of filter conditions.
+ */
+export const FiltersSchema: ContractSchema<Filters> = filtersSchema as unknown as ContractSchema<
+  Filters
+>;
 
 /**
  * Search input schema with filters.
  */
-export const SearchInputSchema = z.object({
+export const SearchInputSchema: ContractObjectSchema<SearchInput> = z.object({
   /** Search query string */
   search: z.string().optional(),
   /** Fields to search in */
   searchFields: z.array(z.string()).optional(),
   /** Filter conditions */
-  filters: FiltersSchema.optional(),
-});
+  filters: filtersSchema.optional(),
+}) as unknown as ContractObjectSchema<SearchInput>;
 
 // ============================================================================
 // FILTER HELPERS
 // ============================================================================
 
-export type FilterOperator = z.infer<typeof FilterOperatorSchema>;
-export type FilterCondition = z.infer<typeof FilterConditionSchema>;
+/** Available filter operator values. */
+export type FilterOperator =
+  | 'equals'
+  | 'not'
+  | 'contains'
+  | 'startsWith'
+  | 'endsWith'
+  | 'gt'
+  | 'gte'
+  | 'lt'
+  | 'lte'
+  | 'in'
+  | 'notIn'
+  | 'isNull'
+  | 'isNotNull';
+
+/** Single filter condition. */
+export type FilterCondition = Readonly<{
+  /** Field name to filter on. */
+  field: string;
+  /** Operator used to compare the field. */
+  operator: FilterOperator;
+  /** Value to compare against. */
+  value?: unknown;
+}>;
 
 /**
  * Builds a Prisma where clause from filter conditions.
@@ -157,7 +194,7 @@ export function buildPrismaWhere(filters: FilterCondition[]): Record<string, unk
  */
 export function buildSearchCondition(
   query: string,
-  fields: string[]
+  fields: string[],
 ): Record<string, unknown> | null {
   if (!query || !fields.length) return null;
 
@@ -210,5 +247,15 @@ export function combineConditions(options: {
 // TYPE EXPORTS
 // ============================================================================
 
-export type Filters = z.infer<typeof FiltersSchema>;
-export type SearchInput = z.infer<typeof SearchInputSchema>;
+/** List of filter conditions. */
+export type Filters = readonly FilterCondition[];
+
+/** Search input with optional query text, search fields, and filters. */
+export type SearchInput = Readonly<{
+  /** Search query string. */
+  search?: string;
+  /** Fields to search in. */
+  searchFields?: readonly string[];
+  /** Filter conditions. */
+  filters?: Filters;
+}>;

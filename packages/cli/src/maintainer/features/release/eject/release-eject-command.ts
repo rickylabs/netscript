@@ -20,7 +20,7 @@ export interface ReleaseEjectCommandDependencies {
 /** Create the maintainer `release eject` command. */
 export function createReleaseEjectCommand(
   dependencies: ReleaseEjectCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('eject')

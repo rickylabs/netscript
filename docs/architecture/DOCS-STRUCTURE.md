@@ -154,7 +154,7 @@ Required content:
 
 1. **Archetype** — explicit declaration: "This package implements the
    Archetype 4 (DSL/Builder) pattern" with link to
-   `.llm/research/architecture-doctrine-docs-v2/doctrine/`.
+   `docs/architecture/doctrine/`.
 2. **Layered diagram** — ascii or markdown, showing domain/ports/application/
    adapters/runtime.
 3. **Public-surface map** — what's exported via `mod.ts` vs sub-entrypoints.

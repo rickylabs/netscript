@@ -63,16 +63,16 @@ export const cron = {
   every30Minutes(): CronExpression {
     return '*/30 * * * *';
   },
-  hourly(minute = 0): CronExpression {
+  hourly(minute: number = 0): CronExpression {
     validateRange(minute, 0, 59, 'minute');
     return `${minute} * * * *`;
   },
-  daily(hour = 0, minute = 0): CronExpression {
+  daily(hour: number = 0, minute: number = 0): CronExpression {
     validateRange(hour, 0, 23, 'hour');
     validateRange(minute, 0, 59, 'minute');
     return `${minute} ${hour} * * *`;
   },
-  weekly(dayOfWeek: DayOfWeek = 0, hour = 0, minute = 0): CronExpression {
+  weekly(dayOfWeek: DayOfWeek = 0, hour: number = 0, minute: number = 0): CronExpression {
     validateRange(dayOfWeek, 0, 6, 'dayOfWeek');
     validateRange(hour, 0, 23, 'hour');
     validateRange(minute, 0, 59, 'minute');

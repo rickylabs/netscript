@@ -5,7 +5,7 @@
 > later beta iteration.
 >
 > Authority: this file extends the Architecture Doctrine
-> (`.llm/research/architecture-doctrine-docs-v2/doctrine/`) for cross-package
+> (`docs/architecture/doctrine/`) for cross-package
 > consistency. Where this document conflicts with the doctrine, doctrine wins.
 
 The single hardest goal of the alpha release is **uniform DX** across 24

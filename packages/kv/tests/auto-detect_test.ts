@@ -57,6 +57,16 @@ Deno.test('Redis connection discovery handles direct URLs and Aspire connection 
       assertEquals(getRedisConnectionFromEnv(), 'redis://:secret@example:6379');
     },
   );
+
+  await withEnv(
+    {
+      ConnectionStrings__redis: undefined,
+      GARNET_TCP: 'tcp://localhost:6379',
+    },
+    () => {
+      assertEquals(getRedisConnectionFromEnv(), 'redis://localhost:6379');
+    },
+  );
 });
 
 Deno.test('autoDetectProvider prefers explicit cache provider and falls back to Deno KV', async () => {

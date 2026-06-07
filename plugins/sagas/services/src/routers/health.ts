@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { baseContract } from '@netscript/shared';
+import { baseContract } from '@netscript/contracts';
 import { implement } from '@orpc/server';
 import { getKv } from '@netscript/kv';
 import { listSagaMetadata } from '../saga-registry.ts';
@@ -74,7 +74,7 @@ const healthContractV1 = implement(healthContract);
 // HEALTH HANDLERS
 // ============================================================================
 
-export const health = {
+export const health: Record<string, unknown> = {
   /**
    * Liveness probe - always returns OK if process is running
    */

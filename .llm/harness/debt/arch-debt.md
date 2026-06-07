@@ -1,7 +1,7 @@
 # Architecture Debt Registry
 
 Seeded from
-`.llm/research/architecture-doctrine-docs-v2/doctrine/10-codebase-verdict-and-handoff.md` on
+`docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on
 2026-04-29. Entries track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts.
 `Keep` and `Defer` verdicts are not seeded here.
 
@@ -16,6 +16,11 @@ Seeded from
   feature slices, kernel adapters, template assets, binary edges, and executable CLI fitness gates
   now cover the former monoliths.
 - **Gate:** F-1, F-5, F-6, F-7
+- **Wave 1 closure evidence:** `feat-package-quality-wave1-contracts--contracts` slice 10 split
+  `packages/runtime-config/mod.ts` into `src/domain/types.ts`, `src/application/loader.ts`,
+  `src/application/watcher.ts`, and `src/diagnostics/summary.ts`; `deno check`, `deno doc --lint`,
+  `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, and
+  `deno fmt --check` pass for the package.
 
 ## packages/config — AP-1 / doctrine verdict Refactor (schema.ts 945 LOC)
 
@@ -27,6 +32,52 @@ Seeded from
 - **Status:** closed 2026-05-01 — public local-source and monorepo behavior moved behind the
   maintainer command graph; `deno task arch:check` enforces public/maintainer isolation.
 - **Gate:** F-1, F-5, F-10
+
+## packages/config — AP-16 root helpers.ts
+
+- **Reason:** Root `helpers.ts` held saga authoring input types behind a generic helper name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slice 11 renamed `helpers.ts` to
+  `src/domain/saga-inputs.ts` and kept the public `defineSagas`/input type exports stable through
+  `src/public/mod.ts`.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
+## packages/config/src/domain/mod.ts — justified domain barrel
+
+- **Reason:** `src/domain/mod.ts` is a sub-barrel, but it intentionally curates the domain schema
+  surface consumed by `src/public/mod.ts` and future docs/reference generation.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when generated reference tooling can crawl individual schema modules.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — slice 17 added `arch:barrel-ok` justification in the file.
+- **Gate:** F-18, `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'`
+
+## packages/contracts — AP-16 helpers directory
+
+- **Reason:** Root `helpers/` held query and transform helpers behind a generic folder name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slices 19 and 20 moved `paginated-query.ts` and
+  `transform.ts` into `src/application/` as role-named modules and removed the `helpers/`
+  directory.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
+## packages/contracts/crud — accepted root subpath layout
+
+- **Reason:** `crud/` remains at the package root to preserve the established `./crud` subpath
+  export and avoid broad downstream import churn during S1.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when subpath exports can move without consumer breakage.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — locked decision L8 keeps `contracts/crud/` at package root.
+- **Gate:** F-5/F-6 remain green for `@netscript/contracts`; consumer validation in slices 25-27.
 
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
@@ -226,8 +277,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
-- **Gate:** F-1, F-2, F-11
+- **Status:** partially closed 2026-06-05 — `utils/datetime.ts` was deleted in Wave 0 and the
+  published surface remains free of generic datetime helpers. Residual unpublished `utils/`
+  compatibility for `@shared/utils` consumers is tracked in the Wave 0 drift registry until later
+  plugin waves migrate those imports.
+- **Gate:** F-1 and F-2 closed for datetime; F-11 remains deferred for residual unpublished `utils/`
+  compatibility
 
 ## plugins/triggers — doctrine verdict Refactor
 
@@ -333,7 +388,10 @@ Seeded from
 - **Linked plan:** `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/plan.md` and
   `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/drift.md`.
 - **Created:** 2026-05-08
-- **Status:** open, DEBT_ACCEPTED for Foundation alpha only.
+- **Status:** closed 2026-06-07 — Wave 2a slice 8 (`37665e2`) removed the `./helpers` export from
+  `packages/aspire/deno.json`; grep for `@netscript/aspire/helpers` across `packages/` and
+  `plugins/` returns zero consumers. F-5 (public surface matches export map), F-7 (doc-lint clean on
+  all 8 entrypoints), F-11 (no `helpers/` folder) verified by IMPL-EVAL.
 - **Gate:** F-5, F-7, F-11, F-18
 
 ## runtime — Aspire OTEL CLI Dashboard API discovery fails (`aspire-otel-cli-discovery`)

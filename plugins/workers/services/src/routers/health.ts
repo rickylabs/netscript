@@ -5,7 +5,7 @@
  */
 
 import { implement } from '@orpc/server';
-import { baseContract } from '@netscript/shared';
+import { baseContract } from '@netscript/contracts';
 import { z } from 'zod';
 
 const startTime = Date.now();
@@ -37,7 +37,7 @@ const healthContractV1 = implement(healthContract);
 // HEALTH CHECK HANDLERS
 // ============================================================================
 
-export const health = {
+export const health: Record<string, unknown> = {
   /**
    * Health check endpoint - for testing oRPC connectivity
    */

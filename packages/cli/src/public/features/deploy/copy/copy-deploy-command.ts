@@ -42,7 +42,7 @@ import {
 // COMMAND
 // ============================================================================
 
-export const copyCommand = new Command()
+export const copyCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('copy')
   .description(
     'Copy build artifacts to the install directory (no Servy registration)',

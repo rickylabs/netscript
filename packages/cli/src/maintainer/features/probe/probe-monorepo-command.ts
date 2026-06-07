@@ -23,7 +23,7 @@ export interface ProbeMonorepoCommandDependencies {
 /** Create the maintainer `probe monorepo` command. */
 export function createProbeMonorepoCommand(
   dependencies: ProbeMonorepoCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('monorepo')

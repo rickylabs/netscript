@@ -22,7 +22,7 @@ export interface LocalPluginAddCommandDependencies {
 /** Create the local contributor `plugin add` command. */
 export function createLocalPluginAddCommand(
   dependencies: LocalPluginAddCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('add')

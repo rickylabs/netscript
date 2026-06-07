@@ -15,13 +15,13 @@ export type DbEngine = 'postgres' | 'mysql' | 'mssql' | 'sqlite';
 export type DbEngineChoice = DbEngine | 'none';
 
 /** Ordered database engine choices accepted by init. */
-export const DB_ENGINE_CHOICES = [
+export const DB_ENGINE_CHOICES: readonly DbEngineChoice[] = [
   'postgres',
   'mysql',
   'mssql',
   'sqlite',
   'none',
-] as const satisfies readonly DbEngineChoice[];
+] as const;
 
 /** Prisma provider names corresponding to each supported database engine. */
 export type PrismaProvider = 'postgresql' | 'mysql' | 'sqlserver' | 'sqlite';

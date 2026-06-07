@@ -26,7 +26,7 @@ export class HostPluginCommand extends CliCommand<Command> {
   }
 
   /** Build the command definition consumed by the CLI runner. */
-  define(): Command {
+  define(): Command<any, any, any, any, any, any, any, any> {
     const print = this.dependencies.print ?? outputText;
     return new Command()
       .name('sync')
@@ -46,6 +46,6 @@ export class HostPluginCommand extends CliCommand<Command> {
 /** Create the host-side plugin command adapter. */
 export function createHostPluginCommand(
   dependencies: HostPluginCommandDependencies,
-): Command {
+): Command<any, any, any, any, any, any, any, any> {
   return new HostPluginCommand(dependencies).define();
 }

@@ -73,7 +73,7 @@ function resolvePluginLocalName(pluginName: string): string {
 }
 
 /** `netscript plugin list` command. */
-export const pluginListCommand = new Command()
+export const pluginListCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('list')
   .description('List configured NetScript plugins')
   .option('--project-root <path:string>', 'Project root directory')

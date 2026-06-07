@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert';
+import { assertEquals } from 'jsr:@std/assert@^1';
 import { defineConfig } from '../../mod.ts';
 import { mergePartialConfig } from '../../src/merge/mod.ts';
 

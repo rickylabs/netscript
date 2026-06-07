@@ -8,7 +8,7 @@ import type { MaintainerCommandDependencies } from '../root/maintainer-command-d
 export function createProbeCommand(
   host: MaintainerCliHost,
   dependencies: MaintainerCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('probe')
     .description('Discover maintainer-only repository capabilities')

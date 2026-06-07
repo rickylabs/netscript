@@ -5,7 +5,7 @@
  */
 
 import { delay } from '@std/async';
-import { createParallelQueue, type MessageQueue } from '@netscript/queue';
+import { createQueue, type MessageQueue } from '@netscript/queue';
 import { type JobMessage, type TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { type TaskExecutor } from '@netscript/plugin-workers-core/executor';
 import type { KvExecutionState } from '@netscript/plugin-workers-core/state';
@@ -143,9 +143,7 @@ export class Worker {
       concurrency: this.concurrency,
     });
 
-    this.queue = createParallelQueue<JobMessage>(this.queueName, {
-      concurrency: this.concurrency,
-    }) as TracedQueue<JobMessage>;
+    this.queue = createQueue<JobMessage>(this.queueName) as TracedQueue<JobMessage>;
 
     this.listenerSupervisors.push(...await startQueueTriggerListeners(this.queueContext()));
     this.listenerSupervisors.push(

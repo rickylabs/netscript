@@ -20,7 +20,7 @@ export interface SyncTemplatesCommandDependencies {
 /** Create the maintainer `sync templates` command. */
 export function createSyncTemplatesCommand(
   dependencies: SyncTemplatesCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('templates')

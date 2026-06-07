@@ -2,7 +2,9 @@ import type { AspireResource, EnvSource } from '../domain/mod.ts';
 
 /** Options for resolving plugin environment variable sources. */
 export interface ResolveEnvSourceOptions {
+  /** Resources available for resource-backed environment references. */
   readonly resources?: ReadonlyMap<string, AspireResource>;
+  /** Secret values available for secret-backed environment references. */
   readonly secrets?: ReadonlyMap<string, string>;
 }
 

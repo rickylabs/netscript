@@ -31,6 +31,9 @@ describe('DatabaseScaffolder', () => {
     const generateZod = await fs.readFile('/project/database/mysql/scripts/generate-zod.ts');
     const fixZodImports = await fs.readFile('/project/database/mysql/scripts/fix-zod-imports.ts');
     const migrate = await fs.readFile('/project/database/mysql/scripts/migrate.ts');
+    const clearSeededClient = await fs.readFile(
+      '/project/database/mysql/scripts/clear-seeded-client.ts',
+    );
     const patchPrismaClient = await fs.readFile(
       '/project/database/mysql/scripts/patch-prisma-client.ts',
     );
@@ -66,6 +69,11 @@ describe('DatabaseScaffolder', () => {
     assertStringIncludes(
       migrate,
       "await runMigrationCli({ provider: 'mysql' });",
+    );
+
+    assertStringIncludes(
+      clearSeededClient,
+      "new URL('../schema/.generated/client.server.ts', import.meta.url)",
     );
 
     assertStringIncludes(

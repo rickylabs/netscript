@@ -1,3 +1,6 @@
+/**
+ * Semantic job attribute names used by scheduler and worker instrumentation.
+ */
 export const JobAttributes = {
   JOB_ID: 'job.id',
   JOB_NAME: 'job.name',
@@ -14,6 +17,9 @@ export const JobAttributes = {
   JOB_TIMEZONE: 'job.timezone',
 } as const;
 
+/**
+ * Standard job trigger names.
+ */
 export const JobTriggers = {
   CRON: 'cron',
   MANUAL: 'manual',
@@ -22,6 +28,9 @@ export const JobTriggers = {
   RETRY: 'retry',
 } as const;
 
+/**
+ * Standard job execution status names.
+ */
 export const JobStatuses = {
   PENDING: 'pending',
   RUNNING: 'running',

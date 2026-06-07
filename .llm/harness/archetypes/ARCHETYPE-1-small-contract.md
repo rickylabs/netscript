@@ -4,29 +4,28 @@
 
 - Axioms: A1, A2, A6, A7, A8, A9, A14.
 - Primary sections:
-  - `doctrine/02-public-surface.md`
-  - `doctrine/04-modules-and-helpers.md`
-  - `doctrine/05-folder-structure.md`
-  - `doctrine/06-archetypes.md#archetype-1--small-contract`
-  - `doctrine/09-anti-patterns-and-fitness-functions.md`
+  - `docs/architecture/doctrine/02-public-surface.md`
+  - `docs/architecture/doctrine/04-modules-and-helpers.md`
+  - `docs/architecture/doctrine/05-folder-structure.md`
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-2, AP-7, AP-9, AP-13, AP-14, AP-15, AP-16, AP-20.
 - Fitness functions: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15.
 
 ## When This Archetype Applies
 
-Use this profile for packages whose value is a clear public contract: types,
-schemas, branded identifiers, parse/validation helpers, and small invariants.
-If the work introduces adapters, runtime lifecycle, state, or a fluent API as
-the main product, select a larger archetype.
+Use this profile for packages whose value is a clear public contract: types, schemas, branded
+identifiers, parse/validation helpers, and small invariants. If the work introduces adapters,
+runtime lifecycle, state, or a fluent API as the main product, select a larger archetype.
 
-Current examples are listed in `doctrine/06-archetypes.md` under "Archetype
-assignments for current packages."
+Current examples are listed in `docs/architecture/doctrine/06-archetypes.md` under "Archetype assignments for current
+packages."
 
 ## Minimum Folder Shape
 
-Use the canonical shape in `doctrine/06-archetypes.md#archetype-1--small-contract`.
-The review question is not whether every folder exists; it is whether the
-package stayed small and avoided invented layers.
+Use the canonical shape in `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`. The review
+question is not whether every folder exists; it is whether the package stayed small and avoided
+invented layers.
 
 ## Skills to Activate
 
@@ -37,19 +36,18 @@ package stayed small and avoided invented layers.
 
 1. This profile.
 2. `../gates/archetype-gate-matrix.md`.
-3. `doctrine/06-archetypes.md#archetype-1--small-contract`.
-4. `doctrine/02-public-surface.md`.
+3. `docs/architecture/doctrine/06-archetypes.md#archetype-1--small-contract`.
+4. `docs/architecture/doctrine/02-public-surface.md`.
 5. The package README, `mod.ts`, `deno.json`, and tests.
 6. Relevant debt entries in `../debt/arch-debt.md`.
 
 ## Required Gates in Order
 
-1. Static gates: narrow `deno check`, package slice check, `deno fmt --check`,
-   `deno lint`, `deno doc --lint`, `deno publish --dry-run` when package scope.
+1. Static gates: narrow `deno check`, package slice check, `deno fmt --check`, `deno lint`,
+   `deno doc --lint`, `deno publish --dry-run` when package scope.
 2. Fitness gates: F-1, F-5, F-6, F-7, F-8, F-10, F-11, F-12, F-14, F-15.
 3. Runtime gates: none by default.
-4. Consumer gates: optional unless exports, names, or validation semantics
-   changed.
+4. Consumer gates: optional unless exports, names, or validation semantics changed.
 
 ## Anti-Patterns to Watch For
 
@@ -62,8 +60,7 @@ package stayed small and avoided invented layers.
 
 ## False-Done States
 
-- The package compiles but the README does not document the type table or
-  permissions.
+- The package compiles but the README does not document the type table or permissions.
 - A single large `schema.ts` remains because "it is only types."
 - The public surface exports every internal type instead of a curated contract.
 - Validation changed but consumer examples were not checked.
@@ -77,9 +74,8 @@ package stayed small and avoided invented layers.
 
 ## Design Checkpoint Expectations
 
-The design checkpoint names the contract boundary first: public types, exported
-schemas, README sections, and semantic tests. Implementation follows that
-surface.
+The design checkpoint names the contract boundary first: public types, exported schemas, README
+sections, and semantic tests. Implementation follows that surface.
 
 The design section in `worklog.md` must include:
 
@@ -99,5 +95,5 @@ Beyond the universal slice checklist in `workflow/run-loop.md`:
 
 ## Historical Notes
 
-Small packages are allowed to remain small. Adding generic layers to make them
-look enterprise-shaped is a doctrine violation, not a maturity upgrade.
+Small packages are allowed to remain small. Adding generic layers to make them look
+enterprise-shaped is a doctrine violation, not a maturity upgrade.

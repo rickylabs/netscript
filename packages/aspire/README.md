@@ -46,14 +46,14 @@ deno add jsr:@netscript/aspire
 
 ## Subpath Exports
 
-| Import Path                   | Contents                                      |
-| ----------------------------- | --------------------------------------------- |
-| `@netscript/aspire`           | Everything (barrel)                           |
-| `@netscript/aspire/config`    | Zod schemas + parser                          |
-| `@netscript/aspire/types`     | `z.infer<>` derived types + generic utilities |
-| `@netscript/aspire/schema`    | JSON Schema generation via `z.toJSONSchema()` |
-| `@netscript/aspire/constants` | OTEL maps, permissions, config keys           |
-| `@netscript/aspire/helpers`   | SDK-agnostic helper functions                 |
+| Import Path                     | Contents                                      |
+| ------------------------------- | --------------------------------------------- |
+| `@netscript/aspire`             | Everything (barrel)                           |
+| `@netscript/aspire/config`      | Zod schemas + parser                          |
+| `@netscript/aspire/types`       | `z.infer<>` derived types + generic utilities |
+| `@netscript/aspire/schema`      | JSON Schema generation via `z.toJSONSchema()` |
+| `@netscript/aspire/constants`   | OTEL maps, permissions, config keys           |
+| `@netscript/aspire/application` | SDK-agnostic helper functions                 |
 
 ## Quick Start
 

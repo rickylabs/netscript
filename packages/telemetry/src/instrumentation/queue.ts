@@ -7,13 +7,16 @@
  * @module
  */
 
-import { type Context, context as otelContext, type Span, SpanKind } from '@opentelemetry/api';
+import { context as otelContext } from '@opentelemetry/api';
 import {
   addSpanEvent,
+  type Context,
   createSpan,
   getQueueTracer,
   setSpanError,
   setSpanOk,
+  type Span,
+  SpanKind,
   withSpan,
 } from '../core/mod.ts';
 import {
@@ -77,6 +80,9 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
   private readonly options: Required<TracedQueueOptions>;
   private readonly tracer = getQueueTracer();
 
+  /**
+   * Create a traced queue wrapper around an existing queue implementation.
+   */
   constructor(inner: MessageQueue<T>, options: TracedQueueOptions) {
     this.inner = inner;
     this.options = {
@@ -118,13 +124,14 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
           }),
         );
 
-        // Prepare headers with trace context
-        // IMPORTANT: If headers already contain traceparent (from scheduler.dispatch),
-        // preserve it instead of overwriting with the queue.enqueue span's context.
-        // This ensures the trace chain is: scheduler.dispatch -> queue.dequeue -> job.execute
+        // Prepare headers with the queue.enqueue span as the propagated parent.
+        // Existing application headers are preserved, but trace context is replaced
+        // so the chain is: scheduler.dispatch -> queue.enqueue -> queue.dequeue.
         let headers = options?.headers ?? {};
-        if (this.options.propagateContext && !headers['traceparent']) {
-          headers = createMessageHeaders(headers);
+        if (this.options.propagateContext) {
+          const { traceparent: _traceparent, tracestate: _tracestate, ...applicationHeaders } =
+            headers;
+          headers = createMessageHeaders(applicationHeaders);
         }
 
         // Add delay info if present

@@ -28,7 +28,7 @@ import {
 // COMMAND
 // ============================================================================
 
-export const upgradeCommand = new Command()
+export const upgradeCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('upgrade')
   .description(
     'Build, sync, reinstall, and restart services in one step',

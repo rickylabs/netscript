@@ -12,6 +12,8 @@ export type AnyInterceptor = (...args: any[]) => Promise<any>;
  * Minimal handler options surface used by telemetry plugins.
  */
 export interface GenericHandlerOptions {
+  /** Root-level oRPC interceptors. */
   rootInterceptors?: AnyInterceptor[];
+  /** Client/procedure-level oRPC interceptors. */
   clientInterceptors?: AnyInterceptor[];
 }
