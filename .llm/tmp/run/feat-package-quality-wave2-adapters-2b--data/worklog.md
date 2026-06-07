@@ -1,54 +1,75 @@
 # Worklog — Wave 2b Data Adapters
 
-Run ID: `feat-package-quality-wave2-adapters-2b--data`
-Branch: `feat/package-quality-wave2-adapters-2b`
-Role: GENERATOR for sub-wave 2b only.
+Run ID: `feat-package-quality-wave2-adapters-2b--data` Branch:
+`feat/package-quality-wave2-adapters-2b` Role: GENERATOR for sub-wave 2b only.
 
 ## Design
 
 ### Public Surface
 
-- `@netscript/kv` keeps its root export plus existing `./redis` and `./kvdex` subpaths; this run adds `./testing` for the in-memory adapter and contract helper.
-- `@netscript/database` keeps the root, adapter, script, tracing, and extension surfaces; this run renames `./interfaces` to `./ports` with no compatibility alias.
+- `@netscript/kv` keeps its root export plus existing `./redis` and `./kvdex` subpaths; this run
+  adds `./testing` for the in-memory adapter and contract helper.
+- `@netscript/database` keeps the root, adapter, script, tracing, and extension surfaces; this run
+  renames `./interfaces` to `./ports` with no compatibility alias.
 - `@netscript/database/testing` is added for contract helpers and mock/in-memory database ports.
-- `@netscript/prisma-adapter-mysql` remains a single-adapter root package; this run keeps its root export, adds a canonical package-root `mod.ts` only if needed by the current package shape, and excludes examples from publish.
+- `@netscript/prisma-adapter-mysql` remains a single-adapter root package; this run keeps its root
+  export, adds a canonical package-root `mod.ts` only if needed by the current package shape, and
+  excludes examples from publish.
 
 ### Domain Vocabulary
 
-- KV vocabulary: `KvStore`, `WatchableKvStore`, `KvKey`, `KvProvider`, Redis/Deno KV/Kvdex adapter variants, and in-memory test adapter.
-- Database vocabulary: database client port, transaction/client capability, query result, SQL JSON extension options, adapter technology variants (`postgres`, `mssql`, `mysql`), tracing controls, and schema generation scripts.
-- Prisma MySQL vocabulary: Prisma driver adapter, MySQL connection options, capabilities, conversion helpers, and driver error mapping.
+- KV vocabulary: `KvStore`, `WatchableKvStore`, `KvKey`, `KvProvider`, Redis/Deno KV/Kvdex adapter
+  variants, and in-memory test adapter.
+- Database vocabulary: database client port, transaction/client capability, query result, SQL JSON
+  extension options, adapter technology variants (`postgres`, `mssql`, `mysql`), tracing controls,
+  and schema generation scripts.
+- Prisma MySQL vocabulary: Prisma driver adapter, MySQL connection options, capabilities, conversion
+  helpers, and driver error mapping.
 
 ### Ports
 
-- `kv` already owns store contracts under `types/`; this run does not widen the port surface, but exposes a `./testing` contract helper that exercises the public KV behavior.
-- `database` renames the consumed contracts from `interfaces/` to `ports/`; adapters import the port contracts from the same package.
-- `prisma-adapter-mysql` is a one-adapter package and does not invent a new port unless an existing source contract already requires it.
+- `kv` already owns store contracts under `types/`; this run does not widen the port surface, but
+  exposes a `./testing` contract helper that exercises the public KV behavior.
+- `database` renames the consumed contracts from `interfaces/` to `ports/`; adapters import the port
+  contracts from the same package.
+- `prisma-adapter-mysql` is a one-adapter package and does not invent a new port unless an existing
+  source contract already requires it.
 
 ### Composition Roots
 
-- `kv` composition roots remain the existing factories and provider auto-detection functions, moved from `core/` to `application/` when role naming changes.
-- `database` composition roots remain the exported adapter factories and tracing helpers; defaults stay explicit in exported functions, with no module-load-time connection acquisition.
-- `prisma-adapter-mysql` composition stays in its adapter factory and connection opening functions; removing `skipLibCheck` must not add hidden process/env reads.
+- `kv` composition roots remain the existing factories and provider auto-detection functions, moved
+  from `core/` to `application/` when role naming changes.
+- `database` composition roots remain the exported adapter factories and tracing helpers; defaults
+  stay explicit in exported functions, with no module-load-time connection acquisition.
+- `prisma-adapter-mysql` composition stays in its adapter factory and connection opening functions;
+  removing `skipLibCheck` must not add hidden process/env reads.
 
 ### Permissions
 
-- `kv` docs must declare `--unstable-kv`, network access for Redis, and environment access only where provider auto-detection reads configuration.
-- `database` docs must declare network/database connectivity permissions, file/process permissions for scripts, and no implicit permissions for pure types.
-- `prisma-adapter-mysql` docs must declare network access to MySQL and any npm/driver runtime requirements.
+- `kv` docs must declare `--unstable-kv`, network access for Redis, and environment access only
+  where provider auto-detection reads configuration.
+- `database` docs must declare network/database connectivity permissions, file/process permissions
+  for scripts, and no implicit permissions for pure types.
+- `prisma-adapter-mysql` docs must declare network access to MySQL and any npm/driver runtime
+  requirements.
 
 ### Consumer-Import Impact
 
-- `@netscript/database/interfaces` is removed and replaced by `@netscript/database/ports`; the approved plan recorded zero external consumers.
+- `@netscript/database/interfaces` is removed and replaced by `@netscript/database/ports`; the
+  approved plan recorded zero external consumers.
 - `kv` subpaths do not change, so consumer impact is internal import updates only.
-- `prisma-adapter-mysql` root import remains stable; examples are excluded from publish but not removed.
+- `prisma-adapter-mysql` root import remains stable; examples are excluded from publish but not
+  removed.
 - Final consumer gate checks CLI and plugins per the locked 2b slice 23.
 
 ### Contributor Path
 
-- Add a new KV backend by opening `packages/kv/adapters/`, implementing the existing KV contract, then adding a `./testing` contract invocation.
-- Add a new database engine by adding a sibling under `packages/database/adapters/`, wiring the same `ports/` contracts, documenting required permissions, and extending the adapter contract test.
-- Extend Prisma MySQL behavior by updating focused files under `packages/prisma-adapter-mysql/src/`, keeping driver-specific conversion separate from adapter lifecycle.
+- Add a new KV backend by opening `packages/kv/adapters/`, implementing the existing KV contract,
+  then adding a `./testing` contract invocation.
+- Add a new database engine by adding a sibling under `packages/database/adapters/`, wiring the same
+  `ports/` contracts, documenting required permissions, and extending the adapter contract test.
+- Extend Prisma MySQL behavior by updating focused files under `packages/prisma-adapter-mysql/src/`,
+  keeping driver-specific conversion separate from adapter lifecycle.
 
 ### Commit Slices
 
@@ -79,14 +100,16 @@ Role: GENERATOR for sub-wave 2b only.
 ### Deferred Scope
 
 - Real backend runtime tests remain deferred to S2 per the locked plan.
-- `kv/tests/bridge_test.ts` AP-1 god-file debt remains open unless a slice must touch it for a failing gate.
+- `kv/tests/bridge_test.ts` AP-1 god-file debt remains open unless a slice must touch it for a
+  failing gate.
 - Queue and cron changes are out of scope for this run.
 
 ## Activity Log
 
-| Date | Slice | Activity | Evidence |
-|------|-------|----------|----------|
-| 2026-06-07 | Design | Created nested run directory and Design checkpoint for Wave 2b. | This file, `commits.md`, `drift.md`. |
-| 2026-06-07 | 1-8 | Completed KV folder role rename, docs, `./testing`, tasks, doctest fixture, and package gates. | `deno task --cwd packages/kv check` PASS; `deno doc --lint packages/kv/mod.ts packages/kv/redis.ts packages/kv/kvdex.ts packages/kv/src/testing/mod.ts` PASS; `deno publish --dry-run --allow-dirty` PASS with 0 slow types; scoped fmt/lint PASS; docs fixture PASS. |
-| 2026-06-07 | 9-17 | Completed database package metadata, `interfaces/` -> `ports/`, slow-type cleanup, public docs/JSDoc cleanup, README/docs, `./testing`, adapter contract tests, and package gates. | README 249 LOC; `rtk proxy deno task --cwd packages/database check` PASS; `deno doc --lint packages/database/mod.ts packages/database/ports/mod.ts packages/database/adapters/mod.ts packages/database/adapters/postgres.adapter.ts packages/database/adapters/mssql.adapter.ts packages/database/adapters/mysql.adapter.ts packages/database/extensions/mod.ts packages/database/scripts/mod.ts packages/database/prisma-tracing.ts packages/database/testing/mod.ts` PASS with upstream npm type-resolution warnings only; `deno test --allow-all packages/database/tests/adapter-contract_test.ts packages/database/tests/_fixtures/docs-examples_test.ts` PASS; `deno publish --dry-run --allow-dirty` PASS with 0 slow types; scoped fmt/lint PASS. |
-| 2026-06-07 | 18-22 | Completed Prisma MySQL adapter package-root export, removed `skipLibCheck`, narrowed root public surface, added README/docs, tests, publish hygiene, and package gates. | README 302 LOC; `rtk proxy deno task --cwd packages/prisma-adapter-mysql check` PASS; `deno doc --lint packages/prisma-adapter-mysql/mod.ts` PASS; `deno test --allow-net --allow-env packages/prisma-adapter-mysql/tests/` PASS; `deno publish --dry-run --allow-dirty` PASS with 0 slow types; scoped fmt/lint PASS; `packages/prisma-adapter-mysql/src` console scan clean. |
+| Date       | Slice  | Activity                                                                                                                                                                           | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ---------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-07 | Design | Created nested run directory and Design checkpoint for Wave 2b.                                                                                                                    | This file, `commits.md`, `drift.md`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 2026-06-07 | 1-8    | Completed KV folder role rename, docs, `./testing`, tasks, doctest fixture, and package gates.                                                                                     | `deno task --cwd packages/kv check` PASS; `deno doc --lint packages/kv/mod.ts packages/kv/redis.ts packages/kv/kvdex.ts packages/kv/src/testing/mod.ts` PASS; `deno publish --dry-run --allow-dirty` PASS with 0 slow types; scoped fmt/lint PASS; docs fixture PASS.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 2026-06-07 | 9-17   | Completed database package metadata, `interfaces/` -> `ports/`, slow-type cleanup, public docs/JSDoc cleanup, README/docs, `./testing`, adapter contract tests, and package gates. | README 249 LOC; `rtk proxy deno task --cwd packages/database check` PASS; `deno doc --lint packages/database/mod.ts packages/database/ports/mod.ts packages/database/adapters/mod.ts packages/database/adapters/postgres.adapter.ts packages/database/adapters/mssql.adapter.ts packages/database/adapters/mysql.adapter.ts packages/database/extensions/mod.ts packages/database/scripts/mod.ts packages/database/prisma-tracing.ts packages/database/testing/mod.ts` PASS with upstream npm type-resolution warnings only; `deno test --allow-all packages/database/tests/adapter-contract_test.ts packages/database/tests/_fixtures/docs-examples_test.ts` PASS; `deno publish --dry-run --allow-dirty` PASS with 0 slow types; scoped fmt/lint PASS. |
+| 2026-06-07 | 18-22  | Completed Prisma MySQL adapter package-root export, removed `skipLibCheck`, narrowed root public surface, added README/docs, tests, publish hygiene, and package gates.            | README 302 LOC; `rtk proxy deno task --cwd packages/prisma-adapter-mysql check` PASS; `deno doc --lint packages/prisma-adapter-mysql/mod.ts` PASS; `deno test --allow-net --allow-env packages/prisma-adapter-mysql/tests/` PASS; `deno publish --dry-run --allow-dirty` PASS with 0 slow types; scoped fmt/lint PASS; `packages/prisma-adapter-mysql/src` console scan clean.                                                                                                                                                                                                                                                                                                                                                                           |
+| 2026-06-07 | 23     | Completed consumer-import gate and Gate handoff evidence.                                                                                                                          | `rtk proxy deno task --cwd packages/cli check` PASS; `rtk proxy deno task --cwd plugins/sagas check` PASS; `rtk proxy deno task --cwd plugins/streams check` PASS; `rtk proxy deno task --cwd plugins/triggers check` PASS; `rtk proxy deno task --cwd plugins/workers check` PASS; scoped doctrine checks for `packages/kv`, `packages/database`, and `packages/prisma-adapter-mysql` all exit 0 with FAIL=0; repo-wide `rtk proxy deno task arch:check` failed on out-of-scope existing doctrine debt and is recorded in drift.                                                                                                                                                                                                                        |

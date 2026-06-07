@@ -7,6 +7,8 @@ order: 1
 
 # KV Architecture
 
+Archetype: 2
+
 `@netscript/kv` implements Archetype 2 (Integration): it owns a small key-value contract and ships
 named adapters for Deno KV, Redis, Kvdex integration, and memory-backed tests.
 

@@ -7,6 +7,8 @@ order: 1
 
 # Database Architecture
 
+Archetype: 2
+
 `@netscript/database` implements Archetype 2 (Integration). It owns database adapter contracts and
 ships named adapters and helper entrypoints for Prisma-backed database integrations.
 

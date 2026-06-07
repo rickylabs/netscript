@@ -5,6 +5,8 @@ title: 'Architecture'
 
 # Architecture
 
+Archetype: 2
+
 `@netscript/prisma-adapter-mysql` is an Archetype 2 integration package.
 
 It wraps a MySQL driver behind Prisma's driver adapter protocol.
