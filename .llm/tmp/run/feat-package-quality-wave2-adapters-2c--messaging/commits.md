@@ -18,3 +18,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 11 | `7a99b6b` | refactor(cron): rename ports folder | S10 |
 | 12 | `c832c4a` | docs(cron): clear public doc lint | S11 |
 | 13 | `ef1dc87` | feat(cron): add testing entrypoint | S12 |
+| 14 | `6dc7dfa` | test(cron): cover scheduler cleanup | S13 |
