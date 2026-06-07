@@ -15,6 +15,7 @@ export type {
   ContextualJobHandler,
   CronExpression,
   CronProvider,
+  CronProviderRegistry,
   JobContext,
   JobExecutionResult,
   JobHandler,

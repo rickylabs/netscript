@@ -158,9 +158,13 @@ export interface JobLifecycleEvent {
 
 /** Typed scheduler event payload map. */
 export interface SchedulerEventMap {
+  /** Emitted after a job handler completes successfully or unsuccessfully. */
   jobRun: JobRunEvent;
+  /** Emitted when a job handler reports a failed execution. */
   jobError: JobRunEvent;
+  /** Emitted when a job is registered with the scheduler. */
   jobScheduled: JobLifecycleEvent;
+  /** Emitted when a job is removed from the scheduler. */
   jobUnscheduled: JobLifecycleEvent;
 }
 

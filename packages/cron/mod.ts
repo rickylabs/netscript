@@ -53,8 +53,7 @@
 
 import { DenoCronAdapter } from './adapters/deno.adapter.ts';
 import { MemoryCronAdapter } from './adapters/memory.adapter.ts';
-import type { CronProvider } from './ports/types.ts';
-import type { CronScheduler } from './ports/scheduler.ts';
+import type { CronProvider, CronScheduler } from './ports/mod.ts';
 
 // ============================================================================
 // FACTORY FUNCTION
@@ -193,7 +192,7 @@ export async function stopScheduler(): Promise<void> {
 }
 
 // ============================================================================
-// INTERFACES & TYPES
+// PORTS & TYPES
 // ============================================================================
 
 export type {
@@ -201,6 +200,7 @@ export type {
   ContextualJobHandler,
   CronExpression,
   CronProvider,
+  CronProviderRegistry,
   JobContext,
   JobExecutionResult,
   JobHandler,
@@ -211,15 +211,15 @@ export type {
   ScheduledJob,
   ScheduleOptions,
   SchedulerEventMap,
-} from './ports/types.ts';
+} from './ports/mod.ts';
 
 export {
   CronPresets,
   CronProviders,
   isValidCronExpression,
   parseCronExpression,
-} from './ports/types.ts';
+} from './ports/mod.ts';
 
-export type { CronScheduler, JobEventListener, SchedulerEvent } from './ports/scheduler.ts';
+export type { CronScheduler, JobEventListener, SchedulerEvent } from './ports/mod.ts';
 
 // ============================================================================
