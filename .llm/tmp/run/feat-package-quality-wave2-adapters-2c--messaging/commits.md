@@ -12,3 +12,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 5 | `e4761e2` | docs(queue): clear public doc lint | S4 |
 | 6 | `6811a56` | feat(queue): add testing memory adapter | S5 |
 | 7 | `6a2e283` | test(queue): cover abort cleanup | S6 |
+| 8 | `b71cde8` | chore(queue): add package quality tasks | S7 |
