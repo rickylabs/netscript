@@ -14,7 +14,8 @@
  * @module
  */
 
-import { ORPCError, ValidationError } from '@orpc/contract';
+import { ORPCError } from '@orpc/contract';
+import type { ValidationError } from '@orpc/contract';
 import type { GenericHandlerOptions } from './_types.ts';
 import { extractInputKeys } from './_utils.ts';
 

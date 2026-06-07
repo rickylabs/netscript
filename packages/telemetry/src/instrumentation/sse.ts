@@ -20,7 +20,7 @@ import {
   SpanKind,
   withSpan,
 } from '../core/mod.ts';
-import { type SerializedTraceContext } from '../context/mod.ts';
+import type { SerializedTraceContext } from '../context/mod.ts';
 import { SpanNames, SSEAttributes } from '../attributes/mod.ts';
 
 // ============================================================================
