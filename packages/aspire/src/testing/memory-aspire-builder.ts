@@ -10,14 +10,19 @@ import type { AspireBuilder } from '../ports/mod.ts';
 
 /** Recorded relationship between two in-memory Aspire resources. */
 export interface MemoryAspireReference {
+  /** Source resource name. */
   readonly from: string;
+  /** Target resource name. */
   readonly to: string;
+  /** Whether the source waits for the target before starting. */
   readonly waitFor: boolean;
 }
 
 /** In-memory Aspire builder used by tests and examples. */
 export class MemoryAspireBuilder implements AspireBuilder {
+  /** Resources added to the in-memory builder. */
   readonly resources: AspireResource[] = [];
+  /** Resource references recorded by the in-memory builder. */
   readonly references: MemoryAspireReference[] = [];
 
   /** Add a Deno service resource to the in-memory graph. */
@@ -70,7 +75,8 @@ export class MemoryAspireBuilder implements AspireBuilder {
     this.references.push({ from, to, waitFor: true });
   }
 
-  private pushResource(
+  /** Add a resource record to the in-memory graph. */
+  protected pushResource(
     name: string,
     kind: AspireResource['kind'],
     port: number | undefined,

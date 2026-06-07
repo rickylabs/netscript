@@ -30,6 +30,7 @@ export function createContributionContextFixture(
 
 /** Example contribution used by public tests and README snippets. */
 export class ExampleAspireContribution extends AspireNSPluginContribution {
+  /** Plugin name reported by the example contribution. */
   readonly pluginName = '@example/plugin';
 
   /** Contribute one Deno service to the supplied builder. */
