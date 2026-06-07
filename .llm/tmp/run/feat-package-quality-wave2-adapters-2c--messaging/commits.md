@@ -22,3 +22,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 15 | `d9db0f8` | chore(cron): add package quality tasks | S14 |
 | 16 | `9d38fd9` | chore(cron): verify publish readiness | S15 |
 | 17 | `62d8c88` | chore(2c): verify consumer gate | S16 |
+| 18 | `d3294de` | chore(2c): record e2e gate result | S17 |
