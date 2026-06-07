@@ -7,13 +7,16 @@
  * @module
  */
 
-import { type Context, context as otelContext, type Span, SpanKind } from '@opentelemetry/api';
+import { context as otelContext } from '@opentelemetry/api';
 import {
   addSpanEvent,
+  type Context,
   createSpan,
   getQueueTracer,
   setSpanError,
   setSpanOk,
+  type Span,
+  SpanKind,
   withSpan,
 } from '../core/mod.ts';
 import {
@@ -77,6 +80,9 @@ export class TracedQueue<T = unknown> implements MessageQueue<T> {
   private readonly options: Required<TracedQueueOptions>;
   private readonly tracer = getQueueTracer();
 
+  /**
+   * Create a traced queue wrapper around an existing queue implementation.
+   */
   constructor(inner: MessageQueue<T>, options: TracedQueueOptions) {
     this.inner = inner;
     this.options = {

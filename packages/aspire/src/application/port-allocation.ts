@@ -1,6 +1,8 @@
 /** Port allocation options for Aspire composition. */
 export interface PortAllocationOptions {
+  /** First generated port when no fallback is supplied. */
   readonly start?: number;
+  /** Pre-assigned ports keyed by resource name. */
   readonly assigned?: ReadonlyMap<string, number>;
 }
 

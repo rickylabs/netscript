@@ -3,6 +3,9 @@ import { getTelemetryConfig } from './environment.ts';
 
 let cachedConfig: TelemetryConfig | null = null;
 
+/**
+ * Return the cached telemetry configuration for the process.
+ */
 export function getConfig(): TelemetryConfig {
   if (!cachedConfig) {
     cachedConfig = getTelemetryConfig();
@@ -10,6 +13,9 @@ export function getConfig(): TelemetryConfig {
   return cachedConfig;
 }
 
+/**
+ * Clear the cached telemetry configuration.
+ */
 export function resetConfig(): void {
   cachedConfig = null;
 }

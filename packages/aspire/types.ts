@@ -17,71 +17,70 @@
  * ```
  */
 
-import type { z } from 'zod';
 import type {
-  AppEntrySchema,
-  AppSettingsSchema,
-  AppTypeSchema,
-  BackgroundProcessorEntrySchema,
-  CacheEngineSchema,
-  CacheEntrySchema,
-  DatabaseEngineSchema,
-  DatabaseEntrySchema,
-  DenoDefaultsSchema,
-  NetScriptConfigSchema,
-  OtelConfigSchema,
-  PluginEntrySchema,
-  ResourceModeSchema,
-  ServiceEntrySchema,
-  ToolEntrySchema,
+  AppEntry as AppEntryConfig,
+  AppSettings as AppSettingsConfig,
+  AppType as AppTypeConfig,
+  BackgroundProcessorEntry as BackgroundProcessorEntryConfig,
+  CacheEngine as CacheEngineConfig,
+  CacheEntry as CacheEntryConfig,
+  DatabaseEngine as DatabaseEngineConfig,
+  DatabaseEntry as DatabaseEntryConfig,
+  DenoDefaults as DenoDefaultsConfig,
+  NetScriptConfig as NetScriptConfigValue,
+  OtelConfig as OtelConfigValue,
+  PluginEntry as PluginEntryConfig,
+  ResourceMode as ResourceModeConfig,
+  ServiceEntry as ServiceEntryConfig,
+  ToolEntry as ToolEntryConfig,
 } from './config.ts';
 
 // --- Base Types (z.infer<> derived) ---
 
 /** Full `appsettings.json` structure. */
-export type AppSettings = z.infer<typeof AppSettingsSchema>;
+export type AppSettings = AppSettingsConfig;
 
 /** Root `NetScript` configuration section. */
-export type NetScriptConfig = z.infer<typeof NetScriptConfigSchema>;
+export type NetScriptConfig = NetScriptConfigValue;
 
 /** A service resource entry. */
-export type ServiceEntry = z.infer<typeof ServiceEntrySchema>;
+export type ServiceEntry = ServiceEntryConfig;
 
 /** An application resource entry. */
-export type AppEntry = z.infer<typeof AppEntrySchema>;
+export type AppEntry = AppEntryConfig;
 
 /** A plugin resource entry. */
-export type PluginEntry = z.infer<typeof PluginEntrySchema>;
+export type PluginEntry = PluginEntryConfig;
 
 /** A background processor entry (worker, saga, or trigger). */
-export type BackgroundProcessorEntry = z.infer<typeof BackgroundProcessorEntrySchema>;
+export type BackgroundProcessorEntry = BackgroundProcessorEntryConfig;
 
 /** A database resource entry. */
-export type DatabaseEntry = z.infer<typeof DatabaseEntrySchema>;
+export type DatabaseEntry = DatabaseEntryConfig;
 
 /** A cache resource entry. */
-export type CacheEntry = z.infer<typeof CacheEntrySchema>;
+export type CacheEntry = CacheEntryConfig;
 
 /** A development tool entry. */
-export type ToolEntry = z.infer<typeof ToolEntrySchema>;
+export type ToolEntry = ToolEntryConfig;
 
 /** OpenTelemetry exporter configuration. */
-export type OtelConfig = z.infer<typeof OtelConfigSchema>;
+export type OtelConfig = OtelConfigValue;
 
 /** Global Deno runtime defaults. */
-export type DenoDefaults = z.infer<typeof DenoDefaultsSchema>;
+export type DenoDefaults = DenoDefaultsConfig;
 
 /** Supported database engine types. */
-export type DatabaseEngine = z.infer<typeof DatabaseEngineSchema>;
+export type DatabaseEngine = DatabaseEngineConfig;
 
 /** Supported cache engine types. */
-export type CacheEngine = z.infer<typeof CacheEngineSchema>;
+export type CacheEngine = CacheEngineConfig;
 
 /** Resource provisioning mode. */
-export type ResourceMode = z.infer<typeof ResourceModeSchema>;
+export type ResourceMode = ResourceModeConfig;
 
 /** Application type variant. */
-export type AppType = z.infer<typeof AppTypeSchema>;
+export type AppType = AppTypeConfig;
 
 // --- Generic Resource Name Extraction Utilities ---
 
@@ -93,34 +92,34 @@ export type AppType = z.infer<typeof AppTypeSchema>;
  * type Services = KnownServices<typeof myConfig>; // "users" | "products" | "orders"
  * ```
  */
-export type KnownServices<T extends NetScriptConfig> = keyof T['Services'] & string;
+export type KnownServices<T extends { Services: object }> = keyof T['Services'] & string;
 
 /**
  * Extracts known plugin names as a literal union type from a config type.
  */
-export type KnownPlugins<T extends NetScriptConfig> = keyof T['Plugins'] & string;
+export type KnownPlugins<T extends { Plugins: object }> = keyof T['Plugins'] & string;
 
 /**
  * Extracts known database names as a literal union type from a config type.
  */
-export type KnownDatabases<T extends NetScriptConfig> = keyof T['Databases'] & string;
+export type KnownDatabases<T extends { Databases: object }> = keyof T['Databases'] & string;
 
 /**
  * Extracts known app names as a literal union type from a config type.
  */
-export type KnownApps<T extends NetScriptConfig> = keyof T['Apps'] & string;
+export type KnownApps<T extends { Apps: object }> = keyof T['Apps'] & string;
 
 /**
  * Extracts known background processor names as a literal union type from a config type.
  */
-export type KnownBackgroundProcessors<T extends NetScriptConfig> =
+export type KnownBackgroundProcessors<T extends { BackgroundProcessors: object }> =
   & keyof T['BackgroundProcessors']
   & string;
 
 /**
  * Extracts known cache names as a literal union type from a config type.
  */
-export type KnownCaches<T extends NetScriptConfig> = keyof T['Cache'] & string;
+export type KnownCaches<T extends { Cache: object }> = keyof T['Cache'] & string;
 
 // --- Typed Entry Accessors ---
 

@@ -1,14 +1,16 @@
+import { context, type Span as OtelSpan, trace } from '@opentelemetry/api';
 import {
-  context,
+  type CreateSpanOptions,
   type Span,
   SpanKind,
   type SpanOptions,
   SpanStatusCode,
-  trace,
   type Tracer,
-} from '@opentelemetry/api';
-import type { CreateSpanOptions } from './types.ts';
+} from './types.ts';
 
+/**
+ * Create a span from the supplied tracer and parent context options.
+ */
 export function createSpan(
   tracer: Tracer,
   name: string,
@@ -24,6 +26,9 @@ export function createSpan(
   return tracer.startSpan(name, spanOptions, parentContext);
 }
 
+/**
+ * Execute an async or sync callback inside a span and close it on completion.
+ */
 export async function withSpan<T>(
   tracer: Tracer,
   name: string,
@@ -39,7 +44,7 @@ export async function withSpan<T>(
 
   try {
     const result = await context.with(
-      trace.setSpan(parentContext, span),
+      trace.setSpan(parentContext, span as OtelSpan),
       async () => await fn(span),
     );
     span.setStatus({ code: SpanStatusCode.OK });
@@ -56,6 +61,9 @@ export async function withSpan<T>(
   }
 }
 
+/**
+ * Execute a synchronous callback inside a span and close it on completion.
+ */
 export function withSpanSync<T>(
   tracer: Tracer,
   name: string,
@@ -70,7 +78,7 @@ export function withSpanSync<T>(
   }, parentContext);
 
   try {
-    const result = context.with(trace.setSpan(parentContext, span), () => fn(span));
+    const result = context.with(trace.setSpan(parentContext, span as OtelSpan), () => fn(span));
     span.setStatus({ code: SpanStatusCode.OK });
     return result;
   } catch (error: unknown) {

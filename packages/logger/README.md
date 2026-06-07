@@ -187,6 +187,7 @@ Relevant environment variables:
   returned a 4xx/5xx status, not that the middleware itself failed.
 - The package uses LogTape context-local storage during configuration so `withContext()` works in
   live request flows.
+- `createConsoleLogger()` is intended for lightweight tests and CLIs that do not need middleware.
 
 ## Resources
 

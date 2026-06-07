@@ -1,3 +1,6 @@
+/**
+ * Semantic worker attribute names used by worker instrumentation.
+ */
 export const WorkerAttributes = {
   WORKER_ID: 'worker.id',
   WORKER_CONCURRENCY: 'worker.concurrency',

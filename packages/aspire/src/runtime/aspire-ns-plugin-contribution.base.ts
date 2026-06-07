@@ -8,6 +8,7 @@ import type { AspireBuilder } from '../ports/mod.ts';
 
 /** Base class plugins extend to contribute Aspire resources to an AppHost. */
 export abstract class AspireNSPluginContribution {
+  /** Plugin package name. */
   abstract readonly pluginName: string;
 
   /**

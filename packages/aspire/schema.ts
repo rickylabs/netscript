@@ -18,7 +18,7 @@
  */
 
 import { z } from 'zod';
-import { AppSettingsSchema } from './config.ts';
+import { type AppSettings, AppSettingsSchema } from './config.ts';
 
 /**
  * Generates a JSON Schema (draft-7) from the Zod `AppSettingsSchema`.
@@ -32,7 +32,7 @@ import { AppSettingsSchema } from './config.ts';
  * @returns A JSON Schema object suitable for writing to `appsettings.schema.json`
  */
 export function generateAppSettingsJsonSchema(): Record<string, unknown> {
-  const base = z.toJSONSchema(AppSettingsSchema, {
+  const base = z.toJSONSchema(AppSettingsSchema as z.ZodType<AppSettings>, {
     target: 'draft-7',
   });
 

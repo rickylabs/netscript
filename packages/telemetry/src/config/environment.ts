@@ -28,6 +28,9 @@ function getEnv(name: string): string | undefined {
   }
 }
 
+/**
+ * Resolve telemetry configuration from OpenTelemetry environment variables.
+ */
 export function getTelemetryConfig(): TelemetryConfig {
   const enabled = getEnv(OTEL_ENV_VARS.OTEL_DENO) === 'true';
   const endpoint = getEnv(OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_ENDPOINT);
@@ -52,18 +55,30 @@ export function getTelemetryConfig(): TelemetryConfig {
   };
 }
 
+/**
+ * Return whether OpenTelemetry instrumentation is enabled.
+ */
 export function isTelemetryEnabled(): boolean {
   return getEnv(OTEL_ENV_VARS.OTEL_DENO) === 'true';
 }
 
+/**
+ * Return the configured service name or the default service name.
+ */
 export function getServiceName(): string {
   return getEnv(OTEL_ENV_VARS.OTEL_SERVICE_NAME) ?? 'unknown-service';
 }
 
+/**
+ * Return the configured OTLP endpoint, when present.
+ */
 export function getOtlpEndpoint(): string | undefined {
   return getEnv(OTEL_ENV_VARS.OTEL_EXPORTER_OTLP_ENDPOINT);
 }
 
+/**
+ * Return configured OpenTelemetry environment variables.
+ */
 export function getOtelEnvVars(): Record<string, string> {
   const vars: Record<string, string> = {};
   for (const key of Object.values(OTEL_ENV_VARS)) {
@@ -75,6 +90,9 @@ export function getOtelEnvVars(): Record<string, string> {
   return vars;
 }
 
+/**
+ * Return a log-safe summary of the resolved telemetry configuration.
+ */
 export function describeTelemetryConfig(): TelemetryConfigDescription {
   const config = getTelemetryConfig();
   return {

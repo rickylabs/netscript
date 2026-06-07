@@ -1,3 +1,6 @@
+/**
+ * Semantic Server-Sent Events attribute names.
+ */
 export const SSEAttributes = {
   SSE_CLIENT_ID: 'sse.client_id',
   SSE_EVENT_TYPE: 'sse.event_type',
