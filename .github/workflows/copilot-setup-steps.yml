@@ -53,7 +53,8 @@ jobs:
         run: |
           set -euo pipefail
           aspire_version="13.4.2"
-          # This commit in dotnet/aspire is the target of the v13.4.2 release tag.
+          # Commit d7d0b6759ce4b936c76bc4775814d27db560dd6d is the target
+          # of the v13.4.2 release tag in dotnet/aspire.
           installer_url="https://raw.githubusercontent.com/dotnet/aspire/d7d0b6759ce4b936c76bc4775814d27db560dd6d/eng/scripts/get-aspire-cli.sh"
           installer_sha256="df1247d87f6e5ca83e71abf55f78bca1bd9a421a3f2f0fd5481f153fc958632a"
           installer="$(mktemp)"
@@ -95,7 +96,7 @@ jobs:
           fi
           mapfile -d '' deno_sources < <(find "${deno_source_dirs[@]}" -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \) -print0)
           if ((${#deno_sources[@]})); then
-            # Batch files to stay comfortably below shell command-line length limits.
+            # 50 files is a conservative margin for typical ~128 KB command-line limits.
             if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
               echo "::warning::Deno cache warming failed. Non-fatal, but may affect firewalled sessions."
             fi
