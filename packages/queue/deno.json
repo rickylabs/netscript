@@ -11,10 +11,11 @@
     "./adapters/kv-polling": "./adapters/kv-polling.adapter.ts",
     "./ports": "./ports/mod.ts",
     "./errors": "./ports/errors.ts",
-    "./validation": "./validation/mod.ts"
+    "./validation": "./validation/mod.ts",
+    "./testing": "./testing/mod.ts"
   },
   "tasks": {
-    "check": "deno check ./mod.ts ./ports/mod.ts ./ports/errors.ts ./validation/mod.ts ./adapters/deno-kv.adapter.ts ./adapters/redis.adapter.ts ./adapters/amqp.adapter.ts ./adapters/kv-polling.adapter.ts",
+    "check": "deno check ./mod.ts ./ports/mod.ts ./ports/errors.ts ./validation/mod.ts ./testing/mod.ts ./adapters/deno-kv.adapter.ts ./adapters/redis.adapter.ts ./adapters/amqp.adapter.ts ./adapters/kv-polling.adapter.ts",
     "test": "deno test ./tests/"
   },
   "imports": {
