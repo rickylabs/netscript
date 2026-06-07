@@ -159,3 +159,14 @@ archetype gate matrix in `.llm/harness/gates/archetype-gate-matrix.md`.
 - Evaluator must be a different session from the generator.
 - Never delete lock files / caches; never `deno cache --reload` without approval.
 - Record every deviation from the locked plan in `drift.md`.
+
+## Resume update — 2026-06-07 Augment feedback fix
+
+- PR review by Augment reported three legitimate issues in `packages/queue/testing/memory-queue.ts`.
+- Fixed in `af471cf`:
+  - `nack({ requeue: true })` no longer leaves a redelivered item auto-settled after handler return.
+  - `listen()` now exits without polling when passed an already-aborted signal.
+  - `wait()` now removes its abort listener when the timeout fires, avoiding listener accumulation in idle loops.
+- Added `packages/queue/tests/memory-queue_test.ts` covering those edge cases.
+- Also typed the V8-only `Error.captureStackTrace` hook in `packages/queue/ports/errors.ts`; the new regression test exposed the standard `ErrorConstructor` typing gap.
+- Validation from `packages/queue`: `deno task fmt --check`, `deno task lint`, `deno task check --unstable-kv`, targeted memory queue tests (3 passed), full queue tests (19 passed), and `deno doc --lint testing/mod.ts testing/memory-queue.ts ports/errors.ts`.
