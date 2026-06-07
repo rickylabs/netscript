@@ -161,11 +161,13 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
 
     try {
       await handler(item.message, context);
-      if (!item.settled && !this.pendingItems.has(item)) {
+      const wasRequeued = this.isPending(item);
+      if (!item.settled && !wasRequeued) {
         item.settled = true;
       }
     } catch (error) {
-      if (!item.settled && !this.pendingItems.has(item)) {
+      const wasRequeued = this.isPending(item);
+      if (!item.settled && !wasRequeued) {
         this.requeue(item);
       }
       throw error;
@@ -201,13 +203,20 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
   private requeue(item: MemoryQueueItem<T>): void {
     item.settled = false;
     item.availableAt = Date.now();
-    if (this.pendingItems.has(item)) {
+    if (this.isPending(item)) {
       this.sortPending();
       return;
     }
     this.pending.push(item);
     this.pendingItems.add(item);
     this.sortPending();
+  }
+
+  /**
+   * Return whether an item is currently waiting for delivery.
+   */
+  private isPending(item: MemoryQueueItem<T>): boolean {
+    return this.pendingItems.has(item);
   }
 
   /**

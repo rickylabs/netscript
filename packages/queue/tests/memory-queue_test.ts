@@ -21,11 +21,10 @@ Deno.test('memory queue preserves requeued item settlement state', async () => {
   await assertRejects(
     () =>
       queue.listen(
-        async (_message, context) => {
+        (_message, context) => {
           secondContext = context;
           secondController.abort();
-          await Promise.resolve();
-          throw new Error('retry me');
+          return Promise.reject(new Error('retry me'));
         },
         { signal: secondController.signal },
       ),
@@ -45,9 +44,9 @@ Deno.test('memory queue listen exits when caller signal is already aborted', asy
   let handled = false;
 
   const listening = queue.listen(
-    async () => {
-      await Promise.resolve();
+    () => {
       handled = true;
+      return Promise.resolve();
     },
     { signal: controller.signal },
   );
