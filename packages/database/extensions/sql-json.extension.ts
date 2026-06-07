@@ -569,21 +569,35 @@ export function mysqlJsonExtension<
  * Export serialization utilities for manual use if needed.
  * These are useful when working with raw queries or custom operations.
  */
-export const jsonUtils = {
+export const jsonUtils: {
+  readonly toJsonString: (value: unknown) => string | null;
+  readonly fromJsonString: <T = unknown>(value: unknown) => T | null;
+  readonly serializeData: (
+    model: string,
+    data: Record<string, unknown>,
+  ) => Record<string, unknown>;
+  readonly deserializeData: (
+    model: string,
+    data: Record<string, unknown>,
+  ) => Record<string, unknown>;
+  readonly getJsonFields: (model: string) => readonly string[];
+  readonly hasJsonFields: (model: string) => boolean;
+  readonly resetRegistry: () => void;
+} = {
   /** Convert value to JSON string for database storage */
-  toJsonString,
+  toJsonString: toJsonString,
   /** Parse JSON string from database to object */
-  fromJsonString,
+  fromJsonString: fromJsonString,
   /** Serialize JSON fields in a data object */
-  serializeData,
+  serializeData: serializeData,
   /** Deserialize JSON fields in a result object */
-  deserializeData,
+  deserializeData: deserializeData,
   /** Get configured JSON fields for a model */
-  getJsonFields,
+  getJsonFields: getJsonFields,
   /** Check if a model has JSON fields configured */
-  hasJsonFields,
+  hasJsonFields: hasJsonFields,
   /** Reset registry to defaults */
-  resetRegistry,
+  resetRegistry: resetRegistry,
 } as const;
 
 /**
