@@ -55,12 +55,14 @@ jobs:
           aspire_version="13.4.2"
           # Commit d7d0b6759ce4b936c76bc4775814d27db560dd6d is the target
           # of the v13.4.2 release tag in dotnet/aspire.
+          # To verify/update: inspect https://github.com/dotnet/aspire/releases/tag/v13.4.2.
           installer_url="https://raw.githubusercontent.com/dotnet/aspire/d7d0b6759ce4b936c76bc4775814d27db560dd6d/eng/scripts/get-aspire-cli.sh"
           installer_sha256="df1247d87f6e5ca83e71abf55f78bca1bd9a421a3f2f0fd5481f153fc958632a"
           installer="$(mktemp)"
           trap 'rm -f "$installer"' EXIT
           curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 \
             --output "$installer" "$installer_url"
+          # sha256sum --check expects: hash<two spaces>filename.
           if ! echo "$installer_sha256  $installer" | sha256sum --check; then
             echo "::error::Aspire installer hash verification failed for $installer_url"
             exit 1
@@ -97,6 +99,7 @@ jobs:
           mapfile -d '' deno_sources < <(find "${deno_source_dirs[@]}" -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \) -print0)
           if ((${#deno_sources[@]})); then
             # 50 files is a conservative margin for typical ~128 KB command-line limits.
+            # --no-lock avoids mutating the checkout; this is only cache warming.
             if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
               echo "::warning::Deno cache warming failed. Non-fatal, but may affect firewalled sessions."
             fi
