@@ -8,3 +8,4 @@ Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-qual
 | 1 | `83d408d` | Add Wave 2c research and locked plan artifacts | Research + Plan & Design |
 | 2 | `83c4644` | refactor(queue): rename ports and validation folders | S1 |
 | 3 | `557680c` | feat(queue): retarget ports exports | S2 |
+| 4 | `7e82d61` | refactor(queue): retarget renamed imports | S3 |
