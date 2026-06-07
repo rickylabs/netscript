@@ -7,7 +7,7 @@ import {
 } from '../config.ts';
 
 const REAL_CONFIG_PATH = new URL(
-  '../../../dotnet/AppHost/appsettings.json',
+  './_fixtures/appsettings.json',
   import.meta.url,
 ).pathname.replace(/^\/([A-Z]:)/, '$1'); // Fix Windows path
 

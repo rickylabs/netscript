@@ -5,22 +5,30 @@ import type { AspireBuilder } from '../ports/mod.ts';
 
 /** Minimal manifest shape consumed by Aspire composition. */
 export interface ComposePluginManifest {
+  /** Plugin package name. */
   readonly name: string;
+  /** Optional contribution declarations. */
   readonly contributions?: {
+    /** Aspire contribution constructor. */
     readonly aspire?: new () => AspireNSPluginContribution;
   };
 }
 
 /** Options for composing plugin Aspire contributions into an AppHost builder. */
 export interface ComposeAppHostOptions {
+  /** Builder receiving resources from plugin contributions. */
   readonly builder: AspireBuilder;
+  /** Context passed to each plugin contribution. */
   readonly context: ContributionContext;
+  /** Plugin manifests to compose. */
   readonly plugins: readonly ComposePluginManifest[];
 }
 
 /** Result of composing an AppHost from plugin Aspire contributions. */
 export interface ComposeAppHostResult {
+  /** Resources contributed by plugins. */
   readonly resources: readonly AspireResource[];
+  /** Registry containing instantiated contributions. */
   readonly registry: ContributionRegistry;
 }
 

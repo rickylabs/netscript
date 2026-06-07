@@ -1,3 +1,6 @@
+/**
+ * Semantic key-value store attribute names.
+ */
 export const KVAttributes = {
   KV_OPERATION: 'kv.operation',
   KV_KEY: 'kv.key',
@@ -6,6 +9,9 @@ export const KVAttributes = {
   KV_VALUE_SIZE: 'kv.value_size_bytes',
 } as const;
 
+/**
+ * Key-value store operation names.
+ */
 export const KVOperations = {
   GET: 'get',
   SET: 'set',

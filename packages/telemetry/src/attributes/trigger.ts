@@ -1,3 +1,6 @@
+/**
+ * Semantic trigger attribute names used by trigger instrumentation.
+ */
 export const TriggerAttributes = {
   TRIGGER_ID: 'netscript.trigger.id',
   TRIGGER_TYPE: 'netscript.trigger.type',
@@ -21,6 +24,9 @@ export const TriggerAttributes = {
   LIFECYCLE_ARCHIVE_PATH: 'netscript.trigger.lifecycle.archive_path',
 } as const;
 
+/**
+ * Build semantic attributes for a trigger definition.
+ */
 export function createTriggerAttributes(trigger: {
   id: string;
   name?: string;
@@ -36,6 +42,9 @@ export function createTriggerAttributes(trigger: {
   return attrs;
 }
 
+/**
+ * Build semantic attributes for a trigger file payload.
+ */
 export function createTriggerFileAttributes(payload: {
   filePath?: string;
   fileName?: string;

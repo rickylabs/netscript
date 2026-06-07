@@ -34,6 +34,7 @@
     "jsr:@std/async@1": "1.3.0",
     "jsr:@std/bytes@^1.0.4": "1.0.6",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
+    "jsr:@std/cli@1": "1.0.29",
     "jsr:@std/cli@^1.0.29": "1.0.29",
     "jsr:@std/collections@1": "1.1.7",
     "jsr:@std/collections@^1.0.9": "1.1.7",
@@ -349,7 +350,7 @@
     "@std/http@1.1.0": {
       "integrity": "265cd9a589fea924c5bb0bbed8bebb4bb2fa19129f760bd014e78dbd7a365a51",
       "dependencies": [
-        "jsr:@std/cli",
+        "jsr:@std/cli@^1.0.29",
         "jsr:@std/encoding",
         "jsr:@std/fmt@^1.0.10",
         "jsr:@std/fs@^1.0.23",

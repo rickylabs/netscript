@@ -9,7 +9,8 @@
  * @module
  */
 
-import { SpanStatusCode, trace } from '@opentelemetry/api';
+import { trace } from '@opentelemetry/api';
+import { SpanStatusCode } from '../core/mod.ts';
 import type { GenericHandlerOptions } from './_types.ts';
 import { extractInputKeys } from './_utils.ts';
 
@@ -82,6 +83,9 @@ export class TracingPlugin {
    */
   order = 1000;
 
+  /**
+   * Create an oRPC tracing plugin.
+   */
   constructor(options: TracingPluginOptions = {}) {
     this.options = {
       serviceName: options.serviceName ?? 'unknown',

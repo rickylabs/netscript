@@ -1,6 +1,9 @@
 import { MessagingAttributes } from './messaging.ts';
 import { JobAttributes } from './job.ts';
 
+/**
+ * Build semantic messaging attributes for a queue operation.
+ */
 export function createMessagingAttributes(options: {
   system: string;
   destination: string;
@@ -23,6 +26,9 @@ export function createMessagingAttributes(options: {
   return attrs;
 }
 
+/**
+ * Build semantic job attributes for scheduler or worker spans.
+ */
 export function createJobAttributes(job: {
   id: string;
   name?: string;

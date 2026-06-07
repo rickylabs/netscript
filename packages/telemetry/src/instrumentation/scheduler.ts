@@ -8,20 +8,21 @@
  */
 
 import {
-  type Attributes,
-  type Context,
   context as otelContext,
   ROOT_CONTEXT,
-  type Span,
-  SpanKind,
+  type Span as OtelSpan,
   trace,
 } from '@opentelemetry/api';
 import {
   addSpanEvent,
+  type Attributes,
+  type Context,
   createSpan,
   getSchedulerTracer,
   setSpanError,
   setSpanOk,
+  type Span,
+  SpanKind,
   withSpan,
 } from '../core/mod.ts';
 import { injectContext, type PropagationHeaders } from '../context/mod.ts';
@@ -40,14 +41,23 @@ import {
  * Job definition for scheduler tracing
  */
 export interface ScheduledJobDefinition {
+  /** Job identifier. */
   id: string;
+  /** Human-readable job name. */
   name?: string;
+  /** Cron expression or schedule descriptor. */
   schedule?: string;
+  /** Time zone used to evaluate the schedule. */
   timezone?: string;
+  /** Whether the job is enabled. */
   enabled?: boolean;
+  /** Script or command entrypoint. */
   entrypoint?: string;
+  /** Execution timeout in milliseconds. */
   timeout?: number;
+  /** Maximum retry attempts. */
   maxRetries?: number;
+  /** Scheduling or routing tags. */
   tags?: string[];
 }
 
@@ -294,7 +304,7 @@ export function startJobDispatchSpan(
   let headers = options.headers ?? {};
   if (options.propagateContext !== false) {
     // Create a context with the dispatch span, then inject it into headers
-    const contextWithDispatchSpan = trace.setSpan(parentContext, span);
+    const contextWithDispatchSpan = trace.setSpan(parentContext, span as OtelSpan);
     headers = injectContext({ ...headers }, contextWithDispatchSpan);
   }
 
@@ -336,7 +346,7 @@ export async function traceJobDispatch(
   // Create context with the dispatch span so that any child operations
   // (like TracedQueue.enqueue) will be properly parented
   const parentContext = options.root ? ROOT_CONTEXT : otelContext.active();
-  const dispatchContext = trace.setSpan(parentContext, span);
+  const dispatchContext = trace.setSpan(parentContext, span as OtelSpan);
 
   try {
     // Run the callback WITHIN the dispatch span's context

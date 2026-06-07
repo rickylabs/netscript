@@ -7,7 +7,8 @@
  * @module
  */
 
-import { type Attributes, type Span, trace } from '@opentelemetry/api';
+import { type Attributes, trace } from '@opentelemetry/api';
+import type { Span } from '../core/mod.ts';
 
 // ============================================================================
 // TYPES
@@ -166,7 +167,7 @@ export function createTraceContext(): TraceContext {
     },
 
     getSpan(): Span | undefined {
-      return trace.getActiveSpan();
+      return trace.getActiveSpan() as Span | undefined;
     },
 
     recordException(error: Error): void {

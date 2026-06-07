@@ -1,3 +1,6 @@
+/**
+ * Semantic execution attribute names used by job instrumentation.
+ */
 export const ExecutionAttributes = {
   EXECUTION_ID: 'execution.id',
   EXECUTION_STARTED_AT: 'execution.started_at',
