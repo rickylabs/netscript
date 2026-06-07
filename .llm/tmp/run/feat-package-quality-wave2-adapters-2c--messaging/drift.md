@@ -42,6 +42,7 @@
 | Cron `./testing` reuse vs duplicate | **Reuse** `MemoryCronAdapter` via `./testing` re-export barrel | Existing `adapters/memory.adapter.ts` already provides full `CronScheduler` + test helpers (`triggerAll`, `waitForExecutions`, etc.). Duplicating would violate DRY and inflate F-16 cardinality. |
 | Queue `./testing` | **New** `MemoryQueueAdapter<T>` | No in-memory queue adapter exists today. Required for multi-adapter A2 archetype `./testing` port-contract entrypoint. |
 | `_envelope.ts` / `_shared.ts` JSDoc obligation | **None** | Not exported from any barrel; underscore-private by convention. |
+| Cron `./testing` implementation | **Re-export only** `MemoryCronAdapter` from `packages/cron/testing/mod.ts` | Slice 12 followed the locked reuse decision; no duplicate adapter was introduced. |
 
 ## PLAN-EVAL refinements (applied during evaluator session)
 
