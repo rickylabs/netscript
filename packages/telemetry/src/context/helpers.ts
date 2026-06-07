@@ -2,6 +2,12 @@ import { context, type Span as OtelSpan, trace } from '@opentelemetry/api';
 import type { Context, Span } from '../core/mod.ts';
 
 function assertOtelSpan(span: Span): asserts span is Span & OtelSpan {
+  if (span === null || typeof span !== 'object') {
+    throw new TypeError(
+      'Expected an OpenTelemetry-compatible span object before adding it to context',
+    );
+  }
+
   for (
     const method of [
       'spanContext',
@@ -19,7 +25,7 @@ function assertOtelSpan(span: Span): asserts span is Span & OtelSpan {
   ) {
     if (typeof span[method] !== 'function') {
       throw new TypeError(
-        `Expected an OpenTelemetry-compatible span before adding it to context; missing method '${method}'`,
+        `Expected an OpenTelemetry-compatible span before adding it to context; missing required method '${method}'`,
       );
     }
   }

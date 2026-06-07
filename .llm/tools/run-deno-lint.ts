@@ -201,7 +201,7 @@ function isAbsolutePath(path: string): boolean {
 
 function resolveFromCwd(cwd: string, path: string): string {
   if (isAbsolutePath(path)) return path;
-  return `${cwd.replace(/[/\\]+$/, '')}/${path}`;
+  return normalizePath(`${cwd.replace(/[/\\]+$/, '')}/${path.replace(/^[/\\]+/, '')}`);
 }
 
 function relativePath(cwd: string, path: string): string {
