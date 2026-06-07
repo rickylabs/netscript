@@ -33,6 +33,14 @@
 | Queue `./testing` | **New** `MemoryQueueAdapter<T>` | No in-memory queue adapter exists today. Required for multi-adapter A2 archetype `./testing` port-contract entrypoint. |
 | `_envelope.ts` / `_shared.ts` JSDoc obligation | **None** | Not exported from any barrel; underscore-private by convention. |
 
+## PLAN-EVAL refinements (applied during evaluator session)
+
+| Date | Severity | Item | Evidence | Action |
+|------|----------|------|----------|--------|
+| 2026-06-07 | note | Export/task enumeration completeness | queue `deno.json` also exports `./errors` → `./interfaces/errors.ts` and a `./validation` subpath → `./utils/mod.ts`; both `tasks.check` (queue + cron) reference renamed paths. Slice 2 originally named only `./types`→`./ports`. | Slice 2 expanded to retarget `./errors`→`./ports/errors.ts`, `./validation`→`./validation/mod.ts`, and `tasks.check`; cron slice 10 expanded to retarget `tasks.check` and point `./types`→`./ports/mod.ts` barrel. Caught by F-5/F-6/static gates regardless; no rework risk. |
+| 2026-06-07 | note | Debt closure precision (AP-16) | F-11 allow-list permits `internal/` (`09-anti-patterns…md` §F-11; `05-folder-structure.md:29`), conflicting with handoff table `10-…:30` ("lift internal/ and utils/"). | Plan "Debt implications" updated: AP-16 closure scoped to `utils/`(+`interfaces/`); `internal/` retained as doctrine-allowed; doctrine-doc tension recorded. |
+| 2026-06-07 | note | Debt registry error (AP-17 cron) | `arch-debt.md:82` marks cron AP-17 `closed 2026-05-01` with a CLI-permissions closure note, yet `packages/cron/interfaces/` still exists (rename never done). | Plan "Debt implications" updated: slice 10 must correct the erroneous closure, not close an already-closed entry. |
+
 ## Re-baseline drift (post-Research)
 
 | Date | Severity | Item | Evidence | Action |

@@ -63,7 +63,7 @@ All open decisions are **safe to defer** — none force rework if deferred.
 | # | Slice | Gate | Files |
 |---|-------|------|-------|
 | 1 | queue: rename `interfaces/` → `ports/`, `utils/` → `validation/` | F-3, F-11, F-16 | `packages/queue/interfaces/*` → `packages/queue/ports/*`, `packages/queue/utils/*` → `packages/queue/validation/*` |
-| 2 | queue: update subpath exports (`./types` → `./ports`, `./validation` stays) | F-5, consumer | `packages/queue/deno.json` |
+| 2 | queue: update subpath exports + tasks. `./types` → `./ports` (target `./ports/mod.ts` barrel); `./errors` → `./ports/errors.ts`; `./validation` subpath name stays but retarget `./utils/mod.ts` → `./validation/mod.ts`; update `tasks.check` paths (`interfaces/*`→`ports/*`, `utils/mod.ts`→`validation/mod.ts`) | F-5, F-6, consumer | `packages/queue/deno.json` |
 | 3 | queue: update all internal imports after rename | F-3, static | `packages/queue/**/*.ts` |
 | 4 | queue: fix doc-lint errors (JSDoc + private-type-ref) | F-7 | `packages/queue/ports/*.ts`, `packages/queue/adapters/*.ts`, `packages/queue/factory/*.ts` |
 | 5 | queue: add `./testing` entrypoint with `MemoryQueueAdapter` | F-5, F-3 | `packages/queue/testing/mod.ts`, `packages/queue/testing/memory-queue.ts` |
@@ -76,7 +76,7 @@ All open decisions are **safe to defer** — none force rework if deferred.
 
 | # | Slice | Gate | Files |
 |---|-------|------|-------|
-| 10 | cron: rename `interfaces/` → `ports/`, update subpath (`./types` → `./ports`) | F-3, F-11, F-16, consumer | `packages/cron/interfaces/*` → `packages/cron/ports/*`, `packages/cron/deno.json` |
+| 10 | cron: rename `interfaces/` → `ports/`, update subpath (`./types` → `./ports`, target `./ports/mod.ts` barrel) + `tasks.check` paths (`interfaces/mod.ts`→`ports/mod.ts`) | F-3, F-11, F-16, consumer | `packages/cron/interfaces/*` → `packages/cron/ports/*`, `packages/cron/deno.json` |
 | 11 | cron: fix doc-lint errors (JSDoc + `CronProviderRegistry` visibility + private-type-ref) | F-7 | `packages/cron/ports/*.ts`, `packages/cron/mod.ts` |
 | 12 | cron: add `./testing` entrypoint re-exporting `MemoryCronAdapter` | F-5, F-3 | `packages/cron/testing/mod.ts` |
 | 13 | cron: add defensive I/O tests (abort/cleanup for scheduler timers) | F-10 | `packages/cron/tests/abort-cleanup_test.ts` |
@@ -96,8 +96,8 @@ All open decisions are **safe to defer** — none force rework if deferred.
 
 | Debt entry | Closing slice | How |
 |------------|---------------|-----|
-| `packages/queue — AP-16 / doctrine verdict Refactor` | Slice 1 | `utils/` → `validation/`, `interfaces/` → `ports/` |
-| `packages/cron — AP-17 / doctrine verdict Refactor` | Slice 10 | `interfaces/` → `ports/` rename |
+| `packages/queue — AP-16` | Slice 1 | `utils/` → `validation/`, plus `interfaces/` → `ports/` (interfaces/ is F-11-forbidden). **Scope note:** the AP-16 entry text also names `internal/`, but F-11's allow-list explicitly permits `internal/` (`09-anti-patterns-and-fitness-functions.md` §F-11; `05-folder-structure.md:29`). `internal/` is therefore **retained**, not a violation. The doctrine handoff table (`10-codebase-verdict-and-handoff.md:30`) says "lift internal/ and utils/", which conflicts with the F-11 gate (source of truth). Closing AP-16 must record this and scope the closure to the `utils/` (+ `interfaces/`) remediation only. |
+| `packages/cron — AP-17` | Slice 10 | `interfaces/` → `ports/` rename. **Registry-correction note:** the AP-17 entry is currently marked `closed 2026-05-01` with a **mismatched closure note** (about CLI permissions) even though cron still has an `interfaces/` folder — i.e. the rename was never performed and the closure is erroneous. Slice 10 performs the real remediation; the plan must **correct the erroneous closure** (re-anchor reason + closure evidence to the interfaces→ports rename) rather than "close" an already-closed entry. |
 
 **Remaining open:**
 
