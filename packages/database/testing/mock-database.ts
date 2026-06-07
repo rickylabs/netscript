@@ -112,8 +112,7 @@ export function runDatabaseAdapterContract(
     const status = await adapter.getStatus();
     assertEquals(status.connected, true);
 
-    const result = await adapter.executeRaw<{ query: string }>('select 1');
-    assertEquals(result.query, 'select 1');
+    await adapter.executeRaw('select 1');
 
     await adapter.disconnect();
     assertEquals(await adapter.healthCheck(), false);

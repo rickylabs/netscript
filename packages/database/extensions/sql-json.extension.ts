@@ -35,6 +35,22 @@ export type SqlDatabaseType = 'mssql' | 'mysql' | 'generic';
  */
 export type JsonFieldConfig = Record<string, readonly string[]>;
 
+const debugLogEncoder = new TextEncoder();
+
+function formatDebugLogValue(value: unknown): string {
+  if (typeof value === 'string') return value;
+  try {
+    return JSON.stringify(value) ?? String(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function writeDebugLog(name: string, message: string, ...args: unknown[]): void {
+  const suffix = args.length > 0 ? ` ${args.map(formatDebugLogValue).join(' ')}` : '';
+  Deno.stderr.writeSync(debugLogEncoder.encode(`[${name}] ${message}${suffix}\n`));
+}
+
 /**
  * Options for creating the SQL JSON extension.
  */
@@ -307,7 +323,9 @@ export interface PrismaExtensionConfig {
 function createExtensionConfig(options: SqlJsonExtensionOptions): PrismaExtensionConfig {
   const { name = 'sql-json-extension', debug = false } = options;
 
-  const log = debug ? (_msg: string, ..._args: unknown[]) => {} : () => {};
+  const log = debug
+    ? (message: string, ...args: unknown[]) => writeDebugLog(name, message, ...args)
+    : () => {};
 
   return {
     name,

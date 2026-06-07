@@ -26,13 +26,63 @@ import {
 import {
   type Context,
   context as _context,
-  type Span,
   SpanKind,
   type SpanOptions,
   trace,
-  type Tracer,
-  type TracerProvider,
 } from '@opentelemetry/api';
+
+/**
+ * Span context fields used by Prisma tracing propagation.
+ */
+export interface PrismaTracingSpanContext {
+  /** Current span identifier. */
+  readonly spanId: string;
+  /** Current trace identifier. */
+  readonly traceId: string;
+  /** OpenTelemetry trace flags for the span. */
+  readonly traceFlags: number;
+}
+
+/**
+ * Span link shape consumed by Prisma tracing helpers.
+ */
+export interface PrismaTracingSpanLink {
+  /** Linked span context. */
+  readonly context: PrismaTracingSpanContext;
+}
+
+/**
+ * Minimum OpenTelemetry span shape used by Prisma tracing helpers.
+ */
+export interface PrismaTracingSpan {
+  /** Return the span context identifiers used for propagation and links. */
+  spanContext(): PrismaTracingSpanContext;
+  /** Add links to related spans. */
+  addLinks(links: readonly PrismaTracingSpanLink[]): void;
+  /** End the span, optionally at a specific timestamp. */
+  end(endTime?: unknown): void;
+}
+
+/**
+ * Minimum OpenTelemetry tracer shape used by Prisma tracing helpers.
+ */
+export interface PrismaTracingTracer {
+  /** Start a span without making it active. */
+  startSpan(name: string, options?: unknown, context?: unknown): PrismaTracingSpan;
+  /** Start an active span and run a callback in that span. */
+  startActiveSpan<R>(
+    name: string,
+    options: unknown,
+    callback: (span: PrismaTracingSpan) => R,
+  ): R;
+  /** Start an active span with an explicit context and run a callback. */
+  startActiveSpan<R>(
+    name: string,
+    options: unknown,
+    context: unknown,
+    callback: (span: PrismaTracingSpan) => R,
+  ): R;
+}
 
 // ---------------------------------------------------------------------------
 // ActiveTracingHelper — ported from @prisma/instrumentation@7.3.0
@@ -72,7 +122,7 @@ interface PrismaExtendedSpanOptions extends SpanOptions {
   context?: Context;
 }
 
-type PrismaSpanCallback<R> = (span?: Span, context?: Context) => R;
+type PrismaSpanCallback<R> = (span?: PrismaTracingSpan, context?: Context) => R;
 
 interface PrismaTracingHelper {
   /** Return whether tracing is enabled. */
@@ -117,7 +167,7 @@ function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
   return value != null && typeof (value as PromiseLike<T>)['then'] === 'function';
 }
 
-function endSpan<T>(span: Span, result: T): T {
+function endSpan<T>(span: PrismaTracingSpan, result: T): T {
   if (isPromiseLike(result)) {
     return result.then(
       (value) => {
@@ -144,7 +194,7 @@ function shouldIgnoreSpan(
 }
 
 function dispatchEngineSpan(
-  tracer: Tracer,
+  tracer: PrismaTracingTracer,
   engineSpan: PrismaEngineSpan,
   allSpans: PrismaEngineSpan[],
   linkIds: Map<string, string>,
@@ -158,7 +208,7 @@ function dispatchEngineSpan(
     startTime: engineSpan.startTime,
   };
 
-  tracer.startActiveSpan(engineSpan.name, spanOptions, (span: Span) => {
+  tracer.startActiveSpan(engineSpan.name, spanOptions, (span: PrismaTracingSpan) => {
     linkIds.set(engineSpan.id, span.spanContext().spanId);
 
     if (engineSpan.links) {
@@ -187,11 +237,11 @@ function dispatchEngineSpan(
 }
 
 class ActiveTracingHelper implements PrismaTracingHelper {
-  private tracerProvider: TracerProvider;
+  private tracerProvider: PrismaTracingProvider;
   private ignoreSpanTypes: (string | RegExp)[];
 
   constructor(options: {
-    tracerProvider: TracerProvider;
+    tracerProvider: PrismaTracingProvider;
     ignoreSpanTypes: (string | RegExp)[];
   }) {
     this.tracerProvider = options.tracerProvider;
@@ -250,7 +300,7 @@ class ActiveTracingHelper implements PrismaTracingHelper {
     return tracer.startActiveSpan(
       name,
       options,
-      (span: Span) => endSpan(span, callback(span, context)),
+      (span: PrismaTracingSpan) => endSpan(span, callback(span, context)),
     );
   }
 }
@@ -264,7 +314,7 @@ class ActiveTracingHelper implements PrismaTracingHelper {
  */
 export interface PrismaTracingProvider {
   /** Return an OpenTelemetry-compatible tracer. */
-  getTracer(name: string, version?: string, options?: unknown): unknown;
+  getTracer(name: string, version?: string, options?: unknown): PrismaTracingTracer;
 }
 
 /**
@@ -288,8 +338,7 @@ export interface PrismaTracingConfig {
 export function enablePrismaTracing(config: PrismaTracingConfig = {}): void {
   setGlobalTracingHelper(
     new ActiveTracingHelper({
-      tracerProvider: (config.tracerProvider as TracerProvider | undefined) ??
-        trace.getTracerProvider(),
+      tracerProvider: config.tracerProvider ?? (trace.getTracerProvider() as PrismaTracingProvider),
       ignoreSpanTypes: config.ignoreSpanTypes ?? [],
     }) as PrismaTracingHelperContract,
   );
