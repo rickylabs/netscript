@@ -16,7 +16,10 @@
   },
   "tasks": {
     "check": "deno check ./mod.ts ./ports/mod.ts ./ports/errors.ts ./validation/mod.ts ./testing/mod.ts ./adapters/deno-kv.adapter.ts ./adapters/redis.adapter.ts ./adapters/amqp.adapter.ts ./adapters/kv-polling.adapter.ts",
-    "test": "deno test ./tests/"
+    "test": "deno test ./tests/",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
     "@fedify/fedify": "jsr:@fedify/fedify@^1.5.0",
