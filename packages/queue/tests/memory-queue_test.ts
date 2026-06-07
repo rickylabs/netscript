@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertRejects } from '@std/assert';
 import { delay } from '@std/async';
 import type { MessageContext } from '../ports/mod.ts';
 import { MemoryQueueAdapter } from '../testing/mod.ts';
@@ -112,7 +112,7 @@ Deno.test('memory queue wait removes abort listeners after empty polls', async (
     controller.abort();
     await listening;
 
-    assertEquals(activeWaitListeners <= 1, true);
+    assert(activeWaitListeners <= 1, 'only the current idle wait should have an abort listener');
   } finally {
     AbortSignal.prototype.addEventListener = originalAdd;
     AbortSignal.prototype.removeEventListener = originalRemove;

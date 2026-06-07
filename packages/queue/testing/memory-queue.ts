@@ -40,6 +40,7 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
   readonly nativeRetrial = false;
 
   private readonly pending: MemoryQueueItem<T>[] = [];
+  private readonly pendingItems = new Set<MemoryQueueItem<T>>();
   private readonly pollInterval: number;
   private listening = false;
   private abortController?: AbortController;
@@ -60,7 +61,7 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
    * @param options - Optional delay and metadata settings.
    */
   enqueue(message: T, options: EnqueueOptions = {}): Promise<void> {
-    this.pending.push({
+    const item = {
       id: crypto.randomUUID(),
       message,
       enqueuedAt: new Date(),
@@ -68,7 +69,9 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
       headers: options.headers ?? {},
       deliveryCount: 0,
       settled: false,
-    });
+    };
+    this.pending.push(item);
+    this.pendingItems.add(item);
     this.sortPending();
     return Promise.resolve();
   }
@@ -142,6 +145,7 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
    */
   drain(): T[] {
     const drained = this.pending.splice(0, this.pending.length);
+    this.pendingItems.clear();
     return drained.map((item) => item.message);
   }
 
@@ -157,11 +161,11 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
 
     try {
       await handler(item.message, context);
-      if (!item.settled && !this.pending.includes(item)) {
+      if (!item.settled && !this.pendingItems.has(item)) {
         item.settled = true;
       }
     } catch (error) {
-      if (!item.settled && !this.pending.includes(item)) {
+      if (!item.settled && !this.pendingItems.has(item)) {
         this.requeue(item);
       }
       throw error;
@@ -197,7 +201,12 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
   private requeue(item: MemoryQueueItem<T>): void {
     item.settled = false;
     item.availableAt = Date.now();
+    if (this.pendingItems.has(item)) {
+      this.sortPending();
+      return;
+    }
     this.pending.push(item);
+    this.pendingItems.add(item);
     this.sortPending();
   }
 
@@ -210,7 +219,9 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
     if (index < 0) {
       return undefined;
     }
-    return this.pending.splice(index, 1)[0];
+    const item = this.pending.splice(index, 1)[0];
+    this.pendingItems.delete(item);
+    return item;
   }
 
   /**
