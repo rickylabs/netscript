@@ -129,8 +129,8 @@ sub-PR + evaluator pass).
 | Nested run ID | `feat-package-quality-wave2-adapters--<suffix>` |
 | Units | `@netscript/logger`, `@netscript/telemetry`, `@netscript/aspire`, `@netscript/kv`, `@netscript/database`, `@netscript/prisma-adapter-mysql`, `@netscript/queue`, `@netscript/cron` |
 | Archetype(s) | A2 — integration |
-| Status | `active` — **PLAN-EVAL `PASS`** (cycle 2, 2026-06-07); implementing sub-wave **2a** next. See `escalations/wave2-subwave-split.md`. |
-| Merge commit | — |
+| Status | `active` — 2a `merged` (PR #10, on track); 2b `merged` (PR #12, → umbrella `55f6108`); **2c `active`** (PR #13 → umbrella). Umbrella PR #11 holds 2a+2b; merges to track at full-wave completeness. |
+| Merge commit | — (umbrella PR #11 merges to track once at full-wave completeness) |
 
 ### Sub-wave structure (OQ-1 resolved; PLAN-EVAL PASS — Option A)
 
@@ -141,13 +141,26 @@ kv→logger (2b after 2a), queue→kv (2c after 2b). PLAN-EVAL routing = **Optio
 
 | Sub-wave | Units | Branch | Slices | Status |
 |----------|-------|--------|--------|--------|
-| 2a — observability/host | logger, telemetry, aspire | `feat/package-quality-wave2-adapters-2a` | 10 | next (impl handoff ready) |
-| 2b — data | kv, database, prisma-adapter-mysql | `feat/package-quality-wave2-adapters-2b` | 23 | blocked on 2a merge |
-| 2c — messaging | queue, cron | `feat/package-quality-wave2-adapters-2c` | 17 | blocked on 2b merge |
+| 2a — observability/host | logger, telemetry, aspire | `feat/package-quality-wave2-adapters-2a` | 10 | `merged` (PR #10, → track `698d890`) |
+| 2b — data | kv, database, prisma-adapter-mysql | `feat/package-quality-wave2-adapters-2b` | 23 | `merged` (PR #12 → umbrella `55f6108`; IMPL-EVAL PASS, 1 in-scope fix) |
+| 2c — messaging | queue, cron | `feat/package-quality-wave2-adapters-2c` | ~14–16 | `active` (PR #13 → umbrella; bootstrapped @ `0a4e043`; Research/Plan pending) |
 
-The original single-group draft **PR #8** (parent `feat/package-quality-wave2-adapters`,
-holds the plan + run artifacts) is superseded for code by the three sub-PRs; sub-wave
-branches fork off the parent so they inherit the plan.
+### Integration-branch recovery (2026-06-07)
+
+The original plan routed each sub-PR into `feat/package-quality` directly (2a did
+this via PR #10). At the same time the Wave 2 plan **PR #8** was squash-merged
+(`merged:true`, not reopenable), collapsing the Wave 2 tracking surface before the
+wave was complete. **Recovery (per user):** re-establish
+`feat/package-quality-wave2-adapters` as the **live Wave 2 integration branch** and
+gate the track on **full-wave completeness**:
+
+- Base-synced the parent with `feat/package-quality` (`e5d54e2`) so it carries 2a +
+  the `copilot-setup-steps` workflow. The eventual umbrella → track merge is a no-op
+  for 2a and only delivers 2b/2c.
+- **New umbrella draft PR #11** (`feat/package-quality-wave2-adapters` → `feat/package-quality`)
+  continues #8 (which can't be reopened). Merges **once**, at full Wave 2 completeness.
+- **2b (PR #12) and 2c target the umbrella branch**, not the track. Sub-wave branches
+  fork off the (now base-synced) parent so they inherit the plan and sit on top of 2a.
 
 ### Pre-conditions
 
@@ -313,7 +326,7 @@ branches fork off the parent so they inherit the plan.
 | 0 — Foundation | `merged` | none | shared | `eb8ae44` (PR #3) |
 | 0b — Harness reinforcement (inserted) | `merged` | 0 | none (harness + `.agents/`) | `82ad2a2`,`d5d8e5f`,`76fbeb7` |
 | 1 — Contracts & schemas | `merged` | 0 | runtime-config, config, contracts | `4c57867` (PR #7) |
-| 2 — Integration adapters | `active` (PLAN-EVAL `PASS`; impl 2a next) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | — (sub-PRs pending) |
+| 2 — Integration adapters | `active` (2a merged #10; 2b merged #12; 2c active #13; umbrella #11 @ `55f6108`) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | — (umbrella #11 → track at full-wave completeness) |
 | 3 — Plugin runner | `planned` | 2 | plugin | — |
 | 4 — Runtimes & plugins | `planned` | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
 | 5 — Application surfaces | `planned` | 4 | sdk, service, fresh, fresh-ui | — |
@@ -328,3 +341,6 @@ Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 | 2026-06-04 | `main` | merged | Pre-wave syncs into `feat/package-quality` (`a7796a0` ignore .worktrees, `44e3b8e` sub-PR rule, `734421c` branch naming) |
 | 2026-06-05 | `feat/package-quality` | merged | Wave 1 base-sync `76fbeb7` (also dropped the rejected D4 capability-gap skill section) |
 | 2026-06-07 | `feat/package-quality` → `feat/package-quality-wave2-adapters` | merged | Pre-implementation base-sync (supervisor.md § 5): brings the new `.github/workflows/copilot-setup-steps.yml` (cloud-agent env: Deno 2.x + .NET 10 + Aspire CLI + Docker) + supervisor PLAN-EVAL-PASS docs onto the Wave 2 branch before sub-wave 2a starts. `main` unchanged since `4c57867`. |
+| 2026-06-07 | `feat/package-quality` (incl. 2a #10) → `feat/package-quality-wave2-adapters` | merged (`e5d54e2`) | Integration-branch recovery: re-base the Wave 2 parent on the track after 2a merged directly via #10, so the parent becomes the live Wave 2 integration branch (carries 2a + copilot setup). 2b/2c now fork off this and target the umbrella PR #11. `main` still at `3b4dcb9` (PR #9 only). |
+| 2026-06-07 | `feat/package-quality-wave2-adapters-2b` → `feat/package-quality-wave2-adapters` | merged (`55f6108`, PR #12) | Sub-wave 2b (kv·database·prisma-adapter-mysql) merged into the umbrella after separate-session IMPL-EVAL **PASS** (1 in-scope fix: `@netscript/database` `jsonUtils` slow-type/doc-lint). Out-of-scope caveat carried: `cli` + `plugins/streams` pre-existing isolated-declarations debt. `@db/redis` migration assessed and **deferred to a future track (NOT Wave 2)**. Umbrella now = track + 2a + 2b. |
+| 2026-06-07 | bootstrap `feat/package-quality-wave2-adapters-2c` off umbrella `55f6108` | n/a (fork) | Sub-wave 2c (queue·cron) worktree `.worktrees/wave2-adapters-2c` + branch forked off the umbrella (queue→kv dep). Seed run docs committed (`0a4e043`); draft PR **#13** opened into the umbrella. Research/Plan pending (separate sessions). |
