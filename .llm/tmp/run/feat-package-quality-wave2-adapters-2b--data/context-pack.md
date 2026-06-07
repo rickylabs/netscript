@@ -62,3 +62,11 @@ Out of scope and not intentionally changed:
   MySQL adapter file size.
 - No generator-side IMPL-EVAL was run. A separate evaluator session must decide PASS/FAIL for Wave
   2b.
+
+## IMPL-EVAL Outcome (separate evaluator session, 2026-06-07)
+
+- Verdict: **PASS** — see `evaluate.md`.
+- One in-scope fix applied (`f9d0958`): `@netscript/database` `jsonUtils` slow-type/doc-lint
+  annotation in `extensions/sql-json.extension.ts`. All target-package gates re-verified green.
+- Out-of-scope caveat: `packages/cli` and `plugins/streams` `check` fail on pre-existing
+  isolated-declarations debt (untouched by 2b, identical on base `e5d54e2`); recorded in `drift.md`.
