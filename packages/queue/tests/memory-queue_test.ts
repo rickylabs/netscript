@@ -1,10 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
+import { delay } from '@std/async';
 import type { MessageContext } from '../ports/mod.ts';
 import { MemoryQueueAdapter } from '../testing/mod.ts';
-
-function delay(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
-}
 
 Deno.test('memory queue preserves requeued item settlement state', async () => {
   const queue = new MemoryQueueAdapter<string>({ pollInterval: 1 });
