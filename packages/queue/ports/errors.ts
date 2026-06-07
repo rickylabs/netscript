@@ -91,10 +91,10 @@ export class QueueError extends Error {
     this.cause = options?.cause;
     this.context = options?.context;
 
-    // Maintains proper stack trace for where error was thrown (V8 only)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, QueueError);
-    }
+    const captureStackTrace = (Error as ErrorConstructor & {
+      captureStackTrace?: (targetObject: object, constructorOpt?: typeof QueueError) => void;
+    }).captureStackTrace;
+    captureStackTrace?.(this, QueueError);
   }
 
   /**

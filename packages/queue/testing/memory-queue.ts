@@ -104,7 +104,11 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
     const signal = this.abortController.signal;
     const externalSignal = options.signal;
     const onAbort = (): void => this.abortController?.abort();
-    externalSignal?.addEventListener('abort', onAbort, { once: true });
+    if (externalSignal?.aborted) {
+      this.abortController.abort();
+    } else {
+      externalSignal?.addEventListener('abort', onAbort, { once: true });
+    }
 
     try {
       while (!signal.aborted) {
@@ -153,11 +157,11 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
 
     try {
       await handler(item.message, context);
-      if (!item.settled) {
+      if (!item.settled && !this.pending.includes(item)) {
         item.settled = true;
       }
     } catch (error) {
-      if (!item.settled) {
+      if (!item.settled && !this.pending.includes(item)) {
         this.requeue(item);
       }
       throw error;
@@ -223,10 +227,14 @@ function wait(milliseconds: number, signal: AbortSignal): Promise<void> {
   }
 
   return new Promise((resolve) => {
-    const timer = setTimeout(resolve, milliseconds);
-    signal.addEventListener('abort', () => {
+    const onAbort = (): void => {
       clearTimeout(timer);
       resolve();
-    }, { once: true });
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener('abort', onAbort);
+      resolve();
+    }, milliseconds);
+    signal.addEventListener('abort', onAbort, { once: true });
   });
 }
