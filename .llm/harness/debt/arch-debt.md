@@ -102,12 +102,18 @@ Seeded from
 
 ## packages/queue — AP-16 / doctrine verdict Refactor
 
-- **Reason:** `internal/` and `utils/` need role-named placement under the doctrine vocabulary.
+- **Reason:** `utils/` needed role-named placement under the doctrine vocabulary; the carried-in
+  `internal/` concern is not debt because F-11 and doctrine folder vocabulary explicitly allow
+  `internal/`.
 - **Owner:** Architecture doctrine follow-up.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-07 — Wave 2c slice 1 renamed `packages/queue/utils/` to
+  `packages/queue/validation/` and `packages/queue/interfaces/` to `packages/queue/ports/`.
+  `packages/queue/internal/` is retained as F-11-allowed. The older doctrine handoff wording that
+  said to lift `internal/` conflicts with the F-11 allow-list; the gate is the source of truth for
+  this closure.
 - **Gate:** F-3, F-11
 
 ## packages/kv — AP-1 / doctrine verdict Refactor (bridge_test.ts 1,039 LOC)
