@@ -9,9 +9,13 @@ Base: `feat/package-quality-wave2-adapters` @ `55f6108`
 |------|-------|---------|-------|
 | 2026-06-07 | Bootstrap | supervisor | Worktree + branch forked off umbrella `55f6108`. Seed run docs authored (context-pack.md, drift.md, worklog.md, commits.md). Draft PR opened into umbrella. |
 | | Research | generator | (pending) Re-baseline queue/cron dynamic gates at `55f6108` (MEASURE-FIRST). |
-| | Plan & Design | generator | (pending) Lock 2c slice plan from combined plan § Sub-wave 2c. |
-| | PLAN-EVAL | evaluator | (pending) Separate session. |
+| 2026-06-07 | Plan & Design | generator | Locked 17-slice plan. Real re-baseline: queue 35 doc-lint errors, cron 16. Cron `./testing` reuses `MemoryCronAdapter`. See `plan.md` + `research.md`. |
+| | PLAN-EVAL | evaluator | (pending) Separate session — hard stop before implementation. |
 | | Implement | generator | (pending) |
 | | Gate | generator | (pending) Static + fitness + consumer + e2e:cli (final slice). |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
+
+## Readiness note
+
+**2026-06-07 — Plan & Design COMPLETE. Ready for PLAN-EVAL (separate session).**

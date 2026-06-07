@@ -7,7 +7,7 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
-| 2026-06-07 | note | Carried-in queue/cron doc-lint counts are stale | 2b drift measured queue 19+ / cron 5 doc-lint at base `ca4d9c4` on a partial sweep. 2a telemetry showed root-only (2) vs full-export sweep (168) divergence. | MEASURE-FIRST: generator Research step 1 re-runs `deno publish --dry-run` + `deno doc --lint` on the FULL export sweep for queue and cron at `55f6108`; record real numbers before locking slice effort. |
+| 2026-06-07 | note | Carried-in queue/cron doc-lint counts are stale | 2b drift measured queue 19+ / cron 5 doc-lint at base `ca4d9c4` on a partial sweep. 2a telemetry showed root-only (2) vs full-export sweep (168) divergence. | **RESOLVED**: Full export sweep at `55f6108` yields **queue 35**, **cron 16**. See `research.md` § MEASURE-FIRST for per-entrypoint breakdown. |
 | 2026-06-07 | note | @db/redis migration is OUT OF SCOPE for 2c | 2b assessment recommended a dedicated future migration track (NOT Wave 2), gated behind a spike (kv → queue → sagas Streams). | queue keeps `npm:ioredis@^5` in `adapters/redis.adapter.ts`. No migration in 2c. Recorded as forward-looking opportunity only. |
 
 ## Carried-in decisions (from 2b drift "Decisions / renames")
@@ -27,4 +27,14 @@
 
 ## Decisions / renames
 
-(append during plan + implement)
+| Item | Decision | Rationale |
+|------|----------|-----------|
+| Cron `./testing` reuse vs duplicate | **Reuse** `MemoryCronAdapter` via `./testing` re-export barrel | Existing `adapters/memory.adapter.ts` already provides full `CronScheduler` + test helpers (`triggerAll`, `waitForExecutions`, etc.). Duplicating would violate DRY and inflate F-16 cardinality. |
+| Queue `./testing` | **New** `MemoryQueueAdapter<T>` | No in-memory queue adapter exists today. Required for multi-adapter A2 archetype `./testing` port-contract entrypoint. |
+| `_envelope.ts` / `_shared.ts` JSDoc obligation | **None** | Not exported from any barrel; underscore-private by convention. |
+
+## Re-baseline drift (post-Research)
+
+| Date | Severity | Item | Evidence | Action |
+|------|----------|------|----------|--------|
+| 2026-06-07 | note | Real doc-lint counts: queue 35, cron 16 | Full export sweep at `55f6108` (see `research.md`). Carried-in counts (19+/5) were under-counted because partial sweep missed `deno-kv.adapter.ts` (21 errors) and `scheduler.ts` (7 errors). | Plan slices 4 and 11 adjusted to real counts. No material rescope required — doc-lint fixes are mechanical (JSDoc + private-type-ref re-exports). |
