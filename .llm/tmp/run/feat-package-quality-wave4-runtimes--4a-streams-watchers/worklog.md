@@ -110,6 +110,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 | 2026-06-08 | S6 | Implement + gate | Resolved `plugin-streams` private-type-refs and missing JSDoc: first-party host/CLI/Aspire types are re-exported through plugin barrels; third-party `StandardSchemaV1` was replaced by package-owned `StreamPayloadSchema`. Gates: `deno doc --lint mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts` PASS, 5 files checked / 0 errors; `rtk proxy deno task check` PASS; `Select-String` found no `@standard-schema` or `StandardSchemaV1` reference in `stream-api.ts`. Implementation commit `c5e7ece`. |
 | 2026-06-08 | S7 | Implement + gate | Added `plugins/streams/verify-plugin.ts` manifest verifier. Gates: `deno run verify-plugin.ts` PASS with `ok: true`, 4 contribution groups, 0 findings; `deno check --unstable-kv verify-plugin.ts` PASS; `rtk proxy deno task check` PASS. Implementation commit `e7ad68f`. |
 | 2026-06-08 | S8 | Implement + gate | Added `plugins/streams/tests/public/manifest_test.ts` covering manifest contribution axes and verifier success. Gates: `deno test tests/public/manifest_test.ts` PASS, 1 test passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `cca1d64`. |
+| 2026-06-08 | S9 | Implement + gate | Added `plugins/streams/tests/cli/streams-cli_test.ts` covering command registry and default CLI instance. Gates: `deno test tests/cli/streams-cli_test.ts` PASS, 2 tests passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `e3c76b1`. |
 
 ## Decisions
 
