@@ -85,7 +85,10 @@ All 3 units publish-ready at `0.0.1-alpha.0` with:
 
 ## Hidden Scope
 
-- `plugin-streams` private-type-ref errors leak upstream types (`PluginManifest`, `PluginCli`, `AspireNSPluginContribution`, `StandardSchemaV1`). Fixing these may require re-exporting upstream types through the public barrel or adding `@ignore` JSDoc — not just adding JSDoc.
+- `plugin-streams` private-type-ref errors reference two distinct type classes; fix them differently (PLAN-EVAL adjustment, Wave 3 LD-8 precedent):
+  - **First-party `@netscript/plugin` types** (`PluginManifest`, `PluginCli`, `AspireNSPluginContribution`): confirm they are part of the merged `@netscript/plugin` public surface (`deno doc @netscript/plugin`). If exported, fix the leak with an explicit **type re-export** of the first-party type through the plugin barrel — F-15/AP-14 target *third-party/upstream* libraries, not first-party `@netscript/*`, so this is doctrine-acceptable. If a referenced type is NOT in the host's public surface, that is host-surface debt — log it and reference the nearest public type, do not invent a parallel.
+  - **Third-party `StandardSchemaV1`** (`@standard-schema/spec`): AP-14 applies — do **NOT** re-export. Mirror Wave 3 LD-8: introduce a **package-owned structural type** (cf. `PluginPayloadSchema`/`PluginManifestParser` in `@netscript/plugin`) and use it in the public signature.
+  - `@ignore` is only acceptable where the referencing symbol is itself genuinely internal and slipped into a public entrypoint — not as a blanket suppression of real surface leaks.
 - `watchers` structural lift is 3 transient slices (`git mv` → retarget exports → retarget imports). Intermediate states will have failing static checks; this is planned, not drift.
 - `plugin-streams` `verify-plugin.ts` must validate manifest shape against `@netscript/plugin` expectations; may surface upstream contract drift.
 
@@ -113,7 +116,7 @@ All 3 units publish-ready at `0.0.1-alpha.0` with:
 
 | Risk | Mitigation |
 |------|------------|
-| `plugin-streams` private-type-ref fixes may require upstream type re-exports that bloat surface | Prefer `@ignore` JSDoc on leaked private types; re-export only if consumer-facing |
+| `plugin-streams` private-type-ref fixes may bloat surface | Split by type origin (Hidden Scope): first-party `@netscript/plugin` types → explicit type re-export (F-15 n/a for first-party); third-party `StandardSchemaV1` → package-owned structural type (Wave 3 LD-8). `@ignore` only for genuinely-internal incidental refs. |
 | `watchers` `git mv` + retarget slices cause transient check failures | Document in `drift.md`; gate only the final slice |
 | `plugin-streams` `verify-plugin.ts` may fail on upstream `@netscript/plugin` contract drift | Run against current `packages/plugin/mod.ts` (Wave 3 merged, no drift confirmed) |
 | Consumer gate fails on pre-existing downstream slow types | Attribute per `validation.md` lesson: diff failing file against base; byte-identical ⇒ pre-existing debt |
@@ -124,7 +127,7 @@ All 3 units publish-ready at `0.0.1-alpha.0` with:
 | AP | Status | Plan |
 |----|--------|------|
 | AP-13 (`console.*` in published runtime) | existing in `plugin-streams-core` | Record debt; `DurableStreamProducer` uses `console.warn` for connection errors. Replacing requires `@netscript/logger` dependency — deferred. |
-| AP-14 (re-exporting upstream libraries) | risk in `plugin-streams` | `stream-api.ts` uses `StandardSchemaV1` from `@standard-schema/spec`. Type is re-exported in interface; fix via `@ignore` or explicit re-export. |
+| AP-14 (re-exporting upstream libraries) | risk in `plugin-streams` | `stream-api.ts` uses `StandardSchemaV1` from `@standard-schema/spec` (third-party). Fix = **package-owned structural type** (Wave 3 LD-8 `PluginPayloadSchema` precedent), NOT re-export and NOT `@ignore`. First-party `@netscript/plugin` types are handled separately (type re-export — see Hidden Scope). |
 | AP-16 (`utils/`, `helpers/`, `common/`) | none found | Avoid creating generic folders during watchers lift. |
 
 ## Fitness Gates
@@ -288,3 +291,41 @@ All 3 units publish-ready at `0.0.1-alpha.0` with:
 - If `watchers` `git mv` slice reveals import cycles during retarget, log in `drift.md`.
 - If `verify-plugin.ts` fails due to upstream `@netscript/plugin` drift, log in `drift.md` and escalate.
 - If consumer gate finds pre-existing slow types in `packages/cli`, attribute per `validation.md` lesson.
+
+## PLAN-EVAL Verdict
+
+**Verdict: PASS WITH ADJUSTMENTS (locked) — cleared to implement.**
+
+Evaluated inline by the supervisor at user direction (small surface, plan near-ready; no
+separate evaluator session for this sub-wave's plan phase). Routing note: this consumes the
+Wave 2 **Option A** budget — one combined-plan PLAN-EVAL stands in for the per-sub-wave plan
+eval here; **IMPL-EVAL remains a separate session.**
+
+### Strengths
+- Archetypes correctly re-derived against the post-`#96` tree: `plugin-streams-core` **A1→A3**
+  is right (`DurableStreamProducer` owns network I/O + lifecycle + singleton registry);
+  `watchers` A3 and `plugin-streams` A5 agree with doctrine.
+- MEASURE-FIRST numbers are real and per-entrypoint (doc-lint 1 / 15 / 5; dry-run PASS×3;
+  check PASS×3); consumer scan proves **non-zero** use for all 3 → D4 (no trimming) is sound.
+- 23 slices < 30; gate tables complete per archetype; transient `git mv` slices (13–15)
+  acknowledged and gated only at the final state.
+
+### Adjustments folded into the plan (mandatory at implementation)
+1. **Private-type-ref fix strategy split by type origin** (Hidden Scope + Risk + AP-14 rows
+   rewritten). First-party `@netscript/plugin` types → explicit **type re-export** (F-15 n/a
+   for first-party `@netscript/*`). Third-party `StandardSchemaV1` → **package-owned
+   structural type**, mirroring **Wave 3 LD-8** (`PluginPayloadSchema`/`PluginManifestParser`).
+   `@ignore` is not a blanket suppressor. This removes the prior internal contradiction with
+   the F-15 gate row and keeps the plugin tier consistent with the merged host.
+
+### Carry to IMPL-EVAL (not blockers)
+- **A5 Runtime/Aspire validation evidence:** the plan satisfies it via `verify-plugin.ts` +
+  an Aspire-contribution **registration** test + manifest test (no live service). Accepted as
+  the alpha bar; IMPL-EVAL must confirm the contribution actually *registers* (service +
+  health check), not merely type-checks.
+- **AP-13 `console.warn` debt (D6):** accepted as a debt entry (replacement needs a
+  `@netscript/logger` dependency = behavior/dep change, out of scope). Confirm the debt entries
+  land in `arch-debt.md`.
+- **Watchers deep-import retarget (slice 15):** confirm the only downstream change needed is the
+  `plugin-triggers` adapter's deep import; the `@netscript/watchers` barrel specifier must stay
+  stable so no other consumer moves.

@@ -10,8 +10,8 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `ee9f26b` (carries merged
 | 2026-06-08 | Bootstrap | supervisor | Sub-branch + worktree `.worktrees/wave4-runtimes-4a` off the track-synced umbrella. Seed (`context-pack.md`) + this log. Draft PR → umbrella. |
 | 2026-06-08 | Research | generator | MEASURE-FIRST complete. Full-export doc-lint: streams-core 1, plugin-streams 15, watchers 5. Dry-run PASS 0 slow types. Check PASS. Consumer scan confirms non-zero use for all 3 units. |
 | 2026-06-08 | Plan & Design | generator | Archetype locked: streams-core **A3** (runtime behavior), plugin-streams **A5**, watchers **A3**. 23 slices < 30 cap. Plan.md + research.md written. |
-| | PLAN-EVAL | evaluator | (pending) **Separate session. Hard stop before implementation.** |
-| | Implement | generator | (pending) |
+| 2026-06-08 | PLAN-EVAL | supervisor (inline, user-directed) | **PASS WITH ADJUSTMENTS** (see `plan.md` §PLAN-EVAL Verdict). One adjustment locked: private-type-ref fix split by type origin (first-party `@netscript/plugin` → type re-export; third-party `StandardSchemaV1` → package-owned structural type, Wave 3 LD-8). 3 items carried to IMPL-EVAL. Cleared to implement. |
+| | Implement | generator | (pending) — proceed all 23 slices without interruption; structured PR summary after each slice. |
 | | Gate | generator | (pending) |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) 4a → umbrella via Draft PR after IMPL-EVAL PASS. |
