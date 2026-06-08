@@ -56,6 +56,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   tests pass.
 - Implementation: slice 17 complete. Commit `214a9a3` adds plugin manifest loader coverage; 2
   focused tests pass.
+- Implementation: slice 18 complete. Empty commit `3279d7b` records full package test-suite
+  verification: 21 passed, 0 failed.
 
 ## One-unit wave
 
