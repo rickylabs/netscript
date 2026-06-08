@@ -1,6 +1,7 @@
 {
   "name": "@netscript/watchers",
   "version": "0.0.1-alpha.0",
+  "description": "Composable file-watching runtime with strategies, filters, stability checks, and stop semantics for NetScript.",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts"
@@ -11,11 +12,18 @@
     "@std/fs": "jsr:@std/fs@^1.0.0",
     "@std/path": "jsr:@std/path@^1.0.0"
   },
+  "tasks": {
+    "check": "deno check --unstable-kv mod.ts",
+    "test": "deno test --allow-read --allow-write --allow-env filters",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+  },
   "publish": {
     "include": [
-      "**/*.ts",
+      "README.md",
       "deno.json",
-      "README.md"
+      "mod.ts",
+      "src/**/*.ts",
+      "docs/**/*.md"
     ],
     "exclude": [
       "**/*_test.ts",
