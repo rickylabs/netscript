@@ -20,7 +20,7 @@
     "@standard-schema/spec": "npm:@standard-schema/spec@^1.1.0"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
     "test": "deno test --allow-all",
