@@ -145,8 +145,8 @@ checks may warn about that dynamic import, but it is intentionally runtime-resol
 ## 14. Required Permissions
 
 The root builder and diagnostic entrypoint require no permissions. CLI and SDK consumers grant
-permissions to the host process that walks files, writes generated registries, or dynamically imports
-local plugin modules.
+permissions to the host process that walks files, writes generated registries, or dynamically
+imports local plugin modules.
 
 Tests in this package run with `deno test --allow-all` because the SDK and scaffolding ports include
 filesystem-shaped adapters and dynamic module loading contracts.

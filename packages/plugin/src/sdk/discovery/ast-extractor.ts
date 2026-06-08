@@ -10,12 +10,14 @@ const CONTRIBUTION_BUILDERS = [
 /** Extractor for exported plugin contribution builder call sites. */
 export class AstExtractor implements ExtractorPort {
   /** Extract contribution candidates from walked source files. */
-  async extract(files: readonly WalkedFile[]): Promise<readonly ExtractedContribution[]> {
+  extract(files: readonly WalkedFile[]): Promise<readonly ExtractedContribution[]> {
     const contributions = files.flatMap((file) => extractFromFile(file));
-    return contributions.sort((left, right) =>
-      left.file.localeCompare(right.file) ||
-      left.axis.localeCompare(right.axis) ||
-      left.symbol.localeCompare(right.symbol)
+    return Promise.resolve(
+      contributions.sort((left, right) =>
+        left.file.localeCompare(right.file) ||
+        left.axis.localeCompare(right.axis) ||
+        left.symbol.localeCompare(right.symbol)
+      ),
     );
   }
 }

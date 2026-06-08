@@ -9,8 +9,8 @@ export class MemoryManifestResolver implements ManifestResolverPort {
   constructor(private readonly manifest: PluginManifest | undefined = undefined) {}
 
   /** Resolve a manifest from the in-memory value. */
-  async resolve(_spec: string): Promise<PluginManifest | undefined> {
-    return this.manifest;
+  resolve(_spec: string): Promise<PluginManifest | undefined> {
+    return Promise.resolve(this.manifest);
   }
 }
 

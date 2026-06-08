@@ -21,6 +21,8 @@
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts",
+    "fmt": "deno fmt",
+    "lint": "deno lint",
     "test": "deno test --allow-all",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },

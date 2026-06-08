@@ -6,17 +6,18 @@ export class MemoryFileSystemAdapter implements FileSystemPort {
   readonly files: Map<string, string> = new Map<string, string>();
 
   /** Read text content from an in-memory path. */
-  async readText(path: string): Promise<string> {
-    return this.files.get(path) ?? '';
+  readText(path: string): Promise<string> {
+    return Promise.resolve(this.files.get(path) ?? '');
   }
 
   /** Write text content to an in-memory path. */
-  async writeText(path: string, text: string): Promise<void> {
+  writeText(path: string, text: string): Promise<void> {
     this.files.set(path, text);
+    return Promise.resolve();
   }
 
   /** Check whether an in-memory path exists. */
-  async exists(path: string): Promise<boolean> {
-    return this.files.has(path);
+  exists(path: string): Promise<boolean> {
+    return Promise.resolve(this.files.has(path));
   }
 }

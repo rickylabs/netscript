@@ -4,16 +4,18 @@ import type { ExtractedContribution } from './ports/extractor-port.ts';
 /** Registry emitter that writes one generated TypeScript module per contribution axis. */
 export class RegistryEmitter implements EmitterPort {
   /** Emit generated registry modules for extracted contributions. */
-  async emit(
+  emit(
     contributions: readonly ExtractedContribution[],
   ): Promise<readonly RegistryEmission[]> {
     const groups = groupByAxis(contributions);
-    return [...groups.entries()]
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([axis, axisContributions]) => ({
-        path: `.netscript/generated/${axis}.registry.ts`,
-        text: emitAxisRegistry(axis, axisContributions),
-      }));
+    return Promise.resolve(
+      [...groups.entries()]
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([axis, axisContributions]) => ({
+          path: `.netscript/generated/${axis}.registry.ts`,
+          text: emitAxisRegistry(axis, axisContributions),
+        })),
+    );
   }
 }
 
