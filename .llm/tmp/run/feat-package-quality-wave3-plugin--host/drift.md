@@ -23,3 +23,9 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
+| 2026-06-08 | note | OQ-A resolved: `./loader` has no dynamic import | `loader.ts` is 64 LOC, exports `PluginLogger` + `createPluginLogger`. The `unanalyzable-dynamic-import` warning is in `src/sdk/discovery/manifest-resolver.ts` ( `./sdk` entrypoint). | Keep `./loader` public. Document `./sdk` runtime caveat in module JSDoc. |
+| 2026-06-08 | note | OQ-B resolved: accept rewrite vocabulary | Current folders: `abstracts/`, `adapters/`, `application/`, `cli/`, `config/`, `diagnostics/`, `domain/`, `kernel/`, `ports/`, `public/`, `sdk/`, `templates/`, `testing/`. No `utils/`/`interfaces/`. F-16 cardinality holds. | No renames. Record as locked decision LD-2. |
+| 2026-06-08 | note | OQ-C resolved: accept `plugin-builder.ts` 343 LOC with debt | Typestate-generic builder; splitting risks breaking compile-time chain. | Create debt entry in `arch-debt.md` with closing gate "pre-beta builder refactor". |
+| 2026-06-08 | note | OQ-D resolved: `e2e:cli` triggers-health is downstream | `src/sdk/runtime/*` are stubs (bootstrap 13 LOC, context 17 LOC, service-context 20 LOC). Failure is in generated trigger service, not host bootstrap. | Carry forward to Wave 4. Do not fix here. |
+| 2026-06-08 | note | OQ-E resolved: `./testing` is exercised | Memory adapters used by `walker-ports_test.ts` and `plugin-registry_test.ts`. | Add `tests/sdk/watcher-cleanup_test.ts` as defensive I/O proof. |
+| 2026-06-08 | note | OQ-F resolved: `inspectPlugin` exported and typed | Exported from `mod.ts` line 43, returns `InspectionReport`. `private-type-ref` on `InspectablePluginManifest`/`InspectablePluginRegistry` because not re-exported through barrel. | Export through `src/diagnostics/mod.ts` and `mod.ts` in Slice 1. |
