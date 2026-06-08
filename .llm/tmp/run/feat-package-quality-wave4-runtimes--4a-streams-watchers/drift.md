@@ -39,6 +39,7 @@
 | 2026-06-08 | none | Slice 20 followed the locked README doctest scope | Added docs example fixture under `tests/_fixtures/` | No drift |
 | 2026-06-08 | none | Slice 21 followed the locked FileWatcher lifecycle test scope | Added abort/stop/running-state lifecycle test under `tests/` | No drift |
 | 2026-06-08 | none | Slice 22 followed the locked consumer validation scope | Downstream checks passed for `plugins/sagas`, `plugins/workers`, `plugins/triggers`, and `packages/cli` | No drift |
+| 2026-06-08 | minor | Slice 23 final lint exposed watcher `ban-types` debt and fmt-check required package-scoped normalization | `deno lint` failed on `string & {}` aliases in `packages/watchers/src/types.ts`; per-unit `deno fmt --check` failed before package-local `deno fmt` | Fixed aliases with `Record<never, never>` and committed package-scoped formatter output; final gates passed |
 | 2026-06-08 | minor | `plugin-streams-core` full-export doc-lint = 1 error (private-type-ref on `StreamTopicFixtureSchema`) | `deno doc --lint mod.ts src/telemetry/mod.ts src/testing/mod.ts` | Fix in slice 3 |
 | 2026-06-08 | minor | `plugin-streams` full-export doc-lint = 15 errors (11 private-type-ref + 4 missing-jsdoc) | `deno doc --lint mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts` | Fix in slice 6 |
 | 2026-06-08 | minor | `watchers` full-export doc-lint = 5 errors (missing-jsdoc on constructors) | `deno doc --lint mod.ts` | Fix in slice 19 |
