@@ -9,3 +9,4 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)
+- 10da21e: docs(wave3): record PLAN-EVAL PASS + lock LD-8 for @netscript/plugin host
