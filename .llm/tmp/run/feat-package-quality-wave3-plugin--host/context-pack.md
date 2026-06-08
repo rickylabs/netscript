@@ -46,6 +46,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
 - Implementation: slice 12 complete. Commit `f283836` adds package-local `lint` and `fmt` tasks,
   fixes task-surfaced `require-await` findings in synchronous promise-returning stubs, and verifies
   lint/fmt/check/doc-lint gates.
+- Implementation: slice 13 complete. Commit `17d60ea` expands `tasks.check` to all 8 public
+  entrypoints with `--unstable-kv`.
 
 ## One-unit wave
 
