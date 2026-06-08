@@ -21,6 +21,7 @@ Branch: `feat/package-quality-wave4-runtimes-4a` → umbrella `feat/package-qual
 | 14 | 9a09b10 | refactor(watchers): retarget public exports | S14 |
 | 15 | 4666b44 | refactor(watchers): retarget filter tests | S15 |
 | 16 | 5eab77a | docs(watchers): add README | S16 |
+| 17 | f7612c4 | docs(watchers): add docs scaffold | S17 |
 
 (Pair each implementation slice commit with its `docs(wave4): record …` run-doc commit,
 per the Wave 2/3 cadence.)
