@@ -19,7 +19,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 12 | 177ed3c | docs(plugin): document cli and port contracts | Slice 6 |
 | 13 | 5e51001 | docs(wave3): record slice 6 cli docs | Slice 6 docs |
 | 14 | 65a7c41 | docs(plugin): verify config and testing docs | Slice 7 |
-| 15 | (this commit) | docs(wave3): record slice 7 doc verification | Slice 7 docs |
+| 15 | 290de80 | docs(wave3): record slice 7 doc verification | Slice 7 docs |
+| 16 | bd1e594 | test(plugin): verify full export doc lint | Slice 8 |
+| 17 | (this commit) | docs(wave3): record slice 8 doc-lint gate | Slice 8 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)

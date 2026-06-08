@@ -35,6 +35,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   have no remaining lint errors.
 - Implementation: slice 7 complete. Empty commit `65a7c41` records the no-op verification for
   config-domain/validators/testing JSDoc targets; full-export doc-lint remains clean.
+- Implementation: slice 8 complete. Empty commit `bd1e594` verifies full-export doc-lint remains
+  clean across all 8 entrypoints. Phase A is complete.
 
 ## One-unit wave
 
