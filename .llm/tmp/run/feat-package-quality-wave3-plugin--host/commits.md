@@ -15,7 +15,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 8 | a308a2e | docs(plugin): document builder errors and memory adapter | Slice 4 |
 | 9 | 9cadaa4 | docs(wave3): record slice 4 builder docs | Slice 4 docs |
 | 10 | d4262ad | docs(plugin): document sdk discovery contracts | Slice 5 |
-| 11 | (this commit) | docs(wave3): record slice 5 sdk docs | Slice 5 docs |
+| 11 | 02feec4 | docs(wave3): record slice 5 sdk docs | Slice 5 docs |
+| 12 | 177ed3c | docs(plugin): document cli and port contracts | Slice 6 |
+| 13 | (this commit) | docs(wave3): record slice 6 cli docs | Slice 6 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)

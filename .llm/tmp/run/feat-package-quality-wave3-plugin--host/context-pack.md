@@ -29,6 +29,10 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   reduces full-export doc-lint to 48 remaining missing-JSDoc errors.
 - Implementation: slice 5 complete. Commit `d4262ad` documents SDK discovery/application/runtime
   members and reduces full-export doc-lint to 23 remaining missing-JSDoc errors.
+- Implementation: slice 6 complete. Commit `177ed3c` documents CLI/base contracts and
+  `FileSystemPort`; full-export `deno doc --lint` now passes across all 8 entrypoints. Slice 7 is
+  a no-op verification/doc-record slice because the planned config/testing JSDoc targets already
+  have no remaining lint errors.
 
 ## One-unit wave
 
