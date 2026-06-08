@@ -60,6 +60,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   verification: 21 passed, 0 failed.
 - Implementation: slice 19 complete. Commit `8f3c204` closes obsolete `types.ts` debt and opens
   accepted F-1 debt for `plugin-builder.ts` size with a pre-beta target.
+- Implementation: slice 20 complete. Commit `4968dd5` adds manual F-1..F-18 evidence to
+  `worklog.md`; F-13 is recorded as n/a for A4.
 
 ## One-unit wave
 
