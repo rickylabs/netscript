@@ -48,6 +48,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   lint/fmt/check/doc-lint gates.
 - Implementation: slice 13 complete. Commit `17d60ea` expands `tasks.check` to all 8 public
   entrypoints with `--unstable-kv`.
+- Implementation: slice 14 complete. Commit `7de2e22` adds dedicated domain tests for errors and
+  core types; 3 focused tests pass.
 
 ## One-unit wave
 

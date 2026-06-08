@@ -31,7 +31,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 24 | f283836 | chore(plugin): add lint and fmt tasks | Slice 12 |
 | 25 | c7feaf3 | docs(wave3): record slice 12 task hygiene | Slice 12 docs |
 | 26 | 17d60ea | chore(plugin): check all public entrypoints | Slice 13 |
-| 27 | (this commit) | docs(wave3): record slice 13 check task | Slice 13 docs |
+| 27 | 846d85e | docs(wave3): record slice 13 check task | Slice 13 docs |
+| 28 | 7de2e22 | test(plugin): cover domain errors and core types | Slice 14 |
+| 29 | (this commit) | docs(wave3): record slice 14 domain tests | Slice 14 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)
