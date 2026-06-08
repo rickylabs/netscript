@@ -20,6 +20,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 7 complete: no-op verification for config-domain/validators/testing JSDoc targets. Empty slice commit `65a7c41`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 8 complete: full-export doc-lint verification passed across all 8 entrypoints. Empty verification commit `bd1e594`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 9 complete: README expanded to 165 LOC with Observability, Compatibility, and Required Permissions sections. Code commit `f6e7189`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 10 complete: README example fixture now matches the current quick start chain. Code commit `5d7ed3a`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -36,6 +37,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 7 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` returns `Checked 8 files` with 0 errors; no config-domain/validators/testing code edits were needed.
 - Slice 8 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` returns `Checked 8 files` with 0 errors.
 - Slice 9 validation: README line count is 165. The same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` returns `Checked 8 files` with 0 errors.
+- Slice 10 validation: `deno test --allow-all tests/_fixtures/readme-examples_test.ts` passes 2 tests. The same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` returns `Checked 8 files` with 0 errors.
 
 ## Implementation Evidence
 
@@ -50,6 +52,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 7 | `65a7c41` | F-7 | PASS | Empty no-op verification slice for config-domain/validators/testing JSDoc targets; full-export doc-lint remained 0 errors. |
 | 8 | `bd1e594` | F-7 | PASS | Empty verification slice for full-export doc-lint; Phase A doc-lint gate is green. |
 | 9 | `f6e7189` | F-7 | PASS | README expanded from 138 to 165 LOC and now has standalone Observability, Compatibility, and Required Permissions sections. |
+| 10 | `5d7ed3a` | F-10 | PASS | README quick-start fixture compiles and asserts the service contribution example; 2 fixture tests pass. |
 
 ## Design Checkpoint
 

@@ -39,6 +39,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   clean across all 8 entrypoints. Phase A is complete.
 - Implementation: slice 9 complete. Commit `f6e7189` expands README to 165 LOC and adds
   Observability, Compatibility, and Required Permissions sections.
+- Implementation: slice 10 complete. Commit `5d7ed3a` aligns the README fixture with the current
+  quick start and passes the focused doctest fixture.
 
 ## One-unit wave
 
