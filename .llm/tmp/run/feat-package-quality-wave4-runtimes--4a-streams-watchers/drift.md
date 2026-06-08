@@ -23,6 +23,7 @@
 | 2026-06-08 | none | Slice 4 followed the locked AP-13 debt scope | `DurableStreamProducer` warn behavior documented; AP-13 entry added to `.llm/harness/debt/arch-debt.md` | No drift |
 | 2026-06-08 | none | Slice 5 followed the locked AbortSignal lifecycle-test scope | Added close-after-abort coverage in existing producer test file | No drift |
 | 2026-06-08 | none | Slice 6 followed the locked private-type-ref split | First-party `@netscript/*` type graph re-exported; third-party Standard Schema reference replaced with package-owned structural `StreamPayloadSchema` | No drift |
+| 2026-06-08 | none | Slice 7 followed the locked verifier scope | `verify-plugin.ts` validates streams manifest shape against `@netscript/plugin` inspector expectations | No drift |
 | 2026-06-08 | minor | `plugin-streams-core` full-export doc-lint = 1 error (private-type-ref on `StreamTopicFixtureSchema`) | `deno doc --lint mod.ts src/telemetry/mod.ts src/testing/mod.ts` | Fix in slice 3 |
 | 2026-06-08 | minor | `plugin-streams` full-export doc-lint = 15 errors (11 private-type-ref + 4 missing-jsdoc) | `deno doc --lint mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts` | Fix in slice 6 |
 | 2026-06-08 | minor | `watchers` full-export doc-lint = 5 errors (missing-jsdoc on constructors) | `deno doc --lint mod.ts` | Fix in slice 19 |
