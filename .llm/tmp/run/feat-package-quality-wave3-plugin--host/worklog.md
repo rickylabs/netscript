@@ -33,6 +33,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 20 complete: recorded manual F-1..F-18 evidence table in worklog. Code commit `4968dd5`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 21 complete: `packages/cli` consumer-import validation passed. Empty verification commit `7a24d51`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 22 complete: `plugins/*` consumer-import validation passed. Empty verification commit `c2c1eec`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 23 complete: final static gate sweep passed (`publish:dry-run`, `check`, `lint`, `fmt --check`, full-export doc-lint). Empty verification commit `9f96342`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -62,6 +63,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 20 validation: `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` pass after adding manual F-gate evidence.
 - Slice 21 validation: from `packages/cli`, `deno check --unstable-kv mod.ts` passes and `deno task check` passes (`bin/netscript.ts`, `bin/netscript-dev.ts`, `mod.ts`, `maintainer.ts`, `scaffolding.ts`, `testing.ts`).
 - Slice 22 validation: `deno task check` passes in `plugins/sagas`, `plugins/streams`, `plugins/triggers`, and `plugins/workers`; explicit `deno check --unstable-kv mod.ts services/src/main.ts` also passes in `plugins/sagas`.
+- Slice 23 validation: from `packages/plugin`, `deno task publish:dry-run` succeeds with 0 slow types and the expected `unanalyzable-dynamic-import` warning for `src/sdk/discovery/manifest-resolver.ts`; `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` all pass.
 
 ## Implementation Evidence
 
@@ -89,6 +91,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 20 | `4968dd5` | Static | PASS | Manual F-1..F-18 evidence table recorded in this worklog; F-13 marked n/a. |
 | 21 | `7a24d51` | Consumer | PASS | `packages/cli` checks clean with `@netscript/plugin` imports. |
 | 22 | `c2c1eec` | Consumer | PASS | First-party plugin package checks pass for `sagas`, `streams`, `triggers`, and `workers`. |
+| 23 | `9f96342` | F-6/F-7/F-8 | PASS_WITH_DOCUMENTED_WARNING | Final static sweep passes; publish dry-run keeps the documented runtime-resolved dynamic import warning and reports 0 slow types. |
 
 ## Manual Fitness Evidence
 

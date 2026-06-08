@@ -66,6 +66,9 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   consumer-import validation; `deno check --unstable-kv mod.ts` and `deno task check` pass.
 - Implementation: slice 22 complete. Empty commit `c2c1eec` records `plugins/*`
   consumer-import validation; all first-party plugin package checks pass.
+- Implementation: slice 23 complete. Empty commit `9f96342` records the final static
+  gate sweep: publish dry-run succeeds with 0 slow types and the documented dynamic-import
+  warning; check, lint, fmt --check, and full-export doc-lint pass.
 
 ## One-unit wave
 
