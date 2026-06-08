@@ -34,6 +34,7 @@
 | 2026-06-08 | minor | Slice 15 did not edit `plugin-triggers` because no deep import existed | `plugins/triggers/src/runtime/watchers-file-watcher-adapter.ts` already imports `@netscript/watchers`; consumer `deno task check` passed | No code change needed; stable barrel preserved |
 | 2026-06-08 | none | Slice 16 followed the locked README scope | README added with 224 lines and required permissions/runtime sections | No drift |
 | 2026-06-08 | none | Slice 17 followed the locked docs scaffold scope | Added architecture, concepts, and getting-started docs | No drift |
+| 2026-06-08 | none | Slice 18 followed the locked task/publish metadata scope | `deno.json` now has description, task block, and publish include list for README/docs/root/src | No drift |
 | 2026-06-08 | minor | `plugin-streams-core` full-export doc-lint = 1 error (private-type-ref on `StreamTopicFixtureSchema`) | `deno doc --lint mod.ts src/telemetry/mod.ts src/testing/mod.ts` | Fix in slice 3 |
 | 2026-06-08 | minor | `plugin-streams` full-export doc-lint = 15 errors (11 private-type-ref + 4 missing-jsdoc) | `deno doc --lint mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts` | Fix in slice 6 |
 | 2026-06-08 | minor | `watchers` full-export doc-lint = 5 errors (missing-jsdoc on constructors) | `deno doc --lint mod.ts` | Fix in slice 19 |

@@ -119,6 +119,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 | 2026-06-08 | S15 | Implement + gate | Retargeted watcher filter tests to `src/filters` and `src/types`; `plugin-triggers` already used the stable `@netscript/watchers` barrel so no downstream file edit was needed. Gates: `deno check --unstable-kv mod.ts` PASS; `deno test --allow-read --allow-write --allow-env filters` PASS, 13 tests passed / 0 failed; `rtk proxy deno task check` in `plugins/triggers` PASS. Implementation commit `4666b44`. |
 | 2026-06-08 | S16 | Implement + gate | Added `packages/watchers/README.md` with permissions, runtime model, network path, stop semantics, and doctestable examples. Gates: `deno fmt README.md` PASS, 1 file checked; README line count = 224; `deno check --unstable-kv mod.ts` PASS. Implementation commit `5eab77a`. |
 | 2026-06-08 | S17 | Implement + gate | Added `packages/watchers/docs/{architecture,concepts,getting-started}.md`. Gates: `deno fmt docs/architecture.md docs/concepts.md docs/getting-started.md` PASS, 3 files checked; docs listing found 3 files; `deno check --unstable-kv mod.ts` PASS. Implementation commit `f7612c4`. |
+| 2026-06-08 | S18 | Implement + gate | Added watchers description, local tasks, and tightened publish include list. Gates: `rtk proxy deno task check` PASS; `rtk proxy deno task test` PASS, 13 tests passed / 0 failed; `rtk proxy deno task publish:dry-run` PASS, 16 published files, 0 slow-type errors. Implementation commit `fe3c30a`. |
 
 ## Decisions
 
