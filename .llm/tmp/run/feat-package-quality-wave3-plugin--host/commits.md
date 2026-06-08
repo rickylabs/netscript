@@ -9,7 +9,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 2 | 0c1b2a1 | fix(plugin): clear private type refs | Slice 1 |
 | 3 | 19f2915 | docs(wave3): record slice 1 private-type-ref fix | Slice 1 docs |
 | 4 | 1a7e71e | docs(plugin): document abstract contributions part one | Slice 2 |
-| 5 | (this commit) | docs(wave3): record slice 2 abstract docs | Slice 2 docs |
+| 5 | 2beed40 | docs(wave3): record slice 2 abstract docs | Slice 2 docs |
+| 6 | b598f3b | docs(plugin): document abstract contributions part two | Slice 3 |
+| 7 | (this commit) | docs(wave3): record slice 3 abstract docs | Slice 3 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)
