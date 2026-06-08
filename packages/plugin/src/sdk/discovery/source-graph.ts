@@ -3,7 +3,9 @@ import type { WalkedFile } from './ports/walker-port.ts';
 
 /** Source graph snapshot produced by discovery. */
 export interface SourceGraph {
+  /** Source files included in the snapshot. */
   readonly files: readonly WalkedFile[];
+  /** Contributions extracted from the source files. */
   readonly contributions: readonly ExtractedContribution[];
 }
 

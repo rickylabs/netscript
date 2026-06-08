@@ -1,11 +1,14 @@
 /** Result returned by plugin item scaffolders. */
 export interface PluginScaffoldResult {
+  /** Files written or planned by the scaffolder. */
   readonly files: readonly string[];
+  /** Non-fatal warnings reported by the scaffolder. */
   readonly warnings?: readonly string[];
 }
 
 /** Abstract base for plugin `add <item>` scaffolders. */
 export abstract class PluginItemScaffolder<TInput> {
+  /** Item name accepted by the scaffolder. */
   abstract readonly itemName: string;
 
   /**
