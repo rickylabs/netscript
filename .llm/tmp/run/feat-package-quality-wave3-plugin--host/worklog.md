@@ -30,6 +30,8 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 17 complete: added plugin manifest loader tests. Code commit `214a9a3`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 18 complete: full package test suite passes. Empty verification commit `3279d7b`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 19 complete: closed obsolete plugin `types.ts` debt and opened accepted `plugin-builder.ts` F-1 size debt. Code commit `8f3c204`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 20 complete: recorded manual F-1..F-18 evidence table in worklog. Code commit `4968dd5`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 21 complete: `packages/cli` consumer-import validation passed. Empty verification commit `7a24d51`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -56,6 +58,8 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 17 validation: `deno test --allow-all tests/application/plugin-loader_test.ts` passes 2 tests. `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` also pass.
 - Slice 18 validation: `deno test --allow-all` passes 21 tests across 9 test files with 0 failures.
 - Slice 19 validation: `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` pass after the debt registry update.
+- Slice 20 validation: `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` pass after adding manual F-gate evidence.
+- Slice 21 validation: from `packages/cli`, `deno check --unstable-kv mod.ts` passes and `deno task check` passes (`bin/netscript.ts`, `bin/netscript-dev.ts`, `mod.ts`, `maintainer.ts`, `scaffolding.ts`, `testing.ts`).
 
 ## Implementation Evidence
 
@@ -80,6 +84,8 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 17 | `214a9a3` | F-10 | PASS | Added loader coverage for resolved and unresolved `ManifestResolverPort` results. |
 | 18 | `3279d7b` | F-10 | PASS | Full package test suite passes: 21 passed, 0 failed. |
 | 19 | `8f3c204` | F-1 | DEBT_ACCEPTED | Closed old `packages/plugin — types.ts 1,005 LOC` entry and opened `plugin-builder.ts` 343 LOC accepted debt with pre-beta closing target. |
+| 20 | `4968dd5` | Static | PASS | Manual F-1..F-18 evidence table recorded in this worklog; F-13 marked n/a. |
+| 21 | `7a24d51` | Consumer | PASS | `packages/cli` checks clean with `@netscript/plugin` imports. |
 
 ## Manual Fitness Evidence
 

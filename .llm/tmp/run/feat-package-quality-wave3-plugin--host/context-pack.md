@@ -62,6 +62,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   accepted F-1 debt for `plugin-builder.ts` size with a pre-beta target.
 - Implementation: slice 20 complete. Commit `4968dd5` adds manual F-1..F-18 evidence to
   `worklog.md`; F-13 is recorded as n/a for A4.
+- Implementation: slice 21 complete. Empty commit `7a24d51` records `packages/cli`
+  consumer-import validation; `deno check --unstable-kv mod.ts` and `deno task check` pass.
 
 ## One-unit wave
 
