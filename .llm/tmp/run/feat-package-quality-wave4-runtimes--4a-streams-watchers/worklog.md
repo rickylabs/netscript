@@ -106,6 +106,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 | 2026-06-08 | S2 | Implement + gate | Updated `packages/plugin-streams-core/deno.json` `check` task to enumerate `.`, `./telemetry`, and `./testing`. Gate: `rtk proxy deno task check` from `packages/plugin-streams-core` PASS, command ran `deno check --unstable-kv mod.ts src/telemetry/mod.ts src/testing/mod.ts`. Implementation commit `0af7e86`. |
 | 2026-06-08 | S3 | Implement + gate | Exported `StreamTopicFixtureSchema` from `packages/plugin-streams-core/src/testing/mod.ts` to resolve the testing private-type-ref. Gates: `deno doc --lint mod.ts src/telemetry/mod.ts src/testing/mod.ts` PASS, 3 files checked; `rtk proxy deno task check` PASS, 3 entrypoints checked. Implementation commit `905480e`. |
 | 2026-06-08 | S4 | Implement + gate | Added `DurableStreamProducer` JSDoc note for alpha `console.warn` reporting and recorded AP-13 debt in `.llm/harness/debt/arch-debt.md`. Gates: `Select-String` found 7 textual `console.warn` matches (6 runtime calls + 1 JSDoc note) and the debt entry; `deno doc --lint ...` PASS, 3 files checked; `rtk proxy deno task check` PASS. Implementation commit `bb6450b`. |
+| 2026-06-08 | S5 | Implement + gate | Added an aborted-connection close lifecycle test for `DurableStreamProducer`. Gates: `deno test --allow-env --allow-net tests/application/durable-stream-producer_test.ts` PASS, 2 tests passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `a38c6f9`. |
 
 ## Decisions
 
