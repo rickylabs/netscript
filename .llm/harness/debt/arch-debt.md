@@ -245,6 +245,22 @@ Seeded from
   `console.warn` is absent from
   `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
 
+## packages/watchers — AP-13 console.warn runtime reporting
+
+- **Reason:** `FileWatcher` and `HybridWatchStrategy` currently use `console.warn` for native
+  watcher fallback and runtime access-failure visibility. The warnings are intentionally retained
+  for alpha operator diagnostics; replacing them correctly requires a structured telemetry or logger
+  dependency that is outside Wave 4a's package-quality scope.
+- **Owner:** `@netscript/watchers` maintainers.
+- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
+  (S23 final debt sweep).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-14, AP-13; close when watcher runtime warnings emit through a structured reporter and
+  `console.warn` is absent from `packages/watchers/src/file-watcher.ts` and
+  `packages/watchers/src/strategies/hybrid.ts`.
+
 ## packages/cli — AP-1 / doctrine verdict Restructure
 
 - **Reason:** `pipeline.ts` and `official-plugin-copier.ts` are monoliths; package should move

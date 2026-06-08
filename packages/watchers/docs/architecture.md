@@ -48,5 +48,5 @@ honored.
 
 ## Debt
 
-`src/fs.ts` still uses `console.warn` for network path access failures. That is tracked as AP-13
-debt for the telemetry-integration wave.
+`src/file-watcher.ts` and `src/strategies/hybrid.ts` still use `console.warn` for runtime fallback
+and access-failure visibility. That is tracked as AP-13 debt for the telemetry-integration wave.
