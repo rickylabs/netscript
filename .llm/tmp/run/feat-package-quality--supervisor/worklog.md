@@ -43,6 +43,12 @@ authority is the nested canonical run
 | 2026-06-07 | 2 | escalation+handoff | Recorded `escalations/wave2-subwave-split.md` (dependency-graph / group-ordering change → user brief per supervisor.md § 4). Promoted OQ-1 split into supervisor `drift.md`. **PLAN-EVAL handoff prepared** (separate session); see Handoff Notes. Supervisor does NOT run PLAN-EVAL. Awaiting user decision on routing (Option A: 1 PLAN-EVAL + 3 IMPL-EVALs, recommended). |
 | 2026-06-07 | 2 | PLAN-EVAL PASS | Separate-session PLAN-EVAL via PR #8: cycle 1 `FAIL_PLAN` (judged pre-plan staging — plan.md absent), generator wrote plan + Design (`1933bce`), **cycle 2 `PASS`** (comment 4640656448). Evaluator fixed two small gaps in place per instruction #10: added F-16/F-17/F-18 to the gate set; clarified kv slice (merge into existing `adapters/`). Routing = **Option A** confirmed. Escalation RESOLVED. |
 | 2026-06-07 | 2a | impl-handoff | Implementation authorized for sub-wave **2a** (logger·telemetry·aspire, 10 slices). Generator handoff prompt issued; sub-PR `…-2a` → `feat/package-quality`; separate IMPL-EVAL on completion. 2b/2c blocked on prior sub-wave merge. |
+| 2026-06-07 | 2a | merged | 2a (logger·telemetry·aspire) merged to track via **PR #10**. Telemetry MEASURE-FIRST lesson: root-only doc-lint 2 → full-export sweep 168. Umbrella PR #11 re-established as the live Wave 2 integration branch; 2a base-synced in (`e5d54e2`). |
+| 2026-06-07 | 2b | merged | 2b (kv·database·prisma-adapter-mysql, 23 slices) → umbrella via **PR #12** (`55f6108`); separate-session IMPL-EVAL **PASS** (1 in-scope fix: `database` `jsonUtils` slow-type/doc-lint). `@db/redis` migration assessed + deferred to a future track. kv `core/`→`application/`, `bridges/`→`adapters/`. |
+| 2026-06-07 | 2c | bootstrap | 2c (queue·cron) worktree + branch forked off umbrella `55f6108`; seed run docs (`0a4e043`); draft **PR #13** into umbrella. Plan & Design handoff issued (separate session). |
+| 2026-06-08 | 2c | merged | 2c (queue·cron, 17 slices) → umbrella via **PR #13** (`d078e5b`). PLAN-EVAL PASS → 17 sliced commits (paired doc-recording) → separate-session IMPL-EVAL **PASS** + Augment hardening round on the in-memory queue adapter. queue `interfaces/`→`ports/`+`utils/`→`validation/` (AP-16), cron `interfaces/`→`ports/` (AP-17). Caveats: `e2e:cli` triggers-health (out-of-scope runtime) + `cli` isolated-declarations debt. |
+| 2026-06-08 | 2 | **MERGED (closeout)** | Umbrella **PR #11 merged → track** (`d4f971e`, `--no-ff`). Full Wave 2 (6 packages) complete on the track. Promoted 4 harness lessons (`package-quality-archetype`, `sub-wave-orchestration`, `validation`, `platform`). Local track FF `d931dc6`→`d4f971e`. |
+| 2026-06-08 | 3 | launch | Wave 3 (`@netscript/plugin`, A4) bootstrapping: umbrella branch + worktree + umbrella Draft PR; first sub-branch + worktree + seed run docs + sub Draft PR. High-level research in the canonical nested run; Plan & Design handoff to follow (separate session). |
 
 ## Decisions
 
@@ -119,6 +125,21 @@ under `.worktrees/<name>`:
 - Base-sync `feat/package-quality` into the Wave 2 branch before implementation (`supervisor.md` § 5);
   log it in the Base-Sync Log.
 - The evaluator for each wave must be a **separate session** from the generator.
-- Waves 3–6 remain `planned`; do not launch Wave 3 until Wave 2 is `merged`.
+- ~~Waves 3–6 remain `planned`; do not launch Wave 3 until Wave 2 is `merged`.~~ **Wave 2 merged
+  2026-06-08 (`d4f971e`); Wave 3 launched.** Waves 4–6 remain `planned`.
 - Standing item: populate a supervisor-wide `release-readiness.ts` audit dir, or formally accept the
   per-wave re-baseline pattern as the substitute and note it here.
+
+### Wave 3 launch state (2026-06-08)
+
+- **Next supervisor action:** Wave 3 (`@netscript/plugin`, A4 dsl-builder/plugin host) is
+  bootstrapped (umbrella + first sub-branch + Draft PRs + seed run docs + high-level research).
+  Dispatch the **Plan & Design** handoff as a separate generator session (prompt delivered to the
+  user). PLAN-EVAL and IMPL-EVAL remain separate sessions; supervisor does not run them.
+- Carry the Wave 2 enterprise-grade bar (`.llm/harness/lessons/package-quality-archetype.md`):
+  package-quality is architectural, not type/lint cleanup. Watch the inherited `e2e:cli`
+  triggers-health caveat — determine whether it is a plugin-host defect (Wave 3) or downstream
+  (Wave 4 `plugin-triggers`) before scoping.
+- A single A4 unit is well under the `< 30` slice cap, so Wave 3 is **not** expected to need a
+  sub-wave split; the umbrella exists for tracking-surface continuity (per
+  `lessons/sub-wave-orchestration.md`: stand up the umbrella before merging anything).

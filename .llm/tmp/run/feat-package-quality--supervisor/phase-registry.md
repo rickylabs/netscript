@@ -129,8 +129,8 @@ sub-PR + evaluator pass).
 | Nested run ID | `feat-package-quality-wave2-adapters--<suffix>` |
 | Units | `@netscript/logger`, `@netscript/telemetry`, `@netscript/aspire`, `@netscript/kv`, `@netscript/database`, `@netscript/prisma-adapter-mysql`, `@netscript/queue`, `@netscript/cron` |
 | Archetype(s) | A2 — integration |
-| Status | `active` — 2a `merged` (PR #10, on track); 2b `merged` (PR #12, → umbrella `55f6108`); **2c `active`** (PR #13 → umbrella). Umbrella PR #11 holds 2a+2b; merges to track at full-wave completeness. |
-| Merge commit | — (umbrella PR #11 merges to track once at full-wave completeness) |
+| Status | `merged` — 2a `merged` (PR #10, on track); 2b `merged` (PR #12 → umbrella `55f6108`); 2c `merged` (PR #13 → umbrella `d078e5b`); **umbrella PR #11 merged → track `d4f971e`**. Full Wave 2 complete. |
+| Merge commit | `d4f971e` (umbrella PR #11 → track, `--no-ff`) |
 
 ### Sub-wave structure (OQ-1 resolved; PLAN-EVAL PASS — Option A)
 
@@ -143,7 +143,33 @@ kv→logger (2b after 2a), queue→kv (2c after 2b). PLAN-EVAL routing = **Optio
 |----------|-------|--------|--------|--------|
 | 2a — observability/host | logger, telemetry, aspire | `feat/package-quality-wave2-adapters-2a` | 10 | `merged` (PR #10, → track `698d890`) |
 | 2b — data | kv, database, prisma-adapter-mysql | `feat/package-quality-wave2-adapters-2b` | 23 | `merged` (PR #12 → umbrella `55f6108`; IMPL-EVAL PASS, 1 in-scope fix) |
-| 2c — messaging | queue, cron | `feat/package-quality-wave2-adapters-2c` | ~14–16 | `active` (PR #13 → umbrella; bootstrapped @ `0a4e043`; Research/Plan pending) |
+| 2c — messaging | queue, cron | `feat/package-quality-wave2-adapters-2c` | 17 | `merged` (PR #13 → umbrella `d078e5b`; IMPL-EVAL PASS + Augment hardening round) |
+
+### Wave 2 closeout (2026-06-08)
+
+Umbrella **PR #11 merged into the track** (`feat/package-quality-wave2-adapters` →
+`feat/package-quality`, merge commit `d4f971e`, `--no-ff`). All three sub-waves
+passed separate-session IMPL-EVAL; every Wave 2 unit is `deno publish --dry-run`
+0 slow types + full-export `deno doc --lint` 0 errors, ships `./testing`
+port-contract entrypoints, defensive abort/cleanup tests, doctests, and docs
+scaffold. Hexagonal folder vocabulary landed across the wave (`interfaces/`→
+`ports/`, `utils/`→`validation/`, kv `core/`→`application/`); AP-16 (queue) and
+AP-17 (cron) closed.
+
+**Caveats carried forward (do NOT block — owned by downstream tracks):**
+
+- `e2e:cli` `behavior.triggers-health` — generated trigger-service runtime health
+  probe fails (`localhost:8093/health`, os error 10054). Out-of-scope per plan
+  risk register; adjudicated by IMPL-EVAL. **Relevant to Wave 3 (`@netscript/plugin`)
+  and the generated-trigger surface.**
+- `cli-maintainer-sync-isolated-declarations` — 3 pre-existing TS9016/TS9027 errors
+  in `packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin.ts:205`,
+  byte-identical to base, imports neither queue nor cron. Owned by the **Wave 6 CLI**
+  track. Recorded in `.llm/harness/debt/arch-debt.md`.
+
+**Harness lessons promoted from Wave 2** (`.llm/harness/lessons/`):
+`package-quality-archetype.md`, `sub-wave-orchestration.md`, `validation.md`,
+`platform.md`.
 
 ### Integration-branch recovery (2026-06-07)
 
@@ -197,12 +223,12 @@ gate the track on **full-wave completeness**:
 | Nested run ID | `feat-package-quality-wave3-plugin--<suffix>` |
 | Units | `@netscript/plugin` |
 | Archetype(s) | A4 — dsl-builder (plugin host) |
-| Status | `planned` |
+| Status | `active` — umbrella branch + worktree + Draft PR being bootstrapped (2026-06-08); Research/Plan & Design pending (separate sessions). |
 | Merge commit | — |
 
 ### Pre-conditions
 
-- Wave 2 `merged`.
+- Wave 2 `merged`. ✅ (`d4f971e`)
 
 ### Phase 0 reading
 
@@ -219,6 +245,8 @@ gate the track on **full-wave completeness**:
 ### Notes
 
 - `plugins/hello-world` is **gone** (replaced by the `netscript plugin scaffold` template); the nested Wave 3 "hello-world" line does not apply here — log the delta.
+- **Inherited caveat from Wave 2:** the `e2e:cli` `behavior.triggers-health` runtime failure (generated trigger service, `localhost:8093/health`, os error 10054) lives on the plugin/generated-trigger surface. Wave 3 touches `@netscript/plugin` (the plugin host); confirm whether the trigger health regression is a plugin-host defect or downstream (Wave 4 `plugin-triggers`) before scoping. Do not assume.
+- Apply the Wave 2 enterprise-grade bar verbatim (`.llm/harness/lessons/package-quality-archetype.md`): A4 still owns public-surface doc-lint, `./testing` where the host exposes a contract, defensive I/O, doctests, and docs scaffold — package-quality is architectural, not type/lint cleanup.
 
 ## Wave 4 — Runtimes & their plugins
 
@@ -326,8 +354,8 @@ gate the track on **full-wave completeness**:
 | 0 — Foundation | `merged` | none | shared | `eb8ae44` (PR #3) |
 | 0b — Harness reinforcement (inserted) | `merged` | 0 | none (harness + `.agents/`) | `82ad2a2`,`d5d8e5f`,`76fbeb7` |
 | 1 — Contracts & schemas | `merged` | 0 | runtime-config, config, contracts | `4c57867` (PR #7) |
-| 2 — Integration adapters | `active` (2a merged #10; 2b merged #12; 2c active #13; umbrella #11 @ `55f6108`) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | — (umbrella #11 → track at full-wave completeness) |
-| 3 — Plugin runner | `planned` | 2 | plugin | — |
+| 2 — Integration adapters | `merged` (2a #10; 2b #12; 2c #13; umbrella #11 → track) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | `d4f971e` (PR #11) |
+| 3 — Plugin runner | `active` (umbrella + sub-branch bootstrapping) | 2 | plugin | — |
 | 4 — Runtimes & plugins | `planned` | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
 | 5 — Application surfaces | `planned` | 4 | sdk, service, fresh, fresh-ui | — |
 | 6 — Tooling | `planned` | 0–5 | cli | — |
@@ -344,3 +372,5 @@ Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 | 2026-06-07 | `feat/package-quality` (incl. 2a #10) → `feat/package-quality-wave2-adapters` | merged (`e5d54e2`) | Integration-branch recovery: re-base the Wave 2 parent on the track after 2a merged directly via #10, so the parent becomes the live Wave 2 integration branch (carries 2a + copilot setup). 2b/2c now fork off this and target the umbrella PR #11. `main` still at `3b4dcb9` (PR #9 only). |
 | 2026-06-07 | `feat/package-quality-wave2-adapters-2b` → `feat/package-quality-wave2-adapters` | merged (`55f6108`, PR #12) | Sub-wave 2b (kv·database·prisma-adapter-mysql) merged into the umbrella after separate-session IMPL-EVAL **PASS** (1 in-scope fix: `@netscript/database` `jsonUtils` slow-type/doc-lint). Out-of-scope caveat carried: `cli` + `plugins/streams` pre-existing isolated-declarations debt. `@db/redis` migration assessed and **deferred to a future track (NOT Wave 2)**. Umbrella now = track + 2a + 2b. |
 | 2026-06-07 | bootstrap `feat/package-quality-wave2-adapters-2c` off umbrella `55f6108` | n/a (fork) | Sub-wave 2c (queue·cron) worktree `.worktrees/wave2-adapters-2c` + branch forked off the umbrella (queue→kv dep). Seed run docs committed (`0a4e043`); draft PR **#13** opened into the umbrella. Research/Plan pending (separate sessions). |
+| 2026-06-08 | `feat/package-quality-wave2-adapters-2c` → `feat/package-quality-wave2-adapters` | merged (`d078e5b`, PR #13) | Sub-wave 2c (queue·cron) merged into the umbrella after separate-session IMPL-EVAL **PASS** + Augment hardening round on the in-memory queue adapter. Hexagonal renames (queue `interfaces/`→`ports/`, `utils/`→`validation/`; cron `interfaces/`→`ports/`), AP-16/AP-17 closed. Caveats: `e2e:cli` triggers-health (out-of-scope runtime) + `cli` isolated-declarations debt. Umbrella now = track + 2a + 2b + 2c. |
+| 2026-06-08 | `feat/package-quality-wave2-adapters` → `feat/package-quality` | merged (`d4f971e`, PR #11) | **Wave 2 closeout.** Umbrella merged to the track with a merge commit (`--no-ff`). Full Wave 2 (2a+2b+2c, 6 packages) complete and on the track. `main` still at `3b4dcb9`. Local track worktree fast-forwarded `d931dc6`→`d4f971e` (clean FF; `d931dc6` is a parent of the merge). |

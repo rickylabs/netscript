@@ -88,6 +88,29 @@ current-state documentation.
   against the matrix, or file a debt entry. Carried as a standing supervisor item.
 - **Severity:** significant (would silently under-gate future waves if unaddressed).
 
+## 2026-06-08 — Wave 2 complete; two out-of-scope caveats carried to downstream tracks
+
+- **What:** Wave 2 (2a+2b+2c, 6 packages) merged to the track via umbrella PR #11
+  (`d4f971e`). Two failures surfaced during 2c that are **out-of-scope** for the
+  messaging rename and were adjudicated as non-blocking by IMPL-EVAL, but they
+  must not be lost — they belong to downstream tracks.
+- **Caveat 1 — `e2e:cli` `behavior.triggers-health`:** the final 2c merge-readiness
+  `deno task e2e:cli` ran 35 passed / 1 failed. The sole failure is a generated
+  trigger-service runtime health probe (`localhost:8093/health`, os error 10054
+  conn reset), not a queue/cron compile/surface/publish/doc-lint failure. **Owner:
+  Wave 3 (`@netscript/plugin` host) / Wave 4 (`plugin-triggers`)** — determine
+  which layer owns the regression during Wave 3 scoping.
+- **Caveat 2 — `cli-maintainer-sync-isolated-declarations`:** 3 pre-existing
+  TS9016/TS9027 errors in `packages/cli/.../copy-official-plugin.ts:205`,
+  byte-identical to base, CLI imports neither queue nor cron. Recorded in
+  `.llm/harness/debt/arch-debt.md`. **Owner: Wave 6 (CLI).**
+- **Severity:** significant (cross-wave hand-off; would be lost if not tracked).
+- **Action:** accept + carry forward. Both recorded in `phase-registry.md` Wave 2
+  closeout + Wave 3 notes. Do not block Wave 2 (per plan risk register).
+- **Process note:** four harness lessons promoted to `.llm/harness/lessons/`
+  (`package-quality-archetype`, `sub-wave-orchestration`, `validation`, `platform`)
+  — the durable Wave 2 knowledge, archetype-agnostic.
+
 ## 2026-06-05 — Stale slow-type counts must be re-measured
 
 - **What:** The 2026-05 readiness numbers predate the platform rewrite.
