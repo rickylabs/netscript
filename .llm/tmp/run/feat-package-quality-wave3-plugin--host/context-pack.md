@@ -54,6 +54,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   coverage; 1 focused test passes.
 - Implementation: slice 16 complete. Commit `b8e44c6` adds watcher cleanup coverage; 2 focused
   tests pass.
+- Implementation: slice 17 complete. Commit `214a9a3` adds plugin manifest loader coverage; 2
+  focused tests pass.
 
 ## One-unit wave
 
