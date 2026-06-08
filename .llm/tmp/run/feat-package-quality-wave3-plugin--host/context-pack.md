@@ -18,6 +18,9 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   rework-forcing decision resolved in-line as **LD-8** (upstream-typed `private-type-ref`
   → package-owned structural types, not upstream re-export; preserves F-15/AP-14). Carry
   LD-8 into slice 1. **Implementation may now begin.**
+- Implementation: slice 1 complete. Commit `0c1b2a1` fixes all `private-type-ref` errors; full-export
+  doc-lint now has no `private-type-ref` matches and 100 planned `missing-jsdoc` errors for slices
+  2-7.
 
 ## One-unit wave
 
