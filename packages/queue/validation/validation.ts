@@ -6,7 +6,7 @@
  * @module
  */
 
-import { QueueValidationError } from '../interfaces/mod.ts';
+import { QueueValidationError } from '../ports/mod.ts';
 
 /**
  * Minimal schema contract supported by queue validation helpers.

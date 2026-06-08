@@ -1,6 +1,6 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { MemoryCronAdapter } from '../adapters/memory.adapter.ts';
-import type { JobRunEvent } from '../interfaces/types.ts';
+import type { JobRunEvent } from '../ports/types.ts';
 
 Deno.test('MemoryCronAdapter schedules, triggers, and tracks runs', async () => {
   const scheduler = new MemoryCronAdapter();

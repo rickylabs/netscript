@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { CronPresets, isValidCronExpression, parseCronExpression } from '../interfaces/types.ts';
+import { CronPresets, isValidCronExpression, parseCronExpression } from '../ports/types.ts';
 
 Deno.test('CronPresets expose valid expressions', () => {
   for (const expression of Object.values(CronPresets)) {

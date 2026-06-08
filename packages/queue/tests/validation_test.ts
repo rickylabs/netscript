@@ -4,8 +4,8 @@ import {
   validateOrThrow,
   type ValidationSchema,
   withValidation,
-} from '../utils/validation.ts';
-import { QueueValidationError } from '../interfaces/errors.ts';
+} from '../validation/validation.ts';
+import { QueueValidationError } from '../ports/errors.ts';
 
 const stringSchema: ValidationSchema<string> = {
   parse(input: unknown): string {

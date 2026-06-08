@@ -86,8 +86,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** closed 2026-05-01 — CLI permission expectations are documented in
-  `packages/cli/docs/permissions.md` and linked from `packages/cli/README.md`.
+- **Status:** closed 2026-06-07 — corrected during Wave 2c after the previous
+  2026-05-01 closure note was found to reference unrelated CLI permission
+  documentation while `packages/cron/interfaces/` still existed. Real evidence:
+  `packages/cron/interfaces/` was renamed to `packages/cron/ports/`, the public
+  `./types` export was replaced with `./ports`, and `tasks.check` now checks
+  `ports/mod.ts`.
 - **Gate:** F-3, F-11
 
 ## packages/database — AP-17 / doctrine verdict Refactor
@@ -102,12 +106,18 @@ Seeded from
 
 ## packages/queue — AP-16 / doctrine verdict Refactor
 
-- **Reason:** `internal/` and `utils/` need role-named placement under the doctrine vocabulary.
+- **Reason:** `utils/` needed role-named placement under the doctrine vocabulary; the carried-in
+  `internal/` concern is not debt because F-11 and doctrine folder vocabulary explicitly allow
+  `internal/`.
 - **Owner:** Architecture doctrine follow-up.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-07 — Wave 2c slice 1 renamed `packages/queue/utils/` to
+  `packages/queue/validation/` and `packages/queue/interfaces/` to `packages/queue/ports/`.
+  `packages/queue/internal/` is retained as F-11-allowed. The older doctrine handoff wording that
+  said to lift `internal/` conflicts with the F-11 allow-list; the gate is the source of truth for
+  this closure.
 - **Gate:** F-3, F-11
 
 ## packages/kv — AP-1 / doctrine verdict Refactor (bridge_test.ts 1,039 LOC)
@@ -518,3 +528,21 @@ Seeded from
 - **Status:** open, DEBT_ACCEPTED for Group D merge.
 - **Gate:** core/plugin `deno publish --dry-run --allow-dirty` stays at 0 slow-type errors, then
   remove the structural contract shim without reintroducing service-router casts or slow types.
+
+## packages/cli — maintainer sync isolated-declarations slow types (`cli-maintainer-sync-isolated-declarations`)
+
+- **Reason:** `deno check` on the `@netscript/cli` public graph (task `check`, via `maintainer.ts`)
+  reports 3 isolated-declarations slow-type errors (TS9016/TS9027) on the shorthand `_internal`
+  object export in
+  `packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin.ts:205`. The object needs
+  an explicit type annotation (or non-shorthand entries) to satisfy `--isolatedDeclarations`.
+- **Owner:** `@netscript/cli` maintainers / CLI doctrine track (Archetype 6).
+- **Target:** Next CLI package-quality wave; not the Wave 2c messaging sub-wave.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md` (CLI track).
+- **Created:** 2026-06-07 (Wave 2c IMPL-EVAL).
+- **Status:** open, DEBT_ACCEPTED for Wave 2c. Pre-existing on base `55f6108`; the file is
+  byte-identical to base and imports neither `@netscript/queue` nor `@netscript/cron`, so it is
+  unrelated to the 2c rename. The 2c slice-16 consumer gate surfaced it. The actual queue/cron
+  consumers — `plugins/triggers` and `plugins/workers` — both pass `deno task check`, confirming the
+  `interfaces/`→`ports/` and `./types`→`./ports` rename is non-breaking.
+- **Gate:** `deno check ./maintainer.ts` from `packages/cli` reports 0 TS9016/TS9027 errors.
