@@ -29,3 +29,9 @@
 | 2026-06-08 | note | OQ-D resolved: `e2e:cli` triggers-health is downstream | `src/sdk/runtime/*` are stubs (bootstrap 13 LOC, context 17 LOC, service-context 20 LOC). Failure is in generated trigger service, not host bootstrap. | Carry forward to Wave 4. Do not fix here. |
 | 2026-06-08 | note | OQ-E resolved: `./testing` is exercised | Memory adapters used by `walker-ports_test.ts` and `plugin-registry_test.ts`. | Add `tests/sdk/watcher-cleanup_test.ts` as defensive I/O proof. |
 | 2026-06-08 | note | OQ-F resolved: `inspectPlugin` exported and typed | Exported from `mod.ts` line 43, returns `InspectionReport`. `private-type-ref` on `InspectablePluginManifest`/`InspectablePluginRegistry` because not re-exported through barrel. | Export through `src/diagnostics/mod.ts` and `mod.ts` in Slice 1. |
+
+## PLAN-EVAL drift
+
+| Date | Severity | Item | Evidence | Action |
+|------|----------|------|----------|--------|
+| 2026-06-08 | note | PLAN-EVAL surfaced rework-forcing decision not flagged by plan: upstream-typed `private-type-ref` fix | 2 of 9 `private-type-ref` errors are on upstream types in public signatures — `z.ZodType` (`src/config/validators/manifest-schema.ts:4`) and `StandardSchemaV1` (`src/abstracts/plugin-stream-topic-contribution.ts:11`). Naive barrel re-export violates F-15/AP-14. | Resolved in-line during PLAN-EVAL: locked as LD-8 (package-owned structural types, not upstream re-export); slice 1, research private-type-ref table, and F-15 evidence amended. Verdict PASS in `plan-eval.md`. |

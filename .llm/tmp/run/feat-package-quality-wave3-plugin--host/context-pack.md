@@ -11,6 +11,14 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
 > `.llm/tmp/run/feat-package-quality-wave3-plugin--umbrella/context-pack.md`.
 > This file is the generator-facing entry point and does not duplicate it.
 
+## Phase status
+
+- Research + Plan & Design: complete (committed).
+- **PLAN-EVAL: PASS** (2026-06-08, separate session) — see `plan-eval.md`. One
+  rework-forcing decision resolved in-line as **LD-8** (upstream-typed `private-type-ref`
+  → package-owned structural types, not upstream re-export; preserves F-15/AP-14). Carry
+  LD-8 into slice 1. **Implementation may now begin.**
+
 ## One-unit wave
 
 `@netscript/plugin` only. Archetype **A4 — DSL/Builder (plugin host)**. Gate set

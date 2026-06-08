@@ -88,6 +88,7 @@ Bring `@netscript/plugin` to the A4 enterprise bar:
 | LD-5 | `./testing` surface is exercised | Memory adapters used by `walker-ports_test.ts` and `plugin-registry_test.ts`. Add trivial cleanup test. |
 | LD-6 | `inspectPlugin` is correctly exported and typed | Returns `InspectionReport`. Fix `private-type-ref` by exporting `InspectablePluginManifest`/`InspectablePluginRegistry` through barrels. |
 | LD-7 | Group doc-lint fixes into 3 mechanical slices | `private-type-ref` (9), abstracts JSDoc (~33), remaining JSDoc (~51). All additive, no API changes. |
+| LD-8 | Fix the 2 **upstream-typed** `private-type-ref` errors (`z.ZodType` in `manifest-schema.ts`, `StandardSchemaV1` in `plugin-stream-topic-contribution.ts`) with **package-owned minimal structural types**, NOT by re-exporting the upstream types | Re-exporting `ZodType`/`StandardSchemaV1` from a barrel would violate F-15 (re-export-upstream lint) and AP-14, contradicting this plan's own F-15 "pass" claim. Doctrine-preferred pattern is a package-owned structural interface in `src/domain/` (precedent: `packages/database/prisma-tracing.ts:37-63` mirrors OpenTelemetry's span instead of re-exporting it). The other 7 `private-type-ref` errors are on package-owned types and are fixed by barrel exports as planned. |
 
 ## Open-Decision Sweep
 
@@ -98,6 +99,8 @@ Bring `@netscript/plugin` to the A4 enterprise bar:
 | `plugin-builder.ts` pre-beta split strategy | safe to defer | Debt entry captures this; implementation not in this wave. |
 
 **No decisions marked "must resolve now" — all load-bearing questions are locked above.**
+
+> PLAN-EVAL note (2026-06-08): the evaluator's open-decision sweep surfaced one rework-forcing decision the original plan left implicit — how to fix the 2 **upstream-typed** `private-type-ref` errors without violating F-15/AP-14. Resolved directly and locked as **LD-8**; slice 1 amended accordingly.
 
 ## Risk Register
 
@@ -135,7 +138,7 @@ Bring `@netscript/plugin` to the A4 enterprise bar:
 | F-11 Forbidden-folder lint | yes | No `utils/`, `interfaces/`, `helpers/`, `common/`, `lib/`. |
 | F-12 Naming-convention lint | yes | Manual: `withNoun`, `createNoun`, `isAdjective`, `runVerb` patterns. No `get`/`find`/`sort`/`merge` prefixes on public API. |
 | F-14 Console-log lint | yes | Manual: `loader.ts` uses `console.log`/`warn`/`error` inside `writePluginLog` — justified as a logger sink adapter. No stray `console.log` in library code. |
-| F-15 Re-export-upstream lint | yes | Manual: No Zod/Cliffy/StandardSchema re-exports at root. |
+| F-15 Re-export-upstream lint | yes | Manual: No Zod/Cliffy/StandardSchema re-exports at root. **The 2 upstream-typed `private-type-ref` errors are fixed via package-owned structural types (LD-8), not by re-exporting `ZodType`/`StandardSchemaV1`.** |
 | F-16 Folder-cardinality lint | yes | Manual: Every role folder has ≥2 siblings or subfolders. `public/` (1 file) and `kernel/` (1 subfolder) are justified. |
 | F-17 Abstract-derived co-location | yes | Manual: `PluginContribution` + 11 derived classes all in `src/abstracts/`. |
 | F-18 Sub-barrel lint | yes | Manual: No nested `mod.ts` barrels that re-export from sibling barrels. Each `mod.ts` is a leaf barrel for its folder. |
@@ -172,7 +175,7 @@ Bring `@netscript/plugin` to the A4 enterprise bar:
 
 | # | Slice | Gate | Files |
 |---|-------|------|-------|
-| 1 | Export private types for `private-type-ref` fix | F-7 | `src/config/builders/plugin-builder.ts`, `src/config/domain/plugin-metadata.ts`, `src/domain/core-types.ts`, `src/abstracts/plugin-contribution.ts`, `src/diagnostics/inspect-plugin.ts`, `src/diagnostics/mod.ts`, `src/abstracts/plugin-stream-topic-contribution.ts`, `src/config/validators/manifest-schema.ts`, `mod.ts` |
+| 1 | Fix 9 `private-type-ref`: barrel-export the 7 package-owned types; replace the 2 upstream-typed signatures (`z.ZodType`, `StandardSchemaV1`) with package-owned structural types per **LD-8** (no upstream re-export — preserves F-15) | F-7 (+F-15) | `src/config/builders/plugin-builder.ts`, `src/config/domain/plugin-metadata.ts`, `src/domain/core-types.ts`, `src/abstracts/plugin-contribution.ts`, `src/diagnostics/inspect-plugin.ts`, `src/diagnostics/mod.ts`, `src/abstracts/plugin-stream-topic-contribution.ts`, `src/config/validators/manifest-schema.ts`, `src/domain/*` (new package-owned structural type), `mod.ts` |
 | 2 | JSDoc abstract contribution classes (part 1) | F-7 | `src/abstracts/plugin-aspire-contribution.ts`, `plugin-background-processor-contribution.ts`, `plugin-contract-version-contribution.ts`, `plugin-db-schema-contribution.ts`, `plugin-e2e-contribution.ts` |
 | 3 | JSDoc abstract contribution classes (part 2) | F-7 | `src/abstracts/plugin-migration-contribution.ts`, `plugin-runtime-config-topic-contribution.ts`, `plugin-service-contribution.ts`, `plugin-stream-topic-contribution.ts`, `plugin-telemetry-contribution.ts`, `plugin-contribution.ts` |
 | 4 | JSDoc builder + errors + adapters | F-7 | `src/config/builders/plugin-builder.ts`, `src/domain/errors.ts`, `src/adapters/memory-file-system-adapter.ts` |

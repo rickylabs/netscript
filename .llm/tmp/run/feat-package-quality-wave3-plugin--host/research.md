@@ -33,8 +33,8 @@
 | `src/abstracts/plugin-contribution.ts` | `ContributionAxis` | Export the type (already exported via domain/mod.ts, but barrel needs re-export) |
 | `src/diagnostics/inspect-plugin.ts` | `InspectablePluginManifest` | Export the interface |
 | `src/diagnostics/inspect-plugin.ts` | `InspectablePluginRegistry` | Export the interface |
-| `src/abstracts/plugin-stream-topic-contribution.ts` | `StandardSchemaV1` | Export the interface |
-| `src/config/validators/manifest-schema.ts` | `ZodType` | Use explicit annotation or re-export |
+| `src/abstracts/plugin-stream-topic-contribution.ts` | `StandardSchemaV1` | **Upstream type — do NOT re-export (F-15/AP-14). Replace with package-owned structural type (LD-8).** |
+| `src/config/validators/manifest-schema.ts` | `ZodType` | **Upstream type — do NOT re-export (F-15/AP-14). Annotate `PluginManifestSchema` with a package-owned structural type (LD-8).** |
 
 ### `missing-jsdoc` (84 errors — mechanical JSDoc sweep)
 | File group | Count | Notes |

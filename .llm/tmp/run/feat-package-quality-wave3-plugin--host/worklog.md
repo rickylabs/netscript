@@ -10,7 +10,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Bootstrap | supervisor | Worktree `.worktrees/wave3-plugin-host` + branch forked off umbrella `89071df`. Seed run docs authored (context-pack.md, worklog.md, drift.md, commits.md). Draft PR opened into the umbrella. |
 | 2026-06-08 | Research | generator | MEASURE-FIRST complete. Real numbers: dry-run 0 slow types (SUCCESS), doc-lint 93 errors (84 missing-jsdoc + 9 private-type-ref), README 138 LOC, tests 4 files/13 passing. All OQ-A..OQ-F resolved with evidence. |
 | 2026-06-08 | Plan & Design | generator | Locked plan.md (24 slices), Design checkpoint in worklog.md. Ready for PLAN-EVAL. |
-| | PLAN-EVAL | evaluator | (pending) Separate session. Hard stop before implementation. |
+| | PLAN-EVAL | evaluator | **PASS** (2026-06-08). Separate session. Full Plan-Gate checklist walked; load-bearing findings spot-checked against tree (8 entrypoints, builder 343 LOC, README 138 LOC, doc-lint 93). One rework-forcing decision surfaced and resolved in-line as LD-8 (upstream-typed `private-type-ref` → package-owned structural types, not upstream re-export, to preserve F-15/AP-14). Verdict in `plan-eval.md`. Implementation may begin. |
 | | Implement | generator | (pending) Sliced, one commit + paired doc-record per slice. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
