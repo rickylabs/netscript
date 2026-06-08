@@ -43,6 +43,9 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   quick start and passes the focused doctest fixture.
 - Implementation: slice 11 complete. Commit `5e9f751` documents the `./sdk`
   `ModuleManifestResolver` dynamic-import caveat; publish dry-run succeeds with the expected warning.
+- Implementation: slice 12 complete. Commit `f283836` adds package-local `lint` and `fmt` tasks,
+  fixes task-surfaced `require-await` findings in synchronous promise-returning stubs, and verifies
+  lint/fmt/check/doc-lint gates.
 
 ## One-unit wave
 

@@ -22,6 +22,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 9 complete: README expanded to 165 LOC with Observability, Compatibility, and Required Permissions sections. Code commit `f6e7189`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 10 complete: README example fixture now matches the current quick start chain. Code commit `5d7ed3a`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 11 complete: `./sdk` module JSDoc documents the dynamic import caveat. Code commit `5e9f751`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 12 complete: added package-local `lint` and `fmt` tasks, fixed task-surfaced `require-await` findings, and verified fmt baseline. Code commit `f283836`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -40,6 +41,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 9 validation: README line count is 165. The same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` returns `Checked 8 files` with 0 errors.
 - Slice 10 validation: `deno test --allow-all tests/_fixtures/readme-examples_test.ts` passes 2 tests. The same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` returns `Checked 8 files` with 0 errors.
 - Slice 11 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` returns `Checked 8 files`. `deno publish --dry-run --allow-dirty` succeeds with the expected `unanalyzable-dynamic-import` warning on `src/sdk/discovery/manifest-resolver.ts`.
+- Slice 12 validation: `deno task lint` passes (`Checked 99 files`), `deno task fmt --check` passes (`Checked 108 files`), the same `deno check --unstable-kv ...` command passes, and full-export `deno doc --lint ...` returns `Checked 8 files`.
 
 ## Implementation Evidence
 
@@ -56,6 +58,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 9 | `f6e7189` | F-7 | PASS | README expanded from 138 to 165 LOC and now has standalone Observability, Compatibility, and Required Permissions sections. |
 | 10 | `5d7ed3a` | F-10 | PASS | README quick-start fixture compiles and asserts the service contribution example; 2 fixture tests pass. |
 | 11 | `5e9f751` | F-7/F-6 | PASS_WITH_DOCUMENTED_WARNING | `./sdk` module JSDoc documents that `ModuleManifestResolver` uses runtime-resolved dynamic imports; publish dry-run succeeds with the expected warning. |
+| 12 | `f283836` | F-6 | PASS | Added `lint` and `fmt` tasks; fixed synchronous promise-returning stubs that triggered `require-await`; package lint/fmt/check/doc-lint gates pass. |
 
 ## Design Checkpoint
 

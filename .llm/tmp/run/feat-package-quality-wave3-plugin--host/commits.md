@@ -27,7 +27,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 20 | 5d7ed3a | test(plugin): align readme examples with quick start | Slice 10 |
 | 21 | 2bdc7af | docs(wave3): record slice 10 readme doctest | Slice 10 docs |
 | 22 | 5e9f751 | docs(plugin): document sdk dynamic import caveat | Slice 11 |
-| 23 | (this commit) | docs(wave3): record slice 11 sdk caveat | Slice 11 docs |
+| 23 | de6eda5 | docs(wave3): record slice 11 sdk caveat | Slice 11 docs |
+| 24 | f283836 | chore(plugin): add lint and fmt tasks | Slice 12 |
+| 25 | (this commit) | docs(wave3): record slice 12 task hygiene | Slice 12 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)
