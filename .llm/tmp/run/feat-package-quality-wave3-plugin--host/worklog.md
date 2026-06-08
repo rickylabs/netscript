@@ -12,6 +12,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Plan & Design | generator | Locked plan.md (24 slices), Design checkpoint in worklog.md. Ready for PLAN-EVAL. |
 | | PLAN-EVAL | evaluator | **PASS** (2026-06-08). Separate session. Full Plan-Gate checklist walked; load-bearing findings spot-checked against tree (8 entrypoints, builder 343 LOC, README 138 LOC, doc-lint 93). One rework-forcing decision surfaced and resolved in-line as LD-8 (upstream-typed `private-type-ref` → package-owned structural types, not upstream re-export, to preserve F-15/AP-14). Verdict in `plan-eval.md`. Implementation may begin. |
 | 2026-06-08 | Implement | generator | Slice 1 complete: fixed all 9 private-type-ref errors, including LD-8 package-owned structural schema types for Zod/Standard Schema signatures. Code commit `0c1b2a1`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 2 complete: documented first abstract contribution group. Code commit `1a7e71e`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -20,12 +21,14 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 
 - Slice 1 validation: `deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts` passes from `packages/plugin`.
 - Slice 1 doc-lint evidence: full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 100 remaining `missing-jsdoc` errors. The remaining doc-lint work belongs to slices 2-7.
+- Slice 2 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 86 remaining `missing-jsdoc` errors.
 
 ## Implementation Evidence
 
 | Slice | Commit | Gate | Result | Notes |
 |-------|--------|------|--------|-------|
 | 1 | `0c1b2a1` | F-7 + F-15 | PASS for private-type-ref scope | Re-exported package-owned referenced types through the relevant entrypoints; replaced `z.ZodType` and `StandardSchemaV1` public annotations with package-owned structural contracts in `src/domain/schema-types.ts`; no upstream type re-export introduced. |
+| 2 | `1a7e71e` | F-7 | PASS for slice scope | Added JSDoc to `PluginAspireContribution`, `PluginBackgroundProcessorContribution`, `PluginContractVersionContribution`, `PluginDbSchemaContribution`, and `PluginE2eContribution`; doc-lint remaining count dropped to 86. |
 
 ## Design Checkpoint
 

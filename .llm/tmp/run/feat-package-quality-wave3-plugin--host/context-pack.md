@@ -21,6 +21,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
 - Implementation: slice 1 complete. Commit `0c1b2a1` fixes all `private-type-ref` errors; full-export
   doc-lint now has no `private-type-ref` matches and 100 planned `missing-jsdoc` errors for slices
   2-7.
+- Implementation: slice 2 complete. Commit `1a7e71e` documents the first abstract contribution
+  group and reduces full-export doc-lint to 86 remaining missing-JSDoc errors.
 
 ## One-unit wave
 
