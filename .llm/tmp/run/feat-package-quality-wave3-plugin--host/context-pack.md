@@ -27,6 +27,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   group and reduces full-export doc-lint to 69 remaining missing-JSDoc errors.
 - Implementation: slice 4 complete. Commit `a308a2e` documents builder/error/adapter exports and
   reduces full-export doc-lint to 48 remaining missing-JSDoc errors.
+- Implementation: slice 5 complete. Commit `d4262ad` documents SDK discovery/application/runtime
+  members and reduces full-export doc-lint to 23 remaining missing-JSDoc errors.
 
 ## One-unit wave
 

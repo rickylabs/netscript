@@ -15,6 +15,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 2 complete: documented first abstract contribution group. Code commit `1a7e71e`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 3 complete: documented remaining abstract contribution group and base axis contract. Code commit `b598f3b`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 4 complete: documented builder state/constructor, plugin errors, and memory file-system adapter. Code commit `a308a2e`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 5 complete: documented SDK discovery/application/runtime public members. Code commit `d4262ad`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -26,6 +27,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 2 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 86 remaining `missing-jsdoc` errors.
 - Slice 3 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 69 remaining `missing-jsdoc` errors.
 - Slice 4 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 48 remaining `missing-jsdoc` errors.
+- Slice 5 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 23 remaining `missing-jsdoc` errors.
 
 ## Implementation Evidence
 
@@ -35,6 +37,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2 | `1a7e71e` | F-7 | PASS for slice scope | Added JSDoc to `PluginAspireContribution`, `PluginBackgroundProcessorContribution`, `PluginContractVersionContribution`, `PluginDbSchemaContribution`, and `PluginE2eContribution`; doc-lint remaining count dropped to 86. |
 | 3 | `b598f3b` | F-7 | PASS for slice scope | Added JSDoc to remaining abstract contribution contracts and `PluginContribution.axis`; doc-lint remaining count dropped to 69. |
 | 4 | `a308a2e` | F-7 | PASS for slice scope | Added JSDoc to exported builder state/constructor, plugin error constructors, and `MemoryFileSystemAdapter`; doc-lint remaining count dropped to 48. |
+| 5 | `d4262ad` | F-7 | PASS for slice scope | Added JSDoc to SDK discovery ports/classes, walker pipeline options, watcher handle, and runtime bootstrap/bridge members; doc-lint remaining count dropped to 23. |
 
 ## Design Checkpoint
 
