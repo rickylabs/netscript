@@ -81,6 +81,29 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 18 | `3279d7b` | F-10 | PASS | Full package test suite passes: 21 passed, 0 failed. |
 | 19 | `8f3c204` | F-1 | DEBT_ACCEPTED | Closed old `packages/plugin — types.ts 1,005 LOC` entry and opened `plugin-builder.ts` 343 LOC accepted debt with pre-beta closing target. |
 
+## Manual Fitness Evidence
+
+| Gate | Result | Evidence |
+|------|--------|----------|
+| F-1 File-size lint | DEBT_ACCEPTED | `plugin-builder.ts` remains 343 LOC and is tracked in `.llm/harness/debt/arch-debt.md` with pre-beta closing target. |
+| F-2 Helper-reinvention scan | PASS | `safeStringifyMetadata` in `loader.ts` is a logger-sink helper for circular-safe metadata serialization; no platform helper replacement exists. |
+| F-3 Layering check | PASS | `domain/` owns core values/errors/schema contracts; `ports/` define consumed contracts; `application/` composes ports; `adapters/` implement ports; `cli/` presentation imports CLI contracts. |
+| F-4 Inheritance audit | PASS | `PluginContribution` and derived contribution bases live in `src/abstracts/`; no cross-package inheritance or deep hierarchy. |
+| F-5 Public surface audit | PASS | 8 export entrypoints remain curated in `deno.json`; root `mod.ts` exposes authoring, diagnostics, domain errors, and selected contracts only. |
+| F-6 JSR publishability | PASS_WITH_DOCUMENTED_WARNING | `deno publish --dry-run --allow-dirty` succeeds with 0 slow types; expected `./sdk` dynamic-import warning is documented in `src/sdk/mod.ts`. |
+| F-7 Doc-score gate | PASS | Full-export `deno doc --lint` over all 8 entrypoints returns `Checked 8 files`. |
+| F-8 Workspace lib check | PASS | Package `tasks.check` runs `deno check --unstable-kv` over all 8 entrypoints. |
+| F-9 Permission declaration check | PASS | README now has Required Permissions; tests that use SDK/scaffolding run under explicit `--allow-all`. |
+| F-10 Test-shape audit | PASS | 21 tests across 9 focused files; no god test file. |
+| F-11 Forbidden-folder lint | PASS | No `utils/`, `helpers/`, `common/`, `lib/`, or `interfaces/` folders under `packages/plugin/src/`. |
+| F-12 Naming-convention lint | PASS | Public verbs remain `define`, `with`, `create`, `start`, `run`, `inspect`; no `I*`/`*T` exported names. |
+| F-13 Saga/runtime invariants | N/A | A4 plugin host package does not own saga/runtime state machines. |
+| F-14 Console-log lint | PASS | Console usage is limited to `loader.ts` logger sink and README example output. |
+| F-15 Re-export-upstream lint | PASS | Upstream Zod/Standard Schema types are not re-exported; slice 1 introduced package-owned structural contracts. |
+| F-16 Folder-cardinality lint | PASS | Role folders remain bounded; `public/` and `kernel/` are narrow accepted roles from the locked plan. |
+| F-17 Abstract-derived co-location | PASS | Abstract contribution contracts are co-located in `src/abstracts/`. |
+| F-18 Sub-barrel lint | PASS | Public/subpath barrels are declared entrypoints; no nested utility barrel was introduced. |
+
 ## Design Checkpoint
 
 ### 1. Public surface
