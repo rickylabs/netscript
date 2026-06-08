@@ -41,6 +41,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   Observability, Compatibility, and Required Permissions sections.
 - Implementation: slice 10 complete. Commit `5d7ed3a` aligns the README fixture with the current
   quick start and passes the focused doctest fixture.
+- Implementation: slice 11 complete. Commit `5e9f751` documents the `./sdk`
+  `ModuleManifestResolver` dynamic-import caveat; publish dry-run succeeds with the expected warning.
 
 ## One-unit wave
 

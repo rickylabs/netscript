@@ -25,7 +25,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 18 | f6e7189 | docs(plugin): expand readme quality sections | Slice 9 |
 | 19 | 63976f5 | docs(wave3): record slice 9 readme expansion | Slice 9 docs |
 | 20 | 5d7ed3a | test(plugin): align readme examples with quick start | Slice 10 |
-| 21 | (this commit) | docs(wave3): record slice 10 readme doctest | Slice 10 docs |
+| 21 | 2bdc7af | docs(wave3): record slice 10 readme doctest | Slice 10 docs |
+| 22 | 5e9f751 | docs(plugin): document sdk dynamic import caveat | Slice 11 |
+| 23 | (this commit) | docs(wave3): record slice 11 sdk caveat | Slice 11 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)
