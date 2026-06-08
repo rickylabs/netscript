@@ -32,6 +32,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 19 complete: closed obsolete plugin `types.ts` debt and opened accepted `plugin-builder.ts` F-1 size debt. Code commit `8f3c204`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 20 complete: recorded manual F-1..F-18 evidence table in worklog. Code commit `4968dd5`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 21 complete: `packages/cli` consumer-import validation passed. Empty verification commit `7a24d51`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 22 complete: `plugins/*` consumer-import validation passed. Empty verification commit `c2c1eec`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -60,6 +61,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 19 validation: `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` pass after the debt registry update.
 - Slice 20 validation: `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` pass after adding manual F-gate evidence.
 - Slice 21 validation: from `packages/cli`, `deno check --unstable-kv mod.ts` passes and `deno task check` passes (`bin/netscript.ts`, `bin/netscript-dev.ts`, `mod.ts`, `maintainer.ts`, `scaffolding.ts`, `testing.ts`).
+- Slice 22 validation: `deno task check` passes in `plugins/sagas`, `plugins/streams`, `plugins/triggers`, and `plugins/workers`; explicit `deno check --unstable-kv mod.ts services/src/main.ts` also passes in `plugins/sagas`.
 
 ## Implementation Evidence
 
@@ -86,6 +88,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 19 | `8f3c204` | F-1 | DEBT_ACCEPTED | Closed old `packages/plugin — types.ts 1,005 LOC` entry and opened `plugin-builder.ts` 343 LOC accepted debt with pre-beta closing target. |
 | 20 | `4968dd5` | Static | PASS | Manual F-1..F-18 evidence table recorded in this worklog; F-13 marked n/a. |
 | 21 | `7a24d51` | Consumer | PASS | `packages/cli` checks clean with `@netscript/plugin` imports. |
+| 22 | `c2c1eec` | Consumer | PASS | First-party plugin package checks pass for `sagas`, `streams`, `triggers`, and `workers`. |
 
 ## Manual Fitness Evidence
 

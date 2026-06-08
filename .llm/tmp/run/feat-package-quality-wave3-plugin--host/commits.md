@@ -47,7 +47,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 40 | 4968dd5 | docs(wave3): record plugin fitness evidence | Slice 20 |
 | 41 | 3fac166 | docs(wave3): record slice 20 evidence update | Slice 20 docs |
 | 42 | 7a24d51 | test(plugin): verify cli consumer imports | Slice 21 |
-| 43 | (this commit) | docs(wave3): record slice 21 cli consumer | Slice 21 docs |
+| 43 | 055b2d0 | docs(wave3): record slice 21 cli consumer | Slice 21 docs |
+| 44 | c2c1eec | test(plugin): verify plugin package consumers | Slice 22 |
+| 45 | (this commit) | docs(wave3): record slice 22 plugin consumers | Slice 22 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)

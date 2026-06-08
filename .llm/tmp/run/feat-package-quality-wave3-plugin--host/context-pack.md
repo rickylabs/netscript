@@ -64,6 +64,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   `worklog.md`; F-13 is recorded as n/a for A4.
 - Implementation: slice 21 complete. Empty commit `7a24d51` records `packages/cli`
   consumer-import validation; `deno check --unstable-kv mod.ts` and `deno task check` pass.
+- Implementation: slice 22 complete. Empty commit `c2c1eec` records `plugins/*`
+  consumer-import validation; all first-party plugin package checks pass.
 
 ## One-unit wave
 
