@@ -5,6 +5,7 @@ Branch: `feat/package-quality-wave4-runtimes-4a` → umbrella `feat/package-qual
 | # | SHA | Subject | Slice(s) |
 |---|-----|---------|----------|
 | seed | (this commit) | chore(wave4): bootstrap 4a (streams + watchers) sub-wave seed | — |
+| 1 | 935415e | docs(core): declare A3 archetype | S1 |
 
 (Pair each implementation slice commit with its `docs(wave4): record …` run-doc commit,
 per the Wave 2/3 cadence.)

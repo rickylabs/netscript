@@ -102,6 +102,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 | Time | Slice | Step | Notes |
 |------|-------|------|-------|
 | 2026-06-08 | Research | MEASURE-FIRST | Doc-lint per entrypoint measured. Dry-run confirmed PASS. Check confirmed PASS. Consumer scan completed. |
+| 2026-06-08 | S1 | Implement + gate | Updated `packages/plugin-streams-core/docs/architecture.md` to declare A3 runtime/behavior. Gate: `deno fmt --check packages/plugin-streams-core/docs/architecture.md` PASS, 1 file checked. Implementation commit `935415e`. |
 
 ## Decisions
 
