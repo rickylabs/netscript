@@ -103,6 +103,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 |------|-------|------|-------|
 | 2026-06-08 | Research | MEASURE-FIRST | Doc-lint per entrypoint measured. Dry-run confirmed PASS. Check confirmed PASS. Consumer scan completed. |
 | 2026-06-08 | S1 | Implement + gate | Updated `packages/plugin-streams-core/docs/architecture.md` to declare A3 runtime/behavior. Gate: `deno fmt --check packages/plugin-streams-core/docs/architecture.md` PASS, 1 file checked. Implementation commit `935415e`. |
+| 2026-06-08 | S2 | Implement + gate | Updated `packages/plugin-streams-core/deno.json` `check` task to enumerate `.`, `./telemetry`, and `./testing`. Gate: `rtk proxy deno task check` from `packages/plugin-streams-core` PASS, command ran `deno check --unstable-kv mod.ts src/telemetry/mod.ts src/testing/mod.ts`. Implementation commit `0af7e86`. |
 
 ## Decisions
 
