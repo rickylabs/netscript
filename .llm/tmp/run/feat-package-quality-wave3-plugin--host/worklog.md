@@ -14,6 +14,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 1 complete: fixed all 9 private-type-ref errors, including LD-8 package-owned structural schema types for Zod/Standard Schema signatures. Code commit `0c1b2a1`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 2 complete: documented first abstract contribution group. Code commit `1a7e71e`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 3 complete: documented remaining abstract contribution group and base axis contract. Code commit `b598f3b`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 4 complete: documented builder state/constructor, plugin errors, and memory file-system adapter. Code commit `a308a2e`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -24,6 +25,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 1 doc-lint evidence: full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 100 remaining `missing-jsdoc` errors. The remaining doc-lint work belongs to slices 2-7.
 - Slice 2 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 86 remaining `missing-jsdoc` errors.
 - Slice 3 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 69 remaining `missing-jsdoc` errors.
+- Slice 4 validation: the same `deno check --unstable-kv ...` command passes. Full-export `deno doc --lint ...` reports **0 `private-type-ref` errors** and 48 remaining `missing-jsdoc` errors.
 
 ## Implementation Evidence
 
@@ -32,6 +34,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 1 | `0c1b2a1` | F-7 + F-15 | PASS for private-type-ref scope | Re-exported package-owned referenced types through the relevant entrypoints; replaced `z.ZodType` and `StandardSchemaV1` public annotations with package-owned structural contracts in `src/domain/schema-types.ts`; no upstream type re-export introduced. |
 | 2 | `1a7e71e` | F-7 | PASS for slice scope | Added JSDoc to `PluginAspireContribution`, `PluginBackgroundProcessorContribution`, `PluginContractVersionContribution`, `PluginDbSchemaContribution`, and `PluginE2eContribution`; doc-lint remaining count dropped to 86. |
 | 3 | `b598f3b` | F-7 | PASS for slice scope | Added JSDoc to remaining abstract contribution contracts and `PluginContribution.axis`; doc-lint remaining count dropped to 69. |
+| 4 | `a308a2e` | F-7 | PASS for slice scope | Added JSDoc to exported builder state/constructor, plugin error constructors, and `MemoryFileSystemAdapter`; doc-lint remaining count dropped to 48. |
 
 ## Design Checkpoint
 
