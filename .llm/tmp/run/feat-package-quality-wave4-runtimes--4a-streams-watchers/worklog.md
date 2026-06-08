@@ -113,6 +113,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 | 2026-06-08 | S9 | Implement + gate | Added `plugins/streams/tests/cli/streams-cli_test.ts` covering command registry and default CLI instance. Gates: `deno test tests/cli/streams-cli_test.ts` PASS, 2 tests passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `e3c76b1`. |
 | 2026-06-08 | S10 | Implement + gate | Added `plugins/streams/tests/aspire/streams-contribution_test.ts` covering streams service registration, env declaration, and health check declaration. Gates: `deno test tests/aspire/streams-contribution_test.ts` PASS, 1 test passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `7112ce5`. |
 | 2026-06-08 | S11 | Implement + gate | Added `plugins/streams/tests/e2e/streams-gates_test.ts` covering E2E gate IDs and probe commands. Gates: `deno test tests/e2e/streams-gates_test.ts` PASS, 1 test passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `33ac977`. |
+| 2026-06-08 | S12 | Implement + gate | Updated `plugins/streams/deno.json` check task to include `verify-plugin.ts` with the exported entrypoints, probes, and service entrypoint. Gates: `rtk proxy deno task check` PASS, command checked 11 targets including `verify-plugin.ts`; `deno doc --lint ...` PASS, 5 files checked. Implementation commit `494f9ea`. |
 
 ## Decisions
 
