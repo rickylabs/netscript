@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import type { PluginManifestParser } from '../../domain/mod.ts';
 
 /** Zod schema for plugin manifests. */
-export const PluginManifestSchema: z.ZodType = z.object({
+export const PluginManifestSchema: PluginManifestParser = z.object({
   name: z.string().min(1),
   version: z.string().min(1),
   description: z.string().optional(),

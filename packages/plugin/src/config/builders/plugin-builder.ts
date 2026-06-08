@@ -15,15 +15,18 @@ import type { StreamTopicContribution } from '../domain/stream-topic-contributio
 import type { TelemetryContribution } from '../domain/telemetry-contribution.ts';
 import { PluginManifestSchema } from '../validators/manifest-schema.ts';
 
-type DependencyContext<TDependencies extends PluginDependencies> = {
+/** Dependency context supplied to contribution callback inputs. */
+export type DependencyContext<TDependencies extends PluginDependencies> = {
   readonly deps: TDependencies;
 };
 
-type ContributionInput<TValue, TDependencies extends PluginDependencies> =
+/** Contribution value or callback resolved by the plugin builder. */
+export type ContributionInput<TValue, TDependencies extends PluginDependencies> =
   | TValue
   | ((ctx: DependencyContext<TDependencies>) => TValue);
 
-interface PluginBuilderState<TDependencies extends PluginDependencies> {
+/** Immutable state accumulated by the plugin builder chain. */
+export interface PluginBuilderState<TDependencies extends PluginDependencies> {
   readonly name?: string;
   readonly version?: string;
   readonly description?: string;
@@ -285,11 +288,10 @@ export class PluginBuilder<
       dependencies: this.#state.dependencies,
     };
 
-    return Object.freeze(PluginManifestSchema.parse(manifest) as PluginManifest) as TName extends never
-      ? never
-      : TVersion extends never
-        ? never
-        : PluginManifest;
+    return Object.freeze(PluginManifestSchema.parse(manifest) as PluginManifest) as TName extends
+      never ? never
+      : TVersion extends never ? never
+      : PluginManifest;
   }
 
   #withArrayContribution<

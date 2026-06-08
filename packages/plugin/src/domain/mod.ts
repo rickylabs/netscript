@@ -10,6 +10,12 @@ export type {
 } from './core-types.ts';
 export { DuplicatePluginError, PluginError, PluginValidationError } from './errors.ts';
 export type { InstalledPluginVersion } from './installed-version.ts';
+export type {
+  PluginManifestParser,
+  PluginPayloadSchema,
+  PluginSchemaIssue,
+  PluginSchemaResult,
+} from './schema-types.ts';
 export {
   CONTRIBUTION_AXES,
   LIFECYCLE_HOOK_NAMES,
