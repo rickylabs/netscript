@@ -21,7 +21,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 14 | 65a7c41 | docs(plugin): verify config and testing docs | Slice 7 |
 | 15 | 290de80 | docs(wave3): record slice 7 doc verification | Slice 7 docs |
 | 16 | bd1e594 | test(plugin): verify full export doc lint | Slice 8 |
-| 17 | (this commit) | docs(wave3): record slice 8 doc-lint gate | Slice 8 docs |
+| 17 | 2fda337 | docs(wave3): record slice 8 doc-lint gate | Slice 8 docs |
+| 18 | f6e7189 | docs(plugin): expand readme quality sections | Slice 9 |
+| 19 | (this commit) | docs(wave3): record slice 9 readme expansion | Slice 9 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)

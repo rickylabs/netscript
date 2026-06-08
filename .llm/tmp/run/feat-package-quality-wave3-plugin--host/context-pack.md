@@ -37,6 +37,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   config-domain/validators/testing JSDoc targets; full-export doc-lint remains clean.
 - Implementation: slice 8 complete. Empty commit `bd1e594` verifies full-export doc-lint remains
   clean across all 8 entrypoints. Phase A is complete.
+- Implementation: slice 9 complete. Commit `f6e7189` expands README to 165 LOC and adds
+  Observability, Compatibility, and Required Permissions sections.
 
 ## One-unit wave
 
