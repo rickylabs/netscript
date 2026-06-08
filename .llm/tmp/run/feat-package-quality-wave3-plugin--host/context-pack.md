@@ -58,6 +58,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   focused tests pass.
 - Implementation: slice 18 complete. Empty commit `3279d7b` records full package test-suite
   verification: 21 passed, 0 failed.
+- Implementation: slice 19 complete. Commit `8f3c204` closes obsolete `types.ts` debt and opens
+  accepted F-1 debt for `plugin-builder.ts` size with a pre-beta target.
 
 ## One-unit wave
 

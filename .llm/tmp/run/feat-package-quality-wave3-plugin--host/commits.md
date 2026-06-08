@@ -41,7 +41,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 34 | 214a9a3 | test(plugin): cover plugin manifest loader | Slice 17 |
 | 35 | 7997c5a | docs(wave3): record slice 17 loader test | Slice 17 docs |
 | 36 | 3279d7b | test(plugin): verify full test suite | Slice 18 |
-| 37 | (this commit) | docs(wave3): record slice 18 full tests | Slice 18 docs |
+| 37 | f0de70f | docs(wave3): record slice 18 full tests | Slice 18 docs |
+| 38 | 8f3c204 | docs(arch): update plugin builder debt | Slice 19 |
+| 39 | (this commit) | docs(wave3): record slice 19 arch debt | Slice 19 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)

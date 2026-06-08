@@ -29,6 +29,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 16 complete: added watcher cleanup tests for no-op discovery handles. Code commit `b8e44c6`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 17 complete: added plugin manifest loader tests. Code commit `214a9a3`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 18 complete: full package test suite passes. Empty verification commit `3279d7b`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 19 complete: closed obsolete plugin `types.ts` debt and opened accepted `plugin-builder.ts` F-1 size debt. Code commit `8f3c204`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -54,6 +55,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 16 validation: `deno test --allow-all tests/sdk/watcher-cleanup_test.ts` passes 2 tests. `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` also pass.
 - Slice 17 validation: `deno test --allow-all tests/application/plugin-loader_test.ts` passes 2 tests. `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` also pass.
 - Slice 18 validation: `deno test --allow-all` passes 21 tests across 9 test files with 0 failures.
+- Slice 19 validation: `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` pass after the debt registry update.
 
 ## Implementation Evidence
 
@@ -77,6 +79,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 16 | `b8e44c6` | F-10 | PASS | Added cleanup coverage for `createWatcherHandle()` and `startWatcher()` no-op handles. |
 | 17 | `214a9a3` | F-10 | PASS | Added loader coverage for resolved and unresolved `ManifestResolverPort` results. |
 | 18 | `3279d7b` | F-10 | PASS | Full package test suite passes: 21 passed, 0 failed. |
+| 19 | `8f3c204` | F-1 | DEBT_ACCEPTED | Closed old `packages/plugin — types.ts 1,005 LOC` entry and opened `plugin-builder.ts` 343 LOC accepted debt with pre-beta closing target. |
 
 ## Design Checkpoint
 
