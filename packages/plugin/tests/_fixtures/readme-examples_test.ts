@@ -2,9 +2,16 @@ import { assertEquals } from '@std/assert';
 import { definePlugin, inspectPlugin } from '../../mod.ts';
 
 Deno.test('README definePlugin example creates an inspectable plugin manifest', () => {
-  const plugin = definePlugin('@example/plugin', '0.0.1-alpha.0').build();
+  const plugin = definePlugin('@example/plugin', '0.0.1-alpha.0')
+    .withDescription('Example plugin.')
+    .withService({
+      name: 'example-api',
+      entrypoint: 'services/api/main.ts',
+    })
+    .build();
 
   assertEquals(inspectPlugin(plugin).target, '@example/plugin');
+  assertEquals(inspectPlugin(plugin).details.contributionGroups, 1);
 });
 
 Deno.test('author guide manifest example uses the public typestate builder', () => {

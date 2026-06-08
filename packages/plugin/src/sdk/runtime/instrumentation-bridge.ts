@@ -1,5 +1,6 @@
 /** Bridge between plugin runtime and telemetry instrumentation. */
 export interface InstrumentationBridge {
+  /** Register a plugin or contribution name with instrumentation. */
   readonly register: (name: string) => void;
 }
 

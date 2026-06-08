@@ -1,0 +1,715 @@
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\config\builders\plugin-builder.ts[0m[0m[33m:51:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m51 | [0m  constructor(state: PluginBuilderState<TDependencies> = { contributions: {} }) {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PluginBuilder.prototype.withService' references private type 'ContributionInput'[0m
+   [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\config\builders\plugin-builder.ts[0m[0m[33m:137:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m137 | [0m  withService(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m22 | [0mtype ContributionInput<TValue, TDependencies extends PluginDependencies> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PluginMetadata' references private type 'PluginMetadataValue'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\config\domain\plugin-metadata.ts[0m[0m[33m:4:1[0m
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport type PluginMetadata = Record<string, PluginMetadataValue>;
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m19 | [0mexport type PluginMetadataValue =
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PluginType' references private type 'PLUGIN_TYPES'[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\domain\core-types.ts[0m[0m[33m:7:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0mexport type PluginType = (typeof PLUGIN_TYPES)[number];
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0mexport const PLUGIN_TYPES = ['background-processor', 'api', 'frontend', 'utility'] as const;
+ [0m[38;5;12m | [0m             [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+ [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PluginContribution.prototype.axis' references private type 'ContributionAxis'[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  abstract readonly axis: ContributionAxis;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0mexport type ContributionAxis = (typeof CONTRIBUTION_AXES)[number];
+ [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+ [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  abstract readonly axis: ContributionAxis;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'inspectPlugin' references private type 'InspectablePluginManifest'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\diagnostics\inspect-plugin.ts[0m[0m[33m:35:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m35 | [0mexport function inspectPlugin(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m2 | [0mexport interface InspectablePluginManifest {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'inspectPlugin' references private type 'InspectablePluginRegistry'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\diagnostics\inspect-plugin.ts[0m[0m[33m:35:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m35 | [0mexport function inspectPlugin(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0mexport interface InspectablePluginRegistry {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-stream-topic-contribution.ts[0m[0m[33m:8:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m8 | [0m  readonly axis = 'stream-topic' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-stream-topic-contribution.ts[0m[0m[33m:9:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-stream-topic-contribution.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  abstract readonly subject: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PluginStreamTopicContribution.prototype.schema' references private type 'StandardSchemaV1'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-stream-topic-contribution.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  abstract readonly schema: StandardSchemaV1<TPayload>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0minterface StandardSchemaV1<Input = unknown, Output = Input> {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-stream-topic-contribution.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  abstract readonly schema: StandardSchemaV1<TPayload>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PluginManifestSchema' references private type 'ZodType'[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\config\validators\manifest-schema.ts[0m[0m[33m:4:14[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0mexport const PluginManifestSchema: z.ZodType = z.object({
+ [0m[38;5;12m | [0m             [0m[1m[31m^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0mexport interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+ [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+ [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'MemoryFileSystemAdapter' references private type 'FileSystemPort'[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\adapters\memory-file-system-adapter.ts[0m[0m[33m:4:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0mexport class MemoryFileSystemAdapter implements FileSystemPort {
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
+  [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+ [0m[38;5;12m | [0m
+[0m[38;5;12m2 | [0mexport interface FileSystemPort {
+ [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+ [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\adapters\memory-file-system-adapter.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly files: Map<string, string> = new Map<string, string>();
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\adapters\memory-file-system-adapter.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  async readText(path: string): Promise<string> {
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\adapters\memory-file-system-adapter.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  async writeText(path: string, text: string): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\adapters\memory-file-system-adapter.ts[0m[0m[33m:15:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0m  async exists(path: string): Promise<boolean> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\domain\errors.ts[0m[0m[33m:3:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0m  constructor(message: string, options?: ErrorOptions) {
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\domain\errors.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  constructor(message: string, readonly issues: readonly string[] = []) {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\domain\errors.ts[0m[0m[33m:19:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m19 | [0m  constructor(name: string) {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-aspire-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'aspire' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-aspire-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly modulePath: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-background-processor-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'background-processor' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-background-processor-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-background-processor-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly entrypoint: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-contract-version-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'contract-version' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-contract-version-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly version: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-contract-version-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly loader: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-db-schema-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'database-schema' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-db-schema-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly path: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-db-schema-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly engine?: 'postgres' | 'mysql' | 'mssql' | 'sqlite';
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-e2e-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'e2e' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-e2e-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-e2e-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly command: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-migration-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'migration' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-migration-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-migration-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly path: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-runtime-config-topic-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'runtime-config-topic' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-runtime-config-topic-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-runtime-config-topic-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly schemaPath?: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-service-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'service' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-service-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-service-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly entrypoint: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-telemetry-contribution.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly axis = 'telemetry' as const;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-telemetry-contribution.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\abstracts\plugin-telemetry-contribution.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  abstract readonly module: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:3:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0m  readonly command: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:4:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0m  readonly flags?: Record<string, string | boolean | number>;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly values?: readonly string[];
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  readonly code: number;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  readonly message?: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:12:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0m  readonly data?: unknown;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:17:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m17 | [0m  readonly name: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:18:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0m  readonly description: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\types.ts[0m[0m[33m:19:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m19 | [0m  readonly run: (args: PluginCliArgs) => PluginCliResult | Promise<PluginCliResult>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\plugin-cli.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  abstract readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\plugin-cli.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  abstract readonly description: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\plugin-item-scaffolder.ts[0m[0m[33m:3:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0m  readonly files: readonly string[];
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\plugin-item-scaffolder.ts[0m[0m[33m:4:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0m  readonly warnings?: readonly string[];
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\plugin-item-scaffolder.ts[0m[0m[33m:9:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0m  abstract readonly itemName: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\plugin-runtime-config-cli.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  abstract readonly topic: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\doctor-report.ts[0m[0m[33m:3:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0m  readonly name: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\doctor-report.ts[0m[0m[33m:4:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0m  readonly ok: boolean;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\doctor-report.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly message?: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\doctor-report.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  readonly plugin: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\cli\base\doctor-report.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  readonly checks: readonly DoctorCheck[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ast-extractor.ts[0m[0m[33m:12:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0m  async extract(files: readonly WalkedFile[]): Promise<readonly ExtractedContribution[]> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\manifest-resolver.ts[0m[0m[33m:8:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m8 | [0m  constructor(private readonly manifest: PluginManifest | undefined = undefined) {}
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\manifest-resolver.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  async resolve(_spec: string): Promise<PluginManifest | undefined> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\manifest-resolver.ts[0m[0m[33m:23:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m23 | [0m  constructor(private readonly options: ModuleManifestResolverOptions) {}
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\registry-emitter.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  async emit(
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\source-graph.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  readonly files: readonly WalkedFile[];
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\source-graph.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  readonly contributions: readonly ExtractedContribution[];
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\watcher.ts[0m[0m[33m:3:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0m  readonly stop: () => Promise<void>;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\emitter-port.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly path: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\emitter-port.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  readonly text: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\emitter-port.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  emit(contributions: readonly ExtractedContribution[]): Promise<readonly RegistryEmission[]>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\extractor-port.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly file: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\extractor-port.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  readonly symbol: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\extractor-port.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  readonly axis: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\extractor-port.ts[0m[0m[33m:12:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0m  extract(files: readonly WalkedFile[]): Promise<readonly ExtractedContribution[]>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\manifest-resolver-port.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  resolve(spec: string): Promise<PluginManifest | undefined>;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\walker-port.ts[0m[0m[33m:3:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0m  readonly path: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\walker-port.ts[0m[0m[33m:4:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m4 | [0m  readonly text: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\discovery\ports\walker-port.ts[0m[0m[33m:9:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0m  walk(root: string): Promise<readonly WalkedFile[]>;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\application\run-walker-pipeline.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  readonly root: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\application\run-walker-pipeline.ts[0m[0m[33m:8:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m8 | [0m  readonly walker: WalkerPort;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\application\run-walker-pipeline.ts[0m[0m[33m:9:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0m  readonly extractor: ExtractorPort;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\application\run-walker-pipeline.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  readonly emitter: EmitterPort;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\runtime\instrumentation-bridge.ts[0m[0m[33m:3:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m3 | [0m  readonly register: (name: string) => void;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave3-plugin-host\packages\plugin\src\sdk\runtime\plugin-host-bootstrap.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly plugins: readonly PluginManifest[];
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[0m: Found [0m[1m93[0m documentation lint errors.

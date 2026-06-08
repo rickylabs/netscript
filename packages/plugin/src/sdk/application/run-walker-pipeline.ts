@@ -4,9 +4,13 @@ import type { WalkerPort } from '../discovery/ports/walker-port.ts';
 
 /** Options for running the SDK walker pipeline. */
 export interface RunWalkerPipelineOptions {
+  /** Root directory to walk. */
   readonly root: string;
+  /** Source walker used to discover files. */
   readonly walker: WalkerPort;
+  /** Extractor used to identify contribution declarations. */
   readonly extractor: ExtractorPort;
+  /** Emitter used to produce registry files. */
   readonly emitter: EmitterPort;
 }
 

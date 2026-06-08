@@ -19,18 +19,24 @@
  */
 
 export { definePlugin } from './src/config/mod.ts';
+export { PLUGIN_TYPES } from './src/config/mod.ts';
 export type {
   BackgroundProcessorContribution,
   ContractVersionContribution,
+  ContributionInput,
   DbSchemaContribution,
+  DependencyContext,
   E2eContribution,
   MigrationContribution,
   PluginBuilder,
+  PluginBuilderState,
   PluginContributions,
   PluginDependencies,
   PluginLifecycleHooks,
   PluginManifest,
+  PluginManifestParser,
   PluginMetadata,
+  PluginMetadataValue,
   PluginType,
   RuntimeConfigTopicContribution,
   ServiceContribution,
@@ -40,5 +46,10 @@ export type {
 export type { PluginContext, PluginLogger } from './src/domain/mod.ts';
 export { DuplicatePluginError, PluginError, PluginValidationError } from './src/domain/mod.ts';
 export { PluginContribution } from './src/abstracts/mod.ts';
-export { inspectPlugin } from './src/diagnostics/inspect-plugin.ts';
-export type { InspectionReport } from './src/diagnostics/inspect-plugin.ts';
+export type { ContributionAxis } from './src/abstracts/mod.ts';
+export { inspectPlugin } from './src/diagnostics/mod.ts';
+export type {
+  InspectablePluginManifest,
+  InspectablePluginRegistry,
+  InspectionReport,
+} from './src/diagnostics/mod.ts';
