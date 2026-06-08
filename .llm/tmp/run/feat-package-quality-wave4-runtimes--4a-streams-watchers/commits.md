@@ -17,6 +17,7 @@ Branch: `feat/package-quality-wave4-runtimes-4a` → umbrella `feat/package-qual
 | 10 | 7112ce5 | test(plugin): cover streams Aspire contribution | S10 |
 | 11 | 33ac977 | test(plugin): cover streams E2E gate metadata | S11 |
 | 12 | 494f9ea | fix(plugin): include verifier in check task | S12 |
+| 13 | 57fdbd8 | refactor(watchers): move sources into src tree | S13 |
 
 (Pair each implementation slice commit with its `docs(wave4): record …` run-doc commit,
 per the Wave 2/3 cadence.)

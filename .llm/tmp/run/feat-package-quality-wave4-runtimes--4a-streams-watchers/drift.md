@@ -29,6 +29,7 @@
 | 2026-06-08 | none | Slice 10 followed the locked Aspire contribution test scope | Added in-memory Aspire registration test under `tests/aspire/` | No drift |
 | 2026-06-08 | none | Slice 11 followed the locked E2E metadata test scope | Added E2E gate metadata test under `tests/e2e/` | No drift |
 | 2026-06-08 | none | Slice 12 followed the locked check-task scope | Added `verify-plugin.ts` to the plugin check task; exported entrypoints remained covered | No drift |
+| 2026-06-08 | planned-transient | Slice 13 moved watchers source files into `src/` before export/import retarget | Git renames for `file-watcher.ts`, `fs.ts`, `types.ts`, `filters/*.ts`, and `strategies/*.ts` | Static failures expected until S15 per locked plan |
 | 2026-06-08 | minor | `plugin-streams-core` full-export doc-lint = 1 error (private-type-ref on `StreamTopicFixtureSchema`) | `deno doc --lint mod.ts src/telemetry/mod.ts src/testing/mod.ts` | Fix in slice 3 |
 | 2026-06-08 | minor | `plugin-streams` full-export doc-lint = 15 errors (11 private-type-ref + 4 missing-jsdoc) | `deno doc --lint mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts` | Fix in slice 6 |
 | 2026-06-08 | minor | `watchers` full-export doc-lint = 5 errors (missing-jsdoc on constructors) | `deno doc --lint mod.ts` | Fix in slice 19 |
