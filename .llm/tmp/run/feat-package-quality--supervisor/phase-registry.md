@@ -280,7 +280,7 @@ concern, **not** a plugin-host defect → terminal owner is Wave 4 sub-wave **4d
 | Nested run ID | `feat-package-quality-wave4-runtimes--<suffix>` |
 | Units | `@netscript/plugin-streams-core`, `@netscript/plugin-workers-core`, `@netscript/plugin-sagas-core`, `@netscript/plugin-triggers-core`, `@netscript/watchers`, `@netscript/plugin-streams`, `@netscript/plugin-workers`, `@netscript/plugin-sagas`, `@netscript/plugin-triggers` |
 | Archetype(s) | A1/A4 (`*-core`), A3 (`watchers`), A5 (`plugins/*`) — **archetype-per-core disputed (registry A1/A4 vs canonical A3); settle in Plan & Design** |
-| Status | `active` — Wave 3 merged → track merged into umbrella; reconciliation pass done; sub-wave **4a** (streams + watchers) opened **PR #18 → umbrella #16** (2026-06-08). PR #16 flipped from BLOCKED → ACTIVE. |
+| Status | `active` — Wave 3 merged → track merged into umbrella; reconciliation pass done. **4a** (streams + watchers) PLAN-EVAL **PASS WITH ADJUSTMENTS** (supervisor-inline, user-approved exception) → **implementing** (PR #18 → umbrella #16). **4b/4c/4d prepared in parallel** off the umbrella with supervisor pre-research (PR #19/#20/#21 → umbrella #16, all BLOCKED on pull-forward). PR #16 ACTIVE. |
 | Merge commit | — |
 
 ### Pre-conditions
@@ -328,6 +328,40 @@ now carries the merged `@netscript/plugin` surface. Reconciliation pass done:
 nested run `feat-package-quality-wave4-runtimes--4a-streams-watchers`, **Draft PR #18 → umbrella #16**.
 Handover = **Research → Plan & Design** (generator session; MEASURE-FIRST full-export
 `deno doc --lint` + dry-run per unit before locking slices).
+
+### 4a PLAN-EVAL + 4b/4c/4d parallel prep (2026-06-08)
+
+**4a PLAN-EVAL (supervisor-inline, user-granted exception** — "we won't run a full
+separate agent on eval for plugins plan phases since they were already almost ready";
+IMPL-EVAL stays a separate session**):** verdict **PASS WITH ADJUSTMENTS** appended to
+4a `plan.md`. 23 slices (S1–S5 streams-core A3, S6–S12 plugin-streams A5, S13–S21
+watchers A3, S22–S23 cross-cutting). One adjustment locked (private-type-ref split-by-
+type-origin: first-party `@netscript/*` → type re-export; third-party e.g.
+`StandardSchemaV1` → package-owned structural type; `@ignore` only for genuinely-internal);
+3 items carried to IMPL-EVAL (A5 runtime-registration evidence via verify-plugin.ts +
+Aspire test; AP-13 console.warn debt entries; watchers deep-import retarget slice 15).
+Implementation proceeding (generator session, PR #18).
+
+**4b/4c/4d prepared in parallel (user-approved** — "prepare them all and then keep them
+up to date before implementing"**).** Each forked off the umbrella @ `ee9f26b` with a
+supervisor read-only MEASURE-FIRST pre-research pass (architectural seeds only — no
+package code). All three carry a **DO-NOT-LOCK pull-forward gate**: each pulls the umbrella
+forward (`git merge feat/package-quality-wave4-runtimes`) after its predecessors merge,
+then re-runs MEASURE-FIRST before locking its plan.
+
+| Sub-wave | Units | Branch / worktree | PR | Measured doc-lint (full-export) @ `ee9f26b` | Headline |
+|----------|-------|-------------------|----|---------------------------------------------|----------|
+| 4b — workers | plugin-workers-core (A3) + plugin-workers (A5) | `…-4b` / `.worktrees/wave4-runtimes-4b` | **#19** | core 460 (180 ptr + 280 jsdoc) · plugin 143 (83+60) = **603** | largest family; 17-export F-5/F-16; 0-test plugin; F-1 501/469; likely core/plugin split. Pull-forward after **4a** (couples `./streams`). |
+| 4c — sagas | plugin-sagas-core (A3) + plugin-sagas (A5) | `…-4c` / `.worktrees/wave4-runtimes-4c` | **#20** | core 397 (48+349) · plugin 122 (71+51) = **519** | 19-export F-5/F-16 + ports/adapters F-3 layering; 0-test plugin + core has no test task; F-1 v1-router **716** (biggest on board) + redis-transport 481; likely core/plugin split. Pull-forward after **4a+4b** (`./streams` + `./integration/workers`). |
+| 4d — triggers | plugin-triggers-core (A3) + plugin-triggers (A5) | `…-4d` / `.worktrees/wave4-runtimes-4d` | **#21** | core 211 (46+165) · plugin 138 (76+62) = **349** | lightest family but **both docs/ MISSING** (F-7); 0-test plugin; `test-webhooks-e2e` 424; **OQ-D owner — `triggers-health` live `localhost:8093/health` probe**; likely combined (no split). Runs LAST. Pull-forward after **4a+4b+4c**; its merge → umbrella full-wave completeness → umbrella→track. |
+
+All 6 units `deno publish --dry-run` **PASS, 0 slow types** at `ee9f26b` → Wave 4 is
+fine-tuning + a surface challenge, not a slow-type rebuild. Family doc-lint totals confirm
+the split-strategy (4b/4c need core/plugin splits; 4d likely combined). Wave-4 doc-lint
+across all 8 not-yet-started units (streams handled in 4a) ≈ **1,471**. Seed docs under
+each `feat-package-quality-wave4-runtimes--4{b,c,d}-*/` (context-pack, pre-research,
+worklog, drift, commits). Each sub-wave's generator owns its own MEASURE-FIRST re-baseline
+(per-entrypoint attribution, consumer scan, test-layer design) after the pull-forward.
 
 ### Inherited debt
 
@@ -455,7 +489,7 @@ worktree `.worktrees/wave5-apps`, off track `9b27fb4`):
 | 1 — Contracts & schemas | `merged` | 0 | runtime-config, config, contracts | `4c57867` (PR #7) |
 | 2 — Integration adapters | `merged` (2a #10; 2b #12; 2c #13; umbrella #11 → track) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | `d4f971e` (PR #11) |
 | 3 — Plugin runner | `merged` (host #15 → umbrella #14 → track; IMPL-EVAL PASS) | 2 | plugin | `1423ab3` (PR #14) |
-| 4 — Runtimes & plugins | `active` (umbrella PR #16; 4a streams+watchers opened) | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
+| 4 — Runtimes & plugins | `active` (umbrella #16; 4a implementing #18; 4b/4c/4d prepared #19/#20/#21) | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
 | 5 — Application surfaces | `prepared` (umbrella PR #17, blocked on 4) | 4 | sdk, service, fresh, fresh-ui | — |
 | 6 — Tooling | `planned` | 0–5 | cli | — |
 
@@ -478,3 +512,6 @@ Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 | 2026-06-08 | `feat/package-quality` (Wave 3 merged, `1423ab3`) | merged (FF `5a73fcf`→`1423ab3`) | **Wave 3 closeout.** Host PR #15 → umbrella PR #14 → track. Local track worktree fast-forwarded (clean FF; `5a73fcf` is an ancestor of the merge). Supervisor registry marked Wave 3 `merged`; OQ-D resolved (triggers-health → 4d). `main` still at `3b4dcb9`. |
 | 2026-06-08 | `feat/package-quality` (incl. Wave 3) → `feat/package-quality-wave4-runtimes` | merged (reconcile) | **Wave 4 unblock.** Track merged into the umbrella to carry the merged `@netscript/plugin` surface into the runtimes base. Reconciliation pass: consumer scan re-confirmed vs merged surface; OQ-D closed (4d owns triggers-health). PR #16 flipped from BLOCKED → active. |
 | 2026-06-08 | bootstrap `feat/package-quality-wave4-runtimes-4a` off umbrella `ee9f26b` | n/a (fork) | **Wave 4 sub-wave 4a (streams + watchers).** Worktree `.worktrees/wave4-runtimes-4a` + branch forked off the (track-synced) umbrella. Seed run docs committed (`8abdf52`); **Draft PR #18 → umbrella #16**. PR #16 flipped BLOCKED → ACTIVE. Research/Plan & Design pending (separate generator session). |
+| 2026-06-08 | bootstrap `feat/package-quality-wave4-runtimes-4b` off umbrella `ee9f26b` | n/a (fork) | **Wave 4 sub-wave 4b (workers) — parallel prep (user-approved).** Worktree `.worktrees/wave4-runtimes-4b` + branch off the umbrella. Supervisor pre-research seed committed (`628f9fb`): core 460 / plugin 143 doc-lint, both dry-run PASS. **Draft PR #19 → umbrella #16**, marked PREPARED/BLOCKED on the 4a pull-forward. Plan-lock deferred. |
+| 2026-06-08 | bootstrap `feat/package-quality-wave4-runtimes-4c` off umbrella `ee9f26b` | n/a (fork) | **Wave 4 sub-wave 4c (sagas) — parallel prep (user-approved).** Worktree `.worktrees/wave4-runtimes-4c` + branch off the umbrella. Supervisor pre-research seed committed (`53e18b9`): core 397 / plugin 122 doc-lint, both dry-run PASS, v1-router 716. **Draft PR #20 → umbrella #16**, marked PREPARED/BLOCKED on the 4a+4b pull-forward. Plan-lock deferred. |
+| 2026-06-08 | bootstrap `feat/package-quality-wave4-runtimes-4d` off umbrella `ee9f26b` | n/a (fork) | **Wave 4 sub-wave 4d (triggers) — parallel prep (user-approved). Runs LAST.** Worktree `.worktrees/wave4-runtimes-4d` + branch off the umbrella. Supervisor pre-research seed committed (`192f288`): core 211 / plugin 138 doc-lint, both dry-run PASS, both docs/ MISSING, owns `triggers-health` (OQ-D). **Draft PR #21 → umbrella #16**, marked PREPARED/BLOCKED on the 4a+4b+4c pull-forward. Plan-lock deferred. |
