@@ -15,27 +15,44 @@ import type { StreamTopicContribution } from '../domain/stream-topic-contributio
 import type { TelemetryContribution } from '../domain/telemetry-contribution.ts';
 import { PluginManifestSchema } from '../validators/manifest-schema.ts';
 
-type DependencyContext<TDependencies extends PluginDependencies> = {
+/** Dependency context supplied to contribution callback inputs. */
+export type DependencyContext<TDependencies extends PluginDependencies> = {
+  /** Typed dependencies registered on the builder. */
   readonly deps: TDependencies;
 };
 
-type ContributionInput<TValue, TDependencies extends PluginDependencies> =
+/** Contribution value or callback resolved by the plugin builder. */
+export type ContributionInput<TValue, TDependencies extends PluginDependencies> =
   | TValue
   | ((ctx: DependencyContext<TDependencies>) => TValue);
 
-interface PluginBuilderState<TDependencies extends PluginDependencies> {
+/** Immutable state accumulated by the plugin builder chain. */
+export interface PluginBuilderState<TDependencies extends PluginDependencies> {
+  /** Plugin package name. */
   readonly name?: string;
+  /** Plugin semantic version. */
   readonly version?: string;
+  /** Plugin description. */
   readonly description?: string;
+  /** Display name shown in host UI surfaces. */
   readonly displayName?: string;
+  /** Plugin category. */
   readonly type?: PluginType;
+  /** Plugin author name or organization. */
   readonly author?: string;
+  /** Plugin license identifier. */
   readonly license?: string;
+  /** Discovery tags attached to the manifest. */
   readonly tags?: readonly string[];
+  /** Host permissions requested by the plugin. */
   readonly permissions?: readonly string[];
+  /** Runtime-safe metadata attached to the manifest. */
   readonly metadata?: PluginMetadata;
+  /** Contributions accumulated by builder methods. */
   readonly contributions: PluginContributions;
+  /** Lifecycle hooks supplied by the plugin. */
   readonly hooks?: PluginLifecycleHooks;
+  /** Typed dependencies available to contribution callbacks. */
   readonly dependencies?: TDependencies;
 }
 
@@ -48,6 +65,7 @@ export class PluginBuilder<
 > {
   readonly #state: PluginBuilderState<TDependencies>;
 
+  /** Create a builder from an existing immutable state snapshot. */
   constructor(state: PluginBuilderState<TDependencies> = { contributions: {} }) {
     this.#state = state;
   }
@@ -285,11 +303,10 @@ export class PluginBuilder<
       dependencies: this.#state.dependencies,
     };
 
-    return Object.freeze(PluginManifestSchema.parse(manifest) as PluginManifest) as TName extends never
-      ? never
-      : TVersion extends never
-        ? never
-        : PluginManifest;
+    return Object.freeze(PluginManifestSchema.parse(manifest) as PluginManifest) as TName extends
+      never ? never
+      : TVersion extends never ? never
+      : PluginManifest;
   }
 
   #withArrayContribution<

@@ -1,3 +1,13 @@
+/**
+ * SDK discovery ports, alpha implementations, and runtime stubs for plugin hosts.
+ *
+ * `ModuleManifestResolver` dynamically imports plugin manifest modules at runtime. Static publish
+ * checks may report that import as unanalyzable; host tooling is responsible for passing resolvable
+ * package or file specifiers when using the resolver.
+ *
+ * @module
+ */
+
 export { AstExtractor } from './discovery/ast-extractor.ts';
 export { FilesystemWalker } from './discovery/filesystem-walker.ts';
 export { MemoryManifestResolver, ModuleManifestResolver } from './discovery/manifest-resolver.ts';
