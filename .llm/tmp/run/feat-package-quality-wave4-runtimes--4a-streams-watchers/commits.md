@@ -24,6 +24,7 @@ Branch: `feat/package-quality-wave4-runtimes-4a` → umbrella `feat/package-qual
 | 17 | f7612c4 | docs(watchers): add docs scaffold | S17 |
 | 18 | fe3c30a | fix(watchers): add package tasks and publish list | S18 |
 | 19 | a4df3eb | fix(watchers): document public constructors | S19 |
+| 20 | cfa38c6 | test(watchers): add README examples doctest | S20 |
 
 (Pair each implementation slice commit with its `docs(wave4): record …` run-doc commit,
 per the Wave 2/3 cadence.)
