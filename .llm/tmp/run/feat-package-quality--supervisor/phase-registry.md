@@ -316,17 +316,19 @@ Supervisor pre-research pass complete:
 | Group branch | `feat/package-quality-wave5-apps` |
 | Nested run ID | `feat-package-quality-wave5-apps--<suffix>` |
 | Units | `@netscript/sdk`, `@netscript/service`, `@netscript/fresh`, `@netscript/fresh-ui` |
-| Archetype(s) | A4 — dsl/app |
-| Status | `planned` |
+| Archetype(s) | **service A4(+A3) · sdk A3(+A4) · fresh-ui A4 Browser · fresh A4+A3 Browser (multi)** — see prep note (registry "A4 — dsl/app" was a first-pass guess) |
+| Status | `prepared` (umbrella PR #17, off track `9b27fb4`, **BLOCKED on Wave 4**) |
 | Merge commit | — |
 
 ### Pre-conditions
 
-- Wave 4 `merged`.
+- Wave 4 `merged` (Wave 4 itself gated on Wave 3).
 
 ### Phase 0 reading
 
-- Nested `PLAN.md` § 4 (Wave 5) + `evaluate_{sdk,service,fresh,fresh-ui}.md` + matching `plan_*`
+- Umbrella `feat-package-quality-wave5-apps--umbrella/{research,split-strategy,context-pack}.md`
+- RFC set at **test-app root** `.resources/rfcs/frontend/` (README map; 14 = unimplemented seams; 17 v3 = realized integration thesis)
+- Nested `evaluate_{sdk,service,fresh,fresh-ui}.md` + matching `plan_*` (stale — structural intent only)
 
 ### Surfaces touched
 
@@ -334,11 +336,42 @@ Supervisor pre-research pass complete:
 
 ### Success criteria
 
-- Each unit: 0 slow-types, `doc --lint`, README/`docs`, archetype matrix. `@netscript/fresh` (≈11.7k LOC) is the long pole — split per nested `plan_fresh.md`.
+- Each unit: **dry-run PASS (currently RED on all 4)**, full-export `doc --lint` clean, README ≥150 doctested, `docs/` scaffold, `./testing` entrypoint, archetype gates, F-16/F-18 surface discipline. Match/exceed plugin-tier quality; forward-compatible RFC 14 seams; CLI-ready registry/preset/testing seams.
+- `@netscript/fresh` (13.2k src LOC, 276 doc-lint, 13 over-cap, multi-archetype) is the long pole — splits internally `5d-1..5d-6` per `split-strategy.md`.
 
 ### Notes
 
-- `fresh` is the largest restructure on the board; budget accordingly. Migrate route/handler code that belongs to `service` per the nested plan.
+- `fresh` is the largest restructure on the board; budget accordingly.
+
+### Wave 5 prep (2026-06-08)
+
+Supervisor pre-research complete (umbrella PR #17, branch `feat/package-quality-wave5-apps`,
+worktree `.worktrees/wave5-apps`, off track `9b27fb4`):
+`feat-package-quality-wave5-apps--umbrella/{research,split-strategy,context-pack,worklog,drift,commits}.md`.
+
+- **This is a RE-ARCHITECTURE wave, not fine-tuning.** Unlike Wave 4 (9/9 PASS dry-run), **all 4
+  Wave 5 packages FAIL `deno publish --dry-run`** (slow types: service 8, sdk 2, fresh 4,
+  fresh-ui 6). They grew via RFC 12/13/15/16/17 **before doctrine + the plugin rewrite**.
+- **Baseline @ `9b27fb4`:** 171 src files, ~23.4k src LOC, **328 doc-lint errors** (sdk 29 /
+  service 23 / fresh **276** / fresh-ui 0), **138 `private-type-ref`** surface leaks, **20
+  over-cap files** (fresh 13), **2 zero-test packages** (sdk, service), `service` has **no
+  README**, **0/4 have `docs/` or `./testing`**. `fresh` = 57% LOC / 84% doc-lint.
+- **Central surface debate:** sdk + fresh each expose **12 subpaths** ⇒ F-16 cardinality + F-18
+  sub-barrel; several are RFC-era (sdk `query-client`/`collections`/`streams`; fresh `query`/
+  `streams`/`vite`/`interactive`) — justify or fold each.
+- **Three architect throughlines** (beyond JSR readiness): (1) surface encapsulation — kill the
+  138 private-type-ref leaks; (2) forward-compatible RFC 14 seams (sdk `Transport`, fresh
+  `defineFreshApp` §10 extension) — **protect, don't implement** unified mode; cross-package
+  integration (sdk↔fresh query/streams, fresh↔fresh-ui forms); (3) CLI-readiness — stable +
+  documented + tested registry/preset/testing seams for Wave 6 starter commands.
+- **Split:** `service (5a) → sdk (5b) → fresh-ui (5c) → fresh (5d)`, dependency-ordered; `fresh`
+  splits internally `5d-1..5d-6` (support → builders → route → defer/streams → form →
+  query/defineFreshApp). PLAN-EVAL Option A; umbrella merges to track once.
+- **Out of scope:** `@netscript/ui-primitives` (RFC-deferred — do NOT create); CLI (Wave 6);
+  Nitro adapters (RFC 14 roadmap).
+- **Next gate:** after Wave 4 merges → merge track into umbrella → extra Claude reconciliation
+  pass (cross-package consumer scan vs merged surface + `fresh/streams`/`sdk/streams` vs merged
+  Wave 4 streams) → then open 5a.
 
 ## Wave 6 — Tooling
 
@@ -383,7 +416,7 @@ Supervisor pre-research pass complete:
 | 2 — Integration adapters | `merged` (2a #10; 2b #12; 2c #13; umbrella #11 → track) | 1 | logger, telemetry, aspire, kv, database, prisma-adapter-mysql, queue, cron (split 2a/2b/2c) | `d4f971e` (PR #11) |
 | 3 — Plugin runner | `active` (umbrella + sub-branch bootstrapping) | 2 | plugin | — |
 | 4 — Runtimes & plugins | `prepared` (umbrella PR #16, blocked on 3) | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
-| 5 — Application surfaces | `planned` | 4 | sdk, service, fresh, fresh-ui | — |
+| 5 — Application surfaces | `prepared` (umbrella PR #17, blocked on 4) | 4 | sdk, service, fresh, fresh-ui | — |
 | 6 — Tooling | `planned` | 0–5 | cli | — |
 
 Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
@@ -401,3 +434,4 @@ Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 | 2026-06-08 | `feat/package-quality-wave2-adapters-2c` → `feat/package-quality-wave2-adapters` | merged (`d078e5b`, PR #13) | Sub-wave 2c (queue·cron) merged into the umbrella after separate-session IMPL-EVAL **PASS** + Augment hardening round on the in-memory queue adapter. Hexagonal renames (queue `interfaces/`→`ports/`, `utils/`→`validation/`; cron `interfaces/`→`ports/`), AP-16/AP-17 closed. Caveats: `e2e:cli` triggers-health (out-of-scope runtime) + `cli` isolated-declarations debt. Umbrella now = track + 2a + 2b + 2c. |
 | 2026-06-08 | `feat/package-quality-wave2-adapters` → `feat/package-quality` | merged (`d4f971e`, PR #11) | **Wave 2 closeout.** Umbrella merged to the track with a merge commit (`--no-ff`). Full Wave 2 (2a+2b+2c, 6 packages) complete and on the track. `main` still at `3b4dcb9`. Local track worktree fast-forwarded `d931dc6`→`d4f971e` (clean FF; `d931dc6` is a parent of the merge). |
 | 2026-06-08 | bootstrap `feat/package-quality-wave4-runtimes` off track `f2a7ff2` | n/a (fork) | **Wave 4 prep (parallel, user-approved).** Umbrella worktree `.worktrees/wave4-runtimes` + branch off the track. Seed + supervisor pre-research committed (`5f0b949`); Draft **PR #16** → track, marked **BLOCKED on Wave 3**. No sub-branch opened; plan-lock deferred. Post-Wave-3: merge track into umbrella → reconciliation pass → open 4a. `main` still at `3b4dcb9`. |
+| 2026-06-08 | bootstrap `feat/package-quality-wave5-apps` off track `9b27fb4` | n/a (fork) | **Wave 5 prep (parallel, user-approved).** Umbrella worktree `.worktrees/wave5-apps` + branch off the track. Seed + supervisor architectural pre-research committed (`acdfab7`); Draft **PR #17** → track, marked **BLOCKED on Wave 4**. Baseline: **all 4 packages FAIL dry-run** (re-architecture, not fine-tuning); 328 doc-lint / 138 private-type-ref / 20 over-cap; `fresh` long pole splits `5d-1..5d-6`. No sub-branch opened; plan-lock deferred. Post-Wave-4: merge track into umbrella → reconciliation pass → open 5a. `main` still at `3b4dcb9`. |
