@@ -26,6 +26,7 @@
 | 2026-06-08 | none | Slice 7 followed the locked verifier scope | `verify-plugin.ts` validates streams manifest shape against `@netscript/plugin` inspector expectations | No drift |
 | 2026-06-08 | none | Slice 8 followed the locked manifest-test scope | Added manifest shape test under `tests/public/` | No drift |
 | 2026-06-08 | none | Slice 9 followed the locked CLI test scope | Added CLI registry test under `tests/cli/` | No drift |
+| 2026-06-08 | none | Slice 10 followed the locked Aspire contribution test scope | Added in-memory Aspire registration test under `tests/aspire/` | No drift |
 | 2026-06-08 | minor | `plugin-streams-core` full-export doc-lint = 1 error (private-type-ref on `StreamTopicFixtureSchema`) | `deno doc --lint mod.ts src/telemetry/mod.ts src/testing/mod.ts` | Fix in slice 3 |
 | 2026-06-08 | minor | `plugin-streams` full-export doc-lint = 15 errors (11 private-type-ref + 4 missing-jsdoc) | `deno doc --lint mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts` | Fix in slice 6 |
 | 2026-06-08 | minor | `watchers` full-export doc-lint = 5 errors (missing-jsdoc on constructors) | `deno doc --lint mod.ts` | Fix in slice 19 |

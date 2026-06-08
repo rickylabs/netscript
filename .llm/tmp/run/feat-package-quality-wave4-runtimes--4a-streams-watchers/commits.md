@@ -14,6 +14,7 @@ Branch: `feat/package-quality-wave4-runtimes-4a` → umbrella `feat/package-qual
 | 7 | e7ad68f | feat(plugin): add streams verifier | S7 |
 | 8 | cca1d64 | test(plugin): cover streams manifest shape | S8 |
 | 9 | e3c76b1 | test(plugin): cover streams CLI registry | S9 |
+| 10 | 7112ce5 | test(plugin): cover streams Aspire contribution | S10 |
 
 (Pair each implementation slice commit with its `docs(wave4): record …` run-doc commit,
 per the Wave 2/3 cadence.)
