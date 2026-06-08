@@ -34,7 +34,8 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 21 complete: `packages/cli` consumer-import validation passed. Empty verification commit `7a24d51`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 22 complete: `plugins/*` consumer-import validation passed. Empty verification commit `c2c1eec`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 23 complete: final static gate sweep passed (`publish:dry-run`, `check`, `lint`, `fmt --check`, full-export doc-lint). Empty verification commit `9f96342`; paired docs commit follows. |
-| | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
+| 2026-06-08 | Implement | generator | Slice 24 complete: merge-readiness `deno task e2e:cli` ran once. Result: 35 passed, 1 failed at known `behavior.triggers-health` (`localhost:8093/health` connection refused), cleanup passed. Empty verification commit `0458b4d`; paired docs commit follows. |
+| 2026-06-08 | Gate | generator | A4 gates, static gates, and consumer-import validation complete. Merge-readiness E2E has only the LD-4 Wave 4 triggers-health carry-forward. Ready to hand to separate IMPL-EVAL. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
 
@@ -64,6 +65,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 21 validation: from `packages/cli`, `deno check --unstable-kv mod.ts` passes and `deno task check` passes (`bin/netscript.ts`, `bin/netscript-dev.ts`, `mod.ts`, `maintainer.ts`, `scaffolding.ts`, `testing.ts`).
 - Slice 22 validation: `deno task check` passes in `plugins/sagas`, `plugins/streams`, `plugins/triggers`, and `plugins/workers`; explicit `deno check --unstable-kv mod.ts services/src/main.ts` also passes in `plugins/sagas`.
 - Slice 23 validation: from `packages/plugin`, `deno task publish:dry-run` succeeds with 0 slow types and the expected `unanalyzable-dynamic-import` warning for `src/sdk/discovery/manifest-resolver.ts`; `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` all pass.
+- Slice 24 validation: `rtk proxy deno task e2e:cli` ran once from the repo root. The suite reported 35 passed, 1 failed; the only failure was the known LD-4 `behavior.triggers-health` connection refusal at `http://localhost:8093/health`. `cleanup.aspire-stop` and Docker cleanup passed.
 
 ## Implementation Evidence
 
@@ -92,6 +94,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 21 | `7a24d51` | Consumer | PASS | `packages/cli` checks clean with `@netscript/plugin` imports. |
 | 22 | `c2c1eec` | Consumer | PASS | First-party plugin package checks pass for `sagas`, `streams`, `triggers`, and `workers`. |
 | 23 | `9f96342` | F-6/F-7/F-8 | PASS_WITH_DOCUMENTED_WARNING | Final static sweep passes; publish dry-run keeps the documented runtime-resolved dynamic import warning and reports 0 slow types. |
+| 24 | `0458b4d` | Merge-readiness | ACCEPTED_CARRY_FORWARD | `e2e:cli` ran once; 35 gates passed and the only failure is the locked LD-4 `behavior.triggers-health` Wave 4 carry-forward. |
 
 ## Manual Fitness Evidence
 

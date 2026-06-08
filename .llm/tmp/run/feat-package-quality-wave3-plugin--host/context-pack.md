@@ -69,6 +69,12 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
 - Implementation: slice 23 complete. Empty commit `9f96342` records the final static
   gate sweep: publish dry-run succeeds with 0 slow types and the documented dynamic-import
   warning; check, lint, fmt --check, and full-export doc-lint pass.
+- Implementation: slice 24 complete. Empty commit `0458b4d` records the merge-readiness
+  `e2e:cli` run: 35 gates passed, `behavior.triggers-health` failed with the locked LD-4
+  `localhost:8093/health` connection refusal, and cleanup passed. This remains a Wave 4
+  carry-forward, not a Wave 3 implementation blocker.
+- Generator handoff status: ready for separate IMPL-EVAL. Do not merge PR #15 from this
+  session.
 
 ## One-unit wave
 
