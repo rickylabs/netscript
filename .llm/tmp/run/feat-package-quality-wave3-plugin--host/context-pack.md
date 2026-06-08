@@ -33,6 +33,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   `FileSystemPort`; full-export `deno doc --lint` now passes across all 8 entrypoints. Slice 7 is
   a no-op verification/doc-record slice because the planned config/testing JSDoc targets already
   have no remaining lint errors.
+- Implementation: slice 7 complete. Empty commit `65a7c41` records the no-op verification for
+  config-domain/validators/testing JSDoc targets; full-export doc-lint remains clean.
 
 ## One-unit wave
 
