@@ -33,7 +33,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 26 | 17d60ea | chore(plugin): check all public entrypoints | Slice 13 |
 | 27 | 846d85e | docs(wave3): record slice 13 check task | Slice 13 docs |
 | 28 | 7de2e22 | test(plugin): cover domain errors and core types | Slice 14 |
-| 29 | (this commit) | docs(wave3): record slice 14 domain tests | Slice 14 docs |
+| 29 | 1092b17 | docs(wave3): record slice 14 domain tests | Slice 14 docs |
+| 30 | 33b1a59 | test(plugin): cover memory file system adapter | Slice 15 |
+| 31 | (this commit) | docs(wave3): record slice 15 adapter test | Slice 15 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)

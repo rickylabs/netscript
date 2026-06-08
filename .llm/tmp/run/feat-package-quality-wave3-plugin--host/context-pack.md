@@ -50,6 +50,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   entrypoints with `--unstable-kv`.
 - Implementation: slice 14 complete. Commit `7de2e22` adds dedicated domain tests for errors and
   core types; 3 focused tests pass.
+- Implementation: slice 15 complete. Commit `33b1a59` adds memory file-system adapter conformance
+  coverage; 1 focused test passes.
 
 ## One-unit wave
 
