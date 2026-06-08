@@ -18,6 +18,9 @@ export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition
 /**
  * Server-side writer for a named durable stream.
  *
+ * @remarks Uses `console.warn` for current alpha operator visibility; tracked as AP-13
+ * architecture debt until the telemetry-integration wave supplies a structured reporter.
+ *
  * @example
  * ```ts
  * const producer = createDurableStream({
