@@ -12,6 +12,7 @@ Branch: `feat/package-quality-wave4-runtimes-4a` → umbrella `feat/package-qual
 | 5 | a38c6f9 | test(core): cover aborted producer close | S5 |
 | 6 | c5e7ece | fix(plugin): clean streams public docs surface | S6 |
 | 7 | e7ad68f | feat(plugin): add streams verifier | S7 |
+| 8 | cca1d64 | test(plugin): cover streams manifest shape | S8 |
 
 (Pair each implementation slice commit with its `docs(wave4): record …` run-doc commit,
 per the Wave 2/3 cadence.)
