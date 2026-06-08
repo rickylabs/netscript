@@ -12,7 +12,7 @@ export {
   type CreateNetscriptDbOptions,
   type KvdexSchema,
   type KvProvider,
-} from './bridges/kvdex.ts';
+} from './adapters/kvdex.ts';
 
 export {
   type DenoAtomicCheck,
@@ -30,7 +30,7 @@ export {
   type DenoKvStrictKey,
   type DenoKvWatchOptions,
   WatchableKvBridge,
-} from './bridges/denokv-bridge.ts';
+} from './adapters/denokv-bridge.ts';
 
 export { collection, kvdex, model } from '@olli/kvdex';
 export type { KvObject } from '@olli/kvdex';

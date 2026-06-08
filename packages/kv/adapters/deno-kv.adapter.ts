@@ -6,8 +6,8 @@
 
 import { delay } from '@std/async';
 import { chunk } from '@std/collections/chunk';
-import { KvClosedError } from '../core/errors.ts';
-import { keyToString } from '../core/keys.ts';
+import { KvClosedError } from '../application/errors.ts';
+import { keyToString } from '../application/keys.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
 import type {

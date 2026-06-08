@@ -7,22 +7,31 @@
  */
 
 import { DenoKvMessageQueue } from '@fedify/denokv';
-import type {
-  EnqueueOptions,
-  ListenOptions,
-  MessageContext,
-  MessageQueue,
-} from '../interfaces/mod.ts';
-import { QueueConnectionError, QueueError, QueueErrorCode } from '../interfaces/mod.ts';
+import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
 import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
+
+export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
 /**
  * Options for creating a DenoKvAdapter.
  */
 export interface DenoKvAdapterOptions {
+  /**
+   * Queue name used for diagnostics and message metadata.
+   */
   queueName?: string;
+  /**
+   * Whether to discover a shared KV instance from the environment before opening the default KV.
+   */
   useShared?: boolean;
+  /**
+   * Explicit KV instance for tests or caller-owned lifecycle management.
+   */
   kv?: Deno.Kv;
+  /**
+   * Enables adapter debug hooks without emitting console output from published code.
+   */
   verbose?: boolean;
 }
 
@@ -49,8 +58,16 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   private readonly explicitKv?: Deno.Kv;
   private readonly verbose: boolean;
 
+  /**
+   * Deno KV provides native retry support through Fedify's queue implementation.
+   */
   readonly nativeRetrial = true;
 
+  /**
+   * Create a Deno KV queue adapter.
+   *
+   * @param options - Adapter configuration and optional caller-owned KV instance.
+   */
   constructor(options: DenoKvAdapterOptions = {}) {
     this.queueName = options.queueName ?? 'default';
     this.useShared = options.useShared ?? true;
@@ -58,10 +75,20 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     this.verbose = options.verbose ?? false;
   }
 
+  /**
+   * Create an adapter around a caller-owned KV instance.
+   *
+   * @param kv - KV instance whose lifecycle is owned by the caller.
+   * @param queueName - Queue name used for diagnostics and message metadata.
+   * @returns Adapter bound to the provided KV instance.
+   */
   static withKv<T>(kv: Deno.Kv, queueName = 'default'): DenoKvAdapter<T> {
     return new DenoKvAdapter<T>({ kv, queueName });
   }
 
+  /**
+   * Return the initialized KV instance, creating it on first use.
+   */
   private async ensureKv(): Promise<Deno.Kv> {
     if (this.kvInstance) {
       return this.kvInstance;
@@ -76,6 +103,9 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     return this.kvInstance;
   }
 
+  /**
+   * Open the explicit, discovered, or default Deno KV connection.
+   */
   private async initializeKv(): Promise<Deno.Kv> {
     try {
       if (this.explicitKv) {
@@ -100,12 +130,21 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Reserved debug hook for verbose mode.
+   */
   private log(_message: string, ..._args: unknown[]): void {
     if (!this.verbose) {
       return;
     }
   }
 
+  /**
+   * Enqueue one message for later processing.
+   *
+   * @param message - Message payload to enqueue.
+   * @param options - Optional delay and metadata settings.
+   */
   async enqueue(message: T, options?: EnqueueOptions): Promise<void> {
     try {
       await this.ensureKv();
@@ -125,6 +164,12 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Enqueue messages sequentially using the same options.
+   *
+   * @param messages - Message payloads to enqueue.
+   * @param options - Optional delay and metadata settings applied to each message.
+   */
   async enqueueMany(messages: T[], options?: EnqueueOptions): Promise<void> {
     try {
       await this.ensureKv();
@@ -143,6 +188,12 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Listen for queued messages until stopped or aborted.
+   *
+   * @param handler - Async callback invoked for each message.
+   * @param options - Listener concurrency and cancellation options.
+   */
   async listen(
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
@@ -205,6 +256,9 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Stop the active listener and wait briefly for Fedify to observe cancellation.
+   */
   async stop(): Promise<void> {
     if (!this.listening) {
       return;
@@ -215,14 +269,25 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
+  /**
+   * Return the initialized KV instance for advanced inspection.
+   *
+   * @returns The Deno KV instance used by this adapter.
+   */
   getKv(): Promise<Deno.Kv> {
     return this.ensureKv();
   }
 
+  /**
+   * Whether the adapter currently has an active listener.
+   */
   get isListening(): boolean {
     return this.listening;
   }
 
+  /**
+   * Build the queue context passed to message handlers.
+   */
   private createContext(
     messageId: string,
     enqueuedAt: Date,

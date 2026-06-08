@@ -39,15 +39,27 @@ const isDecimalLike = (v: unknown): boolean => {
 };
 `.trim();
 
+/**
+ * Options for generated Zod schema post-processing.
+ */
 export interface FixZodImportsOptions {
+  /** Whether to print progress messages. */
   verbose?: boolean;
+  /** Whether to replace Prisma Decimal imports with duck-typed validators. */
   fixDecimalImports?: boolean;
 }
 
+/**
+ * Summary of generated Zod schema post-processing changes.
+ */
 export interface FixZodImportsResult {
+  /** Number of files with relative imports fixed. */
   filesFixed: number;
+  /** Number of relative import specifiers fixed. */
   importsFixed: number;
+  /** Number of files with Decimal compatibility fixes. */
   decimalFilesFixed: number;
+  /** Number of Decimal references fixed. */
   decimalImportsFixed: number;
 }
 
@@ -303,7 +315,7 @@ export async function fixZodImports(
   for await (const entry of walk(zodOutputDir, { exts: ['.ts'] })) {
     if (!entry.isFile) continue;
 
-    let content = await Deno.readTextFile(entry.path);
+    const content = await Deno.readTextFile(entry.path);
 
     if (TYPED_DECIMAL_INPUT_REGEX.test(content)) {
       TYPED_DECIMAL_INPUT_REGEX.lastIndex = 0;

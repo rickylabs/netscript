@@ -1,0 +1,29 @@
+# Commits — feat-package-quality-wave2-adapters-2c--messaging
+
+Branch: `feat/package-quality-wave2-adapters-2c` → umbrella `feat/package-quality-wave2-adapters`
+
+| # | SHA | Subject | Slice(s) |
+|---|-----|---------|----------|
+| seed | (this commit) | chore(2c): seed Wave 2c messaging run docs | — |
+| 1 | `83d408d` | Add Wave 2c research and locked plan artifacts | Research + Plan & Design |
+| 2 | `83c4644` | refactor(queue): rename ports and validation folders | S1 |
+| 3 | `557680c` | feat(queue): retarget ports exports | S2 |
+| 4 | `7e82d61` | refactor(queue): retarget renamed imports | S3 |
+| 5 | `e4761e2` | docs(queue): clear public doc lint | S4 |
+| 6 | `6811a56` | feat(queue): add testing memory adapter | S5 |
+| 7 | `6a2e283` | test(queue): cover abort cleanup | S6 |
+| 8 | `b71cde8` | chore(queue): add package quality tasks | S7 |
+| 9 | `e11e29d` | test(queue): add docs examples fixture | S8 |
+| 10 | `60878e7` | chore(queue): verify publish readiness | S9 |
+| 11 | `7a99b6b` | refactor(cron): rename ports folder | S10 |
+| 12 | `c832c4a` | docs(cron): clear public doc lint | S11 |
+| 13 | `ef1dc87` | feat(cron): add testing entrypoint | S12 |
+| 14 | `6dc7dfa` | test(cron): cover scheduler cleanup | S13 |
+| 15 | `d9db0f8` | chore(cron): add package quality tasks | S14 |
+| 16 | `9d38fd9` | chore(cron): verify publish readiness | S15 |
+| 17 | `62d8c88` | chore(2c): verify consumer gate | S16 |
+| 18 | `d3294de` | chore(2c): record e2e gate result | S17 |
+| 19 | `af471cf` | fix(queue): harden memory testing adapter | Augment feedback |
+| 20 | `7057351` | test(queue): use std async delay | Validation follow-up |
+| 21 | `d9f570f` | fix(queue): index pending memory items | Validation follow-up |
+| 22 | `4c788b0` | fix(queue): clarify memory requeue state | Validation follow-up |

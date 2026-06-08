@@ -6,7 +6,7 @@ import {
   QueueErrorCode,
   QueueHandlerError,
   QueueValidationError,
-} from '../interfaces/errors.ts';
+} from '../ports/errors.ts';
 
 Deno.test('QueueError stores code, cause, and context', () => {
   const cause = new Error('root cause');

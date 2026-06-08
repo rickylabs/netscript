@@ -11,14 +11,10 @@
 
 import { retry } from '@std/async/retry';
 import { createPackageLogger } from '@netscript/logger';
-import { maskRedisUrl } from '../../core/auto-detect.ts';
-import { KvClosedError, KvConnectionError } from '../../core/errors.ts';
+import { maskRedisUrl } from '../../application/auto-detect.ts';
+import { KvClosedError, KvConnectionError } from '../../application/errors.ts';
 import { toErrorMessage } from './serialization.ts';
-import {
-  DEFAULT_REDIS_URL,
-  REDIS_CONNECT_TIMEOUT_MS,
-  REDIS_KEEPALIVE_MS,
-} from './types.ts';
+import { REDIS_CONNECT_TIMEOUT_MS, REDIS_KEEPALIVE_MS } from './types.ts';
 import { Redis, type RedisOptions } from 'ioredis';
 
 const logger = createPackageLogger('kv');

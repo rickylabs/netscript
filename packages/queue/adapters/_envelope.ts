@@ -4,7 +4,7 @@
  * @module
  */
 
-import type { EnqueueOptions, MessageContext } from '../interfaces/message-queue.ts';
+import type { EnqueueOptions, MessageContext } from '../ports/message-queue.ts';
 
 /**
  * Internal message envelope that preserves transport metadata.

@@ -11,7 +11,7 @@ import type {
   DatabaseAdapter,
   DatabaseConnectionOptions,
   DatabaseConnectionStatus,
-} from '../interfaces/database-client.ts';
+} from '../ports/database-client.ts';
 
 /**
  * PostgreSQL-specific connection options
@@ -21,6 +21,18 @@ export interface PostgresConnectionOptions extends DatabaseConnectionOptions {
   schema?: string;
   /** Application name for connection tracking */
   applicationName?: string;
+}
+
+/**
+ * Public structural type returned by PostgreSQL driver adapter factories.
+ */
+export interface PostgresDriverAdapter {
+  /** Database provider identity. */
+  readonly provider?: string;
+  /** Open a Prisma driver connection. */
+  connect(): Promise<unknown>;
+  /** Open a shadow database connection when supported by the driver. */
+  connectToShadowDb?(): Promise<unknown>;
 }
 
 /**
@@ -40,20 +52,28 @@ export interface PostgresConnectionOptions extends DatabaseConnectionOptions {
  * const client = new PrismaClient({ adapter: adapter.getDriverAdapter() });
  * ```
  */
-export class PostgresAdapter<TClient extends {
-  $connect(): Promise<void>;
-  $disconnect(): Promise<void>;
-  $queryRaw: unknown;
-  $executeRaw: unknown;
-  $executeRawUnsafe: unknown;
-}> implements DatabaseAdapter<TClient> {
+export class PostgresAdapter<
+  TClient extends {
+    $connect(): Promise<void>;
+    $disconnect(): Promise<void>;
+    $queryRaw: unknown;
+    $executeRaw: unknown;
+    $executeRawUnsafe: unknown;
+  },
+> implements DatabaseAdapter<TClient> {
+  /** Database provider identity for status reporting. */
   readonly provider = 'postgres' as const;
 
   private client: TClient | null = null;
-  private driverAdapter: PrismaPg | null = null;
+  private driverAdapter: PostgresDriverAdapter | null = null;
   private readonly options: PostgresConnectionOptions;
   private lastConnected?: Date;
 
+  /**
+   * Create a PostgreSQL adapter from connection options.
+   *
+   * @param options - PostgreSQL connection options.
+   */
   constructor(options: PostgresConnectionOptions) {
     this.options = options;
   }
@@ -61,10 +81,10 @@ export class PostgresAdapter<TClient extends {
   /**
    * Get the Prisma driver adapter for use in client initialization
    */
-  getDriverAdapter(): PrismaPg {
+  getDriverAdapter(): PostgresDriverAdapter {
     if (!this.driverAdapter) {
       const connectionString = this.buildConnectionString();
-      this.driverAdapter = new PrismaPg({ connectionString });
+      this.driverAdapter = new PrismaPg({ connectionString }) as PostgresDriverAdapter;
     }
     return this.driverAdapter;
   }
@@ -77,6 +97,7 @@ export class PostgresAdapter<TClient extends {
     this.client = client;
   }
 
+  /** Return the configured Prisma client instance. */
   getClient(): TClient {
     if (!this.client) {
       throw new Error(
@@ -86,6 +107,7 @@ export class PostgresAdapter<TClient extends {
     return this.client;
   }
 
+  /** Open the configured Prisma client connection. */
   async connect(): Promise<void> {
     if (!this.client) {
       throw new Error('PostgreSQL client not set. Call setClient() first.');
@@ -94,12 +116,14 @@ export class PostgresAdapter<TClient extends {
     this.lastConnected = new Date();
   }
 
+  /** Close the configured Prisma client connection. */
   async disconnect(): Promise<void> {
     if (this.client) {
       await this.client.$disconnect();
     }
   }
 
+  /** Probe the database connection with a lightweight query. */
   async healthCheck(): Promise<boolean> {
     try {
       const client = this.getClient();
@@ -115,6 +139,7 @@ export class PostgresAdapter<TClient extends {
     }
   }
 
+  /** Return a status snapshot for the current database connection. */
   async getStatus(): Promise<DatabaseConnectionStatus> {
     const healthy = await this.healthCheck();
     return {
@@ -127,6 +152,7 @@ export class PostgresAdapter<TClient extends {
     };
   }
 
+  /** Execute a raw query through the configured Prisma client. */
   executeRaw<T = unknown>(query: string, ...params: unknown[]): Promise<T> {
     const client = this.getClient();
     const $queryRaw = client.$queryRaw as (
@@ -136,6 +162,7 @@ export class PostgresAdapter<TClient extends {
     return $queryRaw(query as unknown as TemplateStringsArray, ...params);
   }
 
+  /** Execute an unsafe raw command through the configured Prisma client. */
   executeRawUnsafe<T = unknown>(query: string, ...params: unknown[]): Promise<T> {
     const client = this.getClient();
     const $executeRawUnsafe = client.$executeRawUnsafe as (
@@ -185,12 +212,14 @@ export class PostgresAdapter<TClient extends {
 /**
  * Create a PostgreSQL adapter
  */
-export function createPostgresAdapter<TClient extends {
-  $connect(): Promise<void>;
-  $disconnect(): Promise<void>;
-  $queryRaw: unknown;
-  $executeRaw: unknown;
-  $executeRawUnsafe: unknown;
-}>(options: PostgresConnectionOptions): PostgresAdapter<TClient> {
+export function createPostgresAdapter<
+  TClient extends {
+    $connect(): Promise<void>;
+    $disconnect(): Promise<void>;
+    $queryRaw: unknown;
+    $executeRaw: unknown;
+    $executeRawUnsafe: unknown;
+  },
+>(options: PostgresConnectionOptions): PostgresAdapter<TClient> {
   return new PostgresAdapter<TClient>(options);
 }

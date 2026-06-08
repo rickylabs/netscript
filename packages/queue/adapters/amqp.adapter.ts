@@ -8,14 +8,11 @@
 
 import { AmqpMessageQueue } from '@fedify/amqp';
 import { connect } from 'npm:amqplib@^0.10.3';
-import type {
-  EnqueueOptions,
-  ListenOptions,
-  MessageContext,
-  MessageQueue,
-} from '../interfaces/mod.ts';
-import { QueueConnectionError, QueueError, QueueErrorCode } from '../interfaces/mod.ts';
+import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
 import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
+
+export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
 /**
  * AMQP (RabbitMQ) queue adapter implementation.
@@ -28,8 +25,17 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
   private listening = false;
   private abortController?: AbortController;
 
+  /**
+   * RabbitMQ supports native redelivery through broker acknowledgements.
+   */
   readonly nativeRetrial = true;
 
+  /**
+   * Create an AMQP queue adapter.
+   *
+   * @param url - RabbitMQ AMQP connection URL.
+   * @param queueName - Queue name used by the broker.
+   */
   constructor(
     private readonly url: string,
     private readonly queueName = 'default',
@@ -56,6 +62,12 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Enqueue one message through the AMQP queue.
+   *
+   * @param message - Message payload to enqueue.
+   * @param options - Optional delay and metadata settings.
+   */
   async enqueue(message: T, options?: EnqueueOptions): Promise<void> {
     try {
       await this.connection;
@@ -75,6 +87,12 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Enqueue messages concurrently through the AMQP queue.
+   *
+   * @param messages - Message payloads to enqueue.
+   * @param options - Optional delay and metadata settings applied to each message.
+   */
   async enqueueMany(messages: T[], options?: EnqueueOptions): Promise<void> {
     try {
       await this.connection;
@@ -91,6 +109,12 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Listen for AMQP messages until stopped or aborted.
+   *
+   * @param handler - Async callback invoked for each decoded message.
+   * @param options - Listener cancellation and concurrency settings.
+   */
   async listen(
     handler: (message: T, context: MessageContext) => Promise<void>,
     options?: ListenOptions,
@@ -153,6 +177,9 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Stop listening and close the AMQP connection when possible.
+   */
   async stop(): Promise<void> {
     if (!this.listening) {
       return;
@@ -174,6 +201,9 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Build the queue context passed to AMQP message handlers.
+   */
   private createContext(
     messageId: string,
     enqueuedAt: Date,

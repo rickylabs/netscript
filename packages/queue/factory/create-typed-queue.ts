@@ -7,15 +7,22 @@
  * @module
  */
 
-import type {
+import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import { QueueValidationError, type TypedQueueOptions } from '../ports/mod.ts';
+import type { ValidationSchema } from '../validation/mod.ts';
+import { createQueue } from './create-queue.ts';
+
+export type {
   EnqueueOptions,
   ListenOptions,
   MessageContext,
   MessageQueue,
-} from '../interfaces/message-queue.ts';
-import { QueueValidationError, type TypedQueueOptions } from '../interfaces/mod.ts';
-import type { ValidationSchema } from '../utils/validation.ts';
-import { createQueue } from './create-queue.ts';
+  QueueConnectionOptions,
+  QueueOptions,
+  QueueProvider,
+  TypedQueueOptions,
+} from '../ports/mod.ts';
+export type { ValidationSchema } from '../validation/mod.ts';
 
 /**
  * Typed message queue with runtime schema validation.

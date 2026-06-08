@@ -27,11 +27,17 @@ import { exists } from 'jsr:@std/fs@1/exists';
 // TYPES
 // ============================================================================
 
+/**
+ * Options for Prisma client patching.
+ */
 export interface PatchPrismaClientOptions {
   /** Enable console logging (default: true) */
   verbose?: boolean;
 }
 
+/**
+ * Summary of Prisma client patching changes.
+ */
 export interface PatchPrismaClientResult {
   /** Whether client.ts was patched to an isomorphic façade */
   clientPatched: boolean;

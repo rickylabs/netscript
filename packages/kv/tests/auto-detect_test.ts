@@ -4,7 +4,7 @@ import {
   getDenoKvConnectionFromEnv,
   getRedisConnectionFromEnv,
   maskRedisUrl,
-} from '../core/auto-detect.ts';
+} from '../application/auto-detect.ts';
 
 async function withEnv(
   values: Record<string, string | undefined>,

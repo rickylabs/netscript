@@ -15,8 +15,8 @@
 
 import { assert, assertEquals, assertThrows } from '@std/assert';
 import { MemoryKvAdapter } from '../adapters/memory.adapter.ts';
-import { WatchableKvBridge } from '../bridges/denokv-bridge.ts';
-import { createNetscriptDb } from '../bridges/kvdex.ts';
+import { WatchableKvBridge } from '../adapters/denokv-bridge.ts';
+import { createNetscriptDb } from '../adapters/kvdex.ts';
 import { collection, model } from '@olli/kvdex';
 
 // ---------------------------------------------------------------------------

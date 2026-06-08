@@ -1,16 +1,35 @@
 {
   "name": "@netscript/prisma-adapter-mysql",
   "version": "0.0.1-alpha.0",
-  "exports": "./src/mod.ts",
+  "description": "Prisma driver adapter for MySQL and MariaDB on Deno.",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./mod.ts"
+  },
   "imports": {
     "@prisma/driver-adapter-utils": "npm:@prisma/driver-adapter-utils@^7.4.2",
     "mysql": "npm:mysql2@^3.22.3"
   },
   "tasks": {
-    "check": "deno check src/mod.ts",
-    "test": "deno test --allow-net --allow-env"
+    "check": "deno check --unstable-kv ./mod.ts",
+    "test": "deno test --allow-net --allow-env ./tests/",
+    "lint": "deno lint",
+    "fmt": "deno fmt --check",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
-  "compilerOptions": {
-    "skipLibCheck": true
+  "publish": {
+    "include": [
+      "README.md",
+      "docs/**/*.md",
+      "deno.json",
+      "mod.ts",
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "examples/**",
+      "tests/**",
+      "**/*_test.ts",
+      "**/*.test.ts"
+    ]
   }
 }

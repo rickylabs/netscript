@@ -19,7 +19,7 @@ export {
   type KvProvider,
   resetKv,
   type SharedKvConfig,
-} from './core/mod.ts';
+} from './application/mod.ts';
 
 export type {
   AtomicCheck,

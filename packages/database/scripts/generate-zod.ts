@@ -15,6 +15,9 @@ import { fixZodImports } from './fix-zod-imports.ts';
 
 const PRISMA_ZOD_GENERATOR_ENTRYPOINT = 'npm:prisma-zod-generator@2.1.4/lib/generator.js';
 
+/**
+ * Options for Prisma Zod schema generation.
+ */
 export interface GenerateZodOptions {
   /** Path to the generated Zod output directory */
   zodOutputDir: string;

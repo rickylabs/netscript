@@ -15,7 +15,7 @@ import type {
   ListenOptions,
   MessageContext,
   MessageQueue,
-} from '../interfaces/message-queue.ts';
+} from '../ports/message-queue.ts';
 
 /**
  * Wrap a MessageQueue with ParallelMessageQueue for concurrent processing.
