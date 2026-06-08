@@ -123,6 +123,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 | 2026-06-08 | S19 | Implement + gate | Added JSDoc to exported constructors in `FileWatcher`, filters, and `AccessFailureTracker`. Gates: `deno doc --lint mod.ts` PASS, 1 file checked / 0 errors; `rtk proxy deno task check` PASS. Implementation commit `a4df3eb`. |
 | 2026-06-08 | S20 | Implement + gate | Added `packages/watchers/tests/_fixtures/docs-examples_test.ts` covering README examples through the public surface. Gates: `deno test tests/_fixtures/docs-examples_test.ts` PASS, 4 tests passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `cfa38c6`. |
 | 2026-06-08 | S21 | Implement + gate | Added `packages/watchers/tests/file-watcher_test.ts` covering watch-loop start, external abort, `stop()`, and `running` state. Gates: `deno test --allow-read --allow-write tests/file-watcher_test.ts` PASS, 1 test passed / 0 failed; `rtk proxy deno task check` PASS. Implementation commit `a8787c5`. |
+| 2026-06-08 | S22 | Implement + gate | Validated downstream consumers after streams/watchers public-surface changes. Gates: `deno check --unstable-kv mod.ts services/src/main.ts` in `plugins/sagas` PASS; `rtk proxy deno task check` in `plugins/workers` PASS; `rtk proxy deno task check` in `plugins/triggers` PASS; `rtk proxy deno task check` in `packages/cli` PASS. Implementation commit `f0d5c9b` (validation-only empty commit). |
 
 ## Decisions
 
