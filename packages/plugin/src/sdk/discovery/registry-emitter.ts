@@ -3,6 +3,7 @@ import type { ExtractedContribution } from './ports/extractor-port.ts';
 
 /** Registry emitter that writes one generated TypeScript module per contribution axis. */
 export class RegistryEmitter implements EmitterPort {
+  /** Emit generated registry modules for extracted contributions. */
   async emit(
     contributions: readonly ExtractedContribution[],
   ): Promise<readonly RegistryEmission[]> {

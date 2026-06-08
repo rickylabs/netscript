@@ -1,5 +1,6 @@
 /** Watcher handle returned by SDK watch presets. */
 export interface WatcherHandle {
+  /** Stop the watcher and release any owned resources. */
   readonly stop: () => Promise<void>;
 }
 
