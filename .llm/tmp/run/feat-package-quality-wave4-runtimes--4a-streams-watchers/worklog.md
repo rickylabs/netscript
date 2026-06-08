@@ -117,6 +117,7 @@ See `plan.md` §"Commit Slices" for the full 23-slice list. Summary:
 | 2026-06-08 | S13 | Implement + gate | Moved watchers source files into `src/`, `src/filters/`, and `src/strategies/` with Git renames; tests intentionally remain for S15 retarget. Gate: tree/cardinality evidence PASS (`src`: 3 files, `src/filters`: 3, `src/strategies`: 3). Static checks intentionally deferred until S15. Implementation commit `57fdbd8`. |
 | 2026-06-08 | S14 | Implement + gate | Added `packages/watchers/src/public/mod.ts` and retargeted root `mod.ts` to the curated public barrel. Gates: `deno check --unstable-kv mod.ts` PASS; sub-barrel evidence found only `src/public/mod.ts` under `src`. Implementation commit `9a09b10`. |
 | 2026-06-08 | S15 | Implement + gate | Retargeted watcher filter tests to `src/filters` and `src/types`; `plugin-triggers` already used the stable `@netscript/watchers` barrel so no downstream file edit was needed. Gates: `deno check --unstable-kv mod.ts` PASS; `deno test --allow-read --allow-write --allow-env filters` PASS, 13 tests passed / 0 failed; `rtk proxy deno task check` in `plugins/triggers` PASS. Implementation commit `4666b44`. |
+| 2026-06-08 | S16 | Implement + gate | Added `packages/watchers/README.md` with permissions, runtime model, network path, stop semantics, and doctestable examples. Gates: `deno fmt README.md` PASS, 1 file checked; README line count = 224; `deno check --unstable-kv mod.ts` PASS. Implementation commit `5eab77a`. |
 
 ## Decisions
 

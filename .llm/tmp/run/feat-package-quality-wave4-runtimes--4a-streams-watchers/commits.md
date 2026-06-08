@@ -20,6 +20,7 @@ Branch: `feat/package-quality-wave4-runtimes-4a` → umbrella `feat/package-qual
 | 13 | 57fdbd8 | refactor(watchers): move sources into src tree | S13 |
 | 14 | 9a09b10 | refactor(watchers): retarget public exports | S14 |
 | 15 | 4666b44 | refactor(watchers): retarget filter tests | S15 |
+| 16 | 5eab77a | docs(watchers): add README | S16 |
 
 (Pair each implementation slice commit with its `docs(wave4): record …` run-doc commit,
 per the Wave 2/3 cadence.)
