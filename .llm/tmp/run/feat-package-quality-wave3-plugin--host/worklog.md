@@ -26,6 +26,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 13 complete: expanded package `check` task to all 8 public entrypoints with `--unstable-kv`. Code commit `17d60ea`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 14 complete: added dedicated domain tests for errors and core type contracts. Code commit `7de2e22`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 15 complete: added memory file-system adapter conformance test. Code commit `33b1a59`; paired docs commit follows. |
+| 2026-06-08 | Implement | generator | Slice 16 complete: added watcher cleanup tests for no-op discovery handles. Code commit `b8e44c6`; paired docs commit follows. |
 | | Gate | generator | (pending) A4 gates + consumer-import + e2e:cli once. |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) |
@@ -48,6 +49,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 - Slice 13 validation: `deno task check` runs `deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts` and passes. `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` also pass.
 - Slice 14 validation: `deno test --allow-all tests/domain/errors_test.ts tests/domain/core-types_test.ts` passes 3 tests. `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` also pass.
 - Slice 15 validation: `deno test --allow-all tests/adapters/memory-file-system_test.ts` passes 1 test. `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` also pass.
+- Slice 16 validation: `deno test --allow-all tests/sdk/watcher-cleanup_test.ts` passes 2 tests. `deno task check`, `deno task lint`, `deno task fmt --check`, and full-export `deno doc --lint ...` also pass.
 
 ## Implementation Evidence
 
@@ -68,6 +70,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 13 | `17d60ea` | F-8 | PASS | `tasks.check` now covers all 8 public entrypoints with `--unstable-kv`. |
 | 14 | `7de2e22` | F-10 | PASS | Added domain tests for error inheritance/names/issues, finite constants, metadata, logger, and context shapes. |
 | 15 | `33b1a59` | F-10 | PASS | Added `FileSystemPort` conformance coverage for `MemoryFileSystemAdapter` read/write/exists behavior. |
+| 16 | `b8e44c6` | F-10 | PASS | Added cleanup coverage for `createWatcherHandle()` and `startWatcher()` no-op handles. |
 
 ## Design Checkpoint
 

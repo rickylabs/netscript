@@ -52,6 +52,8 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   core types; 3 focused tests pass.
 - Implementation: slice 15 complete. Commit `33b1a59` adds memory file-system adapter conformance
   coverage; 1 focused test passes.
+- Implementation: slice 16 complete. Commit `b8e44c6` adds watcher cleanup coverage; 2 focused
+  tests pass.
 
 ## One-unit wave
 

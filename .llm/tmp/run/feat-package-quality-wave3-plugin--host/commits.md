@@ -35,7 +35,9 @@ Branch: `feat/package-quality-wave3-plugin-host` → umbrella `feat/package-qual
 | 28 | 7de2e22 | test(plugin): cover domain errors and core types | Slice 14 |
 | 29 | 1092b17 | docs(wave3): record slice 14 domain tests | Slice 14 docs |
 | 30 | 33b1a59 | test(plugin): cover memory file system adapter | Slice 15 |
-| 31 | (this commit) | docs(wave3): record slice 15 adapter test | Slice 15 docs |
+| 31 | f50d4b8 | docs(wave3): record slice 15 adapter test | Slice 15 docs |
+| 32 | b8e44c6 | test(plugin): cover watcher cleanup handle | Slice 16 |
+| 33 | (this commit) | docs(wave3): record slice 16 watcher test | Slice 16 docs |
 
 (append one row per slice during Implement; pair each slice commit with its
 `docs(wave3): record …` run-doc commit, per the Wave 2 cadence.)
