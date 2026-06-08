@@ -36,7 +36,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 2026-06-08 | Implement | generator | Slice 23 complete: final static gate sweep passed (`publish:dry-run`, `check`, `lint`, `fmt --check`, full-export doc-lint). Empty verification commit `9f96342`; paired docs commit follows. |
 | 2026-06-08 | Implement | generator | Slice 24 complete: merge-readiness `deno task e2e:cli` ran once. Result: 35 passed, 1 failed at known `behavior.triggers-health` (`localhost:8093/health` connection refused), cleanup passed. Empty verification commit `0458b4d`; paired docs commit follows. |
 | 2026-06-08 | Gate | generator | A4 gates, static gates, and consumer-import validation complete. Merge-readiness E2E has only the LD-4 Wave 4 triggers-health carry-forward. Ready to hand to separate IMPL-EVAL. |
-| | IMPL-EVAL | evaluator | (pending) Separate session. |
+| | IMPL-EVAL | evaluator | **PASS** (2026-06-08). Separate session. Independently re-ran `check`/`lint`/`fmt --check`/full-export `doc --lint`/`test`/`publish:dry-run` (all green; doc-lint 0, 21 tests, 0 slow types) and the `packages/cli` consumer gate. Verified LD-8 (package-owned `PluginManifestParser`/`PluginPayloadSchema`, no upstream re-export — F-15 clean) and the debt delta (1 closed w/ evidence, 1 opened complete). Corrected one low-severity drift in-line: builder LOC 343→360 (slice-4 JSDoc) in `arch-debt.md` + worklog. `e2e:cli` triggers-health is the locked LD-4 Wave 4 carry-forward. Verdict in `evaluate.md`. Ready to merge into umbrella. |
 | | Close | supervisor | (pending) |
 
 ## Readiness note
@@ -89,7 +89,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 | 16 | `b8e44c6` | F-10 | PASS | Added cleanup coverage for `createWatcherHandle()` and `startWatcher()` no-op handles. |
 | 17 | `214a9a3` | F-10 | PASS | Added loader coverage for resolved and unresolved `ManifestResolverPort` results. |
 | 18 | `3279d7b` | F-10 | PASS | Full package test suite passes: 21 passed, 0 failed. |
-| 19 | `8f3c204` | F-1 | DEBT_ACCEPTED | Closed old `packages/plugin — types.ts 1,005 LOC` entry and opened `plugin-builder.ts` 343 LOC accepted debt with pre-beta closing target. |
+| 19 | `8f3c204` | F-1 | DEBT_ACCEPTED | Closed old `packages/plugin — types.ts 1,005 LOC` entry and opened `plugin-builder.ts` 360 LOC accepted debt (343 at base + slice-4 JSDoc) with pre-beta closing target. |
 | 20 | `4968dd5` | Static | PASS | Manual F-1..F-18 evidence table recorded in this worklog; F-13 marked n/a. |
 | 21 | `7a24d51` | Consumer | PASS | `packages/cli` checks clean with `@netscript/plugin` imports. |
 | 22 | `c2c1eec` | Consumer | PASS | First-party plugin package checks pass for `sagas`, `streams`, `triggers`, and `workers`. |
@@ -100,7 +100,7 @@ Base: umbrella `feat/package-quality-wave3-plugin` @ `89071df`
 
 | Gate | Result | Evidence |
 |------|--------|----------|
-| F-1 File-size lint | DEBT_ACCEPTED | `plugin-builder.ts` remains 343 LOC and is tracked in `.llm/harness/debt/arch-debt.md` with pre-beta closing target. |
+| F-1 File-size lint | DEBT_ACCEPTED | `plugin-builder.ts` is 360 LOC (343 at base + public JSDoc added in slice 4) and is tracked in `.llm/harness/debt/arch-debt.md` with pre-beta closing target. |
 | F-2 Helper-reinvention scan | PASS | `safeStringifyMetadata` in `loader.ts` is a logger-sink helper for circular-safe metadata serialization; no platform helper replacement exists. |
 | F-3 Layering check | PASS | `domain/` owns core values/errors/schema contracts; `ports/` define consumed contracts; `application/` composes ports; `adapters/` implement ports; `cli/` presentation imports CLI contracts. |
 | F-4 Inheritance audit | PASS | `PluginContribution` and derived contribution bases live in `src/abstracts/`; no cross-package inheritance or deep hierarchy. |

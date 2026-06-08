@@ -75,6 +75,12 @@ session. **Not** a PLAN-EVAL or IMPL-EVAL artifact.
   carry-forward, not a Wave 3 implementation blocker.
 - Generator handoff status: ready for separate IMPL-EVAL. Do not merge PR #15 from this
   session.
+- **IMPL-EVAL: PASS** (2026-06-08, separate session) — see `evaluate.md`. Evaluator
+  independently re-ran static + fitness gates (`check`/`lint`/`fmt --check`/full-export
+  `doc --lint` = 0/`test` = 21 pass/`publish:dry-run` = 0 slow types) and the `packages/cli`
+  consumer gate; verified LD-8 (package-owned schema types, F-15 clean) and the debt delta.
+  One low-severity drift corrected in-line (builder 343→360 LOC). `e2e:cli` triggers-health
+  is the locked LD-4 Wave 4 carry-forward. **Wave 3 host unit is merge-ready into the umbrella.**
 
 ## One-unit wave
 

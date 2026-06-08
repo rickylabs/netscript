@@ -203,10 +203,11 @@ Seeded from
   through curated entrypoints. Remaining builder size debt is tracked separately below.
 - **Gate:** F-1, F-3, F-5, F-11
 
-## packages/plugin/src/config/builders/plugin-builder.ts — F-1 size (343 LOC)
+## packages/plugin/src/config/builders/plugin-builder.ts — F-1 size (360 LOC)
 
-- **Reason:** `plugin-builder.ts` remains above the doctrine 300 LOC planning cap. It is a
-  typestate-generic fluent builder and splitting it during Wave 3 risks breaking the public chain.
+- **Reason:** `plugin-builder.ts` remains above the doctrine 300 LOC planning cap (343 LOC at base
+  `89071df`, 360 LOC after Wave 3 added public JSDoc in slice 4). It is a typestate-generic fluent
+  builder and splitting it during Wave 3 risks breaking the public chain.
 - **Owner:** Wave 3 `@netscript/plugin` host generator.
 - **Target:** Pre-beta builder refactor.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave3-plugin--host/plan.md` (LD-3, slice 19).
