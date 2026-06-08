@@ -17,6 +17,11 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
+| 2026-06-08 | minor | `plugin-streams-core` full-export doc-lint = 1 error (private-type-ref on `StreamTopicFixtureSchema`) | `deno doc --lint mod.ts src/telemetry/mod.ts src/testing/mod.ts` | Fix in slice 3 |
+| 2026-06-08 | minor | `plugin-streams` full-export doc-lint = 15 errors (11 private-type-ref + 4 missing-jsdoc) | `deno doc --lint mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts` | Fix in slice 6 |
+| 2026-06-08 | minor | `watchers` full-export doc-lint = 5 errors (missing-jsdoc on constructors) | `deno doc --lint mod.ts` | Fix in slice 19 |
+| 2026-06-08 | architectural | `plugin-streams-core` archetype A1→A3 | `DurableStreamProducer` owns runtime behavior (network I/O, lifecycle, registry) | Declare in `docs/architecture.md`; gate delta = F-13 required + Runtime/Aspire validation required |
+| 2026-06-08 | minor | `watchers` has no README, no docs/, no tasks, no description | `deno.json` + directory listing | Structural lift in slices 13–21 |
 
 ## Implementation drift (append during Implement)
 
