@@ -259,4 +259,25 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Warn row recorded: direct cron/watchers upstream exports pulled transitive private-type-ref failures into the triggers doc graph; D11 uses package-owned structural runtime injection contracts and pulled same-file D14 JSDoc forward. |
-| Commits | Implementation `c20e9db`; paired docs/evidence pending. |
+| Commits | Implementation `c20e9db`; paired docs/evidence `a4a7636`. |
+
+### Slice 12/23 — D12 plugin CLI and streams private-type-ref fix
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | `src/cli/composition/main.ts` now re-exports CLI base/command contracts needed by public CLI types; `streams/*` now exposes package-owned structural stream DB/schema/producer contracts instead of leaking Zod, durable-streams, or streams-core generics. Same-file CLI/stream public-member JSDoc was added so raw doc-lint gates are green. |
+| Gate(s) | F-7 doc-score, F-15 re-export-upstream lint |
+| Gate command | `deno doc --lint src/cli/composition/main.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint streams/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint streams/server.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno fmt --check plugins/triggers/src/cli/composition/main.ts plugins/triggers/src/cli/commands.ts plugins/triggers/src/cli/triggers-cli.ts plugins/triggers/src/cli/command-types.ts plugins/triggers/streams/schema.ts plugins/triggers/streams/factory.ts plugins/triggers/streams/producer.ts plugins/triggers/streams/mod.ts plugins/triggers/streams/server.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 9 files`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Warn row recorded: D12 uses package-owned structural stream DB/schema/producer contracts for third-party/upstream stream shapes and pulled same-file D15/D16 JSDoc forward. |
+| Commits | Implementation `00af803`; paired docs/evidence pending. |
