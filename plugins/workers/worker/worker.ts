@@ -7,9 +7,6 @@
 import { delay } from '@std/async';
 import { createQueue, type MessageQueue } from '@netscript/queue';
 import { type JobMessage, type TaskMessage } from '@netscript/plugin-workers-core/runtime';
-import { type TaskExecutor } from '@netscript/plugin-workers-core/executor';
-import type { KvExecutionState } from '@netscript/plugin-workers-core/state';
-import type { KvJobRegistry, KvTaskRegistry } from '@netscript/plugin-workers-core/registry';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
 import {
   startWorkerSpan,
@@ -27,15 +24,45 @@ import {
   type JobExecutionContext,
   type QueueTriggerConfig,
   type WorkerDispatchContext,
+  type WorkerExecutionState,
+  type WorkerJobRegistry,
   type WorkerOptions,
   type WorkerQueueContext,
+  type WorkerTaskExecutor,
+  type WorkerTaskRegistry,
 } from './worker-options.ts';
 
-export type { QueueTriggerConfig, WorkerOptions } from './worker-options.ts';
+export type {
+  QueueTriggerConfig,
+  WorkerCompleteExecutionOptions,
+  WorkerCreateExecutionOptions,
+  WorkerExecutionRecord,
+  WorkerExecutionState,
+  WorkerJobRegistry,
+  WorkerOptions,
+  WorkerPayloadSchema,
+  WorkerTaskExecutor,
+  WorkerTaskRegistry,
+  WorkerTaskResult,
+} from './worker-options.ts';
 
+/** Health snapshot for a worker runtime. */
 export interface WorkerHealthStatus {
+  /** Aggregate worker health state. */
   readonly status: 'healthy' | 'degraded';
-  readonly listeners: readonly WorkerListenerSnapshot[];
+  /** Queue listener health snapshots. */
+  readonly listeners: readonly {
+    /** Listener name. */
+    readonly name: string;
+    /** Listener lifecycle status. */
+    readonly status: 'idle' | 'running' | 'restarting' | 'failed' | 'stopped';
+    /** Whether the listener is healthy. */
+    readonly healthy: boolean;
+    /** Number of restart attempts. */
+    readonly restartCount: number;
+    /** Last listener failure message. */
+    readonly lastError?: string;
+  }[];
 }
 
 /** Worker process that consumes queued jobs and tasks for one runtime instance. */
@@ -43,10 +70,10 @@ export class Worker {
   private readonly workerId: string;
   private readonly queueName: string;
   private readonly concurrency: number;
-  private readonly registry: KvJobRegistry;
-  private readonly executionState: KvExecutionState;
-  private readonly taskExecutor: TaskExecutor;
-  private readonly taskRegistry: KvTaskRegistry;
+  private readonly registry: WorkerJobRegistry;
+  private readonly executionState: WorkerExecutionState;
+  private readonly taskExecutor: WorkerTaskExecutor;
+  private readonly taskRegistry: WorkerTaskRegistry;
   private readonly workerPool: WorkerPool;
   private readonly jobsDir: string;
   private readonly queueTriggers: readonly QueueTriggerConfig[];

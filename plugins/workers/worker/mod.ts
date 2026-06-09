@@ -11,9 +11,41 @@
 // ============================================================================
 
 export { type ScheduledJobInfo, Scheduler, type SchedulerOptions } from './scheduler.ts';
+export type {
+  JobContext,
+  JobDefinition,
+  JobHandler,
+  JobResult,
+  RuntimePermissions,
+  RuntimePermissionValue,
+  StaticJobRegistry,
+  TaskDefinition,
+  TaskExecutionOptions,
+} from '@netscript/plugin-workers-core/runtime';
+export type {
+  WorkerCronJob,
+  WorkerCronScheduler,
+  WorkerSchedulerExecutionState,
+  WorkerSchedulerJobRegistry,
+} from './scheduler.ts';
 
 // ============================================================================
 // WORKER
 // ============================================================================
 
-export { type QueueTriggerConfig, Worker, type WorkerOptions } from './worker.ts';
+export { Worker } from './worker.ts';
+export type {
+  QueueTriggerConfig,
+  WorkerCompleteExecutionOptions,
+  WorkerCreateExecutionOptions,
+  WorkerExecutionRecord,
+  WorkerExecutionState,
+  WorkerHealthStatus,
+  WorkerJobRegistry,
+  WorkerOptions,
+  WorkerPayloadSchema,
+  WorkerTaskExecutor,
+  WorkerTaskRegistry,
+  WorkerTaskResult,
+} from './worker.ts';
+export type { WorkerPoolOptions } from './job-runner-pool.ts';

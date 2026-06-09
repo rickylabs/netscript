@@ -1,14 +1,12 @@
 /** Scheduler process for the NetScript workers plugin. @module */
 
-import { createScheduler, type CronScheduler } from '@netscript/cron';
+import { createScheduler } from '@netscript/cron';
 import { createQueue } from '@netscript/queue';
 import {
   DEFAULT_TOPIC,
   type JobDefinition,
   type JobMessage,
 } from '@netscript/plugin-workers-core/runtime';
-import type { KvExecutionState } from '@netscript/plugin-workers-core/state';
-import type { KvJobRegistry } from '@netscript/plugin-workers-core/registry';
 import {
   createJobScheduleSpan,
   endSchedulerSpan,
@@ -21,9 +19,22 @@ import {
   type TracedQueue,
   traceJobDispatch,
 } from './scheduler-tracing.ts';
-import type { ScheduledJobInfo, SchedulerOptions } from './scheduler-options.ts';
+import type {
+  ScheduledJobInfo,
+  SchedulerOptions,
+  WorkerCronScheduler,
+  WorkerSchedulerExecutionState,
+  WorkerSchedulerJobRegistry,
+} from './scheduler-options.ts';
 
-export type { ScheduledJobInfo, SchedulerOptions } from './scheduler-options.ts';
+export type {
+  ScheduledJobInfo,
+  SchedulerOptions,
+  WorkerCronJob,
+  WorkerCronScheduler,
+  WorkerSchedulerExecutionState,
+  WorkerSchedulerJobRegistry,
+} from './scheduler-options.ts';
 
 // ============================================================================
 // SCHEDULER CLASS
@@ -32,9 +43,9 @@ export type { ScheduledJobInfo, SchedulerOptions } from './scheduler-options.ts'
 /** Scheduler process that loads scheduled jobs and dispatches cron ticks. */
 export class Scheduler {
   private queueName: string;
-  private registry: KvJobRegistry;
-  private executionState: KvExecutionState;
-  private cronScheduler: CronScheduler;
+  private registry: WorkerSchedulerJobRegistry;
+  private executionState: WorkerSchedulerExecutionState;
+  private cronScheduler: WorkerCronScheduler;
   private queue: TracedQueue<JobMessage> | null = null;
   private running = false;
   private scheduledJobs = new Map<string, string>(); // jobId -> cronJobId
@@ -47,7 +58,7 @@ export class Scheduler {
     this.executionState = options.executionState;
     this.cronScheduler = options.cronScheduler ?? createScheduler({
       provider: options.useMemoryScheduler ? 'memory' : undefined,
-    });
+    }) as WorkerCronScheduler;
 
     logSchedulerTelemetryConfig();
   }
