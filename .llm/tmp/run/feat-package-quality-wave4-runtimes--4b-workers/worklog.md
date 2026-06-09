@@ -108,6 +108,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `ee9f26b` (carries merged
 | 2/27 | `@netscript/plugin-workers-core` | A3 | Enumerate retained entrypoints in `check` task | `deno task check`; raw `deno check --unstable-kv <16 entrypoints>` | PASS — both commands exited 0 and checked all retained root/subpath entrypoint files | `3f01a2d` |
 | 3/27 | `@netscript/plugin-workers-core` + `@netscript/plugin-workers` consumer | A3/A5 | Fold `./contracts` to `./contracts/v1`; align workers plugin version | raw core check; raw plugin consumer check; raw CLI copier test check; export-map assertion | PASS — core 16-entrypoint check exit 0; plugin `contracts*`, root, public, Aspire check exit 0; CLI copier test file check exit 0; export map has 16 entries with no `./contracts` alias | `7a738d5` |
 | 4/27 | `@netscript/plugin-workers-core` | A3 | ptr-fix builders, config, and contracts/v1 by type origin | `run-deno-doc-lint.ts` targeted; raw `deno check --unstable-kv <16 entrypoints>` | PASS — targeted doc-lint summary `totalErrors=0`, `totalPrivateTypeRef=0`, `totalMissingJSDoc=0`; full core 16-entrypoint check exit 0 | `92bf266` |
+| 5/27 | `@netscript/plugin-workers-core` | A3 | ptr-fix executor, registry, and runtime by type origin | `run-deno-doc-lint.ts` targeted; raw `deno check --unstable-kv <16 entrypoints>` | PASS — targeted doc-lint summary `totalErrors=0`, `totalPrivateTypeRef=0`, `totalMissingJSDoc=0`; full core 16-entrypoint check exit 0 | `7b7bcaa` |
 
 ## Readiness note
 
