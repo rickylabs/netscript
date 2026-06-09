@@ -7,12 +7,20 @@ PR target: the **umbrella** (NOT the track).
 Role: SUPERVISOR-authored seed + pre-research. Locked slice authority = this sub-wave's
 `plan.md` once PLAN-EVAL-approved.
 
-## ⏳ STATUS: PREPARED IN PARALLEL — DO NOT LOCK YET
+## STATUS: IMPLEMENTING — PLAN-EVAL PASS
 
-Forks off the umbrella. Before this plan locks: **4a AND 4b must merge into the umbrella**,
-then **pull the umbrella forward** (`git merge feat/package-quality-wave4-runtimes`) and re-run
-MEASURE-FIRST. Reason: sagas **depends on workers** (`./integration/workers`) and on streams
-(`sagas-core ./streams`) — both settle at the 4a/4b merges.
+PLAN-EVAL passed in a separate OpenHands evaluator session on 2026-06-09. The locked slice authority
+is `plan.md`; implementation is proceeding one slice at a time.
+
+### Progress
+
+| Slice | Status | Evidence |
+|-------|--------|----------|
+| C1 | complete | `50d17a5` declared `@netscript/plugin-sagas-core` as A3, enumerated all 19 entrypoints in `check`, added `test`; raw `deno check --unstable-kv` PASS; `deno task test` PASS, 17 passed / 0 failed |
+
+Historical seed note: this worktree originally forked before 4a and 4b merged into the umbrella.
+The supervisor later pulled both forward, the generator re-ran MEASURE-FIRST, and PLAN-EVAL locked
+the resulting plan.
 
 ## Scope — 2 publishable units (long pole #2)
 
