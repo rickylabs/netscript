@@ -14,9 +14,24 @@ import {
   type WorkerJob,
   type WorkersStreamProducer,
 } from '@netscript/plugin-workers-core/streams';
-import type { ExecutionMutationHook, KvExecutionState } from '@netscript/plugin-workers-core/state';
+import type { ExecutionMutationHook } from '@netscript/plugin-workers-core/state';
+
+export type { WorkersStreamProducer } from '@netscript/plugin-workers-core/streams';
+export type {
+  ExecutionConcept,
+  ExecutionMutationHook,
+  ExecutionRecord,
+  ExecutionStatus,
+  ExecutionTriggerType,
+} from '@netscript/plugin-workers-core/state';
 
 let producer: WorkersStreamProducer | undefined;
+
+/** Execution-state surface needed to mirror worker changes into streams. */
+export interface WorkersStreamMirrorState {
+  /** Register the mutation hook invoked by execution-state writes. */
+  setMutationHook(hook: ExecutionMutationHook): void;
+}
 
 /**
  * Get (or create) the singleton workers execution stream producer.
@@ -60,6 +75,6 @@ export function emitJobToStream(job: WorkerJob): void {
  * This is synchronous — no KV watch loop, no async setup. The function name
  * is kept for backward compatibility with existing `main.ts` imports.
  */
-export function startWorkersStreamMirror(state: KvExecutionState): void {
+export function startWorkersStreamMirror(state: WorkersStreamMirrorState): void {
   state.setMutationHook(createStreamMutationHook());
 }
