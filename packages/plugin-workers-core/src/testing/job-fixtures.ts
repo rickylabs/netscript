@@ -16,27 +16,42 @@ import {
 import { MemoryJobStorage } from './memory-job-storage.ts';
 import { MemoryWorker } from './memory-worker.ts';
 
+/** Options for creating a test job definition. */
 export type JobFixtureOptions<TId extends string> = Readonly<{
+  /** Optional job identifier. */
   id?: TId;
+  /** Optional stream topic. */
   topic?: string;
+  /** Optional handler for the job. */
   handler?: JobHandler;
+  /** Optional job tags. */
   tags?: readonly string[];
+  /** Optional job metadata. */
   metadata?: Record<string, unknown>;
 }>;
 
+/** Partial execution record fields used to override fixture defaults. */
 export type ExecutionRecordFixtureOptions = Partial<ExecutionRecord>;
 
+/** Options for creating a memory-backed workers runtime fixture. */
 export type TestWorkersRuntimeOptions = Omit<WorkersRuntimeOptions, 'jobRegistry' | 'worker'> & {
+  /** Memory job storage used by the runtime fixture. */
   jobStorage?: MemoryJobStorage;
+  /** Memory worker used by the runtime fixture. */
   worker?: MemoryWorker;
+  /** Static handlers keyed by job id for the default memory worker. */
   handlers?: ReadonlyMap<string, JobHandler>;
 };
 
+/** Workers runtime fixture with direct access to memory ports. */
 export type TestWorkersRuntime =
   & WorkersRuntime
   & Readonly<{
+    /** Memory-backed runtime ports created for the fixture. */
     memory: Readonly<{
+      /** Memory job storage used by the runtime. */
       jobStorage: MemoryJobStorage;
+      /** Memory worker used by the runtime. */
       worker: MemoryWorker;
     }>;
   }>;

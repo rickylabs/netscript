@@ -16,7 +16,9 @@ import { WorkflowStepRunner, type WorkflowStepRunnerOptions } from './workflow-s
 export type WorkflowExecutorOptions =
   & WorkflowStepRunnerOptions
   & Readonly<{
+    /** Clock used to timestamp workflow state transitions. */
     clock?: WorkflowClock;
+    /** Store used to persist workflow state and pending events. */
     stateStore?: WorkflowStateStore;
   }>;
 
@@ -27,6 +29,7 @@ export class WorkflowExecutor {
   readonly #stepRunner: WorkflowStepRunner;
   readonly #activeExecutions = new Set<string>();
 
+  /** Creates a workflow executor backed by the provided state store and callbacks. */
   constructor(options: WorkflowExecutorOptions = {}) {
     this.#clock = options.clock ?? Object.freeze({ now: () => new Date() });
     this.#stateStore = options.stateStore ?? new MemoryWorkflowStateStore();
@@ -38,6 +41,7 @@ export class WorkflowExecutor {
     });
   }
 
+  /** Starts or continues a workflow execution with optional initial payload. */
   async execute<TId extends string, TPayload = unknown>(
     workflow: WorkflowDefinition<TId>,
     options: WorkflowExecutionOptions<TPayload> = {},
@@ -48,6 +52,7 @@ export class WorkflowExecutor {
     return this.run(workflow, state as WorkflowState<TPayload>);
   }
 
+  /** Resumes a persisted workflow execution by id. */
   async resume<TId extends string>(
     workflow: WorkflowDefinition<TId>,
     executionId: string,
@@ -59,14 +64,17 @@ export class WorkflowExecutor {
     return this.run(workflow, state);
   }
 
+  /** Stores an event for a workflow step that is waiting on external input. */
   async sendEvent<T = unknown>(event: WorkflowEvent<T>): Promise<void> {
     await this.#stateStore.saveEvent(event);
   }
 
+  /** Reads persisted workflow state without mutating the execution. */
   getState(workflowId: string, executionId: string): Promise<WorkflowState | undefined> {
     return this.#stateStore.findState(workflowId, executionId);
   }
 
+  /** Runs a workflow from its current state until completion or failure. */
   private async run<TId extends string, TPayload>(
     workflow: WorkflowDefinition<TId>,
     initialState: WorkflowState<TPayload>,
@@ -93,6 +101,7 @@ export class WorkflowExecutor {
     }
   }
 
+  /** Creates the first persisted state for a workflow execution. */
   private createInitialState<TId extends string, TPayload>(
     workflow: WorkflowDefinition<TId>,
     executionId: string,
@@ -110,6 +119,7 @@ export class WorkflowExecutor {
     });
   }
 
+  /** Returns a copy of state with a new lifecycle status. */
   private withStatus<TPayload>(
     state: WorkflowState<TPayload>,
     status: WorkflowState['status'],
@@ -117,6 +127,7 @@ export class WorkflowExecutor {
     return Object.freeze({ ...state, status });
   }
 
+  /** Records a step result and advances the current step cursor. */
   private withStepResult<TPayload>(
     state: WorkflowState<TPayload>,
     currentStepIndex: number,
@@ -129,6 +140,7 @@ export class WorkflowExecutor {
     });
   }
 
+  /** Persists the terminal state for a workflow execution. */
   private async complete<TPayload>(
     state: WorkflowState<TPayload>,
     status: 'completed' | 'failed',
