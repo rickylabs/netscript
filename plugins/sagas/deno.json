@@ -62,6 +62,7 @@
       "scaffold.plugin.json",
       "scaffold.runtime.json",
       "mod.ts",
+      "verify-plugin.ts",
       "src/**/*.ts",
       "contracts/**/*.ts",
       "services/**/*.ts",
