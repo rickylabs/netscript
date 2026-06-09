@@ -13,6 +13,7 @@ Branch: `feat/package-quality-wave4-runtimes-4b` → umbrella `feat/package-qual
 | C6 impl | 969212b | fix(workers-core): publish abstract testing workflow types | C6 |
 | C7 impl | ea24869 | fix(workers-core): hide zod schema internals | C7 |
 | C8 impl | 08ca137 | fix(workers-core): publish remaining support types | C8 |
+| C9 impl | 5d03ac8 | docs(workers-core): document abstract contracts | C9 |
 
 (If split into `4b-core`/`4b-plugin`, each gets its own nested run dir + commits.md. Pair each
 implementation slice commit with its `docs(wave4): record …` doc-record commit.)

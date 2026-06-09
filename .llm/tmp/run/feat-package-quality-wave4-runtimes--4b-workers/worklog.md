@@ -112,6 +112,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `ee9f26b` (carries merged
 | 6/27 | `@netscript/plugin-workers-core` | A3 | ptr-fix abstracts, testing, and workflow by type origin | `run-deno-doc-lint.ts` targeted; raw `deno check --unstable-kv <16 entrypoints>` | PASS — targeted doc-lint summary `totalPrivateTypeRef=0` with `totalMissingJSDoc=74` deferred to locked JSDoc slices; full core 16-entrypoint check exit 0 | `969212b` |
 | 7/27 | `@netscript/plugin-workers-core` | A3 | ptr-fix domain public-schema Zod leaks | `run-deno-doc-lint.ts` targeted; raw `deno check --unstable-kv <16 entrypoints>` | PASS — targeted doc-lint summary `totalErrors=0`, `totalPrivateTypeRef=0`, `totalMissingJSDoc=0`; full core 16-entrypoint check exit 0 | `ea24869` |
 | 8/27 | `@netscript/plugin-workers-core` | A3 | ptr-fix remaining streams, state, telemetry, presets, shutdown | `run-deno-doc-lint.ts` targeted; raw `deno check --unstable-kv <16 entrypoints>` | PASS — targeted doc-lint summary `totalPrivateTypeRef=0` with `totalMissingJSDoc=47` deferred to locked JSDoc slices; full core 16-entrypoint check exit 0 | `08ca137` |
+| 9/27 | `@netscript/plugin-workers-core` | A3 | JSDoc registry and abstracts | `run-deno-doc-lint.ts` targeted; raw `deno check --unstable-kv <16 entrypoints>` | PASS — targeted doc-lint summary `totalErrors=0`, `totalPrivateTypeRef=0`, `totalMissingJSDoc=0`; full core 16-entrypoint check exit 0 | `5d03ac8` |
 
 ## Readiness note
 
