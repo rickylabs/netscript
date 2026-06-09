@@ -6,7 +6,6 @@
   "exports": {
     ".": "./mod.ts",
     "./builders": "./src/builders/mod.ts",
-    "./contracts": "./src/contracts/v1/mod.ts",
     "./contracts/v1": "./src/contracts/v1/mod.ts",
     "./registry": "./src/registry/mod.ts",
     "./state": "./src/state/mod.ts",

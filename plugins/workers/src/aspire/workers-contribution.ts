@@ -7,7 +7,7 @@ import {
   type HealthCheckSpec,
 } from '@netscript/aspire';
 
-const WORKERS_PLUGIN_VERSION = '0.1.0';
+const WORKERS_PLUGIN_VERSION = '0.0.1-alpha.0';
 
 const WORKERS_SERVICE_PERMISSIONS = [
   '--unstable-kv',

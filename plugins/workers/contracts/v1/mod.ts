@@ -7,7 +7,7 @@
  * @module
  */
 
-export * from '@netscript/plugin-workers-core/contracts';
+export * from '@netscript/plugin-workers-core/contracts/v1';
 export type {
   ExecutionRecord,
   JobDefinition,

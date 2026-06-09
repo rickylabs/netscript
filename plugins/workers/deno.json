@@ -20,7 +20,7 @@
     "@netscript/plugin-streams": "../streams/mod.ts",
     "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
     "@netscript/plugin-workers-core": "../../packages/plugin-workers-core/mod.ts",
-    "@netscript/plugin-workers-core/contracts": "../../packages/plugin-workers-core/src/contracts/v1/mod.ts",
+    "@netscript/plugin-workers-core/contracts/v1": "../../packages/plugin-workers-core/src/contracts/v1/mod.ts",
     "@netscript/plugin-workers-core/executor": "../../packages/plugin-workers-core/src/executor/mod.ts",
     "@netscript/plugin-workers-core/presets": "../../packages/plugin-workers-core/src/presets/mod.ts",
     "@netscript/plugin-workers-core/registry": "../../packages/plugin-workers-core/src/registry/mod.ts",

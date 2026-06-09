@@ -143,7 +143,7 @@ function toTopicContribution(
   };
 }
 
-const workersManifest = definePlugin('@netscript/plugin-workers', '0.1.0')
+const workersManifest = definePlugin('@netscript/plugin-workers', '0.0.1-alpha.0')
   .withDisplayName('Background Workers')
   .withType('background-processor')
   .withDescription('Background job scheduling and execution for NetScript applications.')
