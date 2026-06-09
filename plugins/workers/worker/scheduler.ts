@@ -2,22 +2,18 @@
 
 import { createScheduler } from '@netscript/cron';
 import { createQueue } from '@netscript/queue';
+import { type JobDefinition, type JobMessage } from '@netscript/plugin-workers-core/runtime';
+import { enqueueSchedulerJob, type SchedulerJobTrigger } from './scheduler-dispatch.ts';
+import { setupSchedulerEventListeners } from './scheduler-events.ts';
+import { toScheduledJobInfo } from './scheduler-info.ts';
+import { scheduleRegistryJob } from './scheduler-scheduling.ts';
 import {
-  DEFAULT_TOPIC,
-  type JobDefinition,
-  type JobMessage,
-} from '@netscript/plugin-workers-core/runtime';
-import {
-  createJobScheduleSpan,
   endSchedulerSpan,
   logSchedulerTelemetryConfig,
-  recordJobScheduled,
-  recordSchedulerCronRun,
   recordSchedulerStarted,
   type Span,
   startSchedulerSpan,
   type TracedQueue,
-  traceJobDispatch,
 } from './scheduler-tracing.ts';
 import type {
   ScheduledJobInfo,
@@ -101,7 +97,7 @@ export class Scheduler {
     this.schedulerSpan = startSchedulerSpan();
 
     // Set up event listeners for cron jobs
-    this.setupEventListeners();
+    setupSchedulerEventListeners(this.cronScheduler, () => this.schedulerSpan);
 
     // Load and schedule all jobs from registry
     await this.loadScheduledJobs();
@@ -163,50 +159,12 @@ export class Scheduler {
    * Schedule a single job.
    */
   private async scheduleJob(job: JobDefinition): Promise<void> {
-    if (!job.schedule) {
-      return;
-    }
-
-    if (this.scheduledJobs.has(job.id)) {
-      console.warn(`[Scheduler] Job '${job.id}' already scheduled`);
-      return;
-    }
-
-    // Create span for scheduling the job
-    const scheduleSpan = createJobScheduleSpan(job);
-
-    try {
-      const cronJob = await this.cronScheduler.schedule(
-        job.id,
-        job.schedule,
-        async () => {
-          // Create a scheduler tick span to group cron job executions
-          await this.enqueueCronJob(job);
-        },
-        {
-          timezone: job.timezone,
-          enabled: job.enabled,
-          metadata: {
-            jobId: job.id,
-            entrypoint: job.entrypoint,
-          },
-        },
-      );
-
-      this.scheduledJobs.set(job.id, cronJob.id);
-
-      recordJobScheduled(scheduleSpan, job);
-
-      console.log(
-        `[Scheduler] Scheduled job '${job.id}' with schedule '${job.schedule}'`,
-      );
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      scheduleSpan.recordException(error instanceof Error ? error : new Error(message));
-      console.error(`[Scheduler] Failed to schedule job '${job.id}':`, error);
-    } finally {
-      scheduleSpan.end();
-    }
+    await scheduleRegistryJob({
+      job,
+      scheduledJobs: this.scheduledJobs,
+      cronScheduler: this.cronScheduler,
+      enqueueCronJob: (scheduledJob) => this.enqueueCronJob(scheduledJob),
+    });
   }
 
   /**
@@ -278,55 +236,17 @@ export class Scheduler {
    */
   private async enqueueJob(
     job: JobDefinition,
-    triggeredBy: 'cron' | 'manual' | 'api' | 'event' = 'cron',
+    triggeredBy: SchedulerJobTrigger = 'cron',
     payload?: Record<string, unknown>,
   ): Promise<void> {
-    if (!this.queue) {
-      console.error('[Scheduler] Queue not initialized');
-      return;
-    }
-
-    // Get next run time for tracing
-    const cronJob = this.cronScheduler.get(job.id);
-    const nextRun = cronJob?.nextRun ?? undefined;
-
-    // All jobs start their own trace with scheduler.dispatch as root
-    // This creates the flow: scheduler.dispatch → queue.enqueue → queue.dequeue → job.execute
-    await traceJobDispatch(
-      {
-        job: {
-          id: job.id,
-          name: job.name,
-          schedule: job.schedule,
-          timezone: job.timezone,
-          enabled: job.enabled,
-          entrypoint: job.entrypoint,
-          timeout: job.timeout,
-          maxRetries: job.maxRetries,
-          tags: job.tags,
-        },
-        triggeredBy,
-        queueName: this.queueName,
-        priority: 50,
-        payload: payload ?? job.metadata as Record<string, unknown>,
-        nextRun,
-      },
-      async (headers) => {
-        // Create the job message with trace context in headers
-        const message: JobMessage = {
-          jobId: job.id,
-          topic: job.topic ?? DEFAULT_TOPIC,
-          triggeredBy,
-          triggeredAt: new Date().toISOString(),
-          payload: payload ?? job.metadata as Record<string, unknown>,
-          priority: 50,
-        };
-
-        // Enqueue with trace context headers
-        await this.queue!.enqueue(message, { headers });
-      },
-      { root: true },
-    );
+    await enqueueSchedulerJob({
+      queueName: this.queueName,
+      queue: this.queue,
+      cronScheduler: this.cronScheduler,
+      job,
+      triggeredBy,
+      payload,
+    });
   }
 
   /**
@@ -338,60 +258,10 @@ export class Scheduler {
   }
 
   /**
-   * Set up event listeners for cron job events.
-   */
-  private setupEventListeners(): void {
-    this.cronScheduler.on('jobRun', (event) => {
-      // Record cron job run in scheduler span
-      if (this.schedulerSpan) {
-        recordSchedulerCronRun(
-          this.schedulerSpan,
-          event.jobId,
-          event.result.duration,
-          true,
-        );
-      }
-    });
-
-    this.cronScheduler.on('jobError', (event) => {
-      console.error(
-        `[Scheduler] Cron job '${event.jobId}' failed:`,
-        event.result.error?.message,
-      );
-
-      // Record cron job error in scheduler span
-      if (this.schedulerSpan) {
-        recordSchedulerCronRun(
-          this.schedulerSpan,
-          event.jobId,
-          event.result.duration,
-          false,
-          event.result.error?.message,
-        );
-      }
-    });
-  }
-
-  /**
    * Get information about all scheduled jobs.
    */
   getScheduledJobs(): ScheduledJobInfo[] {
-    const cronJobs = this.cronScheduler.list();
-    const result: ScheduledJobInfo[] = [];
-
-    for (const cronJob of cronJobs) {
-      result.push({
-        jobId: cronJob.id,
-        schedule: cronJob.schedule,
-        timezone: cronJob.timezone,
-        enabled: cronJob.enabled,
-        nextRun: cronJob.nextRun,
-        lastRun: cronJob.lastRun,
-        runCount: cronJob.runCount,
-      });
-    }
-
-    return result;
+    return this.cronScheduler.list().map(toScheduledJobInfo);
   }
 
   /**
@@ -405,15 +275,7 @@ export class Scheduler {
       return undefined;
     }
 
-    return {
-      jobId: cronJob.id,
-      schedule: cronJob.schedule,
-      timezone: cronJob.timezone,
-      enabled: cronJob.enabled,
-      nextRun: cronJob.nextRun,
-      lastRun: cronJob.lastRun,
-      runCount: cronJob.runCount,
-    };
+    return toScheduledJobInfo(cronJob);
   }
 
   /**
