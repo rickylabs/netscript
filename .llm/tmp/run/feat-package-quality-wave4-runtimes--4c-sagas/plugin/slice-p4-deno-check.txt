@@ -1,0 +1,28 @@
+exit=1
+command=deno check --unstable-kv <12 plugin entrypoints>
+Check mod.ts
+Check src/public/mod.ts
+Check src/plugin/mod.ts
+Check src/cli/mod.ts
+Check src/scaffolding/mod.ts
+Check src/e2e/mod.ts
+Check src/aspire/mod.ts
+Check src/runtime/mod.ts
+Check contracts/v1/mod.ts
+Check services/src/main.ts
+Check streams/mod.ts
+Check streams/server.ts
+TS2322 [ERROR]: Type 'StateSchema<Readonly<{ sagaInstance: { readonly schema: StreamSchema<Readonly<{ instanceId: string; sagaId: string; correlationKey: string; status: "cancelled" | "compensating" | "completed" | "failed" | "pending" | "running"; state: Record<...>; ... 10 more ...; tracestate?: string | undefined; }>, unknown>; readon...' is not assignable to type 'StreamStateDefinition'.
+    state: sagasStreamSchema,
+    ~~~~~
+    at file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/plugins/sagas/streams/factory.ts:44:5
+
+    '"~standard"' is declared here.
+        readonly "~standard": StandardSchemaV1.Props<Input, Output>;
+                 ~~~~~~~~~~~
+        at file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@standard-schema/spec/1.1.0/dist/index.d.ts:31:14    The expected type comes from property 'state' which is declared here on type 'CreateStreamDBOptions<StreamStateDefinition, Record<string, ActionDefinition<any, any>>>'
+      state: TDef;
+      ~~~~~
+        at file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@durable-streams/state/0.2.3/dist/index.d.ts:192:3
+
+error: Type checking failed.
