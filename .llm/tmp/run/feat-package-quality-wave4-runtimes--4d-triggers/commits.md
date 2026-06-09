@@ -24,3 +24,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 2d45b05: fix(triggers-core): expose D6 telemetry testing types
 - aee486a: docs(wave4): record D6 telemetry testing evidence
 - 98a121f: chore(triggers-core): validate D7 telemetry docs
+- 64109d5: docs(wave4): record D7 telemetry docs evidence
+- 50cc79f: fix(triggers-core): document D8 domain surface
