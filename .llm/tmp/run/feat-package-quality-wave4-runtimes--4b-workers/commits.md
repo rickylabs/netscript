@@ -26,6 +26,7 @@ Branch: `feat/package-quality-wave4-runtimes-4b` → umbrella `feat/package-qual
 | P5 impl | 009941d | docs(workers): document scaffolder metadata | P5 |
 | P6 impl | 8f37cad | docs(workers): document cli worker APIs | P6 |
 | P7 impl | 2f3a064 | refactor(workers): split scheduler concepts | P7 |
+| P8 impl | 05200fd | test(workers): verify plugin manifest | P8 |
 
 (If split into `4b-core`/`4b-plugin`, each gets its own nested run dir + commits.md. Pair each
 implementation slice commit with its `docs(wave4): record …` doc-record commit.)
