@@ -17,6 +17,7 @@ export class HmacSha256WebhookVerifier implements WebhookVerifierPort {
   readonly #signatureHeader: string;
   readonly #idempotencyHeader: string;
 
+  /** Create a verifier with optional secret and header names. */
   constructor(options: HmacSha256WebhookVerifierOptions = {}) {
     this.#secret = options.secret;
     this.#signatureHeader = (options.signatureHeader ?? 'x-netscript-signature').toLowerCase();

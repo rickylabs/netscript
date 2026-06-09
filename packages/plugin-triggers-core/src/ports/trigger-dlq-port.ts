@@ -18,7 +18,10 @@ export type TriggerDlqListOptions = Readonly<{
 
 /** Dead-letter queue boundary for exhausted trigger events. */
 export interface TriggerDlqPort {
+  /** Add an exhausted trigger event to the dead-letter queue. */
   enqueue(entry: TriggerDlqEntry): Promise<void>;
+  /** List dead-letter entries matching the optional filters. */
   list(options?: TriggerDlqListOptions): Promise<readonly TriggerDlqEntry[]>;
+  /** Request replay for a dead-lettered trigger event. */
   replay(eventId: TriggerEventId): Promise<void>;
 }

@@ -24,7 +24,8 @@ export type TriggerIngressEventIdFactory = (
   definition: RuntimeWebhookDefinition,
 ) => TriggerEventId;
 
-type RuntimeWebhookDefinition = WebhookDefinition<string, never, never>;
+/** Webhook definition shape accepted by the trigger ingress runtime. */
+export type RuntimeWebhookDefinition = WebhookDefinition<string, never, never>;
 
 /** Options accepted by the trigger ingress composition root. */
 export type TriggerIngressOptions = Readonly<{

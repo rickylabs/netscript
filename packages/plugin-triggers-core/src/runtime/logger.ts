@@ -1,8 +1,12 @@
 /** Structured logger boundary consumed by trigger runtime code. */
 export interface LoggerPort {
+  /** Emit a debug log event. */
   debug(message: string, attributes?: Readonly<Record<string, unknown>>): void;
+  /** Emit an info log event. */
   info(message: string, attributes?: Readonly<Record<string, unknown>>): void;
+  /** Emit a warning log event. */
   warn(message: string, attributes?: Readonly<Record<string, unknown>>): void;
+  /** Emit an error log event. */
   error(message: string, attributes?: Readonly<Record<string, unknown>>): void;
 }
 
