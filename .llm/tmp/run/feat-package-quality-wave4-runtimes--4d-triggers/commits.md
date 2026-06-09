@@ -26,3 +26,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 98a121f: chore(triggers-core): validate D7 telemetry docs
 - 64109d5: docs(wave4): record D7 telemetry docs evidence
 - 50cc79f: fix(triggers-core): document D8 domain surface
+- 2d441c3: docs(wave4): record D8 domain docs evidence
+- f5e87be: chore(triggers-core): validate D9 testing contracts docs

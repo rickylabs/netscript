@@ -13,7 +13,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `8264a1c` (4a+4b+4c merge
 | 2026-06-09 | Research | generator | MEASURE-FIRST complete. Full per-EP + combined + barrel doc-lint reconciliation. Core 211 (46 ptr + 165 jsdoc), plugin 138 (76 ptr + 62 jsdoc). Both dry-run PASS, 0 slow types. `deno check` all 21 EPs PASS. `behavior.triggers-health` E2E PASS (16ms, port 8093). `verify-plugin.ts` MISSING. Core missing `test` + `publish:dry-run`. Both docs/ MISSING. F-1: `test-webhooks-e2e.ts` 423 LOC. Research.md authored. |
 | 2026-06-09 | Plan & Design | generator | Plan locked: A3 core + A5 plugin, COMBINED (no split, 23 slices <30 cap). Archetype decisions, locked surface (21 EPs all retain), LD-8 ptr-fix strategy, F-1 split design, A5 test layer (verify-plugin.ts + 4 tests), docs/ tree design for both units, risk register, deferred scope, gate-matrix cross-ref. Plan.md authored. **STOP at Plan Gate.** |
 | 2026-06-09 | PLAN-EVAL | evaluator (OpenHands `qwen3.7-max`) | **PASS.** Separate session, Option A (commit `bb985d0`, `plan-eval.md`). 8/8 plan-gate boxes; spot-checked F-1 (`test-webhooks-e2e.ts` 423), F-6 (core `check` only `mod.ts`), docs/ absent. **No `deno.lock` churn** (bot commit touched only `.llm/tmp/openhands/*` + `plan-eval.md`). 2 non-blocking procedural notes: (1) add worklog `## Design` section for IMPL-EVAL traceability → **DONE below**; (2) barrel-vs-per-EP reconciliation confirmed avoided. |
-| 2026-06-10 | Implement | generator | D1-D8 complete. D8 fixed the residual domain worker-type export and error constructor JSDoc; ports/runtime/adapters remained green from D5. |
+| 2026-06-10 | Implement | generator | D1-D9 complete. D9 testing/contracts JSDoc residual validation passed with no further code changes after D4/D6 fixes. |
 | | Gate | generator | (pending) Archetype gates + F-13/Runtime+Aspire (A3/A5) + F-10 (A5) + health-probe evidence + consumer-import + F-1 + F-6 + F-7 (docs/). |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) 4d → umbrella after IMPL-EVAL PASS. **Last sub-wave** → umbrella reaches full-wave completeness → supervisor merges umbrella → track `feat/package-quality`. |
@@ -202,4 +202,21 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `packages/plugin-triggers-core` |
 | Gate result | PASS, exit 0; all 11 core export entrypoints checked with `--unstable-kv`. |
 | Drift | None. |
-| Commits | Implementation `50cc79f`; paired docs/evidence pending. |
+| Commits | Implementation `50cc79f`; paired docs/evidence `2d441c3`. |
+
+### Slice 9/23 — D9 core testing/contracts JSDoc
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers-core` |
+| Archetype | A3 Runtime/Behavior |
+| Changed | No additional code changes; D4 contracts and D6 testing fixes already made the residual JSDoc gates green. D9 is preserved as a residual validation slice. |
+| Gate(s) | F-7 doc-score |
+| Gate command | `deno doc --lint src/testing/mod.ts` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint src/contracts/v1/mod.ts` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno task check` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; all 11 core export entrypoints checked with `--unstable-kv`. |
+| Drift | Covered by D6 info row for testing JSDoc; D4 already made contracts doc-lint green. |
+| Commits | Implementation `f5e87be`; paired docs/evidence pending. |
