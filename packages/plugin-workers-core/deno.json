@@ -33,7 +33,7 @@
     "zod": "npm:zod@^4.3.6"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/contracts/v1/mod.ts src/registry/mod.ts src/state/mod.ts src/executor/mod.ts src/workflow/mod.ts src/streams/mod.ts src/presets/mod.ts src/shutdown/mod.ts src/domain/public-schema.ts src/telemetry/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/config/mod.ts src/runtime/mod.ts",
     "test": "deno test --allow-all tests/",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
