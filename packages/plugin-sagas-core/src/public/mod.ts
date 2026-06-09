@@ -26,6 +26,7 @@ export type {
   RetryPolicy,
   SagaConcurrencyPolicy,
   SagaContext,
+  SagaCorrelation,
   SagaCorrelationKey,
   SagaCorrelationRule,
   SagaDefinition,

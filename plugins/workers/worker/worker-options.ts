@@ -63,9 +63,9 @@ export type WorkerCompleteExecutionOptions = Readonly<{
   /** Process-style exit code. */
   exitCode?: number;
   /** Structured execution result. */
-  result?: Record<string, unknown>;
+  result?: Record<string, unknown> | null;
   /** Failure message. */
-  error?: string;
+  error?: string | null;
 }>;
 
 /** Execution-state surface consumed by the worker process. */
@@ -73,9 +73,12 @@ export interface WorkerExecutionState {
   /** Create an execution record. */
   create(options: WorkerCreateExecutionOptions): Promise<WorkerExecutionRecord>;
   /** Mark an execution as running. */
-  start(executionId: string): Promise<void>;
+  start(executionId: string): Promise<WorkerExecutionRecord | null>;
   /** Complete an execution record. */
-  complete(executionId: string, options: WorkerCompleteExecutionOptions): Promise<void>;
+  complete(
+    executionId: string,
+    options: WorkerCompleteExecutionOptions,
+  ): Promise<WorkerExecutionRecord | null>;
 }
 
 /** Task executor surface consumed by the worker process. */
@@ -93,9 +96,9 @@ export type WorkerTaskResult = Readonly<{
   /** Process-style exit code. */
   exitCode?: number;
   /** Structured task result payload. */
-  result?: Record<string, unknown>;
+  result?: Record<string, unknown> | null;
   /** Failure message. */
-  error?: string;
+  error?: string | null;
   /** Captured standard output. */
   stdout?: string;
   /** Captured standard error. */
