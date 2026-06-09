@@ -8,6 +8,7 @@ Branch: `feat/package-quality-wave4-runtimes-4b` → umbrella `feat/package-qual
 | C1 impl | 0eec3df | docs(workers-core): declare runtime archetype | C1 |
 | C2 impl | 3f01a2d | chore(workers-core): check all retained entrypoints | C2 |
 | C3 impl | 7a738d5 | fix(workers): fold core contracts export | C3 |
+| C4 impl | 92bf266 | fix(workers-core): publish builder config contract types | C4 |
 
 (If split into `4b-core`/`4b-plugin`, each gets its own nested run dir + commits.md. Pair each
 implementation slice commit with its `docs(wave4): record …` doc-record commit.)
