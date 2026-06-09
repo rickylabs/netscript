@@ -70,8 +70,8 @@ const SagaRetryConfigObjectSchema: z.ZodType<NonNullable<SagaConfigEntry['retry'
 });
 
 /** Retry policy schema for global and per-saga config. */
-const SagaRetryConfigZodSchema: z.ZodType<SagaConfigEntry['retry']> =
-  SagaRetryConfigObjectSchema.optional();
+const SagaRetryConfigZodSchema: z.ZodType<SagaConfigEntry['retry']> = SagaRetryConfigObjectSchema
+  .optional();
 
 /** Retry policy schema for global and per-saga config. */
 export const SagaRetryConfigSchema: ConfigSchema<SagaConfigEntry['retry']> =

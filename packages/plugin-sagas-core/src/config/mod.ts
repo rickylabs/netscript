@@ -26,10 +26,10 @@ export type {
   SagaConfigInput,
   SagaGroupConfig,
   SagaGroupConfigData,
+  SagaRetentionConfigData,
   SagaRetryConfig,
   SagaScalingConfigData,
+  SagaStoreProvider,
   SagaTimeoutConfig,
   SagaTransportProvider,
-  SagaStoreProvider,
-  SagaRetentionConfigData,
 } from './saga-config-schema.ts';

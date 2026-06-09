@@ -156,7 +156,7 @@ export class GarnetListTransport implements SagaTransportPort {
     );
   }
 
-  async #startReadLoop(record: ListTransportSubscriptionRecord): Promise<void> {
+  #startReadLoop(record: ListTransportSubscriptionRecord): void {
     if (record.readLoopPromise) return;
     record.attachBlockingClient(this.#createBlockingClient());
     record.resetStop();

@@ -10,10 +10,15 @@ export { createSagaInstrumentation, SagaInstrumentation } from './instrumentatio
 export type { SagaDurabilityTier } from '../domain/mod.ts';
 export type {
   SagaAttributeName,
+  SagaAttributesMap,
   SagaMetricName,
+  SagaMetricNamesMap,
   SagaSpanEventName,
+  SagaSpanEventsMap,
   SagaSpanName,
+  SagaSpanNamesMap,
   SagaTelemetryOutcome,
+  SagaTelemetryOutcomesMap,
 } from './attributes.ts';
 export type {
   SagaCascadeCompensateInput,

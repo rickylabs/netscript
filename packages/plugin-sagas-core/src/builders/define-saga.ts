@@ -1,5 +1,4 @@
 import type {
-  CascadedMessage,
   QueryDefinition,
   SagaConcurrencyPolicy,
   SagaCorrelation,

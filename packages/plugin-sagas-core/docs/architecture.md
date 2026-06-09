@@ -8,13 +8,13 @@ telemetry metadata, and testing fixtures consumed by NetScript saga-aware packag
 
 Doctrine archetype: **A3 Runtime/Behavior**. The package owns long-running saga execution with
 correlated state, delivery through transports, scheduling, idempotency, compensation, and explicit
-start/stop lifecycle. Its gate set therefore includes F-13 saga/runtime invariants,
-Runtime/Aspire validation, and consumer-import validation.
+start/stop lifecycle. Its gate set therefore includes F-13 saga/runtime invariants, Runtime/Aspire
+validation, and consumer-import validation.
 
 ## Boundary
 
-The core package owns reusable saga definitions, contracts, runtime composition, ports, and adapters.
-It does not own the `plugins/sagas` service process, plugin manifest, CLI verbs, scaffold
+The core package owns reusable saga definitions, contracts, runtime composition, ports, and
+adapters. It does not own the `plugins/sagas` service process, plugin manifest, CLI verbs, scaffold
 contributions, or generated database artifacts.
 
 ## Layers

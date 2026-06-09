@@ -1,7 +1,6 @@
 import type { SagaDurabilityTier } from '../domain/mod.ts';
 import {
   SagaAttributes,
-  SagaMetricNames,
   SagaSpanEvents,
   SagaSpanNames,
   type SagaTelemetryOutcome,

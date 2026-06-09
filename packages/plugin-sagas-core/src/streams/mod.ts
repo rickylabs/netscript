@@ -1,9 +1,9 @@
 export { SagaInstanceSchema, sagasStreamSchema } from './schema.ts';
 export type {
-  SagaInstance,
-  SagasStreamDefinition,
   CollectionDefinition,
   CollectionEventHelpers,
+  SagaInstance,
+  SagasStreamDefinition,
   StateSchema,
   StreamSchema,
   StreamSchemaResult,

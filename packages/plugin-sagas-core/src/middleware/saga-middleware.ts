@@ -3,8 +3,11 @@ import type { SagaBusPort, SagaPublishOptions, SagaStorePort } from '../ports/mo
 
 /** Saga helpers injected into Hono request context. */
 export interface HonoSagaContext {
+  /** Bus used for publishing saga messages. */
   readonly bus: SagaBusPort;
+  /** Publish a saga message with optional trace context. */
   publish(message: SagaMessage, options?: SagaPublishOptions): Promise<void>;
+  /** Load saga state through the configured store, when present. */
   getSagaState<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined>;
