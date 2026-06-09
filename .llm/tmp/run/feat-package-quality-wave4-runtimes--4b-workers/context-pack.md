@@ -11,8 +11,8 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C14 and P1-P5 are complete and pushed. Latest implementation commit:
-`009941d` (`docs(workers): document scaffolder metadata`). The 4b-core sweep is green:
+order. Slices C1-C14 and P1-P6 are complete and pushed. Latest implementation commit:
+`8f37cad` (`docs(workers): document cli worker APIs`). The 4b-core sweep is green:
 dry-run PASS with 0 slow types, full-export doc-lint 0/0/0 across all 16 retained
 entrypoints, raw 16-entrypoint `deno check --unstable-kv` PASS, lint PASS, fmt check PASS,
 tests PASS 16/0, live runtime smoke PASS, and consumer-import checks PASS for triggers,
@@ -24,7 +24,9 @@ intentionally deferred to P5/P6. P4 reduced streams, streams/server, and service
 private-type refs to 0 by replacing the third-party `StreamDB` leak with a package-owned
 `WorkersStreamDB` surface and explicitly exporting first-party stream/state/service support
 types. P5 cleared scaffolding + contracts/v1 JSDoc to 0/0/0 by documenting public
-scaffolder metadata fields; contracts/v1 was already clean.
+scaffolder metadata fields; contracts/v1 was already clean. P6 cleared CLI + worker
+JSDoc to 0/0/0 by documenting concrete CLI constructors and worker/scheduler lifecycle
+helpers reported by Deno doc-lint.
 
 ## Scope — 2 publishable units (long pole #1)
 

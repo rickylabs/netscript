@@ -24,6 +24,7 @@ Branch: `feat/package-quality-wave4-runtimes-4b` → umbrella `feat/package-qual
 | P3 impl | f5565b4 | fix(workers): publish worker aspire scaffold types | P3 |
 | P4 impl | 484a06a | fix(workers): publish stream service helper types | P4 |
 | P5 impl | 009941d | docs(workers): document scaffolder metadata | P5 |
+| P6 impl | 8f37cad | docs(workers): document cli worker APIs | P6 |
 
 (If split into `4b-core`/`4b-plugin`, each gets its own nested run dir + commits.md. Pair each
 implementation slice commit with its `docs(wave4): record …` doc-record commit.)
