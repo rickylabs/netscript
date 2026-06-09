@@ -1,64 +1,46 @@
-# IMPL-EVAL Summary — Wave 4 · 4b workers
-
-## Verdict
-**PASS**
-
-Run: `feat-package-quality-wave4-runtimes--4b-workers`  
-PR: #19 → umbrella #16  
-Base: umbrella `2c24662` (4a merged) + 4b merge `173357c`  
-Evaluator: Separate-session IMPL-EVAL  
+# OpenHands Summary — Wave 4 · 4c sagas PLAN-EVAL
 
 ## Summary
 
-Validated `@netscript/plugin-workers-core` (A3) and `@netscript/plugin-workers` (A5) against the harness v2 quality gates defined in the NetScript Architecture Doctrine. Both packages now pass `isolatedDeclarations`, `doc-lint`, dry-run, and test gates. The only code change required was adding explicit `z.ZodType<…>` type annotations to three exported Zod schemas in `plugin-workers-core` so the TypeScript compiler can emit `.d.ts` files without inferring types from initializer expressions.
+Ran PLAN-EVAL for PR #20 (Wave 4 · 4c sagas — package quality) per `.llm/harness/evaluator/plan-protocol.md` and `gates/plan-gate.md`.
+
+## Verdict
+
+**`PASS`** — all 8 plan-gate checklist boxes satisfied. Implementation may begin.
+
+### Checklist Results
+
+| Plan-Gate item | Result | Evidence |
+|---|---|---|
+| Research present and current | PASS | research.md dated 2026-06-09; re-baseline against `1896f854` (4a+4b merged umbrella) |
+| Decisions locked | PASS | plan.md §1-§7: A3/A5 archetypes, split 14+13, surface locked, ptr-fix strategy, F-1 splits, test layer — all with rationale |
+| Open-decision sweep | PASS | plan.md §13: 5 deferred decisions all marked safe-to-defer; evaluator sweep found no unlisted rework-forcing decisions |
+| Commit slices (< 30, gate + files each) | PASS | 4c-core: 14 slices (C1-C14), 4c-plugin: 13 slices (P1-P13); total 27 < 30 |
+| Risk register | PASS | plan.md §8: 6 risks with likelihood/impact/mitigation |
+| Gate set selected | PASS | plan.md §11: full gate matrix cross-ref for A3/A5 |
+| Deferred scope explicit | PASS | plan.md §9: 6 deferred items with reasons + target gates |
+| jsr-audit surface scan | PASS | research.md §9: 19 core + 12 plugin entrypoints, 0 slow types, both dry-run PASS |
+
+### Spot-Checks Performed
+
+1. Over-cap file LOC verified against tree: `redis-transport.ts` 480, `list-transport.ts` 453, `v1.ts` 715
+2. Missing tasks confirmed: core lacks `"test"` task; plugin lacks `"publish:dry-run"` task
+3. Merge-base `1896f854` verified on both branches
+4. F-3 layering audit: research.md §6 confirms "transports swappable behind port" with clean import graph
+5. F-13 validation approach: C14 covers sweep + 4b workers precedent demonstrates A3 runtime validation achievable
+
+### Evaluator Open-Decision Sweep
+
+No unlisted decisions that would force rework if deferred.
 
 ## Changes
 
-### `packages/plugin-workers-core/src/contracts/v1/workers.contract-schemas.ts`
-
-Added explicit type annotations to satisfy `--isolatedDeclarations` (enforced by root `deno.json`):
-
-- `WorkerJobConfigContractSchema` → `z.ZodType<WorkerJobConfigContract>`
-- `WorkerJobContractSchema` → `z.ZodType<WorkerJobContract>`
-- `JobRegistryContractSchema` → `z.ZodType<JobRegistryContract>`
-
-These annotations allow the TypeScript compiler to generate declaration files without needing to analyze the Zod `.strict()` call chains, which are not expressible in `.d.ts` output.
+- Created: `.llm/tmp/run/feat-package-quality-wave4-runtimes--4c-sagas/plan-eval.md`
 
 ## Validation
 
-### `@netscript/plugin-workers-core` (A3)
-
-| Gate | Command | Result |
-|------|---------|--------|
-| `deno check` | `deno task check` | ✅ Pass |
-| Tests | `deno task test` | ✅ 16 passed, 0 failed |
-| Dry-run | `deno publish --dry-run --allow-dirty` | ✅ Success (no slow-types warnings on the changed schemas) |
-| Doc-lint | `deno doc --lint mod.ts` | ✅ Pass (no missing exports) |
-
-### `@netscript/plugin-workers` (A5)
-
-| Gate | Command | Result |
-|------|---------|--------|
-| `deno check` | `deno task check` | ✅ Pass |
-| Tests | `deno task test` | ✅ 5 passed, 0 failed |
-| Dry-run | `deno publish --dry-run --allow-dirty` | ✅ Success (2 pre-existing dynamic-import warnings only) |
-
-### Remaining slow-types warnings (pre-existing, not introduced by this change)
-
-Both packages carry two **expected** `unanalyzable-dynamic-import` warnings that are by design:
-
-- `plugin-workers-core/src/runtime/job-dispatcher.ts:30` — runtime adapter bootstrap
-- `plugins/workers/services/src/main.ts:84` — plugin service bootstrap
-- `plugins/workers/src/cli/workers-cli-backend.ts:107` — CLI module loader
-
-These dynamic imports load user-provided modules at runtime and cannot be statically analyzed. They are **not** slow-types blockers for JSR publishability (the publish dry-run succeeds).
-
-## Responses to Review Comments or Issue Comments
-
-None applicable — this is a continuation of the harnessed IMPL-EVAL pass for PR #19.
+Plan review only (no code changes per PLAN-EVAL protocol). Spot-checked load-bearing findings against the tree (file LOC, missing tasks, merge-base).
 
 ## Remaining Risks
 
-1. **A5 package directory name vs. naming convention**: `@netscript/plugin-workers` lives under `plugins/workers/` rather than `packages/plugin-workers/`. This is consistent with the Tier-2 plugin pattern used elsewhere (`plugins/streams/`, etc.) and does not block gates, but it can confuse archetype mapping if future harness runs expect all A5-shape packages under `packages/`.
-2. **Pre-existing dynamic imports**: The three `unanalyzable-dynamic-import` warnings are architectural (runtime module loading). They should be tracked as accepted debt rather than re-investigated on every wave. If the JSR publish gate ever hardens to reject *any* dynamic-import warnings, these will need inline suppression or a refactor to static imports.
-3. **No e2e:cli run**: The full `deno task e2e:cli` suite was not executed per harness guidance (“expensive; run during evaluator/merge-readiness pass or when explicitly requested”). If the merge-readiness gate requires it, it should be run in a separate session.
+None blocking implementation. Plan is complete and sound per plan-gate criteria.
