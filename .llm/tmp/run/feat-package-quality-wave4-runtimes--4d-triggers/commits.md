@@ -12,3 +12,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 ## Implementation commits
 
 - 7a4aefc: fix(triggers-core): wire D1 package task hygiene
+- 26ab7b0: docs(wave4): record D1 task hygiene evidence
+- 23ecbe4: fix(triggers): wire D2 package check hygiene
