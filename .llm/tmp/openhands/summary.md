@@ -1,46 +1,90 @@
-# OpenHands Summary — Wave 4 · 4c sagas PLAN-EVAL
+# OpenHands Summary — Wave 4 · 4c sagas IMPL-EVAL (PR #20)
+
+**Evaluators**: OpenHands agent session (Qwen-3.7-Max), separate from generator per harness protocol § Evaluator
+**Run**: `feat-package-quality-wave4-runtimes--4c-sagas`
+**PR**: #20 — [Wave 4 · 4c] sagas — package quality
 
 ## Summary
 
-Ran PLAN-EVAL for PR #20 (Wave 4 · 4c sagas — package quality) per `.llm/harness/evaluator/plan-protocol.md` and `gates/plan-gate.md`.
+Conducted IMPL-EVAL for PR #20 following `.agents/skills/netscript-harness/SKILL.md` § Evaluator protocol. Evaluated 27 implementation slices (14 core + 13 plugin) across both `plugin-sagas-core` (A3 Runtime/Behavior) and `plugin-sagas` (A5 Plugin) packages. **Full E2E CLI suite executed per trigger request.**
 
-## Verdict
+## Verdict (Final)
 
-**`PASS`** — all 8 plan-gate checklist boxes satisfied. Implementation may begin.
+**`FAIL_FIX`** — plan remains valid; 1 required gate has residual findings.
 
-### Checklist Results
+### Blocking Finding
 
-| Plan-Gate item | Result | Evidence |
-|---|---|---|
-| Research present and current | PASS | research.md dated 2026-06-09; re-baseline against `1896f854` (4a+4b merged umbrella) |
-| Decisions locked | PASS | plan.md §1-§7: A3/A5 archetypes, split 14+13, surface locked, ptr-fix strategy, F-1 splits, test layer — all with rationale |
-| Open-decision sweep | PASS | plan.md §13: 5 deferred decisions all marked safe-to-defer; evaluator sweep found no unlisted rework-forcing decisions |
-| Commit slices (< 30, gate + files each) | PASS | 4c-core: 14 slices (C1-C14), 4c-plugin: 13 slices (P1-P13); total 27 < 30 |
-| Risk register | PASS | plan.md §8: 6 risks with likelihood/impact/mitigation |
-| Gate set selected | PASS | plan.md §11: full gate matrix cross-ref for A3/A5 |
-| Deferred scope explicit | PASS | plan.md §9: 6 deferred items with reasons + target gates |
-| jsr-audit surface scan | PASS | research.md §9: 19 core + 12 plugin entrypoints, 0 slow types, both dry-run PASS |
+`deno doc --lint packages/plugin-sagas-core/mod.ts` (independent evaluator run) produced **2 `private-type-ref` errors** — both trace to `SagaCorrelation` being missing from the public type closure in `src/public/mod.ts`:
 
-### Spot-Checks Performed
+1. `SagaBuilder["correlate"]` references private type `SagaCorrelation`
+2. `SagaCorrelationRule` references private type `SagaCorrelation`
 
-1. Over-cap file LOC verified against tree: `redis-transport.ts` 480, `list-transport.ts` 453, `v1.ts` 715
-2. Missing tasks confirmed: core lacks `"test"` task; plugin lacks `"publish:dry-run"` task
-3. Merge-base `1896f854` verified on both branches
-4. F-3 layering audit: research.md §6 confirms "transports swappable behind port" with clean import graph
-5. F-13 validation approach: C14 covers sweep + 4b workers precedent demonstrates A3 runtime validation achievable
+This contradicts the generator's C14 worklog claim of `private-type-ref-count=0`. Likely cause: the generator ran per-entrypoint lint but did not merge `builders/mod.ts` → `define-saga.ts` into the public-barrel doc-lint graph. The committed state at `85ee9c0` (HEAD) misses this export.
 
-### Evaluator Open-Decision Sweep
+### Required Fix (1-line)
 
-No unlisted decisions that would force rework if deferred.
+Add `SagaCorrelation,` to the domain type list in `packages/plugin-sagas-core/src/public/mod.ts`. Satisfies plan § 5 F-7 strategy ("First-party `@netscript/*` → Explicit type re-export through barrel"). No code change required.
 
-## Changes
+After fix, rerun IMPL-EVAL and target PASS.
 
-- Created: `.llm/tmp/run/feat-package-quality-wave4-runtimes--4c-sagas/plan-eval.md`
+## Passing Gates
+
+| Gate | Evidence |
+|------|----------|
+| **Type Check (core, 19 entrypoints)** | `deno check --unstable-kv`: exit 0 |
+| **Publish Dry-Run (core)** | `deno publish --dry-run --allow-dirty`: exit 0 |
+| **Unit Tests (core)** | `deno task test`: 17/17 passed (concurrency, idempotency, scheduler, store, testing helpers) |
+| **F-1 File-Size (core)** | `redis-transport.ts` and `list-transport.ts` split into transport + commands modules |
+| **Type Check (plugin, 12 entrypoints)** | `deno check --unstable-kv`: exit 0 |
+| **Doc-Lint (plugin)** | `deno doc --lint` all 12 entrypoints: 0 errors per `slice-p13-doc-lint-report.json` |
+| **Publish Dry-Run (plugin)** | `deno publish --dry-run --allow-dirty`: exit 0, slow-type-count=1 |
+| **Lint & Format (plugin)** | `deno lint`: 54 files clean; `deno fmt --check`: 61 files clean |
+| **Integration Tests (plugin)** | `deno task test`: 5/5 passed (manifest, CLI, aspire, E2E gates, public surface) |
+| **F-1 File-Size (plugin)** | `v1.ts` 715 → split into handlers (265) + helpers (255) + types (343) + barrel (15) |
+| **README (plugin)** | 205 lines (≥150 threshold); doctested examples present |
+| **Test Layer Upgrade (plugin)** | 0 → 5 tests (manifest, CLI, aspire, E2E gates, public surface) |
+| **Public Surface Lock (both)** | 19 + 12 entrypoints retained; no unplanned additions |
+
+### E2E CLI Suite (Requested)
+
+| Total | Passed | Failed |
+|-------|--------|--------|
+| 10 | 9 | 1 (pre-existing) |
+
+**Failed gate**: `database.init` — aspire `--resources` argument forwarding issue. Pre-existing, outside Wave 4c sagas scope. Non-blocking for this PR.
+
+**Passing gates**: `preflight`, `scaffold.runtime`, `scaffold.http`
+
+## Changes Made
+
+None to source code (per evaluator protocol, did not fix implementation).
+
+**Evaluator artifacts written**:
+- `.llm/tmp/run/feat-package-quality-wave4-runtimes--4c-sagas/evaluate.md` (FAIL_FIX verdict with gate evidence)
+- `.llm/tmp/openhands/summary.md` (this file, updated from PLAN-EVAL)
+
+**Required generator fix** (to follow): add `SagaCorrelation,` to `packages/plugin-sagas-core/src/public/mod.ts` line 29.
 
 ## Validation
 
-Plan review only (no code changes per PLAN-EVAL protocol). Spot-checked load-bearing findings against the tree (file LOC, missing tasks, merge-base).
+| Command | Result |
+|---------|--------|
+| `deno doc --lint packages/plugin-sagas-core/mod.ts` | ❌ FAIL (2 `private-type-ref` errors on `SagaCorrelation`) |
+| `deno check --unstable-kv packages/plugin-sagas-core/mod.ts` | ✅ PASS |
+| `deno test --unstable-kv --allow-all` (plugin-sagas-core) | ✅ PASS (17/17) |
+| `deno doc --lint packages/plugin-sagas/mod.ts` (plugin) | ✅ PASS (0 errors per `slice-p13-doc-lint-report.json`) |
+| `deno test --unstable-kv --allow-all` (plugin-sagas) | ✅ PASS (5/5) |
+| Full E2E CLI suite (`deno task e2e:cli full`) | ✅ 9/10 gates passing; 1 pre-existing `database.init` failure |
 
 ## Remaining Risks
 
-None blocking implementation. Plan is complete and sound per plan-gate criteria.
+1. **Generator worklog vs. committed-state discrepancy** — C14 worklog claims clean doc-lint; evaluator sees 2 errors. Post-fix, generator should re-measure with full-merge `deno doc --lint mod.ts`, not per-EP runs.
+2. **Pre-existing E2E `database.init` failure** — Outside Wave 4c scope. Track separately.
+3. **Global `deno task check` failures** — Pre-existing `isolatedDeclarations` errors in `packages/fresh-ui`, `packages/fresh`, `packages/telemetry`. Not sagas-related; deferred to Wave 6 CLI/CI setup.
+
+## Next Steps
+
+1. Generator applies the 1-line fix (`SagaCorrelation` export closure)
+2. Re-run `deno doc --lint packages/plugin-sagas-core/mod.ts` to confirm clean
+3. Re-run IMPL-EVAL for PASS verdict (2nd cycle — generator has 1 FAIL_FIX chance before escalation)
+4. Merge to umbrella on PASS
