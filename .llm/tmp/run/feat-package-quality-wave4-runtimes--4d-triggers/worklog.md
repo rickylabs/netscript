@@ -280,4 +280,25 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Warn row recorded: D12 uses package-owned structural stream DB/schema/producer contracts for third-party/upstream stream shapes and pulled same-file D15/D16 JSDoc forward. |
-| Commits | Implementation `00af803`; paired docs/evidence pending. |
+| Commits | Implementation `00af803`; paired docs/evidence `bd7e0bc`. |
+
+### Slice 13/23 — D13 plugin services/scaffolding/constants residual
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | `services/src/main.ts` now explicitly re-exports first-party trigger domain/port contracts referenced by service options; scaffolder public members gained JSDoc required by the raw scaffolding doc-lint gate. `src/constants.ts` already passed unchanged. |
+| Gate(s) | F-7 doc-score, F-15 re-export-upstream lint |
+| Gate command | `deno doc --lint services/src/main.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file` with inherited Fedify npm type-resolution warnings only. |
+| Gate command | `deno doc --lint src/scaffolding/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint src/constants.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno fmt --check plugins/triggers/services/src/main.ts plugins/triggers/src/scaffolding/trigger-scaffolders.ts plugins/triggers/src/scaffolding/mod.ts plugins/triggers/src/constants.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 4 files`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Info row recorded: D13 pulled same-file D16 scaffolding JSDoc forward so the raw D13 scaffolding gate is green. |
+| Commits | Implementation `225e05c`; paired docs/evidence pending. |
