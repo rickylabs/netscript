@@ -22,6 +22,8 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
+| 2026-06-09 | info | Pull-forward done by supervisor | 4a merged (umbrella `2c24662`); 4b merged it (`173357c`), merge-base now `2c24662` | Base current. Re-measure `workers-core ./streams` surface (plugin-streams-core went 1→0 doc-lint + A1→A3 in 4a) — attribute per entrypoint. |
+| 2026-06-09 | info | **Umbrella-level carry from 4a IMPL-EVAL** | `packages/cli` `deno task check` fails TS9016/TS9027 in `src/maintainer/features/sync/plugin/copy-official-plugin.ts` (byte-identical to base `ee9f26b`; pre-existing Wave 6 CLI debt) | NOT a 4b concern. When running consumer-import checks against `packages/cli`, scope to type-resolution of the workers surface; do not treat the pre-existing isolated-declarations failure as a 4b regression. Tracked in `arch-debt.md`. |
 
 ## Implementation drift (append during Implement)
 
