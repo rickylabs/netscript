@@ -11,8 +11,8 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C14 and P1-P6 are complete and pushed. Latest implementation commit:
-`8f37cad` (`docs(workers): document cli worker APIs`). The 4b-core sweep is green:
+order. Slices C1-C14 and P1-P7 are complete and pushed. Latest implementation commit:
+`2f3a064` (`refactor(workers): split scheduler concepts`). The 4b-core sweep is green:
 dry-run PASS with 0 slow types, full-export doc-lint 0/0/0 across all 16 retained
 entrypoints, raw 16-entrypoint `deno check --unstable-kv` PASS, lint PASS, fmt check PASS,
 tests PASS 16/0, live runtime smoke PASS, and consumer-import checks PASS for triggers,
@@ -26,7 +26,9 @@ private-type refs to 0 by replacing the third-party `StreamDB` leak with a packa
 types. P5 cleared scaffolding + contracts/v1 JSDoc to 0/0/0 by documenting public
 scaffolder metadata fields; contracts/v1 was already clean. P6 cleared CLI + worker
 JSDoc to 0/0/0 by documenting concrete CLI constructors and worker/scheduler lifecycle
-helpers reported by Deno doc-lint.
+helpers reported by Deno doc-lint. P7 completed the plugin F-1 split by reducing
+`worker/scheduler.ts` from 480 to 342 lines via internal dispatch, event, info, and
+scheduling helper modules.
 
 ## Scope — 2 publishable units (long pole #1)
 
