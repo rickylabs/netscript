@@ -5,12 +5,14 @@ import { MemorySagaBus } from './memory-saga-bus.ts';
 import { MemorySagaStore } from './memory-saga-store.ts';
 import { TestSagaClock } from './test-saga-clock.ts';
 
+/** Options for composing a deterministic test saga runtime. */
 export type TestSagaRuntimeOptions = Readonly<{
   bus?: MemorySagaBus;
   store?: MemorySagaStore;
   clock?: TestSagaClock;
 }>;
 
+/** Deterministic runtime facade returned by `createTestSagaRuntime`. */
 export type TestSagaRuntime =
   & SagaRuntime<'native'>
   & Readonly<{

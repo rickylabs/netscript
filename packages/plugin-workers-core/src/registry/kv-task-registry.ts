@@ -1,11 +1,6 @@
-import {
-  DEFAULT_TOPIC,
-  type RegisterTaskInput,
-  type TaskDefinition,
-  TaskDefinitionSchema,
-  type TaskSource,
-} from '../domain/mod.ts';
+import { DEFAULT_TOPIC, TaskDefinitionSchema } from '../domain/mod.ts';
 import type { RegistryKvStore, RegistryOptions } from './registry-options.ts';
+import type { RegisterTaskInput, TaskDefinition, TaskSource } from './registry-types.ts';
 import { Registry } from './registry.ts';
 
 const TASK_PREFIX = ['workers', 'tasks'] as const;
@@ -21,19 +16,23 @@ export type TaskFilterOptions = Readonly<{
 
 /** KV-backed task registry for runtime composition. */
 export class KvTaskRegistry extends Registry<string, TaskDefinition> {
+  /** Stable registry identifier. */
   readonly id: string;
   readonly #kv: RegistryKvStore;
 
+  /** Create a KV-backed task registry. */
   constructor(options: RegistryOptions & { kv: RegistryKvStore }) {
     super();
     this.id = options.id ?? 'kv-task-registry';
     this.#kv = options.kv;
   }
 
+  /** Register or replace a task definition by key. */
   async register(key: string, value: TaskDefinition): Promise<void> {
     await this.#kv.set([...TASK_PREFIX, key], value);
   }
 
+  /** Normalize and register a new task definition. */
   async registerTask(input: RegisterTaskInput): Promise<TaskDefinition> {
     const task = normalizeTaskDefinition(input);
     const existing = await this.get(task.id);
@@ -44,11 +43,13 @@ export class KvTaskRegistry extends Registry<string, TaskDefinition> {
     return task;
   }
 
+  /** Get a task definition by key. */
   async get(key: string): Promise<TaskDefinition | undefined> {
     const entry = await this.#kv.get<TaskDefinition>([...TASK_PREFIX, key]);
     return entry?.value ?? undefined;
   }
 
+  /** List raw registry entries. */
   async entries(): Promise<readonly (readonly [string, TaskDefinition])[]> {
     const result: (readonly [string, TaskDefinition])[] = [];
     for await (const entry of this.#kv.list<TaskDefinition>({ prefix: TASK_PREFIX })) {
@@ -57,6 +58,7 @@ export class KvTaskRegistry extends Registry<string, TaskDefinition> {
     return result;
   }
 
+  /** List tasks with registry filter options. */
   async list(options: TaskFilterOptions = {}): Promise<readonly TaskDefinition[]> {
     const entries = await this.entries();
     let tasks = entries.map((entry) => entry[1]);
@@ -69,6 +71,7 @@ export class KvTaskRegistry extends Registry<string, TaskDefinition> {
     return options.limit ? tasks.slice(0, options.limit) : tasks;
   }
 
+  /** Update an existing task definition. */
   async update(
     taskId: string,
     updates: Partial<Omit<RegisterTaskInput, 'id'>>,
@@ -84,6 +87,7 @@ export class KvTaskRegistry extends Registry<string, TaskDefinition> {
     return updated;
   }
 
+  /** Remove a task definition by id. */
   async unregister(taskId: string): Promise<boolean> {
     const existing = await this.get(taskId);
     if (!existing) return false;

@@ -1,11 +1,5 @@
 import { type BusConfig, createBus } from '@saga-bus/core';
-import type {
-  CascadedMessage,
-  QueryDefinition,
-  SagaDefinition,
-  SagaMessage,
-  SignalDefinition,
-} from '../domain/mod.ts';
+import type { CascadedMessage, SagaDefinition, SagaMessage } from '../domain/mod.ts';
 import { SagasError } from '../domain/mod.ts';
 import type {
   SagaBusPort,
@@ -30,14 +24,19 @@ export type SagaBusLegacyMachine =
 
 /** Local structural view of the upstream legacy bus instance. */
 export interface SagaBusLegacyBus {
+  /** Start the wrapped legacy bus. */
   start(): Promise<void>;
+  /** Stop the wrapped legacy bus. */
   stop(): Promise<void>;
+  /** Publish a legacy bus message. */
   publish(message: unknown): Promise<void>;
+  /** Optionally load legacy saga state by saga and correlation identifiers. */
   getSagaState?<TState>(sagaName: string, correlationId: string): Promise<TState | null>;
 }
 
 /** Logger shape used to report legacy-adapter deprecation without console globals. */
 export interface SagaBusLegacyLogger {
+  /** Emit a warning message with optional structured metadata. */
   warn(message: string, metadata?: Readonly<Record<string, unknown>>): void;
 }
 
@@ -64,6 +63,7 @@ export type SagaBusLegacyOptions = Readonly<{
 
 /** Deprecated adapter that wraps `@saga-bus/core` behind `SagaBusPort`. */
 export class SagaBusLegacy implements SagaBusPort {
+  /** Stable adapter identifier. */
   readonly id: string;
   readonly #options: SagaBusLegacyOptions;
   readonly #idempotency: SagaIdempotencyDedupTable;
@@ -72,6 +72,7 @@ export class SagaBusLegacy implements SagaBusPort {
   #running = false;
   #deprecationLogged = false;
 
+  /** Create a deprecated legacy saga-bus adapter. */
   constructor(options: SagaBusLegacyOptions = {}) {
     this.id = options.id ?? 'saga-bus-legacy';
     this.#options = options;
@@ -79,6 +80,7 @@ export class SagaBusLegacy implements SagaBusPort {
     this.#bus = options.bus;
   }
 
+  /** Start the wrapped legacy saga bus. */
   async start(): Promise<void> {
     if (this.#running) return;
     this.#logDeprecation();
@@ -87,19 +89,23 @@ export class SagaBusLegacy implements SagaBusPort {
     this.#running = true;
   }
 
+  /** Stop the wrapped legacy saga bus. */
   async stop(): Promise<void> {
     if (!this.#running || !this.#bus) return;
     await this.#bus.stop();
     this.#running = false;
   }
 
-  async register(definitions: readonly SagaDefinition[]): Promise<void> {
+  /** Register saga definitions before start. */
+  register(definitions: readonly SagaDefinition[]): Promise<void> {
     if (this.#running) {
       throw SagasError.validationFailed('Cannot register legacy sagas after start().');
     }
     this.#definitions.push(...definitions);
+    return Promise.resolve();
   }
 
+  /** Publish one saga message through the legacy bus. */
   async publish(message: SagaMessage, options: SagaPublishOptions = {}): Promise<void> {
     this.#logDeprecation();
     const idempotencyKey = options.idempotencyKey ?? message.idempotencyKey;
@@ -110,6 +116,7 @@ export class SagaBusLegacy implements SagaBusPort {
     await this.#publishToBus(message, options);
   }
 
+  /** Dispatch cascaded messages supported by the legacy bus adapter. */
   async dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void> {
     for (const message of messages) {
       if (message.idempotencyKey) {
@@ -141,6 +148,7 @@ export class SagaBusLegacy implements SagaBusPort {
     await bus.publish(toLegacyMessage(message, options));
   }
 
+  /** Reject signal dispatches because the legacy bus does not support them. */
   signal<TPayload, TName extends string>(
     _dispatch: SagaSignalDispatch<TPayload, TName>,
   ): Promise<void> {
@@ -149,6 +157,7 @@ export class SagaBusLegacy implements SagaBusPort {
     );
   }
 
+  /** Reject query dispatches because the legacy bus does not support them. */
   query<TResult, TName extends string>(
     _dispatch: SagaQueryDispatch<TResult, TName>,
   ): Promise<TResult> {

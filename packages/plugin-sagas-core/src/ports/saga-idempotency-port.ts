@@ -5,6 +5,7 @@ import type {
 
 /** Durable idempotency boundary for saga publish and cascade deduplication. */
 export interface SagaIdempotencyPort {
+  /** Reserve a target/key tuple and report whether it was accepted. */
   reserve(
     target: SagaIdempotencyTarget,
     idempotencyKey: string,

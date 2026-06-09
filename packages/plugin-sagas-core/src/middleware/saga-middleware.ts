@@ -1,11 +1,13 @@
-import type { Context, MiddlewareHandler, Next } from 'hono';
 import type { SagaInstanceId, SagaMessage, SagaState, SagaStateEnvelope } from '../domain/mod.ts';
 import type { SagaBusPort, SagaPublishOptions, SagaStorePort } from '../ports/mod.ts';
 
 /** Saga helpers injected into Hono request context. */
 export interface HonoSagaContext {
+  /** Bus used for publishing saga messages. */
   readonly bus: SagaBusPort;
+  /** Publish a saga message with optional trace context. */
   publish(message: SagaMessage, options?: SagaPublishOptions): Promise<void>;
+  /** Load saga state through the configured store, when present. */
   getSagaState<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined>;
@@ -15,6 +17,26 @@ export interface HonoSagaContext {
 export type SagaMiddlewareVariables = Readonly<{
   sagas: HonoSagaContext;
 }>;
+
+/** Request surface required by saga middleware. */
+export type SagaMiddlewareRequest = Readonly<{
+  header(name: string): string | undefined;
+}>;
+
+/** Context surface required by saga middleware. */
+export type SagaMiddlewareContext = {
+  readonly req: SagaMiddlewareRequest;
+  set(key: 'sagas', value: HonoSagaContext): void;
+};
+
+/** Continuation invoked by saga middleware. */
+export type SagaMiddlewareNext = () => Promise<void> | void;
+
+/** Package-owned structural middleware handler compatible with Hono middleware. */
+export type SagaMiddlewareHandler = (
+  context: SagaMiddlewareContext,
+  next: SagaMiddlewareNext,
+) => Promise<void>;
 
 /** Options for Hono saga middleware. */
 export type CreateSagaMiddlewareOptions = Readonly<{
@@ -27,13 +49,13 @@ export type CreateSagaMiddlewareOptions = Readonly<{
 /** Create Hono middleware that injects saga runtime helpers into request context. */
 export function createSagaMiddleware(
   options: CreateSagaMiddlewareOptions,
-): MiddlewareHandler<{ Variables: SagaMiddlewareVariables }> {
+): SagaMiddlewareHandler {
   const traceparentHeader = options.traceparentHeader ?? 'traceparent';
   const tracestateHeader = options.tracestateHeader ?? 'tracestate';
 
   return async (
-    context: Context<{ Variables: SagaMiddlewareVariables }>,
-    next: Next,
+    context: SagaMiddlewareContext,
+    next: SagaMiddlewareNext,
   ): Promise<void> => {
     const traceparent = context.req.header(traceparentHeader);
     const tracestate = context.req.header(tracestateHeader);

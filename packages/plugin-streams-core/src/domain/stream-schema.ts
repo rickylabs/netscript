@@ -21,8 +21,9 @@ export interface CollectionEventHelpers<T = unknown> {
 }
 
 /** Collection definition after durable-streams helper methods are attached. */
-export type CollectionWithHelpers<T = unknown> = CollectionDefinition<T> &
-  CollectionEventHelpers<T>;
+export type CollectionWithHelpers<T = unknown> =
+  & CollectionDefinition<T>
+  & CollectionEventHelpers<T>;
 
 /** Input map accepted by `defineStreamSchema`. */
 export type StreamStateDefinition = Record<string, CollectionDefinition>;

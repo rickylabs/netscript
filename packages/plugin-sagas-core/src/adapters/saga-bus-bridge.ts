@@ -10,7 +10,7 @@ import type {
 import {
   cascadedMessageIdempotencyTarget,
   MemorySagaIdempotencyStore,
-  SagaIdempotencyDedupTable,
+  type SagaIdempotencyDedupTable,
   type SagaIdempotencyTarget,
   sagaMessageIdempotencyTarget,
 } from '../runtime/saga-idempotency.ts';
@@ -35,6 +35,7 @@ export type SagaBusBridgeOptions = Readonly<{
 
 /** Native adapter that composes engine, scheduler, and compensator behind `SagaBusPort`. */
 export class SagaBusBridge implements SagaBusPort {
+  /** Stable adapter identifier. */
   readonly id: string;
   readonly #engine: SagaEngine;
   readonly #scheduler?: SagaScheduler;
@@ -42,6 +43,7 @@ export class SagaBusBridge implements SagaBusPort {
   readonly #resolveCompensation?: SagaBridgeCompensationResolver;
   readonly #idempotency: SagaIdempotencyPort;
 
+  /** Create a native saga bus bridge. */
   constructor(options: SagaBusBridgeOptions) {
     this.id = options.id ?? 'saga-bus-bridge';
     this.#engine = options.engine;
@@ -51,20 +53,24 @@ export class SagaBusBridge implements SagaBusPort {
     this.#idempotency = toIdempotencyPort(options.idempotency);
   }
 
+  /** Start the engine and scheduler. */
   async start(): Promise<void> {
     await this.#engine.start();
     await this.#scheduler?.start();
   }
 
+  /** Stop the scheduler and engine. */
   async stop(reason?: string): Promise<void> {
     await this.#scheduler?.stop();
     await this.#engine.stop(reason);
   }
 
+  /** Register saga definitions with the engine. */
   async register(definitions: readonly SagaDefinition[]): Promise<void> {
     await this.#engine.register(definitions);
   }
 
+  /** Publish one saga message through the engine. */
   async publish(message: SagaMessage, options: SagaPublishOptions = {}): Promise<void> {
     const idempotencyKey = options.idempotencyKey ?? message.idempotencyKey;
     if (
@@ -77,6 +83,7 @@ export class SagaBusBridge implements SagaBusPort {
     await this.#engine.publish(withPublishOptions(message, options), options);
   }
 
+  /** Dispatch cascaded messages through engine, scheduler, or compensator. */
   async dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void> {
     for (const message of messages) {
       if (message.idempotencyKey) {
@@ -89,12 +96,14 @@ export class SagaBusBridge implements SagaBusPort {
     }
   }
 
+  /** Dispatch a saga signal through the engine. */
   signal<TPayload, TName extends string>(
     dispatch: SagaSignalDispatch<TPayload, TName>,
   ): Promise<void> {
     return this.#engine.signal(dispatch);
   }
 
+  /** Dispatch a saga query through the engine. */
   query<TResult, TName extends string>(
     dispatch: SagaQueryDispatch<TResult, TName>,
   ): Promise<TResult> {
@@ -172,7 +181,8 @@ function toIdempotencyPort(
     return new MemorySagaIdempotencyStore();
   }
   return {
-    reserve: async (target, idempotencyKey) => idempotency.reserve(target, idempotencyKey),
+    reserve: (target, idempotencyKey) =>
+      Promise.resolve(idempotency.reserve(target, idempotencyKey)),
   };
 }
 

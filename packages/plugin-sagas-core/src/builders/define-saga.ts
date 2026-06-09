@@ -1,5 +1,4 @@
 import type {
-  CascadedMessage,
   QueryDefinition,
   SagaConcurrencyPolicy,
   SagaCorrelation,
@@ -28,7 +27,8 @@ export type SagaConcurrencyOptions<TMessage extends SagaMessage = SagaMessage> =
   key?: (message: TMessage) => string;
 }>;
 
-type SyncQueryResult<TResult> = TResult extends PromiseLike<unknown> ? never : TResult;
+/** Synchronous query result accepted by `onQuery`; promises are rejected at type level. */
+export type SyncQueryResult<TResult> = TResult extends PromiseLike<unknown> ? never : TResult;
 
 /** Userland fluent saga builder. */
 export interface SagaBuilder<

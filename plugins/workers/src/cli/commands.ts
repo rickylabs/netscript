@@ -30,11 +30,15 @@ export class StaticWorkersCliBackend implements WorkersCliBackend {
 
 const defaultBackend: WorkersCliBackend = new LocalWorkersCliBackend();
 
-abstract class WorkersCliCommand extends WorkersCommand {
+/** Base class for concrete workers CLI commands. */
+export abstract class WorkersCliCommand extends WorkersCommand {
+  /** Static command metadata consumed by help and backend adapters. */
   readonly definition: WorkersCliCommandDefinition;
+  /** Group used by host CLI help renderers. */
   readonly category: WorkersCliCategory;
   private readonly backend: WorkersCliBackend;
 
+  /** Create a workers CLI command with an optional backend override. */
   protected constructor(
     definition: WorkersCliCommandDefinition,
     backend: WorkersCliBackend = defaultBackend,
@@ -61,6 +65,7 @@ abstract class WorkersCliCommand extends WorkersCommand {
 
 /** Create a worker job definition file. */
 export class AddJobCommand extends WorkersCliCommand {
+  /** Create an add-job command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'add-job',
@@ -80,6 +85,7 @@ export class AddJobCommand extends WorkersCliCommand {
 
 /** Create a worker task definition file. */
 export class AddTaskCommand extends WorkersCliCommand {
+  /** Create an add-task command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'add-task',
@@ -97,6 +103,7 @@ export class AddTaskCommand extends WorkersCliCommand {
 
 /** List configured worker jobs. */
 export class ListJobsCommand extends WorkersCliCommand {
+  /** Create a list-jobs command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'list-jobs',
@@ -113,6 +120,7 @@ export class ListJobsCommand extends WorkersCliCommand {
 
 /** List configured worker tasks. */
 export class ListTasksCommand extends WorkersCliCommand {
+  /** Create a list-tasks command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'list-tasks',
@@ -126,6 +134,7 @@ export class ListTasksCommand extends WorkersCliCommand {
 
 /** Run a configured worker job. */
 export class RunJobCommand extends WorkersCliCommand {
+  /** Create a run command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'run',
@@ -139,6 +148,7 @@ export class RunJobCommand extends WorkersCliCommand {
 
 /** Show logs for a worker execution. */
 export class LogsCommand extends WorkersCliCommand {
+  /** Create a logs command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'logs',
@@ -151,6 +161,7 @@ export class LogsCommand extends WorkersCliCommand {
 
 /** Edit a worker runtime configuration topic. */
 export class ConfigEditCommand extends WorkersCliCommand {
+  /** Create a config-edit command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'config-edit',
@@ -163,6 +174,7 @@ export class ConfigEditCommand extends WorkersCliCommand {
 
 /** Publish a worker runtime configuration topic. */
 export class ConfigPublishCommand extends WorkersCliCommand {
+  /** Create a config-publish command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'config-publish',
@@ -175,6 +187,7 @@ export class ConfigPublishCommand extends WorkersCliCommand {
 
 /** Enable a worker job. */
 export class EnableCommand extends WorkersCliCommand {
+  /** Create an enable command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'enable',
@@ -187,6 +200,7 @@ export class EnableCommand extends WorkersCliCommand {
 
 /** Disable a worker job. */
 export class DisableCommand extends WorkersCliCommand {
+  /** Create a disable command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'disable',
@@ -199,6 +213,7 @@ export class DisableCommand extends WorkersCliCommand {
 
 /** Compile the static worker registry used by compiled runtimes. */
 export class CompileRegistryCommand extends WorkersCliCommand {
+  /** Create a compile-registry command with an optional backend override. */
   constructor(backend?: WorkersCliBackend) {
     super({
       name: 'compile-registry',

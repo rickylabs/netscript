@@ -167,7 +167,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-09 — Wave 4c slice C13 split the saga transport monoliths in
+  `@netscript/plugin-sagas-core`: `src/transports/list-transport.ts` now owns the transport class
+  and stable public re-exports while list command/key/recovery mechanics live in
+  `src/transports/list-transport-commands.ts`; `src/transports/redis-transport.ts` was split the
+  same way into `src/transports/redis-transport-commands.ts`. All four files are below the F-1 cap
+  and the transport entrypoint still passes raw `deno check --unstable-kv`.
 - **Gate:** F-1, F-13
 
 ## packages/fresh — AP-1 / doctrine verdict Restructure (builders/mod.ts 1,110 LOC)
@@ -228,6 +233,38 @@ Seeded from
 - **Created:** 2026-05-20
 - **Status:** open
 - **Gate:** PLG-WALKER-AST, F-5, F-11
+
+## packages/plugin-streams-core — AP-13 console.warn runtime reporting
+
+- **Reason:** `DurableStreamProducer` currently uses `console.warn` for connection, pending-event,
+  serialization, and primary-key visibility in published runtime code. The warnings are intentionally
+  retained for alpha operator visibility; replacing them correctly requires a structured telemetry or
+  logger dependency that is outside Wave 4a's package-quality scope.
+- **Owner:** `@netscript/plugin-streams-core` maintainers.
+- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
+  (D6, slice 4).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-14, AP-13; close when `DurableStreamProducer` emits through a structured reporter and
+  `console.warn` is absent from
+  `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
+
+## packages/watchers — AP-13 console.warn runtime reporting
+
+- **Reason:** `FileWatcher` and `HybridWatchStrategy` currently use `console.warn` for native
+  watcher fallback and runtime access-failure visibility. The warnings are intentionally retained
+  for alpha operator diagnostics; replacing them correctly requires a structured telemetry or logger
+  dependency that is outside Wave 4a's package-quality scope.
+- **Owner:** `@netscript/watchers` maintainers.
+- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
+  (S23 final debt sweep).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-14, AP-13; close when watcher runtime warnings emit through a structured reporter and
+  `console.warn` is absent from `packages/watchers/src/file-watcher.ts` and
+  `packages/watchers/src/strategies/hybrid.ts`.
 
 ## packages/cli — AP-1 / doctrine verdict Restructure
 

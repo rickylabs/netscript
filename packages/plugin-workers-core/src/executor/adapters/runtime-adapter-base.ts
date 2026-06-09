@@ -1,6 +1,10 @@
 import { TaskRuntimeAdapter } from '../../abstracts/mod.ts';
-import type { ResolvedTaskExecutionOptions } from '../../abstracts/mod.ts';
-import type { TaskDefinition, TaskResult, TaskType } from '../../domain/mod.ts';
+import type {
+  ResolvedTaskExecutionOptions,
+  TaskDefinition,
+  TaskResult,
+  TaskType,
+} from '../executor-types.ts';
 import type { ProcessRunner } from './dax-process-runner.ts';
 import { DaxProcessRunner } from './dax-process-runner.ts';
 import type { RuntimeCommandSpec } from './command-spec.ts';
@@ -12,11 +16,14 @@ type CommandBuilder = (
 
 /** Shared adapter delegation for built-in subprocess runtimes. */
 export class RuntimeAdapterBase extends TaskRuntimeAdapter {
+  /** Stable adapter identifier. */
   readonly id: string;
+  /** Runtime handled by the adapter. */
   readonly runtime: TaskType | null;
   readonly #build: CommandBuilder;
   readonly #runner: ProcessRunner;
 
+  /** Create a subprocess adapter from command-building primitives. */
   constructor(options: {
     id: string;
     runtime: TaskType | null;
@@ -30,10 +37,12 @@ export class RuntimeAdapterBase extends TaskRuntimeAdapter {
     this.#runner = options.runner ?? new DaxProcessRunner();
   }
 
+  /** Return whether the adapter can execute a task. */
   supports(task: TaskDefinition): boolean {
     return task.type === this.runtime && Boolean(task.entrypoint);
   }
 
+  /** Execute a task through the configured process runner. */
   async execute(task: TaskDefinition, options: ResolvedTaskExecutionOptions): Promise<TaskResult> {
     try {
       const spec = this.#build(task, options);

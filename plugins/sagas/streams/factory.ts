@@ -8,13 +8,24 @@
  */
 
 import { createStreamDB } from '@durable-streams/state';
+import type { StreamStateDefinition as DurableStreamStateDefinition } from '@durable-streams/state';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
 import { type SagaInstance, sagasStreamSchema } from './schema.ts';
 
 export type { SagaInstance };
 
 /** StreamDB instance returned by the sagas StreamDB factory. */
-export type SagasStreamDB = ReturnType<typeof createStreamDB>;
+export interface SagasStreamDB {
+  /** TanStack DB collections keyed by saga stream entity name. */
+  readonly collections: {
+    /** Saga instance collection created by the durable streams client. */
+    readonly sagaInstance: unknown;
+  };
+  /** Connect and preload stream state into the collections. */
+  preload(): Promise<void>;
+  /** Close the underlying stream connection. */
+  close(): void;
+}
 
 /**
  * Create a TanStack DB-backed StreamDB for saga instance entities.
@@ -41,6 +52,6 @@ export function createSagasStreamDB(options: { baseUrl?: string } = {}): SagasSt
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: sagasStreamSchema,
-  });
+    state: sagasStreamSchema as unknown as DurableStreamStateDefinition,
+  }) as unknown as SagasStreamDB;
 }

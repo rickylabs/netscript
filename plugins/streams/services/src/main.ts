@@ -32,9 +32,7 @@ const dataDir = Deno.env.get('STREAMS_DATA_DIR');
 
 // ── Start the upstream streams server on an internal port ─────────────
 const internalPortOverride = Deno.env.get('STREAMS_INTERNAL_PORT');
-const preferredInternalPort = internalPortOverride
-  ? parseInt(internalPortOverride, 10)
-  : undefined;
+const preferredInternalPort = internalPortOverride ? parseInt(internalPortOverride, 10) : undefined;
 const internalPort = await getAvailablePort({
   preferredPort: preferredInternalPort,
 });
@@ -65,35 +63,38 @@ const upstreamCheck = healthChecks.custom('durable-streams-server', async () => 
 // ── Hono app with health + proxy ──────────────────────────────────────
 const app = new Hono();
 
-app.use('*', cors({
-  origin: '*',
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
-  allowHeaders: [
-    'Content-Type',
-    'Authorization',
-    'Stream-Seq',
-    'Stream-TTL',
-    'Stream-Expires-At',
-    'Stream-Closed',
-    'Producer-Id',
-    'Producer-Epoch',
-    'Producer-Seq',
-  ],
-  exposeHeaders: [
-    'Stream-Next-Offset',
-    'Stream-Cursor',
-    'Stream-Up-To-Date',
-    'Stream-Closed',
-    'Producer-Epoch',
-    'Producer-Seq',
-    'Producer-Expected-Seq',
-    'Producer-Received-Seq',
-    'etag',
-    'content-type',
-    'content-encoding',
-    'vary',
-  ],
-}));
+app.use(
+  '*',
+  cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
+    allowHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Stream-Seq',
+      'Stream-TTL',
+      'Stream-Expires-At',
+      'Stream-Closed',
+      'Producer-Id',
+      'Producer-Epoch',
+      'Producer-Seq',
+    ],
+    exposeHeaders: [
+      'Stream-Next-Offset',
+      'Stream-Cursor',
+      'Stream-Up-To-Date',
+      'Stream-Closed',
+      'Producer-Epoch',
+      'Producer-Seq',
+      'Producer-Expected-Seq',
+      'Producer-Received-Seq',
+      'etag',
+      'content-type',
+      'content-encoding',
+      'vary',
+    ],
+  }),
+);
 
 app.get(
   '/health',

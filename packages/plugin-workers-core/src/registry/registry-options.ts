@@ -11,9 +11,13 @@ export type KvEntry<TValue> = Readonly<{
 
 /** Minimal KV shape consumed by registry adapters. */
 export interface RegistryKvStore {
+  /** Get a KV entry by key. */
   get<TValue>(key: readonly unknown[]): Promise<KvEntry<TValue> | null>;
+  /** Set a KV entry by key. */
   set<TValue>(key: readonly unknown[], value: TValue): Promise<unknown>;
+  /** Delete a KV entry by key. */
   delete(key: readonly unknown[]): Promise<unknown>;
+  /** List KV entries by selector. */
   list<TValue>(selector: KvListSelector): AsyncIterable<KvEntry<TValue>>;
 }
 

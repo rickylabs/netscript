@@ -22,6 +22,8 @@ import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../strea
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
 
+export type { PluginServiceContext } from '@netscript/plugin/sdk';
+
 type ServiceDatabaseClient = Record<string, unknown>;
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;

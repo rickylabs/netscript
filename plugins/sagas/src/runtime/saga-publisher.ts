@@ -81,6 +81,7 @@ export function createSagaPublisher<TMessage extends SagaMessage = SagaMessage>(
 /** HTTP implementation of the saga publisher port. */
 export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
   implements SagaPublisherPort<TMessage> {
+  /** Stable publisher identifier used by downstream observability. */
   readonly id: string;
 
   private readonly serviceName: string;
@@ -91,6 +92,7 @@ export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
   private readonly readEnv: SagaPublisherEnvReader;
   private readonly retryableStatusCodes: readonly number[];
 
+  /** Create an HTTP saga publisher with optional service discovery overrides. */
   constructor(options: HttpSagaPublisherOptions = {}) {
     this.id = options.id ?? DEFAULT_PUBLISHER_ID;
     this.serviceName = options.serviceName ?? SAGAS_API_SERVICE_NAME;
@@ -156,6 +158,7 @@ export class HttpSagaPublisher<TMessage extends SagaMessage = SagaMessage>
     );
   }
 
+  /** Resolve the current publish URL from static options or Aspire service discovery. */
   private publishUrl(): string {
     return joinUrl(
       resolveServiceUrl(this.serviceName, this.baseUrl, this.readEnv),
