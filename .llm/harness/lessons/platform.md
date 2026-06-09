@@ -1,7 +1,8 @@
 # Platform Lessons (Windows + tooling)
 
 Source: supervisor sessions for `feat/package-quality` Wave 2 (2a–2c); Wave 4 4a
-IMPL-EVAL (`rtk proxy` masking); Wave 4 4b (OpenHands eval automation lock churn).
+IMPL-EVAL (`rtk proxy` masking); Wave 4 4b (OpenHands eval automation lock churn);
+Wave 4 4d PLAN-EVAL (stale OpenHands summary comment).
 
 These are environment gotchas that silently corrupt harness bookkeeping if not
 known up front. All confirmed on Windows 11 + PowerShell + RTK shell hook.
@@ -65,6 +66,23 @@ Rules:
   later work validated against it, reverting just re-churns. Carry it forward, log it
   (registry + drift), and do one deliberate, reviewed lock pass at the umbrella→track
   closeout. (Golden Rule 6: never delete the lock or `--reload` without approval.)
+
+## The OpenHands `<!-- openhands-agent-summary -->` PR comment can be stale
+
+The automation maintains **one persistent summary comment** per PR (marker
+`<!-- openhands-agent-summary -->`) and updates it each run from `.llm/tmp/openhands/summary.md`.
+That file is **not always regenerated** for the new run: Wave 4 4d's PLAN-EVAL run
+(`bb985d0`, qwen3.7-max) bumped the comment's `updated_at` to the run instant but left
+the **previous 4c sagas IMPL-EVAL `FAIL_FIX`** body in place — so the visible PR summary
+on the 4d PLAN-EVAL PR read "Wave 4 · 4c sagas IMPL-EVAL (PR #20) … FAIL_FIX". A reviewer
+trusting the PR comment would have read the wrong package, wrong phase, and wrong verdict.
+
+Rule: **the verdict source is the committed run artifact, never the PR comment.** Read
+`<run>/plan-eval.md` (PLAN-EVAL) or `<run>/evaluate.md` (IMPL-EVAL) from the bot commit
+and confirm it names the **right run id, the right slices, and the right surface** before
+accepting the verdict. The `<!-- openhands-agent-summary -->` comment is a convenience
+mirror that can lag a run behind. (Same shape as the `rtk proxy` false-evidence trap: the
+convenient summary is not the gate.)
 
 ## MSYS mangles `ref:path` colons
 
