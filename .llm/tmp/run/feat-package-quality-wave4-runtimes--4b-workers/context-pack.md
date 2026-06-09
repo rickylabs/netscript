@@ -11,8 +11,8 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C14 and P1-P3 are complete and pushed. Latest implementation commit:
-`f5565b4` (`fix(workers): publish worker aspire scaffold types`). The 4b-core sweep is green:
+order. Slices C1-C14 and P1-P4 are complete and pushed. Latest implementation commit:
+`484a06a` (`fix(workers): publish stream service helper types`). The 4b-core sweep is green:
 dry-run PASS with 0 slow types, full-export doc-lint 0/0/0 across all 16 retained
 entrypoints, raw 16-entrypoint `deno check --unstable-kv` PASS, lint PASS, fmt check PASS,
 tests PASS 16/0, live runtime smoke PASS, and consumer-import checks PASS for triggers,
@@ -20,7 +20,10 @@ sagas, workers, and CLI entrypoints. P1 added plugin `publish:dry-run` and made 
 `check` task enumerate all 9 retained entrypoints. P2 reduced plugin contracts/v1 + CLI
 private-type refs to 0, with 11 CLI constructor JSDoc findings intentionally deferred to P6.
 P3 reduced worker, Aspire, and scaffolding private-type refs to 0, with 30 JSDoc findings
-intentionally deferred to P5/P6.
+intentionally deferred to P5/P6. P4 reduced streams, streams/server, and services
+private-type refs to 0 by replacing the third-party `StreamDB` leak with a package-owned
+`WorkersStreamDB` surface and explicitly exporting first-party stream/state/service support
+types.
 
 ## Scope — 2 publishable units (long pole #1)
 
