@@ -1,0 +1,533 @@
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-agent-runtime.ts[0m[0m[33m:13:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m13 | [0m  abstract readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-agent-runtime.ts[0m[0m[33m:15:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0m  abstract runStep(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-agent-runtime.ts[0m[0m[33m:22:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m22 | [0m  abstract serializeState(state: SagaAgentRuntimeState): Promise<Uint8Array>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-agent-runtime.ts[0m[0m[33m:24:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m24 | [0m  abstract deserializeState(bytes: Uint8Array): Promise<SagaAgentRuntimeState>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  abstract readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:13:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m13 | [0m  abstract start(): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:15:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0m  abstract stop(reason?: string): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:17:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m17 | [0m  abstract register(definitions: readonly SagaDefinition[]): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:19:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m19 | [0m  abstract publish(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:24:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m24 | [0m  abstract dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:26:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m26 | [0m  abstract signal<TPayload, TName extends string>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-bus.ts[0m[0m[33m:30:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m30 | [0m  abstract query<TResult, TName extends string>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-store.ts[0m[0m[33m:17:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m17 | [0m  abstract readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-store.ts[0m[0m[33m:19:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m19 | [0m  abstract load<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-store.ts[0m[0m[33m:23:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m23 | [0m  abstract save<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-store.ts[0m[0m[33m:28:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0m  abstract appendTransition<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-store.ts[0m[0m[33m:33:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m33 | [0m  abstract findByCorrelation(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-store.ts[0m[0m[33m:38:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m38 | [0m  abstract saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-store.ts[0m[0m[33m:40:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m40 | [0m  abstract delete(instanceId: SagaInstanceId): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-transport.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  abstract readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-transport.ts[0m[0m[33m:12:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0m  abstract start(): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-transport.ts[0m[0m[33m:14:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0m  abstract stop(reason?: string): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-transport.ts[0m[0m[33m:16:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m16 | [0m  abstract publish(topic: string, message: SagaMessage): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\abstracts\abstract-saga-transport.ts[0m[0m[33m:18:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0m  abstract subscribe(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:44:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m44 | [0m  readonly adapter: TAdapter;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:45:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m45 | [0m  readonly bus: SagaBusPort;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:46:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m46 | [0m  start(): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:47:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m47 | [0m  stop(reason?: string): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:48:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m48 | [0m  register(definitions: readonly SagaDefinition[]): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:49:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m49 | [0m  publish(message: SagaMessage, options?: SagaPublishOptions): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:50:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0m  dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:51:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m51 | [0m  signal<TPayload, TName extends string>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\runtime\create-saga-runtime.ts[0m[0m[33m:54:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0m  query<TResult, TName extends string>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:10:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport type MemorySagaPublishRecord = Readonly<{
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:17:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m17 | [0m  readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:23:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m23 | [0m  constructor(id = 'memory-saga-bus') {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  start(): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:32:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0m  stop(_reason?: string): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:37:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0m  register(definitions: readonly SagaDefinition[]): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:42:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m42 | [0m  publish(message: SagaMessage, options?: SagaPublishOptions): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:48:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m48 | [0m  dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:54:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0m  signal<TPayload, TName extends string>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:60:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m60 | [0m  query<TResult, TName extends string>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:66:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m66 | [0m  definitions(): readonly SagaDefinition[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:70:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m70 | [0m  published(): readonly MemorySagaPublishRecord[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-bus.ts[0m[0m[33m:74:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m74 | [0m  cascaded(): readonly CascadedMessage[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:18:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0m  readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:23:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m23 | [0m  constructor(id = 'memory-saga-store') {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  load<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:33:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m33 | [0m  save<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:53:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m53 | [0m  appendTransition<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:63:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0m  findByCorrelation(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:70:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m70 | [0m  saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:78:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m78 | [0m  delete(instanceId: SagaInstanceId): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:84:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m84 | [0m  entries(): readonly SagaStateEnvelope[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:88:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m88 | [0m  transitions(instanceId: SagaInstanceId): readonly SagaTransitionRecord[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\memory-saga-store.ts[0m[0m[33m:92:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m92 | [0m  clear(): void {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:15:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport type RecordingSagaStoreOperation =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:25:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m25 | [0m  readonly id: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:29:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0m  constructor(delegate: SagaStorePort, id = 'recording-saga-store') {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:34:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m34 | [0m  load<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:41:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m41 | [0m  save<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:53:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m53 | [0m  appendTransition<TState extends SagaState>(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:65:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m65 | [0m  findByCorrelation(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:73:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m73 | [0m  saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:78:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m78 | [0m  delete(instanceId: SagaInstanceId): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\recording-saga-store.ts[0m[0m[33m:83:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m83 | [0m  operations(): readonly RecordingSagaStoreOperation[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\test-saga-clock.ts[0m[0m[33m:5:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0m  readonly id: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\test-saga-clock.ts[0m[0m[33m:9:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0m  constructor(now: Date = new Date('2026-01-01T00:00:00.000Z'), id = 'test-saga-clock') {
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\test-saga-clock.ts[0m[0m[33m:14:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0m  now(): Date {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\test-saga-clock.ts[0m[0m[33m:18:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0m  sleep(ms: number, options: SagaSleepOptions = {}): Promise<void> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\test-saga-clock.ts[0m[0m[33m:27:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0m  advanceBy(ms: number): Date {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\test-saga-clock.ts[0m[0m[33m:32:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0m  advanceTo(next: Date): Date {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\test-saga-clock.ts[0m[0m[33m:37:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0m  sleeps(): readonly number[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\create-test-saga-runtime.ts[0m[0m[33m:8:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m8 | [0mexport type TestSagaRuntimeOptions = Readonly<{
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\packages\plugin-sagas-core\src\testing\create-test-saga-runtime.ts[0m[0m[33m:14:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0mexport type TestSagaRuntime =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[0m: Found [0m[1m76[0m documentation lint errors.
