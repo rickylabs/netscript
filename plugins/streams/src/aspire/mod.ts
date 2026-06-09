@@ -5,3 +5,17 @@
  */
 
 export { StreamsAspireContribution } from './streams-contribution.ts';
+export type {
+  AspireBuilder,
+  AspireNSPluginContribution,
+  AspireResource,
+  AspireResourceKind,
+  CacheSpec,
+  ContainerSpec,
+  ContributionContext,
+  DatabaseSpec,
+  DenoBackgroundSpec,
+  DenoServiceSpec,
+  EnvSource,
+  HealthCheckSpec,
+} from '@netscript/aspire';

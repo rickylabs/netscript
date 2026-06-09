@@ -1,4 +1,9 @@
-import type { JobId, TaskId, WorkflowDefinition, WorkflowId, WorkflowStep } from '../domain/mod.ts';
+import type {
+  WorkflowDefinition as DomainWorkflowDefinition,
+  WorkflowId as DomainWorkflowId,
+  WorkflowStep as DomainWorkflowStep,
+} from '../domain/mod.ts';
+import type { JobId, TaskId, WorkflowDefinition } from './builder-types.ts';
 
 /** Workflow builder state used to gate `build()`. */
 export type WorkflowBuilderState = 'initial' | 'step-set';
@@ -53,7 +58,7 @@ class WorkflowBuilderImpl<
   TResult,
 > implements WorkflowBuilder<TId, TConfigured, TPayload, TResult> {
   readonly #id: TId;
-  #steps: WorkflowStep[] = [];
+  #steps: DomainWorkflowStep[] = [];
   #metadata: Record<string, unknown> = {};
   #tags: string[] = [];
   #timeout?: number;
@@ -107,8 +112,8 @@ class WorkflowBuilderImpl<
       throw new Error(`Workflow "${this.#id}" requires at least one step before build().`);
     }
 
-    const definition: WorkflowDefinition<TId> = Object.freeze({
-      id: this.#id as WorkflowId<TId>,
+    const definition: DomainWorkflowDefinition<TId> = Object.freeze({
+      id: this.#id as DomainWorkflowId<TId>,
       metadata: Object.keys(this.#metadata).length > 0
         ? Object.freeze({ ...this.#metadata })
         : undefined,

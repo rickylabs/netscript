@@ -1,7 +1,7 @@
-import type { TaskPermissions } from '../../domain/mod.ts';
+import type { WorkerTaskPermissions } from '../executor-types.ts';
 
 /** Build Deno permission flags from a task permissions object. */
-export function buildDenoPermissionFlags(permissions?: TaskPermissions): readonly string[] {
+export function buildDenoPermissionFlags(permissions?: WorkerTaskPermissions): readonly string[] {
   if (!permissions) return ['--allow-all'];
   const flags: string[] = [];
 

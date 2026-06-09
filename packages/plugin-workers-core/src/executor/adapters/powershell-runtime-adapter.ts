@@ -4,6 +4,7 @@ import { RuntimeAdapterBase } from './runtime-adapter-base.ts';
 
 /** Runtime adapter for PowerShell task scripts. */
 export class PowerShellRuntimeAdapter extends RuntimeAdapterBase {
+  /** Create a PowerShell adapter with an optional custom process runner. */
   constructor(options: { runner?: ProcessRunner } = {}) {
     super({
       id: 'powershell-runtime-adapter',

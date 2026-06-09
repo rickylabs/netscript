@@ -1,4 +1,4 @@
-import type { WorkflowState, WorkflowStep, WorkflowStepResult } from '../domain/mod.ts';
+import type { WorkflowState, WorkflowStep, WorkflowStepResult } from './workflow-types.ts';
 
 /** Function that executes a job-backed workflow step. */
 export type WorkflowJobStepRunner = (
@@ -14,9 +14,13 @@ export type WorkflowTaskStepRunner = (
 
 /** Options for executing workflow steps. */
 export type WorkflowStepRunnerOptions = Readonly<{
+  /** Callback used to execute job-backed workflow steps. */
   runJobStep?: WorkflowJobStepRunner;
+  /** Callback used to execute task-backed workflow steps. */
   runTaskStep?: WorkflowTaskStepRunner;
+  /** Callback used to pause sleep steps. */
   sleep?: (durationMs: number) => Promise<void>;
+  /** Clock used to timestamp step results. */
   now?: () => Date;
 }>;
 
@@ -27,6 +31,7 @@ export class WorkflowStepRunner {
   readonly #sleep: (durationMs: number) => Promise<void>;
   readonly #now: () => Date;
 
+  /** Creates a step runner with runtime callbacks for each step kind. */
   constructor(options: WorkflowStepRunnerOptions = {}) {
     this.#runJobStep = options.runJobStep;
     this.#runTaskStep = options.runTaskStep;
@@ -35,6 +40,7 @@ export class WorkflowStepRunner {
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Executes a workflow step and returns a normalized step result. */
   async run(step: WorkflowStep, state: WorkflowState): Promise<WorkflowStepResult> {
     const startedAt = this.#now().getTime();
 
@@ -58,6 +64,7 @@ export class WorkflowStepRunner {
     }
   }
 
+  /** Dispatches a workflow step to the callback that matches its kind. */
   private async runByKind(step: WorkflowStep, state: WorkflowState): Promise<unknown> {
     if (step.kind === 'sleep') {
       await this.#sleep(step.durationMs ?? 0);

@@ -1,26 +1,21 @@
-import type { JobContext, JobDefinition, JobHandler, JobResult } from '../domain/mod.ts';
+import type {
+  JobContext,
+  JobDefinition,
+  JobDispatcherOptions,
+  JobHandler,
+  JobModuleImporter,
+  JobResolution,
+  JobResult,
+  StaticJobRegistry,
+} from './runtime-types.ts';
 
-/** Registry of statically imported job handlers for compiled runtimes. */
-export type StaticJobRegistry = ReadonlyMap<string, JobHandler>;
-
-/** Dynamic module importer used only when explicitly enabled. */
-export type JobModuleImporter = (specifier: string) => Promise<Readonly<Record<string, unknown>>>;
-
-/** Handler resolution source used for diagnostics. */
-export type JobResolutionSource = 'definition' | 'dynamic-import' | 'static-registry';
-
-/** Result of resolving a job handler. */
-export type JobResolution<TPayload = unknown, TResult = unknown> = Readonly<{
-  handler: JobHandler<TPayload, TResult>;
-  source: JobResolutionSource;
-}>;
-
-/** Options for resolving a job handler. */
-export type JobDispatcherOptions = Readonly<{
-  registry?: StaticJobRegistry;
-  fallbackToDynamicImport?: boolean;
-  importModule?: JobModuleImporter;
-}>;
+export type {
+  JobDispatcherOptions,
+  JobModuleImporter,
+  JobResolution,
+  JobResolutionSource,
+  StaticJobRegistry,
+} from './runtime-types.ts';
 
 /** Resolve job handlers from a static registry, definition, or explicit import fallback. */
 export class InProcessJobDispatcher {
@@ -28,12 +23,14 @@ export class InProcessJobDispatcher {
   readonly #fallbackToDynamicImport: boolean;
   readonly #importModule: JobModuleImporter;
 
+  /** Create a dispatcher from explicit handler resolution options. */
   constructor(options: JobDispatcherOptions = {}) {
     this.#registry = options.registry;
     this.#fallbackToDynamicImport = options.fallbackToDynamicImport ?? false;
     this.#importModule = options.importModule ?? ((specifier) => import(specifier));
   }
 
+  /** Resolve the handler for a job definition. */
   async resolve<TPayload, TResult>(
     job: JobDefinition<string, TPayload, TResult>,
   ): Promise<JobResolution<TPayload, TResult>> {
@@ -69,6 +66,7 @@ export class InProcessJobDispatcher {
     });
   }
 
+  /** Dispatch a job to its resolved handler. */
   async dispatch<TPayload, TResult>(
     job: JobDefinition<string, TPayload, TResult>,
     context: JobContext<TPayload, TResult>,

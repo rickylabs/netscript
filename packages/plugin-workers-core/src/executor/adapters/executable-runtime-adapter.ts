@@ -4,6 +4,7 @@ import { RuntimeAdapterBase } from './runtime-adapter-base.ts';
 
 /** Runtime adapter for direct executable tasks. */
 export class ExecutableRuntimeAdapter extends RuntimeAdapterBase {
+  /** Create an executable adapter with an optional custom process runner. */
   constructor(options: { runner?: ProcessRunner } = {}) {
     super({
       id: 'executable-runtime-adapter',

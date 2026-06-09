@@ -14,7 +14,7 @@
     "@std/assert": "jsr:@std/assert@^1"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/telemetry/mod.ts src/testing/mod.ts",
     "test": "deno test --allow-all tests/",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },

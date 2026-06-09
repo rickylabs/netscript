@@ -4,6 +4,7 @@ import { RuntimeAdapterBase } from './runtime-adapter-base.ts';
 
 /** Runtime adapter for POSIX or Git Bash shell scripts. */
 export class ShellRuntimeAdapter extends RuntimeAdapterBase {
+  /** Create a shell adapter with an optional custom process runner. */
   constructor(options: { runner?: ProcessRunner } = {}) {
     super({
       id: 'shell-runtime-adapter',
