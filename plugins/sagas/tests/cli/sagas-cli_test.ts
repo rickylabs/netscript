@@ -1,9 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
-import {
-  SAGAS_CLI_COMMANDS,
-  SagasCli,
-  StaticSagasCliBackend,
-} from '../../src/cli/mod.ts';
+import { SAGAS_CLI_COMMANDS, SagasCli, StaticSagasCliBackend } from '../../src/cli/mod.ts';
 
 Deno.test('SagasCli exposes the sagas command registry', async () => {
   const cli = new SagasCli(new StaticSagasCliBackend());

@@ -7,12 +7,7 @@
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import { streamsPlugin, type StreamsPluginManifest } from '@netscript/plugin-streams';
 import { workersPlugin, type WorkersPluginManifest } from '@netscript/plugin-workers';
-import {
-  SAGAS_API_DEFAULT_PORT,
-  SAGAS_API_SERVICE_NAME,
-  SAGAS_PLUGIN_ID,
-  SAGAS_PLUGIN_VERSION,
-} from '../constants.ts';
+import { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';
 
 const SAGAS_SERVICE_PERMISSIONS = [
   '--unstable-kv',

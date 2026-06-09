@@ -559,17 +559,82 @@ export interface SagasRouteDatabaseClient {
   };
 }
 
+/** Saga instance status filter accepted by structural route handlers. */
+export type SagasRouteInstanceStatus =
+  | 'pending'
+  | 'active'
+  | 'completed'
+  | 'failed'
+  | 'compensating';
+
+/** Runtime message shape published by structural route handlers. */
+export type SagasRouteRuntimeMessage = Readonly<{
+  /** Message type routed by saga handlers. */
+  type: string;
+  /** Optional JSON-like payload. */
+  payload?: unknown;
+  /** Optional saga correlation key. */
+  correlationKey?: string;
+  /** Message occurrence timestamp. */
+  occurredAt: Date;
+  /** W3C traceparent header. */
+  traceparent?: string;
+  /** W3C tracestate header. */
+  tracestate?: string;
+}>;
+
+/** Runtime publish options accepted by structural route handlers. */
+export type SagasRouteRuntimePublishOptions = Readonly<{
+  /** W3C traceparent header. */
+  traceparent?: string;
+  /** W3C tracestate header. */
+  tracestate?: string;
+}>;
+
+/** Runtime boundary required by structural route handlers. */
+export interface SagasRouteRuntime {
+  /** Publish one saga runtime message. */
+  publish(
+    message: SagasRouteRuntimeMessage,
+    options?: SagasRouteRuntimePublishOptions,
+  ): Promise<unknown>;
+}
+
+/** Structural input shape shared by v1 route handlers. */
+export type SagasRouteInput = Readonly<{
+  /** Saga definition identifier. */
+  id: string;
+  /** Saga definition name filter or route parameter. */
+  sagaName: string;
+  /** Saga correlation identifier. */
+  correlationId: string;
+  /** Message type routed by publish handlers. */
+  type: string;
+  /** Optional JSON-like message payload. */
+  payload?: Readonly<Record<string, unknown>>;
+  /** Pagination limit supplied by contract parsing. */
+  limit: number;
+  /** Pagination offset supplied by contract parsing. */
+  offset: number;
+  /** Optional topic filter. */
+  topic?: string;
+  /** Optional enabled filter. */
+  enabled?: boolean;
+  /** Optional saga instance status filter. */
+  status?: SagasRouteInstanceStatus;
+}>;
+
 /** Structural context supplied to v1 route handlers. */
 export type SagasRouteContext = Readonly<{
   db: SagasRouteDatabaseClient;
-  sagaRuntime?: any;
+  sagaRuntime?: SagasRouteRuntime;
 }>;
 
 /** Handler options supplied by the structural v1 service router. */
 export type SagasRouteHandlerOptions = Readonly<{
-  input: any;
-  errors: any;
-  path: any;
+  input: SagasRouteInput;
+  errors: unknown;
+  path: readonly string[] | undefined;
   context: SagasRouteContext;
   lastEventId?: string;
   signal?: AbortSignal;

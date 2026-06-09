@@ -1,6 +1,5 @@
 import { getKv } from '@netscript/kv';
 import { collection, createNetscriptDb, type KvObject, model } from '@netscript/kv/kvdex';
-import { z } from 'zod';
 import type {
   PrismaRecord,
   SagaDefinitionResponse,
@@ -13,19 +12,6 @@ import type {
   SagaMetadataView,
   SagaServiceDatabaseClient,
 } from './v1-types.ts';
-
-const SagaInstanceKvSchema = z.object({
-  sagaName: z.string(),
-  correlationId: z.string(),
-  state: z.record(z.string(), z.unknown()),
-  status: z.enum(['pending', 'active', 'completed', 'failed', 'compensating']),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-  completedAt: z.string().datetime().optional(),
-  version: z.number(),
-  messageCount: z.number(),
-  lastMessageType: z.string().optional(),
-});
 
 /** Kvdex saga instance shape used by the fallback list path. */
 export type SagaInstanceKv = Readonly<{
