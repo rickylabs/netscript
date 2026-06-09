@@ -32,6 +32,12 @@
 | 2026-06-09 | info | **Inherited umbrella-level CLI carry (NOT a 4d finding)** | `packages/cli` `deno task check` pre-existing `isolatedDeclarations` failures (TS9016/TS9027) in `src/maintainer/.../copy-official-plugin.ts`, plus 4c IMPL-EVAL noted `fresh-ui`/`fresh`/`telemetry` isolated-decl failures — all pre-existing, deferred to Wave 6. | NOT a 4d concern. When running consumer-import against `packages/cli`, scope to type-resolution of the triggers surface only; do not treat pre-existing isolated-declaration failures as a 4d regression. Tracked in `arch-debt.md`. |
 | 2026-06-09 | info | **Lesson carried from 4c IMPL-EVAL: full-merge doc-lint, not per-EP** | 4c generator's C14 worklog claimed `private-type-ref-count=0` but IMPL-EVAL found 2 `private-type-ref` (SagaCorrelation) on the full-barrel `mod.ts` because per-entrypoint lint missed the merged builders graph. | 4d generator: final doc-lint gate MUST run `deno doc --lint <pkg>/mod.ts` (full public-barrel merge) and reconcile ptr count against that, not only per-entrypoint runs. The per-EP undercount is exactly the F-7 trap. |
 
+## PLAN-EVAL drift (append during Plan-Eval)
+
+| Date | Severity | Item | Evidence | Action |
+|------|----------|------|----------|--------|
+| 2026-06-09 | warn | **Stale OpenHands `<!-- openhands-agent-summary -->` PR comment** — the auto-summary comment posted on PR #21 for the 4d PLAN-EVAL run shows the **prior 4c sagas IMPL-EVAL `FAIL_FIX`** body, not the 4d PLAN-EVAL verdict. | PR #21 comment `4664487688` (`updated_at` 22:11:23 = same instant as the 4d PLAN-EVAL bot commit `bb985d0`) reads "OpenHands Summary — Wave 4 · 4c sagas IMPL-EVAL (PR #20) … FAIL_FIX". The committed `plan-eval.md` (`bb985d0`) is the genuine 4d artifact (23 slices D1–D23, A3 core/A5 plugin, spot-checks `test-webhooks-e2e.ts` 423 + core `check` task) → verdict **PASS**. `summary.md` was not refreshed for this run. | **Verdict source = the committed `plan-eval.md` / `evaluate.md`, NOT the PR-comment summary.** 4d PLAN-EVAL = PASS confirmed. Promoted to `lessons/platform.md`. Do not let the stale comment mislead the IMPL-EVAL or umbrella-merge review. |
+
 ## Implementation drift (append during Implement)
 
 | Date | Severity | Item | Evidence | Action |
