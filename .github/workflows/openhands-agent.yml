@@ -208,6 +208,18 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
+      - name: Hydrate OpenHands automation from workflow ref
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          WORKFLOW_REF: ${{ github.sha }}
+        run: |
+          mkdir -p /tmp/openhands-runtime
+          for path in .openhands/setup.sh .openhands/agent_runner.py; do
+            target="/tmp/openhands-runtime/$(basename "$path")"
+            gh api "repos/${GITHUB_REPOSITORY}/contents/${path}?ref=${WORKFLOW_REF}" \
+              --jq .content | base64 -d > "$target"
+          done
+
       - name: Prepare OpenHands request files
         env:
           REQUEST_PROMPT: ${{ steps.request.outputs.prompt }}
@@ -256,7 +268,7 @@ jobs:
           fi
 
       - name: Bootstrap NetScript toolchain
-        run: bash ./.openhands/setup.sh
+        run: bash /tmp/openhands-runtime/setup.sh
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -328,7 +340,7 @@ jobs:
         env:
           LLM_MODEL: ${{ steps.request.outputs.model }}
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-        run: uv run python .openhands/agent_runner.py .llm/tmp/openhands/request.md
+        run: uv run python /tmp/openhands-runtime/agent_runner.py .llm/tmp/openhands/request.md
 
       - name: Commit changes back to PR branch
         if: steps.request.outputs.is_pr == 'true'
