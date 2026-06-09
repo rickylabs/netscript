@@ -44,7 +44,7 @@ export const OffsetPaginationQuerySchema: z.ZodObject<typeof OffsetPaginationQue
   OffsetPaginationQueryShape,
 );
 
-export const JobDefinitionResponseZodSchema = JobResponseSchema;
+export const JobDefinitionResponseZodSchema: typeof JobResponseSchema = JobResponseSchema;
 
 /** Schema for worker job definition responses. */
 export const JobDefinitionResponseSchema: ContractSchema<JobDefinitionResponse> =
@@ -69,13 +69,14 @@ const ExecutionRecordResponseSchemaValue: z.ZodObject<ExecutionRecordResponseSha
     executionId: z.string().uuid().describe('Execution ID'),
   });
 
-export const ExecutionRecordResponseZodSchema = ExecutionRecordResponseSchemaValue;
+export const ExecutionRecordResponseZodSchema: z.ZodObject<ExecutionRecordResponseShape> =
+  ExecutionRecordResponseSchemaValue;
 
 /** Schema for worker execution record responses. */
 export const ExecutionRecordResponseSchema: ContractSchema<ExecutionRecordResponse> =
   ExecutionRecordResponseZodSchema as unknown as ContractSchema<ExecutionRecordResponse>;
 
-export const TaskDefinitionResponseZodSchema = TaskResponseSchema;
+export const TaskDefinitionResponseZodSchema: typeof TaskResponseSchema = TaskResponseSchema;
 
 /** Schema for worker task definition responses. */
 export const TaskDefinitionResponseSchema: ContractSchema<TaskDefinitionResponse> =
@@ -174,7 +175,7 @@ type JobUpdateInputShape = {
 
 const JobUpdateInputShape: JobUpdateInputShape = JobEditableSchema.partial().shape;
 const JobUpdateInputSchemaValue: z.ZodObject<JobUpdateInputShape> = z.object(JobUpdateInputShape);
-export const JobUpdateInputZodSchema = JobUpdateInputSchemaValue;
+export const JobUpdateInputZodSchema: z.ZodObject<JobUpdateInputShape> = JobUpdateInputSchemaValue;
 
 /** Schema for updating worker job definitions. */
 export const JobUpdateInputSchema: ContractSchema<Readonly<Record<string, unknown>>> =
@@ -223,7 +224,8 @@ const JobTriggerInputShape: JobTriggerInputShape = {
 const JobTriggerInputSchemaValue: z.ZodObject<JobTriggerInputShape> = z.object(
   JobTriggerInputShape,
 );
-export const JobTriggerInputZodSchema = JobTriggerInputSchemaValue;
+export const JobTriggerInputZodSchema: z.ZodObject<JobTriggerInputShape> =
+  JobTriggerInputSchemaValue;
 
 /** Schema for triggering a worker job by id. */
 export const JobTriggerInputSchema: ContractSchema<JobTriggerInput> =
@@ -237,7 +239,7 @@ export const TaskTriggerInputZodSchema: z.ZodType<TaskTriggerInput> = z.object({
   correlationId: z.string().optional().describe('Correlation ID for tracing'),
 });
 
-export const SSEEventZodSchema = DomainSSEEventSchema;
+export const SSEEventZodSchema: typeof DomainSSEEventSchema = DomainSSEEventSchema;
 
 /** Schema for server-sent event payloads emitted by the workers service. */
 export const SSEEventSchema: ContractSchema<SSEEvent> =
