@@ -36,6 +36,7 @@ export class SagaIdempotencyDedupTable {
   readonly #now: SagaIdempotencyClock;
   readonly #entries = new Map<string, DedupEntry>();
 
+  /** Create an in-memory idempotency table. */
   constructor(options: SagaIdempotencyDedupTableOptions = {}) {
     const ttlMs = options.ttlMs ?? DEFAULT_IDEMPOTENCY_TTL_MS;
     if (!Number.isFinite(ttlMs) || ttlMs <= 0) {
@@ -95,10 +96,12 @@ export class SagaIdempotencyDedupTable {
 export class MemorySagaIdempotencyStore implements SagaIdempotencyPort {
   readonly #table: SagaIdempotencyDedupTable;
 
+  /** Create a memory-backed idempotency store. */
   constructor(options: SagaIdempotencyDedupTableOptions = {}) {
     this.#table = new SagaIdempotencyDedupTable(options);
   }
 
+  /** Reserve a target/key tuple through the underlying table. */
   reserve(
     target: SagaIdempotencyTarget,
     idempotencyKey: string,
@@ -106,14 +109,17 @@ export class MemorySagaIdempotencyStore implements SagaIdempotencyPort {
     return Promise.resolve(this.#table.reserve(target, idempotencyKey));
   }
 
+  /** Remove expired reservations and return the retained count. */
   pruneExpired(): number {
     return this.#table.pruneExpired();
   }
 
+  /** Return the number of retained reservations. */
   size(): number {
     return this.#table.size();
   }
 
+  /** Clear all retained reservations. */
   clear(): void {
     this.#table.clear();
   }

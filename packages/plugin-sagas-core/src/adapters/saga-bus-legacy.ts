@@ -30,14 +30,19 @@ export type SagaBusLegacyMachine =
 
 /** Local structural view of the upstream legacy bus instance. */
 export interface SagaBusLegacyBus {
+  /** Start the wrapped legacy bus. */
   start(): Promise<void>;
+  /** Stop the wrapped legacy bus. */
   stop(): Promise<void>;
+  /** Publish a legacy bus message. */
   publish(message: unknown): Promise<void>;
+  /** Optionally load legacy saga state by saga and correlation identifiers. */
   getSagaState?<TState>(sagaName: string, correlationId: string): Promise<TState | null>;
 }
 
 /** Logger shape used to report legacy-adapter deprecation without console globals. */
 export interface SagaBusLegacyLogger {
+  /** Emit a warning message with optional structured metadata. */
   warn(message: string, metadata?: Readonly<Record<string, unknown>>): void;
 }
 
