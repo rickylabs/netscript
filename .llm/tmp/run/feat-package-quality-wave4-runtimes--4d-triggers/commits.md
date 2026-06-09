@@ -8,3 +8,7 @@ Branch: `feat/package-quality-wave4-runtimes-4d` → umbrella `feat/package-qual
 
 (Pair each implementation slice commit with its `docs(wave4): record …` doc-record commit. 4d is
 the last sub-wave — its merge brings the umbrella to full-wave completeness.)
+
+## Implementation commits
+
+- 7a4aefc: fix(triggers-core): wire D1 package task hygiene

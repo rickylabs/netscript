@@ -7,12 +7,19 @@ PR target: the **umbrella** (NOT the track).
 Role: SUPERVISOR-authored seed + pre-research. Locked slice authority = this sub-wave's
 `plan.md` once PLAN-EVAL-approved.
 
-## ⏳ STATUS: PREPARED IN PARALLEL — RUNS LAST — DO NOT LOCK YET
+## STATUS: IMPLEMENT IN PROGRESS — D1 COMPLETE, D2 NEXT
 
-Forks off the umbrella. Before this plan locks: **4a, 4b AND 4c must merge into the umbrella**,
-then **pull the umbrella forward** (`git merge feat/package-quality-wave4-runtimes`) and re-run
-MEASURE-FIRST. 4d is the **last** sub-wave of Wave 4: when it merges, the umbrella is at full-wave
-completeness and the supervisor merges the umbrella → track `feat/package-quality`.
+The plan is locked and PLAN-EVAL passed in a separate session (`plan-eval.md`, commit `bb985d0`).
+Implementation is proceeding in the approved 23-slice order. 4d is the **last** sub-wave of Wave 4:
+when it merges, the umbrella is at full-wave completeness and the supervisor merges the umbrella
+to track `feat/package-quality`.
+
+## Implementation progress
+
+| Slice | Status | Evidence |
+|-------|--------|----------|
+| D1 | COMPLETE | Core F-6 task hygiene: `check` enumerates all 11 entrypoints; `test` task added. Raw `deno task check` PASS exit 0; raw `deno task test` PASS exit 0 with 13 passed / 0 failed. Implementation commit `7a4aefc`. |
+| D2 | NEXT | Plugin F-6 task hygiene: widen `plugins/triggers` `check` to all 10 entrypoints. |
 
 ## Scope — 2 publishable units + the health seam (OQ-D resolved: in-scope here)
 

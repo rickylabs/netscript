@@ -13,7 +13,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `8264a1c` (4a+4b+4c merge
 | 2026-06-09 | Research | generator | MEASURE-FIRST complete. Full per-EP + combined + barrel doc-lint reconciliation. Core 211 (46 ptr + 165 jsdoc), plugin 138 (76 ptr + 62 jsdoc). Both dry-run PASS, 0 slow types. `deno check` all 21 EPs PASS. `behavior.triggers-health` E2E PASS (16ms, port 8093). `verify-plugin.ts` MISSING. Core missing `test` + `publish:dry-run`. Both docs/ MISSING. F-1: `test-webhooks-e2e.ts` 423 LOC. Research.md authored. |
 | 2026-06-09 | Plan & Design | generator | Plan locked: A3 core + A5 plugin, COMBINED (no split, 23 slices <30 cap). Archetype decisions, locked surface (21 EPs all retain), LD-8 ptr-fix strategy, F-1 split design, A5 test layer (verify-plugin.ts + 4 tests), docs/ tree design for both units, risk register, deferred scope, gate-matrix cross-ref. Plan.md authored. **STOP at Plan Gate.** |
 | 2026-06-09 | PLAN-EVAL | evaluator (OpenHands `qwen3.7-max`) | **PASS.** Separate session, Option A (commit `bb985d0`, `plan-eval.md`). 8/8 plan-gate boxes; spot-checked F-1 (`test-webhooks-e2e.ts` 423), F-6 (core `check` only `mod.ts`), docs/ absent. **No `deno.lock` churn** (bot commit touched only `.llm/tmp/openhands/*` + `plan-eval.md`). 2 non-blocking procedural notes: (1) add worklog `## Design` section for IMPL-EVAL traceability → **DONE below**; (2) barrel-vs-per-EP reconciliation confirmed avoided. |
-| | Implement | generator | (pending) Sliced; one commit + paired doc-record per slice. |
+| 2026-06-10 | Implement | generator | D1 started. Core F-6 task hygiene implemented and gated: `check` now enumerates all 11 exports; `test` task added. |
 | | Gate | generator | (pending) Archetype gates + F-13/Runtime+Aspire (A3/A5) + F-10 (A5) + health-probe evidence + consumer-import + F-1 + F-6 + F-7 (docs/). |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) 4d → umbrella after IMPL-EVAL PASS. **Last sub-wave** → umbrella reaches full-wave completeness → supervisor merges umbrella → track `feat/package-quality`. |
@@ -63,3 +63,20 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 - 2026-06-08: Prepared in parallel; the last sub-wave. Distinguishing workload = both docs/ dirs
   missing + the `triggers-health` runtime seam (OQ-D resolved in-scope). Pull 4a+4b+4c forward +
   re-measure before locking.
+
+## Implementation evidence
+
+### Slice 1/23 — D1 F-6 core task hygiene
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers-core` |
+| Archetype | A3 Runtime/Behavior |
+| Changed | `packages/plugin-triggers-core/deno.json` now checks all 11 export entrypoints and exposes a package `test` task. |
+| Gate(s) | F-6 task hygiene |
+| Gate command | `deno task check` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; raw command expanded to `deno check --unstable-kv mod.ts src/adapters/mod.ts src/builders/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/domain/mod.ts src/ports/mod.ts src/public/mod.ts src/runtime/mod.ts src/telemetry/mod.ts src/testing/mod.ts`. |
+| Gate command | `deno task test` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; 13 tests passed, 0 failed. |
+| Drift | Info row recorded: `publish:dry-run` was already present before D1 implementation. |
+| Commits | Implementation `7a4aefc`; paired docs/evidence pending. |
