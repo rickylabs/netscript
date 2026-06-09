@@ -26,6 +26,11 @@ export {
   WorkerInstrumentation,
 } from './instrumentation.ts';
 export { TaskInstrumentation } from '../abstracts/task-instrumentation.ts';
+export { WorkerInstrumentation as AbstractWorkerInstrumentation } from '../abstracts/worker-instrumentation.ts';
+export type {
+  WorkerInstrumentationContext as AbstractWorkerInstrumentationContext,
+  WorkerInstrumentationSpan as AbstractWorkerInstrumentationSpan,
+} from '../abstracts/worker-instrumentation.ts';
 export type {
   InstrumentationContext,
   TelemetryAttributes,

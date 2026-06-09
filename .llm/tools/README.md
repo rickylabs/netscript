@@ -42,6 +42,7 @@ deno run --allow-read .llm/tools/find-lines.ts --root packages/cli --contains "s
 | `find-symbol-usages.ts`      | Symbol-boundary usage scans for refactors.                            |
 | `list-exports.ts`            | Export and re-export inventory for package surfaces.                  |
 | `compare-export-surface.ts`  | Compare actual exports against an expected symbol list.               |
+| `run-deno-doc-lint.ts`     | Structured `deno doc --lint` runner with per-entrypoint + per-file attribution. |
 | `parse-deno-check-errors.ts` | Group Deno/TypeScript errors by kind, message, and path.              |
 | `run-deno-lint.ts`           | Scoped lint runner with grouped JSON findings.                        |
 | `run-deno-fmt.ts`            | Scoped fmt runner with non-mutating `--check` default.                |

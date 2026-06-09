@@ -1,4 +1,4 @@
-import type { JobDefinition, JobResult } from '../domain/mod.ts';
+import type { JobDefinition, JobResult } from './runtime-types.ts';
 
 /** Message sent to a runner to execute a job. */
 export type ExecuteJobMessage<TPayload = unknown> = Readonly<{

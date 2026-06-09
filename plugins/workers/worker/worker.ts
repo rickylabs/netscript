@@ -6,15 +6,12 @@
 
 import { delay } from '@std/async';
 import { createQueue, type MessageQueue } from '@netscript/queue';
-import { type JobMessage, type TaskMessage } from '@netscript/plugin-workers-core/runtime';
-import { type TaskExecutor } from '@netscript/plugin-workers-core/executor';
-import type { KvExecutionState } from '@netscript/plugin-workers-core/state';
-import type { KvJobRegistry, KvTaskRegistry } from '@netscript/plugin-workers-core/registry';
+import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
 import {
   startWorkerSpan,
   type TracedMessageContext,
-  TracedQueue,
+  type TracedQueue,
 } from '@netscript/telemetry/instrumentation';
 import { describeTelemetryConfig, isTelemetryEnabled } from '@netscript/telemetry/config';
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
@@ -27,15 +24,45 @@ import {
   type JobExecutionContext,
   type QueueTriggerConfig,
   type WorkerDispatchContext,
+  type WorkerExecutionState,
+  type WorkerJobRegistry,
   type WorkerOptions,
   type WorkerQueueContext,
+  type WorkerTaskExecutor,
+  type WorkerTaskRegistry,
 } from './worker-options.ts';
 
-export type { QueueTriggerConfig, WorkerOptions } from './worker-options.ts';
+export type {
+  QueueTriggerConfig,
+  WorkerCompleteExecutionOptions,
+  WorkerCreateExecutionOptions,
+  WorkerExecutionRecord,
+  WorkerExecutionState,
+  WorkerJobRegistry,
+  WorkerOptions,
+  WorkerPayloadSchema,
+  WorkerTaskExecutor,
+  WorkerTaskRegistry,
+  WorkerTaskResult,
+} from './worker-options.ts';
 
+/** Health snapshot for a worker runtime. */
 export interface WorkerHealthStatus {
+  /** Aggregate worker health state. */
   readonly status: 'healthy' | 'degraded';
-  readonly listeners: readonly WorkerListenerSnapshot[];
+  /** Queue listener health snapshots. */
+  readonly listeners: readonly {
+    /** Listener name. */
+    readonly name: string;
+    /** Listener lifecycle status. */
+    readonly status: 'idle' | 'running' | 'restarting' | 'failed' | 'stopped';
+    /** Whether the listener is healthy. */
+    readonly healthy: boolean;
+    /** Number of restart attempts. */
+    readonly restartCount: number;
+    /** Last listener failure message. */
+    readonly lastError?: string;
+  }[];
 }
 
 /** Worker process that consumes queued jobs and tasks for one runtime instance. */
@@ -43,10 +70,10 @@ export class Worker {
   private readonly workerId: string;
   private readonly queueName: string;
   private readonly concurrency: number;
-  private readonly registry: KvJobRegistry;
-  private readonly executionState: KvExecutionState;
-  private readonly taskExecutor: TaskExecutor;
-  private readonly taskRegistry: KvTaskRegistry;
+  private readonly registry: WorkerJobRegistry;
+  private readonly executionState: WorkerExecutionState;
+  private readonly taskExecutor: WorkerTaskExecutor;
+  private readonly taskRegistry: WorkerTaskRegistry;
   private readonly workerPool: WorkerPool;
   private readonly jobsDir: string;
   private readonly queueTriggers: readonly QueueTriggerConfig[];
@@ -63,6 +90,7 @@ export class Worker {
   private abortController: AbortController | null = null;
   private workerSpan: Span | null = null;
 
+  /** Create a worker with queue, registry, execution, and task runtime dependencies. */
   constructor(options: WorkerOptions) {
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
@@ -167,9 +195,9 @@ export class Worker {
     } finally {
       if (jobListener.snapshot().status === 'failed') {
         await this.stop();
-        return;
+      } else {
+        this.running = false;
       }
-      this.running = false;
     }
   }
 
@@ -213,6 +241,7 @@ export class Worker {
     }
   }
 
+  /** Listen for job queue messages until the provided abort signal stops consumption. */
   private async listenForJobs(signal: AbortSignal): Promise<void> {
     if (!this.queue) {
       throw new TypeError('Worker queue is not initialized.');
@@ -245,6 +274,7 @@ export class Worker {
     }
   }
 
+  /** Stop all trigger queues owned by this worker instance. */
   private async stopTriggerQueues(): Promise<void> {
     for (const triggerQueue of this.triggerQueues) {
       try {
@@ -256,6 +286,7 @@ export class Worker {
     this.triggerQueues.length = 0;
   }
 
+  /** Wait for active jobs to finish, cancelling them after the shutdown timeout. */
   private async waitForActiveJobs(): Promise<void> {
     const timeout = 30000;
     const startTime = Date.now();
@@ -276,6 +307,7 @@ export class Worker {
     }
   }
 
+  /** Build the dependency context used by job dispatchers. */
   private dispatchContext(): WorkerDispatchContext {
     return {
       workerId: this.workerId,
@@ -290,6 +322,7 @@ export class Worker {
     };
   }
 
+  /** Build the dependency context used by queue listeners. */
   private queueContext(): WorkerQueueContext {
     return {
       workerId: this.workerId,
@@ -309,6 +342,7 @@ export class Worker {
     };
   }
 
+  /** Return whether this worker still owns runtime resources that need cleanup. */
   private hasRuntimeResources(): boolean {
     return this.abortController !== null ||
       this.listenerSupervisors.length > 0 ||
@@ -318,6 +352,7 @@ export class Worker {
       this.workerSpan !== null;
   }
 
+  /** Log listener restart or terminal failure details. */
   private reportListenerFailure(
     name: string,
     error: unknown,

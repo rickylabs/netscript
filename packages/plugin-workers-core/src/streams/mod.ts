@@ -13,8 +13,18 @@ export {
 export type {
   ExecutionMutation,
   ExecutionMutationHook,
+  WorkerExecutionRecord,
   WorkersStreamProducer,
   WorkersStreamProducerOptions,
 } from './producer.ts';
 export { WorkerExecutionSchema, WorkerJobSchema, workersStreamSchema } from './schema.ts';
-export type { WorkerExecution, WorkerJob } from './schema.ts';
+export type {
+  StreamSchemaDefinition,
+  WorkerExecution,
+  WorkerJob,
+  WorkersStreamDefinition,
+  WorkersStreamSchema,
+  WorkerStreamCollectionDefinition,
+  WorkerStreamEntitySchema,
+  WorkerStreamStandardSchema,
+} from './schema.ts';

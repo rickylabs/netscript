@@ -1,8 +1,12 @@
 import { assertEquals } from '@std/assert';
 import { TaskRuntimeAdapter } from '../../src/abstracts/mod.ts';
-import type { ResolvedTaskExecutionOptions } from '../../src/executor/mod.ts';
+import type {
+  ResolvedTaskExecutionOptions,
+  TaskDefinition,
+  TaskResult,
+  TaskType,
+} from '../../src/executor/mod.ts';
 import { MultiRuntimeTaskExecutor } from '../../src/executor/mod.ts';
-import type { TaskDefinition, TaskResult, TaskType } from '../../src/domain/mod.ts';
 
 Deno.test('MultiRuntimeTaskExecutor dispatches to adapter by task type', async () => {
   const adapter = new FakeRuntimeAdapter('deno');

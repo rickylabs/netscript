@@ -1,7 +1,4 @@
 import { z } from 'zod';
-import type { ZodArray, ZodObject, ZodOptional, ZodRecord, ZodString, ZodUnknown } from 'zod';
-
-export type { ZodArray, ZodObject, ZodOptional, ZodRecord, ZodString, ZodUnknown } from 'zod';
 
 /** Standard Schema compatible public schema surface. */
 export interface PublicStandardSchema<TOutput> {
@@ -33,11 +30,44 @@ export interface PublicStandardSchema<TOutput> {
   };
 }
 
+/** Structural object-shape map used by public definition schemas. */
+// deno-lint-ignore no-explicit-any -- preserves field-specific schema shape types for consumers.
+export type PublicDefinitionSchemaShape = Readonly<Record<string, any>>;
+
+/** Package-owned structural schema surface for public definition schemas. */
+export interface PublicDefinitionSchema<TOutput> extends PublicStandardSchema<TOutput> {
+  /** Object shape exposed for internal schema composition. */
+  readonly shape: PublicDefinitionSchemaShape;
+  /** Parse an unknown value into the schema output. */
+  parse(value: unknown): TOutput;
+  /** Return a schema without selected object keys. */
+  omit(
+    mask: Readonly<Record<string, true>>,
+  ): Readonly<{ readonly shape: PublicDefinitionSchemaShape }>;
+  /** Return a schema with only selected object keys. */
+  pick(
+    mask: Readonly<Record<string, true>>,
+  ): Readonly<{ readonly shape: PublicDefinitionSchemaShape }>;
+  /** Validate an unknown value without throwing. */
+  safeParse(value: unknown):
+    | { readonly success: true; readonly data: TOutput }
+    | {
+      readonly success: false;
+      readonly error: Readonly<{
+        readonly issues: ReadonlyArray<{
+          readonly message: string;
+          readonly path: readonly (string | number)[];
+        }>;
+      }>;
+    };
+}
+
 /** Thin public job definition output. */
 export type PublicJobDefinitionOutput = Readonly<{
   id: string;
   entrypoint?: string;
   name?: string;
+  schedule?: string;
   topic?: string;
 }>;
 
@@ -57,43 +87,40 @@ export type PublicWorkflowDefinitionOutput = Readonly<{
 }>;
 
 /** Internal Zod base for public job definitions. */
-export const JobDefinitionPublicBaseSchema: ZodObject<{
-  id: ZodString;
-  entrypoint: ZodOptional<ZodString>;
-  name: ZodOptional<ZodString>;
-  schedule: ZodOptional<ZodString>;
-  topic: ZodOptional<ZodString>;
-}> = z.object({
+const JobDefinitionPublicBaseZodSchema = z.object({
   id: z.string().min(1),
   entrypoint: z.string().optional(),
   name: z.string().optional(),
   schedule: z.string().optional(),
   topic: z.string().optional(),
 });
+/** Public base schema for thin job definitions. */
+export const JobDefinitionPublicBaseSchema: PublicDefinitionSchema<PublicJobDefinitionOutput> =
+  JobDefinitionPublicBaseZodSchema as PublicDefinitionSchema<PublicJobDefinitionOutput>;
 
 /** Internal Zod base for public task definitions. */
-export const TaskDefinitionPublicBaseSchema: ZodObject<{
-  id: ZodString;
-  entrypoint: ZodOptional<ZodString>;
-  name: ZodOptional<ZodString>;
-  topic: ZodOptional<ZodString>;
-  type: ZodOptional<ZodString>;
-}> = z.object({
+const TaskDefinitionPublicBaseZodSchema = z.object({
   id: z.string().min(1),
   entrypoint: z.string().optional(),
   name: z.string().optional(),
   topic: z.string().optional(),
   type: z.string().optional(),
 });
+/** Public base schema for thin task definitions. */
+export const TaskDefinitionPublicBaseSchema: PublicDefinitionSchema<PublicTaskDefinitionOutput> =
+  TaskDefinitionPublicBaseZodSchema as PublicDefinitionSchema<PublicTaskDefinitionOutput>;
 
 /** Internal Zod base for public workflow definitions. */
-export const WorkflowDefinitionPublicBaseSchema: ZodObject<{
-  id: ZodString;
-  steps: ZodOptional<ZodArray<ZodRecord<ZodString, ZodUnknown>>>;
-}> = z.object({
+const WorkflowDefinitionPublicBaseZodSchema = z.object({
   id: z.string().min(1),
   steps: z.array(z.record(z.string(), z.unknown())).optional(),
 });
+/** Public base schema for thin workflow definitions. */
+export const WorkflowDefinitionPublicBaseSchema: PublicDefinitionSchema<
+  PublicWorkflowDefinitionOutput
+> = WorkflowDefinitionPublicBaseZodSchema as PublicDefinitionSchema<
+  PublicWorkflowDefinitionOutput
+>;
 
 /** Thin public job definition schema for root-level quick-start APIs. */
 export const PublicJobDefinitionSchema: PublicStandardSchema<PublicJobDefinitionOutput> =

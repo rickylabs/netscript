@@ -3,21 +3,29 @@ export type ShutdownState = 'running' | 'shutting-down' | 'stopped';
 
 /** Resource registered for graceful shutdown. */
 export type ShutdownResource = Readonly<{
+  /** Stable resource identifier. */
   id: string;
+  /** Stop ordering priority; higher values stop first. */
   priority?: number;
+  /** Stops the resource during shutdown. */
   stop(reason?: string): Promise<void>;
 }>;
 
 /** Options for creating or invoking a shutdown manager. */
 export type ShutdownManagerOptions = Readonly<{
+  /** Maximum time to wait for resource shutdown. */
   timeoutMs?: number;
 }>;
 
 /** Result returned after a shutdown attempt. */
 export type ShutdownReport = Readonly<{
+  /** Final shutdown state. */
   state: ShutdownState;
+  /** Resource ids that stopped successfully. */
   stopped: readonly string[];
+  /** Resources that failed to stop. */
   failed: readonly Readonly<{ id: string; error: string }>[];
+  /** Whether shutdown reached the timeout before all resources stopped. */
   timedOut: boolean;
 }>;
 
@@ -29,22 +37,27 @@ export class ShutdownManager {
   #state: ShutdownState = 'running';
   #shutdownPromise?: Promise<ShutdownReport>;
 
+  /** Creates a shutdown manager. */
   constructor(options: ShutdownManagerOptions = {}) {
     this.#timeoutMs = options.timeoutMs ?? 30_000;
   }
 
+  /** Current lifecycle state. */
   get state(): ShutdownState {
     return this.#state;
   }
 
+  /** Registers a resource for graceful shutdown. */
   register(resource: ShutdownResource): void {
     this.#resources.set(resource.id, resource);
   }
 
+  /** Removes a resource from graceful shutdown. */
   unregister(id: string): void {
     this.#resources.delete(id);
   }
 
+  /** Creates an abort controller that aborts when shutdown begins. */
   createAbortController(): AbortController {
     const controller = new AbortController();
     if (this.#state !== 'running') {
@@ -55,6 +68,7 @@ export class ShutdownManager {
     return controller;
   }
 
+  /** Resolves once shutdown has started. */
   waitForShutdown(): Promise<void> {
     if (this.#state !== 'running') {
       return Promise.resolve();
@@ -62,6 +76,7 @@ export class ShutdownManager {
     return new Promise((resolve) => this.#waiters.add(resolve));
   }
 
+  /** Starts graceful shutdown and stops registered resources. */
   shutdown(reason?: string, options: ShutdownManagerOptions = {}): Promise<ShutdownReport> {
     if (this.#shutdownPromise) {
       return this.#shutdownPromise;
@@ -77,6 +92,7 @@ export class ShutdownManager {
     return this.#shutdownPromise;
   }
 
+  /** Stops all registered resources with timeout accounting. */
   private async stopResources(
     reason: string | undefined,
     timeoutMs: number,

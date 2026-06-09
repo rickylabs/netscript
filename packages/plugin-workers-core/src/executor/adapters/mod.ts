@@ -14,5 +14,11 @@ export { ExecutableRuntimeAdapter } from './executable-runtime-adapter.ts';
 export { classifyTaskLog } from './log-classifier.ts';
 export { PowerShellRuntimeAdapter } from './powershell-runtime-adapter.ts';
 export { PythonRuntimeAdapter } from './python-runtime-adapter.ts';
+export { RuntimeAdapterBase } from './runtime-adapter-base.ts';
 export { ShellRuntimeAdapter } from './shell-runtime-adapter.ts';
-export type { RuntimeCommandBuildContext, RuntimeCommandSpec } from './command-spec.ts';
+export type {
+  EnvironmentReader,
+  RuntimeCommandBuildContext,
+  RuntimeCommandSpec,
+  RuntimeTaskMetadata,
+} from './command-spec.ts';
