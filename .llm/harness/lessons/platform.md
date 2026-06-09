@@ -1,7 +1,7 @@
 # Platform Lessons (Windows + tooling)
 
 Source: supervisor sessions for `feat/package-quality` Wave 2 (2a–2c); Wave 4 4a
-IMPL-EVAL (`rtk proxy` masking).
+IMPL-EVAL (`rtk proxy` masking); Wave 4 4b (OpenHands eval automation lock churn).
 
 These are environment gotchas that silently corrupt harness bookkeeping if not
 known up front. All confirmed on Windows 11 + PowerShell + RTK shell hook.
@@ -37,6 +37,34 @@ underlying `deno check --unstable-kv <entrypoints>` (or `deno task check` outsid
 hook) and read the raw exit code + full error list. rtk is fine for token savings on
 exploratory reads; it is **not** a verdict source for gates. When a consumer check
 "passes" but you didn't see the file list and error count, treat it as unverified.
+
+## The OpenHands eval automation can commit `deno.lock` churn (silent drift)
+
+Wave 4 4b was the first sub-wave to run both evaluator passes on the OpenHands
+GitHub-Actions automation (`@openhands-agent model=… use harness proceed to
+PLAN-EVAL/IMPL-EVAL`). The **PLAN-EVAL** run, while executing `deno check` /
+`deno publish --dry-run` to verify the plan, re-resolved the workspace and committed
+the result into `deno.lock` (`chore(openhands): apply agent changes`): a
+**`@opentelemetry/semantic-conventions` 1.40.0→1.28.0 downgrade** plus unrelated
+`esbuild`/`esbuild-wasm`/`@deno/loader`/`preact`/`zod` additions (+179/−63 vs the
+sub-wave base). It rode through implementation and **into the merged umbrella** —
+nobody reviewed it, and the implementer's per-slice "`deno.lock` unchanged" check was
+true only relative to its own already-churned baseline, not the pre-sub-wave base.
+
+Rules:
+
+- **A PLAN-EVAL must never mutate `deno.lock`.** It is read-only over the plan. If the
+  automation's checks re-resolve the lock, that churn is an artifact, not a result —
+  the run prompt should instruct the agent to `git checkout -- deno.lock` before
+  committing, the same lock-hygiene rule given to generators.
+- **Diff the lock against the true sub-wave base, not the working baseline.** When
+  closing a sub-wave, the supervisor should `git diff --stat <base> <head> -- deno.lock`
+  (base = the commit the sub-wave forked/synced from, e.g. `2c24662`), because an
+  in-branch "unchanged" claim hides churn that predates the first slice.
+- **Reconcile, don't revert mid-wave.** Once churn has merged into the umbrella and
+  later work validated against it, reverting just re-churns. Carry it forward, log it
+  (registry + drift), and do one deliberate, reviewed lock pass at the umbrella→track
+  closeout. (Golden Rule 6: never delete the lock or `--reload` without approval.)
 
 ## MSYS mangles `ref:path` colons
 
