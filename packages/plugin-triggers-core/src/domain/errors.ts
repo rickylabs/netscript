@@ -19,6 +19,7 @@ export class TriggersError extends Error {
   /** Original cause preserved across runtime boundaries. */
   override readonly cause?: unknown;
 
+  /** Create a structured trigger error. */
   constructor(message: string, options: TriggersErrorOptions) {
     super(message);
     this.name = 'TriggersError';
@@ -88,6 +89,7 @@ export class TriggerNotFoundError extends TriggersError {
   /** Trigger identifier that was requested. */
   readonly triggerId: string;
 
+  /** Create an error for a missing trigger definition. */
   constructor(id: TriggerId | string) {
     super(`Trigger not found: ${id}`, {
       code: 'TRIGGER_NOT_FOUND',
@@ -103,6 +105,7 @@ export class TriggerDeduplicatedError extends TriggersError {
   /** Idempotency key that was already applied. */
   readonly idempotencyKey: string;
 
+  /** Create an error for a duplicate idempotency key. */
   constructor(idempotencyKey: string) {
     super(`Trigger event deduplicated: ${idempotencyKey}`, {
       code: 'TRIGGER_DEDUPLICATED',
@@ -118,6 +121,7 @@ export class TriggerKindNotImplementedError extends TriggersError {
   /** Reserved trigger kind that cannot execute yet. */
   readonly kind: string;
 
+  /** Create an error for a reserved trigger kind. */
   constructor(kind: string) {
     super(`Trigger kind is reserved but not implemented: ${kind}`, {
       code: 'TRIGGER_KIND_NOT_IMPLEMENTED',
@@ -133,6 +137,7 @@ export class UnsupportedOperationError extends TriggersError {
   /** Operation name requested by the caller. */
   readonly operation: string;
 
+  /** Create an error for an unsupported trigger operation. */
   constructor(operation: string, message: string = `Unsupported trigger operation: ${operation}`) {
     super(message, {
       code: 'TRIGGER_UNSUPPORTED_OPERATION',
