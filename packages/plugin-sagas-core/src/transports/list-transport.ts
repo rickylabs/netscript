@@ -18,16 +18,27 @@ import type { RedisConnectionOptions, RedisTransportLogger } from './redis-trans
 
 /** Structural Redis/Garnet client used by `GarnetListTransport`. */
 export interface ListTransportClient extends ListDelayedClient, ListBlockingClient {
+  /** Create an independent client for blocking reads. */
   duplicate(): ListTransportClient;
+  /** Verify that the backing Redis-compatible server is reachable. */
   ping(): Promise<unknown>;
+  /** Push a message to the left side of a list. */
   lpush(key: string, value: string): Promise<unknown>;
+  /** Remove matching messages from a list. */
   lrem(key: string, count: number, value: string): Promise<unknown>;
+  /** Read a range of list entries. */
   lrange(key: string, start: number, stop: number): Promise<readonly string[]>;
+  /** Read the current list length. */
   llen(key: string): Promise<number>;
+  /** Store metadata fields for a processing message. */
   hset(key: string, value: Readonly<Record<string, string>>): Promise<unknown>;
+  /** Read all metadata fields for a processing message. */
   hgetall(key: string): Promise<Readonly<Record<string, string>>>;
+  /** Increment a numeric metadata field. */
   hincrby(key: string, field: string, increment: number): Promise<unknown>;
+  /** Set a metadata key expiry. */
   expire(key: string, seconds: number): Promise<unknown>;
+  /** Delete a metadata key. */
   del(key: string): Promise<unknown>;
 }
 
@@ -77,6 +88,7 @@ type ResolvedGarnetListTransportOptions = Readonly<{
 
 /** Garnet-compatible saga transport using Redis LIST operations. */
 export class GarnetListTransport implements SagaTransportPort {
+  /** Stable transport identifier. */
   readonly id: string;
   readonly #options: ResolvedGarnetListTransportOptions;
   readonly #subscriptions = new Map<string, ListTransportSubscriptionRecord>();
@@ -86,6 +98,7 @@ export class GarnetListTransport implements SagaTransportPort {
   #delayed?: ListDelayedMessageProcessor;
   #orphanTimer?: ReturnType<typeof setInterval>;
 
+  /** Create a Garnet-compatible LIST saga transport. */
   constructor(options: GarnetListTransportOptions = {}) {
     if (!options.redis && !options.connection) {
       throw new TypeError('List transport requires either redis or connection options.');
@@ -95,6 +108,7 @@ export class GarnetListTransport implements SagaTransportPort {
     this.id = this.#options.id;
   }
 
+  /** Start the LIST transport and all registered subscriptions. */
   async start(): Promise<void> {
     if (this.#started) return;
 
@@ -108,6 +122,7 @@ export class GarnetListTransport implements SagaTransportPort {
     );
   }
 
+  /** Stop the LIST transport and release owned Redis clients. */
   async stop(_reason?: string): Promise<void> {
     if (!this.#started || this.#stopping) return;
 
@@ -125,10 +140,12 @@ export class GarnetListTransport implements SagaTransportPort {
     this.#stopping = false;
   }
 
+  /** Publish a message immediately to a topic queue. */
   async publish(topic: string, message: SagaMessage): Promise<void> {
     await this.#publish(topic, message);
   }
 
+  /** Publish a message after the requested delay. */
   async publishDelayed(topic: string, message: SagaMessage, delayMs: number): Promise<void> {
     if (delayMs <= 0) {
       await this.#publish(topic, message);
@@ -137,6 +154,7 @@ export class GarnetListTransport implements SagaTransportPort {
     await this.#requireDelayed().enqueue(this.#queueKey(topic), topic, message, delayMs);
   }
 
+  /** Subscribe a handler to one topic queue. */
   async subscribe(
     topic: string,
     handler: SagaTransportHandler,
@@ -154,22 +172,27 @@ export class GarnetListTransport implements SagaTransportPort {
     return new ListTransportSubscription(topic, (name) => this.#unsubscribe(name));
   }
 
+  /** Return the number of registered topic subscriptions. */
   getSubscriptionCount(): number {
     return this.#subscriptions.size;
   }
 
+  /** Return whether the transport is started and not stopping. */
   isRunning(): boolean {
     return this.#started && !this.#stopping;
   }
 
+  /** Return the ready queue length for one topic. */
   async getQueueLength(topic: string): Promise<number> {
     return await this.#requireRedis().llen(this.#queueKey(topic));
   }
 
+  /** Return the processing-list length for one topic. */
   async getProcessingLength(topic: string): Promise<number> {
     return await this.#requireRedis().llen(this.#processingKey(topic));
   }
 
+  /** Return the dead-letter queue length for one topic. */
   async getDeadLetterLength(topic: string): Promise<number> {
     return await this.#requireRedis().llen(this.#deadLetterKey(topic));
   }

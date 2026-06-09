@@ -29,7 +29,7 @@ export {
   RedisTransportAck,
   RedisTransportSubscription,
 } from './redis-transport-subscription.ts';
-export type { SagaMessage, SagaMessageId } from '../domain/mod.ts';
+export type { SagaCorrelationKey, SagaMessage, SagaMessageId } from '../domain/mod.ts';
 export type {
   SagaTransportAck,
   SagaTransportHandler,

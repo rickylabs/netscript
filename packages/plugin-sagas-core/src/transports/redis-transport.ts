@@ -22,10 +22,15 @@ import {
 
 /** Structural Redis Streams client used by `NetScriptRedisTransport`. */
 export interface RedisStreamClient extends RedisDelayedClient {
+  /** Create an independent client for subscription reads. */
   duplicate(): RedisStreamClient;
+  /** Close the Redis client connection. */
   quit(): Promise<unknown>;
+  /** Add a serialized message envelope to a Redis Stream. */
   xadd(...args: (string | number)[]): Promise<unknown>;
+  /** Acknowledge one Redis Stream message. */
   xack(streamKey: string, group: string, messageId: string): Promise<unknown>;
+  /** Run an XGROUP command used to create consumer groups. */
   xgroup(
     command: 'CREATE',
     streamKey: string,
@@ -33,6 +38,7 @@ export interface RedisStreamClient extends RedisDelayedClient {
     id: string,
     mkstream: 'MKSTREAM',
   ): Promise<unknown>;
+  /** Read messages for the configured consumer group. */
   xreadgroup(
     groupCommand: 'GROUP',
     group: string,
@@ -44,6 +50,7 @@ export interface RedisStreamClient extends RedisDelayedClient {
     streamsCommand: 'STREAMS',
     ...keysAndIds: string[]
   ): Promise<RedisStreamReadGroupResult | null>;
+  /** Read pending message metadata for recovery. */
   xpending(
     streamKey: string,
     group: string,
@@ -51,6 +58,7 @@ export interface RedisStreamClient extends RedisDelayedClient {
     end: string,
     count: number,
   ): Promise<RedisPendingMessageResult>;
+  /** Claim one idle pending message for this consumer. */
   xclaim(
     streamKey: string,
     group: string,
@@ -78,8 +86,11 @@ export type RedisStreamClientFactory = (
 
 /** Transport logger hook; no global console usage in framework code. */
 export interface RedisTransportLogger {
+  /** Record diagnostic transport details. */
   debug(message: string, metadata?: Readonly<Record<string, unknown>>): void;
+  /** Record recoverable transport warnings. */
   warn(message: string, metadata?: Readonly<Record<string, unknown>>): void;
+  /** Record transport errors. */
   error(message: string, metadata?: Readonly<Record<string, unknown>>): void;
 }
 
@@ -128,6 +139,7 @@ type ResolvedRedisTransportOptions = Readonly<{
 
 /** Redis Streams transport for saga message delivery. */
 export class NetScriptRedisTransport implements SagaTransportPort {
+  /** Stable transport identifier. */
   readonly id: string;
   readonly #options: ResolvedRedisTransportOptions;
   readonly #subscriptions = new Map<string, RedisTransportSubscriptionRecord>();
@@ -139,6 +151,7 @@ export class NetScriptRedisTransport implements SagaTransportPort {
   #delayed?: RedisDelayedMessageProcessor;
   #pendingTimer?: ReturnType<typeof setInterval>;
 
+  /** Create a Redis Streams saga transport. */
   constructor(options: NetScriptRedisTransportOptions = {}) {
     if (!options.redis && !options.connection) {
       throw new TypeError('Redis transport requires either redis or connection options.');
@@ -148,6 +161,7 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     this.id = this.#options.id;
   }
 
+  /** Start the Redis transport and its read loop. */
   async start(): Promise<void> {
     if (this.#started) return;
 
@@ -165,6 +179,7 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     });
   }
 
+  /** Stop the Redis transport and release owned clients. */
   async stop(_reason?: string): Promise<void> {
     if (!this.#started || this.#stopping) return;
 
@@ -185,10 +200,12 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     this.#stopping = false;
   }
 
+  /** Publish a message immediately to a Redis Stream. */
   async publish(topic: string, message: SagaMessage): Promise<void> {
     await this.#publish(topic, message);
   }
 
+  /** Publish a message after the requested delay. */
   async publishDelayed(topic: string, message: SagaMessage, delayMs: number): Promise<void> {
     if (delayMs <= 0) {
       await this.#publish(topic, message);
@@ -197,6 +214,7 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     await this.#requireDelayed().enqueue(this.#streamKey(topic), topic, message, delayMs);
   }
 
+  /** Subscribe a handler to one topic stream. */
   async subscribe(
     topic: string,
     handler: SagaTransportHandler,
@@ -216,10 +234,12 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     return new RedisTransportSubscription(topic, (name) => this.#unsubscribe(name));
   }
 
+  /** Return the number of registered topic subscriptions. */
   getSubscriptionCount(): number {
     return this.#subscriptions.size;
   }
 
+  /** Return whether the transport is started and not stopping. */
   isRunning(): boolean {
     return this.#started && !this.#stopping;
   }

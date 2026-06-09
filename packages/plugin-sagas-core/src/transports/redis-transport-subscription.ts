@@ -47,22 +47,26 @@ export type RedisStoredEnvelope = Readonly<{
 export class RedisTransportAck implements SagaTransportAck {
   #settled = false;
 
+  /** Create an ack handle for one Redis Stream message. */
   constructor(
     private readonly streamKey: string,
     private readonly messageId: string,
     private readonly acknowledge: (streamKey: string, messageId: string) => Promise<void>,
   ) {}
 
+  /** Whether the message has already been acknowledged or rejected. */
   get settled(): boolean {
     return this.#settled;
   }
 
+  /** Acknowledge the message in the Redis consumer group. */
   async ack(): Promise<void> {
     if (this.#settled) return;
     await this.acknowledge(this.streamKey, this.messageId);
     this.#settled = true;
   }
 
+  /** Mark the message rejected without acknowledging it in Redis. */
   nack(_reason?: string): Promise<void> {
     this.#settled = true;
     return Promise.resolve();
@@ -71,11 +75,14 @@ export class RedisTransportAck implements SagaTransportAck {
 
 /** Runtime subscription returned to callers. */
 export class RedisTransportSubscription implements SagaTransportSubscription {
+  /** Create a caller-facing Redis subscription handle. */
   constructor(
+    /** Subscribed topic name. */
     readonly topic: string,
     private readonly remove: (topic: string) => Promise<void>,
   ) {}
 
+  /** Unsubscribe from the topic. */
   unsubscribe(): Promise<void> {
     return this.remove(this.topic);
   }
