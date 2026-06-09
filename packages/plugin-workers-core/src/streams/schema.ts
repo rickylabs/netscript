@@ -24,31 +24,51 @@ export interface WorkersStreamSchema<TDefinition extends StreamSchemaDefinition>
 
 /** Worker execution entity stored in the durable stream. */
 export type WorkerExecution = Readonly<{
+  /** Unique execution identifier. */
   id: string;
+  /** Job or task identifier associated with the execution. */
   jobId: string;
+  /** Current execution status. */
   status: string;
+  /** Stream topic associated with the execution. */
   topic?: string;
+  /** Runtime concept represented by this execution. */
   concept?: 'job' | 'task';
+  /** Correlation identifier used to join related executions. */
   correlationId?: string;
+  /** ISO timestamp for when the execution was triggered. */
   triggeredAt?: string;
+  /** ISO timestamp for when the execution started. */
   startedAt?: string | null;
+  /** ISO timestamp for when the execution completed. */
   completedAt?: string | null;
+  /** Execution duration in milliseconds. */
   duration?: number | null;
+  /** Process-style exit code for the execution result. */
   exitCode?: number | null;
+  /** Error message recorded for failed executions. */
   error?: string | null;
+  /** Structured execution result payload. */
   result?: Record<string, unknown> | null;
+  /** Worker identifier that ran the execution. */
   workerId?: string | null;
+  /** Current retry attempt number. */
   attempt?: number;
 }>;
 
 /** Worker job entity stored in the durable stream. */
 export type WorkerJob = Readonly<{
+  /** Unique job identifier. */
   id: string;
+  /** Human-readable job name. */
   name?: string;
+  /** Stream topic associated with the job. */
   topic?: string;
+  /** Whether the job is enabled. */
   enabled?: boolean;
   /** @deprecated Recurring jobs are modelled as scheduled triggers. */
   schedule?: unknown;
+  /** Human-readable job description. */
   description?: string;
 }>;
 
@@ -83,6 +103,7 @@ const WorkerExecutionZodSchema: AnyZodObject = ExecutionRecordSchema.pick({
   workerId: true,
   attempt: true,
 });
+/** Stream entity schema for worker executions. */
 export const WorkerExecutionSchema: WorkerStreamEntitySchema<WorkerExecution> =
   WorkerExecutionZodSchema as unknown as WorkerStreamEntitySchema<WorkerExecution>;
 
@@ -101,18 +122,28 @@ const WorkerJobZodSchema: AnyZodObject = JobResponseSchema.pick({
   schedule: true,
   description: true,
 });
+/** Stream entity schema for worker jobs. */
 export const WorkerJobSchema: WorkerStreamEntitySchema<WorkerJob> =
   WorkerJobZodSchema as unknown as WorkerStreamEntitySchema<WorkerJob>;
 
+/** Durable stream definition for worker execution and job entities. */
 export type WorkersStreamDefinition = Readonly<{
+  /** Execution entity stream definition. */
   execution: {
+    /** Execution entity schema. */
     readonly schema: WorkerStreamEntitySchema<WorkerExecution>;
+    /** Execution entity discriminator. */
     readonly type: 'execution';
+    /** Execution entity primary key. */
     readonly primaryKey: 'id';
   };
+  /** Job entity stream definition. */
   job: {
+    /** Job entity schema. */
     readonly schema: WorkerStreamEntitySchema<WorkerJob>;
+    /** Job entity discriminator. */
     readonly type: 'job';
+    /** Job entity primary key. */
     readonly primaryKey: 'id';
   };
 }>;
@@ -141,5 +172,6 @@ const workersStreamStateSchema: StateSchema<{
     primaryKey: 'id',
   },
 });
+/** Stream schema definition for worker executions and jobs. */
 export const workersStreamSchema: WorkersStreamSchema<WorkersStreamDefinition> =
   workersStreamStateSchema as WorkersStreamSchema<WorkersStreamDefinition>;
