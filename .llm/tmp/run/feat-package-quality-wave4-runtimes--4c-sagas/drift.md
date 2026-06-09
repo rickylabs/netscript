@@ -40,3 +40,4 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
+| 2026-06-09 | info | P3 uses package-owned structural Aspire contribution types instead of re-exporting upstream `@netscript/aspire` public types | Targeted before-measure showed the upstream Aspire type graph introduced private-type-ref noise into the plugin doc surface; `plugin/slice-p3-doc-lint.txt` passes after the local structural boundary while behavior still registers the same service/background resources. | Keep the A5 plugin surface package-owned per LD-8. Later Aspire registration tests should assert the contribution shape and resource registration contract, not subclass identity. |
