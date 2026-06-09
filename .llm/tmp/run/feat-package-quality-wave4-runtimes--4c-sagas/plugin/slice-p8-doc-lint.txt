@@ -1,0 +1,2 @@
+exit=0
+Checked 4 files
