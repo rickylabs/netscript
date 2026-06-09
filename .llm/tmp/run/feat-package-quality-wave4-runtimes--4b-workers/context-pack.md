@@ -11,9 +11,9 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C5 are complete and pushed. Latest implementation commit: `7b7bcaa`
-(`fix(workers-core): publish executor registry runtime types`), with targeted doc-lint 0/0/0
-for executor, registry, runtime and raw core 16-entrypoint check passing.
+order. Slices C1-C6 are complete and pushed. Latest implementation commit: `969212b`
+(`fix(workers-core): publish abstract testing workflow types`), with targeted private-type-ref
+0 for abstracts, testing, workflow and raw core 16-entrypoint check passing.
 
 ## Scope — 2 publishable units (long pole #1)
 
