@@ -20,6 +20,7 @@ is `plan.md`; implementation is proceeding one slice at a time.
 | C2 | complete | `4295c3c` fixed root/builders/config/agent private-type references with first-party re-exports and structural config schema contract; targeted raw `deno doc --lint` PASS; raw all-entrypoint `deno check --unstable-kv` PASS |
 | C3 | complete | `172f42d` fixed contracts/v1, domain, and streams public docs/type refs with structural schema/contract wrappers and first-party stream type re-exports; targeted raw `deno doc --lint` PASS; raw all-entrypoint `deno check --unstable-kv` PASS |
 | C4 | complete | `9226dcc` fixed integration/workers and integration/publisher private-type refs with first-party type re-exports and method docs; targeted raw `deno doc --lint` PASS; raw all-entrypoint `deno check --unstable-kv` PASS |
+| C5 | complete | `0ea4771` fixed ports public-surface private-type refs with explicit first-party domain/runtime re-exports and port-member docs; targeted raw `deno doc --lint` PASS; raw all-entrypoint `deno check --unstable-kv` PASS |
 
 Historical seed note: this worktree originally forked before 4a and 4b merged into the umbrella.
 The supervisor later pulled both forward, the generator re-ran MEASURE-FIRST, and PLAN-EVAL locked
