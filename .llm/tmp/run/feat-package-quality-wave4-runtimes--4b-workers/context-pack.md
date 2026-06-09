@@ -11,9 +11,9 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C10 are complete and pushed. Latest implementation commit: `941b21a`
-(`docs(workers-core): document testing workflow APIs`), with targeted doc-lint 0/0/0 for
-testing, executor, and workflow and raw core 16-entrypoint check passing.
+order. Slices C1-C11 are complete and pushed. Latest implementation commit: `2c601c6`
+(`docs(workers-core): document state telemetry shutdown APIs`), with targeted doc-lint 0/0/0
+for state, contracts/v1, telemetry, and shutdown and raw core 16-entrypoint check passing.
 
 ## Scope — 2 publishable units (long pole #1)
 
