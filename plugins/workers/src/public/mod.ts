@@ -194,6 +194,10 @@ const workersManifest = definePlugin('@netscript/plugin-workers', '0.0.1-alpha.0
   .withDbSchemas([{ path: './database/workers.prisma', engine: 'postgres' }])
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: 'workers', schemaPath: './runtime/workers.schema.json' }])
+  .withE2e([{
+    name: 'workers-health',
+    command: 'deno task workers:e2e',
+  }])
   .withAspire('./src/aspire/mod.ts')
   .withHooks({
     setup: (ctx): void => {

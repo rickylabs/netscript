@@ -77,6 +77,14 @@ export function verifyWorkersPlugin(): WorkersPluginVerificationResult {
     findings.push('expected the workers runtime config topic contribution');
   }
 
+  if (
+    workersPlugin.contributions.e2e?.some((gate) =>
+      gate.name === 'workers-health' && gate.command === 'deno task workers:e2e'
+    ) !== true
+  ) {
+    findings.push('expected the workers-health E2E contribution');
+  }
+
   if (workersPlugin.contributions.aspire !== './src/aspire/mod.ts') {
     findings.push('expected the workers Aspire contribution module');
   }

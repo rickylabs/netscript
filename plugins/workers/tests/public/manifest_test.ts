@@ -2,7 +2,7 @@ import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { inspectWorkers, workersPlugin } from '../../mod.ts';
 import { verifyWorkersPlugin } from '../../verify-plugin.ts';
 
-Deno.test('workersPlugin manifest exposes service, processor, stream, contract, config, and Aspire axes', () => {
+Deno.test('workersPlugin manifest exposes service, processor, stream, contract, config, E2E, and Aspire axes', () => {
   assertEquals(workersPlugin.name, '@netscript/plugin-workers');
   assertEquals(workersPlugin.version, '0.0.1-alpha.0');
   assertEquals(workersPlugin['type'], 'background-processor');
@@ -32,6 +32,11 @@ Deno.test('workersPlugin manifest exposes service, processor, stream, contract, 
   );
   assert(
     workersPlugin.contributions.runtimeConfigTopics?.some((topic) => topic.name === 'workers'),
+  );
+  assert(
+    workersPlugin.contributions.e2e?.some((gate) =>
+      gate.name === 'workers-health' && gate.command === 'deno task workers:e2e'
+    ),
   );
   assertEquals(workersPlugin.contributions.aspire, './src/aspire/mod.ts');
 

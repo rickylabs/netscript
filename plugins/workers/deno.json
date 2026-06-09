@@ -59,6 +59,7 @@
     "test": "deno test --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
+    "workers:e2e": "deno run --allow-net --allow-env src/e2e/probes/health.ts && deno run --allow-read verify-plugin.ts",
     "test:api": "deno run --allow-net --allow-env test-api.ts",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
