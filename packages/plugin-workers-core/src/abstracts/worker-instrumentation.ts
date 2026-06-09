@@ -1,7 +1,10 @@
 /** Span shape accepted by worker instrumentation hooks. */
 export type WorkerInstrumentationSpan = {
+  /** Set one span attribute. */
   setAttribute(name: string, value: unknown): void;
+  /** Set multiple span attributes. */
   setAttributes(attributes: Readonly<Record<string, unknown>>): void;
+  /** Add a span event. */
   addEvent(name: string, attributes?: Readonly<Record<string, unknown>>): void;
 };
 
@@ -13,6 +16,8 @@ export type WorkerInstrumentationContext = Readonly<Record<string, unknown> & {
 
 /** Stub-only contract for worker telemetry instrumentation. */
 export abstract class WorkerInstrumentation {
+  /** Stable instrumentation name. */
   abstract readonly name: string;
+  /** Apply instrumentation to a span. */
   abstract applyTo(span: WorkerInstrumentationSpan, ctx: WorkerInstrumentationContext): void;
 }

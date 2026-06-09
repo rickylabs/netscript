@@ -2,7 +2,9 @@ import type { TaskDefinition, TaskExecutionOptions, TaskResult } from '../execut
 
 /** Execution context shared by worker runtime dispatchers. */
 export interface ExecutionContext {
+  /** Correlation identifier propagated across execution. */
   readonly correlationId?: string;
+  /** Cancellation signal for execution. */
   readonly signal?: AbortSignal;
 }
 
