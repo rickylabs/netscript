@@ -1,0 +1,65 @@
+exit=1
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\runtime\saga-publisher.ts:84:3
+   | 
+84 |   readonly id: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\runtime\saga-publisher.ts:94:3
+   | 
+94 |   constructor(options: HttpSagaPublisherOptions = {}) {
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\runtime\saga-publisher.ts:159:3
+    | 
+159 |   private publishUrl(): string {
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\runtime\saga-supervisor.ts:47:3
+   | 
+47 |   readonly options: SagaRuntimeSupervisorOptions;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\runtime\saga-supervisor.ts:49:3
+   | 
+49 |   constructor(options: SagaRuntimeSupervisorOptions = {}) {
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\runtime\saga-supervisor.ts:103:3
+    | 
+103 |   private async resolveDefinitions(): Promise<readonly SagaDefinition[]> {
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\constants.ts:13:1
+   | 
+13 | export type SagasPluginId = typeof SAGAS_PLUGIN_ID;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\constants.ts:14:1
+   | 
+14 | export type SagasPluginVersion = typeof SAGAS_PLUGIN_VERSION;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\constants.ts:15:1
+   | 
+15 | export type SagasApiServiceName = typeof SAGAS_API_SERVICE_NAME;
+   | ^
+
+
+error: Found 9 documentation lint errors.
