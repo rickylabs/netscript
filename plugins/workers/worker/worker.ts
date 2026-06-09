@@ -90,6 +90,7 @@ export class Worker {
   private abortController: AbortController | null = null;
   private workerSpan: Span | null = null;
 
+  /** Create a worker with queue, registry, execution, and task runtime dependencies. */
   constructor(options: WorkerOptions) {
     this.workerId = options.workerId;
     this.queueName = options.queueName ?? 'jobs';
@@ -240,6 +241,7 @@ export class Worker {
     }
   }
 
+  /** Listen for job queue messages until the provided abort signal stops consumption. */
   private async listenForJobs(signal: AbortSignal): Promise<void> {
     if (!this.queue) {
       throw new TypeError('Worker queue is not initialized.');
@@ -272,6 +274,7 @@ export class Worker {
     }
   }
 
+  /** Stop all trigger queues owned by this worker instance. */
   private async stopTriggerQueues(): Promise<void> {
     for (const triggerQueue of this.triggerQueues) {
       try {
@@ -283,6 +286,7 @@ export class Worker {
     this.triggerQueues.length = 0;
   }
 
+  /** Wait for active jobs to finish, cancelling them after the shutdown timeout. */
   private async waitForActiveJobs(): Promise<void> {
     const timeout = 30000;
     const startTime = Date.now();
@@ -303,6 +307,7 @@ export class Worker {
     }
   }
 
+  /** Build the dependency context used by job dispatchers. */
   private dispatchContext(): WorkerDispatchContext {
     return {
       workerId: this.workerId,
@@ -317,6 +322,7 @@ export class Worker {
     };
   }
 
+  /** Build the dependency context used by queue listeners. */
   private queueContext(): WorkerQueueContext {
     return {
       workerId: this.workerId,
@@ -336,6 +342,7 @@ export class Worker {
     };
   }
 
+  /** Return whether this worker still owns runtime resources that need cleanup. */
   private hasRuntimeResources(): boolean {
     return this.abortController !== null ||
       this.listenerSupervisors.length > 0 ||
@@ -345,6 +352,7 @@ export class Worker {
       this.workerSpan !== null;
   }
 
+  /** Log listener restart or terminal failure details. */
   private reportListenerFailure(
     name: string,
     error: unknown,

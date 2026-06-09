@@ -52,6 +52,7 @@ export class Scheduler {
 
   private schedulerSpan: Span | null = null;
 
+  /** Create a scheduler with registry, execution state, and optional cron adapter wiring. */
   constructor(options: SchedulerOptions) {
     this.queueName = options.queueName ?? 'jobs';
     this.registry = options.registry;
