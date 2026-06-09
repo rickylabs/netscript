@@ -13,7 +13,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `8264a1c` (4a+4b+4c merge
 | 2026-06-09 | Research | generator | MEASURE-FIRST complete. Full per-EP + combined + barrel doc-lint reconciliation. Core 211 (46 ptr + 165 jsdoc), plugin 138 (76 ptr + 62 jsdoc). Both dry-run PASS, 0 slow types. `deno check` all 21 EPs PASS. `behavior.triggers-health` E2E PASS (16ms, port 8093). `verify-plugin.ts` MISSING. Core missing `test` + `publish:dry-run`. Both docs/ MISSING. F-1: `test-webhooks-e2e.ts` 423 LOC. Research.md authored. |
 | 2026-06-09 | Plan & Design | generator | Plan locked: A3 core + A5 plugin, COMBINED (no split, 23 slices <30 cap). Archetype decisions, locked surface (21 EPs all retain), LD-8 ptr-fix strategy, F-1 split design, A5 test layer (verify-plugin.ts + 4 tests), docs/ tree design for both units, risk register, deferred scope, gate-matrix cross-ref. Plan.md authored. **STOP at Plan Gate.** |
 | 2026-06-09 | PLAN-EVAL | evaluator (OpenHands `qwen3.7-max`) | **PASS.** Separate session, Option A (commit `bb985d0`, `plan-eval.md`). 8/8 plan-gate boxes; spot-checked F-1 (`test-webhooks-e2e.ts` 423), F-6 (core `check` only `mod.ts`), docs/ absent. **No `deno.lock` churn** (bot commit touched only `.llm/tmp/openhands/*` + `plan-eval.md`). 2 non-blocking procedural notes: (1) add worklog `## Design` section for IMPL-EVAL traceability → **DONE below**; (2) barrel-vs-per-EP reconciliation confirmed avoided. |
-| 2026-06-10 | Implement | generator | D1-D6 complete. D6 exported telemetry/testing signature types and cleared same-surface JSDoc blockers required for raw doc-lint. |
+| 2026-06-10 | Implement | generator | D1-D7 complete. D7 telemetry JSDoc residual validation passed with no further code changes after D6 pulled the same-surface docs forward. |
 | | Gate | generator | (pending) Archetype gates + F-13/Runtime+Aspire (A3/A5) + F-10 (A5) + health-probe evidence + consumer-import + F-1 + F-6 + F-7 (docs/). |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) 4d → umbrella after IMPL-EVAL PASS. **Last sub-wave** → umbrella reaches full-wave completeness → supervisor merges umbrella → track `feat/package-quality`. |
@@ -162,4 +162,21 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `packages/plugin-triggers-core` |
 | Gate result | PASS, exit 0; all 11 core export entrypoints checked with `--unstable-kv`. |
 | Drift | Info row recorded: D6 pulled same-file D7/D9 JSDoc blockers forward to keep D6's named raw doc-lint gate green. |
-| Commits | Implementation `2d45b05`; paired docs/evidence pending. |
+| Commits | Implementation `2d45b05`; paired docs/evidence `aee486a`. |
+
+### Slice 7/23 — D7 core telemetry JSDoc
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers-core` |
+| Archetype | A3 Runtime/Behavior |
+| Changed | No additional code changes; D6 already added telemetry public-member JSDoc so D6's raw doc-lint gate could pass. D7 is preserved as a residual validation slice. |
+| Gate(s) | F-7 doc-score |
+| Gate command | `deno doc --lint src/telemetry/mod.ts` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno fmt --check src/telemetry/mod.ts src/telemetry/attributes.ts src/telemetry/instrumentation.ts` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; output `Checked 3 files`. |
+| Gate command | `deno task check` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; all 11 core export entrypoints checked with `--unstable-kv`. |
+| Drift | Covered by D6 info row: same-file D7 JSDoc blockers were pulled forward to keep D6 raw doc-lint green. |
+| Commits | Implementation `98a121f`; paired docs/evidence pending. |

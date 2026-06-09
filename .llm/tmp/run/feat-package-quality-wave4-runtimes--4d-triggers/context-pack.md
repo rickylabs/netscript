@@ -7,7 +7,7 @@ PR target: the **umbrella** (NOT the track).
 Role: SUPERVISOR-authored seed + pre-research. Locked slice authority = this sub-wave's
 `plan.md` once PLAN-EVAL-approved.
 
-## STATUS: IMPLEMENT IN PROGRESS — D6 COMPLETE, D7 NEXT
+## STATUS: IMPLEMENT IN PROGRESS — D7 COMPLETE, D8 NEXT
 
 The plan is locked and PLAN-EVAL passed in a separate session (`plan-eval.md`, commit `bb985d0`).
 Implementation is proceeding in the approved 23-slice order. 4d is the **last** sub-wave of Wave 4:
@@ -23,8 +23,9 @@ to track `feat/package-quality`.
 | D3 | COMPLETE | Core ptr-fix for builders plus domain re-exports. Raw `deno doc --lint src/builders/mod.ts` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `521c452`; docs commit `3785ef5`. |
 | D4 | COMPLETE | Core ptr-fix for contracts/v1 and config with structural third-party handling. Raw `deno doc --lint src/config/mod.ts` PASS exit 0; raw `deno doc --lint src/contracts/v1/mod.ts` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `9d3505d`; docs commit `819a6df`. |
 | D5 | COMPLETE | Core ptr-fix for ports, runtime, and adapters. Raw `deno doc --lint src/adapters/mod.ts` PASS exit 0; raw `deno doc --lint src/ports/mod.ts` PASS exit 0; raw `deno doc --lint src/runtime/mod.ts` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `da0cb30`; docs commit `762fe08`. |
-| D6 | COMPLETE | Core ptr-fix for telemetry and testing. Raw `deno doc --lint src/telemetry/mod.ts` PASS exit 0; raw `deno doc --lint src/testing/mod.ts` PASS exit 0; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `2d45b05`. |
-| D7 | NEXT | Core JSDoc telemetry batch residual check. |
+| D6 | COMPLETE | Core ptr-fix for telemetry and testing. Raw `deno doc --lint src/telemetry/mod.ts` PASS exit 0; raw `deno doc --lint src/testing/mod.ts` PASS exit 0; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `2d45b05`; docs commit `aee486a`. |
+| D7 | COMPLETE | Core JSDoc telemetry residual validation. Raw `deno doc --lint src/telemetry/mod.ts` PASS exit 0; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation marker commit `98a121f`. |
+| D8 | NEXT | Core JSDoc ports/domain/runtime/adapters residual check. |
 
 ## Scope — 2 publishable units + the health seam (OQ-D resolved: in-scope here)
 
