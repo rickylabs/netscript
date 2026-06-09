@@ -16,6 +16,7 @@ import type {
 
 const DEFAULT_ACTIVE_CLAIM_TTL_MS = 15 * 60 * 1000;
 
+/** Shared options for Deno KV-backed trigger runtime stores. */
 export type TriggerRuntimeKvStoreOptions = Readonly<{
   kv: Deno.Kv;
   prefix?: readonly Deno.KvKeyPart[];
@@ -33,12 +34,14 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
   readonly #prefix: readonly Deno.KvKeyPart[];
   readonly #now: () => Date;
 
+  /** Create an event store over the supplied Deno KV database. */
   constructor(options: TriggerRuntimeKvStoreOptions) {
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? ['triggers'];
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Persist or replace a trigger event. */
   async save(event: TriggerEvent): Promise<void> {
     await this.#kv.atomic()
       .set(this.#eventKey(event.id), event)
@@ -46,11 +49,13 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
       .commit();
   }
 
+  /** Load a trigger event by id. */
   async load(eventId: TriggerEventId): Promise<TriggerEvent | undefined> {
     const entry = await this.#kv.get<TriggerEvent>(this.#eventKey(eventId));
     return entry.value ?? undefined;
   }
 
+  /** Update a trigger event status and optional metadata. */
   async updateStatus(
     eventId: TriggerEventId,
     status: TriggerEventStatus,
@@ -68,6 +73,7 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
     });
   }
 
+  /** List trigger events matching the supplied filter. */
   async list(options: TriggerEventListOptions = {}): Promise<readonly TriggerEvent[]> {
     const events: TriggerEvent[] = [];
     for await (const entry of this.#kv.list<TriggerEvent>({ prefix: this.#eventsPrefix() })) {
@@ -101,6 +107,7 @@ export class KvTriggerIdempotencyStore implements TriggerIdempotencyPort {
   readonly #now: () => Date;
   readonly #activeTtlMs: number;
 
+  /** Create an idempotency store over the supplied Deno KV database. */
   constructor(
     options: TriggerRuntimeKvStoreOptions & Readonly<{ activeTtlMs?: number }>,
   ) {
@@ -110,6 +117,7 @@ export class KvTriggerIdempotencyStore implements TriggerIdempotencyPort {
     this.#activeTtlMs = options.activeTtlMs ?? DEFAULT_ACTIVE_CLAIM_TTL_MS;
   }
 
+  /** Resolve and claim an idempotency key for a trigger event. */
   async resolveKey(input: TriggerIdempotencyKeyInput): Promise<TriggerIdempotencyClaim> {
     const resolved = await resolveKey(input);
     const activeKey = this.#activeKey(resolved.key);
@@ -122,6 +130,7 @@ export class KvTriggerIdempotencyStore implements TriggerIdempotencyPort {
     return { ...resolved, claimed: result.ok };
   }
 
+  /** Mark an idempotency key as completed for the supplied TTL. */
   async markCompleted(key: string, ttlMs: number): Promise<void> {
     const atomic = this.#kv.atomic()
       .delete(this.#activeKey(key));
@@ -137,6 +146,7 @@ export class KvTriggerIdempotencyStore implements TriggerIdempotencyPort {
     await atomic.commit();
   }
 
+  /** Release an active idempotency claim. */
   async release(key: string): Promise<void> {
     await this.#kv.delete(this.#activeKey(key));
   }
@@ -159,11 +169,13 @@ export class KvTriggerDlqStore implements TriggerDlqPort {
   readonly #kv: Deno.Kv;
   readonly #prefix: readonly Deno.KvKeyPart[];
 
+  /** Create a DLQ store over the supplied Deno KV database. */
   constructor(options: TriggerRuntimeKvStoreOptions) {
     this.#kv = options.kv;
     this.#prefix = options.prefix ?? ['triggers'];
   }
 
+  /** Enqueue a failed trigger event into the DLQ. */
   async enqueue(entry: TriggerDlqEntry): Promise<void> {
     await this.#kv.atomic()
       .set(this.#entryKey(entry.id), entry)
@@ -171,6 +183,7 @@ export class KvTriggerDlqStore implements TriggerDlqPort {
       .commit();
   }
 
+  /** List DLQ entries matching the supplied filter. */
   async list(options: TriggerDlqListOptions = {}): Promise<readonly TriggerDlqEntry[]> {
     const entries: TriggerDlqEntry[] = [];
     for await (const entry of this.#kv.list<TriggerDlqEntry>({ prefix: this.#entriesPrefix() })) {
@@ -181,6 +194,7 @@ export class KvTriggerDlqStore implements TriggerDlqPort {
     return entries;
   }
 
+  /** Remove a DLQ entry after replay has been accepted. */
   async replay(eventId: TriggerEventId): Promise<void> {
     const entry = await this.#kv.get<TriggerDlqEntry>(this.#entryKey(eventId));
     const atomic = this.#kv.atomic().delete(this.#entryKey(eventId));

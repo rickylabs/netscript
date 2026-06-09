@@ -1,4 +1,5 @@
-import { createWatcher, type WatcherOptions, type WatchEvent } from '@netscript/watchers';
+import { createWatcher } from '@netscript/watchers';
+import type { WatcherOptions as UpstreamWatcherOptions } from '@netscript/watchers';
 import type {
   FileWatchDefinition,
   FileWatchLifecycle,
@@ -9,12 +10,43 @@ import type {
 } from '@netscript/plugin-triggers-core/domain';
 import type { FileWatcherHandle, FileWatcherPort } from '@netscript/plugin-triggers-core/ports';
 
-type WatcherInstance = Readonly<{
-  watch(): AsyncIterable<WatchEvent>;
+/** Minimal file metadata emitted by a runtime watcher. */
+export type RuntimeWatchFileInfo = Readonly<{
+  size?: number;
+  modifiedAt?: Date | null;
+}>;
+
+/** Minimal file-watch event consumed by the runtime adapter. */
+export type RuntimeWatchEvent = Readonly<{
+  path: string;
+  kind: string;
+  timestamp: Date;
+  fileInfo?: RuntimeWatchFileInfo | null;
+  contentHash?: string | null;
+}>;
+
+/** Minimal watcher options consumed by the runtime adapter. */
+export type RuntimeWatcherOptions = Readonly<{
+  paths: readonly string[];
+  patterns?: readonly string[];
+  events?: readonly string[];
+  debounceMs?: number;
+  stabilityThreshold?: Readonly<{
+    checkIntervalMs?: number;
+    stableChecks?: number;
+    timeoutMs?: number;
+  }>;
+  signal?: AbortSignal;
+}>;
+
+/** Minimal watcher primitive consumed by the file-watch adapter. */
+export type WatcherInstance = Readonly<{
+  watch(): AsyncIterable<RuntimeWatchEvent>;
   stop(): void;
 }>;
 
-type FileWatchHandler = (event: TriggerEvent<'file-watch'>) => Promise<void>;
+/** Handler invoked when a file-watch trigger observes a matching event. */
+export type FileWatchHandler = (event: TriggerEvent<'file-watch'>) => Promise<void>;
 
 type WatchersFileWatcherRecord =
   & FileWatcherHandle
@@ -27,9 +59,10 @@ type WatchersFileWatcherRecord =
     task: Promise<void>;
   }>;
 
+/** Options for constructing a file-watch trigger adapter. */
 export type WatchersFileWatcherAdapterOptions = Readonly<{
   now?: () => Date;
-  watcherFactory?: (options: WatcherOptions) => WatcherInstance;
+  watcherFactory?: (options: RuntimeWatcherOptions) => WatcherInstance;
   onError?: (error: unknown, handle: FileWatcherHandle) => void | Promise<void>;
 }>;
 
@@ -37,16 +70,19 @@ export type WatchersFileWatcherAdapterOptions = Readonly<{
 export class WatchersFileWatcherAdapter implements FileWatcherPort {
   readonly #records = new Map<string, WatchersFileWatcherRecord>();
   readonly #now: () => Date;
-  readonly #watcherFactory: (options: WatcherOptions) => WatcherInstance;
+  readonly #watcherFactory: (options: RuntimeWatcherOptions) => WatcherInstance;
   readonly #onError?: (error: unknown, handle: FileWatcherHandle) => void | Promise<void>;
   #sequence = 0;
 
+  /** Create a file-watch adapter with optional watcher and clock injection. */
   constructor(options: WatchersFileWatcherAdapterOptions = {}) {
     this.#now = options.now ?? (() => new Date());
-    this.#watcherFactory = options.watcherFactory ?? createWatcher;
+    this.#watcherFactory = options.watcherFactory ??
+      ((watcherOptions) => createWatcher(watcherOptions as UpstreamWatcherOptions));
     this.#onError = options.onError;
   }
 
+  /** Register a file-watch definition and return its runtime handle. */
   async watch(
     definition: FileWatchDefinition<string, never, never>,
     handler: FileWatchHandler,
@@ -84,6 +120,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     return handle;
   }
 
+  /** Remove a file-watch trigger if it exists. */
   unwatch(id: TriggerId): Promise<boolean> {
     const record = this.#records.get(id);
     if (record === undefined) {
@@ -95,23 +132,28 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     return Promise.resolve(true);
   }
 
+  /** List handles for every active file-watch trigger. */
   list(): Promise<readonly FileWatcherHandle[]> {
     return Promise.resolve([...this.#records.values()].map(stripRuntime));
   }
 
+  /** Resolve a file-watch trigger handle by id. */
   get(id: TriggerId): Promise<FileWatcherHandle | undefined> {
     const record = this.#records.get(id);
     return Promise.resolve(record === undefined ? undefined : stripRuntime(record));
   }
 
+  /** Pause a file-watch trigger without removing it. */
   pause(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#setPaused(id, true));
   }
 
+  /** Resume a paused file-watch trigger. */
   resume(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#setPaused(id, false));
   }
 
+  /** Stop all active file-watch triggers and await their tasks. */
   async stop(): Promise<void> {
     const records = [...this.#records.values()];
     this.#records.clear();
@@ -138,7 +180,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
     }
   }
 
-  async #dispatch(record: WatchersFileWatcherRecord, event: WatchEvent): Promise<void> {
+  async #dispatch(record: WatchersFileWatcherRecord, event: RuntimeWatchEvent): Promise<void> {
     try {
       await record.handler(this.#eventFor(record, event));
     } catch (error) {
@@ -165,7 +207,7 @@ export class WatchersFileWatcherAdapter implements FileWatcherPort {
 
   #eventFor(
     record: WatchersFileWatcherRecord,
-    event: WatchEvent,
+    event: RuntimeWatchEvent,
   ): TriggerEvent<'file-watch', FileWatchTriggerPayload> {
     this.#sequence += 1;
     const detectedAt = event.timestamp.toISOString();

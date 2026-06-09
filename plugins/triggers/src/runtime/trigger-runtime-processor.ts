@@ -23,6 +23,7 @@ import {
   openTriggerRuntimeKv,
 } from './kv-trigger-runtime-stores.ts';
 
+/** Options for constructing the plugin trigger processor runtime. */
 export type RuntimeTriggerProcessorOptions = Readonly<{
   kv?: Deno.Kv;
   idempotency?: TriggerIdempotencyPort;
