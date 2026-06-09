@@ -43,3 +43,4 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
+| 2026-06-10 | info | D5 pulled same-file D8 JSDoc blockers forward | After the D5 type re-exports, raw `deno doc --lint src/{adapters,ports,runtime}/mod.ts` no longer reported `private-type-ref` but still failed on public member `missing-jsdoc` in the D5-owned file set. D5's per-slice gate must be raw green, not filtered. | Added concise JSDoc to the affected ports/runtime/adapters public members in D5. D8 will have fewer remaining ports/runtime/adapters JSDoc items; no scope expansion beyond D5's planned file set. |

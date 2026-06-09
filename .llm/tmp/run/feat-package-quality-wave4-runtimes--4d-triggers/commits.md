@@ -18,3 +18,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 521c452: fix(triggers-core): expose D3 builder signature types
 - 3785ef5: docs(wave4): record D3 builder type evidence
 - 9d3505d: fix(triggers-core): expose D4 structural config contracts
+- 819a6df: docs(wave4): record D4 structural contract evidence
+- da0cb30: fix(triggers-core): export D5 port runtime adapter types
