@@ -1,90 +1,38 @@
-import { Redis } from 'ioredis';
 import type { SagaMessage } from '../domain/mod.ts';
 import type {
   SagaTransportHandler,
   SagaTransportPort,
   SagaTransportSubscription,
 } from '../ports/mod.ts';
-import { type ListDelayedClient, ListDelayedMessageProcessor } from './list-transport-delayed.ts';
+import {
+  acknowledgeListMessage,
+  type GarnetListTransportOptions,
+  listDeadLetterKey,
+  listDelayedKey,
+  listMetadataKey,
+  listProcessingKey,
+  listQueueKey,
+  type ListTransportClient,
+  moveNextListMessage,
+  publishListMessage,
+  reclaimListRecords,
+  type ResolvedGarnetListTransportOptions,
+  resolveGarnetListTransportOptions,
+  storeListMetadata,
+} from './list-transport-commands.ts';
+import { ListDelayedMessageProcessor } from './list-transport-delayed.ts';
 import {
   decodeListTransportMessage,
-  encodeListTransportMessage,
-  type ListBlockingClient,
   ListTransportAck,
   ListTransportSubscription,
   ListTransportSubscriptionRecord,
 } from './list-transport-subscription.ts';
-import type { RedisConnectionOptions, RedisTransportLogger } from './redis-transport.ts';
 
-/** Structural Redis/Garnet client used by `GarnetListTransport`. */
-export interface ListTransportClient extends ListDelayedClient, ListBlockingClient {
-  /** Create an independent client for blocking reads. */
-  duplicate(): ListTransportClient;
-  /** Verify that the backing Redis-compatible server is reachable. */
-  ping(): Promise<unknown>;
-  /** Push a message to the left side of a list. */
-  lpush(key: string, value: string): Promise<unknown>;
-  /** Remove matching messages from a list. */
-  lrem(key: string, count: number, value: string): Promise<unknown>;
-  /** Read a range of list entries. */
-  lrange(key: string, start: number, stop: number): Promise<readonly string[]>;
-  /** Read the current list length. */
-  llen(key: string): Promise<number>;
-  /** Store metadata fields for a processing message. */
-  hset(key: string, value: Readonly<Record<string, string>>): Promise<unknown>;
-  /** Read all metadata fields for a processing message. */
-  hgetall(key: string): Promise<Readonly<Record<string, string>>>;
-  /** Increment a numeric metadata field. */
-  hincrby(key: string, field: string, increment: number): Promise<unknown>;
-  /** Set a metadata key expiry. */
-  expire(key: string, seconds: number): Promise<unknown>;
-  /** Delete a metadata key. */
-  del(key: string): Promise<unknown>;
-}
-
-/** List transport client factory for tests and connection policy injection. */
-export type ListTransportClientFactory = (
-  connection: RedisConnectionOptions,
-) => ListTransportClient;
-
-/** Options for the Garnet-compatible LIST saga transport. */
-export type GarnetListTransportOptions = Readonly<{
-  id?: string;
-  redis?: ListTransportClient;
-  connection?: RedisConnectionOptions;
-  createRedis?: ListTransportClientFactory;
-  keyPrefix?: string;
-  consumerGroup?: string;
-  consumerName?: string;
-  blockTimeoutMs?: number;
-  delayedPollIntervalMs?: number;
-  delayedSetKey?: string;
-  orphanClaimIntervalMs?: number;
-  minProcessingTimeMs?: number;
-  maxRetries?: number;
-  logger?: RedisTransportLogger;
-  now?: () => Date;
-  createId?: () => string;
-}>;
-
-type ResolvedGarnetListTransportOptions = Readonly<{
-  id: string;
-  redis?: ListTransportClient;
-  connection?: RedisConnectionOptions;
-  createRedis: ListTransportClientFactory;
-  keyPrefix: string;
-  consumerGroup: string;
-  consumerName: string;
-  blockTimeoutMs: number;
-  delayedPollIntervalMs: number;
-  delayedSetKey: string;
-  orphanClaimIntervalMs: number;
-  minProcessingTimeMs: number;
-  maxRetries: number;
-  logger?: RedisTransportLogger;
-  now: () => Date;
-  createId: () => string;
-}>;
+export type {
+  GarnetListTransportOptions,
+  ListTransportClient,
+  ListTransportClientFactory,
+} from './list-transport-commands.ts';
 
 /** Garnet-compatible saga transport using Redis LIST operations. */
 export class GarnetListTransport implements SagaTransportPort {
@@ -104,7 +52,7 @@ export class GarnetListTransport implements SagaTransportPort {
       throw new TypeError('List transport requires either redis or connection options.');
     }
 
-    this.#options = resolveOptions(options);
+    this.#options = resolveGarnetListTransportOptions(options);
     this.id = this.#options.id;
   }
 
@@ -198,9 +146,13 @@ export class GarnetListTransport implements SagaTransportPort {
   }
 
   async #publish(topic: string, message: SagaMessage): Promise<void> {
-    await this.#requireRedis().rpush(
+    await publishListMessage(
+      this.#requireRedis(),
       this.#queueKey(topic),
-      encodeListTransportMessage(this.#options.createId(), topic, message, this.#options.now()),
+      topic,
+      message,
+      this.#options.now(),
+      this.#options.createId,
     );
   }
 
@@ -230,23 +182,7 @@ export class GarnetListTransport implements SagaTransportPort {
   }
 
   async #moveNext(record: ListTransportSubscriptionRecord): Promise<string | undefined> {
-    const client = record.blockingClient;
-    if (!client) return undefined;
-    try {
-      return await client.blmove(
-        record.queueKey,
-        record.processingKey,
-        'RIGHT',
-        'LEFT',
-        this.#options.blockTimeoutMs / 1000,
-      ) ?? undefined;
-    } catch {
-      return await client.brpoplpush(
-        record.queueKey,
-        record.processingKey,
-        this.#options.blockTimeoutMs / 1000,
-      ) ?? undefined;
-    }
+    return await moveNextListMessage(record.blockingClient, record, this.#options.blockTimeoutMs);
   }
 
   async #handleMovedMessage(
@@ -255,13 +191,14 @@ export class GarnetListTransport implements SagaTransportPort {
   ): Promise<void> {
     const decoded = decodeListTransportMessage(messageJson);
     const metadataKey = this.#metadataKey(decoded.envelopeId);
-    await this.#storeMetadata(metadataKey, 0);
+    await storeListMetadata(this.#requireRedis(), metadataKey, 0, this.#options.now());
 
     const ack = new ListTransportAck(
       record.processingKey,
       messageJson,
       metadataKey,
-      (processingKey, payload, key) => this.#acknowledgeMessage(processingKey, payload, key),
+      (processingKey, payload, key) =>
+        acknowledgeListMessage(this.#requireRedis(), processingKey, payload, key),
     );
 
     try {
@@ -271,15 +208,6 @@ export class GarnetListTransport implements SagaTransportPort {
       this.#options.logger?.error('List saga transport handler error.', { error });
       await this.#requireRedis().hincrby(metadataKey, 'retryCount', 1);
     }
-  }
-
-  async #acknowledgeMessage(
-    processingKey: string,
-    messageJson: string,
-    metadataKey: string,
-  ): Promise<void> {
-    await this.#requireRedis().lrem(processingKey, 1, messageJson);
-    await this.#requireRedis().del(metadataKey);
   }
 
   #startDelayedProcessor(): void {
@@ -311,67 +239,11 @@ export class GarnetListTransport implements SagaTransportPort {
   }
 
   async #reclaimOrphanedMessages(): Promise<void> {
-    await Promise.all(
-      [...this.#subscriptions.values()].map((record) => this.#reclaimRecord(record)),
+    await reclaimListRecords(
+      this.#requireRedis(),
+      [...this.#subscriptions.values()],
+      this.#options,
     );
-  }
-
-  async #reclaimRecord(record: ListTransportSubscriptionRecord): Promise<void> {
-    try {
-      const messages = await this.#requireRedis().lrange(record.processingKey, 0, -1);
-      await Promise.all(messages.map((messageJson) => this.#reclaimMessage(record, messageJson)));
-    } catch (error) {
-      this.#options.logger?.error('List saga transport orphan reclaim error.', { error });
-    }
-  }
-
-  async #reclaimMessage(
-    record: ListTransportSubscriptionRecord,
-    messageJson: string,
-  ): Promise<void> {
-    const decoded = decodeListTransportMessage(messageJson);
-    const metadataKey = this.#metadataKey(decoded.envelopeId);
-    const metadata = await this.#requireRedis().hgetall(metadataKey);
-    const retryCount = Number.parseInt(metadata.retryCount ?? '0', 10);
-    const startedAt = Number.parseInt(metadata.startedAt ?? '0', 10);
-    const processingTime = this.#options.now().getTime() - startedAt;
-    if (processingTime <= this.#options.minProcessingTimeMs) return;
-
-    if (retryCount >= this.#options.maxRetries) {
-      await this.#moveToDeadLetter(record, messageJson, metadataKey);
-      return;
-    }
-
-    await this.#requeueMessage(record, messageJson, metadataKey, retryCount + 1);
-  }
-
-  async #requeueMessage(
-    record: ListTransportSubscriptionRecord,
-    messageJson: string,
-    metadataKey: string,
-    retryCount: number,
-  ): Promise<void> {
-    await this.#storeMetadata(metadataKey, retryCount);
-    await this.#requireRedis().lrem(record.processingKey, 1, messageJson);
-    await this.#requireRedis().lpush(record.queueKey, messageJson);
-  }
-
-  async #moveToDeadLetter(
-    record: ListTransportSubscriptionRecord,
-    messageJson: string,
-    metadataKey: string,
-  ): Promise<void> {
-    await this.#requireRedis().lrem(record.processingKey, 1, messageJson);
-    await this.#requireRedis().rpush(this.#deadLetterKey(record.topic), messageJson);
-    await this.#requireRedis().del(metadataKey);
-  }
-
-  async #storeMetadata(metadataKey: string, retryCount: number): Promise<void> {
-    await this.#requireRedis().hset(metadataKey, {
-      startedAt: this.#options.now().getTime().toString(),
-      retryCount: retryCount.toString(),
-    });
-    await this.#requireRedis().expire(metadataKey, 86400);
   }
 
   async #stopRecord(record: ListTransportSubscriptionRecord): Promise<void> {
@@ -401,23 +273,28 @@ export class GarnetListTransport implements SagaTransportPort {
   }
 
   #queueKey(topic: string): string {
-    return `${this.#options.keyPrefix}queue:${topic}`;
+    return listQueueKey(this.#options.keyPrefix, topic);
   }
 
   #processingKey(topic: string): string {
-    return `${this.#options.keyPrefix}processing:${topic}:${this.#options.consumerGroup}:${this.#options.consumerName}`;
+    return listProcessingKey(
+      this.#options.keyPrefix,
+      this.#options.consumerGroup,
+      this.#options.consumerName,
+      topic,
+    );
   }
 
   #deadLetterKey(topic: string): string {
-    return `${this.#options.keyPrefix}dlq:${topic}`;
+    return listDeadLetterKey(this.#options.keyPrefix, topic);
   }
 
   #metadataKey(envelopeId: string): string {
-    return `${this.#options.keyPrefix}meta:${envelopeId}`;
+    return listMetadataKey(this.#options.keyPrefix, envelopeId);
   }
 
   #delayedKey(): string {
-    return `${this.#options.keyPrefix}${this.#options.delayedSetKey}`;
+    return listDelayedKey(this.#options.keyPrefix, this.#options.delayedSetKey);
   }
 
   async #unsubscribe(topic: string): Promise<void> {
@@ -434,41 +311,6 @@ export function createGarnetListTransport(
   options: GarnetListTransportOptions = {},
 ): GarnetListTransport {
   return new GarnetListTransport(options);
-}
-
-function resolveOptions(
-  options: GarnetListTransportOptions,
-): ResolvedGarnetListTransportOptions {
-  return Object.freeze({
-    id: options.id ?? 'garnet-list-saga-transport',
-    redis: options.redis,
-    connection: options.connection,
-    createRedis: options.createRedis ?? createDefaultListClient,
-    keyPrefix: options.keyPrefix ?? 'saga-bus:',
-    consumerGroup: options.consumerGroup ?? 'saga-processor',
-    consumerName: options.consumerName ?? `consumer-${crypto.randomUUID()}`,
-    blockTimeoutMs: options.blockTimeoutMs ?? 100,
-    delayedPollIntervalMs: options.delayedPollIntervalMs ?? 1000,
-    delayedSetKey: options.delayedSetKey ?? 'delayed',
-    orphanClaimIntervalMs: options.orphanClaimIntervalMs ?? 30000,
-    minProcessingTimeMs: options.minProcessingTimeMs ?? 60000,
-    maxRetries: options.maxRetries ?? 5,
-    logger: options.logger,
-    now: options.now ?? (() => new Date()),
-    createId: options.createId ?? (() => crypto.randomUUID()),
-  });
-}
-
-function createDefaultListClient(connection: RedisConnectionOptions): ListTransportClient {
-  return new Redis({
-    host: connection.host ?? 'localhost',
-    port: connection.port ?? 6379,
-    password: connection.password,
-    db: connection.db ?? 0,
-    tls: connection.tls,
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false,
-  }) as unknown as ListTransportClient;
 }
 
 function sleep(ms: number): Promise<void> {

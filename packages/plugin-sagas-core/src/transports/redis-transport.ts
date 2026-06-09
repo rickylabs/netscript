@@ -1,4 +1,3 @@
-import { Redis } from 'ioredis';
 import type { SagaMessage } from '../domain/mod.ts';
 import type {
   SagaTransportHandler,
@@ -6,93 +5,34 @@ import type {
   SagaTransportSubscription,
 } from '../ports/mod.ts';
 import {
-  type RedisDelayedClient,
-  RedisDelayedMessageProcessor,
-} from './redis-transport-delayed.ts';
+  acknowledgeRedisStreamMessage,
+  addRedisStreamMessage,
+  claimRedisPendingMessages,
+  ensureRedisGroup,
+  readRedisGroupMessages,
+  type RedisConnectionOptions,
+  type RedisStreamClient,
+  type RedisStreamClientFactory,
+  redisStreamKey,
+  type RedisTransportLogger,
+  type ResolvedRedisTransportOptions,
+  resolveRedisTransportOptions,
+} from './redis-transport-commands.ts';
+import { RedisDelayedMessageProcessor } from './redis-transport-delayed.ts';
 import {
   decodeRedisTransportMessage,
   encodeRedisTransportMessage,
-  type RedisClaimedMessageResult,
-  type RedisPendingMessageResult,
-  type RedisStreamReadGroupResult,
   RedisTransportAck,
   RedisTransportSubscription,
   type RedisTransportSubscriptionRecord,
 } from './redis-transport-subscription.ts';
 
-/** Structural Redis Streams client used by `NetScriptRedisTransport`. */
-export interface RedisStreamClient extends RedisDelayedClient {
-  /** Create an independent client for subscription reads. */
-  duplicate(): RedisStreamClient;
-  /** Close the Redis client connection. */
-  quit(): Promise<unknown>;
-  /** Add a serialized message envelope to a Redis Stream. */
-  xadd(...args: (string | number)[]): Promise<unknown>;
-  /** Acknowledge one Redis Stream message. */
-  xack(streamKey: string, group: string, messageId: string): Promise<unknown>;
-  /** Run an XGROUP command used to create consumer groups. */
-  xgroup(
-    command: 'CREATE',
-    streamKey: string,
-    group: string,
-    id: string,
-    mkstream: 'MKSTREAM',
-  ): Promise<unknown>;
-  /** Read messages for the configured consumer group. */
-  xreadgroup(
-    groupCommand: 'GROUP',
-    group: string,
-    consumer: string,
-    countCommand: 'COUNT',
-    count: number,
-    blockCommand: 'BLOCK',
-    blockMs: number,
-    streamsCommand: 'STREAMS',
-    ...keysAndIds: string[]
-  ): Promise<RedisStreamReadGroupResult | null>;
-  /** Read pending message metadata for recovery. */
-  xpending(
-    streamKey: string,
-    group: string,
-    start: string,
-    end: string,
-    count: number,
-  ): Promise<RedisPendingMessageResult>;
-  /** Claim one idle pending message for this consumer. */
-  xclaim(
-    streamKey: string,
-    group: string,
-    consumer: string,
-    minIdleMs: number,
-    messageId: string,
-  ): Promise<RedisClaimedMessageResult>;
-}
-
-/** Redis connection options accepted by the default ioredis factory. */
-export type RedisConnectionOptions = Readonly<{
-  host?: string;
-  port?: number;
-  password?: string;
-  db?: number;
-  tls?: Readonly<{
-    rejectUnauthorized?: boolean;
-  }>;
-}>;
-
-/** Redis client factory for tests and custom connection policies. */
-export type RedisStreamClientFactory = (
-  connection: RedisConnectionOptions,
-) => RedisStreamClient;
-
-/** Transport logger hook; no global console usage in framework code. */
-export interface RedisTransportLogger {
-  /** Record diagnostic transport details. */
-  debug(message: string, metadata?: Readonly<Record<string, unknown>>): void;
-  /** Record recoverable transport warnings. */
-  warn(message: string, metadata?: Readonly<Record<string, unknown>>): void;
-  /** Record transport errors. */
-  error(message: string, metadata?: Readonly<Record<string, unknown>>): void;
-}
+export type {
+  RedisConnectionOptions,
+  RedisStreamClient,
+  RedisStreamClientFactory,
+  RedisTransportLogger,
+} from './redis-transport-commands.ts';
 
 /** Options for the Redis Streams saga transport. */
 export type NetScriptRedisTransportOptions = Readonly<{
@@ -116,27 +56,6 @@ export type NetScriptRedisTransportOptions = Readonly<{
   now?: () => Date;
 }>;
 
-type ResolvedRedisTransportOptions = Readonly<{
-  id: string;
-  redis?: RedisStreamClient;
-  connection?: RedisConnectionOptions;
-  createRedis: RedisStreamClientFactory;
-  keyPrefix: string;
-  consumerGroup: string;
-  consumerName: string;
-  autoCreateGroup: boolean;
-  batchSize: number;
-  blockTimeoutMs: number;
-  maxStreamLength: number;
-  approximateMaxLen: boolean;
-  delayedPollIntervalMs: number;
-  delayedSetKey: string;
-  pendingClaimIntervalMs: number;
-  minIdleTimeMs: number;
-  logger?: RedisTransportLogger;
-  now: () => Date;
-}>;
-
 /** Redis Streams transport for saga message delivery. */
 export class NetScriptRedisTransport implements SagaTransportPort {
   /** Stable transport identifier. */
@@ -157,7 +76,7 @@ export class NetScriptRedisTransport implements SagaTransportPort {
       throw new TypeError('Redis transport requires either redis or connection options.');
     }
 
-    this.#options = resolveOptions(options);
+    this.#options = resolveRedisTransportOptions(options) as ResolvedRedisTransportOptions;
     this.id = this.#options.id;
   }
 
@@ -252,33 +171,11 @@ export class NetScriptRedisTransport implements SagaTransportPort {
   }
 
   async #addToStream(streamKey: string, envelope: string): Promise<void> {
-    const redis = this.#requireRedis();
-    await redis.xadd(...this.#xaddArgs(streamKey, envelope));
-  }
-
-  #xaddArgs(streamKey: string, envelope: string): (string | number)[] {
-    if (this.#options.maxStreamLength <= 0) {
-      return [streamKey, '*', 'data', envelope];
-    }
-    if (this.#options.approximateMaxLen) {
-      return [streamKey, 'MAXLEN', '~', this.#options.maxStreamLength, '*', 'data', envelope];
-    }
-    return [streamKey, 'MAXLEN', this.#options.maxStreamLength, '*', 'data', envelope];
+    await addRedisStreamMessage(this.#requireRedis(), streamKey, envelope, this.#options);
   }
 
   async #ensureGroup(record: RedisTransportSubscriptionRecord): Promise<void> {
-    if (!this.#options.autoCreateGroup) return;
-    try {
-      await this.#requireRedis().xgroup(
-        'CREATE',
-        record.streamKey,
-        this.#options.consumerGroup,
-        '0',
-        'MKSTREAM',
-      );
-    } catch (error) {
-      if (!isBusyGroupError(error)) throw error;
-    }
+    await ensureRedisGroup(this.#requireRedis(), record, this.#options);
   }
 
   #startReadLoop(): void {
@@ -300,18 +197,10 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     }
 
     try {
-      const streams = subscriptions.map((item) => item.streamKey);
-      const results = await this.#requireSubscriberRedis().xreadgroup(
-        'GROUP',
-        this.#options.consumerGroup,
-        this.#options.consumerName,
-        'COUNT',
-        this.#options.batchSize,
-        'BLOCK',
-        this.#options.blockTimeoutMs,
-        'STREAMS',
-        ...streams,
-        ...streams.map(() => '>'),
+      const results = await readRedisGroupMessages(
+        this.#requireSubscriberRedis(),
+        subscriptions,
+        this.#options,
       );
 
       await Promise.all(
@@ -341,7 +230,7 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     const ack = new RedisTransportAck(
       streamKey,
       messageId,
-      (key, id) => this.#acknowledgeMessage(key, id),
+      (key, id) => acknowledgeRedisStreamMessage(this.#requireRedis(), key, id, this.#options),
     );
 
     try {
@@ -350,10 +239,6 @@ export class NetScriptRedisTransport implements SagaTransportPort {
     } catch (error) {
       this.#options.logger?.error('Redis saga transport handler error.', { error });
     }
-  }
-
-  async #acknowledgeMessage(streamKey: string, messageId: string): Promise<void> {
-    await this.#requireRedis().xack(streamKey, this.#options.consumerGroup, messageId);
   }
 
   #startPendingClaimLoop(): void {
@@ -371,44 +256,11 @@ export class NetScriptRedisTransport implements SagaTransportPort {
   }
 
   async #claimPendingMessages(): Promise<void> {
-    await Promise.all(
-      [...this.#subscriptions.values()].map((record) => this.#claimPendingFor(record)),
-    );
-  }
-
-  async #claimPendingFor(record: RedisTransportSubscriptionRecord): Promise<void> {
-    try {
-      const pending = await this.#requireRedis().xpending(
-        record.streamKey,
-        this.#options.consumerGroup,
-        '-',
-        '+',
-        this.#options.batchSize,
-      );
-      await Promise.all(pending.map((entry) => this.#claimPendingEntry(record, entry)));
-    } catch (error) {
-      this.#options.logger?.error('Redis saga transport pending-claim error.', { error });
-    }
-  }
-
-  async #claimPendingEntry(
-    record: RedisTransportSubscriptionRecord,
-    entry: RedisPendingMessageResult[number],
-  ): Promise<void> {
-    const [messageId, , idleMs] = entry;
-    if (idleMs < this.#options.minIdleTimeMs) return;
-
-    const claimed = await this.#requireRedis().xclaim(
-      record.streamKey,
-      this.#options.consumerGroup,
-      this.#options.consumerName,
-      this.#options.minIdleTimeMs,
-      messageId,
-    );
-    await Promise.all(
-      claimed.map(([claimedId, fields]) =>
-        this.#processMessage(record.streamKey, claimedId, fields)
-      ),
+    await claimRedisPendingMessages(
+      this.#requireRedis(),
+      [...this.#subscriptions.values()],
+      this.#options,
+      (record, messageId, fields) => this.#processMessage(record.streamKey, messageId, fields),
     );
   }
 
@@ -448,7 +300,7 @@ export class NetScriptRedisTransport implements SagaTransportPort {
   }
 
   #streamKey(topic: string): string {
-    return `${this.#options.keyPrefix}stream:${topic}`;
+    return redisStreamKey(this.#options.keyPrefix, topic);
   }
 
   #unsubscribe(topic: string): Promise<void> {
@@ -462,37 +314,6 @@ export function createNetScriptRedisTransport(
   options: NetScriptRedisTransportOptions = {},
 ): NetScriptRedisTransport {
   return new NetScriptRedisTransport(options);
-}
-
-function resolveOptions(options: NetScriptRedisTransportOptions): ResolvedRedisTransportOptions {
-  return Object.freeze({
-    id: options.id ?? 'redis-saga-transport',
-    redis: options.redis,
-    connection: options.connection,
-    createRedis: options.createRedis ?? createDefaultRedisClient,
-    keyPrefix: options.keyPrefix ?? 'saga-bus:',
-    consumerGroup: options.consumerGroup ?? 'saga-processor',
-    consumerName: options.consumerName ?? `consumer-${crypto.randomUUID()}`,
-    autoCreateGroup: options.autoCreateGroup ?? true,
-    batchSize: options.batchSize ?? 10,
-    blockTimeoutMs: options.blockTimeoutMs ?? 5000,
-    maxStreamLength: options.maxStreamLength ?? 0,
-    approximateMaxLen: options.approximateMaxLen ?? true,
-    delayedPollIntervalMs: options.delayedPollIntervalMs ?? 1000,
-    delayedSetKey: options.delayedSetKey ?? 'saga-bus:delayed',
-    pendingClaimIntervalMs: options.pendingClaimIntervalMs ?? 30000,
-    minIdleTimeMs: options.minIdleTimeMs ?? 60000,
-    logger: options.logger,
-    now: options.now ?? (() => new Date()),
-  });
-}
-
-function createDefaultRedisClient(connection: RedisConnectionOptions): RedisStreamClient {
-  return new Redis(connection) as unknown as RedisStreamClient;
-}
-
-function isBusyGroupError(error: unknown): boolean {
-  return error instanceof Error && error.message.includes('BUSYGROUP');
 }
 
 function sleep(ms: number): Promise<void> {
