@@ -11,8 +11,8 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C14 and P1-P8 are complete and pushed. Latest implementation commit:
-`05200fd` (`test(workers): verify plugin manifest`). The 4b-core sweep is green:
+order. Slices C1-C14 and P1-P9 are complete and pushed. Latest implementation commit:
+`3075fd9` (`test(workers): cover cli contribution`). The 4b-core sweep is green:
 dry-run PASS with 0 slow types, full-export doc-lint 0/0/0 across all 16 retained
 entrypoints, raw 16-entrypoint `deno check --unstable-kv` PASS, lint PASS, fmt check PASS,
 tests PASS 16/0, live runtime smoke PASS, and consumer-import checks PASS for triggers,
@@ -30,6 +30,8 @@ helpers reported by Deno doc-lint. P7 completed the plugin F-1 split by reducing
 `worker/scheduler.ts` from 480 to 342 lines via internal dispatch, event, info, and
 scheduling helper modules. P8 replaced the old live-service verifier with a pure manifest
 verifier and added the workers public manifest test; verifier output reports `ok: true`.
+P9 added the workers CLI contribution test covering all 11 command registrations, injected
+backend dispatch, missing-command handling, and the default `workersCli` composition root.
 
 ## Scope — 2 publishable units (long pole #1)
 
