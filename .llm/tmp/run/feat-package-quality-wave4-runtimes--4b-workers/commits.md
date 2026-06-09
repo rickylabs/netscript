@@ -20,6 +20,7 @@ Branch: `feat/package-quality-wave4-runtimes-4b` → umbrella `feat/package-qual
 | C13 impl | 55f162b | docs(workers-core): document entrypoint surface | C13 |
 | C14 impl | e2670ce | fix(workers-core): complete validation sweep | C14 |
 | P1 impl | 51ab054 | chore(workers): check all plugin entrypoints | P1 |
+| P2 impl | 3ff2af4 | fix(workers): publish contract cli helper types | P2 |
 
 (If split into `4b-core`/`4b-plugin`, each gets its own nested run dir + commits.md. Pair each
 implementation slice commit with its `docs(wave4): record …` doc-record commit.)
