@@ -105,6 +105,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `ee9f26b` (carries merged
 | Slice | Unit | Archetype | Subject | Gate(s) | Result | Commit |
 |-------|------|-----------|---------|---------|--------|--------|
 | 1/27 | `@netscript/plugin-workers-core` | A3 | Declare runtime archetype in `docs/architecture.md` | `deno check --unstable-kv mod.ts`; declaration grep | PASS — raw check exit 0; A3, Runtime/Aspire, and consumer-import text present | `0eec3df` |
+| 2/27 | `@netscript/plugin-workers-core` | A3 | Enumerate retained entrypoints in `check` task | `deno task check`; raw `deno check --unstable-kv <16 entrypoints>` | PASS — both commands exited 0 and checked all retained root/subpath entrypoint files | `3f01a2d` |
 
 ## Readiness note
 

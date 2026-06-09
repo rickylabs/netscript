@@ -11,8 +11,9 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slice C1 is complete and pushed: `0eec3df` (`docs(workers-core): declare runtime
-archetype`), with raw `deno check --unstable-kv mod.ts` passing for `plugin-workers-core`.
+order. Slices C1-C2 are complete and pushed. Latest implementation commit: `3f01a2d`
+(`chore(workers-core): check all retained entrypoints`), with raw `deno check --unstable-kv`
+passing for all 16 retained `plugin-workers-core` entrypoint files.
 
 ## Scope — 2 publishable units (long pole #1)
 
