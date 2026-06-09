@@ -25,6 +25,9 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
+| 2026-06-09 | info | Pull-forward done by supervisor | 4a merged (umbrella `2c24662`) + 4b merged (umbrella `1896f854`, PR #19); 4c merged the umbrella (`128a0a8`), merge-base now `1896f854` | Base current. Re-measure `sagas-core ./streams` (re-exports the now-A3 `plugin-streams-core`) **and** `./integration/workers` (re-exports the now-A3 `plugin-workers-core`, doc-lint 0) per entrypoint — both upstreams are now clean, so attribute remaining 4c debt to sagas-owned surface. |
+| 2026-06-09 | info | Umbrella-level `deno.lock` drift inherited (NOT a 4c finding) | Umbrella carries lock churn introduced by the 4b PLAN-EVAL OpenHands automation (`@opentelemetry/semantic-conventions` 1.40.0→1.28.0 + esbuild/preact/loader additions; +179/−63 vs `2c24662`). 4b validated green on it. | Do NOT revert here (would re-churn). 4c inherits it; MEASURE-FIRST dry-runs run against it. Terminal reconcile = Wave 4 closeout (umbrella→track), via a deliberate reviewed lock pass. Tracked in supervisor registry + `lessons/platform.md`. |
+| 2026-06-09 | info | **Umbrella-level carry from 4a/4b IMPL-EVAL** | `packages/cli` `deno task check` fails TS9016/TS9027 in `src/maintainer/features/sync/plugin/copy-official-plugin.ts` (byte-identical to base; pre-existing Wave 6 CLI debt) | NOT a 4c concern. When running consumer-import against `packages/cli`, scope to type-resolution of the sagas surface; do not treat the pre-existing isolated-declarations failure as a 4c regression. Tracked in `arch-debt.md`. |
 
 ## Implementation drift (append during Implement)
 
