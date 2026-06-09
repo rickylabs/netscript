@@ -1,9 +1,6 @@
 import {
   DEFAULT_TOPIC,
-  type ExecutionRecord,
   ExecutionRecordSchema,
-  type ExecutionStatus,
-  type TriggerType,
 } from '../domain/mod.ts';
 import type { RegistryKvStore } from '../registry/mod.ts';
 
@@ -12,18 +9,55 @@ const EXECUTION_PREFIX = ['workers', 'executions'] as const;
 /** Execution concept discriminator. */
 export type ExecutionConcept = 'job' | 'task';
 
+/** Execution trigger discriminator. */
+export type ExecutionTriggerType = 'api' | 'event' | 'manual' | 'schedule' | string;
+
+/** Execution status discriminator. */
+export type ExecutionStatus =
+  | 'cancelled'
+  | 'completed'
+  | 'failed'
+  | 'pending'
+  | 'queued'
+  | 'running'
+  | 'timeout';
+
+/** Worker execution record stored in KV. */
+export type ExecutionRecord = Readonly<Record<string, unknown> & {
+  readonly id: string;
+  readonly concept: ExecutionConcept;
+  readonly jobId: string;
+  readonly topic: string;
+  readonly status: ExecutionStatus;
+  readonly triggeredBy: ExecutionTriggerType;
+  readonly triggeredAt: string;
+  readonly startedAt?: string | null;
+  readonly completedAt?: string | null;
+  readonly exitCode?: number | null;
+  readonly duration?: number | null;
+  readonly error?: string | null;
+  readonly result?: Record<string, unknown> | null;
+  readonly workerId?: string | null;
+  readonly attempt?: number;
+  readonly maxAttempts?: number;
+  readonly correlationId?: string;
+}>;
+
 /** Options for creating a worker execution record. */
 export type CreateExecutionOptions = Readonly<{
   concept?: ExecutionConcept;
   jobId: string;
   topic?: string;
-  triggeredBy: TriggerType;
+  triggeredBy: ExecutionTriggerType;
   payload?: Record<string, unknown>;
   correlationId?: string;
   maxAttempts?: number;
   traceparent?: string;
   tracestate?: string;
 }>;
+
+/** Options for listing worker execution records. */
+export type ListExecutionOptions = Readonly<{ concept?: ExecutionConcept; limit?: number }>;
 
 /** Options for completing a worker execution record. */
 export type CompleteExecutionOptions = Readonly<{
@@ -208,8 +242,6 @@ export class KvExecutionState {
     return options.limit ? result.slice(0, options.limit) : result;
   }
 }
-
-type ListExecutionOptions = Readonly<{ concept?: ExecutionConcept; limit?: number }>;
 
 function validateExecution(input: unknown): ExecutionRecord {
   return ExecutionRecordSchema.parse(input) as ExecutionRecord;

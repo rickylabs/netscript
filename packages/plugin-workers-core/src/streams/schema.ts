@@ -3,6 +3,24 @@ import { z } from 'zod';
 import { ExecutionRecordSchema, JobResponseSchema } from '../domain/mod.ts';
 
 type AnyZodObject = z.ZodObject<Record<string, z.ZodTypeAny>>;
+/** Structural stream schema definition map. */
+export type StreamSchemaDefinition = Readonly<Record<string, unknown>>;
+
+/** Package-owned structural schema surface for worker stream entities. */
+export interface WorkerStreamEntitySchema<TOutput> {
+  /** Parse an unknown value into the entity output. */
+  parse(value: unknown): TOutput;
+  /** Validate an unknown value without throwing. */
+  safeParse(value: unknown):
+    | { readonly success: true; readonly data: TOutput }
+    | { readonly success: false; readonly error: unknown };
+}
+
+/** Package-owned structural workers stream schema surface. */
+export interface WorkersStreamSchema<TDefinition extends StreamSchemaDefinition> {
+  /** Stream entity definitions keyed by entity name. */
+  readonly definition?: TDefinition;
+}
 
 /** Worker execution entity stored in the durable stream. */
 export type WorkerExecution = Readonly<{
@@ -35,7 +53,7 @@ export type WorkerJob = Readonly<{
 }>;
 
 /** Zod schema for a worker execution entity stored in the durable stream. */
-export const WorkerExecutionSchema: AnyZodObject = ExecutionRecordSchema.pick({
+const WorkerExecutionZodSchema: AnyZodObject = ExecutionRecordSchema.pick({
   id: true,
   jobId: true,
   topic: true,
@@ -65,9 +83,11 @@ export const WorkerExecutionSchema: AnyZodObject = ExecutionRecordSchema.pick({
   workerId: true,
   attempt: true,
 });
+export const WorkerExecutionSchema: WorkerStreamEntitySchema<WorkerExecution> =
+  WorkerExecutionZodSchema as unknown as WorkerStreamEntitySchema<WorkerExecution>;
 
 /** Zod schema for a worker job entity stored in the durable stream. */
-export const WorkerJobSchema: AnyZodObject = JobResponseSchema.pick({
+const WorkerJobZodSchema: AnyZodObject = JobResponseSchema.pick({
   id: true,
   name: true,
   topic: true,
@@ -81,30 +101,45 @@ export const WorkerJobSchema: AnyZodObject = JobResponseSchema.pick({
   schedule: true,
   description: true,
 });
+export const WorkerJobSchema: WorkerStreamEntitySchema<WorkerJob> =
+  WorkerJobZodSchema as unknown as WorkerStreamEntitySchema<WorkerJob>;
 
-type WorkersStreamDefinition = Readonly<{
+export type WorkersStreamDefinition = Readonly<{
   execution: {
-    readonly schema: typeof WorkerExecutionSchema;
+    readonly schema: WorkerStreamEntitySchema<WorkerExecution>;
     readonly type: 'execution';
     readonly primaryKey: 'id';
   };
   job: {
-    readonly schema: typeof WorkerJobSchema;
+    readonly schema: WorkerStreamEntitySchema<WorkerJob>;
     readonly type: 'job';
     readonly primaryKey: 'id';
   };
 }>;
 
 /** Entity-based durable stream schema for worker executions and jobs. */
-export const workersStreamSchema: StateSchema<WorkersStreamDefinition> = defineStreamSchema({
+const workersStreamStateSchema: StateSchema<{
   execution: {
-    schema: WorkerExecutionSchema,
+    readonly schema: typeof WorkerExecutionZodSchema;
+    readonly type: 'execution';
+    readonly primaryKey: 'id';
+  };
+  job: {
+    readonly schema: typeof WorkerJobZodSchema;
+    readonly type: 'job';
+    readonly primaryKey: 'id';
+  };
+}> = defineStreamSchema({
+  execution: {
+    schema: WorkerExecutionZodSchema,
     type: 'execution',
     primaryKey: 'id',
   },
   job: {
-    schema: WorkerJobSchema,
+    schema: WorkerJobZodSchema,
     type: 'job',
     primaryKey: 'id',
   },
 });
+export const workersStreamSchema: WorkersStreamSchema<WorkersStreamDefinition> =
+  workersStreamStateSchema as WorkersStreamSchema<WorkersStreamDefinition>;
