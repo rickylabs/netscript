@@ -8,11 +8,11 @@ PR target: the **umbrella** `feat/package-quality-wave4-runtimes` (NOT the track
 Role: SUPERVISOR-authored seed + pre-research. The locked slice authority is this
 sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 
-## STATUS: IMPLEMENTATION IN PROGRESS
+## STATUS: IMPLEMENTATION COMPLETE — READY FOR IMPL-EVAL
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C14 and P1-P12 are complete and pushed. Latest implementation commit:
-`9311ad9` (`docs(workers): document plugin entrypoint surface`). The 4b-core sweep is green:
+order. Slices C1-C14 and P1-P13 are complete and pushed. Latest implementation commit:
+`9839de3` (`fix(workers): complete plugin validation sweep`). The 4b-core sweep is green:
 dry-run PASS with 0 slow types, full-export doc-lint 0/0/0 across all 16 retained
 entrypoints, raw 16-entrypoint `deno check --unstable-kv` PASS, lint PASS, fmt check PASS,
 tests PASS 16/0, live runtime smoke PASS, and consumer-import checks PASS for triggers,
@@ -37,6 +37,11 @@ resources, declared env, and health check registration. P11 added internal worke
 gate metadata, a health probe, `workers:e2e` task wiring, manifest E2E contribution, and
 the E2E gate metadata test. P12 aligned the README with the current 9-entrypoint surface,
 E2E axis, and plugin validation commands; full-export plugin doc-lint remains 0/0/0.
+P13 completed the plugin sweep: dry-run PASS with 0 slow types and two known
+`unanalyzable-dynamic-import` warnings, full-export doc-lint 0/0/0 across all 9 retained
+entrypoints, raw 9-entrypoint `deno check --unstable-kv` PASS, lint PASS, fmt check PASS,
+tests PASS 5/0, verifier PASS `ok: true`, Aspire registration test PASS, and consumer-import
+checks PASS for triggers, sagas, workers, and CLI.
 
 ## Scope — 2 publishable units (long pole #1)
 

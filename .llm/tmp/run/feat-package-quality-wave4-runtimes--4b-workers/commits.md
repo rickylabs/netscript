@@ -31,6 +31,7 @@ Branch: `feat/package-quality-wave4-runtimes-4b` → umbrella `feat/package-qual
 | P10 impl | 106e304 | test(workers): cover aspire contribution | P10 |
 | P11 impl | 5700438 | test(workers): register e2e gates | P11 |
 | P12 impl | 9311ad9 | docs(workers): document plugin entrypoint surface | P12 |
+| P13 impl | 9839de3 | fix(workers): complete plugin validation sweep | P13 |
 
 (If split into `4b-core`/`4b-plugin`, each gets its own nested run dir + commits.md. Pair each
 implementation slice commit with its `docs(wave4): record …` doc-record commit.)
