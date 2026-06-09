@@ -110,3 +110,4 @@ umbrella** (runs LAST). If split, `4c-plugin` forks off the `4c-core`-merged umb
 ## Implementation Progress
 
 - 2026-06-09 C7: `@netscript/plugin-sagas-core` adapters/middleware/presets private-type refs cleared by explicit first-party type closure exports and package-owned structural Hono-compatible middleware types. Implementation `1a3a0f0`; raw doc-lint target exits 1 with `private-type-ref-count=0` and remaining `missing-jsdoc`; raw all-entrypoint `deno check --unstable-kv` PASS.
+- 2026-06-09 C8: `@netscript/plugin-sagas-core` transports/stores private-type refs cleared by explicit first-party transport, store, domain, and idempotency closure exports from role-named barrels. Implementation `89de256`; raw doc-lint target exits 1 with `private-type-ref-count=0` and remaining transport `missing-jsdoc`; raw all-entrypoint `deno check --unstable-kv` PASS.
