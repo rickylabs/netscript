@@ -21,8 +21,20 @@ export {
   workersContractV1,
 } from './workers.contract.ts';
 export type {
+  ContractProcedureLike,
+  ContractSchema,
+  ContractSchemaResult,
   ExecutionRecordResponse,
+  JobTriggerInput,
+  JobTriggerOutput,
   JobDefinitionResponse,
+  StandardSchemaLike,
   SSEEvent,
+  TaskTriggerInput,
+  TaskTriggerOutput,
   TaskDefinitionResponse,
+  WorkersContract,
+  WorkersContractV1,
+  WorkersRouteHandler,
+  WorkersRouter,
 } from './workers.contract.ts';

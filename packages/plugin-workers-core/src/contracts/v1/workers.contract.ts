@@ -17,11 +17,24 @@ import {
   JobResponseSchema,
   JobSourceSchema,
   JobTriggerEventSchema,
-  SSEEventSchema,
+  SSEEventSchema as DomainSSEEventSchema,
   SSEEventTypes,
   TaskResponseSchema,
   TaskSourceSchema,
 } from '../../domain/mod.ts';
+
+/** Result returned by contract schema validation. */
+export type ContractSchemaResult<TOutput> =
+  | { readonly success: true; readonly data: TOutput }
+  | { readonly success: false; readonly error: unknown };
+
+/** Package-owned structural schema surface for worker contracts. */
+export interface ContractSchema<TOutput = unknown, TInput = unknown> {
+  /** Parse an input value or throw a validation error. */
+  parse(input: TInput): TOutput;
+  /** Parse an input value and return a result object instead of throwing. */
+  safeParse(input: TInput): ContractSchemaResult<TOutput>;
+}
 
 const nonNegativeInt = (description: string): z.ZodNumber =>
   z.number().int().nonnegative().describe(description);
@@ -69,7 +82,14 @@ const baseContractValue: ReturnType<typeof oc.errors> = oc.errors({
 type BaseContract = typeof baseContractValue;
 const baseContract: BaseContract = baseContractValue;
 
-export const JobDefinitionResponseSchema: typeof JobResponseSchema = JobResponseSchema;
+/** Public response returned for worker job definitions. */
+export type JobDefinitionResponse = Readonly<Record<string, unknown>>;
+
+const JobDefinitionResponseZodSchema = JobResponseSchema;
+
+/** Schema for worker job definition responses. */
+export const JobDefinitionResponseSchema: ContractSchema<JobDefinitionResponse> =
+  JobDefinitionResponseZodSchema as unknown as ContractSchema<JobDefinitionResponse>;
 
 type ExecutionRecordResponseShape =
   & Omit<
@@ -90,11 +110,23 @@ const ExecutionRecordResponseSchemaValue: z.ZodObject<ExecutionRecordResponseSha
     executionId: z.string().uuid().describe('Execution ID'),
   });
 
-type ExecutionRecordResponseSchema = typeof ExecutionRecordResponseSchemaValue;
-export const ExecutionRecordResponseSchema: ExecutionRecordResponseSchema =
-  ExecutionRecordResponseSchemaValue;
+const ExecutionRecordResponseZodSchema = ExecutionRecordResponseSchemaValue;
 
-export const TaskDefinitionResponseSchema: typeof TaskResponseSchema = TaskResponseSchema;
+/** Public response returned for worker execution records. */
+export type ExecutionRecordResponse = Readonly<Record<string, unknown> & { executionId: string }>;
+
+/** Schema for worker execution record responses. */
+export const ExecutionRecordResponseSchema: ContractSchema<ExecutionRecordResponse> =
+  ExecutionRecordResponseZodSchema as unknown as ContractSchema<ExecutionRecordResponse>;
+
+/** Public response returned for worker task definitions. */
+export type TaskDefinitionResponse = Readonly<Record<string, unknown>>;
+
+const TaskDefinitionResponseZodSchema = TaskResponseSchema;
+
+/** Schema for worker task definition responses. */
+export const TaskDefinitionResponseSchema: ContractSchema<TaskDefinitionResponse> =
+  TaskDefinitionResponseZodSchema as unknown as ContractSchema<TaskDefinitionResponse>;
 
 type JobFiltersShape = {
   enabled: z.ZodOptional<z.ZodCoercedBoolean<unknown>>;
@@ -113,7 +145,11 @@ const JobFiltersShapeValue: JobFiltersShape = {
 };
 const JobFiltersShape: JobFiltersShape = JobFiltersShapeValue;
 
-export const JobFiltersSchema: z.ZodObject<typeof JobFiltersShape> = z.object(JobFiltersShape);
+const JobFiltersZodSchema: z.ZodObject<typeof JobFiltersShape> = z.object(JobFiltersShape);
+
+/** Schema for list-jobs filters. */
+export const JobFiltersSchema: ContractSchema<Readonly<Record<string, unknown>>> =
+  JobFiltersZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type ExecutionFiltersShape = {
   jobId: z.ZodOptional<z.ZodString>;
@@ -128,7 +164,7 @@ const ExecutionFiltersShapeValue: ExecutionFiltersShape = {
 };
 const ExecutionFiltersShape: ExecutionFiltersShape = ExecutionFiltersShapeValue;
 
-export const ExecutionFiltersSchema: z.ZodObject<typeof ExecutionFiltersShape> = z.object(
+const ExecutionFiltersZodSchema: z.ZodObject<typeof ExecutionFiltersShape> = z.object(
   ExecutionFiltersShape,
 );
 
@@ -145,7 +181,15 @@ const TaskFiltersShapeValue: TaskFiltersShape = {
 };
 const TaskFiltersShape: TaskFiltersShape = TaskFiltersShapeValue;
 
-export const TaskFiltersSchema: z.ZodObject<typeof TaskFiltersShape> = z.object(TaskFiltersShape);
+/** Schema for list-executions filters. */
+export const ExecutionFiltersSchema: ContractSchema<Readonly<Record<string, unknown>>> =
+  ExecutionFiltersZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
+
+const TaskFiltersZodSchema: z.ZodObject<typeof TaskFiltersShape> = z.object(TaskFiltersShape);
+
+/** Schema for list-tasks filters. */
+export const TaskFiltersSchema: ContractSchema<Readonly<Record<string, unknown>>> =
+  TaskFiltersZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobCreateInputShape = typeof JobEditableSchema.shape & {
   id: z.ZodOptional<z.ZodString>;
@@ -159,9 +203,13 @@ const JobCreateInputShapeValue: JobCreateInputShape = {
 };
 const JobCreateInputShape: JobCreateInputShape = JobCreateInputShapeValue;
 
-export const JobCreateInputSchema: z.ZodObject<typeof JobCreateInputShape> = z.object(
+const JobCreateInputZodSchema: z.ZodObject<typeof JobCreateInputShape> = z.object(
   JobCreateInputShape,
 );
+
+/** Schema for creating worker job definitions. */
+export const JobCreateInputSchema: ContractSchema<Readonly<Record<string, unknown>>> =
+  JobCreateInputZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobUpdateInputShape = {
   [TKey in keyof typeof JobEditableSchema.shape]: z.ZodOptional<
@@ -171,8 +219,11 @@ type JobUpdateInputShape = {
 
 const JobUpdateInputShape: JobUpdateInputShape = JobEditableSchema.partial().shape;
 const JobUpdateInputSchemaValue: z.ZodObject<JobUpdateInputShape> = z.object(JobUpdateInputShape);
-type JobUpdateInputSchema = typeof JobUpdateInputSchemaValue;
-export const JobUpdateInputSchema: JobUpdateInputSchema = JobUpdateInputSchemaValue;
+const JobUpdateInputZodSchema = JobUpdateInputSchemaValue;
+
+/** Schema for updating worker job definitions. */
+export const JobUpdateInputSchema: ContractSchema<Readonly<Record<string, unknown>>> =
+  JobUpdateInputZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobUpdateWithIdShape = JobUpdateInputShape & {
   id: z.ZodString;
@@ -184,9 +235,13 @@ const JobUpdateWithIdShapeValue: JobUpdateWithIdShape = {
 };
 const JobUpdateWithIdShape: JobUpdateWithIdShape = JobUpdateWithIdShapeValue;
 
-export const JobUpdateWithIdSchema: z.ZodObject<typeof JobUpdateWithIdShape> = z.object(
+const JobUpdateWithIdZodSchema: z.ZodObject<typeof JobUpdateWithIdShape> = z.object(
   JobUpdateWithIdShape,
 );
+
+/** Schema for updating a worker job definition by id. */
+export const JobUpdateWithIdSchema: ContractSchema<Readonly<Record<string, unknown>>> =
+  JobUpdateWithIdZodSchema as unknown as ContractSchema<Readonly<Record<string, unknown>>>;
 
 type JobTriggerInputShape =
   & Pick<
@@ -213,15 +268,21 @@ const JobTriggerInputShape: JobTriggerInputShape = {
 const JobTriggerInputSchemaValue: z.ZodObject<JobTriggerInputShape> = z.object(
   JobTriggerInputShape,
 );
-type JobTriggerInputSchema = typeof JobTriggerInputSchemaValue;
-export const JobTriggerInputSchema: JobTriggerInputSchema = JobTriggerInputSchemaValue;
+const JobTriggerInputZodSchema = JobTriggerInputSchemaValue;
 
-export type JobDefinitionResponse = z.infer<typeof JobDefinitionResponseSchema>;
-export type ExecutionRecordResponse = z.infer<typeof ExecutionRecordResponseSchema>;
-export type TaskDefinitionResponse = z.infer<typeof TaskDefinitionResponseSchema>;
-export type SSEEvent = z.infer<typeof SSEEventSchema>;
+/** Schema for triggering a worker job by id. */
+export const JobTriggerInputSchema: ContractSchema<JobTriggerInput> =
+  JobTriggerInputZodSchema as unknown as ContractSchema<JobTriggerInput>;
 
-type StandardSchemaLike<TInput = unknown, TOutput = TInput> = Readonly<{
+/** Server-sent event payload emitted by the workers service. */
+export type SSEEvent = Readonly<Record<string, unknown>>;
+
+/** Schema for server-sent event payloads emitted by the workers service. */
+export const SSEEventSchema: ContractSchema<SSEEvent> =
+  DomainSSEEventSchema as unknown as ContractSchema<SSEEvent>;
+
+/** Structural Standard Schema reference used by contract metadata. */
+export type StandardSchemaLike<TInput = unknown, TOutput = TInput> = Readonly<{
   '~standard': Readonly<{
     types?: Readonly<{
       input: TInput;
@@ -230,14 +291,16 @@ type StandardSchemaLike<TInput = unknown, TOutput = TInput> = Readonly<{
   }>;
 }>;
 
-type ContractProcedureLike<TInput = unknown, TOutput = unknown> = Readonly<{
+/** Structural oRPC procedure reference used by worker contracts. */
+export type ContractProcedureLike<TInput = unknown, TOutput = unknown> = Readonly<{
   '~orpc': Readonly<{
     inputSchema?: StandardSchemaLike<TInput>;
     outputSchema?: StandardSchemaLike<unknown, TOutput>;
   }>;
 }>;
 
-type JobTriggerInput = Readonly<{
+/** Input accepted by the trigger-job procedure. */
+export type JobTriggerInput = Readonly<{
   id: string;
   payload?: Record<string, unknown>;
   priority?: number;
@@ -247,9 +310,11 @@ type JobTriggerInput = Readonly<{
   tracestate?: string;
 }>;
 
-type JobTriggerOutput = Readonly<{ jobId: string; triggered: boolean }>;
+/** Output returned by the trigger-job procedure. */
+export type JobTriggerOutput = Readonly<{ jobId: string; triggered: boolean }>;
 
-type TaskTriggerInput = Readonly<{
+/** Input accepted by the trigger-task procedure. */
+export type TaskTriggerInput = Readonly<{
   id: string;
   payload?: Record<string, unknown>;
   priority?: number;
@@ -257,7 +322,8 @@ type TaskTriggerInput = Readonly<{
   correlationId?: string;
 }>;
 
-type TaskTriggerOutput = Readonly<{ taskId: string; triggered: boolean }>;
+/** Output returned by the trigger-task procedure. */
+export type TaskTriggerOutput = Readonly<{ taskId: string; triggered: boolean }>;
 
 /** Explicit public contract shape for worker service clients. */
 export type WorkersContract = Readonly<{
@@ -284,15 +350,15 @@ export type WorkersContract = Readonly<{
   listTopics: ContractProcedureLike;
 }>;
 
-export { SSEEventSchema, SSEEventTypes };
+export { SSEEventTypes };
 
 function createWorkersContractDefinitionInferred(): Parameters<typeof implement>[0] {
   return {
     listJobs: baseContract
       .route({ method: 'GET', path: '/jobs' })
-      .input(OffsetPaginationQuerySchema.extend(JobFiltersSchema.shape))
+      .input(OffsetPaginationQuerySchema.extend(JobFiltersZodSchema.shape))
       .output(z.object({
-        jobs: z.array(JobDefinitionResponseSchema),
+        jobs: z.array(JobDefinitionResponseZodSchema),
         total: nonNegativeInt('Total count'),
         limit: paginationLimit('Results per page'),
         offset: paginationOffset('Current offset'),
@@ -301,17 +367,17 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
     getJob: baseContract
       .route({ method: 'GET', path: '/jobs/{id}' })
       .input(z.object({ id: z.string() }))
-      .output(JobDefinitionResponseSchema),
+      .output(JobDefinitionResponseZodSchema),
 
     createJob: baseContract
       .route({ method: 'POST', path: '/jobs' })
-      .input(JobCreateInputSchema)
-      .output(JobDefinitionResponseSchema),
+      .input(JobCreateInputZodSchema)
+      .output(JobDefinitionResponseZodSchema),
 
     updateJob: baseContract
       .route({ method: 'PUT', path: '/jobs/{id}' })
-      .input(JobUpdateWithIdSchema)
-      .output(JobDefinitionResponseSchema),
+      .input(JobUpdateWithIdZodSchema)
+      .output(JobDefinitionResponseZodSchema),
 
     deleteJob: baseContract
       .route({ method: 'DELETE', path: '/jobs/{id}' })
@@ -320,14 +386,14 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
 
     triggerJob: baseContract
       .route({ method: 'POST', path: '/jobs/{id}/trigger' })
-      .input(JobTriggerInputSchema)
+      .input(JobTriggerInputZodSchema)
       .output(z.object({ jobId: z.string(), triggered: z.boolean() })),
 
     listExecutions: baseContract
       .route({ method: 'GET', path: '/executions' })
-      .input(OffsetPaginationQuerySchema.extend(ExecutionFiltersSchema.shape))
+      .input(OffsetPaginationQuerySchema.extend(ExecutionFiltersZodSchema.shape))
       .output(z.object({
-        executions: z.array(ExecutionRecordResponseSchema),
+        executions: z.array(ExecutionRecordResponseZodSchema),
         total: nonNegativeInt('Total count'),
         limit: paginationLimit('Results per page'),
       })),
@@ -335,7 +401,7 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
     getExecution: baseContract
       .route({ method: 'GET', path: '/executions/{jobId}/{executionId}' })
       .input(z.object({ jobId: z.string(), executionId: z.string(), topic: z.string().optional() }))
-      .output(ExecutionRecordResponseSchema),
+      .output(ExecutionRecordResponseZodSchema),
 
     batchQueryExecutions: baseContract
       .route({ method: 'POST', path: '/executions/query' })
@@ -347,7 +413,7 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
         limit: z.number().int().min(1).max(1000).default(500),
       }))
       .output(z.object({
-        executions: z.array(ExecutionRecordResponseSchema.extend({
+        executions: z.array(ExecutionRecordResponseZodSchema.extend({
           payload: z.record(z.string(), z.unknown()).optional(),
         })),
         total: nonNegativeInt('Total matching'),
@@ -360,7 +426,7 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
         limit: z.number().int().min(1).max(1000).default(50).optional(),
       }))
       .output(z.object({
-        executions: z.array(ExecutionRecordResponseSchema.extend({
+        executions: z.array(ExecutionRecordResponseZodSchema.extend({
           payload: z.record(z.string(), z.unknown()).optional(),
         })),
         total: nonNegativeInt('Total matching'),
@@ -368,9 +434,9 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
 
     listTasks: baseContract
       .route({ method: 'GET', path: '/tasks' })
-      .input(OffsetPaginationQuerySchema.extend(TaskFiltersSchema.shape))
+      .input(OffsetPaginationQuerySchema.extend(TaskFiltersZodSchema.shape))
       .output(z.object({
-        tasks: z.array(TaskDefinitionResponseSchema),
+        tasks: z.array(TaskDefinitionResponseZodSchema),
         total: nonNegativeInt('Total count'),
         limit: paginationLimit('Results per page'),
       })),
@@ -378,7 +444,7 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
     getTask: baseContract
       .route({ method: 'GET', path: '/tasks/{id}' })
       .input(z.object({ id: z.string() }))
-      .output(TaskDefinitionResponseSchema),
+      .output(TaskDefinitionResponseZodSchema),
 
     triggerTask: baseContract
       .route({ method: 'POST', path: '/tasks/{id}/trigger' })
@@ -401,7 +467,7 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
         offset: paginationOffset('Current offset'),
       }))
       .output(z.object({
-        executions: z.array(ExecutionRecordResponseSchema),
+        executions: z.array(ExecutionRecordResponseZodSchema),
         total: nonNegativeInt('Total count'),
         limit: paginationLimit('Results per page'),
       })),
@@ -413,7 +479,7 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
         executionId: z.string(),
         topic: z.string().optional(),
       }))
-      .output(ExecutionRecordResponseSchema),
+      .output(ExecutionRecordResponseZodSchema),
 
     cleanup: baseContract
       .route({ method: 'DELETE', path: '/cleanup' })
@@ -469,7 +535,7 @@ function createWorkersContractDefinitionInferred(): Parameters<typeof implement>
           streaming: z.coerce.boolean().optional(),
         }).optional(),
       )
-      .output(eventIterator(SSEEventSchema)),
+      .output(eventIterator(DomainSSEEventSchema)),
 
     listTopics: baseContract
       .route({ method: 'GET', path: '/topics' })
@@ -487,14 +553,21 @@ type WorkersContractDefinition = ReturnType<typeof createWorkersContractDefiniti
 function createWorkersContractDefinition(): WorkersContractDefinition {
   return createWorkersContractDefinitionInferred();
 }
+/** Worker service contract definition for client generation. */
 export const workersContract: WorkersContract =
   createWorkersContractDefinition() as unknown as WorkersContract;
-type WorkersRouteHandler = Readonly<{
+/** Structural route handler exposed by the implemented worker router. */
+export type WorkersRouteHandler = Readonly<{
   // deno-lint-ignore no-explicit-any -- structural oRPC server-contract export keeps JSR slow types contained.
   handler: <THandler extends (options: any) => unknown>(handler: THandler) => ReturnType<THandler>;
 }>;
-type WorkersRouter = Readonly<{ [TKey in keyof WorkersContract]: WorkersRouteHandler }>;
-type WorkersContractV1 = Readonly<{ $context: <TContext>() => WorkersRouter }>;
+/** Structural worker router returned after binding a context. */
+export type WorkersRouter = Readonly<{ [TKey in keyof WorkersContract]: WorkersRouteHandler }>;
+
+/** Context-binding contract wrapper for the v1 worker contract. */
+export type WorkersContractV1 = Readonly<{ $context: <TContext>() => WorkersRouter }>;
+
+/** Context-bindable worker service contract definition. */
 export const workersContractV1: WorkersContractV1 = implement(
   createWorkersContractDefinition(),
 ) as unknown as WorkersContractV1;

@@ -48,11 +48,11 @@ export function createJobFixture<TId extends string = 'test-job'>(
   const id = options.id ?? 'test-job' as TId;
   const handler = options.handler ?? (() => createSuccessResult());
   return defineJob(id)
-    .handler(handler)
+    .handler(handler as never)
     .topic(options.topic ?? DEFAULT_TOPIC)
     .tags(...options.tags ?? [])
     .metadata(options.metadata ?? {})
-    .build();
+    .build() as unknown as JobDefinition<TId>;
 }
 
 /** Create an execution record with realistic defaults. */
