@@ -1,12 +1,14 @@
 import {
   DEFAULT_TOPIC,
-  type ExecutionRecord,
-  type JobDefinition,
   JobDefinitionSchema,
-  type JobSource,
-  type RegisterJobInput,
 } from '../domain/mod.ts';
-import type { JobStoragePort } from '../ports/mod.ts';
+import type {
+  ExecutionRecord,
+  JobDefinition,
+  JobSource,
+  RegisterJobInput,
+  RegistryJobStoragePort,
+} from './registry-types.ts';
 import type { RegistryKvStore, RegistryOptions } from './registry-options.ts';
 import { Registry } from './registry.ts';
 
@@ -25,11 +27,13 @@ export type JobFilterOptions = Readonly<{
 }>;
 
 /** KV-backed job registry for runtime composition. */
-export class KvJobRegistry extends Registry<string, JobDefinition> implements JobStoragePort {
+export class KvJobRegistry extends Registry<string, JobDefinition> implements RegistryJobStoragePort {
+  /** Stable registry identifier. */
   readonly id: string;
   readonly #topic?: string;
   readonly #kv: RegistryKvStore;
 
+  /** Create a KV-backed job registry. */
   constructor(options: RegistryOptions & { kv: RegistryKvStore }) {
     super();
     this.id = options.id ?? 'kv-job-registry';
@@ -37,10 +41,12 @@ export class KvJobRegistry extends Registry<string, JobDefinition> implements Jo
     this.#kv = options.kv;
   }
 
+  /** Register or replace a job definition by key. */
   async register(key: string, value: JobDefinition): Promise<void> {
     await this.#kv.set([...JOB_PREFIX, key], value);
   }
 
+  /** Normalize and register a new job definition. */
   async registerJob(input: RegisterJobInput): Promise<JobDefinition> {
     const job = normalizeJobDefinition(input);
     const existing = await this.get(job.id);
@@ -51,11 +57,13 @@ export class KvJobRegistry extends Registry<string, JobDefinition> implements Jo
     return job;
   }
 
+  /** Get a job definition by key. */
   async get(key: string): Promise<JobDefinition | undefined> {
     const entry = await this.#kv.get<JobDefinition>([...JOB_PREFIX, key]);
     return entry?.value ?? undefined;
   }
 
+  /** List raw registry entries. */
   async entries(): Promise<readonly (readonly [string, JobDefinition])[]> {
     const result: (readonly [string, JobDefinition])[] = [];
     for await (const entry of this.#kv.list<JobDefinition>({ prefix: JOB_PREFIX })) {
@@ -64,14 +72,17 @@ export class KvJobRegistry extends Registry<string, JobDefinition> implements Jo
     return result;
   }
 
+  /** Save a job definition. */
   async saveJob(job: JobDefinition): Promise<void> {
     await this.register(job.id, job);
   }
 
+  /** Find a job definition by id. */
   findJob(jobId: string): Promise<JobDefinition | undefined> {
     return this.get(jobId);
   }
 
+  /** List jobs, optionally filtered by topic or filter options. */
   async listJobs(
     optionsOrTopic: JobFilterOptions | string | undefined = this.#topic,
   ): Promise<readonly JobDefinition[]> {
@@ -93,14 +104,17 @@ export class KvJobRegistry extends Registry<string, JobDefinition> implements Jo
     return options.limit ? jobs.slice(0, options.limit) : jobs;
   }
 
+  /** List jobs with registry filter options. */
   list(options?: JobFilterOptions): Promise<readonly JobDefinition[]> {
     return this.listJobs(options);
   }
 
+  /** List enabled jobs that define a schedule. */
   listScheduled(): Promise<readonly JobDefinition[]> {
     return this.listJobs({ enabled: true, scheduled: true });
   }
 
+  /** Update an existing job definition. */
   async update(
     jobId: string,
     updates: Partial<Omit<RegisterJobInput, 'id'>>,
@@ -116,6 +130,7 @@ export class KvJobRegistry extends Registry<string, JobDefinition> implements Jo
     return updated;
   }
 
+  /** Remove a job definition by id. */
   async unregister(jobId: string): Promise<boolean> {
     const existing = await this.get(jobId);
     if (!existing) return false;
@@ -123,23 +138,28 @@ export class KvJobRegistry extends Registry<string, JobDefinition> implements Jo
     return true;
   }
 
+  /** Enable a job definition. */
   async enable(jobId: string): Promise<boolean> {
     return await this.setEnabled(jobId, true);
   }
 
+  /** Disable a job definition. */
   async disable(jobId: string): Promise<boolean> {
     return await this.setEnabled(jobId, false);
   }
 
+  /** Save a job execution record. */
   async saveExecution(record: ExecutionRecord): Promise<void> {
     await this.#kv.set([...EXECUTION_PREFIX, record.id], record);
   }
 
+  /** Find a job execution record by id. */
   async findExecution(executionId: string): Promise<ExecutionRecord | undefined> {
     const entry = await this.#kv.get<ExecutionRecord>([...EXECUTION_PREFIX, executionId]);
     return entry?.value ?? undefined;
   }
 
+  /** Set a job enabled state. */
   private async setEnabled(jobId: string, enabled: boolean): Promise<boolean> {
     const existing = await this.get(jobId);
     if (!existing) return false;

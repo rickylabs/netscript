@@ -90,8 +90,8 @@ export function createTestWorkersRuntime(
   const runtime = createWorkersRuntime({
     ...options,
     clock: options.clock ?? Object.freeze({ now: () => new Date(0) }),
-    jobRegistry: jobStorage,
-    worker,
+    jobRegistry: jobStorage as unknown as WorkersRuntimeOptions['jobRegistry'],
+    worker: worker as unknown as WorkersRuntimeOptions['worker'],
   });
   return Object.freeze({
     ...runtime,

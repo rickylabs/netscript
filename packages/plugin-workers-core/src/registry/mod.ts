@@ -11,6 +11,16 @@ export { Registry } from './registry.ts';
 export type { JobFilterOptions } from './kv-job-registry.ts';
 export type { TaskFilterOptions } from './kv-task-registry.ts';
 export type {
+  ExecutionRecord,
+  JobDefinition,
+  JobSource,
+  RegisterJobInput,
+  RegisterTaskInput,
+  RegistryJobStoragePort,
+  TaskDefinition,
+  TaskSource,
+} from './registry-types.ts';
+export type {
   KvEntry,
   KvListSelector,
   RegistryKvStore,

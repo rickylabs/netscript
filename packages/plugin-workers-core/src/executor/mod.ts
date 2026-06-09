@@ -15,13 +15,16 @@ export {
   PowerShellRuntimeAdapter,
   PythonRuntimeAdapter,
   runProcess,
+  RuntimeAdapterBase,
   ShellRuntimeAdapter,
 } from './adapters/mod.ts';
 export type {
+  EnvironmentReader,
   ProcessRunInput,
   ProcessRunner,
   RuntimeCommandBuildContext,
   RuntimeCommandSpec,
+  RuntimeTaskMetadata,
 } from './adapters/mod.ts';
 export {
   createDefaultRuntimeAdapterMap,
@@ -31,5 +34,14 @@ export {
 export type {
   ResolvedTaskExecutionOptions,
   TaskLogEntry,
-} from '../abstracts/task-runtime-adapter.ts';
+  TaskDefinition,
+  TaskExecutionOptions,
+  TaskInstrumentationLike,
+  TaskInstrumentationSpan,
+  TaskResult,
+  TaskRuntimeAdapterLike,
+  TaskType,
+  WorkerTaskPermissionField,
+  WorkerTaskPermissions,
+} from './executor-types.ts';
 export type { MultiRuntimeTaskExecutorOptions } from './multi-runtime-task-executor.ts';

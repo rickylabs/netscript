@@ -4,6 +4,7 @@ import { RuntimeAdapterBase } from './runtime-adapter-base.ts';
 
 /** Runtime adapter for .NET task programs. */
 export class DotNetRuntimeAdapter extends RuntimeAdapterBase {
+  /** Create a .NET adapter with an optional custom process runner. */
   constructor(options: { runner?: ProcessRunner } = {}) {
     super({
       id: 'dotnet-runtime-adapter',

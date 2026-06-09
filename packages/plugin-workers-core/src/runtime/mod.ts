@@ -4,8 +4,11 @@
  * Worker runtime composition and runner contracts.
  */
 
+import { DEFAULT_TOPIC, JobKvKeys as DomainJobKvKeys, SSEEventTypes } from '../domain/mod.ts';
+import type { RuntimeJobKvKeyFactories } from './runtime-types.ts';
+
+export { DEFAULT_TOPIC, SSEEventTypes };
 export { createWorkersRuntime } from './composition-root.ts';
-export { DEFAULT_TOPIC, JobKvKeys, SSEEventTypes } from '../domain/mod.ts';
 export type {
   TaskRegistryPort,
   WorkersClock,
@@ -14,26 +17,43 @@ export type {
 } from './composition-root.ts';
 export type {
   ExecutionRecord,
+  JobId,
   JobContext,
   JobDefinition,
+  JobDispatcherOptions,
   JobHandler,
   JobMessage,
-  JobResult,
-  RegisterJobInput,
-  RegisterTaskInput,
-  TaskDefinition,
-  TaskExecutionOptions,
-  TaskMessage,
-  TaskResult,
-} from '../domain/mod.ts';
-export { InProcessJobDispatcher } from './job-dispatcher.ts';
-export type {
-  JobDispatcherOptions,
   JobModuleImporter,
   JobResolution,
   JobResolutionSource,
+  JobResult,
+  RegisterJobInput,
+  RegisterTaskInput,
+  RuntimeJobKvKeyFactories,
+  RuntimeJobStoragePort,
+  RuntimeSchedulerPort,
+  RuntimeShutdownManager,
+  RuntimeShutdownOptions,
+  RuntimeShutdownResource,
+  RuntimeTaskExecutor,
+  RuntimeTaskExecutorOptions,
+  RuntimeWorkerPort,
+  RuntimeWorkflowDefinition,
+  RuntimeWorkflowExecutor,
+  RuntimeWorkflowOptions,
   StaticJobRegistry,
-} from './job-dispatcher.ts';
+  TaskDefinition,
+  TaskExecutionOptions,
+  TaskId,
+  TaskMessage,
+  TaskResult,
+  WorkflowId,
+} from './runtime-types.ts';
+
+/** KV key factories used by the runtime storage adapters. */
+export const JobKvKeys: RuntimeJobKvKeyFactories = DomainJobKvKeys;
+
+export { InProcessJobDispatcher } from './job-dispatcher.ts';
 export { InProcessJobRunner } from './in-process-job-runner.ts';
 export type { InProcessJobRunnerOptions } from './in-process-job-runner.ts';
 export { JOB_STATE_CHANNEL } from './messages.ts';

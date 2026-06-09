@@ -1,4 +1,4 @@
-import type { TaskDefinition } from '../domain/mod.ts';
+import type { TaskDefinition as DomainTaskDefinition } from '../domain/mod.ts';
 import { createDefaultTaskExecutor } from '../executor/mod.ts';
 import type { MultiRuntimeTaskExecutorOptions, TaskExecutor } from '../executor/mod.ts';
 import type { JobStoragePort, SchedulerPort, WorkerPort } from '../ports/mod.ts';
@@ -9,6 +9,18 @@ import { WorkflowExecutor } from '../workflow/mod.ts';
 import type { WorkflowExecutorOptions } from '../workflow/mod.ts';
 import { InProcessJobRunner } from './in-process-job-runner.ts';
 import type { StaticJobRegistry } from './job-dispatcher.ts';
+import type {
+  RuntimeJobStoragePort,
+  RuntimeSchedulerPort,
+  RuntimeShutdownManager,
+  RuntimeShutdownOptions,
+  RuntimeTaskExecutor,
+  RuntimeTaskExecutorOptions,
+  RuntimeWorkerPort,
+  RuntimeWorkflowExecutor,
+  RuntimeWorkflowOptions,
+  TaskDefinition,
+} from './runtime-types.ts';
 
 /** Clock contract used by runtime tests and schedulers. */
 export type WorkersClock = Readonly<{
@@ -27,17 +39,17 @@ export type TaskRegistryPort = Readonly<{
 export type WorkersRuntimeOptions = Readonly<{
   id?: string;
   clock?: WorkersClock;
-  jobRegistry?: JobStoragePort;
+  jobRegistry?: RuntimeJobStoragePort;
   taskRegistry?: TaskRegistryPort;
-  worker?: WorkerPort;
-  scheduler?: SchedulerPort;
-  taskExecutor?: TaskExecutor;
-  taskExecutorOptions?: MultiRuntimeTaskExecutorOptions;
-  workflowExecutor?: WorkflowExecutor;
-  workflow?: WorkflowExecutorOptions;
-  shutdownManager?: ShutdownManager;
-  shutdown?: ShutdownManagerOptions;
-  staticJobRegistry?: StaticJobRegistry;
+  worker?: RuntimeWorkerPort;
+  scheduler?: RuntimeSchedulerPort;
+  taskExecutor?: RuntimeTaskExecutor;
+  taskExecutorOptions?: RuntimeTaskExecutorOptions;
+  workflowExecutor?: RuntimeWorkflowExecutor;
+  workflow?: RuntimeWorkflowOptions;
+  shutdownManager?: RuntimeShutdownManager;
+  shutdown?: RuntimeShutdownOptions;
+  staticJobRegistry?: import('./runtime-types.ts').StaticJobRegistry;
   fallbackToDynamicImport?: boolean;
 }>;
 
@@ -45,13 +57,13 @@ export type WorkersRuntimeOptions = Readonly<{
 export type WorkersRuntime = Readonly<{
   readonly id: string;
   readonly clock: WorkersClock;
-  readonly jobRegistry: JobStoragePort;
+  readonly jobRegistry: RuntimeJobStoragePort;
   readonly taskRegistry: TaskRegistryPort;
-  readonly worker: WorkerPort;
-  readonly scheduler?: SchedulerPort;
-  readonly taskExecutor: TaskExecutor;
-  readonly workflowExecutor: WorkflowExecutor;
-  readonly shutdown: ShutdownManager;
+  readonly worker: RuntimeWorkerPort;
+  readonly scheduler?: RuntimeSchedulerPort;
+  readonly taskExecutor: RuntimeTaskExecutor;
+  readonly workflowExecutor: RuntimeWorkflowExecutor;
+  readonly shutdown: RuntimeShutdownManager;
   start(): Promise<void>;
   stop(reason?: string): Promise<void>;
 }>;
@@ -62,14 +74,14 @@ const systemClock: WorkersClock = Object.freeze({
 
 class MemoryTaskRegistry implements TaskRegistryPort {
   readonly id: string;
-  readonly #tasks = new Map<string, TaskDefinition>();
+  readonly #tasks = new Map<string, DomainTaskDefinition>();
 
   constructor(id = 'memory-task-registry') {
     this.id = id;
   }
 
   saveTask(task: TaskDefinition): Promise<void> {
-    this.#tasks.set(task.id, task);
+    this.#tasks.set(task.id, task as DomainTaskDefinition);
     return Promise.resolve();
   }
 
@@ -85,22 +97,24 @@ class MemoryTaskRegistry implements TaskRegistryPort {
 /** Create a fresh workers runtime from explicit dependencies. */
 export function createWorkersRuntime(options: WorkersRuntimeOptions = {}): WorkersRuntime {
   const id = options.id ?? 'workers-runtime';
-  const jobRegistry = options.jobRegistry ?? new MemoryJobRegistry();
+  const jobRegistry = (options.jobRegistry ?? new MemoryJobRegistry()) as JobStoragePort;
   const taskRegistry = options.taskRegistry ?? new MemoryTaskRegistry();
-  const worker = options.worker ?? new InProcessJobRunner({
+  const worker = (options.worker ?? new InProcessJobRunner({
     fallbackToDynamicImport: options.fallbackToDynamicImport,
-    registry: options.staticJobRegistry,
-  });
-  const workflowExecutor = options.workflowExecutor ?? new WorkflowExecutor({
-    clock: options.workflow?.clock ?? options.clock,
-    runJobStep: options.workflow?.runJobStep,
-    runTaskStep: options.workflow?.runTaskStep,
-    sleep: options.workflow?.sleep,
-    stateStore: options.workflow?.stateStore,
-  });
+    registry: options.staticJobRegistry as StaticJobRegistry | undefined,
+  })) as WorkerPort;
+  const workflowExecutor = (options.workflowExecutor ?? new WorkflowExecutor({
+    clock: (options.workflow?.clock ?? options.clock) as WorkflowExecutorOptions['clock'],
+    runJobStep: options.workflow?.runJobStep as WorkflowExecutorOptions['runJobStep'],
+    runTaskStep: options.workflow?.runTaskStep as WorkflowExecutorOptions['runTaskStep'],
+    sleep: options.workflow?.sleep as WorkflowExecutorOptions['sleep'],
+    stateStore: options.workflow?.stateStore as WorkflowExecutorOptions['stateStore'],
+  })) as WorkflowExecutor;
   const taskExecutor = options.taskExecutor ??
-    createDefaultTaskExecutor(options.taskExecutorOptions ?? {});
-  const shutdown = options.shutdownManager ?? new ShutdownManager(options.shutdown);
+    createDefaultTaskExecutor((options.taskExecutorOptions ?? {}) as MultiRuntimeTaskExecutorOptions);
+  const shutdown = (options.shutdownManager ?? new ShutdownManager(
+    options.shutdown as ShutdownManagerOptions | undefined,
+  )) as ShutdownManager;
 
   shutdown.register({
     id: 'worker',
@@ -120,13 +134,13 @@ export function createWorkersRuntime(options: WorkersRuntimeOptions = {}): Worke
   return Object.freeze({
     id,
     clock: options.clock ?? systemClock,
-    jobRegistry,
+    jobRegistry: jobRegistry as unknown as RuntimeJobStoragePort,
     taskRegistry,
-    worker,
+    worker: worker as unknown as RuntimeWorkerPort,
     scheduler: options.scheduler,
-    shutdown,
-    taskExecutor,
-    workflowExecutor,
+    shutdown: shutdown as unknown as RuntimeShutdownManager,
+    taskExecutor: taskExecutor as unknown as RuntimeTaskExecutor,
+    workflowExecutor: workflowExecutor as unknown as RuntimeWorkflowExecutor,
     start(): Promise<void> {
       started = true;
       return Promise.resolve();
