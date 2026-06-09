@@ -36,3 +36,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 00af803: fix(triggers): expose D12 cli stream contracts
 - bd7e0bc: docs(wave4): record D12 cli stream evidence
 - 225e05c: fix(triggers): expose D13 service scaffolding contracts
+- 82b5b64: docs(wave4): record D13 service scaffolding evidence
+- 5d25e90: chore(triggers): validate D14 runtime docs

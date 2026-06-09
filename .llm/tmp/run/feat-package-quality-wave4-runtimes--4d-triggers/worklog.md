@@ -301,4 +301,21 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Info row recorded: D13 pulled same-file D16 scaffolding JSDoc forward so the raw D13 scaffolding gate is green. |
-| Commits | Implementation `225e05c`; paired docs/evidence pending. |
+| Commits | Implementation `225e05c`; paired docs/evidence `82b5b64`. |
+
+### Slice 14/23 — D14 plugin runtime JSDoc residual
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | No additional code changes; D11 already added runtime public-member JSDoc so D11's raw doc-lint gate could pass. D14 is preserved as a residual validation slice. |
+| Gate(s) | F-7 doc-score |
+| Gate command | `deno doc --lint src/runtime/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file` with inherited Fedify npm type-resolution warnings only. |
+| Gate command | `deno fmt --check plugins/triggers/src/runtime/cron-trigger-scheduler-adapter.ts plugins/triggers/src/runtime/kv-trigger-runtime-stores.ts plugins/triggers/src/runtime/project-trigger-registry.ts plugins/triggers/src/runtime/trigger-runtime-processor.ts plugins/triggers/src/runtime/trigger-processor.ts plugins/triggers/src/runtime/watchers-file-watcher-adapter.ts plugins/triggers/src/runtime/mod.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 7 files`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Covered by D11 warn row: same-file D14 runtime JSDoc blockers were pulled forward to keep D11 raw doc-lint green. |
+| Commits | Implementation `5d25e90`; paired docs/evidence pending. |
