@@ -100,6 +100,12 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `ee9f26b` (carries merged
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) 4b → umbrella after IMPL-EVAL PASS. 4c forks off the 4b-merged umbrella. |
 
+## Implementation slices
+
+| Slice | Unit | Archetype | Subject | Gate(s) | Result | Commit |
+|-------|------|-----------|---------|---------|--------|--------|
+| 1/27 | `@netscript/plugin-workers-core` | A3 | Declare runtime archetype in `docs/architecture.md` | `deno check --unstable-kv mod.ts`; declaration grep | PASS — raw check exit 0; A3, Runtime/Aspire, and consumer-import text present | `0eec3df` |
+
 ## Readiness note
 
 - 2026-06-08: Prepared in parallel; invariant to 4a EXCEPT `workers-core ./streams` (re-exports

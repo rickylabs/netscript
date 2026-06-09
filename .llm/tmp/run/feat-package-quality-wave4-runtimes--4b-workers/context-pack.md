@@ -8,14 +8,11 @@ PR target: the **umbrella** `feat/package-quality-wave4-runtimes` (NOT the track
 Role: SUPERVISOR-authored seed + pre-research. The locked slice authority is this
 sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 
-## ⏳ STATUS: PREPARED IN PARALLEL — DO NOT LOCK YET
+## STATUS: IMPLEMENTATION IN PROGRESS
 
-Prepared ahead of turn (user-approved) so the Plan & Design agent starts with maximum
-context. **Forks off the umbrella, NOT off 4a.** Before this sub-wave's plan locks:
-**4a (streams + watchers) must merge into the umbrella**, then **pull the umbrella forward
-into this branch** (`git merge feat/package-quality-wave4-runtimes`). Reason: `workers-core`
-exports `./streams` (re-exports `@netscript/plugin-streams-core`) — that surface settles
-at the 4a merge. Re-run MEASURE-FIRST after the pull-forward.
+PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
+order. Slice C1 is complete and pushed: `0eec3df` (`docs(workers-core): declare runtime
+archetype`), with raw `deno check --unstable-kv mod.ts` passing for `plugin-workers-core`.
 
 ## Scope — 2 publishable units (long pole #1)
 
