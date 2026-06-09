@@ -35,3 +35,4 @@
 
 | Date | Severity | Item | Evidence | Action |
 |------|----------|------|----------|--------|
+| 2026-06-09 | info | C14 validation sweep required first-party contract refinements | Raw consumer-import initially exposed `JobMessage`, runtime/registry definition, execution-record, and workers stream-schema structural type gaps. Fixes were limited to `@netscript/plugin-workers-core` public first-party contracts plus package-local formatting; no locked surface was added or removed. | Recorded in slice C14. Consumer-import now passes for `plugins/triggers`, `plugins/sagas`, `plugins/workers`, and `packages/cli`; full-export doc-lint remains 0/0/0. |

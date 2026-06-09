@@ -11,9 +11,12 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C13 are complete and pushed. Latest implementation commit: `55f162b`
-(`docs(workers-core): document entrypoint surface`), with full-export workers-core doc-lint
-at 0/0/0 across all 16 retained entrypoints and raw core 16-entrypoint check passing.
+order. Slices C1-C14 are complete and pushed. Latest implementation commit: `e2670ce`
+(`fix(workers-core): complete validation sweep`). The 4b-core sweep is green: dry-run PASS
+with 0 slow types, full-export doc-lint 0/0/0 across all 16 retained entrypoints, raw
+16-entrypoint `deno check --unstable-kv` PASS, lint PASS, fmt check PASS, tests PASS
+16/0, live runtime smoke PASS, and consumer-import checks PASS for triggers, sagas,
+workers, and CLI entrypoints.
 
 ## Scope — 2 publishable units (long pole #1)
 

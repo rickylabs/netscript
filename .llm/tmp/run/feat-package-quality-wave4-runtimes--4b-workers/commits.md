@@ -18,6 +18,7 @@ Branch: `feat/package-quality-wave4-runtimes-4b` → umbrella `feat/package-qual
 | C11 impl | 2c601c6 | docs(workers-core): document state telemetry shutdown APIs | C11 |
 | C12 impl | f8051e5 | refactor(workers-core): split workers contract concepts | C12 |
 | C13 impl | 55f162b | docs(workers-core): document entrypoint surface | C13 |
+| C14 impl | e2670ce | fix(workers-core): complete validation sweep | C14 |
 
 (If split into `4b-core`/`4b-plugin`, each gets its own nested run dir + commits.md. Pair each
 implementation slice commit with its `docs(wave4): record …` doc-record commit.)
