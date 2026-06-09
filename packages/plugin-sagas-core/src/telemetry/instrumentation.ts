@@ -8,23 +8,33 @@ import {
   SagaTelemetryOutcomes,
 } from './attributes.ts';
 
+/** Attribute value accepted by the structural telemetry boundary. */
 export type SagaTelemetryAttributeValue = string | number | boolean | undefined;
+/** Attribute map attached to saga spans and metrics. */
 export type SagaTelemetryAttributes = Readonly<Record<string, SagaTelemetryAttributeValue>>;
 
+/** Span kind values supported by saga instrumentation. */
 export type SagaTelemetrySpanKind = 'internal' | 'producer' | 'consumer';
+/** Span status values supported by saga instrumentation. */
 export type SagaTelemetryStatus = 'ok' | 'error';
 
 /** Structural span boundary compatible with OpenTelemetry adapters. */
 export interface SagaTelemetrySpan {
+  /** Attach a single defined attribute to the span. */
   setAttribute(key: string, value: Exclude<SagaTelemetryAttributeValue, undefined>): void;
+  /** Add a named event with optional attributes to the span. */
   addEvent(name: string, attributes?: SagaTelemetryAttributes): void;
+  /** Set the completion status for the span. */
   setStatus(status: SagaTelemetryStatus, description?: string): void;
+  /** Record an exception object on the span. */
   recordException(error: unknown): void;
+  /** End the span, optionally at a supplied timestamp. */
   end(endTime?: Date): void;
 }
 
 /** Structural tracer boundary supplied by composition roots. */
 export interface SagaTelemetryTracer {
+  /** Start a saga telemetry span. */
   startSpan(
     name: string,
     options: Readonly<{
@@ -34,15 +44,21 @@ export interface SagaTelemetryTracer {
   ): SagaTelemetrySpan;
 }
 
+/** Counter instrument boundary used by saga metrics. */
 export interface SagaTelemetryCounter {
+  /** Add a delta to the counter with optional attributes. */
   add(value: number, attributes?: SagaTelemetryAttributes): void;
 }
 
+/** Histogram instrument boundary used by saga duration metrics. */
 export interface SagaTelemetryHistogram {
+  /** Record one observed value with optional attributes. */
   record(value: number, attributes?: SagaTelemetryAttributes): void;
 }
 
+/** Gauge instrument boundary used by active-instance metrics. */
 export interface SagaTelemetryGauge {
+  /** Record a current gauge value with optional attributes. */
   record(value: number, attributes?: SagaTelemetryAttributes): void;
 }
 
@@ -57,11 +73,13 @@ export type SagaTelemetryMeter = Readonly<{
   replayDurationMs?: SagaTelemetryHistogram;
 }>;
 
+/** Dependencies used to create saga instrumentation. */
 export type SagaInstrumentationOptions = Readonly<{
   tracer?: SagaTelemetryTracer;
   meter?: SagaTelemetryMeter;
 }>;
 
+/** Input attributes for a saga handle span. */
 export type SagaHandleSpanInput = Readonly<{
   sagaId: string;
   instanceId?: string;
@@ -71,6 +89,7 @@ export type SagaHandleSpanInput = Readonly<{
   correlationKey?: string;
 }>;
 
+/** Input attributes for a send cascade span. */
 export type SagaCascadeSendInput = Readonly<{
   targetJobId?: string;
   idempotencyKey?: string;
@@ -79,21 +98,25 @@ export type SagaCascadeSendInput = Readonly<{
   queueName?: string;
 }>;
 
+/** Input attributes for a scheduled cascade span. */
 export type SagaCascadeScheduleInput = Readonly<{
   scheduledFor?: Date;
   delayMs?: number;
 }>;
 
+/** Input attributes for a child saga spawn span. */
 export type SagaCascadeSpawnInput = Readonly<{
   childSagaId: string;
   childInstanceId?: string;
 }>;
 
+/** Input attributes for a compensation cascade span. */
 export type SagaCascadeCompensateInput = Readonly<{
   reason?: string;
   cascadeSize: number;
 }>;
 
+/** Input attributes for saga handle duration metrics. */
 export type SagaHandleMetricInput =
   & SagaHandleSpanInput
   & Readonly<{
@@ -101,6 +124,7 @@ export type SagaHandleMetricInput =
     durationMs: number;
   }>;
 
+/** Input attributes for saga error counters. */
 export type SagaErrorMetricInput = Readonly<{
   sagaId: string;
   errorClass: string;
@@ -125,14 +149,18 @@ const NOOP_TRACER: SagaTelemetryTracer = Object.freeze({
 
 /** Saga telemetry facade with explicit tracer and meter dependencies. */
 export class SagaInstrumentation {
+  /** Tracer used to create saga spans. */
   readonly tracer: SagaTelemetryTracer;
+  /** Optional meter used to record saga metrics. */
   readonly meter?: SagaTelemetryMeter;
 
+  /** Create instrumentation with optional tracer and meter dependencies. */
   constructor(options: SagaInstrumentationOptions = {}) {
     this.tracer = options.tracer ?? NOOP_TRACER;
     this.meter = options.meter;
   }
 
+  /** Start a span for handling one saga event. */
   startHandleSpan(input: SagaHandleSpanInput): SagaTelemetrySpan {
     return this.tracer.startSpan(SagaSpanNames.HANDLE, {
       kind: 'internal',
@@ -140,6 +168,7 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Start a span for a send cascade. */
   startCascadeSendSpan(input: SagaCascadeSendInput): SagaTelemetrySpan {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_SEND, {
       kind: 'producer',
@@ -153,6 +182,7 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Start a span for a scheduled cascade. */
   startCascadeScheduleSpan(input: SagaCascadeScheduleInput): SagaTelemetrySpan {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_SCHEDULE, {
       kind: 'producer',
@@ -163,6 +193,7 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Start a span for a child saga spawn cascade. */
   startCascadeSpawnSpan(input: SagaCascadeSpawnInput): SagaTelemetrySpan {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_SPAWN, {
       kind: 'producer',
@@ -173,6 +204,7 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Start a span for a compensation cascade. */
   startCascadeCompensateSpan(input: SagaCascadeCompensateInput): SagaTelemetrySpan {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_COMPENSATE, {
       kind: 'internal',
@@ -183,18 +215,22 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Start a span for cascade completion bookkeeping. */
   startCascadeCompleteSpan(): SagaTelemetrySpan {
     return this.tracer.startSpan(SagaSpanNames.CASCADE_COMPLETE, { kind: 'internal' });
   }
 
+  /** Record a state-before event on a saga span. */
   recordStateBefore(span: SagaTelemetrySpan, attributes: SagaTelemetryAttributes = {}): void {
     span.addEvent(SagaSpanEvents.STATE_BEFORE, attributes);
   }
 
+  /** Record a state-after event on a saga span. */
   recordStateAfter(span: SagaTelemetrySpan, attributes: SagaTelemetryAttributes = {}): void {
     span.addEvent(SagaSpanEvents.STATE_AFTER, attributes);
   }
 
+  /** Finish a saga span with outcome and optional error details. */
   finishSpan(
     span: SagaTelemetrySpan,
     outcome: SagaTelemetryOutcome = SagaTelemetryOutcomes.SUCCESS,
@@ -210,6 +246,7 @@ export class SagaInstrumentation {
     span.end();
   }
 
+  /** Record saga event handling duration. */
   recordHandleDuration(input: SagaHandleMetricInput): void {
     this.meter?.handleDurationMs?.record(input.durationMs, {
       [SagaAttributes.SAGA_ID]: input.sagaId,
@@ -218,12 +255,14 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Record the current active instance count for a saga. */
   recordInstancesActive(sagaId: string, activeInstances: number): void {
     this.meter?.instancesActive?.record(activeInstances, {
       [SagaAttributes.SAGA_ID]: sagaId,
     });
   }
 
+  /** Record one compensation event. */
   recordCompensation(sagaId: string, reason: string): void {
     this.meter?.compensationsTotal?.add(1, {
       [SagaAttributes.SAGA_ID]: sagaId,
@@ -231,6 +270,7 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Record one dead-lettered saga event. */
   recordDlq(input: SagaErrorMetricInput): void {
     this.meter?.dlqTotal?.add(1, {
       [SagaAttributes.SAGA_ID]: input.sagaId,
@@ -238,12 +278,14 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Record one idempotency hit. */
   recordIdempotencyHit(sagaId: string): void {
     this.meter?.idempotencyHitsTotal?.add(1, {
       [SagaAttributes.SAGA_ID]: sagaId,
     });
   }
 
+  /** Record one concurrency-throttled dispatch. */
   recordConcurrencyThrottled(sagaId: string, concurrencyKey: string): void {
     this.meter?.concurrencyThrottledTotal?.add(1, {
       [SagaAttributes.SAGA_ID]: sagaId,
@@ -251,6 +293,7 @@ export class SagaInstrumentation {
     });
   }
 
+  /** Record saga replay duration. */
   recordReplayDuration(sagaId: string, durationMs: number): void {
     this.meter?.replayDurationMs?.record(durationMs, {
       [SagaAttributes.SAGA_ID]: sagaId,
