@@ -9,13 +9,13 @@ description: >
 
 # NetScript Harness v2 — Orchestration Skill
 
-This skill coordinates harness-mode runs. The authoritative harness docs live
-under `.llm/harness/`; this skill tells you what to load and in what order.
+This skill coordinates harness-mode runs. The authoritative harness docs live under `.llm/harness/`;
+this skill tells you what to load and in what order.
 
 ## 1. Activation
 
-The harness activates on any prompt containing `use harness` or an equivalent
-request for a harnessed run.
+The harness activates on any prompt containing `use harness` or an equivalent request for a
+harnessed run.
 
 On activation, read:
 
@@ -29,28 +29,30 @@ On activation, read:
 For package/plugin work, also use `.claude/skills/netscript-doctrine/SKILL.md`.
 
 For a **supervisor run** (two or more capability-scoped phase groups), also read
-`.llm/harness/workflow/supervisor.md` and `.llm/harness/workflow/escalation.md`,
-and track the groups in `phase-registry.md`.
+`.llm/harness/workflow/supervisor.md` and `.llm/harness/workflow/escalation.md`, and track the
+groups in `phase-registry.md`.
+
+For OpenHands, Copilot, Augment, or local-agent handoffs during a run, also read
+`.llm/harness/workflow/agent-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
 
 ## 2. From Prompt Profile to v2 Profile
 
-The user may still write `profile: package`, `profile: docs`, or similar. In v2
-that field is an intent hint, not the final profile.
+The user may still write `profile: package`, `profile: docs`, or similar. In v2 that field is an
+intent hint, not the final profile.
 
-| User hint | v2 selection |
-|-----------|--------------|
-| `package` | identify `ARCHETYPE-1` through `ARCHETYPE-6` |
-| `plugin` | normally `ARCHETYPE-5`, unless sibling packages also change |
-| `frontend` | affected archetype(s) plus `SCOPE-frontend.md` |
-| `service` | affected archetype(s) plus `SCOPE-service.md` |
-| `docs` or `knowledge-base` | `SCOPE-docs.md` plus any described archetypes |
+| User hint                  | v2 selection                                                |
+| -------------------------- | ----------------------------------------------------------- |
+| `package`                  | identify `ARCHETYPE-1` through `ARCHETYPE-6`                |
+| `plugin`                   | normally `ARCHETYPE-5`, unless sibling packages also change |
+| `frontend`                 | affected archetype(s) plus `SCOPE-frontend.md`              |
+| `service`                  | affected archetype(s) plus `SCOPE-service.md`               |
+| `docs` or `knowledge-base` | `SCOPE-docs.md` plus any described archetypes               |
 
 If no package/plugin is touched, an overlay-only run is valid.
 
 ## 3. Run ID
 
-`<run-id>` is the current branch name with `/` replaced by `-`, followed by
-`--<suffix>`.
+`<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
 
 Example:
 
@@ -60,28 +62,27 @@ feat/frontend-rfc-implementation -> feat-frontend-rfc-implementation--package-kv
 
 ## 4. Run Artifacts
 
-Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from
-`.llm/harness/templates/`.
+Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from `.llm/harness/templates/`.
 
-| File | Purpose |
-|------|---------|
-| `plan.md` | approved scope, archetype, gates, debt implications |
-| `implement.md` | generator prompt when needed |
-| `worklog.md` | implementation evidence and gate results |
-| `evaluate.md` | separate evaluator verdict |
-| `context-pack.md` | resumable summary |
-| `drift.md` | append-only drift log |
-| `commits.md` | append-only commit list |
+| File                | Purpose                                                        |
+| ------------------- | -------------------------------------------------------------- |
+| `plan.md`           | approved scope, archetype, gates, debt implications            |
+| `implement.md`      | generator prompt when needed                                   |
+| `worklog.md`        | implementation evidence and gate results                       |
+| `evaluate.md`       | separate evaluator verdict                                     |
+| `context-pack.md`   | resumable summary                                              |
+| `drift.md`          | append-only drift log                                          |
+| `commits.md`        | append-only commit list                                        |
 | `phase-registry.md` | supervisor runs only: phase-group map + live status (template) |
 
-Append `commits.md` immediately after every commit. Supervisor runs additionally
-keep `phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder;
-brief each group agent with `templates/agent-briefing.md`.
+Append `commits.md` immediately after every commit. Supervisor runs additionally keep
+`phase-registry.md`, `final-pr-handoff.md`, and an `escalations/` folder; brief each group agent
+with `templates/agent-briefing.md`.
 
 ## 5. `.llm/tmp` Path Caveat
 
-Some search/index tools may skip or lag on `.llm/tmp/`. Verify run paths with a
-direct filesystem listing when needed:
+Some search/index tools may skip or lag on `.llm/tmp/`. Verify run paths with a direct filesystem
+listing when needed:
 
 ```powershell
 dir /s /b ".llm\tmp\run\<id>" 2>&1
@@ -101,12 +102,10 @@ When external docs or examples matter:
 
 The evaluator must be a separate session.
 
-- Generator writes `worklog.md`, `context-pack.md`, `drift.md`, and
-  `commits.md`.
-- Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog,
-  context pack, drift, commits, selected archetype, overlays, and gate docs.
-- Evaluator writes `evaluate.md` with `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or
-  `FAIL_DEBT`.
+- Generator writes `worklog.md`, `context-pack.md`, `drift.md`, and `commits.md`.
+- Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog, context pack, drift,
+  commits, selected archetype, overlays, and gate docs.
+- Evaluator writes `evaluate.md` with `PASS`, `FAIL_FIX`, `FAIL_RESCOPE`, or `FAIL_DEBT`.
 - Eval loop limit is two failures before escalation.
 
 ## 8. Commit Tracking
@@ -126,22 +125,21 @@ Commit log format:
 
 ## 9. Rescoping
 
-Rescope when the real work is materially larger than the approved plan or when
-the selected archetype is wrong. Confirm with the user before expanding scope.
+Rescope when the real work is materially larger than the approved plan or when the selected
+archetype is wrong. Confirm with the user before expanding scope.
 
-Record rescope evidence in `drift.md` with severity `significant` or
-`architectural`.
+Record rescope evidence in `drift.md` with severity `significant` or `architectural`.
 
 ## 10. Where Lessons Belong
 
-| Content type | Destination |
-|--------------|-------------|
-| Generic run mechanics | `.llm/harness/workflow/` |
-| Archetype-specific gates or false-done states | `.llm/harness/archetypes/` |
-| Stable repeated cross-run lessons | `.llm/harness/lessons/` |
-| Package/plugin doctrine navigation | `.claude/skills/netscript-doctrine/` |
-| Deep domain expertise | a focused skill |
-| Deferred doctrine violations | `.llm/harness/debt/arch-debt.md` |
+| Content type                                  | Destination                          |
+| --------------------------------------------- | ------------------------------------ |
+| Generic run mechanics                         | `.llm/harness/workflow/`             |
+| Archetype-specific gates or false-done states | `.llm/harness/archetypes/`           |
+| Stable repeated cross-run lessons             | `.llm/harness/lessons/`              |
+| Package/plugin doctrine navigation            | `.claude/skills/netscript-doctrine/` |
+| Deep domain expertise                         | a focused skill                      |
+| Deferred doctrine violations                  | `.llm/harness/debt/arch-debt.md`     |
 
 ## Quick Decision Tree
 
@@ -152,6 +150,7 @@ User says "use harness"
   -> package/plugin? select ARCHETYPE-* and load netscript-doctrine
   -> frontend/service/docs? apply SCOPE-* overlay
   -> two or more phase groups? read workflow/supervisor.md + escalation.md, keep phase-registry.md
+  -> OpenHands/local/cloud handoff? read workflow/agent-handoff.md
   -> read gate matrix
   -> update run artifacts while working
   -> commit tracking required? append commits.md after every commit

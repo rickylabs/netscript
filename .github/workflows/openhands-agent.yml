@@ -1,0 +1,355 @@
+name: OpenHands Agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: Task prompt for OpenHands.
+        required: true
+        type: string
+      model:
+        description: Literal LiteLLM model id. Overrides model_profile when set.
+        required: false
+        type: string
+      model_profile:
+        description: Model profile to use when model is empty.
+        required: false
+        default: sonnet
+        type: choice
+        options:
+          - sonnet
+          - gpt
+          - gemini
+      target_pr:
+        description: Optional PR number to inspect/comment on.
+        required: false
+        type: string
+      output_mode:
+        description: Required output behavior.
+        required: false
+        default: pr-comment
+        type: choice
+        options:
+          - pr-comment
+          - respond-comments
+          - thread-replies
+          - summary-only
+  issues:
+    types: [labeled]
+  pull_request:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+  push:
+    branches:
+      - '**'
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: openhands-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  agent:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[openhands')) ||
+      (github.event_name == 'issue_comment' &&
+        contains(github.event.comment.body, '@openhands-agent') &&
+        contains(fromJson('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+      ((github.event_name == 'issues' || github.event_name == 'pull_request') &&
+        (github.event.label.name == 'fix-me' ||
+         github.event.label.name == 'openhands' ||
+         startsWith(github.event.label.name, 'agent:')))
+    runs-on: ubuntu-latest
+    env:
+      DEFAULT_OPENHANDS_MODEL: ${{ vars.OPENHANDS_DEFAULT_MODEL || 'anthropic/claude-sonnet-4' }}
+    steps:
+      - name: Resolve trigger, model, and output contract
+        id: request
+        uses: actions/github-script@v7
+        env:
+          DISPATCH_PROMPT: ${{ inputs.prompt }}
+          DISPATCH_MODEL: ${{ inputs.model }}
+          DISPATCH_MODEL_PROFILE: ${{ inputs.model_profile }}
+          DISPATCH_TARGET_PR: ${{ inputs.target_pr }}
+          DISPATCH_OUTPUT_MODE: ${{ inputs.output_mode }}
+          DEFAULT_OPENHANDS_MODEL: ${{ env.DEFAULT_OPENHANDS_MODEL }}
+        with:
+          script: |
+            const payload = context.payload;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const eventName = context.eventName;
+
+            const modelProfiles = new Map([
+              ['sonnet', 'anthropic/claude-sonnet-4'],
+              ['gpt', 'openai/gpt-5.1'],
+              ['gemini', 'gemini/gemini-2.5-pro'],
+            ]);
+
+            const labels = new Set();
+            for (const label of payload.issue?.labels ?? []) labels.add(label.name);
+            for (const label of payload.pull_request?.labels ?? []) labels.add(label.name);
+            if (payload.label?.name) labels.add(payload.label.name);
+
+            const rawText = [
+              process.env.DISPATCH_PROMPT,
+              payload.comment?.body,
+              payload.head_commit?.message,
+              payload.issue?.body,
+              payload.pull_request?.body,
+              [...labels].join(' '),
+            ].filter(Boolean).join('\n');
+
+            function matchValue(name) {
+              const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              const re = new RegExp(`(?:^|\\s)${escaped}\\s*[:=]\\s*([^\\s\\]]+)`, 'i');
+              return rawText.match(re)?.[1];
+            }
+
+            function pickModel() {
+              if (process.env.DISPATCH_MODEL) return process.env.DISPATCH_MODEL;
+              const explicit = matchValue('model');
+              if (explicit) return explicit;
+              const explicitAgent = matchValue('agent');
+              if (explicitAgent && modelProfiles.has(explicitAgent)) return modelProfiles.get(explicitAgent);
+              const profile = process.env.DISPATCH_MODEL_PROFILE;
+              if (profile && modelProfiles.has(profile)) return modelProfiles.get(profile);
+              for (const label of labels) {
+                if (label.startsWith('agent:')) {
+                  const key = label.slice('agent:'.length);
+                  if (modelProfiles.has(key)) return modelProfiles.get(key);
+                  return key;
+                }
+              }
+              return process.env.DEFAULT_OPENHANDS_MODEL;
+            }
+
+            const outputMode = matchValue('output') || process.env.DISPATCH_OUTPUT_MODE || 'pr-comment';
+
+            let issueNumber = payload.issue?.number || payload.pull_request?.number || '';
+            let isPr = Boolean(payload.pull_request);
+            if (payload.issue?.pull_request) isPr = true;
+            if (process.env.DISPATCH_TARGET_PR) {
+              issueNumber = process.env.DISPATCH_TARGET_PR;
+              isPr = true;
+            }
+
+            let checkoutRepo = `${owner}/${repo}`;
+            let checkoutRef = payload.ref || context.ref;
+            let baseBranch = context.ref.replace('refs/heads/', '');
+
+            if (payload.pull_request) {
+              checkoutRepo = payload.pull_request.head.repo.full_name;
+              checkoutRef = payload.pull_request.head.ref;
+              baseBranch = payload.pull_request.base.ref;
+            } else if (payload.issue?.pull_request) {
+              const { data: pr } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: payload.issue.number,
+              });
+              checkoutRepo = pr.head.repo.full_name;
+              checkoutRef = pr.head.ref;
+              baseBranch = pr.base.ref;
+            }
+
+            const promptParts = [];
+            if (process.env.DISPATCH_PROMPT) promptParts.push(process.env.DISPATCH_PROMPT);
+            if (payload.comment?.body) promptParts.push(`Trigger comment:\n${payload.comment.body}`);
+            if (payload.issue?.title) promptParts.push(`Issue/PR title: ${payload.issue.title}`);
+            if (payload.pull_request?.title) promptParts.push(`PR title: ${payload.pull_request.title}`);
+            if (payload.head_commit?.message) promptParts.push(`Trigger commit message:\n${payload.head_commit.message}`);
+            const prompt = promptParts.join('\n\n') || rawText;
+
+            core.setOutput('model', pickModel());
+            core.setOutput('output_mode', outputMode);
+            core.setOutput('prompt', prompt);
+            core.setOutput('issue_number', String(issueNumber));
+            core.setOutput('is_pr', String(isPr));
+            core.setOutput('checkout_repo', checkoutRepo);
+            core.setOutput('checkout_ref', checkoutRef);
+            core.setOutput('base_branch', baseBranch);
+            core.setOutput('branch_name', `openhands/${issueNumber || context.runId}-${context.runAttempt}`);
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ steps.request.outputs.checkout_repo }}
+          ref: ${{ steps.request.outputs.checkout_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Prepare OpenHands request files
+        env:
+          REQUEST_PROMPT: ${{ steps.request.outputs.prompt }}
+          REQUEST_MODEL: ${{ steps.request.outputs.model }}
+          REQUEST_OUTPUT_MODE: ${{ steps.request.outputs.output_mode }}
+          REQUEST_ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          REQUEST_IS_PR: ${{ steps.request.outputs.is_pr }}
+          REQUEST_EVENT_NAME: ${{ github.event_name }}
+          REQUEST_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p .llm/tmp/openhands
+          cat > .llm/tmp/openhands/request.md <<REQUEST
+          You are OpenHands running for the NetScript repository.
+
+          User task:
+          ${REQUEST_PROMPT}
+
+          Operational contract:
+          - Read AGENTS.md first.
+          - If the task says "use harness", follow .agents/skills/netscript-harness/SKILL.md.
+          - If the work touches packages/ or plugins/, use .agents/skills/netscript-doctrine/SKILL.md.
+          - Use rtk for read-heavy git/grep/gh/docker commands when it is available.
+          - Preserve user changes and avoid destructive git commands.
+          - Run the smallest validation that proves the change.
+          - Write .llm/tmp/openhands/summary.md before exit. Include Summary, Changes, Validation,
+            Responses to review comments or issue comments when relevant, and Remaining risks.
+          - If output_mode is thread-replies, optionally write .llm/tmp/openhands/replies.json as
+            an array of {"comment_id": number, "body": string} objects for PR review-thread replies.
+
+          Trigger metadata:
+          - event: ${REQUEST_EVENT_NAME}
+          - issue_or_pr: ${REQUEST_ISSUE_NUMBER}
+          - is_pr: ${REQUEST_IS_PR}
+          - output_mode: ${REQUEST_OUTPUT_MODE}
+          - selected_model: ${REQUEST_MODEL}
+          - action_run: ${REQUEST_RUN_URL}
+          REQUEST
+          if [ "${REQUEST_IS_PR}" = "true" ] && [ -n "${REQUEST_ISSUE_NUMBER}" ]; then
+            gh api "repos/${GITHUB_REPOSITORY}/issues/${REQUEST_ISSUE_NUMBER}/comments" \
+              > .llm/tmp/openhands/issue-comments.json || true
+            gh api "repos/${GITHUB_REPOSITORY}/pulls/${REQUEST_ISSUE_NUMBER}/comments" \
+              > .llm/tmp/openhands/pr-review-comments.json || true
+          fi
+
+      - name: Bootstrap NetScript toolchain
+        run: bash ./.openhands/setup.sh
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install OpenHands SDK
+        run: |
+          uv pip install --system "openhands-sdk @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-sdk"
+          uv pip install --system "openhands-tools @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-tools"
+
+      - name: Run OpenHands
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+          LLM_MODEL: ${{ steps.request.outputs.model }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        run: uv run python .openhands/agent_runner.py .llm/tmp/openhands/request.md
+
+      - name: Commit changes back to PR branch
+        if: steps.request.outputs.is_pr == 'true'
+        env:
+          TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
+          CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+        run: |
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.email "openhands@all-hands.dev"
+          git config user.name "OpenHands Bot"
+          git add -A
+          git commit -m "chore(openhands): apply agent changes"
+          git push "https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git" "HEAD:${CHECKOUT_REF}"
+
+      - name: Create pull request for non-PR triggers
+        if: steps.request.outputs.is_pr != 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.request.outputs.branch_name }}
+          base: ${{ steps.request.outputs.base_branch }}
+          commit-message: 'chore(openhands): apply agent changes'
+          title: 'OpenHands agent task'
+          body-path: .llm/tmp/openhands/summary.md
+          draft: true
+
+      - name: Post summary comment
+        if: always() && steps.request.outputs.output_mode != 'summary-only' && steps.request.outputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          MODEL: ${{ steps.request.outputs.model }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ ! -f .llm/tmp/openhands/summary.md ]; then
+            cat > .llm/tmp/openhands/summary.md <<SUMMARY
+          ## OpenHands task did not write a summary
+
+          Model: \`${MODEL}\`
+          Run: ${RUN_URL}
+          SUMMARY
+          fi
+          {
+            echo "<!-- openhands-agent-summary -->"
+            echo "Model: \`${MODEL}\`"
+            echo
+            cat .llm/tmp/openhands/summary.md
+            echo
+            echo "Run: ${RUN_URL}"
+          } > .llm/tmp/openhands/comment.md
+          gh issue comment "${ISSUE_NUMBER}" --body-file .llm/tmp/openhands/comment.md
+
+      - name: Post review-thread replies
+        if: always() && steps.request.outputs.output_mode == 'thread-replies' && steps.request.outputs.is_pr == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          if [ ! -f .llm/tmp/openhands/replies.json ]; then
+            echo "No replies.json written."
+            exit 0
+          fi
+          python - <<'PY'
+          import json
+          import os
+          import subprocess
+
+          repo = os.environ["GITHUB_REPOSITORY"]
+          with open(".llm/tmp/openhands/replies.json", encoding="utf-8") as f:
+              replies = json.load(f)
+
+          for reply in replies:
+              comment_id = int(reply["comment_id"])
+              body = str(reply["body"])
+              subprocess.run(
+                  [
+                      "gh",
+                      "api",
+                      "--method",
+                      "POST",
+                      f"repos/{repo}/pulls/comments/{comment_id}/replies",
+                      "-f",
+                      f"body={body}",
+                  ],
+                  check=True,
+              )
+          PY
+
+      - name: Upload OpenHands artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openhands-agent-artifacts
+          path: .llm/tmp/openhands
+          retention-days: 14
