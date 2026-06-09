@@ -30,11 +30,15 @@ export class StaticWorkersCliBackend implements WorkersCliBackend {
 
 const defaultBackend: WorkersCliBackend = new LocalWorkersCliBackend();
 
-abstract class WorkersCliCommand extends WorkersCommand {
+/** Base class for concrete workers CLI commands. */
+export abstract class WorkersCliCommand extends WorkersCommand {
+  /** Static command metadata consumed by help and backend adapters. */
   readonly definition: WorkersCliCommandDefinition;
+  /** Group used by host CLI help renderers. */
   readonly category: WorkersCliCategory;
   private readonly backend: WorkersCliBackend;
 
+  /** Create a workers CLI command with an optional backend override. */
   protected constructor(
     definition: WorkersCliCommandDefinition,
     backend: WorkersCliBackend = defaultBackend,
