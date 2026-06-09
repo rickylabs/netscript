@@ -5,6 +5,7 @@ Source runs:
 - `.llm/tmp/run/feat-package-quality-wave2-adapters-2a--observability` (telemetry)
 - `.llm/tmp/run/feat-package-quality-wave2-adapters-2b--data`
 - `.llm/tmp/run/feat-package-quality-wave2-adapters-2c--messaging`
+- `.llm/tmp/run/feat-package-quality-wave4-runtimes--4c-sagas` (per-EP vs full-barrel)
 
 ## MEASURE-FIRST: doc-lint must be a full-export sweep
 
@@ -25,6 +26,25 @@ Evidence of how badly root-only undercounts:
 
 Never trust a root-only doc-lint number for scoping. Record the real per-entrypoint
 breakdown in `research.md` / `drift.md` before locking the plan.
+
+### …but the *final gate* must be the full-barrel `mod.ts`, not per-EP runs
+
+Per-entrypoint doc-lint is correct for **scoping/attribution** (count debt per
+surface). It is **not sufficient as the final pass/fail gate**: linting each
+entrypoint in isolation can miss a `private-type-ref` that only appears when the
+public barrel's merged type graph is resolved together.
+
+Wave 4 4c: the generator's C14 worklog claimed `private-type-ref-count=0` from
+per-entrypoint runs, but IMPL-EVAL ran `deno doc --lint packages/plugin-sagas-core/mod.ts`
+(the full public barrel) and found **2** `private-type-ref` errors — `SagaCorrelation`
+referenced by `SagaBuilder["correlate"]` + `SagaCorrelationRule` but never exported
+from `src/public/mod.ts`. The per-EP sweep missed it because the `builders/mod.ts`
+→ `define-saga.ts` graph was only fully resolved through the merged barrel. Result:
+a `FAIL_FIX` IMPL-EVAL cycle for a 1-line export.
+
+Rule: scope with per-entrypoint counts; **gate with `deno doc --lint <pkg>/mod.ts`**
+(the full merged barrel) and reconcile the ptr count against *that* before claiming
+clean. A "0 per-EP" is not "0 on the barrel."
 
 ## Rename slices are intentionally transient — gate at the end
 
