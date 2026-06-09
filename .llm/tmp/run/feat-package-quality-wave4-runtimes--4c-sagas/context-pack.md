@@ -19,6 +19,7 @@ is `plan.md`; implementation is proceeding one slice at a time.
 | C1 | complete | `50d17a5` declared `@netscript/plugin-sagas-core` as A3, enumerated all 19 entrypoints in `check`, added `test`; raw `deno check --unstable-kv` PASS; `deno task test` PASS, 17 passed / 0 failed |
 | C2 | complete | `4295c3c` fixed root/builders/config/agent private-type references with first-party re-exports and structural config schema contract; targeted raw `deno doc --lint` PASS; raw all-entrypoint `deno check --unstable-kv` PASS |
 | C3 | complete | `172f42d` fixed contracts/v1, domain, and streams public docs/type refs with structural schema/contract wrappers and first-party stream type re-exports; targeted raw `deno doc --lint` PASS; raw all-entrypoint `deno check --unstable-kv` PASS |
+| C4 | complete | `9226dcc` fixed integration/workers and integration/publisher private-type refs with first-party type re-exports and method docs; targeted raw `deno doc --lint` PASS; raw all-entrypoint `deno check --unstable-kv` PASS |
 
 Historical seed note: this worktree originally forked before 4a and 4b merged into the umbrella.
 The supervisor later pulled both forward, the generator re-ran MEASURE-FIRST, and PLAN-EVAL locked
