@@ -32,6 +32,7 @@ export class LocalSagasCliBackend implements SagasCliBackend {
     }
   }
 
+  /** Execute a validated sagas command after outer error handling is installed. */
   private async handleChecked(
     definition: SagasCliCommandDefinition,
     args: PluginCliArgs,
