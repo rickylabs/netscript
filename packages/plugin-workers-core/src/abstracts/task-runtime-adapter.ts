@@ -1,7 +1,6 @@
 import type {
   ResolvedTaskExecutionOptions,
   TaskDefinition,
-  TaskLogEntry,
   TaskResult,
   TaskType,
 } from '../executor/executor-types.ts';

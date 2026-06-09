@@ -1,7 +1,4 @@
-import {
-  DEFAULT_TOPIC,
-  JobDefinitionSchema,
-} from '../domain/mod.ts';
+import { DEFAULT_TOPIC, JobDefinitionSchema } from '../domain/mod.ts';
 import type {
   ExecutionRecord,
   JobDefinition,
@@ -27,7 +24,8 @@ export type JobFilterOptions = Readonly<{
 }>;
 
 /** KV-backed job registry for runtime composition. */
-export class KvJobRegistry extends Registry<string, JobDefinition> implements RegistryJobStoragePort {
+export class KvJobRegistry extends Registry<string, JobDefinition>
+  implements RegistryJobStoragePort {
   /** Stable registry identifier. */
   readonly id: string;
   readonly #topic?: string;

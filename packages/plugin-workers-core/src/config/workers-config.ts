@@ -58,8 +58,8 @@ const ScalingConfigObjectSchema: z.ZodType<ScalingConfigData> = z.object({
   mode: z.enum(['combined', 'distributed']).default('combined'),
 });
 
-const ScalingConfigZodSchema: z.ZodType<ScalingConfigData | undefined> =
-  ScalingConfigObjectSchema.optional();
+const ScalingConfigZodSchema: z.ZodType<ScalingConfigData | undefined> = ScalingConfigObjectSchema
+  .optional();
 
 /** Per-topic scaling configuration schema. */
 export const ScalingConfigSchema: ConfigSchema<ScalingConfigData | undefined> =
@@ -112,15 +112,15 @@ const WorkersConfigObjectSchema = z.object({
 });
 
 const WorkersConfigZodSchema = WorkersConfigObjectSchema.transform((config) => ({
-    ...config,
-    groups: config.groups.map((group) => ({
-      ...group,
-      jobs: group.jobs.map((job) => ({
-        ...job,
-        topic: group.topic,
-      })),
+  ...config,
+  groups: config.groups.map((group) => ({
+    ...group,
+    jobs: group.jobs.map((job) => ({
+      ...job,
+      topic: group.topic,
     })),
-  })).optional() as unknown as z.ZodType<WorkersConfigData | undefined>;
+  })),
+})).optional() as unknown as z.ZodType<WorkersConfigData | undefined>;
 
 /** Workers plugin configuration schema. */
 export const WorkersConfigSchema: ConfigSchema<WorkersConfigData | undefined> =

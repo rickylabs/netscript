@@ -1,13 +1,40 @@
-import { defineStreamSchema, type StateSchema } from '@netscript/plugin-streams-core';
-import { z } from 'zod';
+import { defineStreamSchema } from '@netscript/plugin-streams-core';
+import type { z } from 'zod';
 import { ExecutionRecordSchema, JobResponseSchema } from '../domain/mod.ts';
 
 type AnyZodObject = z.ZodObject<Record<string, z.ZodTypeAny>>;
-/** Structural stream schema definition map. */
-export type StreamSchemaDefinition = Readonly<Record<string, unknown>>;
+/** Standard Schema compatible public schema surface for stream entities. */
+export interface WorkerStreamStandardSchema<TOutput> {
+  /** Standard Schema metadata and validation hooks. */
+  readonly '~standard': {
+    readonly version: 1;
+    readonly vendor: string;
+    readonly validate: (
+      value: unknown,
+      options?: { readonly libraryOptions?: Record<string, unknown> | undefined },
+    ) =>
+      | { readonly value: TOutput; readonly issues?: undefined }
+      | {
+        readonly issues: ReadonlyArray<{
+          readonly message: string;
+          readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined;
+        }>;
+      }
+      | Promise<
+        | { readonly value: TOutput; readonly issues?: undefined }
+        | {
+          readonly issues: ReadonlyArray<{
+            readonly message: string;
+            readonly path?: ReadonlyArray<PropertyKey | { readonly key: PropertyKey }> | undefined;
+          }>;
+        }
+      >;
+    readonly types?: { readonly input: unknown; readonly output: TOutput } | undefined;
+  };
+}
 
 /** Package-owned structural schema surface for worker stream entities. */
-export interface WorkerStreamEntitySchema<TOutput> {
+export interface WorkerStreamEntitySchema<TOutput> extends WorkerStreamStandardSchema<TOutput> {
   /** Parse an unknown value into the entity output. */
   parse(value: unknown): TOutput;
   /** Validate an unknown value without throwing. */
@@ -16,11 +43,21 @@ export interface WorkerStreamEntitySchema<TOutput> {
     | { readonly success: false; readonly error: unknown };
 }
 
-/** Package-owned structural workers stream schema surface. */
-export interface WorkersStreamSchema<TDefinition extends StreamSchemaDefinition> {
-  /** Stream entity definitions keyed by entity name. */
-  readonly definition?: TDefinition;
+/** Package-owned structural stream collection definition. */
+export interface WorkerStreamCollectionDefinition<TOutput> {
+  /** Standard Schema compatible validator for collection entities. */
+  readonly schema: WorkerStreamEntitySchema<TOutput>;
+  /** State Protocol type discriminator emitted for the collection. */
+  readonly type: string;
+  /** Property name used as the entity primary key. */
+  readonly primaryKey: string;
 }
+
+/** Structural stream schema definition map. */
+export type StreamSchemaDefinition = Record<string, WorkerStreamCollectionDefinition<unknown>>;
+
+/** Package-owned structural workers stream schema surface. */
+export type WorkersStreamSchema<TDefinition extends StreamSchemaDefinition> = TDefinition;
 
 /** Worker execution entity stored in the durable stream. */
 export type WorkerExecution = Readonly<{
@@ -127,9 +164,9 @@ export const WorkerJobSchema: WorkerStreamEntitySchema<WorkerJob> =
   WorkerJobZodSchema as unknown as WorkerStreamEntitySchema<WorkerJob>;
 
 /** Durable stream definition for worker execution and job entities. */
-export type WorkersStreamDefinition = Readonly<{
+export type WorkersStreamDefinition = {
   /** Execution entity stream definition. */
-  execution: {
+  execution: WorkerStreamCollectionDefinition<WorkerExecution> & {
     /** Execution entity schema. */
     readonly schema: WorkerStreamEntitySchema<WorkerExecution>;
     /** Execution entity discriminator. */
@@ -138,7 +175,7 @@ export type WorkersStreamDefinition = Readonly<{
     readonly primaryKey: 'id';
   };
   /** Job entity stream definition. */
-  job: {
+  job: WorkerStreamCollectionDefinition<WorkerJob> & {
     /** Job entity schema. */
     readonly schema: WorkerStreamEntitySchema<WorkerJob>;
     /** Job entity discriminator. */
@@ -146,21 +183,10 @@ export type WorkersStreamDefinition = Readonly<{
     /** Job entity primary key. */
     readonly primaryKey: 'id';
   };
-}>;
+} & StreamSchemaDefinition;
 
 /** Entity-based durable stream schema for worker executions and jobs. */
-const workersStreamStateSchema: StateSchema<{
-  execution: {
-    readonly schema: typeof WorkerExecutionZodSchema;
-    readonly type: 'execution';
-    readonly primaryKey: 'id';
-  };
-  job: {
-    readonly schema: typeof WorkerJobZodSchema;
-    readonly type: 'job';
-    readonly primaryKey: 'id';
-  };
-}> = defineStreamSchema({
+const workersStreamStateSchema = defineStreamSchema({
   execution: {
     schema: WorkerExecutionZodSchema,
     type: 'execution',
@@ -174,4 +200,4 @@ const workersStreamStateSchema: StateSchema<{
 });
 /** Stream schema definition for worker executions and jobs. */
 export const workersStreamSchema: WorkersStreamSchema<WorkersStreamDefinition> =
-  workersStreamStateSchema as WorkersStreamSchema<WorkersStreamDefinition>;
+  workersStreamStateSchema as unknown as WorkersStreamSchema<WorkersStreamDefinition>;

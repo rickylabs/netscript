@@ -17,6 +17,8 @@ export type {
   RegisterJobInput,
   RegisterTaskInput,
   RegistryJobStoragePort,
+  RuntimePermissions,
+  RuntimePermissionValue,
   TaskDefinition,
   TaskSource,
 } from './registry-types.ts';

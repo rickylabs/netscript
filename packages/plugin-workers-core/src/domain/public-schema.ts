@@ -31,6 +31,7 @@ export interface PublicStandardSchema<TOutput> {
 }
 
 /** Structural object-shape map used by public definition schemas. */
+// deno-lint-ignore no-explicit-any -- preserves field-specific schema shape types for consumers.
 export type PublicDefinitionSchemaShape = Readonly<Record<string, any>>;
 
 /** Package-owned structural schema surface for public definition schemas. */
@@ -40,9 +41,13 @@ export interface PublicDefinitionSchema<TOutput> extends PublicStandardSchema<TO
   /** Parse an unknown value into the schema output. */
   parse(value: unknown): TOutput;
   /** Return a schema without selected object keys. */
-  omit(mask: Readonly<Record<string, true>>): Readonly<{ readonly shape: PublicDefinitionSchemaShape }>;
+  omit(
+    mask: Readonly<Record<string, true>>,
+  ): Readonly<{ readonly shape: PublicDefinitionSchemaShape }>;
   /** Return a schema with only selected object keys. */
-  pick(mask: Readonly<Record<string, true>>): Readonly<{ readonly shape: PublicDefinitionSchemaShape }>;
+  pick(
+    mask: Readonly<Record<string, true>>,
+  ): Readonly<{ readonly shape: PublicDefinitionSchemaShape }>;
   /** Validate an unknown value without throwing. */
   safeParse(value: unknown):
     | { readonly success: true; readonly data: TOutput }

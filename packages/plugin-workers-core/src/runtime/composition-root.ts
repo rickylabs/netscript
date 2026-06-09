@@ -1,7 +1,7 @@
 import type { TaskDefinition as DomainTaskDefinition } from '../domain/mod.ts';
 import { createDefaultTaskExecutor } from '../executor/mod.ts';
-import type { MultiRuntimeTaskExecutorOptions, TaskExecutor } from '../executor/mod.ts';
-import type { JobStoragePort, SchedulerPort, WorkerPort } from '../ports/mod.ts';
+import type { MultiRuntimeTaskExecutorOptions } from '../executor/mod.ts';
+import type { JobStoragePort, WorkerPort } from '../ports/mod.ts';
 import { MemoryJobRegistry } from '../registry/mod.ts';
 import { ShutdownManager } from '../shutdown/mod.ts';
 import type { ShutdownManagerOptions } from '../shutdown/mod.ts';
@@ -111,7 +111,9 @@ export function createWorkersRuntime(options: WorkersRuntimeOptions = {}): Worke
     stateStore: options.workflow?.stateStore as WorkflowExecutorOptions['stateStore'],
   })) as WorkflowExecutor;
   const taskExecutor = options.taskExecutor ??
-    createDefaultTaskExecutor((options.taskExecutorOptions ?? {}) as MultiRuntimeTaskExecutorOptions);
+    createDefaultTaskExecutor(
+      (options.taskExecutorOptions ?? {}) as MultiRuntimeTaskExecutorOptions,
+    );
   const shutdown = (options.shutdownManager ?? new ShutdownManager(
     options.shutdown as ShutdownManagerOptions | undefined,
   )) as ShutdownManager;

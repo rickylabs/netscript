@@ -1,4 +1,8 @@
-import type { TaskDefinition, TaskExecutionOptions, TaskResult } from '../executor/executor-types.ts';
+import type {
+  TaskDefinition,
+  TaskExecutionOptions,
+  TaskResult,
+} from '../executor/executor-types.ts';
 
 /** Execution context shared by worker runtime dispatchers. */
 export interface ExecutionContext {

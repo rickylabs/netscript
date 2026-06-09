@@ -33,11 +33,11 @@ export {
 } from './multi-runtime-task-executor.ts';
 export type {
   ResolvedTaskExecutionOptions,
-  TaskLogEntry,
   TaskDefinition,
   TaskExecutionOptions,
   TaskInstrumentationLike,
   TaskInstrumentationSpan,
+  TaskLogEntry,
   TaskResult,
   TaskRuntimeAdapterLike,
   TaskType,

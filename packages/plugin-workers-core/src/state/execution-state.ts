@@ -1,7 +1,4 @@
-import {
-  DEFAULT_TOPIC,
-  ExecutionRecordSchema,
-} from '../domain/mod.ts';
+import { DEFAULT_TOPIC, ExecutionRecordSchema } from '../domain/mod.ts';
 import type { RegistryKvStore } from '../registry/mod.ts';
 
 const EXECUTION_PREFIX = ['workers', 'executions'] as const;
@@ -23,42 +20,44 @@ export type ExecutionStatus =
   | 'timeout';
 
 /** Worker execution record stored in KV. */
-export type ExecutionRecord = Readonly<Record<string, unknown> & {
-  /** Unique execution identifier. */
-  readonly id: string;
-  /** Runtime concept represented by this execution. */
-  readonly concept: ExecutionConcept;
-  /** Job or task identifier associated with the execution. */
-  readonly jobId: string;
-  /** Stream topic associated with the execution. */
-  readonly topic: string;
-  /** Current execution status. */
-  readonly status: ExecutionStatus;
-  /** Source that triggered the execution. */
-  readonly triggeredBy: ExecutionTriggerType;
-  /** ISO timestamp for when the execution was triggered. */
-  readonly triggeredAt: string;
-  /** ISO timestamp for when the execution started. */
-  readonly startedAt?: string | null;
-  /** ISO timestamp for when the execution completed. */
-  readonly completedAt?: string | null;
-  /** Process-style exit code for the execution result. */
-  readonly exitCode?: number | null;
-  /** Execution duration in milliseconds. */
-  readonly duration?: number | null;
-  /** Error message recorded for failed executions. */
-  readonly error?: string | null;
-  /** Structured execution result payload. */
-  readonly result?: Record<string, unknown> | null;
-  /** Worker identifier that ran the execution. */
-  readonly workerId?: string | null;
-  /** Current retry attempt number. */
-  readonly attempt?: number;
-  /** Maximum retry attempts allowed for the execution. */
-  readonly maxAttempts?: number;
-  /** Correlation identifier used to join related executions. */
-  readonly correlationId?: string;
-}>;
+export type ExecutionRecord = Readonly<
+  Record<string, unknown> & {
+    /** Unique execution identifier. */
+    readonly id: string;
+    /** Runtime concept represented by this execution. */
+    readonly concept: ExecutionConcept;
+    /** Job or task identifier associated with the execution. */
+    readonly jobId: string;
+    /** Stream topic associated with the execution. */
+    readonly topic: string;
+    /** Current execution status. */
+    readonly status: ExecutionStatus;
+    /** Source that triggered the execution. */
+    readonly triggeredBy: ExecutionTriggerType;
+    /** ISO timestamp for when the execution was triggered. */
+    readonly triggeredAt: string;
+    /** ISO timestamp for when the execution started. */
+    readonly startedAt: string | null;
+    /** ISO timestamp for when the execution completed. */
+    readonly completedAt: string | null;
+    /** Process-style exit code for the execution result. */
+    readonly exitCode: number | null;
+    /** Execution duration in milliseconds. */
+    readonly duration: number | null;
+    /** Error message recorded for failed executions. */
+    readonly error: string | null;
+    /** Structured execution result payload. */
+    readonly result: Record<string, unknown> | null;
+    /** Worker identifier that ran the execution. */
+    readonly workerId: string | null;
+    /** Current retry attempt number. */
+    readonly attempt: number;
+    /** Maximum retry attempts allowed for the execution. */
+    readonly maxAttempts: number;
+    /** Correlation identifier used to join related executions. */
+    readonly correlationId?: string;
+  }
+>;
 
 /** Options for creating a worker execution record. */
 export type CreateExecutionOptions = Readonly<{

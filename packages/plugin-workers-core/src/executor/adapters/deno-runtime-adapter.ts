@@ -1,4 +1,8 @@
-import type { ResolvedTaskExecutionOptions, TaskDefinition, TaskResult } from '../executor-types.ts';
+import type {
+  ResolvedTaskExecutionOptions,
+  TaskDefinition,
+  TaskResult,
+} from '../executor-types.ts';
 import { buildDenoCommand } from './argv-builder.ts';
 import type { ProcessRunner } from './dax-process-runner.ts';
 import { RuntimeAdapterBase } from './runtime-adapter-base.ts';

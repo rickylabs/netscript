@@ -1,6 +1,4 @@
-import {
-  createSuccessResult,
-} from '../domain/mod.ts';
+import { createSuccessResult } from '../domain/mod.ts';
 import type {
   JobContext,
   JobDefinition,

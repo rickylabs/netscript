@@ -9,18 +9,20 @@ export type TaskType =
   | 'shell';
 
 /** Task definition shape consumed by executor adapters. */
-export type TaskDefinition = Readonly<Record<string, unknown> & {
-  readonly id: string;
-  readonly type: string;
-  readonly entrypoint?: string;
-  readonly cwd?: string;
-  readonly env?: Readonly<Record<string, string>>;
-  readonly timeout?: number;
-  readonly args?: readonly string[];
-  readonly importMapUrl?: string;
-  readonly metadata?: RuntimeTaskMetadata;
-  readonly permissions?: WorkerTaskPermissions;
-}>;
+export type TaskDefinition = Readonly<
+  Record<string, unknown> & {
+    readonly id: string;
+    readonly type: string;
+    readonly entrypoint?: string;
+    readonly cwd?: string;
+    readonly env?: Readonly<Record<string, string>>;
+    readonly timeout?: number;
+    readonly args?: readonly string[];
+    readonly importMapUrl?: string;
+    readonly metadata?: RuntimeTaskMetadata;
+    readonly permissions?: WorkerTaskPermissions;
+  }
+>;
 
 /** Permission field accepted by Deno task execution. */
 export type WorkerTaskPermissionField = boolean | readonly string[];

@@ -13,23 +13,25 @@ export type WorkersStreamProducer = Readonly<{
 }>;
 
 /** Execution record shape mirrored into the workers durable stream. */
-export type WorkerExecutionRecord = Readonly<Record<string, unknown> & {
-  readonly id: string;
-  readonly jobId: string;
-  readonly status: string;
-  readonly topic?: string;
-  readonly concept?: 'job' | 'task';
-  readonly correlationId?: string;
-  readonly triggeredAt?: string;
-  readonly startedAt?: string | null;
-  readonly completedAt?: string | null;
-  readonly duration?: number | null;
-  readonly exitCode?: number | null;
-  readonly error?: string | null;
-  readonly result?: Record<string, unknown> | null;
-  readonly workerId?: string | null;
-  readonly attempt?: number;
-}>;
+export type WorkerExecutionRecord = Readonly<
+  Record<string, unknown> & {
+    readonly id: string;
+    readonly jobId: string;
+    readonly status: string;
+    readonly topic?: string;
+    readonly concept?: 'job' | 'task';
+    readonly correlationId?: string;
+    readonly triggeredAt?: string;
+    readonly startedAt?: string | null;
+    readonly completedAt?: string | null;
+    readonly duration?: number | null;
+    readonly exitCode?: number | null;
+    readonly error?: string | null;
+    readonly result?: Record<string, unknown> | null;
+    readonly workerId?: string | null;
+    readonly attempt?: number;
+  }
+>;
 
 /** Options for creating a workers durable stream producer. */
 export type WorkersStreamProducerOptions = Readonly<{

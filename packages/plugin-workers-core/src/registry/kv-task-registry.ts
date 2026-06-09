@@ -1,7 +1,4 @@
-import {
-  DEFAULT_TOPIC,
-  TaskDefinitionSchema,
-} from '../domain/mod.ts';
+import { DEFAULT_TOPIC, TaskDefinitionSchema } from '../domain/mod.ts';
 import type { RegistryKvStore, RegistryOptions } from './registry-options.ts';
 import type { RegisterTaskInput, TaskDefinition, TaskSource } from './registry-types.ts';
 import { Registry } from './registry.ts';

@@ -20,6 +20,7 @@ export type JobContext<TPayload = unknown, TResult = unknown> = Readonly<{
   readonly correlationId?: string;
   readonly traceparent?: string;
   readonly tracestate?: string;
+  readonly reportProgress?: (percent: number, message?: string) => void;
 }>;
 
 /** Function that executes a runtime job. */
@@ -27,47 +28,137 @@ export type JobHandler<TPayload = unknown, TResult = unknown> = (
   context: JobContext<TPayload, TResult>,
 ) => JobResult<TResult> | Promise<JobResult<TResult>>;
 
+/** Runtime permission value accepted by task and job execution. */
+export type RuntimePermissionValue = boolean | string[];
+
+/** Runtime permission bag accepted by task and job execution. */
+export type RuntimePermissions = Readonly<{
+  readonly net: RuntimePermissionValue;
+  readonly read: RuntimePermissionValue;
+  readonly write: RuntimePermissionValue;
+  readonly env: RuntimePermissionValue;
+  readonly run: RuntimePermissionValue;
+  readonly ffi: boolean;
+  readonly import?: string[];
+}>;
+
 /** Runtime job definition. */
 export type JobDefinition<TId extends string = string, TPayload = unknown, TResult = unknown> =
-  Readonly<Record<string, unknown> & {
-    readonly id: TId;
-    readonly name?: string;
-    readonly topic?: string;
-    readonly entrypoint?: string;
-    readonly sourceUrl?: string;
-    readonly handler?: JobHandler<TPayload, TResult>;
-  }>;
+  Readonly<
+    Record<string, unknown> & {
+      readonly id: TId;
+      readonly name?: string;
+      readonly description?: string;
+      readonly topic?: string;
+      readonly entrypoint?: string;
+      readonly schedule?: string;
+      readonly timezone?: string;
+      readonly timeout?: number;
+      readonly maxRetries?: number;
+      readonly priority?: number;
+      readonly enabled?: boolean;
+      readonly tags?: string[];
+      readonly metadata?: Record<string, unknown>;
+      readonly retryDelay?: number;
+      readonly maxConcurrency?: number;
+      readonly persist?: boolean;
+      readonly source?: string;
+      readonly sourceUrl?: string;
+      readonly importMapUrl?: string;
+      readonly executionType?: string;
+      readonly pluginId?: string;
+      readonly permissions?: RuntimePermissions;
+      readonly handler?: JobHandler<TPayload, TResult>;
+    }
+  >;
 
 /** Runtime task definition. */
 export type TaskDefinition<TId extends string = string, TPayload = unknown, TResult = unknown> =
-  Readonly<Record<string, unknown> & {
-    readonly id: TId;
-    readonly name?: string;
-    readonly topic?: string;
-    readonly type: string;
-    readonly entrypoint?: string;
-    readonly handler?: (context: Readonly<{ id: string; payload: TPayload }>) => TResult;
-  }>;
+  Readonly<
+    Record<string, unknown> & {
+      readonly id: TId;
+      readonly name?: string;
+      readonly description?: string;
+      readonly topic?: string;
+      readonly type: string;
+      readonly entrypoint?: string;
+      readonly schedule?: string;
+      readonly timezone?: string;
+      readonly timeout?: number;
+      readonly maxRetries?: number;
+      readonly priority?: number;
+      readonly enabled?: boolean;
+      readonly tags?: string[];
+      readonly metadata?: Record<string, unknown>;
+      readonly retryDelay?: number;
+      readonly maxConcurrency?: number;
+      readonly persist?: boolean;
+      readonly source?: string;
+      readonly sourceUrl?: string;
+      readonly importMapUrl?: string;
+      readonly args?: string[];
+      readonly cwd?: string;
+      readonly env?: Record<string, string>;
+      readonly permissions?: RuntimePermissions;
+      readonly pluginId?: string;
+      readonly inlineScript?: string;
+      readonly handler?: (context: Readonly<{ id: string; payload: TPayload }>) => TResult;
+    }
+  >;
 
 /** Runtime execution record. */
-export type ExecutionRecord = Readonly<Record<string, unknown> & {
-  readonly id: string;
-  readonly concept: 'job' | 'task';
-  readonly status: string;
-  readonly topic: string;
-}>;
+export type ExecutionRecord = Readonly<
+  Record<string, unknown> & {
+    readonly id: string;
+    readonly concept: 'job' | 'task';
+    readonly jobId: string;
+    readonly status: string;
+    readonly topic: string;
+    readonly triggeredBy: string;
+    readonly triggeredAt: string;
+    readonly startedAt: string | null;
+    readonly completedAt: string | null;
+    readonly exitCode: number | null;
+    readonly duration: number | null;
+    readonly error: string | null;
+    readonly result: Record<string, unknown> | null;
+    readonly workerId: string | null;
+    readonly attempt: number;
+    readonly maxAttempts: number;
+    readonly payload?: Record<string, unknown>;
+    readonly correlationId?: string;
+  }
+>;
 
 /** Message enqueued to trigger a job execution. */
-export type JobMessage = Readonly<Record<string, unknown> & {
-  readonly jobId: string;
-  readonly topic: string;
-}>;
+export type JobMessage = Readonly<
+  Record<string, unknown> & {
+    readonly jobId: string;
+    readonly topic: string;
+    readonly triggeredBy: string;
+    readonly triggeredAt?: string;
+    readonly payload?: Record<string, unknown>;
+    readonly priority?: number;
+    readonly correlationId?: string;
+    readonly traceparent?: string;
+    readonly tracestate?: string;
+  }
+>;
 
 /** Message enqueued to trigger a task execution. */
-export type TaskMessage = Readonly<Record<string, unknown> & {
-  readonly taskId: string;
-  readonly topic: string;
-}>;
+export type TaskMessage = Readonly<
+  Record<string, unknown> & {
+    readonly taskId: string;
+    readonly topic: string;
+    readonly triggeredBy: string;
+    readonly triggeredAt?: string;
+    readonly payload?: Record<string, unknown>;
+    readonly priority?: number;
+    readonly correlationId?: string;
+    readonly traceparent?: string;
+    readonly tracestate?: string;
+  }
+>;
 
 /** Input for registering a job definition. */
 export type RegisterJobInput = Readonly<Record<string, unknown> & { readonly id?: string }>;
@@ -148,10 +239,12 @@ export type RuntimeWorkflowExecutor = Readonly<{
 }>;
 
 /** Runtime workflow definition accepted by composition. */
-export type RuntimeWorkflowDefinition = Readonly<Record<string, unknown> & {
-  readonly id: WorkflowId | string;
-  readonly name: string;
-}>;
+export type RuntimeWorkflowDefinition = Readonly<
+  Record<string, unknown> & {
+    readonly id: WorkflowId | string;
+    readonly name: string;
+  }
+>;
 
 /** Runtime workflow executor options. */
 export type RuntimeWorkflowOptions = Readonly<{
@@ -185,7 +278,11 @@ export type RuntimeJobKvKeyFactories = Readonly<{
   readonly byTopic: (topic: string) => readonly unknown[];
   readonly byJob: (topic: string, jobId: string) => readonly unknown[];
   readonly allExecutions: () => readonly unknown[];
-  readonly taskExecution: (topic: string, taskId: string, executionId: string) => readonly unknown[];
+  readonly taskExecution: (
+    topic: string,
+    taskId: string,
+    executionId: string,
+  ) => readonly unknown[];
   readonly taskByTopic: (topic: string) => readonly unknown[];
   readonly taskByTask: (topic: string, taskId: string) => readonly unknown[];
   readonly allTaskExecutions: () => readonly unknown[];

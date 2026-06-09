@@ -19,10 +19,12 @@ export type {
 } from './producer.ts';
 export { WorkerExecutionSchema, WorkerJobSchema, workersStreamSchema } from './schema.ts';
 export type {
+  StreamSchemaDefinition,
   WorkerExecution,
   WorkerJob,
-  WorkerStreamEntitySchema,
-  StreamSchemaDefinition,
   WorkersStreamDefinition,
   WorkersStreamSchema,
+  WorkerStreamCollectionDefinition,
+  WorkerStreamEntitySchema,
+  WorkerStreamStandardSchema,
 } from './schema.ts';

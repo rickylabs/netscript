@@ -17,11 +17,11 @@ export type {
 } from './composition-root.ts';
 export type {
   ExecutionRecord,
-  JobId,
   JobContext,
   JobDefinition,
   JobDispatcherOptions,
   JobHandler,
+  JobId,
   JobMessage,
   JobModuleImporter,
   JobResolution,
@@ -31,6 +31,8 @@ export type {
   RegisterTaskInput,
   RuntimeJobKvKeyFactories,
   RuntimeJobStoragePort,
+  RuntimePermissions,
+  RuntimePermissionValue,
   RuntimeSchedulerPort,
   RuntimeShutdownManager,
   RuntimeShutdownOptions,

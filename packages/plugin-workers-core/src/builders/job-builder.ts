@@ -5,12 +5,7 @@ import type {
   JobHandler as DomainJobHandler,
   JobId as DomainJobId,
 } from '../domain/mod.ts';
-import type {
-  BuilderPermissions,
-  JobDefinition,
-  JobHandler,
-  JobId,
-} from './builder-types.ts';
+import type { BuilderPermissions, JobDefinition, JobHandler } from './builder-types.ts';
 
 /** Job builder state used to gate `build()`. */
 export type JobBuilderState = 'initial' | 'entrypoint-set' | 'handler-set';

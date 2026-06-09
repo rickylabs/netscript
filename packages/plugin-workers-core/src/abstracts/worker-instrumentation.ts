@@ -9,10 +9,12 @@ export type WorkerInstrumentationSpan = {
 };
 
 /** Context supplied to worker instrumentation hooks. */
-export type WorkerInstrumentationContext = Readonly<Record<string, unknown> & {
-  readonly correlationId?: string;
-  readonly status?: string;
-}>;
+export type WorkerInstrumentationContext = Readonly<
+  Record<string, unknown> & {
+    readonly correlationId?: string;
+    readonly status?: string;
+  }
+>;
 
 /** Stub-only contract for worker telemetry instrumentation. */
 export abstract class WorkerInstrumentation {

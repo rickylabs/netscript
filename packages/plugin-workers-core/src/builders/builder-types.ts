@@ -98,7 +98,11 @@ export type TaskHandler<TPayload = unknown, TResult = unknown> = (
 ) => TResult | Promise<TResult>;
 
 /** Public task definition produced by the task builder. */
-export interface TaskDefinition<TId extends string = string, TPayload = unknown, TResult = unknown> {
+export interface TaskDefinition<
+  TId extends string = string,
+  TPayload = unknown,
+  TResult = unknown,
+> {
   /** Task identifier. */
   readonly id: TaskId<TId>;
   /** Queue topic used to route the task. */

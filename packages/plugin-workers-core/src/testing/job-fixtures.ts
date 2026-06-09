@@ -1,9 +1,5 @@
 import { defineJob } from '../builders/mod.ts';
-import {
-  createSuccessResult,
-  DEFAULT_TOPIC,
-  type TriggerType,
-} from '../domain/mod.ts';
+import { createSuccessResult, DEFAULT_TOPIC, type TriggerType } from '../domain/mod.ts';
 import type { ExecutionRecord } from '../registry/mod.ts';
 import {
   createWorkersRuntime,
