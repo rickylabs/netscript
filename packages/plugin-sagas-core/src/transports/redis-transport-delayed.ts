@@ -3,12 +3,15 @@ import { encodeRedisTransportMessage } from './redis-transport-subscription.ts';
 
 /** Minimal Redis sorted-set client needed by delayed saga delivery. */
 export interface RedisDelayedClient {
+  /** Store a delayed envelope under its delivery timestamp. */
   zadd(key: string, score: number, member: string): Promise<unknown>;
+  /** Read delayed entries with scores inside the requested range. */
   zrangebyscore(
     key: string,
     min: number | string,
     max: number | string,
   ): Promise<readonly string[]>;
+  /** Remove one delayed entry after it has been delivered. */
   zrem(key: string, member: string): Promise<unknown>;
 }
 
@@ -39,6 +42,7 @@ export class RedisDelayedMessageProcessor {
   readonly #onError?: (error: unknown) => void;
   #timer?: ReturnType<typeof setInterval>;
 
+  /** Create a delayed Redis processor. */
   constructor(options: RedisDelayedMessageProcessorOptions) {
     this.#client = options.client;
     this.#delayedSetKey = options.delayedSetKey;
@@ -48,17 +52,20 @@ export class RedisDelayedMessageProcessor {
     this.#onError = options.onError;
   }
 
+  /** Start polling for due delayed messages. */
   start(): void {
     if (this.#timer || this.#intervalMs <= 0) return;
     this.#timer = setInterval(() => void this.processDue(), this.#intervalMs);
   }
 
+  /** Stop polling for due delayed messages. */
   stop(): void {
     if (!this.#timer) return;
     clearInterval(this.#timer);
     this.#timer = undefined;
   }
 
+  /** Enqueue a message for delayed Redis Stream delivery. */
   enqueue(
     streamKey: string,
     topic: string,
@@ -74,6 +81,7 @@ export class RedisDelayedMessageProcessor {
     return this.#client.zadd(this.#delayedSetKey, deliverAt, entry);
   }
 
+  /** Move all currently due delayed entries into their streams. */
   async processDue(): Promise<void> {
     const now = this.#now().getTime();
     const entries = await this.#client.zrangebyscore(this.#delayedSetKey, '-inf', now);

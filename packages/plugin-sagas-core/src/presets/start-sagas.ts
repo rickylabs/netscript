@@ -6,6 +6,7 @@ import {
   type SagaRuntimeAdapter,
 } from '../runtime/mod.ts';
 
+/** Options accepted by `startSagas` and `startSagaHandlers`. */
 export type StartSagasOptions<TAdapter extends SagaRuntimeAdapter = SagaRuntimeAdapter> =
   & CreateSagaRuntimeOptions
   & Readonly<{
@@ -14,6 +15,7 @@ export type StartSagasOptions<TAdapter extends SagaRuntimeAdapter = SagaRuntimeA
     adapter?: TAdapter;
   }>;
 
+/** Runtime bundle returned from a `startSagas` call. */
 export type StartSagasResult<TAdapter extends SagaRuntimeAdapter = SagaRuntimeAdapter> = Readonly<{
   runtime: SagaRuntime<TAdapter>;
   bus: SagaRuntime<TAdapter>['bus'];

@@ -44,8 +44,10 @@ export class SagaRuntimeSupervisor {
   private definitions: readonly SagaDefinition[] = Object.freeze([]);
   private failure?: string;
 
+  /** Frozen supervisor options used for lifecycle operations. */
   readonly options: SagaRuntimeSupervisorOptions;
 
+  /** Create a supervisor for generated saga definitions and a runtime factory. */
   constructor(options: SagaRuntimeSupervisorOptions = {}) {
     this.options = Object.freeze({ ...options });
   }
@@ -100,6 +102,7 @@ export class SagaRuntimeSupervisor {
     });
   }
 
+  /** Resolve static or lazily loaded saga definitions before runtime startup. */
   private async resolveDefinitions(): Promise<readonly SagaDefinition[]> {
     if (this.options.definitions !== undefined) {
       return Object.freeze([...this.options.definitions]);

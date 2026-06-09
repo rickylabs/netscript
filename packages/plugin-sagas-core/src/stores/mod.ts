@@ -8,6 +8,23 @@
  * stable role-named subpath without importing test-only memory stores.
  */
 
+export { SAGA_DURABILITY_TIERS, SAGA_INSTANCE_STATUSES } from '../domain/mod.ts';
+export type {
+  SagaCorrelationKey,
+  SagaDurabilityTier,
+  SagaId,
+  SagaInstanceId,
+  SagaInstanceStatus,
+  SagaState,
+  SagaStateEnvelope,
+  SagaStateMetadata,
+  SagaTransition,
+  SagaTransitionRecord,
+} from '../domain/mod.ts';
+export type {
+  SagaIdempotencyReservation,
+  SagaIdempotencyTarget,
+} from '../runtime/saga-idempotency.ts';
 export type {
   SagaCorrelationIndexEntry,
   SagaIdempotencyPort,

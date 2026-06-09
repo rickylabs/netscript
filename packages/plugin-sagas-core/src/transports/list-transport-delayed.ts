@@ -3,13 +3,17 @@ import { encodeListTransportMessage } from './list-transport-subscription.ts';
 
 /** Minimal sorted-set/list client needed by delayed LIST delivery. */
 export interface ListDelayedClient {
+  /** Push a serialized envelope onto the ready queue. */
   rpush(key: string, value: string): Promise<unknown>;
+  /** Store a delayed envelope under its delivery timestamp. */
   zadd(key: string, score: number, member: string): Promise<unknown>;
+  /** Read delayed entries with scores inside the requested range. */
   zrangebyscore(
     key: string,
     min: number | string,
     max: number | string,
   ): Promise<readonly string[]>;
+  /** Remove one delayed entry after it has been queued. */
   zrem(key: string, member: string): Promise<unknown>;
 }
 
@@ -40,6 +44,7 @@ export class ListDelayedMessageProcessor {
   readonly #onError?: (error: unknown) => void;
   #timer?: ReturnType<typeof setInterval>;
 
+  /** Create a delayed LIST processor. */
   constructor(options: ListDelayedMessageProcessorOptions) {
     this.#client = options.client;
     this.#delayedSetKey = options.delayedSetKey;
@@ -49,17 +54,20 @@ export class ListDelayedMessageProcessor {
     this.#onError = options.onError;
   }
 
+  /** Start polling for due delayed messages. */
   start(): void {
     if (this.#timer || this.#intervalMs <= 0) return;
     this.#timer = setInterval(() => void this.processDue(), this.#intervalMs);
   }
 
+  /** Stop polling for due delayed messages. */
   stop(): void {
     if (!this.#timer) return;
     clearInterval(this.#timer);
     this.#timer = undefined;
   }
 
+  /** Enqueue a message for delayed LIST delivery. */
   enqueue(
     queueKey: string,
     topic: string,
@@ -75,6 +83,7 @@ export class ListDelayedMessageProcessor {
     return this.#client.zadd(this.#delayedSetKey, deliverAt, entry);
   }
 
+  /** Move all currently due delayed entries into their ready queues. */
   async processDue(): Promise<void> {
     const now = this.#now().getTime();
     const entries = await this.#client.zrangebyscore(this.#delayedSetKey, '-inf', now);

@@ -4,25 +4,10 @@
  * Public manifest and constants for the sagas plugin package.
  */
 
-import {
-  type ContractVersionContribution,
-  type DbSchemaContribution,
-  definePlugin,
-  type E2eContribution,
-  type MigrationContribution,
-  type PluginManifest,
-  type RuntimeConfigTopicContribution,
-  type ServiceContribution,
-  type TelemetryContribution,
-} from '@netscript/plugin';
+import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import { streamsPlugin, type StreamsPluginManifest } from '@netscript/plugin-streams';
 import { workersPlugin, type WorkersPluginManifest } from '@netscript/plugin-workers';
-import {
-  SAGAS_API_DEFAULT_PORT,
-  SAGAS_API_SERVICE_NAME,
-  SAGAS_PLUGIN_ID,
-  SAGAS_PLUGIN_VERSION,
-} from '../constants.ts';
+import { SAGAS_API_DEFAULT_PORT, SAGAS_API_SERVICE_NAME, SAGAS_PLUGIN_ID } from '../constants.ts';
 
 const SAGAS_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -32,41 +17,87 @@ const SAGAS_SERVICE_PERMISSIONS = [
   '--allow-write',
 ] as const;
 
+/** Structural plugin manifest dependency reference. */
+export type SagasPluginDependencyManifest = Readonly<{
+  name?: string;
+  version?: string;
+  [key: string]: unknown;
+}>;
+
 /** Typed dependencies consumed by the sagas plugin manifest. */
 export type SagasPluginDependencies = Readonly<
-  Record<string, PluginManifest> & {
-    workers: WorkersPluginManifest;
-    streams: StreamsPluginManifest;
+  Record<string, SagasPluginDependencyManifest> & {
+    workers: SagasPluginDependencyManifest;
+    streams: SagasPluginDependencyManifest;
   }
 >;
+
+/** Structural service contribution in the sagas plugin manifest. */
+export type SagasServiceContribution = Readonly<{
+  name: string;
+  entrypoint: string;
+  port?: number;
+}>;
+
+/** Structural database schema contribution in the sagas plugin manifest. */
+export type SagasDbSchemaContribution = Readonly<{
+  path: string;
+  engine?: string;
+}>;
+
+/** Structural runtime config topic contribution in the sagas plugin manifest. */
+export type SagasRuntimeConfigTopicContribution = Readonly<{
+  name: string;
+  schemaPath?: string;
+}>;
+
+/** Structural contract version contribution in the sagas plugin manifest. */
+export type SagasContractVersionContribution = Readonly<{
+  version: string;
+  loader: string;
+}>;
+
+/** Structural E2E contribution in the sagas plugin manifest. */
+export type SagasE2eContribution = Readonly<Record<string, unknown>>;
+
+/** Structural telemetry contribution in the sagas plugin manifest. */
+export type SagasTelemetryContribution = Readonly<Record<string, unknown>>;
+
+/** Structural migration contribution in the sagas plugin manifest. */
+export type SagasMigrationContribution = Readonly<Record<string, unknown>>;
 
 /** Public contribution groups exposed by the sagas plugin. */
 export interface SagasPluginContributions {
   /** Sagas API service contribution. */
-  readonly services?: readonly ServiceContribution[];
+  readonly services?: readonly SagasServiceContribution[];
   /** Database schema contribution for saga state. */
-  readonly databaseSchemas?: readonly DbSchemaContribution[];
+  readonly databaseSchemas?: readonly SagasDbSchemaContribution[];
   /** Runtime config topic contribution for saga overrides. */
-  readonly runtimeConfigTopics?: readonly RuntimeConfigTopicContribution[];
+  readonly runtimeConfigTopics?: readonly SagasRuntimeConfigTopicContribution[];
   /** Contract versions exposed by the sagas API. */
-  readonly contractVersions?: readonly ContractVersionContribution[];
+  readonly contractVersions?: readonly SagasContractVersionContribution[];
   /** End-to-end test contributions. */
-  readonly e2e?: readonly E2eContribution[];
+  readonly e2e?: readonly SagasE2eContribution[];
   /** Telemetry contribution modules. */
-  readonly telemetry?: readonly TelemetryContribution[];
+  readonly telemetry?: readonly SagasTelemetryContribution[];
   /** Migration contribution modules or assets. */
-  readonly migrations?: readonly MigrationContribution[];
+  readonly migrations?: readonly SagasMigrationContribution[];
   /** Aspire contribution module reference. */
   readonly aspire?: string;
 }
 
 /** Public manifest shape for the sagas plugin. */
-export interface SagasPluginManifest
-  extends Omit<PluginManifest, 'dependencies' | 'contributions'> {
+export interface SagasPluginManifest {
+  /** Plugin package name. */
+  readonly name: string;
+  /** Plugin semantic version. */
+  readonly version: string;
   /** Declared typed plugin dependencies. */
   readonly dependencies: SagasPluginDependencies;
   /** Declared contribution axes. */
   readonly contributions: SagasPluginContributions;
+  /** Additional manifest metadata carried by the plugin host. */
+  readonly [key: string]: unknown;
 }
 
 /** Inspection summary for the sagas plugin manifest. */
@@ -81,10 +112,12 @@ export interface SagasPluginInspection {
   readonly axes: readonly string[];
 }
 
-const sagasPluginDependencies: SagasPluginDependencies = Object.freeze({
-  workers: workersPlugin,
-  streams: streamsPlugin,
-});
+const sagasPluginDependencies = Object.freeze(
+  {
+    workers: workersPlugin,
+    streams: streamsPlugin,
+  } satisfies Readonly<{ workers: WorkersPluginManifest; streams: StreamsPluginManifest }>,
+);
 
 const sagasManifest: PluginManifest = definePlugin(
   '@netscript/plugin-sagas',
@@ -145,7 +178,7 @@ const sagasManifest: PluginManifest = definePlugin(
   .build();
 
 /** Plugin manifest for NetScript sagas. */
-export const sagasPlugin: SagasPluginManifest = sagasManifest as SagasPluginManifest;
+export const sagasPlugin: SagasPluginManifest = sagasManifest as unknown as SagasPluginManifest;
 
 /** Inspect the sagas plugin manifest without invoking lifecycle hooks. */
 export function inspectSagas(

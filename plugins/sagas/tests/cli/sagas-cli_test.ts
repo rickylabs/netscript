@@ -1,0 +1,39 @@
+import { assertEquals } from 'jsr:@std/assert@^1';
+import { SAGAS_CLI_COMMANDS, SagasCli, StaticSagasCliBackend } from '../../src/cli/mod.ts';
+
+Deno.test('SagasCli exposes the sagas command registry', async () => {
+  const cli = new SagasCli(new StaticSagasCliBackend());
+  const commands = cli.commands();
+
+  assertEquals(cli.name, 'sagas');
+  assertEquals(cli.description, 'Saga orchestration plugin CLI.');
+  assertEquals(commands.map((command) => command.name), [...SAGAS_CLI_COMMANDS]);
+
+  const inspect = await cli.run({
+    command: 'inspect',
+    values: ['project/sagas'],
+    flags: { root: 'sagas,services' },
+  });
+  assertEquals(inspect.code, 0);
+  assertEquals(inspect.data, {
+    command: 'inspect',
+    category: 'inspection',
+    usage: 'ns-sagas inspect [--root=sagas]',
+    flags: { root: 'sagas,services' },
+    values: ['project/sagas'],
+  });
+
+  const missing = await cli.run({ command: 'missing-command' });
+  assertEquals(missing.code, 1);
+});
+
+Deno.test('SagasCli exposes command metadata with categories and flags', () => {
+  const cli = new SagasCli(new StaticSagasCliBackend());
+  const definitions = cli.commands();
+
+  assertEquals(definitions.map((definition) => definition.description), [
+    'Generate the static saga registry for compiled runtimes.',
+    'Inspect fluent saga definitions in project source.',
+    'Rewrite legacy sagas imports to plugin package specifiers.',
+  ]);
+});

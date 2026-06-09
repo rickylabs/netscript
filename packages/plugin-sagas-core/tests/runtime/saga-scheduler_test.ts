@@ -1,4 +1,4 @@
-import { assertEquals } from 'jsr:@std/assert';
+import { assertEquals } from '@std/assert';
 
 import type { SagaClockPort } from '../../src/ports/mod.ts';
 import type { SagaMessageId } from '../../src/domain/mod.ts';

@@ -1,0 +1,510 @@
+{
+  "source": {
+    "mode": "auto",
+    "root": "packages/plugin-sagas-core",
+    "entrypoints": [
+      "./mod.ts",
+      "./src/abstracts/mod.ts",
+      "./src/adapters/mod.ts",
+      "./src/agent/mod.ts",
+      "./src/builders/mod.ts",
+      "./src/config/mod.ts",
+      "./src/contracts/v1/mod.ts",
+      "./src/domain/mod.ts",
+      "./src/integration/publisher/mod.ts",
+      "./src/integration/workers/mod.ts",
+      "./src/middleware/mod.ts",
+      "./src/ports/mod.ts",
+      "./src/presets/mod.ts",
+      "./src/runtime/mod.ts",
+      "./src/stores/mod.ts",
+      "./src/streams/mod.ts",
+      "./src/telemetry/mod.ts",
+      "./src/testing/mod.ts",
+      "./src/transports/mod.ts"
+    ]
+  },
+  "summary": {
+    "totalPackages": 1,
+    "totalErrors": 397,
+    "totalPrivateTypeRef": 48,
+    "totalMissingJSDoc": 349,
+    "totalOther": 0
+  },
+  "packages": [
+    {
+      "name": "@netscript/plugin-sagas-core",
+      "dir": "packages/plugin-sagas-core",
+      "entrypoints": [
+        {
+          "path": "./mod.ts",
+          "privateTypeRef": 17,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 17
+        },
+        {
+          "path": "./src/abstracts/mod.ts",
+          "privateTypeRef": 27,
+          "missingJSDoc": 24,
+          "other": 0,
+          "total": 51
+        },
+        {
+          "path": "./src/adapters/mod.ts",
+          "privateTypeRef": 23,
+          "missingJSDoc": 23,
+          "other": 0,
+          "total": 46
+        },
+        {
+          "path": "./src/agent/mod.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "./src/builders/mod.ts",
+          "privateTypeRef": 14,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 14
+        },
+        {
+          "path": "./src/config/mod.ts",
+          "privateTypeRef": 11,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 11
+        },
+        {
+          "path": "./src/contracts/v1/mod.ts",
+          "privateTypeRef": 19,
+          "missingJSDoc": 18,
+          "other": 0,
+          "total": 37
+        },
+        {
+          "path": "./src/domain/mod.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 4,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "./src/integration/publisher/mod.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 3,
+          "other": 0,
+          "total": 9
+        },
+        {
+          "path": "./src/integration/workers/mod.ts",
+          "privateTypeRef": 8,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 10
+        },
+        {
+          "path": "./src/middleware/mod.ts",
+          "privateTypeRef": 14,
+          "missingJSDoc": 5,
+          "other": 0,
+          "total": 19
+        },
+        {
+          "path": "./src/ports/mod.ts",
+          "privateTypeRef": 35,
+          "missingJSDoc": 40,
+          "other": 0,
+          "total": 75
+        },
+        {
+          "path": "./src/presets/mod.ts",
+          "privateTypeRef": 5,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "./src/runtime/mod.ts",
+          "privateTypeRef": 58,
+          "missingJSDoc": 48,
+          "other": 0,
+          "total": 106
+        },
+        {
+          "path": "./src/stores/mod.ts",
+          "privateTypeRef": 11,
+          "missingJSDoc": 8,
+          "other": 0,
+          "total": 19
+        },
+        {
+          "path": "./src/streams/mod.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "./src/telemetry/mod.ts",
+          "privateTypeRef": 6,
+          "missingJSDoc": 53,
+          "other": 0,
+          "total": 59
+        },
+        {
+          "path": "./src/testing/mod.ts",
+          "privateTypeRef": 34,
+          "missingJSDoc": 43,
+          "other": 0,
+          "total": 77
+        },
+        {
+          "path": "./src/transports/mod.ts",
+          "privateTypeRef": 24,
+          "missingJSDoc": 84,
+          "other": 0,
+          "total": 108
+        }
+      ],
+      "files": [
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/telemetry/instrumentation.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 43,
+          "other": 0,
+          "total": 43
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/contracts/v1/sagas.contract.ts",
+          "privateTypeRef": 17,
+          "missingJSDoc": 18,
+          "other": 0,
+          "total": 35
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/transports/list-transport.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 23,
+          "other": 0,
+          "total": 23
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/transports/redis-transport.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 20,
+          "other": 0,
+          "total": 20
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/transports/list-transport-subscription.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 18,
+          "other": 0,
+          "total": 18
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/telemetry/attributes.ts",
+          "privateTypeRef": 5,
+          "missingJSDoc": 10,
+          "other": 0,
+          "total": 15
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/adapters/saga-bus-legacy.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 14,
+          "other": 0,
+          "total": 14
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/testing/memory-saga-bus.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 13,
+          "other": 0,
+          "total": 13
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/runtime/saga-scheduler.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 11,
+          "other": 0,
+          "total": 11
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/testing/memory-saga-store.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 11,
+          "other": 0,
+          "total": 11
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/config/saga-config-schema.ts",
+          "privateTypeRef": 10,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 10
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/testing/recording-saga-store.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 10,
+          "other": 0,
+          "total": 10
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/adapters/saga-bus-bridge.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 9,
+          "other": 0,
+          "total": 9
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-transport-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 9,
+          "other": 0,
+          "total": 9
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/runtime/saga-engine.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 9,
+          "other": 0,
+          "total": 9
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 9,
+          "other": 0,
+          "total": 9
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/transports/list-transport-delayed.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 9,
+          "other": 0,
+          "total": 9
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/abstracts/abstract-saga-bus.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 8,
+          "other": 0,
+          "total": 8
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-bus-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 8,
+          "other": 0,
+          "total": 8
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/runtime/logger.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 8,
+          "other": 0,
+          "total": 8
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/transports/redis-transport-delayed.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 8,
+          "other": 0,
+          "total": 8
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/abstracts/abstract-saga-store.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 7,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-store-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 7,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/testing/test-saga-clock.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 7,
+          "other": 0,
+          "total": 7
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/integration/workers/types.ts",
+          "privateTypeRef": 4,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/runtime/saga-idempotency.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 6,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/transports/redis-transport-subscription.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 6,
+          "other": 0,
+          "total": 6
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/abstracts/abstract-saga-transport.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 5,
+          "other": 0,
+          "total": 5
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/runtime/saga-compensator.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 5,
+          "other": 0,
+          "total": 5
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/middleware/saga-middleware.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 3,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/abstracts/abstract-agent-runtime.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 4,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/domain/errors.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 4,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-agent-runtime-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 4,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-history-store-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 4,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-outbox-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 4,
+          "other": 0,
+          "total": 4
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/public/messages.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/streams/schema.ts",
+          "privateTypeRef": 3,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/integration/publisher/saga-publisher-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 3,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-clock-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 3,
+          "other": 0,
+          "total": 3
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/integration/workers/triggers.ts",
+          "privateTypeRef": 2,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 2
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/middleware/sse-events-middleware.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 2
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/presets/start-sagas.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 2
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/testing/create-test-saga-runtime.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 2,
+          "other": 0,
+          "total": 2
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/builders/define-saga.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/integration/workers/trigger-job.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/integration/workers/trigger-task.ts",
+          "privateTypeRef": 1,
+          "missingJSDoc": 0,
+          "other": 0,
+          "total": 1
+        },
+        {
+          "path": "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave4-runtimes-4c/packages/plugin-sagas-core/src/ports/saga-idempotency-port.ts",
+          "privateTypeRef": 0,
+          "missingJSDoc": 1,
+          "other": 0,
+          "total": 1
+        }
+      ],
+      "combinedTotal": 397,
+      "combinedPrivateTypeRef": 48,
+      "combinedMissingJSDoc": 349,
+      "combinedOther": 0
+    }
+  ]
+}

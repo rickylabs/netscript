@@ -1,13 +1,17 @@
 import { createDurableStream, type DurableStreamProducer } from '@netscript/plugin-streams-core';
 import { sagasStreamSchema } from './schema.ts';
 
+export type { DurableStreamProducer, StreamProducerPort } from '@netscript/plugin-streams-core';
+export type { SagasStreamDefinition, StateSchema, StreamStateDefinition } from './schema.ts';
+
 const STREAM_PATH = '/sagas/instances';
 const PRODUCER_ID = 'sagas-service';
 
 let producer: DurableStreamProducer<typeof sagasStreamSchema> | undefined;
 let reconciliationStarted = false;
 
-type SagaInstanceRecordSelect = {
+/** Selected Prisma fields required to mirror saga instance state. */
+export type SagaInstanceRecordSelect = {
   correlationId: true;
   sagaName: true;
   state: true;
@@ -17,7 +21,8 @@ type SagaInstanceRecordSelect = {
   updatedAt: true;
 };
 
-type SagaInstanceRecord = {
+/** Minimal saga instance record shape returned by the Prisma-like client. */
+export type SagaInstanceRecord = {
   correlationId: string;
   sagaName: string;
   state: unknown;
@@ -29,11 +34,17 @@ type SagaInstanceRecord = {
 
 /** Minimal Prisma-like client needed for saga stream state reconciliation. */
 export interface SagaStreamPrismaClient {
+  /** Saga instance repository used for paged reconciliation. */
   sagaInstance: {
+    /** Return a deterministic page of saga instance records. */
     findMany(args: {
+      /** Stable ordering for deterministic stream mirrors. */
       orderBy: Array<{ updatedAt: 'asc' } | { correlationId: 'asc' }>;
+      /** Maximum records to return. */
       take: number;
+      /** Number of records to skip. */
       skip: number;
+      /** Selected fields used by the mirror. */
       select: SagaInstanceRecordSelect;
     }): Promise<SagaInstanceRecord[]>;
   };
@@ -41,7 +52,9 @@ export interface SagaStreamPrismaClient {
 
 /** Options for bootstrapping saga state into durable streams. */
 export interface SagasStreamMirrorOptions {
+  /** Abort signal used to stop reconciliation. */
   readonly signal?: AbortSignal;
+  /** Prisma-like client used to read existing saga instances. */
   readonly prisma?: SagaStreamPrismaClient | null;
 }
 

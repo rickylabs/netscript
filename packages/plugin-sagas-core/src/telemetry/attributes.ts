@@ -8,6 +8,7 @@ export type SagaSpanNamesMap = Readonly<{
   CASCADE_COMPLETE: 'saga.cascade.complete';
 }>;
 
+/** Canonical span names emitted by saga runtime operations. */
 export const SagaSpanNames: SagaSpanNamesMap = Object.freeze(
   {
     HANDLE: 'saga.handle',
@@ -42,6 +43,7 @@ export type SagaAttributesMap = Readonly<{
   OUTCOME: 'outcome';
 }>;
 
+/** Canonical attribute keys emitted by saga spans and metrics. */
 export const SagaAttributes: SagaAttributesMap = Object.freeze(
   {
     SAGA_ID: 'saga.id',
@@ -72,6 +74,7 @@ export type SagaSpanEventsMap = Readonly<{
   STATE_AFTER: 'state.after';
 }>;
 
+/** Canonical span events used to annotate state snapshots. */
 export const SagaSpanEvents: SagaSpanEventsMap = Object.freeze(
   {
     STATE_BEFORE: 'state.before',
@@ -90,6 +93,7 @@ export type SagaMetricNamesMap = Readonly<{
   REPLAY_DURATION_MS: 'netscript_saga_replay_duration_ms';
 }>;
 
+/** Canonical metric names emitted by saga instrumentation. */
 export const SagaMetricNames: SagaMetricNamesMap = Object.freeze(
   {
     HANDLE_DURATION_MS: 'netscript_saga_handle_duration_ms',
@@ -110,6 +114,7 @@ export type SagaTelemetryOutcomesMap = Readonly<{
   SKIPPED: 'skipped';
 }>;
 
+/** Canonical outcome values attached to saga spans and metrics. */
 export const SagaTelemetryOutcomes: SagaTelemetryOutcomesMap = Object.freeze(
   {
     SUCCESS: 'success',
@@ -119,9 +124,14 @@ export const SagaTelemetryOutcomes: SagaTelemetryOutcomesMap = Object.freeze(
   } as const,
 );
 
+/** Literal union of supported saga span names. */
 export type SagaSpanName = (typeof SagaSpanNames)[keyof typeof SagaSpanNames];
+/** Literal union of supported saga telemetry attribute names. */
 export type SagaAttributeName = (typeof SagaAttributes)[keyof typeof SagaAttributes];
+/** Literal union of supported saga span event names. */
 export type SagaSpanEventName = (typeof SagaSpanEvents)[keyof typeof SagaSpanEvents];
+/** Literal union of supported saga metric names. */
 export type SagaMetricName = (typeof SagaMetricNames)[keyof typeof SagaMetricNames];
+/** Literal union of supported saga telemetry outcome values. */
 export type SagaTelemetryOutcome =
   (typeof SagaTelemetryOutcomes)[keyof typeof SagaTelemetryOutcomes];

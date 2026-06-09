@@ -5,6 +5,45 @@
  * T2/T3/agent durability axes.
  */
 
+export {
+  CASCADED_MESSAGE_KINDS,
+  SAGA_DURABILITY_TIERS,
+  SAGA_INSTANCE_STATUSES,
+} from '../domain/mod.ts';
+export type {
+  CascadedMessage,
+  CascadedMessageKind,
+  CascadedMessageOptions,
+  CascadedMessageTarget,
+  QueryDefinition,
+  RetryPolicy,
+  SagaConcurrencyPolicy,
+  SagaContext,
+  SagaCorrelation,
+  SagaCorrelationKey,
+  SagaCorrelationRule,
+  SagaDefinition,
+  SagaDurabilityTier,
+  SagaHandler,
+  SagaId,
+  SagaInstanceId,
+  SagaInstanceStatus,
+  SagaMessage,
+  SagaMessageId,
+  SagaQueryHandler,
+  SagaSignal,
+  SagaSignalHandler,
+  SagaState,
+  SagaStateEnvelope,
+  SagaStateMetadata,
+  SagaTransition,
+  SagaTransitionRecord,
+  SignalDefinition,
+} from '../domain/mod.ts';
+export type {
+  SagaIdempotencyReservation,
+  SagaIdempotencyTarget,
+} from '../runtime/saga-idempotency.ts';
 export type {
   SagaBusPort,
   SagaPublishOptions,

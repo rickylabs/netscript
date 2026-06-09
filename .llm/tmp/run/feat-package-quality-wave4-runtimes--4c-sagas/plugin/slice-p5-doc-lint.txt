@@ -1,0 +1,44 @@
+exit=1
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\scaffolding\saga-scaffolders.ts:15:3
+   | 
+15 |   readonly id = 'saga-definition';
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\scaffolding\saga-scaffolders.ts:16:3
+   | 
+16 |   readonly kind = 'saga';
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\scaffolding\saga-scaffolders.ts:17:3
+   | 
+17 |   readonly templatePath = './templates/saga-definition.ts.template';
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\scaffolding\saga-scaffolders.ts:71:3
+   | 
+71 |   readonly id = 'saga-config';
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\scaffolding\saga-scaffolders.ts:72:3
+   | 
+72 |   readonly kind = 'saga-config';
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\scaffolding\saga-scaffolders.ts:73:3
+   | 
+73 |   readonly templatePath = './templates/saga-config.ts.template';
+   |   ^
+
+
+error: Found 6 documentation lint errors.

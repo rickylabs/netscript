@@ -1,35 +1,43 @@
 ## PLAN-EVAL Verdict: **PASS**
 
-Run: `feat-package-quality-wave4-runtimes--4b-workers` (PR #19 → umbrella #16)
-Base: umbrella `2c24662` (4a merged) + 4b merge `173357c`
+Run: `feat-package-quality-wave4-runtimes--4c-sagas` (PR #20 → umbrella #16)
+Base: umbrella `1896f854` (4a + 4b merged; pull-forward `128a0a8`)
+Surface: `@netscript/plugin-sagas-core` (A3) + `@netscript/plugin-sagas` (A5)
 
 ### Plan-Gate Checklist Results
 
 | Check | Result | Evidence |
 |---|---|---|
-| Research present and current | **PASS** | `research.md` exists; re-baselined against umbrella `2c24662`. Spot-checks confirmed duplicate `./contracts` alias, over-cap files (500/468 LOC), version mismatch, missing `publish:dry-run`, non-enumerating `check`, dry-run PASS both units. |
-| Decisions locked | **PASS** | A3 core, A5 plugin, core/plugin split, `./contracts` fold, ptr-fix strategy, F-1 split filenames, test-layer mock strategy all stated with rationale. |
-| Open-decision sweep | **PASS** | Plan §13 lists all decisions; "must resolve now" items are locked, deferred items are safe to defer. Evaluator found no hidden open decisions that would force rework. |
-| Commit slices (<30, gate+files each) | **PASS** | 27 slices (14 core + 13 plugin), each names its proving gate and touched files/concerns. |
-| Risk register | **PASS** | 5 risks with likelihood, impact, and mitigations. |
-| Gate set selected | **PASS** | Aligned with `gates/archetype-gate-matrix.md`; A3 gate delta (F-13 + Runtime/Aspire required) justified in `drift.md`. |
-| Deferred scope explicit | **PASS** | 5 deferred items with "why deferred" and target gates. |
-| jsr-audit surface scan | **PASS** | Publishability rubric applied to both units; gaps mapped to slices. |
+| Research present and current | **PASS** | `research.md` dated 2026-06-09; re-baselined against `1896f854` (4a + 4b merged umbrella). Over-cap files (480/453/715 LOC), missing `test`/`publish:dry-run` tasks, dry-run PASS both units confirmed via tree spot-checks. |
+| Decisions locked | **PASS** | A3 core, A5 plugin, core/plugin split (14+13), 19+12 entrypoints locked, F-3 layering verdict, ptr-fix strategy (LD-8), F-1 split file names, test-layer mock vs real, v1 router split scope — all stated with rationale. |
+| Open-decision sweep | **PASS** | Plan §13 lists all decisions; 5 deferred items all marked safe-to-defer. Evaluator sweep found no hidden open decisions that would force rework. |
+| Commit slices (<30, gate+files each) | **PASS** | 27 slices (14 core C1–C14 + 13 plugin P1–P13), each names its proving gate and touched files/concerns. Ordered: hygiene → ptr-fix → jsdoc → F-1 splits → tests → validate. |
+| Risk register | **PASS** | 6 risks (ptr leaks, F-1 splits, v1 router #96 drift, test layer, slice drift, consumer breaks) with likelihood, impact, and mitigations. |
+| Gate set selected | **PASS** | Aligned with `gates/archetype-gate-matrix.md` for A3/A5; F-13 + Runtime/Aspire required for both; consumer-import validation included. |
+| Deferred scope explicit | **PASS** | 6 deferred items with reasons + target gates (Prisma artifacts → Wave 6, check:sagas → environment, zero-consumer trim → post-alpha, manifest type cast → Wave 3 follow-up). |
+| jsr-audit surface scan | **PASS** | Research §9: publishability rubric applied per-package; 19 core + 12 plugin entrypoints reviewed; 0 slow types; gaps mapped to slices C1–C12, P1–P9. |
 
 ### Spot-Checks Performed
-1. **Duplicate contracts alias** — `packages/plugin-workers-core/deno.json` exports show `./contracts` and `./contracts/v1` both pointing to `src/contracts/v1/mod.ts` → confirmed fold candidate.
-2. **Missing plugin task** — `plugins/workers/deno.json` has no `publish:dry-run` task, and `check` only covers 4 files instead of all 9 entrypoints → confirmed in slices P1/C2.
-3. **Dry-run** — `deno publish --dry-run --allow-dirty` **PASS** for both core and plugin.
-4. **Version mismatch** — `plugins/workers/src/public/mod.ts` line 146 declares `0.1.0`; `deno.json` says `0.0.1-alpha.0` → confirmed bug to fix in slice C3/P1.
-5. **F-1 over-cap** — `workers.contract.ts` 500 LOC, `scheduler.ts` 468 LOC → confirmed.
-6. **Pre-existing CLI carry** — `packages/cli` TS9016/TS9027 failures are Wave 6 CLI debt, byte-identical to base. Correctly excluded from 4b scope.
+1. **Over-cap files** — verified against tree: `redis-transport.ts` 480 LOC, `list-transport.ts` 453 LOC, `v1.ts` 715 LOC — matches research.md §7.
+2. **Missing tasks** — `packages/plugin-sagas-core/deno.json` has no `"test"` task (0 matches); `plugins/sagas/deno.json` has no `"publish:dry-run"` task — confirmed in slices C1, P1.
+3. **Merge-base** — `1896f854` verified on both `feat/package-quality-wave4-runtimes-4c` and `origin/feat/package-quality-wave4-runtimes`.
+4. **F-3 layering** — research.md §6 confirms clean ports → adapters → transports layering with "transports swappable behind `SagaTransportPort`".
+5. **F-13 validation** — C14 covers sweep; 4b workers IMPL-EVAL PASS demonstrates A3 runtime validation is achievable without a dedicated slice.
+6. **Pre-existing CLI carry** — `packages/cli` TS9016/TS9027 failures are Wave 6 CLI debt, byte-identical to base. Correctly excluded from 4c scope.
+
+### Evaluator Open-Decision Sweep
+No unlisted decisions found that would force rework if deferred. All material architecture decisions are locked in the plan.
 
 ### Remaining Risks
-- **Slice buffer is thin (27/30).** Rescope if implementation drift pushes a sub-wave over 18 slices.
-- **Zod ptr leaks (75 errors)** may resist structural-type fix; fallback (`@ignore`) and debt recording path are defined.
-- **Zero-consumer entrypoint trim** deferred to post-alpha; monitor as tech debt.
+- **Slice buffer is thin (27/30).** Rescope if implementation drift pushes either sub-wave over 18 slices.
+- **Zod/oRPC ptr leaks (119 total)** may resist structural-type fix; `@ignore` fallback and debt recording path are defined.
+- **v1 router #96 typing drift** may surface additional issues during the P8 concept-split; plan includes Prisma interface as deferred scope.
+- **Zero-consumer entrypoint trim** (`./abstracts`, `./testing`, `./telemetry`, `./presets`, `./agent`) deferred to post-alpha; 5 entrypoints flagged.
 
 **Implementation may begin. No slices before this PASS.**
+
+### Artifacts
+- `plan-eval.md` written to `.llm/tmp/run/feat-package-quality-wave4-runtimes--4c-sagas/plan-eval.md`
 
 ---
 _This comment was created by an AI agent (OpenHands) on behalf of the user._

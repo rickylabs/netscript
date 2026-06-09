@@ -5,6 +5,8 @@
  */
 
 export { defineSagaConfig } from './define-saga-config.ts';
+export type { ConfigSchema, ConfigSchemaResult } from './config-schema.ts';
+export type { SagaId } from '../domain/mod.ts';
 export type {
   SagaConfigBuilder,
   SagaConfigBuilderState,
@@ -20,8 +22,14 @@ export {
 } from './saga-config-schema.ts';
 export type {
   SagaConfig,
+  SagaConfigData,
   SagaConfigInput,
   SagaGroupConfig,
+  SagaGroupConfigData,
+  SagaRetentionConfigData,
   SagaRetryConfig,
+  SagaScalingConfigData,
+  SagaStoreProvider,
   SagaTimeoutConfig,
+  SagaTransportProvider,
 } from './saga-config-schema.ts';

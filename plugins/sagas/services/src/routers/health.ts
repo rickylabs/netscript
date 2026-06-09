@@ -78,7 +78,7 @@ export const health: Record<string, unknown> = {
   /**
    * Liveness probe - always returns OK if process is running
    */
-  live: healthContractV1.live.handler(async () => {
+  live: healthContractV1.live.handler(() => {
     return {
       status: 'ok' as const,
       timestamp: new Date().toISOString(),

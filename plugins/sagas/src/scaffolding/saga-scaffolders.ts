@@ -12,8 +12,11 @@ import { SagasItemScaffolder } from './sagas-item-scaffolder.ts';
 
 /** Scaffold a fluent saga definition module. */
 export class SagaDefinitionScaffolder extends SagasItemScaffolder<SagasScaffoldInput> {
+  /** Stable scaffolder identifier. */
   readonly id = 'saga-definition';
+  /** Scaffolded item kind. */
   readonly kind = 'saga';
+  /** Template path used by template-aware hosts. */
   readonly templatePath = './templates/saga-definition.ts.template';
 
   /** Generate TypeScript source for a saga definition. */
@@ -68,8 +71,11 @@ export class SagaDefinitionScaffolder extends SagasItemScaffolder<SagasScaffoldI
 
 /** Scaffold a config-time saga entry module. */
 export class SagaConfigScaffolder extends SagasItemScaffolder<SagasScaffoldInput> {
+  /** Stable scaffolder identifier. */
   readonly id = 'saga-config';
+  /** Scaffolded item kind. */
   readonly kind = 'saga-config';
+  /** Template path used by template-aware hosts. */
   readonly templatePath = './templates/saga-config.ts.template';
 
   /** Generate TypeScript source for a config-time saga entry. */

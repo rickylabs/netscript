@@ -23,13 +23,17 @@ export type SagaAgentStepResult = Readonly<{
 
 /** Reserved AI-agent runtime boundary for future plugin integration. */
 export interface SagaAgentRuntimePort {
+  /** Stable adapter identifier used by runtime diagnostics and plugin registration. */
   readonly id: string;
+  /** Run one agent step for a saga-bound conversation. */
   runStep(
     agentId: SagaAgentId,
     conversationId: SagaAgentConversationId,
     input: SagaAgentInput,
     context: SagaContext,
   ): Promise<SagaAgentStepResult>;
+  /** Serialize agent runtime state for durable storage. */
   serializeState(state: SagaAgentRuntimeState): Promise<Uint8Array>;
+  /** Deserialize durable agent runtime state. */
   deserializeState(bytes: Uint8Array): Promise<SagaAgentRuntimeState>;
 }
