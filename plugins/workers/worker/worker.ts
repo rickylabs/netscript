@@ -6,12 +6,12 @@
 
 import { delay } from '@std/async';
 import { createQueue, type MessageQueue } from '@netscript/queue';
-import { type JobMessage, type TaskMessage } from '@netscript/plugin-workers-core/runtime';
+import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
 import {
   startWorkerSpan,
   type TracedMessageContext,
-  TracedQueue,
+  type TracedQueue,
 } from '@netscript/telemetry/instrumentation';
 import { describeTelemetryConfig, isTelemetryEnabled } from '@netscript/telemetry/config';
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
@@ -195,9 +195,9 @@ export class Worker {
     } finally {
       if (jobListener.snapshot().status === 'failed') {
         await this.stop();
-        return;
+      } else {
+        this.running = false;
       }
-      this.running = false;
     }
   }
 

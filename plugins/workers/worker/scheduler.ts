@@ -2,7 +2,7 @@
 
 import { createScheduler } from '@netscript/cron';
 import { createQueue } from '@netscript/queue';
-import { type JobDefinition, type JobMessage } from '@netscript/plugin-workers-core/runtime';
+import type { JobDefinition, JobMessage } from '@netscript/plugin-workers-core/runtime';
 import { enqueueSchedulerJob, type SchedulerJobTrigger } from './scheduler-dispatch.ts';
 import { setupSchedulerEventListeners } from './scheduler-events.ts';
 import { toScheduledJobInfo } from './scheduler-info.ts';
