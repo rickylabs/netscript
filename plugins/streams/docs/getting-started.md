@@ -3,7 +3,9 @@
 Add the plugin to `netscript.config.ts`:
 
 ```ts
-plugins: ['./plugins/streams/mod.ts'];
+export default {
+  plugins: ['./plugins/streams/mod.ts'],
+};
 ```
 
 Run the service in development:

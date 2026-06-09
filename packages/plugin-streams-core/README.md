@@ -4,8 +4,9 @@
 
 ## 1. Package Role
 
-This package is the Tier 1 core for stream-aware plugins. It is an Archetype 1 small-contract
-package. It keeps the public stream API out of the runtime plugin. It exposes schema, producer,
+This package is the Tier 1 core for stream-aware plugins. It is an Archetype 3 runtime/behavior
+package: `DurableStreamProducer` owns network I/O, connection lifecycle, and a singleton registry.
+It keeps the public stream API out of the runtime plugin. It exposes schema, producer,
 configuration, telemetry, diagnostics, and tests. It does not start a server. It does not depend on
 non-core plugin packages. It is the lowest core in the extraction graph.
 
