@@ -29,6 +29,14 @@ export {
   RedisTransportAck,
   RedisTransportSubscription,
 } from './redis-transport-subscription.ts';
+export type { SagaMessage, SagaMessageId } from '../domain/mod.ts';
+export type {
+  SagaTransportAck,
+  SagaTransportHandler,
+  SagaTransportMessage,
+  SagaTransportPort,
+  SagaTransportSubscription,
+} from '../ports/mod.ts';
 export type {
   GarnetListTransportOptions,
   ListTransportClient,
