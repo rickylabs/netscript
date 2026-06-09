@@ -242,4 +242,21 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Warn row recorded: first-party upstream root re-exports pulled unrelated package-private refs into the triggers public doc graph, so D10 uses package-owned structural contracts for dependency/builder shapes. |
-| Commits | Implementation `437e605`; paired docs/evidence pending. |
+| Commits | Implementation `437e605`; paired docs/evidence `35e3020`. |
+
+### Slice 11/23 — D11 plugin runtime private-type-ref fix
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | `src/runtime/*` and `src/runtime/mod.ts` now expose the runtime adapter contracts referenced by public signatures; cron/watchers injection points use package-owned structural contracts, and same-surface public-member JSDoc was added so the raw slice doc-lint gate is green. |
+| Gate(s) | F-7 doc-score, F-15 re-export-upstream lint |
+| Gate command | `deno doc --lint src/runtime/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file` with inherited Fedify npm type-resolution warnings only. |
+| Gate command | `deno fmt --check plugins/triggers/src/runtime/cron-trigger-scheduler-adapter.ts plugins/triggers/src/runtime/kv-trigger-runtime-stores.ts plugins/triggers/src/runtime/project-trigger-registry.ts plugins/triggers/src/runtime/trigger-runtime-processor.ts plugins/triggers/src/runtime/trigger-processor.ts plugins/triggers/src/runtime/watchers-file-watcher-adapter.ts plugins/triggers/src/runtime/mod.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 7 files`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Warn row recorded: direct cron/watchers upstream exports pulled transitive private-type-ref failures into the triggers doc graph; D11 uses package-owned structural runtime injection contracts and pulled same-file D14 JSDoc forward. |
+| Commits | Implementation `c20e9db`; paired docs/evidence pending. |

@@ -30,3 +30,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - f5e87be: chore(triggers-core): validate D9 testing contracts docs
 - 476cec4: docs(wave4): record D9 testing contracts evidence
 - 437e605: fix(triggers): expose D10 public aspire contracts
+- 35e3020: docs(wave4): record D10 plugin public evidence
+- c20e9db: fix(triggers): expose D11 runtime contracts

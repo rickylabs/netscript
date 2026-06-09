@@ -7,7 +7,7 @@ PR target: the **umbrella** (NOT the track).
 Role: SUPERVISOR-authored seed + pre-research. Locked slice authority = this sub-wave's
 `plan.md` once PLAN-EVAL-approved.
 
-## STATUS: IMPLEMENT IN PROGRESS — D10 COMPLETE, D11 NEXT
+## STATUS: IMPLEMENT IN PROGRESS — D11 COMPLETE, D12 NEXT
 
 The plan is locked and PLAN-EVAL passed in a separate session (`plan-eval.md`, commit `bb985d0`).
 Implementation is proceeding in the approved 23-slice order. 4d is the **last** sub-wave of Wave 4:
@@ -27,8 +27,9 @@ to track `feat/package-quality`.
 | D7 | COMPLETE | Core JSDoc telemetry residual validation. Raw `deno doc --lint src/telemetry/mod.ts` PASS exit 0; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation marker commit `98a121f`; docs commit `64109d5`. |
 | D8 | COMPLETE | Core JSDoc ports/domain/runtime/adapters. Raw `deno doc --lint` PASS exit 0 for `src/ports/mod.ts`, `src/domain/mod.ts`, `src/runtime/mod.ts`, and `src/adapters/mod.ts`; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `50cc79f`; docs commit `2d441c3`. |
 | D9 | COMPLETE | Core JSDoc testing/contracts residual validation. Raw `deno doc --lint src/testing/mod.ts` PASS exit 0; raw `deno doc --lint src/contracts/v1/mod.ts` PASS exit 0; raw `deno task check` PASS exit 0. Implementation marker commit `f5e87be`; docs commit `476cec4`. |
-| D10 | COMPLETE | Plugin ptr-fix public/mod, root mod, plugin/mod, aspire. Raw `deno doc --lint` PASS exit 0 for `src/public/mod.ts`, `mod.ts`, `src/plugin/mod.ts`, and `src/aspire/mod.ts`; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `437e605`. |
-| D11 | NEXT | Plugin ptr-fix runtime. |
+| D10 | COMPLETE | Plugin ptr-fix public/mod, root mod, plugin/mod, aspire. Raw `deno doc --lint` PASS exit 0 for `src/public/mod.ts`, `mod.ts`, `src/plugin/mod.ts`, and `src/aspire/mod.ts`; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `437e605`; docs commit `35e3020`. |
+| D11 | COMPLETE | Plugin ptr-fix runtime. Raw `deno doc --lint src/runtime/mod.ts` PASS exit 0 with inherited Fedify npm type-resolution warnings only; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `c20e9db`. |
+| D12 | NEXT | Plugin ptr-fix CLI + streams. |
 
 ## Scope — 2 publishable units + the health seam (OQ-D resolved: in-scope here)
 
