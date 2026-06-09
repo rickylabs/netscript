@@ -1,6 +1,9 @@
 export {
   EventFiltersSchema,
   OffsetPaginationQuerySchema,
+  TRIGGER_CONTRACT_DURABILITY_TIERS,
+  TRIGGER_CONTRACT_EVENT_STATUSES,
+  TRIGGER_CONTRACT_KINDS,
   TriggerDefinitionResponseSchema,
   TriggerEventResponseSchema,
   TriggerFiltersSchema,
@@ -13,10 +16,18 @@ export {
   TriggerSSEEventTypeSchema,
 } from './triggers.contract.ts';
 export type {
+  EventFilters,
+  OffsetPaginationQuery,
+  TriggerContractDurabilityTier,
+  TriggerContractEventStatus,
+  TriggerContractKind,
+  TriggerContractSchema,
   TriggerDefinitionResponse,
   TriggerEventResponse,
+  TriggerFilters,
   TriggerFireInput,
   TriggerFireResponse,
   TriggerPreviewResponse,
   TriggerSSEEvent,
+  TriggerSSEEventType,
 } from './triggers.contract.ts';
