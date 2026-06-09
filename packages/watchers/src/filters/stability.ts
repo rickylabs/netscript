@@ -48,6 +48,12 @@ export class StabilityFilter implements WatchFilter {
   private readonly options: ResolvedStabilityOptions;
   private readonly signal?: AbortSignal;
 
+  /**
+   * Create a stability filter.
+   *
+   * @param options - Optional stability threshold settings.
+   * @param signal - Optional abort signal used while waiting.
+   */
   constructor(options?: StabilityOptions, signal?: AbortSignal) {
     this.options = {
       checkIntervalMs: options?.checkIntervalMs ?? DEFAULTS.checkIntervalMs,
