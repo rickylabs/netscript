@@ -1,0 +1,6 @@
+exit=0
+command=deno check --unstable-kv src/aspire/mod.ts src/runtime/mod.ts
+apphost-search=no apphost.ts/apphost.cs/*.csproj found in worktree
+
+[0m[32mCheck[0m src/aspire/mod.ts
+[0m[32mCheck[0m src/runtime/mod.ts
