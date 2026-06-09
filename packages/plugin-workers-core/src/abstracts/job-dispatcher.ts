@@ -1,4 +1,4 @@
-import type { JobDefinition, JobResult } from '../domain/mod.ts';
+import type { JobDefinition, JobResult } from '../runtime/runtime-types.ts';
 import type { ExecutionContext } from './task-executor.ts';
 
 /** Stub-only contract for job dispatchers. */

@@ -1,11 +1,13 @@
 import {
   createSuccessResult,
-  type JobContext,
-  type JobDefinition,
-  type JobHandler,
-  type JobResult,
 } from '../domain/mod.ts';
-import type { WorkerPort } from '../ports/mod.ts';
+import type {
+  JobContext,
+  JobDefinition,
+  JobHandler,
+  JobResult,
+  RuntimeWorkerPort,
+} from '../runtime/mod.ts';
 
 export type MemoryWorkerDispatch<TResult = unknown> = Readonly<{
   job: JobDefinition;
@@ -20,7 +22,7 @@ export type MemoryWorkerOptions = Readonly<{
 }>;
 
 /** In-memory worker port that records dispatches and executes registered handlers. */
-export class MemoryWorker implements WorkerPort {
+export class MemoryWorker implements RuntimeWorkerPort {
   readonly id: string;
   readonly #handlers: ReadonlyMap<string, JobHandler>;
   readonly #defaultResult: JobResult;

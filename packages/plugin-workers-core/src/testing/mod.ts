@@ -20,3 +20,39 @@ export type {
 export { MemoryJobRegistry, MemoryJobStorage } from './memory-job-storage.ts';
 export { MemoryWorker } from './memory-worker.ts';
 export type { MemoryWorkerDispatch, MemoryWorkerOptions } from './memory-worker.ts';
+export type {
+  ExecutionRecord,
+  JobDefinition as RegistryJobDefinition,
+  JobSource as RegistryJobSource,
+  RegisterJobInput as RegistryRegisterJobInput,
+  Registry,
+  RegistryJobStoragePort,
+} from '../registry/mod.ts';
+export type {
+  ExecutionRecord as RuntimeExecutionRecord,
+  JobContext,
+  JobDefinition,
+  JobHandler,
+  JobMessage,
+  JobResult,
+  RuntimeJobStoragePort,
+  RuntimeSchedulerPort,
+  RuntimeShutdownManager,
+  RuntimeShutdownOptions,
+  RuntimeShutdownResource,
+  RuntimeTaskExecutor,
+  RuntimeTaskExecutorOptions,
+  RuntimeWorkflowDefinition,
+  RuntimeWorkerPort,
+  RuntimeWorkflowExecutor,
+  RuntimeWorkflowOptions,
+  StaticJobRegistry,
+  TaskDefinition,
+  TaskExecutionOptions,
+  TaskRegistryPort,
+  TaskResult,
+  WorkersClock,
+  WorkersRuntime,
+  WorkersRuntimeOptions,
+  WorkflowId,
+} from '../runtime/mod.ts';

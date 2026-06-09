@@ -1,4 +1,4 @@
-import type { WorkflowState, WorkflowStep, WorkflowStepResult } from '../domain/mod.ts';
+import type { WorkflowState, WorkflowStep, WorkflowStepResult } from './workflow-types.ts';
 
 /** Function that executes a job-backed workflow step. */
 export type WorkflowJobStepRunner = (

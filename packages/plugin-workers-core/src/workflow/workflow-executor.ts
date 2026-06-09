@@ -4,7 +4,7 @@ import type {
   WorkflowExecutionOptions,
   WorkflowState,
   WorkflowStepResult,
-} from '../domain/mod.ts';
+} from './workflow-types.ts';
 import {
   MemoryWorkflowStateStore,
   type WorkflowClock,

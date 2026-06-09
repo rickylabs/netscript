@@ -1,4 +1,4 @@
-import type { WorkflowEvent, WorkflowState } from '../domain/mod.ts';
+import type { WorkflowEvent, WorkflowState } from './workflow-types.ts';
 
 /** Clock contract used by workflow runtime code. */
 export type WorkflowClock = Readonly<{

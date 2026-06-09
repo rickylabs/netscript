@@ -17,5 +17,20 @@ export { WorkersItemScaffolder } from './workers-item-scaffolder.ts';
 export type { DisposeContext, InitContext } from './job-lifecycle-adapter.ts';
 export type { DispatchContext } from './job-scheduler.ts';
 export type { ExecutionContext } from './task-executor.ts';
-export type { ResolvedTaskExecutionOptions, TaskLogEntry } from './task-runtime-adapter.ts';
+export type {
+  ResolvedTaskExecutionOptions,
+  RuntimeTaskMetadata,
+  TaskDefinition,
+  TaskExecutionOptions,
+  TaskLogEntry,
+  TaskResult,
+  TaskType,
+  WorkerTaskPermissionField,
+  WorkerTaskPermissions,
+} from '../executor/executor-types.ts';
+export type { JobContext, JobDefinition, JobHandler, JobResult } from '../runtime/runtime-types.ts';
+export type {
+  WorkerInstrumentationContext,
+  WorkerInstrumentationSpan,
+} from './worker-instrumentation.ts';
 export type { WorkersCommandDefinition } from './workers-command.ts';

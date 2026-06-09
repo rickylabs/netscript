@@ -2,14 +2,14 @@ import { defineJob } from '../builders/mod.ts';
 import {
   createSuccessResult,
   DEFAULT_TOPIC,
-  type ExecutionRecord,
+  type TriggerType,
+} from '../domain/mod.ts';
+import type { ExecutionRecord } from '../registry/mod.ts';
+import {
+  createWorkersRuntime,
   type JobDefinition,
   type JobHandler,
   type JobResult,
-  type TriggerType,
-} from '../domain/mod.ts';
-import {
-  createWorkersRuntime,
   type WorkersRuntime,
   type WorkersRuntimeOptions,
 } from '../runtime/mod.ts';

@@ -1,4 +1,4 @@
-import type { JobDefinition } from '../domain/mod.ts';
+import type { JobDefinition } from '../runtime/runtime-types.ts';
 
 /** Runtime dispatch context supplied to scheduled jobs. */
 export interface DispatchContext {

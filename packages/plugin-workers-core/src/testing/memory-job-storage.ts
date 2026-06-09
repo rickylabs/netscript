@@ -1,9 +1,8 @@
-import type { ExecutionRecord, JobDefinition } from '../domain/mod.ts';
-import type { JobStoragePort } from '../ports/mod.ts';
+import type { ExecutionRecord, JobDefinition, RegistryJobStoragePort } from '../registry/mod.ts';
 export { MemoryJobRegistry } from '../registry/mod.ts';
 
 /** In-memory job storage for package consumers and tests. */
-export class MemoryJobStorage implements JobStoragePort {
+export class MemoryJobStorage implements RegistryJobStoragePort {
   readonly id: string;
   readonly #jobs = new Map<string, JobDefinition>();
   readonly #executions = new Map<string, ExecutionRecord>();
