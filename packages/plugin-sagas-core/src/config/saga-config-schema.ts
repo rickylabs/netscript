@@ -1,37 +1,63 @@
 import { z } from 'zod';
 import type { SagaId } from '../domain/mod.ts';
+import type { ConfigSchema } from './config-schema.ts';
 import type { SagaConfigEntry } from './define-saga-config.ts';
 
-type SagaTransportProvider = 'auto' | 'redis' | 'rabbitmq' | 'inmemory';
-type SagaStoreProvider = 'auto' | 'redis' | 'postgres' | 'inmemory';
+/** Saga transport backend provider selector. */
+export type SagaTransportProvider = 'auto' | 'redis' | 'rabbitmq' | 'inmemory';
 
-interface SagaScalingConfigData {
+/** Saga store backend provider selector. */
+export type SagaStoreProvider = 'auto' | 'redis' | 'postgres' | 'inmemory';
+
+/** Topic-level saga scaling configuration. */
+export interface SagaScalingConfigData {
+  /** Maximum concurrent saga handlers for the topic. */
   readonly concurrency: number;
+  /** Runtime placement mode for this topic. */
   readonly mode: 'combined' | 'distributed';
 }
 
-interface SagaRetentionConfigData {
+/** Topic-level saga retention configuration. */
+export interface SagaRetentionConfigData {
+  /** Number of days active saga instances remain available. */
   readonly activeDays: number;
+  /** Number of days completed saga instances remain available. */
   readonly completedDays: number;
+  /** Whether completed saga instances are archived to the database. */
   readonly archiveToDb: boolean;
 }
 
-interface SagaGroupConfigData {
+/** Topic-isolated saga group configuration. */
+export interface SagaGroupConfigData {
+  /** Topic identifier for message routing. */
   readonly topic: string;
+  /** Scaling policy for this topic. */
   readonly scaling?: SagaScalingConfigData;
+  /** Retention policy for this topic. */
   readonly retention?: SagaRetentionConfigData;
+  /** Saga entries assigned to this topic. */
   readonly sagas: SagaConfigEntry[];
 }
 
-interface SagaConfigData {
+/** Saga plugin configuration after defaults and group topic normalization. */
+export interface SagaConfigData {
+  /** Directory containing saga modules. */
   readonly sagasDir: string;
+  /** Transport backend provider selector. */
   readonly transportProvider: SagaTransportProvider;
+  /** Store backend provider selector. */
   readonly storeProvider: SagaStoreProvider;
+  /** Default concurrency budget. */
   readonly concurrency: number;
+  /** Global retry policy. */
   readonly retry?: SagaConfigEntry['retry'];
+  /** Global completion timeout policy. */
   readonly timeout?: SagaConfigEntry['timeout'];
+  /** Legacy flat saga entries. */
   readonly sagas: SagaConfigEntry[];
+  /** Topic-isolated saga groups. */
   readonly groups: SagaGroupConfigData[];
+  /** Whether saga runtime contributions are enabled. */
   readonly enabled: boolean;
 }
 
@@ -44,8 +70,12 @@ const SagaRetryConfigObjectSchema: z.ZodType<NonNullable<SagaConfigEntry['retry'
 });
 
 /** Retry policy schema for global and per-saga config. */
-export const SagaRetryConfigSchema: z.ZodType<SagaConfigEntry['retry']> =
+const SagaRetryConfigZodSchema: z.ZodType<SagaConfigEntry['retry']> =
   SagaRetryConfigObjectSchema.optional();
+
+/** Retry policy schema for global and per-saga config. */
+export const SagaRetryConfigSchema: ConfigSchema<SagaConfigEntry['retry']> =
+  SagaRetryConfigZodSchema;
 
 const SagaTimeoutConfigObjectSchema: z.ZodType<NonNullable<SagaConfigEntry['timeout']>> = z
   .object({
@@ -55,8 +85,12 @@ const SagaTimeoutConfigObjectSchema: z.ZodType<NonNullable<SagaConfigEntry['time
   });
 
 /** Completion timeout schema for global and per-saga config. */
-export const SagaTimeoutConfigSchema: z.ZodType<SagaConfigEntry['timeout']> =
+const SagaTimeoutConfigZodSchema: z.ZodType<SagaConfigEntry['timeout']> =
   SagaTimeoutConfigObjectSchema.optional();
+
+/** Completion timeout schema for global and per-saga config. */
+export const SagaTimeoutConfigSchema: ConfigSchema<SagaConfigEntry['timeout']> =
+  SagaTimeoutConfigZodSchema;
 
 const SagaEntryConfigSchema: z.ZodType<SagaConfigEntry> = z.object({
   id: z.string().min(1).transform((id) => id as SagaId),
@@ -65,8 +99,8 @@ const SagaEntryConfigSchema: z.ZodType<SagaConfigEntry> = z.object({
   description: z.string().min(1).optional(),
   entrypoint: z.string().min(1),
   enabled: z.boolean().default(true),
-  retry: SagaRetryConfigSchema,
-  timeout: SagaTimeoutConfigSchema,
+  retry: SagaRetryConfigZodSchema,
+  timeout: SagaTimeoutConfigZodSchema,
   tags: z.array(z.string().min(1)).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
@@ -83,12 +117,15 @@ const SagaRetentionConfigSchema: z.ZodType<SagaRetentionConfigData | undefined> 
 }).optional();
 
 /** Topic-isolated saga group schema. */
-export const SagaGroupSchema: z.ZodType<SagaGroupConfigData> = z.object({
+const SagaGroupZodSchema: z.ZodType<SagaGroupConfigData> = z.object({
   topic: z.string().min(1).describe('Topic identifier for message routing'),
   scaling: SagaScalingConfigSchema,
   retention: SagaRetentionConfigSchema,
   sagas: z.array(SagaEntryConfigSchema).default([]),
 });
+
+/** Topic-isolated saga group schema. */
+export const SagaGroupSchema: ConfigSchema<SagaGroupConfigData> = SagaGroupZodSchema;
 
 const SagaTransportProviderSchema: z.ZodType<SagaTransportProvider> = z.enum([
   'auto',
@@ -109,15 +146,15 @@ const SagaConfigObjectSchema: z.ZodType<SagaConfigData> = z.object({
   transportProvider: SagaTransportProviderSchema,
   storeProvider: SagaStoreProviderSchema,
   concurrency: z.number().min(1).default(5),
-  retry: SagaRetryConfigSchema,
-  timeout: SagaTimeoutConfigSchema,
+  retry: SagaRetryConfigZodSchema,
+  timeout: SagaTimeoutConfigZodSchema,
   sagas: z.array(SagaEntryConfigSchema).default([]),
-  groups: z.array(SagaGroupSchema).default([]),
+  groups: z.array(SagaGroupZodSchema).default([]),
   enabled: z.boolean().default(true),
 });
 
 /** Saga plugin configuration schema. */
-export const SagaConfigSchema: z.ZodType<SagaConfigData | undefined> = SagaConfigObjectSchema
+const SagaConfigZodSchema: z.ZodType<SagaConfigData | undefined> = SagaConfigObjectSchema
   .transform((config) => ({
     ...config,
     groups: config.groups.map((group) => ({
@@ -130,17 +167,20 @@ export const SagaConfigSchema: z.ZodType<SagaConfigData | undefined> = SagaConfi
   }))
   .optional();
 
+/** Saga plugin configuration schema. */
+export const SagaConfigSchema: ConfigSchema<SagaConfigData | undefined> = SagaConfigZodSchema;
+
 /** Saga plugin configuration after defaults and group topic normalization. */
-export type SagaConfig = z.infer<typeof SagaConfigSchema>;
+export type SagaConfig = SagaConfigData | undefined;
 
 /** Topic-isolated saga group after defaults. */
-export type SagaGroupConfig = z.infer<typeof SagaGroupSchema>;
+export type SagaGroupConfig = SagaGroupConfigData;
 
 /** Retry policy after defaults. */
-export type SagaRetryConfig = z.infer<typeof SagaRetryConfigSchema>;
+export type SagaRetryConfig = SagaConfigEntry['retry'];
 
 /** Timeout policy after defaults. */
-export type SagaTimeoutConfig = z.infer<typeof SagaTimeoutConfigSchema>;
+export type SagaTimeoutConfig = SagaConfigEntry['timeout'];
 
 /** Authoring form for saga config before schema defaults are applied. */
 export interface SagaConfigInput extends Partial<Omit<NonNullable<SagaConfig>, 'groups'>> {
