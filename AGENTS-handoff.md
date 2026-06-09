@@ -56,6 +56,10 @@ provider-specific base URLs use the same suffix pattern, such as `LLM_BASE_URL_O
 
 The agent must write `.llm/tmp/openhands/summary.md` before exit.
 
+The workflow owns GitHub comments: it reacts to the trigger comment, posts one running status
+comment with the Actions URL, then edits that same comment with the final summary. Agents should not
+post their own PR or issue comments during OpenHands runs.
+
 ## Token Rule
 
 GitHub does not trigger follow-up workflows from events created with the default `GITHUB_TOKEN`. Use

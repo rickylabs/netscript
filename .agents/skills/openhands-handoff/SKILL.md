@@ -25,17 +25,18 @@ required summary artifacts keep local and cloud agents synchronized.
 
 ## Key Concepts
 
-| Concept          | Meaning                                                                                       |
-| ---------------- | --------------------------------------------------------------------------------------------- |
-| Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                           |
-| VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.         |
-| Model profile    | `sonnet`, `gpt`, or `gemini`; maps to a LiteLLM model id in the workflow.                     |
-| Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                     |
-| Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.        |
-| Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                        |
-| Summary artifact | `.llm/tmp/openhands/summary.md`, required before the workflow exits.                          |
-| Thread replies   | Optional `.llm/tmp/openhands/replies.json` review-comment replies.                            |
-| Chainable token  | `PAT_TOKEN` or GitHub App token; required for cloud-created events to trigger more workflows. |
+| Concept          | Meaning                                                                                         |
+| ---------------- | ----------------------------------------------------------------------------------------------- |
+| Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                             |
+| VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.           |
+| Model profile    | `sonnet`, `gpt`, or `gemini`; maps to a LiteLLM model id in the workflow.                       |
+| Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                       |
+| Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.          |
+| Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                          |
+| Summary artifact | `.llm/tmp/openhands/summary.md`, required before the workflow exits.                            |
+| Status comment   | One workflow-owned PR/issue comment that starts as running and is edited with the final result. |
+| Thread replies   | Optional `.llm/tmp/openhands/replies.json` review-comment replies.                              |
+| Chainable token  | `PAT_TOKEN` or GitHub App token; required for cloud-created events to trigger more workflows.   |
 
 ## Workflow
 
@@ -66,6 +67,8 @@ required summary artifacts keep local and cloud agents synchronized.
   `replies.json`. Use `respond-comments` for a single high-quality response when IDs are uncertain.
 - **Skipping the summary artifact**: GitHub comments and PR bodies come from
   `.llm/tmp/openhands/summary.md`; missing summaries produce weak handoffs.
+- **Posting duplicate comments**: the workflow owns the status/final comment. Agents write
+  artifacts; they do not call `gh issue comment` directly.
 - **Using Actions for long sessions**: move multi-step, human-in-the-loop work to the VPS Web UI.
 
 ## Reference Files

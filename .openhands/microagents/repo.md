@@ -36,6 +36,9 @@ Before finishing an OpenHands workflow run, write `.llm/tmp/openhands/summary.md
 - responses to relevant PR, issue, or review comments,
 - remaining risks or follow-up work.
 
+Do not post GitHub issue or PR comments directly. The workflow reacts to the trigger, creates the
+running status comment, and edits that comment with this summary artifact.
+
 When the workflow output mode is `thread-replies`, optionally write
 `.llm/tmp/openhands/replies.json`:
 

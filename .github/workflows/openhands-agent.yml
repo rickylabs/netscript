@@ -195,10 +195,60 @@ jobs:
             core.setOutput('prompt', prompt);
             core.setOutput('issue_number', String(issueNumber));
             core.setOutput('is_pr', String(isPr));
+            core.setOutput('trigger_comment_id', String(payload.comment?.id || ''));
             core.setOutput('checkout_repo', checkoutRepo);
             core.setOutput('checkout_ref', checkoutRef);
             core.setOutput('base_branch', baseBranch);
             core.setOutput('branch_name', `openhands/${issueNumber || context.runId}-${context.runAttempt}`);
+
+      - name: Acknowledge trigger and post run link
+        id: status-comment
+        if: steps.request.outputs.output_mode != 'summary-only' && steps.request.outputs.issue_number != ''
+        uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          TRIGGER_COMMENT_ID: ${{ steps.request.outputs.trigger_comment_id }}
+          MODEL: ${{ steps.request.outputs.model }}
+          PROVIDER: ${{ steps.request.outputs.provider }}
+          OUTPUT_MODE: ${{ steps.request.outputs.output_mode }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        with:
+          github-token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          script: |
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+            const triggerCommentId = process.env.TRIGGER_COMMENT_ID;
+
+            if (triggerCommentId) {
+              try {
+                await github.rest.reactions.createForIssueComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: Number(triggerCommentId),
+                  content: 'eyes',
+                });
+              } catch (error) {
+                core.notice(`Could not add trigger reaction: ${error.message}`);
+              }
+            }
+
+            const body = [
+              '<!-- openhands-agent-summary -->',
+              '## OpenHands Agent — Running',
+              '',
+              `Model: \`${process.env.MODEL}\``,
+              `Provider: \`${process.env.PROVIDER}\``,
+              `Output mode: \`${process.env.OUTPUT_MODE}\``,
+              '',
+              `Run: ${process.env.RUN_URL}`,
+            ].join('\n');
+
+            const { data: comment } = await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body,
+            });
+            core.setOutput('comment_id', String(comment.id));
 
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -246,6 +296,7 @@ jobs:
           - Use rtk for read-heavy git/grep/gh/docker commands when it is available.
           - Preserve user changes and avoid destructive git commands.
           - Run the smallest validation that proves the change.
+          - Do not post GitHub issue or PR comments directly. The workflow owns GitHub comments.
           - Write .llm/tmp/openhands/summary.md before exit. Include Summary, Changes, Validation,
             Responses to review comments or issue comments when relevant, and Remaining risks.
           - If output_mode is thread-replies, optionally write .llm/tmp/openhands/replies.json as
@@ -376,12 +427,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          STATUS_COMMENT_ID: ${{ steps.status-comment.outputs.comment_id }}
           MODEL: ${{ steps.request.outputs.model }}
+          PROVIDER: ${{ steps.request.outputs.provider }}
+          JOB_STATUS: ${{ job.status }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if [ ! -f .llm/tmp/openhands/summary.md ]; then
             cat > .llm/tmp/openhands/summary.md <<SUMMARY
-          ## OpenHands task did not write a summary
+          # OpenHands Agent Summary
+
+          ## Status
+          The workflow reached final comment publication, but the agent did not write `.llm/tmp/openhands/summary.md`.
 
           Model: \`${MODEL}\`
           Run: ${RUN_URL}
@@ -389,13 +446,31 @@ jobs:
           fi
           {
             echo "<!-- openhands-agent-summary -->"
+            echo "## OpenHands Agent — ${JOB_STATUS}"
+            echo
             echo "Model: \`${MODEL}\`"
+            echo "Provider: \`${PROVIDER}\`"
             echo
             cat .llm/tmp/openhands/summary.md
             echo
             echo "Run: ${RUN_URL}"
           } > .llm/tmp/openhands/comment.md
-          gh issue comment "${ISSUE_NUMBER}" --body-file .llm/tmp/openhands/comment.md
+          if [ -n "${STATUS_COMMENT_ID}" ]; then
+            python - <<'PY'
+          import json
+
+          with open(".llm/tmp/openhands/comment.md", encoding="utf-8") as source:
+              payload = {"body": source.read()}
+          with open(".llm/tmp/openhands/comment.json", "w", encoding="utf-8") as target:
+              json.dump(payload, target)
+          PY
+            gh api --method PATCH \
+              "repos/${GITHUB_REPOSITORY}/issues/comments/${STATUS_COMMENT_ID}" \
+              --input .llm/tmp/openhands/comment.json \
+              --jq .html_url >/dev/null
+          else
+            gh issue comment "${ISSUE_NUMBER}" --body-file .llm/tmp/openhands/comment.md
+          fi
 
       - name: Post review-thread replies
         if: always() && steps.request.outputs.output_mode == 'thread-replies' && steps.request.outputs.is_pr == 'true'
