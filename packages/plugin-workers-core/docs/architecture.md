@@ -2,6 +2,11 @@
 
 `@netscript/plugin-workers-core` is the Tier 1 core package for workers.
 
+Doctrine archetype: **A3 Runtime/Behavior**. The package owns long-running job,
+task, workflow, registry, execution-state, shutdown, and runtime composition
+behavior, so the required gate set includes runtime invariants, Runtime/Aspire
+validation, and consumer-import validation.
+
 ## Boundary
 
 The package owns reusable worker definitions, schemas, contracts, and runtime composition contracts.
