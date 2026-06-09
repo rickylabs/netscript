@@ -28,3 +28,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 50cc79f: fix(triggers-core): document D8 domain surface
 - 2d441c3: docs(wave4): record D8 domain docs evidence
 - f5e87be: chore(triggers-core): validate D9 testing contracts docs
+- 476cec4: docs(wave4): record D9 testing contracts evidence
+- 437e605: fix(triggers): expose D10 public aspire contracts

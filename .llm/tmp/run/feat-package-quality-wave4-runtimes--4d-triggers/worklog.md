@@ -13,7 +13,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `8264a1c` (4a+4b+4c merge
 | 2026-06-09 | Research | generator | MEASURE-FIRST complete. Full per-EP + combined + barrel doc-lint reconciliation. Core 211 (46 ptr + 165 jsdoc), plugin 138 (76 ptr + 62 jsdoc). Both dry-run PASS, 0 slow types. `deno check` all 21 EPs PASS. `behavior.triggers-health` E2E PASS (16ms, port 8093). `verify-plugin.ts` MISSING. Core missing `test` + `publish:dry-run`. Both docs/ MISSING. F-1: `test-webhooks-e2e.ts` 423 LOC. Research.md authored. |
 | 2026-06-09 | Plan & Design | generator | Plan locked: A3 core + A5 plugin, COMBINED (no split, 23 slices <30 cap). Archetype decisions, locked surface (21 EPs all retain), LD-8 ptr-fix strategy, F-1 split design, A5 test layer (verify-plugin.ts + 4 tests), docs/ tree design for both units, risk register, deferred scope, gate-matrix cross-ref. Plan.md authored. **STOP at Plan Gate.** |
 | 2026-06-09 | PLAN-EVAL | evaluator (OpenHands `qwen3.7-max`) | **PASS.** Separate session, Option A (commit `bb985d0`, `plan-eval.md`). 8/8 plan-gate boxes; spot-checked F-1 (`test-webhooks-e2e.ts` 423), F-6 (core `check` only `mod.ts`), docs/ absent. **No `deno.lock` churn** (bot commit touched only `.llm/tmp/openhands/*` + `plan-eval.md`). 2 non-blocking procedural notes: (1) add worklog `## Design` section for IMPL-EVAL traceability → **DONE below**; (2) barrel-vs-per-EP reconciliation confirmed avoided. |
-| 2026-06-10 | Implement | generator | D1-D9 complete. D9 testing/contracts JSDoc residual validation passed with no further code changes after D4/D6 fixes. |
+| 2026-06-10 | Implement | generator | D1-D10 complete. D10 fixed plugin public/root/plugin/aspire doc-lint with package-owned structural contracts for host/sibling dependency shapes. |
 | | Gate | generator | (pending) Archetype gates + F-13/Runtime+Aspire (A3/A5) + F-10 (A5) + health-probe evidence + consumer-import + F-1 + F-6 + F-7 (docs/). |
 | | IMPL-EVAL | evaluator | (pending) Separate session. |
 | | Close | supervisor | (pending) 4d → umbrella after IMPL-EVAL PASS. **Last sub-wave** → umbrella reaches full-wave completeness → supervisor merges umbrella → track `feat/package-quality`. |
@@ -219,4 +219,27 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `packages/plugin-triggers-core` |
 | Gate result | PASS, exit 0; all 11 core export entrypoints checked with `--unstable-kv`. |
 | Drift | Covered by D6 info row for testing JSDoc; D4 already made contracts doc-lint green. |
-| Commits | Implementation `f5e87be`; paired docs/evidence pending. |
+| Commits | Implementation `f5e87be`; paired docs/evidence `476cec4`. |
+
+### Slice 10/23 — D10 plugin public/root/plugin/aspire private-type-ref fix
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | `src/public/mod.ts`, root `mod.ts`, `src/plugin/mod.ts`, and `src/aspire/*` now expose package-owned public contracts for trigger plugin dependencies and Aspire contribution boundaries; constants type aliases gained JSDoc required by raw doc-lint. |
+| Gate(s) | F-7 doc-score, F-15 re-export-upstream lint |
+| Gate command | `deno doc --lint src/public/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint src/plugin/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint src/aspire/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno fmt --check mod.ts src/public/mod.ts src/plugin/mod.ts src/aspire/mod.ts src/aspire/triggers-contribution.ts src/constants.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 6 files`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Warn row recorded: first-party upstream root re-exports pulled unrelated package-private refs into the triggers public doc graph, so D10 uses package-owned structural contracts for dependency/builder shapes. |
+| Commits | Implementation `437e605`; paired docs/evidence pending. |
