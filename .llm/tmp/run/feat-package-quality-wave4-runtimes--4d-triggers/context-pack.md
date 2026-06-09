@@ -7,7 +7,7 @@ PR target: the **umbrella** (NOT the track).
 Role: SUPERVISOR-authored seed + pre-research. Locked slice authority = this sub-wave's
 `plan.md` once PLAN-EVAL-approved.
 
-## STATUS: IMPLEMENT IN PROGRESS — D2 COMPLETE, D3 NEXT
+## STATUS: IMPLEMENT IN PROGRESS — D3 COMPLETE, D4 NEXT
 
 The plan is locked and PLAN-EVAL passed in a separate session (`plan-eval.md`, commit `bb985d0`).
 Implementation is proceeding in the approved 23-slice order. 4d is the **last** sub-wave of Wave 4:
@@ -19,8 +19,9 @@ to track `feat/package-quality`.
 | Slice | Status | Evidence |
 |-------|--------|----------|
 | D1 | COMPLETE | Core F-6 task hygiene: `check` enumerates all 11 entrypoints; `test` task added. Raw `deno task check` PASS exit 0; raw `deno task test` PASS exit 0 with 13 passed / 0 failed. Implementation commit `7a4aefc`; docs commit `26ab7b0`. |
-| D2 | COMPLETE | Plugin F-6 task hygiene: `check` enumerates all 10 entrypoints. Raw `deno task check` PASS exit 0. Implementation commit `23ecbe4`. |
-| D3 | NEXT | Core ptr-fix for builders plus domain re-exports. |
+| D2 | COMPLETE | Plugin F-6 task hygiene: `check` enumerates all 10 entrypoints. Raw `deno task check` PASS exit 0. Implementation commit `23ecbe4`; docs commit `7b2fe54`. |
+| D3 | COMPLETE | Core ptr-fix for builders plus domain re-exports. Raw `deno doc --lint src/builders/mod.ts` PASS exit 0; raw `deno task check` PASS exit 0. Implementation commit `521c452`. |
+| D4 | NEXT | Core ptr-fix for contracts/v1 and config with structural third-party handling or `@ignore` fallback. |
 
 ## Scope — 2 publishable units + the health seam (OQ-D resolved: in-scope here)
 

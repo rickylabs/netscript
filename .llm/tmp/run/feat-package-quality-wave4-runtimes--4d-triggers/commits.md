@@ -14,3 +14,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 7a4aefc: fix(triggers-core): wire D1 package task hygiene
 - 26ab7b0: docs(wave4): record D1 task hygiene evidence
 - 23ecbe4: fix(triggers): wire D2 package check hygiene
+- 7b2fe54: docs(wave4): record D2 task hygiene evidence
+- 521c452: fix(triggers-core): expose D3 builder signature types
