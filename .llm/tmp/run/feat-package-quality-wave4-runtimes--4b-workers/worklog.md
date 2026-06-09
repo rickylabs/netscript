@@ -106,6 +106,7 @@ Base: umbrella `feat/package-quality-wave4-runtimes` @ `ee9f26b` (carries merged
 |-------|------|-----------|---------|---------|--------|--------|
 | 1/27 | `@netscript/plugin-workers-core` | A3 | Declare runtime archetype in `docs/architecture.md` | `deno check --unstable-kv mod.ts`; declaration grep | PASS — raw check exit 0; A3, Runtime/Aspire, and consumer-import text present | `0eec3df` |
 | 2/27 | `@netscript/plugin-workers-core` | A3 | Enumerate retained entrypoints in `check` task | `deno task check`; raw `deno check --unstable-kv <16 entrypoints>` | PASS — both commands exited 0 and checked all retained root/subpath entrypoint files | `3f01a2d` |
+| 3/27 | `@netscript/plugin-workers-core` + `@netscript/plugin-workers` consumer | A3/A5 | Fold `./contracts` to `./contracts/v1`; align workers plugin version | raw core check; raw plugin consumer check; raw CLI copier test check; export-map assertion | PASS — core 16-entrypoint check exit 0; plugin `contracts*`, root, public, Aspire check exit 0; CLI copier test file check exit 0; export map has 16 entries with no `./contracts` alias | `7a738d5` |
 
 ## Readiness note
 

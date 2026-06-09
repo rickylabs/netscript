@@ -11,9 +11,9 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C2 are complete and pushed. Latest implementation commit: `3f01a2d`
-(`chore(workers-core): check all retained entrypoints`), with raw `deno check --unstable-kv`
-passing for all 16 retained `plugin-workers-core` entrypoint files.
+order. Slices C1-C3 are complete and pushed. Latest implementation commit: `7a738d5`
+(`fix(workers): fold core contracts export`), with raw checks passing for the folded core
+surface, plugin consumers, and the CLI copier fixture that encoded the removed alias.
 
 ## Scope — 2 publishable units (long pole #1)
 
