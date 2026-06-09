@@ -46,7 +46,7 @@
     "zod": "npm:zod@^4.3.6"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --allow-all --unstable-kv",
     "dev": "deno run --unstable-kv --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --unstable-kv --allow-net --allow-env --allow-read services/src/main.ts",
