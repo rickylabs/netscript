@@ -90,6 +90,7 @@ jobs:
               ['sonnet', 'anthropic/claude-sonnet-4'],
               ['gpt', 'openai/gpt-5.1'],
               ['gemini', 'gemini/gemini-2.5-pro'],
+              ['openrouter', 'openrouter/anthropic/claude-sonnet-4'],
             ]);
 
             const labels = new Set();
@@ -132,6 +133,26 @@ jobs:
 
             const outputMode = matchValue('output') || process.env.DISPATCH_OUTPUT_MODE || 'pr-comment';
 
+            function inferProvider(model) {
+              const explicitProvider = matchValue('provider');
+              if (explicitProvider) return explicitProvider.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+              const prefix = String(model).split('/')[0]?.toLowerCase() || '';
+              const providerAliases = new Map([
+                ['anthropic', 'ANTHROPIC'],
+                ['openai', 'OPENAI'],
+                ['gemini', 'GEMINI'],
+                ['google', 'GEMINI'],
+                ['openrouter', 'OPENROUTER'],
+                ['azure', 'AZURE'],
+                ['ollama', 'OLLAMA'],
+                ['xai', 'XAI'],
+                ['groq', 'GROQ'],
+                ['mistral', 'MISTRAL'],
+                ['deepseek', 'DEEPSEEK'],
+              ]);
+              return providerAliases.get(prefix) || prefix.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+            }
+
             let issueNumber = payload.issue?.number || payload.pull_request?.number || '';
             let isPr = Boolean(payload.pull_request);
             if (payload.issue?.pull_request) isPr = true;
@@ -167,7 +188,9 @@ jobs:
             if (payload.head_commit?.message) promptParts.push(`Trigger commit message:\n${payload.head_commit.message}`);
             const prompt = promptParts.join('\n\n') || rawText;
 
-            core.setOutput('model', pickModel());
+            const selectedModel = pickModel();
+            core.setOutput('model', selectedModel);
+            core.setOutput('provider', inferProvider(selectedModel));
             core.setOutput('output_mode', outputMode);
             core.setOutput('prompt', prompt);
             core.setOutput('issue_number', String(issueNumber));
@@ -189,6 +212,7 @@ jobs:
         env:
           REQUEST_PROMPT: ${{ steps.request.outputs.prompt }}
           REQUEST_MODEL: ${{ steps.request.outputs.model }}
+          REQUEST_PROVIDER: ${{ steps.request.outputs.provider }}
           REQUEST_OUTPUT_MODE: ${{ steps.request.outputs.output_mode }}
           REQUEST_ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
           REQUEST_IS_PR: ${{ steps.request.outputs.is_pr }}
@@ -221,6 +245,7 @@ jobs:
           - is_pr: ${REQUEST_IS_PR}
           - output_mode: ${REQUEST_OUTPUT_MODE}
           - selected_model: ${REQUEST_MODEL}
+          - selected_provider: ${REQUEST_PROVIDER}
           - action_run: ${REQUEST_RUN_URL}
           REQUEST
           if [ "${REQUEST_IS_PR}" = "true" ] && [ -n "${REQUEST_ISSUE_NUMBER}" ]; then
@@ -248,10 +273,59 @@ jobs:
           uv pip install --system "openhands-sdk @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-sdk"
           uv pip install --system "openhands-tools @ git+https://github.com/OpenHands/software-agent-sdk.git@main#subdirectory=openhands-tools"
 
+      - name: Resolve provider credentials
+        env:
+          LLM_PROVIDER: ${{ steps.request.outputs.provider }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_KEY_ANTHROPIC: ${{ secrets.LLM_API_KEY_ANTHROPIC }}
+          LLM_API_KEY_OPENAI: ${{ secrets.LLM_API_KEY_OPENAI }}
+          LLM_API_KEY_GEMINI: ${{ secrets.LLM_API_KEY_GEMINI }}
+          LLM_API_KEY_OPENROUTER: ${{ secrets.LLM_API_KEY_OPENROUTER }}
+          LLM_API_KEY_AZURE: ${{ secrets.LLM_API_KEY_AZURE }}
+          LLM_API_KEY_OLLAMA: ${{ secrets.LLM_API_KEY_OLLAMA }}
+          LLM_API_KEY_XAI: ${{ secrets.LLM_API_KEY_XAI }}
+          LLM_API_KEY_GROQ: ${{ secrets.LLM_API_KEY_GROQ }}
+          LLM_API_KEY_MISTRAL: ${{ secrets.LLM_API_KEY_MISTRAL }}
+          LLM_API_KEY_DEEPSEEK: ${{ secrets.LLM_API_KEY_DEEPSEEK }}
+          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL || vars.LLM_BASE_URL }}
+          LLM_BASE_URL_ANTHROPIC: ${{ secrets.LLM_BASE_URL_ANTHROPIC || vars.LLM_BASE_URL_ANTHROPIC }}
+          LLM_BASE_URL_OPENAI: ${{ secrets.LLM_BASE_URL_OPENAI || vars.LLM_BASE_URL_OPENAI }}
+          LLM_BASE_URL_GEMINI: ${{ secrets.LLM_BASE_URL_GEMINI || vars.LLM_BASE_URL_GEMINI }}
+          LLM_BASE_URL_OPENROUTER: ${{ secrets.LLM_BASE_URL_OPENROUTER || vars.LLM_BASE_URL_OPENROUTER }}
+          LLM_BASE_URL_AZURE: ${{ secrets.LLM_BASE_URL_AZURE || vars.LLM_BASE_URL_AZURE }}
+          LLM_BASE_URL_OLLAMA: ${{ secrets.LLM_BASE_URL_OLLAMA || vars.LLM_BASE_URL_OLLAMA }}
+          LLM_BASE_URL_XAI: ${{ secrets.LLM_BASE_URL_XAI || vars.LLM_BASE_URL_XAI }}
+          LLM_BASE_URL_GROQ: ${{ secrets.LLM_BASE_URL_GROQ || vars.LLM_BASE_URL_GROQ }}
+          LLM_BASE_URL_MISTRAL: ${{ secrets.LLM_BASE_URL_MISTRAL || vars.LLM_BASE_URL_MISTRAL }}
+          LLM_BASE_URL_DEEPSEEK: ${{ secrets.LLM_BASE_URL_DEEPSEEK || vars.LLM_BASE_URL_DEEPSEEK }}
+        run: |
+          provider="${LLM_PROVIDER:-}"
+          if [ -z "$provider" ]; then
+            echo "Could not infer LLM provider from selected model."
+            exit 1
+          fi
+
+          key_var="LLM_API_KEY_${provider}"
+          base_url_var="LLM_BASE_URL_${provider}"
+          api_key="${!key_var:-${LLM_API_KEY:-}}"
+          base_url="${!base_url_var:-${LLM_BASE_URL:-}}"
+
+          if [ -z "$api_key" ]; then
+            echo "Missing API key for provider ${provider}."
+            echo "Set repository secret ${key_var}, or set fallback secret LLM_API_KEY."
+            exit 1
+          fi
+
+          echo "::add-mask::${api_key}"
+          echo "LLM_API_KEY=${api_key}" >> "$GITHUB_ENV"
+          echo "LLM_PROVIDER=${provider}" >> "$GITHUB_ENV"
+          if [ -n "$base_url" ]; then
+            echo "LLM_BASE_URL=${base_url}" >> "$GITHUB_ENV"
+          fi
+          echo "Using provider ${provider} with secret ${key_var} when present."
+
       - name: Run OpenHands
         env:
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
           LLM_MODEL: ${{ steps.request.outputs.model }}
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
         run: uv run python .openhands/agent_runner.py .llm/tmp/openhands/request.md

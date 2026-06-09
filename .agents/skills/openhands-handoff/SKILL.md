@@ -31,6 +31,7 @@ required summary artifacts keep local and cloud agents synchronized.
 | VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.         |
 | Model profile    | `sonnet`, `gpt`, or `gemini`; maps to a LiteLLM model id in the workflow.                     |
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                     |
+| Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.        |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                        |
 | Summary artifact | `.llm/tmp/openhands/summary.md`, required before the workflow exits.                          |
 | Thread replies   | Optional `.llm/tmp/openhands/replies.json` review-comment replies.                            |
@@ -44,6 +45,7 @@ required summary artifacts keep local and cloud agents synchronized.
    - add `fix-me` or `openhands` for default model work,
    - add `agent:<profile>` for a model-label run,
    - comment `@openhands-agent model=<provider/model> ...` for a per-run literal model,
+   - add `provider=<provider>` when routing a model through a provider gateway such as OpenRouter,
    - use `[openhands model=... output=...]` in a commit message for local-to-cloud handoff.
 4. Choose an output mode:
    - `pr-comment` for ordinary summaries,

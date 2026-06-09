@@ -19,6 +19,7 @@ Model selection is per run:
 @openhands-agent model=anthropic/claude-sonnet-4 use harness proceed to IMPL-EVAL
 @openhands-agent agent=gemini output=respond-comments fix the legitimate Augment comments
 [openhands model=openai/gpt-5.1 output=pr-comment] run a focused evaluator pass
+@openhands-agent provider=openrouter model=openai/gpt-5.1 run through OpenRouter
 ```
 
 The model precedence is:
@@ -29,6 +30,20 @@ The model precedence is:
 4. `agent:<profile-or-literal>` label,
 5. repository variable `OPENHANDS_DEFAULT_MODEL`,
 6. `anthropic/claude-sonnet-4`.
+
+The workflow infers the provider from the selected model prefix unless `provider=...` is present.
+For example:
+
+| Model prefix           | Provider     | Preferred secret         |
+| ---------------------- | ------------ | ------------------------ |
+| `anthropic/`           | `ANTHROPIC`  | `LLM_API_KEY_ANTHROPIC`  |
+| `openai/`              | `OPENAI`     | `LLM_API_KEY_OPENAI`     |
+| `gemini/` or `google/` | `GEMINI`     | `LLM_API_KEY_GEMINI`     |
+| `openrouter/`          | `OPENROUTER` | `LLM_API_KEY_OPENROUTER` |
+
+Provider-specific secrets fall back to `LLM_API_KEY` when the specific key is absent. Optional
+provider-specific base URLs use the same suffix pattern, such as `LLM_BASE_URL_OPENROUTER`, with
+`LLM_BASE_URL` as the fallback.
 
 ## Output Modes
 
