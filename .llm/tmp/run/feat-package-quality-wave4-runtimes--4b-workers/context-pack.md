@@ -11,10 +11,9 @@ sub-wave's `plan.md` once written + PLAN-EVAL-approved.
 ## STATUS: IMPLEMENTATION IN PROGRESS
 
 PLAN-EVAL returned PASS on 2026-06-09. Implementation is proceeding in the locked 27-slice
-order. Slices C1-C12 are complete and pushed. Latest implementation commit: `f8051e5`
-(`refactor(workers-core): split workers contract concepts`), with `workers.contract.ts`
-reduced to 42 lines and all split contract files below 350 lines; targeted doc-lint and raw
-core 16-entrypoint check passing.
+order. Slices C1-C13 are complete and pushed. Latest implementation commit: `55f162b`
+(`docs(workers-core): document entrypoint surface`), with full-export workers-core doc-lint
+at 0/0/0 across all 16 retained entrypoints and raw core 16-entrypoint check passing.
 
 ## Scope — 2 publishable units (long pole #1)
 
