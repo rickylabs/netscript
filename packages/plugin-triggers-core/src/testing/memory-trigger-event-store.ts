@@ -7,10 +7,12 @@ export class MemoryTriggerEventStore implements TriggerEventStorePort {
   readonly #order: string[] = [];
   readonly #now: () => Date;
 
+  /** Create an in-memory event store with an optional clock hook. */
   constructor(options: Readonly<{ now?: () => Date }> = {}) {
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Persist a trigger event in memory. */
   save(event: TriggerEvent): Promise<void> {
     if (!this.#events.has(event.id)) {
       this.#order.push(event.id);
@@ -19,10 +21,12 @@ export class MemoryTriggerEventStore implements TriggerEventStorePort {
     return Promise.resolve();
   }
 
+  /** Load a trigger event by id. */
   load(eventId: TriggerEventId): Promise<TriggerEvent | undefined> {
     return Promise.resolve(this.#events.get(eventId));
   }
 
+  /** Update the status and metadata for a stored trigger event. */
   updateStatus(
     eventId: TriggerEventId,
     status: TriggerEventStatus,
@@ -40,6 +44,7 @@ export class MemoryTriggerEventStore implements TriggerEventStorePort {
     return Promise.resolve();
   }
 
+  /** List stored trigger events matching optional filters. */
   list(options: TriggerEventListOptions = {}): Promise<readonly TriggerEvent[]> {
     const events = this.#order
       .map((id) => this.#events.get(id))
@@ -48,6 +53,7 @@ export class MemoryTriggerEventStore implements TriggerEventStorePort {
     return Promise.resolve(options.limit === undefined ? events : events.slice(0, options.limit));
   }
 
+  /** Clear all stored trigger events. */
   clear(): void {
     this.#events.clear();
     this.#order.splice(0);
