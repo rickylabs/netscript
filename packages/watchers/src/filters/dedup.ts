@@ -54,6 +54,11 @@ export class DedupFilter implements WatchFilter {
   private readonly windowMs: number;
   private readonly seen = new Map<string, number>();
 
+  /**
+   * Create a deduplication filter.
+   *
+   * @param options - Optional deduplication window configuration.
+   */
   constructor(options?: DedupFilterOptions) {
     this.windowMs = options?.windowMs ?? 60_000;
   }

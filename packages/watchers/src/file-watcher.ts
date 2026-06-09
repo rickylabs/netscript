@@ -207,6 +207,11 @@ export class FileWatcher {
   private readonly abortController: AbortController;
   private _running = false;
 
+  /**
+   * Create a watcher with strategy, filters, and cancellation options.
+   *
+   * @param options - Watcher configuration.
+   */
   constructor(options: WatcherOptions) {
     this.options = options;
     this.abortController = new AbortController();

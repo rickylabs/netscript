@@ -23,7 +23,7 @@
     "hono": "npm:hono@^4.10.6"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts services/src/main.ts",
+    "check": "deno check --unstable-kv mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts verify-plugin.ts services/src/main.ts",
     "dev": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read --allow-write --allow-sys --allow-ffi services/src/main.ts",
     "streams:e2e": "deno run --allow-net --allow-env src/e2e/probes/health.ts && deno run --allow-all src/e2e/probes/publish.ts && deno run --allow-net --allow-env src/e2e/probes/subscribe.ts",

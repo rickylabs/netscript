@@ -27,6 +27,8 @@ export class GlobFilter implements WatchFilter {
   private readonly regexps: RegExp[];
 
   /**
+   * Create a glob filter from filename patterns.
+   *
    * @param patterns - Glob patterns to match against filenames.
    *                   Examples: `'*.csv'`, `'sales_*.xlsx'`, `'**\/*.json'`
    */

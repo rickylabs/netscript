@@ -73,6 +73,11 @@ export class AccessFailureTracker {
   private readonly maxFailures: number;
   private readonly onPersistentFailure: (path: string, count: number) => void;
 
+  /**
+   * Create an access failure tracker.
+   *
+   * @param options - Failure threshold and persistent-failure callback.
+   */
   constructor(options: {
     /** Consecutive failures before reporting. @default 3 */
     maxConsecutiveFailures?: number;

@@ -15,13 +15,13 @@
 export type KnownEventKind = 'create' | 'modify' | 'remove';
 
 /** File system event kind. New runtime kinds require doctrine review before use. */
-export type EventKind = KnownEventKind | (string & {});
+export type EventKind = KnownEventKind | (string & Record<never, never>);
 
 /** Built-in watch strategies for detecting file changes. */
 export type KnownWatchStrategy = 'native' | 'polling' | 'hybrid';
 
 /** Watch strategy identifier. Built-in factory values remain runtime validated. */
-export type WatchStrategy = KnownWatchStrategy | (string & {});
+export type WatchStrategy = KnownWatchStrategy | (string & Record<never, never>);
 
 // ============================================================================
 // FILE INFO
