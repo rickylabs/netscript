@@ -8,3 +8,4 @@
 | C4 | `9226dcc` | `fix(sagas-core): publish integration boundary types` | raw `deno doc --lint src/integration/workers/mod.ts src/integration/publisher/mod.ts` PASS; raw `deno check --unstable-kv` all 19 entrypoints PASS |
 | C5 | `0ea4771` | `fix(sagas-core): publish port boundary contracts` | raw `deno doc --lint src/ports/mod.ts` PASS; raw `deno check --unstable-kv` all 19 entrypoints PASS |
 | C6 | `64711a1` | `fix(sagas-core): publish runtime boundary contracts` | raw `deno doc --lint src/runtime/mod.ts` exit 1 with `private-type-ref-count=0` and 53 C11 `missing-jsdoc` errors remaining; raw `deno check --unstable-kv` all 19 entrypoints PASS |
+| C7 | `1a3a0f0` | `fix(sagas-core): publish adapter middleware preset contracts` | raw `deno doc --lint src/adapters/mod.ts src/middleware/mod.ts src/presets/mod.ts` exit 1 with `private-type-ref-count=0` and 69 later-slice `missing-jsdoc` errors remaining; raw `deno check --unstable-kv` all 19 entrypoints PASS |

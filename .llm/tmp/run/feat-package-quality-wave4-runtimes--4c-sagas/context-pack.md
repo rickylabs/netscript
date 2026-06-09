@@ -106,3 +106,7 @@ F-5 trim; `@ignore` only for genuinely-internal incidental refs.
 
 4c merges into the umbrella after IMPL-EVAL PASS. **4d (triggers) forks off the 4c-merged
 umbrella** (runs LAST). If split, `4c-plugin` forks off the `4c-core`-merged umbrella.
+
+## Implementation Progress
+
+- 2026-06-09 C7: `@netscript/plugin-sagas-core` adapters/middleware/presets private-type refs cleared by explicit first-party type closure exports and package-owned structural Hono-compatible middleware types. Implementation `1a3a0f0`; raw doc-lint target exits 1 with `private-type-ref-count=0` and remaining `missing-jsdoc`; raw all-entrypoint `deno check --unstable-kv` PASS.
