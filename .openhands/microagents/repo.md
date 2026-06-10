@@ -37,8 +37,7 @@ Before finishing an OpenHands workflow run, write the file named by `OPENHANDS_S
 - remaining risks or follow-up work.
 
 Do not write or reuse `.llm/tmp/openhands/summary.md`. That legacy shared path is ignored by the
-workflow because older PR branches can contain stale committed summaries. The workflow deletes and
-stages removals for tracked legacy files on every PR run. Runtime artifacts live in
+workflow because older PR branches can contain stale committed summaries. Runtime artifacts live in
 `OPENHANDS_RUN_DIR`; durable run trace metadata is mirrored under `OPENHANDS_TRACE_DIR`.
 
 Do not post GitHub issue or PR comments directly. The workflow reacts to the trigger, creates the

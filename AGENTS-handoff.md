@@ -58,8 +58,7 @@ The agent must write `OPENHANDS_SUMMARY_PATH` before exit. The workflow gives ea
 `OPENHANDS_RUN_DIR` outside the repository checkout and mirrors compact trace metadata to
 `OPENHANDS_TRACE_DIR`, usually under `.llm/tmp/run/openhands/<source>/run-<id>-<attempt>/`.
 Do not write or reuse `.llm/tmp/openhands/summary.md`; that legacy shared path is ignored to avoid
-posting stale summaries from old PR branches. The workflow removes tracked files under that legacy
-path from PR branches when it commits agent results or failure traces.
+posting stale summaries from old PR branches.
 
 The workflow owns GitHub comments: it reacts to the trigger comment, posts one running status
 comment with the Actions URL, then edits that same comment with the final summary. Agents should not

@@ -69,8 +69,8 @@ required summary artifacts keep local and cloud agents synchronized.
 - **Skipping the summary artifact**: GitHub comments and PR bodies come from
   `OPENHANDS_SUMMARY_PATH`; missing summaries produce workflow failure diagnostics.
 - **Reusing legacy OpenHands scratch files**: `.llm/tmp/openhands/` is gitignored runtime scratch.
-  The workflow prunes tracked legacy files from PR branches, uses a clean per-run
-  `OPENHANDS_RUN_DIR`, and mirrors compact trace metadata to `OPENHANDS_TRACE_DIR`.
+  The workflow uses a clean per-run `OPENHANDS_RUN_DIR` and mirrors compact trace metadata to
+  `OPENHANDS_TRACE_DIR`.
 - **Posting duplicate comments**: the workflow owns the status/final comment. Agents write
   artifacts; they do not call `gh issue comment` directly.
 - **Using Actions for long sessions**: move multi-step, human-in-the-loop work to the VPS Web UI.
