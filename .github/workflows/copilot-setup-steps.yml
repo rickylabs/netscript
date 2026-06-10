@@ -9,21 +9,22 @@
 #    audit-fix passes (deno publish --dry-run, deno doc --lint, deno task check,
 #    deno task e2e:cli) without a local agent.
 #
-# Toolchain pinned to this repo's reality:
-#   - Deno 2.x  (deno.json uses unstable: kv, temporal, tsgo, worker-options, raw-imports)
-#   - .NET SDK 10.x  (CLI scaffold AppHost/ServiceDefaults target net10.0)
-#   - Aspire CLI via the official install script, pinned to a release + script hash
-#     (NOT `dotnet workload install aspire`, which was removed after Aspire 8)
-#   - Docker (pre-installed on ubuntu-latest; AppHost resources need the engine)
+# Toolchain pinned to this repo's reality in .github/toolchain.env:
+#   - Deno 2.7.x
+#   - .NET SDK 10.x (CLI scaffold AppHost/ServiceDefaults target net10.0)
+#   - Aspire CLI 13.2.x (matches scaffold Aspire SDK/package constants)
+#   - Docker latest stable (AppHost resources need the engine)
 name: 'Copilot Setup Steps'
 
 on:
   workflow_dispatch:
   push:
     paths:
+      - .github/toolchain.env
       - .github/workflows/copilot-setup-steps.yml
   pull_request:
     paths:
+      - .github/toolchain.env
       - .github/workflows/copilot-setup-steps.yml
 
 jobs:
@@ -35,47 +36,58 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Load NetScript toolchain
+        id: toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          source .github/toolchain.env
+          echo "deno-version=${NETSCRIPT_DENO_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "dotnet-version=${NETSCRIPT_DOTNET_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "aspire-version=${NETSCRIPT_ASPIRE_CLI_VERSION}" >> "$GITHUB_OUTPUT"
+          grep -F "ASPIRE_SDK: '${NETSCRIPT_ASPIRE_CLI_VERSION}'" \
+            packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts
+
       # --- Deno (primary toolchain) ---
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.x
+          deno-version: ${{ steps.toolchain.outputs.deno-version }}
           cache-hash: ${{ hashFiles('**/deno.json') }}
 
       # --- .NET SDK 10 (Aspire AppHost / ServiceDefaults target net10.0) ---
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ steps.toolchain.outputs.dotnet-version }}
 
       # --- Aspire CLI (standalone install script; adds $HOME/.aspire/bin to PATH) ---
       - name: Install Aspire CLI
         run: |
           set -euo pipefail
-          aspire_version="13.4.2"
-          # Commit d7d0b6759ce4b936c76bc4775814d27db560dd6d is the target
-          # of the v13.4.2 release tag in dotnet/aspire.
-          # To verify/update: inspect https://github.com/dotnet/aspire/releases/tag/v13.4.2.
-          installer_url="https://raw.githubusercontent.com/dotnet/aspire/d7d0b6759ce4b936c76bc4775814d27db560dd6d/eng/scripts/get-aspire-cli.sh"
-          installer_sha256="df1247d87f6e5ca83e71abf55f78bca1bd9a421a3f2f0fd5481f153fc958632a"
+          aspire_version="${{ steps.toolchain.outputs.aspire-version }}"
+          installer_url="https://aspire.dev/install.sh"
           installer="$(mktemp)"
           trap 'rm -f "$installer"' EXIT
           curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 \
             --output "$installer" "$installer_url"
-          # sha256sum --check expects the hash, two space characters, then the filename.
-          if ! echo "$installer_sha256  $installer" | sha256sum --check; then
-            echo "::error::Aspire installer hash verification failed for $installer_url"
-            exit 1
-          fi
           bash "$installer" --version "$aspire_version" --install-path "$HOME/.aspire/bin" --skip-path
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Verify Aspire CLI
         run: |
+          set -euo pipefail
           export PATH="$HOME/.aspire/bin:$PATH"
-          aspire --version
+          actual="$(aspire --version)"
+          echo "$actual"
+          test "$actual" = "${{ steps.toolchain.outputs.aspire-version }}"
 
-      # --- Docker (AppHost container resources; engine is pre-installed) ---
+      # --- Docker (AppHost container resources) ---
+      - name: Setup Docker
+        uses: docker/setup-docker-action@v5
+        with:
+          version: latest
+
       - name: Verify Docker
         run: |
           docker --version
