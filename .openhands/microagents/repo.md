@@ -28,7 +28,7 @@ Common gates:
 
 ## Output Contract
 
-Before finishing an OpenHands workflow run, write `.llm/tmp/openhands/summary.md` with:
+Before finishing an OpenHands workflow run, write the file named by `OPENHANDS_SUMMARY_PATH` with:
 
 - summary of what was done,
 - changed files or areas,
@@ -36,11 +36,16 @@ Before finishing an OpenHands workflow run, write `.llm/tmp/openhands/summary.md
 - responses to relevant PR, issue, or review comments,
 - remaining risks or follow-up work.
 
+Do not write or reuse `.llm/tmp/openhands/summary.md`. That legacy shared path is ignored by the
+workflow because older PR branches can contain stale committed summaries. The workflow deletes and
+stages removals for tracked legacy files on every PR run. Runtime artifacts live in
+`OPENHANDS_RUN_DIR`; durable run trace metadata is mirrored under `OPENHANDS_TRACE_DIR`.
+
 Do not post GitHub issue or PR comments directly. The workflow reacts to the trigger, creates the
 running status comment, and edits that comment with this summary artifact.
 
 When the workflow output mode is `thread-replies`, optionally write
-`.llm/tmp/openhands/replies.json`:
+the file named by `OPENHANDS_REPLIES_PATH`:
 
 ```json
 [

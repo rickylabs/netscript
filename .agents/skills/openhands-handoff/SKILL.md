@@ -33,9 +33,9 @@ required summary artifacts keep local and cloud agents synchronized.
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                       |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.          |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                          |
-| Summary artifact | `.llm/tmp/openhands/summary.md`, required before the workflow exits.                            |
+| Summary artifact | `OPENHANDS_SUMMARY_PATH`, required before the workflow exits.                                   |
 | Status comment   | One workflow-owned PR/issue comment that starts as running and is edited with the final result. |
-| Thread replies   | Optional `.llm/tmp/openhands/replies.json` review-comment replies.                              |
+| Thread replies   | Optional `OPENHANDS_REPLIES_PATH` review-comment replies.                                      |
 | Chainable token  | `PAT_TOKEN` or GitHub App token; required for cloud-created events to trigger more workflows.   |
 
 ## Workflow
@@ -53,8 +53,8 @@ required summary artifacts keep local and cloud agents synchronized.
    - `respond-comments` when review comments must be addressed in one summary,
    - `thread-replies` only when exact PR review-comment IDs are available,
    - `summary-only` for artifact-only runs.
-5. Require the cloud agent to write `.llm/tmp/openhands/summary.md` with changes, validation,
-   comment responses, and risks.
+5. Require the cloud agent to write `OPENHANDS_SUMMARY_PATH` with changes, validation, comment
+   responses, and risks. The workflow ignores legacy `.llm/tmp/openhands/summary.md`.
 6. For long-running work, use the VPS Web UI deployment and leave a PR/issue comment that links the
    session outcome back to the GitHub thread.
 
@@ -64,9 +64,13 @@ required summary artifacts keep local and cloud agents synchronized.
   with the default Actions token. Use `PAT_TOKEN` or a GitHub App token when one cloud agent should
   trigger another.
 - **Choosing thread replies without IDs**: `thread-replies` needs PR review-comment IDs in
-  `replies.json`. Use `respond-comments` for a single high-quality response when IDs are uncertain.
+  `OPENHANDS_REPLIES_PATH`. Use `respond-comments` for a single high-quality response when IDs are
+  uncertain.
 - **Skipping the summary artifact**: GitHub comments and PR bodies come from
-  `.llm/tmp/openhands/summary.md`; missing summaries produce weak handoffs.
+  `OPENHANDS_SUMMARY_PATH`; missing summaries produce workflow failure diagnostics.
+- **Reusing legacy OpenHands scratch files**: `.llm/tmp/openhands/` is gitignored runtime scratch.
+  The workflow prunes tracked legacy files from PR branches, uses a clean per-run
+  `OPENHANDS_RUN_DIR`, and mirrors compact trace metadata to `OPENHANDS_TRACE_DIR`.
 - **Posting duplicate comments**: the workflow owns the status/final comment. Agents write
   artifacts; they do not call `gh issue comment` directly.
 - **Using Actions for long sessions**: move multi-step, human-in-the-loop work to the VPS Web UI.
@@ -87,5 +91,5 @@ required summary artifacts keep local and cloud agents synchronized.
 - [ ] Trigger names the model/profile when default model is not desired.
 - [ ] Output mode matches the requested comment behavior.
 - [ ] `PAT_TOKEN` or GitHub App token is configured for chained cloud events.
-- [ ] `.llm/tmp/openhands/summary.md` is written before exit.
+- [ ] `OPENHANDS_SUMMARY_PATH` is written before exit.
 - [ ] Harness evaluator separation is preserved when the task says `use harness`.

@@ -51,10 +51,15 @@ provider-specific base URLs use the same suffix pattern, such as `LLM_BASE_URL_O
 | ------------------ | --------------------------------------------------------------------------------------- |
 | `pr-comment`       | Post one summary comment to the target issue or PR.                                     |
 | `respond-comments` | Post one summary comment that explicitly responds to relevant review or issue comments. |
-| `thread-replies`   | Post the summary and any review-thread replies from `.llm/tmp/openhands/replies.json`.  |
+| `thread-replies`   | Post the summary and any review-thread replies from `OPENHANDS_REPLIES_PATH`.           |
 | `summary-only`     | Upload artifacts only; do not comment.                                                  |
 
-The agent must write `.llm/tmp/openhands/summary.md` before exit.
+The agent must write `OPENHANDS_SUMMARY_PATH` before exit. The workflow gives each run a fresh
+`OPENHANDS_RUN_DIR` outside the repository checkout and mirrors compact trace metadata to
+`OPENHANDS_TRACE_DIR`, usually under `.llm/tmp/run/openhands/<source>/run-<id>-<attempt>/`.
+Do not write or reuse `.llm/tmp/openhands/summary.md`; that legacy shared path is ignored to avoid
+posting stale summaries from old PR branches. The workflow removes tracked files under that legacy
+path from PR branches when it commits agent results or failure traces.
 
 The workflow owns GitHub comments: it reacts to the trigger comment, posts one running status
 comment with the Actions URL, then edits that same comment with the final summary. Agents should not
@@ -73,8 +78,8 @@ Local agents that push with your own credentials already produce chainable event
 For Augment or Copilot review comments:
 
 1. Trigger with `@openhands-agent output=respond-comments ...` or `output=thread-replies`.
-2. The workflow writes current issue comments to `.llm/tmp/openhands/issue-comments.json`.
-3. For PRs, the workflow writes review comments to `.llm/tmp/openhands/pr-review-comments.json`.
+2. The workflow writes current issue comments to `OPENHANDS_ISSUE_COMMENTS_PATH`.
+3. For PRs, the workflow writes review comments to `OPENHANDS_PR_REVIEW_COMMENTS_PATH`.
 4. The agent fixes legitimate comments first when the prompt asks for that.
 5. The final summary names each addressed comment and the validation result.
 

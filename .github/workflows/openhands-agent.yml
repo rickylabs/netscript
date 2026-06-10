@@ -270,6 +270,55 @@ jobs:
               --jq .content | base64 -d > "$target"
           done
 
+      - name: Prepare OpenHands artifact paths
+        id: artifacts
+        env:
+          CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+          ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+        run: |
+          set -euo pipefail
+          run_dir="${RUNNER_TEMP}/openhands/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          raw_scope="ref-${CHECKOUT_REF:-${GITHUB_REF_NAME:-unknown}}"
+          if [ -n "${ISSUE_NUMBER}" ]; then
+            raw_scope="pr-${ISSUE_NUMBER}"
+          fi
+          safe_scope="$(printf '%s' "$raw_scope" | tr -c 'A-Za-z0-9._-' '-' | sed -E 's/-+/-/g; s/^-//; s/-$//' | cut -c1-80)"
+          trace_dir=".llm/tmp/run/openhands/${safe_scope}/run-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          rm -rf "$run_dir"
+          mkdir -p "$run_dir" "$trace_dir"
+          # Legacy path is intentionally cleaned and ignored; it may contain stale committed
+          # summaries on old PR branches, but the workflow must never publish from it.
+          rm -rf .llm/tmp/openhands
+
+          {
+            echo "run_dir=$run_dir"
+            echo "trace_dir=$trace_dir"
+            echo "request=$run_dir/request.md"
+            echo "summary=$run_dir/summary.md"
+            echo "replies=$run_dir/replies.json"
+            echo "issue_comments=$run_dir/issue-comments.json"
+            echo "pr_review_comments=$run_dir/pr-review-comments.json"
+            echo "agent_log=$run_dir/agent.log"
+            echo "comment=$run_dir/comment.md"
+            echo "comment_json=$run_dir/comment.json"
+            echo "metadata=$run_dir/metadata.json"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "OPENHANDS_RUN_DIR=$run_dir"
+            echo "OPENHANDS_TRACE_DIR=$trace_dir"
+            echo "OPENHANDS_REQUEST_PATH=$run_dir/request.md"
+            echo "OPENHANDS_SUMMARY_PATH=$run_dir/summary.md"
+            echo "OPENHANDS_REPLIES_PATH=$run_dir/replies.json"
+            echo "OPENHANDS_ISSUE_COMMENTS_PATH=$run_dir/issue-comments.json"
+            echo "OPENHANDS_PR_REVIEW_COMMENTS_PATH=$run_dir/pr-review-comments.json"
+            echo "OPENHANDS_AGENT_LOG_PATH=$run_dir/agent.log"
+            echo "OPENHANDS_COMMENT_PATH=$run_dir/comment.md"
+            echo "OPENHANDS_COMMENT_JSON_PATH=$run_dir/comment.json"
+            echo "OPENHANDS_METADATA_PATH=$run_dir/metadata.json"
+          } >> "$GITHUB_ENV"
+
       - name: Prepare OpenHands request files
         env:
           REQUEST_PROMPT: ${{ steps.request.outputs.prompt }}
@@ -282,8 +331,9 @@ jobs:
           REQUEST_RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p .llm/tmp/openhands
-          cat > .llm/tmp/openhands/request.md <<REQUEST
+          set -euo pipefail
+          mkdir -p "$OPENHANDS_RUN_DIR" "$OPENHANDS_TRACE_DIR"
+          cat > "$OPENHANDS_REQUEST_PATH" <<REQUEST
           You are OpenHands running for the NetScript repository.
 
           User task:
@@ -297,10 +347,13 @@ jobs:
           - Preserve user changes and avoid destructive git commands.
           - Run the smallest validation that proves the change.
           - Do not post GitHub issue or PR comments directly. The workflow owns GitHub comments.
-          - Write .llm/tmp/openhands/summary.md before exit. Include Summary, Changes, Validation,
+          - Write ${OPENHANDS_SUMMARY_PATH} before exit. Include Summary, Changes, Validation,
             Responses to review comments or issue comments when relevant, and Remaining risks.
-          - If output_mode is thread-replies, optionally write .llm/tmp/openhands/replies.json as
+          - Do not write or reuse .llm/tmp/openhands/summary.md; that legacy shared path is ignored
+            because it can contain stale summaries from older PR branches.
+          - If output_mode is thread-replies, optionally write ${OPENHANDS_REPLIES_PATH} as
             an array of {"comment_id": number, "body": string} objects for PR review-thread replies.
+          - The workflow records durable trace metadata under ${OPENHANDS_TRACE_DIR}.
 
           Trigger metadata:
           - event: ${REQUEST_EVENT_NAME}
@@ -311,11 +364,12 @@ jobs:
           - selected_provider: ${REQUEST_PROVIDER}
           - action_run: ${REQUEST_RUN_URL}
           REQUEST
+          cp "$OPENHANDS_REQUEST_PATH" "$OPENHANDS_TRACE_DIR/request.md"
           if [ "${REQUEST_IS_PR}" = "true" ] && [ -n "${REQUEST_ISSUE_NUMBER}" ]; then
             gh api "repos/${GITHUB_REPOSITORY}/issues/${REQUEST_ISSUE_NUMBER}/comments" \
-              > .llm/tmp/openhands/issue-comments.json || true
+              > "$OPENHANDS_ISSUE_COMMENTS_PATH" || true
             gh api "repos/${GITHUB_REPOSITORY}/pulls/${REQUEST_ISSUE_NUMBER}/comments" \
-              > .llm/tmp/openhands/pr-review-comments.json || true
+              > "$OPENHANDS_PR_REVIEW_COMMENTS_PATH" || true
           fi
 
       - name: Setup Docker
@@ -393,30 +447,127 @@ jobs:
           echo "Using provider ${provider} with secret ${key_var} when present."
 
       - name: Run OpenHands
+        id: run-agent
         env:
           LLM_MODEL: ${{ steps.request.outputs.model }}
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-        run: uv run python /tmp/openhands-runtime/agent_runner.py .llm/tmp/openhands/request.md
+        run: |
+          set +e
+          uv run python /tmp/openhands-runtime/agent_runner.py "$OPENHANDS_REQUEST_PATH" 2>&1 | tee "$OPENHANDS_AGENT_LOG_PATH"
+          status=${PIPESTATUS[0]}
+          echo "$status" > "$OPENHANDS_RUN_DIR/agent-exit-code.txt"
+          exit "$status"
+
+      - name: Materialize OpenHands trace
+        if: always()
+        env:
+          AGENT_OUTCOME: ${{ steps.run-agent.outcome }}
+          MODEL: ${{ steps.request.outputs.model }}
+          PROVIDER: ${{ steps.request.outputs.provider }}
+          OUTPUT_MODE: ${{ steps.request.outputs.output_mode }}
+          ISSUE_NUMBER: ${{ steps.request.outputs.issue_number }}
+          CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
+          CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$OPENHANDS_RUN_DIR" "$OPENHANDS_TRACE_DIR"
+          if [ ! -f "$OPENHANDS_SUMMARY_PATH" ]; then
+            cat > "$OPENHANDS_SUMMARY_PATH" <<SUMMARY
+          # OpenHands Agent Summary
+
+          ## Status
+          The OpenHands run did not produce a run-scoped summary artifact.
+
+          This is a workflow/agent failure, not a task verdict. The workflow ignored any legacy
+          `.llm/tmp/openhands/summary.md` file from the repository checkout to prevent stale
+          summaries from being posted to the wrong PR.
+
+          ## Diagnostics
+          - Agent outcome: \`${AGENT_OUTCOME}\`
+          - Model: \`${MODEL}\`
+          - Provider: \`${PROVIDER}\`
+          - Output mode: \`${OUTPUT_MODE}\`
+          - Run: ${RUN_URL}
+          SUMMARY
+          fi
+          python - <<'PY'
+          import json
+          import os
+
+          metadata = {
+              "run_id": os.environ["GITHUB_RUN_ID"],
+              "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "run_url": os.environ["RUN_URL"],
+              "agent_outcome": os.environ["AGENT_OUTCOME"],
+              "model": os.environ["MODEL"],
+              "provider": os.environ["PROVIDER"],
+              "output_mode": os.environ["OUTPUT_MODE"],
+              "issue_number": os.environ["ISSUE_NUMBER"],
+              "checkout_repo": os.environ["CHECKOUT_REPO"],
+              "checkout_ref": os.environ["CHECKOUT_REF"],
+              "summary_path": os.environ["OPENHANDS_SUMMARY_PATH"],
+              "trace_dir": os.environ["OPENHANDS_TRACE_DIR"],
+          }
+          with open(os.environ["OPENHANDS_METADATA_PATH"], "w", encoding="utf-8") as target:
+              json.dump(metadata, target, indent=2)
+              target.write("\n")
+          PY
+          cp "$OPENHANDS_SUMMARY_PATH" "$OPENHANDS_TRACE_DIR/summary.md"
+          cp "$OPENHANDS_METADATA_PATH" "$OPENHANDS_TRACE_DIR/metadata.json"
+          if [ -f "$OPENHANDS_RUN_DIR/agent-exit-code.txt" ]; then
+            cp "$OPENHANDS_RUN_DIR/agent-exit-code.txt" "$OPENHANDS_TRACE_DIR/agent-exit-code.txt"
+          fi
+          if [ -f "$OPENHANDS_AGENT_LOG_PATH" ]; then
+            tail -n 400 "$OPENHANDS_AGENT_LOG_PATH" > "$OPENHANDS_TRACE_DIR/agent.log"
+          fi
+          if [ "${AGENT_OUTCOME}" != "success" ]; then
+            cat > "$OPENHANDS_TRACE_DIR/failure.md" <<FAILURE
+          # OpenHands Run Failure
+
+          The run failed before a valid task verdict could be trusted.
+
+          - Outcome: \`${AGENT_OUTCOME}\`
+          - Run: ${RUN_URL}
+          - Runtime artifacts: uploaded as \`openhands-agent-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}\`
+
+          The workflow posts only \`${OPENHANDS_SUMMARY_PATH}\`; legacy summaries under
+          \`.llm/tmp/openhands/\` are ignored.
+          FAILURE
+          fi
 
       - name: Commit changes back to PR branch
-        if: steps.request.outputs.is_pr == 'true'
+        if: always() && steps.request.outputs.is_pr == 'true'
         env:
           TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
           CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+          AGENT_OUTCOME: ${{ steps.run-agent.outcome }}
         run: |
-          if git diff --quiet && git diff --cached --quiet; then
+          set -euo pipefail
+          # Prune any tracked legacy OpenHands scratch files from old PR branches. Because the path
+          # is gitignored, this stages deletions only and cannot add new runtime scratch files.
+          git add -u -- .llm/tmp/openhands || true
+          if [ "${AGENT_OUTCOME}" = "success" ]; then
+            git add -A -- . ':!.llm/tmp/openhands'
+          else
+            git add -A -- "$OPENHANDS_TRACE_DIR"
+          fi
+          if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
           git config user.email "openhands@all-hands.dev"
           git config user.name "OpenHands Bot"
-          git add -A
-          git commit -m "chore(openhands): apply agent changes"
+          if [ "${AGENT_OUTCOME}" = "success" ]; then
+            git commit -m "chore(openhands): apply agent changes"
+          else
+            git commit -m "chore(openhands): record failed agent run"
+          fi
           git push "https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git" "HEAD:${CHECKOUT_REF}"
 
       - name: Create pull request for non-PR triggers
-        if: steps.request.outputs.is_pr != 'true'
+        if: steps.run-agent.outcome == 'success' && steps.request.outputs.is_pr != 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -424,7 +575,7 @@ jobs:
           base: ${{ steps.request.outputs.base_branch }}
           commit-message: 'chore(openhands): apply agent changes'
           title: 'OpenHands agent task'
-          body-path: .llm/tmp/openhands/summary.md
+          body-path: ${{ steps.artifacts.outputs.trace_dir }}/summary.md
           draft: true
 
       - name: Post summary comment
@@ -438,12 +589,18 @@ jobs:
           JOB_STATUS: ${{ job.status }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          if [ ! -f .llm/tmp/openhands/summary.md ]; then
-            cat > .llm/tmp/openhands/summary.md <<SUMMARY
+          set -euo pipefail
+          : "${OPENHANDS_SUMMARY_PATH:=${RUNNER_TEMP}/openhands-fallback/summary.md}"
+          : "${OPENHANDS_COMMENT_PATH:=${RUNNER_TEMP}/openhands-fallback/comment.md}"
+          : "${OPENHANDS_COMMENT_JSON_PATH:=${RUNNER_TEMP}/openhands-fallback/comment.json}"
+          : "${OPENHANDS_TRACE_DIR:=unavailable-before-artifact-setup}"
+          mkdir -p "$(dirname "$OPENHANDS_SUMMARY_PATH")" "$(dirname "$OPENHANDS_COMMENT_PATH")"
+          if [ ! -f "$OPENHANDS_SUMMARY_PATH" ]; then
+            cat > "$OPENHANDS_SUMMARY_PATH" <<SUMMARY
           # OpenHands Agent Summary
 
           ## Status
-          The workflow reached final comment publication, but the agent did not write `.llm/tmp/openhands/summary.md`.
+          The workflow reached final comment publication, but no run-scoped summary exists.
 
           Model: \`${MODEL}\`
           Run: ${RUN_URL}
@@ -455,26 +612,28 @@ jobs:
             echo
             echo "Model: \`${MODEL}\`"
             echo "Provider: \`${PROVIDER}\`"
+            echo "Artifacts: \`${OPENHANDS_TRACE_DIR}\`"
             echo
-            cat .llm/tmp/openhands/summary.md
+            cat "$OPENHANDS_SUMMARY_PATH"
             echo
             echo "Run: ${RUN_URL}"
-          } > .llm/tmp/openhands/comment.md
+          } > "$OPENHANDS_COMMENT_PATH"
           if [ -n "${STATUS_COMMENT_ID}" ]; then
             python - <<'PY'
           import json
+          import os
 
-          with open(".llm/tmp/openhands/comment.md", encoding="utf-8") as source:
+          with open(os.environ["OPENHANDS_COMMENT_PATH"], encoding="utf-8") as source:
               payload = {"body": source.read()}
-          with open(".llm/tmp/openhands/comment.json", "w", encoding="utf-8") as target:
+          with open(os.environ["OPENHANDS_COMMENT_JSON_PATH"], "w", encoding="utf-8") as target:
               json.dump(payload, target)
           PY
             gh api --method PATCH \
               "repos/${GITHUB_REPOSITORY}/issues/comments/${STATUS_COMMENT_ID}" \
-              --input .llm/tmp/openhands/comment.json \
+              --input "$OPENHANDS_COMMENT_JSON_PATH" \
               --jq .html_url >/dev/null
           else
-            gh issue comment "${ISSUE_NUMBER}" --body-file .llm/tmp/openhands/comment.md
+            gh issue comment "${ISSUE_NUMBER}" --body-file "$OPENHANDS_COMMENT_PATH"
           fi
 
       - name: Post review-thread replies
@@ -482,7 +641,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
-          if [ ! -f .llm/tmp/openhands/replies.json ]; then
+          if [ ! -f "$OPENHANDS_REPLIES_PATH" ]; then
             echo "No replies.json written."
             exit 0
           fi
@@ -492,7 +651,7 @@ jobs:
           import subprocess
 
           repo = os.environ["GITHUB_REPOSITORY"]
-          with open(".llm/tmp/openhands/replies.json", encoding="utf-8") as f:
+          with open(os.environ["OPENHANDS_REPLIES_PATH"], encoding="utf-8") as f:
               replies = json.load(f)
 
           for reply in replies:
@@ -516,6 +675,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: openhands-agent-artifacts
-          path: .llm/tmp/openhands
+          name: openhands-agent-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ steps.artifacts.outputs.run_dir }}
+            ${{ steps.artifacts.outputs.trace_dir }}
           retention-days: 14
