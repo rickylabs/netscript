@@ -29,7 +29,7 @@ export DENO_INSTALL="${DENO_INSTALL:-$HOME/.deno}"
 export PATH="$DENO_INSTALL/bin:$HOME/.aspire/bin:$HOME/.dotnet:$PATH"
 
 if ! command -v deno >/dev/null 2>&1; then
-  curl -fsSL https://deno.land/install.sh | sh -s -- -y
+  curl -fsSL https://deno.land/install.sh | sh -s -- -y "$NETSCRIPT_DENO_VERSION"
 fi
 
 target_deno="${NETSCRIPT_DENO_VERSION#v}"
@@ -62,10 +62,13 @@ dotnet --version
 dotnet --list-sdks | grep -E "^${target_dotnet_major}\."
 actual_aspire="$(aspire --version)"
 echo "$actual_aspire"
-if [ "$actual_aspire" != "$NETSCRIPT_ASPIRE_CLI_VERSION" ]; then
-  echo "Aspire CLI version mismatch: expected $NETSCRIPT_ASPIRE_CLI_VERSION, got $actual_aspire"
-  exit 1
-fi
+case "$actual_aspire" in
+  "$NETSCRIPT_ASPIRE_CLI_VERSION"*) ;;
+  *)
+    echo "Aspire CLI version mismatch: expected $NETSCRIPT_ASPIRE_CLI_VERSION, got $actual_aspire"
+    exit 1
+    ;;
+esac
 docker --version
 docker compose version
 
