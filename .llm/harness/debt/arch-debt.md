@@ -195,6 +195,21 @@ Seeded from
 - **Status:** open
 - **Gate:** F-3, F-11
 
+## packages/service — assets/scalar.min.js (3.3 MB vendored in publish)
+
+- **Reason:** `assets/scalar.min.js` (3.3 MB) is vendored and included in the JSR publish so that
+  offline/no-CDN Scalar docs work for JSR-installed consumers. The size is acceptable for alpha but
+  should be revisited before beta (lazy npm specifier, optional peer dependency, or CDN-only mode).
+- **Owner:** Wave 5a `@netscript/service` generator (D-9).
+- **Target:** Revisit before beta; no 2027-Q1 commitment unless publish-size limits change.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5a-service/plan.md` (D-9).
+- **Created:** 2026-06-15 (PLAN-EVAL advisory finding #2).
+- **Status:** open, DEBT_ACCEPTED. Locked decision D-9 keeps the vendored asset; this entry tracks
+  the revisit.
+- **Gate:** F-14, JSR publish-size limits; close when an alternative delivery mechanism (lazy
+  specifier, optional peer, or CDN-only flag) replaces the vendored file without breaking offline
+  docs.
+
 ## packages/plugin — AP-1 / doctrine verdict Restructure (types.ts 1,005 LOC)
 
 - **Reason:** `types.ts` should split per concept and introduce `domain/` plus `ports/`.
