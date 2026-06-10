@@ -280,8 +280,8 @@ concern, **not** a plugin-host defect → terminal owner is Wave 4 sub-wave **4d
 | Nested run ID | `feat-package-quality-wave4-runtimes--<suffix>` |
 | Units | `@netscript/plugin-streams-core`, `@netscript/plugin-workers-core`, `@netscript/plugin-sagas-core`, `@netscript/plugin-triggers-core`, `@netscript/watchers`, `@netscript/plugin-streams`, `@netscript/plugin-workers`, `@netscript/plugin-sagas`, `@netscript/plugin-triggers` |
 | Archetype(s) | A1/A4 (`*-core`), A3 (`watchers`), A5 (`plugins/*`) — **archetype-per-core disputed (registry A1/A4 vs canonical A3); settle in Plan & Design** |
-| Status | `active` — **4a merged** → umbrella `2c24662` (IMPL-EVAL PASS, PR #18). **4b (workers) merged** → umbrella `1896f854` (separate-session PLAN-EVAL + IMPL-EVAL PASS, OpenHands kimi-k2.6, PR #19). **4c (sagas) merged** → umbrella `8264a1c` (separate-session PLAN-EVAL + IMPL-EVAL PASS after 1 FAIL_FIX, OpenHands qwen3.7-max, PR #20). **4d (triggers, LAST)** pulled forward onto the 4c-merged umbrella (`32637a9`) → **Research/Plan & Design next** (PR #21). PR #16 ACTIVE — only 4d remains. |
-| Merge commit | — (umbrella → track once, at full-wave completeness) |
+| Status | **`merged`** — all sub-waves IMPL-EVAL PASS (separate sessions): 4a → umbrella `2c24662` (PR #18); 4b workers → `1896f854` (PR #19, OpenHands kimi-k2.6); 4c sagas → `8264a1c` (PR #20, OpenHands qwen3.7-max, after 1 FAIL_FIX); 4d triggers (LAST) → umbrella `67aa453` (PR #21, IMPL-EVAL PASS committed `bc17fe3`). **Umbrella → track closeout via PR #16 (GitHub merge) → `f0e1441`** with the deliberate `deno.lock` reconcile (otel 1.40→1.28 + esbuild/preact/loader; track untouched since `da0e470` → inherited clean, no conflict). |
+| Merge commit | **`f0e1441`** (PR #16, umbrella → track, 2026-06-10) |
 
 ### Pre-conditions
 
@@ -525,8 +525,8 @@ deliberate `deno.lock` reconcile.
 | Nested run ID | `feat-package-quality-wave5-apps--<suffix>` |
 | Units | `@netscript/sdk`, `@netscript/service`, `@netscript/fresh`, `@netscript/fresh-ui` |
 | Archetype(s) | **service A4(+A3) · sdk A3(+A4) · fresh-ui A4 Browser · fresh A4+A3 Browser (multi)** — see prep note (registry "A4 — dsl/app" was a first-pass guess) |
-| Status | `prepared` (umbrella PR #17, off track `9b27fb4`, **BLOCKED on Wave 4**) |
-| Merge commit | — |
+| Status | **`unblocked`** — Wave 4 merged (`f0e1441`); track reconciled into umbrella (**`dfab7a4`**, clean merge); apps layer re-baselined (umbrella `research.md` §0.5, `wave5-doclint.json`). PR #17 (umbrella → track, Draft). **Ready to open 5a (service).** Fable 5 handover persisted (`fable5-handover.md`). |
+| Merge commit | — (umbrella → track once, at full Wave 5 completeness) |
 
 ### Pre-conditions
 
@@ -580,6 +580,29 @@ worktree `.worktrees/wave5-apps`, off track `9b27fb4`):
 - **Next gate:** after Wave 4 merges → merge track into umbrella → extra Claude reconciliation
   pass (cross-package consumer scan vs merged surface + `fresh/streams`/`sdk/streams` vs merged
   Wave 4 streams) → then open 5a.
+
+### Wave 5 reconcile + re-baseline DONE (2026-06-10 @ `dfab7a4`)
+
+Wave 4 merged to track (`f0e1441`). Track reconciled into umbrella `feat/package-quality-wave5-apps`
+(`acdfab7..dfab7a4`, clean ort — no conflicts; pushed, verified via ls-remote). Apps layer
+re-baselined against the merged Wave 4 surface + blessed lock (raw `deno` spawned, RTK-bypassed;
+`wave5-rebaseline.json` + `wave5-doclint.json`; supervisor doc commit `09f4845`):
+
+- **Headline unchanged vs `9b27fb4`:** combined doc-lint = **328** (service 23 / sdk 29 / fresh-ui 0
+  / fresh **276**); **138 `private-type-ref`**; all 4 `deno publish --dry-run` RED. Apps layer was
+  untouched by Wave 4, as expected — re-architecture scope stands.
+- **What changed:** **all 4 now PASS `deno check --unstable-kv`** on the merged plugin surface +
+  blessed lock (no new app-layer type breakage). Stream coupling re-confirmed (27 `fresh` files →
+  merged `@netscript/plugin-streams(-core)`, all resolve); the exact stream surface locks at 5d-4.
+- **doc-lint ground truth = COMBINED over all entrypoints** — `fresh` root-barrel `mod.ts` = 23 vs
+  combined **276** (undercount ×12); generator MEASURE-FIRST + IMPL-EVAL must use the combined sweep
+  AND a full-barrel run (4c `SagaCorrelation` trap).
+- **Tooling drift:** `parse-deno-check-errors.ts` removed → `.llm/tools/run-deno-check.ts`; doctrine
+  gained **F-19**; root `check`/`lint`/`fmt:check` scoped to exclude Wave 5 apps + Wave 6 CLI debt.
+- **Fable 5 handover persisted:** `…/feat-package-quality-wave5-apps--umbrella/fable5-handover.md`
+  (curated generator entry point — read order, re-baseline table, throughlines, constraints, gotchas).
+- **Next:** the generator (a separate session — supervisor stops at unblock) opens sub-wave **5a
+  (service)** off umbrella head `dfab7a4`. Supervisor does NOT lock plans or open 5a.
 
 ## Wave 6 — Tooling
 
