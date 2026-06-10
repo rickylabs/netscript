@@ -360,4 +360,25 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Covered by D12/D13 drift rows: same-file streams/scaffolding JSDoc blockers were pulled forward to keep earlier raw gates green. |
-| Commits | Implementation `da10d52`; paired docs/evidence pending. |
+| Commits | Implementation `da10d52`; paired docs/evidence `0feabec`. |
+
+### Slice 17/23 — D17 split webhook E2E concepts
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | Deleted over-budget `test-webhooks-e2e.ts` (423 LOC) and split it into `tests/e2e/webhooks-health_test.ts`, `webhooks-ingress_test.ts`, `webhooks-security_test.ts`, plus shared `webhooks_helpers.ts`. E2E tests are discovered but ignored unless `NETSCRIPT_RUN_WEBHOOK_E2E=1`, preserving manual Aspire dependency. |
+| Gate(s) | F-1 file-size/concept split |
+| Gate command | `Get-ChildItem plugins/triggers/tests/e2e/*.ts | ForEach-Object { (Get-Content $_).Count }` from repo root |
+| Gate result | PASS, exit 0; line counts: helpers 69, health 19, ingress 102, security 73. |
+| Gate command | `deno fmt --check plugins/triggers/tests/e2e/webhooks_helpers.ts plugins/triggers/tests/e2e/webhooks-health_test.ts plugins/triggers/tests/e2e/webhooks-ingress_test.ts plugins/triggers/tests/e2e/webhooks-security_test.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 4 files`. |
+| Gate command | `deno check --unstable-kv tests/e2e/webhooks_helpers.ts tests/e2e/webhooks-health_test.ts tests/e2e/webhooks-ingress_test.ts tests/e2e/webhooks-security_test.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all four split E2E files checked. |
+| Gate command | `deno test --allow-net --allow-env --unstable-kv tests/e2e` from `plugins/triggers` |
+| Gate result | PASS, exit 0; 0 passed / 0 failed / 12 ignored because `NETSCRIPT_RUN_WEBHOOK_E2E` was not set. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Info row recorded: plan table named three split test files; the user instruction also required four files under `tests/e2e`, so D17 added a shared helper module as the fourth file to avoid duplication. |
+| Commits | Implementation `c2df49a`; paired docs/evidence pending. |
