@@ -448,4 +448,25 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Info row recorded: D20 added the manifest `e2e` contribution and task required by the locked E2E-gate test expectation. |
-| Commits | Implementation `972783d`; paired docs/evidence pending. |
+| Commits | Implementation `972783d`; paired docs/evidence `ad8a060`. |
+
+### Slice 21/23 — D21 core docs tree
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers-core` |
+| Archetype | A3 Runtime/Behavior |
+| Changed | Added `docs/README.md`, `docs/architecture.md`, `docs/getting-started.md`, `docs/reference/ports.md`, and `docs/reference/testing.md`. README is 351 lines after formatting. Doctested examples cover webhook, file-watch, scheduled trigger, clock port, and test clock usage. Also added explicit root type re-exports for companion port/runtime/domain types so the full root barrel doc-lint gate passes. |
+| Gate(s) | F-7 docs tree; full-barrel doc-lint guard |
+| Gate command | `(Get-Content packages/plugin-triggers-core/docs/README.md).Count` from repo root |
+| Gate result | PASS, exit 0; README line count 351 (>=150). |
+| Gate command | `deno fmt --check packages/plugin-triggers-core/docs/README.md packages/plugin-triggers-core/docs/architecture.md packages/plugin-triggers-core/docs/getting-started.md packages/plugin-triggers-core/docs/reference/ports.md packages/plugin-triggers-core/docs/reference/testing.md packages/plugin-triggers-core/src/public/mod.ts packages/plugin-triggers-core/src/builders/mod.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 7 files`. |
+| Gate command | `deno test --doc --allow-all --unstable-kv packages/plugin-triggers-core/docs/README.md packages/plugin-triggers-core/docs/getting-started.md packages/plugin-triggers-core/docs/reference/ports.md packages/plugin-triggers-core/docs/reference/testing.md` from repo root |
+| Gate result | PASS, exit 0; 6 doctests passed / 0 failed. |
+| Gate command | `deno doc --lint mod.ts` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; output `Checked 1 file`, proving the root full-barrel private-type-ref trap is closed for core. |
+| Gate command | `deno task check` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; all 11 core export entrypoints checked with `--unstable-kv`. |
+| Drift | Info row recorded: D21 pulled forward explicit root type re-exports required by the D23 full-barrel doc-lint guard. |
+| Commits | Implementation `03fce94`; paired docs/evidence pending. |
