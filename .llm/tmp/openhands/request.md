@@ -2,9 +2,9 @@ You are OpenHands running for the NetScript repository.
 
 User task:
 Trigger comment:
-@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment use harness proceed to PLAN-EVAL for this PR.
+@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment use harness proceed to IMPL-EVAL for this PR. including the E2E CLI suite test. If surface of required changes/fixes  are minimal proceed to fix them before giving your final verdict.
 
-Issue/PR title: [Wave 4 · 4d] triggers — package quality (LAST · pulled forward · Research next)
+Issue/PR title: [Wave 4 · 4d] triggers — package quality (LAST · PLAN-EVAL PASS · Implementation next)
 
 Operational contract:
 - Read AGENTS.md first.
@@ -26,4 +26,4 @@ Trigger metadata:
 - output_mode: pr-comment
 - selected_model: openrouter/qwen/qwen3.7-max
 - selected_provider: OPENROUTER
-- action_run: https://github.com/rickylabs/netscript/actions/runs/27238904000
+- action_run: https://github.com/rickylabs/netscript/actions/runs/27249997237
