@@ -57,4 +57,4 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - a5ff553: docs(wave4): record D22 plugin docs evidence
 - fd300c3: fix(triggers): close D23 final validation findings
 - 753c431: fix(wave4): keep root deno check on source scope
-- bcabe39: test(cli): lock database init aspire resources polling
+- f2926f9: test(cli): lock database init aspire resources polling
