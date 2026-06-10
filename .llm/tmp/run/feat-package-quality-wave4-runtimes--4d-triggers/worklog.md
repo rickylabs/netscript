@@ -469,4 +469,25 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `packages/plugin-triggers-core` |
 | Gate result | PASS, exit 0; all 11 core export entrypoints checked with `--unstable-kv`. |
 | Drift | Info row recorded: D21 pulled forward explicit root type re-exports required by the D23 full-barrel doc-lint guard. |
-| Commits | Implementation `03fce94`; paired docs/evidence pending. |
+| Commits | Implementation `03fce94`; paired docs/evidence `11b121a`. |
+
+### Slice 22/23 — D22 plugin docs tree
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | Added `docs/README.md`, `docs/architecture.md`, `docs/getting-started.md`, and recipes for webhooks, schedules, and file watching. README is 266 lines after formatting. Doctested examples cover manifest inspection and stable public constants without starting services. |
+| Gate(s) | F-7 docs tree |
+| Gate command | `(Get-Content plugins/triggers/docs/README.md).Count` from repo root |
+| Gate result | PASS, exit 0; README line count 266 (>=150). |
+| Gate command | `deno fmt --check plugins/triggers/docs/README.md plugins/triggers/docs/architecture.md plugins/triggers/docs/getting-started.md plugins/triggers/docs/recipes/webhooks.md plugins/triggers/docs/recipes/schedules.md plugins/triggers/docs/recipes/file-watching.md` from repo root |
+| Gate result | PASS, exit 0; output `Checked 6 files`. |
+| Gate command | `deno test --doc --allow-all --unstable-kv plugins/triggers/docs/README.md plugins/triggers/docs/getting-started.md plugins/triggers/docs/recipes/webhooks.md plugins/triggers/docs/recipes/schedules.md plugins/triggers/docs/recipes/file-watching.md` from repo root |
+| Gate result | PASS, exit 0; 5 doctests passed / 0 failed. |
+| Gate command | `deno doc --lint mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | None. |
+| Commits | Implementation `7f96e92`; paired docs/evidence pending. |

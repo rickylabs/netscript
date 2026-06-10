@@ -52,3 +52,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 972783d: test(triggers): add D20 aspire and e2e gate coverage
 - ad8a060: docs(wave4): record D20 aspire e2e evidence
 - 03fce94: docs(triggers-core): add D21 package docs tree
+- 11b121a: docs(wave4): record D21 core docs evidence
+- 7f96e92: docs(triggers): add D22 plugin docs tree
