@@ -264,7 +264,7 @@ jobs:
           WORKFLOW_REF: ${{ github.sha }}
         run: |
           mkdir -p /tmp/openhands-runtime
-          for path in .openhands/setup.sh .openhands/agent_runner.py; do
+          for path in .openhands/setup.sh .openhands/agent_runner.py .github/toolchain.env; do
             target="/tmp/openhands-runtime/$(basename "$path")"
             gh api "repos/${GITHUB_REPOSITORY}/contents/${path}?ref=${WORKFLOW_REF}" \
               --jq .content | base64 -d > "$target"
@@ -317,6 +317,11 @@ jobs:
             gh api "repos/${GITHUB_REPOSITORY}/pulls/${REQUEST_ISSUE_NUMBER}/comments" \
               > .llm/tmp/openhands/pr-review-comments.json || true
           fi
+
+      - name: Setup Docker
+        uses: docker/setup-docker-action@v5
+        with:
+          version: latest
 
       - name: Bootstrap NetScript toolchain
         run: bash /tmp/openhands-runtime/setup.sh
