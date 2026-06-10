@@ -337,4 +337,27 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | None; this is D15's planned CLI JSDoc/barrel cleanup after D12 narrowed the composition entrypoint. |
-| Commits | Implementation `de55dab`; paired docs/evidence pending. |
+| Commits | Implementation `de55dab`; paired docs/evidence `775662b`. |
+
+### Slice 16/23 — D16 plugin streams/scaffolding/constants JSDoc residual
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | No additional code changes; D12 covered streams public JSDoc and D13 covered scaffolding public-member JSDoc. D16 is preserved as a residual validation slice for streams/scaffolding/constants. |
+| Gate(s) | F-7 doc-score |
+| Gate command | `deno doc --lint streams/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint streams/server.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint src/scaffolding/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint src/constants.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno fmt --check plugins/triggers/streams/producer.ts plugins/triggers/streams/schema.ts plugins/triggers/streams/server.ts plugins/triggers/streams/mod.ts plugins/triggers/src/scaffolding/trigger-scaffolders.ts plugins/triggers/src/scaffolding/mod.ts plugins/triggers/src/constants.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 7 files`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Covered by D12/D13 drift rows: same-file streams/scaffolding JSDoc blockers were pulled forward to keep earlier raw gates green. |
+| Commits | Implementation `da10d52`; paired docs/evidence pending. |
