@@ -7,6 +7,9 @@
     "examples/*",
     "apps/*"
   ],
+  "exclude": [
+    ".llm/tmp/"
+  ],
   "unstable": [
     "kv",
     "temporal",
