@@ -9,9 +9,13 @@ export {
 export { createTriggerInstrumentation, TriggerInstrumentation } from './instrumentation.ts';
 export type {
   TriggerAttributeName,
+  TriggerAttributesMap,
   TriggerMetricName,
+  TriggerMetricNamesMap,
   TriggerSpanName,
+  TriggerSpanNamesMap,
   TriggerTelemetryOutcome,
+  TriggerTelemetryOutcomesMap,
 } from './attributes.ts';
 export type {
   TriggerActionDispatchInput,
@@ -30,3 +34,10 @@ export type {
   TriggerTelemetryStatus,
   TriggerTelemetryTracer,
 } from './instrumentation.ts';
+export { TRIGGER_DURABILITY_TIERS, TRIGGER_EVENT_STATUSES, TRIGGER_KINDS } from '../domain/mod.ts';
+export type {
+  TriggerDurabilityTier,
+  TriggerEventStatus,
+  TriggerKind,
+  TriggerKnownKind,
+} from '../domain/mod.ts';

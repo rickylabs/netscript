@@ -12,6 +12,7 @@ export {
   ShellTaskScaffolder,
 } from './task-scaffolders.ts';
 export { WorkflowScaffolder } from './workflow-scaffolder.ts';
+export { WorkersItemScaffolder } from '@netscript/plugin-workers-core/abstracts';
 export { createWorkersItemScaffolders } from './starter.ts';
 export { WORKERS_TASK_SCAFFOLD_RUNTIMES } from './input.ts';
 export type { WorkersScaffoldInput, WorkersTaskScaffoldRuntime } from './input.ts';

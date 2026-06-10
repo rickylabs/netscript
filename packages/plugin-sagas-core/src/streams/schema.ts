@@ -1,8 +1,25 @@
-import { defineStreamSchema, type StateSchema } from '@netscript/plugin-streams-core';
+import {
+  type CollectionDefinition,
+  type CollectionEventHelpers,
+  defineStreamSchema,
+  type StateSchema,
+  type StreamStateDefinition,
+} from '@netscript/plugin-streams-core';
 import { z } from 'zod';
 import { SAGA_INSTANCE_STATUSES } from '../domain/mod.ts';
 
-type ZodRecordObject = z.ZodObject<Record<string, z.ZodType<unknown>>>;
+/** Result returned by a stream entity schema parse attempt. */
+export type StreamSchemaResult<TOutput> =
+  | { readonly success: true; readonly data: TOutput }
+  | { readonly success: false; readonly error: unknown };
+
+/** Package-owned structural schema surface for durable stream entities. */
+export interface StreamSchema<TOutput = unknown, TInput = unknown> {
+  /** Parse an input value or throw a validation error. */
+  parse(input: TInput): TOutput;
+  /** Parse an input value and return a result object instead of throwing. */
+  safeParse(input: TInput): StreamSchemaResult<TOutput>;
+}
 
 /** Saga instance entity stored in the durable stream. */
 export type SagaInstance = Readonly<{
@@ -24,8 +41,7 @@ export type SagaInstance = Readonly<{
   tracestate?: string;
 }>;
 
-/** Standard Schema-compatible Zod schema for saga instances. */
-export const SagaInstanceSchema: ZodRecordObject = z.object({
+const SagaInstanceZodSchema: z.ZodObject<Record<string, z.ZodType<unknown>>> = z.object({
   instanceId: z.string().min(1),
   sagaId: z.string().min(1),
   correlationKey: z.string().min(1),
@@ -44,7 +60,12 @@ export const SagaInstanceSchema: ZodRecordObject = z.object({
   tracestate: z.string().optional(),
 });
 
-type SagasStreamDefinition = Readonly<{
+/** Standard Schema-compatible schema for saga instances. */
+export const SagaInstanceSchema: StreamSchema<SagaInstance> =
+  SagaInstanceZodSchema as unknown as StreamSchema<SagaInstance>;
+
+/** Durable stream schema definition for saga instance entities. */
+export type SagasStreamDefinition = Readonly<{
   sagaInstance: {
     readonly schema: typeof SagaInstanceSchema;
     readonly type: 'saga-instance';
@@ -55,8 +76,10 @@ type SagasStreamDefinition = Readonly<{
 /** Entity-based durable stream schema for saga instances. */
 export const sagasStreamSchema: StateSchema<SagasStreamDefinition> = defineStreamSchema({
   sagaInstance: {
-    schema: SagaInstanceSchema,
+    schema: SagaInstanceZodSchema,
     type: 'saga-instance',
     primaryKey: 'instanceId',
   },
-});
+}) as unknown as StateSchema<SagasStreamDefinition>;
+
+export type { CollectionDefinition, CollectionEventHelpers, StateSchema, StreamStateDefinition };

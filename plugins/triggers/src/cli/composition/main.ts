@@ -1,6 +1,8 @@
 import { TriggersCli } from '../triggers-cli.ts';
 import { LocalTriggersCliBackend } from '../triggers-cli-backend.ts';
 
+export { PluginCli } from '@netscript/plugin/cli';
+export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
 export { TriggersCli } from '../triggers-cli.ts';
 export {
   AddFileWatchCommand,
@@ -11,8 +13,18 @@ export {
   FireTriggerCommand,
   ListTriggersCommand,
   PreviewScheduleCommand,
+  StaticTriggersCliBackend,
   TestTriggerCommand,
+  TriggersCliCommand,
 } from '../commands.ts';
+export { TRIGGERS_CLI_COMMANDS } from '../command-types.ts';
+export type {
+  TriggersCliBackend,
+  TriggersCliCategory,
+  TriggersCliCommandDefinition,
+  TriggersCliCommandName,
+  TriggersCliFlagDefinition,
+} from '../command-types.ts';
 
 /** Default CLI instance used by the host CLI walker. */
 export const triggersCli: TriggersCli = new TriggersCli(new LocalTriggersCliBackend());

@@ -1,4 +1,4 @@
-import { assertEquals, assertRejects } from 'jsr:@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 
 import { defineSaga, send } from '../../mod.ts';
 import { SagasError, type SagaState } from '../../src/domain/mod.ts';

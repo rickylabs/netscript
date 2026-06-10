@@ -5,10 +5,12 @@ import type { ManifestResolverPort } from './ports/manifest-resolver-port.ts';
 
 /** In-memory manifest resolver used by tests and alpha SDK stubs. */
 export class MemoryManifestResolver implements ManifestResolverPort {
+  /** Create a resolver that always returns the provided manifest. */
   constructor(private readonly manifest: PluginManifest | undefined = undefined) {}
 
-  async resolve(_spec: string): Promise<PluginManifest | undefined> {
-    return this.manifest;
+  /** Resolve a manifest from the in-memory value. */
+  resolve(_spec: string): Promise<PluginManifest | undefined> {
+    return Promise.resolve(this.manifest);
   }
 }
 
@@ -20,6 +22,7 @@ export interface ModuleManifestResolverOptions {
 
 /** Manifest resolver backed by dynamic imports. */
 export class ModuleManifestResolver implements ManifestResolverPort {
+  /** Create a module resolver with project-root options. */
   constructor(private readonly options: ModuleManifestResolverOptions) {}
 
   /** Resolve a plugin manifest module by package or file specifier. */

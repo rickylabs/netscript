@@ -10,11 +10,17 @@ export {
 } from '../public/mod.ts';
 export type {
   TriggersApiServiceName,
+  TriggersDefineSaga,
   TriggersPluginContributions,
   TriggersPluginCoreDependencies,
   TriggersPluginDependencies,
+  TriggersPluginDependencyManifest,
   TriggersPluginId,
   TriggersPluginInspection,
   TriggersPluginManifest,
+  TriggersPluginMetadata,
+  TriggersPluginServiceContribution,
   TriggersPluginVersion,
+  TriggersStreamProducerPort,
+  TriggersWorkerJobDefinition,
 } from '../public/mod.ts';

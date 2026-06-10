@@ -1,42 +1,53 @@
 import { defineJob } from '../builders/mod.ts';
+import { createSuccessResult, DEFAULT_TOPIC, type TriggerType } from '../domain/mod.ts';
+import type { ExecutionRecord } from '../registry/mod.ts';
 import {
-  createSuccessResult,
-  DEFAULT_TOPIC,
-  type ExecutionRecord,
+  createWorkersRuntime,
   type JobDefinition,
   type JobHandler,
   type JobResult,
-  type TriggerType,
-} from '../domain/mod.ts';
-import {
-  createWorkersRuntime,
   type WorkersRuntime,
   type WorkersRuntimeOptions,
 } from '../runtime/mod.ts';
 import { MemoryJobStorage } from './memory-job-storage.ts';
 import { MemoryWorker } from './memory-worker.ts';
 
+/** Options for creating a test job definition. */
 export type JobFixtureOptions<TId extends string> = Readonly<{
+  /** Optional job identifier. */
   id?: TId;
+  /** Optional stream topic. */
   topic?: string;
+  /** Optional handler for the job. */
   handler?: JobHandler;
+  /** Optional job tags. */
   tags?: readonly string[];
+  /** Optional job metadata. */
   metadata?: Record<string, unknown>;
 }>;
 
+/** Partial execution record fields used to override fixture defaults. */
 export type ExecutionRecordFixtureOptions = Partial<ExecutionRecord>;
 
+/** Options for creating a memory-backed workers runtime fixture. */
 export type TestWorkersRuntimeOptions = Omit<WorkersRuntimeOptions, 'jobRegistry' | 'worker'> & {
+  /** Memory job storage used by the runtime fixture. */
   jobStorage?: MemoryJobStorage;
+  /** Memory worker used by the runtime fixture. */
   worker?: MemoryWorker;
+  /** Static handlers keyed by job id for the default memory worker. */
   handlers?: ReadonlyMap<string, JobHandler>;
 };
 
+/** Workers runtime fixture with direct access to memory ports. */
 export type TestWorkersRuntime =
   & WorkersRuntime
   & Readonly<{
+    /** Memory-backed runtime ports created for the fixture. */
     memory: Readonly<{
+      /** Memory job storage used by the runtime. */
       jobStorage: MemoryJobStorage;
+      /** Memory worker used by the runtime. */
       worker: MemoryWorker;
     }>;
   }>;
@@ -48,11 +59,11 @@ export function createJobFixture<TId extends string = 'test-job'>(
   const id = options.id ?? 'test-job' as TId;
   const handler = options.handler ?? (() => createSuccessResult());
   return defineJob(id)
-    .handler(handler)
+    .handler(handler as never)
     .topic(options.topic ?? DEFAULT_TOPIC)
     .tags(...options.tags ?? [])
     .metadata(options.metadata ?? {})
-    .build();
+    .build() as unknown as JobDefinition<TId>;
 }
 
 /** Create an execution record with realistic defaults. */
@@ -90,8 +101,8 @@ export function createTestWorkersRuntime(
   const runtime = createWorkersRuntime({
     ...options,
     clock: options.clock ?? Object.freeze({ now: () => new Date(0) }),
-    jobRegistry: jobStorage,
-    worker,
+    jobRegistry: jobStorage as unknown as WorkersRuntimeOptions['jobRegistry'],
+    worker: worker as unknown as WorkersRuntimeOptions['worker'],
   });
   return Object.freeze({
     ...runtime,

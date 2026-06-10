@@ -1,0 +1,10 @@
+exit=0
+command=deno check --unstable-kv mod.ts src/public/mod.ts src/plugin/mod.ts src/aspire/mod.ts src/runtime/mod.ts contracts/v1/mod.ts
+scope=core-facing sagas consumer surfaces; full plugin export check is recorded separately and fails in streams/factory.ts pending P-slices
+
+[0m[32mCheck[0m mod.ts
+[0m[32mCheck[0m src/public/mod.ts
+[0m[32mCheck[0m src/plugin/mod.ts
+[0m[32mCheck[0m src/aspire/mod.ts
+[0m[32mCheck[0m src/runtime/mod.ts
+[0m[32mCheck[0m contracts/v1/mod.ts

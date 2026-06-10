@@ -124,7 +124,34 @@ for doctor commands.
 Tests use Deno test APIs and cover CLI contracts, SDK ports, registry behavior, scaffolding, and
 README examples.
 
-## 12. Architecture And Stability
+## 12. Observability
+
+The package does not emit telemetry by itself. Plugin manifests may describe telemetry contribution
+modules with `.withTelemetry(...)`, and host packages decide how those modules are loaded,
+registered, and connected to a telemetry backend.
+
+Diagnostics are explicit data contracts. `inspectPlugin` and `inspectWalkerOutput` return
+JSON-stable objects so CLI doctor commands and tests can render or assert them without scraping log
+text.
+
+## 13. Compatibility
+
+The package is ESM-only and targets Deno/JSR publication. Source imports use `jsr:`, `npm:`, and
+relative specifiers; CommonJS `require()` and `module.exports` are not supported.
+
+The `./sdk` subpath includes a dynamic module resolver for runtime plugin manifests. Static publish
+checks may warn about that dynamic import, but it is intentionally runtime-resolved by host tooling.
+
+## 14. Required Permissions
+
+The root builder and diagnostic entrypoint require no permissions. CLI and SDK consumers grant
+permissions to the host process that walks files, writes generated registries, or dynamically
+imports local plugin modules.
+
+Tests in this package run with `deno test --allow-all` because the SDK and scaffolding ports include
+filesystem-shaped adapters and dynamic module loading contracts.
+
+## 15. Architecture And Stability
 
 `@netscript/plugin` follows the Arch-4 DSL/builder archetype. Public exports are curated; role-named
 implementation folders keep config, domain, CLI, SDK, adapters, testing, and diagnostics separate.

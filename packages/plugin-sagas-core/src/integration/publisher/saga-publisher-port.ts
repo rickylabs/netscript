@@ -47,11 +47,14 @@ export type SagaPublisherResult<TMessageType extends string = string> =
 
 /** Explicit publisher boundary implemented by plugin-layer HTTP clients. */
 export interface SagaPublisherPort<TMessage extends SagaMessage = SagaMessage> {
+  /** Stable publisher identifier used in diagnostics. */
   readonly id: string;
+  /** Publish one saga message and return an accepted or rejected receipt. */
   publish<TNextMessage extends TMessage>(
     message: TNextMessage,
     options?: SagaPublisherPublishOptions,
   ): Promise<SagaPublisherResult<TNextMessage['type']>>;
+  /** Publish multiple saga messages using the requested batch mode. */
   publishMany<TNextMessage extends TMessage>(
     messages: readonly TNextMessage[],
     options?: SagaPublisherPublishManyOptions,

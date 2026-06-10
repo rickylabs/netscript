@@ -36,7 +36,7 @@ Deno.test('copyOfficialPlugin copies plugin and background source workspaces', a
       name: '@netscript/plugin-workers',
       imports: {
         '@netscript/plugin': '../../packages/plugin/mod.ts',
-        '@netscript/plugin-workers-core/contracts':
+        '@netscript/plugin-workers-core/contracts/v1':
           '../../packages/plugin-workers-core/src/contracts/v1/mod.ts',
         '@netscript/contracts': '../../packages/contracts/mod.ts',
       },
@@ -145,8 +145,8 @@ Deno.test('copyOfficialPlugin copies plugin and background source workspaces', a
   ) as { imports: Record<string, string> };
   assertEquals(pluginDenoJson.imports['@netscript/plugin'], 'jsr:@netscript/plugin@^1.0.0');
   assertEquals(
-    pluginDenoJson.imports['@netscript/plugin-workers-core/contracts'],
-    'jsr:@netscript/plugin-workers-core@^1.0.0/contracts',
+    pluginDenoJson.imports['@netscript/plugin-workers-core/contracts/v1'],
+    'jsr:@netscript/plugin-workers-core@^1.0.0/contracts/v1',
   );
   assertEquals(pluginDenoJson.imports['@netscript/contracts'], 'jsr:@netscript/contracts@^1.0.0');
 

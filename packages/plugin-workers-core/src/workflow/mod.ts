@@ -22,6 +22,8 @@ export type {
   WorkflowTaskStepRunner,
 } from './workflow-step-runner.ts';
 export type {
+  JobId,
+  TaskId,
   WorkflowDefinition,
   WorkflowEvent,
   WorkflowExecutionOptions,
@@ -33,4 +35,4 @@ export type {
   WorkflowStepKind,
   WorkflowStepResult,
   WorkflowStepStatus,
-} from '../domain/mod.ts';
+} from './workflow-types.ts';

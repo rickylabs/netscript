@@ -1,4 +1,4 @@
-import { assertRejects } from '@std/assert';
+import { assertEquals, assertRejects } from '@std/assert';
 import { DurableStreamProducer } from '../../src/application/create-durable-stream.ts';
 import { createStreamTopicFixture } from '../../src/testing/mod.ts';
 
@@ -24,6 +24,35 @@ Deno.test('DurableStreamProducer skips unserializable upsert payloads without th
     producer.upsert('execution', { id: 'bigint', count: 1n });
 
     await assertRejects(() => producer.flush(), Error);
+  } finally {
+    if (previousUrl === undefined) {
+      Deno.env.delete('DURABLE_STREAMS_URL');
+    } else {
+      Deno.env.set('DURABLE_STREAMS_URL', previousUrl);
+    }
+  }
+});
+
+Deno.test('DurableStreamProducer close completes after an aborted connection', async () => {
+  const previousUrl = Deno.env.get('DURABLE_STREAMS_URL');
+  Deno.env.set('DURABLE_STREAMS_URL', 'http://127.0.0.1:1');
+
+  const abort = new AbortController();
+  abort.abort();
+
+  try {
+    const producer = new DurableStreamProducer({
+      streamPath: '/aborted-close',
+      schema: createStreamTopicFixture(),
+      producerId: 'aborted-close-producer',
+      signal: abort.signal,
+    });
+
+    await producer.close();
+    assertEquals(producer.closed, true);
+
+    producer.upsert('execution', { id: 'ignored-after-close' });
+    await producer.close();
   } finally {
     if (previousUrl === undefined) {
       Deno.env.delete('DURABLE_STREAMS_URL');

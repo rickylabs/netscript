@@ -4,6 +4,62 @@
  * Native saga runtime primitives.
  */
 
+export {
+  CASCADED_MESSAGE_KINDS,
+  SAGA_DURABILITY_TIERS,
+  SAGA_INSTANCE_STATUSES,
+} from '../domain/mod.ts';
+export type {
+  CascadedMessage,
+  CascadedMessageKind,
+  CascadedMessageOptions,
+  CascadedMessageTarget,
+  QueryDefinition,
+  RetryPolicy,
+  SagaConcurrencyPolicy,
+  SagaContext,
+  SagaCorrelation,
+  SagaCorrelationKey,
+  SagaCorrelationRule,
+  SagaDefinition,
+  SagaDurabilityTier,
+  SagaHandler,
+  SagaId,
+  SagaInstanceId,
+  SagaInstanceStatus,
+  SagaMessage,
+  SagaMessageId,
+  SagaQueryHandler,
+  SagaSignal,
+  SagaSignalHandler,
+  SagaState,
+  SagaStateEnvelope,
+  SagaStateMetadata,
+  SagaTransition,
+  SagaTransitionRecord,
+  SignalDefinition,
+} from '../domain/mod.ts';
+export type {
+  SagaBusPort,
+  SagaClockPort,
+  SagaCorrelationIndexEntry,
+  SagaIdempotencyPort,
+  SagaPublishOptions,
+  SagaQueryDispatch,
+  SagaSignalDispatch,
+  SagaSleepOptions,
+  SagaStorePort,
+  SagaStoreWriteOptions,
+} from '../ports/mod.ts';
+export type {
+  SagaBridgeCompensationResolver,
+  SagaBusLegacyBus,
+  SagaBusLegacyDefinitionMapper,
+  SagaBusLegacyFactory,
+  SagaBusLegacyLogger,
+  SagaBusLegacyMachine,
+  SagaBusLegacyOptions,
+} from '../adapters/mod.ts';
 export { createSagaEngine, SagaEngine } from './saga-engine.ts';
 export { createSagaScheduler, SagaScheduler } from './saga-scheduler.ts';
 export { createSagaCompensator, SagaCompensator } from './saga-compensator.ts';

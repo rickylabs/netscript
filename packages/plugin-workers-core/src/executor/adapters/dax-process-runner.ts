@@ -1,6 +1,10 @@
 import $, { type CommandChild } from '@david/dax';
-import type { ResolvedTaskExecutionOptions, TaskLogEntry } from '../../abstracts/mod.ts';
-import type { TaskDefinition, TaskResult } from '../../domain/mod.ts';
+import type {
+  ResolvedTaskExecutionOptions,
+  TaskDefinition,
+  TaskLogEntry,
+  TaskResult,
+} from '../executor-types.ts';
 import { classifyTaskLog } from './log-classifier.ts';
 
 /** Process runner input shared by built-in runtime adapters. */
@@ -13,11 +17,13 @@ export type ProcessRunInput = Readonly<{
 
 /** Subprocess primitive used by runtime adapters. */
 export interface ProcessRunner {
+  /** Run a subprocess and return the normalized task result. */
   run(input: ProcessRunInput): Promise<TaskResult>;
 }
 
 /** Run task subprocesses through Dax with streaming output capture. */
 export class DaxProcessRunner implements ProcessRunner {
+  /** Run a subprocess and return the normalized task result. */
   run(input: ProcessRunInput): Promise<TaskResult> {
     return runProcess(input);
   }

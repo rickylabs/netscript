@@ -71,6 +71,7 @@ export class TriggerProcessor implements TriggerProcessorPort {
   readonly #circuits = new Map<string, CircuitBreakerState>();
   #stopping = false;
 
+  /** Create a trigger processor from runtime ports and optional hooks. */
   constructor(options: TriggerProcessorOptions) {
     this.#idempotency = options.idempotency;
     this.#dlq = options.dlq;

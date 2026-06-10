@@ -54,9 +54,11 @@ export type SagaTaskTriggerReceipt<TTaskId extends string, TResult = unknown> = 
 
 /** Explicit worker boundary consumed by saga integrations. */
 export interface SagaWorkersClientPort {
+  /** Trigger a worker job from a saga transition. */
   triggerJob<TJobId extends string, TPayload, TResult = unknown>(
     request: SagaJobTriggerRequest<TJobId, TPayload>,
   ): Promise<SagaJobTriggerReceipt<TJobId, TResult>>;
+  /** Trigger a worker task from a saga transition. */
   triggerTask<TTaskId extends string, TPayload, TResult = unknown>(
     request: SagaTaskTriggerRequest<TTaskId, TPayload>,
   ): Promise<SagaTaskTriggerReceipt<TTaskId, TResult>>;

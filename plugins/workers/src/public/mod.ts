@@ -143,7 +143,7 @@ function toTopicContribution(
   };
 }
 
-const workersManifest = definePlugin('@netscript/plugin-workers', '0.1.0')
+const workersManifest = definePlugin('@netscript/plugin-workers', '0.0.1-alpha.0')
   .withDisplayName('Background Workers')
   .withType('background-processor')
   .withDescription('Background job scheduling and execution for NetScript applications.')
@@ -194,6 +194,10 @@ const workersManifest = definePlugin('@netscript/plugin-workers', '0.1.0')
   .withDbSchemas([{ path: './database/workers.prisma', engine: 'postgres' }])
   .withContractVersions([{ version: 'v1', loader: './contracts/v1/mod.ts' }])
   .withRuntimeConfigTopics([{ name: 'workers', schemaPath: './runtime/workers.schema.json' }])
+  .withE2e([{
+    name: 'workers-health',
+    command: 'deno task workers:e2e',
+  }])
   .withAspire('./src/aspire/mod.ts')
   .withHooks({
     setup: (ctx): void => {

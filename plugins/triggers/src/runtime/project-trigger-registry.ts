@@ -1,6 +1,8 @@
 import type { ProcessableTriggerDefinition } from '@netscript/plugin-triggers-core/ports';
 import { dirname, fromFileUrl, join, resolve, toFileUrl } from '@std/path';
 
+export type { ProcessableTriggerDefinition } from '@netscript/plugin-triggers-core/ports';
+
 /** Load trigger definitions from the generated project registry. */
 export async function loadProjectTriggerDefinitions(
   registryModule: string = Deno.env.get('NETSCRIPT_TRIGGER_REGISTRY_MODULE') ??

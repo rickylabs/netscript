@@ -10,4 +10,8 @@ export type {
   CreateExecutionOptions,
   ExecutionConcept,
   ExecutionMutationHook,
+  ExecutionRecord,
+  ExecutionStatus,
+  ExecutionTriggerType,
+  ListExecutionOptions,
 } from './execution-state.ts';

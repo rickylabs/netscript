@@ -1,0 +1,2 @@
+exit=0
+command=deno check --unstable-kv <12 plugin entrypoints>

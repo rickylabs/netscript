@@ -57,7 +57,7 @@ Deno.test('MemoryTriggerIdempotencyStore applies caller, header, and payload-has
 Deno.test('inline processor invokes handler and reports deferred status', async () => {
   const processor = new InlineTriggerProcessor({ now: fixedNow });
   const definition = defineWebhook(
-    async () => [{ kind: 'defer', until: fixedNow().toISOString() }],
+    () => Promise.resolve([{ kind: 'defer', until: fixedNow().toISOString() }]),
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
 
@@ -74,11 +74,11 @@ Deno.test('memory scheduler and file watcher emit unified trigger events', async
   const scheduler = new MemoryTriggerSchedulerAdapter({ now: fixedNow });
   const watcher = new MemoryFileWatcherAdapter({ now: fixedNow });
   const scheduled = defineScheduledTrigger(
-    async () => [],
+    () => Promise.resolve([]),
     { id: 'nightly', cron: '0 0 * * *' },
   );
   const fileWatch = defineFileWatch(
-    async () => [],
+    () => Promise.resolve([]),
     { id: 'inbox', paths: ['./inbox'], patterns: ['**/*.json'], on: ['create'] },
   );
 

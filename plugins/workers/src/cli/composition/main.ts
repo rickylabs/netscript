@@ -2,6 +2,10 @@ import { WorkersCli } from '../workers-cli.ts';
 import { LocalWorkersCliBackend } from '../workers-cli-backend.ts';
 
 export { WorkersCli } from '../workers-cli.ts';
+export { PluginCli } from '@netscript/plugin/cli';
+export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
+export { CliCommand, WorkersCommand } from '@netscript/plugin-workers-core/abstracts';
+export type { WorkersCommandDefinition } from '@netscript/plugin-workers-core/abstracts';
 export {
   AddJobCommand,
   AddTaskCommand,
@@ -14,7 +18,16 @@ export {
   ListTasksCommand,
   LogsCommand,
   RunJobCommand,
+  WorkersCliCommand,
 } from '../commands.ts';
+export { WORKERS_CLI_COMMANDS } from '../command-types.ts';
+export type {
+  WorkersCliBackend,
+  WorkersCliCategory,
+  WorkersCliCommandDefinition,
+  WorkersCliCommandName,
+  WorkersCliFlagDefinition,
+} from '../command-types.ts';
 
 /** Default CLI instance used by the host CLI walker. */
 export const workersCli: WorkersCli = new WorkersCli(new LocalWorkersCliBackend());

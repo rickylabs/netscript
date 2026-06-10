@@ -22,7 +22,7 @@ import type { LoggerPort } from './logger.ts';
 
 Deno.test('createTriggerIngress returns 202 before processor work completes', async () => {
   const definition = defineWebhook(
-    async () => [],
+    () => Promise.resolve([]),
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
   const eventStore = new MemoryTriggerEventStore();
@@ -66,7 +66,7 @@ Deno.test('createTriggerIngress returns 202 before processor work completes', as
 
 Deno.test('createTriggerIngress stores malformed JSON as raw text', async () => {
   const definition = defineWebhook(
-    async () => [],
+    () => Promise.resolve([]),
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
   const eventStore = new MemoryTriggerEventStore();
@@ -95,7 +95,7 @@ Deno.test('createTriggerIngress stores malformed JSON as raw text', async () => 
 
 Deno.test('createTriggerIngress logs status update failures from async processing', async () => {
   const definition = defineWebhook(
-    async () => [],
+    () => Promise.resolve([]),
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
   const eventStore = new RejectingUpdateStore();

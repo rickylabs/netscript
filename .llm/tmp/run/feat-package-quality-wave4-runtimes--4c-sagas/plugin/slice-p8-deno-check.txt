@@ -1,0 +1,7 @@
+exit=0
+command=deno check --unstable-kv P8 service router split targets
+Check services/src/routers/v1.ts
+Check services/src/routers/v1-types.ts
+Check services/src/routers/v1-helpers.ts
+Check services/src/routers/v1-handlers.ts
+Check services/src/main.ts

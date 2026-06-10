@@ -19,6 +19,7 @@ It contributes:
 - database schema metadata
 - versioned API contracts
 - runtime config topic metadata
+- E2E gate metadata
 - CLI commands mounted by the host CLI walker
 - scaffolding assets for jobs, tasks, and workflows
 - Aspire resource contribution metadata
@@ -95,6 +96,7 @@ The plugin declares these contribution groups:
 - `databaseSchemas`
 - `runtimeConfigTopics`
 - `contractVersions`
+- `e2e`
 - `aspire`
 
 Each group is data on the manifest. Runtime work begins only when the host invokes a service,
@@ -199,6 +201,7 @@ plugins/workers/
   services/            Workers API service process
   src/aspire/          Aspire contribution
   src/cli/             CLI commands, backend, registry compiler
+  src/e2e/             E2E gate metadata and probes
   src/public/          manifest composition
   src/scaffolding/     source scaffolders and templates
   streams/             stream mirror integration
@@ -226,18 +229,15 @@ Focused tests exist for:
 
 - plugin manifest shape
 - CLI command surface
-- local CLI backend behavior
-- scaffolding source output
-- template assets
-- E2E add-job registry generation
 - Aspire contribution data
+- E2E gate metadata
 
 Run the plugin checks from the repository root:
 
 ```powershell
-deno check --unstable-kv plugins/workers/mod.ts
-deno check --unstable-kv plugins/workers/src/cli/composition/main.ts
-deno test --allow-all --unstable-kv plugins/workers/tests/
+deno check --unstable-kv plugins/workers/mod.ts plugins/workers/src/aspire/mod.ts plugins/workers/src/cli/composition/main.ts plugins/workers/contracts/v1/mod.ts plugins/workers/src/scaffolding/mod.ts plugins/workers/services/src/main.ts plugins/workers/streams/mod.ts plugins/workers/streams/server.ts plugins/workers/worker/mod.ts
+deno test --allow-all plugins/workers/tests/
+deno run --allow-read plugins/workers/verify-plugin.ts
 ```
 
 ## 17. Migration Status

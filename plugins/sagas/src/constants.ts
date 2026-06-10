@@ -10,6 +10,9 @@ export const SAGAS_API_SERVICE_NAME = 'sagas-api' as const;
 /** Default HTTP port for the sagas API process. */
 export const SAGAS_API_DEFAULT_PORT = 8092 as const;
 
+/** Literal type for the sagas plugin identifier. */
 export type SagasPluginId = typeof SAGAS_PLUGIN_ID;
+/** Literal type for the sagas plugin manifest version. */
 export type SagasPluginVersion = typeof SAGAS_PLUGIN_VERSION;
+/** Literal type for the sagas API Aspire service name. */
 export type SagasApiServiceName = typeof SAGAS_API_SERVICE_NAME;

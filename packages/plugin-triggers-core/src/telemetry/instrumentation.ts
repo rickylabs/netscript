@@ -6,23 +6,33 @@ import {
   TriggerTelemetryOutcomes,
 } from './attributes.ts';
 
+/** Attribute value accepted by trigger telemetry spans and metrics. */
 export type TriggerTelemetryAttributeValue = string | number | boolean | undefined;
+/** Attribute map accepted by trigger telemetry spans and metrics. */
 export type TriggerTelemetryAttributes = Readonly<Record<string, TriggerTelemetryAttributeValue>>;
 
+/** Span kind values used by trigger telemetry. */
 export type TriggerTelemetrySpanKind = 'server' | 'internal' | 'producer';
+/** Span status values used by trigger telemetry. */
 export type TriggerTelemetryStatus = 'ok' | 'error';
 
 /** Structural span boundary compatible with OpenTelemetry adapters. */
 export interface TriggerTelemetrySpan {
+  /** Set a scalar attribute on the span. */
   setAttribute(key: string, value: Exclude<TriggerTelemetryAttributeValue, undefined>): void;
+  /** Add a named event to the span. */
   addEvent(name: string, attributes?: TriggerTelemetryAttributes): void;
+  /** Set the final span status. */
   setStatus(status: TriggerTelemetryStatus, description?: string): void;
+  /** Record an exception on the span. */
   recordException(error: unknown): void;
+  /** End the span at the optional end time. */
   end(endTime?: Date): void;
 }
 
 /** Structural tracer boundary supplied by composition roots. */
 export interface TriggerTelemetryTracer {
+  /** Start a telemetry span. */
   startSpan(
     name: string,
     options: Readonly<{
@@ -32,11 +42,15 @@ export interface TriggerTelemetryTracer {
   ): TriggerTelemetrySpan;
 }
 
+/** Structural counter instrument boundary. */
 export interface TriggerTelemetryCounter {
+  /** Add a value to the counter. */
   add(value: number, attributes?: TriggerTelemetryAttributes): void;
 }
 
+/** Structural histogram instrument boundary. */
 export interface TriggerTelemetryHistogram {
+  /** Record a value in the histogram. */
   record(value: number, attributes?: TriggerTelemetryAttributes): void;
 }
 
@@ -48,11 +62,13 @@ export type TriggerTelemetryMeter = Readonly<{
   idempotencyHitsTotal?: TriggerTelemetryCounter;
 }>;
 
+/** Options for trigger instrumentation composition. */
 export type TriggerInstrumentationOptions = Readonly<{
   tracer?: TriggerTelemetryTracer;
   meter?: TriggerTelemetryMeter;
 }>;
 
+/** Common trigger span input attributes. */
 export type TriggerSpanInput = Readonly<{
   triggerId: string;
   eventId?: string;
@@ -62,24 +78,28 @@ export type TriggerSpanInput = Readonly<{
   durabilityTier?: TriggerDurabilityTier;
 }>;
 
+/** Input attributes for action dispatch spans and metrics. */
 export type TriggerActionDispatchInput =
   & TriggerSpanInput
   & Readonly<{
     actionKind: string;
   }>;
 
+/** Input attributes for DLQ spans and metrics. */
 export type TriggerDlqInput =
   & TriggerSpanInput
   & Readonly<{
     reason?: string;
   }>;
 
+/** Input attributes for ingress metrics. */
 export type TriggerIngressMetricInput =
   & TriggerSpanInput
   & Readonly<{
     outcome: TriggerTelemetryOutcome;
   }>;
 
+/** Input attributes for dispatch duration metrics. */
 export type TriggerDispatchMetricInput =
   & TriggerActionDispatchInput
   & Readonly<{
@@ -106,14 +126,18 @@ const NOOP_TRACER: TriggerTelemetryTracer = Object.freeze({
 
 /** Trigger telemetry facade with explicit tracer and meter dependencies. */
 export class TriggerInstrumentation {
+  /** Tracer used to create trigger spans. */
   readonly tracer: TriggerTelemetryTracer;
+  /** Optional meter used to record trigger metrics. */
   readonly meter?: TriggerTelemetryMeter;
 
+  /** Create trigger instrumentation with optional tracer and meter dependencies. */
   constructor(options: TriggerInstrumentationOptions = {}) {
     this.tracer = options.tracer ?? NOOP_TRACER;
     this.meter = options.meter;
   }
 
+  /** Start an ingress span. */
   startIngressSpan(input: TriggerSpanInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.INGRESS, {
       kind: 'server',
@@ -121,6 +145,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Start a trigger detection span. */
   startDetectSpan(input: TriggerSpanInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.DETECT, {
       kind: 'internal',
@@ -128,6 +153,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Start a trigger processing span. */
   startProcessSpan(input: TriggerSpanInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.PROCESS, {
       kind: 'internal',
@@ -135,6 +161,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Start an action dispatch span. */
   startActionDispatchSpan(input: TriggerActionDispatchInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.ACTION_DISPATCH, {
       kind: 'producer',
@@ -145,6 +172,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Start a DLQ enqueue span. */
   startDlqEnqueueSpan(input: TriggerDlqInput): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.DLQ_ENQUEUE, {
       kind: 'producer',
@@ -155,6 +183,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Start an ingress response span. */
   startIngressResponseSpan(input: TriggerSpanInput, statusCode: number): TriggerTelemetrySpan {
     return this.tracer.startSpan(TriggerSpanNames.INGRESS_RESPONSE, {
       kind: 'server',
@@ -165,6 +194,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Finish a span with outcome and optional error details. */
   finishSpan(
     span: TriggerTelemetrySpan,
     outcome: TriggerTelemetryOutcome = TriggerTelemetryOutcomes.SUCCESS,
@@ -181,6 +211,7 @@ export class TriggerInstrumentation {
     span.end();
   }
 
+  /** Record an ingress metric. */
   recordIngress(input: TriggerIngressMetricInput): void {
     this.meter?.ingressTotal?.add(1, {
       ...triggerAttributes(input),
@@ -188,6 +219,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Record an action dispatch duration metric. */
   recordDispatchDuration(input: TriggerDispatchMetricInput): void {
     this.meter?.dispatchDurationMs?.record(input.durationMs, {
       ...triggerAttributes(input),
@@ -196,6 +228,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Record a DLQ enqueue metric. */
   recordDlq(input: TriggerDlqInput): void {
     this.meter?.dlqTotal?.add(1, {
       ...triggerAttributes(input),
@@ -203,6 +236,7 @@ export class TriggerInstrumentation {
     });
   }
 
+  /** Record an idempotency hit metric. */
   recordIdempotencyHit(input: TriggerSpanInput, source: string): void {
     this.meter?.idempotencyHitsTotal?.add(1, {
       ...triggerAttributes(input),

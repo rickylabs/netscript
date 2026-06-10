@@ -3,8 +3,11 @@ import { isWorkersScaffoldInput, type WorkersScaffoldInput } from './input.ts';
 
 /** Scaffold a worker workflow definition module. */
 export class WorkflowScaffolder extends WorkersItemScaffolder<WorkersScaffoldInput> {
+  /** Stable scaffolder identifier for workflow files. */
   readonly id = 'workflow';
+  /** Workers item kind produced by this scaffolder. */
   readonly kind = 'workflow';
+  /** Template path associated with workflow scaffolds. */
   readonly templatePath = './templates/workflow.ts.template';
 
   /** Generate TypeScript source for a workflow definition. */

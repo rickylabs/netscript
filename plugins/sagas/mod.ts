@@ -13,8 +13,16 @@ export {
   sagasPlugin,
 } from './src/public/mod.ts';
 export type {
+  SagasContractVersionContribution,
+  SagasDbSchemaContribution,
+  SagasE2eContribution,
+  SagasMigrationContribution,
   SagasPluginContributions,
   SagasPluginDependencies,
+  SagasPluginDependencyManifest,
   SagasPluginInspection,
   SagasPluginManifest,
+  SagasRuntimeConfigTopicContribution,
+  SagasServiceContribution,
+  SagasTelemetryContribution,
 } from './src/public/mod.ts';

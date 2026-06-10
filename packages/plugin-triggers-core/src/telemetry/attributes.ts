@@ -8,6 +8,7 @@ export type TriggerSpanNamesMap = Readonly<{
   INGRESS_RESPONSE: 'trigger.ingress.response';
 }>;
 
+/** Trigger span names keyed by lifecycle stage. */
 export const TriggerSpanNames: TriggerSpanNamesMap = Object.freeze(
   {
     INGRESS: 'trigger.ingress',
@@ -36,6 +37,7 @@ export type TriggerAttributesMap = Readonly<{
   ERROR_CLASS: 'error_class';
 }>;
 
+/** Trigger attribute keys keyed by semantic name. */
 export const TriggerAttributes: TriggerAttributesMap = Object.freeze(
   {
     TRIGGER_ID: 'trigger.id',
@@ -62,6 +64,7 @@ export type TriggerMetricNamesMap = Readonly<{
   IDEMPOTENCY_HITS_TOTAL: 'netscript_trigger_idempotency_hits_total';
 }>;
 
+/** Trigger metric names keyed by metric purpose. */
 export const TriggerMetricNames: TriggerMetricNamesMap = Object.freeze(
   {
     INGRESS_TOTAL: 'netscript_trigger_ingress_total',
@@ -81,6 +84,7 @@ export type TriggerTelemetryOutcomesMap = Readonly<{
   DEDUPLICATED: 'deduplicated';
 }>;
 
+/** Trigger telemetry outcomes keyed by terminal state. */
 export const TriggerTelemetryOutcomes: TriggerTelemetryOutcomesMap = Object.freeze(
   {
     ACCEPTED: 'accepted',
@@ -92,8 +96,12 @@ export const TriggerTelemetryOutcomes: TriggerTelemetryOutcomesMap = Object.free
   } as const,
 );
 
+/** Union of trigger span name values. */
 export type TriggerSpanName = (typeof TriggerSpanNames)[keyof typeof TriggerSpanNames];
+/** Union of trigger attribute name values. */
 export type TriggerAttributeName = (typeof TriggerAttributes)[keyof typeof TriggerAttributes];
+/** Union of trigger metric name values. */
 export type TriggerMetricName = (typeof TriggerMetricNames)[keyof typeof TriggerMetricNames];
+/** Union of trigger telemetry outcome values. */
 export type TriggerTelemetryOutcome =
   (typeof TriggerTelemetryOutcomes)[keyof typeof TriggerTelemetryOutcomes];

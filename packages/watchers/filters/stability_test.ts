@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
-import { StabilityFilter } from './stability.ts';
-import type { WatchEvent } from '../types.ts';
+import { StabilityFilter } from '../src/filters/stability.ts';
+import type { WatchEvent } from '../src/types.ts';
 
 function makeEvent(path: string): WatchEvent {
   return {

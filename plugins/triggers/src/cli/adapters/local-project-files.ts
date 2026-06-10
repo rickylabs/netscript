@@ -28,6 +28,7 @@ export interface ProjectFiles {
 
 /** Deno-backed project file adapter for local triggers CLI execution. */
 export class LocalProjectFiles implements ProjectFiles {
+  /** Absolute root path for project-relative file operations. */
   readonly projectRoot: string;
 
   /** Create a project file adapter rooted at the current working directory by default. */
@@ -81,6 +82,7 @@ export class LocalProjectFiles implements ProjectFiles {
     return relative(this.projectRoot, path).replaceAll('\\', '/');
   }
 
+  /** Recursively collect matching files below a root directory. */
   private async collectFiles(
     root: string,
     entries: ProjectFileEntry[],

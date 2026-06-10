@@ -5,3 +5,4 @@
  */
 
 export { defineAgent } from './define-agent.ts';
+export type { SagaBuilder } from '../builders/mod.ts';

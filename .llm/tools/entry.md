@@ -48,13 +48,24 @@ across sessions; temporary investigation scripts belong under `.llm/tmp/`.
 
 ## Diagnostics
 
-### `parse-deno-check-errors.ts`
+### `run-deno-check.ts`
 
-- Purpose: parse `deno check` / `deno task check*` output into structured JSON grouped by error kind
-  and affected paths.
+- Purpose: run scoped `deno check` selections and parse `deno check` / `deno task check*` output
+  into structured JSON grouped by error code and affected paths.
 - Example commands:
-  - `deno run --allow-read .llm/tools/parse-deno-check-errors.ts --input .llm/tmp/check.log --pretty`
-  - `deno run --allow-run --allow-read .llm/tools/parse-deno-check-errors.ts --pretty --cwd . -- deno task check`
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/logger --ext ts,tsx --pretty`
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --input .llm/tmp/check.log --pretty`
+  - `deno run --allow-run --allow-read .llm/tools/run-deno-check.ts --pretty --cwd . -- deno task check`
+
+### `run-deno-fmt.ts`
+
+- Purpose: run scoped `deno fmt --check` or mutating `deno fmt` over explicit roots, extensions, and
+  excludes without shell glob expansion.
+- Example commands:
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/logger --ext ts,tsx --pretty`
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --ignore-line-endings`
+- Notes: `--ignore-line-endings` counts known baseline line-ending drift without listing every
+  ignored file. Add `--show-ignored` only when the ignored file list is needed.
 
 ### `find-lines.ts`
 

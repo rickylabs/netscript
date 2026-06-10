@@ -16,8 +16,10 @@ export class MemoryWebhookVerifier implements WebhookVerifierPort {
   readonly #accepted: boolean;
   readonly #idempotencyKey?: string;
   readonly #reason?: string;
+  /** Requests received by this verifier instance. */
   readonly requests: WebhookVerificationRequest[] = [];
 
+  /** Create a verifier with a deterministic verification result. */
   constructor(options: MemoryWebhookVerifierOptions = {}) {
     this.#accepted = options.accepted ?? true;
     this.#idempotencyKey = options.idempotencyKey;
