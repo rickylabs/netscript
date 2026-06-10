@@ -7,11 +7,26 @@
  * @module
  */
 
-import { createStreamDB, type StreamDB } from '@durable-streams/state';
+import { createStreamDB } from '@durable-streams/state';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
 import { type TriggerEvent, triggersStreamSchema } from './schema.ts';
 
 export type { TriggerEvent };
+
+/** Browser StreamDB collections exposed by the triggers stream client. */
+export type TriggersStreamCollections = Readonly<{
+  triggerEvent: unknown;
+}>;
+
+/** Browser StreamDB handle for trigger event entities. */
+export type TriggersStreamDB = Readonly<{
+  collections: TriggersStreamCollections;
+}>;
+
+/** Options for creating a triggers StreamDB client. */
+export type TriggersStreamDBOptions = Readonly<{
+  baseUrl?: string;
+}>;
 
 /**
  * Create a TanStack DB-backed StreamDB for trigger event entities.
@@ -30,8 +45,8 @@ export type { TriggerEvent };
  * ```
  */
 export function createTriggersStreamDB(
-  options: { baseUrl?: string } = {},
-): StreamDB<typeof triggersStreamSchema> {
+  options: TriggersStreamDBOptions = {},
+): TriggersStreamDB {
   const baseUrl = options.baseUrl ?? 'http://localhost:4437';
 
   return createStreamDB({
@@ -40,6 +55,6 @@ export function createTriggersStreamDB(
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: triggersStreamSchema,
-  });
+    state: triggersStreamSchema as never,
+  }) as unknown as TriggersStreamDB;
 }

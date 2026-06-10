@@ -7,7 +7,7 @@ type ValidationPayload = Readonly<{
 
 /** Sample webhook that accepts validation payloads without dispatching worker jobs. */
 export const webhookValidateData = defineWebhook<'webhook-validate-data', ValidationPayload>(
-  async () => [],
+  () => Promise.resolve([]),
   {
     id: 'webhook-validate-data',
     path: 'validate/data',

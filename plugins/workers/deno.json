@@ -20,7 +20,7 @@
     "@netscript/plugin-streams": "../streams/mod.ts",
     "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
     "@netscript/plugin-workers-core": "../../packages/plugin-workers-core/mod.ts",
-    "@netscript/plugin-workers-core/contracts": "../../packages/plugin-workers-core/src/contracts/v1/mod.ts",
+    "@netscript/plugin-workers-core/contracts/v1": "../../packages/plugin-workers-core/src/contracts/v1/mod.ts",
     "@netscript/plugin-workers-core/executor": "../../packages/plugin-workers-core/src/executor/mod.ts",
     "@netscript/plugin-workers-core/presets": "../../packages/plugin-workers-core/src/presets/mod.ts",
     "@netscript/plugin-workers-core/registry": "../../packages/plugin-workers-core/src/registry/mod.ts",
@@ -55,11 +55,13 @@
     "@durable-streams/state": "npm:@durable-streams/state@^0.2.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/cli/mod.ts src/cli/composition/main.ts services/src/main.ts",
+    "check": "deno check --unstable-kv mod.ts src/aspire/mod.ts src/cli/composition/main.ts contracts/v1/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts worker/mod.ts",
     "test": "deno test --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
-    "test:api": "deno run --allow-net --allow-env test-api.ts"
+    "workers:e2e": "deno run --allow-net --allow-env src/e2e/probes/health.ts && deno run --allow-read verify-plugin.ts",
+    "test:api": "deno run --allow-net --allow-env test-api.ts",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "publish": {
     "include": [

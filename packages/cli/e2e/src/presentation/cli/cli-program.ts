@@ -4,6 +4,7 @@ import { defaultRunOptions } from '../../create-default-runner.ts';
 import { SCAFFOLD } from '../../domain/cli-surface.ts';
 import { createGateCommand } from './commands/gate-command.ts';
 import { createGatesCommand } from './commands/gates-command.ts';
+import { createFullCommand } from './commands/full-command.ts';
 import { createRunCommand } from './commands/run-command.ts';
 import { createSuitesCommand } from './commands/suites-command.ts';
 import type { CliRunnerFactory } from './cli-command-contracts.ts';
@@ -21,6 +22,7 @@ export function createCliProgram(createRunner: CliRunnerFactory) {
       const report = await createRunner(options).run(suite, { suiteId: suite.id, options });
       if (!report.ok) throw new RemoteError(1, 'CLI E2E suite failed');
     })
+    .command('full', createFullCommand(createRunner))
     .command('run', createRunCommand(createRunner))
     .command('gate', createGateCommand(createRunner))
     .command('suites', createSuitesCommand())

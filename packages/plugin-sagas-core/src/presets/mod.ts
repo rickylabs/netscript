@@ -1,2 +1,10 @@
+export type { SagaDefinition } from '../domain/mod.ts';
+export type { SagaBusLegacyOptions } from '../adapters/mod.ts';
+export type {
+  CreateSagaRuntimeOptions,
+  SagaRuntime,
+  SagaRuntimeAdapter,
+  SagaRuntimeNativeOptions,
+} from '../runtime/mod.ts';
 export { startSagaHandlers, startSagas } from './start-sagas.ts';
 export type { StartSagasOptions, StartSagasResult } from './start-sagas.ts';

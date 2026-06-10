@@ -41,16 +41,25 @@ export type CreateSagaRuntimeOptions = Readonly<{
 
 /** Runtime façade returned by the composition root. */
 export interface SagaRuntime<TAdapter extends SagaRuntimeAdapter = SagaRuntimeAdapter> {
+  /** Runtime adapter selected by the composition root. */
   readonly adapter: TAdapter;
+  /** Bus implementation backing this runtime facade. */
   readonly bus: SagaBusPort;
+  /** Start runtime resources. */
   start(): Promise<void>;
+  /** Stop runtime resources. */
   stop(reason?: string): Promise<void>;
+  /** Register saga definitions with the runtime bus. */
   register(definitions: readonly SagaDefinition[]): Promise<void>;
+  /** Publish a saga message through the runtime bus. */
   publish(message: SagaMessage, options?: SagaPublishOptions): Promise<void>;
+  /** Dispatch cascaded messages through the runtime bus. */
   dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void>;
+  /** Dispatch a signal through the runtime bus. */
   signal<TPayload, TName extends string>(
     dispatch: SagaSignalDispatch<TPayload, TName>,
   ): Promise<void>;
+  /** Dispatch a query through the runtime bus. */
   query<TResult, TName extends string>(
     dispatch: SagaQueryDispatch<TResult, TName>,
   ): Promise<TResult>;

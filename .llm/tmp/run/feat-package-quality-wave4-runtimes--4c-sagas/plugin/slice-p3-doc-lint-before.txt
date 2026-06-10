@@ -1,0 +1,392 @@
+exit=1
+command=deno doc --lint src/plugin/mod.ts src/aspire/mod.ts services/src/main.ts
+private-type-ref-count=16
+missing-jsdoc-count=0
+
+[0m[33mWarning[0m Failed resolving types. Could not find package 'zlib' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m117[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'zlib.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m116[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'worker_threads.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m115[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'wasi.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m114[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'vm.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m113[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'v8.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m112[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'util' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m111[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'util.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m110[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'url.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m109[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'tty.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m108[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'trace_events.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m107[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'tls.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m106[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'timers' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m105[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'timers.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m104[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'test' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m103[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'test.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m102[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'string_decoder.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m101[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m100[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m99[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m98[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m97[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'stream.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m96[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'sqlite.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m95[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'sea.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m94[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'repl.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m93[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'readline' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m92[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'readline.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m91[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'quic.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m90[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'querystring.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m89[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'punycode.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m88[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'process.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m87[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'perf_hooks.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m86[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'path' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m85[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'path' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m84[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'path.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m83[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'os.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m82[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'net.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m81[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'module.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m80[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'inspector' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m79[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'inspector.generated.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m78[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'inspector.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m77[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'https.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m76[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'http2.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m75[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'http.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m74[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'fs' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m73[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'fs.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m72[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'events.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m71[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'domain.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m70[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'dns' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m69[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'dns.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m68[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'diagnostics_channel.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m67[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'dgram.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m66[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'crypto.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m65[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'constants.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m64[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'console.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m63[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'cluster.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m62[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'child_process.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m61[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'buffer.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m60[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'async_hooks.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m59[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'assert' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m58[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'assert.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m57[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m56[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m55[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m54[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m53[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m52[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m51[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m50[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m49[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m48[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m47[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m46[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m45[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m44[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m43[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m42[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'web-globals' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m41[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'globals.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m40[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'buffer.buffer.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m37[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'globals.typedarray.d.ts' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m36[0m:[0m[33m21[0m
+[0m[33mWarning[0m Failed resolving types. Could not find package 'compatibility' from referrer 'file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at [0m[36mfile:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts[0m:[0m[33m33[0m:[0m[33m21[0m
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginDependencies' references private type 'SagasPluginDependencyManifest'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:33:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m33 | [0mexport type SagasPluginDependencies = Readonly<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m26 | [0mexport type SagasPluginDependencyManifest = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginContributions["services"]' references private type 'SagasServiceContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:77:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m77 | [0m  readonly services?: readonly SagasServiceContribution[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m41 | [0mexport type SagasServiceContribution = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginContributions["databaseSchemas"]' references private type 'SagasDbSchemaContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:79:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m79 | [0m  readonly databaseSchemas?: readonly SagasDbSchemaContribution[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m48 | [0mexport type SagasDbSchemaContribution = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginContributions["runtimeConfigTopics"]' references private type 'SagasRuntimeConfigTopicContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:81:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0m  readonly runtimeConfigTopics?: readonly SagasRuntimeConfigTopicContribution[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0mexport type SagasRuntimeConfigTopicContribution = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginContributions["contractVersions"]' references private type 'SagasContractVersionContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:83:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m83 | [0m  readonly contractVersions?: readonly SagasContractVersionContribution[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m60 | [0mexport type SagasContractVersionContribution = Readonly<{
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginContributions["e2e"]' references private type 'SagasE2eContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:85:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m85 | [0m  readonly e2e?: readonly SagasE2eContribution[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m66 | [0mexport type SagasE2eContribution = Readonly<Record<string, unknown>>;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginContributions["telemetry"]' references private type 'SagasTelemetryContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:87:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m87 | [0m  readonly telemetry?: readonly SagasTelemetryContribution[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m69 | [0mexport type SagasTelemetryContribution = Readonly<Record<string, unknown>>;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasPluginContributions["migrations"]' references private type 'SagasMigrationContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\public\mod.ts[0m[0m[33m:89:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m89 | [0m  readonly migrations?: readonly SagasMigrationContribution[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m72 | [0mexport type SagasMigrationContribution = Readonly<Record<string, unknown>>;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasAspireContribution' references private type 'AspireNSPluginContribution'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\aspire\sagas-contribution.ts[0m[0m[33m:38:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m38 | [0mexport class SagasAspireContribution extends AspireNSPluginContribution {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport abstract class AspireNSPluginContribution {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasAspireContribution.prototype.pluginName' references private type 'SAGAS_PLUGIN_PACKAGE_NAME'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\aspire\sagas-contribution.ts[0m[0m[33m:40:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m40 | [0m  readonly pluginName: typeof SAGAS_PLUGIN_PACKAGE_NAME = SAGAS_PLUGIN_PACKAGE_NAME;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m16 | [0mconst SAGAS_PLUGIN_PACKAGE_NAME = '@netscript/plugin-sagas' as const;
+  [0m[38;5;12m | [0m      [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasAspireContribution.prototype.contribute' references private type 'AspireBuilder'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\aspire\sagas-contribution.ts[0m[0m[33m:43:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0m  contribute(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0mexport interface AspireBuilder {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasAspireContribution.prototype.contribute' references private type 'ContributionContext'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\aspire\sagas-contribution.ts[0m[0m[33m:43:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0m  contribute(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m5 | [0mexport interface ContributionContext {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasAspireContribution.prototype.contribute' references private type 'AspireResource'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\aspire\sagas-contribution.ts[0m[0m[33m:43:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0m  contribute(
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport interface AspireResource {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasAspireContribution.prototype.declareEnv' references private type 'EnvSource'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\aspire\sagas-contribution.ts[0m[0m[33m:69:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m69 | [0m  override declareEnv(_ctx: ContributionContext): Record<string, EnvSource | string> {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m2 | [0mexport type EnvSource =
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'SagasAspireContribution.prototype.declareHealthChecks' references private type 'HealthCheckSpec'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\src\aspire\sagas-contribution.ts[0m[0m[33m:79:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m79 | [0m  override declareHealthChecks(_ctx: ContributionContext): readonly HealthCheckSpec[] {
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m2 | [0mexport interface HealthCheckSpec {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'createSagasService' references private type 'PluginServiceContext'[0m
+  [0m[38;5;12m-->[0m [0m[36mC:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave4-runtimes-4c\plugins\sagas\services\src\main.ts[0m[0m[33m:35:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m35 | [0mexport default async function createSagasService(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m2 | [0mexport interface PluginServiceContext {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[0m: Found [0m[1m16[0m documentation lint errors.

@@ -1,104 +1,133 @@
 import { z } from 'zod';
-import type { TriggerKind } from '../domain/mod.ts';
 
-export type TriggerConfigKind = Extract<
-  TriggerKind,
-  'webhook' | 'file-watch' | 'scheduled' | 'queue' | 'stream' | 'manual'
->;
+/** Minimal schema contract exposed without leaking Zod internals. */
+export type TriggerConfigSchema<TOutput> = Readonly<{
+  parse(data: unknown): TOutput;
+  safeParse(data: unknown):
+    | { readonly success: true; readonly data: TOutput }
+    | { readonly success: false; readonly error: unknown };
+}>;
 
-interface TriggerDefinitionConfigData {
+/** Trigger kinds accepted in `netscript.config.ts`. */
+export const TRIGGER_CONFIG_KINDS: readonly [
+  'webhook',
+  'file-watch',
+  'scheduled',
+  'queue',
+  'stream',
+  'manual',
+] = ['webhook', 'file-watch', 'scheduled', 'queue', 'stream', 'manual'];
+
+/** Trigger kinds accepted in `netscript.config.ts`. */
+export type TriggerConfigKind = (typeof TRIGGER_CONFIG_KINDS)[number];
+
+/** Config entry for a discovered trigger definition. */
+export type TriggerDefinitionConfig = Readonly<{
   readonly id: string;
   readonly name: string;
   readonly kind: TriggerConfigKind;
   readonly enabled: boolean;
   readonly entrypoint?: string;
   readonly tags: string[];
-}
+}>;
 
-interface TriggerScalingConfigData {
+/** Per-group trigger runtime scaling settings. */
+export type TriggerScalingConfig = Readonly<{
   readonly concurrency: number;
-}
+}>;
 
-interface TriggerRetentionConfigData {
+/** Retention windows for trigger event storage. */
+export type TriggerRetentionConfig = Readonly<{
   readonly kvDays: number;
   readonly dbDays: number;
-}
+}>;
 
-interface TriggerGroupConfigData {
+/** Topic-isolated trigger group configuration. */
+export type TriggerGroupConfig = Readonly<{
   readonly topic: string;
-  readonly scaling: TriggerScalingConfigData;
-  readonly retention: TriggerRetentionConfigData;
-  readonly triggers: TriggerDefinitionConfigData[];
-}
+  readonly scaling: TriggerScalingConfig;
+  readonly retention: TriggerRetentionConfig;
+  readonly triggers: TriggerDefinitionConfig[];
+}>;
 
-interface WebhookConfigData {
+/** Webhook ingress configuration. */
+export type WebhookConfig = Readonly<{
   readonly enabled: boolean;
   readonly basePath: string;
   readonly rateLimitPerMinute: number;
-}
+}>;
 
-interface TriggersConfigData {
-  readonly triggersDir: string;
-  readonly groups: TriggerGroupConfigData[];
-  readonly webhooks?: WebhookConfigData;
-  readonly enabled: boolean;
-}
+/** Root trigger plugin configuration when enabled. */
+export type TriggersConfig =
+  | Readonly<{
+    readonly triggersDir: string;
+    readonly groups: TriggerGroupConfig[];
+    readonly webhooks?: WebhookConfig;
+    readonly enabled: boolean;
+  }>
+  | undefined;
 
-/** Trigger definition config schema for `netscript.config.ts`. */
-export const TriggerDefinitionConfigSchema: z.ZodType<TriggerDefinitionConfigData> = z.object({
+const triggerDefinitionConfigSchema: z.ZodType<TriggerDefinitionConfig> = z.object({
   id: z.string().min(1).describe('Trigger identifier'),
   name: z.string().min(1).describe('Trigger name'),
-  kind: z.enum(['webhook', 'file-watch', 'scheduled', 'queue', 'stream', 'manual']).default(
-    'webhook',
-  ),
+  kind: z.enum(TRIGGER_CONFIG_KINDS).default('webhook'),
   enabled: z.boolean().default(true),
   entrypoint: z.string().min(1).optional().describe('Trigger entrypoint file'),
   tags: z.array(z.string().min(1)).default([]),
 });
 
-/** Trigger group scaling configuration schema. */
-export const TriggerScalingConfigSchema: z.ZodType<TriggerScalingConfigData> = z.object({
+/** Trigger definition config schema for `netscript.config.ts`. */
+export const TriggerDefinitionConfigSchema: TriggerConfigSchema<TriggerDefinitionConfig> =
+  triggerDefinitionConfigSchema;
+
+const triggerScalingConfigSchema: z.ZodType<TriggerScalingConfig> = z.object({
   concurrency: z.number().int().positive().default(10),
 });
 
-/** Trigger event retention configuration schema. */
-export const TriggerRetentionConfigSchema: z.ZodType<TriggerRetentionConfigData> = z.object({
+/** Trigger group scaling configuration schema. */
+export const TriggerScalingConfigSchema: TriggerConfigSchema<TriggerScalingConfig> =
+  triggerScalingConfigSchema;
+
+const triggerRetentionConfigSchema: z.ZodType<TriggerRetentionConfig> = z.object({
   kvDays: z.number().int().positive().default(7),
   dbDays: z.number().int().positive().default(90),
 });
 
-/** Topic-isolated trigger group schema. */
-export const TriggerGroupSchema: z.ZodType<TriggerGroupConfigData> = z.object({
+/** Trigger event retention configuration schema. */
+export const TriggerRetentionConfigSchema: TriggerConfigSchema<TriggerRetentionConfig> =
+  triggerRetentionConfigSchema;
+
+const triggerGroupSchema: z.ZodType<TriggerGroupConfig> = z.object({
   topic: z.string().min(1).describe('Topic identifier for trigger grouping'),
-  scaling: TriggerScalingConfigSchema.default({ concurrency: 10 }),
-  retention: TriggerRetentionConfigSchema.default({ kvDays: 7, dbDays: 90 }),
-  triggers: z.array(TriggerDefinitionConfigSchema).default([]),
+  scaling: triggerScalingConfigSchema.default({ concurrency: 10 }),
+  retention: triggerRetentionConfigSchema.default({ kvDays: 7, dbDays: 90 }),
+  triggers: z.array(triggerDefinitionConfigSchema).default([]),
 });
 
-/** Webhook ingestion configuration schema. */
-export const WebhookConfigSchema: z.ZodType<WebhookConfigData> = z.object({
+/** Topic-isolated trigger group schema. */
+export const TriggerGroupSchema: TriggerConfigSchema<TriggerGroupConfig> = triggerGroupSchema;
+
+const webhookConfigSchema: z.ZodType<WebhookConfig> = z.object({
   enabled: z.boolean().default(false),
   basePath: z.string().default('/api/v1/webhooks'),
   rateLimitPerMinute: z.number().int().positive().default(60),
 });
 
-const TriggersConfigObjectSchema: z.ZodType<TriggersConfigData> = z.object({
+/** Webhook ingestion configuration schema. */
+export const WebhookConfigSchema: TriggerConfigSchema<WebhookConfig> = webhookConfigSchema;
+
+const triggersConfigObjectSchema: z.ZodType<NonNullable<TriggersConfig>> = z.object({
   triggersDir: z.string().default('./triggers'),
-  groups: z.array(TriggerGroupSchema).default([]),
-  webhooks: WebhookConfigSchema.optional(),
+  groups: z.array(triggerGroupSchema).default([]),
+  webhooks: webhookConfigSchema.optional(),
   enabled: z.boolean().default(true),
 });
 
 /** Trigger plugin configuration schema. */
-export const TriggersConfigSchema: z.ZodType<TriggersConfigData | undefined> =
-  TriggersConfigObjectSchema.optional();
+export const TriggersConfigSchema: TriggerConfigSchema<TriggersConfig> = triggersConfigObjectSchema
+  .optional();
 
-export type TriggerDefinitionConfig = z.infer<typeof TriggerDefinitionConfigSchema>;
-export type TriggerScalingConfig = z.infer<typeof TriggerScalingConfigSchema>;
-export type TriggerRetentionConfig = z.infer<typeof TriggerRetentionConfigSchema>;
-export type TriggerGroupConfig = z.infer<typeof TriggerGroupSchema>;
-export type WebhookConfig = z.infer<typeof WebhookConfigSchema>;
-export type TriggersConfig = z.infer<typeof TriggersConfigSchema>;
+/** Partial trigger plugin configuration accepted from user config files. */
 export type TriggersConfigInput = Partial<Omit<NonNullable<TriggersConfig>, 'groups'>> & {
   readonly groups?: Array<
     & Partial<Omit<TriggerGroupConfig, 'topic' | 'triggers'>>

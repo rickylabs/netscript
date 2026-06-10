@@ -2,7 +2,7 @@ import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
 import { commandGate } from './gate-factory.ts';
 
-const WEBHOOK_URL = 'http://localhost:8093/api/v1/webhooks/inbound/generic';
+const WEBHOOK_URL = 'http://127.0.0.1:8093/api/v1/webhooks/inbound/generic';
 const DASHBOARD_TRACES_URL = 'https://localhost:18888/api/telemetry/traces';
 
 export function createOtelGates(): readonly GateDefinition[] {

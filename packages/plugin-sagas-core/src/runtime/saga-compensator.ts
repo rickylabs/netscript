@@ -40,14 +40,17 @@ export type SagaCompensatorOptions = Readonly<{
 
 /** Runtime primitive for `sagaFail()` and `sagaCompensate()` cascades. */
 export class SagaCompensator {
+  /** Stable compensator identifier. */
   readonly id: string;
   readonly #clock: SagaClockPort;
 
+  /** Create a saga compensator. */
   constructor(options: SagaCompensatorOptions) {
     this.id = options.id ?? 'saga-compensator';
     this.#clock = options.clock;
   }
 
+  /** Run the registered compensation handler for one failed message. */
   compensate<TState extends SagaState>(
     request: SagaCompensationRequest<TState>,
   ): Promise<SagaCompensationResult<TState>> {
@@ -90,6 +93,7 @@ export class SagaCompensator {
     }));
   }
 
+  /** Run compensation from a cascaded compensate command. */
   compensateCascaded<TState extends SagaState>(
     definition: SagaDefinition<string, TState, SagaMessage>,
     instanceId: SagaInstanceId,
@@ -111,6 +115,7 @@ export class SagaCompensator {
     });
   }
 
+  /** Run compensation using a failure cascade reason. */
   compensateFailure<TState extends SagaState>(
     request: SagaCompensationRequest<TState>,
     failure: CascadedMessage<'fail'>,

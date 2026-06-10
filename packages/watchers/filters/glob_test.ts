@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
-import { GlobFilter } from './glob.ts';
-import type { WatchEvent } from '../types.ts';
+import { GlobFilter } from '../src/filters/glob.ts';
+import type { WatchEvent } from '../src/types.ts';
 
 function makeEvent(path: string, kind: 'create' | 'modify' | 'remove' = 'create'): WatchEvent {
   return {

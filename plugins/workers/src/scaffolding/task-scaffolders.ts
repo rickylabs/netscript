@@ -7,8 +7,11 @@ import {
 
 /** Scaffold a Deno task definition module. */
 export class DenoTaskScaffolder extends WorkersItemScaffolder<WorkersScaffoldInput> {
+  /** Stable scaffolder identifier for Deno task files. */
   readonly id = 'task-deno';
+  /** Workers item kind produced by this scaffolder. */
   readonly kind = 'task';
+  /** Template path associated with Deno task scaffolds. */
   readonly templatePath = './templates/task-deno.ts.template';
 
   /** Generate TypeScript source for a Deno task. */
@@ -24,8 +27,11 @@ export class DenoTaskScaffolder extends WorkersItemScaffolder<WorkersScaffoldInp
 
 /** Scaffold a Python task script. */
 export class PythonTaskScaffolder extends WorkersItemScaffolder<WorkersScaffoldInput> {
+  /** Stable scaffolder identifier for Python task files. */
   readonly id = 'task-python';
+  /** Workers item kind produced by this scaffolder. */
   readonly kind = 'task';
+  /** Template path associated with Python task scaffolds. */
   readonly templatePath = './templates/task-python.py.template';
 
   /** Generate Python source for a worker task. */
@@ -49,8 +55,11 @@ export class PythonTaskScaffolder extends WorkersItemScaffolder<WorkersScaffoldI
 
 /** Scaffold a POSIX shell task script. */
 export class ShellTaskScaffolder extends WorkersItemScaffolder<WorkersScaffoldInput> {
+  /** Stable scaffolder identifier for shell task files. */
   readonly id = 'task-shell';
+  /** Workers item kind produced by this scaffolder. */
   readonly kind = 'task';
+  /** Template path associated with shell task scaffolds. */
   readonly templatePath = './templates/task-shell.sh.template';
 
   /** Generate shell source for a worker task. */
@@ -72,8 +81,11 @@ export class ShellTaskScaffolder extends WorkersItemScaffolder<WorkersScaffoldIn
 
 /** Scaffold a PowerShell task script. */
 export class PsTaskScaffolder extends WorkersItemScaffolder<WorkersScaffoldInput> {
+  /** Stable scaffolder identifier for PowerShell task files. */
   readonly id = 'task-powershell';
+  /** Workers item kind produced by this scaffolder. */
   readonly kind = 'task';
+  /** Template path associated with PowerShell task scaffolds. */
   readonly templatePath = './templates/task-ps1.ps1.template';
 
   /** Generate PowerShell source for a worker task. */

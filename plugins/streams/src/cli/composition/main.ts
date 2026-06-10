@@ -2,6 +2,12 @@ import { StreamsCli } from '../streams-cli.ts';
 
 /** CLI command group for the streams plugin. */
 export { StreamsCli };
+export type {
+  PluginCli,
+  PluginCliArgs,
+  PluginCliCommand,
+  PluginCliResult,
+} from '@netscript/plugin/cli';
 
 /** Default CLI instance used by `deno dx jsr:@netscript/plugin-streams/cli`. */
 export const streamsCli: StreamsCli = new StreamsCli();

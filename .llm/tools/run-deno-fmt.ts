@@ -18,6 +18,8 @@ interface Options {
   exclude?: RegExp;
   cwd: string;
   check: boolean;
+  ignoreLineEndings: boolean;
+  showIgnored: boolean;
   batchSize: number;
   pretty: boolean;
 }
@@ -42,8 +44,10 @@ interface OutputReport {
     batches: number;
     failedBatches: number;
     findings: number;
+    ignoredFindings: number;
   };
   findings: FormatFinding[];
+  ignoredFindings?: FormatFinding[];
 }
 
 const DEFAULT_EXTENSIONS = new Set(['ts', 'tsx', 'js', 'jsx', 'mjs', 'mts', 'json', 'jsonc', 'md']);
@@ -71,6 +75,9 @@ function printHelp(): void {
     '  --cwd <path>        Working directory. Defaults to Deno.cwd().',
     '  --batch-size <n>    Files per deno fmt invocation. Defaults to 200.',
     '  --write             Run mutating deno fmt instead of non-mutating deno fmt --check.',
+    '  --ignore-line-endings',
+    '                      Treat line-ending-only check findings as baseline drift.',
+    '  --show-ignored      Include ignored findings in JSON output.',
     '  --pretty           Pretty-print JSON output.',
     '  --help             Show this help.',
   ].join('\n'));
@@ -96,6 +103,8 @@ function parseArgs(args: string[]): Options | null {
   let exclude: RegExp | undefined;
   let cwd = Deno.cwd();
   let check = true;
+  let ignoreLineEndings = false;
+  let showIgnored = false;
   let batchSize = 200;
   let pretty = false;
   let sawExt = false;
@@ -143,6 +152,12 @@ function parseArgs(args: string[]): Options | null {
       case '--write':
         check = false;
         break;
+      case '--ignore-line-endings':
+        ignoreLineEndings = true;
+        break;
+      case '--show-ignored':
+        showIgnored = true;
+        break;
       case '--pretty':
         pretty = true;
         break;
@@ -162,9 +177,15 @@ function parseArgs(args: string[]): Options | null {
     exclude,
     cwd,
     check,
+    ignoreLineEndings,
+    showIgnored,
     batchSize,
     pretty,
   };
+}
+
+function isLineEndingFinding(finding: FormatFinding): boolean {
+  return finding.reason === 'Text differed by line endings.';
 }
 
 function normalizePath(path: string): string {
@@ -322,8 +343,16 @@ async function main(): Promise<void> {
     results.push(await runBatch(batch, options));
   }
 
-  const findings = parseFindings(results);
+  const allFindings = parseFindings(results);
+  const ignoredFindings = options.ignoreLineEndings ? allFindings.filter(isLineEndingFinding) : [];
+  const findings = options.ignoreLineEndings
+    ? allFindings.filter((finding) => !isLineEndingFinding(finding))
+    : allFindings;
   const failedBatches = results.filter((result) => result.exitCode !== 0).length;
+  const failedWithoutParsedFindings = failedBatches > 0 && allFindings.length === 0;
+  const effectiveFailedBatches = findings.length > 0 || failedWithoutParsedFindings
+    ? failedBatches
+    : 0;
   const report: OutputReport = {
     command: `deno fmt${options.check ? ' --check' : ''}`,
     cwd: options.cwd,
@@ -331,15 +360,20 @@ async function main(): Promise<void> {
     summary: {
       filesSelected: files.length,
       batches: batches.length,
-      failedBatches,
+      failedBatches: effectiveFailedBatches,
       findings: findings.length,
+      ignoredFindings: ignoredFindings.length,
     },
     findings,
   };
 
+  if (options.showIgnored) {
+    report.ignoredFindings = ignoredFindings;
+  }
+
   console.log(JSON.stringify(report, null, options.pretty ? 2 : undefined));
 
-  if (failedBatches > 0) Deno.exit(1);
+  if (findings.length > 0 || failedWithoutParsedFindings) Deno.exit(1);
 }
 
 await main();

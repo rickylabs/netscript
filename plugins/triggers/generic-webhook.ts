@@ -13,12 +13,13 @@ const workersPluginHealthCheckJob = {
 
 /** Generic open webhook used by runtime scaffold and telemetry E2E gates. */
 export const genericInboundWebhook = defineWebhook(
-  async () => [
-    enqueueJob<'workers-plugin-health-check', HealthCheckPayload>(workersPluginHealthCheckJob, {
-      payload: { verbose: false },
-      priority: 50,
-    }),
-  ],
+  () =>
+    Promise.resolve([
+      enqueueJob<'workers-plugin-health-check', HealthCheckPayload>(workersPluginHealthCheckJob, {
+        payload: { verbose: false },
+        priority: 50,
+      }),
+    ]),
   {
     id: 'generic-inbound-webhook' as const,
     path: 'inbound/generic',

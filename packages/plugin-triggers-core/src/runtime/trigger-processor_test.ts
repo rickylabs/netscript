@@ -32,7 +32,7 @@ Deno.test('TriggerProcessor dispatches handler actions once', async () => {
   });
   const job = { id: 'send-email' as never };
   const definition = defineWebhook(
-    async () => [enqueueJob(job)],
+    () => Promise.resolve([enqueueJob(job)]),
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
 
@@ -51,7 +51,7 @@ Deno.test('TriggerProcessor rejects duplicate idempotency claims', async () => {
     now: fixedNow,
   });
   const definition = defineWebhook(
-    async () => [],
+    () => Promise.resolve([]),
     { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
   );
 
@@ -71,6 +71,7 @@ Deno.test('TriggerProcessor moves exhausted retry failures to DLQ', async () => 
   const definition = {
     ...defineWebhook(
       async () => {
+        await Promise.resolve();
         throw TriggersError.nonRetryable('boom');
       },
       { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
@@ -102,6 +103,7 @@ Deno.test('TriggerProcessor applies jitter to retry delay', async () => {
   const definition = {
     ...defineWebhook(
       async () => {
+        await Promise.resolve();
         attempts += 1;
         if (attempts === 1) {
           throw TriggersError.retryable('try again');
@@ -138,7 +140,7 @@ Deno.test('TriggerProcessor rejects reserved trigger kinds', async () => {
     kind: 'manual' as const,
     durability: 't1' as const,
     auditRequired: true,
-    handler: async () => [],
+    handler: () => Promise.resolve([]),
   };
 
   const error = await assertRejects(

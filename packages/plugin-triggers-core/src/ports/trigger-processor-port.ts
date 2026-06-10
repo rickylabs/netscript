@@ -17,9 +17,11 @@ export type TriggerProcessorStopOptions = Readonly<{
 
 /** Processes unified trigger events through the T1 dispatch pipeline. */
 export interface TriggerProcessorPort {
+  /** Process one trigger event against its runtime definition. */
   process<TDefinition extends ProcessableTriggerDefinition>(
     event: TriggerEvent,
     definition: TDefinition,
   ): Promise<TriggerProcessResult>;
+  /** Stop the processor, optionally waiting for in-flight work to drain. */
   stop(options?: TriggerProcessorStopOptions): Promise<void>;
 }

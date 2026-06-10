@@ -20,11 +20,13 @@ export type SagaSSEEvent = Readonly<{
 
 /** Event sink used by SSE delivery implementations. */
 export interface SagaEventSink {
+  /** Emit one saga SSE event. */
   emit(event: SagaSSEEvent): Promise<void>;
 }
 
 /** Durable history writer for saga timeline persistence. */
 export interface SagaHistoryWriter {
+  /** Persist one saga history entry. */
   write(entry: SagaHistoryEntry): Promise<void>;
 }
 

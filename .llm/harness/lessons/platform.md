@@ -4,22 +4,21 @@ Source: supervisor sessions for `feat/package-quality` Wave 2 (2a–2c); Wave 4 
 IMPL-EVAL (`rtk proxy` masking); Wave 4 4b (OpenHands eval automation lock churn);
 Wave 4 4d PLAN-EVAL (stale OpenHands summary comment).
 
-These are environment gotchas that silently corrupt harness bookkeeping if not
-known up front. All confirmed on Windows 11 + PowerShell + RTK shell hook.
+These are environment gotchas that silently corrupt harness bookkeeping if not known up front. All
+confirmed on Windows 11 + PowerShell + RTK shell hook.
 
 ## RTK serves stale git reads
 
 The shell hook rewrites `git …` → `rtk git …`, and rtk caches read commands, so
-`git log`/`git rev-parse`/`git status` can lag reality (especially right after a
-remote merge). Symptoms: a branch tip that "won't update," a merge that "didn't
-happen."
+`git log`/`git rev-parse`/`git status` can lag reality (especially right after a remote merge).
+Symptoms: a branch tip that "won't update," a merge that "didn't happen."
 
 Bypass for ground truth:
 
 - `rtk proxy git <args>` — runs the raw command, no cache.
 - **Preferred for scripts:** spawn git directly with no shell, e.g.
-  `deno eval 'new Deno.Command("git",{args:[...]})'`, or use
-  `.llm/tools/git-verify.ts`. No shell = no rewrite = no cache.
+  `deno eval 'new Deno.Command("git",{args:[...]})'`, or use `.llm/tools/git-verify.ts`. No shell =
+  no rewrite = no cache.
 
 (Also captured in auto-memory `rtk-stale-git-cache`.)
 
@@ -86,29 +85,46 @@ convenient summary is not the gate.)
 
 ## MSYS mangles `ref:path` colons
 
-In the Bash tool (MSYS), `git show <ref>:<path>` and similar `rev:path` forms get
-their colon path-mangled and fail or read the wrong thing. Work around by spawning
-git directly via `deno eval` (no shell translation), not by escaping.
+In the Bash tool (MSYS), `git show <ref>:<path>` and similar `rev:path` forms get their colon
+path-mangled and fail or read the wrong thing. Work around by spawning git directly via `deno eval`
+(no shell translation), not by escaping.
 
 ## Bash tool ≠ PowerShell here-strings
 
-The Bash tool runs **bash**, not PowerShell. A PowerShell `@'…'@` here-string
-passed to `git commit -m` leaks a literal `@` into the commit subject (observed:
-`@ chore(2c)…`). In the Bash tool use bash quoting or multiple `-m` flags; reserve
-`@'…'@` for the PowerShell tool only. If it slips through on a PR-less seed branch,
-`git commit --amend` + `git push --force-with-lease` is safe.
+The Bash tool runs **bash**, not PowerShell. A PowerShell `@'…'@` here-string passed to
+`git commit -m` leaks a literal `@` into the commit subject (observed: `@ chore(2c)…`). In the Bash
+tool use bash quoting or multiple `-m` flags; reserve `@'…'@` for the PowerShell tool only. If it
+slips through on a PR-less seed branch, `git commit --amend` + `git push --force-with-lease` is
+safe.
 
 ## `gh` CLI not on the Bash PATH
 
-The GitHub CLI is not reliably on PATH in the Bash tool here. Use the GitHub MCP
-tools instead (`pull_request_read`, `update_pull_request`, `merge_pull_request`,
-`create_pull_request`, `get_file_contents`, `create_or_update_file`). They also
-integrate with the permission UI.
+The GitHub CLI is not reliably on PATH in the Bash tool here. Use the GitHub MCP tools instead
+(`pull_request_read`, `update_pull_request`, `merge_pull_request`, `create_pull_request`,
+`get_file_contents`, `create_or_update_file`). They also integrate with the permission UI.
 
 ## Syncing a local track worktree without touching lock files
 
-When a stale local track worktree blocks a supervisor-doc commit and `deno.lock`
-has uncommitted churn: `git stash push -- deno.lock` (preserves, does not delete),
-then `git merge --ff-only origin/<track>`. Never delete lock files or run
-`deno cache --reload` without approval (Golden Rule 6). Leave intentional lock
-churn parked in the stash rather than committing it into a docs commit.
+When a stale local track worktree blocks a supervisor-doc commit and `deno.lock` has uncommitted
+churn: `git stash push -- deno.lock` (preserves, does not delete), then
+`git merge --ff-only origin/<track>`. Never delete lock files or run `deno cache --reload` without
+approval (Golden Rule 6). Leave intentional lock churn parked in the stash rather than committing it
+into a docs commit.
+
+## Root quality gates must exclude scratch and future-wave surfaces
+
+Root package-quality gates are verdict sources only when their file selection matches the current
+wave. `deno check .`, raw `deno lint`, and raw `deno fmt --check` can walk `.llm/tmp` scratch
+workspaces, generated scaffold output, Markdown, and packages intentionally deferred to later waves.
+Use explicit roots and excludes:
+
+- `.llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude <future/generated>`
+  for type-check verdicts. It defaults to `--unstable-kv` and can also parse saved/stdin command
+  output.
+- `.llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude <future/generated>`
+  for lint verdicts.
+- `.llm/tools/run-deno-fmt.ts --root <owned roots> --ext ts,tsx --exclude <future/generated>` for
+  formatting verdicts.
+
+If raw root formatting reports line-ending-only drift in untouched legacy files, record it as
+baseline drift instead of normalizing hundreds of files in an unrelated wave.

@@ -2,10 +2,14 @@ import type { SagasErrorCode } from './constants.ts';
 
 /** Structured error thrown by sagas core APIs. */
 export class SagasError extends Error {
+  /** Stable saga error code used by callers and telemetry. */
   readonly code: SagasErrorCode;
+  /** Whether the runtime may retry the failed operation. */
   readonly retryable: boolean;
+  /** Original error or contextual cause captured at the boundary. */
   override readonly cause?: unknown;
 
+  /** Create a structured saga error. */
   constructor(message: string, options: SagasErrorOptions) {
     super(message);
     this.name = 'SagasError';

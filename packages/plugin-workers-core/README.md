@@ -196,7 +196,8 @@ The versioned contract subpath exports the workers API contract:
 import { workersContract, workersContractV1 } from '@netscript/plugin-workers-core/contracts/v1';
 ```
 
-`./contracts` and `./contracts/v1` both point to `src/contracts/v1/mod.ts`.
+Use `./contracts/v1` for all public contract imports. The unversioned `./contracts` alias is not
+exported in this alpha package.
 
 ## Configuration
 
@@ -243,11 +244,10 @@ Testing helpers create fresh instances. They do not depend on singleton state.
 
 ## Subpaths
 
-Stable subpaths:
+Stable alpha subpaths:
 
 - `@netscript/plugin-workers-core`
 - `@netscript/plugin-workers-core/builders`
-- `@netscript/plugin-workers-core/contracts`
 - `@netscript/plugin-workers-core/contracts/v1`
 - `@netscript/plugin-workers-core/registry`
 - `@netscript/plugin-workers-core/state`
@@ -263,6 +263,24 @@ Stable subpaths:
 - `@netscript/plugin-workers-core/runtime`
 
 The root barrel stays intentionally small. Use subpaths for specialized APIs.
+
+Subpath roles:
+
+- `./builders` contains the typestate job, task, and workflow builders.
+- `./contracts/v1` contains the versioned workers API contract and structural schema wrappers.
+- `./registry` contains job and task registry ports and KV-backed implementations.
+- `./state` contains execution state storage and query helpers.
+- `./executor` contains task execution adapters and process command builders.
+- `./workflow` contains workflow definitions, durable state, and step execution.
+- `./streams` contains stream schema integration with `@netscript/plugin-streams-core`.
+- `./presets` contains runtime construction presets such as `startWorkers`.
+- `./shutdown` contains graceful shutdown coordination.
+- `./schemas` contains package-owned public structural schemas.
+- `./telemetry` contains worker span names, attributes, events, and instrumentation contracts.
+- `./abstracts` contains extension-point contracts retained for alpha consumers.
+- `./testing` contains memory adapters and fixtures.
+- `./config` contains worker-owned job and task config schemas.
+- `./runtime` contains runtime composition contracts and `createWorkersRuntime`.
 
 ## Permissions
 

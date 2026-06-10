@@ -12,6 +12,7 @@ import type {
   SagaTransitionRecord,
 } from '../domain/mod.ts';
 
+/** Operation captured by `RecordingSagaStore`. */
 export type RecordingSagaStoreOperation =
   | Readonly<{ kind: 'load'; instanceId: SagaInstanceId }>
   | Readonly<{ kind: 'save'; instanceId: SagaInstanceId; expectedVersion?: number }>
@@ -22,15 +23,18 @@ export type RecordingSagaStoreOperation =
 
 /** Store wrapper that records persistence operations while delegating behavior. */
 export class RecordingSagaStore implements SagaStorePort {
+  /** Stable store identifier. */
   readonly id: string;
   readonly #delegate: SagaStorePort;
   readonly #operations: RecordingSagaStoreOperation[] = [];
 
+  /** Create a recording wrapper around another saga store. */
   constructor(delegate: SagaStorePort, id = 'recording-saga-store') {
     this.id = id;
     this.#delegate = delegate;
   }
 
+  /** Record and delegate a state load. */
   load<TState extends SagaState>(
     instanceId: SagaInstanceId,
   ): Promise<SagaStateEnvelope<TState> | undefined> {
@@ -38,6 +42,7 @@ export class RecordingSagaStore implements SagaStorePort {
     return this.#delegate.load<TState>(instanceId);
   }
 
+  /** Record and delegate a state save. */
   save<TState extends SagaState>(
     envelope: SagaStateEnvelope<TState>,
     options: SagaStoreWriteOptions = {},
@@ -50,6 +55,7 @@ export class RecordingSagaStore implements SagaStorePort {
     return this.#delegate.save(envelope, options);
   }
 
+  /** Record and delegate a transition append. */
   appendTransition<TState extends SagaState>(
     instanceId: SagaInstanceId,
     record: SagaTransitionRecord<TState>,
@@ -62,6 +68,7 @@ export class RecordingSagaStore implements SagaStorePort {
     return this.#delegate.appendTransition(instanceId, record);
   }
 
+  /** Record and delegate a correlation lookup. */
   findByCorrelation(
     sagaId: SagaId,
     correlationKey: SagaCorrelationKey,
@@ -70,16 +77,19 @@ export class RecordingSagaStore implements SagaStorePort {
     return this.#delegate.findByCorrelation(sagaId, correlationKey);
   }
 
+  /** Record and delegate saving a correlation index entry. */
   saveCorrelation(entry: SagaCorrelationIndexEntry): Promise<void> {
     this.#operations.push(Object.freeze({ kind: 'saveCorrelation', entry }));
     return this.#delegate.saveCorrelation(entry);
   }
 
+  /** Record and delegate an instance delete. */
   delete(instanceId: SagaInstanceId): Promise<void> {
     this.#operations.push(Object.freeze({ kind: 'delete', instanceId }));
     return this.#delegate.delete(instanceId);
   }
 
+  /** Return captured store operations. */
   operations(): readonly RecordingSagaStoreOperation[] {
     return Object.freeze([...this.#operations]);
   }

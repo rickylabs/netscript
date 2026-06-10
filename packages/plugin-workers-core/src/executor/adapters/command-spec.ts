@@ -1,23 +1,15 @@
 import type {
-  DotNetTaskConfig,
-  PythonTaskConfig,
-  ShellTaskConfig,
+  ResolvedTaskExecutionOptions,
+  RuntimeTaskMetadata,
   TaskDefinition,
-} from '../../domain/mod.ts';
-import type { ResolvedTaskExecutionOptions } from '../../abstracts/mod.ts';
+} from '../executor-types.ts';
+export type { RuntimeTaskMetadata } from '../executor-types.ts';
 
 /** Command and arguments prepared for a task runtime adapter. */
 export type RuntimeCommandSpec = Readonly<{
   command: string;
   args: readonly string[];
   env?: Readonly<Record<string, string>>;
-}>;
-
-/** Runtime-specific task metadata recognized by built-in adapters. */
-export type RuntimeTaskMetadata = Readonly<{
-  dotnetConfig?: DotNetTaskConfig;
-  pythonConfig?: PythonTaskConfig;
-  shellConfig?: ShellTaskConfig;
 }>;
 
 /** Function used by command builders to read process environment. */
@@ -31,6 +23,7 @@ export type RuntimeCommandBuildContext = Readonly<{
   os: typeof Deno.build.os;
 }>;
 
+/** Require a task entrypoint and return it. */
 export function requireEntrypoint(task: TaskDefinition): string {
   if (!task.entrypoint) {
     throw new Error(`Task ${task.id} does not define an entrypoint.`);
@@ -38,10 +31,12 @@ export function requireEntrypoint(task: TaskDefinition): string {
   return task.entrypoint;
 }
 
+/** Return runtime-specific task metadata. */
 export function runtimeMetadata(task: TaskDefinition): RuntimeTaskMetadata {
   return (task.metadata ?? {}) as RuntimeTaskMetadata;
 }
 
+/** Combine task and execution-option arguments. */
 export function allTaskArgs(
   task: TaskDefinition,
   options: ResolvedTaskExecutionOptions,

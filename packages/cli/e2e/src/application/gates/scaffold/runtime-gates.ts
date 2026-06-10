@@ -116,7 +116,7 @@ export function createRuntimeGates(): readonly GateDefinition[] {
     httpGate(
       GATE.BEHAVIOR_TRIGGERS_HEALTH,
       'Triggers API health',
-      'http://localhost:8093/health',
+      'http://127.0.0.1:8093/health',
     ),
     commandGate(
       GATE.BEHAVIOR_TRIGGERS_WEBHOOK,
@@ -127,7 +127,7 @@ export function createRuntimeGates(): readonly GateDefinition[] {
         '-sf',
         '-X',
         'POST',
-        'http://localhost:8093/api/v1/webhooks/inbound/generic',
+        'http://127.0.0.1:8093/api/v1/webhooks/inbound/generic',
         '-H',
         'Content-Type: application/json',
         '-d',
@@ -147,7 +147,7 @@ export function createRuntimeGates(): readonly GateDefinition[] {
 }
 
 const VALIDATE_TRIGGER_EVENTS_SCRIPT = [
-  'const url = "http://localhost:8093/api/v1/events?limit=10";',
+  'const url = "http://127.0.0.1:8093/api/v1/events?limit=10";',
   'const response = await fetch(url);',
   'if (!response.ok) throw new Error("HTTP " + response.status + " from " + url);',
   'const body = await response.json() as { events?: unknown[]; total?: number };',

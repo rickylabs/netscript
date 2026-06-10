@@ -15,7 +15,10 @@ export type TriggerIdempotencyClaim = Readonly<{
 
 /** Event-boundary idempotency store with a TTL window. */
 export interface TriggerIdempotencyPort {
+  /** Resolve and claim an idempotency key for a trigger event. */
   resolveKey(input: TriggerIdempotencyKeyInput): Promise<TriggerIdempotencyClaim>;
+  /** Mark a claimed idempotency key as completed for the TTL window. */
   markCompleted(key: string, ttlMs: number): Promise<void>;
+  /** Release a claimed idempotency key after a failed attempt. */
   release(key: string): Promise<void>;
 }

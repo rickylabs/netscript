@@ -1,13 +1,4 @@
 import {
-  type AspireBuilder,
-  AspireNSPluginContribution,
-  type AspireResource,
-  type ContributionContext,
-  type EnvSource,
-  type HealthCheckSpec,
-} from '@netscript/aspire';
-
-import {
   SAGAS_API_DEFAULT_PORT,
   SAGAS_API_SERVICE_NAME,
   SAGAS_PLUGIN_VERSION,
@@ -34,16 +25,88 @@ const SAGAS_BACKGROUND_PERMISSIONS = [
   '--allow-write',
 ] as const;
 
+/** Environment source reference accepted by sagas Aspire declarations. */
+export type SagasEnvSource =
+  | { readonly kind: 'literal'; readonly value: string }
+  | { readonly kind: 'resource'; readonly resource: string; readonly key: string }
+  | { readonly kind: 'secret'; readonly name: string };
+
+/** Resource returned by the sagas Aspire builder boundary. */
+export interface SagasAspireResource {
+  /** Stable resource name. */
+  readonly name: string;
+  /** Resource kind supplied by the host builder. */
+  readonly kind?: string;
+  /** Host-specific resource metadata. */
+  readonly [key: string]: unknown;
+}
+
+/** Deno service resource spec used by the sagas Aspire contribution. */
+export interface SagasDenoServiceSpec {
+  /** Working directory for the resource process. */
+  readonly workdir: string;
+  /** Entrypoint executed by Deno. */
+  readonly entrypoint: string;
+  /** HTTP port assigned to the resource. */
+  readonly port?: number;
+  /** Deno permissions granted to the process. */
+  readonly permissions?: readonly string[];
+  /** Environment variables attached to the resource. */
+  readonly env?: Readonly<Record<string, string>>;
+}
+
+/** Deno background resource spec used by the sagas Aspire contribution. */
+export interface SagasDenoBackgroundSpec {
+  /** Working directory for the resource process. */
+  readonly workdir: string;
+  /** Entrypoint executed by Deno. */
+  readonly entrypoint: string;
+  /** Deno permissions granted to the process. */
+  readonly permissions?: readonly string[];
+  /** Optional environment variable used by the host to control concurrency. */
+  readonly concurrencyEnvVar?: string;
+  /** Whether the background process should run in watch mode. */
+  readonly watchMode?: boolean;
+}
+
+/** Aspire builder methods required by the sagas contribution. */
+export interface SagasAspireBuilder {
+  /** Add a Deno HTTP service resource. */
+  addDenoService(name: string, spec: SagasDenoServiceSpec): SagasAspireResource;
+  /** Add a Deno background process resource. */
+  addDenoBackground(name: string, spec: SagasDenoBackgroundSpec): SagasAspireResource;
+}
+
+/** Contribution context required by the sagas Aspire contribution. */
+export interface SagasContributionContext {
+  /** Root directory of the NetScript project. */
+  readonly projectRoot: string;
+  /** Deterministic port allocator. */
+  readonly port: (key: string, fallback?: number) => number;
+}
+
+/** Health check declaration emitted by the sagas Aspire contribution. */
+export interface SagasHealthCheckSpec {
+  /** Resource name checked by the health probe. */
+  readonly resource: string;
+  /** URL to probe. */
+  readonly url: string;
+  /** Expected HTTP status code. */
+  readonly expect: number;
+  /** Optional timeout in milliseconds. */
+  readonly timeoutMs?: number;
+}
+
 /** Aspire contribution for the NetScript sagas plugin. */
-export class SagasAspireContribution extends AspireNSPluginContribution {
+export class SagasAspireContribution {
   /** Plugin package name owning this contribution. */
-  readonly pluginName: typeof SAGAS_PLUGIN_PACKAGE_NAME = SAGAS_PLUGIN_PACKAGE_NAME;
+  readonly pluginName: string = SAGAS_PLUGIN_PACKAGE_NAME;
 
   /** Register sagas API and background runtime resources with the AppHost builder. */
   contribute(
-    builder: AspireBuilder,
-    ctx: ContributionContext,
-  ): readonly AspireResource[] {
+    builder: SagasAspireBuilder,
+    ctx: SagasContributionContext,
+  ): readonly SagasAspireResource[] {
     const api = builder.addDenoService(SAGAS_API_SERVICE_NAME, {
       workdir: ctx.projectRoot,
       entrypoint: 'plugins/sagas/services/src/main.ts',
@@ -66,7 +129,7 @@ export class SagasAspireContribution extends AspireNSPluginContribution {
   }
 
   /** Declare environment values used by sagas Aspire resources. */
-  override declareEnv(_ctx: ContributionContext): Record<string, EnvSource | string> {
+  declareEnv(_ctx: SagasContributionContext): Record<string, SagasEnvSource | string> {
     return {
       SAGAS_API_URL: `http://localhost:${SAGAS_API_DEFAULT_PORT}`,
       SAGAS_ADAPTER: 'native',
@@ -76,7 +139,7 @@ export class SagasAspireContribution extends AspireNSPluginContribution {
   }
 
   /** Declare health checks used by plugin doctor commands. */
-  override declareHealthChecks(_ctx: ContributionContext): readonly HealthCheckSpec[] {
+  declareHealthChecks(_ctx: SagasContributionContext): readonly SagasHealthCheckSpec[] {
     return [{
       resource: SAGAS_API_SERVICE_NAME,
       url: `http://localhost:${SAGAS_API_DEFAULT_PORT}/health`,

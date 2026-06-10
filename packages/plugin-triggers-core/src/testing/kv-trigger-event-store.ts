@@ -7,6 +7,7 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
   readonly #prefix: readonly Deno.KvKeyPart[];
   readonly #now: () => Date;
 
+  /** Create a Deno KV event store for integration tests. */
   constructor(
     options: Readonly<{
       kv: Deno.Kv;
@@ -19,6 +20,7 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Persist a trigger event in Deno KV. */
   async save(event: TriggerEvent): Promise<void> {
     await this.#kv.atomic()
       .set(this.#eventKey(event.id), event)
@@ -26,11 +28,13 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
       .commit();
   }
 
+  /** Load a trigger event from Deno KV by id. */
   async load(eventId: TriggerEventId): Promise<TriggerEvent | undefined> {
     const entry = await this.#kv.get<TriggerEvent>(this.#eventKey(eventId));
     return entry.value ?? undefined;
   }
 
+  /** Update the status and metadata for a persisted trigger event. */
   async updateStatus(
     eventId: TriggerEventId,
     status: TriggerEventStatus,
@@ -48,6 +52,7 @@ export class KvTriggerEventStore implements TriggerEventStorePort {
     });
   }
 
+  /** List trigger events from Deno KV matching optional filters. */
   async list(options: TriggerEventListOptions = {}): Promise<readonly TriggerEvent[]> {
     const events: TriggerEvent[] = [];
     for await (const entry of this.#kv.list<TriggerEvent>({ prefix: this.#eventsPrefix() })) {

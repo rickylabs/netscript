@@ -114,6 +114,10 @@ migration plan and debt entry explicitly cover them.
   The doctrine is the single source of truth.
 - **Ignoring debt registry** — New violations must be recorded with a closing gate and owner.
   Unrecorded violations are `FAIL_DEBT`.
+- **Using raw root CLI output as package evidence** — For package/plugin quality gates, check, lint,
+  and formatting evidence should use the scoped wrappers under `.llm/tools/` with explicit roots,
+  `--ext ts,tsx`, and generated/future-wave excludes. Use doctrine file 09 for the full fitness-gate
+  rule.
 
 ## Reference Files
 

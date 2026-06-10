@@ -1,10 +1,13 @@
 import { TaskExecutor } from '../abstracts/task-executor.ts';
 import type {
   ResolvedTaskExecutionOptions,
-  TaskInstrumentation,
-  TaskRuntimeAdapter,
-} from '../abstracts/mod.ts';
-import type { TaskDefinition, TaskExecutionOptions, TaskResult, TaskType } from '../domain/mod.ts';
+  TaskDefinition,
+  TaskExecutionOptions,
+  TaskInstrumentationLike,
+  TaskResult,
+  TaskRuntimeAdapterLike,
+  TaskType,
+} from './executor-types.ts';
 import type { TelemetryAttributeValue, WorkerTelemetryStatus } from '../telemetry/mod.ts';
 import {
   CmdRuntimeAdapter,
@@ -19,23 +22,25 @@ import { failedTaskResult } from './adapters/runtime-adapter-base.ts';
 
 /** Options for the default multi-runtime task executor. */
 export type MultiRuntimeTaskExecutorOptions = Readonly<{
-  adapters?: ReadonlyMap<TaskType, TaskRuntimeAdapter>;
-  customAdapters?: Readonly<Record<string, TaskRuntimeAdapter>>;
+  adapters?: ReadonlyMap<TaskType, TaskRuntimeAdapterLike>;
+  customAdapters?: Readonly<Record<string, TaskRuntimeAdapterLike>>;
   defaults?: Readonly<{
     cwd?: string;
     timeout?: number;
   }>;
-  instrumentations?: readonly TaskInstrumentation[];
+  instrumentations?: readonly TaskInstrumentationLike[];
 }>;
 
 /** Dispatches task execution to runtime-specific adapters. */
 export class MultiRuntimeTaskExecutor extends TaskExecutor {
+  /** Stable executor identifier. */
   readonly id = 'multi-runtime-task-executor';
-  readonly #adapters: ReadonlyMap<TaskType, TaskRuntimeAdapter>;
-  readonly #customAdapters: Readonly<Record<string, TaskRuntimeAdapter>>;
+  readonly #adapters: ReadonlyMap<TaskType, TaskRuntimeAdapterLike>;
+  readonly #customAdapters: Readonly<Record<string, TaskRuntimeAdapterLike>>;
   readonly #defaults: Required<NonNullable<MultiRuntimeTaskExecutorOptions['defaults']>>;
-  readonly #instrumentations: readonly TaskInstrumentation[];
+  readonly #instrumentations: readonly TaskInstrumentationLike[];
 
+  /** Create a task executor from runtime adapters and defaults. */
   constructor(options: MultiRuntimeTaskExecutorOptions = {}) {
     super();
     this.#adapters = options.adapters ?? createDefaultRuntimeAdapterMap();
@@ -47,10 +52,12 @@ export class MultiRuntimeTaskExecutor extends TaskExecutor {
     this.#instrumentations = options.instrumentations ?? [];
   }
 
+  /** Return whether any configured adapter can execute a task. */
   override supports(task: TaskDefinition): boolean {
     return this.#resolveAdapter(task)?.supports(task) ?? false;
   }
 
+  /** Execute a task through the resolved runtime adapter. */
   override async execute(
     task: TaskDefinition,
     options: TaskExecutionOptions = {},
@@ -69,7 +76,7 @@ export class MultiRuntimeTaskExecutor extends TaskExecutor {
     return result;
   }
 
-  #resolveAdapter(task: TaskDefinition): TaskRuntimeAdapter | undefined {
+  #resolveAdapter(task: TaskDefinition): TaskRuntimeAdapterLike | undefined {
     const runtime = task.type;
     if (runtime && this.#customAdapters[runtime]) {
       return this.#customAdapters[runtime];
@@ -118,8 +125,8 @@ export function createDefaultTaskExecutor(
 }
 
 /** Create the default built-in runtime adapter map. */
-export function createDefaultRuntimeAdapterMap(): ReadonlyMap<TaskType, TaskRuntimeAdapter> {
-  return new Map<TaskType, TaskRuntimeAdapter>([
+export function createDefaultRuntimeAdapterMap(): ReadonlyMap<TaskType, TaskRuntimeAdapterLike> {
+  return new Map<TaskType, TaskRuntimeAdapterLike>([
     ['deno', new DenoRuntimeAdapter()],
     ['python', new PythonRuntimeAdapter()],
     ['dotnet', new DotNetRuntimeAdapter()],

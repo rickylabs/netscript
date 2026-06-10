@@ -5,6 +5,10 @@
  */
 
 export { WorkersCli } from './workers-cli.ts';
+export { PluginCli } from '@netscript/plugin/cli';
+export type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '@netscript/plugin/cli';
+export { CliCommand, WorkersCommand } from '@netscript/plugin-workers-core/abstracts';
+export type { WorkersCommandDefinition } from '@netscript/plugin-workers-core/abstracts';
 export { LocalWorkersCliBackend } from './workers-cli-backend.ts';
 export type { LocalWorkersCliBackendOptions } from './workers-cli-backend.ts';
 export {
@@ -20,6 +24,7 @@ export {
   LogsCommand,
   RunJobCommand,
   StaticWorkersCliBackend,
+  WorkersCliCommand,
 } from './commands.ts';
 export { compileWorkersRegistry } from './registry-compiler.ts';
 export type { CompileRegistryResult } from './registry-compiler.ts';

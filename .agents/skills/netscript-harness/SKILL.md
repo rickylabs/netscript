@@ -62,6 +62,12 @@ this skill tells you what to load and in what order.
   self-certify.
 - **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
 - **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
+- **Raw root CLI noise as a verdict** — Package-quality check/lint/fmt evidence should use the
+  scoped wrappers `.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and
+  `.llm/tools/run-deno-fmt.ts`. They select explicit roots, file extensions, and excludes, then emit
+  compact structured output. Raw root `deno fmt --check` over Markdown, generated targets, or legacy
+  line-ending drift is not a package-quality verdict source unless the plan explicitly owns
+  repo-wide formatting.
 
 ## Run Artifacts
 
