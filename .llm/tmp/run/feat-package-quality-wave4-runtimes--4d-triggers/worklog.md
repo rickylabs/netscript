@@ -402,4 +402,23 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task test` from `plugins/triggers` |
 | Gate result | PASS, exit 0; 1 passed / 0 failed / 12 ignored; package test task discovered the new public manifest test plus gated webhook E2E files. |
 | Drift | None. |
-| Commits | Implementation `fb25c72`; paired docs/evidence pending. |
+| Commits | Implementation `fb25c72`; paired docs/evidence `f54d787`. |
+
+### Slice 19/23 — D19 A5 CLI contribution test
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | Added `tests/cli/cli_test.ts` covering `TriggersCli` command registry order, dispatch through an injected backend, missing-command behavior, default `triggersCli` composition root, and `StaticTriggersCliBackend` metadata output without runtime dependencies. |
+| Gate(s) | F-10 test-shape audit |
+| Gate command | `deno fmt --check plugins/triggers/tests/cli/cli_test.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 1 file` after targeted `deno fmt` corrected import ordering. |
+| Gate command | `deno check --unstable-kv plugins/triggers/tests/cli/cli_test.ts` from repo root |
+| Gate result | PASS, exit 0; D19 CLI test checked. |
+| Gate command | `deno test --allow-all --unstable-kv plugins/triggers/tests/cli/cli_test.ts` from repo root |
+| Gate result | PASS, exit 0; 3 passed / 0 failed. |
+| Gate command | `deno task test` from `plugins/triggers` |
+| Gate result | PASS, exit 0; 4 passed / 0 failed / 12 ignored across CLI, public manifest, and gated webhook E2E files. |
+| Drift | None. |
+| Commits | Implementation `27083c9`; paired docs/evidence pending. |

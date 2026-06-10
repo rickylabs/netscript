@@ -46,3 +46,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - c2df49a: test(triggers): split D17 webhook e2e concepts
 - d33e07c: docs(wave4): record D17 e2e split evidence
 - fb25c72: test(triggers): add D18 manifest verification
+- f54d787: docs(wave4): record D18 manifest verification evidence
+- 27083c9: test(triggers): add D19 cli contribution coverage
