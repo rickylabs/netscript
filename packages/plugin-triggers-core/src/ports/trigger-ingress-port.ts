@@ -15,5 +15,6 @@ export type TriggerIngressResponse = Readonly<{
 
 /** Fast ack-then-process ingress boundary. */
 export interface TriggerIngressPort {
+  /** Accept an inbound trigger request for asynchronous processing. */
   accept(request: TriggerIngressRequest): Promise<TriggerIngressResponse>;
 }

@@ -38,6 +38,7 @@ export type {
   TriggerRuntimeKind,
   TriggersErrorCode,
 } from './constants.ts';
+export type { JobDefinition, JobId } from '@netscript/plugin-workers-core';
 export type { TriggersErrorOptions } from './errors.ts';
 export type { TriggerEventId, TriggerId, WebhookId } from './ids.ts';
 export type { CronExpression, ScheduledTriggerSpec } from './scheduled-spec.ts';

@@ -37,13 +37,11 @@ for (const root of PRESENTATION_ROOTS) {
     const lines = countLines(text);
     if (lines > 150) {
       findings.push({
-        status: 'FAIL',
         message: `${path} has ${lines} lines; presentation limit is 150`,
       });
     }
     if (text.includes('Deno.')) {
       findings.push({
-        status: 'FAIL',
         message: `${path} calls Deno.* from presentation`,
       });
     }
@@ -73,7 +71,6 @@ for (const binary of ['packages/cli/bin/netscript.ts', 'packages/cli/bin/netscri
   const lines = countLines(await Deno.readTextFile(binary));
   if (lines > BINARY_LIMIT) {
     findings.push({
-      status: 'FAIL',
       message: `${binary} has ${lines} lines; binary limit is ${BINARY_LIMIT}`,
     });
   }

@@ -51,7 +51,7 @@ const FileRelayPayloadSchema = z.object({
 
 const handler = defineJobHandler(async (ctx) => {
   const payload = FileRelayPayloadSchema.parse(ctx.payload ?? {});
-  const { log, progress, trace, traceContext } = createJobTools(ctx);
+  const { log, progress, trace } = createJobTools(ctx);
   const { filePath, fileName, contentHash, target } = payload;
 
   log.info('Starting file relay', { filePath, fileName, targetType: target.type });

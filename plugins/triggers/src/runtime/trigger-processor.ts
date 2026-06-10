@@ -1,7 +1,6 @@
 import type {
   FileWatchDefinition,
   ScheduledTriggerDefinition,
-  TriggerDefinition,
 } from '@netscript/plugin-triggers-core/domain';
 import type {
   FileWatcherPort,
@@ -14,6 +13,7 @@ import { loadProjectTriggerDefinitions } from './project-trigger-registry.ts';
 import { createRuntimeTriggerProcessor } from './trigger-runtime-processor.ts';
 import { WatchersFileWatcherAdapter } from './watchers-file-watcher-adapter.ts';
 
+/** Options for starting the background trigger processor runtime. */
 export type TriggerProcessorRuntimeOptions = Readonly<{
   signal?: AbortSignal;
   definitions?: readonly ProcessableTriggerDefinition[];

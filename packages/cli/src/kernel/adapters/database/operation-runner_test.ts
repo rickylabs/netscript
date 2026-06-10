@@ -138,7 +138,14 @@ describe('DbOperationRunner', () => {
     assertEquals(executor.outputCalls[0].args[0], 'start');
     assertEquals(executor.outputCalls[0].args.includes('--isolated'), false);
     assertEquals(executor.outputCalls[0].args.includes('--'), false);
-    assertEquals(executor.outputCalls[1].args[0], 'ps');
+    assertEquals(executor.outputCalls[1].args, [
+      'ps',
+      '--resources',
+      '--format',
+      'Json',
+      '--non-interactive',
+      '--nologo',
+    ]);
     assertEquals(executor.outputCalls[4].args[0], 'logs');
     assertEquals(executor.outputCalls[5].args[0], 'stop');
     assertEquals(

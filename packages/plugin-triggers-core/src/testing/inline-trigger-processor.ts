@@ -7,14 +7,17 @@ import type {
 
 /** Inline processor that invokes handlers directly for tests. */
 export class InlineTriggerProcessor implements TriggerProcessorPort {
+  /** Events processed by this inline processor. */
   readonly processed: TriggerEvent[] = [];
   readonly #now: () => Date;
   #stopped = false;
 
+  /** Create an inline processor with an optional clock hook. */
   constructor(options: Readonly<{ now?: () => Date }> = {}) {
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Process a trigger event by invoking the definition handler directly. */
   async process<TDefinition extends TriggerDefinition<string, never, never>>(
     event: TriggerEvent,
     definition: TDefinition,
@@ -40,6 +43,7 @@ export class InlineTriggerProcessor implements TriggerProcessorPort {
     };
   }
 
+  /** Stop the inline processor. */
   stop(_options?: TriggerProcessorStopOptions): Promise<void> {
     this.#stopped = true;
     return Promise.resolve();

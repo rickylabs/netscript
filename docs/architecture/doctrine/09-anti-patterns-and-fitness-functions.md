@@ -327,6 +327,25 @@ A sub-barrel that genuinely aggregates (constructs one symbol from many, not jus
 allowed via a `// arch:barrel-ok
 <reason>` comment, recorded in the audit registry.
 
+### F-19. Scoped source gate runners
+
+Check, lint, and formatting evidence for package/plugin quality runs targets source TypeScript, not
+the whole repository by directory accident. The gates run over `.ts` and `.tsx` source under the
+owned or current-wave package/plugin roots, exclude generated output (`.generated/`, generated
+client trees, scaffold scratch), and exclude future-wave packages that the current plan does not
+own.
+
+Raw root `deno check .`, `deno lint`, or `deno fmt --check` over scratch workspaces, copied
+templates, generated output, Markdown, or legacy line-ending-only drift is not a package-quality
+verdict source unless the plan explicitly owns a repo-wide normalization pass. For ordinary
+package-quality work, use the scoped wrapper family:
+
+```powershell
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <pkg> --ext ts,tsx --exclude <generated-or-future-wave-regex>
+deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root <pkg> --ext ts,tsx --exclude <generated-or-future-wave-regex>
+deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <pkg> --ext ts,tsx --exclude <generated-or-future-wave-regex>
+```
+
 ## How fitness functions ship
 
 The doctrine prescribes the _checks_; implementation lives in `.llm/tools/`:
@@ -348,7 +367,7 @@ The doctrine prescribes the _checks_; implementation lives in `.llm/tools/`:
 Each script:
 
 - runs as `deno task arch:check:<name>`,
-- emits structured JSON output (parseable by `.llm/tools/parse-deno-check-errors.ts` style tooling),
+- emits structured JSON output compatible with the `.llm/tools/run-deno-*.ts` wrapper family,
 - exits non-zero on violation,
 - supports a `--allow <package>` opt-out (with mandatory justification recorded in
   `.llm/arch-debt.md`).

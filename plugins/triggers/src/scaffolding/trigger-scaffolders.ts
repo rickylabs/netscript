@@ -10,8 +10,10 @@ export interface TriggerDefinitionScaffolder {
 
 /** Scaffold a webhook trigger definition module. */
 export class WebhookTriggerScaffolder implements TriggerDefinitionScaffolder {
+  /** Trigger kind created by this scaffolder. */
   readonly kind = 'webhook';
 
+  /** Generate a webhook trigger definition module. */
   generate(input: TriggerScaffoldInput): Promise<string> {
     const exportName = `${toTriggerExportName(input.id)}Trigger`;
     const source = [
@@ -38,8 +40,10 @@ export class WebhookTriggerScaffolder implements TriggerDefinitionScaffolder {
 
 /** Scaffold a file-watch trigger definition module. */
 export class FileWatchTriggerScaffolder implements TriggerDefinitionScaffolder {
+  /** Trigger kind created by this scaffolder. */
   readonly kind = 'file-watch';
 
+  /** Generate a file-watch trigger definition module. */
   generate(input: TriggerScaffoldInput): Promise<string> {
     const exportName = `${toTriggerExportName(input.id)}Trigger`;
     const paths = input.paths?.length ? input.paths : ['./shared/incoming'];
@@ -72,8 +76,10 @@ export class FileWatchTriggerScaffolder implements TriggerDefinitionScaffolder {
 
 /** Scaffold a scheduled trigger definition module. */
 export class ScheduledTriggerScaffolder implements TriggerDefinitionScaffolder {
+  /** Trigger kind created by this scaffolder. */
   readonly kind = 'scheduled';
 
+  /** Generate a scheduled trigger definition module. */
   generate(input: TriggerScaffoldInput): Promise<string> {
     const exportName = `${toTriggerExportName(input.id)}Trigger`;
     const source = [

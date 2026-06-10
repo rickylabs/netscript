@@ -7,7 +7,8 @@ import type {
 } from '../domain/mod.ts';
 import type { ScheduledTriggerHandle, TriggerSchedulerPort } from '../ports/mod.ts';
 
-type ScheduledHandler = (event: TriggerEvent<'scheduled'>) => Promise<void>;
+/** Handler invoked by the in-memory scheduled trigger adapter. */
+export type ScheduledHandler = (event: TriggerEvent<'scheduled'>) => Promise<void>;
 type ScheduleRecord = ScheduledTriggerHandle & Readonly<{ handler: ScheduledHandler }>;
 
 /** In-memory scheduler adapter for scheduled trigger tests. */
@@ -16,10 +17,12 @@ export class MemoryTriggerSchedulerAdapter implements TriggerSchedulerPort {
   readonly #now: () => Date;
   #sequence = 0;
 
+  /** Create an in-memory scheduler with an optional clock hook. */
   constructor(options: Readonly<{ now?: () => Date }> = {}) {
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Register a scheduled trigger and handler. */
   schedule(
     id: TriggerId,
     spec: ScheduledTriggerSpec,
@@ -37,27 +40,33 @@ export class MemoryTriggerSchedulerAdapter implements TriggerSchedulerPort {
     return Promise.resolve(stripHandler(handle));
   }
 
+  /** Remove a scheduled trigger by id. */
   unschedule(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#records.delete(id));
   }
 
+  /** List scheduled trigger handles. */
   list(): Promise<readonly ScheduledTriggerHandle[]> {
     return Promise.resolve([...this.#records.values()].map(stripHandler));
   }
 
+  /** Get a scheduled trigger handle by id. */
   get(id: TriggerId): Promise<ScheduledTriggerHandle | undefined> {
     const record = this.#records.get(id);
     return Promise.resolve(record === undefined ? undefined : stripHandler(record));
   }
 
+  /** Pause a scheduled trigger. */
   pause(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#setPaused(id, true));
   }
 
+  /** Resume a scheduled trigger. */
   resume(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#setPaused(id, false));
   }
 
+  /** Fire a scheduled trigger immediately. */
   async fireNow(id: TriggerId): Promise<boolean> {
     const record = this.#records.get(id);
     if (record === undefined || record.paused) {
@@ -67,6 +76,7 @@ export class MemoryTriggerSchedulerAdapter implements TriggerSchedulerPort {
     return true;
   }
 
+  /** Stop all scheduled trigger handles. */
   stop(): Promise<void> {
     this.#records.clear();
     return Promise.resolve();

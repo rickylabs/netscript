@@ -31,7 +31,7 @@ const StagedCleanupPayloadSchema = z.object({
 
 const handler = defineJobHandler(async (ctx) => {
   const payload = StagedCleanupPayloadSchema.parse(ctx.payload ?? {});
-  const { log, progress, trace, traceContext } = createJobTools(ctx);
+  const { log } = createJobTools(ctx);
   const { filePath, fileName } = payload;
 
   log.info('Starting staged file cleanup', { filePath, fileName });

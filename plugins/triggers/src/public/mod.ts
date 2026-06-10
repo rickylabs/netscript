@@ -4,16 +4,77 @@
  * Public manifest constants for the triggers plugin package.
  */
 
-import { definePlugin, type PluginManifest, type ServiceContribution } from '@netscript/plugin';
-import type { defineSaga } from '@netscript/plugin-sagas-core';
-import type { StreamProducerPort } from '@netscript/plugin-streams-core';
-import type { JobDefinition } from '@netscript/plugin-workers-core';
+import { definePlugin, type PluginManifest } from '@netscript/plugin';
 import {
   TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,
   TRIGGERS_PLUGIN_ID,
   TRIGGERS_PLUGIN_VERSION,
 } from '../constants.ts';
+
+/** Worker job shape consumed by trigger actions. */
+export type TriggersWorkerJobDefinition = Readonly<{
+  id: string;
+  entrypoint?: string;
+  name?: string;
+  topic?: string;
+}>;
+
+/** Stream producer capability consumed by trigger actions. */
+export interface TriggersStreamProducerPort {
+  /** Upsert an entity into a stream collection. */
+  upsert(entityType: string, value: Record<string, unknown>): void;
+  /** Delete an entity from a stream collection by primary key. */
+  delete(entityType: string, key: string): void;
+  /** Flush pending writes. */
+  flush(): Promise<void>;
+  /** Flush and close the producer. */
+  close(): Promise<void>;
+}
+
+/** Saga definition factory accepted by trigger plugin integrations. */
+export type TriggersDefineSaga = (id: string) => unknown;
+
+/** Runtime-safe metadata attached to trigger plugin manifests. */
+export type TriggersPluginMetadata = Readonly<Record<string, unknown>>;
+
+/** Plugin manifest shape needed by trigger dependency declarations. */
+export interface TriggersPluginDependencyManifest {
+  /** Plugin package name. */
+  readonly name: string;
+  /** Plugin semantic version. */
+  readonly version: string;
+  /** Human-readable plugin description. */
+  readonly description?: string;
+  /** Display name used by hosts. */
+  readonly displayName?: string;
+  /** Plugin category. */
+  readonly type?: string;
+  /** Plugin author. */
+  readonly author?: string;
+  /** Plugin license identifier. */
+  readonly license?: string;
+  /** Plugin discovery tags. */
+  readonly tags?: readonly string[];
+  /** Runtime permissions requested by the plugin. */
+  readonly permissions?: readonly string[];
+  /** Runtime-safe plugin metadata. */
+  readonly metadata?: TriggersPluginMetadata;
+  /** Contribution groups registered by the plugin. */
+  readonly contributions?: Readonly<Record<string, unknown>>;
+  /** Typed plugin dependencies. */
+  readonly dependencies?: Readonly<Record<string, TriggersPluginDependencyManifest>>;
+}
+
+/** Service contribution shape exposed by the triggers manifest. */
+export interface TriggersPluginServiceContribution {
+  /** Logical service name. */
+  readonly name: string;
+  /** Service entrypoint path. */
+  readonly entrypoint: string;
+  /** Optional service port. */
+  readonly port?: number;
+}
 
 const TRIGGERS_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -24,35 +85,37 @@ const TRIGGERS_SERVICE_PERMISSIONS = [
 
 /** Type-only sibling-core capabilities consumed by trigger actions and adapters. */
 export type TriggersPluginCoreDependencies = Readonly<{
-  workersCore: Readonly<{ job: JobDefinition }>;
-  streamsCore: Readonly<{ producer: StreamProducerPort }>;
-  sagasCore: Readonly<{ defineSaga: typeof defineSaga }>;
+  workersCore: Readonly<{ job: TriggersWorkerJobDefinition }>;
+  streamsCore: Readonly<{ producer: TriggersStreamProducerPort }>;
+  sagasCore: Readonly<{ defineSaga: TriggersDefineSaga }>;
 }>;
 
 /** Typed plugin dependency manifests for sibling core packages. */
 export type TriggersPluginDependencies = Readonly<
-  Record<string, PluginManifest> & {
-    workersCore: PluginManifest;
-    streamsCore: PluginManifest;
-    sagasCore: PluginManifest;
+  Record<string, TriggersPluginDependencyManifest> & {
+    workersCore: TriggersPluginDependencyManifest;
+    streamsCore: TriggersPluginDependencyManifest;
+    sagasCore: TriggersPluginDependencyManifest;
   }
 >;
 
 /** Public contribution groups exposed by the triggers plugin. */
 export interface TriggersPluginContributions {
   /** Trigger HTTP API and ingress service contribution. */
-  readonly services?: readonly ServiceContribution[];
+  readonly services?: readonly TriggersPluginServiceContribution[];
   /** Contract versions exposed by the triggers API. */
   readonly contractVersions?: readonly { version: string; loader: string }[];
   /** Runtime config topic contribution for trigger registry ownership. */
   readonly runtimeConfigTopics?: readonly { name: string; schemaPath: string }[];
+  /** End-to-end gate contributions exposed by the plugin manifest. */
+  readonly e2e?: readonly { name: string; command: string }[];
   /** Aspire contribution module reference. */
   readonly aspire?: string;
 }
 
 /** Public manifest shape for the triggers plugin. */
 export interface TriggersPluginManifest
-  extends Omit<PluginManifest, 'dependencies' | 'contributions'> {
+  extends Omit<TriggersPluginDependencyManifest, 'dependencies' | 'contributions'> {
   /** Declared typed plugin dependencies. */
   readonly dependencies: TriggersPluginDependencies;
   /** Declared contribution axes. */
@@ -71,7 +134,7 @@ export interface TriggersPluginInspection {
   readonly axes: readonly string[];
 }
 
-const triggersPluginDependencies: TriggersPluginDependencies = Object.freeze({
+const triggersPluginDependencies = Object.freeze({
   workersCore: definePlugin('@netscript/plugin-workers-core', '0.0.1-alpha.0').build(),
   streamsCore: definePlugin('@netscript/plugin-streams-core', '0.0.1-alpha.0').build(),
   sagasCore: definePlugin('@netscript/plugin-sagas-core', '0.0.1-alpha.0').build(),
@@ -98,6 +161,10 @@ const triggersManifest: PluginManifest = definePlugin(
   .withRuntimeConfigTopics([
     { name: TRIGGERS_PLUGIN_ID, schemaPath: './runtime/triggers.schema.json' },
   ])
+  .withE2e([{
+    name: 'triggers-health',
+    command: 'deno task triggers:e2e',
+  }])
   .withAspire('./src/aspire/mod.ts')
   .withHooks({
     setup: (ctx): void => {

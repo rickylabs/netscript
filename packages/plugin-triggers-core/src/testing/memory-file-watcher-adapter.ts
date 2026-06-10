@@ -8,7 +8,8 @@ import type {
 } from '../domain/mod.ts';
 import type { FileWatcherHandle, FileWatcherPort } from '../ports/mod.ts';
 
-type FileWatchHandler = (event: TriggerEvent<'file-watch'>) => Promise<void>;
+/** Handler invoked by the in-memory file watcher adapter. */
+export type FileWatchHandler = (event: TriggerEvent<'file-watch'>) => Promise<void>;
 type FileWatchRecord =
   & FileWatcherHandle
   & Readonly<{
@@ -22,10 +23,12 @@ export class MemoryFileWatcherAdapter implements FileWatcherPort {
   readonly #now: () => Date;
   #sequence = 0;
 
+  /** Create an in-memory file watcher with an optional clock hook. */
   constructor(options: Readonly<{ now?: () => Date }> = {}) {
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Register a file-watch definition and handler. */
   watch(
     definition: FileWatchDefinition<string, never, never>,
     handler: FileWatchHandler,
@@ -42,32 +45,39 @@ export class MemoryFileWatcherAdapter implements FileWatcherPort {
     return Promise.resolve(stripInternals(record));
   }
 
+  /** Remove a file watcher by trigger id. */
   unwatch(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#records.delete(id));
   }
 
+  /** List active file watchers. */
   list(): Promise<readonly FileWatcherHandle[]> {
     return Promise.resolve([...this.#records.values()].map(stripInternals));
   }
 
+  /** Get an active file watcher by trigger id. */
   get(id: TriggerId): Promise<FileWatcherHandle | undefined> {
     const record = this.#records.get(id);
     return Promise.resolve(record === undefined ? undefined : stripInternals(record));
   }
 
+  /** Pause an active file watcher. */
   pause(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#setPaused(id, true));
   }
 
+  /** Resume an active file watcher. */
   resume(id: TriggerId): Promise<boolean> {
     return Promise.resolve(this.#setPaused(id, false));
   }
 
+  /** Stop all active file watchers. */
   stop(): Promise<void> {
     this.#records.clear();
     return Promise.resolve();
   }
 
+  /** Emit a synthetic file-watch lifecycle event. */
   async emit(
     id: TriggerId,
     payload: Readonly<{

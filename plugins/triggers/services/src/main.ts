@@ -18,6 +18,72 @@ import { loadProjectTriggerDefinitions } from '../../src/runtime/project-trigger
 import { createRuntimeTriggerProcessor } from '../../src/runtime/trigger-runtime-processor.ts';
 import { createTriggersHttpRouter } from './router.ts';
 
+export {
+  TRIGGER_ACTION_KINDS,
+  TRIGGER_BACKFILL_POLICIES,
+  TRIGGER_DURABILITY_TIERS,
+  TRIGGER_EVENT_STATUSES,
+  TRIGGER_KINDS,
+  TRIGGER_RESERVED_KINDS,
+  TRIGGER_RUNTIME_KINDS,
+} from '@netscript/plugin-triggers-core/domain';
+export type {
+  CronExpression,
+  DeferAction,
+  EnqueueJobAction,
+  EnqueueJobOptions,
+  FileWatchDefinition,
+  FileWatchLifecycle,
+  FileWatchStabilityThreshold,
+  FileWatchTriggerPayload,
+  JobDefinition,
+  JobId,
+  ManualTriggerDefinition,
+  ManualTriggerPayload,
+  QueueTriggerDefinition,
+  QueueTriggerPayload,
+  RuntimeTriggerDefinition,
+  ScheduledTriggerDefinition,
+  ScheduledTriggerPayload,
+  ScheduledTriggerSpec,
+  StreamTriggerDefinition,
+  StreamTriggerPayload,
+  TriggerActionResult,
+  TriggerBackfillPolicy,
+  TriggerBackfillSpec,
+  TriggerCircuitBreakerSpec,
+  TriggerConcurrencySpec,
+  TriggerContext,
+  TriggerDeduplicationSpec,
+  TriggerDefinition,
+  TriggerDefinitionBase,
+  TriggerDurabilityTier,
+  TriggerEvent,
+  TriggerEventId,
+  TriggerEventStatus,
+  TriggerHandler,
+  TriggerId,
+  TriggerKind,
+  TriggerKnownKind,
+  TriggerPayload,
+  TriggerReservedKind,
+  TriggerRetryPolicy,
+  TriggerRuntimeKind,
+  WebhookDefinition,
+  WebhookId,
+  WebhookTriggerPayload,
+  WebhookVerifierKind,
+} from '@netscript/plugin-triggers-core/domain';
+export type {
+  ProcessableTriggerDefinition,
+  TriggerEventListOptions,
+  TriggerEventStorePort,
+  TriggerProcessorPort,
+  TriggerProcessorStopOptions,
+  TriggerProcessResult,
+} from '@netscript/plugin-triggers-core/ports';
+
+/** Options for the triggers HTTP ingress service. */
 export type TriggersServiceOptions = Readonly<{
   port?: number;
   definitions?: readonly ProcessableTriggerDefinition[];
