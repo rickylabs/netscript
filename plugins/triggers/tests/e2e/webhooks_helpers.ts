@@ -1,9 +1,9 @@
 import { assert, assertEquals, assertExists } from '@std/assert';
 
-export const TRIGGERS_API = Deno.env.get('TRIGGERS_API_URL') ?? 'http://localhost:8093';
-export const WEBHOOKS_BASE = `${TRIGGERS_API}/api/v1/webhooks`;
-export const REST_BASE = `${TRIGGERS_API}/api/v1/triggers`;
-export const EXPORT_WEBHOOK_SECRET = Deno.env.get('WEBHOOK_EXPORT_SECRET') ??
+export const TRIGGERS_API: string = Deno.env.get('TRIGGERS_API_URL') ?? 'http://localhost:8093';
+export const WEBHOOKS_BASE: string = `${TRIGGERS_API}/api/v1/webhooks`;
+export const REST_BASE: string = `${TRIGGERS_API}/api/v1/triggers`;
+export const EXPORT_WEBHOOK_SECRET: string = Deno.env.get('WEBHOOK_EXPORT_SECRET') ??
   'dev-export-secret-change-me';
 
 export function webhookE2eEnabled(): boolean {
