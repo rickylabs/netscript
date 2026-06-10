@@ -1,0 +1,121 @@
+{
+  "at": "dfab7a4",
+  "measuredAt": "2026-06-10T14:21:16.431Z",
+  "results": {
+    "service": {
+      "entrypoints": 1,
+      "entrypointList": [
+        "./mod.ts"
+      ],
+      "dryRun": {
+        "exit": 1,
+        "slowTypeHits": 11
+      },
+      "docLintCombined": {
+        "exit": 1,
+        "diagnostics": 0,
+        "privateTypeRefish": 14
+      },
+      "docLintBarrel": {
+        "exit": 1,
+        "diagnostics": 0
+      },
+      "check": {
+        "exit": 0
+      },
+      "testFiles": 0
+    },
+    "sdk": {
+      "entrypoints": 12,
+      "entrypointList": [
+        "./mod.ts",
+        "./adapters/mod.ts",
+        "./cache/mod.ts",
+        "./client/mod.ts",
+        "./collections/mod.ts",
+        "./discovery/mod.ts",
+        "./interfaces/mod.ts",
+        "./openapi/mod.ts",
+        "./query/mod.ts",
+        "./query-client/mod.ts",
+        "./streams.ts",
+        "./telemetry/mod.ts"
+      ],
+      "dryRun": {
+        "exit": 1,
+        "slowTypeHits": 5
+      },
+      "docLintCombined": {
+        "exit": 1,
+        "diagnostics": 0,
+        "privateTypeRefish": 9
+      },
+      "docLintBarrel": {
+        "exit": 1,
+        "diagnostics": 0
+      },
+      "check": {
+        "exit": 0
+      },
+      "testFiles": 0
+    },
+    "fresh-ui": {
+      "entrypoints": 2,
+      "entrypointList": [
+        "./mod.ts",
+        "./interactive.ts"
+      ],
+      "dryRun": {
+        "exit": 1,
+        "slowTypeHits": 9
+      },
+      "docLintCombined": {
+        "exit": 0,
+        "diagnostics": 0,
+        "privateTypeRefish": 0
+      },
+      "docLintBarrel": {
+        "exit": 0,
+        "diagnostics": 0
+      },
+      "check": {
+        "exit": 0
+      },
+      "testFiles": 8
+    },
+    "fresh": {
+      "entrypoints": 12,
+      "entrypointList": [
+        "./mod.ts",
+        "./server.ts",
+        "./builders/mod.ts",
+        "./route/mod.ts",
+        "./defer/mod.ts",
+        "./form/mod.ts",
+        "./error/mod.ts",
+        "./utils/mod.ts",
+        "./streams/mod.ts",
+        "./query/mod.ts",
+        "./interactive.ts",
+        "./config/vite.ts"
+      ],
+      "dryRun": {
+        "exit": 1,
+        "slowTypeHits": 7
+      },
+      "docLintCombined": {
+        "exit": 1,
+        "diagnostics": 0,
+        "privateTypeRefish": 115
+      },
+      "docLintBarrel": {
+        "exit": 1,
+        "diagnostics": 0
+      },
+      "check": {
+        "exit": 0
+      },
+      "testFiles": 12
+    }
+  }
+}

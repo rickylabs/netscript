@@ -6,20 +6,26 @@ PR target: `feat/package-quality` (the S1 track) — merges **once**, at full Wa
 Role: SUPERVISOR-authored umbrella/tracking + architectural pre-research. **Not** a PLAN-EVAL or
 IMPL-EVAL artifact. The locked slice authority is each sub-wave `plan.md` once written.
 
-## ⛔ STATUS: PREPARED — PLAN-LOCK BLOCKED ON WAVE 4
+## ✅ STATUS: UNBLOCKED — RECONCILED @ `dfab7a4` (2026-06-10). READY TO OPEN 5a.
 
-Research is done (`research.md`, `split-strategy.md`). **Do not open sub-branches or lock any
-plan yet.** Wave 5's stream surfaces couple to Wave 4's streams package, and `fresh` composes the
-Wave 3/4 plugin surface. Gate sequence:
+Wave 4 is **merged to the track** (closeout PR #16 → `f0e1441`; all sub-waves 4a/4b/4c/4d
+IMPL-EVAL PASS, separate sessions). The track has been **reconciled into this umbrella**
+(`dfab7a4`, merge clean — no conflicts) and the apps layer was **re-baselined against the merged
+surface** (`research.md` §0.5, `wave5-rebaseline.json` + `wave5-doclint.json`). Gate sequence:
 
-1. **Now (done):** umbrella branch + worktree + this seed + Draft PR (marked BLOCKED).
-2. **Wait:** Wave 4 (runtimes/plugins) IMPL-EVAL PASS + merged to the track. (Wave 4 itself waits
-   on Wave 3.)
-3. **Reconcile (extra Claude pass):** merge the track into this umbrella, then re-run the
-   cross-package consumer scan (`apps/playground`, `services/`, `@netscript/*`) against the merged
-   surface; confirm the `fresh/streams`+`sdk/streams` surfaces vs the merged Wave 4 streams
-   package; update this seed + `split-strategy.md`.
-4. **Then:** open sub-wave **5a** (service). Plan & Design per sub-wave from there.
+1. ✅ umbrella branch + worktree + seed + Draft PR.
+2. ✅ Wave 4 IMPL-EVAL PASS + merged to track (`f0e1441`; 4d verdict committed `bc17fe3`).
+3. ✅ **Reconcile (this pass):** track merged into umbrella (`dfab7a4`); cross-package consumer
+   scan + stream coupling re-confirmed against the merged Wave 4 streams surface; re-baseline
+   recorded. **Headline unchanged:** 328 doc-lint / 138 private-type-ref / all 4 dry-run FAIL —
+   but **all 4 now PASS `deno check`** on the merged surface + blessed lock.
+4. ▶️ **NOW:** open sub-wave **5a** (service). Plan & Design + separate PLAN-EVAL/IMPL-EVAL per
+   sub-wave from here. (This is the next generator's job — supervisor stops at unblock + re-baseline.)
+
+> **Tooling note (Wave 4 tail):** `.llm/tools/parse-deno-check-errors.ts` was **removed**; the
+> scoped `deno check` runner/parser is now `.llm/tools/run-deno-check.ts` (root `check`/`lint`/
+> `fmt:check` use scoped wrappers that exclude Wave 5 app packages + Wave 6 CLI debt). Doctrine
+> gained F-19. Use `run-deno-check.ts`, not the old path.
 
 ## Scope — 4 publishable units
 
@@ -92,7 +98,10 @@ Umbrella merges once at full completeness.
    fixes precede doc-lint work.
 2. **138 private-type-ref** — each is a surface decision (export the type vs change the signature);
    weigh against F-16. Do not blanket-export.
-3. **`fresh/streams` + `sdk/streams`** couple to Wave 4 streams — lock after reconciliation.
+3. **`fresh/streams` + `sdk/streams`** couple to Wave 4 streams — **reconcile done** (`dfab7a4`);
+   the merged `@netscript/plugin-streams(-core)` surface is now in-tree and all 4 app packages
+   `deno check` PASS against it. 27 `fresh` files reference sdk/streams/plugin surfaces (consumer
+   scan). Lock the exact stream surface decision at the 5d-4 sub-wave plan.
 4. **`@netscript/ui-primitives`** is RFC-deferred — do NOT create it.
 5. **Zero-consumer rule** — grep playground/services/packages before any removal; no shims in
    alpha, but no silent playground breakage.

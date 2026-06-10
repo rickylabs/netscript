@@ -3,6 +3,11 @@
 Umbrella: `feat/package-quality-wave5-apps` → track `feat/package-quality` (merges **once**, at
 full Wave 5 completeness). Sub-branches fork off the prior sub-wave's merge into the umbrella.
 
+> **UNBLOCKED @ `dfab7a4`** (2026-06-10): Wave 4 merged to track (`f0e1441`), reconciled into this
+> umbrella, re-baseline confirmed (`research.md` §0.5 — 328 doc-lint / 138 ptr unchanged; all 4
+> `deno check` PASS). 5a (service) is ready to open. The `fresh` 5d cut below is still a proposal —
+> the generator re-measures per-cluster doc-lint at MEASURE-FIRST and the Plan Gate confirms it.
+
 > Authority: this is the SUPERVISOR proposal. The **locked** slice authority is each sub-wave
 > `plan.md` once written + PLAN-EVAL'd. The `fresh` internal split is decided at its Plan Gate
 > from the generator's MEASURE-FIRST doc-lint budget, not here.

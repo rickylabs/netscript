@@ -1,9 +1,10 @@
 # Wave 5 — Apps Layer (sdk · service · fresh · fresh-ui) — Architectural Research
 
 Run ID: `feat-package-quality-wave5-apps--umbrella`
-Umbrella branch: `feat/package-quality-wave5-apps` (off track `feat/package-quality` @ `9b27fb4`)
+Umbrella branch: `feat/package-quality-wave5-apps` (off track `feat/package-quality`; reconciled
+@ `dfab7a4` with Wave 4 merged — was `9b27fb4`)
 Author: SUPERVISOR pre-research (read-only). **Not** a PLAN-EVAL/IMPL-EVAL artifact.
-Status: **PREPARED — PLAN-LOCK BLOCKED ON WAVE 4** (see `context-pack.md`).
+Status: **UNBLOCKED — RECONCILED @ `dfab7a4`, re-baselined (§0.5). Ready to open 5a** (see `context-pack.md`).
 
 > This is the architect's pass the user asked for: not JSR cleanup, but a re-architecture
 > brief. Wave 5 is the **last wave before CLI (Wave 6)** and the **most RFC-laden, least
@@ -38,6 +39,43 @@ publish errors, 2 packages with 0 tests, 1 with no README, 0/4 with `docs/`, 0/4
 
 `fresh` alone = **57% of the LOC, 84% of the doc-lint debt, 65% of the over-cap files.** It is
 the largest single restructure on the entire S1 board.
+
+---
+
+## §0.5. RECONCILIATION RE-BASELINE — measured at `dfab7a4` (Wave 4 merged, 2026-06-10)
+
+Wave 4 closed out to the track (PR #16 → `f0e1441`; 4d IMPL-EVAL PASS committed `bc17fe3`) and the
+track was reconciled into this umbrella (`dfab7a4`, clean merge). The 4 app packages were
+**re-measured against the merged surface + blessed `deno.lock`** (otel 1.40→1.28 + esbuild/preact/
+loader). Raw `deno` spawned directly (RTK-bypassed); see `wave5-rebaseline.json` + `wave5-doclint.json`.
+
+| Pkg | eps | dry-run | `deno check` | doc-lint (combined, **ground truth**) | ptr / ret / jsdoc | barrel-only mod.ts | tests |
+|-----|----:|---------|--------------|--------------------------------------:|-------------------|-------------------:|------:|
+| `service`  | 1  | **FAIL** | ✅ **PASS** | **23** | 14 / 8 / 1   | 23  | 0  |
+| `sdk`      | 12 | **FAIL** | ✅ **PASS** | **29** | 9 / 2 / 18   | 20  | 0  |
+| `fresh-ui` | 2  | **FAIL** | ✅ **PASS** | **0** (clean) | 0 / 0 / 0 | 0 | 8  |
+| `fresh`    | 12 | **FAIL** | ✅ **PASS** | **276** | 115 / 4 / 157 | 23 | 12 |
+
+**Totals: 328 doc-lint / 138 private-type-ref** — **identical** to the `9b27fb4` baseline (the apps
+layer was untouched by Wave 4, as expected). What the reconcile *changed*:
+
+1. **All 4 now PASS `deno check --unstable-kv`** against the merged Wave 4 plugin surface + blessed
+   lock. The merge introduced **no new type breakage** in the app layer. (dry-run still RED on all 4
+   — slow types are the F-6 work, not type errors.)
+2. **Barrel-vs-combined gap is live and large** — `fresh` root `mod.ts` reports **23** vs the
+   12-entrypoint combined **276**; `sdk` **20** vs **29**. The **combined run over every `exports`
+   entrypoint is ground truth**; root-barrel undercounts by 253 (fresh) / 9 (sdk). The generator
+   must lint the combined entrypoint set, *and* also run the full-barrel `mod.ts` independently to
+   catch merged-graph leaks the per-EP run misses (the 4c `SagaCorrelation` trap, `lessons/validation.md`).
+3. **Stream coupling confirmed:** 27 `fresh` files reference `sdk`/`streams`/`plugin-streams`
+   surfaces; all resolve + `deno check` PASS against the merged `@netscript/plugin-streams(-core)`.
+   The exact stream public-surface decision is locked at the **5d-4** sub-wave plan.
+4. **Tooling drift:** `.llm/tools/parse-deno-check-errors.ts` removed → use `.llm/tools/run-deno-check.ts`
+   (scoped runner/parser; root gates exclude Wave 5 apps + Wave 6 CLI debt). Doctrine gained **F-19**.
+
+Slow-type *counts* per package were not re-extracted cleanly (dry-run summary phrasing varies); the
+exit code (RED on all 4) is the gate fact. The generator re-measures exact slow-type + per-cluster
+doc-lint at MEASURE-FIRST before locking effort (the `fresh` internal split depends on it).
 
 ---
 
