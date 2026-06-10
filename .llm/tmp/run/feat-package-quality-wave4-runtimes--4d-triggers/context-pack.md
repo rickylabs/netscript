@@ -126,3 +126,14 @@ F-5 trim; `@ignore` only for genuinely-internal incidental refs.
 4d merges into the umbrella after IMPL-EVAL PASS. **4d is the last sub-wave** — on its merge the
 supervisor brings the umbrella to full-wave completeness and merges the umbrella → track
 `feat/package-quality` (`--no-ff`).
+
+## D23 generator status
+
+- Trigger-family implementation gates are green after D23 fixes: combined doc-lint, full-barrel
+  doc-lint, unit checks/tests, both publish dry-runs, doctests, consumer-import, scoped trigger
+  lint/fmt, and the full `scaffold.runtime` suite all pass.
+- Runtime evidence anchor is fresh: `deno task e2e:cli run scaffold.runtime --cleanup --format
+  pretty` passed 41/41, including `behavior.triggers-health`.
+- Do **not** treat the branch as READY FOR IMPL-EVAL yet without supervisor/evaluator direction:
+  raw root `deno lint --json` and raw root `deno fmt --check` fail on inherited repo-wide debt
+  outside the 4d trigger scope. See `drift.md` D23 significant row for counts.

@@ -54,3 +54,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 03fce94: docs(triggers-core): add D21 package docs tree
 - 11b121a: docs(wave4): record D21 core docs evidence
 - 7f96e92: docs(triggers): add D22 plugin docs tree
+- a5ff553: docs(wave4): record D22 plugin docs evidence
+- fd300c3: fix(triggers): close D23 final validation findings

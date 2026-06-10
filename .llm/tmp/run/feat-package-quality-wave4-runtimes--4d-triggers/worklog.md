@@ -491,3 +491,38 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | None. |
 | Commits | Implementation `7f96e92`; paired docs/evidence pending. |
+
+### Slice 23/23 — D23 final validation sweep
+
+| Field | Evidence |
+|-------|----------|
+| Unit | combined triggers family |
+| Archetype | A3 Runtime/Behavior + A5 Plugin Package |
+| Changed | Fixed final validation findings: trigger-owned lint cleanup, generated contract compatibility for the scaffold runtime suite, and a scoped consumer-import artifact for trigger public barrels. |
+| Gate(s) | Combined doc-lint, full-barrel doc-lint, check, tests, publish dry-run, doctests, consumer-import, runtime health, raw lint/fmt |
+| Gate command | `deno doc --lint mod.ts src/adapters/mod.ts src/builders/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/domain/mod.ts src/ports/mod.ts src/public/mod.ts src/runtime/mod.ts src/telemetry/mod.ts src/testing/mod.ts` from `packages/plugin-triggers-core` |
+| Gate result | PASS, exit 0; output `Checked 11 files`. |
+| Gate command | `deno doc --lint mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 10 files`; inherited Fedify npm type-resolution warnings only. |
+| Gate command | `deno doc --lint mod.ts` from each unit |
+| Gate result | PASS, exit 0; output `Checked 1 file` for core and plugin full barrels. |
+| Gate command | `deno task check` from each unit |
+| Gate result | PASS, exit 0; core checked 11 entrypoints and plugin checked 10 entrypoints with `--unstable-kv`. |
+| Gate command | `deno task test` from each unit |
+| Gate result | PASS, exit 0; core 13 passed / 0 failed; plugin 6 passed / 0 failed / 12 ignored. |
+| Gate command | `deno publish --dry-run --allow-dirty` from each unit |
+| Gate result | PASS, exit 0; both dry-runs completed with 0 slow types. Plugin emitted the known non-failing dynamic-import warnings in CLI/runtime loaders. |
+| Gate command | `deno test --doc --unstable-kv packages/plugin-triggers-core/docs/README.md plugins/triggers/docs/README.md` from repo root |
+| Gate result | PASS, exit 0; 2 doctests passed / 0 failed. |
+| Gate command | `deno check --unstable-kv .llm/tmp/run/feat-package-quality-wave4-runtimes--4d-triggers/consumer-triggers-surface.ts` from repo root |
+| Gate result | PASS, exit 0; trigger public barrels type-resolve for an external consumer. |
+| Gate command | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` from repo root |
+| Gate result | PASS on rerun, exit 0; 41 passed / 0 failed, including `behavior.triggers-health` in 6ms. First run exposed a generated trigger contract compatibility issue fixed in implementation commit `fd300c3`. |
+| Gate command | `deno lint packages/plugin-triggers-core plugins/triggers .llm/tmp/run/feat-package-quality-wave4-runtimes--4d-triggers/consumer-triggers-surface.ts` from repo root |
+| Gate result | PASS, exit 0; checked 109 trigger-owned files. |
+| Gate command | `deno fmt --check` from repo root |
+| Gate result | FAIL, exit 1; inherited repo-wide formatting drift affects 2,143 files. D23-touched files pass scoped `deno fmt --check` (14 files). |
+| Gate command | `deno lint --json` from repo root |
+| Gate result | FAIL, exit 1; inherited repo-wide lint debt reports 6,093 diagnostics outside trigger-owned files after D23 cleanup. |
+| Drift | Significant drift row recorded for raw root lint/fmt blocker; info row recorded for generated contract compatibility fix. |
+| Commits | Implementation `fd300c3`; paired docs/evidence pending. |
