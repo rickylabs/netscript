@@ -44,3 +44,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - da10d52: chore(triggers): validate D16 stream scaffolding docs
 - 0feabec: docs(wave4): record D16 stream scaffolding evidence
 - c2df49a: test(triggers): split D17 webhook e2e concepts
+- d33e07c: docs(wave4): record D17 e2e split evidence
+- fb25c72: test(triggers): add D18 manifest verification

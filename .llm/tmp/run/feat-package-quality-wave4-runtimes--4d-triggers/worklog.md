@@ -381,4 +381,25 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Info row recorded: plan table named three split test files; the user instruction also required four files under `tests/e2e`, so D17 added a shared helper module as the fourth file to avoid duplication. |
-| Commits | Implementation `c2df49a`; paired docs/evidence pending. |
+| Commits | Implementation `c2df49a`; paired docs/evidence `d33e07c`. |
+
+### Slice 18/23 — D18 A5 manifest verification test layer
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | Added `verify-plugin.ts` with package-owned `{ ok, inspection, findings }` verification and CLI exit semantics; added `tests/public/manifest_test.ts` covering manifest name/version/type, core dependency aliases, service, contract, runtime-config, Aspire, `inspectTriggers()`, and verifier output. |
+| Gate(s) | F-10 test-shape audit |
+| Gate command | `deno fmt --check plugins/triggers/verify-plugin.ts plugins/triggers/tests/public/manifest_test.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 2 files`. |
+| Gate command | `deno check --unstable-kv plugins/triggers/verify-plugin.ts plugins/triggers/tests/public/manifest_test.ts` from repo root |
+| Gate result | PASS, exit 0; both new D18 files checked. |
+| Gate command | `deno run --unstable-kv plugins/triggers/verify-plugin.ts` from repo root |
+| Gate result | PASS, exit 0; JSON result `{ "ok": true, "findings": [] }` with `contributionGroups: 4`. |
+| Gate command | `deno test --allow-all --unstable-kv plugins/triggers/tests/public/manifest_test.ts` from repo root |
+| Gate result | PASS, exit 0; 1 passed / 0 failed. |
+| Gate command | `deno task test` from `plugins/triggers` |
+| Gate result | PASS, exit 0; 1 passed / 0 failed / 12 ignored; package test task discovered the new public manifest test plus gated webhook E2E files. |
+| Drift | None. |
+| Commits | Implementation `fb25c72`; paired docs/evidence pending. |
