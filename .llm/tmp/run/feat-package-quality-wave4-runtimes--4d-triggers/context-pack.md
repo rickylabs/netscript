@@ -7,7 +7,7 @@ PR target: the **umbrella** (NOT the track).
 Role: SUPERVISOR-authored seed + pre-research. Locked slice authority = this sub-wave's
 `plan.md` once PLAN-EVAL-approved.
 
-## STATUS: IMPLEMENT IN PROGRESS — D19 COMPLETE, D20 NEXT
+## STATUS: IMPLEMENT IN PROGRESS — D20 COMPLETE, D21 NEXT
 
 The plan is locked and PLAN-EVAL passed in a separate session (`plan-eval.md`, commit `bb985d0`).
 Implementation is proceeding in the approved 23-slice order. 4d is the **last** sub-wave of Wave 4:
@@ -36,8 +36,9 @@ to track `feat/package-quality`.
 | D16 | COMPLETE | Plugin streams/scaffolding/constants JSDoc residual validation. Raw `deno doc --lint` PASS exit 0 for `streams/mod.ts`, `streams/server.ts`, `src/scaffolding/mod.ts`, and `src/constants.ts`; scoped `deno fmt --check` PASS exit 0; raw `deno task check` PASS exit 0. Implementation marker commit `da10d52`; docs commit `0feabec`. |
 | D17 | COMPLETE | F-1 split `test-webhooks-e2e.ts` into focused e2e files. New files under `tests/e2e`: helpers 69 LOC, health 19, ingress 102, security 73. Raw `deno check --unstable-kv tests/e2e/*.ts` PASS exit 0; `deno test --allow-net --allow-env --unstable-kv tests/e2e` PASS exit 0 with 12 ignored unless `NETSCRIPT_RUN_WEBHOOK_E2E=1`; raw `deno task check` PASS exit 0. Implementation commit `c2df49a`; docs commit `d33e07c`. |
 | D18 | COMPLETE | A5 manifest verification layer: `verify-plugin.ts` returns `{ ok, inspection, findings }` and exits 0/1 as main; `tests/public/manifest_test.ts` covers public manifest axes and verifier output. Raw `deno check --unstable-kv` PASS exit 0; direct verifier run PASS exit 0 with `ok: true`; direct manifest test PASS exit 0 with 1 passed / 0 failed; package `deno task test` PASS exit 0 with 1 passed / 0 failed / 12 ignored. Implementation commit `fb25c72`; docs commit `f54d787`. |
-| D19 | COMPLETE | A5 CLI contribution test added in `tests/cli/cli_test.ts`. Raw `deno fmt --check` PASS exit 0, raw `deno check --unstable-kv` PASS exit 0, direct CLI test PASS exit 0 with 3 passed / 0 failed, and package `deno task test` PASS exit 0 with 4 passed / 0 failed / 12 ignored. Implementation commit `27083c9`. |
-| D20 | NEXT | A5 test layer: Aspire contribution test and E2E gate manifest test. |
+| D19 | COMPLETE | A5 CLI contribution test added in `tests/cli/cli_test.ts`. Raw `deno fmt --check` PASS exit 0, raw `deno check --unstable-kv` PASS exit 0, direct CLI test PASS exit 0 with 3 passed / 0 failed, and package `deno task test` PASS exit 0 with 4 passed / 0 failed / 12 ignored. Implementation commit `27083c9`; docs commit `dd72ad5`. |
+| D20 | COMPLETE | A5 Aspire/E2E gate test layer added. Manifest now declares `triggers-health` via `withE2e` and package task `triggers:e2e`; Aspire test covers API/processor resources, wait-for, env, and health checks. Raw `deno check --unstable-kv` PASS exit 0; direct D20 tests PASS exit 0 with 3 passed / 0 failed; package `deno task test` PASS exit 0 with 6 passed / 0 failed / 12 ignored; `deno task triggers:e2e` PASS exit 0 with 1 passed / 0 failed / 12 ignored; `deno task check` PASS exit 0. Implementation commit `972783d`. |
+| D21 | NEXT | F-7 core docs tree under `packages/plugin-triggers-core/docs/`. |
 
 ## Scope — 2 publishable units + the health seam (OQ-D resolved: in-scope here)
 

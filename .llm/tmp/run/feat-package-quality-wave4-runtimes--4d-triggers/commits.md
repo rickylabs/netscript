@@ -48,3 +48,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - fb25c72: test(triggers): add D18 manifest verification
 - f54d787: docs(wave4): record D18 manifest verification evidence
 - 27083c9: test(triggers): add D19 cli contribution coverage
+- dd72ad5: docs(wave4): record D19 cli contribution evidence
+- 972783d: test(triggers): add D20 aspire and e2e gate coverage

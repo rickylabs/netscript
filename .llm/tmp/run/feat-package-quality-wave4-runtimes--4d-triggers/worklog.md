@@ -421,4 +421,31 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task test` from `plugins/triggers` |
 | Gate result | PASS, exit 0; 4 passed / 0 failed / 12 ignored across CLI, public manifest, and gated webhook E2E files. |
 | Drift | None. |
-| Commits | Implementation `27083c9`; paired docs/evidence pending. |
+| Commits | Implementation `27083c9`; paired docs/evidence `dd72ad5`. |
+
+### Slice 20/23 — D20 A5 Aspire and E2E gate tests
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | Added `tests/aspire/aspire_test.ts` for `TriggersAspireContribution` resources, wait-for edge, env, and health check declarations. Added `tests/e2e/e2e-gates_test.ts`. Completed the planned manifest gate by adding `withE2e([{ name: "triggers-health", command: "deno task triggers:e2e" }])`, adding a resolvable `triggers:e2e` task, and updating `verify-plugin.ts` plus `tests/public/manifest_test.ts` to assert the e2e axis. |
+| Gate(s) | F-10 test-shape audit; Runtime/Aspire validation anchor |
+| Gate command | `deno fmt --check plugins/triggers/deno.json plugins/triggers/src/public/mod.ts plugins/triggers/verify-plugin.ts plugins/triggers/tests/public/manifest_test.ts plugins/triggers/tests/aspire/aspire_test.ts plugins/triggers/tests/e2e/e2e-gates_test.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 6 files` after targeted `deno fmt` corrected line endings/import ordering. |
+| Gate command | `deno check --unstable-kv plugins/triggers/src/public/mod.ts plugins/triggers/verify-plugin.ts plugins/triggers/tests/public/manifest_test.ts plugins/triggers/tests/aspire/aspire_test.ts plugins/triggers/tests/e2e/e2e-gates_test.ts` from repo root |
+| Gate result | PASS, exit 0; changed public manifest, verifier, and D20 tests checked. |
+| Gate command | `deno doc --lint src/public/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`, proving the manifest e2e contribution did not regress doc-lint. |
+| Gate command | `deno run --unstable-kv plugins/triggers/verify-plugin.ts` from repo root |
+| Gate result | PASS, exit 0; JSON result `{ "ok": true, "findings": [] }` with `contributionGroups: 5`. |
+| Gate command | `deno test --allow-all --unstable-kv plugins/triggers/tests/aspire/aspire_test.ts plugins/triggers/tests/e2e/e2e-gates_test.ts plugins/triggers/tests/public/manifest_test.ts` from repo root |
+| Gate result | PASS, exit 0; 3 passed / 0 failed. |
+| Gate command | `deno task test` from `plugins/triggers` |
+| Gate result | PASS, exit 0; 6 passed / 0 failed / 12 ignored. |
+| Gate command | `deno task triggers:e2e` from `plugins/triggers` |
+| Gate result | PASS, exit 0; manifest command resolved; 1 passed / 0 failed / 12 ignored because live webhook probes remain gated unless `NETSCRIPT_RUN_WEBHOOK_E2E=1`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | Info row recorded: D20 added the manifest `e2e` contribution and task required by the locked E2E-gate test expectation. |
+| Commits | Implementation `972783d`; paired docs/evidence pending. |
