@@ -68,7 +68,7 @@ function parseCsv(
 
 const handler = defineJobHandler(async (ctx) => {
   const payload = FileImportPayloadSchema.parse(ctx.payload ?? {});
-  const { log, progress, trace, traceContext } = createJobTools(ctx);
+  const { log, progress, trace } = createJobTools(ctx);
   const { filePath, fileName, contentHash, format, sagaMessageType, csvDelimiter } = payload;
 
   log.info('Starting file import', { filePath, fileName, format });

@@ -1,4 +1,4 @@
-import type { TriggerEvent, TriggerEventId, TriggerEventStatus, TriggerId } from '../domain/mod.ts';
+import type { TriggerEvent, TriggerEventId, TriggerEventStatus } from '../domain/mod.ts';
 import type { TriggerEventListOptions, TriggerEventStorePort } from '../ports/mod.ts';
 
 /** In-memory trigger event store for deterministic tests. */

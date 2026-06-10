@@ -1,7 +1,6 @@
 import type {
   FileWatchDefinition,
   ScheduledTriggerDefinition,
-  TriggerDefinition,
 } from '@netscript/plugin-triggers-core/domain';
 import type {
   FileWatcherPort,
