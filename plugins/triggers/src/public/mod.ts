@@ -107,6 +107,8 @@ export interface TriggersPluginContributions {
   readonly contractVersions?: readonly { version: string; loader: string }[];
   /** Runtime config topic contribution for trigger registry ownership. */
   readonly runtimeConfigTopics?: readonly { name: string; schemaPath: string }[];
+  /** End-to-end gate contributions exposed by the plugin manifest. */
+  readonly e2e?: readonly { name: string; command: string }[];
   /** Aspire contribution module reference. */
   readonly aspire?: string;
 }
@@ -159,6 +161,10 @@ const triggersManifest: PluginManifest = definePlugin(
   .withRuntimeConfigTopics([
     { name: TRIGGERS_PLUGIN_ID, schemaPath: './runtime/triggers.schema.json' },
   ])
+  .withE2e([{
+    name: 'triggers-health',
+    command: 'deno task triggers:e2e',
+  }])
   .withAspire('./src/aspire/mod.ts')
   .withHooks({
     setup: (ctx): void => {

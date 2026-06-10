@@ -70,6 +70,14 @@ export function verifyTriggersPlugin(): TriggersPluginVerificationResult {
     findings.push('expected the triggers runtime config topic contribution');
   }
 
+  if (
+    triggersPlugin.contributions.e2e?.some((gate) =>
+      gate.name === 'triggers-health' && gate.command === 'deno task triggers:e2e'
+    ) !== true
+  ) {
+    findings.push('expected the triggers-health E2E contribution');
+  }
+
   if (triggersPlugin.contributions.aspire !== './src/aspire/mod.ts') {
     findings.push('expected the triggers Aspire contribution module');
   }

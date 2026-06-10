@@ -34,16 +34,27 @@ Deno.test('triggersPlugin manifest exposes core dependencies, service, contract,
       topic.name === TRIGGERS_PLUGIN_ID && topic.schemaPath === './runtime/triggers.schema.json'
     ),
   );
+  assert(
+    triggersPlugin.contributions.e2e?.some((gate) =>
+      gate.name === 'triggers-health' && gate.command === 'deno task triggers:e2e'
+    ),
+  );
   assertEquals(triggersPlugin.contributions.aspire, './src/aspire/mod.ts');
 
   const inspection = inspectTriggers();
   assertEquals(inspection.name, '@netscript/plugin-triggers');
   assertEquals(inspection.version, TRIGGERS_PLUGIN_VERSION);
   assertEquals(inspection.dependencies, ['workersCore', 'streamsCore', 'sagasCore']);
-  assertEquals(inspection.axes, ['services', 'contractVersions', 'runtimeConfigTopics', 'aspire']);
+  assertEquals(inspection.axes, [
+    'services',
+    'contractVersions',
+    'runtimeConfigTopics',
+    'e2e',
+    'aspire',
+  ]);
 
   const verification = verifyTriggersPlugin();
   assertEquals(verification.ok, true);
   assertEquals(verification.findings, []);
-  assertEquals(verification.inspection.details.contributionGroups, 4);
+  assertEquals(verification.inspection.details.contributionGroups, 5);
 });

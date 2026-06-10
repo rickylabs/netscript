@@ -48,6 +48,7 @@
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --allow-all --unstable-kv",
+    "triggers:e2e": "deno test --allow-net --allow-env --unstable-kv tests/e2e",
     "dev": "deno run --unstable-kv --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --unstable-kv --allow-net --allow-env --allow-read services/src/main.ts",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
