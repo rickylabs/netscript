@@ -38,3 +38,5 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 225e05c: fix(triggers): expose D13 service scaffolding contracts
 - 82b5b64: docs(wave4): record D13 service scaffolding evidence
 - 5d25e90: chore(triggers): validate D14 runtime docs
+- 8e67f02: docs(wave4): record D14 runtime docs evidence
+- de55dab: fix(triggers): document D15 cli surface

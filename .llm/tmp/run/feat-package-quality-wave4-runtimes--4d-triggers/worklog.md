@@ -318,4 +318,23 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate command | `deno task check` from `plugins/triggers` |
 | Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
 | Drift | Covered by D11 warn row: same-file D14 runtime JSDoc blockers were pulled forward to keep D11 raw doc-lint green. |
-| Commits | Implementation `5d25e90`; paired docs/evidence pending. |
+| Commits | Implementation `5d25e90`; paired docs/evidence `8e67f02`. |
+
+### Slice 15/23 — D15 plugin CLI JSDoc residual
+
+| Field | Evidence |
+|-------|----------|
+| Unit | `@netscript/plugin-triggers` |
+| Archetype | A5 Plugin Package |
+| Changed | `src/cli/mod.ts` now re-exports host CLI base/argument/result contracts needed by the full CLI barrel; local CLI backend/helper members gained remaining JSDoc required by raw CLI barrel doc-lint. |
+| Gate(s) | F-7 doc-score |
+| Gate command | `deno doc --lint src/cli/composition/main.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno doc --lint src/cli/mod.ts` from `plugins/triggers` |
+| Gate result | PASS, exit 0; output `Checked 1 file`. |
+| Gate command | `deno fmt --check plugins/triggers/src/cli/mod.ts plugins/triggers/src/cli/composition/main.ts plugins/triggers/src/cli/commands.ts plugins/triggers/src/cli/triggers-cli.ts plugins/triggers/src/cli/command-types.ts plugins/triggers/src/cli/triggers-cli-backend.ts plugins/triggers/src/cli/adapters/local-project-files.ts` from repo root |
+| Gate result | PASS, exit 0; output `Checked 7 files`. |
+| Gate command | `deno task check` from `plugins/triggers` |
+| Gate result | PASS, exit 0; all 10 plugin export entrypoints checked with `--unstable-kv`. |
+| Drift | None; this is D15's planned CLI JSDoc/barrel cleanup after D12 narrowed the composition entrypoint. |
+| Commits | Implementation `de55dab`; paired docs/evidence pending. |
