@@ -1,0 +1,65 @@
+# Worklog — Sub-wave 5a: `@netscript/service`
+
+## Bootstrap
+
+- Forked `feat/package-quality-wave5-apps-5a-service` from umbrella tip `09f4845`
+  (mandate said dfab7a4; 09f4845 = docs/handover commit atop it — drift D-1).
+- Worktree: `.worktrees/wave5-apps-5a-service`; run dir created.
+
+## Measure-first
+
+- `.llm/temp/measure-5a-service.ts` (raw deno via `Deno.Command`, bypasses rtk) →
+  `measure-5a.json`. check PASS; doc-lint 23 (14 ptr / 8 ret / 1 jsdoc); dry-run FAIL
+  = 8 slow-types + 6 excluded-module; 0 tests. Matches umbrella re-baseline exactly,
+  except excluded-module ×6 now root-caused to root `deno.json` exclude (drift D-2).
+
+## Research
+
+See `research.md`. Highlights: full ptr decomposition; telemetry `src/orpc/_types.ts`
+identified as the template for `StandardHandlerPlugin` removal; RFC 14 §5.3 seam =
+router-as-input + `build()` preserved; consumer census shows zero users of `build()`,
+`addHealthCheck`, `addReadinessCheck`, or the `ServiceBuilder` type name.
+
+## Design
+
+**Public surface (after 5a, single `.` entrypoint):**
+
+- Layer 1 primitives: `createHealthHandler`, `createLivenessHandler`,
+  `createReadinessHandler`, `healthChecks`, `HealthCheck`, `HealthResponse`,
+  `HealthHandlerOptions`; `createRPCPlugins`, `createRPCHandler`,
+  `createOpenAPIHandler`, `createNotFoundHandler`, `createErrorHandler`,
+  `RPCHandlerConfig`; `createOpenAPISpec`, `createScalarDocs`, `createScalarJs`,
+  `OpenAPIConfig`, `ScalarDocsOptions`
+- Layer 2 builder: `createService`, `ServiceBuilder` (interface), `ServiceConfig`
+- Layer 3 preset: `defineService`, `DefineServiceOptions`
+- Types module: `ServiceRouter`, `ServiceApp`, `RunningService`, `FetchHandler`,
+  `ServiceHandlerPlugin`, `ServiceMiddleware`, `CorsOptions`, `Database`,
+  `DbContext`, `ContextFactory`, `ServiceHandler`
+- Sibling re-export kept: `LoggerMiddlewareOptions` (from `@netscript/logger`)
+
+**Domain vocabulary:** service, router (oRPC, input), builder, preset
+(`defineService`), primitives (handler factories), running service (serve handle),
+diagnostics (internal DB-connectivity UX).
+
+**Ports / seams:** router is always an input (RFC 14 unified-mode seam); `build()`
+returns a non-listening `ServiceApp` (mountable); `serve({signal})` is the only place
+`Deno.serve` is touched; logger + telemetry consumed via `@netscript/*` siblings;
+oRPC interop via structural types only (telemetry precedent).
+
+**Constants:** ENGINE_CONFIGS (diagnostics, internal), default port/env names
+(`PORT`, `DB_PROVIDER`, `NETSCRIPT_DEBUG`, `DENO_ENV`) — keep as documented constants
+in src/, not magic strings at call sites.
+
+**Commit slices:** 15 (plan §4). Slice 2 is an intentionally transient rename-only
+slice (lesson: rename slices transient). Slice 15 = root-exclude lift + full sweep.
+
+**Deferred scope:** plan §8.
+
+**Contributor path:** README quickstart (defineService) → builder recipes →
+docs/architecture (layered surface + seam notes) → tests as living examples
+(doctest runner mirrors README).
+
+## Hand-off
+
+Artifacts ready for PLAN-EVAL (separate session): research.md, plan.md (PROPOSED, not
+locked), drift.md, context-pack.md, measure-5a.json. No implementation performed.

@@ -1,0 +1,7 @@
+# Commits — Sub-wave 5a: `@netscript/service`
+
+| # | Hash | Slice | Notes |
+| --- | --- | --- | --- |
+| 0 | d265205 | docs(5a): research + proposed plan & design artifacts | generator hand-off to PLAN-EVAL; no implementation |
+
+Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the plan.
