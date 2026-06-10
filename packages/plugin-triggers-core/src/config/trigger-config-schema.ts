@@ -58,12 +58,14 @@ export type WebhookConfig = Readonly<{
 }>;
 
 /** Root trigger plugin configuration when enabled. */
-export type TriggersConfig = Readonly<{
-  readonly triggersDir: string;
-  readonly groups: TriggerGroupConfig[];
-  readonly webhooks?: WebhookConfig;
-  readonly enabled: boolean;
-}> | undefined;
+export type TriggersConfig =
+  | Readonly<{
+    readonly triggersDir: string;
+    readonly groups: TriggerGroupConfig[];
+    readonly webhooks?: WebhookConfig;
+    readonly enabled: boolean;
+  }>
+  | undefined;
 
 const triggerDefinitionConfigSchema: z.ZodType<TriggerDefinitionConfig> = z.object({
   id: z.string().min(1).describe('Trigger identifier'),

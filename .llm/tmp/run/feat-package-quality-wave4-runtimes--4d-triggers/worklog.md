@@ -526,3 +526,26 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate result | FAIL, exit 1; inherited repo-wide lint debt reports 6,093 diagnostics outside trigger-owned files after D23 cleanup. |
 | Drift | Significant drift row recorded for raw root lint/fmt blocker; info row recorded for generated contract compatibility fix. |
 | Commits | Implementation `fd300c3`; paired docs/evidence pending. |
+
+### Post-IMPL-EVAL follow-up — root scoped Deno gates
+
+| Field | Evidence |
+|-------|----------|
+| Unit | repo root / package-quality gate hygiene |
+| Archetype | gate hygiene |
+| Changed | Added `.llm/tools/run-deno-check.ts` as the single Deno check wrapper/parser, deleted the old `parse-deno-check-errors.ts` path, made root `check`/`lint`/`fmt:check` use scoped wrapper tasks, and documented wrapper-first gate policy in AGENTS, harness/doctrine skills, platform lessons, static gates, and doctrine F-19. |
+| Gate(s) | Root scoped Deno check/lint/fmt |
+| Gate command | `deno check --unstable-kv .` from repo root |
+| Gate result | PASS, exit 0 after excluding `.llm/tmp/` scratch output from root Deno config and fixing stale `Finding.status` fields in `tools/fitness/check-cli-presentation.ts`. |
+| Gate command | `deno task check` from repo root |
+| Gate result | PASS, exit 0; `run-deno-check.ts` selected 1,353 `.ts/.tsx` files under packages/plugins, defaulted to `--unstable-kv`, and produced 0 occurrences / 0 groups. Wave 5 app packages (`service`, `sdk`, `fresh-ui`, `fresh`), generated targets, and `node_modules` are excluded. |
+| Gate command | `deno task lint` from repo root |
+| Gate result | PASS, exit 0; scoped wrapper selected 861 `.ts/.tsx` files under packages/plugins, excluding Wave 5 apps, generated targets, and Wave 6 CLI debt; 0 diagnostics. |
+| Gate command | `deno task fmt:check` from repo root |
+| Gate result | PASS, exit 0; scoped formatter selected 861 `.ts/.tsx` files, found 0 formatting findings, and counted 793 ignored line-ending-only baseline findings without printing the ignored file list. |
+| Gate command | `deno check --unstable-kv .llm/tools/run-deno-check.ts .llm/tools/run-deno-fmt.ts` from repo root |
+| Gate result | PASS, exit 0; wrapper tools type-check. |
+| Gate command | `deno doc .llm/tools/run-deno-check.ts` from repo root |
+| Gate result | PASS, exit 0; Deno doc rendered the wrapper module. Official Deno docs confirm `deno doc <source_file>` renders exported JSDoc and `deno doc --lint` diagnoses documentation problems with non-zero exit on failure. |
+| Drift | Rows recorded for scratch traversal, root lint scope, line-ending baseline policy, and run-deno-check wrapper consolidation. |
+| Commits | pending |

@@ -43,8 +43,7 @@ export const TRIGGER_CONTRACT_EVENT_STATUSES: readonly [
 export type TriggerContractKind = (typeof TRIGGER_CONTRACT_KINDS)[number];
 
 /** Durability tier returned by v1 contract responses. */
-export type TriggerContractDurabilityTier =
-  (typeof TRIGGER_CONTRACT_DURABILITY_TIERS)[number];
+export type TriggerContractDurabilityTier = (typeof TRIGGER_CONTRACT_DURABILITY_TIERS)[number];
 
 /** Event status returned by v1 contract responses. */
 export type TriggerContractEventStatus = (typeof TRIGGER_CONTRACT_EVENT_STATUSES)[number];
@@ -265,8 +264,7 @@ const triggerSSEEventSchema: z.ZodType<TriggerSSEEvent> = z.object({
 });
 
 /** Trigger SSE event schema. */
-export const TriggerSSEEventSchema: TriggerContractSchema<TriggerSSEEvent> =
-  triggerSSEEventSchema;
+export const TriggerSSEEventSchema: TriggerContractSchema<TriggerSSEEvent> = triggerSSEEventSchema;
 
 const TriggerFiltersShape: z.ZodRawShape = {
   kind: z.enum(TRIGGER_KINDS).nullable().optional(),

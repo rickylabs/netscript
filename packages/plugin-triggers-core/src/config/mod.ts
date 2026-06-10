@@ -15,8 +15,8 @@ export {
 } from './trigger-config-schema.ts';
 export { defineTriggers } from './define-triggers.ts';
 export type {
-  TriggerConfigSchema,
   TriggerConfigKind,
+  TriggerConfigSchema,
   TriggerDefinitionConfig,
   TriggerGroupConfig,
   TriggerRetentionConfig,

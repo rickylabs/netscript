@@ -62,10 +62,14 @@ Wrap `deno task` validation runs in `rtk proxy` to keep logs tracked and compres
 `rtk proxy deno task check`), and prefix git inspection between slices with `rtk` (`rtk git status`,
 `rtk git diff`). See `.agents/skills/rtk`.
 
-For lint and formatting validation that needs a package/file subset, prefer the scoped tools:
-`.llm/tools/run-deno-lint.ts` and `.llm/tools/run-deno-fmt.ts`. They accept roots, extensions, and
-include/exclude filters and avoid shell glob expansion. Do not run the mutating root `deno task fmt`
-as a validation gate unless the user explicitly asks for repo-wide formatting changes.
+For root check, lint, and formatting validation, prefer the scoped wrappers:
+`.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and `.llm/tools/run-deno-fmt.ts`.
+They accept roots, extensions, include/exclude filters, batching, and structured compact output,
+avoiding raw CLI noise and shell glob expansion. Package-quality formatting gates must target source
+TypeScript only (`--ext ts,tsx`) and exclude generated output, scratch workspaces, and future-wave
+packages. Do not treat raw root `deno fmt --check` across Markdown, generated files, or
+line-ending-only legacy drift as a package-quality verdict, and do not run the mutating root
+`deno task fmt` unless the user explicitly asks for repo-wide formatting changes.
 
 Common commands:
 
@@ -73,7 +77,10 @@ Common commands:
 deno task check
 deno task test
 deno task lint
-deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <path> --ext <list>
+deno task fmt:check
+deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root <path> --ext ts,tsx
+deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root <path> --ext ts,tsx
+deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <path> --ext ts,tsx
 deno task publish:dry-run
 deno task arch:check
 ```

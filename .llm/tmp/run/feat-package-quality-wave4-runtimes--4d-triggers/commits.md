@@ -56,3 +56,4 @@ the last sub-wave — its merge brings the umbrella to full-wave completeness.)
 - 7f96e92: docs(triggers): add D22 plugin docs tree
 - a5ff553: docs(wave4): record D22 plugin docs evidence
 - fd300c3: fix(triggers): close D23 final validation findings
+- 753c431: fix(wave4): keep root deno check on source scope

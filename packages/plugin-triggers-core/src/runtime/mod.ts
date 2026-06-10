@@ -5,9 +5,9 @@ export { createTriggerIngress } from './create-trigger-ingress.ts';
 export { NoopLogger } from './logger.ts';
 export { defaultRetryPolicy, TriggerProcessor } from './trigger-processor.ts';
 export type {
+  RuntimeWebhookDefinition,
   TriggerIngressEventIdFactory,
   TriggerIngressOptions,
-  RuntimeWebhookDefinition,
 } from './create-trigger-ingress.ts';
 export type { LoggerPort } from './logger.ts';
 export type { TriggerActionDispatcher, TriggerProcessorOptions } from './trigger-processor.ts';
