@@ -549,3 +549,22 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Gate result | PASS, exit 0; Deno doc rendered the wrapper module. Official Deno docs confirm `deno doc <source_file>` renders exported JSDoc and `deno doc --lint` diagnoses documentation problems with non-zero exit on failure. |
 | Drift | Rows recorded for scratch traversal, root lint scope, line-ending baseline policy, and run-deno-check wrapper consolidation. |
 | Commits | pending |
+
+### Post-IMPL-EVAL follow-up — CLI E2E database.init verification
+
+| Field | Evidence |
+|-------|----------|
+| Unit | CLI E2E suite / database runner |
+| Archetype | gate hygiene |
+| Changed | Added a regression assertion proving `DbOperationRunner` forwards `aspire ps --resources --format Json --non-interactive --nologo` as Aspire argv during detached database polling. Updated `packages/cli/e2e/README.md` to state that `gate <suite> <gate>` is a narrow debugging command and dependent gates such as `database.init` need prerequisites; CI/requested checks should run the sequenced suite command. |
+| Gate(s) | CLI E2E database.init reproduction + regression |
+| Gate command | `deno task e2e:cli run scaffold.runtime --format json` from repo root |
+| Gate result | PASS, exit 0; local sequenced suite result `passed=39 failed=0`, including `database.init` PASS. The direct isolated `gate scaffold.runtime database.init` failed only because no scaffold prerequisite had created `appsettings.json`, confirming that command shape is not a valid CI verdict for a dependent gate. |
+| Gate command | `deno task e2e:cli gate scaffold.runtime cleanup.aspire-stop --smoke-root .llm/tmp/cli-e2e --name plugin-smoke-20260610-155301 --format pretty` |
+| Gate result | PASS, exit 0; stopped the locally started generated Aspire AppHost. |
+| Gate command | `deno test --allow-all packages/cli/src/kernel/adapters/database/operation-runner_test.ts` |
+| Gate result | PASS, exit 0; 1 test module, 2 BDD steps passed. |
+| Gate command | `deno task check`; `deno task lint`; `deno task fmt:check` |
+| Gate result | PASS, exit 0 for all three root scoped wrapper tasks. |
+| Drift | None. The suspected `--resources` forwarding issue is already fixed on this branch; this follow-up adds local proof and prevents regression. |
+| Commits | pending |

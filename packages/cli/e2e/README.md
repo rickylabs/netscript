@@ -44,6 +44,13 @@ workflow, generated type checks, Aspire runtime boot, HTTP behavior checks, OTEL
 cleanup. The narrower `scaffold.plugins` suite stops after plugin scaffold and host-diagnostic
 checks.
 
+`gate <suite> <gate>` is a narrow debugging command. It does not automatically run prerequisite
+gates, so dependent gates such as `database.init`, `database.generate`, runtime waits, and behavior
+checks require an existing generated project via matching `--smoke-root` and `--name` options. CI
+and requested PR checks should use
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty` instead of invoking
+`database.init` directly.
+
 ## Built-in Suites
 
 | Suite                     | Coverage                                                   |
