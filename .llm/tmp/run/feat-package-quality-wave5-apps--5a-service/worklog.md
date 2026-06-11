@@ -87,3 +87,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. A `--no-config` probe reached the moved files and failed only on unresolved bare imports, as expected without `packages/service/deno.json` imports. |
 | Concept of done | Every moved file remains reachable from `mod.ts`. No new behavior files or speculative folders were added; `src/` now contains only the planned builder, primitives, and presets roles. |
 | Drift | none |
+
+### Slice 3/15 — D-3/D-4/D-6 package-owned public types
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `88e0cc0` — `Add service public structural types` |
+| Changed | Added `packages/service/src/types.ts` and exported its public structural contracts from `mod.ts`: `ServiceRouter`, `ServiceApp`, `RunningService`, `FetchHandler`, `ServiceHandlerPlugin`, `ServiceMiddleware`, `CorsOptions`, `Database`, `DbContext`, `ContextFactory`, and supporting context/result types. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. Root formatter cannot target service while excluded; new code was manually wrapped to root style and final slice 15 owns the authoritative fmt gate. |
+| Concept of done | New file is reachable from the public surface, contains only named public vocabulary required by D-3/D-4/D-6, avoids upstream type exports, and gives later slices one file to copy when adding structural mirrors. |
+| Drift | none |

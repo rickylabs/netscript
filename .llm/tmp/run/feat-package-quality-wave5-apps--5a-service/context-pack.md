@@ -2,10 +2,12 @@
 
 ## Current state
 
-Implementation has started after PLAN-EVAL PASS. Slices 1-2/15 are complete:
+Implementation has started after PLAN-EVAL PASS. Slices 1-3/15 are complete:
 `packages/service/deno.json` is standardized, and service sources now live under `src/` with only
-path updates required by the move. Implementation commits: `0785a8f`, `d9897c0`. Next slice:
-package-owned public types in `src/types.ts` for D-3/D-4/D-6.
+path updates required by the move. `src/types.ts` now defines the package-owned structural mirror
+types that later slices will use to clear private-type-ref and slow-type findings. Implementation
+commits: `0785a8f`, `d9897c0`, `88e0cc0`. Next slice: handlers drop
+`StandardHandlerPlugin` and return `FetchHandler` / typed service handlers.
 
 Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
 files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do
