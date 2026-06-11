@@ -129,3 +129,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Gate | Raw `Deno.Command`: `deno task check` from `packages/plugin-streams-core` PASS exit 0. Raw `Deno.Command`: `deno task check` from `plugins/streams` PASS exit 0. Raw `Deno.Command`: `deno doc --lint packages/plugin-streams-core/mod.ts` PASS, checked 1 file. Raw `Deno.Command`: `deno doc --lint packages/sdk/streams.ts` PASS, checked 1 file. |
 | Concept of done | Wave-4 package behavior and signatures are unchanged; only type exports were added. The sdk stream facade now exposes the full referenced type chain, clearing the private-type-ref path without re-exporting third-party upstream packages. |
 | Drift | none |
+
+### Slice 6/19 — D-5 `QueryClientPort`
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `9585851` — `Add sdk query client structural port` |
+| Changed | Added `packages/sdk/src/ports/query-client.ts` with `QueryClientPort`, filters, fetch options, set options, and predicate types. Exported the port through `./ports`, `./query-client`, and root. Changed `createNetScriptQueryClient()` to return `QueryClientPort`. Changed `QueryCollectionOptions.queryClient` to `QueryClientPort` and kept the upstream `QueryClient` cast internal at the TanStack DB boundary with a why-comment. |
+| Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. Focused query-client/collections doc-lint probe no longer reports the `QueryClient` private-type-ref; it still reports known later-slice missing-jsdoc and missing-return-type findings already tracked for slices 9 and 13. Static scan shows upstream `QueryClient` only in internal imports/casts, not public signatures. |
+| Advisory | B4 completed for current width: each `QueryClientPort` member has a JSDoc line naming the sdk/Fresh/TanStack DB consumer that drives it. |
+| Concept of done | The public sdk surface no longer exposes TanStack's `QueryClient` type. The port is package-owned, structural, upstream-type-free, and narrow enough to document the maintenance width. |
+| Drift | none |

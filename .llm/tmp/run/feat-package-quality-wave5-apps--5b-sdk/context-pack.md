@@ -6,7 +6,7 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-5/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-6/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
@@ -18,10 +18,11 @@ imports `@netscript/sdk/ports`. Subpaths are now reduced from 12 to 10 by foldin
 B1 is complete: `research.md` now says the streams types are "not exported from the
 declaring module's public chain." Slice 5 added pure type re-exports from the
 plugin-streams-core declaring modules and made `@netscript/sdk/streams` re-export the
-plugin core type surface so sdk-facing doc-lint can see the full chain. Gates passed:
-plugin-streams-core check, plugins/streams check, plugin-streams-core doc-lint, and
-sdk streams doc-lint. Next slice: add `QueryClientPort`, type the query-client factory,
-and update collection options.
+plugin core type surface so sdk-facing doc-lint can see the full chain. Slice 6 added
+`QueryClientPort` in `src/ports/query-client.ts`, documented the member list with
+consumer drivers, changed `createNetScriptQueryClient()` to return the structural port,
+and changed collection options to accept the port with an internal TanStack boundary
+cast. Next slice: `ServiceQueryUtils<TContract>` mapped type (type-only + fixtures).
 
 ## What the plan session did
 
