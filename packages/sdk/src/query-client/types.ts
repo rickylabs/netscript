@@ -22,10 +22,15 @@ export interface ActionQueryOptions {
  * TanStack Query-compatible options produced by `ActionMethod.queryOptions()`.
  */
 export interface QueryOptionsWithInitialData<TData> {
+  /** Stable TanStack Query key for this action invocation. */
   readonly queryKey: readonly unknown[];
+  /** Fetcher used by TanStack Query to execute the action. */
   readonly queryFn: () => Promise<TData>;
+  /** Optional hydrated payload supplied by a server loader. */
   readonly initialData?: TData;
+  /** Timestamp used by TanStack Query to age hydrated payloads. */
   readonly initialDataUpdatedAt?: number;
+  /** Freshness window used by the client-side cache. */
   readonly staleTime: number;
 }
 
@@ -35,8 +40,11 @@ export interface QueryOptionsWithInitialData<TData> {
 export interface ActionMutationOptions {
   /** Optional callbacks merged into the TanStack mutation config. */
   onSuccess?: (...args: unknown[]) => void;
+  /** Callback invoked when the mutation fails. */
   onError?: (...args: unknown[]) => void;
+  /** Callback invoked after either mutation success or failure. */
   onSettled?: (...args: unknown[]) => void;
+  /** Callback invoked before the mutation function runs. */
   onMutate?: (...args: unknown[]) => unknown;
 }
 
@@ -45,6 +53,8 @@ export interface ActionMutationOptions {
  * `ActionMethod.mutationOptions()`.
  */
 export interface MutationOptionsResult<TData, TInput> {
+  /** Stable TanStack Mutation key for this action. */
   readonly mutationKey: readonly unknown[];
+  /** Mutation function used by TanStack Query. */
   readonly mutationFn: (input: TInput) => Promise<TData>;
 }

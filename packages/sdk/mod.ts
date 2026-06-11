@@ -15,6 +15,15 @@
 export * from './cache/mod.ts';
 export * from './client/mod.ts';
 export * from './discovery/mod.ts';
+export {
+  type DefinedServiceClients,
+  type DefinedServiceQueries,
+  type DefinedServiceQueryUtils,
+  type DefinedServices,
+  type DefineServiceConfig,
+  defineServices,
+  type DefineServicesConfigMap,
+} from './src/presets/define-services.ts';
 export * from './src/openapi/helpers.ts';
 export * from './query/mod.ts';
 export * from './query-client/mod.ts';
