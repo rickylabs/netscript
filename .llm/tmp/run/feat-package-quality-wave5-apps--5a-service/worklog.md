@@ -167,3 +167,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. Focused search in preset found no remaining `AnyRouter`, explicit `any`, `Promise<void>`, or `ensureLogging` implementation references. |
 | Concept of done | Preset users now get the same lifecycle stop handle as builder users, while existing await-and-ignore consumers remain valid. |
 | Drift | none |
+
+### Slice 11/15 — documented `mod.ts` barrel
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `104f215` — `Document service barrel as public contract` |
+| Changed | Rewrote root `mod.ts` module docs to explain the three-layer surface, `build()`/`serve()` seam, structural mirror types, and the first-party `LoggerMiddlewareOptions` sibling re-export. Barrel remains export-only and is 130 lines. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
+| Concept of done | A reader can understand the service public surface and extension path from the root barrel without it becoming executable logic. |
+| Drift | none |

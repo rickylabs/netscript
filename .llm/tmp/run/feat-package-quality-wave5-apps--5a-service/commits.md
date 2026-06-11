@@ -16,3 +16,4 @@ Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the pla
 - 58e7d1e: Add stoppable service runtime handle
 - d33d6d1: Extract service database diagnostics behind logger
 - 53b646a: Return running service from defineService
+- 104f215: Document service barrel as public contract
