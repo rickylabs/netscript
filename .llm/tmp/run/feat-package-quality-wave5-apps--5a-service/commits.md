@@ -14,3 +14,4 @@ Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the pla
 - 65c6512: Add explicit health primitive return contracts
 - ff9ca2d: Expose service builder as structural interface
 - 58e7d1e: Add stoppable service runtime handle
+- d33d6d1: Extract service database diagnostics behind logger

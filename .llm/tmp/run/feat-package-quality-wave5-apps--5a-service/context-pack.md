@@ -2,7 +2,7 @@
 
 ## Current state
 
-Implementation has started after PLAN-EVAL PASS. Slices 1-8/15 are complete:
+Implementation has started after PLAN-EVAL PASS. Slices 1-9/15 are complete:
 `packages/service/deno.json` is standardized, and service sources now live under `src/` with only
 path updates required by the move. `src/types.ts` now defines the package-owned structural mirror
 types. Handler primitives now use those mirrors for plugins, fetch handlers, not-found handlers, and
@@ -12,8 +12,9 @@ Scalar/OpenAPI constants. Health primitives now return `ServiceHandler` and expo
 `ServiceBuilderImpl`, uses package-owned mirror types, and custom checks are renamed to
 `withHealthCheck` / `withReadinessCheck`. `serve()` now returns `RunningService`, supports external
 abort signals, and logs its banner/error path through `@netscript/logger`. Implementation commits:
-`0785a8f`, `d9897c0`, `88e0cc0`, `b62dfbe`, `aabcde2`, `65c6512`, `ff9ca2d`, `58e7d1e`. Next
-slice: extract database connectivity diagnostics into `src/diagnostics/`.
+`0785a8f`, `d9897c0`, `88e0cc0`, `b62dfbe`, `aabcde2`, `65c6512`, `ff9ca2d`, `58e7d1e`.
+Database connectivity diagnostics are now internal under `src/diagnostics/`, logger-backed, and
+`define-service.ts` is 143 lines. Next slice: `defineService()` returns `RunningService`.
 
 Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
 files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do

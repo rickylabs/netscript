@@ -147,3 +147,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. `Select-String` over builder + handlers for `console.` returned no matches. |
 | Concept of done | Runtime lifecycle now has an explicit handle and cancellation path; logger usage is centralized in the affected runtime/error paths. |
 | Drift | none |
+
+### Slice 9/15 — D-7 diagnostics extraction
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `d33d6d1` — `Extract service database diagnostics behind logger` |
+| Changed | Moved engine configs, endpoint resolution, TCP probing, retry loop, Prisma root-cause extraction, and formatted database diagnostics into internal `src/diagnostics/database-connectivity.ts`. `define-service.ts` now delegates via `createDatabaseConnectivityStartupHook()` and drops to 143 lines. Diagnostics emit through `@netscript/logger` while preserving the multi-line troubleshooting block. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. `Select-String packages/service/src/**/*.ts -Pattern 'console\\.'`: 0 matches. Line counts: `define-service.ts` 143, diagnostics module 395. |
+| Concept of done | The diagnostics module is reachable from the preset startup hook, not exported through the public barrel, and names database engine/env vocabulary in one internal file. |
+| Drift | none |
