@@ -107,6 +107,22 @@ export const freshUiRegistryManifest = {
       css: [{ layer: 'components', content: "@import './ui/sheet.css';" }],
     },
     {
+      name: 'floating-styles',
+      kind: 'style',
+      layer: 2,
+      description:
+        'Popover API and CSS anchor-positioning styles with fixed/inset fallback for package-owned floating runtimes.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['surface', 'popover', 'tooltip', 'styles', 'support'],
+      files: [{
+        source: 'registry/components/ui/floating.css',
+        target: '@assets/ui/floating.css',
+      }],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/floating.css';" }],
+    },
+    {
       name: 'alert-styles',
       kind: 'style',
       layer: 2,
