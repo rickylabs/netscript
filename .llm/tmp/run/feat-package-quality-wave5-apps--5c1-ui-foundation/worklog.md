@@ -79,6 +79,34 @@ gates under `.llm/tools/fitness/` for registry/token invariants. CLI
 installation behavior lives under `packages/cli/src/public/features/ui/` once
 slices 13-14 land.
 
+## D-5c1-2 closeout
+
+Commit: pending
+
+Changed:
+
+- Adopted the run-local Fresh/Zag spike config proven under a short path:
+  `nodeModulesDir: "auto"`, Vite native config loader, and explicit Fresh
+  `serverEntry`.
+- Added `slice-10-hydration-evidence.md` with the MAX_PATH root cause, path
+  measurement, config matrix, SSR transcript, Playwright MCP closeout notes, and
+  root lock hygiene evidence.
+- Appended the D-5c1-2 resolution entry to `drift.md`.
+
+Evidence:
+
+- Raw `deno task check` from the run-local spike exited 0.
+- `%TEMP%\zag-spike-5c1` SSR probe returned HTTP 200 with `#ssr-marker`,
+  server-rendered combobox markup, and server-rendered listbox markup.
+- Playwright MCP browser was closed, reopened on a fresh tab, snapshotted, then
+  closed again; the dev server was stopped after the pass.
+- Root lock diff was empty.
+
+Drift:
+
+- D-5c1-2 RESOLVED: MAX_PATH was the root cause. Conditional no-go is flipped to
+  **Tier Z = GO** for Run 2+ implementation scope.
+
 ### Slice 16 — README/docs/JSR dry-run sweep
 
 Commit: `2d76d21`.

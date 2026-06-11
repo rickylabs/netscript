@@ -62,3 +62,23 @@ before the related commit.
 - Impact: the JSR publish graph is no longer blocked by stale workspace
   exclusion. Broad root task behavior remains unchanged, and no lock files are
   touched.
+
+### D-5c1-2 — RESOLVED: Slice 10 hydration blocked by Windows MAX_PATH
+
+- Slice: 10 closeout
+- Supersedes: the earlier D-5c1-2 conditional no-go entry.
+- Root cause: the Fresh Vite builder was not blocked by Zag, Fresh, Vite, Deno,
+  or esbuild compatibility. It was blocked by Windows MAX_PATH: the nested
+  run-dir `esbuild.exe` path measured 299 characters, so process creation failed
+  even though the binary existed on disk.
+- Evidence: see
+  `.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-hydration-evidence.md`
+  and generator PR comment
+  `https://github.com/rickylabs/netscript/pull/31#issuecomment-4684398933`.
+- Decision: short-path re-hosting at `%TEMP%\zag-spike-5c1` proves SSR and
+  hydration with `nodeModulesDir: "auto"`, Vite native config loader, and
+  `fresh({ serverEntry: "./main.tsx" })`.
+- Verdict flip: conditional no-go -> **Tier Z = GO**.
+- Impact: no package runtime code is introduced. No `LongPathsEnabled` registry
+  change was made or required. Slice 10 remains evidence-only, and Tier-Z
+  component shipping remains Run 2+ scope.
