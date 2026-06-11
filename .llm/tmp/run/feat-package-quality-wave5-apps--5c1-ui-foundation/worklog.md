@@ -254,6 +254,39 @@ Drift:
   failure; Tier Z shipping remains no-go until builder-backed hydration evidence
   passes in a reachable app environment.
 
+### Slice 11 — Accordion internals to native details
+
+Commit: `bdaebad`.
+
+Changed:
+
+- `Accordion.Root` now renders the existing root data contract instead of only a
+  context provider.
+- `Accordion.Item` now renders native `details` while preserving the item data
+  attributes.
+- `useAccordion().getItemProps` adds controlled `open` and grouped `name` for
+  non-multiple accordions, preserving the public return type.
+- `Accordion.ItemTrigger` now renders `summary`, strips button-only `type` and
+  `disabled` from the DOM, maps disabled state to `aria-disabled`, and delegates
+  clicks through the existing hook event pipeline.
+- Captured before/after `deno doc` snapshots for the interactive entrypoint,
+  accordion module, and `useAccordion` module.
+
+Evidence:
+
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 35 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno lint --config packages/fresh-ui/deno.gates.json packages/fresh-ui/runtime/accordion/Accordion.tsx packages/fresh-ui/runtime/accordion/use-accordion.ts packages/fresh-ui/runtime/accordion/accordion.test.ts`
+  → PASS/exit 0, checked 3 files.
+- `deno fmt --check --config packages/fresh-ui/deno.gates.json packages/fresh-ui/runtime/accordion/Accordion.tsx packages/fresh-ui/runtime/accordion/use-accordion.ts`
+  → PASS/exit 0, checked 2 files.
+- `slice-11-public-shape-preservation.json` reports `publicShapePreserved: true`
+  for `interactive`, `accordion-module`, and `use-accordion-module`.
+
+Drift: none.
+
 ### Slice 7 — `manifest-integrity` fitness gate
 
 Commit: `6977b9b`.

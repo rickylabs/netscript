@@ -34,3 +34,5 @@ hash-record commit; commits are never amended.
 - Slice 9 impl `c256bdb`: Add fresh-ui L0 primitives surface.
 - Slice 9 docs `d965c4d`: Record slice 9 evidence.
 - Slice 10 impl `ac0e1a3`: Record Fresh Zag spike evidence.
+- Slice 10 docs `e2537bb`: Record slice 10 evidence.
+- Slice 11 impl `bdaebad`: Render accordion with native details.

@@ -85,3 +85,9 @@ markup. Builder-backed Vite hydration is blocked in this Windows/Deno worktree
 by `esbuild@0.27.7` failing on `ChildProcess.unref`, so Tier Z shipping is a
 conditional no-go until a reachable Fresh app can prove hydrated interaction.
 Drift entries D-5c1-1 and D-5c1-2 record the scratch hosting and no-go decision.
+
+Slice 11 complete: accordion compound internals now render native `details` and
+`summary` elements. `details` receives the existing item data contract plus
+controlled `open` and grouped `name` when `multiple` is false; `summary` reuses
+the existing trigger event pipeline. The public `Accordion` and `useAccordion`
+doc shapes are preserved in normalized before/after evidence.
