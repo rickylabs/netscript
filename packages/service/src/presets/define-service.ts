@@ -24,7 +24,7 @@
  * @module
  */
 
-import { createService, type ServiceConfig } from '../builders/service-builder.ts';
+import { createService, type ServiceConfig } from '../builder/service-builder.ts';
 import { ensureLogging } from '@netscript/logger';
 
 // Router type that matches oRPC router structure

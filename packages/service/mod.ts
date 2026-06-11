@@ -50,7 +50,7 @@ export {
   healthChecks,
   type HealthHandlerOptions,
   type HealthResponse,
-} from './primitives/health.ts';
+} from './src/primitives/health.ts';
 
 export {
   createOpenAPISpec,
@@ -58,7 +58,7 @@ export {
   createScalarJs,
   type OpenAPIConfig,
   type ScalarDocsOptions,
-} from './primitives/openapi.ts';
+} from './src/primitives/openapi.ts';
 
 export {
   createErrorHandler,
@@ -67,13 +67,13 @@ export {
   createRPCHandler,
   createRPCPlugins,
   type RPCHandlerConfig,
-} from './primitives/handlers.ts';
+} from './src/primitives/handlers.ts';
 
 // Layer 2: Builders
-export { createService, ServiceBuilder, type ServiceConfig } from './builders/service-builder.ts';
+export { createService, ServiceBuilder, type ServiceConfig } from './src/builder/service-builder.ts';
 
 // Re-export logger types for convenience
 export type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 
 // Layer 3: Presets
-export { defineService, type DefineServiceOptions } from './presets/define-service.ts';
+export { defineService, type DefineServiceOptions } from './src/presets/define-service.ts';

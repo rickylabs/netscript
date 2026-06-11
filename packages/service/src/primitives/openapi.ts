@@ -25,7 +25,7 @@ import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
 // deno-lint-ignore no-explicit-any
 type AnyRouter = Record<string, any>;
 
-const scalarJsUrl = new URL('../assets/scalar.min.js', import.meta.url);
+const scalarJsUrl = new URL('../../assets/scalar.min.js', import.meta.url);
 let scalarJsCache: string | undefined;
 
 /**
