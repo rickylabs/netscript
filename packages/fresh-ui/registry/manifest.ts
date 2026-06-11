@@ -12,6 +12,41 @@ export const freshUiRegistryManifest = {
   tokenSourceStrategy: 'style-dictionary-dtcg-source',
   items: [
     {
+      name: 'cn',
+      kind: 'lib',
+      description: 'Shared class-name merge helper for copied registry components.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['lib', 'class-names', 'support'],
+      files: [{ source: 'registry/lib/cn.ts', target: '@lib/cn.ts' }],
+      dependencies: ['npm:clsx@^2.1.1', 'npm:tailwind-merge@^3.5.0'],
+    },
+    {
+      name: 'public-types',
+      kind: 'lib',
+      description: 'Shared renderable and component result types for copied registry components.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['lib', 'types', 'support'],
+      files: [{
+        source: 'registry/lib/public-types.ts',
+        target: '@lib/public-types.ts',
+      }],
+    },
+    {
+      name: 'control-props',
+      kind: 'support',
+      layer: 2,
+      description: 'Control-prop narrowing helpers used by registry verification and form seams.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['forms', 'descriptors', 'support'],
+      files: [{
+        source: 'registry/components/ui/control-props.ts',
+        target: '@ui/control-props.ts',
+      }],
+    },
+    {
       name: 'theme-seed',
       kind: 'theme',
       description:
@@ -52,6 +87,7 @@ export const freshUiRegistryManifest = {
           target: '@assets/components/feedback.css',
         },
       ],
+      registryDependencies: ['cn', 'public-types'],
       cssVars: {
         theme: {
           '--ns-bg': 'var(--ns-gray-12)',
