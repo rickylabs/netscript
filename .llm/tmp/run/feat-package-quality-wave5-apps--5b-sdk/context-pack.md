@@ -6,7 +6,7 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-11/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-16/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
@@ -51,7 +51,13 @@ map. Slice 14 expanded root `mod.ts` module docs to 35 lines and refreshed all
 subpath module docs without changing exports. Slice 15 replaced the README with a
 14-section / 329-line package guide and added `docs/architecture.md` with the
 layer map, composability contract, transport seam audit, discovery split, cache
-state decision, and contributor path. Next slice: doctest runner and unit tests.
+state decision, and contributor path. Slice 16 added focused unit tests for
+`CacheQuery` stale-while-revalidate, `preferFreshOnStale`, in-flight dedupe,
+query-factory keys, the KV query-cache persister, and README TypeScript/JSON
+doctests. The cache dedupe test exposed and fixed a race by rechecking the
+instance in-flight map after the async cache read and before starting a fetch.
+Next slice: type-level assignability fixtures for D-5/D-6/D-7 plus
+`ServiceClient` inference.
 
 ## What the plan session did
 

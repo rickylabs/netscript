@@ -241,3 +241,13 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Size check | README: 329 lines, 14 `##` sections. Architecture doc: 116 lines. |
 | Concept of done | A contributor can start from README quickstart, drop down through focused subpaths, then use `docs/architecture.md` to extend the right layer without inventing new seams. |
 | Drift | none |
+
+### Slice 16/19 — doctest runner and unit tests
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `117fd2e` — `Add sdk cache and doctest coverage` |
+| Changed | Added `tests/test-helpers.ts`, focused cache/query/persister unit tests, and a README doctest runner that extracts TypeScript and JSON fences. Fixed a `CacheQuery` in-flight dedupe race by rechecking the instance in-flight map after the async cache read and before creating a new fetch promise. |
+| Gate | Raw `Deno.Command`: `deno test --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --allow-read --allow-write --allow-run --allow-env packages/sdk/tests/cache/cache-query_test.ts packages/sdk/tests/query/query-factory_test.ts packages/sdk/tests/query-client/kv-cache-persister_test.ts packages/sdk/tests/discovery/env-ordering_test.ts packages/sdk/tests/readme-doctest_test.ts` PASS exit 0, 10 passed / 0 failed. Raw `Deno.Command`: `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json <slice-16 files>` PASS exit 0. Raw `Deno.Command`: `deno check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv <slice-16 files>` PASS exit 0. Raw `Deno.Command`: `deno lint --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json <slice-16 files>` PASS exit 0. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Concept of done | The cache behavior, query-factory key shape, discovery ordering, persister storage path, and README examples are reachable through tests. The cache race fix stays inside the existing `CacheQuery` abstraction and preserves the instance-state decision from slice 13. |
+| Drift | none |
