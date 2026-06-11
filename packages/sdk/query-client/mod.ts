@@ -15,7 +15,7 @@
 export {
   createServiceQueryUtils,
   type CreateServiceQueryUtilsOptions,
-} from './create-service-query-utils.ts';
+} from '../src/query-client/create-service-query-utils.ts';
 
 // QueryClient factory
 export {
@@ -23,17 +23,17 @@ export {
   DEFAULT_GC_TIME,
   DEFAULT_STALE_TIME,
   type NetScriptQueryClientOptions,
-} from './query-client-factory.ts';
+} from '../src/query-client/query-client-factory.ts';
 
 // Key bridge
-export { bridgeInvalidation, toClientKeyPrefix } from './key-bridge.ts';
+export { bridgeInvalidation, toClientKeyPrefix } from '../src/query-client/key-bridge.ts';
 
 // KV cache persister
 export {
   createKvCachePersister,
   type KvCachePersisterOptions,
   type KvCachePersisterStorage,
-} from './kv-cache-persister.ts';
+} from '../src/query-client/kv-cache-persister.ts';
 
 // Types
 export type {
@@ -41,4 +41,4 @@ export type {
   ActionQueryOptions,
   MutationOptionsResult,
   QueryOptionsWithInitialData,
-} from './types.ts';
+} from '../src/query-client/types.ts';

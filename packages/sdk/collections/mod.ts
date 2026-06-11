@@ -8,4 +8,7 @@
  * @module
  */
 
-export { createQueryCollection, type QueryCollectionOptions } from './create-query-collection.ts';
+export {
+  createQueryCollection,
+  type QueryCollectionOptions,
+} from '../src/collections/create-query-collection.ts';

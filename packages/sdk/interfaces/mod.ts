@@ -4,10 +4,14 @@
  * @module
  */
 
-export type { CachedEntry, CacheEntry } from './cache-entry.ts';
-export { isCacheEntryStale, toCachedEntry } from './cache-entry.ts';
-export type { CacheKey, CacheStore, CacheStoreEntry } from './cache-store.ts';
-export type { HealthCheckResponse, PaginatedResponse, ServiceMetadata } from './metadata.ts';
+export type { CachedEntry, CacheEntry } from '../src/interfaces/cache-entry.ts';
+export { isCacheEntryStale, toCachedEntry } from '../src/interfaces/cache-entry.ts';
+export type { CacheKey, CacheStore, CacheStoreEntry } from '../src/interfaces/cache-store.ts';
+export type {
+  HealthCheckResponse,
+  PaginatedResponse,
+  ServiceMetadata,
+} from '../src/interfaces/metadata.ts';
 export type {
   ActionMethod,
   CompositeQuery,
@@ -15,16 +19,16 @@ export type {
   ProcedureInput,
   ProcedureOutput,
   QueryFactory,
-} from './query-factory.ts';
-export type { QueryKey, QueryKeyPart } from './query-key.ts';
-export { createActionQueryKey, serializeQueryKeyInput } from './query-key.ts';
-export type { CacheQueryOptions, QueryParams } from './query-options.ts';
+} from '../src/interfaces/query-factory.ts';
+export type { QueryKey, QueryKeyPart } from '../src/interfaces/query-key.ts';
+export { createActionQueryKey, serializeQueryKeyInput } from '../src/interfaces/query-key.ts';
+export type { CacheQueryOptions, QueryParams } from '../src/interfaces/query-options.ts';
 export type {
   ActionMutationOptions,
   ActionQueryOptions,
   MutationOptionsResult,
   QueryOptionsWithInitialData,
-} from '../query-client/types.ts';
+} from '../src/query-client/types.ts';
 export type {
   ContractLike,
   ContractProcedureLike,
@@ -40,5 +44,5 @@ export type {
   ServiceClientContext,
   ServiceClientMethod,
   ServiceRequestOptions,
-} from './service-client.ts';
-export type { ServiceTransport } from './transport.ts';
+} from '../src/interfaces/service-client.ts';
+export type { ServiceTransport } from '../src/interfaces/transport.ts';

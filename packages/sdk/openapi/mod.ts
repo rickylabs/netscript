@@ -10,4 +10,4 @@ export {
   type OpenAPIConfig,
   type OpenAPIDocument,
   type OpenAPIGeneratorLike,
-} from './helpers.ts';
+} from '../src/openapi/helpers.ts';

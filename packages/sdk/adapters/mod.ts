@@ -6,4 +6,4 @@
  * @module
  */
 
-export { KvCacheStore } from './kv-cache-store.ts';
+export { KvCacheStore } from '../src/cache/kv-cache-store.ts';

@@ -4,7 +4,7 @@
  * @module
  */
 
-import { getCacheProvider } from './cache-provider.ts';
+import { getCacheProvider } from '../cache/cache-provider.ts';
 import { serializeQueryKeyInput } from '../interfaces/query-key.ts';
 import type { CompositeQuery } from '../interfaces/query-factory.ts';
 import type { QueryParams } from '../interfaces/query-options.ts';

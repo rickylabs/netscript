@@ -4,9 +4,9 @@
  * @module
  */
 
-export { createServiceClient } from './service-client.ts';
-export { isDefinedError, safe } from './errors.ts';
-export type { DefinedError, SafeFailure, SafeResult, SafeSuccess } from './errors.ts';
+export { createServiceClient } from '../src/client/service-client.ts';
+export { isDefinedError, safe } from '../src/client/errors.ts';
+export type { DefinedError, SafeFailure, SafeResult, SafeSuccess } from '../src/client/errors.ts';
 export type {
   ContractLike,
   ContractProcedureLike,
@@ -22,4 +22,4 @@ export type {
   ServiceClientContext,
   ServiceClientMethod,
   ServiceRequestOptions,
-} from '../interfaces/service-client.ts';
+} from '../src/interfaces/service-client.ts';

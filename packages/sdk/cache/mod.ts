@@ -8,19 +8,19 @@
  * @module
  */
 
-import { setCacheProvider } from '../core/cache-provider.ts';
-import { cacheQuery } from '../core/cache-query.ts';
+import { setCacheProvider } from '../src/cache/cache-provider.ts';
+import { cacheQuery } from '../src/cache/cache-query.ts';
 
 // Auto-register: any server-side code that imports @netscript/sdk/cache
 // gets the KV-backed CacheQuery wired as the global cache provider.
 setCacheProvider(cacheQuery);
 
-export { CacheQuery, cacheQuery } from '../core/cache-query.ts';
-export type { CachedEntry, CacheEntry } from '../interfaces/cache-entry.ts';
-export { isCacheEntryStale, toCachedEntry } from '../interfaces/cache-entry.ts';
-export type { CacheQueryOptions, QueryParams } from '../interfaces/query-options.ts';
-export type { QueryKey, QueryKeyPart } from '../interfaces/query-key.ts';
-export { createActionQueryKey, serializeQueryKeyInput } from '../interfaces/query-key.ts';
+export { CacheQuery, cacheQuery } from '../src/cache/cache-query.ts';
+export type { CachedEntry, CacheEntry } from '../src/interfaces/cache-entry.ts';
+export { isCacheEntryStale, toCachedEntry } from '../src/interfaces/cache-entry.ts';
+export type { CacheQueryOptions, QueryParams } from '../src/interfaces/query-options.ts';
+export type { QueryKey, QueryKeyPart } from '../src/interfaces/query-key.ts';
+export { createActionQueryKey, serializeQueryKeyInput } from '../src/interfaces/query-key.ts';
 
 // Re-export the provider API for manual registration and testing.
 export {
@@ -29,4 +29,4 @@ export {
   hasCacheProvider,
   resetCacheProvider,
   setCacheProvider,
-} from '../core/cache-provider.ts';
+} from '../src/cache/cache-provider.ts';

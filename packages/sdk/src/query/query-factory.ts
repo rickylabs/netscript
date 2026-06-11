@@ -26,7 +26,7 @@ import type {
   QueryOptionsWithInitialData,
 } from '../query-client/types.ts';
 
-import { getCacheProvider } from './cache-provider.ts';
+import { getCacheProvider } from '../cache/cache-provider.ts';
 
 /**
  * Create a query factory for an oRPC contract.

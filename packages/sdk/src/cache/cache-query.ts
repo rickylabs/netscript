@@ -4,7 +4,7 @@
  * @module
  */
 
-import { KvCacheStore } from '../adapters/kv-cache-store.ts';
+import { KvCacheStore } from './kv-cache-store.ts';
 import type { CachedEntry, CacheEntry } from '../interfaces/cache-entry.ts';
 import { toCachedEntry } from '../interfaces/cache-entry.ts';
 import type { CacheStore } from '../interfaces/cache-store.ts';

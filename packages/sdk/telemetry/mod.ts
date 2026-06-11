@@ -4,4 +4,8 @@
  * @module
  */
 
-export { type MiddlewareHandler, type MiddlewareNext, otelMiddleware } from './otel-middleware.ts';
+export {
+  type MiddlewareHandler,
+  type MiddlewareNext,
+  otelMiddleware,
+} from '../src/telemetry/otel-middleware.ts';

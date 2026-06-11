@@ -4,13 +4,13 @@
  * @module
  */
 
-export { createCompositeQuery } from '../core/composite-query.ts';
-export { createQueryFactories, createQueryFactory } from '../core/query-factory.ts';
+export { createCompositeQuery } from '../src/query/composite-query.ts';
+export { createQueryFactories, createQueryFactory } from '../src/query/query-factory.ts';
 export {
   type CacheProvider,
   hasCacheProvider,
   setCacheProvider,
-} from '../core/cache-provider.ts';
+} from '../src/cache/cache-provider.ts';
 export type {
   ActionMethod,
   CompositeQuery,
@@ -18,4 +18,4 @@ export type {
   ProcedureInput,
   ProcedureOutput,
   QueryFactory,
-} from '../interfaces/query-factory.ts';
+} from '../src/interfaces/query-factory.ts';
