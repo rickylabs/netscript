@@ -45,3 +45,42 @@
   - visual diff: button.css +152L/-50L, toast.css +225L/-121L (net +206L)
 - Commits: `2a1b378` (impl), `3fb5098` (docs/measure)
 - Drift: none
+
+## Slice 1 (cont.) — remaining raw rgba in form-control-styles + sheet
+
+- Scope: finish the slice-1 raw-value cleanup across the registry component CSS
+  corpus (form-control-styles, sheet).
+- Changes:
+  - form-control-styles.css: focus ring + error shadows now use
+    `color-mix(in srgb, ...)` over semantic tokens (`--ns-ring`,
+    `--ns-destructive`) instead of raw rgba.
+  - sheet.css: backdrop + shadows mix `var(--ns-gray-12)` via `color-mix`
+    instead of black rgba literals.
+- Gate evidence:
+  - claim at commit time: zero raw rgba remaining in registry **component** CSS
+    (touched files); corpus-wide verification deferred to the step-0 takeover
+    audit below.
+- Commits: `ae29999` (impl)
+- Drift: none
+
+## Slice 2 — layout-objects (layouts.css token cleanup)
+
+- Scope: layout-objects deliverable. `layouts.css` (shell, stack, cluster,
+  grid, toolbar, section, split, scroll-region, switcher, cover, sidebar,
+  content-rail, dashboard) already existed from Run 1 as a file of the
+  `theme-seed` item; this slice cleaned the one remaining raw rgba.
+- Changes:
+  - layouts.css: `.ns-status-bar__sep` / `.ns-status-sep` raw
+    `rgba(135, 132, 125, 0.4)` → `color-mix(in srgb, var(--ns-muted-fg) 40%, transparent)`.
+- Gate evidence: zero raw hex/rgba remaining in layouts.css.
+- Commits: `7c5dffc` (impl)
+- Note (takeover session): the locked slice-2 deliverable is a **separate
+  `layout-objects` style item**; at `ae29999` layouts.css is still bundled
+  inside the `theme-seed` theme item. Completed in the step-0 audit
+  (slice 2 cont.) below, with drift recorded.
+
+## Takeover checkpoint (session handover)
+
+- Implementation taken over by a new generator session at remote tip
+  `ae29999`; bookkeeping reconciled (this entry, slice 1-cont and slice 2
+  worklog entries, commits.md rows) as a follow-up commit — no amends.
