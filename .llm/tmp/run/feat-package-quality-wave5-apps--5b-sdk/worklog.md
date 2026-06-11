@@ -119,3 +119,13 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Advisory | B1 completed: `research.md` now says the plugin-streams-core types are "not exported from the declaring module's public chain" instead of "unexported." |
 | Concept of done | The folded symbols remain reachable from public surfaces (`KvCacheStore` via `./cache`; OpenAPI helpers via root). The removed facade files no longer exist only to preserve folder shape, and subpath cardinality is now 10. |
 | Drift | none |
+
+### Slice 5/19 — D-4 stream type export chain
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `549326c` — `Export stream producer types for sdk docs` |
+| Changed | Added pure type re-exports for `StateSchema`/`StreamStateDefinition` from `packages/plugin-streams-core/src/application/create-durable-stream.ts` and `src/builders/define-stream-schema.ts`, plus `StreamProducerPort` from the producer declaring module. Updated `packages/sdk/streams.ts` to `export type * from '@netscript/plugin-streams-core'` while preserving the existing selected value exports and `createStreamProducer` alias. |
+| Gate | Raw `Deno.Command`: `deno task check` from `packages/plugin-streams-core` PASS exit 0. Raw `Deno.Command`: `deno task check` from `plugins/streams` PASS exit 0. Raw `Deno.Command`: `deno doc --lint packages/plugin-streams-core/mod.ts` PASS, checked 1 file. Raw `Deno.Command`: `deno doc --lint packages/sdk/streams.ts` PASS, checked 1 file. |
+| Concept of done | Wave-4 package behavior and signatures are unchanged; only type exports were added. The sdk stream facade now exposes the full referenced type chain, clearing the private-type-ref path without re-exporting third-party upstream packages. |
+| Drift | none |
