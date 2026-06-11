@@ -26,7 +26,8 @@
     "@orpc/zod": "npm:@orpc/zod@^1.13.5",
     "@orpc/zod/zod4": "npm:@orpc/zod@^1.13.5/zod4",
     "@netscript/telemetry": "../telemetry/mod.ts",
-    "@netscript/logger": "../logger/mod.ts"
+    "@netscript/logger": "../logger/mod.ts",
+    "@std/assert": "jsr:@std/assert@^1"
   },
   "publish": {
     "include": [
