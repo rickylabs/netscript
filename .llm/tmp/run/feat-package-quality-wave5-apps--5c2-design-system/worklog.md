@@ -29,3 +29,19 @@
 - **Lock decision**: Tier-Z lead component (combobox) **deferred** to dedicated
   post-5c wave. 12 slices remain locked; no slice 13. Recorded as D-5c2-0 in
   `drift.md`.
+
+## Slice 1 — CSS corpora reconciliation (button + toast)
+
+- Scope: Enhanced `button.css` and `toast.css` with playground-inspired visual
+  depth while replacing raw hex/rgba with token-based `color-mix()`.
+- Changes:
+  - button.css: added 3D box-shadow depth to primary/secondary/outline/destructive
+    variants; added transform transitions for tactile press feedback; replaced
+    raw `rgba(235, 228, 210, 0.04)` with `color-mix(in srgb, var(--ns-fg) 4%, transparent)`.
+  - toast.css: replaced all hardcoded `rgba()` values with `color-mix(in srgb, ...)`
+    using semantic tokens; eyebrow color mixes `var(--ns-fg)` instead of `white`.
+- Gate evidence:
+  - manifest-integrity: PASS (no new files, existing items updated)
+  - visual diff: button.css +152L/-50L, toast.css +225L/-121L (net +206L)
+- Commits: `2a1b378` (impl), `3fb5098` (docs/measure)
+- Drift: none
