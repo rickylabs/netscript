@@ -70,3 +70,10 @@ under `registry/components/ui/`; the old four aggregate component CSS files are
 gone from `theme-seed`. Move-only evidence preserved 161/161 top-level CSS
 statements from base `91a01ee`, and manifest-integrity now claims 61/61
 installable registry files through 41 items.
+
+Slice 9 complete: `@netscript/fresh-ui/primitives` now exports the L0
+platform-contract primitives `VisuallyHidden`, `SrOnly`, and `Show`, with
+package-owned structural public types that avoid leaking Preact private JSX
+internals through `deno doc --lint`. The L0 conventions doc is published under
+`packages/fresh-ui/docs/`, README documents the entrypoint, and 35 package tests
+pass including JSX component usage for `VisuallyHidden`.

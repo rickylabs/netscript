@@ -162,6 +162,40 @@ Evidence:
 
 Drift: none.
 
+### Slice 9 — L0 conventions doc and primitives module
+
+Commit: `c256bdb`.
+
+Changed:
+
+- Added `@netscript/fresh-ui/primitives` as a package export.
+- Added `VisuallyHidden`, `SrOnly`, and `Show` with package-owned public
+  structural render types so `deno doc --lint` does not expose Preact private
+  JSX internals.
+- Added `packages/fresh-ui/docs/l0-conventions.md` documenting L0 layer rules,
+  data/ARIA attribute conventions, native-first behavior, and token consumption.
+- Updated README entrypoint/features/usage/architecture docs for L0 primitives.
+- Added primitive tests, including JSX component usage for `VisuallyHidden`.
+- Captured `deno doc` before/after and per-symbol snapshots in the run dir.
+
+Evidence:
+
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 35 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno lint --config packages/fresh-ui/deno.gates.json packages/fresh-ui/primitives.tsx packages/fresh-ui/primitives.test.tsx`
+  → PASS/exit 0.
+- `deno fmt --check --config packages/fresh-ui/deno.gates.json packages/fresh-ui/deno.json packages/fresh-ui/primitives.tsx packages/fresh-ui/primitives.test.tsx packages/fresh-ui/README.md packages/fresh-ui/docs/l0-conventions.md`
+  → PASS/exit 0.
+- `deno doc --json packages/fresh-ui/mod.ts` before/after captured at
+  `slice-09-deno-doc-mod-before.json` and `slice-09-deno-doc-mod-after.json`.
+- `deno doc --json packages/fresh-ui/primitives.tsx` captured at
+  `slice-09-deno-doc-primitives-after.json`; `deno doc --filter` snapshots
+  captured for `VisuallyHidden`, `SrOnly`, and `Show`.
+
+Drift: none.
+
 ### Slice 7 — `manifest-integrity` fitness gate
 
 Commit: `6977b9b`.
