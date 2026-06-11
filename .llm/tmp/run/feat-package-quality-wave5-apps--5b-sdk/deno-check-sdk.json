@@ -1,5 +1,11 @@
 {
   "imports": {
+    "@netscript/telemetry/context": "./telemetry-context-stub.ts",
+    "@orpc/client": "npm:@orpc/client@^1.13.5",
+    "@orpc/client/fetch": "npm:@orpc/client@^1.13.5/fetch",
+    "@orpc/client/plugins": "npm:@orpc/client@^1.13.5/plugins",
+    "@orpc/client/standard": "npm:@orpc/client@^1.13.5/standard",
+    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
     "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.13.5",
     "@tanstack/db": "npm:@tanstack/db@^0.6.1",
     "@tanstack/query-core": "npm:@tanstack/query-core@^5.75.5",

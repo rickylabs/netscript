@@ -173,3 +173,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Lock hygiene | The run-local check config and lock were expanded for TanStack DB/query-db-collection resolution used by the focused slice gate; the repository root lock was not touched. |
 | Concept of done | The collection factory no longer exposes an inferred upstream TanStack DB `Collection` type. The return port is structural, package-owned, and includes common read/preload/mutation operations without leaking upstream transaction or virtual-prop helper types. |
 | Drift | none |
+
+### Slice 10/19 — D-8 internal `ClientLinkFactory` transport seam
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `112e4a2` — `Extract sdk HTTP client link seam` |
+| Changed | Added internal `ClientLinkFactory`/`ClientLinkPort` structural seam in `src/ports/client-link-factory.ts`. Moved the existing HTTP `RPCLink` construction, discovery URL resolution, trace header propagation, retry plugin, dedupe plugin, and fetch bridge into `src/client/http-client-link.ts`. `createServiceClient()` now composes the HTTP link via `createHttpClientLink()` and keeps the public options unchanged. No in-process transport or public transport option was added. |
+| Gate | Raw `Deno.Command`: `deno check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv ./packages/sdk/src/ports/client-link-factory.ts ./packages/sdk/src/client/http-client-link.ts ./packages/sdk/src/client/service-client.ts` PASS exit 0. Raw `Deno.Command`: `deno lint --no-config ./packages/sdk/src/ports/client-link-factory.ts ./packages/sdk/src/client/http-client-link.ts ./packages/sdk/src/client/service-client.ts .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/telemetry-context-stub.ts` PASS exit 0. Raw `Deno.Command`: `deno fmt --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json --check <slice-10 files>` PASS exit 0. Raw `Deno.Command`: `deno doc --lint ./packages/sdk/src/ports/client-link-factory.ts ./packages/sdk/src/client/http-client-link.ts ./packages/sdk/src/client/service-client.ts ./packages/sdk/src/ports/service-client.ts` PASS, checked 4 files. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Lock hygiene | The run-local check config/lock were expanded for oRPC client/fetch/plugins/standard/contract resolution and a local telemetry-context stub used only by the focused gate. Root `deno.lock` was not touched. |
+| Concept of done | Transport construction is now behind an internal package-owned seam and `createServiceClient()` composes only that lower-level factory. The HTTP behavior remains the only implementation; RFC 14 unified/in-process mode remains unimplemented as required. |
+| Drift | none |
