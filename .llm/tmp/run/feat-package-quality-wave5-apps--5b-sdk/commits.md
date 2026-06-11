@@ -14,3 +14,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 - 549326c: Export stream producer types for sdk docs
 - 9585851: Add sdk query client structural port
 - 82abaa6: Add sdk service query utils type mirror
+- b0eca88: Type sdk service query utils factory

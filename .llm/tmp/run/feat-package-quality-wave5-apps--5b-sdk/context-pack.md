@@ -6,7 +6,7 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-7/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-8/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
@@ -25,9 +25,12 @@ and changed collection options to accept the port with an internal TanStack boun
 cast. Slice 7 added `ServiceQueryUtils<TContract>` in `src/ports/service-query-utils.ts`,
 exported it through `./ports`, `./query-client`, and root, and added dual compile-only
 fixtures proving sdk contract inference plus upstream `createTanstackQueryUtils()`
-return assignability. Next slice: type `createServiceQueryUtils()` as
-`createServiceQueryUtils<TContract>(client: ServiceClient<TContract>, options?)` with
-the single documented upstream-boundary cast.
+return assignability. Slice 8 typed `createServiceQueryUtils()` as
+`createServiceQueryUtils<TContract>(client: ServiceClient<TContract>, options?):
+ServiceQueryUtils<TContract>`, removed the public `any` bridge, added a type-only
+`ServiceClientContract<TContract>` marker so clients infer their source contract, and
+kept one documented upstream-boundary return assertion. Next slice: `QueryCollection<TItem>`
+return port (D-7).
 
 ## What the plan session did
 

@@ -1,0 +1,16 @@
+{
+  "imports": {
+    "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.13.5"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "isolatedDeclarations": true,
+    "lib": [
+      "dom",
+      "deno.ns",
+      "deno.unstable"
+    ]
+  }
+}
