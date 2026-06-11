@@ -375,10 +375,10 @@ jobs:
           REQUEST
           cp "$OPENHANDS_REQUEST_PATH" "$OPENHANDS_TRACE_DIR/request.md"
           if [ "${REQUEST_IS_PR}" = "true" ] && [ -n "${REQUEST_ISSUE_NUMBER}" ]; then
-            gh api "repos/${GITHUB_REPOSITORY}/issues/${REQUEST_ISSUE_NUMBER}/comments" \
-              > "$OPENHANDS_ISSUE_COMMENTS_PATH" || true
-            gh api "repos/${GITHUB_REPOSITORY}/pulls/${REQUEST_ISSUE_NUMBER}/comments" \
-              > "$OPENHANDS_PR_REVIEW_COMMENTS_PATH" || true
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${REQUEST_ISSUE_NUMBER}/comments" \
+              --jq '.[]' | jq -s '.' > "$OPENHANDS_ISSUE_COMMENTS_PATH" || true
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${REQUEST_ISSUE_NUMBER}/comments" \
+              --jq '.[]' | jq -s '.' > "$OPENHANDS_PR_REVIEW_COMMENTS_PATH" || true
           fi
 
       - name: Setup Deno
@@ -485,6 +485,7 @@ jobs:
           exit "$status"
 
       - name: Materialize OpenHands trace
+        id: trace
         if: always()
         env:
           BOOTSTRAP_OUTCOME: ${{ steps.bootstrap.outcome }}
@@ -499,13 +500,57 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$OPENHANDS_RUN_DIR" "$OPENHANDS_TRACE_DIR"
-          if [ ! -f "$OPENHANDS_SUMMARY_PATH" ]; then
+
+          summary_source="none"
+          if [ -f "$OPENHANDS_RUN_DIR/summary-source.txt" ]; then
+            summary_source="$(head -n 1 "$OPENHANDS_RUN_DIR/summary-source.txt")"
+          fi
+
+          verdict="completed"
+          if [ "${BOOTSTRAP_OUTCOME}" != "success" ]; then
+            verdict="bootstrap-failed"
+          elif [ "${AGENT_OUTCOME}" = "skipped" ] || [ "${AGENT_OUTCOME}" = "cancelled" ]; then
+            verdict="not-run"
+          elif [ "${AGENT_OUTCOME}" != "success" ]; then
+            verdict="agent-failed"
+          elif [ ! -s "$OPENHANDS_SUMMARY_PATH" ]; then
+            verdict="summary-missing"
+          fi
+          {
+            echo "verdict=$verdict"
+            echo "summary_source=$summary_source"
+          } >> "$GITHUB_OUTPUT"
+          export RUN_VERDICT="$verdict" SUMMARY_SOURCE="$summary_source"
+
+          if [ ! -s "$OPENHANDS_SUMMARY_PATH" ]; then
             {
               echo "# OpenHands Agent Summary"
               echo
-              echo "OpenHands did not start or did not produce a summary."
-              echo
-              echo "This is a workflow failure, not a task verdict."
+              case "$verdict" in
+                bootstrap-failed)
+                  echo "Toolchain bootstrap failed, so the agent never ran."
+                  echo
+                  echo "This is a workflow failure, not a task verdict."
+                  ;;
+                not-run)
+                  echo "The agent step did not run (outcome: ${AGENT_OUTCOME})."
+                  echo
+                  echo "This is a workflow failure, not a task verdict."
+                  ;;
+                agent-failed)
+                  echo "The agent run failed before producing a summary."
+                  echo
+                  echo "This is a workflow failure, not a task verdict."
+                  ;;
+                *)
+                  echo "The agent completed but did not write its run summary"
+                  echo "(agent contract miss, not a workflow failure)."
+                  echo
+                  echo "The agent may still have done real work. Inspect commits on"
+                  echo "the branch and agent.log in the Actions artifact before"
+                  echo "trusting or discarding any verdict."
+                  ;;
+              esac
               echo
               echo "## Diagnostics"
               echo "- Bootstrap: ${BOOTSTRAP_OUTCOME}"
@@ -528,6 +573,8 @@ jobs:
               "run_url": os.environ["RUN_URL"],
               "bootstrap_outcome": os.environ["BOOTSTRAP_OUTCOME"],
               "agent_outcome": os.environ["AGENT_OUTCOME"],
+              "verdict": os.environ.get("RUN_VERDICT", "unknown"),
+              "summary_source": os.environ.get("SUMMARY_SOURCE", "none"),
               "model": os.environ["MODEL"],
               "provider": os.environ["PROVIDER"],
               "output_mode": os.environ["OUTPUT_MODE"],
@@ -543,6 +590,9 @@ jobs:
           PY
           cp "$OPENHANDS_SUMMARY_PATH" "$OPENHANDS_TRACE_DIR/summary.md"
           cp "$OPENHANDS_METADATA_PATH" "$OPENHANDS_TRACE_DIR/metadata.json"
+          if [ -f "$OPENHANDS_RUN_DIR/summary-source.txt" ]; then
+            cp "$OPENHANDS_RUN_DIR/summary-source.txt" "$OPENHANDS_TRACE_DIR/summary-source.txt"
+          fi
           if [ -f "$OPENHANDS_RUN_DIR/bootstrap-exit-code.txt" ]; then
             cp "$OPENHANDS_RUN_DIR/bootstrap-exit-code.txt" "$OPENHANDS_TRACE_DIR/bootstrap-exit-code.txt"
           fi
@@ -587,6 +637,33 @@ jobs:
           git commit -m "chore(openhands): apply agent changes"
           git push "https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git" "HEAD:${CHECKOUT_REF}"
 
+      - name: Commit run trace to PR branch
+        if: always() && steps.request.outputs.is_pr == 'true' && steps.artifacts.outputs.trace_dir != ''
+        env:
+          TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
+          CHECKOUT_REF: ${{ steps.request.outputs.checkout_ref }}
+          TRACE_DIR: ${{ steps.artifacts.outputs.trace_dir }}
+        run: |
+          set -euo pipefail
+          if [ ! -d .git ] || [ ! -d "$TRACE_DIR" ]; then
+            echo "No checkout or trace directory; skipping trace commit."
+            exit 0
+          fi
+          git add -- "$TRACE_DIR"
+          if git diff --cached --quiet; then
+            echo "No trace changes to commit."
+            exit 0
+          fi
+          git config user.email "openhands@all-hands.dev"
+          git config user.name "OpenHands Bot"
+          git commit -m "chore(openhands): record run trace ${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          remote="https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git"
+          if ! git push "$remote" "HEAD:${CHECKOUT_REF}"; then
+            git -c rebase.autoStash=true pull --rebase "$remote" "${CHECKOUT_REF}"
+            git push "$remote" "HEAD:${CHECKOUT_REF}"
+          fi
+
       - name: Create pull request for non-PR triggers
         if: steps.run-agent.outcome == 'success' && steps.request.outputs.is_pr != 'true'
         uses: peter-evans/create-pull-request@v8
@@ -608,6 +685,10 @@ jobs:
           MODEL: ${{ steps.request.outputs.model }}
           PROVIDER: ${{ steps.request.outputs.provider }}
           JOB_STATUS: ${{ job.status }}
+          VERDICT: ${{ steps.trace.outputs.verdict }}
+          SUMMARY_SOURCE: ${{ steps.trace.outputs.summary_source }}
+          IS_PR: ${{ steps.request.outputs.is_pr }}
+          ARTIFACT_NAME: openhands-agent-${{ github.run_id }}-${{ github.run_attempt }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
@@ -626,13 +707,32 @@ jobs:
               echo "- Run: ${RUN_URL}"
             } > "$OPENHANDS_SUMMARY_PATH"
           fi
+          case "${VERDICT:-}" in
+            completed) heading="Completed" ;;
+            summary-missing) heading="Completed — no agent summary" ;;
+            agent-failed) heading="Agent failed" ;;
+            bootstrap-failed) heading="Bootstrap failed" ;;
+            not-run) heading="Did not run" ;;
+            '') heading="${JOB_STATUS}" ;;
+            *) heading="${VERDICT}" ;;
+          esac
+          if [ "${IS_PR}" = "true" ]; then
+            trace_line="Trace: ${OPENHANDS_TRACE_DIR} (committed to the PR branch)"
+          else
+            trace_line="Trace: ${OPENHANDS_TRACE_DIR} (in Actions artifact)"
+          fi
           {
             echo "<!-- openhands-agent-summary -->"
-            echo "## OpenHands Agent — ${JOB_STATUS}"
+            echo "## OpenHands Agent — ${heading}"
             echo
             echo "Model: ${MODEL}"
             echo "Provider: ${PROVIDER}"
-            echo "Artifacts: ${OPENHANDS_TRACE_DIR}"
+            echo "Job status: ${JOB_STATUS}"
+            if [ -n "${SUMMARY_SOURCE:-}" ] && [ "${SUMMARY_SOURCE}" != "agent" ] && [ "${SUMMARY_SOURCE}" != "none" ]; then
+              echo "Summary source: ${SUMMARY_SOURCE}"
+            fi
+            echo "${trace_line}"
+            echo "Artifact: ${ARTIFACT_NAME}"
             echo
             cat "$OPENHANDS_SUMMARY_PATH"
             echo
