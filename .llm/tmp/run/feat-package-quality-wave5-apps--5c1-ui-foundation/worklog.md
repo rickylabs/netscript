@@ -79,6 +79,41 @@ gates under `.llm/tools/fitness/` for registry/token invariants. CLI
 installation behavior lives under `packages/cli/src/public/features/ui/` once
 slices 13-14 land.
 
+### Slice 14 — `ui:add <item|collection>` command
+
+Commit: pending.
+
+Changed:
+
+- Added the public root command `ui:add <item|collection>`.
+- Reused the Slice 13 registry installer for the locked resolution algorithm:
+  manifest item/collection lookup, dependency topological sort, target
+  placeholder mapping, source copy, copied relative import rewrite, dependency
+  import-map merge, and CSS aggregator rewrite.
+- Added command-tree assertion coverage for the new public command.
+- Recorded item and collection smoke evidence in
+  `slice-14-ui-add-evidence.json`.
+
+Evidence:
+
+- `deno task --cwd packages/cli check` → PASS/exit 0.
+- `deno lint --no-config ...` over the UI feature files, touched root wiring
+  files, and command-tree assertion → PASS/exit 0, checked 8 files.
+- `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.fmt.json ...`
+  over the UI feature files → PASS/exit 0, checked 5 files.
+- `deno run --allow-all packages/cli/bin/netscript.ts ui:add button --project-root <run-local scratch app> --force`
+  → PASS/exit 0; installed 5 dependency-resolved items, copied 11 files,
+  merged 4 imports, wrote 2 per-item CSS imports, scratch file count 12.
+- `deno run --allow-all packages/cli/bin/netscript.ts ui:add forms-core --project-root <run-local scratch app> --force`
+  → PASS/exit 0; installed 15 dependency-resolved items, copied 26 files,
+  merged 4 imports, wrote 9 per-item CSS imports, scratch file count 27.
+- `deno test --allow-all packages/cli/src/local/composition/local-contributor-command-tree_test.ts`
+  → PASS/exit 0.
+- `git diff -- deno.lock packages/cli/deno.lock .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.lock`
+  → PASS/exit 0, no lock-file diff.
+
+Drift: none.
+
 ### Slice 13 — `ui:init` command
 
 Commit: `9c2a38b`.

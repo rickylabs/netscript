@@ -8,6 +8,7 @@ import { createInitCommand } from '../init/init-command.ts';
 import { createMarketplaceCommand } from '../marketplace/marketplace-group.ts';
 import { createPluginCommand } from '../plugins/plugins-group.ts';
 import { createServiceCommand } from '../services/services-group.ts';
+import { createUiAddCommand } from '../ui/add/add-ui-command.ts';
 import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
 import { createPublicCommandDependencies } from './public-command-dependencies.ts';
 
@@ -44,6 +45,13 @@ export function createPublicCommandTree(host: PublicCliHost): PublicCliCommand {
     .command('marketplace', createMarketplaceCommand())
     .command('plugin', createPluginCommand(dependencies))
     .command('service', createServiceCommand(dependencies))
+    .command(
+      'ui:add',
+      createUiAddCommand({
+        installDependencies: dependencies.uiInstallDependencies,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    )
     .command(
       'ui:init',
       createUiInitCommand({

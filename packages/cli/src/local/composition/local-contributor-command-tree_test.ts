@@ -23,6 +23,7 @@ describe('local contributor CLI composition', () => {
       'marketplace',
       'plugin',
       'service',
+      'ui:add',
       'ui:init',
     ]);
   });
