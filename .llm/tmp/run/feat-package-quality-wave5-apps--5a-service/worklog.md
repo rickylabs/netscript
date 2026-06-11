@@ -187,3 +187,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. README line count: 234. |
 | Concept of done | Docs are reachable from the README and publish include map; examples use current `RunningService` stop semantics and no deprecated builder names. |
 | Drift | none |
+
+### Slice 13/15 — D-12 doctest runner and unit tests
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `86426fa` — `Add service doctest and unit coverage` |
+| Changed | Added README example guard `tests/_fixtures/readme-examples_test.ts`; unit tests for builder chain, custom health checks, health primitives, not-found/error handlers, and type assignability. Added `@std/assert` package import and corresponding `deno.lock` entry. |
+| Gate | `deno test --config packages/service/deno.json --allow-all packages/service/tests`: exit 1 `No test modules found` while root exclude still hides `packages/service/` before slice 15. `deno check --unstable-kv packages/service/mod.ts`: PASS exit 0 with known root-exclude warning. |
+| Concept of done | Test files are public-surface consumers and will become active when slice 15 lifts the root exclude. No test helper imports another test. |
+| Drift | none |

@@ -18,3 +18,4 @@ Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the pla
 - 53b646a: Return running service from defineService
 - 104f215: Document service barrel as public contract
 - ca090b0: Add service package documentation surface
+- 86426fa: Add service doctest and unit coverage
