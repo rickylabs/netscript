@@ -46,3 +46,8 @@ Slice 3 complete: `packages/fresh-ui` now has `tokens:build` and `tokens:check`
 tasks backed by `npm:style-dictionary@5.4.4`. `tokens:build` regenerates
 `registry/theme/tokens.css` from the DTCG source and currently produces
 byte-identical CSS; evidence is in `slice-03-token-build-parity.json`.
+
+Slice 4 complete: `tokens:build` now also generates
+`registry/theme/theme-bridge.css` with Tailwind v4 `@theme inline` and
+`registry/theme/tokens.json`. `registry/theme/styles.css` imports the generated
+bridge and no longer owns an inline `@theme` block.

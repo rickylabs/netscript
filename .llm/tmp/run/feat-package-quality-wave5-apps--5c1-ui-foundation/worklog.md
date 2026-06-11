@@ -123,6 +123,45 @@ Evidence:
 
 Drift: none.
 
+### Slice 4 — Generated `theme-bridge.css` + `tokens.json`
+
+Commit: `15a13e0`.
+
+Changed:
+
+- Extended `packages/fresh-ui/scripts/build-tokens.ts` to generate
+  `registry/theme/theme-bridge.css` and `registry/theme/tokens.json` in addition
+  to `tokens.css`.
+- Moved Tailwind theme declarations out of `registry/theme/styles.css` and into
+  generated `theme-bridge.css`, imported immediately after `tokens.css`.
+- Generated the Tailwind bridge with `@theme inline`, preserving existing
+  `--color-ns-*`, `--font-*`, `--radius-*`, and `--shadow-*` utility meanings
+  while adding explicit `input-border`, spacing, radius-ns, and shadow-ns bridge
+  entries.
+- Added `registry/**/*.json` to package publish include so the generated
+  `tokens.json` artifact is publishable.
+- Added run-local bridge/token JSON integrity evidence.
+
+Evidence:
+
+- `deno task --cwd packages/fresh-ui tokens:check` → PASS/exit 0 after staging
+  generated artifacts; build completed and generated outputs were stable.
+- `deno run --allow-read --allow-write .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-04-theme-outputs.ts`
+  → PASS/exit 0; stylesImportsBridge true, stylesInlineThemeBlocks 0,
+  bridgeUsesThemeInline true, missingBridgeLines 0, rootTokenCount 134,
+  lightTokenCount 27.
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0, including
+  `scripts/build-tokens.ts`.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 30 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno fmt --check --no-config ...` over changed package/run files → PASS/exit
+  0, checked 7 files.
+- `deno lint --no-config packages/fresh-ui/scripts/build-tokens.ts .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-04-theme-outputs.ts`
+  → PASS/exit 0.
+
+Drift: none.
+
 ### Slice 3 — Style Dictionary v5 build task + generated `tokens.css`
 
 Commit: `bf4465f`.
