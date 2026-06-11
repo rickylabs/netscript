@@ -41,3 +41,8 @@ Slice 2 complete: DTCG token source files now live under
 `packages/fresh-ui/tokens/`. The source covers all 134 root `--ns-*` custom
 properties and all 27 light overrides from `registry/theme/tokens.css`;
 run-local verifier evidence is in `slice-02-token-parity.json`.
+
+Slice 3 complete: `packages/fresh-ui` now has `tokens:build` and `tokens:check`
+tasks backed by `npm:style-dictionary@5.4.4`. `tokens:build` regenerates
+`registry/theme/tokens.css` from the DTCG source and currently produces
+byte-identical CSS; evidence is in `slice-03-token-build-parity.json`.

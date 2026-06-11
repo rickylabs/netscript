@@ -123,6 +123,43 @@ Evidence:
 
 Drift: none.
 
+### Slice 3 — Style Dictionary v5 build task + generated `tokens.css`
+
+Commit: `bf4465f`.
+
+Changed:
+
+- Added `packages/fresh-ui/scripts/build-tokens.ts`, pinned to
+  `npm:style-dictionary@5.4.4`.
+- Added package tasks `tokens:build` and `tokens:check`.
+- Excluded internal `scripts/**` from publish output so the Style Dictionary
+  build helper does not become part of the public JSR package surface.
+- Added run-local parity verifier and evidence at
+  `slice-03-token-build-parity.json`.
+- Regenerated `registry/theme/tokens.css`; it remained byte-identical to `HEAD`,
+  so no CSS content diff was committed.
+
+Evidence:
+
+- `deno task --cwd packages/fresh-ui tokens:check` → PASS/exit 0; build
+  completed and `git diff --exit-code registry/theme/tokens.css` found no CSS
+  diff.
+- `deno run --allow-read --allow-write --allow-run=git .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-03-token-build.ts`
+  → PASS/exit 0; byte parity true, matching SHA-256
+  `e0e53f0e63ae2bf0b7a0d8507bfdf76ec1761550aae251abf41452c85fc567df`, root 134
+  declarations, light 27 declarations.
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0, including
+  `scripts/build-tokens.ts`.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 30 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno fmt --check --no-config ...` over the package task file, build script,
+  verifier, and evidence JSON → PASS/exit 0, checked 4 files.
+- `deno lint --no-config packages/fresh-ui/scripts/build-tokens.ts .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-03-token-build.ts`
+  → PASS/exit 0.
+
+Drift: none.
+
 ### Slice 2 — DTCG 2025.10 token source
 
 Commit: `4ea5103`.

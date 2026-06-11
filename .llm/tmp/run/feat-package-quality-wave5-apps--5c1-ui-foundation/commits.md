@@ -18,3 +18,5 @@ hash-record commit; commits are never amended.
 - Slice 1 impl `047558c`: Replace fresh-ui brittle check file list.
 - Slice 1 docs `d6cb2da`: Record slice 1 evidence.
 - Slice 2 impl `4ea5103`: Transcribe fresh-ui tokens to DTCG source.
+- Slice 2 docs `34b5282`: Record slice 2 evidence.
+- Slice 3 impl `bf4465f`: Build fresh-ui tokens with Style Dictionary.
