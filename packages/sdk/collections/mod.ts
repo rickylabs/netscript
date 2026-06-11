@@ -10,5 +10,10 @@
 
 export {
   createQueryCollection,
+  type QueryCollection,
   type QueryCollectionOptions,
+  type QueryCollectionStatus,
+  type QueryCollectionTransaction,
+  type QueryCollectionUpdate,
+  type QueryCollectionUpdateMany,
 } from '../src/collections/create-query-collection.ts';
