@@ -81,7 +81,7 @@ slices 13-14 land.
 
 ## D-5c1-2 closeout
 
-Commit: pending
+Commit: `ef34f27`
 
 Changed:
 

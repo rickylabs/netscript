@@ -47,3 +47,8 @@ hash-record commit; commits are never amended.
 - Slice 15 docs `fb278c8`: Record slice 15 evidence.
 - Slice 16 impl `2d76d21`: Prepare fresh UI package for JSR exit.
 - Slice 16 docs `24e9d3d`: Record slice 16 evidence.
+
+## Closeout
+
+- D-5c1-2 closeout impl `ef34f27`: Resolve Zag hydration closeout evidence.
+- D-5c1-2 closeout docs: this follow-up commit records the closeout hash.
