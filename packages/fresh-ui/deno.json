@@ -24,6 +24,7 @@
       "README.md"
     ],
     "exclude": [
+      "scripts/**",
       "**/*_test.ts",
       "**/*_test.tsx",
       "**/*.test.ts",
@@ -32,7 +33,9 @@
   },
   "tasks": {
     "check": "deno check --config deno.gates.json --no-lock --unstable-kv \"**/*.ts\" \"**/*.tsx\"",
-    "test": "deno test --config deno.gates.json --no-lock --unstable-kv \"**/*_test.ts\" \"**/*_test.tsx\" \"**/*.test.ts\" \"**/*.test.tsx\""
+    "test": "deno test --config deno.gates.json --no-lock --unstable-kv \"**/*_test.ts\" \"**/*_test.tsx\" \"**/*.test.ts\" \"**/*.test.tsx\"",
+    "tokens:build": "deno run --no-lock --allow-read=. --allow-write=registry/theme/tokens.css --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
+    "tokens:check": "deno task tokens:build && git diff --exit-code registry/theme/tokens.css"
   },
   "compilerOptions": {
     "lib": [
