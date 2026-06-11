@@ -1,11 +1,15 @@
-# Plan — Sub-wave 5c: NetScript UI end product (PROPOSED)
+# Plan — Sub-wave 5c: NetScript UI end product (LOCKED v2)
 
-> Status: **PROPOSED** — awaiting PLAN-EVAL. Generator session only; no
-> implementation in this branch. This plan deliberately spans **three
-> implementation runs** (user-sanctioned: "it is fine that conclusions drive us
-> towards 3 separate implementation runs, or different branches"). Runs 2 and 3
-> re-slice at their own lock points after upstream learnings; this plan locks the
-> architecture decisions, the run split, and run 1's slices.
+> Status: **LOCKED** — PLAN-EVAL passed (2026-06-11).
+> Amendments from eval session:
+> - D-4: registry schema v2 adds `cssVars?` and `author?` fields.
+> - D-2: anchor-positioning fallback = CSS `position: fixed` fallback (OddBird polyfill rejected).
+> - D-11: full scaffolded-app spec, registry v2 spec, token pipeline spec, tier matrix added to design-appendix.md.
+> - Runs 2–3 re-sliced to table form (≤16 slices each) with gate-evidence columns.
+>
+> This plan spans **three implementation runs**. Runs 2 and 3 re-slice at their
+> own lock points after upstream learnings. Architecture decisions, run split,
+> and run 1 slices are locked.
 
 ## 1. Archetype + doctrine verdict
 
@@ -51,9 +55,8 @@ platform-first interactivity behind a Zag-shaped contract.
 
 - Naming of the official DS theme ("NS One" placeholder) — user call, cosmetic,
   doesn't block runs.
-- Anchor-positioning fallback choice (OddBird polyfill vs CSS fixed-position
-  degradation) — decided inside run 1's popover slice after the spike measures
-  polyfill weight.
+- ~~Anchor-positioning fallback choice~~ → **DECIDED**: CSS `position: fixed` +
+  `inset` fallback (no OddBird polyfill). See drift D-7.
 - Which Tier-Z components ship first (combobox is the likely lead) — decided at run
   2 lock; zero schema impact.
 - `block:add` contract introspection — designed seam, explicitly deferred (§9).
@@ -75,28 +78,49 @@ platform-first interactivity behind a Zag-shaped contract.
 | 9 | L0 conventions doc + primitives module (VisuallyHidden, SrOnly, Show) | D-1 |
 | 10 | Zag×Fresh spike: `npm:@zag-js/preact` combobox in playground island (SSR + hydration) | go/no-go evidence for Tier Z; throwaway route |
 | 11 | Accordion internals → native `<details name>` (hook shape preserved) | D-2 Tier P |
-| 12 | Popover/tooltip internals → Popover API + anchor positioning + fallback | D-2 Tier P; largest slice |
+| 12 | Popover/tooltip internals → Popover API + anchor positioning + CSS fallback | D-2 Tier P; largest slice |
 | 13 | `ui:init` command in packages/cli (theme + styles aggregator + imports) | D-5 |
 | 14 | `ui:add <item|collection>` command (copy, specifier rewrite, deps) | D-5 |
 | 15 | OKLCH ramp re-derivation in token source | D-3 phase 2; visual review on /design precursor route |
 | 16 | README/docs/jsr dry-run sweep | exit |
 
-### Run 2 — Official design system (`feat/...-5c2-design-system`), ~12 slices (re-sliced at its lock)
+### Run 2 — Official design system (`feat/...-5c2-design-system`), 12 slices
 
-CSS corpora reconciliation (playground 2,264L → registry homes); layout-objects
-style item; component completion/reconciliation pass (toast, data-table, ...);
-playground converted to `ui:add` consumer; `/design` styleguide (tokens browser,
-gallery, rules); DS lint gates (no raw hex, no off-vocabulary color utilities);
-real-route validation.
+| # | Slice | Gate evidence | Notes |
+|---|-------|---------------|-------|
+| 1 | CSS corpora reconciliation: playground 2,264L → registry homes | visual diff, manifest-integrity | move-only; no renames |
+| 2 | layout-objects style item (Stack, Cluster, Grid, Toolbar, Section, Split, ScrollRegion) | check + lint | CSS-only, zero JS |
+| 3 | Playground converted to `ui:add` consumer | playground check passes | replaces deep relative imports |
+| 4 | `/design` route group: tokens browser | browser validation | reads tokens.json |
+| 5 | `/design` route group: component gallery | browser validation | per registry item |
+| 6 | `/design` route group: composition-rules page | browser validation | static docs route |
+| 7 | DS lint gate: no raw hex in components | lint rule | PENDING_SCRIPT |
+| 8 | DS lint gate: no off-vocabulary color utilities | lint rule | PENDING_SCRIPT |
+| 9 | Component completion: toast, data-table reconciliation | check + tests | reconcile playground vs registry |
+| 10 | Run 2 README/docs sweep | doc-lint | |
+| 11 | Run 2 check:packages + lint + fmt | raw deno | |
+| 12 | JSR dry-run from package dir | raw deno publish --dry-run | |
 
-### Run 3 — Generated app revamp (`feat/...-5c3-scaffold-revamp`), ~12 slices (re-sliced at its lock; gated on 5b merge)
+### Run 3 — Generated app revamp (`feat/...-5c3-scaffold-revamp`), 16 slices
 
-Scaffold pipeline: app phase delegates to `ui:init` + starter collection; delete
-forked component/CSS templates; new starter routes per D-11 (dashboard resource
-page w/ defer+partials, SSE live page, forms example) written against post-5b sdk
-(`defineServices()`); route doc-headers; template manifest/loader cleanup;
-`netscript init` e2e + generated-app check/lint/fmt green; visual parity review
-against playground.
+| # | Slice | Gate evidence | Notes |
+|---|-------|---------------|-------|
+| 1 | `ui:init` integration into `netscript init` app phase | e2e: `netscript init` green | delegates to existing ui:init path |
+| 2 | Delete forked component/CSS templates from CLI | manifest-integrity | ~10 template files |
+| 3 | Template glue whitelist update | e2e: init green | main/router/vite/lib/routes |
+| 4 | Starter route: `/` welcome map | check + browser | static, service list introspection |
+| 5 | Starter route: `/dashboard` resource page | check + browser | defer + partial + skeleton |
+| 6 | Starter route: `/dashboard/live` SSE widget | check + browser | EventSource island |
+| 7 | Starter route: `/forms` validation demo | check + browser | form-field + schema validation |
+| 8 | Starter route: `/health` | check | content-negotiated |
+| 9 | Scaffolded app deno.json imports block | check | auto-merged from registry items |
+| 10 | `netscript init` e2e green | deno task e2e:cli | full scaffold.runtime suite |
+| 11 | Generated-app check/lint/fmt green | raw deno | |
+| 12 | Visual parity review vs playground | manual | browser screenshots |
+| 13 | Run 3 README/docs sweep | doc-lint | |
+| 14 | JSR dry-run from package dir | raw deno publish --dry-run | |
+| 15 | Template manifest/loader cleanup | check | remove dead manifest keys |
+| 16 | Route doc-headers | lint | "what this demonstrates / where to edit" |
 
 ## 6. Gates (exit criteria per run)
 

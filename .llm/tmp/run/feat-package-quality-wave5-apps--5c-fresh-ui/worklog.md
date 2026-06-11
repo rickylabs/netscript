@@ -47,3 +47,18 @@
 
 - Commit artifacts, push, Draft PR to umbrella; PLAN-EVAL is a separate session.
   Plan status PROPOSED until then.
+
+## PLAN-EVAL (2026-06-11, separate session)
+
+- Evaluator read: plan-gate.md, protocol.md, research.md, design.md, plan.md,
+  drift.md, archetype-gate-matrix.md, RFC 06, whitepaper.
+- External resource aggregation: 9 extract files written to .llm/tmp/docs/
+  (style-dictionary, dtcg, zagjs, tailwindcss, fresh, popover-api, base-ui,
+  shadcn, react-aria, oklch).
+- Decision matrix: D-1…D-13 all CONFIRMED except D-4 (AMEND: +cssVars/+author)
+  and D-11 (AMEND: full spec provided in design-appendix.md).
+- Fallback decision made: CSS fixed-position fallback, not OddBird polyfill.
+- Design deepening written: scaffold spec, registry v2 schema+algorithm,
+  token pipeline config, tier matrix, runs 2-3 re-slice.
+- Plan amended to v2 LOCKED. drift.md updated with D-7, D-8.
+- Verdict: PASS with amendments.

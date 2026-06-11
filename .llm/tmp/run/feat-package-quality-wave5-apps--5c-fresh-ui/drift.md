@@ -53,3 +53,20 @@ concrete two-phase design (plan D-3): DTCG 2025.10 source → SD v5 → three ch
 generated artifacts with a drift gate; phase 1 hex parity, phase 2 OKLCH; the
 `--ns-*` / `*-ns-*` / ns- class contract is the declared invariant. RFC 06 line 578
 and the manifest literal `tokenSourceStrategy` should be updated when run 1 lands.
+
+## D-7 — Anchor positioning fallback: OddBird polyfill rejected (2026-06-11)
+
+Plan D-2 left the anchor-positioning fallback choice open (polyfill vs degrade).
+PLAN-EVAL evaluated OddBird polyfill (v0.6.0, tens of KB, dynamic-content caveat
+incompatible with Fresh partials) and decided: CSS `position: fixed` + `inset`
+fallback for non-supporting browsers (Firefox). Polyfill not used. Recorded as
+accepted debt: tooltip/popover positioning degrades to centered fixed placement
+on Firefox until anchor positioning reaches Baseline.
+
+## D-8 — Registry schema v2 amended (2026-06-11)
+
+Original v2 schema dropped `cssVars` and `author` fields present in shadcn
+registry-item.json. PLAN-EVAL diff showed these are worth adopting:
+`cssVars?: { theme?, light?, dark? }` enables theme-aware items to contribute
+scoped variables; `author?: string` reserves the field for future community
+namespaces. Added to schema v2 (design-appendix §B.1).
