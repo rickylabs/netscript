@@ -1,6 +1,19 @@
-# Context pack — Sub-wave 5b: `@netscript/sdk` (for PLAN-EVAL)
+# Context pack — Sub-wave 5b: `@netscript/sdk` (implementation)
 
-## What this session did
+## Current state
+
+PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
+2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
+no commits. First duties are complete and pushed at `13dca51`.
+
+Slice 1/19 is complete: `packages/sdk/deno.json` now has package-local
+`check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. The slice gate passed:
+`deno task check` from `packages/sdk` exits 0 with the known pre-slice-19 root-exclude
+warning, and scoped JSON format check passes with `deno fmt --check --no-config --ext json
+packages/sdk/deno.json`. Next slice: move sdk sources under `src/` with thin retained
+subpath entries.
+
+## What the plan session did
 
 Wave 5 GENERATOR, RESEARCH + PLAN & DESIGN only. No implementation, no locked plan.
 PLAN-EVAL (you, a separate session) reviews `plan.md` against
@@ -16,8 +29,9 @@ deliverables; docs/architecture.md must ship the layer map + seam audit.
 
 - Branch `feat/package-quality-wave5-apps-5b-sdk` @ fork from `19cae06` (umbrella tip
   incl. 5a merge). Worktree `.worktrees/wave5-apps-5b-sdk`.
-- This run dir: `research.md`, `plan.md` (PROPOSED), `worklog.md` (## Design),
-  `drift.md` (4 entries), `measure-5b.json`, `commits.md`.
+- This run dir: `research.md`, `plan.md` (LOCKED), `plan-eval-summary.md`,
+  `worklog.md` (## Design + implementation evidence), `drift.md` (5 entries),
+  `measure-5b.json`, `commits.md`.
 - 5a precedents: `.llm/tmp/run/feat-package-quality-wave5-apps--5a-service/`
   (structural mirrors, interface-builder, root-exclude lift, gate-evidence pairing —
   all reusable).

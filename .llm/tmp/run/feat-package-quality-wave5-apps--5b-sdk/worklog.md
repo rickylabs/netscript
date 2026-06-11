@@ -67,3 +67,24 @@ fixtures as living examples.
 
 Artifacts ready for PLAN-EVAL (separate session): research.md, plan.md (PROPOSED),
 drift.md, context-pack.md, measure-5b.json. No implementation performed.
+
+## Implementation
+
+### First duties — PLAN-EVAL lock materialized
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `13dca51` — `Lock sdk plan after PLAN-EVAL pass` |
+| Changed | `plan.md` status now records LOCKED / PLAN-EVAL PASS; `plan-eval-summary.md` materializes the PASS verdict, locked `defineServices` naming decision, and advisories B1-B4; `drift.md` records the one-time exception that the PR comment is the verdict source because the evaluator committed no `plan-eval.md`. |
+| Gate | Raw git verification: local `HEAD` and `git ls-remote origin refs/heads/feat/package-quality-wave5-apps-5b-sdk` both resolved to `13dca519586c67d6a26235395577cba3dc27830f` after push. |
+| Drift | D-5 |
+
+### Slice 1/19 — D-12 package task block
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `ef6a6bd` — `Add sdk package tasks for quality gates` |
+| Changed | `packages/sdk/deno.json` now declares package-local `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks while preserving the locked exports/imports/publish map for later slices. |
+| Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with the known pre-slice-19 root-exclude warning `No matching files found`. Raw `Deno.Command`: `deno fmt --check --no-config --ext json packages/sdk/deno.json` PASS exit 0 after scoped formatting of that one metadata file. |
+| Concept of done | Metadata-only slice; no source files created. The package now exposes the local quality commands later slices and final validation will use. |
+| Drift | none |
