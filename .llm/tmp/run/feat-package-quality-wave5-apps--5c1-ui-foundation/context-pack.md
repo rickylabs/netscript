@@ -51,3 +51,7 @@ Slice 4 complete: `tokens:build` now also generates
 `registry/theme/theme-bridge.css` with Tailwind v4 `@theme inline` and
 `registry/theme/tokens.json`. `registry/theme/styles.css` imports the generated
 bridge and no longer owns an inline `@theme` block.
+
+Slice 5 complete: `.llm/tools/fitness/check-token-drift.ts` provides the
+`tokens-drift` gate. It rebuilds fresh-ui token outputs and fails on untracked
+or changed generated artifacts.

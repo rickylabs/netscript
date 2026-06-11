@@ -123,6 +123,32 @@ Evidence:
 
 Drift: none.
 
+### Slice 5 — `tokens-drift` fitness gate
+
+Commit: `42b9b92`.
+
+Changed:
+
+- Added `.llm/tools/fitness/check-token-drift.ts`.
+- The gate runs raw `deno task --cwd packages/fresh-ui tokens:build`, verifies
+  all generated token artifacts are tracked, then runs raw
+  `git diff --exit-code` over `tokens.css`, `theme-bridge.css`, and
+  `tokens.json`.
+
+Evidence:
+
+- `deno run --allow-run=deno,git .llm/tools/fitness/check-token-drift.ts` →
+  PASS/exit 0, `tokens-drift: PASS 3 generated artifacts stable`.
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 30 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno fmt --check --no-config .llm/tools/fitness/check-token-drift.ts` →
+  PASS/exit 0.
+- `deno lint --no-config .llm/tools/fitness/check-token-drift.ts` → PASS/exit 0.
+
+Drift: none.
+
 ### Slice 4 — Generated `theme-bridge.css` + `tokens.json`
 
 Commit: `15a13e0`.

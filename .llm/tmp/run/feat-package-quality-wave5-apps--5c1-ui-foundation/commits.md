@@ -22,3 +22,5 @@ hash-record commit; commits are never amended.
 - Slice 3 impl `bf4465f`: Build fresh-ui tokens with Style Dictionary.
 - Slice 3 docs `9509b7c`: Record slice 3 evidence.
 - Slice 4 impl `15a13e0`: Generate Tailwind theme bridge artifacts.
+- Slice 4 docs `c4467c0`: Record slice 4 evidence.
+- Slice 5 impl `42b9b92`: Add fresh-ui token drift fitness gate.
