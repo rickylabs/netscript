@@ -337,7 +337,7 @@ deno publish --dry-run --allow-dirty
 Run the standards gate from the repository root:
 
 ```bash
-deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/contracts --text
+deno run --allow-read .llm/tools/fitness/check-netscript-standards.ts --root packages/contracts --text
 ```
 
 Run the workspace check from the repository root:

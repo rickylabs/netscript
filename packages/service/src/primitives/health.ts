@@ -17,7 +17,19 @@
  * @module
  */
 
-import type { Context } from 'hono';
+import type { ServiceContext, ServiceHandler } from '../types.ts';
+
+/** Health status values emitted by service health handlers. */
+export const HEALTH_STATUS = {
+  healthy: 'healthy',
+  degraded: 'degraded',
+  unhealthy: 'unhealthy',
+} as const;
+
+/** Health status emitted by the service health endpoint. */
+export type HealthStatus = typeof HEALTH_STATUS[keyof typeof HEALTH_STATUS];
+
+const LIVENESS_STATUS_OK = 'ok';
 
 /**
  * A single health check definition.
@@ -33,8 +45,8 @@ export interface HealthCheck {
  * Response format for health endpoint.
  */
 export interface HealthResponse {
-  /** Overall status: healthy if all checks pass, degraded if some pass, unhealthy if all fail */
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  /** Overall health status for the service. */
+  status: HealthStatus;
   /** ISO timestamp of the health check */
   timestamp: string;
   /** Optional service version */
@@ -71,10 +83,10 @@ export interface HealthHandlerOptions {
  * }));
  * ```
  */
-export function createHealthHandler(options?: HealthHandlerOptions) {
+export function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler {
   const { checks = [], version, includeDetails = true } = options ?? {};
 
-  return async (c: Context): Promise<Response> => {
+  return (async (c: ServiceContext): Promise<Response> => {
     const results = await Promise.allSettled(
       checks.map(async (check) => {
         const start = performance.now();
@@ -93,25 +105,33 @@ export function createHealthHandler(options?: HealthHandlerOptions) {
             latency: Math.round(performance.now() - start),
           };
         }
-      })
+      }),
     );
 
     const checkResults = results.map((r) =>
-      r.status === 'fulfilled' ? r.value : { name: 'unknown', healthy: false, message: 'Check failed' }
+      r.status === 'fulfilled'
+        ? r.value
+        : { name: 'unknown', healthy: false, message: 'Check failed' }
     );
 
     const allHealthy = checkResults.length === 0 || checkResults.every((r) => r.healthy);
     const someHealthy = checkResults.some((r) => r.healthy);
+    let status: HealthStatus = HEALTH_STATUS.unhealthy;
+    if (allHealthy) {
+      status = HEALTH_STATUS.healthy;
+    } else if (someHealthy) {
+      status = HEALTH_STATUS.degraded;
+    }
 
     const response: HealthResponse = {
-      status: allHealthy ? 'healthy' : someHealthy ? 'degraded' : 'unhealthy',
+      status,
       timestamp: new Date().toISOString(),
       checks: includeDetails ? checkResults : [],
       version,
     };
 
     return c.json(response, allHealthy ? 200 : 503);
-  };
+  }) as ServiceHandler;
 }
 
 /**
@@ -126,7 +146,9 @@ export const healthChecks = {
    * healthChecks.database(db)
    * ```
    */
-  database: (db: { $queryRaw: (query: TemplateStringsArray) => Promise<unknown> }): HealthCheck => ({
+  database: (
+    db: { $queryRaw: (query: TemplateStringsArray) => Promise<unknown> },
+  ): HealthCheck => ({
     name: 'database',
     check: async () => {
       await db.$queryRaw`SELECT 1`;
@@ -198,8 +220,9 @@ export const healthChecks = {
  * app.get('/health/live', createLivenessHandler());
  * ```
  */
-export function createLivenessHandler() {
-  return (c: Context): Response => c.json({ status: 'ok' }, 200);
+export function createLivenessHandler(): ServiceHandler {
+  return ((c: ServiceContext): Response =>
+    c.json({ status: LIVENESS_STATUS_OK }, 200)) as ServiceHandler;
 }
 
 /**
@@ -212,8 +235,10 @@ export function createLivenessHandler() {
  * ]));
  * ```
  */
-export function createReadinessHandler(checks: Array<() => Promise<boolean>>) {
-  return async (c: Context): Promise<Response> => {
+export function createReadinessHandler(
+  checks: Array<() => Promise<boolean>>,
+): ServiceHandler {
+  return (async (c: ServiceContext): Promise<Response> => {
     try {
       const results = await Promise.all(checks.map((check) => check()));
       const allReady = results.every((r) => r === true);
@@ -221,5 +246,5 @@ export function createReadinessHandler(checks: Array<() => Promise<boolean>>) {
     } catch {
       return c.json({ ready: false }, 503);
     }
-  };
+  }) as ServiceHandler;
 }

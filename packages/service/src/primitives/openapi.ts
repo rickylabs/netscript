@@ -17,15 +17,15 @@
  * @module
  */
 
-import type { Context } from 'hono';
 import { OpenAPIGenerator } from '@orpc/openapi';
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
+import type { ServiceContext, ServiceHandler, ServiceRouter } from '../types.ts';
 
-// Router type that matches oRPC router structure
-// deno-lint-ignore no-explicit-any
-type AnyRouter = Record<string, any>;
-
-const scalarJsUrl = new URL('../assets/scalar.min.js', import.meta.url);
+const DEFAULT_OPENAPI_SERVER_URL = '/api';
+const DEFAULT_SCALAR_TITLE = 'API Documentation';
+const DEFAULT_SCALAR_THEME = 'kepler';
+const SCALAR_JS_CACHE_CONTROL = 'public, max-age=31536000, immutable';
+const scalarJsUrl = new URL('../../assets/scalar.min.js', import.meta.url);
 let scalarJsCache: string | undefined;
 
 /**
@@ -71,18 +71,21 @@ const openApiGenerator = new OpenAPIGenerator({
  * }));
  * ```
  */
-export function createOpenAPISpec<T extends AnyRouter>(router: T, config: OpenAPIConfig) {
-  return async (c: Context): Promise<Response> => {
-    const spec = await openApiGenerator.generate(router, {
+export function createOpenAPISpec<T extends ServiceRouter>(
+  router: T,
+  config: OpenAPIConfig,
+): ServiceHandler {
+  return (async (c: ServiceContext): Promise<Response> => {
+    const spec = await openApiGenerator.generate(router as never, {
       info: {
         title: config.title,
         version: config.version,
         description: config.description,
       },
-      servers: config.servers ?? [{ url: '/api' }],
+      servers: config.servers ?? [{ url: DEFAULT_OPENAPI_SERVER_URL }],
     });
     return c.json(spec);
-  };
+  }) as ServiceHandler;
 }
 
 /**
@@ -98,10 +101,14 @@ export function createOpenAPISpec<T extends AnyRouter>(router: T, config: OpenAP
  * }));
  * ```
  */
-export function createScalarDocs(options: ScalarDocsOptions) {
-  const { specUrl, title = 'API Documentation', theme = 'kepler' } = options;
+export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
+  const {
+    specUrl,
+    title = DEFAULT_SCALAR_TITLE,
+    theme = DEFAULT_SCALAR_THEME,
+  } = options;
 
-  return (c: Context): Response => {
+  return ((c: ServiceContext): Response => {
     // Serve Scalar UI with locally bundled JS (no CDN dependency)
     const html = `<!doctype html>
 <html>
@@ -126,7 +133,7 @@ export function createScalarDocs(options: ScalarDocsOptions) {
 </html>`;
 
     return c.html(html);
-  };
+  }) as ServiceHandler;
 }
 
 /**
@@ -138,14 +145,14 @@ export function createScalarDocs(options: ScalarDocsOptions) {
  * app.get('/api/docs/scalar.js', createScalarJs());
  * ```
  */
-export function createScalarJs() {
-  return async (c: Context): Promise<Response> => {
+export function createScalarJs(): ServiceHandler {
+  return (async (c: ServiceContext): Promise<Response> => {
     const scalarJs = scalarJsCache ?? await Deno.readTextFile(scalarJsUrl);
     scalarJsCache = scalarJs;
 
     return c.body(scalarJs, 200, {
       'Content-Type': 'application/javascript',
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cache-Control': SCALAR_JS_CACHE_CONTROL,
     });
-  };
+  }) as ServiceHandler;
 }

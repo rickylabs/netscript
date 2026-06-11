@@ -2380,6 +2380,7 @@
       },
       "packages/service": {
         "dependencies": [
+          "jsr:@std/assert@1",
           "npm:@orpc/client@^1.13.5",
           "npm:@orpc/openapi@^1.13.5",
           "npm:@orpc/server@^1.13.5",

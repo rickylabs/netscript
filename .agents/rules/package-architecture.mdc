@@ -20,4 +20,4 @@ alwaysApply: false
 - Avoid doctrine anti-patterns listed in `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`,
   especially monolithic files, hidden globals, generic `utils`/`helpers`/`common` folders, and
   side effects outside edge files.
-- Run or extend `tools/fitness/*` when a change touches an enforced architectural rule.
+- Run or extend `.llm/tools/fitness/*` when a change touches an enforced architectural rule.

@@ -31,7 +31,7 @@ versions, or wire OIDC.**
 
 - [x] `research.md` — reviewer-seeded **structural** re-baseline (all 8 units), stale audit flagged, dynamic gates marked `MEASURE-FIRST`.
 - [x] `context-pack.md` — this file.
-- [ ] **Research step 1** — run `tools/fitness/release-readiness.ts` + per-unit `deno publish --dry-run` / `deno doc --lint`; record REAL numbers; log drift.
+- [ ] **Research step 1** — run `.llm/tools/fitness/release-readiness.ts` + per-unit `deno publish --dry-run` / `deno doc --lint`; record REAL numbers; log drift.
 - [ ] `plan.md` — locked decisions, **open-decision sweep (resolve OQ-1..OQ-7)**, commit slices (< 30 — see OQ-1), risk register, **full A2 gate set**, deferred scope.
 - [ ] `worklog.md` — Design checkpoint: per-unit port/adapter shape, composition root, required permissions, consumer-import impact, vocabulary renames.
 - [ ] `drift.md` — re-baseline delta + every subpath/folder rename.
