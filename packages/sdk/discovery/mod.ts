@@ -21,4 +21,4 @@ export {
   type PostgresConnectionInfo,
   type ServiceInfo,
   type ServiceProtocol,
-} from '../src/discovery/service-discovery.ts';
+} from '../src/discovery/mod.ts';
