@@ -23,3 +23,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 - 4938c64: Document sdk module entrypoints
 - 6e50265: Document sdk package architecture
 - 117fd2e: Add sdk cache and doctest coverage
+- c250f7d: Prove sdk type assignability chain

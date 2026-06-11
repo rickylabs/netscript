@@ -6,7 +6,7 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-16/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-17/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
@@ -56,8 +56,11 @@ state decision, and contributor path. Slice 16 added focused unit tests for
 query-factory keys, the KV query-cache persister, and README TypeScript/JSON
 doctests. The cache dedupe test exposed and fixed a race by rechecking the
 instance in-flight map after the async cache read and before starting a fetch.
-Next slice: type-level assignability fixtures for D-5/D-6/D-7 plus
-`ServiceClient` inference.
+Slice 17 added a joined assignability fixture proving `createServiceClient()`
+contract inference through `ServiceClient<TContract>`, `QueryFactory<TContract>`,
+`ServiceQueryUtils<TContract>`, `QueryClientPort`, and `QueryCollection<TItem>`.
+Next slice: live `@netscript/service` integration with round-trip, retry/abort,
+and B2 failure paths.
 
 ## What the plan session did
 
