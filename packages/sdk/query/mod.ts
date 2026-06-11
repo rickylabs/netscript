@@ -18,4 +18,4 @@ export type {
   ProcedureInput,
   ProcedureOutput,
   QueryFactory,
-} from '../src/interfaces/query-factory.ts';
+} from '../src/ports/query-factory.ts';

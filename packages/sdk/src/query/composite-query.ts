@@ -5,9 +5,9 @@
  */
 
 import { getCacheProvider } from '../cache/cache-provider.ts';
-import { serializeQueryKeyInput } from '../interfaces/query-key.ts';
-import type { CompositeQuery } from '../interfaces/query-factory.ts';
-import type { QueryParams } from '../interfaces/query-options.ts';
+import { serializeQueryKeyInput } from '../ports/query-key.ts';
+import type { CompositeQuery } from '../ports/query-factory.ts';
+import type { QueryParams } from '../ports/query-options.ts';
 
 /**
  * Create a composite query that combines multiple endpoints under one cache key.

@@ -5,20 +5,20 @@
  */
 
 import { invokeClientProcedure } from './client-proxy.ts';
-import { createActionQueryKey } from '../interfaces/query-key.ts';
+import { createActionQueryKey } from '../ports/query-key.ts';
 import type {
   ActionMethod,
   ProcedureInput,
   ProcedureOutput,
   QueryFactory,
-} from '../interfaces/query-factory.ts';
+} from '../ports/query-factory.ts';
 import type {
   ContractLike,
   ContractProcedureNames,
   ServiceClient,
-} from '../interfaces/service-client.ts';
-import type { FactoryConfig } from '../interfaces/query-factory.ts';
-import type { QueryParams } from '../interfaces/query-options.ts';
+} from '../ports/service-client.ts';
+import type { FactoryConfig } from '../ports/query-factory.ts';
+import type { QueryParams } from '../ports/query-options.ts';
 import type {
   ActionMutationOptions,
   ActionQueryOptions,

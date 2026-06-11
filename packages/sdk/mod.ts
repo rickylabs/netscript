@@ -29,4 +29,4 @@ export type {
   PaginatedResponse,
   ServiceMetadata,
   ServiceTransport,
-} from './interfaces/mod.ts';
+} from './ports/mod.ts';

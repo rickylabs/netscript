@@ -13,9 +13,9 @@
  * @module
  */
 
-import type { CachedEntry } from '../interfaces/cache-entry.ts';
-import type { QueryKey } from '../interfaces/query-key.ts';
-import type { CacheQueryOptions } from '../interfaces/query-options.ts';
+import type { CachedEntry } from '../ports/cache-entry.ts';
+import type { QueryKey } from '../ports/query-key.ts';
+import type { CacheQueryOptions } from '../ports/query-options.ts';
 
 /**
  * Minimal interface that the query-factory layer needs from the cache engine.

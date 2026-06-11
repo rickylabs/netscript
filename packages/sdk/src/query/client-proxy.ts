@@ -4,12 +4,12 @@
  * @module
  */
 
-import type { ProcedureInput, ProcedureOutput } from '../interfaces/query-factory.ts';
+import type { ProcedureInput, ProcedureOutput } from '../ports/query-factory.ts';
 import type {
   ContractLike,
   ContractProcedureNames,
   ServiceClient,
-} from '../interfaces/service-client.ts';
+} from '../ports/service-client.ts';
 
 /**
  * Invoke a named procedure on an oRPC proxy client.

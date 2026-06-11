@@ -22,7 +22,7 @@
  */
 
 import type { WatchableKv } from '@netscript/kv';
-import type { CacheKey, CacheStore, CacheStoreEntry } from '../interfaces/cache-store.ts';
+import type { CacheKey, CacheStore, CacheStoreEntry } from '../ports/cache-store.ts';
 
 /**
  * SDK cache store backed by the shared `@netscript/kv` singleton.

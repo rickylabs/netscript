@@ -16,11 +16,11 @@ import { cacheQuery } from '../src/cache/cache-query.ts';
 setCacheProvider(cacheQuery);
 
 export { CacheQuery, cacheQuery } from '../src/cache/cache-query.ts';
-export type { CachedEntry, CacheEntry } from '../src/interfaces/cache-entry.ts';
-export { isCacheEntryStale, toCachedEntry } from '../src/interfaces/cache-entry.ts';
-export type { CacheQueryOptions, QueryParams } from '../src/interfaces/query-options.ts';
-export type { QueryKey, QueryKeyPart } from '../src/interfaces/query-key.ts';
-export { createActionQueryKey, serializeQueryKeyInput } from '../src/interfaces/query-key.ts';
+export type { CachedEntry, CacheEntry } from '../src/ports/cache-entry.ts';
+export { isCacheEntryStale, toCachedEntry } from '../src/ports/cache-entry.ts';
+export type { CacheQueryOptions, QueryParams } from '../src/ports/query-options.ts';
+export type { QueryKey, QueryKeyPart } from '../src/ports/query-key.ts';
+export { createActionQueryKey, serializeQueryKeyInput } from '../src/ports/query-key.ts';
 
 // Re-export the provider API for manual registration and testing.
 export {

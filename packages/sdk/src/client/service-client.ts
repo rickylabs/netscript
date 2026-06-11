@@ -23,7 +23,7 @@ import type {
   CreateServiceClientOptions,
   ServiceClient,
   ServiceClientContext,
-} from '../interfaces/service-client.ts';
+} from '../ports/service-client.ts';
 
 type InternalServiceClientContext = ServiceClientContext & ClientRetryPluginContext;
 

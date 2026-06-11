@@ -1,4 +1,4 @@
-import type { CachedEntry as CacheEntryLike } from '@netscript/sdk/interfaces';
+import type { CachedEntry as CacheEntryLike } from '@netscript/sdk/ports';
 import type { ComponentChildren, ComponentType, JSX } from 'preact';
 import { z } from 'zod';
 import type { DeferPolicyInput, DeferPolicyProfile } from '../../defer/policy.ts';

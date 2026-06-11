@@ -22,4 +22,4 @@ export type {
   ServiceClientContext,
   ServiceClientMethod,
   ServiceRequestOptions,
-} from '../src/interfaces/service-client.ts';
+} from '../src/ports/service-client.ts';

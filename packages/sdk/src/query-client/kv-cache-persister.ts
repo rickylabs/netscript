@@ -8,7 +8,7 @@
  * @module
  */
 
-import type { CacheStore } from '../interfaces/cache-store.ts';
+import type { CacheStore } from '../ports/cache-store.ts';
 
 /** KV key prefix for persisted TanStack Query cache entries. */
 const PERSISTER_KEY_PREFIX = 'tanstack_query_cache';

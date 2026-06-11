@@ -5,11 +5,11 @@
  */
 
 import { KvCacheStore } from './kv-cache-store.ts';
-import type { CachedEntry, CacheEntry } from '../interfaces/cache-entry.ts';
-import { toCachedEntry } from '../interfaces/cache-entry.ts';
-import type { CacheStore } from '../interfaces/cache-store.ts';
-import type { QueryKey } from '../interfaces/query-key.ts';
-import type { CacheQueryOptions } from '../interfaces/query-options.ts';
+import type { CachedEntry, CacheEntry } from '../ports/cache-entry.ts';
+import { toCachedEntry } from '../ports/cache-entry.ts';
+import type { CacheStore } from '../ports/cache-store.ts';
+import type { QueryKey } from '../ports/query-key.ts';
+import type { CacheQueryOptions } from '../ports/query-options.ts';
 
 /** Root prefix for all SDK cache keys in the KV store. */
 const CACHE_PREFIX = 'cache_query' as const;
