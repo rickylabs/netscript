@@ -81,7 +81,7 @@ slices 13-14 land.
 
 ### Slice 13 — `ui:init` command
 
-Commit: pending.
+Commit: `9c2a38b`.
 
 Changed:
 
