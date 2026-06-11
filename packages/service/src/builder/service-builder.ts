@@ -19,13 +19,10 @@
  * @module
  */
 
-import { type Context, Hono, type MiddlewareHandler } from 'hono';
+import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
-
-// Context factory type for oRPC context injection
-type ContextFactory = (c: Context) => Record<string, unknown>;
 import {
   createHealthHandler,
   createLivenessHandler,
@@ -40,19 +37,16 @@ import {
   createOpenAPIHandler,
   createRPCHandler,
 } from '../primitives/handlers.ts';
-
-// Router type that matches oRPC router structure
-// deno-lint-ignore no-explicit-any
-type AnyRouter = Record<string, any>;
-
-// Database type for health checks
-interface Database {
-  $queryRaw: (query: TemplateStringsArray) => Promise<unknown>;
-}
-
-/** Any database context — single client or multi-db record. */
-// deno-lint-ignore no-explicit-any
-type AnyDbContext = Record<string, any>;
+import type {
+  ContextFactory,
+  CorsOptions,
+  Database,
+  DbContext,
+  ServiceApp,
+  ServiceHandler,
+  ServiceMiddleware,
+  ServiceRouter,
+} from '../types.ts';
 
 /**
  * Service configuration options.
@@ -66,26 +60,92 @@ export interface ServiceConfig {
   port?: number;
 }
 
+/** Fluent builder for configuring and materializing a NetScript service. */
+export interface ServiceBuilder<TRouter extends ServiceRouter> {
+  /** Enables CORS middleware. */
+  withCors(options?: CorsOptions): ServiceBuilder<TRouter>;
+
+  /** Enables structured request logging middleware. */
+  withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter>;
+
+  /** Adds database context, health, and readiness wiring. */
+  withDatabase(db: DbContext, healthCheckDb?: Database): ServiceBuilder<TRouter>;
+
+  /** Adds a custom health check. */
+  withHealthCheck(check: HealthCheck): ServiceBuilder<TRouter>;
+
+  /** Adds a custom readiness check. */
+  withReadinessCheck(check: () => Promise<boolean>): ServiceBuilder<TRouter>;
+
+  /** Configures the OpenAPI JSON endpoint. */
+  withOpenAPI(
+    options?: { title?: string; description?: string },
+  ): ServiceBuilder<TRouter>;
+
+  /** Configures the Scalar API documentation UI. */
+  withDocs(options?: { specUrl?: string }): ServiceBuilder<TRouter>;
+
+  /** Configures oRPC RPC and OpenAPI request handlers. */
+  withRPC(
+    options?: {
+      rpcPath?: string;
+      apiPath?: string;
+      debug?: boolean;
+      traceContext?: boolean;
+    },
+  ): ServiceBuilder<TRouter>;
+
+  /** Sets the per-request oRPC context factory. */
+  withContext(factory: ContextFactory): ServiceBuilder<TRouter>;
+
+  /** Registers an async startup hook. */
+  onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter>;
+
+  /** Configures health check endpoints. */
+  withHealth(
+    options?: { checks?: HealthCheck[]; includeDetails?: boolean },
+  ): ServiceBuilder<TRouter>;
+
+  /** Adds custom middleware to the service. */
+  use(middleware: ServiceMiddleware): ServiceBuilder<TRouter>;
+
+  /** Adds a custom route to the service. */
+  route(
+    method: 'get' | 'post' | 'put' | 'delete' | 'patch',
+    path: string,
+    handler: ServiceHandler,
+  ): ServiceBuilder<TRouter>;
+
+  /** Configures the root service information endpoint. */
+  withServiceInfo(): ServiceBuilder<TRouter>;
+
+  /** Builds a mountable service app without starting a listener. */
+  build(): ServiceApp;
+
+  /** Starts the service listener. */
+  serve(options?: { port?: number }): Promise<ServiceApp>;
+}
+
 /**
- * Fluent builder for creating Deno services with consistent patterns.
+ * Internal builder implementation for creating Deno services with consistent patterns.
  *
  * Provides a Layer 2 API that allows customization while maintaining
  * sensible defaults. For a Layer 3 one-liner, use `defineService()`.
  *
  * @example
  * ```typescript
- * const builder = new ServiceBuilder(router, { name: 'users' })
+ * const builder = createService(router, { name: 'users' })
  *   .withCors()
  *   .withHealth();
  *
- * // Get the Hono app for additional customization
+ * // Get the service app for additional customization.
  * const app = builder.build();
  *
  * // Or serve directly
  * await builder.serve({ port: 3000 });
  * ```
  */
-export class ServiceBuilder<TRouter extends AnyRouter> {
+class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilder<TRouter> {
   private app: Hono;
   private router: TRouter;
   private config: ServiceConfig;
@@ -98,7 +158,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
   private loggerEnabled = false;
   private startupHooks: Array<() => Promise<void>> = [];
   private contextFactory: ContextFactory = () => ({});
-  private database: AnyDbContext | null = null;
+  private database: DbContext | null = null;
 
   constructor(router: TRouter, config: ServiceConfig) {
     this.app = new Hono();
@@ -109,10 +169,10 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
   /**
    * Enables CORS middleware.
    *
-   * @param options - CORS configuration options (from hono/cors)
+   * @param options - CORS configuration options
    */
-  withCors(options?: Parameters<typeof cors>[0]): this {
-    this.app.use('*', cors(options ?? { origin: '*' }));
+  withCors(options?: CorsOptions): ServiceBuilder<TRouter> {
+    this.app.use('*', cors((options ?? { origin: '*' }) as never));
     return this;
   }
 
@@ -127,7 +187,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - Logger middleware configuration
    */
-  withLogger(options?: LoggerMiddlewareOptions): this {
+  withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter> {
     this.loggerEnabled = true;
     this.app.use('*', loggerMiddleware(this.config.name, options));
     return this;
@@ -155,7 +215,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    * });
    * ```
    */
-  withDatabase(db: AnyDbContext, healthCheckDb?: Database): this {
+  withDatabase(db: DbContext, healthCheckDb?: Database): ServiceBuilder<TRouter> {
     // Store database reference for context injection
     this.database = db;
 
@@ -182,7 +242,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param check - Health check definition
    */
-  addHealthCheck(check: HealthCheck): this {
+  withHealthCheck(check: HealthCheck): ServiceBuilder<TRouter> {
     this.healthChecks.push(check);
     return this;
   }
@@ -192,7 +252,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param check - Async function returning true if ready
    */
-  addReadinessCheck(check: () => Promise<boolean>): this {
+  withReadinessCheck(check: () => Promise<boolean>): ServiceBuilder<TRouter> {
     this.readinessChecks.push(check);
     return this;
   }
@@ -202,7 +262,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - OpenAPI configuration
    */
-  withOpenAPI(options?: { title?: string; description?: string }): this {
+  withOpenAPI(options?: { title?: string; description?: string }): ServiceBuilder<TRouter> {
     if (this.openApiConfigured) return this;
     this.openApiConfigured = true;
 
@@ -222,7 +282,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - Scalar docs configuration
    */
-  withDocs(options?: { specUrl?: string }): this {
+  withDocs(options?: { specUrl?: string }): ServiceBuilder<TRouter> {
     if (this.docsConfigured) return this;
     this.docsConfigured = true;
 
@@ -252,8 +312,13 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    * @param options.traceContext - Enable trace context propagation (default: true)
    */
   withRPC(
-    options?: { rpcPath?: string; apiPath?: string; debug?: boolean; traceContext?: boolean },
-  ): this {
+    options?: {
+      rpcPath?: string;
+      apiPath?: string;
+      debug?: boolean;
+      traceContext?: boolean;
+    },
+  ): ServiceBuilder<TRouter> {
     if (this.rpcConfigured) return this;
     this.rpcConfigured = true;
 
@@ -270,7 +335,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
 
     // Helper to build context with database and optional trace headers
     const buildContext = (c: Context): Record<string, unknown> => {
-      const ctx = this.contextFactory(c);
+      const ctx = this.contextFactory(c as unknown as Parameters<ContextFactory>[0]);
 
       // Add database to context if configured via withDatabase()
       if (this.database) {
@@ -325,7 +390,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * Use this to inject custom context into all oRPC handlers.
    *
-   * @param factory - Function that receives Hono context and returns oRPC context
+   * @param factory - Function that receives service context and returns oRPC context
    *
    * @example
    * ```typescript
@@ -337,7 +402,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *   .withRPC()
    * ```
    */
-  withContext(factory: ContextFactory): this {
+  withContext(factory: ContextFactory): ServiceBuilder<TRouter> {
     this.contextFactory = factory;
     return this;
   }
@@ -360,7 +425,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *   .serve()
    * ```
    */
-  onStartup(hook: () => Promise<void>): this {
+  onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter> {
     this.startupHooks.push(hook);
     return this;
   }
@@ -374,7 +439,9 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - Health check configuration
    */
-  withHealth(options?: { checks?: HealthCheck[]; includeDetails?: boolean }): this {
+  withHealth(
+    options?: { checks?: HealthCheck[]; includeDetails?: boolean },
+  ): ServiceBuilder<TRouter> {
     if (this.healthConfigured) return this;
     this.healthConfigured = true;
 
@@ -399,10 +466,10 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
   /**
    * Adds custom middleware to the service.
    *
-   * @param middleware - Hono middleware handler
+   * @param middleware - Service middleware handler
    */
-  use(middleware: MiddlewareHandler): this {
-    this.app.use('*', middleware);
+  use(middleware: ServiceMiddleware): ServiceBuilder<TRouter> {
+    this.app.use('*', middleware as never);
     return this;
   }
 
@@ -413,16 +480,19 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    * @param path - Route path
    * @param handler - Route handler
    */
-  // deno-lint-ignore no-explicit-any
-  route(method: 'get' | 'post' | 'put' | 'delete' | 'patch', path: string, handler: any): this {
-    this.app[method](path, handler);
+  route(
+    method: 'get' | 'post' | 'put' | 'delete' | 'patch',
+    path: string,
+    handler: ServiceHandler,
+  ): ServiceBuilder<TRouter> {
+    this.app[method](path, handler as never);
     return this;
   }
 
   /**
    * Configures the service root endpoint with service info.
    */
-  withServiceInfo(): this {
+  withServiceInfo(): ServiceBuilder<TRouter> {
     this.app.get('/', (c: Context) =>
       c.json({
         service: this.config.name,
@@ -439,13 +509,13 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
   }
 
   /**
-   * Builds and returns the Hono app instance.
+   * Builds and returns the service app instance.
    * Adds error handlers and returns the app for further customization.
    */
-  build(): Hono {
-    this.app.notFound(createNotFoundHandler(this.config.name));
-    this.app.onError(createErrorHandler(this.config.name));
-    return this.app;
+  build(): ServiceApp {
+    this.app.notFound(createNotFoundHandler(this.config.name) as never);
+    this.app.onError(createErrorHandler(this.config.name) as never);
+    return this.app as unknown as ServiceApp;
   }
 
   /**
@@ -453,7 +523,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
    *
    * @param options - Server options
    */
-  async serve(options?: { port?: number }): Promise<Hono> {
+  async serve(options?: { port?: number }): Promise<ServiceApp> {
     // Ensure logging is configured if withLogger() was called
     if (this.loggerEnabled) {
       await ensureLogging();
@@ -480,7 +550,7 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
 }
 
 /**
- * Factory function to create a new ServiceBuilder.
+ * Factory function to create a new service builder.
  *
  * @example
  * ```typescript
@@ -494,9 +564,9 @@ export class ServiceBuilder<TRouter extends AnyRouter> {
  *   .serve({ port: 3000 });
  * ```
  */
-export function createService<T extends AnyRouter>(
+export function createService<T extends ServiceRouter>(
   router: T,
   config: ServiceConfig,
 ): ServiceBuilder<T> {
-  return new ServiceBuilder(router, config);
+  return new ServiceBuilderImpl(router, config);
 }

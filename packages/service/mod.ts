@@ -93,7 +93,7 @@ export type {
 // Layer 2: Builders
 export {
   createService,
-  ServiceBuilder,
+  type ServiceBuilder,
   type ServiceConfig,
 } from './src/builder/service-builder.ts';
 
