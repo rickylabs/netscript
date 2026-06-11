@@ -275,7 +275,23 @@ Deno.test('manifest exposes the expanded foundation and layout collections', () 
   );
   assertExists(layoutCollection, 'Expected layout-foundations collection to be present');
   assert(
-    layoutCollection.items.includes('theme-seed'),
-    'Expected layout-foundations to point at theme-seed',
+    layoutCollection.items.includes('layout-objects'),
+    'Expected layout-foundations to point at the layout-objects style item',
+  );
+
+  const layoutObjects = freshUiRegistryManifest.items.find((item) =>
+    item.name === 'layout-objects'
+  );
+  assertExists(layoutObjects, 'Expected the layout-objects style item to be present');
+  assertStrictEquals(layoutObjects.kind, 'style');
+  assert(
+    layoutObjects.registryDependencies?.includes('theme-seed'),
+    'Expected layout-objects to consume the theme token contract',
+  );
+  const themeSeed = freshUiRegistryManifest.items.find((item) => item.name === 'theme-seed');
+  assertExists(themeSeed, 'Expected the theme-seed theme item to be present');
+  assert(
+    themeSeed.files.every((file) => !file.source.endsWith('layouts.css')),
+    'Expected theme-seed to ship only theme artifacts (no layout objects)',
   );
 });

@@ -21,4 +21,28 @@ D-5c1-3 root-exclude lift with accepted root publish-graph churn).
 - Impact: no rescope of the 12 locked slices; Tier-Z component buildout recorded as
   deferred scope beyond Run 3.
 
-No Run 2 implementation drift recorded yet.
+## D-5c2-1 — Structural: layouts.css moved out of theme-seed into a layout-objects style item
+
+- Slice: 2 (cont.) / step-0 takeover audit
+- Plan reference: locked Run 2 table slice 2 ("layout-objects" deliverable) and the
+  theme-architecture mandate (theme = token artifacts; components/styles consume
+  only the semantic `--ns-*` vocabulary).
+- Reality at takeover (`ae29999`): `registry/theme/layouts.css` was shipped as a
+  *file of the theme-seed theme item*, conflating theme-specific artifacts with
+  theme-independent layout objects. The locked slice-2 deliverable (a separate
+  style item) had not actually been created — only the rgba cleanup landed.
+- Change: `git mv registry/theme/layouts.css → registry/styles/layouts.css`; new
+  manifest item `layout-objects` (kind `style`, layer 2, depends on `theme-seed`,
+  css contribution `@import './layouts.css';`); theme-seed slimmed to the 4 NS One
+  artifacts (styles.css, tokens.css, theme-bridge.css, tokens.json) and re-described
+  as the NS One theme; 9 dependent items (skeleton, breadcrumb, sidebar-shell,
+  page-header, stats-grid, detail-layout, pagination, empty-state, sidebar-toggle)
+  now declare `layout-objects` in registryDependencies; layout-foundations
+  collection points at `layout-objects`; styles.css drops the layouts import
+  (aggregator now contributes it) and its last raw rgba
+  (`-webkit-tap-highlight-color` → `var(--ns-primary-border)`).
+- Impact: additive/structural only — ui:init now installs 28 items (was 27,
+  +layout-objects) and 40 files; aggregator emits `@import './layouts.css';` from
+  the css contribution instead of the theme's own import. No component API change.
+  This is the open/closed seam the mandate requires: a second theme can replace
+  theme-seed without touching layout objects.

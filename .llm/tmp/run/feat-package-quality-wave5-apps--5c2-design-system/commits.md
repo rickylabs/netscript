@@ -7,3 +7,4 @@
 | 1 | `2a1b378` | `57d1825` | button + toast CSS reconciliation (token color-mix) |
 | 1 (cont.) | `ae29999` | — | form-control-styles + sheet rgba cleanup; worklog entry added in takeover follow-up |
 | 2 | `7c5dffc` | — | layouts.css token cleanup; worklog entry added in takeover follow-up |
+| takeover bookkeeping | — | `9a1f971` | worklog slices 1-cont/2 + commits.md reconciliation |

@@ -84,3 +84,39 @@
 - Implementation taken over by a new generator session at remote tip
   `ae29999`; bookkeeping reconciled (this entry, slice 1-cont and slice 2
   worklog entries, commits.md rows) as a follow-up commit — no amends.
+
+## Slice 2 (cont.) — step-0 audit + layout-objects style item extraction
+
+- Scope: step-0 takeover audit of inherited slices 1/1-cont/2, plus completion
+  of the locked slice-2 deliverable (separate `layout-objects` style item).
+- Audit findings:
+  - Raw-value sweep over the registry CSS corpus: generated theme artifacts
+    (tokens.css / theme-bridge.css / tokens.json) legitimately carry raw
+    values — they ARE the theme. Only true residual outside them was
+    `registry/theme/styles.css:22` `-webkit-tap-highlight-color: rgba(...)`
+    → now `var(--ns-primary-border)`. TSX corpus clean.
+  - Locked slice-2 deliverable gap: layouts.css was still a theme-seed file,
+    not a separate style item. Fixed below; recorded as drift D-5c2-1.
+- Changes:
+  - `git mv registry/theme/layouts.css → registry/styles/layouts.css`.
+  - manifest: new `layout-objects` style item (layer 2, depends theme-seed,
+    css contribution `@import './layouts.css';`); theme-seed slimmed to the
+    4 NS One artifacts and re-described per the theme mandate; 9 dependents
+    (skeleton, breadcrumb, sidebar-shell, page-header, stats-grid,
+    detail-layout, pagination, empty-state, sidebar-toggle) gain
+    `layout-objects` in registryDependencies; layout-foundations collection
+    now points at `layout-objects`.
+  - styles.css: dropped `@import './layouts.css';` (aggregator contributes it).
+  - foundation.test.tsx: assertions for layout-objects item shape and that
+    theme-seed ships no layouts.css.
+- Gate evidence:
+  - package check: PASS; tests: 35 passed (incl. updated foundation tests)
+  - manifest-integrity: PASS 62/62 claimed (registry/styles/ auto-walked)
+  - tokens-drift: PASS (3 artifacts stable)
+  - CLI focused registry test: PASS
+  - ui:init smoke into scratch dir: 28 items (was 27, +layout-objects),
+    40 files copied, `assets/layouts.css` present, aggregator line 16 =
+    `@import './layouts.css';`
+  - fmt (changed sources): PASS after `deno fmt` on manifest.ts +
+    foundation.test.tsx
+- Drift: D-5c2-1 (structural extraction, additive)

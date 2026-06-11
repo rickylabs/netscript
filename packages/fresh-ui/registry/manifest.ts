@@ -140,17 +140,16 @@ export const freshUiRegistryManifest = {
     {
       name: 'theme-seed',
       kind: 'theme',
-      description:
-        'Initial token, component-class, and CSS-first layout-object seed sourced from the playground.',
+      description: 'NS One theme: DTCG-generated token artifacts plus base element styles. ' +
+        'Components consume only the semantic --ns-* vocabulary this theme provides.',
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: [
         'theme',
+        'ns-one',
         'tailwind-v4',
         'tokens',
         'style-dictionary-ready',
-        'layout-objects',
-        'dashboard-foundation',
       ],
       files: [
         { source: 'registry/theme/styles.css', target: '@assets/styles.css' },
@@ -160,7 +159,6 @@ export const freshUiRegistryManifest = {
           target: '@assets/theme-bridge.css',
         },
         { source: 'registry/theme/tokens.json', target: '@assets/tokens.json' },
-        { source: 'registry/theme/layouts.css', target: '@assets/layouts.css' },
       ],
       registryDependencies: ['cn', 'public-types'],
       cssVars: {
@@ -175,6 +173,24 @@ export const freshUiRegistryManifest = {
           '--ns-fg': 'var(--ns-gray-12)',
         },
       },
+    },
+    {
+      name: 'layout-objects',
+      kind: 'style',
+      layer: 2,
+      description:
+        'Theme-independent CSS layout objects — Shell, Stack, Cluster, Grid, Switcher, ' +
+        'Cover, Sidebar, Section, Split, Toolbar, ScrollRegion, ContentRail, and the ' +
+        'dashboard scaffold — consuming only semantic spacing and color tokens.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['layout', 'styles', 'css-only', 'composition', 'dashboard-foundation'],
+      files: [{
+        source: 'registry/styles/layouts.css',
+        target: '@assets/layouts.css',
+      }],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './layouts.css';" }],
     },
     {
       name: 'button',
@@ -534,7 +550,7 @@ export const freshUiRegistryManifest = {
           target: '@assets/ui/skeleton.css',
         },
       ],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'layout-objects'],
       css: [{ layer: 'components', content: "@import './ui/skeleton.css';" }],
     },
     {
@@ -549,7 +565,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/breadcrumb.tsx',
         target: '@ui/breadcrumb.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'layout-objects'],
     },
     {
       name: 'sidebar-shell',
@@ -564,7 +580,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/sidebar-shell.tsx',
         target: '@ui/sidebar-shell.tsx',
       }],
-      registryDependencies: ['theme-seed', 'breadcrumb'],
+      registryDependencies: ['theme-seed', 'layout-objects', 'breadcrumb'],
     },
     {
       name: 'page-header',
@@ -579,7 +595,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/page-header.tsx',
         target: '@ui/page-header.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'layout-objects'],
     },
     {
       name: 'filter-form',
@@ -609,7 +625,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/stats-grid.tsx',
         target: '@ui/stats-grid.tsx',
       }],
-      registryDependencies: ['theme-seed', 'card'],
+      registryDependencies: ['theme-seed', 'layout-objects', 'card'],
     },
     {
       name: 'detail-layout',
@@ -624,7 +640,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/detail-layout.tsx',
         target: '@ui/detail-layout.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'layout-objects'],
     },
     {
       name: 'data-table',
@@ -652,7 +668,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/pagination.tsx',
         target: '@ui/pagination.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'layout-objects'],
     },
     {
       name: 'empty-state',
@@ -667,7 +683,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/empty-state.tsx',
         target: '@ui/empty-state.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'layout-objects'],
     },
     {
       name: 'section-divider',
@@ -709,7 +725,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/islands/SidebarToggle.tsx',
         target: '@islands/SidebarToggle.tsx',
       }],
-      registryDependencies: ['theme-seed', 'sidebar-shell', 'button'],
+      registryDependencies: ['theme-seed', 'layout-objects', 'sidebar-shell', 'button'],
     },
     {
       name: 'toast-support',
@@ -825,8 +841,8 @@ export const freshUiRegistryManifest = {
     {
       name: 'layout-foundations',
       description:
-        'CSS-first B seams shipped through theme-seed today: Stack, Cluster, Grid, Toolbar, Section, Split, and ScrollRegion.',
-      items: ['theme-seed'],
+        'CSS-first B seams shipped as the layout-objects style item: Stack, Cluster, Grid, Toolbar, Section, Split, and ScrollRegion.',
+      items: ['layout-objects'],
     },
     {
       name: 'dashboard-blocks',
