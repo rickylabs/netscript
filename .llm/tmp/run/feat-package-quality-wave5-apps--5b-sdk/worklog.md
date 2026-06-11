@@ -98,3 +98,13 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with the known pre-slice-19 root-exclude warning `No matching files found`. Stale-path scan over sdk TypeScript found no references to removed implementation locations such as `../core`, `../adapters/kv-cache-store`, old query-client sibling files, or old discovery/openapi/telemetry implementation files. A no-config probe reached the moved files and reported only expected import-map/workspace strictness failures, not missing moved paths. |
 | Concept of done | Every moved implementation file remains reachable from an existing public subpath facade or the root barrel. No speculative folders were added; each `src/` folder corresponds to a locked area, and the F-11 `interfaces` rename is intentionally deferred to slice 3. |
 | Drift | none |
+
+### Slice 3/19 — D-2 rename `interfaces` to `ports`
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `998c4d6` — `Rename sdk interface surface to ports` |
+| Changed | Renamed `packages/sdk/src/interfaces/` to `src/ports/`; renamed public subpath facade `packages/sdk/interfaces/mod.ts` to `packages/sdk/ports/mod.ts`; updated `packages/sdk/deno.json` export/task entry from `./interfaces` to `./ports`; updated root `mod.ts`, sdk facades, and internal imports to use `ports`; fixed the Fresh consumer at `packages/fresh/builders/define-page/types.ts` to import `@netscript/sdk/ports`. |
+| Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. Raw `Deno.Command`: `deno task check` from `packages/fresh` PASS exit 0 with known root-exclude warning. Rename scan over packages/plugins/services found no remaining `@netscript/sdk/interfaces`, `src/interfaces`, `./interfaces`, or `../interfaces` references. |
+| Concept of done | The package-owned structural port algebra is preserved unchanged; only its doctrine vocabulary and public subpath changed. The single known Fresh consumer was updated in-slice, and no compatibility shim for the alpha `./interfaces` path was left behind. |
+| Drift | none |

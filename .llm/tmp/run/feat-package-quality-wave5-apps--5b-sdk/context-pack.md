@@ -6,16 +6,16 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-2/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-3/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
-locked paths. `core/` is dissolved into `src/cache/` and `src/query/`; `interfaces/`
-is currently moved as `src/interfaces/` and is intentionally left for slice 3's
-`ports` rename. The slice 2 gate passed with `deno task check` from `packages/sdk`
-exit 0 and the known pre-slice-19 root-exclude warning. A stale-path scan found no
-references to the removed implementation locations. Next slice: rename
-`src/interfaces/` to `src/ports/`, replace `./interfaces` with `./ports`, and fix the
-Fresh consumer in-slice.
+locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
+`interfaces` vocabulary is gone from sdk and the one Fresh consumer:
+`src/interfaces/` is now `src/ports/`, the public subpath is `./ports`, root `mod.ts`
+exports from `./ports/mod.ts`, and `packages/fresh/builders/define-page/types.ts`
+imports `@netscript/sdk/ports`. The slice 3 gates passed with sdk and Fresh package
+checks exiting 0 with the known pre-slice-19 root-exclude warnings, plus a clean rename
+scan. Next slice: fold `./adapters` into `./cache` and `./openapi` into root barrel.
 
 ## What the plan session did
 
