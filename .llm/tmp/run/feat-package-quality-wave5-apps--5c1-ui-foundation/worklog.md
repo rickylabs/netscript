@@ -79,6 +79,50 @@ gates under `.llm/tools/fitness/` for registry/token invariants. CLI
 installation behavior lives under `packages/cli/src/public/features/ui/` once
 slices 13-14 land.
 
+### Slice 15 — OKLCH ramp re-derivation
+
+Commit: pending.
+
+Changed:
+
+- Re-derived the existing primitive color token names as DTCG OKLCH color
+  objects with populated hex fallbacks.
+- Updated the token builder to emit CSS fallback declarations followed by
+  `oklch()` declarations for OKLCH-backed tokens.
+- Regenerated `registry/theme/tokens.css` and `registry/theme/tokens.json`;
+  `theme-bridge.css` remained stable after rebuild.
+- Added run-local derivation and verification scripts:
+  `derive-slice-15-oklch.ts` and `verify-slice-15-oklch.ts`.
+- Recorded ramp evidence in `slice-15-oklch-ramp-evidence.json`, verification
+  evidence in `slice-15-oklch-verification.json`, and visual review artifacts in
+  `slice-15-oklch-visual-review.html` plus `slice-15-oklch-visual-review.png`.
+
+Evidence:
+
+- `deno run --allow-read --allow-write .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/derive-slice-15-oklch.ts`
+  → PASS/exit 0; generated OKLCH source values, hex fallbacks, JSON evidence,
+  and visual review HTML.
+- `deno task --cwd packages/fresh-ui tokens:build` → PASS/exit 0.
+- `deno run --allow-run=deno,git .llm/tools/fitness/check-token-drift.ts` →
+  PASS/exit 0, 3 generated artifacts stable after rebuild.
+- `deno run --allow-read --allow-write .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-15-oklch.ts`
+  → PASS/exit 0, 41 color tokens verified with OKLCH source, hex fallback, CSS
+  fallback declaration, CSS OKLCH declaration, and visual artifacts.
+- Browser visual review: served `slice-15-oklch-visual-review.html` over
+  localhost and captured `slice-15-oklch-visual-review.png` (109524 bytes).
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 35 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno lint --no-config packages/fresh-ui/scripts/build-tokens.ts .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/derive-slice-15-oklch.ts .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-15-oklch.ts`
+  → PASS/exit 0.
+- `deno fmt --check --no-config ...` over the builder, token JSON, generated
+  token JSON, derivation/verification scripts, and JSON evidence → PASS/exit 0.
+- `git diff -- deno.lock packages/fresh-ui/deno.lock .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.lock`
+  → PASS/exit 0, no lock-file diff.
+
+Drift: none.
+
 ### Slice 14 — `ui:add <item|collection>` command
 
 Commit: `b03f590`.

@@ -4,6 +4,8 @@ type TokenValue =
   | string
   | number
   | {
+    colorSpace?: string;
+    components?: number[];
     hex?: string;
   };
 
@@ -190,7 +192,7 @@ function renderBlock(
   const values = new Map(tokens.map((token) => {
     const name = tokenSourceCssVar(token)?.replace(/^--ns-/, "");
     if (!name) throw new Error("Token is missing $extensions.netscript.cssVar");
-    return [name, tokenCssValue(token)] as const;
+    return [name, tokenCssDeclarations(name, token)] as const;
   }));
   const claimed = new Set<string>();
   const lines = [`  color-scheme: ${colorScheme};`];
@@ -203,7 +205,7 @@ function renderBlock(
         throw new Error(`Missing token for --ns-${name}`);
       }
       claimed.add(name);
-      lines.push(`  --ns-${name}: ${value};`);
+      lines.push(...value);
     }
   }
 
@@ -219,8 +221,31 @@ function renderBlock(
   return lines;
 }
 
+function tokenCssDeclarations(name: string, token: DictionaryToken) {
+  const value = token.original?.$value ?? token.$value;
+  if (
+    value && typeof value === "object" &&
+    value.colorSpace === "oklch" &&
+    Array.isArray(value.components) &&
+    typeof value.hex === "string"
+  ) {
+    return [
+      `  --ns-${name}: ${value.hex};`,
+      `  --ns-${name}: ${oklchCssValue(value.components)};`,
+    ];
+  }
+  return [`  --ns-${name}: ${tokenCssValue(token)};`];
+}
+
 function tokenCssValue(token: DictionaryToken) {
   const value = token.original?.$value ?? token.$value;
+  if (
+    value && typeof value === "object" &&
+    value.colorSpace === "oklch" &&
+    Array.isArray(value.components)
+  ) {
+    return oklchCssValue(value.components);
+  }
   if (value && typeof value === "object" && typeof value.hex === "string") {
     return value.hex;
   }
@@ -232,6 +257,13 @@ function tokenCssValue(token: DictionaryToken) {
     return value;
   }
   return String(value);
+}
+
+function oklchCssValue(components: number[]) {
+  const [lightness, chroma, hue] = components;
+  return `oklch(${round(lightness * 100, 2)}% ${round(chroma, 4)} ${
+    round(hue, 2)
+  })`;
 }
 
 function tokenSourceCssVar(token: DictionaryToken) {
@@ -353,4 +385,9 @@ function range(prefix: string, start: number, end: number) {
     { length: end - start + 1 },
     (_, index) => `${prefix}-${start + index}`,
   );
+}
+
+function round(value: number, places: number) {
+  const factor = 10 ** places;
+  return Math.round(value * factor) / factor;
 }
