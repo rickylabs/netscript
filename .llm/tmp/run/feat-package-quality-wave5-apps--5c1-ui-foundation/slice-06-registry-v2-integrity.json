@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "tokenSourceStrategy": "style-dictionary-dtcg-source",
+  "itemCount": 33,
+  "blockItemCount": 10,
+  "invalidTargets": [],
+  "oldDependencyShape": [],
+  "registryDependencyErrors": [],
+  "authorlessItems": [],
+  "themeSeedGeneratedFiles": {
+    "themeBridge": true,
+    "tokensJson": true
+  },
+  "themeSeedCssVars": {
+    "theme": 4,
+    "light": 2
+  }
+}
