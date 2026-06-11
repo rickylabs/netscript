@@ -2,12 +2,13 @@
 
 ## Current state
 
-Implementation has started after PLAN-EVAL PASS. Slices 1-4/15 are complete:
+Implementation has started after PLAN-EVAL PASS. Slices 1-5/15 are complete:
 `packages/service/deno.json` is standardized, and service sources now live under `src/` with only
 path updates required by the move. `src/types.ts` now defines the package-owned structural mirror
 types. Handler primitives now use those mirrors for plugins, fetch handlers, not-found handlers, and
-error handlers. Implementation commits: `0785a8f`, `d9897c0`, `88e0cc0`, `b62dfbe`. Next slice:
-OpenAPI primitives get explicit package-owned return types and module state cleanup.
+error handlers. OpenAPI primitives now use `ServiceRouter`/`ServiceHandler` returns and named
+Scalar/OpenAPI constants. Implementation commits: `0785a8f`, `d9897c0`, `88e0cc0`, `b62dfbe`,
+`aabcde2`. Next slice: health primitives get explicit package-owned return types.
 
 Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
 files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do

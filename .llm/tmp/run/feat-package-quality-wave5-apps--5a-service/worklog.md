@@ -107,3 +107,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
 | Concept of done | Handler public signatures are now package-owned and copyable from one file; finite error strings remain centralized inside the handler factories until diagnostics/logger slices. |
 | Drift | none |
+
+### Slice 5/15 — D-6 OpenAPI explicit returns
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `aabcde2` — `Add explicit OpenAPI primitive return contracts` |
+| Changed | `src/primitives/openapi.ts` now uses `ServiceRouter` and explicit `ServiceHandler` returns for `createOpenAPISpec`, `createScalarDocs`, and `createScalarJs`; removed the Hono `Context` public return dependency; named OpenAPI/Scalar defaults and cache-control string constants. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
+| Concept of done | OpenAPI primitive signatures are package-owned, and finite default/cache vocabulary now lives in one file for copyable extension. Scalar asset inclusion remains unchanged for D-9. |
+| Drift | none |

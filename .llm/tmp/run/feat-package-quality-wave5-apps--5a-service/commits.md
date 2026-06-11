@@ -10,3 +10,4 @@ Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the pla
 - d9897c0: Move service sources under src without behavior changes
 - 88e0cc0: Add service public structural types
 - b62dfbe: Replace handler leaks with service structural contracts
+- aabcde2: Add explicit OpenAPI primitive return contracts
