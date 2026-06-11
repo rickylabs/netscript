@@ -6,12 +6,16 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slice 1/19 is complete: `packages/sdk/deno.json` now has package-local
-`check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. The slice gate passed:
-`deno task check` from `packages/sdk` exits 0 with the known pre-slice-19 root-exclude
-warning, and scoped JSON format check passes with `deno fmt --check --no-config --ext json
-packages/sdk/deno.json`. Next slice: move sdk sources under `src/` with thin retained
-subpath entries.
+Slices 1-2/19 are complete. `packages/sdk/deno.json` now has package-local
+`check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
+now live under `packages/sdk/src/`, with public subpath facades retained at their
+locked paths. `core/` is dissolved into `src/cache/` and `src/query/`; `interfaces/`
+is currently moved as `src/interfaces/` and is intentionally left for slice 3's
+`ports` rename. The slice 2 gate passed with `deno task check` from `packages/sdk`
+exit 0 and the known pre-slice-19 root-exclude warning. A stale-path scan found no
+references to the removed implementation locations. Next slice: rename
+`src/interfaces/` to `src/ports/`, replace `./interfaces` with `./ports`, and fix the
+Fresh consumer in-slice.
 
 ## What the plan session did
 

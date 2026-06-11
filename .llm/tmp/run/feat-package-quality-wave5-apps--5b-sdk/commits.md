@@ -8,3 +8,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 
 - 13dca51: Lock sdk plan after PLAN-EVAL pass
 - ef6a6bd: Add sdk package tasks for quality gates
+- 0cbd962: Move sdk implementation under src facades

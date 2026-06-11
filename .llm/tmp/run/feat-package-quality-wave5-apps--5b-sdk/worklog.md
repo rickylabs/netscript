@@ -88,3 +88,13 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with the known pre-slice-19 root-exclude warning `No matching files found`. Raw `Deno.Command`: `deno fmt --check --no-config --ext json packages/sdk/deno.json` PASS exit 0 after scoped formatting of that one metadata file. |
 | Concept of done | Metadata-only slice; no source files created. The package now exposes the local quality commands later slices and final validation will use. |
 | Drift | none |
+
+### Slice 2/19 — D-1 move implementation under `src/`
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `0cbd962` — `Move sdk implementation under src facades` |
+| Changed | Moved implementation files under `packages/sdk/src/` while keeping existing public subpath entry files as thin facades. `core/` was dissolved into real areas: cache engine/provider/KV adapter under `src/cache/`, and client proxy/composite/query factory under `src/query/`. Client, collections, discovery, interfaces, openapi, query-client, and telemetry internals moved to matching `src/<area>/` folders. |
+| Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with the known pre-slice-19 root-exclude warning `No matching files found`. Stale-path scan over sdk TypeScript found no references to removed implementation locations such as `../core`, `../adapters/kv-cache-store`, old query-client sibling files, or old discovery/openapi/telemetry implementation files. A no-config probe reached the moved files and reported only expected import-map/workspace strictness failures, not missing moved paths. |
+| Concept of done | Every moved implementation file remains reachable from an existing public subpath facade or the root barrel. No speculative folders were added; each `src/` folder corresponds to a locked area, and the F-11 `interfaces` rename is intentionally deferred to slice 3. |
+| Drift | none |
