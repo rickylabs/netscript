@@ -262,3 +262,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Gate notes | The upstream assignability fixture remains included in typecheck and format. It is excluded from the lint command because it intentionally uses inline `npm:` specifiers to test the upstream return type directly, matching the slice-7 evidence pattern. |
 | Concept of done | The fixture is reachable from the typecheck gate and proves the composability chain without adding runtime-only files or public annotations. |
 | Drift | none |
+
+### Slice 18/19 — live service-client integration
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `f430fd0` — `Prove sdk live service client runtime` |
+| Changed | Added `tests/integration/service-client-runtime_test.ts` booting real `@netscript/service` via `createService(...).withRPC({ rpcPath: \"/api/rpc/v1/sdk-live\" }).serve({ port: 0 })`, resolving it through `services__sdk-live__http__0`, and calling `createServiceClient()`. Added `ServiceClientContext.signal` and forwarded it through the internal HTTP link so cancellation reaches `fetch`. Expanded the run-local check config/lock for service/logger/telemetry/oRPC server dependencies; root `deno.lock` was not touched. |
+| Gate | Raw `Deno.Command`: `deno test --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run packages/sdk/tests/integration/service-client-runtime_test.ts` PASS exit 0, 4 passed / 0 failed. Tests cover live discovery round-trip, bad URL connection failure with timeout signal, retry exhaustion with two retry callbacks, cancellation propagation through `AbortController`, and clean listener stop in `finally`. Raw `Deno.Command`: `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json <slice-18 files + run check config>` PASS exit 0. Raw `Deno.Command`: `deno check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv <slice-18 files>` PASS exit 0 with known oRPC peer warning. Raw `Deno.Command`: `deno lint --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json <slice-18 files>` PASS exit 0. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Advisory | B2 complete: live integration now covers connection failure, retry exhaustion, and cancellation propagation in addition to round-trip and clean stop. |
+| Concept of done | The runtime path is reachable from a real service listener and the cancellation extension is documented at the public request context while transport implementation remains behind the internal HTTP link seam. |
+| Drift | none |
