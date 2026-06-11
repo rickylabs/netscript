@@ -9,12 +9,13 @@
  */
 
 import type { CacheStore } from '../ports/cache-store.ts';
+import { DEFAULT_QUERY_CACHE_TIME } from '../cache/defaults.ts';
 
 /** KV key prefix for persisted TanStack Query cache entries. */
 const PERSISTER_KEY_PREFIX = 'tanstack_query_cache';
 
 /** Default TTL matching TanStack Query gcTime (5 minutes). */
-const DEFAULT_EXPIRE_IN = 300_000;
+const DEFAULT_EXPIRE_IN = DEFAULT_QUERY_CACHE_TIME;
 
 /**
  * Options for `createKvCachePersister`.
@@ -34,8 +35,11 @@ export interface KvCachePersisterOptions {
  * calls `getItem` / `setItem` / `removeItem` automatically.
  */
 export interface KvCachePersisterStorage {
+  /** Read a serialized persisted query payload by key. */
   getItem: (key: string) => Promise<string | null>;
+  /** Write a serialized persisted query payload by key. */
   setItem: (key: string, value: string) => Promise<void>;
+  /** Remove a serialized persisted query payload by key. */
   removeItem: (key: string) => Promise<void>;
 }
 

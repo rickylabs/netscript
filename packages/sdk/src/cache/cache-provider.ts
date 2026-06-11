@@ -22,10 +22,15 @@ import type { CacheQueryOptions } from '../ports/query-options.ts';
  * Matches the public surface of {@link CacheQuery} without importing it.
  */
 export interface CacheProvider {
+  /** Execute a query through the registered cache engine. */
   query<TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData>;
+  /** Prefetch a query through the registered cache engine. */
   prefetch<TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void>;
+  /** Read cached data for a query key without fetching. */
   getCachedData<TData>(queryKey: QueryKey): Promise<TData | null>;
+  /** Read cached data and timestamp metadata for a query key. */
   getCachedEntry<TData>(queryKey: QueryKey): Promise<CachedEntry<TData> | null>;
+  /** Invalidate all cached entries under a query-key prefix. */
   invalidateQueries(prefix: QueryKey): Promise<void>;
 }
 

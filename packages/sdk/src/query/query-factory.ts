@@ -27,6 +27,7 @@ import type {
 } from '../query-client/types.ts';
 
 import { getCacheProvider } from '../cache/cache-provider.ts';
+import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from '../cache/defaults.ts';
 
 /**
  * Create a query factory for an oRPC contract.
@@ -44,8 +45,8 @@ export function createQueryFactory<TContract extends ContractLike>(
   defaultOptions: QueryParams = {},
 ): QueryFactory<TContract> {
   const {
-    staleTime: defaultStaleTime = 30_000,
-    cacheTime: defaultCacheTime = 300_000,
+    staleTime: defaultStaleTime = DEFAULT_QUERY_STALE_TIME,
+    cacheTime: defaultCacheTime = DEFAULT_QUERY_CACHE_TIME,
     revalidateOnStale: defaultRevalidateOnStale = true,
     preferFreshOnStale: defaultPreferFreshOnStale = false,
   } = defaultOptions;

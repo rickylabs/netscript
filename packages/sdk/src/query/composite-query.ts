@@ -5,6 +5,7 @@
  */
 
 import { getCacheProvider } from '../cache/cache-provider.ts';
+import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from '../cache/defaults.ts';
 import { serializeQueryKeyInput } from '../ports/query-key.ts';
 import type { CompositeQuery } from '../ports/query-factory.ts';
 import type { QueryParams } from '../ports/query-options.ts';
@@ -32,8 +33,8 @@ export function createCompositeQuery<
   defaultOptions?: QueryParams;
 }): CompositeQuery<TProps, TOutput, TKey> {
   const {
-    staleTime: defaultStaleTime = 30_000,
-    cacheTime: defaultCacheTime = 300_000,
+    staleTime: defaultStaleTime = DEFAULT_QUERY_STALE_TIME,
+    cacheTime: defaultCacheTime = DEFAULT_QUERY_CACHE_TIME,
     revalidateOnStale: defaultRevalidateOnStale = true,
     preferFreshOnStale: defaultPreferFreshOnStale = false,
   } = defaultOptions;
@@ -70,7 +71,9 @@ export function createCompositeQuery<
   };
 
   compositeQuery.getCachedEntry = async (props: TProps) => {
-    return await getCacheProvider().getCachedEntry([...key, serializeQueryKeyInput(props)] as const);
+    return await getCacheProvider().getCachedEntry(
+      [...key, serializeQueryKeyInput(props)] as const,
+    );
   };
 
   compositeQuery.key = (props: TProps): readonly [...TKey, string] => {

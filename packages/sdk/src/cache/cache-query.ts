@@ -5,6 +5,7 @@
  */
 
 import { KvCacheStore } from './kv-cache-store.ts';
+import { DEFAULT_QUERY_CACHE_TIME, DEFAULT_QUERY_STALE_TIME } from './defaults.ts';
 import type { CachedEntry, CacheEntry } from '../ports/cache-entry.ts';
 import { toCachedEntry } from '../ports/cache-entry.ts';
 import type { CacheStore } from '../ports/cache-store.ts';
@@ -13,10 +14,6 @@ import type { CacheQueryOptions } from '../ports/query-options.ts';
 
 /** Root prefix for all SDK cache keys in the KV store. */
 const CACHE_PREFIX = 'cache_query' as const;
-const DEFAULT_STALE_TIME_MS = 60_000;
-const DEFAULT_CACHE_TIME_MS = 300_000;
-
-const inflightRequests = new Map<string, Promise<unknown>>();
 
 function getInflightKey(queryKey: QueryKey): string {
   return JSON.stringify(queryKey);
@@ -31,14 +28,20 @@ function toCacheStoreKey(queryKey: QueryKey): Deno.KvKey {
  */
 export class CacheQuery {
   private readonly store: CacheStore;
+  private readonly inflightRequests: Map<string, Promise<unknown>>;
 
   /**
    * Create a cache-query engine.
    *
    * @param store - Optional custom cache store. Defaults to `KvCacheStore`.
+   * @param inflightRequests - Optional per-engine map for in-flight dedupe.
    */
-  constructor(store?: CacheStore) {
+  constructor(
+    store?: CacheStore,
+    inflightRequests: Map<string, Promise<unknown>> = new Map<string, Promise<unknown>>(),
+  ) {
     this.store = store ?? new KvCacheStore();
+    this.inflightRequests = inflightRequests;
   }
 
   /**
@@ -53,8 +56,8 @@ export class CacheQuery {
     options: CacheQueryOptions<TData>,
   ): Promise<TData> {
     const {
-      staleTime = DEFAULT_STALE_TIME_MS,
-      cacheTime = DEFAULT_CACHE_TIME_MS,
+      staleTime = DEFAULT_QUERY_STALE_TIME,
+      cacheTime = DEFAULT_QUERY_CACHE_TIME,
       revalidateOnStale = true,
       preferFreshOnStale = false,
       queryFn,
@@ -63,8 +66,8 @@ export class CacheQuery {
     const key = toCacheStoreKey(queryKey);
     const inflightKey = getInflightKey(queryKey);
 
-    if (inflightRequests.has(inflightKey)) {
-      return await inflightRequests.get(inflightKey)! as TData;
+    if (this.inflightRequests.has(inflightKey)) {
+      return await this.inflightRequests.get(inflightKey)! as TData;
     }
 
     const cached = await this.store.get<CacheEntry<TData>>(key);
@@ -107,7 +110,7 @@ export class CacheQuery {
     cacheTime: number,
   ): Promise<TData> {
     const promise = queryFn();
-    inflightRequests.set(inflightKey, promise);
+    this.inflightRequests.set(inflightKey, promise);
 
     try {
       const data = await promise;
@@ -119,7 +122,7 @@ export class CacheQuery {
       await this.store.set(cacheKey, entry, { expireIn: cacheTime });
       return data;
     } finally {
-      inflightRequests.delete(inflightKey);
+      this.inflightRequests.delete(inflightKey);
     }
   }
 
@@ -218,7 +221,7 @@ export class CacheQuery {
   async setCachedData<TData>(
     queryKey: QueryKey,
     data: TData,
-    cacheTime = DEFAULT_CACHE_TIME_MS,
+    cacheTime: number = DEFAULT_QUERY_CACHE_TIME,
   ): Promise<void> {
     const entry: CacheEntry<TData> = {
       data,
