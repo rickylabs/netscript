@@ -25,3 +25,13 @@ the `@orpc/server@^1.13.5` map entry but the type then leaks into the public sur
 (2 of the 14 private-type-refs). Resolved by design (plan D-3/D-6): structural
 `ServiceHandlerPlugin`, upstream import removed. Recorded here because the baseline
 counted it only as a ptr, not as an interop-typing gap.
+
+## D-4 — Root check wrapper task names differ from locked-plan text (2026-06-11)
+
+Plan §5 names `deno task check:packages` and `deno task check:plugins`, but the root
+`deno.json` in this worktree defines `check`, `lint`, and `fmt:check` wrappers rather
+than `check:packages`/`check:plugins`. Slice 15 therefore used the available root
+wrapper `deno task check` (packages + plugins, exit 0) and an explicit focused plugin
+consumer check over `plugins/workers/services/src/main.ts`,
+`plugins/sagas/services/src/main.ts`, and `plugins/streams/services/src/main.ts`
+(exit 0). Severity: minor tooling-name drift; no scope change.

@@ -207,3 +207,29 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno test --config packages/service/deno.json --allow-all packages/service/tests`: exit 1 `No test modules found` while root exclude still hides `packages/service/` before slice 15. `deno check --unstable-kv packages/service/mod.ts`: PASS exit 0 with known root-exclude warning. |
 | Concept of done | Runtime tests exercise A3 success, cancellation, start-failure, and shutdown-after-error paths through the public builder surface. |
 | Drift | none |
+
+### Slice 15/15 — D-11 final validation sweep
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `100ab31` — `Lift service into root quality gates` |
+| Changed | Root `deno.json` no longer excludes `packages/service/` from root package/plugin check, lint, or fmt wrappers. Public handler callback interfaces expose service-native and Hono-compatible call signatures so plugin Hono apps can keep passing health handlers directly to `app.get()`. Runtime tests normalize `0.0.0.0` listener addresses to `127.0.0.1` for Windows clients. |
+| Gates | `deno check --unstable-kv packages/service/mod.ts`: PASS. `deno task check`: PASS, 1367 files, 12 batches, 0 findings. `deno task lint`: PASS, 875 files, 0 findings. `deno task fmt:check`: PASS, 875 files, 0 findings. `deno test --config packages/service/deno.json --allow-all packages/service/tests`: PASS, 17 passed / 0 failed. `deno doc --lint packages/service/mod.ts`: PASS, checked 1 file. `deno publish --dry-run --allow-dirty` from `packages/service`: PASS with 0 slow types and 0 excluded-module errors. Consumer gate equivalent: `deno check --unstable-kv plugins/workers/services/src/main.ts plugins/sagas/services/src/main.ts plugins/streams/services/src/main.ts`: PASS. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env tools/fitness/audit-jsr-package.ts --root packages/service --text`: PASS target, publishability 8/10 (target >=7/10). Audit artifact: `jsr-audit-service.json`. The tool reports one WARN because it parses the dry-run banner line "Checking for slow types..." as a warning; raw `deno publish --dry-run --allow-dirty` reports success with no slow-type warnings. |
+| Non-locked context | `deno task arch:check` remains red on repo-wide pre-existing failures outside this unit (58 FAIL / 91 WARN, mostly CLI/plugin abstract-class and Jest-style test findings). Not a locked service exit gate in plan §5; recorded here for evaluator context. |
+| Concept of done | `@netscript/service` is reachable from root quality wrappers, publishable as a JSR package, covered by public-surface tests, and compile-checked through plugin service consumers. |
+| Drift | D-4 — root check wrapper task names differ from locked-plan text; used available `deno task check` plus focused plugin consumer check. |
+
+## Final Gate Table — `@netscript/service` A4 ∪ A3
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Surface / F-1 | PASS | Single `.` entrypoint in `packages/service/deno.json`; root `mod.ts` is documented and barrel-only. |
+| F-5 canonical entrypoint | PASS | `packages/service/mod.ts` exists and `deno doc --lint packages/service/mod.ts` exits 0. |
+| F-6 JSR config | PASS | `name`, `version`, `description`, `license`, `exports`, and publish include/exclude are present in `packages/service/deno.json`. |
+| F-7 publish dry-run | PASS | `deno publish --dry-run --allow-dirty` from `packages/service` exits 0 with no slow types or excluded modules. |
+| F-13 runtime | PASS | Runtime tests boot `serve({ port: 0 })`, GET `/health` 200, stop cleanly, abort via external signal, reject invalid config/startup failure, and stop after handler error. |
+| Root check/lint/fmt | PASS | `deno task check`, `deno task lint`, and `deno task fmt:check` all exit 0 after lifting `packages/service/`. |
+| Consumer compile | PASS | Focused plugin service check over workers/sagas/streams `main.ts` exits 0. |
+| JSR audit | PASS | Package audit target met at 8/10; README 235 lines, docs folder present, module tag present, description 99 chars, 6 test files. |
+| Lock hygiene | PASS | No lock files/caches deleted; no `deno cache --reload` run. `deno.lock` dependency changes were introduced in slice 13 for `@std/assert` tests. |

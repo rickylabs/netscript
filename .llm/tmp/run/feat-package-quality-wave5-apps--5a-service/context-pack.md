@@ -2,7 +2,7 @@
 
 ## Current state
 
-Implementation has started after PLAN-EVAL PASS. Slices 1-14/15 are complete:
+Implementation has completed after PLAN-EVAL PASS. Slices 1-15/15 are complete:
 `packages/service/deno.json` is standardized, and service sources now live under `src/` with only
 path updates required by the move. `src/types.ts` now defines the package-owned structural mirror
 types. Handler primitives now use those mirrors for plugins, fetch handlers, not-found handlers, and
@@ -17,13 +17,18 @@ Database connectivity diagnostics are now internal under `src/diagnostics/`, log
 `define-service.ts` is 143 lines. `defineService()` now returns `Promise<RunningService>` and uses
 package-owned router/db context types. `mod.ts` is now a 130-line documented public contract and
 still barrel-only. README is 234 lines with package docs scaffold under `docs/`. Doctest and unit
-test files are added but masked until the slice 15 root-exclude lift. Next slice: runtime
-integration tests for ephemeral serve/stop and failure paths are also added but masked until slice
-15. Next slice: lift `packages/service/` from root exclude and run the full validation sweep.
+test files are active after slice 15. Runtime integration tests cover ephemeral serve/stop,
+AbortSignal shutdown, invalid-port start failure, startup-hook failure, and shutdown after handler
+error. Slice 15 lifted `packages/service/` from the root exclude, fixed final Hono assignability for
+public handler factories, and made Windows runtime tests fetch via `127.0.0.1` when Deno reports
+`0.0.0.0`. Final implementation commit: `100ab31`.
 
-Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
-files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do
-not treat root-exclude lift as available before slice 15.
+Final locked gates are green: publish dry-run exit 0 with 0 slow types and 0 excluded modules,
+doc-lint exit 0, root `deno task check`/`lint`/`fmt:check` exit 0, service tests 17/17 pass,
+focused plugin consumer check exit 0, and JSR publishability target met (8/10, target >=7/10).
+Root `deno task arch:check` was run for context and remains red on pre-existing repo-wide findings
+outside `@netscript/service`; it is recorded in `worklog.md` as non-locked evidence, not a service
+gate blocker.
 
 ## What this session did
 
