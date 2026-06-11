@@ -7,3 +7,4 @@
 Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the plan.
 
 - 0785a8f: Standardize service package metadata for publish gates
+- d9897c0: Move service sources under src without behavior changes

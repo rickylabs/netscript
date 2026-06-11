@@ -77,3 +77,13 @@ locked), drift.md, context-pack.md, measure-5a.json. No implementation performed
 | Drift | none |
 
 PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/A for this package, and plan exit gates now name jsr-audit publishability target `>=7/10`.
+
+### Slice 2/15 — D-1 move sources under `src/`
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `d9897c0` — `Move service sources under src without behavior changes` |
+| Changed | `builders/service-builder.ts` moved to `src/builder/service-builder.ts`; `primitives/*` moved to `src/primitives/*`; `presets/define-service.ts` moved to `src/presets/define-service.ts`; root `mod.ts`, preset import, and Scalar asset URL were updated for the new paths. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. A `--no-config` probe reached the moved files and failed only on unresolved bare imports, as expected without `packages/service/deno.json` imports. |
+| Concept of done | Every moved file remains reachable from `mod.ts`. No new behavior files or speculative folders were added; `src/` now contains only the planned builder, primitives, and presets roles. |
+| Drift | none |

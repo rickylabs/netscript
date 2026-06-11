@@ -2,10 +2,10 @@
 
 ## Current state
 
-Implementation has started after PLAN-EVAL PASS. Slice 1/15 is complete:
-`packages/service/deno.json` is standardized with description, license, package-local tasks, and
-publish include/exclude metadata. Implementation commit: `0785a8f`. Next slice: move service
-sources under `src/` as a rename-only transient slice.
+Implementation has started after PLAN-EVAL PASS. Slices 1-2/15 are complete:
+`packages/service/deno.json` is standardized, and service sources now live under `src/` with only
+path updates required by the move. Implementation commits: `0785a8f`, `d9897c0`. Next slice:
+package-owned public types in `src/types.ts` for D-3/D-4/D-6.
 
 Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
 files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do
