@@ -137,3 +137,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. Consumer grep for removed method names found no TypeScript service consumers; the only hit was unrelated C# template text `AddHealthChecks`. |
 | Concept of done | Builder extension path is one file: add the interface method and mirror implementation method together. Constructor path is only `createService()`, preserving the DSL entrypoint and zero-consumer rename rule. |
 | Drift | none |
+
+### Slice 8/15 — D-4/D-8 stoppable serve runtime
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `58e7d1e` — `Add stoppable service runtime handle` |
+| Changed | Added/exported `ServeOptions`; `ServiceBuilder.serve()` now accepts `{ port, signal }` and returns `RunningService` with `{ app, addr, stop() }`. `Deno.serve` is wired with an internal `AbortController`, external abort propagation, and awaited `server.finished` stop semantics. Serve banner now uses `createServiceLogger`; `createErrorHandler()` logs through `@netscript/logger`; builder/handler runtime paths are console-free. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. `Select-String` over builder + handlers for `console.` returned no matches. |
+| Concept of done | Runtime lifecycle now has an explicit handle and cancellation path; logger usage is centralized in the affected runtime/error paths. |
+| Drift | none |
