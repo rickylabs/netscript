@@ -43,8 +43,11 @@ that the one-liner returns the composed L2 values: `clients`, `queries`, and
 `queryUtils`. Slice 12 split discovery into `browser-env.ts`, `service-url.ts`,
 `kv-connection.ts`, and `mod.ts`, leaving `service-discovery.ts` as a 7-line
 compatibility barrel and adding three parity tests for lookup ordering
-(full VITE key -> shorthand -> server env). Next slice: jsdoc sweep and the
-`inflightRequests` state decision (D-11).
+(full VITE key -> shorthand -> server env). Slice 13 completed the remaining
+JSDoc member sweep reached by the current public surface, centralized SWR/cache
+timing defaults in `src/cache/defaults.ts`, and moved `inflightRequests` from
+module state onto `CacheQuery` instance state with an optional constructor-injected
+map. Next slice: root `mod.ts` @module docs >=30L and per-subpath module docs.
 
 ## What the plan session did
 

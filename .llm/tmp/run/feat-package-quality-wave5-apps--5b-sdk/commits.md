@@ -19,3 +19,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 - 112e4a2: Extract sdk HTTP client link seam
 - a18ee60: Add sdk defineServices composition preset
 - 4fccdd8: Split sdk discovery lookup modules
+- 4443e5f: Document sdk cache state boundaries

@@ -206,3 +206,15 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Size check | `browser-env.ts` 70L; `service-url.ts` 196L; `kv-connection.ts` 285L; `mod.ts` 37L; `service-discovery.ts` 7L. The prior 643L over-cap file is gone. |
 | Concept of done | Discovery behavior remains reachable from `@netscript/sdk/discovery`; each new file has one extension pattern and the browser/server env ordering risk is covered by tests before the final root-exclude lift. |
 | Drift | none |
+
+### Slice 13/19 — D-11 JSDoc sweep and cache state decision
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `4443e5f` — `Document sdk cache state boundaries` |
+| Changed | Added member JSDoc for `CacheProvider` and `KvCachePersisterStorage`, completing the remaining doc-lint JSDoc chain after slice 11's pulled-forward query-client type comments. Added `src/cache/defaults.ts` as the single named constants home for SDK query stale/cache timing and rewired `CacheQuery`, query factories, composite queries, query-client defaults, and KV persister TTL to consume it. Moved `inflightRequests` from module-global state into `CacheQuery` instance state with an optional constructor-injected map default. |
+| Gate | Raw `Deno.Command`: `deno check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv packages/sdk/src/cache/defaults.ts packages/sdk/src/cache/cache-query.ts packages/sdk/src/cache/cache-provider.ts packages/sdk/src/query/query-factory.ts packages/sdk/src/query/composite-query.ts packages/sdk/src/query-client/query-client-factory.ts packages/sdk/src/query-client/kv-cache-persister.ts` PASS exit 0. Raw `Deno.Command`: `deno lint --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json <slice-13 files>` PASS exit 0. Raw `Deno.Command`: `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json <slice-13 files>` PASS exit 0. Raw `Deno.Command`: `deno doc --lint --import-map .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-doc-import-map.json <slice-13 files + referenced ports>` PASS, checked 15 files. Wrapper read: `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/sdk --pretty` exit 0; combined missingJSDoc 0, combined privateTypeRef 0, combinedOther 0 for the current entrypoint set. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Decision | `inflightRequests` is instance state, not process-global. Default construction still gives the shared exported `cacheQuery` one dedupe map, while tests and alternate engines can inject an isolated map without cross-instance leakage. |
+| Advisory | B3 complete: runtime SWR/cache timing defaults now resolve through `src/cache/defaults.ts`; remaining `30_000`/`300_000` matches are docs or the constants home. |
+| Concept of done | The touched public interfaces have one-line member docs, cache state is explicit at the `CacheQuery` boundary, and a contributor can extend timing defaults by editing one constants file. |
+| Drift | none |
