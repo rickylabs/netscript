@@ -25,3 +25,6 @@ Bootstrap artifacts created and baseline measurement recorded in `measure-5c1.js
 Starting baseline: scoped check and doc-lint pass; package-local check/test have weak/no-file
 behavior; lint/fmt wrappers exit 1 despite zero reported findings; JSR dry-run fails with excluded
 module errors plus six missing return types in `runtime/sheet/Sheet.tsx`.
+
+Slice 1 complete: package-local `check` and `test` now use `deno.gates.json` and glob arguments,
+fixing the baseline no-file behavior without touching root `deno.lock`.

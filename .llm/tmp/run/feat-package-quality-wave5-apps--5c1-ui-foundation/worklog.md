@@ -89,4 +89,21 @@ remained clean.
 
 ## Slice Evidence
 
-Pending.
+### Slice 1 — Package task block + file-list cleanup
+
+Commit: `047558c`.
+
+Changed:
+- Replaced the brittle explicit `deno task check` file list in `packages/fresh-ui/deno.json`
+  with glob-based `check` and `test` tasks.
+- Added `packages/fresh-ui/deno.gates.json` so package-local tasks keep Fresh/Preact JSX and
+  import settings without inheriting the root workspace exclude for `packages/fresh-ui`.
+- Expanded only the run-local lock under this run directory; root `deno.lock` stayed untouched.
+
+Evidence:
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0, no `No matching files found`.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 30 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+
+Drift: none.

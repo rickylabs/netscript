@@ -13,4 +13,4 @@ commits are never amended.
 
 ## Slices
 
-Pending.
+- Slice 1 impl `047558c`: Replace fresh-ui brittle check file list.
