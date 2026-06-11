@@ -24,6 +24,13 @@ export {
   DEFAULT_STALE_TIME,
   type NetScriptQueryClientOptions,
 } from '../src/query-client/query-client-factory.ts';
+export type {
+  QueryClientFetchOptions,
+  QueryClientFilters,
+  QueryClientPort,
+  QueryClientPredicate,
+  QueryClientSetOptions,
+} from '../src/ports/query-client.ts';
 
 // Key bridge
 export { bridgeInvalidation, toClientKeyPrefix } from '../src/query-client/key-bridge.ts';

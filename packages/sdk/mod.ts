@@ -25,6 +25,7 @@ export type {
   CacheStoreEntry,
   HealthCheckResponse,
   PaginatedResponse,
+  QueryClientPort,
   ServiceMetadata,
   ServiceTransport,
 } from './ports/mod.ts';

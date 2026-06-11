@@ -24,6 +24,13 @@ export type { QueryKey, QueryKeyPart } from '../src/ports/query-key.ts';
 export { createActionQueryKey, serializeQueryKeyInput } from '../src/ports/query-key.ts';
 export type { CacheQueryOptions, QueryParams } from '../src/ports/query-options.ts';
 export type {
+  QueryClientFetchOptions,
+  QueryClientFilters,
+  QueryClientPort,
+  QueryClientPredicate,
+  QueryClientSetOptions,
+} from '../src/ports/query-client.ts';
+export type {
   ActionMutationOptions,
   ActionQueryOptions,
   MutationOptionsResult,

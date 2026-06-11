@@ -5,6 +5,7 @@
  */
 
 import { QueryClient } from '@tanstack/query-core';
+import type { QueryClientPort } from '../ports/query-client.ts';
 
 /** Default stale time matching NetScript's server-first philosophy (30 s). */
 export const DEFAULT_STALE_TIME = 30_000;
@@ -42,7 +43,7 @@ export interface NetScriptQueryClientOptions {
  */
 export function createNetScriptQueryClient(
   options: NetScriptQueryClientOptions = {},
-): QueryClient {
+): QueryClientPort {
   const {
     staleTime = DEFAULT_STALE_TIME,
     gcTime = DEFAULT_GC_TIME,

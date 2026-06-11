@@ -11,6 +11,7 @@
 import { createCollection } from '@tanstack/db';
 import { queryCollectionOptions } from '@tanstack/query-db-collection';
 import type { QueryClient } from '@tanstack/query-core';
+import type { QueryClientPort } from '../ports/query-client.ts';
 
 /**
  * Options for `createQueryCollection`.
@@ -24,8 +25,8 @@ export interface QueryCollectionOptions<TItem extends Record<string, unknown>> {
   queryFn: () => Promise<TItem[]>;
   /** Extract a unique key from each item. */
   getKey: (item: TItem) => string | number;
-  /** TanStack Query client instance. */
-  queryClient: QueryClient;
+  /** Structural TanStack Query client port. */
+  queryClient: QueryClientPort;
 }
 
 /**
@@ -61,7 +62,10 @@ export function createQueryCollection<TItem extends Record<string, unknown>>(
       queryKey: queryKey as unknown[],
       queryFn: () => queryFn(),
       getKey,
-      queryClient,
+      // TanStack DB expects the concrete upstream QueryClient type. The public
+      // SDK option is structural to keep upstream types out of the surface; a
+      // real QueryClient from `createNetScriptQueryClient()` is assignable here.
+      queryClient: queryClient as QueryClient,
     }),
   );
 }
