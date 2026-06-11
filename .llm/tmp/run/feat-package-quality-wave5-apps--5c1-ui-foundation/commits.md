@@ -46,4 +46,4 @@ hash-record commit; commits are never amended.
 - Slice 15 impl `aaf043d`: Derive fresh-ui color ramps with OKLCH.
 - Slice 15 docs `fb278c8`: Record slice 15 evidence.
 - Slice 16 impl `2d76d21`: Prepare fresh UI package for JSR exit.
-- Slice 16 docs `pending`: Record slice 16 evidence.
+- Slice 16 docs `24e9d3d`: Record slice 16 evidence.
