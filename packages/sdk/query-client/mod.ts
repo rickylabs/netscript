@@ -31,6 +31,27 @@ export type {
   QueryClientPredicate,
   QueryClientSetOptions,
 } from '../src/ports/query-client.ts';
+export type {
+  ServiceOperationKey,
+  ServiceOperationKeyOptions,
+  ServiceOperationType,
+  ServiceOptionalInputRest,
+  ServicePartialInput,
+  ServiceProcedureInfiniteOptions,
+  ServiceProcedureInfiniteResult,
+  ServiceProcedureLiveResult,
+  ServiceProcedureMutationOptions,
+  ServiceProcedureMutationResult,
+  ServiceProcedureQueryOptions,
+  ServiceProcedureQueryResult,
+  ServiceProcedureQueryUtils,
+  ServiceProcedureStreamedOptions,
+  ServiceProcedureStreamedResult,
+  ServiceQueryClientContext,
+  ServiceQueryKeyOptions,
+  ServiceQueryUtils,
+  ServiceStreamedKeyOptions,
+} from '../src/ports/service-query-utils.ts';
 
 // Key bridge
 export { bridgeInvalidation, toClientKeyPrefix } from '../src/query-client/key-bridge.ts';

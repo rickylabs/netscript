@@ -27,5 +27,6 @@ export type {
   PaginatedResponse,
   QueryClientPort,
   ServiceMetadata,
+  ServiceQueryUtils,
   ServiceTransport,
 } from './ports/mod.ts';
