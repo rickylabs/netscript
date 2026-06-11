@@ -79,6 +79,62 @@ gates under `.llm/tools/fitness/` for registry/token invariants. CLI
 installation behavior lives under `packages/cli/src/public/features/ui/` once
 slices 13-14 land.
 
+### Slice 16 — README/docs/JSR dry-run sweep
+
+Commit: `2d76d21`.
+
+Changed:
+
+- Updated `packages/fresh-ui/README.md` for the current package version,
+  `Sheet`, `netscript ui:init`, `netscript ui:add`, generated token artifacts,
+  and Popover API/CSS anchor fallback posture.
+- Formatted `packages/fresh-ui/docs/l0-conventions.md`.
+- Fixed JSR slow-type findings in `runtime/sheet/Sheet.tsx` with explicit public
+  component return annotations.
+- Fixed package-wide lint findings surfaced by lifting the root package
+  exclusion: `Toast.tsx` now uses `globalThis`, `cn.ts` imports `ClassValue` as
+  type-only, and `use-sheet.ts` drops an unused type import.
+- Removed stale root top-level `packages/fresh-ui/` exclusion so
+  `deno publish --dry-run` can see the package graph; root task-level excludes
+  remain unchanged.
+- Added `slice-16-exit-evidence.json`.
+
+Evidence:
+
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 35 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh-ui --ext ts,tsx`
+  → PASS/exit 0, 0 occurrences.
+- `deno fmt --check --config packages/fresh-ui/deno.gates.json packages/fresh-ui/registry/islands/Toast.tsx packages/fresh-ui/registry/lib/cn.ts packages/fresh-ui/runtime/sheet/Sheet.tsx packages/fresh-ui/runtime/sheet/use-sheet.ts`
+  → PASS/exit 0, checked 4 files.
+- `deno fmt --check --no-config packages/fresh-ui/README.md packages/fresh-ui/docs/l0-conventions.md`
+  → PASS/exit 0, checked 2 files.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno run --allow-run=deno,git .llm/tools/fitness/check-token-drift.ts` →
+  PASS/exit 0, 3 generated artifacts stable.
+- `deno run --allow-read .llm/tools/fitness/check-manifest-integrity.ts` →
+  PASS/exit 0, 62/62 registry files claimed (4 excluded).
+- `deno publish --dry-run --allow-dirty --no-check=remote` from
+  `packages/fresh-ui` → PASS/exit 0, Dry run complete.
+- `git diff -- deno.lock packages/fresh-ui/deno.lock .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.lock`
+  → PASS/exit 0, no lock-file diff.
+
+Baseline vs final:
+
+- LOC `ts|tsx|css`: 6861 → 9253.
+- Registry source files: 46 → 65.
+- Registry manifest items: 33 → 42.
+- Registry collections: 6 → 6.
+- JSR dry-run: FAIL 39 problems → PASS.
+
+Residue:
+
+- The package-wide fmt wrapper still exits 1 with zero findings, matching the
+  baseline wrapper anomaly. Direct changed-source and docs fmt checks pass.
+
+Drift: D-5c1-3.
+
 ### Slice 15 — OKLCH ramp re-derivation
 
 Commit: `aaf043d`.
@@ -146,11 +202,11 @@ Evidence:
 - `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.fmt.json ...`
   over the UI feature files → PASS/exit 0, checked 5 files.
 - `deno run --allow-all packages/cli/bin/netscript.ts ui:add button --project-root <run-local scratch app> --force`
-  → PASS/exit 0; installed 5 dependency-resolved items, copied 11 files,
-  merged 4 imports, wrote 2 per-item CSS imports, scratch file count 12.
+  → PASS/exit 0; installed 5 dependency-resolved items, copied 11 files, merged
+  4 imports, wrote 2 per-item CSS imports, scratch file count 12.
 - `deno run --allow-all packages/cli/bin/netscript.ts ui:add forms-core --project-root <run-local scratch app> --force`
-  → PASS/exit 0; installed 15 dependency-resolved items, copied 26 files,
-  merged 4 imports, wrote 9 per-item CSS imports, scratch file count 27.
+  → PASS/exit 0; installed 15 dependency-resolved items, copied 26 files, merged
+  4 imports, wrote 9 per-item CSS imports, scratch file count 27.
 - `deno test --allow-all packages/cli/src/local/composition/local-contributor-command-tree_test.ts`
   → PASS/exit 0.
 - `git diff -- deno.lock packages/cli/deno.lock .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.lock`
@@ -168,8 +224,8 @@ Changed:
 - Added a Fresh UI registry installer under
   `packages/cli/src/public/features/ui/` that resolves manifest items and
   collections, topologically includes `registryDependencies`, maps target
-  placeholders (`@ui/`, `@islands/`, `@assets/`, `@lib/`, `~/`), copies
-  registry files, rewrites copied relative registry imports, writes an
+  placeholders (`@ui/`, `@islands/`, `@assets/`, `@lib/`, `~/`), copies registry
+  files, rewrites copied relative registry imports, writes an
   `assets/styles.css` aggregator, and merges required `deno.json` imports.
 - `ui:init` installs the locked starter item set from the plan. Dependencies
   resolve it to 27 installed registry items, 40 copied registry files, 12
@@ -181,15 +237,15 @@ Changed:
 Evidence:
 
 - `deno task --cwd packages/cli check` → PASS/exit 0.
-- `deno lint --no-config ...` over the new UI feature files, touched root
-  wiring files, and command-tree assertion → PASS/exit 0, checked 6 files.
+- `deno lint --no-config ...` over the new UI feature files, touched root wiring
+  files, and command-tree assertion → PASS/exit 0, checked 6 files.
 - `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.fmt.json ...`
   over the new UI feature files → PASS/exit 0, checked 3 files. The root repo
   fmt config excludes `packages/cli`, so pre-existing CLI root wiring files were
   left in their legacy style.
 - `deno run --allow-all packages/cli/bin/netscript.ts ui:init --project-root <run-local scratch app> --force`
-  → PASS/exit 0; installed 27 items, copied 40 files, wrote
-  `assets/styles.css`, merged 4 imports, scratch file count 41.
+  → PASS/exit 0; installed 27 items, copied 40 files, wrote `assets/styles.css`,
+  merged 4 imports, scratch file count 41.
 - `deno run --allow-all packages/cli/bin/netscript.ts init slice13-init-smoke --path <run-local scratch> --ci --yes --no-git --no-aspire`
   → PASS/exit 0; existing `netscript init` path scaffolded successfully with 39
   files and 19 directories.
