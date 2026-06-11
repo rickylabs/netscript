@@ -40,3 +40,5 @@ hash-record commit; commits are never amended.
 - Slice 12 impl `802e001`: Use platform popover for floating runtimes.
 - Slice 12 docs `a10b6d7`: Record slice 12 evidence.
 - Slice 13 impl `9c2a38b`: Add Fresh UI init command.
+- Slice 13 docs `86121a4`: Record slice 13 evidence.
+- Slice 14 impl `b03f590`: Add Fresh UI add command.

@@ -81,7 +81,7 @@ slices 13-14 land.
 
 ### Slice 14 — `ui:add <item|collection>` command
 
-Commit: pending.
+Commit: `b03f590`.
 
 Changed:
 
