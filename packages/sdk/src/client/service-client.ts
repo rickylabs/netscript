@@ -4,28 +4,14 @@
  * @module
  */
 
-import { createORPCClient, type ClientOptions } from '@orpc/client';
-import { RPCLink } from '@orpc/client/fetch';
-import {
-  ClientRetryPlugin,
-  type ClientRetryPluginContext,
-  DedupeRequestsPlugin,
-} from '@orpc/client/plugins';
-import { StandardLinkClientInterceptorOptions } from '@orpc/client/standard';
-import {
-  type AnyContractRouter as ORPCAnyContractRouter,
-  inferRPCMethodFromContractRouter,
-} from '@orpc/contract';
+import { createORPCClient } from '@orpc/client';
 import { getTraceContext } from '@netscript/telemetry/context';
-import { getServiceUrl } from '../discovery/service-discovery.ts';
+import { createHttpClientLink } from './http-client-link.ts';
 import type {
   ContractLike,
   CreateServiceClientOptions,
   ServiceClient,
-  ServiceClientContext,
 } from '../ports/service-client.ts';
-
-type InternalServiceClientContext = ServiceClientContext & ClientRetryPluginContext;
 
 function getTraceHeaders(): Record<string, string> {
   const headers: Record<string, string> = {};
@@ -61,65 +47,16 @@ export function createServiceClient<TContract extends ContractLike>({
   propagateTraceContext = true,
 }: CreateServiceClientOptions<TContract>): ServiceClient<TContract> {
   const pathSegment = routerName ?? serviceName;
+  const link = createHttpClientLink({
+    contract,
+    serviceName,
+    pathSegment,
+    protocol,
+    apiPath,
+    apiVersion,
+    propagateTraceContext,
+    getTraceHeaders,
+  });
 
-  return createORPCClient(
-    new RPCLink<InternalServiceClientContext>({
-      // Resolve the service URL lazily so browser clients can rely on
-      // SSR-injected discovery data instead of touching Deno APIs at import time.
-      url: () => {
-        const baseUrl = getServiceUrl(serviceName, protocol);
-        return `${baseUrl}${apiPath}/${apiVersion}/${pathSegment}`;
-      },
-      method: inferRPCMethodFromContractRouter(contract as unknown as ORPCAnyContractRouter),
-      headers: (options: ClientOptions<InternalServiceClientContext>) => {
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/json',
-        };
-
-        if (propagateTraceContext) {
-          const explicitHeaders = options?.context?.traceHeaders;
-          if (explicitHeaders?.traceparent) {
-            headers.traceparent = explicitHeaders.traceparent;
-            if (explicitHeaders.tracestate) {
-              headers.tracestate = explicitHeaders.tracestate;
-            }
-          } else {
-            Object.assign(headers, getTraceHeaders());
-          }
-        }
-
-        return headers;
-      },
-      plugins: [
-        new ClientRetryPlugin<InternalServiceClientContext>({
-          default: {
-            retry: 0,
-          },
-        }),
-        new DedupeRequestsPlugin<InternalServiceClientContext>({
-          filter: ({ request }) => request.method === 'GET',
-          groups: [
-            {
-              condition: ({
-                context,
-              }: StandardLinkClientInterceptorOptions<InternalServiceClientContext>) =>
-                context?.cache === 'force-cache',
-              context: {
-                cache: 'force-cache',
-              },
-            },
-            {
-              condition: () => true,
-              context: {},
-            },
-          ],
-        }),
-      ],
-      fetch: (request, init, { context }) =>
-        globalThis.fetch(request, {
-          ...init,
-          cache: context?.cache as RequestCache,
-        }),
-    }),
-  ) as ServiceClient<TContract>;
+  return createORPCClient(link) as ServiceClient<TContract>;
 }
