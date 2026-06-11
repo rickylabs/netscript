@@ -26,3 +26,5 @@ hash-record commit; commits are never amended.
 - Slice 5 impl `42b9b92`: Add fresh-ui token drift fitness gate.
 - Slice 5 docs `122869a`: Record slice 5 evidence.
 - Slice 6 impl `999fdf9`: Migrate fresh-ui registry schema to v2.
+- Slice 6 docs `e6d473b`: Record slice 6 evidence.
+- Slice 7 impl `6977b9b`: Add fresh-ui manifest integrity gate.

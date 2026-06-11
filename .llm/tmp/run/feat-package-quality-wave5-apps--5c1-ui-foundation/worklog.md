@@ -123,6 +123,39 @@ Evidence:
 
 Drift: none.
 
+### Slice 7 — `manifest-integrity` fitness gate
+
+Commit: `6977b9b`.
+
+Changed:
+
+- Added `.llm/tools/fitness/check-manifest-integrity.ts`.
+- Added run-local evidence at `slice-07-manifest-integrity.json`.
+- Claimed shared registry support files as manifest items: `cn`, `public-types`,
+  and `control-props`.
+- Added `theme-seed` registry dependencies on `cn` and `public-types` so future
+  `ui:add` dependency resolution has manifest-owned copy targets for shared
+  support files.
+
+Evidence:
+
+- `deno run --allow-read --allow-write .llm/tools/fitness/check-manifest-integrity.ts --json-out .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-07-manifest-integrity.json`
+  → PASS/exit 0; 44/44 registry files claimed, 4 verification/manifest files
+  excluded, no missing files, unclaimed files, duplicate items, duplicate
+  sources, invalid targets, unknown dependencies, or authorless items.
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 30 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno fmt --check --config packages/fresh-ui/deno.gates.json packages/fresh-ui/registry/manifest.ts`
+  → PASS/exit 0.
+- `deno fmt --check --no-config .llm/tools/fitness/check-manifest-integrity.ts .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-07-manifest-integrity.json`
+  → PASS/exit 0.
+- `deno lint --no-config .llm/tools/fitness/check-manifest-integrity.ts` →
+  PASS/exit 0.
+
+Drift: none.
+
 ### Slice 6 — Registry schema v2 types + manifest migration
 
 Commit: `999fdf9`.

@@ -60,3 +60,7 @@ Slice 6 complete: registry schema v2 is in place. Manifest files now use
 placeholder `target` paths, registry dependencies are string arrays, layer-3 UI
 items are `block` kind, all items carry `author`, and `theme-seed` claims the
 generated bridge/token JSON artifacts.
+
+Slice 7 complete: `.llm/tools/fitness/check-manifest-integrity.ts` provides the
+`manifest-integrity` gate. The manifest now claims 44 installable registry files
+through 36 items, with manifest/schema/test files excluded from copy inventory.
