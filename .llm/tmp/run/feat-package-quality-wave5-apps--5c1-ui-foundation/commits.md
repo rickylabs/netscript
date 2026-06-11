@@ -5,7 +5,7 @@ commits are never amended.
 
 ## Bootstrap
 
-Pending initial commit.
+- `50c8a41`: Bootstrap 5c1 UI foundation run artifacts.
 
 ## Baseline
 
