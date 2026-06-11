@@ -77,3 +77,11 @@ package-owned structural public types that avoid leaking Preact private JSX
 internals through `deno doc --lint`. The L0 conventions doc is published under
 `packages/fresh-ui/docs/`, README documents the entrypoint, and 35 package tests
 pass including JSX component usage for `VisuallyHidden`.
+
+Slice 10 complete as non-shipped spike evidence: a throwaway Fresh 2 scratch app
+under the run directory type-checks `npm:@zag-js/preact@1.41.2` with
+`@zag-js/combobox@1.41.2` and direct Fresh SSR returns HTTP 200 with combobox
+markup. Builder-backed Vite hydration is blocked in this Windows/Deno worktree
+by `esbuild@0.27.7` failing on `ChildProcess.unref`, so Tier Z shipping is a
+conditional no-go until a reachable Fresh app can prove hydrated interaction.
+Drift entries D-5c1-1 and D-5c1-2 record the scratch hosting and no-go decision.

@@ -196,6 +196,64 @@ Evidence:
 
 Drift: none.
 
+### Slice 10 — Zag x Fresh combobox spike
+
+Commit: `ac0e1a3`.
+
+Changed:
+
+- Added a throwaway Fresh 2 scratch app under
+  `.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-fresh-spike/`.
+- Implemented a combobox island probe using current `@zag-js/combobox@1.41.2`
+  and `@zag-js/preact@1.41.2` APIs: `combobox.collection`, `combobox.machine`,
+  `combobox.connect`, `useMachine`, and `normalizeProps`.
+- Captured direct Fresh SSR HTML and summary evidence at `slice-10-ssr.html` and
+  `slice-10-ssr-summary.json`.
+- Captured the Fresh Vite hydration startup failure in
+  `slice-10-dev-server.stderr.log`.
+- Recorded run-local drift D-5c1-1 and D-5c1-2.
+
+Evidence:
+
+- `deno task check` from the scratch app → PASS/exit 0, with
+  `deno check --no-lock --unstable-kv main.tsx client.ts vite.config.ts routes/**/*.tsx islands/**/*.tsx`.
+- `deno lint main.tsx client.ts vite.config.ts routes/_app.tsx routes/index.tsx islands/ZagComboboxSpike.tsx`
+  from the scratch app → PASS/exit 0, checked 6 files.
+- `deno fmt --check deno.json main.tsx client.ts vite.config.ts routes/_app.tsx routes/index.tsx islands/ZagComboboxSpike.tsx`
+  from the scratch app → PASS/exit 0, checked 7 files.
+- `deno run -A --no-lock main.tsx` plus GET `http://127.0.0.1:8071/` → PASS/HTTP
+  200; SSR marker true, Zag combobox scope true, selected city true, hydration
+  script false.
+- `deno run -A --no-lock npm:vite@7.3.5 --host 127.0.0.1 --port 8071` → FAIL
+  before serving a page with
+  `TypeError: Cannot read properties of undefined (reading 'unref')` in
+  `esbuild@0.27.7` while Vite loads `vite.config.ts`.
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 35 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno fmt --check --no-config` over drift/evidence/SSR summary files →
+  PASS/exit 0.
+
+Diagnostics:
+
+- `deno task --cwd packages/fresh-ui lint` and
+  `deno task --cwd packages/fresh-ui fmt:check` still fail before checking code
+  because the package aliases resolve `.llm/tools/*` relative to
+  `packages/fresh-ui`.
+- Root scoped lint/fmt wrappers reproduce the baseline quirk: exit 1 with zero
+  reported findings.
+- Direct package-wide lint/fmt diagnostics fail on pre-existing package debt
+  outside the Slice 10 scratch artifact.
+
+Drift:
+
+- D-5c1-1: scratch app hosting used because the playground app is outside this
+  framework worktree.
+- D-5c1-2: Fresh Vite hydration blocked by the Deno/Vite/esbuild `unref`
+  failure; Tier Z shipping remains no-go until builder-backed hydration evidence
+  passes in a reachable app environment.
+
 ### Slice 7 — `manifest-integrity` fitness gate
 
 Commit: `6977b9b`.

@@ -32,3 +32,5 @@ hash-record commit; commits are never amended.
 - Slice 8 impl `097fde8`: Extract fresh-ui component CSS per registry item.
 - Slice 8 docs `c24ee22`: Record slice 8 evidence.
 - Slice 9 impl `c256bdb`: Add fresh-ui L0 primitives surface.
+- Slice 9 docs `d965c4d`: Record slice 9 evidence.
+- Slice 10 impl `ac0e1a3`: Record Fresh Zag spike evidence.
