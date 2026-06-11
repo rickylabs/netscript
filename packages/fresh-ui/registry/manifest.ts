@@ -47,6 +47,81 @@ export const freshUiRegistryManifest = {
       }],
     },
     {
+      name: 'form-control-styles',
+      kind: 'style',
+      layer: 2,
+      description: 'Shared input, select, and textarea control CSS blocks.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['forms', 'styles', 'support'],
+      files: [{
+        source: 'registry/components/ui/form-control-styles.css',
+        target: '@assets/ui/form-control-styles.css',
+      }],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/form-control-styles.css';" }],
+    },
+    {
+      name: 'choice-styles',
+      kind: 'style',
+      layer: 2,
+      description: 'Shared choice-control CSS blocks for checkbox and switch seams.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['forms', 'selection', 'styles', 'support'],
+      files: [{
+        source: 'registry/components/ui/choice-styles.css',
+        target: '@assets/ui/choice-styles.css',
+      }],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/choice-styles.css';" }],
+    },
+    {
+      name: 'surface-styles',
+      kind: 'style',
+      layer: 2,
+      description: 'Shared card and panel surface CSS blocks.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['surface', 'styles', 'support'],
+      files: [{
+        source: 'registry/components/ui/surface-styles.css',
+        target: '@assets/ui/surface-styles.css',
+      }],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/surface-styles.css';" }],
+    },
+    {
+      name: 'sheet-styles',
+      kind: 'style',
+      layer: 2,
+      description: 'Platform dialog sheet CSS blocks for package-owned sheet runtime.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['surface', 'sheet', 'styles', 'support'],
+      files: [{
+        source: 'registry/components/ui/sheet.css',
+        target: '@assets/ui/sheet.css',
+      }],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/sheet.css';" }],
+    },
+    {
+      name: 'alert-styles',
+      kind: 'style',
+      layer: 2,
+      description: 'Shared alert and inline-notice feedback CSS blocks.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['feedback', 'styles', 'support'],
+      files: [{
+        source: 'registry/components/ui/alert-styles.css',
+        target: '@assets/ui/alert-styles.css',
+      }],
+      registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/alert-styles.css';" }],
+    },
+    {
       name: 'theme-seed',
       kind: 'theme',
       description:
@@ -70,22 +145,6 @@ export const freshUiRegistryManifest = {
         },
         { source: 'registry/theme/tokens.json', target: '@assets/tokens.json' },
         { source: 'registry/theme/layouts.css', target: '@assets/layouts.css' },
-        {
-          source: 'registry/theme/components/actions.css',
-          target: '@assets/components/actions.css',
-        },
-        {
-          source: 'registry/theme/components/forms.css',
-          target: '@assets/components/forms.css',
-        },
-        {
-          source: 'registry/theme/components/surfaces.css',
-          target: '@assets/components/surfaces.css',
-        },
-        {
-          source: 'registry/theme/components/feedback.css',
-          target: '@assets/components/feedback.css',
-        },
       ],
       registryDependencies: ['cn', 'public-types'],
       cssVars: {
@@ -109,11 +168,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['forms', 'actions', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/button.tsx',
-        target: '@ui/button.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/button.tsx',
+          target: '@ui/button.tsx',
+        },
+        {
+          source: 'registry/components/ui/button.css',
+          target: '@assets/ui/button.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'spinner'],
+      css: [{ layer: 'components', content: "@import './ui/button.css';" }],
     },
     {
       name: 'icon-button',
@@ -141,7 +207,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/input.tsx',
         target: '@ui/input.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'form-control-styles'],
     },
     {
       name: 'textarea',
@@ -151,11 +217,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['forms', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/textarea.tsx',
-        target: '@ui/textarea.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/textarea.tsx',
+          target: '@ui/textarea.tsx',
+        },
+        {
+          source: 'registry/components/ui/textarea.css',
+          target: '@assets/ui/textarea.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'form-control-styles'],
+      css: [{ layer: 'components', content: "@import './ui/textarea.css';" }],
     },
     {
       name: 'checkbox',
@@ -165,11 +238,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['forms', 'selection', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/checkbox.tsx',
-        target: '@ui/checkbox.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/checkbox.tsx',
+          target: '@ui/checkbox.tsx',
+        },
+        {
+          source: 'registry/components/ui/checkbox.css',
+          target: '@assets/ui/checkbox.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'choice-styles'],
+      css: [{ layer: 'components', content: "@import './ui/checkbox.css';" }],
     },
     {
       name: 'switch',
@@ -179,11 +259,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['forms', 'selection', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/switch.tsx',
-        target: '@ui/switch.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/switch.tsx',
+          target: '@ui/switch.tsx',
+        },
+        {
+          source: 'registry/components/ui/switch.css',
+          target: '@assets/ui/switch.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'choice-styles'],
+      css: [{ layer: 'components', content: "@import './ui/switch.css';" }],
     },
     {
       name: 'label',
@@ -193,11 +280,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['forms', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/label.tsx',
-        target: '@ui/label.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/label.tsx',
+          target: '@ui/label.tsx',
+        },
+        {
+          source: 'registry/components/ui/label.css',
+          target: '@assets/ui/label.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/label.css';" }],
     },
     {
       name: 'select',
@@ -211,7 +305,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/select.tsx',
         target: '@ui/select.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'form-control-styles'],
     },
     {
       name: 'form-field',
@@ -226,8 +320,13 @@ export const freshUiRegistryManifest = {
           source: 'registry/components/ui/form-field.tsx',
           target: '@ui/form-field.tsx',
         },
+        {
+          source: 'registry/components/ui/form-field.css',
+          target: '@assets/ui/form-field.css',
+        },
       ],
       registryDependencies: ['theme-seed', 'label'],
+      css: [{ layer: 'components', content: "@import './ui/form-field.css';" }],
     },
     {
       name: 'card',
@@ -238,11 +337,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['surface', 'container', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/card.tsx',
-        target: '@ui/card.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/card.tsx',
+          target: '@ui/card.tsx',
+        },
+        {
+          source: 'registry/components/ui/card.css',
+          target: '@assets/ui/card.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'surface-styles'],
+      css: [{ layer: 'components', content: "@import './ui/card.css';" }],
     },
     {
       name: 'panel',
@@ -252,11 +358,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['surface', 'container', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/panel.tsx',
-        target: '@ui/panel.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/panel.tsx',
+          target: '@ui/panel.tsx',
+        },
+        {
+          source: 'registry/components/ui/panel.css',
+          target: '@assets/ui/panel.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'surface-styles'],
+      css: [{ layer: 'components', content: "@import './ui/panel.css';" }],
     },
     {
       name: 'badge',
@@ -266,11 +379,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['status', 'feedback', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/badge.tsx',
-        target: '@ui/badge.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/badge.tsx',
+          target: '@ui/badge.tsx',
+        },
+        {
+          source: 'registry/components/ui/badge.css',
+          target: '@assets/ui/badge.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/badge.css';" }],
     },
     {
       name: 'separator',
@@ -280,11 +400,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['surface', 'layout', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/separator.tsx',
-        target: '@ui/separator.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/separator.tsx',
+          target: '@ui/separator.tsx',
+        },
+        {
+          source: 'registry/components/ui/separator.css',
+          target: '@assets/ui/separator.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/separator.css';" }],
     },
     {
       name: 'alert',
@@ -295,11 +422,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['feedback', 'status', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/alert.tsx',
-        target: '@ui/alert.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/alert.tsx',
+          target: '@ui/alert.tsx',
+        },
+        {
+          source: 'registry/components/ui/alert.css',
+          target: '@assets/ui/alert.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'alert-styles'],
+      css: [{ layer: 'components', content: "@import './ui/alert.css';" }],
     },
     {
       name: 'inline-notice',
@@ -309,11 +443,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['feedback', 'status', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/inline-notice.tsx',
-        target: '@ui/inline-notice.tsx',
-      }],
-      registryDependencies: ['theme-seed'],
+      files: [
+        {
+          source: 'registry/components/ui/inline-notice.tsx',
+          target: '@ui/inline-notice.tsx',
+        },
+        {
+          source: 'registry/components/ui/inline-notice.css',
+          target: '@assets/ui/inline-notice.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'alert-styles'],
+      css: [{ layer: 'components', content: "@import './ui/inline-notice.css';" }],
     },
     {
       name: 'spinner',
@@ -323,11 +464,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['feedback', 'loading', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/spinner.tsx',
-        target: '@ui/spinner.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/spinner.tsx',
+          target: '@ui/spinner.tsx',
+        },
+        {
+          source: 'registry/components/ui/spinner.css',
+          target: '@assets/ui/spinner.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/spinner.css';" }],
     },
     {
       name: 'progress',
@@ -338,11 +486,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['feedback', 'loading', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/progress.tsx',
-        target: '@ui/progress.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/progress.tsx',
+          target: '@ui/progress.tsx',
+        },
+        {
+          source: 'registry/components/ui/progress.css',
+          target: '@assets/ui/progress.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/progress.css';" }],
     },
     {
       name: 'skeleton',
@@ -353,11 +508,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['feedback', 'loading', 'primitive'],
-      files: [{
-        source: 'registry/components/ui/skeleton.tsx',
-        target: '@ui/skeleton.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/components/ui/skeleton.tsx',
+          target: '@ui/skeleton.tsx',
+        },
+        {
+          source: 'registry/components/ui/skeleton.css',
+          target: '@assets/ui/skeleton.css',
+        },
+      ],
       registryDependencies: ['theme-seed'],
+      css: [{ layer: 'components', content: "@import './ui/skeleton.css';" }],
     },
     {
       name: 'breadcrumb',
@@ -416,7 +578,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/components/ui/filter-form.tsx',
         target: '@ui/filter-form.tsx',
       }],
-      registryDependencies: ['theme-seed'],
+      registryDependencies: ['theme-seed', 'card'],
     },
     {
       name: 'stats-grid',
@@ -531,7 +693,7 @@ export const freshUiRegistryManifest = {
         source: 'registry/islands/SidebarToggle.tsx',
         target: '@islands/SidebarToggle.tsx',
       }],
-      registryDependencies: ['theme-seed', 'sidebar-shell'],
+      registryDependencies: ['theme-seed', 'sidebar-shell', 'button'],
     },
     {
       name: 'toast-support',
@@ -550,11 +712,18 @@ export const freshUiRegistryManifest = {
       copyOwnership: 'app-owned-after-copy',
       author: 'NetScript',
       tags: ['toast', 'feedback', 'island'],
-      files: [{
-        source: 'registry/islands/Toast.tsx',
-        target: '@islands/Toast.tsx',
-      }],
+      files: [
+        {
+          source: 'registry/islands/Toast.tsx',
+          target: '@islands/Toast.tsx',
+        },
+        {
+          source: 'registry/components/ui/toast.css',
+          target: '@assets/ui/toast.css',
+        },
+      ],
       registryDependencies: ['theme-seed', 'toast-support'],
+      css: [{ layer: 'components', content: "@import './ui/toast.css';" }],
     },
   ],
   collections: [
@@ -564,6 +733,7 @@ export const freshUiRegistryManifest = {
         'Expanded enterprise dashboard foundation: theme seed, installable A seams, and the first feedback/theme islands.',
       items: [
         'theme-seed',
+        'sheet-styles',
         'button',
         'icon-button',
         'input',

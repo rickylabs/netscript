@@ -1,0 +1,67 @@
+.ns-progress {
+  width: 100%;
+}
+
+.ns-progress__track {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--ns-radius-full);
+  background: color-mix(in srgb, var(--ns-border-hover) 90%, transparent);
+}
+
+.ns-progress--sm .ns-progress__track {
+  height: 0.325rem;
+}
+
+.ns-progress--md .ns-progress__track {
+  height: 0.5rem;
+}
+
+.ns-progress--lg .ns-progress__track {
+  height: 0.7rem;
+}
+
+.ns-progress__bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ns-primary);
+  transition: width var(--ns-ease-normal);
+}
+
+.ns-progress--secondary .ns-progress__bar {
+  background: var(--ns-secondary);
+}
+
+.ns-progress--success .ns-progress__bar {
+  background: var(--ns-success);
+}
+
+.ns-progress--warning .ns-progress__bar {
+  background: var(--ns-warning);
+}
+
+.ns-progress--destructive .ns-progress__bar {
+  background: var(--ns-destructive);
+}
+
+.ns-progress--indeterminate .ns-progress__bar {
+  width: 42%;
+  animation: ns-progress-indeterminate 1.2s ease-in-out infinite;
+}
+
+@keyframes ns-progress-indeterminate {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  50% {
+    transform: translateX(30%);
+  }
+
+  100% {
+    transform: translateX(180%);
+  }
+}
