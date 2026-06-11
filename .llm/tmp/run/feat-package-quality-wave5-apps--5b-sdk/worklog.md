@@ -195,3 +195,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Lock hygiene | Added run-local `deno-doc-import-map.json` because `deno doc` accepts an import map but not the focused check config containing compiler options. Root `deno.lock` was not touched. |
 | Concept of done | The L3 one-liner has no separate runtime path: every value it returns is a lower-layer value, so dropping to L2 does not require rewiring. The function has one internal mapped-result assertion because `Object.entries()` loses literal key/contract correlation; the assertion is documented at the cast site. |
 | Drift | none |
+
+### Slice 12/19 — D-10 split discovery lookup modules
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `4fccdd8` — `Split sdk discovery lookup modules` |
+| Changed | Split the former 643-line `src/discovery/service-discovery.ts` into `browser-env.ts` (browser/VITE key construction and lookup), `service-url.ts` (server env resolver, service info/list/availability), `kv-connection.ts` (KV/Postgres/MSSQL/MySQL connection helpers), and `mod.ts`. `service-discovery.ts` remains a 7-line compatibility barrel and public `discovery/mod.ts` now exports from the new implementation barrel. Added `tests/discovery/env-ordering_test.ts` with three parity tests for full browser key -> shorthand -> server env fallback. |
+| Gate | Raw `Deno.Command`: `deno check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv packages/sdk/src/discovery/mod.ts packages/sdk/discovery/mod.ts packages/sdk/tests/discovery/env-ordering_test.ts` PASS exit 0. Raw `Deno.Command`: `deno test --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --allow-env packages/sdk/tests/discovery/env-ordering_test.ts` PASS exit 0, 3 passed / 0 failed. Raw `Deno.Command`: `deno lint --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json <slice-12 files>` PASS exit 0. Raw `Deno.Command`: `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json <slice-12 files>` PASS exit 0. Raw `Deno.Command`: `deno doc --lint --import-map .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-doc-import-map.json <slice-12 discovery files>` PASS, checked 6 files. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Size check | `browser-env.ts` 70L; `service-url.ts` 196L; `kv-connection.ts` 285L; `mod.ts` 37L; `service-discovery.ts` 7L. The prior 643L over-cap file is gone. |
+| Concept of done | Discovery behavior remains reachable from `@netscript/sdk/discovery`; each new file has one extension pattern and the browser/server env ordering risk is covered by tests before the final root-exclude lift. |
+| Drift | none |

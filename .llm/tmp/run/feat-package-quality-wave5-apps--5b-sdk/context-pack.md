@@ -40,8 +40,11 @@ HTTP `RPCLink` construction into `src/client/http-client-link.ts`, and left
 `createServiceClient()` public options unchanged. Slice 11 added the L3
 `defineServices()` preset, exported it from root, and added an inference fixture proving
 that the one-liner returns the composed L2 values: `clients`, `queries`, and
-`queryUtils`. Next slice: split the 643L discovery module into browser-env,
-service-url, and kv-connection files with parity tests for env lookup ordering (D-10).
+`queryUtils`. Slice 12 split discovery into `browser-env.ts`, `service-url.ts`,
+`kv-connection.ts`, and `mod.ts`, leaving `service-discovery.ts` as a 7-line
+compatibility barrel and adding three parity tests for lookup ordering
+(full VITE key -> shorthand -> server env). Next slice: jsdoc sweep and the
+`inflightRequests` state decision (D-11).
 
 ## What the plan session did
 
