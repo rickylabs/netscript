@@ -79,6 +79,52 @@ gates under `.llm/tools/fitness/` for registry/token invariants. CLI
 installation behavior lives under `packages/cli/src/public/features/ui/` once
 slices 13-14 land.
 
+### Slice 13 — `ui:init` command
+
+Commit: pending.
+
+Changed:
+
+- Added the public root command `ui:init` to the CLI command tree.
+- Added a Fresh UI registry installer under
+  `packages/cli/src/public/features/ui/` that resolves manifest items and
+  collections, topologically includes `registryDependencies`, maps target
+  placeholders (`@ui/`, `@islands/`, `@assets/`, `@lib/`, `~/`), copies
+  registry files, rewrites copied relative registry imports, writes an
+  `assets/styles.css` aggregator, and merges required `deno.json` imports.
+- `ui:init` installs the locked starter item set from the plan. Dependencies
+  resolve it to 27 installed registry items, 40 copied registry files, 12
+  per-item CSS imports, and four import-map entries in the smoke app.
+- Updated the local contributor command-tree assertion to include the current
+  command surface, including `ui:init`.
+- Recorded durable evidence in `slice-13-ui-init-evidence.json`.
+
+Evidence:
+
+- `deno task --cwd packages/cli check` → PASS/exit 0.
+- `deno lint --no-config ...` over the new UI feature files, touched root
+  wiring files, and command-tree assertion → PASS/exit 0, checked 6 files.
+- `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.fmt.json ...`
+  over the new UI feature files → PASS/exit 0, checked 3 files. The root repo
+  fmt config excludes `packages/cli`, so pre-existing CLI root wiring files were
+  left in their legacy style.
+- `deno run --allow-all packages/cli/bin/netscript.ts ui:init --project-root <run-local scratch app> --force`
+  → PASS/exit 0; installed 27 items, copied 40 files, wrote
+  `assets/styles.css`, merged 4 imports, scratch file count 41.
+- `deno run --allow-all packages/cli/bin/netscript.ts init slice13-init-smoke --path <run-local scratch> --ci --yes --no-git --no-aspire`
+  → PASS/exit 0; existing `netscript init` path scaffolded successfully with 39
+  files and 19 directories.
+- `deno test --allow-all packages/cli/src/local/composition/local-contributor-command-tree_test.ts`
+  → PASS/exit 0.
+- Informational only: `deno task --cwd packages/cli test` → FAIL/exit 1 with
+  unrelated existing failures in config/deploy tests, Vite fixture version
+  expectations, and maintainer plugin copy fixtures. The slice-induced
+  command-tree failure was fixed and passes focused test.
+- `git diff -- deno.lock packages/cli/deno.lock .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/gates/deno.lock`
+  → PASS/exit 0, no lock-file diff.
+
+Drift: none.
+
 ## Baseline
 
 Baseline saved to `measure-5c1.json`.

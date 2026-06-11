@@ -8,6 +8,7 @@ import { createInitCommand } from '../init/init-command.ts';
 import { createMarketplaceCommand } from '../marketplace/marketplace-group.ts';
 import { createPluginCommand } from '../plugins/plugins-group.ts';
 import { createServiceCommand } from '../services/services-group.ts';
+import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
 import { createPublicCommandDependencies } from './public-command-dependencies.ts';
 
 /** Host services supplied by the binary edge. */
@@ -42,5 +43,12 @@ export function createPublicCommandTree(host: PublicCliHost): PublicCliCommand {
     .command('generate', createGenerateCommand(dependencies))
     .command('marketplace', createMarketplaceCommand())
     .command('plugin', createPluginCommand(dependencies))
-    .command('service', createServiceCommand(dependencies));
+    .command('service', createServiceCommand(dependencies))
+    .command(
+      'ui:init',
+      createUiInitCommand({
+        installDependencies: dependencies.uiInstallDependencies,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    );
 }
