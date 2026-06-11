@@ -26,27 +26,28 @@
 
 import { createService, type ServiceConfig } from '../builder/service-builder.ts';
 import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-connectivity.ts';
-import type { Database } from '../types.ts';
-
-// Router type that matches oRPC router structure
-// deno-lint-ignore no-explicit-any
-type AnyRouter = Record<string, any>;
+import type { Database, DbContext, RunningService, ServiceRouter } from '../types.ts';
 
 /**
- * Extract a `$queryRaw`-capable client from any db context object.
+ * Extract a `$queryRaw`-capable client from a db context object.
  *
  * - Single-db: `db` itself has `$queryRaw` → return it directly
  * - Multi-db:  first value in `db` that has `$queryRaw` → use as primary
  *
  * Returns `undefined` if no such client is found (health check is skipped).
  */
-// deno-lint-ignore no-explicit-any
-function findHealthCheckDb(db: Record<string, any>): Database | undefined {
-  if (typeof db.$queryRaw === 'function') return db as Database;
+function findHealthCheckDb(db: DbContext): Database | undefined {
+  if (isDatabase(db)) return db;
   for (const value of Object.values(db)) {
-    if (value && typeof value.$queryRaw === 'function') return value as Database;
+    if (isDatabase(value)) return value;
   }
   return undefined;
+}
+
+function isDatabase(value: unknown): value is Database {
+  return typeof value === 'object' &&
+    value !== null &&
+    typeof (value as { $queryRaw?: unknown }).$queryRaw === 'function';
 }
 
 /**
@@ -61,8 +62,7 @@ export interface DefineServiceOptions extends ServiceConfig {
    * is resolved automatically: the first value (or the object itself) that
    * exposes `$queryRaw` is used for `/health` and `/health/ready` probes.
    */
-  // deno-lint-ignore no-explicit-any
-  db?: Record<string, any>;
+  db?: DbContext;
   /** OpenAPI configuration */
   openapi?: {
     title?: string;
@@ -109,10 +109,10 @@ export interface DefineServiceOptions extends ServiceConfig {
  * @param router - oRPC router with contract handlers
  * @param options - Service configuration options
  */
-export async function defineService<T extends AnyRouter>(
+export async function defineService<T extends ServiceRouter>(
   router: T,
   options: DefineServiceOptions,
-): Promise<void> {
+): Promise<RunningService> {
   const builder = createService(router, {
     name: options.name,
     version: options.version,
@@ -139,5 +139,5 @@ export async function defineService<T extends AnyRouter>(
     }
   }
 
-  await builder.withHealth().serve();
+  return await builder.withHealth().serve();
 }
