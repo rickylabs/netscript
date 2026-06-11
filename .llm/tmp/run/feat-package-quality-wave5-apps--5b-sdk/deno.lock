@@ -3,7 +3,10 @@
   "specifiers": {
     "npm:@orpc/client@1.13.5": "1.13.5",
     "npm:@orpc/tanstack-query@1.13.5": "1.13.5_@orpc+client@1.13.5_@tanstack+query-core@5.101.0",
-    "npm:@orpc/tanstack-query@^1.13.5": "1.13.5_@orpc+client@1.13.5_@tanstack+query-core@5.101.0"
+    "npm:@orpc/tanstack-query@^1.13.5": "1.13.5_@orpc+client@1.13.5_@tanstack+query-core@5.101.0",
+    "npm:@tanstack/db@~0.6.1": "0.6.7_typescript@6.0.3",
+    "npm:@tanstack/query-core@^5.75.5": "5.101.0",
+    "npm:@tanstack/query-db-collection@^1.0.32": "1.0.38_@tanstack+query-core@5.101.0_typescript@6.0.3"
   },
   "npm": {
     "@orpc/client@1.13.5": {
@@ -50,11 +53,49 @@
         "@tanstack/query-core"
       ]
     },
+    "@standard-schema/spec@1.1.0": {
+      "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
+    },
+    "@tanstack/db-ivm@0.1.18_typescript@6.0.3": {
+      "integrity": "sha512-+pZJiRKdoKRM5Epq9T7otD9ZJl82pRFauo7LKuJGrarjVKQ7r+QQlPe3kGdN9LEKSnuNGIWjX9OOY4M8kH4eLw==",
+      "dependencies": [
+        "fractional-indexing",
+        "sorted-btree",
+        "typescript"
+      ]
+    },
+    "@tanstack/db@0.6.7_typescript@6.0.3": {
+      "integrity": "sha512-nCwOhNXogu3JHdkNPXX6+B8aL0F4wVe0CwLvNS7ccCQ6m9147L8qJewL4IZVyACQDsLGs5MKg91x+VUiD+MplQ==",
+      "dependencies": [
+        "@standard-schema/spec",
+        "@tanstack/db-ivm",
+        "@tanstack/pacer-lite",
+        "typescript"
+      ]
+    },
+    "@tanstack/pacer-lite@0.2.2": {
+      "integrity": "sha512-eQ1MyLKCHyXiH7NbdmB80W77OhiMgGBUb+qDx/8WMGbwg5Lf/NlfD0TfNYAqY77i8V3AxoDoYdICrQE5ADw4Yw=="
+    },
     "@tanstack/query-core@5.101.0": {
       "integrity": "sha512-cQetA74EB+seWySv1TTKr828TnP0u39m6LykwDXIo84SNortpDkp30TMEjkqtYCNP9c40uT/iwl6MLiufEt0Ow=="
     },
+    "@tanstack/query-db-collection@1.0.38_@tanstack+query-core@5.101.0_typescript@6.0.3": {
+      "integrity": "sha512-cHD951MBgOvzI+/6367Bf3S88z5n9demxZ7+MfqxRJdXxaogF73h8Pjg+iB9Lnb4WZB8oU6g9eDexaZakLeiBA==",
+      "dependencies": [
+        "@standard-schema/spec",
+        "@tanstack/db",
+        "@tanstack/query-core",
+        "typescript"
+      ]
+    },
+    "fractional-indexing@3.2.0": {
+      "integrity": "sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ=="
+    },
     "radash@12.1.1": {
       "integrity": "sha512-h36JMxKRqrAxVD8201FrCpyeNuUY9Y5zZwujr20fFO77tpUtGa6EZzfKw/3WaiBX95fq7+MpsuMLNdSnORAwSA=="
+    },
+    "sorted-btree@1.8.1": {
+      "integrity": "sha512-395+XIP+wqNn3USkFSrNz7G3Ss/MXlZEqesxvzCRFwL14h6e8LukDHdLBePn5pwbm5OQ9vGu8mDyz2lLDIqamQ=="
     },
     "tagged-tag@1.0.0": {
       "integrity": "sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng=="
@@ -64,11 +105,18 @@
       "dependencies": [
         "tagged-tag"
       ]
+    },
+    "typescript@6.0.3": {
+      "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
+      "bin": true
     }
   },
   "workspace": {
     "dependencies": [
-      "npm:@orpc/tanstack-query@^1.13.5"
+      "npm:@orpc/tanstack-query@^1.13.5",
+      "npm:@tanstack/db@~0.6.1",
+      "npm:@tanstack/query-core@^5.75.5",
+      "npm:@tanstack/query-db-collection@^1.0.32"
     ]
   }
 }

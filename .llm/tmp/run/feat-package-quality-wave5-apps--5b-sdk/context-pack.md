@@ -6,7 +6,7 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-8/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-9/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
@@ -30,7 +30,11 @@ return assignability. Slice 8 typed `createServiceQueryUtils()` as
 ServiceQueryUtils<TContract>`, removed the public `any` bridge, added a type-only
 `ServiceClientContract<TContract>` marker so clients infer their source contract, and
 kept one documented upstream-boundary return assertion. Next slice: `QueryCollection<TItem>`
-return port (D-7).
+return port (D-7). Slice 9 added the structural `QueryCollection<TItem>` return port,
+annotated `createQueryCollection()` to return it, exported the port from
+`@netscript/sdk/collections`, relaxed collection items to `TItem extends object`, and
+added a type fixture proving item inference and common read/write methods. Next slice:
+internal `ClientLinkFactory` HTTP transport seam (D-8), seam only, no in-process transport.
 
 ## What the plan session did
 

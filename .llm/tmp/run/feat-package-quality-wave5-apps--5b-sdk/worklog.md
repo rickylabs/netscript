@@ -162,3 +162,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Lock hygiene | The run-local check config created `.llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno.lock` containing only the npm resolution for `@orpc/tanstack-query`/`@orpc/client` used by the slice gate. It is kept with run evidence rather than deleted. |
 | Concept of done | The public factory now composes from the lower L0 client port and returns the L0 query-utils mirror with full contract inference. The only assertion is an internal upstream-boundary cast with a why-comment; no user-facing `any` remains. |
 | Drift | none |
+
+### Slice 9/19 — D-7 `QueryCollection<TItem>` return port
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `830affb` — `Expose sdk query collection port` |
+| Changed | Added package-owned structural `QueryCollection<TItem>` plus named transaction/update/status aliases in `src/collections/create-query-collection.ts`. Annotated `createQueryCollection()` to return that port and exported the port through `@netscript/sdk/collections` and root barrel transitively. Relaxed item constraint from `Record<string, unknown>` to `object` to match normal interface-shaped items. Added `query-collection_type.ts` fixture proving item inference and common read/write methods. |
+| Gate | Raw `Deno.Command`: `deno check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv ./packages/sdk/src/collections/create-query-collection.ts ./packages/sdk/tests/type-fixtures/query-collection_type.ts` PASS exit 0. Raw `Deno.Command`: `deno lint --no-config ./packages/sdk/src/collections/create-query-collection.ts ./packages/sdk/tests/type-fixtures/query-collection_type.ts` PASS exit 0. Raw `Deno.Command`: `deno fmt --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json --check <slice-9 files>` PASS exit 0. Raw `Deno.Command`: `deno doc --lint ./packages/sdk/src/ports/query-client.ts ./packages/sdk/src/collections/create-query-collection.ts` PASS, checked 2 files. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Lock hygiene | The run-local check config and lock were expanded for TanStack DB/query-db-collection resolution used by the focused slice gate; the repository root lock was not touched. |
+| Concept of done | The collection factory no longer exposes an inferred upstream TanStack DB `Collection` type. The return port is structural, package-owned, and includes common read/preload/mutation operations without leaking upstream transaction or virtual-prop helper types. |
+| Drift | none |

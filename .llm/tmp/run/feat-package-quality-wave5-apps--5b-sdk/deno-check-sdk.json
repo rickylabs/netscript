@@ -1,6 +1,9 @@
 {
   "imports": {
-    "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.13.5"
+    "@orpc/tanstack-query": "npm:@orpc/tanstack-query@^1.13.5",
+    "@tanstack/db": "npm:@tanstack/db@^0.6.1",
+    "@tanstack/query-core": "npm:@tanstack/query-core@^5.75.5",
+    "@tanstack/query-db-collection": "npm:@tanstack/query-db-collection@^1.0.32"
   },
   "compilerOptions": {
     "strict": true,
