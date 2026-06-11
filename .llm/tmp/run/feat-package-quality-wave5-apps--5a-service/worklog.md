@@ -97,3 +97,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. Root formatter cannot target service while excluded; new code was manually wrapped to root style and final slice 15 owns the authoritative fmt gate. |
 | Concept of done | New file is reachable from the public surface, contains only named public vocabulary required by D-3/D-4/D-6, avoids upstream type exports, and gives later slices one file to copy when adding structural mirrors. |
 | Drift | none |
+
+### Slice 4/15 — D-6 handlers use structural contracts
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `b62dfbe` — `Replace handler leaks with service structural contracts` |
+| Changed | `src/primitives/handlers.ts` no longer imports `@orpc/server/standard`; `RPCHandlerConfig.plugins` and `createRPCPlugins()` use `ServiceHandlerPlugin`; `createRPCHandler()` and `createOpenAPIHandler()` return `FetchHandler`; `createNotFoundHandler()` and `createErrorHandler()` return package-owned handler types. Added `ServiceErrorHandler` to `src/types.ts` and the root barrel. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
+| Concept of done | Handler public signatures are now package-owned and copyable from one file; finite error strings remain centralized inside the handler factories until diagnostics/logger slices. |
+| Drift | none |
