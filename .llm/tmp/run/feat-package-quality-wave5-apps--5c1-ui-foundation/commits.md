@@ -9,7 +9,7 @@ commits are never amended.
 
 ## Baseline
 
-Pending.
+- `d2e1a9f`: Measure 5c1 fresh-ui baseline.
 
 ## Slices
 
