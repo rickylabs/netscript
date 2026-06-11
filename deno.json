@@ -10,7 +10,6 @@
   "exclude": [
     ".llm/tmp/",
     "packages/sdk/",
-    "packages/fresh-ui/",
     "packages/fresh/"
   ],
   "unstable": [

@@ -46,3 +46,19 @@ before the related commit.
 - Impact: no package runtime code is introduced from the spike. Run 1 continues
   with the recorded no-go evidence because the slice deliverable is evidence,
   not shipped Tier Z code.
+
+### D-5c1-3 — Slice 16 JSR dry-run required lifting the root fresh-ui exclusion
+
+- Slice: 16
+- Plan reference: locked plan requires `deno publish --dry-run` from
+  `packages/fresh-ui` as an exit gate.
+- Reality: the workspace root `deno.json` excluded `packages/fresh-ui/`, so
+  Deno treated every package export and graph module as excluded from publishing
+  even when the package-local `publish.include` listed those files.
+- Decision: remove only `packages/fresh-ui/` from the root top-level `exclude`
+  list and keep the root task-level check/fmt/lint excludes unchanged. The
+  package remains governed by its own local gates and publish include/exclude
+  set.
+- Impact: the JSR publish graph is no longer blocked by stale workspace
+  exclusion. Broad root task behavior remains unchanged, and no lock files are
+  touched.

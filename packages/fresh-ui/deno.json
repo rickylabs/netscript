@@ -3,6 +3,7 @@
   "version": "0.0.1-alpha.0",
   "description": "Fresh UI registry seams and interactive foundations for NetScript.",
   "license": "MIT",
+  "exclude": [],
   "exports": {
     ".": "./mod.ts",
     "./interactive": "./interactive.ts",
@@ -27,6 +28,13 @@
       "README.md"
     ],
     "exclude": [
+      "!**/*.ts",
+      "!**/*.tsx",
+      "!**/*.css",
+      "!registry/**/*.json",
+      "!docs/**/*.md",
+      "!deno.json",
+      "!README.md",
       "scripts/**",
       "**/*_test.ts",
       "**/*_test.tsx",
