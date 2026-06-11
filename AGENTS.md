@@ -100,26 +100,28 @@ use `deno task e2e:cli suites`, `deno task e2e:cli gates scaffold.runtime`, or
 `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
 
 For changes that affect scaffold output, plugin scaffolding, DB wiring, Aspire helper generation, or
-official plugin copy mode, use the full scaffold/plugins smoke in one pass:
+official plugin copy mode, use the full runtime smoke in one pass:
 
 ```powershell
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 ```
 
 Do not replace that command with separate `gates` or individual scaffold commands when a full
-scaffold/plugins verdict is requested. The `scaffold.plugins` suite creates a local-source project,
-adds the first-party plugins (`workers`, `sagas`, `triggers`, `streams`), provisions DB/runtime
-state, restores Aspire modules, validates plugin endpoints/background paths, and cleans up when
-`--cleanup` is present.
+runtime verdict is requested. The `scaffold.runtime` suite creates a local-source project, adds the
+first-party plugins (`workers`, `sagas`, `triggers`, `streams`), initializes/generates/seeds the
+database, generates plugin registries, type-checks the generated workspaces, restores and starts
+Aspire, validates plugin endpoints/background paths, and cleans up when `--cleanup` is present.
+`scaffold.plugins` is narrower: it stops after plugin scaffold, registry generation, and plugin
+doctor.
 
 OpenHands PR trigger template for this gate:
 
 ```text
-@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment run the full scaffold/plugins E2E smoke for this PR.
+@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment run the full scaffold runtime E2E smoke for this PR.
 
 Use this single one-pass command from the repository root:
 
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 
 Do not split this into individual gate commands. Report the raw exit code and summarize failing suite/test names if any. Preserve lock hygiene: do not commit deno.lock or source churn unless the run explicitly requires a reviewed fix.
 ```

@@ -1,7 +1,13 @@
 # Maintainer CLI
 
 `netscript-dev` is the local contributor and maintainer binary for working inside the NetScript
-repository. It is not exported by the published package.
+repository. It uses local monorepo sources and copies unpublished packages/plugins into generated
+workspaces. It is not exported by the published package.
+
+The public CLI is `netscript` (`packages/cli/bin/netscript.ts` in this repo). Once all NetScript
+packages are published on JSR, end users should run public `netscript ...` commands against JSR
+packages instead of maintainer `netscript-dev` local-source commands. Release CI must cover that
+public JSR-backed path.
 
 ## Entry Point
 
@@ -62,18 +68,19 @@ deno run -A packages/cli/bin/netscript-dev.ts probe monorepo
 Runs scaffold validation for a selected fixture.
 
 ```bash
-deno run -A packages/cli/bin/netscript-dev.ts test scaffold scaffold.plugins --cleanup --format pretty
+deno run -A packages/cli/bin/netscript-dev.ts test scaffold scaffold.runtime --cleanup --format pretty
 ```
 
 This command delegates to the root E2E runner. From the repository root, the equivalent one-pass
-full scaffold/plugins smoke is:
+full scaffold runtime smoke is:
 
 ```bash
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 ```
 
 Use this suite before merging scaffold output, plugin scaffolding, DB wiring, Aspire helper
-generation, or official plugin copy-mode changes.
+generation, or official plugin copy-mode changes. `scaffold.plugins` is narrower: it stops after
+plugin scaffold, registry generation, and plugin doctor.
 
 ## Manual Full Scaffold Smoke
 
@@ -85,22 +92,48 @@ deno run -A packages/cli/bin/netscript-dev.ts init full-test \
   --path scaffold \
   --db postgres \
   --service --service-name users --service-port 3001 \
+  --editor zed \
   --ci --yes --no-git --force
+```
 
-cd scaffold/full-test
+Add the official plugins using the same cwd-sensitive shape as the E2E runtime suite:
 
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root . --force
+```powershell
+deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root scaffold/full-test --samples --force
 
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin list
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin doctor --project-root .
-deno run -A ../../packages/cli/bin/netscript-dev.ts generate plugins --project-root .
-deno task check
+Push-Location scaffold/full-test
+deno run -A packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --samples --force
+deno run -A ..\..\packages\cli\bin\netscript-dev.ts plugin add trigger --name triggers --project-root . --samples --force
+Pop-Location
+
+deno run -A packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root scaffold/full-test --samples --force
+
+deno run -A packages/cli/bin/netscript-dev.ts plugin list --project-root scaffold/full-test
+```
+
+Run the database and generated-registry workflow:
+
+```powershell
+deno run -A packages/cli/bin/netscript-dev.ts db init --project-root scaffold/full-test --db postgres --name init
+deno run -A packages/cli/bin/netscript-dev.ts db generate --project-root scaffold/full-test --db postgres
+deno run -A packages/cli/bin/netscript-dev.ts db seed --project-root scaffold/full-test --db postgres
+
+deno run -A packages/cli/bin/netscript-dev.ts generate plugins --project-root scaffold/full-test
+
+Push-Location scaffold/full-test
+deno check --unstable-kv ./packages ./plugins ./workers ./sagas ./triggers ./services ./database
+Pop-Location
+
+deno run -A packages/cli/bin/netscript-dev.ts plugin doctor --project-root scaffold/full-test
+
+Push-Location scaffold/full-test/aspire
+aspire restore
+Pop-Location
 ```
 
 Expected plugin inventory: `workers`, `sagas`, `triggers`, and `streams`.
+`--editor zed` writes `.zed/settings.json`, `.zed/tasks.json`, and `.zed/debug.json` in the
+generated project.
 
 ## Boundary
 

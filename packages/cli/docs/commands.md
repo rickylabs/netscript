@@ -3,9 +3,10 @@
 This page summarizes the public `netscript` commands. Run `netscript --help` or
 `netscript <group> --help` for exact option spelling in your installed version.
 
-When a scaffolded workspace contains a copied CLI package from a local checkout, use
-`deno run -A packages/cli/bin/netscript-dev.ts ...` for local contributor workflows. The
-`netscript.ts` binary mirrors the published public surface.
+When a scaffolded workspace contains copied packages from a local checkout, use
+`deno run -A packages/cli/bin/netscript-dev.ts ...` for maintainer/local-source workflows only.
+End users ultimately run public `netscript ...` commands backed by published JSR packages; release
+CI must validate that public path once all packages are published.
 
 ## Project
 
@@ -43,7 +44,7 @@ Lists available contracts.
 
 ## Databases
 
-Local workspace invocation:
+Maintainer/local-source invocation:
 
 ```bash
 deno run -A packages/cli/bin/netscript-dev.ts db <command> [options]
@@ -156,33 +157,60 @@ Generates plugin registries from project source.
 
 ## Local Maintainer Scaffolding
 
-When testing scaffold output from this monorepo, use the maintainer binary rather than the published
-binary shape:
+When testing scaffold output from this monorepo, use the maintainer binary rather than the public
+JSR-backed binary shape:
 
 ```bash
 deno run -A packages/cli/bin/netscript-dev.ts init full-test \
   --path scaffold \
   --db postgres \
   --service --service-name users --service-port 3001 \
+  --editor zed \
   --ci --yes --no-git --force
 ```
 
-Then add the first-party plugins from inside `scaffold/full-test`:
+Then add the first-party plugins with the same cwd-sensitive shape as the E2E runtime suite:
 
-```bash
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts generate plugins --project-root .
-deno task check
+```powershell
+deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root scaffold/full-test --samples --force
+
+Push-Location scaffold/full-test
+deno run -A packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --samples --force
+deno run -A ..\..\packages\cli\bin\netscript-dev.ts plugin add trigger --name triggers --project-root . --samples --force
+Pop-Location
+
+deno run -A packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root scaffold/full-test --samples --force
+
+deno run -A packages/cli/bin/netscript-dev.ts plugin list --project-root scaffold/full-test
 ```
 
-The full one-pass scaffold/plugins E2E smoke from the repository root is:
+Run the DB, generated registry, generated check, plugin doctor, and Aspire restore steps:
+
+```powershell
+deno run -A packages/cli/bin/netscript-dev.ts db init --project-root scaffold/full-test --db postgres --name init
+deno run -A packages/cli/bin/netscript-dev.ts db generate --project-root scaffold/full-test --db postgres
+deno run -A packages/cli/bin/netscript-dev.ts db seed --project-root scaffold/full-test --db postgres
+
+deno run -A packages/cli/bin/netscript-dev.ts generate plugins --project-root scaffold/full-test
+
+Push-Location scaffold/full-test
+deno check --unstable-kv ./packages ./plugins ./workers ./sagas ./triggers ./services ./database
+Pop-Location
+
+deno run -A packages/cli/bin/netscript-dev.ts plugin doctor --project-root scaffold/full-test
+
+Push-Location scaffold/full-test/aspire
+aspire restore
+Pop-Location
+```
+
+The full one-pass scaffold runtime E2E smoke from the repository root is:
 
 ```bash
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 ```
+
+`scaffold.plugins` is a narrower suite for plugin scaffold and host diagnostics only.
 
 ## Deployment
 

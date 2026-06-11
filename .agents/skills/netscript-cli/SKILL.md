@@ -17,15 +17,21 @@ From the repository root:
 deno run -A packages/cli/bin/netscript-dev.ts <command>
 ```
 
-Inside a generated local-source scaffold, use the copied CLI through the relative repo path:
+`packages/cli/bin/netscript-dev.ts` is the local maintainer/contributor binary. It uses local
+monorepo sources, copies unpublished packages/plugins into generated workspaces, and exposes
+maintainer-only `sync`, `probe`, `test`, and release workflows.
+
+The public binary is `packages/cli/bin/netscript.ts`, published as the user-facing `netscript`
+command. End users ultimately run `netscript ...` against JSR packages, not local source copies.
+Release CI must validate that public surface once all packages are published on JSR.
+
+Inside a generated local-source scaffold, the maintainer init copies a local CLI package, so these
+commands are valid from the generated project root:
 
 ```powershell
 deno run -A ../../packages/cli/bin/netscript-dev.ts <command>
+deno run -A packages/cli/bin/netscript-dev.ts <command>
 ```
-
-`packages/cli/bin/netscript-dev.ts` is the local maintainer/contributor binary. It exposes public
-commands plus repository-only `sync`, `probe`, `test`, and release workflows. `netscript.ts` mirrors
-the published user-facing command surface.
 
 ## Full E2E Suites
 
@@ -35,25 +41,27 @@ Before merge-readiness for general CLI work:
 deno task e2e:cli
 ```
 
-For scaffold output, plugin scaffolding, DB wiring, Aspire helper generation, or official plugin
-copy mode, run the stronger full scaffold/plugins smoke in one pass:
+For scaffold output, plugin scaffolding, DB wiring, Aspire helper generation, official plugin copy
+mode, or release readiness, run the stronger full runtime smoke in one pass:
 
 ```powershell
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 ```
 
 Do not replace that command with separate `gates` or individual scaffold commands when the user asks
 for the full suite. Use `--format pretty` for manual runs. Keep `--cleanup` unless the user wants
-the generated Aspire runtime left running for inspection.
+the generated Aspire runtime left running for inspection. `scaffold.plugins` is only the narrower
+plugin scaffold and diagnostic suite; it does not run DB init/generate/seed or Aspire runtime
+behavior.
 
 OpenHands trigger template:
 
 ```text
-@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment run the full scaffold/plugins E2E smoke for this PR.
+@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment run the full scaffold runtime E2E smoke for this PR.
 
 Use this single one-pass command from the repository root:
 
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 
 Do not split this into individual gate commands. Report the raw exit code and summarize failing suite/test names if any. Preserve lock hygiene: do not commit deno.lock or source churn unless the run explicitly requires a reviewed fix.
 ```
@@ -67,34 +75,52 @@ deno run -A packages/cli/bin/netscript-dev.ts init full-test `
   --path scaffold `
   --db postgres `
   --service --service-name users --service-port 3001 `
+  --editor zed `
   --ci --yes --no-git --force
 
-cd scaffold/full-test
+deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root scaffold/full-test --samples --force
 
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --project-root . --force
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root . --force
+Push-Location scaffold/full-test
+deno run -A packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --samples --force
+deno run -A ..\..\packages\cli\bin\netscript-dev.ts plugin add trigger --name triggers --project-root . --samples --force
+Pop-Location
 
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin list
-deno run -A ../../packages/cli/bin/netscript-dev.ts plugin doctor --project-root .
-deno run -A ../../packages/cli/bin/netscript-dev.ts generate plugins --project-root .
-deno task check
+deno run -A packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root scaffold/full-test --samples --force
+
+deno run -A packages/cli/bin/netscript-dev.ts plugin list --project-root scaffold/full-test
+
+deno run -A packages/cli/bin/netscript-dev.ts db init --project-root scaffold/full-test --db postgres --name init
+deno run -A packages/cli/bin/netscript-dev.ts db generate --project-root scaffold/full-test --db postgres
+deno run -A packages/cli/bin/netscript-dev.ts db seed --project-root scaffold/full-test --db postgres
+
+deno run -A packages/cli/bin/netscript-dev.ts generate plugins --project-root scaffold/full-test
+Push-Location scaffold/full-test
+deno check --unstable-kv ./packages ./plugins ./workers ./sagas ./triggers ./services ./database
+Pop-Location
+deno run -A packages/cli/bin/netscript-dev.ts plugin doctor --project-root scaffold/full-test
+
+Push-Location scaffold/full-test/aspire
+aspire restore
+Pop-Location
 ```
 
-Expected plugin inventory: `workers`, `sagas`, `triggers`, and `streams`.
+Expected plugin inventory: `workers`, `sagas`, `triggers`, and `streams`. The generated Zed config
+lives under `scaffold/full-test/.zed/` when `--editor zed` is used.
 
 ## Current Command Shapes
 
 Use these as the baseline, and verify with `--help` if changing docs or automation:
 
 ```powershell
-deno run -A packages/cli/bin/netscript-dev.ts init <name> --path <parent> --db <engine> --service --service-name <name> --service-port <port> --ci --yes --no-git --force
+deno run -A packages/cli/bin/netscript-dev.ts init <name> --path <parent> --db <engine> --service --service-name <name> --service-port <port> --editor zed --ci --yes --no-git --force
 deno run -A packages/cli/bin/netscript-dev.ts sync packages --project-root <project>
 deno run -A packages/cli/bin/netscript-dev.ts sync plugin <kind> [name] --project-root <project> --force
 deno run -A packages/cli/bin/netscript-dev.ts sync templates --target-path <project>
-deno run -A packages/cli/bin/netscript-dev.ts test scaffold scaffold.plugins --cleanup --format pretty
+deno run -A packages/cli/bin/netscript-dev.ts test scaffold scaffold.runtime --cleanup --format pretty
 deno run -A packages/cli/bin/netscript-dev.ts plugin add <kind> --name <name> --project-root <project> --force
+deno run -A packages/cli/bin/netscript-dev.ts db init --project-root <project> --db <engine> --name init
+deno run -A packages/cli/bin/netscript-dev.ts db generate --project-root <project> --db <engine>
+deno run -A packages/cli/bin/netscript-dev.ts db seed --project-root <project> --db <engine>
 deno run -A packages/cli/bin/netscript-dev.ts generate plugins --project-root <project>
 ```
 
