@@ -1,9 +1,15 @@
 /**
- * Cache primitives for the NetScript SDK.
+ * `@netscript/sdk/cache` server-side cache primitives.
  *
- * **Server-only module.** Importing this module automatically registers the
- * KV-backed cache engine as the SDK's cache provider so that query-factory
- * and composite-query cache methods work out of the box.
+ * Import this subpath from loaders, services, background jobs, or other
+ * server-side code that is allowed to touch Deno KV. It exports the `CacheQuery`
+ * SWR engine, the KV-backed `KvCacheStore`, cache key helpers, cached-entry
+ * helpers, and the cache-provider registration seam.
+ *
+ * Importing this module registers the shared `cacheQuery` provider so
+ * `@netscript/sdk/query` factories can execute cache-aware methods without
+ * additional setup. Browser bundles should prefer query-client helpers and
+ * avoid importing this server-only module.
  *
  * @module
  */

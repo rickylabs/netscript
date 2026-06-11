@@ -1,5 +1,15 @@
 /**
- * Public structural ports for the NetScript SDK.
+ * `@netscript/sdk/ports` package-owned structural contracts.
+ *
+ * Ports define the SDK's public type vocabulary without re-exporting upstream
+ * implementation types. They cover cache stores and entries, service-client
+ * contract inference, query factories, TanStack Query client width,
+ * service-query utils, discovery metadata, and the transport seam.
+ *
+ * Import this subpath when another NetScript package needs to accept or return
+ * SDK-compatible shapes without depending on concrete adapters. Runtime
+ * factories live in the focused `client`, `query`, `query-client`, `cache`, and
+ * `collections` subpaths.
  *
  * @module
  */

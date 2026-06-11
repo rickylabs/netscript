@@ -1,5 +1,13 @@
 /**
- * Service-client and client-error APIs for the NetScript SDK.
+ * `@netscript/sdk/client` service client APIs.
+ *
+ * This subpath creates typed oRPC clients from NetScript service contracts and
+ * Aspire service discovery. It also exports the package-owned contract algebra
+ * used by query factories, query utils, and type fixtures.
+ *
+ * Use `createServiceClient()` when code only needs direct service calls. Use
+ * the root `defineServices()` preset when the same contract should also create
+ * query factories and frontend query utilities.
  *
  * @module
  */

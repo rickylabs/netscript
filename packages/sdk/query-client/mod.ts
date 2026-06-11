@@ -1,12 +1,15 @@
 /**
- * `@netscript/sdk/query-client` — TanStack Query integration for the SDK.
+ * `@netscript/sdk/query-client` TanStack Query integration.
  *
- * This subpath provides:
- * - `createServiceQueryUtils()` — oRPC → TanStack Query bridge
- * - `createNetScriptQueryClient()` — QueryClient factory with sensible defaults
- * - `createKvCachePersister()` — TanStack Query ↔ Deno KV persistence
- * - `toClientKeyPrefix()` / `bridgeInvalidation()` — server ↔ client key mapping
- * - Type definitions for ActionMethod TanStack extensions
+ * This subpath bridges typed SDK service clients into frontend query utilities.
+ * It provides `createServiceQueryUtils()` for oRPC/TanStack options,
+ * `createNetScriptQueryClient()` for NetScript-aligned QueryClient defaults,
+ * `createKvCachePersister()` for persisted query cache storage, and key helpers
+ * that map server invalidation keys to client query prefixes.
+ *
+ * The public `QueryClientPort` and `ServiceQueryUtils<TContract>` types are
+ * package-owned structural mirrors. They preserve contract inference while
+ * keeping upstream TanStack and oRPC helper types behind internal boundaries.
  *
  * @module
  */
