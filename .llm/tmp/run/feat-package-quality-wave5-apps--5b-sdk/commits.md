@@ -17,3 +17,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 - b0eca88: Type sdk service query utils factory
 - 830affb: Expose sdk query collection port
 - 112e4a2: Extract sdk HTTP client link seam
+- a18ee60: Add sdk defineServices composition preset

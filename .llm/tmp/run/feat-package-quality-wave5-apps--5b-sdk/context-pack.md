@@ -6,7 +6,7 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-10/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-11/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
@@ -37,8 +37,11 @@ added a type fixture proving item inference and common read/write methods. Next 
 internal `ClientLinkFactory` HTTP transport seam (D-8), seam only, no in-process transport.
 Slice 10 added the internal `ClientLinkFactory`/`ClientLinkPort` seam, moved the existing
 HTTP `RPCLink` construction into `src/client/http-client-link.ts`, and left
-`createServiceClient()` public options unchanged. Next slice: `defineServices()` L3
-one-liner preset (D-9) that returns the composed L2 values without a no-cliff cliff.
+`createServiceClient()` public options unchanged. Slice 11 added the L3
+`defineServices()` preset, exported it from root, and added an inference fixture proving
+that the one-liner returns the composed L2 values: `clients`, `queries`, and
+`queryUtils`. Next slice: split the 643L discovery module into browser-env,
+service-url, and kv-connection files with parity tests for env lookup ordering (D-10).
 
 ## What the plan session did
 
