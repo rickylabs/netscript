@@ -21,4 +21,7 @@ lock files live in this run directory.
 
 ## Current State
 
-Bootstrap artifacts created; baseline measurement pending.
+Bootstrap artifacts created and baseline measurement recorded in `measure-5c1.json`.
+Starting baseline: scoped check and doc-lint pass; package-local check/test have weak/no-file
+behavior; lint/fmt wrappers exit 1 despite zero reported findings; JSR dry-run fails with excluded
+module errors plus six missing return types in `runtime/sheet/Sheet.tsx`.

@@ -71,7 +71,21 @@ Start at `packages/fresh-ui/registry/schema.ts` for item contract changes, then
 
 ## Baseline
 
-Pending measure-first run.
+Baseline saved to `measure-5c1.json`.
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Package-local check | `deno task --cwd packages/fresh-ui --frozen check` | PASS_WITH_WEAK_SIGNAL: exit 0, but `No matching files found` |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh-ui --ext ts,tsx --pretty` | PASS: 77 files, 0 occurrences |
+| Lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh-ui --ext ts,tsx --pretty` | FAIL: exit 1 with 0 reported occurrences |
+| Fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh-ui --ext ts,tsx --ignore-line-endings --pretty` | FAIL: exit 1 with 0 reported findings |
+| Test | `deno task --cwd packages/fresh-ui --frozen test` | FAIL: no test modules found |
+| Doc-lint | `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty` | PASS: 0 combined doc-lint errors |
+| JSR dry-run | `deno publish --dry-run --allow-dirty` from `packages/fresh-ui` | FAIL: 39 problems, including excluded exported modules and 6 slow-type errors |
+
+LOC/census: 6,861 TS/TSX/CSS LOC; 46 registry source files; 33 manifest items across 6
+collections (`theme`: 1, `component`: 28, `island`: 3, `support`: 1). Root `deno.lock`
+remained clean.
 
 ## Slice Evidence
 
