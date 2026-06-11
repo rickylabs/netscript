@@ -69,11 +69,36 @@ export {
   type RPCHandlerConfig,
 } from './src/primitives/handlers.ts';
 
+export type {
+  ContextFactory,
+  CorsOptions,
+  Database,
+  DbContext,
+  FetchHandler,
+  FetchHandlerResult,
+  RunningService,
+  RunningServiceAddress,
+  ServiceApp,
+  ServiceContext,
+  ServiceHandler,
+  ServiceHandlerPlugin,
+  ServiceMiddleware,
+  ServiceRequest,
+  ServiceRouter,
+} from './src/types.ts';
+
 // Layer 2: Builders
-export { createService, ServiceBuilder, type ServiceConfig } from './src/builder/service-builder.ts';
+export {
+  createService,
+  ServiceBuilder,
+  type ServiceConfig,
+} from './src/builder/service-builder.ts';
 
 // Re-export logger types for convenience
 export type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 
 // Layer 3: Presets
-export { defineService, type DefineServiceOptions } from './src/presets/define-service.ts';
+export {
+  defineService,
+  type DefineServiceOptions,
+} from './src/presets/define-service.ts';
