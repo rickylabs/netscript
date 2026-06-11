@@ -1,6 +1,6 @@
 # Plan — Sub-wave 5b: `@netscript/sdk`
 
-Status: **PROPOSED — awaiting PLAN-EVAL** (generator does not lock; separate session).
+Status: **LOCKED — PLAN-EVAL PASS (OpenHands run 27343770321, PR #29 comment 2026-06-11)**.
 Evidence: `research.md` + `measure-5b.json`. Carries the umbrella architecture mandate
 (composability layers, transport seam) from 2026-06-11 user feedback.
 

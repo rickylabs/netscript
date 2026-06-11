@@ -29,3 +29,10 @@ seam") implied the seam was real; it was declared-but-dormant.
 Umbrella noted "tasks missing on sdk+service"; correct, but sdk already has
 description, license, and a publish block (service had none). 5b metadata slice is
 tasks-only.
+
+## D-5 — PLAN-EVAL verdict source is PR comment, not committed `plan-eval.md` (2026-06-11)
+
+PLAN-EVAL returned PASS in OpenHands run `27343770321` and posted the verdict on PR #29,
+but the evaluator made no commits. The usual committed `plan-eval.md` artifact is therefore
+absent from the branch. Implementation materializes the verdict as `plan-eval-summary.md`
+and treats the PR comment as the verdict source for this one lock-keeping exception only.
