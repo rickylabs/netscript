@@ -1,0 +1,10 @@
+{
+  "$description": "Default dark NetScript UI theme. Values inherit from semantic.tokens.json.",
+  "$extensions": {
+    "netscript": {
+      "theme": "dark",
+      "default": true,
+      "colorScheme": "dark"
+    }
+  }
+}
