@@ -108,3 +108,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. Raw `Deno.Command`: `deno task check` from `packages/fresh` PASS exit 0 with known root-exclude warning. Rename scan over packages/plugins/services found no remaining `@netscript/sdk/interfaces`, `src/interfaces`, `./interfaces`, or `../interfaces` references. |
 | Concept of done | The package-owned structural port algebra is preserved unchanged; only its doctrine vocabulary and public subpath changed. The single known Fresh consumer was updated in-slice, and no compatibility shim for the alpha `./interfaces` path was left behind. |
 | Drift | none |
+
+### Slice 4/19 — D-3 fold `./adapters` and `./openapi`
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `8759d99` — `Fold sdk adapters and openapi subpaths` |
+| Changed | Removed `packages/sdk/adapters/mod.ts` and `packages/sdk/openapi/mod.ts`; removed `./adapters` and `./openapi` from `packages/sdk/deno.json` exports and package check task; exported `KvCacheStore` from `@netscript/sdk/cache`; exported OpenAPI helpers from the root barrel; updated sdk README/example references from removed subpaths to `@netscript/sdk/cache` or root. |
+| Gate | Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. SDK-only removed-subpath scan found no remaining `@netscript/sdk/adapters`, `@netscript/sdk/openapi`, `sdk/adapters`, `sdk/openapi`, `./adapters/mod.ts`, or `./openapi/mod.ts` references. |
+| Advisory | B1 completed: `research.md` now says the plugin-streams-core types are "not exported from the declaring module's public chain" instead of "unexported." |
+| Concept of done | The folded symbols remain reachable from public surfaces (`KvCacheStore` via `./cache`; OpenAPI helpers via root). The removed facade files no longer exist only to preserve folder shape, and subpath cardinality is now 10. |
+| Drift | none |

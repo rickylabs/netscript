@@ -6,16 +6,19 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-3/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-4/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
 `interfaces` vocabulary is gone from sdk and the one Fresh consumer:
 `src/interfaces/` is now `src/ports/`, the public subpath is `./ports`, root `mod.ts`
 exports from `./ports/mod.ts`, and `packages/fresh/builders/define-page/types.ts`
-imports `@netscript/sdk/ports`. The slice 3 gates passed with sdk and Fresh package
-checks exiting 0 with the known pre-slice-19 root-exclude warnings, plus a clean rename
-scan. Next slice: fold `./adapters` into `./cache` and `./openapi` into root barrel.
+imports `@netscript/sdk/ports`. Subpaths are now reduced from 12 to 10 by folding
+`./adapters` into `./cache` (`KvCacheStore`) and `./openapi` into the root barrel.
+B1 is complete: `research.md` now says the streams types are "not exported from the
+declaring module's public chain." Slice gates continue to exit 0 with known
+pre-slice-19 root-exclude warnings. Next slice: additive type exports in
+`plugin-streams-core` with plugin-streams-core/plugins-streams gates.
 
 ## What the plan session did
 
