@@ -66,8 +66,9 @@ export class CacheQuery {
     const key = toCacheStoreKey(queryKey);
     const inflightKey = getInflightKey(queryKey);
 
-    if (this.inflightRequests.has(inflightKey)) {
-      return await this.inflightRequests.get(inflightKey)! as TData;
+    const inflight = this.getInflight<TData>(inflightKey);
+    if (inflight) {
+      return await inflight;
     }
 
     const cached = await this.store.get<CacheEntry<TData>>(key);
@@ -78,7 +79,7 @@ export class CacheQuery {
       const isExpired = age > cacheTime;
 
       if (isExpired) {
-        return await this.fetchAndCache(queryFn, key, inflightKey, cacheTime);
+        return await this.fetchAndCacheOnce(queryFn, key, inflightKey, cacheTime);
       }
 
       if (isFresh) {
@@ -86,7 +87,7 @@ export class CacheQuery {
       }
 
       if (preferFreshOnStale) {
-        return await this.fetchAndCache(queryFn, key, inflightKey, cacheTime);
+        return await this.fetchAndCacheOnce(queryFn, key, inflightKey, cacheTime);
       }
 
       if (revalidateOnStale) {
@@ -96,7 +97,25 @@ export class CacheQuery {
       return cached.value.data;
     }
 
-    return await this.fetchAndCache(queryFn, key, inflightKey, cacheTime);
+    return await this.fetchAndCacheOnce(queryFn, key, inflightKey, cacheTime);
+  }
+
+  private getInflight<TData>(inflightKey: string): Promise<TData> | undefined {
+    return this.inflightRequests.get(inflightKey) as Promise<TData> | undefined;
+  }
+
+  private fetchAndCacheOnce<TData>(
+    queryFn: () => Promise<TData>,
+    cacheKey: Deno.KvKey,
+    inflightKey: string,
+    cacheTime: number,
+  ): Promise<TData> {
+    const inflight = this.getInflight<TData>(inflightKey);
+    if (inflight) {
+      return inflight;
+    }
+
+    return this.fetchAndCache(queryFn, cacheKey, inflightKey, cacheTime);
   }
 
   /**
