@@ -8,7 +8,6 @@ import type {
   SheetContentElementProps,
   SheetDescriptionElementProps,
   SheetOpenChangeReason,
-  SheetSide,
   SheetTitleElementProps,
   SheetTriggerElementProps,
   UseSheetOptions,
@@ -140,7 +139,18 @@ export function useSheet({
       ref: composeRefs(props.ref, contentRef),
       role: props.role ?? 'dialog',
     }),
-    [closeOnEscape, closeOnInteractOutside, contentId, dataState, descriptionId, modal, open, setOpen, side, titleId],
+    [
+      closeOnEscape,
+      closeOnInteractOutside,
+      contentId,
+      dataState,
+      descriptionId,
+      modal,
+      open,
+      setOpen,
+      side,
+      titleId,
+    ],
   );
 
   const getTitleProps = useCallback(

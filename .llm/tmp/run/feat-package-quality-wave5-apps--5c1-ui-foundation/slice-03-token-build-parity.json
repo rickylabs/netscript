@@ -1,0 +1,9 @@
+{
+  "cssPath": "packages/fresh-ui/registry/theme/tokens.css",
+  "byteParity": true,
+  "headSha256": "e0e53f0e63ae2bf0b7a0d8507bfdf76ec1761550aae251abf41452c85fc567df",
+  "generatedSha256": "e0e53f0e63ae2bf0b7a0d8507bfdf76ec1761550aae251abf41452c85fc567df",
+  "rootDeclarations": 134,
+  "lightDeclarations": 27,
+  "visualParityInference": "Generated CSS is byte-identical to the checked-in baseline, so rendered token values are unchanged."
+}

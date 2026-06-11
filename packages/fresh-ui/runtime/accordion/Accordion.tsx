@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, JSX } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -30,7 +30,11 @@ function withChildren(children: ComponentChildren) {
 
 function AccordionRoot({ children, ...options }: AccordionRootProps): unknown {
   const accordion = useAccordion(options);
-  return <AccordionContext.Provider value={accordion}>{children}</AccordionContext.Provider>;
+  return (
+    <AccordionContext.Provider value={accordion}>
+      <div {...accordion.getRootProps()}>{children}</div>
+    </AccordionContext.Provider>
+  );
 }
 
 function AccordionItem({ children, disabled, value, ...props }: AccordionItemProps): unknown {
@@ -39,7 +43,9 @@ function AccordionItem({ children, disabled, value, ...props }: AccordionItemPro
 
   return (
     <AccordionItemContext.Provider value={item}>
-      <div {...accordion.getItemProps(item, props)}>{withChildren(children)}</div>
+      <details {...(accordion.getItemProps(item, props) as JSX.HTMLAttributes<HTMLDetailsElement>)}>
+        {withChildren(children)}
+      </details>
     </AccordionItemContext.Provider>
   );
 }
@@ -47,7 +53,22 @@ function AccordionItem({ children, disabled, value, ...props }: AccordionItemPro
 function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps): unknown {
   const accordion = useAccordionContext('Accordion.ItemTrigger');
   const item = useAccordionItemContext('Accordion.ItemTrigger');
-  return <button {...accordion.getItemTriggerProps(item, props)}>{withChildren(children)}</button>;
+  const triggerProps = accordion.getItemTriggerProps(item, props);
+  const { disabled, onClick, type: _type, ...summaryProps } = triggerProps;
+
+  return (
+    <summary
+      {...(summaryProps as JSX.HTMLAttributes<HTMLElement>)}
+      aria-disabled={disabled ? 'true' : summaryProps['aria-disabled']}
+      onClick={(event) => {
+        event.preventDefault();
+        onClick?.(event as unknown as JSX.TargetedMouseEvent<HTMLButtonElement>);
+      }}
+      role={summaryProps.role ?? 'button'}
+    >
+      {withChildren(children)}
+    </summary>
+  );
 }
 
 function AccordionItemIndicator({ children, ...props }: AccordionItemIndicatorProps): unknown {

@@ -19,36 +19,36 @@ function useSheetContext(partName: string): UseSheetReturn {
   return requireFreshUiContext(useContext(SheetContext), partName, 'Sheet.Root');
 }
 
-function withChildren(children: ComponentChildren) {
+function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-function SheetRoot({ children, ...options }: SheetRootProps) {
+function SheetRoot({ children, ...options }: SheetRootProps): unknown {
   const sheet = useSheet(options);
   return <SheetContext.Provider value={sheet}>{children}</SheetContext.Provider>;
 }
 
-function SheetTrigger({ children, ...props }: SheetTriggerProps) {
+function SheetTrigger({ children, ...props }: SheetTriggerProps): unknown {
   const sheet = useSheetContext('Sheet.Trigger');
   return <button {...sheet.getTriggerProps(props)}>{withChildren(children)}</button>;
 }
 
-function SheetContent({ children, ...props }: SheetContentProps) {
+function SheetContent({ children, ...props }: SheetContentProps): unknown {
   const sheet = useSheetContext('Sheet.Content');
   return <dialog {...sheet.getContentProps(props)}>{withChildren(children)}</dialog>;
 }
 
-function SheetTitle({ children, ...props }: SheetTitleProps) {
+function SheetTitle({ children, ...props }: SheetTitleProps): unknown {
   const sheet = useSheetContext('Sheet.Title');
   return <h2 {...sheet.getTitleProps(props)}>{withChildren(children)}</h2>;
 }
 
-function SheetDescription({ children, ...props }: SheetDescriptionProps) {
+function SheetDescription({ children, ...props }: SheetDescriptionProps): unknown {
   const sheet = useSheetContext('Sheet.Description');
   return <p {...sheet.getDescriptionProps(props)}>{withChildren(children)}</p>;
 }
 
-function SheetClose({ children, ...props }: SheetCloseProps) {
+function SheetClose({ children, ...props }: SheetCloseProps): unknown {
   const sheet = useSheetContext('Sheet.Close');
   return <button {...sheet.getCloseProps(props)}>{withChildren(children)}</button>;
 }
