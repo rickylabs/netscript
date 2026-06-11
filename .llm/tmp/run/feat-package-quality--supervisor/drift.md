@@ -119,6 +119,6 @@ current-state documentation.
 - **Actual:** many `*-core` units and their plugins reached 0 slow-types during the
   rewrite; some non-runtime packages may have shifted too.
 - **Severity:** minor
-- **Action:** fix — Wave 0 re-runs `tools/fitness/release-readiness.ts` in this repo
+- **Action:** fix — Wave 0 re-runs `.llm/tools/fitness/release-readiness.ts` in this repo
   and supersedes the stale numbers before any wave refactors.
 - **Evidence:** to be produced by the Wave 0 baseline re-audit.

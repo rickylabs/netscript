@@ -19,7 +19,7 @@ deno run -A packages/cli/bin/netscript-dev.ts <command>
 Creates a scaffolded workspace using local repository package sources.
 
 ```bash
-deno run -A packages/cli/bin/netscript-dev.ts init --target ./tmp/demo
+deno run -A packages/cli/bin/netscript-dev.ts init demo --path ./tmp --ci --yes --no-git
 ```
 
 ### `netscript-dev sync packages`
@@ -27,7 +27,7 @@ deno run -A packages/cli/bin/netscript-dev.ts init --target ./tmp/demo
 Copies local package sources into an existing scaffolded workspace.
 
 ```bash
-deno run -A packages/cli/bin/netscript-dev.ts sync packages --target ./tmp/demo
+deno run -A packages/cli/bin/netscript-dev.ts sync packages --project-root ./tmp/demo
 ```
 
 ### `netscript-dev sync plugin`
@@ -35,15 +35,18 @@ deno run -A packages/cli/bin/netscript-dev.ts sync packages --target ./tmp/demo
 Copies an official plugin source tree from the repository into a workspace.
 
 ```bash
-deno run -A packages/cli/bin/netscript-dev.ts sync plugin --target ./tmp/demo --plugin workers
+deno run -A packages/cli/bin/netscript-dev.ts sync plugin worker workers --project-root ./tmp/demo
 ```
+
+Official local-copy kinds are `worker`, `saga`, `trigger`, and `stream`. The optional second
+argument is the installed plugin name, conventionally `workers`, `sagas`, `triggers`, or `streams`.
 
 ### `netscript-dev sync templates`
 
 Regenerates helper templates in a workspace.
 
 ```bash
-deno run -A packages/cli/bin/netscript-dev.ts sync templates --target ./tmp/demo
+deno run -A packages/cli/bin/netscript-dev.ts sync templates --target-path ./tmp/demo
 ```
 
 ### `netscript-dev probe monorepo`
@@ -59,8 +62,45 @@ deno run -A packages/cli/bin/netscript-dev.ts probe monorepo
 Runs scaffold validation for a selected fixture.
 
 ```bash
-deno run -A packages/cli/bin/netscript-dev.ts test scaffold --fixture smoke
+deno run -A packages/cli/bin/netscript-dev.ts test scaffold scaffold.plugins --cleanup --format pretty
 ```
+
+This command delegates to the root E2E runner. From the repository root, the equivalent one-pass
+full scaffold/plugins smoke is:
+
+```bash
+deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+```
+
+Use this suite before merging scaffold output, plugin scaffolding, DB wiring, Aspire helper
+generation, or official plugin copy-mode changes.
+
+## Manual Full Scaffold Smoke
+
+For local maintainer review, create a generated project under the gitignored `scaffold/` directory
+from the repository root:
+
+```bash
+deno run -A packages/cli/bin/netscript-dev.ts init full-test \
+  --path scaffold \
+  --db postgres \
+  --service --service-name users --service-port 3001 \
+  --ci --yes --no-git --force
+
+cd scaffold/full-test
+
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root . --force
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --force
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --project-root . --force
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root . --force
+
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin list
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin doctor --project-root .
+deno run -A ../../packages/cli/bin/netscript-dev.ts generate plugins --project-root .
+deno task check
+```
+
+Expected plugin inventory: `workers`, `sagas`, `triggers`, and `streams`.
 
 ## Boundary
 

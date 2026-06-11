@@ -99,7 +99,7 @@ matrix but not yet in `archetypes/ARCHETYPE-2-integration.md`'s fitness line —
 
 | Gate | How verified |
 |------|--------------|
-| F-1 File-size lint | `tools/fitness/release-readiness.ts` or manual check |
+| F-1 File-size lint | `.llm/tools/fitness/release-readiness.ts` or manual check |
 | F-2 Helper-reinvention scan | No new `utils/` / `helpers/` folders; use `@std/*` |
 | F-3 Layering check | `ports/` imports no adapters; `adapters/` imports `ports/` + external |
 | F-4 Inheritance audit | Adapters are named classes, not deep hierarchies |

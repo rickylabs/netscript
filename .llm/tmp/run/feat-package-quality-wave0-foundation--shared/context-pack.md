@@ -20,7 +20,7 @@ check` pass.
 ## Completed
 
 - Read harness workflow, supervisor plan, phase registry, Wave 0 scaffold, stale shared plan/evaluation, standards, public surface patterns, docs structure, doctrine 01..10, A1 gate matrix, and architecture debt registry.
-- Ran `deno run -A tools/fitness/release-readiness.ts --out ./audit --include-plugins`.
+- Ran `deno run -A .llm/tools/fitness/release-readiness.ts --out ./audit --include-plugins`.
 - Ran `deno publish --dry-run --allow-dirty` in `packages/shared`.
 - Verified current consumers of `@netscript/shared` and `@shared/utils`.
 - Recorded Design checkpoint before implementation edits.

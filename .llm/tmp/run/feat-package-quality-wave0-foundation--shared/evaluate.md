@@ -31,7 +31,7 @@
 | Doc lint | `npx --yes deno doc --lint packages/shared/mod.ts` | PASS | Checked 1 file. |  |
 | Package tests | `cd packages/shared && npx --yes deno test --allow-all .` | PASS | 2 tests passed. |  |
 | Publish dry-run | `cd packages/shared && npx --yes deno publish --dry-run --allow-dirty` | PASS | Simulated publish succeeds with 0 slow-types; publish set includes README/docs/src and excludes `utils/**`. |  |
-| Standards script | `npx --yes deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/shared --text` | NOT_RUN | Fails loading `https://jsr.io/@std/fs/meta.json`. | Environment/DNS blocker to `jsr.io`. |
+| Standards script | `npx --yes deno run --allow-read .llm/tools/fitness/check-netscript-standards.ts --root packages/shared --text` | NOT_RUN | Fails loading `https://jsr.io/@std/fs/meta.json`. | Environment/DNS blocker to `jsr.io`. |
 | STANDARDS §7 docs tree/frontmatter | Manual required-file/frontmatter check | PASS | All required `docs/`, `recipes/`, `reference/`, and `advanced/` pages exist; each has `title`, `description`, `package`, and `order` frontmatter. | Prior FAIL_FIX finding fixed. |
 | README length | `wc -l packages/shared/README.md` | PASS | 366 lines. | Exceeds 150-line requirement. |
 

@@ -21,7 +21,13 @@ Common options:
 - `--db <engine>`
 - `--service [enabled]`
 - `--service-name <name>`
+- `--service-port <port>`
+- `--editor <none|zed|vscode>`
 - `--no-aspire`
+- `--legacy-aspire`
+- `--ci`
+- `--yes`
+- `--no-git`
 - `--dry-run`
 - `--force`
 
@@ -99,15 +105,84 @@ Regenerates Aspire helper files from service configuration.
 
 Adds a plugin package and updates workspace plugin registration.
 
+Supported local contributor kinds are:
+
+- `worker` -> conventional installed name `workers`
+- `saga` -> conventional installed name `sagas`
+- `trigger` -> conventional installed name `triggers`
+- `stream` -> conventional installed name `streams`
+
+Common options:
+
+- `--name <name>`
+- `--port <port>`
+- `--service-refs <refs>`
+- `--plugin-refs <refs>`
+- `--db <engine-or-key>`
+- `--no-db`
+- `--samples` / `--no-samples`
+- `--project-root <path>`
+- `--force`
+
 ### `netscript plugin list`
 
 Lists registered plugins.
+
+### `netscript plugin info`
+
+Runs a plugin info command through the plugin's published CLI.
+
+### `netscript plugin update`
+
+Runs a plugin update command through the plugin's published CLI.
+
+### `netscript plugin remove`
+
+Removes a configured plugin.
+
+### `netscript plugin doctor`
+
+Checks installed NetScript plugin health.
 
 ## Code Generation
 
 ### `netscript generate runtime-schemas`
 
 Generates runtime configuration schemas from registered plugin metadata.
+
+### `netscript generate plugins`
+
+Generates plugin registries from project source.
+
+## Local Maintainer Scaffolding
+
+When testing scaffold output from this monorepo, use the maintainer binary rather than the published
+binary shape:
+
+```bash
+deno run -A packages/cli/bin/netscript-dev.ts init full-test \
+  --path scaffold \
+  --db postgres \
+  --service --service-name users --service-port 3001 \
+  --ci --yes --no-git --force
+```
+
+Then add the first-party plugins from inside `scaffold/full-test`:
+
+```bash
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add worker --name workers --project-root . --force
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --project-root . --force
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --project-root . --force
+deno run -A ../../packages/cli/bin/netscript-dev.ts plugin add stream --name streams --project-root . --force
+deno run -A ../../packages/cli/bin/netscript-dev.ts generate plugins --project-root .
+deno task check
+```
+
+The full one-pass scaffold/plugins E2E smoke from the repository root is:
+
+```bash
+deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+```
 
 ## Deployment
 

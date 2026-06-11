@@ -5,6 +5,10 @@ NetScript package and plugin architecture is governed by the Architecture Doctri
 architecture decisions, gates, and debt entries. Use `.agents/skills/netscript-harness` and
 `.llm/harness/` for harnessed work. Follow `.agents/rules/*.mdc` where present.
 
+Use `.agents/skills/netscript-cli` for CLI/scaffold/plugin/maintainer command work and
+`.agents/skills/netscript-tools` for repo tooling, validation evidence, OpenHands triggers, raw git
+verification, and lock-hygiene decisions.
+
 When the user says `use harness`, activate the harness workflow. The evaluator must be a separate
 session from the implementation session.
 
@@ -94,6 +98,31 @@ deno task e2e:cli
 The bare task runs the `scaffold.runtime` merge-readiness suite with cleanup enabled. For debugging,
 use `deno task e2e:cli suites`, `deno task e2e:cli gates scaffold.runtime`, or
 `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
+
+For changes that affect scaffold output, plugin scaffolding, DB wiring, Aspire helper generation, or
+official plugin copy mode, use the full scaffold/plugins smoke in one pass:
+
+```powershell
+deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+```
+
+Do not replace that command with separate `gates` or individual scaffold commands when a full
+scaffold/plugins verdict is requested. The `scaffold.plugins` suite creates a local-source project,
+adds the first-party plugins (`workers`, `sagas`, `triggers`, `streams`), provisions DB/runtime
+state, restores Aspire modules, validates plugin endpoints/background paths, and cleans up when
+`--cleanup` is present.
+
+OpenHands PR trigger template for this gate:
+
+```text
+@openhands-agent model=openrouter/qwen/qwen3.7-max output=pr-comment run the full scaffold/plugins E2E smoke for this PR.
+
+Use this single one-pass command from the repository root:
+
+deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+
+Do not split this into individual gate commands. Report the raw exit code and summarize failing suite/test names if any. Preserve lock hygiene: do not commit deno.lock or source churn unless the run explicitly requires a reviewed fix.
+```
 
 This gate is expensive. Do not run it for every intermediate implementation loop; run it during the
 evaluator/merge-readiness pass or when explicitly requested.
