@@ -127,3 +127,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
 | Concept of done | Health primitives stay reachable from `mod.ts`, use one file as the extension pattern for new health states/handlers, and preserve runtime response shapes. |
 | Drift | none |
+
+### Slice 7/15 — D-2/D-3/D-5 builder interface and mirror types
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `ff9ca2d` — `Expose service builder as structural interface` |
+| Changed | `ServiceBuilder` is now an exported interface; concrete implementation is internal `ServiceBuilderImpl`. Builder public methods use `CorsOptions`, `DbContext`, `Database`, `ContextFactory`, `ServiceMiddleware`, `ServiceHandler`, `ServiceApp`, and `ServiceRouter`. Renamed `addHealthCheck`/`addReadinessCheck` to `withHealthCheck`/`withReadinessCheck` with no shims. Root barrel exports `type ServiceBuilder`. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. Consumer grep for removed method names found no TypeScript service consumers; the only hit was unrelated C# template text `AddHealthChecks`. |
+| Concept of done | Builder extension path is one file: add the interface method and mirror implementation method together. Constructor path is only `createService()`, preserving the DSL entrypoint and zero-consumer rename rule. |
+| Drift | none |

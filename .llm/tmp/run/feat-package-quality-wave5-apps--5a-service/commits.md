@@ -12,3 +12,4 @@ Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the pla
 - b62dfbe: Replace handler leaks with service structural contracts
 - aabcde2: Add explicit OpenAPI primitive return contracts
 - 65c6512: Add explicit health primitive return contracts
+- ff9ca2d: Expose service builder as structural interface
