@@ -81,7 +81,7 @@ slices 13-14 land.
 
 ### Slice 15 — OKLCH ramp re-derivation
 
-Commit: pending.
+Commit: `aaf043d`.
 
 Changed:
 
