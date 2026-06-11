@@ -177,3 +177,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
 | Concept of done | A reader can understand the service public surface and extension path from the root barrel without it becoming executable logic. |
 | Drift | none |
+
+### Slice 12/15 — D-12 README and docs scaffold
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `ca090b0` — `Add service package documentation surface` |
+| Changed | Added `packages/service/README.md` (234 lines, 14+ sections) plus `docs/getting-started.md`, `docs/concepts.md`, and `docs/architecture.md`. README covers install, quick start, entrypoint, public surface, builder, preset, lifecycle, build-without-listening, health, RPC/OpenAPI, database context, logging/diagnostics, permissions, testing, docs links, see also, and license. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. README line count: 234. |
+| Concept of done | Docs are reachable from the README and publish include map; examples use current `RunningService` stop semantics and no deprecated builder names. |
+| Drift | none |

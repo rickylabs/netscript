@@ -2,7 +2,7 @@
 
 ## Current state
 
-Implementation has started after PLAN-EVAL PASS. Slices 1-11/15 are complete:
+Implementation has started after PLAN-EVAL PASS. Slices 1-12/15 are complete:
 `packages/service/deno.json` is standardized, and service sources now live under `src/` with only
 path updates required by the move. `src/types.ts` now defines the package-owned structural mirror
 types. Handler primitives now use those mirrors for plugins, fetch handlers, not-found handlers, and
@@ -16,7 +16,8 @@ abort signals, and logs its banner/error path through `@netscript/logger`. Imple
 Database connectivity diagnostics are now internal under `src/diagnostics/`, logger-backed, and
 `define-service.ts` is 143 lines. `defineService()` now returns `Promise<RunningService>` and uses
 package-owned router/db context types. `mod.ts` is now a 130-line documented public contract and
-still barrel-only. Next slice: README and docs scaffold.
+still barrel-only. README is 234 lines with package docs scaffold under `docs/`. Next slice: doctest
+runner and unit tests.
 
 Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
 files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do
