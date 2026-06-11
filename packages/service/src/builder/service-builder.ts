@@ -5,7 +5,7 @@
  * ```typescript
  * import { createService } from '@netscript/service';
  *
- * await createService(router, { name: 'users', version: '1.0.0' })
+ * const running = await createService(router, { name: 'users', version: '1.0.0' })
  *   .withCors()
  *   .withLogger()
  *   .withDatabase(db)
@@ -14,6 +14,8 @@
  *   .withRPC()
  *   .withHealth()
  *   .serve({ port: 3000 });
+ *
+ * await running.stop();
  * ```
  *
  * @module
@@ -21,7 +23,7 @@
 
 import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { ensureLogging } from '@netscript/logger';
+import { createServiceLogger, ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import {
   createHealthHandler,
@@ -42,6 +44,8 @@ import type {
   CorsOptions,
   Database,
   DbContext,
+  RunningService,
+  ServeOptions,
   ServiceApp,
   ServiceHandler,
   ServiceMiddleware,
@@ -123,7 +127,7 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
   build(): ServiceApp;
 
   /** Starts the service listener. */
-  serve(options?: { port?: number }): Promise<ServiceApp>;
+  serve(options?: ServeOptions): Promise<RunningService>;
 }
 
 /**
@@ -141,8 +145,9 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
  * // Get the service app for additional customization.
  * const app = builder.build();
  *
- * // Or serve directly
- * await builder.serve({ port: 3000 });
+ * // Or serve directly.
+ * const running = await builder.serve({ port: 3000 });
+ * await running.stop();
  * ```
  */
 class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilder<TRouter> {
@@ -155,7 +160,6 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
   private openApiConfigured = false;
   private docsConfigured = false;
   private healthConfigured = false;
-  private loggerEnabled = false;
   private startupHooks: Array<() => Promise<void>> = [];
   private contextFactory: ContextFactory = () => ({});
   private database: DbContext | null = null;
@@ -188,7 +192,6 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
    * @param options - Logger middleware configuration
    */
   withLogger(options?: LoggerMiddlewareOptions): ServiceBuilder<TRouter> {
-    this.loggerEnabled = true;
     this.app.use('*', loggerMiddleware(this.config.name, options));
     return this;
   }
@@ -417,12 +420,11 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
    *
    * @example
    * ```typescript
-   * createService(router, { name: 'workers' })
-   *   .onStartup(async () => {
-   *     await registerPluginJobs();
-   *     console.log('Jobs registered');
-   *   })
-   *   .serve()
+ * createService(router, { name: 'workers' })
+ *   .onStartup(async () => {
+ *     await registerPluginJobs();
+ *   })
+ *   .serve()
    * ```
    */
   onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter> {
@@ -523,11 +525,9 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
    *
    * @param options - Server options
    */
-  async serve(options?: { port?: number }): Promise<ServiceApp> {
-    // Ensure logging is configured if withLogger() was called
-    if (this.loggerEnabled) {
-      await ensureLogging();
-    }
+  async serve(options?: ServeOptions): Promise<RunningService> {
+    await ensureLogging();
+    const serviceLogger = createServiceLogger(this.config.name);
 
     // Run startup hooks
     for (const hook of this.startupHooks) {
@@ -536,16 +536,46 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
 
     const app = this.build();
     const port = options?.port ?? this.config.port ?? 3000;
+    const controller = new AbortController();
 
-    console.log(`🚀 ${this.config.name} running on http://localhost:${port}`);
-    console.log(`📚 API Docs: http://localhost:${port}/api/docs`);
-    console.log(`📄 OpenAPI Spec: http://localhost:${port}/api/openapi.json`);
-    console.log(`💚 Health: http://localhost:${port}/health`);
+    if (options?.signal?.aborted) {
+      controller.abort(options.signal.reason);
+    } else {
+      options?.signal?.addEventListener(
+        'abort',
+        () => controller.abort(options.signal?.reason),
+        { once: true },
+      );
+    }
 
-    // Note: Deno.serve is non-blocking in this context, it returns immediately
-    Deno.serve({ port }, app.fetch);
+    const server = Deno.serve(
+      {
+        port,
+        signal: controller.signal,
+        onListen: ({ hostname, port }) => {
+          const origin = `http://${hostname}:${port}`;
+          serviceLogger.info('Service listening', {
+            service: this.config.name,
+            origin,
+            docs: `${origin}/api/docs`,
+            openapi: `${origin}/api/openapi.json`,
+            health: `${origin}/health`,
+          });
+        },
+      },
+      (request) => app.fetch(request),
+    );
 
-    return app;
+    return {
+      app,
+      addr: server.addr,
+      stop: async () => {
+        if (!controller.signal.aborted) {
+          controller.abort();
+        }
+        await server.finished;
+      },
+    };
   }
 }
 
@@ -554,7 +584,7 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
  *
  * @example
  * ```typescript
- * await createService(router, { name: 'users', version: '1.0.0' })
+ * const running = await createService(router, { name: 'users', version: '1.0.0' })
  *   .withCors()
  *   .withLogger()
  *   .withOpenAPI()
@@ -562,6 +592,8 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
  *   .withRPC()
  *   .withHealth()
  *   .serve({ port: 3000 });
+ *
+ * await running.stop();
  * ```
  */
 export function createService<T extends ServiceRouter>(

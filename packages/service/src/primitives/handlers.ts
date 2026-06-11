@@ -23,6 +23,7 @@ import { RPCHandler } from '@orpc/server/fetch';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
 import { CORSPlugin } from '@orpc/server/plugins';
 import { ZodSmartCoercionPlugin } from '@orpc/zod';
+import { createServiceLogger } from '@netscript/logger';
 import { LoggingPlugin } from '@netscript/logger/orpc';
 import { ErrorHandlingPlugin, TracingPlugin } from '@netscript/telemetry/orpc';
 import type {
@@ -196,8 +197,14 @@ export function createNotFoundHandler(serviceName: string): ServiceHandler {
  * ```
  */
 export function createErrorHandler(serviceName: string): ServiceErrorHandler {
+  const logger = createServiceLogger(serviceName);
+
   return (err, c): Response => {
-    console.error(`[${serviceName}] Unhandled error:`, err);
+    logger.error('Unhandled service error', {
+      error: err.message,
+      stack: err.stack,
+    });
+
     return c.json(
       {
         error: 'INTERNAL_ERROR',

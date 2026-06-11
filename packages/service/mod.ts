@@ -80,6 +80,7 @@ export type {
   FetchHandlerResult,
   RunningService,
   RunningServiceAddress,
+  ServeOptions,
   ServiceApp,
   ServiceContext,
   ServiceErrorHandler,

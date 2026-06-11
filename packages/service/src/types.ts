@@ -40,6 +40,15 @@ export interface RunningService {
   stop(): Promise<void>;
 }
 
+/** Options for starting a service listener. */
+export interface ServeOptions {
+  /** Preferred listener port; use `0` for an ephemeral port. */
+  port?: number;
+
+  /** External signal that stops the listener when aborted. */
+  signal?: AbortSignal;
+}
+
 /** Result returned by oRPC-compatible fetch handlers. */
 export interface FetchHandlerResult {
   /** Whether the handler matched the request path. */
