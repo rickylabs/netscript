@@ -287,6 +287,47 @@ Evidence:
 
 Drift: none.
 
+### Slice 12 — Popover API and CSS anchor positioning
+
+Commit: `802e001`.
+
+Changed:
+
+- Added internal `platform-popover` helpers for native popover synchronization,
+  anchor-name generation, placement-to-position-area mapping, and style merging.
+- Updated popover trigger/content props with `popovertarget`,
+  `popovertargetaction`, `popover="auto"`, native toggle synchronization, and
+  anchor-positioning style hooks.
+- Updated tooltip trigger/content props with `interestfor`, `popover="manual"`,
+  native popover synchronization, and anchor-positioning style hooks.
+- Replaced touched tooltip `window.setTimeout` calls with `globalThis` while
+  preserving existing delay behavior.
+- Added `registry/components/ui/floating.css` with fixed/inset fallback and
+  anchor positioning under `@supports`.
+- Added the `floating-styles` manifest item so the new registry CSS source is
+  claimed by manifest-integrity.
+- Captured before/after `deno doc` snapshots for the interactive entrypoint and
+  both hook modules.
+
+Evidence:
+
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 35 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno lint --config packages/fresh-ui/deno.gates.json packages/fresh-ui/runtime/_internal/platform-popover.ts packages/fresh-ui/runtime/popover/use-popover.ts packages/fresh-ui/runtime/tooltip/use-tooltip.ts packages/fresh-ui/registry/manifest.ts packages/fresh-ui/runtime/popover/popover.test.ts packages/fresh-ui/runtime/tooltip/tooltip.test.ts`
+  → PASS/exit 0, checked 6 files.
+- `deno fmt --check --config packages/fresh-ui/deno.gates.json packages/fresh-ui/runtime/_internal/platform-popover.ts packages/fresh-ui/runtime/popover/use-popover.ts packages/fresh-ui/runtime/tooltip/use-tooltip.ts packages/fresh-ui/registry/manifest.ts`
+  → PASS/exit 0, checked 4 files.
+- `deno fmt --check --no-config packages/fresh-ui/registry/components/ui/floating.css .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-12-manifest-integrity.json`
+  → PASS/exit 0.
+- `deno run --allow-read --allow-write .llm/tools/fitness/check-manifest-integrity.ts --json-out .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-12-manifest-integrity.json`
+  → PASS/exit 0, 62/62 registry files claimed, 4 excluded.
+- `slice-12-public-shape-preservation.json` reports `publicShapePreserved: true`
+  for `interactive`, `use-popover-module`, and `use-tooltip-module`.
+
+Drift: none; this follows parent D-7 with CSS fallback and no polyfill.
+
 ### Slice 7 — `manifest-integrity` fitness gate
 
 Commit: `6977b9b`.

@@ -91,3 +91,11 @@ Slice 11 complete: accordion compound internals now render native `details` and
 controlled `open` and grouped `name` when `multiple` is false; `summary` reuses
 the existing trigger event pipeline. The public `Accordion` and `useAccordion`
 doc shapes are preserved in normalized before/after evidence.
+
+Slice 12 complete: popover and tooltip hooks now emit platform Popover API
+attributes and synchronize native `showPopover`/`hidePopover` with existing
+controlled state. Floating positioning uses inline anchor custom properties plus
+`registry/components/ui/floating.css`, which provides the D-7 CSS
+`position: fixed` + `inset` fallback and an anchor-positioning enhancement under
+`@supports`. The new CSS file is claimed by `floating-styles`; manifest
+integrity passes with 62/62 registry files claimed. No polyfill was added.

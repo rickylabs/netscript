@@ -36,3 +36,5 @@ hash-record commit; commits are never amended.
 - Slice 10 impl `ac0e1a3`: Record Fresh Zag spike evidence.
 - Slice 10 docs `e2537bb`: Record slice 10 evidence.
 - Slice 11 impl `bdaebad`: Render accordion with native details.
+- Slice 11 docs `cbaea4c`: Record slice 11 evidence.
+- Slice 12 impl `802e001`: Use platform popover for floating runtimes.
