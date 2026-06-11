@@ -123,6 +123,45 @@ Evidence:
 
 Drift: none.
 
+### Slice 6 — Registry schema v2 types + manifest migration
+
+Commit: `999fdf9`.
+
+Changed:
+
+- Expanded `RegistryItemKind` and migrated `RegistryFileDefinition` from
+  `destination` to `target`.
+- Added v2 fields: `title?`, `author?`, `registryDependencies?`, external
+  `dependencies?`, `css?`, `cssVars?`, `docs?`, `categories?`, and `meta?`.
+- Set manifest `schemaVersion: 2` and
+  `tokenSourceStrategy: 'style-dictionary-dtcg-source'`.
+- Migrated manifest file targets to placeholders: `@ui/`, `@islands/`,
+  `@assets/`, and `@lib/`.
+- Converted registry dependency object arrays to string `registryDependencies`.
+- Converted layer-3 UI items to `kind: 'block'`.
+- Added `author: 'NetScript'` to all items.
+- Updated `theme-seed` to claim `theme-bridge.css` and `tokens.json` and expose
+  representative `cssVars` metadata.
+
+Evidence:
+
+- `deno run --allow-read --allow-write .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-06-registry-v2.ts`
+  → PASS/exit 0; schemaVersion 2, itemCount 33, blockItemCount 10,
+  invalidTargets 0, oldDependencyShape 0, registryDependencyErrors 0,
+  authorlessItems 0, themeSeed generated files present, cssVars present.
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 30 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno fmt --check --config packages/fresh-ui/deno.gates.json packages/fresh-ui/registry/schema.ts packages/fresh-ui/registry/manifest.ts`
+  → PASS/exit 0.
+- `deno fmt --check --no-config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-06-registry-v2.ts .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-06-registry-v2-integrity.json`
+  → PASS/exit 0.
+- `deno lint --no-config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-06-registry-v2.ts`
+  → PASS/exit 0.
+
+Drift: none.
+
 ### Slice 5 — `tokens-drift` fitness gate
 
 Commit: `42b9b92`.

@@ -55,3 +55,8 @@ bridge and no longer owns an inline `@theme` block.
 Slice 5 complete: `.llm/tools/fitness/check-token-drift.ts` provides the
 `tokens-drift` gate. It rebuilds fresh-ui token outputs and fails on untracked
 or changed generated artifacts.
+
+Slice 6 complete: registry schema v2 is in place. Manifest files now use
+placeholder `target` paths, registry dependencies are string arrays, layer-3 UI
+items are `block` kind, all items carry `author`, and `theme-seed` claims the
+generated bridge/token JSON artifacts.

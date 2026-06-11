@@ -24,3 +24,5 @@ hash-record commit; commits are never amended.
 - Slice 4 impl `15a13e0`: Generate Tailwind theme bridge artifacts.
 - Slice 4 docs `c4467c0`: Record slice 4 evidence.
 - Slice 5 impl `42b9b92`: Add fresh-ui token drift fitness gate.
+- Slice 5 docs `122869a`: Record slice 5 evidence.
+- Slice 6 impl `999fdf9`: Migrate fresh-ui registry schema to v2.
