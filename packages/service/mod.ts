@@ -80,6 +80,7 @@ export type {
   RunningServiceAddress,
   ServiceApp,
   ServiceContext,
+  ServiceErrorHandler,
   ServiceHandler,
   ServiceHandlerPlugin,
   ServiceMiddleware,

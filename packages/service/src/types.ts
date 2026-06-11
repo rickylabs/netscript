@@ -108,6 +108,12 @@ export type ServiceHandler = (
   context: ServiceContext,
 ) => Response | Promise<Response>;
 
+/** Error handler used by service applications. */
+export type ServiceErrorHandler = (
+  error: Error,
+  context: ServiceContext,
+) => Response | Promise<Response>;
+
 /** CORS options supported by `withCors()`. */
 export interface CorsOptions {
   /** Allowed origin value or matcher. */

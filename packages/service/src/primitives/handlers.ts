@@ -19,18 +19,19 @@
  * @module
  */
 
-import type { Context } from 'hono';
 import { RPCHandler } from '@orpc/server/fetch';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
 import { CORSPlugin } from '@orpc/server/plugins';
-import { StandardHandlerPlugin } from '@orpc/server/standard';
 import { ZodSmartCoercionPlugin } from '@orpc/zod';
 import { LoggingPlugin } from '@netscript/logger/orpc';
 import { ErrorHandlingPlugin, TracingPlugin } from '@netscript/telemetry/orpc';
-
-// Router type that matches oRPC router structure
-// deno-lint-ignore no-explicit-any
-type AnyRouter = Record<string, any>;
+import type {
+  FetchHandler,
+  ServiceErrorHandler,
+  ServiceHandler,
+  ServiceHandlerPlugin,
+  ServiceRouter,
+} from '../types.ts';
 
 /**
  * Configuration options for RPC handlers.
@@ -39,8 +40,7 @@ export interface RPCHandlerConfig {
   /** Service name for telemetry */
   serviceName?: string;
   /** Additional oRPC plugins */
-  // deno-lint-ignore no-explicit-any
-  plugins?: StandardHandlerPlugin<any>[];
+  plugins?: ServiceHandlerPlugin[];
   /** Enable request tracing (default: true) */
   tracing?: boolean;
   /** Enable error handling plugin (default: true) */
@@ -67,10 +67,8 @@ export interface RPCHandlerConfig {
  * });
  * ```
  */
-// deno-lint-ignore no-explicit-any
-export function createRPCPlugins(config: RPCHandlerConfig): StandardHandlerPlugin<any>[] {
-  // deno-lint-ignore no-explicit-any
-  const plugins: StandardHandlerPlugin<any>[] = [];
+export function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin[] {
+  const plugins: ServiceHandlerPlugin[] = [];
 
   // Tracing plugin
   if (config.tracing !== false && config.serviceName) {
@@ -130,13 +128,14 @@ export function createRPCPlugins(config: RPCHandlerConfig): StandardHandlerPlugi
  * });
  * ```
  */
-// deno-lint-ignore no-explicit-any
-export function createRPCHandler<T extends AnyRouter>(
+export function createRPCHandler<T extends ServiceRouter>(
   router: T,
   config?: RPCHandlerConfig,
-): any {
+): FetchHandler {
   const plugins = createRPCPlugins(config ?? {});
-  return new RPCHandler(router, { plugins });
+  return new RPCHandler(router as never, {
+    plugins: plugins as never[],
+  }) as FetchHandler;
 }
 
 /**
@@ -157,13 +156,14 @@ export function createRPCHandler<T extends AnyRouter>(
  * });
  * ```
  */
-// deno-lint-ignore no-explicit-any
-export function createOpenAPIHandler<T extends AnyRouter>(
+export function createOpenAPIHandler<T extends ServiceRouter>(
   router: T,
   config?: RPCHandlerConfig,
-): any {
+): FetchHandler {
   const plugins = [...createRPCPlugins(config ?? {}), new ZodSmartCoercionPlugin()];
-  return new OpenAPIHandler(router, { plugins });
+  return new OpenAPIHandler(router as never, {
+    plugins: plugins as never[],
+  }) as FetchHandler;
 }
 
 /**
@@ -174,8 +174,8 @@ export function createOpenAPIHandler<T extends AnyRouter>(
  * app.notFound(createNotFoundHandler('users'));
  * ```
  */
-export function createNotFoundHandler(serviceName: string) {
-  return (c: Context): Response => {
+export function createNotFoundHandler(serviceName: string): ServiceHandler {
+  return (c): Response => {
     return c.json(
       {
         error: 'NOT_FOUND',
@@ -195,13 +195,15 @@ export function createNotFoundHandler(serviceName: string) {
  * app.onError(createErrorHandler('users'));
  * ```
  */
-export function createErrorHandler(serviceName: string) {
-  return (err: Error, c: Context): Response => {
+export function createErrorHandler(serviceName: string): ServiceErrorHandler {
+  return (err, c): Response => {
     console.error(`[${serviceName}] Unhandled error:`, err);
     return c.json(
       {
         error: 'INTERNAL_ERROR',
-        message: Deno.env.get('DENO_ENV') === 'development' ? err.message : 'Internal server error',
+        message: Deno.env.get('DENO_ENV') === 'development'
+          ? err.message
+          : 'Internal server error',
       },
       500,
     );
