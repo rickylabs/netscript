@@ -117,3 +117,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
 | Concept of done | OpenAPI primitive signatures are package-owned, and finite default/cache vocabulary now lives in one file for copyable extension. Scalar asset inclusion remains unchanged for D-9. |
 | Drift | none |
+
+### Slice 6/15 — D-6 health explicit returns
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `65c6512` — `Add explicit health primitive return contracts` |
+| Changed | `src/primitives/health.ts` now returns `ServiceHandler` from health, liveness, and readiness factories; added/exported `HEALTH_STATUS` and `HealthStatus` so finite health vocabulary is named rather than repeated as raw strings. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. |
+| Concept of done | Health primitives stay reachable from `mod.ts`, use one file as the extension pattern for new health states/handlers, and preserve runtime response shapes. |
+| Drift | none |
