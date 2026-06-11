@@ -28,3 +28,5 @@ hash-record commit; commits are never amended.
 - Slice 6 impl `999fdf9`: Migrate fresh-ui registry schema to v2.
 - Slice 6 docs `e6d473b`: Record slice 6 evidence.
 - Slice 7 impl `6977b9b`: Add fresh-ui manifest integrity gate.
+- Slice 7 docs `91a01ee`: Record slice 7 evidence.
+- Slice 8 impl `097fde8`: Extract fresh-ui component CSS per registry item.

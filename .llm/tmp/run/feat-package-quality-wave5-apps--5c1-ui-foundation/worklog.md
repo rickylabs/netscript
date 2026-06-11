@@ -123,6 +123,45 @@ Evidence:
 
 Drift: none.
 
+### Slice 8 — Per-item CSS extraction
+
+Commit: `097fde8`.
+
+Changed:
+
+- Moved aggregate CSS from
+  `registry/theme/components/{actions,forms,surfaces,feedback}.css` into
+  per-item/support CSS files under `registry/components/ui/`.
+- Removed component aggregate imports from `registry/theme/styles.css`.
+- Added registry style-support items for exact grouped CSS blocks:
+  `form-control-styles`, `choice-styles`, `surface-styles`, `sheet-styles`, and
+  `alert-styles`.
+- Added per-item CSS files and `css` import contributions for button, form
+  controls, surfaces, feedback, toast, progress, spinner, and skeleton seams.
+- Updated registry dependencies exposed by extraction: `button` depends on
+  `spinner`, `filter-form` depends on `card`, `sidebar-toggle` depends on
+  `button`, and the foundation collection includes `sheet-styles`.
+
+Evidence:
+
+- `deno run --allow-read --allow-write --allow-run=git .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-08-css-move-only.ts --base-ref 91a01ee --json-out .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-08-css-move-only.json`
+  → PASS/exit 0; 161/161 top-level CSS statements preserved, missing 0, extra 0.
+- `deno run --allow-read --allow-write .llm/tools/fitness/check-manifest-integrity.ts --json-out .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-08-manifest-integrity.json`
+  → PASS/exit 0; 61/61 registry files claimed, 4 excluded, no missing or
+  unclaimed files.
+- `deno task --cwd packages/fresh-ui check` → PASS/exit 0.
+- `deno task --cwd packages/fresh-ui test` → PASS/exit 0, 30 passed / 0 failed.
+- `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/fresh-ui --pretty`
+  → PASS/exit 0, totalErrors 0.
+- `deno fmt --check --config packages/fresh-ui/deno.gates.json packages/fresh-ui/registry/manifest.ts packages/fresh-ui/registry/theme/styles.css packages/fresh-ui/registry/components/ui/*.css`
+  → PASS/exit 0.
+- `deno fmt --check --no-config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-08-css-move-only.ts .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-08-css-move-only.json .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-08-manifest-integrity.json`
+  → PASS/exit 0.
+- `deno lint --no-config .llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/verify-slice-08-css-move-only.ts`
+  → PASS/exit 0.
+
+Drift: none.
+
 ### Slice 7 — `manifest-integrity` fitness gate
 
 Commit: `6977b9b`.

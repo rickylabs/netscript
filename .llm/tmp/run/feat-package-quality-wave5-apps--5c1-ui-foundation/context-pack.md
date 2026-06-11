@@ -64,3 +64,9 @@ generated bridge/token JSON artifacts.
 Slice 7 complete: `.llm/tools/fitness/check-manifest-integrity.ts` provides the
 `manifest-integrity` gate. The manifest now claims 44 installable registry files
 through 36 items, with manifest/schema/test files excluded from copy inventory.
+
+Slice 8 complete: component CSS now travels through per-item/support CSS files
+under `registry/components/ui/`; the old four aggregate component CSS files are
+gone from `theme-seed`. Move-only evidence preserved 161/161 top-level CSS
+statements from base `91a01ee`, and manifest-integrity now claims 61/61
+installable registry files through 41 items.
