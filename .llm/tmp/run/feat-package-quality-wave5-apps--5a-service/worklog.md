@@ -197,3 +197,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno test --config packages/service/deno.json --allow-all packages/service/tests`: exit 1 `No test modules found` while root exclude still hides `packages/service/` before slice 15. `deno check --unstable-kv packages/service/mod.ts`: PASS exit 0 with known root-exclude warning. |
 | Concept of done | Test files are public-surface consumers and will become active when slice 15 lifts the root exclude. No test helper imports another test. |
 | Drift | none |
+
+### Slice 14/15 — A3 runtime lifecycle and failure tests
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `101e790` — `Add service runtime lifecycle tests` |
+| Changed | Added `tests/runtime_test.ts` covering ephemeral `serve({ port: 0 })`, `/health` round-trip, clean `stop()`, external AbortSignal shutdown, invalid port start failure, startup-hook failure, clean stop after handler error, and assigned listener address shape. |
+| Gate | `deno test --config packages/service/deno.json --allow-all packages/service/tests`: exit 1 `No test modules found` while root exclude still hides `packages/service/` before slice 15. `deno check --unstable-kv packages/service/mod.ts`: PASS exit 0 with known root-exclude warning. |
+| Concept of done | Runtime tests exercise A3 success, cancellation, start-failure, and shutdown-after-error paths through the public builder surface. |
+| Drift | none |

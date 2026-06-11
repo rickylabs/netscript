@@ -2,7 +2,7 @@
 
 ## Current state
 
-Implementation has started after PLAN-EVAL PASS. Slices 1-13/15 are complete:
+Implementation has started after PLAN-EVAL PASS. Slices 1-14/15 are complete:
 `packages/service/deno.json` is standardized, and service sources now live under `src/` with only
 path updates required by the move. `src/types.ts` now defines the package-owned structural mirror
 types. Handler primitives now use those mirrors for plugins, fetch handlers, not-found handlers, and
@@ -18,7 +18,8 @@ Database connectivity diagnostics are now internal under `src/diagnostics/`, log
 package-owned router/db context types. `mod.ts` is now a 130-line documented public contract and
 still barrel-only. README is 234 lines with package docs scaffold under `docs/`. Doctest and unit
 test files are added but masked until the slice 15 root-exclude lift. Next slice: runtime
-integration tests for ephemeral serve/stop and failure paths.
+integration tests for ephemeral serve/stop and failure paths are also added but masked until slice
+15. Next slice: lift `packages/service/` from root exclude and run the full validation sweep.
 
 Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
 files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do

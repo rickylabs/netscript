@@ -19,3 +19,4 @@ Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the pla
 - 104f215: Document service barrel as public contract
 - ca090b0: Add service package documentation surface
 - 86426fa: Add service doctest and unit coverage
+- 101e790: Add service runtime lifecycle tests
