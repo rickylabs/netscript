@@ -44,7 +44,7 @@ export interface KvCachePersisterStorage {
  *
  * @example
  * ```ts
- * import { KvCacheStore } from '@netscript/sdk/adapters';
+ * import { KvCacheStore } from '@netscript/sdk/cache';
  * import { createKvCachePersister } from '@netscript/sdk/query-client';
  *
  * const store = new KvCacheStore();

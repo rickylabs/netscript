@@ -16,6 +16,7 @@ import { cacheQuery } from '../src/cache/cache-query.ts';
 setCacheProvider(cacheQuery);
 
 export { CacheQuery, cacheQuery } from '../src/cache/cache-query.ts';
+export { KvCacheStore } from '../src/cache/kv-cache-store.ts';
 export type { CachedEntry, CacheEntry } from '../src/ports/cache-entry.ts';
 export { isCacheEntryStale, toCachedEntry } from '../src/ports/cache-entry.ts';
 export type { CacheQueryOptions, QueryParams } from '../src/ports/query-options.ts';

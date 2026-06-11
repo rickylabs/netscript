@@ -65,9 +65,9 @@ const result = await ordersApi.list({ limit: 10, offset: 0 });
 | `@netscript/sdk/client` | oRPC client factories and error helpers | `createServiceClient`, `safe`, `isDefinedError` |
 | `@netscript/sdk/cache` | Cache primitives and cache-entry helpers | `cacheQuery`, `CacheQuery`, `isCacheEntryStale`, `toCachedEntry` |
 | `@netscript/sdk/query` | Query factories with built-in caching | `createQueryFactories`, `createQueryFactory`, `createCompositeQuery` |
-| `@netscript/sdk/openapi` | OpenAPI spec generation | `createOpenAPIGenerator`, `generateOpenAPISpec` |
+| `@netscript/sdk` | OpenAPI spec generation | `createOpenAPIGenerator`, `generateOpenAPISpec` |
 | `@netscript/sdk/telemetry` | OpenTelemetry middleware | `otelMiddleware` |
-| `@netscript/sdk/adapters` | KV-backed cache store adapter | `KvCacheStore` |
+| `@netscript/sdk/cache` | KV-backed cache store adapter | `KvCacheStore` |
 | `@netscript/sdk/interfaces` | Canonical TypeScript contracts | `CacheStore`, `ServiceMetadata`, `PaginatedResponse` |
 
 ## Usage
@@ -158,7 +158,7 @@ await queries.orders.invalidate();
 ### Generate an OpenAPI spec
 
 ```ts
-import { createOpenAPIGenerator, generateOpenAPISpec } from "@netscript/sdk/openapi";
+import { createOpenAPIGenerator, generateOpenAPISpec } from "@netscript/sdk";
 
 const generator = createOpenAPIGenerator();
 

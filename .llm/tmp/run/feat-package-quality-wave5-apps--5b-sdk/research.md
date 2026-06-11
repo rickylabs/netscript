@@ -27,7 +27,8 @@ Source: `.llm/temp/measure-5b-sdk.ts` → `measure-5b.json`. Matches umbrella re
 - **7 of 9 ptr are NOT in sdk** — they point at
   `packages/plugin-streams-core/src/{application/create-durable-stream.ts,builders/define-stream-schema.ts}`:
   `StreamStateDefinition`, `StateSchema`, `StreamProducerPort` are package-owned there
-  but unexported, surfaced through sdk's `./streams` facade re-export (`streams.ts`
+  but not exported from the declaring module's public chain, surfaced through sdk's
+  `./streams` facade re-export (`streams.ts`
   re-exports `createDurableStream as createStreamProducer`, `DurableStreamProducer`,
   `defineStreamSchema`, …). Cross-package attribution: upstream Wave-4 package debt
   reached via sdk.
