@@ -15,3 +15,17 @@
   wrapper exit-1-with-zero-findings baseline quirk (use changed-source fmt
   checks as verdicts); tokens-drift gate env permission note for Linux
   runners (local runs unaffected).
+
+## MEASURE-FIRST + Run 2 Lock
+
+- HEAD verified: `fb71ddd` on top of `652c0bc`.
+- Baseline recorded in `measure-5c2.json`:
+  - check: PASS, test: 35 passed, lint: 0 findings, doc-lint: 0 errors
+  - tokens-drift: PASS (3 artifacts stable)
+  - manifest-integrity: PASS (62/62 files claimed, 4 excluded)
+  - JSR dry-run: PASS (`Success Dry run complete`)
+  - LOC: ~8,160 (ts+tsx+css), registry: 66 source files, 42 items, 6 collections
+  - theme CSS: 868 lines
+- **Lock decision**: Tier-Z lead component (combobox) **deferred** to dedicated
+  post-5c wave. 12 slices remain locked; no slice 13. Recorded as D-5c2-0 in
+  `drift.md`.
