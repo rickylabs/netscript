@@ -230,3 +230,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Lock hygiene | Run-local check/doc import maps and run-local `deno.lock` were expanded for the root entrypoint graph (`@orpc/openapi`, `@orpc/zod`, `@netscript/plugin-streams-core`, `@durable-streams/client`, `@durable-streams/state`). Root `deno.lock` was not touched. |
 | Concept of done | Each public entrypoint now explains when to import that layer and how it composes with the adjacent SDK layers; no docs-only facade exists solely for folder shape. |
 | Drift | none |
+
+### Slice 15/19 — README and architecture docs
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `6e50265` — `Document sdk package architecture` |
+| Changed | Replaced `packages/sdk/README.md` with a 14-section package guide covering install, entrypoints, `defineServices()`, direct clients, query factories, query-client, cache, discovery, collections, OpenAPI/telemetry, ports, architecture notes, and validation. Added `packages/sdk/docs/architecture.md` with layer map, composability contract, type inference contract, transport seam audit, discovery split, cache state, public surface boundaries, and contributor path. |
+| Gate | Raw `Deno.Command`: `deno fmt --check --no-config packages/sdk/README.md packages/sdk/docs/architecture.md` PASS exit 0. Wrapper read: `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/sdk --pretty` exit 0; combined missingJSDoc 0, combined privateTypeRef 0, combinedOther 0 for the current entrypoint set. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. Architecture probe confirmed `Layer Map`, `Composability Contract`, `Transport Seam Audit`, `ClientLinkFactory`, `defineServices`, and `CacheQuery` references in `docs/architecture.md`. |
+| Size check | README: 329 lines, 14 `##` sections. Architecture doc: 116 lines. |
+| Concept of done | A contributor can start from README quickstart, drop down through focused subpaths, then use `docs/architecture.md` to extend the right layer without inventing new seams. |
+| Drift | none |
