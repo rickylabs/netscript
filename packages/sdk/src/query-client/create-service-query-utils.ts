@@ -10,6 +10,8 @@
  */
 
 import { createTanstackQueryUtils } from '@orpc/tanstack-query';
+import type { ContractLike, ServiceClient } from '../ports/service-client.ts';
+import type { ServiceQueryUtils } from '../ports/service-query-utils.ts';
 
 /**
  * Options for creating TanStack Query utils from an SDK service client.
@@ -45,18 +47,18 @@ export interface CreateServiceQueryUtilsOptions {
  *   ordersQueryUtils.list.queryOptions({ input: { page: 1, limit: 20 } }),
  * );
  * ```
+ *
+ * @typeParam TContract - Contract used by the service client.
  */
-// deno-lint-ignore no-explicit-any
-export function createServiceQueryUtils<TClient extends Record<string, any>>(
-  client: TClient,
+export function createServiceQueryUtils<TContract extends ContractLike>(
+  client: ServiceClient<TContract>,
   options?: CreateServiceQueryUtilsOptions,
-) {
-  // The SDK's createServiceClient() returns an actual oRPC client (via
-  // createORPCClient). The ServiceClient<T> type alias narrows the proxy
-  // shape for SDK ergonomics, but the runtime value IS a NestedClient.
-  // We use `any` here to bridge the structural-vs-nominal type gap.
-  // deno-lint-ignore no-explicit-any
-  return createTanstackQueryUtils(client as any, {
+): ServiceQueryUtils<TContract> {
+  const utils: unknown = createTanstackQueryUtils(client, {
     path: options?.path,
   });
+  // The runtime value is produced by createORPCClient and accepted by
+  // createTanstackQueryUtils; the SDK return type remaps that upstream
+  // utility shape back to the package-owned contract algebra.
+  return utils as ServiceQueryUtils<TContract>;
 }

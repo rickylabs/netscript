@@ -147,13 +147,29 @@ export type ServiceClientMethod<TInput, TOutput> = (
 ) => Promise<TOutput>;
 
 /**
- * Typed service client derived from a contract router.
+ * Compile-time marker that preserves the source contract for inference.
  */
-export type ServiceClient<TContract extends ContractLike> = TContract extends ContractProcedureLike
+export interface ServiceClientContract<TContract extends ContractLike> {
+  /** Contract marker used only by TypeScript inference. */
+  readonly __netscriptServiceContract?: TContract;
+}
+
+/**
+ * Recursive callable/router shape for a typed service client.
+ */
+export type ServiceClientShape<TContract extends ContractLike> = TContract extends
+  ContractProcedureLike
   ? ServiceClientMethod<ProcedureInputFromNode<TContract>, ProcedureOutputFromNode<TContract>>
   : {
     [K in keyof TContract]: TContract[K] extends ContractLike ? ServiceClient<TContract[K]> : never;
   };
+
+/**
+ * Typed service client derived from a contract router.
+ */
+export type ServiceClient<TContract extends ContractLike> =
+  & ServiceClientShape<TContract>
+  & ServiceClientContract<TContract>;
 
 /**
  * Options for creating a discovered service client.

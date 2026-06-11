@@ -70,7 +70,9 @@ export type {
   ProcedureOutputFromNode,
   ServiceClient,
   ServiceClientContext,
+  ServiceClientContract,
   ServiceClientMethod,
+  ServiceClientShape,
   ServiceRequestOptions,
 } from '../src/ports/service-client.ts';
 export type { ServiceTransport } from '../src/ports/transport.ts';
