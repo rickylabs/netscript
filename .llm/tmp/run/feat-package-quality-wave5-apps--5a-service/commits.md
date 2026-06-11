@@ -15,3 +15,4 @@ Implementation slices 1–15 (plan §4) begin only after PLAN-EVAL locks the pla
 - ff9ca2d: Expose service builder as structural interface
 - 58e7d1e: Add stoppable service runtime handle
 - d33d6d1: Extract service database diagnostics behind logger
+- 53b646a: Return running service from defineService

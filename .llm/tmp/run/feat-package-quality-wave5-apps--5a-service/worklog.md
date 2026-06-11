@@ -157,3 +157,13 @@ PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/
 | Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. `Select-String packages/service/src/**/*.ts -Pattern 'console\\.'`: 0 matches. Line counts: `define-service.ts` 143, diagnostics module 395. |
 | Concept of done | The diagnostics module is reachable from the preset startup hook, not exported through the public barrel, and names database engine/env vocabulary in one internal file. |
 | Drift | none |
+
+### Slice 10/15 — D-13 `defineService()` returns `RunningService`
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `53b646a` — `Return running service from defineService` |
+| Changed | `defineService()` now returns `Promise<RunningService>` from `builder.withHealth().serve()`. Preset router and db context signatures use `ServiceRouter`, `DbContext`, `Database`, and `RunningService`; local `AnyRouter` and explicit `any` context typing were removed. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command`: PASS exit 0 with known root-exclude warning. Focused search in preset found no remaining `AnyRouter`, explicit `any`, `Promise<void>`, or `ensureLogging` implementation references. |
+| Concept of done | Preset users now get the same lifecycle stop handle as builder users, while existing await-and-ignore consumers remain valid. |
+| Drift | none |
