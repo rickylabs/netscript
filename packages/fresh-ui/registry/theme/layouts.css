@@ -294,11 +294,11 @@
 }
 
 .ns-status-bar__sep {
-  color: rgba(135, 132, 125, 0.4);
+  color: color-mix(in srgb, var(--ns-muted-fg) 40%, transparent);
 }
 
 .ns-status-sep {
-  color: rgba(135, 132, 125, 0.4);
+  color: color-mix(in srgb, var(--ns-muted-fg) 40%, transparent);
 }
 
 .ns-skip-link {
