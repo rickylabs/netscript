@@ -20,6 +20,7 @@
       "**/*.ts",
       "**/*.tsx",
       "**/*.css",
+      "registry/**/*.json",
       "deno.json",
       "README.md"
     ],
@@ -34,8 +35,8 @@
   "tasks": {
     "check": "deno check --config deno.gates.json --no-lock --unstable-kv \"**/*.ts\" \"**/*.tsx\"",
     "test": "deno test --config deno.gates.json --no-lock --unstable-kv \"**/*_test.ts\" \"**/*_test.tsx\" \"**/*.test.ts\" \"**/*.test.tsx\"",
-    "tokens:build": "deno run --no-lock --allow-read=. --allow-write=registry/theme/tokens.css --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
-    "tokens:check": "deno task tokens:build && git diff --exit-code registry/theme/tokens.css"
+    "tokens:build": "deno run --no-lock --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
+    "tokens:check": "deno task tokens:build && git diff --exit-code registry/theme/tokens.css registry/theme/theme-bridge.css registry/theme/tokens.json"
   },
   "compilerOptions": {
     "lib": [

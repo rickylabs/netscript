@@ -1,59 +1,11 @@
-@import 'tailwindcss';
-@import './tokens.css';
-@import './layouts.css';
-@import './components/actions.css';
-@import './components/forms.css';
-@import './components/surfaces.css';
-@import './components/feedback.css';
-
-@theme {
-  --color-ns-bg: var(--ns-bg);
-  --color-ns-fg: var(--ns-fg);
-  --color-ns-surface: var(--ns-surface);
-  --color-ns-surface-raised: var(--ns-surface-raised);
-  --color-ns-overlay: var(--ns-overlay);
-  --color-ns-card: var(--ns-card);
-  --color-ns-card-fg: var(--ns-card-fg);
-  --color-ns-primary: var(--ns-primary);
-  --color-ns-primary-fg: var(--ns-primary-fg);
-  --color-ns-primary-hover: var(--ns-primary-hover);
-  --color-ns-primary-subtle: var(--ns-primary-subtle);
-  --color-ns-secondary: var(--ns-secondary);
-  --color-ns-secondary-fg: var(--ns-secondary-fg);
-  --color-ns-secondary-hover: var(--ns-secondary-hover);
-  --color-ns-secondary-subtle: var(--ns-secondary-subtle);
-  --color-ns-muted: var(--ns-muted);
-  --color-ns-muted-fg: var(--ns-muted-fg);
-  --color-ns-accent: var(--ns-accent);
-  --color-ns-accent-fg: var(--ns-accent-fg);
-  --color-ns-accent-subtle: var(--ns-accent-subtle);
-  --color-ns-success: var(--ns-success);
-  --color-ns-success-fg: var(--ns-success-fg);
-  --color-ns-success-subtle: var(--ns-success-subtle);
-  --color-ns-warning: var(--ns-warning);
-  --color-ns-warning-fg: var(--ns-warning-fg);
-  --color-ns-warning-subtle: var(--ns-warning-subtle);
-  --color-ns-destructive: var(--ns-destructive);
-  --color-ns-destructive-fg: var(--ns-destructive-fg);
-  --color-ns-destructive-subtle: var(--ns-destructive-subtle);
-  --color-ns-border: var(--ns-border);
-  --color-ns-border-hover: var(--ns-border-hover);
-  --color-ns-border-strong: var(--ns-border-strong);
-  --color-ns-input: var(--ns-input-border);
-  --color-ns-ring: var(--ns-ring);
-  --font-sans: var(--ns-font-sans);
-  --font-mono: var(--ns-font-mono);
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --shadow-xs: var(--ns-shadow-xs);
-  --shadow-sm: var(--ns-shadow-sm);
-  --shadow-md: var(--ns-shadow-md);
-  --shadow-lg: var(--ns-shadow-lg);
-}
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./theme-bridge.css";
+@import "./layouts.css";
+@import "./components/actions.css";
+@import "./components/forms.css";
+@import "./components/surfaces.css";
+@import "./components/feedback.css";
 
 @layer base {
   html {
@@ -64,7 +16,7 @@
     min-height: 100%;
   }
 
-  html[data-theme='light'] {
+  html[data-theme="light"] {
     color-scheme: light;
   }
 
