@@ -1,0 +1,5 @@
+[0m[3m[38;5;8mDefined in file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/Accordion.tsx:65:14
+
+[0m[0m[3m[38;5;8m[0m[0m[35mconst[0m [0m[1mAccordion[0m: { [0m[35m[0m[0m[1mItem[0m[0m[35m[0m; [0m[35m[0m[0m[1mItemContent[0m[0m[35m[0m; [0m[35m[0m[0m[1mItemIndicator[0m[0m[35m[0m; [0m[35m[0m[0m[1mItemTrigger[0m[0m[35m[0m; [0m[35m[0m[0m[1mRoot[0m[0m[35m[0m; }
+  Compound accordion namespace with root and item subcomponents.
+
