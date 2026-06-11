@@ -57,6 +57,8 @@ export type {
   HealthCheckResponse,
   PaginatedResponse,
   QueryClientPort,
+  ServiceClientContract,
+  ServiceClientShape,
   ServiceMetadata,
   ServiceQueryUtils,
   ServiceTransport,

@@ -28,6 +28,8 @@ export type {
   ProcedureOutputFromNode,
   ServiceClient,
   ServiceClientContext,
+  ServiceClientContract,
   ServiceClientMethod,
+  ServiceClientShape,
   ServiceRequestOptions,
 } from '../src/ports/service-client.ts';

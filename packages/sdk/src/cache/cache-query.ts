@@ -100,10 +100,12 @@ export class CacheQuery {
     return await this.fetchAndCacheOnce(queryFn, key, inflightKey, cacheTime);
   }
 
+  /** Return an existing in-flight fetch for this query key. */
   private getInflight<TData>(inflightKey: string): Promise<TData> | undefined {
     return this.inflightRequests.get(inflightKey) as Promise<TData> | undefined;
   }
 
+  /** Recheck in-flight state before starting a cache refresh. */
   private fetchAndCacheOnce<TData>(
     queryFn: () => Promise<TData>,
     cacheKey: Deno.KvKey,

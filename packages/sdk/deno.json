@@ -26,6 +26,7 @@
     "@netscript/kv": "../kv/mod.ts",
     "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
     "@netscript/telemetry": "../telemetry/mod.ts",
+    "@std/assert": "jsr:@std/assert@^1",
     "@standard-schema/spec": "npm:@standard-schema/spec@^1.1.0",
     "@orpc/client": "npm:@orpc/client@^1.13.5",
     "@orpc/contract": "npm:@orpc/contract@^1.13.5",
@@ -44,6 +45,7 @@
       "README.md"
     ],
     "exclude": [
+      "tests/",
       "**/*_test.ts",
       "**/*.test.ts"
     ]

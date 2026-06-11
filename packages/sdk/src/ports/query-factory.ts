@@ -83,7 +83,10 @@ export interface ActionMethod<
   /** TanStack mutationOptions with typed mutationKey and mutationFn. */
   mutationOptions: (
     options?: ActionMutationOptions,
-  ) => MutationOptionsResult<ProcedureOutput<TContract, TAction>, ProcedureInput<TContract, TAction>>;
+  ) => MutationOptionsResult<
+    ProcedureOutput<TContract, TAction>,
+    ProcedureInput<TContract, TAction>
+  >;
 
   /** Client-side query key for TanStack invalidation (prefix-matchable). */
   clientKey: (

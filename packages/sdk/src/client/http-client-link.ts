@@ -11,7 +11,7 @@ import {
   type ClientRetryPluginContext,
   DedupeRequestsPlugin,
 } from '@orpc/client/plugins';
-import { StandardLinkClientInterceptorOptions } from '@orpc/client/standard';
+import type { StandardLinkClientInterceptorOptions } from '@orpc/client/standard';
 import {
   type AnyContractRouter as ORPCAnyContractRouter,
   inferRPCMethodFromContractRouter,
