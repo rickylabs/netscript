@@ -13,3 +13,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 - 8759d99: Fold sdk adapters and openapi subpaths
 - 549326c: Export stream producer types for sdk docs
 - 9585851: Add sdk query client structural port
+- 82abaa6: Add sdk service query utils type mirror

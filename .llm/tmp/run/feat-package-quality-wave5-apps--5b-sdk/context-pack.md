@@ -6,7 +6,7 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-6/19 are complete. `packages/sdk/deno.json` now has package-local
+Slices 1-7/19 are complete. `packages/sdk/deno.json` now has package-local
 `check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
 now live under `packages/sdk/src/`, with public subpath facades retained at their
 locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
@@ -22,7 +22,12 @@ plugin core type surface so sdk-facing doc-lint can see the full chain. Slice 6 
 `QueryClientPort` in `src/ports/query-client.ts`, documented the member list with
 consumer drivers, changed `createNetScriptQueryClient()` to return the structural port,
 and changed collection options to accept the port with an internal TanStack boundary
-cast. Next slice: `ServiceQueryUtils<TContract>` mapped type (type-only + fixtures).
+cast. Slice 7 added `ServiceQueryUtils<TContract>` in `src/ports/service-query-utils.ts`,
+exported it through `./ports`, `./query-client`, and root, and added dual compile-only
+fixtures proving sdk contract inference plus upstream `createTanstackQueryUtils()`
+return assignability. Next slice: type `createServiceQueryUtils()` as
+`createServiceQueryUtils<TContract>(client: ServiceClient<TContract>, options?)` with
+the single documented upstream-boundary cast.
 
 ## What the plan session did
 

@@ -140,3 +140,14 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Advisory | B4 completed for current width: each `QueryClientPort` member has a JSDoc line naming the sdk/Fresh/TanStack DB consumer that drives it. |
 | Concept of done | The public sdk surface no longer exposes TanStack's `QueryClient` type. The port is package-owned, structural, upstream-type-free, and narrow enough to document the maintenance width. |
 | Drift | none |
+
+### Slice 7/19 — D-6a `ServiceQueryUtils<TContract>` mapped type
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `82abaa6` — `Add sdk service query utils type mirror` |
+| Changed | Added `packages/sdk/src/ports/service-query-utils.ts`, a package-owned structural mirror for oRPC/TanStack query utilities derived from the existing `ContractLike` algebra. Exported `ServiceQueryUtils<TContract>` and named option/result aliases through `./ports`, `./query-client`, and root. Added compile-only fixtures for sdk contract inference and upstream `createTanstackQueryUtils()` return assignability. Runtime `createServiceQueryUtils()` is unchanged until slice 8. |
+| Gate | Raw `Deno.Command`: `deno check --no-config --unstable-kv ./packages/sdk/tests/type-fixtures/service-query-utils-contract_type.ts ./packages/sdk/tests/type-fixtures/service-query-utils-upstream_type.ts` PASS exit 0. Raw `Deno.Command`: `deno lint --no-config ./packages/sdk/src/ports/service-query-utils.ts ./packages/sdk/tests/type-fixtures/service-query-utils-contract_type.ts ./packages/sdk/tests/type-fixtures/service-query-utils-upstream_type.ts` PASS exit 0. Raw `Deno.Command`: `deno fmt --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json --check <slice-7 files>` PASS exit 0. Raw `Deno.Command`: `deno doc --lint ./packages/sdk/src/ports/service-client.ts ./packages/sdk/src/ports/service-query-utils.ts` PASS, checked 2 files. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Gate notes | Direct `ports` / `query-client` barrel doc-lint still reports known pre-existing later-slice findings in `src/query-client/types.ts`, `kv-cache-persister.ts`, and the slice-8 return annotation on `createServiceQueryUtils()`; the new port passes with its contract-algebra source. |
+| Concept of done | The type layer is reachable from public surfaces and fixtures. The mirror is structural and upstream-type-free, and the dual fixture proves that the current upstream utility result is assignable to the sdk type while preserving contract-derived input/output inference. |
+| Drift | none |
