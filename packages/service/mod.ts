@@ -46,10 +46,12 @@ export {
   createHealthHandler,
   createLivenessHandler,
   createReadinessHandler,
+  HEALTH_STATUS,
   type HealthCheck,
   healthChecks,
   type HealthHandlerOptions,
   type HealthResponse,
+  type HealthStatus,
 } from './src/primitives/health.ts';
 
 export {
