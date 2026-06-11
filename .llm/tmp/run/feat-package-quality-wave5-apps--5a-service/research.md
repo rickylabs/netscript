@@ -17,6 +17,10 @@ Reconciles exactly with umbrella re-baseline @ dfab7a4.
 | Tests | **0** (no tests/ dir, no `*_test.ts` anywhere in package) |
 | README / docs/ | **none** (README-from-zero confirmed) |
 
+Aspire: N/A for `@netscript/service`. The package uses `Deno.serve` directly and exposes health
+handlers/builders; Aspire health probes are service-layer-consumer concerns, not package runtime
+integration points.
+
 ### 0.1 `excluded-module` root cause (NEW finding vs umbrella baseline)
 
 The 6 `excluded-module` dry-run errors are caused by **root `deno.json`

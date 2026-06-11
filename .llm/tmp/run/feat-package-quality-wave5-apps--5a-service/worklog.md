@@ -63,3 +63,17 @@ docs/architecture (layered surface + seam notes) → tests as living examples
 
 Artifacts ready for PLAN-EVAL (separate session): research.md, plan.md (PROPOSED, not
 locked), drift.md, context-pack.md, measure-5a.json. No implementation performed.
+
+## Implementation
+
+### Slice 1/15 — D-10 standardize deno.json
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `0785a8f` — `Standardize service package metadata for publish gates` |
+| Changed | `packages/service/deno.json` now declares description, MIT license, local check/test/lint/fmt/publish tasks, and publish include/exclude metadata that keeps `mod.ts`, future `src/`, docs, README, and `assets/scalar.min.js` in the package. |
+| Gate | `deno check --unstable-kv packages/service/mod.ts` via raw `Deno.Command` from repo root: PASS exit 0, known `No matching files found` warning while root `deno.json` still excludes `packages/service/` until slice 15. Package-local rerun with `--config packages/service/deno.json` produced the same exit-0 warning, consistent with drift D-2. |
+| Concept of done | Metadata-only slice; no source files created. Publish metadata preserves D-9 asset inclusion and prepares D-11 root-exclude lift. |
+| Drift | none |
+
+PLAN-EVAL advisory fold-ins started in this slice: research records Aspire as N/A for this package, and plan exit gates now name jsr-audit publishability target `>=7/10`.

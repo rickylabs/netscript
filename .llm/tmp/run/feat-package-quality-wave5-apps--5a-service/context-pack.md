@@ -1,4 +1,15 @@
-# Context pack — Sub-wave 5a: `@netscript/service` (for PLAN-EVAL)
+# Context pack — Sub-wave 5a: `@netscript/service`
+
+## Current state
+
+Implementation has started after PLAN-EVAL PASS. Slice 1/15 is complete:
+`packages/service/deno.json` is standardized with description, license, package-local tasks, and
+publish include/exclude metadata. Implementation commit: `0785a8f`. Next slice: move service
+sources under `src/` as a rename-only transient slice.
+
+Known caveat: `deno check --unstable-kv packages/service/mod.ts` still exits 0 with `No matching
+files found` because root `deno.json` excludes `packages/service/` until slice 15 (drift D-2). Do
+not treat root-exclude lift as available before slice 15.
 
 ## What this session did
 

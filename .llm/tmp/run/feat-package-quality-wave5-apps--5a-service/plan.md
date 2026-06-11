@@ -142,8 +142,8 @@ Each slice ends `deno check --unstable-kv packages/service/mod.ts` green
 - Consumer gates: `deno task check:plugins` (workers/sagas main.ts compile against new
   surface) — attribute any failure to the causing slice (consumer-gate attribution
   lesson)
-- jsr-audit rubric applied to final surface (description, license, docs, exports,
-  no slow types, no `any`)
+- jsr-audit rubric applied to final surface with publishability target **≥7/10**
+  (description, license, docs, exports, no slow types, no `any`)
 
 ## 6. Risk register
 
