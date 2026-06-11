@@ -218,3 +218,15 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Advisory | B3 complete: runtime SWR/cache timing defaults now resolve through `src/cache/defaults.ts`; remaining `30_000`/`300_000` matches are docs or the constants home. |
 | Concept of done | The touched public interfaces have one-line member docs, cache state is explicit at the `CacheQuery` boundary, and a contributor can extend timing defaults by editing one constants file. |
 | Drift | none |
+
+### Slice 14/19 — root and subpath module docs
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `4938c64` — `Document sdk module entrypoints` |
+| Changed | Expanded root `packages/sdk/mod.ts` module docs to describe the root barrel, L3 `defineServices()` path, focused subpaths, server-only cache warning, discovery isolation, and port ownership. Refreshed module docs for `cache`, `client`, `collections`, `discovery`, `ports`, `query`, `query-client`, `streams`, and `telemetry` facades. No export surface changed. |
+| Gate | Raw `Deno.Command`: `deno check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json --unstable-kv packages/sdk/mod.ts packages/sdk/cache/mod.ts packages/sdk/client/mod.ts packages/sdk/collections/mod.ts packages/sdk/discovery/mod.ts packages/sdk/ports/mod.ts packages/sdk/query/mod.ts packages/sdk/query-client/mod.ts packages/sdk/telemetry/mod.ts packages/sdk/streams.ts` PASS exit 0 with an npm peer warning only. Raw `Deno.Command`: `deno doc --lint --import-map .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-doc-import-map.json <all current sdk entrypoints>` PASS, checked 10 files. Raw `Deno.Command`: `deno lint --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-check-sdk.json <all current sdk entrypoints>` PASS exit 0. Raw `Deno.Command`: `deno fmt --check --config .llm/tmp/run/feat-package-quality-wave5-apps--5b-sdk/deno-format-sdk.json <all current sdk entrypoints + run configs>` PASS exit 0. Raw `Deno.Command`: `deno task check` from `packages/sdk` PASS exit 0 with known pre-slice-19 root-exclude warning. |
+| Size check | Root `mod.ts` module doc block is 35 lines, satisfying the >=30L requirement. |
+| Lock hygiene | Run-local check/doc import maps and run-local `deno.lock` were expanded for the root entrypoint graph (`@orpc/openapi`, `@orpc/zod`, `@netscript/plugin-streams-core`, `@durable-streams/client`, `@durable-streams/state`). Root `deno.lock` was not touched. |
+| Concept of done | Each public entrypoint now explains when to import that layer and how it composes with the adjacent SDK layers; no docs-only facade exists solely for folder shape. |
+| Drift | none |

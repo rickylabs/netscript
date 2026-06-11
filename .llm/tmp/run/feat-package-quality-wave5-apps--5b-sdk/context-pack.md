@@ -47,7 +47,10 @@ compatibility barrel and adding three parity tests for lookup ordering
 JSDoc member sweep reached by the current public surface, centralized SWR/cache
 timing defaults in `src/cache/defaults.ts`, and moved `inflightRequests` from
 module state onto `CacheQuery` instance state with an optional constructor-injected
-map. Next slice: root `mod.ts` @module docs >=30L and per-subpath module docs.
+map. Slice 14 expanded root `mod.ts` module docs to 35 lines and refreshed all
+subpath module docs without changing exports. Next slice: README (14 sections,
+>=150L) plus `docs/architecture.md` layer map, composability contract, and
+transport seam audit.
 
 ## What the plan session did
 

@@ -20,3 +20,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 - a18ee60: Add sdk defineServices composition preset
 - 4fccdd8: Split sdk discovery lookup modules
 - 4443e5f: Document sdk cache state boundaries
+- 4938c64: Document sdk module entrypoints
