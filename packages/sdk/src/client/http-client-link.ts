@@ -109,6 +109,7 @@ export function createHttpClientLink({
       globalThis.fetch(request, {
         ...init,
         cache: context?.cache as RequestCache,
+        signal: context?.signal,
       }),
   });
   return link as ClientLinkPort<ServiceClientContext>;

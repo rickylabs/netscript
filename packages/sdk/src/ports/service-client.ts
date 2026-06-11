@@ -105,6 +105,8 @@ export type ProcedureOutputFromNode<TNode> = TNode extends ContractProcedureLike
  * Per-call service client context.
  */
 export interface ServiceClientContext {
+  /** Abort signal forwarded to the underlying HTTP request. */
+  signal?: AbortSignal;
   /** Fetch cache mode forwarded to `fetch`. */
   cache?: RequestCache;
   /** Retry count or resolver for stream-style subscriptions. */
