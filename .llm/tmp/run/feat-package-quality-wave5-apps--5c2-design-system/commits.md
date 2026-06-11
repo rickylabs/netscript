@@ -8,3 +8,4 @@
 | 1 (cont.) | `ae29999` | — | form-control-styles + sheet rgba cleanup; worklog entry added in takeover follow-up |
 | 2 | `7c5dffc` | — | layouts.css token cleanup; worklog entry added in takeover follow-up |
 | takeover bookkeeping | — | `9a1f971` | worklog slices 1-cont/2 + commits.md reconciliation |
+| 2 (cont.) | `7c09c06` | — | step-0 audit; layout-objects style item extraction (drift D-5c2-1) |
