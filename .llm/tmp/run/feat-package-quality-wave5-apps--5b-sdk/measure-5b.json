@@ -1,0 +1,292 @@
+{
+  "pkg": "packages/sdk",
+  "measuredAt": "2026-06-11T10:34:05.347Z",
+  "entrypoints": [
+    "packages/sdk/mod.ts",
+    "packages/sdk/adapters/mod.ts",
+    "packages/sdk/cache/mod.ts",
+    "packages/sdk/client/mod.ts",
+    "packages/sdk/collections/mod.ts",
+    "packages/sdk/discovery/mod.ts",
+    "packages/sdk/interfaces/mod.ts",
+    "packages/sdk/openapi/mod.ts",
+    "packages/sdk/query/mod.ts",
+    "packages/sdk/query-client/mod.ts",
+    "packages/sdk/streams.ts",
+    "packages/sdk/telemetry/mod.ts"
+  ],
+  "check": {
+    "code": 0,
+    "stderr": "\u001b[0m\u001b[33mWarning\u001b[0m No matching files found.\n"
+  },
+  "docLintCombined": {
+    "code": 1,
+    "total": 29,
+    "byRule": {
+      "private-type-ref": 9,
+      "missing-return-type": 2,
+      "missing-jsdoc": 18
+    },
+    "raw": "\u001b[0m\u001b[33m╭\u001b[0m \u001b[0m\u001b[1m\u001b[33mWarning\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Ignored build scripts for packages:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:lmdb@3.5.5\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[3mnpm:msgpackr-extract@3.0.4\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m\n\u001b[0m\u001b[33m│\u001b[0m  Lifecycle scripts are only supported when using a `node_modules` directory.\n\u001b[0m\u001b[33m│\u001b[0m  Enable it in your deno config file:\n\u001b[0m\u001b[33m│\u001b[0m  \u001b[0m\u001b[1m\"nodeModulesDir\": \"auto\"\u001b[0m\n\u001b[0m\u001b[33m╰─\u001b[0m\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'createNetScriptQueryClient' references private type 'QueryClient'\u001b[0m\n    \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\query-client-factory.ts\u001b[0m\u001b[0m\u001b[33m:43:1\u001b[0m\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\n  \u001b[0m\u001b[38;5;12m43 | \u001b[0mexport function createNetScriptQueryClient(\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n     \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m1285 | \u001b[0mdeclare class QueryClient {\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'QueryCollectionOptions[\"queryClient\"]' references private type 'QueryClient'\u001b[0m\n    \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\collections\\create-query-collection.ts\u001b[0m\u001b[0m\u001b[33m:28:3\u001b[0m\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\n  \u001b[0m\u001b[38;5;12m28 | \u001b[0m  queryClient: QueryClient;\n    \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n     \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m1285 | \u001b[0mdeclare class QueryClient {\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n    \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-return-type]\u001b[0m: \u001b[0m\u001b[1mexported function is missing an explicit return type annotation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\collections\\create-query-collection.ts\u001b[0m\u001b[0m\u001b[33m:54:1\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m54 | \u001b[0mexport function createQueryCollection<TItem extends Record<string, unknown>>(\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'DurableStreamProducerOptions' references private type 'StreamStateDefinition'\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\plugin-streams-core\\src\\application\\create-durable-stream.ts\u001b[0m\u001b[0m\u001b[33m:7:1\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n \u001b[0m\u001b[38;5;12m7 | \u001b[0mexport interface DurableStreamProducerOptions<TDef extends StreamStateDefinition> {\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m29 | \u001b[0mexport type StreamStateDefinition = Record<string, CollectionDefinition>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'DurableStreamProducerOptions[\"schema\"]' references private type 'StateSchema'\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\plugin-streams-core\\src\\application\\create-durable-stream.ts\u001b[0m\u001b[0m\u001b[33m:11:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m11 | \u001b[0m  readonly schema: StateSchema<TDef>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m32 | \u001b[0mexport type StateSchema<TDef extends StreamStateDefinition> = {\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'DurableStreamProducer' references private type 'StreamStateDefinition'\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\plugin-streams-core\\src\\application\\create-durable-stream.ts\u001b[0m\u001b[0m\u001b[33m:33:1\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m33 | \u001b[0mexport class DurableStreamProducer<TDef extends StreamStateDefinition>\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m29 | \u001b[0mexport type StreamStateDefinition = Record<string, CollectionDefinition>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'DurableStreamProducer' references private type 'StreamProducerPort'\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\plugin-streams-core\\src\\application\\create-durable-stream.ts\u001b[0m\u001b[0m\u001b[33m:33:1\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m33 | \u001b[0mexport class DurableStreamProducer<TDef extends StreamStateDefinition>\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n \u001b[0m\u001b[38;5;12m4 | \u001b[0mexport interface StreamProducerPort {\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'createDurableStream' references private type 'StreamStateDefinition'\u001b[0m\n   \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\plugin-streams-core\\src\\application\\create-durable-stream.ts\u001b[0m\u001b[0m\u001b[33m:250:1\u001b[0m\n   \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m250 | \u001b[0mexport function createDurableStream<TDef extends StreamStateDefinition>(\n   \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n    \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n   \u001b[0m\u001b[38;5;12m | \u001b[0m\n \u001b[0m\u001b[38;5;12m29 | \u001b[0mexport type StreamStateDefinition = Record<string, CollectionDefinition>;\n   \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n   \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'defineStreamSchema' references private type 'StreamStateDefinition'\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\plugin-streams-core\\src\\builders\\define-stream-schema.ts\u001b[0m\u001b[0m\u001b[33m:24:1\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m24 | \u001b[0mexport function defineStreamSchema<TDef extends StreamStateDefinition>(\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m29 | \u001b[0mexport type StreamStateDefinition = Record<string, CollectionDefinition>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[private-type-ref]\u001b[0m: \u001b[0m\u001b[1mpublic type 'defineStreamSchema' references private type 'StateSchema'\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\plugin-streams-core\\src\\builders\\define-stream-schema.ts\u001b[0m\u001b[0m\u001b[33m:24:1\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m24 | \u001b[0mexport function defineStreamSchema<TDef extends StreamStateDefinition>(\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n   \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: make the referenced type public or remove the reference\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m32 | \u001b[0mexport type StateSchema<TDef extends StreamStateDefinition> = {\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[38;5;12m-\u001b[0m \u001b[0m\u001b[38;5;12mthis is the referenced type\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: to ensure documentation is complete all types that are exposed in the public API must be public\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\cache-provider.ts\u001b[0m\u001b[0m\u001b[33m:25:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m25 | \u001b[0m  query<TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<TData>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\cache-provider.ts\u001b[0m\u001b[0m\u001b[33m:26:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m26 | \u001b[0m  prefetch<TData>(queryKey: QueryKey, options: CacheQueryOptions<TData>): Promise<void>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\cache-provider.ts\u001b[0m\u001b[0m\u001b[33m:27:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m27 | \u001b[0m  getCachedData<TData>(queryKey: QueryKey): Promise<TData | null>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\cache-provider.ts\u001b[0m\u001b[0m\u001b[33m:28:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m28 | \u001b[0m  getCachedEntry<TData>(queryKey: QueryKey): Promise<CachedEntry<TData> | null>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\cache-provider.ts\u001b[0m\u001b[0m\u001b[33m:29:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m29 | \u001b[0m  invalidateQueries(prefix: QueryKey): Promise<void>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-return-type]\u001b[0m: \u001b[0m\u001b[1mexported function is missing an explicit return type annotation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\create-service-query-utils.ts\u001b[0m\u001b[0m\u001b[33m:50:1\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m50 | \u001b[0mexport function createServiceQueryUtils<TClient extends Record<string, any>>(\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\kv-cache-persister.ts\u001b[0m\u001b[0m\u001b[33m:37:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m37 | \u001b[0m  getItem: (key: string) => Promise<string | null>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\kv-cache-persister.ts\u001b[0m\u001b[0m\u001b[33m:38:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m38 | \u001b[0m  setItem: (key: string, value: string) => Promise<void>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\kv-cache-persister.ts\u001b[0m\u001b[0m\u001b[33m:39:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m39 | \u001b[0m  removeItem: (key: string) => Promise<void>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:25:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m25 | \u001b[0m  readonly queryKey: readonly unknown[];\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:26:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m26 | \u001b[0m  readonly queryFn: () => Promise<TData>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:27:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m27 | \u001b[0m  readonly initialData?: TData;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:28:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m28 | \u001b[0m  readonly initialDataUpdatedAt?: number;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:29:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m29 | \u001b[0m  readonly staleTime: number;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:38:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m38 | \u001b[0m  onError?: (...args: unknown[]) => void;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:39:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m39 | \u001b[0m  onSettled?: (...args: unknown[]) => void;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:40:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m40 | \u001b[0m  onMutate?: (...args: unknown[]) => unknown;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:48:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m48 | \u001b[0m  readonly mutationKey: readonly unknown[];\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror[missing-jsdoc]\u001b[0m: \u001b[0m\u001b[1mexported symbol is missing JSDoc documentation\u001b[0m\n  \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\query-client\\types.ts\u001b[0m\u001b[0m\u001b[33m:49:3\u001b[0m\n  \u001b[0m\u001b[38;5;12m | \u001b[0m\n\u001b[0m\u001b[38;5;12m49 | \u001b[0m  readonly mutationFn: (input: TInput) => Promise<TData>;\n  \u001b[0m\u001b[38;5;12m | \u001b[0m  \u001b[0m\u001b[1m\u001b[31m^\u001b[0m\n\n\n\u001b[0m\u001b[1m\u001b[31merror\u001b[0m: Found \u001b[0m\u001b[1m29\u001b[0m documentation lint errors.\n"
+  },
+  "docLintBarrel": {
+    "code": 1,
+    "total": 20,
+    "byRule": {
+      "private-type-ref": 1,
+      "missing-jsdoc": 18,
+      "missing-return-type": 1
+    }
+  },
+  "docLintPerEntrypoint": {
+    "packages/sdk/mod.ts": {
+      "code": 1,
+      "total": 20,
+      "byRule": {
+        "private-type-ref": 1,
+        "missing-jsdoc": 18,
+        "missing-return-type": 1
+      }
+    },
+    "packages/sdk/adapters/mod.ts": {
+      "code": 1,
+      "total": 3,
+      "byRule": {
+        "private-type-ref": 3
+      }
+    },
+    "packages/sdk/cache/mod.ts": {
+      "code": 1,
+      "total": 5,
+      "byRule": {
+        "missing-jsdoc": 5
+      }
+    },
+    "packages/sdk/client/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/collections/mod.ts": {
+      "code": 1,
+      "total": 2,
+      "byRule": {
+        "private-type-ref": 1,
+        "missing-return-type": 1
+      }
+    },
+    "packages/sdk/discovery/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/interfaces/mod.ts": {
+      "code": 1,
+      "total": 10,
+      "byRule": {
+        "missing-jsdoc": 10
+      }
+    },
+    "packages/sdk/openapi/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/query/mod.ts": {
+      "code": 1,
+      "total": 35,
+      "byRule": {
+        "private-type-ref": 30,
+        "missing-jsdoc": 5
+      }
+    },
+    "packages/sdk/query-client/mod.ts": {
+      "code": 1,
+      "total": 16,
+      "byRule": {
+        "private-type-ref": 2,
+        "missing-jsdoc": 13,
+        "missing-return-type": 1
+      }
+    },
+    "packages/sdk/streams.ts": {
+      "code": 1,
+      "total": 7,
+      "byRule": {
+        "private-type-ref": 7
+      }
+    },
+    "packages/sdk/telemetry/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    }
+  },
+  "dryRun": {
+    "code": 1,
+    "total": 39,
+    "byRule": {
+      "excluded-module": 37,
+      "missing-explicit-return-type": 2
+    },
+    "raw": "\u001b[0m\u001b[32mCheck\u001b[0m mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m adapters/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m cache/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m client/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m collections/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m discovery/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m interfaces/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m openapi/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m query/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m query-client/mod.ts\n\u001b[0m\u001b[32mCheck\u001b[0m streams.ts\n\u001b[0m\u001b[32mCheck\u001b[0m telemetry/mod.ts\nChecking for slow types in the public API...\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\adapters\\kv-cache-store.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\adapters\\mod.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\cache\\mod.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\client\\errors.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\client\\mod.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\client\\service-client.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\collections\\create-query-collection.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\collections\\mod.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\cache-provider.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\cache-query.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\client-proxy.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\composite-query.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\core\\query-factory.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\discovery\\mod.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\discovery\\service-discovery.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\cache-entry.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\cache-store.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\metadata.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\mod.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\query-factory.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\query-key.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\query-options.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced via a package export will error at runtime due to not existing in the package\n  \u001b[0m\u001b[38;5;12mdocs\u001b[0m: https://jsr.io/go/excluded-module\n\n\u001b[0m\u001b[1m\u001b[31merror[excluded-module]\u001b[0m: \u001b[0m\u001b[1mmodule in package's module graph was excluded from publishing\u001b[0m\n \u001b[0m\u001b[38;5;12m-->\u001b[0m \u001b[0m\u001b[36mC:\\Dev\\repos\\netscript\\output\\test-app\\worktrees\\repo-genesis\\.genesis\\netscript\\.worktrees\\wave5-apps-5b-sdk\\packages\\sdk\\interfaces\\service-client.ts\u001b[0m\n  \u001b[0m\u001b[38;5;12m=\u001b[0m \u001b[0m\u001b[1mhint\u001b[0m: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore\n\n  \u001b[0m\u001b[38;5;12minfo\u001b[0m: excluded modules referenced"
+  },
+  "tests": [],
+  "srcLocTotal": 3117,
+  "srcFiles": [
+    {
+      "path": "packages/sdk/discovery/service-discovery.ts",
+      "loc": 643
+    },
+    {
+      "path": "packages/sdk/core/cache-query.ts",
+      "loc": 243
+    },
+    {
+      "path": "packages/sdk/core/query-factory.ts",
+      "loc": 223
+    },
+    {
+      "path": "packages/sdk/interfaces/service-client.ts",
+      "loc": 183
+    },
+    {
+      "path": "packages/sdk/interfaces/query-factory.ts",
+      "loc": 139
+    },
+    {
+      "path": "packages/sdk/adapters/kv-cache-store.ts",
+      "loc": 132
+    },
+    {
+      "path": "packages/sdk/client/service-client.ts",
+      "loc": 126
+    },
+    {
+      "path": "packages/sdk/core/composite-query.ts",
+      "loc": 102
+    },
+    {
+      "path": "packages/sdk/client/errors.ts",
+      "loc": 93
+    },
+    {
+      "path": "packages/sdk/interfaces/cache-store.ts",
+      "loc": 91
+    },
+    {
+      "path": "packages/sdk/core/cache-provider.ts",
+      "loc": 80
+    },
+    {
+      "path": "packages/sdk/openapi/helpers.ts",
+      "loc": 80
+    },
+    {
+      "path": "packages/sdk/query-client/kv-cache-persister.ts",
+      "loc": 79
+    },
+    {
+      "path": "packages/sdk/collections/create-query-collection.ts",
+      "loc": 68
+    },
+    {
+      "path": "packages/sdk/interfaces/cache-entry.ts",
+      "loc": 65
+    },
+    {
+      "path": "packages/sdk/query-client/query-client-factory.ts",
+      "loc": 64
+    },
+    {
+      "path": "packages/sdk/query-client/create-service-query-utils.ts",
+      "loc": 63
+    },
+    {
+      "path": "packages/sdk/interfaces/metadata.ts",
+      "loc": 54
+    },
+    {
+      "path": "packages/sdk/query-client/types.ts",
+      "loc": 51
+    },
+    {
+      "path": "packages/sdk/interfaces/mod.ts",
+      "loc": 45
+    },
+    {
+      "path": "packages/sdk/query-client/mod.ts",
+      "loc": 45
+    },
+    {
+      "path": "packages/sdk/telemetry/otel-middleware.ts",
+      "loc": 44
+    },
+    {
+      "path": "packages/sdk/core/client-proxy.ts",
+      "loc": 43
+    },
+    {
+      "path": "packages/sdk/interfaces/query-key.ts",
+      "loc": 42
+    },
+    {
+      "path": "packages/sdk/query-client/key-bridge.ts",
+      "loc": 38
+    },
+    {
+      "path": "packages/sdk/streams.ts",
+      "loc": 38
+    },
+    {
+      "path": "packages/sdk/cache/mod.ts",
+      "loc": 33
+    },
+    {
+      "path": "packages/sdk/interfaces/query-options.ts",
+      "loc": 33
+    },
+    {
+      "path": "packages/sdk/mod.ts",
+      "loc": 33
+    },
+    {
+      "path": "packages/sdk/interfaces/transport.ts",
+      "loc": 27
+    },
+    {
+      "path": "packages/sdk/client/mod.ts",
+      "loc": 26
+    },
+    {
+      "path": "packages/sdk/discovery/mod.ts",
+      "loc": 25
+    },
+    {
+      "path": "packages/sdk/query/mod.ts",
+      "loc": 22
+    },
+    {
+      "path": "packages/sdk/openapi/mod.ts",
+      "loc": 14
+    },
+    {
+      "path": "packages/sdk/collections/mod.ts",
+      "loc": 12
+    },
+    {
+      "path": "packages/sdk/adapters/mod.ts",
+      "loc": 10
+    },
+    {
+      "path": "packages/sdk/telemetry/mod.ts",
+      "loc": 8
+    }
+  ],
+  "overCap350": [
+    {
+      "path": "packages/sdk/discovery/service-discovery.ts",
+      "loc": 643
+    }
+  ]
+}
