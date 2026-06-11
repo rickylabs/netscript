@@ -1,4 +1,5 @@
 .ns-btn {
+.ns-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -15,7 +16,8 @@
     background var(--ns-ease-normal),
     border-color var(--ns-ease-normal),
     color var(--ns-ease-normal),
-    box-shadow var(--ns-ease-normal);
+    box-shadow var(--ns-ease-normal),
+    transform var(--ns-ease-normal);
   white-space: nowrap;
   text-decoration: none;
 }
@@ -32,58 +34,108 @@
   pointer-events: none;
 }
 
+/* Primary — copper action with 3D shadow depth */
 .ns-btn--primary {
   background: var(--ns-primary);
   color: var(--ns-primary-fg);
   border-color: var(--ns-primary);
+  box-shadow:
+    3px 3px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-gray-12));
 }
 
 .ns-btn--primary:hover {
   background: var(--ns-primary-hover);
+  transform: translate(1px, 1px);
+  box-shadow:
+    2px 2px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-gray-12));
 }
 
+.ns-btn--primary:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    1px 1px 0 color-mix(in srgb, var(--ns-primary) 55%, var(--ns-gray-12));
+}
+
+/* Secondary — slate action with subtle depth */
 .ns-btn--secondary {
   background: var(--ns-secondary-subtle);
   color: var(--ns-secondary);
   border-color: var(--ns-secondary-border);
+  box-shadow:
+    3px 3px 0 color-mix(in srgb, var(--ns-secondary-border) 40%, transparent);
 }
 
 .ns-btn--secondary:hover {
-  background: rgba(144, 152, 166, 0.12);
-  border-color: rgba(144, 152, 166, 0.22);
+  background: color-mix(in srgb, var(--ns-secondary) 10%, transparent);
+  border-color: color-mix(in srgb, var(--ns-secondary) 30%, transparent);
+  transform: translate(1px, 1px);
+  box-shadow:
+    2px 2px 0 color-mix(in srgb, var(--ns-secondary-border) 40%, transparent);
 }
 
+.ns-btn--secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    1px 1px 0 color-mix(in srgb, var(--ns-secondary-border) 40%, transparent);
+}
+
+/* Ghost — minimal, surface-only hover */
 .ns-btn--ghost {
   background: transparent;
   color: var(--ns-muted-fg);
 }
 
 .ns-btn--ghost:hover {
-  background: rgba(235, 228, 210, 0.04);
+  background: color-mix(in srgb, var(--ns-fg) 4%, transparent);
   color: var(--ns-fg);
 }
 
+/* Outline — bordered with subtle depth */
 .ns-btn--outline {
   background: transparent;
   color: var(--ns-fg);
   border-color: var(--ns-border-hover);
+  box-shadow:
+    3px 3px 0 color-mix(in srgb, var(--ns-border-hover) 35%, transparent);
 }
 
 .ns-btn--outline:hover {
-  background: rgba(235, 228, 210, 0.04);
+  background: color-mix(in srgb, var(--ns-fg) 4%, transparent);
   border-color: var(--ns-border-strong);
+  transform: translate(1px, 1px);
+  box-shadow:
+    2px 2px 0 color-mix(in srgb, var(--ns-border-hover) 35%, transparent);
 }
 
+.ns-btn--outline:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    1px 1px 0 color-mix(in srgb, var(--ns-border-hover) 35%, transparent);
+}
+
+/* Destructive — red action with depth */
 .ns-btn--destructive {
   background: var(--ns-destructive);
   color: var(--ns-destructive-fg);
   border-color: var(--ns-destructive);
+  box-shadow:
+    3px 3px 0 color-mix(in srgb, var(--ns-destructive) 60%, var(--ns-gray-12));
 }
 
 .ns-btn--destructive:hover {
   background: var(--ns-red-6);
+  transform: translate(1px, 1px);
+  box-shadow:
+    2px 2px 0 color-mix(in srgb, var(--ns-destructive) 60%, var(--ns-gray-12));
 }
 
+.ns-btn--destructive:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    1px 1px 0 color-mix(in srgb, var(--ns-destructive) 60%, var(--ns-gray-12));
+}
+
+/* Sizes */
 .ns-btn--sm {
   font-size: var(--ns-text-xs);
   padding: var(--ns-space-1-5) var(--ns-space-3);

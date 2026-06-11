@@ -1,219 +1,225 @@
 .ns-toast {
-  position: relative;
-  width: min(100%, 360px);
-  border-radius: var(--ns-radius-lg);
-  border: 1px solid rgba(235, 228, 210, 0.12);
-  background: var(--ns-surface-raised);
-  color: var(--ns-fg);
-  box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.52),
-    4px 4px 0 rgba(0, 0, 0, 0.26),
-    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
-  overflow: hidden;
-  pointer-events: auto;
+    position: relative;
+    width: min(100%, 360px);
+    border-radius: var(--ns-radius-lg);
+    border: 1px solid var(--ns-border-hover);
+    background: color-mix(
+        in srgb,
+        var(--ns-card) 92%,
+        var(--ns-surface-raised)
+    );
+    color: var(--ns-card-fg);
+    box-shadow:
+        var(--ns-shadow-lg),
+        4px 4px 0 color-mix(in srgb, var(--ns-border-strong) 70%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--ns-fg) 3%, transparent) inset;
+    overflow: hidden;
+    pointer-events: auto;
 }
 
 .ns-toast--success {
-  border-color: rgba(91, 168, 160, 0.24);
+    border-color: color-mix(in srgb, var(--ns-success) 24%, transparent);
 }
 
 .ns-toast--error {
-  border-color: rgba(224, 69, 69, 0.24);
+    border-color: color-mix(in srgb, var(--ns-destructive) 24%, transparent);
 }
 
 .ns-toast--warning {
-  border-color: rgba(224, 174, 79, 0.24);
+    border-color: color-mix(in srgb, var(--ns-warning) 24%, transparent);
 }
 
 .ns-toast--info {
-  border-color: rgba(144, 152, 166, 0.24);
+    border-color: color-mix(in srgb, var(--ns-secondary) 24%, transparent);
 }
 
 .ns-toast-wrapper {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: var(--ns-z-toast);
-  width: min(360px, calc(100vw - 2rem));
-  pointer-events: none;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: var(--ns-z-toast);
+    width: min(360px, calc(100vw - 2rem));
+    pointer-events: none;
 }
 
 .ns-toast__panel {
-  padding: var(--ns-space-4);
+    padding: var(--ns-space-4);
 }
 
 @media (max-width: 640px) {
-  .ns-toast-wrapper {
-    left: 1rem;
-    right: 1rem;
-    width: auto;
-  }
+    .ns-toast-wrapper {
+        left: 1rem;
+        right: 1rem;
+        width: auto;
+    }
 }
 
 .ns-toast__progress-track {
-  position: relative;
-  height: 3px;
-  background: rgba(235, 228, 210, 0.06);
+    position: relative;
+    height: 3px;
+    background: color-mix(in srgb, var(--ns-border) 90%, transparent);
 }
 
 .ns-toast__symbol {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.9rem;
-  height: 1.9rem;
-  border-radius: var(--ns-radius-sm);
-  border: 1px solid rgba(144, 152, 166, 0.16);
-  background: rgba(144, 152, 166, 0.06);
-  font-family: var(--ns-font-mono);
-  font-size: 0.84rem;
-  line-height: 1;
-  color: var(--ns-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: var(--ns-radius-sm);
+    border: 1px solid color-mix(in srgb, var(--ns-secondary) 16%, transparent);
+    background: color-mix(in srgb, var(--ns-secondary) 6%, transparent);
+    font-family: var(--ns-font-mono);
+    font-size: 0.84rem;
+    line-height: 1;
+    color: var(--ns-secondary);
 }
 
 .ns-toast--success .ns-toast__symbol {
-  border-color: rgba(91, 168, 160, 0.18);
-  background: rgba(91, 168, 160, 0.08);
-  color: var(--ns-success);
+    border-color: color-mix(in srgb, var(--ns-success) 18%, transparent);
+    background: color-mix(in srgb, var(--ns-success) 8%, transparent);
+    color: var(--ns-success);
 }
 
 .ns-toast--error .ns-toast__symbol {
-  border-color: rgba(224, 69, 69, 0.18);
-  background: rgba(224, 69, 69, 0.08);
-  color: var(--ns-destructive);
+    border-color: color-mix(in srgb, var(--ns-destructive) 18%, transparent);
+    background: color-mix(in srgb, var(--ns-destructive) 8%, transparent);
+    color: var(--ns-destructive);
 }
 
 .ns-toast--warning .ns-toast__symbol {
-  border-color: rgba(224, 174, 79, 0.18);
-  background: rgba(224, 174, 79, 0.08);
-  color: var(--ns-warning);
+    border-color: color-mix(in srgb, var(--ns-warning) 18%, transparent);
+    background: color-mix(in srgb, var(--ns-warning) 8%, transparent);
+    color: var(--ns-warning);
 }
 
 .ns-toast__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--ns-space-3);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--ns-space-3);
 }
 
 .ns-toast__title-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ns-space-3);
-  min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--ns-space-3);
+    min-width: 0;
 }
 
 .ns-toast__eyebrow {
-  font-family: var(--ns-font-mono);
-  font-size: 0.62rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: color-mix(in srgb, var(--ns-secondary) 88%, white 12%);
+    font-family: var(--ns-font-mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: color-mix(in srgb, var(--ns-secondary) 88%, var(--ns-fg) 12%);
 }
 
 .ns-toast--success .ns-toast__eyebrow {
-  color: var(--ns-success);
+    color: var(--ns-success);
 }
 
 .ns-toast--error .ns-toast__eyebrow {
-  color: var(--ns-destructive);
+    color: var(--ns-destructive);
 }
 
 .ns-toast--warning .ns-toast__eyebrow {
-  color: var(--ns-warning);
+    color: var(--ns-warning);
 }
 
 .ns-toast__title {
-  margin-top: 4px;
-  color: var(--ns-fg);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
+    margin-top: 4px;
+    color: var(--ns-fg);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
 }
 
 .ns-toast__message {
-  margin-top: var(--ns-space-3);
-  padding-top: var(--ns-space-3);
-  border-top: 1px solid rgba(235, 228, 210, 0.08);
-  color: color-mix(in srgb, var(--ns-fg) 92%, var(--ns-muted-fg));
-  font-size: var(--ns-text-sm);
-  line-height: 1.6;
+    margin-top: var(--ns-space-3);
+    padding-top: var(--ns-space-3);
+    border-top: 1px solid color-mix(in srgb, var(--ns-border) 80%, transparent);
+    color: color-mix(in srgb, var(--ns-fg) 92%, var(--ns-muted-fg));
+    font-size: var(--ns-text-sm);
+    line-height: 1.6;
 }
 
 .ns-toast__dismiss {
-  color: var(--ns-muted-fg);
-  font-family: var(--ns-font-mono);
-  font-size: 1rem;
-  line-height: 1;
-  opacity: 0.82;
-  transition: opacity var(--ns-ease-fast), color var(--ns-ease-fast);
+    color: var(--ns-muted-fg);
+    font-family: var(--ns-font-mono);
+    font-size: 1rem;
+    line-height: 1;
+    opacity: 0.82;
+    transition:
+        opacity var(--ns-ease-fast),
+        color var(--ns-ease-fast);
 }
 
 .ns-toast__dismiss:hover {
-  opacity: 1;
-  color: var(--ns-fg);
+    opacity: 1;
+    color: var(--ns-fg);
 }
 
 .ns-toast__progress-bar {
-  height: 100%;
-  transform-origin: left center;
-  transform: scaleX(1);
-  background: var(--ns-secondary);
+    height: 100%;
+    transform-origin: left center;
+    transform: scaleX(1);
+    background: var(--ns-secondary);
 }
 
 .ns-toast--success .ns-toast__progress-bar {
-  background: var(--ns-success);
+    background: var(--ns-success);
 }
 
 .ns-toast--error .ns-toast__progress-bar {
-  background: var(--ns-destructive);
+    background: var(--ns-destructive);
 }
 
 .ns-toast--warning .ns-toast__progress-bar {
-  background: var(--ns-warning);
+    background: var(--ns-warning);
 }
 
 .ns-toast-enter {
-  animation: ns-toast-enter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: ns-toast-enter 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ns-toast-exit {
-  animation: ns-toast-exit 0.2s cubic-bezier(0.4, 0, 1, 1);
-  animation-fill-mode: forwards;
+    animation: ns-toast-exit 0.2s cubic-bezier(0.4, 0, 1, 1);
+    animation-fill-mode: forwards;
 }
 
 @keyframes ns-toast-enter {
-  from {
-    transform: translateX(18px) scale(0.97);
-    opacity: 0;
-  }
+    from {
+        transform: translateX(18px) scale(0.97);
+        opacity: 0;
+    }
 
-  to {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
 }
 
 @keyframes ns-toast-exit {
-  from {
-    transform: translateX(0) scale(1);
-    opacity: 1;
-  }
+    from {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
 
-  to {
-    transform: translateX(18px) scale(0.97);
-    opacity: 0;
-  }
+    to {
+        transform: translateX(18px) scale(0.97);
+        opacity: 0;
+    }
 }
 
 @keyframes ns-toast-progress {
-  from {
-    transform: scaleX(1);
-  }
+    from {
+        transform: scaleX(1);
+    }
 
-  to {
-    transform: scaleX(0);
-  }
+    to {
+        transform: scaleX(0);
+    }
 }
