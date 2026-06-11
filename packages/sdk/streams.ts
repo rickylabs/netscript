@@ -29,9 +29,9 @@
 export {
   createDurableStream as createStreamProducer,
   DurableStreamProducer,
-  type DurableStreamProducerOptions,
   defineStreamSchema,
   getStreamsUrl,
   getStreamsAuth,
   buildStreamUrl,
 } from '@netscript/plugin-streams-core';
+export type * from '@netscript/plugin-streams-core';
