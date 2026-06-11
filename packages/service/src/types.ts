@@ -107,21 +107,22 @@ export interface ServiceContext {
 }
 
 /** Middleware function accepted by the service builder. */
-export type ServiceMiddleware = (
-  context: ServiceContext,
-  next: () => Promise<void>,
-) => Promise<Response | void>;
+export interface ServiceMiddleware {
+  (context: ServiceContext, next: () => Promise<void>): Promise<Response | void>;
+  (context: unknown, next: () => Promise<void>): Promise<Response | void>;
+}
 
 /** Service route handler accepted by the builder route API. */
-export type ServiceHandler = (
-  context: ServiceContext,
-) => Response | Promise<Response>;
+export interface ServiceHandler {
+  (context: ServiceContext): Response | Promise<Response>;
+  (context: unknown, next: unknown): Response | Promise<Response>;
+}
 
 /** Error handler used by service applications. */
-export type ServiceErrorHandler = (
-  error: Error,
-  context: ServiceContext,
-) => Response | Promise<Response>;
+export interface ServiceErrorHandler {
+  (error: Error, context: ServiceContext): Response | Promise<Response>;
+  (error: Error, context: unknown): Response | Promise<Response>;
+}
 
 /** CORS options supported by `withCors()`. */
 export interface CorsOptions {

@@ -420,11 +420,11 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
    *
    * @example
    * ```typescript
- * createService(router, { name: 'workers' })
- *   .onStartup(async () => {
- *     await registerPluginJobs();
- *   })
- *   .serve()
+   * createService(router, { name: 'workers' })
+   *   .onStartup(async () => {
+   *     await registerPluginJobs();
+   *   })
+   *   .serve()
    * ```
    */
   onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter> {
@@ -568,7 +568,7 @@ class ServiceBuilderImpl<TRouter extends ServiceRouter> implements ServiceBuilde
 
     return {
       app,
-      addr: server.addr,
+      addr: server.addr as RunningService['addr'],
       stop: async () => {
         if (!controller.signal.aborted) {
           controller.abort();

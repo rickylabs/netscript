@@ -28,6 +28,7 @@ import { LoggingPlugin } from '@netscript/logger/orpc';
 import { ErrorHandlingPlugin, TracingPlugin } from '@netscript/telemetry/orpc';
 import type {
   FetchHandler,
+  ServiceContext,
   ServiceErrorHandler,
   ServiceHandler,
   ServiceHandlerPlugin,
@@ -176,7 +177,7 @@ export function createOpenAPIHandler<T extends ServiceRouter>(
  * ```
  */
 export function createNotFoundHandler(serviceName: string): ServiceHandler {
-  return (c): Response => {
+  return ((c: ServiceContext): Response => {
     return c.json(
       {
         error: 'NOT_FOUND',
@@ -185,7 +186,7 @@ export function createNotFoundHandler(serviceName: string): ServiceHandler {
       },
       404,
     );
-  };
+  }) as ServiceHandler;
 }
 
 /**
@@ -199,7 +200,7 @@ export function createNotFoundHandler(serviceName: string): ServiceHandler {
 export function createErrorHandler(serviceName: string): ServiceErrorHandler {
   const logger = createServiceLogger(serviceName);
 
-  return (err, c): Response => {
+  return ((err: Error, c: ServiceContext): Response => {
     logger.error('Unhandled service error', {
       error: err.message,
       stack: err.stack,
@@ -208,11 +209,9 @@ export function createErrorHandler(serviceName: string): ServiceErrorHandler {
     return c.json(
       {
         error: 'INTERNAL_ERROR',
-        message: Deno.env.get('DENO_ENV') === 'development'
-          ? err.message
-          : 'Internal server error',
+        message: Deno.env.get('DENO_ENV') === 'development' ? err.message : 'Internal server error',
       },
       500,
     );
-  };
+  }) as ServiceErrorHandler;
 }

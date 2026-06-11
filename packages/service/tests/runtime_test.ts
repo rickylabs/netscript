@@ -1,13 +1,20 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { createService } from '../mod.ts';
 
+function clientOrigin(hostname: string, port: number): string {
+  const host = hostname === '0.0.0.0' ? '127.0.0.1' : hostname;
+  return `http://${host}:${port}`;
+}
+
 Deno.test('serve starts on an ephemeral port and stops cleanly', async () => {
   const running = await createService({}, { name: 'runtime' })
     .withHealth()
     .serve({ port: 0 });
 
   try {
-    const response = await fetch(`http://${running.addr.hostname}:${running.addr.port}/health`);
+    const response = await fetch(
+      `${clientOrigin(running.addr.hostname, running.addr.port)}/health`,
+    );
     const body = await response.json();
 
     assertEquals(response.status, 200);
@@ -27,7 +34,7 @@ Deno.test('serve stops when external signal aborts', async () => {
   await running.stop();
 
   await assertRejects(
-    () => fetch(`http://${running.addr.hostname}:${running.addr.port}/health`),
+    () => fetch(`${clientOrigin(running.addr.hostname, running.addr.port)}/health`),
     TypeError,
   );
 });
@@ -58,7 +65,7 @@ Deno.test('service stops cleanly after handler error response', async () => {
     .serve({ port: 0 });
 
   try {
-    const response = await fetch(`http://${running.addr.hostname}:${running.addr.port}/boom`);
+    const response = await fetch(`${clientOrigin(running.addr.hostname, running.addr.port)}/boom`);
     const body = await response.json();
 
     assertEquals(response.status, 500);
@@ -68,7 +75,7 @@ Deno.test('service stops cleanly after handler error response', async () => {
   }
 
   await assertRejects(
-    () => fetch(`http://${running.addr.hostname}:${running.addr.port}/boom`),
+    () => fetch(`${clientOrigin(running.addr.hostname, running.addr.port)}/boom`),
     TypeError,
   );
 });

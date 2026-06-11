@@ -9,7 +9,6 @@
   ],
   "exclude": [
     ".llm/tmp/",
-    "packages/service/",
     "packages/sdk/",
     "packages/fresh-ui/",
     "packages/fresh/"
@@ -22,13 +21,13 @@
     "raw-imports"
   ],
   "tasks": {
-    "check": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(service|sdk|fresh|fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+    "check": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(sdk|fresh|fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
     "test": "deno test --allow-all",
     "publish:dry-run": "deno publish --dry-run --allow-dirty",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
-    "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(service|sdk|fresh|fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
-    "fmt:check": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(service|sdk|fresh|fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
-    "lint": "deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(service|sdk|fresh|fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+    "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(sdk|fresh|fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
+    "fmt:check": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(sdk|fresh|fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
+    "lint": "deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(sdk|fresh|fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
     "arch:check": "deno run --allow-read tools/fitness/check-doctrine.ts"
   },
   "imports": {},
@@ -68,7 +67,6 @@
       "plugins/**/*.tsx"
     ],
     "exclude": [
-      "packages/service/",
       "packages/sdk/",
       "packages/fresh-ui/",
       "packages/fresh/",

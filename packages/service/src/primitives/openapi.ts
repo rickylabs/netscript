@@ -19,7 +19,7 @@
 
 import { OpenAPIGenerator } from '@orpc/openapi';
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
-import type { ServiceHandler, ServiceRouter } from '../types.ts';
+import type { ServiceContext, ServiceHandler, ServiceRouter } from '../types.ts';
 
 const DEFAULT_OPENAPI_SERVER_URL = '/api';
 const DEFAULT_SCALAR_TITLE = 'API Documentation';
@@ -75,7 +75,7 @@ export function createOpenAPISpec<T extends ServiceRouter>(
   router: T,
   config: OpenAPIConfig,
 ): ServiceHandler {
-  return async (c): Promise<Response> => {
+  return (async (c: ServiceContext): Promise<Response> => {
     const spec = await openApiGenerator.generate(router as never, {
       info: {
         title: config.title,
@@ -85,7 +85,7 @@ export function createOpenAPISpec<T extends ServiceRouter>(
       servers: config.servers ?? [{ url: DEFAULT_OPENAPI_SERVER_URL }],
     });
     return c.json(spec);
-  };
+  }) as ServiceHandler;
 }
 
 /**
@@ -108,7 +108,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
     theme = DEFAULT_SCALAR_THEME,
   } = options;
 
-  return (c): Response => {
+  return ((c: ServiceContext): Response => {
     // Serve Scalar UI with locally bundled JS (no CDN dependency)
     const html = `<!doctype html>
 <html>
@@ -133,7 +133,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
 </html>`;
 
     return c.html(html);
-  };
+  }) as ServiceHandler;
 }
 
 /**
@@ -146,7 +146,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
  * ```
  */
 export function createScalarJs(): ServiceHandler {
-  return async (c): Promise<Response> => {
+  return (async (c: ServiceContext): Promise<Response> => {
     const scalarJs = scalarJsCache ?? await Deno.readTextFile(scalarJsUrl);
     scalarJsCache = scalarJs;
 
@@ -154,5 +154,5 @@ export function createScalarJs(): ServiceHandler {
       'Content-Type': 'application/javascript',
       'Cache-Control': SCALAR_JS_CACHE_CONTROL,
     });
-  };
+  }) as ServiceHandler;
 }

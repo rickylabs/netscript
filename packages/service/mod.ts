@@ -124,7 +124,4 @@ export {
 export type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 
 // Layer 3: Presets
-export {
-  defineService,
-  type DefineServiceOptions,
-} from './src/presets/define-service.ts';
+export { defineService, type DefineServiceOptions } from './src/presets/define-service.ts';

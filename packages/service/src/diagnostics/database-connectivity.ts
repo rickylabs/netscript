@@ -247,7 +247,9 @@ function logConnectionDiagnostics(
   engineCfg: EngineConfig,
   errorMessage?: string,
 ): void {
-  logger.error(buildConnectionDiagnostics(serviceName, host, port, reason, engineCfg, errorMessage));
+  logger.error(
+    buildConnectionDiagnostics(serviceName, host, port, reason, engineCfg, errorMessage),
+  );
 }
 
 function buildConnectionDiagnostics(
@@ -349,11 +351,12 @@ function extractRootCause(error: unknown): string | undefined {
     const metadata = readErrorMetadata(current);
     deepestCause = metadata ?? deepestCause;
 
-    if (current.cause instanceof Error) {
-      current = current.cause;
-      if (current.message && !current.message.includes('invocation:')) {
-        deepestCause = current.message;
-        const code = readErrorCode(current);
+    const cause = current.cause;
+    if (cause instanceof Error) {
+      current = cause;
+      if (cause.message && !cause.message.includes('invocation:')) {
+        deepestCause = cause.message;
+        const code = readErrorCode(cause);
         if (code) {
           deepestCause = `${code}: ${deepestCause}`;
         }

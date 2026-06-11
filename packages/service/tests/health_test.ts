@@ -9,8 +9,7 @@ function createContext(): ServiceContext {
       path: '/health',
       header: () => undefined,
     },
-    json: (data: unknown, status = 200) =>
-      Response.json(data, { status }),
+    json: (data: unknown, status = 200) => Response.json(data, { status }),
     html: (html: string, status = 200) =>
       new Response(html, {
         status,
