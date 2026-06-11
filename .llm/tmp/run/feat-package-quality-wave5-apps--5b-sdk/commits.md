@@ -25,3 +25,4 @@ Implementation slices 1–19 (plan §5) begin only after PLAN-EVAL locks the pla
 - 117fd2e: Add sdk cache and doctest coverage
 - c250f7d: Prove sdk type assignability chain
 - f430fd0: Prove sdk live service client runtime
+- f8e8bf8: Lift sdk into root quality gates

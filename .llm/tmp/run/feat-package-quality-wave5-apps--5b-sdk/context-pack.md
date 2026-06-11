@@ -6,65 +6,27 @@ PLAN-EVAL is locked as PASS via OpenHands run `27343770321` / PR #29 comment
 2026-06-11, materialized locally in `plan-eval-summary.md` because the evaluator made
 no commits. First duties are complete and pushed at `13dca51`.
 
-Slices 1-18/19 are complete. `packages/sdk/deno.json` now has package-local
-`check`, `test`, `lint`, `fmt`, and `publish:dry-run` tasks. SDK implementation files
-now live under `packages/sdk/src/`, with public subpath facades retained at their
-locked paths. `core/` is dissolved into `src/cache/` and `src/query/`. The forbidden
-`interfaces` vocabulary is gone from sdk and the one Fresh consumer:
-`src/interfaces/` is now `src/ports/`, the public subpath is `./ports`, root `mod.ts`
-exports from `./ports/mod.ts`, and `packages/fresh/builders/define-page/types.ts`
-imports `@netscript/sdk/ports`. Subpaths are now reduced from 12 to 10 by folding
-`./adapters` into `./cache` (`KvCacheStore`) and `./openapi` into the root barrel.
-B1 is complete: `research.md` now says the streams types are "not exported from the
-declaring module's public chain." Slice 5 added pure type re-exports from the
-plugin-streams-core declaring modules and made `@netscript/sdk/streams` re-export the
-plugin core type surface so sdk-facing doc-lint can see the full chain. Slice 6 added
-`QueryClientPort` in `src/ports/query-client.ts`, documented the member list with
-consumer drivers, changed `createNetScriptQueryClient()` to return the structural port,
-and changed collection options to accept the port with an internal TanStack boundary
-cast. Slice 7 added `ServiceQueryUtils<TContract>` in `src/ports/service-query-utils.ts`,
-exported it through `./ports`, `./query-client`, and root, and added dual compile-only
-fixtures proving sdk contract inference plus upstream `createTanstackQueryUtils()`
-return assignability. Slice 8 typed `createServiceQueryUtils()` as
-`createServiceQueryUtils<TContract>(client: ServiceClient<TContract>, options?):
-ServiceQueryUtils<TContract>`, removed the public `any` bridge, added a type-only
-`ServiceClientContract<TContract>` marker so clients infer their source contract, and
-kept one documented upstream-boundary return assertion. Next slice: `QueryCollection<TItem>`
-return port (D-7). Slice 9 added the structural `QueryCollection<TItem>` return port,
-annotated `createQueryCollection()` to return it, exported the port from
-`@netscript/sdk/collections`, relaxed collection items to `TItem extends object`, and
-added a type fixture proving item inference and common read/write methods. Next slice:
-internal `ClientLinkFactory` HTTP transport seam (D-8), seam only, no in-process transport.
-Slice 10 added the internal `ClientLinkFactory`/`ClientLinkPort` seam, moved the existing
-HTTP `RPCLink` construction into `src/client/http-client-link.ts`, and left
-`createServiceClient()` public options unchanged. Slice 11 added the L3
-`defineServices()` preset, exported it from root, and added an inference fixture proving
-that the one-liner returns the composed L2 values: `clients`, `queries`, and
-`queryUtils`. Slice 12 split discovery into `browser-env.ts`, `service-url.ts`,
-`kv-connection.ts`, and `mod.ts`, leaving `service-discovery.ts` as a 7-line
-compatibility barrel and adding three parity tests for lookup ordering
-(full VITE key -> shorthand -> server env). Slice 13 completed the remaining
-JSDoc member sweep reached by the current public surface, centralized SWR/cache
-timing defaults in `src/cache/defaults.ts`, and moved `inflightRequests` from
-module state onto `CacheQuery` instance state with an optional constructor-injected
-map. Slice 14 expanded root `mod.ts` module docs to 35 lines and refreshed all
-subpath module docs without changing exports. Slice 15 replaced the README with a
-14-section / 329-line package guide and added `docs/architecture.md` with the
-layer map, composability contract, transport seam audit, discovery split, cache
-state decision, and contributor path. Slice 16 added focused unit tests for
-`CacheQuery` stale-while-revalidate, `preferFreshOnStale`, in-flight dedupe,
-query-factory keys, the KV query-cache persister, and README TypeScript/JSON
-doctests. The cache dedupe test exposed and fixed a race by rechecking the
-instance in-flight map after the async cache read and before starting a fetch.
-Slice 17 added a joined assignability fixture proving `createServiceClient()`
-contract inference through `ServiceClient<TContract>`, `QueryFactory<TContract>`,
-`ServiceQueryUtils<TContract>`, `QueryClientPort`, and `QueryCollection<TItem>`.
-Slice 18 added a live `@netscript/service` integration test that boots
-`serve({ port: 0 })`, resolves the client through discovery env, proves round-trip,
-bad URL connection failure, retry exhaustion callbacks, cancellation propagation, and
-clean stop. The cancellation path added `ServiceClientContext.signal` and forwards it
-through the internal HTTP link. Next slice: lift `packages/sdk` from the root exclude
-and run the full exit gate sweep plus measure-after.
+Slices 1-19/19 are implemented. The SDK now follows the locked layer model: L0
+package-owned ports, L1 primitives, L2 factories, and the L3 `defineServices()`
+one-liner. Sources live under `packages/sdk/src/` with thin public facades; the
+forbidden `interfaces` vocabulary is replaced by `ports`; subpaths are reduced from
+12 to 10; stream private-type chains are fixed through additive
+plugin-streams-core type exports; `QueryClientPort`, `ServiceQueryUtils<TContract>`,
+`QueryCollection<TItem>`, and `ServiceClient<TContract>` preserve full inference
+without public upstream leaks; the HTTP transport is behind the internal
+`ClientLinkFactory` seam; and `docs/architecture.md` records the layer map,
+composability contract, and transport seam audit.
+
+Final validation has been run for the implementation handoff: package publish
+dry-run is exit 0 with no raw slow-type or excluded-module diagnostics, combined
+SDK doc-lint is 0, independent root-barrel `deno doc --lint packages/sdk/mod.ts`
+is 0, package tests are 14 passed / 0 failed across 6 files, root `check`,
+`lint`, and `fmt:check` wrappers pass with SDK included, live service integration
+covers discovery round-trip plus B2 failure paths, and the measure-after artifact
+shows 0 combined doc-lint, 0 dry-run findings, 6 test files, 4,377 tracked source
+LOC, and 0 files over the 350-line cap. The Fresh consumer import was updated to
+`@netscript/sdk/ports`; the Fresh package check still exits 0 with its pre-existing
+future-wave root-exclude warning, so that caveat is recorded for IMPL-EVAL.
 
 ## What the plan session did
 

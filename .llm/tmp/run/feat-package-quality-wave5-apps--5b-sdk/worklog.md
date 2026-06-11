@@ -273,3 +273,45 @@ drift.md, context-pack.md, measure-5b.json. No implementation performed.
 | Advisory | B2 complete: live integration now covers connection failure, retry exhaustion, and cancellation propagation in addition to round-trip and clean stop. |
 | Concept of done | The runtime path is reachable from a real service listener and the cancellation extension is documented at the public request context while transport implementation remains behind the internal HTTP link seam. |
 | Drift | none |
+
+### Slice 19/19 — D-14 root-exclude lift and full gate sweep
+
+| Field | Evidence |
+| --- | --- |
+| Commit | `f8e8bf8` — `Lift sdk into root quality gates` |
+| Changed | Removed `packages/sdk/` from the root exclude and from root check/lint/fmt wrapper filters; added the SDK test dependency/import-map entry needed once SDK tests participate in root checks; excluded `tests/` from the SDK publish file set; fixed final doc-lint reachability by exporting `ServiceClientContract`/`ServiceClientShape`; converted one client-link import to type-only; accepted root `deno.lock` churn caused by SDK root inclusion and oRPC/@std/assert resolution. |
+| Gate | `deno task check` from `packages/sdk` PASS. `deno publish --dry-run --allow-dirty` from `packages/sdk` PASS exit 0 with no raw slow-type or excluded-module diagnostics. Root `rtk proxy deno task check` PASS, 1,425 files / 12 batches / 0 failed batches. Root `rtk proxy deno task lint` PASS, 933 files / 5 batches / 0 findings. Root `rtk proxy deno task fmt:check` PASS, 933 files / 0 findings. `deno task test` from `packages/sdk` PASS, 14 passed / 0 failed. Combined `run-deno-doc-lint --root packages/sdk` PASS, 0 findings. Independent `deno doc --lint packages/sdk/mod.ts` PASS. `deno doc packages/sdk/mod.ts` PASS. Consumer checks: queue PASS, cli PASS, plugin-streams-core PASS, plugins/streams PASS, Fresh task exit 0 with pre-existing future-wave root-exclude warning. JSR audit script exit 0; raw package dry-run is authoritative for no slow types. Measure-after script exit 0. |
+| Measure-after | `check` 0; combined doc-lint 0; barrel doc-lint 0; dry-run 0 findings; 6 test files; 4,377 tracked source LOC; 0 files over 350L. |
+| Concept of done | SDK is now inside root quality gates instead of passing only through package-local checks. The published file set excludes tests, all public entrypoints are documented, and final validation ties the implementation to the A3 runtime and A4 package-quality exits. |
+| Drift | none |
+
+## Final Validation Sweep
+
+| Gate | Result |
+| --- | --- |
+| Publish dry-run | PASS: `deno publish --dry-run --allow-dirty` from `packages/sdk`, exit 0, no raw slow-type diagnostics and no excluded-module diagnostics. |
+| Doc lint | PASS: combined all SDK entrypoints 0 findings; independent root barrel `deno doc --lint packages/sdk/mod.ts` PASS. |
+| Static checks | PASS: package `deno task check`; root `deno task check`; root `deno task lint`; root `deno task fmt:check`. |
+| Tests and doctests | PASS: `deno task test` from `packages/sdk`, 14 passed / 0 failed across cache, discovery, integration, persister, query, and README doctest files. |
+| A3 runtime | PASS: real `@netscript/service` `serve({ port: 0 })` round-trip through discovery env, clean stop, bad URL failure, retry exhaustion, and cancellation propagation. |
+| Consumer gates | PASS for queue, cli, plugin-streams-core, and plugins/streams package checks. Fresh exits 0 with its pre-existing future-wave root-exclude warning; the touched consumer import is verified as `@netscript/sdk/ports`. |
+| JSR audit | PASS exit 0 from `.llm/tools/fitness/audit-jsr-package.ts --root packages/sdk --text`; script emitted one parser warning for the dry-run banner, while the raw dry-run command has no slow-type diagnostic. |
+| Architecture deliverables | PASS: `packages/sdk/docs/architecture.md` contains the layer map, composability contract, transport seam audit, and contributor path. |
+| Public surface docs | PASS: `deno doc packages/sdk/mod.ts` completed and listed documented SDK exports without command failure. |
+
+## Measure Before/After
+
+| Metric | Baseline | After | Target |
+| --- | --- | --- | --- |
+| Check | PASS with SDK root-excluded | PASS with SDK root-included | PASS |
+| Combined doc-lint | 29 total: 9 private-type-ref, 2 missing-return-type, 18 missing-jsdoc | 0 | 0 |
+| Publish dry-run | 2 slow-types, 37 excluded-module | 0 raw slow-types, 0 excluded-module | 0 |
+| Tests | 0 | 6 test files, 14 passing tests | >0 |
+| Source LOC inventory | 3,117 | 4,377 | tracked |
+| Over-cap files | 1: discovery at 643L | 0 | 0 |
+
+## Ready Handoff Notes
+
+- Implementation commit range after PLAN-EVAL lock: `13dca51..f8e8bf8`.
+- Root `deno.lock` was intentionally updated only in slice 19, when SDK entered root checks; diff was inspected and attributed to SDK test/import-map dependencies and oRPC resolution exposed by the root graph.
+- The separate IMPL-EVAL session should use the committed run artifacts as source of truth, not stale PR summary comments.
