@@ -18,3 +18,5 @@
 | 6 (repo-genesis) | `0e6013211` | — | /design/composition rules page + nav entry + ns-rules-* skin (branch `feat/repo-genesis`) |
 | 7 | `fd9b41a` | — | ds-no-raw-hex fitness gate + consumer-render.test.tsx (D-5c2-2 follow-up closed) |
 | 8 | `9cf8bea` | — | ds-color-utilities fitness gate (off-vocabulary Tailwind colors) |
+| 9 | 1d7b3053ef443502a26ccf46901020a218991153 | framework | fmt-normalize registry, reduced-motion guards, drift D-5c2-5/6 |
+| 9 | 3d8374d14285afad194f9425be9724eb02dd5124 | repo-genesis | sync registry copy + playground CSS/tsx |

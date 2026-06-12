@@ -406,3 +406,26 @@ replaced by a real `.llm/tools/fitness/` script.
   by root config (consistent with all existing fitness scripts).
 
 **Drift:** none new.
+
+## Slice 9 — component completion: reconciliation + reduced-motion (2026-06-12)
+
+Survey: toast.css and data-table.tsx divergence was formatting-only (package
+fmt config never covered CSS; root config excludes the package). Fix: fmt-
+normalized all 60 registry sources (`deno fmt --no-config --indent-width 2
+--line-width 100 --single-quote`); copies now pass `diff --strip-trailing-cr`
+(CRLF is repo-genesis autocrlf; island copies legitimately adapt import
+depth — drift D-5c2-6). `islands/Toast.tsx` "divergence" was exactly that
+import-depth adaptation; `lib/toast.ts` is imported from the package root by
+design (no copy). Closed D-5c2-4: prefers-reduced-motion guards in
+progress (static 42% fill), skeleton (static gradient), spinner (1.5s,
+essential indicator), toast/sheet (0.01ms one-shots, fill-mode preserved;
+grep-verified no JS animationend dependency).
+
+Gates: ds-no-raw-hex PASS 93, ds-color-utilities PASS 93, package check
+exit 0, tests 36/36, browser gate on /design/components with
+emulateMedia reducedMotion=reduce → progress animationName none w=188px
+translated, skeleton none, spinner ns-spin 1.5s. ns-responsive-table
+recorded as out-of-scope registry candidate (D-5c2-5).
+
+Commits: framework 1d7b3053ef443502a26ccf46901020a218991153,
+repo-genesis 3d8374d14285afad194f9425be9724eb02dd5124.
