@@ -175,3 +175,62 @@
 - Commits: framework `372484e`, `7c7863a`, `b54e3533`; repo-genesis
   `b2008985` (sync), `e8ae8068` (conversion), `32cc5bb` (normalization).
 - Drift: D-5c2-2
+
+## Slice 4 — /design tokens browser route (2026-06-12)
+
+- Scope (locked table row 4): `/design` route group: tokens browser |
+  gate: browser validation | reads tokens.json. Built in repo-genesis
+  `apps/playground` (the ui:add consumer from slice 3).
+- Changes (repo-genesis, 7 files, 1066 insertions):
+  - `lib/design/tokens.ts`: typed loader over `assets/tokens.json`
+    (`with { type: 'json' }`); groups the 134-token manifest into
+    foundation roles, six semantic intents (base/fg/hover/subtle/border
+    companions), six primitive ramps, and type/space/radius/shadow/
+    motion/z scales. Space tokens sorted by resolved px, z by value.
+  - `routes/(design)/design/`: `_layout.tsx` (SidebarShell + breadcrumbs
+    + ThemeToggle, "design system" badge), `index.tsx` (302 →
+    /design/tokens), `tokens.tsx` (anchor rail + 8 sections; every
+    swatch/specimen/bar/tile renders from its live `var(--ns-*)`, so the
+    page is theme-aware by construction per the theme architecture
+    mandate — no hardcoded NS One values).
+  - `islands/design/TokenClipboard.tsx`: single delegated-click island;
+    copies `var(--ns-*)` to clipboard, transient `data-copied` feedback.
+  - `assets/design.css` (+ `styles.css` import): app-owned skin speaking
+    only the ns token vocabulary + color-mix; 64rem responsive collapse
+    (rail → pills, intents → 1-col, z-stack flattens);
+    prefers-reduced-motion kills transitions/transforms.
+- SSR unblock (env, not committed): playground SSR 500'd on missing
+  gitignored `database/postgres/schema/.generated/zod/` artifacts.
+  Restored the historical `generator zod` block from `6d2caeb57` into
+  `schema/schema.prisma` TEMPORARILY, ran `db:generate` with a
+  placeholder `DATABASE_URL` (generate never connects), verified
+  artifacts, reverted the schema edit. Root `deno.lock` mutations from
+  the regeneration/dev runs restored via `git checkout`. Drift D-5c2-3.
+- Browser validation (Playwright, real route http://localhost:5173/design/tokens):
+  - 200 SSR; title "Design tokens — NetScript design system"; zero
+    console errors/warnings; `/design` → 302 → `/design/tokens`.
+  - All 8 sections render in light AND dark themes (toggle exercised
+    both ways); full-page + per-section screenshots in
+    `scratch/slice4-evidence/`.
+  - Copy interaction: island hydrated; click writes `var(--ns-primary)`
+    to clipboard and sets `data-copied` (atomic in-page assertion).
+  - Anchor rail: #ramps lands heading at y=80 (scroll-margin honored).
+  - 390px mobile: scrollWidth 375 ≤ viewport (no horizontal overflow).
+  - Reduced-motion emulation: ramp-step transition → `none`; motion-chip
+    keeps inline transition but hover transform forced `none` (no motion).
+- Fixes found BY browser validation (impeccable pass):
+  - tile-row overlap: `.ns-token-row__preview` shrank to 22px in narrow
+    `.ns-token-tiles` columns, sliding shadow/motion previews under the
+    copy chip → `flex: 1 0 auto` for tile previews; overlap re-measured
+    false for ease-spring/shadow-xs/radius-sm.
+  - ramp label contrast: `mix-blend-mode: difference` failed mid-ramp
+    (copper-6, teal-5) → token-based translucent pill
+    (`color-mix(var(--ns-bg) 70%, transparent)` + `--ns-fg`), verified
+    readable on every step in both themes.
+  - z-stack mobile overflow (500px scrollWidth): inline staircase indent
+    moved to `--zplate-indent` custom prop; 64rem media query flattens.
+- Static gates: fmt PASS (6 files), lint PASS (5 files),
+  `deno check --unstable-kv` PASS (exit 0, all 5 TS/TSX files).
+- Commits: repo-genesis `30972f89` (pushed; remote head verified
+  `30972f89b73666a403a1671ee2de3a5670a09fde`).
+- Drift: D-5c2-3

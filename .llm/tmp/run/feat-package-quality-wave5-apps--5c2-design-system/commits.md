@@ -13,3 +13,4 @@
 | 3 (pre) | `7c7863a` | — | ui-init-smoke driver: extras + theme args |
 | 3 | `b54e3533` | — | runtime `: unknown` → `: VNode` JSX fix (44 components / 7 files) |
 | 3 (repo-genesis) | `b2008985`, `e8ae8068`, `32cc5bb` | — | sync @ b54e3533 / playground ui:add conversion / fmt+lint normalization (branch `feat/repo-genesis`) |
+| 4 (repo-genesis) | `30972f89` | — | /design tokens browser route + TokenClipboard island + design.css skin (branch `feat/repo-genesis`) |

@@ -81,3 +81,33 @@ D-5c1-3 root-exclude lift with accepted root publish-graph churn).
      no registry change.
   6. **Slice-9 candidate**: playground responsive table patterns flagged for
      `ns-responsive-table` registry item during slice 9.
+
+## D-5c2-3 — Slice 4: Prisma zod regeneration pipeline broken at HEAD (2026-06-12)
+
+1. **Broken regeneration pipeline (env/repo defect, out of run scope).**
+   Playground SSR depends on gitignored
+   `database/postgres/schema/.generated/zod/` artifacts, but
+   `schema/schema.prisma` at HEAD declares only `generator client` (the
+   `generator zod` block was removed with a comment saying
+   prisma-zod-generator is "not used here to avoid requiring a global
+   binary"), while `packages/database/scripts/generate-zod.ts` still
+   expects `prisma generate` to trigger the zod generator. Result:
+   `deno task db:generate` can never produce the zod artifacts a fresh
+   clone needs — `fix-zod-imports.ts` crashes on the missing dir.
+   Follow-up owner: database package; either restore the `generator zod`
+   block (it resolves via the workspace `node_modules/.bin/`
+   prisma-zod-generator, no global binary needed) or rewrite
+   generate-zod.ts to invoke the generator directly.
+2. **Workaround used (local-only, not committed).** Temporarily restored
+   the historical `generator zod` block from `6d2caeb57`, ran
+   `db:generate` with placeholder `DATABASE_URL` (prisma.config.ts
+   requires it at config-eval time even for generate; generate never
+   connects), verified artifacts, reverted the schema edit. Working tree
+   clean after.
+3. **Side-effect guarded:** the regeneration + dev-server runs mutated
+   root `deno.lock` (+1075 lines of additive resolutions); restored via
+   `git checkout -- deno.lock` both times. Lock content committed by
+   slice 3 (`e8ae8068`) unaffected.
+4. **Gate-shape note:** "browser validation" for /design routes required
+   regenerating env artifacts unrelated to the design system. Slices 5–6
+   inherit the workaround (artifacts persist locally until cleaned).
