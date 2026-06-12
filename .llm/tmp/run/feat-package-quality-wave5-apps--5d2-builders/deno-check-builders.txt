@@ -1,0 +1,2 @@
+Warning No matching files found.
+exit=0
