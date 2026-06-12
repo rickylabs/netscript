@@ -68,7 +68,13 @@ export function useTabs({
         return;
       }
 
-      const nextIndex = getNextTabsIndex(key, currentIndex, triggerOrder.current.length, axis, loop);
+      const nextIndex = getNextTabsIndex(
+        key,
+        currentIndex,
+        triggerOrder.current.length,
+        axis,
+        loop,
+      );
       if (nextIndex < 0 || nextIndex === currentIndex) {
         return;
       }
@@ -106,7 +112,10 @@ export function useTabs({
   );
 
   const getTriggerProps = useCallback(
-    (tabValue: string, props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): TabsTriggerElementProps => {
+    (
+      tabValue: string,
+      props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {},
+    ): TabsTriggerElementProps => {
       const selected = selectedValue === tabValue;
       const triggerId = `${rootId}-trigger-${tabValue}`;
       const panelId = `${rootId}-panel-${tabValue}`;
@@ -121,29 +130,45 @@ export function useTabs({
         'data-state': getTabsDataState(selected),
         id: props.id ?? triggerId,
         onClick: composeEventHandlers(props.onClick, () => setSelectedValue(tabValue)),
-        onKeyDown: composeEventHandlers(props.onKeyDown, (event: JSX.TargetedKeyboardEvent<HTMLButtonElement>) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            if (activationMode === 'manual') {
-              event.preventDefault();
-              setSelectedValue(tabValue);
+        onKeyDown: composeEventHandlers(
+          props.onKeyDown,
+          (event: JSX.TargetedKeyboardEvent<HTMLButtonElement>) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              if (activationMode === 'manual') {
+                event.preventDefault();
+                setSelectedValue(tabValue);
+              }
+
+              return;
             }
 
-            return;
-          }
+            handleNavigation(tabValue, event.key, activationMode, orientation);
 
-          handleNavigation(tabValue, event.key, activationMode, orientation);
-
-          if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) {
-            event.preventDefault();
-          }
-        }),
-        ref: composeRefs(props.ref, (node: HTMLButtonElement | null) => registerTrigger(tabValue, node)),
+            if (
+              ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)
+            ) {
+              event.preventDefault();
+            }
+          },
+        ),
+        ref: composeRefs(
+          props.ref,
+          (node: HTMLButtonElement | null) => registerTrigger(tabValue, node),
+        ),
         role: props.role ?? 'tab',
         tabIndex: selected ? 0 : -1,
         type: props.type ?? 'button',
       };
     },
-    [activationMode, handleNavigation, orientation, registerTrigger, rootId, selectedValue, setSelectedValue],
+    [
+      activationMode,
+      handleNavigation,
+      orientation,
+      registerTrigger,
+      rootId,
+      selectedValue,
+      setSelectedValue,
+    ],
   );
 
   const getContentProps = useCallback(

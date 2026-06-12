@@ -9,9 +9,10 @@ export function composeEventHandlers<T>(
   return (event: T) => {
     externalHandler?.(event);
 
-    const defaultPrevented = typeof event === 'object' && event !== null && 'defaultPrevented' in event
-      ? Boolean((event as { defaultPrevented?: boolean }).defaultPrevented)
-      : false;
+    const defaultPrevented =
+      typeof event === 'object' && event !== null && 'defaultPrevented' in event
+        ? Boolean((event as { defaultPrevented?: boolean }).defaultPrevented)
+        : false;
 
     if (!defaultPrevented) {
       internalHandler?.(event);

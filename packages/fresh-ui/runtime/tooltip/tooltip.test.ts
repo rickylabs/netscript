@@ -16,4 +16,3 @@ Deno.test('getTooltipDataState returns closed when the tooltip is closed', () =>
     'Tooltip data-state should reflect a closed tooltip',
   );
 });
-

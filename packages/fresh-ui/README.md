@@ -5,52 +5,46 @@
 [![Fresh](https://img.shields.io/badge/framework-Fresh-ffdb1e?logo=deno&logoColor=111111)](https://fresh.deno.dev/)
 [![License](https://img.shields.io/badge/license-MIT-0f172a)](https://opensource.org/licenses/MIT)
 
-The NetScript design system for Fresh: a theme-driven token vocabulary, a
-copy-source component registry, and a small package-owned runtime of
-accessible interactive primitives.
+The NetScript design system for Fresh: a theme-driven token vocabulary, a copy-source component
+registry, and a small package-owned runtime of accessible interactive primitives.
 
-It follows the shadcn model adapted to Deno + Fresh: **you own the
-components** (they are copied into your app), while accessibility behavior
-and the token contract stay package-owned and update with releases.
+It follows the shadcn model adapted to Deno + Fresh: **you own the components** (they are copied
+into your app), while accessibility behavior and the token contract stay package-owned and update
+with releases.
 
 ## The three pillars
 
-1. **Themes** — A theme is a complete set of semantic `--ns-*` CSS variables
-   (light + dark) generated from a DTCG token source. **NS One** is the
-   first theme that ships with the package; it is an instance, not the
-   system. Components never reference a specific theme — they consume only
+1. **Themes** — A theme is a complete set of semantic `--ns-*` CSS variables (light + dark)
+   generated from a DTCG token source. **NS One** is the first theme that ships with the package; it
+   is an instance, not the system. Components never reference a specific theme — they consume only
    the semantic vocabulary, so swapping themes restyles every component.
-2. **Registry** — `fresh-ui-foundation` (manifest schema v2): 43 copy-source
-   items — 18 L2 components, 10 L3 blocks, 3 islands, 7 style sheets,
-   2 libs, 2 support modules, and the theme seed. Installed with the
-   NetScript CLI; once copied, the code is yours.
-3. **Runtime** — Package-owned, imported (not copied): seven interactive
-   compound components (Accordion, Dialog, Drawer, Popover, Sheet, Tabs,
-   Tooltip), L0 primitives (`Show`, `VisuallyHidden`, `SrOnly`), and stable
-   helpers (`cn()`, URL toast state).
+2. **Registry** — `fresh-ui-foundation` (manifest schema v2): 43 copy-source items — 18 L2
+   components, 10 L3 blocks, 3 islands, 7 style sheets, 2 libs, 2 support modules, and the theme
+   seed. Installed with the NetScript CLI; once copied, the code is yours.
+3. **Runtime** — Package-owned, imported (not copied): seven interactive compound components
+   (Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip), L0 primitives (`Show`,
+   `VisuallyHidden`, `SrOnly`), and stable helpers (`cn()`, URL toast state).
 
 ## Layer model
 
-Every item in this package has a layer. The layer decides who owns it and
-what it may import.
+Every item in this package has a layer. The layer decides who owns it and what it may import.
 
-| Layer | What | Delivery | May import |
-| ----- | ---- | -------- | ---------- |
-| L0 | Platform contract: token vocabulary, attribute rules, behavior primitives | imported | platform only |
-| L1 | Runtime behavior: hooks and interactive compound components | imported | L0 |
-| L2 | Registry components (button, input, card, …) | copied | L0, L1 — **never another L2** |
-| L3 | Registry blocks (data-table, sidebar-shell, …) | copied | L0–L2 |
-| L4 | Your application | yours | everything |
+| Layer | What                                                                      | Delivery | May import                    |
+| ----- | ------------------------------------------------------------------------- | -------- | ----------------------------- |
+| L0    | Platform contract: token vocabulary, attribute rules, behavior primitives | imported | platform only                 |
+| L1    | Runtime behavior: hooks and interactive compound components               | imported | L0                            |
+| L2    | Registry components (button, input, card, …)                              | copied   | L0, L1 — **never another L2** |
+| L3    | Registry blocks (data-table, sidebar-shell, …)                            | copied   | L0–L2                         |
+| L4    | Your application                                                          | yours    | everything                    |
 
-Shared behavior moves **down** to L0/L1; shared composition moves **up** to
-L3. The full contract is in [`docs/l0-conventions.md`](docs/l0-conventions.md).
+Shared behavior moves **down** to L0/L1; shared composition moves **up** to L3. The full contract is
+in [`docs/l0-conventions.md`](docs/l0-conventions.md).
 
 ## Install
 
-The NetScript CLI is the supported installation path. It copies registry
-sources, resolves registry dependencies, rewrites relative imports for your
-project layout, creates the styles aggregator, and merges `deno.json`
-imports:
+The NetScript CLI is the supported installation path. It copies registry sources, resolves registry
+dependencies, rewrites relative imports for your project layout, creates the styles aggregator, and
+merges `deno.json` imports:
 
 ```sh
 netscript ui:init --project-root ./my-app      # theme seed + foundation
@@ -58,8 +52,8 @@ netscript ui:add button --project-root ./my-app
 netscript ui:add forms-core --project-root ./my-app   # collections work too
 ```
 
-Collections: `foundation`, `forms-core`, `surface-core`, `feedback-core`,
-`layout-foundations`, `dashboard-blocks`.
+Collections: `foundation`, `forms-core`, `surface-core`, `feedback-core`, `layout-foundations`,
+`dashboard-blocks`.
 
 For the imported runtime, add the package to your `deno.json`:
 
@@ -71,17 +65,16 @@ For the imported runtime, add the package to your `deno.json`:
 }
 ```
 
-Manual copying also works — the registry source ships in the published
-package under `registry/`; copy files and fix up the relative imports
-(island copies typically change `../lib/` depth).
+Manual copying also works — the registry source ships in the published package under `registry/`;
+copy files and fix up the relative imports (island copies typically change `../lib/` depth).
 
 ## Entry points
 
-| Import | Layer | Purpose |
-| ------ | ----- | ------- |
-| `@netscript/fresh-ui` | — | Stable helpers: `cn()`, `withToast`, `getToast`, `stripToastFromUrl` |
-| `@netscript/fresh-ui/interactive` | L1 | Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip |
-| `@netscript/fresh-ui/primitives` | L0 | `Show`, `VisuallyHidden`, `SrOnly` |
+| Import                            | Layer | Purpose                                                              |
+| --------------------------------- | ----- | -------------------------------------------------------------------- |
+| `@netscript/fresh-ui`             | —     | Stable helpers: `cn()`, `withToast`, `getToast`, `stripToastFromUrl` |
+| `@netscript/fresh-ui/interactive` | L1    | Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip             |
+| `@netscript/fresh-ui/primitives`  | L0    | `Show`, `VisuallyHidden`, `SrOnly`                                   |
 
 ## Quick start
 
@@ -103,53 +96,48 @@ export function ConfirmDeleteDialog() {
 }
 ```
 
-Runtime components emit `data-part`, `data-state`, and ARIA attributes —
-never `ns-*` classes. Styling comes from the copied registry CSS, which
-targets those attributes and the `--ns-*` vocabulary.
+Runtime components emit `data-part`, `data-state`, and ARIA attributes — never `ns-*` classes.
+Styling comes from the copied registry CSS, which targets those attributes and the `--ns-*`
+vocabulary.
 
 ## Theme contract
 
 Components are theme-blind. The rules that make that work:
 
-- Component CSS consumes **only** semantic `--ns-*` variables (and
-  `color-mix()` over them). Raw hex / `rgb()` / `oklch()` literals are
-  forbidden outside generated theme artifacts and are enforced by fitness
-  gates in CI.
-- Markup uses only the `*-ns-*` Tailwind utilities produced by the theme
-  bridge — never stock palette utilities (`bg-red-500`, `text-white`) or
-  arbitrary color values.
-- Primitive color **ramps** (`--ns-gray-1..12`, etc.) are theme raw
-  material: themes map ramps onto semantic slots; components do not read
-  ramps directly (documented exceptions carry an allow marker).
-- Looping animations honor `prefers-reduced-motion`: infinite loops become
-  static treatments, essential spinners slow down, sub-250ms one-shot
-  enter/exit animations collapse to their end state.
+- Component CSS consumes **only** semantic `--ns-*` variables (and `color-mix()` over them). Raw hex
+  / `rgb()` / `oklch()` literals are forbidden outside generated theme artifacts and are enforced by
+  fitness gates in CI.
+- Markup uses only the `*-ns-*` Tailwind utilities produced by the theme bridge — never stock
+  palette utilities (`bg-red-500`, `text-white`) or arbitrary color values.
+- Primitive color **ramps** (`--ns-gray-1..12`, etc.) are theme raw material: themes map ramps onto
+  semantic slots; components do not read ramps directly (documented exceptions carry an allow
+  marker).
+- Looping animations honor `prefers-reduced-motion`: infinite loops become static treatments,
+  essential spinners slow down, sub-250ms one-shot enter/exit animations collapse to their end
+  state.
 
 Theme artifacts are generated from a DTCG source with Style Dictionary v5
-(`deno task tokens:build`): `registry/theme/tokens.css` (light + dark
-variable blocks), `registry/theme/theme-bridge.css` (Tailwind v4
-`@theme inline` bridge), `registry/theme/tokens.json`, and
-`registry/theme/styles.css` (aggregator). To author a new theme, see
-[`docs/theme-authoring.md`](docs/theme-authoring.md).
+(`deno task tokens:build`): `registry/theme/tokens.css` (light + dark variable blocks),
+`registry/theme/theme-bridge.css` (Tailwind v4 `@theme inline` bridge),
+`registry/theme/tokens.json`, and `registry/theme/styles.css` (aggregator). To author a new theme,
+see [`docs/theme-authoring.md`](docs/theme-authoring.md).
 
 ## Registry catalog
 
 `fresh-ui-foundation` v0.1.0 — copy-source, schema v2.
 
-**Components (L2)** — `button`, `icon-button`, `input`, `textarea`,
-`checkbox`, `switch`, `label`, `select`, `form-field`, `card`, `panel`,
-`badge`, `separator`, `alert`, `inline-notice`, `spinner`, `progress`,
-`skeleton`.
+**Components (L2)** — `button`, `icon-button`, `input`, `textarea`, `checkbox`, `switch`, `label`,
+`select`, `form-field`, `card`, `panel`, `badge`, `separator`, `alert`, `inline-notice`, `spinner`,
+`progress`, `skeleton`.
 
-**Blocks (L3)** — `breadcrumb`, `sidebar-shell`, `page-header`,
-`filter-form`, `stats-grid`, `detail-layout`, `data-table`, `pagination`,
-`empty-state`, `section-divider`.
+**Blocks (L3)** — `breadcrumb`, `sidebar-shell`, `page-header`, `filter-form`, `stats-grid`,
+`detail-layout`, `data-table`, `pagination`, `empty-state`, `section-divider`.
 
 **Islands** — `theme-toggle` (L2), `sidebar-toggle` (L3), `toast` (L2).
 
-**Styles (L2)** — `form-control-styles`, `choice-styles`, `surface-styles`,
-`sheet-styles`, `floating-styles`, `alert-styles`, `layout-objects`
-(stack / cluster / grid / split / toolbar / switcher composition objects).
+**Styles (L2)** — `form-control-styles`, `choice-styles`, `surface-styles`, `sheet-styles`,
+`floating-styles`, `alert-styles`, `layout-objects` (stack / cluster / grid / split / toolbar /
+switcher composition objects).
 
 **Lib & support** — `cn`, `public-types`, `control-props`, `toast-support`.
 
@@ -181,17 +169,15 @@ const klass = cn('ns-button', isQuiet && 'ns-button--ghost', props.class);
 
 ## Living reference
 
-A consuming app should expose the design system on real routes (the
-NetScript playground ships these under `/design`):
+A consuming app should expose the design system on real routes (the NetScript playground ships these
+under `/design`):
 
-- `/design/tokens` — the full semantic vocabulary, live against the active
-  theme;
+- `/design/tokens` — the full semantic vocabulary, live against the active theme;
 - `/design/components` — every registry component in every variant/state;
-- `/design/composition` — the layer model, layout objects, and
-  do/don't rules.
+- `/design/composition` — the layer model, layout objects, and do/don't rules.
 
-These routes double as the browser validation surface: theme flip, reduced
-motion, and 390px viewport checks run against them.
+These routes double as the browser validation surface: theme flip, reduced motion, and 390px
+viewport checks run against them.
 
 ## Validation
 
@@ -212,12 +198,11 @@ deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts
 
 ## Resources
 
-- [`@netscript/fresh`](https://jsr.io/@netscript/fresh) — page builders,
-  route contracts, and form helpers
+- [`@netscript/fresh`](https://jsr.io/@netscript/fresh) — page builders, route contracts, and form
+  helpers
 - [Fresh documentation](https://fresh.deno.dev/docs/)
 - [Preact documentation](https://preactjs.com/guide/v10/getting-started)
-- [DTCG design tokens](https://tr.designtokens.org/format/) — token source
-  format
+- [DTCG design tokens](https://tr.designtokens.org/format/) — token source format
 - [Style Dictionary](https://styledictionary.com/) — token build pipeline
 
 ## License
