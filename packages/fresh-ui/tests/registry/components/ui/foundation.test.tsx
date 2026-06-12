@@ -1,12 +1,16 @@
 import { assert, assertExists, assertStrictEquals, assertStringIncludes } from '@std/assert';
-import { freshUiRegistryManifest } from '../../../registry.manifest.ts';
-import { Button } from './button.tsx';
-import { getInputProps, getSelectProps, getTextareaProps } from './control-props.ts';
-import { IconButton } from './icon-button.tsx';
-import { Progress } from './progress.tsx';
-import { Select } from './select.tsx';
-import { Skeleton } from './skeleton.tsx';
-import { Textarea } from './textarea.tsx';
+import { freshUiRegistryManifest } from '../../../../registry.manifest.ts';
+import { Button } from '../../../../registry/components/ui/button.tsx';
+import {
+  getInputProps,
+  getSelectProps,
+  getTextareaProps,
+} from '../../../../registry/components/ui/control-props.ts';
+import { IconButton } from '../../../../registry/components/ui/icon-button.tsx';
+import { Progress } from '../../../../registry/components/ui/progress.tsx';
+import { Select } from '../../../../registry/components/ui/select.tsx';
+import { Skeleton } from '../../../../registry/components/ui/skeleton.tsx';
+import { Textarea } from '../../../../registry/components/ui/textarea.tsx';
 
 interface VNodeLike {
   type: unknown;

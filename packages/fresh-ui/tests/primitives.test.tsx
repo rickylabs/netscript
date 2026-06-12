@@ -1,5 +1,5 @@
 import { assertStrictEquals } from '@std/assert';
-import { Show, SrOnly, VisuallyHidden } from './primitives.tsx';
+import { Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
 
 interface VNodeLike {
   type: unknown;

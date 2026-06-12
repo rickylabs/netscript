@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { getNextCollectionIndex } from './collection-navigation.ts';
+import { getNextCollectionIndex } from '../../../runtime/_internal/collection-navigation.ts';
 
 Deno.test('getNextCollectionIndex wraps forward navigation when looping', () => {
   assertEquals(

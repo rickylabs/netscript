@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { getPopoverDataState } from './use-popover.ts';
+import { getPopoverDataState } from '../../../runtime/popover/use-popover.ts';
 
 Deno.test('getPopoverDataState returns open when the popover is open', () => {
   assertEquals(

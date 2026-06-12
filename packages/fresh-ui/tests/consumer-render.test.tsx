@@ -11,8 +11,8 @@
 
 import { assert } from '@std/assert';
 import type { VNode } from 'preact';
-import { Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip } from './interactive.ts';
-import { Show, SrOnly, VisuallyHidden } from './primitives.tsx';
+import { Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip } from '../interactive.ts';
+import { Show, SrOnly, VisuallyHidden } from '../primitives.tsx';
 
 const accordion: VNode = (
   <Accordion.Root>

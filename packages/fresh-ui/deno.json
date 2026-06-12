@@ -1,6 +1,6 @@
 {
   "name": "@netscript/fresh-ui",
-  "version": "0.0.1-alpha.0",
+  "version": "0.1.0",
   "description": "Fresh UI registry seams and interactive foundations for NetScript.",
   "license": "MIT",
   "exclude": [],
@@ -36,15 +36,12 @@
       "!deno.json",
       "!README.md",
       "scripts/**",
-      "**/*_test.ts",
-      "**/*_test.tsx",
-      "**/*.test.ts",
-      "**/*.test.tsx"
+      "tests/**"
     ]
   },
   "tasks": {
     "check": "deno check --lock=deno.lock --unstable-kv \"**/*.ts\" \"**/*.tsx\"",
-    "test": "deno test --lock=deno.lock --unstable-kv \"**/*_test.ts\" \"**/*_test.tsx\" \"**/*.test.ts\" \"**/*.test.tsx\"",
+    "test": "deno test --lock=deno.lock --unstable-kv \"tests/**/*.ts\" \"tests/**/*.tsx\"",
     "tokens:build": "deno run --lock=deno.lock --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
     "tokens:check": "deno task tokens:build && git diff --exit-code registry/theme/tokens.css registry/theme/theme-bridge.css registry/theme/tokens.json"
   },

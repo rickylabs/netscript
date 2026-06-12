@@ -1,5 +1,10 @@
 import { assertEquals, assertExists } from '@std/assert';
-import { getToast, REGISTRY_TOAST_QUERY_KEYS, stripToastFromUrl, withToast } from './toast.ts';
+import {
+  getToast,
+  REGISTRY_TOAST_QUERY_KEYS,
+  stripToastFromUrl,
+  withToast,
+} from '../../../registry/lib/toast.ts';
 
 Deno.test('withToast appends toast params to a path', () => {
   const result = withToast('/users/42', {

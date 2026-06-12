@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { getNextTabsIndex } from './tabs.utils.ts';
+import { getNextTabsIndex } from '../../../runtime/tabs/tabs.utils.ts';
 
 Deno.test('getNextTabsIndex advances horizontally with looping', () => {
   assertEquals(
