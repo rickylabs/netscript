@@ -10,7 +10,10 @@ export interface UseDismissableLayerOptions {
   onDismiss: (reason: DismissableLayerReason) => void;
 }
 
-function isWithinElements(target: EventTarget | null, elements: Array<HTMLElement | null>): boolean {
+function isWithinElements(
+  target: EventTarget | null,
+  elements: Array<HTMLElement | null>,
+): boolean {
   if (!(target instanceof Node)) {
     return false;
   }

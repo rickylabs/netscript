@@ -5,14 +5,23 @@ import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 // Element-level prop types (returned by hook getters)
 // ---------------------------------------------------------------------------
 
-export type SheetTriggerElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & MachineDataAttributes;
-export type SheetContentElementProps = JSX.HTMLAttributes<HTMLDialogElement> & MachineDataAttributes & {
-  'data-side'?: SheetSide;
-  open?: boolean;
-};
+export type SheetTriggerElementProps =
+  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & MachineDataAttributes;
+export type SheetContentElementProps =
+  & JSX.HTMLAttributes<HTMLDialogElement>
+  & MachineDataAttributes
+  & {
+    'data-side'?: SheetSide;
+    open?: boolean;
+  };
 export type SheetTitleElementProps = JSX.HTMLAttributes<HTMLHeadingElement> & MachineDataAttributes;
-export type SheetDescriptionElementProps = JSX.HTMLAttributes<HTMLParagraphElement> & MachineDataAttributes;
-export type SheetCloseElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & MachineDataAttributes;
+export type SheetDescriptionElementProps =
+  & JSX.HTMLAttributes<HTMLParagraphElement>
+  & MachineDataAttributes;
+export type SheetCloseElementProps =
+  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & MachineDataAttributes;
 
 // ---------------------------------------------------------------------------
 // Semantic types
@@ -52,9 +61,13 @@ export interface UseSheetOptions {
 export interface UseSheetReturn {
   getCloseProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => SheetCloseElementProps;
   getContentProps: (props?: JSX.HTMLAttributes<HTMLDialogElement>) => SheetContentElementProps;
-  getDescriptionProps: (props?: JSX.HTMLAttributes<HTMLParagraphElement>) => SheetDescriptionElementProps;
+  getDescriptionProps: (
+    props?: JSX.HTMLAttributes<HTMLParagraphElement>,
+  ) => SheetDescriptionElementProps;
   getTitleProps: (props?: JSX.HTMLAttributes<HTMLHeadingElement>) => SheetTitleElementProps;
-  getTriggerProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => SheetTriggerElementProps;
+  getTriggerProps: (
+    props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+  ) => SheetTriggerElementProps;
   ids: {
     content: string;
     description: string;
@@ -74,7 +87,8 @@ export interface SheetRootProps extends UseSheetOptions {
   children: ComponentChildren;
 }
 
-export interface SheetTriggerProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface SheetTriggerProps
+  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: ComponentChildren;
   type?: 'button' | 'submit' | 'reset';
 }

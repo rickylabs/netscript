@@ -26,3 +26,11 @@
     transform: rotate(360deg);
   }
 }
+
+/* Reduced motion: spinner is an essential progress indicator, so it keeps
+   spinning, only slower. */
+@media (prefers-reduced-motion: reduce) {
+  .ns-spinner {
+    animation-duration: 1.5s;
+  }
+}

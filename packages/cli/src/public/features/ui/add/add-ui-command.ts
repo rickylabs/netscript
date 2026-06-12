@@ -26,6 +26,7 @@ export function createUiAddCommand(
     .arguments("<name:string>")
     .option("--project-root <path:string>", "Project root directory")
     .option("--registry-root <path:string>", "Fresh UI package root override")
+    .option("--theme <name:string>", "Theme registry item (defaults to the official theme)")
     .option("--force", "Overwrite existing copied UI files", { default: false })
     .action(async (options: UiAddCommandInput, name: string): Promise<void> => {
       const projectRoot = await requireProjectRoot(
@@ -37,6 +38,7 @@ export function createUiAddCommand(
         registryRoot: options.registryRoot,
         names: [name],
         overwrite: options.force ?? false,
+        theme: options.theme,
       }, dependencies.installDependencies);
 
       print(`Installed ${result.installedItems.length} Fresh UI registry items.`);

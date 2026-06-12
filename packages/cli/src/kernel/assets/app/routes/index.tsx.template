@@ -6,29 +6,40 @@ export const homePage = definePage()
   .withRoute(appRoutes.home)
   .withMeta(() => ({
     title: '{{name}} — {{appName}}',
-    description: 'NetScript starter scaffold with definePage routes and showcase examples.',
+    description: 'NetScript starter scaffold with app-owned fresh-ui pages.',
   }))
   .withLayer('home', HomeView, () => ({
     projectName: '{{name}}',
     appName: '{{appName}}',
     routes: [
       {
-        title: 'Health route',
-        href: appRoutes.health.href(),
-        description: 'Content-negotiated liveness route for browsers, probes, and Aspire.',
-        cta: 'Open /health',
+        title: 'Dashboard',
+        href: appRoutes.dashboard.href(),
+        description: 'Operational overview built from registry stats, tables, panels, and alerts.',
+        cta: 'Open dashboard',
+        badge: 'app',
       },
       {
-        title: 'Examples landing',
-        href: appRoutes.examples.href(),
-        description: 'Entry point for the upcoming service and telemetry showcase routes.',
-        cta: 'Open /examples',
+        title: 'CRUD example',
+        href: appRoutes.crudExample.href(),
+        description: 'Directory, filters, table, and detail rail composed from copied UI blocks.',
+        cta: 'Open CRUD',
+        badge: 'example',
       },
-    ],
-    nextSteps: [
-      'Edit apps/{{appName}}/routes/index.tsx to shape the frontend.',
-      'Add a service with netscript service add --name=<name>.',
-      'Define contracts under contracts/versions/v1/.',
+      {
+        title: 'Design reference',
+        href: '/design/components',
+        description: 'The scaffolded component gallery and token reference for the active theme.',
+        cta: 'Open design',
+        badge: 'design',
+      },
+      {
+        title: 'Examples',
+        href: appRoutes.examples.href(),
+        description: 'Index of generated workflow examples and integration placeholders.',
+        cta: 'Open examples',
+        badge: 'routes',
+      },
     ],
   }))
   .withLayout((slots) => slots.home())

@@ -28,7 +28,7 @@
 .ns-textarea:focus {
   outline: none;
   border-color: var(--ns-ring);
-  box-shadow: 0 0 0 2px rgba(200, 149, 108, 0.15);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-ring) 15%, transparent);
 }
 
 .ns-input--error,
@@ -40,5 +40,5 @@
 .ns-input--error:focus,
 .ns-select--error:focus,
 .ns-textarea--error:focus {
-  box-shadow: 0 0 0 2px rgba(224, 69, 69, 0.15);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-destructive) 15%, transparent);
 }

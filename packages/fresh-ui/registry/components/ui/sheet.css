@@ -10,7 +10,9 @@ dialog[data-part='content'][data-side] {
   border: none;
   background: var(--ns-card);
   color: var(--ns-card-fg);
-  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    -8px 0 30px color-mix(in srgb, var(--ns-gray-12) 35%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--ns-gray-12) 10%, transparent);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   max-width: 100vw;
@@ -18,7 +20,7 @@ dialog[data-part='content'][data-side] {
 }
 
 dialog[data-part='content'][data-side]::backdrop {
-  background: rgba(0, 0, 0, 0.55);
+  background: color-mix(in srgb, var(--ns-gray-12) 55%, transparent);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
@@ -126,4 +128,14 @@ dialog[data-part='content'][data-side='bottom']::before {
   border-radius: 9999px;
   background: var(--ns-border-strong);
   margin: var(--ns-space-2) auto var(--ns-space-1);
+}
+
+/* Reduced motion: enter animations are one-shot with fill-mode forwards, so
+   they jump to their end state instead of being removed. */
+@media (prefers-reduced-motion: reduce) {
+  dialog[data-part='content'][data-side][open],
+  dialog[data-part='content'][data-side][open]::backdrop,
+  dialog[data-part='content'][data-side='bottom'][open] {
+    animation-duration: 0.01ms;
+  }
 }

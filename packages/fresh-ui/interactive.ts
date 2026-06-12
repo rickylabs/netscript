@@ -1,4 +1,6 @@
 /**
+ * @module
+ *
  * Runtime interactive seams for `@netscript/fresh-ui`.
  *
  * These exports intentionally stay separate from the copy-based

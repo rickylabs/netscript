@@ -1,93 +1,67 @@
-import { Button, Card } from '@app/components/ui/mod.ts';
-import ThemeToggle from '@app/islands/ThemeToggle.tsx';
+import { Badge, Button, Card, PageHeader, StatsGrid } from '@app/components/ui/mod.ts';
 
 interface RouteCard {
   readonly title: string;
   readonly href: string;
   readonly description: string;
   readonly cta: string;
+  readonly badge: string;
 }
 
 interface HomeViewProps {
   readonly projectName: string;
   readonly appName: string;
   readonly routes: readonly RouteCard[];
-  readonly nextSteps: readonly string[];
 }
 
-export default function HomeView({ projectName, appName, routes, nextSteps }: HomeViewProps) {
+export default function HomeView({ projectName, appName, routes }: HomeViewProps) {
   return (
-    <div class='min-h-[calc(100vh-52px)] bg-ns-bg text-ns-fg'>
-      <section class='ns-shell ns-section ns-section--lg'>
-        <div class='ns-stack ns-stack--sm'>
-          <span class='ns-badge ns-badge--primary w-fit'>definePage scaffold</span>
-          <h1 class='text-4xl font-semibold text-ns-fg sm:text-5xl'>{projectName}</h1>
-          <p class='max-w-3xl text-sm leading-7 text-ns-muted-fg sm:text-base'>
-            The starter app now uses the same builder seam the framework is standardizing around:
-            typed route definitions, shared layout chrome, and example landing pages ready for the
-            next rollout steps.
-          </p>
-        </div>
-
-        <div class='ns-grid'>
-          {routes.map((route) => (
-            <Card key={route.href} interactive>
-              <Card.Header>
-                <Card.Title>{route.title}</Card.Title>
-                <Card.Description>{route.description}</Card.Description>
-              </Card.Header>
-              <Card.Body class='ns-stack ns-stack--sm text-sm text-ns-muted-fg'>
-                <p>{route.href}</p>
-                <Button type='link' href={route.href} variant='ghost' class='w-fit px-0'>
-                  {route.cta}
-                </Button>
-              </Card.Body>
-            </Card>
-          ))}
-
-          <Card interactive>
-            <Card.Header class='flex items-start justify-between gap-4'>
-              <div class='ns-stack ns-stack--xs'>
-                <Card.Title>Theme</Card.Title>
-                <Card.Description>
-                  The scaffold still ships a hydrated island so light and dark mode can be checked
-                  on the builder-backed routes from the first load.
-                </Card.Description>
-              </div>
-              <ThemeToggle />
-            </Card.Header>
-            <Card.Body class='text-sm leading-6 text-ns-muted-fg'>
-              The same theme seed powers the shared layout chrome, copied UI seams, and every
-              example page under <code>/examples</code>.
-            </Card.Body>
-          </Card>
-
-          <Card interactive>
-            <Card.Header>
-              <Card.Title>Next steps</Card.Title>
-              <Card.Description>
-                This starter now has the scaffold shape needed for the upcoming service and
-                telemetry demos.
-              </Card.Description>
-            </Card.Header>
-            <Card.Body>
-              <ul class='ml-5 space-y-2 text-sm leading-6 text-ns-muted-fg'>
-                {nextSteps.map((step) => <li key={step}>{step}</li>)}
-              </ul>
-            </Card.Body>
-          </Card>
-        </div>
-
-        <div class='ns-inline-notice ns-inline-notice--info'>
-          <div class='ns-inline-notice__body'>
-            <p class='ns-inline-notice__title'>Scaffold route surface</p>
-            <p class='ns-inline-notice__description'>
-              <code>{appName}</code> now boots with `definePage()` routes, `define.layout()`
-              chrome, copied UI seams, and an examples landing page ready for Step 5 and Step 10.
+    <main class='ns-shell ns-section ns-stack ns-stack--lg'>
+      <PageHeader>
+        <PageHeader.Main>
+          <PageHeader.Badges>
+            <Badge variant='primary'>Fresh app</Badge>
+            <Badge variant='muted'>{appName}</Badge>
+          </PageHeader.Badges>
+          <PageHeader.Intro>
+            <h1>{projectName}</h1>
+            <p class='ns-lede'>
+              A generated NetScript workspace with app-owned UI copies, design reference routes,
+              and operational examples ready to adapt.
             </p>
-          </div>
-        </div>
-      </section>
-    </div>
+          </PageHeader.Intro>
+          <PageHeader.Actions>
+            <Button type='link' href='/dashboard'>Open dashboard</Button>
+            <Button type='link' href='/design/components' variant='outline'>
+              Browse UI
+            </Button>
+          </PageHeader.Actions>
+        </PageHeader.Main>
+      </PageHeader>
+
+      <StatsGrid>
+        <StatsGrid.Card label='Routes' value='6' detail='Home, dashboard, health, examples, CRUD, design' />
+        <StatsGrid.Card label='UI source' value='app-owned' detail='Installed from @netscript/fresh-ui registry' />
+        <StatsGrid.Card label='Theme' value='NS One' detail='Light/dark tokens from copied artifacts' />
+        <StatsGrid.Card label='Mode' value='local' detail='Generated by the maintainer scaffold' />
+      </StatsGrid>
+
+      <div class='ns-grid ns-grid--3'>
+        {routes.map((route) => (
+          <Card key={route.href}>
+            <Card.Header>
+              <div class='ns-cluster ns-cluster--between'>
+                <Card.Title>{route.title}</Card.Title>
+                <Badge variant='secondary'>{route.badge}</Badge>
+              </div>
+              <Card.Description>{route.description}</Card.Description>
+            </Card.Header>
+            <Card.Footer>
+              <Button type='link' href={route.href} variant='outline'>{route.cta}</Button>
+            </Card.Footer>
+          </Card>
+        ))}
+      </div>
+    </main>
   );
 }

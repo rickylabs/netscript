@@ -50,6 +50,7 @@ const PACKAGE_TO_JSR: Record<string, string> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_VITE]: 'jsr:@netscript/fresh@^1.0.0/vite',
   [SCAFFOLD_PACKAGES.NETSCRIPT_KV]: 'jsr:@netscript/kv@^1.0.0',
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI]: 'jsr:@netscript/fresh-ui@^1.0.0',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE]: 'jsr:@netscript/fresh-ui@^1.0.0/interactive',
   [SCAFFOLD_PACKAGES.STD_PATH]: 'jsr:@std/path@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_FS]: 'jsr:@std/fs@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_ASSERT]: 'jsr:@std/assert@^1.0.0',
@@ -86,6 +87,7 @@ const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_VITE]: 'packages/fresh/config/vite.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_KV]: 'packages/kv/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI]: 'packages/fresh-ui/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE]: 'packages/fresh-ui/interactive.ts',
 };
 
 const EXTERNAL_DEPS: Readonly<Record<string, string>> = {

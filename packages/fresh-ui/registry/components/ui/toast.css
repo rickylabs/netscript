@@ -2,31 +2,35 @@
   position: relative;
   width: min(100%, 360px);
   border-radius: var(--ns-radius-lg);
-  border: 1px solid rgba(235, 228, 210, 0.12);
-  background: var(--ns-surface-raised);
-  color: var(--ns-fg);
+  border: 1px solid var(--ns-border-hover);
+  background: color-mix(
+    in srgb,
+    var(--ns-card) 92%,
+    var(--ns-surface-raised)
+  );
+  color: var(--ns-card-fg);
   box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.52),
-    4px 4px 0 rgba(0, 0, 0, 0.26),
-    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    var(--ns-shadow-lg),
+    4px 4px 0 color-mix(in srgb, var(--ns-border-strong) 70%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--ns-fg) 3%, transparent) inset;
   overflow: hidden;
   pointer-events: auto;
 }
 
 .ns-toast--success {
-  border-color: rgba(91, 168, 160, 0.24);
+  border-color: color-mix(in srgb, var(--ns-success) 24%, transparent);
 }
 
 .ns-toast--error {
-  border-color: rgba(224, 69, 69, 0.24);
+  border-color: color-mix(in srgb, var(--ns-destructive) 24%, transparent);
 }
 
 .ns-toast--warning {
-  border-color: rgba(224, 174, 79, 0.24);
+  border-color: color-mix(in srgb, var(--ns-warning) 24%, transparent);
 }
 
 .ns-toast--info {
-  border-color: rgba(144, 152, 166, 0.24);
+  border-color: color-mix(in srgb, var(--ns-secondary) 24%, transparent);
 }
 
 .ns-toast-wrapper {
@@ -53,7 +57,7 @@
 .ns-toast__progress-track {
   position: relative;
   height: 3px;
-  background: rgba(235, 228, 210, 0.06);
+  background: color-mix(in srgb, var(--ns-border) 90%, transparent);
 }
 
 .ns-toast__symbol {
@@ -63,8 +67,8 @@
   width: 1.9rem;
   height: 1.9rem;
   border-radius: var(--ns-radius-sm);
-  border: 1px solid rgba(144, 152, 166, 0.16);
-  background: rgba(144, 152, 166, 0.06);
+  border: 1px solid color-mix(in srgb, var(--ns-secondary) 16%, transparent);
+  background: color-mix(in srgb, var(--ns-secondary) 6%, transparent);
   font-family: var(--ns-font-mono);
   font-size: 0.84rem;
   line-height: 1;
@@ -72,20 +76,20 @@
 }
 
 .ns-toast--success .ns-toast__symbol {
-  border-color: rgba(91, 168, 160, 0.18);
-  background: rgba(91, 168, 160, 0.08);
+  border-color: color-mix(in srgb, var(--ns-success) 18%, transparent);
+  background: color-mix(in srgb, var(--ns-success) 8%, transparent);
   color: var(--ns-success);
 }
 
 .ns-toast--error .ns-toast__symbol {
-  border-color: rgba(224, 69, 69, 0.18);
-  background: rgba(224, 69, 69, 0.08);
+  border-color: color-mix(in srgb, var(--ns-destructive) 18%, transparent);
+  background: color-mix(in srgb, var(--ns-destructive) 8%, transparent);
   color: var(--ns-destructive);
 }
 
 .ns-toast--warning .ns-toast__symbol {
-  border-color: rgba(224, 174, 79, 0.18);
-  background: rgba(224, 174, 79, 0.08);
+  border-color: color-mix(in srgb, var(--ns-warning) 18%, transparent);
+  background: color-mix(in srgb, var(--ns-warning) 8%, transparent);
   color: var(--ns-warning);
 }
 
@@ -109,7 +113,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: color-mix(in srgb, var(--ns-secondary) 88%, white 12%);
+  color: color-mix(in srgb, var(--ns-secondary) 88%, var(--ns-fg) 12%);
 }
 
 .ns-toast--success .ns-toast__eyebrow {
@@ -136,7 +140,7 @@
 .ns-toast__message {
   margin-top: var(--ns-space-3);
   padding-top: var(--ns-space-3);
-  border-top: 1px solid rgba(235, 228, 210, 0.08);
+  border-top: 1px solid color-mix(in srgb, var(--ns-border) 80%, transparent);
   color: color-mix(in srgb, var(--ns-fg) 92%, var(--ns-muted-fg));
   font-size: var(--ns-text-sm);
   line-height: 1.6;
@@ -215,5 +219,14 @@
 
   to {
     transform: scaleX(0);
+  }
+}
+
+/* Reduced motion: enter/exit are one-shot fill-mode animations, so they jump
+   to their end state instead of being removed. */
+@media (prefers-reduced-motion: reduce) {
+  .ns-toast-enter,
+  .ns-toast-exit {
+    animation-duration: 0.01ms;
   }
 }

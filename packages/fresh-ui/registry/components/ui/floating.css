@@ -1,6 +1,6 @@
 :where(
-  [data-scope="popover"][data-part="content"],
-  [data-scope="tooltip"][data-part="content"]
+  [data-scope='popover'][data-part='content'],
+  [data-scope='tooltip'][data-part='content']
 ) {
   position: fixed;
   inset: var(
@@ -12,31 +12,31 @@
 }
 
 :where(
-  [data-scope="popover"][data-part="content"],
-  [data-scope="tooltip"][data-part="content"]
-)[data-state="closed"] {
+  [data-scope='popover'][data-part='content'],
+  [data-scope='tooltip'][data-part='content']
+)[data-state='closed'] {
   display: none;
 }
 
 :where(
-  [data-scope="popover"][data-part="content"],
-  [data-scope="tooltip"][data-part="content"]
+  [data-scope='popover'][data-part='content'],
+  [data-scope='tooltip'][data-part='content']
 ):popover-open {
   display: block;
 }
 
 @supports (anchor-name: --ns-floating-anchor) and (position-area: bottom) {
   :where(
-    [data-scope="popover"][data-part="trigger"],
-    [data-scope="popover"][data-part="anchor"],
-    [data-scope="tooltip"][data-part="trigger"]
+    [data-scope='popover'][data-part='trigger'],
+    [data-scope='popover'][data-part='anchor'],
+    [data-scope='tooltip'][data-part='trigger']
   ) {
     anchor-name: var(--ns-floating-anchor-name);
   }
 
   :where(
-    [data-scope="popover"][data-part="content"],
-    [data-scope="tooltip"][data-part="content"]
+    [data-scope='popover'][data-part='content'],
+    [data-scope='tooltip'][data-part='content']
   ) {
     inset: auto;
     position-anchor: var(--ns-floating-anchor-name);

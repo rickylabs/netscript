@@ -10,8 +10,7 @@ import { cn } from '../../lib/cn.ts';
 import type { Renderable } from '../../lib/public-types.ts';
 import { Label } from './label.tsx';
 
-interface FormFieldProps
-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'children' | 'class'> {
+interface FormFieldProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'children' | 'class'> {
   label: Renderable;
   name: string;
   required?: boolean;

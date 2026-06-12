@@ -7,7 +7,9 @@ export interface UseControllableSignalOptions<T> {
   value?: T;
 }
 
-export function useControllableSignal<T>({ defaultValue, onChange, value }: UseControllableSignalOptions<T>) {
+export function useControllableSignal<T>(
+  { defaultValue, onChange, value }: UseControllableSignalOptions<T>,
+) {
   const uncontrolledValue = useSignal(defaultValue);
   const currentValue = value === undefined ? uncontrolledValue.value : value;
 
