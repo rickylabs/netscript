@@ -46,3 +46,38 @@ D-5c1-3 root-exclude lift with accepted root publish-graph churn).
   the css contribution instead of the theme's own import. No component API change.
   This is the open/closed seam the mandate requires: a second theme can replace
   theme-seed without touching layout objects.
+
+## D-5c2-2 — Slice 3: consumer-surfaced regressions + conversion shape (2026-06-12)
+
+- Plan said: "playground converted to ui:add consumer | gate: playground
+  check passes | replaces deep relative imports."
+- Reality / deviations recorded:
+  1. **`: unknown` JSX regression in shipped runtime** — the JSR
+     no-slow-types annotation pass (Run 1) had stamped `): unknown {` on 44
+     runtime components across 7 files (Accordion, Dialog, Drawer, Popover,
+     Sheet, Tabs, Tooltip). `unknown` is not a valid JSX element type, so any
+     consumer rendering them fails TS2786. Invisible to all package
+     self-gates (they never render runtime components in JSX); surfaced only
+     by the consumer typecheck this slice introduces. Fixed `: VNode` per
+     house convention (framework `b54e3533`). Follow-up: slice 7/8 gate
+     scripts should include a consumer-shaped JSX render typecheck.
+  2. **button.css slice-1 regression** — `2a1b378` introduced a duplicated
+     `.ns-btn {` opening line (unbalanced brace, CSS parse error at EOF in
+     every consumer copy). Step-0 audit missed it (audit swept raw values,
+     not parse validity). Fixed in framework `372484e`.
+  3. **Scope growth, deliberate**: playground-wide fmt normalization + all 37
+     pre-existing lint findings fixed, because the locked gate is the
+     app-level `deno task check` (fmt && lint && check) and the pass-2
+     mandate forbids waiving it. Isolated in its own commit (`32cc5bb`).
+  4. **Typecheck gate is INFO_FAIL at env level**: playground full
+     `deno check` is red at HEAD (347 errors) due to missing
+     `database/postgres/schema/.generated/zod/` Prisma artifacts; generating
+     them requires Prisma engines + env files, out of run scope. Gate verdict
+     therefore = "no new errors vs HEAD baseline" (normalized set-diff
+     empty), not "exit 0". fmt + lint are hard PASS.
+  5. **App-owned skin split**: playground styles.css monolith split into
+     registry `assets/ui/*.css` (package-owned) + components.css /
+     dashboard.css (app-owned skins) — additive consumer-side structure,
+     no registry change.
+  6. **Slice-9 candidate**: playground responsive table patterns flagged for
+     `ns-responsive-table` registry item during slice 9.

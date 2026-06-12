@@ -9,3 +9,7 @@
 | 2 | `7c5dffc` | — | layouts.css token cleanup; worklog entry added in takeover follow-up |
 | takeover bookkeeping | — | `9a1f971` | worklog slices 1-cont/2 + commits.md reconciliation |
 | 2 (cont.) | `7c09c06` | — | step-0 audit; layout-objects style item extraction (drift D-5c2-1) |
+| 3 (pre) | `372484e` | — | button.css duplicate `.ns-btn {` fix (slice-1 regression) |
+| 3 (pre) | `7c7863a` | — | ui-init-smoke driver: extras + theme args |
+| 3 | `b54e3533` | — | runtime `: unknown` → `: VNode` JSX fix (44 components / 7 files) |
+| 3 (repo-genesis) | `b2008985`, `e8ae8068`, `32cc5bb` | — | sync @ b54e3533 / playground ui:add conversion / fmt+lint normalization (branch `feat/repo-genesis`) |

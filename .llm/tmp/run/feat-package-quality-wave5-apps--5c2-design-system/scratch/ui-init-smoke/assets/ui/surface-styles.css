@@ -1,0 +1,27 @@
+.ns-card,
+.ns-panel {
+  border-radius: var(--ns-radius-xl);
+  border: 1px solid var(--ns-border-hover);
+  overflow: hidden;
+}
+
+.ns-card__header,
+.ns-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-2);
+}
+
+.ns-card__title,
+.ns-panel__title {
+  font-size: var(--ns-text-sm);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ns-card__description,
+.ns-panel__description {
+  font-size: var(--ns-text-sm);
+  line-height: 1.55;
+  color: var(--ns-muted-fg);
+}

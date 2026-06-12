@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "preact": "npm:preact@^10.27.2",
+    "preact/hooks": "npm:preact@^10.27.2/hooks",
+    "clsx": "npm:clsx@^2.1.1",
+    "tailwind-merge": "npm:tailwind-merge@^3.5.0"
+  }
+}

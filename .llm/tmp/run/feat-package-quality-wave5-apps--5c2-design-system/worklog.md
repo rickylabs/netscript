@@ -120,3 +120,58 @@
   - fmt (changed sources): PASS after `deno fmt` on manifest.ts +
     foundation.test.tsx
 - Drift: D-5c2-1 (structural extraction, additive)
+
+## Slice 3 — playground converted to ui:add consumer
+
+- Scope: convert `apps/playground` (repo-genesis, branch `feat/repo-genesis`)
+  from deep relative imports into `packages/fresh-ui` to a real ui:add
+  consumer, validating the design system on the synced copy (cross-repo R5:
+  framework ships the DS; test-app syncs via the genesis flow).
+- Changes (framework worktree):
+  - `registry/components/ui/button.css`: removed duplicated `.ns-btn {`
+    opening line — a slice-1 (`2a1b378`) regression producing a CSS parse
+    error at EOF in every consumer copy. Follow-up fix commit, no amend.
+  - `.llm/temp/ui-init-smoke.ts`: driver now accepts extra items CSV + theme
+    args for consumer-shaped smoke runs.
+  - `runtime/{accordion,dialog,drawer,popover,sheet,tabs,tooltip}/*.tsx`:
+    **fixed `: unknown` → `: VNode` on 44 components in 7 files** (+ `VNode`
+    type imports). The JSR no-slow-types pass had annotated explicit
+    `: unknown` returns, which is not a valid JSX element type — any consumer
+    rendering `<Sheet.Root>` etc. fails TS2786. Package self-gates never
+    render runtime components in JSX, so only the consumer typecheck caught
+    it: exactly the regression class the slice-3 gate exists to catch.
+- Changes (repo-genesis), three structured commits:
+  - sync: full `packages/fresh-ui` directory replace @ framework `b54e3533`
+    (package-level untracked deno.lock excluded to mirror framework).
+  - conversion: app-owned ui:add copies (`components/ui`, `islands/ui`,
+    `lib/cn.ts`, `lib/ui/toast.ts`), bare `@netscript/fresh-ui`
+    (+`/interactive`) import-map entries, registry styles as
+    `assets/ui/*.css`, app skins split into components.css/dashboard.css,
+    ns token vocabulary in tokens.css/theme-bridge.css/tokens.json,
+    deno.json + root deno.lock (+clsx, +tailwind-merge; conflicting
+    `preact/hooks` pin removed), islands SidebarToggle/ThemeToggle/Toast
+    rewired to `./ui/*` copies.
+  - normalization: mechanical fmt over the app + all 37 pre-existing lint
+    findings fixed (playground lint gate green per pass-2 mandate).
+- Gate evidence (gate: playground check passes):
+  - `deno task check` in apps/playground: fmt PASS, lint PASS (0 problems),
+    typecheck 347 errors — **byte-identical set to the HEAD baseline**
+    (temp worktree `rg-baseline-check` @ `ce13e8089`; normalized `comm`
+    set-diff empty). All 347 pre-existing, rooted in missing
+    `database/postgres/schema/.generated/zod/` Prisma artifacts (77 TS2307
+    cascade) — env INFO_FAIL, out of scope (`db:generate` needs Prisma
+    engines + env files). Zero conversion-introduced errors; TS2786 count 0.
+  - Conversion-owned files typecheck clean
+    (`deno check --unstable-kv components/ui/mod.ts islands/{SidebarToggle,ThemeToggle,Toast}.tsx islands/ui/*.tsx lib/cn.ts lib/ui/toast.ts`).
+  - fresh-ui package: typecheck PASS (entrypoints + 7 fixed files), lint
+    PASS (37 files), tests 5/5 PASS in framework worktree AND on the synced
+    repo-genesis copy; 7 edited files fmt-clean per deno.gates.json.
+  - Deep-import sweep: no `../../packages/fresh-ui` imports remain in
+    playground islands/components/routes.
+- Pre-existing noted for slice 11: 30 runtime files unformatted per the
+  package's own deno.gates.json fmt config (untouched by this slice).
+- Slice-9 candidate carried: playground responsive table patterns →
+  `ns-responsive-table` registry item.
+- Commits: framework `372484e`, `7c7863a`, `b54e3533`; repo-genesis
+  `b2008985` (sync), `e8ae8068` (conversion), `32cc5bb` (normalization).
+- Drift: D-5c2-2

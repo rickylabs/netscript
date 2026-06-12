@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@import './tokens.css';
+@import './theme-bridge.css';
+
+/* Per-item CSS - ui:init writes these @import lines. */
+@import './ui/spinner.css';
+@import './ui/button.css';
+@import './ui/surface-styles.css';
+@import './ui/card.css';
+@import './ui/badge.css';
+@import './ui/label.css';
+@import './ui/form-field.css';
+@import './ui/form-control-styles.css';
+@import './ui/alert-styles.css';
+@import './ui/alert.css';
+@import './layouts.css';
+@import './ui/skeleton.css';
+@import './ui/toast.css';
+@layer base {
+  html {
+    @apply bg-ns-bg text-ns-fg;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color-scheme: dark;
+    min-height: 100%;
+  }
+
+  html[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-ns-bg text-ns-fg font-sans;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: var(--ns-primary-border);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  a,
+  button {
+    touch-action: manipulation;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply tracking-tight leading-tight;
+    text-wrap: balance;
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* App-specific custom styles below. */
