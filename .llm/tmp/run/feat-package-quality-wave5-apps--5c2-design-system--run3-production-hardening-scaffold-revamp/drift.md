@@ -103,3 +103,17 @@ documentation.
 - **Action:** accept for Slice 2; broad copy reconciliation remains deferred to later locked slices.
 - **Evidence:** framework commit `17f410390396f079c8abd184522871a46abd95fc`; repo-genesis commit
   `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`.
+
+## 2026-06-12 - repo-genesis lacks CLI source for Slice 3 sync
+
+- **What:** Slice 3 changes the framework CLI `ui:add` registry loader, but the outer
+  repo-genesis worktree does not contain `packages/cli/src/public/features/ui/registry.ts`.
+- **Source:** `Get-Content` for the outer CLI path failed before sync.
+- **Expected:** Copy-fidelity sync applies relevant package and CLI changes to repo-genesis where
+  those files exist.
+- **Actual:** Only the outer `packages/fresh-ui` manifest/schema relocation and package test import
+  could be synced in this worktree.
+- **Severity:** minor
+- **Action:** accept; later scaffold-revamp slices will operate against the framework CLI source.
+- **Evidence:** framework commit `84558e0e2eab6d314763fa1d339a173786e15a34`; repo-genesis commit
+  `5137ec90f7e3a758601d2ce3cf6373c5768cae37`.

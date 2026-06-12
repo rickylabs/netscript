@@ -92,6 +92,9 @@ only if the generated app should ship it by default.
 | 2026-06-12 | Slice 2 | decision | User approved continuing without interruption; applied the package-lock policy as tracked package-local `packages/fresh-ui/deno.lock` with explicit `--lock=deno.lock` tasks. |
 | 2026-06-12 | Slice 2 | implementation | Removed `--no-lock` from package tasks, added explicit package-local lock usage, tracked `packages/fresh-ui/deno.lock`, and synced the same policy to repo-genesis. An initial root `deno.lock` mutation was restored before gates. |
 | 2026-06-12 | Slice 2 | gates | Framework package check/test/tokens and both DS fitness gates passed; repo-genesis package check/test passed. |
+| 2026-06-12 | Slice 3 | implementation | Moved `registry/manifest.ts` and `registry/schema.ts` to package-root `registry.manifest.ts` and `registry.schema.ts`; updated package tests and CLI `ui:add` manifest lookup to root support files. |
+| 2026-06-12 | Slice 3 | negative test | Added a CLI registry test proving the manifest URL resolves to package-root `registry.manifest.ts` and not payload-local `registry/manifest.ts`. |
+| 2026-06-12 | Slice 3 | gates | CLI registry test/check passed; framework package check/test/tokens and both DS fitness gates passed; repo-genesis package check/test passed. |
 
 ## Decisions
 
@@ -102,6 +105,7 @@ only if the generated app should ship it by default.
 | Use checked-in `.llm/tmp/docs/` before web | User instruction; sufficient curated notes exist for planned slices. | prompt |
 | Treat Zag as prior proof to cite, not an unknown viability question | User says Zag already works in a previous commit and is mentioned in PR #32. | user clarification |
 | Track package-local fresh-ui lock | User approved Slice 2 continuation; local package lock gives publish-readiness determinism while avoiding root lock ownership. | user approval + C-2 |
+| Keep registry support code outside copy payload | C-3 requires `registry/` to contain copy-source payload only; `ui:add` now imports `registry.manifest.ts` from the package root. | plan of record C-3 |
 
 ## Drift
 
@@ -114,6 +118,7 @@ only if the generated app should ship it by default.
 | `rg`/`rtk grep` unavailable in shell. | minor | yes |
 | repo-genesis fresh-ui copy has broader pre-existing package drift; Slice 1 synced only config ownership. | minor | yes |
 | repo-genesis package lock captures a broader workspace dependency closure than the framework worktree lock. | minor | yes |
+| repo-genesis worktree lacks the CLI source path, so Slice 3 CLI lookup changes sync only in the framework repo. | minor | yes |
 
 ## Gate Results
 
@@ -134,6 +139,13 @@ only if the generated app should ship it by default.
 | Slice 2 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
 | Slice 2 repo-genesis check | `deno task check` from outer `packages/fresh-ui` | PASS | Explicit package-local lock in outer copy. |
 | Slice 2 repo-genesis test | `deno task test` from outer `packages/fresh-ui` | PASS | 30 passed, 0 failed. |
+| Slice 3 CLI registry test | `deno test --no-lock packages/cli/src/public/features/ui/registry.test.ts` | PASS | 6 passed, including root manifest URL negative/path test. |
+| Slice 3 CLI registry check | `deno check --no-lock --unstable-kv packages/cli/src/public/features/ui/registry.ts packages/cli/src/public/features/ui/registry.test.ts` | PASS | Targeted check for `ui:add` manifest lookup. |
+| Slice 3 package check | `deno task check` from `packages/fresh-ui` | PASS | Manifest/schema support files checked from package root. |
+| Slice 3 package test | `deno task test` from `packages/fresh-ui` | PASS | 36 passed, 0 failed. |
+| Slice 3 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
+| Slice 3 repo-genesis check | `deno task check` from outer `packages/fresh-ui` | PASS | Explicit outer check list updated for root manifest/schema files. |
+| Slice 3 repo-genesis test | `deno task test` from outer `packages/fresh-ui` | PASS | 30 passed, 0 failed. |
 
 ### Fitness Gates
 
@@ -146,6 +158,8 @@ only if the generated app should ship it by default.
 | DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 93 files clean. |
 | DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | Slice 2; 93 files clean. |
 | DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 2; 93 files clean. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | Slice 3; 93 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 3; 93 files clean. |
 
 ### Runtime Gates
 
@@ -168,3 +182,5 @@ only if the generated app should ship it by default.
   repo-genesis `a76b344600de529c00d3d707db4f61be8997201a`.
 - Slice 2 implementation commits: framework `17f410390396f079c8abd184522871a46abd95fc`;
   repo-genesis `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`.
+- Slice 3 implementation commits: framework `84558e0e2eab6d314763fa1d339a173786e15a34`;
+  repo-genesis `5137ec90f7e3a758601d2ce3cf6373c5768cae37`.

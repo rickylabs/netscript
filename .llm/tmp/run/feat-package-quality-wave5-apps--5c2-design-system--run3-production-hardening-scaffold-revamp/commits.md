@@ -18,3 +18,6 @@ Format:
 - 007f7d3: harness: record fresh-ui config slice
 - 17f410390396f079c8abd184522871a46abd95fc: fresh-ui: track package lock
 - 808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f: fresh-ui: sync package lock policy
+- 9feeab7: harness: record fresh-ui lock slice
+- 84558e0e2eab6d314763fa1d339a173786e15a34: fresh-ui: move registry support files out of payload
+- 5137ec90f7e3a758601d2ce3cf6373c5768cae37: fresh-ui: sync registry support relocation

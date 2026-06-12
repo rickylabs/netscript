@@ -13,8 +13,8 @@
 ## Current State
 
 Run 3 artifacts are created and the user-provided 16-slice table is locked in `plan.md`.
-OpenHands PLAN-EVAL passed. Slices 1 and 2 are implemented in the framework worktree and synced to
-the outer repo-genesis copy.
+OpenHands PLAN-EVAL passed. Slices 1, 2, and 3 are implemented in the framework worktree and synced
+to the outer repo-genesis copy where matching files exist.
 
 ## Completed
 
@@ -35,17 +35,22 @@ the outer repo-genesis copy.
   root `deno.lock` was restored after an initial accidental mutation.
 - Slice 2 gates passed: framework package check/test/tokens, DS no-raw-hex, DS color utilities,
   repo-genesis package check/test.
+- Slice 3 C-3 manifest/schema cleanup: moved registry support code out of the copy payload to
+  `packages/fresh-ui/registry.manifest.ts` and `packages/fresh-ui/registry.schema.ts`, updated
+  framework CLI `ui:add` lookup, and updated package tests.
+- Slice 3 gates passed: CLI registry test/check, framework package check/test/tokens, DS no-raw-hex,
+  DS color utilities, repo-genesis package check/test.
 
 ## In Progress
 
-- Slice 2 bookkeeping commit pending, then push both repos and post the PR comment.
+- Slice 3 bookkeeping commit pending, then push both repos and post the PR comment.
 
 ## Next Steps
 
-1. Commit Slice 2 bookkeeping and push both repos.
-2. Post the Slice 2 PR comment.
-3. Start Slice 3: C-3 manifest/schema out of the registry payload, checking the netscript-cli
-   skill and existing UI add behavior before edits.
+1. Commit Slice 3 bookkeeping and push both repos.
+2. Post the Slice 3 PR comment.
+3. Start Slice 4: C-4 dead registry items, wiring `sheet-styles` and `floating-styles` into the
+   gallery with browser validation.
 
 ## Key Decisions
 
@@ -56,6 +61,7 @@ the outer repo-genesis copy.
 | Use `.agents/skills/netscript-doctrine` for doctrine. | Drift | `.claude` path absent. |
 | Treat Zag as prior proof to cite. | User clarification | Slice 7 still records ADR policy and evidence. |
 | Track package-local fresh-ui lock. | User approval | Explicit `--lock=deno.lock` avoids root lock ownership. |
+| Keep manifest/schema outside the copy payload. | Plan C-3 | `ui:add` resolves root `registry.manifest.ts`. |
 
 ## Files Changed
 
@@ -73,6 +79,12 @@ the outer repo-genesis copy.
 | outer `packages/fresh-ui/deno.gates.json` | deleted | Repo-genesis redundant package config removed. |
 | `packages/fresh-ui/deno.lock` | new | Framework package-local lock tracked in Slice 2. |
 | outer `packages/fresh-ui/deno.lock` | new | Repo-genesis package-local lock tracked; broader closure drift logged. |
+| `packages/fresh-ui/registry.manifest.ts` | moved | Framework manifest support file outside copy payload. |
+| `packages/fresh-ui/registry.schema.ts` | moved | Framework schema support file outside copy payload. |
+| `packages/cli/src/public/features/ui/registry.ts` | changed | Framework CLI loads root manifest. |
+| `packages/cli/src/public/features/ui/registry.test.ts` | changed | Root manifest URL negative/path test. |
+| outer `packages/fresh-ui/registry.manifest.ts` | moved | Repo-genesis fresh-ui copy synced. |
+| outer `packages/fresh-ui/registry.schema.ts` | moved | Repo-genesis fresh-ui copy synced. |
 
 ## Gates
 
@@ -80,7 +92,7 @@ the outer repo-genesis copy.
 | ----------- | -------------- | -------- |
 | Static | PASS | Plan-Gate PASS; package check/test/tokens PASS. |
 | Fitness | PASS | DS no-raw-hex and DS color utilities PASS. |
-| Runtime | N/A | Slices 1-2 config/lock-only; no browser/runtime route changes. |
+| Runtime | N/A | Slices 1-3 config/lock/contract-only; no visual route changes. |
 | Consumer | PASS | Repo-genesis package check/test PASS. |
 
 ## Open Questions
@@ -91,7 +103,8 @@ the outer repo-genesis copy.
 
 - Drift: missing `.claude` doctrine skill path, missing Impeccable helper scripts, absent
   `.resources/deps-docs/`, unavailable `rg`/`rtk grep`, prior Zag proof clarification, and
-  broader pre-existing repo-genesis fresh-ui copy drift including the larger outer package lock.
+  broader pre-existing repo-genesis fresh-ui copy drift including the larger outer package lock and
+  missing outer CLI source path for Slice 3 sync.
 - Debt: no new architecture debt created.
 
 ## Commits
@@ -100,3 +113,5 @@ the outer repo-genesis copy.
 - `a76b344600de529c00d3d707db4f61be8997201a`: fresh-ui: sync unified deno config
 - `17f410390396f079c8abd184522871a46abd95fc`: fresh-ui: track package lock
 - `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`: fresh-ui: sync package lock policy
+- `84558e0e2eab6d314763fa1d339a173786e15a34`: fresh-ui: move registry support files out of payload
+- `5137ec90f7e3a758601d2ce3cf6373c5768cae37`: fresh-ui: sync registry support relocation
