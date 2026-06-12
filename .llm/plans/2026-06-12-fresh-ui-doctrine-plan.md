@@ -119,3 +119,13 @@ validation on `/design/*`, copy-fidelity sweep (`diff --strip-trailing-cr`).
   islands (SSR + hydration + bundle size), record the verdict as an ADR
   in docs/architecture.md. If the spike fails, the fallback is
   hand-rolled hooks following the existing runtime/_internal patterns.
+
+## Resources
+
+Curated dependency/research notes in `.llm/tmp/docs/` — consult BEFORE web
+search (per repo tooling order): `zagjs-preact-api.md` (C-12 spike),
+`base-ui-contract.md`, `react-aria-patterns.md` (runtime patterns),
+`shadcn-registry-schema.md` (registry/manifest work, C-3),
+`style-dictionary-dtcg.md`, `oklch-ramps.md`, `tailwindcss-v4-theme.md`
+(theme pipeline), `popover-api-anchor.md` (floating runtime),
+`fresh2-islands-partials.md` (islands/SSR constraints).
