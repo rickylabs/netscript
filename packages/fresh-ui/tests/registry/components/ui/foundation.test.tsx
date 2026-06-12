@@ -8,6 +8,7 @@ import {
 } from '../../../../registry/components/ui/control-props.ts';
 import { IconButton } from '../../../../registry/components/ui/icon-button.tsx';
 import { Progress } from '../../../../registry/components/ui/progress.tsx';
+import { ResponsiveTable } from '../../../../registry/components/ui/responsive-table.tsx';
 import { Select } from '../../../../registry/components/ui/select.tsx';
 import { Skeleton } from '../../../../registry/components/ui/skeleton.tsx';
 import { Textarea } from '../../../../registry/components/ui/textarea.tsx';
@@ -251,6 +252,39 @@ Deno.test('Skeleton stats variant renders the requested number of cards', () => 
   );
 });
 
+Deno.test('ResponsiveTable renders semantic table chrome with labeled cells', () => {
+  type DeploymentRow = { service: string; region: string };
+
+  const element: unknown = ResponsiveTable<DeploymentRow>({
+    caption: 'Deployments',
+    columns: [
+      {
+        key: 'service',
+        label: 'Service',
+        priority: 'primary',
+        cell: (row) => row.service,
+      },
+      {
+        key: 'region',
+        label: 'Region',
+        align: 'end',
+        cell: (row) => row.region,
+      },
+    ],
+    rows: [{ service: 'api-gateway', region: 'eu-west' }],
+    getRowKey: (row) => row.service,
+  });
+  assertVNode(element, 'Expected ResponsiveTable to return a vnode');
+  assertStrictEquals(element.type, 'div', 'Expected ResponsiveTable to render a div root');
+
+  const className = element.props.class;
+  assert(typeof className === 'string', 'Expected ResponsiveTable to include a class attribute');
+  assert(
+    classList(className).includes('ns-responsive-table'),
+    'Expected ResponsiveTable to include the root class',
+  );
+});
+
 Deno.test('manifest exposes the expanded foundation and layout collections', () => {
   const itemNames = new Set(freshUiRegistryManifest.items.map((item) => item.name));
 
@@ -269,6 +303,7 @@ Deno.test('manifest exposes the expanded foundation and layout collections', () 
       'spinner',
       'progress',
       'skeleton',
+      'responsive-table',
     ]
   ) {
     assert(itemNames.has(requiredItem), `Expected manifest to include ${requiredItem}`);

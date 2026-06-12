@@ -657,6 +657,28 @@ export const freshUiRegistryManifest = {
       registryDependencies: ['theme-seed', 'card'],
     },
     {
+      name: 'responsive-table',
+      kind: 'block',
+      layer: 3,
+      description:
+        'Semantic table block that collapses dense operational rows into labeled mobile cells.',
+      copyOwnership: 'app-owned-after-copy',
+      author: 'NetScript',
+      tags: ['table', 'responsive', 'block'],
+      files: [
+        {
+          source: 'registry/components/ui/responsive-table.tsx',
+          target: '@ui/responsive-table.tsx',
+        },
+        {
+          source: 'registry/components/ui/responsive-table.css',
+          target: '@assets/ui/responsive-table.css',
+        },
+      ],
+      registryDependencies: ['theme-seed', 'cn', 'public-types'],
+      css: [{ layer: 'components', content: "@import './ui/responsive-table.css';" }],
+    },
+    {
       name: 'pagination',
       kind: 'block',
       layer: 3,
@@ -791,6 +813,7 @@ export const freshUiRegistryManifest = {
         'stats-grid',
         'detail-layout',
         'data-table',
+        'responsive-table',
         'pagination',
         'empty-state',
         'section-divider',
@@ -858,6 +881,7 @@ export const freshUiRegistryManifest = {
         'stats-grid',
         'detail-layout',
         'data-table',
+        'responsive-table',
         'pagination',
         'empty-state',
         'section-divider',
