@@ -1,47 +1,44 @@
 .ns-input,
 .ns-select,
 .ns-textarea {
-    width: 100%;
-    font-family: var(--ns-font-sans);
-    font-size: var(--ns-text-sm);
-    color: var(--ns-fg);
-    background: var(--ns-surface);
-    border: 1px solid var(--ns-input-border);
-    border-radius: var(--ns-radius-md);
-    padding: var(--ns-space-2) var(--ns-space-3);
-    transition:
-        border-color var(--ns-ease-normal),
-        box-shadow var(--ns-ease-normal);
+  width: 100%;
+  font-family: var(--ns-font-sans);
+  font-size: var(--ns-text-sm);
+  color: var(--ns-fg);
+  background: var(--ns-surface);
+  border: 1px solid var(--ns-input-border);
+  border-radius: var(--ns-radius-md);
+  padding: var(--ns-space-2) var(--ns-space-3);
+  transition: border-color var(--ns-ease-normal), box-shadow var(--ns-ease-normal);
 }
 
 .ns-input::placeholder,
 .ns-textarea::placeholder {
-    color: var(--ns-muted-fg);
+  color: var(--ns-muted-fg);
 }
 
 .ns-input:hover,
 .ns-select:hover,
 .ns-textarea:hover {
-    border-color: var(--ns-border-hover);
+  border-color: var(--ns-border-hover);
 }
 
 .ns-input:focus,
 .ns-select:focus,
 .ns-textarea:focus {
-    outline: none;
-    border-color: var(--ns-ring);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-ring) 15%, transparent);
+  outline: none;
+  border-color: var(--ns-ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-ring) 15%, transparent);
 }
 
 .ns-input--error,
 .ns-select--error,
 .ns-textarea--error {
-    border-color: var(--ns-destructive);
+  border-color: var(--ns-destructive);
 }
 
 .ns-input--error:focus,
 .ns-select--error:focus,
 .ns-textarea--error:focus {
-    box-shadow: 0 0 0 2px
-        color-mix(in srgb, var(--ns-destructive) 15%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ns-destructive) 15%, transparent);
 }

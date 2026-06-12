@@ -39,9 +39,7 @@ function DataTableHeader({ children, class: className, ...props }: DataTableSect
 }
 
 function DataTableBody({ children, class: className, ...props }: DataTableSectionProps): VNode {
-  return (
-    <div {...props} class={cn('divide-y divide-ns-border', className)}>{children}</div>
-  );
+  return <div {...props} class={cn('divide-y divide-ns-border', className)}>{children}</div>;
 }
 
 function DataTableRow({ children, class: className, ...props }: DataTableSectionProps): VNode {

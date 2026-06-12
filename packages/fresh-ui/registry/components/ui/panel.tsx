@@ -21,7 +21,8 @@ interface PanelSectionProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'cl
   class?: string;
 }
 
-interface PanelTextProps extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
+interface PanelTextProps
+  extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
   children: ComponentChildren;
   class?: string;
 }

@@ -2,7 +2,8 @@ import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 import type { Renderable } from '../../lib/public-types.ts';
 
-interface SectionDividerProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+interface SectionDividerProps
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
   label: Renderable;
   class?: string;
   lineClass?: string;

@@ -157,3 +157,25 @@ right shape for a theme-blind component kit. NOT fixed inside slice 5
 the framework worktree + re-syncing byte-identical app copies in
 repo-genesis). Follow-up owner: slice 9 (component completion — toast
 is already in its scope; add the guards package-wide there and re-sync).
+
+## D-5c2-5 — ns-responsive-table is a registry candidate, not built (2026-06-12)
+
+The slice-9 reconciliation survey confirmed data-table.tsx renders a plain
+semantic table inside `.ns-data-table` overflow scroll; there is no
+stacked-card / responsive collapse variant anywhere in the registry, while
+the gallery's 390px pass relies purely on horizontal scroll. A dedicated
+`ns-responsive-table` (stacked rows under a container query) is a good
+registry candidate but is OUT of the locked Run 2 scope. Recorded here so
+the doctrine plan (post-Run-2 task) can pick it up as a backlog item.
+
+## D-5c2-6 — copy fidelity is content-identity, not byte-identity (2026-06-12)
+
+Slice-9 sweep: playground checkouts are CRLF (repo-genesis autocrlf) while
+registry sources are LF, and island copies legitimately rewrite relative
+import depth (`../lib/` → `../../lib/`). The practical copy-fidelity gate
+is therefore `diff --strip-trailing-cr` plus the documented import-path
+adaptation, not `cmp`. After fmt-normalizing registry sources
+(`deno fmt --no-config --indent-width 2 --line-width 100 --single-quote`)
+all 38+14 copied files pass that gate; `foundation.test.tsx`,
+`floating.css`, `sheet.css` have no playground copies because those
+registry items were never installed by the app (expected).

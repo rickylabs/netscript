@@ -65,3 +65,12 @@
     transform: translateX(180%);
   }
 }
+
+/* Reduced motion: indeterminate sweep becomes a static partial fill. */
+@media (prefers-reduced-motion: reduce) {
+  .ns-progress--indeterminate .ns-progress__bar {
+    animation: none;
+    width: 42%;
+    transform: translateX(70%);
+  }
+}

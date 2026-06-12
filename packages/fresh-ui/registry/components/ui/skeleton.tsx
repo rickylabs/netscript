@@ -8,8 +8,7 @@
 import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
-interface SkeletonProps
-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+interface SkeletonProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
   cards?: number;
   class?: string;
   columns?: number;
@@ -24,9 +23,7 @@ function clamp(value: number, fallback: number): number {
 function SkeletonBlock(
   { class: className, style }: { class?: string; style?: JSX.CSSProperties },
 ): VNode {
-  return (
-    <span aria-hidden='true' class={cn('ns-skeleton__block', className)} style={style} />
-  );
+  return <span aria-hidden='true' class={cn('ns-skeleton__block', className)} style={style} />;
 }
 
 /**

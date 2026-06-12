@@ -14,8 +14,7 @@ export interface BreadcrumbItem {
   icon?: Renderable;
 }
 
-interface BreadcrumbProps
-  extends Omit<JSX.HTMLAttributes<HTMLElement>, 'class' | 'children'> {
+interface BreadcrumbProps extends Omit<JSX.HTMLAttributes<HTMLElement>, 'class' | 'children'> {
   items: readonly BreadcrumbItem[];
   class?: string;
 }

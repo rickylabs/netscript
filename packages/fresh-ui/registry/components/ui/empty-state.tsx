@@ -2,8 +2,7 @@ import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 import type { Renderable } from '../../lib/public-types.ts';
 
-interface EmptyStateProps
-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+interface EmptyStateProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
   children: Renderable;
   class?: string;
   heading?: Renderable;

@@ -58,3 +58,10 @@
     background-position: -100% 0;
   }
 }
+
+/* Reduced motion: shimmer becomes a static gradient. */
+@media (prefers-reduced-motion: reduce) {
+  .ns-skeleton__block {
+    animation: none;
+  }
+}

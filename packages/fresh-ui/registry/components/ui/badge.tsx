@@ -20,8 +20,7 @@ export type BadgeVariant =
   | 'destructive'
   | 'muted';
 
-interface BadgeProps
-  extends Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class' | 'children'> {
+interface BadgeProps extends Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class' | 'children'> {
   children: Renderable;
   class?: string;
   variant?: BadgeVariant;
