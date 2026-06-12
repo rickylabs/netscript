@@ -7,15 +7,17 @@ import {
 
 const projectRoot = Deno.args[0];
 if (!projectRoot) {
-  console.error('usage: ui-init-smoke.ts <projectRoot> [theme]');
+  console.error('usage: ui-init-smoke.ts <projectRoot> [extraItems,csv] [theme]');
   Deno.exit(2);
 }
 
+const extras = Deno.args[1] ? Deno.args[1].split(',') : [];
+
 const result = await installUiRegistryItems({
   projectRoot,
-  names: DEFAULT_UI_INIT_ITEMS,
+  names: [...DEFAULT_UI_INIT_ITEMS, ...extras],
   overwrite: true,
-  theme: Deno.args[1],
+  theme: Deno.args[2],
 }, { fs: new DenoFileSystem() });
 
 console.log(`items=${result.installedItems.length}`);
