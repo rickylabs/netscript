@@ -74,3 +74,18 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `research.md`, `plan.md`, and `worklog.md` updated in this bookkeeping pass.
+
+## 2026-06-12 - repo-genesis fresh-ui copy has broader pre-existing drift
+
+- **What:** The outer repo-genesis `packages/fresh-ui/deno.json` already differed from the
+  framework worktree before Slice 1 (version/export/publish/task shape). Slice 1 synced only the
+  single-config ownership change: folded the local `deno.gates.json` fmt settings into
+  repo-genesis `deno.json` and deleted repo-genesis `deno.gates.json`.
+- **Source:** `Get-Content` and targeted `git diff` against the outer repo before sync.
+- **Expected:** Copy-fidelity guidance wants synced package copies.
+- **Actual:** A broad package-copy reconciliation would exceed Slice 1 and overlap later version,
+  manifest, test-layout, and scaffold slices.
+- **Severity:** minor
+- **Action:** defer
+- **Evidence:** framework commit `52a9ab24ed4dd32801a8422bf85b591367d62999`; repo-genesis commit
+  `a76b344600de529c00d3d707db4f61be8997201a`.

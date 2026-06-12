@@ -86,6 +86,9 @@ only if the generated app should ship it by default.
 | 2026-06-12 | bootstrap | run artifact lock | Created Run 3 artifacts and locked the 16-slice table before code edits. |
 | 2026-06-12 | blocked | plan-gate | No Run 3 `plan-eval.md` found; implementation must wait for separate evaluator `PASS` or explicit waiver. |
 | 2026-06-12 | plan context | Zag evidence | User clarified Zag has already been proved working in a previous commit and mentioned in PR #32; Slice 7 should cite that evidence in the ADR. |
+| 2026-06-12 | plan-gate | evaluator | OpenHands PLAN-EVAL wrote `plan-eval.md` with `PASS`; implementation began after this point. |
+| 2026-06-12 | Slice 1 | implementation | Folded `packages/fresh-ui/deno.gates.json` into `deno.json`, removed `--config deno.gates.json` from package tasks, preserved `--no-lock` for C-2, and synced the same config ownership change to repo-genesis. |
+| 2026-06-12 | Slice 1 | gates | Framework package check/test/tokens and both DS fitness gates passed; repo-genesis package check/test passed. |
 
 ## Decisions
 
@@ -105,6 +108,7 @@ only if the generated app should ship it by default.
 | `.resources/deps-docs/` absent; `.llm/tmp/docs/` used. | minor | yes |
 | No Run 3 Plan-Gate artifact found. | significant | yes |
 | `rg`/`rtk grep` unavailable in shell. | minor | yes |
+| repo-genesis fresh-ui copy has broader pre-existing package drift; Slice 1 synced only config ownership. | minor | yes |
 
 ## Gate Results
 
@@ -114,14 +118,22 @@ only if the generated app should ship it by default.
 | ---- | ---------------- | ------ | ----- |
 | Plan-Gate presence | `Get-ChildItem -Recurse .llm/tmp/run -Filter plan-eval.md` | FAIL_BLOCKED | No Run 3 plan-eval artifact. |
 | Git status | `rtk git status --short --branch` | PASS_WITH_UNTRACKED | Existing untracked `.playwright-mcp/` and `packages/fresh-ui/deno.lock`; not touched. |
+| Plan-Gate verdict | `.llm/tmp/run/.../plan-eval.md` | PASS | OpenHands PLAN-EVAL allowed implementation under the locked 16-slice table. |
+| Slice 1 package check | `deno task check` from `packages/fresh-ui` | PASS | Unified package config resolved without `deno.gates.json`. |
+| Slice 1 package test | `deno task test` from `packages/fresh-ui` | PASS | 36 passed, 0 failed. |
+| Slice 1 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
+| Slice 1 repo-genesis check | `deno task check` from outer `packages/fresh-ui` | PASS | Targeted copy validation. |
+| Slice 1 repo-genesis test | `deno task test` from outer `packages/fresh-ui` | PASS | 30 passed, 0 failed. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| F-1..F-15 | NOT_RUN | Plan-Gate blocked | Implementation gates not run yet. |
+| F-1..F-18 | NOT_RUN | Plan-Gate blocked | Superseded by Slice 1 gate rows where applicable; full `arch:check` remains due in the promoted-gate slice. |
 | DS no raw hex | NOT_RUN | Plan-Gate blocked | Run after relevant slice edits. |
 | DS color utilities | NOT_RUN | Plan-Gate blocked | Run after relevant slice edits. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 93 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 93 files clean. |
 
 ### Runtime Gates
 
@@ -140,4 +152,6 @@ only if the generated app should ship it by default.
 
 - Evaluator should inspect `plan.md`, this `## Design` section, `research.md`, and `drift.md`
   first.
-- Implementation is intentionally blocked pending Plan-Gate.
+- Slice 1 implementation commits: framework `52a9ab24ed4dd32801a8422bf85b591367d62999`;
+  repo-genesis `a76b344600de529c00d3d707db4f61be8997201a`.
+- Slice 2 must ask the user for package `deno.lock` policy before changing it.
