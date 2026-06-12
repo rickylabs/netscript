@@ -26,3 +26,5 @@ Format:
 - 986e889e35ccad034f845a13e403905fdb756aad: harness: record fresh-ui visual style slice
 - c7014af6d3cea8f28cebd78c929765dc9234202e: fresh-ui: consolidate tests and align version
 - c83d2e1639b1ffd846b934ec156513a34a11a093: fresh-ui: sync test layout and publish version
+- b9ccc7bf90a4a14852c612f04ff0c1a9a2650770: fresh-ui: promote package fmt and ds gates
+- f0ac62694914fa90361752fa572f8888d5ef9037: fresh-ui: sync fmt ownership gates

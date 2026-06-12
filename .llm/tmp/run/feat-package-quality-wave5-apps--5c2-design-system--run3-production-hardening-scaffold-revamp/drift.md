@@ -168,3 +168,29 @@ documentation.
 - **Severity:** minor
 - **Action:** defer to Slice 6.
 - **Evidence:** `worklog.md` Slice 5 package fmt probe row.
+
+## 2026-06-12 - repo-genesis root arch:check remains CLI-owned during Slice 6
+
+- **What:** Framework root `arch:check` was promoted to a fresh-ui package architecture composite;
+  repo-genesis root `arch:check` is a separate CLI fitness chain and does not include the fresh-ui
+  DS scripts.
+- **Source:** Outer `deno.json` carries CLI-specific architecture gates; outer `.llm/tools/fitness/`
+  does not include the fresh-ui DS gate scripts.
+- **Expected:** Copy-fidelity sync applies framework package changes to repo-genesis.
+- **Actual:** Synced package fmt/token changes to repo-genesis and left the outer CLI root
+  `arch:check` unchanged.
+- **Severity:** minor
+- **Action:** accept; scaffold/CLI gate ownership is handled by later locked scaffold slices.
+- **Evidence:** repo-genesis commit `f0ac62694914fa90361752fa572f8888d5ef9037`.
+
+## 2026-06-12 - repo-genesis package lock expanded during token-generator sync
+
+- **What:** Running the outer fresh-ui token builder directly refreshed `packages/fresh-ui/deno.lock`
+  with `style-dictionary` transitive dependencies.
+- **Source:** The outer fresh-ui package predates the newer `tokens:build` task but has the same
+  token builder script import.
+- **Expected:** Package lock is tracked when package commands resolve dependencies.
+- **Actual:** Package lock changed; root `deno.lock` remained untouched.
+- **Severity:** minor
+- **Action:** accept as package-lock sync drift for the outer copied package.
+- **Evidence:** repo-genesis commit `f0ac62694914fa90361752fa572f8888d5ef9037`.

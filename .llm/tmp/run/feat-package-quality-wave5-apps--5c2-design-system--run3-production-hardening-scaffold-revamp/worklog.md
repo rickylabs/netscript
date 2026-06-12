@@ -214,3 +214,41 @@ only if the generated app should ship it by default.
 - Slice 4 implementation commit: repo-genesis `84748b56be0199a193bf556a454d62fd55937c02`.
 - Slice 5 implementation commits: framework `c7014af6d3cea8f28cebd78c929765dc9234202e`;
   repo-genesis `c83d2e1639b1ffd846b934ec156513a34a11a093`.
+
+## 2026-06-12 - Slice 6: C-7 fmt ownership + C-8 arch gate promotion
+
+### Changed
+
+- Expanded `packages/fresh-ui` formatter ownership to CSS and Markdown through the package
+  `deno.json`.
+- Removed the root fmt exclusion for `packages/fresh-ui/` while leaving root check/lint package
+  exclusions unchanged.
+- Added `.llm/tools/fitness/check-architecture-gates.ts` and wired root `deno task arch:check`
+  to run doctrine for `packages/fresh-ui` plus both DS fitness gates.
+- Added `--root` support to `check-ds-no-raw-hex.ts` and `check-ds-color-utilities.ts`.
+- Added negative fixture tests proving both DS gates fail on raw color/off-vocabulary utility input.
+- Updated the token generator to write a trailing newline so generated CSS passes package fmt and
+  `tokens:check` together.
+- Synced package fmt/token changes to repo-genesis.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| DS negative fixtures | PASS | `deno test --allow-read --allow-write --allow-run .llm/tools/fitness/check-ds-gates_test.ts` | 2 tests passed; raw hex and stock palette utility fixtures fail their gates. |
+| package fmt | PASS | `deno fmt --check` from `packages/fresh-ui` | 111 files checked. |
+| scoped package fmt wrapper | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh-ui --ext ts,tsx,css,md --pretty` | 111 selected; 0 findings. |
+| package check | PASS | `deno task check` from `packages/fresh-ui` | Includes `--unstable-kv`; checked exported package files, scripts, and tests. |
+| package test | PASS | `deno task test` from `packages/fresh-ui` | 36 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from `packages/fresh-ui` | Passed after staging the intentional generated `tokens.css` newline update. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 93 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 93 files clean. |
+| arch:check | PASS | `deno task arch:check` | Doctrine scoped to `packages/fresh-ui`: 0 fail, 1 warn, 1 info; DS gates passed. |
+| repo-genesis package fmt | PASS | `deno fmt --check` from outer `packages/fresh-ui` | 111 files checked after package line-ending normalization. |
+| repo-genesis package check | PASS | `deno task check` from outer `packages/fresh-ui` | Existing outer task shape; check passed. |
+| repo-genesis package test | PASS | `deno task test` from outer `packages/fresh-ui` | 36 tests passed. |
+
+### Commits
+
+- Framework: `b9ccc7bf90a4a14852c612f04ff0c1a9a2650770`
+- Repo-genesis: `f0ac62694914fa90361752fa572f8888d5ef9037`
