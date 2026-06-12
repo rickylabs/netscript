@@ -85,6 +85,7 @@ only if the generated app should ship it by default.
 | 2026-06-12 | bootstrap | skills/read order | Read harness, doctrine, fresh-ui horizontal, design, impeccable text, netscript-cli, jsr-audit, deno-fresh, plan of record, L0/theme/README, frontend overlay, doctrine files, and curated docs. |
 | 2026-06-12 | bootstrap | run artifact lock | Created Run 3 artifacts and locked the 16-slice table before code edits. |
 | 2026-06-12 | blocked | plan-gate | No Run 3 `plan-eval.md` found; implementation must wait for separate evaluator `PASS` or explicit waiver. |
+| 2026-06-12 | plan context | Zag evidence | User clarified Zag has already been proved working in a previous commit and mentioned in PR #32; Slice 7 should cite that evidence in the ADR. |
 
 ## Decisions
 
@@ -93,6 +94,7 @@ only if the generated app should ship it by default.
 | Stop before implementation pending Plan-Gate | Harness run-loop hard stop applies; no Run 3 plan-eval artifact found. | `.llm/harness/workflow/run-loop.md` |
 | Treat missing `.claude/skills/netscript-doctrine` as drift, not blocker | Equivalent `.agents/skills/netscript-doctrine` exists and was read. | prompt + filesystem |
 | Use checked-in `.llm/tmp/docs/` before web | User instruction; sufficient curated notes exist for planned slices. | prompt |
+| Treat Zag as prior proof to cite, not an unknown viability question | User says Zag already works in a previous commit and is mentioned in PR #32. | user clarification |
 
 ## Drift
 

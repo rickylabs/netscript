@@ -23,6 +23,7 @@ implementation has started because a Run 3 Plan-Gate `PASS` artifact was not fou
 - Read curated `.llm/tmp/docs/` notes for Zag, shadcn registry schema, Fresh islands, and Tailwind
   v4 theme.
 - Created `research.md`, `plan.md`, `worklog.md`, `drift.md`, `commits.md`, and `context-pack.md`.
+- Recorded user clarification that Zag already has working proof in a previous commit and PR #32.
 
 ## In Progress
 
@@ -41,6 +42,7 @@ implementation has started because a Run 3 Plan-Gate `PASS` artifact was not fou
 | Locked 16 slices exactly as prompted. | User prompt | Never rescope locked slices in place. |
 | Implementation blocked pending Plan-Gate. | Harness run-loop | No Run 3 `plan-eval.md` exists. |
 | Use `.agents/skills/netscript-doctrine` for doctrine. | Drift | `.claude` path absent. |
+| Treat Zag as prior proof to cite. | User clarification | Slice 7 still records ADR policy and evidence. |
 
 ## Files Changed
 

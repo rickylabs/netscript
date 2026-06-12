@@ -61,3 +61,16 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** bootstrap command output.
+
+## 2026-06-12 - Zag proof already exists
+
+- **What:** User clarified that Zag has already been proved working in a previous commit and is
+  mentioned in PR #32.
+- **Source:** User message on 2026-06-12.
+- **Expected:** Initial Run 3 artifacts described Zag as needing a fresh viability spike.
+- **Actual:** Slice 7 should cite and validate the existing proof while still recording the
+  adoption policy as an ADR. The locked slice remains unchanged; this narrows the evidence-gathering
+  posture, not the scope.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `research.md`, `plan.md`, and `worklog.md` updated in this bookkeeping pass.

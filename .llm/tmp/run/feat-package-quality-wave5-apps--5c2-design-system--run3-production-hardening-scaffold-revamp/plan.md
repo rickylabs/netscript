@@ -73,7 +73,7 @@ from a freshly generated app.
 | LD-2 | `@netscript/fresh-ui` is treated as Archetype 3 for this run, with frontend/docs overlays. | Runtime behavior and browser-gated UI package scope. |
 | LD-3 | `@netscript/cli` scaffold slices follow `netscript-cli` and Archetype 6 expectations. | Slices 12-16 change generated A-Z scaffold behavior. |
 | LD-4 | C-2 requires user approval before tracking, deleting, or ignoring package `deno.lock`. | Explicit user instruction and lock hygiene rule. |
-| LD-5 | Zag is spike-only: adopt only for future complex non-platform widgets if Fresh evidence passes. | Native-first L0 contract and carried plan addendum. |
+| LD-5 | Zag remains ADR/evidence-only for this run: use the existing proof already mentioned in PR #32 and adopt only for future complex non-platform widgets if the recorded evidence supports it. | Native-first L0 contract, carried plan addendum, and user clarification. |
 | LD-6 | Design routes and scaffolded pages use registry vocabulary only. | Prevents off-vocabulary styling and keeps scaffold aligned with the package. |
 
 ## Open-Decision Sweep
@@ -82,7 +82,7 @@ from a freshly generated app.
 | -------- | ------ | ----- |
 | Package `deno.lock` policy | Safe to defer until Slice 2; must resolve before Slice 2 edits. | Ask user before C-2. |
 | Run 3 PLAN-EVAL status | Must resolve before implementation. | No Run 3 plan-eval artifact found; need separate evaluator `PASS` or explicit waiver. |
-| Zag production dependency | Safe to defer until Slice 7 verdict. | Slice 7 records ADR evidence; no migration is allowed. |
+| Zag production dependency | Safe to defer until Slice 7 verdict. | User clarified Zag already has working proof in a previous commit and is mentioned in PR #32; Slice 7 should cite/validate that evidence in the ADR and no migration is allowed. |
 
 ## Locked Slice Table
 
@@ -114,7 +114,7 @@ from a freshly generated app.
 | CLI scaffold revamp expands beyond five slices. | Log drift and follow-ups; do not rescope locked slices silently. |
 | Browser gates mutate root `deno.lock`. | Restore root lock before staging; never commit root lock churn. |
 | Visual routes pass static checks but fail at 390px/reduced motion. | Real route Playwright validation on visual slices. |
-| Zag adds bundle/hydration cost. | Spike with measurable SSR/hydration/bundle evidence and ADR verdict. |
+| Zag adds bundle/hydration cost. | Use the prior working proof already mentioned in PR #32 as the starting evidence, then record SSR/hydration/bundle implications in the ADR. |
 
 ## Anti-Patterns to Resolve or Avoid
 
