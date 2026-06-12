@@ -36,3 +36,5 @@ Format:
 - 12fcebaeea9d401adb9d3f8d284f2224091bee32: fresh-ui: sync docs scaffold and doctests
 - 097423042153d556d27e96ba1dc5137ec1916f7b: agents: remove legacy standards shim
 - e18027e4470306149b605a46c22d5360dcb15c9b: agents: sync standards shim removal
+- 3f3db55ca8be163f2bf5f4e888d3ec038ba0e517: fresh-ui: document interactive entrypoint module
+- 189fa782fd0a4b72c8f1e8101b8e3f6a6ee2aa61: fresh-ui: sync interactive module docs

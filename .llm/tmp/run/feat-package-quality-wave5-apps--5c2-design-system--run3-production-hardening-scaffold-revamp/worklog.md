@@ -426,3 +426,46 @@ only if the generated app should ship it by default.
 
 - Framework: `097423042153d556d27e96ba1dc5137ec1916f7b`
 - Repo-genesis: `e18027e4470306149b605a46c22d5360dcb15c9b`
+
+## 2026-06-12 - Slice 11: JSR release readiness
+
+### Changed
+
+- Added the missing `@module` JSDoc tag to `packages/fresh-ui/interactive.ts`, the only JSR audit
+  failure found in the public entrypoint scan.
+- Synced the public entrypoint doc fix to repo-genesis.
+- Added `slice11-jsr-audit.json` as the JSR audit artifact.
+- Added a local-only Git exclude for the pre-existing untracked `.playwright-mcp/` directory so
+  Deno's no-`--allow-dirty` publish dry-run could run against a clean worktree without deleting or
+  editing that directory.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| clean status before final dry-run | PASS | `git status --short` | Framework and repo-genesis were clean after code commits; `.playwright-mcp/` ignored locally only. |
+| publish dry-run | PASS | `deno publish --dry-run` from `packages/fresh-ui` | Ran without `--allow-dirty`; no slow types; docs included; tests excluded. |
+| JSR audit | PASS | `deno run -A .llm/tools/fitness/audit-jsr-package.ts --root packages/fresh-ui --out .../slice11-jsr-audit.json` | 0 FAIL; all exported entrypoints have `@module`; `slowTypes.ok=true`. |
+| doc lint | PASS | `deno doc --lint mod.ts interactive.ts primitives.tsx` | 3 public entrypoints checked. |
+| package check | PASS | `deno task check` from framework `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `deno task test` from framework `packages/fresh-ui` | 39 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from framework `packages/fresh-ui` | Generated token artifacts stable. |
+| DS no raw hex | PASS | `check-ds-no-raw-hex.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| DS color utilities | PASS | `check-ds-color-utilities.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| arch:check | PASS | `deno task arch:check` from framework root | 0 fail, 1 existing manifest-size warn; DS gates passed. |
+| repo-genesis package check/test | PASS | outer `packages/fresh-ui` | Check passed; 39 tests passed. |
+| README/docs final check | PASS | `Select-String` sanity checks | README shows 44 items, `responsive-table`, and docs links; docs scaffold headings present. |
+
+### Drift
+
+- The first no-`--allow-dirty` dry-run failed because the pre-existing untracked `.playwright-mcp/`
+  directory made Deno treat the worktree as dirty. The directory was not touched; a local Git
+  exclude entry was added outside tracked files, then the final dry-run passed from clean status.
+- The repo-native JSR audit emits a WARN gate for Deno's informational "Checking for slow types in
+  the public API..." line even when `slowTypes.ok=true`; treated as audit pass because there are 0
+  FAIL gates and the actual publish dry-run passed.
+
+### Commits
+
+- Framework: `3f3db55ca8be163f2bf5f4e888d3ec038ba0e517`
+- Repo-genesis: `189fa782fd0a4b72c8f1e8101b8e3f6a6ee2aa61`

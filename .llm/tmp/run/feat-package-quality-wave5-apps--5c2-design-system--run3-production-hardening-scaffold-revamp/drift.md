@@ -244,3 +244,28 @@ documentation.
 - **Action:** defer any fitness-tool rename to a dedicated tooling slice; keep release-readiness
   stable for this cleanup.
 - **Evidence:** Slice 10 worklog reference-check rows.
+
+## 2026-06-12 - Deno publish dry-run sees pre-existing untracked Playwright directory
+
+- **What:** Slice 11 `deno publish --dry-run` refused to run because the framework worktree had a
+  pre-existing untracked `.playwright-mcp/` directory.
+- **Source:** Deno dry-run error listed `?? .playwright-mcp/`.
+- **Expected:** Run `deno publish --dry-run` without `--allow-dirty` from a clean tree.
+- **Actual:** Added `.playwright-mcp/` to local Git exclude metadata only; did not delete, edit, or
+  commit anything for that directory. Final dry-run passed with clean tracked status.
+- **Severity:** minor
+- **Action:** accept local exclude for this worktree; keep source tree unchanged.
+- **Evidence:** Slice 11 worklog dry-run gate.
+
+## 2026-06-12 - JSR audit parser preserves Deno slow-type banner as WARN
+
+- **What:** `audit-jsr-package.ts` reports a WARN gate containing Deno's informational
+  "Checking for slow types in the public API..." line.
+- **Source:** `slice11-jsr-audit.json` has `slowTypes.ok=true` and 0 FAIL gates, but one WARN with
+  the banner text.
+- **Expected:** JSR audit passes when dry-run reports no slow types and public docs are complete.
+- **Actual:** Treated as pass with a parser warning; the authoritative `deno publish --dry-run`
+  succeeded without `--allow-dirty`.
+- **Severity:** minor
+- **Action:** defer parser cleanup; no package change needed.
+- **Evidence:** `slice11-jsr-audit.json` and Slice 11 dry-run gate.
