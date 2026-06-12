@@ -230,3 +230,17 @@ documentation.
 - **Severity:** minor
 - **Action:** defer unrelated line-ending normalization; do not broaden Slice 8.
 - **Evidence:** Slice 8 worklog gate table and `slice8-browser-report.json`.
+
+## 2026-06-12 - standards-named fitness tool is not the removed skill shim
+
+- **What:** Slice 10 reference checks still found `netscript-standards` in
+  `.llm/tools/fitness/check-netscript-standards.ts`, `release-readiness.ts`, and a
+  `packages/contracts/README.md` command.
+- **Source:** Focused framework reference scan after deleting `.agents/skills/netscript-standards`.
+- **Expected:** Remove the legacy skill shim and active guidance references to that shim.
+- **Actual:** The remaining matches are a separate fitness evaluator filename and docs that invoke
+  it; no active skill shim files or live instruction-file references remain.
+- **Severity:** minor
+- **Action:** defer any fitness-tool rename to a dedicated tooling slice; keep release-readiness
+  stable for this cleanup.
+- **Evidence:** Slice 10 worklog reference-check rows.

@@ -34,3 +34,5 @@ Format:
 - 46520db8296e8149b7dc12f4d3fd0c7ed0d73d9d: fresh-ui: wire responsive table gallery block
 - da7091fa14551fdbe8168a12365f4b2608f04970: fresh-ui: add docs scaffold and doctests
 - 12fcebaeea9d401adb9d3f8d284f2224091bee32: fresh-ui: sync docs scaffold and doctests
+- 097423042153d556d27e96ba1dc5137ec1916f7b: agents: remove legacy standards shim
+- e18027e4470306149b605a46c22d5360dcb15c9b: agents: sync standards shim removal

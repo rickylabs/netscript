@@ -387,3 +387,42 @@ only if the generated app should ship it by default.
 
 - Framework: `da7091fa14551fdbe8168a12365f4b2608f04970`
 - Repo-genesis: `12fcebaeea9d401adb9d3f8d284f2224091bee32`
+
+## 2026-06-12 - Slice 10: C-10 standards shim removal
+
+### Changed
+
+- Removed the legacy `.agents/skills/netscript-standards` skill shim from the framework worktree.
+- Removed the legacy `.agents/skills/netscript-standards` and
+  `.claude/skills/netscript-standards` shim copies from repo-genesis.
+- Removed the legacy skill row from the framework `.agents/skills/README.md`.
+- Removed repo-genesis live instruction-file mentions that named the removed shim; doctrine remains
+  the only package/plugin architecture guidance path.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| active shim file check | PASS | `Test-Path .agents/skills/netscript-standards/SKILL.md` | Framework returned `False`; repo-genesis `.agents` and `.claude` returned `False`. |
+| active instruction reference check | PASS | `Select-String AGENTS.md,CLAUDE.md,.claude/README.md` | Repo-genesis live instruction files no longer mention the removed shim. |
+| framework skill index reference check | PASS | `Select-String .agents/skills/README.md` | No `netscript-standards` row remains. |
+| markdown fmt | PASS | `deno fmt --check` on touched instruction/index files | Framework and repo-genesis files passed after formatting. |
+| package check | PASS | `deno task check` from framework `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `deno task test` from framework `packages/fresh-ui` | 39 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from framework `packages/fresh-ui` | Generated token artifacts stable. |
+| DS no raw hex | PASS | `check-ds-no-raw-hex.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| DS color utilities | PASS | `check-ds-color-utilities.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| arch:check | PASS | `deno task arch:check` from framework root | 0 fail, 1 existing manifest-size warn; DS gates passed. |
+| repo-genesis package check/test/tokens | PASS | outer `packages/fresh-ui` gates | Check passed, 39 tests passed, tokens stable. |
+
+### Drift
+
+- Remaining framework matches for `netscript-standards` are the separate
+  `.llm/tools/fitness/check-netscript-standards.ts` tool, `release-readiness.ts` references to that
+  tool, and `packages/contracts/README.md` command text. They are not the removed skill shim and
+  were left unchanged for this slice.
+
+### Commits
+
+- Framework: `097423042153d556d27e96ba1dc5137ec1916f7b`
+- Repo-genesis: `e18027e4470306149b605a46c22d5360dcb15c9b`
