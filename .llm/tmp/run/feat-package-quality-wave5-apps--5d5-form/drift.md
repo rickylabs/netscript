@@ -1,4 +1,6 @@
-# 5d5 `./form` drift log
+# [5d5] Drift Ledger
 
-Entries prefixed `D-5d5-n`. Append-only.
+Status: IN PROGRESS
+
+- D-5d5-1: TODO
 

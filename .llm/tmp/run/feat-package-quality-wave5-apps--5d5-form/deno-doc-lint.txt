@@ -1,0 +1,596 @@
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:17:1
+   | 
+17 | export function createFormEnhancementSnapshot<TValues extends FormValues>(
+   | ^
+
+
+error[private-type-ref]: public type 'applyCollectionStrategy' references private type 'IntentButtonProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:39:1
+    | 
+ 39 | export function applyCollectionStrategy<TProps extends IntentButtonProps>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+143 | export interface IntentButtonProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:39:1
+   | 
+39 | export function applyCollectionStrategy<TProps extends IntentButtonProps>(
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:57:1
+   | 
+57 | export function useFormEnhancement<TValues extends FormValues>(
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:240:1
+    | 
+240 | export function getSubmissionHiddenInputProps(submissionId: string) {
+    | ^
+
+
+error[missing-return-type]: exported function is missing an explicit return type annotation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:240:1
+    | 
+240 | export function getSubmissionHiddenInputProps(submissionId: string) {
+    | ^
+
+
+error[private-type-ref]: public type 'Form' references private type 'FormProps'
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx:21:1
+   | 
+21 | export function Form<TValues extends FormValues>({
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+14 | export interface FormProps<TValues extends FormValues>
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx:21:1
+   | 
+21 | export function Form<TValues extends FormValues>({
+   | ^
+
+
+error[missing-return-type]: exported function is missing an explicit return type annotation
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx:21:1
+   | 
+21 | export function Form<TValues extends FormValues>({
+   | ^
+
+
+error[private-type-ref]: public type 'FormRegion' references private type 'FormRegionProps'
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx:10:1
+   | 
+10 | export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 4 | export interface FormRegionProps {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx:10:1
+   | 
+10 | export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+   | ^
+
+
+error[missing-return-type]: exported function is missing an explicit return type annotation
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx:10:1
+   | 
+10 | export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:332:1
+    | 
+332 | export interface RuntimeFormState<TValues extends FormValues> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:333:3
+    | 
+333 |   readonly id: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:334:3
+    | 
+334 |   readonly action: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:335:3
+    | 
+335 |   readonly method: 'POST' | 'PUT' | 'PATCH';
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:336:3
+    | 
+336 |   readonly values: TValues;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:337:3
+    | 
+337 |   readonly initialValues: Partial<TValues>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:338:3
+    | 
+338 |   readonly fieldErrors: FormFieldErrors<TValues>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:339:3
+    | 
+339 |   readonly formErrors: readonly string[];
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:340:3
+    | 
+340 |   readonly hasErrors: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:341:3
+    | 
+341 |   readonly submitted: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:342:3
+    | 
+342 |   readonly intent: FormIntent | null;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:343:3
+    | 
+343 |   readonly submissionId: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:344:3
+    | 
+344 |   readonly csrfToken: string;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["fields"]' references private type 'FieldDescriptorMap'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
+    | 
+345 |   readonly fields: FieldDescriptorMap<TValues>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+325 | export type FieldDescriptorMap<T> = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
+    | 
+345 |   readonly fields: FieldDescriptorMap<TValues>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["constraints"]' references private type 'FieldConstraints'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
+    | 
+346 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 49 | export interface FieldConstraints {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
+    | 
+346 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["formProps"]' references private type 'FormElementProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
+    | 
+347 |   readonly formProps: FormElementProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 62 | export interface FormElementProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
+    | 
+347 |   readonly formProps: FormElementProps;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["csrfInputProps"]' references private type 'FormCsrfInputProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
+    | 
+348 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 69 | export interface FormCsrfInputProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
+    | 
+348 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:351:1
+    | 
+351 | export interface FormEnhancementSnapshot<TValues extends FormValues> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:352:3
+    | 
+352 |   readonly id: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:353:3
+    | 
+353 |   readonly action: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:354:3
+    | 
+354 |   readonly method: 'POST' | 'PUT' | 'PATCH';
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:355:3
+    | 
+355 |   readonly values: TValues;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:356:3
+    | 
+356 |   readonly initialValues: Partial<TValues>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:357:3
+    | 
+357 |   readonly fieldErrors: FormFieldErrors<TValues>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:358:3
+    | 
+358 |   readonly formErrors: readonly string[];
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:359:3
+    | 
+359 |   readonly hasErrors: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:360:3
+    | 
+360 |   readonly submitted: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:361:3
+    | 
+361 |   readonly intent: FormIntent | null;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:362:3
+    | 
+362 |   readonly submissionId: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:363:3
+    | 
+363 |   readonly csrfToken: string;
+    |   ^
+
+
+error[private-type-ref]: public type 'FormEnhancementSnapshot["constraints"]' references private type 'FieldConstraints'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:364:3
+    | 
+364 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 49 | export interface FieldConstraints {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:364:3
+    | 
+364 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+
+
+error[private-type-ref]: public type 'FormEnhancementSnapshot["formProps"]' references private type 'FormElementProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:365:3
+    | 
+365 |   readonly formProps: FormElementProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 62 | export interface FormElementProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:365:3
+    | 
+365 |   readonly formProps: FormElementProps;
+    |   ^
+
+
+error[private-type-ref]: public type 'FormEnhancementSnapshot["csrfInputProps"]' references private type 'FormCsrfInputProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:366:3
+    | 
+366 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 69 | export interface FormCsrfInputProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:366:3
+    | 
+366 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:369:1
+    | 
+369 | export type FormCollectionStrategyMode = 'server' | 'client' | 'hybrid';
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:371:1
+    | 
+371 | export interface FormCollectionStrategy {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:372:3
+    | 
+372 |   readonly mode: FormCollectionStrategyMode;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:373:3
+    | 
+373 |   readonly partial?: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:374:3
+    | 
+374 |   readonly clientNav?: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:377:1
+    | 
+377 | export interface FormEnhancementOptions<TValues extends FormValues> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:378:3
+    | 
+378 |   readonly partial?: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:379:3
+    | 
+379 |   readonly clientNav?: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:380:3
+    | 
+380 |   readonly validate?: 'onSubmit' | 'onBlur' | 'onChange';
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:381:3
+    | 
+381 |   readonly schema?: {
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:388:3
+    | 
+388 |   readonly focusOnError?: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:389:3
+    | 
+389 |   readonly onSubmitStart?: () => void;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:390:3
+    | 
+390 |   readonly onSubmitEnd?: () => void;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:391:3
+    | 
+391 |   readonly collections?: Partial<Record<Extract<keyof TValues, string>, FormCollectionStrategy>>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:403:1
+    | 
+403 | export interface FormEnhancementState<TValues extends FormValues> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:404:3
+    | 
+404 |   readonly pending: boolean;
+    |   ^
+
+
+error[private-type-ref]: public type 'FormEnhancementState["formProps"]' references private type 'EnhancedFormProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:405:3
+    | 
+405 |   readonly formProps: EnhancedFormProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+394 | export interface EnhancedFormProps extends FormElementProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:405:3
+    | 
+405 |   readonly formProps: EnhancedFormProps;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:406:3
+    | 
+406 |   readonly fieldErrors: FormFieldErrors<TValues>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:407:3
+    | 
+407 |   readonly formErrors: readonly string[];
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:408:3
+    | 
+408 |   readonly collectionStrategies: Partial<
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:411:3
+    | 
+411 |   submit(intent?: FormIntent): void;
+    |   ^
+
+
+error: Found 74 documentation lint errors.

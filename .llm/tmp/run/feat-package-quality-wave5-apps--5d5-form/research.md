@@ -1,39 +1,44 @@
-# 5d5 `./form` PLAN-phase research
+# [5d5] `@netscript/fresh/form` — Phase 1 Research
 
-Run: `feat/package-quality-wave5-apps-5d5-form` PR #38  
-Trigger: RE-DISPATCH phase 1 of 2 — RESEARCH ONLY.  
-Reused from prior trace `.llm/tmp/run/openhands/pr-38/run-27442097563-1/summary.md` where noted.
+Status: IN PROGRESS — skeleton, findings appended incrementally.
 
-## 1. MEASURE-FIRST baseline
+## 1. MEASURE-FIRST
 
-> TODO: fill with current numbers from `deno doc --lint`, `deno check`, `deno publish --dry-run`, file sizes, private-type-ref count.
+- [x] `deno doc --lint` on `packages/fresh/form/mod.ts`
+- [ ] `deno check --unstable-kv` on `./form` entrypoints
+- [ ] private-type-ref count
+- [ ] over-cap inventory (16.3K/16K/15.5K trio)
+- [ ] publish dry-run excluded-module tally for form cluster
 
-| Check | Command / scope | Result |
-|---|---|---|
-| Type check `./form` | TODO | TODO |
-| Root type check (excludes `packages/fresh`) | TODO | TODO |
-| Doc lint `./form` combined | TODO | TODO |
-| JSR dry-run `@netscript/fresh` | TODO | TODO |
-| Over-cap files | TODO | TODO |
-| Private-type-refs | TODO | TODO |
+## 2. PUBLIC SURFACE MAP
 
-## 2. `./form` public surface & internal seams
+- [ ] exports from `mod.ts`
+- [ ] symbol map from `deno doc`
+- [ ] public type graph
 
-> TODO: symbol map from `deno doc` + exports; decomposition raw material.
+## 3. INTERNAL SEAMS (DECOMPOSITION RAW MATERIAL)
 
-## 3. fresh↔fresh-ui seam analysis
+- [ ] `field-descriptors.ts`
+- [ ] `schema-adapter.ts`
+- [ ] `state.ts`
+- [ ] `pipeline.ts`, `intent.ts`, `reply.ts`
 
-> TODO: read `packages/fresh-ui/registry/components/ui/form-field.tsx`, `registry/lib/control-props.ts`, `packages/fresh-ui/docs/l0-conventions.md`; document state contract and `data-*`/ARIA expectations.
+## 4. fresh ↔ fresh-ui SEAM ANALYSIS
 
-## 4. Standard Schema landscape & market bar
+- [ ] read `packages/fresh-ui/registry/components/ui/form-field.tsx`
+- [ ] read `packages/fresh-ui/registry/lib/control-props.ts`
+- [ ] read `packages/fresh-ui/docs/l0-conventions.md`
+- [ ] document state + `data-*`/ARIA contract
 
-> TODO: zod/valibot/arktype interop sources; Remix/RR, Next.js server actions + useActionState, TanStack Form gaps worth closing vs deferring.
+## 5. STANDARD SCHEMA LANDSCAPE & PROGRESSIVE ENHANCEMENT MARKET BAR
 
-## 5. Reused findings from prior trace
+- [ ] zod/valibot/arktype interop (sources)
+- [ ] Remix/React Router actions, Next.js server actions + useActionState, TanStack Form gaps
 
-> TODO: distill what was valid from run-27442097563-1 and what we re-verified.
+## 6. DRIFT / RISKS / GAPS
 
-## 6. Gaps / blockers
+- [ ] drift entries `D-5d5-n`
+- [ ] remaining phase-2 questions
 
-> TODO: questions requiring supervisor/design trigger.
+---
 
