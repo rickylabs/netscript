@@ -429,3 +429,22 @@ recorded as out-of-scope registry candidate (D-5c2-5).
 
 Commits: framework 1d7b3053ef443502a26ccf46901020a218991153,
 repo-genesis 3d8374d14285afad194f9425be9724eb02dd5124.
+
+## Slice 10 — README + docs rewritten from scratch (2026-06-12)
+
+User directive: rewrite entirely, reflecting the FINAL production-ready
+package so follow-on agents can rely on it. README.md now leads with the
+three pillars (themes/registry/runtime), the L0-L4 layer table, the CLI
+install path + collections, the theme contract summary, the registry
+catalog dumped from the live manifest (43 items, schema v2), living
+reference routes (/design/*), and validation incl. the two DS fitness
+gates. New docs/theme-authoring.md captures the theme contract (full
+semantic vocabulary assignment, light+dark, ramps as raw material,
+Tailwind bridge, must-NOT list). docs/l0-conventions.md rewritten with
+the motion rule (slice-9 policy promoted to contract) and the
+copy-fidelity criterion (D-5c2-6). Task names verified against deno.json
+(tokens:build/tokens:check); token slot names verified against
+registry/theme/tokens.css. Gates re-run: both PASS 93.
+
+Commits: framework 571eccabf37a811454ddb457f8cb6bd65ee8cb59,
+repo-genesis 40924ff89de8b9312b6798423d8772b20fcae91f.

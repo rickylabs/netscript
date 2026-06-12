@@ -20,3 +20,5 @@
 | 8 | `9cf8bea` | — | ds-color-utilities fitness gate (off-vocabulary Tailwind colors) |
 | 9 | 1d7b3053ef443502a26ccf46901020a218991153 | framework | fmt-normalize registry, reduced-motion guards, drift D-5c2-5/6 |
 | 9 | 3d8374d14285afad194f9425be9724eb02dd5124 | repo-genesis | sync registry copy + playground CSS/tsx |
+| 10 | 571eccabf37a811454ddb457f8cb6bd65ee8cb59 | framework | rewrite README + docs (theme-authoring.md new, l0-conventions.md rewritten) |
+| 10 | 40924ff89de8b9312b6798423d8772b20fcae91f | repo-genesis | sync docs |
