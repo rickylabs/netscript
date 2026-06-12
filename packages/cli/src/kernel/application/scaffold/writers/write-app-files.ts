@@ -88,6 +88,16 @@ export async function writeNormalizedAppFiles(
   const {
     appAppTemplate,
     appClientTemplate,
+    appDesignComponentsRouteTemplate,
+    appDesignCompositionRouteTemplate,
+    appDesignCssTemplate,
+    appDesignFloatingSurfaceDemoTemplate,
+    appDesignIndexRouteTemplate,
+    appDesignLayoutTemplate,
+    appDesignRegistryTemplate,
+    appDesignTokenClipboardTemplate,
+    appDesignTokensLibTemplate,
+    appDesignTokensRouteTemplate,
     appExamplesIndexRouteTemplate,
     appExamplesViewTemplate,
     appHealthRouteTemplate,
@@ -119,12 +129,17 @@ export async function writeNormalizedAppFiles(
   const examplesRoutesDir = join(routesDir, 'examples');
   const routeComponentsDir = join(routesDir, '(_components)');
   const routeSharedDir = join(routesDir, '(_shared)');
+  const designGroupDir = join(routesDir, '(design)');
+  const designRoutesDir = join(designGroupDir, 'design');
   const examplesComponentsDir = join(examplesRoutesDir, '(_components)');
   const islandsDir = join(appDir, 'islands');
+  const designIslandsDir = join(islandsDir, 'design');
   const generatedDir = join(appDir, '.generated');
   const componentsDir = join(appDir, 'components');
   const uiComponentsDir = join(componentsDir, 'ui');
+  const assetsDir = join(appDir, 'assets');
   const libDir = join(appDir, 'lib');
+  const designLibDir = join(libDir, 'design');
   const partialsDir = join(routesDir, 'partials');
   const partialsExamplesDir = join(partialsDir, 'examples');
   const serviceExampleDir = options.serviceName
@@ -150,13 +165,18 @@ export async function writeNormalizedAppFiles(
   await createDir(examplesRoutesDir);
   await createDir(routeComponentsDir);
   await createDir(routeSharedDir);
+  await createDir(designGroupDir);
+  await createDir(designRoutesDir);
   await createDir(examplesComponentsDir);
   await createDir(islandsDir);
+  await createDir(designIslandsDir);
   await createDir(generatedDir);
   await createDir(componentsDir);
   await createDir(uiComponentsDir);
+  await createDir(assetsDir);
+  await createDir(libDir);
+  await createDir(designLibDir);
   if (options.includeExampleService) {
-    await createDir(libDir);
     if (
       serviceExampleDir && serviceExampleComponentsDir && serviceExampleIslandsDir &&
       serviceExampleSharedDir && serviceExamplePartialDir
@@ -193,6 +213,7 @@ export async function writeNormalizedAppFiles(
     if (!filesCreated.includes(copiedFile)) filesCreated.push(copiedFile);
   }
   if (!filesCreated.includes(uiInstall.stylesPath)) filesCreated.push(uiInstall.stylesPath);
+  await write(join(assetsDir, 'design.css'), appDesignCssTemplate);
   await write(
     join(appDir, 'client.ts'),
     appClientTemplate,
@@ -209,6 +230,13 @@ export async function writeNormalizedAppFiles(
   await write(join(generatedDir, 'manifest.ts'), generateRouteManifestSeed());
   await write(join(generatedDir, 'routes.ts'), generateRoutesSeed());
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
+  await write(join(designLibDir, 'registry.ts'), appDesignRegistryTemplate);
+  await write(join(designLibDir, 'tokens.ts'), appDesignTokensLibTemplate);
+  await write(
+    join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),
+    appDesignFloatingSurfaceDemoTemplate,
+  );
+  await write(join(designIslandsDir, 'TokenClipboard.tsx'), appDesignTokenClipboardTemplate);
   await write(
     join(routesDir, '_app.tsx'),
     await context.templateAdapter.render(appAppTemplate, appTemplateVars),
@@ -237,6 +265,14 @@ export async function writeNormalizedAppFiles(
     join(routeSharedDir, 'health.ts'),
     await context.templateAdapter.render(appHealthSharedTemplate, appTemplateVars),
   );
+  await write(
+    join(designRoutesDir, '_layout.tsx'),
+    await context.templateAdapter.render(appDesignLayoutTemplate, appTemplateVars),
+  );
+  await write(join(designRoutesDir, 'index.tsx'), appDesignIndexRouteTemplate);
+  await write(join(designRoutesDir, 'tokens.tsx'), appDesignTokensRouteTemplate);
+  await write(join(designRoutesDir, 'components.tsx'), appDesignComponentsRouteTemplate);
+  await write(join(designRoutesDir, 'composition.tsx'), appDesignCompositionRouteTemplate);
   await write(
     join(examplesRoutesDir, 'index.tsx'),
     await context.templateAdapter.render(appExamplesIndexRouteTemplate, appTemplateVars),

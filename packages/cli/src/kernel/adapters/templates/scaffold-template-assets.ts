@@ -4,6 +4,16 @@ import { readTemplateAsset } from '../templates/template-asset.ts';
 type TemplateUrlMap = Readonly<Record<string, TemplateKey>>;
 
 const APP_TEMPLATE_URLS: TemplateUrlMap = {
+  appDesignCssTemplate: TEMPLATE_KEYS.appAssetsDesignCss,
+  appDesignComponentsRouteTemplate: TEMPLATE_KEYS.appRoutesDesignComponents,
+  appDesignCompositionRouteTemplate: TEMPLATE_KEYS.appRoutesDesignComposition,
+  appDesignIndexRouteTemplate: TEMPLATE_KEYS.appRoutesDesignIndex,
+  appDesignLayoutTemplate: TEMPLATE_KEYS.appRoutesDesignLayout,
+  appDesignRegistryTemplate: TEMPLATE_KEYS.appLibDesignRegistry,
+  appDesignFloatingSurfaceDemoTemplate: TEMPLATE_KEYS.appIslandsDesignFloatingSurfaceDemo,
+  appDesignTokenClipboardTemplate: TEMPLATE_KEYS.appIslandsDesignTokenClipboard,
+  appDesignTokensLibTemplate: TEMPLATE_KEYS.appLibDesignTokens,
+  appDesignTokensRouteTemplate: TEMPLATE_KEYS.appRoutesDesignTokens,
   appAppTemplate: TEMPLATE_KEYS.appRoutesApp,
   appClientTemplate: TEMPLATE_KEYS.appClient,
   appExamplesIndexRouteTemplate: TEMPLATE_KEYS.appRoutesExamplesIndex,

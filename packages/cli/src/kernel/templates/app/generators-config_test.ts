@@ -84,6 +84,7 @@ describe('generateAppDenoJson', () => {
     assert(config.imports['@netscript/fresh/server']);
     assert(config.imports['@netscript/fresh/vite']);
     assert(config.imports['@netscript/fresh-ui']);
+    assert(config.imports['@netscript/fresh-ui/interactive']);
     assert(config.imports['@test/contracts']);
     assert(config.imports['@netscript/sdk']);
     assert(config.imports['@netscript/sdk/client']);
@@ -155,6 +156,10 @@ describe('generateAppDenoJson', () => {
     assertEquals(config.imports['@netscript/fresh/server'], '../../packages/fresh/server.ts');
     assertEquals(config.imports['@netscript/fresh/vite'], '../../packages/fresh/config/vite.ts');
     assertEquals(config.imports['@netscript/fresh-ui'], '../../packages/fresh-ui/mod.ts');
+    assertEquals(
+      config.imports['@netscript/fresh-ui/interactive'],
+      '../../packages/fresh-ui/interactive.ts',
+    );
     assertEquals(config.imports['@netscript/sdk'], '../../packages/sdk/mod.ts');
     assertEquals(config.imports['@netscript/sdk/client'], '../../packages/sdk/client/mod.ts');
     assertEquals(config.imports['@netscript/sdk/query'], '../../packages/sdk/query/mod.ts');

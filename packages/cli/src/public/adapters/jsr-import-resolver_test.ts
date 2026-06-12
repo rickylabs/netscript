@@ -15,6 +15,10 @@ describe('JsrImportResolver', () => {
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_VITE),
       'jsr:@netscript/fresh@^1.0.0/vite',
     );
+    assertEquals(
+      resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE),
+      'jsr:@netscript/fresh-ui@^1.0.0/interactive',
+    );
   });
 
   it('resolves external dependencies to registry imports', () => {

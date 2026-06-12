@@ -21,6 +21,18 @@ export function makeAdapter(): StringTemplateAdapter {
 const appTemplates = await loadAppScaffoldTemplateAssets();
 
 export const {
+  appAppTemplate,
+  appClientTemplate,
+  appDesignComponentsRouteTemplate,
+  appDesignCompositionRouteTemplate,
+  appDesignCssTemplate,
+  appDesignFloatingSurfaceDemoTemplate,
+  appDesignIndexRouteTemplate,
+  appDesignLayoutTemplate,
+  appDesignRegistryTemplate,
+  appDesignTokenClipboardTemplate,
+  appDesignTokensLibTemplate,
+  appDesignTokensRouteTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
   appHealthRouteTemplate,

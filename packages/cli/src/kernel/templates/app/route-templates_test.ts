@@ -5,6 +5,18 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
 import {
+  appAppTemplate,
+  appClientTemplate,
+  appDesignComponentsRouteTemplate,
+  appDesignCompositionRouteTemplate,
+  appDesignCssTemplate,
+  appDesignFloatingSurfaceDemoTemplate,
+  appDesignIndexRouteTemplate,
+  appDesignLayoutTemplate,
+  appDesignRegistryTemplate,
+  appDesignTokenClipboardTemplate,
+  appDesignTokensLibTemplate,
+  appDesignTokensRouteTemplate,
   appExampleServiceTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
@@ -63,6 +75,14 @@ describe('app route template rendering', () => {
     );
     assertStringIncludes(appUtilsTemplate, 'export function definePage()');
     assertStringIncludes(appUtilsTemplate, 'return createDefinePage<State>();');
+  });
+
+  it('app shell imports design CSS and avoids favicon console noise', async () => {
+    const adapter = makeAdapter();
+    const appShell = await adapter.render(appAppTemplate, SAMPLE_APP_VARS);
+    assertStringIncludes(appClientTemplate, "import './assets/styles.css';");
+    assertStringIncludes(appClientTemplate, "import './assets/design.css';");
+    assertStringIncludes(appShell, "<link rel='icon' href='data:,' />");
   });
 
   it('index route keeps the builder in index.tsx and the view in a child component', async () => {
@@ -124,6 +144,41 @@ describe('app route template rendering', () => {
       output,
       "aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}",
     );
+  });
+
+  it('design route templates port the playground reference pages into the scaffold', async () => {
+    const adapter = makeAdapter();
+    const layout = await adapter.render(appDesignLayoutTemplate, SAMPLE_APP_VARS);
+
+    assertStringIncludes(layout, "import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';");
+    assertStringIncludes(layout, "import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';");
+    assertStringIncludes(layout, "href: '/design/tokens'");
+    assertStringIncludes(layout, 'test-project');
+    assertStringIncludes(appDesignIndexRouteTemplate, "return ctx.redirect('/design/tokens');");
+    assertStringIncludes(
+      appDesignTokensRouteTemplate,
+      "import TokenClipboard from '@app/islands/design/TokenClipboard.tsx';",
+    );
+    assertStringIncludes(appDesignTokensRouteTemplate, "from '@app/lib/design/tokens.ts';");
+    assertStringIncludes(appDesignComponentsRouteTemplate, "from '@app/lib/design/registry.ts';");
+    assertStringIncludes(
+      appDesignComponentsRouteTemplate,
+      "from '@app/islands/design/FloatingSurfaceDemo.tsx';",
+    );
+    assertStringIncludes(appDesignComponentsRouteTemplate, 'responsive-table');
+    assertStringIncludes(appDesignCompositionRouteTemplate, 'Composition');
+    assertStringIncludes(appDesignRegistryTemplate, "name: 'responsive-table'");
+    assertStringIncludes(
+      appDesignTokensLibTemplate,
+      "import manifest from '@app/assets/tokens.json'",
+    );
+    assertStringIncludes(
+      appDesignFloatingSurfaceDemoTemplate,
+      "import { Popover, Sheet, Tooltip } from '@netscript/fresh-ui/interactive';",
+    );
+    assertStringIncludes(appDesignTokenClipboardTemplate, '[data-token-copy]');
+    assertStringIncludes(appDesignCssTemplate, '.ns-tokens-page');
+    assert(!appDesignCssTemplate.includes('repeating-linear-gradient'));
   });
 
   it('examples landing route keeps the builder in index.tsx and the cards in a child view', async () => {

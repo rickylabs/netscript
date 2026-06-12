@@ -1,7 +1,12 @@
 /** Typed manifest for checked-in CLI template assets. */
 export const TEMPLATE_KEYS = {
   appClient: 'app/client.ts.template',
+  appAssetsDesignCss: 'app/assets/design.css.template',
   appComponentsUiMod: 'app/components/ui/mod.ts.template',
+  appIslandsDesignFloatingSurfaceDemo: 'app/islands/design/FloatingSurfaceDemo.tsx.template',
+  appIslandsDesignTokenClipboard: 'app/islands/design/TokenClipboard.tsx.template',
+  appLibDesignRegistry: 'app/lib/design/registry.ts.template',
+  appLibDesignTokens: 'app/lib/design/tokens.ts.template',
   appLibExampleService: 'app/lib/example-service.ts.template',
   appMain: 'app/main.ts.template',
   appRouter: 'app/router.ts.template',
@@ -10,6 +15,11 @@ export const TEMPLATE_KEYS = {
   appRoutesSharedHealth: 'app/routes/(_shared)/health.ts.template',
   appRoutesApp: 'app/routes/_app.tsx.template',
   appRoutesLayout: 'app/routes/_layout.tsx.template',
+  appRoutesDesignComponents: 'app/routes/(design)/design/components.tsx.template',
+  appRoutesDesignComposition: 'app/routes/(design)/design/composition.tsx.template',
+  appRoutesDesignIndex: 'app/routes/(design)/design/index.tsx.template',
+  appRoutesDesignLayout: 'app/routes/(design)/design/_layout.tsx.template',
+  appRoutesDesignTokens: 'app/routes/(design)/design/tokens.tsx.template',
   appRoutesExamplesComponentsExamplesView:
     'app/routes/examples/(_components)/examples-view.tsx.template',
   appRoutesExamplesComponentsHero: 'app/routes/examples/(_components)/hero.tsx.template',
