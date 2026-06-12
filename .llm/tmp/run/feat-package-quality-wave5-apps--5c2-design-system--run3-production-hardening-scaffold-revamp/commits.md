@@ -28,3 +28,5 @@ Format:
 - c83d2e1639b1ffd846b934ec156513a34a11a093: fresh-ui: sync test layout and publish version
 - b9ccc7bf90a4a14852c612f04ff0c1a9a2650770: fresh-ui: promote package fmt and ds gates
 - f0ac62694914fa90361752fa572f8888d5ef9037: fresh-ui: sync fmt ownership gates
+- c4ac8ff14994256b39655b0ff237a982e3c0dba1: fresh-ui: record zag adoption adr
+- 00a29027915283a52ae56e2c06adbc3287ebc7a6: fresh-ui: sync zag adoption adr

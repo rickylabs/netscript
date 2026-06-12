@@ -252,3 +252,41 @@ only if the generated app should ship it by default.
 
 - Framework: `b9ccc7bf90a4a14852c612f04ff0c1a9a2650770`
 - Repo-genesis: `f0ac62694914fa90361752fa572f8888d5ef9037`
+
+## 2026-06-12 - Slice 7: C-12 Zag ADR spike verdict
+
+### Changed
+
+- Added `packages/fresh-ui/docs/architecture.md`.
+- Recorded ADR 0001: Tiered Interactivity And Zag Adoption.
+- Used prior Run 5c1 Slice 10 and closeout evidence instead of rerunning the spike:
+  `@zag-js/preact@1.41.2` + `@zag-js/combobox@1.41.2` type-check, Fresh SSR returns 200,
+  short-path Vite hosting proves hydrated interaction, and the prior blocker was Windows MAX_PATH.
+- Locked policy: keep the existing seven native-backed components (`dialog`, `sheet`, `drawer`,
+  `accordion`, `popover`, `tooltip`, `tabs`) on platform-backed runtimes; adopt Zag only for
+  future machine-class widgets.
+- Synced the ADR doc to repo-genesis.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| package fmt | PASS | `deno fmt --check` from `packages/fresh-ui` | 112 files checked. |
+| package check | PASS | `deno task check` from `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `deno task test` from `packages/fresh-ui` | 36 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from `packages/fresh-ui` | Generated token artifacts stable. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 93 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 93 files clean. |
+| arch:check | PASS | `deno task arch:check` | Doctrine: 0 fail, 1 existing manifest-size warn, 0 info; DS gates passed. |
+| repo-genesis package fmt | PASS | `deno fmt --check` from outer `packages/fresh-ui` | 112 files checked. |
+| repo-genesis package check | PASS | `deno task check` from outer `packages/fresh-ui` | Existing outer task shape; check passed. |
+| repo-genesis package test | PASS | `deno task test` from outer `packages/fresh-ui` | 36 tests passed. |
+
+### Drift
+
+- None.
+
+### Commits
+
+- Framework: `c4ac8ff14994256b39655b0ff237a982e3c0dba1`
+- Repo-genesis: `00a29027915283a52ae56e2c06adbc3287ebc7a6`
