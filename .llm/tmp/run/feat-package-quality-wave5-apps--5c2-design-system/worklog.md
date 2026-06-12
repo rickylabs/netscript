@@ -448,3 +448,19 @@ registry/theme/tokens.css. Gates re-run: both PASS 93.
 
 Commits: framework 571eccabf37a811454ddb457f8cb6bd65ee8cb59,
 repo-genesis 40924ff89de8b9312b6798423d8772b20fcae91f.
+
+## Slice 11 — workspace checks + fmt debt closed (2026-06-12)
+
+Root gates: `deno task check` 1373 files / 0 errors (12 batches), `deno
+task lint` 875 files / 0, `deno task fmt:check` 0 findings (875 ignored
+line-ending findings). Package: check exit 0, test 36/36, tokens:check
+exit 0, ds-no-raw-hex PASS 93, ds-color-utilities PASS 93. Closed the
+pre-existing fmt debt: ~30 runtime/ + root modules were unformatted
+because root fmt excludes the package and package fmt was never run in
+CI; normalized with house flags. registry/theme artifacts: line-ending
+churn only (content diff empty). Untracked packages/fresh-ui/deno.lock
+left untracked in both repos (deliberate: package tasks run --no-lock;
+flagged for evaluator).
+
+Commits: framework 48a9ec61311653736dae8a7c006f922ae95ada6d,
+repo-genesis 7c63e08c34af77f7b5ef61c5d65b0881949c9a35.

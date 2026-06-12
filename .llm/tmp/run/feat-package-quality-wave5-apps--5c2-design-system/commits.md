@@ -22,3 +22,5 @@
 | 9 | 3d8374d14285afad194f9425be9724eb02dd5124 | repo-genesis | sync registry copy + playground CSS/tsx |
 | 10 | 571eccabf37a811454ddb457f8cb6bd65ee8cb59 | framework | rewrite README + docs (theme-authoring.md new, l0-conventions.md rewritten) |
 | 10 | 40924ff89de8b9312b6798423d8772b20fcae91f | repo-genesis | sync docs |
+| 11 | 48a9ec61311653736dae8a7c006f922ae95ada6d | framework | fmt-normalize runtime + root modules, workspace gates green |
+| 11 | 7c63e08c34af77f7b5ef61c5d65b0881949c9a35 | repo-genesis | sync |
