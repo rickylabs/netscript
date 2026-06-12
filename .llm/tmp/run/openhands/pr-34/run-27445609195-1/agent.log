@@ -1,0 +1,400 @@
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/mod.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/error/handler.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/error/mod.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/error/primitives.ts
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/form/collection-keys.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/config.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/form/error-normalization.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/errors.ts
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/form/field-descriptors.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/form/handler-context.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/idempotency.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/intent.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/mod.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/pipeline.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/reply.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/schema-adapter.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/state.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/telemetry.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/hooks/use-promise.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/interactive.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/mod.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/hooks.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/hydration.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/mod.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/query-client.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/query-island.tsx
+ --> /home/runner/work/netscript/netscript/packages/fresh/route/contract.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/route/mod.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/server.ts
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/server/define-fresh-app.ts
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundar
+y.tsx
+ --> /home/runner/work/netscript/netscript/packages/fresh/server/stream.ts
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/streams/create-stream-db.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/streams/mod.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/utils/cache-entry.ts
+ --> /home/runner/work/netscript/netscript/packages/fresh/utils/mod.ts
+
+📁 Working directory: /home/runner/work/netscript/netscript/packages/fresh
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Find excluded module reasons
+
+$ cd /home/runner/work/netscript/netscript/packages/fresh && deno publish 
+--dry-run --allow-dirty 2>&1 | grep -B15 "excluded-module" | grep "module in 
+package" -A1 | head -20
+
+Tokens: ↑ input 3.72M • cache hit 95.16% •  reasoning 5.9K • ↓ output 18K • $ 
+0.9162
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builde
+r.tsx
+--
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/intern
+al.ts
+--
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/naviga
+tion.tsx
+--
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/runtim
+e.tsx
+--
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search
+-params.ts
+--
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.
+ts
+--
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx
+
+📁 Working directory: /home/runner/work/netscript/netscript/packages/fresh
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Find gitignore files
+
+$ cd /home/runner/work/netscript/netscript && find . -name ".gitignore" | head 
+-5
+
+Tokens: ↑ input 3.76M • cache hit 95.20% •  reasoning 5.9K • ↓ output 18.05K • $
+0.9243
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+./.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system/scratch/.gitig
+nore
+./.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-f
+resh-spike/.gitignore
+./.gitignore
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read root gitignore
+
+$ cd /home/runner/work/netscript/netscript && cat .gitignore
+
+Tokens: ↑ input 3.8M • cache hit 95.24% •  reasoning 5.9K • ↓ output 18.09K • $ 
+0.9322
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+node_modules/
+coverage/
+.env
+.env.*
+.deno/
+dist/
+
+# Local git worktrees for parallel harness supervisor/wave runs
+.worktrees/
+
+.llm/tmp/cli-e2e/
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Dry run head details
+
+$ cd /home/runner/work/netscript/netscript/packages/fresh && deno publish 
+--dry-run --allow-dirty 2>&1 | head -80
+
+Tokens: ↑ input 3.84M • cache hit 95.28% •  reasoning 5.9K • ↓ output 18.15K • $
+0.9403
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Checking for slow types in the public API...
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builde
+r.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/intern
+al.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/naviga
+tion.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/runtim
+e.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search
+-params.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.
+ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> 
+/home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the 
+config file or use 'publish.exclude' with a negative glob to unexclude from 
+gitignore
+
+  info: excluded modules referenced via a package export will error at runtime 
+due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from 
+publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx
+
+📁 Working directory: /home/runner/work/netscript/netscript/packages/fresh
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check missing mod files
+
+$ cd /home/runner/work/netscript/netscript/packages/fresh && ls -la builders/ 
+route/ defer/ form/ streams/ query/ 2>&1 | head -40
+
+Tokens: ↑ input 3.88M • cache hit 95.30% •  reasoning 5.9K • ↓ output 18.21K • $
+0.9495
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+builders/:
+total 116
+drwxr-xr-x  3 runner runner  4096 Jun 12 22:02 .
+drwxr-xr-x 14 runner runner  4096 Jun 12 22:02 ..
+drwxr-xr-x  2 runner runner  4096 Jun 12 22:02 define-page
+-rw-r--r--  1 runner runner 45816 Jun 12 22:02 define-page.test.tsx
+-rw-r--r--  1 runner runner  5721 Jun 12 22:02 define-partial.test.tsx
+-rw-r--r--  1 runner runner  3164 Jun 12 22:02 define-partial.tsx
+-rw-r--r--  1 runner runner 41369 Jun 12 22:02 mod.ts
+
+defer/:
+total 64
+drwxr-xr-x  2 runner runner 4096 Jun 12 22:02 .
+drwxr-xr-x 14 runner runner 4096 Jun 12 22:02 ..
+-rw-r--r--  1 runner runner 2181 Jun 12 22:02 DeferIsland.test.ts
+-rw-r--r--  1 runner runner 7410 Jun 12 22:02 DeferIsland.tsx
+-rw-r--r--  1 runner runner 8289 Jun 12 22:02 DeferPage.tsx
+-rw-r--r--  1 runner runner 4259 Jun 12 22:02 Deferred.test.tsx
+-rw-r--r--  1 runner runner 2062 Jun 12 22:02 Deferred.tsx
+-rw-r--r--  1 runner runner  366 Jun 12 22:02 mod.ts
+-rw-r--r--  1 runner runner 4937 Jun 12 22:02 policy.ts
+-rw-r--r--  1 runner runner 5610 Jun 12 22:02 telemetry.ts
+
+form/:
+total 212
+drwxr-xr-x  2 runner runner  4096 Jun 12 22:02 .
+drwxr-xr-x 14 runner runner  4096 Jun 12 22:02 ..
+-rw-r--r--  1 runner runner  1685 Jun 12 22:02 collection-keys.ts
+-rw-r--r--  1 runner runner  5127 Jun 12 22:02 collection.test.ts
+-rw-r--r--  1 runner runner  4574 Jun 12 22:02 config.ts
+-rw-r--r--  1 runner runner  1567 Jun 12 22:02 csrf.test.ts
+-rw-r--r--  1 runner runner  2259 Jun 12 22:02 csrf.ts
+-rw-r--r--  1 runner runner  7090 Jun 12 22:02 enhancement.tsx
+-rw-r--r--  1 runner runner  1646 Jun 12 22:02 error-normalization.test.ts
+-rw-r--r--  1 runner runner  2857 Jun 12 22:02 error-normalization.ts
+-rw-r--r--  1 runner runner  3026 Jun 12 22:02 errors.ts
+-rw-r--r--  1 runner runner 15364 Jun 12 22:02 field-descriptors.ts
+-rw-r--r--  1 runner runner   418 Jun 12 22:02 form-region.tsx
+-rw-r--r--  1 runner runner  2550 Jun 12 22:02 form.test.tsx
+-rw-r--r--  1 runner runner  1096 Jun 12 22:02 form.tsx
+
+📁 Working directory: /home/runner/work/netscript/netscript/packages/fresh
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check if mod files exist
+
+$ cd /home/runner/work/netscript/netscript/packages/fresh && ls -la form/mod.ts 
+streams/mod.ts route/mod.ts query/mod.ts
+
+Tokens: ↑ input 3.93M • cache hit 95.32% •  reasoning 5.9K • ↓ output 18.26K • $
+0.9587
+
