@@ -13,8 +13,9 @@
 ## Current State
 
 Run 3 artifacts are created and the user-provided 16-slice table is locked in `plan.md`.
-OpenHands PLAN-EVAL passed. Slices 1, 2, and 3 are implemented in the framework worktree and synced
-to the outer repo-genesis copy where matching files exist.
+OpenHands PLAN-EVAL passed. Slices 1, 2, 3, and 4 are implemented. Slices 1-3 touched the
+framework package/CLI and repo-genesis package copy; Slice 4 visual gallery work lives in the outer
+repo-genesis playground because the framework worktree has no `apps/` directory.
 
 ## Completed
 
@@ -40,17 +41,22 @@ to the outer repo-genesis copy where matching files exist.
   framework CLI `ui:add` lookup, and updated package tests.
 - Slice 3 gates passed: CLI registry test/check, framework package check/test/tokens, DS no-raw-hex,
   DS color utilities, repo-genesis package check/test.
+- Slice 4 C-4 dead registry items: copied `sheet.css` and `floating.css` into
+  `apps/playground/assets/ui/`, imported both from `assets/styles.css`, and added a Fresh island on
+  `/design/components` that exercises Sheet, Popover, and Tooltip runtime contracts.
+- Slice 4 gates passed: framework package check/test/tokens, DS no-raw-hex, DS color utilities,
+  focused playground fmt/lint/check, and browser validation with screenshots/report. Full
+  playground `deno task check` is blocked by unrelated pre-existing CRLF fmt drift.
 
 ## In Progress
 
-- Slice 3 bookkeeping commit pending, then push both repos and post the PR comment.
+- Slice 4 bookkeeping commit pending, then push both repos and post the PR comment.
 
 ## Next Steps
 
-1. Commit Slice 3 bookkeeping and push both repos.
-2. Post the Slice 3 PR comment.
-3. Start Slice 4: C-4 dead registry items, wiring `sheet-styles` and `floating-styles` into the
-   gallery with browser validation.
+1. Commit Slice 4 browser evidence/bookkeeping and push both repos.
+2. Post the Slice 4 PR comment.
+3. Start Slice 5: C-5 consolidate tests under `tests/` and C-6 version coherence (`0.1.0`).
 
 ## Key Decisions
 
@@ -62,6 +68,7 @@ to the outer repo-genesis copy where matching files exist.
 | Treat Zag as prior proof to cite. | User clarification | Slice 7 still records ADR policy and evidence. |
 | Track package-local fresh-ui lock. | User approval | Explicit `--lock=deno.lock` avoids root lock ownership. |
 | Keep manifest/schema outside the copy payload. | Plan C-3 | `ui:add` resolves root `registry.manifest.ts`. |
+| Use repo-genesis playground for visual gallery slices. | Filesystem | Framework repo has no `apps/playground`; outer repo-genesis does. |
 
 ## Files Changed
 
@@ -85,6 +92,11 @@ to the outer repo-genesis copy where matching files exist.
 | `packages/cli/src/public/features/ui/registry.test.ts` | changed | Root manifest URL negative/path test. |
 | outer `packages/fresh-ui/registry.manifest.ts` | moved | Repo-genesis fresh-ui copy synced. |
 | outer `packages/fresh-ui/registry.schema.ts` | moved | Repo-genesis fresh-ui copy synced. |
+| outer `apps/playground/assets/ui/sheet.css` | new | App-owned copy of registry sheet styles. |
+| outer `apps/playground/assets/ui/floating.css` | new | App-owned copy of registry floating styles. |
+| outer `apps/playground/islands/design/FloatingSurfaceDemo.tsx` | new | Live Sheet/Popover/Tooltip gallery demos. |
+| outer `apps/playground/routes/(design)/design/components.tsx` | changed | Renders demos for `sheet-styles` and `floating-styles`. |
+| run `slice4-browser-report.json` and screenshots | new | Browser evidence for visual gate. |
 
 ## Gates
 
@@ -92,8 +104,8 @@ to the outer repo-genesis copy where matching files exist.
 | ----------- | -------------- | -------- |
 | Static | PASS | Plan-Gate PASS; package check/test/tokens PASS. |
 | Fitness | PASS | DS no-raw-hex and DS color utilities PASS. |
-| Runtime | N/A | Slices 1-3 config/lock/contract-only; no visual route changes. |
-| Consumer | PASS | Repo-genesis package check/test PASS. |
+| Runtime | PASS | Slice 4 Playwright Core browser report: real `/design/components`, theme flip, mobile, reduced motion, interactions. |
+| Consumer | PASS_WITH_DRIFT | Focused playground fmt/lint/check PASS; full playground check blocked by unrelated CRLF fmt drift. |
 
 ## Open Questions
 
@@ -104,7 +116,8 @@ to the outer repo-genesis copy where matching files exist.
 - Drift: missing `.claude` doctrine skill path, missing Impeccable helper scripts, absent
   `.resources/deps-docs/`, unavailable `rg`/`rtk grep`, prior Zag proof clarification, and
   broader pre-existing repo-genesis fresh-ui copy drift including the larger outer package lock and
-  missing outer CLI source path for Slice 3 sync.
+  missing outer CLI source path for Slice 3 sync. Slice 4 adds framework `apps/playground` absence,
+  Playwright MCP profile lock, and playground full-check CRLF fmt drift.
 - Debt: no new architecture debt created.
 
 ## Commits
@@ -115,3 +128,4 @@ to the outer repo-genesis copy where matching files exist.
 - `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`: fresh-ui: sync package lock policy
 - `84558e0e2eab6d314763fa1d339a173786e15a34`: fresh-ui: move registry support files out of payload
 - `5137ec90f7e3a758601d2ce3cf6373c5768cae37`: fresh-ui: sync registry support relocation
+- `84748b56be0199a193bf556a454d62fd55937c02`: playground: wire sheet and floating style demos

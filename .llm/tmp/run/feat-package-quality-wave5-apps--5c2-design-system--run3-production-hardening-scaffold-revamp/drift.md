@@ -117,3 +117,43 @@ documentation.
 - **Action:** accept; later scaffold-revamp slices will operate against the framework CLI source.
 - **Evidence:** framework commit `84558e0e2eab6d314763fa1d339a173786e15a34`; repo-genesis commit
   `5137ec90f7e3a758601d2ce3cf6373c5768cae37`.
+
+## 2026-06-12 - framework worktree lacks apps/playground for Slice 4
+
+- **What:** The locked Slice 4 asks to wire `sheet-styles` and `floating-styles` into the gallery,
+  but the framework worktree has no `apps/` directory.
+- **Source:** `Get-ChildItem apps` failed in the framework worktree; prior run context and the
+  outer repo-genesis tree locate the real playground at `apps/playground`.
+- **Expected:** Gallery work happens in `apps/playground`.
+- **Actual:** Visual gallery implementation lives in repo-genesis; framework repo records browser
+  evidence and harness artifacts.
+- **Severity:** minor
+- **Action:** accept for visual slices.
+- **Evidence:** repo-genesis commit `84748b56be0199a193bf556a454d62fd55937c02`.
+
+## 2026-06-12 - Playwright MCP profile locked during Slice 4
+
+- **What:** Both Playwright MCP namespaces failed with a locked profile error for
+  `mcp-chrome-a7ac91e`.
+- **Source:** `browser_resize` and `browser_tabs list` returned "Browser is already in use".
+- **Expected:** Browser validation uses Playwright on real routes.
+- **Actual:** An isolated Playwright Core script launched installed Chrome headlessly and produced
+  the browser report and screenshots.
+- **Severity:** minor
+- **Action:** accept; evidence remains Playwright-based.
+- **Evidence:** `slice4-browser-check.ts`, `slice4-browser-report.json`, and screenshots in the run
+  directory.
+
+## 2026-06-12 - playground full check blocked by unrelated CRLF fmt drift
+
+- **What:** `deno task check` in `apps/playground` failed at the fmt phase on eight unrelated
+  existing files due line-ending-only differences.
+- **Source:** full playground check output listed existing files such as
+  `assets/ui/checkbox.css`, `assets/ui/choice-styles.css`, and
+  `components/ui/checkbox.tsx`.
+- **Expected:** Full playground check is green after visual edits.
+- **Actual:** Focused fmt/lint/check on touched Slice 4 files passed; unrelated line-ending
+  normalization was left untouched.
+- **Severity:** minor
+- **Action:** defer to the fmt ownership slice or a dedicated playground normalization slice.
+- **Evidence:** focused gate rows in `worklog.md`; root `deno.lock` restored after checks.

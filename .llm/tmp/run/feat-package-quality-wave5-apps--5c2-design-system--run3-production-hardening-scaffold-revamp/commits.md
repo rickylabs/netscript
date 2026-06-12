@@ -21,3 +21,5 @@ Format:
 - 9feeab7: harness: record fresh-ui lock slice
 - 84558e0e2eab6d314763fa1d339a173786e15a34: fresh-ui: move registry support files out of payload
 - 5137ec90f7e3a758601d2ce3cf6373c5768cae37: fresh-ui: sync registry support relocation
+- 8102fa2: harness: record fresh-ui registry payload slice
+- 84748b56be0199a193bf556a454d62fd55937c02: playground: wire sheet and floating style demos

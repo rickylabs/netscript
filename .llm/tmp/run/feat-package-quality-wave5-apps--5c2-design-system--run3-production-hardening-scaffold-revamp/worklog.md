@@ -95,6 +95,8 @@ only if the generated app should ship it by default.
 | 2026-06-12 | Slice 3 | implementation | Moved `registry/manifest.ts` and `registry/schema.ts` to package-root `registry.manifest.ts` and `registry.schema.ts`; updated package tests and CLI `ui:add` manifest lookup to root support files. |
 | 2026-06-12 | Slice 3 | negative test | Added a CLI registry test proving the manifest URL resolves to package-root `registry.manifest.ts` and not payload-local `registry/manifest.ts`. |
 | 2026-06-12 | Slice 3 | gates | CLI registry test/check passed; framework package check/test/tokens and both DS fitness gates passed; repo-genesis package check/test passed. |
+| 2026-06-12 | Slice 4 | implementation | Copied `sheet.css` and `floating.css` into the repo-genesis playground, imported them from `assets/styles.css`, and added a Fresh island demo for Sheet, Popover, and Tooltip on `/design/components`. |
+| 2026-06-12 | Slice 4 | gates | Framework package check/test/tokens and both DS fitness gates passed; focused playground fmt/lint/check passed; browser report passed with desktop, popover, tooltip, sheet, mobile 390x844, reduced-motion, and theme-flip screenshots. |
 
 ## Decisions
 
@@ -106,6 +108,7 @@ only if the generated app should ship it by default.
 | Treat Zag as prior proof to cite, not an unknown viability question | User says Zag already works in a previous commit and is mentioned in PR #32. | user clarification |
 | Track package-local fresh-ui lock | User approved Slice 2 continuation; local package lock gives publish-readiness determinism while avoiding root lock ownership. | user approval + C-2 |
 | Keep registry support code outside copy payload | C-3 requires `registry/` to contain copy-source payload only; `ui:add` now imports `registry.manifest.ts` from the package root. | plan of record C-3 |
+| Use repo-genesis playground as the gallery worktree for visual slices | The framework repo has no `apps/` directory; the real playground app lives in the outer repo-genesis worktree. | filesystem + prior run context |
 
 ## Drift
 
@@ -119,6 +122,9 @@ only if the generated app should ship it by default.
 | repo-genesis fresh-ui copy has broader pre-existing package drift; Slice 1 synced only config ownership. | minor | yes |
 | repo-genesis package lock captures a broader workspace dependency closure than the framework worktree lock. | minor | yes |
 | repo-genesis worktree lacks the CLI source path, so Slice 3 CLI lookup changes sync only in the framework repo. | minor | yes |
+| framework repo lacks `apps/playground`; visual gallery changes live in repo-genesis only. | minor | yes |
+| Playwright MCP profile locked; isolated Playwright Core script used installed Chrome for browser evidence. | minor | yes |
+| Full playground `deno task check` blocked by unrelated CRLF-only fmt drift in existing copied files. | minor | yes |
 
 ## Gate Results
 
@@ -146,6 +152,13 @@ only if the generated app should ship it by default.
 | Slice 3 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
 | Slice 3 repo-genesis check | `deno task check` from outer `packages/fresh-ui` | PASS | Explicit outer check list updated for root manifest/schema files. |
 | Slice 3 repo-genesis test | `deno task test` from outer `packages/fresh-ui` | PASS | 30 passed, 0 failed. |
+| Slice 4 package check | `deno task check` from `packages/fresh-ui` | PASS | No framework package code changed; required per-slice package gate. |
+| Slice 4 package test | `deno task test` from `packages/fresh-ui` | PASS | 36 passed, 0 failed. |
+| Slice 4 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
+| Slice 4 playground focused fmt | `deno fmt --check assets/styles.css assets/design.css islands/design/FloatingSurfaceDemo.tsx routes/(design)/design/components.tsx` | PASS | Touched visual files only. |
+| Slice 4 playground focused lint | `deno lint islands/design/FloatingSurfaceDemo.tsx routes/(design)/design/components.tsx` | PASS | Touched TSX files only. |
+| Slice 4 playground focused check | `deno check --no-lock --unstable-kv islands/design/FloatingSurfaceDemo.tsx routes/(design)/design/components.tsx` | PASS | Root lock clean after restore. |
+| Slice 4 playground full check | `deno task check` from outer `apps/playground` | FAIL_DRIFT | Pre-existing CRLF-only fmt drift in unrelated copied files; logged in drift.md and not normalized. |
 
 ### Fitness Gates
 
@@ -160,12 +173,15 @@ only if the generated app should ship it by default.
 | DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 2; 93 files clean. |
 | DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | Slice 3; 93 files clean. |
 | DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 3; 93 files clean. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | Slice 4; 93 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 4; 93 files clean. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | Browser validation | NOT_RUN | Plan-Gate blocked | Required for visual slices. |
+| Slice 4 browser validation | PASS | `deno run -A --no-lock .../slice4-browser-check.ts` | `slice4-browser-report.json`: SSR 200, no console/page errors, sheet/floating items and CSS loaded, popover/tooltip/sheet screenshots, theme flip, 390x844 no overflow, reduced motion matched. |
 
 ### Consumer Gates
 
@@ -184,3 +200,4 @@ only if the generated app should ship it by default.
   repo-genesis `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`.
 - Slice 3 implementation commits: framework `84558e0e2eab6d314763fa1d339a173786e15a34`;
   repo-genesis `5137ec90f7e3a758601d2ce3cf6373c5768cae37`.
+- Slice 4 implementation commit: repo-genesis `84748b56be0199a193bf556a454d62fd55937c02`.
