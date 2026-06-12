@@ -613,3 +613,48 @@ only if the generated app should ship it by default.
 
 - Framework: `8edbd45e6f06d734870f6504384a240bbed5f051`
 - Repo-genesis: N/A, CLI package absent from outer worktree.
+
+## Slice 15 — Scaffolded App Pages On Registry Components
+
+### Changed
+
+- Rebuilt generated `/`, `/dashboard`, `/examples`, and `/examples/crud` surfaces around copied
+  fresh-ui registry components and `ns-*` layout objects.
+- Removed raw utility classes from the app-page surface and shared scaffold chrome.
+- Added typed dashboard and CRUD route references to the generated route seed and app router.
+- Refactored scaffolded `/design/{tokens,components,composition}` into NetScript Fresh page-builder
+  route files with route-scoped `(_components)`, `(_islands)`, and `(_shared)` folders.
+- Updated CLI template manifest, asset loader, writer, and route-template tests for the new files.
+
+### Gates
+
+| Gate | Result | Command / Evidence | Notes |
+|---|---|---|---|
+| focused CLI check | PASS | `deno check --unstable-kv ...write-app-files.ts ...scaffold-template-assets.ts ...route-templates_test.ts` | Edited scaffold writer/asset/test modules type-check. |
+| focused CLI tests | PASS | `deno test --allow-read --allow-write --allow-env --allow-run ...route-templates_test.ts ...generators-config_test.ts` | 3 tests / 32 BDD steps. |
+| generated scaffold | PASS | `deno run -A packages/cli/bin/netscript-dev.ts init slice15-pages ...` | Created 110 files / 23 dirs. |
+| generated app check | PASS | `deno check --unstable-kv apps/dashboard` from generated app root | Scoped design routes, dashboard, CRUD all type-check. |
+| browser validation | PASS | Playwright MCP against `http://127.0.0.1:8025` | `/dashboard`, `/examples/crud`, and all three design routes loaded with expected titles and zero console errors. |
+| mobile validation | PASS | 390x844 screenshots/snapshots | Dashboard, CRUD, and design routes render without active content overflow. |
+| package check | PASS | `deno task check` from `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `deno task test` from `packages/fresh-ui` | 39 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from `packages/fresh-ui` | Token artifacts stable; CRLF warnings only. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 95 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 95 files clean. |
+| arch:check | PASS | `deno task arch:check` | Existing `registry.manifest.ts` size WARN only. |
+| root lock hygiene | PASS | `git status --short deno.lock packages/fresh-ui/deno.lock` | No lock churn. |
+| copy fidelity | N/A | CLI package absent from repo-genesis | No outer-worktree sync target. |
+
+### Drift
+
+- `deno fmt --check` with explicit CLI paths still reported `No target files found` because the root
+  and package configs exclude/ignore those paths; the focused `deno check` and tests covered the
+  edited TS modules.
+- The click-capable Playwright MCP namespace was blocked by an existing MCP profile lock during the
+  theme-toggle click; route screenshots and console checks passed, and the user manually verified
+  the theme flip.
+
+### Commits
+
+- Framework: `fa71f95702a23539fc2d2a54825b9d0ee40d3492`
+- Repo-genesis: N/A, CLI package absent from outer worktree.

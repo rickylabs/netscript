@@ -41,3 +41,4 @@ Format:
 - c424dd6ee58d952400fdd1d39ca7bb1e1b543574: docs: audit scaffold fresh-ui gaps
 - cd30ffdf2bfb66557191b70b275614659e5a378f: cli: install fresh-ui registry during scaffold
 - 8edbd45e6f06d734870f6504384a240bbed5f051: cli: scaffold fresh-ui design routes
+- fa71f95702a23539fc2d2a54825b9d0ee40d3492: cli: rebuild scaffold app pages on fresh-ui
