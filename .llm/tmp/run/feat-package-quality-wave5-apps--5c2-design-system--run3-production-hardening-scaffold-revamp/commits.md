@@ -15,3 +15,6 @@ Format:
 - 24fda69: harness: note prior zag proof for plan eval
 - 52a9ab24ed4dd32801a8422bf85b591367d62999: fresh-ui: unify package deno config
 - a76b344600de529c00d3d707db4f61be8997201a: fresh-ui: sync unified deno config
+- 007f7d3: harness: record fresh-ui config slice
+- 17f410390396f079c8abd184522871a46abd95fc: fresh-ui: track package lock
+- 808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f: fresh-ui: sync package lock policy

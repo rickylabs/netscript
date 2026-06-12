@@ -89,3 +89,17 @@ documentation.
 - **Action:** defer
 - **Evidence:** framework commit `52a9ab24ed4dd32801a8422bf85b591367d62999`; repo-genesis commit
   `a76b344600de529c00d3d707db4f61be8997201a`.
+
+## 2026-06-12 - repo-genesis package lock captures broader workspace closure
+
+- **What:** Applying the approved package-local lock policy in the outer repo-genesis copy generated
+  a larger `packages/fresh-ui/deno.lock` than the framework worktree lock.
+- **Source:** Slice 2 outer `deno task check` from `packages/fresh-ui` after adding explicit
+  `--lock=deno.lock`.
+- **Expected:** Copy-fidelity sync records the same lock policy in both repos.
+- **Actual:** The outer copy's existing workspace and package drift causes Deno to resolve a broader
+  dependency closure while still writing to the package-local lock.
+- **Severity:** minor
+- **Action:** accept for Slice 2; broad copy reconciliation remains deferred to later locked slices.
+- **Evidence:** framework commit `17f410390396f079c8abd184522871a46abd95fc`; repo-genesis commit
+  `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`.

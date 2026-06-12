@@ -89,6 +89,9 @@ only if the generated app should ship it by default.
 | 2026-06-12 | plan-gate | evaluator | OpenHands PLAN-EVAL wrote `plan-eval.md` with `PASS`; implementation began after this point. |
 | 2026-06-12 | Slice 1 | implementation | Folded `packages/fresh-ui/deno.gates.json` into `deno.json`, removed `--config deno.gates.json` from package tasks, preserved `--no-lock` for C-2, and synced the same config ownership change to repo-genesis. |
 | 2026-06-12 | Slice 1 | gates | Framework package check/test/tokens and both DS fitness gates passed; repo-genesis package check/test passed. |
+| 2026-06-12 | Slice 2 | decision | User approved continuing without interruption; applied the package-lock policy as tracked package-local `packages/fresh-ui/deno.lock` with explicit `--lock=deno.lock` tasks. |
+| 2026-06-12 | Slice 2 | implementation | Removed `--no-lock` from package tasks, added explicit package-local lock usage, tracked `packages/fresh-ui/deno.lock`, and synced the same policy to repo-genesis. An initial root `deno.lock` mutation was restored before gates. |
+| 2026-06-12 | Slice 2 | gates | Framework package check/test/tokens and both DS fitness gates passed; repo-genesis package check/test passed. |
 
 ## Decisions
 
@@ -98,6 +101,7 @@ only if the generated app should ship it by default.
 | Treat missing `.claude/skills/netscript-doctrine` as drift, not blocker | Equivalent `.agents/skills/netscript-doctrine` exists and was read. | prompt + filesystem |
 | Use checked-in `.llm/tmp/docs/` before web | User instruction; sufficient curated notes exist for planned slices. | prompt |
 | Treat Zag as prior proof to cite, not an unknown viability question | User says Zag already works in a previous commit and is mentioned in PR #32. | user clarification |
+| Track package-local fresh-ui lock | User approved Slice 2 continuation; local package lock gives publish-readiness determinism while avoiding root lock ownership. | user approval + C-2 |
 
 ## Drift
 
@@ -109,6 +113,7 @@ only if the generated app should ship it by default.
 | No Run 3 Plan-Gate artifact found. | significant | yes |
 | `rg`/`rtk grep` unavailable in shell. | minor | yes |
 | repo-genesis fresh-ui copy has broader pre-existing package drift; Slice 1 synced only config ownership. | minor | yes |
+| repo-genesis package lock captures a broader workspace dependency closure than the framework worktree lock. | minor | yes |
 
 ## Gate Results
 
@@ -124,6 +129,11 @@ only if the generated app should ship it by default.
 | Slice 1 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
 | Slice 1 repo-genesis check | `deno task check` from outer `packages/fresh-ui` | PASS | Targeted copy validation. |
 | Slice 1 repo-genesis test | `deno task test` from outer `packages/fresh-ui` | PASS | 30 passed, 0 failed. |
+| Slice 2 package check | `deno task check` from `packages/fresh-ui` | PASS | Explicit package-local `--lock=deno.lock`; root lock clean afterward. |
+| Slice 2 package test | `deno task test` from `packages/fresh-ui` | PASS | 36 passed, 0 failed. |
+| Slice 2 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
+| Slice 2 repo-genesis check | `deno task check` from outer `packages/fresh-ui` | PASS | Explicit package-local lock in outer copy. |
+| Slice 2 repo-genesis test | `deno task test` from outer `packages/fresh-ui` | PASS | 30 passed, 0 failed. |
 
 ### Fitness Gates
 
@@ -134,6 +144,8 @@ only if the generated app should ship it by default.
 | DS color utilities | NOT_RUN | Plan-Gate blocked | Run after relevant slice edits. |
 | DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 93 files clean. |
 | DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 93 files clean. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | Slice 2; 93 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 2; 93 files clean. |
 
 ### Runtime Gates
 
@@ -154,4 +166,5 @@ only if the generated app should ship it by default.
   first.
 - Slice 1 implementation commits: framework `52a9ab24ed4dd32801a8422bf85b591367d62999`;
   repo-genesis `a76b344600de529c00d3d707db4f61be8997201a`.
-- Slice 2 must ask the user for package `deno.lock` policy before changing it.
+- Slice 2 implementation commits: framework `17f410390396f079c8abd184522871a46abd95fc`;
+  repo-genesis `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`.

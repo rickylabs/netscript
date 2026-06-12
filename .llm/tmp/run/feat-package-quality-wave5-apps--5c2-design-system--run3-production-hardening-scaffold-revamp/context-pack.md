@@ -13,8 +13,8 @@
 ## Current State
 
 Run 3 artifacts are created and the user-provided 16-slice table is locked in `plan.md`.
-OpenHands PLAN-EVAL passed. Slice 1 is implemented in the framework worktree and synced to the
-outer repo-genesis copy.
+OpenHands PLAN-EVAL passed. Slices 1 and 2 are implemented in the framework worktree and synced to
+the outer repo-genesis copy.
 
 ## Completed
 
@@ -30,16 +30,22 @@ outer repo-genesis copy.
   `--config deno.gates.json`.
 - Slice 1 gates passed: framework package check/test/tokens, DS no-raw-hex, DS color utilities,
   repo-genesis package check/test.
+- Slice 2 C-2 package lock decision: user approved continuing; package-local
+  `packages/fresh-ui/deno.lock` is tracked, package tasks use explicit `--lock=deno.lock`, and
+  root `deno.lock` was restored after an initial accidental mutation.
+- Slice 2 gates passed: framework package check/test/tokens, DS no-raw-hex, DS color utilities,
+  repo-genesis package check/test.
 
 ## In Progress
 
-- Slice 1 bookkeeping commit pending, then push both repos and post the PR comment.
+- Slice 2 bookkeeping commit pending, then push both repos and post the PR comment.
 
 ## Next Steps
 
-1. Commit Slice 1 bookkeeping and push both repos.
-2. Post the Slice 1 PR comment.
-3. Before Slice 2, ask the user to approve the package `deno.lock` policy.
+1. Commit Slice 2 bookkeeping and push both repos.
+2. Post the Slice 2 PR comment.
+3. Start Slice 3: C-3 manifest/schema out of the registry payload, checking the netscript-cli
+   skill and existing UI add behavior before edits.
 
 ## Key Decisions
 
@@ -49,6 +55,7 @@ outer repo-genesis copy.
 | Implementation blocked pending Plan-Gate. | Harness run-loop | No Run 3 `plan-eval.md` exists. |
 | Use `.agents/skills/netscript-doctrine` for doctrine. | Drift | `.claude` path absent. |
 | Treat Zag as prior proof to cite. | User clarification | Slice 7 still records ADR policy and evidence. |
+| Track package-local fresh-ui lock. | User approval | Explicit `--lock=deno.lock` avoids root lock ownership. |
 
 ## Files Changed
 
@@ -64,6 +71,8 @@ outer repo-genesis copy.
 | `packages/fresh-ui/deno.gates.json` | deleted | Redundant package config removed. |
 | outer `packages/fresh-ui/deno.json` | changed | Repo-genesis copy synced for Slice 1 config ownership. |
 | outer `packages/fresh-ui/deno.gates.json` | deleted | Repo-genesis redundant package config removed. |
+| `packages/fresh-ui/deno.lock` | new | Framework package-local lock tracked in Slice 2. |
+| outer `packages/fresh-ui/deno.lock` | new | Repo-genesis package-local lock tracked; broader closure drift logged. |
 
 ## Gates
 
@@ -71,22 +80,23 @@ outer repo-genesis copy.
 | ----------- | -------------- | -------- |
 | Static | PASS | Plan-Gate PASS; package check/test/tokens PASS. |
 | Fitness | PASS | DS no-raw-hex and DS color utilities PASS. |
-| Runtime | N/A | Slice 1 config-only; no browser/runtime route changes. |
+| Runtime | N/A | Slices 1-2 config/lock-only; no browser/runtime route changes. |
 | Consumer | PASS | Repo-genesis package check/test PASS. |
 
 ## Open Questions
 
-- What package `deno.lock` policy should Slice 2 apply?
+- None for the current slice.
 
 ## Drift and Debt
 
 - Drift: missing `.claude` doctrine skill path, missing Impeccable helper scripts, absent
   `.resources/deps-docs/`, unavailable `rg`/`rtk grep`, prior Zag proof clarification, and
-  broader pre-existing repo-genesis fresh-ui copy drift.
+  broader pre-existing repo-genesis fresh-ui copy drift including the larger outer package lock.
 - Debt: no new architecture debt created.
 
 ## Commits
 
-- None yet.
 - `52a9ab24ed4dd32801a8422bf85b591367d62999`: fresh-ui: unify package deno config
 - `a76b344600de529c00d3d707db4f61be8997201a`: fresh-ui: sync unified deno config
+- `17f410390396f079c8abd184522871a46abd95fc`: fresh-ui: track package lock
+- `808a6bd3d24a4f2ad4e1b622f48ea2f8a9d1792f`: fresh-ui: sync package lock policy
