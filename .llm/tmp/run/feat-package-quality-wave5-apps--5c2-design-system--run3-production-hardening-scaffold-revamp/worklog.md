@@ -469,3 +469,39 @@ only if the generated app should ship it by default.
 
 - Framework: `3f3db55ca8be163f2bf5f4e888d3ec038ba0e517`
 - Repo-genesis: `189fa782fd0a4b72c8f1e8101b8e3f6a6ee2aa61`
+
+## 2026-06-12 - Slice 12: scaffold revamp audit
+
+### Changed
+
+- Added `slice12-scaffold-fresh-ui-gap-report.md` to the run artifacts.
+- Audited the current CLI Fresh app scaffold templates against the fresh-ui registry manifest,
+  `ui:init` / `ui:add` installer, and playground design routes.
+- Locked concrete follow-ups for Slices 13-16 without changing the approved slice table:
+  registry-backed init, design route port, registry-only app pages, and generated-app browser proof.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| package check | PASS | `deno task check` from framework `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `deno task test` from framework `packages/fresh-ui` | 39 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from framework `packages/fresh-ui` | Generated token artifacts stable; Git emitted CRLF warning only. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 95 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 95 files clean. |
+| CLI scaffold/UI focused tests | PASS | `deno test --allow-read --allow-write --allow-env --allow-run packages/cli/src/public/features/ui/registry.test.ts packages/cli/src/kernel/templates/app/route-templates_test.ts` | 7 tests passed, 14 BDD steps passed. |
+| browser validation | N/A | Audit-only slice | Real generated-app browser proof is locked to Slice 16. |
+| copy fidelity | N/A | No registry/app copies changed | Repo-genesis had no Slice 12 source changes. |
+
+### Drift
+
+- `floating-styles` is required by the playground design component demo but is outside both
+  `DEFAULT_UI_INIT_ITEMS` and the `foundation` collection. This is recorded as a Slice 13/14
+  scaffold install follow-up, not fixed in the audit slice.
+- The Impeccable helper script remains absent in this checkout; existing drift entry from Slice 8
+  still applies.
+
+### Commits
+
+- Framework: `c424dd6ee58d952400fdd1d39ca7bb1e1b543574`
+- Repo-genesis: N/A, audit-only slice.

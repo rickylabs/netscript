@@ -269,3 +269,17 @@ documentation.
 - **Severity:** minor
 - **Action:** defer parser cleanup; no package change needed.
 - **Evidence:** `slice11-jsr-audit.json` and Slice 11 dry-run gate.
+
+## 2026-06-12 - scaffold design routes need floating styles outside default install
+
+- **What:** Slice 12 audit found that `floating-styles` is used by the playground design component
+  demo but is not included by `DEFAULT_UI_INIT_ITEMS` or the `foundation` collection.
+- **Source:** `packages/fresh-ui/registry.manifest.ts`, `packages/cli/src/public/features/ui/registry.ts`,
+  and `apps/playground/routes/(design)/design/components.tsx`.
+- **Expected:** A generated app that ships `/design/components` installs every CSS item required by
+  that route through the registry installer.
+- **Actual:** `floating-styles` must be installed explicitly or the collection/default install set
+  must be expanded in a later locked scaffold slice.
+- **Severity:** minor
+- **Action:** defer to Slice 13/14; Slice 12 is audit-only.
+- **Evidence:** `slice12-scaffold-fresh-ui-gap-report.md`.
