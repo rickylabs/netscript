@@ -234,3 +234,75 @@
 - Commits: repo-genesis `30972f89` (pushed; remote head verified
   `30972f89b73666a403a1671ee2de3a5670a09fde`).
 - Drift: D-5c2-3
+
+## Slice 5 — /design component gallery route (2026-06-12)
+
+- Scope (locked table row 5): `/design` component gallery | gate:
+  browser validation, per registry item. Built in repo-genesis
+  `apps/playground` on top of the slice-4 design route group.
+- Changes (repo-genesis, 18 files, commit `e4da873bc`):
+  - `routes/(design)/design/components.tsx`: all 43 fresh-ui-foundation
+    registry items, grouped by kind — Components 18, Blocks 10,
+    Islands 3, Styles 7, Foundation 5 (theme/lib/support). Every item
+    is an `<article data-registry-item=… data-registry-kind=…>` with
+    mono name, kind badge, layer badge, and manifest description.
+    Live demos for every visual item (button incl. link form/loading/
+    disabled, icon-button, all form controls, card, panel ×3 tones,
+    badge ×6, separator h+v, alert ×4 with correct status/alert roles,
+    inline-notice, spinner, progress det+indet, skeleton table+form,
+    breadcrumb, page-header, filter-form, stats-grid, detail-layout,
+    data-table 3 rows, pagination, empty-state, section-divider).
+    Chrome-live items (sidebar-shell, theme-toggle, sidebar-toggle)
+    documented in place via "Live on this page" notices — the page IS
+    their demo. Style seams cross-link the demos that exercise them
+    (`#item-*` anchors); theme-seed links to /design/tokens using
+    `tokenManifestMeta.total`.
+  - Installed the 6 registry items the playground had not copied:
+    icon-button, checkbox, switch, panel, separator, progress (+ their
+    CSS and choice-styles.css), byte-identical to
+    `packages/fresh-ui/registry/` sources; `components/ui/mod.ts`
+    barrel +9 exports (6 new + missing Label/Skeleton/Spinner);
+    `assets/styles.css` +6 @import lines.
+  - `lib/design/registry.ts`: app-owned 43-item catalog snapshot of
+    `registry/manifest.ts` (decision from slice-5 prep: snapshot
+    instead of widening the package API surface with a manifest
+    export).
+  - `assets/design.css`: gallery skin (item shell on `--ns-surface`,
+    demo zone recessed to `--ns-bg`, row/stack helpers, refs links) —
+    ns token vocabulary only; `_layout.tsx` nav gains Components entry.
+- Browser validation (Playwright, real route
+  http://localhost:5173/design/components):
+  - SSR 200; title "Components — NetScript design system"; zero console
+    errors/warnings.
+  - Per-registry-item gate: 43/43 `data-registry-item` present, zero
+    missing/extra/duplicate vs the manifest list; section counts exactly
+    18/10/3/7/5; every item has name + description; the only items
+    without demo zones are the 11 catalog-only style/lib/support items.
+  - Demo integrity: 10 buttons (+link form anchor), 4 icon-buttons,
+    3 inputs (1 error), 4 checkboxes, 3 role=switch, 4 select options,
+    form-field error text, card title, 3 panels, 6 badges,
+    3 role=separator, 4 alerts with roles [status,status,alert,alert],
+    3 inline-notices, 4 spinners, 4 role=progressbar (64%/100% widths),
+    22 skeleton blocks, breadcrumb aria-current, filter-form is a real
+    `<form>`, stats values, 3 data-table rows, pagination disabled
+    Previous, empty-state heading, 12 style-ref links all resolving to
+    real anchors.
+  - Themes: flipped via the REAL ThemeToggle island both ways
+    (light→dark→light); oklch surface values verified to change;
+    full-page screenshots both themes in `scratch/slice5-evidence/`.
+  - 390px mobile: scrollWidth 375 ≤ 390, zero offending elements, rail
+    collapses to static row pills.
+  - Reduced-motion emulation: gallery skin itself adds no animation;
+    FOUND package-level gap — registry CSS has no
+    prefers-reduced-motion guards at all (progress indeterminate keeps
+    its 1.2s loop; skeleton shimmer 1.35s; spinner; sheet; toast).
+    Recorded as drift D-5c2-4, follow-up in slice 9.
+- Static gates: fmt PASS (6 files), lint PASS (3 files),
+  `deno check --unstable-kv` PASS (exit 0: components.tsx, _layout.tsx).
+- Env notes: root `deno.lock` mutated again by the dev server
+  (+562/−35) → restored via `git checkout -- deno.lock`. New untracked
+  `packages/fresh-ui/deno.lock` appeared in repo-genesis during the dev
+  run; left in place per the never-delete-locks rule (not committed).
+- Commits: repo-genesis `e4da873bc` (pushed; remote head verified
+  `e4da873bc967101f9013e4b45792c1865f6639a3`).
+- Drift: D-5c2-4

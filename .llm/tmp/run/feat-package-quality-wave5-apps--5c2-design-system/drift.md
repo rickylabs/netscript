@@ -111,3 +111,49 @@ D-5c1-3 root-exclude lift with accepted root publish-graph churn).
 4. **Gate-shape note:** "browser validation" for /design routes required
    regenerating env artifacts unrelated to the design system. Slices 5–6
    inherit the workaround (artifacts persist locally until cleaned).
+
+## D-5c2-3 CORRECTION — zod pipeline NOT broken framework-wide (2026-06-12)
+
+User feedback (with `.agents/skills/netscript-cli/SKILL.md` §Manual Full
+Scaffold Smoke): `db init/generate/seed` are CLI commands intended to be
+run manually via `deno run -A packages/cli/bin/netscript-dev.ts db
+generate --project-root <app> --db postgres` as part of the manual smoke
+procedure — and the CLI scaffold template
+(`packages/cli/src/kernel/assets/database/schema.prisma.template`)
+**ships WITH the `generator zod` block**. Corrected reading of D-5c2-3
+item 1:
+
+- The framework pipeline is NOT broken: fresh scaffolds get a
+  schema.prisma containing `generator zod`, so CLI `db generate` emits
+  the zod artifacts.
+- What I observed is app-local drift in the repo-genesis instance: its
+  `database/postgres/schema/schema.prisma` had the block removed (with
+  an "avoid requiring a global binary" comment), which orphans the
+  app-local `deno task db:generate` zod step. Follow-up owner is the
+  repo-genesis app schema (realign with the CLI template), not the
+  database package.
+- My temporary block restoration matched the template exactly, so the
+  regenerated artifacts are template-faithful.
+- Process lesson recorded: activate the `netscript-cli` skill before
+  reasoning about scaffold/db/CLI command behavior.
+
+## D-5c2-4 — registry CSS ships zero prefers-reduced-motion guards (2026-06-12)
+
+Found by the slice-5 browser gate (reduced-motion emulation on
+/design/components). `grep -r prefers-reduced-motion packages/fresh-ui`
+returns nothing, while five registry stylesheets animate:
+
+- `progress.css:52` — indeterminate bar, 1.2s ease-in-out infinite
+- `skeleton.css:16` — shimmer, 1.35s ease-in-out infinite
+- `spinner.css:6` — ns-spin 0.6s linear infinite
+- `sheet.css:30,34,78` — enter/backdrop transitions (~220ms one-shot)
+- `toast.css:185,189` — enter/exit (~220ms one-shot)
+
+The infinite loops (progress, skeleton) are the WCAG-relevant ones;
+spinner is an essential loading indicator and the sheet/toast one-shots
+are sub-250ms micro-motions, but a vocabulary-level guard is still the
+right shape for a theme-blind component kit. NOT fixed inside slice 5
+(locked scope = gallery route; fixing means editing registry sources in
+the framework worktree + re-syncing byte-identical app copies in
+repo-genesis). Follow-up owner: slice 9 (component completion — toast
+is already in its scope; add the guards package-wide there and re-sync).
