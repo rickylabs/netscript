@@ -16,3 +16,4 @@
 | 4 (repo-genesis) | `30972f89` | — | /design tokens browser route + TokenClipboard island + design.css skin (branch `feat/repo-genesis`) |
 | 5 (repo-genesis) | `e4da873bc` | — | /design/components 43-item registry gallery + 6 missing ui:add copies + catalog snapshot (branch `feat/repo-genesis`) |
 | 6 (repo-genesis) | `0e6013211` | — | /design/composition rules page + nav entry + ns-rules-* skin (branch `feat/repo-genesis`) |
+| 7 | `fd9b41a` | — | ds-no-raw-hex fitness gate + consumer-render.test.tsx (D-5c2-2 follow-up closed) |

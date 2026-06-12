@@ -347,3 +347,36 @@
   Untracked packages/fresh-ui/deno.lock left untouched per never-delete-locks rule.
 
 **Drift:** none new.
+
+## Slice 7 — DS lint gate: no raw hex in components (2026-06-12)
+
+**Goal (locked plan row 7):** DS lint gate "no raw hex in components", PENDING_SCRIPT replaced by
+a real `.llm/tools/fitness/` script. Carries the D-5c2-2 follow-up (consumer-shaped JSX render
+typecheck).
+
+**Built (framework commit `fd9b41a2bc144bd1ea6246eb822b9b6c2fecfb1a`):**
+
+- `.llm/tools/fitness/check-ds-no-raw-hex.ts` (NEW): scans packages/fresh-ui css/ts/tsx
+  (excluding generated `registry/theme/` artifacts, `scripts/`, `docs/`, and test files) for raw
+  hex literals and raw color functions (rgb/rgba/hsl/hsla/oklch/oklab/hwb). `color-mix(` is
+  structurally immune (lookbehind excludes `-`). Escape hatch for documented platform fallbacks:
+  `ds-allow-raw-color` same-line marker, per the l0-conventions token rule. House conventions
+  followed (plain Deno script, PASS/FAIL + exit code, CI command in header, no deps).
+- `packages/fresh-ui/consumer-render.test.tsx` (NEW): constructs all 7 interactive namespaces
+  (full sub-seam trees) + Show/VisuallyHidden/SrOnly in consumer-shaped JSX, typed `: VNode`.
+  Closes D-5c2-2 follow-up: the `: unknown` runtime regression class now fails `deno task check`
+  inside the package itself. Excluded from publish by existing `**/*.test.tsx` rule.
+
+**Gate evidence:**
+
+- `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` → `PASS 93 files clean`.
+- Negative test: injected `#ff0000` + `rgba(0,0,0,.5)` into layouts.css → FAIL exit 1 listing
+  both literals with file:line; reverted; PASS again.
+- `deno task check` (package): exit 0 incl. new fixture. `deno task test`: 36 passed / 0 failed,
+  including `runtime namespaces construct consumer-shaped JSX trees ... ok`.
+- fmt + lint clean on both new files.
+- NOTE: untracked `packages/fresh-ui/deno.lock` (843B) now also present in the framework
+  worktree (appeared during package task runs). Left untracked per never-delete-locks rule;
+  flag for slice 11/12 review (likely belongs in .gitignore or needs tracking decision).
+
+**Drift:** none new; D-5c2-2 follow-up closed.
