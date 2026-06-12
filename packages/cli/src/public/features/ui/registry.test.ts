@@ -1,4 +1,8 @@
-import { resolveRegistryItems, type UiRegistryManifest } from "./registry.ts";
+import {
+  registryManifestModuleUrl,
+  resolveRegistryItems,
+  type UiRegistryManifest,
+} from "./registry.ts";
 
 const manifest: UiRegistryManifest = {
   items: [
@@ -74,5 +78,15 @@ Deno.test("resolveRegistryItems rejects an unknown theme override", () => {
   }
   if (!message.includes("Unknown Fresh UI theme")) {
     throw new Error(`Expected an unknown-theme error, got: ${message || "no error"}`);
+  }
+});
+
+Deno.test("registryManifestModuleUrl resolves manifest outside the copy payload", () => {
+  const url = registryManifestModuleUrl("/workspace/packages/fresh-ui");
+  if (!url.endsWith("/workspace/packages/fresh-ui/registry.manifest.ts")) {
+    throw new Error(`Expected root registry.manifest.ts URL, got: ${url}`);
+  }
+  if (url.includes("/registry/manifest.ts")) {
+    throw new Error(`Manifest URL must not point inside the copy payload: ${url}`);
   }
 });

@@ -1,5 +1,5 @@
 import { assert, assertExists, assertStrictEquals, assertStringIncludes } from '@std/assert';
-import { freshUiRegistryManifest } from '../../manifest.ts';
+import { freshUiRegistryManifest } from '../../../registry.manifest.ts';
 import { Button } from './button.tsx';
 import { getInputProps, getSelectProps, getTextareaProps } from './control-props.ts';
 import { IconButton } from './icon-button.tsx';

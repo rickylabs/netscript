@@ -148,12 +148,16 @@ export async function installUiRegistryItems(
 }
 
 export async function loadRegistryManifest(registryRoot: string): Promise<UiRegistryManifest> {
-  const manifestUrl = toFileUrl(join(registryRoot, "registry", "manifest.ts")).href;
+  const manifestUrl = registryManifestModuleUrl(registryRoot);
   const module = await import(manifestUrl) as { freshUiRegistryManifest?: UiRegistryManifest };
   if (!module.freshUiRegistryManifest) {
     throw new Error(`Fresh UI registry manifest not found at ${manifestUrl}`);
   }
   return module.freshUiRegistryManifest;
+}
+
+export function registryManifestModuleUrl(registryRoot: string): string {
+  return toFileUrl(join(registryRoot, "registry.manifest.ts")).href;
 }
 
 export function resolveRegistryItems(

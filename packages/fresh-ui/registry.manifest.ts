@@ -1,4 +1,4 @@
-import type { RegistryManifest } from './schema.ts';
+import type { RegistryManifest } from './registry.schema.ts';
 
 /**
  * Copy-based registry manifest for the published `@netscript/fresh-ui` foundation package.
