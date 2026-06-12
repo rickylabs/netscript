@@ -29,6 +29,7 @@ export function createUiInitCommand(
     .description("Install the NetScript Fresh UI foundation into an app workspace")
     .option("--project-root <path:string>", "Project root directory")
     .option("--registry-root <path:string>", "Fresh UI package root override")
+    .option("--theme <name:string>", "Theme registry item (defaults to the official theme)")
     .option("--force", "Overwrite existing copied UI files", { default: false })
     .action(async (options: UiInitCommandInput): Promise<void> => {
       const projectRoot = await requireProjectRoot(
@@ -40,6 +41,7 @@ export function createUiInitCommand(
         registryRoot: options.registryRoot,
         names: DEFAULT_UI_INIT_ITEMS,
         overwrite: options.force ?? false,
+        theme: options.theme,
       }, dependencies.installDependencies);
 
       print(`Installed ${result.installedItems.length} Fresh UI registry items.`);

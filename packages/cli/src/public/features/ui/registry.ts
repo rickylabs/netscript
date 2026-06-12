@@ -23,6 +23,7 @@ export type UiRegistryCssContribution = {
 
 export type UiRegistryItem = {
   readonly name: string;
+  readonly kind?: string;
   readonly files: readonly UiRegistryFile[];
   readonly registryDependencies?: readonly string[];
   readonly dependencies?: readonly string[];
@@ -48,6 +49,8 @@ export type UiInstallInput = {
   readonly registryRoot?: string;
   readonly names: readonly string[];
   readonly overwrite: boolean;
+  /** Theme item that satisfies theme dependencies; defaults to the registry's official theme. */
+  readonly theme?: string;
 };
 
 export type UiInstallResult = {
@@ -109,7 +112,7 @@ export async function installUiRegistryItems(
   const registryRoot = resolve(input.registryRoot ?? defaultFreshUiRegistryRoot());
   const projectRoot = resolve(input.projectRoot);
   const manifest = await loadRegistryManifest(registryRoot);
-  const items = resolveRegistryItems(manifest, input.names);
+  const items = resolveRegistryItems(manifest, input.names, input.theme);
   const plannedFiles = planFiles(registryRoot, projectRoot, items);
   const sourceToTarget = new Map(plannedFiles.map((file) => [normalize(file.source), file.target]));
   const copiedFiles: string[] = [];
@@ -129,6 +132,7 @@ export async function installUiRegistryItems(
   const stylesPath = await writeStylesAggregator({
     registryRoot,
     projectRoot,
+    manifest,
     items,
     fs: dependencies.fs,
   });
@@ -155,29 +159,33 @@ export async function loadRegistryManifest(registryRoot: string): Promise<UiRegi
 export function resolveRegistryItems(
   manifest: UiRegistryManifest,
   names: readonly string[],
+  theme?: string,
 ): readonly UiRegistryItem[] {
   const byName = new Map(manifest.items.map((item) => [item.name, item]));
   const collections = new Map(manifest.collections.map((collection) => [
     collection.name,
     collection.items,
   ]));
+  const themeOverride = theme === undefined ? undefined : requireThemeItem(manifest, theme);
   const resolved: UiRegistryItem[] = [];
   const visiting = new Set<string>();
   const visited = new Set<string>();
 
   const visitItem = (name: string): void => {
-    if (visited.has(name)) return;
-    if (visiting.has(name)) {
-      throw new Error(`Cycle detected in Fresh UI registry dependencies at "${name}".`);
-    }
-    const item = byName.get(name);
-    if (!item) {
+    const direct = byName.get(name);
+    if (!direct) {
       throw new Error(`Unknown Fresh UI registry item or collection: ${name}`);
     }
-    visiting.add(name);
+    // Theme dependencies name the official theme; an override satisfies them instead.
+    const item = themeOverride !== undefined && direct.kind === "theme" ? themeOverride : direct;
+    if (visited.has(item.name)) return;
+    if (visiting.has(item.name)) {
+      throw new Error(`Cycle detected in Fresh UI registry dependencies at "${item.name}".`);
+    }
+    visiting.add(item.name);
     for (const dependency of item.registryDependencies ?? []) visitItem(dependency);
-    visiting.delete(name);
-    visited.add(name);
+    visiting.delete(item.name);
+    visited.add(item.name);
     resolved.push(item);
   };
 
@@ -275,10 +283,16 @@ function toImportSpecifier(path: string): string {
 async function writeStylesAggregator(input: {
   readonly registryRoot: string;
   readonly projectRoot: string;
+  readonly manifest: UiRegistryManifest;
   readonly items: readonly UiRegistryItem[];
   readonly fs: DenoFileSystem;
 }): Promise<string> {
-  const themeStylesPath = join(input.registryRoot, "registry", "theme", "styles.css");
+  const themeItem = input.items.find((item) => item.kind === "theme") ??
+    input.manifest.items.find((item) => item.kind === "theme");
+  if (!themeItem) {
+    throw new Error("Fresh UI registry manifest does not declare a theme item.");
+  }
+  const themeStylesPath = themeEntryStylesSource(input.registryRoot, themeItem);
   const themeStyles = await input.fs.readFile(themeStylesPath);
   const cssImports = [
     ...new Set(
@@ -293,6 +307,25 @@ async function writeStylesAggregator(input: {
   const target = resolve(input.projectRoot, "assets", "styles.css");
   await input.fs.writeFile(target, styles);
   return target;
+}
+
+function requireThemeItem(manifest: UiRegistryManifest, name: string): UiRegistryItem {
+  const item = manifest.items.find((candidate) => candidate.name === name);
+  if (!item) {
+    throw new Error(`Unknown Fresh UI theme: ${name}`);
+  }
+  if (item.kind !== "theme") {
+    throw new Error(`Fresh UI registry item "${name}" is not a theme (kind: ${item.kind}).`);
+  }
+  return item;
+}
+
+function themeEntryStylesSource(registryRoot: string, themeItem: UiRegistryItem): string {
+  const entry = themeItem.files.find((file) => file.target.endsWith("styles.css"));
+  if (!entry) {
+    throw new Error(`Fresh UI theme "${themeItem.name}" does not ship a styles.css entry file.`);
+  }
+  return resolve(registryRoot, entry.source);
 }
 
 function composeStylesAggregator(themeStyles: string, cssImports: readonly string[]): string {
