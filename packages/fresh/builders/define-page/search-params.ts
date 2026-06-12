@@ -6,24 +6,28 @@ import type {
   SearchParamValue,
 } from './types.ts';
 
-type PaginationSearchBaseShape = {
+/** Base shape required for pagination search parameters. */
+export type PaginationSearchBaseShape = {
   page: z.ZodType<number>;
   limit: z.ZodType<number>;
   sortBy: z.ZodType<string>;
   sortOrder: z.ZodType<'asc' | 'desc'>;
 };
 
-type PaginationSearchShape = z.ZodRawShape & PaginationSearchBaseShape;
+/** Shape accepted by {@link PaginationSearchSchema}. */
+export type PaginationSearchShape = z.ZodRawShape & PaginationSearchBaseShape;
 type PaginationSearchComputedInput<TShape extends PaginationSearchShape> =
   & z.output<z.ZodObject<TShape>>
   & {
     page: number;
     limit: number;
   };
-type PaginationSearchOutput<TShape extends PaginationSearchShape> =
+/** Output type produced by {@link PaginationSearchSchema}. */
+export type PaginationSearchOutput<TShape extends PaginationSearchShape> =
   & z.output<z.ZodObject<TShape>>
   & PaginationSearchState;
 
+/** search Params To Input. */
 export function searchParamsToInput(searchParams: URLSearchParams): Record<string, SearchParamValue> {
   const input: Record<string, SearchParamValue> = {};
 
@@ -48,16 +52,21 @@ function addPaginationOffset<TData extends { page: number; limit: number }>(
   };
 }
 
+/** Pagination Search Schema implementation. */
 export class PaginationSearchSchema<TShape extends PaginationSearchShape> implements
   SchemaLike<
     Record<string, SearchParamValue>,
     PaginationSearchOutput<TShape>
   > {
+  /** The _input. */
   declare readonly _input: Record<string, SearchParamValue>;
+  /** The _output. */
   declare readonly _output: PaginationSearchOutput<TShape>;
 
+  /** constructor. */
   constructor(private readonly schema: z.ZodObject<TShape>) {}
 
+  /** extend. */
   extend<TAugmentation extends z.ZodRawShape>(
     shape: TAugmentation,
   ): PaginationSearchSchema<TShape & TAugmentation> {
@@ -66,12 +75,14 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
     );
   }
 
+  /** safe Extend. */
   safeExtend<TAugmentation extends z.ZodRawShape>(
     shape: TAugmentation,
   ): PaginationSearchSchema<TShape & TAugmentation> {
     return this.extend(shape);
   }
 
+  /** safe Parse. */
   safeParse(input: Record<string, SearchParamValue>):
     | { success: true; data: PaginationSearchOutput<TShape> }
     | { success: false; error?: unknown } {
@@ -89,12 +100,14 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
     };
   }
 
+  /** parse. */
   parse(input: Record<string, SearchParamValue>): PaginationSearchOutput<TShape> {
     return addPaginationOffset(
       this.schema.parse(input) as PaginationSearchComputedInput<TShape>,
     ) as PaginationSearchOutput<TShape>;
   }
 
+  /** Asynchronously parses search parameters and returns either the parsed pagination output or a failure result. */
   async safeParseAsync(input: Record<string, SearchParamValue>): Promise<
     | { success: true; data: PaginationSearchOutput<TShape> }
     | { success: false; error?: unknown }
@@ -113,6 +126,7 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
     };
   }
 
+  /** Asynchronously parses search parameters into the pagination output shape. */
   async parseAsync(
     input: Record<string, SearchParamValue>,
   ): Promise<PaginationSearchOutput<TShape>> {
@@ -122,6 +136,7 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
   }
 }
 
+/** fallback. */
 export function fallback<TSchema extends z.ZodType>(
   schema: TSchema,
   defaultValue: z.output<TSchema>,
@@ -129,6 +144,7 @@ export function fallback<TSchema extends z.ZodType>(
   return schema.catch(defaultValue);
 }
 
+/** pagination Search Schema. */
 export function paginationSearchSchema(
   options: PaginationSearchSchemaOptions = {},
 ): PaginationSearchSchema<PaginationSearchBaseShape> {

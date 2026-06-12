@@ -72,6 +72,7 @@ import type {
   SearchParamSchema,
 } from './types.ts';
 
+/** Defines the shape of define page builder. */
 export interface DefinePageBuilder<
   TTypes extends AnyDefinePageTypeState = DefinePageRootTypeState,
   THasConfiguredRoute extends boolean = false,
@@ -82,15 +83,18 @@ export interface DefinePageBuilder<
    */
   readonly $types?: TTypes;
 
+  /** with Resource. */
   withResource<K extends string, TOut>(
     key: K,
     factory: DefinePageResourceFactoryFor<TTypes, TOut, THasConfiguredRoute>,
   ): DefinePageBuilder<DefinePageWithResource<TTypes, K, TOut>, THasConfiguredRoute>;
 
+  /** with Resources. */
   withResources<TFactories extends ResourceFactoryMap<TTypes, THasConfiguredRoute>>(
     factories: TFactories,
   ): DefinePageBuilder<DefinePageWithResources<TTypes, TFactories>, THasConfiguredRoute>;
 
+  /** with Params. */
   withParams<TPathSchema, TSearchSchema>(
     schemas: {
       path?: TPathSchema & PathParamSchema;
@@ -101,25 +105,31 @@ export interface DefinePageBuilder<
     THasConfiguredRoute
   >;
 
+  /** with Path Params. */
   withPathParams<TSchema>(
     schema: TSchema & PathParamSchema,
   ): DefinePageBuilder<DefinePageWithPathParams<TTypes, TSchema>, THasConfiguredRoute>;
 
+  /** with Search Params. */
   withSearchParams<TSchema>(
     schema: TSchema & SearchParamSchema,
   ): DefinePageBuilder<DefinePageWithSearchParams<TTypes, TSchema>, THasConfiguredRoute>;
 
+  /** with Route. */
   withRoute<TRoute extends TypedRouteTarget<object, object>>(
     route: TRoute,
   ): DefinePageBuilder<DefinePageWithRoute<TTypes, TRoute>, true>;
 
+  /** with Policy. */
   withPolicy(
     policy: RuntimePageConfig<TTypes>['policy'],
   ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+  /** with Telemetry. */
   withTelemetry(
     telemetry: DefinePageTelemetryConfig,
   ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
 
+  /** with Layer. */
   withLayer<K extends string, TProps extends DefinePageLayerProps = EmptyRecord>(
     id: K,
     component: ComponentType<TProps>,
@@ -165,23 +175,30 @@ export interface DefinePageBuilder<
     config: DefinePageFormConfigFor<TTypes, THasConfiguredRoute, TSchema, TOutput>,
   ): DefinePageBuilder<DefinePageWithForm<TTypes, K, TSchema>, THasConfiguredRoute>;
 
+  /** with Handler. */
   withHandler(
     method: DefinePageMethod,
     handler: DefinePageMethodHandlerFor<TTypes, THasConfiguredRoute>,
   ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+  /** with Layout. */
   withLayout(
     layout: DefinePageLayoutFor<TTypes, THasConfiguredRoute>,
   ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+  /** with Meta. */
   withMeta(
     resolver: DefinePageMetaResolverFor<TTypes, THasConfiguredRoute>,
   ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
 
+  /** with Header. */
   withHeader(name: string, value: string): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+  /** with Header. */
   withHeader(headers: HeadersInit): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+  /** with Header. */
   withHeader(
     resolver: DefinePageHeaderResolverFor<TTypes, THasConfiguredRoute>,
   ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
 
+  /** with Status. */
   withStatus(status: number): DefinePageBuilder<TTypes, THasConfiguredRoute>;
 
   /**
@@ -193,19 +210,25 @@ export interface DefinePageBuilder<
    */
   withStreaming(): DefinePageBuilder<TTypes, THasConfiguredRoute>;
 
+  /** create Nav. */
   createNav(routePattern?: string): DefinePageRouteNavFor<TTypes>;
+  /** build. */
   build(): THasConfiguredRoute extends true ? DefinePageRoutedDefinitionFor<TTypes>
     : DefinePageDefinitionFor<TTypes>;
+  /** build. */
   build(routePattern: string): DefinePageRoutedDefinitionFor<TTypes>;
+  /** build. */
   build<TBuildOptions extends DefinePageBuildOptions>(
     options: TBuildOptions,
   ): DefinePageBuildResultFor<TBuildOptions, TTypes>;
 }
 
+/** Defines the shape of define page root builder. */
 export interface DefinePageRootBuilder<TState = EmptyRecord>
   extends DefinePageBuilder<DefinePageRootTypeState<TState>, false> {}
 
-type FormSchemaInput<TSchema extends z.ZodTypeAny> = z.input<TSchema> & FormValues;
+/** Input type derived from a form Zod schema. */
+export type FormSchemaInput<TSchema extends z.ZodTypeAny> = z.input<TSchema> & FormValues;
 
 function createDefaultConfig<TState>(): RuntimePageConfig<DefinePageRootTypeState<TState>, false> {
   return { resources: [], layers: [], handlers: {}, headers: [] };
@@ -729,8 +752,11 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
   }
 }
 
+/** define Page. */
 export function definePage(): DefinePageRootBuilder;
+/** define Page. */
 export function definePage<TState>(): DefinePageRootBuilder<TState>;
+/** JSDoc for exported symbol `definePage`. */
 export function definePage<TState = EmptyRecord>(): DefinePageRootBuilder<TState> {
   return createBuilder<DefinePageRootTypeState<TState>, false>(
     createDefaultConfig<TState>(),

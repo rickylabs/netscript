@@ -1,45 +1,65 @@
+/** JSDoc for exported type `DeferPolicyProfile`. */
 export type DeferPolicyProfile =
   | 'balanced'
   | 'aggressive-first-paint'
   | 'background-refresh'
   | 'low-bandwidth';
 
+/** JSDoc for exported type `LegacyStaleStrategy`. */
 export type LegacyStaleStrategy = 'none' | 'server-prewarm';
 
+/** JSDoc for exported interface `DeferPolicyInput`. */
 export interface DeferPolicyInput {
+  /** Property `profile`. */
   profile?: DeferPolicyProfile;
+  /** Property `staleTimeMs`. */
   staleTimeMs?: number;
+  /** Property `prewarmOnMiss`. */
   prewarmOnMiss?: boolean;
+  /** Property `prewarmOnStale`. */
   prewarmOnStale?: boolean;
+  /** Property `clientRefreshOnFreshCache`. */
   clientRefreshOnFreshCache?: boolean;
+  /** Property `skipClientWhenServerPrewarm`. */
   skipClientWhenServerPrewarm?: boolean;
 }
 
+/** JSDoc for exported interface `DeferPolicyResolved`. */
 export interface DeferPolicyResolved {
+  /** Property `profile`. */
   profile: DeferPolicyProfile;
+  /** Property `staleTimeMs`. */
   staleTimeMs: number;
+  /** Property `prewarmOnMiss`. */
   prewarmOnMiss: boolean;
+  /** Property `prewarmOnStale`. */
   prewarmOnStale: boolean;
+  /** Property `clientRefreshOnFreshCache`. */
   clientRefreshOnFreshCache: boolean;
+  /** Property `skipClientWhenServerPrewarm`. */
   skipClientWhenServerPrewarm: boolean;
 }
 
+/** JSDoc for exported symbol `DEFER_POLICY`. */
 export const DEFER_POLICY = {
   header: 'balanced',
   detail: 'background-refresh',
 } as const;
 
+/** JSDoc for exported symbol `DEFER_STALE_MS`. */
 export const DEFER_STALE_MS = {
   crud: 30_000,
   forceRefresh: 0,
 } as const;
 
+/** JSDoc for exported symbol `DETAIL_FORCE_REFRESH_POLICY`. */
 export const DETAIL_FORCE_REFRESH_POLICY: DeferPolicyInput = {
   profile: DEFER_POLICY.detail,
   // Keep immediate consistency for linked resources after first client nav.
   skipClientWhenServerPrewarm: false,
 };
 
+/** JSDoc for exported symbol `resolveDetailDeferConfig`. */
 export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
   staleTime: number;
   policy: DeferPolicyInput | DeferPolicyProfile;
@@ -50,6 +70,7 @@ export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
   };
 }
 
+/** JSDoc for exported type `DeferClientDecisionReason`. */
 export type DeferClientDecisionReason =
   | 'partial-miss'
   | 'partial-hit'
@@ -60,8 +81,11 @@ export type DeferClientDecisionReason =
   | 'stale-cache'
   | 'policy-background-refresh';
 
+/** JSDoc for exported interface `DeferClientDecision`. */
 export interface DeferClientDecision {
+  /** Property `action`. */
   action: 'submit' | 'skip';
+  /** Property `reason`. */
   reason: DeferClientDecisionReason;
 }
 
@@ -110,6 +134,7 @@ const PROFILE_DEFAULTS: Record<DeferPolicyProfile, DeferPolicyResolved> = {
   },
 };
 
+/** JSDoc for exported symbol `resolveDeferPolicy`. */
 export function resolveDeferPolicy(
   policy: DeferPolicyInput | DeferPolicyProfile | undefined,
   staleTimeOverrideMs: number | undefined,
@@ -140,6 +165,7 @@ export function resolveDeferPolicy(
   };
 }
 
+/** JSDoc for exported symbol `decideDeferClientAction`. */
 export function decideDeferClientAction(input: DeferClientDecisionInput): DeferClientDecision {
   if (input.isPartialRequest) {
     return input.hasCachedData

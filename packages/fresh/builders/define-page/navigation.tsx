@@ -34,112 +34,165 @@ interface DefinePageNavigationContextValue {
   readonly nav: DefinePageRouteNav<object, object>;
 }
 
+/** Target carrying the typed path and search shapes for a route. */
 export interface TypedRouteTarget<
   TPath extends object = EmptyRecord,
   TSearch extends object = EmptyRecord,
 > {
+  /** Pattern the route was registered under. */
   readonly routePattern: string;
+  /** Optional schema describing path parameters. */
   readonly pathSchema?: PathParamSchema<TPath>;
+  /** Optional schema describing search parameters. */
   readonly searchSchema?: SearchParamSchema<TSearch>;
+  /** Type carrier exposing path and search shapes. */
   readonly $types?: {
     path: TPath;
     search: TSearch;
   };
 }
 
+/** Infers the path parameter shape of a route target. */
 export type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
   TTarget['$types']
 >['path'];
 
+/** Infers the search parameter shape of a route target. */
 export type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
   TTarget['$types']
 >['search'];
 
+/** Alias for the inferred path shape of a route target. */
 export type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
   TTarget
 >;
+/** Alias for the inferred search shape of a route target. */
 export type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
   TTarget
 >;
 
+/** Current path/search state observed by navigation hooks. */
 export interface CurrentRouteState<TTarget extends TypedRouteTarget<object, object>> {
+  /** Parsed path parameters. */
   readonly path: TypedRoutePathOf<TTarget>;
+  /** Parsed search parameters. */
   readonly search: TypedRouteSearchOf<TTarget>;
 }
 
-interface CurrentDefinePageRoute<TValue extends DefinePageTypeCarrier>
+/** Route object returned by {@link DefinePageHooks.useRoute} and {@link usePageRoute}. */
+export interface CurrentDefinePageRoute<TValue extends DefinePageTypeCarrier>
   extends TypedRouteTarget<InferDefinePagePath<TValue>, InferDefinePageSearch<TValue>> {
+  /** Parsed path parameters for the current route. */
   readonly path: InferDefinePagePath<TValue>;
+  /** Parsed search parameters for the current route. */
   readonly search: InferDefinePageSearch<TValue>;
+  /** Navigation helpers for this route. */
   readonly nav: DefinePageRouteNav<InferDefinePagePath<TValue>, InferDefinePageSearch<TValue>>;
+  /** Build link props bound to this route's path/search shapes. */
   getLinkProps(
+    /** Property `input`. */
     input: BoundGetLinkPropsInput<CurrentDefinePageRoute<TValue>>,
   ): FreshLinkAttributes & { href: ValidatedRouteHref };
+  /** Bound Fresh {@link Link} component for this route. */
   readonly Link: ComponentType<BoundLinkProps<CurrentDefinePageRoute<TValue>>>;
 }
 
+/** Anchor attributes used by Fresh client navigation links. */
 export interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+  /** Opt the link in to Fresh client-side navigation. */
   'f-client-nav'?: boolean;
 }
 
+/** Anchor attributes used for partial Fresh updates. */
 export interface FreshPartialLinkAttributes extends FreshLinkAttributes {
+  /** Partial target selector for Fresh partial rendering. */
   'f-partial'?: string;
 }
 
+/** Defines the shape of define page hooks. */
 export interface DefinePageHooks<TValue extends DefinePageTypeCarrier> {
+  /** Hook that returns the context. */
   useContext(): InferDefinePageContext<TValue>;
+  /** Hook that returns the state. */
   useState(): DefinePageStateOf<InferDefinePageTypes<TValue>>;
+  /** Hook that returns the resources. */
   useResources(): InferDefinePageResources<TValue>;
+  /** Hook that returns the resource. */
   useResource<TKey extends keyof InferDefinePageResources<TValue> & string>(
+    /** Property `key`. */
     key: TKey,
   ): InferDefinePageResources<TValue>[TKey];
+  /** Hook that returns the layers. */
   useLayers(): Partial<InferDefinePageLayerData<TValue>>;
+  /** Hook that returns the layer. */
   useLayer<TLayer extends keyof InferDefinePageLayerData<TValue> & string>(
+    /** Property `id`. */
     id: TLayer,
   ): InferDefinePageLayerData<TValue>[TLayer] | undefined;
+  /** Hook that returns the required layer. */
   useRequiredLayer<TLayer extends keyof InferDefinePageLayerData<TValue> & string>(
+    /** Property `id`. */
     id: TLayer,
   ): InferDefinePageLayerData<TValue>[TLayer];
+  /** Hook that returns the slots. */
   useSlots(): DefinePageSlotsFor<InferDefinePageTypes<TValue>>;
+  /** Hook that returns the route. */
   useRoute(): CurrentDefinePageRoute<TValue>;
+  /** Hook that returns the path. */
   usePath(): InferDefinePagePath<TValue>;
+  /** Hook that returns the search. */
   useSearch(): InferDefinePageSearch<TValue>;
 }
 
+/** Path input shape for a route, required when the route has path params. */
 export type TypedRoutePathInput<TPath extends object> = HasPathParams<TPath> extends true
   ? { path: TPath }
   : { path?: TPath };
 
+/** Update to apply to the current search state. */
 export type RouteSearchUpdate<TSearch extends object> =
   | Partial<TSearch>
   | ((prev: TSearch) => Partial<TSearch>);
 
+/** Input for building link props with an explicit route target. */
 export type GetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> =
   & Omit<FreshLinkAttributes, 'children' | 'href'>
   & TypedRoutePathInput<TypedRoutePathOf<TTarget>>
   & {
+    /** Target route to link to. */
     to: TTarget;
+    /** Search update for the destination. */
     search?: RouteSearchUpdate<TypedRouteSearchOf<TTarget>>;
+    /** Replace the current history entry instead of pushing. */
     replace?: boolean;
+    /** Keep existing search parameters when applying the update. */
     preserveSearchParams?: boolean;
   };
 
+/** Input for building link props when the target is bound by context. */
 export type BoundGetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> = Omit<
   GetLinkPropsInput<TTarget>,
   'to'
 >;
 
+/** Props for the typed {@link Link} component. */
 export type LinkProps<TTarget extends TypedRouteTarget<object, object>> =
   & Omit<FreshLinkAttributes, 'href'>
   & TypedRoutePathInput<TypedRoutePathOf<TTarget>>
   & {
+    /** Target route to link to. */
     to: TTarget;
+    /** Search update for the destination. */
     search?: RouteSearchUpdate<TypedRouteSearchOf<TTarget>>;
+    /** Child elements rendered inside the anchor. */
     children: ComponentChildren;
+    /** Replace the current history entry instead of pushing. */
     replace?: boolean;
+    /** Keep existing search parameters when applying the update. */
     preserveSearchParams?: boolean;
   };
 
+/** Props for a Link whose target is bound by context. */
 export type BoundLinkProps<TTarget extends TypedRouteTarget<object, object>> = Omit<
   LinkProps<TTarget>,
   'to'
@@ -276,6 +329,7 @@ function fillRoutePattern(pattern: string, path: UnknownRecord): string {
   return pathname.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
 }
 
+/** wrap With Navigation Context. */
 export function wrapWithNavigationContext<TSearch extends object>(
   body: ComponentChildren,
   routePattern: string,
@@ -323,6 +377,7 @@ function assertRouteContext<TTarget extends TypedRouteTarget<object, object>>(
   }
 }
 
+/** Hook returning the current path and search state for a route target. */
 export function useCurrentRoute<TTarget extends TypedRouteTarget<object, object>>(
   target: TTarget,
 ): CurrentRouteState<TTarget> {
@@ -411,18 +466,21 @@ function useDefinePageSlots<TValue extends DefinePageTypeCarrier>(): DefinePageS
   return useDefinePageContext<TValue>().slots;
 }
 
+/** Hook returning the current path parameters for a route target. */
 export function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
   target: TTarget,
 ): TypedRoutePathOf<TTarget> {
   return useCurrentRoute(target).path;
 }
 
+/** Hook returning the current search parameters for a route target. */
 export function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
   target: TTarget,
 ): TypedRouteSearchOf<TTarget> {
   return useCurrentRoute(target).search;
 }
 
+/** Hook that returns the page route. */
 export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDefinePageRoute<
   TValue
 > {
@@ -472,16 +530,19 @@ export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDef
   };
 }
 
+/** Hook that returns the page path. */
 export function usePagePath<TValue extends DefinePageTypeCarrier>(): InferDefinePagePath<TValue> {
   return usePageRoute<TValue>().path;
 }
 
+/** Hook that returns the page search. */
 export function usePageSearch<TValue extends DefinePageTypeCarrier>(): InferDefinePageSearch<
   TValue
 > {
   return usePageRoute<TValue>().search;
 }
 
+/** CreateDefinePageHooks helper. */
 export function createDefinePageHooks<TValue extends DefinePageTypeCarrier>(): DefinePageHooks<
   TValue
 > {
@@ -601,6 +662,7 @@ function createResolvedLinkProps<TPath extends object, TSearch extends object>(
   };
 }
 
+/** Build anchor attributes and validated HREF for a route target. */
 export function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
   input: GetLinkPropsInput<TTarget>,
 ): FreshLinkAttributes & { href: ValidatedRouteHref } {
@@ -616,6 +678,7 @@ export function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
   );
 }
 
+/** Build anchor attributes for a route target using the ambient navigation context. */
 export function getBoundLinkProps<TTarget extends TypedRouteTarget<object, object>>(
   target: TTarget,
   input: BoundGetLinkPropsInput<TTarget>,
@@ -633,6 +696,7 @@ export function getBoundLinkProps<TTarget extends TypedRouteTarget<object, objec
   );
 }
 
+/** Typed anchor component that resolves the destination route and validates the HREF. */
 export function Link<TTarget extends TypedRouteTarget<object, object>>(
   props: LinkProps<TTarget>,
 ): JSX.Element {
@@ -650,6 +714,7 @@ export function Link<TTarget extends TypedRouteTarget<object, object>>(
   );
 }
 
+/** CreateRouteNav helper. */
 export function createRouteNav<TPath extends object, TSearch extends object>(
   options: {
     routePattern: string;
