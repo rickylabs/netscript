@@ -153,7 +153,7 @@ const css = [
   '}',
 ].join('\n');
 
-await Deno.writeTextFile('registry/theme/tokens.css', css);
+await Deno.writeTextFile('registry/theme/tokens.css', `${css}\n`);
 await Deno.writeTextFile(
   'registry/theme/theme-bridge.css',
   renderThemeBridge(rootTokens),

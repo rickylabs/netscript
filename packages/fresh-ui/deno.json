@@ -74,7 +74,9 @@
   "fmt": {
     "include": [
       "**/*.ts",
-      "**/*.tsx"
+      "**/*.tsx",
+      "**/*.css",
+      "**/*.md"
     ],
     "useTabs": false,
     "lineWidth": 100,

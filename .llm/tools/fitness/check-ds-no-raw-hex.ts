@@ -16,7 +16,8 @@
  * deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts
  */
 
-const PACKAGE_ROOT = 'packages/fresh-ui';
+const DEFAULT_PACKAGE_ROOT = 'packages/fresh-ui';
+const PACKAGE_ROOT = parseRootArg(Deno.args);
 const SCAN_EXTENSIONS = ['.css', '.ts', '.tsx'];
 const EXCLUDED_SEGMENTS = ['registry/theme/', 'scripts/', 'docs/'];
 const ALLOW_MARKER = 'ds-allow-raw-color';
@@ -49,6 +50,21 @@ if (violations.length) {
 }
 
 console.log(`ds-no-raw-hex: PASS ${scanned} files clean`);
+
+function parseRootArg(args: string[]): string {
+  for (let index = 0; index < args.length; index++) {
+    const arg = args[index];
+    if (arg === '--root') {
+      const value = args[index + 1];
+      if (!value) throw new Error('Missing value for --root');
+      return value;
+    }
+    if (arg.startsWith('--root=')) {
+      return arg.slice('--root='.length);
+    }
+  }
+  return DEFAULT_PACKAGE_ROOT;
+}
 
 async function* walk(dir: string): AsyncGenerator<string> {
   for await (const entry of Deno.readDir(dir)) {
