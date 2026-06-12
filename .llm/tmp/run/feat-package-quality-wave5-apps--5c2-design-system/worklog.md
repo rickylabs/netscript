@@ -306,3 +306,44 @@
 - Commits: repo-genesis `e4da873bc` (pushed; remote head verified
   `e4da873bc967101f9013e4b45792c1865f6639a3`).
 - Drift: D-5c2-4
+
+## Slice 6 — /design/composition rules page (2026-06-12)
+
+**Goal (locked plan row 6):** /design composition-rules page; browser validation; static docs route.
+
+**Built (repo-genesis, branch `feat/repo-genesis`, commit `0e6013211d995da5f99c2cee3202aef9a1650ab5`):**
+
+- `apps/playground/routes/(design)/design/composition.tsx` (NEW): static docs route with six
+  anchored sections — layers (L0–L4 ladder, ownership column, per-layer import rule incl.
+  "L2 must not import another L2; behavior moves down, composition moves up"), ownership
+  (imported surface vs copy-source registry), tokens (5-point token rule: semantic --ns-* only,
+  color-mix derivation, ramps are theme raw material, documented platform fallbacks only,
+  theme = generated DTCG artifact set; NS One is a theme not the system), layout objects
+  (6 live specimens: ns-stack/ns-cluster/ns-grid--3/ns-split/ns-toolbar/ns-switcher + footnote
+  naming the rest of the vocabulary), attributes (data-part / data-state / aria-* / prop getters
+  + native-first note), do/don't (6 pairs). Content grounded in
+  packages/fresh-ui/docs/l0-conventions.md and README §Architecture.
+- `apps/playground/routes/(design)/design/_layout.tsx`: nav entry /design/composition.
+- `apps/playground/assets/design.css`: ns-rules-* skin (ladder staircase via nth-child indent,
+  model cards, specimen figures with recessed --ns-bg canvas, dashed plates, def cards,
+  do/don't cards with --ns-success / --ns-destructive accent borders). Token vocabulary only;
+  initial --ns-fg-muted/--ns-fg-subtle slips corrected to --ns-muted-fg before commit.
+
+**Gate evidence:**
+
+- fmt: 3 files clean; lint: 2 files clean; `deno check --unstable-kv` route + layout: exit 0.
+- Browser (Playwright, real route http://localhost:5173/design/composition):
+  - SSR 200, console 0 errors / 0 warnings across whole session.
+  - Sections 6/6 present, rail links 6/6, rungs L0–L4 in order, specimens 6/6 with live layout
+    behavior verified computed (grid--3 → 3 columns, stack → column flex, cluster → flex).
+  - Counts: 19 plates, 2 model cards, 4 attribute defs, 6 do + 6 don't, 5 token-rule items,
+    link buttons → /design/tokens + /design/components, nav entry present.
+  - Theme flip via live ThemeToggle: light → dark (bodyBg oklch(0.135 0.006 85), rung surface
+    oklch(0.175 0.006 85), do-border oklch(0.61 0.082 190), dont-border oklch(0.625 0.165 28))
+    → back to light. Full-page screenshots both themes + 390px viewport.
+  - 390×844: scrollWidth 375 ≤ 390, 0 offenders; rail static row; switcher specimen stacks;
+    deepest ladder rung right edge 331 < 390.
+- Root deno.lock mutated by dev server again (4th occurrence) → restored via git checkout.
+  Untracked packages/fresh-ui/deno.lock left untouched per never-delete-locks rule.
+
+**Drift:** none new.

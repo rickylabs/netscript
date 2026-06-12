@@ -15,3 +15,4 @@
 | 3 (repo-genesis) | `b2008985`, `e8ae8068`, `32cc5bb` | — | sync @ b54e3533 / playground ui:add conversion / fmt+lint normalization (branch `feat/repo-genesis`) |
 | 4 (repo-genesis) | `30972f89` | — | /design tokens browser route + TokenClipboard island + design.css skin (branch `feat/repo-genesis`) |
 | 5 (repo-genesis) | `e4da873bc` | — | /design/components 43-item registry gallery + 6 missing ui:add copies + catalog snapshot (branch `feat/repo-genesis`) |
+| 6 (repo-genesis) | `0e6013211` | — | /design/composition rules page + nav entry + ns-rules-* skin (branch `feat/repo-genesis`) |
