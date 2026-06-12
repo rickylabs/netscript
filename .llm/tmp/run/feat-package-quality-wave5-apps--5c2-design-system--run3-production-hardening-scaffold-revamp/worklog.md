@@ -698,5 +698,5 @@ only if the generated app should ship it by default.
 
 ### Commits
 
-- Framework: pending.
+- Framework: `4bf05ebd68224a5d53407a6808b0cadb4881fb7e`
 - Repo-genesis: N/A, CLI package absent from outer worktree.
