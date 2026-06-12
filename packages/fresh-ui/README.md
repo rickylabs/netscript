@@ -18,8 +18,8 @@ with releases.
    generated from a DTCG token source. **NS One** is the first theme that ships with the package; it
    is an instance, not the system. Components never reference a specific theme — they consume only
    the semantic vocabulary, so swapping themes restyles every component.
-2. **Registry** — `fresh-ui-foundation` (manifest schema v2): 43 copy-source items — 18 L2
-   components, 10 L3 blocks, 3 islands, 7 style sheets, 2 libs, 2 support modules, and the theme
+2. **Registry** — `fresh-ui-foundation` (manifest schema v2): 44 copy-source items — 18 L2
+   components, 11 L3 blocks, 3 islands, 7 style sheets, 2 libs, 2 support modules, and the theme
    seed. Installed with the NetScript CLI; once copied, the code is yours.
 3. **Runtime** — Package-owned, imported (not copied): seven interactive compound components
    (Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip), L0 primitives (`Show`,
@@ -79,17 +79,35 @@ copy files and fix up the relative imports (island copies typically change `../l
 ## Quick start
 
 ```tsx
+import { cn, getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
 import { Dialog } from '@netscript/fresh-ui/interactive';
+import { Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 
-export function ConfirmDeleteDialog() {
+const deployButtonClass = cn('ns-button', 'ns-button--primary');
+
+const redirectTo = withToast('/dashboard/deployments', {
+  type: 'success',
+  title: 'Deployment queued',
+  message: 'api-gateway will roll out to three regions.',
+});
+
+const toast = getToast(new URL(`https://app.example${redirectTo}`));
+const cleanPath = stripToastFromUrl(new URL(`https://app.example${redirectTo}`));
+
+export function ConfirmDeployDialog() {
   return (
     <Dialog.Root>
-      <Dialog.Trigger>Delete item</Dialog.Trigger>
-      <Dialog.Content aria-label='Confirm deletion'>
-        <Dialog.Title>Are you sure?</Dialog.Title>
-        <Dialog.Description>This action cannot be undone.</Dialog.Description>
+      <Dialog.Trigger class={deployButtonClass}>Deploy</Dialog.Trigger>
+      <Dialog.Content aria-label='Confirm deployment'>
+        <Dialog.Title>Deploy api-gateway?</Dialog.Title>
+        <Dialog.Description>
+          {toast?.message ?? 'The deployment will use the selected region plan.'}
+        </Dialog.Description>
+        <Show when={cleanPath === '/dashboard/deployments'}>
+          <VisuallyHidden>Redirect path is clean</VisuallyHidden>
+        </Show>
         <Dialog.Close>Cancel</Dialog.Close>
-        <button type='submit'>Delete</button>
+        <button type='submit'>Confirm</button>
       </Dialog.Content>
     </Dialog.Root>
   );
@@ -131,7 +149,7 @@ see [`docs/theme-authoring.md`](docs/theme-authoring.md).
 `progress`, `skeleton`.
 
 **Blocks (L3)** — `breadcrumb`, `sidebar-shell`, `page-header`, `filter-form`, `stats-grid`,
-`detail-layout`, `data-table`, `pagination`, `empty-state`, `section-divider`.
+`detail-layout`, `data-table`, `responsive-table`, `pagination`, `empty-state`, `section-divider`.
 
 **Islands** — `theme-toggle` (L2), `sidebar-toggle` (L3), `toast` (L2).
 
@@ -195,6 +213,17 @@ Design-system fitness gates (run from the workspace root in CI):
 deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts
 deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts
 ```
+
+## Docs
+
+- [`docs/getting-started.md`](docs/getting-started.md) — install flow and doctested runtime helper
+  example
+- [`docs/concepts.md`](docs/concepts.md) — themes, registry ownership, runtime, and validation
+- [`docs/architecture.md`](docs/architecture.md) — ADRs and package architecture decisions
+- [`docs/l0-conventions.md`](docs/l0-conventions.md) — layer, token, attribute, and motion rules
+- [`docs/theme-authoring.md`](docs/theme-authoring.md) — authoring a complete `--ns-*` theme
+- [`docs/recipes/living-design-routes.md`](docs/recipes/living-design-routes.md) — browser proof
+  routes for consuming apps
 
 ## Resources
 
