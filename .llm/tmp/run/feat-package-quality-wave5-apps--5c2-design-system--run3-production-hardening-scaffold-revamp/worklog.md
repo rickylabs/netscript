@@ -341,3 +341,49 @@ only if the generated app should ship it by default.
 
 - Framework: `95b5d0cdf40d9b028d68caa25ab7f72ce505313e`
 - Repo-genesis: `46520db8296e8149b7dc12f4d3fd0c7ed0d73d9d`
+
+## 2026-06-12 - Slice 9: C-11 docs scaffold and doctests
+
+### Changed
+
+- Added `docs/getting-started.md` with the supported `ui:init` / `ui:add` flow, runtime import
+  setup, and the README-matched runtime helper example.
+- Added `docs/concepts.md` covering themes, copy-source registry ownership, runtime behavior,
+  layer boundaries, and validation expectations.
+- Added earned recipe `docs/recipes/living-design-routes.md` for `/design/tokens`,
+  `/design/components`, and `/design/composition` browser proof routes.
+- Updated `README.md` for the Slice 8 registry count (`44` items, `11` L3 blocks), added
+  `responsive-table`, replaced quick start with the doctested helper/runtime flow, and linked the
+  docs scaffold.
+- Added `tests/_fixtures/docs-examples_test.ts` executing the README/getting-started helper and
+  runtime component flow against local package entrypoints.
+- Verified the package publish include already carries `docs/**/*.md` and excludes `tests/**`.
+- Synced README/docs/doctest fixture to repo-genesis.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| package Markdown fmt | PASS | `deno fmt --check` from `packages/fresh-ui` | 118 files checked, including Markdown docs. |
+| package fmt wrapper | PASS | `deno task fmt:check` from framework package path | Existing root wrapper path passed. |
+| package check | PASS | `deno task check` from `packages/fresh-ui` | Includes `--unstable-kv`; checked `tests/_fixtures/docs-examples_test.ts`. |
+| package test | PASS | `deno task test` from `packages/fresh-ui` | 39 tests passed, including 2 doctest fixture cases. |
+| package tokens | PASS | `deno task tokens:check` from `packages/fresh-ui` | Generated token artifacts stable. |
+| DS no raw hex | PASS | `check-ds-no-raw-hex.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| DS color utilities | PASS | `check-ds-color-utilities.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| arch:check | PASS | `deno task arch:check` from framework root | 0 fail, 1 existing manifest-size warn; DS gates passed. |
+| publish include check | PASS | `Select-String packages/fresh-ui/deno.json` | `docs/**/*.md` and `README.md` included; `tests/**` excluded. |
+| copy fidelity | PASS | `git diff --no-index --ignore-cr-at-eol` | README, new docs, recipe, and doctest fixture matched repo-genesis package copy. |
+| repo-genesis package fmt | PASS | `deno fmt --check` from outer `packages/fresh-ui` | 118 files checked. |
+| repo-genesis package check | PASS | `deno task check` from outer `packages/fresh-ui` | Includes doctest fixture. |
+| repo-genesis package test | PASS | `deno task test` from outer `packages/fresh-ui` | 39 tests passed. |
+| repo-genesis package tokens | PASS | `deno task tokens:check` from outer `packages/fresh-ui` | Generated token artifacts stable. |
+
+### Drift
+
+- None.
+
+### Commits
+
+- Framework: `da7091fa14551fdbe8168a12365f4b2608f04970`
+- Repo-genesis: `12fcebaeea9d401adb9d3f8d284f2224091bee32`

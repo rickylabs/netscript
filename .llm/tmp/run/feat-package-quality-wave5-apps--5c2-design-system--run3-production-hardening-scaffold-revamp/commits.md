@@ -32,3 +32,5 @@ Format:
 - 00a29027915283a52ae56e2c06adbc3287ebc7a6: fresh-ui: sync zag adoption adr
 - 95b5d0cdf40d9b028d68caa25ab7f72ce505313e: fresh-ui: add responsive table block
 - 46520db8296e8149b7dc12f4d3fd0c7ed0d73d9d: fresh-ui: wire responsive table gallery block
+- da7091fa14551fdbe8168a12365f4b2608f04970: fresh-ui: add docs scaffold and doctests
+- 12fcebaeea9d401adb9d3f8d284f2224091bee32: fresh-ui: sync docs scaffold and doctests
