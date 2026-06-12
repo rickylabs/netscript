@@ -380,3 +380,29 @@ typecheck).
   flag for slice 11/12 review (likely belongs in .gitignore or needs tracking decision).
 
 **Drift:** none new; D-5c2-2 follow-up closed.
+
+## Slice 8 — DS lint gate: no off-vocabulary color utilities (2026-06-12)
+
+**Goal (locked plan row 8):** DS lint gate "no off-vocabulary color utilities", PENDING_SCRIPT
+replaced by a real `.llm/tools/fitness/` script.
+
+**Built (framework commit `9cf8bea5306bfc3caf305b8c71ccc4bd3053e1d0`):**
+
+- `.llm/tools/fitness/check-ds-color-utilities.ts` (NEW): same walk/scope as slice 7 gate
+  (packages/fresh-ui css/ts/tsx minus registry/theme, scripts, docs, tests). Three violation
+  classes across 15 color-bearing utility prefixes (bg/text/border/ring/fill/stroke/outline/
+  decoration/divide/accent/caret/from/via/to/shadow): stock Tailwind palette (22 palette names ×
+  numeric steps), keyword colors (-white/-black), arbitrary color values (-[#…/-[rgb…/-[oklch…).
+  Semantic `*-ns-*` utilities structurally unmatched. Escape hatch: `ds-allow-color-utility`.
+
+**Gate evidence:**
+
+- PASS 93 files clean at HEAD.
+- Negative test: injected `bg-red-500 text-white border-[#ccc]` line → FAIL exit 1 listing all
+  three violations with file:line; removed; PASS 93 again. (Injection accidentally created a
+  stray new file — real components live under registry/components/ui/ — deleted immediately,
+  verified untracked-by-git, gate re-run PASS.)
+- `deno check --no-lock --unstable-kv` on script: exit 0. fmt clean. deno lint skips `.llm/`
+  by root config (consistent with all existing fitness scripts).
+
+**Drift:** none new.
