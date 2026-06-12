@@ -1,0 +1,148 @@
+error[private-type-ref]: public type 'renderToStream' references private type 'VNode'
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream.ts:74:1
+   | 
+74 | export function renderToStream(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+13 | export interface VNode<P = {}> {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'createStreamingResponse' references private type 'VNode'
+   --> /home/runner/work/netscript/netscript/packages/fresh/server/stream.ts:135:1
+    | 
+135 | export function createStreamingResponse(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 13 | export interface VNode<P = {}> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'StreamErrorBoundaryProps["fallback"]' references private type 'JSXInternal'
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:16:3
+   | 
+16 |   fallback?: JSX.Element | ((error: Error) => JSX.Element);
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+78 | export namespace JSXInternal {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'StreamErrorBoundaryProps["fallback"]' references private type 'JSXInternal.Element'
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:16:3
+   | 
+16 |   fallback?: JSX.Element | ((error: Error) => JSX.Element);
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+96 |   export interface Element extends VNode<any> {}
+   |   - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'StreamErrorBoundaryProps["children"]' references private type 'ComponentChildren'
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:19:3
+   | 
+19 |   children: ComponentChildren;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:19:3
+   | 
+19 |   children: ComponentChildren;
+   |   ^
+
+
+error[private-type-ref]: public type 'StreamErrorBoundary' references private type 'Component'
+   --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:42:1
+    | 
+ 42 | export class StreamErrorBoundary extends Component<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+120 | export interface Component<P = {}, S = {}> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'StreamErrorBoundary' references private type 'StreamErrorBoundaryState'
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:42:1
+   | 
+42 | export class StreamErrorBoundary extends Component<
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+22 | interface StreamErrorBoundaryState {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:46:3
+   | 
+46 |   override state: StreamErrorBoundaryState = { error: null };
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:48:3
+   | 
+48 |   static override getDerivedStateFromError(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:56:3
+   | 
+56 |   override componentDidCatch(error: Error): void {
+   |   ^
+
+
+error[private-type-ref]: public type 'StreamErrorBoundary.prototype.render' references private type 'ComponentChildren'
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:60:3
+   | 
+60 |   override render(): ComponentChildren {
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx:60:3
+   | 
+60 |   override render(): ComponentChildren {
+   |   ^
+
+
+error: Found 13 documentation lint errors.

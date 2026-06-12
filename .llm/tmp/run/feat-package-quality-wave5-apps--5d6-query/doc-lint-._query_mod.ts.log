@@ -1,0 +1,1065 @@
+error[private-type-ref]: public type 'QueryIslandProps["children"]' references private type 'ComponentChildren'
+  --> /home/runner/work/netscript/netscript/packages/fresh/query/query-island.tsx:21:3
+   | 
+21 |   children: ComponentChildren;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'QueryIslandProps["queryClient"]' references private type 'QueryClient'
+    --> /home/runner/work/netscript/netscript/packages/fresh/query/query-island.tsx:23:3
+     | 
+  23 |   queryClient?: QueryClient;
+     |   ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-return-type]: exported function is missing an explicit return type annotation
+  --> /home/runner/work/netscript/netscript/packages/fresh/query/query-island.tsx:40:1
+   | 
+40 | export function QueryIsland({ children, queryClient }: QueryIslandProps) {
+   | ^
+
+
+error[private-type-ref]: public type 'getIslandQueryClient' references private type 'QueryClient'
+    --> /home/runner/work/netscript/netscript/packages/fresh/query/query-client.ts:33:1
+     | 
+  33 | export function getIslandQueryClient(): QueryClient {
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'DefaultError'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:792:1
+    | 
+792 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: DefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): DefinedUseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+105 | declare type DefaultError = Register extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'InfiniteData'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:792:1
+    | 
+792 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: DefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): DefinedUseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+418 | declare interface InfiniteData<TData, TPageParam = unknown> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'QueryKey'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:792:1
+     | 
+ 792 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: DefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): DefinedUseInfiniteQueryResult<TData, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1407 | declare type QueryKey = Register extends {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'DefinedInitialDataInfiniteOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:792:1
+    | 
+792 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: DefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): DefinedUseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+202 | declare type DefinedInitialDataInfiniteOptions<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown> = UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam> & {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:792:1
+     | 
+ 792 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: DefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): DefinedUseInfiniteQueryResult<TData, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'DefinedUseInfiniteQueryResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:792:1
+    | 
+792 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: DefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): DefinedUseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+217 | declare type DefinedUseInfiniteQueryResult<TData = unknown, TError = DefaultError> = DefinedInfiniteQueryObserverResult<TData, TError>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:792:1
+    | 
+792 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: DefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): DefinedUseInfiniteQueryResult<TData, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'UndefinedInitialDataInfiniteOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:794:1
+    | 
+794 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UndefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+736 | declare type UndefinedInitialDataInfiniteOptions<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown> = UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam> & {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'UseInfiniteQueryResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:794:1
+    | 
+794 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UndefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+810 | declare type UseInfiniteQueryResult<TData = unknown, TError = DefaultError> = InfiniteQueryObserverResult<TData, TError>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:794:1
+    | 
+794 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UndefinedInitialDataInfiniteOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseInfiniteQueryResult<TData, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useInfiniteQuery' references private type 'UseInfiniteQueryOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:796:1
+    | 
+796 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+800 | declare interface UseInfiniteQueryOptions<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown> extends OmitKeyof<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, 'suspense'> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:796:1
+    | 
+796 | declare function useInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseInfiniteQueryResult<TData, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useIsFetching' references private type 'QueryFilters'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:814:1
+     | 
+ 814 | declare function useIsFetching(filters?: QueryFilters, queryClient?: QueryClient): number;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1348 | declare interface QueryFilters<TQueryKey extends QueryKey = QueryKey> {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useIsFetching' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:814:1
+     | 
+ 814 | declare function useIsFetching(filters?: QueryFilters, queryClient?: QueryClient): number;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:814:1
+    | 
+814 | declare function useIsFetching(filters?: QueryFilters, queryClient?: QueryClient): number;
+    | ^
+
+
+error[private-type-ref]: public type 'useIsMutating' references private type 'MutationFilters'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:818:1
+    | 
+818 | declare function useIsMutating(filters?: MutationFilters, queryClient?: QueryClient): number;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+748 | declare interface MutationFilters<TData = unknown, TError = DefaultError, TVariables = unknown, TOnMutateResult = unknown> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useIsMutating' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:818:1
+     | 
+ 818 | declare function useIsMutating(filters?: MutationFilters, queryClient?: QueryClient): number;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:818:1
+    | 
+818 | declare function useIsMutating(filters?: MutationFilters, queryClient?: QueryClient): number;
+    | ^
+
+
+error[private-type-ref]: public type 'useMutation' references private type 'DefaultError'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:834:1
+    | 
+834 | declare function useMutation<TData = unknown, TError = DefaultError, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient): UseMutationResult<TData, TError, TVariables, TOnMutateResult>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+105 | declare type DefaultError = Register extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useMutation' references private type 'UseMutationOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:834:1
+    | 
+834 | declare function useMutation<TData = unknown, TError = DefaultError, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient): UseMutationResult<TData, TError, TVariables, TOnMutateResult>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+838 | declare interface UseMutationOptions<TData = unknown, TError = DefaultError, TVariables = void, TOnMutateResult = unknown> extends OmitKeyof<MutationObserverOptions<TData, TError, TVariables, TOnMutateResult>, '_defaulted'> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useMutation' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:834:1
+     | 
+ 834 | declare function useMutation<TData = unknown, TError = DefaultError, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient): UseMutationResult<TData, TError, TVariables, TOnMutateResult>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useMutation' references private type 'UseMutationResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:834:1
+    | 
+834 | declare function useMutation<TData = unknown, TError = DefaultError, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient): UseMutationResult<TData, TError, TVariables, TOnMutateResult>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+843 | declare type UseMutationResult<TData = unknown, TError = DefaultError, TVariables = unknown, TOnMutateResult = unknown> = UseBaseMutationResult<TData, TError, TVariables, TOnMutateResult>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:834:1
+    | 
+834 | declare function useMutation<TData = unknown, TError = DefaultError, TVariables = void, TOnMutateResult = unknown>(options: UseMutationOptions<TData, TError, TVariables, TOnMutateResult>, queryClient?: QueryClient): UseMutationResult<TData, TError, TVariables, TOnMutateResult>;
+    | ^
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'DefaultError'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:875:1
+    | 
+875 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<NoInfer<TData>, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+105 | declare type DefaultError = Register extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'QueryKey'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:875:1
+     | 
+ 875 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<NoInfer<TData>, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1407 | declare type QueryKey = Register extends {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'DefinedInitialDataOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:875:1
+    | 
+875 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<NoInfer<TData>, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+208 | declare type DefinedInitialDataOptions<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> = Omit<UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryFn'> & {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:875:1
+     | 
+ 875 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<NoInfer<TData>, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'DefinedUseQueryResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:875:1
+    | 
+875 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<NoInfer<TData>, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+221 | declare type DefinedUseQueryResult<TData = unknown, TError = DefaultError> = DefinedQueryObserverResult<TData, TError>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:875:1
+    | 
+875 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): DefinedUseQueryResult<NoInfer<TData>, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'UndefinedInitialDataOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:877:1
+    | 
+877 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseQueryResult<NoInfer<TData>, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+742 | declare type UndefinedInitialDataOptions<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> = UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> & {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'UseQueryResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:877:1
+    | 
+877 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseQueryResult<NoInfer<TData>, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+900 | declare type UseQueryResult<TData = unknown, TError = DefaultError> = UseBaseQueryResult<TData, TError>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:877:1
+    | 
+877 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseQueryResult<NoInfer<TData>, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useQuery' references private type 'UseQueryOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:879:1
+    | 
+879 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseQueryResult<NoInfer<TData>, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+891 | declare interface UseQueryOptions<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> extends OmitKeyof<UseBaseQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>, 'suspense'> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:879:1
+    | 
+879 | declare function useQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseQueryResult<NoInfer<TData>, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useQueryClient' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:883:15
+     | 
+ 883 | declare const useQueryClient: (queryClient?: QueryClient) => QueryClient;
+     |               ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:883:15
+    | 
+883 | declare const useQueryClient: (queryClient?: QueryClient) => QueryClient;
+    |               ^
+
+
+error[private-type-ref]: public type 'useSuspenseInfiniteQuery' references private type 'DefaultError'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:904:1
+    | 
+904 | declare function useSuspenseInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseSuspenseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+105 | declare type DefaultError = Register extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseInfiniteQuery' references private type 'InfiniteData'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:904:1
+    | 
+904 | declare function useSuspenseInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseSuspenseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+418 | declare interface InfiniteData<TData, TPageParam = unknown> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseInfiniteQuery' references private type 'QueryKey'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:904:1
+     | 
+ 904 | declare function useSuspenseInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseSuspenseInfiniteQueryResult<TData, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1407 | declare type QueryKey = Register extends {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseInfiniteQuery' references private type 'UseSuspenseInfiniteQueryOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:904:1
+    | 
+904 | declare function useSuspenseInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseSuspenseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+908 | declare interface UseSuspenseInfiniteQueryOptions<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown> extends OmitKeyof<UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, 'queryFn' | 'enabled' | 'throwOnError' | 'placeholderData'> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseInfiniteQuery' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:904:1
+     | 
+ 904 | declare function useSuspenseInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseSuspenseInfiniteQueryResult<TData, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseInfiniteQuery' references private type 'UseSuspenseInfiniteQueryResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:904:1
+    | 
+904 | declare function useSuspenseInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseSuspenseInfiniteQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+914 | declare type UseSuspenseInfiniteQueryResult<TData = unknown, TError = DefaultError> = OmitKeyof<DefinedInfiniteQueryObserverResult<TData, TError>, 'isPlaceholderData' | 'promise'>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:904:1
+    | 
+904 | declare function useSuspenseInfiniteQuery<TQueryFnData, TError = DefaultError, TData = InfiniteData<TQueryFnData>, TQueryKey extends QueryKey = QueryKey, TPageParam = unknown>(options: UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient?: QueryClient): UseSuspenseInfiniteQueryResult<TData, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useSuspenseQuery' references private type 'DefaultError'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:932:1
+    | 
+932 | declare function useSuspenseQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseSuspenseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseSuspenseQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+105 | declare type DefaultError = Register extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseQuery' references private type 'QueryKey'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:932:1
+     | 
+ 932 | declare function useSuspenseQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseSuspenseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseSuspenseQueryResult<TData, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1407 | declare type QueryKey = Register extends {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseQuery' references private type 'UseSuspenseQueryOptions'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:932:1
+    | 
+932 | declare function useSuspenseQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseSuspenseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseSuspenseQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+936 | declare interface UseSuspenseQueryOptions<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey> extends OmitKeyof<UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryFn' | 'enabled' | 'throwOnError' | 'placeholderData'> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseQuery' references private type 'QueryClient'
+    --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:932:1
+     | 
+ 932 | declare function useSuspenseQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseSuspenseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseSuspenseQueryResult<TData, TError>;
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useSuspenseQuery' references private type 'UseSuspenseQueryResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:932:1
+    | 
+932 | declare function useSuspenseQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseSuspenseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseSuspenseQueryResult<TData, TError>;
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+942 | declare type UseSuspenseQueryResult<TData = unknown, TError = DefaultError> = DistributiveOmit<DefinedQueryObserverResult<TData, TError>, 'isPlaceholderData' | 'promise'>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/preact-query/5.101.0/build/modern/_tsup-dts-rollup.d.ts:932:1
+    | 
+932 | declare function useSuspenseQuery<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData, TQueryKey extends QueryKey = QueryKey>(options: UseSuspenseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, queryClient?: QueryClient): UseSuspenseQueryResult<TData, TError>;
+    | ^
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'Context'
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:61:1
+   | 
+61 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+30 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'InitialQueryBuilder'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:61:1
+    | 
+ 61 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+428 | export type InitialQueryBuilder = Pick<BaseQueryBuilder<Context>, `from` | `unionAll`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'QueryBuilder'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:61:1
+    | 
+ 61 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+430 | export type QueryBuilder<TContext extends Context> = Omit<BaseQueryBuilder<TContext>, `from` | `unionAll` | `_getQuery`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'GetResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:61:1
+    | 
+ 61 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+587 | export type GetResult<TContext extends Context> = Prettify<ResultValue<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'InferResultType'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:61:1
+    | 
+ 61 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+541 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'Collection'
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:61:1
+   | 
+61 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+20 | export interface Collection<T extends object = Record<string, unknown>, TKey extends string | number = string | number, TUtils extends UtilsRecord = UtilsRecord, TSchema extends StandardSchemaV1 = StandardSchemaV1, TInsertInput extends object = T> extends CollectionImpl<T, TKey, TUtils, TSchema, TInsertInput> {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'CollectionStatus'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:61:1
+    | 
+ 61 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+368 | export type CollectionStatus = 
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'UseLiveQueryStatus'
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:73:1
+   | 
+73 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext> | undefined | null, deps?: Array<unknown>): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 2 | export type UseLiveQueryStatus = CollectionStatus | `disabled`;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:73:1
+   | 
+73 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext> | undefined | null, deps?: Array<unknown>): {
+   | ^
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'LiveQueryCollectionConfig'
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:85:1
+   | 
+85 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => LiveQueryCollectionConfig<TContext> | undefined | null, deps?: Array<unknown>): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+45 | export interface LiveQueryCollectionConfig<TContext extends Context, TResult extends object = RootQueryResult<TContext>> {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:85:1
+   | 
+85 | export declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => LiveQueryCollectionConfig<TContext> | undefined | null, deps?: Array<unknown>): {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:97:1
+   | 
+97 | export declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(queryFn: (q: InitialQueryBuilder) => Collection<TResult, TKey, TUtils> | undefined | null, deps?: Array<unknown>): {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:109:1
+    | 
+109 | export declare function useLiveQuery<TContext extends Context, TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext> | LiveQueryCollectionConfig<TContext> | Collection<TResult, TKey, TUtils> | undefined | null, deps?: Array<unknown>): {
+    | ^
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'NonSingleResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:195:1
+    | 
+195 | export declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & NonSingleResult): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+596 | export type NonSingleResult = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveQuery' references private type 'SingleResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:207:1
+    | 
+207 | export declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+593 | export type SingleResult = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts:207:1
+    | 
+207 | export declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+    | ^
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'Context'
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:95:1
+   | 
+95 | export declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+30 | export interface Context {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'InitialQueryBuilder'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:95:1
+    | 
+ 95 | export declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+428 | export type InitialQueryBuilder = Pick<BaseQueryBuilder<Context>, `from` | `unionAll`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'QueryBuilder'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:95:1
+    | 
+ 95 | export declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+430 | export type QueryBuilder<TContext extends Context> = Omit<BaseQueryBuilder<TContext>, `from` | `unionAll` | `_getQuery`>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'GetResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:95:1
+    | 
+ 95 | export declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+587 | export type GetResult<TContext extends Context> = Prettify<ResultValue<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'InferResultType'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:95:1
+    | 
+ 95 | export declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+541 | export type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'Collection'
+  --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:95:1
+   | 
+95 | export declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+20 | export interface Collection<T extends object = Record<string, unknown>, TKey extends string | number = string | number, TUtils extends UtilsRecord = UtilsRecord, TSchema extends StandardSchemaV1 = StandardSchemaV1, TInsertInput extends object = T> extends CollectionImpl<T, TKey, TUtils, TSchema, TInsertInput> {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'LiveQueryCollectionConfig'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:100:1
+    | 
+100 | export declare function useLiveSuspenseQuery<TContext extends Context>(config: LiveQueryCollectionConfig<TContext>, deps?: Array<unknown>): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 45 | export interface LiveQueryCollectionConfig<TContext extends Context, TResult extends object = RootQueryResult<TContext>> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:100:1
+    | 
+100 | export declare function useLiveSuspenseQuery<TContext extends Context>(config: LiveQueryCollectionConfig<TContext>, deps?: Array<unknown>): {
+    | ^
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'NonSingleResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:105:1
+    | 
+105 | export declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & NonSingleResult): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+596 | export type NonSingleResult = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:105:1
+    | 
+105 | export declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & NonSingleResult): {
+    | ^
+
+
+error[private-type-ref]: public type 'useLiveSuspenseQuery' references private type 'SingleResult'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:110:1
+    | 
+110 | export declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+593 | export type SingleResult = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts:110:1
+    | 
+110 | export declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/query-core/5.101.0/build/modern/_tsup-dts-rollup.d.ts:163:1
+    | 
+163 | declare interface DehydratedState {
+    | ^
+
+
+error[private-type-ref]: public type 'DehydratedState["mutations"]' references private type 'DehydratedMutation'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/query-core/5.101.0/build/modern/_tsup-dts-rollup.d.ts:164:5
+    | 
+164 |     mutations: Array<DehydratedMutation>;
+    |     ^
+    = hint: make the referenced type public or remove the reference
+    | 
+146 | declare interface DehydratedMutation {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/query-core/5.101.0/build/modern/_tsup-dts-rollup.d.ts:164:5
+    | 
+164 |     mutations: Array<DehydratedMutation>;
+    |     ^
+
+
+error[private-type-ref]: public type 'DehydratedState["queries"]' references private type 'DehydratedQuery'
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/query-core/5.101.0/build/modern/_tsup-dts-rollup.d.ts:165:5
+    | 
+165 |     queries: Array<DehydratedQuery>;
+    |     ^
+    = hint: make the referenced type public or remove the reference
+    | 
+153 | declare interface DehydratedQuery {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/query-core/5.101.0/build/modern/_tsup-dts-rollup.d.ts:165:5
+    | 
+165 |     queries: Array<DehydratedQuery>;
+    |     ^
+
+
+error[private-type-ref]: public type 'dehydrateQueryClient' references private type 'QueryClient'
+    --> /home/runner/work/netscript/netscript/packages/fresh/query/hydration.ts:26:1
+     | 
+  26 | export function dehydrateQueryClient(queryClient: QueryClient): DehydratedState {
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'hydrateFromDehydrated' references private type 'QueryClient'
+    --> /home/runner/work/netscript/netscript/packages/fresh/query/hydration.ts:39:1
+     | 
+  39 | export function hydrateFromDehydrated(
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1285 | declare class QueryClient {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error: Found 88 documentation lint errors.

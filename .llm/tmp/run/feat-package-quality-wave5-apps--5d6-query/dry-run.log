@@ -1,0 +1,461 @@
+Checking for slow types in the public API...
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/runtime.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/error/handler.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/error/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/error/primitives.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/collection-keys.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/config.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/error-normalization.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/errors.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/field-descriptors.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/handler-context.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/idempotency.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/intent.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/pipeline.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/reply.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/schema-adapter.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/state.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/telemetry.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/hooks/use-promise.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/interactive.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/hooks.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/hydration.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/query-client.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/query/query-island.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/route/contract.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/route/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/server.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/server/define-fresh-app.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/server/stream-error-boundary.tsx
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/server/stream.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/streams/create-stream-db.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/streams/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/utils/cache-entry.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[excluded-module]: module in package's module graph was excluded from publishing
+ --> /home/runner/work/netscript/netscript/packages/fresh/utils/mod.ts
+  = hint: remove the module from 'exclude' and/or 'publish.exclude' in the config file or use 'publish.exclude' with a negative glob to unexclude from gitignore
+
+  info: excluded modules referenced via a package export will error at runtime due to not existing in the package
+  docs: https://jsr.io/go/excluded-module
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:240:17
+    | 
+240 | export function getSubmissionHiddenInputProps(submissionId: string) {
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx:10:17
+   | 
+10 | export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+   |                 ^^^^^^^^^^ this function is missing an explicit return type
+   | 
+   = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+  --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx:21:17
+   | 
+21 | export function Form<TValues extends FormValues>({
+   |                 ^^^^ this function is missing an explicit return type
+   | 
+   = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+  --> /home/runner/work/netscript/netscript/packages/fresh/query/query-island.tsx:40:17
+   | 
+40 | export function QueryIsland({ children, queryClient }: QueryIslandProps) {
+   |                 ^^^^^^^^^^^ this function is missing an explicit return type
+   | 
+   = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+This package contains errors for slow types. Fixing these errors will:
+
+  1. Significantly improve your package users' type checking performance.
+  2. Improve the automatic documentation generation.
+  3. Enable automatic .d.ts generation for Node.js.
+
+Don't want to bother? You can choose to skip this step by
+providing the --allow-slow-types flag.
+
+error: Found 62 problems

@@ -1,0 +1,267 @@
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx:24:1
+   | 
+24 | export interface ErrorDisplayProps {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx:25:3
+   | 
+25 |   error: ErrorData;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx:26:3
+   | 
+26 |   title?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx:27:3
+   | 
+27 |   showRetry?: boolean;
+   |   ^
+
+
+error[private-type-ref]: public type 'ErrorDisplayProps["children"]' references private type 'ComponentChildren'
+  --> /home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx:37:3
+   | 
+37 |   children?: ComponentChildren | ((props: ErrorPrimitives) => ComponentChildren);
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'ErrorDisplay' references private type 'ComponentChildren'
+  --> /home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisplay.tsx:97:1
+   | 
+97 | export function ErrorDisplay({
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DeferComponent' references private type 'DeferComponentProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx:113:1
+    | 
+113 | export function DeferComponent({
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 23 | export interface DeferComponentProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DeferComponent' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx:113:1
+    | 
+113 | export function DeferComponent({
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DeferComponent' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx:113:1
+    | 
+113 | export function DeferComponent({
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DeferPage' references private type 'DeferPageProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:114:1
+    | 
+114 | export function DeferPage({
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 29 | export interface DeferPageProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DeferPage' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:114:1
+    | 
+114 | export function DeferPage({
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DeferPage' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:114:1
+    | 
+114 | export function DeferPage({
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:27:14
+   | 
+27 | export const DEFER_POLICY = {
+   |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:32:14
+   | 
+32 | export const DEFER_STALE_MS = {
+   |              ^
+
+
+error[private-type-ref]: public type 'DETAIL_FORCE_REFRESH_POLICY' references private type 'DeferPolicyInput'
+  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:37:14
+   | 
+37 | export const DETAIL_FORCE_REFRESH_POLICY: DeferPolicyInput = {
+   |              ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 9 | export interface DeferPolicyInput {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:37:14
+   | 
+37 | export const DETAIL_FORCE_REFRESH_POLICY: DeferPolicyInput = {
+   |              ^
+
+
+error[private-type-ref]: public type 'resolveDetailDeferConfig' references private type 'DeferPolicyInput'
+  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:43:1
+   | 
+43 | export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 9 | export interface DeferPolicyInput {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'resolveDetailDeferConfig' references private type 'DeferPolicyProfile'
+  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:43:1
+   | 
+43 | export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 1 | export type DeferPolicyProfile =
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:43:1
+   | 
+43 | export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
+   | ^
+
+
+error[private-type-ref]: public type 'hasAllCacheEntries' references private type 'CacheEntryLike'
+  --> /home/runner/work/netscript/netscript/packages/fresh/utils/mod.ts:31:1
+   | 
+31 | export function hasAllCacheEntries(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+16 | export interface CacheEntryLike<T> {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'minCachedAt' references private type 'CacheEntryLike'
+  --> /home/runner/work/netscript/netscript/packages/fresh/utils/mod.ts:40:1
+   | 
+40 | export function minCachedAt(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+16 | export interface CacheEntryLike<T> {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'projectCachedItemFromList' references private type 'CachedListEntryLike'
+  --> /home/runner/work/netscript/netscript/packages/fresh/utils/mod.ts:49:1
+   | 
+49 | export function projectCachedItemFromList<TItem>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+26 | export interface CachedListEntryLike<TItem> extends CacheEntryLike<{ items: TItem[] }> {}
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'projectCachedItemFromList' references private type 'CacheEntryLike'
+  --> /home/runner/work/netscript/netscript/packages/fresh/utils/mod.ts:49:1
+   | 
+49 | export function projectCachedItemFromList<TItem>(
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+16 | export interface CacheEntryLike<T> {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error: Found 23 documentation lint errors.

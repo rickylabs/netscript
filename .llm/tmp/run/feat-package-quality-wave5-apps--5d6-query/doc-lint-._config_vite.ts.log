@@ -1,0 +1,336 @@
+Warning Failed resolving types. Could not find package 'zlib' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:117:21
+Warning Failed resolving types. Could not find package 'zlib.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:116:21
+Warning Failed resolving types. Could not find package 'worker_threads.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:115:21
+Warning Failed resolving types. Could not find package 'wasi.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:114:21
+Warning Failed resolving types. Could not find package 'vm.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:113:21
+Warning Failed resolving types. Could not find package 'v8.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:112:21
+Warning Failed resolving types. Could not find package 'util' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:111:21
+Warning Failed resolving types. Could not find package 'util.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:110:21
+Warning Failed resolving types. Could not find package 'url.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:109:21
+Warning Failed resolving types. Could not find package 'tty.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:108:21
+Warning Failed resolving types. Could not find package 'trace_events.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:107:21
+Warning Failed resolving types. Could not find package 'tls.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:106:21
+Warning Failed resolving types. Could not find package 'timers' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:105:21
+Warning Failed resolving types. Could not find package 'timers.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:104:21
+Warning Failed resolving types. Could not find package 'test' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:103:21
+Warning Failed resolving types. Could not find package 'test.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:102:21
+Warning Failed resolving types. Could not find package 'string_decoder.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:101:21
+Warning Failed resolving types. Could not find package 'stream' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:100:21
+Warning Failed resolving types. Could not find package 'stream' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:99:21
+Warning Failed resolving types. Could not find package 'stream' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:98:21
+Warning Failed resolving types. Could not find package 'stream' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:97:21
+Warning Failed resolving types. Could not find package 'stream.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:96:21
+Warning Failed resolving types. Could not find package 'sqlite.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:95:21
+Warning Failed resolving types. Could not find package 'sea.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:94:21
+Warning Failed resolving types. Could not find package 'repl.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:93:21
+Warning Failed resolving types. Could not find package 'readline' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:92:21
+Warning Failed resolving types. Could not find package 'readline.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:91:21
+Warning Failed resolving types. Could not find package 'quic.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:90:21
+Warning Failed resolving types. Could not find package 'querystring.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:89:21
+Warning Failed resolving types. Could not find package 'punycode.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:88:21
+Warning Failed resolving types. Could not find package 'process.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:87:21
+Warning Failed resolving types. Could not find package 'perf_hooks.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:86:21
+Warning Failed resolving types. Could not find package 'path' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:85:21
+Warning Failed resolving types. Could not find package 'path' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:84:21
+Warning Failed resolving types. Could not find package 'path.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:83:21
+Warning Failed resolving types. Could not find package 'os.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:82:21
+Warning Failed resolving types. Could not find package 'net.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:81:21
+Warning Failed resolving types. Could not find package 'module.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:80:21
+Warning Failed resolving types. Could not find package 'inspector' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:79:21
+Warning Failed resolving types. Could not find package 'inspector.generated.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:78:21
+Warning Failed resolving types. Could not find package 'inspector.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:77:21
+Warning Failed resolving types. Could not find package 'https.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:76:21
+Warning Failed resolving types. Could not find package 'http2.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:75:21
+Warning Failed resolving types. Could not find package 'http.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:74:21
+Warning Failed resolving types. Could not find package 'fs' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:73:21
+Warning Failed resolving types. Could not find package 'fs.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:72:21
+Warning Failed resolving types. Could not find package 'events.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:71:21
+Warning Failed resolving types. Could not find package 'domain.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:70:21
+Warning Failed resolving types. Could not find package 'dns' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:69:21
+Warning Failed resolving types. Could not find package 'dns.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:68:21
+Warning Failed resolving types. Could not find package 'diagnostics_channel.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:67:21
+Warning Failed resolving types. Could not find package 'dgram.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:66:21
+Warning Failed resolving types. Could not find package 'crypto.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:65:21
+Warning Failed resolving types. Could not find package 'constants.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:64:21
+Warning Failed resolving types. Could not find package 'console.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:63:21
+Warning Failed resolving types. Could not find package 'cluster.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:62:21
+Warning Failed resolving types. Could not find package 'child_process.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:61:21
+Warning Failed resolving types. Could not find package 'buffer.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:60:21
+Warning Failed resolving types. Could not find package 'async_hooks.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:59:21
+Warning Failed resolving types. Could not find package 'assert' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:58:21
+Warning Failed resolving types. Could not find package 'assert.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:57:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:56:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:55:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:54:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:53:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:52:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:51:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:50:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:49:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:48:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:47:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:46:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:45:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:44:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:43:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:42:21
+Warning Failed resolving types. Could not find package 'web-globals' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:41:21
+Warning Failed resolving types. Could not find package 'globals.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:40:21
+Warning Failed resolving types. Could not find package 'buffer.buffer.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:37:21
+Warning Failed resolving types. Could not find package 'globals.typedarray.d.ts' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:36:21
+Warning Failed resolving types. Could not find package 'compatibility' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts' (@types/node@25.9.1).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/@types/node/25.9.1/index.d.ts:33:21
+Warning Failed resolving types. Could not find package 'terser' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/terserOptions.d.ts' (vite@7.2.2).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/terserOptions.d.ts:4:30
+Warning Failed resolving types. Could not find package 'stylus' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts' (vite@7.2.2).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts:10:25
+Warning Failed resolving types. Could not find package 'less' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts' (vite@7.2.2).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts:8:23
+Warning Failed resolving types. Could not find package 'sass-embedded' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts' (vite@7.2.2).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts:6:31
+Warning Failed resolving types. Could not find package 'sass' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts' (vite@7.2.2).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/cssPreprocessorOptions.d.ts:4:27
+Warning Failed resolving types. Could not find package 'lightningcss' from referrer 'file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/lightningcssOptions.d.ts' (vite@7.2.2).
+    at file:///home/runner/.cache/deno/npm/registry.npmjs.org/vite/7.2.2/types/internal/lightningcssOptions.d.ts:4:31
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:30:1
+   | 
+30 | export interface NetScriptViteEnvMapping {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:31:3
+   | 
+31 |   source: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:32:3
+   | 
+32 |   target: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:33:3
+   | 
+33 |   fallback?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:36:1
+   | 
+36 | export interface NetScriptVitePluginOptions {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:37:3
+   | 
+37 |   appRoot?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:38:3
+   | 
+38 |   workspaceRoot?: string;
+   |   ^
+
+
+error[private-type-ref]: public type 'NetScriptVitePluginOptions["aliasEntries"]' references private type 'NetScriptViteAlias'
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:39:3
+   | 
+39 |   aliasEntries?: NetScriptViteAlias[];
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+25 | interface NetScriptViteAlias {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:39:3
+   | 
+39 |   aliasEntries?: NetScriptViteAlias[];
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:40:3
+   | 
+40 |   aliasDirectories?: string[];
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:41:3
+   | 
+41 |   aliasPrefix?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:42:3
+   | 
+42 |   watchPaths?: string[];
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:43:3
+   | 
+43 |   envMappings?: NetScriptViteEnvMapping[];
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:44:3
+   | 
+44 |   env?: Record<string, string | undefined>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:45:3
+   | 
+45 |   allowFsPaths?: string[];
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:46:3
+   | 
+46 |   includeWorkspaceRootInFsAllow?: boolean;
+   |   ^
+
+
+error[private-type-ref]: public type 'NetScriptVitePluginOptions["routeManifest"]' references private type 'NetScriptRouteManifestOptions'
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:47:3
+   | 
+47 |   routeManifest?: NetScriptRouteManifestOptions;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 6 | export interface NetScriptRouteManifestOptions {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:47:3
+   | 
+47 |   routeManifest?: NetScriptRouteManifestOptions;
+   |   ^
+
+
+error[private-type-ref]: public type 'createNetScriptVitePlugin' references private type 'Plugin'
+    --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:129:1
+     | 
+ 129 | export function createNetScriptVitePlugin(options: NetScriptVitePluginOptions = {}): Plugin {
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+2694 | interface Plugin<A = any> extends Rollup.Plugin<A> {
+     | - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/config/vite.ts:129:1
+    | 
+129 | export function createNetScriptVitePlugin(options: NetScriptVitePluginOptions = {}): Plugin {
+    | ^
+
+
+error: Found 20 documentation lint errors.
