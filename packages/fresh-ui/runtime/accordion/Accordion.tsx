@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -28,7 +28,7 @@ function withChildren(children: ComponentChildren) {
   return children;
 }
 
-function AccordionRoot({ children, ...options }: AccordionRootProps): unknown {
+function AccordionRoot({ children, ...options }: AccordionRootProps): VNode {
   const accordion = useAccordion(options);
   return (
     <AccordionContext.Provider value={accordion}>
@@ -37,7 +37,7 @@ function AccordionRoot({ children, ...options }: AccordionRootProps): unknown {
   );
 }
 
-function AccordionItem({ children, disabled, value, ...props }: AccordionItemProps): unknown {
+function AccordionItem({ children, disabled, value, ...props }: AccordionItemProps): VNode {
   const accordion = useAccordionContext('Accordion.Item');
   const item = { disabled, value };
 
@@ -50,7 +50,7 @@ function AccordionItem({ children, disabled, value, ...props }: AccordionItemPro
   );
 }
 
-function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps): unknown {
+function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps): VNode {
   const accordion = useAccordionContext('Accordion.ItemTrigger');
   const item = useAccordionItemContext('Accordion.ItemTrigger');
   const triggerProps = accordion.getItemTriggerProps(item, props);
@@ -71,13 +71,13 @@ function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps)
   );
 }
 
-function AccordionItemIndicator({ children, ...props }: AccordionItemIndicatorProps): unknown {
+function AccordionItemIndicator({ children, ...props }: AccordionItemIndicatorProps): VNode {
   const accordion = useAccordionContext('Accordion.ItemIndicator');
   const item = useAccordionItemContext('Accordion.ItemIndicator');
   return <div {...accordion.getItemIndicatorProps(item, props)}>{withChildren(children)}</div>;
 }
 
-function AccordionItemContent({ children, ...props }: AccordionItemContentProps): unknown {
+function AccordionItemContent({ children, ...props }: AccordionItemContentProps): VNode {
   const accordion = useAccordionContext('Accordion.ItemContent');
   const item = useAccordionItemContext('Accordion.ItemContent');
   return <div {...accordion.getItemContentProps(item, props)}>{withChildren(children)}</div>;
