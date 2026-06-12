@@ -97,6 +97,8 @@ only if the generated app should ship it by default.
 | 2026-06-12 | Slice 3 | gates | CLI registry test/check passed; framework package check/test/tokens and both DS fitness gates passed; repo-genesis package check/test passed. |
 | 2026-06-12 | Slice 4 | implementation | Copied `sheet.css` and `floating.css` into the repo-genesis playground, imported them from `assets/styles.css`, and added a Fresh island demo for Sheet, Popover, and Tooltip on `/design/components`. |
 | 2026-06-12 | Slice 4 | gates | Framework package check/test/tokens and both DS fitness gates passed; focused playground fmt/lint/check passed; browser report passed with desktop, popover, tooltip, sheet, mobile 390x844, reduced-motion, and theme-flip screenshots. |
+| 2026-06-12 | Slice 5 | implementation | Moved all 11 fresh-ui tests under `packages/fresh-ui/tests/`, retargeted imports to source files, changed publish exclusion to structural `tests/**`, narrowed the package test task to `tests/**/*.ts(x)`, and aligned framework package version to `0.1.0`. |
+| 2026-06-12 | Slice 5 | gates | Framework package check/test/tokens and both DS fitness gates passed; repo-genesis fresh-ui package check/test passed. |
 
 ## Decisions
 
@@ -125,6 +127,7 @@ only if the generated app should ship it by default.
 | framework repo lacks `apps/playground`; visual gallery changes live in repo-genesis only. | minor | yes |
 | Playwright MCP profile locked; isolated Playwright Core script used installed Chrome for browser evidence. | minor | yes |
 | Full playground `deno task check` blocked by unrelated CRLF-only fmt drift in existing copied files. | minor | yes |
+| Bare package `deno fmt --check` finds no targets under current fmt ownership. | minor | yes |
 
 ## Gate Results
 
@@ -159,6 +162,12 @@ only if the generated app should ship it by default.
 | Slice 4 playground focused lint | `deno lint islands/design/FloatingSurfaceDemo.tsx routes/(design)/design/components.tsx` | PASS | Touched TSX files only. |
 | Slice 4 playground focused check | `deno check --no-lock --unstable-kv islands/design/FloatingSurfaceDemo.tsx routes/(design)/design/components.tsx` | PASS | Root lock clean after restore. |
 | Slice 4 playground full check | `deno task check` from outer `apps/playground` | FAIL_DRIFT | Pre-existing CRLF-only fmt drift in unrelated copied files; logged in drift.md and not normalized. |
+| Slice 5 package check | `deno task check` from `packages/fresh-ui` | PASS | Checks source and relocated `tests/` files. |
+| Slice 5 package test | `deno task test` from `packages/fresh-ui` | PASS | 36 passed from `tests/`. |
+| Slice 5 tokens | `deno task tokens:check` from `packages/fresh-ui` | PASS | Generated token artifacts had no diff. |
+| Slice 5 repo-genesis check | `deno task check` from outer `packages/fresh-ui` | PASS | Explicit source list unchanged; tests compile through `deno task test`. |
+| Slice 5 repo-genesis test | `deno task test` from outer `packages/fresh-ui` | PASS | 36 passed from `tests/`. |
+| Slice 5 package fmt probe | `deno fmt --check` from `packages/fresh-ui` | FAIL_DRIFT | No target files found; fmt ownership is locked to Slice 6. |
 
 ### Fitness Gates
 
@@ -175,6 +184,8 @@ only if the generated app should ship it by default.
 | DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 3; 93 files clean. |
 | DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | Slice 4; 93 files clean. |
 | DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 4; 93 files clean. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | Slice 5; 93 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | Slice 5; 93 files clean. |
 
 ### Runtime Gates
 
@@ -201,3 +212,5 @@ only if the generated app should ship it by default.
 - Slice 3 implementation commits: framework `84558e0e2eab6d314763fa1d339a173786e15a34`;
   repo-genesis `5137ec90f7e3a758601d2ce3cf6373c5768cae37`.
 - Slice 4 implementation commit: repo-genesis `84748b56be0199a193bf556a454d62fd55937c02`.
+- Slice 5 implementation commits: framework `c7014af6d3cea8f28cebd78c929765dc9234202e`;
+  repo-genesis `c83d2e1639b1ffd846b934ec156513a34a11a093`.

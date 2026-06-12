@@ -23,3 +23,6 @@ Format:
 - 5137ec90f7e3a758601d2ce3cf6373c5768cae37: fresh-ui: sync registry support relocation
 - 8102fa2: harness: record fresh-ui registry payload slice
 - 84748b56be0199a193bf556a454d62fd55937c02: playground: wire sheet and floating style demos
+- 986e889e35ccad034f845a13e403905fdb756aad: harness: record fresh-ui visual style slice
+- c7014af6d3cea8f28cebd78c929765dc9234202e: fresh-ui: consolidate tests and align version
+- c83d2e1639b1ffd846b934ec156513a34a11a093: fresh-ui: sync test layout and publish version

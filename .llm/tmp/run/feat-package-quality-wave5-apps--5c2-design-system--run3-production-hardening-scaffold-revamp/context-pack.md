@@ -13,7 +13,7 @@
 ## Current State
 
 Run 3 artifacts are created and the user-provided 16-slice table is locked in `plan.md`.
-OpenHands PLAN-EVAL passed. Slices 1, 2, 3, and 4 are implemented. Slices 1-3 touched the
+OpenHands PLAN-EVAL passed. Slices 1, 2, 3, 4, and 5 are implemented. Slices 1-3 touched the
 framework package/CLI and repo-genesis package copy; Slice 4 visual gallery work lives in the outer
 repo-genesis playground because the framework worktree has no `apps/` directory.
 
@@ -47,16 +47,21 @@ repo-genesis playground because the framework worktree has no `apps/` directory.
 - Slice 4 gates passed: framework package check/test/tokens, DS no-raw-hex, DS color utilities,
   focused playground fmt/lint/check, and browser validation with screenshots/report. Full
   playground `deno task check` is blocked by unrelated pre-existing CRLF fmt drift.
+- Slice 5 C-5/C-6 cleanup: moved all fresh-ui tests under `tests/`, made publish exclusion
+  structural with `tests/**`, narrowed the test task to `tests/**/*.ts(x)`, and aligned framework
+  package version with registry manifest `0.1.0`.
+- Slice 5 gates passed: framework package check/test/tokens, DS no-raw-hex, DS color utilities,
+  repo-genesis fresh-ui package check/test.
 
 ## In Progress
 
-- Slice 4 bookkeeping commit pending, then push both repos and post the PR comment.
+- Slice 5 bookkeeping commit pending, then push both repos and post the PR comment.
 
 ## Next Steps
 
-1. Commit Slice 4 browser evidence/bookkeeping and push both repos.
-2. Post the Slice 4 PR comment.
-3. Start Slice 5: C-5 consolidate tests under `tests/` and C-6 version coherence (`0.1.0`).
+1. Commit Slice 5 bookkeeping and push both repos.
+2. Post the Slice 5 PR comment.
+3. Start Slice 6: C-7 fmt ownership and C-8 gate promotion into `arch:check`.
 
 ## Key Decisions
 
@@ -69,6 +74,7 @@ repo-genesis playground because the framework worktree has no `apps/` directory.
 | Track package-local fresh-ui lock. | User approval | Explicit `--lock=deno.lock` avoids root lock ownership. |
 | Keep manifest/schema outside the copy payload. | Plan C-3 | `ui:add` resolves root `registry.manifest.ts`. |
 | Use repo-genesis playground for visual gallery slices. | Filesystem | Framework repo has no `apps/playground`; outer repo-genesis does. |
+| Tests live structurally under `tests/`. | Plan C-5 | Publish exclusion is `tests/**`, not test-name globs. |
 
 ## Files Changed
 
@@ -97,6 +103,10 @@ repo-genesis playground because the framework worktree has no `apps/` directory.
 | outer `apps/playground/islands/design/FloatingSurfaceDemo.tsx` | new | Live Sheet/Popover/Tooltip gallery demos. |
 | outer `apps/playground/routes/(design)/design/components.tsx` | changed | Renders demos for `sheet-styles` and `floating-styles`. |
 | run `slice4-browser-report.json` and screenshots | new | Browser evidence for visual gate. |
+| `packages/fresh-ui/tests/` | moved | All framework tests consolidated under structural test root. |
+| outer `packages/fresh-ui/tests/` | moved | Repo-genesis fresh-ui copy synced. |
+| `packages/fresh-ui/deno.json` | changed | Version `0.1.0`, structural publish exclude, tests task. |
+| outer `packages/fresh-ui/deno.json` | changed | Structural publish exclude and tests task; version was already `0.1.0`. |
 
 ## Gates
 
@@ -105,7 +115,7 @@ repo-genesis playground because the framework worktree has no `apps/` directory.
 | Static | PASS | Plan-Gate PASS; package check/test/tokens PASS. |
 | Fitness | PASS | DS no-raw-hex and DS color utilities PASS. |
 | Runtime | PASS | Slice 4 Playwright Core browser report: real `/design/components`, theme flip, mobile, reduced motion, interactions. |
-| Consumer | PASS_WITH_DRIFT | Focused playground fmt/lint/check PASS; full playground check blocked by unrelated CRLF fmt drift. |
+| Consumer | PASS_WITH_DRIFT | Repo-genesis package check/test PASS; playground focused gates PASS; full playground check blocked by unrelated CRLF fmt drift. |
 
 ## Open Questions
 
@@ -117,7 +127,8 @@ repo-genesis playground because the framework worktree has no `apps/` directory.
   `.resources/deps-docs/`, unavailable `rg`/`rtk grep`, prior Zag proof clarification, and
   broader pre-existing repo-genesis fresh-ui copy drift including the larger outer package lock and
   missing outer CLI source path for Slice 3 sync. Slice 4 adds framework `apps/playground` absence,
-  Playwright MCP profile lock, and playground full-check CRLF fmt drift.
+  Playwright MCP profile lock, and playground full-check CRLF fmt drift. Slice 5 adds package fmt
+  no-target probe, deferred to Slice 6.
 - Debt: no new architecture debt created.
 
 ## Commits
@@ -129,3 +140,5 @@ repo-genesis playground because the framework worktree has no `apps/` directory.
 - `84558e0e2eab6d314763fa1d339a173786e15a34`: fresh-ui: move registry support files out of payload
 - `5137ec90f7e3a758601d2ce3cf6373c5768cae37`: fresh-ui: sync registry support relocation
 - `84748b56be0199a193bf556a454d62fd55937c02`: playground: wire sheet and floating style demos
+- `c7014af6d3cea8f28cebd78c929765dc9234202e`: fresh-ui: consolidate tests and align version
+- `c83d2e1639b1ffd846b934ec156513a34a11a093`: fresh-ui: sync test layout and publish version

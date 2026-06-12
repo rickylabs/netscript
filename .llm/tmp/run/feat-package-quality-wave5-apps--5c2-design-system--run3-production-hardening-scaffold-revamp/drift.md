@@ -157,3 +157,14 @@ documentation.
 - **Severity:** minor
 - **Action:** defer to the fmt ownership slice or a dedicated playground normalization slice.
 - **Evidence:** focused gate rows in `worklog.md`; root `deno.lock` restored after checks.
+
+## 2026-06-12 - package fmt has no targets before fmt ownership slice
+
+- **What:** A bare `deno fmt --check` from `packages/fresh-ui` returns "No target files found" under
+  the current package fmt config.
+- **Source:** Slice 5 fmt probe after moving tests.
+- **Expected:** Package fmt ownership is resolved in locked Slice 6 (C-7).
+- **Actual:** Slice 5 does not rescope fmt ownership; package check/test/tokens and DS gates passed.
+- **Severity:** minor
+- **Action:** defer to Slice 6.
+- **Evidence:** `worklog.md` Slice 5 package fmt probe row.
