@@ -10,4 +10,4 @@ Format:
 
 ## Log
 
-- None yet.
+- b3cc69c: harness: lock run3 fresh-ui scaffold plan
