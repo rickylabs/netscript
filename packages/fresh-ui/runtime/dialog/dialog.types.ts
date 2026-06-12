@@ -1,13 +1,24 @@
 import type { ComponentChildren, JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 
-export type DialogTriggerElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & MachineDataAttributes;
-export type DialogContentElementProps = JSX.HTMLAttributes<HTMLDialogElement> & MachineDataAttributes & {
-  open?: boolean;
-};
-export type DialogTitleElementProps = JSX.HTMLAttributes<HTMLHeadingElement> & MachineDataAttributes;
-export type DialogDescriptionElementProps = JSX.HTMLAttributes<HTMLParagraphElement> & MachineDataAttributes;
-export type DialogCloseElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & MachineDataAttributes;
+export type DialogTriggerElementProps =
+  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & MachineDataAttributes;
+export type DialogContentElementProps =
+  & JSX.HTMLAttributes<HTMLDialogElement>
+  & MachineDataAttributes
+  & {
+    open?: boolean;
+  };
+export type DialogTitleElementProps =
+  & JSX.HTMLAttributes<HTMLHeadingElement>
+  & MachineDataAttributes;
+export type DialogDescriptionElementProps =
+  & JSX.HTMLAttributes<HTMLParagraphElement>
+  & MachineDataAttributes;
+export type DialogCloseElementProps =
+  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & MachineDataAttributes;
 
 export type DialogOpenChangeReason =
   | 'trigger'
@@ -34,9 +45,13 @@ export interface UseDialogOptions {
 export interface UseDialogReturn {
   getCloseProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => DialogCloseElementProps;
   getContentProps: (props?: JSX.HTMLAttributes<HTMLDialogElement>) => DialogContentElementProps;
-  getDescriptionProps: (props?: JSX.HTMLAttributes<HTMLParagraphElement>) => DialogDescriptionElementProps;
+  getDescriptionProps: (
+    props?: JSX.HTMLAttributes<HTMLParagraphElement>,
+  ) => DialogDescriptionElementProps;
   getTitleProps: (props?: JSX.HTMLAttributes<HTMLHeadingElement>) => DialogTitleElementProps;
-  getTriggerProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => DialogTriggerElementProps;
+  getTriggerProps: (
+    props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+  ) => DialogTriggerElementProps;
   ids: {
     content: string;
     description: string;
@@ -51,7 +66,8 @@ export interface DialogRootProps extends UseDialogOptions {
   children: ComponentChildren;
 }
 
-export interface DialogTriggerProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface DialogTriggerProps
+  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: ComponentChildren;
   type?: 'button' | 'submit' | 'reset';
 }
@@ -68,7 +84,8 @@ export interface DialogDescriptionProps extends JSX.HTMLAttributes<HTMLParagraph
   children: ComponentChildren;
 }
 
-export interface DialogCloseProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface DialogCloseProps
+  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: ComponentChildren;
   type?: 'button' | 'submit' | 'reset';
 }

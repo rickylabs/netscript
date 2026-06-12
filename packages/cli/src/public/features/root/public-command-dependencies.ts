@@ -81,6 +81,10 @@ export interface PublicCommandDependencies {
       readonly scaffoldWorkspacePackages: () => Promise<ReturnType<typeof emptyScaffoldResult>>;
     };
   };
+  /** Dependencies for Fresh UI registry installation commands. */
+  readonly uiInstallDependencies: {
+    readonly fs: DenoFileSystem;
+  };
   /** Dependencies for DB lifecycle commands. */
   readonly dbOperationDependencies: { readonly cwd: () => string };
   /** Dependencies for DB add. */
@@ -212,6 +216,7 @@ export function createPublicCommandDependencies(
         scaffoldWorkspacePackages: () => Promise.resolve(emptyScaffoldResult()),
       },
     },
+    uiInstallDependencies: { fs },
     dbOperationDependencies: { cwd: host.cwd },
     dbAddDependencies: {
       fs,

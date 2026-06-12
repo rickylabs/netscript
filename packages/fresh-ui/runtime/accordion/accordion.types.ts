@@ -3,9 +3,15 @@ import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 
 export type AccordionRootElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
 export type AccordionItemElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
-export type AccordionItemTriggerElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & MachineDataAttributes;
-export type AccordionItemIndicatorElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
-export type AccordionItemContentElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
+export type AccordionItemTriggerElementProps =
+  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & MachineDataAttributes;
+export type AccordionItemIndicatorElementProps =
+  & JSX.HTMLAttributes<HTMLDivElement>
+  & MachineDataAttributes;
+export type AccordionItemContentElementProps =
+  & JSX.HTMLAttributes<HTMLDivElement>
+  & MachineDataAttributes;
 
 export type AccordionOrientation = 'horizontal' | 'vertical';
 
@@ -50,7 +56,10 @@ export interface UseAccordionReturn {
     item: AccordionItemOptions,
     props?: JSX.HTMLAttributes<HTMLDivElement>,
   ) => AccordionItemIndicatorElementProps;
-  getItemProps: (item: AccordionItemOptions, props?: JSX.HTMLAttributes<HTMLDivElement>) => AccordionItemElementProps;
+  getItemProps: (
+    item: AccordionItemOptions,
+    props?: JSX.HTMLAttributes<HTMLDivElement>,
+  ) => AccordionItemElementProps;
   getItemState: (item: AccordionItemOptions) => AccordionItemState;
   getItemTriggerProps: (
     item: AccordionItemOptions,
@@ -71,7 +80,8 @@ export interface AccordionItemProps extends JSX.HTMLAttributes<HTMLDivElement> {
   value: string;
 }
 
-export interface AccordionItemTriggerProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface AccordionItemTriggerProps
+  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: ComponentChildren;
   type?: 'button' | 'submit' | 'reset';
 }

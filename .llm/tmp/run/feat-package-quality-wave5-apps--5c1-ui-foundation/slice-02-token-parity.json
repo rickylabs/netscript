@@ -1,0 +1,16 @@
+{
+  "root": {
+    "expected": 134,
+    "actual": 134,
+    "missing": [],
+    "extra": [],
+    "valueMismatches": []
+  },
+  "light": {
+    "expected": 27,
+    "actual": 27,
+    "missing": [],
+    "extra": [],
+    "valueMismatches": []
+  }
+}

@@ -7,7 +7,8 @@
  *
  * Collected operations are exposed via {@link DryRunFileSystemAdapter.operations}
  * and {@link DryRunFileSystemAdapter.getOperations} for rendering dry-run
- * output to the user.
+ * output to the user. Reads first consult recorded writes so later scaffold
+ * phases can patch files created earlier in the same dry-run.
  */
 
 import type { DirEntry, DryRunOperation, FileInfo, WalkEntry } from '../../domain/core-types.ts';
@@ -55,14 +56,20 @@ export class DryRunFileSystemAdapter implements FileSystemPort {
   /**
    * Read a file as UTF-8 text.
    *
-   * Delegates to the inner adapter so templates can be resolved during
-   * a dry-run scaffold.
+   * Returns recorded write content when a previous dry-run phase created or
+   * patched the file, then delegates to the inner adapter for source templates.
    *
    * @param path - Absolute path to the file.
    * @returns The file content as a string.
    * @throws If the file does not exist in the inner adapter.
    */
   async readFile(path: string): Promise<string> {
+    for (let i = this.operations.length - 1; i >= 0; i--) {
+      const op = this.operations[i];
+      if (op.path !== path) continue;
+      if (op.type === 'write' && op.content !== undefined) return op.content;
+      if (op.type === 'remove') break;
+    }
     return await this.#inner.readFile(path);
   }
 

@@ -1,17 +1,34 @@
 import type { ComponentChildren, JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
 
-export type PopoverTriggerElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & MachineDataAttributes;
+export type PopoverTriggerElementProps =
+  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & MachineDataAttributes;
 export type PopoverAnchorElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
-export type PopoverPositionerElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
+export type PopoverPositionerElementProps =
+  & JSX.HTMLAttributes<HTMLDivElement>
+  & MachineDataAttributes;
 export type PopoverContentElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
-export type PopoverTitleElementProps = JSX.HTMLAttributes<HTMLHeadingElement> & MachineDataAttributes;
-export type PopoverDescriptionElementProps = JSX.HTMLAttributes<HTMLParagraphElement> & MachineDataAttributes;
-export type PopoverCloseElementProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & MachineDataAttributes;
+export type PopoverTitleElementProps =
+  & JSX.HTMLAttributes<HTMLHeadingElement>
+  & MachineDataAttributes;
+export type PopoverDescriptionElementProps =
+  & JSX.HTMLAttributes<HTMLParagraphElement>
+  & MachineDataAttributes;
+export type PopoverCloseElementProps =
+  & JSX.ButtonHTMLAttributes<HTMLButtonElement>
+  & MachineDataAttributes;
 export type PopoverArrowElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
-export type PopoverArrowTipElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
+export type PopoverArrowTipElementProps =
+  & JSX.HTMLAttributes<HTMLDivElement>
+  & MachineDataAttributes;
 
-export type PopoverOpenChangeReason = 'trigger' | 'close-button' | 'escape-key' | 'interact-outside' | 'programmatic';
+export type PopoverOpenChangeReason =
+  | 'trigger'
+  | 'close-button'
+  | 'escape-key'
+  | 'interact-outside'
+  | 'programmatic';
 
 export interface PopoverOpenChangeDetails {
   reason: PopoverOpenChangeReason;
@@ -34,10 +51,14 @@ export interface UsePopoverReturn {
   getArrowTipProps: (props?: JSX.HTMLAttributes<HTMLDivElement>) => PopoverArrowTipElementProps;
   getCloseProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => PopoverCloseElementProps;
   getContentProps: (props?: JSX.HTMLAttributes<HTMLDivElement>) => PopoverContentElementProps;
-  getDescriptionProps: (props?: JSX.HTMLAttributes<HTMLParagraphElement>) => PopoverDescriptionElementProps;
+  getDescriptionProps: (
+    props?: JSX.HTMLAttributes<HTMLParagraphElement>,
+  ) => PopoverDescriptionElementProps;
   getPositionerProps: (props?: JSX.HTMLAttributes<HTMLDivElement>) => PopoverPositionerElementProps;
   getTitleProps: (props?: JSX.HTMLAttributes<HTMLHeadingElement>) => PopoverTitleElementProps;
-  getTriggerProps: (props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => PopoverTriggerElementProps;
+  getTriggerProps: (
+    props?: JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+  ) => PopoverTriggerElementProps;
   ids: {
     content: string;
     description: string;
@@ -53,7 +74,8 @@ export interface PopoverRootProps extends UsePopoverOptions {
   children: ComponentChildren;
 }
 
-export interface PopoverTriggerProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface PopoverTriggerProps
+  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children: ComponentChildren;
   type?: 'button' | 'submit' | 'reset';
 }
@@ -78,7 +100,8 @@ export interface PopoverDescriptionProps extends JSX.HTMLAttributes<HTMLParagrap
   children?: ComponentChildren;
 }
 
-export interface PopoverCloseProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface PopoverCloseProps
+  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   children?: ComponentChildren;
   type?: 'button' | 'submit' | 'reset';
 }

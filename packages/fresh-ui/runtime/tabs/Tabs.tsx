@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -21,22 +21,22 @@ function withChildren(children: ComponentChildren) {
   return children;
 }
 
-function TabsRoot({ children, ...options }: TabsRootProps): unknown {
+function TabsRoot({ children, ...options }: TabsRootProps): VNode {
   const tabs = useTabs(options);
   return <TabsContext.Provider value={tabs}>{children}</TabsContext.Provider>;
 }
 
-function TabsList({ children, ...props }: TabsListProps): unknown {
+function TabsList({ children, ...props }: TabsListProps): VNode {
   const tabs = useTabsContext('Tabs.List');
   return <div {...tabs.getListProps(props)}>{withChildren(children)}</div>;
 }
 
-function TabsTrigger({ children, value, ...props }: TabsTriggerProps): unknown {
+function TabsTrigger({ children, value, ...props }: TabsTriggerProps): VNode {
   const tabs = useTabsContext('Tabs.Trigger');
   return <button {...tabs.getTriggerProps(value, props)}>{withChildren(children)}</button>;
 }
 
-function TabsContent({ children, value, ...props }: TabsContentProps): unknown {
+function TabsContent({ children, value, ...props }: TabsContentProps): VNode {
   const tabs = useTabsContext('Tabs.Content');
   return <div {...tabs.getContentProps(value, props)}>{withChildren(children)}</div>;
 }

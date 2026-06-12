@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -23,32 +23,32 @@ function withChildren(children: ComponentChildren) {
   return children;
 }
 
-function DrawerRoot({ children, ...options }: DrawerRootProps): unknown {
+function DrawerRoot({ children, ...options }: DrawerRootProps): VNode {
   const drawer = useDrawer(options);
   return <DrawerContext.Provider value={drawer}>{children}</DrawerContext.Provider>;
 }
 
-function DrawerTrigger({ children, ...props }: DrawerTriggerProps): unknown {
+function DrawerTrigger({ children, ...props }: DrawerTriggerProps): VNode {
   const drawer = useDrawerContext('Drawer.Trigger');
   return <button {...drawer.getTriggerProps(props)}>{withChildren(children)}</button>;
 }
 
-function DrawerContent({ children, ...props }: DrawerContentProps): unknown {
+function DrawerContent({ children, ...props }: DrawerContentProps): VNode {
   const drawer = useDrawerContext('Drawer.Content');
   return <dialog {...drawer.getContentProps(props)}>{withChildren(children)}</dialog>;
 }
 
-function DrawerTitle({ children, ...props }: DrawerTitleProps): unknown {
+function DrawerTitle({ children, ...props }: DrawerTitleProps): VNode {
   const drawer = useDrawerContext('Drawer.Title');
   return <h2 {...drawer.getTitleProps(props)}>{withChildren(children)}</h2>;
 }
 
-function DrawerDescription({ children, ...props }: DrawerDescriptionProps): unknown {
+function DrawerDescription({ children, ...props }: DrawerDescriptionProps): VNode {
   const drawer = useDrawerContext('Drawer.Description');
   return <p {...drawer.getDescriptionProps(props)}>{withChildren(children)}</p>;
 }
 
-function DrawerClose({ children, ...props }: DrawerCloseProps): unknown {
+function DrawerClose({ children, ...props }: DrawerCloseProps): VNode {
   const drawer = useDrawerContext('Drawer.Close');
   return <button {...drawer.getCloseProps(props)}>{withChildren(children)}</button>;
 }

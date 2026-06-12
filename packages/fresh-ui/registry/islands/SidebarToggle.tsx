@@ -6,7 +6,8 @@ import type { Renderable } from '../lib/public-types.ts';
 /**
  * Props for the registry sidebar toggle island.
  */
-export interface SidebarToggleProps extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'class' | 'children'> {
+export interface SidebarToggleProps
+  extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'class' | 'children'> {
   class?: string;
   sidebarSelector?: string;
   backdropSelector?: string;
@@ -68,7 +69,10 @@ export default function SidebarToggle({
     <button
       {...props}
       type='button'
-      class={cn('ns-dashboard__mobile-trigger ns-btn ns-btn--ghost ns-btn--icon ns-btn--sm', className)}
+      class={cn(
+        'ns-dashboard__mobile-trigger ns-btn ns-btn--ghost ns-btn--icon ns-btn--sm',
+        className,
+      )}
       aria-label={open ? closeLabel : openLabel}
       aria-expanded={open}
       onClick={toggle}

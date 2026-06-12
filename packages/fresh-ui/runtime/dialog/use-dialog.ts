@@ -103,29 +103,45 @@ export function useDialog({
       'data-part': 'content',
       'data-state': dataState,
       id: props.id ?? contentId,
-      onCancel: composeEventHandlers(props.onCancel, (event: JSX.TargetedEvent<HTMLDialogElement, Event>) => {
-        if (!closeOnEscape) {
-          event.preventDefault();
-          return;
-        }
+      onCancel: composeEventHandlers(
+        props.onCancel,
+        (event: JSX.TargetedEvent<HTMLDialogElement, Event>) => {
+          if (!closeOnEscape) {
+            event.preventDefault();
+            return;
+          }
 
-        setOpen(false, 'escape-key');
-      }),
-      onClick: composeEventHandlers(props.onClick, (event: JSX.TargetedMouseEvent<HTMLDialogElement>) => {
-        if (!closeOnInteractOutside) {
-          return;
-        }
+          setOpen(false, 'escape-key');
+        },
+      ),
+      onClick: composeEventHandlers(
+        props.onClick,
+        (event: JSX.TargetedMouseEvent<HTMLDialogElement>) => {
+          if (!closeOnInteractOutside) {
+            return;
+          }
 
-        if (event.target === event.currentTarget) {
-          setOpen(false, 'interact-outside');
-        }
-      }),
+          if (event.target === event.currentTarget) {
+            setOpen(false, 'interact-outside');
+          }
+        },
+      ),
       onClose: composeEventHandlers(props.onClose, () => setOpen(false, 'native-close')),
       open: open ? true : undefined,
       ref: composeRefs(props.ref, contentRef),
       role: props.role ?? 'dialog',
     }),
-    [closeOnEscape, closeOnInteractOutside, contentId, dataState, descriptionId, modal, open, setOpen, titleId],
+    [
+      closeOnEscape,
+      closeOnInteractOutside,
+      contentId,
+      dataState,
+      descriptionId,
+      modal,
+      open,
+      setOpen,
+      titleId,
+    ],
   );
 
   const getTitleProps = useCallback(

@@ -1,0 +1,373 @@
+{
+  "$description": "Semantic NetScript UI token aliases transcribed from the default dark token seed.",
+  "semantic": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bg"
+        }
+      }
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{color.gray.1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-fg"
+        }
+      }
+    },
+    "surface": {
+      "$type": "color",
+      "$value": "{color.gray.11}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-surface"
+        }
+      }
+    },
+    "surface-raised": {
+      "$type": "color",
+      "$value": "{color.gray.10}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-surface-raised"
+        }
+      }
+    },
+    "overlay": {
+      "$type": "color",
+      "$value": "rgba(17, 17, 16, 0.8)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-overlay"
+        }
+      }
+    },
+    "card": {
+      "$type": "color",
+      "$value": "{color.gray.10}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card"
+        }
+      }
+    },
+    "card-fg": {
+      "$type": "color",
+      "$value": "{color.gray.1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-fg"
+        }
+      }
+    },
+    "primary": {
+      "$type": "color",
+      "$value": "{color.copper.6}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary"
+        }
+      }
+    },
+    "primary-fg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-fg"
+        }
+      }
+    },
+    "primary-hover": {
+      "$type": "color",
+      "$value": "{color.copper.7}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-hover"
+        }
+      }
+    },
+    "primary-subtle": {
+      "$type": "color",
+      "$value": "rgba(200, 149, 108, 0.08)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-subtle"
+        }
+      }
+    },
+    "primary-border": {
+      "$type": "color",
+      "$value": "rgba(200, 149, 108, 0.18)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-border"
+        }
+      }
+    },
+    "secondary": {
+      "$type": "color",
+      "$value": "{color.slate.5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-secondary"
+        }
+      }
+    },
+    "secondary-fg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-secondary-fg"
+        }
+      }
+    },
+    "secondary-hover": {
+      "$type": "color",
+      "$value": "{color.slate.6}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-secondary-hover"
+        }
+      }
+    },
+    "secondary-subtle": {
+      "$type": "color",
+      "$value": "rgba(144, 152, 166, 0.07)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-secondary-subtle"
+        }
+      }
+    },
+    "secondary-border": {
+      "$type": "color",
+      "$value": "rgba(144, 152, 166, 0.14)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-secondary-border"
+        }
+      }
+    },
+    "muted": {
+      "$type": "color",
+      "$value": "{color.gray.9}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-muted"
+        }
+      }
+    },
+    "muted-fg": {
+      "$type": "color",
+      "$value": "{color.gray.5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-muted-fg"
+        }
+      }
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "{color.copper.6}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-accent"
+        }
+      }
+    },
+    "accent-fg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-accent-fg"
+        }
+      }
+    },
+    "accent-subtle": {
+      "$type": "color",
+      "$value": "rgba(200, 149, 108, 0.08)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-accent-subtle"
+        }
+      }
+    },
+    "accent-border": {
+      "$type": "color",
+      "$value": "rgba(200, 149, 108, 0.18)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-accent-border"
+        }
+      }
+    },
+    "success": {
+      "$type": "color",
+      "$value": "{color.teal.5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-success"
+        }
+      }
+    },
+    "success-fg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-success-fg"
+        }
+      }
+    },
+    "success-subtle": {
+      "$type": "color",
+      "$value": "rgba(91, 168, 160, 0.07)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-success-subtle"
+        }
+      }
+    },
+    "success-border": {
+      "$type": "color",
+      "$value": "rgba(91, 168, 160, 0.15)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-success-border"
+        }
+      }
+    },
+    "warning": {
+      "$type": "color",
+      "$value": "{color.amber.5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-warning"
+        }
+      }
+    },
+    "warning-fg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-warning-fg"
+        }
+      }
+    },
+    "warning-subtle": {
+      "$type": "color",
+      "$value": "rgba(224, 174, 79, 0.08)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-warning-subtle"
+        }
+      }
+    },
+    "warning-border": {
+      "$type": "color",
+      "$value": "rgba(224, 174, 79, 0.16)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-warning-border"
+        }
+      }
+    },
+    "destructive": {
+      "$type": "color",
+      "$value": "{color.red.5}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-destructive"
+        }
+      }
+    },
+    "destructive-fg": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff"
+      },
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-destructive-fg"
+        }
+      }
+    },
+    "destructive-subtle": {
+      "$type": "color",
+      "$value": "rgba(224, 69, 69, 0.08)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-destructive-subtle"
+        }
+      }
+    },
+    "destructive-border": {
+      "$type": "color",
+      "$value": "rgba(224, 69, 69, 0.16)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-destructive-border"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(235, 228, 210, 0.06)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border"
+        }
+      }
+    },
+    "border-hover": {
+      "$type": "color",
+      "$value": "rgba(235, 228, 210, 0.12)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border-hover"
+        }
+      }
+    },
+    "border-strong": {
+      "$type": "color",
+      "$value": "rgba(235, 228, 210, 0.18)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border-strong"
+        }
+      }
+    },
+    "input-border": {
+      "$type": "color",
+      "$value": "rgba(235, 228, 210, 0.1)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-input-border"
+        }
+      }
+    },
+    "ring": {
+      "$type": "color",
+      "$value": "{color.copper.6}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-ring"
+        }
+      }
+    }
+  }
+}

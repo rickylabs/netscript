@@ -28,8 +28,7 @@ export interface SidebarNavSection {
   items: readonly SidebarNavItem[];
 }
 
-interface SidebarShellProps
-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+interface SidebarShellProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
   children: Renderable;
   class?: string;
   pathname: string;

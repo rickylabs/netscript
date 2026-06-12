@@ -1,0 +1,8 @@
+{
+  "lock": "./deno.lock",
+  "unstable": ["kv"],
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.14",
+    "style-dictionary": "npm:style-dictionary@5.0.0"
+  }
+}
