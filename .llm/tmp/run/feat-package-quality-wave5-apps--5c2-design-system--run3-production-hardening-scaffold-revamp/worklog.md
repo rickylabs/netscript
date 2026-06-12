@@ -553,3 +553,63 @@ only if the generated app should ship it by default.
 
 - Framework: `cd30ffdf2bfb66557191b70b275614659e5a378f`
 - Repo-genesis: N/A, CLI package absent from outer worktree.
+
+## 2026-06-12 - Slice 14: scaffolded app design routes
+
+### Changed
+
+- Ported the playground `/design/tokens`, `/design/components`, and `/design/composition` routes
+  into the CLI app scaffold templates.
+- Added scaffold templates for design route CSS, design registry metadata, token manifest helpers,
+  `TokenClipboard`, and `FloatingSurfaceDemo`.
+- Updated scaffold generation to create design route, design island, and design lib directories and
+  write those templates on every generated Fresh app.
+- Added the app `@netscript/fresh-ui/interactive` import-map entry in local and JSR resolver modes
+  so design floating/sheet demos use the package-owned L1 runtime.
+- Imported `assets/design.css` from the generated app client and added a data-URI favicon in the app
+  shell to avoid browser console noise from `/favicon.ico`.
+- Added focused template/import-map tests and run artifacts:
+  `slice14-design-routes-browser-report.md`, `slice14-browser-gate.ts`, and three 390x844 route
+  screenshots.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| focused CLI fmt | PASS | `deno fmt --check --no-config ...` | 12 touched TS files checked. |
+| focused CLI lint | PASS | `deno lint --no-config ...` | Includes the browser-gate artifact script. |
+| targeted check | PASS | `deno check --unstable-kv ...` | Scaffold writer, template loader, app deno generator, JSR resolver, and route template tests checked. |
+| focused CLI tests | PASS | `deno test --allow-read --allow-write --allow-env --allow-run ...` | 16 tests / 42 BDD steps passed across route templates, app generator config, JSR resolver, template registry, orchestrate init, scaffolder, and ui registry. |
+| generated scaffold smoke | PASS | `netscript-dev init slice14-design ...` | Created 103 files / 23 directories; copied 21 local packages. |
+| generated app assertions | PASS | PowerShell `Test-Path` / `Select-String` checks | Design routes/libs/islands/css, interactive import map, design CSS import, and favicon all present. |
+| generated app check | PASS | `deno check --unstable-kv apps/dashboard` from generated workspace | Checked all generated design routes, design islands/libs, copied registry UI, and Fresh app entrypoints. |
+| browser validation | PASS | local Playwright MCP against `http://127.0.0.1:5173` | `/design/tokens`, `/design/components`, `/design/composition` returned expected titles/content, 0 console errors, and no 390x844 document overflow. Theme flip passed on `/design/tokens`. |
+| reduced motion | PASS with static evidence | `assets/design.css.template` and generated route render | Local MCP lacks media emulation; CSS contains `@media (prefers-reduced-motion: reduce)` disabling design-route transitions/transforms. |
+| package check | PASS | `deno task check` from framework `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `deno task test` from framework `packages/fresh-ui` | 39 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from framework `packages/fresh-ui` | Generated token artifacts stable; Git emitted CRLF warning only. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 95 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 95 files clean. |
+| arch:check | PASS | `deno task arch:check` from framework root | 0 fail, 1 existing manifest-size warn. |
+| root lock hygiene | PASS | `git checkout -- deno.lock`, `git status --short` | Temporary Playwright npm probe touched root `deno.lock`; restored before staging. |
+| copy fidelity | N/A | CLI package absent from repo-genesis | No outer-worktree sync target for this slice. |
+
+### Drift
+
+- The Impeccable `reference/product.md` file is absent in this checkout; continued with the loaded
+  general Impeccable/design guidance, existing fresh-ui token/component docs, and live browser
+  checks.
+- Deno Playwright could resolve `npm:playwright`, but its bundled Chromium was not installed; using
+  installed Chrome through Deno then failed in the Deno npm child-process shim with
+  `The handle is invalid. (os error 6)`.
+- Firecrawl's remote browser could open the localhost URL but did not observe local app content, so
+  it was not used as evidence.
+- The local Playwright MCP initially had a stale MCP Chrome profile lock; only processes using the
+  MCP profile path were stopped, then route validation passed.
+- The local Playwright MCP does not expose reduced-motion media emulation, so reduced-motion
+  validation for Slice 14 is static CSS evidence plus route render rather than emulated media.
+
+### Commits
+
+- Framework: `8edbd45e6f06d734870f6504384a240bbed5f051`
+- Repo-genesis: N/A, CLI package absent from outer worktree.

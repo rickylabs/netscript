@@ -296,3 +296,44 @@ documentation.
 - **Action:** for scaffold smoke checks, run Deno from the generated project root or check for
   actual file targets in the output.
 - **Evidence:** `slice13-scaffold-ui-init-smoke.md`.
+
+## 2026-06-12 - impeccable product register reference absent
+
+- **What:** The Impeccable skill requested `reference/product.md` for app/dashboard surfaces, but
+  the reference file is absent in this checkout.
+- **Source:** `Get-Content .agents/skills/impeccable/reference/product.md` failed during Slice 14
+  setup.
+- **Expected:** Load the product-register reference before visual/frontend implementation.
+- **Actual:** Continued with the loaded general Impeccable guidance, frontend-design skill,
+  fresh-ui conventions, existing playground implementation, and live browser route checks.
+- **Severity:** minor
+- **Action:** accept for this run; do not block Slice 14 on a missing skill reference file.
+- **Evidence:** Slice 14 worklog and `slice14-design-routes-browser-report.md`.
+
+## 2026-06-12 - reduced-motion browser emulation unavailable in local MCP
+
+- **What:** Slice 14 local browser validation could not emulate `prefers-reduced-motion: reduce`.
+- **Source:** The available local Playwright MCP exposed navigation, resize, click, evaluate,
+  screenshots, snapshots, and console logs, but no media-emulation tool.
+- **Expected:** Browser gate runs the generated design routes under reduced-motion media.
+- **Actual:** Reduced-motion coverage used static CSS evidence (`@media (prefers-reduced-motion:
+  reduce)` disabling transitions/transforms) plus successful route rendering; full media emulation
+  remains for Slice 16 if a scriptable Playwright path is available.
+- **Severity:** minor
+- **Action:** record limitation; do not broaden Slice 14 into browser infrastructure repair.
+- **Evidence:** `slice14-design-routes-browser-report.md`.
+
+## 2026-06-12 - Playwright automation fallbacks for local generated app
+
+- **What:** Deno Playwright and Firecrawl were not usable as the authoritative Slice 14 generated
+  app browser gate.
+- **Source:** `deno run -A npm:playwright` lacked the bundled Chromium executable; launching
+  installed Chrome through Deno's npm shim failed with `The handle is invalid. (os error 6)`;
+  Firecrawl's remote browser did not observe local app content at `127.0.0.1`.
+- **Expected:** Use a Playwright route gate against the generated localhost app.
+- **Actual:** Used the local Playwright MCP after clearing only its stale MCP Chrome profile
+  processes; route title/content, console, theme flip, mobile overflow, and screenshots passed.
+- **Severity:** minor
+- **Action:** keep the local MCP evidence; revisit a pure-script Playwright harness in Slice 16 if
+  needed.
+- **Evidence:** `slice14-design-routes-browser-report.md`.
