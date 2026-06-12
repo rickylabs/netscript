@@ -24,3 +24,4 @@
 | 10 | 40924ff89de8b9312b6798423d8772b20fcae91f | repo-genesis | sync docs |
 | 11 | 48a9ec61311653736dae8a7c006f922ae95ada6d | framework | fmt-normalize runtime + root modules, workspace gates green |
 | 11 | 7c63e08c34af77f7b5ef61c5d65b0881949c9a35 | repo-genesis | sync |
+| 12 | (no impl commit — gate-only slice) | framework | JSR dry-run Success incl. slow-types |

@@ -464,3 +464,10 @@ flagged for evaluator).
 
 Commits: framework 48a9ec61311653736dae8a7c006f922ae95ada6d,
 repo-genesis 7c63e08c34af77f7b5ef61c5d65b0881949c9a35.
+
+## Slice 12 — JSR dry-run + unit close (2026-06-12)
+
+`deno publish --dry-run --allow-dirty` from packages/fresh-ui: Success,
+including the slow-types pass over mod.ts / interactive.ts /
+primitives.tsx. Publish set excludes tests and scripts per deno.json.
+Run 2 locked slices 1-12 all complete; unit handed to IMPL-EVAL.
