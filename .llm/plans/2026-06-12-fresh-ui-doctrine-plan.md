@@ -97,3 +97,25 @@ Archetype 3 matrix (F-1..F-15 per
 `.llm/harness/gates/archetype-gate-matrix.md`) plus: ds-no-raw-hex,
 ds-color-utilities, package check/test/tokens:check, JSR dry-run, browser
 validation on `/design/*`, copy-fidelity sweep (`diff --strip-trailing-cr`).
+
+## Addendum (2026-06-12, user review)
+
+- **C-11 Docs scaffold + doctests.** Per
+  `.llm/harness/lessons/package-quality-archetype.md` items 6-7, the
+  package is missing `docs/getting-started.md`, `docs/architecture.md`,
+  `docs/concepts.md` (l0-conventions/theme-authoring slot under concepts/
+  reference), `docs/recipes/` where earned, AND a doctest fixture
+  (`tests/_fixtures/docs-examples_test.ts`) that executes the exact
+  README/getting-started flow so documentation cannot rot silently.
+  Docs join the publish include set.
+- **C-12 Zag adoption ADR (spike, not migration).** Decision proposal:
+  do NOT migrate the existing seven interactive components — Dialog/
+  Drawer/Sheet are native <dialog>-backed and Popover/Tooltip wrap the
+  platform Popover API; replacing platform behavior with JS state
+  machines regresses the native-first axiom. Adopt @zag-js selectively
+  for complex widgets with no platform backing (combobox, menu, custom
+  select, slider, date picker, tags-input) as they enter the registry.
+  Spike first: validate @zag-js/react via preact/compat inside Fresh
+  islands (SSR + hydration + bundle size), record the verdict as an ADR
+  in docs/architecture.md. If the spike fails, the fallback is
+  hand-rolled hooks following the existing runtime/_internal patterns.
