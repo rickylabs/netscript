@@ -352,3 +352,19 @@ documentation.
 - **Action:** Carry a scriptable isolated browser proof into Slice 16 e2e if the MCP profile remains
   locked.
 - **Evidence:** `slice15-scaffold-pages-browser-report.md`.
+
+## 2026-06-12 - Slice 16 full scaffold runtime DB gate fails in Prisma schema engine
+
+- **What:** The required full `scaffold.runtime` E2E smoke failed at `database.init`.
+- **Source:** `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` from the
+  framework root.
+- **Expected:** Generated Postgres scaffold initializes the database migration in the one-pass
+  runtime smoke.
+- **Actual:** Aspire/Postgres resources reached healthy/ready state, then Prisma
+  `schema-engine-windows.exe` exited with `ERR_STREAM_PREMATURE_CLOSE` during
+  `cli can-connect-to-database`.
+- **Severity:** major for the broader runtime smoke, outside the fresh-ui frontend scaffold proof.
+- **Action:** Record as evaluator-visible drift and keep the frontend-specific generated-app proof
+  separate. Do not broaden Slice 16 into Prisma/DB runtime repair without a new locked slice.
+- **Evidence:** `slice16-full-scaffold-runtime-e2e.ndjson` and
+  `slice16-e2e-proof-report.md`.

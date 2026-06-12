@@ -658,3 +658,45 @@ only if the generated app should ship it by default.
 
 - Framework: `fa71f95702a23539fc2d2a54825b9d0ee40d3492`
 - Repo-genesis: N/A, CLI package absent from outer worktree.
+
+## Slice 16 - Fresh Scaffold E2E Proof
+
+### Changed
+
+- Ran the full `scaffold.runtime` CLI E2E smoke from the framework root.
+- Generated a fresh frontend-only `slice16-proof` app with the revamped scaffold and local package
+  copies.
+- Ran the generated Fresh app and browser-gated the generated design routes plus `/dashboard`.
+- Captured mobile screenshots, theme flip evidence, reduced-motion media evidence, console status,
+  and the full scaffold runtime NDJSON log.
+
+### Gates
+
+| Gate | Result | Command / Evidence | Notes |
+|---|---|---|---|
+| full scaffold runtime E2E | FAIL | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | Failed at `database.init` with Prisma `schema-engine-windows.exe` `ERR_STREAM_PREMATURE_CLOSE`; prior scaffold/plugin gates passed. |
+| generated frontend scaffold | PASS | `deno run -A packages/cli/bin/netscript-dev.ts init slice16-proof --db none --no-aspire ...` | Created 110 files / 23 dirs. |
+| generated app check | PASS | `deno check --unstable-kv apps/dashboard` from generated workspace | Generated app and design routes type-check. |
+| browser routes | PASS | Playwright MCP against `http://127.0.0.1:8026` | `/design/tokens`, `/design/components`, `/design/composition`, and `/dashboard` matched expected titles. |
+| mobile validation | PASS | 390x844 Playwright screenshots and metrics | All required routes had `scrollWidth=375`, `innerWidth=390`. |
+| theme flip | PASS | Playwright button clicks on generated `/dashboard` | `light -> dark -> light`; labels changed both ways. |
+| reduced motion | PASS | Playwright `emulateMedia({ reducedMotion: "reduce" })` | Media matched and token-route transitions computed as `none`. |
+| console validation | PASS | Playwright console/pageerror collection | 0 errors; Vite debug messages only. |
+| package check | PASS | `rtk proxy deno task check` from `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `rtk proxy deno task test` from `packages/fresh-ui` | 39 tests passed. |
+| package tokens | PASS | `rtk proxy deno task tokens:check` from `packages/fresh-ui` | Token artifacts stable; CRLF warnings only. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts packages/fresh-ui` | 95 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts packages/fresh-ui` | 95 files clean. |
+| arch:check | PASS | `rtk proxy deno task arch:check` | Existing `registry.manifest.ts` size WARN only. |
+| lock hygiene | PASS | `git status --short deno.lock packages/fresh-ui/deno.lock` | No lock churn. |
+| copy fidelity | N/A | CLI package absent from repo-genesis | No outer-worktree sync target. |
+
+### Drift
+
+- The full runtime scaffold E2E smoke failed in the DB branch at Prisma `database.init`; generated
+  frontend scaffold proof passed independently and is recorded in `slice16-e2e-proof-report.md`.
+
+### Commits
+
+- Framework: pending.
+- Repo-genesis: N/A, CLI package absent from outer worktree.
