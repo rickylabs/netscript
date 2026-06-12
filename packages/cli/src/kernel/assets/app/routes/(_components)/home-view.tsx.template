@@ -1,5 +1,5 @@
 import { Button, Card } from '@app/components/ui/mod.ts';
-import ThemeToggle from '@app/islands/ThemeToggle.tsx';
+import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
 
 interface RouteCard {
   readonly title: string;

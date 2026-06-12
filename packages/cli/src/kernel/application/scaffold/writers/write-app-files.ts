@@ -4,12 +4,12 @@ import { SCAFFOLD_DEFAULTS } from '../../../constants/scaffold/scaffold-defaults
 import { SCAFFOLD_FILES } from '../../../constants/scaffold/scaffold-files.ts';
 import type { ValidatedInitOptions } from '../../../domain/scaffold/scaffold-options.ts';
 import { generateAppDenoJson } from '../../../adapters/templates/app/generate-app-deno-json.ts';
-import { generateAppStyles } from '../../../adapters/templates/app/generate-styles.ts';
 import { generateAppViteConfig } from '../../../adapters/templates/app/generate-vite-config.ts';
 import {
   loadAppScaffoldTemplateAssets,
   loadExampleServiceAppTemplateAssets,
 } from '../../../adapters/templates/scaffold-template-assets.ts';
+import { DEFAULT_UI_INIT_ITEMS, installUiRegistryItems } from '../../ui/registry.ts';
 import type { InitPipelineContext } from '../context.ts';
 import { adjustLocalBase } from '../helpers.ts';
 import { createScaffoldPlan } from '../../../domain/scaffold/scaffold-plan.ts';
@@ -86,27 +86,18 @@ export async function writeNormalizedAppFiles(
     serviceName: plan.service?.name ?? SCAFFOLD_DEFAULTS.SERVICE_NAME,
   };
   const {
-    appActionsCssTemplate,
     appAppTemplate,
     appClientTemplate,
     appExamplesIndexRouteTemplate,
     appExamplesViewTemplate,
-    appFeedbackCssTemplate,
-    appFormsCssTemplate,
     appHealthRouteTemplate,
     appHealthSharedTemplate,
     appHealthViewTemplate,
     appHomeViewTemplate,
     appIndexRouteTemplate,
-    appLayoutsCssTemplate,
     appLayoutTemplate,
     appMainTemplate,
     appRouterTemplate,
-    appSurfacesCssTemplate,
-    appThemeToggleTemplate,
-    appTokensCssTemplate,
-    appUiButtonTemplate,
-    appUiCardTemplate,
     appUiModTemplate,
     appUtilsTemplate,
   } = await loadAppScaffoldTemplateAssets();
@@ -134,8 +125,6 @@ export async function writeNormalizedAppFiles(
   const componentsDir = join(appDir, 'components');
   const uiComponentsDir = join(componentsDir, 'ui');
   const libDir = join(appDir, 'lib');
-  const assetsDir = join(appDir, 'assets');
-  const assetComponentsDir = join(assetsDir, 'components');
   const partialsDir = join(routesDir, 'partials');
   const partialsExamplesDir = join(partialsDir, 'examples');
   const serviceExampleDir = options.serviceName
@@ -184,20 +173,26 @@ export async function writeNormalizedAppFiles(
     await createDir(telemetryExampleComponentsDir);
     await createDir(telemetryExampleSharedDir);
   }
-  await createDir(assetsDir);
-  await createDir(assetComponentsDir);
 
-  await write(
-    join(appDir, SCAFFOLD_FILES.DENO_JSON),
-    generateAppDenoJson({
-      projectName: options.name,
-      appName: options.appName,
-      importMode: options.importMode,
-      localBase: options.localBase ? adjustLocalBase(options.localBase, 2) : undefined,
-      packagesAsWorkspaceMembers: plan.useWorkspacePackages,
-      jsrResolver: context.jsrResolver,
-    }),
-  );
+  const appDenoJsonPath = join(appDir, SCAFFOLD_FILES.DENO_JSON);
+  const appDenoJson = generateAppDenoJson({
+    projectName: options.name,
+    appName: options.appName,
+    importMode: options.importMode,
+    localBase: options.localBase ? adjustLocalBase(options.localBase, 2) : undefined,
+    packagesAsWorkspaceMembers: plan.useWorkspacePackages,
+    jsrResolver: context.jsrResolver,
+  });
+  await write(appDenoJsonPath, appDenoJson);
+  const uiInstall = await installUiRegistryItems({
+    projectRoot: appDir,
+    names: DEFAULT_UI_INIT_ITEMS,
+    overwrite: true,
+  }, { fs: context.fs });
+  for (const copiedFile of uiInstall.copiedFiles) {
+    if (!filesCreated.includes(copiedFile)) filesCreated.push(copiedFile);
+  }
+  if (!filesCreated.includes(uiInstall.stylesPath)) filesCreated.push(uiInstall.stylesPath);
   await write(
     join(appDir, 'client.ts'),
     appClientTemplate,
@@ -213,9 +208,6 @@ export async function writeNormalizedAppFiles(
   );
   await write(join(generatedDir, 'manifest.ts'), generateRouteManifestSeed());
   await write(join(generatedDir, 'routes.ts'), generateRoutesSeed());
-  await write(join(islandsDir, 'ThemeToggle.tsx'), appThemeToggleTemplate);
-  await write(join(uiComponentsDir, 'button.tsx'), appUiButtonTemplate);
-  await write(join(uiComponentsDir, 'card.tsx'), appUiCardTemplate);
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
   await write(
     join(routesDir, '_app.tsx'),
@@ -278,11 +270,4 @@ export async function writeNormalizedAppFiles(
     join(appDir, 'vite.config.ts'),
     generateAppViteConfig({ appName: options.appName }),
   );
-  await write(join(assetsDir, 'styles.css'), generateAppStyles());
-  await write(join(assetsDir, 'tokens.css'), appTokensCssTemplate);
-  await write(join(assetsDir, 'layouts.css'), appLayoutsCssTemplate);
-  await write(join(assetComponentsDir, 'actions.css'), appActionsCssTemplate);
-  await write(join(assetComponentsDir, 'forms.css'), appFormsCssTemplate);
-  await write(join(assetComponentsDir, 'surfaces.css'), appSurfacesCssTemplate);
-  await write(join(assetComponentsDir, 'feedback.css'), appFeedbackCssTemplate);
 }

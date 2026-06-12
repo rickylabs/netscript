@@ -1,5 +1,5 @@
 import { Partial } from 'fresh/runtime';
-import ThemeToggle from '@app/islands/ThemeToggle.tsx';
+import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
 import { appRoutes } from '@app/router.ts';
 import { define } from '@app/utils.ts';
 

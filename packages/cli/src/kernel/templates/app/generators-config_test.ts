@@ -5,7 +5,6 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { generateAppDenoJson } from '../../adapters/templates/app/generate-app-deno-json.ts';
-import { generateAppStyles } from '../../adapters/templates/app/generate-styles.ts';
 import { generateAppViteConfig } from '../../adapters/templates/app/generate-vite-config.ts';
 
 describe('generateAppDenoJson', () => {
@@ -124,7 +123,7 @@ describe('generateAppDenoJson', () => {
     ]);
     assertEquals(config.imports['@app/'], './');
     assertEquals(config.imports['@my-project/contracts'], '../../contracts/mod.ts');
-    assertEquals(config.imports['vite/client'], 'npm:vite@^7.1.3/client');
+    assertEquals(config.imports['vite/client'], 'npm:vite@^7.1.4/client');
   });
 
   it('should resolve @netscript/fresh/vite in local mode', () => {
@@ -165,7 +164,7 @@ describe('generateAppDenoJson', () => {
     );
     assertEquals(config.imports['@test/contracts'], '../../contracts/mod.ts');
     assertEquals(config.imports['tailwindcss'], 'npm:tailwindcss@^4.2.2');
-    assertEquals(config.imports['vite/client'], 'npm:vite@^7.1.3/client');
+    assertEquals(config.imports['vite/client'], 'npm:vite@^7.1.4/client');
     assertEquals(config.compilerOptions.types, ['vite/client']);
   });
 });
@@ -204,49 +203,6 @@ describe('generateAppViteConfig', () => {
     assertStringIncludes(
       output,
       "port: Number.parseInt(env.NETSCRIPT_VITE_PORT ?? process.env.PORT ?? '5173', 10)",
-    );
-  });
-});
-
-describe('generateAppStyles', () => {
-  it('should include the theme block and imported theme asset layers', () => {
-    const output = generateAppStyles();
-    assertStringIncludes(output, "@import './tokens.css';");
-    assertStringIncludes(output, "@import './layouts.css';");
-    assertStringIncludes(output, "@import './components/actions.css';");
-    assertStringIncludes(output, '@theme {');
-  });
-
-  it('should expose the core NetScript token mappings', () => {
-    const output = generateAppStyles();
-    assertStringIncludes(output, '--color-ns-primary: var(--ns-primary);');
-    assertStringIncludes(output, '--color-ns-success: var(--ns-success);');
-    assertStringIncludes(output, '--color-ns-secondary: var(--ns-secondary);');
-    assertStringIncludes(output, '--color-ns-muted-fg: var(--ns-muted-fg);');
-    assertStringIncludes(output, '--color-ns-bg: var(--ns-bg);');
-    assertStringIncludes(output, '--color-ns-fg: var(--ns-fg);');
-  });
-
-  it('should include the light-theme selector and trailing newline', () => {
-    const output = generateAppStyles();
-    assertStringIncludes(output, "html[data-theme='light']");
-    assert(output.endsWith('\n'));
-  });
-
-  it('keeps the stylesheet layer ordering stable', () => {
-    const output = generateAppStyles();
-
-    assert(
-      output.indexOf("@import './tokens.css';") < output.indexOf("@import './layouts.css';") &&
-        output.indexOf("@import './layouts.css';") <
-          output.indexOf("@import './components/actions.css';") &&
-        output.indexOf("@import './components/actions.css';") <
-          output.indexOf("@import './components/forms.css';") &&
-        output.indexOf("@import './components/forms.css';") <
-          output.indexOf("@import './components/surfaces.css';") &&
-        output.indexOf("@import './components/surfaces.css';") <
-          output.indexOf("@import './components/feedback.css';") &&
-        output.indexOf('@theme {') < output.indexOf('@layer base {'),
     );
   });
 });

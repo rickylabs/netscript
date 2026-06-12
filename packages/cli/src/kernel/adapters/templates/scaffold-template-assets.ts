@@ -4,27 +4,18 @@ import { readTemplateAsset } from '../templates/template-asset.ts';
 type TemplateUrlMap = Readonly<Record<string, TemplateKey>>;
 
 const APP_TEMPLATE_URLS: TemplateUrlMap = {
-  appActionsCssTemplate: TEMPLATE_KEYS.appAssetsComponentsActions,
   appAppTemplate: TEMPLATE_KEYS.appRoutesApp,
   appClientTemplate: TEMPLATE_KEYS.appClient,
   appExamplesIndexRouteTemplate: TEMPLATE_KEYS.appRoutesExamplesIndex,
   appExamplesViewTemplate: TEMPLATE_KEYS.appRoutesExamplesComponentsExamplesView,
-  appFeedbackCssTemplate: TEMPLATE_KEYS.appAssetsComponentsFeedback,
-  appFormsCssTemplate: TEMPLATE_KEYS.appAssetsComponentsForms,
   appHealthRouteTemplate: TEMPLATE_KEYS.appRoutesHealth,
   appHealthSharedTemplate: TEMPLATE_KEYS.appRoutesSharedHealth,
   appHealthViewTemplate: TEMPLATE_KEYS.appRoutesComponentsHealthView,
   appHomeViewTemplate: TEMPLATE_KEYS.appRoutesComponentsHomeView,
   appIndexRouteTemplate: TEMPLATE_KEYS.appRoutesIndex,
-  appLayoutsCssTemplate: TEMPLATE_KEYS.appAssetsLayouts,
   appLayoutTemplate: TEMPLATE_KEYS.appRoutesLayout,
   appMainTemplate: TEMPLATE_KEYS.appMain,
   appRouterTemplate: TEMPLATE_KEYS.appRouter,
-  appSurfacesCssTemplate: TEMPLATE_KEYS.appAssetsComponentsSurfaces,
-  appThemeToggleTemplate: TEMPLATE_KEYS.appIslandsThemetoggle,
-  appTokensCssTemplate: TEMPLATE_KEYS.appAssetsTokens,
-  appUiButtonTemplate: TEMPLATE_KEYS.appComponentsUiButton,
-  appUiCardTemplate: TEMPLATE_KEYS.appComponentsUiCard,
   appUiModTemplate: TEMPLATE_KEYS.appComponentsUiMod,
   appUtilsTemplate: TEMPLATE_KEYS.appUtils,
 } as const;

@@ -1,17 +1,7 @@
 /** Typed manifest for checked-in CLI template assets. */
 export const TEMPLATE_KEYS = {
-  appAssetsComponentsActions: 'app/assets/components/actions.css.template',
-  appAssetsComponentsFeedback: 'app/assets/components/feedback.css.template',
-  appAssetsComponentsForms: 'app/assets/components/forms.css.template',
-  appAssetsComponentsSurfaces: 'app/assets/components/surfaces.css.template',
-  appAssetsLayouts: 'app/assets/layouts.css.template',
-  appAssetsStyles: 'app/assets/styles.css.template',
-  appAssetsTokens: 'app/assets/tokens.css.template',
   appClient: 'app/client.ts.template',
-  appComponentsUiButton: 'app/components/ui/button.tsx.template',
-  appComponentsUiCard: 'app/components/ui/card.tsx.template',
   appComponentsUiMod: 'app/components/ui/mod.ts.template',
-  appIslandsThemetoggle: 'app/islands/ThemeToggle.tsx.template',
   appLibExampleService: 'app/lib/example-service.ts.template',
   appMain: 'app/main.ts.template',
   appRouter: 'app/router.ts.template',

@@ -130,8 +130,15 @@ describe('DryRunFileSystemAdapter', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // readFile() — delegates to inner (reads must work during dry-run)
+  // readFile() — reads recorded writes, then delegates to inner
   // ---------------------------------------------------------------------------
+
+  it('readFile() returns content from recorded writes before inner adapter', async () => {
+    await inner.writeFile('/out/file.ts', 'old');
+    await dryRun.writeFile('/out/file.ts', 'new');
+    const content = await dryRun.readFile('/out/file.ts');
+    assertEquals(content, 'new');
+  });
 
   it('readFile() delegates to inner adapter', async () => {
     await inner.writeFile('/templates/tmpl.template', 'hello {{name}}');

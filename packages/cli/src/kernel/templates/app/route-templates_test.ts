@@ -81,7 +81,7 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface HomeViewProps {');
-    assertStringIncludes(view, '<ThemeToggle />');
+    assertStringIncludes(view, "import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';");
     assertStringIncludes(view, 'Scaffold route surface');
   });
 
