@@ -1,12 +1,15 @@
 /**
- * `@netscript/sdk/query-client` — TanStack Query integration for the SDK.
+ * `@netscript/sdk/query-client` TanStack Query integration.
  *
- * This subpath provides:
- * - `createServiceQueryUtils()` — oRPC → TanStack Query bridge
- * - `createNetScriptQueryClient()` — QueryClient factory with sensible defaults
- * - `createKvCachePersister()` — TanStack Query ↔ Deno KV persistence
- * - `toClientKeyPrefix()` / `bridgeInvalidation()` — server ↔ client key mapping
- * - Type definitions for ActionMethod TanStack extensions
+ * This subpath bridges typed SDK service clients into frontend query utilities.
+ * It provides `createServiceQueryUtils()` for oRPC/TanStack options,
+ * `createNetScriptQueryClient()` for NetScript-aligned QueryClient defaults,
+ * `createKvCachePersister()` for persisted query cache storage, and key helpers
+ * that map server invalidation keys to client query prefixes.
+ *
+ * The public `QueryClientPort` and `ServiceQueryUtils<TContract>` types are
+ * package-owned structural mirrors. They preserve contract inference while
+ * keeping upstream TanStack and oRPC helper types behind internal boundaries.
  *
  * @module
  */
@@ -15,7 +18,7 @@
 export {
   createServiceQueryUtils,
   type CreateServiceQueryUtilsOptions,
-} from './create-service-query-utils.ts';
+} from '../src/query-client/create-service-query-utils.ts';
 
 // QueryClient factory
 export {
@@ -23,17 +26,45 @@ export {
   DEFAULT_GC_TIME,
   DEFAULT_STALE_TIME,
   type NetScriptQueryClientOptions,
-} from './query-client-factory.ts';
+} from '../src/query-client/query-client-factory.ts';
+export type {
+  QueryClientFetchOptions,
+  QueryClientFilters,
+  QueryClientPort,
+  QueryClientPredicate,
+  QueryClientSetOptions,
+} from '../src/ports/query-client.ts';
+export type {
+  ServiceOperationKey,
+  ServiceOperationKeyOptions,
+  ServiceOperationType,
+  ServiceOptionalInputRest,
+  ServicePartialInput,
+  ServiceProcedureInfiniteOptions,
+  ServiceProcedureInfiniteResult,
+  ServiceProcedureLiveResult,
+  ServiceProcedureMutationOptions,
+  ServiceProcedureMutationResult,
+  ServiceProcedureQueryOptions,
+  ServiceProcedureQueryResult,
+  ServiceProcedureQueryUtils,
+  ServiceProcedureStreamedOptions,
+  ServiceProcedureStreamedResult,
+  ServiceQueryClientContext,
+  ServiceQueryKeyOptions,
+  ServiceQueryUtils,
+  ServiceStreamedKeyOptions,
+} from '../src/ports/service-query-utils.ts';
 
 // Key bridge
-export { bridgeInvalidation, toClientKeyPrefix } from './key-bridge.ts';
+export { bridgeInvalidation, toClientKeyPrefix } from '../src/query-client/key-bridge.ts';
 
 // KV cache persister
 export {
   createKvCachePersister,
   type KvCachePersisterOptions,
   type KvCachePersisterStorage,
-} from './kv-cache-persister.ts';
+} from '../src/query-client/kv-cache-persister.ts';
 
 // Types
 export type {
@@ -41,4 +72,4 @@ export type {
   ActionQueryOptions,
   MutationOptionsResult,
   QueryOptionsWithInitialData,
-} from './types.ts';
+} from '../src/query-client/types.ts';

@@ -4,201 +4,326 @@
 [![Deno](https://img.shields.io/badge/runtime-Deno-000000?logo=deno&logoColor=white)](https://deno.com/)
 [![License](https://img.shields.io/badge/license-MIT-0f172a)](https://opensource.org/licenses/MIT)
 
-Service discovery, type-safe oRPC clients, and cache-backed query factories for NetScript applications running on Deno with Aspire orchestration.
+Service discovery, typed service clients, cache-aware query factories, and
+TanStack Query utilities for NetScript applications running on Deno with Aspire
+orchestration.
 
-## Features
+## 1. What This Package Provides
 
-- **Service discovery** — Automatic URL resolution from Aspire environment variables
-- **Type-safe clients** — oRPC client factories with full contract inference and typed return values
-- **Cache-backed queries** — Query factories with built-in KV caching, stale-while-revalidate, and prefetch
-- **OpenTelemetry tracing** — Automatic span propagation on all RPC calls
-- **OpenAPI generation** — Spec generation from oRPC routers with configurable title, version, and description
-- **Database discovery** — Helpers for resolving Postgres, MySQL, and SQL Server connection strings from Aspire
-- **Subpath imports** — Import only the capability you need
+`@netscript/sdk` is the package that connects generated service contracts to
+runtime clients and query helpers. It is designed as four composable layers:
 
-## Install
+- L0 ports: package-owned structural types such as `ServiceClient`,
+  `QueryFactory`, `QueryClientPort`, `ServiceQueryUtils`, `CacheStore`, and
+  `ServiceTransport`.
+- L1 primitives: service discovery, cache query execution, KV cache storage,
+  OpenAPI helpers, and telemetry middleware.
+- L2 factories: `createServiceClient()`, `createQueryFactory()`,
+  `createServiceQueryUtils()`, `createQueryCollection()`, and
+  `createNetScriptQueryClient()`.
+- L3 preset: `defineServices()`, a one-liner that returns the same L2 values for
+  many services.
 
-```ts
-// deno.json
+Each layer is implemented in terms of the layer below it. The one-liner is a
+convenience, not a container: if you outgrow it, the returned values are already
+the lower-level values you would have wired by hand.
+
+## 2. Install
+
+```json
 {
   "imports": {
-    "@netscript/sdk": "jsr:@netscript/sdk@^1.0.0"
+    "@netscript/sdk": "jsr:@netscript/sdk@^0.0.1-alpha.0",
+    "@netscript/sdk/": "jsr:@netscript/sdk@^0.0.1-alpha.0/"
   }
 }
 ```
 
-Focused subpath imports are also available for narrower dependency graphs:
+The package is Deno-first. It assumes Aspire-style environment variables for
+service discovery and uses Deno KV through the cache subpath when server-side
+cache primitives are imported.
+
+## 3. Entry Points
+
+| Import                        | Use it for                                     | Main exports                                                                |
+| ----------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------- |
+| `@netscript/sdk`              | Root composition and broad service app imports | `defineServices`, client/query/cache/discovery exports                      |
+| `@netscript/sdk/client`       | Direct oRPC clients                            | `createServiceClient`, `safe`, `isDefinedError`, `ServiceClient`            |
+| `@netscript/sdk/query`        | Server-side cache-aware query factories        | `createQueryFactory`, `createQueryFactories`, `createCompositeQuery`        |
+| `@netscript/sdk/query-client` | TanStack Query integration                     | `createServiceQueryUtils`, `createNetScriptQueryClient`, key bridge helpers |
+| `@netscript/sdk/cache`        | Server-only cache primitives                   | `CacheQuery`, `cacheQuery`, `KvCacheStore`, provider registration           |
+| `@netscript/sdk/collections`  | TanStack DB collection adapter                 | `createQueryCollection`, `QueryCollection`                                  |
+| `@netscript/sdk/discovery`    | Aspire service and database lookup             | `getServiceUrl`, `getServiceInfo`, `getKvConnection`, SQL helpers           |
+| `@netscript/sdk/ports`        | Structural SDK contracts                       | `ServiceClient`, `QueryFactory`, `QueryClientPort`, `ServiceQueryUtils`     |
+| `@netscript/sdk/streams`      | Durable stream producer facade                 | `createStreamProducer`, stream-core type exports                            |
+| `@netscript/sdk/telemetry`    | Middleware type surface                        | `otelMiddleware`                                                            |
+
+## 4. Quick Start With `defineServices`
+
+Use `defineServices()` when an app has several service contracts and wants
+clients plus query helpers from one map.
 
 ```ts
-import { createServiceClient } from "@netscript/sdk/client";
-import { getServiceUrl } from "@netscript/sdk/discovery";
-import { createQueryFactories } from "@netscript/sdk/query";
+import { defineServices } from "@netscript/sdk";
+import { ordersContract, usersContract } from "./contracts.ts";
+
+export const sdk = defineServices({
+  orders: { contract: ordersContract },
+  users: { contract: usersContract, options: { staleTime: 60_000 } },
+});
+
+const order = await sdk.clients.orders.get({ id: "ord_1" });
+const page = await sdk.queries.orders.list({ limit: 20, offset: 0 });
+const options = sdk.queryUtils.orders.list.queryOptions({
+  input: { limit: 20, offset: 0 },
+});
+
+void order;
+void page;
+void options;
 ```
 
-## Quick Start
+The type of each client, query factory, and query utility is inferred from the
+matching contract. No user-facing type annotation is required.
 
-Resolve a service URL and make a type-safe API call:
+## 5. Direct Service Clients
+
+Use `createServiceClient()` when you only need direct RPC calls.
 
 ```ts
-import { createServiceClient } from "@netscript/sdk/client";
-import { getServiceUrl } from "@netscript/sdk/discovery";
+import {
+  createServiceClient,
+  isDefinedError,
+  safe,
+} from "@netscript/sdk/client";
+import { ordersContract } from "./contracts.ts";
 
-// Reads services__orders-api__http__0 from the Aspire environment
-const baseUrl = getServiceUrl("orders-api");
-
-// Pass your oRPC contract and the service name — the client resolves the URL automatically
-const ordersApi = createServiceClient({
+const orders = createServiceClient({
   contract: ordersContract,
   serviceName: "orders-api",
 });
 
-const result = await ordersApi.list({ limit: 10, offset: 0 });
-//    ^? inferred from your contract
-```
+const [error, result] = await safe(orders.get({ id: "ord_1" }));
 
-## Entry Points
-
-| Import | Purpose | Key Exports |
-|--------|---------|-------------|
-| `@netscript/sdk` | Root — re-exports the full primary API | Everything below |
-| `@netscript/sdk/discovery` | Service and database URL discovery | `getServiceUrl`, `getServiceInfo`, `getAllServices`, `getPostgresUri`, `getMysqlUri` |
-| `@netscript/sdk/client` | oRPC client factories and error helpers | `createServiceClient`, `safe`, `isDefinedError` |
-| `@netscript/sdk/cache` | Cache primitives and cache-entry helpers | `cacheQuery`, `CacheQuery`, `isCacheEntryStale`, `toCachedEntry` |
-| `@netscript/sdk/query` | Query factories with built-in caching | `createQueryFactories`, `createQueryFactory`, `createCompositeQuery` |
-| `@netscript/sdk/openapi` | OpenAPI spec generation | `createOpenAPIGenerator`, `generateOpenAPISpec` |
-| `@netscript/sdk/telemetry` | OpenTelemetry middleware | `otelMiddleware` |
-| `@netscript/sdk/adapters` | KV-backed cache store adapter | `KvCacheStore` |
-| `@netscript/sdk/interfaces` | Canonical TypeScript contracts | `CacheStore`, `ServiceMetadata`, `PaginatedResponse` |
-
-## Usage
-
-### Resolve service URLs
-
-```ts
-import {
-  getAllServices,
-  getServiceInfo,
-  getServiceUrl,
-  isServiceAvailable,
-} from "@netscript/sdk/discovery";
-
-// Single endpoint — throws if not found
-const url = getServiceUrl("orders-api", "http");
-
-// All endpoints for a service
-const info = getServiceInfo("orders-api");
-console.log(info.http);  // http://localhost:5001
-console.log(info.https); // https://localhost:5002
-
-// List every service registered in the environment
-const names = getAllServices(); // ["frontend", "orders-api", "users-api"]
-
-// Guard before connecting
-if (isServiceAvailable("payments-api")) {
-  // ...
+if (error && isDefinedError(error)) {
+  console.error(error.code, error.data);
 }
+
+void result;
 ```
 
-### Type-safe oRPC clients
+The client resolves `services__orders-api__http__0` by default and keeps trace
+headers connected when telemetry context is available.
 
-```ts
-import { createServiceClient } from "@netscript/sdk/client";
+## 6. Query Factories
 
-const usersApi = createServiceClient({
-  contract: usersContract,       // your oRPC contract
-  serviceName: "users-api",
-  propagateTraceContext: true,   // default — keeps OTel spans connected across services
-});
-
-const user = await usersApi.getById({ id: "usr_1" });
-//    ^? inferred output type from contract
-```
-
-### Error handling
-
-```ts
-import { isDefinedError, safe } from "@netscript/sdk/client";
-
-const [err, user] = await safe(usersApi.getById({ id: "usr_1" }));
-
-if (err) {
-  if (isDefinedError(err)) {
-    // err is a typed contract error — access err.data for the payload
-  } else {
-    // unexpected error
-  }
-}
-```
-
-### Cache-backed query factories
-
-Build per-resource query helpers with built-in caching, invalidation, and prefetch:
+Query factories are framework-neutral L2 helpers. They use the SDK cache
+provider and expose execution, invalidation, prefetch, cache reads, and
+TanStack-compatible options for each contract procedure.
 
 ```ts
 import { createQueryFactories } from "@netscript/sdk/query";
 
 const queries = createQueryFactories({
-  orders: { contract: ordersContract, client: ordersApi },
-  users:  { contract: usersContract,  client: usersApi  },
+  orders: { contract: ordersContract, client: ordersClient },
 });
 
-// Cached fetch — serves stale data while revalidating in the background
-const page = await queries.orders.list({ limit: 20, offset: 0 });
+const firstPage = await queries.orders.list({ limit: 20, offset: 0 });
+const key = queries.orders.list.key({ limit: 20, offset: 0 });
 
-// Read what's in cache without making a network request
-const cached = await queries.orders.list.getCachedEntry({ limit: 20, offset: 0 });
-
-// Prefetch for the next page
 queries.orders.list.prefetch({ limit: 20, offset: 20 });
-
-// Invalidate all cached data for a resource
 await queries.orders.invalidate();
+
+void firstPage;
+void key;
 ```
 
-### Generate an OpenAPI spec
+Import `@netscript/sdk/cache` once in server-side code to register the default
+KV-backed cache provider.
+
+## 7. TanStack Query Integration
+
+Use `@netscript/sdk/query-client` in browser or island code.
 
 ```ts
-import { createOpenAPIGenerator, generateOpenAPISpec } from "@netscript/sdk/openapi";
+import {
+  createNetScriptQueryClient,
+  createServiceQueryUtils,
+} from "@netscript/sdk/query-client";
+
+const queryClient = createNetScriptQueryClient();
+const orderUtils = createServiceQueryUtils(ordersClient, { path: ["orders"] });
+
+const queryOptions = orderUtils.list.queryOptions({
+  input: { limit: 20, offset: 0 },
+});
+
+void queryClient;
+void queryOptions;
+```
+
+The public `ServiceQueryUtils<TContract>` type is a structural mirror. It
+preserves contract inference without requiring applications to import upstream
+oRPC helper types.
+
+## 8. Cache Primitives
+
+`@netscript/sdk/cache` is server-only. Importing it registers `cacheQuery` as
+the provider used by query factories.
+
+```ts
+import { CacheQuery, cacheQuery, KvCacheStore } from "@netscript/sdk/cache";
+
+const customCache = new CacheQuery(new KvCacheStore());
+await cacheQuery.setCachedData(["orders", "summary"], { count: 3 });
+
+void customCache;
+```
+
+Cache timing defaults live in one internal constants module and are shared by
+server cache queries, query factories, query-client defaults, and the KV
+persister.
+
+## 9. Service Discovery
+
+Service discovery supports browser and server lookup paths.
+
+```ts
+import {
+  getAllServices,
+  getKvConnection,
+  getServiceInfo,
+  getServiceUrl,
+} from "@netscript/sdk/discovery";
+
+const apiUrl = getServiceUrl("orders-api", "http");
+const info = getServiceInfo("orders-api");
+const kvConnection = getKvConnection("kv");
+const services = getAllServices();
+
+void apiUrl;
+void info;
+void kvConnection;
+void services;
+```
+
+Lookup order is:
+
+1. `VITE_services__{serviceName}__{protocol}__{index}`
+2. `VITE_{NORMALISED_SERVICE_NAME}_URL`
+3. `services__{serviceName}__{protocol}__{index}`
+
+The browser and server lookup logic lives in separate implementation files so
+consumers can reason about which runtime surface they are importing.
+
+## 10. Collections
+
+Collections wrap TanStack DB behind the package-owned `QueryCollection<TItem>`
+return port.
+
+```ts
+import { createQueryCollection } from "@netscript/sdk/collections";
+
+const orders = createQueryCollection({
+  resource: "orders",
+  queryKey: ["orders", "list"],
+  queryFn: () => queries.orders.list({ limit: 100, offset: 0 }),
+  getKey: (order) => order.id,
+  queryClient,
+});
+
+await orders.preload();
+const order = orders.get("ord_1");
+
+void order;
+```
+
+The public port includes common read, iteration, mutation, lifecycle, and
+preload operations without leaking TanStack DB helper types.
+
+## 11. OpenAPI And Telemetry
+
+OpenAPI helpers are exported from the root barrel.
+
+```ts
+import { createOpenAPIGenerator, generateOpenAPISpec } from "@netscript/sdk";
 
 const generator = createOpenAPIGenerator();
-
 const spec = await generateOpenAPISpec(router, generator, {
   title: "Orders API",
   version: "1.0.0",
   description: "Order management endpoints",
 });
 
-// Serve it from your Fresh or Hono app
-app.get("/api/openapi.json", (c) => c.json(spec));
+void spec;
 ```
 
-### Resolve database connections
+Telemetry middleware is intentionally narrow:
 
 ```ts
-import {
-  getMysqlUri,
-  getPostgresConnection,
-  getPostgresUri,
-} from "@netscript/sdk/discovery";
+import { otelMiddleware } from "@netscript/sdk/telemetry";
 
-// Full URI for connecting a Postgres driver
-const pgUri = getPostgresUri("postgresdb");
-
-// Structured connection info
-const pg = getPostgresConnection("postgresdb");
-console.log(pg?.host, pg?.port, pg?.database);
-
-// MySQL
-const mysqlUri = getMysqlUri("mysqldb");
+const middleware = otelMiddleware();
+void middleware;
 ```
 
-## Resources
+Client trace propagation is handled through `createServiceClient()` and the
+internal HTTP link.
 
-- [`@netscript/kv`](https://jsr.io/@netscript/kv) — KV backend used by `KvCacheStore` and the cache adapters
-- [oRPC documentation](https://orpc.unnoq.com) — Contract and client primitives
-- [OpenTelemetry for Deno](https://docs.deno.com/runtime/fundamentals/telemetry/)
-- [Aspire service discovery](https://learn.microsoft.com/en-us/dotnet/aspire/service-discovery/overview)
+## 12. Ports And Extension Points
 
-## License
+Use `@netscript/sdk/ports` when another package needs SDK-compatible shapes
+without depending on concrete SDK adapters.
+
+```ts
+import type {
+  QueryClientPort,
+  QueryFactory,
+  ServiceClient,
+  ServiceQueryUtils,
+} from "@netscript/sdk/ports";
+
+type OrdersClient = ServiceClient<typeof ordersContract>;
+type OrdersQueries = QueryFactory<typeof ordersContract>;
+type OrdersUtils = ServiceQueryUtils<typeof ordersContract>;
+
+void (undefined as unknown as QueryClientPort);
+void (undefined as unknown as OrdersClient);
+void (undefined as unknown as OrdersQueries);
+void (undefined as unknown as OrdersUtils);
+```
+
+The transport seam for a future in-process client adapter is internal today. The
+public `createServiceClient()` options remain transport-agnostic.
+
+## 13. Architecture Notes
+
+The SDK follows the layer model described in
+[`docs/architecture.md`](./docs/architecture.md).
+
+- Ports are structural and package-owned.
+- Higher layers expose the lower-layer values they compose.
+- The HTTP transport link is isolated behind an internal client-link factory.
+- Service discovery keeps browser environment lookup separate from server
+  environment lookup.
+- Cache in-flight dedupe state belongs to `CacheQuery` instances, not
+  process-global module state.
+
+## 14. Development, Validation, And License
+
+Common package-local tasks:
+
+```sh
+deno task check
+deno task test
+deno task lint
+deno task fmt
+deno task publish:dry-run
+```
+
+During package-quality work, the repository may keep `packages/sdk/` excluded
+from the root config until the final validation slice. Focused checks use
+explicit configs and entrypoints so type and documentation evidence still covers
+the current public surface.
 
 MIT

@@ -2,6 +2,8 @@ import { createStateSchema } from '@durable-streams/state';
 import type { StreamStateDefinition as DurableStreamStateDefinition } from '@durable-streams/state';
 import type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
 
+export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
+
 /**
  * Define a type-safe durable stream schema.
  *
