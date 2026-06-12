@@ -1,3 +1,4 @@
-# Drift — 5d5-form
+# 5d5 `./form` drift log
 
-Append-only. Reality vs RFC/doctrine/plan divergences.
+Entries prefixed `D-5d5-n`. Append-only.
+
