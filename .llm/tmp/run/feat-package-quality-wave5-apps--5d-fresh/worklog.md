@@ -16,3 +16,9 @@
 - Diagnosed iteration-budget exhaustion + fabricated post-cutoff summaries; full chain documented in drift D-5d-1.
 - Opened PR #41 (fix/openhands-iteration-budget, commit 893c090) against main.
 - Next: merge #41, then re-trigger 5d1-5d6 PLAN runs with iterations= and tightened write-early instructions.
+
+## 2026-06-13 PLAN re-dispatch, phase 1/2 research (supervisor)
+- PR #41 merged to main (9a02c23): iterations= knob, truthful cutoff reporting (exit 3), always() commit-back preserving partial work, write-early contract line.
+- Re-triggered all six PRs #34-#39 with phase-split triggers: RESEARCH ONLY (research.md + drift.md), iterations=800 (5d2: 1000), write-early contract (skeleton within ~15 actions, consolidate at 60% budget), explicit reuse of prior-run trace summaries (completion claims false, measured findings real; 5d4 must resolve the 3-vs-27 plugin-streams coupling divergence).
+- Phase 2 (design.md + plan.md) triggers follow after supervisor review of each research.md.
+- Trigger comment IDs: 4695788877 4695791024 4695793170 4695795419 4695797819 4695799874.
