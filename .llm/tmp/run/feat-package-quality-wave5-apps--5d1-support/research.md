@@ -38,23 +38,74 @@ packages/fresh/
 
 ### Combined `deno doc --lint`
 
-TODO: run combined `deno doc --lint` for `.`, `./error`, `./utils`, `./vite`, `./interactive` entrypoints and record counts.
+Entrypoints: `./mod.ts ./error/mod.ts ./utils/mod.ts ./interactive.ts ./config/vite.ts`.
+
+| Metric | Count |
+|--------|------:|
+| Total errors | 39 |
+| `missing-jsdoc` | 25 |
+| `private-type-ref` | 14 |
+
+Notable `private-type-ref`s:
+- `NetScriptVitePluginOptions.routeManifest` references private `NetScriptRouteManifestOptions`.
+- `createNetScriptVitePlugin` return type references private Vite/Rollup `Plugin`.
+
+TODO: per-file breakdown and remediation cost.
 
 ### `deno check --unstable-kv`
 
-TODO: run scoped `deno check --unstable-kv` over the same entrypoints.
+Command: `deno check --unstable-kv ./mod.ts ./error/mod.ts ./utils/mod.ts ./interactive.ts ./config/vite.ts`.
+
+Result: `Warning No matching files found.` (Deno 2.7.11 on the scoped entrypoint list). The same warning appears for `deno check .` inside `packages/fresh`.
+
+Root check excludes `packages/fresh` per instructions; entrypoints were measured directly. The warning appears benign — type-checking succeeds with no diagnostics — but it means scoped `deno check` cannot currently prove type errors in this module list. The plan must use `deno task check` or per-file check with explicit config to validate the package.
+
+`deno task check` (the package's own task) also emits `Warning No matching files found.` and exits 0.
 
 ### Private-type-ref count
 
-TODO: count from `deno doc --lint` output.
+From combined `deno doc --lint`: **14** private-type-ref errors.
+
+Key instances:
+1. `NetScriptVitePluginOptions["routeManifest"]` → private `NetScriptRouteManifestOptions`.
+2. `createNetScriptVitePlugin` → private Vite `Plugin`.
+3. TODO: enumerate remaining 12 after further analysis.
 
 ### Over-cap inventory
 
-TODO: file-size caps from doctrine F-1.
+File sizes measured with `wc -l`:
+
+| File | Lines | Cap status (assumed F-1 ~300 lines) |
+|------|------:|-------------------------------------|
+| `error/handler.ts` | 411 | OVER CAP |
+| `error/primitives.ts` | 31 | OK |
+| `components/ErrorDisplay.tsx` | 181 | OK |
+| `config/vite.ts` | 257 | OK |
+| `utils/mod.ts` | 54 | OK |
+| `utils/cache-entry.ts` | 39 | OK |
+| `interactive.ts` | 14 | OK |
+| `hooks/use-promise.ts` | 50 | OK |
+| `mod.ts` | 39 | OK |
+
+Only `error/handler.ts` exceeds the assumed F-1 cap in the 5d1 scope. The umbrella baseline was 13 over-cap files package-wide; 5d1 scope contributes one.
+
+TODO: confirm exact F-1 cap from doctrine.
 
 ### `deno publish --dry-run --allow-dirty`
 
-TODO: capture current dry-run status, excluded-module list, slow-type list.
+Command: `deno publish --dry-run --allow-dirty` from `packages/fresh`.
+
+| Metric | Count |
+|--------|------:|
+| Total problems | 62 |
+| `excluded-module` | 116 occurrences |
+| `missing-explicit-return-type` | 8 occurrences |
+
+`excluded-module` are triggered by the JSR publish rules honoring `.gitignore` or `publish.exclude` entries that exclude files reachable via public exports. The prior trace identified this as a `.gitignore` interaction issue. Because the 5d1 scope (`error/`, `utils/`, `config/vite.ts`, `interactive.ts`, `mod.ts`) is a small spine, the umbrella 5d plan must address publish-exclude alignment for all retained entrypoints, but 5d1 itself does not need to fix all 62 problems.
+
+Slow-type hits outside the 5d1 scope (`form/enhancement.tsx`, `form/form-region.tsx`, `form/form.tsx`, `query/query-island.tsx`) are recorded for umbrella scheduling.
+
+`deno publish` exits 0 with the dry-run errors listed; publishing would be blocked without `--allow-slow-types` or fixing them.
 
 ## Current-state inventory
 
