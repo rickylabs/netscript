@@ -20,13 +20,31 @@ function generateRouteManifestSeed(): string {
 
 export const routePatterns = {
   $route: '/',
+  dashboard: {
+    $route: '/dashboard',
+  },
   health: {
     $route: '/health',
   },
   examples: {
     $route: '/examples',
+    crud: {
+      $route: '/examples/crud',
+    },
     telemetry: {
       $route: '/examples/telemetry',
+    },
+  },
+  design: {
+    $route: '/design',
+    tokens: {
+      $route: '/design/tokens',
+    },
+    components: {
+      $route: '/design/components',
+    },
+    composition: {
+      $route: '/design/composition',
     },
   },
 } as const;
@@ -45,6 +63,12 @@ function generateRoutesSeed(): string {
     "    id: 'home',",
     "    kind: 'page',",
     '  }),',
+    '  dashboard: {',
+    '    $route: createRouteReference(routePatterns.dashboard.$route, {',
+    "      id: 'dashboard',",
+    "      kind: 'page',",
+    '    }),',
+    '  },',
     '  health: {',
     '    $route: createRouteReference(routePatterns.health.$route, {',
     "      id: 'health',",
@@ -56,8 +80,30 @@ function generateRoutesSeed(): string {
     "      id: 'examples',",
     "      kind: 'page',",
     '    }),',
+    '    crud: createRouteReference(routePatterns.examples.crud.$route, {',
+    "      id: 'examples.crud',",
+    "      kind: 'page',",
+    '    }),',
     '    telemetry: createRouteReference(routePatterns.examples.telemetry.$route, {',
     "      id: 'examples.telemetry',",
+    "      kind: 'page',",
+    '    }),',
+    '  },',
+    '  design: {',
+    '    $route: createRouteReference(routePatterns.design.$route, {',
+    "      id: 'design',",
+    "      kind: 'page',",
+    '    }),',
+    '    tokens: createRouteReference(routePatterns.design.tokens.$route, {',
+    "      id: 'design.tokens',",
+    "      kind: 'page',",
+    '    }),',
+    '    components: createRouteReference(routePatterns.design.components.$route, {',
+    "      id: 'design.components',",
+    "      kind: 'page',",
+    '    }),',
+    '    composition: createRouteReference(routePatterns.design.composition.$route, {',
+    "      id: 'design.composition',",
     "      kind: 'page',",
     '    }),',
     '  },',
@@ -88,8 +134,14 @@ export async function writeNormalizedAppFiles(
   const {
     appAppTemplate,
     appClientTemplate,
+    appCrudExampleRouteTemplate,
+    appCrudExampleViewTemplate,
+    appDashboardRouteTemplate,
+    appDashboardViewTemplate,
     appDesignComponentsRouteTemplate,
+    appDesignComponentsViewTemplate,
     appDesignCompositionRouteTemplate,
+    appDesignCompositionViewTemplate,
     appDesignCssTemplate,
     appDesignFloatingSurfaceDemoTemplate,
     appDesignIndexRouteTemplate,
@@ -98,6 +150,7 @@ export async function writeNormalizedAppFiles(
     appDesignTokenClipboardTemplate,
     appDesignTokensLibTemplate,
     appDesignTokensRouteTemplate,
+    appDesignTokensViewTemplate,
     appExamplesIndexRouteTemplate,
     appExamplesViewTemplate,
     appHealthRouteTemplate,
@@ -131,15 +184,15 @@ export async function writeNormalizedAppFiles(
   const routeSharedDir = join(routesDir, '(_shared)');
   const designGroupDir = join(routesDir, '(design)');
   const designRoutesDir = join(designGroupDir, 'design');
+  const designComponentsDir = join(designRoutesDir, '(_components)');
+  const designIslandsDir = join(designRoutesDir, '(_islands)');
+  const designSharedDir = join(designRoutesDir, '(_shared)');
   const examplesComponentsDir = join(examplesRoutesDir, '(_components)');
-  const islandsDir = join(appDir, 'islands');
-  const designIslandsDir = join(islandsDir, 'design');
   const generatedDir = join(appDir, '.generated');
   const componentsDir = join(appDir, 'components');
   const uiComponentsDir = join(componentsDir, 'ui');
   const assetsDir = join(appDir, 'assets');
   const libDir = join(appDir, 'lib');
-  const designLibDir = join(libDir, 'design');
   const partialsDir = join(routesDir, 'partials');
   const partialsExamplesDir = join(partialsDir, 'examples');
   const serviceExampleDir = options.serviceName
@@ -167,15 +220,15 @@ export async function writeNormalizedAppFiles(
   await createDir(routeSharedDir);
   await createDir(designGroupDir);
   await createDir(designRoutesDir);
-  await createDir(examplesComponentsDir);
-  await createDir(islandsDir);
+  await createDir(designComponentsDir);
   await createDir(designIslandsDir);
+  await createDir(designSharedDir);
+  await createDir(examplesComponentsDir);
   await createDir(generatedDir);
   await createDir(componentsDir);
   await createDir(uiComponentsDir);
   await createDir(assetsDir);
   await createDir(libDir);
-  await createDir(designLibDir);
   if (options.includeExampleService) {
     if (
       serviceExampleDir && serviceExampleComponentsDir && serviceExampleIslandsDir &&
@@ -230,8 +283,8 @@ export async function writeNormalizedAppFiles(
   await write(join(generatedDir, 'manifest.ts'), generateRouteManifestSeed());
   await write(join(generatedDir, 'routes.ts'), generateRoutesSeed());
   await write(join(uiComponentsDir, 'mod.ts'), appUiModTemplate);
-  await write(join(designLibDir, 'registry.ts'), appDesignRegistryTemplate);
-  await write(join(designLibDir, 'tokens.ts'), appDesignTokensLibTemplate);
+  await write(join(designSharedDir, 'registry.ts'), appDesignRegistryTemplate);
+  await write(join(designSharedDir, 'tokens.ts'), appDesignTokensLibTemplate);
   await write(
     join(designIslandsDir, 'FloatingSurfaceDemo.tsx'),
     appDesignFloatingSurfaceDemoTemplate,
@@ -248,6 +301,14 @@ export async function writeNormalizedAppFiles(
   await write(
     join(routeComponentsDir, 'home-view.tsx'),
     await context.templateAdapter.render(appHomeViewTemplate, appTemplateVars),
+  );
+  await write(
+    join(routesDir, 'dashboard.tsx'),
+    await context.templateAdapter.render(appDashboardRouteTemplate, appTemplateVars),
+  );
+  await write(
+    join(routeComponentsDir, 'dashboard-view.tsx'),
+    await context.templateAdapter.render(appDashboardViewTemplate, appTemplateVars),
   );
   await write(
     join(routesDir, '_layout.tsx'),
@@ -271,8 +332,14 @@ export async function writeNormalizedAppFiles(
   );
   await write(join(designRoutesDir, 'index.tsx'), appDesignIndexRouteTemplate);
   await write(join(designRoutesDir, 'tokens.tsx'), appDesignTokensRouteTemplate);
+  await write(join(designComponentsDir, 'tokens-view.tsx'), appDesignTokensViewTemplate);
   await write(join(designRoutesDir, 'components.tsx'), appDesignComponentsRouteTemplate);
+  await write(join(designComponentsDir, 'components-view.tsx'), appDesignComponentsViewTemplate);
   await write(join(designRoutesDir, 'composition.tsx'), appDesignCompositionRouteTemplate);
+  await write(
+    join(designComponentsDir, 'composition-view.tsx'),
+    appDesignCompositionViewTemplate,
+  );
   await write(
     join(examplesRoutesDir, 'index.tsx'),
     await context.templateAdapter.render(appExamplesIndexRouteTemplate, appTemplateVars),
@@ -280,6 +347,14 @@ export async function writeNormalizedAppFiles(
   await write(
     join(examplesComponentsDir, 'examples-view.tsx'),
     await context.templateAdapter.render(appExamplesViewTemplate, appTemplateVars),
+  );
+  await write(
+    join(examplesRoutesDir, 'crud.tsx'),
+    await context.templateAdapter.render(appCrudExampleRouteTemplate, appTemplateVars),
+  );
+  await write(
+    join(examplesComponentsDir, 'crud-view.tsx'),
+    await context.templateAdapter.render(appCrudExampleViewTemplate, appTemplateVars),
   );
   if (
     options.includeExampleService && serviceExampleDir &&

@@ -27,10 +27,25 @@ export const routes = {
 
 export const appRoutes = {
   home: routes.$route,
+  dashboard: routes.dashboard.$route,
   health: routes.health.$route,
   examples: routes.examples.$route,
+  crudExample: routes.examples.crud,
   serviceExample: routes.examples.serviceExample,
   telemetryExample: routes.examples.telemetry,
+  design: routes.design.$route,
+  designTokens: createRouteReference('/design/tokens', {
+    id: 'design.tokens',
+    kind: 'page',
+  }),
+  designComponents: createRouteReference('/design/components', {
+    id: 'design.components',
+    kind: 'page',
+  }),
+  designComposition: createRouteReference('/design/composition', {
+    id: 'design.composition',
+    kind: 'page',
+  }),
 } as const;
 
 export const appRouter = {

@@ -1,21 +1,32 @@
 import { Badge, Breadcrumb, SidebarShell } from '@app/components/ui/mod.ts';
 import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
+import { appRoutes } from '@app/router.ts';
 import { define } from '@app/utils.ts';
 
 const DESIGN_NAVIGATION = [
   {
     label: 'Reference',
     items: [
-      { href: '/design/tokens', label: 'Tokens', icon: '◧', matchPrefix: true },
-      { href: '/design/components', label: 'Components', icon: '▣', matchPrefix: true },
-      { href: '/design/composition', label: 'Composition', icon: '◰', matchPrefix: true },
+      { href: appRoutes.designTokens.href(), label: 'Tokens', icon: '◧', matchPrefix: true },
+      {
+        href: appRoutes.designComponents.href(),
+        label: 'Components',
+        icon: '▣',
+        matchPrefix: true,
+      },
+      {
+        href: appRoutes.designComposition.href(),
+        label: 'Composition',
+        icon: '◰',
+        matchPrefix: true,
+      },
     ],
   },
   {
     label: 'App',
     items: [
-      { href: '/', label: 'Home', icon: '◫', matchPrefix: false },
+      { href: appRoutes.home.href(), label: 'Home', icon: '◫', matchPrefix: false },
     ],
   },
 ] as const;

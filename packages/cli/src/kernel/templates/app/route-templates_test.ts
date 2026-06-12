@@ -7,8 +7,14 @@ import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
 import {
   appAppTemplate,
   appClientTemplate,
+  appCrudExampleRouteTemplate,
+  appCrudExampleViewTemplate,
+  appDashboardRouteTemplate,
+  appDashboardViewTemplate,
   appDesignComponentsRouteTemplate,
+  appDesignComponentsViewTemplate,
   appDesignCompositionRouteTemplate,
+  appDesignCompositionViewTemplate,
   appDesignCssTemplate,
   appDesignFloatingSurfaceDemoTemplate,
   appDesignIndexRouteTemplate,
@@ -17,6 +23,7 @@ import {
   appDesignTokenClipboardTemplate,
   appDesignTokensLibTemplate,
   appDesignTokensRouteTemplate,
+  appDesignTokensViewTemplate,
   appExampleServiceTemplate,
   appExamplesIndexRouteTemplate,
   appExamplesViewTemplate,
@@ -62,9 +69,14 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, "id: 'examples.teamMembers'");
     assertStringIncludes(output, 'export const appRoutes = {');
     assertStringIncludes(output, 'home: routes.$route,');
+    assertStringIncludes(output, 'dashboard: routes.dashboard.$route,');
     assertStringIncludes(output, 'health: routes.health.$route,');
     assertStringIncludes(output, 'examples: routes.examples.$route,');
+    assertStringIncludes(output, 'crudExample: routes.examples.crud,');
     assertStringIncludes(output, 'serviceExample: routes.examples.serviceExample,');
+    assertStringIncludes(output, "designTokens: createRouteReference('/design/tokens'");
+    assertStringIncludes(output, "id: 'design.components'");
+    assertStringIncludes(output, "id: 'design.composition'");
     assertStringIncludes(output, 'export const appRouter = {');
   });
 
@@ -95,14 +107,33 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, 'export const homePage = definePage()');
     assertStringIncludes(route, '.withRoute(appRoutes.home)');
     assertStringIncludes(route, '.withMeta(() => ({');
-    assertStringIncludes(route, 'href: appRoutes.health.href()');
+    assertStringIncludes(route, 'href: appRoutes.dashboard.href()');
+    assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
     assertStringIncludes(route, 'href: appRoutes.examples.href()');
-    assertStringIncludes(route, 'Edit apps/dashboard/routes/index.tsx to shape the frontend.');
+    assertStringIncludes(route, 'href: \'/design/components\'');
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface HomeViewProps {');
-    assertStringIncludes(view, "import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';");
-    assertStringIncludes(view, 'Scaffold route surface');
+    assertStringIncludes(view, "import { Badge, Button, Card, PageHeader, StatsGrid }");
+    assertStringIncludes(view, 'A generated NetScript workspace with app-owned UI copies');
+  });
+
+  it('dashboard route keeps operations data in a registry-only child view', async () => {
+    const adapter = makeAdapter();
+    const route = await adapter.render(appDashboardRouteTemplate, SAMPLE_APP_VARS);
+    const view = await adapter.render(appDashboardViewTemplate, SAMPLE_APP_VARS);
+    assertStringIncludes(route, "import DashboardView from './(_components)/dashboard-view.tsx';");
+    assertStringIncludes(route, "import { appRoutes } from '@app/router.ts';");
+    assertStringIncludes(route, '.withRoute(appRoutes.dashboard)');
+    assertStringIncludes(route, ".withLayer('dashboard', DashboardView");
+    assertStringIncludes(route, "name: 'api-gateway'");
+    assertStringIncludes(route, '.build();');
+    assertStringIncludes(view, 'interface DashboardViewProps {');
+    assertStringIncludes(view, 'StatsGrid');
+    assertStringIncludes(view, 'ResponsiveTable');
+    assertStringIncludes(view, 'Deployment readiness');
+    assert(!view.includes('class=\'flex'));
+    assert(!view.includes('class=\'grid'));
   });
 
   it('health route keeps the builder in health.tsx and the probe payload in shared helpers', async () => {
@@ -137,36 +168,60 @@ describe('app route template rendering', () => {
     assertStringIncludes(output, 'export default define.layout(');
     assertStringIncludes(output, "<Partial name='page'>");
     assertStringIncludes(output, 'const homeHref = appRoutes.home.href();');
+    assertStringIncludes(output, 'const dashboardHref = appRoutes.dashboard.href();');
     assertStringIncludes(output, 'const examplesHref = appRoutes.examples.href();');
     assertStringIncludes(output, 'url.pathname.startsWith(examplesHref)');
-    assertStringIncludes(output, 'f-client-nav={true}');
+    assertStringIncludes(output, "import { Badge, Button } from '@app/components/ui/mod.ts';");
+    assertStringIncludes(output, "<Button\n            type='link'\n            href={dashboardHref}");
     assertStringIncludes(
       output,
       "aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}",
     );
   });
 
-  it('design route templates port the playground reference pages into the scaffold', async () => {
+  it('design route templates use NetScript page builders and scoped route files', async () => {
     const adapter = makeAdapter();
     const layout = await adapter.render(appDesignLayoutTemplate, SAMPLE_APP_VARS);
+    const tokensRoute = await adapter.render(appDesignTokensRouteTemplate, SAMPLE_APP_VARS);
+    const componentsRoute = await adapter.render(appDesignComponentsRouteTemplate, SAMPLE_APP_VARS);
+    const compositionRoute = await adapter.render(
+      appDesignCompositionRouteTemplate,
+      SAMPLE_APP_VARS,
+    );
 
     assertStringIncludes(layout, "import SidebarToggle from '@app/islands/ui/SidebarToggle.tsx';");
     assertStringIncludes(layout, "import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';");
-    assertStringIncludes(layout, "href: '/design/tokens'");
+    assertStringIncludes(layout, "import { appRoutes } from '@app/router.ts';");
+    assertStringIncludes(layout, 'href: appRoutes.designTokens.href()');
     assertStringIncludes(layout, 'test-project');
-    assertStringIncludes(appDesignIndexRouteTemplate, "return ctx.redirect('/design/tokens');");
+    assertStringIncludes(appDesignIndexRouteTemplate, 'return ctx.redirect(appRoutes.designTokens.href());');
+    assertStringIncludes(tokensRoute, "import DesignTokensView from './(_components)/tokens-view.tsx';");
+    assertStringIncludes(tokensRoute, '.withRoute(appRoutes.designTokens)');
+    assertStringIncludes(tokensRoute, ".withLayer('tokens', DesignTokensView");
     assertStringIncludes(
-      appDesignTokensRouteTemplate,
-      "import TokenClipboard from '@app/islands/design/TokenClipboard.tsx';",
+      componentsRoute,
+      "import DesignComponentsView from './(_components)/components-view.tsx';",
     );
-    assertStringIncludes(appDesignTokensRouteTemplate, "from '@app/lib/design/tokens.ts';");
-    assertStringIncludes(appDesignComponentsRouteTemplate, "from '@app/lib/design/registry.ts';");
+    assertStringIncludes(componentsRoute, '.withRoute(appRoutes.designComponents)');
+    assertStringIncludes(componentsRoute, ".withLayer('components', DesignComponentsView");
     assertStringIncludes(
-      appDesignComponentsRouteTemplate,
-      "from '@app/islands/design/FloatingSurfaceDemo.tsx';",
+      compositionRoute,
+      "import DesignCompositionView from './(_components)/composition-view.tsx';",
     );
-    assertStringIncludes(appDesignComponentsRouteTemplate, 'responsive-table');
-    assertStringIncludes(appDesignCompositionRouteTemplate, 'Composition');
+    assertStringIncludes(compositionRoute, '.withRoute(appRoutes.designComposition)');
+    assertStringIncludes(compositionRoute, ".withLayer('composition', DesignCompositionView");
+    assertStringIncludes(
+      appDesignTokensViewTemplate,
+      "import TokenClipboard from '../(_islands)/TokenClipboard.tsx';",
+    );
+    assertStringIncludes(appDesignTokensViewTemplate, "from '../(_shared)/tokens.ts';");
+    assertStringIncludes(appDesignComponentsViewTemplate, "from '../(_shared)/registry.ts';");
+    assertStringIncludes(
+      appDesignComponentsViewTemplate,
+      "from '../(_islands)/FloatingSurfaceDemo.tsx';",
+    );
+    assertStringIncludes(appDesignComponentsViewTemplate, 'responsive-table');
+    assertStringIncludes(appDesignCompositionViewTemplate, 'Composition');
     assertStringIncludes(appDesignRegistryTemplate, "name: 'responsive-table'");
     assertStringIncludes(
       appDesignTokensLibTemplate,
@@ -190,12 +245,29 @@ describe('app route template rendering', () => {
     assertStringIncludes(route, "import { definePage } from '@app/utils.ts';");
     assertStringIncludes(route, 'export const examplesPage = definePage()');
     assertStringIncludes(route, '.withRoute(appRoutes.examples)');
-    assertStringIncludes(route, 'href: appRoutes.serviceExample.href()');
+    assertStringIncludes(route, 'href: appRoutes.crudExample.href()');
     assertStringIncludes(route, '/examples/telemetry');
     assertStringIncludes(route, '.build();');
     assertStringIncludes(route, 'export { page as default };');
     assertStringIncludes(view, 'interface ExamplesViewProps {');
-    assertStringIncludes(view, 'Visit route');
+    assertStringIncludes(view, 'ResponsiveTable');
+    assertStringIncludes(view, 'Open CRUD example');
+  });
+
+  it('CRUD example route uses registry form, table, and detail blocks', async () => {
+    const adapter = makeAdapter();
+    const route = await adapter.render(appCrudExampleRouteTemplate, SAMPLE_APP_VARS);
+    const view = await adapter.render(appCrudExampleViewTemplate, SAMPLE_APP_VARS);
+    assertStringIncludes(route, "import CrudExampleView from './(_components)/crud-view.tsx';");
+    assertStringIncludes(route, '.withRoute(appRoutes.crudExample)');
+    assertStringIncludes(route, ".withLayer('crud', CrudExampleView");
+    assertStringIncludes(route, "name: 'Acme Robotics'");
+    assertStringIncludes(view, 'FilterForm');
+    assertStringIncludes(view, 'ResponsiveTable');
+    assertStringIncludes(view, 'DetailLayout');
+    assertStringIncludes(view, 'No accounts match these filters');
+    assert(!view.includes('class=\'flex'));
+    assert(!view.includes('class=\'grid'));
   });
 
   it('example service template wires the selected service client and query helpers', async () => {

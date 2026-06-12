@@ -1,14 +1,17 @@
 import { Partial } from 'fresh/runtime';
 import ThemeToggle from '@app/islands/ui/ThemeToggle.tsx';
+import { Badge, Button } from '@app/components/ui/mod.ts';
 import { appRoutes } from '@app/router.ts';
 import { define } from '@app/utils.ts';
 
 export default define.layout(function RootLayout({ Component, url }) {
   const homeHref = appRoutes.home.href();
+  const dashboardHref = appRoutes.dashboard.href();
   const examplesHref = appRoutes.examples.href();
   const healthHref = appRoutes.health.href();
-  const navLinkClass = 'ns-btn ns-btn--ghost ns-btn--sm';
-  const showScaffoldChrome = url.pathname === homeHref || url.pathname.startsWith(examplesHref);
+  const designHref = '/design/components';
+  const showScaffoldChrome = url.pathname === homeHref || url.pathname === dashboardHref ||
+    url.pathname.startsWith(examplesHref);
 
   if (!showScaffoldChrome) {
     return (
@@ -21,39 +24,52 @@ export default define.layout(function RootLayout({ Component, url }) {
   return (
     <Partial name='page'>
       <header class='ns-topbar'>
-        <div class='flex items-center gap-4'>
-          <a href={homeHref} f-client-nav={true} class='font-mono text-sm font-medium tracking-tight text-ns-fg no-underline'>
+        <div class='ns-cluster ns-cluster--sm'>
+          <a href={homeHref} f-client-nav={true} class='ns-topbar__brand'>
             {{name}}
           </a>
-          <span class='text-[0.68rem] font-mono uppercase tracking-[0.18em] text-ns-muted-fg'>
-            {{appName}}
-          </span>
+          <Badge variant='muted'>{{appName}}</Badge>
         </div>
-        <nav class='flex items-center gap-2'>
-          <a
+        <nav class='ns-cluster ns-cluster--sm'>
+          <Button
+            type='link'
             href={homeHref}
-            f-client-nav={true}
-            class={navLinkClass}
+            variant='ghost'
+            size='sm'
             aria-current={url.pathname === homeHref ? 'page' : undefined}
           >
             Home
-          </a>
-          <a
+          </Button>
+          <Button
+            type='link'
+            href={dashboardHref}
+            variant='ghost'
+            size='sm'
+            aria-current={url.pathname === dashboardHref ? 'page' : undefined}
+          >
+            Dashboard
+          </Button>
+          <Button
+            type='link'
             href={examplesHref}
-            f-client-nav={true}
-            class={navLinkClass}
+            variant='ghost'
+            size='sm'
             aria-current={url.pathname.startsWith(examplesHref) ? 'page' : undefined}
           >
             Examples
-          </a>
-          <a
+          </Button>
+          <Button
+            type='link'
             href={healthHref}
-            f-client-nav={true}
-            class={navLinkClass}
+            variant='ghost'
+            size='sm'
             aria-current={url.pathname === healthHref ? 'page' : undefined}
           >
             Health
-          </a>
+          </Button>
+          <Button type='link' href={designHref} variant='ghost' size='sm'>
+            Design
+          </Button>
           <ThemeToggle />
         </nav>
       </header>

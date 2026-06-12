@@ -337,3 +337,18 @@ documentation.
 - **Action:** keep the local MCP evidence; revisit a pure-script Playwright harness in Slice 16 if
   needed.
 - **Evidence:** `slice14-design-routes-browser-report.md`.
+
+## 2026-06-12 - Slice 15 MCP theme-click limitation
+
+- **What:** The generated app route screenshots and console checks passed through the Playwright MCP,
+  but the click-capable MCP namespace could not attach to the same browser profile for the theme
+  toggle interaction.
+- **Source:** `mcp__mcp_server_playwright.browser_click` returned `Browser is already in use for
+  C:\Users\chaut\AppData\Local\ms-playwright-mcp\mcp-chrome-a7ac91e`.
+- **Expected:** Automated theme-toggle click on the generated `/design/composition` route.
+- **Actual:** Captured route/mobile screenshots and console evidence through `mcp__playwright`;
+  user manually verified the theme flip and route rendering.
+- **Severity:** minor
+- **Action:** Carry a scriptable isolated browser proof into Slice 16 e2e if the MCP profile remains
+  locked.
+- **Evidence:** `slice15-scaffold-pages-browser-report.md`.
