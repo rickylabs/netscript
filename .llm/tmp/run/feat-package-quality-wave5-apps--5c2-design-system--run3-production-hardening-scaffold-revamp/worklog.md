@@ -700,3 +700,16 @@ only if the generated app should ship it by default.
 
 - Framework: `4bf05ebd68224a5d53407a6808b0cadb4881fb7e`
 - Repo-genesis: N/A, CLI package absent from outer worktree.
+
+## Final Readiness Check
+
+### Gates
+
+| Gate | Result | Command / Evidence | Notes |
+|---|---|---|---|
+| publish dry-run | PASS | `deno publish --dry-run` from `packages/fresh-ui` | Ran from a clean tree without `--allow-dirty`; simulated `@netscript/fresh-ui@0.1.0`. |
+| JSR audit | PASS with WARN | `deno run --allow-read --allow-run ../../.llm/tools/fitness/audit-jsr-package.ts` from `packages/fresh-ui` | Dry-run OK; one known parser warning for Deno's slow-types banner. |
+
+### Evidence
+
+- `final-readiness-report.md`
