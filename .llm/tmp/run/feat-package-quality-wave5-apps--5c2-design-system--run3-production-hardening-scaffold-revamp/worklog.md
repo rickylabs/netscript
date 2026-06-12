@@ -505,3 +505,51 @@ only if the generated app should ship it by default.
 
 - Framework: `c424dd6ee58d952400fdd1d39ca7bb1e1b543574`
 - Repo-genesis: N/A, audit-only slice.
+
+## 2026-06-12 - Slice 13: scaffold consumes fresh-ui registry install
+
+### Changed
+
+- Moved the CLI `ui:init` / `ui:add` registry installer into kernel application code and kept the
+  public feature module as a re-export.
+- Replaced the scaffold's bespoke Fresh app design CSS and local Button/Card/ThemeToggle templates
+  with a real `installUiRegistryItems()` call against `DEFAULT_UI_INIT_ITEMS`.
+- Seeded the generated app with `foundation`, `floating-styles`, and `control-props`, including
+  app `deno.json` import merging and the fresh-ui styles aggregator.
+- Updated generated app UI exports and ThemeToggle imports to use the registry copy locations.
+- Taught the dry-run file-system adapter to read its latest recorded write before falling back to
+  the host file system, which lets the registry installer patch scaffold-created `deno.json` during
+  dry runs.
+- Added `slice13-scaffold-ui-init-smoke.md` with generated-app smoke evidence.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| focused CLI fmt | PASS | `deno fmt --no-config --check` on touched TS files | Re-run after implementation; no formatting drift. |
+| focused CLI lint | PASS | `deno lint --no-config` on touched TS files | Registry/scaffold/dry-run/template tests targets clean. |
+| targeted check | PASS | `deno check --unstable-kv` on scaffold writer and registry modules | Covers the moved installer and scaffold integration. |
+| focused CLI tests | PASS | `deno test --allow-read --allow-write --allow-env --allow-run ...` | 16 tests / 54 steps passed across registry, dry-run FS, route templates, generator config, template registry, orchestrate init, and scaffolder tests. |
+| generated scaffold smoke | PASS | `deno run -A packages/cli/bin/netscript-dev.ts init slice13-ui ...` | Created 93 files / 17 directories; copied 21 local packages. |
+| generated app check | PASS | `deno check --unstable-kv apps/dashboard` from generated workspace | Real generated app checked after rejecting a root-relative no-match run as non-evidence. |
+| package check | PASS | `deno task check` from framework `packages/fresh-ui` | Includes `--unstable-kv`. |
+| package test | PASS | `deno task test` from framework `packages/fresh-ui` | 39 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from framework `packages/fresh-ui` | Generated token artifacts stable; Git emitted CRLF warning only. |
+| DS no raw hex | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts` | 95 files clean. |
+| DS color utilities | PASS | `deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts` | 95 files clean. |
+| arch:check | PASS | `deno task arch:check` from framework root | 0 fail, 1 existing manifest-size warn. |
+| browser validation | N/A | Non-visual integration slice | Full generated app browser proof remains locked to Slice 16. |
+| copy fidelity | N/A | CLI package absent from repo-genesis | No outer-worktree sync target for this slice. |
+
+### Drift
+
+- The first generated-app check command was root-relative and produced Deno's "No matching files
+  found" message with exit 0. It was rejected as evidence; the command was re-run from the generated
+  workspace against `apps/dashboard` and passed.
+- `control-props` needed to join the default scaffold install set because the app-owned UI barrel
+  exports the registry helper; this is an in-scope Slice 13 correction.
+
+### Commits
+
+- Framework: `cd30ffdf2bfb66557191b70b275614659e5a378f`
+- Repo-genesis: N/A, CLI package absent from outer worktree.

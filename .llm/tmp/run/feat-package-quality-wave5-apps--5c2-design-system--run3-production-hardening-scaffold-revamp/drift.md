@@ -283,3 +283,16 @@ documentation.
 - **Severity:** minor
 - **Action:** defer to Slice 13/14; Slice 12 is audit-only.
 - **Evidence:** `slice12-scaffold-fresh-ui-gap-report.md`.
+
+## 2026-06-12 - generated app check can pass vacuously from the wrong cwd
+
+- **What:** A Slice 13 generated-app `deno check --unstable-kv .llm/tmp/.../apps/dashboard`
+  invocation from the repository root emitted "No matching files found" while returning exit 0.
+- **Source:** Deno interpreted the root-relative generated app path as a non-matching target.
+- **Expected:** Generated app checks must prove the scaffolded workspace type-checks.
+- **Actual:** The no-match run was discarded; the command was re-run from the generated workspace
+  as `deno check --unstable-kv apps/dashboard` and passed.
+- **Severity:** minor
+- **Action:** for scaffold smoke checks, run Deno from the generated project root or check for
+  actual file targets in the output.
+- **Evidence:** `slice13-scaffold-ui-init-smoke.md`.

@@ -39,3 +39,4 @@ Format:
 - 3f3db55ca8be163f2bf5f4e888d3ec038ba0e517: fresh-ui: document interactive entrypoint module
 - 189fa782fd0a4b72c8f1e8101b8e3f6a6ee2aa61: fresh-ui: sync interactive module docs
 - c424dd6ee58d952400fdd1d39ca7bb1e1b543574: docs: audit scaffold fresh-ui gaps
+- cd30ffdf2bfb66557191b70b275614659e5a378f: cli: install fresh-ui registry during scaffold
