@@ -1,596 +1,596 @@
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:17:1
-   | 
-17 | export function createFormEnhancementSnapshot<TValues extends FormValues>(
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx[0m[0m[33m:17:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m17 | [0mexport function createFormEnhancementSnapshot<TValues extends FormValues>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'applyCollectionStrategy' references private type 'IntentButtonProps'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:39:1
-    | 
- 39 | export function applyCollectionStrategy<TProps extends IntentButtonProps>(
-    | ^
-    = hint: make the referenced type public or remove the reference
-    | 
-143 | export interface IntentButtonProps {
-    | - this is the referenced type
-    | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'applyCollectionStrategy' references private type 'IntentButtonProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx[0m[0m[33m:39:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m39 | [0mexport function applyCollectionStrategy<TProps extends IntentButtonProps>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m143 | [0mexport interface IntentButtonProps {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:39:1
-   | 
-39 | export function applyCollectionStrategy<TProps extends IntentButtonProps>(
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx[0m[0m[33m:39:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0mexport function applyCollectionStrategy<TProps extends IntentButtonProps>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:57:1
-   | 
-57 | export function useFormEnhancement<TValues extends FormValues>(
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx[0m[0m[33m:57:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m57 | [0mexport function useFormEnhancement<TValues extends FormValues>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:240:1
-    | 
-240 | export function getSubmissionHiddenInputProps(submissionId: string) {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx[0m[0m[33m:240:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m240 | [0mexport function getSubmissionHiddenInputProps(submissionId: string) {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-return-type]: exported function is missing an explicit return type annotation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx:240:1
-    | 
-240 | export function getSubmissionHiddenInputProps(submissionId: string) {
-    | ^
+[0m[1m[31merror[missing-return-type][0m: [0m[1mexported function is missing an explicit return type annotation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx[0m[0m[33m:240:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m240 | [0mexport function getSubmissionHiddenInputProps(submissionId: string) {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'Form' references private type 'FormProps'
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx:21:1
-   | 
-21 | export function Form<TValues extends FormValues>({
-   | ^
-   = hint: make the referenced type public or remove the reference
-   | 
-14 | export interface FormProps<TValues extends FormValues>
-   | - this is the referenced type
-   | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Form' references private type 'FormProps'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/form.tsx[0m[0m[33m:21:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0mexport function Form<TValues extends FormValues>({
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0mexport interface FormProps<TValues extends FormValues>
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx:21:1
-   | 
-21 | export function Form<TValues extends FormValues>({
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/form.tsx[0m[0m[33m:21:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0mexport function Form<TValues extends FormValues>({
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-return-type]: exported function is missing an explicit return type annotation
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/form.tsx:21:1
-   | 
-21 | export function Form<TValues extends FormValues>({
-   | ^
+[0m[1m[31merror[missing-return-type][0m: [0m[1mexported function is missing an explicit return type annotation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/form.tsx[0m[0m[33m:21:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0mexport function Form<TValues extends FormValues>({
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'FormRegion' references private type 'FormRegionProps'
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx:10:1
-   | 
-10 | export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
-   | ^
-   = hint: make the referenced type public or remove the reference
-   | 
- 4 | export interface FormRegionProps {
-   | - this is the referenced type
-   | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'FormRegion' references private type 'FormRegionProps'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx[0m[0m[33m:10:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m4 | [0mexport interface FormRegionProps {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx:10:1
-   | 
-10 | export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx[0m[0m[33m:10:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-return-type]: exported function is missing an explicit return type annotation
-  --> /home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx:10:1
-   | 
-10 | export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
-   | ^
+[0m[1m[31merror[missing-return-type][0m: [0m[1mexported function is missing an explicit return type annotation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx[0m[0m[33m:10:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0mexport function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:332:1
-    | 
-332 | export interface RuntimeFormState<TValues extends FormValues> {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:332:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m332 | [0mexport interface RuntimeFormState<TValues extends FormValues> {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:333:3
-    | 
-333 |   readonly id: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:333:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m333 | [0m  readonly id: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:334:3
-    | 
-334 |   readonly action: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:334:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m334 | [0m  readonly action: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:335:3
-    | 
-335 |   readonly method: 'POST' | 'PUT' | 'PATCH';
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:335:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m335 | [0m  readonly method: 'POST' | 'PUT' | 'PATCH';
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:336:3
-    | 
-336 |   readonly values: TValues;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:336:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m336 | [0m  readonly values: TValues;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:337:3
-    | 
-337 |   readonly initialValues: Partial<TValues>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:337:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m337 | [0m  readonly initialValues: Partial<TValues>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:338:3
-    | 
-338 |   readonly fieldErrors: FormFieldErrors<TValues>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:338:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m338 | [0m  readonly fieldErrors: FormFieldErrors<TValues>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:339:3
-    | 
-339 |   readonly formErrors: readonly string[];
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:339:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m339 | [0m  readonly formErrors: readonly string[];
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:340:3
-    | 
-340 |   readonly hasErrors: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:340:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m340 | [0m  readonly hasErrors: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:341:3
-    | 
-341 |   readonly submitted: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:341:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m341 | [0m  readonly submitted: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:342:3
-    | 
-342 |   readonly intent: FormIntent | null;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:342:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m342 | [0m  readonly intent: FormIntent | null;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:343:3
-    | 
-343 |   readonly submissionId: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:343:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m343 | [0m  readonly submissionId: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:344:3
-    | 
-344 |   readonly csrfToken: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:344:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m344 | [0m  readonly csrfToken: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'RuntimeFormState["fields"]' references private type 'FieldDescriptorMap'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
-    | 
-345 |   readonly fields: FieldDescriptorMap<TValues>;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
-325 | export type FieldDescriptorMap<T> = {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RuntimeFormState["fields"]' references private type 'FieldDescriptorMap'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:345:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m345 | [0m  readonly fields: FieldDescriptorMap<TValues>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m325 | [0mexport type FieldDescriptorMap<T> = {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
-    | 
-345 |   readonly fields: FieldDescriptorMap<TValues>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:345:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m345 | [0m  readonly fields: FieldDescriptorMap<TValues>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'RuntimeFormState["constraints"]' references private type 'FieldConstraints'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
-    | 
-346 |   readonly constraints: Record<string, FieldConstraints>;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 49 | export interface FieldConstraints {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RuntimeFormState["constraints"]' references private type 'FieldConstraints'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:346:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m346 | [0m  readonly constraints: Record<string, FieldConstraints>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m49 | [0mexport interface FieldConstraints {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
-    | 
-346 |   readonly constraints: Record<string, FieldConstraints>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:346:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m346 | [0m  readonly constraints: Record<string, FieldConstraints>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'RuntimeFormState["formProps"]' references private type 'FormElementProps'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
-    | 
-347 |   readonly formProps: FormElementProps;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 62 | export interface FormElementProps {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RuntimeFormState["formProps"]' references private type 'FormElementProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:347:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m347 | [0m  readonly formProps: FormElementProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m62 | [0mexport interface FormElementProps {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
-    | 
-347 |   readonly formProps: FormElementProps;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:347:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m347 | [0m  readonly formProps: FormElementProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'RuntimeFormState["csrfInputProps"]' references private type 'FormCsrfInputProps'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
-    | 
-348 |   readonly csrfInputProps: FormCsrfInputProps;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 69 | export interface FormCsrfInputProps {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RuntimeFormState["csrfInputProps"]' references private type 'FormCsrfInputProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:348:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m348 | [0m  readonly csrfInputProps: FormCsrfInputProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m69 | [0mexport interface FormCsrfInputProps {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
-    | 
-348 |   readonly csrfInputProps: FormCsrfInputProps;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:348:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m348 | [0m  readonly csrfInputProps: FormCsrfInputProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:351:1
-    | 
-351 | export interface FormEnhancementSnapshot<TValues extends FormValues> {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:351:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m351 | [0mexport interface FormEnhancementSnapshot<TValues extends FormValues> {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:352:3
-    | 
-352 |   readonly id: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:352:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m352 | [0m  readonly id: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:353:3
-    | 
-353 |   readonly action: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:353:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m353 | [0m  readonly action: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:354:3
-    | 
-354 |   readonly method: 'POST' | 'PUT' | 'PATCH';
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:354:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m354 | [0m  readonly method: 'POST' | 'PUT' | 'PATCH';
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:355:3
-    | 
-355 |   readonly values: TValues;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:355:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m355 | [0m  readonly values: TValues;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:356:3
-    | 
-356 |   readonly initialValues: Partial<TValues>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:356:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m356 | [0m  readonly initialValues: Partial<TValues>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:357:3
-    | 
-357 |   readonly fieldErrors: FormFieldErrors<TValues>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:357:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m357 | [0m  readonly fieldErrors: FormFieldErrors<TValues>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:358:3
-    | 
-358 |   readonly formErrors: readonly string[];
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:358:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m358 | [0m  readonly formErrors: readonly string[];
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:359:3
-    | 
-359 |   readonly hasErrors: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:359:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m359 | [0m  readonly hasErrors: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:360:3
-    | 
-360 |   readonly submitted: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:360:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m360 | [0m  readonly submitted: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:361:3
-    | 
-361 |   readonly intent: FormIntent | null;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:361:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m361 | [0m  readonly intent: FormIntent | null;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:362:3
-    | 
-362 |   readonly submissionId: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:362:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m362 | [0m  readonly submissionId: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:363:3
-    | 
-363 |   readonly csrfToken: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:363:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m363 | [0m  readonly csrfToken: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'FormEnhancementSnapshot["constraints"]' references private type 'FieldConstraints'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:364:3
-    | 
-364 |   readonly constraints: Record<string, FieldConstraints>;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 49 | export interface FieldConstraints {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'FormEnhancementSnapshot["constraints"]' references private type 'FieldConstraints'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:364:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m364 | [0m  readonly constraints: Record<string, FieldConstraints>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m49 | [0mexport interface FieldConstraints {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:364:3
-    | 
-364 |   readonly constraints: Record<string, FieldConstraints>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:364:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m364 | [0m  readonly constraints: Record<string, FieldConstraints>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'FormEnhancementSnapshot["formProps"]' references private type 'FormElementProps'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:365:3
-    | 
-365 |   readonly formProps: FormElementProps;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 62 | export interface FormElementProps {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'FormEnhancementSnapshot["formProps"]' references private type 'FormElementProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:365:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m365 | [0m  readonly formProps: FormElementProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m62 | [0mexport interface FormElementProps {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:365:3
-    | 
-365 |   readonly formProps: FormElementProps;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:365:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m365 | [0m  readonly formProps: FormElementProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'FormEnhancementSnapshot["csrfInputProps"]' references private type 'FormCsrfInputProps'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:366:3
-    | 
-366 |   readonly csrfInputProps: FormCsrfInputProps;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 69 | export interface FormCsrfInputProps {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'FormEnhancementSnapshot["csrfInputProps"]' references private type 'FormCsrfInputProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:366:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m366 | [0m  readonly csrfInputProps: FormCsrfInputProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m69 | [0mexport interface FormCsrfInputProps {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:366:3
-    | 
-366 |   readonly csrfInputProps: FormCsrfInputProps;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:366:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m366 | [0m  readonly csrfInputProps: FormCsrfInputProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:369:1
-    | 
-369 | export type FormCollectionStrategyMode = 'server' | 'client' | 'hybrid';
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:369:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m369 | [0mexport type FormCollectionStrategyMode = 'server' | 'client' | 'hybrid';
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:371:1
-    | 
-371 | export interface FormCollectionStrategy {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:371:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m371 | [0mexport interface FormCollectionStrategy {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:372:3
-    | 
-372 |   readonly mode: FormCollectionStrategyMode;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:372:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m372 | [0m  readonly mode: FormCollectionStrategyMode;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:373:3
-    | 
-373 |   readonly partial?: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:373:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m373 | [0m  readonly partial?: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:374:3
-    | 
-374 |   readonly clientNav?: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:374:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m374 | [0m  readonly clientNav?: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:377:1
-    | 
-377 | export interface FormEnhancementOptions<TValues extends FormValues> {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:377:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m377 | [0mexport interface FormEnhancementOptions<TValues extends FormValues> {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:378:3
-    | 
-378 |   readonly partial?: string;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:378:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m378 | [0m  readonly partial?: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:379:3
-    | 
-379 |   readonly clientNav?: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:379:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m379 | [0m  readonly clientNav?: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:380:3
-    | 
-380 |   readonly validate?: 'onSubmit' | 'onBlur' | 'onChange';
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:380:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m380 | [0m  readonly validate?: 'onSubmit' | 'onBlur' | 'onChange';
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:381:3
-    | 
-381 |   readonly schema?: {
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:381:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m381 | [0m  readonly schema?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:388:3
-    | 
-388 |   readonly focusOnError?: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:388:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m388 | [0m  readonly focusOnError?: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:389:3
-    | 
-389 |   readonly onSubmitStart?: () => void;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:389:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m389 | [0m  readonly onSubmitStart?: () => void;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:390:3
-    | 
-390 |   readonly onSubmitEnd?: () => void;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:390:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m390 | [0m  readonly onSubmitEnd?: () => void;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:391:3
-    | 
-391 |   readonly collections?: Partial<Record<Extract<keyof TValues, string>, FormCollectionStrategy>>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:391:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m391 | [0m  readonly collections?: Partial<Record<Extract<keyof TValues, string>, FormCollectionStrategy>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:403:1
-    | 
-403 | export interface FormEnhancementState<TValues extends FormValues> {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:403:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m403 | [0mexport interface FormEnhancementState<TValues extends FormValues> {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:404:3
-    | 
-404 |   readonly pending: boolean;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:404:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m404 | [0m  readonly pending: boolean;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'FormEnhancementState["formProps"]' references private type 'EnhancedFormProps'
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:405:3
-    | 
-405 |   readonly formProps: EnhancedFormProps;
-    |   ^
-    = hint: make the referenced type public or remove the reference
-    | 
-394 | export interface EnhancedFormProps extends FormElementProps {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'FormEnhancementState["formProps"]' references private type 'EnhancedFormProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:405:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m405 | [0m  readonly formProps: EnhancedFormProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m394 | [0mexport interface EnhancedFormProps extends FormElementProps {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:405:3
-    | 
-405 |   readonly formProps: EnhancedFormProps;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:405:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m405 | [0m  readonly formProps: EnhancedFormProps;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:406:3
-    | 
-406 |   readonly fieldErrors: FormFieldErrors<TValues>;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:406:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m406 | [0m  readonly fieldErrors: FormFieldErrors<TValues>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:407:3
-    | 
-407 |   readonly formErrors: readonly string[];
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:407:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m407 | [0m  readonly formErrors: readonly string[];
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:408:3
-    | 
-408 |   readonly collectionStrategies: Partial<
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:408:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m408 | [0m  readonly collectionStrategies: Partial<
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:411:3
-    | 
-411 |   submit(intent?: FormIntent): void;
-    |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/form/types.ts[0m[0m[33m:411:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m411 | [0m  submit(intent?: FormIntent): void;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error: Found 74 documentation lint errors.
+[0m[1m[31merror[0m: Found [0m[1m74[0m documentation lint errors.

@@ -1,519 +1,519 @@
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:30:3
-   | 
-30 |   action: string;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:30:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m30 | [0m  action: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:31:3
-   | 
-31 |   partial: string;
-   |   ^
-
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:32:3
-   | 
-32 |   partialSearchParams?: string;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:31:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m31 | [0m  partial: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:32:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0m  partialSearchParams?: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:33:3
-   | 
-33 |   name: string;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:33:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m33 | [0m  name: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'DeferPageProps["component"]' references private type 'JSXInternal'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:34:3
-   | 
-34 |   component?: JSX.Element;
-   |   ^
-   = hint: make the referenced type public or remove the reference
-   | 
-78 | export namespace JSXInternal {
-   | - this is the referenced type
-   | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferPageProps["component"]' references private type 'JSXInternal'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:34:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m34 | [0m  component?: JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m78 | [0mexport namespace JSXInternal {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
-
-error[private-type-ref]: public type 'DeferPageProps["component"]' references private type 'JSXInternal.Element'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:34:3
-   | 
-34 |   component?: JSX.Element;
-   |   ^
-   = hint: make the referenced type public or remove the reference
-   | 
-96 |   export interface Element extends VNode<any> {}
-   |   - this is the referenced type
-   | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
-
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:34:3
-   | 
-34 |   component?: JSX.Element;
-   |   ^
-
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:35:3
-   | 
-35 |   fallback: JSX.Element;
-   |   ^
-
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:36:3
-   | 
-36 |   cachedAt?: number;
-   |   ^
-
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:37:3
-   | 
-37 |   staleTime?: number;
-   |   ^
-
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:52:3
-   | 
-52 |   ctx?: DeferPageRequestContextLike;
-   |   ^
-
-
-error[private-type-ref]: public type 'DeferPage' references private type 'JSXInternal'
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:114:1
-    | 
-114 | export function DeferPage({
-    | ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 78 | export namespace JSXInternal {
-    | - this is the referenced type
-    | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferPageProps["component"]' references private type 'JSXInternal.Element'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:34:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m34 | [0m  component?: JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m96 | [0m  export interface Element extends VNode<any> {}
+  [0m[38;5;12m | [0m  [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:34:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m34 | [0m  component?: JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:35:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m35 | [0m  fallback: JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:36:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0m  cachedAt?: number;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:37:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0m  staleTime?: number;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:52:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m52 | [0m  ctx?: DeferPageRequestContextLike;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferPage' references private type 'JSXInternal'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:114:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m114 | [0mexport function DeferPage({
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m78 | [0mexport namespace JSXInternal {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[private-type-ref]: public type 'DeferPage' references private type 'JSXInternal.Element'
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx:114:1
-    | 
-114 | export function DeferPage({
-    | ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 96 |   export interface Element extends VNode<any> {}
-    |   - this is the referenced type
-    | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
-
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:13:3
-   | 
-13 |   promise: Promise<T>;
-   |   ^
-
-
-error[private-type-ref]: public type 'DeferredProps["fallback"]' references private type 'JSXInternal'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:14:3
-   | 
-14 |   fallback?: JSX.Element;
-   |   ^
-   = hint: make the referenced type public or remove the reference
-   | 
-78 | export namespace JSXInternal {
-   | - this is the referenced type
-   | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
-
-
-error[private-type-ref]: public type 'DeferredProps["fallback"]' references private type 'JSXInternal.Element'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:14:3
-   | 
-14 |   fallback?: JSX.Element;
-   |   ^
-   = hint: make the referenced type public or remove the reference
-   | 
-96 |   export interface Element extends VNode<any> {}
-   |   - this is the referenced type
-   | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferPage' references private type 'JSXInternal.Element'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferPage.tsx[0m[0m[33m:114:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m114 | [0mexport function DeferPage({
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m96 | [0m  export interface Element extends VNode<any> {}
+   [0m[38;5;12m | [0m  [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:13:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m13 | [0m  promise: Promise<T>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferredProps["fallback"]' references private type 'JSXInternal'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:14:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0m  fallback?: JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m78 | [0mexport namespace JSXInternal {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferredProps["fallback"]' references private type 'JSXInternal.Element'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:14:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0m  fallback?: JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m96 | [0m  export interface Element extends VNode<any> {}
+  [0m[38;5;12m | [0m  [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
-
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:14:3
-   | 
-14 |   fallback?: JSX.Element;
-   |   ^
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:14:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0m  fallback?: JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'DeferredProps["children"]' references private type 'ComponentChildren'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:15:3
-   | 
-15 |   children: ComponentChildren | ((data: T) => JSX.Element);
-   |   ^
-   = hint: make the referenced type public or remove the reference
-   | 
-55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
-   | - this is the referenced type
-   | 
-
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferredProps["children"]' references private type 'ComponentChildren'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:15:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0m  children: ComponentChildren | ((data: T) => JSX.Element);
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m55 | [0mexport type ComponentChildren = ComponentChild[] | ComponentChild;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:15:3
-   | 
-15 |   children: ComponentChildren | ((data: T) => JSX.Element);
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:15:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0m  children: ComponentChildren | ((data: T) => JSX.Element);
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:16:3
-   | 
-16 |   errorFallback?: (error: Error) => JSX.Element;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:16:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m16 | [0m  errorFallback?: (error: Error) => JSX.Element;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'Deferred' references private type 'VNode'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx:67:1
-   | 
-67 | export function Deferred<T>(
-   | ^
-   = hint: make the referenced type public or remove the reference
-   | 
-13 | export interface VNode<P = {}> {
-   | - this is the referenced type
-   | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Deferred' references private type 'VNode'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/Deferred.tsx[0m[0m[33m:67:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m67 | [0mexport function Deferred<T>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m13 | [0mexport interface VNode<P = {}> {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[private-type-ref]: public type 'DeferComponent' references private type 'JSXInternal'
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx:113:1
-    | 
-113 | export function DeferComponent({
-    | ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 78 | export namespace JSXInternal {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferComponent' references private type 'JSXInternal'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx[0m[0m[33m:113:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m113 | [0mexport function DeferComponent({
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m78 | [0mexport namespace JSXInternal {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[private-type-ref]: public type 'DeferComponent' references private type 'JSXInternal.Element'
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx:113:1
-    | 
-113 | export function DeferComponent({
-    | ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 96 |   export interface Element extends VNode<any> {}
-    |   - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DeferComponent' references private type 'JSXInternal.Element'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/DeferIsland.tsx[0m[0m[33m:113:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m113 | [0mexport function DeferComponent({
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m96 | [0m  export interface Element extends VNode<any> {}
+   [0m[38;5;12m | [0m  [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
- --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:1:1
-  | 
-1 | export type DeferPolicyProfile =
-  | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:1:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m1 | [0mexport type DeferPolicyProfile =
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
- --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:7:1
-  | 
-7 | export type LegacyStaleStrategy = 'none' | 'server-prewarm';
-  | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:7:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0mexport type LegacyStaleStrategy = 'none' | 'server-prewarm';
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
- --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:9:1
-  | 
-9 | export interface DeferPolicyInput {
-  | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:9:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0mexport interface DeferPolicyInput {
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:10:3
-   | 
-10 |   profile?: DeferPolicyProfile;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  profile?: DeferPolicyProfile;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:11:3
-   | 
-11 |   staleTimeMs?: number;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:11:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0m  staleTimeMs?: number;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:12:3
-   | 
-12 |   prewarmOnMiss?: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:12:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m12 | [0m  prewarmOnMiss?: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:13:3
-   | 
-13 |   prewarmOnStale?: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:13:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m13 | [0m  prewarmOnStale?: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:14:3
-   | 
-14 |   clientRefreshOnFreshCache?: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:14:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0m  clientRefreshOnFreshCache?: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:15:3
-   | 
-15 |   skipClientWhenServerPrewarm?: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:15:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0m  skipClientWhenServerPrewarm?: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:18:1
-   | 
-18 | export interface DeferPolicyResolved {
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:18:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0mexport interface DeferPolicyResolved {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:19:3
-   | 
-19 |   profile: DeferPolicyProfile;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:19:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m19 | [0m  profile: DeferPolicyProfile;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:20:3
-   | 
-20 |   staleTimeMs: number;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:20:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m20 | [0m  staleTimeMs: number;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:21:3
-   | 
-21 |   prewarmOnMiss: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:21:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0m  prewarmOnMiss: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:22:3
-   | 
-22 |   prewarmOnStale: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:22:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m22 | [0m  prewarmOnStale: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:23:3
-   | 
-23 |   clientRefreshOnFreshCache: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:23:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m23 | [0m  clientRefreshOnFreshCache: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:24:3
-   | 
-24 |   skipClientWhenServerPrewarm: boolean;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:24:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m24 | [0m  skipClientWhenServerPrewarm: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:27:14
-   | 
-27 | export const DEFER_POLICY = {
-   |              ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:27:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m27 | [0mexport const DEFER_POLICY = {
+  [0m[38;5;12m | [0m             [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:32:14
-   | 
-32 | export const DEFER_STALE_MS = {
-   |              ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:32:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0mexport const DEFER_STALE_MS = {
+  [0m[38;5;12m | [0m             [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:37:14
-   | 
-37 | export const DETAIL_FORCE_REFRESH_POLICY: DeferPolicyInput = {
-   |              ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:37:14[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0mexport const DETAIL_FORCE_REFRESH_POLICY: DeferPolicyInput = {
+  [0m[38;5;12m | [0m             [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:43:1
-   | 
-43 | export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:43:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0mexport function resolveDetailDeferConfig(hasCompleteCache: boolean): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:53:1
-   | 
-53 | export type DeferClientDecisionReason =
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:53:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m53 | [0mexport type DeferClientDecisionReason =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:63:1
-   | 
-63 | export interface DeferClientDecision {
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:63:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0mexport interface DeferClientDecision {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:64:3
-   | 
-64 |   action: 'submit' | 'skip';
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:64:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m64 | [0m  action: 'submit' | 'skip';
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:65:3
-   | 
-65 |   reason: DeferClientDecisionReason;
-   |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:65:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m65 | [0m  reason: DeferClientDecisionReason;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:113:1
-    | 
-113 | export function resolveDeferPolicy(
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:113:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m113 | [0mexport function resolveDeferPolicy(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'decideDeferClientAction' references private type 'DeferClientDecisionInput'
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:143:1
-    | 
-143 | export function decideDeferClientAction(input: DeferClientDecisionInput): DeferClientDecision {
-    | ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 68 | interface DeferClientDecisionInput {
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'decideDeferClientAction' references private type 'DeferClientDecisionInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:143:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m143 | [0mexport function decideDeferClientAction(input: DeferClientDecisionInput): DeferClientDecision {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m68 | [0minterface DeferClientDecisionInput {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts:143:1
-    | 
-143 | export function decideDeferClientAction(input: DeferClientDecisionInput): DeferClientDecision {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/policy.ts[0m[0m[33m:143:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m143 | [0mexport function decideDeferClientAction(input: DeferClientDecisionInput): DeferClientDecision {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
- --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:5:1
-  | 
-5 | export interface DeferPrewarmResult {
-  | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:5:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m5 | [0mexport interface DeferPrewarmResult {
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
- --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:6:3
-  | 
-6 |   status: number;
-  |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:6:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0m  status: number;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
- --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:7:3
-  | 
-7 |   ok: boolean;
-  |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  ok: boolean;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
- --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:8:3
-  | 
-8 |   durationMs: number;
-  |   ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:8:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m8 | [0m  durationMs: number;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'emitDeferPrewarmDispatchSpan' references private type 'DeferPrewarmSpanInput'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:18:1
-   | 
-18 | export async function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
-   | ^
-   = hint: make the referenced type public or remove the reference
-   | 
-11 | interface DeferPrewarmSpanInput {
-   | - this is the referenced type
-   | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'emitDeferPrewarmDispatchSpan' references private type 'DeferPrewarmSpanInput'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:18:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0mexport async function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m11 | [0minterface DeferPrewarmSpanInput {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:18:1
-   | 
-18 | export async function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:18:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0mexport async function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'emitDeferCacheReadSpan' references private type 'DeferCacheReadSpanInput'
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:87:1
-   | 
-87 | export function emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise<void> {
-   | ^
-   = hint: make the referenced type public or remove the reference
-   | 
-81 | interface DeferCacheReadSpanInput {
-   | - this is the referenced type
-   | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'emitDeferCacheReadSpan' references private type 'DeferCacheReadSpanInput'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:87:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m87 | [0mexport function emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise<void> {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0minterface DeferCacheReadSpanInput {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-  --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:87:1
-   | 
-87 | export function emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise<void> {
-   | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:87:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m87 | [0mexport function emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise<void> {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error[private-type-ref]: public type 'emitDeferClientDecisionSpan' references private type 'Attributes'
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:104:1
-    | 
-104 | export function emitDeferClientDecisionSpan(attributes: Attributes): Promise<void> {
-    | ^
-    = hint: make the referenced type public or remove the reference
-    | 
- 19 | export type Attributes = Record<string, AttributeValue | undefined>;
-    | - this is the referenced type
-    | 
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'emitDeferClientDecisionSpan' references private type 'Attributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:104:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m104 | [0mexport function emitDeferClientDecisionSpan(attributes: Attributes): Promise<void> {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m19 | [0mexport type Attributes = Record<string, AttributeValue | undefined>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
 
-  info: to ensure documentation is complete all types that are exposed in the public API must be public
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
 
 
-error[missing-jsdoc]: exported symbol is missing JSDoc documentation
-   --> /home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts:104:1
-    | 
-104 | export function emitDeferClientDecisionSpan(attributes: Attributes): Promise<void> {
-    | ^
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/defer/telemetry.ts[0m[0m[33m:104:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m104 | [0mexport function emitDeferClientDecisionSpan(attributes: Attributes): Promise<void> {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
 
 
-error: Found 60 documentation lint errors.
+[0m[1m[31merror[0m: Found [0m[1m60[0m documentation lint errors.
