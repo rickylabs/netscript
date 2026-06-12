@@ -33,6 +33,7 @@ required summary artifacts keep local and cloud agents synchronized.
 | Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                       |
 | Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.          |
 | Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                          |
+| Iteration budget | `iterations=<n>` trigger token (default 500, clamped 50-3000); a run cut off at the limit reports `agent-failed` and keeps partial workspace files via the commit-back step. |
 | Summary artifact | `OPENHANDS_SUMMARY_PATH`, required before the workflow exits.                                   |
 | Status comment   | One workflow-owned PR/issue comment that starts as running and is edited with the final result. |
 | Thread replies   | Optional `OPENHANDS_REPLIES_PATH` review-comment replies.                                      |
@@ -74,6 +75,10 @@ required summary artifacts keep local and cloud agents synchronized.
 - **Posting duplicate comments**: the workflow owns the status/final comment. Agents write
   artifacts; they do not call `gh issue comment` directly.
 - **Using Actions for long sessions**: move multi-step, human-in-the-loop work to the VPS Web UI.
+- **Oversized single-run tasks**: a research+design+plan mega-prompt can exhaust the iteration
+  budget during exploration, leaving zero artifacts. Split the task into sequential triggers
+  and/or raise `iterations=`, and require the agent to create deliverable files early and grow
+  them incrementally.
 
 ## Reference Files
 

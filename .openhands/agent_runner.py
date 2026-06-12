@@ -16,8 +16,13 @@ logger = get_logger(__name__)
 SUMMARY_RETRY_PROMPT = (
     "You finished without writing the required run summary file at {path}. "
     "Write that file now as markdown with Summary, Changes, Validation, and "
-    "Remaining risks sections, then stop."
+    "Remaining risks sections, then stop. Describe ONLY work you actually "
+    "performed and files you actually wrote in this run. If the task is "
+    "incomplete, state that explicitly and list what remains; never describe "
+    "intended or planned work as if it were done."
 )
+
+DEFAULT_MAX_ITERATIONS = 500
 
 
 def summary_present(path: Path) -> bool:
@@ -53,6 +58,54 @@ def final_agent_message(conversation: Conversation) -> str:
             if joined.strip():
                 texts.append(joined.strip())
     return texts[-1] if texts else ""
+
+
+def resolve_max_iterations() -> int:
+    raw = os.getenv("OPENHANDS_MAX_ITERATIONS", "")
+    try:
+        value = int(raw)
+    except ValueError:
+        if raw:
+            logger.warning("Ignoring non-integer OPENHANDS_MAX_ITERATIONS=%r", raw)
+        return DEFAULT_MAX_ITERATIONS
+    return max(50, min(value, 3000))
+
+
+def hit_iteration_limit(conversation: Conversation) -> bool:
+    """Detect the SDK's MaxIterationsReached error; event shape may drift."""
+    try:
+        events = list(getattr(conversation.state, "events", []) or [])
+    except Exception as error:
+        logger.warning("Could not read conversation events: %s", error)
+        events = []
+    for event in events:
+        if str(getattr(event, "code", "")) == "MaxIterationsReached":
+            return True
+    status = str(getattr(conversation.state, "execution_status", "") or "")
+    return status.lower().endswith("error")
+
+
+def write_failure_summary(path: Path, max_iterations: int, message: str) -> None:
+    """Truthful summary for runs cut off by the iteration limit.
+
+    Never ask the agent to summarize after a cutoff: with its context gone it
+    reliably describes intended work as done.
+    """
+    lines = [
+        "# OpenHands Agent Summary — INCOMPLETE (iteration limit)",
+        "",
+        f"The agent hit the maximum iterations limit ({max_iterations}) before",
+        "finishing the task. Any commits on the branch reflect partial work;",
+        "treat claims of completed artifacts as unverified.",
+        "",
+        "Re-trigger with a narrower task or a higher `iterations=` value.",
+        "",
+    ]
+    if message:
+        lines += ["## Last agent message before cutoff", "", message, ""]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines), encoding="utf-8")
+    record_summary_source(path, "synthesized-after-iteration-limit")
 
 
 def ensure_summary(conversation: Conversation) -> None:
@@ -123,14 +176,33 @@ def main() -> int:
         llm=LLM(**llm_config),
         cli_mode=True,
     )
+    max_iterations = resolve_max_iterations()
     conversation = Conversation(
         agent=agent,
         workspace=os.getcwd(),
+        max_iteration_per_run=max_iterations,
     )
 
-    logger.info("Starting OpenHands conversation from %s", prompt_path)
+    logger.info(
+        "Starting OpenHands conversation from %s (max iterations %d)",
+        prompt_path,
+        max_iterations,
+    )
     conversation.send_message(prompt)
     conversation.run()
+
+    if hit_iteration_limit(conversation):
+        logger.error("Run ended at the iteration limit; reporting failure")
+        raw_path = os.getenv("OPENHANDS_SUMMARY_PATH")
+        if raw_path:
+            try:
+                write_failure_summary(
+                    Path(raw_path), max_iterations, final_agent_message(conversation)
+                )
+            except Exception as error:
+                logger.warning("Failure summary write failed: %s", error)
+        return 3
+
     try:
         ensure_summary(conversation)
     except Exception as error:

@@ -34,6 +34,10 @@ on:
           - respond-comments
           - thread-replies
           - summary-only
+      iterations:
+        description: Max agent iterations (default 500, clamped 50-3000).
+        required: false
+        type: string
   issues:
     types: [labeled]
   pull_request:
@@ -79,6 +83,7 @@ jobs:
           DISPATCH_MODEL_PROFILE: ${{ inputs.model_profile }}
           DISPATCH_TARGET_PR: ${{ inputs.target_pr }}
           DISPATCH_OUTPUT_MODE: ${{ inputs.output_mode }}
+          DISPATCH_ITERATIONS: ${{ inputs.iterations }}
           DEFAULT_OPENHANDS_MODEL: ${{ env.DEFAULT_OPENHANDS_MODEL }}
         with:
           script: |
@@ -133,6 +138,7 @@ jobs:
             }
 
             const outputMode = matchValue('output') || process.env.DISPATCH_OUTPUT_MODE || 'pr-comment';
+            const iterations = matchValue('iterations') || process.env.DISPATCH_ITERATIONS || '';
 
             function inferProvider(model) {
               const explicitProvider = matchValue('provider');
@@ -193,6 +199,7 @@ jobs:
             core.setOutput('model', selectedModel);
             core.setOutput('provider', inferProvider(selectedModel));
             core.setOutput('output_mode', outputMode);
+            core.setOutput('iterations', /^\d+$/.test(iterations) ? iterations : '');
             core.setOutput('prompt', prompt);
             core.setOutput('issue_number', String(issueNumber));
             core.setOutput('is_pr', String(isPr));
@@ -350,6 +357,10 @@ jobs:
 
           Operational contract:
           - Read AGENTS.md first.
+          - Your iteration budget is limited. Create deliverable files in the repository
+            workspace EARLY and grow them incrementally as you learn; never defer all
+            writing to the end of the run. Uncommitted workspace files are committed back
+            to the branch automatically when the run ends, even if you run out of budget.
           - If the task says "use harness", follow .agents/skills/netscript-harness/SKILL.md.
           - If the work touches packages/ or plugins/, use .agents/skills/netscript-doctrine/SKILL.md.
           - Use rtk for read-heavy git/grep/gh/docker commands when it is available.
@@ -476,6 +487,7 @@ jobs:
         id: run-agent
         env:
           LLM_MODEL: ${{ steps.request.outputs.model }}
+          OPENHANDS_MAX_ITERATIONS: ${{ steps.request.outputs.iterations }}
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           set +e
@@ -619,7 +631,9 @@ jobs:
           fi
 
       - name: Commit changes back to PR branch
-        if: steps.run-agent.outcome == 'success' && steps.request.outputs.is_pr == 'true'
+        # always(): partial work from a failed or budget-cut run must still be
+        # preserved on the branch, not discarded with the runner.
+        if: always() && steps.bootstrap.outcome == 'success' && steps.request.outputs.is_pr == 'true'
         env:
           TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
           CHECKOUT_REPO: ${{ steps.request.outputs.checkout_repo }}
@@ -627,15 +641,27 @@ jobs:
           AGENT_OUTCOME: ${{ steps.run-agent.outcome }}
         run: |
           set -euo pipefail
+          if [ ! -d .git ]; then
+            echo "No checkout; skipping agent-changes commit."
+            exit 0
+          fi
           git add -A -- . ':!.llm/tmp/openhands' ':!.llm/tmp/run/openhands'
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
+          message="chore(openhands): apply agent changes"
+          if [ "${AGENT_OUTCOME}" != "success" ]; then
+            message="chore(openhands): apply partial agent changes (agent outcome: ${AGENT_OUTCOME})"
+          fi
           git config user.email "openhands@all-hands.dev"
           git config user.name "OpenHands Bot"
-          git commit -m "chore(openhands): apply agent changes"
-          git push "https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git" "HEAD:${CHECKOUT_REF}"
+          git commit -m "$message"
+          remote="https://x-access-token:${TOKEN}@github.com/${CHECKOUT_REPO}.git"
+          if ! git push "$remote" "HEAD:${CHECKOUT_REF}"; then
+            git -c rebase.autoStash=true pull --rebase "$remote" "${CHECKOUT_REF}"
+            git push "$remote" "HEAD:${CHECKOUT_REF}"
+          fi
 
       - name: Commit run trace to PR branch
         if: always() && steps.request.outputs.is_pr == 'true' && steps.artifacts.outputs.trace_dir != ''
