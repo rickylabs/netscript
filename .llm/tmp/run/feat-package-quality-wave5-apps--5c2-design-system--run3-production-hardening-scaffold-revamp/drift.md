@@ -194,3 +194,39 @@ documentation.
 - **Severity:** minor
 - **Action:** accept as package-lock sync drift for the outer copied package.
 - **Evidence:** repo-genesis commit `f0ac62694914fa90361752fa572f8888d5ef9037`.
+
+## 2026-06-12 - installed Git lacks `--strip-trailing-cr`
+
+- **What:** The run instructions request `diff --strip-trailing-cr`, but the installed Git rejected
+  that option for `git diff --no-index`.
+- **Source:** Slice 8 copy-fidelity check returned "unknown option `strip-trailing-cr`".
+- **Expected:** Copy-fidelity check ignores CRLF-only differences.
+- **Actual:** Used Git's supported `--ignore-cr-at-eol` option for equivalent CRLF-tolerant
+  package/app copy comparisons.
+- **Severity:** minor
+- **Action:** accept; no content differences were found.
+- **Evidence:** Slice 8 worklog copy-fidelity gate.
+
+## 2026-06-12 - impeccable context helper absent
+
+- **What:** The impeccable skill requested `node .agents/skills/impeccable/scripts/context.mjs`,
+  but that helper script is absent in this checkout.
+- **Source:** Node returned `MODULE_NOT_FOUND` for the helper path during Slice 8 setup.
+- **Expected:** The helper summarizes design context before visual implementation.
+- **Actual:** Continued with the local fresh-ui docs, tokens, gallery code, and browser screenshots.
+- **Severity:** minor
+- **Action:** accept; do not block implementation on a missing helper script.
+- **Evidence:** Slice 8 worklog browser validation and package gates.
+
+## 2026-06-12 - playground full check still blocked by unrelated CRLF fmt drift
+
+- **What:** Slice 8 `deno task check` in `apps/playground` failed during `deno fmt --check .`.
+- **Source:** The failing files were pre-existing copied UI files such as
+  `assets/ui/choice-styles.css`, `assets/ui/checkbox.css`, `components/ui/checkbox.tsx`, and
+  `components/ui/progress.tsx`.
+- **Expected:** The visual route can be validated end to end.
+- **Actual:** Focused fmt/lint/check for touched files passed, and Playwright browser validation on
+  `/design/components` passed.
+- **Severity:** minor
+- **Action:** defer unrelated line-ending normalization; do not broaden Slice 8.
+- **Evidence:** Slice 8 worklog gate table and `slice8-browser-report.json`.

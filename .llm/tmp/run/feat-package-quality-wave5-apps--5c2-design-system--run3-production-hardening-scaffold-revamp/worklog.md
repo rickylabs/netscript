@@ -290,3 +290,54 @@ only if the generated app should ship it by default.
 
 - Framework: `c4ac8ff14994256b39655b0ff237a982e3c0dba1`
 - Repo-genesis: `00a29027915283a52ae56e2c06adbc3287ebc7a6`
+
+## 2026-06-12 - Slice 8: C-9 responsive table L3 block
+
+### Changed
+
+- Added `responsive-table` as a Layer-3 registry block with semantic table markup, mobile labeled
+  cells, and CSS constrained to the `ns-responsive-table` vocabulary.
+- Registered the item in `packages/fresh-ui/registry.manifest.ts` and included it in the
+  foundation and dashboard block collections.
+- Added package tests proving the component root class and manifest exposure.
+- Synced the package copy into repo-genesis, including the newer package `deno.json` required for
+  copy-fidelity check coverage.
+- Copied the component into `apps/playground/components/ui/`, copied CSS into
+  `apps/playground/assets/ui/`, added the CSS import, exported the component from the app UI
+  barrel, and added a live `/design/components` demo.
+- Updated the playground design catalog snapshot from 43 to 44 items so the gallery renders the
+  new block.
+
+### Gates
+
+| Gate | Result | Evidence | Notes |
+| ---- | ------ | -------- | ----- |
+| package fmt | PASS | `deno fmt --check packages/fresh-ui/...` and `deno task fmt:check` from framework package | Targeted new files plus existing root fmt wrapper path passed. |
+| package check | PASS | `deno task check` from `packages/fresh-ui` | Includes `--unstable-kv`; checked `responsive-table.tsx`. |
+| package test | PASS | `deno task test` from `packages/fresh-ui` | 37 tests passed. |
+| package tokens | PASS | `deno task tokens:check` from `packages/fresh-ui` | Generated token artifacts stable. |
+| DS no raw hex | PASS | `deno run --allow-read --allow-run .llm/tools/fitness/check-ds-no-raw-hex.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| DS color utilities | PASS | `deno run --allow-read --allow-run .llm/tools/fitness/check-ds-color-utilities.ts --root packages/fresh-ui/registry` | 60 files clean; `arch:check` composite also passed 95 files. |
+| arch:check | PASS | `deno task arch:check` from framework root | 0 fail, 1 existing manifest-size warn; DS gates passed. |
+| copy fidelity | PASS | `git diff --no-index --ignore-cr-at-eol` | New TSX/CSS files matched package copy and playground app-owned copy. |
+| repo-genesis package fmt | PASS | `deno fmt --check packages/fresh-ui/...` | Targeted package files passed. |
+| repo-genesis package check | PASS | `deno task check` from outer `packages/fresh-ui` | Passed after syncing package `deno.json`; includes `responsive-table.tsx`. |
+| repo-genesis package test | PASS | `deno task test` from outer `packages/fresh-ui` | 37 tests passed. |
+| repo-genesis package tokens | PASS | `deno task tokens:check` from outer `packages/fresh-ui` | Root `deno.lock` restored afterward. |
+| playground focused fmt/lint/check | PASS | `deno fmt --check`, `deno lint`, `deno check --unstable-kv` on touched files | Covers app-owned component, CSS import, catalog, and real route. |
+| playground full check | FAIL (drift) | `deno task check` from `apps/playground` | Blocked by pre-existing CRLF-only fmt drift in eight unrelated copied UI files. |
+| browser validation | PASS | `slice8-browser-check.ts` against `http://127.0.0.1:5175/design/components` | HTTP 200, zero console errors, theme flip dark->light->dark, 390x844 no overflow, reduced motion rendered; screenshots and report recorded. |
+
+### Drift
+
+- Full playground `deno task check` remains blocked by unrelated CRLF-only drift in existing copied
+  UI files; focused fmt/lint/check for touched files passed.
+- `git diff --strip-trailing-cr` is not supported by the installed Git; used
+  `git diff --no-index --ignore-cr-at-eol` for equivalent copy-fidelity checks.
+- The impeccable context helper referenced by the skill is absent in this checkout; design review
+  used local package docs, tokens, and real-browser validation instead.
+
+### Commits
+
+- Framework: `95b5d0cdf40d9b028d68caa25ab7f72ce505313e`
+- Repo-genesis: `46520db8296e8149b7dc12f4d3fd0c7ed0d73d9d`
