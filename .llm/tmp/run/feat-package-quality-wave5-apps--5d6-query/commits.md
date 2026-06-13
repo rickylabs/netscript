@@ -1,3 +1,5 @@
 # Commits — 5d6-query
 
 Append-only hash record (repo + hash + subject).
+
+- `1bdd141`: docs(5d6): PLAN-phase design.md, plan.md, drift update for query/server/final surface
