@@ -19,7 +19,7 @@
     "./testing": "./testing.ts"
   },
   "tasks": {
-    "test": "deno test --allow-all ./builders ./config ./defer ./form ./interactive ./route ./server ./utils ./error ./tests",
+"test": "deno test --allow-all ./builders ./config ./defer ./form ./interactive ./route ./server ./utils ./error ./tests",
     "check": "deno check --unstable-kv ./mod.ts ./interactive.ts ./server.ts ./builders/mod.ts ./route/mod.ts ./defer/mod.ts ./form/mod.ts ./error/mod.ts ./utils/mod.ts ./streams/mod.ts ./query/mod.ts ./config/vite.ts ./testing.ts",
     "doc-lint": "deno doc --lint ./mod.ts ./interactive.ts ./server.ts ./builders/mod.ts ./route/mod.ts ./defer/mod.ts ./form/mod.ts ./error/mod.ts ./utils/mod.ts ./streams/mod.ts ./query/mod.ts ./config/vite.ts ./testing.ts",
     "fmt": "deno fmt ./mod.ts ./interactive.ts ./interactive ./error ./utils ./config ./_internal ./testing.ts ./tests/_fixtures",

@@ -24,3 +24,16 @@ Supervisor-owned umbrella for sub-wave 5d. Contents:
 All branches fork from `c64cb16` (5c head post-umbrella-reconcile). PLAN
 phases parallel; IMPLEMENTATION chained 5d1→5d6. Plan review by Fable 5 on
 each sub-PR, then PLAN-EVAL (separate session).
+
+## Publication Protocol For Subagents
+
+Implementation and evaluator agents must run from native WSL ext4 worktrees. They should attempt a
+normal `git push` once after committing. If the shell reports missing GitHub HTTPS credentials
+(`could not read Username for 'https://github.com'`) or `gh` is unavailable/unauthenticated, do not
+repeat unauthenticated pushes. Record the blocker in `drift.md`/`worklog.md`, comment the PR through
+the GitHub connector when available, and hand publication back to the supervisor.
+
+The supervisor may publish branch-visible source/artifact state through the GitHub connector when
+normal shell credentials are absent. Connector-published commits may not preserve local commit SHAs;
+record both local and remote commit IDs explicitly in the run artifacts and PR handoff.
+

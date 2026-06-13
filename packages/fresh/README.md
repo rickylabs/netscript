@@ -29,6 +29,19 @@ Page builders, route contracts, form helpers, and deferred rendering primitives 
 }
 ```
 
+## Required Permissions
+
+`@netscript/fresh` is mostly a framework helper package, but several streaming and deferred
+rendering helpers touch platform capabilities when used at runtime:
+
+- `--allow-net` for deferred partial prewarm requests and durable stream endpoints.
+- `--allow-env` when `@netscript/plugin-streams-core` resolves stream server URL or auth settings
+  from environment variables.
+- `--unstable-kv` for server-side SSE helpers that watch `Deno.Kv` keys or prefixes.
+
+Type-checking package entrypoints should include `--unstable-kv` because the streaming server
+helpers expose KV-aware types.
+
 ## Quick Start
 
 Define a page with a typed route contract and pagination:

@@ -22,3 +22,22 @@
 - Re-triggered all six PRs #34-#39 with phase-split triggers: RESEARCH ONLY (research.md + drift.md), iterations=800 (5d2: 1000), write-early contract (skeleton within ~15 actions, consolidate at 60% budget), explicit reuse of prior-run trace summaries (completion claims false, measured findings real; 5d4 must resolve the 3-vs-27 plugin-streams coupling divergence).
 - Phase 2 (design.md + plan.md) triggers follow after supervisor review of each research.md.
 - Trigger comment IDs: 4695788877 4695791024 4695793170 4695795419 4695797819 4695799874.
+
+## 2026-06-13 IMPL merge: 5d1 support + 5d4 streaming
+
+- Separate 5d1 IMPL-EVAL rerun completed with canonical harness **PASS** and accepted 5d1-only
+  F-7 doc-lint debt. `deno task dry-run`, check, fmt, lint, test, and focused 5d1 doc-lint passed;
+  broad `packages/fresh` doc-lint remains 5d2-5d6/5d6-closeout debt.
+- Merged local 5d1 branch `feat/package-quality-wave5-apps-5d1-support` into this supervisor branch.
+- Merged local 5d4 branch `feat/package-quality-wave5-apps-5d4-streaming` into this supervisor branch.
+- Resolved conflicts in `packages/fresh/defer/telemetry.ts`, `packages/fresh/deno.json`,
+  `packages/fresh/form/form-region.tsx`, `packages/fresh/form/form.tsx`, and
+  `packages/fresh/query/query-island.tsx`.
+- Resolution policy: keep 5d1 shared Fresh telemetry spine and richer package tasks/exports; keep
+  5d4 streaming/defer public-surface wrappers; use `object` return annotations for form/query
+  components to satisfy publishability without leaking Preact JSX private types.
+- Validation: targeted `deno check --config packages/fresh/deno.json --unstable-kv` over the merged
+  defer/server/form/query overlap passed.
+- Publication lesson: subagents must attempt push once, then use GitHub connector or supervisor
+  handoff when this WSL shell lacks HTTPS Git credentials. Do not loop on unauthenticated pushes.
+

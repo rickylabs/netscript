@@ -1,6 +1,9 @@
 import { type Attributes, SpanKind } from '@netscript/telemetry/tracer';
 import { emitFreshError, withFreshSpan } from '../_internal/telemetry.ts';
 
+/** Attribute map accepted by Fresh defer telemetry helpers. */
+export type FreshDeferTelemetryAttributes = Record<string, string | number | boolean | undefined>;
+
 /** Result metrics captured by a defer prewarm dispatch. */
 export interface DeferPrewarmResult {
   /** HTTP response status returned by the prewarm action. */
@@ -24,11 +27,11 @@ export interface DeferPrewarmSpanInput {
 }
 
 /** Emit a span that wraps a defer prewarm dispatch operation. */
-export async function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
+export function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
   input: DeferPrewarmSpanInput,
   run: () => Promise<T>,
 ): Promise<T> {
-  return await withFreshSpan(
+  return withFreshSpan(
     {
       scope: 'defer',
       name: 'defer.prewarm.dispatch',
@@ -76,9 +79,9 @@ export interface DeferCacheReadSpanInput {
   /** Defer region name being read from cache. */
   regionName: string;
   /** Span attributes for cache-read state. */
-  attributes: Attributes;
+  attributes: FreshDeferTelemetryAttributes;
   /** Event attributes for cache-read completion. */
-  eventAttributes: Attributes;
+  eventAttributes: FreshDeferTelemetryAttributes;
 }
 
 /** Emit a span for reading a defer region from cache. */
@@ -98,34 +101,34 @@ export function emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise<
       const attributes = {
         ...input.attributes,
         'netscript.operation': 'defer.cache.read',
-      };
+      } as Attributes;
       span.setAttributes(attributes);
       span.addEvent('defer.cache.read.complete', {
         ...input.eventAttributes,
         'netscript.operation': 'defer.cache.read',
-      });
+      } as Attributes);
     },
   );
 }
 
 /** Emit a span for a client-side defer decision. */
-export function emitDeferClientDecisionSpan(attributes: Attributes): Promise<void> {
+export function emitDeferClientDecisionSpan(
+  attributes: FreshDeferTelemetryAttributes,
+): Promise<void> {
+  const eventAttributes = {
+    ...attributes,
+    'netscript.operation': 'defer.client.decision',
+  } as Attributes;
+
   return withFreshSpan(
     {
       scope: 'defer',
       name: 'defer.client.decision',
       operation: 'defer.client.decision',
       kind: SpanKind.INTERNAL,
-      attributes: {
-        ...attributes,
-        'netscript.operation': 'defer.client.decision',
-      },
+      attributes: eventAttributes,
     },
     (span) => {
-      const eventAttributes = {
-        ...attributes,
-        'netscript.operation': 'defer.client.decision',
-      };
       span.setAttributes(eventAttributes);
       span.addEvent('defer.client.lifecycle', eventAttributes);
     },

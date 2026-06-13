@@ -23,7 +23,7 @@ export function Form<TValues extends FormValues>({
   enhancement,
   children,
   ...props
-}: FormProps<TValues>): JSX.Element {
+}: FormProps<TValues>): object {
   const formProps = {
     ...state.formProps,
     ...(enhancement?.formProps ?? {}),
