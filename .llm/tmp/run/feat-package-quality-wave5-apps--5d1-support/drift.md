@@ -40,3 +40,9 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
   feat/package-quality-wave5-apps-5d1-support` failed with `fatal: could not read Username for
   'https://github.com': No such device or address`. Local commits `fcb188c` and `c9a4841` are not on
   origin from this shell; PR #34 received a connector handoff comment.
+- D-5d1-023: IMPL-EVAL-5D1-RERUN publication is blocked locally by the same HTTPS credential issue.
+  `git push origin feat/package-quality-wave5-apps-5d1-support` failed with exit 128:
+  `fatal: could not read Username for 'https://github.com': No such device or address`. Remote has
+  the connector-published fail-fix source repair at `1c92dc9`; local evaluator artifact commits
+  `2ae0d7a` and `8aa0b74` remain local. PR #34 received connector comment `4699880163` with the
+  PASS/PASS_WITH_ESCALATION verdict and exact blocker details.

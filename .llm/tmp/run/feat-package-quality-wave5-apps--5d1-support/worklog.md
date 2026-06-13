@@ -144,3 +144,15 @@ required `worklog.md` fields so the run artifact set satisfies harness v2 withou
     `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`.
 - Verdict written to `evaluate.md`: canonical harness **PASS**, requested classification
   **PASS_WITH_ESCALATION** because broad package doc-lint remains 5d2-5d6/5d6-closeout debt.
+
+## 2026-06-13T23:59:00+02:00 — IMPL-EVAL-5D1-RERUN push blocker
+
+- Local evaluator artifact commits:
+  - `2ae0d7a` — `eval(5d1): record rerun pass verdict`
+  - `8aa0b74` — `chore(5d1): record rerun evaluator commit`
+- `git push origin feat/package-quality-wave5-apps-5d1-support` failed with exit 128:
+  `fatal: could not read Username for 'https://github.com': No such device or address`.
+- Branch remains clean locally and ahead of origin by 7 commits.
+- Remote branch remains at `1c92dc9`, which contains the connector-published fail-fix source repair.
+- Posted PR #34 connector comment `4699880163` with the rerun verdict, validation summary, local
+  commit IDs, remote head, and exact push blocker.

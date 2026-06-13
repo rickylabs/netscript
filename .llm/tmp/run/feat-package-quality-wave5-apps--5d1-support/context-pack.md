@@ -161,3 +161,7 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
     `escalations/failfix-doc-lint.md`.
 - Handoff: 5d1 may merge into the 5d umbrella with the accepted F-7 debt still open. Do not treat
   this as package-wide doc-lint closure; 5d6 closeout must prove package-wide zero.
+- Push blocker: local evaluator artifact commits `2ae0d7a` and `8aa0b74` could not be pushed from
+  this shell because `git push origin feat/package-quality-wave5-apps-5d1-support` failed with
+  `fatal: could not read Username for 'https://github.com': No such device or address`. PR #34
+  received connector comment `4699880163` with the rerun verdict and blocker details.
