@@ -121,3 +121,26 @@ required `worklog.md` fields so the run artifact set satisfies harness v2 withou
   `fatal: could not read Username for 'https://github.com': No such device or address`.
 - Branch remains clean locally and ahead of origin. A PR handoff comment was posted through the
   GitHub connector because local HTTPS credentials are unavailable.
+
+## 2026-06-13T23:55:00+02:00 — IMPL-EVAL-5D1-RERUN verdict
+
+- Separate evaluator rerun from native WSL ext4 worktree; no source files were changed.
+- Remote fail-fix publication was present before artifact edits:
+  - `origin/feat/package-quality-wave5-apps-5d1-support` at `1c92dc9`
+    (`fix(fresh): publish 5d1 fail-fix gate repairs`).
+  - Local branch had merged that remote commit at `09b64bf` and was clean, ahead of origin by local
+    artifact/merge commits.
+- Independent validation:
+  - PASS: `deno task dry-run` from `packages/fresh` (`Success Dry run complete`).
+  - PASS: `deno task check` from `packages/fresh` (`--unstable-kv` included in the task).
+  - PASS: `deno task fmt:check` from `packages/fresh` (`Checked 21 files`).
+  - PASS: `deno task lint` from `packages/fresh` (`Checked 20 files`).
+  - PASS: `deno task test` from `packages/fresh` (`121 passed | 0 failed`).
+  - PASS with optional dependency warnings: focused 5d1
+    `deno doc --lint ./mod.ts ./interactive.ts ./error/mod.ts ./utils/mod.ts ./config/vite.ts ./testing.ts`.
+  - DEBT_ACCEPTED: broad `deno task doc-lint` from `packages/fresh` still fails with 244
+    documentation lint errors; accepted for 5d1 only by
+    `.llm/harness/debt/arch-debt.md` and
+    `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`.
+- Verdict written to `evaluate.md`: canonical harness **PASS**, requested classification
+  **PASS_WITH_ESCALATION** because broad package doc-lint remains 5d2-5d6/5d6-closeout debt.

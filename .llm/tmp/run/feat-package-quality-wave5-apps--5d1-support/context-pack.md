@@ -142,3 +142,22 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 - Publication blocker: local fail-fix commits `fcb188c` and `c9a4841` could not be pushed because
   HTTPS Git credentials are unavailable in this shell. Use the GitHub connector PR handoff as the
   remote-visible status until credentials or a maintainer push publishes the local commits.
+
+## IMPL-EVAL rerun update — 2026-06-13
+
+- Remote fail-fix publication is now present on origin as `1c92dc9`
+  (`fix(fresh): publish 5d1 fail-fix gate repairs`), and the local branch merged it at `09b64bf`.
+- Evaluator rerun verdict in `evaluate.md`: canonical harness **PASS** with requested classification
+  **PASS_WITH_ESCALATION**.
+- Rerun validation from `packages/fresh`:
+  - PASS: `deno task dry-run`.
+  - PASS: `deno task check` (`--unstable-kv` included).
+  - PASS: `deno task fmt:check`.
+  - PASS: `deno task lint`.
+  - PASS: `deno task test` (`121 passed | 0 failed`).
+  - PASS with optional dependency warnings: focused 5d1 `deno doc --lint`.
+  - DEBT_ACCEPTED: broad `deno task doc-lint` still fails with 244 errors, formally accepted for
+    5d1 only via `.llm/harness/debt/arch-debt.md` and
+    `escalations/failfix-doc-lint.md`.
+- Handoff: 5d1 may merge into the 5d umbrella with the accepted F-7 debt still open. Do not treat
+  this as package-wide doc-lint closure; 5d6 closeout must prove package-wide zero.
