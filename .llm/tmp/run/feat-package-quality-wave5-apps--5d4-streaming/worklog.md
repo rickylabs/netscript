@@ -79,3 +79,21 @@ Implementation resumes from the approved `design.md` and `plan.md` artifacts. PL
 | F-7 doc lint | `deno doc --lint packages/fresh/server/stream.ts` | PASS |
 | Static lint | `deno lint --config deno.json packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS, checked 2 files |
 | Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS, checked 2 files |
+
+## 2026-06-13 — Slice 4 SSE / KV watch abort tests
+
+### Scope
+
+- Added colocated `packages/fresh/server/sse_test.ts` coverage for:
+  - external request/caller abort clearing the SSE heartbeat timer,
+  - response body cancellation aborting the KV watch signal.
+- Used local fake clock and fake KV watch ports; no shared testing helper was needed.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| F-13 runtime invariant | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/server/sse_test.ts` | PASS, 2 tests |
+| Static check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
+| Static lint | `deno lint --config deno.json packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS, checked 2 files |
+| Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS, checked 2 files |

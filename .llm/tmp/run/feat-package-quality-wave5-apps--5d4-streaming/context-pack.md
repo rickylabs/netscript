@@ -20,6 +20,7 @@
   `packages/fresh/` exclusion caused Deno gates to report false-green/no-file results.
 - Slice 2 telemetry / policy / server polish is implemented and validated.
 - Slice 3 renderer abort tests are implemented and validated.
+- Slice 4 SSE / KV watch abort tests are implemented and validated.
 - No lockfile changes.
 
 ## Completed
@@ -37,6 +38,8 @@
 - Added SSE clock and external abort seams without adding new package-level exports.
 - Added a `StreamingRenderer` port and colocated `server/stream_test.ts` coverage for renderer
   cancellation on abort.
+- Added colocated `server/sse_test.ts` coverage for external abort heartbeat cleanup and KV watch
+  signal abort on response cancellation.
 
 ## Validation Evidence
 
@@ -57,11 +60,15 @@
 | Slice 3 doc lint | `deno doc --lint packages/fresh/server/stream.ts` | PASS |
 | Slice 3 lint | `deno lint --config deno.json packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS |
 | Slice 3 fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS |
+| Slice 4 test | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/server/sse_test.ts` | PASS, 2 tests |
+| Slice 4 check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
+| Slice 4 lint | `deno lint --config deno.json packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
+| Slice 4 fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
 
 ## Next Steps
 
-1. Commit the Slice 3 batch.
-2. Continue with Slice 4: SSE / KV watch abort tests.
+1. Commit the Slice 4 batch.
+2. Continue with Slice 5: client durable stream lifecycle tests.
 3. Re-run focused static gates after each source slice.
 4. Publish/push via GitHub connector if local HTTPS credentials remain unavailable.
 
@@ -79,6 +86,7 @@
 | `packages/fresh/server/stream.ts` | update | Public renderable alias and documented incremental chunk contract. |
 | `packages/fresh/server/sse.ts` | update | Local KV watch types, clock port, external abort signal, no console logging. |
 | `packages/fresh/server/stream_test.ts` | new | Renderer abort invariant tests. |
+| `packages/fresh/server/sse_test.ts` | new | SSE heartbeat cleanup and KV watch abort invariant tests. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/drift.md` | update | Added D-5d4-11 and D-5d4-12. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/worklog.md` | update | Added implementation and validation evidence. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/context-pack.md` | update | Refreshed resumable state. |
@@ -92,4 +100,5 @@
 
 - b326c52: fix fresh streaming public surface
 - 7d3c8e3: polish fresh streaming telemetry and sse surface
-- Pending: Slice 3 renderer abort tests commit.
+- 27f1267: test fresh renderer abort cancellation
+- Pending: Slice 4 SSE / KV watch abort tests commit.
