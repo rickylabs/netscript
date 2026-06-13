@@ -131,3 +131,25 @@ documentation score. The decision whether to add a slow-type declaration to
 `packages/fresh/deno.json` is deferred until slice 26 produces `deno publish --dry-run` output.
 
 **Closing gate:** `deno publish --dry-run` from `packages/fresh` succeeds.
+
+---
+
+## D-5d2-6: Builders form API needed structural schema input helper
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 2  
+**Status:** open implementation drift
+
+**Description:**
+The approved slice budget focused on form-package private-type references, but
+`deno doc --lint packages/fresh/builders/mod.ts` also reported private references to upstream Zod
+types from the legacy `PageFormConfig` / `PageBuilder.withForm` public API. Exporting upstream Zod
+types would deepen AP-14, so Slice 2 removed the direct public `zod` type references and added a
+structural `SchemaInput<TSchema, TFallback>` helper next to the existing public `SchemaOutput`.
+
+**Disposition:** Accept as the smallest public-surface addition needed to keep the builders barrel
+doc-lint clean without re-exporting upstream Zod internals. Surface snapshot was updated to include
+the helper.
+
+**Closing gate:** Final `deno doc --lint packages/fresh/builders/mod.ts` and
+`deno publish --dry-run --allow-dirty` from `packages/fresh` pass.

@@ -27,6 +27,8 @@ import {
 } from '../../server/stream.ts';
 import { createDefinePageHooks, createRouteNav, type TypedRouteTarget } from './navigation.tsx';
 import { executePagePipeline, prepareRequestState } from './runtime.tsx';
+export type { DefinePageBuilder, DefinePageRootBuilder } from './builder/state.ts';
+import type { DefinePageBuilder, DefinePageRootBuilder, FormSchemaInput } from './builder/state.ts';
 import type {
   ResourceFactoryMap,
   RuntimeLayerDescriptor,
@@ -59,8 +61,8 @@ import type {
   DefinePageSearchOf,
   DefinePageStateOf,
   DefinePageTelemetryConfig,
-  DefinePageWithLayer,
   DefinePageWithForm,
+  DefinePageWithLayer,
   DefinePageWithParams,
   DefinePageWithPathParams,
   DefinePageWithResource,
@@ -71,141 +73,6 @@ import type {
   PathParamSchema,
   SearchParamSchema,
 } from './types.ts';
-
-export interface DefinePageBuilder<
-  TTypes extends AnyDefinePageTypeState = DefinePageRootTypeState,
-  THasConfiguredRoute extends boolean = false,
-> {
-  /**
-   * Compile-time-only type carrier for inference helpers.
-   * This property is not part of the meaningful runtime builder surface.
-   */
-  readonly $types?: TTypes;
-
-  withResource<K extends string, TOut>(
-    key: K,
-    factory: DefinePageResourceFactoryFor<TTypes, TOut, THasConfiguredRoute>,
-  ): DefinePageBuilder<DefinePageWithResource<TTypes, K, TOut>, THasConfiguredRoute>;
-
-  withResources<TFactories extends ResourceFactoryMap<TTypes, THasConfiguredRoute>>(
-    factories: TFactories,
-  ): DefinePageBuilder<DefinePageWithResources<TTypes, TFactories>, THasConfiguredRoute>;
-
-  withParams<TPathSchema, TSearchSchema>(
-    schemas: {
-      path?: TPathSchema & PathParamSchema;
-      search?: TSearchSchema & SearchParamSchema;
-    },
-  ): DefinePageBuilder<
-    DefinePageWithParams<TTypes, TPathSchema, TSearchSchema>,
-    THasConfiguredRoute
-  >;
-
-  withPathParams<TSchema>(
-    schema: TSchema & PathParamSchema,
-  ): DefinePageBuilder<DefinePageWithPathParams<TTypes, TSchema>, THasConfiguredRoute>;
-
-  withSearchParams<TSchema>(
-    schema: TSchema & SearchParamSchema,
-  ): DefinePageBuilder<DefinePageWithSearchParams<TTypes, TSchema>, THasConfiguredRoute>;
-
-  withRoute<TRoute extends TypedRouteTarget<object, object>>(
-    route: TRoute,
-  ): DefinePageBuilder<DefinePageWithRoute<TTypes, TRoute>, true>;
-
-  withPolicy(
-    policy: RuntimePageConfig<TTypes>['policy'],
-  ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-  withTelemetry(
-    telemetry: DefinePageTelemetryConfig,
-  ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-
-  withLayer<K extends string, TProps extends DefinePageLayerProps = EmptyRecord>(
-    id: K,
-    component: ComponentType<TProps>,
-    config?:
-      | DefinePageLayerConfigFor<TTypes, TProps, THasConfiguredRoute>
-      | DefinePageLayerLoaderFor<TTypes, TProps, THasConfiguredRoute>,
-  ): DefinePageBuilder<DefinePageWithLayer<TTypes, K, TProps>, THasConfiguredRoute>;
-  /**
-   * Register a route-bound form as a typed layer in the page pipeline.
-   *
-   * Creates a layer (`RuntimeFormState` props for the component), a method
-   * handler (the submit pipeline), CSRF headers, and form metadata in a
-   * single step.
-   *
-   * @typeParam K — Layer key, inferred from the `id` argument. Used to key
-   *   the form's `RuntimeFormState` in the page's layer data map.
-   * @typeParam TSchema — Zod schema type, inferred from `config.schema`.
-   *   Drives input validation, constraint extraction, and default values.
-   * @typeParam TOutput — Mutation result type, inferred from the
-   *   `config.mutate` return type. Flows to `redirectTo`, `onSuccess`, and
-   *   `invalidate` callbacks. Explicit generics override inference and
-   *   enforce the return type.
-   *
-   * @param id — Unique identifier for this form layer. Used as the key in
-   *   `layerData` and the telemetry span prefix (`form.{id}`).
-   * @param component — Preact component that receives
-   *   `RuntimeFormState<TValues>` as props. Renders the form UI including
-   *   field descriptors, errors, and CSRF input.
-   * @param config — Form configuration object. See `FormConfig` for
-   *   callback documentation.
-   *
-   * All three generics are auto-inferred: `K` from `id`, `TSchema` from
-   * `config.schema`, `TOutput` from `mutate` return. Explicit generics are
-   * optional and enforce type contracts.
-   */
-  withForm<
-    K extends string,
-    TSchema extends z.ZodTypeAny,
-    TOutput = unknown,
-  >(
-    id: K,
-    component: ComponentType<RuntimeFormState<FormSchemaInput<TSchema>>>,
-    config: DefinePageFormConfigFor<TTypes, THasConfiguredRoute, TSchema, TOutput>,
-  ): DefinePageBuilder<DefinePageWithForm<TTypes, K, TSchema>, THasConfiguredRoute>;
-
-  withHandler(
-    method: DefinePageMethod,
-    handler: DefinePageMethodHandlerFor<TTypes, THasConfiguredRoute>,
-  ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-  withLayout(
-    layout: DefinePageLayoutFor<TTypes, THasConfiguredRoute>,
-  ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-  withMeta(
-    resolver: DefinePageMetaResolverFor<TTypes, THasConfiguredRoute>,
-  ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-
-  withHeader(name: string, value: string): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-  withHeader(headers: HeadersInit): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-  withHeader(
-    resolver: DefinePageHeaderResolverFor<TTypes, THasConfiguredRoute>,
-  ): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-
-  withStatus(status: number): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-
-  /**
-   * Mark this page as streaming-capable.
-   *
-   * When enabled, layers with `delivery: 'stream'` are wrapped in Suspense
-   * boundaries whose resolved HTML is streamed inline via
-   * `renderToReadableStream` instead of loaded via partial refresh.
-   */
-  withStreaming(): DefinePageBuilder<TTypes, THasConfiguredRoute>;
-
-  createNav(routePattern?: string): DefinePageRouteNavFor<TTypes>;
-  build(): THasConfiguredRoute extends true ? DefinePageRoutedDefinitionFor<TTypes>
-    : DefinePageDefinitionFor<TTypes>;
-  build(routePattern: string): DefinePageRoutedDefinitionFor<TTypes>;
-  build<TBuildOptions extends DefinePageBuildOptions>(
-    options: TBuildOptions,
-  ): DefinePageBuildResultFor<TBuildOptions, TTypes>;
-}
-
-export interface DefinePageRootBuilder<TState = EmptyRecord>
-  extends DefinePageBuilder<DefinePageRootTypeState<TState>, false> {}
-
-type FormSchemaInput<TSchema extends z.ZodTypeAny> = z.input<TSchema> & FormValues;
 
 function createDefaultConfig<TState>(): RuntimePageConfig<DefinePageRootTypeState<TState>, false> {
   return { resources: [], layers: [], handlers: {}, headers: [] };
@@ -574,7 +441,9 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
       const method = formConfig.method ?? 'POST';
       const adapter = createZodAdapter(formConfig.schema);
       const nextConfig = retagConfig<TTypes, TNextTypes, THasConfiguredRoute>(config);
-      const headerResolver: DefinePageHeaderResolverFor<TNextTypes, THasConfiguredRoute> = (ctx) => {
+      const headerResolver: DefinePageHeaderResolverFor<TNextTypes, THasConfiguredRoute> = (
+        ctx,
+      ) => {
         if (formConfig.csrf === false) {
           return {};
         }
@@ -597,12 +466,10 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
             const result = isWithFormResult<FormSchemaInput<TSchema>, TOutput>(ctx.data)
               ? ctx.data
               : undefined;
-            const initialValues = result
-              ? undefined
-              : mergeInitialFormValues(
-                adapter.getDefaults(),
-                formConfig.initial ? await formConfig.initial(ctx) : undefined,
-              );
+            const initialValues = result ? undefined : mergeInitialFormValues(
+              adapter.getDefaults(),
+              formConfig.initial ? await formConfig.initial(ctx) : undefined,
+            );
             const csrfToken = formConfig.csrf === false
               ? undefined
               : result?.csrfToken || readCsrfToken(ctx.req) || crypto.randomUUID();
@@ -631,7 +498,9 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
             adapter,
           ) as RuntimePageConfig<TNextTypes, THasConfiguredRoute>['handlers'][typeof method],
         },
-        headers: formConfig.csrf === false ? nextConfig.headers : [...nextConfig.headers, headerResolver],
+        headers: formConfig.csrf === false
+          ? nextConfig.headers
+          : [...nextConfig.headers, headerResolver],
         form: {
           id,
           config: formConfig as RuntimePageConfig<TNextTypes, THasConfiguredRoute>['form'] extends
@@ -794,17 +663,17 @@ function createWithFormHandler<
     );
 
     if (formConfig.csrf !== false && !verifyCsrfToken(cookieToken, parsed.csrfToken)) {
-          return {
-            data: reply.error({
-              values: parsed.values as FormSchemaInput<TSchema>,
-              initialValues,
-              intent: parsed.intent,
-              submissionId,
-              csrfToken,
-              collectionKeys: parsed.collectionKeys,
-              formErrors: ['Your form session expired. Reload the page and try again.'],
-            }),
-          };
+      return {
+        data: reply.error({
+          values: parsed.values as FormSchemaInput<TSchema>,
+          initialValues,
+          intent: parsed.intent,
+          submissionId,
+          csrfToken,
+          collectionKeys: parsed.collectionKeys,
+          formErrors: ['Your form session expired. Reload the page and try again.'],
+        }),
+      };
     }
 
     if (parsed.intent && parsed.intent.type !== 'submit' && formConfig.onIntent) {

@@ -6,16 +6,14 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `plan` — revised and ready for PLAN-EVAL            |
+| Current phase  | `implement` — Slice 2 complete, Slice 3 next        |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-`design.md`, `plan.md`, and `drift.md` are revised in place.  
-Phase-1 research is reused; measurement baselines stand.  
-The plan now contains a locked one-plan decision, a 28-slice commit lock, the full A3 + SCOPE-frontend
-gate set, a jsr-audit rubric, and completed design sections.
+Slices 1 and 2 are committed locally. Slice 3 is implemented and ready to commit with the current
+harness artifact updates.
 
 ## Completed
 
@@ -27,16 +25,26 @@ gate set, a jsr-audit rubric, and completed design sections.
   required tail section.
 - Appended `drift.md` with D-5d2-1 (form-package visibility/JSDoc), D-5d2-2 (F-18 sub-barrel
   opt-outs), and D-5d2-3 (slow-type opt-in pending).
+- Slice 1 committed locally as `0b30d11 test(fresh): snapshot builders public surface`.
+- Slice 2 committed locally as `b01ec31 fix(fresh): document form builder surface`.
+- Slice 2 gates passed:
+  - `deno doc --lint packages/fresh/form/types.ts`
+  - `deno doc --lint packages/fresh/builders/mod.ts`
+  - `deno test packages/fresh/builders/define-page/surface.test.ts`
+  - `deno check --unstable-kv packages/fresh/form/types.ts packages/fresh/form/mod.ts packages/fresh/builders/mod.ts packages/fresh/builders/define-page/types.ts packages/fresh/builders/define-page/surface.test.ts`
+- Slice 3 implemented:
+  - `packages/fresh/builders/define-page/builder/state.ts` created.
+  - `packages/fresh/builders/define-page/builder.tsx` now imports/re-exports builder state types.
+  - Slice 3 gates passed.
 
 ## In Progress
 
-- Supervisor / PLAN-EVAL review of revised artifacts.
+- Slice 3 commit.
 
 ## Next Steps
 
-1. PLAN-EVAL passes.
-2. Implementation begins per slice lock (waits for 5d1 merge).
-3. First implementation slice: add surface snapshot test and fix builders-local doc-lint errors.
+1. Commit Slice 3 and append `commits.md` immediately.
+2. Continue Slice 4: extract builder factory helpers.
 
 ## Key Decisions
 
@@ -57,6 +65,11 @@ gate set, a jsr-audit rubric, and completed design sections.
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/drift.md` | revised | D-5d2-1, D-5d2-2, D-5d2-3 |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/context-pack.md` | revised | resume-ready state |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/worklog.md` | revised | design checkpoint entry |
+| `packages/fresh/form/types.ts` | committed `b01ec31` | exported/JSDoc form contracts for builders doc-lint |
+| `packages/fresh/form/mod.ts` | committed `b01ec31` | re-export documented form contracts |
+| `packages/fresh/builders/mod.ts` | committed `b01ec31` | re-export form contracts; structural schema input helper |
+| `packages/fresh/builders/define-page/builder/state.ts` | new, pending commit | definition-time builder interface/type state |
+| `packages/fresh/builders/define-page/builder.tsx` | pending commit | imports/re-exports builder state types |
 
 ## Gates
 
@@ -66,6 +79,8 @@ gate set, a jsr-audit rubric, and completed design sections.
 | Fitness | planned | Slices 25–26 will run `deno task arch:check` / per-script gates. |
 | Runtime | planned | Slice 24 playground routes; slice 25 test suite. |
 | Consumer | planned | No public API changes; surface snapshot test in slice 1 proves this. |
+| Slice 2 doc-lint | passed | `deno doc --lint packages/fresh/form/types.ts`; `deno doc --lint packages/fresh/builders/mod.ts` |
+| Slice 3 state | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/state.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `state.ts` 6400 bytes |
 
 ## Open Questions
 
@@ -78,7 +93,10 @@ gate set, a jsr-audit rubric, and completed design sections.
 - D-5d2-2: F-18 sub-barrel opt-outs required for `builder/mod.ts`, `runtime/mod.ts`,
   `navigation/mod.ts`, `define-page/mod.ts`.
 - D-5d2-3: Potential slow-type opt-in for `FieldDescriptorMap` / `RuntimeFormState`.
+- D-5d2-6: Structural `SchemaInput` helper added to avoid public Zod private-type refs.
 
 ## Commits
 
 - Pending: commit of revised `design.md`, `plan.md`, `drift.md`, `context-pack.md`, `worklog.md`.
+- 0b30d11: test(fresh): snapshot builders public surface
+- b01ec31: fix(fresh): document form builder surface

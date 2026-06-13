@@ -55,6 +55,62 @@
 | `deno check --unstable-kv packages/fresh/builders/define-page/types.ts packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `deno doc --lint packages/fresh/builders/define-page/types.ts` | FAIL: 185 remaining documentation lint errors, tracked as D-5d2-5 for later type/barrel cleanup |
 
+## 2026-06-14 slice 2 — form leak cleanup
+
+**Files changed:**
+
+- `packages/fresh/form/types.ts`
+- `packages/fresh/form/mod.ts`
+- `packages/fresh/builders/mod.ts`
+- `packages/fresh/builders/define-page/types.ts`
+- `packages/fresh/builders/define-page/surface.test.ts`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/doc-lint-builders-slice2.txt`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/doc-lint-form-types-slice2.txt`
+
+**Implementation:**
+
+- Exported and documented the form value, descriptor, intent, reply, submission, and enhancement
+  contracts surfaced through the builders barrel.
+- Re-exported the documented form contracts from `form/mod.ts` and `builders/mod.ts`.
+- Removed public `zod` type references from the legacy builders form API by using structural
+  `SchemaInput` / `SchemaOutput` inference.
+- Restored the Slice 1 loader-output helper visibility and kept `InferDefinePageLayerLoaderProps`
+  structurally typed so the builders barrel doc-lint gate is clean.
+- Recorded D-5d2-6 for the narrow top-level builders type helper addition required by doc-lint.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno doc --lint packages/fresh/form/types.ts` | PASS |
+| `deno doc --lint packages/fresh/builders/mod.ts` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `deno check --unstable-kv packages/fresh/form/types.ts packages/fresh/form/mod.ts packages/fresh/builders/mod.ts packages/fresh/builders/define-page/types.ts packages/fresh/builders/define-page/surface.test.ts` | PASS |
+
+**Commit:** `b01ec31 fix(fresh): document form builder surface`
+
+## 2026-06-14 slice 3 — builder state module
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/builder/state.ts`
+- `packages/fresh/builders/define-page/builder.tsx`
+
+**Implementation:**
+
+- Created the role-named `builder/` folder and moved the public definition-time builder interface
+  plus the schema input alias into `builder/state.ts`.
+- Kept `builder.tsx` as the runtime factory for now and re-exported the moved types from it so the
+  current `define-page/mod.ts` export shape remains stable until the planned barrel slice.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/builder/state.ts packages/fresh/builders/define-page/builder.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/builder/state.ts packages/fresh/builders/define-page/builder.tsx` | PASS: `state.ts` 6400 bytes; `builder.tsx` 32906 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13
