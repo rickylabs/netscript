@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1 through 7 are committed locally. Slice 8 is implemented and ready to commit with the
+Slices 1 through 8 are committed locally. Slice 9 is implemented and ready to commit with the
 current harness artifact updates.
 
 ## Completed
@@ -64,15 +64,20 @@ current harness artifact updates.
   - `packages/fresh/builders/define-page/runtime/render.tsx` created.
   - `runtime.tsx` now imports render/fallback/head/header helpers.
   - Slice 8 gates passed.
+- Slice 8 committed locally as `05ac7f5 refactor(fresh): extract define page runtime render`.
+- Slice 9 implemented:
+  - `packages/fresh/builders/define-page/runtime/handlers.ts` created.
+  - `runtime.tsx` re-exports `prepareRequestState` from handlers.
+  - Slice 9 gates passed.
 
 ## In Progress
 
-- Slice 8 commit.
+- Slice 9 commit.
 
 ## Next Steps
 
-1. Commit Slice 8 and append `commits.md` immediately.
-2. Continue Slice 9: create runtime handlers module.
+1. Commit Slice 9 and append `commits.md` immediately.
+2. Continue Slice 10: replace `runtime.tsx` with runtime role entry.
 
 ## Key Decisions
 
@@ -104,6 +109,7 @@ current harness artifact updates.
 | `packages/fresh/builders/define-page/runtime/context.ts` | new, pending commit | runtime context, telemetry, path/search resolution |
 | `packages/fresh/builders/define-page/runtime.tsx` | pending commit | imports runtime context helpers |
 | `packages/fresh/builders/define-page/runtime/render.tsx` | new, pending commit | render/fallback/head/header helpers |
+| `packages/fresh/builders/define-page/runtime/handlers.ts` | new, pending commit | request-state preparation and resource dispatch |
 
 ## Gates
 
@@ -120,6 +126,7 @@ current harness artifact updates.
 | Slice 6 builder entry | partial | type-check and surface snapshot pass; direct internal-entry doc-lint and size target recorded as D-5d2-7/D-5d2-8 |
 | Slice 7 runtime context | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/context.ts packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `context.ts` 5075 bytes |
 | Slice 8 runtime render | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/render.tsx packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `render.tsx` 3456 bytes |
+| Slice 9 runtime handlers | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/handlers.ts packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `handlers.ts` 1970 bytes |
 
 ## Open Questions
 

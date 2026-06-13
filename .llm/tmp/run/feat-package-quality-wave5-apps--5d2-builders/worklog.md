@@ -239,6 +239,29 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/runtime/render.tsx packages/fresh/builders/define-page/runtime.tsx` | PASS: `render.tsx` 3456 bytes; `runtime.tsx` 11998 bytes |
 
+**Commit:** `05ac7f5 refactor(fresh): extract define page runtime render`
+
+## 2026-06-14 slice 9 — runtime handlers module
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/runtime/handlers.ts`
+- `packages/fresh/builders/define-page/runtime.tsx`
+
+**Implementation:**
+
+- Moved request-state preparation and resource factory dispatch into `runtime/handlers.ts`.
+- Re-exported `prepareRequestState` from `runtime.tsx` to preserve current imports until the runtime
+  barrel slice.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/runtime/handlers.ts packages/fresh/builders/define-page/runtime.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/runtime/handlers.ts packages/fresh/builders/define-page/runtime.tsx` | PASS: `handlers.ts` 1970 bytes; `runtime.tsx` 10429 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13
