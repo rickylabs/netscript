@@ -524,6 +524,19 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno check --unstable-kv packages/fresh/tests/fixtures/builders/static-page.tsx 'packages/fresh/tests/fixtures/builders/routed-page/[id].tsx' packages/fresh/tests/fixtures/builders/search-page.tsx packages/fresh/tests/fixtures/builders/layer-page.tsx packages/fresh/tests/fixtures/builders/form-page.tsx packages/fresh/tests/fixtures/builders/partial-page.tsx` | PASS |
 | `deno fmt packages/fresh/tests/fixtures/builders` | PASS |
 
+## 2026-06-14 slice 24 — full builders test suite
+
+**Files changed:**
+
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/worklog.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/context-pack.md`
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno test --allow-all packages/fresh/builders` | PASS: 36 tests, 0 failures |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

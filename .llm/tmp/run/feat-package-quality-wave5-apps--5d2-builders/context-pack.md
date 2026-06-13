@@ -6,13 +6,13 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 23 complete, Slice 24 next      |
+| Current phase  | `implement` — Slice 24 complete, Slice 25 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 23 are complete. The branch is clean at the latest pushed head after each committed
+Slices 1 through 24 are complete. The branch is clean at the latest pushed head after each committed
 slice when publication succeeds.
 
 ## Completed
@@ -123,15 +123,17 @@ slice when publication succeeds.
   - `packages/fresh/tests/fixtures/builders/*` fixture route modules added because
     `apps/playground` is absent.
   - Fixture route check passes; D-5d2-14 records the package-local substitute.
+- Slice 24 implemented:
+  - `deno test --allow-all packages/fresh/builders` passed with 36 tests.
 
 ## In Progress
 
-- Slice 24: run full builders test suite.
+- Slice 25: run architecture fitness gates.
 
 ## Next Steps
 
-1. Continue Slice 24: run the full builders test suite.
-2. Continue Slice 25: run architecture fitness gates.
+1. Continue Slice 25: run architecture fitness gates.
+2. Continue Slice 26: final doc-lint and publish dry-run.
 
 ## Key Decisions
 
