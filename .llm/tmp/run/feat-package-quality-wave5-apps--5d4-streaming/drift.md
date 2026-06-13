@@ -45,12 +45,13 @@ Proposed fix direction (design phase):
 - **Action:** accept and record debt in `arch-debt.md` if the plan is approved; do not deepen existing violations.
 - **Evidence:** plan.md §Current Doctrine Verdict, design.md §Doctrine baseline.
 
-## D-5d4-7: open clock / timer port question
+## D-5d4-7: clock / timer port question (RESOLVED)
 
 - **What:** Abort/cleanup tests need deterministic control of timers, but no shared clock port exists in `@netscript/fresh` today.
 - **Source:** `server/sse.ts` uses `setInterval`-style heartbeat logic (or equivalent watch polling); `defer/telemetry.ts` uses `performance.now`.
 - **Expected:** A doctrine-aligned adapter would accept a clock port rather than call `setInterval`/`Date.now` directly.
 - **Actual:** Current code may inline timer / time reads; exact call sites to be verified during slice 2.
-- **Severity:** minor (significant if timers are inlined in non-adapter files).
-- **Action:** fix in slice 2 if call sites are in adapter files; record debt if the change is larger than one slice.
-- **Evidence:** design.md §Ports / adapters, plan.md slice 2.
+- **Severity:** minor.
+- **Resolution:** Supervisor decided to lock the default — use a **local fake-timer/clock test helper inside `packages/fresh`** for stream tests, and promote it to a shared `./testing` utility **only if a later unit (5d5/5d6) needs it**.
+- **Action:** recorded as locked decision `L-5d4-7` in `plan.md`; update the drift entry to RESOLVED; implement the local helper during slice 3/4 if needed.
+- **Evidence:** design.md §Ports / adapters, plan.md §Locked Decisions (L-5d4-7) and §Open-Decision Sweep.

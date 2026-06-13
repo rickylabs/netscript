@@ -78,14 +78,15 @@ Deliver a locked implementation plan for RFC 13 (Progressive Streaming Rendering
 | L-5d4-4     | Emit telemetry through the `@netscript/telemetry/tracer` port.           | Reuses 5d1 convention; no `console.*` in published code. |
 | L-5d4-5     | Do not add new package-level exports unless RFC 13/16 explicitly demand it. | Keeps public surface minimal and publishable. |
 | L-5d4-6     | Heartbeat / timers live only in adapters and accept a clock port.        | Avoids AP-12 and keeps tests deterministic. |
+| L-5d4-7     | Fake timer / clock test helper stays local to `packages/fresh` by default. | Supervisor resolution: use a local helper for stream tests; promote it to a shared `./testing` utility only if a later unit (5d5/5d6) needs it. Keeps the test port scoped and avoids premature shared-surface expansion. |
 
 ## Open-Decision Sweep
 
-| Decision                                          | Status             | Notes |
-| ------------------------------------------------- | ------------------ | ----- |
-| Exact fallback shape for `StreamErrorBoundary`    | Safe to defer      | Design proposes render-prop fallback; slice will finalize. |
-| Fake timer / clock port for stream tests          | Must resolve now   | Needed before slice 3/4 abort tests can be written. |
-| Whether to expose a TanStack DB query helper      | Safe to defer      | Keep client surface unchanged unless RFC 16 demands it. |
+| Decision                                          | Status                              | Notes |
+| ------------------------------------------------- | ----------------------------------- | ----- |
+| Exact fallback shape for `StreamErrorBoundary`    | Safe to defer                       | Design proposes render-prop fallback; slice will finalize. |
+| Fake timer / clock port for stream tests          | RESOLVED — local test helper (supervisor) | L-5d4-7 locks the default: local helper in `packages/fresh`; promote to `./testing` only if reused by 5d5/5d6. |
+| Whether to expose a TanStack DB query helper      | Safe to defer                       | Keep client surface unchanged unless RFC 16 demands it. |
 
 ## Risk Register
 
@@ -192,9 +193,8 @@ Deliver a locked implementation plan for RFC 13 (Progressive Streaming Rendering
 
 ## Questions for supervisor
 
-1. Should the fake-timer / clock port be introduced as a new shared testing utility, or kept local to the stream tests?
-2. If consumer type-check in `fresh-ui` or `plugins/streams` fails, do we widen 5d4 scope or record debt and defer?
-3. Is a PLAN-EVAL session already scheduled, or should this plan be handed off explicitly?
+1. If consumer type-check in `fresh-ui` or `plugins/streams` fails, do we widen 5d4 scope or record debt and defer?
+2. Is a PLAN-EVAL session already scheduled, or should this plan be handed off explicitly?
 
 ## Dependencies & merge impact
 
