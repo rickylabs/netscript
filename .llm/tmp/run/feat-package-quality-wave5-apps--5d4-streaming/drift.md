@@ -120,3 +120,16 @@ Proposed fix direction (design phase):
   and move the Preact class to an internal implementation class.
 - **Evidence:** `deno doc --lint packages/fresh/defer/DeferPage.tsx
   packages/fresh/server/stream-error-boundary.tsx` passes with 0 errors.
+
+## D-5d4-13: local git push unavailable in WSL session
+
+- **What:** `git push origin feat/package-quality-wave5-apps-5d4-streaming` failed because the WSL
+  shell has no HTTPS GitHub credentials.
+- **Source:** `fatal: could not read Username for 'https://github.com': No such device or address`.
+- **Expected:** Implementation commits are pushed to PR #37 after each slice.
+- **Actual:** The local worktree contains the completed implementation commit stack, but the remote
+  branch remains at the pre-implementation head.
+- **Severity:** blocking for remote IMPL-EVAL.
+- **Action:** PR #37 will be updated with a structured blocker/evidence comment through GitHub MCP.
+  A credentialed push or maintainer-applied patch is required before separate IMPL-EVAL can evaluate
+  the remote branch.

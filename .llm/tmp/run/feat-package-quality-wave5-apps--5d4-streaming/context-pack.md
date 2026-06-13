@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------ |
 | Run ID         | feat-package-quality-wave5-apps--5d4-streaming         |
 | Branch         | `feat/package-quality-wave5-apps-5d4-streaming`        |
-| Current phase  | Implementation complete; ready for separate IMPL-EVAL   |
+| Current phase  | Local implementation complete; remote push blocked       |
 | Archetype      | 3 — Runtime / Behavior                                 |
 | Scope overlays | `SCOPE-frontend`                                       |
 
@@ -50,6 +50,8 @@
 - Consumer checks pass for `packages/fresh-ui` and `plugins/streams`.
 - Combined closeout gates pass for doc-lint, runtime tests, JSR dry-run, console scan, file-size,
   folder, naming, sub-barrel, lint, and fmt evidence.
+- Local branch is complete but remote PR branch is not updated because local HTTPS git credentials
+  are unavailable. See D-5d4-13.
 
 ## Validation Evidence
 
@@ -95,9 +97,9 @@
 ## Next Steps
 
 1. Commit closeout artifact update and boundary naming fix.
-2. Publish/push the completed branch via GitHub connector because local HTTPS git credentials are
-   unavailable.
-3. Comment on PR #37 that the 5d4 implementation is ready for separate IMPL-EVAL.
+2. Restore GitHub push credentials or apply the local commit stack from this WSL worktree to the PR
+   branch.
+3. After the remote branch is updated, request separate IMPL-EVAL.
 
 ## Files Changed
 
@@ -129,7 +131,7 @@
 
 ## Drift and Debt
 
-- Drift: D-5d4-11 and D-5d4-12 added.
+- Drift: D-5d4-11, D-5d4-12, and D-5d4-13 added.
 - Debt: no new arch-debt entry yet; promoted root exclusion removal is approved scope, not debt.
 
 ## Commits
@@ -140,4 +142,6 @@
 - dcbb4a8: test fresh sse abort cleanup
 - 10b0121: wrap fresh streams public surface
 - d669b82: document fresh permissions and slow types
-- Pending: closeout artifact update / boundary naming fix.
+- f490b60: close out fresh streaming gates
+- 9be04b0: record fresh streaming closeout commit
+- Pending: push-blocker drift/context update.
