@@ -1,0 +1,346 @@
+import { type ComponentChildren, type JSX } from 'preact';
+import { type DefinePageNavigationContextValue, readNavigationContext } from './context.ts';
+import type {
+  DefinePageRouteNav,
+  EmptyRecord,
+  HasPathParams,
+  PathParamSchema,
+  SearchParamSchema,
+  SearchParamValue,
+  UnknownRecord,
+  ValidatedRouteHref,
+} from '../types.ts';
+
+export interface TypedRouteTarget<
+  TPath extends object = EmptyRecord,
+  TSearch extends object = EmptyRecord,
+> {
+  readonly routePattern: string;
+  readonly pathSchema?: PathParamSchema<TPath>;
+  readonly searchSchema?: SearchParamSchema<TSearch>;
+  readonly $types?: {
+    path: TPath;
+    search: TSearch;
+  };
+}
+
+export type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  TTarget['$types']
+>['path'];
+
+export type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  TTarget['$types']
+>['search'];
+
+export type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+  TTarget
+>;
+export type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+  TTarget
+>;
+
+export interface CurrentRouteState<TTarget extends TypedRouteTarget<object, object>> {
+  readonly path: TypedRoutePathOf<TTarget>;
+  readonly search: TypedRouteSearchOf<TTarget>;
+}
+
+export interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+  'f-client-nav'?: boolean;
+}
+
+export interface FreshPartialLinkAttributes extends FreshLinkAttributes {
+  'f-partial'?: string;
+}
+
+export type TypedRoutePathInput<TPath extends object> = HasPathParams<TPath> extends true
+  ? { path: TPath }
+  : { path?: TPath };
+
+export type RouteSearchUpdate<TSearch extends object> =
+  | Partial<TSearch>
+  | ((prev: TSearch) => Partial<TSearch>);
+
+export type GetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> =
+  & Omit<FreshLinkAttributes, 'children' | 'href'>
+  & TypedRoutePathInput<TypedRoutePathOf<TTarget>>
+  & {
+    to: TTarget;
+    search?: RouteSearchUpdate<TypedRouteSearchOf<TTarget>>;
+    replace?: boolean;
+    preserveSearchParams?: boolean;
+  };
+
+export type BoundGetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> = Omit<
+  GetLinkPropsInput<TTarget>,
+  'to'
+>;
+
+export type LinkProps<TTarget extends TypedRouteTarget<object, object>> =
+  & Omit<FreshLinkAttributes, 'href'>
+  & TypedRoutePathInput<TypedRoutePathOf<TTarget>>
+  & {
+    to: TTarget;
+    search?: RouteSearchUpdate<TypedRouteSearchOf<TTarget>>;
+    children: ComponentChildren;
+    replace?: boolean;
+    preserveSearchParams?: boolean;
+  };
+
+export type BoundLinkProps<TTarget extends TypedRouteTarget<object, object>> = Omit<
+  LinkProps<TTarget>,
+  'to'
+>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function stringifySearchValue(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => stringifySearchValue(entry));
+  }
+
+  if (value === undefined || value === null) {
+    return [];
+  }
+
+  return [String(value)];
+}
+
+function serializeSearch(search: UnknownRecord): string {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(search)) {
+    const values = stringifySearchValue(value);
+    for (const entry of values) {
+      params.append(key, entry);
+    }
+  }
+
+  return params.toString();
+}
+
+function normalizeBaseSearch<TSearch extends object>(
+  schema: SearchParamSchema<TSearch> | undefined,
+  routePattern: string,
+  navigationContext: DefinePageNavigationContextValue | null,
+  preserveSearchParams: boolean,
+): TSearch {
+  if (preserveSearchParams && navigationContext?.routePattern === routePattern) {
+    return navigationContext.runtimeContext.search as TSearch;
+  }
+
+  if (!schema) {
+    return {} as TSearch;
+  }
+
+  const fallback = schema.safeParse({});
+  if (fallback.success && isRecord(fallback.data)) {
+    return fallback.data as TSearch;
+  }
+
+  return {} as TSearch;
+}
+
+function validatePath<TPath extends object>(
+  schema: PathParamSchema<TPath> | undefined,
+  path: TPath | undefined,
+): TPath {
+  const candidate = (path ?? {}) as TPath;
+
+  if (!schema) {
+    return candidate;
+  }
+
+  const result = schema.safeParse(candidate as Record<string, string | undefined>);
+  if (!result.success || !isRecord(result.data)) {
+    throw new Error('definePage().nav.makeHref() received invalid path params.');
+  }
+
+  return result.data as TPath;
+}
+
+function validateSearch<TSearch extends object>(
+  schema: SearchParamSchema<TSearch> | undefined,
+  search: UnknownRecord,
+): TSearch {
+  if (!schema) {
+    return search as TSearch;
+  }
+
+  const result = schema.safeParse(search as Record<string, SearchParamValue>);
+  if (!result.success || !isRecord(result.data)) {
+    throw new Error('definePage().nav.makeHref() received invalid search params.');
+  }
+
+  return result.data as TSearch;
+}
+
+function fillRoutePattern(pattern: string, path: UnknownRecord): string {
+  let pathname = pattern;
+
+  pathname = pathname.replace(/\[\[\.\.\.([^\]]+)\]\]/g, (_match, key: string) => {
+    const value = path[key];
+    if (value === undefined || value === null || value === '') {
+      return '';
+    }
+
+    const parts = stringifySearchValue(value).map((entry) => encodeURIComponent(entry));
+    return parts.length === 0 ? '' : `/${parts.join('/')}`;
+  });
+
+  pathname = pathname.replace(/\[\.\.\.([^\]]+)\]/g, (_match, key: string) => {
+    const value = path[key];
+    const parts = stringifySearchValue(value).map((entry) => encodeURIComponent(entry));
+    if (parts.length === 0) {
+      throw new Error(`definePage().nav.makeHref() is missing catch-all path param "${key}".`);
+    }
+
+    return parts.join('/');
+  });
+
+  pathname = pathname.replace(/\[([^\]]+)\]/g, (_match, key: string) => {
+    const value = path[key];
+    if (value === undefined || value === null || value === '') {
+      throw new Error(`definePage().nav.makeHref() is missing path param "${key}".`);
+    }
+
+    return encodeURIComponent(String(value));
+  });
+
+  pathname = pathname.replace(/:([A-Za-z0-9_]+)/g, (_match, key: string) => {
+    const value = path[key];
+    if (value === undefined || value === null || value === '') {
+      throw new Error(`definePage().nav.makeHref() is missing path param "${key}".`);
+    }
+
+    return encodeURIComponent(String(value));
+  });
+
+  return pathname.replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+}
+
+function buildHref<TPath extends object, TSearch extends object>(
+  options: {
+    routePattern: string;
+    pathSchema?: PathParamSchema<TPath>;
+    searchSchema?: SearchParamSchema<TSearch>;
+  },
+  input: {
+    path?: TPath;
+    search?: RouteSearchUpdate<TSearch>;
+    preserveSearchParams?: boolean;
+  },
+  navigationContext: DefinePageNavigationContextValue | null,
+): ValidatedRouteHref {
+  const resolvedPath = validatePath(options.pathSchema, input.path);
+  const baseSearch = normalizeBaseSearch<TSearch>(
+    options.searchSchema,
+    options.routePattern,
+    navigationContext,
+    input.preserveSearchParams ?? false,
+  );
+  const nextSearch = typeof input.search === 'function' ? input.search(baseSearch) : input.search;
+  const resolvedSearch = validateSearch<TSearch>(options.searchSchema, {
+    ...baseSearch,
+    ...(nextSearch ?? {}),
+  } as UnknownRecord);
+
+  const pathname = fillRoutePattern(options.routePattern, resolvedPath as UnknownRecord);
+  const queryString = serializeSearch(resolvedSearch as UnknownRecord);
+  return `${pathname}${queryString ? `?${queryString}` : ''}` as ValidatedRouteHref;
+}
+
+export function createResolvedLinkProps<TPath extends object, TSearch extends object>(
+  options: {
+    routePattern: string;
+    pathSchema?: PathParamSchema<TPath>;
+    searchSchema?: SearchParamSchema<TSearch>;
+  },
+  input: Omit<FreshLinkAttributes, 'children' | 'href'> & {
+    path?: TPath;
+    search?: RouteSearchUpdate<TSearch>;
+    replace?: boolean;
+    preserveSearchParams?: boolean;
+  },
+  navigationContext: DefinePageNavigationContextValue | null,
+): FreshLinkAttributes & { href: ValidatedRouteHref } {
+  const {
+    path,
+    search,
+    replace: _replace,
+    preserveSearchParams,
+    ...anchorProps
+  } = input;
+  const href = buildHref(options, { path, search, preserveSearchParams }, navigationContext);
+
+  return {
+    ...anchorProps,
+    href,
+    'f-client-nav': anchorProps['f-client-nav'] ?? true,
+  };
+}
+
+export function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+  input: GetLinkPropsInput<TTarget>,
+): FreshLinkAttributes & { href: ValidatedRouteHref } {
+  const { to, ...linkInput } = input;
+  return createResolvedLinkProps(
+    {
+      routePattern: to.routePattern,
+      pathSchema: to.pathSchema,
+      searchSchema: to.searchSchema,
+    },
+    linkInput,
+    null,
+  );
+}
+
+export function getBoundLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+  target: TTarget,
+  input: BoundGetLinkPropsInput<TTarget>,
+): FreshLinkAttributes & { href: ValidatedRouteHref } {
+  const navigationContext = readNavigationContext();
+
+  return createResolvedLinkProps(
+    {
+      routePattern: target.routePattern,
+      pathSchema: target.pathSchema,
+      searchSchema: target.searchSchema,
+    },
+    input,
+    navigationContext,
+  );
+}
+
+export function Link<TTarget extends TypedRouteTarget<object, object>>(
+  props: LinkProps<TTarget>,
+): JSX.Element {
+  const { to, children, ...linkInput } = props;
+  const resolvedAnchorProps = getBoundLinkProps(to, linkInput as BoundGetLinkPropsInput<TTarget>);
+
+  return (
+    <a
+      {...resolvedAnchorProps}
+      href={resolvedAnchorProps.href}
+      f-client-nav={resolvedAnchorProps['f-client-nav'] ?? true}
+    >
+      {children}
+    </a>
+  );
+}
+
+export function createRouteNav<TPath extends object, TSearch extends object>(
+  options: {
+    routePattern: string;
+    pathSchema?: PathParamSchema<TPath>;
+    searchSchema?: SearchParamSchema<TSearch>;
+  },
+): DefinePageRouteNav<TPath, TSearch> {
+  const makeHref: DefinePageRouteNav<TPath, TSearch>['makeHref'] = (...args) => {
+    const [input] = args as [{ path?: TPath; search?: Partial<TSearch> } | undefined];
+    return buildHref(options, { ...(input ?? {}), path: input?.path ?? ({} as TPath) }, null);
+  };
+
+  return { makeHref };
+}
