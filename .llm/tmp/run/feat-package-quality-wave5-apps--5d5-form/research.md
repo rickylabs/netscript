@@ -205,7 +205,94 @@ The current boundary is already clean: `fresh/form` owns "what the field is" (va
 
 ## 5. STANDARD SCHEMA LANDSCAPE & PROGRESSIVE ENHANCEMENT MARKET BAR
 
-(Placeholder — will be filled from file reads and web sources below.)
+Sources: `packages/fresh/form/schema-adapter.ts`; `packages/fresh/form/types.ts` lines 377–392 (enhancement schema option); Standard Schema spec https://github.com/standard-schema/standard-schema; Zod v3.23 release notes / Standard Schema support https://zod.dev/?id=standard-schema; Valibot Standard Schema support https://valibot.dev/guides/standard-schema/; ArkType "Standard Schema" docs https://arktype.io/docs/standard-schema; Remix `action`/`useActionData` docs https://remix.run/docs/en/main/guides/forms; React Router `Form`/`action` docs https://reactrouter.com/start/framework/form-validation; Next.js Server Actions docs https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations; React `useActionState` docs https://react.dev/reference/react/useActionState; TanStack Form docs https://tanstack.com/form/latest/docs/overview.
+
+### 5.1 Current state: Zod-locked adapter
+
+`schema-adapter.ts` is 576 lines and is the largest file in `./form`. It imports `z` directly, inspects `z.ZodTypeAny`, `z.ZodDefWithInner`, `ZodObject`, `ZodArray`, `ZodDefault`, `ZodCatch`, etc., and emits a `FormSchemaAdapter<TValues, TOutput>`.
+
+The public contract is already library-agnostic:
+
+```ts
+export interface FormSchemaAdapter<TValues extends FormValues, TOutput = TValues> {
+  parse(input: unknown): Promise<TOutput>;
+  safeParse(input: unknown): Promise<FormSchemaParseResult<TValues, TOutput>>;
+  getConstraints(): Partial<Record<string, FieldConstraints>>;
+  getDefaults(): Partial<TValues>;
+}
+```
+
+However, the only concrete implementation is `createZodAdapter`. Because `FormSchemaAdapter` is public, the framework could ship multiple vendor adapters, but the over-cap adapter file currently couples defaults, constraints, and error flattening to Zod internals. That is the decomposition target.
+
+### 5.2 Standard Schema spec
+
+Standard Schema (https://github.com/standard-schema/standard-schema) is a community specification that gives validation libraries a single shared entry point:
+
+```ts
+interface StandardSchemaV1<Input = unknown, Output = unknown> {
+  readonly '~validate': (value: unknown) =>
+    | { readonly issues: ReadonlyArray<StandardSchemaV1Issue>; }
+    | { readonly value: Output; };
+  // optional metadata
+  readonly '~types'?: { input: Input; output: Output; };
+}
+```
+
+Supported libraries (as of 2024–2025):
+
+| Library | Standard Schema support | Notes |
+|---------|------------------------|-------|
+| **Zod** | v3.23+ ships `~validate` and `~types` | https://zod.dev/?id=standard-schema |
+| **Valibot** | v0.30+ ships `~validate` and `~types` | https://valibot.dev/guides/standard-schema/ |
+| **ArkType** | v2.0+ ships `~validate` and `~types` | https://arktype.io/docs/standard-schema |
+
+The spec intentionally does **not** expose constraint metadata or defaults. It standardizes *validation*, not *schema introspection*. Therefore a form framework that wants to derive HTML constraints from a schema still needs per-library introspection or a supplementary contract.
+
+### 5.3 Market bar: Remix / React Router, Next.js, TanStack Form
+
+#### Remix / React Router
+
+- **Form model**: HTML `<Form>` posts to a route `action` (server function). `action` receives `args.request`/`args.params`, returns `json({ errors, values })` or `redirect()`.
+- **Validation**: bring-your-own (Zod/Valibot/ArkType via Standard Schema is common).
+- **Progressive enhancement**: works without JS; JavaScript-enabled clients get client-side navigation and optimistic UI via `useNavigation`/`useFetcher`.
+- **Field-level rendering**: no framework-provided field descriptor; authors manually wire `useActionData()` to each input's `defaultValue`, `aria-invalid`, `aria-describedby`.
+- **Gaps vs. NetScript form**: no built-in CSRF/idempotency token model; no collection-intent abstraction; no typed HTML-constraint derivation; error wiring is manual.
+
+#### Next.js App Router + Server Actions + `useActionState`
+
+- **Form model**: React Server Action exported from a `'use server'` module is used as the form `action`. `useActionState(action, initialState)` returns `[state, dispatch, isPending]`.
+- **Validation**: BYO. Pattern is `await schema.safeParse(formData)` inside the action and return a state object with `fieldErrors`/`formErrors`.
+- **Progressive enhancement**: server actions are callable as form actions, so no-JS submission works as long as the action parses `FormData`.
+- **Field-level rendering**: authors manually map `state.fieldErrors` to each control. No framework-level descriptor/constraint contract.
+- **Gaps vs. NetScript form**: no collection intents; no shared CSRF/idempotency helper in the framework; `useActionState` state shape is user-defined and not type-linked to a schema by default.
+
+#### TanStack Form
+
+- **Form model**: headless form primitives with framework adapters (React, Solid, Vue, Angular, Svelte). Core is `@tanstack/form-core`.
+- **Validation**: explicitly supports Standard Schema, plus field-level validators, sync and async validation, field-level debounce.
+- **Progressive enhancement**: supports SSR initial values and validation, but the "submit" path is typically client-driven; server submission requires framework adapter wiring.
+- **Field-level rendering**: `useField()` returns `name`, `state`, `handleChange`, `handleBlur`, `errors`. ARIA/data attributes are the consumer's responsibility.
+- **Gaps vs. NetScript form**: no built-in server-side CSRF/idempotency/collection-intent model; no Fresh-specific islands integration; no HTML-constraint derivation from schema.
+
+### 5.4 Verdict for 5d5 plan
+
+NetScript's form differentiator should be: **one Standard Schema-aware contract drives server validation, client validation, HTML constraints, defaults, and error rendering**, while keeping the no-JS path first-class via Fresh's existing intent/reply/CSRF/idempotency pipeline.
+
+Recommended design decisions:
+
+1. **Make `FormSchemaAdapter` the canonical abstraction**, and add a `createStandardSchemaAdapter(schema)` that works with any Standard Schema (Zod ≥3.23, Valibot ≥0.30, ArkType ≥2.0). Keep `createZodAdapter` if needed for introspection-heavy constraints/defaults, but re-implement it *on top of* `createStandardSchemaAdapter` plus a Zod-specific introspection plugin.
+2. **Split `schema-adapter.ts`** along responsibilities:
+   - `schema-adapter/contract.ts` — public `FormSchemaAdapter`, `FormSchemaParseResult`.
+   - `schema-adapter/standard.ts` — `createStandardSchemaAdapter` and issue-to-form-error mapping.
+   - `schema-adapter/zod.ts` — Zod introspection for constraints and defaults.
+   - `schema-adapter/mod.ts` — barrel.
+3. **Constraint/defaults introspection is per-library** because Standard Schema does not specify it. Provide a small `SchemaIntrospector<TSchema>` plugin interface so adding Valibot/ArkType adapters later is a single file.
+4. **Progressive enhancement bar**: the playground must prove no-JS submit, enhanced submit, server validation errors rendered through fresh-ui, pending UX, and CSRF. This matches Remix's no-JS baseline and exceeds Next.js Server Actions by providing typed field descriptors and collection intents.
+
+### 5.5 Defer vs. close
+
+- **Close now**: Standard Schema parse adapter; no-JS/enhanced submit in playground; CSRF/idempotency.
+- **Defer**: client-side `onBlur`/`onChange` async validation via Standard Schema (valuable but can be a follow-up slice); Valibot/ArkType constraint introspection (need community-stable introspection APIs); multi-step wizard pagination (exists in `pagination.ts` but not integrated with fresh-ui yet).
 
 ## 6. DRIFT / RISKS / GAPS
 
