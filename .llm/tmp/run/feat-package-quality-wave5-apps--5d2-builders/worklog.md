@@ -388,6 +388,26 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno doc --lint packages/fresh/builders/define-page/mod.ts` | PASS |
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 
+## 2026-06-14 slice 18 — package export and publish dry-run check
+
+**Files changed:**
+
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/worklog.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/context-pack.md`
+
+**Implementation:**
+
+- Verified `packages/fresh/deno.json` still maps `./builders` to `./builders/mod.ts`.
+- Verified the package `compilerOptions.lib` override includes `deno.unstable`.
+- No `deno.json` or lockfile changes were required.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/mod.ts` | PASS |
+| `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

@@ -6,13 +6,13 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 17 complete, Slice 18 next      |
+| Current phase  | `implement` — Slice 18 complete, Slice 19 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 17 are complete. The branch is clean at the latest pushed head after each committed
+Slices 1 through 18 are complete. The branch is clean at the latest pushed head after each committed
 slice when publication succeeds.
 
 ## Completed
@@ -95,15 +95,19 @@ slice when publication succeeds.
   - `define-page/mod.ts` now carries the planned A4 aggregate barrel rationale.
   - Compatibility-only role exports are marked `@internal` for clean public docs.
   - `define-page/mod.ts` doc-lint, check, and surface snapshot pass.
+- Slice 18 implemented:
+  - `packages/fresh/deno.json` verified with `./builders` export and `deno.unstable` lib.
+  - `deno check --unstable-kv packages/fresh/builders/mod.ts` passed.
+  - `deno publish --dry-run --allow-dirty` passed from `packages/fresh`.
 
 ## In Progress
 
-- Slice 18: verify `packages/fresh/deno.json` and scoped publish dry-run.
+- Slice 19: split builder seam tests.
 
 ## Next Steps
 
-1. Continue Slice 18: verify `packages/fresh/deno.json` and publish dry-run scope.
-2. Continue Slice 19: split builder seam tests.
+1. Continue Slice 19: split builder seam tests.
+2. Continue Slice 20: split runtime seam tests.
 
 ## Key Decisions
 
