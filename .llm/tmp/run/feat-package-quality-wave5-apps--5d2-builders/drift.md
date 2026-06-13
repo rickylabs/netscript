@@ -1,5 +1,81 @@
 # 5d2 builders — drift ledger
 
-Authority: umbrella plan `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/plan.md`.
-Add `D-5d2-n` entries only when implementation reality diverges from plan or doctrine.
+## D-5d2-1: Form-package surface visibility touched by 5d2
 
+**Date:** 2026-06-13  
+**Plan slice:** Slice 2  
+**Status:** planned, implementation pending
+
+**Description:**
+`packages/fresh/builders/mod.ts` re-exports `RuntimeFormState` (and members whose types are
+declared in `packages/fresh/form/types.ts`). JSR's doc-lint reports 19 `private-type-ref` errors
+and 18 `missing-jsdoc` errors because those member types (`FormValues`, `FormFieldErrors`,
+`FieldDescriptorMap`, `FormElementProps`, `FormCsrfInputProps`, `CollectionKeyInputProps`,
+`LabelProps`, `ErrorProps`, `DescriptionProps`, `ControlProps`, `IntentButtonProps`,
+`FieldConstraints`, `FormIntent`, `FormIntentResult`, `FormReplyInit`, `CollectionDescriptor`,
+`FieldDescriptor`) are not exported from `form/types.ts` and lack JSDoc.
+
+This is nominally 5d5 (forms) scope, but it blocks 5d2's JSR publishability gate. The fix is
+limited to:
+
+1. Adding `export` to the referenced types in `packages/fresh/form/types.ts`.
+2. Adding JSDoc summaries to each newly exported symbol and to `RuntimeFormState` members.
+3. No behavior changes, no signature changes, no new runtime code.
+
+**Rationale:** The umbrella plan requires 0 doc-lint errors over all exports combined. Since the
+leak surfaces through the builders barrel, 5d2 will close it rather than leave a known JSR blocker
+for 5d5.
+
+**Closing gate:** `deno doc --lint packages/fresh/builders/mod.ts` returns 0 errors.
+
+**Cross-unit impact:** 5d5 should be notified that 5d2 changed form-package public surface
+(visibility/JSDoc only). If 5d5 later renames or removes these symbols, it must coordinate with
+the builders surface test added in slice 1.
+
+---
+
+## D-5d2-2: F-18 sub-barrel opt-outs for A4 role modules
+
+**Date:** 2026-06-13  
+**Plan slices:** Slices 6, 10, 14, 17  
+**Status:** planned, implementation pending
+
+**Description:**
+The decomposition creates role-named subfolders under `packages/fresh/builders/define-page/`:
+`builder/`, `runtime/`, and `navigation/`. Each has a `mod.ts` that aggregates its role modules.
+`define-page/mod.ts` also aggregates the role modules. Doctrine F-18 forbids sub-barrels inside
+`packages/*/src/**` subdirectories unless they are declared subpath exports or genuinely aggregate
+one symbol from many.
+
+The new `mod.ts` files are genuine aggregation points that construct the public `definePage`
+surface from role modules, so they qualify for the `// arch:barrel-ok` opt-out.
+
+**Required action:**
+
+1. Add a comment at the top of each new sub-barrel:
+   ```ts
+   // arch:barrel-ok A4-aggregate: composes public definePage surface from role modules
+   ```
+2. Record an entry in `.llm/arch-debt.md` (or the audit registry used by `deno task arch:check`)
+   naming the files and the rationale.
+
+**Closing gate:** `deno task arch:check:sub-barrels` passes for `packages/fresh/builders`.
+
+---
+
+## D-5d2-3: Potential slow-type opt-in for recursive form types
+
+**Date:** 2026-06-13  
+**Plan slice:** Slice 26  
+**Status:** planned, decision pending on `deno publish --dry-run` output
+
+**Description:**
+`FieldDescriptorMap<T>` in `packages/fresh/form/types.ts` is a recursive mapped type. After it is
+made public (D-5d2-1), JSR may classify it as a slow type. `RuntimeFormState<TValues>` depends on
+it and may also be flagged slow.
+
+Slow types do not block publishing if the package explicitly opts in, but they reduce the JSR
+documentation score. The decision whether to add a slow-type declaration to
+`packages/fresh/deno.json` is deferred until slice 26 produces `deno publish --dry-run` output.
+
+**Closing gate:** `deno publish --dry-run` from `packages/fresh` succeeds.
