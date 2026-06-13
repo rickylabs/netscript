@@ -14,11 +14,50 @@
  */
 
 import { createStreamDB } from '@durable-streams/state';
-import type { StateSchema, StreamDB, StreamStateDefinition } from '@durable-streams/state';
+import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 
+/** NetScript-owned durable stream state definition. */
+export type NetScriptStreamStateDefinition = Record<string, unknown>;
+
+/** NetScript-owned state schema accepted by the stream DB factory. */
+export type NetScriptStateSchema<TDef extends NetScriptStreamStateDefinition> = Record<
+  keyof TDef,
+  unknown
+>;
+
+/** NetScript-owned stream database handle returned by the factory. */
+export interface NetScriptStreamDB<TDef extends NetScriptStreamStateDefinition> {
+  /** Reactive collections keyed by schema collection name. */
+  readonly collections: Record<keyof TDef & string, unknown>;
+  /** Optional stop hook exposed by compatible stream DB adapters. */
+  readonly stop?: () => void | Promise<void>;
+  /** Optional dispose hook exposed by compatible stream DB adapters. */
+  readonly dispose?: () => void | Promise<void>;
+}
+
+/** Input passed to the underlying stream DB factory port. */
+export interface NetScriptStreamDBFactoryInput<TDef extends NetScriptStreamStateDefinition> {
+  /** Transport options used to connect to the durable streams endpoint. */
+  streamOptions: {
+    /** Fully resolved durable stream URL. */
+    url: string;
+    /** Content type sent to the durable streams endpoint. */
+    contentType: 'application/json';
+    /** Auth headers sent to the durable streams endpoint. */
+    headers: Record<string, string>;
+  };
+  /** State schema passed to the underlying stream DB adapter. */
+  state: NetScriptStateSchema<TDef>;
+}
+
+/** Factory port used to create a durable stream DB handle. */
+export type NetScriptStreamDBFactory<TDef extends NetScriptStreamStateDefinition> = (
+  input: NetScriptStreamDBFactoryInput<TDef>,
+) => NetScriptStreamDB<TDef>;
+
 /** Options for `createNetScriptStreamDB`. */
-export interface NetScriptStreamDBOptions {
+export interface NetScriptStreamDBOptions<TDef extends NetScriptStreamStateDefinition> {
   /**
    * Stream path relative to the streams server root.
    * (e.g. `/workers/executions`)
@@ -29,6 +68,10 @@ export interface NetScriptStreamDBOptions {
    * Defaults to `getStreamsUrl()` (env-resolved).
    */
   baseUrl?: string;
+  /** State schema used by the durable stream database. */
+  schema: NetScriptStateSchema<TDef>;
+  /** Optional factory port for tests or alternate stream DB adapters. */
+  createStreamDB?: NetScriptStreamDBFactory<TDef>;
 }
 
 /**
@@ -54,17 +97,29 @@ export interface NetScriptStreamDBOptions {
  * );
  * ```
  */
-export function createNetScriptStreamDB<TDef extends StreamStateDefinition>(
-  options: NetScriptStreamDBOptions & { schema: StateSchema<TDef> },
-): StreamDB<TDef> {
+export function createNetScriptStreamDB<TDef extends NetScriptStreamStateDefinition>(
+  options: NetScriptStreamDBOptions<TDef>,
+): NetScriptStreamDB<TDef> {
   const baseUrl = options.baseUrl ?? getStreamsUrl();
+  const factory = options.createStreamDB ?? defaultCreateStreamDB;
 
-  return createStreamDB<TDef>({
+  return factory({
     streamOptions: {
       url: buildStreamUrl(options.streamPath, baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: options.schema as unknown as TDef,
+    state: options.schema,
   });
+}
+
+function defaultCreateStreamDB<TDef extends NetScriptStreamStateDefinition>(
+  input: NetScriptStreamDBFactoryInput<TDef>,
+): NetScriptStreamDB<TDef> {
+  return createStreamDB(
+    {
+      streamOptions: input.streamOptions,
+      state: input.state as unknown as StateSchema<StreamStateDefinition>,
+    } as Parameters<typeof createStreamDB>[0],
+  ) as unknown as NetScriptStreamDB<TDef>;
 }

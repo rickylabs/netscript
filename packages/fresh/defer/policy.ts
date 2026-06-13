@@ -1,65 +1,65 @@
-/** JSDoc for exported type `DeferPolicyProfile`. */
+/** Named policy profiles for deferred rendering freshness behavior. */
 export type DeferPolicyProfile =
   | 'balanced'
   | 'aggressive-first-paint'
   | 'background-refresh'
   | 'low-bandwidth';
 
-/** JSDoc for exported type `LegacyStaleStrategy`. */
+/** Legacy stale strategy accepted by older defer call sites. */
 export type LegacyStaleStrategy = 'none' | 'server-prewarm';
 
-/** JSDoc for exported interface `DeferPolicyInput`. */
+/** Policy overrides that tune when deferred regions refresh. */
 export interface DeferPolicyInput {
-  /** Property `profile`. */
+  /** Named policy profile used as the defaults source. */
   profile?: DeferPolicyProfile;
-  /** Property `staleTimeMs`. */
+  /** Freshness window in milliseconds before cached data is stale. */
   staleTimeMs?: number;
-  /** Property `prewarmOnMiss`. */
+  /** Whether cache misses start a server-side prewarm request. */
   prewarmOnMiss?: boolean;
-  /** Property `prewarmOnStale`. */
+  /** Whether stale cache hits start a server-side prewarm request. */
   prewarmOnStale?: boolean;
-  /** Property `clientRefreshOnFreshCache`. */
+  /** Whether fresh cache hits still trigger a client refresh. */
   clientRefreshOnFreshCache?: boolean;
-  /** Property `skipClientWhenServerPrewarm`. */
+  /** Whether client refresh is skipped while server prewarm is active. */
   skipClientWhenServerPrewarm?: boolean;
 }
 
-/** JSDoc for exported interface `DeferPolicyResolved`. */
+/** Fully resolved defer policy used by server and island renderers. */
 export interface DeferPolicyResolved {
-  /** Property `profile`. */
+  /** Active named policy profile. */
   profile: DeferPolicyProfile;
-  /** Property `staleTimeMs`. */
+  /** Resolved freshness window in milliseconds. */
   staleTimeMs: number;
-  /** Property `prewarmOnMiss`. */
+  /** Resolved cache-miss prewarm behavior. */
   prewarmOnMiss: boolean;
-  /** Property `prewarmOnStale`. */
+  /** Resolved stale-hit prewarm behavior. */
   prewarmOnStale: boolean;
-  /** Property `clientRefreshOnFreshCache`. */
+  /** Resolved fresh-cache client refresh behavior. */
   clientRefreshOnFreshCache: boolean;
-  /** Property `skipClientWhenServerPrewarm`. */
+  /** Resolved duplicate-refresh suppression behavior. */
   skipClientWhenServerPrewarm: boolean;
 }
 
-/** JSDoc for exported symbol `DEFER_POLICY`. */
+/** Conventional defer policy profiles used by generated pages. */
 export const DEFER_POLICY = {
   header: 'balanced',
   detail: 'background-refresh',
 } as const;
 
-/** JSDoc for exported symbol `DEFER_STALE_MS`. */
+/** Conventional stale windows used by generated CRUD pages. */
 export const DEFER_STALE_MS = {
   crud: 30_000,
   forceRefresh: 0,
 } as const;
 
-/** JSDoc for exported symbol `DETAIL_FORCE_REFRESH_POLICY`. */
+/** Detail-page policy that preserves immediate consistency after navigation. */
 export const DETAIL_FORCE_REFRESH_POLICY: DeferPolicyInput = {
   profile: DEFER_POLICY.detail,
   // Keep immediate consistency for linked resources after first client nav.
   skipClientWhenServerPrewarm: false,
 };
 
-/** JSDoc for exported symbol `resolveDetailDeferConfig`. */
+/** Resolve the detail-page stale window and defer policy for the current cache state. */
 export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
   staleTime: number;
   policy: DeferPolicyInput | DeferPolicyProfile;
@@ -70,7 +70,7 @@ export function resolveDetailDeferConfig(hasCompleteCache: boolean): {
   };
 }
 
-/** JSDoc for exported type `DeferClientDecisionReason`. */
+/** Reasons the client island can choose to submit or skip a deferred refresh. */
 export type DeferClientDecisionReason =
   | 'partial-miss'
   | 'partial-hit'
@@ -81,21 +81,29 @@ export type DeferClientDecisionReason =
   | 'stale-cache'
   | 'policy-background-refresh';
 
-/** JSDoc for exported interface `DeferClientDecision`. */
+/** Client-side deferred refresh decision. */
 export interface DeferClientDecision {
-  /** Property `action`. */
+  /** Action the client island should take. */
   action: 'submit' | 'skip';
-  /** Property `reason`. */
+  /** Stable reason explaining the chosen action. */
   reason: DeferClientDecisionReason;
 }
 
-interface DeferClientDecisionInput {
+/** Inputs used to decide whether a deferred region should refresh on the client. */
+export interface DeferClientDecisionInput {
+  /** True when the current request already targets a Fresh partial. */
   isPartialRequest?: boolean;
+  /** True when the server rendered cached data. */
   hasCachedData?: boolean;
+  /** True when cached data has a timestamp and stale window. */
   hasFreshnessInfo: boolean;
+  /** True when cached data is still within its stale window. */
   isFresh: boolean;
+  /** True when the server already started revalidation for this region. */
   serverRevalidating?: boolean;
+  /** Stale window used for the decision. */
   staleTimeMs: number;
+  /** Resolved policy for the region. */
   policy: DeferPolicyResolved;
 }
 
@@ -134,7 +142,7 @@ const PROFILE_DEFAULTS: Record<DeferPolicyProfile, DeferPolicyResolved> = {
   },
 };
 
-/** JSDoc for exported symbol `resolveDeferPolicy`. */
+/** Resolve user policy input, stale overrides, and legacy strategy into a complete policy. */
 export function resolveDeferPolicy(
   policy: DeferPolicyInput | DeferPolicyProfile | undefined,
   staleTimeOverrideMs: number | undefined,
@@ -165,7 +173,7 @@ export function resolveDeferPolicy(
   };
 }
 
-/** JSDoc for exported symbol `decideDeferClientAction`. */
+/** Decide whether the client island should submit or skip its deferred refresh form. */
 export function decideDeferClientAction(input: DeferClientDecisionInput): DeferClientDecision {
   if (input.isPartialRequest) {
     return input.hasCachedData
