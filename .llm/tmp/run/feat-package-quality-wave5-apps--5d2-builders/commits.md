@@ -25,3 +25,4 @@ Append-only hash record (repo + hash + subject).
 - fca2a2f: test(fresh): split define page navigation tests
 - cddbfdc: test(fresh): split define page search tests
 - 580dfb2: test(fresh): add builder route fixtures
+- 959f756: chore(harness): record builders test suite
