@@ -10,7 +10,7 @@
 
 import { QueryClientProvider } from '@tanstack/preact-query';
 import type { QueryClient } from '@tanstack/query-core';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, JSX } from 'preact';
 import { getIslandQueryClient } from './query-client.ts';
 
 /**
@@ -37,7 +37,7 @@ export interface QueryIslandProps {
  * }
  * ```
  */
-export function QueryIsland({ children, queryClient }: QueryIslandProps) {
+export function QueryIsland({ children, queryClient }: QueryIslandProps): JSX.Element {
   const client = queryClient ?? getIslandQueryClient();
   return (
     <QueryClientProvider client={client}>

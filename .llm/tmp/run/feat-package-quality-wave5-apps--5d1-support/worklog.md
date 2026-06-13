@@ -2,6 +2,33 @@
 
 Append-only. One entry per slice / decision.
 
+## Design
+
+Protocol repair recorded during FAIL_FIX. The canonical design checkpoint for this run is
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/design.md`; this section mirrors the
+required `worklog.md` fields so the run artifact set satisfies harness v2 without rewriting history.
+
+- **Public surface**: `@netscript/fresh`, `./error`, `./utils`, `./interactive`, `./vite`, and
+  `./testing` are the 5d1-owned surfaces. Later surfaces `./builders`, `./defer`, `./form`,
+  `./streams`, and `./query` remain exported for package validation but are owned by 5d2-5d6.
+- **Domain vocabulary**: error taxonomy (`ErrorType`, `ErrorData`, `LoaderResult`), cache-entry
+  projection (`CacheEntryLike`), interactive promise state, Vite alias/env/plugin wrapper shapes,
+  mock route context, mock defer policy, and shared Fresh telemetry span attributes.
+- **Ports**: no new external runtime port is introduced. 5d1 consumes existing Fresh/Vite/Preact and
+  NetScript telemetry APIs at package edges; the shared telemetry helper remains internal.
+- **Constants**: defer root exports are intentionally removed from the root barrel and retained under
+  `./defer`; telemetry uses the `netscript.operation` convention described in `design.md`.
+- **Commit slices**: the approved plan locked 24 slices. Implementation collapsed those into one
+  source commit (`ed5fedc`) plus artifact/evaluator/publication commits. That is a process
+  exception, not a source-design change; it is recorded in `drift.md` and this worklog.
+- **Deferred scope**: full package doc-lint 0 across builders/defer/form/streams/query remains owned
+  by later 5d slices, with 5d6 responsible for final package closeout. The FAIL_FIX only adds
+  gate-forced explicit return types in form/query files.
+- **Contributor path**: support-spine contributors should start at `packages/fresh/mod.ts` for the
+  curated root, then follow subpath entrypoints (`error/mod.ts`, `utils/mod.ts`,
+  `interactive.ts`, `config/vite.ts`, `testing.ts`) to implementation files. Later feature-surface
+  contributors should follow their owning 5d plan before changing public exports.
+
 ## 2026-06-13T22:43:49+02:00 — IMPL-5D1 support-spine implementation
 
 - Verified native WSL ext4 worktree at `/home/codex/repos/netscript-wave5-apps-5d1-support`, branch `feat/package-quality-wave5-apps-5d1-support`, current with origin before edits. `rtk` was unavailable (`command not found`), so validation and git inspection used direct shell commands; recorded as drift.
@@ -64,3 +91,23 @@ Append-only. One entry per slice / decision.
 - Remaining status: publication blocker resolved; the evaluator verdict remains **FAIL_FIX** until
   the broad `doc-lint`/`dry-run` failures and process/artifact gaps are addressed or explicitly
   accepted.
+
+## 2026-06-13T23:20:00+02:00 — FAIL_FIX gate repair
+
+- Fixed the required JSR publishability blocker with explicit return types only:
+  - `packages/fresh/form/enhancement.tsx#getSubmissionHiddenInputProps`
+  - `packages/fresh/form/form-region.tsx#FormRegion`
+  - `packages/fresh/form/form.tsx#Form`
+  - `packages/fresh/query/query-island.tsx#QueryIsland`
+- Validation:
+  - PASS: `deno task dry-run` from `packages/fresh`.
+  - PASS: `deno task check` from `packages/fresh` (`--unstable-kv` included in package task).
+  - PASS: `deno task fmt:check` from `packages/fresh` (`Checked 21 files`).
+  - FAIL/ESCALATED: `deno task doc-lint` from `packages/fresh` now reports 244 documentation lint
+    errors. The residue is broad 5d public-surface debt in builders/defer/form/streams/query; see
+    `escalations/failfix-doc-lint.md` and `.llm/harness/debt/arch-debt.md`.
+- Process repair:
+  - Added this `## Design` section to satisfy harness protocol while preserving the existing
+    standalone `design.md`.
+  - Recorded the monolithic implementation commit as an explicit process exception rather than
+    rewriting history.

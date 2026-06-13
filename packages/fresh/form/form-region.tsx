@@ -1,5 +1,5 @@
 import { Partial } from 'fresh/runtime';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, JSX } from 'preact';
 
 export interface FormRegionProps {
   readonly name: string;
@@ -7,7 +7,7 @@ export interface FormRegionProps {
   readonly children: ComponentChildren;
 }
 
-export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+export function FormRegion({ name, mode = 'replace', children }: FormRegionProps): JSX.Element {
   return (
     <Partial name={name} mode={mode}>
       {children}

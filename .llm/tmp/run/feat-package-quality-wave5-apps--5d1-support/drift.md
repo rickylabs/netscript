@@ -25,3 +25,14 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
   `git push` used the token as an HTTPS credential without printing or persisting it. Remote branch
   now contains implementation/evaluator artifacts through `9440f11`, and `git ls-remote origin
   refs/heads/feat/package-quality-wave5-apps-5d1-support` matches local `HEAD`.
+- D-5d1-019: FAIL_FIX repaired the JSR publish dry-run by adding explicit return types in
+  later-slice-owned form/query files. This is minimal gate-forced public-surface annotation work, not
+  5d5/5d6 feature implementation.
+- D-5d1-020: Broad `deno task doc-lint` remains out of reach for 5d1 without implementing later
+  builders/defer/form/streams/query surface work. After the return-type repair, it reports 244
+  errors. The formal escalation is
+  `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`;
+  full package doc-lint 0 remains assigned to 5d6 closeout.
+- D-5d1-021: Harness process repair added the protocol-required `## Design` section to `worklog.md`
+  after implementation. The original source implementation remains a monolithic source commit; this
+  run records the process exception instead of rewriting history.

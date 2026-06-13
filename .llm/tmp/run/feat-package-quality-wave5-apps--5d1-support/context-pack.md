@@ -126,3 +126,16 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 - The evaluator's publication blocker is now resolved, but the evaluator verdict remains
   **FAIL_FIX**. Remaining blockers are the broad package `doc-lint` and `dry-run` failures plus
   process/artifact gaps recorded above.
+
+## FAIL_FIX update — 2026-06-13
+
+- Fixed the JSR publishability blocker. `deno task dry-run` from `packages/fresh` now passes after
+  adding explicit return types to the four evaluator-reported form/query symbols.
+- Re-ran `deno task check` and `deno task fmt:check` from `packages/fresh`; both pass.
+- `deno task doc-lint` still fails and is formally escalated in
+  `escalations/failfix-doc-lint.md`. The failing surface is broad 5d residue in
+  builders/defer/form/streams/query and cannot be completed in 5d1 without violating slice
+  ownership.
+- Process artifact repair: `worklog.md` now contains the protocol-required `## Design` section, and
+  `drift.md` records the monolithic-commit exception explicitly. `commits.md` was corrected to the
+  current branch history before the FAIL_FIX commit.
