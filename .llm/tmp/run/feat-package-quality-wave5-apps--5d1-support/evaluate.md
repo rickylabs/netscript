@@ -70,7 +70,7 @@ completion/artifact hygiene/publication, not a new architecture plan.
 
 ## Publication Blocker
 
-Local branch state is clean but unpublished:
+Local branch state was clean but unpublished before this evaluator artifact commit:
 
 ```text
 origin/feat/package-quality-wave5-apps-5d1-support...HEAD = 0 behind / 3 ahead
@@ -80,14 +80,19 @@ HEAD commits:
 ed5fedc Implement fresh support spine quality slice
 ```
 
+After committing `evaluate.md`, the local branch is ahead of origin by 4 commits, with the evaluator
+artifact commit on top.
+
 Prior implementation attempted `git push` and failed with:
 
 ```text
 fatal: could not read Username for 'https://github.com': No such device or address
 ```
 
-`gh` is unavailable, and GitHub MCP cannot update the remote ref to local-only commit objects. This
-publication blocker prevents PASS even if local source gates were otherwise acceptable.
+`gh` is unavailable, and GitHub MCP cannot update the remote ref to local-only commit objects. A
+post-evaluator `git push origin feat/package-quality-wave5-apps-5d1-support` was attempted and
+failed with the same HTTPS credential error. This publication blocker prevents PASS even if local
+source gates were otherwise acceptable.
 
 ## Arch-Debt Delta
 
