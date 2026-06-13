@@ -135,6 +135,30 @@
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/builder/factory.ts packages/fresh/builders/define-page/builder.tsx` | PASS: `factory.ts` 3505 bytes; `builder.tsx` 29943 bytes |
 
+**Commit:** `5105cf1 refactor(fresh): extract define page builder factory`
+
+## 2026-06-14 slice 5 — builder validators
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/builder/validators.ts`
+- `packages/fresh/builders/define-page/builder.tsx`
+
+**Implementation:**
+
+- Moved route pattern validation, layer config normalization, header overload normalization, and
+  layer component storage casting into `builder/validators.ts`.
+- Kept form submission validation in `builder.tsx` for now because it belongs with the current form
+  handler pipeline until the runtime split.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/builder/validators.ts packages/fresh/builders/define-page/builder.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/builder/validators.ts packages/fresh/builders/define-page/builder.tsx` | PASS: `validators.ts` 2545 bytes; `builder.tsx` 29294 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

@@ -28,6 +28,12 @@ import {
 import { createDefinePageHooks, createRouteNav, type TypedRouteTarget } from './navigation.tsx';
 import { executePagePipeline, prepareRequestState } from './runtime.tsx';
 import { createDefaultConfig, promoteConfigToRoute, retagConfig } from './builder/factory.ts';
+import {
+  normalizeLayerComponent,
+  resolveConfiguredRoutePattern,
+  resolveHeaderDescriptor,
+  resolveLayerConfig,
+} from './builder/validators.ts';
 export type { DefinePageBuilder, DefinePageRootBuilder } from './builder/state.ts';
 import type { DefinePageBuilder, DefinePageRootBuilder, FormSchemaInput } from './builder/state.ts';
 import type {
@@ -78,31 +84,13 @@ import type {
 function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRoute extends boolean>(
   config: RuntimePageConfig<TTypes, THasConfiguredRoute>,
 ): DefinePageBuilder<TTypes, THasConfiguredRoute> {
-  const resolveConfiguredRoutePattern = (routePattern?: string): string => {
-    const resolvedRoutePattern = routePattern ?? config.defaultRoutePattern;
-    if (!resolvedRoutePattern) {
-      throw new Error(
-        'definePage() requires a route pattern. Pass one explicitly or provide a generated route via withRoute(...).',
-      );
-    }
-
-    if (config.route && resolvedRoutePattern !== config.route.routePattern) {
-      throw new Error(
-        `definePage().withRoute(...) already configured the route pattern "${config.route.routePattern}". ` +
-          'Do not override it in createNav() or build().',
-      );
-    }
-
-    return resolvedRoutePattern;
-  };
-
   const createTypedNav = (routePattern?: string): DefinePageRouteNavFor<TTypes> => {
     if (config.route) {
-      resolveConfiguredRoutePattern(routePattern);
+      resolveConfiguredRoutePattern(config, routePattern);
       return config.route.nav as DefinePageRouteNavFor<TTypes>;
     }
 
-    const resolvedRoutePattern = resolveConfiguredRoutePattern(routePattern);
+    const resolvedRoutePattern = resolveConfiguredRoutePattern(config, routePattern);
     return createRouteNav<DefinePagePathOf<TTypes>, DefinePageSearchOf<TTypes>>({
       routePattern: resolvedRoutePattern,
       pathSchema: config.pathSchema,
@@ -118,7 +106,7 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
     const explicitRoutePattern = typeof options === 'string' ? options : options?.routePattern;
     const routePattern =
       explicitRoutePattern !== undefined || config.defaultRoutePattern !== undefined
-        ? resolveConfiguredRoutePattern(explicitRoutePattern)
+        ? resolveConfiguredRoutePattern(config, explicitRoutePattern)
         : undefined;
     const routeContract = !config.route && routePattern
       ? defineRouteContract({
@@ -346,12 +334,10 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
         | DefinePageLayerConfigFor<TTypes, TProps, THasConfiguredRoute>
         | DefinePageLayerLoaderFor<TTypes, TProps, THasConfiguredRoute>,
     ) {
-      const resolvedConfig = typeof layerConfig === 'function'
-        ? { loader: layerConfig }
-        : (layerConfig ?? {});
+      const resolvedConfig = resolveLayerConfig(layerConfig);
       const descriptor: RuntimeLayerDescriptor<TTypes, THasConfiguredRoute> = {
         id,
-        component: component as ComponentType<DefinePageLayerProps>,
+        component: normalizeLayerComponent(component),
         config: resolvedConfig as RuntimeLayerDescriptor<TTypes, THasConfiguredRoute>['config'],
       };
       return createBuilder<DefinePageWithLayer<TTypes, K, TProps>, THasConfiguredRoute>({
@@ -467,9 +453,7 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
         | DefinePageHeaderResolverFor<TTypes, THasConfiguredRoute>,
       value?: string,
     ) {
-      const descriptor = typeof nameOrHeadersOrResolver === 'string'
-        ? { [nameOrHeadersOrResolver]: value ?? '' }
-        : nameOrHeadersOrResolver;
+      const descriptor = resolveHeaderDescriptor(nameOrHeadersOrResolver, value);
       return createBuilder<TTypes, THasConfiguredRoute>({
         ...config,
         headers: [...config.headers, descriptor],
