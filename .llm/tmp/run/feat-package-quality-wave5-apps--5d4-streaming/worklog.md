@@ -97,3 +97,24 @@ Implementation resumes from the approved `design.md` and `plan.md` artifacts. PL
 | Static check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
 | Static lint | `deno lint --config deno.json packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS, checked 2 files |
 | Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS, checked 2 files |
+
+## 2026-06-13 — Slices 5 and 6 streams lifecycle + upstream-type wrap
+
+### Scope
+
+- Replaced raw `@tanstack/react-db` and `@durable-streams/state` re-exports from
+  `@netscript/fresh/streams` with NetScript-owned wrapper types and live-query wrapper functions.
+- Updated `createNetScriptStreamDB` to expose NetScript-owned schema, DB handle, and factory-port
+  types while keeping durable-streams types internal.
+- Added `create-stream-db_test.ts` to prove stream URL resolution, schema handoff, and lifecycle
+  handle propagation through the injected factory seam.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| F-7 / F-15 doc lint | `deno doc --lint packages/fresh/streams/mod.ts` | PASS, checked 1 file |
+| Static check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
+| F-13 lifecycle test | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/streams/create-stream-db_test.ts` | PASS, 1 test |
+| Static lint | `deno lint --no-config packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS, checked 3 files |
+| Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS, checked 3 files |

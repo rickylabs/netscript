@@ -21,6 +21,7 @@
 - Slice 2 telemetry / policy / server polish is implemented and validated.
 - Slice 3 renderer abort tests are implemented and validated.
 - Slice 4 SSE / KV watch abort tests are implemented and validated.
+- Slices 5 and 6 streams lifecycle + upstream-type wrap are implemented and validated.
 - No lockfile changes.
 
 ## Completed
@@ -40,6 +41,8 @@
   cancellation on abort.
 - Added colocated `server/sse_test.ts` coverage for external abort heartbeat cleanup and KV watch
   signal abort on response cancellation.
+- Replaced raw streams upstream re-exports with NetScript-owned wrappers and added
+  `streams/create-stream-db_test.ts` coverage for URL/schema/lifecycle handle handoff.
 
 ## Validation Evidence
 
@@ -64,11 +67,16 @@
 | Slice 4 check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
 | Slice 4 lint | `deno lint --config deno.json packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
 | Slice 4 fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/sse.ts packages/fresh/server/sse_test.ts` | PASS |
+| Streams doc lint | `deno doc --lint packages/fresh/streams/mod.ts` | PASS |
+| Streams check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
+| Streams test | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/streams/create-stream-db_test.ts` | PASS, 1 test |
+| Streams lint | `deno lint --no-config packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
+| Streams fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
 
 ## Next Steps
 
-1. Commit the Slice 4 batch.
-2. Continue with Slice 5: client durable stream lifecycle tests.
+1. Commit the streams batch.
+2. Continue with Slice 8: README / permission updates, then Slice 9 slow-type return annotations.
 3. Re-run focused static gates after each source slice.
 4. Publish/push via GitHub connector if local HTTPS credentials remain unavailable.
 
@@ -87,6 +95,9 @@
 | `packages/fresh/server/sse.ts` | update | Local KV watch types, clock port, external abort signal, no console logging. |
 | `packages/fresh/server/stream_test.ts` | new | Renderer abort invariant tests. |
 | `packages/fresh/server/sse_test.ts` | new | SSE heartbeat cleanup and KV watch abort invariant tests. |
+| `packages/fresh/streams/mod.ts` | update | NetScript-owned live-query wrappers; no raw upstream re-exports. |
+| `packages/fresh/streams/create-stream-db.ts` | update | NetScript-owned DB/schema/factory types and injectable factory port. |
+| `packages/fresh/streams/create-stream-db_test.ts` | new | Stream DB URL/schema/lifecycle handle test. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/drift.md` | update | Added D-5d4-11 and D-5d4-12. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/worklog.md` | update | Added implementation and validation evidence. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/context-pack.md` | update | Refreshed resumable state. |
@@ -101,4 +112,5 @@
 - b326c52: fix fresh streaming public surface
 - 7d3c8e3: polish fresh streaming telemetry and sse surface
 - 27f1267: test fresh renderer abort cancellation
-- Pending: Slice 4 SSE / KV watch abort tests commit.
+- dcbb4a8: test fresh sse abort cleanup
+- Pending: streams lifecycle / upstream-type wrap commit.
