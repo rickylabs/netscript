@@ -20,3 +20,8 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - D-5d1-015: Broad `deno task doc-lint` now reports 242 errors. The remaining failures are inherited/out-of-scope for 5d1, dominated by TanStack/query public type exposure and query hydration references. Scoped 5d1 doc-lint over `mod.ts`, `interactive.ts`, `error/mod.ts`, `utils/mod.ts`, `config/vite.ts`, and `testing.ts` passes with only optional npm type-resolution warnings.
 - D-5d1-016: `deno task dry-run` now passes package checks but fails slow-type validation on four later-slice symbols: `form/enhancement.tsx#getSubmissionHiddenInputProps`, `form/form-region.tsx#FormRegion`, `form/form.tsx#Form`, and `query/query-island.tsx#QueryIsland`. These are 5d5/5d6-owned and were not patched in the 5d1 implementation session.
 - D-5d1-017: Push is blocked by unavailable local GitHub credentials. `git push` failed with `could not read Username for 'https://github.com'`, `gh` is not installed, and GitHub MCP `_update_ref` cannot move the remote branch to a local-only commit object. Local branch is clean and ahead of origin with commits `ed5fedc65a9f16b750be0ea426527771ff217f14` and `877e1c50c21f106018ef63e06654f7e2004b0827`.
+- D-5d1-018: Publication blocker resolved after the evaluator verdict. `gh` was installed locally but
+  could not authenticate the Zed MCP token because the token lacks `read:org`; a Deno-run one-shot
+  `git push` used the token as an HTTPS credential without printing or persisting it. Remote branch
+  now contains implementation/artifact commits through `98a96ca` and `.llm/tools/git-verify.ts sync`
+  reports `0 ahead / 0 behind origin`.
