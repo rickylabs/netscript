@@ -6,13 +6,13 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 19 complete, Slice 20 next      |
+| Current phase  | `implement` — Slice 20 complete, Slice 21 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 19 are complete. The branch is clean at the latest pushed head after each committed
+Slices 1 through 20 are complete. The branch is clean at the latest pushed head after each committed
 slice when publication succeeds.
 
 ## Completed
@@ -105,16 +105,19 @@ slice when publication succeeds.
   - Builder test gate passes with `--allow-env`.
   - D-5d2-12 records that `withForm` behavior tests remain for the next test split to keep
     `builder.test.tsx` under cap.
+- Slice 20 implemented:
+  - `packages/fresh/builders/define-page/runtime.test.tsx` created for `withForm` runtime behavior.
+  - Runtime test gate passes with `--allow-env`.
+  - `define-page.test.tsx` trimmed to 541 LOC.
 
 ## In Progress
 
-- Slice 20: split runtime seam tests.
+- Slice 21: split navigation seam tests.
 
 ## Next Steps
 
-1. Continue Slice 20: split runtime seam tests, including the remaining form-runtime blocks if they
-   fit that seam.
-2. Continue Slice 21: split navigation seam tests.
+1. Continue Slice 21: split navigation seam tests.
+2. Continue Slice 22: split search-params/defer tests and retire the old monolithic test if empty.
 
 ## Key Decisions
 
