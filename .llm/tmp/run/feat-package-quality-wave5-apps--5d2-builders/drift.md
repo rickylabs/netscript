@@ -1,5 +1,57 @@
 # 5d2 builders — drift ledger
 
+## D-5d2-4: RTK unavailable in implementation shell
+
+**Date:** 2026-06-14  
+**Plan slice:** implementation bootstrap  
+**Status:** open environment drift
+
+**Description:**
+The run protocol prefers `rtk` for read-heavy git/grep/listing commands and `rtk proxy` for Deno
+task validation. In this WSL shell, the first `rtk git status --short --branch` command failed with:
+
+```text
+/bin/bash: line 1: rtk: command not found
+```
+
+**Disposition:** Continue with focused direct commands. Keep validation commands narrow and record
+raw command names in `worklog.md`.
+
+**Closing gate:** Environment PATH includes `rtk` again, or the supervisor accepts direct-command
+evidence for this sub-run.
+
+---
+
+## D-5d2-5: Direct define-page types doc-lint baseline is larger than plan
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 1  
+**Status:** open implementation drift
+
+**Description:**
+The approved plan states slice 1 should clear the local builders type doc-lint debt for
+`packages/fresh/builders/define-page/types.ts` and budgets it as 2 private-type-ref errors plus
+1 missing-jsdoc error. The direct command:
+
+```text
+deno doc --lint packages/fresh/builders/define-page/types.ts
+```
+
+currently reports 186 documentation lint errors. Many are missing JSDoc entries for exported
+internal type-catalog symbols that will be moved or narrowed during later slice-16 type trimming;
+others are private references to external package types or private helper aliases.
+
+**Disposition:** Keep slice 1 focused on the approved public-surface snapshot and the specific
+`InferDefinePageLayerLoaderProps` private-type-ref/JSDoc fix. Treat full direct
+`define-page/types.ts` doc-lint cleanliness as part of the planned later type/barrel cleanup and
+final slice-26 doc-lint gate.
+
+**Closing gate:** Final `deno doc --lint packages/fresh/builders/mod.ts` and
+`deno doc --lint packages/fresh/form/mod.ts` pass, and any remaining direct type-file doc-lint
+exceptions are either eliminated by the decomposition or explicitly recorded.
+
+---
+
 ## D-5d2-1: Form-package surface visibility touched by 5d2
 
 **Date:** 2026-06-13  

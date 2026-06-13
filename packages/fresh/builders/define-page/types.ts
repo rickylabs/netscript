@@ -410,10 +410,12 @@ export type DefinePageLayerLoader<
   false
 >;
 
-type ResolveDefinePageLayerLoaderOutput<TOutput> = TOutput extends CacheEntryLike<infer TProps>
+/** Resolve the props payload returned by a page layer loader. */
+export type ResolveDefinePageLayerLoaderOutput<TOutput> = TOutput extends CacheEntryLike<infer TProps>
   ? TProps
   : Exclude<TOutput, null | undefined>;
 
+/** Infer the layer props produced by a page layer loader function. */
 export type InferDefinePageLayerLoaderProps<TLoader extends (...args: never[]) => unknown> =
   ResolveDefinePageLayerLoaderOutput<Awaited<ReturnType<TLoader>>> extends
     infer TProps extends DefinePageLayerProps ? TProps
