@@ -20,9 +20,7 @@ import {
   usePageRoute,
   usePageSearch,
 } from './define-page/mod.ts';
-import {
-  CSRF_COOKIE_NAME,
-} from '../form/mod.ts';
+import { CSRF_COOKIE_NAME } from '../form/mod.ts';
 import type { RuntimeFormState } from '../form/types.ts';
 import type { FormSubmissionResult } from '../form/types.ts';
 import {
@@ -274,9 +272,15 @@ Deno.test('definePage withForm resolves initial layer props and sets the CSRF co
   assert(snapshot, 'Expected withForm layer data to be captured');
   assert(snapshot.action === '/dashboard/users', `Unexpected form action: ${snapshot.action}`);
   assert(snapshot.method === 'POST', `Unexpected form method: ${snapshot.method}`);
-  assert(snapshot.values.name === 'Ada', `Unexpected initial form value: ${String(snapshot.values.name)}`);
+  assert(
+    snapshot.values.name === 'Ada',
+    `Unexpected initial form value: ${String(snapshot.values.name)}`,
+  );
   assert(snapshot.formProps.noValidate, 'Expected runtime form state to enable noValidate');
-  assert(snapshot.fields.name.id === 'form-name', `Unexpected field id: ${snapshot.fields.name.id}`);
+  assert(
+    snapshot.fields.name.id === 'form-name',
+    `Unexpected field id: ${snapshot.fields.name.id}`,
+  );
   assert(
     snapshot.fields.name.controlProps().defaultValue === 'Ada',
     'Expected field descriptor control props to expose the initial value',
@@ -415,7 +419,10 @@ Deno.test('definePage withForm redirects after a successful submit', async () =>
   );
 
   assert(response instanceof Response, 'Expected redirecting submit to return a Response');
-  assert(seenName === 'Ada', `Expected parsed input to reach mutate, received: ${String(seenName)}`);
+  assert(
+    seenName === 'Ada',
+    `Expected parsed input to reach mutate, received: ${String(seenName)}`,
+  );
   assert(response.status === 303, `Unexpected redirect status: ${response.status}`);
   assert(
     response.headers.get('location') === '/dashboard/users/42',
@@ -548,15 +555,22 @@ Deno.test('definePage withForm applies collection intents before returning runti
   assert(!(result instanceof Response), 'Expected collection intent to return data');
   const data = result.data as FormSubmissionResult<z.input<typeof schema>, { ok: boolean }>;
   assert(data.status === 'initial', `Expected initial intent reply, received: ${data.status}`);
-  assert(data.values.items.length === 2, `Expected a second item after intent, received: ${data.values.items.length}`);
+  assert(
+    data.values.items.length === 2,
+    `Expected a second item after intent, received: ${data.values.items.length}`,
+  );
   assert(data.values.items[1]?.quantity === '1', 'Expected default quantity to be preserved');
 
   await route.page(createRequestContext({ data }));
 
   assert(snapshot, 'Expected runtime form state after the intent round-trip');
-  assert(snapshot.fields.items.length === 2, `Expected 2 collection rows, received: ${snapshot.fields.items.length}`);
   assert(
-    snapshot.fields.items.list[1]?.fields.quantity.controlProps({ type: 'number' }).defaultValue === '1',
+    snapshot.fields.items.length === 2,
+    `Expected 2 collection rows, received: ${snapshot.fields.items.length}`,
+  );
+  assert(
+    snapshot.fields.items.list[1]?.fields.quantity.controlProps({ type: 'number' }).defaultValue ===
+      '1',
     'Expected runtime field descriptors to expose the added row',
   );
 });
@@ -1310,4 +1324,5 @@ Deno.test('definePage withStreaming generates a chunked GET response without wai
     'Expected streaming response headers to be applied',
   );
   assert(loaderRuns === 1, `Expected stream layer loader to run once, got ${loaderRuns}`);
+  await new Promise((resolve) => setTimeout(resolve, 30));
 });
