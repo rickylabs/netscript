@@ -1,6 +1,6 @@
 ---
 name: codex-wsl-remote
-description: Use for NetScript Codex Desktop/mobile remote-control through WSL SSH, especially when launching or supervising mobile-visible Codex app-server sessions, choosing native WSL worktree paths, verifying full-access app-server settings, or running Deno/Aspire CLI E2E gates without `/mnt/c` DrvFS failures.
+description: Use for NetScript Codex Desktop/mobile remote-control through WSL SSH, especially when launching or supervising mobile-visible Codex app-server sessions, choosing native WSL worktree paths, recovering unmanaged app-server daemon state without interrupting active sessions, verifying full-access app-server settings, or running Deno/Aspire CLI E2E gates without `/mnt/c` DrvFS failures.
 ---
 
 # Codex WSL Remote
@@ -80,13 +80,40 @@ Verify app-server remote-control:
 ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; codex remote-control start --json; codex app-server daemon version'
 ```
 
+Expected remote-control output includes:
+
+```text
+"status":"connected"
+"remoteControlEnabled":true
+"serverName":"YogaBook9i"
+"environmentId":"env_e_6a2d7485c5a0832a82505a12442cd3ec"
+```
+
+For passive health checks, prefer daemon status and process inspection:
+
+```powershell
+ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; codex app-server daemon version; ps -eo user,pid,ppid,etime,cmd | grep -E "[c]odex app-server|[a]pp-server daemon" || true'
+```
+
+Do not use `codex debug app-server send-message-v2` as a routine health check after remote-control
+has been restored. On Codex CLI `0.139.0`, that debug client can leave the running app-server in a
+state where `codex remote-control start --json` later fails with:
+
+```text
+Error: app server is running but is not managed by codex app-server daemon
+```
+
+Use Desktop/mobile itself to verify user-visible remote threads once the passive checks show
+remote-control is connected.
+
 Verify the native NetScript toolchain:
 
 ```powershell
 ssh.exe codex-wsl 'cd /home/codex/repos/netscript-wave5-apps; deno --version; dotnet --version; aspire --version; docker version --format "{{.Client.Version}} / {{.Server.Version}}"; node --version; npm --version; git status --short --branch'
 ```
 
-Verify app-server turns are full access. The `thread/start` response should report
+Only run a debug app-server turn when explicitly diagnosing app-server turn startup, and expect to
+restore remote-control afterward. The `thread/start` response should report
 `approvalPolicy: "never"` and `sandbox.type: "dangerFullAccess"`:
 
 ```powershell
@@ -137,5 +164,56 @@ If mobile says connection is impossible or Desktop shows a failed SSH connection
    ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; codex remote-control start --json; codex app-server daemon version'
    ```
 
+Before restarting app-server while implementation agents are running, check whether active work would
+be interrupted:
+
+```powershell
+ssh.exe codex-wsl 'ps -eo user,pid,ppid,stat,etime,cmd | grep -E "[d]eno|[d]otnet|[a]spire|[d]ocker compose|[n]pm|[n]ode|[g]it |[c]odex" | sed -n "1,200p"'
+ssh.exe codex-wsl 'find ~/.codex/sessions -type f -name "*.jsonl" -printf "%T@ %TY-%Tm-%Td %TH:%TM:%TS %p\n" 2>/dev/null | sort -nr | head -20'
+```
+
+If there are no active child jobs and the latest relevant session has completed, repair an unmanaged
+remote-control daemon by killing only the `codex` user's app-server processes by anchored PID match
+and then starting remote-control fresh:
+
+```powershell
+ssh.exe codex-wsl 'set -e; export PATH="$HOME/.local/bin:$PATH"; pids=$(pgrep -u codex -f "^/home/codex/.codex/packages/standalone/current/codex app-server" || true); if [ -n "$pids" ]; then echo "killing app-server pids: $pids"; kill $pids; sleep 2; fi; rm -f ~/.codex/app-server-control/app-server-control.sock; codex remote-control start --json; codex app-server daemon version'
+```
+
+Do not use a broad `pkill -f "codex app-server"` inside an SSH one-liner. The pattern can match the
+SSH shell command itself and terminate the repair command before it restarts remote-control.
+
 Avoid root-owned app-server daemons for normal Desktop/mobile work. They create duplicate host chips
 and stale mobile entries.
+
+## Known Incidents
+
+### 2026-06-14 unmanaged app-server after mobile disconnect
+
+Symptoms:
+
+- Mobile lost connection to the green `YogaBook9i` host.
+- `Test-NetConnection 127.0.0.1 -Port 2222` passed.
+- `ssh codex-wsl` passed.
+- `ssh.service` was active.
+- `codex app-server daemon version` reported a running app-server.
+- `codex remote-control start --json` failed with:
+
+  ```text
+  Error: app server is running but is not managed by codex app-server daemon
+  ```
+
+Safe recovery used:
+
+1. Confirmed the latest 5d2 session had completed and no `deno`, `dotnet`, `aspire`, `node`, or
+   child worker commands were running.
+2. Killed only the `codex` user's app-server PIDs matched by
+   `^/home/codex/.codex/packages/standalone/current/codex app-server`.
+3. Removed the stale app-server control socket.
+4. Ran `codex remote-control start --json`.
+5. Confirmed remote-control output returned `"status":"connected"` and
+   `"remoteControlEnabled":true`.
+
+Additional lesson: a later `codex debug app-server send-message-v2` smoke returned the expected
+marker, but immediately put remote-control back into the unmanaged state. Treat debug app-server
+turns as diagnostic only, not as the normal mobile-connectivity smoke.
