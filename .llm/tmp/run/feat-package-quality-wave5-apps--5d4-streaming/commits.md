@@ -10,3 +10,4 @@ Append-only hash record (repo + hash + subject).
 - d669b82: document fresh permissions and slow types
 - f490b60: close out fresh streaming gates
 - 9be04b0: record fresh streaming closeout commit
+- 6aeebf3: record fresh streaming push blocker
