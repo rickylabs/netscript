@@ -1,533 +1,311 @@
-# PLAN-EVAL Verdict: 5d2 builders — `definePage` DSL decomposition
+# PLAN-EVAL: 5d2 builders — definePage DSL decomposition
 
-Evaluator session: Separate PLAN-EVAL (per protocol)  
-Evaluator agent: kimi k2.7 (independent from generator)  
-Plan generator: kimi k2.7 (Phase 1 & 2)  
-Evaluation date: 2026-06-13  
-Evaluated artifacts: research.md, design.md, plan.md, context-pack.md  
+**Evaluator session:** openhands (independent, did not write the plan)
+**Date:** 2026-06-13
+**Artifacts reviewed:**
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/plan.md` (689 lines)
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/design.md` (236 lines)
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/research.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/drift.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/context-pack.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/plan.md` (umbrella)
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/handover-5d2-plan.md`
+- `.llm/harness/evaluator/plan-protocol.md`
+- `.llm/harness/gates/archetype-gate-matrix.md`
+- `.llm/harness/gates/plan-gate.md`
 
-## VERDICT: FAIL_PLAN
-
-The plan is INCOMPLETE and does not satisfy the plan-gate checklist. Implementation may not proceed.
-
----
-
-## Gate-by-Gate Check (plan-gate.md §17-36)
-
-### 1. Research present and current — ⚠️ PARTIAL
-
-**Criterion:** "research.md exists; any carried-in plan/audit/run is explicitly re-baselined against current main."
-
-**Findings:**
-- ✓ research.md exists (committed to `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/`)
-- ✓ §1 documents reuse of prior trace (`.llm/tmp/run/openhands/pr-35/run-27442040668-1/summary.md`)
-- ✗ §4 "Streaming touchpoints" is marked TODO with only 3 import statements named but no call-site enumeration
-- ✗ §5 "Island / hydration seam" is entirely TODO (critical for 5d6 query bridge design)
-- ✗ §6 "DSL market bar" (all 4 subsections: TanStack Start, Next.js App Router, Remix data APIs, synthesis) is marked TODO
-
-**Assessment:** The symbol map and MEASURE-FIRST baselines are present, but three critical deep-dive directives from the handover are unanswered. The generator reused prior work but did not complete the required analysis.
+**Previous eval:** FAIL_PLAN (4 blockers)
 
 ---
 
-### 2. Decisions locked — ✗ FAIL
+## Prior Blocker Resolution
 
-**Criterion:** "Architecture decisions are stated with rationale."
+### Blocker 1: One-plan vs two decision — ✓ RESOLVED (PASS)
 
-**Findings:**
-- ✓ plan.md §58-66 "Locked Decisions" has 5 decisions with rationale (L-1 through L-5)
-- ✗ plan.md §68-74 "Open-Decision Sweep" marks "One plan or two plans" as "must resolve now"
-- ✗ No resolution provided: the plan does not state whether it will commit to Plan A (single plan) or Plan B (split into two)
+**Finding:** L-6 (plan.md §101) states "One plan, not two" with measurement-grounded rationale:
+> "5 over-cap source files + 1 test file + 40 doc-lint errors can be sequenced in a single lock"
 
-**Assessment:** The "One plan or two plans" decision is flagged as critical (handover §12-13: "The umbrella plan sanctions splitting this unit into TWO locked plans if your measurements justify it"). The plan leaves this UNRESOLVED while claiming to be ready for evaluation. This is a **blocking open decision**.
+**Verification:**
+- Decision locked, not deferred
+- Rationale cites specific measurements (5 source files, 1 test file, 40 errors)
+- Open-decision sweep table marks "One plan or two plans" as RESOLVED
+- Context-pack.md echoes the decision
 
----
-
-### 3. Open-decision sweep — ⚠️ PARTIAL
-
-**Criterion:** "Every still-open decision is listed and marked 'safe to defer' or 'must resolve now.' If any open decision would force rework when deferred → FAIL_PLAN."
-
-**Findings:**
-- ✓ Sweep table exists (§68-74)
-- ✗ "One plan or two plans" marked "must resolve now" but left unresolved — deferring this until implementation would force rework (if Plan B is chosen, the slice structure would need reorganization)
-
-**Assessment:** The plan correctly identifies the decision as blocking but fails to make the call. This violates the plan-gate requirement that "must resolve now" items are actually resolved.
+**Minor finding:** L-6 claims "28-slice rationale" but the plan lists 27 slices (Slice 1–27). Counting error (off-by-one), not material to the decision.
 
 ---
 
-### 4. Commit slices — ✗ FAIL
+### Blocker 2: Actionable implementation sequence — ✓ RESOLVED (PASS)
 
-**Criterion:** "Enumerated, ordered, < 30. Each names what it proves, the gate that proves it, and the files it touches."
+**Finding:** 27 slices enumerated (plan.md §214–591), each with:
+- Purpose (what it achieves)
+- Files touched (explicit list)
+- Proving gates (deno check, deno doc --lint, file-size checks, surface snapshot test)
+- Budget retired (doc-lint error count, private-type-refs, file size reduction)
 
-**Findings:**
-- ✗ NO commit slices are present in plan.md
-- ✗ No slice enumeration, no proving gates, no file touch lists
+**Slice structure:**
+- Slices 1–2: Surface snapshot + form-package leak fix (40 doc-lint errors)
+- Slices 3–6: Builder split (state, factory, validators, barrel)
+- Slices 7–10: Runtime split (context, render, handlers, barrel)
+- Slices 11–14: Navigation split (context, hooks, link, barrel)
+- Slices 15–18: Barrel updates (builders/mod.ts, define-page/types.ts, define-page/mod.ts, deno.json)
+- Slices 19–22: Test splits (builder, runtime, navigation, search-params)
+- Slices 23–25: Fixtures + fitness gates (playground routes, arch:check)
+- Slice 26: Final validation (doc-lint, publish dry-run)
+- Slice 27: Drift/context-pack/worklog updates
 
-**Assessment:** This is the most severe blocker. The plan is a structural sketch with goals and risks, but provides no actionable implementation sequence. The plan-gate explicitly requires this as a checklist item. Without it, the generator cannot proceed with implementation, and the evaluator cannot verify slice scope or budget adherence.
+**Verification:**
+- All 27 slices under 30 cap (handover allowed ≤30 per plan if split into two; single plan gets 30)
+- Each slice names specific proving gates (not generic "run tests")
+- Budget retired is quantified (e.g., "Retire 19 private-type-refs + 18 missing-jsdoc")
+- Slice ordering is logical (surface first, form leaks, then decomposition, then tests, then validation)
 
-**Required fix:** Provide a commit slice list (≤30 slices for a single plan, or two ≤30 lists if splitting into two plans) with:
-1. Slice order
-2. Slice purpose (what it proves)
-3. Proving gate command (e.g., `deno check`, `deno doc --lint`, `deno test`)
-4. Files touched (source and test files)
-5. Budget targets (private-type-ref reduction, file-size reduction, missing-jsdoc reduction)
-
----
-
-### 5. Risk register — ✓ PASS
-
-**Criterion:** "Risks listed with mitigations."
-
-**Findings:**
-- ✓ plan.md §77-84 has 5 risks with specific mitigations
-- ✓ Risks address: private-type-refs, navigation context dependencies, runtime-builder coupling, browser test flakiness, merge conflicts
-
-**Assessment:** Risk register is adequate, although it lacks quantified impact (e.g., "21 private-type-refs risk propagating could add 15-30 errors if not handled"). Mitigations are specific and actionable.
+**Comparison to prior eval:** Prior plan had no slices. This revision has the full sequence.
 
 ---
 
-### 6. Gate set selected — ✗ FAIL
+### Blocker 3: Slow-type risk listing — ✓ RESOLVED (PASS)
 
-**Criterion:** "Required gates chosen from gates/archetype-gate-matrix.md for this surface, plus scope overlays."
+**Finding:** plan.md §156–164 has explicit slow-type risk table:
 
-**Findings:**
-- ✗ plan.md §97-99 is marked TODO: "TODO: map matrix selections"
-- ✗ No explicit listing of which fitness gates apply (F-1 through F-18)
-- ✗ No mention of static gates or runtime/Aspire validation
-- ✗ The archetype-gate-matrix.md specifies A3 requires all 18 fitness gates + static gates + runtime validation (see matrix table §15-34)
+| Symbol | File | Slow-type reason | Blocks JSR publishing? |
+|--------|------|------------------|------------------------|
+| InferDefinePageLayerLoaderProps | builders/define-page/types.ts | Conditional infer over function return | Only while ResolveDefinePageLayerLoaderOutput is private; after slice 2, publishable but may be flagged slow |
+| FieldDescriptorMap | form/types.ts | Recursive mapped type | Yes if exported without slow-type opt-in |
+| RuntimeFormState | form/types.ts | Uses recursive FieldDescriptorMap | Same as above |
+| DefinePageLayerConfigFor | builders/define-page/types.ts | Multiple generic + conditional type state | Not a private-type-ref; slow-type only if inference explodes |
+| DefinePageLayerLoaderFor | builders/define-page/types.ts | Complex generic over type state and loader output | Same as above |
 
-**Assessment:** The generator did not consult archetype-gate-matrix.md to select the validation gate set. This is a protocol requirement. The plan must explicitly list:
-- Required fitness gates (F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-13, F-14, F-15, F-16, F-17, F-18)
-- Required static gates (from archetype-3 profile)
-- Runtime validation (A3 requires runtime/Aspire validation — plan-gate-matrix §50)
-- SCOPE-frontend overlay requirements
+**Verification:**
+- Table names 5 symbols with file location and slow-type reason
+- "Blocks JSR publishing?" column distinguishes hard blockers (private-type-refs) from slow-type warnings
+- Verdict text (plan.md §166–169) states: "only hard JSR blockers are the private-type-refs"
+- Retiring slices named (slice 1, slice 2)
 
----
-
-### 7. Deferred scope explicit — ✓ PASS
-
-**Criterion:** "Deferred scope explicit."
-
-**Findings:**
-- ✓ plan.md §43-50 "Non-Scope" section clearly lists 6 deferred items
-- ✓ Each item names the owning unit (5d4 streams, 5d6 query, 5d5 form-fields, etc.)
-- ✓ Dependencies on other sub-gates are acknowledged
-
-**Assessment:** Non-scope is well-defined and matches the umbrella plan.
+**Drift cross-check:**
+- D-5d2-3 (drift.md §66–81) documents slow-type opt-in decision deferred to slice 26
+- Consistent with plan table
 
 ---
 
-### 8. jsr-audit (package/plugin waves) — ⚠️ PARTIAL
+### Blocker 4: design.md completeness — ✓ RESOLVED (PASS)
 
-**Criterion:** "The jsr-audit skill's publishability rubric has been applied to the PLANNED public surface and slow-type / surface risks are named before slicing. Mark N/A with a reason for non-package waves."
+**Finding:** All 7 required sections present and populated (design.md §1–236).
 
-**Findings:**
-- ✓ research.md §2.2 documents `deno doc --lint` baseline (40 total errors, 21 private-type-ref, 19 missing-jsdoc)
-- ✗ No explicit jsr-audit publishability rubric table
-- ✗ No slow-type risk listing (which private-type-refs are slow types? which block publishing?)
-- ✗ The 21 private-type-refs come from two sources (builders/define-page/types.ts and form/types.ts leakage into builders/mod.ts) — the plan does not distinguish or prioritize
-- ✗ No mention of `deno publish --dry-run` validation results
+**Section-by-section:**
 
-**Assessment:** The baseline is measured, but the plan does not apply the jsr-audit rubric or name the publishability risks. This is required for Archetype 3 (plan-gate.md §33).
+1. **Decomposition target (§1–93)** — PASS
+   - Current topology (design.md §21–35): 6 files with byte sizes
+   - Proposed topology (design.md §39–70): 4 folders (builder/, runtime/, navigation/, types/) with 15 files
+   - Public-surface contract (design.md §72–79): "same export specifiers, same public type names"
+   - File-cap targets (design.md §81–93): table mapping current size → target size per file
 
----
+2. **DSL market bar (§94–142)** — PASS
+   - TanStack Start comparison (§97–108): route/loader APIs, typed search params, pending UI
+   - Next.js comparison (§110–119): server components, layouts, streaming, error boundaries
+   - Remix comparison (§121–131): loader/action pattern, form actions, typed navigation
+   - Gap synthesis (§133–142): table of 7 DX gaps with verdicts (in-scope polish vs RFC-deferred)
 
-## Plan Tail Section Check (plan-protocol.md)
+3. **Island/partial bridge (§143–175)** — PASS
+   - Serialization seam (§146–158): builder context → route context → HTML → island props
+   - 5d6 query/island hook-in (§160–168): "runtime/context.ts accepts optional queryClient"
+   - Partial route support (§170–175): f-partial response headers, Link component, usePartial hook
 
-### Required tail section — ✗ FAIL
+4. **RFC 14 protection seams (§176–193)** — PASS
+   - Table (§181–189): 6 Fresh-specific builder options mapped to adapter abstractions
+   - Verdict (§191–193): "isolation points documented; no RFC 14 implementation in 5d2"
 
-**Criterion:** The plan-protocol.md requires a final section covering: Review map, Assumptions, Questions for supervisor, Dependencies & merge impact, Side-effect ledger.
+5. **Browser validation strategy (§194–210)** — PASS
+   - 6 fixture routes named (§201–209): static, routed, search, layer, form, partial
+   - Each route proves specific behavior (SSR, path params, search params, pending, form submission, partial navigation)
+   - apps/playground location explicit
 
-**Findings:**
-- plan.md §125-127 has the section header but content is marked TODO: "TODO: required final section"
+6. **Test decomposition (§211–224)** — PASS
+   - 4 test files named: builder.test.tsx, runtime.test.tsx, navigation.test.tsx, search-params.test.tsx
+   - Each maps to source seam (builder/, runtime/, navigation/, search-params.ts)
+   - define-page.test.tsx deleted after migration
 
-**Assessment:** This is a protocol-violating omission. The plan-protocol.md §29-30 states: "Emit exactly one verdict" and requires this section to document:
-- **Review map**: which gates the generator self-verified
-- **Assumptions**: what the generator is assuming (e.g., 5d1 lands before implementation starts)
-- **Questions for supervisor**: what decisions need upstream escalation
-- **Dependencies & merge impact**: how this slices affects other running sub-gates
-- **Side-effect ledger**: what non-source files will change (deno.json, deno.lock, docs, tests)
+7. **Risk and trade-offs (§225–236)** — PASS
+   - 7 risks with mitigations
+   - Addresses: private-type-refs, public surface drift, form-package leak, barrel move propagation, test split coordination, fixture browser tests, merge conflicts
 
----
-
-## Design Document Completeness (design.md)
-
-### Content — ⚠️ PARTIAL
-
-**Findings:**
-- ✓ §1 "Decomposition target" (§1.1 current topology, §1.2 proposed topology, §1.3 public-surface contract, §1.4 file-cap targets) — WELL DONE
-- ✗ §2 "DSL market bar" — TODO
-- ✗ §3 "Island / partial bridge" — TODO
-- ✗ §4 "RFC 14 protection seams" — TODO
-- ✗ §5 "Browser validation strategy" — TODO
-- ✗ §6 "Test decomposition" — TODO
-- ✗ §7 "Risk and trade-offs" — TODO
-
-**Assessment:** Only 1 of 7 design sections is complete. The design checkpoint is required by run-loop.md and handover §69 "Concept of done (PLAN phase)" requires "design.md (decomposition + DSL gap verdicts + island/RFC-14 seams)".
-
-**Deep-dive directives from handover §38-61:**
-1. Decomposition under caps — ✓ §1 covered
-2. DSL benchmark — ✗ §2 TODO (TanStack Start, Next.js, Remix comparison)
-3. Island bridge & partials — ✗ §3 TODO
-4. RFC 14 protection — ✗ §4 TODO
-5. Browser validation — ✗ §5 TODO
-
-The handover explicitly requires these: "use your judgment hard here" and "Identify DX gaps (typed search params, navigation, pending UI, error/redirect ergonomics) and propose which gaps are in-scope polish vs RFC-deferred."
+**Research.md TODOs:** §4 (streaming call-sites), §5 (island hydration), §6 (DSL market bar) marked TODO but design.md §2–3 completes the analysis. Acceptable: research captures initial findings, design operationalizes them.
 
 ---
 
-## Budget Operationalization Check
+## Standard Plan-Gate Items
 
-### doc-lint budgets — ✗ NOT OPERATIONALIZED
+### Research present and current — ✓ PASS
 
-**Findings:**
-- Umbrella plan §72-76 sets target: "doc-lint **0** over ALL exports combined"
-- research.md §2.2 baseline: 21 private-type-ref, 19 missing-jsdoc = 40 total
-- plan.md does not map slices to error reduction targets
-- No strategy for clearing the 21 private-type-refs (which ones are in builders vs form package leak?)
+- research.md exists
+- §2.1 byte-size baseline (6 over-cap files named with byte counts)
+- §2.2 doc-lint baseline (40 errors: 21 private-type-refs + 19 missing-jsdoc)
+- §2.3 type-check baseline (`deno check` exits 0)
+- Carried-in work re-baselined (§26–40: "carried in from Phase 1")
+- §4, §5, §6 TODOs completed in design.md §2–3
 
-**Required:** The commit slices must include targets like:
-- Slice N: resolve 5 private-type-refs in define-page/types.ts (specific symbols named)
-- Slice M: add JSDoc to 8 missing-jsdoc entries in navigation.tsx
-- Final slice: run combined `deno doc --lint` and verify 0 errors
+### Decisions locked — ✓ PASS
 
-### Over-cap budgets — ✗ NOT OPERATIONALIZED
+- L-1 through L-8 stated with rationale (plan.md §94–103)
+- L-6: One plan, not two (rationale: measurements fit in 27 slices under 30 cap)
+- L-7: Form-package leak fix in 5d2 (rationale: unblocks 19 private-type-refs + 18 missing-jsdoc)
+- L-8: No new subpath exports (rationale: umbrella plan forbids new subpaths in wave 5)
+- Open-decision sweep table separates "safe to defer" from resolved decisions
 
-**Findings:**
-- Umbrella plan §76: "**0** over-cap files"
-- research.md §2.1: 5 source files over 20K (mod.ts 41.4K, builder.tsx 38.4K, types.ts 22.4K, navigation.tsx 20.6K, runtime.tsx 18.4K)
-- plan.md §1.4 has aspirational "<16K" targets but no per-slice reduction path
+### Open-decision sweep — ✓ PASS
 
-**Required:** Each slice that moves code must specify:
-- Current file and size
-- Files extracted and target sizes
-- Proving gate: file-size lint (`deno run --allow-read tools/check-file-sizes.ts`)
+- Table at plan.md §105–114
+- 2 decisions marked RESOLVED (one plan vs two, form-package leak ownership)
+- 3 decisions marked "safe to defer" (types.ts sub-split, fixture route names, slow-type opt-in)
+- No deferred decisions would force rework if left open
 
-### Private-type-ref budgets — ⚠️ PARTially OPERATIONALIZED
+### Commit slices — ✓ PASS
 
-**Findings:**
-- plan.md §80 (Risk Register) mentions: "Private-type-refs propagate through re-export moves" and proposes mitigation "fix by re-exporting referenced types publicly"
-- BUT: no slice-level targets or symbol-level enumeration
-- The 21 private-type-refs come from TWO sources:
-  - 2 in builders/define-page/types.ts (InferDefinePageLayerLoaderProps → ResolveDefinePageLayerLoaderOutput + DefinePageLayerProps)
-  - 19 via form/types.ts leakage into builders/mod.ts (RuntimeFormState, FormValues, FormFieldErrors, etc.)
-- plan.md §114 acknowledges: "form/types.ts: private-type-ref leak from form must be fixed in 5d5 or with umbrella drift"
-- No decision made on whether 5d2 will fix the form leak or accept it as 5d5's scope
+(See Blocker 2 above)
 
-**Required:** Explicit strategy for the 19 form-package leaks — does 5d2 own them (drift entry needed) or are they deferred to 5d5 (dependency acknowledged)?
+- 27 slices enumerated
+- Under 30 cap
+- Each names: purpose, files, gates, budget
+- Ordered logically
 
----
+### Risk register — ✓ PASS
 
-## Drift Ledger Check
+- plan.md §115–127 has 7 risks with mitigations
+- Risks are specific (not generic "tests might fail")
+- Mitigations are actionable (surface snapshot test, drift entries, coordination with 5d6)
 
-### drift.md — ⚠️ EMPTY
+### Gate set selected — ✓ PASS (with advisory findings)
 
-**Findings:**
-- drift.md has only a header line: "# 5d2 builders — drift ledger"
-- No entries recorded
+- plan.md §171–210 has full fitness gate table (F-1 through F-18)
+- Static gates mapped (deno check, publish dry-run)
+- Runtime/SCOPE-frontend mapped (slice 24 fixtures, slice 25 test suite)
+- Consumer import validation marked "optional" in matrix for A3 — correctly omitted
 
-**Assessment:** Per run-loop.md and AGENTS.md §25 "Drift is explicit: if implementation reality diverges from plan, docs, or doctrine, record it in the harness run drift/worklog artifacts." The plan has unresolved questions (one plan vs two plans, form-package private-type-refs) that should be logged as **potential drift** if the plan is approved despite them, or as **decisions pending** in the open-decision sweep.
+**Gate coverage detail:**
+- F-1 through F-18 all present with verification commands
+- F-4, F-17 skipped with rationale (no new classes / no abstract classes)
+- F-13 skipped with rationale (no sagas in builders) — see finding below
 
----
+**Gate-slice mapping inconsistency (advisory):** The gate table says F-18 retiring in "Slices 7, 11, 15, 18" but the commit lock actually creates the sub-barrels at slices 6 (builder/mod.ts), 10 (runtime/mod.ts), 14 (navigation/mod.ts), and 17 (define-page/mod.ts). The slice numbers in the gate table are off by one for F-18. Similarly, F-8 and F-9 reference "Slice 19" (test split) rather than Slice 18 (deno.json verification). F-5 references "Slices 1, 16, 17, 18, 27" but the surface snapshot test is in Slice 1 and the barrel updates in 15, 17 — Slice 16 is types.ts trim, which is adjacent. Not a blocker, but should be reconciled before implementation to avoid gate confusion.
 
-## Worklog Check
+**F-13 Saga/runtime invariants:** Required for A3 per archetype-gate-matrix. Plan marks N/A with rationale (no sagas). Acceptable under Phase A reporting as PENDING_SCRIPT with manual evidence (no saga code exists; no violation detected).
 
-### worklog.md — ⚠️ EMPTY
+### Deferred scope explicit — ✓ PASS
 
-**Findings:**
-- worklog.md has only a header: "# Worklog — 5d2-builders"
+- plan.md §75–82 lists deferred scope:
+  - Streaming primitives (5d4)
+  - Query/island-bridge (5d6)
+  - Form-field/validation behavior (5d5)
+  - RFC 14 unified-mode implementation
+  - New DSL features (definePage signature unchanged)
+  - New subpath exports (umbrella plan forbids)
+- Each deferred item names owning unit
 
-**Assessment:** The worklog has no Design checkpoint entry. Per run-loop.md, the Design checkpoint should be recorded in worklog.md when the design.md is complete. Since the design.md is incomplete, this is not a protocol violation yet, but it indicates the generator did not follow the full workflow.
+### jsr-audit (package/plugin waves) — ✓ PASS
 
----
-
-## Context Pack Check
-
-### context-pack.md — ⚠️ STALE SKELETON
-
-**Findings:**
-- context-pack.md §14-17 "Current State": "Skeleton design.md, plan.md, context-pack.md created"
-- No substantive decisions recorded
-- §27-29 "Next Steps" lists work that should have been done before evaluation
-
-**Assessment:** The context pack is not in a "resume-ready" state. Per the protocol, the context pack should contain the current state well enough for a new session to resume without re-reading all artifacts. This is a skeleton.
-
----
-
-## MEASURE-FIRST Internal Consistency Check
-
-### Baseline measurements in research.md vs committed artifacts — ✓ CONSISTENT
-
-**Findings:**
-- research.md §2.2 claims: 21 private-type-ref, 19 missing-jsdoc, Total 40 errors
-- Committed artifact `doc-lint-builders.txt` confirms: "Found 40 documentation lint errors"
-- Counting the artifact: 21 private-type-ref errors + 19 missing-jsdoc errors = 40 ✓
-
-- research.md §2.1 file sizes (5 over-cap files listed with byte counts)
-- These match the umbrella plan's baseline assertion of "13 over-cap files" for the entire package (so builders has 5 of 13)
-
-**Assessment:** The MEASURE-FIRST baselines are internally consistent with the committed measurement artifacts. No drift in numbers detected.
-
-**However:** The plan does not operationalize these baselines into targets. The umbrella plan sets 0-error targets, but the slices do not show how to reduce 40 errors → 0 errors.
+- plan.md §141–164 has jsr-audit publishability rubric
+- Baseline: 40 doc-lint errors (21 ptr + 19 missing)
+- Breakdown by source: form/types.ts (19 ptr + 18 missing), builders/define-page/types.ts (2 ptr + 1 missing)
+- Slow-type risk table (see Blocker 3)
+- Retiring slices named for each risk
 
 ---
 
-## Summary of Blocking Findings
+## Plan Tail Sections
 
-### Critical Blockers (any one fails PLAN-EVAL)
+### Review map — ✓ PASS
 
-1. **No commit slices** — The plan-gate checklist requires "Enumerated, ordered, < 30. Each names what it proves, the gate that proves it, and the files it touches." The plan has ZERO slices. This is non-negotiable.
+- plan.md §644–654 present
+- Self-verification checklist: AGENTS.md, doctrine, gate matrix, umbrella plan, measurement artifacts, drift cross-check
 
-2. **"One plan or two plans" unresolved** — The open-decision sweep marks this as "must resolve now" but provides no resolution. Deferring this to implementation would force rework. The handover explicitly states: "The umbrella plan sanctions splitting this unit into TWO locked plans if your measurements justify it."
+### Assumptions — ✓ PASS
 
-3. **No fitness gate matrix selected** — The archetype-gate-matrix.md requires A3 to select all 18 fitness gates + static gates + runtime validation. The plan has a TODO placeholder.
+- plan.md §656–663 present
+- 4 assumptions:
+  - 5d1 merge before implementation
+  - deno task arch:check exists
+  - Manual browser validation acceptable if Playwright unavailable
+  - Umbrella target = zero doc-lint errors over combined exports
 
-4. **Required tail section missing** — The plan-protocol.md requires Review map, Assumptions, Questions for supervisor, Dependencies & merge impact, Side-effect ledger. This entire section is TODO.
+### Questions for supervisor — ✓ PASS
 
-### Significant Gaps (would block if critical items were fixed)
+- plan.md §665–672 present
+- 3 questions:
+  - Form-package leak ownership (5d2 vs 5d5)
+  - Error-boundary fixture scope (accept 5d1 dependency or stub?)
+  - Slow-type opt-in timing (slice 26 vs later?)
 
-5. **Design document 6/7 sections TODO** — The handover requires design checkpoint with "decomposition + DSL gap verdicts + island/RFC-14 seams." Only decomposition is present.
+### Dependencies & merge impact — ✓ PASS
 
-6. **Target budgets not operationalized** — The 40 doc-lint errors and 5 over-cap files have no per-slice reduction strategy. The plan sets goals but provides no path.
+- plan.md §605–622 present
+- Dependencies: 5d1 (binding), streaming primitives, DeferPage, form/types.ts leak, route/contract.ts
+- Merge impact: no new subpath exports, internal import churn, 5d4/5d6 not blocked
 
-7. **Form-package leak strategy missing** — 19 of the 21 private-type-refs come from form/types.ts. The plan acknowledges this but does not decide whether 5d2 addresses it or defers to 5d5.
+### Side-effect ledger — ✓ PASS
 
-### Minor Issues (informational)
-
-8. **Research gaps** — §4 streaming touchpoints, §5 island seam, and §6 DSL market bar are marked TODO. These were deep-dive directives from the handover.
-
-9. **Drift ledger empty** — No drift entries recorded despite unresolved questions.
-
-10. **Worklog Design checkpoint missing** — No Design entry in worklog.md.
-
-11. **Context pack stale** — Skeleton only, not resume-ready.
-
----
-
-## Recommended Fixes for Generator
-
-To achieve PASS on the second PLAN-EVAL cycle, the generator must:
-
-### Must-Fix (Critical Blockers)
-
-1. **Commit slice enumeration:**
-   - Produce a slice list (15-25 slices recommended based on MEASURE-FIRST numbers)
-   - Each slice: slice number, purpose, proving gate command, files touched, budget targets
-   - Decide NOW: one plan or two plans (recommend two plans: Plan A = define-page internal decomposition, Plan B = builders barrel thinning + doc-lint clearance)
-
-2. **Resolve one plan vs two plans:**
-   - Analyze whether 5 over-cap files + 40 doc-lint errors can be done in ≤30 coherent slices
-   - If yes: commit to Plan A
-   - If no: commit to Plan B with explicit boundary between the two plans
-   - Document the rationale in the locked decisions table
-
-3. **Fitness gate matrix:**
-   - Extract the full A3 gate set from archetype-gate-matrix.md §15-34 (F-1 through F-18 + static gates + runtime validation)
-   - Add the SCOPE-frontend overlay requirements
-   - List which gates apply to each slice (slices should group by gate family where possible)
-
-4. **Complete tail section:**
-   - **Review map:** Which gates did you self-verify? (Answer: none yet, since no slices exist)
-   - **Assumptions:** What are you assuming? (e.g., 5d1 lands first, form-package leaks are 5d5's scope)
-   - **Questions for supervisor:** What needs escalation? (e.g., "Should 5d2 fix the 19 form-package private-type-refs or defer to 5d5?")
-   - **Dependencies & merge impact:** How does this affect other sub-gates? (e.g., "5d2 barrel thinning affects 5d4 streams import paths")
-   - **Side-effect ledger:** What non-source files change? (e.g., deno.json, deno.lock, docs, tests)
-
-### Should-Fix (Significant Gaps)
-
-5. **Complete design document:**
-   - §2 DSL market bar: Compare `definePage` to TanStack Start/Next.js/Remix APIs as handover requires
-   - §3 Island/partial bridge: Where `builder.tsx`/`runtime.tsx` inject context, how islands consume it
-   - §4 RFC 14 seams: Which builder options would break under a non-Fresh adapter?
-   - §5 Browser validation: Which `apps/playground` routes prove the builder pipeline?
-
-6. **Operationalize budgets:**
-   - Map each commit slice to a budget target
-   - Example: "Slice 3: extract 8,000 bytes from builder.tsx → builders/define-page/builder/factory.ts, target size 12K"
-   - Example: "Slice 7: add JSDoc to 5 navigation.tsx types, clearing 5 of the 19 missing-jsdoc errors"
-   - Final verification: combined `deno doc --lint` shows 0 errors
-
-7. **Form-package leak decision:**
-   - Explicit choice: does 5d2 fix the 19 form-package private-type-refs or defer to 5d5?
-   - If fixing: name the specific symbols to re-export in builders/mod.ts
-   - If deferring: log as drift entry and document dependency on 5d5
-
-### Nice-to-Fix (Minor)
-
-8. **Research gaps:**
-   - §4 streaming: line numbers and argument shapes for `builder.tsx` calling streaming primitives
-   - §5 island seam: where serialized runtime context is injected, how islands consume it
-   - §6 DSL market bar: detailed comparison tables for each framework
-
-9. **Drift entries:**
-   - If the plan proceeds with 19 form-package leaks deferred, log as `D-5d2-1`: "Form-package private-type-ref leaks accepted as 5d5 scope"
-   - If any scope change from umbrella, log it
-
-10. **Worklog Design checkpoint:**
-    - After completing design.md, add entry: "Design checkpoint complete. See design.md §1-§7."
-
-11. **Context pack update:**
-    - After completing plan, update context-pack.md with final state: decisions locked, slices enumerated, gate set selected.
+- plan.md §631–640 present
+- Lists: drift.md (appended), context-pack.md (updated), worklog.md (updated), arch-debt.md (F-18 entries), deno.json (read-only), deno.lock (no changes)
 
 ---
 
-## Evaluator Protocol Compliance Check
+## Umbrella Divergence Check
 
-Did the generator follow the protocol?
+**Finding:** No divergences detected.
 
-- ✓ Read AGENTS.md and netscript-harness skill (confirmed in context-pack.md §21)
-- ✓ Selected archetype and overlays (plan.md §15-19: A3 + A4 vocabulary + SCOPE-frontend)
-- ✓ Measured baselines before designing (research.md §2)
-- ✗ Did not complete design checkpoint (6 of 7 sections TODO)
-- ✗ Did not produce commit slices (the core of the plan)
-- ✗ Did not select fitness gate set from archetype-gate-matrix.md
-- ✗ Did not complete required tail section
-- ✗ Did not log drift despite unresolved questions
-- ✗ Did not update worklog with Design checkpoint
-- ✗ Did not update context-pack to resume-ready state
-
-**Protocol compliance: PARTIAL (40%)**
-
-The generator completed research and topology design but stopped before producing an implementable plan.
+**Verification:**
+- Plan aligns with umbrella §48–52 target topology (4 folders: builder/, runtime/, navigation/, types/)
+- Plan aligns with umbrella §34 public surface targets (same export specifiers, same public type names)
+- Plan aligns with umbrella §82–86 quality bar (zero doc-lint errors, all files <20K)
+- Umbrella §93 allows 5d2 to split into two plans if justified; 5d2 chose one plan (permitted)
+- Plan.md §622 acknowledges RFC 14 seams documented in design.md §176–193 (consistent)
 
 ---
 
-## Evaluator's Gate Assessment (archetype-gate-matrix.md)
+## Drift Cross-Check
 
-What gates should the plan have selected for A3 + SCOPE-frontend?
+**Finding:** All drift entries referenced in plan.
 
-### Required Fitness Gates (A3 per matrix §15-34)
+- D-5d2-1 (form-package leak fix): referenced in plan.md L-7, slice 2
+- D-5d2-2 (F-18 sub-barrel lint exceptions): referenced in plan.md slice 22
+- D-5d2-3 (slow-type opt-in): referenced in plan.md slice 26, open-decision sweep table
 
-- F-1 File-size lint — REQUIRED (plan has file-size targets but no gate command)
-- F-2 Helper-reinvention scan — REQUIRED
-- F-3 Layering check — REQUIRED
-- F-4 Inheritance audit — REQUIRED
-- F-5 Public surface audit — REQUIRED
-- F-6 JSR publishability — REQUIRED (jsr-audit should have been applied)
-- F-7 Doc-score gate — REQUIRED (40 doc-lint errors to clear)
-- F-8 Workspace lib check — REQUIRED
-- F-9 Permission decl check — REQUIRED
-- F-10 Test-shape audit — REQUIRED (46K test file needs decomposition)
-- F-11 Forbidden-folder lint — REQUIRED
-- F-12 Naming-convention lint — REQUIRED
-- F-13 Saga/runtime invariants — REQUIRED (A3 subtype)
-- F-14 Console-log lint — REQUIRED
-- F-15 Re-export-upstream lint — REQUIRED
-- F-16 Folder-cardinality lint — REQUIRED
-- F-17 Abstract-derived co-location — REQUIRED
-- F-18 Sub-barrel lint — REQUIRED
-
-### Required Static Gates (A3)
-
-- Type-check clean: `deno check --unstable-kv packages/fresh/builders/mod.ts`
-- Publishability: `deno publish --dry-run` for `packages/fresh`
-
-### Required Runtime Validation (A3)
-
-- Runtime/Aspire validation per matrix §50 (required for A3)
-- Browser validation per SCOPE-frontend overlay
-
-### Required SCOPE-frontend Overlay
-
-- Browser tests on real routes in `apps/playground` (handover §58-61: "A4-Browser: define which real routes in apps/playground prove the builder pipeline")
-- SSR validation
-- Navigation state validation
-- Error boundary validation
-
-**Plan Status:** NONE of these gates are explicitly selected or mapped to slices.
+No phantom drift entries (no drift references in plan that lack a D-* entry).
 
 ---
 
-## Archetype-Specific Nuances
+## Minor Findings (Non-Blocking)
 
-The umbrella plan §23-27 notes:
+1. **Slice count discrepancy:** L-6 claims "28-slice rationale" but plan lists 27 slices (Slice 1–27). Off-by-one counting error, not material to plan viability.
 
-> "5d2 (builders) and 5d5 (form) add the A4-Browser obligation: validation on real routes in `apps/playground` (and/or a fixture app), not just unit tests."
+2. **Research.md TODOs:** §4 (streaming call-sites), §5 (island hydration), §6 (DSL market bar) marked TODO but design.md §2–3 completes the analysis. Acceptable: research captures initial findings, design operationalizes them.
 
-The plan §66 (L-5) acknowledges this: "Browser validation uses `apps/playground` fixture routes"
+3. **Consumer import validation:** Marked "optional" in matrix for A3 (archetype-gate-matrix.md row 29). Plan correctly omits dedicated gate. Not a blocker.
 
-But plan.md §41 only states: "Add/update browser-validation fixture route(s) in `apps/playground` (or a dedicated fixture) to exercise SSR, navigation, pending states, error boundaries."
-
-**Missing:** Which specific routes? Which states? What does "prove the builder pipeline" mean concretely? The handover requires:
-- "SSR" — prove server-side rendering works
-- "navigation" — prove useCurrentRoute / usePage* hooks work
-- "pending states" — prove pending UI renders correctly
-- "error boundaries" — prove error taxonomy integration (depends on 5d1)
-
-The plan should enumerate 4-6 fixture routes, each proving specific builder behaviors.
+4. **Slice 27 (drift/context-pack/worklog):** Meta-slice for run artifacts. Legitimate (ensures artifacts are updated before implementation phase).
 
 ---
 
-## Comparison to Umbrella Plan Quality Bar
+## Verdict
 
-Umbrella plan §72-86 "Quality bar (final output, all units summed)":
+**PASS**
 
-| Metric | Umbrella Target | research.md Baseline | plan.md Target | plan.md Strategy |
-|--------|-----------------|---------------------|----------------|-----------------|
-| Doc-lint errors | 0 (all exports combined) | 40 (21 ptr + 19 missing) | NOT STATED | NOT STATED |
-| Over-cap files | 0 | 5 files over 20K | "0 over-cap files" (implied by §1.4 cap targets) | File-size targets named but no slice path |
-| Private-type-refs | 0 | 21 | NOT STATED | Risk mentions them but no resolution |
-| README lines | ≥150 | Not measured | NOT STATED | Not in scope |
-| Doctested examples | yes | no | NOT STATED | Not in scope |
-| Docs scaffold | complete (items 6-7) | not present | NOT STATED | Not in scope |
-| Stream/SSE abort tests | yes | no | NOT IN 5d2 SCOPE (5d4) | Deferred correctly |
-| RFC 14 seams | audited & protected | not measured | "protection seams" named | §4 TODO |
-| Package in root quality gates | yes (5d6 close) | excluded | N/A | N/A |
+All 4 prior blockers resolved:
+1. ✓ One-plan vs two decision made (L-6, measurement-grounded)
+2. ✓ Actionable implementation sequence (27 slices, each with files/gates/budget)
+3. ✓ Slow-type risk listing (table at plan.md §156–164)
+4. ✓ design.md complete (all 7 sections present)
 
-**Assessment:** The plan does NOT operationalize the umbrella quality bar. Only "over-cap files" has implicit targets.
+All standard plan-gate items satisfied:
+- ✓ Research present and current
+- ✓ Decisions locked
+- ✓ Open-decision sweep
+- ✓ Commit slices
+- ✓ Risk register
+- ✓ Gate set selected
+- ✓ Deferred scope explicit
+- ✓ jsr-audit (package/plugin waves)
+- ✓ Review map, assumptions, questions, dependencies, side-effect ledger
 
----
+No umbrella divergences. No phantom drift entries.
 
-## Dependencies & Sequencing
-
-Plan.md §111-114 "Dependencies":
-- ✓ Names 5d1 dependencies (error taxonomy, telemetry, `./testing` entrypoint, docs scaffold)
-- ✓ Names streaming primitives source (`packages/fresh/server/stream.ts`)
-- ✓ Names DeferPage import (`packages/fresh/defer/DeferPage.tsx`)
-- ✓ Names form/types.ts leak as cross-unit issue
-
-**Missing:**
-- No explicit statement: "5d2 implementation waits for 5d1 merge" (plan says "implementation waits" but not in Dependencies section)
-- No statement of how 5d2 slices affect 5d4 streams or 5d6 query
-- No merge-impact analysis
-
----
-
-## Final Evaluator Note
-
-This is the first PLAN-EVAL cycle. The protocol allows two FAIL_PLAN cycles before escalation.
-
-The generator completed substantial research and produced a topology design (decomposition target), but the plan is missing the operational elements required for implementation:
-
-- **What to do:** Commit slices (not present)
-- **How to prove it:** Fitness gate selection (not present)
-- **What success looks like:** Budget targets per slice (not operationalized)
-- **What's at risk:** Review map and Questions for supervisor (not present)
-
-The plan is in "proposal sketch" state, not "approved for implementation" state. The generator needs one more pass to complete the missing elements.
-
-**Recommendation:** The generator should focus on the 4 critical blockers first. If those are addressed in the second cycle, the 3 significant gaps can be addressed concurrently or deferred with explicit justification.
-
----
-
-## PLAN-EVAL Verdict Summary
-
-**VERDICT: FAIL_PLAN**
-
-**Blocking Findings:**
-1. No commit slices enumerated (plan-gate.md checklist violation)
-2. "One plan or two plans" decision unresolved (open-decision sweep violation)
-3. Fitness gate matrix not selected from archetype-gate-matrix.md (plan-gate.md violation)
-4. Required tail section (Review map / Assumptions / Questions / Dependencies / Side-effect ledger) not present (plan-protocol.md violation)
-
-**Required before second PLAN-EVAL cycle:**
-- Enumerate 15-25 slices with proving gates and budget targets
-- Decide one plan vs two plans with rationale
-- Select full A3 + SCOPE-frontend gate set from archetype-gate-matrix.md
-- Complete tail section with all 5 sub-sections
-
-**Recommended (non-blocking for second cycle):**
-- Complete design.md §2-§7
-- Operationalize doc-lint / over-cap / private-type-ref budgets
-- Decide form-package leak strategy
-- Fill research gaps (§4, §5, §6)
-- Log drift for deferred decisions
+**Plan cleared for implementation.**
