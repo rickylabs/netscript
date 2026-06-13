@@ -27,6 +27,7 @@ import {
 } from '../../server/stream.ts';
 import { createDefinePageHooks, createRouteNav, type TypedRouteTarget } from './navigation.tsx';
 import { executePagePipeline, prepareRequestState } from './runtime.tsx';
+import { createDefaultConfig, promoteConfigToRoute, retagConfig } from './builder/factory.ts';
 export type { DefinePageBuilder, DefinePageRootBuilder } from './builder/state.ts';
 import type { DefinePageBuilder, DefinePageRootBuilder, FormSchemaInput } from './builder/state.ts';
 import type {
@@ -73,74 +74,6 @@ import type {
   PathParamSchema,
   SearchParamSchema,
 } from './types.ts';
-
-function createDefaultConfig<TState>(): RuntimePageConfig<DefinePageRootTypeState<TState>, false> {
-  return { resources: [], layers: [], handlers: {}, headers: [] };
-}
-
-function retagConfig<
-  TCurrent extends AnyDefinePageTypeState,
-  TNext extends AnyDefinePageTypeState,
-  THasConfiguredRoute extends boolean,
->(
-  config: RuntimePageConfig<TCurrent, THasConfiguredRoute>,
-): RuntimePageConfig<TNext, THasConfiguredRoute> {
-  return {
-    ...config,
-    resources: config.resources.map((descriptor) => ({
-      key: descriptor.key,
-      factory: descriptor.factory as RuntimeResourceDescriptor<
-        TNext,
-        THasConfiguredRoute
-      >['factory'],
-    })),
-    layers: config.layers.map((descriptor) => ({
-      id: descriptor.id,
-      component: descriptor.component,
-      config: descriptor.config as RuntimeLayerDescriptor<TNext, THasConfiguredRoute>['config'],
-    })),
-    handlers: config.handlers as RuntimePageConfig<TNext, THasConfiguredRoute>['handlers'],
-    form: config.form as RuntimePageConfig<TNext, THasConfiguredRoute>['form'],
-    route: config.route as RuntimePageConfig<TNext, THasConfiguredRoute>['route'],
-    pathSchema: config.pathSchema as RuntimePageConfig<TNext, THasConfiguredRoute>['pathSchema'],
-    searchSchema: config.searchSchema as RuntimePageConfig<
-      TNext,
-      THasConfiguredRoute
-    >['searchSchema'],
-    layout: config.layout as RuntimePageConfig<TNext, THasConfiguredRoute>['layout'],
-    meta: config.meta as RuntimePageConfig<TNext, THasConfiguredRoute>['meta'],
-    headers: config.headers as RuntimePageConfig<TNext, THasConfiguredRoute>['headers'],
-  };
-}
-
-function promoteConfigToRoute<
-  TCurrent extends AnyDefinePageTypeState,
-  TNext extends AnyDefinePageTypeState,
-  THasConfiguredRoute extends boolean,
->(config: RuntimePageConfig<TCurrent, THasConfiguredRoute>): RuntimePageConfig<TNext, true> {
-  const retaggedConfig = retagConfig<TCurrent, TNext, THasConfiguredRoute>(config);
-
-  return {
-    ...retaggedConfig,
-    resources: retaggedConfig.resources.map((descriptor) => ({
-      key: descriptor.key,
-      factory: descriptor.factory as RuntimeResourceDescriptor<TNext, true>['factory'],
-    })),
-    layers: retaggedConfig.layers.map((descriptor) => ({
-      id: descriptor.id,
-      component: descriptor.component,
-      config: descriptor.config as RuntimeLayerDescriptor<TNext, true>['config'],
-    })),
-    handlers: retaggedConfig.handlers as RuntimePageConfig<TNext, true>['handlers'],
-    form: retaggedConfig.form as RuntimePageConfig<TNext, true>['form'],
-    route: retaggedConfig.route as RuntimePageConfig<TNext, true>['route'],
-    pathSchema: retaggedConfig.pathSchema as RuntimePageConfig<TNext, true>['pathSchema'],
-    searchSchema: retaggedConfig.searchSchema as RuntimePageConfig<TNext, true>['searchSchema'],
-    layout: retaggedConfig.layout as RuntimePageConfig<TNext, true>['layout'],
-    meta: retaggedConfig.meta as RuntimePageConfig<TNext, true>['meta'],
-    headers: retaggedConfig.headers as RuntimePageConfig<TNext, true>['headers'],
-  };
-}
 
 function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRoute extends boolean>(
   config: RuntimePageConfig<TTypes, THasConfiguredRoute>,

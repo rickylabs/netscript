@@ -12,8 +12,8 @@
 
 ## Current State
 
-Slices 1 and 2 are committed locally. Slice 3 is implemented and ready to commit with the current
-harness artifact updates.
+Slices 1 through 3 are committed locally. Slice 4 is implemented and ready to commit with the
+current harness artifact updates.
 
 ## Completed
 
@@ -36,15 +36,20 @@ harness artifact updates.
   - `packages/fresh/builders/define-page/builder/state.ts` created.
   - `packages/fresh/builders/define-page/builder.tsx` now imports/re-exports builder state types.
   - Slice 3 gates passed.
+- Slice 3 committed locally as `aed2925 refactor(fresh): extract define page builder state`.
+- Slice 4 implemented:
+  - `packages/fresh/builders/define-page/builder/factory.ts` created.
+  - `builder.tsx` now imports pure config factory helpers.
+  - Slice 4 gates passed.
 
 ## In Progress
 
-- Slice 3 commit.
+- Slice 4 commit.
 
 ## Next Steps
 
-1. Commit Slice 3 and append `commits.md` immediately.
-2. Continue Slice 4: extract builder factory helpers.
+1. Commit Slice 4 and append `commits.md` immediately.
+2. Continue Slice 5: extract builder validators.
 
 ## Key Decisions
 
@@ -70,6 +75,7 @@ harness artifact updates.
 | `packages/fresh/builders/mod.ts` | committed `b01ec31` | re-export form contracts; structural schema input helper |
 | `packages/fresh/builders/define-page/builder/state.ts` | new, pending commit | definition-time builder interface/type state |
 | `packages/fresh/builders/define-page/builder.tsx` | pending commit | imports/re-exports builder state types |
+| `packages/fresh/builders/define-page/builder/factory.ts` | new, pending commit | pure builder config factory helpers |
 
 ## Gates
 
@@ -81,6 +87,7 @@ harness artifact updates.
 | Consumer | planned | No public API changes; surface snapshot test in slice 1 proves this. |
 | Slice 2 doc-lint | passed | `deno doc --lint packages/fresh/form/types.ts`; `deno doc --lint packages/fresh/builders/mod.ts` |
 | Slice 3 state | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/state.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `state.ts` 6400 bytes |
+| Slice 4 factory | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/factory.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `factory.ts` 3505 bytes |
 
 ## Open Questions
 

@@ -111,6 +111,30 @@
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/builder/state.ts packages/fresh/builders/define-page/builder.tsx` | PASS: `state.ts` 6400 bytes; `builder.tsx` 32906 bytes |
 
+**Commit:** `aed2925 refactor(fresh): extract define page builder state`
+
+## 2026-06-14 slice 4 — builder factory helpers
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/builder/factory.ts`
+- `packages/fresh/builders/define-page/builder.tsx`
+
+**Implementation:**
+
+- Moved the pure builder configuration helpers into `builder/factory.ts`:
+  `createDefaultConfig`, `retagConfig`, and `promoteConfigToRoute`.
+- Left `createBuilder()` and build-time response assembly in `builder.tsx` because they still depend
+  on form/runtime behavior scheduled for later slices.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/builder/factory.ts packages/fresh/builders/define-page/builder.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/builder/factory.ts packages/fresh/builders/define-page/builder.tsx` | PASS: `factory.ts` 3505 bytes; `builder.tsx` 29943 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13
