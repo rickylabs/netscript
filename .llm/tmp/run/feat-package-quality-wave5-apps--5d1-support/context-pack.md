@@ -1,0 +1,89 @@
+# Context pack — 5d1 support spine (`@netscript/fresh`)
+
+Run: `feat/package-quality-wave5-apps-5d1-support` (PR #34)  
+Purpose: resumable summary for PLAN-EVAL and later implementation sessions.
+
+## Branch / PR
+
+- Branch: `feat/package-quality-wave5-apps--5d1-support`
+- Base: `feat/package-quality-wave5-apps--5d-fresh`
+- PR: #34
+
+## Scope
+
+Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite config wrapper, interactive seam, root mod skeleton, telemetry convention, docs scaffold, `./testing` entrypoint.
+
+## Key decisions locked
+
+1. **Error taxonomy**: split `error/handler.ts` into `error/types.ts`, `error/classify.ts`, `error/extract.ts`, `error/handler.ts`; keep public symbols unchanged.
+2. **ErrorDisplay**: move `components/ErrorDisplay.tsx` → `error/ErrorDisplay.tsx`; dissolve `components/`.
+3. **Telemetry convention**: one shared `_internal/telemetry.ts` with OTel-aligned `netscript.operation` attribute; `defer/telemetry.ts` migrates, `form/telemetry.ts` shimmed/deprecated for 5d5.
+4. **Vite wrapper**: keep `config/vite.ts`; export `NetScriptViteAlias`, re-export `NetScriptRouteManifestOptions`, annotate `createNetScriptVitePlugin` return as `Plugin`.
+5. **Interactive**: move `hooks/use-promise.ts` → `interactive/use-promise.ts`; dissolve `hooks/`.
+6. **Utils**: normalize `CacheEntryLike<T>` against SDK shape.
+7. **Root barrel**: drop defer symbols from root `mod.ts`.
+8. **Docs/testing**: docs scaffold + doctest fixture + `testing.ts` entrypoint.
+
+## Entrypoints in plan
+
+```text
+.
+./server
+./builders
+./route
+./defer
+./form
+./error
+./utils
+./streams
+./query
+./interactive
+./vite
+./testing   (new)
+```
+
+## Budget retirement
+
+| Metric | Baseline | 5d1 target |
+|--------|----------|------------|
+| `missing-jsdoc` on 5d1-owned exports | 25 | 0 |
+| `private-type-ref` in 5d1 scope | 6 | 0 |
+| Files > 500 LOC | 0 | 0 |
+| Slow types in 5d1 scope | 4 historical | 0 |
+
+## Files expected to change (implementation)
+
+- `packages/fresh/deno.json`
+- `packages/fresh/mod.ts`
+- `packages/fresh/interactive.ts`
+- `packages/fresh/testing.ts` (new)
+- `packages/fresh/_internal/telemetry.ts` (new)
+- `packages/fresh/error/*.ts`, `error/*.tsx` (split + move)
+- `packages/fresh/config/vite.ts`
+- `packages/fresh/utils/mod.ts`, `utils/cache-entry.ts`
+- `packages/fresh/interactive/use-promise.ts` (moved)
+- `packages/fresh/defer/telemetry.ts`
+- `packages/fresh/form/telemetry.ts` (deprecation comment only)
+- `packages/fresh/docs/**` (new)
+- `packages/fresh/tests/_fixtures/docs-examples_test.ts` (new)
+- Root `deno.json` (optional, S24)
+
+## Open questions for supervisor
+
+1. Remove defer symbols from root `mod.ts` now?
+2. Un-exclude `packages/fresh` from root workspace now?
+3. Split `error/handler.ts` even though below 500 LOC flag?
+4. `./testing` scope: Fresh-local only or re-export SDK adapter?
+5. Confirm `netscript.operation` telemetry attribute namespace.
+
+## Risks
+
+- Root defer drop may break an unknown consumer.
+- Root workspace un-exclusion may surface inherited errors from other clusters.
+- `_internal/telemetry.ts` must not leak into public exports.
+
+## Drift entries to watch
+
+- D-5d1-003: root workspace exclusion.
+- D-5d1-009: inherited doc-lint errors from `defer/`/`form/`/`builders/`/`route/`.
+- New drift expected for root defer drop if approved.
