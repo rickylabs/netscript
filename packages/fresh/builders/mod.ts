@@ -7,13 +7,46 @@
  */
 
 import { definePage as definePageImpl } from './define-page/builder.tsx';
-import { z } from 'zod';
 import {
   definePartial as definePartialImpl,
   defineStatsPartial as defineStatsPartialImpl,
 } from './define-partial.tsx';
 export type { InferDefinePageLayerLoaderProps } from './define-page/types.ts';
-export type { RuntimeFormState } from '../form/types.ts';
+export type {
+  CollectionDescriptor,
+  CollectionItem,
+  CollectionKeyInputProps,
+  CollectionKeyMap,
+  ControlProps,
+  DescriptionProps,
+  ErrorFormReplyInit,
+  ErrorProps,
+  FieldConstraints,
+  FieldDescriptor,
+  FieldDescriptorMap,
+  FormCsrfInputProps,
+  FormElementProps,
+  FormErrorMessages,
+  FormFieldErrors,
+  FormFieldPath,
+  FormIntent,
+  FormIntentResult,
+  FormReplyHelpers,
+  FormReplyInit,
+  FormSubmissionErrorResult,
+  FormSubmissionInitialResult,
+  FormSubmissionInvalidResult,
+  FormSubmissionRedirectResult,
+  FormSubmissionResult,
+  FormSubmissionSuccessResult,
+  FormValues,
+  IntentButtonProps,
+  InvalidFormReplyInit,
+  LabelProps,
+  RedirectFormReplyInit,
+  RuntimeFormState,
+  SuccessFormReplyInit,
+} from '../form/types.ts';
 import type {
   FormIntent,
   FormIntentResult,
@@ -388,6 +421,12 @@ export type SchemaOutput<TSchema, TFallback extends object> = TSchema extends un
     { safeParse(input: unknown): PageSchemaParseResult<infer TOutput extends object> } ? TOutput
   : TFallback;
 
+/** Infer the input object accepted by a schema-like value. */
+export type SchemaInput<TSchema, TFallback extends object> = TSchema extends undefined ? TFallback
+  : TSchema extends { readonly _input: infer TInput extends object } ? TInput
+  : TSchema extends { safeParse(input: infer TInput extends object): unknown } ? TInput
+  : TFallback;
+
 /** Flatten mapped and intersected object types for cleaner IntelliSense. */
 export type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
@@ -563,12 +602,19 @@ export interface PageFormHandlerContext<
   TOutput = unknown,
   THasRoute extends boolean = false,
 > extends PageContext<TState, TResources, TPath, TSearch, TLayerData, THasRoute> {
+  /** Form-specific values and reply helpers available to form callbacks. */
   readonly form: {
+    /** Factory helpers for constructing typed form replies. */
     readonly reply: FormReplyHelpers<TValues, TOutput>;
+    /** Parsed form intent, when present. */
     readonly intent: FormIntent | null;
+    /** Raw submitted form data. */
     readonly formData: FormData;
+    /** Stable submission id. */
     readonly submissionId: string;
+    /** CSRF token submitted with the form, when present. */
     readonly csrfToken?: string;
+    /** Parsed form values before schema validation completes. */
     readonly values: Partial<TValues>;
   };
 }
@@ -594,26 +640,28 @@ export interface PageFormConfig<
   TPath extends object = EmptyRecord,
   TSearch extends object = EmptyRecord,
   TLayerData extends PageLayerMap = EmptyRecord,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
+  TSchema = unknown,
   TOutput = unknown,
   THasRoute extends boolean = false,
 > {
-  /** Zod schema used for validation and constraint extraction. Inference site for `TSchema`. */
+  /** Schema used for validation and constraint extraction. Inference site for `TSchema`. */
   readonly schema: TSchema;
   /** Resolves initial form values on GET. Merged with schema defaults. */
   readonly initial?: (
     ctx: PageContext<TState, TResources, TPath, TSearch, TLayerData, THasRoute>,
-  ) => Partial<z.input<TSchema> & FormValues> | Promise<Partial<z.input<TSchema> & FormValues>>;
+  ) =>
+    | Partial<SchemaInput<TSchema, FormValues> & FormValues>
+    | Promise<Partial<SchemaInput<TSchema, FormValues> & FormValues>>;
   /** Executes the mutation with validated input. Return type is the sole inference site for `TOutput`. */
   readonly mutate: (
-    input: z.output<TSchema>,
+    input: SchemaOutput<TSchema, FormValues>,
     ctx: PageFormHandlerContext<
       TState,
       TResources,
       TPath,
       TSearch,
       TLayerData,
-      z.input<TSchema> & FormValues,
+      SchemaInput<TSchema, FormValues> & FormValues,
       unknown,
       THasRoute
     >,
@@ -621,21 +669,21 @@ export interface PageFormConfig<
   /** Handles non-submit intents (e.g. validate, reset). Short-circuits before validation. */
   readonly onIntent?: (
     intent: FormIntent,
-    values: z.input<TSchema> & FormValues,
+    values: SchemaInput<TSchema, FormValues> & FormValues,
     ctx: PageFormHandlerContext<
       TState,
       TResources,
       TPath,
       TSearch,
       TLayerData,
-      z.input<TSchema> & FormValues,
+      SchemaInput<TSchema, FormValues> & FormValues,
       unknown,
       THasRoute
     >,
   ) =>
-    | FormIntentResult<z.input<TSchema> & FormValues>
+    | FormIntentResult<SchemaInput<TSchema, FormValues> & FormValues>
     | Promise<
-      FormIntentResult<z.input<TSchema> & FormValues>
+      FormIntentResult<SchemaInput<TSchema, FormValues> & FormValues>
     >;
   /** Redirect target after successful mutation. Takes precedence over `onSuccess`. */
   readonly redirectTo?: (
@@ -646,7 +694,7 @@ export interface PageFormConfig<
       TPath,
       TSearch,
       TLayerData,
-      z.input<TSchema> & FormValues,
+      SchemaInput<TSchema, FormValues> & FormValues,
       NoInfer<TOutput>,
       THasRoute
     >,
@@ -660,14 +708,20 @@ export interface PageFormConfig<
       TPath,
       TSearch,
       TLayerData,
-      z.input<TSchema> & FormValues,
+      SchemaInput<TSchema, FormValues> & FormValues,
       NoInfer<TOutput>,
       THasRoute
     >,
   ) =>
-    | { readonly message?: string; readonly nextValues?: Partial<z.input<TSchema> & FormValues> }
+    | {
+      readonly message?: string;
+      readonly nextValues?: Partial<SchemaInput<TSchema, FormValues> & FormValues>;
+    }
     | Promise<
-      { readonly message?: string; readonly nextValues?: Partial<z.input<TSchema> & FormValues> }
+      {
+        readonly message?: string;
+        readonly nextValues?: Partial<SchemaInput<TSchema, FormValues> & FormValues>;
+      }
     >;
   /** Cache invalidation after mutation, before the response is sent. */
   readonly invalidate?: (
@@ -678,7 +732,7 @@ export interface PageFormConfig<
       TPath,
       TSearch,
       TLayerData,
-      z.input<TSchema> & FormValues,
+      SchemaInput<TSchema, FormValues> & FormValues,
       NoInfer<TOutput>,
       THasRoute
     >,
@@ -950,9 +1004,9 @@ export interface PageBuilder<
    * @param component Component receiving {@link RuntimeFormState} props.
    * @param config    Form configuration — see {@link PageFormConfig}.
    */
-  withForm<K extends string, TSchema extends z.ZodTypeAny, TOutput = unknown>(
+  withForm<K extends string, TSchema, TOutput = unknown>(
     id: K,
-    component: ComponentLike<RuntimeFormState<z.input<TSchema> & FormValues>>,
+    component: ComponentLike<RuntimeFormState<SchemaInput<TSchema, FormValues> & FormValues>>,
     config: PageFormConfig<
       TState,
       TResources,
@@ -968,7 +1022,9 @@ export interface PageBuilder<
     TResources,
     TPath,
     TSearch,
-    Simplify<TLayerData & Record<K, RuntimeFormState<z.input<TSchema> & FormValues>>>,
+    Simplify<
+      TLayerData & Record<K, RuntimeFormState<SchemaInput<TSchema, FormValues> & FormValues>>
+    >,
     THasRoute
   >;
   /** Register a page method handler. */

@@ -1,3 +1,5 @@
 # Commits — 5d2-builders
 
 Append-only hash record (repo + hash + subject).
+
+- 0b30d11: test(fresh): snapshot builders public surface
