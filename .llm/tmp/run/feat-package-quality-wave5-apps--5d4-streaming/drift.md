@@ -55,3 +55,36 @@ Proposed fix direction (design phase):
 - **Resolution:** Supervisor decided to lock the default — use a **local fake-timer/clock test helper inside `packages/fresh`** for stream tests, and promote it to a shared `./testing` utility **only if a later unit (5d5/5d6) needs it**.
 - **Action:** recorded as locked decision `L-5d4-7` in `plan.md`; update the drift entry to RESOLVED; implement the local helper during slice 3/4 if needed.
 - **Evidence:** design.md §Ports / adapters, plan.md §Locked Decisions (L-5d4-7) and §Open-Decision Sweep.
+
+## D-5d4-8: root `deno.json` excludes entire `@netscript/fresh` package from JSR publish
+
+- **What:** `packages/fresh/` is listed in the root `deno.json` `"exclude"` array, which blocks JSR publishing with `error[excluded-module]` on every module reachable from the package exports.
+- **Source:** `/home/runner/work/netscript/netscript/deno.json` line 12; committed dry-run artifact `jsr-dry-run-package-fresh.txt` shows 58 `excluded-module` findings.
+- **Expected:** A publishable workspace member is not excluded at the workspace root; file-level filtering is done by the package's own `publish.include/exclude`.
+- **Actual:** 58 publishability errors prevent a clean `deno publish --dry-run` for `@netscript/fresh`.
+- **Severity:** blocking.
+- **Resolution:** Locked decision `L-5d4-8` — remove `packages/fresh/` from root `deno.json` `exclude`; rely on `packages/fresh/deno.json` `publish.include/exclude` for publish filtering.
+- **Action:** Slice 1 removes the root exclusion and verifies root tasks still skip fresh; dry-run must report 0 `excluded-module` errors.
+- **Evidence:** design.md §JSR-audit findings; plan.md §Commit Slices (Slice 1) and §JSR-Audit / Over-Cap Budget Reconciliation.
+
+## D-5d4-9: JSR slow-type findings in `form/` and `query/` surface files
+
+- **What:** Package-level `deno publish --dry-run` reports 4 `missing-explicit-return-type` slow-type errors in files outside the streaming core: `form/enhancement.tsx`, `form/form-region.tsx`, `form/form.tsx`, and `query/query-island.tsx`.
+- **Source:** Committed dry-run artifact `jsr-dry-run-package-fresh.txt`.
+- **Expected:** All exported public API symbols have explicit return types (JSR "No slow types" requirement).
+- **Actual:** 4 exported functions rely on inferred return types.
+- **Severity:** blocking for JSR F-6 gate.
+- **Resolution:** Locked decision `L-5d4-9` — fix the 4 slow types inside 5d4 as a fresh-wide publishability sweep (one-line explicit return types, no behavior change).
+- **Action:** Slice 9 adds explicit return types and re-runs `deno publish --dry-run --allow-dirty` until clean.
+- **Evidence:** design.md §JSR-audit findings; plan.md §JSR-Audit / Over-Cap Budget Reconciliation.
+
+## D-5d4-10: upstream type leakage through `@netscript/fresh/streams` public surface
+
+- **What:** `deno doc --lint` attributes 32 upstream errors (`@tanstack/react-db` and `@durable-streams/state`) to `@netscript/fresh` because its `streams/` surface re-exports or exposes upstream types with private/internal references and missing JSDoc.
+- **Source:** Committed artifact `doc-lint-raw.txt`; upstream `.d.ts` files under `/home/runner/.cache/deno/npm/`.
+- **Expected:** Public package surface wraps or aliases upstream dependencies; consumers do not depend on internal upstream types.
+- **Actual:** Raw upstream types leak through the public API, producing `private-type-ref` (24) and `missing-jsdoc` (8) errors counted against `@netscript/fresh`.
+- **Severity:** blocking for F-5/F-7.
+- **Resolution:** Slice 6 wraps the upstream query/DB helpers with local public types and JSDoc. If wrapping is infeasible for a symbol, stop re-exporting it and record debt.
+- **Action:** Implement local wrappers in `streams/mod.ts` / `streams/create-stream-db.ts`; re-run `deno doc --lint` on `packages/fresh/streams/mod.ts` until 0 upstream-related errors remain.
+- **Evidence:** plan.md §Doc-Lint Budget Reconciliation (Slice 6 bucket) and §Commit Slices (Slice 6).
