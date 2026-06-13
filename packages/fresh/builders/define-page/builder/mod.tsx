@@ -27,7 +27,7 @@ import {
   createStreamingResponse,
 } from '../../../server/stream.ts';
 import { createDefinePageHooks, createRouteNav, type TypedRouteTarget } from '../navigation.tsx';
-import { executePagePipeline, prepareRequestState } from '../runtime.tsx';
+import { executePagePipeline, prepareRequestState } from '../runtime/mod.tsx';
 import { createDefaultConfig, promoteConfigToRoute, retagConfig } from './factory.ts';
 import {
   normalizeLayerComponent,

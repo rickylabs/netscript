@@ -1,12 +1,13 @@
+// arch:barrel-ok A4-aggregate: assembles runtime pipeline from role modules.
 import type { CachedEntry } from '@netscript/sdk';
 import type { ComponentType, JSX } from 'preact';
-import { DeferPage } from '../../defer/DeferPage.tsx';
-import { Deferred } from '../../defer/Deferred.tsx';
-import { isCacheEntryStale } from '../../utils/cache-entry.ts';
-import { wrapWithNavigationContext } from './navigation.tsx';
-import { type AnyRuntimePageConfig, withOptionalSpan } from './runtime/context.ts';
-export { prepareRequestState } from './runtime/handlers.ts';
-import { prepareRequestState } from './runtime/handlers.ts';
+import { DeferPage } from '../../../defer/DeferPage.tsx';
+import { Deferred } from '../../../defer/Deferred.tsx';
+import { isCacheEntryStale } from '../../../utils/cache-entry.ts';
+import { wrapWithNavigationContext } from '../navigation.tsx';
+import { type AnyRuntimePageConfig, withOptionalSpan } from './context.ts';
+export { prepareRequestState } from './handlers.ts';
+import { prepareRequestState } from './handlers.ts';
 import {
   createLayerSlot,
   createStreamSlotId,
@@ -15,7 +16,7 @@ import {
   renderLayerComponent,
   resolveFallback,
   toElement,
-} from './runtime/render.tsx';
+} from './render.tsx';
 import type {
   AnyDefinePageTypeState,
   DefinePageLayerDataOf,
@@ -29,12 +30,12 @@ import type {
   SearchParamInput,
   SearchParamSchema,
   UnknownRecord,
-} from './types.ts';
+} from '../types.ts';
 import type {
   RuntimeLayerResolution,
   RuntimePageConfig,
   RuntimeStreamLayerResolution,
-} from './internal.ts';
+} from '../internal.ts';
 
 function isCacheEntryLike(value: unknown): value is CachedEntry<UnknownRecord> {
   if (typeof value !== 'object' || value === null) {

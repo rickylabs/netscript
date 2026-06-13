@@ -262,6 +262,31 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/runtime/handlers.ts packages/fresh/builders/define-page/runtime.tsx` | PASS: `handlers.ts` 1970 bytes; `runtime.tsx` 10429 bytes |
 
+**Commit:** `2fa86c1 refactor(fresh): extract define page runtime handlers`
+
+## 2026-06-14 slice 10 — runtime role entry
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/runtime/mod.tsx`
+- `packages/fresh/builders/define-page/builder/mod.tsx`
+- `packages/fresh/builders/define-page/README.md`
+
+**Implementation:**
+
+- Moved `runtime.tsx` into the role-named runtime folder as `runtime/mod.tsx`.
+- Updated builder imports and README references.
+- Added the planned `// arch:barrel-ok` comment to the runtime role entry.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/runtime/mod.tsx packages/fresh/builders/define-page/builder/mod.tsx packages/fresh/builders/define-page/mod.ts packages/fresh/builders/mod.ts` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/runtime/mod.tsx` | PASS: 10487 bytes |
+| `deno doc --lint packages/fresh/builders/define-page/runtime/mod.tsx` | FAIL: direct internal-entry doc-lint expands imported type aliases as private; recorded as D-5d2-10 |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

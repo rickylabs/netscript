@@ -200,6 +200,27 @@ cleanup. The slice still ran type-check and surface snapshot gates.
 
 ---
 
+## D-5d2-10: Direct runtime role doc-lint deferred until public barrel cleanup
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 10  
+**Status:** open implementation drift
+
+**Description:**
+`deno doc --lint packages/fresh/builders/define-page/runtime/mod.tsx` reports private-type-ref
+errors for internal runtime exports (`prepareRequestState`, `executePagePipeline`) because their
+signatures reference type-state and runtime config aliases that are exported through the combined
+define-page surface, not through this internal role entry alone. The file also remains `.tsx`
+because the runtime pipeline still renders Fresh/Preact nodes.
+
+**Disposition:** Continue with the role-folder move and defer direct role-entry doc-lint to the
+public barrel cleanup. Type-check and surface snapshot gates pass.
+
+**Closing gate:** Final `deno doc --lint packages/fresh/builders/define-page/mod.ts` and
+`deno doc --lint packages/fresh/builders/mod.ts` pass.
+
+---
+
 ## D-5d2-9: Push blocked by HTTPS credentials
 
 **Date:** 2026-06-14  
