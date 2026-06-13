@@ -48,7 +48,8 @@ Append-only. One entry per slice / decision.
 - Independent validation reproduced blocking FAIL gates:
   - FAIL: `deno task doc-lint` in `packages/fresh` (`242 documentation lint errors`).
   - FAIL: `deno task dry-run` in `packages/fresh` (4 slow-type errors in form/query surfaces).
-- Publication remains blocked: after committing evaluator artifacts, local branch is clean and ahead of origin by 4 commits; remote PR #34 does not contain the implementation. A post-evaluator `git push origin feat/package-quality-wave5-apps-5d1-support` failed with `could not read Username for 'https://github.com'`.
+- Publication was blocked during evaluator validation: local implementation commits were not yet on
+  PR #34 and local GitHub HTTPS credentials were unavailable.
 
 ## 2026-06-13T23:20:00+02:00 — Publication blocker resolved
 
