@@ -23,3 +23,4 @@ Append-only hash record (repo + hash + subject).
 - 12305b7: test(fresh): split define page builder tests
 - 431bf52: test(fresh): split define page runtime tests
 - fca2a2f: test(fresh): split define page navigation tests
+- cddbfdc: test(fresh): split define page search tests
