@@ -310,3 +310,23 @@ under the planned 12K cap. The file name is slightly broader than ideal, but the
 file is retired and all split test gates pass.
 
 **Closing gate:** Full builders test suite passes in Slice 24.
+
+---
+
+## D-5d2-14: Playground app is absent in this worktree
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 23  
+**Status:** accepted implementation drift
+
+**Description:**
+The approved Slice 23 target named `apps/playground/routes/playground/builders/*`, but this
+worktree has no `apps/` directory or playground app. The repo currently contains only packages and
+plugins.
+
+**Disposition:** Added equivalent checkable fixture route modules under
+`packages/fresh/tests/fixtures/builders/` so the builder route surfaces are still type-checked in
+this repository. Browser validation remains unavailable without an app workspace.
+
+**Closing gate:** Fixture route modules pass `deno check`; final evaluator accepts the package-local
+fixture substitute or requests a follow-up when the playground app exists.

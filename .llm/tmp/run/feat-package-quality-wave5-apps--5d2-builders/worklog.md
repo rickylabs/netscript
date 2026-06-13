@@ -498,6 +498,32 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -l -c packages/fresh/builders/define-page/search-params.test.tsx packages/fresh/builders/define-page/builder.test.tsx packages/fresh/builders/define-page/runtime.test.tsx packages/fresh/builders/define-page/navigation.test.tsx` | PASS: `search-params.test.tsx` 252 LOC / 8889 bytes; `builder.test.tsx` 509 LOC / 17148 bytes; `runtime.test.tsx` 400 LOC / 12659 bytes; `navigation.test.tsx` 350 LOC / 12437 bytes |
 
+## 2026-06-14 slice 23 — package-local builder route fixtures
+
+**Files changed:**
+
+- `packages/fresh/tests/fixtures/builders/static-page.tsx`
+- `packages/fresh/tests/fixtures/builders/routed-page/[id].tsx`
+- `packages/fresh/tests/fixtures/builders/search-page.tsx`
+- `packages/fresh/tests/fixtures/builders/layer-page.tsx`
+- `packages/fresh/tests/fixtures/builders/form-page.tsx`
+- `packages/fresh/tests/fixtures/builders/partial-page.tsx`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/drift.md`
+
+**Implementation:**
+
+- Added checkable package-local route fixture modules because `apps/playground` is absent in this
+  worktree.
+- Covered static, routed path params, search params, defer layer, form, and partial builder
+  scenarios.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/tests/fixtures/builders/static-page.tsx 'packages/fresh/tests/fixtures/builders/routed-page/[id].tsx' packages/fresh/tests/fixtures/builders/search-page.tsx packages/fresh/tests/fixtures/builders/layer-page.tsx packages/fresh/tests/fixtures/builders/form-page.tsx packages/fresh/tests/fixtures/builders/partial-page.tsx` | PASS |
+| `deno fmt packages/fresh/tests/fixtures/builders` | PASS |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

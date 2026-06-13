@@ -6,13 +6,13 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 22 complete, Slice 23 next      |
+| Current phase  | `implement` — Slice 23 complete, Slice 24 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 22 are complete. The branch is clean at the latest pushed head after each committed
+Slices 1 through 23 are complete. The branch is clean at the latest pushed head after each committed
 slice when publication succeeds.
 
 ## Completed
@@ -119,15 +119,19 @@ slice when publication succeeds.
     search/defer/streaming blocks.
   - Deleted `packages/fresh/builders/define-page.test.tsx`.
   - Split test gates pass; D-5d2-13 records the mixed search/defer remainder.
+- Slice 23 implemented:
+  - `packages/fresh/tests/fixtures/builders/*` fixture route modules added because
+    `apps/playground` is absent.
+  - Fixture route check passes; D-5d2-14 records the package-local substitute.
 
 ## In Progress
 
-- Slice 23: add playground fixture routes.
+- Slice 24: run full builders test suite.
 
 ## Next Steps
 
-1. Continue Slice 23: add playground fixture routes.
-2. Continue Slice 24: run the full builders test suite.
+1. Continue Slice 24: run the full builders test suite.
+2. Continue Slice 25: run architecture fitness gates.
 
 ## Key Decisions
 
