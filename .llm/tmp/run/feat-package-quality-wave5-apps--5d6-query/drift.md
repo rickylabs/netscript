@@ -42,3 +42,11 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - Observation: `server.ts` does not re-export SSE helpers; they are internal-only today.
 - Final surface pass must decide whether SSE belongs in `@netscript/fresh/server` or remains internal.
 - Status: question raised for supervisor.
+
+## D-5d6-7 — PLAN-phase design.md and plan.md written (this run)
+
+- Trace: `openhands/pr-39/run-27467331167-1`.
+- Deliverables created: `design.md`, `plan.md`.
+- Decisions recorded: RFC 17 bridge via `initialData` + optional dehydration script, hook wrappers to retire upstream `privateTypeRef`, `defineFreshApp` alpha-surface seams, F-16 entrypoint lock, wave closeout lift of root workspace exclusion.
+- Open questions: six supervisor questions in `design.md` §5.
+- Status: READY FOR PLAN-EVAL; implementation deferred pending supervisor review.
