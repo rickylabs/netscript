@@ -185,6 +185,37 @@
 | `deno doc --lint packages/fresh/builders/define-page/builder/mod.tsx` | FAIL: direct internal-entry doc-lint expands imported type aliases as private; recorded as D-5d2-8 |
 | `wc -c packages/fresh/builders/define-page/builder/mod.tsx` | FAIL: 29396 bytes; recorded as D-5d2-7 pending runtime/render split |
 
+**Commit:** `8e519ad refactor(fresh): move define page builder entry`
+
+## 2026-06-14 publication checkpoint after slice 6
+
+| Command | Result |
+| ------- | ------ |
+| `git push` | FAIL: `fatal: could not read Username for 'https://github.com': No such device or address` |
+
+Recorded D-5d2-9 and will not loop on push attempts.
+
+## 2026-06-14 slice 7 — runtime context module
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/runtime/context.ts`
+- `packages/fresh/builders/define-page/runtime.tsx`
+
+**Implementation:**
+
+- Moved telemetry span wrapping, search-param object conversion, path/search schema resolution,
+  resource lookup, and runtime context assembly into `runtime/context.ts`.
+- Kept JSX render/defer behavior in `runtime.tsx` for the next runtime slices.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/runtime/context.ts packages/fresh/builders/define-page/runtime.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/runtime/context.ts packages/fresh/builders/define-page/runtime.tsx` | PASS: `context.ts` 5075 bytes; `runtime.tsx` 14693 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

@@ -1,11 +1,19 @@
 import { Head } from 'fresh/runtime';
-import { getTracer, withSpan } from '@netscript/telemetry/tracer';
 import type { CachedEntry } from '@netscript/sdk';
 import type { ComponentChildren, ComponentType, JSX } from 'preact';
 import { DeferPage } from '../../defer/DeferPage.tsx';
 import { Deferred } from '../../defer/Deferred.tsx';
 import { isCacheEntryStale } from '../../utils/cache-entry.ts';
-import { createRouteNav, wrapWithNavigationContext } from './navigation.tsx';
+import { wrapWithNavigationContext } from './navigation.tsx';
+import {
+  type AnyRuntimePageConfig,
+  createRuntimeContextBase,
+  resolvePathParams,
+  resolveSearchParams,
+  withOptionalSpan,
+  withoutRouteContext,
+  withRouteContext,
+} from './runtime/context.ts';
 import type {
   AnyDefinePageTypeState,
   DefinePageLayerDataOf,
@@ -15,7 +23,6 @@ import type {
   DefinePageRenderContext,
   DefinePageRequestContext,
   DefinePageResourcesOf,
-  DefinePageRouteFor,
   DefinePageSearchOf,
   DefinePageSlot,
   DefinePageSlotsFor,
@@ -30,54 +37,6 @@ import type {
   RuntimePageConfig,
   RuntimeStreamLayerResolution,
 } from './internal.ts';
-
-type AnyRuntimePageConfig = RuntimePageConfig<AnyDefinePageTypeState>;
-
-const definePageTracer = getTracer('@netscript/fresh/define-page');
-
-function telemetryEnabled(config: AnyRuntimePageConfig): boolean {
-  return config.telemetry?.enabled !== false;
-}
-
-async function withOptionalSpan<T>(
-  config: AnyRuntimePageConfig,
-  name: string,
-  attributes: Record<string, string | number | boolean | undefined>,
-  run: () => Promise<T>,
-): Promise<T> {
-  if (!telemetryEnabled(config)) {
-    return await run();
-  }
-
-  return await withSpan(definePageTracer, name, async (span) => {
-    for (const [key, value] of Object.entries(attributes)) {
-      if (value !== undefined) {
-        span.setAttribute(key, value);
-      }
-    }
-
-    return await run();
-  });
-}
-
-function searchParamsToObject(searchParams: URLSearchParams): SearchParamInput {
-  const entries = new Map<string, string[]>();
-
-  for (const [key, value] of searchParams.entries()) {
-    const current = entries.get(key);
-    if (current) {
-      current.push(value);
-    } else {
-      entries.set(key, [value]);
-    }
-  }
-
-  return Object.fromEntries(
-    Array.from(entries.entries()).map((
-      [key, values],
-    ) => [key, values.length > 1 ? values : values[0]]),
-  );
-}
 
 function isCacheEntryLike(value: unknown): value is CachedEntry<UnknownRecord> {
   if (typeof value !== 'object' || value === null) {
@@ -140,43 +99,6 @@ function buildLayerMemoKey(
     search,
     deps,
   });
-}
-
-function resolvePathParams<TPath extends object>(
-  schema: PathParamSchema<TPath> | undefined,
-  params: Record<string, string | undefined>,
-): TPath {
-  if (!schema) {
-    return {} as TPath;
-  }
-
-  const result = schema.safeParse(params);
-  if (!result.success) {
-    throw new Response(null, { status: 404 });
-  }
-
-  return result.data;
-}
-
-function resolveSearchParams<TSearch extends object>(
-  schema: SearchParamSchema<TSearch> | undefined,
-  searchParams: URLSearchParams,
-): TSearch {
-  if (!schema) {
-    return {} as TSearch;
-  }
-
-  const result = schema.safeParse(searchParamsToObject(searchParams));
-  if (!result.success) {
-    const fallbackResult = schema.safeParse({});
-    if (!fallbackResult.success) {
-      throw new Response(null, { status: 400 });
-    }
-
-    return fallbackResult.data;
-  }
-
-  return result.data;
 }
 
 function renderLayerComponent(
@@ -260,58 +182,6 @@ function mergeHeaders(values: HeadersInit[]): Headers {
     }
   }
   return headers;
-}
-
-function resolveResource(resources: UnknownRecord, key: string): unknown {
-  if (!(key in resources)) {
-    throw new Error(`definePage() could not resolve resource "${key}"`);
-  }
-
-  return resources[key];
-}
-
-function createRuntimeContextBase<TTypes extends AnyDefinePageTypeState>(
-  ctx:
-    | DefinePageRequestContext<DefinePageStateOf<TTypes>>
-    | DefinePageRenderContext<DefinePageStateOf<TTypes>>,
-  config: RuntimePageConfig<TTypes, boolean>,
-  resources: DefinePageResourcesOf<TTypes>,
-  signal: AbortSignal,
-  path: DefinePagePathOf<TTypes>,
-  search: DefinePageSearchOf<TTypes>,
-): Omit<DefinePageLayoutContextBase<TTypes, true>, 'route'> {
-  return {
-    ...ctx,
-    routePattern: config.routePattern ?? '',
-    pathSchema: config.pathSchema,
-    searchSchema: config.searchSchema,
-    nav: config.route?.nav ?? createRouteNav({
-      routePattern: config.routePattern ?? '',
-      pathSchema: config.pathSchema,
-      searchSchema: config.searchSchema,
-    }),
-    path,
-    search,
-    signal,
-    resources,
-    layerData: {} as Partial<DefinePageLayerDataOf<TTypes>>,
-    resource: <K extends keyof DefinePageResourcesOf<TTypes> & string>(key: K) => {
-      return resolveResource(resources, key) as DefinePageResourcesOf<TTypes>[K];
-    },
-  };
-}
-
-function withRouteContext<TTypes extends AnyDefinePageTypeState>(
-  context: Omit<DefinePageLayoutContextBase<TTypes, true>, 'route'>,
-  route: DefinePageRouteFor<TTypes>,
-): DefinePageLayoutContextBase<TTypes, true> {
-  return { ...context, route };
-}
-
-function withoutRouteContext<TTypes extends AnyDefinePageTypeState>(
-  context: Omit<DefinePageLayoutContextBase<TTypes, true>, 'route'>,
-): DefinePageLayoutContextBase<TTypes, false> {
-  return context as DefinePageLayoutContextBase<TTypes, false>;
 }
 
 export async function prepareRequestState<

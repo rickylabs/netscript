@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1 through 5 are committed locally. Slice 6 is implemented and ready to commit with the
+Slices 1 through 6 are committed locally. Slice 7 is implemented and ready to commit with the
 current harness artifact updates.
 
 ## Completed
@@ -52,15 +52,22 @@ current harness artifact updates.
   - Barrels and README updated.
   - Type-check and surface snapshot pass.
   - Direct builder-entry doc-lint and file-size target are deferred with D-5d2-7 and D-5d2-8.
+- Slice 6 committed locally as `8e519ad refactor(fresh): move define page builder entry`.
+- Push after Slice 6 failed once with the HTTPS username error and was recorded as D-5d2-9.
+- PR #35 was commented through the GitHub connector with the Slice 2-6 checkpoint.
+- Slice 7 implemented:
+  - `packages/fresh/builders/define-page/runtime/context.ts` created.
+  - `runtime.tsx` now imports context/telemetry/schema-resolution helpers.
+  - Slice 7 gates passed.
 
 ## In Progress
 
-- Slice 6 commit.
+- Slice 7 commit.
 
 ## Next Steps
 
-1. Commit Slice 6 and append `commits.md` immediately.
-2. Continue Slice 7: create runtime context module.
+1. Commit Slice 7 and append `commits.md` immediately.
+2. Continue Slice 8: create runtime render module.
 
 ## Key Decisions
 
@@ -89,6 +96,8 @@ current harness artifact updates.
 | `packages/fresh/builders/define-page/builder/factory.ts` | new, pending commit | pure builder config factory helpers |
 | `packages/fresh/builders/define-page/builder/validators.ts` | new, pending commit | route/layer/header validation helpers |
 | `packages/fresh/builders/define-page/builder/mod.tsx` | moved, pending commit | builder role entry; still over size target |
+| `packages/fresh/builders/define-page/runtime/context.ts` | new, pending commit | runtime context, telemetry, path/search resolution |
+| `packages/fresh/builders/define-page/runtime.tsx` | pending commit | imports runtime context helpers |
 
 ## Gates
 
@@ -103,6 +112,7 @@ current harness artifact updates.
 | Slice 4 factory | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/factory.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `factory.ts` 3505 bytes |
 | Slice 5 validators | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/validators.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `validators.ts` 2545 bytes |
 | Slice 6 builder entry | partial | type-check and surface snapshot pass; direct internal-entry doc-lint and size target recorded as D-5d2-7/D-5d2-8 |
+| Slice 7 runtime context | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/context.ts packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `context.ts` 5075 bytes |
 
 ## Open Questions
 

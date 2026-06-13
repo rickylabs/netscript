@@ -197,3 +197,31 @@ cleanup. The slice still ran type-check and surface snapshot gates.
 
 **Closing gate:** Final `deno doc --lint packages/fresh/builders/define-page/mod.ts` and
 `deno doc --lint packages/fresh/builders/mod.ts` pass.
+
+---
+
+## D-5d2-9: Push blocked by HTTPS credentials
+
+**Date:** 2026-06-14  
+**Plan slice:** post Slice 6 publication checkpoint  
+**Status:** open publication blocker
+
+**Description:**
+After completing and committing slices 2 through 6, a single normal push attempt failed with:
+
+```text
+fatal: could not read Username for 'https://github.com': No such device or address
+```
+
+**Local commits not pushed by this implementation session:**
+
+- `b01ec31 fix(fresh): document form builder surface`
+- `aed2925 refactor(fresh): extract define page builder state`
+- `5105cf1 refactor(fresh): extract define page builder factory`
+- `52bd5b9 refactor(fresh): extract define page builder validators`
+- `8e519ad refactor(fresh): move define page builder entry`
+
+**Disposition:** Do not loop on push. Continue local implementation and publish progress to PR #35
+through the GitHub connector when available.
+
+**Closing gate:** Supervisor or authenticated environment pushes the local branch.
