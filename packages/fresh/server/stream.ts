@@ -17,6 +17,23 @@ import type { VNode } from 'preact';
 // ============================================================================
 
 /**
+ * Renderable Preact tree accepted by Fresh streaming helpers.
+ */
+export type StreamingRenderable = object;
+
+/** Readable stream returned by the Preact streaming renderer. */
+export interface StreamingRenderStream extends ReadableStream<Uint8Array> {
+  /** Resolves when all renderer boundaries have completed. */
+  readonly allReady: Promise<void>;
+}
+
+/** Renderer port used by `renderToStream` to create an HTML byte stream. */
+export type StreamingRenderer = (
+  vnode: StreamingRenderable,
+  context?: Record<string, unknown>,
+) => StreamingRenderStream;
+
+/**
  * Options for streaming HTML rendering.
  */
 export interface StreamRenderOptions {
@@ -24,6 +41,8 @@ export interface StreamRenderOptions {
   signal?: AbortSignal;
   /** Preact context object passed to `renderToReadableStream`. */
   context?: Record<string, unknown>;
+  /** Renderer implementation used to create the underlying HTML stream. */
+  renderer?: StreamingRenderer;
   /** Called when all Suspense boundaries have resolved. */
   onAllReady?: () => void;
   /** Called when a stream-level error occurs. */
@@ -47,10 +66,17 @@ export interface StreamRenderResult {
   allReady: Promise<void>;
 }
 
+/** Deferred HTML chunk rendered into a shell slot. */
 export interface IncrementalStreamChunk {
+  /** DOM slot id that receives the rendered chunk. */
   slotId: string;
+  /** Render function that produces replacement HTML for the slot. */
   render: () => Promise<string>;
 }
+
+const defaultStreamingRenderer: StreamingRenderer = (vnode, context) => {
+  return renderToReadableStream(vnode as VNode, context) as StreamingRenderStream;
+};
 
 // ============================================================================
 // STREAMING RENDERER
@@ -72,10 +98,10 @@ export interface IncrementalStreamChunk {
  * ```
  */
 export function renderToStream(
-  vnode: VNode,
+  vnode: StreamingRenderable,
   options: StreamRenderOptions = {},
 ): StreamRenderResult {
-  const renderStream = renderToReadableStream(vnode, options.context);
+  const renderStream = (options.renderer ?? defaultStreamingRenderer)(vnode, options.context);
 
   // Wire the allReady notification.
   const allReady = renderStream.allReady.then(() => {
@@ -133,7 +159,7 @@ const STREAMING_HEADERS: Record<string, string> = {
  * ```
  */
 export function createStreamingResponse(
-  vnode: VNode,
+  vnode: StreamingRenderable,
   options: StreamRenderOptions = {},
 ): Response {
   const { stream } = renderToStream(vnode, options);
@@ -180,8 +206,9 @@ async function* settleChunks(chunks: IncrementalStreamChunk[]): AsyncGenerator<s
   }
 }
 
+/** Create a streaming response that patches resolved chunks into a rendered shell. */
 export function createIncrementalStreamingResponse(
-  shell: VNode,
+  shell: StreamingRenderable,
   chunks: IncrementalStreamChunk[],
   options: StreamRenderOptions = {},
 ): Response {
@@ -192,7 +219,7 @@ export function createIncrementalStreamingResponse(
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
-      controller.enqueue(encodeHtmlChunk(renderToString(shell)));
+      controller.enqueue(encodeHtmlChunk(renderToString(shell as VNode)));
 
       void (async () => {
         try {

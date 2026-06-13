@@ -185,6 +185,22 @@ Seeded from
 - **Status:** open
 - **Gate:** F-1, F-5, F-11
 
+## packages/fresh — F-7 full package doc-lint residue after 5d1
+
+- **Reason:** 5d1 support-spine FAIL_FIX cannot make broad `deno task doc-lint` pass without
+  implementing later 5d-owned public surfaces. The remaining diagnostics are concentrated in
+  builders/defer/form/streams/query, including direct upstream TanStack/durable-streams public type
+  exposure and missing JSDoc on later-slice symbols.
+- **Owner:** Wave 5d `@netscript/fresh` chain; final closeout owner is 5d6 query/server/package
+  surface.
+- **Target:** Close before merging 5d into Wave 5 apps; 5d6 must prove `deno task doc-lint` passes
+  from `packages/fresh`.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/plan.md`;
+  `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`.
+- **Created:** 2026-06-13
+- **Status:** open, DEBT_ACCEPTED for 5d1 only.
+- **Gate:** F-7, F-5, `deno task doc-lint` from `packages/fresh`.
+
 ## packages/service — doctrine verdict Refactor
 
 - **Reason:** `presets/` and `assets/` need role clarification.

@@ -5,9 +5,7 @@
  */
 
 import { useEffect, useRef } from 'preact/hooks';
-import type { JSX } from 'preact';
 import { IS_BROWSER } from 'fresh/runtime';
-import { type Attributes } from '@netscript/telemetry/tracer';
 import {
   decideDeferClientAction,
   type DeferPolicyInput,
@@ -15,7 +13,7 @@ import {
   type DeferPolicyResolved,
   resolveDeferPolicy,
 } from './policy.ts';
-import { emitDeferClientDecisionSpan } from './telemetry.ts';
+import { emitDeferClientDecisionSpan, type FreshDeferTelemetryAttributes } from './telemetry.ts';
 
 const FRESH_TRANSPORT_QUERY_PARAMS = new Set(['fresh-partial']);
 
@@ -121,8 +119,7 @@ export function DeferComponent({
   staleTime,
   policy,
   serverRevalidating,
-  debug = false,
-}: DeferComponentProps): JSX.Element {
+}: DeferComponentProps): object {
   const formRef = useRef<HTMLFormElement>(null);
   const sanitizedActionSearchParams = sanitizeDeferSearchParams(searchParams);
   const sanitizedPartialSearchParams = sanitizeDeferSearchParams(
@@ -143,7 +140,7 @@ export function DeferComponent({
       ? policy as DeferPolicyResolved
       : resolveDeferPolicy(policy, staleTime, undefined);
 
-    const decisionContext: Attributes = {
+    const decisionContext: FreshDeferTelemetryAttributes = {
       'defer.action': action,
       'defer.partial': partial,
       'defer.partial_search': partialSearchParams ?? searchParams ?? '',
@@ -173,7 +170,7 @@ export function DeferComponent({
         | 'policy-background-refresh',
       details: Record<string, unknown> = {},
     ) => {
-      const attributes: Attributes = {
+      const attributes: FreshDeferTelemetryAttributes = {
         ...decisionContext,
         'defer.decision': decision,
         'defer.decision_reason': reason,

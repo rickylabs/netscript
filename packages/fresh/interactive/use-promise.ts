@@ -5,13 +5,7 @@ type PromiseState<T> =
 
 const promiseStateCache = new WeakMap<Promise<unknown>, PromiseState<unknown>>();
 
-/**
- * Manual promise reader for Suspense-style server rendering.
- *
- * Returns the resolved value when available, throws the original rejection on
- * failure, and throws the promise itself while pending so a Suspense boundary
- * can render its fallback.
- */
+/** Read a promise using the Suspense throw-promise protocol. */
 export function usePromise<T>(promise: Promise<T>): T {
   let state = promiseStateCache.get(promise) as PromiseState<T> | undefined;
 
@@ -40,9 +34,7 @@ export function usePromise<T>(promise: Promise<T>): T {
   throw state.promise;
 }
 
-/**
- * Create a promise that is already primed as fulfilled for `usePromise()`.
- */
+/** Create a promise already primed as fulfilled for `usePromise()`. */
 export function resolvedPromise<T>(value: T): Promise<T> {
   const promise = Promise.resolve(value);
   promiseStateCache.set(promise, { status: 'fulfilled', value });
