@@ -19,6 +19,7 @@
 - Approved Slice 7 root exclusion removal was promoted ahead of source commits because the root
   `packages/fresh/` exclusion caused Deno gates to report false-green/no-file results.
 - Slice 2 telemetry / policy / server polish is implemented and validated.
+- Slice 3 renderer abort tests are implemented and validated.
 - No lockfile changes.
 
 ## Completed
@@ -34,6 +35,8 @@
 - Cleared the 57-error Slice 2 doc-lint bucket over `defer/mod.ts`, `server/stream.ts`, and
   `server/sse.ts`.
 - Added SSE clock and external abort seams without adding new package-level exports.
+- Added a `StreamingRenderer` port and colocated `server/stream_test.ts` coverage for renderer
+  cancellation on abort.
 
 ## Validation Evidence
 
@@ -49,11 +52,16 @@
 | Slice 2 lint | `deno lint --config deno.json packages/fresh/defer/DeferPage.tsx packages/fresh/defer/Deferred.tsx packages/fresh/defer/DeferIsland.tsx packages/fresh/defer/policy.ts packages/fresh/defer/telemetry.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS |
 | Slice 2 fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/defer/DeferPage.tsx packages/fresh/defer/Deferred.tsx packages/fresh/defer/DeferIsland.tsx packages/fresh/defer/policy.ts packages/fresh/defer/telemetry.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS |
 | Console scan | `rg "console\\." packages/fresh/defer packages/fresh/server packages/fresh/streams --glob '*.ts' --glob '*.tsx'` | PASS |
+| Slice 3 test | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/server/stream_test.ts` | PASS, 2 tests |
+| Slice 3 check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS |
+| Slice 3 doc lint | `deno doc --lint packages/fresh/server/stream.ts` | PASS |
+| Slice 3 lint | `deno lint --config deno.json packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS |
+| Slice 3 fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS |
 
 ## Next Steps
 
-1. Commit the Slice 2 batch.
-2. Continue with Slice 3: renderer abort tests.
+1. Commit the Slice 3 batch.
+2. Continue with Slice 4: SSE / KV watch abort tests.
 3. Re-run focused static gates after each source slice.
 4. Publish/push via GitHub connector if local HTTPS credentials remain unavailable.
 
@@ -70,6 +78,7 @@
 | `packages/fresh/defer/telemetry.ts` | update | Local public telemetry attribute map; documented exported span helpers. |
 | `packages/fresh/server/stream.ts` | update | Public renderable alias and documented incremental chunk contract. |
 | `packages/fresh/server/sse.ts` | update | Local KV watch types, clock port, external abort signal, no console logging. |
+| `packages/fresh/server/stream_test.ts` | new | Renderer abort invariant tests. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/drift.md` | update | Added D-5d4-11 and D-5d4-12. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/worklog.md` | update | Added implementation and validation evidence. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/context-pack.md` | update | Refreshed resumable state. |
@@ -82,4 +91,5 @@
 ## Commits
 
 - b326c52: fix fresh streaming public surface
-- Pending: Slice 2 telemetry / policy / server polish commit.
+- 7d3c8e3: polish fresh streaming telemetry and sse surface
+- Pending: Slice 3 renderer abort tests commit.

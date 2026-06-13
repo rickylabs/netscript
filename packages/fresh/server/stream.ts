@@ -21,6 +21,18 @@ import type { VNode } from 'preact';
  */
 export type StreamingRenderable = object;
 
+/** Readable stream returned by the Preact streaming renderer. */
+export interface StreamingRenderStream extends ReadableStream<Uint8Array> {
+  /** Resolves when all renderer boundaries have completed. */
+  readonly allReady: Promise<void>;
+}
+
+/** Renderer port used by `renderToStream` to create an HTML byte stream. */
+export type StreamingRenderer = (
+  vnode: StreamingRenderable,
+  context?: Record<string, unknown>,
+) => StreamingRenderStream;
+
 /**
  * Options for streaming HTML rendering.
  */
@@ -29,6 +41,8 @@ export interface StreamRenderOptions {
   signal?: AbortSignal;
   /** Preact context object passed to `renderToReadableStream`. */
   context?: Record<string, unknown>;
+  /** Renderer implementation used to create the underlying HTML stream. */
+  renderer?: StreamingRenderer;
   /** Called when all Suspense boundaries have resolved. */
   onAllReady?: () => void;
   /** Called when a stream-level error occurs. */
@@ -60,6 +74,10 @@ export interface IncrementalStreamChunk {
   render: () => Promise<string>;
 }
 
+const defaultStreamingRenderer: StreamingRenderer = (vnode, context) => {
+  return renderToReadableStream(vnode as VNode, context) as StreamingRenderStream;
+};
+
 // ============================================================================
 // STREAMING RENDERER
 // ============================================================================
@@ -83,7 +101,7 @@ export function renderToStream(
   vnode: StreamingRenderable,
   options: StreamRenderOptions = {},
 ): StreamRenderResult {
-  const renderStream = renderToReadableStream(vnode as VNode, options.context);
+  const renderStream = (options.renderer ?? defaultStreamingRenderer)(vnode, options.context);
 
   // Wire the allReady notification.
   const allReady = renderStream.allReady.then(() => {

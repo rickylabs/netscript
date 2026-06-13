@@ -58,3 +58,24 @@ Implementation resumes from the approved `design.md` and `plan.md` artifacts. PL
 | Static lint | `deno lint --config deno.json packages/fresh/defer/DeferPage.tsx packages/fresh/defer/Deferred.tsx packages/fresh/defer/DeferIsland.tsx packages/fresh/defer/policy.ts packages/fresh/defer/telemetry.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS, checked 8 files |
 | Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/defer/DeferPage.tsx packages/fresh/defer/Deferred.tsx packages/fresh/defer/DeferIsland.tsx packages/fresh/defer/policy.ts packages/fresh/defer/telemetry.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS, checked 8 files |
 | F-14 console scan | `rg "console\\." packages/fresh/defer packages/fresh/server packages/fresh/streams --glob '*.ts' --glob '*.tsx'` | PASS, no matches |
+
+## 2026-06-13 — Slice 3 renderer abort tests
+
+### Scope
+
+- Added a `StreamingRenderer` port to `renderToStream` so renderer cancellation can be tested
+  deterministically.
+- Added colocated `packages/fresh/server/stream_test.ts` coverage for:
+  - abort after renderer creation cancels the renderer stream,
+  - already-aborted signals cancel immediately,
+  - renderer context still flows through the port.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| F-13 runtime invariant | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/server/stream_test.ts` | PASS, 2 tests |
+| Static check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS |
+| F-7 doc lint | `deno doc --lint packages/fresh/server/stream.ts` | PASS |
+| Static lint | `deno lint --config deno.json packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS, checked 2 files |
+| Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/server/stream.ts packages/fresh/server/stream_test.ts` | PASS, checked 2 files |
