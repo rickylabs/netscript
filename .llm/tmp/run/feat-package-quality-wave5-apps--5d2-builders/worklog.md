@@ -159,6 +159,32 @@
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/builder/validators.ts packages/fresh/builders/define-page/builder.tsx` | PASS: `validators.ts` 2545 bytes; `builder.tsx` 29294 bytes |
 
+**Commit:** `52bd5b9 refactor(fresh): extract define page builder validators`
+
+## 2026-06-14 slice 6 — builder role entry
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/builder/mod.tsx`
+- `packages/fresh/builders/define-page/mod.ts`
+- `packages/fresh/builders/mod.ts`
+- `packages/fresh/builders/define-page/README.md`
+
+**Implementation:**
+
+- Moved `builder.tsx` into the role-named builder folder as `builder/mod.tsx`.
+- Updated the define-page and builders barrels plus README references.
+- Added the planned `// arch:barrel-ok` comment to the builder role entry.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/builder/mod.tsx packages/fresh/builders/define-page/mod.ts packages/fresh/builders/mod.ts` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `deno doc --lint packages/fresh/builders/define-page/builder/mod.tsx` | FAIL: direct internal-entry doc-lint expands imported type aliases as private; recorded as D-5d2-8 |
+| `wc -c packages/fresh/builders/define-page/builder/mod.tsx` | FAIL: 29396 bytes; recorded as D-5d2-7 pending runtime/render split |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

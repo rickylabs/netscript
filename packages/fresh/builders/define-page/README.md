@@ -46,6 +46,6 @@ const usersPage = definePage<AppState>()
 ## Related files
 
 - public entry: `packages/fresh/builders/define-page/mod.ts`
-- builder: `packages/fresh/builders/define-page/builder.tsx`
+- builder: `packages/fresh/builders/define-page/builder/mod.tsx`
 - request/runtime pipeline: `packages/fresh/builders/define-page/runtime.tsx`
 - tests: `packages/fresh/builders/define-page.test.tsx`

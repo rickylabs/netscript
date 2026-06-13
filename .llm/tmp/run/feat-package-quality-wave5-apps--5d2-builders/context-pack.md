@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1 through 4 are committed locally. Slice 5 is implemented and ready to commit with the
+Slices 1 through 5 are committed locally. Slice 6 is implemented and ready to commit with the
 current harness artifact updates.
 
 ## Completed
@@ -46,15 +46,21 @@ current harness artifact updates.
   - `packages/fresh/builders/define-page/builder/validators.ts` created.
   - `builder.tsx` now imports route/layer/header normalization helpers.
   - Slice 5 gates passed.
+- Slice 5 committed locally as `52bd5b9 refactor(fresh): extract define page builder validators`.
+- Slice 6 implemented:
+  - `builder.tsx` moved to `builder/mod.tsx`.
+  - Barrels and README updated.
+  - Type-check and surface snapshot pass.
+  - Direct builder-entry doc-lint and file-size target are deferred with D-5d2-7 and D-5d2-8.
 
 ## In Progress
 
-- Slice 5 commit.
+- Slice 6 commit.
 
 ## Next Steps
 
-1. Commit Slice 5 and append `commits.md` immediately.
-2. Continue Slice 6: replace `builder.tsx` with `builder/mod.ts`.
+1. Commit Slice 6 and append `commits.md` immediately.
+2. Continue Slice 7: create runtime context module.
 
 ## Key Decisions
 
@@ -82,6 +88,7 @@ current harness artifact updates.
 | `packages/fresh/builders/define-page/builder.tsx` | pending commit | imports/re-exports builder state types |
 | `packages/fresh/builders/define-page/builder/factory.ts` | new, pending commit | pure builder config factory helpers |
 | `packages/fresh/builders/define-page/builder/validators.ts` | new, pending commit | route/layer/header validation helpers |
+| `packages/fresh/builders/define-page/builder/mod.tsx` | moved, pending commit | builder role entry; still over size target |
 
 ## Gates
 
@@ -95,6 +102,7 @@ current harness artifact updates.
 | Slice 3 state | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/state.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `state.ts` 6400 bytes |
 | Slice 4 factory | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/factory.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `factory.ts` 3505 bytes |
 | Slice 5 validators | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/validators.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `validators.ts` 2545 bytes |
+| Slice 6 builder entry | partial | type-check and surface snapshot pass; direct internal-entry doc-lint and size target recorded as D-5d2-7/D-5d2-8 |
 
 ## Open Questions
 
@@ -108,6 +116,8 @@ current harness artifact updates.
   `navigation/mod.ts`, `define-page/mod.ts`.
 - D-5d2-3: Potential slow-type opt-in for `FieldDescriptorMap` / `RuntimeFormState`.
 - D-5d2-6: Structural `SchemaInput` helper added to avoid public Zod private-type refs.
+- D-5d2-7: Builder role entry remains `.tsx` and over the slice-6 size target.
+- D-5d2-8: Direct builder role doc-lint deferred until public barrel cleanup.
 
 ## Commits
 

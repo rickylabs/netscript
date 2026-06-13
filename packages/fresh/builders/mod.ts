@@ -6,7 +6,7 @@
  * @module
  */
 
-import { definePage as definePageImpl } from './define-page/builder.tsx';
+import { definePage as definePageImpl } from './define-page/builder/mod.tsx';
 import {
   definePartial as definePartialImpl,
   defineStatsPartial as defineStatsPartialImpl,

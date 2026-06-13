@@ -6,3 +6,4 @@ Append-only hash record (repo + hash + subject).
 - b01ec31: fix(fresh): document form builder surface
 - aed2925: refactor(fresh): extract define page builder state
 - 5105cf1: refactor(fresh): extract define page builder factory
+- 52bd5b9: refactor(fresh): extract define page builder validators

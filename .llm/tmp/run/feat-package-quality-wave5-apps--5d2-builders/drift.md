@@ -153,3 +153,47 @@ the helper.
 
 **Closing gate:** Final `deno doc --lint packages/fresh/builders/mod.ts` and
 `deno publish --dry-run --allow-dirty` from `packages/fresh` pass.
+
+---
+
+## D-5d2-7: Builder entry remains TSX and over the slice-6 size target
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 6  
+**Status:** open implementation drift
+
+**Description:**
+The approved plan names `packages/fresh/builders/define-page/builder/mod.ts` as the replacement for
+`builder.tsx`. At implementation time, the builder entry still contains JSX in the streaming
+response assembly path, so moving it to `.ts` would fail parsing. Slice 6 therefore moved the entry
+to `builder/mod.tsx` and added the planned `// arch:barrel-ok` justification.
+
+The moved file is still 29396 bytes, above the planned slice-6 target. That is because `createBuilder`
+still owns response assembly and form handler wiring until the runtime/render slices move those
+concerns out.
+
+**Disposition:** Continue with `builder/mod.tsx` temporarily. Close this drift when later slices
+extract render/form runtime code so the builder entry can become a small `.ts` barrel or receive an
+explicit final rationale.
+
+**Closing gate:** Final file-size gate passes for `packages/fresh/builders/define-page/builder/`.
+
+---
+
+## D-5d2-8: Direct builder entry doc-lint expands imported type aliases as private
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 6  
+**Status:** open implementation drift
+
+**Description:**
+`deno doc --lint packages/fresh/builders/define-page/builder/mod.tsx` reports private-type-ref
+errors for the moved `DefinePageBuilder` interface because it now lives in `builder/state.ts` and
+references type-state aliases exported by `define-page/types.ts`. The public `define-page/mod.ts`
+surface still exports both modules, and the surface snapshot passes.
+
+**Disposition:** Treat direct `builder/mod.tsx` doc-lint as deferred until the planned public barrel
+cleanup. The slice still ran type-check and surface snapshot gates.
+
+**Closing gate:** Final `deno doc --lint packages/fresh/builders/define-page/mod.ts` and
+`deno doc --lint packages/fresh/builders/mod.ts` pass.

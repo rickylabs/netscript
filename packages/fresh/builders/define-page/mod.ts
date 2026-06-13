@@ -1,5 +1,5 @@
 export * from './types.ts';
-export * from './builder.tsx';
+export * from './builder/mod.tsx';
 export * from './search-params.ts';
 export {
   createDefinePageHooks,

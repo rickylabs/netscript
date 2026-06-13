@@ -1,16 +1,17 @@
+// arch:barrel-ok A4-aggregate: defines definePage from role modules under builder/.
 import type { ComponentType, JSX } from 'preact';
 import { z } from 'zod';
 import { render as renderToString } from 'preact-render-to-string';
-import { createZodAdapter } from '../../form/schema-adapter.ts';
-import { applyCollectionKeyOperation, applyIntentOperation } from '../../form/intent.ts';
-import { normalizeFormError } from '../../form/error-normalization.ts';
-import { parseFormSubmission } from '../../form/pipeline.ts';
-import { readCsrfToken, setCsrfCookie, verifyCsrfToken } from '../../form/csrf.ts';
-import { generateSubmissionId } from '../../form/idempotency.ts';
-import { replyFor } from '../../form/reply.ts';
-import type { FormConfig } from '../../form/config.ts';
-import type { FormHandlerContext } from '../../form/handler-context.ts';
-import { resolveRuntimeFormState } from '../../form/state.ts';
+import { createZodAdapter } from '../../../form/schema-adapter.ts';
+import { applyCollectionKeyOperation, applyIntentOperation } from '../../../form/intent.ts';
+import { normalizeFormError } from '../../../form/error-normalization.ts';
+import { parseFormSubmission } from '../../../form/pipeline.ts';
+import { readCsrfToken, setCsrfCookie, verifyCsrfToken } from '../../../form/csrf.ts';
+import { generateSubmissionId } from '../../../form/idempotency.ts';
+import { replyFor } from '../../../form/reply.ts';
+import type { FormConfig } from '../../../form/config.ts';
+import type { FormHandlerContext } from '../../../form/handler-context.ts';
+import { resolveRuntimeFormState } from '../../../form/state.ts';
 import type {
   FormFieldErrors,
   FormIntent,
@@ -18,30 +19,30 @@ import type {
   FormSubmissionResult,
   FormValues,
   RuntimeFormState,
-} from '../../form/types.ts';
-import { emitFormError, withFormSpan } from '../../form/telemetry.ts';
-import { bindRoutePattern, defineRouteContract } from '../../route/contract.ts';
+} from '../../../form/types.ts';
+import { emitFormError, withFormSpan } from '../../../form/telemetry.ts';
+import { bindRoutePattern, defineRouteContract } from '../../../route/contract.ts';
 import {
   createIncrementalStreamingResponse,
   createStreamingResponse,
-} from '../../server/stream.ts';
-import { createDefinePageHooks, createRouteNav, type TypedRouteTarget } from './navigation.tsx';
-import { executePagePipeline, prepareRequestState } from './runtime.tsx';
-import { createDefaultConfig, promoteConfigToRoute, retagConfig } from './builder/factory.ts';
+} from '../../../server/stream.ts';
+import { createDefinePageHooks, createRouteNav, type TypedRouteTarget } from '../navigation.tsx';
+import { executePagePipeline, prepareRequestState } from '../runtime.tsx';
+import { createDefaultConfig, promoteConfigToRoute, retagConfig } from './factory.ts';
 import {
   normalizeLayerComponent,
   resolveConfiguredRoutePattern,
   resolveHeaderDescriptor,
   resolveLayerConfig,
-} from './builder/validators.ts';
-export type { DefinePageBuilder, DefinePageRootBuilder } from './builder/state.ts';
-import type { DefinePageBuilder, DefinePageRootBuilder, FormSchemaInput } from './builder/state.ts';
+} from './validators.ts';
+export type { DefinePageBuilder, DefinePageRootBuilder } from './state.ts';
+import type { DefinePageBuilder, DefinePageRootBuilder, FormSchemaInput } from './state.ts';
 import type {
   ResourceFactoryMap,
   RuntimeLayerDescriptor,
   RuntimePageConfig,
   RuntimeResourceDescriptor,
-} from './internal.ts';
+} from '../internal.ts';
 import type {
   AnyDefinePageTypeState,
   DefinePageBuildOptions,
@@ -79,7 +80,7 @@ import type {
   EmptyRecord,
   PathParamSchema,
   SearchParamSchema,
-} from './types.ts';
+} from '../types.ts';
 
 function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRoute extends boolean>(
   config: RuntimePageConfig<TTypes, THasConfiguredRoute>,
@@ -766,7 +767,7 @@ function createFormHandlerContext<
 
 function createIntentReply<TValues extends FormValues, TOutput>(
   reply: ReturnType<typeof replyFor<TValues, TOutput>>,
-  collectionKeys: import('../../form/types.ts').CollectionKeyMap,
+  collectionKeys: import('../../../form/types.ts').CollectionKeyMap,
   submissionId: string,
   csrfToken: string | undefined,
   initialValues: Partial<TValues>,
