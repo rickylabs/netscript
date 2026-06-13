@@ -84,7 +84,7 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 
 ## Implementation handoff — 2026-06-13
 
-- 5d1 support-spine implementation is complete and ready for separate IMPL-EVAL after commit/push.
+- 5d1 support-spine implementation is complete locally and ready for separate IMPL-EVAL once pushed.
 - Key implementation decisions:
   - `ErrorDisplay` moved to `error/ErrorDisplay.tsx`; `components/ErrorDisplay.tsx` removed.
   - `ComponentChildren` is not re-exported from Preact. `ErrorDisplay` uses package-owned `ErrorDisplayContent` to avoid new private-type doc-lint exposure.
@@ -98,6 +98,7 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
   - FAIL inherited/out-of-scope: package broad `doc-lint` (242 errors, primarily TanStack/query public type exposure).
   - FAIL inherited/out-of-scope: package `dry-run` (4 slow-type errors in form/query surfaces owned by later slices).
 - Tooling drift: `rtk` is unavailable in this WSL worktree; direct shell commands were used.
+- Push blocker: local branch is clean and ahead of origin, but `git push` failed because HTTPS Git credentials are unavailable, `gh` is not installed, and GitHub MCP cannot update a ref to a local-only commit object. Local commits: `ed5fedc65a9f16b750be0ea426527771ff217f14`, `877e1c50c21f106018ef63e06654f7e2004b0827`.
 
 ## Drift entries to watch
 

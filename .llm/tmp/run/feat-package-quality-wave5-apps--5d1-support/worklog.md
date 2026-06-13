@@ -24,3 +24,13 @@ Append-only. One entry per slice / decision.
   - FAIL inherited/out-of-scope: broad `deno task doc-lint` from `packages/fresh` (`242 documentation lint errors`, dominated by TanStack/query public type exposure and query hydration references).
   - FAIL inherited/out-of-scope: `deno task dry-run` from `packages/fresh` (4 slow-type errors in `form/enhancement.tsx`, `form/form-region.tsx`, `form/form.tsx`, `query/query-island.tsx`).
 - Scope guard: did not patch 5d5 form or 5d6 query slow-type blockers; those remain for their owning slices.
+
+## 2026-06-13T22:50:00+02:00 — Push blocker
+
+- Local commits created:
+  - `ed5fedc65a9f16b750be0ea426527771ff217f14` — implementation commit.
+  - `877e1c50c21f106018ef63e06654f7e2004b0827` — commit ledger update.
+- `git push origin feat/package-quality-wave5-apps-5d1-support` failed: `fatal: could not read Username for 'https://github.com': No such device or address`.
+- `gh` is not installed in this environment.
+- GitHub MCP `_update_ref` could not move the remote branch to local commit `877e1c50c21f106018ef63e06654f7e2004b0827` because GitHub does not have the local commit object (`422 Object does not exist`).
+- Branch remains clean and ahead of origin locally. PR handoff comment will report this explicitly.
