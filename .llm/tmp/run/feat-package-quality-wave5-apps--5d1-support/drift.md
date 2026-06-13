@@ -23,5 +23,5 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - D-5d1-018: Publication blocker resolved after the evaluator verdict. `gh` was installed locally but
   could not authenticate the Zed MCP token because the token lacks `read:org`; a Deno-run one-shot
   `git push` used the token as an HTTPS credential without printing or persisting it. Remote branch
-  now contains implementation/artifact commits through `98a96ca` and `.llm/tools/git-verify.ts sync`
-  reports `0 ahead / 0 behind origin`.
+  now contains implementation/evaluator artifacts through `9440f11`, and `git ls-remote origin
+  refs/heads/feat/package-quality-wave5-apps-5d1-support` matches local `HEAD`.

@@ -57,8 +57,10 @@ Append-only. One entry per slice / decision.
   rejected the Zed MCP token because it lacks `read:org`.
 - Used the same token only as a one-shot HTTPS credential for `git push` from a Deno-run helper;
   no token was printed or committed.
-- Pushed `feat/package-quality-wave5-apps-5d1-support` to origin. Remote advanced from `6104b94`
-  to `98a96ca`.
-- Verified sync with `.llm/tools/git-verify.ts`: `0 ahead / 0 behind origin`.
-- Remaining status: publication blocker resolved; separate IMPL-EVAL must re-run after addressing
-  or explicitly accepting the broad `doc-lint`/`dry-run` failures.
+- Pushed `feat/package-quality-wave5-apps-5d1-support` to origin. Remote publication was later
+  verified at `9440f11`.
+- Verified sync with `git ls-remote`: local `HEAD` and
+  `origin/feat/package-quality-wave5-apps-5d1-support` both point at `9440f11`.
+- Remaining status: publication blocker resolved; the evaluator verdict remains **FAIL_FIX** until
+  the broad `doc-lint`/`dry-run` failures and process/artifact gaps are addressed or explicitly
+  accepted.

@@ -113,7 +113,7 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 - Blocking gates still fail:
   - `deno task doc-lint` exits 1 with 242 documentation lint errors.
   - `deno task dry-run` exits 1 with 4 slow-type errors in later form/query surfaces.
-- Publication blocker still prevents PASS: after committing evaluator artifacts, branch is clean but 4 commits ahead of origin (`ed5fedc`, `877e1c5`, `98a96ca`, evaluator commit); local GitHub HTTPS credentials are missing and `gh` is unavailable.
+- Publication was blocked during the evaluator pass, but was later resolved; local `HEAD` and `origin/feat/package-quality-wave5-apps-5d1-support` now match at `9440f11`.
 - Process/artifact issues recorded by evaluator: `worklog.md` lacks the protocol-required `## Design` section, implementation did not follow the 24 planned commit slices, and `commits.md` needed evaluator correction for unpublished artifact commits.
 
 ## Publication update — 2026-06-13
@@ -121,8 +121,8 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 - The implementation commits were pushed after the evaluator verdict using the GitHub token from the
   local Zed MCP settings through a Deno-run credentialed `git push`; the token was not printed or
   persisted in repo config.
-- Verified with `.llm/tools/git-verify.ts sync --branch feat/package-quality-wave5-apps-5d1-support`:
-  local and `origin/feat/package-quality-wave5-apps-5d1-support` are in sync at `98a96ca`.
+- Verified with `git ls-remote origin refs/heads/feat/package-quality-wave5-apps-5d1-support`:
+  local and `origin/feat/package-quality-wave5-apps-5d1-support` are in sync at `9440f11`.
 - The evaluator's publication blocker is now resolved, but the evaluator verdict remains
-  **FAIL_FIX** until a separate evaluator re-runs. Remaining blockers are the broad package
-  `doc-lint` and `dry-run` failures recorded above.
+  **FAIL_FIX**. Remaining blockers are the broad package `doc-lint` and `dry-run` failures plus
+  process/artifact gaps recorded above.

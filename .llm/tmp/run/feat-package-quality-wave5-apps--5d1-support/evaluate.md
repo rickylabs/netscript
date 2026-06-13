@@ -11,10 +11,10 @@ Archetype: Archetype 3 Runtime/Behavior, package-level A3 gate matrix, with SCOP
 
 **VERDICT: FAIL_FIX**
 
-The local implementation has useful support-spine progress and passes focused package checks, but
-it cannot PASS IMPL-EVAL because required approved gates still fail and the implemented commits are
-not published to PR #34. The plan remains valid; this is not a rescope. Required fixes are gate
-completion/artifact hygiene/publication, not a new architecture plan.
+The implementation has useful support-spine progress and passes focused package checks, but it
+cannot PASS IMPL-EVAL because required approved gates still fail and harness process/artifact gaps
+remain. The plan remains valid; this is not a rescope. Required fixes are gate completion and
+artifact/process hygiene, not a new architecture plan.
 
 ## Process Verification
 
@@ -27,7 +27,7 @@ completion/artifact hygiene/publication, not a new architecture plan.
 | Commit slices match design plan | FAIL | `plan.md` locks 24 slices; implementation is one source commit (`ed5fedc`) plus artifact/blocker commits. |
 | Commit ledger complete | FAIL | `commits.md` only listed `ed5fedc`; local HEAD is 3 commits ahead: `ed5fedc`, `877e1c5`, `98a96ca`. Updated in this evaluator pass. |
 | Worktree cleanliness | PASS | `git status --short --branch` before evaluator edits: clean, ahead of origin by 3. |
-| Public PR state contains implementation | FAIL | Local commits are not pushed; PR #34 remote head remains `6104b94`. |
+| Public PR state contains implementation | PASS_AFTER_BLOCKER | Publication was blocked during validation, then resolved after the verdict; remote head now contains evaluator artifacts through `9440f11`. |
 
 ## Static Gates
 
@@ -48,7 +48,7 @@ completion/artifact hygiene/publication, not a new architecture plan.
 |------|--------|----------|-------|
 | F-1 File-size lint | PASS_MANUAL | Error handler split and package checks pass; no new over-cap 5d1 support-spine file observed in evidence. | Existing `packages/fresh` builders debt remains umbrella-owned. |
 | F-2 Helper-reinvention scan | PASS_MANUAL | `CacheEntryLike<T>` normalized in one package-owned utils surface per worklog. | No blocker found in 5d1 scope. |
-| F-5 Public surface audit | FAIL_EVIDENCE | Root defer drop and type-shape deviations are recorded in drift D-5d1-014, but PR publication is blocked. | Consumers cannot review public surface until pushed. |
+| F-5 Public surface audit | PASS_PARTIAL | Root defer drop and type-shape deviations are recorded in drift D-5d1-014; PR publication was later resolved. | Remaining blockers are doc-lint/dry-run/process, not publication. |
 | F-6 JSR publishability | FAIL | `deno task dry-run` fails with 4 slow-type errors. | Required by plan S19 and A3 matrix. |
 | F-7 Doc-score gate | FAIL | `deno task doc-lint` fails with 242 doc lint errors. | Focused support-spine doc-lint is green, but the approved gate is broader. |
 | F-8 Workspace lib check | PASS_PARTIAL | Package `deno task check` passes; root wrappers still exclude `fresh` per D-5d1-013. | Root inclusion remains deferred to later closeout, but package check is valid. |
@@ -65,12 +65,11 @@ completion/artifact hygiene/publication, not a new architecture plan.
 |----------|---------|----------|-----------------|
 | High | Required package doc-lint gate fails. | `deno task doc-lint` exit 1; 242 documentation lint errors. | Either fix the public doc/type exposure required for the approved gate or formally rescope/debt-accept a narrower 5d1 gate before PASS. |
 | High | Required JSR publishability gate fails. | `deno task dry-run` exit 1; missing explicit return types in `form/enhancement.tsx`, `form/form-region.tsx`, `form/form.tsx`, `query/query-island.tsx`. | Fix slow types or obtain explicit accepted debt/rescope for out-of-scope surfaces. |
-| High | Implementation is not on PR #34. | `git status` shows local branch ahead of origin by 3; `git push` is blocked by missing HTTPS credentials; remote head remains `6104b94`. | Push local commits or otherwise publish equivalent changes before PR can pass evaluator. |
 | Medium | Harness process artifacts do not match protocol. | Missing `## Design` section in `worklog.md`; implementation collapsed 24 planned slices into one source commit; `commits.md` was incomplete before evaluator correction. | Repair artifact trail or record an accepted process exception before close. |
 
-## Publication Blocker
+## Publication Blocker Review
 
-Local branch state was clean but unpublished before this evaluator artifact commit:
+During evaluator validation, local branch state was clean but unpublished:
 
 ```text
 origin/feat/package-quality-wave5-apps-5d1-support...HEAD = 0 behind / 3 ahead
@@ -80,19 +79,16 @@ HEAD commits:
 ed5fedc Implement fresh support spine quality slice
 ```
 
-After committing `evaluate.md`, the local branch is ahead of origin by 4 commits, with the evaluator
-artifact commit on top.
-
 Prior implementation attempted `git push` and failed with:
 
 ```text
 fatal: could not read Username for 'https://github.com': No such device or address
 ```
 
-`gh` is unavailable, and GitHub MCP cannot update the remote ref to local-only commit objects. A
-post-evaluator `git push origin feat/package-quality-wave5-apps-5d1-support` was attempted and
-failed with the same HTTPS credential error. This publication blocker prevents PASS even if local
-source gates were otherwise acceptable.
+That publication blocker was resolved after this evaluator verdict was first written. Current
+ground truth from `git ls-remote origin refs/heads/feat/package-quality-wave5-apps-5d1-support` is
+`9440f11bea6860f4147cc3c92c320d326efe9a7a`, matching local `HEAD`. Publication no longer blocks
+PASS; the remaining blockers are the failing approved gates and process/artifact gaps above.
 
 ## Arch-Debt Delta
 
