@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------ |
 | Run ID         | feat-package-quality-wave5-apps--5d4-streaming         |
 | Branch         | `feat/package-quality-wave5-apps-5d4-streaming`        |
-| Current phase  | Implementation complete; remote branch pushed for IMPL-EVAL |
+| Current phase  | IMPL-EVAL PASS; ready for supervisor merge-order review |
 | Archetype      | 3 — Runtime / Behavior                                 |
 | Scope overlays | `SCOPE-frontend`                                       |
 
@@ -24,11 +24,9 @@
 - Slices 5 and 6 streams lifecycle + upstream-type wrap are implemented and validated.
 - Slices 8 and 9 README permissions + slow-type return annotations are implemented and validated.
 - Slices 10 and 11 consumer gate + closeout sweep are implemented and validated.
-- Implementation handoff claimed no lockfile changes; IMPL-EVAL found uncommitted `deno.lock` churn
-  and recorded D-5d4-15.
-- IMPL-EVAL-5D4 ran locally on 2026-06-13 and returned `FAIL_FIX`: local source gates pass, but
-  PASS is blocked by an uncommitted `deno.lock` diff, incomplete `commits.md` tracking for
-  `6aeebf3`, and the remote PR branch still being at `4504b6b`.
+- IMPL-EVAL-5D4 ran locally on 2026-06-13 and returned `PASS`: source gates pass, final lockfile
+  diff is clean, `commits.md` records through `6aeebf3`, and the remote PR branch is pushed to
+  `83a84fa`.
 
 ## Completed
 

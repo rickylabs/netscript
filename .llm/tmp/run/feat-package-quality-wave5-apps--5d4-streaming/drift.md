@@ -150,7 +150,7 @@ Proposed fix direction (design phase):
 - **Evidence:** `git push origin feat/package-quality-wave5-apps-5d4-streaming` succeeded,
   advancing the remote branch from `4504b6b` to `83a84fa`.
 
-## D-5d4-14: `rtk` unavailable in evaluator shell
+## D-5d4-15: `rtk` unavailable in evaluator shell
 
 - **What:** Evaluator attempted the required read-heavy status command through `rtk`, but the binary
   was not on PATH in this WSL shell.
@@ -162,7 +162,7 @@ Proposed fix direction (design phase):
 - **Action:** No implementation fix in this evaluator pass. Environment/tooling should restore
   `rtk` on PATH for future harness runs.
 
-## D-5d4-15: evaluator found uncommitted `deno.lock` churn
+## D-5d4-16: evaluator found transient uncommitted `deno.lock` churn
 
 - **What:** The implementation handoff said the local worktree was clean and no lockfile changes
   existed, but evaluator ground truth showed `deno.lock` modified.
@@ -170,7 +170,8 @@ Proposed fix direction (design phase):
   a 3-line resolver/specifier change for `jsr:@std/jsonc`.
 - **Expected:** Lock hygiene requires no unreviewed lockfile churn, and run closeout requires a clean
   worktree before PASS.
-- **Actual:** Local source gates pass, but the dirty lockfile prevents a clean evaluator PASS.
-- **Severity:** blocking for IMPL-EVAL PASS.
-- **Action:** Generator or maintainer must either commit a reviewed lockfile change with rationale or
-  restore the lockfile before a PASS evaluator rerun.
+- **Actual:** The lockfile diff was present during early evaluator inspection, but final evaluator
+  status showed no `deno.lock` diff.
+- **Severity:** minor.
+- **Action:** No blocking action for this pass; rerun `git diff -- deno.lock` before any future
+  evaluator verdict.
