@@ -4,16 +4,34 @@
  * @module
  */
 
-import type { ComponentChildren, JSX, VNode } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { Suspense } from 'preact/compat';
 import { usePromise } from '../hooks/use-promise.ts';
 
+/** Renderable content accepted by deferred Suspense slots. */
+export type DeferredRenderable =
+  | object
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined
+  | readonly DeferredRenderable[];
+
+/** Render function used to turn resolved deferred data into content. */
+export type DeferredRenderFunction<T> = (data: T) => DeferredRenderable;
+
 /** Props for the `Deferred` Suspense helper. */
 export interface DeferredProps<T> {
+  /** Promise whose resolved value is rendered by the child function. */
   promise: Promise<T>;
-  fallback?: JSX.Element;
-  children: ComponentChildren | ((data: T) => JSX.Element);
-  errorFallback?: (error: Error) => JSX.Element;
+  /** Fallback content displayed while the promise is pending. */
+  fallback?: DeferredRenderable;
+  /** Render function, or the single child render function passed through JSX. */
+  children: DeferredRenderable | DeferredRenderFunction<T>;
+  /** Fallback renderer used when the promise rejects. */
+  errorFallback?: (error: Error) => DeferredRenderable;
 }
 
 class DeferredRenderFunctionError extends TypeError {
@@ -23,13 +41,13 @@ class DeferredRenderFunctionError extends TypeError {
   }
 }
 
-function resolveRenderChild<T>(children: DeferredProps<T>['children']): (data: T) => JSX.Element {
+function resolveRenderChild<T>(children: DeferredProps<T>['children']): DeferredRenderFunction<T> {
   if (typeof children === 'function') {
-    return children as (data: T) => JSX.Element;
+    return children as DeferredRenderFunction<T>;
   }
 
   if (Array.isArray(children) && children.length === 1 && typeof children[0] === 'function') {
-    return children[0] as (data: T) => JSX.Element;
+    return children[0] as DeferredRenderFunction<T>;
   }
 
   throw new DeferredRenderFunctionError();
@@ -37,7 +55,7 @@ function resolveRenderChild<T>(children: DeferredProps<T>['children']): (data: T
 
 function DeferredInner<T>(
   { promise, children, errorFallback }: DeferredProps<T>,
-): JSX.Element {
+): DeferredRenderable {
   try {
     const data = usePromise(promise);
     return resolveRenderChild(children)(data);
@@ -66,10 +84,12 @@ function DeferredInner<T>(
  */
 export function Deferred<T>(
   { promise, fallback, children, errorFallback }: DeferredProps<T>,
-): VNode {
+): DeferredRenderable {
   return (
-    <Suspense fallback={fallback ?? null}>
-      <DeferredInner promise={promise} children={children} errorFallback={errorFallback} />
+    <Suspense fallback={(fallback ?? null) as ComponentChildren}>
+      <DeferredInner promise={promise} errorFallback={errorFallback}>
+        {children as ComponentChildren}
+      </DeferredInner>
     </Suspense>
   );
 }

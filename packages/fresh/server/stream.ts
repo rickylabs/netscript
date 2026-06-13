@@ -17,6 +17,11 @@ import type { VNode } from 'preact';
 // ============================================================================
 
 /**
+ * Renderable Preact tree accepted by Fresh streaming helpers.
+ */
+export type StreamingRenderable = object;
+
+/**
  * Options for streaming HTML rendering.
  */
 export interface StreamRenderOptions {
@@ -47,8 +52,11 @@ export interface StreamRenderResult {
   allReady: Promise<void>;
 }
 
+/** Deferred HTML chunk rendered into a shell slot. */
 export interface IncrementalStreamChunk {
+  /** DOM slot id that receives the rendered chunk. */
   slotId: string;
+  /** Render function that produces replacement HTML for the slot. */
   render: () => Promise<string>;
 }
 
@@ -72,10 +80,10 @@ export interface IncrementalStreamChunk {
  * ```
  */
 export function renderToStream(
-  vnode: VNode,
+  vnode: StreamingRenderable,
   options: StreamRenderOptions = {},
 ): StreamRenderResult {
-  const renderStream = renderToReadableStream(vnode, options.context);
+  const renderStream = renderToReadableStream(vnode as VNode, options.context);
 
   // Wire the allReady notification.
   const allReady = renderStream.allReady.then(() => {
@@ -133,7 +141,7 @@ const STREAMING_HEADERS: Record<string, string> = {
  * ```
  */
 export function createStreamingResponse(
-  vnode: VNode,
+  vnode: StreamingRenderable,
   options: StreamRenderOptions = {},
 ): Response {
   const { stream } = renderToStream(vnode, options);
@@ -180,8 +188,9 @@ async function* settleChunks(chunks: IncrementalStreamChunk[]): AsyncGenerator<s
   }
 }
 
+/** Create a streaming response that patches resolved chunks into a rendered shell. */
 export function createIncrementalStreamingResponse(
-  shell: VNode,
+  shell: StreamingRenderable,
   chunks: IncrementalStreamChunk[],
   options: StreamRenderOptions = {},
 ): Response {
@@ -192,7 +201,7 @@ export function createIncrementalStreamingResponse(
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
-      controller.enqueue(encodeHtmlChunk(renderToString(shell)));
+      controller.enqueue(encodeHtmlChunk(renderToString(shell as VNode)));
 
       void (async () => {
         try {

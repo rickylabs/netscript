@@ -36,3 +36,25 @@ Implementation resumes from the approved `design.md` and `plan.md` artifacts. PL
 - D-5d4-11 records why Slice 7 root exclusion removal was promoted ahead of source-slice commits.
 - D-5d4-12 records why `StreamErrorBoundary` changed from an exported class to an exported
   function component backed by an internal class.
+
+## 2026-06-13 — Slice 2 telemetry / policy / server polish
+
+### Scope
+
+- Added JSDoc to exported defer policy types, constants, and decision helpers.
+- Replaced public Preact return/prop types in `Deferred`, `DeferIsland`, and server streaming
+  helpers with package-owned structural renderable types.
+- Replaced exported telemetry `Attributes` references with a local Fresh telemetry attribute map.
+- Added `SSEClock`, `SSEKvKey`, and `SSEWatchableKv` public structural types for the SSE adapter.
+- Added optional external abort signal and injectable clock support to `createSSEStream`.
+- Removed all `console.*` calls from the touched defer/server streaming surface.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| F-7 doc lint | `deno doc --lint packages/fresh/defer/mod.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts` | PASS, checked 3 files |
+| Static check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/defer/mod.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/builders/define-page/runtime.tsx packages/fresh/server.ts` | PASS |
+| Static lint | `deno lint --config deno.json packages/fresh/defer/DeferPage.tsx packages/fresh/defer/Deferred.tsx packages/fresh/defer/DeferIsland.tsx packages/fresh/defer/policy.ts packages/fresh/defer/telemetry.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS, checked 8 files |
+| Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/defer/DeferPage.tsx packages/fresh/defer/Deferred.tsx packages/fresh/defer/DeferIsland.tsx packages/fresh/defer/policy.ts packages/fresh/defer/telemetry.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS, checked 8 files |
+| F-14 console scan | `rg "console\\." packages/fresh/defer packages/fresh/server packages/fresh/streams --glob '*.ts' --glob '*.tsx'` | PASS, no matches |

@@ -6,9 +6,12 @@
 
 import { Partial } from 'fresh/runtime';
 import { DeferComponent } from './DeferIsland.tsx';
-import type { Attributes } from '@netscript/telemetry/tracer';
 import { resolveDeferPolicy } from './policy.ts';
-import { emitDeferCacheReadSpan, emitDeferPrewarmDispatchSpan } from './telemetry.ts';
+import {
+  emitDeferCacheReadSpan,
+  emitDeferPrewarmDispatchSpan,
+  type FreshDeferTelemetryAttributes,
+} from './telemetry.ts';
 
 /** Renderable content accepted by deferred page slots. */
 export type DeferPageRenderable =
@@ -159,7 +162,6 @@ export function DeferPage({
   staleTime,
   policy,
   staleStrategy = 'none',
-  debug = false,
   ctx,
 }: DeferPageProps): object {
   const renderStart = performance.now();
@@ -177,7 +179,6 @@ export function DeferPage({
   // Server prewarm strategy:
   // - stale hit: start eager server revalidation
   // - cache miss: start eager server fetch so client island has less to wait on
-  const shouldServerPrewarm = resolvedPolicy.prewarmOnMiss || resolvedPolicy.prewarmOnStale;
   const shouldPrewarmStale = !isPartialRequest && hasCachedData && isStale &&
     resolvedPolicy.prewarmOnStale;
   const shouldPrewarmMiss = !isPartialRequest && !hasCachedData && resolvedPolicy.prewarmOnMiss;
@@ -215,7 +216,7 @@ export function DeferPage({
 
   if (!isPrewarmRequest) {
     queueMicrotask(() => {
-      const attributes: Attributes = {
+      const attributes: FreshDeferTelemetryAttributes = {
         'defer.region.name': name,
         'defer.action': action,
         'defer.partial': partial,
@@ -250,31 +251,6 @@ export function DeferPage({
           'defer.fallback.visible': fallbackVisible,
         },
       });
-    });
-  }
-
-  if (debug) {
-    console.log('🧊 DeferPage render state', {
-      name,
-      action,
-      partial,
-      isPartialRequest,
-      hasCachedData,
-      cachedAt,
-      staleTime,
-      hasFreshnessInfo,
-      isStale,
-      shouldServerPrewarm,
-      shouldPrewarmStale,
-      shouldPrewarmMiss,
-      policyProfile: resolvedPolicy.profile,
-      policyStaleTimeMs: resolvedPolicy.staleTimeMs,
-      policyClientRefreshOnFresh: resolvedPolicy.clientRefreshOnFreshCache,
-      policySkipClientWhenServerPrewarm: resolvedPolicy.skipClientWhenServerPrewarm,
-      isPrewarmRequest,
-      requestOrigin,
-      fallbackVisible,
-      fallbackVisibleMs: fallbackVisible ? renderDurationMs : 0,
     });
   }
 

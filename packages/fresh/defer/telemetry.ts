@@ -1,21 +1,35 @@
-import { type Attributes, getTracer, SpanKind, withSpan } from '@netscript/telemetry/tracer';
+import type { Attributes } from '@netscript/telemetry/tracer';
+import { getTracer, SpanKind, withSpan } from '@netscript/telemetry/tracer';
 
 const deferTracer = getTracer('@netscript/fresh/defer');
 
+/** Attribute map accepted by Fresh defer telemetry helpers. */
+export type FreshDeferTelemetryAttributes = Record<string, string | number | boolean | undefined>;
+
+/** Result returned by a defer prewarm request span. */
 export interface DeferPrewarmResult {
+  /** HTTP status returned by the partial request. */
   status: number;
+  /** True when the partial request completed with a successful status. */
   ok: boolean;
+  /** Total partial request duration in milliseconds. */
   durationMs: number;
 }
 
-interface DeferPrewarmSpanInput {
+/** Input used to describe a defer prewarm telemetry span. */
+export interface DeferPrewarmSpanInput {
+  /** Deferred region name being prewarmed. */
   regionName: string;
+  /** Reason the prewarm was scheduled. */
   reason: 'stale' | 'miss';
+  /** Full action URL associated with the page render. */
   actionUrl: string;
+  /** Partial URL requested by the prewarm. */
   partialUrl: string;
 }
 
-export async function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
+/** Emit a telemetry span around a background deferred partial prewarm request. */
+export function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>(
   input: DeferPrewarmSpanInput,
   run: () => Promise<T>,
 ): Promise<T> {
@@ -78,19 +92,24 @@ export async function emitDeferPrewarmDispatchSpan<T extends DeferPrewarmResult>
   );
 }
 
-interface DeferCacheReadSpanInput {
+/** Input used to emit cache-read telemetry for a deferred region. */
+export interface DeferCacheReadSpanInput {
+  /** Deferred region name being rendered. */
   regionName: string;
-  attributes: Attributes;
-  eventAttributes: Attributes;
+  /** Span attributes describing cache state. */
+  attributes: FreshDeferTelemetryAttributes;
+  /** Event attributes emitted when the cache read decision completes. */
+  eventAttributes: FreshDeferTelemetryAttributes;
 }
 
+/** Emit a telemetry span for a server-side defer cache read decision. */
 export function emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise<void> {
   return withSpan(
     deferTracer,
     'defer.cache.read',
     (span) => {
-      span.setAttributes(input.attributes);
-      span.addEvent('defer.cache.read.complete', input.eventAttributes);
+      span.setAttributes(input.attributes as Attributes);
+      span.addEvent('defer.cache.read.complete', input.eventAttributes as Attributes);
     },
     {
       kind: SpanKind.INTERNAL,
@@ -101,17 +120,20 @@ export function emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise<
   );
 }
 
-export function emitDeferClientDecisionSpan(attributes: Attributes): Promise<void> {
+/** Emit a telemetry span for a client-side defer submit/skip decision. */
+export function emitDeferClientDecisionSpan(
+  attributes: FreshDeferTelemetryAttributes,
+): Promise<void> {
   return withSpan(
     deferTracer,
     'defer.client.decision',
     (span) => {
-      span.setAttributes(attributes);
-      span.addEvent('defer.client.lifecycle', attributes);
+      span.setAttributes(attributes as Attributes);
+      span.addEvent('defer.client.lifecycle', attributes as Attributes);
     },
     {
       kind: SpanKind.INTERNAL,
-      attributes,
+      attributes: attributes as Attributes,
     },
   );
 }
