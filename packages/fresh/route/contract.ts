@@ -15,8 +15,13 @@ import {
   type TypedRouteSearchOf,
   type TypedRouteTarget,
 } from '../builders/define-page/navigation.tsx';
-import type { ComponentType } from 'preact';
+import type { ComponentChildren, ComponentType } from 'preact';
 import { searchParamsToInput } from '../builders/define-page/search-params.ts';
+
+/** Re-exported Preact component type used for typed route links. */
+export type { ComponentType };
+/** Re-exported Preact child type used in typed link props. */
+export type { ComponentChildren };
 import type {
   DefinePageRouteNav,
   EmptyRecord,
@@ -332,7 +337,7 @@ export interface RouteReference<
   parseSearch(input: URLSearchParams | SearchParamInput): TSearch;
   /** Safely parse raw search parameters into a typed result. */
   safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<TSearch>;
-  /** Preact component rendering a link bound to this route. */
+  /** @ignore Preact component rendering a link bound to this route. */
   readonly Link: ComponentType<BoundLinkProps<RouteReference<TPath, TSearch>>>;
   /** Pair this route with a partial route target. */
   withPartial<TPartial extends TypedRouteTarget<object, object>>(
