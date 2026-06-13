@@ -296,7 +296,33 @@ Recommended design decisions:
 
 ## 6. DRIFT / RISKS / GAPS
 
-- D-5d5-1: TODO
+- **D-5d5-1 — Root workspace exclusion prevents any fresh package from publishing (umbrella-level blocker)**
+
+  `deno.json` excludes `packages/fresh/` from the root workspace:
+
+  ```jsonc
+  "exclude": [
+    ".llm/tmp/",
+    "packages/fresh/"
+  ],
+  ```
+
+  The dry-run artifact (`dry-run-raw.txt`) reports **116** `excluded-module` errors across `packages/fresh/`. `packages/fresh/form/*` accounts for **23** of those (e.g., `schema-adapter.ts`, `field-descriptors.ts`, `types.ts`, `mod.ts` referenced through the public package graph). Even if every form-internal `deno doc --lint` issue is fixed and `packages/fresh/form/` passes standalone `deno publish --dry-run`, the root-level exclusion means the package still cannot be published as part of the workspace.
+
+  **Impact:**
+  - 5d5 can reduce doc-lint errors and decompose the three over-cap files, but it cannot close publishability for `@netscript/fresh/form`.
+  - Any new `schema-adapter/` subfolder will inherit the same exclusion, so decomposition alone does not unblock JSR readiness.
+  - Because the umbrella plan targets removing the workspace exclude as the final Wave-5 close condition (5d6/final close), D-5d5-1 cannot be resolved inside the 5d5 subtask.
+
+  **Resolution options:**
+  1. **Umbrella fix (preferred)**: remove `packages/fresh/` from `deno.json` `exclude` at the 5d6 close, after the broader fresh package graph has been repaired (see umbrella `plan.md`). This makes D-5d5-1 a tracked umbrella dependency rather than a 5d5 deliverable.
+  2. **Sub-package publish root**: configure `packages/fresh/` as a standalone workspace member with its own `deno.json`/`publish` block. This is architecturally cleaner but is a larger structural change than 5d5 should own.
+
+  **Mitigation in 5d5:** keep form changes self-contained (no new workspace entries, no lockfile changes) and ensure the internal `deno doc --lint` error count and file-size gates are met. Record the umbrella dependency in the handoff so 5d6 can lift the exclusion.
+
+  **Status:** OPEN — umbrella owner: 5d6 / final close.
+
+- D-5d5-2 through D-5d5-n: reserved for design/implementation phase; none identified during research.
 
 ---
 
