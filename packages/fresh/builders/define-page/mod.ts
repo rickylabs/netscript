@@ -7,4 +7,4 @@ export {
   usePagePath,
   usePageRoute,
   usePageSearch,
-} from './navigation.tsx';
+} from './navigation/mod.ts';

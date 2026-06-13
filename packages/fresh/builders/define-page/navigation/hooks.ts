@@ -21,7 +21,7 @@ import type {
   TypedRoutePathOf,
   TypedRouteSearchOf,
   TypedRouteTarget,
-} from '../navigation.tsx';
+} from './link.tsx';
 
 function assertRouteContext<TTarget extends TypedRouteTarget<object, object>>(
   target: TTarget,

@@ -4,7 +4,7 @@ import type { ComponentType, JSX } from 'preact';
 import { DeferPage } from '../../../defer/DeferPage.tsx';
 import { Deferred } from '../../../defer/Deferred.tsx';
 import { isCacheEntryStale } from '../../../utils/cache-entry.ts';
-import { wrapWithNavigationContext } from '../navigation.tsx';
+import { wrapWithNavigationContext } from '../navigation/mod.ts';
 import { type AnyRuntimePageConfig, withOptionalSpan } from './context.ts';
 export { prepareRequestState } from './handlers.ts';
 import { prepareRequestState } from './handlers.ts';

@@ -10,7 +10,7 @@ import type {
   InferRoutePath,
   InferRouteSearch,
   TypedRouteTarget,
-} from './navigation.tsx';
+} from './navigation/mod.ts';
 
 export type UnknownRecord = Record<string, unknown>;
 export type EmptyRecord = Record<string, never>;

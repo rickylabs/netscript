@@ -1,9 +1,9 @@
-import { type ComponentChildren, type ComponentType, type JSX } from 'preact';
+import { type ComponentChildren, type ComponentType, h, type JSX } from 'preact';
 import {
   DefinePageNavigationContext,
   type DefinePageNavigationContextValue,
   useRequiredNavigationContext,
-} from './navigation/context.ts';
+} from './context.ts';
 import {
   useCurrentPath,
   useCurrentRoute,
@@ -16,7 +16,7 @@ import {
   useDefinePageSlots,
   useDefinePageState,
   useRequiredDefinePageLayer,
-} from './navigation/hooks.ts';
+} from './hooks.ts';
 import {
   type BoundGetLinkPropsInput,
   type BoundLinkProps,
@@ -26,9 +26,9 @@ import {
   Link,
   type LinkProps,
   type TypedRouteTarget,
-} from './navigation/link.tsx';
-export { useCurrentPath, useCurrentRoute, useCurrentSearch } from './navigation/hooks.ts';
-export { createRouteNav, getBoundLinkProps, getLinkProps, Link } from './navigation/link.tsx';
+} from './link.tsx';
+export { useCurrentPath, useCurrentRoute, useCurrentSearch } from './hooks.ts';
+export { createRouteNav, getBoundLinkProps, getLinkProps, Link } from './link.tsx';
 export type {
   BoundGetLinkPropsInput,
   BoundLinkProps,
@@ -44,7 +44,7 @@ export type {
   TypedRoutePathOf,
   TypedRouteSearchOf,
   TypedRouteTarget,
-} from './navigation/link.tsx';
+} from './link.tsx';
 import type {
   AnyDefinePageTypeState,
   DefinePageLayoutContextBase,
@@ -65,7 +65,7 @@ import type {
   SearchParamSchema,
   UnknownRecord,
   ValidatedRouteHref,
-} from './types.ts';
+} from '../types.ts';
 
 interface CurrentDefinePageRoute<TValue extends DefinePageTypeCarrier>
   extends TypedRouteTarget<InferDefinePagePath<TValue>, InferDefinePageSearch<TValue>> {
@@ -106,20 +106,16 @@ export function wrapWithNavigationContext<TSearch extends object>(
   runtimeContext: DefinePageLayoutContextBase<AnyDefinePageTypeState, boolean>,
   slots: Record<string, DefinePageSlot<UnknownRecord>>,
 ): JSX.Element {
-  return (
-    <DefinePageNavigationContext.Provider
-      value={{
-        routePattern,
-        pathSchema,
-        searchSchema,
-        runtimeContext,
-        slots,
-        nav: createRouteNav({ routePattern, pathSchema, searchSchema }),
-      }}
-    >
-      {body}
-    </DefinePageNavigationContext.Provider>
-  );
+  return h(DefinePageNavigationContext.Provider, {
+    value: {
+      routePattern,
+      pathSchema,
+      searchSchema,
+      runtimeContext,
+      slots,
+      nav: createRouteNav({ routePattern, pathSchema, searchSchema }),
+    },
+  }, body);
 }
 
 export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDefinePageRoute<

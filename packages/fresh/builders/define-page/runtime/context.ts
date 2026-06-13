@@ -1,5 +1,5 @@
 import { getTracer, withSpan } from '@netscript/telemetry/tracer';
-import { createRouteNav } from '../navigation.tsx';
+import { createRouteNav } from '../navigation/mod.ts';
 import type {
   AnyDefinePageTypeState,
   DefinePageLayerDataOf,
