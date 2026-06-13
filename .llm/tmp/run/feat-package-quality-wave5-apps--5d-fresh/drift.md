@@ -23,3 +23,14 @@ Append-only.
   comment fallback before launching the next dependent subwave.
 - **Status:** open environment/process drift for Wave 5d.
 
+## D-5d-3 — supervisor branch push blocked after local merge
+
+- **What:** The local supervisor branch merged 5d1 and 5d4 successfully, but `git push origin
+  feat/package-quality-wave5-apps-5d-fresh` failed from WSL.
+- **Evidence:** Push failed with `fatal: could not read Username for 'https://github.com': No such
+  device or address` after merge commit `3ae35dc`.
+- **Impact:** Remote PR/branch does not yet contain the supervisor merge. Local native WSL worktrees
+  can still merge the local supervisor branch before subwave implementation starts.
+- **Action:** Supervisor owns publication fallback; subagents must not assume normal push credentials
+  exist in their shell.
+

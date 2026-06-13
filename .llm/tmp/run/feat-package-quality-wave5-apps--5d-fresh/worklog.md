@@ -41,3 +41,13 @@
 - Publication lesson: subagents must attempt push once, then use GitHub connector or supervisor
   handoff when this WSL shell lacks HTTPS Git credentials. Do not loop on unauthenticated pushes.
 
+## 2026-06-13 supervisor push blocker after 5d1/5d4 merge
+
+- Completed local supervisor merge commit `3ae35dc`, containing local 5d1 PASS-with-escalation and
+  5d4 PASS inputs.
+- Attempted `git push origin feat/package-quality-wave5-apps-5d-fresh` once.
+- Push failed with `fatal: could not read Username for 'https://github.com': No such device or address`.
+- Until supervisor publication is handled by credentials or connector, remaining native WSL subwave
+  worktrees must merge from the local `feat/package-quality-wave5-apps-5d-fresh` branch before
+  starting implementation.
+
