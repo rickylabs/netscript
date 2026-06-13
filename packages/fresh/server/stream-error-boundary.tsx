@@ -52,10 +52,10 @@ interface StreamErrorBoundaryState {
  * ```
  */
 export function StreamErrorBoundary(props: StreamErrorBoundaryProps): object {
-  return <StreamErrorBoundaryImpl {...props} />;
+  return <StreamErrorBoundaryComponent {...props} />;
 }
 
-class StreamErrorBoundaryImpl extends Component<
+class StreamErrorBoundaryComponent extends Component<
   StreamErrorBoundaryProps,
   StreamErrorBoundaryState
 > {

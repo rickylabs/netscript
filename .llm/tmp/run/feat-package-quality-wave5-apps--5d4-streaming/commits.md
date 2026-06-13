@@ -7,3 +7,4 @@ Append-only hash record (repo + hash + subject).
 - 27f1267: test fresh renderer abort cancellation
 - dcbb4a8: test fresh sse abort cleanup
 - 10b0121: wrap fresh streams public surface
+- d669b82: document fresh permissions and slow types

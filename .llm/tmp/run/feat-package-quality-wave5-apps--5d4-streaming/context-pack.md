@@ -6,7 +6,7 @@
 | -------------- | ------------------------------------------------------ |
 | Run ID         | feat-package-quality-wave5-apps--5d4-streaming         |
 | Branch         | `feat/package-quality-wave5-apps-5d4-streaming`        |
-| Current phase  | Implementation in progress                             |
+| Current phase  | Implementation complete; ready for separate IMPL-EVAL   |
 | Archetype      | 3 — Runtime / Behavior                                 |
 | Scope overlays | `SCOPE-frontend`                                       |
 
@@ -23,6 +23,7 @@
 - Slice 4 SSE / KV watch abort tests are implemented and validated.
 - Slices 5 and 6 streams lifecycle + upstream-type wrap are implemented and validated.
 - Slices 8 and 9 README permissions + slow-type return annotations are implemented and validated.
+- Slices 10 and 11 consumer gate + closeout sweep are implemented and validated.
 - No lockfile changes.
 
 ## Completed
@@ -46,6 +47,9 @@
   `streams/create-stream-db_test.ts` coverage for URL/schema/lifecycle handle handoff.
 - `deno publish --dry-run --allow-dirty` from `packages/fresh` now passes with 0 slow-type or
   excluded-module problems.
+- Consumer checks pass for `packages/fresh-ui` and `plugins/streams`.
+- Combined closeout gates pass for doc-lint, runtime tests, JSR dry-run, console scan, file-size,
+  folder, naming, sub-barrel, lint, and fmt evidence.
 
 ## Validation Evidence
 
@@ -79,13 +83,21 @@
 | Slow-type check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx` | PASS |
 | Slow-type lint | `deno lint --config deno.json packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
 | Slow-type fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx packages/fresh/deno.json` | PASS |
+| Consumer check | `deno check --config packages/fresh-ui/deno.json --unstable-kv packages/fresh-ui/mod.ts` | PASS |
+| Consumer check | `deno check --config plugins/streams/deno.json --unstable-kv plugins/streams/mod.ts` | PASS |
+| Package check | `deno task check` from `packages/fresh` | PASS |
+| Combined doc lint | `deno doc --lint packages/fresh/defer/mod.ts packages/fresh/streams/mod.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS |
+| Runtime tests | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/server/stream_test.ts packages/fresh/server/sse_test.ts packages/fresh/streams/create-stream-db_test.ts` | PASS, 5 tests |
+| Closeout JSR | `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS |
+| Structural sweep | console, file-size, forbidden-folder, sub-barrel, naming scans | PASS |
+| Touched-source lint/fmt | `deno lint --config deno.json <17 files>` and `deno fmt --no-config --single-quote --line-width 100 --check <18 files>` | PASS |
 
 ## Next Steps
 
-1. Commit Slices 8/9.
-2. Continue with Slice 10 consumer type-check and Slice 11 closeout sweep.
-3. Re-run focused static gates after each source slice.
-4. Publish/push via GitHub connector if local HTTPS credentials remain unavailable.
+1. Commit closeout artifact update and boundary naming fix.
+2. Publish/push the completed branch via GitHub connector because local HTTPS git credentials are
+   unavailable.
+3. Comment on PR #37 that the 5d4 implementation is ready for separate IMPL-EVAL.
 
 ## Files Changed
 
@@ -127,4 +139,5 @@
 - 27f1267: test fresh renderer abort cancellation
 - dcbb4a8: test fresh sse abort cleanup
 - 10b0121: wrap fresh streams public surface
-- Pending: permissions / slow-type commit.
+- d669b82: document fresh permissions and slow types
+- Pending: closeout artifact update / boundary naming fix.

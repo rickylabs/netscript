@@ -139,3 +139,32 @@ Implementation resumes from the approved `design.md` and `plan.md` artifacts. PL
 
 Note: `deno fmt` over `README.md` would rewrap historical examples and prose unrelated to this
 slice. Package-quality formatting evidence is source TypeScript plus the touched JSON manifest.
+
+## 2026-06-13 — Slices 10 and 11 consumer gate + closeout sweep
+
+### Scope
+
+- Ran consumer type-checks for `packages/fresh-ui` and `plugins/streams`.
+- Ran package-local Fresh check task after root exclusion removal.
+- Ran combined touched-surface doc-lint, runtime tests, JSR dry-run, console scan, file-size sweep,
+  forbidden-folder scan, sub-barrel scan, and naming scan.
+- Renamed internal `StreamErrorBoundaryImpl` to `StreamErrorBoundaryComponent` after the naming scan
+  caught the `*Impl` suffix.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| Consumer check | `deno check --config packages/fresh-ui/deno.json --unstable-kv packages/fresh-ui/mod.ts` | PASS |
+| Consumer check | `deno check --config plugins/streams/deno.json --unstable-kv plugins/streams/mod.ts` | PASS |
+| Package check | `deno task check` from `packages/fresh` | PASS |
+| Combined doc lint | `deno doc --lint packages/fresh/defer/mod.ts packages/fresh/streams/mod.ts packages/fresh/server/stream.ts packages/fresh/server/sse.ts packages/fresh/server/stream-error-boundary.tsx` | PASS, checked 5 files |
+| Runtime tests | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/server/stream_test.ts packages/fresh/server/sse_test.ts packages/fresh/streams/create-stream-db_test.ts` | PASS, 5 tests |
+| JSR dry-run | `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS |
+| Console scan | `rg "console\\." packages/fresh/defer packages/fresh/server packages/fresh/streams --glob '*.ts' --glob '*.tsx'` | PASS, no matches |
+| File-size sweep | `find packages/fresh/defer packages/fresh/server packages/fresh/streams -type f ... | xargs wc -l` | PASS; largest touched source `server/sse.ts` is 464 LOC |
+| Forbidden-folder scan | `find packages/fresh/defer packages/fresh/server packages/fresh/streams -type d \\( -name utils -o -name helpers -o -name common -o -name lib -o -name interfaces \\) -print` | PASS, no matches |
+| Sub-barrel scan | `find packages/fresh/defer packages/fresh/server packages/fresh/streams -mindepth 2 -type f \\( -name mod.ts -o -name index.ts \\) -print` | PASS, no matches |
+| Naming scan | `rg "interface I[A-Z]\|type \\w+_T\|class .*Impl\\b\|class Abstract" packages/fresh/defer packages/fresh/server packages/fresh/streams --glob '*.ts' --glob '*.tsx'` | PASS after internal class rename |
+| Touched-source lint | `deno lint --config deno.json <17 touched source/test files>` | PASS |
+| Touched-source fmt | `deno fmt --no-config --single-quote --line-width 100 --check <18 touched source/test/json files>` | PASS |
