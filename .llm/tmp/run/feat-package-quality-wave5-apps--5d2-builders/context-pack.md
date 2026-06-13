@@ -6,13 +6,13 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 21 complete, Slice 22 next      |
+| Current phase  | `implement` — Slice 22 complete, Slice 23 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 21 are complete. The branch is clean at the latest pushed head after each committed
+Slices 1 through 22 are complete. The branch is clean at the latest pushed head after each committed
 slice when publication succeeds.
 
 ## Completed
@@ -114,15 +114,20 @@ slice when publication succeeds.
     behavior.
   - Navigation test gate passes with `--allow-env`.
   - `define-page.test.tsx` trimmed to 252 LOC.
+- Slice 22 implemented:
+  - `packages/fresh/builders/define-page/search-params.test.tsx` created for remaining
+    search/defer/streaming blocks.
+  - Deleted `packages/fresh/builders/define-page.test.tsx`.
+  - Split test gates pass; D-5d2-13 records the mixed search/defer remainder.
 
 ## In Progress
 
-- Slice 22: split search-params/defer tests and retire old monolithic test.
+- Slice 23: add playground fixture routes.
 
 ## Next Steps
 
-1. Continue Slice 22: split search-params/defer tests and retire the old monolithic test if empty.
-2. Continue Slice 23: add playground fixture routes.
+1. Continue Slice 23: add playground fixture routes.
+2. Continue Slice 24: run the full builders test suite.
 
 ## Key Decisions
 

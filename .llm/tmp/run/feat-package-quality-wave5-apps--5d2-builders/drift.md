@@ -290,3 +290,23 @@ tests. The `withForm` behavior tests remain in `define-page.test.tsx` for the ne
 
 **Closing gate:** `builder.test.tsx` passes under the size cap, and the later runtime/form test
 split moves the remaining `withForm` blocks out of the monolithic test file.
+
+---
+
+## D-5d2-13: Search-params split also carries defer/streaming leftovers
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 22  
+**Status:** accepted implementation drift
+
+**Description:**
+After the builder, runtime/form, and navigation splits, the only remaining monolithic test blocks
+were two search-parameter tests plus defer-layer, telemetry, and streaming tests. Creating another
+test file only for five leftover runtime blocks would add an unplanned file and leave
+`define-page.test.tsx` alive for a tiny remainder.
+
+**Disposition:** Slice 22 moved all remaining blocks into `search-params.test.tsx`, which remains
+under the planned 12K cap. The file name is slightly broader than ideal, but the monolithic test
+file is retired and all split test gates pass.
+
+**Closing gate:** Full builders test suite passes in Slice 24.

@@ -19,10 +19,10 @@ import {
   usePagePath,
   usePageRoute,
   usePageSearch,
-} from './define-page/mod.ts';
-import { CSRF_COOKIE_NAME } from '../form/mod.ts';
-import type { RuntimeFormState } from '../form/types.ts';
-import type { FormSubmissionResult } from '../form/types.ts';
+} from './mod.ts';
+import { CSRF_COOKIE_NAME } from '../../form/mod.ts';
+import type { RuntimeFormState } from '../../form/types.ts';
+import type { FormSubmissionResult } from '../../form/types.ts';
 import {
   bindRoutePattern,
   defineRouteContract,
@@ -32,7 +32,7 @@ import {
   useCurrentPath,
   useCurrentRoute,
   useCurrentSearch,
-} from '../route/contract.ts';
+} from '../../route/contract.ts';
 import { render as renderToString } from 'preact-render-to-string';
 import { z } from 'zod';
 

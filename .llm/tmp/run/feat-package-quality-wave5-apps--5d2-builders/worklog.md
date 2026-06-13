@@ -476,6 +476,28 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -l -c packages/fresh/builders/define-page/navigation.test.tsx packages/fresh/builders/define-page.test.tsx` | PASS: `navigation.test.tsx` 350 LOC / 12437 bytes; `define-page.test.tsx` 252 LOC / 8889 bytes |
 
+## 2026-06-14 slice 22 — search/defer test split and monolith removal
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/search-params.test.tsx`
+- deleted `packages/fresh/builders/define-page.test.tsx`
+
+**Implementation:**
+
+- Moved remaining search-parameter, defer-layer, telemetry, and streaming tests into
+  `search-params.test.tsx`.
+- Deleted the old monolithic `define-page.test.tsx`.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/search-params.test.tsx packages/fresh/builders/define-page/builder.test.tsx packages/fresh/builders/define-page/runtime.test.tsx packages/fresh/builders/define-page/navigation.test.tsx` | PASS |
+| `deno test --allow-env packages/fresh/builders/define-page/search-params.test.tsx` | PASS: 7 tests |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -l -c packages/fresh/builders/define-page/search-params.test.tsx packages/fresh/builders/define-page/builder.test.tsx packages/fresh/builders/define-page/runtime.test.tsx packages/fresh/builders/define-page/navigation.test.tsx` | PASS: `search-params.test.tsx` 252 LOC / 8889 bytes; `builder.test.tsx` 509 LOC / 17148 bytes; `runtime.test.tsx` 400 LOC / 12659 bytes; `navigation.test.tsx` 350 LOC / 12437 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13
