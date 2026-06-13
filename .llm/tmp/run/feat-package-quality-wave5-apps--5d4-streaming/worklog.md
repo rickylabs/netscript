@@ -118,3 +118,24 @@ Implementation resumes from the approved `design.md` and `plan.md` artifacts. PL
 | F-13 lifecycle test | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/streams/create-stream-db_test.ts` | PASS, 1 test |
 | Static lint | `deno lint --no-config packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS, checked 3 files |
 | Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS, checked 3 files |
+
+## 2026-06-13 — Slices 8 and 9 permissions + slow-type return annotations
+
+### Scope
+
+- Added README required-permissions documentation for deferred prewarm, stream endpoint, environment,
+  and KV watch usage.
+- Added `--unstable-kv` to the package-local `check` task.
+- Added explicit return types to the four approved JSR slow-type sites in `form/` and `query/`.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| F-6 JSR dry-run | `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS, dry run complete |
+| Static check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx` | PASS |
+| Static lint | `deno lint --config deno.json packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS, checked 7 files |
+| Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx packages/fresh/deno.json` | PASS, checked 5 files |
+
+Note: `deno fmt` over `README.md` would rewrap historical examples and prose unrelated to this
+slice. Package-quality formatting evidence is source TypeScript plus the touched JSON manifest.

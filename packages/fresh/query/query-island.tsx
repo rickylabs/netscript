@@ -37,7 +37,7 @@ export interface QueryIslandProps {
  * }
  * ```
  */
-export function QueryIsland({ children, queryClient }: QueryIslandProps) {
+export function QueryIsland({ children, queryClient }: QueryIslandProps): object {
   const client = queryClient ?? getIslandQueryClient();
   return (
     <QueryClientProvider client={client}>

@@ -22,6 +22,7 @@
 - Slice 3 renderer abort tests are implemented and validated.
 - Slice 4 SSE / KV watch abort tests are implemented and validated.
 - Slices 5 and 6 streams lifecycle + upstream-type wrap are implemented and validated.
+- Slices 8 and 9 README permissions + slow-type return annotations are implemented and validated.
 - No lockfile changes.
 
 ## Completed
@@ -43,6 +44,8 @@
   signal abort on response cancellation.
 - Replaced raw streams upstream re-exports with NetScript-owned wrappers and added
   `streams/create-stream-db_test.ts` coverage for URL/schema/lifecycle handle handoff.
+- `deno publish --dry-run --allow-dirty` from `packages/fresh` now passes with 0 slow-type or
+  excluded-module problems.
 
 ## Validation Evidence
 
@@ -72,11 +75,15 @@
 | Streams test | `deno test --config packages/fresh/deno.json --allow-all packages/fresh/streams/create-stream-db_test.ts` | PASS, 1 test |
 | Streams lint | `deno lint --no-config packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
 | Streams fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
+| JSR dry-run | `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS |
+| Slow-type check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx` | PASS |
+| Slow-type lint | `deno lint --config deno.json packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx packages/fresh/streams/mod.ts packages/fresh/streams/create-stream-db.ts packages/fresh/streams/create-stream-db_test.ts` | PASS |
+| Slow-type fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/form/enhancement.tsx packages/fresh/form/form-region.tsx packages/fresh/form/form.tsx packages/fresh/query/query-island.tsx packages/fresh/deno.json` | PASS |
 
 ## Next Steps
 
-1. Commit the streams batch.
-2. Continue with Slice 8: README / permission updates, then Slice 9 slow-type return annotations.
+1. Commit Slices 8/9.
+2. Continue with Slice 10 consumer type-check and Slice 11 closeout sweep.
 3. Re-run focused static gates after each source slice.
 4. Publish/push via GitHub connector if local HTTPS credentials remain unavailable.
 
@@ -98,6 +105,12 @@
 | `packages/fresh/streams/mod.ts` | update | NetScript-owned live-query wrappers; no raw upstream re-exports. |
 | `packages/fresh/streams/create-stream-db.ts` | update | NetScript-owned DB/schema/factory types and injectable factory port. |
 | `packages/fresh/streams/create-stream-db_test.ts` | new | Stream DB URL/schema/lifecycle handle test. |
+| `packages/fresh/README.md` | update | Required permissions and streaming semantics. |
+| `packages/fresh/deno.json` | update | Package check task includes `--unstable-kv`. |
+| `packages/fresh/form/enhancement.tsx` | update | Explicit return type for JSR slow-type gate. |
+| `packages/fresh/form/form-region.tsx` | update | Explicit return type for JSR slow-type gate. |
+| `packages/fresh/form/form.tsx` | update | Explicit return type for JSR slow-type gate. |
+| `packages/fresh/query/query-island.tsx` | update | Explicit return type for JSR slow-type gate. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/drift.md` | update | Added D-5d4-11 and D-5d4-12. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/worklog.md` | update | Added implementation and validation evidence. |
 | `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/context-pack.md` | update | Refreshed resumable state. |
@@ -113,4 +126,5 @@
 - 7d3c8e3: polish fresh streaming telemetry and sse surface
 - 27f1267: test fresh renderer abort cancellation
 - dcbb4a8: test fresh sse abort cleanup
-- Pending: streams lifecycle / upstream-type wrap commit.
+- 10b0121: wrap fresh streams public surface
+- Pending: permissions / slow-type commit.

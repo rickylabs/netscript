@@ -7,7 +7,7 @@ export interface FormRegionProps {
   readonly children: ComponentChildren;
 }
 
-export function FormRegion({ name, mode = 'replace', children }: FormRegionProps) {
+export function FormRegion({ name, mode = 'replace', children }: FormRegionProps): object {
   return (
     <Partial name={name} mode={mode}>
       {children}
