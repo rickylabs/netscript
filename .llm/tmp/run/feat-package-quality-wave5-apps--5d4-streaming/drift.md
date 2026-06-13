@@ -64,7 +64,7 @@ Proposed fix direction (design phase):
 - **Actual:** 58 publishability errors prevent a clean `deno publish --dry-run` for `@netscript/fresh`.
 - **Severity:** blocking.
 - **Resolution:** Locked decision `L-5d4-8` — remove `packages/fresh/` from root `deno.json` `exclude`; rely on `packages/fresh/deno.json` `publish.include/exclude` for publish filtering.
-- **Action:** Slice 1 removes the root exclusion and verifies root tasks still skip fresh; dry-run must report 0 `excluded-module` errors.
+- **Action:** Slice 7 removes the root exclusion and verifies root tasks still resolve fresh; dry-run must report 0 `excluded-module` errors.
 - **Evidence:** design.md §JSR-audit findings; plan.md §Commit Slices (Slice 1) and §JSR-Audit / Over-Cap Budget Reconciliation.
 
 ## D-5d4-9: JSR slow-type findings in `form/` and `query/` surface files
