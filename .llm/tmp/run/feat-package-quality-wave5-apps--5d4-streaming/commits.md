@@ -8,3 +8,4 @@ Append-only hash record (repo + hash + subject).
 - dcbb4a8: test fresh sse abort cleanup
 - 10b0121: wrap fresh streams public surface
 - d669b82: document fresh permissions and slow types
+- f490b60: close out fresh streaming gates
