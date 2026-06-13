@@ -14,3 +14,4 @@ Append-only hash record (repo + hash + subject).
 - 4ba10a4: refactor(fresh): move define page runtime entry
 - 80d9070: refactor(fresh): extract define page navigation context
 - edab690: refactor(fresh): extract define page navigation hooks
+- 0ee035c: refactor(fresh): extract define page navigation link
