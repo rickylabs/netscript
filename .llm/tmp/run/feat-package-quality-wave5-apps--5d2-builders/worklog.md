@@ -311,6 +311,32 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/navigation/context.ts packages/fresh/builders/define-page/navigation.tsx` | PASS: `context.ts` 1816 bytes; `navigation.tsx` 19483 bytes |
 
+**Commit:** `80d9070 refactor(fresh): extract define page navigation context`
+
+## 2026-06-14 slice 12 — navigation hooks module
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/navigation/hooks.ts`
+- `packages/fresh/builders/define-page/navigation.tsx`
+
+**Implementation:**
+
+- Moved current-route hooks and define-page context/resource/layer/slot hooks into
+  `navigation/hooks.ts`.
+- Re-exported the public current-route hooks through `navigation.tsx` to keep the existing public
+  surface stable.
+- Left `usePageRoute()` in `navigation.tsx` until the link module split because it constructs the
+  bound `Link` component.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/navigation/hooks.ts packages/fresh/builders/define-page/navigation.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/navigation/hooks.ts packages/fresh/builders/define-page/navigation.tsx` | PASS: `hooks.ts` 4816 bytes; `navigation.tsx` 16226 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

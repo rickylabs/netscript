@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1 through 10 are committed locally. Slice 11 is implemented and ready to commit with the
+Slices 1 through 11 are committed locally. Slice 12 is implemented and ready to commit with the
 current harness artifact updates.
 
 ## Completed
@@ -80,15 +80,20 @@ current harness artifact updates.
   - `packages/fresh/builders/define-page/navigation/context.ts` created.
   - `navigation.tsx` imports context helpers.
   - Slice 11 gates passed.
+- Slice 11 committed locally as `80d9070 refactor(fresh): extract define page navigation context`.
+- Slice 12 implemented:
+  - `packages/fresh/builders/define-page/navigation/hooks.ts` created.
+  - `navigation.tsx` re-exports public current-route hooks from hooks module.
+  - Slice 12 gates passed.
 
 ## In Progress
 
-- Slice 11 commit.
+- Slice 12 commit.
 
 ## Next Steps
 
-1. Commit Slice 11 and append `commits.md` immediately.
-2. Continue Slice 12: create navigation hooks module.
+1. Commit Slice 12 and append `commits.md` immediately.
+2. Continue Slice 13: create navigation link module.
 
 ## Key Decisions
 
@@ -123,6 +128,7 @@ current harness artifact updates.
 | `packages/fresh/builders/define-page/runtime/handlers.ts` | new, pending commit | request-state preparation and resource dispatch |
 | `packages/fresh/builders/define-page/runtime/mod.tsx` | moved, pending commit | runtime role entry |
 | `packages/fresh/builders/define-page/navigation/context.ts` | new, pending commit | navigation context value/read helpers |
+| `packages/fresh/builders/define-page/navigation/hooks.ts` | new, pending commit | current-route and define-page hooks |
 
 ## Gates
 
@@ -142,6 +148,7 @@ current harness artifact updates.
 | Slice 9 runtime handlers | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/handlers.ts packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `handlers.ts` 1970 bytes |
 | Slice 10 runtime entry | partial | type-check and surface snapshot pass; direct role-entry doc-lint recorded as D-5d2-10 |
 | Slice 11 navigation context | passed | `deno check --unstable-kv packages/fresh/builders/define-page/navigation/context.ts packages/fresh/builders/define-page/navigation.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `context.ts` 1816 bytes |
+| Slice 12 navigation hooks | passed | `deno check --unstable-kv packages/fresh/builders/define-page/navigation/hooks.ts packages/fresh/builders/define-page/navigation.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `hooks.ts` 4816 bytes |
 
 ## Open Questions
 

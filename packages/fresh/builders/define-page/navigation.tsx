@@ -5,6 +5,20 @@ import {
   readNavigationContext,
   useRequiredNavigationContext,
 } from './navigation/context.ts';
+import {
+  useCurrentPath,
+  useCurrentRoute,
+  useCurrentSearch,
+  useDefinePageContext,
+  useDefinePageLayer,
+  useDefinePageLayers,
+  useDefinePageResource,
+  useDefinePageResources,
+  useDefinePageSlots,
+  useDefinePageState,
+  useRequiredDefinePageLayer,
+} from './navigation/hooks.ts';
+export { useCurrentPath, useCurrentRoute, useCurrentSearch } from './navigation/hooks.ts';
 import type {
   AnyDefinePageTypeState,
   DefinePageLayoutContextBase,
@@ -292,117 +306,6 @@ export function wrapWithNavigationContext<TSearch extends object>(
       {body}
     </DefinePageNavigationContext.Provider>
   );
-}
-
-function assertRouteContext<TTarget extends TypedRouteTarget<object, object>>(
-  target: TTarget,
-  navigationContext: DefinePageNavigationContextValue,
-): void {
-  if (navigationContext.routePattern !== target.routePattern) {
-    throw new Error(
-      `Current route context mismatch. Expected "${target.routePattern}" but received "${navigationContext.routePattern}".`,
-    );
-  }
-}
-
-export function useCurrentRoute<TTarget extends TypedRouteTarget<object, object>>(
-  target: TTarget,
-): CurrentRouteState<TTarget> {
-  const navigationContext = useRequiredNavigationContext();
-  assertRouteContext(target, navigationContext);
-
-  return {
-    path: navigationContext.runtimeContext.path as TypedRoutePathOf<TTarget>,
-    search: navigationContext.runtimeContext.search as TypedRouteSearchOf<TTarget>,
-  };
-}
-
-function useDefinePageContext<TValue extends DefinePageTypeCarrier>(): InferDefinePageContext<
-  TValue
-> {
-  const navigationContext = useRequiredNavigationContext();
-  type TTypes = InferDefinePageTypes<TValue>;
-  type THasRoute = InferDefinePageHasRoute<TValue>;
-
-  return {
-    ...(navigationContext.runtimeContext as DefinePageLayoutContextBase<TTypes, THasRoute>),
-    routePattern: navigationContext.routePattern,
-    pathSchema: navigationContext.pathSchema as
-      | PathParamSchema<InferDefinePagePath<TValue>>
-      | undefined,
-    searchSchema: navigationContext.searchSchema as
-      | SearchParamSchema<
-        InferDefinePageSearch<TValue>
-      >
-      | undefined,
-    nav: navigationContext.nav as DefinePageRouteNavFor<TTypes>,
-    slots: navigationContext.slots as DefinePageSlotsFor<TTypes>,
-  } as InferDefinePageContext<TValue>;
-}
-
-function useDefinePageState<TValue extends DefinePageTypeCarrier>(): DefinePageStateOf<
-  InferDefinePageTypes<TValue>
-> {
-  return useDefinePageContext<TValue>().state;
-}
-
-function useDefinePageResources<TValue extends DefinePageTypeCarrier>(): InferDefinePageResources<
-  TValue
-> {
-  return useDefinePageContext<TValue>().resources;
-}
-
-function useDefinePageResource<
-  TValue extends DefinePageTypeCarrier,
-  TKey extends keyof InferDefinePageResources<TValue> & string,
->(key: TKey): InferDefinePageResources<TValue>[TKey] {
-  return useDefinePageContext<TValue>().resource(key);
-}
-
-function useDefinePageLayers<TValue extends DefinePageTypeCarrier>(): Partial<
-  InferDefinePageLayerData<TValue>
-> {
-  return useDefinePageContext<TValue>().layerData;
-}
-
-function useDefinePageLayer<
-  TValue extends DefinePageTypeCarrier,
-  TLayer extends keyof InferDefinePageLayerData<TValue> & string,
->(id: TLayer): InferDefinePageLayerData<TValue>[TLayer] | undefined {
-  return useDefinePageLayers<TValue>()[id];
-}
-
-function useRequiredDefinePageLayer<
-  TValue extends DefinePageTypeCarrier,
-  TLayer extends keyof InferDefinePageLayerData<TValue> & string,
->(id: TLayer): InferDefinePageLayerData<TValue>[TLayer] {
-  const layer = useDefinePageLayer<TValue, TLayer>(id);
-
-  if (layer === undefined) {
-    throw new Error(
-      `definePage() could not resolve layer data for "${id}" in the current render tree.`,
-    );
-  }
-
-  return layer;
-}
-
-function useDefinePageSlots<TValue extends DefinePageTypeCarrier>(): DefinePageSlotsFor<
-  InferDefinePageTypes<TValue>
-> {
-  return useDefinePageContext<TValue>().slots;
-}
-
-export function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
-  target: TTarget,
-): TypedRoutePathOf<TTarget> {
-  return useCurrentRoute(target).path;
-}
-
-export function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
-  target: TTarget,
-): TypedRouteSearchOf<TTarget> {
-  return useCurrentRoute(target).search;
 }
 
 export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDefinePageRoute<
