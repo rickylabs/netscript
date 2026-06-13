@@ -16,3 +16,4 @@ Append-only hash record (repo + hash + subject).
 - edab690: refactor(fresh): extract define page navigation hooks
 - 0ee035c: refactor(fresh): extract define page navigation link
 - 30e0a6f: refactor(fresh): move define page navigation entry
+- 762a337: refactor(fresh): thin builders barrel
