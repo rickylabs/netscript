@@ -105,3 +105,13 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 - D-5d1-003: root workspace exclusion.
 - D-5d1-009: inherited doc-lint errors from `defer/`/`form/`/`builders/`/`route/`.
 - New drift expected for root defer drop if approved.
+
+## IMPL-EVAL handoff — 2026-06-13
+
+- Evaluator verdict: **FAIL_FIX** in `evaluate.md`.
+- Focused local package gates pass: `fmt:check`, `check`, `test`, `lint`, and focused 5d1 `deno doc --lint`.
+- Blocking gates still fail:
+  - `deno task doc-lint` exits 1 with 242 documentation lint errors.
+  - `deno task dry-run` exits 1 with 4 slow-type errors in later form/query surfaces.
+- Publication blocker still prevents PASS: branch is clean but 3 commits ahead of origin (`ed5fedc`, `877e1c5`, `98a96ca`); local GitHub HTTPS credentials are missing and `gh` is unavailable.
+- Process/artifact issues recorded by evaluator: `worklog.md` lacks the protocol-required `## Design` section, implementation did not follow the 24 planned commit slices, and `commits.md` needed evaluator correction for unpublished artifact commits.

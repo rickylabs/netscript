@@ -34,3 +34,18 @@ Append-only. One entry per slice / decision.
 - `gh` is not installed in this environment.
 - GitHub MCP `_update_ref` could not move the remote branch to local commit `877e1c50c21f106018ef63e06654f7e2004b0827` because GitHub does not have the local commit object (`422 Object does not exist`).
 - Branch remains clean and ahead of origin locally. PR handoff comment will report this explicitly.
+
+## 2026-06-13T23:04:13+02:00 — IMPL-EVAL-5D1 verdict
+
+- Separate evaluator session ran from native WSL ext4 worktree and did not edit source files.
+- Verdict written to `evaluate.md`: **FAIL_FIX**.
+- Independent validation reproduced focused PASS gates:
+  - PASS: `deno task fmt:check` in `packages/fresh` (`Checked 21 files`).
+  - PASS: `deno task check` in `packages/fresh` (`--unstable-kv` included).
+  - PASS: `deno task test` in `packages/fresh` (`121 passed | 0 failed`).
+  - PASS: `deno task lint` in `packages/fresh` (`Checked 20 files`).
+  - PASS with optional dependency warnings: focused `deno doc --lint ./mod.ts ./interactive.ts ./error/mod.ts ./utils/mod.ts ./config/vite.ts ./testing.ts`.
+- Independent validation reproduced blocking FAIL gates:
+  - FAIL: `deno task doc-lint` in `packages/fresh` (`242 documentation lint errors`).
+  - FAIL: `deno task dry-run` in `packages/fresh` (4 slow-type errors in form/query surfaces).
+- Publication remains blocked: local branch is clean and ahead of origin by 3 commits; remote PR #34 does not contain the implementation.
