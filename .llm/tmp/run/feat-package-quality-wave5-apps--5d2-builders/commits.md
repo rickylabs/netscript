@@ -21,3 +21,4 @@ Append-only hash record (repo + hash + subject).
 - a7a867b: docs(fresh): clean define page subbarrel docs
 - 8fda34f: chore(harness): record fresh publish dry run
 - 12305b7: test(fresh): split define page builder tests
+- 431bf52: test(fresh): split define page runtime tests
