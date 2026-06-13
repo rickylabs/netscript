@@ -18,3 +18,4 @@ Append-only hash record (repo + hash + subject).
 - 30e0a6f: refactor(fresh): move define page navigation entry
 - 762a337: refactor(fresh): thin builders barrel
 - 2b1e62f: refactor(fresh): trim define page type catalog
+- a7a867b: docs(fresh): clean define page subbarrel docs
