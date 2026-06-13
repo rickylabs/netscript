@@ -19,3 +19,4 @@ Append-only hash record (repo + hash + subject).
 - 762a337: refactor(fresh): thin builders barrel
 - 2b1e62f: refactor(fresh): trim define page type catalog
 - a7a867b: docs(fresh): clean define page subbarrel docs
+- 8fda34f: chore(harness): record fresh publish dry run
