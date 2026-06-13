@@ -5,8 +5,9 @@
  * materialization.
  */
 
-import { ensureDir, walk } from '@std/fs';
-import { dirname, join, relative } from '@std/path';
+import { ensureDir, walk } from "@std/fs";
+import { dirname, join, relative } from "@std/path";
+import { copyFilePortable } from "../runtime/file-system/deno-file-system.ts";
 
 /** Options for recursively copying a directory with scaffold filters. */
 export interface CopyDirectoryFilteredOptions {
@@ -64,7 +65,10 @@ async function copyDirectoryFilteredInto(
   source: string,
   dest: string,
   options: Required<
-    Pick<CopyDirectoryFilteredOptions, 'skipDirs' | 'skipFileSuffixes' | 'overwrite'>
+    Pick<
+      CopyDirectoryFilteredOptions,
+      "skipDirs" | "skipFileSuffixes" | "overwrite"
+    >
   >,
   directoriesCreated: string[],
   filesCreated: string[],
@@ -82,7 +86,7 @@ async function copyDirectoryFilteredInto(
     })
   ) {
     const rel = relative(source, entry.path);
-    if (rel === '') {
+    if (rel === "") {
       continue;
     }
 
@@ -94,7 +98,9 @@ async function copyDirectoryFilteredInto(
       continue;
     }
 
-    if (options.skipFileSuffixes.some((suffix) => entry.name.endsWith(suffix))) {
+    if (
+      options.skipFileSuffixes.some((suffix) => entry.name.endsWith(suffix))
+    ) {
       filesSkipped.push(dst);
       continue;
     }
@@ -112,7 +118,7 @@ async function copyDirectoryFilteredInto(
     }
 
     await ensureDir(dirname(dst));
-    await Deno.copyFile(entry.path, dst);
+    await copyFilePortable(entry.path, dst);
     filesCreated.push(dst);
   }
 }
