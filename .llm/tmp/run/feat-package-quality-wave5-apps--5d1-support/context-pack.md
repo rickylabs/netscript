@@ -139,3 +139,6 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 - Process artifact repair: `worklog.md` now contains the protocol-required `## Design` section, and
   `drift.md` records the monolithic-commit exception explicitly. `commits.md` was corrected to the
   current branch history before the FAIL_FIX commit.
+- Publication blocker: local fail-fix commits `fcb188c` and `c9a4841` could not be pushed because
+  HTTPS Git credentials are unavailable in this shell. Use the GitHub connector PR handoff as the
+  remote-visible status until credentials or a maintainer push publishes the local commits.

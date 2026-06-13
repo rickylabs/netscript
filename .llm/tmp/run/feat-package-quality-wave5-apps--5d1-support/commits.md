@@ -12,3 +12,4 @@ Append-only hash record (repo + hash + subject).
 - `/home/codex/repos/netscript-wave5-apps-5d1-support` `9440f11` — Merge remote-tracking branch 'origin/feat/package-quality-wave5-apps-5d1-support' into feat/package-quality-wave5-apps-5d1-support
 - `/home/codex/repos/netscript-wave5-apps-5d1-support` `17a5b17` — eval(5d1): clarify final publication state
 - `/home/codex/repos/netscript-wave5-apps-5d1-support` `fcb188c` — fix(fresh): repair 5d1 fail-fix gates
+- `/home/codex/repos/netscript-wave5-apps-5d1-support` `c9a4841` — chore(5d1): record fail-fix commit

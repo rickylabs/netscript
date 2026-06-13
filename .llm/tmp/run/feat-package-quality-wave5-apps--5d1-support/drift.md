@@ -36,3 +36,7 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - D-5d1-021: Harness process repair added the protocol-required `## Design` section to `worklog.md`
   after implementation. The original source implementation remains a monolithic source commit; this
   run records the process exception instead of rewriting history.
+- D-5d1-022: FAIL_FIX publication is blocked locally. `git push origin
+  feat/package-quality-wave5-apps-5d1-support` failed with `fatal: could not read Username for
+  'https://github.com': No such device or address`. Local commits `fcb188c` and `c9a4841` are not on
+  origin from this shell; PR #34 received a connector handoff comment.
