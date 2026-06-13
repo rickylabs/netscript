@@ -1,7 +1,7 @@
 import { Partial } from 'fresh/runtime';
-import type { ErrorPrimitives } from '../components/ErrorDisplay.tsx';
-import { ErrorDisplay } from '../components/ErrorDisplay.tsx';
-import { PARTIAL_ROUTE_CONFIG, definePartial, defineStatsPartial } from './define-partial.tsx';
+import type { ErrorPrimitives } from '../error/ErrorDisplay.tsx';
+import { ErrorDisplay } from '../error/ErrorDisplay.tsx';
+import { definePartial, defineStatsPartial, PARTIAL_ROUTE_CONFIG } from './define-partial.tsx';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -76,9 +76,18 @@ Deno.test('definePartial returns partial config and renders success content', as
     component: StatsCard,
   });
 
-  assert(route.config.skipAppWrapper === PARTIAL_ROUTE_CONFIG.skipAppWrapper, 'Expected skipAppWrapper=true');
-  assert(route.config.skipInheritedLayouts === PARTIAL_ROUTE_CONFIG.skipInheritedLayouts, 'Expected skipInheritedLayouts=true');
-  assert(route.default === route.page, 'Expected default alias to point at the partial page renderer');
+  assert(
+    route.config.skipAppWrapper === PARTIAL_ROUTE_CONFIG.skipAppWrapper,
+    'Expected skipAppWrapper=true',
+  );
+  assert(
+    route.config.skipInheritedLayouts === PARTIAL_ROUTE_CONFIG.skipInheritedLayouts,
+    'Expected skipInheritedLayouts=true',
+  );
+  assert(
+    route.default === route.page,
+    'Expected default alias to point at the partial page renderer',
+  );
 
   const element = await route.default({ traceId: 'trace-123' });
   assert(receivedTraceId === 'trace-123', 'Expected loader to receive the route context');
@@ -112,8 +121,14 @@ Deno.test('definePartial wraps loader failures in ErrorDisplay inside the partia
   const child = findVNodeByType(element, ErrorDisplay);
   assert(child, 'Expected loader failures to render ErrorDisplay');
   assert(child.type === ErrorDisplay, 'Expected loader failures to render ErrorDisplay');
-  assert(child.props.title === 'Live stats unavailable', 'Expected custom error title to be forwarded');
-  assert(typeof child.props.children === 'function', 'Expected custom error renderer to be passed through');
+  assert(
+    child.props.title === 'Live stats unavailable',
+    'Expected custom error title to be forwarded',
+  );
+  assert(
+    typeof child.props.children === 'function',
+    'Expected custom error renderer to be passed through',
+  );
 
   const error = child.props.error;
   assert(isRecord(error), 'Expected normalized error data to be present');
@@ -128,7 +143,11 @@ Deno.test('defineStatsPartial delegates to a query function and preserves handle
     },
   };
 
-  const route = defineStatsPartial<{ label: string; value: string }, Record<string, never>, typeof handler>({
+  const route = defineStatsPartial<
+    { label: string; value: string },
+    Record<string, never>,
+    typeof handler
+  >({
     name: 'stats-only',
     query: async () => {
       queryCalls += 1;
@@ -147,5 +166,8 @@ Deno.test('defineStatsPartial delegates to a query function and preserves handle
   const child = findVNodeByType(element, StatsCard);
   assert(child, 'Expected stats partial to render the provided component');
   assert(child.type === StatsCard, 'Expected stats partial to render the provided component');
-  assert(child.props.label === 'Orders', 'Expected stats query result to flow into component props');
+  assert(
+    child.props.label === 'Orders',
+    'Expected stats query result to flow into component props',
+  );
 });

@@ -8,8 +8,7 @@
     "apps/*"
   ],
   "exclude": [
-    ".llm/tmp/",
-    "packages/fresh/"
+    ".llm/tmp/"
   ],
   "unstable": [
     "kv",
@@ -65,7 +64,6 @@
       "plugins/**/*.tsx"
     ],
     "exclude": [
-      "packages/fresh/",
       "packages/cli/",
       "**/.generated/",
       "**/node_modules/"

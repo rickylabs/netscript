@@ -6,7 +6,7 @@
 
 import type { ComponentChildren, JSX, VNode } from 'preact';
 import { Suspense } from 'preact/compat';
-import { usePromise } from '../hooks/use-promise.ts';
+import { usePromise } from '../interactive/use-promise.ts';
 
 /** Props for the `Deferred` Suspense helper. */
 export interface DeferredProps<T> {

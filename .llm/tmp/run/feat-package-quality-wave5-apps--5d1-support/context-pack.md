@@ -5,8 +5,8 @@ Purpose: resumable summary for PLAN-EVAL and later implementation sessions.
 
 ## Branch / PR
 
-- Branch: `feat/package-quality-wave5-apps--5d1-support`
-- Base: `feat/package-quality-wave5-apps--5d-fresh`
+- Branch: `feat/package-quality-wave5-apps-5d1-support`
+- Base: `feat/package-quality-wave5-apps-5d-fresh`
 - PR: #34
 
 ## Scope
@@ -81,6 +81,23 @@ Support spine for `@netscript/fresh`: error taxonomy, utils normalization, vite 
 - Root defer drop may break an unknown consumer.
 - Root workspace un-exclusion may surface inherited errors from other clusters.
 - `_internal/telemetry.ts` must not leak into public exports.
+
+## Implementation handoff — 2026-06-13
+
+- 5d1 support-spine implementation is complete and ready for separate IMPL-EVAL after commit/push.
+- Key implementation decisions:
+  - `ErrorDisplay` moved to `error/ErrorDisplay.tsx`; `components/ErrorDisplay.tsx` removed.
+  - `ComponentChildren` is not re-exported from Preact. `ErrorDisplay` uses package-owned `ErrorDisplayContent` to avoid new private-type doc-lint exposure.
+  - `createNetScriptVitePlugin` returns package-owned `NetScriptVitePlugin` instead of raw Vite `Plugin`, avoiding Vite private/internal public API leakage while preserving actual Vite-style hook behavior.
+  - `CacheEntryLike<T>` is package-owned and shape-compatible with SDK cached entries instead of directly aliasing SDK types; this avoids upstream/private type leakage in docs.
+  - Root `mod.ts` drops defer symbols; consumers should use `@netscript/fresh/defer`.
+  - Root `deno.json` no longer excludes `packages/fresh` from workspace membership or formatter config, but root `check`/`lint`/`fmt:check` wrapper task regexes still exclude `fresh`; full root-gate inclusion remains for the closing package-quality slice.
+- Gates recorded:
+  - PASS: package `fmt:check`, `check`, `test`, `lint`.
+  - PASS with optional dependency warnings: scoped 5d1 `deno doc --lint ./mod.ts ./interactive.ts ./error/mod.ts ./utils/mod.ts ./config/vite.ts ./testing.ts`.
+  - FAIL inherited/out-of-scope: package broad `doc-lint` (242 errors, primarily TanStack/query public type exposure).
+  - FAIL inherited/out-of-scope: package `dry-run` (4 slow-type errors in form/query surfaces owned by later slices).
+- Tooling drift: `rtk` is unavailable in this WSL worktree; direct shell commands were used.
 
 ## Drift entries to watch
 
