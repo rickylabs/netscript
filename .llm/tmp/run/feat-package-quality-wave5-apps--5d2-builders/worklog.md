@@ -363,6 +363,31 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/types.ts packages/fresh/builders/define-page/catalog.ts` | PASS: `types.ts` 14129 bytes; `catalog.ts` 12095 bytes |
 
+## 2026-06-14 slice 17 — define-page sub-barrel cleanup
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/mod.ts`
+- `packages/fresh/builders/define-page/navigation/mod.ts`
+- `packages/fresh/builders/define-page/builder/state.ts`
+- `packages/fresh/builders/define-page/builder/mod.tsx`
+- `packages/fresh/builders/define-page/search-params.ts`
+
+**Implementation:**
+
+- Added the planned `// arch:barrel-ok` rationale to `define-page/mod.ts`.
+- Marked compatibility-only hook, builder-state, and search-parameter exports as `@internal` for
+  the public docs pass while preserving import compatibility.
+- Added JSDoc summaries to the `definePage()` overloads that remain part of the public manual.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/mod.ts` | PASS |
+| `deno doc --lint packages/fresh/builders/define-page/mod.ts` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

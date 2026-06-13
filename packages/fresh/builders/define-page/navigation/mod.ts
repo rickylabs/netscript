@@ -78,6 +78,7 @@ interface CurrentDefinePageRoute<TValue extends DefinePageTypeCarrier>
   readonly Link: ComponentType<BoundLinkProps<CurrentDefinePageRoute<TValue>>>;
 }
 
+/** @internal */
 export interface DefinePageHooks<TValue extends DefinePageTypeCarrier> {
   useContext(): InferDefinePageContext<TValue>;
   useState(): DefinePageStateOf<InferDefinePageTypes<TValue>>;
@@ -98,6 +99,7 @@ export interface DefinePageHooks<TValue extends DefinePageTypeCarrier> {
   useSearch(): InferDefinePageSearch<TValue>;
 }
 
+/** @internal */
 export function wrapWithNavigationContext<TSearch extends object>(
   body: ComponentChildren,
   routePattern: string,
@@ -118,6 +120,7 @@ export function wrapWithNavigationContext<TSearch extends object>(
   }, body);
 }
 
+/** @internal */
 export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDefinePageRoute<
   TValue
 > {
@@ -167,16 +170,19 @@ export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDef
   };
 }
 
+/** @internal */
 export function usePagePath<TValue extends DefinePageTypeCarrier>(): InferDefinePagePath<TValue> {
   return usePageRoute<TValue>().path;
 }
 
+/** @internal */
 export function usePageSearch<TValue extends DefinePageTypeCarrier>(): InferDefinePageSearch<
   TValue
 > {
   return usePageRoute<TValue>().search;
 }
 
+/** @internal */
 export function createDefinePageHooks<TValue extends DefinePageTypeCarrier>(): DefinePageHooks<
   TValue
 > {

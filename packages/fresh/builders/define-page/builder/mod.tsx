@@ -516,8 +516,11 @@ function createBuilder<TTypes extends AnyDefinePageTypeState, THasConfiguredRout
   }
 }
 
+/** Create a page builder with the default request state type. */
 export function definePage(): DefinePageRootBuilder;
+/** Create a page builder with a caller-provided request state type. */
 export function definePage<TState>(): DefinePageRootBuilder<TState>;
+/** Create a fluent page builder that materializes a Fresh route definition. */
 export function definePage<TState = EmptyRecord>(): DefinePageRootBuilder<TState> {
   return createBuilder<DefinePageRootTypeState<TState>, false>(
     createDefaultConfig<TState>(),

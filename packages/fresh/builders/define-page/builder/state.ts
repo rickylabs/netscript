@@ -35,10 +35,10 @@ import type {
   SearchParamSchema,
 } from '../types.ts';
 
-/** Input values inferred from the schema used by a page form. */
+/** @internal */
 export type FormSchemaInput<TSchema extends z.ZodTypeAny> = z.input<TSchema> & object;
 
-/** Fluent definition-time builder for page contracts. */
+/** @internal */
 export interface DefinePageBuilder<
   TTypes extends AnyDefinePageTypeState = DefinePageRootTypeState,
   THasConfiguredRoute extends boolean = false,
@@ -166,6 +166,6 @@ export interface DefinePageBuilder<
   ): DefinePageBuildResultFor<TBuildOptions, TTypes>;
 }
 
-/** Root page builder returned by `definePage()`. */
+/** @internal */
 export interface DefinePageRootBuilder<TState = EmptyRecord>
   extends DefinePageBuilder<DefinePageRootTypeState<TState>, false> {}

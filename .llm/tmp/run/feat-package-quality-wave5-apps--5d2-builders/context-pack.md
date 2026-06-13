@@ -6,13 +6,13 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 16 complete, Slice 17 next      |
+| Current phase  | `implement` — Slice 17 complete, Slice 18 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 16 are complete. The branch is clean at the latest pushed head after each committed
+Slices 1 through 17 are complete. The branch is clean at the latest pushed head after each committed
 slice when publication succeeds.
 
 ## Completed
@@ -91,15 +91,19 @@ slice when publication succeeds.
     aliases.
   - Direct `types.ts` and `catalog.ts` doc-lint pass.
   - Surface snapshot passes.
+- Slice 17 implemented:
+  - `define-page/mod.ts` now carries the planned A4 aggregate barrel rationale.
+  - Compatibility-only role exports are marked `@internal` for clean public docs.
+  - `define-page/mod.ts` doc-lint, check, and surface snapshot pass.
 
 ## In Progress
 
-- Slice 17: update `define-page/mod.ts` sub-barrel.
+- Slice 18: verify `packages/fresh/deno.json` and scoped publish dry-run.
 
 ## Next Steps
 
-1. Continue Slice 17: update `define-page/mod.ts` sub-barrel and run its doc-lint/surface gates.
-2. Continue Slice 18: verify `packages/fresh/deno.json` and publish dry-run scope.
+1. Continue Slice 18: verify `packages/fresh/deno.json` and publish dry-run scope.
+2. Continue Slice 19: split builder seam tests.
 
 ## Key Decisions
 

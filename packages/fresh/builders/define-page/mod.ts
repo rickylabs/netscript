@@ -1,3 +1,4 @@
+// arch:barrel-ok A4-aggregate: public define-page surface composed from role modules.
 export * from './types.ts';
 export * from './builder/mod.tsx';
 export * from './search-params.ts';
