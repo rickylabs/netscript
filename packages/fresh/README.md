@@ -58,12 +58,10 @@ export const ordersPage = definePage()
 
 ### Root
 
-The root entrypoint re-exports a curated set of commonly used helpers including error handling, defer primitives, and cache-entry utilities.
+The root entrypoint re-exports a curated set of commonly used helpers including error handling and cache-entry utilities.
 
 ```ts
 import {
-  DeferComponent,
-  DeferPage,
   extractErrorData,
   hasAllCacheEntries,
   minCachedAt,
@@ -122,7 +120,12 @@ import { extractErrorData, type ErrorData, type ErrorPrimitives } from "@netscri
 Deferred rendering and refresh helpers.
 
 ```tsx
-import { DeferComponent, DeferPage, Deferred } from "@netscript/fresh/defer";
+import {
+  DeferComponent,
+  DeferPage,
+  Deferred,
+  resolveDetailDeferConfig,
+} from "@netscript/fresh/defer";
 ```
 
 ### Interactive
@@ -158,7 +161,18 @@ import {
 NetScript Vite integration.
 
 ```ts
-import { ... } from "@netscript/fresh/vite";
+import { createNetScriptVitePlugin } from "@netscript/fresh/vite";
+```
+
+### Testing
+
+Fresh-local fixtures for route and defer tests.
+
+```ts
+import {
+  createMockDeferPolicy,
+  createMockRouteContext,
+} from "@netscript/fresh/testing";
 ```
 
 ## Usage

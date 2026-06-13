@@ -1,70 +1,43 @@
-/**
- * Error Display Component
- *
- * Extensible error display using render props pattern
- * Server-rendered only - no island needed
- *
- * Provides error primitives to custom components for consistent error handling
- * Uses error classification from utils (following HTTP standards)
- */
+import type { ErrorPrimitives } from './primitives.ts';
+import type { ErrorData } from './types.ts';
 
-import type { ErrorData, ErrorType } from '../error/handler.ts';
-import type { ErrorPrimitives } from '../error/primitives.ts';
-import type { ComponentChildren } from 'preact';
-export type { ErrorPrimitives } from '../error/primitives.ts';
+export type { ErrorPrimitives } from './primitives.ts';
 
-// ============================================================================
-// ERROR PRIMITIVES - Strongly typed props for custom error components
-// ============================================================================
+/** Renderable content accepted and returned by Fresh error display helpers. */
+export type ErrorDisplayContent =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | object
+  | readonly ErrorDisplayContent[];
 
-// ============================================================================
-// COMPONENT TYPES
-// ============================================================================
-
+/** Props accepted by the default Fresh error display component. */
 export interface ErrorDisplayProps {
+  /** Normalized error payload to render. */
   error: ErrorData;
+  /** Optional title shown above the error message. */
   title?: string;
+  /** Whether retry affordances should be shown for retryable errors. */
   showRetry?: boolean;
-  /**
-   * Render function or component - receives error primitives
-   * @example
-   * ```tsx
-   * <ErrorDisplay error={error}>
-   *   {(props) => <StatsError {...props} />}
-   * </ErrorDisplay>
-   * ```
-   */
-  children?: ComponentChildren | ((props: ErrorPrimitives) => ComponentChildren);
+  /** Optional render prop or replacement node for custom error presentation. */
+  children?: ErrorDisplayContent | ((props: ErrorPrimitives) => ErrorDisplayContent);
 }
 
-// ============================================================================
-// ERROR PRIMITIVES FACTORY
-// ============================================================================
-
-/**
- * Create strongly-typed error primitives from ErrorData
- * Uses error type classification from utils (HTTP standards)
- */
 function createErrorPrimitives(error: ErrorData, title?: string): ErrorPrimitives {
-  // Error type is already classified in utils following HTTP standards
   const { type, status, code, message, retry, timestamp } = error;
-
-  // Choose icon based on error type (from utils classification)
-  const errorIcon = type === 'server' ? '🔥' : type === 'client' ? '⚠️' : '❌';
-
-  // Choose colors based on error type
+  const errorIcon = type === 'server' ? '!' : type === 'client' ? '?' : 'x';
   const bgColor = type === 'server'
     ? 'bg-red-50'
     : type === 'client'
     ? 'bg-yellow-50'
     : 'bg-gray-50';
-
   const borderColor = type === 'server'
     ? 'border-red-200'
     : type === 'client'
     ? 'border-yellow-200'
     : 'border-gray-200';
-
   const textColor = type === 'server'
     ? 'text-red-800'
     : type === 'client'
@@ -87,32 +60,23 @@ function createErrorPrimitives(error: ErrorData, title?: string): ErrorPrimitive
   };
 }
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
-
-/**
- * Display error - uses render props if provided, otherwise shows default card
- */
+/** Render normalized Fresh error data with an overridable presentation slot. */
 export function ErrorDisplay({
   error,
   title = 'Error',
   showRetry = true,
   children,
-}: ErrorDisplayProps): ComponentChildren {
+}: ErrorDisplayProps): ErrorDisplayContent {
   const primitives = createErrorPrimitives(error, title);
 
-  // If children is a function (render props), call it with primitives
   if (typeof children === 'function') {
     return <>{children(primitives)}</>;
   }
 
-  // If children is a component, render it directly
   if (children) {
     return <>{children}</>;
   }
 
-  // Default error display
   return (
     <div
       class={`${primitives.bgColor} border ${primitives.borderColor} rounded-lg p-6 shadow-sm`}
@@ -154,14 +118,8 @@ export function ErrorDisplay({
   );
 }
 
-// ============================================================================
-// UTILITY COMPONENTS
-// ============================================================================
-
-/**
- * Inline error display for smaller contexts
- */
-export function InlineError({ error }: { error: ErrorData }): ComponentChildren {
+/** Render normalized Fresh error data in a compact inline layout. */
+export function InlineError({ error }: { error: ErrorData }): ErrorDisplayContent {
   const primitives = createErrorPrimitives(error);
 
   return (

@@ -15,11 +15,17 @@
     "./streams": "./streams/mod.ts",
     "./query": "./query/mod.ts",
     "./interactive": "./interactive.ts",
-    "./vite": "./config/vite.ts"
+    "./vite": "./config/vite.ts",
+    "./testing": "./testing.ts"
   },
   "tasks": {
-    "test": "deno test --allow-all ./builders ./config ./defer ./form ./route ./server",
-    "check": "deno check ./mod.ts ./interactive.ts ./server.ts ./builders/mod.ts ./route/mod.ts ./defer/mod.ts ./form/mod.ts ./error/mod.ts ./utils/mod.ts ./streams/mod.ts ./config/vite.ts"
+    "test": "deno test --allow-all ./builders ./config ./defer ./form ./interactive ./route ./server ./utils ./error ./tests",
+    "check": "deno check --unstable-kv ./mod.ts ./interactive.ts ./server.ts ./builders/mod.ts ./route/mod.ts ./defer/mod.ts ./form/mod.ts ./error/mod.ts ./utils/mod.ts ./streams/mod.ts ./query/mod.ts ./config/vite.ts ./testing.ts",
+    "doc-lint": "deno doc --lint ./mod.ts ./interactive.ts ./server.ts ./builders/mod.ts ./route/mod.ts ./defer/mod.ts ./form/mod.ts ./error/mod.ts ./utils/mod.ts ./streams/mod.ts ./query/mod.ts ./config/vite.ts ./testing.ts",
+    "fmt": "deno fmt ./mod.ts ./interactive.ts ./interactive ./error ./utils ./config ./_internal ./testing.ts ./tests/_fixtures",
+    "fmt:check": "deno fmt --check ./mod.ts ./interactive.ts ./interactive ./error ./utils ./config ./_internal ./testing.ts ./tests/_fixtures",
+    "lint": "deno lint --rules-exclude=no-slow-types ./mod.ts ./interactive.ts ./interactive ./error ./utils ./config ./_internal ./testing.ts ./tests/_fixtures",
+    "dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
     "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
@@ -47,7 +53,8 @@
       "**/*.ts",
       "**/*.tsx",
       "deno.json",
-      "README.md"
+      "README.md",
+      "docs/**/*.md"
     ],
     "exclude": [
       "**/*_test.ts",
