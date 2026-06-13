@@ -5,78 +5,65 @@
 | Field          | Value                                                  |
 | -------------- | ------------------------------------------------------ |
 | Run ID         | feat-package-quality-wave5-apps--5d4-streaming         |
-| Branch         | `feat/package-quality-wave5-apps--5d4-streaming`       |
-| Current phase  | Plan & Design complete; awaiting Plan-Gate             |
-| Archetype      | 3 — Runtime / Behavior                                |
+| Branch         | `feat/package-quality-wave5-apps-5d4-streaming`        |
+| Current phase  | Implementation in progress                             |
+| Archetype      | 3 — Runtime / Behavior                                 |
 | Scope overlays | `SCOPE-frontend`                                       |
 
 ## Current State
 
-- Phase-1 research was committed and is reused without re-derivation.
-- `design.md`, `plan.md`, and `context-pack.md` have been created and populated.
-- `drift.md` has been updated with new D-5d4 entries.
-- No source code changes have been made (PLAN phase only).
+- PLAN-EVAL is `APPROVED` in `plan-eval.md`; implementation is allowed.
+- Branch was clean and even with `origin/feat/package-quality-wave5-apps-5d4-streaming` at
+  `4504b6bc2981d75e5ee9ad3624bab5223199cdb0` before implementation began.
+- Slice 1 public-surface cleanup is implemented for `DeferPage` and `StreamErrorBoundary`.
+- Approved Slice 7 root exclusion removal was promoted ahead of source commits because the root
+  `packages/fresh/` exclusion caused Deno gates to report false-green/no-file results.
 - No lockfile changes.
 
 ## Completed
 
-- Read `AGENTS.md` and activated harness/doctrine skills.
-- Read harness templates, plan-gate checklist, archetype guidance, and gate matrix.
-- Read doctrine files 09 and 10 for anti-patterns and verdicts.
-- Inspected existing implementation files and cataloged lint defects.
-- Created design, plan, and context-pack deliverables.
-- Updated drift log.
+- Read required harness, WSL, CLI/tools, rtk, doctrine, JSR, workflow, run, and umbrella artifacts.
+- Verified native WSL ext4 worktree and current branch.
+- Removed `packages/fresh/` from root `deno.json` `exclude` to enable real package validation.
+- Replaced Preact-private public types in `DeferPage` with package-owned renderable and policy prop
+  types.
+- Preserved `StreamErrorBoundary` export name while moving the Preact class to an internal
+  implementation so public docs do not expose Preact `Component` internals.
+- Recorded drift D-5d4-11 and D-5d4-12.
 
-## In Progress
+## Validation Evidence
 
-- Final review of plan deliverables for consistency.
-- Commit artifacts to the branch.
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| F-7 doc lint | `deno doc --lint packages/fresh/defer/DeferPage.tsx packages/fresh/server/stream-error-boundary.tsx` | PASS |
+| Static check | `deno check --config packages/fresh/deno.json --unstable-kv packages/fresh/defer/DeferPage.tsx packages/fresh/server/stream-error-boundary.tsx packages/fresh/builders/define-page/runtime.tsx packages/fresh/server.ts` | PASS |
+| Static lint | `deno lint --config deno.json packages/fresh/defer/DeferPage.tsx packages/fresh/server/stream-error-boundary.tsx` | PASS |
+| Static fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/fresh/defer/DeferPage.tsx packages/fresh/server/stream-error-boundary.tsx` | PASS |
+| Root config fmt | `deno fmt --config deno.json --check deno.json` | PASS |
 
 ## Next Steps
 
-1. Run the smallest validation that proves the deliverables are present and consistent (e.g., `ls` + `deno fmt --check` on `.md` files, or just `git diff --stat`).
-2. Commit `design.md`, `plan.md`, `context-pack.md`, and updated `drift.md`.
-3. Hand off to PLAN-EVAL session (separate evaluator).
-
-## Key Decisions
-
-| Decision                              | Source                  | Notes |
-| ------------------------------------- | ----------------------- | ----- |
-| Archetype 3 + SCOPE-frontend          | Archetype decision tree | Runtime lifecycle + UI rendering. |
-| Keep existing folder layout           | Plan L-5d4-1            | Full restructure is out of scope. |
-| AbortSignal first-class               | Design + doctrine A7    | Every stream path accepts a signal. |
-| No new exports unless required        | Plan L-5d4-5            | Minimal public surface. |
-| Clock / timer port for adapters       | Design + AP-12          | Avoid hidden globals and direct timer use. |
+1. Commit and push the current batch.
+2. Continue with Slice 2: telemetry / policy / server doc + port polish.
+3. Re-run focused static gates after each source slice.
+4. Append `commits.md` immediately after each commit.
 
 ## Files Changed
 
-| Path                                                                                         | Status | Notes |
-| -------------------------------------------------------------------------------------------- | ------ | ----- |
-| `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/design.md`                      | new    | Design deliverable. |
-| `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/plan.md`                        | new    | Plan deliverable. |
-| `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/context-pack.md`                | new    | Resumable context pack. |
-| `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/drift.md`                       | update | Added D-5d4-6, D-5d4-7. |
-
-## Gates
-
-| Gate family | Current status | Evidence |
-| ----------- | -------------- | -------- |
-| Static      | not run        | Plan phase; no source edits yet. |
-| Fitness     | planned        | Listed in plan.md with commands. |
-| Runtime     | planned        | Slice 3-5 define abort lifecycle tests. |
-| Consumer    | planned        | Slice 7 runs downstream `deno check`. |
-
-## Open Questions
-
-- Clock / timer port: local test helper or shared testing utility?
-- Scope of consumer type-check failure handling.
-- PLAN-EVAL scheduling.
+| Path | Status | Notes |
+| ---- | ------ | ----- |
+| `deno.json` | update | Removed root `packages/fresh/` exclusion early; see D-5d4-11. |
+| `packages/fresh/defer/DeferPage.tsx` | update | Public renderable/policy aliases + prop docs; removed dead internal `debug` parameter. |
+| `packages/fresh/server/stream-error-boundary.tsx` | update | Public renderable alias; exported function component backed by internal class. |
+| `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/drift.md` | update | Added D-5d4-11 and D-5d4-12. |
+| `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/worklog.md` | update | Added implementation and validation evidence. |
+| `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/context-pack.md` | update | Refreshed resumable state. |
 
 ## Drift and Debt
 
-- Drift: see `.llm/tmp/run/feat-package-quality-wave5-apps--5d4-streaming/drift.md`.
-- Debt: no new arch-debt created in plan phase; any new debt will be recorded during implementation if fixes exceed wave scope.
+- Drift: D-5d4-11 and D-5d4-12 added.
+- Debt: no new arch-debt entry yet; promoted root exclusion removal is approved scope, not debt.
 
 ## Commits
 
-- None yet in this phase.
+- Pending for current batch.

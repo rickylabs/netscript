@@ -8,15 +8,27 @@
  */
 
 import { Component } from 'preact';
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren } from 'preact';
+
+/** Renderable content accepted by streaming error boundaries. */
+export type StreamBoundaryRenderable =
+  | object
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined
+  | readonly StreamBoundaryRenderable[];
 
 /** Props for {@link StreamErrorBoundary}. */
 export interface StreamErrorBoundaryProps {
   /** Fallback UI rendered when a child boundary errors. */
-  fallback?: JSX.Element | ((error: Error) => JSX.Element);
+  fallback?: StreamBoundaryRenderable | ((error: Error) => StreamBoundaryRenderable);
   /** Optional callback invoked when an error is caught. */
   onError?: (error: Error) => void;
-  children: ComponentChildren;
+  /** Content protected by the boundary. */
+  children: StreamBoundaryRenderable;
 }
 
 interface StreamErrorBoundaryState {
@@ -39,7 +51,11 @@ interface StreamErrorBoundaryState {
  * </StreamErrorBoundary>
  * ```
  */
-export class StreamErrorBoundary extends Component<
+export function StreamErrorBoundary(props: StreamErrorBoundaryProps): object {
+  return <StreamErrorBoundaryImpl {...props} />;
+}
+
+class StreamErrorBoundaryImpl extends Component<
   StreamErrorBoundaryProps,
   StreamErrorBoundaryState
 > {

@@ -88,3 +88,35 @@ Proposed fix direction (design phase):
 - **Resolution:** Slice 6 wraps the upstream query/DB helpers with local public types and JSDoc. If wrapping is infeasible for a symbol, stop re-exporting it and record debt.
 - **Action:** Implement local wrappers in `streams/mod.ts` / `streams/create-stream-db.ts`; re-run `deno doc --lint` on `packages/fresh/streams/mod.ts` until 0 upstream-related errors remain.
 - **Evidence:** plan.md §Doc-Lint Budget Reconciliation (Slice 6 bucket) and §Commit Slices (Slice 6).
+
+## D-5d4-11: root fresh exclusion had to move before source-slice validation
+
+- **What:** The approved plan placed root `deno.json` exclusion removal in Slice 7, but Deno
+  commands invoked before that change reported success while checking no `packages/fresh` files.
+- **Source:** `deno check --config packages/fresh/deno.json ...`, `deno task --config ./deno.json
+  check`, and root `deno fmt --check` all emitted "No matching files found" / "No target files
+  found" while `packages/fresh/` remained in the root `exclude`.
+- **Expected:** Slice 1 can run real targeted `deno check`, lint, fmt, and doc-lint evidence before
+  Slice 7.
+- **Actual:** Type-check and formatting evidence were false-green until the root exclusion was
+  removed.
+- **Severity:** minor.
+- **Resolution:** Promoted the approved Slice 7 root `deno.json` exclusion removal ahead of the
+  first source commit. This does not add scope; it only enables real validation for the approved
+  slices.
+- **Evidence:** After removal, targeted `deno check --config packages/fresh/deno.json
+  --unstable-kv ...` checked the intended files and passed.
+
+## D-5d4-12: `StreamErrorBoundary` class export leaked Preact internals
+
+- **What:** `deno doc --lint` counted the exported `StreamErrorBoundary` class itself as a public
+  type that referenced Preact's private `Component` type and the private state shape.
+- **Source:** First Slice 1 doc-lint run on `packages/fresh/server/stream-error-boundary.tsx`.
+- **Expected:** Adding prop JSDoc and replacing `JSX.Element` / `ComponentChildren` in public props
+  would clear the boundary's private-type refs.
+- **Actual:** Keeping the class exported still leaked `Component` and `StreamErrorBoundaryState`.
+- **Severity:** minor.
+- **Resolution:** Preserve the exported `StreamErrorBoundary` component name as a function component
+  and move the Preact class to an internal implementation class.
+- **Evidence:** `deno doc --lint packages/fresh/defer/DeferPage.tsx
+  packages/fresh/server/stream-error-boundary.tsx` passes with 0 errors.

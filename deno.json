@@ -8,8 +8,7 @@
     "apps/*"
   ],
   "exclude": [
-    ".llm/tmp/",
-    "packages/fresh/"
+    ".llm/tmp/"
   ],
   "unstable": [
     "kv",
