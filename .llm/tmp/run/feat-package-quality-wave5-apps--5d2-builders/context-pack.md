@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1 through 9 are committed locally. Slice 10 is implemented and ready to commit with the
+Slices 1 through 10 are committed locally. Slice 11 is implemented and ready to commit with the
 current harness artifact updates.
 
 ## Completed
@@ -75,15 +75,20 @@ current harness artifact updates.
   - Builder import and README updated.
   - Type-check and surface snapshot pass.
   - Direct runtime-entry doc-lint deferred with D-5d2-10.
+- Slice 10 committed locally as `4ba10a4 refactor(fresh): move define page runtime entry`.
+- Slice 11 implemented:
+  - `packages/fresh/builders/define-page/navigation/context.ts` created.
+  - `navigation.tsx` imports context helpers.
+  - Slice 11 gates passed.
 
 ## In Progress
 
-- Slice 10 commit.
+- Slice 11 commit.
 
 ## Next Steps
 
-1. Commit Slice 10 and append `commits.md` immediately.
-2. Continue Slice 11: create navigation context module.
+1. Commit Slice 11 and append `commits.md` immediately.
+2. Continue Slice 12: create navigation hooks module.
 
 ## Key Decisions
 
@@ -117,6 +122,7 @@ current harness artifact updates.
 | `packages/fresh/builders/define-page/runtime/render.tsx` | new, pending commit | render/fallback/head/header helpers |
 | `packages/fresh/builders/define-page/runtime/handlers.ts` | new, pending commit | request-state preparation and resource dispatch |
 | `packages/fresh/builders/define-page/runtime/mod.tsx` | moved, pending commit | runtime role entry |
+| `packages/fresh/builders/define-page/navigation/context.ts` | new, pending commit | navigation context value/read helpers |
 
 ## Gates
 
@@ -135,6 +141,7 @@ current harness artifact updates.
 | Slice 8 runtime render | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/render.tsx packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `render.tsx` 3456 bytes |
 | Slice 9 runtime handlers | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/handlers.ts packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `handlers.ts` 1970 bytes |
 | Slice 10 runtime entry | partial | type-check and surface snapshot pass; direct role-entry doc-lint recorded as D-5d2-10 |
+| Slice 11 navigation context | passed | `deno check --unstable-kv packages/fresh/builders/define-page/navigation/context.ts packages/fresh/builders/define-page/navigation.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `context.ts` 1816 bytes |
 
 ## Open Questions
 

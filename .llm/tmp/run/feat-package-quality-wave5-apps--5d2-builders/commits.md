@@ -11,3 +11,4 @@ Append-only hash record (repo + hash + subject).
 - f1f2b9a: refactor(fresh): extract define page runtime context
 - 05ac7f5: refactor(fresh): extract define page runtime render
 - 2fa86c1: refactor(fresh): extract define page runtime handlers
+- 4ba10a4: refactor(fresh): move define page runtime entry

@@ -287,6 +287,30 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `wc -c packages/fresh/builders/define-page/runtime/mod.tsx` | PASS: 10487 bytes |
 | `deno doc --lint packages/fresh/builders/define-page/runtime/mod.tsx` | FAIL: direct internal-entry doc-lint expands imported type aliases as private; recorded as D-5d2-10 |
 
+**Commit:** `4ba10a4 refactor(fresh): move define page runtime entry`
+
+## 2026-06-14 slice 11 — navigation context module
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/navigation/context.ts`
+- `packages/fresh/builders/define-page/navigation.tsx`
+
+**Implementation:**
+
+- Moved the navigation context value, Preact context object, required-context hook, and safe context
+  read helper into `navigation/context.ts`.
+- Left the provider wrapper in `navigation.tsx` until link creation moves, because it still depends
+  on `createRouteNav()`.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/navigation/context.ts packages/fresh/builders/define-page/navigation.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/navigation/context.ts packages/fresh/builders/define-page/navigation.tsx` | PASS: `context.ts` 1816 bytes; `navigation.tsx` 19483 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

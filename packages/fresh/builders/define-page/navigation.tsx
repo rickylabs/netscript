@@ -1,5 +1,10 @@
-import { type ComponentChildren, type ComponentType, createContext, type JSX } from 'preact';
-import { useContext } from 'preact/hooks';
+import { type ComponentChildren, type ComponentType, type JSX } from 'preact';
+import {
+  DefinePageNavigationContext,
+  type DefinePageNavigationContextValue,
+  readNavigationContext,
+  useRequiredNavigationContext,
+} from './navigation/context.ts';
 import type {
   AnyDefinePageTypeState,
   DefinePageLayoutContextBase,
@@ -24,15 +29,6 @@ import type {
   UnknownRecord,
   ValidatedRouteHref,
 } from './types.ts';
-
-interface DefinePageNavigationContextValue {
-  readonly routePattern: string;
-  readonly pathSchema?: PathParamSchema<object>;
-  readonly searchSchema?: SearchParamSchema<object>;
-  readonly runtimeContext: DefinePageLayoutContextBase<AnyDefinePageTypeState, boolean>;
-  readonly slots: Record<string, DefinePageSlot<UnknownRecord>>;
-  readonly nav: DefinePageRouteNav<object, object>;
-}
 
 export interface TypedRouteTarget<
   TPath extends object = EmptyRecord,
@@ -144,8 +140,6 @@ export type BoundLinkProps<TTarget extends TypedRouteTarget<object, object>> = O
   LinkProps<TTarget>,
   'to'
 >;
-
-const DefinePageNavigationContext = createContext<DefinePageNavigationContextValue | null>(null);
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null;
@@ -298,18 +292,6 @@ export function wrapWithNavigationContext<TSearch extends object>(
       {body}
     </DefinePageNavigationContext.Provider>
   );
-}
-
-function useRequiredNavigationContext(): DefinePageNavigationContextValue {
-  const navigationContext = useContext(DefinePageNavigationContext);
-
-  if (!navigationContext) {
-    throw new Error(
-      'definePage() hooks must be rendered inside a definePage() route render tree.',
-    );
-  }
-
-  return navigationContext;
 }
 
 function assertRouteContext<TTarget extends TypedRouteTarget<object, object>>(
@@ -551,24 +533,6 @@ function buildHref<TPath extends object, TSearch extends object>(
   const pathname = fillRoutePattern(options.routePattern, resolvedPath as UnknownRecord);
   const queryString = serializeSearch(resolvedSearch as UnknownRecord);
   return `${pathname}${queryString ? `?${queryString}` : ''}` as ValidatedRouteHref;
-}
-
-function readNavigationContext(): DefinePageNavigationContextValue | null {
-  try {
-    return useContext(DefinePageNavigationContext);
-  } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      (
-        error.message.includes('Hook can only be invoked') ||
-        error.message.includes("reading 'context'")
-      )
-    ) {
-      return null;
-    }
-
-    throw error;
-  }
 }
 
 function createResolvedLinkProps<TPath extends object, TSearch extends object>(
