@@ -3,10 +3,15 @@ import { dirname, extname, relative, resolve } from '@std/path';
 const ROUTE_FILE_EXTENSIONS = new Set(['.ts', '.tsx']);
 const IGNORED_DIRECTORIES = new Set(['.git', '_fresh', 'coverage', 'dist', 'node_modules']);
 
+/** Options for generating NetScript route manifest files from a Fresh routes directory. */
 export interface NetScriptRouteManifestOptions {
+  /** Enable or disable manifest generation. */
   enabled?: boolean;
+  /** App-root-relative routes directory to scan. */
   routesDir?: string;
+  /** App-root-relative path for the generated manifest module. */
   outputPath?: string;
+  /** Logging verbosity for manifest generation. */
   logLevel?: 'silent' | 'changes' | 'verbose';
 }
 

@@ -8,7 +8,4 @@
  * @module
  */
 
-export {
-  resolvedPromise,
-  usePromise,
-} from './hooks/use-promise.ts';
+export { resolvedPromise, usePromise } from './interactive/use-promise.ts';

@@ -1,5 +1,7 @@
 import { type Attributes, getTracer, SpanKind, withSpan } from '@netscript/telemetry/tracer';
 
+// Deprecated-in-place for 5d5: form telemetry will cut over to
+// `../_internal/telemetry.ts` when the form slice owns the public behavior.
 const formTracer = getTracer('@netscript/fresh/form');
 
 export async function withFormSpan<T>(

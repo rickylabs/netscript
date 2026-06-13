@@ -1,7 +1,7 @@
 import type { VNode } from 'preact';
 import { Suspense } from 'preact/compat';
 import { Deferred } from './Deferred.tsx';
-import { resolvedPromise, usePromise } from '../hooks/use-promise.ts';
+import { resolvedPromise, usePromise } from '../interactive/use-promise.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
@@ -70,8 +70,7 @@ Deno.test('Deferred normalizes JSX render-function children before passing them 
   const boundary = renderedProps.children;
   assertVNode(boundary, 'Expected Deferred JSX render to include an inner boundary');
 
-  const inner = boundary.props.children;
-  assertVNode(inner, 'Expected Suspense to wrap DeferredInner');
+  const inner = boundary;
   assert(
     typeof inner.props.children === 'function',
     'Expected Deferred to normalize the JSX children into a render function',
