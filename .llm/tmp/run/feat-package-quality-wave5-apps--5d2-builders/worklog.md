@@ -454,6 +454,28 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -l -c packages/fresh/builders/define-page/runtime.test.tsx packages/fresh/builders/define-page.test.tsx` | PASS: `runtime.test.tsx` 400 LOC / 12659 bytes; `define-page.test.tsx` 541 LOC / 19594 bytes |
 
+## 2026-06-14 slice 21 — navigation seam test split
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/navigation.test.tsx`
+- `packages/fresh/builders/define-page.test.tsx`
+
+**Implementation:**
+
+- Created `navigation.test.tsx` for route context, current-route, page-route hooks, prebound hooks,
+  and route mismatch behavior.
+- Removed those tests from the monolithic `define-page.test.tsx`.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/navigation.test.tsx packages/fresh/builders/define-page.test.tsx` | PASS |
+| `deno test --allow-env packages/fresh/builders/define-page/navigation.test.tsx` | PASS: 6 tests |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -l -c packages/fresh/builders/define-page/navigation.test.tsx packages/fresh/builders/define-page.test.tsx` | PASS: `navigation.test.tsx` 350 LOC / 12437 bytes; `define-page.test.tsx` 252 LOC / 8889 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13
