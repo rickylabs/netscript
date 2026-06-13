@@ -34,3 +34,23 @@ Proposed fix direction (design phase):
 
 - `defer/telemetry.ts` span names and attributes (`defer.prewarm.dispatch`, `stream.render`, etc.) are local to this package.
 - 5d1 (PR #34) owns the cross-cutting telemetry vocabulary; any new TTFB/chunk telemetry should defer to that convention or be updated after merge.
+
+## D-5d4-6: plan-phase doctrine verdict mismatch
+
+- **What:** `@netscript/fresh` is marked **Restructure** in doctrine file 10, but 5d4 does not own the full restructure.
+- **Source:** `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md`.
+- **Expected:** A restructure wave would migrate folders and split `builders/mod.ts` before streaming work.
+- **Actual:** 5d4 only fixes streaming-related surface/lifecycle issues and keeps the existing folder layout.
+- **Severity:** minor.
+- **Action:** accept and record debt in `arch-debt.md` if the plan is approved; do not deepen existing violations.
+- **Evidence:** plan.md §Current Doctrine Verdict, design.md §Doctrine baseline.
+
+## D-5d4-7: open clock / timer port question
+
+- **What:** Abort/cleanup tests need deterministic control of timers, but no shared clock port exists in `@netscript/fresh` today.
+- **Source:** `server/sse.ts` uses `setInterval`-style heartbeat logic (or equivalent watch polling); `defer/telemetry.ts` uses `performance.now`.
+- **Expected:** A doctrine-aligned adapter would accept a clock port rather than call `setInterval`/`Date.now` directly.
+- **Actual:** Current code may inline timer / time reads; exact call sites to be verified during slice 2.
+- **Severity:** minor (significant if timers are inlined in non-adapter files).
+- **Action:** fix in slice 2 if call sites are in adapter files; record debt if the change is larger than one slice.
+- **Evidence:** design.md §Ports / adapters, plan.md slice 2.
