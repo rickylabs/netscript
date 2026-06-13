@@ -21,4 +21,36 @@ Status: IN PROGRESS
   - Owner: 5d6 / umbrella final close
   - Proposed close gate: root `deno publish --dry-run` passes for `@netscript/fresh/form` after `packages/fresh/` is removed from `deno.json` `exclude`.
 
+- **D-5d5-2 — fresh-ui `FormField` needs optional `htmlFor` prop for ergonomic seam**
+
+  The RFC 15 `FieldDescriptor` emits `field.id` for the control and the label must point to that id. `fresh-ui` `FormField` currently uses `name` as both label `htmlFor` and control `name`. The seam works by passing `name={field.id}`, but that is awkward when the descriptor id differs from the form path. Plan proposes adding an optional `htmlFor` prop to `FormField` defaulting to `name`.
+
+  - Status: OPEN
+  - Owner: 5d5 (slice 13) if supervisor confirms; otherwise fresh-ui follow-up.
+  - Proposed close gate: Playground route renders with correct label-to-control association using either `name={field.id}` or `htmlFor={field.id}`.
+
+- **D-5d5-3 — Standard Schema adapter may shift error-shape assumptions for consumers**
+
+  `createStandardSchemaAdapter(schema)` will be the recommended adapter for Zod ≥3.23, Valibot, and ArkType. The public contract (`FormSchemaAdapter`, `FormSchemaParseResult`) is preserved, but the exact error messages and issue paths may differ from the current Zod-only adapter. Consumers using brittle message assertions will need migration guidance.
+
+  - Status: OPEN
+  - Owner: 5d5 implementation (slices 9–11)
+  - Proposed close gate: Unit tests prove `toFormErrors` parity for representative Zod schemas; README migration note added.
+
+- **D-5d5-4 — Internal barrels in `schema-adapter/` and `field-descriptors/` need architectural justification**
+
+  Decomposition creates internal aggregation files (`schema-adapter/mod.ts`, `field-descriptors/mod.ts`). The public surface remains `form/mod.ts`; these internal barrels are only imported by `form/mod.ts` and the package-local tests. They must carry `// arch:barrel-ok` justification to pass F-18.
+
+  - Status: OPEN
+  - Owner: 5d5 implementation (slices 3, 4)
+  - Proposed close gate: Internal barrels annotated; `deno doc --lint` and lint pass.
+
+- **D-5d5-5 — Root `deno check` excludes `packages/fresh/`; form package check must run scoped**
+
+  Because root `deno.json` excludes `packages/fresh/`, CI/root `deno check` will not cover `@netscript/fresh/form`. The implementation must add a scoped `deno check` step (via `packages/fresh/deno.json` `tasks.check`) and capture evidence in the run artifacts.
+
+  - Status: OPEN
+  - Owner: 5d5 implementation (slice 22)
+  - Proposed close gate: `deno check --unstable-kv packages/fresh/form/mod.ts` passes and evidence is archived.
+
 
