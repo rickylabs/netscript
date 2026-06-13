@@ -6,13 +6,13 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 18 complete, Slice 19 next      |
+| Current phase  | `implement` — Slice 19 complete, Slice 20 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 18 are complete. The branch is clean at the latest pushed head after each committed
+Slices 1 through 19 are complete. The branch is clean at the latest pushed head after each committed
 slice when publication succeeds.
 
 ## Completed
@@ -99,15 +99,22 @@ slice when publication succeeds.
   - `packages/fresh/deno.json` verified with `./builders` export and `deno.unstable` lib.
   - `deno check --unstable-kv packages/fresh/builders/mod.ts` passed.
   - `deno publish --dry-run --allow-dirty` passed from `packages/fresh`.
+- Slice 19 implemented:
+  - `packages/fresh/builders/define-page/builder.test.tsx` created for builder-chain tests.
+  - `define-page.test.tsx` trimmed to 880 LOC.
+  - Builder test gate passes with `--allow-env`.
+  - D-5d2-12 records that `withForm` behavior tests remain for the next test split to keep
+    `builder.test.tsx` under cap.
 
 ## In Progress
 
-- Slice 19: split builder seam tests.
+- Slice 20: split runtime seam tests.
 
 ## Next Steps
 
-1. Continue Slice 19: split builder seam tests.
-2. Continue Slice 20: split runtime seam tests.
+1. Continue Slice 20: split runtime seam tests, including the remaining form-runtime blocks if they
+   fit that seam.
+2. Continue Slice 21: split navigation seam tests.
 
 ## Key Decisions
 

@@ -269,3 +269,24 @@ size cap.
 **Closing gate:** `deno doc --lint packages/fresh/builders/define-page/types.ts`,
 `deno doc --lint packages/fresh/builders/define-page/catalog.ts`, and the surface snapshot test all
 pass for Slice 16.
+
+---
+
+## D-5d2-12: With-form behavior tests deferred from builder seam split
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 19  
+**Status:** accepted implementation drift
+
+**Description:**
+The approved Slice 19 text listed `withForm` among the builder seam tests to move into
+`builder.test.tsx`. Moving all `withForm` behavior tests with the builder-chain tests made
+`builder.test.tsx` exceed the slice cap. Those tests also exercise GET/POST runtime form behavior,
+CSRF cookies, redirects, error normalization, and collection intents, which fit the planned runtime
+and form-oriented splits better than the builder-chain seam.
+
+**Disposition:** Slice 19 moved builder-chain, route-build, type-inference, and builder navigation
+tests. The `withForm` behavior tests remain in `define-page.test.tsx` for the next test split.
+
+**Closing gate:** `builder.test.tsx` passes under the size cap, and the later runtime/form test
+split moves the remaining `withForm` blocks out of the monolithic test file.

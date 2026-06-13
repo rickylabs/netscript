@@ -408,6 +408,31 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno check --unstable-kv packages/fresh/builders/mod.ts` | PASS |
 | `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS |
 
+## 2026-06-14 slice 19 — builder seam test split
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/builder.test.tsx`
+- `packages/fresh/builders/define-page.test.tsx`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/drift.md`
+
+**Implementation:**
+
+- Created `builder.test.tsx` for builder-chain, route-build, type-inference, and builder navigation
+  tests.
+- Removed those tests from the monolithic `define-page.test.tsx`.
+- Kept the heavy `withForm` behavior tests in `define-page.test.tsx` for the upcoming runtime/form
+  split so `builder.test.tsx` stays below the slice cap.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/builder.test.tsx packages/fresh/builders/define-page.test.tsx` | PASS |
+| `deno test --allow-env packages/fresh/builders/define-page/builder.test.tsx` | PASS: 13 tests |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -l -c packages/fresh/builders/define-page/builder.test.tsx packages/fresh/builders/define-page.test.tsx` | PASS: `builder.test.tsx` 509 LOC / 17148 bytes; `define-page.test.tsx` 880 LOC / 30524 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13
