@@ -126,12 +126,82 @@ The umbrella plan (`plan.md`) forbids changing export specifiers or public type 
 
 ## 4. fresh ↔ fresh-ui SEAM ANALYSIS
 
-Read:
-- `packages/fresh-ui/registry/components/ui/form-field.tsx`
-- `packages/fresh-ui/registry/lib/control-props.ts`
-- `packages/fresh-ui/docs/l0-conventions.md`
+Sources: `packages/fresh-ui/registry/components/ui/form-field.tsx`; `packages/fresh-ui/registry/components/ui/control-props.ts`; `packages/fresh-ui/docs/l0-conventions.md`; `packages/fresh/form/types.ts` lines 82–141, 274–297; `packages/fresh/form/field-descriptors.ts` lines 101–172.
 
-(Placeholder — will be filled from file reads below.)
+### 4.1 fresh-ui inventory (L2 registry presentation)
+
+`FormField` is a Layer-2 registry component. Its props are intentionally small and presentation-only:
+
+| Prop | Type | Role |
+|------|------|------|
+| `label` | `Renderable` | Visible label rendered via the L1 `Label` primitive |
+| `name` | `string` | Becomes `<Label htmlFor={name}>` and should match the control `id` |
+| `required` | `boolean` | Visual required indicator on the label |
+| `error` | `string` | Single visible error message (renders an `ns-field__error-row`) |
+| `helpText` | `string` | Helper text shown when no error is present |
+| `children` | `Renderable` | The actual control (Input, Select, Textarea) |
+| `class` | `string` | Optional wrapper class |
+| spread | `JSX.HTMLAttributes<HTMLDivElement>` | Extra wrapper attributes (excluding `children`/`class`) |
+
+`FormField` does **not** import anything from `@netscript/fresh/form`. It expects the consumer to translate the form runtime's state into these props.
+
+`control-props.ts` is the L2-side adapter for the `controlProps(...)` contract already emitted by fresh field descriptors:
+
+```ts
+interface ControlPropSource {
+  controlProps(overrides?: Record<string, unknown>): Record<string, unknown>;
+}
+```
+
+It exports three narrowing helpers:
+
+- `getInputProps(field, overrides?) -> InputControlProps`
+- `getSelectProps(field, overrides?) -> SelectControlProps`
+- `getTextareaProps(field, overrides?) -> TextareaControlProps`
+
+Each helper coerces the descriptor's `controlProps()` map into a statically-typed Preact prop subset (id, name, form, defaultValue/defaultChecked, `aria-*`, constraint attributes, etc.) while discarding unknown values. This is the exact boundary fresh should preserve: fresh emits a broad, runtime-derived prop bag; fresh-ui narrows it to a safe JSX element contract.
+
+### 4.2 L0 attribute contract
+
+`l0-conventions.md` establishes the rules this seam must respect:
+
+- **Interactive state is platform attributes**: `data-part`, `data-state`, ARIA, and native attributes are the styling/behavior contract; classes are for copy-owned styling only.
+- **L1 emits data + ARIA, not `ns-*` classes**: the runtime/fresh package should emit attributes, not component classes.
+- **Native-first**: semantic form controls, native validation attributes, and platform popover/dialog behavior are preferred over JS state.
+- **Motion rule**: animations must declare reduced-motion behavior; any future form pending/error transition in fresh-ui must respect this.
+- **Copy fidelity**: registry files are copied into apps; fresh's runtime contract must remain stable so copied L2 components do not silently break when fresh upgrades.
+
+### 4.3 Mapping fresh runtime state to fresh-ui props
+
+A fresh `FieldDescriptor` already carries everything `FormField` + `control-props.ts` need:
+
+| fresh descriptor | fresh-ui prop / control attr | Notes |
+|------------------|------------------------------|-------|
+| `id` | control `id`, `Label htmlFor={name}` | `FormField.name` must equal descriptor `id` (current `FormField` uses `name` as `htmlFor`; fresh uses `id` as control id; a consumer must pass `name={field.id}`) |
+| `error` | `FormField error={field.error}` | First error only; descriptor exposes full `errors[]` if a richer UI wants the list |
+| `required` | `FormField required={field.required}` and `aria-required` / `required` on control | Descriptor emits these via `controlProps` |
+| `descriptionProps.id` | `FormField helpText` + `aria-describedby` | Consumer supplies help text and forwards `field.descriptionProps.id` to `aria-describedby` |
+| `errorProps.id` | `aria-describedby` | Descriptor's `controlProps` already merges `errorId` into `aria-describedby` when errors exist |
+| `controlProps()` | `getInputProps(field)`, `getSelectProps(field)`, `getTextareaProps(field)` | Narrowed before spreading onto the JSX control |
+| `data-field-path` | data attribute on control | L0-style state hook (`data-part`-like); can drive scoped CSS or e2e selectors |
+| `data-field-invalid` | data attribute on control | L0-style visual state (`data-state`-like) |
+| `data-field-dirty` | data attribute on control | L0-style dirty-state hook |
+| `data-form-id` | data attribute on control | Ties control back to the owning form |
+
+The current boundary is already clean: `fresh/form` owns "what the field is" (value, errors, constraints, ARIA, intents); `fresh-ui` owns "how it looks" (Label, error row, help text, classes). Neither package imports the other. The consumer JSX is the seam, e.g.:
+
+```tsx
+<FormField label="Email" name={email.id} required={email.required} error={email.error} helpText={helpText}>
+  <Input {...getInputProps(email)} />
+</FormField>
+```
+
+### 4.4 Contract gaps / design decisions to lock
+
+1. **ID vs. name in `FormField`**: `FormField.name` is currently used for `htmlFor`. The fresh descriptor's canonical identifier is `id`. A thin mapping is required in consumer code. Plan should decide whether to add an `htmlFor` prop to `FormField` or document the `name={field.id}` convention.
+2. **Description wiring**: `controlProps` merges `errorId` into `aria-describedby`, but `helpText` requires the consumer to set the descriptor's `descriptionProps.id` on the wrapper/help text element. A plan-level recipe should show this.
+3. **Data-state naming**: fresh uses `data-field-*`; L0 conventions prefer generic `data-state`. Form plan should decide if fresh keeps its domain-specific data attributes or aligns to `data-state="invalid|dirty"` + `data-part="field"`. Either is acceptable if documented.
+4. **Pending state**: fresh-ui `FormField` currently has no pending/busy indicator. Fresh's `FormEnhancementState.pending` will need a presentation partner (likely an L1 spinner primitive or an L2 wrapper slot) if the playground requires it.
 
 ## 5. STANDARD SCHEMA LANDSCAPE & PROGRESSIVE ENHANCEMENT MARKET BAR
 
