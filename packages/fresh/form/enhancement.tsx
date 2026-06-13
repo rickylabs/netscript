@@ -193,7 +193,9 @@ function toClientFieldErrors<TValues extends FormValues>(
         continue;
       }
 
-      nextErrors[field as Extract<keyof TValues, string>] = [...messages] as unknown as FormFieldErrors<TValues>[
+      nextErrors[field as Extract<keyof TValues, string>] = [
+        ...messages,
+      ] as unknown as FormFieldErrors<TValues>[
         Extract<keyof TValues, string>
       ];
     }
@@ -237,7 +239,11 @@ function focusFirstInvalidField<TValues extends FormValues>(
   }
 }
 
-export function getSubmissionHiddenInputProps(submissionId: string) {
+export function getSubmissionHiddenInputProps(submissionId: string): {
+  readonly type: 'hidden';
+  readonly name: typeof SUBMISSION_ID_FIELD_NAME;
+  readonly value: string;
+} {
   return {
     type: 'hidden' as const,
     name: SUBMISSION_ID_FIELD_NAME,
