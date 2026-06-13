@@ -246,3 +246,26 @@ fatal: could not read Username for 'https://github.com': No such device or addre
 through the GitHub connector when available.
 
 **Closing gate:** Supervisor or authenticated environment pushes the local branch.
+
+---
+
+## D-5d2-11: Slice 16 uses a compatibility catalog beside `types.ts`
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 16  
+**Status:** accepted implementation drift
+
+**Description:**
+The approved slice text allowed moving non-public helper types into `internal.ts` or
+`builder/state.ts`. Direct `deno doc --lint packages/fresh/builders/define-page/types.ts` exposed a
+broader set of exported compatibility aliases than could be deleted without breaking the surface
+snapshot. Slice 16 therefore created `packages/fresh/builders/define-page/catalog.ts` as a
+role-named compatibility type catalog and re-exported those aliases from `types.ts`.
+
+The moved aliases are marked `@internal`, preserving TypeScript import compatibility while keeping
+direct doc-lint focused on the stable manual surface. This also brought `types.ts` below the slice
+size cap.
+
+**Closing gate:** `deno doc --lint packages/fresh/builders/define-page/types.ts`,
+`deno doc --lint packages/fresh/builders/define-page/catalog.ts`, and the surface snapshot test all
+pass for Slice 16.

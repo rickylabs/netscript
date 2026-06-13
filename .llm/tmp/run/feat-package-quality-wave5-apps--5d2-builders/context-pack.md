@@ -6,14 +6,14 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 2 complete, Slice 3 next        |
+| Current phase  | `implement` — Slice 16 complete, Slice 17 next      |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 11 are committed locally. Slice 12 is implemented and ready to commit with the
-current harness artifact updates.
+Slices 1 through 16 are complete. The branch is clean at the latest pushed head after each committed
+slice when publication succeeds.
 
 ## Completed
 
@@ -85,15 +85,21 @@ current harness artifact updates.
   - `packages/fresh/builders/define-page/navigation/hooks.ts` created.
   - `navigation.tsx` re-exports public current-route hooks from hooks module.
   - Slice 12 gates passed.
+- Slice 16 implemented:
+  - `packages/fresh/builders/define-page/types.ts` trimmed to 14129 bytes.
+  - `packages/fresh/builders/define-page/catalog.ts` created for compatibility-heavy inference
+    aliases.
+  - Direct `types.ts` and `catalog.ts` doc-lint pass.
+  - Surface snapshot passes.
 
 ## In Progress
 
-- Slice 12 commit.
+- Slice 17: update `define-page/mod.ts` sub-barrel.
 
 ## Next Steps
 
-1. Commit Slice 12 and append `commits.md` immediately.
-2. Continue Slice 13: create navigation link module.
+1. Continue Slice 17: update `define-page/mod.ts` sub-barrel and run its doc-lint/surface gates.
+2. Continue Slice 18: verify `packages/fresh/deno.json` and publish dry-run scope.
 
 ## Key Decisions
 

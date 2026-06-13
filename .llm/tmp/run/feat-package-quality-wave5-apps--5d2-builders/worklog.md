@@ -337,6 +337,32 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/navigation/hooks.ts packages/fresh/builders/define-page/navigation.tsx` | PASS: `hooks.ts` 4816 bytes; `navigation.tsx` 16226 bytes |
 
+## 2026-06-14 slice 16 — define-page type catalog trim
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/types.ts`
+- `packages/fresh/builders/define-page/catalog.ts`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/drift.md`
+
+**Implementation:**
+
+- Split the compatibility-heavy lower type catalog from `types.ts` into `catalog.ts`, keeping the
+  existing `types.ts` export surface through type re-exports.
+- Marked compatibility inference aliases as `@internal` so direct `types.ts` doc-lint reflects the
+  stable public manual rather than every internal typestate alias.
+- Replaced private unique-symbol brand references with package-owned structural brand fields.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/types.ts packages/fresh/builders/define-page/catalog.ts` | PASS |
+| `deno doc --lint packages/fresh/builders/define-page/types.ts` | PASS |
+| `deno doc --lint packages/fresh/builders/define-page/catalog.ts` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/types.ts packages/fresh/builders/define-page/catalog.ts` | PASS: `types.ts` 14129 bytes; `catalog.ts` 12095 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13
