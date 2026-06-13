@@ -216,6 +216,29 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
 | `wc -c packages/fresh/builders/define-page/runtime/context.ts packages/fresh/builders/define-page/runtime.tsx` | PASS: `context.ts` 5075 bytes; `runtime.tsx` 14693 bytes |
 
+**Commit:** `f1f2b9a refactor(fresh): extract define page runtime context`
+
+## 2026-06-14 slice 8 — runtime render module
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/runtime/render.tsx`
+- `packages/fresh/builders/define-page/runtime.tsx`
+
+**Implementation:**
+
+- Moved JSX render helpers, fallback resolution, stream slot id creation, head rendering, layer slot
+  construction, and header merging into `runtime/render.tsx`.
+- Kept pipeline orchestration in `runtime.tsx` for the handler split.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno check --unstable-kv packages/fresh/builders/define-page/runtime/render.tsx packages/fresh/builders/define-page/runtime.tsx` | PASS |
+| `deno test packages/fresh/builders/define-page/surface.test.ts` | PASS |
+| `wc -c packages/fresh/builders/define-page/runtime/render.tsx packages/fresh/builders/define-page/runtime.tsx` | PASS: `render.tsx` 3456 bytes; `runtime.tsx` 11998 bytes |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

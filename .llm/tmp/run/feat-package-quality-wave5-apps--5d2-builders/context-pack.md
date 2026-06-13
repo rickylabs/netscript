@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1 through 6 are committed locally. Slice 7 is implemented and ready to commit with the
+Slices 1 through 7 are committed locally. Slice 8 is implemented and ready to commit with the
 current harness artifact updates.
 
 ## Completed
@@ -59,15 +59,20 @@ current harness artifact updates.
   - `packages/fresh/builders/define-page/runtime/context.ts` created.
   - `runtime.tsx` now imports context/telemetry/schema-resolution helpers.
   - Slice 7 gates passed.
+- Slice 7 committed locally as `f1f2b9a refactor(fresh): extract define page runtime context`.
+- Slice 8 implemented:
+  - `packages/fresh/builders/define-page/runtime/render.tsx` created.
+  - `runtime.tsx` now imports render/fallback/head/header helpers.
+  - Slice 8 gates passed.
 
 ## In Progress
 
-- Slice 7 commit.
+- Slice 8 commit.
 
 ## Next Steps
 
-1. Commit Slice 7 and append `commits.md` immediately.
-2. Continue Slice 8: create runtime render module.
+1. Commit Slice 8 and append `commits.md` immediately.
+2. Continue Slice 9: create runtime handlers module.
 
 ## Key Decisions
 
@@ -98,6 +103,7 @@ current harness artifact updates.
 | `packages/fresh/builders/define-page/builder/mod.tsx` | moved, pending commit | builder role entry; still over size target |
 | `packages/fresh/builders/define-page/runtime/context.ts` | new, pending commit | runtime context, telemetry, path/search resolution |
 | `packages/fresh/builders/define-page/runtime.tsx` | pending commit | imports runtime context helpers |
+| `packages/fresh/builders/define-page/runtime/render.tsx` | new, pending commit | render/fallback/head/header helpers |
 
 ## Gates
 
@@ -113,6 +119,7 @@ current harness artifact updates.
 | Slice 5 validators | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/validators.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `validators.ts` 2545 bytes |
 | Slice 6 builder entry | partial | type-check and surface snapshot pass; direct internal-entry doc-lint and size target recorded as D-5d2-7/D-5d2-8 |
 | Slice 7 runtime context | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/context.ts packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `context.ts` 5075 bytes |
+| Slice 8 runtime render | passed | `deno check --unstable-kv packages/fresh/builders/define-page/runtime/render.tsx packages/fresh/builders/define-page/runtime.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `render.tsx` 3456 bytes |
 
 ## Open Questions
 

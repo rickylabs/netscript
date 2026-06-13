@@ -8,3 +8,4 @@ Append-only hash record (repo + hash + subject).
 - 5105cf1: refactor(fresh): extract define page builder factory
 - 52bd5b9: refactor(fresh): extract define page builder validators
 - 8e519ad: refactor(fresh): move define page builder entry
+- f1f2b9a: refactor(fresh): extract define page runtime context
