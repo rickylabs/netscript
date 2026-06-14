@@ -9,3 +9,4 @@ Append-only hash record (repo + hash + subject).
 - `7599cca`: fix(fresh): expose server streaming types
 - `3c841e4`: fix(fresh): expose root cache entry types
 - `b59b340`: docs(5d6): rebaseline fresh public surface gates
+- `3925d5c`: chore(fresh): clean package fmt lint residuals
