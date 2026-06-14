@@ -4,7 +4,9 @@ import type { FieldConstraints, FormFieldErrors, FormValues } from '../types.ts'
  * Successful schema parse result.
  */
 export interface FormSchemaParseSuccess<TOutput> {
+  /** Whether parsing succeeded. */
   readonly success: true;
+  /** Parsed and coerced output value. */
   readonly data: TOutput;
 }
 
@@ -12,8 +14,11 @@ export interface FormSchemaParseSuccess<TOutput> {
  * Failed schema parse result normalized for the form runtime.
  */
 export interface FormSchemaParseFailure<TValues extends FormValues> {
+  /** Whether parsing failed. */
   readonly success: false;
+  /** Field-keyed validation messages normalized for form rendering. */
   readonly fieldErrors: FormFieldErrors<TValues>;
+  /** Form-level validation messages not associated with one field. */
   readonly formErrors: readonly string[];
 }
 

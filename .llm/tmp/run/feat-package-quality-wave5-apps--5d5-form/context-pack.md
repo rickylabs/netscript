@@ -202,3 +202,10 @@
 - `91e8e17`: [5d5] Slice 7 align form telemetry
 - `abc70b7`: [5d5] Record slice 7 commit
 - `6fe4fbe`: [5d5] Slice 8 audit form public surface
+
+## Slice 9 Update
+
+- `createStandardSchemaAdapter` is implemented in `packages/fresh/form/schema-adapter/standard.ts`.
+- `packages/fresh/form/mod.ts` exports the Standard Schema adapter and package-owned Standard Schema types, but not `createZodAdapter`, to keep root form doc-lint free of Zod private-type refs.
+- `packages/fresh/form/schema-adapter-standard.test.ts` covers Standard Schema success, normalized errors, aggregate parse failure, and Zod Standard Schema metadata compatibility.
+- Slice 9 gates passed: public doc-lint, narrow typecheck, scoped form check, focused adapter tests, touched-file fmt/lint, and file-size scan.

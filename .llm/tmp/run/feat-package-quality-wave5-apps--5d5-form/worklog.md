@@ -224,3 +224,24 @@ Append-only. One entry per slice / decision.
 | Touched-file lint | `deno lint packages/fresh/form/mod.ts` | PASS |
 | Re-export-upstream scan | `grep -R "export .*from ['\\\"]\\(npm:\\|jsr:\\|zod\\|@std/\\|fresh\\|preact\\)" -n packages/fresh/form/mod.ts packages/fresh/form/*.ts packages/fresh/form/*.tsx \| head -80` | PASS: no matches |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -30` | PASS: `mod.ts` 93 LOC; no over-cap form files |
+
+## 2026-06-14 - Slice 9 Standard Schema adapter
+
+- Added `createStandardSchemaAdapter` for Standard Schema v1 compatible schemas.
+- Added package-owned Standard Schema contract types and exported them through `schema-adapter.ts` and `form/mod.ts`.
+- Preserved `createZodAdapter` on the existing `form/schema-adapter.ts` path without adding it to the root form public surface, avoiding Zod private-type leaks in `form/mod.ts` doc-lint.
+- Added focused `schema-adapter-standard.test.ts` coverage for successful parses, field/form error normalization, aggregate parse errors, and Zod Standard Schema metadata compatibility.
+- Documented schema-adapter contract result properties so public doc-lint remains clean.
+- Reverted incidental `deno.lock` churn from an earlier root-config test run; package-config tests use the pinned `zod` import.
+
+### Slice 9 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Focused adapter tests | `deno test --config packages/fresh/deno.json --unstable-kv packages/fresh/form/schema-adapter-standard.test.ts packages/fresh/form/schema-adapter.test.ts` | PASS: 18 passed, 0 failed |
+| Touched-file format | `deno fmt --check packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/standard.ts packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter/contract.ts packages/fresh/form/schema-adapter-standard.test.ts` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/standard.ts packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter/contract.ts packages/fresh/form/schema-adapter-standard.test.ts` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: new files ≤171 LOC |
