@@ -18,3 +18,4 @@ Append-only hash record (repo + hash + subject).
 | `22b964d` | [5d5] Slice 10 rebuild zod adapter |
 | `3a11750` | [5d5] Slice 11 add schema introspector contract |
 | `395bab5` | [5d5] Slice 12 refresh fresh-ui seam recipe |
+- a461644: [5d5] Final scoped closeout
