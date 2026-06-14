@@ -29,8 +29,8 @@ export {
   getSubmissionHiddenInputProps,
   useFormEnhancement,
 } from './enhancement.tsx';
-export { Form } from './form.tsx';
-export { FormRegion } from './form-region.tsx';
+export { Form, type FormContent, type FormProps, type FormStateLike } from './form.tsx';
+export { FormRegion, type FormRegionProps } from './form-region.tsx';
 export { generateSubmissionId, SUBMISSION_ID_FIELD_NAME } from './idempotency.ts';
 export {
   applyIntentOperation,
@@ -54,6 +54,7 @@ export type {
   CollectionKeyMap,
   ControlProps,
   DescriptionProps,
+  EnhancedFormProps,
   ErrorFormReplyInit,
   ErrorProps,
   FieldConstraints,

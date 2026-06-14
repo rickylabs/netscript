@@ -580,6 +580,33 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/builders --ext ts,tsx --ignore-line-endings` | PASS |
 | `deno test --allow-all packages/fresh/builders` | PASS: 36 tests, 0 failures |
 
+## 2026-06-14 slice 26 — final doc-lint and publish dry-run
+
+**Files changed:**
+
+- `packages/fresh/form/form.tsx`
+- `packages/fresh/form/form-region.tsx`
+- `packages/fresh/form/enhancement.tsx`
+- `packages/fresh/form/mod.ts`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/worklog.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/context-pack.md`
+
+**Implementation:**
+
+- Added missing JSDoc for public form helpers exposed by `form/mod.ts`.
+- Exported package-owned form prop/content/state types through the form barrel so direct
+  `deno doc --lint packages/fresh/form/mod.ts` does not expose private Preact JSX internals.
+- Re-exported `EnhancedFormProps` because it is part of `FormEnhancementState`'s public shape.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno doc --lint packages/fresh/builders/mod.ts` | PASS |
+| `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| `deno check --unstable-kv packages/fresh/form/mod.ts packages/fresh/builders/mod.ts` | PASS |
+| `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

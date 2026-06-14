@@ -132,8 +132,7 @@ slice when publication succeeds.
 
 ## Next Steps
 
-1. Continue Slice 26: final doc-lint and publish dry-run.
-2. Continue Slice 27: closeout artifacts and readiness handoff.
+1. Continue Slice 27: closeout artifacts and readiness handoff.
 
 ## Key Decisions
 
@@ -174,7 +173,7 @@ slice when publication succeeds.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | planned | Slice 26 will run final doc-lint + `deno publish --dry-run`. |
+| Static | passed | Slice 26 final builders/form doc-lint and `deno publish --dry-run --allow-dirty` pass. |
 | Fitness | partial | Slice 25 scoped builders gates passed; root `deno task arch:check` remains repo-wide baseline failure D-5d2-15. |
 | Runtime | passed | Slice 24 builders suite and Slice 25 rerun passed: 36 tests. |
 | Consumer | planned | No public API changes; surface snapshot test in slice 1 proves this. |
@@ -190,6 +189,7 @@ slice when publication succeeds.
 | Slice 11 navigation context | passed | `deno check --unstable-kv packages/fresh/builders/define-page/navigation/context.ts packages/fresh/builders/define-page/navigation.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `context.ts` 1816 bytes |
 | Slice 12 navigation hooks | passed | `deno check --unstable-kv packages/fresh/builders/define-page/navigation/hooks.ts packages/fresh/builders/define-page/navigation.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `hooks.ts` 4816 bytes |
 | Slice 25 architecture fitness | partial | Root `deno task arch:check` FAIL baseline; scoped builders doctrine scan PASS with warnings; scoped builders check/lint/fmt/tests PASS |
+| Slice 26 final doc-lint/publish | passed | `deno doc --lint packages/fresh/builders/mod.ts`; `deno doc --lint packages/fresh/form/mod.ts`; `deno publish --dry-run --allow-dirty` from `packages/fresh` |
 
 ## Open Questions
 
