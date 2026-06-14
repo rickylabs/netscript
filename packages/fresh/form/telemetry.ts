@@ -1,63 +1,62 @@
-import { type Attributes, getTracer, SpanKind, withSpan } from '@netscript/telemetry/tracer';
+import { type Attributes, SpanKind } from '@netscript/telemetry/tracer';
+import { emitFreshError, withFreshSpan } from '../_internal/telemetry.ts';
 
-// Deprecated-in-place for 5d5: form telemetry will cut over to
-// `../_internal/telemetry.ts` when the form slice owns the public behavior.
-const formTracer = getTracer('@netscript/fresh/form');
+type FormTelemetryAttributeMap = Record<string, string | number | boolean | undefined>;
 
 export async function withFormSpan<T>(
   spanName: string,
   phase: string,
-  attributes: Record<string, string | number | boolean | undefined>,
+  attributes: FormTelemetryAttributeMap,
   run: () => Promise<T>,
 ): Promise<T> {
-  return await withSpan(formTracer, `${spanName}.${phase}`, async (span) => {
-    for (const [key, value] of Object.entries(attributes)) {
-      if (value !== undefined) {
-        span.setAttribute(key, value);
-      }
-    }
-
-    return await run();
-  });
-}
-
-export async function emitFormError(
-  spanName: string,
-  phase: string,
-  attributes: Record<string, string | number | boolean | undefined>,
-  error: unknown,
-): Promise<void> {
-  const message = error instanceof Error ? error.message : String(error);
   const filteredAttributes = toAttributes(attributes);
 
-  await withSpan(
-    formTracer,
-    `${spanName}.${phase}.error`,
-    async (span) => {
-      span.setAttributes({
-        ...filteredAttributes,
-        'form.phase': phase,
-        'form.error.message': message,
-      } as Attributes);
-      span.recordException(error instanceof Error ? error : new Error(message));
-      span.addEvent('form.error', {
-        ...filteredAttributes,
-        'form.phase': phase,
-        'form.error.message': message,
-      });
-    },
+  return await withFreshSpan(
     {
+      scope: 'form',
+      name: `${spanName}.${phase}`,
+      operation: `form.${phase}`,
       kind: SpanKind.INTERNAL,
       attributes: {
         ...filteredAttributes,
         'form.phase': phase,
       },
     },
+    async () => await run(),
+  );
+}
+
+export async function emitFormError(
+  spanName: string,
+  phase: string,
+  attributes: FormTelemetryAttributeMap,
+  error: unknown,
+): Promise<void> {
+  const filteredAttributes = toAttributes(attributes);
+
+  await withFreshSpan(
+    {
+      scope: 'form',
+      name: `${spanName}.${phase}.error`,
+      operation: `form.${phase}.error`,
+      kind: SpanKind.INTERNAL,
+      attributes: {
+        ...filteredAttributes,
+        'form.phase': phase,
+      },
+    },
+    (span) => {
+      emitFreshError(span, error, {
+        ...filteredAttributes,
+        'form.phase': phase,
+        'netscript.operation': `form.${phase}.error`,
+      });
+    },
   );
 }
 
 function toAttributes(
-  attributes: Record<string, string | number | boolean | undefined>,
+  attributes: FormTelemetryAttributeMap,
 ): Attributes {
   return Object.fromEntries(
     Object.entries(attributes).filter(([, value]) => value !== undefined),

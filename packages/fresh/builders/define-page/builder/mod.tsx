@@ -716,12 +716,6 @@ function createWithFormHandler<
         },
         error,
       );
-      console.error('[netscript/fresh] withForm submit failed', {
-        formId: id,
-        route: ctx.url.pathname,
-        submissionId,
-        error,
-      });
 
       return {
         data: normalizeFormError(
