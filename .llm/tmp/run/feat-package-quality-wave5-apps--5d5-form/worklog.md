@@ -95,3 +95,32 @@ Append-only. One entry per slice / decision.
 | Touched-file format | `deno fmt --check packages/fresh/form/field-descriptors.ts packages/fresh/form/field-descriptors/*.ts` | PASS |
 | Touched-file lint | `deno lint packages/fresh/form/field-descriptors.ts packages/fresh/form/field-descriptors/*.ts` | PASS |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS for slice target: facade 1 LOC; new descriptor files all ≤198 LOC; `schema-adapter.ts` remains 576 LOC for Slice 4 |
+
+## 2026-06-14 - Slice 4 schema-adapter.ts decomposition
+
+- Split the 576 LOC `packages/fresh/form/schema-adapter.ts` implementation into focused
+  role-named files under `packages/fresh/form/schema-adapter/`:
+  - `contract.ts` owns `FormSchemaAdapter` and parse-result contract types.
+  - `zod.ts` owns the public `createZodAdapter` factory and delegates internals.
+  - `zod-errors.ts` owns Zod field/form error normalization.
+  - `zod-defaults.ts` owns default-value extraction and defensive cloning.
+  - `zod-constraints.ts` owns conservative HTML constraint extraction.
+  - `zod-internals.ts` owns Zod wrapper unwrapping helpers used by defaults and constraints.
+  - `mod.ts` re-exports the contract and Zod adapter with `// arch:barrel-ok` justification.
+- Preserved `packages/fresh/form/schema-adapter.ts` as a compatibility facade for existing imports.
+- Kept `createStandardSchemaAdapter` out of this slice; it remains the planned additive public
+  feature for later schema-adapter slices.
+- Public `packages/fresh/form/mod.ts` exports were unchanged.
+- All previously over-cap implementation files owned by slices 2-4 are now under the cap.
+
+### Slice 4 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Touched-file format | `deno fmt --check packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/*.ts` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/*.ts` | PASS after bracketing moved switch cases for `no-case-declarations` |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS for slice target: facade 7 LOC; new schema-adapter files all ≤237 LOC |
+| Focused regression test | `deno test --unstable-kv packages/fresh/form/schema-adapter.test.ts` | PASS: 14 passed, 0 failed |

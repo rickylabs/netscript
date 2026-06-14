@@ -19,11 +19,14 @@
   `_internal/*-types.ts` files.
 - Slice 3 is complete locally: `field-descriptors.ts` split into role-named
   `field-descriptors/*` files with the original import path preserved as a compatibility facade.
+- Slice 4 is complete locally: `schema-adapter.ts` split into role-named `schema-adapter/*` files
+  with the original import path preserved as a compatibility facade.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
   - Over-cap files retired so far: `types.ts` 753 LOC and `field-descriptors.ts` 518 LOC.
-  - Remaining planned over-cap target: `schema-adapter.ts` 576 LOC.
+  - Slices 2-4 have retired the planned over-cap implementation files (`types.ts`,
+    `field-descriptors.ts`, and `schema-adapter.ts`).
 - Drift `D-5d5-6` records the changed baseline before implementation edits.
 - Slice 1 gates passed: form doc-lint, scoped form check, touched-doc Markdown format, and doc path
   existence check.
@@ -32,6 +35,8 @@
   pre-existing findings in untouched files.
 - Slice 3 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   touched-file fmt, touched-file lint, and file-size scan.
+- Slice 4 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  touched-file fmt, touched-file lint, file-size scan, and focused schema-adapter tests.
 
 ## Completed
 
@@ -56,16 +61,21 @@
   - New `field-descriptors/{aria-data,collection,constraints,descriptor,mod}.ts` files carry the
     moved implementation and all stay under 198 LOC.
   - `createFieldDescriptors` import path remains preserved.
+- Split `packages/fresh/form/schema-adapter.ts` for slice 4:
+  - `packages/fresh/form/schema-adapter.ts` is now a compatibility facade.
+  - New `schema-adapter/{contract,mod,zod,zod-constraints,zod-defaults,zod-errors,zod-internals}.ts`
+    files carry the moved implementation and all stay under 237 LOC.
+  - `createZodAdapter`, `FormSchemaAdapter`, and parse-result type import paths remain preserved.
 
 ## In Progress
 
-- Commit slice 3 descriptor split and harness artifacts, then append the commit ledger.
+- Commit slice 4 schema-adapter split and harness artifacts, then append the commit ledger.
 
 ## Next Steps
 
-1. Commit and push slice 3.
+1. Commit and push slice 4.
 2. Comment PR #38 with slice summary and next slice.
-3. Start slice 4 `schema-adapter.ts` decomposition.
+3. Start slice 5 explicit public return-type sweep.
 
 ## Key Decisions
 
@@ -106,6 +116,14 @@
 | `packages/fresh/form/field-descriptors/constraints.ts` | new | Slice 3 constraint/path helpers |
 | `packages/fresh/form/field-descriptors/descriptor.ts` | new | Slice 3 scalar descriptor construction |
 | `packages/fresh/form/field-descriptors/mod.ts` | new | Slice 3 descriptor-tree orchestration |
+| `packages/fresh/form/schema-adapter.ts` | update | Slice 4 compatibility facade |
+| `packages/fresh/form/schema-adapter/contract.ts` | new | Slice 4 schema adapter contract |
+| `packages/fresh/form/schema-adapter/mod.ts` | new | Slice 4 internal adapter aggregation |
+| `packages/fresh/form/schema-adapter/zod.ts` | new | Slice 4 Zod adapter factory |
+| `packages/fresh/form/schema-adapter/zod-constraints.ts` | new | Slice 4 Zod constraint extraction |
+| `packages/fresh/form/schema-adapter/zod-defaults.ts` | new | Slice 4 Zod default extraction |
+| `packages/fresh/form/schema-adapter/zod-errors.ts` | new | Slice 4 Zod error normalization |
+| `packages/fresh/form/schema-adapter/zod-internals.ts` | new | Slice 4 Zod unwrap helpers |
 
 ## Gates
 
