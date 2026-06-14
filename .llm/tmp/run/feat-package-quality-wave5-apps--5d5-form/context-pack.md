@@ -145,11 +145,11 @@
 
 ## In Progress
 
-- Commit and push Slice 12, then append the commit ledger and comment PR #38.
+- Push Slice 12 ledger commit and comment PR #38.
 
 ## Next Steps
 
-1. Commit and push Slice 12.
+1. Push Slice 12 ledger commit.
 2. Comment PR #38 with slice summary and next slice.
 3. Run scoped 5d5 closeout gates and mark ready for IMPL-EVAL.
 
@@ -259,6 +259,7 @@
 - `7fe2963`: [5d5] Record slice 10 commit
 - `3a11750`: [5d5] Slice 11 add schema introspector contract
 - `9921aef`: [5d5] Record slice 11 commit
+- `395bab5`: [5d5] Slice 12 refresh fresh-ui seam recipe
 
 ## Slice 9 Update
 
