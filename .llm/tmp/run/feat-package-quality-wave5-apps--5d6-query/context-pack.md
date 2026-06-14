@@ -6,7 +6,7 @@
 - PR: `https://github.com/rickylabs/netscript/pull/39`
 - Agent role: implementation agent only; final IMPL-EVAL must be separate.
 - PLAN-EVAL: `APPROVED` in `plan-eval.md`.
-- Latest completed implementation slice: Slice 3 server streaming public type exports.
+- Latest completed implementation slice: Slice 4 root cache-entry type exports.
 
 ## Rebaseline Summary
 
@@ -15,7 +15,6 @@
 - Targeted `deno check --unstable-kv` for query/server/root passes.
 - Package check wrapper passes for `packages/fresh`.
 - Remaining expected failures:
-  - `packages/fresh/mod.ts` doc-lint: 4 inherited utils errors.
   - scoped fmt: existing server `define-fresh-app` files need formatting.
   - package scoped lint: two builder fixture `require-await` findings remain from the rebaseline; the query `JSX` unused import was fixed in Slice 2.
 
@@ -36,6 +35,14 @@
 - Server barrel scoped fmt/lint wrappers pass.
 - Package dry-run still passes.
 
+## Slice 4 Summary
+
+- Root `@netscript/fresh` now exports `CacheEntryLike` and `CachedListEntryLike` alongside the cache helper functions that expose those types.
+- `deno doc --lint packages/fresh/mod.ts` passes.
+- `deno doc --lint packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/mod.ts packages/fresh/utils/mod.ts` passes.
+- `deno check --unstable-kv packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/mod.ts` passes.
+- Package dry-run still passes.
+
 ## Next Slice
 
-Implement the root/utils inherited doc-lint cleanup for cache-entry public helper types.
+Rebaseline whole public-entrypoint doc-lint across the 13 package exports and retire or rescope already-completed plan slices.

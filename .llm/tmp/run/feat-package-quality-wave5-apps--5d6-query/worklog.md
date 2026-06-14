@@ -106,3 +106,29 @@ Proceed to server public surface cleanup: export or package-own the streaming re
 ### Next slice
 
 Proceed to root/utils inherited doc-lint cleanup by exporting the cache-entry public helper types used by `@netscript/fresh` root utilities.
+
+## 2026-06-14 - Slice 4 - Root cache-entry type exports
+
+- Changed `packages/fresh/mod.ts`.
+- Re-exported `CacheEntryLike` and `CachedListEntryLike` from the curated root barrel alongside the cache helper functions that expose those types in their public signatures.
+- No runtime behavior changed.
+
+### Slice 4 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Root doc-lint | PASS | `deno doc --lint packages/fresh/mod.ts` |
+| Utils doc-lint | PASS | `deno doc --lint packages/fresh/utils/mod.ts` |
+| Cleaned entrypoint doc-lint | PASS | `deno doc --lint packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/mod.ts packages/fresh/utils/mod.ts` |
+| Combined touched entrypoint check | PASS | `deno check --unstable-kv packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/mod.ts` |
+| Root/utils fmt wrapper | PASS | `run-deno-fmt.ts --root packages/fresh/mod.ts --root packages/fresh/utils --ext ts,tsx --ignore-line-endings` |
+| Root/utils lint wrapper | PASS | `run-deno-lint.ts --root packages/fresh/mod.ts --root packages/fresh/utils --ext ts,tsx` |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+
+### Residual risk
+
+- The root barrel remains intentionally small. This slice adds only the two types required by existing root utility function signatures.
+
+### Next slice
+
+Rebaseline whole public-entrypoint doc-lint across the 13 package exports and retire or rescope any remaining planned slices that the merged 5d1-5d5 baseline already completed.

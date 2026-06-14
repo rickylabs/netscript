@@ -25,4 +25,10 @@ export {
   hasError,
   type LoaderResult,
 } from './error/mod.ts';
-export { hasAllCacheEntries, minCachedAt, projectCachedItemFromList } from './utils/mod.ts';
+export {
+  type CachedListEntryLike,
+  type CacheEntryLike,
+  hasAllCacheEntries,
+  minCachedAt,
+  projectCachedItemFromList,
+} from './utils/mod.ts';
