@@ -27,6 +27,8 @@
   formatting `state.ts`, `intent.ts`, `reply.ts`, and changing `config.ts` to a type-only Zod import.
 - Slice 7 is complete locally: `form/telemetry.ts` now delegates to shared Fresh telemetry, and the
   duplicate submit-failure `console.error` was removed from the form builder path.
+- Slice 8 is complete locally as a no-source-change verification slice: `mod.ts` public surface has
+  78 documented symbols, no upstream declaration leaks, and no doc-lint private-type refs.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
@@ -50,6 +52,8 @@
   touched-file fmt/lint for the planned JSDoc-sweep files, and file-size scan.
 - Slice 7 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   direct touched-file typecheck, touched-file fmt/lint, F-14 console scan, and file-size scan.
+- Slice 8 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  public surface JSON audit, `mod.ts` fmt/lint, re-export-upstream scan, and file-size scan.
 
 ## Completed
 
@@ -90,16 +94,20 @@
   - `packages/fresh/form/telemetry.ts` delegates to `../_internal/telemetry.ts`.
   - `packages/fresh/builders/define-page/builder/mod.tsx` no longer logs form submit failures to
     `console.error`; structured telemetry remains.
+- Completed Slice 8 `mod.ts` public surface audit:
+  - No source edits were required.
+  - Public names and import paths remain stable.
+  - `_internal` declaration locations are expected from the Slice 2 public type-manifest split.
 
 ## In Progress
 
-- Commit slice 7 telemetry alignment and harness artifacts, then append the commit ledger.
+- Commit slice 8 public surface audit and harness artifacts, then append the commit ledger.
 
 ## Next Steps
 
-1. Commit and push slice 7.
+1. Commit and push slice 8.
 2. Comment PR #38 with slice summary and next slice.
-3. Start slice 8 `mod.ts` public surface audit.
+3. Start Slice 9 schema adapter additive work only if gates remain clean.
 
 ## Key Decisions
 
@@ -192,3 +200,4 @@
 - `2e790c5`: [5d5] Slice 6 public export sweep
 - `43be65f`: [5d5] Record slice 6 commit
 - `91e8e17`: [5d5] Slice 7 align form telemetry
+- `abc70b7`: [5d5] Record slice 7 commit

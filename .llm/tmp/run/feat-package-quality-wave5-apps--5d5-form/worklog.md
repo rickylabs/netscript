@@ -197,3 +197,30 @@ Append-only. One entry per slice / decision.
 | Touched-file lint | `deno lint packages/fresh/form/telemetry.ts packages/fresh/builders/define-page/builder/mod.tsx` | PASS |
 | F-14 console scan | `grep -R "console\\." -n packages/fresh/form packages/fresh/builders/define-page/builder/mod.tsx \| head -80` | PASS: no matches |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -30` | PASS: `telemetry.ts` 64 LOC; no over-cap form files |
+
+## 2026-06-14 - Slice 8 mod.ts public surface audit
+
+- Audited `packages/fresh/form/mod.ts` without source edits.
+- `deno doc --json packages/fresh/form/mod.ts` reports 78 public symbols, counting value exports
+  and all exported types.
+- Public surface findings:
+  - Missing declaration docs: 0.
+  - Upstream declaration leaks: 0.
+  - Deno doc-lint private-type refs: 0.
+- Deno JSON still reports 42 public type declarations from `_internal/*-types.ts`; this matches the
+  Slice 2 manifest split, where `types.ts` publicly re-exports those author-facing names while the
+  implementation lives in focused internal files. No consumer import path or public export name
+  changed.
+
+### Slice 8 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS: 0 occurrences |
+| Public surface JSON audit | `deno doc --json packages/fresh/form/mod.ts` parsed for symbol count, missing docs, internal declarations, and upstream declarations | PASS: 78 symbols, 0 missing docs, 0 upstream declarations, 42 expected `_internal` declarations |
+| Touched-file format | `deno fmt --check packages/fresh/form/mod.ts` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/mod.ts` | PASS |
+| Re-export-upstream scan | `grep -R "export .*from ['\\\"]\\(npm:\\|jsr:\\|zod\\|@std/\\|fresh\\|preact\\)" -n packages/fresh/form/mod.ts packages/fresh/form/*.ts packages/fresh/form/*.tsx \| head -80` | PASS: no matches |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -30` | PASS: `mod.ts` 93 LOC; no over-cap form files |
