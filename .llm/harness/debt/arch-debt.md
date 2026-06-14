@@ -182,7 +182,9 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** RESOLVED 2026-06-14 — Wave 5 consolidation Phase D split `builders/mod.ts` (1,110 LOC)
+  into `src/application/builders/` per-concern modules; max file now 497 LOC (< 500). Independent
+  IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED) confirmed F-1/F-5/F-11 PASS.
 - **Gate:** F-1, F-5, F-11
 
 ## packages/fresh — F-7 full package doc-lint residue after 5d1
@@ -198,7 +200,9 @@ Seeded from
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/plan.md`;
   `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`.
 - **Created:** 2026-06-13
-- **Status:** open, DEBT_ACCEPTED for 5d1 only.
+- **Status:** RESOLVED 2026-06-14 — `deno task doc-lint` now passes from `packages/fresh` (0
+  findings, 12 entrypoints). Independent IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED)
+  confirmed F-7/F-5 PASS at HEAD.
 - **Gate:** F-7, F-5, `deno task doc-lint` from `packages/fresh`.
 
 ## packages/service — doctrine verdict Refactor
