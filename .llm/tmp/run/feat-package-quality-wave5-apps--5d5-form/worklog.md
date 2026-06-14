@@ -66,3 +66,32 @@ Append-only. One entry per slice / decision.
 | Touched-file lint | `deno lint packages/fresh/form/types.ts packages/fresh/form/_internal/*.ts` | PASS |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr` | PASS for slice target: `types.ts` 50 LOC; new `_internal/*` files all ≤219 LOC |
 | Broad form fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/form --ext ts,tsx` | FAIL on pre-existing formatting findings in untouched files; not mutated in slice 2 |
+
+## 2026-06-14 - Slice 3 field-descriptors.ts decomposition
+
+- Split the 518 LOC `packages/fresh/form/field-descriptors.ts` implementation into focused
+  role-named files under `packages/fresh/form/field-descriptors/`:
+  - `descriptor.ts` owns scalar descriptor creation, descriptor options, value comparison, and
+    object-shape guards.
+  - `constraints.ts` owns constraint cloning, path normalization, and child-key discovery.
+  - `collection.ts` owns collection descriptors, collection item keys, and collection intent button
+    props.
+  - `aria-data.ts` owns field IDs, control value formatting, and ARIA/data prop merging.
+  - `mod.ts` owns descriptor-tree orchestration and carries the required `// arch:barrel-ok`
+    justification.
+- Preserved the existing `packages/fresh/form/field-descriptors.ts` import path as a one-line
+  compatibility facade that re-exports `createFieldDescriptors`.
+- Public `packages/fresh/form/mod.ts` exports were unchanged.
+- Remaining over-cap implementation target is the planned Slice 4 file:
+  - `schema-adapter.ts` 576 LOC.
+
+### Slice 3 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Touched-file format | `deno fmt --check packages/fresh/form/field-descriptors.ts packages/fresh/form/field-descriptors/*.ts` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/field-descriptors.ts packages/fresh/form/field-descriptors/*.ts` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS for slice target: facade 1 LOC; new descriptor files all ≤198 LOC; `schema-adapter.ts` remains 576 LOC for Slice 4 |

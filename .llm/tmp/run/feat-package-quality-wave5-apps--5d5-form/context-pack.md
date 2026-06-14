@@ -15,19 +15,23 @@
 - PLAN-EVAL passed before implementation.
 - Branch was synced with supervisor commit `07a1f70` via sync commit `ff8cf6f`.
 - Slice 1 is pushed and PR-commented: baseline refresh plus form documentation scaffold.
-- Slice 2 is complete locally: `types.ts` split into a public manifest plus focused
+- Slice 2 is pushed and PR-commented: `types.ts` split into a public manifest plus focused
   `_internal/*-types.ts` files.
+- Slice 3 is complete locally: `field-descriptors.ts` split into role-named
+  `field-descriptors/*` files with the original import path preserved as a compatibility facade.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
-  - Over-cap files: `types.ts` 753 LOC, `schema-adapter.ts` 576 LOC,
-    `field-descriptors.ts` 518 LOC.
+  - Over-cap files retired so far: `types.ts` 753 LOC and `field-descriptors.ts` 518 LOC.
+  - Remaining planned over-cap target: `schema-adapter.ts` 576 LOC.
 - Drift `D-5d5-6` records the changed baseline before implementation edits.
 - Slice 1 gates passed: form doc-lint, scoped form check, touched-doc Markdown format, and doc path
   existence check.
 - Slice 2 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   touched-file fmt, touched-file lint, and type-file size scan. Broad form fmt wrapper still reports
   pre-existing findings in untouched files.
+- Slice 3 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  touched-file fmt, touched-file lint, and file-size scan.
 
 ## Completed
 
@@ -47,16 +51,21 @@
   - `packages/fresh/form/types.ts` is now a 50 LOC public manifest.
   - New `_internal/*-types.ts` files carry the moved definitions and all stay under 219 LOC.
   - Public type names and import paths are preserved.
+- Split `packages/fresh/form/field-descriptors.ts` for slice 3:
+  - `packages/fresh/form/field-descriptors.ts` is now a 1 LOC compatibility facade.
+  - New `field-descriptors/{aria-data,collection,constraints,descriptor,mod}.ts` files carry the
+    moved implementation and all stay under 198 LOC.
+  - `createFieldDescriptors` import path remains preserved.
 
 ## In Progress
 
-- Commit slice 2 type split and harness artifacts, then append the commit ledger.
+- Commit slice 3 descriptor split and harness artifacts, then append the commit ledger.
 
 ## Next Steps
 
-1. Commit and push slice 2.
+1. Commit and push slice 3.
 2. Comment PR #38 with slice summary and next slice.
-3. Start slice 3 `field-descriptors.ts` decomposition.
+3. Start slice 4 `schema-adapter.ts` decomposition.
 
 ## Key Decisions
 
@@ -91,6 +100,12 @@
 | `packages/fresh/form/_internal/descriptor-types.ts` | new | Slice 2 field descriptor types |
 | `packages/fresh/form/_internal/runtime-types.ts` | new | Slice 2 runtime/enhancement types |
 | `packages/fresh/form/_internal/page-types.ts` | new | Slice 2 page bridge types |
+| `packages/fresh/form/field-descriptors.ts` | update | Slice 3 compatibility facade |
+| `packages/fresh/form/field-descriptors/aria-data.ts` | new | Slice 3 ARIA/data prop helpers |
+| `packages/fresh/form/field-descriptors/collection.ts` | new | Slice 3 collection descriptor helpers |
+| `packages/fresh/form/field-descriptors/constraints.ts` | new | Slice 3 constraint/path helpers |
+| `packages/fresh/form/field-descriptors/descriptor.ts` | new | Slice 3 scalar descriptor construction |
+| `packages/fresh/form/field-descriptors/mod.ts` | new | Slice 3 descriptor-tree orchestration |
 
 ## Gates
 
@@ -120,3 +135,5 @@
 - `3ae538cdd07ef49b5b27fc97db859ad29791ce27`: (amend) added commits.md hash record
 - `0977ce5dc9aefe413fbaeb60c52275b4f49c9005`: [5d5] Slice 1 form docs baseline
 - `c987bce`: [5d5] Record slice 1 commit
+- `4e3c0bcbf34692e55a03674628172d82abe95197`: [5d5] Slice 2 split form types
+- `1e482b2`: [5d5] Record slice 2 commit
