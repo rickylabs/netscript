@@ -27,8 +27,14 @@
   formatting `state.ts`, `intent.ts`, `reply.ts`, and changing `config.ts` to a type-only Zod import.
 - Slice 7 is complete locally: `form/telemetry.ts` now delegates to shared Fresh telemetry, and the
   duplicate submit-failure `console.error` was removed from the form builder path.
-- Slice 8 is complete locally as a no-source-change verification slice: `mod.ts` public surface has
-  78 documented symbols, no upstream declaration leaks, and no doc-lint private-type refs.
+- Slice 8 is pushed and PR-commented as a no-source-change verification slice: `mod.ts` public
+  surface has 78 documented symbols, no upstream declaration leaks, and no doc-lint private-type
+  refs.
+- Slice 9 is pushed and PR-commented: `createStandardSchemaAdapter` is implemented and exported
+  through the root form surface without adding `createZodAdapter` to `form/mod.ts`.
+- Slice 10 is complete locally: `createZodAdapter` now validates through the Standard Schema
+  `~standard.validate()` path while preserving the existing ZodError rejection behavior,
+  flattened field-error shape, defaults, constraints, signature, and import path.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
@@ -54,6 +60,10 @@
   direct touched-file typecheck, touched-file fmt/lint, F-14 console scan, and file-size scan.
 - Slice 8 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   public surface JSON audit, `mod.ts` fmt/lint, re-export-upstream scan, and file-size scan.
+- Slice 9 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  focused adapter tests, touched-file fmt/lint, and file-size scan.
+- Slice 10 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  focused adapter tests, touched-file fmt/lint, and file-size scan.
 
 ## Completed
 
@@ -98,16 +108,28 @@
   - No source edits were required.
   - Public names and import paths remain stable.
   - `_internal` declaration locations are expected from the Slice 2 public type-manifest split.
+- Completed Slice 9 Standard Schema adapter:
+  - `createStandardSchemaAdapter` is implemented in `schema-adapter/standard.ts`.
+  - Package-owned Standard Schema contract types are exported through `schema-adapter.ts` and
+    `form/mod.ts`.
+  - Focused tests cover success, normalized field/form errors, aggregate parse failure, and Zod
+    Standard Schema metadata compatibility.
+- Completed Slice 10 Zod adapter rebuild:
+  - `createZodAdapter` uses Zod's Standard Schema metadata for validation.
+  - The public signature and existing `form/schema-adapter.ts` import path are unchanged.
+  - Zod-specific defaults and constraints remain delegated to existing introspector helpers.
+  - Zod parse failures still throw `ZodError`, and safe-parse errors still use
+    `z.flattenError(...)` normalization.
 
 ## In Progress
 
-- Commit slice 8 public surface audit and harness artifacts, then append the commit ledger.
+- Commit and push Slice 10, then append the commit ledger and comment PR #38.
 
 ## Next Steps
 
-1. Commit and push slice 8.
+1. Commit and push Slice 10.
 2. Comment PR #38 with slice summary and next slice.
-3. Start Slice 9 schema adapter additive work only if gates remain clean.
+3. Start Slice 11 schema introspector contract only if it remains additive and gates stay clean.
 
 ## Key Decisions
 
@@ -163,6 +185,10 @@
 | `packages/fresh/form/config.ts` | update | Slice 6 type-only Zod import |
 | `packages/fresh/form/telemetry.ts` | update | Slice 7 shared telemetry convention |
 | `packages/fresh/builders/define-page/builder/mod.tsx` | update | Slice 7 remove duplicate console side effect |
+| `packages/fresh/form/schema-adapter/standard.ts` | new | Slice 9 Standard Schema adapter |
+| `packages/fresh/form/schema-adapter-standard.test.ts` | new | Slice 9 Standard Schema adapter tests |
+| `packages/fresh/form/schema-adapter/zod.ts` | update | Slice 10 validates through Standard Schema metadata |
+| `packages/fresh/form/schema-adapter.test.ts` | update | Slice 10 Zod adapter parity tests |
 
 ## Gates
 
@@ -202,6 +228,7 @@
 - `91e8e17`: [5d5] Slice 7 align form telemetry
 - `abc70b7`: [5d5] Record slice 7 commit
 - `6fe4fbe`: [5d5] Slice 8 audit form public surface
+- `25e7bc2`: [5d5] Slice 9 add standard schema adapter
 
 ## Slice 9 Update
 
@@ -209,3 +236,12 @@
 - `packages/fresh/form/mod.ts` exports the Standard Schema adapter and package-owned Standard Schema types, but not `createZodAdapter`, to keep root form doc-lint free of Zod private-type refs.
 - `packages/fresh/form/schema-adapter-standard.test.ts` covers Standard Schema success, normalized errors, aggregate parse failure, and Zod Standard Schema metadata compatibility.
 - Slice 9 gates passed: public doc-lint, narrow typecheck, scoped form check, focused adapter tests, touched-file fmt/lint, and file-size scan.
+
+## Slice 10 Update
+
+- `createZodAdapter` now validates through Zod's Standard Schema metadata path while preserving
+  existing Zod-specific public behavior.
+- `packages/fresh/form/schema-adapter.test.ts` now guards both `safeParse()` and `parse()` against
+  accidental regression to the public `safeParseAsync()` path.
+- Slice 10 gates passed: public doc-lint, narrow typecheck, scoped form check, focused adapter
+  tests, touched-file fmt/lint, and file-size scan.

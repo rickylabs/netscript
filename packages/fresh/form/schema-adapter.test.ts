@@ -96,6 +96,27 @@ Deno.test('createZodAdapter safeParse returns parsed output on success', async (
   });
 });
 
+Deno.test('createZodAdapter safeParse validates through Standard Schema metadata', async () => {
+  const schema = z.object({
+    name: z.string().min(1, 'Name is required'),
+  });
+  schema.safeParseAsync = () => {
+    throw new Error('safeParseAsync should not be called');
+  };
+  const adapter = createZodAdapter(schema);
+
+  const result = await adapter.safeParse({ name: '' });
+
+  assertEquals(result.success, false, 'Expected parsing to fail');
+
+  if (result.success) {
+    throw new Error('Expected safeParse() to fail');
+  }
+
+  assertDeepEquals(result.fieldErrors.name, ['Name is required']);
+  assertDeepEquals(result.fieldErrors._form, []);
+});
+
 Deno.test('createZodAdapter safeParse returns flattened field and form errors on invalid input', async () => {
   const adapter = createZodAdapter(demoSchema);
 
@@ -149,6 +170,20 @@ Deno.test('createZodAdapter parse returns parsed output on valid input', async (
     receiveUpdates: 'no',
     items: [],
   });
+});
+
+Deno.test('createZodAdapter parse validates through Standard Schema metadata', async () => {
+  const schema = z.object({
+    name: z.string().min(1, 'Name is required'),
+  });
+  schema.safeParseAsync = () => {
+    throw new Error('safeParseAsync should not be called');
+  };
+  const adapter = createZodAdapter(schema);
+
+  const parsed = await adapter.parse({ name: 'Ada' });
+
+  assertDeepEquals(parsed, { name: 'Ada' });
 });
 
 Deno.test('createZodAdapter parse throws on invalid input', async () => {

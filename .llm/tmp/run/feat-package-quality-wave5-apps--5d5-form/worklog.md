@@ -245,3 +245,29 @@ Append-only. One entry per slice / decision.
 | Touched-file format | `deno fmt --check packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/standard.ts packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter/contract.ts packages/fresh/form/schema-adapter-standard.test.ts` | PASS |
 | Touched-file lint | `deno lint packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/standard.ts packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter/contract.ts packages/fresh/form/schema-adapter-standard.test.ts` | PASS |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: new files ≤171 LOC |
+
+## 2026-06-14 - Slice 10 Zod adapter Standard Schema rebuild
+
+- Rebuilt `createZodAdapter` parsing on the Zod schema's Standard Schema `~standard.validate()`
+  path.
+- Preserved the existing public `createZodAdapter` signature and import path.
+- Preserved Zod-specific observable behavior:
+  - `parse()` still rejects with `ZodError` for invalid Zod input.
+  - `safeParse()` still normalizes errors through `z.flattenError(...)`, preserving the existing
+    top-level field-error shape for nested collection issues.
+  - Zod-specific defaults and HTML constraint introspection remain owned by the existing
+    Zod introspector helpers.
+- Added focused tests proving both `safeParse()` and `parse()` avoid the public
+  `safeParseAsync()` method and validate through Standard Schema metadata.
+
+### Slice 10 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Focused adapter tests | `deno test --config packages/fresh/deno.json --unstable-kv packages/fresh/form/schema-adapter.test.ts packages/fresh/form/schema-adapter-standard.test.ts` | PASS: 20 passed, 0 failed |
+| Touched-file format | `deno fmt --check packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter.test.ts` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter.test.ts` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: touched test file 439 LOC; no form file over cap |
