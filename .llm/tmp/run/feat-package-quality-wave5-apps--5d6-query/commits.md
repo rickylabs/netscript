@@ -12,3 +12,4 @@ Append-only hash record (repo + hash + subject).
 - `3925d5c`: chore(fresh): clean package fmt lint residuals
 - `8cdf510`: chore(root): include fresh in quality wrappers
 - 4584b32: feat(fresh): add query hydration and app seams
+- 58ee48c: fix(fresh): log withForm mutate errors
