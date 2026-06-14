@@ -28,7 +28,18 @@ rationalized (D6) with all consumers/CLI-templates/tests updated atomically.
 
 ## Status
 - [x] Bootstrap run + artifacts (research, consolidation-plan, worklog+Design, drift, commits, this).
+## HARD REQUIREMENT — docs quality (user, 2026-06-14)
+Every Wave 5 package's public API docs are **rendered directly on the public website docs**. Doc
+quality is a first-class deliverable for ALL four packages, not just structure:
+- Every exported symbol carries complete, accurate JSDoc (summary + `@param`/`@returns`/`@throws`
+  + at least one runnable `@example` for non-trivial APIs). No slow types.
+- Module (`@module`) headers explain the subpath's role and when to reach for it.
+- READMEs lead with Package Role/archetype, give copy-paste quick starts, and document every subpath.
+- `deno doc --lint` (full export set) is a gate for every package; prefer `deno doc --html` spot-check.
+- Retro-apply to service + sdk (already restructured) as well as fresh-ui + fresh.
+
 - [x] Phase A (service) — A1 split builder (a0e5bcc), A2 docs/archetype (e67edf1). DONE.
+- [x] Phase B (sdk) — B3 barrel collapse into src/ (5367093). B1/B2 deferred (drift). DONE.
 - [ ] Phase B (sdk) — B1 adapters, B2 domain/application, B3 delete barrels + repoint exports.
 - [ ] Phase C (fresh-ui) — C1 src/ wrap, C2 manifest split + A4 label.
 - [ ] Phase D (fresh) — D1 utils kill, D2 builders, D3 route, D4 form, D5 streaming, D6 surface.
