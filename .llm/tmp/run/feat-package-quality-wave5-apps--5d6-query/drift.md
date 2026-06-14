@@ -50,3 +50,17 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - Decisions recorded: RFC 17 bridge via `initialData` + optional dehydration script, hook wrappers to retire upstream `privateTypeRef`, `defineFreshApp` alpha-surface seams, F-16 entrypoint lock, wave closeout lift of root workspace exclusion.
 - Open questions: six supervisor questions in `design.md` §5.
 - Status: READY FOR PLAN-EVAL; implementation deferred pending supervisor review.
+
+## D-5d6-8 - Post-5d5 supervisor baseline retired the root-exclusion/dry-run blocker
+
+- Original plan fact: root `deno.json` excluded `packages/fresh/`, causing package-local `deno publish --dry-run` to fail with excluded-module errors.
+- Current measurement after supervisor sync: root `deno.json` `exclude` is only `.llm/tmp/`, and `(cd packages/fresh && deno task dry-run)` passes.
+- Impact: planned Slice 18 (JSR dry-run unblocked) is already materially retired by the merged 5d1-5d5 baseline. Final closeout still needs a regression dry-run, but no source/config unblock is required in 5d6 implementation unless later slices regress it.
+- Status: recorded as Slice 1 rebaseline evidence.
+
+## D-5d6-9 - RTK unavailable in this WSL session
+
+- Expected tool state: repo instructions prefer `rtk` for read-heavy git/grep/ls and `rtk proxy` for `deno task`.
+- Current measurement: `command -v rtk` fails and `~/.local/bin/rtk` does not exist.
+- Impact: rebaseline commands were run raw, increasing output volume only. Gate semantics and exit codes are unaffected.
+- Status: use raw commands until RTK becomes available; do not block implementation on output filtering.
