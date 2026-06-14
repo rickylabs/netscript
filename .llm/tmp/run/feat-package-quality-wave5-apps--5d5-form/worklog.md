@@ -149,3 +149,25 @@ Append-only. One entry per slice / decision.
 | Touched-file lint | `deno lint packages/fresh/form/enhancement.tsx packages/fresh/form/form.tsx packages/fresh/form/form-region.tsx packages/fresh/form/mod.ts` | PASS |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no planned over-cap implementation files remain |
 | Publish dry-run | `cd packages/fresh && deno publish --dry-run --allow-dirty` | PASS: no slow-type findings |
+
+## 2026-06-14 - Slice 6 JSDoc/public-export sweep
+
+- Rechecked the planned public-export files:
+  - `state.ts`, `pipeline.ts`, `intent.ts`, `reply.ts`, `errors.ts`, `csrf.ts`,
+    `idempotency.ts`, `pagination.ts`, `config.ts`, `handler-context.ts`.
+- Current public doc-lint remained clean; no JSDoc additions were required.
+- Touched-file gates surfaced focused hygiene findings in the planned files:
+  - `state.ts`, `intent.ts`, and `reply.ts` needed formatting only.
+  - `config.ts` imported Zod as a value even though it is used only in exported types; changed it
+    to `import type { z } from 'zod';`.
+
+### Slice 6 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Touched-file format | `deno fmt --check packages/fresh/form/state.ts packages/fresh/form/pipeline.ts packages/fresh/form/intent.ts packages/fresh/form/reply.ts packages/fresh/form/errors.ts packages/fresh/form/csrf.ts packages/fresh/form/idempotency.ts packages/fresh/form/pagination.ts packages/fresh/form/config.ts packages/fresh/form/handler-context.ts` | PASS after formatting `state.ts`, `intent.ts`, and `reply.ts` |
+| Touched-file lint | `deno lint packages/fresh/form/state.ts packages/fresh/form/pipeline.ts packages/fresh/form/intent.ts packages/fresh/form/reply.ts packages/fresh/form/errors.ts packages/fresh/form/csrf.ts packages/fresh/form/idempotency.ts packages/fresh/form/pagination.ts packages/fresh/form/config.ts packages/fresh/form/handler-context.ts` | PASS after type-only import fix in `config.ts` |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no planned over-cap implementation files remain |

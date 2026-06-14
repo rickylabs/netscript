@@ -157,7 +157,9 @@ export function replyFor<TValues extends FormValues, TOutput = unknown>(): FormR
       };
     },
 
-    success(init: SuccessFormReplyInit<TValues, TOutput>): FormSubmissionSuccessResult<TValues, TOutput> {
+    success(
+      init: SuccessFormReplyInit<TValues, TOutput>,
+    ): FormSubmissionSuccessResult<TValues, TOutput> {
       const base = createBaseReply(init);
 
       return {
