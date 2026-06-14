@@ -87,7 +87,10 @@ Deno.test('resolveRuntimeFormState builds nested field descriptors and success-s
     runtime.fields.profile.displayName.controlProps().defaultValue,
     'Ada Lovelace',
   );
-  assert(!runtime.fields.profile.displayName.dirty, 'Expected success nextValues to reset dirty state');
+  assert(
+    !runtime.fields.profile.displayName.dirty,
+    'Expected success nextValues to reset dirty state',
+  );
 });
 
 Deno.test('resolveRuntimeFormState builds collection descriptors and intent button props', () => {
@@ -130,7 +133,10 @@ Deno.test('resolveRuntimeFormState builds collection descriptors and intent butt
     runtime.fields.items.list[0]?.fields.quantity.controlProps({ type: 'number' }).defaultValue,
     '2',
   );
-  assert(runtime.fields.items.list[0]?.fields.quantity.dirty, 'Expected changed collection field to be dirty');
+  assert(
+    runtime.fields.items.list[0]?.fields.quantity.dirty,
+    'Expected changed collection field to be dirty',
+  );
 
   const addButton = runtime.fields.items.addButtonProps({
     defaultValue: { label: '', quantity: '1' },

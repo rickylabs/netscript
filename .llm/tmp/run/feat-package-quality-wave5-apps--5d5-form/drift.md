@@ -33,25 +33,26 @@ Status: IN PROGRESS
 
   `createStandardSchemaAdapter(schema)` will be the recommended adapter for Zod ≥3.23, Valibot, and ArkType. The public contract (`FormSchemaAdapter`, `FormSchemaParseResult`) is preserved, but the exact error messages and issue paths may differ from the current Zod-only adapter. Consumers using brittle message assertions will need migration guidance.
 
-  - Status: OPEN
+  - Status: CLOSED by slices 9–11. Standard Schema support is implemented, Zod validation now runs
+    through Standard Schema metadata, and focused adapter tests preserve Zod error-shape parity.
   - Owner: 5d5 implementation (slices 9–11)
-  - Proposed close gate: Unit tests prove `toFormErrors` parity for representative Zod schemas; README migration note added.
+  - Close gate: `deno test --config packages/fresh/deno.json --unstable-kv packages/fresh/form/schema-adapter-standard.test.ts packages/fresh/form/schema-adapter.test.ts` passed; Slice 11 docs describe the Standard Schema / introspector seam.
 
 - **D-5d5-4 — Internal barrels in `schema-adapter/` and `field-descriptors/` need architectural justification**
 
   Decomposition creates internal aggregation files (`schema-adapter/mod.ts`, `field-descriptors/mod.ts`). The public surface remains `form/mod.ts`; these internal barrels are only imported by `form/mod.ts` and the package-local tests. They must carry `// arch:barrel-ok` justification to pass F-18.
 
-  - Status: OPEN
+  - Status: CLOSED by slices 3 and 4. Internal barrels are annotated with `// arch:barrel-ok`.
   - Owner: 5d5 implementation (slices 3, 4)
-  - Proposed close gate: Internal barrels annotated; `deno doc --lint` and lint pass.
+  - Close gate: final public doc-lint, scoped form check, scoped lint, and file-size scan passed.
 
 - **D-5d5-5 — Root `deno check` excludes `packages/fresh/`; form package check must run scoped**
 
   Because root `deno.json` excludes `packages/fresh/`, CI/root `deno check` will not cover `@netscript/fresh/form`. The implementation must add a scoped `deno check` step (via `packages/fresh/deno.json` `tasks.check`) and capture evidence in the run artifacts.
 
-  - Status: OPEN
+  - Status: CLOSED by closeout. Scoped form checks are part of every slice gate and final closeout.
   - Owner: 5d5 implementation (slice 22)
-  - Proposed close gate: `deno check --unstable-kv packages/fresh/form/mod.ts` passes and evidence is archived.
+  - Close gate: `deno check --unstable-kv packages/fresh/form/mod.ts` and `.llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` passed in final closeout.
 
 - **D-5d5-6 — Supervisor sync changed form baseline before implementation**
 

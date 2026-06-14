@@ -317,3 +317,36 @@ Append-only. One entry per slice / decision.
 | Touched-doc format | `deno fmt --check packages/fresh/docs/form/fresh-ui-recipe.md` | PASS |
 | Link/path existence | `test -f packages/fresh-ui/registry/components/ui/control-props.ts && test -f packages/fresh-ui/registry/components/ui/form-field.tsx && test -f packages/fresh/docs/form/fresh-ui-recipe.md` | PASS |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no form file over cap |
+
+## 2026-06-14 - Final scoped 5d5 closeout
+
+- Ran the scoped 5d5 form/package gates for IMPL-EVAL handoff.
+- Did not run full CLI E2E, per protocol.
+- First closeout pass found four pre-existing form test formatting findings and a full-form-test
+  permission mismatch: Fresh's build-id dependency reads `DENO_DEPLOYMENT_ID`, so the full form test
+  command needs `--allow-env`.
+- Formatted only the four reported form test files:
+  - `packages/fresh/form/collection.test.ts`
+  - `packages/fresh/form/form.test.tsx`
+  - `packages/fresh/form/reply.test.ts`
+  - `packages/fresh/form/runtime-state.test.ts`
+- Re-ran closeout with the corrected test permission and all scoped gates passed.
+- Remaining open drift is limited to D-5d5-1 (umbrella/root workspace exclude ownership) and
+  D-5d5-2 (optional fresh-ui `htmlFor` follow-up / browser route proof). The feasible 5d5 source
+  slices are ready for IMPL-EVAL.
+
+### Final closeout gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Scoped form fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/form --ext ts,tsx` | PASS after formatting four form test files |
+| Scoped form lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Full form tests | `deno test --allow-env --config packages/fresh/deno.json --unstable-kv packages/fresh/form` | PASS: 53 passed, 0 failed |
+| Publish dry-run | `cd packages/fresh && deno publish --dry-run --allow-dirty` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -30` | PASS: largest form file is `schema-adapter.test.ts` at 439 LOC |
+| Console scan | `grep -R "console\\." -n packages/fresh/form \| head -80` | PASS: no matches |
+| Upstream re-export scan | `grep -R "export .*from ['\\\"]\\(npm:\\|jsr:\\|zod\\|@std/\\|fresh\\|preact\\)" -n packages/fresh/form/mod.ts packages/fresh/form/*.ts packages/fresh/form/*.tsx \| head -80` | PASS: no matches |
+| Folder vocabulary | `find packages/fresh/form -maxdepth 2 -type d \| sort` | PASS: `form`, `_internal`, `field-descriptors`, `schema-adapter` |

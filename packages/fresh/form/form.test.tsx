@@ -1,6 +1,6 @@
 import { assert, assertEquals } from '@std/assert';
 import { render as renderToString } from 'preact-render-to-string';
-import { createFormEnhancementSnapshot, applyCollectionStrategy } from './enhancement.tsx';
+import { applyCollectionStrategy, createFormEnhancementSnapshot } from './enhancement.tsx';
 import { Form } from './form.tsx';
 import { resolveRuntimeFormState } from './state.ts';
 import { replyFor } from './reply.ts';
