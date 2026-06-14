@@ -205,7 +205,9 @@ deno run -A packages/cli/bin/netscript-dev.ts --help
 ```
 
 Maintainer commands synchronize local package sources, copy official plugin templates, and run
-scaffold validation suites. They are intentionally separate from the published command surface. See
+scaffold validation suites. They are intentionally separate from the published command surface.
+`netscript-dev` proves the local-source maintainer workflow; public release CI must also prove the
+JSR-backed `netscript` workflow once dependent packages are published. See
 [docs/maintainer-cli.md](./docs/maintainer-cli.md).
 
 ## Documentation

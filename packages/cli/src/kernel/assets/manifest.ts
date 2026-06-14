@@ -1,27 +1,37 @@
 /** Typed manifest for checked-in CLI template assets. */
 export const TEMPLATE_KEYS = {
-  appAssetsComponentsActions: 'app/assets/components/actions.css.template',
-  appAssetsComponentsFeedback: 'app/assets/components/feedback.css.template',
-  appAssetsComponentsForms: 'app/assets/components/forms.css.template',
-  appAssetsComponentsSurfaces: 'app/assets/components/surfaces.css.template',
-  appAssetsLayouts: 'app/assets/layouts.css.template',
-  appAssetsStyles: 'app/assets/styles.css.template',
-  appAssetsTokens: 'app/assets/tokens.css.template',
   appClient: 'app/client.ts.template',
-  appComponentsUiButton: 'app/components/ui/button.tsx.template',
-  appComponentsUiCard: 'app/components/ui/card.tsx.template',
+  appAssetsDesignCss: 'app/assets/design.css.template',
   appComponentsUiMod: 'app/components/ui/mod.ts.template',
-  appIslandsThemetoggle: 'app/islands/ThemeToggle.tsx.template',
+  appRoutesDesignIslandsFloatingSurfaceDemo:
+    'app/routes/(design)/design/(_islands)/FloatingSurfaceDemo.tsx.template',
+  appRoutesDesignIslandsTokenClipboard:
+    'app/routes/(design)/design/(_islands)/TokenClipboard.tsx.template',
+  appRoutesDesignSharedRegistry: 'app/routes/(design)/design/(_shared)/registry.ts.template',
+  appRoutesDesignSharedTokens: 'app/routes/(design)/design/(_shared)/tokens.ts.template',
   appLibExampleService: 'app/lib/example-service.ts.template',
   appMain: 'app/main.ts.template',
   appRouter: 'app/router.ts.template',
   appRoutesComponentsHealthView: 'app/routes/(_components)/health-view.tsx.template',
+  appRoutesComponentsDashboardView: 'app/routes/(_components)/dashboard-view.tsx.template',
   appRoutesComponentsHomeView: 'app/routes/(_components)/home-view.tsx.template',
   appRoutesSharedHealth: 'app/routes/(_shared)/health.ts.template',
   appRoutesApp: 'app/routes/_app.tsx.template',
   appRoutesLayout: 'app/routes/_layout.tsx.template',
+  appRoutesDesignComponents: 'app/routes/(design)/design/components.tsx.template',
+  appRoutesDesignComponentsView:
+    'app/routes/(design)/design/(_components)/components-view.tsx.template',
+  appRoutesDesignComposition: 'app/routes/(design)/design/composition.tsx.template',
+  appRoutesDesignCompositionView:
+    'app/routes/(design)/design/(_components)/composition-view.tsx.template',
+  appRoutesDesignIndex: 'app/routes/(design)/design/index.tsx.template',
+  appRoutesDesignLayout: 'app/routes/(design)/design/_layout.tsx.template',
+  appRoutesDesignTokens: 'app/routes/(design)/design/tokens.tsx.template',
+  appRoutesDesignTokensView: 'app/routes/(design)/design/(_components)/tokens-view.tsx.template',
   appRoutesExamplesComponentsExamplesView:
     'app/routes/examples/(_components)/examples-view.tsx.template',
+  appRoutesExamplesComponentsCrudView:
+    'app/routes/examples/(_components)/crud-view.tsx.template',
   appRoutesExamplesComponentsHero: 'app/routes/examples/(_components)/hero.tsx.template',
   appRoutesExamplesComponentsLabPanel: 'app/routes/examples/(_components)/lab-panel.tsx.template',
   appRoutesExamplesComponentsNotesCard: 'app/routes/examples/(_components)/notes-card.tsx.template',
@@ -36,6 +46,7 @@ export const TEMPLATE_KEYS = {
   appRoutesExamplesSharedServiceShowcase:
     'app/routes/examples/(_shared)/service-showcase.ts.template',
   appRoutesExamplesIndex: 'app/routes/examples/index.tsx.template',
+  appRoutesExamplesCrud: 'app/routes/examples/crud.tsx.template',
   appRoutesExamplesServiceIndexLayout: 'app/routes/examples/service/index.layout.tsx.template',
   appRoutesExamplesServiceIndex: 'app/routes/examples/service/index.tsx.template',
   appRoutesExamplesTelemetryComponentsTelemetryView:
@@ -45,6 +56,7 @@ export const TEMPLATE_KEYS = {
   appRoutesExamplesTelemetryIndex: 'app/routes/examples/telemetry/index.tsx.template',
   appRoutesHealth: 'app/routes/health.tsx.template',
   appRoutesIndex: 'app/routes/index.tsx.template',
+  appRoutesDashboard: 'app/routes/dashboard.tsx.template',
   appRoutesPartialsExamplesServiceSummary:
     'app/routes/partials/examples/service-summary.tsx.template',
   appUtils: 'app/utils.ts.template',

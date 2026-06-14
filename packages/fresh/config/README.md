@@ -31,7 +31,8 @@ export default defineConfig({
 - extends `server.fs.allow` for workspace packages
 - bridges selected process env values into `import.meta.env.*`
 - registers extra watch paths during dev
-- can generate app-local `.generated/manifest.ts` and `.generated/routes.ts` outputs from Fresh file routes
+- can generate app-local `.generated/manifest.ts` and `.generated/routes.ts` outputs from Fresh file
+  routes
 
 ## Route manifest generation
 
@@ -44,11 +45,12 @@ file routes:
 ### What gets generated
 
 - `manifest.ts` exports `routePatterns` for all discovered route patterns
-- `routes.ts` exports `routes` for every discovered route; routes with sibling `*.route.ts[x]` sidecars are contract-bound via `bindRoutePattern(...)`
+- `routes.ts` exports `routes` for every discovered route; routes with sibling `*.route.ts[x]`
+  sidecars are contract-bound via `bindRoutePattern(...)`
 - generated route bindings import `routePatterns` from `manifest.ts`
 
-This keeps Fresh file routing as the runtime source of truth while still enabling centralized,
-typed cross-page navigation contracts.
+This keeps Fresh file routing as the runtime source of truth while still enabling centralized, typed
+cross-page navigation contracts.
 
 Recommended consumer pattern:
 
@@ -64,7 +66,11 @@ Use sibling route-contract sidecars to opt specific routes into typed manifest e
 import { defineRouteContract, enumPathParamSchema, paginationSearchSchema } from '@netscript/fresh';
 
 const pathSchema = enumPathParamSchema('section', ['overview', 'navigation', 'mutation']);
-const searchSchema = paginationSearchSchema({ defaultLimit: 3, defaultSort: 'freshness', defaultOrder: 'desc' });
+const searchSchema = paginationSearchSchema({
+  defaultLimit: 3,
+  defaultSort: 'freshness',
+  defaultOrder: 'desc',
+});
 
 export default defineRouteContract({ pathSchema, searchSchema });
 ```
@@ -94,7 +100,8 @@ When `routeManifest.enabled !== false`, the plugin performs route-manifest work 
 
 1. **plugin init** — initial sync when the Vite config instantiates the plugin
 2. **buildStart** — sync before Vite build work begins
-3. **dev watcher** — watches the configured `routes/` tree and regenerates on relevant `*.ts` / `*.tsx` / `*.route.ts[x]` changes
+3. **dev watcher** — watches the configured `routes/` tree and regenerates on relevant `*.ts` /
+   `*.tsx` / `*.route.ts[x]` changes
 
 If either generated file changes during dev, the plugin triggers a full reload so imports of
 `@app/router.ts` (and the generated files it re-exports) stay aligned with the route tree.

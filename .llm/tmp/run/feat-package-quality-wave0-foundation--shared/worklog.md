@@ -55,7 +55,7 @@
 |---|-------|------|-------|
 | 1 | Establish harness artifacts and package design checkpoint with current baseline and drift. | `git status --short`; baseline commands already run | `.llm/tmp/run/feat-package-quality-wave0-foundation--shared/{worklog,context-pack,drift,commits}.md` |
 | 2 | Move the published shared contract to `src/domain`, `src/application`, `src/diagnostics`, and `src/public`; remove inferred public Zod types and clear slow-types/doc lint. | `deno publish --dry-run --allow-dirty`; `deno doc --lint packages/shared/mod.ts`; `deno test --allow-all packages/shared` | `packages/shared/{mod.ts,deno.json}`, `packages/shared/src/**` |
-| 3 | Write alpha README and `/docs` structure; satisfy standards gate and record final gates. | `deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/shared --text`; full requested gate set | `packages/shared/README.md`, `packages/shared/docs/**`, run artifacts |
+| 3 | Write alpha README and `/docs` structure; satisfy standards gate and record final gates. | `deno run --allow-read .llm/tools/fitness/check-netscript-standards.ts --root packages/shared --text`; full requested gate set | `packages/shared/README.md`, `packages/shared/docs/**`, run artifacts |
 
 ### Deferred Scope
 
@@ -72,7 +72,7 @@ To add a new shared primitive, add its explicit public data type and schema to `
 
 | Time | Slice | Step | Notes |
 |------|-------|------|-------|
-| 2026-06-05 04:44 UTC | baseline | release readiness | `deno run -A tools/fitness/release-readiness.ts --out ./audit --include-plugins` generated `./audit/_summary.md`; summary reported `Ready: 0/27`. |
+| 2026-06-05 04:44 UTC | baseline | release readiness | `deno run -A .llm/tools/fitness/release-readiness.ts --out ./audit --include-plugins` generated `./audit/_summary.md`; summary reported `Ready: 0/27`. |
 | 2026-06-05 04:45 UTC | baseline | publish dry-run | `deno publish --dry-run --allow-dirty` in `packages/shared` failed with 35 slow-type problems. |
 | 2026-06-05 04:55 UTC | design | checkpoint | Current tree verified before source edits; design narrows published surface and defers cross-wave consumer migration. |
 | 2026-06-05 05:05 UTC | slice 2 | implementation gates | Published surface moved under `src/**`; package doc lint and publish dry-run are clean. |
@@ -104,14 +104,14 @@ To add a new shared primitive, add its explicit public data type and schema to `
 
 | Gate | Command or check | Result | Notes |
 |------|------------------|--------|-------|
-| Baseline re-audit | `deno run -A tools/fitness/release-readiness.ts --out ./audit --include-plugins` | PASS | Generated `./audit/_summary.md`; `Ready: 0/27`. |
+| Baseline re-audit | `deno run -A .llm/tools/fitness/release-readiness.ts --out ./audit --include-plugins` | PASS | Generated `./audit/_summary.md`; `Ready: 0/27`. |
 | Baseline publish | `cd packages/shared; deno publish --dry-run --allow-dirty` | FAIL | 35 slow-type problems. |
 | Baseline doc lint | `deno doc --lint packages/shared/mod.ts` | FAIL | 106 documentation lint errors. |
-| Baseline standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/shared --text` | FAIL | `strict` missing; README/docs/barrel/test warnings. |
+| Baseline standards | `deno run --allow-read .llm/tools/fitness/check-netscript-standards.ts --root packages/shared --text` | FAIL | `strict` missing; README/docs/barrel/test warnings. |
 | Publish dry-run | `cd packages/shared; deno publish --dry-run --allow-dirty` | PASS | No slow-type failures; simulated publish includes root, docs, and `src/**` only. |
 | Doc lint | `deno doc --lint packages/shared/mod.ts` | PASS | Checked 1 file clean. |
-| Package standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/shared --text` | PASS | Exit 0; residual warnings are naming/test-location debt, mostly legacy unpublished `utils/`. |
-| Exact root standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts` | FAIL | Checks repo root metadata (`deno.json`) and unrelated whole-tree warnings; logged as drift from Wave 0 package scope. |
+| Package standards | `deno run --allow-read .llm/tools/fitness/check-netscript-standards.ts --root packages/shared --text` | PASS | Exit 0; residual warnings are naming/test-location debt, mostly legacy unpublished `utils/`. |
+| Exact root standards | `deno run --allow-read .llm/tools/fitness/check-netscript-standards.ts` | FAIL | Checks repo root metadata (`deno.json`) and unrelated whole-tree warnings; logged as drift from Wave 0 package scope. |
 | Package tests | `deno test --allow-all packages/shared` | PASS | 0 Deno tests; legacy datetime script executes and exits 0. |
 | Workspace check | `deno task check` | PASS | Root packages/plugins typecheck green. |
 
@@ -188,7 +188,7 @@ explicit subexport entrypoints, migrated plugin and CLI consumers, and removed `
 | Contracts check | `deno check mod.ts crud.ts query.ts transform.ts` in `packages/contracts` | PASS | Entry points typecheck. |
 | JSR dry run | `deno publish --dry-run --allow-dirty` in `packages/contracts` | PASS | 0 slow-types; simulated publish includes root and named subexports. |
 | Doc lint | `deno doc --lint packages/contracts/mod.ts packages/contracts/crud.ts packages/contracts/query.ts packages/contracts/transform.ts` | PASS | Checked 4 entrypoints clean. |
-| Standards | `deno run --allow-read tools/fitness/check-netscript-standards.ts --root packages/contracts --text` | PASS | `FAIL=0`; warnings are naming/test-location/info only. |
+| Standards | `deno run --allow-read .llm/tools/fitness/check-netscript-standards.ts --root packages/contracts --text` | PASS | `FAIL=0`; warnings are naming/test-location/info only. |
 | Package tests | `deno test --allow-all packages/contracts` | PASS | 2 tests pass. |
 | Workspace check | `deno task check` | PASS | Packages and plugins typecheck with contracts imports. |
 | CLI focused tests | `deno test --allow-all packages/cli/src/kernel/adapters/scaffold/tests/import-resolver_test.ts packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts` | PASS | Public and maintainer import-map rewrites verified. |

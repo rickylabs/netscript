@@ -5,274 +5,234 @@
 [![Fresh](https://img.shields.io/badge/framework-Fresh-ffdb1e?logo=deno&logoColor=111111)](https://fresh.deno.dev/)
 [![License](https://img.shields.io/badge/license-MIT-0f172a)](https://opensource.org/licenses/MIT)
 
-Interactive UI primitives and a copy-source component registry for Fresh applications in the NetScript ecosystem.
+The NetScript design system for Fresh: a theme-driven token vocabulary, a copy-source component
+registry, and a small package-owned runtime of accessible interactive primitives.
 
-## Features
+It follows the shadcn model adapted to Deno + Fresh: **you own the components** (they are copied
+into your app), while accessibility behavior and the token contract stay package-owned and update
+with releases.
 
-- **Interactive primitives** — Accessible Accordion, Dialog, Drawer, Popover, Tabs, and Tooltip with full keyboard navigation
-- **Copy-source registry** — UI components you copy into your app and own: buttons, inputs, cards, tables, layouts, and more
-- **Utility helpers** — `cn()` for class merging and URL-based toast state management
-- **Headless architecture** — Accessibility and interaction behavior are built in; styling is yours
-- **Focus management** — Focus trapping and restoration handled automatically in Dialog and Drawer
-- **Fresh-native** — Built on Preact and `@preact/signals`, designed for Fresh island boundaries
+## The three pillars
+
+1. **Themes** — A theme is a complete set of semantic `--ns-*` CSS variables (light + dark)
+   generated from a DTCG token source. **NS One** is the first theme that ships with the package; it
+   is an instance, not the system. Components never reference a specific theme — they consume only
+   the semantic vocabulary, so swapping themes restyles every component.
+2. **Registry** — `fresh-ui-foundation` (manifest schema v2): 44 copy-source items — 18 L2
+   components, 11 L3 blocks, 3 islands, 7 style sheets, 2 libs, 2 support modules, and the theme
+   seed. Installed with the NetScript CLI; once copied, the code is yours.
+3. **Runtime** — Package-owned, imported (not copied): seven interactive compound components
+   (Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip), L0 primitives (`Show`,
+   `VisuallyHidden`, `SrOnly`), and stable helpers (`cn()`, URL toast state).
+
+## Layer model
+
+Every item in this package has a layer. The layer decides who owns it and what it may import.
+
+| Layer | What                                                                      | Delivery | May import                    |
+| ----- | ------------------------------------------------------------------------- | -------- | ----------------------------- |
+| L0    | Platform contract: token vocabulary, attribute rules, behavior primitives | imported | platform only                 |
+| L1    | Runtime behavior: hooks and interactive compound components               | imported | L0                            |
+| L2    | Registry components (button, input, card, …)                              | copied   | L0, L1 — **never another L2** |
+| L3    | Registry blocks (data-table, sidebar-shell, …)                            | copied   | L0–L2                         |
+| L4    | Your application                                                          | yours    | everything                    |
+
+Shared behavior moves **down** to L0/L1; shared composition moves **up** to L3. The full contract is
+in [`docs/l0-conventions.md`](docs/l0-conventions.md).
 
 ## Install
 
-```ts
-// deno.json
+The NetScript CLI is the supported installation path. It copies registry sources, resolves registry
+dependencies, rewrites relative imports for your project layout, creates the styles aggregator, and
+merges `deno.json` imports:
+
+```sh
+netscript ui:init --project-root ./my-app      # theme seed + foundation
+netscript ui:add button --project-root ./my-app
+netscript ui:add forms-core --project-root ./my-app   # collections work too
+```
+
+Collections: `foundation`, `forms-core`, `surface-core`, `feedback-core`, `layout-foundations`,
+`dashboard-blocks`.
+
+For the imported runtime, add the package to your `deno.json`:
+
+```jsonc
 {
   "imports": {
-    "@netscript/fresh-ui": "jsr:@netscript/fresh-ui@^0.1.0"
+    "@netscript/fresh-ui": "jsr:@netscript/fresh-ui@^0.1"
   }
 }
 ```
 
-## Quick Start
+Manual copying also works — the registry source ships in the published package under `registry/`;
+copy files and fix up the relative imports (island copies typically change `../lib/` depth).
 
-Render a modal dialog with accessible trigger and close controls:
+## Entry points
+
+| Import                            | Layer | Purpose                                                              |
+| --------------------------------- | ----- | -------------------------------------------------------------------- |
+| `@netscript/fresh-ui`             | —     | Stable helpers: `cn()`, `withToast`, `getToast`, `stripToastFromUrl` |
+| `@netscript/fresh-ui/interactive` | L1    | Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip             |
+| `@netscript/fresh-ui/primitives`  | L0    | `Show`, `VisuallyHidden`, `SrOnly`                                   |
+
+## Quick start
 
 ```tsx
-import { Dialog } from "@netscript/fresh-ui/interactive";
+import { cn, getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
+import { Dialog } from '@netscript/fresh-ui/interactive';
+import { Show, VisuallyHidden } from '@netscript/fresh-ui/primitives';
 
-export function ConfirmDeleteDialog() {
+const deployButtonClass = cn('ns-button', 'ns-button--primary');
+
+const redirectTo = withToast('/dashboard/deployments', {
+  type: 'success',
+  title: 'Deployment queued',
+  message: 'api-gateway will roll out to three regions.',
+});
+
+const toast = getToast(new URL(`https://app.example${redirectTo}`));
+const cleanPath = stripToastFromUrl(new URL(`https://app.example${redirectTo}`));
+
+export function ConfirmDeployDialog() {
   return (
     <Dialog.Root>
-      <Dialog.Trigger>Delete item</Dialog.Trigger>
-      <Dialog.Content aria-label="Confirm deletion">
-        <Dialog.Title>Are you sure?</Dialog.Title>
-        <Dialog.Description>This action cannot be undone.</Dialog.Description>
+      <Dialog.Trigger class={deployButtonClass}>Deploy</Dialog.Trigger>
+      <Dialog.Content aria-label='Confirm deployment'>
+        <Dialog.Title>Deploy api-gateway?</Dialog.Title>
+        <Dialog.Description>
+          {toast?.message ?? 'The deployment will use the selected region plan.'}
+        </Dialog.Description>
+        <Show when={cleanPath === '/dashboard/deployments'}>
+          <VisuallyHidden>Redirect path is clean</VisuallyHidden>
+        </Show>
         <Dialog.Close>Cancel</Dialog.Close>
-        <button type="submit">Delete</button>
+        <button type='submit'>Confirm</button>
       </Dialog.Content>
     </Dialog.Root>
   );
 }
 ```
 
-## Entry Points
+Runtime components emit `data-part`, `data-state`, and ARIA attributes — never `ns-*` classes.
+Styling comes from the copied registry CSS, which targets those attributes and the `--ns-*`
+vocabulary.
 
-| Import | Purpose |
-|--------|---------|
-| `@netscript/fresh-ui` | Stable utility helpers — `cn()`, toast state management |
-| `@netscript/fresh-ui/interactive` | Package-owned interactive primitives — Accordion, Dialog, Drawer, Popover, Tabs, Tooltip |
+## Theme contract
 
-## Usage
+Components are theme-blind. The rules that make that work:
 
-### Toast state management
+- Component CSS consumes **only** semantic `--ns-*` variables (and `color-mix()` over them). Raw hex
+  / `rgb()` / `oklch()` literals are forbidden outside generated theme artifacts and are enforced by
+  fitness gates in CI.
+- Markup uses only the `*-ns-*` Tailwind utilities produced by the theme bridge — never stock
+  palette utilities (`bg-red-500`, `text-white`) or arbitrary color values.
+- Primitive color **ramps** (`--ns-gray-1..12`, etc.) are theme raw material: themes map ramps onto
+  semantic slots; components do not read ramps directly (documented exceptions carry an allow
+  marker).
+- Looping animations honor `prefers-reduced-motion`: infinite loops become static treatments,
+  essential spinners slow down, sub-250ms one-shot enter/exit animations collapse to their end
+  state.
 
-Store toast notifications in the URL so they survive redirects:
+Theme artifacts are generated from a DTCG source with Style Dictionary v5
+(`deno task tokens:build`): `registry/theme/tokens.css` (light + dark variable blocks),
+`registry/theme/theme-bridge.css` (Tailwind v4 `@theme inline` bridge),
+`registry/theme/tokens.json`, and `registry/theme/styles.css` (aggregator). To author a new theme,
+see [`docs/theme-authoring.md`](docs/theme-authoring.md).
+
+## Registry catalog
+
+`fresh-ui-foundation` v0.1.0 — copy-source, schema v2.
+
+**Components (L2)** — `button`, `icon-button`, `input`, `textarea`, `checkbox`, `switch`, `label`,
+`select`, `form-field`, `card`, `panel`, `badge`, `separator`, `alert`, `inline-notice`, `spinner`,
+`progress`, `skeleton`.
+
+**Blocks (L3)** — `breadcrumb`, `sidebar-shell`, `page-header`, `filter-form`, `stats-grid`,
+`detail-layout`, `data-table`, `responsive-table`, `pagination`, `empty-state`, `section-divider`.
+
+**Islands** — `theme-toggle` (L2), `sidebar-toggle` (L3), `toast` (L2).
+
+**Styles (L2)** — `form-control-styles`, `choice-styles`, `surface-styles`, `sheet-styles`,
+`floating-styles`, `alert-styles`, `layout-objects` (stack / cluster / grid / split / toolbar /
+switcher composition objects).
+
+**Lib & support** — `cn`, `public-types`, `control-props`, `toast-support`.
+
+**Theme** — `theme-seed` (the NS One artifacts above).
+
+## Helpers
+
+URL-encoded toast state that survives redirects:
 
 ```ts
-import { getToast, stripToastFromUrl, withToast } from "@netscript/fresh-ui";
+import { getToast, stripToastFromUrl, withToast } from '@netscript/fresh-ui';
 
-// Attach a toast to a redirect URL
-const redirectTo = withToast("/dashboard/users", {
-  type: "success",
-  title: "User saved",
-  message: "Your changes were persisted.",
+const redirectTo = withToast('/dashboard/users', {
+  type: 'success',
+  title: 'User saved',
+  message: 'Your changes were persisted.',
 });
-
-// Read the toast back on the destination page
 const toast = getToast(new URL(request.url));
-
-// Clean the toast params before rendering the canonical URL
 const cleanUrl = stripToastFromUrl(new URL(request.url));
 ```
 
-### Class name merging
+Class merging with conflict resolution (clsx + tailwind-merge):
 
 ```ts
-import { cn } from "@netscript/fresh-ui";
+import { cn } from '@netscript/fresh-ui';
 
-const buttonClass = cn(
-  "px-4 py-2 rounded font-medium",
-  isDestructive && "bg-red-600 text-white",
-  isDisabled && "opacity-50 cursor-not-allowed",
-);
+const klass = cn('ns-button', isQuiet && 'ns-button--ghost', props.class);
 ```
 
-### Accordion
+## Living reference
 
-Collapsible content panels — single or multiple open at a time:
+A consuming app should expose the design system on real routes (the NetScript playground ships these
+under `/design`):
 
-```tsx
-import { Accordion } from "@netscript/fresh-ui/interactive";
+- `/design/tokens` — the full semantic vocabulary, live against the active theme;
+- `/design/components` — every registry component in every variant/state;
+- `/design/composition` — the layer model, layout objects, and do/don't rules.
 
-export function FaqSection() {
-  return (
-    <Accordion.Root>
-      <Accordion.Item value="shipping">
-        <Accordion.ItemTrigger>
-          Shipping policy
-          <Accordion.ItemIndicator>▾</Accordion.ItemIndicator>
-        </Accordion.ItemTrigger>
-        <Accordion.ItemContent>
-          <p>Orders ship within 2 business days.</p>
-        </Accordion.ItemContent>
-      </Accordion.Item>
+These routes double as the browser validation surface: theme flip, reduced motion, and 390px
+viewport checks run against them.
 
-      <Accordion.Item value="returns">
-        <Accordion.ItemTrigger>
-          Return policy
-          <Accordion.ItemIndicator>▾</Accordion.ItemIndicator>
-        </Accordion.ItemTrigger>
-        <Accordion.ItemContent>
-          <p>Returns accepted within 30 days.</p>
-        </Accordion.ItemContent>
-      </Accordion.Item>
-    </Accordion.Root>
-  );
-}
+## Validation
+
+From the package directory:
+
+```sh
+deno task check    # type-check (no-slow-types-safe public surface)
+deno task test     # unit tests + consumer-shaped JSX render fixture
+deno task tokens:build
 ```
 
-### Tabs
+Design-system fitness gates (run from the workspace root in CI):
 
-Tabbed content navigation with keyboard support:
-
-```tsx
-import { Tabs } from "@netscript/fresh-ui/interactive";
-
-export function OrderDetailTabs() {
-  return (
-    <Tabs.Root defaultValue="summary">
-      <Tabs.List>
-        <Tabs.Trigger value="summary">Summary</Tabs.Trigger>
-        <Tabs.Trigger value="items">Items</Tabs.Trigger>
-        <Tabs.Trigger value="history">History</Tabs.Trigger>
-      </Tabs.List>
-
-      <Tabs.Content value="summary"><OrderSummary /></Tabs.Content>
-      <Tabs.Content value="items"><OrderItems /></Tabs.Content>
-      <Tabs.Content value="history"><OrderHistory /></Tabs.Content>
-    </Tabs.Root>
-  );
-}
+```sh
+deno run --allow-read .llm/tools/fitness/check-ds-no-raw-hex.ts
+deno run --allow-read .llm/tools/fitness/check-ds-color-utilities.ts
 ```
 
-### Drawer
+## Docs
 
-Slide-out panel — same compound API as Dialog:
-
-```tsx
-import { Drawer } from "@netscript/fresh-ui/interactive";
-
-export function FilterDrawer() {
-  return (
-    <Drawer.Root>
-      <Drawer.Trigger>Filters</Drawer.Trigger>
-      <Drawer.Content aria-label="Filter options">
-        <Drawer.Title>Filter orders</Drawer.Title>
-        <Drawer.Description>Narrow results by date, status, or customer.</Drawer.Description>
-        {/* filter form */}
-        <Drawer.Close>Apply</Drawer.Close>
-      </Drawer.Content>
-    </Drawer.Root>
-  );
-}
-```
-
-### Tooltip
-
-```tsx
-import { Tooltip } from "@netscript/fresh-ui/interactive";
-
-export function HelpIcon() {
-  return (
-    <Tooltip.Root>
-      <Tooltip.Trigger aria-label="Help">?</Tooltip.Trigger>
-      <Tooltip.Positioner>
-        <Tooltip.Content>
-          Hover or focus to see this tooltip.
-          <Tooltip.Arrow><Tooltip.ArrowTip /></Tooltip.Arrow>
-        </Tooltip.Content>
-      </Tooltip.Positioner>
-    </Tooltip.Root>
-  );
-}
-```
-
-### Using registry components
-
-Registry components are copy-source files. Copy them into your app, then own and customize them freely.
-
-From the JSR-published package, the registry source lives under `registry/`. Copy the files you need into your project:
-
-```
-registry/components/ui/button.tsx       → your-app/components/ui/button.tsx
-registry/components/ui/input.tsx        → your-app/components/ui/input.tsx
-registry/islands/Toast.tsx              → your-app/islands/Toast.tsx
-```
-
-After copying, the files are yours — update styles, add props, or wire up your own state. The package update cycle does not affect code you have already copied.
-
-## Available Components
-
-### Interactive Primitives
-
-Import from `@netscript/fresh-ui/interactive`. These stay up to date with package releases.
-
-| Component | Subcomponents | Description |
-|-----------|---------------|-------------|
-| `Accordion` | `Root`, `Item`, `ItemTrigger`, `ItemIndicator`, `ItemContent` | Collapsible content panels |
-| `Dialog` | `Root`, `Trigger`, `Content`, `Title`, `Description`, `Close` | Modal dialog with focus trap |
-| `Drawer` | `Root`, `Trigger`, `Content`, `Title`, `Description`, `Close` | Slide-out panel |
-| `Popover` | `Root`, `Trigger`, `Anchor`, `Positioner`, `Content`, `Title`, `Description`, `Close`, `Arrow`, `ArrowTip` | Floating content anchored to a trigger |
-| `Tabs` | `Root`, `List`, `Trigger`, `Content` | Tabbed content navigation |
-| `Tooltip` | `Root`, `Trigger`, `Positioner`, `Content`, `Arrow`, `ArrowTip` | Hover/focus information overlay |
-
-### Registry Components
-
-Copy from `registry/components/ui/`. After copying, you own the source.
-
-| Component | Description |
-|-----------|-------------|
-| `Button`, `IconButton` | Action triggers with variant and size props |
-| `Input`, `Textarea`, `Select` | Text and choice form controls |
-| `Checkbox`, `Switch`, `Label` | Boolean and toggle controls |
-| `FormField` | Field wrapper with label, hint, and error display |
-| `Card`, `Panel` | Content containers with optional header and footer |
-| `Badge` | Inline status and category labels |
-| `Breadcrumb` | Navigation breadcrumb trail |
-| `DataTable` | Sortable, paginated data grid |
-| `DetailLayout` | Two-column detail/sidebar page layout |
-| `EmptyState` | Placeholder for empty data sets |
-| `FilterForm` | Collapsible filter panel for list pages |
-| `PageHeader` | Page title, description, and action row |
-| `Pagination` | Page navigation controls |
-| `SectionDivider` | Labelled horizontal rule |
-| `Separator` | Plain horizontal or vertical divider |
-| `SidebarShell` | Full-page sidebar + content shell |
-| `Alert`, `InlineNotice` | Contextual feedback messages |
-| `Spinner`, `Progress`, `Skeleton` | Loading and progress indicators |
-| `StatsGrid` | Grid of metric/stat cards |
-
-### Registry Islands
-
-Copy from `registry/islands/`. Fresh islands for client-side interactivity.
-
-| Island | Description |
-|--------|-------------|
-| `SidebarToggle` | Toggle sidebar open/closed state |
-| `ThemeToggle` | Switch between light and dark themes |
-| `Toast` | Display URL-encoded toast notifications |
-
-## Architecture
-
-This package uses two delivery models side by side.
-
-**Interactive primitives** (under `runtime/`) are imported directly from `@netscript/fresh-ui/interactive` and used as regular package dependencies. They centralize accessibility behavior — keyboard interaction, focus management, ARIA attributes — while leaving layout and styling to your application. These components update with the package.
-
-**Registry components** (under `registry/`) are published as copy-source files. You copy the ones you want into your project and they become your code. This model is intentional: UI components often need project-specific customization that conflicts with a stable package API. Once copied, a component is fully under your control and is not affected by package updates.
-
-The root entrypoint (`@netscript/fresh-ui`) exports only the small set of stable utility helpers that are safe to use as package runtime dependencies: `cn()` and the toast helpers.
+- [`docs/getting-started.md`](docs/getting-started.md) — install flow and doctested runtime helper
+  example
+- [`docs/concepts.md`](docs/concepts.md) — themes, registry ownership, runtime, and validation
+- [`docs/architecture.md`](docs/architecture.md) — ADRs and package architecture decisions
+- [`docs/l0-conventions.md`](docs/l0-conventions.md) — layer, token, attribute, and motion rules
+- [`docs/theme-authoring.md`](docs/theme-authoring.md) — authoring a complete `--ns-*` theme
+- [`docs/recipes/living-design-routes.md`](docs/recipes/living-design-routes.md) — browser proof
+  routes for consuming apps
 
 ## Resources
 
-- [`@netscript/fresh`](https://jsr.io/@netscript/fresh) — Page builders, route contracts, and form helpers
-- [Preact documentation](https://preactjs.com/guide/v10/getting-started)
+- [`@netscript/fresh`](https://jsr.io/@netscript/fresh) — page builders, route contracts, and form
+  helpers
 - [Fresh documentation](https://fresh.deno.dev/docs/)
-- [tailwind-merge](https://github.com/dcastil/tailwind-merge) — Used by `cn()` for conflict resolution
-- [clsx](https://github.com/lukeed/clsx) — Used by `cn()` for conditional class joining
+- [Preact documentation](https://preactjs.com/guide/v10/getting-started)
+- [DTCG design tokens](https://tr.designtokens.org/format/) — token source format
+- [Style Dictionary](https://styledictionary.com/) — token build pipeline
 
 ## License
 

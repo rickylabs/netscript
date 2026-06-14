@@ -1,37 +1,35 @@
 /**
- * `@netscript/sdk/streams` — SDK extension for durable stream publishing.
+ * `@netscript/sdk/streams` durable stream publishing facade.
  *
- * Provides service-side helpers for writing to durable streams from
- * oRPC handlers, background tasks, or any server-side code.
+ * This subpath re-exports the first-party stream producer surface from
+ * `@netscript/plugin-streams-core` for SDK consumers that publish stream
+ * events from oRPC handlers, service jobs, or other server-side workflows.
  *
- * Re-exports `DurableStreamProducer`, `createDurableStream`, and related
- * config helpers from `@netscript/plugin-streams-core` so SDK consumers only need a
- * single import.
+ * The facade keeps stream producer imports colocated with the rest of the SDK
+ * without changing stream-core behavior. It also re-exports the plugin-core
+ * type chain so generated SDK docs can resolve the durable stream public
+ * surface without private type references.
  *
  * @example
  * ```ts
  * import { createStreamProducer } from '@netscript/sdk/streams';
- * import { chatStreamSchema } from '../schemas.ts';
  *
- * const chatProducer = createStreamProducer({
- *   streamPath: `/user/chat-room-${roomId}`,
+ * const producer = createStreamProducer({
+ *   streamPath: '/user/chat-room-1',
  *   schema: chatStreamSchema,
- *   producerId: `chat-service-1`,
+ *   producerId: 'chat-service-1',
  * });
- *
- * // In an oRPC handler:
- * chatProducer.upsert('message', { id: msg.id, content: msg.text, role: 'user' });
  * ```
  *
  * @module
  */
 
 export {
-  createDurableStream as createStreamProducer,
-  DurableStreamProducer,
-  type DurableStreamProducerOptions,
-  defineStreamSchema,
-  getStreamsUrl,
-  getStreamsAuth,
   buildStreamUrl,
+  createDurableStream as createStreamProducer,
+  defineStreamSchema,
+  DurableStreamProducer,
+  getStreamsAuth,
+  getStreamsUrl,
 } from '@netscript/plugin-streams-core';
+export type * from '@netscript/plugin-streams-core';

@@ -1,0 +1,270 @@
+{
+  "$description": "Light NetScript UI theme overrides transcribed from registry/theme/tokens.css.",
+  "$extensions": {
+    "netscript": {
+      "theme": "light",
+      "colorScheme": "light"
+    }
+  },
+  "semantic": {
+    "bg": {
+      "$type": "color",
+      "$value": "{color.gray.1}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-bg"
+        }
+      }
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-fg"
+        }
+      }
+    },
+    "surface": {
+      "$type": "color",
+      "$value": "{color.gray.2}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-surface"
+        }
+      }
+    },
+    "surface-raised": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff"
+      },
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-surface-raised"
+        }
+      }
+    },
+    "overlay": {
+      "$type": "color",
+      "$value": "rgba(0, 0, 0, 0.4)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-overlay"
+        }
+      }
+    },
+    "card": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff"
+      },
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card"
+        }
+      }
+    },
+    "card-fg": {
+      "$type": "color",
+      "$value": "{color.gray.12}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-card-fg"
+        }
+      }
+    },
+    "primary-subtle": {
+      "$type": "color",
+      "$value": "rgba(200, 149, 108, 0.1)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-subtle"
+        }
+      }
+    },
+    "primary-border": {
+      "$type": "color",
+      "$value": "rgba(200, 149, 108, 0.25)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-primary-border"
+        }
+      }
+    },
+    "secondary-subtle": {
+      "$type": "color",
+      "$value": "rgba(144, 152, 166, 0.1)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-secondary-subtle"
+        }
+      }
+    },
+    "secondary-border": {
+      "$type": "color",
+      "$value": "rgba(144, 152, 166, 0.2)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-secondary-border"
+        }
+      }
+    },
+    "muted": {
+      "$type": "color",
+      "$value": "{color.gray.3}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-muted"
+        }
+      }
+    },
+    "muted-fg": {
+      "$type": "color",
+      "$value": "{color.gray.7}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-muted-fg"
+        }
+      }
+    },
+    "success-subtle": {
+      "$type": "color",
+      "$value": "rgba(91, 168, 160, 0.1)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-success-subtle"
+        }
+      }
+    },
+    "success-border": {
+      "$type": "color",
+      "$value": "rgba(91, 168, 160, 0.2)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-success-border"
+        }
+      }
+    },
+    "warning-subtle": {
+      "$type": "color",
+      "$value": "rgba(224, 174, 79, 0.1)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-warning-subtle"
+        }
+      }
+    },
+    "warning-border": {
+      "$type": "color",
+      "$value": "rgba(224, 174, 79, 0.2)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-warning-border"
+        }
+      }
+    },
+    "destructive-subtle": {
+      "$type": "color",
+      "$value": "rgba(224, 69, 69, 0.1)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-destructive-subtle"
+        }
+      }
+    },
+    "destructive-border": {
+      "$type": "color",
+      "$value": "rgba(224, 69, 69, 0.2)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-destructive-border"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(0, 0, 0, 0.08)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border"
+        }
+      }
+    },
+    "border-hover": {
+      "$type": "color",
+      "$value": "rgba(0, 0, 0, 0.14)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border-hover"
+        }
+      }
+    },
+    "border-strong": {
+      "$type": "color",
+      "$value": "rgba(0, 0, 0, 0.22)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-border-strong"
+        }
+      }
+    },
+    "input-border": {
+      "$type": "color",
+      "$value": "{color.gray.4}",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-input-border"
+        }
+      }
+    },
+    "shadow-xs": {
+      "$type": "string",
+      "$value": "0 1px 2px rgba(0, 0, 0, 0.05)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-xs"
+        }
+      }
+    },
+    "shadow-sm": {
+      "$type": "string",
+      "$value": "0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-sm"
+        }
+      }
+    },
+    "shadow-md": {
+      "$type": "string",
+      "$value": "0 4px 6px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-md"
+        }
+      }
+    },
+    "shadow-lg": {
+      "$type": "string",
+      "$value": "0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.03)",
+      "$extensions": {
+        "netscript": {
+          "cssVar": "--ns-shadow-lg"
+        }
+      }
+    }
+  }
+}

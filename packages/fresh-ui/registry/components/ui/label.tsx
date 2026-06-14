@@ -9,8 +9,7 @@ import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 import type { Renderable } from '../../lib/public-types.ts';
 
-interface LabelProps
-  extends Omit<JSX.LabelHTMLAttributes<HTMLLabelElement>, 'class' | 'children'> {
+interface LabelProps extends Omit<JSX.LabelHTMLAttributes<HTMLLabelElement>, 'class' | 'children'> {
   children: Renderable;
   class?: string;
   required?: boolean;

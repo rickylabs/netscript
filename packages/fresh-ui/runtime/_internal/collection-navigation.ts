@@ -30,7 +30,9 @@ export function getNextCollectionIndex(
     return -1;
   }
 
-  const isSupportedKey = orientation === 'vertical' ? VERTICAL_KEYS.has(key) : HORIZONTAL_KEYS.has(key);
+  const isSupportedKey = orientation === 'vertical'
+    ? VERTICAL_KEYS.has(key)
+    : HORIZONTAL_KEYS.has(key);
 
   if (!isSupportedKey) {
     return currentIndex;

@@ -18,7 +18,8 @@ interface CardProps extends CardSectionProps {
   interactive?: boolean;
 }
 
-interface CardTextProps extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
+interface CardTextProps
+  extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
   children: Renderable;
   class?: string;
 }

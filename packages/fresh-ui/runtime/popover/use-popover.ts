@@ -3,6 +3,13 @@ import { useSignal } from '@preact/signals';
 import { useCallback, useEffect, useId, useRef } from 'preact/hooks';
 import { composeEventHandlers } from '../_internal/compose-event-handlers.ts';
 import { composeRefs } from '../_internal/compose-refs.ts';
+import {
+  getPlatformAnchorName,
+  getPositionArea,
+  isPopoverOpen,
+  mergePlatformStyle,
+  useSyncedPopover,
+} from '../_internal/platform-popover.ts';
 import { useDismissableLayer } from '../_internal/use-dismissable-layer.ts';
 import type {
   PopoverAnchorElementProps,
@@ -39,6 +46,7 @@ export function usePopover({
   const uncontrolledOpen = useSignal(defaultOpen);
   const open = controlledOpen === undefined ? uncontrolledOpen.value : controlledOpen;
   const contentId = id ?? `ns-popover-${generatedId}`;
+  const anchorName = getPlatformAnchorName('popover', contentId);
   const titleId = `${contentId}-title`;
   const descriptionId = `${contentId}-description`;
   const dataState = getPopoverDataState(open);
@@ -63,6 +71,7 @@ export function usePopover({
     getElements,
     onDismiss: (reason) => setOpen(false, reason),
   });
+  useSyncedPopover(contentRef, open);
 
   useEffect(() => {
     if (!open) {
@@ -73,32 +82,44 @@ export function usePopover({
   }, [open]);
 
   const getTriggerProps = useCallback(
-    (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): PopoverTriggerElementProps => ({
-      ...props,
-      'aria-controls': contentId,
-      'aria-expanded': open,
-      'aria-haspopup': 'dialog',
-      'data-expanded': open ? 'true' : 'false',
-      'data-part': 'trigger',
-      'data-placement': placement,
-      'data-scope': 'popover',
-      'data-state': dataState,
-      onClick: composeEventHandlers(props.onClick, () => setOpen(!open, 'trigger')),
-      ref: composeRefs(props.ref, triggerRef),
-      type: props.type ?? 'button',
-    }),
-    [contentId, dataState, open, placement, setOpen],
+    (props: JSX.ButtonHTMLAttributes<HTMLButtonElement> = {}): PopoverTriggerElementProps =>
+      ({
+        ...props,
+        'aria-controls': contentId,
+        'aria-expanded': open,
+        'aria-haspopup': 'dialog',
+        'data-expanded': open ? 'true' : 'false',
+        'data-part': 'trigger',
+        'data-placement': placement,
+        'data-scope': 'popover',
+        'data-state': dataState,
+        popovertarget: contentId,
+        popovertargetaction: 'toggle',
+        onClick: composeEventHandlers(props.onClick, () => setOpen(!open, 'trigger')),
+        ref: composeRefs(props.ref, triggerRef),
+        style: mergePlatformStyle(props.style, {
+          '--ns-floating-anchor-name': anchorName,
+          'anchor-name': 'var(--ns-floating-anchor-name)',
+        }),
+        type: props.type ?? 'button',
+      }) as PopoverTriggerElementProps,
+    [anchorName, contentId, dataState, open, placement, setOpen],
   );
 
   const getAnchorProps = useCallback(
-    (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverAnchorElementProps => ({
-      ...props,
-      'data-part': 'anchor',
-      'data-placement': placement,
-      'data-scope': 'popover',
-      'data-state': dataState,
-    }),
-    [dataState, placement],
+    (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverAnchorElementProps =>
+      ({
+        ...props,
+        'data-part': 'anchor',
+        'data-placement': placement,
+        'data-scope': 'popover',
+        'data-state': dataState,
+        style: mergePlatformStyle(props.style, {
+          '--ns-floating-anchor-name': anchorName,
+          'anchor-name': 'var(--ns-floating-anchor-name)',
+        }),
+      }) as PopoverAnchorElementProps,
+    [anchorName, dataState, placement],
   );
 
   const getPositionerProps = useCallback(
@@ -108,29 +129,45 @@ export function usePopover({
       'data-placement': placement,
       'data-scope': 'popover',
       'data-state': dataState,
-      hidden: open ? props.hidden : true,
+      style: mergePlatformStyle(props.style, {
+        '--ns-floating-anchor-name': anchorName,
+        '--ns-floating-position-area': getPositionArea(placement),
+      }),
     }),
-    [dataState, open, placement],
+    [anchorName, dataState, placement],
   );
 
   const getContentProps = useCallback(
-    (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverContentElementProps => ({
-      ...props,
-      'aria-describedby': props['aria-describedby'] ?? descriptionId,
-      'aria-labelledby': props['aria-labelledby'] ?? titleId,
-      'aria-modal': modal ? 'true' : undefined,
-      'data-expanded': open ? 'true' : 'false',
-      'data-part': 'content',
-      'data-placement': placement,
-      'data-scope': 'popover',
-      'data-state': dataState,
-      hidden: open ? props.hidden : true,
-      id: props.id ?? contentId,
-      ref: composeRefs(props.ref, contentRef),
-      role: props.role ?? 'dialog',
-      tabIndex: props.tabIndex ?? -1,
-    }),
-    [contentId, dataState, descriptionId, modal, open, placement, titleId],
+    (props: JSX.HTMLAttributes<HTMLDivElement> = {}): PopoverContentElementProps =>
+      ({
+        ...props,
+        'aria-describedby': props['aria-describedby'] ?? descriptionId,
+        'aria-labelledby': props['aria-labelledby'] ?? titleId,
+        'aria-modal': modal ? 'true' : undefined,
+        'data-expanded': open ? 'true' : 'false',
+        'data-part': 'content',
+        'data-placement': placement,
+        'data-scope': 'popover',
+        'data-state': dataState,
+        id: props.id ?? contentId,
+        onToggle: composeEventHandlers(props.onToggle, () => {
+          const nextOpen = isPopoverOpen(contentRef.current);
+          if (nextOpen !== open) {
+            setOpen(nextOpen, 'programmatic');
+          }
+        }),
+        popover: 'auto',
+        ref: composeRefs(props.ref, contentRef),
+        role: props.role ?? 'dialog',
+        style: mergePlatformStyle(props.style, {
+          '--ns-floating-anchor-name': anchorName,
+          '--ns-floating-position-area': getPositionArea(placement),
+          'position-anchor': 'var(--ns-floating-anchor-name)',
+          'position-area': 'var(--ns-floating-position-area)',
+        }),
+        tabIndex: props.tabIndex ?? -1,
+      }) as PopoverContentElementProps,
+    [anchorName, contentId, dataState, descriptionId, modal, open, placement, setOpen, titleId],
   );
 
   const getTitleProps = useCallback(

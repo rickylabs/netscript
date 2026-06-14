@@ -37,9 +37,7 @@ function PageHeaderLayout({ children, class: className, ...props }: PageHeaderSe
 }
 
 function PageHeaderMain({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return (
-    <div {...props} class={cn('ns-stack ns-stack--md min-w-0', className)}>{children}</div>
-  );
+  return <div {...props} class={cn('ns-stack ns-stack--md min-w-0', className)}>{children}</div>;
 }
 
 function PageHeaderAside({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
@@ -51,12 +49,12 @@ function PageHeaderBadges({ children, class: className, ...props }: PageHeaderSe
 }
 
 function PageHeaderIntro({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
-  return (
-    <div {...props} class={cn('ns-stack ns-stack--sm min-w-0', className)}>{children}</div>
-  );
+  return <div {...props} class={cn('ns-stack ns-stack--sm min-w-0', className)}>{children}</div>;
 }
 
-function PageHeaderActions({ children, class: className, ...props }: PageHeaderSectionProps): VNode {
+function PageHeaderActions(
+  { children, class: className, ...props }: PageHeaderSectionProps,
+): VNode {
   return <div {...props} class={cn('ns-cluster', className)}>{children}</div>;
 }
 

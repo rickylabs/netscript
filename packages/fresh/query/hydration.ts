@@ -11,8 +11,9 @@
  * @module
  */
 
-import { dehydrate, type DehydratedState, hydrate } from '@tanstack/query-core';
+import { dehydrate, hydrate } from '@tanstack/query-core';
 import type { QueryClient } from '@tanstack/query-core';
+import type { DehydratedState, IslandQueryClient } from './query-types.ts';
 
 /**
  * Dehydrate a QueryClient into a serializable state object.
@@ -23,8 +24,8 @@ import type { QueryClient } from '@tanstack/query-core';
  * @param queryClient - The server-side QueryClient with prefetched data.
  * @returns Serializable dehydrated state.
  */
-export function dehydrateQueryClient(queryClient: QueryClient): DehydratedState {
-  return dehydrate(queryClient);
+export function dehydrateQueryClient(queryClient: IslandQueryClient): DehydratedState {
+  return dehydrate(queryClient as QueryClient) as DehydratedState;
 }
 
 /**
@@ -37,10 +38,8 @@ export function dehydrateQueryClient(queryClient: QueryClient): DehydratedState 
  * @param dehydratedState - State from `dehydrateQueryClient()`.
  */
 export function hydrateFromDehydrated(
-  queryClient: QueryClient,
+  queryClient: IslandQueryClient,
   dehydratedState: DehydratedState,
 ): void {
-  hydrate(queryClient, dehydratedState);
+  hydrate(queryClient as QueryClient, dehydratedState);
 }
-
-export type { DehydratedState };

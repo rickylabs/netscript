@@ -1,0 +1,764 @@
+Fluent builder entry point for `[0m[36m@netscript/fresh[0m`.
+
+Route contracts live on `[0m[36m@netscript/fresh/route[0m`.
+@[0m[35mmodule[0m
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:1077:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35m[0m[0m[35mfunction[0m[0m[35m[0m [0m[1mdefinePage[0m<TState = [0m[38;5;12mEmptyRecord[0m>(): [0m[38;5;12mPageRootBuilder[0m<[0m[38;5;12mTState[0m>
+  Start a new typed page builder chain.
+
+  @[0m[35mreturn[0m
+      A fluent builder for assembling a Fresh page module.
+
+  @[0m[35mexample[0m
+      [0m[38;5;245m```ts[0m
+      [0m[38;5;245mimport { definePage } from "@netscript/fresh/builders";[0m
+      [0m[38;5;245m[0m
+      [0m[38;5;245mconst page = definePage()[0m
+      [0m[38;5;245m  .withLayout(() => "ready")[0m
+      [0m[38;5;245m  .build();[0m
+      [0m[38;5;245m```[0m
+
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:1087:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35m[0m[0m[35mfunction[0m[0m[35m[0m [0m[1mdefinePartial[0m<TProps extends [0m[36mobject[0m, TContext, THandler = [0m[36mundefined[0m>(options[0m[35m[0m: [0m[38;5;12mDefinePartialOptions[0m<[0m[38;5;12mTProps[0m, [0m[38;5;12mTContext[0m, [0m[38;5;12mTHandler[0m>): [0m[38;5;12mDefinedPartialRoute[0m<[0m[38;5;12mTContext[0m, [0m[38;5;12mTHandler[0m>
+  Define a framework-owned partial route backed by an async loader.
+
+  @[0m[35mparam[0m [0m[1moptions[0m
+      Partial route configuration.
+
+  @[0m[35mreturn[0m
+      A Fresh route module contract for the partial.
+
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:1102:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35m[0m[0m[35mfunction[0m[0m[35m[0m [0m[1mdefineStatsPartial[0m<TProps extends [0m[36mobject[0m, TContext, THandler = [0m[36mundefined[0m>(options[0m[35m[0m: [0m[38;5;12mDefineStatsPartialOptions[0m<[0m[38;5;12mTProps[0m, [0m[38;5;12mTContext[0m, [0m[38;5;12mTHandler[0m>): [0m[38;5;12mDefinedPartialRoute[0m<[0m[38;5;12mTContext[0m, [0m[38;5;12mTHandler[0m>
+  Define a stats-only partial route backed by a context-free query function.
+
+  @[0m[35mparam[0m [0m[1moptions[0m
+      Partial route configuration.
+
+  @[0m[35mreturn[0m
+      A Fresh route module contract for the partial.
+
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:49:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mComponentLike[0m<TProps extends [0m[36mobject[0m>
+  Minimal component contract accepted by page and partial builders.
+
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:1039:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mDefinePartialOptions[0m<TProps extends [0m[36mobject[0m, TContext, THandler = [0m[36mundefined[0m>
+  Options for creating a framework-owned partial route.
+
+  [0m[35mreadonly [0m[0m[1mname[0m[0m[35m[0m: [0m[36mstring[0m
+    Stable Fresh partial name rendered into the response.
+  [0m[35mreadonly [0m[0m[1mloader[0m[0m[35m[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mTContext[0m) => [0m[38;5;12mPromise[0m<[0m[38;5;12mTProps[0m>
+    Async loader producing the component props.
+  [0m[35mreadonly [0m[0m[1mcomponent[0m[0m[35m[0m: [0m[38;5;12mComponentLike[0m<[0m[38;5;12mTProps[0m>
+    Display component rendered inside the partial.
+  [0m[35mreadonly [0m[0m[1merrorComponent[0m[0m[35m?[0m: [0m[38;5;12mComponentLike[0m<[0m[38;5;12mPageErrorPrimitives[0m>
+    Optional error component rendered inside the default error shell.
+  [0m[35mreadonly [0m[0m[1merrorTitle[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional override for the default partial error title.
+  [0m[35mreadonly [0m[0m[1mhandler[0m[0m[35m?[0m: [0m[38;5;12mTHandler[0m
+    Optional Fresh handler attached to the partial route.
+  [0m[35mreadonly [0m[0m[1mconfig[0m[0m[35m?[0m: [0m[38;5;12mPartialRouteConfig[0m
+    Optional Fresh route config merged with the framework defaults.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:1057:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mDefineStatsPartialOptions[0m<TProps extends [0m[36mobject[0m, TContext, THandler = [0m[36mundefined[0m> [0m[35mextends[0m [0m[38;5;12mOmit[0m<[0m[38;5;12mDefinePartialOptions[0m<[0m[38;5;12mTProps[0m, [0m[38;5;12mTContext[0m, [0m[38;5;12mTHandler[0m>, [0m[32m"loader"[0m>
+  Options for creating a stats-only partial route.
+
+  [0m[35mreadonly [0m[0m[1mquery[0m[0m[35m[0m: [0m[35m[0m() => [0m[38;5;12mPromise[0m<[0m[38;5;12mTProps[0m>
+    Async query that resolves the stats payload.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:1027:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mDefinedPartialRoute[0m<TContext, THandler = [0m[36mundefined[0m>
+  Materialized partial route contract returned by `[0m[36mdefinePartial()[0m`.
+
+  [0m[35mreadonly [0m[0m[1mconfig[0m[0m[35m[0m: [0m[38;5;12mPartialRouteConfig[0m
+    Fresh route config for the partial.
+  [0m[35mreadonly [0m[0m[1mhandler[0m[0m[35m?[0m: [0m[38;5;12mTHandler[0m
+    Optional Fresh handler attached to the partial route.
+  [0m[35mreadonly [0m[0m[1mpage[0m[0m[35m[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mTContext[0m) => [0m[38;5;12mPromise[0m<[0m[36munknown[0m>
+    Page renderer for the partial route.
+  [0m[35mreadonly [0m[0m[1mdefault[0m[0m[35m[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mTContext[0m) => [0m[38;5;12mPromise[0m<[0m[36munknown[0m>
+    Default export-compatible page renderer.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:774:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageBuildOptions[0m
+  Build options accepted by `[0m[36mpage.build(...)[0m`.
+
+  [0m[35mreadonly [0m[0m[1mroutePattern[0m[0m[35m?[0m: [0m[36mstring[0m
+    Explicit route pattern when not using `[0m[36mwithRoute(...)[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:849:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageBuilder[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m>
+  Public fluent page builder surface.
+
+  [0m[1mwithResource[0m[0m[35m[0m(key[0m[35m[0m: [0m[38;5;12mK[0m, factory[0m[35m[0m: [0m[38;5;12mPageResourceFactory[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTOut[0m, [0m[38;5;12mTHasRoute[0m>): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mSimplify[0m<[0m[38;5;12mTResources[0m & [0m[38;5;12mRecord[0m<[0m[38;5;12mK[0m, [0m[38;5;12mAwaited[0m<[0m[38;5;12mTOut[0m>>>, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Add a single named resource to the page pipeline.
+  [0m[1mwithResources[0m[0m[35m[0m(factories[0m[35m[0m: [0m[38;5;12mTFactories[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mSimplify[0m<[0m[38;5;12mTResources[0m & [K in keyof [0m[38;5;12mTFactories[0m]: [0m[38;5;12mAwaited[0m<[0m[38;5;12mReturnType[0m<[0m[38;5;12mTFactories[0m[[0m[38;5;12mK[0m]>>>, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Add multiple named resources to the page pipeline.
+  [0m[1mwithParams[0m[0m[35m[0m(schemas[0m[35m[0m: { [0m[35mreadonly [0m[0m[1mpath[0m[0m[35m?[0m: [0m[38;5;12mTPathSchema[0m; [0m[35mreadonly [0m[0m[1msearch[0m[0m[35m?[0m: [0m[38;5;12mTSearchSchema[0m; }): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mSchemaOutput[0m<[0m[38;5;12mTPathSchema[0m, [0m[38;5;12mTPath[0m>, [0m[38;5;12mSchemaOutput[0m<[0m[38;5;12mTSearchSchema[0m, [0m[38;5;12mTSearch[0m>, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Apply both path and search schemas in one step.
+  [0m[1mwithPathParams[0m[0m[35m[0m(schema[0m[35m[0m: [0m[38;5;12mTSchema[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mSchemaOutput[0m<[0m[38;5;12mTSchema[0m, [0m[38;5;12mTPath[0m>, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Apply a typed path schema to the page.
+  [0m[1mwithSearchParams[0m[0m[35m[0m(schema[0m[35m[0m: [0m[38;5;12mTSchema[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mSchemaOutput[0m<[0m[38;5;12mTSchema[0m, [0m[38;5;12mTSearch[0m>, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Apply a typed search schema to the page.
+  [0m[1mwithRoute[0m[0m[35m[0m(route[0m[35m[0m: [0m[38;5;12mTRoute[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mPageRoutePath[0m<[0m[38;5;12mTRoute[0m>, [0m[38;5;12mPageRouteSearch[0m<[0m[38;5;12mTRoute[0m>, [0m[38;5;12mTLayerData[0m, [0m[33mtrue[0m>
+    Bind the page to a generated route reference.
+  [0m[1mwithPolicy[0m[0m[35m[0m(policy[0m[35m[0m: [0m[38;5;12mPageDeferPolicyInput[0m | [0m[38;5;12mPageDeferPolicyProfile[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Configure defer policy defaults for the page.
+  [0m[1mwithTelemetry[0m[0m[35m[0m(telemetry[0m[35m[0m: [0m[38;5;12mPageTelemetryConfig[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Configure telemetry metadata for the page.
+  [0m[1mwithLayer[0m[0m[35m[0m(id[0m[35m[0m: [0m[38;5;12mK[0m, component[0m[35m[0m: [0m[38;5;12mComponentLike[0m<[0m[38;5;12mTProps[0m>, config[0m[35m?[0m: [0m[38;5;12mPageLayerConfig[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTProps[0m, [0m[38;5;12mTHasRoute[0m> | [0m[38;5;12mPageLayerLoader[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTProps[0m, [0m[38;5;12mTHasRoute[0m>): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mSimplify[0m<[0m[38;5;12mTLayerData[0m & [0m[38;5;12mRecord[0m<[0m[38;5;12mK[0m, [0m[38;5;12mTProps[0m>>, [0m[38;5;12mTHasRoute[0m>
+    Register a render layer for the page.
+  [0m[1mwithForm[0m[0m[35m[0m(id[0m[35m[0m: [0m[38;5;12mK[0m, component[0m[35m[0m: [0m[38;5;12mComponentLike[0m<[0m[38;5;12mRuntimeFormState[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m>>, config[0m[35m[0m: [0m[38;5;12mPageFormConfig[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTSchema[0m, [0m[38;5;12mTOutput[0m, [0m[38;5;12mTHasRoute[0m>): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mSimplify[0m<[0m[38;5;12mTLayerData[0m & [0m[38;5;12mRecord[0m<[0m[38;5;12mK[0m, [0m[38;5;12mRuntimeFormState[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m>>>, [0m[38;5;12mTHasRoute[0m>
+    Registers a route-bound form as a typed layer.
+
+    Creates a layer, method handler, CSRF headers, and form metadata for
+    the given form identifier. All generics (`[0m[36mK[0m`, `[0m[36mTSchema[0m`, `[0m[36mTOutput[0m`)
+    are auto-inferred; explicit generics override and enforce.
+
+    @[0m[35mparam[0m [0m[1mid[0m
+        Unique form layer identifier.
+
+    @[0m[35mparam[0m [0m[1mcomponent[0m
+        Component receiving {@link RuntimeFormState} props.
+
+    @[0m[35mparam[0m [0m[1mconfig[0m
+        Form configuration — see {@link PageFormConfig}.
+
+  [0m[1mwithHandler[0m[0m[35m[0m(method[0m[35m[0m: [0m[38;5;12mPageMethod[0m, handler[0m[35m[0m: [0m[38;5;12mPageMethodHandler[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Register a page method handler.
+  [0m[1mwithLayout[0m[0m[35m[0m(layout[0m[35m[0m: [0m[38;5;12mPageLayout[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Register the page layout.
+  [0m[1mwithMeta[0m[0m[35m[0m(resolver[0m[35m[0m: [0m[38;5;12mPageMetaResolver[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Register the page metadata resolver.
+  [0m[1mwithHeader[0m[0m[35m[0m(name[0m[35m[0m: [0m[36mstring[0m, value[0m[35m[0m: [0m[36mstring[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Append one static header to the built page.
+  [0m[1mwithHeader[0m[0m[35m[0m(headers[0m[35m[0m: [0m[38;5;12mHeadersInit[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Append a static header map to the built page.
+  [0m[1mwithHeader[0m[0m[35m[0m(resolver[0m[35m[0m: [0m[38;5;12mPageHeaderResolver[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Append computed headers to the built page.
+  [0m[1mwithStatus[0m[0m[35m[0m(status[0m[35m[0m: [0m[36mnumber[0m): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Set the default HTTP status code for Fresh `[0m[36mGET[0m` rendering.
+  [0m[1mwithStreaming[0m[0m[35m[0m(): [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+    Enable builder-owned HTML streaming for `[0m[36mdelivery: 'stream'[0m` layers.
+  [0m[1mcreateNav[0m[0m[35m[0m(routePattern[0m[35m?[0m: [0m[36mstring[0m): [0m[38;5;12mPageRouteNavigation[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>
+    Create typed route navigation for the page.
+  [0m[1mbuild[0m[0m[35m[0m(): [0m[38;5;12mTHasRoute[0m [0m[35mextends[0m [0m[33mtrue[0m ? [0m[38;5;12mRoutedPageDefinition[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m> : [0m[38;5;12mPageDefinition[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m>
+    Build the page definition without an explicit route pattern.
+  [0m[1mbuild[0m[0m[35m[0m(routePattern[0m[35m[0m: [0m[36mstring[0m): [0m[38;5;12mRoutedPageDefinition[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m>
+    Build the page definition for the supplied route pattern.
+  [0m[1mbuild[0m[0m[35m[0m(options[0m[35m[0m: [0m[38;5;12mTBuildOptions[0m): [0m[38;5;12mTBuildOptions[0m [0m[35mextends[0m { [0m[35m[0m[0m[1mroutePattern[0m[0m[35m[0m: [0m[36mstring[0m; } ? [0m[38;5;12mRoutedPageDefinition[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m> : [0m[38;5;12mTHasRoute[0m [0m[35mextends[0m [0m[33mtrue[0m ? [0m[38;5;12mRoutedPageDefinition[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m> : [0m[38;5;12mPageDefinition[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m>
+    Build the page definition for the supplied build options.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:65:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageCacheEntry[0m<T>
+  Minimal cache-entry shape accepted by page layer loaders.
+
+  [0m[35mreadonly [0m[0m[1mdata[0m[0m[35m[0m: [0m[38;5;12mT[0m
+    Cached payload.
+  [0m[35mreadonly [0m[0m[1mcachedAt[0m[0m[35m[0m: [0m[36mnumber[0m
+    Unix epoch timestamp in milliseconds.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:394:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageContext[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> [0m[35mextends[0m [0m[38;5;12mPageRequestContext[0m<[0m[38;5;12mTState[0m>
+  Runtime context shared by loaders, handlers, layouts, and metadata resolvers.
+
+  [0m[35mreadonly [0m[0m[1msignal[0m[0m[35m[0m: [0m[38;5;12mAbortSignal[0m
+    Request abort signal.
+  [0m[35mreadonly [0m[0m[1mpath[0m[0m[35m[0m: [0m[38;5;12mTPath[0m
+    Parsed route path params.
+  [0m[35mreadonly [0m[0m[1msearch[0m[0m[35m[0m: [0m[38;5;12mTSearch[0m
+    Parsed route search state.
+  [0m[35mreadonly [0m[0m[1mlayerData[0m[0m[35m[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mTLayerData[0m>
+    Layer data already resolved by earlier pipeline stages.
+  [0m[35mreadonly [0m[0m[1mroutePattern[0m[0m[35m[0m: [0m[36mstring[0m
+    Route pattern currently being rendered.
+  [0m[35mreadonly [0m[0m[1mpathSchema[0m[0m[35m?[0m: [0m[38;5;12mPagePathSchema[0m<[0m[38;5;12mTPath[0m>
+    Optional typed path schema.
+  [0m[35mreadonly [0m[0m[1msearchSchema[0m[0m[35m?[0m: [0m[38;5;12mPageSearchSchema[0m<[0m[38;5;12mTSearch[0m>
+    Optional typed search schema.
+  [0m[35mreadonly [0m[0m[1mnav[0m[0m[35m[0m: [0m[38;5;12mPageRouteNavigation[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>
+    Typed href builder for the route.
+  [0m[35mreadonly [0m[0m[1mroute[0m[0m[35m[0m: [0m[38;5;12mTHasRoute[0m [0m[35mextends[0m [0m[33mtrue[0m ? [0m[38;5;12mPageRouteReference[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m> : [0m[38;5;12mPageRouteReference[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m> | [0m[36mundefined[0m
+    Generated route reference when the page was built with routing.
+  [0m[35mreadonly [0m[0m[1mresources[0m[0m[35m[0m: [0m[38;5;12mTResources[0m
+    All resolved resources keyed by resource id.
+  [0m[1mresource[0m[0m[35m[0m(key[0m[35m[0m: [0m[38;5;12mTKey[0m): [0m[38;5;12mTResources[0m[[0m[38;5;12mTKey[0m]
+    Resolve a single named resource with full typing.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:347:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageDeferPolicyInput[0m
+  Typed defer policy override accepted by `[0m[36mwithPolicy()[0m`.
+
+  [0m[35mreadonly [0m[0m[1mprofile[0m[0m[35m?[0m: [0m[38;5;12mPageDeferPolicyProfile[0m
+    Named policy profile to start from.
+  [0m[35mreadonly [0m[0m[1mstaleTimeMs[0m[0m[35m?[0m: [0m[36mnumber[0m
+    Override for the freshness window in milliseconds.
+  [0m[35mreadonly [0m[0m[1mprewarmOnMiss[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Prewarm the partial when the cache is missing.
+  [0m[35mreadonly [0m[0m[1mprewarmOnStale[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Prewarm the partial when the cache is stale.
+  [0m[35mreadonly [0m[0m[1mclientRefreshOnFreshCache[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Allow client refresh even when server cache is fresh.
+  [0m[35mreadonly [0m[0m[1mskipClientWhenServerPrewarm[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Skip client refresh when the server is already prewarming.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:780:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageDefinition[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m>
+  Unrouted page definition returned by `[0m[36mbuild()[0m` without a route.
+
+  [0m[35mreadonly [0m[0m[1mpage[0m[0m[35m[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageRequestContext[0m<[0m[38;5;12mTState[0m>) => [0m[38;5;12mPromise[0m<[0m[38;5;12mPageRenderable[0m>
+    Page renderer used by Fresh route modules.
+  [0m[35mreadonly [0m[0m[1mdefault[0m[0m[35m[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageRequestContext[0m<[0m[38;5;12mTState[0m>) => [0m[38;5;12mPromise[0m<[0m[38;5;12mPageRenderable[0m>
+    Default export-compatible page renderer.
+  [0m[35mreadonly [0m[0m[1mhandler[0m[0m[35m?[0m: [0m[38;5;12mPageHandlers[0m<[0m[38;5;12mTState[0m>
+    Optional built handlers.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:283:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageErrorPrimitives[0m
+  Minimal error payload accepted by builder-owned partial error components.
+
+  [0m[35mreadonly [0m[0m[1merror[0m[0m[35m[0m: { [0m[35mreadonly [0m[0m[1mmessage[0m[0m[35m[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mstatus[0m[0m[35m[0m: [0m[36mnumber[0m; [0m[35mreadonly [0m[0m[1mcode[0m[0m[35m?[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mtype[0m[0m[35m[0m: [0m[32m"client"[0m | [0m[32m"server"[0m | [0m[32m"unknown"[0m; [0m[35mreadonly [0m[0m[1mretry[0m[0m[35m[0m: [0m[36mboolean[0m; [0m[35mreadonly [0m[0m[1mtimestamp[0m[0m[35m[0m: [0m[36mnumber[0m; }
+    Normalized error payload.
+  [0m[35mreadonly [0m[0m[1merrorTitle[0m[0m[35m[0m: [0m[36mstring[0m
+    Human-readable title for the error surface.
+  [0m[35mreadonly [0m[0m[1merrorMessage[0m[0m[35m[0m: [0m[36mstring[0m
+    User-facing message shown in the view.
+  [0m[35mreadonly [0m[0m[1merrorCode[0m[0m[35m[0m: [0m[36mstring[0m | [0m[36mundefined[0m
+    Optional machine-readable code.
+  [0m[35mreadonly [0m[0m[1merrorType[0m[0m[35m[0m: [0m[32m"client"[0m | [0m[32m"server"[0m | [0m[32m"unknown"[0m
+    Error classification.
+  [0m[35mreadonly [0m[0m[1merrorStatus[0m[0m[35m[0m: [0m[36mnumber[0m
+    HTTP status associated with the error.
+  [0m[35mreadonly [0m[0m[1merrorTimestamp[0m[0m[35m[0m: [0m[36mnumber[0m
+    Unix epoch timestamp in milliseconds.
+  [0m[35mreadonly [0m[0m[1merrorIcon[0m[0m[35m[0m: [0m[36mstring[0m
+    Decorative icon chosen for the error severity.
+  [0m[35mreadonly [0m[0m[1misRetryable[0m[0m[35m[0m: [0m[36mboolean[0m
+    Whether retry affordances should be shown.
+  [0m[35mreadonly [0m[0m[1mbgColor[0m[0m[35m[0m: [0m[36mstring[0m
+    Background utility class for the default renderer.
+  [0m[35mreadonly [0m[0m[1mborderColor[0m[0m[35m[0m: [0m[36mstring[0m
+    Border utility class for the default renderer.
+  [0m[35mreadonly [0m[0m[1mtextColor[0m[0m[35m[0m: [0m[36mstring[0m
+    Text utility class for the default renderer.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:590:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageFormConfig[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, TSchema extends [0m[38;5;12mz.ZodTypeAny[0m = [0m[38;5;12mz.ZodTypeAny[0m, TOutput = [0m[36munknown[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m>
+  Configuration for the `[0m[36mwithForm()[0m` builder method (legacy `[0m[36mPageBuilder[0m`
+  interface).
+
+  Uses a two-tier context design:
+
+  - [0m[1mPre-mutation[0m callbacks (`[0m[36mmutate[0m`, `[0m[36monIntent[0m`) receive their context
+    with `[0m[36mTOutput = unknown[0m`, keeping the inference site open so TypeScript
+    can infer `[0m[36mTOutput[0m` from `[0m[36mmutate[0m`'s return type.
+  - [0m[1mPost-mutation[0m callbacks (`[0m[36mredirectTo[0m`, `[0m[36monSuccess[0m`, `[0m[36minvalidate[0m`)
+    receive `[0m[36mNoInfer<TOutput>[0m`, consuming the inferred type without
+    widening it.
+
+  `[0m[36mTOutput[0m` is inferred from the return type of `[0m[36mmutate[0m`. Supplying an
+  explicit generic overrides and enforces the type.
+
+  [0m[35mreadonly [0m[0m[1mschema[0m[0m[35m[0m: [0m[38;5;12mTSchema[0m
+    Zod schema used for validation and constraint extraction. Inference site for `[0m[36mTSchema[0m`.
+  [0m[35mreadonly [0m[0m[1minitial[0m[0m[35m?[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mPartial[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m> | [0m[38;5;12mPromise[0m<[0m[38;5;12mPartial[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m>>
+    Resolves initial form values on GET. Merged with schema defaults.
+  [0m[35mreadonly [0m[0m[1mmutate[0m[0m[35m[0m: [0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mz.output[0m<[0m[38;5;12mTSchema[0m>, ctx[0m[35m[0m: [0m[38;5;12mPageFormHandlerContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m, [0m[36munknown[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mTOutput[0m | [0m[38;5;12mPromise[0m<[0m[38;5;12mTOutput[0m>
+    Executes the mutation with validated input. Return type is the sole inference site for `[0m[36mTOutput[0m`.
+  [0m[35mreadonly [0m[0m[1monIntent[0m[0m[35m?[0m: [0m[35m[0m(intent[0m[35m[0m: [0m[38;5;12mFormIntent[0m, values[0m[35m[0m: [0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m, ctx[0m[35m[0m: [0m[38;5;12mPageFormHandlerContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m, [0m[36munknown[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mFormIntentResult[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m> | [0m[38;5;12mPromise[0m<[0m[38;5;12mFormIntentResult[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m>>
+    Handles non-submit intents (e.g. validate, reset). Short-circuits before validation.
+  [0m[35mreadonly [0m[0m[1mredirectTo[0m[0m[35m?[0m: [0m[35m[0m(output[0m[35m[0m: [0m[38;5;12mNoInfer[0m<[0m[38;5;12mTOutput[0m>, ctx[0m[35m[0m: [0m[38;5;12mPageFormHandlerContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m, [0m[38;5;12mNoInfer[0m<[0m[38;5;12mTOutput[0m>, [0m[38;5;12mTHasRoute[0m>) => [0m[36mstring[0m | [0m[38;5;12mResponse[0m | [0m[38;5;12mPromise[0m<[0m[36mstring[0m | [0m[38;5;12mResponse[0m>
+    Redirect target after successful mutation. Takes precedence over `[0m[36monSuccess[0m`.
+  [0m[35mreadonly [0m[0m[1monSuccess[0m[0m[35m?[0m: [0m[35m[0m(output[0m[35m[0m: [0m[38;5;12mNoInfer[0m<[0m[38;5;12mTOutput[0m>, ctx[0m[35m[0m: [0m[38;5;12mPageFormHandlerContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m, [0m[38;5;12mNoInfer[0m<[0m[38;5;12mTOutput[0m>, [0m[38;5;12mTHasRoute[0m>) => { [0m[35mreadonly [0m[0m[1mmessage[0m[0m[35m?[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mnextValues[0m[0m[35m?[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m>; } | [0m[38;5;12mPromise[0m<{ [0m[35mreadonly [0m[0m[1mmessage[0m[0m[35m?[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mnextValues[0m[0m[35m?[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m>; }>
+    Success metadata when staying on the same page (message and/or next values).
+  [0m[35mreadonly [0m[0m[1minvalidate[0m[0m[35m?[0m: [0m[35m[0m(output[0m[35m[0m: [0m[38;5;12mNoInfer[0m<[0m[38;5;12mTOutput[0m>, ctx[0m[35m[0m: [0m[38;5;12mPageFormHandlerContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mz.input[0m<[0m[38;5;12mTSchema[0m> & [0m[38;5;12mFormValues[0m, [0m[38;5;12mNoInfer[0m<[0m[38;5;12mTOutput[0m>, [0m[38;5;12mTHasRoute[0m>) => [0m[36mvoid[0m | [0m[38;5;12mPromise[0m<[0m[36mvoid[0m>
+    Cache invalidation after mutation, before the response is sent.
+  [0m[35mreadonly [0m[0m[1mcsrf[0m[0m[35m?[0m: [0m[36mboolean[0m
+    CSRF protection toggle. Defaults to `[0m[36mtrue[0m`.
+  [0m[35mreadonly [0m[0m[1mmethod[0m[0m[35m?[0m: [0m[32m"POST"[0m | [0m[32m"PUT"[0m | [0m[32m"PATCH"[0m
+    HTTP method for the form submission. Defaults to `[0m[36mPOST[0m`.
+  [0m[35mreadonly [0m[0m[1mspanName[0m[0m[35m?[0m: [0m[36mstring[0m
+    Telemetry span prefix. Defaults to `[0m[36mform.{id}[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:555:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageFormHandlerContext[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, TValues extends [0m[38;5;12mFormValues[0m = [0m[38;5;12mFormValues[0m, TOutput = [0m[36munknown[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> [0m[35mextends[0m [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+  Extended context exposed to `[0m[36mwithForm()[0m` callbacks.
+
+  Extends the base page context with a `[0m[36mform[0m` namespace that provides access
+  to reply helpers, the parsed intent, raw `[0m[36mFormData[0m`, submission ID, CSRF
+  token, and parsed values.
+
+  `[0m[36mTOutput[0m` is `[0m[36munknown[0m` in pre-mutation callbacks (`[0m[36mmutate[0m`, `[0m[36monIntent[0m`) and
+  fully typed in post-mutation callbacks (`[0m[36mredirectTo[0m`, `[0m[36monSuccess[0m`,
+  `[0m[36minvalidate[0m`).
+
+  [0m[35mreadonly [0m[0m[1mform[0m[0m[35m[0m: { [0m[35mreadonly [0m[0m[1mreply[0m[0m[35m[0m: [0m[38;5;12mFormReplyHelpers[0m<[0m[38;5;12mTValues[0m, [0m[38;5;12mTOutput[0m>; [0m[35mreadonly [0m[0m[1mintent[0m[0m[35m[0m: [0m[38;5;12mFormIntent[0m | [0m[36mnull[0m; [0m[35mreadonly [0m[0m[1mformData[0m[0m[35m[0m: [0m[38;5;12mFormData[0m; [0m[35mreadonly [0m[0m[1msubmissionId[0m[0m[35m[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mcsrfToken[0m[0m[35m?[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mvalues[0m[0m[35m[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mTValues[0m>; }
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:796:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageHooks[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m>
+  Hook bundle returned on routed page definitions.
+
+  [0m[1museContext[0m[0m[35m[0m(): [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[33mtrue[0m> & { [0m[35mreadonly [0m[0m[1mslots[0m[0m[35m[0m: [0m[38;5;12mPageSlots[0m<[0m[38;5;12mTLayerData[0m>; }
+    Read the full routed page context.
+  [0m[1museState[0m[0m[35m[0m(): [0m[38;5;12mTState[0m
+    Read the current Fresh route state.
+  [0m[1museResources[0m[0m[35m[0m(): [0m[38;5;12mTResources[0m
+    Read all resolved resources.
+  [0m[1museResource[0m[0m[35m[0m(key[0m[35m[0m: [0m[38;5;12mTKey[0m): [0m[38;5;12mTResources[0m[[0m[38;5;12mTKey[0m]
+    Read one resolved resource by key.
+  [0m[1museLayers[0m[0m[35m[0m(): [0m[38;5;12mPartial[0m<[0m[38;5;12mTLayerData[0m>
+    Read all resolved layer data.
+  [0m[1museLayer[0m[0m[35m[0m(id[0m[35m[0m: [0m[38;5;12mTLayer[0m): [0m[38;5;12mTLayerData[0m[[0m[38;5;12mTLayer[0m] | [0m[36mundefined[0m
+    Read one optional layer payload.
+  [0m[1museRequiredLayer[0m[0m[35m[0m(id[0m[35m[0m: [0m[38;5;12mTLayer[0m): [0m[38;5;12mTLayerData[0m[[0m[38;5;12mTLayer[0m]
+    Read one required layer payload.
+  [0m[1museSlots[0m[0m[35m[0m(): [0m[38;5;12mPageSlots[0m<[0m[38;5;12mTLayerData[0m>
+    Read all layer render slots.
+  [0m[1museRoute[0m[0m[35m[0m(): [0m[38;5;12mPageRouteReference[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m> & { [0m[35mreadonly [0m[0m[1mpath[0m[0m[35m[0m: [0m[38;5;12mTPath[0m; [0m[35mreadonly [0m[0m[1msearch[0m[0m[35m[0m: [0m[38;5;12mTSearch[0m; }
+    Read the bound typed route.
+  [0m[1musePath[0m[0m[35m[0m(): [0m[38;5;12mTPath[0m
+    Read the current path state.
+  [0m[1museSearch[0m[0m[35m[0m(): [0m[38;5;12mTSearch[0m
+    Read the current search state.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:469:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageLayerConfig[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, TProps extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m>
+  Config object accepted by `[0m[36mwithLayer()[0m`.
+
+  [0m[35mreadonly [0m[0m[1mloader[0m[0m[35m?[0m: [0m[38;5;12mPageLayerLoader[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTProps[0m, [0m[38;5;12mTHasRoute[0m>
+    Async loader providing data for the layer component.
+  [0m[35mreadonly [0m[0m[1mpartial[0m[0m[35m?[0m: [0m[36mstring[0m | ([0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[36mstring[0m)
+    Partial endpoint or partial resolver used to refresh the layer.
+  [0m[35mreadonly [0m[0m[1mpartialName[0m[0m[35m?[0m: [0m[36mstring[0m | ([0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[36mstring[0m)
+    Stable Fresh partial name.
+  [0m[35mreadonly [0m[0m[1mfallback[0m[0m[35m?[0m: [0m[36munknown[0m
+    Fallback content shown while a deferred layer is pending.
+  [0m[35mreadonly [0m[0m[1mpolicy[0m[0m[35m?[0m: [0m[38;5;12mPageDeferPolicyInput[0m | [0m[38;5;12mPageDeferPolicyProfile[0m
+    Defer policy applied to the layer.
+  [0m[35mreadonly [0m[0m[1mparams[0m[0m[35m?[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[36mstring[0m>
+    Extra params added to defer form submissions.
+  [0m[35mreadonly [0m[0m[1mlayerDeps[0m[0m[35m?[0m: [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPick[0m<[0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>, [0m[32m"path"[0m | [0m[32m"search"[0m>) => [0m[36munknown[0m
+    Dependency projection used to decide when the layer should reload.
+  [0m[35mreadonly [0m[0m[1mstaleTime[0m[0m[35m?[0m: [0m[36mnumber[0m
+    Freshness window for the cached layer payload.
+  [0m[35mreadonly [0m[0m[1mgcTime[0m[0m[35m?[0m: [0m[36mnumber[0m
+    Cache retention window for the layer payload.
+  [0m[35mreadonly [0m[0m[1mstaleReloadMode[0m[0m[35m?[0m: [0m[32m"blocking"[0m | [0m[32m"background"[0m
+    Stale reload mode.
+  [0m[35mreadonly [0m[0m[1mshouldReload[0m[0m[35m?[0m: [0m[36mboolean[0m | ([0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[36mboolean[0m)
+    Explicit reload guard.
+  [0m[35mreadonly [0m[0m[1mdelivery[0m[0m[35m?[0m: [0m[38;5;12mPageLayerDelivery[0m
+    Delivery mode for the layer.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:428:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageLayoutContext[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> [0m[35mextends[0m [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>
+  Runtime context variant used for page layouts and metadata.
+
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:115:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageLinkProps[0m
+  Link props returned by builder-owned route helpers.
+
+  [0m[35mreadonly [0m[0m[1mhref[0m[0m[35m?[0m: [0m[36mstring[0m
+    Generated href.
+  [0m[35mreadonly [0m[0m[1mf-client-nav[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Enables Fresh client navigation.
+  [0m[35mreadonly [0m[0m[1mf-partial[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional Fresh partial href.
+  [0m[35mreadonly [0m[0m[1mid[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional DOM id forwarded to the anchor.
+  [0m[35mreadonly [0m[0m[1mclass[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional CSS class forwarded to the anchor.
+  [0m[35mreadonly [0m[0m[1mstyle[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional inline style forwarded to the anchor.
+  [0m[35mreadonly [0m[0m[1mtitle[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional title forwarded to the anchor.
+  [0m[35mreadonly [0m[0m[1maria-current[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional ARIA current state.
+  [0m[35mreadonly [0m[key[0m[35m[0m: [0m[36mstring[0m]: [0m[36munknown[0m
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:705:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageMetaDescriptor[0m
+  Metadata descriptor accepted by `[0m[36mwithMeta()[0m`.
+
+  [0m[35mreadonly [0m[0m[1mtitle[0m[0m[35m?[0m: [0m[36mstring[0m
+    Document title.
+  [0m[35mreadonly [0m[0m[1mdescription[0m[0m[35m?[0m: [0m[36mstring[0m
+    Document description.
+  [0m[35mreadonly [0m[0m[1mcanonicalUrl[0m[0m[35m?[0m: [0m[36mstring[0m
+    Canonical URL for the page.
+  [0m[35mreadonly [0m[0m[1mrobots[0m[0m[35m?[0m: [0m[36mstring[0m
+    Robots directive.
+  [0m[35mreadonly [0m[0m[1mmeta[0m[0m[35m?[0m: [0m[38;5;12mReadonlyArray[0m<{ [0m[35mreadonly [0m[0m[1mname[0m[0m[35m?[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mproperty[0m[0m[35m?[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mcontent[0m[0m[35m[0m: [0m[36mstring[0m; }>
+    Additional meta tags.
+  [0m[35mreadonly [0m[0m[1mlinks[0m[0m[35m?[0m: [0m[38;5;12mReadonlyArray[0m<{ [0m[35mreadonly [0m[0m[1mrel[0m[0m[35m[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mhref[0m[0m[35m[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mtitle[0m[0m[35m?[0m: [0m[36mstring[0m; [0m[35mreadonly [0m[0m[1mtype[0m[0m[35m?[0m: [0m[36mstring[0m; }>
+    Additional link tags.
+  [0m[35mreadonly [0m[0m[1mjsonLd[0m[0m[35m?[0m: [0m[36munknown[0m | readonly [0m[36munknown[0m[]
+    Optional JSON-LD payload.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:203:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPagePairedRouteTarget[0m<TPrimaryPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TPrimarySearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TPartialPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TPartialSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m>
+  Combined page/partial route helper returned by `[0m[36mroute.withPartial(...)[0m`.
+
+  [0m[35mreadonly [0m[0m[1mroute[0m[0m[35m[0m: [0m[38;5;12mPageRouteReference[0m<[0m[38;5;12mTPrimaryPath[0m, [0m[38;5;12mTPrimarySearch[0m>
+    Primary page route.
+  [0m[35mreadonly [0m[0m[1mpartialRoute[0m[0m[35m[0m: [0m[38;5;12mPageRouteTarget[0m<[0m[38;5;12mTPartialPath[0m, [0m[38;5;12mTPartialSearch[0m>
+    Partial route refreshed by the page.
+  [0m[1mhref[0m[0m[35m[0m(input[0m[35m?[0m: [0m[38;5;12mPagePairedRouteHrefInput[0m<[0m[38;5;12mTPrimaryPath[0m, [0m[38;5;12mTPrimarySearch[0m, [0m[38;5;12mTPartialPath[0m, [0m[38;5;12mTPartialSearch[0m>): [0m[36mstring[0m
+    Build the page href for the paired target.
+  [0m[1mpartialHref[0m[0m[35m[0m(input[0m[35m?[0m: [0m[38;5;12mPagePairedRouteHrefInput[0m<[0m[38;5;12mTPrimaryPath[0m, [0m[38;5;12mTPrimarySearch[0m, [0m[38;5;12mTPartialPath[0m, [0m[38;5;12mTPartialSearch[0m>): [0m[36mstring[0m
+    Build the partial href for the paired target.
+  [0m[1mgetLinkProps[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mPageRouteGetLinkPropsInput[0m<[0m[38;5;12mTPrimaryPath[0m, [0m[38;5;12mTPrimarySearch[0m> & { [0m[35mreadonly [0m[0m[1mpartialPath[0m[0m[35m?[0m: [0m[38;5;12mTPartialPath[0m; [0m[35mreadonly [0m[0m[1mpartialSearch[0m[0m[35m?[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mTPartialSearch[0m> | ([0m[35m[0m(prev[0m[35m[0m: [0m[38;5;12mTPartialSearch[0m) => [0m[38;5;12mPartial[0m<[0m[38;5;12mTPartialSearch[0m>); [0m[35mreadonly [0m[0m[1mpartialPreserveSearchParams[0m[0m[35m?[0m: [0m[36mboolean[0m; }): [0m[38;5;12mPagePartialLinkProps[0m & { [0m[35mreadonly [0m[0m[1mhref[0m[0m[35m[0m: [0m[36mstring[0m; }
+    Build anchor props with both `[0m[36mhref[0m` and `[0m[36mf-partial[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:197:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPagePartialLinkProps[0m [0m[35mextends[0m [0m[38;5;12mPageLinkProps[0m
+  Link props produced by paired page/partial route helpers.
+
+  [0m[35mreadonly [0m[0m[1mf-partial[0m[0m[35m[0m: [0m[36mstring[0m
+    Partial href used by Fresh partial navigation.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:103:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPagePathSchema[0m<TOutput extends [0m[36mobject[0m = [0m[36mobject[0m>
+  Minimal path schema contract accepted by `[0m[36mdefinePage()[0m`.
+
+  [0m[1msafeParse[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mPagePathParamInput[0m): [0m[38;5;12mPageSchemaParseResult[0m<[0m[38;5;12mTOutput[0m>
+    Parse raw path params into typed route state.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:334:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageRenderContext[0m<TState = [0m[38;5;12mEmptyRecord[0m> [0m[35mextends[0m [0m[38;5;12mPageRequestContext[0m<[0m[38;5;12mTState[0m>
+  Request context variant used when a page can call `[0m[36mctx.render()[0m`.
+
+  [0m[1mrender[0m[0m[35m[0m(body[0m[35m[0m: [0m[36munknown[0m, init[0m[35m?[0m: [0m[38;5;12mResponseInit[0m): [0m[38;5;12mResponse[0m
+    Render the page body with Fresh response metadata.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:318:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageRequestContext[0m<TState = [0m[38;5;12mEmptyRecord[0m>
+  Typed request context exposed to page builders.
+
+  [0m[35mreadonly [0m[0m[1murl[0m[0m[35m[0m: [0m[38;5;12mURL[0m
+    Request URL for the current route render.
+  [0m[35mreadonly [0m[0m[1mreq[0m[0m[35m[0m: [0m[38;5;12mRequest[0m
+    Raw request object from Fresh.
+  [0m[35mreadonly [0m[0m[1mparams[0m[0m[35m[0m: [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[36mstring[0m | [0m[36mundefined[0m>
+    Raw Fresh path params.
+  [0m[35mreadonly [0m[0m[1mstate[0m[0m[35m[0m: [0m[38;5;12mTState[0m
+    Fresh route state.
+  [0m[35mreadonly [0m[0m[1misPartial[0m[0m[35m?[0m: [0m[36mboolean[0m
+    True when the current request already targets a partial.
+  [0m[35mreadonly [0m[0m[1mdata[0m[0m[35m?[0m: [0m[36munknown[0m
+    Data returned by a page method handler.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:1023:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageRootBuilder[0m<TState = [0m[38;5;12mEmptyRecord[0m> [0m[35mextends[0m [0m[38;5;12mPageBuilder[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mEmptyRecord[0m, [0m[38;5;12mEmptyRecord[0m, [0m[38;5;12mEmptyRecord[0m, [0m[38;5;12mEmptyRecord[0m, [0m[33mfalse[0m>
+  Root page builder returned by `[0m[36mdefinePage()[0m`.
+
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:169:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageRouteNavigation[0m<TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m>
+  Typed route navigation surface exposed by routed pages.
+
+  [0m[1mmakeHref[0m[0m[35m[0m(...args[0m[35m[0m: [] | [[0m[38;5;12mPageRouteHrefInput[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>]): [0m[36mstring[0m
+    Build a validated href for the route.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:252:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageRouteReference[0m<TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m> [0m[35mextends[0m [0m[38;5;12mPageRouteTarget[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>
+  Minimal route reference accepted by `[0m[36mwithRoute()[0m`.
+
+  [0m[35mreadonly [0m[0m[1mnav[0m[0m[35m[0m: [0m[38;5;12mPageRouteNavigation[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>
+    Typed route navigation helper.
+  [0m[35mreadonly [0m[0m[1m$href[0m[0m[35m?[0m: [0m[36mstring[0m
+    Static href when the route has no dynamic path params.
+  [0m[35mreadonly [0m[0m[1mLink[0m[0m[35m[0m: [0m[35m[0m(props[0m[35m[0m: [0m[38;5;12mPageRouteLinkComponentProps[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>) => [0m[38;5;12mPageRenderable[0m
+    Route-bound link component.
+  [0m[1mhref[0m[0m[35m[0m(...args[0m[35m[0m: [] | [[0m[38;5;12mPageRouteHrefInput[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>]): [0m[36mstring[0m
+    Build a validated href for the route.
+  [0m[1mgetLinkProps[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mPageRouteGetLinkPropsInput[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>): [0m[38;5;12mPageLinkProps[0m & { [0m[35mreadonly [0m[0m[1mhref[0m[0m[35m[0m: [0m[36mstring[0m; }
+    Build link props for the route.
+  [0m[1mparsePath[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mPagePathParamInput[0m): [0m[38;5;12mTPath[0m
+    Parse raw path params into typed route state.
+  [0m[1msafeParsePath[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mPagePathParamInput[0m): [0m[38;5;12mPageSchemaParseResult[0m<[0m[38;5;12mTPath[0m>
+    Safely parse raw path params into typed route state.
+  [0m[1mparseSearch[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mURLSearchParams[0m | [0m[38;5;12mPageSearchParamInput[0m): [0m[38;5;12mTSearch[0m
+    Parse raw search params into typed route state.
+  [0m[1msafeParseSearch[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mURLSearchParams[0m | [0m[38;5;12mPageSearchParamInput[0m): [0m[38;5;12mPageSchemaParseResult[0m<[0m[38;5;12mTSearch[0m>
+    Safely parse raw search params into typed route state.
+  [0m[1mwithPartial[0m[0m[35m[0m(partialRoute[0m[35m[0m: [0m[38;5;12mPageRouteTarget[0m<[0m[38;5;12mTPartialPath[0m, [0m[38;5;12mTPartialSearch[0m>): [0m[38;5;12mPagePairedRouteTarget[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTPartialPath[0m, [0m[38;5;12mTPartialSearch[0m>
+    Pair the page route with a framework partial route.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:234:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageRouteTarget[0m<TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m>
+  Minimal route target accepted by `[0m[36mwithRoute()[0m`.
+
+  [0m[35mreadonly [0m[0m[1m$types[0m[0m[35m?[0m: { [0m[35mreadonly [0m[0m[1mpath[0m[0m[35m[0m: [0m[38;5;12mTPath[0m; [0m[35mreadonly [0m[0m[1msearch[0m[0m[35m[0m: [0m[38;5;12mTSearch[0m; }
+    Compile-time-only path and search state metadata.
+  [0m[35mreadonly [0m[0m[1mroutePattern[0m[0m[35m[0m: [0m[36mstring[0m
+    Fresh route pattern used to build hrefs.
+  [0m[35mreadonly [0m[0m[1mpathSchema[0m[0m[35m?[0m: [0m[38;5;12mPagePathSchema[0m<[0m[38;5;12mTPath[0m>
+    Optional typed path schema.
+  [0m[35mreadonly [0m[0m[1msearchSchema[0m[0m[35m?[0m: [0m[38;5;12mPageSearchSchema[0m<[0m[38;5;12mTSearch[0m>
+    Optional typed search schema.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:90:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageSchemaParseFailure[0m
+  Failure result returned by page-owned schemas.
+
+  [0m[35mreadonly [0m[0m[1msuccess[0m[0m[35m[0m: [0m[33mfalse[0m
+    Always `[0m[36mfalse[0m` for failed parses.
+  [0m[35mreadonly [0m[0m[1merror[0m[0m[35m?[0m: [0m[36munknown[0m
+    Optional parse error from the underlying validator.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:82:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageSchemaParseSuccess[0m<TOutput>
+  Success result returned by page-owned schemas.
+
+  [0m[35mreadonly [0m[0m[1msuccess[0m[0m[35m[0m: [0m[33mtrue[0m
+    Always `[0m[36mtrue[0m` for successful parses.
+  [0m[35mreadonly [0m[0m[1mdata[0m[0m[35m[0m: [0m[38;5;12mTOutput[0m
+    Parsed output payload.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:109:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageSearchSchema[0m<TOutput extends [0m[36mobject[0m = [0m[36mobject[0m>
+  Minimal search schema contract accepted by `[0m[36mdefinePage()[0m`.
+
+  [0m[1msafeParse[0m[0m[35m[0m(input[0m[35m[0m: [0m[38;5;12mPageSearchParamInput[0m): [0m[38;5;12mPageSchemaParseResult[0m<[0m[38;5;12mTOutput[0m>
+    Parse raw search params into typed route state.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:363:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPageTelemetryConfig[0m
+  Typed telemetry configuration accepted by `[0m[36mwithTelemetry()[0m`.
+
+  [0m[35mreadonly [0m[0m[1menabled[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Enables or disables route telemetry.
+  [0m[35mreadonly [0m[0m[1mspanName[0m[0m[35m?[0m: [0m[36mstring[0m
+    Optional explicit span name.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:55:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mPartialRouteConfig[0m
+  Minimal route config surface emitted by framework partial routes.
+
+  [0m[35mreadonly [0m[0m[1mskipAppWrapper[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Skip the app wrapper for the route.
+  [0m[35mreadonly [0m[0m[1mskipInheritedLayouts[0m[0m[35m?[0m: [0m[36mboolean[0m
+    Skip inherited layouts for the route.
+  [0m[35mreadonly [0m[key[0m[35m[0m: [0m[36mstring[0m]: [0m[36munknown[0m
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:833:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mRoutedPageDefinition[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m> [0m[35mextends[0m [0m[38;5;12mPageDefinition[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m>
+  Routed page definition returned by `[0m[36mbuild()[0m` with route metadata.
+
+  [0m[35mreadonly [0m[0m[1mnav[0m[0m[35m[0m: [0m[38;5;12mPageRouteNavigation[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>
+    Typed href builder for the page route.
+  [0m[35mreadonly [0m[0m[1mroute[0m[0m[35m[0m: [0m[38;5;12mPageRouteReference[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m>
+    Bound route reference for the page.
+  [0m[35mreadonly [0m[0m[1mhooks[0m[0m[35m[0m: [0m[38;5;12mPageHooks[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m>
+    Typed hook bundle for the page.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts:331:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35minterface[0m [0m[1mRuntimeFormState[0m<TValues extends [0m[38;5;12mFormValues[0m>
+
+  [0m[35mreadonly [0m[0m[1mid[0m[0m[35m[0m: [0m[36mstring[0m
+  [0m[35mreadonly [0m[0m[1maction[0m[0m[35m[0m: [0m[36mstring[0m
+  [0m[35mreadonly [0m[0m[1mmethod[0m[0m[35m[0m: [0m[32m"POST"[0m | [0m[32m"PUT"[0m | [0m[32m"PATCH"[0m
+  [0m[35mreadonly [0m[0m[1mvalues[0m[0m[35m[0m: [0m[38;5;12mTValues[0m
+  [0m[35mreadonly [0m[0m[1minitialValues[0m[0m[35m[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mTValues[0m>
+  [0m[35mreadonly [0m[0m[1mfieldErrors[0m[0m[35m[0m: [0m[38;5;12mFormFieldErrors[0m<[0m[38;5;12mTValues[0m>
+  [0m[35mreadonly [0m[0m[1mformErrors[0m[0m[35m[0m: readonly [0m[36mstring[0m[]
+  [0m[35mreadonly [0m[0m[1mhasErrors[0m[0m[35m[0m: [0m[36mboolean[0m
+  [0m[35mreadonly [0m[0m[1msubmitted[0m[0m[35m[0m: [0m[36mboolean[0m
+  [0m[35mreadonly [0m[0m[1mintent[0m[0m[35m[0m: [0m[38;5;12mFormIntent[0m | [0m[36mnull[0m
+  [0m[35mreadonly [0m[0m[1msubmissionId[0m[0m[35m[0m: [0m[36mstring[0m
+  [0m[35mreadonly [0m[0m[1mcsrfToken[0m[0m[35m[0m: [0m[36mstring[0m
+  [0m[35mreadonly [0m[0m[1mfields[0m[0m[35m[0m: [0m[38;5;12mFieldDescriptorMap[0m<[0m[38;5;12mTValues[0m>
+  [0m[35mreadonly [0m[0m[1mconstraints[0m[0m[35m[0m: [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[38;5;12mFieldConstraints[0m>
+  [0m[35mreadonly [0m[0m[1mformProps[0m[0m[35m[0m: [0m[38;5;12mFormElementProps[0m
+  [0m[35mreadonly [0m[0m[1mcsrfInputProps[0m[0m[35m[0m: [0m[38;5;12mFormCsrfInputProps[0m
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:25:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mEmptyRecord[0m = [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[36mnever[0m>
+  Empty object shape used by page builders without typed state.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:416:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mInferDefinePageLayerLoaderProps[0m<TLoader extends [0m[35m[0m(...args[0m[35m[0m: [0m[36mnever[0m[]) => [0m[36munknown[0m> = [0m[38;5;12mResolveDefinePageLayerLoaderOutput[0m<[0m[38;5;12mAwaited[0m<[0m[38;5;12mReturnType[0m<[0m[38;5;12mTLoader[0m>>> [0m[35mextends[0m [0m[35minfer[0m TProps extends [0m[38;5;12mDefinePageLayerProps[0m ? [0m[38;5;12mTProps[0m : [0m[36mnever[0m
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:340:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageDeferPolicyProfile[0m = [0m[32m"balanced"[0m | [0m[32m"aggressive-first-paint"[0m | [0m[32m"background-refresh"[0m | [0m[32m"low-bandwidth"[0m
+  Typed defer policy profile accepted by `[0m[36mwithPolicy()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:764:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageHandlers[0m<TState = [0m[38;5;12mEmptyRecord[0m> = [0m[38;5;12mPartial[0m<[0m[38;5;12mRecord[0m<[0m[38;5;12mPageMethod[0m, [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageRequestContext[0m<[0m[38;5;12mTState[0m> | [0m[38;5;12mPageRenderContext[0m<[0m[38;5;12mTState[0m>) => [0m[38;5;12mResponse[0m | { [0m[35m[0m[0m[1mdata[0m[0m[35m[0m: [0m[36munknown[0m; } | [0m[38;5;12mPromise[0m<[0m[38;5;12mResponse[0m | { [0m[35m[0m[0m[1mdata[0m[0m[35m[0m: [0m[36munknown[0m; }>>>
+  Built page handlers returned by `[0m[36mbuild()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:739:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageHeaderResolver[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> = [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageLayoutContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mHeadersInit[0m | [0m[38;5;12mPromise[0m<[0m[38;5;12mHeadersInit[0m>
+  Header resolver accepted by `[0m[36mwithHeader()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:371:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageLayerDelivery[0m = [0m[32m"blocking"[0m | [0m[32m"defer"[0m | [0m[32m"stream"[0m
+  Delivery mode for a deferred page layer.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:451:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageLayerLoader[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, TProps extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> = [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mTProps[0m | [0m[38;5;12mPageCacheEntry[0m<[0m[38;5;12mTProps[0m> | [0m[36mnull[0m | [0m[36mundefined[0m | [0m[38;5;12mPromise[0m<[0m[38;5;12mTProps[0m | [0m[38;5;12mPageCacheEntry[0m<[0m[38;5;12mTProps[0m> | [0m[36mnull[0m | [0m[36mundefined[0m>
+  Async loader accepted by `[0m[36mwithLayer()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:31:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageLayerMap[0m = [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[36mobject[0m>
+  Layer props keyed by layer id.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:751:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageLayout[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> = [0m[35m[0m(slots[0m[35m[0m: [0m[38;5;12mPageSlots[0m<[0m[38;5;12mTLayerData[0m>, ctx[0m[35m[0m: [0m[38;5;12mPageLayoutContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mPageRenderable[0m
+  Layout function accepted by `[0m[36mwithLayout()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:727:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageMetaResolver[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> = [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageLayoutContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mPageMetaDescriptor[0m | [0m[38;5;12mPromise[0m<[0m[38;5;12mPageMetaDescriptor[0m>
+  Metadata resolver accepted by `[0m[36mwithMeta()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:530:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageMethod[0m = [0m[32m"GET"[0m | [0m[32m"POST"[0m | [0m[32m"PUT"[0m | [0m[32m"PATCH"[0m | [0m[32m"DELETE"[0m | [0m[32m"OPTIONS"[0m | [0m[32m"HEAD"[0m
+  HTTP methods accepted by `[0m[36mwithHandler()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:533:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageMethodHandler[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> = [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mResponse[0m | { [0m[35m[0m[0m[1mdata[0m[0m[35m[0m: [0m[36munknown[0m; } | [0m[38;5;12mPromise[0m<[0m[38;5;12mResponse[0m | { [0m[35m[0m[0m[1mdata[0m[0m[35m[0m: [0m[36munknown[0m; }>
+  Handler function accepted by `[0m[36mwithHandler()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:178:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPagePairedRouteHrefInput[0m<TPrimaryPath extends [0m[36mobject[0m, TPrimarySearch extends [0m[36mobject[0m, TPartialPath extends [0m[36mobject[0m, TPartialSearch extends [0m[36mobject[0m> = [0m[38;5;12mPageRouteHrefInput[0m<[0m[38;5;12mTPrimaryPath[0m, [0m[38;5;12mTPrimarySearch[0m> & { [0m[35mreadonly [0m[0m[1mpartialPath[0m[0m[35m?[0m: [0m[38;5;12mTPartialPath[0m; [0m[35mreadonly [0m[0m[1mpartialSearch[0m[0m[35m?[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mTPartialSearch[0m> | ([0m[35m[0m(prev[0m[35m[0m: [0m[38;5;12mTPartialSearch[0m) => [0m[38;5;12mPartial[0m<[0m[38;5;12mTPartialSearch[0m>); [0m[35mreadonly [0m[0m[1mpartialPreserveSearchParams[0m[0m[35m?[0m: [0m[36mboolean[0m; }
+  Input accepted by paired page/partial route helpers.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:73:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPagePathParamInput[0m = [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[36mstring[0m | [0m[36mundefined[0m>
+  Raw path input keyed by dynamic segment name.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:34:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageRenderable[0m = [0m[36mnull[0m | [0m[36mundefined[0m | [0m[36mboolean[0m | [0m[36mnumber[0m | [0m[36mbigint[0m | [0m[36mstring[0m | { [0m[35mreadonly [0m[0m[1mtype[0m[0m[35m?[0m: [0m[36munknown[0m; [0m[35mreadonly [0m[0m[1mprops[0m[0m[35m?[0m: [0m[36munknown[0m; [0m[35mreadonly [0m[0m[1mkey[0m[0m[35m?[0m: [0m[36munknown[0m; } | readonly [0m[38;5;12mPageRenderable[0m[]
+  Renderable content accepted by builder-owned components, layouts, and slots.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:438:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageResourceFactory[0m<TState = [0m[38;5;12mEmptyRecord[0m, TResources extends [0m[38;5;12mUnknownRecord[0m = [0m[38;5;12mEmptyRecord[0m, TPath extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TSearch extends [0m[36mobject[0m = [0m[38;5;12mEmptyRecord[0m, TLayerData extends [0m[38;5;12mPageLayerMap[0m = [0m[38;5;12mEmptyRecord[0m, TOut = [0m[36munknown[0m, THasRoute extends [0m[36mboolean[0m = [0m[33mfalse[0m> = [0m[35m[0m(ctx[0m[35m[0m: [0m[38;5;12mPageContext[0m<[0m[38;5;12mTState[0m, [0m[38;5;12mTResources[0m, [0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m, [0m[38;5;12mTLayerData[0m, [0m[38;5;12mTHasRoute[0m>) => [0m[38;5;12mTOut[0m | [0m[38;5;12mPromise[0m<[0m[38;5;12mTOut[0m>
+  Resource factory accepted by `[0m[36mwithResource()[0m` and `[0m[36mwithResources()[0m`.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:149:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageRouteGetLinkPropsInput[0m<TPath extends [0m[36mobject[0m, TSearch extends [0m[36mobject[0m> = [0m[38;5;12mOmit[0m<[0m[38;5;12mPageLinkProps[0m, [0m[32m"children"[0m | [0m[32m"href"[0m> & [0m[38;5;12mPageRouteHrefInput[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m> & { [0m[35mreadonly [0m[0m[1mreplace[0m[0m[35m?[0m: [0m[36mboolean[0m; }
+  Input accepted by builder-owned bound route link-prop helpers.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:137:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageRouteHrefInput[0m<TPath extends [0m[36mobject[0m, TSearch extends [0m[36mobject[0m> = ([keyof [0m[38;5;12mTPath[0m] [0m[35mextends[0m [[0m[36mnever[0m] ? { [0m[35mreadonly [0m[0m[1mpath[0m[0m[35m?[0m: [0m[38;5;12mTPath[0m; } : [0m[38;5;12mTPath[0m [0m[35mextends[0m [0m[38;5;12mEmptyRecord[0m ? { [0m[35mreadonly [0m[0m[1mpath[0m[0m[35m?[0m: [0m[38;5;12mTPath[0m; } : { [0m[35mreadonly [0m[0m[1mpath[0m[0m[35m[0m: [0m[38;5;12mTPath[0m; }) & { [0m[35mreadonly [0m[0m[1msearch[0m[0m[35m?[0m: [0m[38;5;12mPartial[0m<[0m[38;5;12mTSearch[0m> | ([0m[35m[0m(prev[0m[35m[0m: [0m[38;5;12mTSearch[0m) => [0m[38;5;12mPartial[0m<[0m[38;5;12mTSearch[0m>); [0m[35mreadonly [0m[0m[1mpreserveSearchParams[0m[0m[35m?[0m: [0m[36mboolean[0m; }
+  Input accepted by builder-owned route href helpers.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:158:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageRouteLinkComponentProps[0m<TPath extends [0m[36mobject[0m, TSearch extends [0m[36mobject[0m> = [0m[38;5;12mOmit[0m<[0m[38;5;12mPageLinkProps[0m, [0m[32m"href"[0m> & [0m[38;5;12mPageRouteHrefInput[0m<[0m[38;5;12mTPath[0m, [0m[38;5;12mTSearch[0m> & { [0m[35mreadonly [0m[0m[1mchildren[0m[0m[35m[0m: [0m[38;5;12mPageRenderable[0m; [0m[35mreadonly [0m[0m[1mreplace[0m[0m[35m?[0m: [0m[36mboolean[0m; }
+  Props accepted by builder-owned route link components.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:374:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageRoutePath[0m<TRoute extends [0m[38;5;12mPageRouteTarget[0m<[0m[36mobject[0m, [0m[36mobject[0m>> = [0m[38;5;12mNonNullable[0m<[0m[38;5;12mTRoute[0m[[0m[32m"$types"[0m]>[[0m[32m"path"[0m]
+  Infer the typed path state from a route target.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:379:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageRouteSearch[0m<TRoute extends [0m[38;5;12mPageRouteTarget[0m<[0m[36mobject[0m, [0m[36mobject[0m>> = [0m[38;5;12mNonNullable[0m<[0m[38;5;12mTRoute[0m[[0m[32m"$types"[0m]>[[0m[32m"search"[0m]
+  Infer the typed search state from a route target.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:98:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageSchemaParseResult[0m<TOutput> = [0m[38;5;12mPageSchemaParseSuccess[0m<[0m[38;5;12mTOutput[0m> | [0m[38;5;12mPageSchemaParseFailure[0m
+  Result returned by page-owned path and search schemas.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:79:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageSearchParamInput[0m = [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[38;5;12mPageSearchParamValue[0m>
+  Raw search input keyed by query param name.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:76:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageSearchParamValue[0m = [0m[36mstring[0m | [0m[36mstring[0m[] | [0m[36mundefined[0m
+  Raw search-param value accepted by route helpers.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:694:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageSlot[0m<TProps extends [0m[36mobject[0m> = ([0m[35m[0m() => [0m[38;5;12mPageRenderable[0m) & { [0m[35m[0m[0m[1mdata[0m[0m[35m?[0m: [0m[38;5;12mTProps[0m; }
+  Slot function exposed to layouts for a resolved layer.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:700:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mPageSlots[0m<TLayerData extends [0m[38;5;12mPageLayerMap[0m> = [K in keyof [0m[38;5;12mTLayerData[0m]: [0m[38;5;12mPageSlot[0m<[0m[38;5;12mTLayerData[0m[[0m[38;5;12mK[0m]>
+  Slot map exposed to layouts.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:384:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mSchemaOutput[0m<TSchema, TFallback extends [0m[36mobject[0m> = [0m[38;5;12mTSchema[0m [0m[35mextends[0m [0m[36mundefined[0m ? [0m[38;5;12mTFallback[0m : [0m[38;5;12mTSchema[0m [0m[35mextends[0m { [0m[35mreadonly [0m[0m[1m_output[0m[0m[35m[0m: [0m[35minfer[0m TOutput extends [0m[36mobject[0m; } ? [0m[38;5;12mTOutput[0m : [0m[38;5;12mTSchema[0m [0m[35mextends[0m { [0m[1msafeParse[0m[0m[35m[0m(input[0m[35m[0m: [0m[36munknown[0m): [0m[38;5;12mPageSchemaParseResult[0m<[0m[35minfer[0m TOutput extends [0m[36mobject[0m>; } ? [0m[38;5;12mTOutput[0m : [0m[38;5;12mTFallback[0m
+  Infer the output object carried by a schema-like value.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:391:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mSimplify[0m<T> = [K in keyof [0m[38;5;12mT[0m]: [0m[38;5;12mT[0m[[0m[38;5;12mK[0m] & { }
+  Flatten mapped and intersected object types for cleaner IntelliSense.
+
+[0m[3m[38;5;8mDefined in file:///home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:28:1
+
+[0m[0m[3m[38;5;8m[0m[0m[35mtype[0m [0m[1mUnknownRecord[0m = [0m[38;5;12mRecord[0m<[0m[36mstring[0m, [0m[36munknown[0m>
+  Generic object map used by resources and layer registries.
+

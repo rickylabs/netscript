@@ -81,7 +81,10 @@ Deno.test('applyCollectionKeyOperation mirrors collection reorder and duplicate 
 
   assertEquals(duplicatedKeys['sections[0].items[0]'], 'row-b');
   assertEquals(duplicatedKeys['sections[0].items[1]'], 'row-a');
-  assert(!!duplicatedKeys['sections[0].items[2]'], 'Expected duplicate rows to receive a fresh key');
+  assert(
+    !!duplicatedKeys['sections[0].items[2]'],
+    'Expected duplicate rows to receive a fresh key',
+  );
   assert(
     duplicatedKeys['sections[0].items[2]'] !== duplicatedKeys['sections[0].items[1]'],
     'Expected duplicate rows to avoid reusing the source key',
@@ -175,7 +178,10 @@ Deno.test('collection descriptors expose schema limits and stable item keys', ()
     item.key,
   ]));
 
-  assert(first.fields.items.list[0]?.key !== first.fields.items.list[1]?.key, 'Expected unique keys per collection row');
+  assert(
+    first.fields.items.list[0]?.key !== first.fields.items.list[1]?.key,
+    'Expected unique keys per collection row',
+  );
   assertEquals(secondKeysById.a, firstKeysById.a);
   assertEquals(secondKeysById.b, firstKeysById.b);
 });

@@ -7,9 +7,9 @@ import { composeRefs } from '../_internal/compose-refs.ts';
 import { useControllableSignal } from '../_internal/use-controllable-signal.ts';
 import type {
   AccordionItemContentElementProps,
+  AccordionItemElementProps,
   AccordionItemIndicatorElementProps,
   AccordionItemOptions,
-  AccordionItemElementProps,
   AccordionItemState,
   AccordionItemTriggerElementProps,
   AccordionOrientation,
@@ -73,7 +73,9 @@ export function useAccordion({
   );
 
   const getItemState = useCallback(
-    ({ disabled: itemDisabled = false, value: itemValue }: AccordionItemOptions): AccordionItemState => {
+    (
+      { disabled: itemDisabled = false, value: itemValue }: AccordionItemOptions,
+    ): AccordionItemState => {
       const state = {
         disabled: disabled || itemDisabled,
         expanded: expandedValues.includes(itemValue),
@@ -130,7 +132,9 @@ export function useAccordion({
         return;
       }
 
-      const enabledValues = itemOrder.current.filter((entry) => !itemDisabledState.current.get(entry));
+      const enabledValues = itemOrder.current.filter((entry) =>
+        !itemDisabledState.current.get(entry)
+      );
       const currentIndex = enabledValues.indexOf(item.value);
       const nextIndex = getNextCollectionIndex(key, currentIndex, enabledValues.length, axis, true);
 
@@ -160,7 +164,10 @@ export function useAccordion({
   );
 
   const getItemProps = useCallback(
-    (item: AccordionItemOptions, props: JSX.HTMLAttributes<HTMLDivElement> = {}): AccordionItemElementProps => {
+    (
+      item: AccordionItemOptions,
+      props: JSX.HTMLAttributes<HTMLDivElement> = {},
+    ): AccordionItemElementProps => {
       const state = getItemState(item);
 
       return {
@@ -172,9 +179,11 @@ export function useAccordion({
         'data-scope': 'accordion',
         'data-state': getAccordionDataState(state.expanded),
         'data-value': item.value,
-      };
+        name: multiple ? undefined : rootId,
+        open: state.expanded ? true : undefined,
+      } as AccordionItemElementProps;
     },
-    [getItemState, orientation],
+    [getItemState, multiple, orientation, rootId],
   );
 
   const getItemTriggerProps = useCallback(
@@ -202,21 +211,42 @@ export function useAccordion({
         onBlur: composeEventHandlers(props.onBlur, () => setFocusedValue(null)),
         onClick: composeEventHandlers(props.onClick, () => toggleItem(item)),
         onFocus: composeEventHandlers(props.onFocus, () => setFocusedValue(item.value)),
-        onKeyDown: composeEventHandlers(props.onKeyDown, (event: JSX.TargetedKeyboardEvent<HTMLButtonElement>) => {
-          const supportedKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+        onKeyDown: composeEventHandlers(
+          props.onKeyDown,
+          (event: JSX.TargetedKeyboardEvent<HTMLButtonElement>) => {
+            const supportedKeys = [
+              'ArrowLeft',
+              'ArrowRight',
+              'ArrowUp',
+              'ArrowDown',
+              'Home',
+              'End',
+            ];
 
-          if (!supportedKeys.includes(event.key)) {
-            return;
-          }
+            if (!supportedKeys.includes(event.key)) {
+              return;
+            }
 
-          event.preventDefault();
-          handleNavigation(item, event.key, orientation);
-        }),
-        ref: composeRefs(props.ref, (node: HTMLButtonElement | null) => registerItemTrigger(item.value, node)),
+            event.preventDefault();
+            handleNavigation(item, event.key, orientation);
+          },
+        ),
+        ref: composeRefs(
+          props.ref,
+          (node: HTMLButtonElement | null) => registerItemTrigger(item.value, node),
+        ),
         type: props.type ?? 'button',
       };
     },
-    [getItemState, handleNavigation, orientation, registerItemTrigger, rootId, setFocusedValue, toggleItem],
+    [
+      getItemState,
+      handleNavigation,
+      orientation,
+      registerItemTrigger,
+      rootId,
+      setFocusedValue,
+      toggleItem,
+    ],
   );
 
   const getItemIndicatorProps = useCallback(
@@ -240,7 +270,10 @@ export function useAccordion({
   );
 
   const getItemContentProps = useCallback(
-    (item: AccordionItemOptions, props: JSX.HTMLAttributes<HTMLDivElement> = {}): AccordionItemContentElementProps => {
+    (
+      item: AccordionItemOptions,
+      props: JSX.HTMLAttributes<HTMLDivElement> = {},
+    ): AccordionItemContentElementProps => {
       const state = getItemState(item);
       const triggerId = `${rootId}-trigger-${item.value}`;
       const contentId = `${rootId}-content-${item.value}`;

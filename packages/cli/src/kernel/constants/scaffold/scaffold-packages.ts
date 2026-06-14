@@ -33,6 +33,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_FRESH_VITE: '@netscript/fresh/vite',
   NETSCRIPT_KV: '@netscript/kv',
   NETSCRIPT_FRESH_UI: '@netscript/fresh-ui',
+  NETSCRIPT_FRESH_UI_INTERACTIVE: '@netscript/fresh-ui/interactive',
   ZOD: 'zod',
 } as const;
 

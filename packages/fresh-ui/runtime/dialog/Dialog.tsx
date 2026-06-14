@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -23,32 +23,32 @@ function withChildren(children: ComponentChildren) {
   return children;
 }
 
-function DialogRoot({ children, ...options }: DialogRootProps): unknown {
+function DialogRoot({ children, ...options }: DialogRootProps): VNode {
   const dialog = useDialog(options);
   return <DialogContext.Provider value={dialog}>{children}</DialogContext.Provider>;
 }
 
-function DialogTrigger({ children, ...props }: DialogTriggerProps): unknown {
+function DialogTrigger({ children, ...props }: DialogTriggerProps): VNode {
   const dialog = useDialogContext('Dialog.Trigger');
   return <button {...dialog.getTriggerProps(props)}>{withChildren(children)}</button>;
 }
 
-function DialogContent({ children, ...props }: DialogContentProps): unknown {
+function DialogContent({ children, ...props }: DialogContentProps): VNode {
   const dialog = useDialogContext('Dialog.Content');
   return <dialog {...dialog.getContentProps(props)}>{withChildren(children)}</dialog>;
 }
 
-function DialogTitle({ children, ...props }: DialogTitleProps): unknown {
+function DialogTitle({ children, ...props }: DialogTitleProps): VNode {
   const dialog = useDialogContext('Dialog.Title');
   return <h2 {...dialog.getTitleProps(props)}>{withChildren(children)}</h2>;
 }
 
-function DialogDescription({ children, ...props }: DialogDescriptionProps): unknown {
+function DialogDescription({ children, ...props }: DialogDescriptionProps): VNode {
   const dialog = useDialogContext('Dialog.Description');
   return <p {...dialog.getDescriptionProps(props)}>{withChildren(children)}</p>;
 }
 
-function DialogClose({ children, ...props }: DialogCloseProps): unknown {
+function DialogClose({ children, ...props }: DialogCloseProps): VNode {
   const dialog = useDialogContext('Dialog.Close');
   return <button {...dialog.getCloseProps(props)}>{withChildren(children)}</button>;
 }

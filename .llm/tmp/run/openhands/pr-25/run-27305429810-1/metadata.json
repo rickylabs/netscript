@@ -1,0 +1,14 @@
+{
+  "run_id": "27305429810",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27305429810",
+  "agent_outcome": "skipped",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "25",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feat/package-quality-wave5-apps-5a-service",
+  "summary_path": "/home/runner/work/_temp/openhands/27305429810-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-25/run-27305429810-1"
+}

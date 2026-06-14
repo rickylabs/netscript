@@ -1,0 +1,317 @@
+{
+  "pkg": "packages/sdk",
+  "measuredAt": "2026-06-11T15:00:00.199Z",
+  "entrypoints": [
+    "packages/sdk/mod.ts",
+    "packages/sdk/cache/mod.ts",
+    "packages/sdk/client/mod.ts",
+    "packages/sdk/collections/mod.ts",
+    "packages/sdk/discovery/mod.ts",
+    "packages/sdk/ports/mod.ts",
+    "packages/sdk/query/mod.ts",
+    "packages/sdk/query-client/mod.ts",
+    "packages/sdk/streams.ts",
+    "packages/sdk/telemetry/mod.ts"
+  ],
+  "check": {
+    "code": 0,
+    "stderr": ""
+  },
+  "docLintCombined": {
+    "code": 0,
+    "total": 0,
+    "byRule": {},
+    "raw": "Checked 10 files\n"
+  },
+  "docLintBarrel": {
+    "code": 0,
+    "total": 0,
+    "byRule": {}
+  },
+  "docLintPerEntrypoint": {
+    "packages/sdk/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/cache/mod.ts": {
+      "code": 1,
+      "total": 3,
+      "byRule": {
+        "private-type-ref": 3
+      }
+    },
+    "packages/sdk/client/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/collections/mod.ts": {
+      "code": 1,
+      "total": 1,
+      "byRule": {
+        "private-type-ref": 1
+      }
+    },
+    "packages/sdk/discovery/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/ports/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/query/mod.ts": {
+      "code": 1,
+      "total": 30,
+      "byRule": {
+        "private-type-ref": 30
+      }
+    },
+    "packages/sdk/query-client/mod.ts": {
+      "code": 1,
+      "total": 8,
+      "byRule": {
+        "private-type-ref": 8
+      }
+    },
+    "packages/sdk/streams.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    },
+    "packages/sdk/telemetry/mod.ts": {
+      "code": 0,
+      "total": 0,
+      "byRule": {}
+    }
+  },
+  "dryRun": {
+    "code": 0,
+    "total": 0,
+    "byRule": {},
+    "raw": "Checking for slow types in the public API...\n\u001b[0m\u001b[1m\u001b[32mSimulating publish\u001b[0m of \u001b[0m\u001b[38;5;245m@netscript/sdk@0.0.1-alpha.0\u001b[0m with files:\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/README.md (10.66KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/cache/mod.ts (1.66KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/client/mod.ts (1.15KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/collections/mod.ts (848B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/deno.json (1.87KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/discovery/mod.ts (947B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/mod.ts (2.24KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/ports/mod.ts (2.79KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/query-client/mod.ts (2.24KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/query/mod.ts (1023B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/cache/cache-provider.ts (2.85KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/cache/cache-query.ts (7.26KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/cache/defaults.ts (291B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/cache/kv-cache-store.ts (4.66KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/client/errors.ts (2.59KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/client/http-client-link.ts (3.8KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/client/service-client.ts (1.56KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/collections/create-query-collection.ts (5.83KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/discovery/browser-env.ts (1.84KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/discovery/kv-connection.ts (7.4KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/discovery/mod.ts (790B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/discovery/service-discovery.ts (106B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/discovery/service-url.ts (4.68KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/openapi/helpers.ts (2.05KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/cache-entry.ts (1.57KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/cache-store.ts (2.87KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/client-link-factory.ts (878B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/metadata.ts (1.35KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/query-client.ts (2.47KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/query-factory.ts (4.35KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/query-key.ts (1.07KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/query-options.ts (846B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/service-client.ts (6KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/service-query-utils.ts (9.51KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/ports/transport.ts (694B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/presets/define-services.ts (4.45KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query-client/create-service-query-utils.ts (2.24KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query-client/key-bridge.ts (1.17KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query-client/kv-cache-persister.ts (2.63KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query-client/query-client-factory.ts (2.22KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query-client/types.ts (2.19KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query/client-proxy.ts (1.29KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query/composite-query.ts (3.07KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/query/query-factory.ts (6.86KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/src/telemetry/otel-middleware.ts (1.38KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/streams.ts (1.06KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5b-sdk/packages/sdk/telemetry/mod.ts (503B)\n\u001b[0m\u001b[32mSuccess\u001b[0m Dry run complete\n"
+  },
+  "tests": [
+    "packages/sdk/tests/cache/cache-query_test.ts",
+    "packages/sdk/tests/discovery/env-ordering_test.ts",
+    "packages/sdk/tests/integration/service-client-runtime_test.ts",
+    "packages/sdk/tests/query/query-factory_test.ts",
+    "packages/sdk/tests/query-client/kv-cache-persister_test.ts",
+    "packages/sdk/tests/readme-doctest_test.ts"
+  ],
+  "srcLocTotal": 4377,
+  "srcFiles": [
+    {
+      "path": "packages/sdk/src/discovery/kv-connection.ts",
+      "loc": 286
+    },
+    {
+      "path": "packages/sdk/src/cache/cache-query.ts",
+      "loc": 267
+    },
+    {
+      "path": "packages/sdk/src/ports/service-query-utils.ts",
+      "loc": 231
+    },
+    {
+      "path": "packages/sdk/src/query/query-factory.ts",
+      "loc": 224
+    },
+    {
+      "path": "packages/sdk/src/ports/service-client.ts",
+      "loc": 201
+    },
+    {
+      "path": "packages/sdk/src/discovery/service-url.ts",
+      "loc": 197
+    },
+    {
+      "path": "packages/sdk/src/collections/create-query-collection.ts",
+      "loc": 153
+    },
+    {
+      "path": "packages/sdk/src/ports/query-factory.ts",
+      "loc": 142
+    },
+    {
+      "path": "packages/sdk/src/cache/kv-cache-store.ts",
+      "loc": 132
+    },
+    {
+      "path": "packages/sdk/src/presets/define-services.ts",
+      "loc": 129
+    },
+    {
+      "path": "packages/sdk/src/client/http-client-link.ts",
+      "loc": 117
+    },
+    {
+      "path": "packages/sdk/tests/type-fixtures/sdk-assignability_type.ts",
+      "loc": 113
+    },
+    {
+      "path": "packages/sdk/src/query/composite-query.ts",
+      "loc": 105
+    },
+    {
+      "path": "packages/sdk/tests/type-fixtures/service-query-utils-contract_type.ts",
+      "loc": 98
+    },
+    {
+      "path": "packages/sdk/src/client/errors.ts",
+      "loc": 93
+    },
+    {
+      "path": "packages/sdk/src/ports/cache-store.ts",
+      "loc": 91
+    },
+    {
+      "path": "packages/sdk/ports/mod.ts",
+      "loc": 89
+    },
+    {
+      "path": "packages/sdk/src/cache/cache-provider.ts",
+      "loc": 85
+    },
+    {
+      "path": "packages/sdk/src/query-client/kv-cache-persister.ts",
+      "loc": 83
+    },
+    {
+      "path": "packages/sdk/src/openapi/helpers.ts",
+      "loc": 80
+    },
+    {
+      "path": "packages/sdk/query-client/mod.ts",
+      "loc": 76
+    },
+    {
+      "path": "packages/sdk/tests/test-helpers.ts",
+      "loc": 74
+    },
+    {
+      "path": "packages/sdk/src/discovery/browser-env.ts",
+      "loc": 71
+    },
+    {
+      "path": "packages/sdk/src/query-client/query-client-factory.ts",
+      "loc": 70
+    },
+    {
+      "path": "packages/sdk/tests/type-fixtures/define-services_type.ts",
+      "loc": 70
+    },
+    {
+      "path": "packages/sdk/mod.ts",
+      "loc": 66
+    },
+    {
+      "path": "packages/sdk/src/ports/cache-entry.ts",
+      "loc": 65
+    },
+    {
+      "path": "packages/sdk/src/query-client/create-service-query-utils.ts",
+      "loc": 65
+    },
+    {
+      "path": "packages/sdk/src/ports/query-client.ts",
+      "loc": 64
+    },
+    {
+      "path": "packages/sdk/src/client/service-client.ts",
+      "loc": 63
+    },
+    {
+      "path": "packages/sdk/src/query-client/types.ts",
+      "loc": 61
+    },
+    {
+      "path": "packages/sdk/src/ports/metadata.ts",
+      "loc": 54
+    },
+    {
+      "path": "packages/sdk/tests/type-fixtures/service-query-utils-factory_type.ts",
+      "loc": 47
+    },
+    {
+      "path": "packages/sdk/src/telemetry/otel-middleware.ts",
+      "loc": 44
+    },
+    {
+      "path": "packages/sdk/tests/type-fixtures/service-query-utils-upstream_type.ts",
+      "loc": 44
+    },
+    {
+      "path": "packages/sdk/src/query/client-proxy.ts",
+      "loc": 43
+    },
+    {
+      "path": "packages/sdk/src/ports/query-key.ts",
+      "loc": 42
+    },
+    {
+      "path": "packages/sdk/cache/mod.ts",
+      "loc": 40
+    },
+    {
+      "path": "packages/sdk/src/discovery/mod.ts",
+      "loc": 38
+    },
+    {
+      "path": "packages/sdk/src/query-client/key-bridge.ts",
+      "loc": 38
+    },
+    {
+      "path": "packages/sdk/client/mod.ts",
+      "loc": 36
+    },
+    {
+      "path": "packages/sdk/streams.ts",
+      "loc": 36
+    },
+    {
+      "path": "packages/sdk/tests/type-fixtures/query-collection_type.ts",
+      "loc": 36
+    },
+    {
+      "path": "packages/sdk/discovery/mod.ts",
+      "loc": 34
+    },
+    {
+      "path": "packages/sdk/src/ports/query-options.ts",
+      "loc": 33
+    },
+    {
+      "path": "packages/sdk/query/mod.ts",
+      "loc": 31
+    },
+    {
+      "path": "packages/sdk/src/ports/client-link-factory.ts",
+      "loc": 31
+    },
+    {
+      "path": "packages/sdk/src/ports/transport.ts",
+      "loc": 27
+    },
+    {
+      "path": "packages/sdk/collections/mod.ts",
+      "loc": 25
+    },
+    {
+      "path": "packages/sdk/telemetry/mod.ts",
+      "loc": 17
+    },
+    {
+      "path": "packages/sdk/src/cache/defaults.ts",
+      "loc": 12
+    },
+    {
+      "path": "packages/sdk/src/discovery/service-discovery.ts",
+      "loc": 8
+    }
+  ],
+  "overCap350": []
+}

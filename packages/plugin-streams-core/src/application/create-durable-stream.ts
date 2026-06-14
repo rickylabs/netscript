@@ -3,6 +3,9 @@ import type { StateSchema, StreamStateDefinition } from '../domain/stream-schema
 import type { StreamProducerPort } from '../ports/stream-producer-port.ts';
 import { buildStreamUrl, getStreamsAuth } from './stream-url-resolver.ts';
 
+export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
+export type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+
 /** Options accepted by {@link DurableStreamProducer}. */
 export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition> {
   /** Stream path relative to the base URL, for example `/workers/executions`. */
