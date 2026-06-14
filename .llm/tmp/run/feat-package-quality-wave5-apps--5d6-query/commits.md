@@ -10,3 +10,4 @@ Append-only hash record (repo + hash + subject).
 - `3c841e4`: fix(fresh): expose root cache entry types
 - `b59b340`: docs(5d6): rebaseline fresh public surface gates
 - `3925d5c`: chore(fresh): clean package fmt lint residuals
+- `8cdf510`: chore(root): include fresh in quality wrappers
