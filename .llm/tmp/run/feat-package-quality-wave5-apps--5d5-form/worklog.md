@@ -124,3 +124,28 @@ Append-only. One entry per slice / decision.
 | Touched-file lint | `deno lint packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/*.ts` | PASS after bracketing moved switch cases for `no-case-declarations` |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS for slice target: facade 7 LOC; new schema-adapter files all ≤237 LOC |
 | Focused regression test | `deno test --unstable-kv packages/fresh/form/schema-adapter.test.ts` | PASS: 14 passed, 0 failed |
+
+## 2026-06-14 - Slice 5 explicit return-type verification
+
+- Rechecked the plan-named public files for slow-type return annotations:
+  - `packages/fresh/form/enhancement.tsx`
+  - `packages/fresh/form/form.tsx`
+  - `packages/fresh/form/form-region.tsx`
+  - `packages/fresh/form/mod.ts`
+- Current branch already has explicit public return annotations in the plan-named files, so this
+  slice required no source changes.
+- Ran `deno publish --dry-run --allow-dirty` from `packages/fresh`; the dry-run completed
+  successfully with no `missing-explicit-return-type` findings. Output archived as
+  `slice5-publish-dry-run.txt`.
+
+### Slice 5 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Touched-file format | `deno fmt --check packages/fresh/form/enhancement.tsx packages/fresh/form/form.tsx packages/fresh/form/form-region.tsx packages/fresh/form/mod.ts` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/enhancement.tsx packages/fresh/form/form.tsx packages/fresh/form/form-region.tsx packages/fresh/form/mod.ts` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no planned over-cap implementation files remain |
+| Publish dry-run | `cd packages/fresh && deno publish --dry-run --allow-dirty` | PASS: no slow-type findings |

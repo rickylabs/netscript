@@ -21,6 +21,8 @@
   `field-descriptors/*` files with the original import path preserved as a compatibility facade.
 - Slice 4 is complete locally: `schema-adapter.ts` split into role-named `schema-adapter/*` files
   with the original import path preserved as a compatibility facade.
+- Slice 5 is complete locally as a no-source-change verification slice: current public return
+  annotations already satisfy the plan, and `packages/fresh` publish dry-run is clean.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
@@ -37,6 +39,9 @@
   touched-file fmt, touched-file lint, and file-size scan.
 - Slice 4 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   touched-file fmt, touched-file lint, file-size scan, and focused schema-adapter tests.
+- Slice 5 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  touched-file fmt/lint for the plan-named public files, file-size scan, and
+  `deno publish --dry-run --allow-dirty` from `packages/fresh`.
 
 ## Completed
 
@@ -66,16 +71,19 @@
   - New `schema-adapter/{contract,mod,zod,zod-constraints,zod-defaults,zod-errors,zod-internals}.ts`
     files carry the moved implementation and all stay under 237 LOC.
   - `createZodAdapter`, `FormSchemaAdapter`, and parse-result type import paths remain preserved.
+- Verified Slice 5 explicit return-type target:
+  - No source edits were required.
+  - `slice5-publish-dry-run.txt` captures a clean `packages/fresh` publish dry-run.
 
 ## In Progress
 
-- Commit slice 4 schema-adapter split and harness artifacts, then append the commit ledger.
+- Commit slice 5 verification artifacts, then append the commit ledger.
 
 ## Next Steps
 
-1. Commit and push slice 4.
+1. Commit and push slice 5.
 2. Comment PR #38 with slice summary and next slice.
-3. Start slice 5 explicit public return-type sweep.
+3. Start slice 6 JSDoc sweep on remaining public form exports.
 
 ## Key Decisions
 
@@ -124,6 +132,7 @@
 | `packages/fresh/form/schema-adapter/zod-defaults.ts` | new | Slice 4 Zod default extraction |
 | `packages/fresh/form/schema-adapter/zod-errors.ts` | new | Slice 4 Zod error normalization |
 | `packages/fresh/form/schema-adapter/zod-internals.ts` | new | Slice 4 Zod unwrap helpers |
+| `.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/slice5-publish-dry-run.txt` | new | Slice 5 publish dry-run evidence |
 
 ## Gates
 
