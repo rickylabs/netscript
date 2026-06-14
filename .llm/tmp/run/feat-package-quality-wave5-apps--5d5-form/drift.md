@@ -53,4 +53,23 @@ Status: IN PROGRESS
   - Owner: 5d5 implementation (slice 22)
   - Proposed close gate: `deno check --unstable-kv packages/fresh/form/mod.ts` passes and evidence is archived.
 
+- **D-5d5-6 — Supervisor sync changed form baseline before implementation**
+
+  Re-baseline on 2026-06-14 after supervisor sync commit `ff8cf6f` found the package no longer
+  matches the PLAN-phase measurements:
+
+  - `deno doc --lint packages/fresh/form/mod.ts` now reports 0 errors.
+  - `packages/fresh/form/types.ts` is now 753 LOC, not the planned 474 LOC.
+  - `schema-adapter.ts` remains 576 LOC and `field-descriptors.ts` remains 518 LOC.
+  - Scoped form check via `.llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx`
+    passes with 0 occurrences.
+
+  This does not expand 5d5 scope, but it changes the decomposition budget. Slice 2 must now split a
+  larger `types.ts`; the doc-lint budget is already retired by upstream work and should be treated
+  as verification rather than planned cleanup.
+
+  - Status: OPEN
+  - Owner: 5d5 implementation (slice 2 budget update, final evidence)
+  - Proposed close gate: `types.ts` is brought under the file-size cap without public export
+    renames, and final form doc-lint remains clean.
 
