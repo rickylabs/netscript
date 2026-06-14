@@ -11,5 +11,4 @@ Append-only hash record (repo + hash + subject).
 - `b59b340`: docs(5d6): rebaseline fresh public surface gates
 - `3925d5c`: chore(fresh): clean package fmt lint residuals
 - `8cdf510`: chore(root): include fresh in quality wrappers
-- : 4584b32
-- : feat(fresh): add query hydration and app seams
+- 4584b32: feat(fresh): add query hydration and app seams
