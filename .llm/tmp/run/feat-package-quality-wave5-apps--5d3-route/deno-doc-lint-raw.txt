@@ -1,0 +1,1779 @@
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:39:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0mexport type EnumPathParam<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:46:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m46 | [0mexport interface EnumPathParamDefinition<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:50:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0m  readonly paramName: TParamName;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:51:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m51 | [0m  readonly values: TValues;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'EnumPathParamDefinition["schema"]' references private type 'PathParamSchema'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:52:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m52 | [0m  readonly schema: PathParamSchema<EnumPathParam<TParamName, TValues>>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:52:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m52 | [0m  readonly schema: PathParamSchema<EnumPathParam<TParamName, TValues>>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:53:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m53 | [0m  parse(value: string | undefined): TValues[number] | null;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePatternPath' references private type 'InferRoutePatternPathSegments'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:76:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m76 | [0mexport type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatternPathSegments<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m71 | [0mtype InferRoutePatternPathSegments<TPattern extends string> = TPattern extends '' ? {}
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePatternPath' references private type 'StripLeadingSlash'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:76:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m76 | [0mexport type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatternPathSegments<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0mtype StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest : TPattern;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:76:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m76 | [0mexport type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatternPathSegments<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:80:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m80 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRoutePathInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:80:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m80 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m109 | [0mexport type TypedRoutePathInput<TPath extends object> = HasPathParams<TPath> extends true
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:80:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m80 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'RouteSearchUpdate'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:80:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m80 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m113 | [0mexport type RouteSearchUpdate<TSearch extends object> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:80:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m80 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:80:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m80 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:91:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m91 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRoutePathInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:91:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m91 | [0mexport type PairedRouteHrefInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m109 | [0mexport type TypedRoutePathInput<TPath extends object> = HasPathParams<TPath> extends true
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:91:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m91 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'RouteSearchUpdate'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:91:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m91 | [0mexport type PairedRouteHrefInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m113 | [0mexport type RouteSearchUpdate<TSearch extends object> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:91:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m91 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:91:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m91 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteGetLinkPropsInput' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:111:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m111 | [0mexport type PairedRouteGetLinkPropsInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteGetLinkPropsInput' references private type 'FreshPartialLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:111:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m111 | [0mexport type PairedRouteGetLinkPropsInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m85 | [0mexport interface FreshPartialLinkAttributes extends FreshLinkAttributes {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:111:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m111 | [0mexport type PairedRouteGetLinkPropsInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:118:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m118 | [0mexport type RouteContractTypeCarrier = {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:125:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m125 | [0mexport type InferRouteContractPath<TValue extends RouteContractTypeCarrier> = NonNullable<TValue['$types']>['path'];
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:126:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m126 | [0mexport type InferRouteContractSearch<TValue extends RouteContractTypeCarrier> = NonNullable<TValue['$types']>['search'];
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContractOptions' references private type 'PathParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:178:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m178 | [0mexport interface DefineRouteContractOptions<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContractOptions' references private type 'SearchParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:178:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m178 | [0mexport interface DefineRouteContractOptions<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:178:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m178 | [0mexport interface DefineRouteContractOptions<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:182:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m182 | [0m  pathSchema?: TPathSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:183:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m183 | [0m  searchSchema?: TSearchSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:186:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m186 | [0mexport type RouteReferenceKind = 'page' | 'partial';
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:188:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m188 | [0mexport interface RouteReferenceOptions {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:189:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m189 | [0m  readonly id?: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:190:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m190 | [0m  readonly kind?: RouteReferenceKind;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteTarget' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:193:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m193 | [0mexport interface PairedRouteTarget<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:193:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m193 | [0mexport interface PairedRouteTarget<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:197:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m197 | [0m  readonly route: TPrimary;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:198:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m198 | [0m  readonly partialRoute: TPartial;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteTarget["href"]' references private type 'PairedRouteHrefArgs'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:199:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m199 | [0m  href(...args: PairedRouteHrefArgs<TPrimary, TPartial>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m104 | [0mtype PairedRouteHrefArgs<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteTarget["href"]' references private type 'ValidatedRouteHref'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:199:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m199 | [0m  href(...args: PairedRouteHrefArgs<TPrimary, TPartial>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m50 | [0mexport type ValidatedRouteHref = string & { readonly [validatedRouteHrefBrand]: true };
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:199:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m199 | [0m  href(...args: PairedRouteHrefArgs<TPrimary, TPartial>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:200:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m200 | [0m  partialHref(...args: PairedRouteHrefArgs<TPrimary, TPartial>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteTarget["getLinkProps"]' references private type 'FreshPartialLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:201:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m201 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m85 | [0mexport interface FreshPartialLinkAttributes extends FreshLinkAttributes {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:201:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m201 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference' references private type 'EmptyRecord'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:206:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m206 | [0mexport interface RouteReference<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m16 | [0mexport type EmptyRecord = Record<string, never>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference' references private type 'SearchParamInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:206:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m206 | [0mexport interface RouteReference<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m24 | [0mexport type SearchParamInput = Record<string, SearchParamValue>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:206:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m206 | [0mexport interface RouteReference<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:206:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m206 | [0mexport interface RouteReference<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:210:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m210 | [0m  readonly routePattern: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["pathSchema"]' references private type 'PathParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:211:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m211 | [0m  readonly pathSchema?: PathParamSchema<TPath>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:211:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m211 | [0m  readonly pathSchema?: PathParamSchema<TPath>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["searchSchema"]' references private type 'SearchParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:212:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m212 | [0m  readonly searchSchema?: SearchParamSchema<TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:212:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m212 | [0m  readonly searchSchema?: SearchParamSchema<TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["nav"]' references private type 'DefinePageRouteNav'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:213:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m213 | [0m  readonly nav: DefinePageRouteNav<TPath, TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m469 | [0mexport interface DefinePageRouteNav<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:213:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m213 | [0m  readonly nav: DefinePageRouteNav<TPath, TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:214:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m214 | [0m  readonly $pattern: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["$href"]' references private type 'ValidatedRouteHref'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:215:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m215 | [0m  readonly $href?: ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m50 | [0mexport type ValidatedRouteHref = string & { readonly [validatedRouteHrefBrand]: true };
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:215:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m215 | [0m  readonly $href?: ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:216:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m216 | [0m  readonly $id?: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:217:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m217 | [0m  readonly $kind?: RouteReferenceKind;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["href"]' references private type 'RouteHrefArgs'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:218:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m218 | [0m  href(...args: RouteHrefArgs<RouteReference<TPath, TSearch>>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m87 | [0mtype RouteHrefArgs<TTarget extends TypedRouteTarget<object, object>> = HasPathParams<TypedRoutePathOf<TTarget>> extends true
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:218:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m218 | [0m  href(...args: RouteHrefArgs<RouteReference<TPath, TSearch>>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["getLinkProps"]' references private type 'BoundGetLinkPropsInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:219:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m219 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m127 | [0mexport type BoundGetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> = Omit<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["getLinkProps"]' references private type 'FreshLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:219:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m219 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m81 | [0mexport interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:219:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m219 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["parsePath"]' references private type 'PathParamInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:222:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m222 | [0m  parsePath(input: PathParamInput): TPath;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m23 | [0mexport type PathParamInput = Record<string, string | undefined>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:222:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m222 | [0m  parsePath(input: PathParamInput): TPath;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["safeParsePath"]' references private type 'SchemaParseResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:223:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m223 | [0m  safeParsePath(input: PathParamInput): SchemaParseResult<TPath>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m78 | [0mexport type SchemaParseResult<TOutput> = SchemaParseSuccess<TOutput> | SchemaParseFailure;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:223:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m223 | [0m  safeParsePath(input: PathParamInput): SchemaParseResult<TPath>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:224:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m224 | [0m  parseSearch(input: URLSearchParams | SearchParamInput): TSearch;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:225:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m225 | [0m  safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["Link"]' references private type 'ComponentType'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:226:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m226 | [0m  readonly Link: ComponentType<BoundLinkProps<RouteReference<TPath, TSearch>>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m80 | [0mexport type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["Link"]' references private type 'BoundLinkProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:226:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m226 | [0m  readonly Link: ComponentType<BoundLinkProps<RouteReference<TPath, TSearch>>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m143 | [0mexport type BoundLinkProps<TTarget extends TypedRouteTarget<object, object>> = Omit<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:226:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m226 | [0m  readonly Link: ComponentType<BoundLinkProps<RouteReference<TPath, TSearch>>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:227:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m227 | [0m  withPartial<TPartial extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'BoundRouteContract' references private type 'PathParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:232:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m232 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'BoundRouteContract' references private type 'SearchParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:232:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m232 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'BoundRouteContract' references private type 'RouteContractPathOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:232:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m232 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m56 | [0mtype RouteContractPathOf<TPathSchema> = InferSchemaOutput<TPathSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'BoundRouteContract' references private type 'RouteContractSearchOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:232:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m232 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m59 | [0mtype RouteContractSearchOf<TSearchSchema> = InferSchemaOutput<TSearchSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:232:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m232 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:236:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m236 | [0m  readonly pathSchema: TPathSchema extends undefined ? undefined
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:238:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m238 | [0m  readonly searchSchema: TSearchSchema extends undefined ? undefined
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:240:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m240 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract' references private type 'PathParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:257:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m257 | [0mexport interface DefineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract' references private type 'SearchParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:257:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m257 | [0mexport interface DefineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:257:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m257 | [0mexport interface DefineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:261:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m261 | [0m  readonly pathSchema: TPathSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:262:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m262 | [0m  readonly searchSchema: TSearchSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["$types"]' references private type 'RouteContractPathOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:263:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m263 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m56 | [0mtype RouteContractPathOf<TPathSchema> = InferSchemaOutput<TPathSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["$types"]' references private type 'RouteContractSearchOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:263:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m263 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m59 | [0mtype RouteContractSearchOf<TSearchSchema> = InferSchemaOutput<TSearchSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:263:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m263 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["createNav"]' references private type 'DefinePageRouteNav'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:267:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m267 | [0m  createNav(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m469 | [0mexport interface DefinePageRouteNav<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:267:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m267 | [0m  createNav(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:270:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m270 | [0m  bind(routePattern: string): BoundRouteContract<TPathSchema, TSearchSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["parsePath"]' references private type 'PathParamInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:271:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m271 | [0m  parsePath(input: PathParamInput): RouteContractPathOf<TPathSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m23 | [0mexport type PathParamInput = Record<string, string | undefined>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:271:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m271 | [0m  parsePath(input: PathParamInput): RouteContractPathOf<TPathSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["safeParsePath"]' references private type 'SchemaParseResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:272:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m272 | [0m  safeParsePath(input: PathParamInput): SchemaParseResult<RouteContractPathOf<TPathSchema>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m78 | [0mexport type SchemaParseResult<TOutput> = SchemaParseSuccess<TOutput> | SchemaParseFailure;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:272:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m272 | [0m  safeParsePath(input: PathParamInput): SchemaParseResult<RouteContractPathOf<TPathSchema>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["parseSearch"]' references private type 'SearchParamInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:273:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m273 | [0m  parseSearch(input: URLSearchParams | SearchParamInput): RouteContractSearchOf<TSearchSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m24 | [0mexport type SearchParamInput = Record<string, SearchParamValue>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:273:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m273 | [0m  parseSearch(input: URLSearchParams | SearchParamInput): RouteContractSearchOf<TSearchSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:274:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m274 | [0m  safeParseSearch(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'enumPathParamSchema' references private type 'PathParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:279:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m279 | [0mexport function enumPathParamSchema<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:279:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m279 | [0mexport function enumPathParamSchema<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:304:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m304 | [0mexport function defineEnumPathParam<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'pairRouteTargets' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:444:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m444 | [0mexport function pairRouteTargets<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:444:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m444 | [0mexport function pairRouteTargets<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'createRouteReference' references private type 'SearchParamInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:502:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m502 | [0mexport function createRouteReference<const TRoutePattern extends string>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m24 | [0mexport type SearchParamInput = Record<string, SearchParamValue>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:502:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m502 | [0mexport function createRouteReference<const TRoutePattern extends string>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'bindRoutePattern' references private type 'PathParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:524:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m524 | [0mexport function bindRoutePattern<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'bindRoutePattern' references private type 'SearchParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:524:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m524 | [0mexport function bindRoutePattern<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:524:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m524 | [0mexport function bindRoutePattern<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:554:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m554 | [0mexport function defineRouteContract(): DefineRouteContract<undefined, undefined>;
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'defineRouteContract' references private type 'PathParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:555:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m555 | [0mexport function defineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m99 | [0mexport type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'defineRouteContract' references private type 'SearchParamSchema'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:555:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m555 | [0mexport function defineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/contract.ts[0m[0m[33m:555:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m555 | [0mexport function defineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePath' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:58:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m58 | [0mexport type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePath' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:58:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m58 | [0mexport type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:58:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m58 | [0mexport type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRouteSearch' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:61:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m61 | [0mexport type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRouteSearch' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:61:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m61 | [0mexport type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:61:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m61 | [0mexport type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'CurrentRouteState' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:65:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m65 | [0mexport interface CurrentRouteState<TTarget extends TypedRouteTarget<object, object>> {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:65:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m65 | [0mexport interface CurrentRouteState<TTarget extends TypedRouteTarget<object, object>> {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'CurrentRouteState["path"]' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:66:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m66 | [0m  readonly path: TypedRoutePathOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:66:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m66 | [0m  readonly path: TypedRoutePathOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'CurrentRouteState["search"]' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:67:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m67 | [0m  readonly search: TypedRouteSearchOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m54 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:67:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m67 | [0m  readonly search: TypedRouteSearchOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentRoute' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:326:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m326 | [0mexport function useCurrentRoute<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:326:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m326 | [0mexport function useCurrentRoute<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentPath' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:414:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m414 | [0mexport function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentPath' references private type 'TypedRoutePathOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:414:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m414 | [0mexport function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m50 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:414:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m414 | [0mexport function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentSearch' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:420:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m420 | [0mexport function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentSearch' references private type 'TypedRouteSearchOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:420:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m420 | [0mexport function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m54 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:420:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m420 | [0mexport function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'getLinkProps' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:604:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m604 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'getLinkProps' references private type 'GetLinkPropsInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:604:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m604 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m117 | [0mexport type GetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'getLinkProps' references private type 'FreshLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:604:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m604 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m81 | [0mexport interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'getLinkProps' references private type 'ValidatedRouteHref'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:604:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m604 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m50 | [0mexport type ValidatedRouteHref = string & { readonly [validatedRouteHrefBrand]: true };
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:604:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m604 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:636:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m636 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m37 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'LinkProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:636:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m636 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m132 | [0mexport type LinkProps<TTarget extends TypedRouteTarget<object, object>> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'JSXInternal'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:636:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m636 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m78 | [0mexport namespace JSXInternal {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'JSXInternal.Element'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:636:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m636 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m96 | [0m  export interface Element extends VNode<any> {}
+   [0m[38;5;12m | [0m  [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx[0m[0m[33m:636:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m636 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:6:1[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m6 | [0mexport interface NetScriptRouteManifestOptions {
+ [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:7:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m7 | [0m  enabled?: boolean;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:8:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m8 | [0m  routesDir?: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+ [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:9:3[0m
+ [0m[38;5;12m | [0m
+[0m[38;5;12m9 | [0m  outputPath?: string;
+ [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:10:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m10 | [0m  logLevel?: 'silent' | 'changes' | 'verbose';
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:13:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m13 | [0mexport interface ResolvedNetScriptRouteManifestOptions {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:14:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m14 | [0m  appRoot: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:15:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0m  routesDir: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:16:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m16 | [0m  manifestOutputPath: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:17:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m17 | [0m  routesOutputPath: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:18:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m18 | [0m  logLevel: 'silent' | 'changes' | 'verbose';
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:21:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m21 | [0mexport interface DiscoveredNetScriptRoute {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:22:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m22 | [0m  routeFilePath: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:23:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m23 | [0m  relativeRouteFilePath: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:24:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m24 | [0m  routePattern: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:25:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m25 | [0m  routeKeyPath: string[];
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:26:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m26 | [0m  routeContractImportPath?: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:29:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m29 | [0mexport interface WriteNetScriptRouteManifestResult {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:30:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m30 | [0m  changed: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:31:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m31 | [0m  manifestChanged: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:32:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0m  routesChanged: boolean;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:33:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m33 | [0m  manifestOutputPath: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:34:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m34 | [0m  routesOutputPath: string;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:35:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m35 | [0m  routeCount: number;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:36:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0m  boundRouteCount: number;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:287:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m287 | [0mexport function resolveNetScriptRouteManifestOptions(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:302:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m302 | [0mexport function isRouteManifestRelevantPath(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:315:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m315 | [0mexport function isRouteManifestWatchPath(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:327:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m327 | [0mexport function discoverNetScriptRoutes(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:376:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m376 | [0mexport function renderNetScriptRouteManifest(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:394:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m394 | [0mexport function renderNetScriptRoutesModule(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/work/netscript/netscript/packages/fresh/route/manifest.ts[0m[0m[33m:430:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m430 | [0mexport function writeNetScriptRouteManifestSync(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[0m: Found [0m[1m180[0m documentation lint errors.

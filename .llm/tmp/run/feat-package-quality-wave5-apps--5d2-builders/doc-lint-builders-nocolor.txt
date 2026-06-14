@@ -1,0 +1,3270 @@
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:15:1
+   | 
+15 | export type UnknownRecord = Record<string, unknown>;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:16:1
+   | 
+16 | export type EmptyRecord = Record<string, never>;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:17:1
+   | 
+17 | export type HasPathParams<TPath extends object> = [keyof TPath] extends [never] ? false
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:20:1
+   | 
+20 | export type DefinePageLayerProps = object;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:21:1
+   | 
+21 | export type DefinePageLayerMap = Record<string, DefinePageLayerProps>;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:22:1
+   | 
+22 | export type SearchParamValue = string | string[] | undefined;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:23:1
+   | 
+23 | export type PathParamInput = Record<string, string | undefined>;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:24:1
+   | 
+24 | export type SearchParamInput = Record<string, SearchParamValue>;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:26:1
+   | 
+26 | export interface PaginationSearchSchemaOptions {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:27:3
+   | 
+27 |   defaultLimit?: number;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:28:3
+   | 
+28 |   defaultSort?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:29:3
+   | 
+29 |   defaultOrder?: 'asc' | 'desc';
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:32:1
+   | 
+32 | export interface PaginationSearchState {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:33:3
+   | 
+33 |   page: number;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:34:3
+   | 
+34 |   limit: number;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:35:3
+   | 
+35 |   offset: number;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:36:3
+   | 
+36 |   sortBy: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:37:3
+   | 
+37 |   sortOrder: 'asc' | 'desc';
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:40:1
+   | 
+40 | export interface DefinePageTelemetryConfig {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:41:3
+   | 
+41 |   enabled?: boolean;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:42:3
+   | 
+42 |   spanName?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:45:1
+   | 
+45 | export type DefinePageLayerDelivery = 'blocking' | 'defer' | 'stream';
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:47:15
+   | 
+47 | declare const validatedRouteHrefBrand: unique symbol;
+   |               ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:48:15
+   | 
+48 | declare const definePageTypeStateBrand: unique symbol;
+   |               ^
+
+
+error[private-type-ref]: public type 'ValidatedRouteHref' references private type 'validatedRouteHrefBrand'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:50:1
+   | 
+50 | export type ValidatedRouteHref = string & { readonly [validatedRouteHrefBrand]: true };
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+47 | declare const validatedRouteHrefBrand: unique symbol;
+   |               - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:50:1
+   | 
+50 | export type ValidatedRouteHref = string & { readonly [validatedRouteHrefBrand]: true };
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:51:1
+   | 
+51 | export type Simplify<T> = { [K in keyof T]: T[K] } & Record<PropertyKey, never>;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:52:1
+   | 
+52 | export type DefinePageMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD';
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:54:1
+   | 
+54 | export interface DefinePageRequestContext<TState = EmptyRecord> {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:55:3
+   | 
+55 |   url: URL;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:56:3
+   | 
+56 |   req: Request;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:57:3
+   | 
+57 |   params: Record<string, string | undefined>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:58:3
+   | 
+58 |   state: TState;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:59:3
+   | 
+59 |   isPartial?: boolean;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:60:3
+   | 
+60 |   data?: unknown;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:63:1
+   | 
+63 | export interface DefinePageRenderContext<TState = EmptyRecord>
+   | ^
+
+
+error[private-type-ref]: public type 'DefinePageRenderContext["render"]' references private type 'ComponentChildren'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:65:3
+   | 
+65 |   render(body: ComponentChildren, init?: ResponseInit): Response;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:65:3
+   | 
+65 |   render(body: ComponentChildren, init?: ResponseInit): Response;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:68:1
+   | 
+68 | export interface SchemaParseSuccess<TOutput> {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:69:3
+   | 
+69 |   success: true;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:70:3
+   | 
+70 |   data: TOutput;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:73:1
+   | 
+73 | export interface SchemaParseFailure {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:74:3
+   | 
+74 |   success: false;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:75:3
+   | 
+75 |   error?: unknown;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:78:1
+   | 
+78 | export type SchemaParseResult<TOutput> = SchemaParseSuccess<TOutput> | SchemaParseFailure;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:80:1
+   | 
+80 | export interface SchemaLike<TInput = unknown, TOutput = TInput> {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:81:3
+   | 
+81 |   safeParse(input: TInput): SchemaParseResult<TOutput>;
+   |   ^
+
+
+error[private-type-ref]: public type 'InferSchemaOutput' references private type 'InferSafeParseOutput'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:91:1
+   | 
+91 | export type InferSchemaOutput<TSchema> = TSchema extends { _output: infer TOutput } ? TOutput
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+84 | type InferSafeParseOutput<TSchema> = TSchema extends
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:91:1
+   | 
+91 | export type InferSchemaOutput<TSchema> = TSchema extends { _output: infer TOutput } ? TOutput
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:95:1
+   | 
+95 | export type ResolveSchemaOutput<TCurrent, TSchema> = InferSchemaOutput<TSchema> extends object
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:99:1
+   | 
+99 | export type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:100:1
+    | 
+100 | export type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:102:1
+    | 
+102 | export interface DefinePageTypeState<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageTypeState["definePageTypeStateBrand"]' references private type 'definePageTypeStateBrand'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:109:3
+    | 
+109 |   readonly [definePageTypeStateBrand]: true;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 48 | declare const definePageTypeStateBrand: unique symbol;
+    |               - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:109:3
+    | 
+109 |   readonly [definePageTypeStateBrand]: true;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:110:3
+    | 
+110 |   state: TState;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:111:3
+    | 
+111 |   resources: TResources;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:112:3
+    | 
+112 |   path: TPath;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:113:3
+    | 
+113 |   search: TSearch;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:114:3
+    | 
+114 |   layerData: TLayerData;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:117:1
+    | 
+117 | export type AnyDefinePageTypeState = DefinePageTypeState<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:124:1
+    | 
+124 | export type DefinePageRootTypeState<TState = EmptyRecord> = DefinePageTypeState<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:132:1
+    | 
+132 | export type NormalizeDefinePageTypeState<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:141:1
+    | 
+141 | export type DefinePageStateOf<TTypes extends AnyDefinePageTypeState> = TTypes['state'];
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:142:1
+    | 
+142 | export type DefinePageResourcesOf<TTypes extends AnyDefinePageTypeState> = TTypes['resources'];
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:143:1
+    | 
+143 | export type DefinePagePathOf<TTypes extends AnyDefinePageTypeState> = TTypes['path'];
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:144:1
+    | 
+144 | export type DefinePageSearchOf<TTypes extends AnyDefinePageTypeState> = TTypes['search'];
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:145:1
+    | 
+145 | export type DefinePageLayerDataOf<TTypes extends AnyDefinePageTypeState> = TTypes['layerData'];
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:147:1
+    | 
+147 | export interface DefinePageContract<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:150:3
+    | 
+150 |   readonly $types: TTypes;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:153:1
+    | 
+153 | export type DefinePageTypeCarrier = DefinePageContract | {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:157:1
+    | 
+157 | export type InferDefinePageTypes<TValue extends DefinePageTypeCarrier> = TValue extends {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:163:1
+    | 
+163 | export type InferDefinePageState<TValue extends DefinePageTypeCarrier> = DefinePageStateOf<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:166:1
+    | 
+166 | export type InferDefinePageResources<TValue extends DefinePageTypeCarrier> = DefinePageResourcesOf<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:169:1
+    | 
+169 | export type InferDefinePagePath<TValue extends DefinePageTypeCarrier> = DefinePagePathOf<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:172:1
+    | 
+172 | export type InferDefinePageSearch<TValue extends DefinePageTypeCarrier> = DefinePageSearchOf<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:175:1
+    | 
+175 | export type InferDefinePageLayerData<TValue extends DefinePageTypeCarrier> = DefinePageLayerDataOf<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:178:1
+    | 
+178 | export type InferDefinePageResource<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:182:1
+    | 
+182 | export type InferDefinePageLayerProps<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:186:1
+    | 
+186 | export type InferDefinePageHasRoute<TValue extends DefinePageTypeCarrier> = TValue extends {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:190:1
+    | 
+190 | export type InferDefinePageLayoutSlots<TValue extends DefinePageTypeCarrier> = DefinePageSlotsFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:193:1
+    | 
+193 | export type InferDefinePageLayoutContext<TValue extends DefinePageTypeCarrier> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:195:1
+    | 
+195 | export interface InferDefinePageLayoutProps<TValue extends DefinePageTypeCarrier> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:196:3
+    | 
+196 |   readonly slots: InferDefinePageLayoutSlots<TValue>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:197:3
+    | 
+197 |   readonly ctx: InferDefinePageLayoutContext<TValue>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:199:1
+    | 
+199 | export type InferDefinePageContext<TValue extends DefinePageTypeCarrier> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:202:1
+    | 
+202 | export type DefinePageWithResource<TTypes extends AnyDefinePageTypeState, K extends string, TOut> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:211:1
+    | 
+211 | export type DefinePageWithResources<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:224:1
+    | 
+224 | export type DefinePageWithPathParams<TTypes extends AnyDefinePageTypeState, TSchema> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:233:1
+    | 
+233 | export type DefinePageWithSearchParams<TTypes extends AnyDefinePageTypeState, TSchema> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:242:1
+    | 
+242 | export type DefinePageWithParams<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:254:1
+    | 
+254 | export type DefinePageWithRoute<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:265:1
+    | 
+265 | export type DefinePageWithLayer<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageWithForm' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:277:1
+    | 
+277 | export type DefinePageWithForm<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageWithForm' references private type 'input'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:277:1
+    | 
+277 | export type DefinePageWithForm<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 50 | export type input<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageWithForm' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:277:1
+    | 
+277 | export type DefinePageWithForm<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:277:1
+    | 
+277 | export type DefinePageWithForm<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageRouteFor' references private type 'RouteReference'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:283:1
+    | 
+283 | export type DefinePageRouteFor<TTypes extends AnyDefinePageTypeState> = RouteReference<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+206 | export interface RouteReference<
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:283:1
+    | 
+283 | export type DefinePageRouteFor<TTypes extends AnyDefinePageTypeState> = RouteReference<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageLayerContextBase' references private type 'DefinePageAugmentedContextBase'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:313:1
+    | 
+313 | export type DefinePageLayerContextBase<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+296 | type DefinePageAugmentedContextBase<
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:313:1
+    | 
+313 | export type DefinePageLayerContextBase<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:318:1
+    | 
+318 | export type DefinePageLayerContext<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageLayoutContextBase' references private type 'DefinePageAugmentedContextBase'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:334:1
+    | 
+334 | export type DefinePageLayoutContextBase<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+296 | type DefinePageAugmentedContextBase<
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:334:1
+    | 
+334 | export type DefinePageLayoutContextBase<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:339:1
+    | 
+339 | export type DefinePageLayoutContext<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:356:1
+    | 
+356 | export type DefinePageResourceFactoryFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:364:1
+    | 
+364 | export type DefinePageResourceFactory<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageLayerLoaderFor' references private type 'CachedEntry'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:382:1
+    | 
+382 | export type DefinePageLayerLoaderFor<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 24 | export interface CachedEntry<TData> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:382:1
+    | 
+382 | export type DefinePageLayerLoaderFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:395:1
+    | 
+395 | export type DefinePageLayerLoader<
+    | ^
+
+
+error[private-type-ref]: public type 'InferDefinePageLayerLoaderProps' references private type 'ResolveDefinePageLayerLoaderOutput'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:417:1
+    | 
+417 | export type InferDefinePageLayerLoaderProps<TLoader extends (...args: never[]) => unknown> =
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+413 | type ResolveDefinePageLayerLoaderOutput<TOutput> = TOutput extends CacheEntryLike<infer TProps>
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:417:1
+    | 
+417 | export type InferDefinePageLayerLoaderProps<TLoader extends (...args: never[]) => unknown> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:422:1
+    | 
+422 | export interface DefinePageLayerConfigFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:427:3
+    | 
+427 |   loader?: DefinePageLayerLoaderFor<TTypes, TProps, THasRoute>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:428:3
+    | 
+428 |   partial?: string | ((ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => string);
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:429:3
+    | 
+429 |   partialName?: string | ((ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => string);
+    |   ^
+
+
+error[private-type-ref]: public type 'DefinePageLayerConfigFor["fallback"]' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:430:3
+    | 
+430 |   fallback?: JSX.Element | ComponentType<Record<string, never>>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageLayerConfigFor["fallback"]' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:430:3
+    | 
+430 |   fallback?: JSX.Element | ComponentType<Record<string, never>>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageLayerConfigFor["fallback"]' references private type 'ComponentType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:430:3
+    | 
+430 |   fallback?: JSX.Element | ComponentType<Record<string, never>>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 80 | export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:430:3
+    | 
+430 |   fallback?: JSX.Element | ComponentType<Record<string, never>>;
+    |   ^
+
+
+error[private-type-ref]: public type 'DefinePageLayerConfigFor["policy"]' references private type 'DeferPolicyInput'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:431:3
+    | 
+431 |   policy?: DeferPolicyInput | DeferPolicyProfile;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  9 | export interface DeferPolicyInput {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageLayerConfigFor["policy"]' references private type 'DeferPolicyProfile'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:431:3
+    | 
+431 |   policy?: DeferPolicyInput | DeferPolicyProfile;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  1 | export type DeferPolicyProfile =
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:431:3
+    | 
+431 |   policy?: DeferPolicyInput | DeferPolicyProfile;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:432:3
+    | 
+432 |   params?: (ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => Record<string, string>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:433:3
+    | 
+433 |   layerDeps?: (
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:436:3
+    | 
+436 |   staleTime?: number;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:437:3
+    | 
+437 |   gcTime?: number;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:438:3
+    | 
+438 |   staleReloadMode?: 'blocking' | 'background';
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:439:3
+    | 
+439 |   shouldReload?: boolean | ((ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => boolean);
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:440:3
+    | 
+440 |   delivery?: DefinePageLayerDelivery;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:443:1
+    | 
+443 | export type DefinePageLayerConfig<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:469:1
+    | 
+469 | export interface DefinePageRouteNav<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageRouteNav["makeHref"]' references private type 'MakeHrefArgs'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:473:3
+    | 
+473 |   makeHref(...args: MakeHrefArgs<TPath, TSearch>): ValidatedRouteHref;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+465 | type MakeHrefArgs<TPath extends object, TSearch extends object> = HasPathParams<TPath> extends true
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:473:3
+    | 
+473 |   makeHref(...args: MakeHrefArgs<TPath, TSearch>): ValidatedRouteHref;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:476:1
+    | 
+476 | export type DefinePageRouteNavFor<TTypes extends AnyDefinePageTypeState> = DefinePageRouteNav<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:481:1
+    | 
+481 | export interface DefinePageBuildOptions {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:482:3
+    | 
+482 |   routePattern?: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:485:1
+    | 
+485 | export type DefinePageMethodHandlerFor<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageFormConfigFor' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:492:1
+    | 
+492 | export type DefinePageFormConfigFor<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageFormConfigFor' references private type 'FormConfig'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:492:1
+    | 
+492 | export type DefinePageFormConfigFor<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 42 | export interface FormConfig<
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:492:1
+    | 
+492 | export type DefinePageFormConfigFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:499:1
+    | 
+499 | export type DefinePageMethodHandler<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageSlot' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:515:1
+    | 
+515 | export type DefinePageSlot<TProps extends DefinePageLayerProps> = (() => JSX.Element | null) & {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageSlot' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:515:1
+    | 
+515 | export type DefinePageSlot<TProps extends DefinePageLayerProps> = (() => JSX.Element | null) & {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:515:1
+    | 
+515 | export type DefinePageSlot<TProps extends DefinePageLayerProps> = (() => JSX.Element | null) & {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:519:1
+    | 
+519 | export type DefinePageSlots<TLayerData extends DefinePageLayerMap> = {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:523:1
+    | 
+523 | export type DefinePageSlotsFor<TTypes extends AnyDefinePageTypeState> = DefinePageSlots<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageRuntimeContextBase' references private type 'DefinePageAugmentedContextBase'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:527:1
+    | 
+527 | export type DefinePageRuntimeContextBase<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+296 | type DefinePageAugmentedContextBase<
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:527:1
+    | 
+527 | export type DefinePageRuntimeContextBase<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:534:1
+    | 
+534 | export interface DefinePageMetaDescriptor {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:535:3
+    | 
+535 |   title?: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:536:3
+    | 
+536 |   description?: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:537:3
+    | 
+537 |   canonicalUrl?: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:538:3
+    | 
+538 |   robots?: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:539:3
+    | 
+539 |   meta?: Array<{ name?: string; property?: string; content: string }>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:540:3
+    | 
+540 |   links?: Array<{ rel: string; href: string; title?: string; type?: string }>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:541:3
+    | 
+541 |   jsonLd?: unknown | unknown[];
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:544:1
+    | 
+544 | export type DefinePageMetaResolverFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:551:1
+    | 
+551 | export type DefinePageMetaResolver<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:568:1
+    | 
+568 | export type DefinePageHeaderResolverFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:575:1
+    | 
+575 | export type DefinePageHeaderResolver<
+    | ^
+
+
+error[private-type-ref]: public type 'DefinePageLayoutFor' references private type 'ComponentChildren'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:592:1
+    | 
+592 | export type DefinePageLayoutFor<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:592:1
+    | 
+592 | export type DefinePageLayoutFor<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:600:1
+    | 
+600 | export type DefinePageLayout<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:617:1
+    | 
+617 | export type DefinePageHandlersFor<TTypes extends AnyDefinePageTypeState> = Partial<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:628:1
+    | 
+628 | export type DefinePageHandlers<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:643:1
+    | 
+643 | export interface DefinePageDefinitionFor<TTypes extends AnyDefinePageTypeState> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:644:3
+    | 
+644 |   readonly $types?: TTypes;
+    |   ^
+
+
+error[private-type-ref]: public type 'DefinePageDefinitionFor["page"]' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:645:3
+    | 
+645 |   page: (ctx: DefinePageRequestContext<DefinePageStateOf<TTypes>>) => Promise<JSX.Element>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageDefinitionFor["page"]' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:645:3
+    | 
+645 |   page: (ctx: DefinePageRequestContext<DefinePageStateOf<TTypes>>) => Promise<JSX.Element>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:645:3
+    | 
+645 |   page: (ctx: DefinePageRequestContext<DefinePageStateOf<TTypes>>) => Promise<JSX.Element>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:646:3
+    | 
+646 |   readonly default: (
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:649:3
+    | 
+649 |   handler?: DefinePageHandlersFor<TTypes>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:652:1
+    | 
+652 | export type DefinePageDefinition<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:668:1
+    | 
+668 | export interface DefinePageRoutedDefinitionFor<TTypes extends AnyDefinePageTypeState>
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:670:3
+    | 
+670 |   readonly nav: DefinePageRouteNavFor<TTypes>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:671:3
+    | 
+671 |   readonly route: DefinePageRouteFor<TTypes>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:672:3
+    | 
+672 |   readonly hooks: DefinePageHooks<DefinePageRoutedDefinitionFor<TTypes>>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:675:1
+    | 
+675 | export type DefinePageRoutedDefinition<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:691:1
+    | 
+691 | export type DefinePageBuildResultFor<TBuildOptions, TTypes extends AnyDefinePageTypeState> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:695:1
+    | 
+695 | export type DefinePageBuildResult<
+    | ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:332:1
+    | 
+332 | export interface RuntimeFormState<TValues extends FormValues> {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:332:1
+    | 
+332 | export interface RuntimeFormState<TValues extends FormValues> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:333:3
+    | 
+333 |   readonly id: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:334:3
+    | 
+334 |   readonly action: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:335:3
+    | 
+335 |   readonly method: 'POST' | 'PUT' | 'PATCH';
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:336:3
+    | 
+336 |   readonly values: TValues;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:337:3
+    | 
+337 |   readonly initialValues: Partial<TValues>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["fieldErrors"]' references private type 'FormFieldErrors'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:338:3
+    | 
+338 |   readonly fieldErrors: FormFieldErrors<TValues>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 43 | export type FormFieldErrors<TValues extends FormValues> =
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:338:3
+    | 
+338 |   readonly fieldErrors: FormFieldErrors<TValues>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:339:3
+    | 
+339 |   readonly formErrors: readonly string[];
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:340:3
+    | 
+340 |   readonly hasErrors: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:341:3
+    | 
+341 |   readonly submitted: boolean;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["intent"]' references private type 'FormIntent'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:342:3
+    | 
+342 |   readonly intent: FormIntent | null;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+159 | export interface FormIntent {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:342:3
+    | 
+342 |   readonly intent: FormIntent | null;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:343:3
+    | 
+343 |   readonly submissionId: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:344:3
+    | 
+344 |   readonly csrfToken: string;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["fields"]' references private type 'FieldDescriptorMap'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
+    | 
+345 |   readonly fields: FieldDescriptorMap<TValues>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+325 | export type FieldDescriptorMap<T> = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
+    | 
+345 |   readonly fields: FieldDescriptorMap<TValues>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["constraints"]' references private type 'FieldConstraints'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
+    | 
+346 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 49 | export interface FieldConstraints {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
+    | 
+346 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["formProps"]' references private type 'FormElementProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
+    | 
+347 |   readonly formProps: FormElementProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 62 | export interface FormElementProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
+    | 
+347 |   readonly formProps: FormElementProps;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["csrfInputProps"]' references private type 'FormCsrfInputProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
+    | 
+348 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 69 | export interface FormCsrfInputProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
+    | 
+348 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+
+
+error[private-type-ref]: public type 'PageFormHandlerContext' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:556:1
+    | 
+556 | export interface PageFormHandlerContext<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormHandlerContext["form"]' references private type 'FormReplyHelpers'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:566:3
+    | 
+566 |   readonly form: {
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+414 | export interface FormReplyHelpers<TValues extends FormValues, TOutput = unknown> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormHandlerContext["form"]' references private type 'FormIntent'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:566:3
+    | 
+566 |   readonly form: {
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+159 | export interface FormIntent {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:566:3
+    | 
+566 |   readonly form: {
+    |   ^
+
+
+error[private-type-ref]: public type 'PageFormConfig' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:591:1
+    | 
+591 | export interface PageFormConfig<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["initial"]' references private type 'input'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:604:3
+    | 
+604 |   readonly initial?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 50 | export type input<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["initial"]' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:604:3
+    | 
+604 |   readonly initial?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["mutate"]' references private type 'output'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:608:3
+    | 
+608 |   readonly mutate: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 55 | export type output<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["onIntent"]' references private type 'FormIntent'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:622:3
+    | 
+622 |   readonly onIntent?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+159 | export interface FormIntent {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["onIntent"]' references private type 'FormIntentResult'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:622:3
+    | 
+622 |   readonly onIntent?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | export interface FormIntentResult<TValues extends FormValues> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageBuilder["withForm"]' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:953:3
+    | 
+953 |   withForm<K extends string, TSchema extends z.ZodTypeAny, TOutput = unknown>(
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageBuilder["withForm"]' references private type 'input'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:953:3
+    | 
+953 |   withForm<K extends string, TSchema extends z.ZodTypeAny, TOutput = unknown>(
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 50 | export type input<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageBuilder["withForm"]' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:953:3
+    | 
+953 |   withForm<K extends string, TSchema extends z.ZodTypeAny, TOutput = unknown>(
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:75:1
+   | 
+75 | export interface DefinePageBuilder<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:85:3
+   | 
+85 |   withResource<K extends string, TOut>(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:90:3
+   | 
+90 |   withResources<TFactories extends ResourceFactoryMap<TTypes, THasConfiguredRoute>>(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:94:3
+   | 
+94 |   withParams<TPathSchema, TSearchSchema>(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:104:3
+    | 
+104 |   withPathParams<TSchema>(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:108:3
+    | 
+108 |   withSearchParams<TSchema>(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:112:3
+    | 
+112 |   withRoute<TRoute extends TypedRouteTarget<object, object>>(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:116:3
+    | 
+116 |   withPolicy(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:119:3
+    | 
+119 |   withTelemetry(
+    |   ^
+
+
+error[private-type-ref]: public type 'DefinePageBuilder["withLayer"]' references private type 'ComponentType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:123:3
+    | 
+123 |   withLayer<K extends string, TProps extends DefinePageLayerProps = EmptyRecord>(
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 80 | export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:123:3
+    | 
+123 |   withLayer<K extends string, TProps extends DefinePageLayerProps = EmptyRecord>(
+    |   ^
+
+
+error[private-type-ref]: public type 'DefinePageBuilder["withForm"]' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:158:3
+    | 
+158 |   withForm<
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinePageBuilder["withForm"]' references private type 'FormSchemaInput'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:158:3
+    | 
+158 |   withForm<
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+208 | type FormSchemaInput<TSchema extends z.ZodTypeAny> = z.input<TSchema> & FormValues;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:168:3
+    | 
+168 |   withHandler(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:172:3
+    | 
+172 |   withLayout(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:175:3
+    | 
+175 |   withMeta(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:179:3
+    | 
+179 |   withHeader(name: string, value: string): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:180:3
+    | 
+180 |   withHeader(headers: HeadersInit): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:181:3
+    | 
+181 |   withHeader(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:185:3
+    | 
+185 |   withStatus(status: number): DefinePageBuilder<TTypes, THasConfiguredRoute>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:196:3
+    | 
+196 |   createNav(routePattern?: string): DefinePageRouteNavFor<TTypes>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:197:3
+    | 
+197 |   build(): THasConfiguredRoute extends true ? DefinePageRoutedDefinitionFor<TTypes>
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:199:3
+    | 
+199 |   build(routePattern: string): DefinePageRoutedDefinitionFor<TTypes>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:200:3
+    | 
+200 |   build<TBuildOptions extends DefinePageBuildOptions>(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:205:1
+    | 
+205 | export interface DefinePageRootBuilder<TState = EmptyRecord>
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:732:1
+    | 
+732 | export function definePage(): DefinePageRootBuilder;
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/builder.tsx:733:1
+    | 
+733 | export function definePage<TState>(): DefinePageRootBuilder<TState>;
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:37:1
+   | 
+37 | export interface TypedRouteTarget<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:41:3
+   | 
+41 |   readonly routePattern: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:42:3
+   | 
+42 |   readonly pathSchema?: PathParamSchema<TPath>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:43:3
+   | 
+43 |   readonly searchSchema?: SearchParamSchema<TSearch>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:44:3
+   | 
+44 |   readonly $types?: {
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:50:1
+   | 
+50 | export type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:54:1
+   | 
+54 | export type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:58:1
+   | 
+58 | export type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:61:1
+   | 
+61 | export type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:65:1
+   | 
+65 | export interface CurrentRouteState<TTarget extends TypedRouteTarget<object, object>> {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:66:3
+   | 
+66 |   readonly path: TypedRoutePathOf<TTarget>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:67:3
+   | 
+67 |   readonly search: TypedRouteSearchOf<TTarget>;
+   |   ^
+
+
+error[private-type-ref]: public type 'FreshLinkAttributes' references private type 'JSXInternal'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:81:1
+   | 
+81 | export interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+78 | export namespace JSXInternal {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'FreshLinkAttributes' references private type 'JSXInternal.HTMLAttributes'
+    --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:81:1
+     | 
+  81 | export interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+     | ^
+     = hint: make the referenced type public or remove the reference
+     | 
+1580 |   export interface HTMLAttributes<RefType extends EventTarget = EventTarget>
+     |   - this is the referenced type
+     | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:81:1
+   | 
+81 | export interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:82:3
+   | 
+82 |   'f-client-nav'?: boolean;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:85:1
+   | 
+85 | export interface FreshPartialLinkAttributes extends FreshLinkAttributes {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:86:3
+   | 
+86 |   'f-partial'?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:89:1
+   | 
+89 | export interface DefinePageHooks<TValue extends DefinePageTypeCarrier> {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:90:3
+   | 
+90 |   useContext(): InferDefinePageContext<TValue>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:91:3
+   | 
+91 |   useState(): DefinePageStateOf<InferDefinePageTypes<TValue>>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:92:3
+   | 
+92 |   useResources(): InferDefinePageResources<TValue>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:93:3
+   | 
+93 |   useResource<TKey extends keyof InferDefinePageResources<TValue> & string>(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:96:3
+   | 
+96 |   useLayers(): Partial<InferDefinePageLayerData<TValue>>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:97:3
+   | 
+97 |   useLayer<TLayer extends keyof InferDefinePageLayerData<TValue> & string>(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:100:3
+    | 
+100 |   useRequiredLayer<TLayer extends keyof InferDefinePageLayerData<TValue> & string>(
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:103:3
+    | 
+103 |   useSlots(): DefinePageSlotsFor<InferDefinePageTypes<TValue>>;
+    |   ^
+
+
+error[private-type-ref]: public type 'DefinePageHooks["useRoute"]' references private type 'CurrentDefinePageRoute'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:104:3
+    | 
+104 |   useRoute(): CurrentDefinePageRoute<TValue>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 70 | interface CurrentDefinePageRoute<TValue extends DefinePageTypeCarrier>
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:104:3
+    | 
+104 |   useRoute(): CurrentDefinePageRoute<TValue>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:105:3
+    | 
+105 |   usePath(): InferDefinePagePath<TValue>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:106:3
+    | 
+106 |   useSearch(): InferDefinePageSearch<TValue>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:109:1
+    | 
+109 | export type TypedRoutePathInput<TPath extends object> = HasPathParams<TPath> extends true
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:113:1
+    | 
+113 | export type RouteSearchUpdate<TSearch extends object> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:117:1
+    | 
+117 | export type GetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:127:1
+    | 
+127 | export type BoundGetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> = Omit<
+    | ^
+
+
+error[private-type-ref]: public type 'LinkProps' references private type 'ComponentChildren'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:132:1
+    | 
+132 | export type LinkProps<TTarget extends TypedRouteTarget<object, object>> =
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:132:1
+    | 
+132 | export type LinkProps<TTarget extends TypedRouteTarget<object, object>> =
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:143:1
+    | 
+143 | export type BoundLinkProps<TTarget extends TypedRouteTarget<object, object>> = Omit<
+    | ^
+
+
+error[private-type-ref]: public type 'wrapWithNavigationContext' references private type 'ComponentChildren'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:279:1
+    | 
+279 | export function wrapWithNavigationContext<TSearch extends object>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 55 | export type ComponentChildren = ComponentChild[] | ComponentChild;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'wrapWithNavigationContext' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:279:1
+    | 
+279 | export function wrapWithNavigationContext<TSearch extends object>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'wrapWithNavigationContext' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:279:1
+    | 
+279 | export function wrapWithNavigationContext<TSearch extends object>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:279:1
+    | 
+279 | export function wrapWithNavigationContext<TSearch extends object>(
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:326:1
+    | 
+326 | export function useCurrentRoute<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:414:1
+    | 
+414 | export function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:420:1
+    | 
+420 | export function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+
+
+error[private-type-ref]: public type 'usePageRoute' references private type 'CurrentDefinePageRoute'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:426:1
+    | 
+426 | export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDefinePageRoute<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 70 | interface CurrentDefinePageRoute<TValue extends DefinePageTypeCarrier>
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:426:1
+    | 
+426 | export function usePageRoute<TValue extends DefinePageTypeCarrier>(): CurrentDefinePageRoute<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:475:1
+    | 
+475 | export function usePagePath<TValue extends DefinePageTypeCarrier>(): InferDefinePagePath<TValue> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:479:1
+    | 
+479 | export function usePageSearch<TValue extends DefinePageTypeCarrier>(): InferDefinePageSearch<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:485:1
+    | 
+485 | export function createDefinePageHooks<TValue extends DefinePageTypeCarrier>(): DefinePageHooks<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:604:1
+    | 
+604 | export function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:619:1
+    | 
+619 | export function getBoundLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+
+
+error[private-type-ref]: public type 'Link' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:636:1
+    | 
+636 | export function Link<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'Link' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:636:1
+    | 
+636 | export function Link<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:636:1
+    | 
+636 | export function Link<TTarget extends TypedRouteTarget<object, object>>(
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/navigation.tsx:653:1
+    | 
+653 | export function createRouteNav<TPath extends object, TSearch extends object>(
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/runtime.tsx:317:1
+    | 
+317 | export async function prepareRequestState<
+    | ^
+
+
+error[private-type-ref]: public type 'executePagePipeline' references private type 'JSXInternal'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/runtime.tsx:363:1
+    | 
+363 | export async function executePagePipeline<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 78 | export namespace JSXInternal {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'executePagePipeline' references private type 'JSXInternal.Element'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/runtime.tsx:363:1
+    | 
+363 | export async function executePagePipeline<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 96 |   export interface Element extends VNode<any> {}
+    |   - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/runtime.tsx:363:1
+    | 
+363 | export async function executePagePipeline<
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:27:1
+   | 
+27 | export function searchParamsToInput(searchParams: URLSearchParams): Record<string, SearchParamValue> {
+   | ^
+
+
+error[private-type-ref]: public type 'PaginationSearchSchema' references private type 'PaginationSearchShape'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:51:1
+   | 
+51 | export class PaginationSearchSchema<TShape extends PaginationSearchShape> implements
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+16 | type PaginationSearchShape = z.ZodRawShape & PaginationSearchBaseShape;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PaginationSearchSchema' references private type 'PaginationSearchOutput'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:51:1
+   | 
+51 | export class PaginationSearchSchema<TShape extends PaginationSearchShape> implements
+   | ^
+   = hint: make the referenced type public or remove the reference
+   | 
+23 | type PaginationSearchOutput<TShape extends PaginationSearchShape> =
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:51:1
+   | 
+51 | export class PaginationSearchSchema<TShape extends PaginationSearchShape> implements
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:56:3
+   | 
+56 |   declare readonly _input: Record<string, SearchParamValue>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:57:3
+   | 
+57 |   declare readonly _output: PaginationSearchOutput<TShape>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:59:3
+   | 
+59 |   constructor(private readonly schema: z.ZodObject<TShape>) {}
+   |   ^
+
+
+error[private-type-ref]: public type 'PaginationSearchSchema.prototype.extend' references private type 'ZodRawShape'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:61:3
+   | 
+61 |   extend<TAugmentation extends z.ZodRawShape>(
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+47 | export type ZodRawShape = core.$ZodShape;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:61:3
+   | 
+61 |   extend<TAugmentation extends z.ZodRawShape>(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:69:3
+   | 
+69 |   safeExtend<TAugmentation extends z.ZodRawShape>(
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:75:3
+   | 
+75 |   safeParse(input: Record<string, SearchParamValue>):
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:92:3
+   | 
+92 |   parse(input: Record<string, SearchParamValue>): PaginationSearchOutput<TShape> {
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:98:3
+   | 
+98 |   async safeParseAsync(input: Record<string, SearchParamValue>): Promise<
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:116:3
+    | 
+116 |   async parseAsync(
+    |   ^
+
+
+error[private-type-ref]: public type 'fallback' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:125:1
+    | 
+125 | export function fallback<TSchema extends z.ZodType>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'fallback' references private type 'output'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:125:1
+    | 
+125 | export function fallback<TSchema extends z.ZodType>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 55 | export type output<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'fallback' references private type 'ZodCatch'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:125:1
+    | 
+125 | export function fallback<TSchema extends z.ZodType>(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+645 | export interface ZodCatch<T extends core.SomeType = core.$ZodType> extends _ZodType<core.$ZodCatchInternals<T>>, core.$ZodCatch<T> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:125:1
+    | 
+125 | export function fallback<TSchema extends z.ZodType>(
+    | ^
+
+
+error[private-type-ref]: public type 'paginationSearchSchema' references private type 'PaginationSearchBaseShape'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:132:1
+    | 
+132 | export function paginationSearchSchema(
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  9 | type PaginationSearchBaseShape = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/search-params.ts:132:1
+    | 
+132 | export function paginationSearchSchema(
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:23:1
+   | 
+23 | export type ResourceFactoryMap<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:31:1
+   | 
+31 | export type InferResourceOutputs<TFactories extends Record<string, (...args: never[]) => unknown>> =
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:36:1
+   | 
+36 | export interface RuntimeResourceDescriptor<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:40:3
+   | 
+40 |   key: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:41:3
+   | 
+41 |   factory: DefinePageResourceFactoryFor<TTypes, unknown, THasRoute>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:44:1
+   | 
+44 | export interface RuntimeLayerDescriptor<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:48:3
+   | 
+48 |   id: string;
+   |   ^
+
+
+error[private-type-ref]: public type 'RuntimeLayerDescriptor["component"]' references private type 'ComponentType'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:49:3
+   | 
+49 |   component: ComponentType<DefinePageLayerProps>;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+80 | export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:49:3
+   | 
+49 |   component: ComponentType<DefinePageLayerProps>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:50:3
+   | 
+50 |   config: DefinePageLayerConfigFor<TTypes, DefinePageLayerProps, THasRoute>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:53:1
+   | 
+53 | export interface RuntimePageConfig<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:57:3
+   | 
+57 |   resources: RuntimeResourceDescriptor<TTypes, THasRoute>[];
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:58:3
+   | 
+58 |   layers: RuntimeLayerDescriptor<TTypes, THasRoute>[];
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:59:3
+   | 
+59 |   handlers: Partial<Record<DefinePageMethod, DefinePageMethodHandlerFor<TTypes, THasRoute>>>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:60:3
+   | 
+60 |   form?: RuntimeFormDescriptor<TTypes, THasRoute>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:61:3
+   | 
+61 |   routePattern?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:62:3
+   | 
+62 |   defaultRoutePattern?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:63:3
+   | 
+63 |   route?: DefinePageRouteFor<TTypes>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:64:3
+   | 
+64 |   pathSchema?: PathParamSchema<DefinePagePathOf<TTypes>>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:65:3
+   | 
+65 |   searchSchema?: SearchParamSchema<DefinePageSearchOf<TTypes>>;
+   |   ^
+
+
+error[private-type-ref]: public type 'RuntimePageConfig["policy"]' references private type 'DeferPolicyInput'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:66:3
+   | 
+66 |   policy?: DeferPolicyInput | DeferPolicyProfile;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 9 | export interface DeferPolicyInput {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'RuntimePageConfig["policy"]' references private type 'DeferPolicyProfile'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:66:3
+   | 
+66 |   policy?: DeferPolicyInput | DeferPolicyProfile;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 1 | export type DeferPolicyProfile =
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:66:3
+   | 
+66 |   policy?: DeferPolicyInput | DeferPolicyProfile;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:67:3
+   | 
+67 |   telemetry?: DefinePageTelemetryConfig;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:68:3
+   | 
+68 |   layout?: DefinePageLayoutFor<TTypes, THasRoute>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:69:3
+   | 
+69 |   meta?: DefinePageMetaResolverFor<TTypes, THasRoute>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:70:3
+   | 
+70 |   headers: Array<HeadersInit | DefinePageHeaderResolverFor<TTypes, THasRoute>>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:71:3
+   | 
+71 |   status?: number;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:81:1
+   | 
+81 | export interface RuntimeFormDescriptor<
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:85:3
+   | 
+85 |   id: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:86:3
+   | 
+86 |   config: DefinePageFormConfigFor<TTypes, THasRoute>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:89:1
+   | 
+89 | export interface RuntimeLayerResolution {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:90:3
+   | 
+90 |   id: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:91:3
+   | 
+91 |   data?: UnknownRecord;
+   |   ^
+
+
+error[private-type-ref]: public type 'RuntimeLayerResolution["element"]' references private type 'JSXInternal'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:92:3
+   | 
+92 |   element: JSX.Element | null;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+78 | export namespace JSXInternal {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'RuntimeLayerResolution["element"]' references private type 'JSXInternal.Element'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:92:3
+   | 
+92 |   element: JSX.Element | null;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+96 |   export interface Element extends VNode<any> {}
+   |   - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:92:3
+   | 
+92 |   element: JSX.Element | null;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:93:3
+   | 
+93 |   stream?: RuntimeStreamLayerResolution;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:96:1
+   | 
+96 | export interface RuntimeStreamLayerResolution {
+   | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:97:3
+   | 
+97 |   slotId: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:98:3
+   | 
+98 |   promise: Promise<UnknownRecord | undefined>;
+   |   ^
+
+
+error[private-type-ref]: public type 'RuntimeStreamLayerResolution["component"]' references private type 'ComponentType'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:99:3
+   | 
+99 |   component: ComponentType<DefinePageLayerProps>;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+80 | export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/internal.ts:99:3
+   | 
+99 |   component: ComponentType<DefinePageLayerProps>;
+   |   ^
+
+
+error[private-type-ref]: public type 'PARTIAL_ROUTE_CONFIG' references private type 'RouteConfig'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:15:14
+   | 
+15 | export const PARTIAL_ROUTE_CONFIG: RouteConfig = {
+   |              ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 5 | export interface RouteConfig {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinedPartialRoute["config"]' references private type 'RouteConfig'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:22:3
+   | 
+22 |   config: RouteConfig;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 5 | export interface RouteConfig {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:22:3
+   | 
+22 |   config: RouteConfig;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:23:3
+   | 
+23 |   handler?: THandler;
+   |   ^
+
+
+error[private-type-ref]: public type 'DefinedPartialRoute["page"]' references private type 'JSXInternal'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:24:3
+   | 
+24 |   page: (ctx: TContext) => Promise<JSX.Element>;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+78 | export namespace JSXInternal {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'DefinedPartialRoute["page"]' references private type 'JSXInternal.Element'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:24:3
+   | 
+24 |   page: (ctx: TContext) => Promise<JSX.Element>;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+96 |   export interface Element extends VNode<any> {}
+   |   - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:24:3
+   | 
+24 |   page: (ctx: TContext) => Promise<JSX.Element>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:25:3
+   | 
+25 |   readonly default: (ctx: TContext) => Promise<JSX.Element>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:34:3
+   | 
+34 |   name: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:35:3
+   | 
+35 |   loader: (ctx: TContext) => Promise<TProps>;
+   |   ^
+
+
+error[private-type-ref]: public type 'DefinePartialOptions["component"]' references private type 'ComponentType'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:36:3
+   | 
+36 |   component: ComponentType<TProps>;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+80 | export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:36:3
+   | 
+36 |   component: ComponentType<TProps>;
+   |   ^
+
+
+error[private-type-ref]: public type 'DefinePartialOptions["errorComponent"]' references private type 'ErrorPrimitives'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:37:3
+   | 
+37 |   errorComponent?: ComponentType<ErrorPrimitives>;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 6 | export interface ErrorPrimitives {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:37:3
+   | 
+37 |   errorComponent?: ComponentType<ErrorPrimitives>;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:38:3
+   | 
+38 |   errorTitle?: string;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:39:3
+   | 
+39 |   handler?: THandler;
+   |   ^
+
+
+error[private-type-ref]: public type 'DefinePartialOptions["config"]' references private type 'RouteConfig'
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:40:3
+   | 
+40 |   config?: RouteConfig;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 5 | export interface RouteConfig {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:40:3
+   | 
+40 |   config?: RouteConfig;
+   |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-partial.tsx:95:3
+   | 
+95 |   query: () => Promise<TProps>;
+   |   ^
+
+
+error: Found 387 documentation lint errors.

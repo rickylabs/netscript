@@ -1,0 +1,5 @@
+Command: deno doc --lint packages/fresh/builders/mod.ts
+Result: PASS
+
+Output:
+Checked 1 file
