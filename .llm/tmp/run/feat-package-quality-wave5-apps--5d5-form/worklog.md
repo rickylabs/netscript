@@ -350,3 +350,20 @@ Append-only. One entry per slice / decision.
 | Console scan | `grep -R "console\\." -n packages/fresh/form \| head -80` | PASS: no matches |
 | Upstream re-export scan | `grep -R "export .*from ['\\\"]\\(npm:\\|jsr:\\|zod\\|@std/\\|fresh\\|preact\\)" -n packages/fresh/form/mod.ts packages/fresh/form/*.ts packages/fresh/form/*.tsx \| head -80` | PASS: no matches |
 | Folder vocabulary | `find packages/fresh/form -maxdepth 2 -type d \| sort` | PASS: `form`, `_internal`, `field-descriptors`, `schema-adapter` |
+
+## 2026-06-14 - IMPL-EVAL verdict
+
+- Ran the separate evaluator pass for PR #38 from the native WSL worktree.
+- Verified the branch started clean and was current with `origin/feat/package-quality-wave5-apps-5d5-form` after fetch (`a590187ac7626bbc4594f0e987b3e2293d6c749a`).
+- Independently ran the required evaluator gates:
+  - `deno doc --lint packages/fresh/form/mod.ts`
+  - `deno check --unstable-kv packages/fresh/form/mod.ts`
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx`
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/form --ext ts,tsx`
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh/form --ext ts,tsx`
+  - `deno test --allow-env --config packages/fresh/deno.json --unstable-kv packages/fresh/form`
+  - `(cd packages/fresh && deno task dry-run)`
+- All required gates passed. Full form tests reported 53 passed, 0 failed; package dry-run reported `Success Dry run complete`.
+- Verified no `deno.lock` churn, no upstream re-export leaks from the form public surface, `arch:barrel-ok` justifications on both internal barrels, and focused Standard Schema/Zod adapter coverage.
+- Accepted `D-5d5-1` and `D-5d5-2` as open residual drift that does not block the 5d5 source slice; full CLI E2E remains skipped by protocol for supervisor merge-readiness.
+- Verdict recorded in `evaluate.md`: `PASS`. 5d5 is ready for supervisor merge into `feat/package-quality-wave5-apps-5d-fresh`.
