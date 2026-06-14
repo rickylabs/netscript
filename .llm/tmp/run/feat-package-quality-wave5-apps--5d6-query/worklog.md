@@ -232,3 +232,29 @@ Run final package/root regression gates and update `context-pack.md` for READY-F
 
 - `telemetry` is intentionally a reserved public seam in this slice; no runtime telemetry bootstrap behavior is added until the telemetry schema is finalized.
 - `HydrationBoundary` schedules client hydration in an effect; SSR rendering is intentionally a pass-through.
+
+## 2026-06-14 - Slice 9 - Restore withForm mutate error log and final package/root regression
+
+- Restored the structured `console.error('withForm submit failed', { error })` emission in the `withForm` mutate catch path.
+- This satisfies the existing regression test that ensures the original mutate error is logged before the form reply is normalized.
+- Re-ran the final package/root regression gates after the fix.
+
+### Slice 9 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Targeted builder regression | PASS | `deno test --allow-all --config packages/fresh/deno.json --unstable-kv packages/fresh/builders/define-page/runtime.test.tsx --filter "logs the original mutate error"` |
+| Package public doc-lint | PASS | `(cd packages/fresh && deno task doc-lint)` checked 13 files |
+| Package check wrapper | PASS | `run-deno-check.ts --root packages/fresh --ext ts,tsx` selected 142 files |
+| Package fmt wrapper | PASS | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx` selected 142 files, 0 findings |
+| Package lint wrapper | PASS | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` selected 142 files, 0 findings |
+| Package tests | PASS | `deno test --allow-all --config packages/fresh/deno.json --unstable-kv packages/fresh` reported 141 passed, 0 failed |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+| Root check | PASS | `deno task check` selected 1574 files, 0 findings |
+| Root fmt | PASS | `deno task fmt:check` selected 1159 files, 0 findings |
+| Root lint | PASS | `deno task lint` selected 1075 files, 0 findings |
+
+### Residual risk
+
+- This is an intentional structured error log, not an incidental debug `console.log`.
+- Full CLI E2E remains reserved for supervisor merge-readiness/full CLI E2E.
