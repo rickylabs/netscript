@@ -36,3 +36,33 @@ Append-only. One entry per slice / decision.
 | F-1 baseline | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr` | DRIFT: `types.ts` 753 LOC; `schema-adapter.ts` 576 LOC; `field-descriptors.ts` 518 LOC |
 | Docs format | `deno fmt --check packages/fresh/form/README.md packages/fresh/docs/README.md packages/fresh/docs/form/getting-started.md packages/fresh/docs/form/architecture.md packages/fresh/docs/form/fresh-ui-recipe.md` | PASS |
 | Link/path existence | `test -f` for new form docs and form README | PASS |
+
+## 2026-06-14 - Slice 2 types.ts split
+
+- Split the 753 LOC `packages/fresh/form/types.ts` into a small public type manifest plus focused
+  package-local `_internal/*-types.ts` files:
+  - `_internal/value-types.ts`
+  - `_internal/prop-types.ts`
+  - `_internal/intent-reply-types.ts`
+  - `_internal/descriptor-types.ts`
+  - `_internal/runtime-types.ts`
+  - `_internal/page-types.ts`
+  - `_internal/types.ts`
+- Preserved the public import path and export names by re-exporting all existing type names through
+  `packages/fresh/form/types.ts`.
+- Closed `D-5d5-6`: `types.ts` is now under the file-size cap and public doc-lint remains clean.
+- Remaining over-cap files are the planned slice 3 and 4 targets:
+  - `schema-adapter.ts` 576 LOC
+  - `field-descriptors.ts` 518 LOC
+
+### Slice 2 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Touched-file format | `deno fmt --check packages/fresh/form/types.ts packages/fresh/form/_internal/*.ts` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/types.ts packages/fresh/form/_internal/*.ts` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr` | PASS for slice target: `types.ts` 50 LOC; new `_internal/*` files all ≤219 LOC |
+| Broad form fmt wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/form --ext ts,tsx` | FAIL on pre-existing formatting findings in untouched files; not mutated in slice 2 |

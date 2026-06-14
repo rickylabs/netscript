@@ -14,7 +14,9 @@
 
 - PLAN-EVAL passed before implementation.
 - Branch was synced with supervisor commit `07a1f70` via sync commit `ff8cf6f`.
-- Slice 1 is complete locally: baseline refresh plus form documentation scaffold.
+- Slice 1 is pushed and PR-commented: baseline refresh plus form documentation scaffold.
+- Slice 2 is complete locally: `types.ts` split into a public manifest plus focused
+  `_internal/*-types.ts` files.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
@@ -23,6 +25,9 @@
 - Drift `D-5d5-6` records the changed baseline before implementation edits.
 - Slice 1 gates passed: form doc-lint, scoped form check, touched-doc Markdown format, and doc path
   existence check.
+- Slice 2 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  touched-file fmt, touched-file lint, and type-file size scan. Broad form fmt wrapper still reports
+  pre-existing findings in untouched files.
 
 ## Completed
 
@@ -38,16 +43,20 @@
   - `packages/fresh/docs/form/architecture.md`
   - `packages/fresh/docs/form/fresh-ui-recipe.md`
   - `packages/fresh/docs/README.md` links
+- Split `packages/fresh/form/types.ts` for slice 2:
+  - `packages/fresh/form/types.ts` is now a 50 LOC public manifest.
+  - New `_internal/*-types.ts` files carry the moved definitions and all stay under 219 LOC.
+  - Public type names and import paths are preserved.
 
 ## In Progress
 
-- Commit slice 1 docs and harness artifacts, then append the commit ledger.
+- Commit slice 2 type split and harness artifacts, then append the commit ledger.
 
 ## Next Steps
 
-1. Commit and push slice 1.
+1. Commit and push slice 2.
 2. Comment PR #38 with slice summary and next slice.
-3. Start slice 2 `types.ts` split, using updated 753 LOC baseline.
+3. Start slice 3 `field-descriptors.ts` decomposition.
 
 ## Key Decisions
 
@@ -74,6 +83,14 @@
 | `packages/fresh/docs/form/architecture.md` | new | Slice 1 form docs |
 | `packages/fresh/docs/form/fresh-ui-recipe.md` | new | Slice 1 seam recipe |
 | `packages/fresh/docs/README.md` | update | Form doc links |
+| `packages/fresh/form/types.ts` | update | Slice 2 public type manifest |
+| `packages/fresh/form/_internal/types.ts` | new | Slice 2 internal type aggregation |
+| `packages/fresh/form/_internal/value-types.ts` | new | Slice 2 value/error/constraint types |
+| `packages/fresh/form/_internal/prop-types.ts` | new | Slice 2 form/control prop types |
+| `packages/fresh/form/_internal/intent-reply-types.ts` | new | Slice 2 intent/reply result types |
+| `packages/fresh/form/_internal/descriptor-types.ts` | new | Slice 2 field descriptor types |
+| `packages/fresh/form/_internal/runtime-types.ts` | new | Slice 2 runtime/enhancement types |
+| `packages/fresh/form/_internal/page-types.ts` | new | Slice 2 page bridge types |
 
 ## Gates
 
@@ -94,10 +111,12 @@
 
 ## Drift and Debt
 
-- Drift: `D-5d5-1` root workspace exclusion (open, umbrella owner); `D-5d5-6` updated baseline after supervisor sync.
+- Drift: `D-5d5-1` root workspace exclusion (open, umbrella owner); `D-5d5-6` updated baseline after supervisor sync (closed by slice 2).
 - Debt: none new; internal barrels will carry `// arch:barrel-ok` justification.
 
 ## Commits
 
 - `9141d37dd624f6529dd0c86ffb0d347713e27eb9`: [5d5] PLAN phase artifacts: design, plan, context-pack, drift
 - `3ae538cdd07ef49b5b27fc97db859ad29791ce27`: (amend) added commits.md hash record
+- `0977ce5dc9aefe413fbaeb60c52275b4f49c9005`: [5d5] Slice 1 form docs baseline
+- `c987bce`: [5d5] Record slice 1 commit

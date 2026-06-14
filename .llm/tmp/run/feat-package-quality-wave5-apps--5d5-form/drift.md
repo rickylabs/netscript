@@ -68,8 +68,7 @@ Status: IN PROGRESS
   larger `types.ts`; the doc-lint budget is already retired by upstream work and should be treated
   as verification rather than planned cleanup.
 
-  - Status: OPEN
+  - Status: CLOSED by slice 2 type split (`types.ts` now 50 LOC; public doc-lint remains clean)
   - Owner: 5d5 implementation (slice 2 budget update, final evidence)
   - Proposed close gate: `types.ts` is brought under the file-size cap without public export
     renames, and final form doc-lint remains clean.
-
