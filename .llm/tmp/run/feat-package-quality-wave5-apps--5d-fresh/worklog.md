@@ -86,3 +86,12 @@
 - Merge gates from native WSL supervisor worktree passed: `deno doc --lint packages/fresh/form/mod.ts`; `deno check --unstable-kv packages/fresh/form/mod.ts`; scoped form check/fmt/lint wrappers; `deno test --allow-env --config packages/fresh/deno.json --unstable-kv packages/fresh/form` PASS 53/0; `packages/fresh` `deno task dry-run` PASS.
 - Accepted residual 5d5 drift remains explicit: D-5d5-1 root workspace check exclusion is 5d6/umbrella-owned, and D-5d5-2 optional fresh-ui/browser proof may be revisited during final integration.
 - 5d6 query is now the only remaining 5d dependency-chain subwave. Before launch, merge this updated supervisor branch into the 5d6 query worktree and require per-slice commit, push, and structured PR comments.
+
+## 2026-06-14 - 5d6 query merged into supervisor
+
+- Merged evaluated PR #39 branch `feat/package-quality-wave5-apps-5d6-query` at evaluator commit `e0b4b4d` into `feat/package-quality-wave5-apps-5d-fresh` with merge commit `9241537`.
+- Separate IMPL-EVAL verdict: PASS, recorded in `.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/evaluate.md`; supervisor confirmation posted to PR #39 as comment `4700559061`.
+- Merge gates from native WSL supervisor worktree passed: `packages/fresh` doc-lint; scoped package check/fmt/lint wrappers; `deno test --allow-all --config packages/fresh/deno.json --unstable-kv packages/fresh` PASS 141/0; `packages/fresh` `deno task dry-run` PASS; root `deno task check`, `deno task fmt:check`, and `deno task lint` PASS.
+- Accepted residual 5d6 drift remains explicit: `defineFreshApp.telemetry` is a reserved seam only, and full CLI E2E is deferred to final 5d supervisor merge-readiness.
+- All 5d dependency-chain subwaves are now merged into the 5d supervisor branch. Next step: publish this supervisor branch, run the full `scaffold.runtime` CLI E2E gate from native WSL ext4, then merge 5d into the umbrella branch if the full gate passes.
+
