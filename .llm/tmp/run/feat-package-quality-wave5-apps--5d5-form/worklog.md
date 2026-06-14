@@ -294,3 +294,26 @@ Append-only. One entry per slice / decision.
 | Touched-file format | `deno fmt --check packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/contract.ts packages/fresh/form/README.md packages/fresh/docs/form/architecture.md` | PASS |
 | Touched-file lint | `deno lint packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/contract.ts` | PASS |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no form file over cap |
+
+## 2026-06-14 - Slice 12 fresh-ui seam recipe refresh
+
+- Updated `packages/fresh/docs/form/fresh-ui-recipe.md` as a docs-only seam slice.
+- Clarified that `@netscript/fresh/form` and `@netscript/fresh-ui` compose through copied registry
+  components and descriptor values, not package imports.
+- Corrected the copied registry import example to use `components/ui/control-props.ts` and
+  `components/ui/form-field.tsx`, matching the current source registry paths.
+- Added Standard Schema / `SchemaIntrospector` guidance so Fresh UI consumers treat descriptor props
+  as the source of truth instead of inspecting upstream schema libraries.
+- No playground/browser slice was attempted because this worktree has no `apps/playground`
+  directory; this slice is limited to the plan's seam-doc recipe.
+
+### Slice 12 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Touched-doc format | `deno fmt --check packages/fresh/docs/form/fresh-ui-recipe.md` | PASS |
+| Link/path existence | `test -f packages/fresh-ui/registry/components/ui/control-props.ts && test -f packages/fresh-ui/registry/components/ui/form-field.tsx && test -f packages/fresh/docs/form/fresh-ui-recipe.md` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no form file over cap |

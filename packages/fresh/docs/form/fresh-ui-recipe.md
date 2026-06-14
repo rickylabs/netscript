@@ -3,6 +3,9 @@
 Fresh forms and Fresh UI components compose through field descriptors. The form package emits
 platform attributes; Fresh UI renders labels, help text, errors, and controls.
 
+The packages do not import each other. Applications copy Fresh UI registry files into their app,
+then pass `@netscript/fresh/form` descriptor values into those copied components.
+
 ## Field Mapping
 
 | Form descriptor             | Fresh UI usage                                 |
@@ -15,12 +18,24 @@ platform attributes; Fresh UI renders labels, help text, errors, and controls.
 | `field.errorProps.id`       | Error text id referenced by `aria-describedby` |
 | `field.controlProps()`      | Props narrowed by Fresh UI control helpers     |
 
+## Validation Metadata
+
+Schema adapters validate submitted values and may expose conservative metadata for rendering:
+
+- Standard Schema is the validation path for library-agnostic adapters.
+- `SchemaIntrospector<TSchema, TValues>` is the vendor-specific seam for constraints and defaults.
+- Zod uses Standard Schema for validation and keeps Zod-specific introspection for defaults and HTML
+  constraints.
+
+Fresh UI components should treat descriptor props as the source of truth. They should not inspect
+Zod, Valibot, ArkType, or any other upstream schema directly.
+
 ## Example
 
 ```tsx
 import { Form, type RuntimeFormState } from '@netscript/fresh/form';
-import { getInputProps } from '../components/ui/control-props.ts';
-import { FormField } from '../components/ui/form-field.tsx';
+import { getInputProps } from './components/ui/control-props.ts';
+import { FormField } from './components/ui/form-field.tsx';
 
 export function ProfileForm({ state }: { state: RuntimeFormState<{ email: string }> }) {
   const email = state.fields.email;
@@ -42,8 +57,8 @@ export function ProfileForm({ state }: { state: RuntimeFormState<{ email: string
 }
 ```
 
-The imports above assume the Fresh UI registry files have been copied into the application. The
-source registry files live at `packages/fresh-ui/registry/components/ui/`.
+The imports above assume the Fresh UI registry files have been copied into the application under
+`components/ui/`. The source registry files live at `packages/fresh-ui/registry/components/ui/`.
 
 `FormField` currently targets labels with its `name` prop. When the submitted field name and DOM id
 differ, pass `name={field.id}` until the optional `htmlFor` seam lands.

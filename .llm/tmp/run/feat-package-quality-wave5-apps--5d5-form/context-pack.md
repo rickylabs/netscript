@@ -35,9 +35,13 @@
 - Slice 10 is pushed and PR-commented: `createZodAdapter` now validates through the Standard Schema
   `~standard.validate()` path while preserving the existing ZodError rejection behavior,
   flattened field-error shape, defaults, constraints, signature, and import path.
-- Slice 11 is complete locally: `SchemaIntrospector<TSchema, TValues>` is an additive public
+- Slice 11 is pushed and PR-commented: `SchemaIntrospector<TSchema, TValues>` is an additive public
   contract exported through the form schema-adapter surface and root form manifest, with docs
   updated for Standard Schema validation plus vendor-specific metadata introspection.
+- Slice 12 is complete locally as a docs-only seam slice: `fresh-ui-recipe.md` now reflects copied
+  registry composition, current `control-props.ts` / `form-field.tsx` paths, and
+  Standard Schema / `SchemaIntrospector` metadata ownership. Playground/browser work was not
+  attempted because this worktree has no `apps/playground` directory.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
@@ -69,6 +73,8 @@
   focused adapter tests, touched-file fmt/lint, and file-size scan.
 - Slice 11 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   focused adapter tests, touched-file fmt/lint, and file-size scan.
+- Slice 12 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  touched-doc fmt, link/path existence, and file-size scan.
 
 ## Completed
 
@@ -130,16 +136,22 @@
   - Exported the type through `schema-adapter/mod.ts`, `schema-adapter.ts`, and `form/mod.ts`.
   - Updated form README and architecture docs with the Standard Schema plus introspector seam.
   - No runtime adapter behavior changed.
+- Completed Slice 12 fresh-ui seam recipe refresh:
+  - Updated `packages/fresh/docs/form/fresh-ui-recipe.md`.
+  - Corrected copied registry import paths for `control-props.ts` and `form-field.tsx`.
+  - Documented descriptor-props ownership for Fresh UI consumers.
+  - Recorded that no playground/browser work was attempted because no `apps/playground` directory
+    exists in this worktree.
 
 ## In Progress
 
-- Push Slice 11 ledger commit and comment PR #38.
+- Commit and push Slice 12, then append the commit ledger and comment PR #38.
 
 ## Next Steps
 
-1. Push Slice 11 ledger commit.
+1. Commit and push Slice 12.
 2. Comment PR #38 with slice summary and next slice.
-3. Start Slice 12 fresh-ui seam docs only if package gates stay clean.
+3. Run scoped 5d5 closeout gates and mark ready for IMPL-EVAL.
 
 ## Key Decisions
 
@@ -202,6 +214,7 @@
 | `packages/fresh/form/schema-adapter/contract.ts` | update | Slice 11 schema introspector contract |
 | `packages/fresh/form/README.md` | update | Slice 11 Standard Schema/introspector docs |
 | `packages/fresh/docs/form/architecture.md` | update | Slice 11 Standard Schema/introspector docs |
+| `packages/fresh/docs/form/fresh-ui-recipe.md` | update | Slice 12 fresh-ui seam recipe |
 
 ## Gates
 
@@ -245,6 +258,7 @@
 - `22b964d`: [5d5] Slice 10 rebuild zod adapter
 - `7fe2963`: [5d5] Record slice 10 commit
 - `3a11750`: [5d5] Slice 11 add schema introspector contract
+- `9921aef`: [5d5] Record slice 11 commit
 
 ## Slice 9 Update
 
@@ -270,3 +284,12 @@
   introspection for vendor metadata.
 - Slice 11 gates passed: public doc-lint, narrow typecheck, scoped form check, focused adapter
   tests, touched-file fmt/lint, and file-size scan.
+
+## Slice 12 Update
+
+- `fresh-ui-recipe.md` now documents copied registry composition, current control-props/form-field
+  source paths, and Standard Schema / `SchemaIntrospector` metadata ownership.
+- Playground/browser validation remains unattempted in this worktree because `apps/playground` is
+  absent.
+- Slice 12 gates passed: public doc-lint, narrow typecheck, scoped form check, touched-doc fmt,
+  link/path existence, and file-size scan.
