@@ -1,8 +1,8 @@
 import { resolve } from '@std/path';
 import {
   discoverNetScriptRoutes,
-  isRouteManifestWatchPath,
   isRouteManifestRelevantPath,
+  isRouteManifestWatchPath,
   renderNetScriptRouteManifest,
   renderNetScriptRoutesModule,
   resolveNetScriptRouteManifestOptions,
@@ -97,26 +97,41 @@ Deno.test('discoverNetScriptRoutes preserves key semantics for grouped, nested, 
   const options = resolveNetScriptRouteManifestOptions(appRoot, {});
   const routes = discoverNetScriptRoutes(options);
 
-  const editRoute = routes.find((route) => route.relativeRouteFilePath.endsWith('[company]/users/[id]/edit.tsx'));
-  const catchAllRoute = routes.find((route) => route.relativeRouteFilePath.endsWith('dashboard/[...admin].tsx'));
-  const optionalCatchAllRoute = routes.find((route) => route.relativeRouteFilePath.endsWith('docs/[[...slug]].tsx'));
+  const editRoute = routes.find((route) =>
+    route.relativeRouteFilePath.endsWith('[company]/users/[id]/edit.tsx')
+  );
+  const catchAllRoute = routes.find((route) =>
+    route.relativeRouteFilePath.endsWith('dashboard/[...admin].tsx')
+  );
+  const optionalCatchAllRoute = routes.find((route) =>
+    route.relativeRouteFilePath.endsWith('docs/[[...slug]].tsx')
+  );
 
   assert(editRoute !== undefined, 'Expected grouped edit route to be discovered');
-  assert(editRoute.routePattern === '/dashboard/[company]/users/[id]/edit', `Unexpected grouped route pattern: ${editRoute.routePattern}`);
+  assert(
+    editRoute.routePattern === '/dashboard/[company]/users/[id]/edit',
+    `Unexpected grouped route pattern: ${editRoute.routePattern}`,
+  );
   assert(
     editRoute.routeKeyPath.join('.') === 'dashboard.$company.users.$id.edit.$route',
     `Unexpected grouped route key path: ${editRoute.routeKeyPath.join('.')}`,
   );
 
   assert(catchAllRoute !== undefined, 'Expected catch-all route to be discovered');
-  assert(catchAllRoute.routePattern === '/dashboard/[...admin]', `Unexpected catch-all route pattern: ${catchAllRoute.routePattern}`);
+  assert(
+    catchAllRoute.routePattern === '/dashboard/[...admin]',
+    `Unexpected catch-all route pattern: ${catchAllRoute.routePattern}`,
+  );
   assert(
     catchAllRoute.routeKeyPath.join('.') === 'dashboard.$adminAll.$route',
     `Unexpected catch-all route key path: ${catchAllRoute.routeKeyPath.join('.')}`,
   );
 
   assert(optionalCatchAllRoute !== undefined, 'Expected optional catch-all route to be discovered');
-  assert(optionalCatchAllRoute.routePattern === '/docs/[[...slug]]', `Unexpected optional catch-all route pattern: ${optionalCatchAllRoute.routePattern}`);
+  assert(
+    optionalCatchAllRoute.routePattern === '/docs/[[...slug]]',
+    `Unexpected optional catch-all route pattern: ${optionalCatchAllRoute.routePattern}`,
+  );
   assert(
     optionalCatchAllRoute.routeKeyPath.join('.') === 'docs.$slugOptional.$route',
     `Unexpected optional catch-all route key path: ${optionalCatchAllRoute.routeKeyPath.join('.')}`,
@@ -208,8 +223,7 @@ Deno.test('renderNetScriptRouteManifest renders the pure routePatterns tree', ()
       relativeRouteFilePath: '(dashboard)/dashboard/framework/wi-09/[section].tsx',
       routePattern: '/dashboard/framework/wi-09/[section]',
       routeKeyPath: ['dashboard', 'framework', 'wi09', '$section', '$route'],
-      routeContractImportPath:
-        '../routes/(dashboard)/dashboard/framework/wi-09/[section].route.ts',
+      routeContractImportPath: '../routes/(dashboard)/dashboard/framework/wi-09/[section].route.ts',
     },
   ]);
 
@@ -217,7 +231,10 @@ Deno.test('renderNetScriptRouteManifest renders the pure routePatterns tree', ()
     source.includes('$route: "/dashboard/framework/wi-09/[section]"'),
     'Expected route pattern leaf',
   );
-  assert(!source.includes('bindRoutePattern('), 'Did not expect typed route bindings in manifest.ts');
+  assert(
+    !source.includes('bindRoutePattern('),
+    'Did not expect typed route bindings in manifest.ts',
+  );
 });
 
 Deno.test('renderNetScriptRoutesModule renders routes bindings backed by manifest.ts', () => {
@@ -228,13 +245,14 @@ Deno.test('renderNetScriptRoutesModule renders routes bindings backed by manifes
       relativeRouteFilePath: '(dashboard)/dashboard/framework/wi-09/[section].tsx',
       routePattern: '/dashboard/framework/wi-09/[section]',
       routeKeyPath: ['dashboard', 'framework', 'wi09', '$section', '$route'],
-      routeContractImportPath:
-        '../routes/(dashboard)/dashboard/framework/wi-09/[section].route.ts',
+      routeContractImportPath: '../routes/(dashboard)/dashboard/framework/wi-09/[section].route.ts',
     },
   ]);
 
   assert(
-    source.includes("import { createRouteReference, bindRoutePattern } from '@netscript/fresh/route';"),
+    source.includes(
+      "import { createRouteReference, bindRoutePattern } from '@netscript/fresh/route';",
+    ),
     'Expected routes helper imports',
   );
   assert(
@@ -275,7 +293,9 @@ Deno.test('writeNetScriptRouteManifestSync writes sibling manifest.ts and routes
     'Expected routes.ts to consume manifest.ts',
   );
   assert(
-    routesSource.includes('bindRoutePattern(routeContract0, routePatterns.dashboard.framework.wi09.$section.$route,'),
+    routesSource.includes(
+      'bindRoutePattern(routeContract0, routePatterns.dashboard.framework.wi09.$section.$route,',
+    ),
     'Expected routes.ts to bind sidecar route contracts directly',
   );
   assert(

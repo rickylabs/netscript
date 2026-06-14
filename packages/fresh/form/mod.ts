@@ -29,8 +29,8 @@ export {
   getSubmissionHiddenInputProps,
   useFormEnhancement,
 } from './enhancement.tsx';
-export { Form } from './form.tsx';
-export { FormRegion } from './form-region.tsx';
+export { Form, type FormContent, type FormProps, type FormStateLike } from './form.tsx';
+export { FormRegion, type FormRegionProps } from './form-region.tsx';
 export { generateSubmissionId, SUBMISSION_ID_FIELD_NAME } from './idempotency.ts';
 export {
   applyIntentOperation,
@@ -48,16 +48,46 @@ export {
 } from './pagination.ts';
 export { type FormState, resolveFormState } from './state.ts';
 export type {
+  CollectionDescriptor,
+  CollectionItem,
+  CollectionKeyInputProps,
+  CollectionKeyMap,
+  ControlProps,
+  DescriptionProps,
+  EnhancedFormProps,
+  ErrorFormReplyInit,
+  ErrorProps,
+  FieldConstraints,
+  FieldDescriptor,
+  FieldDescriptorMap,
   FormCollectionStrategy,
   FormCollectionStrategyMode,
+  FormCsrfInputProps,
+  FormElementProps,
   FormEnhancementOptions,
   FormEnhancementSnapshot,
   FormEnhancementState,
+  FormErrorMessages,
   FormFieldErrors,
+  FormFieldPath,
   FormIntent,
+  FormIntentResult,
   FormPageInvalidateContext,
   FormPageMode,
   FormPageProps,
+  FormReplyHelpers,
+  FormReplyInit,
+  FormSubmissionErrorResult,
+  FormSubmissionInitialResult,
+  FormSubmissionInvalidResult,
+  FormSubmissionRedirectResult,
+  FormSubmissionResult,
+  FormSubmissionSuccessResult,
   FormValues,
+  IntentButtonProps,
+  InvalidFormReplyInit,
+  LabelProps,
+  RedirectFormReplyInit,
   RuntimeFormState,
+  SuccessFormReplyInit,
 } from './types.ts';

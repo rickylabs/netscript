@@ -1,0 +1,1156 @@
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:39:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0mexport type EnumPathParam<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:46:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m46 | [0mexport interface EnumPathParamDefinition<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:50:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0m  readonly paramName: TParamName;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:51:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m51 | [0m  readonly values: TValues;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:52:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m52 | [0m  readonly schema: PathParamSchema<EnumPathParam<TParamName, TValues>>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:53:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m53 | [0m  parse(value: string | undefined): TValues[number] | null;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePatternPath' references private type 'InferRoutePatternPathSegments'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:77:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m77 | [0mexport type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatternPathSegments<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m72 | [0mtype InferRoutePatternPathSegments<TPattern extends string> = TPattern extends '' ? {}
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePatternPath' references private type 'StripLeadingSlash'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:77:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m77 | [0mexport type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatternPathSegments<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m63 | [0mtype StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:77:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m77 | [0mexport type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatternPathSegments<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:81:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRoutePathInput'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:81:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m56 | [0mexport type TypedRoutePathInput<TPath extends object> = HasPathParams<TPath> extends true
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:81:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'RouteSearchUpdate'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:81:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m60 | [0mexport type RouteSearchUpdate<TSearch extends object> =
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteHrefInput' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:81:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:81:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m81 | [0mexport type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:92:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m92 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRoutePathInput'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:92:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m92 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m56 | [0mexport type TypedRoutePathInput<TPath extends object> = HasPathParams<TPath> extends true
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:92:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m92 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'RouteSearchUpdate'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:92:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m92 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m60 | [0mexport type RouteSearchUpdate<TSearch extends object> =
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteHrefInput' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:92:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m92 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:92:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m92 | [0mexport type PairedRouteHrefInput<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteGetLinkPropsInput' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:112:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m112 | [0mexport type PairedRouteGetLinkPropsInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteGetLinkPropsInput' references private type 'FreshPartialLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:112:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m112 | [0mexport type PairedRouteGetLinkPropsInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m52 | [0mexport interface FreshPartialLinkAttributes extends FreshLinkAttributes {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:112:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m112 | [0mexport type PairedRouteGetLinkPropsInput<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:119:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m119 | [0mexport type RouteContractTypeCarrier = {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:126:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m126 | [0mexport type InferRouteContractPath<TValue extends RouteContractTypeCarrier> = NonNullable<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:129:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m129 | [0mexport type InferRouteContractSearch<TValue extends RouteContractTypeCarrier> = NonNullable<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:185:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m185 | [0mexport interface DefineRouteContractOptions<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:189:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m189 | [0m  pathSchema?: TPathSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:190:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m190 | [0m  searchSchema?: TSearchSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:193:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m193 | [0mexport type RouteReferenceKind = 'page' | 'partial';
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:195:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m195 | [0mexport interface RouteReferenceOptions {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:196:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m196 | [0m  readonly id?: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:197:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m197 | [0m  readonly kind?: RouteReferenceKind;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteTarget' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:200:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m200 | [0mexport interface PairedRouteTarget<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:200:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m200 | [0mexport interface PairedRouteTarget<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:204:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m204 | [0m  readonly route: TPrimary;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:205:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m205 | [0m  readonly partialRoute: TPartial;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteTarget["href"]' references private type 'PairedRouteHrefArgs'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:206:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m206 | [0m  href(...args: PairedRouteHrefArgs<TPrimary, TPartial>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m105 | [0mtype PairedRouteHrefArgs<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:206:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m206 | [0m  href(...args: PairedRouteHrefArgs<TPrimary, TPartial>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:207:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m207 | [0m  partialHref(...args: PairedRouteHrefArgs<TPrimary, TPartial>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'PairedRouteTarget["getLinkProps"]' references private type 'FreshPartialLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:208:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m208 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m52 | [0mexport interface FreshPartialLinkAttributes extends FreshLinkAttributes {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:208:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m208 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:213:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m213 | [0mexport interface RouteReference<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:213:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m213 | [0mexport interface RouteReference<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:217:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m217 | [0m  readonly routePattern: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:218:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m218 | [0m  readonly pathSchema?: PathParamSchema<TPath>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:219:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m219 | [0m  readonly searchSchema?: SearchParamSchema<TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:220:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m220 | [0m  readonly nav: DefinePageRouteNav<TPath, TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:221:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m221 | [0m  readonly $pattern: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:222:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m222 | [0m  readonly $href?: ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:223:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m223 | [0m  readonly $id?: string;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:224:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m224 | [0m  readonly $kind?: RouteReferenceKind;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["href"]' references private type 'RouteHrefArgs'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:225:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m225 | [0m  href(...args: RouteHrefArgs<RouteReference<TPath, TSearch>>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m88 | [0mtype RouteHrefArgs<TTarget extends TypedRouteTarget<object, object>> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:225:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m225 | [0m  href(...args: RouteHrefArgs<RouteReference<TPath, TSearch>>): ValidatedRouteHref;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["getLinkProps"]' references private type 'BoundGetLinkPropsInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:226:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m226 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m74 | [0mexport type BoundGetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> = Omit<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["getLinkProps"]' references private type 'FreshLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:226:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m226 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m48 | [0mexport interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:226:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m226 | [0m  getLinkProps(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:229:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m229 | [0m  parsePath(input: PathParamInput): TPath;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:230:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m230 | [0m  safeParsePath(input: PathParamInput): SchemaParseResult<TPath>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:231:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m231 | [0m  parseSearch(input: URLSearchParams | SearchParamInput): TSearch;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:232:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m232 | [0m  safeParseSearch(input: URLSearchParams | SearchParamInput): SchemaParseResult<TSearch>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["Link"]' references private type 'ComponentType'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:233:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m233 | [0m  readonly Link: ComponentType<BoundLinkProps<RouteReference<TPath, TSearch>>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m80 | [0mexport type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'RouteReference["Link"]' references private type 'BoundLinkProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:233:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m233 | [0m  readonly Link: ComponentType<BoundLinkProps<RouteReference<TPath, TSearch>>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m90 | [0mexport type BoundLinkProps<TTarget extends TypedRouteTarget<object, object>> = Omit<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:233:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m233 | [0m  readonly Link: ComponentType<BoundLinkProps<RouteReference<TPath, TSearch>>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:234:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m234 | [0m  withPartial<TPartial extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'BoundRouteContract' references private type 'RouteContractPathOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:239:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m239 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m56 | [0mtype RouteContractPathOf<TPathSchema> = InferSchemaOutput<TPathSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'BoundRouteContract' references private type 'RouteContractSearchOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:239:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m239 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m59 | [0mtype RouteContractSearchOf<TSearchSchema> = InferSchemaOutput<TSearchSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:239:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m239 | [0mexport interface BoundRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:243:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m243 | [0m  readonly pathSchema: TPathSchema extends undefined ? undefined
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:245:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m245 | [0m  readonly searchSchema: TSearchSchema extends undefined ? undefined
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:247:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m247 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:264:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m264 | [0mexport interface DefineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:268:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m268 | [0m  readonly pathSchema: TPathSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:269:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m269 | [0m  readonly searchSchema: TSearchSchema;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["$types"]' references private type 'RouteContractPathOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:270:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m270 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m56 | [0mtype RouteContractPathOf<TPathSchema> = InferSchemaOutput<TPathSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'DefineRouteContract["$types"]' references private type 'RouteContractSearchOf'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:270:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m270 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m59 | [0mtype RouteContractSearchOf<TSearchSchema> = InferSchemaOutput<TSearchSchema> extends object
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:270:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m270 | [0m  readonly $types?: {
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:274:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m274 | [0m  createNav(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:277:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m277 | [0m  bind(routePattern: string): BoundRouteContract<TPathSchema, TSearchSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:278:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m278 | [0m  parsePath(input: PathParamInput): RouteContractPathOf<TPathSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:279:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m279 | [0m  safeParsePath(input: PathParamInput): SchemaParseResult<RouteContractPathOf<TPathSchema>>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:280:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m280 | [0m  parseSearch(input: URLSearchParams | SearchParamInput): RouteContractSearchOf<TSearchSchema>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:281:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m281 | [0m  safeParseSearch(
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:286:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m286 | [0mexport function enumPathParamSchema<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:311:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m311 | [0mexport function defineEnumPathParam<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'pairRouteTargets' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:451:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m451 | [0mexport function pairRouteTargets<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:451:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m451 | [0mexport function pairRouteTargets<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:511:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m511 | [0mexport function createRouteReference<const TRoutePattern extends string>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:536:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m536 | [0mexport function bindRoutePattern<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:573:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m573 | [0mexport function defineRouteContract(): DefineRouteContract<undefined, undefined>;
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/route/contract.ts[0m[0m[33m:574:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m574 | [0mexport function defineRouteContract<
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePath' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:36:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0mexport type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRoutePath' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:36:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0mexport type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:36:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m36 | [0mexport type InferRoutePath<TTarget extends TypedRouteTarget<object, object>> = TypedRoutePathOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRouteSearch' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:39:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0mexport type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'InferRouteSearch' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:39:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0mexport type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:39:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m39 | [0mexport type InferRouteSearch<TTarget extends TypedRouteTarget<object, object>> = TypedRouteSearchOf<
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'CurrentRouteState' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:43:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0mexport interface CurrentRouteState<TTarget extends TypedRouteTarget<object, object>> {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:43:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m43 | [0mexport interface CurrentRouteState<TTarget extends TypedRouteTarget<object, object>> {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'CurrentRouteState["path"]' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:44:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m44 | [0m  readonly path: TypedRoutePathOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:44:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m44 | [0m  readonly path: TypedRoutePathOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'CurrentRouteState["search"]' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:45:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m45 | [0m  readonly search: TypedRouteSearchOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:45:3[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m45 | [0m  readonly search: TypedRouteSearchOf<TTarget>;
+  [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'getLinkProps' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:285:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m285 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'getLinkProps' references private type 'GetLinkPropsInput'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:285:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m285 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m64 | [0mexport type GetLinkPropsInput<TTarget extends TypedRouteTarget<object, object>> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'getLinkProps' references private type 'FreshLinkAttributes'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:285:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m285 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m48 | [0mexport interface FreshLinkAttributes extends JSX.HTMLAttributes<HTMLAnchorElement> {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:285:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m285 | [0mexport function getLinkProps<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'TypedRouteTarget'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:317:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m317 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'LinkProps'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:317:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m317 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m79 | [0mexport type LinkProps<TTarget extends TypedRouteTarget<object, object>> =
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'JSXInternal'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:317:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m317 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m78 | [0mexport namespace JSXInternal {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'Link' references private type 'JSXInternal.Element'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:317:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m317 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m96 | [0m  export interface Element extends VNode<any> {}
+   [0m[38;5;12m | [0m  [0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/link.tsx[0m[0m[33m:317:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m317 | [0mexport function Link<TTarget extends TypedRouteTarget<object, object>>(
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentRoute' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/hooks.ts[0m[0m[33m:37:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m37 | [0mexport function useCurrentRoute<TTarget extends TypedRouteTarget<object, object>>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentPath' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/hooks.ts[0m[0m[33m:50:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0mexport function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentPath' references private type 'TypedRoutePathOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/hooks.ts[0m[0m[33m:50:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m50 | [0mexport function useCurrentPath<TTarget extends TypedRouteTarget<object, object>>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m28 | [0mexport type TypedRoutePathOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentSearch' references private type 'TypedRouteTarget'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/hooks.ts[0m[0m[33m:57:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m57 | [0mexport function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m15 | [0mexport interface TypedRouteTarget<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useCurrentSearch' references private type 'TypedRouteSearchOf'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/codex/repos/netscript-wave5-apps-5d3-route/packages/fresh/builders/define-page/navigation/hooks.ts[0m[0m[33m:57:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m57 | [0mexport function useCurrentSearch<TTarget extends TypedRouteTarget<object, object>>(
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m32 | [0mexport type TypedRouteSearchOf<TTarget extends TypedRouteTarget<object, object>> = NonNullable<
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[0m: Found [0m[1m118[0m documentation lint errors.

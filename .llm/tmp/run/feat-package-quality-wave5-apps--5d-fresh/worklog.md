@@ -51,3 +51,30 @@
   worktrees must merge from the local `feat/package-quality-wave5-apps-5d-fresh` branch before
   starting implementation.
 
+
+## 2026-06-14 IMPL merge: 5d2 builders
+
+- WSL Git publication was restored by switching native worktrees to SSH remote
+  `git@github.com:rickylabs/netscript.git`; direct `git push` now works from the ext4 worktrees.
+- 5d2 implementation completed through Slice 27 and pushed PR #35 at
+  `aa310dc chore(harness): record slice 27 commit`.
+- Required PR #35 slice comments were posted for Slices 25, 26, and 27; supervisor IMPL-EVAL PASS
+  was posted as comment `4700202752` after the separate app-server evaluator failed to start due to
+  Codex usage limits.
+- IMPL-EVAL gates run by supervisor from native WSL ext4: branch clean/current at `aa310dc`,
+  `deno test --allow-all packages/fresh/builders` (36 passed), builders/form doc-lint, scoped
+  builders check/lint/fmt wrappers, scoped builders doctrine scan (`FAIL=0 WARN=3 INFO=1`), and
+  `deno publish --dry-run --allow-dirty` from `packages/fresh`.
+- Merged `feat/package-quality-wave5-apps-5d2-builders` into this supervisor branch as
+  `8cd6a44 Merge branch feat/package-quality-wave5-apps-5d2-builders into feat/package-quality-wave5-apps-5d-fresh`.
+- Post-merge supervisor gates passed: `deno test --allow-all packages/fresh/builders`,
+  `deno doc --lint packages/fresh/builders/mod.ts`, `deno doc --lint packages/fresh/form/mod.ts`,
+  and `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/builders --ext ts,tsx`.
+- 5d3 is now the next dependency-chain subwave; before launch, pull/merge the updated supervisor
+  branch into the 5d3 route worktree and require per-slice commit, push, and structured PR comments.
+
+## 2026-06-14 - 5d3 route merged into supervisor
+
+- Merged evaluated PR #36 branch `feat/package-quality-wave5-apps-5d3-route` at evaluator commit `7056c02` into `feat/package-quality-wave5-apps-5d-fresh` with merge commit `c3ef016`.
+- Separate IMPL-EVAL verdict: PASS, recorded in `.llm/tmp/run/feat-package-quality-wave5-apps--5d3-route/evaluate.md` and PR #36 comment `4700304548`.
+- Merge gates: public route `deno doc --lint` PASS; scoped route+builders check/lint/fmt PASS 0 findings; `deno test --allow-all packages/fresh/route packages/fresh/builders` PASS 52/0; `packages/fresh` `deno task dry-run` PASS.

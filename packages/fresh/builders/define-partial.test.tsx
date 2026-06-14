@@ -69,9 +69,9 @@ Deno.test('definePartial returns partial config and renders success content', as
 
   const route = definePartial<{ label: string; value: string }, { traceId: string }>({
     name: 'demo-stats',
-    loader: async (ctx) => {
+    loader: (ctx) => {
       receivedTraceId = ctx.traceId;
-      return { label: 'Users', value: '42' };
+      return Promise.resolve({ label: 'Users', value: '42' });
     },
     component: StatsCard,
   });
@@ -106,7 +106,7 @@ Deno.test('definePartial returns partial config and renders success content', as
 Deno.test('definePartial wraps loader failures in ErrorDisplay inside the partial boundary', async () => {
   const route = definePartial<{ label: string; value: string }, Record<string, never>>({
     name: 'failing-stats',
-    loader: async () => {
+    loader: () => {
       throw new Error('boom');
     },
     component: StatsCard,
@@ -138,7 +138,7 @@ Deno.test('definePartial wraps loader failures in ErrorDisplay inside the partia
 Deno.test('defineStatsPartial delegates to a query function and preserves handler passthrough', async () => {
   let queryCalls = 0;
   const handler = {
-    async POST() {
+    POST() {
       return new Response(null, { status: 204 });
     },
   };
@@ -149,9 +149,9 @@ Deno.test('defineStatsPartial delegates to a query function and preserves handle
     typeof handler
   >({
     name: 'stats-only',
-    query: async () => {
+    query: () => {
       queryCalls += 1;
-      return { label: 'Orders', value: '18' };
+      return Promise.resolve({ label: 'Orders', value: '18' });
     },
     component: StatsCard,
     handler,

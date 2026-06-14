@@ -1,45 +1,20 @@
 import { dirname, extname, relative, resolve } from '@std/path';
+import type {
+  DiscoveredNetScriptRoute,
+  NetScriptRouteManifestOptions,
+  ResolvedNetScriptRouteManifestOptions,
+  WriteNetScriptRouteManifestResult,
+} from './manifest-types.ts';
+
+export type {
+  DiscoveredNetScriptRoute,
+  NetScriptRouteManifestOptions,
+  ResolvedNetScriptRouteManifestOptions,
+  WriteNetScriptRouteManifestResult,
+} from './manifest-types.ts';
 
 const ROUTE_FILE_EXTENSIONS = new Set(['.ts', '.tsx']);
 const IGNORED_DIRECTORIES = new Set(['.git', '_fresh', 'coverage', 'dist', 'node_modules']);
-
-/** Options for generating NetScript route manifest files from a Fresh routes directory. */
-export interface NetScriptRouteManifestOptions {
-  /** Enable or disable manifest generation. */
-  enabled?: boolean;
-  /** App-root-relative routes directory to scan. */
-  routesDir?: string;
-  /** App-root-relative path for the generated manifest module. */
-  outputPath?: string;
-  /** Logging verbosity for manifest generation. */
-  logLevel?: 'silent' | 'changes' | 'verbose';
-}
-
-export interface ResolvedNetScriptRouteManifestOptions {
-  appRoot: string;
-  routesDir: string;
-  manifestOutputPath: string;
-  routesOutputPath: string;
-  logLevel: 'silent' | 'changes' | 'verbose';
-}
-
-export interface DiscoveredNetScriptRoute {
-  routeFilePath: string;
-  relativeRouteFilePath: string;
-  routePattern: string;
-  routeKeyPath: string[];
-  routeContractImportPath?: string;
-}
-
-export interface WriteNetScriptRouteManifestResult {
-  changed: boolean;
-  manifestChanged: boolean;
-  routesChanged: boolean;
-  manifestOutputPath: string;
-  routesOutputPath: string;
-  routeCount: number;
-  boundRouteCount: number;
-}
 
 interface RawManifestExpression {
   __raw: string;
@@ -280,7 +255,9 @@ function renderRouteReferenceExpression(
   routePatternAccessor: string,
   importName?: string,
 ): string {
-  const metadata = `{ id: ${JSON.stringify(route.routeKeyPath.slice(0, -1).join('.'))}, kind: ${JSON.stringify(inferRouteReferenceKind(route))} }`;
+  const metadata = `{ id: ${JSON.stringify(route.routeKeyPath.slice(0, -1).join('.'))}, kind: ${
+    JSON.stringify(inferRouteReferenceKind(route))
+  } }`;
 
   if (importName) {
     return `bindRoutePattern(${importName}, ${routePatternAccessor}, ${metadata})`;
@@ -289,11 +266,20 @@ function renderRouteReferenceExpression(
   return `createRouteReference(${routePatternAccessor}, ${metadata})`;
 }
 
+/**
+ * Resolve user-facing manifest options into fully normalized paths.
+ *
+ * @param appRoot - Absolute application root.
+ * @param options - Optional manifest generator configuration.
+ * @returns Resolved manifest options.
+ */
 export function resolveNetScriptRouteManifestOptions(
   appRoot: string,
   options: NetScriptRouteManifestOptions = {},
 ): ResolvedNetScriptRouteManifestOptions {
-  const routesOutputPath = normalizeFsPath(options.outputPath ?? resolve(appRoot, '.generated/routes.ts'));
+  const routesOutputPath = normalizeFsPath(
+    options.outputPath ?? resolve(appRoot, '.generated/routes.ts'),
+  );
 
   return {
     appRoot: normalizeFsPath(appRoot),
@@ -304,6 +290,13 @@ export function resolveNetScriptRouteManifestOptions(
   };
 }
 
+/**
+ * Determine whether a file change should trigger a manifest rebuild.
+ *
+ * @param filePath - Absolute path of the changed file.
+ * @param options - Resolved manifest options.
+ * @returns True when the file is inside the routes tree and is a route module or sidecar.
+ */
 export function isRouteManifestRelevantPath(
   filePath: string,
   options: ResolvedNetScriptRouteManifestOptions,
@@ -317,6 +310,13 @@ export function isRouteManifestRelevantPath(
     isRouteContractSidecar(normalizedPath);
 }
 
+/**
+ * Determine whether a file path should be watched for route changes.
+ *
+ * @param filePath - Absolute path of the changed file.
+ * @param options - Resolved manifest options.
+ * @returns True when the file is a TypeScript route file inside the routes tree.
+ */
 export function isRouteManifestWatchPath(
   filePath: string,
   options: ResolvedNetScriptRouteManifestOptions,
@@ -329,6 +329,12 @@ export function isRouteManifestWatchPath(
   return ROUTE_FILE_EXTENSIONS.has(extname(normalizedPath));
 }
 
+/**
+ * Walk the routes directory and discover all routable modules.
+ *
+ * @param options - Resolved manifest options.
+ * @returns Sorted list of discovered routes.
+ */
 export function discoverNetScriptRoutes(
   options: ResolvedNetScriptRouteManifestOptions,
 ): DiscoveredNetScriptRoute[] {
@@ -378,6 +384,12 @@ export function discoverNetScriptRoutes(
   return routes;
 }
 
+/**
+ * Render the generated `manifest.ts` source that exports the route pattern tree.
+ *
+ * @param routes - Discovered routes.
+ * @returns TypeScript source string.
+ */
 export function renderNetScriptRouteManifest(
   routes: DiscoveredNetScriptRoute[],
 ): string {
@@ -396,6 +408,13 @@ export function renderNetScriptRouteManifest(
   ].filter((line, index, lines) => !(line === '' && lines[index - 1] === '')).join('\n');
 }
 
+/**
+ * Render the generated `routes.ts` source that exports bound route references.
+ *
+ * @param routes - Discovered routes.
+ * @param manifestImportPath - Relative import path to the generated manifest.
+ * @returns TypeScript source string.
+ */
 export function renderNetScriptRoutesModule(
   routes: DiscoveredNetScriptRoute[],
   manifestImportPath = './manifest.ts',
@@ -423,7 +442,9 @@ export function renderNetScriptRoutesModule(
   return [
     '// This file is auto-generated by @netscript/fresh/vite.',
     '// Do not edit manually; update route files or route sidecars instead.',
-    `import { createRouteReference${routeContractImports.length > 0 ? ', bindRoutePattern' : ''} } from '@netscript/fresh/route';`,
+    `import { createRouteReference${
+      routeContractImports.length > 0 ? ', bindRoutePattern' : ''
+    } } from '@netscript/fresh/route';`,
     `import { routePatterns } from '${manifestImportPath}';`,
     ...routeContractImports,
     '',
@@ -432,6 +453,12 @@ export function renderNetScriptRoutesModule(
   ].filter((line, index, lines) => !(line === '' && lines[index - 1] === '')).join('\n');
 }
 
+/**
+ * Discover routes and write the generated manifest and routes modules to disk.
+ *
+ * @param options - Resolved manifest options.
+ * @returns Summary of what was discovered and whether files changed.
+ */
 export function writeNetScriptRouteManifestSync(
   options: ResolvedNetScriptRouteManifestOptions,
 ): WriteNetScriptRouteManifestResult {
