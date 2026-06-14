@@ -21,7 +21,7 @@ import {
   bindRoutePattern,
   defineRouteContract,
   enumPathParamSchema,
-} from '../../route/contract.ts';
+} from '../../route/_internal/contract-runtime.ts';
 import { z } from 'zod';
 
 function assert(condition: unknown, message: string): asserts condition {

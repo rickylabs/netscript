@@ -21,7 +21,10 @@ import type {
   RuntimeFormState,
 } from '../../../form/types.ts';
 import { emitFormError, withFormSpan } from '../../../form/telemetry.ts';
-import { bindRoutePattern, defineRouteContract } from '../../../route/contract.ts';
+import {
+  bindRoutePattern,
+  defineRouteContract,
+} from '../../../route/_internal/contract-runtime.ts';
 import {
   createIncrementalStreamingResponse,
   createStreamingResponse,
