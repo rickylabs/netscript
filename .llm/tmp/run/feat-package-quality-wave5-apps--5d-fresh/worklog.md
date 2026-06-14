@@ -72,3 +72,9 @@
   and `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/builders --ext ts,tsx`.
 - 5d3 is now the next dependency-chain subwave; before launch, pull/merge the updated supervisor
   branch into the 5d3 route worktree and require per-slice commit, push, and structured PR comments.
+
+## 2026-06-14 - 5d3 route merged into supervisor
+
+- Merged evaluated PR #36 branch `feat/package-quality-wave5-apps-5d3-route` at evaluator commit `7056c02` into `feat/package-quality-wave5-apps-5d-fresh` with merge commit `c3ef016`.
+- Separate IMPL-EVAL verdict: PASS, recorded in `.llm/tmp/run/feat-package-quality-wave5-apps--5d3-route/evaluate.md` and PR #36 comment `4700304548`.
+- Merge gates: public route `deno doc --lint` PASS; scoped route+builders check/lint/fmt PASS 0 findings; `deno test --allow-all packages/fresh/route packages/fresh/builders` PASS 52/0; `packages/fresh` `deno task dry-run` PASS.
