@@ -11,3 +11,11 @@ Append-only. One entry per slice / decision.
   supervisor questions, dependencies/merge impact, side-effect ledger.
 - Updated `drift.md` with D-5d3-002 through D-5d3-005.
 - Verified zero `TODO` markers remain in `design.md` and `plan.md`.
+
+## 2026-06-14 - supervisor sync after 5d2 merge
+
+- Merged supervisor branch origin/feat/package-quality-wave5-apps-5d-fresh through commit 9e13d3b.
+- Resolved builder/form conflicts to the evaluated 5d2 decomposition and deleted obsolete define-page/navigation.tsx.
+- Resolved route/contract.ts to the 5d2-compatible baseline; route doc-lint/decomposition remains the 5d3 implementation budget.
+- Removed obsolete failed-agent probe tests alias_test.ts and zod_compat_test.ts, which were not present on supervisor and failed type-check after 5d2.
+- Sync gates: deno test --allow-all packages/fresh/builders PASS 36/0; scoped builders+route deno check PASS 0 findings; deno doc --lint packages/fresh/builders/mod.ts PASS.

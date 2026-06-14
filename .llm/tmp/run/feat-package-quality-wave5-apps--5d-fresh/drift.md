@@ -34,3 +34,28 @@ Append-only.
 - **Action:** Supervisor owns publication fallback; subagents must not assume normal push credentials
   exist in their shell.
 
+
+## D-5d-4 — 5d2 evaluator fallback due app-server usage limit
+
+- **What:** The separate 5d2 IMPL-EVAL app-server session was launched from the native WSL worktree,
+  but Codex app-server returned `usageLimitExceeded` before any evaluator work ran.
+- **Disposition:** Supervisor ran the IMPL-EVAL gates directly from
+  `/home/codex/repos/netscript-wave5-apps-5d2-builders` and posted the PASS verdict to PR #35 as
+  comment `4700202752`.
+- **Evidence:** Evaluated head `aa310dc`; builders tests, builders/form doc-lint, scoped builders
+  check/lint/fmt, scoped builders doctrine scan, and `packages/fresh` publish dry-run all passed.
+- **Impact:** Evaluation independence was preserved operationally by separating implementation from
+  the supervisor-run evaluation evidence, but not by a second active app-server model turn.
+- **Follow-up:** When app-server credits/rate limit reset, prefer a true separate app-server
+  evaluator again. If unavailable, record the fallback and keep all evidence in PR comments.
+
+## D-5d-5 — WSL GitHub SSH publication restored
+
+- **What:** Earlier 5d supervisor and subagent pushes failed through the HTTPS credential helper.
+- **Fix:** WSL Git remotes now use `git@github.com:rickylabs/netscript.git` with SSH key
+  `/home/codex/.ssh/id_ed25519_netscript_wave5` authenticated as `rickylabs`.
+- **Impact:** Future implementation agents must push after every slice from their native WSL
+  worktree. Supervisor should still verify `git ls-remote` after each slice because app-server
+  sessions can hit usage limits before final handoff.
+- **Status:** D-5d-2/D-5d-3 are resolved for current WSL worktrees unless a specific worktree remote
+  regresses to HTTPS.

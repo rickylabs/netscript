@@ -1,5 +1,3 @@
-import type { JSX } from 'preact';
-
 /**
  * Shared form type definitions for `@netscript/fresh`.
  *
@@ -32,12 +30,13 @@ export type FormValues = object;
 /** Mode used by page-owned create/edit forms in the playground consumer. */
 export type FormPageMode = 'create' | 'edit';
 
-/** JSDoc for exported type `FormFieldPath`. */
+/** Dot-path name for a field in nested form values. */
 export type FormFieldPath = string;
-/** JSDoc for exported type `CollectionKeyMap`. */
+
+/** Stable collection item keys by collection field path. */
 export type CollectionKeyMap = Record<string, string>;
 
-/** JSDoc for exported type `FormErrorMessages`. */
+/** Ordered validation messages for a field or form. */
 export type FormErrorMessages = readonly string[];
 
 /**
@@ -46,182 +45,197 @@ export type FormErrorMessages = readonly string[];
 export type FormFieldErrors<TValues extends FormValues> =
   & Partial<Record<Extract<keyof TValues, string>, string[]>>
   & {
+    /** Form-level validation errors not tied to a single field. */
     _form: string[];
   };
 
-/** JSDoc for exported interface `FieldConstraints`. */
+/** HTML constraint attributes derived from a schema field. */
 export interface FieldConstraints {
-  /** Property `required`. */
+  /** Whether the field is required. */
   readonly required?: boolean;
-  /** Property `minLength`. */
+  /** Minimum string length. */
   readonly minLength?: number;
-  /** Property `maxLength`. */
+  /** Maximum string length. */
   readonly maxLength?: number;
-  /** Property `minItems`. */
+  /** Minimum collection item count. */
   readonly minItems?: number;
-  /** Property `maxItems`. */
+  /** Maximum collection item count. */
   readonly maxItems?: number;
-  /** Property `min`. */
+  /** Minimum numeric or date-like value. */
   readonly min?: number | string;
-  /** Property `max`. */
+  /** Maximum numeric or date-like value. */
   readonly max?: number | string;
-  /** Property `pattern`. */
+  /** HTML pattern constraint. */
   readonly pattern?: string;
-  /** Property `step`. */
+  /** HTML step constraint. */
   readonly step?: number | string;
-  /** Property `multiple`. */
+  /** Whether the control accepts multiple values. */
   readonly multiple?: boolean;
 }
 
-/** JSDoc for exported interface `FormElementProps`. */
+/** Props applied to the root form element. */
 export interface FormElementProps {
-  /** Property `id`. */
+  /** DOM id for the form element. */
   readonly id: string;
-  /** Property `action`. */
+  /** Submission URL. */
   readonly action: string;
-  /** Property `method`. */
+  /** HTTP method used by the form. */
   readonly method: string;
-  /** Property `noValidate`. */
+  /** Disable native browser validation when framework validation owns errors. */
   readonly noValidate: boolean;
 }
 
-/** JSDoc for exported interface `FormCsrfInputProps`. */
+/** Props for the hidden CSRF token input. */
 export interface FormCsrfInputProps {
-  /** Property `type`. */
+  /** Hidden input type. */
   readonly type: 'hidden';
-  /** Property `name`. */
+  /** CSRF field name. */
   readonly name: string;
-  /** Property `value`. */
+  /** CSRF token value. */
   readonly value: string;
 }
 
-/** JSDoc for exported interface `CollectionKeyInputProps`. */
+/** Props for a hidden collection-key input. */
 export interface CollectionKeyInputProps {
-  /** Property `type`. */
+  /** Hidden input type. */
   readonly type: 'hidden';
-  /** Property `name`. */
+  /** Collection key field name. */
   readonly name: string;
-  /** Property `value`. */
+  /** Stable collection item key. */
   readonly value: string;
-  /** Property `form`. */
+  /** Owning form id. */
   readonly form: string;
 }
 
-/** JSDoc for exported interface `LabelProps`. */
+/** Props applied to a field label. */
 export interface LabelProps {
-  /** Property `for`. */
+  /** DOM id of the labelled control. */
   readonly for: string;
 }
 
-/** JSDoc for exported interface `ErrorProps`. */
+/** Props applied to a field error element. */
 export interface ErrorProps {
-  /** Property `id`. */
+  /** DOM id for the error element. */
   readonly id: string;
-  /** Property `role`. */
+  /** Alert role used by assistive technologies. */
   readonly role: 'alert';
+  /** Live-region behavior for updated errors. */
   readonly 'aria-live': 'polite';
 }
 
-/** JSDoc for exported interface `DescriptionProps`. */
+/** Props applied to a field description element. */
 export interface DescriptionProps {
-  /** Property `id`. */
+  /** DOM id for the description element. */
   readonly id: string;
 }
 
-/** JSDoc for exported interface `ControlProps`. */
+/** Props applied to an input, select, textarea, or compatible control. */
 export interface ControlProps {
-  /** Property `id`. */
+  /** DOM id for the control. */
   readonly id: string;
-  /** Property `name`. */
+  /** Submitted field name. */
   readonly name: string;
-  /** Property `form`. */
+  /** Owning form id. */
   readonly form: string;
-  /** Property `defaultValue`. */
+  /** Initial string value. */
   readonly defaultValue?: string;
-  /** Property `defaultChecked`. */
+  /** Initial checked state. */
   readonly defaultChecked?: boolean;
-  /** Property `value`. */
+  /** Controlled string value. */
   readonly value?: string;
-  /** Property `checked`. */
+  /** Controlled checked state. */
   readonly checked?: boolean;
+  /** Whether the control currently has validation errors. */
   readonly 'aria-invalid'?: boolean;
+  /** Space-separated ids describing the control. */
   readonly 'aria-describedby'?: string;
+  /** Whether the field is required for assistive technologies. */
   readonly 'aria-required'?: boolean;
-  /** Property `required`. */
+  /** Native required constraint. */
   readonly required?: boolean;
-  /** Property `minLength`. */
+  /** Native minimum string length. */
   readonly minLength?: number;
-  /** Property `maxLength`. */
+  /** Native maximum string length. */
   readonly maxLength?: number;
-  /** Property `min`. */
+  /** Native minimum value. */
   readonly min?: number | string;
-  /** Property `max`. */
+  /** Native maximum value. */
   readonly max?: number | string;
-  /** Property `pattern`. */
+  /** Native pattern constraint. */
   readonly pattern?: string;
-  /** Property `step`. */
+  /** Native step constraint. */
   readonly step?: number | string;
-  /** Property `multiple`. */
+  /** Native multiple-value flag. */
   readonly multiple?: boolean;
-  /** Property `formNoValidate`. */
+  /** Override form validation for this control. */
   readonly formNoValidate?: boolean;
-  /** Property `type`. */
-  readonly type?: JSX.HTMLInputTypeAttribute;
-  /** Property `disabled`. */
+  /** Input type when rendered as an input element. */
+  readonly type?: string;
+  /** Disabled control state. */
   readonly disabled?: boolean;
-  /** Property `readOnly`. */
+  /** Read-only control state. */
   readonly readOnly?: boolean;
-  /** Property `placeholder`. */
+  /** Placeholder text. */
   readonly placeholder?: string;
-  /** Property `inputMode`. */
+  /** Input mode hint. */
   readonly inputMode?: string;
-  /** Property `rows`. */
+  /** Textarea row count. */
   readonly rows?: number;
-  /** Property `cols`. */
+  /** Textarea column count. */
   readonly cols?: number;
-  /** Property `autocomplete`. */
+  /** Autocomplete hint. */
   readonly autocomplete?: string;
-  /** Property `spellCheck`. */
+  /** Spellcheck hint. */
   readonly spellCheck?: boolean;
-  /** Property `accept`. */
+  /** Accepted file types for file inputs. */
   readonly accept?: string;
-  /** Property `formAction`. */
+  /** Submitter-specific action URL. */
   readonly formAction?: string;
-  /** Property `formMethod`. */
+  /** Submitter-specific method. */
   readonly formMethod?: string;
-  /** Property `formTarget`. */
+  /** Submitter-specific target. */
   readonly formTarget?: string;
-  /** Property `formEncType`. */
+  /** Submitter-specific encoding. */
   readonly formEncType?: string;
-  /** Property `formNoValidateButton`. */
+  /** Submitter-specific validation override. */
   readonly formNoValidateButton?: boolean;
-  /** Property `list`. */
+  /** Associated datalist id. */
   readonly list?: string;
-  /** Property `role`. */
+  /** Optional ARIA role. */
   readonly role?: string;
-  /** Property `tabIndex`. */
+  /** Optional tab order. */
   readonly tabIndex?: number;
+  /** Field path diagnostic marker. */
   readonly 'data-field-path'?: string;
+  /** Field validity diagnostic marker. */
   readonly 'data-field-invalid'?: 'true' | 'false';
+  /** Field dirtiness diagnostic marker. */
   readonly 'data-field-dirty'?: 'true' | 'false';
+  /** Owning form diagnostic marker. */
   readonly 'data-form-id'?: string;
+  /** Submit intent diagnostic marker. */
   readonly 'data-intent'?: string;
+  /** Collection name diagnostic marker. */
   readonly 'data-collection-name'?: string;
+  /** Collection index diagnostic marker. */
   readonly 'data-collection-index'?: string;
 }
 
-/** JSDoc for exported interface `IntentButtonProps`. */
+/** Props for an intent submit button generated by a form field helper. */
 export interface IntentButtonProps {
-  /** Property `type`. */
+  /** Submit button type. */
   readonly type: 'submit';
-  /** Property `name`. */
+  /** Hidden intent field name. */
   readonly name: '__intent__';
-  /** Property `value`. */
+  /** Encoded intent value. */
   readonly value: string;
-  /** Property `formNoValidate`. */
+  /** Disable native validation for intent-only operations. */
   readonly formNoValidate: boolean;
+  /** Intent diagnostic marker. */
   readonly 'data-intent': string;
+  /** Collection name diagnostic marker. */
   readonly 'data-collection-name'?: string;
+  /** Collection index diagnostic marker. */
   readonly 'data-collection-index'?: string;
 }
 
@@ -238,186 +252,186 @@ export interface FormIntent {
   readonly payload?: Record<string, unknown>;
 }
 
-/** JSDoc for exported interface `FormIntentResult`. */
+/** Result returned after applying an encoded form intent. */
 export interface FormIntentResult<TValues extends FormValues> {
-  /** Property `values`. */
+  /** Values after the intent operation has been applied. */
   readonly values: TValues;
-  /** Property `formErrors`. */
+  /** Optional form-level errors produced by the operation. */
   readonly formErrors?: readonly string[];
-  /** Property `fieldErrors`. */
+  /** Optional field-level errors produced by the operation. */
   readonly fieldErrors?: Partial<Record<Extract<keyof TValues, string>, readonly string[]>>;
 }
 
-/** JSDoc for exported interface `FormReplyInit`. */
+/** Base input used to construct a form reply state. */
 export interface FormReplyInit<TValues extends FormValues> {
-  /** Property `values`. */
+  /** Current submitted or initial values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial values used to compute dirty state. */
   readonly initialValues?: Partial<TValues>;
-  /** Property `intent`. */
+  /** Parsed form intent, when present. */
   readonly intent?: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token included in the rendered form. */
   readonly csrfToken?: string;
-  /** Property `collectionKeys`. */
+  /** Stable collection item keys by collection path. */
   readonly collectionKeys?: CollectionKeyMap;
 }
 
-/** JSDoc for exported interface `InvalidFormReplyInit`. */
+/** Input used to construct an invalid form reply. */
 export interface InvalidFormReplyInit<TValues extends FormValues> extends FormReplyInit<TValues> {
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Optional form-level validation errors. */
   readonly formErrors?: readonly string[];
 }
 
-/** JSDoc for exported interface `SuccessFormReplyInit`. */
+/** Input used to construct a successful form reply. */
 export interface SuccessFormReplyInit<TValues extends FormValues, TOutput>
   extends FormReplyInit<TValues> {
-  /** Property `output`. */
+  /** Mutation output payload. */
   readonly output: TOutput;
-  /** Property `message`. */
+  /** Optional user-facing success message. */
   readonly message?: string;
-  /** Property `nextValues`. */
+  /** Optional next values used after success. */
   readonly nextValues?: Partial<TValues>;
 }
 
-/** JSDoc for exported interface `ErrorFormReplyInit`. */
+/** Input used to construct an errored form reply. */
 export interface ErrorFormReplyInit<TValues extends FormValues> extends FormReplyInit<TValues> {
-  /** Property `formErrors`. */
+  /** Form-level errors returned by the failed operation. */
   readonly formErrors: readonly string[];
 }
 
-/** JSDoc for exported interface `RedirectFormReplyInit`. */
+/** Input used to construct a redirect form reply. */
 export interface RedirectFormReplyInit<TValues extends FormValues> extends FormReplyInit<TValues> {
-  /** Property `location`. */
+  /** Redirect location. */
   readonly location: string;
-  /** Property `status`. */
+  /** Redirect status. */
   readonly status?: 303 | 307 | 308;
 }
 
-/** JSDoc for exported interface `FormSubmissionInitialResult`. */
+/** Initial form submission state. */
 export interface FormSubmissionInitialResult<TValues extends FormValues> {
-  /** Property `status`. */
+  /** Submission status discriminator. */
   readonly status: 'initial';
-  /** Property `values`. */
+  /** Current form values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial values used to compute dirty state. */
   readonly initialValues: Partial<TValues>;
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Form-level validation errors. */
   readonly formErrors: readonly string[];
-  /** Property `intent`. */
+  /** Parsed submit intent, when present. */
   readonly intent: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token for the rendered form. */
   readonly csrfToken: string;
-  /** Property `collectionKeys`. */
+  /** Stable collection item keys by collection path. */
   readonly collectionKeys: CollectionKeyMap;
 }
 
-/** JSDoc for exported interface `FormSubmissionInvalidResult`. */
+/** Invalid form submission state. */
 export interface FormSubmissionInvalidResult<TValues extends FormValues> {
-  /** Property `status`. */
+  /** Submission status discriminator. */
   readonly status: 'invalid';
-  /** Property `values`. */
+  /** Current form values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial values used to compute dirty state. */
   readonly initialValues: Partial<TValues>;
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Form-level validation errors. */
   readonly formErrors: readonly string[];
-  /** Property `intent`. */
+  /** Parsed submit intent, when present. */
   readonly intent: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token for the rendered form. */
   readonly csrfToken: string;
-  /** Property `collectionKeys`. */
+  /** Stable collection item keys by collection path. */
   readonly collectionKeys: CollectionKeyMap;
 }
 
-/** JSDoc for exported interface `FormSubmissionSuccessResult`. */
+/** Successful form submission state. */
 export interface FormSubmissionSuccessResult<TValues extends FormValues, TOutput = unknown> {
-  /** Property `status`. */
+  /** Submission status discriminator. */
   readonly status: 'success';
-  /** Property `values`. */
+  /** Current form values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial values used to compute dirty state. */
   readonly initialValues: Partial<TValues>;
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Form-level validation errors. */
   readonly formErrors: readonly string[];
-  /** Property `intent`. */
+  /** Parsed submit intent, when present. */
   readonly intent: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token for the rendered form. */
   readonly csrfToken: string;
-  /** Property `collectionKeys`. */
+  /** Stable collection item keys by collection path. */
   readonly collectionKeys: CollectionKeyMap;
-  /** Property `output`. */
+  /** Mutation output payload. */
   readonly output: TOutput;
-  /** Property `message`. */
+  /** Optional user-facing success message. */
   readonly message?: string;
-  /** Property `nextValues`. */
+  /** Optional next values used after success. */
   readonly nextValues?: Partial<TValues>;
 }
 
-/** JSDoc for exported interface `FormSubmissionErrorResult`. */
+/** Errored form submission state. */
 export interface FormSubmissionErrorResult<TValues extends FormValues> {
-  /** Property `status`. */
+  /** Submission status discriminator. */
   readonly status: 'error';
-  /** Property `values`. */
+  /** Current form values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial values used to compute dirty state. */
   readonly initialValues: Partial<TValues>;
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Form-level validation errors. */
   readonly formErrors: readonly string[];
-  /** Property `intent`. */
+  /** Parsed submit intent, when present. */
   readonly intent: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token for the rendered form. */
   readonly csrfToken: string;
-  /** Property `collectionKeys`. */
+  /** Stable collection item keys by collection path. */
   readonly collectionKeys: CollectionKeyMap;
 }
 
-/** JSDoc for exported interface `FormSubmissionRedirectResult`. */
+/** Redirect form submission state. */
 export interface FormSubmissionRedirectResult<TValues extends FormValues> {
-  /** Property `status`. */
+  /** Submission status discriminator. */
   readonly status: 'redirect';
-  /** Property `values`. */
+  /** Current form values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial values used to compute dirty state. */
   readonly initialValues: Partial<TValues>;
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Form-level validation errors. */
   readonly formErrors: readonly string[];
-  /** Property `intent`. */
+  /** Parsed submit intent, when present. */
   readonly intent: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token for the rendered form. */
   readonly csrfToken: string;
-  /** Property `collectionKeys`. */
+  /** Stable collection item keys by collection path. */
   readonly collectionKeys: CollectionKeyMap;
-  /** Property `location`. */
+  /** Redirect location. */
   readonly location: string;
-  /** Property `redirectStatus`. */
+  /** Redirect status. */
   readonly redirectStatus: 303 | 307 | 308;
 }
 
-/** JSDoc for exported type `FormSubmissionResult`. */
+/** Union of all form submission result states. */
 export type FormSubmissionResult<TValues extends FormValues, TOutput = unknown> =
   | FormSubmissionInitialResult<TValues>
   | FormSubmissionInvalidResult<TValues>
@@ -425,96 +439,100 @@ export type FormSubmissionResult<TValues extends FormValues, TOutput = unknown> 
   | FormSubmissionErrorResult<TValues>
   | FormSubmissionRedirectResult<TValues>;
 
-/** JSDoc for exported interface `FieldDescriptor`. */
+/** Descriptor for one form field and its generated props. */
 export interface FieldDescriptor<TValue = unknown> {
-  /** Property `name`. */
+  /** Submitted field name. */
   readonly name: FormFieldPath;
-  /** Property `id`. */
+  /** DOM id for the field control. */
   readonly id: string;
-  /** Property `key`. */
+  /** Stable render key for repeated fields. */
   readonly key: string;
-  /** Property `formId`. */
+  /** Owning form id. */
   readonly formId: string;
-  /** Property `value`. */
+  /** Current field value. */
   readonly value: TValue | undefined;
-  /** Property `initialValue`. */
+  /** Initial field value. */
   readonly initialValue: TValue | undefined;
-  /** Property `defaultValue`. */
+  /** Default field value. */
   readonly defaultValue: TValue | undefined;
-  /** Property `errors`. */
+  /** Validation errors for this field. */
   readonly errors: readonly string[];
-  /** Property `error`. */
+  /** First validation error for this field. */
   readonly error: string | undefined;
-  /** Property `invalid`. */
+  /** Whether the field is invalid. */
   readonly invalid: boolean;
-  /** Property `valid`. */
+  /** Whether the field is valid. */
   readonly valid: boolean;
-  /** Property `required`. */
+  /** Whether the field is required. */
   readonly required: boolean;
-  /** Property `dirty`. */
+  /** Whether the current value differs from the initial value. */
   readonly dirty: boolean;
-  /** Property `constraints`. */
+  /** HTML constraints derived from schema metadata. */
   readonly constraints: FieldConstraints;
-  /** Property `errorId`. */
+  /** DOM id for the error element. */
   readonly errorId: string;
-  /** Property `descriptionId`. */
+  /** DOM id for the description element. */
   readonly descriptionId: string;
+  /** Build control props with optional overrides. */
   controlProps<TOverrides extends Record<string, unknown> = Record<string, never>>(
-    /** Property `overrides`. */
     overrides?: TOverrides,
   ): ControlProps & TOverrides;
-  /** Property `labelProps`. */
+  /** Props for the field label. */
   readonly labelProps: LabelProps;
-  /** Property `errorProps`. */
+  /** Props for the field error element. */
   readonly errorProps: ErrorProps;
-  /** Property `descriptionProps`. */
+  /** Props for the field description element. */
   readonly descriptionProps: DescriptionProps;
 }
 
-/** JSDoc for exported interface `CollectionItem`. */
+/** Descriptor for one item in a collection field. */
 export interface CollectionItem<TItem> {
-  /** Property `key`. */
+  /** Stable item key. */
   readonly key: string;
-  /** Property `index`. */
+  /** Current item index. */
   readonly index: number;
-  /** Property `keyInputProps`. */
+  /** Props for the hidden item key input. */
   readonly keyInputProps: CollectionKeyInputProps;
-  /** Property `fields`. */
+  /** Field descriptors for the collection item. */
   readonly fields: TItem extends object ? FieldDescriptorMap<TItem>
     : FieldDescriptor<TItem>;
 }
 
-/** JSDoc for exported interface `CollectionDescriptor`. */
+/** Descriptor for a collection field and its item intent buttons. */
 export interface CollectionDescriptor<TItem> {
-  /** Property `name`. */
+  /** Collection field name. */
   readonly name: string;
-  /** Property `list`. */
+  /** Ordered collection items. */
   readonly list: ReadonlyArray<CollectionItem<TItem>>;
-  /** Property `length`. */
+  /** Current collection length. */
   readonly length: number;
-  /** Property `errors`. */
+  /** Collection-level errors. */
   readonly errors: readonly string[];
-  /** Property `error`. */
+  /** First collection-level error. */
   readonly error: string | undefined;
-  /** Property `minItems`. */
+  /** Minimum item count constraint. */
   readonly minItems?: number;
-  /** Property `maxItems`. */
+  /** Maximum item count constraint. */
   readonly maxItems?: number;
-  /** Property `errorId`. */
+  /** DOM id for the collection error element. */
   readonly errorId: string;
-  /** Property `descriptionId`. */
+  /** DOM id for the collection description element. */
   readonly descriptionId: string;
-  /** Property `errorProps`. */
+  /** Props for the collection error element. */
   readonly errorProps: ErrorProps;
-  /** Property `descriptionProps`. */
+  /** Props for the collection description element. */
   readonly descriptionProps: DescriptionProps;
+  /** Build props for an add-item intent button. */
   addButtonProps(opts?: { defaultValue?: Partial<TItem> }): IntentButtonProps;
+  /** Build props for a remove-item intent button. */
   removeButtonProps(index: number): IntentButtonProps;
+  /** Build props for a reorder-item intent button. */
   reorderButtonProps(from: number, to: number): IntentButtonProps;
+  /** Build props for a duplicate-item intent button. */
   duplicateButtonProps(index: number): IntentButtonProps;
 }
 
-/** JSDoc for exported type `FieldDescriptorMap`. */
+/** Field descriptors keyed by form value path. */
 export type FieldDescriptorMap<T> = {
   [K in keyof T & string]: T[K] extends Array<infer U>
     ? CollectionDescriptor<U> & FieldDescriptor<T[K]>
@@ -522,159 +540,165 @@ export type FieldDescriptorMap<T> = {
     : FieldDescriptor<T[K]>;
 };
 
-/** JSDoc for exported interface `RuntimeFormState`. */
+/** Runtime state passed to a form layer component. */
 export interface RuntimeFormState<TValues extends FormValues> {
-  /** Property `id`. */
+  /** Stable form id. */
   readonly id: string;
-  /** Property `action`. */
+  /** Submission URL. */
   readonly action: string;
-  /** Property `method`. */
+  /** HTTP method used by the form. */
   readonly method: 'POST' | 'PUT' | 'PATCH';
-  /** Property `values`. */
+  /** Current form values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial form values used to compute dirty state. */
   readonly initialValues: Partial<TValues>;
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Form-level validation errors. */
   readonly formErrors: readonly string[];
-  /** Property `hasErrors`. */
+  /** Whether the form currently has any errors. */
   readonly hasErrors: boolean;
-  /** Property `submitted`. */
+  /** Whether a submission has been processed. */
   readonly submitted: boolean;
-  /** Property `intent`. */
+  /** Parsed submit intent, when present. */
   readonly intent: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token for the rendered form. */
   readonly csrfToken: string;
-  /** Property `fields`. */
+  /** Field descriptors keyed by form value path. */
   readonly fields: FieldDescriptorMap<TValues>;
-  /** Property `constraints`. */
+  /** HTML constraints keyed by field path. */
   readonly constraints: Record<string, FieldConstraints>;
-  /** Property `formProps`. */
+  /** Props for the root form element. */
   readonly formProps: FormElementProps;
-  /** Property `csrfInputProps`. */
+  /** Props for the hidden CSRF input. */
   readonly csrfInputProps: FormCsrfInputProps;
 }
 
-/** JSDoc for exported interface `FormEnhancementSnapshot`. */
+/** Snapshot consumed by progressive enhancement code for one form. */
 export interface FormEnhancementSnapshot<TValues extends FormValues> {
-  /** Property `id`. */
+  /** Stable form id. */
   readonly id: string;
-  /** Property `action`. */
+  /** Submission URL. */
   readonly action: string;
-  /** Property `method`. */
+  /** HTTP method used by the form. */
   readonly method: 'POST' | 'PUT' | 'PATCH';
-  /** Property `values`. */
+  /** Current form values. */
   readonly values: TValues;
-  /** Property `initialValues`. */
+  /** Initial values used to compute dirty state. */
   readonly initialValues: Partial<TValues>;
-  /** Property `fieldErrors`. */
+  /** Field-level validation errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Form-level validation errors. */
   readonly formErrors: readonly string[];
-  /** Property `hasErrors`. */
+  /** Whether the form currently has any errors. */
   readonly hasErrors: boolean;
-  /** Property `submitted`. */
+  /** Whether a submission has been processed. */
   readonly submitted: boolean;
-  /** Property `intent`. */
+  /** Parsed submit intent, when present. */
   readonly intent: FormIntent | null;
-  /** Property `submissionId`. */
+  /** Stable submission id. */
   readonly submissionId: string;
-  /** Property `csrfToken`. */
+  /** CSRF token for the rendered form. */
   readonly csrfToken: string;
-  /** Property `constraints`. */
+  /** HTML constraints keyed by field path. */
   readonly constraints: Record<string, FieldConstraints>;
-  /** Property `formProps`. */
+  /** Props for the root form element. */
   readonly formProps: FormElementProps;
-  /** Property `csrfInputProps`. */
+  /** Props for the hidden CSRF input. */
   readonly csrfInputProps: FormCsrfInputProps;
 }
 
-/** JSDoc for exported type `FormCollectionStrategyMode`. */
+/** Progressive enhancement strategy for collection fields. */
 export type FormCollectionStrategyMode = 'server' | 'client' | 'hybrid';
 
-/** JSDoc for exported interface `FormCollectionStrategy`. */
+/** Client/server ownership policy for a collection field. */
 export interface FormCollectionStrategy {
-  /** Property `mode`. */
+  /** Strategy mode. */
   readonly mode: FormCollectionStrategyMode;
-  /** Property `partial`. */
+  /** Partial route used for collection updates. */
   readonly partial?: string;
-  /** Property `clientNav`. */
+  /** Whether client navigation is enabled for collection updates. */
   readonly clientNav?: boolean;
 }
 
-/** JSDoc for exported interface `FormEnhancementOptions`. */
+/** Options used to progressively enhance a rendered form. */
 export interface FormEnhancementOptions<TValues extends FormValues> {
-  /** Property `partial`. */
+  /** Partial route used for enhanced submissions. */
   readonly partial?: string;
-  /** Property `clientNav`. */
+  /** Whether Fresh client navigation handles enhanced submissions. */
   readonly clientNav?: boolean;
-  /** Property `validate`. */
+  /** Client validation timing. */
   readonly validate?: 'onSubmit' | 'onBlur' | 'onChange';
-  /** Property `schema`. */
+  /** Optional schema-like validator used before submission. */
   readonly schema?: {
+    /** Validate the given input. */
     safeParse(
-      /** Property `input`. */
       input: unknown,
     ):
       | { readonly success: true; readonly data: unknown }
       | { readonly success: false; readonly error: unknown };
   };
-  /** Property `focusOnError`. */
+  /** Whether invalid submission should focus the first errored control. */
   readonly focusOnError?: boolean;
-  /** Property `onSubmitStart`. */
+  /** Callback invoked before an enhanced submission starts. */
   readonly onSubmitStart?: () => void;
-  /** Property `onSubmitEnd`. */
+  /** Callback invoked after an enhanced submission settles. */
   readonly onSubmitEnd?: () => void;
-  /** Property `collections`. */
+  /** Collection-field enhancement strategies keyed by field name. */
   readonly collections?: Partial<Record<Extract<keyof TValues, string>, FormCollectionStrategy>>;
 }
 
-/** JSDoc for exported interface `EnhancedFormProps`. */
+/** Form element props after progressive enhancement handlers are attached. */
 export interface EnhancedFormProps extends FormElementProps {
+  /** Fresh client-navigation flag. */
   readonly 'f-client-nav'?: boolean;
+  /** Fresh partial route name. */
   readonly 'f-partial'?: string;
-  /** Property `onSubmit`. */
-  readonly onSubmit?: JSX.GenericEventHandler<HTMLFormElement>;
-  /** Property `onBlurCapture`. */
-  readonly onBlurCapture?: JSX.FocusEventHandler<HTMLFormElement>;
-  /** Property `onInputCapture`. */
-  readonly onInputCapture?: JSX.GenericEventHandler<HTMLFormElement>;
-  /** Property `ref`. */
+  /** Enhanced submit handler. */
+  readonly onSubmit?: (event: Event) => void;
+  /** Enhanced blur-capture handler. */
+  readonly onBlurCapture?: (event: FocusEvent) => void;
+  /** Enhanced input-capture handler. */
+  readonly onInputCapture?: (event: Event) => void;
+  /** Form element ref callback. */
   readonly ref?: (element: HTMLFormElement | null) => void;
 }
 
-/** JSDoc for exported interface `FormEnhancementState`. */
+/** Runtime state returned by the progressive form enhancement hook. */
 export interface FormEnhancementState<TValues extends FormValues> {
-  /** Property `pending`. */
+  /** Whether an enhanced submission is pending. */
   readonly pending: boolean;
-  /** Property `formProps`. */
+  /** Enhanced props for the form element. */
   readonly formProps: EnhancedFormProps;
-  /** Property `fieldErrors`. */
+  /** Current client-side field errors. */
   readonly fieldErrors: FormFieldErrors<TValues>;
-  /** Property `formErrors`. */
+  /** Current client-side form errors. */
   readonly formErrors: readonly string[];
-  /** Property `collectionStrategies`. */
+  /** Collection strategies keyed by field name. */
   readonly collectionStrategies: Partial<
     Record<Extract<keyof TValues, string>, FormCollectionStrategy>
   >;
+  /** Submit the form with an optional intent. */
   submit(intent?: FormIntent): void;
 }
 
-/** JSDoc for exported interface `FormReplyHelpers`. */
+/** Factory helpers for constructing typed form submission results. */
 export interface FormReplyHelpers<TValues extends FormValues, TOutput = unknown> {
+  /** Create an initial form state. */
   initial(
-    /** Property `init`. */
     init: FormReplyInit<TValues> & { readonly initialValues?: Partial<TValues> },
   ): FormSubmissionInitialResult<TValues>;
+  /** Create an invalid form state. */
   invalid(init: InvalidFormReplyInit<TValues>): FormSubmissionInvalidResult<TValues>;
+  /** Create a successful form state. */
   success(
-    /** Property `init`. */
     init: SuccessFormReplyInit<TValues, TOutput>,
   ): FormSubmissionSuccessResult<TValues, TOutput>;
+  /** Create an errored form state. */
   error(init: ErrorFormReplyInit<TValues>): FormSubmissionErrorResult<TValues>;
+  /** Create a redirect form state. */
   redirect(init: RedirectFormReplyInit<TValues>): FormSubmissionRedirectResult<TValues>;
 }
 

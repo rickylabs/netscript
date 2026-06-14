@@ -34,3 +34,7 @@ Plan (design.md § oRPC/contracts alignment) proposes redefining the public type
 `ContractSchema<T>` from `@netscript/contracts`, with Zod kept as an internal implementation
 adapter. This is a type-level narrowing, not a runtime change; consumer compatibility is the
 consumer-import gate (slice 22).
+
+## D-5d3-006 - 5d2 merge superseded stale builder probes
+
+The pre-5d2 5d3 branch contained failed-agent probe tests under builders/define-page/alias_test.ts and zod_compat_test.ts. After syncing the evaluated 5d2 builder decomposition, those probes failed type-check and were not present on the supervisor branch, so the sync removes them. Route doc-lint remains open for 5d3 slices.

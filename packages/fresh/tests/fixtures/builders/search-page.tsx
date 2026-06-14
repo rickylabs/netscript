@@ -1,0 +1,10 @@
+import { definePage } from '../../../builders/mod.ts';
+import { paginationSearchSchema } from '../../../builders/define-page/mod.ts';
+
+const page = definePage<{ requestId: string }>()
+  .withSearchParams(paginationSearchSchema({ defaultLimit: 5, defaultSort: 'name' }))
+  .withLayout((_slots, { search }) => <main>search:{search.page}:{search.limit}</main>)
+  .build({ routePattern: '/playground/builders/search-page' });
+
+export const handler = page.handler;
+export default page.default;

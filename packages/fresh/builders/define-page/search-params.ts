@@ -6,7 +6,7 @@ import type {
   SearchParamValue,
 } from './types.ts';
 
-/** Base shape required for pagination search parameters. */
+/** @internal */
 export type PaginationSearchBaseShape = {
   page: z.ZodType<number>;
   limit: z.ZodType<number>;
@@ -14,7 +14,7 @@ export type PaginationSearchBaseShape = {
   sortOrder: z.ZodType<'asc' | 'desc'>;
 };
 
-/** Shape accepted by {@link PaginationSearchSchema}. */
+/** @internal */
 export type PaginationSearchShape = z.ZodRawShape & PaginationSearchBaseShape;
 type PaginationSearchComputedInput<TShape extends PaginationSearchShape> =
   & z.output<z.ZodObject<TShape>>
@@ -22,13 +22,15 @@ type PaginationSearchComputedInput<TShape extends PaginationSearchShape> =
     page: number;
     limit: number;
   };
-/** Output type produced by {@link PaginationSearchSchema}. */
+/** @internal */
 export type PaginationSearchOutput<TShape extends PaginationSearchShape> =
   & z.output<z.ZodObject<TShape>>
   & PaginationSearchState;
 
-/** search Params To Input. */
-export function searchParamsToInput(searchParams: URLSearchParams): Record<string, SearchParamValue> {
+/** @internal */
+export function searchParamsToInput(
+  searchParams: URLSearchParams,
+): Record<string, SearchParamValue> {
   const input: Record<string, SearchParamValue> = {};
 
   for (const key of searchParams.keys()) {
@@ -52,21 +54,17 @@ function addPaginationOffset<TData extends { page: number; limit: number }>(
   };
 }
 
-/** Pagination Search Schema implementation. */
+/** @internal */
 export class PaginationSearchSchema<TShape extends PaginationSearchShape> implements
   SchemaLike<
     Record<string, SearchParamValue>,
     PaginationSearchOutput<TShape>
   > {
-  /** The _input. */
   declare readonly _input: Record<string, SearchParamValue>;
-  /** The _output. */
   declare readonly _output: PaginationSearchOutput<TShape>;
 
-  /** constructor. */
   constructor(private readonly schema: z.ZodObject<TShape>) {}
 
-  /** extend. */
   extend<TAugmentation extends z.ZodRawShape>(
     shape: TAugmentation,
   ): PaginationSearchSchema<TShape & TAugmentation> {
@@ -75,14 +73,12 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
     );
   }
 
-  /** safe Extend. */
   safeExtend<TAugmentation extends z.ZodRawShape>(
     shape: TAugmentation,
   ): PaginationSearchSchema<TShape & TAugmentation> {
     return this.extend(shape);
   }
 
-  /** safe Parse. */
   safeParse(input: Record<string, SearchParamValue>):
     | { success: true; data: PaginationSearchOutput<TShape> }
     | { success: false; error?: unknown } {
@@ -100,14 +96,12 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
     };
   }
 
-  /** parse. */
   parse(input: Record<string, SearchParamValue>): PaginationSearchOutput<TShape> {
     return addPaginationOffset(
       this.schema.parse(input) as PaginationSearchComputedInput<TShape>,
     ) as PaginationSearchOutput<TShape>;
   }
 
-  /** Asynchronously parses search parameters and returns either the parsed pagination output or a failure result. */
   async safeParseAsync(input: Record<string, SearchParamValue>): Promise<
     | { success: true; data: PaginationSearchOutput<TShape> }
     | { success: false; error?: unknown }
@@ -126,7 +120,6 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
     };
   }
 
-  /** Asynchronously parses search parameters into the pagination output shape. */
   async parseAsync(
     input: Record<string, SearchParamValue>,
   ): Promise<PaginationSearchOutput<TShape>> {
@@ -136,7 +129,7 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
   }
 }
 
-/** fallback. */
+/** @internal */
 export function fallback<TSchema extends z.ZodType>(
   schema: TSchema,
   defaultValue: z.output<TSchema>,
@@ -144,7 +137,7 @@ export function fallback<TSchema extends z.ZodType>(
   return schema.catch(defaultValue);
 }
 
-/** pagination Search Schema. */
+/** @internal */
 export function paginationSearchSchema(
   options: PaginationSearchSchemaOptions = {},
 ): PaginationSearchSchema<PaginationSearchBaseShape> {
