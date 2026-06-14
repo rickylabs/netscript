@@ -607,6 +607,28 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | `deno check --unstable-kv packages/fresh/form/mod.ts packages/fresh/builders/mod.ts` | PASS |
 | `deno publish --dry-run --allow-dirty` from `packages/fresh` | PASS |
 
+## 2026-06-14 slice 27 — closeout artifacts
+
+**Files changed:**
+
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/context-pack.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/worklog.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/commits.md`
+
+**Implementation:**
+
+- Updated the context pack with final Slice 26 state, latest pushed head before closeout, and
+  evaluator handoff caveat for D-5d2-15.
+- Left drift ledger unchanged in this slice; D-5d2-15 already records the root architecture baseline
+  failure from Slice 25.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `git status --short --branch` | PASS: clean before Slice 27 artifact edits; branch matched origin at `12e8068` |
+| Supervisor review | pending: separate IMPL-EVAL session |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

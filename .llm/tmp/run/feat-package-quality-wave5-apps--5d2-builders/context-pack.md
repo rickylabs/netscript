@@ -6,14 +6,18 @@
 | -------------- | ---------------------------------------------------- |
 | Run ID         | `feat-package-quality-wave5-apps--5d2-builders`      |
 | Branch         | `feat/package-quality-wave5-apps-5d2-builders`       |
-| Current phase  | `implement` — Slice 24 complete, Slice 25 next      |
+| Current phase  | `implement` — Slice 26 complete, Slice 27 closeout next |
 | Archetype      | A3 Runtime/Behavior + A4 DSL/Builder + SCOPE-frontend |
 | Scope overlays | frontend                                             |
 
 ## Current State
 
-Slices 1 through 24 are complete. The branch is clean at the latest pushed head after each committed
-slice when publication succeeds.
+Slices 1 through 26 are complete and pushed. Latest pushed head before closeout is
+`12e8068 chore(harness): record slice 26 commit`.
+
+Slice 25 recorded root `deno task arch:check` as a repo-wide baseline failure and closed the
+builders-local architecture evidence with passing scoped gates. Slice 26 closed final builders/form
+doc-lint and package publish dry-run.
 
 ## Completed
 
@@ -210,6 +214,21 @@ slice when publication succeeds.
 
 ## Commits
 
-- Pending: commit of revised `design.md`, `plan.md`, `drift.md`, `context-pack.md`, `worklog.md`.
+- Latest pushed head before Slice 27 closeout: `12e8068`.
+- Pending: Slice 27 closeout artifact commit.
 - 0b30d11: test(fresh): snapshot builders public surface
 - b01ec31: fix(fresh): document form builder surface
+
+## Closeout Handoff
+
+**Status:** implementation complete through Slice 26; Slice 27 artifact closeout in progress.
+
+**Latest pushed head before closeout:** `12e8068`.
+
+**Ready for separate IMPL-EVAL after Slice 27 commit/push:** yes, with one explicit caveat:
+root `deno task arch:check` remains a repo-wide baseline failure recorded as D-5d2-15. Scoped
+builders check, lint, fmt, doctrine scan, tests, final doc-lint, and `packages/fresh` publish
+dry-run pass.
+
+**Do not run unless supervisor asks:** full scaffold runtime E2E
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty`.
