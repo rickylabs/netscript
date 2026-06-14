@@ -12,3 +12,4 @@ Append-only hash record (repo + hash + subject).
 | `7ed51f5` | [5d5] Slice 4 split schema adapter |
 | `fb58a7d` | [5d5] Slice 5 verify return types |
 | `2e790c5` | [5d5] Slice 6 public export sweep |
+| `91e8e17` | [5d5] Slice 7 align form telemetry |

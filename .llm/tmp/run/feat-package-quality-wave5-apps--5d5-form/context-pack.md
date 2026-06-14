@@ -191,3 +191,4 @@
 - `fb58a7d`: [5d5] Slice 5 verify return types
 - `2e790c5`: [5d5] Slice 6 public export sweep
 - `43be65f`: [5d5] Record slice 6 commit
+- `91e8e17`: [5d5] Slice 7 align form telemetry
