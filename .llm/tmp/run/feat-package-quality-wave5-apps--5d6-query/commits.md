@@ -6,3 +6,4 @@ Append-only hash record (repo + hash + subject).
 - 64dcc0f: Merge 5d supervisor after 5d5 form
 - `11bbc73`: docs(5d6): rebaseline query implementation start
 - `7d4e10b`: feat(fresh): wrap query public surface
+- `7599cca`: fix(fresh): expose server streaming types
