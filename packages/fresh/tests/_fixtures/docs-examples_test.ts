@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { definePage } from '../../builders/mod.ts';
 import { defineRouteContract } from '../../route/mod.ts';
-import { createMockDeferPolicy, createMockRouteContext } from '../../testing.ts';
+import { createMockDeferPolicy, createMockRouteContext } from '../../src/testing/mod.ts';
 
 Deno.test('README quick-start symbols are importable', () => {
   const route = defineRouteContract().bind('/orders');

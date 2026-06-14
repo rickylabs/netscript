@@ -1,5 +1,5 @@
 import { definePage } from '../../../builders/mod.ts';
-import { paginationSearchSchema } from '../../../builders/define-page/mod.ts';
+import { paginationSearchSchema } from '../../../src/application/builders/define-page/mod.ts';
 
 const page = definePage<{ requestId: string }>()
   .withSearchParams(paginationSearchSchema({ defaultLimit: 5, defaultSort: 'name' }))

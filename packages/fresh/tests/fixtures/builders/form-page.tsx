@@ -1,5 +1,5 @@
 import { definePage } from '../../../builders/mod.ts';
-import type { RuntimeFormState } from '../../../form/mod.ts';
+import type { RuntimeFormState } from '../../../src/application/form/mod.ts';
 import { z } from 'zod';
 
 const schema = z.object({ name: z.string().min(1) });

@@ -15,7 +15,7 @@ export {
   type ErrorDisplayContent,
   type ErrorDisplayProps,
   type ErrorPrimitives,
-} from './error/mod.ts';
+} from './src/diagnostics/error/mod.ts';
 export {
   type ErrorData,
   errorHandler,
@@ -24,11 +24,11 @@ export {
   extractErrorData,
   hasError,
   type LoaderResult,
-} from './error/mod.ts';
+} from './src/diagnostics/error/mod.ts';
 export {
   type CachedListEntryLike,
   type CacheEntryLike,
   hasAllCacheEntries,
   minCachedAt,
   projectCachedItemFromList,
-} from './utils/mod.ts';
+} from './src/application/cache-entries/mod.ts';
