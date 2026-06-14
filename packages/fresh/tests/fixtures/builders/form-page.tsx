@@ -13,7 +13,7 @@ const page = definePage<{ requestId: string }>()
     schema,
     csrf: false,
     initial: () => ({ name: 'Ada' }),
-    mutate: async (input) => ({ greeting: `Hello ${input.name}` }),
+    mutate: (input) => ({ greeting: `Hello ${input.name}` }),
   })
   .withLayout((slots) => <main>{slots.form()}</main>)
   .build({ routePattern: '/playground/builders/form-page' });

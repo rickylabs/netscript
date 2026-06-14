@@ -6,7 +6,7 @@
 - PR: `https://github.com/rickylabs/netscript/pull/39`
 - Agent role: implementation agent only; final IMPL-EVAL must be separate.
 - PLAN-EVAL: `APPROVED` in `plan-eval.md`.
-- Latest completed implementation slice: Slice 5 whole public-surface doc-lint rebaseline.
+- Latest completed implementation slice: Slice 6 package fmt/lint cleanup.
 
 ## Rebaseline Summary
 
@@ -15,8 +15,7 @@
 - Targeted `deno check --unstable-kv` for query/server/root passes.
 - Package check wrapper passes for `packages/fresh`.
 - Remaining expected failures:
-  - scoped fmt: existing server `define-fresh-app` files need formatting.
-  - package scoped lint: two builder fixture `require-await` findings remain from the rebaseline; the query `JSX` unused import was fixed in Slice 2.
+  - root wrappers may still exclude `packages/fresh`; Slice 7 should rebaseline root tasks and adjust only if needed.
 
 ## Slice 2 Summary
 
@@ -52,6 +51,12 @@
 - Package-wide lint still reports `require-await` in two builder fixtures.
 - Planned whole-package doc-lint cleanup is retired for the current implementation state; final closeout should still rerun it after remaining source slices.
 
+## Slice 6 Summary
+
+- Package-wide fmt, lint, check, public doc-lint, and dry-run all pass for current `packages/fresh` source.
+- Targeted server define-fresh-app and builder partial tests pass.
+- No lockfile churn observed.
+
 ## Next Slice
 
-Clean the narrow package fmt/lint residuals, then continue final root/package quality closeout.
+Rebaseline root check/fmt/lint wrappers and adjust root package inclusion only if required.

@@ -158,3 +158,28 @@ Rebaseline whole public-entrypoint doc-lint across the 13 package exports and re
 ### Next slice
 
 Clean the narrow package fmt/lint residuals: format `server/define-fresh-app*` and remove unnecessary `async` from the two builder fixtures, then rerun package scoped fmt/lint/check.
+
+## 2026-06-14 - Slice 6 - Package fmt/lint cleanup
+
+- Changed `packages/fresh/server/define-fresh-app.ts` and `packages/fresh/server/define-fresh-app.test.ts` with formatter-only edits.
+- Changed builder fixture callbacks in `packages/fresh/tests/fixtures/builders/form-page.tsx` and `partial-page.tsx` to satisfy lint while preserving the typed async loader contract for `definePartial`.
+
+### Slice 6 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Package fmt wrapper | PASS | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx --ignore-line-endings` |
+| Package lint wrapper | PASS | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` |
+| Package check wrapper | PASS | `run-deno-check.ts --root packages/fresh --ext ts,tsx` |
+| Package public doc-lint | PASS | `(cd packages/fresh && deno task doc-lint)` |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+| Targeted tests | PASS | `(cd packages/fresh && deno test --allow-all server/define-fresh-app.test.ts builders/define-partial.test.tsx)` |
+
+### Residual risk
+
+- `partial-page.tsx` keeps an async loader because the `definePartial` contract expects a promise-returning loader; it awaits a resolved fixture value to satisfy `require-await`.
+- Package-wide check/lint/fmt/doc-lint/dry-run now pass for current source state.
+
+### Next slice
+
+Rebaseline root `deno task check`, `deno task fmt:check`, and `deno task lint` now that package-local quality gates are clean, then adjust root package inclusion only if the wrappers still exclude `packages/fresh` in a way that masks this package.

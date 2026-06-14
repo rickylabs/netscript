@@ -1,4 +1,4 @@
-import { App, staticFiles, type FreshConfig, type Middleware } from 'fresh';
+import { App, type FreshConfig, type Middleware, staticFiles } from 'fresh';
 // Server-only: register the KV-backed cache provider so that SDK
 // query-factory and composite-query cache methods work automatically.
 // This import is safe here because defineFreshApp is never bundled for
