@@ -16,6 +16,7 @@
 
 import { QueryClient } from '@tanstack/query-core';
 import { DEFAULT_GC_TIME, DEFAULT_STALE_TIME } from '@netscript/sdk/query-client';
+import type { IslandQueryClient } from './query-types.ts';
 
 let islandQueryClient: QueryClient | undefined;
 
@@ -30,7 +31,7 @@ let islandQueryClient: QueryClient | undefined;
  * const queryClient = getIslandQueryClient();
  * ```
  */
-export function getIslandQueryClient(): QueryClient {
+export function getIslandQueryClient(): IslandQueryClient {
   if (!islandQueryClient) {
     islandQueryClient = new QueryClient({
       defaultOptions: {
@@ -45,7 +46,7 @@ export function getIslandQueryClient(): QueryClient {
       },
     });
   }
-  return islandQueryClient;
+  return islandQueryClient as IslandQueryClient;
 }
 
 /**

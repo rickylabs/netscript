@@ -705,6 +705,10 @@ function createWithFormHandler<
         }),
       };
     } catch (error: unknown) {
+      console.error('withForm submit failed', {
+        error: error instanceof Error ? error : new Error(String(error)),
+      });
+
       await emitFormError(
         spanName,
         'mutate',
