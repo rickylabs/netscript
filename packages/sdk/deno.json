@@ -5,18 +5,18 @@
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
-    "./cache": "./cache/mod.ts",
-    "./client": "./client/mod.ts",
-    "./collections": "./collections/mod.ts",
-    "./discovery": "./discovery/mod.ts",
-    "./ports": "./ports/mod.ts",
-    "./query": "./query/mod.ts",
-    "./query-client": "./query-client/mod.ts",
-    "./streams": "./streams.ts",
-    "./telemetry": "./telemetry/mod.ts"
+    "./cache": "./src/cache/mod.ts",
+    "./client": "./src/client/mod.ts",
+    "./collections": "./src/collections/mod.ts",
+    "./discovery": "./src/discovery/mod.ts",
+    "./ports": "./src/ports/mod.ts",
+    "./query": "./src/query/mod.ts",
+    "./query-client": "./src/query-client/mod.ts",
+    "./streams": "./src/streams.ts",
+    "./telemetry": "./src/telemetry/mod.ts"
   },
   "tasks": {
-    "check": "deno check --unstable-kv ./mod.ts ./cache/mod.ts ./client/mod.ts ./collections/mod.ts ./discovery/mod.ts ./ports/mod.ts ./query/mod.ts ./query-client/mod.ts ./streams.ts ./telemetry/mod.ts",
+    "check": "deno check --unstable-kv ./mod.ts ./src/cache/mod.ts ./src/client/mod.ts ./src/collections/mod.ts ./src/discovery/mod.ts ./src/ports/mod.ts ./src/query/mod.ts ./src/query-client/mod.ts ./src/streams.ts ./src/telemetry/mod.ts",
     "test": "deno test --allow-all ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt --check",

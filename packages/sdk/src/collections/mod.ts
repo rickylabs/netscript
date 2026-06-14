@@ -21,4 +21,4 @@ export {
   type QueryCollectionTransaction,
   type QueryCollectionUpdate,
   type QueryCollectionUpdateMany,
-} from '../src/collections/create-query-collection.ts';
+} from './create-query-collection.ts';

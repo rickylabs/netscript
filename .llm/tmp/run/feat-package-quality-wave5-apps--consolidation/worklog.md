@@ -66,3 +66,23 @@ reference which leads with an explicit role/archetype section. `docs/architectur
 declared the archetype.
 Validation: `deno doc --lint packages/service/mod.ts` EXIT=0; `deno publish --dry-run --allow-dirty`
 EXIT=0. **Phase A complete.**
+
+### B3 — sdk barrel collapse (src/ as only source root) — DONE
+Collapsed the 8 root barrel folders (`cache/`, `client/`, `collections/`, `discovery/`, `ports/`,
+`query/`, `query-client/`, `telemetry/`) and root `streams.ts` into `src/`, matching the wave-2/3
+`plugin` reference (subpaths resolve to `./src/<role>/mod.ts`; only `mod.ts`/`README`/`deno.json`
+remain at root).
+- Created `src/{cache,client,collections,ports,query,query-client,telemetry}/mod.ts` (curated public
+  barrels, paths rewritten src-relative). `src/cache/mod.ts` preserves the cache-provider
+  auto-registration side-effect.
+- `discovery`: the existing `src/discovery/mod.ts` impl-barrel was replaced with the curated public
+  barrel (the extra env-key builders it exported are unused outside `src/discovery/` and were never in
+  the public `./discovery` surface — net public surface unchanged).
+- `git mv streams.ts src/streams.ts`; `git rm -r` the 8 root folders.
+- Repointed `mod.ts` internal re-exports and `deno.json` `exports` + `check` task into `src/`.
+  **Subpath keys unchanged** → verified all 10 consumed specifiers (`@netscript/sdk`,`/cache`,`/client`,
+  `/collections`,`/discovery`,`/ports`,`/query`,`/query-client`,`/streams`,`/telemetry`) across cli,
+  fresh, queue, plugin-streams-core still resolve. Zero consumer edits.
+Validation: `deno task check` EXIT=0; `deno task test` 14/14; `deno lint` clean; `deno fmt` applied;
+`deno publish --dry-run` EXIT=0; full-export `deno doc --lint` (10 files) EXIT=0. **Phase B complete**
+(B1/B2 deferred — see drift).

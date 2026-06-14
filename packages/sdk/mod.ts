@@ -34,9 +34,9 @@
  * @module
  */
 
-export * from './cache/mod.ts';
-export * from './client/mod.ts';
-export * from './discovery/mod.ts';
+export * from './src/cache/mod.ts';
+export * from './src/client/mod.ts';
+export * from './src/discovery/mod.ts';
 export {
   type DefinedServiceClients,
   type DefinedServiceQueries,
@@ -47,9 +47,9 @@ export {
   type DefineServicesConfigMap,
 } from './src/presets/define-services.ts';
 export * from './src/openapi/helpers.ts';
-export * from './query/mod.ts';
-export * from './query-client/mod.ts';
-export * from './telemetry/mod.ts';
+export * from './src/query/mod.ts';
+export * from './src/query-client/mod.ts';
+export * from './src/telemetry/mod.ts';
 export type {
   CacheKey,
   CacheStore,
@@ -62,4 +62,4 @@ export type {
   ServiceMetadata,
   ServiceQueryUtils,
   ServiceTransport,
-} from './ports/mod.ts';
+} from './src/ports/mod.ts';

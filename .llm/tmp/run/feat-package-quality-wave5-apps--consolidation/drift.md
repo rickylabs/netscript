@@ -22,6 +22,23 @@ would invent structure that isn't there. Shipped instead: `service-builder.ts` (
 lifecycle) — split along real seams. Same doctrine outcome (no file > ceiling, complexity isolated,
 public surface unchanged). No re-plan needed.
 
+## 2026-06-14 — Phase B narrowed to B3 (barrel collapse); B1/B2 deferred (significant)
+Plan B1 (gather adapters into `src/adapters/`) and B2 (split `src/domain/` + `src/application/`)
+were **not executed**. Reason, from live inspection:
+- The three "adapters" (`kv-cache-store.ts`, `http-client-link.ts`, `kv-cache-persister.ts`) are each
+  tightly coupled to a sibling in their feature folder (`cache-query.ts`↔`kv-cache-store.ts`,
+  `service-client.ts`↔`http-client-link.ts`). A global `src/adapters/` folder would break that
+  co-location and *reduce* cohesion — over-abstraction under KISS / doctrine "co-locate what changes
+  together". The port seams already exist in `src/ports/` (the user's "ports" ask is satisfied).
+- `src/` feature folders (`cache`, `client`, `query`, `query-client`, `discovery`, `collections`,
+  `telemetry`, `ports`, `presets`, `openapi`) are already cohesive and role-correct; forcing a
+  domain/application/adapters re-slice is churn without a maintainability win.
+The genuine doctrine drift was the **root barrel duplication** (exports pointed at root folders, not
+`src/` like the `plugin` reference). B3 fixed exactly that: 8 root barrel folders + `streams.ts`
+collapsed into `src/`, exports repointed, subpath keys unchanged (zero consumer break). Recorded so
+the evaluator sees B1/B2 omission as a reasoned KISS decision, not a gap. Revisit if a second concrete
+adapter per port ever lands.
+
 ## 2026-06-14 — user requested base classes; doctrine realizes seams as ports (architectural)
 User asked for "abstract class for public facing seams, base class with implements and adapters and
 ports." Doctrine 03 (A4/A5) forbids base classes without ≥ 2 concrete subtypes and routes

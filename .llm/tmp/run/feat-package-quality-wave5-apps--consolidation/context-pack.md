@@ -28,7 +28,7 @@ rationalized (D6) with all consumers/CLI-templates/tests updated atomically.
 
 ## Status
 - [x] Bootstrap run + artifacts (research, consolidation-plan, worklog+Design, drift, commits, this).
-- [ ] Phase A (service) — A1 split builder, A2 docs/archetype.
+- [x] Phase A (service) — A1 split builder (a0e5bcc), A2 docs/archetype (e67edf1). DONE.
 - [ ] Phase B (sdk) — B1 adapters, B2 domain/application, B3 delete barrels + repoint exports.
 - [ ] Phase C (fresh-ui) — C1 src/ wrap, C2 manifest split + A4 label.
 - [ ] Phase D (fresh) — D1 utils kill, D2 builders, D3 route, D4 form, D5 streaming, D6 surface.
