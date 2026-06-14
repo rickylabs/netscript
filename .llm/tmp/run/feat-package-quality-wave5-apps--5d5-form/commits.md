@@ -8,3 +8,4 @@ Append-only hash record (repo + hash + subject).
 | `3ae538cdd07ef49b5b27fc97db859ad29791ce27` | (amend) added commits.md hash record |
 | `0977ce5dc9aefe413fbaeb60c52275b4f49c9005` | [5d5] Slice 1 form docs baseline |
 | `4e3c0bcbf34692e55a03674628172d82abe95197` | [5d5] Slice 2 split form types |
+| `c283d4b` | [5d5] Slice 3 split field descriptors |
