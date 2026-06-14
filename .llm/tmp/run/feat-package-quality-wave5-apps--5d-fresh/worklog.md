@@ -78,3 +78,11 @@
 - Merged evaluated PR #36 branch `feat/package-quality-wave5-apps-5d3-route` at evaluator commit `7056c02` into `feat/package-quality-wave5-apps-5d-fresh` with merge commit `c3ef016`.
 - Separate IMPL-EVAL verdict: PASS, recorded in `.llm/tmp/run/feat-package-quality-wave5-apps--5d3-route/evaluate.md` and PR #36 comment `4700304548`.
 - Merge gates: public route `deno doc --lint` PASS; scoped route+builders check/lint/fmt PASS 0 findings; `deno test --allow-all packages/fresh/route packages/fresh/builders` PASS 52/0; `packages/fresh` `deno task dry-run` PASS.
+
+## 2026-06-14 - 5d5 form merged into supervisor
+
+- Merged evaluated PR #38 branch `feat/package-quality-wave5-apps-5d5-form` at evaluator commit `40693c9` into `feat/package-quality-wave5-apps-5d-fresh` with merge commit `8a3298d`.
+- Separate IMPL-EVAL verdict: PASS, recorded in `.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/evaluate.md`; supervisor confirmation posted to PR #38 as comment `4700478575`.
+- Merge gates from native WSL supervisor worktree passed: `deno doc --lint packages/fresh/form/mod.ts`; `deno check --unstable-kv packages/fresh/form/mod.ts`; scoped form check/fmt/lint wrappers; `deno test --allow-env --config packages/fresh/deno.json --unstable-kv packages/fresh/form` PASS 53/0; `packages/fresh` `deno task dry-run` PASS.
+- Accepted residual 5d5 drift remains explicit: D-5d5-1 root workspace check exclusion is 5d6/umbrella-owned, and D-5d5-2 optional fresh-ui/browser proof may be revisited during final integration.
+- 5d6 query is now the only remaining 5d dependency-chain subwave. Before launch, merge this updated supervisor branch into the 5d6 query worktree and require per-slice commit, push, and structured PR comments.
