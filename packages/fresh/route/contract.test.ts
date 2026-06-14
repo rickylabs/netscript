@@ -5,9 +5,6 @@ import {
   defineEnumPathParam,
   defineRouteContract,
   enumPathParamSchema,
-  getLinkProps,
-  type InferRoutePath,
-  pairRouteTargets,
   type InferRouteContractPath,
   type InferRouteContractSearch,
 } from './contract.ts';
@@ -39,18 +36,28 @@ Deno.test('defineEnumPathParam exposes values, schema, and parser together', () 
 Deno.test('bindRoutePattern preserves schemas alongside nav and route pattern', () => {
   const contract = defineRouteContract({
     pathSchema: enumPathParamSchema('section', ['overview', 'navigation', 'mutation']),
-    searchSchema: paginationSearchSchema({ defaultLimit: 3, defaultSort: 'freshness', defaultOrder: 'desc' }),
+    searchSchema: paginationSearchSchema({
+      defaultLimit: 3,
+      defaultSort: 'freshness',
+      defaultOrder: 'desc',
+    }),
   });
 
   const bound = bindRoutePattern(contract, '/dashboard/framework/wi-09/[section]');
-  const parsedPath = bound.pathSchema.safeParse({ section: 'mutation' });
+  const parsedPath = bound.pathSchema?.safeParse({ section: 'mutation' });
   const href = bound.nav.makeHref({
     path: { section: 'overview' },
     search: { page: 1, limit: 3, sortBy: 'freshness', sortOrder: 'desc' },
   });
 
-  assert(bound.routePattern === '/dashboard/framework/wi-09/[section]', 'Expected route pattern to be preserved');
-  assert(parsedPath.success && parsedPath.data.section === 'mutation', 'Expected bound path schema to remain available');
+  assert(
+    bound.routePattern === '/dashboard/framework/wi-09/[section]',
+    'Expected route pattern to be preserved',
+  );
+  assert(
+    parsedPath?.success && parsedPath.data.section === 'mutation',
+    'Expected bound path schema to remain available',
+  );
   assert(href.includes('/dashboard/framework/wi-09/overview'), `Unexpected href: ${href}`);
   assert(!('RouteLink' in bound.nav), 'Expected bound route nav to expose only makeHref');
   assert(!('getLinkProps' in bound.nav), 'Expected duplicate nav link helpers to be removed');
@@ -59,19 +66,25 @@ Deno.test('bindRoutePattern preserves schemas alongside nav and route pattern', 
 Deno.test('getLinkProps builds anchor props from a bound route contract target', () => {
   const contract = defineRouteContract({
     pathSchema: enumPathParamSchema('section', ['overview', 'navigation', 'mutation']),
-    searchSchema: paginationSearchSchema({ defaultLimit: 3, defaultSort: 'freshness', defaultOrder: 'desc' }),
+    searchSchema: paginationSearchSchema({
+      defaultLimit: 3,
+      defaultSort: 'freshness',
+      defaultOrder: 'desc',
+    }),
   });
 
   const bound = bindRoutePattern(contract, '/dashboard/framework/wi-09/[section]');
-  const linkProps = getLinkProps({
-    to: bound,
+  const linkProps = bound.getLinkProps({
     path: { section: 'navigation' },
     search: { page: 2, limit: 2, sortBy: 'duration', sortOrder: 'asc' },
     class: 'ns-link',
   });
   const url = new URL(linkProps.href, 'https://netscript.local');
 
-  assert(url.pathname === '/dashboard/framework/wi-09/navigation', `Unexpected href: ${linkProps.href}`);
+  assert(
+    url.pathname === '/dashboard/framework/wi-09/navigation',
+    `Unexpected href: ${linkProps.href}`,
+  );
   assert(url.searchParams.get('page') === '2', `Unexpected href: ${linkProps.href}`);
   assert(url.searchParams.get('limit') === '2', `Unexpected href: ${linkProps.href}`);
   assert(url.searchParams.get('offset') === '2', `Unexpected href: ${linkProps.href}`);
@@ -84,7 +97,11 @@ Deno.test('getLinkProps builds anchor props from a bound route contract target',
 Deno.test('bound route contract exposes getLinkProps directly', () => {
   const contract = defineRouteContract({
     pathSchema: enumPathParamSchema('section', ['overview', 'navigation', 'mutation']),
-    searchSchema: paginationSearchSchema({ defaultLimit: 3, defaultSort: 'freshness', defaultOrder: 'desc' }),
+    searchSchema: paginationSearchSchema({
+      defaultLimit: 3,
+      defaultSort: 'freshness',
+      defaultOrder: 'desc',
+    }),
   });
 
   const bound = bindRoutePattern(contract, '/dashboard/framework/wi-09/[section]');
@@ -94,29 +111,47 @@ Deno.test('bound route contract exposes getLinkProps directly', () => {
   });
   const url = new URL(linkProps.href, 'https://netscript.local');
 
-  assert(url.pathname === '/dashboard/framework/wi-09/mutation', `Unexpected href: ${linkProps.href}`);
+  assert(
+    url.pathname === '/dashboard/framework/wi-09/mutation',
+    `Unexpected href: ${linkProps.href}`,
+  );
   assert(url.searchParams.get('page') === '3', `Unexpected href: ${linkProps.href}`);
 });
 
 Deno.test('route contracts expose parse helpers for path params and URLSearchParams', () => {
   const contract = defineRouteContract({
     pathSchema: enumPathParamSchema('section', ['overview', 'navigation', 'mutation']),
-    searchSchema: paginationSearchSchema({ defaultLimit: 3, defaultSort: 'freshness', defaultOrder: 'desc' }),
+    searchSchema: paginationSearchSchema({
+      defaultLimit: 3,
+      defaultSort: 'freshness',
+      defaultOrder: 'desc',
+    }),
   });
   const bound = bindRoutePattern(contract, '/dashboard/framework/wi-09/[section]');
 
-  const parsedPath: InferRouteContractPath<typeof contract> = contract.parsePath({ section: 'navigation' });
+  const parsedPath: InferRouteContractPath<typeof contract> = contract.parsePath({
+    section: 'navigation',
+  });
   const parsedSearch: InferRouteContractSearch<typeof contract> = contract.parseSearch(
     new URLSearchParams('page=2&limit=2&sortBy=duration&sortOrder=asc'),
   );
   const invalidPath = contract.safeParsePath({ section: 'legacy' });
   const boundPath = bound.parsePath({ section: 'mutation' });
 
-  assert(parsedPath.section === 'navigation', `Unexpected parsed path: ${JSON.stringify(parsedPath)}`);
+  assert(
+    parsedPath.section === 'navigation',
+    `Unexpected parsed path: ${JSON.stringify(parsedPath)}`,
+  );
   assert(parsedSearch.page === 2, `Unexpected parsed page: ${JSON.stringify(parsedSearch)}`);
-  assert(parsedSearch.sortBy === 'duration', `Unexpected parsed search: ${JSON.stringify(parsedSearch)}`);
+  assert(
+    parsedSearch.sortBy === 'duration',
+    `Unexpected parsed search: ${JSON.stringify(parsedSearch)}`,
+  );
   assert(!invalidPath.success, 'Expected invalid path params to fail safe parsing');
-  assert(boundPath.section === 'mutation', `Unexpected bound parsed path: ${JSON.stringify(boundPath)}`);
+  assert(
+    boundPath.section === 'mutation',
+    `Unexpected bound parsed path: ${JSON.stringify(boundPath)}`,
+  );
 });
 
 Deno.test('getLinkProps fails loudly when path params do not satisfy the target contract', () => {
@@ -128,8 +163,7 @@ Deno.test('getLinkProps fails loudly when path params do not satisfy the target 
 
   let message = '';
   try {
-    getLinkProps({
-      to: bound,
+    bound.getLinkProps({
       path: { section: 'legacy' as 'overview' },
     });
   } catch (error: unknown) {
@@ -148,15 +182,17 @@ Deno.test('createRouteReference infers dynamic, catch-all, optional catch-all, a
   const optionalSplatRoute = createRouteReference('/docs/[[...slug]]');
   const staticRoute = createRouteReference('/dashboard/products');
 
-  const detailPath: InferRoutePath<typeof detailRoute> = { id: 'product-42' } as InferRoutePath<
+  const detailPath: InferRouteContractPath<typeof detailRoute> = {
+    id: 'product-42',
+  } as InferRouteContractPath<
     typeof detailRoute
   >;
   const splatPath = {
     admin: ['settings', 'users'] as const,
-  } as unknown as InferRoutePath<typeof splatRoute>;
+  } as unknown as InferRouteContractPath<typeof splatRoute>;
   const optionalSplatPath = {
     slug: ['guides', 'install'] as const,
-  } as unknown as InferRoutePath<typeof optionalSplatRoute>;
+  } as unknown as InferRouteContractPath<typeof optionalSplatRoute>;
 
   const detailHref = detailRoute.href({ path: detailPath });
   const splatHref = splatRoute.href({ path: splatPath });
@@ -166,24 +202,46 @@ Deno.test('createRouteReference infers dynamic, catch-all, optional catch-all, a
   const parsedOptionalSplat = optionalSplatRoute.parsePath({ slug: 'guides/install' });
   const staticHref = staticRoute.href();
 
-  assert(detailHref === '/dashboard/products/product-42/edit', `Unexpected detail href: ${detailHref}`);
+  assert(
+    detailHref === '/dashboard/products/product-42/edit',
+    `Unexpected detail href: ${detailHref}`,
+  );
   assert(splatHref === '/dashboard/settings/users', `Unexpected splat href: ${splatHref}`);
-  assert(parsedSplat.admin[0] === 'settings', `Unexpected parsed splat path: ${JSON.stringify(parsedSplat)}`);
-  assert(parsedSplat.admin[1] === 'users', `Unexpected parsed splat path: ${JSON.stringify(parsedSplat)}`);
-  assert(optionalSplatHref === '/docs/guides/install', `Unexpected optional splat href: ${optionalSplatHref}`);
-  assert(optionalSplatRootHref === '/docs', `Unexpected optional root href: ${optionalSplatRootHref}`);
+  assert(
+    parsedSplat.admin[0] === 'settings',
+    `Unexpected parsed splat path: ${JSON.stringify(parsedSplat)}`,
+  );
+  assert(
+    parsedSplat.admin[1] === 'users',
+    `Unexpected parsed splat path: ${JSON.stringify(parsedSplat)}`,
+  );
+  assert(
+    optionalSplatHref === '/docs/guides/install',
+    `Unexpected optional splat href: ${optionalSplatHref}`,
+  );
+  assert(
+    optionalSplatRootHref === '/docs',
+    `Unexpected optional root href: ${optionalSplatRootHref}`,
+  );
   assert(
     parsedOptionalSplat.slug?.join('/') === 'guides/install',
     `Unexpected parsed optional splat path: ${JSON.stringify(parsedOptionalSplat)}`,
   );
   assert(staticHref === '/dashboard/products', `Unexpected static href(): ${staticHref}`);
-  assert(staticRoute.$href === '/dashboard/products', `Unexpected static href: ${staticRoute.$href}`);
+  assert(
+    staticRoute.$href === '/dashboard/products',
+    `Unexpected static href: ${staticRoute.$href}`,
+  );
 });
 
 Deno.test('pairRouteTargets keeps page and partial hrefs aligned', () => {
   const pageRoute = bindRoutePattern(
     defineRouteContract({
-      searchSchema: paginationSearchSchema({ defaultLimit: 10, defaultSort: 'createdAt', defaultOrder: 'desc' }),
+      searchSchema: paginationSearchSchema({
+        defaultLimit: 10,
+        defaultSort: 'createdAt',
+        defaultOrder: 'desc',
+      }),
     }),
     '/dashboard/users',
   );
@@ -191,14 +249,20 @@ Deno.test('pairRouteTargets keeps page and partial hrefs aligned', () => {
     kind: 'partial',
   });
 
-  const paired = pairRouteTargets(pageRoute, partialRoute);
+  const paired = pageRoute.withPartial(partialRoute);
   const linkProps = paired.getLinkProps({
     search: { page: 2, limit: 20, sortBy: 'updatedAt', sortOrder: 'asc' },
     class: 'ns-link',
   });
 
   assert(linkProps.href.includes('/dashboard/users'), `Unexpected page href: ${linkProps.href}`);
-  assert(linkProps['f-partial'].includes('/partials/dashboard/users/list'), 'Expected partial href to target the partial route');
-  assert(linkProps['f-partial'].includes('page=2'), `Unexpected partial href: ${linkProps['f-partial']}`);
+  assert(
+    linkProps['f-partial'].includes('/partials/dashboard/users/list'),
+    'Expected partial href to target the partial route',
+  );
+  assert(
+    linkProps['f-partial'].includes('page=2'),
+    `Unexpected partial href: ${linkProps['f-partial']}`,
+  );
   assert(linkProps.class === 'ns-link', 'Expected paired link props to preserve anchor props');
 });

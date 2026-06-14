@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import type { z } from 'zod';
 import type { FormValues, RuntimeFormState } from '../../form/types.ts';
-import type { RouteReference } from '../../route/contract.ts';
+import type { RouteReference } from '../../route/_internal/contract-runtime.ts';
 import type { InferRoutePath, InferRouteSearch, TypedRouteTarget } from './navigation/mod.ts';
 import type {
   DefinePageRouteNavFor,

@@ -4,13 +4,12 @@
  * @module
  */
 
-import { z } from 'zod';
 import {
   bindRoutePattern as bindRoutePatternImpl,
   createRouteReference as createRouteReferenceImpl,
   defineRouteContract as defineRouteContractImpl,
   enumPathParamSchema as enumPathParamSchemaImpl,
-} from './contract.ts';
+} from './_internal/contract-runtime.ts';
 import {
   fallback as fallbackImpl,
   paginationSearchSchema as paginationSearchSchemaImpl,
@@ -113,17 +112,19 @@ export type InferRoutePatternPath<TRoutePattern extends string> = InferRoutePatt
 >;
 
 /** Strip a leading slash from a Fresh route pattern. */
-export type StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest : TPattern;
+export type StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest
+  : TPattern;
 
 /** Infer one typed path segment from a Fresh route pattern segment. */
-export type InferRoutePatternSegment<TSegment extends string> = TSegment extends `[[...${infer TParam}]]`
-  ? { [TKey in TParam]?: readonly string[] }
+export type InferRoutePatternSegment<TSegment extends string> = TSegment extends
+  `[[...${infer TParam}]]` ? { [TKey in TParam]?: readonly string[] }
   : TSegment extends `[...${infer TParam}]` ? { [TKey in TParam]: readonly string[] }
   : TSegment extends `[${infer TParam}]` ? { [TKey in TParam]: string }
-  : {};
+  : EmptyRecord;
 
 /** Infer typed path params from the stripped Fresh route pattern. */
-export type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends '' ? {}
+export type InferRoutePatternPathSegments<TPattern extends string> = TPattern extends ''
+  ? EmptyRecord
   : TPattern extends `${infer TSegment}/${infer TRest}`
     ? InferRoutePatternSegment<TSegment> & InferRoutePatternPathSegments<TRest>
   : InferRoutePatternSegment<TPattern>;
@@ -131,7 +132,10 @@ export type InferRoutePatternPathSegments<TPattern extends string> = TPattern ex
 /**
  * Public type carrier used by route contracts and route references.
  */
-export interface RouteContractTypeCarrier<TPath extends object = object, TSearch extends object = object> {
+export interface RouteContractTypeCarrier<
+  TPath extends object = object,
+  TSearch extends object = object,
+> {
   /** Compile-time-only path and search state metadata. */
   readonly $types?: {
     readonly path: TPath;
@@ -164,13 +168,14 @@ export type RouteHrefInput<TPath extends object, TSearch extends object> =
   };
 
 /** Path input accepted by route href builders. */
-export type RoutePathInput<TPath extends object> = [keyof TPath] extends [never] ? { readonly path?: TPath }
+export type RoutePathInput<TPath extends object> = [keyof TPath] extends [never]
+  ? { readonly path?: TPath }
   : TPath extends EmptyRecord ? { readonly path?: TPath }
   : { readonly path: TPath };
 
 /** Variadic args accepted by route href builders. */
-export type RouteHrefArgs<TPath extends object, TSearch extends object> = [keyof TPath] extends [never]
-  ? [input?: RouteHrefInput<TPath, TSearch>]
+export type RouteHrefArgs<TPath extends object, TSearch extends object> = [keyof TPath] extends
+  [never] ? [input?: RouteHrefInput<TPath, TSearch>]
   : TPath extends EmptyRecord ? [input?: RouteHrefInput<TPath, TSearch>]
   : [input: RouteHrefInput<TPath, TSearch>];
 
@@ -234,7 +239,10 @@ export type PairedRouteHrefArgs<
   : [input: PairedRouteHrefInput<TPrimaryPath, TPrimarySearch, TPartialPath, TPartialSearch>];
 
 /** Minimal typed route navigation API exposed to consumers. */
-export interface RouteNavigation<TPath extends object = EmptyRecord, TSearch extends object = EmptyRecord> {
+export interface RouteNavigation<
+  TPath extends object = EmptyRecord,
+  TSearch extends object = EmptyRecord,
+> {
   /**
    * Build a validated href for the route.
    *
@@ -258,8 +266,10 @@ export interface RouteReferenceOptions {
 /**
  * Stable route reference returned by route contracts and generated manifests.
  */
-export interface RouteReference<TPath extends object = EmptyRecord, TSearch extends object = EmptyRecord>
-  extends RouteContractTypeCarrier<TPath, TSearch> {
+export interface RouteReference<
+  TPath extends object = EmptyRecord,
+  TSearch extends object = EmptyRecord,
+> extends RouteContractTypeCarrier<TPath, TSearch> {
   /** Fresh route pattern used to generate the href. */
   readonly routePattern: string;
   /** Optional typed path schema for the route. */
@@ -344,7 +354,10 @@ export interface RouteReference<TPath extends object = EmptyRecord, TSearch exte
 }
 
 /** Bound route reference created from a route contract and concrete route pattern. */
-export type BoundRouteContract<TPath extends object = EmptyRecord, TSearch extends object = EmptyRecord> =
+export type BoundRouteContract<
+  TPath extends object = EmptyRecord,
+  TSearch extends object = EmptyRecord,
+> =
   & RouteReference<TPath, TSearch>
   & RouteContractTypeCarrier<TPath, TSearch>;
 
@@ -406,8 +419,10 @@ export interface DefineRouteContractOptions<
 }
 
 /** Public route contract produced by `defineRouteContract()`. */
-export interface DefineRouteContract<TPath extends object = EmptyRecord, TSearch extends object = EmptyRecord>
-  extends RouteContractTypeCarrier<TPath, TSearch> {
+export interface DefineRouteContract<
+  TPath extends object = EmptyRecord,
+  TSearch extends object = EmptyRecord,
+> extends RouteContractTypeCarrier<TPath, TSearch> {
   /** Optional path schema used when binding the contract to a route pattern. */
   readonly pathSchema?: PathParamSchema<TPath>;
   /** Optional search schema used when binding the contract to a route pattern. */
@@ -628,7 +643,10 @@ export function createRouteReference<const TRoutePattern extends string>(
  * @param metadata - Optional generated manifest metadata.
  * @returns A bound route reference with typed parsing and href helpers.
  */
-export function bindRoutePattern<TPath extends object = EmptyRecord, TSearch extends object = EmptyRecord>(
+export function bindRoutePattern<
+  TPath extends object = EmptyRecord,
+  TSearch extends object = EmptyRecord,
+>(
   contract: DefineRouteContract<TPath, TSearch>,
   routePattern: string,
   metadata?: RouteReferenceOptions,

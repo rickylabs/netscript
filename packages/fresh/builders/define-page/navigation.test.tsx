@@ -12,12 +12,14 @@ import {
   bindRoutePattern,
   defineRouteContract,
   enumPathParamSchema,
+} from '../../route/_internal/contract-runtime.ts';
+import {
   type InferRoutePath,
   type InferRouteSearch,
   useCurrentPath,
   useCurrentRoute,
   useCurrentSearch,
-} from '../../route/contract.ts';
+} from './navigation/mod.ts';
 import { render as renderToString } from 'preact-render-to-string';
 import { z } from 'zod';
 
