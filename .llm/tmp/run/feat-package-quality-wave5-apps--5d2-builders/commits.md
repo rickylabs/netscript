@@ -30,3 +30,5 @@ Append-only hash record (repo + hash + subject).
 - 6fb0555: chore(fresh): satisfy builders fitness gates
 
 - cdf59fa: docs(fresh): complete form public doc lint
+
+- 2ded6cd: chore(harness): close out builders implementation
