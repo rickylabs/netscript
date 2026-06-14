@@ -5,3 +5,4 @@ Append-only hash record (repo + hash + subject).
 - netscript 232b078 chore(5d3): record implementation session prompt
 - netscript dc5470f refactor(fresh): split route contract facade
 - netscript cabbaa8 refactor(fresh): extract route public types
+- netscript 46881c5 refactor(fresh): split route pagination types
