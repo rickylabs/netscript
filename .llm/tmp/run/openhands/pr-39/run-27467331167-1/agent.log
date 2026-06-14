@@ -1,0 +1,400 @@
+research run.\n\n## Changes\n- 
+**`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/design.md`** (new)\n 
+- RFC 17 typed island query bridge: server-loader \u2192 island-props \u2192 
+client-hook design.\n  - Hook wrapper strategy to retire 49 upstream 
+`@tanstack/preact-query`/`@tanstack/react-db` private-type-ref errors.\n  - 
+`defineFreshApp` alpha-surface seams (`createApp`, `staticFiles`, `fsRoutes`, 
+`preConfigure`, `telemetry`).\n  - RFC 14 seam audit conclusions and scope 
+boundary.\n  - F-16 entrypoint lock, root barrel policy, private-type-ref 
+retirement map.\n  - Risk register and six supervisor questions.\n\n- 
+**`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/plan.md`** (new)\n  -
+Proposed 30-slice commit lock.\n  - Full Archetype 3 gate matrix with N/A 
+rationale and slice mappings.\n  - MEASURE-FIRST table reused from 
+`doc-lint-aggregate.json` and `dry-run.log`.\n  - Required tail sections: Review
+map, Assumptions, Questions for supervisor, Dependencies & merge impact, 
+Side-effect ledger.\n\n- 
+**`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/drift.md`**\n  - 
+Added `D-5d6-7` entry recording PLAN-phase completion and readiness for 
+PLAN-EVAL.\n\n- 
+**`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/commits.md`**\n  - 
+Recorded commit hashes.\n\n## Validation\n- No code changes; no `deno check`, 
+`deno doc --lint`, or `deno publish --dry-run` was re-run.\n- Plan artifacts 
+were committed successfully.\n\n## Artifact paths + commit hashes\n| Artifact | 
+Path | Commit |\n|---|---|---|\n| design.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/design.md` | `1bdd141` 
+|\n| plan.md | `.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/plan.md`
+| `1bdd141` |\n| drift.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/drift.md` | `1bdd141` 
+|\n| commits.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/commits.md` | `bcc1cc1`
+|\n\n## MEASURE-FIRST table (reused from committed artifacts)\n| Entrypoint | 
+Total errors | privateTypeRef | missingJSDoc | Other 
+|\n|---|---|---:|---:|---:|\n| `./query/mod.ts` | 88 | 64 | 23 | 1 |\n| 
+`./form/mod.ts` | 74 | 11 | 60 | 3 |\n| `./defer/mod.ts` | 60 | 14 | 46 | 0 |\n|
+`./builders/mod.ts` | 40 | 21 | 19 | 0 |\n| `./streams/mod.ts` | 32 | 24 | 8 | 0
+|\n| `./mod.ts` | 23 | 15 | 8 | 0 |\n| `./server.ts` | 13 | 8 | 5 | 0 |\n| 
+`./config/vite.ts` | 20 | 3 | 17 | 0 |\n| `./route/mod.ts` | 0 | 0 | 0 | 0 |\n| 
+`./error/mod.ts` | 0 | 0 | 0 | 0 |\n| `./utils/mod.ts` | 0 | 0 | 0 | 0 |\n| 
+`./interactive.ts` | 0 | 0 | 0 | 0 |\n| **Deduplicated total** | **276** | 
+**115** | **157** | **4** |\n| **Dry-run package** | **62** | \u2014 | \u2014 | 
+\u2014 |\n\nTarget after all slices: **0** doc-lint errors, **0** dry-run 
+errors.\n\n## Slice count\n30 proposed commit slices (Phase A: 1\u20135, Phase 
+B: 6\u20139, Phase C: 10\u201315, Phase D: 16\u201330).\n\n## Gate-to-slice map 
+(high-level)\n- F-1, F-11, F-16: slices 5, 11, 12, 14, 21, 27\n- F-2, F-3, F-9: 
+slices 1, 10, 14, 19, 25\n- F-4, F-17: slices 6, 8, 15, 25\n- F-5, F-16, F-18: 
+slices 2, 6, 9, 11, 12, 13, 16, 22\n- F-6, F-7, F-8, F-15: slices 2, 3, 4, 8, 
+10, 11, 12, 13, 14, 15, 16, 17, 18, 24, 29\n- F-10, F-14: slices 4, 7, 20, 23, 
+28\n- Runtime/Aspire/browser/consumer-import: slices 7, 14, 21, 28, 30\n\n## Top
+decisions / risks\n1. Replace raw upstream hook re-exports with package-owned 
+wrappers to clear 49 private-type-refs.\n2. Keep RFC 17 recommended path as 
+`initialData`; dehydration helpers remain an advanced opt-in.\n3. Add 
+backward-compatible `defineFreshApp` seams for future RFC 14 adapter without 
+breaking existing callers.\n4. Lift `packages/fresh` from root workspace 
+`exclude` in closeout slice; budget for one-time root fmt/lint/check pass.\n5. 
+Open questions for supervisor remain in `design.md` \u00a75 (hook aliases, 
+dehydration scope, SSE surface, `createQueryFactories` helper, telemetry 
+schema).\n\n## Remaining risks\n- Supervisor may rescope hook re-export policy 
+or dehydration components.\n- Root workspace exclusion lift may surface 
+unexpected legacy fmt/lint debt.\n- Cross-cluster private-type-ref fixes depend 
+on prior 5d1\u20135d5 landings matching assumptions.\n\nREADY FOR PLAN-EVAL\n"}
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27467331167-1/summary.md"
+  file_text: 
+    # OpenHands Summary — 5d6 PLAN phase
+    
+    ## Summary
+    Created and committed the PLAN-phase deliverables for `@netscript/fresh` 
+sub-gate 5d6 (`./query` + `./server` + final package surface). No implementation
+was performed. All measurements were reused from the committed run artifacts 
+produced by the prior research run.
+    
+    ## Changes
+    - **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/design.md`** 
+(new)
+      - RFC 17 typed island query bridge: server-loader → island-props → 
+client-hook design.
+      - Hook wrapper strategy to retire 49 upstream 
+`@tanstack/preact-query`/`@tanstack/react-db` private-type-ref errors.
+      - `defineFreshApp` alpha-surface seams (`createApp`, `staticFiles`, 
+`fsRoutes`, `preConfigure`, `telemetry`).
+      - RFC 14 seam audit conclusions and scope boundary.
+      - F-16 entrypoint lock, root barrel policy, private-type-ref retirement 
+map.
+      - Risk register and six supervisor questions.
+    
+    - **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/plan.md`** 
+(new)
+      - Proposed 30-slice commit lock.
+      - Full Archetype 3 gate matrix with N/A rationale and slice mappings.
+      - MEASURE-FIRST table reused from `doc-lint-aggregate.json` and 
+`dry-run.log`.
+      - Required tail sections: Review map, Assumptions, Questions for 
+supervisor, Dependencies & merge impact, Side-effect ledger.
+    
+    - **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/drift.md`**
+      - Added `D-5d6-7` entry recording PLAN-phase completion and readiness for 
+PLAN-EVAL.
+    
+    - **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/commits.md`**
+      - Recorded commit hashes.
+    
+    ## Validation
+    - No code changes; no `deno check`, `deno doc --lint`, or `deno publish 
+--dry-run` was re-run.
+    - Plan artifacts were committed successfully.
+    
+    ## Artifact paths + commit hashes
+    | Artifact | Path | Commit |
+    |---|---|---|
+    | design.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/design.md` | `1bdd141` 
+|
+    | plan.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/plan.md` | `1bdd141` |
+    | drift.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/drift.md` | `1bdd141` |
+    | commits.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/commits.md` | `bcc1cc1`
+|
+    
+    ## MEASURE-FIRST table (reused from committed artifacts)
+    | Entrypoint | Total errors | privateTypeRef | missingJSDoc | Other |
+    |---|---|---:|---:|---:|
+    | `./query/mod.ts` | 88 | 64 | 23 | 1 |
+    | `./form/mod.ts` | 74 | 11 | 60 | 3 |
+    | `./defer/mod.ts` | 60 | 14 | 46 | 0 |
+    | `./builders/mod.ts` | 40 | 21 | 19 | 0 |
+    | `./streams/mod.ts` | 32 | 24 | 8 | 0 |
+    | `./mod.ts` | 23 | 15 | 8 | 0 |
+    | `./server.ts` | 13 | 8 | 5 | 0 |
+    | `./config/vite.ts` | 20 | 3 | 17 | 0 |
+    | `./route/mod.ts` | 0 | 0 | 0 | 0 |
+    | `./error/mod.ts` | 0 | 0 | 0 | 0 |
+    | `./utils/mod.ts` | 0 | 0 | 0 | 0 |
+    | `./interactive.ts` | 0 | 0 | 0 | 0 |
+    | **Deduplicated total** | **276** | **115** | **157** | **4** |
+    | **Dry-run package** | **62** | — | — | — |
+    
+    Target after all slices: **0** doc-lint errors, **0** dry-run errors.
+    
+    ## Slice count
+    30 proposed commit slices (Phase A: 1–5, Phase B: 6–9, Phase C: 10–15, Phase
+D: 16–30).
+    
+    ## Gate-to-slice map (high-level)
+    - F-1, F-11, F-16: slices 5, 11, 12, 14, 21, 27
+    - F-2, F-3, F-9: slices 1, 10, 14, 19, 25
+    - F-4, F-17: slices 6, 8, 15, 25
+    - F-5, F-16, F-18: slices 2, 6, 9, 11, 12, 13, 16, 22
+    - F-6, F-7, F-8, F-15: slices 2, 3, 4, 8, 10, 11, 12, 13, 14, 15, 16, 17, 
+18, 24, 29
+    - F-10, F-14: slices 4, 7, 20, 23, 28
+    - Runtime/Aspire/browser/consumer-import: slices 7, 14, 21, 28, 30
+    
+    ## Top decisions / risks
+    1. Replace raw upstream hook re-exports with package-owned wrappers to clear
+49 private-type-refs.
+    2. Keep RFC 17 recommended path as `initialData`; dehydration helpers remain
+an advanced opt-in.
+    3. Add backward-compatible `defineFreshApp` seams for future RFC 14 adapter 
+without breaking existing callers.
+    4. Lift `packages/fresh` from root workspace `exclude` in closeout slice; 
+budget for one-time root fmt/lint/check pass.
+    5. Open questions for supervisor remain in `design.md` §5 (hook aliases, 
+dehydration scope, SSE surface, `createQueryFactories` helper, telemetry 
+schema).
+    
+    ## Remaining risks
+    - Supervisor may rescope hook re-export policy or dehydration components.
+    - Root workspace exclusion lift may surface unexpected legacy fmt/lint debt.
+    - Cross-cluster private-type-ref fixes depend on prior 5d1–5d5 landings 
+matching assumptions.
+    
+    READY FOR PLAN-EVAL
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 775.51K • cache hit 93.26% •  reasoning 52 • ↓ output 17.7K • $ 
+0.2579
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27467331167-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# OpenHands Summary — 5d6 PLAN phase
+ 2|
++3|## Summary
++4|Created and committed the PLAN-phase deliverables for `@netscript/fresh` 
+sub-gate 5d6 (`./query` + `./server` + final package surface). No implementation
+was performed. All measurements were reused from the committed run artifacts 
+produced by the prior research run.
++5|
++6|## Changes
++7|- **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/design.md`** 
+(new)
++8|  - RFC 17 typed island query bridge: server-loader → island-props → 
+client-hook design.
++9|  - Hook wrapper strategy to retire 49 upstream 
+`@tanstack/preact-query`/`@tanstack/react-db` private-type-ref errors.
++10|  - `defineFreshApp` alpha-surface seams (`createApp`, `staticFiles`, 
+`fsRoutes`, `preConfigure`, `telemetry`).
++11|  - RFC 14 seam audit conclusions and scope boundary.
++12|  - F-16 entrypoint lock, root barrel policy, private-type-ref retirement 
+map.
++13|  - Risk register and six supervisor questions.
++14|
++15|- **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/plan.md`** 
+(new)
++16|  - Proposed 30-slice commit lock.
++17|  - Full Archetype 3 gate matrix with N/A rationale and slice mappings.
++18|  - MEASURE-FIRST table reused from `doc-lint-aggregate.json` and 
+`dry-run.log`.
++19|  - Required tail sections: Review map, Assumptions, Questions for 
+supervisor, Dependencies & merge impact, Side-effect ledger.
++20|
++21|- **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/drift.md`**
++22|  - Added `D-5d6-7` entry recording PLAN-phase completion and readiness for 
+PLAN-EVAL.
++23|
++24|- **`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/commits.md`**
++25|  - Recorded commit hashes.
++26|
++27|## Validation
++28|- No code changes; no `deno check`, `deno doc --lint`, or `deno publish 
+--dry-run` was re-run.
++29|- Plan artifacts were committed successfully.
++30|
++31|## Artifact paths + commit hashes
++32|| Artifact | Path | Commit |
++33||---|---|---|
++34|| design.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/design.md` | `1bdd141` 
+|
++35|| plan.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/plan.md` | `1bdd141` |
++36|| drift.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/drift.md` | `1bdd141` |
++37|| commits.md | 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/commits.md` | `bcc1cc1`
+|
++38|
++39|## MEASURE-FIRST table (reused from committed artifacts)
++40|| Entrypoint | Total errors | privateTypeRef | missingJSDoc | Other |
++41||---|---|---:|---:|---:|
++42|| `./query/mod.ts` | 88 | 64 | 23 | 1 |
++43|| `./form/mod.ts` | 74 | 11 | 60 | 3 |
++44|| `./defer/mod.ts` | 60 | 14 | 46 | 0 |
++45|| `./builders/mod.ts` | 40 | 21 | 19 | 0 |
++46|| `./streams/mod.ts` | 32 | 24 | 8 | 0 |
++47|| `./mod.ts` | 23 | 15 | 8 | 0 |
++48|| `./server.ts` | 13 | 8 | 5 | 0 |
++49|| `./config/vite.ts` | 20 | 3 | 17 | 0 |
++50|| `./route/mod.ts` | 0 | 0 | 0 | 0 |
++51|| `./error/mod.ts` | 0 | 0 | 0 | 0 |
++52|| `./utils/mod.ts` | 0 | 0 | 0 | 0 |
++53|| `./interactive.ts` | 0 | 0 | 0 | 0 |
++54|| **Deduplicated total** | **276** | **115** | **157** | **4** |
++55|| **Dry-run package** | **62** | — | — | — |
++56|
++57|Target after all slices: **0** doc-lint errors, **0** dry-run errors.
++58|
++59|## Slice count
++60|30 proposed commit slices (Phase A: 1–5, Phase B: 6–9, Phase C: 10–15, Phase
+D: 16–30).
++61|
++62|## Gate-to-slice map (high-level)
++63|- F-1, F-11, F-16: slices 5, 11, 12, 14, 21, 27
++64|- F-2, F-3, F-9: slices 1, 10, 14, 19, 25
++65|- F-4, F-17: slices 6, 8, 15, 25
++66|- F-5, F-16, F-18: slices 2, 6, 9, 11, 12, 13, 16, 22
++67|- F-6, F-7, F-8, F-15: slices 2, 3, 4, 8, 10, 11, 12, 13, 14, 15, 16, 17, 
+18, 24, 29
++68|- F-10, F-14: slices 4, 7, 20, 23, 28
++69|- Runtime/Aspire/browser/consumer-import: slices 7, 14, 21, 28, 30
++70|
++71|## Top decisions / risks
++72|1. Replace raw upstream hook re-exports with package-owned wrappers to clear
+49 private-type-refs.
++73|2. Keep RFC 17 recommended path as `initialData`; dehydration helpers remain
+an advanced opt-in.
++74|3. Add backward-compatible `defineFreshApp` seams for future RFC 14 adapter 
+without breaking existing callers.
++75|4. Lift `packages/fresh` from root workspace `exclude` in closeout slice; 
+budget for one-time root fmt/lint/check pass.
++76|5. Open questions for supervisor remain in `design.md` §5 (hook aliases, 
+dehydration scope, SSE surface, `createQueryFactories` helper, telemetry 
+schema).
++77|
++78|## Remaining risks
++79|- Supervisor may rescope hook re-export policy or dehydration components.
++80|- Root workspace exclusion lift may surface unexpected legacy fmt/lint debt.
++81|- Cross-cluster private-type-ref fixes depend on prior 5d1–5d5 landings 
+matching assumptions.
++82|
++83|READY FOR PLAN-EVAL
++84|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final git status check
+
+$ git status && echo '---' && git log --oneline -5
+
+Tokens: ↑ input 832.62K • cache hit 93.50% •  reasoning 52 • ↓ output 17.74K • $
+0.2703
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+On branch feat/package-quality-wave5-apps-5d6-query
+Your branch is ahead of 'origin/feat/package-quality-wave5-apps-5d6-query' by 2 
+commits.
+  (use "git push" to publish your local commits)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/openhands/pr-39/run-27467331167-1/
+
+nothing added to commit but untracked files present (use "git add" to track)
+---
+bcc1cc1 (HEAD -> feat/package-quality-wave5-apps-5d6-query) docs(5d6): record 
+PLAN-phase commit hash
+1bdd141 docs(5d6): PLAN-phase design.md, plan.md, drift update for 
+query/server/final surface
+1333b21 (origin/feat/package-quality-wave5-apps-5d6-query) chore(openhands): 
+record run trace 27465201451-1
+eeb95c3 chore(openhands): record run trace 27463663749-1
+36bd391 docs(5d6): fill research.md TODOs and drift ledger for 
+query/server/final surface
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Committed 5d6 PLAN deliverables and summary
+
+Finish with message:
+PLAN-phase deliverables for 5d6 (`./query` + `./server` + final package surface)
+are created, committed, and ready for supervisor PLAN-EVAL.
+
+**Committed artifacts**
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/design.md` — RFC 17 
+typed island query bridge, hook wrapper strategy, `defineFreshApp` alpha-surface
+seams, RFC 14 seam audit, F-16 surface policy, private-type-ref retirement map, 
+risk register, supervisor questions.
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/plan.md` — proposed 
+30-slice lock, full Archetype 3 gate matrix with N/A rationale and slice 
+mappings, MEASURE-FIRST table, Review map, Assumptions, Questions, Dependencies 
+& merge impact, Side-effect ledger.
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/drift.md` — extended 
+with `D-5d6-7` PLAN completion entry.
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d6-query/commits.md` — 
+recorded hashes.
+
+**Commit hashes**
+- `1bdd141` — design.md + plan.md + drift.md
+- `bcc1cc1` — commits.md hash record
+
+**Measurements reused (not re-run)**
+- `doc-lint-aggregate.json`: 276 distinct errors (115 privateTypeRef, 157 
+missingJSDoc, 4 other).
+- `dry-run.log`: 62 errors (58 excluded-module from root workspace exclude, 4 
+missing-explicit-return-type).
+- Largest surfaces: `./query/mod.ts` (88 errors, 49 from upstream hooks), 
+`./form/mod.ts` (74), `./defer/mod.ts` (60), `./builders/mod.ts` (40), 
+`./streams/mod.ts` (32).
+
+**Slice count**: 30 proposed commit slices.
+
+**Top decisions / risks**
+1. Wrap upstream hooks with package-owned signatures to retire 49 
+private-type-refs.
+2. Keep RFC 17 recommended path as `initialData`; dehydration helpers as 
+advanced opt-in.
+3. Add backward-compatible `defineFreshApp` seams for future RFC 14 adapter.
+4. Lift `packages/fresh` from root workspace `exclude` in closeout slice.
+5. Six supervisor questions captured in `design.md` §5.
+
+Run-scoped summary written to 
+`/home/runner/work/_temp/openhands/27467331167-1/summary.md`.
+
+READY FOR PLAN-EVAL
+
+Tokens: ↑ input 890.11K • cache hit 93.87% •  reasoning 52 • ↓ output 18.34K • $
+0.2839
+

@@ -6,14 +6,46 @@
 
 import { Partial } from 'fresh/runtime';
 import { DeferComponent } from './DeferIsland.tsx';
-import type { JSX } from 'preact';
-import { type Attributes } from '@netscript/telemetry/tracer';
+import { resolveDeferPolicy } from './policy.ts';
 import {
-  type DeferPolicyInput,
-  type DeferPolicyProfile,
-  resolveDeferPolicy,
-} from './policy.ts';
-import { emitDeferCacheReadSpan, emitDeferPrewarmDispatchSpan } from './telemetry.ts';
+  emitDeferCacheReadSpan,
+  emitDeferPrewarmDispatchSpan,
+  type FreshDeferTelemetryAttributes,
+} from './telemetry.ts';
+
+/** Renderable content accepted by deferred page slots. */
+export type DeferPageRenderable =
+  | object
+  | string
+  | number
+  | bigint
+  | boolean
+  | null
+  | undefined
+  | readonly DeferPageRenderable[];
+
+/** Named defer policy profiles accepted by the page wrapper. */
+export type DeferPagePolicyProfile =
+  | 'balanced'
+  | 'aggressive-first-paint'
+  | 'background-refresh'
+  | 'low-bandwidth';
+
+/** Policy overrides accepted by the page wrapper. */
+export interface DeferPagePolicyInput {
+  /** Named profile that seeds default defer behavior. */
+  profile?: DeferPagePolicyProfile;
+  /** Freshness window in milliseconds before cached content is considered stale. */
+  staleTimeMs?: number;
+  /** Whether cache misses should start a background server prewarm. */
+  prewarmOnMiss?: boolean;
+  /** Whether stale cache hits should start a background server prewarm. */
+  prewarmOnStale?: boolean;
+  /** Whether fresh cached content should still refresh on the client. */
+  clientRefreshOnFreshCache?: boolean;
+  /** Whether client refresh should be skipped while server prewarm is active. */
+  skipClientWhenServerPrewarm?: boolean;
+}
 
 /** Fresh request fields consumed by `DeferPage` without depending on app-local ctx types. */
 export interface DeferPageRequestContextLike {
@@ -27,18 +59,26 @@ export interface DeferPageRequestContextLike {
 
 /** Props for the `DeferPage` server wrapper. */
 export interface DeferPageProps {
+  /** Action URL used when the deferred island requests a refresh. */
   action: string;
+  /** Partial route URL that renders the deferred region content. */
   partial: string;
+  /** Search params applied to the partial request instead of the current route params. */
   partialSearchParams?: string;
+  /** Fresh partial name used to match server-rendered and hydrated regions. */
   name: string;
-  component?: JSX.Element;
-  fallback: JSX.Element;
+  /** Cached component content rendered when the deferred region has data. */
+  component?: DeferPageRenderable;
+  /** Fallback content rendered until the deferred region resolves. */
+  fallback: DeferPageRenderable;
+  /** Epoch milliseconds when the cached component content was produced. */
   cachedAt?: number;
+  /** Freshness window in milliseconds before cached content is considered stale. */
   staleTime?: number;
   /**
    * Shared framework-level defer policy.
    */
-  policy?: DeferPolicyInput | DeferPolicyProfile;
+  policy?: DeferPagePolicyInput | DeferPagePolicyProfile;
   /**
    * Optional stale handling strategy.
    * - `none` (default): do nothing server-side; let island decide.
@@ -49,6 +89,7 @@ export interface DeferPageProps {
    * Enables verbose Defer diagnostics in server logs.
    */
   debug?: boolean;
+  /** Request context fields used to detect partial and prewarm rendering. */
   ctx?: DeferPageRequestContextLike;
 }
 
@@ -68,7 +109,6 @@ function prewarmPartial(
   name: string,
   searchParams?: string,
   reason: 'stale' | 'miss' = 'stale',
-  debug = false,
 ): void {
   const params = new URLSearchParams(searchParams ?? '');
   params.set('fresh-partial', 'true');
@@ -122,9 +162,8 @@ export function DeferPage({
   staleTime,
   policy,
   staleStrategy = 'none',
-  debug = false,
   ctx,
-}: DeferPageProps): JSX.Element {
+}: DeferPageProps): object {
   const renderStart = performance.now();
 
   const hasCachedData = !!component;
@@ -140,7 +179,6 @@ export function DeferPage({
   // Server prewarm strategy:
   // - stale hit: start eager server revalidation
   // - cache miss: start eager server fetch so client island has less to wait on
-  const shouldServerPrewarm = resolvedPolicy.prewarmOnMiss || resolvedPolicy.prewarmOnStale;
   const shouldPrewarmStale = !isPartialRequest && hasCachedData && isStale &&
     resolvedPolicy.prewarmOnStale;
   const shouldPrewarmMiss = !isPartialRequest && !hasCachedData && resolvedPolicy.prewarmOnMiss;
@@ -178,7 +216,7 @@ export function DeferPage({
 
   if (!isPrewarmRequest) {
     queueMicrotask(() => {
-      const attributes: Attributes = {
+      const attributes: FreshDeferTelemetryAttributes = {
         'defer.region.name': name,
         'defer.action': action,
         'defer.partial': partial,
@@ -213,31 +251,6 @@ export function DeferPage({
           'defer.fallback.visible': fallbackVisible,
         },
       });
-    });
-  }
-
-  if (debug) {
-    console.log('🧊 DeferPage render state', {
-      name,
-      action,
-      partial,
-      isPartialRequest,
-      hasCachedData,
-      cachedAt,
-      staleTime,
-      hasFreshnessInfo,
-      isStale,
-      shouldServerPrewarm,
-      shouldPrewarmStale,
-      shouldPrewarmMiss,
-      policyProfile: resolvedPolicy.profile,
-      policyStaleTimeMs: resolvedPolicy.staleTimeMs,
-      policyClientRefreshOnFresh: resolvedPolicy.clientRefreshOnFreshCache,
-      policySkipClientWhenServerPrewarm: resolvedPolicy.skipClientWhenServerPrewarm,
-      isPrewarmRequest,
-      requestOrigin,
-      fallbackVisible,
-      fallbackVisibleMs: fallbackVisible ? renderDurationMs : 0,
     });
   }
 

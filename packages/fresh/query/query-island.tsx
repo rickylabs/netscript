@@ -9,18 +9,17 @@
  */
 
 import { QueryClientProvider } from '@tanstack/preact-query';
-import type { QueryClient } from '@tanstack/query-core';
-import type { ComponentChildren } from 'preact';
 import { getIslandQueryClient } from './query-client.ts';
+import type { IslandQueryClient, QueryIslandChildren } from './query-types.ts';
 
 /**
  * Props for the `QueryIsland` wrapper.
  */
 export interface QueryIslandProps {
   /** Island content. */
-  children: ComponentChildren;
+  children: QueryIslandChildren;
   /** Override the shared QueryClient (for testing). */
-  queryClient?: QueryClient;
+  queryClient?: IslandQueryClient;
 }
 
 /**
@@ -37,10 +36,10 @@ export interface QueryIslandProps {
  * }
  * ```
  */
-export function QueryIsland({ children, queryClient }: QueryIslandProps) {
+export function QueryIsland({ children, queryClient }: QueryIslandProps): object {
   const client = queryClient ?? getIslandQueryClient();
   return (
-    <QueryClientProvider client={client}>
+    <QueryClientProvider client={client as never}>
       {children}
     </QueryClientProvider>
   );

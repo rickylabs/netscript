@@ -1,0 +1,400 @@
+private type 'FieldDescriptorMap'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
+--
+error[private-type-ref]: public type 'RuntimeFormState["constraints"]' 
+references private type 'FieldConstraints'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
+--
+error[private-type-ref]: public type 'RuntimeFormState["formProps"]' references 
+private type 'FormElementProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
+--
+error[private-type-ref]: public type 'RuntimeFormState["csrfInputProps"]' 
+references private type 'FormCsrfInputProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
+--
+error[private-type-ref]: public type 'FormEnhancementSnapshot["constraints"]' 
+references private type 'FieldConstraints'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:364:3
+--
+error[private-type-ref]: public type 'FormEnhancementSnapshot["formProps"]' 
+references private type 'FormElementProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:365:3
+--
+error[private-type-ref]: public type 'FormEnhancementSnapshot["csrfInputProps"]'
+references private type 'FormCsrfInputProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:366:3
+--
+error[private-type-ref]: public type 'FormEnhancementState["formProps"]' 
+references private type 'EnhancedFormProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:405:3
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+{"asctime": "2026-06-12 21:35:42,293", "levelname": "ERROR", "name": "openhands.sdk.conversation.impl.local_conversation", "filename": "local_conversation.py", "lineno": 1194, "message": "Agent reached maximum iterations limit (500)."}
+{"asctime": "2026-06-12 21:35:42,293", "levelname": "WARNING", "name": "openhands.sdk.conversation.visualizer.default", "filename": "default.py", "lineno": 321, "message": "Event type ConversationErrorEvent is not registered in EVENT_VISUALIZATION_CONFIG. Skipping visualization."}
+{"asctime": "2026-06-12 21:35:42,298", "levelname": "WARNING", "name": "__main__", "filename": "agent_runner.py", "lineno": 68, "message": "Agent did not write /home/runner/work/_temp/openhands/27442097563-1/summary.md; asking once more"}
+Message from User ──────────────────────────────────────────────────────────────
+
+You finished without writing the required run summary file at 
+/home/runner/work/_temp/openhands/27442097563-1/summary.md. Write that file now 
+as markdown with Summary, Changes, Validation, and Remaining risks sections, 
+then stop.
+
+Tokens: ↑ input 16.77M • cache hit 94.19% •  reasoning 23.19K • ↓ output 68.85K 
+• $ 4.2016
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Ensure summary directory exists
+
+Reasoning:
+The user is asking me to write the run summary file. However, I haven't actually
+completed the task yet - I only did exploration. The task requires producing 
+research.md, design.md, plan.md, drift.md, context-pack.md in 
+.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/ and committing them, 
+plus writing a summary to OPENHANDS_SUMMARY_PATH.
+
+But the user specifically says "Write that file now as markdown with Summary, 
+Changes, Validation, and Remaining risks sections, then stop." This is a direct 
+instruction. I should write the summary file. Since this is PLAN phase and I 
+haven't completed the full deliverables yet, I need to be honest in the summary 
+that this is an interim state.
+
+Wait, looking more carefully - the user is saying I "finished without writing 
+the required run summary file" - implying the session is ending. But I haven't 
+produced the artifacts. I should write an honest summary documenting what's been
+done so far: exploration, measurements, and the fact that the deliverable 
+artifacts are pending/in-progress.
+
+Actually, re-reading: the user wants me to write the summary file now and stop. 
+I should do exactly that. The summary should reflect current state: I've started
+exploration, gathered measurements, but the required PLAN-phase artifacts have 
+not been produced yet. This is important honesty.
+
+Let me write the summary file with:
+- Summary: Started PLAN phase for 5d5 form, explored repo, read binding docs, 
+measured package quality
+- Changes: None - PLAN phase, zero implementation
+- Validation: deno check passes for form, doc-lint 74 errors surfaced, dry-run 
+62 problems (mostly excluded-module from package config)
+- Remaining risks: Full artifact set not produced; need to complete 
+research/design/plan docs
+
+I'll write this to the exact path requested.
+
+$ mkdir -p /home/runner/work/_temp/openhands/27442097563-1
+
+Tokens: ↑ input 16.8M • cache hit 94.20% •  reasoning 23.65K • ↓ output 69.27K •
+$ 4.2098
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "create", "path": 
+"/home/runner/work/_temp/openhands/27442097563-1/summary.md", "file_text": "# 
+Run Summary\n\n## Summary\n\nPLAN-phase session for Wave 5d sub-gate 5/6 
+(`@netscript/fresh` RFC 15 forms system, `packages/fresh/form`). Goal: inspect 
+the 28-file `./form` cluster, surface package-quality issues, design a refactor 
+plan, and lock proposed slices without changing the public contract. This is a 
+harness v2 PLAN phase (Archetype 3 + SCOPE-frontend overlay). No implementation 
+was performed.\n\nThe session read the branch handover, umbrella target 
+architecture, AGENTS.md, and key fresh-ui seams (`form-field.tsx`, 
+`control-props.ts`, `docs/l0-conventions.md`). It measured the current `./form` 
+quality baseline with `deno doc --lint`, `deno check --unstable-kv`, and `deno 
+publish --dry-run`, then captured the results. The actual 
+research/design/plan/drift/context-pack artifacts for the 5d5 PR must be 
+authored and committed in a follow-up session; this summary only records the 
+exploration and validation done so far.\n\n## Changes\n\n- No code changes were 
+made.\n- No files were created or modified in the repository.\n- Branch remains 
+`feat/package-quality-wave5-apps-5d5-form` at `b6cb09a`.\n- Run summary written 
+to `/home/runner/work/_temp/openhands/27442097563-1/summary.md`.\n\n## 
+Validation\n\n| Check | Command / scope | Result |\n|---|---|---|\n| Type check 
+(`packages/fresh/form`) | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | \u2705 0
+errors |\n| Root type check (excludes `packages/fresh`) | `deno task check` | 
+\u2705 0 errors |\n| Doc lint (`packages/fresh/form/mod.ts`) | `deno doc --lint 
+packages/fresh/form/mod.ts` | \u26a0\ufe0f 74 issues: 60 missing-jsdoc, 11 
+private-type-ref, 3 missing-return-type |\n| JSR dry run (`@netscript/fresh`) | 
+`cd packages/fresh && deno publish --dry-run` | \u274c 62 problems; 4 in 
+`./form` are `missing-explicit-return-type` for `Form`, `FormRegion`, 
+`getSubmissionHiddenInputProps`, plus the package-wide excluded-module config 
+issues inherited from the 5d umbrella. |\n\n### Notable quality findings in 
+`./form`\n- **Over-cap files** (baseline): `schema-adapter.ts` (576 LOC), 
+`types.ts` (474 LOC), `field-descriptors.ts` (518 LOC). `intent.ts` (320), 
+`state.ts` (326), `pipeline.ts` (259) are also sizable.\n- **Slow-type / 
+private-type-ref issues** are concentrated in:\n  - `form/enhancement.tsx` 
+\u2014 `applyCollectionStrategy` references private `IntentButtonProps`; 
+`getSubmissionHiddenInputProps` lacks JSDoc + return type.\n  - `form/form.tsx` 
+\u2014 `Form` references private `FormProps`; lacks JSDoc + return type.\n  - 
+`form/form-region.tsx` \u2014 `FormRegion` references private `FormRegionProps`;
+lacks JSDoc + return type.\n  - `form/types.ts` \u2014 `RuntimeFormState`, 
+`FormEnhancementSnapshot`, `FormEnhancementState` expose private 
+field/constraint/form/CSRF prop types.\n- **fresh-ui seam inspected**: 
+`packages/fresh-ui/registry/components/ui/form-field.tsx` and 
+`packages/fresh-ui/registry/components/ui/control-props.ts` are the rendering 
+side. `control-props.ts` consumes any object implementing 
+`controlProps(overrides?)`, which is the clean integration point for `./form` 
+descriptors to emit state without importing fresh-ui internals.\n- 
+**Progressive-enhancement primitives present**: `intent.ts`, `reply.ts`, 
+`csrf.ts`, `idempotency.ts`, `enhancement.tsx` encode no-JS submit \u2192 island
+upgrade behavior.\n- **Umbrella dependency note**: `@netscript/fresh` already 
+depends on `zod`. Evaluating Standard Schema as a replacement target for 
+`schema-adapter.ts` is a required plan decision; adding any new dependency must 
+be recorded as umbrella drift.\n\n## Remaining risks\n\n1. **Artifactory not yet
+produced**: the required deliverables (`research.md`, `design.md`, `plan.md`, 
+`drift.md`, `context-pack.md`) under 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/` still need to be 
+authored and committed.\n2. **PR comment not emitted**: the final 
+`OPENHANDS_SUMMARY_PATH` PR comment must be generated by the workflow after the 
+plan artifacts are complete.\n3. **Umbrella quality gates**: the 5d umbrella 
+demands 0 doc-lint errors, 0 over-cap files, 0 private-type-refs, and JSR 
+dry-run pass for `./form`. The current baseline (74 doc-lint issues, 3 over-cap 
+files, 11 private-type-refs) requires a non-trivial refactor plan.\n4. **fresh 
+\u2194 fresh-ui contract design**: this is the highest-review-risk item. The 
+plan must precisely define how RFC 15 form state maps onto fresh-ui 
+`data-part`/`data-state`/ARIA attributes without cross-package internal 
+imports.\n5. **Standard Schema dependency decision**: switching 
+`schema-adapter.ts` to Standard Schema could reduce per-library glue but touches
+the public validation contract and dependency surface; it must be evaluated 
+against the umbrella drift policy.\n6. **Browser-validation obligation**: the 
+A4-Browser gate requires real playground routes proving no-JS submit, enhanced 
+submit, server validation errors, pending/idempotency UX, and CSRF. These routes
+and their acceptance criteria must be named in `plan.md`.\n"}
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27442097563-1/summary.md"
+  file_text: 
+    # Run Summary
+    
+    ## Summary
+    
+    PLAN-phase session for Wave 5d sub-gate 5/6 (`@netscript/fresh` RFC 15 forms
+system, `packages/fresh/form`). Goal: inspect the 28-file `./form` cluster, 
+surface package-quality issues, design a refactor plan, and lock proposed slices
+without changing the public contract. This is a harness v2 PLAN phase (Archetype
+3 + SCOPE-frontend overlay). No implementation was performed.
+    
+    The session read the branch handover, umbrella target architecture, 
+AGENTS.md, and key fresh-ui seams (`form-field.tsx`, `control-props.ts`, 
+`docs/l0-conventions.md`). It measured the current `./form` quality baseline 
+with `deno doc --lint`, `deno check --unstable-kv`, and `deno publish 
+--dry-run`, then captured the results. The actual 
+research/design/plan/drift/context-pack artifacts for the 5d5 PR must be 
+authored and committed in a follow-up session; this summary only records the 
+exploration and validation done so far.
+    
+    ## Changes
+    
+    - No code changes were made.
+    - No files were created or modified in the repository.
+    - Branch remains `feat/package-quality-wave5-apps-5d5-form` at `b6cb09a`.
+    - Run summary written to 
+`/home/runner/work/_temp/openhands/27442097563-1/summary.md`.
+    
+    ## Validation
+    
+    | Check | Command / scope | Result |
+    |---|---|---|
+    | Type check (`packages/fresh/form`) | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | ✅ 0 
+errors |
+    | Root type check (excludes `packages/fresh`) | `deno task check` | ✅ 0 
+errors |
+    | Doc lint (`packages/fresh/form/mod.ts`) | `deno doc --lint 
+packages/fresh/form/mod.ts` | ⚠️ 74 issues: 60 missing-jsdoc, 11 
+private-type-ref, 3 missing-return-type |
+    | JSR dry run (`@netscript/fresh`) | `cd packages/fresh && deno publish 
+--dry-run` | ❌ 62 problems; 4 in `./form` are `missing-explicit-return-type` 
+for `Form`, `FormRegion`, `getSubmissionHiddenInputProps`, plus the package-wide
+excluded-module config issues inherited from the 5d umbrella. |
+    
+    ### Notable quality findings in `./form`
+    - **Over-cap files** (baseline): `schema-adapter.ts` (576 LOC), `types.ts` 
+(474 LOC), `field-descriptors.ts` (518 LOC). `intent.ts` (320), `state.ts` 
+(326), `pipeline.ts` (259) are also sizable.
+    - **Slow-type / private-type-ref issues** are concentrated in:
+      - `form/enhancement.tsx` — `applyCollectionStrategy` references private 
+`IntentButtonProps`; `getSubmissionHiddenInputProps` lacks JSDoc + return type.
+      - `form/form.tsx` — `Form` references private `FormProps`; lacks JSDoc + 
+return type.
+      - `form/form-region.tsx` — `FormRegion` references private 
+`FormRegionProps`; lacks JSDoc + return type.
+      - `form/types.ts` — `RuntimeFormState`, `FormEnhancementSnapshot`, 
+`FormEnhancementState` expose private field/constraint/form/CSRF prop types.
+    - **fresh-ui seam inspected**: 
+`packages/fresh-ui/registry/components/ui/form-field.tsx` and 
+`packages/fresh-ui/registry/components/ui/control-props.ts` are the rendering 
+side. `control-props.ts` consumes any object implementing 
+`controlProps(overrides?)`, which is the clean integration point for `./form` 
+descriptors to emit state without importing fresh-ui internals.
+    - **Progressive-enhancement primitives present**: `intent.ts`, `reply.ts`, 
+`csrf.ts`, `idempotency.ts`, `enhancement.tsx` encode no-JS submit → island 
+upgrade behavior.
+    - **Umbrella dependency note**: `@netscript/fresh` already depends on `zod`.
+Evaluating Standard Schema as a replacement target for `schema-adapter.ts` is a 
+required plan decision; adding any new dependency must be recorded as umbrella 
+drift.
+    
+    ## Remaining risks
+    
+    1. **Artifactory not yet produced**: the required deliverables 
+(`research.md`, `design.md`, `plan.md`, `drift.md`, `context-pack.md`) under 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/` still need to be 
+authored and committed.
+    2. **PR comment not emitted**: the final `OPENHANDS_SUMMARY_PATH` PR comment
+must be generated by the workflow after the plan artifacts are complete.
+    3. **Umbrella quality gates**: the 5d umbrella demands 0 doc-lint errors, 0 
+over-cap files, 0 private-type-refs, and JSR dry-run pass for `./form`. The 
+current baseline (74 doc-lint issues, 3 over-cap files, 11 private-type-refs) 
+requires a non-trivial refactor plan.
+    4. **fresh ↔ fresh-ui contract design**: this is the highest-review-risk 
+item. The plan must precisely define how RFC 15 form state maps onto fresh-ui 
+`data-part`/`data-state`/ARIA attributes without cross-package internal imports.
+    5. **Standard Schema dependency decision**: switching `schema-adapter.ts` to
+Standard Schema could reduce per-library glue but touches the public validation 
+contract and dependency surface; it must be evaluated against the umbrella drift
+policy.
+    6. **Browser-validation obligation**: the A4-Browser gate requires real 
+playground routes proving no-JS submit, enhanced submit, server validation 
+errors, pending/idempotency UX, and CSRF. These routes and their acceptance 
+criteria must be named in `plan.md`.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 16.83M • cache hit 94.20% •  reasoning 23.65K • ↓ output 70.57K 
+• $ 4.2213
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27442097563-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# Run Summary
+ 2|
++3|## Summary
++4|
++5|PLAN-phase session for Wave 5d sub-gate 5/6 (`@netscript/fresh` RFC 15 forms 
+system, `packages/fresh/form`). Goal: inspect the 28-file `./form` cluster, 
+surface package-quality issues, design a refactor plan, and lock proposed slices
+without changing the public contract. This is a harness v2 PLAN phase (Archetype
+3 + SCOPE-frontend overlay). No implementation was performed.
++6|
++7|The session read the branch handover, umbrella target architecture, 
+AGENTS.md, and key fresh-ui seams (`form-field.tsx`, `control-props.ts`, 
+`docs/l0-conventions.md`). It measured the current `./form` quality baseline 
+with `deno doc --lint`, `deno check --unstable-kv`, and `deno publish 
+--dry-run`, then captured the results. The actual 
+research/design/plan/drift/context-pack artifacts for the 5d5 PR must be 
+authored and committed in a follow-up session; this summary only records the 
+exploration and validation done so far.
++8|
++9|## Changes
++10|
++11|- No code changes were made.
++12|- No files were created or modified in the repository.
++13|- Branch remains `feat/package-quality-wave5-apps-5d5-form` at `b6cb09a`.
++14|- Run summary written to 
+`/home/runner/work/_temp/openhands/27442097563-1/summary.md`.
++15|
++16|## Validation
++17|
++18|| Check | Command / scope | Result |
++19||---|---|---|
++20|| Type check (`packages/fresh/form`) | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | ✅ 0 
+errors |
++21|| Root type check (excludes `packages/fresh`) | `deno task check` | ✅ 0 
+errors |
++22|| Doc lint (`packages/fresh/form/mod.ts`) | `deno doc --lint 
+packages/fresh/form/mod.ts` | ⚠️ 74 issues: 60 missing-jsdoc, 11 
+private-type-ref, 3 missing-return-type |
++23|| JSR dry run (`@netscript/fresh`) | `cd packages/fresh && deno publish 
+--dry-run` | ❌ 62 problems; 4 in `./form` are `missing-explicit-return-type` 
+for `Form`, `FormRegion`, `getSubmissionHiddenInputProps`, plus the package-wide
+excluded-module config issues inherited from the 5d umbrella. |
++24|
++25|### Notable quality findings in `./form`
++26|- **Over-cap files** (baseline): `schema-adapter.ts` (576 LOC), `types.ts` 
+(474 LOC), `field-descriptors.ts` (518 LOC). `intent.ts` (320), `state.ts` 
+(326), `pipeline.ts` (259) are also sizable.
++27|- **Slow-type / private-type-ref issues** are concentrated in:
++28|  - `form/enhancement.tsx` — `applyCollectionStrategy` references private 
+`IntentButtonProps`; `getSubmissionHiddenInputProps` lacks JSDoc + return type.
++29|  - `form/form.tsx` — `Form` references private `FormProps`; lacks JSDoc + 
+return type.
++30|  - `form/form-region.tsx` — `FormRegion` references private 
+`FormRegionProps`; lacks JSDoc + return type.
++31|  - `form/types.ts` — `RuntimeFormState`, `FormEnhancementSnapshot`, 
+`FormEnhancementState` expose private field/constraint/form/CSRF prop types.
++32|- **fresh-ui seam inspected**: 
+`packages/fresh-ui/registry/components/ui/form-field.tsx` and 
+`packages/fresh-ui/registry/components/ui/control-props.ts` are the rendering 
+side. `control-props.ts` consumes any object implementing 
+`controlProps(overrides?)`, which is the clean integration point for `./form` 
+descriptors to emit state without importing fresh-ui internals.
++33|- **Progressive-enhancement primitives present**: `intent.ts`, `reply.ts`, 
+`csrf.ts`, `idempotency.ts`, `enhancement.tsx` encode no-JS submit → island 
+upgrade behavior.
++34|- **Umbrella dependency note**: `@netscript/fresh` already depends on `zod`.
+Evaluating Standard Schema as a replacement target for `schema-adapter.ts` is a 
+required plan decision; adding any new dependency must be recorded as umbrella 
+drift.
++35|
++36|## Remaining risks
++37|
++38|1. **Artifactory not yet produced**: the required deliverables 
+(`research.md`, `design.md`, `plan.md`, `drift.md`, `context-pack.md`) under 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/` still need to be 
+authored and committed.
++39|2. **PR comment not emitted**: the final `OPENHANDS_SUMMARY_PATH` PR comment
+must be generated by the workflow after the plan artifacts are complete.
++40|3. **Umbrella quality gates**: the 5d umbrella demands 0 doc-lint errors, 0 
+over-cap files, 0 private-type-refs, and JSR dry-run pass for `./form`. The 
+current baseline (74 doc-lint issues, 3 over-cap files, 11 private-type-refs) 
+requires a non-trivial refactor plan.
++41|4. **fresh ↔ fresh-ui contract design**: this is the highest-review-risk 
+item. The plan must precisely define how RFC 15 form state maps onto fresh-ui 
+`data-part`/`data-state`/ARIA attributes without cross-package internal imports.
++42|5. **Standard Schema dependency decision**: switching `schema-adapter.ts` to
+Standard Schema could reduce per-library glue but touches the public validation 
+contract and dependency surface; it must be evaluated against the umbrella drift
+policy.
++43|6. **Browser-validation obligation**: the A4-Browser gate requires real 
+playground routes proving no-JS submit, enhanced submit, server validation 
+errors, pending/idempotency UX, and CSRF. These routes and their acceptance 
+criteria must be named in `plan.md`.
++44|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Wrote run summary for 5d5 form plan phase
+
+Finish with message:
+Run summary written to 
+`/home/runner/work/_temp/openhands/27442097563-1/summary.md`. No repository 
+changes were made in this PLAN-phase exploration.
+
+Tokens: ↑ input 16.86M • cache hit 94.21% •  reasoning 23.65K • ↓ output 70.64K 
+• $ 4.2288
+

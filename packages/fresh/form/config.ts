@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import type {
   AnyDefinePageTypeState,
   DefinePageLayerContextBase,
@@ -6,8 +6,10 @@ import type {
 import type { FormHandlerContext } from './handler-context.ts';
 import type { FormIntent, FormIntentResult, FormValues } from './types.ts';
 
-type MaybePromise<T> = T | Promise<T>;
-type FormSchemaInput<TSchema extends z.ZodTypeAny> = z.input<TSchema> & FormValues;
+/** Promise-or-value helper for form callbacks. */
+export type MaybePromise<T> = T | Promise<T>;
+/** Schema input inferred from a Zod schema merged with form values. */
+export type FormSchemaInput<TSchema extends z.ZodTypeAny> = z.input<TSchema> & FormValues;
 
 /**
  * Metadata returned from {@link FormConfig.onSuccess} when the form stays on

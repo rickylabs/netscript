@@ -1,4 +1,4 @@
-import type { ErrorData, ErrorType } from './handler.ts';
+import type { ErrorData, ErrorType } from './types.ts';
 
 /**
  * Shared error-display payload used by package-owned and app-owned error views.

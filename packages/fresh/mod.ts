@@ -12,27 +12,22 @@
 
 export {
   ErrorDisplay,
+  type ErrorDisplayContent,
   type ErrorDisplayProps,
   type ErrorPrimitives,
-} from './components/ErrorDisplay.tsx';
+} from './error/mod.ts';
 export {
+  type ErrorData,
   errorHandler,
+  type ErrorType,
   extractData,
   extractErrorData,
   hasError,
-  type ErrorData,
-  type ErrorType,
   type LoaderResult,
-} from './error/handler.ts';
+} from './error/mod.ts';
 export {
-  DeferComponent,
-  DeferPage,
-  DEFER_POLICY,
-  DEFER_STALE_MS,
-  DETAIL_FORCE_REFRESH_POLICY,
-  resolveDetailDeferConfig,
-} from './defer/mod.ts';
-export {
+  type CachedListEntryLike,
+  type CacheEntryLike,
   hasAllCacheEntries,
   minCachedAt,
   projectCachedItemFromList,

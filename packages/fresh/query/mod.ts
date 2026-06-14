@@ -4,8 +4,8 @@
  * This subpath provides:
  * - `QueryIsland` — island-level provider wrapper
  * - `getIslandQueryClient()` — shared QueryClient singleton
- * - TanStack Preact Query hooks (`useQuery`, `useMutation`, etc.)
- * - TanStack DB live query hooks (`useLiveQuery`, `useLiveSuspenseQuery`)
+ * - package-owned query hooks (`useIslandQuery`, `useIslandMutation`, etc.)
+ * - package-owned live query hooks (`useLiveQuery`, `useLiveSuspenseQuery`)
  * - Hydration utilities for streaming SSR
  *
  * **Import discipline:** Island code should import from `@netscript/fresh/query`,
@@ -21,10 +21,36 @@ export { QueryIsland, type QueryIslandProps } from './query-island.tsx';
 // === QueryClient singleton ===
 export { getIslandQueryClient, resetIslandQueryClient } from './query-client.ts';
 
-// === TanStack Preact Query hooks ===
+// === Package-owned query types ===
+export type {
+  DehydratedState,
+  InitialDataFor,
+  IslandInfiniteQueryOptions,
+  IslandInfiniteQueryResult,
+  IslandLiveQueryFactory,
+  IslandLiveQueryResult,
+  IslandMutationOptions,
+  IslandMutationResult,
+  IslandQueryClient,
+  IslandQueryFilters,
+  IslandQueryOptions,
+  IslandQueryResult,
+  IslandSuspenseQueryResult,
+  LoaderData,
+  QueryIslandChildren,
+  QueryJsonValue,
+  QueryKey,
+} from './query-types.ts';
+
+// === Package-owned query hooks ===
 export {
   useInfiniteQuery,
   useIsFetching,
+  useIslandInfiniteQuery,
+  useIslandMutation,
+  useIslandQuery,
+  useIslandSuspenseInfiniteQuery,
+  useIslandSuspenseQuery,
   useIsMutating,
   useLiveQuery,
   useLiveSuspenseQuery,
@@ -36,4 +62,11 @@ export {
 } from './hooks.ts';
 
 // === Hydration utilities ===
-export { type DehydratedState, dehydrateQueryClient, hydrateFromDehydrated } from './hydration.ts';
+export { dehydrateQueryClient, hydrateFromDehydrated } from './hydration.ts';
+export {
+  DEFAULT_QUERY_HYDRATION_SCRIPT_ID,
+  HydrationBoundary,
+  type HydrationBoundaryProps,
+  QueryHydrationScript,
+  type QueryHydrationScriptProps,
+} from './hydration-script.tsx';

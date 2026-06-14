@@ -14,6 +14,7 @@ import type {
   RuntimeFormState,
 } from './types.ts';
 
+/** Create a serializable client enhancement snapshot from runtime form state. */
 export function createFormEnhancementSnapshot<TValues extends FormValues>(
   state: RuntimeFormState<TValues>,
 ): FormEnhancementSnapshot<TValues> {
@@ -36,6 +37,7 @@ export function createFormEnhancementSnapshot<TValues extends FormValues>(
   };
 }
 
+/** Apply collection update navigation metadata to intent button props. */
 export function applyCollectionStrategy<TProps extends IntentButtonProps>(
   props: TProps,
   strategy: FormCollectionStrategy | undefined,
@@ -54,6 +56,7 @@ export function applyCollectionStrategy<TProps extends IntentButtonProps>(
   };
 }
 
+/** Manage progressive form enhancement state and client-side validation handlers. */
 export function useFormEnhancement<TValues extends FormValues>(
   snapshot: FormEnhancementSnapshot<TValues>,
   options: FormEnhancementOptions<TValues> = {},
@@ -193,7 +196,9 @@ function toClientFieldErrors<TValues extends FormValues>(
         continue;
       }
 
-      nextErrors[field as Extract<keyof TValues, string>] = [...messages] as unknown as FormFieldErrors<TValues>[
+      nextErrors[field as Extract<keyof TValues, string>] = [
+        ...messages,
+      ] as unknown as FormFieldErrors<TValues>[
         Extract<keyof TValues, string>
       ];
     }
@@ -237,7 +242,12 @@ function focusFirstInvalidField<TValues extends FormValues>(
   }
 }
 
-export function getSubmissionHiddenInputProps(submissionId: string) {
+/** Return the hidden input props for carrying an idempotent submission id. */
+export function getSubmissionHiddenInputProps(submissionId: string): {
+  readonly type: 'hidden';
+  readonly name: typeof SUBMISSION_ID_FIELD_NAME;
+  readonly value: string;
+} {
   return {
     type: 'hidden' as const,
     name: SUBMISSION_ID_FIELD_NAME,

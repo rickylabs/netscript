@@ -1,0 +1,400 @@
+    33      "@std/assert": "jsr:@std/assert@^1",
+    34      "@std/http": "jsr:@std/http@^1",
+    35      "@std/path": "jsr:@std/path@^1",
+    36      "@std/text": "jsr:@std/text@^1",
+    37      "fresh": "jsr:@fresh/core@^2.3.0",
+    38      "preact": "npm:preact@^10.29.1",
+    39      "preact-render-to-string": "npm:preact-render-to-string@^6.6.5",
+    40      "vite": "npm:vite@7.2.2",
+    41      "zod": "npm:zod@^4.3.6",
+    42      "@durable-streams/state": "npm:@durable-streams/state@^0.2.3",
+    43      "@tanstack/react-db": "npm:@tanstack/react-db@^0.1.79"
+    44    },
+    45    "publish": {
+    46      "include": [
+    47        "**/*.ts",
+    48        "**/*.tsx",
+    49        "deno.json",
+    50        "README.md"
+    51      ],
+    52      "exclude": [
+    53        "**/*_test.ts",
+    54        "**/*_test.tsx",
+    55        "**/*.test.ts",
+    56        "**/*.test.tsx"
+    57      ]
+    58    },
+    59    "compilerOptions": {
+    60      "lib": [
+    61        "dom",
+    62        "dom.asynciterable",
+    63        "dom.iterable",
+    64        "deno.ns",
+    65        "deno.unstable"
+    66      ],
+    67      "jsx": "precompile",
+    68      "jsxImportSource": "preact",
+    69      "jsxPrecompileSkipElements": [
+    70        "a",
+    71        "img",
+    72        "source",
+    73        "body",
+    74        "html",
+    75        "head",
+    76        "title",
+    77        "meta",
+    78        "script",
+    79        "link",
+    80        "style",
+    81        "base",
+    82        "noscript",
+    83        "template"
+    84      ]
+    85    }
+    86  }
+    87  
+
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Run fresh check task
+
+$ cd /home/runner/work/netscript/netscript/packages/fresh && deno task check 
+2>&1 | tail -40 [timeout: 180.0s]
+
+Tokens: ↑ input 2.74M • cache hit 95.01% •  reasoning 4.37K • ↓ output 16.83K • 
+$ 0.6918
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Task check deno check ./mod.ts ./interactive.ts ./server.ts ./builders/mod.ts 
+./route/mod.ts ./defer/mod.ts ./form/mod.ts ./error/mod.ts ./utils/mod.ts 
+./streams/mod.ts ./config/vite.ts
+Warning No matching files found.
+
+📁 Working directory: /home/runner/work/netscript/netscript/packages/fresh
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: deno check single file
+
+$ cd /home/runner/work/netscript/netscript/packages/fresh && deno check 
+./defer/mod.ts 2>&1 | tail -40 [timeout: 180.0s]
+
+Tokens: ↑ input 2.76M • cache hit 95.03% •  reasoning 4.37K • ↓ output 16.89K • 
+$ 0.6961
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Warning No matching files found.
+
+📁 Working directory: /home/runner/work/netscript/netscript/packages/fresh
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Inspect fresh package structure
+
+$ cd /home/runner/work/netscript/netscript && find packages/fresh -type f -name 
+"*.ts" -o -name "*.tsx" | head -30 && echo "---" && ls packages/fresh
+
+Tokens: ↑ input 2.78M • cache hit 95.06% •  reasoning 4.37K • ↓ output 16.96K • 
+$ 0.7004
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+packages/fresh/form/intent.ts
+packages/fresh/form/pagination.ts
+packages/fresh/form/idempotency.ts
+packages/fresh/form/error-normalization.ts
+packages/fresh/form/types.ts
+packages/fresh/form/telemetry.ts
+packages/fresh/form/handler-context.ts
+packages/fresh/form/schema-adapter.test.ts
+packages/fresh/form/schema-adapter.ts
+packages/fresh/form/csrf.test.ts
+packages/fresh/form/pipeline.ts
+packages/fresh/form/collection.test.ts
+packages/fresh/form/form.tsx
+packages/fresh/form/field-descriptors.ts
+packages/fresh/form/reply.ts
+packages/fresh/form/intent.test.ts
+packages/fresh/form/state.ts
+packages/fresh/form/form-region.tsx
+packages/fresh/form/reply.test.ts
+packages/fresh/form/mod.ts
+packages/fresh/form/form.test.tsx
+packages/fresh/form/error-normalization.test.ts
+packages/fresh/form/config.ts
+packages/fresh/form/runtime-state.test.ts
+packages/fresh/form/errors.ts
+packages/fresh/form/collection-keys.ts
+packages/fresh/form/enhancement.tsx
+packages/fresh/form/csrf.ts
+packages/fresh/utils/cache-entry.ts
+packages/fresh/utils/mod.ts
+---
+README.md  builders  components  config  defer  deno.json  error  form  hooks  
+interactive.ts  mod.ts  query  route  server  server.ts  streams  utils
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: deno check absolute path
+
+$ cd /home/runner/work/netscript/netscript && deno check 
+./packages/fresh/defer/mod.ts 2>&1 [timeout: 180.0s]
+
+Tokens: ↑ input 2.8M • cache hit 95.08% •  reasoning 4.37K • ↓ output 17.02K • $
+0.7050
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Warning No matching files found.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check deno check warning meaning
+
+$ cd /home/runner/work/netscript/netscript && deno check --help | grep -A2 "no 
+match" [timeout: 60.0s]
+
+Tokens: ↑ input 2.82M • cache hit 95.10% •  reasoning 4.37K • ↓ output 17.08K • 
+$ 0.7094
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+❌ Exit code: 1
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: deno check fresh mod
+
+$ cd /home/runner/work/netscript/netscript && deno check ./packages/fresh/mod.ts
+2>&1 | tail -20 [timeout: 180.0s]
+
+Tokens: ↑ input 2.84M • cache hit 95.13% •  reasoning 4.37K • ↓ output 17.14K • 
+$ 0.7140
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Warning No matching files found.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: deno check multiple absolute
+
+$ cd /home/runner/work/netscript/netscript && deno check ./packages/fresh/mod.ts
+./packages/fresh/server.ts ./packages/fresh/defer/mod.ts 
+./packages/fresh/streams/mod.ts 2>&1 | tail -20 [timeout: 180.0s]
+
+Tokens: ↑ input 2.86M • cache hit 95.15% •  reasoning 4.37K • ↓ output 17.22K • 
+$ 0.7185
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Warning No matching files found.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: deno check with node flag
+
+$ cd /home/runner/work/netscript/netscript && deno check 
+--node-modules-dir=false ./packages/fresh/mod.ts 2>&1 | head -20 [timeout: 
+180.0s]
+
+Tokens: ↑ input 2.89M • cache hit 95.18% •  reasoning 4.37K • ↓ output 17.29K • 
+$ 0.7230
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Warning No matching files found.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: deno check all
+
+$ cd /home/runner/work/netscript/netscript && deno check --all 
+./packages/fresh/mod.ts 2>&1 | tail -40 [timeout: 180.0s]
+
+Tokens: ↑ input 2.91M • cache hit 95.21% •  reasoning 4.37K • ↓ output 17.35K • 
+$ 0.7276
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Warning No matching files found.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: deno info fresh mod
+
+$ cd /home/runner/work/netscript/netscript && deno info ./packages/fresh/mod.ts 
+2>&1 | head -40 [timeout: 120.0s]
+
+Tokens: ↑ input 2.93M • cache hit 95.24% •  reasoning 4.37K • ↓ output 17.41K • 
+$ 0.7321
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+local: /home/runner/work/netscript/netscript/packages/fresh/mod.ts
+type: TypeScript
+dependencies: 247 unique
+size: 5.92MB
+
+file:///home/runner/work/netscript/netscript/packages/fresh/mod.ts (960B)
+├─┬ 
+file:///home/runner/work/netscript/netscript/packages/fresh/components/ErrorDisp
+lay.tsx (5.48KB)
+│ ├── npm:/preact@10.29.2/jsx-runtime (1.49MB)
+│ ├── npm:/preact@10.29.2/jsx-runtime *
+│ ├─┬ 
+file:///home/runner/work/netscript/netscript/packages/fresh/error/handler.ts 
+(11.37KB)
+│ │ ├─┬ https://jsr.io/@fresh/core/2.3.3/src/mod.ts (1.12KB)
+│ │ │ ├─┬ https://jsr.io/@fresh/core/2.3.3/src/app.ts (14.32KB)
+│ │ │ │ ├── npm:/@opentelemetry/api@1.9.1 (977.86KB)
+│ │ │ │ ├─┬ https://jsr.io/@fresh/build-id/1.0.1/mod.ts (537B)
+│ │ │ │ │ └─┬ https://jsr.io/@std/encoding/1.0.10/hex.ts (2.45KB)
+│ │ │ │ │   ├─┬ https://jsr.io/@std/encoding/1.0.10/_common16.ts (1.88KB)
+│ │ │ │ │   │ └── https://jsr.io/@std/encoding/1.0.10/_types.ts (333B)
+│ │ │ │ │   ├─┬ https://jsr.io/@std/encoding/1.0.10/_common_detach.ts (625B)
+│ │ │ │ │   │ └── https://jsr.io/@std/encoding/1.0.10/_types.ts *
+│ │ │ │ │   └── https://jsr.io/@std/encoding/1.0.10/_types.ts *
+│ │ │ │ ├── https://jsr.io/@std/fmt/1.0.10/colors.ts (21.21KB)
+│ │ │ │ ├─┬ https://jsr.io/@fresh/core/2.3.3/src/middlewares/mod.ts (4.97KB)
+│ │ │ │ │ ├─┬ https://jsr.io/@fresh/core/2.3.3/src/context.ts (17.92KB)
+│ │ │ │ │ │ ├── npm:/preact@10.29.2 *
+│ │ │ │ │ │ ├── npm:/preact@10.29.2/jsx-runtime *
+│ │ │ │ │ │ ├── npm:/@opentelemetry/api@1.9.1 *
+│ │ │ │ │ │ ├─┬ https://jsr.io/@fresh/core/2.3.3/src/config.ts (1.78KB)
+│ │ │ │ │ │ │ └─┬ https://jsr.io/@std/path/1.1.4/mod.ts (7.44KB)
+│ │ │ │ │ │ │   ├─┬ https://jsr.io/@std/path/1.1.4/basename.ts (1.22KB)
+│ │ │ │ │ │ │   │ ├─┬ https://jsr.io/@std/internal/1.0.13/os.ts (232B)
+│ │ │ │ │ │ │   │ │ └── https://jsr.io/@std/internal/1.0.13/_os.ts (459B)
+│ │ │ │ │ │ │   │ ├─┬ https://jsr.io/@std/path/1.1.4/posix/basename.ts (2.31KB)
+│ │ │ │ │ │ │   │ │ ├─┬ https://jsr.io/@std/path/1.1.4/_common/basename.ts 
+(1.21KB)
+│ │ │ │ │ │ │   │ │ │ └── https://jsr.io/@std/path/1.1.4/_common/assert_path.ts 
+(288B)
+│ │ │ │ │ │ │   │ │ ├─┬ https://jsr.io/@std/path/1.1.4/posix/from_file_url.ts 
+(668B)
+│ │ │ │ │ │ │   │ │ │ └── 
+https://jsr.io/@std/path/1.1.4/_common/from_file_url.ts (335B)
+│ │ │ │ │ │ │   │ │ ├── 
+https://jsr.io/@std/path/1.1.4/_common/strip_trailing_separators.ts (571B)
+│ │ │ │ │ │ │   │ │ └─┬ https://jsr.io/@std/path/1.1.4/posix/_util.ts (370B)
+│ │ │ │ │ │ │   │ │   └── https://jsr.io/@std/path/1.1.4/_common/constants.ts 
+(1.95KB)
+│ │ │ │ │ │ │   │ └─┬ https://jsr.io/@std/path/1.1.4/windows/basename.ts 
+(1.94KB)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read fresh main mod
+
+$ cd /home/runner/work/netscript/netscript && cat packages/fresh/mod.ts
+
+Tokens: ↑ input 2.95M • cache hit 95.23% •  reasoning 4.37K • ↓ output 17.45K • 
+$ 0.7377
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+/**
+ * Root convenience entrypoint for commonly shared `@netscript/fresh` helpers.
+ *
+ * Prefer explicit subpaths such as `@netscript/fresh/builders`,
+ * `@netscript/fresh/route`, `@netscript/fresh/form`, and
+ * `@netscript/fresh/defer` for new package consumers. The root surface remains
+ * intentionally curated so existing apps can keep importing the small set of
+ * runtime helpers they already depend on.
+ *
+ * @module
+ */
+
+export {
+  ErrorDisplay,
+  type ErrorDisplayProps,
+  type ErrorPrimitives,
+} from './components/ErrorDisplay.tsx';
+export {
+  errorHandler,
+  extractData,
+  extractErrorData,
+  hasError,
+  type ErrorData,
+  type ErrorType,
+  type LoaderResult,
+} from './error/handler.ts';
+export {
+  DeferComponent,
+  DeferPage,
+  DEFER_POLICY,
+  DEFER_STALE_MS,
+  DETAIL_FORCE_REFRESH_POLICY,
+  resolveDetailDeferConfig,
+} from './defer/mod.ts';
+export {
+  hasAllCacheEntries,
+  minCachedAt,
+  projectCachedItemFromList,
+} from './utils/mod.ts';
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+

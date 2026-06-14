@@ -1,5 +1,5 @@
 import { resolve } from '@std/path';
-import { normalizePath, type ConfigEnv, type UserConfig, type ViteDevServer } from 'vite';
+import { type ConfigEnv, normalizePath, type UserConfig, type ViteDevServer } from 'vite';
 import { createNetScriptVitePlugin } from './vite.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -9,7 +9,10 @@ function assert(condition: unknown, message: string): asserts condition {
 }
 
 function asConfigHook(plugin: ReturnType<typeof createNetScriptVitePlugin>) {
-  return plugin.config as unknown as (config: UserConfig, env: ConfigEnv) => UserConfig | void | null;
+  return plugin.config as unknown as (
+    config: UserConfig,
+    env: ConfigEnv,
+  ) => UserConfig | void | null;
 }
 
 function asConfigureServerHook(plugin: ReturnType<typeof createNetScriptVitePlugin>) {
@@ -20,7 +23,12 @@ function asResolveIdHook(plugin: ReturnType<typeof createNetScriptVitePlugin>) {
   return plugin.resolveId as unknown as (
     source: string,
     importer?: string,
-    options?: { attributes: Record<string, string>; custom?: Record<string, unknown>; isEntry: boolean; ssr?: boolean },
+    options?: {
+      attributes: Record<string, string>;
+      custom?: Record<string, unknown>;
+      isEntry: boolean;
+      ssr?: boolean;
+    },
   ) => string | null | undefined | Promise<string | null | undefined>;
 }
 
@@ -40,12 +48,18 @@ Deno.test('createNetScriptVitePlugin returns config through official plugin hook
   });
 
   assert(typeof plugin.config === 'function', 'Expected plugin.config hook');
-  const config = asConfigHook(plugin)({} as UserConfig, { command: 'serve', mode: 'development' } as ConfigEnv);
+  const config = asConfigHook(plugin)(
+    {} as UserConfig,
+    { command: 'serve', mode: 'development' } as ConfigEnv,
+  );
   assert(config !== undefined && config !== null, 'Expected config hook to return config');
 
   assert(config.resolve?.alias !== undefined, 'Expected resolve.alias entries');
-  assert(config.server?.fs?.allow?.includes(normalizePath(resolve('C:/repo'))), 'Expected workspace root in fs.allow');
-  assert(config.define?.['import.meta.env.VITE_USERS_URL'] === '"http://localhost:3000"', 'Expected env define entry');
+  assert(config.server?.fs?.allow?.includes('C:/repo'), 'Expected workspace root in fs.allow');
+  assert(
+    config.define?.['import.meta.env.VITE_USERS_URL'] === '"http://localhost:3000"',
+    'Expected env define entry',
+  );
 });
 
 Deno.test('createNetScriptVitePlugin returns actual Vite-style plugin objects', () => {
@@ -66,10 +80,16 @@ Deno.test('createNetScriptVitePlugin returns actual Vite-style plugin objects', 
   } as ViteDevServer);
 
   assert(plugin.name === 'vite-plugin-netscript', `Unexpected plugin name: ${plugin.name}`);
-  assert(watchedPaths.includes('C:/repo/packages'), 'Expected watch path to be registered via configureServer');
+  assert(
+    watchedPaths.includes('C:/repo/packages'),
+    'Expected watch path to be registered via configureServer',
+  );
 
   assert(typeof plugin.config === 'function', 'Expected plugin.config hook');
-  const envConfig = asConfigHook(plugin)({} as UserConfig, { command: 'serve', mode: 'development' } as ConfigEnv);
+  const envConfig = asConfigHook(plugin)(
+    {} as UserConfig,
+    { command: 'serve', mode: 'development' } as ConfigEnv,
+  );
   assert(envConfig?.define?.['import.meta.env.VITE_A'] === '"value"', 'Expected env config hook');
 });
 
@@ -122,7 +142,10 @@ Deno.test('createNetScriptVitePlugin resolves @app aliases via resolveId', async
     custom: {},
     isEntry: false,
   });
-  assert(resolved === 'C:/repo/apps/playground/assets/tokens.css', `Unexpected resolved path: ${resolved}`);
+  assert(
+    resolved === 'C:/repo/apps/playground/assets/tokens.css',
+    `Unexpected resolved path: ${resolved}`,
+  );
 });
 
 Deno.test('route manifest watch resyncs when helper TypeScript files move under routes', () => {

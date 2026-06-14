@@ -1,0 +1,17 @@
+{
+  "run_id": "27463177474",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27463177474",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/moonshotai/kimi-k2.7-code",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "37",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feat/package-quality-wave5-apps-5d4-streaming",
+  "summary_path": "/home/runner/work/_temp/openhands/27463177474-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-37/run-27463177474-1"
+}

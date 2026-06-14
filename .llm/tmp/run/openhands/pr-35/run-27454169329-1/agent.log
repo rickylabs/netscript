@@ -1,0 +1,400 @@
+
+## Read First
+
+1. `docs/architecture/doctrine/06-archetypes.md#archetype-3--runtimebehavior`.
+2. `docs/architecture/doctrine/08-runtime-state-failure.md`.
+3. `docs/architecture/doctrine/03-base-and-derived-classes.md` if classes or 
+inheritance change.
+4. The runtime README, definitions/builders, state model, runner, supervisor, 
+adapters, and
+   diagnostics.
+5. Existing tests around retries, cancellation, delivery, and errors.
+6. Relevant debt entries.
+
+## Required Gates in Order
+
+1. Static gates: package/slice checks, fmt, lint, doc lint, publish dry-run.
+2. Fitness gates: all F-1 through F-15.
+3. Runtime gates: required. Validate lifecycle, stop handles, cancellation, 
+backend health where
+   applicable, and representative traces/logs.
+4. Consumer gates: required when definitions, builders, runtime contracts, or 
+exported handles
+   change.
+
+## Anti-Patterns to Watch For
+
+- AP-1: executor, transport, or dispatcher monolith.
+- AP-6: base class with concrete lifecycle behavior.
+- AP-10: handler catches errors that the supervisor should decide.
+- AP-11: hidden globals for stores, clocks, telemetry, or queues.
+- AP-12: direct time and timer use inside handlers.
+- AP-13: `console.*` in published runtime code.
+
+## False-Done States
+
+- Static checks pass but no runtime start/stop path was exercised.
+- A new async path ignores `AbortSignal`.
+- Retry or failure logic works in the happy path only.
+- README omits delivery guarantees, concurrency, permissions, or stop semantics.
+- Sagas have handlers but no terminal or compensation story where required.
+
+## Rescope Triggers
+
+- The runtime needs a supervisor split not named in the plan.
+- State shape or lifecycle phases are implicit or missing.
+- An executor file must be split before the requested change can be safe.
+- Runtime validation requires Aspire resources or external services not 
+available in the current
+  session.
+
+## Design Checkpoint Expectations
+
+The design checkpoint must name state shape, identity, lifecycle phases, 
+supervisor boundary, clock
+port, cancellation path, delivery guarantee, concurrency model, and diagnostics 
+before
+implementation.
+
+The design section in `worklog.md` must include:
+
+- state type and lifecycle enum/union,
+- ports for clock, transport, and external dependencies,
+- constants for states, event kinds, or delivery modes,
+- commit slices: state+lifecycle first, then runner/supervisor, then adapters, 
+then consumer
+  integration,
+- contributor path for adding a new handler or lifecycle hook.
+
+## Concept of Done
+
+Beyond the universal slice checklist in `workflow/run-loop.md`:
+
+- start, stop, and failure paths are exercised by tests or runtime gates,
+- async paths respect `AbortSignal`,
+- the README documents delivery guarantees, concurrency, and stop semantics,
+- sagas have terminal and compensation paths where required.
+
+## Historical Notes
+
+Runtime packages can appear done because `deno check` is green. The closure bar 
+is behavior: start,
+stop, failure, retry, cancellation, and consumer impact.
+--- SCOPE FRONTEND ---
+# Scope Overlay — Frontend
+
+Use this overlay for Fresh routes, UI components, islands, dashboard pages, 
+browser workflows, and
+frontend package work.
+
+## Doctrine Boundary
+
+Application code is a consumer of the package/plugin doctrine unless it modifies
+`packages/` or
+`plugins/`. When frontend work touches `@netscript/fresh`, 
+`@netscript/fresh-ui`, plugin UI
+contracts, or public builders, apply the matching archetype profile first.
+
+## Additional Read First
+
+- `.claude/05-frontend.md`
+- relevant Fresh/Fresh 2 docs in `.resources/deps-docs/`
+- route files, islands, components, loaders, and API contracts touched by the 
+work
+- existing UI tests and screenshots when available
+
+## Additional Gates
+
+| Gate                       | Requirement                                      
+|
+| -------------------------- | 
+------------------------------------------------------- |
+| Route check                | Real route renders with representative data      
+|
+| Browser validation         | Use Playwright or browser tooling for changed 
+workflows |
+| Loading/empty/error states | Verify each affected state, not only happy path  
+|
+| Responsive check           | Validate mobile and desktop for changed views    
+|
+| Contract check             | Affected API contracts and clients typecheck     
+|
+
+## False-Done States
+
+- Main route works but subpages or nested states remain broken.
+- Static check passes but browser render blocks, flashes, or shows stale data.
+- Visual change is verified only by reading code.
+- Package builder changes are not checked against frontend consumers.
+
+## Rescope Triggers
+
+- UI task requires contract or service redesign.
+- Fresh route behavior depends on package API changes not in the plan.
+- Browser validation exposes broader navigation or data-loading failures.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read doctrine archetype 4 section
+
+$ cd /home/runner/work/netscript/netscript && cat 
+docs/architecture/doctrine/06-archetypes.md | grep -A 60 'Archetype 4'
+
+Tokens: ↑ input 29.55M • cache hit 94.09% •  reasoning 41.09K • ↓ output 109.33K
+• $ 7.3771
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+## Archetype 4 — Public DSL / Builder
+
+For packages whose primary product is a fluent builder API.
+Examples: `@netscript/fresh`, `@netscript/sdk`, the future
+CLI E2E suite, future `@netscript/contracts` design DSL.
+
+Minimum shape:
+
+```
+mod.ts                              ← thin re-export
+README.md
+deno.json
+src/
+  domain/                           ← definition objects
+  application/
+    builders/                       ← per-concern builder file groups
+      define-x.ts                   ← entry function
+      x-builder.ts                  ← class
+      x-builder-state.ts            ← typestate / accumulator
+      x-builder-validation.ts       ← invariants
+      x-definition-factory.ts       ← finalize/freeze
+    runtime/                        ← (only if the DSL has runtime)
+  testing/                          ← builder-fixture helpers
+tests/
+```
+
+Doctrine for this archetype:
+
+- One file per builder concern. No 1,000-line builder mod.
+- `defineX()` is the only entry; everything else is reachable via
+  builder methods.
+- The materialized definition is a frozen plain object.
+- Typestate is used where omitting a step silently produces a
+  broken runtime (see Rust as source).
+- Subpath exports per major builder concern (`./builders/route`,
+  `./builders/query`).
+- The README's quick-start is one chained call.
+
+## Archetype 5 — Plugin Package
+
+For first-party plugin packages under `plugins/*`. Examples:
+`plugins/workers`, `plugins/sagas`, `plugins/triggers`,
+`plugins/hello-world`.
+
+Minimum shape:
+
+```
+mod.ts
+README.md
+deno.json
+contracts.ts                        ← public schemas used by plugin loader
+src/
+  services/                         ← service entrypoints
+  database/                         ← Prisma schema contributions
+  jobs/ | sagas/ | triggers/        ← per-runtime declarations
+  streams/                          ← event-bus declarations
+  verify-plugin.ts                  ← package-owned validation
+tests/
+```
+
+Doctrine for this archetype:
+--
+4. Is the package's *primary product* a fluent DSL? → Archetype 4.
+5. Is the package a *first-party plugin*? → Archetype 5.
+6. Does the package ship a *binary* the user runs? → Archetype 6.
+
+If two archetypes apply (e.g. a runtime package that also publishes
+a DSL), pick the *larger* archetype. Layers from the smaller one
+fold into the larger one. Do not fragment a package across two
+archetypes.
+
+## Archetype assignments for current packages
+
+| Package                      | Archetype                  |
+| ---------------------------- | -------------------------- |
+| `streams`, `runtime-config`, `config` | 1 — Small Contract |
+| `database`, `queue`, `kv`, `aspire`, `cron`, `prisma-adapter-mysql`, `logger`,
+`telemetry` | 2 — Integration |
+| `workers`, `triggers`, `watchers` | 3 — Runtime/Behavior |
+| `sagas`                      | 3 — Runtime/Behavior with state-machine 
+specialization |
+| `fresh`, `fresh-ui`, `sdk`, `service`, `contracts`, `plugin` | 4 — DSL/Builder
+|
+| `cli`                        | 6 — CLI/Tooling            |
+| `shared`                     | Special — see below.       |
+| `plugins/*`                  | 5 — Plugin Package         |
+
+### About `packages/shared`
+
+A `shared` package is an architectural smell unless every export is
+a domain-neutral primitive that genuinely is shared by three or
+more sibling packages. Today, `shared/utils/datetime.ts` (1,112
+LOC) is the worst offender — it is reinventing `@std/datetime`. The
+remediation is to delete or shrink `shared/` until what remains is
+either (a) re-exports of `@std/*`/`crypto`/`Temporal` shaped to
+NetScript policy, or (b) a single `domain/` with cross-package
+identifiers (`CorrelationId`, `RunId`, `EventId`).
+
+## Archetype checklist for review
+
+- [ ] The package's archetype is named in its README ("This is a
+      Runtime/Behavior package…").
+- [ ] The folder shape matches the archetype's minimum (more is
+      OK; fewer is suspicious).
+- [ ] No archetype-specific folders in a package that does not
+      need them (no `presentation/` in a Small Contract package; no
+      `state/` in a Small Contract package).
+- [ ] If two archetypes seemed to apply, the package picked the
+      larger one and folded the smaller in.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read doctrine archetype 3 section
+
+$ cd /home/runner/work/netscript/netscript && cat 
+docs/architecture/doctrine/06-archetypes.md | grep -A 60 'Archetype 3'
+
+Tokens: ↑ input 29.58M • cache hit 94.10% •  reasoning 41.09K • ↓ output 109.39K
+• $ 7.3848
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+## Archetype 3 — Runtime/Behavior
+
+For packages that own long-running behavior with state, lifecycle,
+and supervised execution. Examples: `@netscript/workers`,
+`@netscript/triggers`, future `@netscript/streams` runtime layer.
+*Not* `@netscript/sagas`, which is its own archetype below.
+
+Minimum shape:
+
+```
+mod.ts
+README.md
+deno.json
+src/
+  domain/                           ← types: Job, Task, Trigger
+  ports/                            ← stores, transports, clocks
+  state/                            ← per-instance state shapes
+  application/
+    builders/                       ← defineX builders
+    runtime/                        ← JobRuntime, TaskExecutor
+    runner/                         ← lifecycle dispatch
+  adapters/
+  middleware/
+  registry/
+  presets/                          ← startCombined, startWorkers
+  diagnostics/                      ← error normalization
+tests/
+```
+
+Doctrine for this archetype:
+
+- The runtime class owns lifecycle and is constructor-injected with
+  collaborators (store, queue, telemetry).
+- A `defineX()` builder returns a frozen definition consumed by the
+  runtime.
+- Long-running tasks return small `{ stop(): Promise<void> }`
+  handles. They do not rely on global state.
+- `AbortSignal` is plumbed through every async path.
+- Crash boundaries are explicit; a supervisor decides restart vs.
+  escalate. (See 
+[`08-runtime-state-failure.md`](./08-runtime-state-failure.md).)
+
+## Archetype 4 — Public DSL / Builder
+
+For packages whose primary product is a fluent builder API.
+Examples: `@netscript/fresh`, `@netscript/sdk`, the future
+CLI E2E suite, future `@netscript/contracts` design DSL.
+
+Minimum shape:
+
+```
+mod.ts                              ← thin re-export
+README.md
+deno.json
+src/
+  domain/                           ← definition objects
+  application/
+    builders/                       ← per-concern builder file groups
+      define-x.ts                   ← entry function
+      x-builder.ts                  ← class
+      x-builder-state.ts            ← typestate / accumulator
+      x-builder-validation.ts       ← invariants
+--
+   Archetype 3.
+4. Is the package's *primary product* a fluent DSL? → Archetype 4.
+5. Is the package a *first-party plugin*? → Archetype 5.
+6. Does the package ship a *binary* the user runs? → Archetype 6.
+
+If two archetypes apply (e.g. a runtime package that also publishes
+a DSL), pick the *larger* archetype. Layers from the smaller one
+fold into the larger one. Do not fragment a package across two
+archetypes.
+
+## Archetype assignments for current packages
+
+| Package                      | Archetype                  |
+| ---------------------------- | -------------------------- |
+| `streams`, `runtime-config`, `config` | 1 — Small Contract |
+| `database`, `queue`, `kv`, `aspire`, `cron`, `prisma-adapter-mysql`, `logger`,
+`telemetry` | 2 — Integration |
+| `workers`, `triggers`, `watchers` | 3 — Runtime/Behavior |
+| `sagas`                      | 3 — Runtime/Behavior with state-machine 
+specialization |
+| `fresh`, `fresh-ui`, `sdk`, `service`, `contracts`, `plugin` | 4 — DSL/Builder
+|
+| `cli`                        | 6 — CLI/Tooling            |
+| `shared`                     | Special — see below.       |
+| `plugins/*`                  | 5 — Plugin Package         |
+
+### About `packages/shared`
+
+A `shared` package is an architectural smell unless every export is
+a domain-neutral primitive that genuinely is shared by three or
+more sibling packages. Today, `shared/utils/datetime.ts` (1,112
+LOC) is the worst offender — it is reinventing `@std/datetime`. The
+remediation is to delete or shrink `shared/` until what remains is
+either (a) re-exports of `@std/*`/`crypto`/`Temporal` shaped to
+NetScript policy, or (b) a single `domain/` with cross-package
+identifiers (`CorrelationId`, `RunId`, `EventId`).
+
+## Archetype checklist for review
+
+- [ ] The package's archetype is named in its README ("This is a
+      Runtime/Behavior package…").
+- [ ] The folder shape matches the archetype's minimum (more is
+      OK; fewer is suspicious).
+- [ ] No archetype-specific folders in a package that does not
+      need them (no `presentation/` in a Small Contract package; no
+      `state/` in a Small Contract package).
+- [ ] If two archetypes seemed to apply, the package picked the
+      larger one and folded the smaller in.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+{"asctime": "2026-06-13 03:37:26,423", "levelname": "ERROR", "name": "openhands.sdk.conversation.impl.local_conversation", "filename": "local_conversation.py", "lineno": 1228, "message": "Agent reached maximum iterations limit (800)."}
+{"asctime": "2026-06-13 03:37:26,424", "levelname": "WARNING", "name": "openhands.sdk.conversation.visualizer.default", "filename": "default.py", "lineno": 321, "message": "Event type ConversationErrorEvent is not registered in EVENT_VISUALIZATION_CONFIG. Skipping visualization."}
+{"asctime": "2026-06-13 03:37:26,434", "levelname": "ERROR", "name": "__main__", "filename": "agent_runner.py", "lineno": 195, "message": "Run ended at the iteration limit; reporting failure"}

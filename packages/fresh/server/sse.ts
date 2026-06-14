@@ -10,11 +10,56 @@
  * @module
  */
 
-import { getKv, type KvKey, type WatchableKv } from '@netscript/kv';
+import { getKv } from '@netscript/kv';
 
 // ============================================================================
 // TYPES
 // ============================================================================
+
+/**
+ * KV key shape accepted by SSE watch helpers.
+ */
+export type SSEKvKey = readonly Deno.KvKeyPart[];
+
+/**
+ * Clock port used by the SSE adapter for heartbeat and timestamp behavior.
+ */
+export interface SSEClock {
+  /** Schedule repeated heartbeat work. */
+  setInterval(callback: () => void, ms: number): number;
+  /** Clear a scheduled heartbeat. */
+  clearInterval(id: number): void;
+  /** Return the current timestamp for emitted events. */
+  now(): Date;
+}
+
+/** KV watch surface consumed by the SSE helpers. */
+export interface SSEWatchableKv {
+  /** Watch a fixed list of KV keys. */
+  watch(
+    keys: SSEKvKey[],
+    options: { signal?: AbortSignal; debounce?: number },
+  ): AsyncIterable<unknown[]>;
+  /** Watch all changes below a KV key prefix. */
+  watchPrefix(
+    prefix: SSEKvKey,
+    options: { signal?: AbortSignal; pollInterval?: number },
+  ): AsyncIterable<unknown>;
+  /** Optional list method used by callers when fetching initial state. */
+  list?(selector: { prefix: SSEKvKey }, options?: unknown): AsyncIterable<unknown>;
+}
+
+const SYSTEM_SSE_CLOCK: SSEClock = {
+  setInterval(callback, ms) {
+    return setInterval(callback, ms);
+  },
+  clearInterval(id) {
+    clearInterval(id);
+  },
+  now() {
+    return new Date();
+  },
+};
 
 /**
  * SSE event to send to clients
@@ -38,6 +83,10 @@ export interface SSEStreamOptions {
   keepaliveInterval?: number;
   /** Whether to send initial connected event (default: true) */
   sendConnected?: boolean;
+  /** Abort signal from the request or caller that owns this stream. */
+  signal?: AbortSignal;
+  /** Clock port for heartbeat scheduling and timestamps. */
+  clock?: SSEClock;
   /** Custom headers to include */
   headers?: Record<string, string>;
 }
@@ -100,6 +149,8 @@ export function createSSEStream(
   const {
     keepaliveInterval = 15000,
     sendConnected = true,
+    signal: externalSignal,
+    clock = SYSTEM_SSE_CLOCK,
     headers: customHeaders = {},
   } = options;
 
@@ -115,9 +166,17 @@ export function createSSEStream(
   let closed = false;
   let keepaliveTimer: number | null = null;
 
+  const disposeKeepalive = (): void => {
+    if (keepaliveTimer !== null) {
+      clock.clearInterval(keepaliveTimer);
+      keepaliveTimer = null;
+    }
+  };
+
   const stream = new ReadableStream({
     async start(streamController) {
       const encoder = new TextEncoder();
+      let onExternalAbort: (() => void) | undefined;
 
       // Create SSE controller
       const sseController: SSEController = {
@@ -139,8 +198,8 @@ export function createSSEStream(
             message += `data: ${JSON.stringify(event.data)}\n\n`;
 
             streamController.enqueue(encoder.encode(message));
-          } catch (error) {
-            console.error('[SSE] Failed to send event:', error);
+          } catch {
+            this.close();
           }
         },
 
@@ -156,10 +215,9 @@ export function createSSEStream(
           if (closed) return;
           closed = true;
           abortController.abort();
-
-          if (keepaliveTimer !== null) {
-            clearInterval(keepaliveTimer);
-            keepaliveTimer = null;
+          disposeKeepalive();
+          if (onExternalAbort) {
+            externalSignal?.removeEventListener('abort', onExternalAbort);
           }
 
           try {
@@ -170,28 +228,33 @@ export function createSSEStream(
         },
       };
 
+      if (externalSignal) {
+        onExternalAbort = () => sseController.close();
+        if (externalSignal.aborted) {
+          onExternalAbort();
+        } else {
+          externalSignal.addEventListener('abort', onExternalAbort, { once: true });
+        }
+      }
+
       // Send connected event
       if (sendConnected) {
         sseController.emit('connected', {
           message: 'SSE connection established',
-          timestamp: new Date().toISOString(),
+          timestamp: clock.now().toISOString(),
         });
       }
 
       // Start keepalive
-      keepaliveTimer = setInterval(() => {
+      keepaliveTimer = clock.setInterval(() => {
         if (closed) {
-          if (keepaliveTimer !== null) {
-            clearInterval(keepaliveTimer);
-            keepaliveTimer = null;
-          }
+          disposeKeepalive();
           return;
         }
 
         try {
           streamController.enqueue(encoder.encode(': keepalive\n\n'));
-        } catch (error) {
-          console.error('[SSE] Keepalive failed:', error);
+        } catch {
           sseController.close();
         }
       }, keepaliveInterval);
@@ -201,10 +264,9 @@ export function createSSEStream(
         await handler(sseController, abortController.signal);
       } catch (error) {
         if (!closed && !(error instanceof Error && error.name === 'AbortError')) {
-          console.error('[SSE] Handler error:', error);
           sseController.emit('error', {
             message: error instanceof Error ? error.message : String(error),
-            timestamp: new Date().toISOString(),
+            timestamp: clock.now().toISOString(),
           });
         }
       } finally {
@@ -215,11 +277,7 @@ export function createSSEStream(
     cancel() {
       closed = true;
       abortController.abort();
-
-      if (keepaliveTimer !== null) {
-        clearInterval(keepaliveTimer);
-        keepaliveTimer = null;
-      }
+      disposeKeepalive();
     },
   });
 
@@ -235,9 +293,9 @@ export function createSSEStream(
  */
 export interface KvWatchSSEOptions<T> extends SSEStreamOptions {
   /** KV instance to use (uses shared if not provided) */
-  kv?: WatchableKv;
+  kv?: SSEWatchableKv;
   /** Function to fetch initial data */
-  fetchInitial?: (kv: WatchableKv) => Promise<T>;
+  fetchInitial?: (kv: SSEWatchableKv) => Promise<T>;
   /** Event name for initial data (default: 'initial') */
   initialEventName?: string;
   /** Event name for updates (default: 'update') */
@@ -276,7 +334,7 @@ export interface KvWatchSSEOptions<T> extends SSEStreamOptions {
  * ```
  */
 export function createKvWatchSSE<T = unknown>(
-  keys: KvKey[],
+  keys: SSEKvKey[],
   options: KvWatchSSEOptions<T> = {},
 ): Response {
   const {
@@ -290,7 +348,7 @@ export function createKvWatchSSE<T = unknown>(
   } = options;
 
   return createSSEStream(async (sse, signal) => {
-    const kv = explicitKv ?? await getKv();
+    const kv = explicitKv ?? await getKv() as SSEWatchableKv;
 
     // Fetch and send initial data
     if (fetchInitial) {
@@ -298,13 +356,12 @@ export function createKvWatchSSE<T = unknown>(
         const initialData = await fetchInitial(kv);
         sse.emit(initialEventName, {
           data: initialData,
-          timestamp: new Date().toISOString(),
+          timestamp: sseOptions.clock?.now().toISOString() ?? SYSTEM_SSE_CLOCK.now().toISOString(),
         });
-      } catch (error) {
-        console.error('[SSE] Failed to fetch initial data:', error);
+      } catch {
         sse.emit('error', {
           message: 'Failed to fetch initial data',
-          timestamp: new Date().toISOString(),
+          timestamp: sseOptions.clock?.now().toISOString() ?? SYSTEM_SSE_CLOCK.now().toISOString(),
         });
       }
     }
@@ -318,7 +375,7 @@ export function createKvWatchSSE<T = unknown>(
 
         sse.emit(updateEventName, {
           events: transformedEvents,
-          timestamp: new Date().toISOString(),
+          timestamp: sseOptions.clock?.now().toISOString() ?? SYSTEM_SSE_CLOCK.now().toISOString(),
         });
       }
     } catch (error) {
@@ -354,7 +411,7 @@ export function createKvWatchSSE<T = unknown>(
  * ```
  */
 export function createKvPrefixWatchSSE<T = unknown>(
-  prefix: KvKey,
+  prefix: SSEKvKey,
   options: KvWatchSSEOptions<T> & { pollInterval?: number } = {},
 ): Response {
   const {
@@ -368,7 +425,7 @@ export function createKvPrefixWatchSSE<T = unknown>(
   } = options;
 
   return createSSEStream(async (sse, signal) => {
-    const kv = explicitKv ?? await getKv();
+    const kv = explicitKv ?? await getKv() as SSEWatchableKv;
 
     // Fetch and send initial data
     if (fetchInitial) {
@@ -376,13 +433,12 @@ export function createKvPrefixWatchSSE<T = unknown>(
         const initialData = await fetchInitial(kv);
         sse.emit(initialEventName, {
           data: initialData,
-          timestamp: new Date().toISOString(),
+          timestamp: sseOptions.clock?.now().toISOString() ?? SYSTEM_SSE_CLOCK.now().toISOString(),
         });
-      } catch (error) {
-        console.error('[SSE] Failed to fetch initial data:', error);
+      } catch {
         sse.emit('error', {
           message: 'Failed to fetch initial data',
-          timestamp: new Date().toISOString(),
+          timestamp: sseOptions.clock?.now().toISOString() ?? SYSTEM_SSE_CLOCK.now().toISOString(),
         });
       }
     }
@@ -396,7 +452,7 @@ export function createKvPrefixWatchSSE<T = unknown>(
 
         sse.emit(updateEventName, {
           event: transformedEvent,
-          timestamp: new Date().toISOString(),
+          timestamp: sseOptions.clock?.now().toISOString() ?? SYSTEM_SSE_CLOCK.now().toISOString(),
         });
       }
     } catch (error) {
