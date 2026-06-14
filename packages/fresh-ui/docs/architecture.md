@@ -2,11 +2,21 @@
 
 This document records package architecture decisions for `@netscript/fresh-ui`.
 
-Archetype: 3
+Archetype: 4 (DSL/Builder) with Archetype 3 runtime behavior folded in
 
-`packages/fresh-ui` is **Archetype 3 — Runtime/Behavior** with the frontend overlay. It owns
-stateful interactive lifecycle behavior plus copy-source registry data, while preserving a small
-imported public surface.
+`packages/fresh-ui` is **Archetype 4 — DSL/Builder** per the doctrine archetype map
+([`06-archetypes.md`](../../../docs/architecture/doctrine/06-archetypes.md)): its _primary product_
+is a design-system DSL — the semantic `--ns-*` token vocabulary and the copy-source component
+registry (`fresh-ui-foundation`) authored against a manifest schema. Archetype 3 runtime behavior is
+**folded in**: the package also owns a small imported runtime of stateful interactive primitives
+(Accordion, Dialog, Drawer, Popover, Sheet, Tabs, Tooltip). This mirrors how `@netscript/service`
+declares "Arch-4 DSL/builder with Archetype 3 runtime behavior folded in" — the DSL is the public
+contract, the runtime is the behavior it composes. The public surface stays small and imported; the
+registry surface is copy-source and owned by consumers after `ui:add`.
+
+The tiered-interactivity decision below (ADR 0001) governs the **folded-in Archetype 3 runtime**: it
+records when interactive behavior is platform-backed versus machine-backed, independent of the
+package's Archetype 4 DSL classification.
 
 ## ADR 0001: Tiered Interactivity And Zag Adoption
 

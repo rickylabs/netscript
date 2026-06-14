@@ -9,8 +9,11 @@ for NetScript applications running on Deno with Aspire orchestration.
 
 ## 1. What This Package Provides
 
-`@netscript/sdk` is the package that connects generated service contracts to runtime clients and
-query helpers. It is designed as four composable layers:
+`@netscript/sdk` is an **Archetype 4 (DSL/Builder)** package (see the doctrine archetype map and
+[`docs/architecture.md`](./docs/architecture.md)): its public product is a set of typed factory and
+preset builders that turn generated service contracts into runtime clients and query helpers. The
+package connects generated service contracts to runtime clients and query helpers, and is designed
+as four composable layers:
 
 - L0 ports: package-owned structural types such as `ServiceClient`, `QueryFactory`,
   `QueryClientPort`, `ServiceQueryUtils`, `CacheStore`, and `ServiceTransport`.

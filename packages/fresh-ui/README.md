@@ -12,6 +12,16 @@ It follows the shadcn model adapted to Deno + Fresh: **you own the components** 
 into your app), while accessibility behavior and the token contract stay package-owned and update
 with releases.
 
+## Package role
+
+`@netscript/fresh-ui` is an **Archetype 4 (DSL/Builder)** package with **Archetype 3 runtime
+behavior folded in** (see [`docs/architecture.md`](docs/architecture.md)). Its primary product is a
+design-system DSL — the semantic `--ns-*` token vocabulary plus the copy-source component registry —
+and it also owns a small imported runtime of accessible interactive primitives. The public import
+surface is curated through `mod.ts`, `interactive.ts`, and `primitives.tsx`; `src/` holds the
+role-named implementation (`src/runtime/`, `src/presentation/`), and `registry/` is the copy-source
+payload consumers own after `ui:add`.
+
 ## The three pillars
 
 1. **Themes** — A theme is a complete set of semantic `--ns-*` CSS variables (light + dark)
