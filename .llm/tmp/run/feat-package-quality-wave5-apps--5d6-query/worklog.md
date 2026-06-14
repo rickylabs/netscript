@@ -278,3 +278,30 @@ Run final package/root regression gates and update `context-pack.md` for READY-F
 | Root check | PASS | `deno task check`, 1574 files, 0 findings |
 | Root fmt | PASS | `deno task fmt:check`, 1159 files, 0 findings |
 | Root lint | PASS | `deno task lint`, 1075 files, 0 findings |
+
+## 2026-06-14 - IMPL-EVAL separate evaluator verdict
+
+- Role/protocol: separate IMPL-EVAL evaluator; no source changes made.
+- Worktree/branch: native WSL ext4 worktree `/home/codex/repos/netscript-wave5-apps-5d6-query`; branch current with `origin/feat/package-quality-wave5-apps-5d6-query` at `95787f3796a7279b5e09bdd9c2f9746eefb13b93` before evaluator artifacts.
+- PR base/head inspected: PR #39 base `feat/package-quality-wave5-apps-5d-fresh` at `200905ed459efac3b9ae471cca0cc9adc8651138`; head `95787f3796a7279b5e09bdd9c2f9746eefb13b93`.
+- Lock hygiene: no `deno.lock` or other lockfile paths changed in the PR range.
+- Source-scope checks: verified query package-owned wrappers/types, query hydration components, server `defineFreshApp` seams, root cache-entry type inclusion, withForm mutate error logging, and root wrapper inclusion for `packages/fresh`.
+- Residual drift accepted as documented: `telemetry` is a reserved seam only; full CLI E2E remains deferred to supervisor merge-readiness.
+
+### IMPL-EVAL gates
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Package public doc-lint | PASS | `(cd packages/fresh && deno task doc-lint)`, exit 0, checked 13 files with optional npm/Vite/Node type-resolution warnings only |
+| Package check wrapper | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx`, 142 files, 0 diagnostics |
+| Package fmt wrapper | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh --ext ts,tsx`, 142 files, 0 findings |
+| Package lint wrapper | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh --ext ts,tsx`, 142 files, 0 findings |
+| Package tests | PASS | `deno test --allow-all --config packages/fresh/deno.json --unstable-kv packages/fresh`, 141 passed, 0 failed |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)`, `Success Dry run complete` |
+| Root check | PASS | `deno task check`, 1574 files, 0 diagnostics |
+| Root fmt | PASS | `deno task fmt:check`, 1159 files, 0 findings |
+| Root lint | PASS | `deno task lint`, 1075 files, 0 findings |
+
+### IMPL-EVAL verdict
+
+PASS. No blocking implementation, gate, lock hygiene, or public-surface findings found. Full CLI E2E intentionally not run in this evaluator session.
