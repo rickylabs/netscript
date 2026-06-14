@@ -28,3 +28,5 @@ Append-only hash record (repo + hash + subject).
 - 959f756: chore(harness): record builders test suite
 
 - 6fb0555: chore(fresh): satisfy builders fitness gates
+
+- cdf59fa: docs(fresh): complete form public doc lint
