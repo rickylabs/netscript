@@ -26,3 +26,9 @@ Append-only. One entry per slice / decision.
 - Replaced packages/fresh/route/contract.ts with a documented compatibility wrapper that re-exports the public route facade.
 - Pointed define-page internals/tests at the internal runtime and updated public contract tests to use route-bound helpers.
 - Gates: deno doc --lint route contract/mod/manifest PASS; scoped route+builders deno check PASS 0 findings; scoped route+builders lint PASS 0 findings; scoped route+builders fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
+
+## 2026-06-14 - Slice 2: extract route public types
+
+- Extracted the public route type surface from route/mod.ts into route/types.ts and re-exported it from the route facade.
+- Reduced route/mod.ts from 755 LOC to 184 LOC. route/types.ts remains above the F-1 soft cap and is scheduled for the next type-group split.
+- Gates: deno doc --lint route mod/types/contract/manifest PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
