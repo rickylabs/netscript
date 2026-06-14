@@ -14,12 +14,16 @@ export { defineFreshApp, type DefineFreshAppOptions } from './server/define-fres
 export {
   createStreamingResponse,
   renderToStream,
+  type StreamingRenderable,
+  type StreamingRenderer,
+  type StreamingRenderStream,
   type StreamRenderOptions,
   type StreamRenderResult,
 } from './server/stream.ts';
 
 // Streaming error boundary
 export {
+  type StreamBoundaryRenderable,
   StreamErrorBoundary,
   type StreamErrorBoundaryProps,
 } from './server/stream-error-boundary.tsx';

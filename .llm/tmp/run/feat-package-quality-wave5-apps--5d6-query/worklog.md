@@ -81,3 +81,28 @@ Proceed to query bridge source work: add package-owned query public types and st
 ### Next slice
 
 Proceed to server public surface cleanup: export or package-own the streaming renderable/renderer/boundary types used by `@netscript/fresh/server`.
+
+## 2026-06-14 - Slice 3 - Server streaming public type exports
+
+- Changed `packages/fresh/server.ts`.
+- Re-exported `StreamingRenderable`, `StreamingRenderer`, `StreamingRenderStream`, and `StreamBoundaryRenderable` from the server barrel so public server signatures no longer reference private exported types through the `@netscript/fresh/server` entrypoint.
+- No runtime behavior changed.
+
+### Slice 3 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Server doc-lint | PASS | `deno doc --lint packages/fresh/server.ts` |
+| Server check | PASS | `deno check --unstable-kv packages/fresh/server.ts` |
+| Combined touched entrypoint check | PASS | `deno check --unstable-kv packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/mod.ts` |
+| Server fmt wrapper | PASS | `run-deno-fmt.ts --root packages/fresh/server.ts --ext ts,tsx --ignore-line-endings` |
+| Server lint wrapper | PASS | `run-deno-lint.ts --root packages/fresh/server.ts --ext ts,tsx` |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+
+### Residual risk
+
+- This slice only cures the public type visibility issue in the server barrel. `defineFreshApp` alpha extension seams and existing formatting drift in `server/define-fresh-app*` remain for a later server slice.
+
+### Next slice
+
+Proceed to root/utils inherited doc-lint cleanup by exporting the cache-entry public helper types used by `@netscript/fresh` root utilities.
