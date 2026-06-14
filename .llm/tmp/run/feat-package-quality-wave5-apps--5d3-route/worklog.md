@@ -45,3 +45,10 @@ Append-only. One entry per slice / decision.
 - Reduced route/_internal/contract-runtime.ts from 558 LOC to 460 LOC while preserving the existing value exports from the runtime facade.
 - Kept the public route contract facade unchanged; type re-exports remain available through route/contract.ts and route/mod.ts.
 - Gates: deno doc --lint route mod/types/pagination-types/contract/manifest PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
+
+## 2026-06-14 - Slice 5: extract route manifest types
+
+- Moved the public route manifest option/result/discovered-route interfaces into packages/fresh/route/manifest-types.ts.
+- Re-exported those types from packages/fresh/route/manifest.ts to preserve existing consumers such as packages/fresh/config/vite.ts.
+- Reduced packages/fresh/route/manifest.ts from 540 LOC to 495 LOC, retiring the remaining route F-1 soft-cap target.
+- Gates: deno doc --lint route mod/types/pagination-types/contract/manifest/manifest-types PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.

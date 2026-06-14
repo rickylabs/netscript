@@ -7,3 +7,4 @@ Append-only hash record (repo + hash + subject).
 - netscript cabbaa8 refactor(fresh): extract route public types
 - netscript 46881c5 refactor(fresh): split route pagination types
 - netscript 7810efc refactor(fresh): split route contract types
+- netscript e63ad37 refactor(fresh): extract route manifest types
