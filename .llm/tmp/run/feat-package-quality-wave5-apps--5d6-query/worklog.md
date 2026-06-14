@@ -132,3 +132,29 @@ Proceed to root/utils inherited doc-lint cleanup by exporting the cache-entry pu
 ### Next slice
 
 Rebaseline whole public-entrypoint doc-lint across the 13 package exports and retire or rescope any remaining planned slices that the merged 5d1-5d5 baseline already completed.
+
+## 2026-06-14 - Slice 5 - Whole public-surface doc-lint rebaseline
+
+- Artifact-only slice after the query/server/root cleanup slices.
+- Re-ran the package public-entrypoint gates across the 13 approved exports.
+- Result: the whole `@netscript/fresh` public doc-lint surface is now clean. This retires the plan's final doc-lint cleanup/regression slices unless a later source change regresses them.
+
+### Slice 5 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Package public doc-lint | PASS | `(cd packages/fresh && deno task doc-lint)` checked 13 files; only optional npm/Vite/Node type-resolution warnings were emitted |
+| Package public check | PASS | `(cd packages/fresh && deno task check)` |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+| Package fmt wrapper | FAIL expected | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx --ignore-line-endings` still reports `server/define-fresh-app.ts` and `server/define-fresh-app.test.ts` |
+| Package lint wrapper | FAIL expected | `run-deno-lint.ts --root packages/fresh --ext ts,tsx` still reports `require-await` in two builder fixtures |
+
+### Retired planned slices
+
+- Planned Slice 17 (whole-package doc-lint 0) is retired by current evidence.
+- Planned Slice 18 (JSR dry-run unblocked) remains retired by the merged baseline plus repeated Slice 1-5 dry-run PASS evidence.
+- Planned Slice 24 (final doc-lint + dry-run regression gate) is partially retired for current implementation state; re-run it during final closeout after remaining source slices.
+
+### Next slice
+
+Clean the narrow package fmt/lint residuals: format `server/define-fresh-app*` and remove unnecessary `async` from the two builder fixtures, then rerun package scoped fmt/lint/check.

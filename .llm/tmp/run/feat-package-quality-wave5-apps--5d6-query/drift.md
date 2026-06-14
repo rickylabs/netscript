@@ -71,3 +71,10 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - Current implementation fact: `deno doc --lint packages/fresh/query/mod.ts` remained red until the public hook wrappers, `QueryIslandProps`, `getIslandQueryClient`, and hydration signatures all stopped referencing upstream public types together.
 - Impact: implementation Slice 2 combines the query public-type scaffold, hook wrappers, and query island/hydration public signature cleanup. No server/defer/form/builders scope was pulled into the slice.
 - Status: accepted as minor sequencing drift; gate evidence is stronger because the whole `@netscript/fresh/query` subpath is doc-lint clean after the slice.
+
+## D-5d6-11 - Whole-package doc-lint is clean much earlier than the original 30-slice plan
+
+- Original plan: many cross-cluster private-type-ref/JSDoc slices were expected for builders, defer, form, streams, vite, root, and final whole-package doc-lint.
+- Current measurement after merged 5d1-5d5 plus 5d6 Slices 2-4: `(cd packages/fresh && deno task doc-lint)` passes across all 13 approved entrypoints.
+- Impact: several planned source slices are now retired or reduced to final regression checks. Remaining known package-quality work is fmt/lint cleanup, final root gate inclusion, over-cap/debt handling, and any specific consumer/runtime proof the supervisor still requires.
+- Status: recorded in Slice 5 rebaseline.

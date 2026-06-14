@@ -6,7 +6,7 @@
 - PR: `https://github.com/rickylabs/netscript/pull/39`
 - Agent role: implementation agent only; final IMPL-EVAL must be separate.
 - PLAN-EVAL: `APPROVED` in `plan-eval.md`.
-- Latest completed implementation slice: Slice 4 root cache-entry type exports.
+- Latest completed implementation slice: Slice 5 whole public-surface doc-lint rebaseline.
 
 ## Rebaseline Summary
 
@@ -43,6 +43,15 @@
 - `deno check --unstable-kv packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/mod.ts` passes.
 - Package dry-run still passes.
 
+## Slice 5 Summary
+
+- Whole public-entrypoint doc-lint passes across the 13 approved `@netscript/fresh` exports.
+- Package check passes.
+- Package dry-run passes.
+- Package-wide fmt still reports `server/define-fresh-app.ts` and `server/define-fresh-app.test.ts`.
+- Package-wide lint still reports `require-await` in two builder fixtures.
+- Planned whole-package doc-lint cleanup is retired for the current implementation state; final closeout should still rerun it after remaining source slices.
+
 ## Next Slice
 
-Rebaseline whole public-entrypoint doc-lint across the 13 package exports and retire or rescope already-completed plan slices.
+Clean the narrow package fmt/lint residuals, then continue final root/package quality closeout.
