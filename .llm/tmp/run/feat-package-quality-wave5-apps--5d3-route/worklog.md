@@ -38,3 +38,10 @@ Append-only. One entry per slice / decision.
 - Extracted pagination/search-schema public types from route/types.ts into route/pagination-types.ts.
 - route/types.ts now re-exports pagination types and is under the F-1 soft cap at 497 LOC.
 - Gates: deno doc --lint route mod/types/pagination-types/contract/manifest PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
+
+## 2026-06-14 - Slice 4: split internal route contract types
+
+- Moved builder-shaped route contract type declarations from route/_internal/contract-runtime.ts into route/_internal/contract-types.ts.
+- Reduced route/_internal/contract-runtime.ts from 558 LOC to 460 LOC while preserving the existing value exports from the runtime facade.
+- Kept the public route contract facade unchanged; type re-exports remain available through route/contract.ts and route/mod.ts.
+- Gates: deno doc --lint route mod/types/pagination-types/contract/manifest PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
