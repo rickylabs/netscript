@@ -1,5 +1,6 @@
+// arch:barrel-ok A4-aggregate: public define-page surface composed from role modules.
 export * from './types.ts';
-export * from './builder.tsx';
+export * from './builder/mod.tsx';
 export * from './search-params.ts';
 export {
   createDefinePageHooks,
@@ -7,4 +8,4 @@ export {
   usePagePath,
   usePageRoute,
   usePageSearch,
-} from './navigation.tsx';
+} from './navigation/mod.ts';

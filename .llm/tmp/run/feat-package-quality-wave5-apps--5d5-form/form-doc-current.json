@@ -1,0 +1,4662 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///home/runner/work/netscript/netscript/packages/fresh/form/mod.ts": {
+      "module_doc": {
+        "doc": "Public form surface for `@netscript/fresh`.\n\nThis entrypoint is intentionally narrow. It exposes the shipped helper\nsurface used by playground consumers while keeping deeper RFC-15 form\ninternals out of the public package contract.\n",
+        "tags": [
+          {
+            "kind": "module"
+          }
+        ]
+      },
+      "symbols": [
+        {
+          "name": "CSRF_COOKIE_NAME",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts",
+                "line": 13,
+                "col": 13,
+                "byteIndex": 393
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Cookie used to persist the current CSRF token between GET and POST."
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "repr": "ns_form_csrf",
+                  "kind": "literal",
+                  "value": {
+                    "kind": "string",
+                    "string": "ns_form_csrf"
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        },
+        {
+          "name": "CSRF_FIELD_NAME",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts",
+                "line": 16,
+                "col": 13,
+                "byteIndex": 521
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Hidden input field used to submit the CSRF token with the form payload."
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "repr": "__csrf__",
+                  "kind": "literal",
+                  "value": {
+                    "kind": "string",
+                    "string": "__csrf__"
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        },
+        {
+          "name": "generateCsrfToken",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts",
+                "line": 22,
+                "col": 0,
+                "byteIndex": 667
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Generate a new CSRF token for a rendered form."
+              },
+              "kind": "function",
+              "def": {
+                "params": [],
+                "returnType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "readCsrfToken",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts",
+                "line": 27,
+                "col": 0,
+                "byteIndex": 811
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Read the current CSRF token from a request cookie header."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "request",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "Request",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "Request"
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    },
+                    {
+                      "repr": "undefined",
+                      "kind": "keyword",
+                      "value": "undefined"
+                    }
+                  ]
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "setCsrfCookie",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts",
+                "line": 49,
+                "col": 0,
+                "byteIndex": 1499
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Set the CSRF cookie on response headers.\n\n`requestUrl` is optional so tests can exercise secure-cookie behavior\ndeterministically without requiring a full request context."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "headers",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "Headers",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "Headers"
+                      }
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "token",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "requestUrl",
+                    "optional": true,
+                    "tsType": {
+                      "repr": "URL",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "URL"
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "void",
+                  "kind": "keyword",
+                  "value": "void"
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "verifyCsrfToken",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/csrf.ts",
+                "line": 32,
+                "col": 0,
+                "byteIndex": 1005
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Verify that the submitted token matches the cookie token."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "cookieToken",
+                    "optional": false,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        },
+                        {
+                          "repr": "undefined",
+                          "kind": "keyword",
+                          "value": "undefined"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "formToken",
+                    "optional": false,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        },
+                        {
+                          "repr": "undefined",
+                          "kind": "keyword",
+                          "value": "undefined"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "boolean",
+                  "kind": "keyword",
+                  "value": "boolean"
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "createEmptyFormErrors",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                "line": 42,
+                "col": 0,
+                "byteIndex": 1384
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Create an empty form error map."
+              },
+              "kind": "function",
+              "def": {
+                "params": [],
+                "returnType": {
+                  "repr": "FormErrors",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TValues",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TValues",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "createEmptyFormErrors",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "FormErrors",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "firstFieldError",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                "line": 75,
+                "col": 0,
+                "byteIndex": 2316
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Return the first error message for a field, if present."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "errors",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "FormErrors",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "firstFieldError",
+                                "declaringKind": "function"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormErrors",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "field",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "Extract",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "kind": "typeOperator",
+                            "value": {
+                              "operator": "keyof",
+                              "tsType": {
+                                "repr": "TValues",
+                                "kind": "typeRef",
+                                "value": {
+                                  "typeName": "TValues",
+                                  "resolution": {
+                                    "kind": "typeParam",
+                                    "declaringName": "firstFieldError",
+                                    "declaringKind": "function"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        ],
+                        "typeName": "Extract"
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    },
+                    {
+                      "repr": "undefined",
+                      "kind": "keyword",
+                      "value": "undefined"
+                    }
+                  ]
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "Record",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          },
+                          {
+                            "repr": "unknown",
+                            "kind": "keyword",
+                            "value": "unknown"
+                          }
+                        ],
+                        "typeName": "Record"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormErrors",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                "line": 18,
+                "col": 0,
+                "byteIndex": 674
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Field-level error map produced by validation or error normalization.\n\nEach top-level key maps to an array of error messages for that field.\nThe `_form` key stores form-wide errors that are not tied to one field."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "intersection",
+                  "value": [
+                    {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "Record",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeParams": [
+                                {
+                                  "repr": "Extract",
+                                  "kind": "typeRef",
+                                  "value": {
+                                    "typeParams": [
+                                      {
+                                        "kind": "typeOperator",
+                                        "value": {
+                                          "operator": "keyof",
+                                          "tsType": {
+                                            "repr": "TValues",
+                                            "kind": "typeRef",
+                                            "value": {
+                                              "typeName": "TValues",
+                                              "resolution": {
+                                                "kind": "typeParam",
+                                                "declaringName": "FormErrors",
+                                                "declaringKind": "typeAlias"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    ],
+                                    "typeName": "Extract"
+                                  }
+                                },
+                                {
+                                  "kind": "array",
+                                  "value": {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                }
+                              ],
+                              "typeName": "Record"
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    },
+                    {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "_form",
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                              "line": 21,
+                              "col": 4,
+                              "byteIndex": 799
+                            },
+                            "tsType": {
+                              "kind": "array",
+                              "value": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormSchemaValidationError",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                "line": 31,
+                "col": 0,
+                "byteIndex": 1067
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Minimal contract for a validation error that can be flattened into\nfield-level and form-level messages.\n\nThis matches the shape exposed by Zod's `flatten()` result closely enough\nto keep the form pipeline adapter-friendly."
+              },
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "flatten",
+                    "jsDoc": {
+                      "doc": "Flatten validation issues into field and form buckets."
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                      "line": 33,
+                      "col": 2,
+                      "byteIndex": 1206
+                    },
+                    "params": [],
+                    "returnType": {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "fieldErrors",
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                              "line": 34,
+                              "col": 4,
+                              "byteIndex": 1223
+                            },
+                            "tsType": {
+                              "repr": "Partial",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "Record",
+                                    "kind": "typeRef",
+                                    "value": {
+                                      "typeParams": [
+                                        {
+                                          "repr": "Extract",
+                                          "kind": "typeRef",
+                                          "value": {
+                                            "typeParams": [
+                                              {
+                                                "kind": "typeOperator",
+                                                "value": {
+                                                  "operator": "keyof",
+                                                  "tsType": {
+                                                    "repr": "TValues",
+                                                    "kind": "typeRef",
+                                                    "value": {
+                                                      "typeName": "TValues",
+                                                      "resolution": {
+                                                        "kind": "typeParam",
+                                                        "declaringName": "FormSchemaValidationError",
+                                                        "declaringKind": "interface"
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "repr": "string",
+                                                "kind": "keyword",
+                                                "value": "string"
+                                              }
+                                            ],
+                                            "typeName": "Extract"
+                                          }
+                                        },
+                                        {
+                                          "kind": "union",
+                                          "value": [
+                                            {
+                                              "kind": "array",
+                                              "value": {
+                                                "repr": "string",
+                                                "kind": "keyword",
+                                                "value": "string"
+                                              }
+                                            },
+                                            {
+                                              "repr": "undefined",
+                                              "kind": "keyword",
+                                              "value": "undefined"
+                                            }
+                                          ]
+                                        }
+                                      ],
+                                      "typeName": "Record"
+                                    }
+                                  }
+                                ],
+                                "typeName": "Partial"
+                              }
+                            }
+                          },
+                          {
+                            "name": "formErrors",
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                              "line": 35,
+                              "col": 4,
+                              "byteIndex": 1311
+                            },
+                            "tsType": {
+                              "kind": "array",
+                              "value": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "toFormErrors",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/errors.ts",
+                "line": 49,
+                "col": 0,
+                "byteIndex": 1614
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Convert a Zod-like validation error into the canonical `FormErrors<T>` shape."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "error",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "FormSchemaValidationError",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "toFormErrors",
+                                "declaringKind": "function"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormSchemaValidationError",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "FormErrors",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TValues",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TValues",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "toFormErrors",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "FormErrors",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "applyCollectionStrategy",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx",
+                "line": 38,
+                "col": 0,
+                "byteIndex": 1226
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "props",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "TProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TProps",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "applyCollectionStrategy",
+                          "declaringKind": "function"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "strategy",
+                    "optional": false,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "FormCollectionStrategy",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "FormCollectionStrategy",
+                            "resolution": {
+                              "kind": "import",
+                              "specifier": "./types.ts",
+                              "name": "FormCollectionStrategy"
+                            }
+                          }
+                        },
+                        {
+                          "repr": "undefined",
+                          "kind": "keyword",
+                          "value": "undefined"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "returnType": {
+                  "kind": "intersection",
+                  "value": [
+                    {
+                      "repr": "TProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TProps",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "applyCollectionStrategy",
+                          "declaringKind": "function"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "f-client-nav",
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx",
+                              "line": 42,
+                              "col": 2,
+                              "byteIndex": 1382
+                            },
+                            "readonly": true,
+                            "optional": true,
+                            "tsType": {
+                              "repr": "boolean",
+                              "kind": "keyword",
+                              "value": "boolean"
+                            }
+                          },
+                          {
+                            "name": "f-partial",
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx",
+                              "line": 43,
+                              "col": 2,
+                              "byteIndex": 1419
+                            },
+                            "readonly": true,
+                            "optional": true,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TProps",
+                    "constraint": {
+                      "repr": "IntentButtonProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "IntentButtonProps",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "IntentButtonProps"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "createFormEnhancementSnapshot",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx",
+                "line": 16,
+                "col": 0,
+                "byteIndex": 456
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "state",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "RuntimeFormState",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "createFormEnhancementSnapshot",
+                                "declaringKind": "function"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "RuntimeFormState",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "RuntimeFormState"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "FormEnhancementSnapshot",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TValues",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TValues",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "createFormEnhancementSnapshot",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "FormEnhancementSnapshot",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "./types.ts",
+                      "name": "FormEnhancementSnapshot"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "getSubmissionHiddenInputProps",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx",
+                "line": 239,
+                "col": 0,
+                "byteIndex": 6912
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "submissionId",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ],
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "useFormEnhancement",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/enhancement.tsx",
+                "line": 56,
+                "col": 0,
+                "byteIndex": 1642
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "snapshot",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "FormEnhancementSnapshot",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "useFormEnhancement",
+                                "declaringKind": "function"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormEnhancementSnapshot",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormEnhancementSnapshot"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "kind": "assign",
+                    "left": {
+                      "kind": "identifier",
+                      "name": "options",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "FormEnhancementOptions",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeParams": [
+                            {
+                              "repr": "TValues",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "TValues",
+                                "resolution": {
+                                  "kind": "typeParam",
+                                  "declaringName": "useFormEnhancement",
+                                  "declaringKind": "function"
+                                }
+                              }
+                            }
+                          ],
+                          "typeName": "FormEnhancementOptions",
+                          "resolution": {
+                            "kind": "import",
+                            "specifier": "./types.ts",
+                            "name": "FormEnhancementOptions"
+                          }
+                        }
+                      }
+                    },
+                    "right": "[UNSUPPORTED]"
+                  }
+                ],
+                "returnType": {
+                  "repr": "FormEnhancementState",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TValues",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TValues",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "useFormEnhancement",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "FormEnhancementState",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "./types.ts",
+                      "name": "FormEnhancementState"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Form",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/form.tsx",
+                "line": 20,
+                "col": 0,
+                "byteIndex": 664
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "object",
+                    "props": [
+                      {
+                        "kind": "assign",
+                        "key": "state",
+                        "value": null
+                      },
+                      {
+                        "kind": "assign",
+                        "key": "enhancement",
+                        "value": null
+                      },
+                      {
+                        "kind": "assign",
+                        "key": "children",
+                        "value": null
+                      },
+                      {
+                        "kind": "rest",
+                        "arg": {
+                          "kind": "identifier",
+                          "name": "props",
+                          "optional": false
+                        }
+                      }
+                    ],
+                    "optional": false,
+                    "tsType": {
+                      "repr": "FormProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "Form",
+                                "declaringKind": "function"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormProps",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormRegion",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/form-region.tsx",
+                "line": 9,
+                "col": 0,
+                "byteIndex": 246
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "object",
+                    "props": [
+                      {
+                        "kind": "assign",
+                        "key": "name",
+                        "value": null
+                      },
+                      {
+                        "kind": "assign",
+                        "key": "mode",
+                        "value": "[UNSUPPORTED]"
+                      },
+                      {
+                        "kind": "assign",
+                        "key": "children",
+                        "value": null
+                      }
+                    ],
+                    "optional": false,
+                    "tsType": {
+                      "repr": "FormRegionProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormRegionProps",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "generateSubmissionId",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/idempotency.ts",
+                "line": 13,
+                "col": 0,
+                "byteIndex": 406
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Create a new form submission identifier."
+              },
+              "kind": "function",
+              "def": {
+                "params": [],
+                "returnType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "SUBMISSION_ID_FIELD_NAME",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/idempotency.ts",
+                "line": 10,
+                "col": 13,
+                "byteIndex": 309
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Hidden field used to round-trip a submission identifier through form POSTs."
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "repr": "__submission_id__",
+                  "kind": "literal",
+                  "value": {
+                    "kind": "string",
+                    "string": "__submission_id__"
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        },
+        {
+          "name": "applyIntentOperation",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/intent.ts",
+                "line": 84,
+                "col": 0,
+                "byteIndex": 2231
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Apply a collection intent to the submitted values.\n\nPhase A only mutates existing array fields. Missing or malformed collection\ntargets are treated as a no-op so the higher-level pipeline can continue\nwithout turning malformed intent payloads into runtime crashes."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "intent",
+                    "optional": false,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "FormIntent",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "FormIntent",
+                            "resolution": {
+                              "kind": "import",
+                              "specifier": "./types.ts",
+                              "name": "FormIntent"
+                            }
+                          }
+                        },
+                        {
+                          "repr": "null",
+                          "kind": "keyword",
+                          "value": "null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "values",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "TValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TValues",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "applyIntentOperation",
+                          "declaringKind": "function"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "TValues",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "TValues",
+                    "resolution": {
+                      "kind": "typeParam",
+                      "declaringName": "applyIntentOperation",
+                      "declaringKind": "function"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "collectionIntent",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/intent.ts",
+                "line": 34,
+                "col": 0,
+                "byteIndex": 1034
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Serialize a collection intent into the native field value shape."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "action",
+                    "optional": false,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "add",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "add"
+                          }
+                        },
+                        {
+                          "repr": "duplicate",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "duplicate"
+                          }
+                        },
+                        {
+                          "repr": "remove",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "remove"
+                          }
+                        },
+                        {
+                          "repr": "reorder",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "reorder"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "name",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "kind": "assign",
+                    "left": {
+                      "kind": "identifier",
+                      "name": "payload",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "Record",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeParams": [
+                            {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            },
+                            {
+                              "repr": "unknown",
+                              "kind": "keyword",
+                              "value": "unknown"
+                            }
+                          ],
+                          "typeName": "Record"
+                        }
+                      }
+                    },
+                    "right": "[UNSUPPORTED]"
+                  }
+                ],
+                "returnType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "INTENT_FIELD_NAME",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/intent.ts",
+                "line": 13,
+                "col": 13,
+                "byteIndex": 443
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Field name reserved for encoded form intents."
+              },
+              "kind": "variable",
+              "def": {
+                "tsType": {
+                  "repr": "__intent__",
+                  "kind": "literal",
+                  "value": {
+                    "kind": "string",
+                    "string": "__intent__"
+                  }
+                },
+                "kind": "const"
+              }
+            }
+          ]
+        },
+        {
+          "name": "parseFormIntent",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/intent.ts",
+                "line": 51,
+                "col": 0,
+                "byteIndex": 1430
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Parse an encoded form intent from raw posted values."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "rawValues",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "Record",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          },
+                          {
+                            "repr": "unknown",
+                            "kind": "keyword",
+                            "value": "unknown"
+                          }
+                        ],
+                        "typeName": "Record"
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "FormIntent",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormIntent",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormIntent"
+                        }
+                      }
+                    },
+                    {
+                      "repr": "null",
+                      "kind": "keyword",
+                      "value": "null"
+                    }
+                  ]
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "submitIntent",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/intent.ts",
+                "line": 29,
+                "col": 0,
+                "byteIndex": 888
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Serialize a submit intent into the native field value shape."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "assign",
+                    "left": {
+                      "kind": "identifier",
+                      "name": "type",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      }
+                    },
+                    "right": "submit"
+                  }
+                ],
+                "returnType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "formDataToRawValues",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pipeline.ts",
+                "line": 192,
+                "col": 0,
+                "byteIndex": 5825
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Parse a `FormData` instance into a nested object.\n\nHandles dotted paths and bracket indices:\n- `name` → `{ name: \"value\" }`\n- `items[0].productId` → `{ items: [{ productId: \"value\" }] }`\n\nFile inputs are represented by their file name, matching the existing\nframework behavior."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "formData",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "FormData",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormData"
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "Record",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "repr": "unknown",
+                        "kind": "keyword",
+                        "value": "unknown"
+                      }
+                    ],
+                    "typeName": "Record"
+                  }
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "normalizeFormValues",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pipeline.ts",
+                "line": 208,
+                "col": 0,
+                "byteIndex": 6299
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Normalize raw form values by converting empty strings to `undefined`.\n\nRecursively processes nested objects and arrays, then narrows the result to the\nrequested form shape."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "rawValues",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "Record",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          },
+                          {
+                            "repr": "unknown",
+                            "kind": "keyword",
+                            "value": "unknown"
+                          }
+                        ],
+                        "typeName": "Record"
+                      }
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "Partial",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TValues",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TValues",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "normalizeFormValues",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "Partial"
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "buildPaginationState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                "line": 76,
+                "col": 0,
+                "byteIndex": 2042
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Build a complete pagination state from URLSearchParams and query results."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "searchParams",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "URLSearchParams",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "URLSearchParams"
+                      }
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "total",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "hasMore",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "defaultLimit",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "PaginationState",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "PaginationState",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "PaginationInput",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                "line": 10,
+                "col": 0,
+                "byteIndex": 265
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Parsed pagination input derived from URLSearchParams."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "page",
+                    "jsDoc": {
+                      "doc": "Current page number starting at 1."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                      "line": 12,
+                      "col": 2,
+                      "byteIndex": 346
+                    },
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "limit",
+                    "jsDoc": {
+                      "doc": "Page size used for the query."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                      "line": 14,
+                      "col": 2,
+                      "byteIndex": 401
+                    },
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "offset",
+                    "jsDoc": {
+                      "doc": "Zero-based offset derived from the page and limit."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                      "line": 16,
+                      "col": 2,
+                      "byteIndex": 478
+                    },
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PaginationState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                "line": 20,
+                "col": 0,
+                "byteIndex": 576
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Full pagination state including total count and original search params."
+              },
+              "kind": "interface",
+              "def": {
+                "extends": [
+                  {
+                    "repr": "PaginationInput",
+                    "kind": "typeRef",
+                    "value": {
+                      "typeName": "PaginationInput",
+                      "resolution": {
+                        "kind": "local"
+                      }
+                    }
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "total",
+                    "jsDoc": {
+                      "doc": "Total number of items reported by the query."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                      "line": 22,
+                      "col": 2,
+                      "byteIndex": 691
+                    },
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "name": "hasMore",
+                    "jsDoc": {
+                      "doc": "Whether another page is available after the current one."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                      "line": 24,
+                      "col": 2,
+                      "byteIndex": 774
+                    },
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "searchParams",
+                    "jsDoc": {
+                      "doc": "Original search params used to derive the pagination state."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                      "line": 26,
+                      "col": 2,
+                      "byteIndex": 863
+                    },
+                    "tsType": {
+                      "repr": "URLSearchParams",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "URLSearchParams"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "resolvePagination",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/pagination.ts",
+                "line": 46,
+                "col": 0,
+                "byteIndex": 1386
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Resolve pagination input from URLSearchParams.\n\nSupports both `page`-based and `offset`-based pagination:\n- If `page` is present, computes `offset` from `(page - 1) * limit`\n- Otherwise reads `offset` directly and computes `page`"
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "searchParams",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "URLSearchParams",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "URLSearchParams"
+                      }
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "defaultLimit",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  }
+                ],
+                "returnType": {
+                  "repr": "PaginationInput",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "PaginationInput",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/state.ts",
+                "line": 20,
+                "col": 0,
+                "byteIndex": 697
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Lightweight form state used by the currently shipped helper surface.\n\nThis remains intentionally small so existing playground routes and components\ncan keep using `resolveFormState()` while the richer RFC-15 form state model\nis introduced in later slices."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "values",
+                    "jsDoc": {
+                      "doc": "Current form values."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/state.ts",
+                      "line": 22,
+                      "col": 2,
+                      "byteIndex": 786
+                    },
+                    "tsType": {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "FormState",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    }
+                  },
+                  {
+                    "name": "errors",
+                    "jsDoc": {
+                      "doc": "Canonical field and form errors."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/state.ts",
+                      "line": 24,
+                      "col": 2,
+                      "byteIndex": 856
+                    },
+                    "tsType": {
+                      "repr": "FormErrors",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "FormState",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormErrors",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./errors.ts",
+                          "name": "FormErrors"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "resolveFormState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/state.ts",
+                "line": 34,
+                "col": 0,
+                "byteIndex": 1161
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Resolve form state from route handler data.\n\nIf the supplied `data` value structurally matches a `FormState<TValues>`, the\nreturned state preserves the submitted values and errors. Otherwise, a fresh\nstate is created from the provided initial values."
+              },
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "data",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  },
+                  {
+                    "kind": "assign",
+                    "left": {
+                      "kind": "identifier",
+                      "name": "initialValues",
+                      "optional": false,
+                      "tsType": {
+                        "repr": "Partial",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeParams": [
+                            {
+                              "repr": "TValues",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "TValues",
+                                "resolution": {
+                                  "kind": "typeParam",
+                                  "declaringName": "resolveFormState",
+                                  "declaringKind": "function"
+                                }
+                              }
+                            }
+                          ],
+                          "typeName": "Partial"
+                        }
+                      }
+                    },
+                    "right": "[UNSUPPORTED]"
+                  }
+                ],
+                "returnType": {
+                  "repr": "FormState",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "TValues",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "TValues",
+                          "resolution": {
+                            "kind": "typeParam",
+                            "declaringName": "resolveFormState",
+                            "declaringKind": "function"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "FormState",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "hasBody": true,
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "import",
+                          "specifier": "./types.ts",
+                          "name": "FormValues"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormCollectionStrategy",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 370,
+                "col": 0,
+                "byteIndex": 12036
+              },
+              "declarationKind": "export",
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "mode",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 371,
+                      "col": 2,
+                      "byteIndex": 12080
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormCollectionStrategyMode",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormCollectionStrategyMode",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "partial",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 372,
+                      "col": 2,
+                      "byteIndex": 12125
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "clientNav",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 373,
+                      "col": 2,
+                      "byteIndex": 12154
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormCollectionStrategyMode",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 368,
+                "col": 0,
+                "byteIndex": 11962
+              },
+              "declarationKind": "export",
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "server",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "server"
+                      }
+                    },
+                    {
+                      "repr": "client",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "client"
+                      }
+                    },
+                    {
+                      "repr": "hybrid",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "hybrid"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormEnhancementOptions",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 376,
+                "col": 0,
+                "byteIndex": 12187
+              },
+              "declarationKind": "export",
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "partial",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 377,
+                      "col": 2,
+                      "byteIndex": 12259
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "clientNav",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 378,
+                      "col": 2,
+                      "byteIndex": 12288
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "validate",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 379,
+                      "col": 2,
+                      "byteIndex": 12320
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "onSubmit",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "onSubmit"
+                          }
+                        },
+                        {
+                          "repr": "onBlur",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "onBlur"
+                          }
+                        },
+                        {
+                          "repr": "onChange",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "onChange"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "schema",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 380,
+                      "col": 2,
+                      "byteIndex": 12378
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "methods": [
+                          {
+                            "name": "safeParse",
+                            "kind": "method",
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                              "line": 381,
+                              "col": 4,
+                              "byteIndex": 12402
+                            },
+                            "params": [
+                              {
+                                "kind": "identifier",
+                                "name": "input",
+                                "optional": false,
+                                "tsType": {
+                                  "repr": "unknown",
+                                  "kind": "keyword",
+                                  "value": "unknown"
+                                }
+                              }
+                            ],
+                            "returnType": {
+                              "kind": "union",
+                              "value": [
+                                {
+                                  "kind": "typeLiteral",
+                                  "value": {
+                                    "properties": [
+                                      {
+                                        "name": "success",
+                                        "location": {
+                                          "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                                          "line": 384,
+                                          "col": 10,
+                                          "byteIndex": 12452
+                                        },
+                                        "readonly": true,
+                                        "tsType": {
+                                          "repr": "true",
+                                          "kind": "literal",
+                                          "value": {
+                                            "kind": "boolean",
+                                            "boolean": true
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "name": "data",
+                                        "location": {
+                                          "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                                          "line": 384,
+                                          "col": 34,
+                                          "byteIndex": 12476
+                                        },
+                                        "readonly": true,
+                                        "tsType": {
+                                          "repr": "unknown",
+                                          "kind": "keyword",
+                                          "value": "unknown"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                {
+                                  "kind": "typeLiteral",
+                                  "value": {
+                                    "properties": [
+                                      {
+                                        "name": "success",
+                                        "location": {
+                                          "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                                          "line": 385,
+                                          "col": 10,
+                                          "byteIndex": 12511
+                                        },
+                                        "readonly": true,
+                                        "tsType": {
+                                          "repr": "false",
+                                          "kind": "literal",
+                                          "value": {
+                                            "kind": "boolean",
+                                            "boolean": false
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "name": "error",
+                                        "location": {
+                                          "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                                          "line": 385,
+                                          "col": 35,
+                                          "byteIndex": 12536
+                                        },
+                                        "readonly": true,
+                                        "tsType": {
+                                          "repr": "unknown",
+                                          "kind": "keyword",
+                                          "value": "unknown"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "name": "focusOnError",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 387,
+                      "col": 2,
+                      "byteIndex": 12570
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "onSubmitStart",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 388,
+                      "col": 2,
+                      "byteIndex": 12605
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "fnOrConstructor",
+                      "value": {
+                        "constructor": false,
+                        "tsType": {
+                          "repr": "void",
+                          "kind": "keyword",
+                          "value": "void"
+                        },
+                        "params": []
+                      }
+                    }
+                  },
+                  {
+                    "name": "onSubmitEnd",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 389,
+                      "col": 2,
+                      "byteIndex": 12644
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "kind": "fnOrConstructor",
+                      "value": {
+                        "constructor": false,
+                        "tsType": {
+                          "repr": "void",
+                          "kind": "keyword",
+                          "value": "void"
+                        },
+                        "params": []
+                      }
+                    }
+                  },
+                  {
+                    "name": "collections",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 390,
+                      "col": 2,
+                      "byteIndex": 12681
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "Record",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeParams": [
+                                {
+                                  "repr": "Extract",
+                                  "kind": "typeRef",
+                                  "value": {
+                                    "typeParams": [
+                                      {
+                                        "kind": "typeOperator",
+                                        "value": {
+                                          "operator": "keyof",
+                                          "tsType": {
+                                            "repr": "TValues",
+                                            "kind": "typeRef",
+                                            "value": {
+                                              "typeName": "TValues",
+                                              "resolution": {
+                                                "kind": "typeParam",
+                                                "declaringName": "FormEnhancementOptions",
+                                                "declaringKind": "interface"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    ],
+                                    "typeName": "Extract"
+                                  }
+                                },
+                                {
+                                  "repr": "FormCollectionStrategy",
+                                  "kind": "typeRef",
+                                  "value": {
+                                    "typeName": "FormCollectionStrategy",
+                                    "resolution": {
+                                      "kind": "local"
+                                    }
+                                  }
+                                }
+                              ],
+                              "typeName": "Record"
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormEnhancementSnapshot",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 350,
+                "col": 0,
+                "byteIndex": 11321
+              },
+              "declarationKind": "export",
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "id",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 351,
+                      "col": 2,
+                      "byteIndex": 11394
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "action",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 352,
+                      "col": 2,
+                      "byteIndex": 11417
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "method",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 353,
+                      "col": 2,
+                      "byteIndex": 11444
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "POST",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "POST"
+                          }
+                        },
+                        {
+                          "repr": "PUT",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "PUT"
+                          }
+                        },
+                        {
+                          "repr": "PATCH",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "PATCH"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 354,
+                      "col": 2,
+                      "byteIndex": 11489
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "TValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TValues",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "FormEnhancementSnapshot",
+                          "declaringKind": "interface"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "initialValues",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 355,
+                      "col": 2,
+                      "byteIndex": 11517
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "FormEnhancementSnapshot",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    }
+                  },
+                  {
+                    "name": "fieldErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 356,
+                      "col": 2,
+                      "byteIndex": 11561
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormFieldErrors",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "FormEnhancementSnapshot",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormFieldErrors",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "formErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 357,
+                      "col": 2,
+                      "byteIndex": 11611
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeOperator",
+                      "value": {
+                        "operator": "readonly",
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "hasErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 358,
+                      "col": 2,
+                      "byteIndex": 11653
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "submitted",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 359,
+                      "col": 2,
+                      "byteIndex": 11684
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "intent",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 360,
+                      "col": 2,
+                      "byteIndex": 11715
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "FormIntent",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "FormIntent",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        },
+                        {
+                          "repr": "null",
+                          "kind": "keyword",
+                          "value": "null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "submissionId",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 361,
+                      "col": 2,
+                      "byteIndex": 11753
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "csrfToken",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 362,
+                      "col": 2,
+                      "byteIndex": 11786
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "constraints",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 363,
+                      "col": 2,
+                      "byteIndex": 11816
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Record",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          },
+                          {
+                            "repr": "FieldConstraints",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "FieldConstraints",
+                              "resolution": {
+                                "kind": "local"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Record"
+                      }
+                    }
+                  },
+                  {
+                    "name": "formProps",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 364,
+                      "col": 2,
+                      "byteIndex": 11874
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormElementProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormElementProps",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "csrfInputProps",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 365,
+                      "col": 2,
+                      "byteIndex": 11914
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormCsrfInputProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormCsrfInputProps",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormEnhancementState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 402,
+                "col": 0,
+                "byteIndex": 13176
+              },
+              "declarationKind": "export",
+              "kind": "interface",
+              "def": {
+                "methods": [
+                  {
+                    "name": "submit",
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 410,
+                      "col": 2,
+                      "byteIndex": 13522
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "intent",
+                        "optional": true,
+                        "tsType": {
+                          "repr": "FormIntent",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "FormIntent",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "repr": "void",
+                      "kind": "keyword",
+                      "value": "void"
+                    }
+                  }
+                ],
+                "properties": [
+                  {
+                    "name": "pending",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 403,
+                      "col": 2,
+                      "byteIndex": 13246
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "formProps",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 404,
+                      "col": 2,
+                      "byteIndex": 13275
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "EnhancedFormProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "EnhancedFormProps",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "fieldErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 405,
+                      "col": 2,
+                      "byteIndex": 13316
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormFieldErrors",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "FormEnhancementState",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormFieldErrors",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "formErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 406,
+                      "col": 2,
+                      "byteIndex": 13366
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeOperator",
+                      "value": {
+                        "operator": "readonly",
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "collectionStrategies",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 407,
+                      "col": 2,
+                      "byteIndex": 13408
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "Record",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeParams": [
+                                {
+                                  "repr": "Extract",
+                                  "kind": "typeRef",
+                                  "value": {
+                                    "typeParams": [
+                                      {
+                                        "kind": "typeOperator",
+                                        "value": {
+                                          "operator": "keyof",
+                                          "tsType": {
+                                            "repr": "TValues",
+                                            "kind": "typeRef",
+                                            "value": {
+                                              "typeName": "TValues",
+                                              "resolution": {
+                                                "kind": "typeParam",
+                                                "declaringName": "FormEnhancementState",
+                                                "declaringKind": "interface"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    ],
+                                    "typeName": "Extract"
+                                  }
+                                },
+                                {
+                                  "repr": "FormCollectionStrategy",
+                                  "kind": "typeRef",
+                                  "value": {
+                                    "typeName": "FormCollectionStrategy",
+                                    "resolution": {
+                                      "kind": "local"
+                                    }
+                                  }
+                                }
+                              ],
+                              "typeName": "Record"
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormFieldErrors",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 42,
+                "col": 0,
+                "byteIndex": 1387
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Canonical field and form error map for submitted values."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "intersection",
+                  "value": [
+                    {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "Record",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeParams": [
+                                {
+                                  "repr": "Extract",
+                                  "kind": "typeRef",
+                                  "value": {
+                                    "typeParams": [
+                                      {
+                                        "kind": "typeOperator",
+                                        "value": {
+                                          "operator": "keyof",
+                                          "tsType": {
+                                            "repr": "TValues",
+                                            "kind": "typeRef",
+                                            "value": {
+                                              "typeName": "TValues",
+                                              "resolution": {
+                                                "kind": "typeParam",
+                                                "declaringName": "FormFieldErrors",
+                                                "declaringKind": "typeAlias"
+                                              }
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      }
+                                    ],
+                                    "typeName": "Extract"
+                                  }
+                                },
+                                {
+                                  "kind": "array",
+                                  "value": {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  }
+                                }
+                              ],
+                              "typeName": "Record"
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    },
+                    {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "_form",
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                              "line": 45,
+                              "col": 4,
+                              "byteIndex": 1517
+                            },
+                            "tsType": {
+                              "kind": "array",
+                              "value": {
+                                "repr": "string",
+                                "kind": "keyword",
+                                "value": "string"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormIntent",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 158,
+                "col": 0,
+                "byteIndex": 4557
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Structured representation of an encoded form intent.\n\nCollection operations use the `collection:*` namespace and carry payload\nmetadata such as a collection name, indexes, or default values."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "type",
+                    "jsDoc": {
+                      "doc": "Intent discriminator understood by the forms pipeline."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 160,
+                      "col": 2,
+                      "byteIndex": 4653
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "payload",
+                    "jsDoc": {
+                      "doc": "Optional structured metadata carried with the intent."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 162,
+                      "col": 2,
+                      "byteIndex": 4741
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "Record",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          },
+                          {
+                            "repr": "unknown",
+                            "kind": "keyword",
+                            "value": "unknown"
+                          }
+                        ],
+                        "typeName": "Record"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormPageInvalidateContext",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 452,
+                "col": 0,
+                "byteIndex": 15185
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Invalidation context passed to app-owned cache invalidators after a\nsuccessful form mutation."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "input",
+                    "jsDoc": {
+                      "doc": "Submitted form input."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 457,
+                      "col": 2,
+                      "byteIndex": 15307
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "TValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TValues",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "FormPageInvalidateContext",
+                          "declaringKind": "interface"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "result",
+                    "jsDoc": {
+                      "doc": "Successful mutation result returned by the app."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 459,
+                      "col": 2,
+                      "byteIndex": 15391
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "TResult",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TResult",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "FormPageInvalidateContext",
+                          "declaringKind": "interface"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "mutation",
+                    "jsDoc": {
+                      "doc": "Request metadata for the completed mutation."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 461,
+                      "col": 2,
+                      "byteIndex": 15473
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeLiteral",
+                      "value": {
+                        "properties": [
+                          {
+                            "name": "request",
+                            "jsDoc": {
+                              "doc": "Original request object."
+                            },
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                              "line": 463,
+                              "col": 4,
+                              "byteIndex": 15534
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "Request",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "Request"
+                              }
+                            }
+                          },
+                          {
+                            "name": "params",
+                            "jsDoc": {
+                              "doc": "Fresh route params available during the mutation."
+                            },
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                              "line": 465,
+                              "col": 4,
+                              "byteIndex": 15626
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "Record",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeParams": [
+                                  {
+                                    "repr": "string",
+                                    "kind": "keyword",
+                                    "value": "string"
+                                  },
+                                  {
+                                    "kind": "union",
+                                    "value": [
+                                      {
+                                        "repr": "string",
+                                        "kind": "keyword",
+                                        "value": "string"
+                                      },
+                                      {
+                                        "repr": "undefined",
+                                        "kind": "keyword",
+                                        "value": "undefined"
+                                      }
+                                    ]
+                                  }
+                                ],
+                                "typeName": "Record"
+                              }
+                            }
+                          },
+                          {
+                            "name": "url",
+                            "jsDoc": {
+                              "doc": "Request URL for the mutation."
+                            },
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                              "line": 467,
+                              "col": 4,
+                              "byteIndex": 15724
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "URL",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "URL"
+                              }
+                            }
+                          },
+                          {
+                            "name": "mode",
+                            "jsDoc": {
+                              "doc": "Whether the page was in create or edit mode."
+                            },
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                              "line": 469,
+                              "col": 4,
+                              "byteIndex": 15803
+                            },
+                            "readonly": true,
+                            "tsType": {
+                              "repr": "FormPageMode",
+                              "kind": "typeRef",
+                              "value": {
+                                "typeName": "FormPageMode",
+                                "resolution": {
+                                  "kind": "local"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "name": "id",
+                            "jsDoc": {
+                              "doc": "Optional entity identifier used by edit forms."
+                            },
+                            "location": {
+                              "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                              "line": 471,
+                              "col": 4,
+                              "byteIndex": 15894
+                            },
+                            "readonly": true,
+                            "optional": true,
+                            "tsType": {
+                              "repr": "string",
+                              "kind": "keyword",
+                              "value": "string"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TResult"
+                  },
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormPageMode",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 32,
+                "col": 0,
+                "byteIndex": 1128
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Mode used by page-owned create/edit forms in the playground consumer."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "create",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "create"
+                      }
+                    },
+                    {
+                      "repr": "edit",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "edit"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormPageProps",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 429,
+                "col": 0,
+                "byteIndex": 14312
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Transitional page-form props still consumed by the playground routes while\nthey migrate from legacy page builders to the framework-owned forms API."
+              },
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "action",
+                    "jsDoc": {
+                      "doc": "Action URL submitted by the form."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 431,
+                      "col": 2,
+                      "byteIndex": 14418
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "method",
+                    "jsDoc": {
+                      "doc": "HTTP method used by the form action."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 433,
+                      "col": 2,
+                      "byteIndex": 14491
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "POST",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "POST"
+                          }
+                        },
+                        {
+                          "repr": "PUT",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "PUT"
+                          }
+                        },
+                        {
+                          "repr": "PATCH",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "PATCH"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "mode",
+                    "jsDoc": {
+                      "doc": "Whether the page is creating or editing an entity."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 435,
+                      "col": 2,
+                      "byteIndex": 14596
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormPageMode",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormPageMode",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "id",
+                    "jsDoc": {
+                      "doc": "Optional entity identifier used by edit forms."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 437,
+                      "col": 2,
+                      "byteIndex": 14683
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "jsDoc": {
+                      "doc": "Current form values rendered by the page."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 439,
+                      "col": 2,
+                      "byteIndex": 14758
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "FormPageProps",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    }
+                  },
+                  {
+                    "name": "errors",
+                    "jsDoc": {
+                      "doc": "Canonical field and form errors."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 441,
+                      "col": 2,
+                      "byteIndex": 14837
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormFieldErrors",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "FormPageProps",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormFieldErrors",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "submissionId",
+                    "jsDoc": {
+                      "doc": "Hidden submission identifier used for idempotency and tracing."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 443,
+                      "col": 2,
+                      "byteIndex": 14954
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "csrfToken",
+                    "jsDoc": {
+                      "doc": "Hidden CSRF token for the current rendered form."
+                    },
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 445,
+                      "col": 2,
+                      "byteIndex": 15045
+                    },
+                    "readonly": true,
+                    "optional": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "FormValues",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 29,
+                "col": 0,
+                "byteIndex": 1017
+              },
+              "declarationKind": "export",
+              "jsDoc": {
+                "doc": "Generic constraint for form value objects.\n\nUses `object` rather than `Record<string, unknown>` so concrete interfaces\n(which lack an explicit index signature) satisfy the constraint without\nneeding `[key: string]: unknown` or `any`. All downstream generics use\n`Extract<keyof TValues, string>` to access field names, which works\ncorrectly with both `object` and narrower interface types."
+              },
+              "kind": "typeAlias",
+              "def": {
+                "tsType": {
+                  "repr": "object",
+                  "kind": "keyword",
+                  "value": "object"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "RuntimeFormState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                "line": 331,
+                "col": 0,
+                "byteIndex": 10639
+              },
+              "declarationKind": "export",
+              "kind": "interface",
+              "def": {
+                "properties": [
+                  {
+                    "name": "id",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 332,
+                      "col": 2,
+                      "byteIndex": 10705
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "action",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 333,
+                      "col": 2,
+                      "byteIndex": 10728
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "method",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 334,
+                      "col": 2,
+                      "byteIndex": 10755
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "POST",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "POST"
+                          }
+                        },
+                        {
+                          "repr": "PUT",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "PUT"
+                          }
+                        },
+                        {
+                          "repr": "PATCH",
+                          "kind": "literal",
+                          "value": {
+                            "kind": "string",
+                            "string": "PATCH"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "values",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 335,
+                      "col": 2,
+                      "byteIndex": 10800
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "TValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "TValues",
+                        "resolution": {
+                          "kind": "typeParam",
+                          "declaringName": "RuntimeFormState",
+                          "declaringKind": "interface"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "initialValues",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 336,
+                      "col": 2,
+                      "byteIndex": 10828
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Partial",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "RuntimeFormState",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Partial"
+                      }
+                    }
+                  },
+                  {
+                    "name": "fieldErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 337,
+                      "col": 2,
+                      "byteIndex": 10872
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormFieldErrors",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "RuntimeFormState",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FormFieldErrors",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "formErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 338,
+                      "col": 2,
+                      "byteIndex": 10922
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "typeOperator",
+                      "value": {
+                        "operator": "readonly",
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "hasErrors",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 339,
+                      "col": 2,
+                      "byteIndex": 10964
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "submitted",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 340,
+                      "col": 2,
+                      "byteIndex": 10995
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "intent",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 341,
+                      "col": 2,
+                      "byteIndex": 11026
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "FormIntent",
+                          "kind": "typeRef",
+                          "value": {
+                            "typeName": "FormIntent",
+                            "resolution": {
+                              "kind": "local"
+                            }
+                          }
+                        },
+                        {
+                          "repr": "null",
+                          "kind": "keyword",
+                          "value": "null"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "submissionId",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 342,
+                      "col": 2,
+                      "byteIndex": 11064
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "csrfToken",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 343,
+                      "col": 2,
+                      "byteIndex": 11097
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "fields",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 344,
+                      "col": 2,
+                      "byteIndex": 11127
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FieldDescriptorMap",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "TValues",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "TValues",
+                              "resolution": {
+                                "kind": "typeParam",
+                                "declaringName": "RuntimeFormState",
+                                "declaringKind": "interface"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "FieldDescriptorMap",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "constraints",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 345,
+                      "col": 2,
+                      "byteIndex": 11175
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "Record",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeParams": [
+                          {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          },
+                          {
+                            "repr": "FieldConstraints",
+                            "kind": "typeRef",
+                            "value": {
+                              "typeName": "FieldConstraints",
+                              "resolution": {
+                                "kind": "local"
+                              }
+                            }
+                          }
+                        ],
+                        "typeName": "Record"
+                      }
+                    }
+                  },
+                  {
+                    "name": "formProps",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 346,
+                      "col": 2,
+                      "byteIndex": 11233
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormElementProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormElementProps",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "csrfInputProps",
+                    "location": {
+                      "filename": "file:///home/runner/work/netscript/netscript/packages/fresh/form/types.ts",
+                      "line": 347,
+                      "col": 2,
+                      "byteIndex": 11273
+                    },
+                    "readonly": true,
+                    "tsType": {
+                      "repr": "FormCsrfInputProps",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormCsrfInputProps",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "typeParams": [
+                  {
+                    "name": "TValues",
+                    "constraint": {
+                      "repr": "FormValues",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "FormValues",
+                        "resolution": {
+                          "kind": "local"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

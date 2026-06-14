@@ -5,25 +5,14 @@
  */
 
 import {
+  type CachedListEntryLike,
+  type CacheEntryLike,
   hasAllCacheEntries as hasAllCacheEntriesImpl,
   minCachedAt as minCachedAtImpl,
   projectCachedItemFromList as projectCachedItemFromListImpl,
 } from './cache-entry.ts';
 
-/**
- * Minimal cached-entry shape consumed by the public helpers.
- */
-export interface CacheEntryLike<T> {
-  /** Cached payload. */
-  readonly data: T;
-  /** Unix epoch timestamp in milliseconds. */
-  readonly cachedAt: number;
-}
-
-/**
- * Cached list-entry shape used when projecting a single item from a list.
- */
-export interface CachedListEntryLike<TItem> extends CacheEntryLike<{ items: TItem[] }> {}
+export type { CachedListEntryLike, CacheEntryLike };
 
 /**
  * Return `true` when every supplied entry is present.

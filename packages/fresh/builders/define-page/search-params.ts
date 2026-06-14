@@ -6,25 +6,31 @@ import type {
   SearchParamValue,
 } from './types.ts';
 
-type PaginationSearchBaseShape = {
+/** @internal */
+export type PaginationSearchBaseShape = {
   page: z.ZodType<number>;
   limit: z.ZodType<number>;
   sortBy: z.ZodType<string>;
   sortOrder: z.ZodType<'asc' | 'desc'>;
 };
 
-type PaginationSearchShape = z.ZodRawShape & PaginationSearchBaseShape;
+/** @internal */
+export type PaginationSearchShape = z.ZodRawShape & PaginationSearchBaseShape;
 type PaginationSearchComputedInput<TShape extends PaginationSearchShape> =
   & z.output<z.ZodObject<TShape>>
   & {
     page: number;
     limit: number;
   };
-type PaginationSearchOutput<TShape extends PaginationSearchShape> =
+/** @internal */
+export type PaginationSearchOutput<TShape extends PaginationSearchShape> =
   & z.output<z.ZodObject<TShape>>
   & PaginationSearchState;
 
-export function searchParamsToInput(searchParams: URLSearchParams): Record<string, SearchParamValue> {
+/** @internal */
+export function searchParamsToInput(
+  searchParams: URLSearchParams,
+): Record<string, SearchParamValue> {
   const input: Record<string, SearchParamValue> = {};
 
   for (const key of searchParams.keys()) {
@@ -48,6 +54,7 @@ function addPaginationOffset<TData extends { page: number; limit: number }>(
   };
 }
 
+/** @internal */
 export class PaginationSearchSchema<TShape extends PaginationSearchShape> implements
   SchemaLike<
     Record<string, SearchParamValue>,
@@ -122,6 +129,7 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
   }
 }
 
+/** @internal */
 export function fallback<TSchema extends z.ZodType>(
   schema: TSchema,
   defaultValue: z.output<TSchema>,
@@ -129,6 +137,7 @@ export function fallback<TSchema extends z.ZodType>(
   return schema.catch(defaultValue);
 }
 
+/** @internal */
 export function paginationSearchSchema(
   options: PaginationSearchSchemaOptions = {},
 ): PaginationSearchSchema<PaginationSearchBaseShape> {

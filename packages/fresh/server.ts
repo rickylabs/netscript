@@ -8,18 +8,29 @@
  */
 
 export type { App, FreshConfig, Middleware } from 'fresh';
-export { defineFreshApp, type DefineFreshAppOptions } from './server/define-fresh-app.ts';
+export {
+  defineFreshApp,
+  type DefineFreshAppOptions,
+  type FreshAppFactory,
+  type FreshAppFsRoutes,
+  type FreshAppTelemetryAttribute,
+  type FreshAppTelemetryOptions,
+} from './server/define-fresh-app.ts';
 
 // Streaming SSR
 export {
   createStreamingResponse,
   renderToStream,
+  type StreamingRenderable,
+  type StreamingRenderer,
+  type StreamingRenderStream,
   type StreamRenderOptions,
   type StreamRenderResult,
 } from './server/stream.ts';
 
 // Streaming error boundary
 export {
+  type StreamBoundaryRenderable,
   StreamErrorBoundary,
   type StreamErrorBoundaryProps,
 } from './server/stream-error-boundary.tsx';

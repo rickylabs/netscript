@@ -1,34 +1,41 @@
-import type { CachedEntry as CacheEntryLike } from '@netscript/sdk/ports';
-import type { ComponentChildren, ComponentType, JSX } from 'preact';
-import { z } from 'zod';
-import type { DeferPolicyInput, DeferPolicyProfile } from '../../defer/policy.ts';
-import type { FormConfig } from '../../form/config.ts';
+import type { ComponentChildren } from 'preact';
+import type { z } from 'zod';
 import type { FormValues, RuntimeFormState } from '../../form/types.ts';
-import type { RouteReference } from '../../route/contract.ts';
+import type { RouteReference } from '../../route/_internal/contract-runtime.ts';
+import type { InferRoutePath, InferRouteSearch, TypedRouteTarget } from './navigation/mod.ts';
 import type {
-  DefinePageHooks,
-  InferRoutePath,
-  InferRouteSearch,
-  TypedRouteTarget,
-} from './navigation.tsx';
+  DefinePageRouteNavFor,
+  DefinePageRuntimeContextBase,
+  DefinePageSlotsFor,
+} from './catalog.ts';
 
+/** @internal */
 export type UnknownRecord = Record<string, unknown>;
+/** @internal */
 export type EmptyRecord = Record<string, never>;
+/** @internal */
 export type HasPathParams<TPath extends object> = [keyof TPath] extends [never] ? false
   : TPath extends EmptyRecord ? false
   : true;
+/** @internal */
 export type DefinePageLayerProps = object;
+/** @internal */
 export type DefinePageLayerMap = Record<string, DefinePageLayerProps>;
+/** @internal */
 export type SearchParamValue = string | string[] | undefined;
+/** @internal */
 export type PathParamInput = Record<string, string | undefined>;
+/** @internal */
 export type SearchParamInput = Record<string, SearchParamValue>;
 
+/** @internal */
 export interface PaginationSearchSchemaOptions {
   defaultLimit?: number;
   defaultSort?: string;
   defaultOrder?: 'asc' | 'desc';
 }
 
+/** @internal */
 export interface PaginationSearchState {
   page: number;
   limit: number;
@@ -37,20 +44,23 @@ export interface PaginationSearchState {
   sortOrder: 'asc' | 'desc';
 }
 
+/** @internal */
 export interface DefinePageTelemetryConfig {
   enabled?: boolean;
   spanName?: string;
 }
 
+/** @internal */
 export type DefinePageLayerDelivery = 'blocking' | 'defer' | 'stream';
 
-declare const validatedRouteHrefBrand: unique symbol;
-declare const definePageTypeStateBrand: unique symbol;
-
-export type ValidatedRouteHref = string & { readonly [validatedRouteHrefBrand]: true };
+/** @internal */
+export type ValidatedRouteHref = string & { readonly __validatedRouteHref: true };
+/** @internal */
 export type Simplify<T> = { [K in keyof T]: T[K] } & Record<PropertyKey, never>;
+/** @internal */
 export type DefinePageMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD';
 
+/** @internal */
 export interface DefinePageRequestContext<TState = EmptyRecord> {
   url: URL;
   req: Request;
@@ -60,23 +70,28 @@ export interface DefinePageRequestContext<TState = EmptyRecord> {
   data?: unknown;
 }
 
+/** @internal */
 export interface DefinePageRenderContext<TState = EmptyRecord>
   extends DefinePageRequestContext<TState> {
   render(body: ComponentChildren, init?: ResponseInit): Response;
 }
 
+/** @internal */
 export interface SchemaParseSuccess<TOutput> {
   success: true;
   data: TOutput;
 }
 
+/** @internal */
 export interface SchemaParseFailure {
   success: false;
   error?: unknown;
 }
 
+/** @internal */
 export type SchemaParseResult<TOutput> = SchemaParseSuccess<TOutput> | SchemaParseFailure;
 
+/** @internal */
 export interface SchemaLike<TInput = unknown, TOutput = TInput> {
   safeParse(input: TInput): SchemaParseResult<TOutput>;
 }
@@ -88,17 +103,22 @@ type InferSafeParseOutput<TSchema> = TSchema extends
   : never
   : never;
 
+/** @internal */
 export type InferSchemaOutput<TSchema> = TSchema extends { _output: infer TOutput } ? TOutput
   : [InferSafeParseOutput<TSchema>] extends [never] ? EmptyRecord
   : InferSafeParseOutput<TSchema>;
 
+/** @internal */
 export type ResolveSchemaOutput<TCurrent, TSchema> = InferSchemaOutput<TSchema> extends object
   ? InferSchemaOutput<TSchema>
   : TCurrent;
 
+/** @internal */
 export type PathParamSchema<TOutput = unknown> = SchemaLike<PathParamInput, TOutput>;
+/** @internal */
 export type SearchParamSchema<TOutput = unknown> = SchemaLike<SearchParamInput, TOutput>;
 
+/** @internal */
 export interface DefinePageTypeState<
   TState = EmptyRecord,
   TResources extends UnknownRecord = EmptyRecord,
@@ -106,7 +126,7 @@ export interface DefinePageTypeState<
   TSearch extends object = EmptyRecord,
   TLayerData extends DefinePageLayerMap = EmptyRecord,
 > {
-  readonly [definePageTypeStateBrand]: true;
+  readonly __definePageTypeState: true;
   state: TState;
   resources: TResources;
   path: TPath;
@@ -114,6 +134,7 @@ export interface DefinePageTypeState<
   layerData: TLayerData;
 }
 
+/** @internal */
 export type AnyDefinePageTypeState = DefinePageTypeState<
   unknown,
   UnknownRecord,
@@ -121,6 +142,7 @@ export type AnyDefinePageTypeState = DefinePageTypeState<
   object,
   DefinePageLayerMap
 >;
+/** @internal */
 export type DefinePageRootTypeState<TState = EmptyRecord> = DefinePageTypeState<
   TState,
   EmptyRecord,
@@ -129,6 +151,7 @@ export type DefinePageRootTypeState<TState = EmptyRecord> = DefinePageTypeState<
   EmptyRecord
 >;
 
+/** @internal */
 export type NormalizeDefinePageTypeState<
   TStateOrTypes = EmptyRecord,
   TResources extends UnknownRecord = EmptyRecord,
@@ -138,67 +161,88 @@ export type NormalizeDefinePageTypeState<
 > = TStateOrTypes extends AnyDefinePageTypeState ? TStateOrTypes
   : DefinePageTypeState<TStateOrTypes, TResources, TPath, TSearch, TLayerData>;
 
+/** @internal */
 export type DefinePageStateOf<TTypes extends AnyDefinePageTypeState> = TTypes['state'];
+/** @internal */
 export type DefinePageResourcesOf<TTypes extends AnyDefinePageTypeState> = TTypes['resources'];
+/** @internal */
 export type DefinePagePathOf<TTypes extends AnyDefinePageTypeState> = TTypes['path'];
+/** @internal */
 export type DefinePageSearchOf<TTypes extends AnyDefinePageTypeState> = TTypes['search'];
+/** @internal */
 export type DefinePageLayerDataOf<TTypes extends AnyDefinePageTypeState> = TTypes['layerData'];
 
+/** @internal */
 export interface DefinePageContract<
   TTypes extends AnyDefinePageTypeState = AnyDefinePageTypeState,
 > {
   readonly $types: TTypes;
 }
 
+/** @internal */
 export type DefinePageTypeCarrier = DefinePageContract | {
   readonly $types?: AnyDefinePageTypeState;
 };
 
+/** @internal */
 export type InferDefinePageTypes<TValue extends DefinePageTypeCarrier> = TValue extends {
   readonly $types: infer TTypes extends AnyDefinePageTypeState;
 } ? TTypes
   : TValue extends { readonly $types?: infer TTypes extends AnyDefinePageTypeState } ? TTypes
   : never;
 
+/** @internal */
 export type InferDefinePageState<TValue extends DefinePageTypeCarrier> = DefinePageStateOf<
   InferDefinePageTypes<TValue>
 >;
+/** @internal */
 export type InferDefinePageResources<TValue extends DefinePageTypeCarrier> = DefinePageResourcesOf<
   InferDefinePageTypes<TValue>
 >;
+/** @internal */
 export type InferDefinePagePath<TValue extends DefinePageTypeCarrier> = DefinePagePathOf<
   InferDefinePageTypes<TValue>
 >;
+/** @internal */
 export type InferDefinePageSearch<TValue extends DefinePageTypeCarrier> = DefinePageSearchOf<
   InferDefinePageTypes<TValue>
 >;
+/** @internal */
 export type InferDefinePageLayerData<TValue extends DefinePageTypeCarrier> = DefinePageLayerDataOf<
   InferDefinePageTypes<TValue>
 >;
+/** @internal */
 export type InferDefinePageResource<
   TValue extends DefinePageTypeCarrier,
   TKey extends keyof InferDefinePageResources<TValue> & string,
 > = InferDefinePageResources<TValue>[TKey];
+/** @internal */
 export type InferDefinePageLayerProps<
   TValue extends DefinePageTypeCarrier,
   TLayer extends keyof InferDefinePageLayerData<TValue> & string,
 > = InferDefinePageLayerData<TValue>[TLayer];
+/** @internal */
 export type InferDefinePageHasRoute<TValue extends DefinePageTypeCarrier> = TValue extends {
   readonly route: unknown;
 } ? true
   : false;
+/** @internal */
 export type InferDefinePageLayoutSlots<TValue extends DefinePageTypeCarrier> = DefinePageSlotsFor<
   InferDefinePageTypes<TValue>
 >;
+/** @internal */
 export type InferDefinePageLayoutContext<TValue extends DefinePageTypeCarrier> =
   DefinePageLayoutContextBase<InferDefinePageTypes<TValue>, InferDefinePageHasRoute<TValue>>;
+/** @internal */
 export interface InferDefinePageLayoutProps<TValue extends DefinePageTypeCarrier> {
   readonly slots: InferDefinePageLayoutSlots<TValue>;
   readonly ctx: InferDefinePageLayoutContext<TValue>;
 }
+/** @internal */
 export type InferDefinePageContext<TValue extends DefinePageTypeCarrier> =
   DefinePageRuntimeContextBase<InferDefinePageTypes<TValue>, InferDefinePageHasRoute<TValue>>;
 
+/** @internal */
 export type DefinePageWithResource<TTypes extends AnyDefinePageTypeState, K extends string, TOut> =
   DefinePageTypeState<
     DefinePageStateOf<TTypes>,
@@ -208,6 +252,7 @@ export type DefinePageWithResource<TTypes extends AnyDefinePageTypeState, K exte
     DefinePageLayerDataOf<TTypes>
   >;
 
+/** @internal */
 export type DefinePageWithResources<
   TTypes extends AnyDefinePageTypeState,
   TFactories extends Record<string, (...args: never[]) => unknown>,
@@ -221,6 +266,7 @@ export type DefinePageWithResources<
   DefinePageLayerDataOf<TTypes>
 >;
 
+/** @internal */
 export type DefinePageWithPathParams<TTypes extends AnyDefinePageTypeState, TSchema> =
   DefinePageTypeState<
     DefinePageStateOf<TTypes>,
@@ -230,6 +276,7 @@ export type DefinePageWithPathParams<TTypes extends AnyDefinePageTypeState, TSch
     DefinePageLayerDataOf<TTypes>
   >;
 
+/** @internal */
 export type DefinePageWithSearchParams<TTypes extends AnyDefinePageTypeState, TSchema> =
   DefinePageTypeState<
     DefinePageStateOf<TTypes>,
@@ -239,6 +286,7 @@ export type DefinePageWithSearchParams<TTypes extends AnyDefinePageTypeState, TS
     DefinePageLayerDataOf<TTypes>
   >;
 
+/** @internal */
 export type DefinePageWithParams<
   TTypes extends AnyDefinePageTypeState,
   TPathSchema,
@@ -251,6 +299,7 @@ export type DefinePageWithParams<
   DefinePageLayerDataOf<TTypes>
 >;
 
+/** @internal */
 export type DefinePageWithRoute<
   TTypes extends AnyDefinePageTypeState,
   TRoute extends TypedRouteTarget<object, object>,
@@ -262,6 +311,7 @@ export type DefinePageWithRoute<
   DefinePageLayerDataOf<TTypes>
 >;
 
+/** @internal */
 export type DefinePageWithLayer<
   TTypes extends AnyDefinePageTypeState,
   K extends string,
@@ -274,12 +324,14 @@ export type DefinePageWithLayer<
   Simplify<DefinePageLayerDataOf<TTypes> & Record<K, TProps>>
 >;
 
+/** @internal */
 export type DefinePageWithForm<
   TTypes extends AnyDefinePageTypeState,
   K extends string,
   TSchema extends z.ZodTypeAny,
 > = DefinePageWithLayer<TTypes, K, RuntimeFormState<z.input<TSchema> & FormValues>>;
 
+/** @internal */
 export type DefinePageRouteFor<TTypes extends AnyDefinePageTypeState> = RouteReference<
   DefinePagePathOf<TTypes>,
   DefinePageSearchOf<TTypes>
@@ -293,7 +345,8 @@ type DefinePageRouteContext<TTypes extends AnyDefinePageTypeState, THasRoute ext
   route?: DefinePageRouteFor<TTypes>;
 } & (THasRoute extends true ? { route: DefinePageRouteFor<TTypes> } : EmptyRecord);
 
-type DefinePageAugmentedContextBase<
+/** @internal */
+export type DefinePageAugmentedContextBase<
   TTypes extends AnyDefinePageTypeState,
   THasRoute extends boolean,
 > =
@@ -310,11 +363,13 @@ type DefinePageAugmentedContextBase<
     resources: DefinePageResourcesOf<TTypes>;
   };
 
+/** @internal */
 export type DefinePageLayerContextBase<
   TTypes extends AnyDefinePageTypeState,
   THasRoute extends boolean = false,
 > = DefinePageAugmentedContextBase<TTypes, THasRoute>;
 
+/** @internal */
 export type DefinePageLayerContext<
   TStateOrTypes = EmptyRecord,
   TResources extends UnknownRecord = EmptyRecord,
@@ -331,11 +386,13 @@ export type DefinePageLayerContext<
   false
 >;
 
+/** @internal */
 export type DefinePageLayoutContextBase<
   TTypes extends AnyDefinePageTypeState,
   THasRoute extends boolean = false,
 > = DefinePageAugmentedContextBase<TTypes, THasRoute>;
 
+/** @internal */
 export type DefinePageLayoutContext<
   TStateOrTypes = EmptyRecord,
   TResources extends UnknownRecord = EmptyRecord,
@@ -353,359 +410,40 @@ export type DefinePageLayoutContext<
   false
 >;
 
-export type DefinePageResourceFactoryFor<
-  TTypes extends AnyDefinePageTypeState,
-  TOut,
-  THasRoute extends boolean = false,
-> = (
-  ctx: DefinePageLayerContextBase<TTypes, THasRoute>,
-) => TOut | Promise<TOut>;
-
-export type DefinePageResourceFactory<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TOut = unknown,
-> = DefinePageResourceFactoryFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    EmptyRecord
-  >,
-  TOut,
-  false
->;
-
-export type DefinePageLayerLoaderFor<
-  TTypes extends AnyDefinePageTypeState,
-  TProps extends DefinePageLayerProps,
-  THasRoute extends boolean = false,
-> = (
-  ctx: DefinePageLayerContextBase<TTypes, THasRoute>,
-) =>
-  | TProps
-  | CacheEntryLike<TProps>
-  | null
-  | undefined
-  | Promise<TProps | CacheEntryLike<TProps> | null | undefined>;
-
-export type DefinePageLayerLoader<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TProps extends DefinePageLayerProps = EmptyRecord,
-> = DefinePageLayerLoaderFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    EmptyRecord
-  >,
-  TProps,
-  false
->;
-
-type ResolveDefinePageLayerLoaderOutput<TOutput> = TOutput extends CacheEntryLike<infer TProps>
-  ? TProps
-  : Exclude<TOutput, null | undefined>;
-
-export type InferDefinePageLayerLoaderProps<TLoader extends (...args: never[]) => unknown> =
-  ResolveDefinePageLayerLoaderOutput<Awaited<ReturnType<TLoader>>> extends
-    infer TProps extends DefinePageLayerProps ? TProps
-    : never;
-
-export interface DefinePageLayerConfigFor<
-  TTypes extends AnyDefinePageTypeState,
-  TProps extends DefinePageLayerProps,
-  THasRoute extends boolean = false,
-> {
-  loader?: DefinePageLayerLoaderFor<TTypes, TProps, THasRoute>;
-  partial?: string | ((ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => string);
-  partialName?: string | ((ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => string);
-  fallback?: JSX.Element | ComponentType<Record<string, never>>;
-  policy?: DeferPolicyInput | DeferPolicyProfile;
-  params?: (ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => Record<string, string>;
-  layerDeps?: (
-    ctx: Pick<DefinePageLayerContextBase<TTypes, THasRoute>, 'path' | 'search'>,
-  ) => unknown;
-  staleTime?: number;
-  gcTime?: number;
-  staleReloadMode?: 'blocking' | 'background';
-  shouldReload?: boolean | ((ctx: DefinePageLayerContextBase<TTypes, THasRoute>) => boolean);
-  delivery?: DefinePageLayerDelivery;
-}
-
-export type DefinePageLayerConfig<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TProps extends DefinePageLayerProps = EmptyRecord,
-> = DefinePageLayerConfigFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    EmptyRecord
-  >,
-  TProps,
-  false
->;
-
-type MakeHrefInput<TPath extends object, TSearch extends object> = HasPathParams<TPath> extends true
-  ? { path: TPath; search?: Partial<TSearch> }
-  : { path?: TPath; search?: Partial<TSearch> };
-
-type MakeHrefArgs<TPath extends object, TSearch extends object> = HasPathParams<TPath> extends true
-  ? [input: MakeHrefInput<TPath, TSearch>]
-  : [input?: MakeHrefInput<TPath, TSearch>];
-
-export interface DefinePageRouteNav<
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-> {
-  makeHref(...args: MakeHrefArgs<TPath, TSearch>): ValidatedRouteHref;
-}
-
-export type DefinePageRouteNavFor<TTypes extends AnyDefinePageTypeState> = DefinePageRouteNav<
-  DefinePagePathOf<TTypes>,
-  DefinePageSearchOf<TTypes>
->;
-
-export interface DefinePageBuildOptions {
-  routePattern?: string;
-}
-
-export type DefinePageMethodHandlerFor<
-  TTypes extends AnyDefinePageTypeState,
-  THasRoute extends boolean = false,
-> = (
-  ctx: DefinePageLayerContextBase<TTypes, THasRoute>,
-) => Response | { data: unknown } | Promise<Response | { data: unknown }>;
-
-export type DefinePageFormConfigFor<
-  TTypes extends AnyDefinePageTypeState,
-  THasRoute extends boolean = false,
-  TSchema extends z.ZodTypeAny = z.ZodTypeAny,
-  TOutput = unknown,
-> = FormConfig<TTypes, THasRoute, TSchema, TOutput>;
-
-export type DefinePageMethodHandler<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-> = DefinePageMethodHandlerFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    EmptyRecord
-  >,
-  false
->;
-
-export type DefinePageSlot<TProps extends DefinePageLayerProps> = (() => JSX.Element | null) & {
-  data?: TProps;
-};
-
-export type DefinePageSlots<TLayerData extends DefinePageLayerMap> = {
-  [K in keyof TLayerData]: DefinePageSlot<TLayerData[K]>;
-};
-
-export type DefinePageSlotsFor<TTypes extends AnyDefinePageTypeState> = DefinePageSlots<
-  DefinePageLayerDataOf<TTypes>
->;
-
-export type DefinePageRuntimeContextBase<
-  TTypes extends AnyDefinePageTypeState,
-  THasRoute extends boolean = false,
-> = DefinePageAugmentedContextBase<TTypes, THasRoute> & {
-  slots: DefinePageSlotsFor<TTypes>;
-};
-
-export interface DefinePageMetaDescriptor {
-  title?: string;
-  description?: string;
-  canonicalUrl?: string;
-  robots?: string;
-  meta?: Array<{ name?: string; property?: string; content: string }>;
-  links?: Array<{ rel: string; href: string; title?: string; type?: string }>;
-  jsonLd?: unknown | unknown[];
-}
-
-export type DefinePageMetaResolverFor<
-  TTypes extends AnyDefinePageTypeState,
-  THasRoute extends boolean = false,
-> = (
-  ctx: DefinePageLayoutContextBase<TTypes, THasRoute>,
-) => DefinePageMetaDescriptor | Promise<DefinePageMetaDescriptor>;
-
-export type DefinePageMetaResolver<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TLayerData extends DefinePageLayerMap = EmptyRecord,
-> = DefinePageMetaResolverFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    TLayerData
-  >,
-  false
->;
-
-export type DefinePageHeaderResolverFor<
-  TTypes extends AnyDefinePageTypeState,
-  THasRoute extends boolean = false,
-> = (
-  ctx: DefinePageLayoutContextBase<TTypes, THasRoute>,
-) => HeadersInit | Promise<HeadersInit>;
-
-export type DefinePageHeaderResolver<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TLayerData extends DefinePageLayerMap = EmptyRecord,
-> = DefinePageHeaderResolverFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    TLayerData
-  >,
-  false
->;
-
-export type DefinePageLayoutFor<
-  TTypes extends AnyDefinePageTypeState,
-  THasRoute extends boolean = false,
-> = (
-  slots: DefinePageSlotsFor<TTypes>,
-  ctx: DefinePageLayoutContextBase<TTypes, THasRoute>,
-) => ComponentChildren;
-
-export type DefinePageLayout<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TLayerData extends DefinePageLayerMap = EmptyRecord,
-> = DefinePageLayoutFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    TLayerData
-  >,
-  false
->;
-
-export type DefinePageHandlersFor<TTypes extends AnyDefinePageTypeState> = Partial<
-  Record<
-    DefinePageMethod,
-    (
-      ctx:
-        | DefinePageRequestContext<DefinePageStateOf<TTypes>>
-        | DefinePageRenderContext<DefinePageStateOf<TTypes>>,
-    ) => Response | { data: unknown } | Promise<Response | { data: unknown }>
-  >
->;
-
-export type DefinePageHandlers<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-> = DefinePageHandlersFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    EmptyRecord
-  >
->;
-
-export interface DefinePageDefinitionFor<TTypes extends AnyDefinePageTypeState> {
-  readonly $types?: TTypes;
-  page: (ctx: DefinePageRequestContext<DefinePageStateOf<TTypes>>) => Promise<JSX.Element>;
-  readonly default: (
-    ctx: DefinePageRequestContext<DefinePageStateOf<TTypes>>,
-  ) => Promise<JSX.Element>;
-  handler?: DefinePageHandlersFor<TTypes>;
-}
-
-export type DefinePageDefinition<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TLayerData extends DefinePageLayerMap = EmptyRecord,
-> = DefinePageDefinitionFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    TLayerData
-  >
->;
-
-export interface DefinePageRoutedDefinitionFor<TTypes extends AnyDefinePageTypeState>
-  extends DefinePageDefinitionFor<TTypes> {
-  readonly nav: DefinePageRouteNavFor<TTypes>;
-  readonly route: DefinePageRouteFor<TTypes>;
-  readonly hooks: DefinePageHooks<DefinePageRoutedDefinitionFor<TTypes>>;
-}
-
-export type DefinePageRoutedDefinition<
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TLayerData extends DefinePageLayerMap = EmptyRecord,
-> = DefinePageRoutedDefinitionFor<
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    TLayerData
-  >
->;
-
-export type DefinePageBuildResultFor<TBuildOptions, TTypes extends AnyDefinePageTypeState> =
-  TBuildOptions extends string | { routePattern: string } ? DefinePageRoutedDefinitionFor<TTypes>
-    : DefinePageDefinitionFor<TTypes>;
-
-export type DefinePageBuildResult<
-  TBuildOptions,
-  TStateOrTypes = EmptyRecord,
-  TResources extends UnknownRecord = EmptyRecord,
-  TPath extends object = EmptyRecord,
-  TSearch extends object = EmptyRecord,
-  TLayerData extends DefinePageLayerMap = EmptyRecord,
-> = DefinePageBuildResultFor<
-  TBuildOptions,
-  NormalizeDefinePageTypeState<
-    TStateOrTypes,
-    TResources,
-    TPath,
-    TSearch,
-    TLayerData
-  >
->;
+export type {
+  DefinePageBuildOptions,
+  DefinePageBuildResult,
+  DefinePageBuildResultFor,
+  DefinePageDefinition,
+  DefinePageDefinitionFor,
+  DefinePageFormConfigFor,
+  DefinePageHandlers,
+  DefinePageHandlersFor,
+  DefinePageHeaderResolver,
+  DefinePageHeaderResolverFor,
+  DefinePageLayerConfig,
+  DefinePageLayerConfigFor,
+  DefinePageLayerLoader,
+  DefinePageLayerLoaderFor,
+  DefinePageLayout,
+  DefinePageLayoutFor,
+  DefinePageMetaDescriptor,
+  DefinePageMetaResolver,
+  DefinePageMetaResolverFor,
+  DefinePageMethodHandler,
+  DefinePageMethodHandlerFor,
+  DefinePageResourceFactory,
+  DefinePageResourceFactoryFor,
+  DefinePageRoutedDefinition,
+  DefinePageRoutedDefinitionFor,
+  DefinePageRouteNav,
+  DefinePageRouteNavFor,
+  DefinePageRuntimeContextBase,
+  DefinePageSlot,
+  DefinePageSlots,
+  DefinePageSlotsFor,
+  InferDefinePageLayerLoaderProps,
+  MakeHrefArgs,
+  MakeHrefInput,
+  ResolveDefinePageLayerLoaderOutput,
+} from './catalog.ts';

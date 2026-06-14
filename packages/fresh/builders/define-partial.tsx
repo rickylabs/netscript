@@ -7,7 +7,7 @@
 import type { RouteConfig } from 'fresh';
 import { Partial } from 'fresh/runtime';
 import type { ComponentType, JSX } from 'preact';
-import { ErrorDisplay } from '../components/ErrorDisplay.tsx';
+import { ErrorDisplay } from '../error/ErrorDisplay.tsx';
 import { errorHandler, hasError } from '../error/handler.ts';
 import type { ErrorPrimitives } from '../error/primitives.ts';
 
@@ -45,7 +45,9 @@ export function definePartial<
   TProps extends object,
   TContext,
   THandler = undefined,
->(options: DefinePartialOptions<TProps, TContext, THandler>): DefinedPartialRoute<TContext, THandler> {
+>(
+  options: DefinePartialOptions<TProps, TContext, THandler>,
+): DefinedPartialRoute<TContext, THandler> {
   const config = {
     ...options.config,
     ...PARTIAL_ROUTE_CONFIG,

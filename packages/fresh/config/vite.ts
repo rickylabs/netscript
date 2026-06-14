@@ -8,43 +8,101 @@ import {
 } from 'vite';
 import {
   isRouteManifestWatchPath,
-  type NetScriptRouteManifestOptions,
   resolveNetScriptRouteManifestOptions,
   writeNetScriptRouteManifestSync,
 } from '../route/manifest.ts';
+import type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
+
+export type { NetScriptRouteManifestOptions } from '../route/manifest.ts';
 
 const ROUTE_MANIFEST_WATCH_DEBOUNCE_MS = 25;
+const ABSOLUTE_PATH_PATTERN = /^(?:[A-Za-z]:\/|\/)/;
+
+function resolveConfigPath(path: string): string {
+  return ABSOLUTE_PATH_PATTERN.test(path) ? normalizePath(path) : normalizePath(resolve(path));
+}
+
+function joinConfigPath(basePath: string, childPath: string): string {
+  const normalizedChild = normalizePath(childPath);
+  if (ABSOLUTE_PATH_PATTERN.test(normalizedChild)) {
+    return normalizedChild;
+  }
+  if (/^[A-Za-z]:\//.test(basePath)) {
+    return normalizePath(`${basePath}/${normalizedChild}`);
+  }
+  return normalizePath(resolve(basePath, normalizedChild));
+}
+
+function defaultWorkspaceRoot(appRoot: string): string {
+  if (/^[A-Za-z]:\//.test(appRoot)) {
+    return normalizePath(appRoot.split('/').slice(0, -2).join('/'));
+  }
+  return normalizePath(resolve(appRoot, '../..'));
+}
 
 function resolveWatchedFilePath(appRoot: string, filePath: string): string {
   const normalized = normalizePath(filePath);
-  return /^(?:[A-Za-z]:\/|\/)/.test(normalized)
-    ? normalized
-    : normalizePath(resolve(appRoot, normalized));
+  return ABSOLUTE_PATH_PATTERN.test(normalized) ? normalized : joinConfigPath(appRoot, normalized);
 }
 
-interface NetScriptViteAlias {
+/** Resolved Vite alias entry generated or accepted by the NetScript Vite plugin. */
+export interface NetScriptViteAlias {
+  /** Import specifier prefix or exact specifier to match. */
   find: string;
+  /** Filesystem path that replaces the matched import specifier. */
   replacement: string;
 }
 
+/** Environment variable mapping injected into `import.meta.env`. */
 export interface NetScriptViteEnvMapping {
+  /** Source key read from the provided environment map. */
   source: string;
+  /** Target `import.meta.env` key to define. */
   target: string;
+  /** Fallback value used when the source key is absent. */
   fallback?: string;
 }
 
+/** Options accepted by the NetScript Fresh Vite plugin. */
 export interface NetScriptVitePluginOptions {
+  /** Fresh app root used for aliases and route manifest output. */
   appRoot?: string;
+  /** Workspace root allowed through the Vite dev-server filesystem guard. */
   workspaceRoot?: string;
+  /** Explicit Vite aliases to use instead of generated aliases. */
   aliasEntries?: NetScriptViteAlias[];
+  /** App-root-relative directories used to generate aliases. */
   aliasDirectories?: string[];
+  /** Alias prefix used for generated aliases. */
   aliasPrefix?: string;
+  /** Additional paths watched by the Vite dev server. */
   watchPaths?: string[];
+  /** Environment variable mappings to expose through `import.meta.env`. */
   envMappings?: NetScriptViteEnvMapping[];
+  /** Environment source values used by `envMappings`. */
   env?: Record<string, string | undefined>;
+  /** Additional filesystem paths allowed by the Vite dev server. */
   allowFsPaths?: string[];
+  /** Whether to include `workspaceRoot` in the Vite filesystem allow-list. */
   includeWorkspaceRootInFsAllow?: boolean;
+  /** Route manifest generation options. */
   routeManifest?: NetScriptRouteManifestOptions;
+}
+
+/** Package-owned view of the Vite plugin hooks used by NetScript Fresh. */
+export interface NetScriptVitePlugin {
+  /** Vite plugin name. */
+  readonly name: string;
+  /** Vite hook ordering. */
+  readonly enforce: 'pre';
+  /** Return Vite config defaults for NetScript Fresh workspaces. */
+  config(config: Record<string, unknown>, env: Record<string, unknown>): Record<string, unknown>;
+  /** Resolve NetScript app aliases to absolute file paths. */
+  resolveId(source: string): string | undefined;
+  /** Generate route manifests when the Vite build starts. */
+  buildStart(): void;
+  /** Register development-server watchers for route manifests. */
+  configureServer(server: unknown): void;
 }
 
 function dedupe(values: string[]): string[] {
@@ -59,7 +117,7 @@ function createAliasEntries(
   return [
     ...aliasDirectories.map((directory) => ({
       find: `${aliasPrefix}/${directory}`,
-      replacement: normalizePath(resolve(appRoot, directory)),
+      replacement: joinConfigPath(appRoot, directory),
     })),
     {
       find: aliasPrefix,
@@ -101,6 +159,9 @@ function resolveAliasImport(
 
     if (source.startsWith(`${alias.find}/`)) {
       const suffix = source.slice(alias.find.length + 1);
+      if (ABSOLUTE_PATH_PATTERN.test(alias.replacement)) {
+        return normalizePath(`${alias.replacement}/${suffix}`);
+      }
       return normalizePath(resolve(alias.replacement, suffix));
     }
   }
@@ -109,8 +170,8 @@ function resolveAliasImport(
 }
 
 function logRouteManifestResult(
-  phase: 'init' | 'build' | 'watch',
-  result: {
+  _phase: 'init' | 'build' | 'watch',
+  _result: {
     changed: boolean;
     manifestChanged: boolean;
     routesChanged: boolean;
@@ -126,9 +187,12 @@ function logRouteManifestResult(
   }
 }
 
-export function createNetScriptVitePlugin(options: NetScriptVitePluginOptions = {}): Plugin {
-  const appRoot = resolve(options.appRoot ?? Deno.cwd());
-  const workspaceRoot = resolve(options.workspaceRoot ?? resolve(appRoot, '../..'));
+/** Create the NetScript Fresh Vite plugin for aliases, env mapping, and route manifests. */
+export function createNetScriptVitePlugin(
+  options: NetScriptVitePluginOptions = {},
+): NetScriptVitePlugin {
+  const appRoot = resolveConfigPath(options.appRoot ?? Deno.cwd());
+  const workspaceRoot = resolveConfigPath(options.workspaceRoot ?? defaultWorkspaceRoot(appRoot));
   const aliasPrefix = options.aliasPrefix ?? '@app';
   const aliasEntries = options.aliasEntries ??
     createAliasEntries(appRoot, options.aliasDirectories ?? [], aliasPrefix);
@@ -145,7 +209,7 @@ export function createNetScriptVitePlugin(options: NetScriptVitePluginOptions = 
     logRouteManifestResult('init', result, routeManifest.logLevel);
   }
 
-  return {
+  const plugin: Plugin = {
     name: 'vite-plugin-netscript',
     enforce: 'pre',
     config(_config: UserConfig, _env: ConfigEnv) {
@@ -254,4 +318,6 @@ export function createNetScriptVitePlugin(options: NetScriptVitePluginOptions = 
       }
     },
   };
+
+  return plugin as unknown as NetScriptVitePlugin;
 }
