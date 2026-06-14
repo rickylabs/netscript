@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { getDrawerDataState } from '../../../runtime/drawer/use-drawer.ts';
+import { getDrawerDataState } from '../../../src/runtime/drawer/use-drawer.ts';
 
 Deno.test('getDrawerDataState returns open when the drawer is open', () => {
   assertEquals(getDrawerDataState(true), 'open', 'Drawer data-state should reflect an open drawer');

@@ -904,6 +904,7 @@
       },
       "packages/sdk": {
         "dependencies": [
+          "jsr:@std/assert@1",
           "npm:@orpc/client@^1.13.5",
           "npm:@orpc/contract@^1.13.5",
           "npm:@orpc/openapi@^1.13.5",

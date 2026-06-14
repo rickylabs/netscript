@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { getTooltipDataState } from '../../../runtime/tooltip/use-tooltip.ts';
+import { getTooltipDataState } from '../../../src/runtime/tooltip/use-tooltip.ts';
 
 Deno.test('getTooltipDataState returns open when the tooltip is open', () => {
   assertEquals(

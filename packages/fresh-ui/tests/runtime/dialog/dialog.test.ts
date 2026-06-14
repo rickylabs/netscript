@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { getDialogDataState } from '../../../runtime/dialog/use-dialog.ts';
+import { getDialogDataState } from '../../../src/runtime/dialog/use-dialog.ts';
 
 Deno.test('getDialogDataState returns open when the dialog is open', () => {
   assertEquals(getDialogDataState(true), 'open', 'Dialog data-state should reflect an open dialog');

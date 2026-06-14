@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { getAccordionDataState } from '../../../runtime/accordion/use-accordion.ts';
+import { getAccordionDataState } from '../../../src/runtime/accordion/use-accordion.ts';
 
 Deno.test('getAccordionDataState returns open when the accordion item is expanded', () => {
   assertEquals(
