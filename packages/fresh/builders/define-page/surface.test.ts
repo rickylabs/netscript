@@ -165,7 +165,13 @@ import type {
 
 type AnyLoader = () => Promise<{ readonly id: string }>;
 type AnyTypes = DefinePageRootTypeState;
-type AnyTarget = any;
+type AnyTarget = {
+  readonly routePattern: string;
+  readonly $types?: {
+    readonly path: object;
+    readonly search: object;
+  };
+};
 type AnyDefinition = DefinePageDefinitionFor<AnyTypes>;
 type AnyLayerMap = DefinePageLayerMap;
 type AnyRenderable = PageRenderable;

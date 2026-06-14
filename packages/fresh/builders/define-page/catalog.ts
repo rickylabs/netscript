@@ -1,6 +1,6 @@
 import type { CachedEntry as CacheEntryLike } from '@netscript/sdk/ports';
 import type { ComponentChildren, ComponentType, JSX } from 'preact';
-import { z } from 'zod';
+import type { z } from 'zod';
 import type { DeferPolicyInput, DeferPolicyProfile } from '../../defer/policy.ts';
 import type { FormConfig } from '../../form/config.ts';
 import type {

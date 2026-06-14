@@ -330,3 +330,27 @@ this repository. Browser validation remains unavailable without an app workspace
 
 **Closing gate:** Fixture route modules pass `deno check`; final evaluator accepts the package-local
 fixture substitute or requests a follow-up when the playground app exists.
+
+---
+
+## D-5d2-15: Root architecture gate remains a repo-wide baseline failure
+
+**Date:** 2026-06-14  
+**Plan slice:** Slice 25  
+**Status:** accepted gate drift
+
+**Description:**
+The approved Slice 25 called for architecture fitness gates. Running `deno task arch:check` from the
+repository root exits non-zero with broad existing doctrine failures across the repo
+(`FAIL=58 WARN=133 INFO=1`), including root/global entrypoint and CLI/plugin doctrine findings that
+are outside the 5d2 builders package scope.
+
+**Disposition:**
+Treat the root command as a recorded baseline failure for this run and use scoped builders evidence
+for the Slice 25 implementation verdict. The focused builders doctrine scan has no failures and
+reports warnings only for remaining known size/cardinality architecture debt:
+`define-page/types.ts`, `define-page/page-compat.ts`, `define-page/` child count, and missing local
+architecture docs info.
+
+**Closing gate:** Scoped builders check, lint, fmt, doctrine scan, and test suite pass. Root
+`deno task arch:check` remains a repo-wide baseline failure for evaluator/supervisor follow-up.

@@ -537,6 +537,49 @@ Recorded D-5d2-9 and will not loop on push attempts.
 | ------- | ------ |
 | `deno test --allow-all packages/fresh/builders` | PASS: 36 tests, 0 failures |
 
+## 2026-06-14 slice 25 — architecture fitness gates
+
+**Files changed:**
+
+- `packages/fresh/builders/define-page/builder.test.tsx`
+- `packages/fresh/builders/define-page/navigation.test.tsx`
+- `packages/fresh/builders/define-page/runtime.test.tsx`
+- `packages/fresh/builders/define-page/search-params.test.tsx`
+- `packages/fresh/builders/define-partial.test.tsx`
+- `packages/fresh/builders/define-page/types.ts`
+- `packages/fresh/builders/define-page/catalog.ts`
+- `packages/fresh/builders/define-page/builder/state.ts`
+- `packages/fresh/builders/define-page/builder/mod.tsx`
+- `packages/fresh/builders/define-page/navigation/hooks.ts`
+- `packages/fresh/builders/define-page/navigation/link.tsx`
+- `packages/fresh/builders/define-page/navigation/mod.ts`
+- `packages/fresh/builders/define-page/runtime/mod.tsx`
+- `packages/fresh/builders/define-page/page-compat.ts`
+- `packages/fresh/builders/define-page/surface.test.ts`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/worklog.md`
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d2-builders/drift.md`
+
+**Implementation:**
+
+- Ran root architecture gate and recorded the existing repo-wide baseline failure separately from
+  builders-local evidence.
+- Cleaned builders-local lint issues exposed by the architecture slice: removed copied unused test
+  imports, converted value imports used only as types to `import type`, removed unused runtime type
+  imports, and replaced a compatibility `Simplify<T> & {}` intersection with `Simplify<T> & object`.
+- Preserved the public surface snapshot and route-builder behavior while making the scoped builders
+  check/lint/fmt gates pass.
+
+**Gates:**
+
+| Command | Result |
+| ------- | ------ |
+| `deno task arch:check` | FAIL: existing repo-wide doctrine baseline (`FAIL=58 WARN=133 INFO=1`), not isolated to `packages/fresh/builders` |
+| `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/fresh/builders` | PASS with warnings only: `types.ts` 454 LOC, `page-compat.ts` 1112 LOC, `define-page/` 15 children, missing local `docs/architecture.md` info |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/builders --ext ts,tsx` | PASS |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/fresh/builders --ext ts,tsx` | PASS |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh/builders --ext ts,tsx --ignore-line-endings` | PASS |
+| `deno test --allow-all packages/fresh/builders` | PASS: 36 tests, 0 failures |
+
 ## Design checkpoint complete
 
 **Date:** 2026-06-13

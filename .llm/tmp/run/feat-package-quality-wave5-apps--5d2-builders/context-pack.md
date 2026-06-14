@@ -132,8 +132,8 @@ slice when publication succeeds.
 
 ## Next Steps
 
-1. Continue Slice 25: run architecture fitness gates.
-2. Continue Slice 26: final doc-lint and publish dry-run.
+1. Continue Slice 26: final doc-lint and publish dry-run.
+2. Continue Slice 27: closeout artifacts and readiness handoff.
 
 ## Key Decisions
 
@@ -174,9 +174,9 @@ slice when publication succeeds.
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | planned | Slice 27 will run `deno check` + `deno publish --dry-run`. |
-| Fitness | planned | Slices 25–26 will run `deno task arch:check` / per-script gates. |
-| Runtime | planned | Slice 24 playground routes; slice 25 test suite. |
+| Static | planned | Slice 26 will run final doc-lint + `deno publish --dry-run`. |
+| Fitness | partial | Slice 25 scoped builders gates passed; root `deno task arch:check` remains repo-wide baseline failure D-5d2-15. |
+| Runtime | passed | Slice 24 builders suite and Slice 25 rerun passed: 36 tests. |
 | Consumer | planned | No public API changes; surface snapshot test in slice 1 proves this. |
 | Slice 2 doc-lint | passed | `deno doc --lint packages/fresh/form/types.ts`; `deno doc --lint packages/fresh/builders/mod.ts` |
 | Slice 3 state | passed | `deno check --unstable-kv packages/fresh/builders/define-page/builder/state.ts packages/fresh/builders/define-page/builder.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `state.ts` 6400 bytes |
@@ -189,6 +189,7 @@ slice when publication succeeds.
 | Slice 10 runtime entry | partial | type-check and surface snapshot pass; direct role-entry doc-lint recorded as D-5d2-10 |
 | Slice 11 navigation context | passed | `deno check --unstable-kv packages/fresh/builders/define-page/navigation/context.ts packages/fresh/builders/define-page/navigation.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `context.ts` 1816 bytes |
 | Slice 12 navigation hooks | passed | `deno check --unstable-kv packages/fresh/builders/define-page/navigation/hooks.ts packages/fresh/builders/define-page/navigation.tsx`; `deno test packages/fresh/builders/define-page/surface.test.ts`; `hooks.ts` 4816 bytes |
+| Slice 25 architecture fitness | partial | Root `deno task arch:check` FAIL baseline; scoped builders doctrine scan PASS with warnings; scoped builders check/lint/fmt/tests PASS |
 
 ## Open Questions
 
@@ -205,6 +206,7 @@ slice when publication succeeds.
 - D-5d2-7: Builder role entry remains `.tsx` and over the slice-6 size target.
 - D-5d2-8: Direct builder role doc-lint deferred until public barrel cleanup.
 - D-5d2-10: Direct runtime role doc-lint deferred until public barrel cleanup.
+- D-5d2-15: Root `deno task arch:check` remains a repo-wide baseline failure; scoped builders architecture gates pass with warnings only.
 
 ## Commits
 

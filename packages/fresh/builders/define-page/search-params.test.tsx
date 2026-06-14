@@ -1,39 +1,4 @@
-import {
-  definePage,
-  type DefinePageLayerContextBase,
-  fallback,
-  type InferDefinePageLayerData,
-  type InferDefinePageLayerLoaderProps,
-  type InferDefinePageLayerProps,
-  type InferDefinePageLayoutContext,
-  type InferDefinePageLayoutProps,
-  type InferDefinePageLayoutSlots,
-  type InferDefinePagePath,
-  type InferDefinePageResource,
-  type InferDefinePageResources,
-  type InferDefinePageSearch,
-  type InferDefinePageState,
-  type InferDefinePageTypes,
-  paginationSearchSchema,
-  searchParamsToInput,
-  usePagePath,
-  usePageRoute,
-  usePageSearch,
-} from './mod.ts';
-import { CSRF_COOKIE_NAME } from '../../form/mod.ts';
-import type { RuntimeFormState } from '../../form/types.ts';
-import type { FormSubmissionResult } from '../../form/types.ts';
-import {
-  bindRoutePattern,
-  defineRouteContract,
-  enumPathParamSchema,
-  type InferRoutePath,
-  type InferRouteSearch,
-  useCurrentPath,
-  useCurrentRoute,
-  useCurrentSearch,
-} from '../../route/contract.ts';
-import { render as renderToString } from 'preact-render-to-string';
+import { definePage, fallback, paginationSearchSchema, searchParamsToInput } from './mod.ts';
 import { z } from 'zod';
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -209,8 +174,8 @@ Deno.test('definePage accepts telemetry configuration without breaking execution
 
   const route = definePage<{ requestId: string }>()
     .withTelemetry({ enabled: true, spanName: 'custom.page.render' })
-    .withResource('settings', async () => ({ theme: 'dark' }))
-    .withLayer('panel', () => <div />, async () => {
+    .withResource('settings', () => ({ theme: 'dark' }))
+    .withLayer('panel', () => <div />, () => {
       loaderRuns += 1;
       return { ok: true };
     })

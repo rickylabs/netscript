@@ -1,13 +1,6 @@
 import { type ComponentChildren, type ComponentType, h, type JSX } from 'preact';
+import { DefinePageNavigationContext, useRequiredNavigationContext } from './context.ts';
 import {
-  DefinePageNavigationContext,
-  type DefinePageNavigationContextValue,
-  useRequiredNavigationContext,
-} from './context.ts';
-import {
-  useCurrentPath,
-  useCurrentRoute,
-  useCurrentSearch,
   useDefinePageContext,
   useDefinePageLayer,
   useDefinePageLayers,
@@ -49,13 +42,11 @@ import type {
   AnyDefinePageTypeState,
   DefinePageLayoutContextBase,
   DefinePageRouteNav,
-  DefinePageRouteNavFor,
   DefinePageSlot,
   DefinePageSlotsFor,
   DefinePageStateOf,
   DefinePageTypeCarrier,
   InferDefinePageContext,
-  InferDefinePageHasRoute,
   InferDefinePageLayerData,
   InferDefinePagePath,
   InferDefinePageResources,

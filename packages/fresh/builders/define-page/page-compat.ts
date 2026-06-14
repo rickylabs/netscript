@@ -421,7 +421,7 @@ export type SchemaInput<TSchema, TFallback extends object> = TSchema extends und
   : TFallback;
 
 /** Flatten mapped and intersected object types for cleaner IntelliSense. */
-export type Simplify<T> = { [K in keyof T]: T[K] } & {};
+export type Simplify<T> = { [K in keyof T]: T[K] } & object;
 
 /** Runtime context shared by loaders, handlers, layouts, and metadata resolvers. */
 export interface PageContext<

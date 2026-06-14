@@ -1,5 +1,6 @@
-import { type ComponentChildren, type JSX } from 'preact';
-import { type DefinePageNavigationContextValue, readNavigationContext } from './context.ts';
+import type { ComponentChildren, JSX } from 'preact';
+import { readNavigationContext } from './context.ts';
+import type { DefinePageNavigationContextValue } from './context.ts';
 import type {
   DefinePageRouteNav,
   EmptyRecord,

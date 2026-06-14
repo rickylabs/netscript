@@ -1,6 +1,5 @@
 import { type DefinePageNavigationContextValue, useRequiredNavigationContext } from './context.ts';
 import type {
-  AnyDefinePageTypeState,
   DefinePageLayoutContextBase,
   DefinePageRouteNavFor,
   DefinePageSlotsFor,

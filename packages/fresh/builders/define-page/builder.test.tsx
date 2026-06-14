@@ -16,25 +16,12 @@ import {
   type InferDefinePageState,
   type InferDefinePageTypes,
   paginationSearchSchema,
-  searchParamsToInput,
-  usePagePath,
-  usePageRoute,
-  usePageSearch,
 } from './mod.ts';
-import { CSRF_COOKIE_NAME } from '../../form/mod.ts';
-import type { RuntimeFormState } from '../../form/types.ts';
-import type { FormSubmissionResult } from '../../form/types.ts';
 import {
   bindRoutePattern,
   defineRouteContract,
   enumPathParamSchema,
-  type InferRoutePath,
-  type InferRouteSearch,
-  useCurrentPath,
-  useCurrentRoute,
-  useCurrentSearch,
 } from '../../route/contract.ts';
-import { render as renderToString } from 'preact-render-to-string';
 import { z } from 'zod';
 
 function assert(condition: unknown, message: string): asserts condition {
@@ -354,7 +341,7 @@ Deno.test('InferDefinePage child-component helpers expose resource, layer loader
     signal: new AbortController().signal,
     path: { id: 'user-1' },
     search: { page: 1 },
-    resource: ((key: 'profile') => typedResource) as InferDefinePageLayoutContext<
+    resource: ((_key: 'profile') => typedResource) as InferDefinePageLayoutContext<
       typeof panelContract
     >['resource'],
     resources: { profile: typedResource } as InferDefinePageResources<typeof panelContract>,
@@ -447,7 +434,7 @@ Deno.test('definePage withRoute(route) supports implicit createNav and build()',
 
       return <main />;
     })
-    .withHandler('POST', async (ctx) => {
+    .withHandler('POST', (ctx) => {
       handlerHref = ctx.route.nav.makeHref({
         path: { section: 'overview' },
         search: { page: ctx.search.page + 1 },
@@ -468,6 +455,7 @@ Deno.test('definePage withRoute(route) supports implicit createNav and build()',
   );
 
   const explicitHref = route.nav.makeHref({ path: { section: 'overview' }, search: { page: 3 } });
+  const navHref = routeNav.makeHref({ path: { section: 'navigation' }, search: { page: 4 } });
 
   assert(
     explicitHref.startsWith('/dashboard/framework/wi-09/overview'),
@@ -476,6 +464,10 @@ Deno.test('definePage withRoute(route) supports implicit createNav and build()',
   assert(
     explicitHref.includes('page=3'),
     `Expected explicit href to preserve page search: ${explicitHref}`,
+  );
+  assert(
+    navHref.includes('page=4'),
+    `Expected createNav href to preserve page search: ${navHref}`,
   );
   assert(
     capturedHref.startsWith('/dashboard/framework/wi-09/navigation'),

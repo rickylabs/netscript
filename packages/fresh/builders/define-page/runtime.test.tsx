@@ -1,39 +1,8 @@
 // Runtime seam tests split from ../define-page.test.tsx.
-import {
-  definePage,
-  type DefinePageLayerContextBase,
-  fallback,
-  type InferDefinePageLayerData,
-  type InferDefinePageLayerLoaderProps,
-  type InferDefinePageLayerProps,
-  type InferDefinePageLayoutContext,
-  type InferDefinePageLayoutProps,
-  type InferDefinePageLayoutSlots,
-  type InferDefinePagePath,
-  type InferDefinePageResource,
-  type InferDefinePageResources,
-  type InferDefinePageSearch,
-  type InferDefinePageState,
-  type InferDefinePageTypes,
-  paginationSearchSchema,
-  searchParamsToInput,
-  usePagePath,
-  usePageRoute,
-  usePageSearch,
-} from './mod.ts';
+import { definePage } from './mod.ts';
 import { CSRF_COOKIE_NAME } from '../../form/mod.ts';
 import type { RuntimeFormState } from '../../form/types.ts';
 import type { FormSubmissionResult } from '../../form/types.ts';
-import {
-  bindRoutePattern,
-  defineRouteContract,
-  enumPathParamSchema,
-  type InferRoutePath,
-  type InferRouteSearch,
-  useCurrentPath,
-  useCurrentRoute,
-  useCurrentSearch,
-} from '../../route/contract.ts';
 import { render as renderToString } from 'preact-render-to-string';
 import { z } from 'zod';
 
@@ -75,7 +44,7 @@ Deno.test('definePage withForm resolves initial layer props and sets the CSRF co
         name: z.string().optional(),
       }),
       initial: () => ({ name: 'Ada' }),
-      mutate: async () => ({ id: 1 }),
+      mutate: () => ({ id: 1 }),
     })
     .withLayout((slots, { layerData }) => {
       snapshot = layerData.form;
@@ -140,7 +109,7 @@ Deno.test('definePage withForm returns invalid data when schema validation fails
     .withForm('form', UserForm, {
       schema,
       csrf: false,
-      mutate: async () => {
+      mutate: () => {
         mutateCalled = true;
         return { id: 1 };
       },
@@ -187,7 +156,7 @@ Deno.test('definePage withForm ignores malformed ctx.data that only partially re
         name: z.string().optional(),
       }),
       initial: () => ({ name: 'Ada' }),
-      mutate: async () => ({ id: 1 }),
+      mutate: () => ({ id: 1 }),
     })
     .withLayout((slots, { layerData }) => {
       snapshot = layerData.form;
@@ -220,7 +189,7 @@ Deno.test('definePage withForm redirects after a successful submit', async () =>
     .withForm('form', UserForm, {
       schema,
       csrf: false,
-      mutate: async (input) => {
+      mutate: (input) => {
         seenName = input.name;
         return { id: 42 };
       },
@@ -272,7 +241,7 @@ Deno.test('definePage withForm logs the original mutate error before normalizing
     .withForm('form', UserForm, {
       schema,
       csrf: false,
-      mutate: async () => {
+      mutate: () => {
         throw new Error('Mutation exploded');
       },
     })
@@ -343,7 +312,7 @@ Deno.test('definePage withForm applies collection intents before returning runti
         items: [{ label: 'Widget', quantity: '1' }],
       }),
       onIntent: (_intent, values) => ({ values }),
-      mutate: async () => ({ ok: true }),
+      mutate: () => ({ ok: true }),
     })
     .withLayout((slots, { layerData }) => {
       snapshot = layerData.form;

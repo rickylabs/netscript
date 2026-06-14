@@ -1,5 +1,5 @@
 import type { ComponentType } from 'preact';
-import { z } from 'zod';
+import type { z } from 'zod';
 import type { RuntimeFormState } from '../../../form/types.ts';
 import type { TypedRouteTarget } from '../navigation/mod.ts';
 import type { ResourceFactoryMap, RuntimePageConfig } from '../internal.ts';

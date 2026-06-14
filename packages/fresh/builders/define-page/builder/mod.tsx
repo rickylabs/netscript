@@ -1,6 +1,6 @@
 // arch:barrel-ok A4-aggregate: defines definePage from role modules under builder/.
 import type { ComponentType, JSX } from 'preact';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { render as renderToString } from 'preact-render-to-string';
 import { createZodAdapter } from '../../../form/schema-adapter.ts';
 import { applyCollectionKeyOperation, applyIntentOperation } from '../../../form/intent.ts';
@@ -48,14 +48,11 @@ import type {
   DefinePageBuildOptions,
   DefinePageBuildResultFor,
   DefinePageDefinitionFor,
-  DefinePageFormConfigFor,
   DefinePageHandlersFor,
   DefinePageHeaderResolverFor,
   DefinePageLayerConfigFor,
   DefinePageLayerLoaderFor,
   DefinePageLayerProps,
-  DefinePageLayoutFor,
-  DefinePageMetaResolverFor,
   DefinePageMethod,
   DefinePageMethodHandlerFor,
   DefinePagePathOf,
@@ -68,7 +65,6 @@ import type {
   DefinePageRouteNavFor,
   DefinePageSearchOf,
   DefinePageStateOf,
-  DefinePageTelemetryConfig,
   DefinePageWithForm,
   DefinePageWithLayer,
   DefinePageWithParams,

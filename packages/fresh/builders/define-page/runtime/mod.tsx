@@ -1,8 +1,7 @@
 // arch:barrel-ok A4-aggregate: assembles runtime pipeline from role modules.
 import type { CachedEntry } from '@netscript/sdk';
-import type { ComponentType, JSX } from 'preact';
+import type { JSX } from 'preact';
 import { DeferPage } from '../../../defer/DeferPage.tsx';
-import { Deferred } from '../../../defer/Deferred.tsx';
 import { isCacheEntryStale } from '../../../utils/cache-entry.ts';
 import { wrapWithNavigationContext } from '../navigation/mod.ts';
 import { type AnyRuntimePageConfig, withOptionalSpan } from './context.ts';
@@ -27,8 +26,6 @@ import type {
   DefinePageSlotsFor,
   DefinePageStateOf,
   PathParamSchema,
-  SearchParamInput,
-  SearchParamSchema,
   UnknownRecord,
 } from '../types.ts';
 import type {
@@ -102,7 +99,7 @@ export async function executePagePipeline<
       'page.has_meta': !!config.meta,
     },
     async () => {
-      const { runtimeCtx, resources } = await prepareRequestState(config, ctx);
+      const { runtimeCtx } = await prepareRequestState(config, ctx);
       const layerMemo = new Map<string, Promise<RuntimeLayerResolution>>();
 
       const layers = await Promise.all(
