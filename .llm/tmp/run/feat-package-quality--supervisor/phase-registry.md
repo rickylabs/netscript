@@ -525,8 +525,8 @@ deliberate `deno.lock` reconcile.
 | Nested run ID | `feat-package-quality-wave5-apps--<suffix>` |
 | Units | `@netscript/sdk`, `@netscript/service`, `@netscript/fresh`, `@netscript/fresh-ui` |
 | Archetype(s) | **service A4(+A3) · sdk A3(+A4) · fresh-ui A4 Browser · fresh A4+A3 Browser (multi)** — see prep note (registry "A4 — dsl/app" was a first-pass guess) |
-| Status | **`unblocked`** — Wave 4 merged (`f0e1441`); track reconciled into umbrella (**`dfab7a4`**, clean merge); apps layer re-baselined (umbrella `research.md` §0.5, `wave5-doclint.json`). PR #17 (umbrella → track, Draft). **Ready to open 5a (service).** Fable 5 handover persisted (`fable5-handover.md`). |
-| Merge commit | — (umbrella → track once, at full Wave 5 completeness) |
+| Status | **`merged`** — all 4 sub-waves (5a service, 5b sdk, 5c fresh-ui, 5d fresh) merged into umbrella; post-merge structural consolidation A–E landed; **3× independent IMPL-EVAL (MiniMax M3) APPROVED**; **umbrella PR #17 merged → track `82c1185`** (2026-06-14). |
+| Merge commit | `82c1185` (PR #17 umbrella → track, merge commit) |
 
 ### Pre-conditions
 
@@ -604,6 +604,33 @@ re-baselined against the merged Wave 4 surface + blessed lock (raw `deno` spawne
 - **Next:** the generator (a separate session — supervisor stops at unblock) opens sub-wave **5a
   (service)** off umbrella head `dfab7a4`. Supervisor does NOT lock plans or open 5a.
 
+### Wave 5 CLOSEOUT — merged to track (2026-06-14 @ `82c1185`)
+
+All four sub-waves completed, merged into the umbrella, then a post-merge **structural
+consolidation run** (`feat-package-quality-wave5-apps--consolidation`) restructured all four to
+the canonical `src/` doctrine layering. Umbrella **PR #17 merged into the track** (`82c1185`,
+GitHub merge commit; base was `24720fe`).
+
+- **Sub-waves:** 5a service (PR-merged), 5b sdk, 5c fresh-ui (PR #30, runs 5c1+5c2), 5d fresh
+  (internal 5d1–5d6) — all merged into the umbrella.
+- **Consolidation A–E** (`src/` role folders, no forbidden names, ≤500 LOC files, archetype-4 docs):
+  - A `service` — split `service-builder.ts` (604 LOC) → builder/{impl,rpc,listener}; package-owned
+    `ServiceContext`/`ServiceHandler`/`RunningService` types (no Hono/oRPC leak); DB-connectivity diagnostic.
+  - B `sdk` — collapse 8 root barrels + `streams.ts` into `src/` single source root; 10 subpath keys byte-stable; B1/B2 re-slice deferred (KISS, drift-recorded).
+  - C `fresh-ui` — `runtime/`→`src/runtime`, `primitives`→`src/presentation`; A3→A4 doc correction.
+  - D/D2 `fresh` — full `src/` layering; `./utils` removed; **all 5 root re-export shells deleted** (no backward compat); CLI import-maps repointed; scaffold E2E `scaffold.runtime` **41/41**.
+- **Phase E — 3× independent IMPL-EVAL (OpenHands, `openrouter/minimax/minimax-m3`, iterations=600, write-artifact-first), all `VERDICT: APPROVED`, `summary_source=agent` (genuine):**
+  - fresh   [run 27507518739] — 8/8 PASS, E2E 41/41, max file 497 LOC.
+  - service [run 27508042691] — 7/7 PASS, max 408 LOC, no vendor leak, `stop()`+AbortSignal.
+  - sdk     [run 27511443802] — 7/7 PASS, byte-stable surface, RFC-14 Transport seam public.
+- **Debt:** `packages/fresh` AP-1 (builders split) + F-7 (doc-lint) → **RESOLVED**. `packages/service`
+  presets/assets role-clarification (F-3/F-11) + `scalar.min.js` 3.3 MB (D-9) remain open + DEBT_ACCEPTED.
+  sdk B1/B2 re-slice = drift deferral (revisit when a 2nd concrete adapter per port lands).
+- **Run docs (for the next agent):** `.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/`
+  {research, consolidation-plan, worklog, drift, commits, context-pack, **eval-results.md**, impl-eval*.md}.
+- **Result:** Wave 5 = the last application-surface wave. **Only Wave 6 (cli) remains** before S1 is
+  publish-clean across all 27 units.
+
 ## Wave 6 — Tooling
 
 | Field | Value |
@@ -612,12 +639,12 @@ re-baselined against the merged Wave 4 surface + blessed lock (raw `deno` spawne
 | Nested run ID | `feat-package-quality-wave6-cli--<suffix>` |
 | Units | `@netscript/cli` |
 | Archetype(s) | A6 — cli-tooling |
-| Status | `planned` |
+| Status | **`unblocked`** — Waves 0–5 all `merged` (Wave 5 → track `82c1185`, 2026-06-14). **Last remaining S1 wave.** Generator (separate session) opens the wave6-cli worktree/branch off the current track head. |
 | Merge commit | — |
 
 ### Pre-conditions
 
-- Waves 0–5 `merged` (CLI references every other unit at `0.0.1-alpha.0`).
+- Waves 0–5 `merged` ✅ (Wave 5 → track `82c1185`). CLI references every other unit at `0.0.1-alpha.0`.
 
 ### Phase 0 reading
 

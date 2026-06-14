@@ -25,3 +25,12 @@ Format:
   - `1933bce`: Wave 2 research, plan, and design checkpoint (generator)
   - (on branch): PLAN-EVAL cycle 2 `PASS` (gate set +F-16/17/18; kv slice clarified)
   - sub-PRs `…-2a` / `…-2b` / `…-2c` → `feat/package-quality` to follow per sub-wave
+- `d4f971e`: Merge PR #11 — Wave 2 Integration adapters umbrella (2a+2b+2c). IMPL-EVAL PASS per sub-wave.
+- `1423ab3`: Merge PR #14 — Wave 3 Plugin runner (`@netscript/plugin`, host PR #15). IMPL-EVAL PASS.
+- `f0e1441`: Merge — Wave 4 Runtimes & plugins (4a streams/watchers, 4b workers, 4c sagas, 4d triggers). Per-sub-wave IMPL-EVAL PASS (OpenHands automation).
+- `82c1185`: **Merge PR #17 — Wave 5 Application surfaces** (sdk · service · fresh · fresh-ui). All
+  4 sub-waves + post-merge structural consolidation A–E. **Phase E: 3× independent IMPL-EVAL
+  (MiniMax M3) → all `VERDICT: APPROVED`** (fresh run 27507518739 8/8 + E2E 41/41; service
+  27508042691 7/7; sdk 27511443802 7/7). Debt: fresh AP-1+F-7 RESOLVED; service F-3/F-11 + D-9
+  remain DEBT_ACCEPTED. Closeout: `…--consolidation/eval-results.md`. **Wave 6 (cli) is the last
+  remaining S1 wave.**
