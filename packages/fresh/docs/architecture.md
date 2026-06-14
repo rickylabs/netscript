@@ -14,8 +14,8 @@ lives on named subpaths.
 ## Source layout
 
 Implementation lives under `src/` in canonical doctrine role folders (Doctrine 05). The package root
-holds only `mod.ts` and the re-export shells the CLI import map depends on (`server.ts`,
-`builders/mod.ts`, `route/mod.ts`, `query/mod.ts`, `config/vite.ts`).
+holds only `mod.ts`; every published subpath in `deno.json` resolves directly into `src/`, with no
+re-export shells in between.
 
 | Role               | Holds                                                                       |
 | ------------------ | --------------------------------------------------------------------------- |
@@ -28,16 +28,19 @@ holds only `mod.ts` and the re-export shells the CLI import map depends on (`ser
 ## Subpath conventions
 
 - Error normalization and display primitives live under `./error` (`src/diagnostics/error/`).
-- Cache-entry loader helpers live under `src/application/cache-entries/` and are re-exported from the
-  root entrypoint; there is no dedicated `./utils` subpath (the forbidden `utils/` folder name was
-  removed during the Wave 5 consolidation).
+- Cache-entry loader helpers live under `src/application/cache-entries/` and are the sole export of
+  the root entrypoint; they are cross-cutting and belong to no single feature subpath. There is no
+  dedicated `./utils` subpath (the forbidden `utils/` folder name was removed during the Wave 5
+  consolidation).
 - Vite integration stays under `./vite` (`src/application/vite/`).
 - Test fixtures stay under `./testing` (`src/testing/`).
 - Fresh telemetry uses one internal convention (`src/internal/`) shared by feature-specific helpers.
 
-## Public surface stability
+## Public surface
 
-The published subpath keys are the contract. Root re-export shells let the implementation move into
-`src/` without changing any consumer import or the NetScript CLI's local `PACKAGE_TO_LOCAL_PATH`
-resolution. Oversized builder/page-compatibility modules are split into cohesive type modules under
+The published subpath keys in `deno.json` are the contract, and each one resolves straight to its
+implementation in `src/` — there is no compatibility layer and no backward-compatible re-export
+surface. The NetScript CLI's local `PACKAGE_TO_LOCAL_PATH` map points at the same `src/` targets as
+the JSR `exports`, so locally-scaffolded apps and published consumers resolve identical modules.
+Oversized builder/page modules are split into cohesive type modules under
 `src/application/builders/define-page/` so no single file exceeds the doctrine size ceiling.

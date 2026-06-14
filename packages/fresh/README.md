@@ -25,9 +25,9 @@ The implementation lives under `src/` in doctrine role folders:
 - `src/testing/` — route and defer test fixtures.
 - `src/internal/` — package-private telemetry.
 
-The root `mod.ts` and the `server.ts`, `builders/mod.ts`, `route/mod.ts`, `query/mod.ts`, and
-`config/vite.ts` files are thin re-export shells. They keep both the published subpath surface and
-the NetScript CLI's local import map stable while the real code lives in `src/`.
+The package root holds only `mod.ts`. Every published subpath in `deno.json` resolves directly into
+`src/` — there are no re-export shells and no backward-compatibility surface. Each import you write
+points at the module that actually implements it.
 
 ## Install
 
@@ -62,7 +62,7 @@ Import only the layer you need — the package is subpath-first.
 
 | Import                          | Role        | Use it for                                  | Main exports                                                                                |
 | ------------------------------- | ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `@netscript/fresh`              | root        | Curated cross-cutting helpers               | `extractErrorData`, `errorHandler`, `hasAllCacheEntries`, `minCachedAt`, `projectCachedItemFromList` |
+| `@netscript/fresh`              | root        | Cross-cutting page-loader cache helpers     | `hasAllCacheEntries`, `minCachedAt`, `projectCachedItemFromList`                            |
 | `@netscript/fresh/builders`     | application | Page and partial builders                   | `definePage`, `definePartial`, `defineStatsPartial`                                         |
 | `@netscript/fresh/route`        | application | Typed route contracts and links             | `defineRouteContract`, `paginationSearchSchema`, `createRouteReference`, `bindRoutePattern` |
 | `@netscript/fresh/form`         | application | Form state, errors, and data pipeline       | `resolveFormState`, `toFormErrors`, `normalizeFormValues`, `createEmptyFormErrors`          |
@@ -75,9 +75,10 @@ Import only the layer you need — the package is subpath-first.
 | `@netscript/fresh/vite`         | application | NetScript Vite integration                  | `createNetScriptVitePlugin`                                                                 |
 | `@netscript/fresh/testing`      | testing     | Route and defer test fixtures               | `createMockRouteContext`, `createMockDeferPolicy`                                           |
 
-The root entrypoint stays intentionally small: it re-exports error handling and the cache-entry
-loader helpers so existing apps can keep their current imports. New code should prefer the explicit
-subpaths.
+The root entrypoint stays intentionally minimal: it exposes only the page-loader cache helpers, which
+are cross-cutting and belong to no single feature subpath. Every other capability — error handling
+included (`@netscript/fresh/error`) — lives on a named subpath. Reach for the subpath that owns the
+behavior you need.
 
 ## Quick start
 
@@ -201,7 +202,7 @@ export default defineFreshApp({
 From the package directory:
 
 ```sh
-deno task check      # type-check shells + src roots (no-slow-types-safe public surface)
+deno task check      # type-check the root + every src entrypoint (no-slow-types-safe public surface)
 deno task test       # unit tests across ./src and ./tests
 deno task lint
 deno task fmt:check

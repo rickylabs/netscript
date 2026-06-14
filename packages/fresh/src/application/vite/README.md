@@ -184,7 +184,7 @@ Vite `loadEnv()` in the app config:
 ## Related files
 
 - plugin: `packages/fresh/src/application/vite/vite.ts`
-- re-export shell: `packages/fresh/config/vite.ts`
+- subpath export: `@netscript/fresh/vite` (mapped to `vite.ts` in `deno.json`)
 - tests: `packages/fresh/src/application/vite/vite.test.ts`
 - playground consumer: `apps/playground/vite.config.ts`
 - frontend consumer: `apps/frontend/vite.config.ts`
