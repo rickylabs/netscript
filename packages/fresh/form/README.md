@@ -109,8 +109,10 @@ The UI seam is value-level. `FieldDescriptor.controlProps()` emits platform attr
 metadata, and `data-field-*` state hooks. Design-system components such as `@netscript/fresh-ui`
 should narrow and spread those props; `@netscript/fresh/form` does not import presentation packages.
 
-Schema adapters are internal until the Standard Schema export slice lands. Current package code uses
-the adapter contract to derive constraints, defaults, and normalized validation failures.
+Schema adapters validate through Standard Schema when possible. Vendor-specific adapters can pair
+that validation path with a `SchemaIntrospector<TSchema, TValues>` for conservative HTML constraints
+and default values. The form surface owns those contracts and does not re-export upstream schema
+packages.
 
 ## See Also
 

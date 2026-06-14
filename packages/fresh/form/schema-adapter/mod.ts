@@ -4,6 +4,7 @@ export type {
   FormSchemaParseFailure,
   FormSchemaParseResult,
   FormSchemaParseSuccess,
+  SchemaIntrospector,
 } from './contract.ts';
 export {
   createStandardSchemaAdapter,

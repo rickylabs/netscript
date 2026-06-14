@@ -30,6 +30,25 @@ export type FormSchemaParseResult<TValues extends FormValues, TOutput> =
   | FormSchemaParseFailure<TValues>;
 
 /**
+ * Vendor-specific schema metadata extractor.
+ *
+ * Standard Schema covers validation only. Schema libraries that expose stable
+ * metadata can provide an introspector to keep HTML constraints and default
+ * values available without changing the validation adapter contract.
+ */
+export interface SchemaIntrospector<TSchema, TValues extends FormValues = FormValues> {
+  /**
+   * Extract conservative HTML constraint metadata for a schema.
+   */
+  getConstraints(schema: TSchema): Partial<Record<string, FieldConstraints>>;
+
+  /**
+   * Extract best-effort default values for a schema.
+   */
+  getDefaults(schema: TSchema): Partial<TValues>;
+}
+
+/**
  * Validation boundary abstraction for forms.
  *
  * `TValues` represents the submitted/raw form values shape used by the page and

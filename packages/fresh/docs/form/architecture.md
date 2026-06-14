@@ -41,8 +41,15 @@ Validation is behind a package-owned schema-adapter contract. The adapter is res
 - exposing conservative HTML constraint metadata,
 - exposing default values when the schema supports them.
 
-The planned Standard Schema slice keeps this boundary and adds a library-agnostic adapter without
-making `@netscript/fresh/form` re-export Zod, Valibot, ArkType, or any upstream schema package.
+Standard Schema is the library-agnostic validation path. It keeps `@netscript/fresh/form` from
+re-exporting Zod, Valibot, ArkType, or any other upstream schema package. Standard Schema does not
+standardize constraint or default-value metadata, so vendor-specific adapters use the additive
+`SchemaIntrospector<TSchema, TValues>` contract for that metadata.
+
+The Zod adapter validates through Standard Schema and keeps Zod-specific introspection for
+constraints and defaults. Future Valibot or ArkType adapters should follow the same shape: Standard
+Schema for validation, a package-owned introspector for conservative metadata, and no upstream
+surface re-export.
 
 ## UI Seam
 

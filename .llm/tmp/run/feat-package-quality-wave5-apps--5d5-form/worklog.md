@@ -271,3 +271,26 @@ Append-only. One entry per slice / decision.
 | Touched-file format | `deno fmt --check packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter.test.ts` | PASS |
 | Touched-file lint | `deno lint packages/fresh/form/schema-adapter/zod.ts packages/fresh/form/schema-adapter.test.ts` | PASS |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: touched test file 439 LOC; no form file over cap |
+
+## 2026-06-14 - Slice 11 schema introspector contract
+
+- Added the additive `SchemaIntrospector<TSchema, TValues>` contract to
+  `packages/fresh/form/schema-adapter/contract.ts`.
+- Exported the type through `schema-adapter/mod.ts`, the `schema-adapter.ts` compatibility facade,
+  and the root `form/mod.ts` manifest.
+- Updated form architecture docs and the form README to describe the current Standard Schema
+  validation path plus vendor-specific introspection seam.
+- No runtime adapter behavior changed; the interface exists so future Valibot/ArkType adapters can
+  add conservative constraints/defaults without re-exporting upstream schema packages.
+
+### Slice 11 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS |
+| Focused adapter tests | `deno test --config packages/fresh/deno.json --unstable-kv packages/fresh/form/schema-adapter.test.ts packages/fresh/form/schema-adapter-standard.test.ts` | PASS: 20 passed, 0 failed |
+| Touched-file format | `deno fmt --check packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/contract.ts packages/fresh/form/README.md packages/fresh/docs/form/architecture.md` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/mod.ts packages/fresh/form/schema-adapter.ts packages/fresh/form/schema-adapter/mod.ts packages/fresh/form/schema-adapter/contract.ts` | PASS |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no form file over cap |

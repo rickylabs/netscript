@@ -32,9 +32,12 @@
   refs.
 - Slice 9 is pushed and PR-commented: `createStandardSchemaAdapter` is implemented and exported
   through the root form surface without adding `createZodAdapter` to `form/mod.ts`.
-- Slice 10 is complete locally: `createZodAdapter` now validates through the Standard Schema
+- Slice 10 is pushed and PR-commented: `createZodAdapter` now validates through the Standard Schema
   `~standard.validate()` path while preserving the existing ZodError rejection behavior,
   flattened field-error shape, defaults, constraints, signature, and import path.
+- Slice 11 is complete locally: `SchemaIntrospector<TSchema, TValues>` is an additive public
+  contract exported through the form schema-adapter surface and root form manifest, with docs
+  updated for Standard Schema validation plus vendor-specific metadata introspection.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
@@ -63,6 +66,8 @@
 - Slice 9 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   focused adapter tests, touched-file fmt/lint, and file-size scan.
 - Slice 10 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  focused adapter tests, touched-file fmt/lint, and file-size scan.
+- Slice 11 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   focused adapter tests, touched-file fmt/lint, and file-size scan.
 
 ## Completed
@@ -120,16 +125,21 @@
   - Zod-specific defaults and constraints remain delegated to existing introspector helpers.
   - Zod parse failures still throw `ZodError`, and safe-parse errors still use
     `z.flattenError(...)` normalization.
+- Completed Slice 11 schema introspector contract:
+  - Added `SchemaIntrospector<TSchema, TValues>` to `schema-adapter/contract.ts`.
+  - Exported the type through `schema-adapter/mod.ts`, `schema-adapter.ts`, and `form/mod.ts`.
+  - Updated form README and architecture docs with the Standard Schema plus introspector seam.
+  - No runtime adapter behavior changed.
 
 ## In Progress
 
-- Push Slice 10 ledger commit and comment PR #38.
+- Commit and push Slice 11, then append the commit ledger and comment PR #38.
 
 ## Next Steps
 
-1. Push Slice 10 ledger commit.
+1. Commit and push Slice 11.
 2. Comment PR #38 with slice summary and next slice.
-3. Start Slice 11 schema introspector contract only if it remains additive and gates stay clean.
+3. Start Slice 12 fresh-ui seam docs only if package gates stay clean.
 
 ## Key Decisions
 
@@ -189,6 +199,9 @@
 | `packages/fresh/form/schema-adapter-standard.test.ts` | new | Slice 9 Standard Schema adapter tests |
 | `packages/fresh/form/schema-adapter/zod.ts` | update | Slice 10 validates through Standard Schema metadata |
 | `packages/fresh/form/schema-adapter.test.ts` | update | Slice 10 Zod adapter parity tests |
+| `packages/fresh/form/schema-adapter/contract.ts` | update | Slice 11 schema introspector contract |
+| `packages/fresh/form/README.md` | update | Slice 11 Standard Schema/introspector docs |
+| `packages/fresh/docs/form/architecture.md` | update | Slice 11 Standard Schema/introspector docs |
 
 ## Gates
 
@@ -230,6 +243,7 @@
 - `6fe4fbe`: [5d5] Slice 8 audit form public surface
 - `25e7bc2`: [5d5] Slice 9 add standard schema adapter
 - `22b964d`: [5d5] Slice 10 rebuild zod adapter
+- `7fe2963`: [5d5] Record slice 10 commit
 
 ## Slice 9 Update
 
@@ -245,4 +259,13 @@
 - `packages/fresh/form/schema-adapter.test.ts` now guards both `safeParse()` and `parse()` against
   accidental regression to the public `safeParseAsync()` path.
 - Slice 10 gates passed: public doc-lint, narrow typecheck, scoped form check, focused adapter
+  tests, touched-file fmt/lint, and file-size scan.
+
+## Slice 11 Update
+
+- `SchemaIntrospector<TSchema, TValues>` is now the additive contract for vendor-specific
+  constraints/default metadata.
+- The form README and architecture docs now describe Standard Schema validation plus package-owned
+  introspection for vendor metadata.
+- Slice 11 gates passed: public doc-lint, narrow typecheck, scoped form check, focused adapter
   tests, touched-file fmt/lint, and file-size scan.

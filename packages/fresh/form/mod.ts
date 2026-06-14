@@ -52,6 +52,7 @@ export {
   type FormSchemaParseFailure,
   type FormSchemaParseResult,
   type FormSchemaParseSuccess,
+  type SchemaIntrospector,
   type StandardSchemaInput,
   type StandardSchemaIssue,
   type StandardSchemaOutput,
