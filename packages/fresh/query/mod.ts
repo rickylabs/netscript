@@ -63,3 +63,10 @@ export {
 
 // === Hydration utilities ===
 export { dehydrateQueryClient, hydrateFromDehydrated } from './hydration.ts';
+export {
+  DEFAULT_QUERY_HYDRATION_SCRIPT_ID,
+  HydrationBoundary,
+  type HydrationBoundaryProps,
+  QueryHydrationScript,
+  type QueryHydrationScriptProps,
+} from './hydration-script.tsx';

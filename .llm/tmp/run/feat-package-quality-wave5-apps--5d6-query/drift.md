@@ -78,3 +78,9 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - Current measurement after merged 5d1-5d5 plus 5d6 Slices 2-4: `(cd packages/fresh && deno task doc-lint)` passes across all 13 approved entrypoints.
 - Impact: several planned source slices are now retired or reduced to final regression checks. Remaining known package-quality work is fmt/lint cleanup, final root gate inclusion, over-cap/debt handling, and any specific consumer/runtime proof the supervisor still requires.
 - Status: recorded in Slice 5 rebaseline.
+
+## D-5d6-8 - Supervisor filled skipped implementation source slice after app-server timeout
+
+- Observation: the app-server implementation session pushed through Slice 7 and left the branch clean/current, but its next-step summary jumped to final closeout while the approved plan still included `defineFreshApp` extension seams and query hydration components.
+- Action: supervisor implemented those planned source items as Slice 8, with focused tests and gates, before final closeout.
+- Status: CLOSED by Slice 8.

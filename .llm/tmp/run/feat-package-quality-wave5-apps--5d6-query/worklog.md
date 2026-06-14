@@ -209,3 +209,26 @@ Rebaseline root `deno task check`, `deno task fmt:check`, and `deno task lint` n
 ### Next slice
 
 Run final package/root regression gates and update `context-pack.md` for READY-FOR-IMPL-EVAL unless a remaining consumer/runtime proof is required by the supervisor.
+
+## 2026-06-14 - Slice 8 - DefineFreshApp seams and query hydration components
+
+- Supervisor completed a planned source slice after the app-server implementation session timed out following Slice 7.
+- Added `defineFreshApp` adapter seams: `createApp`, `staticFiles`, `fsRoutes`, `preConfigure`, and reserved `telemetry` options while preserving existing `app`, `serveStaticFiles`, `middleware`, `configure`, and `registerFsRoutes` defaults.
+- Added public server seam types through `@netscript/fresh/server`: `FreshAppFactory`, `FreshAppFsRoutes`, `FreshAppTelemetryAttribute`, and `FreshAppTelemetryOptions`.
+- Added `QueryHydrationScript`, `HydrationBoundary`, and `DEFAULT_QUERY_HYDRATION_SCRIPT_ID` to the public `@netscript/fresh/query` surface for the advanced dehydration path.
+- Added focused tests for app construction/static/fsRoutes lifecycle seams and hydration script SSR rendering/escaping.
+
+### Slice 8 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Focused fmt | PASS | `run-deno-fmt.ts --root packages/fresh/query --root packages/fresh/server --root packages/fresh/server.ts --ext ts,tsx` |
+| Focused check | PASS | `deno check --unstable-kv packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/query/hydration-script.test.tsx packages/fresh/server/define-fresh-app.test.ts` |
+| Query/server doc-lint | PASS | `deno doc --lint packages/fresh/query/mod.ts packages/fresh/server.ts` |
+| Focused tests | PASS | `deno test --allow-all --config packages/fresh/deno.json --unstable-kv packages/fresh/query/hydration-script.test.tsx packages/fresh/server/define-fresh-app.test.ts` reported 9 passed, 0 failed |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+
+### Residual risk
+
+- `telemetry` is intentionally a reserved public seam in this slice; no runtime telemetry bootstrap behavior is added until the telemetry schema is finalized.
+- `HydrationBoundary` schedules client hydration in an effect; SSR rendering is intentionally a pass-through.
