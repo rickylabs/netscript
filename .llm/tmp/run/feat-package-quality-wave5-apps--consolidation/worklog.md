@@ -37,4 +37,23 @@ beyond split needs.
 
 ## Implementation evidence
 
-(Appended per slice as work proceeds.)
+### A1 — split `service-builder.ts` (service) — DONE
+`src/builder/service-builder.ts` 604 LOC → four files, each well under the 500-LOC ceiling:
+- `service-builder.ts` (146) — public surface only: `ServiceConfig`, `ServiceBuilder<TRouter>`
+  interface, `createService` factory. mod.ts + presets/define-service.ts imports unchanged.
+- `service-builder-impl.ts` (408) — the `ServiceBuilderImpl` class; `withRPC`/`serve` are now thin
+  delegations; extracted private `buildRpcContext`.
+- `service-rpc.ts` (75) — `wireRpc(app, router, name, buildContext, options)` free function +
+  `RpcWiringOptions` (oRPC RPC + OpenAPI endpoint registration).
+- `service-listener.ts` (72) — `startServiceListener(app, name, defaultPort, options)` (Deno.serve
+  lifecycle, abort bridging, listen banner, `stop()`).
+
+Deviation from plan's named files (recorded in drift): plan proposed
+`service-builder-state.ts`/`service-builder-steps.ts` (typestate accumulator). The live builder is a
+single mutable class (not typestate), so a state/steps split would be fictional. Split instead along
+real seams — impl class + the two genuinely heavy concerns (rpc wiring, listener) — which is the
+doctrine intent (files read as lifecycle of one-line steps; complexity isolated). No public surface
+change.
+
+Validation: `deno check --unstable-kv` (4 files + whole package) EXIT=0; `deno test` service
+17 passed / 0 failed; `deno lint` + `deno fmt` clean.

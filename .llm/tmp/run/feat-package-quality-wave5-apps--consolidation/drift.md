@@ -14,6 +14,14 @@ User: "It won't require an additional PLAN PHASE, you are smart enough." Per run
 Plan-Gate is a hard stop "unless the user explicitly waives it in writing." This is that waiver.
 Recorded so the IMPL-EVAL does not flag missing `plan-eval.md` as a process failure.
 
+## 2026-06-14 — A1 split file names differ from plan (minor)
+Plan A1 named `service-builder-state.ts` + `service-builder-steps.ts` (typestate accumulator + step
+fns). The live `ServiceBuilderImpl` is a single mutable class, not a typestate builder, so that split
+would invent structure that isn't there. Shipped instead: `service-builder.ts` (public surface),
+`service-builder-impl.ts` (class), `service-rpc.ts` (oRPC wiring), `service-listener.ts` (Deno.serve
+lifecycle) — split along real seams. Same doctrine outcome (no file > ceiling, complexity isolated,
+public surface unchanged). No re-plan needed.
+
 ## 2026-06-14 — user requested base classes; doctrine realizes seams as ports (architectural)
 User asked for "abstract class for public facing seams, base class with implements and adapters and
 ports." Doctrine 03 (A4/A5) forbids base classes without ≥ 2 concrete subtypes and routes
