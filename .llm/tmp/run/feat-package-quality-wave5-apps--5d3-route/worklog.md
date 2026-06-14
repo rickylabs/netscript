@@ -52,3 +52,10 @@ Append-only. One entry per slice / decision.
 - Re-exported those types from packages/fresh/route/manifest.ts to preserve existing consumers such as packages/fresh/config/vite.ts.
 - Reduced packages/fresh/route/manifest.ts from 540 LOC to 495 LOC, retiring the remaining route F-1 soft-cap target.
 - Gates: deno doc --lint route mod/types/pagination-types/contract/manifest/manifest-types PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
+
+## 2026-06-14 - 5d3 implementation readiness
+
+- Confirmed final route LOC targets: mod.ts 185, types.ts 497, pagination-types.ts 132, contract.ts 11, manifest.ts 495, manifest-types.ts 59, _internal/contract-runtime.ts 460, _internal/contract-types.ts 225.
+- Confirmed public route doc-lint remains zero across mod/types/pagination-types/contract/manifest/manifest-types.
+- Final implementation gates: scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0; packages/fresh deno task dry-run PASS.
+- Branch is ready for separate IMPL-EVAL.
