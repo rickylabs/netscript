@@ -86,3 +86,40 @@ remain at root).
 Validation: `deno task check` EXIT=0; `deno task test` 14/14; `deno lint` clean; `deno fmt` applied;
 `deno publish --dry-run` EXIT=0; full-export `deno doc --lint` (10 files) EXIT=0. **Phase B complete**
 (B1/B2 deferred — see drift).
+
+### D1 — fresh src/ role layering (single commit, codex) — DONE
+Commit `43ffcc7` on the WSL-native worktree. 157 files, +2413/-2423 — almost entirely
+100%-similarity `git mv` into canonical `src/` role folders, plus three real splits. Role mapping:
+- `builders/ route/ form/ query/ defer/ config/vite.ts` → `src/application/`; the old `utils/` cache
+  helpers → `src/application/cache-entries/`.
+- `server/ server.ts streams/ interactive/` → `src/runtime/`.
+- `error/` → `src/diagnostics/error/`; `_internal/telemetry.ts` → `src/internal/package-telemetry/`;
+  `testing.ts` → `src/testing/mod.ts`.
+
+Real splits (size ceiling): `define-page/page-compat.ts` (1111 LOC) → 7 type modules under
+`page-compat/` (shared/route/context/form/definition/builder/partial-types.ts); `builder/mod.tsx` →
+extracted `form-support.ts` (382) + `route-support.ts` (29); form regrouped under
+`components/ runtime/ validation/ schema-adapter/ field-descriptors/`. Left genuinely-small modules
+unsplit (`route/types.ts`, `route/manifest.ts`, `server/sse.ts`, `route/_internal/contract-runtime.ts`
+now < 500 LOC). Deleted 4 `test-jsx*.ts` scratch files that arrived via the 5d merge.
+
+**Surface (D6):** `deno.json` exports 13→12 keys — `./utils` REMOVED (no compat alias). Surviving 12
+keys repointed into `src/`; root shells `server.ts`, `builders/mod.ts`, `route/mod.ts`,
+`query/mod.ts`, `config/vite.ts` kept (CLI import-map). Cache-entry helpers re-exported from root
+`mod.ts`. Cross-package: `plugins/workers/deno.json` + `plugins/sagas/deno.json` repointed
+`@netscript/fresh/streams` → `src/runtime/streams/mod.ts` (pure path repoint, no logic).
+
+Validation: root `deno task check` EXIT=0; root `deno task test` 632 passed / 11 failed / 12 ignored
+— **all 11 failures pre-existing in packages/cli + memory-queue, zero in packages/fresh** (drift
+2026-06-14 "Phase D validation"). Lead reviewed + accepted the structural commit. **Phase D
+structural complete.**
+
+### D-docs — fresh README + architecture rewrite (lead) — DONE
+Lead-owned docs pass (codex never touches `.md`). `packages/fresh/README.md`: added "## Package role"
+(Archetype 4, `src/` role layering, root shells), fixed Install to `^0.0.1-alpha.0` with trailing-
+slash import, replaced prose with a 12-row "## Entry points" table (Import/Role/Use/Main exports),
+removed the `### Utils` section, added a query-islands example, added "## Validation" + "## Docs"
+sections. `packages/fresh/docs/architecture.md`: "Archetype: 4 (DSL/Builder)" header + doctrine link,
+"## Source layout" table, "## Subpath conventions" (explains the `./utils` removal + forbidden folder
+name), "## Public surface stability". Committed with the harness-artifact transcription as the
+lead docs commit.

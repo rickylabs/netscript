@@ -41,8 +41,8 @@ quality is a first-class deliverable for ALL four packages, not just structure:
 - [x] Phase A (service) — A1 split builder (a0e5bcc), A2 docs/archetype (e67edf1). DONE.
 - [x] Phase B (sdk) — B3 barrel collapse into src/ (5367093). B1/B2 deferred (drift). DONE.
 - [ ] Phase B (sdk) — B1 adapters, B2 domain/application, B3 delete barrels + repoint exports.
-- [ ] Phase C (fresh-ui) — C1 src/ wrap, C2 manifest split + A4 label.
-- [ ] Phase D (fresh) — D1 utils kill, D2 builders, D3 route, D4 form, D5 streaming, D6 surface.
+- [x] Phase C (fresh-ui) — C1 src/ wrap (29bcc30). C2 manifest split deferred (CLI copy-out contract, drift). DONE.
+- [x] Phase D (fresh) — src/ role layering, `./utils` removed, splits, root shells, consumer repoints — single commit 43ffcc7 (codex). README + architecture.md rewritten (lead). Root check PASS; 11 root-test failures all pre-existing (cli + memory-queue), zero in fresh. DONE.
 - [ ] Phase E — gates, WSL e2e, PR summary.
 
 ## Resume hint

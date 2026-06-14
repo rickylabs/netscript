@@ -116,6 +116,6 @@ packages.
 
 ## See Also
 
-- [Form getting started](../docs/form/getting-started.md)
-- [Form architecture](../docs/form/architecture.md)
-- [Fresh UI recipe](../docs/form/fresh-ui-recipe.md)
+- [Form getting started](../../../docs/form/getting-started.md)
+- [Form architecture](../../../docs/form/architecture.md)
+- [Fresh UI recipe](../../../docs/form/fresh-ui-recipe.md)
