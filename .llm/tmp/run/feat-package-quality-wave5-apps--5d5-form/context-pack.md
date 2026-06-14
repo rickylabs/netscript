@@ -133,11 +133,11 @@
 
 ## In Progress
 
-- Commit and push Slice 11, then append the commit ledger and comment PR #38.
+- Push Slice 11 ledger commit and comment PR #38.
 
 ## Next Steps
 
-1. Commit and push Slice 11.
+1. Push Slice 11 ledger commit.
 2. Comment PR #38 with slice summary and next slice.
 3. Start Slice 12 fresh-ui seam docs only if package gates stay clean.
 
@@ -244,6 +244,7 @@
 - `25e7bc2`: [5d5] Slice 9 add standard schema adapter
 - `22b964d`: [5d5] Slice 10 rebuild zod adapter
 - `7fe2963`: [5d5] Record slice 10 commit
+- `3a11750`: [5d5] Slice 11 add schema introspector contract
 
 ## Slice 9 Update
 
