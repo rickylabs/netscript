@@ -200,3 +200,31 @@ blocker, so it lands now). Also satisfied the doctrine README-naming checklist (
 in README"): added an explicit **Archetype 4** "Package role" statement to `fresh-ui/README.md` and
 an **Archetype 4** declaration to `sdk/README.md` (both previously described their layer model
 without naming the archetype; `service/README.md` already named it). No code/surface change.
+
+## 2026-06-14 — D2: reverse D1's "root shells kept" — full no-backward-compat elimination (architectural)
+**Decision reversed.** D1 (43ffcc7) deliberately KEPT the 5 root re-export shells (server.ts,
+builders/mod.ts, route/mod.ts, query/mod.ts, config/vite.ts) "for the CLI import-map," and D-docs
+(09ab17d) described them as a legitimate stable surface. The maintainer rejected this: the shells are
+"legacy files and useless reexport" that violate the run's **no-backward-compat** mandate. D2
+(c47fb46) eliminates them entirely.
+
+**Why the shells were removable:** investigation confirmed the JSR `exports` map already resolved
+every subpath into `src/`; the shells existed ONLY to satisfy the CLI's local monorepo import-map
+(`PACKAGE_TO_LOCAL_PATH`) for locally-scaffolded apps. There were NO bare-root `@netscript/fresh`
+code consumers. So the shells were deletable by repointing the two CLI resolvers' local paths to the
+same `src/` targets the JSR `exports` already use — giving locally-scaffolded apps and published
+consumers byte-identical module resolution.
+
+**Root surface also de-duplicated:** root `mod.ts` previously re-exported the `./error` helpers AND
+the cache-entry helpers with explicit backward-compat framing. D2 drops the error re-export (it
+duplicated `./error`) and keeps only the cache-entry helpers, which are genuinely cross-cutting
+page-loader utilities with no other subpath home. Root is now a minimal, deliberate surface.
+
+**Bonus consumers caught by codex:** 7 builders test fixtures imported the old shell paths
+(`../../../builders/mod.ts`) and were repointed to `src/application/builders/mod.ts` — these were not
+in the original brief's consumer list.
+
+**Validation:** `scaffold.runtime` E2E passed 41/41 with the repointed import-map (proves
+locally-scaffolded apps resolve `@netscript/fresh/*` to src/ without the shells). Routing held: code
+via WSL codex (c47fb46), all `.md` via the lead (c5f1f0e + this entry). Supersedes the D1 commits.md
+note "root shells kept for CLI import-map" and the D-docs framing.
