@@ -19,7 +19,7 @@ import {
   useCurrentPath,
   useCurrentRoute,
   useCurrentSearch,
-} from '../builders/define-page/navigation.tsx';
+} from '../builders/define-page/navigation/mod.ts';
 import type { ComponentType } from 'preact';
 import { searchParamsToInput } from '../builders/define-page/search-params.ts';
 import type {
@@ -60,7 +60,8 @@ type RouteContractSearchOf<TSearchSchema> = InferSchemaOutput<TSearchSchema> ext
   ? InferSchemaOutput<TSearchSchema>
   : EmptyRecord;
 
-type StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest : TPattern;
+type StripLeadingSlash<TPattern extends string> = TPattern extends `/${infer TRest}` ? TRest
+  : TPattern;
 
 type InferRoutePatternSegment<TSegment extends string> = TSegment extends `[[...${infer TParam}]]`
   ? { [TKey in TParam]?: readonly string[] }
@@ -84,9 +85,9 @@ export type RouteHrefInput<TTarget extends TypedRouteTarget<object, object>> =
     preserveSearchParams?: boolean;
   };
 
-type RouteHrefArgs<TTarget extends TypedRouteTarget<object, object>> = HasPathParams<TypedRoutePathOf<TTarget>> extends true
-  ? [input: RouteHrefInput<TTarget>]
-  : [input?: RouteHrefInput<TTarget>];
+type RouteHrefArgs<TTarget extends TypedRouteTarget<object, object>> =
+  HasPathParams<TypedRoutePathOf<TTarget>> extends true ? [input: RouteHrefInput<TTarget>]
+    : [input?: RouteHrefInput<TTarget>];
 
 export type PairedRouteHrefInput<
   TPrimary extends TypedRouteTarget<object, object>,
@@ -122,8 +123,12 @@ export type RouteContractTypeCarrier = {
   };
 };
 
-export type InferRouteContractPath<TValue extends RouteContractTypeCarrier> = NonNullable<TValue['$types']>['path'];
-export type InferRouteContractSearch<TValue extends RouteContractTypeCarrier> = NonNullable<TValue['$types']>['search'];
+export type InferRouteContractPath<TValue extends RouteContractTypeCarrier> = NonNullable<
+  TValue['$types']
+>['path'];
+export type InferRouteContractSearch<TValue extends RouteContractTypeCarrier> = NonNullable<
+  TValue['$types']
+>['search'];
 
 function safeParseRoutePath<TPathSchema extends PathParamSchema<object> | undefined>(
   schema: TPathSchema,
@@ -160,7 +165,9 @@ function safeParseRouteSearch<TSearchSchema extends SearchParamSchema<object> | 
     return { success: true, data: {} as RouteContractSearchOf<TSearchSchema> };
   }
 
-  return schema.safeParse(toSearchParamInput(input)) as SchemaParseResult<RouteContractSearchOf<TSearchSchema>>;
+  return schema.safeParse(toSearchParamInput(input)) as SchemaParseResult<
+    RouteContractSearchOf<TSearchSchema>
+  >;
 }
 
 function parseRouteSearch<TSearchSchema extends SearchParamSchema<object> | undefined>(
@@ -478,7 +485,9 @@ export function pairRouteTargets<
     partialHref(...args) {
       const [input] = args as [PairedRouteHrefInput<TPrimary, TPartial> | undefined];
       const normalizedInput = toNormalizedInput(input);
-      const partialPath = (normalizedInput.partialPath ?? normalizedInput.path) as TypedRoutePathOf<TPartial>;
+      const partialPath = (normalizedInput.partialPath ?? normalizedInput.path) as TypedRoutePathOf<
+        TPartial
+      >;
       const partialSearch = (normalizedInput.partialSearch ??
         normalizedInput.search) as RouteSearchUpdate<TypedRouteSearchOf<TPartial>> | undefined;
 
@@ -509,7 +518,10 @@ export function createRouteReference<const TRoutePattern extends string>(
       return inferRoutePathFromPattern<InferRoutePatternPath<TRoutePattern>>(routePattern, input);
     },
     safeParsePath(input) {
-      return safeInferRoutePathFromPattern<InferRoutePatternPath<TRoutePattern>>(routePattern, input);
+      return safeInferRoutePathFromPattern<InferRoutePatternPath<TRoutePattern>>(
+        routePattern,
+        input,
+      );
     },
     parseSearch(input) {
       return toSearchParamInput(input);
@@ -529,11 +541,18 @@ export function bindRoutePattern<
   routePattern: string,
   metadata?: RouteReferenceOptions,
 ): BoundRouteContract<TPathSchema, TSearchSchema> {
-  return createRouteReferenceBase<RouteContractPathOf<TPathSchema>, RouteContractSearchOf<TSearchSchema>>(
+  return createRouteReferenceBase<
+    RouteContractPathOf<TPathSchema>,
+    RouteContractSearchOf<TSearchSchema>
+  >(
     {
       routePattern,
-      pathSchema: contract.pathSchema as PathParamSchema<RouteContractPathOf<TPathSchema>> | undefined,
-      searchSchema: contract.searchSchema as SearchParamSchema<RouteContractSearchOf<TSearchSchema>> | undefined,
+      pathSchema: contract.pathSchema as
+        | PathParamSchema<RouteContractPathOf<TPathSchema>>
+        | undefined,
+      searchSchema: contract.searchSchema as
+        | SearchParamSchema<RouteContractSearchOf<TSearchSchema>>
+        | undefined,
       parsePath(input) {
         return contract.parsePath(input);
       },
