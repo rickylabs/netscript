@@ -25,3 +25,12 @@ Base: track `feat/package-quality` @ `9b27fb4`
 - 2026-06-08: Prepared in parallel with Waves 3 + 4 (user-approved). Research conclusions are
   invariant to Wave 3/4 surfaces **except** the stream entrypoints (`fresh/streams`,
   `sdk/streams`) and `defineFreshApp` plugin composition, which reconcile post-Wave-4.
+
+## 2026-06-14 - Wave 5d Fresh integrated into umbrella
+
+- Merged pushed supervisor branch `feat/package-quality-wave5-apps-5d-fresh` into umbrella branch `feat/package-quality-wave5-apps` with merge commit `2c4efbe`.
+- Conflict resolution: preserved the newer umbrella `.agents/skills/codex-wsl-remote/SKILL.md` unmanaged-daemon recovery guidance while accepting the rest of the 5d supervisor merge content.
+- 5d supervisor merge evidence: final supervisor commit `dacc426`; 5d6 merge commit `9241537`; 5d6 evaluator commit `e0b4b4d`; PR #39 supervisor confirmation comment `4700559061`.
+- Full merge-readiness gate from native WSL ext4 `/home/codex/repos/netscript-wave5-apps` passed: `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` exited 0 with `passed=41 failed=0`.
+- Scaffold runtime covered generated project scaffold, first-party plugin add/list, database init/generate/seed, plugin registry generation, generated workspace type-check, Aspire restore/start/describe, runtime health/behavior checks, OTEL trace validation, and cleanup.
+
