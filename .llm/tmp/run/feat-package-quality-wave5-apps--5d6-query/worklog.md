@@ -258,3 +258,23 @@ Run final package/root regression gates and update `context-pack.md` for READY-F
 
 - This is an intentional structured error log, not an incidental debug `console.log`.
 - Full CLI E2E remains reserved for supervisor merge-readiness/full CLI E2E.
+
+## 2026-06-14 - Final implementation closeout / READY FOR IMPL-EVAL
+
+- Updated `context-pack.md` with final 5d6 implementation status and gate evidence.
+- Branch is ready for a separate IMPL-EVAL session.
+- Full CLI E2E was not run by design; reserve it for supervisor merge-readiness/full CLI E2E.
+
+### Final closeout gates
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Package public doc-lint | PASS | `(cd packages/fresh && deno task doc-lint)` checked 13 files |
+| Package check wrapper | PASS | `run-deno-check.ts --root packages/fresh --ext ts,tsx`, 142 files |
+| Package fmt wrapper | PASS | `run-deno-fmt.ts --root packages/fresh --ext ts,tsx`, 142 files, 0 findings |
+| Package lint wrapper | PASS | `run-deno-lint.ts --root packages/fresh --ext ts,tsx`, 142 files, 0 findings |
+| Package tests | PASS | `deno test --allow-all --config packages/fresh/deno.json --unstable-kv packages/fresh`, 141 passed, 0 failed |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+| Root check | PASS | `deno task check`, 1574 files, 0 findings |
+| Root fmt | PASS | `deno task fmt:check`, 1159 files, 0 findings |
+| Root lint | PASS | `deno task lint`, 1075 files, 0 findings |
