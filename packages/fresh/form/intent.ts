@@ -277,7 +277,9 @@ function readCollectionItemKeys(
       }
 
       const itemSegment = pathSegments[collectionSegments.length];
-      if (pathSegments.length !== collectionSegments.length + 1 || typeof itemSegment !== 'number') {
+      if (
+        pathSegments.length !== collectionSegments.length + 1 || typeof itemSegment !== 'number'
+      ) {
         return [];
       }
 

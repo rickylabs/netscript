@@ -1,0 +1,400 @@
++75|**Verdict:** PASS — drift.md integrity maintained.
++76|
++77|## Responses to review comments
++78|
++79|N/A — this is the PLAN-EVAL evaluation, not a code review response.
++80|
++81|## Remaining risks
++82|
++83|1. **5d4 dependency (slice 0):** 5d5 implementation cannot begin until 5d4 
+lands on the umbrella branch and slice 0 (rebase/merge) completes successfully. 
+If 5d4 has conflicts or delays, 5d5 timeline shifts accordingly. **Mitigation:**
+Plan explicitly states slice 0 = merge 5d4 into 5d5 branch and re-baseline; if 
+conflict, escalate.
++84|
++85|2. **Optional `htmlFor` prop (slice 13):** Marked optional in plan. If 
+supervisor rejects during implementation, plan documents fallback 
+(`name={field.id}`). **Impact:** Low — seam works without it; recipe documents 
+the workaround.
++86|
++87|3. **Root workspace exclusion (D-5d5-1):** Deferred to 5d6. 5d5 cannot 
+deliver JSR publishability for `@netscript/fresh/form` until 5d6 removes 
+`packages/fresh/` from root `deno.json` exclude. **Impact:** Acceptable — 5d5 
+retires form-internal gates (doc-lint, file-size, type-safety) so 5d6 can lift 
+the exclusion cleanly.
++88|
++89|4. **Standard Schema error-shape parity (D-5d5-3):** 
+`createStandardSchemaAdapter` may produce different error messages than current 
+Zod-only adapter. **Mitigation:** Plan slices 9-11 include unit tests proving 
+`toFormErrors` parity for representative Zod schemas; README migration note 
+(slice 1).
++90|
++91|5. **Valibot/ArkType introspection adapters:** Deferred to follow-up slices.
+**Impact:** Low — Standard Schema validation works for all three libraries; 
+constraint introspection is only needed for HTML constraint derivation (Zod 
+introspector is sufficient for 5d5).
++92|
++93|6. **Client-side async validation:** Deferred to follow-up slices. 
+**Impact:** Low — server-side validation via Standard Schema is the 5d5 
+deliverable; client-side validation is an enhancement.
++94|
++95|7. **Playground route scope:** Plan resolves as "one route covers all five 
+browser gates" (open-decision sweep line 79). **Risk:** If supervisor wants 
+separate routes for no-JS vs enhanced, slice 15 may need adjustment. 
+**Mitigation:** Open-decision sweep marks this as "must resolve during slice 1" 
+— early resolution prevents rework.
++96|
++97|## Implementation readiness
++98|
++99|**VERDICT: APPROVED**
++100|
++101|All 5 task-defined criteria satisfied. All 8 Plan-Gate checklist items 
+satisfied. All required fitness gates (F-1 through F-18), static gates, 
+runtime/browser/consumer gates present and mapped to slices. Slice numbering 
+consistent (no off-by-one). Budgets reconcile against research.md measurements 
+and measurement artifacts. drift.md integrity maintained.
++102|
++103|**Implementation may begin after:**
++104|1. 5d4 lands on the umbrella branch 
+(`feat/package-quality-wave5-apps-5d-fresh`)
++105|2. Slice 0 (rebase/merge 5d4 into 5d5 branch) completes successfully
++106|3. Baseline checks re-run to confirm no conflicts
++107|
++108|No plan revisions required. No blockers identified.
++109|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: terminal: {"command": "echo $OPENHANDS_SUMMARY_PATH 2>/dev/null || echo
+\"not set\""}
+
+Reasoning:
+The task says "Summary via OPENHANDS_SUMMARY_PATH ending with EXACTLY one 
+verdict line: VERDICT: APPROVED or VERDICT: NEEDS-REVISION + remaining 
+blockers." I need to also check what the OPENHANDS_SUMMARY_PATH is - it seems 
+like it might be the same path I already wrote the summary to. Let me check if 
+there's an environment variable.
+
+Also, I need to append the exact verdict line at the end of the summary. Let me 
+check if the summary I wrote already has the verdict line at the end. It does 
+end with the verdict but the task says the summary should end with EXACTLY one 
+verdict line. Let me also verify the summary file I wrote matches what's 
+expected.
+
+
+I need to locate the OPENHANDS_SUMMARY_PATH environment variable and ensure my 
+summary file ends with exactly a single verdict line without any additional text
+following it.
+
+$ echo $OPENHANDS_SUMMARY_PATH 2>/dev/null || echo "not set"
+
+Tokens: ↑ input 801.6K • cache hit 87.35% •  reasoning 4.72K • ↓ output 14.53K •
+$ 0.3563
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+/home/runner/work/_temp/openhands/27466343559-1/summary.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: terminal: {"command": "wc -l 
+.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md 
+/home/runner/work/_temp/openhands/27466343559-1/summary.md"}
+
+Reasoning:
+The user reminded me to make a tool call. I need to verify my work is complete 
+and call finish. Let me check:
+
+1. I've evaluated all 5 criteria (all PASS)
+2. I've done the gate-by-gate reconciliation (all complete)
+3. I've verified budgets reconcile against measurements
+4. I've checked drift.md integrity
+5. I've created plan-eval.md with the evaluation
+6. I've created summary.md with the detailed findings
+
+Now I need to:
+- Verify the files exist
+- Make sure the verdict is clear in the summary
+- Call finish with the completion message
+
+The task requires ending the summary with EXACTLY one verdict line:
+`VERDICT: APPROVED` or `VERDICT: NEEDS-REVISION` + remaining blockers
+
+Let me update the summary to ensure it ends with the verdict line, then call 
+finish.
+
+$ wc -l .llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md 
+/home/runner/work/_temp/openhands/27466343559-1/summary.md
+
+Tokens: ↑ input 857.75K • cache hit 88.09% •  reasoning 4.91K • ↓ output 14.8K •
+$ 0.3721
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+224 .llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md
+  108 /home/runner/work/_temp/openhands/27466343559-1/summary.md
+  332 total
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "str_replace", "path": 
+"/home/runner/work/_temp/openhands/27466343559-1/summary.md", "old_str": "- 
+Created `.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` 
+(447 lines)", "new_str": "- Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` (224 
+lines)"}
+
+Reasoning:
+The file is 224 lines, not 447 as stated. The summary file says 447 lines which 
+is incorrect. Let me verify the plan-eval structure and fix the summary's 
+reference to line count.
+
+Actually wait - the summary.md file is 108 lines. The plan-eval.md is 224 lines.
+The summary says "(447 lines)" as part of a bullet point describing the file - 
+that's just wrong. Let me fix it.
+
+But actually the more important thing is - the summary needs a VERDICT line at 
+the end. Let me check and fix both files. I also need to verify the plan-eval 
+has the final verdict line.
+
+The summary.md already ends with "VERDICT: APPROVED" as part of the narrative. 
+But the task says the summary must end with EXACTLY one verdict line: `VERDICT: 
+APPROVED` or `VERDICT: NEEDS-REVISION`. Let me add the exact line at the end.
+
+
+I need to correct the line count discrepancy in the summary and add the required
+VERDICT line to both files.
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "str_replace"
+  path: "/home/runner/work/_temp/openhands/27466343559-1/summary.md"
+  old_str: "- Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` (447 
+lines)"
+  new_str: "- Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` (224 
+lines)"
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 914.13K • cache hit 88.72% •  reasoning 5.15K • ↓ output 15.19K 
+• $ 0.3886
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27466343559-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 11|## Changes
+ 12|
+-13|- Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` (447 
+lines)
+ 14|  - Binary PASS/FAIL verdicts for 5 task-defined criteria
+ 15|  - Plan-Gate checklist evaluation (8 items, all PASS)
+(content after edit)
+ 11|## Changes
+ 12|
++13|- Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` (224 
+lines)
+ 14|  - Binary PASS/FAIL verdicts for 5 task-defined criteria
+ 15|  - Plan-Gate checklist evaluation (8 items, all PASS)
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "str_replace", "path": 
+"/home/runner/work/_temp/openhands/27466343559-1/summary.md", "old_str": 
+"**Implementation may begin after:**\n1. 5d4 lands on the umbrella branch 
+(`feat/package-quality-wave5-apps-5d-fresh`)\n2. Slice 0 (rebase/merge 5d4 into 
+5d5 branch) completes successfully\n3. Baseline checks re-run to confirm no 
+conflicts\n\nNo plan revisions required. No blockers identified.", "new_str": 
+"**Implementation may begin after:**\n1. 5d4 lands on the umbrella branch 
+(`feat/package-quality-wave5-apps-5d-fresh`)\n2. Slice 0 (rebase/merge 5d4 into 
+5d5 branch) completes successfully\n3. Baseline checks re-run to confirm no 
+conflicts\n\nNo plan revisions required. No blockers identified.\n\nVERDICT: 
+APPROVED"}
+
+Reasoning:
+Now let me also append the required verdict line to the summary.md file.
+
+
+Thought:
+Now let me append the exact verdict line format required by the task:
+
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "str_replace"
+  path: "/home/runner/work/_temp/openhands/27466343559-1/summary.md"
+  old_str: 
+    **Implementation may begin after:**
+    1. 5d4 lands on the umbrella branch 
+(`feat/package-quality-wave5-apps-5d-fresh`)
+    2. Slice 0 (rebase/merge 5d4 into 5d5 branch) completes successfully
+    3. Baseline checks re-run to confirm no conflicts
+    
+    No plan revisions required. No blockers identified.
+
+  new_str: 
+    **Implementation may begin after:**
+    1. 5d4 lands on the umbrella branch 
+(`feat/package-quality-wave5-apps-5d-fresh`)
+    2. Slice 0 (rebase/merge 5d4 into 5d5 branch) completes successfully
+    3. Baseline checks re-run to confirm no conflicts
+    
+    No plan revisions required. No blockers identified.
+    
+    VERDICT: APPROVED
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 970.91K • cache hit 89.24% •  reasoning 5.16K • ↓ output 15.47K 
+• $ 0.4052
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27466343559-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 108|No plan revisions required. No blockers identified.
+ 109|
+(content after edit)
+ 108|No plan revisions required. No blockers identified.
+ 109|
++110|VERDICT: APPROVED
++111|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: finish: {"message": "## PLAN-EVAL COMPLETE \u2014 [5d5] fresh form / 
+RFC 15 forms consuming fresh-ui seams\n\n### Evaluation result\n**VERDICT: 
+APPROVED** \u2014 All criteria satisfied, no blockers identified. Implementation
+may proceed after 5d4 merge + slice-0 rebase.\n\n### Criteria evaluated (binary 
+PASS/FAIL)\n\n| # | Criterion | Verdict |\n|---|-----------|---------|\n| 1 | 
+`form/` decomposition target is **DECIDED** (not left as options) | \u2705 PASS 
+|\n| 2 | fresh\u2194fresh-ui **SEAM specified** 
+(`form-field.tsx`/`control-props.ts`/`l0-conventions.md` + data-*/ARIA contract)
+| \u2705 PASS |\n| 3 | **Standard Schema** interop choice MADE with 
+measurement-grounded rationale & single canonical adapter 
+(`createStandardSchemaAdapter`) | \u2705 PASS |\n| 4 | Progressive-enhancement 
+strategy (HTML-first + island hydration) decided & consistent with RFC 15 | 
+\u2705 PASS |\n| 5 | `design.md` resolves every D-5d5-n decision research handed
+off; slices retire doc-lint/private-type-ref budgets | \u2705 PASS |\n\n### 
+Plan-Gate checklist (8/8)\nAll items PASS: research present, decisions locked, 
+open-decision sweep clean, 30 slices (0\u201329, two buffers) with files+gates, 
+risk register complete, gate set selected from A3 + SCOPE-frontend, deferred 
+scope explicit, jsr-audit surface scan complete.\n\n### Gate matrix 
+reconciliation (CRITICAL gate check)\n- F-1 through F-18: **all present**, 
+mapped to slices (F-13 noted n/a with rationale \u2014 vacuously satisfied, form
+has no sagas/workers)\n- Static gates (7), Runtime/Browser/Consumer gates (8): 
+**all present and slice-mapped**\n- No omitted required gates\n- Slice numbering
+consistent across the gate-to-slice map (no off-by-one errors)\n- Budgets 
+(doc-lint 74\u21920, private-type-ref 11\u21920, missing-return-type 3\u21920, 
+missing-explicit-return-type 4\u21920, over-cap files 3\u21920) reconcile 
+against `research.md` \u00a71 MEASURE-FIRST and archived measurement artifacts 
+(`deno-doc-lint.txt`, `dry-run-raw.txt`, `publish-dry-run-form.txt`, 
+`form-doc.json`, `form-symbols.json`)\n- `drift.md` integrity verified \u2014 no
+phantom references to absent sections/locks/slices\n\n### Files written\n- 
+`.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` (224 
+lines, full evaluation)\n- `$OPENHANDS_SUMMARY_PATH` (111 lines, summary + 
+VERDICT: APPROVED)\n\n### Pre-implementation prerequisites\n1. 5d4 lands on 
+umbrella branch `feat/package-quality-wave5-apps-5d-fresh`\n2. Slice 0 
+(rebase/merge) completes successfully\n3. Baseline checks re-run to confirm no 
+conflicts\n\n### Zero edits performed\nEvaluation only \u2014 no modifications 
+to `plan.md`, `design.md`, `research.md`, `drift.md`, or 
+`context-pack.md`.\n\nTask UUID: 7466343559"}
+
+Reasoning:
+`task_tracker.command`.view` doesn't exist — valid commands are probably 
+`update` or `list`. Let me check by trying `list` or just skip task tracking 
+since we're already past all work. Better: just call finish now.
+
+Finish with message:
+## PLAN-EVAL COMPLETE — [5d5] fresh form / RFC 15 forms consuming fresh-ui seams
+
+### Evaluation result
+**VERDICT: APPROVED** — All criteria satisfied, no blockers identified. 
+Implementation may proceed after 5d4 merge + slice-0 rebase.
+
+### Criteria evaluated (binary PASS/FAIL)
+
+| # | Criterion | Verdict |
+|---|-----------|---------|
+| 1 | `form/` decomposition target is **DECIDED** (not left as options) | ✅ 
+PASS |
+| 2 | fresh↔fresh-ui **SEAM specified** 
+(`form-field.tsx`/`control-props.ts`/`l0-conventions.md` + data-*/ARIA contract)
+| ✅ PASS |
+| 3 | **Standard Schema** interop choice MADE with measurement-grounded 
+rationale & single canonical adapter (`createStandardSchemaAdapter`) | ✅ PASS |
+| 4 | Progressive-enhancement strategy (HTML-first + island hydration) decided &
+consistent with RFC 15 | ✅ PASS |
+| 5 | `design.md` resolves every D-5d5-n decision research handed off; slices 
+retire doc-lint/private-type-ref budgets | ✅ PASS |
+
+### Plan-Gate checklist (8/8)
+All items PASS: research present, decisions locked, open-decision sweep clean, 
+30 slices (0–29, two buffers) with files+gates, risk register complete, gate set
+selected from A3 + SCOPE-frontend, deferred scope explicit, jsr-audit surface 
+scan complete.
+
+### Gate matrix reconciliation (CRITICAL gate check)
+- F-1 through F-18: **all present**, mapped to slices (F-13 noted n/a with 
+rationale — vacuously satisfied, form has no sagas/workers)
+- Static gates (7), Runtime/Browser/Consumer gates (8): **all present and 
+slice-mapped**
+- No omitted required gates
+- Slice numbering consistent across the gate-to-slice map (no off-by-one errors)
+- Budgets (doc-lint 74→0, private-type-ref 11→0, missing-return-type 3→0, 
+missing-explicit-return-type 4→0, over-cap files 3→0) reconcile against 
+`research.md` §1 MEASURE-FIRST and archived measurement artifacts 
+(`deno-doc-lint.txt`, `dry-run-raw.txt`, `publish-dry-run-form.txt`, 
+`form-doc.json`, `form-symbols.json`)
+- `drift.md` integrity verified — no phantom references to absent 
+sections/locks/slices
+
+### Files written
+- `.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/plan-eval.md` (224 
+lines, full evaluation)
+- `$OPENHANDS_SUMMARY_PATH` (111 lines, summary + VERDICT: APPROVED)
+
+### Pre-implementation prerequisites
+1. 5d4 lands on umbrella branch `feat/package-quality-wave5-apps-5d-fresh`
+2. Slice 0 (rebase/merge) completes successfully
+3. Baseline checks re-run to confirm no conflicts
+
+### Zero edits performed
+Evaluation only — no modifications to `plan.md`, `design.md`, `research.md`, 
+`drift.md`, or `context-pack.md`.
+
+Task UUID: 7466343559
+
+Tokens: ↑ input 1.03M • cache hit 84.26% •  reasoning 5.21K • ↓ output 16.27K • 
+$ 0.4800
+

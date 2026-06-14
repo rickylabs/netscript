@@ -3,3 +3,4 @@
 Append-only hash record.
 
 - 8cd6a44: Merge branch feat/package-quality-wave5-apps-5d2-builders into feat/package-quality-wave5-apps-5d-fresh
+- 8a3298d: Merge 5d5 form into 5d supervisor

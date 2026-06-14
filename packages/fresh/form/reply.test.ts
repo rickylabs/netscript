@@ -1,8 +1,4 @@
-import {
-  createEmptyFormErrors,
-  type FormFieldErrors,
-  type FormValues,
-} from './mod.ts';
+import { createEmptyFormErrors, type FormFieldErrors, type FormValues } from './mod.ts';
 import type { FormSubmissionResult } from './types.ts';
 import { replyFor } from './reply.ts';
 

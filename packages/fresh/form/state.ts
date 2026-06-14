@@ -190,7 +190,9 @@ export function resolveRuntimeFormState<TValues extends FormValues, TOutput = un
   };
 }
 
-function isFormState<TValues extends FormValues>(value: unknown): value is Partial<FormState<TValues>> {
+function isFormState<TValues extends FormValues>(
+  value: unknown,
+): value is Partial<FormState<TValues>> {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -259,7 +261,9 @@ function cloneFormErrors(
   return Array.isArray(fallbackFormErrors) ? [...fallbackFormErrors] : [];
 }
 
-function hasFieldErrors<TValues extends FormValues>(fieldErrors: FormFieldErrors<TValues>): boolean {
+function hasFieldErrors<TValues extends FormValues>(
+  fieldErrors: FormFieldErrors<TValues>,
+): boolean {
   return Object.entries(fieldErrors).some(([field, messages]) =>
     field !== '_form' && Array.isArray(messages) && messages.length > 0
   );
