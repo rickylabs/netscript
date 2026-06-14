@@ -8,3 +8,4 @@ Append-only hash record (repo + hash + subject).
 - `7d4e10b`: feat(fresh): wrap query public surface
 - `7599cca`: fix(fresh): expose server streaming types
 - `3c841e4`: fix(fresh): expose root cache entry types
+- `b59b340`: docs(5d6): rebaseline fresh public surface gates
