@@ -15,7 +15,7 @@
     "./worker": "./worker/mod.ts"
   },
   "imports": {
-    "@netscript/fresh/streams": "../../packages/fresh/streams/mod.ts",
+    "@netscript/fresh/streams": "../../packages/fresh/src/runtime/streams/mod.ts",
     "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
     "@netscript/plugin-streams": "../streams/mod.ts",
     "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",

@@ -12,7 +12,7 @@ Reusable Deno utilities for MCP/Codex sessions live here. Keep one-off scripts i
 - Use `.llm/tools/run-deno-fmt.ts` to run scoped, non-mutating fmt checks by root and extension. Add
   `--ignore-line-endings` for known baseline line-ending drift; add `--show-ignored` only when the
   ignored file list is needed.
-- Use `tools/fitness/*.ts` for doctrine and package-readiness gates; do not duplicate those scripts
+- Use `.llm/tools/fitness/*.ts` for doctrine and package-readiness gates; do not duplicate those scripts
   under `.llm/tools`.
 
 ## Common Commands

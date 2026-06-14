@@ -2,11 +2,49 @@
  * Deno-backed filesystem adapter for CLI workflows.
  */
 
-import { ensureDir, walk } from '@std/fs';
-import { dirname, resolve } from '@std/path';
+import { ensureDir, walk } from "@std/fs";
+import { dirname, resolve } from "@std/path";
 
-import type { DirEntry, FileInfo, WalkEntry } from '../../../domain/core-types.ts';
-import type { FileSystemPort } from '../../../ports/file-system-port.ts';
+import type {
+  DirEntry,
+  FileInfo,
+  WalkEntry,
+} from "../../../domain/core-types.ts";
+import type { FileSystemPort } from "../../../ports/file-system-port.ts";
+
+interface CopyFileOperations {
+  copyFile(src: string, dest: string): Promise<void>;
+  readFile(path: string): Promise<Uint8Array>;
+  writeFile(path: string, data: Uint8Array): Promise<void>;
+}
+
+const denoCopyFileOperations: CopyFileOperations = {
+  copyFile: Deno.copyFile,
+  readFile: Deno.readFile,
+  writeFile: Deno.writeFile,
+};
+
+/**
+ * Copy a file with a byte-stream fallback for hosts where native copy is blocked.
+ *
+ * Deno.copyFile can return EPERM on WSL DrvFS mounts such as `/mnt/c` even when
+ * normal read/write access is available. Scaffold materialization only needs
+ * file contents, so fall back to read/write for that specific failure mode.
+ */
+export async function copyFilePortable(
+  src: string,
+  dest: string,
+  operations: CopyFileOperations = denoCopyFileOperations,
+): Promise<void> {
+  try {
+    await operations.copyFile(src, dest);
+  } catch (error) {
+    if (!(error instanceof Deno.errors.PermissionDenied)) {
+      throw error;
+    }
+    await operations.writeFile(dest, await operations.readFile(src));
+  }
+}
 
 /** Filesystem adapter backed by Deno APIs and `@std/fs`. */
 export class DenoFileSystem implements FileSystemPort {
@@ -64,7 +102,7 @@ export class DenoFileSystem implements FileSystemPort {
   /** Copy a file and create parent directories first. */
   async copy(src: string, dest: string): Promise<void> {
     await ensureDir(dirname(dest));
-    await Deno.copyFile(src, dest);
+    await copyFilePortable(src, dest);
   }
 
   /** Walk a directory tree recursively. */

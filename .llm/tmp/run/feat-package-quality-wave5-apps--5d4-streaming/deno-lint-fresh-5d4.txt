@@ -1,0 +1,1 @@
+{"source":{"mode":"command","cwd":"/home/runner/work/netscript/netscript","exitCode":1},"selection":{"filesSelected":76,"batches":1},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueRules":0,"uniquePaths":0},"groups":[]}

@@ -1,0 +1,2 @@
+{"source":{"mode":"selection","cwd":"/home/runner/work/netscript/netscript"},"command":"deno check --quiet --unstable-kv <files>","selection":{"filesSelected":11,"batches":1,"failedBatches":0},"summary":{"totalOccurrences":0,"uniqueOccurrences":0,"uniqueCodes":0,"uniquePaths":0},"groups":[]}
+exit=0

@@ -182,8 +182,28 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** RESOLVED 2026-06-14 — Wave 5 consolidation Phase D split `builders/mod.ts` (1,110 LOC)
+  into `src/application/builders/` per-concern modules; max file now 497 LOC (< 500). Independent
+  IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED) confirmed F-1/F-5/F-11 PASS.
 - **Gate:** F-1, F-5, F-11
+
+## packages/fresh — F-7 full package doc-lint residue after 5d1
+
+- **Reason:** 5d1 support-spine FAIL_FIX cannot make broad `deno task doc-lint` pass without
+  implementing later 5d-owned public surfaces. The remaining diagnostics are concentrated in
+  builders/defer/form/streams/query, including direct upstream TanStack/durable-streams public type
+  exposure and missing JSDoc on later-slice symbols.
+- **Owner:** Wave 5d `@netscript/fresh` chain; final closeout owner is 5d6 query/server/package
+  surface.
+- **Target:** Close before merging 5d into Wave 5 apps; 5d6 must prove `deno task doc-lint` passes
+  from `packages/fresh`.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/plan.md`;
+  `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`.
+- **Created:** 2026-06-13
+- **Status:** RESOLVED 2026-06-14 — `deno task doc-lint` now passes from `packages/fresh` (0
+  findings, 12 entrypoints). Independent IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED)
+  confirmed F-7/F-5 PASS at HEAD.
+- **Gate:** F-7, F-5, `deno task doc-lint` from `packages/fresh`.
 
 ## packages/service — doctrine verdict Refactor
 
@@ -194,6 +214,21 @@ Seeded from
 - **Created:** 2026-04-29
 - **Status:** open
 - **Gate:** F-3, F-11
+
+## packages/service — assets/scalar.min.js (3.3 MB vendored in publish)
+
+- **Reason:** `assets/scalar.min.js` (3.3 MB) is vendored and included in the JSR publish so that
+  offline/no-CDN Scalar docs work for JSR-installed consumers. The size is acceptable for alpha but
+  should be revisited before beta (lazy npm specifier, optional peer dependency, or CDN-only mode).
+- **Owner:** Wave 5a `@netscript/service` generator (D-9).
+- **Target:** Revisit before beta; no 2027-Q1 commitment unless publish-size limits change.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5a-service/plan.md` (D-9).
+- **Created:** 2026-06-15 (PLAN-EVAL advisory finding #2).
+- **Status:** open, DEBT_ACCEPTED. Locked decision D-9 keeps the vendored asset; this entry tracks
+  the revisit.
+- **Gate:** F-14, JSR publish-size limits; close when an alternative delivery mechanism (lazy
+  specifier, optional peer, or CDN-only flag) replaces the vendored file without breaking offline
+  docs.
 
 ## packages/plugin — AP-1 / doctrine verdict Restructure (types.ts 1,005 LOC)
 

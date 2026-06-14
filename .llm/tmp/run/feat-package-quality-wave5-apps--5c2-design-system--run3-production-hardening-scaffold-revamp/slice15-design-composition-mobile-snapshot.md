@@ -1,0 +1,11 @@
+- generic [active] [ref=e1] [box=0,0,390,6792]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer] [box=16,-65,160,38]:
+    - /url: "#main-content"
+  - generic [ref=e4] [box=0,0,390,6792]:
+    - complementary [ref=e5] [box=-280,0,280,844]:
+      - generic [ref=e6] [box=-280,0,279,52]
+      - navigation "Sidebar navigation" [ref=e10] [box=-280,52,279,764]
+      - generic [ref=e32] [box=-260,823,77,15]: NS One theme
+    - generic [ref=e33] [box=0,0,390,6792]:
+      - banner [ref=e34] [box=0,0,390,52]
+      - main [ref=e47] [box=0,52,390,6740]

@@ -1,0 +1,400 @@
++357|2. **Close AP-1 debt entry formally.** The 1,110-LOC `builders/mod.ts` is 
+now a 45-LOC `src/application/builders/define-page/{builder,types,...}/` 
+subtree; AP-1's purpose is achieved. Lead should mark it closed per the same 
+template.
++358|3. (Out of scope here) Phase E merge close-out — explicitly labelled `IN 
+PROGRESS` in the PR title.
++359|
++360|VERDICT: APPROVED
++361|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Replace impl-eval.md with full version
+
+$ cd /home/runner/work/netscript/netscript && mv 
+.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md.tmp 
+.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md && wc 
+-l .llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md && 
+echo "---tail---" && tail -5 
+.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md
+
+Tokens: ↑ input 3.68M • cache hit 94.72% •  reasoning 1.13K • ↓ output 29.96K • 
+$ 0.3035
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+360 .llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md
+---tail---
+1. **Close F-7 debt entry formally.** The entry's gating condition (`deno task 
+doc-lint` from `packages/fresh`) is met at HEAD; lead should mark it closed in 
+`.llm/harness/debt/arch-debt.md` per the entry's stated close criteria.
+2. **Close AP-1 debt entry formally.** The 1,110-LOC `builders/mod.ts` is now a 
+45-LOC `src/application/builders/define-page/{builder,types,...}/` subtree; 
+AP-1's purpose is achieved. Lead should mark it closed per the same template.
+3. (Out of scope here) Phase E merge close-out — explicitly labelled `IN 
+PROGRESS` in the PR title.
+
+VERDICT: APPROVED
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write summary.md for the run
+
+Thought:
+Now let me also write the summary.md (per OpenHands contract, ending with the 
+verdict line).
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27507518739-1/summary.md"
+  file_text: 
+    # OpenHands Run 27507518739-1 — IMPL-EVAL Wave 5 Apps Consolidation (Phase D
++ D2)
+    
+    ## Summary
+    
+    Independent evaluator session for the Wave 5 `@netscript/fresh` 
+consolidation on branch
+    `feat/package-quality-wave5-apps` (HEAD `ca6c00a`, last consolidation commit
+`c47fb46` +
+    doc `c5f1f0e`). The implementation deletes all 5 root re-export shells and 
+repoints every
+    consumer to `src/` — this eval verifies that the no-backward-compat mandate 
+is satisfied
+    and that the package passes its Archetype 4 gates.
+    
+    ## Changes
+    
+    - **No edits to `packages/`** — evaluator session is read-only verification.
+    - Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md` —
+      the binary PASS/FAIL ruling artifact, written incrementally (skeleton 
+first per the
+      WRITE-ARTIFACT-FIRST mandate) and re-saved with full evidence at the end.
+    - The file is committed back to the branch automatically at run end (per the
+run-loop).
+    
+    ## Validation
+    
+    All 8 evaluation items ruled PASS:
+    
+    1. **No backward-compat surface** — exact-mandated `grep` returns 0 matches;
+package root holds only `README.md`, `deno.json`, `mod.ts`, `docs/`, `src/`, 
+`tests/`.
+    2. **Root surface minimal & de-duplicated** — `mod.ts` re-exports only 
+`hasAllCacheEntries`, `minCachedAt`, `projectCachedItemFromList` + types; no 
+error re-exports; no "backward-compat" framing in doc.
+    3. **`deno.json` exports + tasks integrity** — 12 `exports` keys, all 
+targets exist; `./utils` correctly removed; tasks reference real `src/` paths.
+    4. **CLI import-map parity** — 
+`maintainer/adapters/local-import-resolver.ts` and 
+`kernel/adapters/scaffold/import-resolver.ts` `PACKAGE_TO_LOCAL_PATH` maps both 
+repointed to the same `src/` targets; `generators-config_test.ts` (2 tests, 14 
+steps) passes.
+    5. **Doctrine 05 structure** — 5 canonical role folders, no forbidden names,
+max depth 4, max 12 children/dir, max file 497 LOC (under 500 ceiling).
+    6. **Archetype 4 gates (run + paste evidence)** — `deno task check` (0), 
+`lint` (0, 141 files), `doc-lint` (0, 12 files, only external 
+`@types/node`/`vite` warnings), `publish --dry-run` (0, "Success Dry run 
+complete"), `fmt:check` (0, 144 files), `test --allow-all` (141/141) — all PASS.
+    7. **E2E import resolution** — `deno task e2e:cli run scaffold.runtime 
+--cleanup --format pretty` → `passed=41 failed=0` exit 0, verified by re-running
+the suite in this eval session.
+    8. **Docs truth** — `README.md`, `docs/architecture.md`, 
+`src/application/vite/README.md` all describe the no-shell, no-backward-compat 
+reality; entry-point root row lists only cache helpers.
+    
+    Cross-artefact reconciliation: every claim in `commits.md` and `drift.md` 
+matches the committed tree; no fabricated gate.
+    
+    ## Responses to review comments or issue comments
+    
+    N/A — this is an evaluator session, not a code-change PR session. The 
+PR-comment channel
+    is not used by this run; the `OPENHANDS_SUMMARY_PATH` summary is the only 
+output going
+    through the OpenHands workflow.
+    
+    ## Remaining risks (non-blocking, for Wave 5 closeout pass)
+    
+    - `.llm/harness/debt/arch-debt.md` still marks two `packages/fresh` debt 
+entries open
+      (`AP-1 Restructure` and `F-7 doc-lint residue`). Both gating conditions 
+are now met at
+      HEAD. Lead should mark them closed in the closeout pass — flagged in 
+`impl-eval.md`
+      §"Remaining items".
+    - Phase E (merge close-out) is explicitly `IN PROGRESS` per the PR title and
+is out of
+      scope for this eval.
+    
+    VERDICT: APPROVED
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 3.73M • cache hit 94.78% •  reasoning 1.13K • ↓ output 30.99K • 
+$ 0.3077
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27507518739-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# OpenHands Run 27507518739-1 — IMPL-EVAL Wave 5 Apps Consolidation (Phase D 
++ D2)
+ 2|
++3|## Summary
++4|
++5|Independent evaluator session for the Wave 5 `@netscript/fresh` consolidation
+on branch
++6|`feat/package-quality-wave5-apps` (HEAD `ca6c00a`, last consolidation commit 
+`c47fb46` +
++7|doc `c5f1f0e`). The implementation deletes all 5 root re-export shells and 
+repoints every
++8|consumer to `src/` — this eval verifies that the no-backward-compat mandate 
+is satisfied
++9|and that the package passes its Archetype 4 gates.
++10|
++11|## Changes
++12|
++13|- **No edits to `packages/`** — evaluator session is read-only verification.
++14|- Created 
+`.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md` —
++15|  the binary PASS/FAIL ruling artifact, written incrementally (skeleton 
+first per the
++16|  WRITE-ARTIFACT-FIRST mandate) and re-saved with full evidence at the end.
++17|- The file is committed back to the branch automatically at run end (per the
+run-loop).
++18|
++19|## Validation
++20|
++21|All 8 evaluation items ruled PASS:
++22|
++23|1. **No backward-compat surface** — exact-mandated `grep` returns 0 matches;
+package root holds only `README.md`, `deno.json`, `mod.ts`, `docs/`, `src/`, 
+`tests/`.
++24|2. **Root surface minimal & de-duplicated** — `mod.ts` re-exports only 
+`hasAllCacheEntries`, `minCachedAt`, `projectCachedItemFromList` + types; no 
+error re-exports; no "backward-compat" framing in doc.
++25|3. **`deno.json` exports + tasks integrity** — 12 `exports` keys, all 
+targets exist; `./utils` correctly removed; tasks reference real `src/` paths.
++26|4. **CLI import-map parity** — 
+`maintainer/adapters/local-import-resolver.ts` and 
+`kernel/adapters/scaffold/import-resolver.ts` `PACKAGE_TO_LOCAL_PATH` maps both 
+repointed to the same `src/` targets; `generators-config_test.ts` (2 tests, 14 
+steps) passes.
++27|5. **Doctrine 05 structure** — 5 canonical role folders, no forbidden names,
+max depth 4, max 12 children/dir, max file 497 LOC (under 500 ceiling).
++28|6. **Archetype 4 gates (run + paste evidence)** — `deno task check` (0), 
+`lint` (0, 141 files), `doc-lint` (0, 12 files, only external 
+`@types/node`/`vite` warnings), `publish --dry-run` (0, "Success Dry run 
+complete"), `fmt:check` (0, 144 files), `test --allow-all` (141/141) — all PASS.
++29|7. **E2E import resolution** — `deno task e2e:cli run scaffold.runtime 
+--cleanup --format pretty` → `passed=41 failed=0` exit 0, verified by re-running
+the suite in this eval session.
++30|8. **Docs truth** — `README.md`, `docs/architecture.md`, 
+`src/application/vite/README.md` all describe the no-shell, no-backward-compat 
+reality; entry-point root row lists only cache helpers.
++31|
++32|Cross-artefact reconciliation: every claim in `commits.md` and `drift.md` 
+matches the committed tree; no fabricated gate.
++33|
++34|## Responses to review comments or issue comments
++35|
++36|N/A — this is an evaluator session, not a code-change PR session. The 
+PR-comment channel
++37|is not used by this run; the `OPENHANDS_SUMMARY_PATH` summary is the only 
+output going
++38|through the OpenHands workflow.
++39|
++40|## Remaining risks (non-blocking, for Wave 5 closeout pass)
++41|
++42|- `.llm/harness/debt/arch-debt.md` still marks two `packages/fresh` debt 
+entries open
++43|  (`AP-1 Restructure` and `F-7 doc-lint residue`). Both gating conditions 
+are now met at
++44|  HEAD. Lead should mark them closed in the closeout pass — flagged in 
+`impl-eval.md`
++45|  §"Remaining items".
++46|- Phase E (merge close-out) is explicitly `IN PROGRESS` per the PR title and
+is out of
++47|  scope for this eval.
++48|
++49|VERDICT: APPROVED
++50|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify summary + impl-eval final line
+
+$ cd /home/runner/work/netscript/netscript && echo "===summary file===" && cat 
+/home/runner/work/_temp/openhands/27507518739-1/summary.md | head -10 && echo 
+"..." && tail -3 /home/runner/work/_temp/openhands/27507518739-1/summary.md && 
+echo "===impl-eval final line===" && tail -1 
+.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md && echo
+"===impl-eval size===" && wc -l 
+.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md
+
+Tokens: ↑ input 3.78M • cache hit 94.85% •  reasoning 1.13K • ↓ output 31.19K • 
+$ 0.3108
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+===summary file===
+# OpenHands Run 27507518739-1 — IMPL-EVAL Wave 5 Apps Consolidation (Phase D + 
+D2)
+
+## Summary
+
+Independent evaluator session for the Wave 5 `@netscript/fresh` consolidation on
+branch
+`feat/package-quality-wave5-apps` (HEAD `ca6c00a`, last consolidation commit 
+`c47fb46` +
+doc `c5f1f0e`). The implementation deletes all 5 root re-export shells and 
+repoints every
+consumer to `src/` — this eval verifies that the no-backward-compat mandate is 
+satisfied
+and that the package passes its Archetype 4 gates.
+
+...
+  scope for this eval.
+
+VERDICT: APPROVED
+===impl-eval final line===
+VERDICT: APPROVED
+===impl-eval size===
+360 .llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final no-edits check + summary commit
+
+Thought:
+Both artifacts are in place. Let me do a final reconciliation — confirm I did 
+not edit `packages/` and the git state is clean.
+
+$ cd /home/runner/work/netscript/netscript && echo "===git status (no packages/ 
+changes expected)===" && git status --short | head -20 && echo "===any package 
+edits?===" && git status --short packages/ 2>&1 | head -5 && echo "===HEAD===" 
+&& git log --oneline -1 && echo "===impl-eval is staged for auto-commit===" && 
+git status --short 
+.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md && echo
+"===Summary file path (per OPENHANDS_SUMMARY_PATH)===" && ls -la 
+/home/runner/work/_temp/openhands/27507518739-1/
+
+Tokens: ↑ input 3.83M • cache hit 94.90% •  reasoning 1.13K • ↓ output 31.43K • 
+$ 0.3141
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+===git status (no packages/ changes expected)===
+?? .llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md
+?? .llm/tmp/run/openhands/pr-17/run-27507518739-1/
+===any package edits?===
+===HEAD===
+ca6c00a (HEAD -> feat/package-quality-wave5-apps, 
+origin/feat/package-quality-wave5-apps) harness(consolidation): record D-docs + 
+D2 shell elimination in commits/drift
+===impl-eval is staged for auto-commit===
+?? .llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md
+===Summary file path (per OPENHANDS_SUMMARY_PATH)===
+total 572
+drwxr-xr-x 2 runner runner   4096 Jun 14 18:23 .
+drwxr-xr-x 3 runner runner   4096 Jun 14 18:07 ..
+-rw-r--r-- 1 runner runner 500077 Jun 14 18:23 agent.log
+-rw-r--r-- 1 runner runner      2 Jun 14 18:07 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner   2729 Jun 14 18:07 bootstrap.log
+-rw-r--r-- 1 runner runner  41592 Jun 14 18:07 issue-comments.json
+-rw-r--r-- 1 runner runner   5348 Jun 14 18:07 pr-review-comments.json
+-rw-r--r-- 1 runner runner   7101 Jun 14 18:07 request.md
+-rw------- 1 runner runner   3458 Jun 14 18:23 summary.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL complete with VERDICT: APPROVED
+
+Thought:
+Clean state:
+- `git status` shows only untracked files (the new `impl-eval.md` and the run 
+trace dir) — zero modifications to `packages/`.
+- HEAD is `ca6c00a` as expected.
+- Both the in-repo artifact (`.llm/tmp/run/.../impl-eval.md`) and the OpenHands 
+summary (`/home/runner/work/_temp/.../summary.md`) are in place.
+- Both end with the required `VERDICT: APPROVED` line.
+
+Finish with message:
+IMPL-EVAL complete for Wave 5 Apps Consolidation (Phase D + D2, 
+`packages/fresh`).
+
+**Verdict: APPROVED**
+
+All 8 evaluation items ruled PASS against branch 
+`feat/package-quality-wave5-apps` HEAD `ca6c00a`:
+
+1. No backward-compat surface — exact-mandated grep returns 0; 5 shells + their 
+emptied dirs are gone.
+2. Root surface minimal & de-duplicated — `mod.ts` re-exports only the cache 
+helpers; no error re-exports; no "backward-compat" framing in the doc.
+3. `deno.json` exports + tasks integrity — 12 subpath keys, all targets exist; 
+`./utils` removed; tasks reference real `src/` paths.
+4. CLI import-map parity — `maintainer` and `scaffold kernel` 
+`PACKAGE_TO_LOCAL_PATH` maps both point at the same `src/` targets as JSR 
+`exports`; `generators-config_test.ts` passes (2 tests, 14 steps).
+5. Doctrine 05 structure — 5 canonical role folders, no forbidden names, max 
+depth 4, max 12 children/dir, largest file 497 LOC.
+6. Archetype 4 gates (run + paste evidence) — `deno task 
+check`/`lint`/`doc-lint`/`fmt:check`/`test` and `deno publish --dry-run` all 
+exit 0; only external `@types/node`/`vite` warnings remain in doc-lint.
+7. E2E import resolution — `scaffold.runtime` re-run in this session: **41/41 
+passed**, exit 0.
+8. Docs truth — README, architecture.md, vite/README describe the no-shell 
+reality; entry-point root row lists only cache helpers.
+
+Cross-artefact reconciliation: every claim in `commits.md` / `drift.md` matches 
+the committed tree; no fabricated gate. Two debt entries (`AP-1 Restructure` and
+`F-7 doc-lint residue`) have their gating conditions met at HEAD but are still 
+marked open in `.llm/harness/debt/arch-debt.md` — flagged as non-blocking 
+closeout items for the Wave 5 lead.
+
+**Outputs:**
+- `.llm/tmp/run/feat-package-quality-wave5-apps--consolidation/impl-eval.md` — 
+360-line binary PASS/FAIL artifact with per-item evidence, gate-by-gate command 
+output, and reconciliation table. Will be auto-committed at run end.
+- `/home/runner/work/_temp/openhands/27507518739-1/summary.md` — run-scoped 
+OpenHands summary, ending with `VERDICT: APPROVED`.
+
+**No edits to `packages/`, no implementation, no merging.** `git status` 
+confirms only the new `impl-eval.md` and the run-trace dir are untracked.
+
+Tokens: ↑ input 3.88M • cache hit 94.96% •  reasoning 1.13K • ↓ output 32.18K • 
+$ 0.3180
+

@@ -15,12 +15,16 @@ describe('local contributor CLI composition', () => {
       'sync',
       'probe',
       'test',
+      'release',
       'deploy',
       'contract',
       'db',
       'generate',
+      'marketplace',
       'plugin',
       'service',
+      'ui:add',
+      'ui:init',
     ]);
   });
 });

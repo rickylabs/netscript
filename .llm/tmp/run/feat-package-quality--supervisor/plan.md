@@ -57,7 +57,7 @@ Per-package, owned by the nested canonical run. The platform rewrite
 during the `*-core` split — **the prior run's raw counts are stale and must be
 re-measured in this repo at Wave 0 (baseline re-audit)** before trusting any
 "today's state" number. Do not assume a unit is dirty or clean from the 2026-05
-audit; re-run `tools/fitness/release-readiness.ts` here first.
+audit; re-run `.llm/tools/fitness/release-readiness.ts` here first.
 
 ## Axioms in Play
 
@@ -146,8 +146,8 @@ Per-package detail lives in the nested canonical run — cite it, do not duplica
 | Slow-types | yes | `deno publish --dry-run --allow-dirty` (no `--allow-slow-types`) = 0 slow-types per unit in the wave |
 | Doc lint | yes | `deno doc --lint <unit>/mod.ts` clean |
 | Archetype matrix | yes | `gates/archetype-gate-matrix.md` green for each unit's archetype |
-| Standards | yes | `tools/fitness/check-netscript-standards.ts` per unit (mod.ts barrel, exports map, README ≥ 150, `/docs`) |
-| Doctrine | yes | `tools/fitness/check-doctrine.ts` (root `deno task arch:check`) clean for the wave |
+| Standards | yes | `.llm/tools/fitness/check-netscript-standards.ts` per unit (mod.ts barrel, exports map, README ≥ 150, `/docs`) |
+| Doctrine | yes | `.llm/tools/fitness/check-doctrine.ts` (root `deno task arch:check`) clean for the wave |
 | Workspace check | yes | `deno task check` green on the integration branch after each merge |
 | Affected tests | yes | `deno test --allow-all` for the wave's units |
 | Source alignment (SCOPE-docs) | yes | per-unit claims trace to nested `evaluate_*`/`plan_*` + STANDARDS |
@@ -163,10 +163,10 @@ Per-package detail lives in the nested canonical run — cite it, do not duplica
 
 | Order | Gate | Command or check | Expected result |
 |-------|------|------------------|-----------------|
-| 1 | Baseline re-audit | `deno run -A tools/fitness/release-readiness.ts --out .llm/tmp/run/feat-package-quality--supervisor/audit --include-plugins` | current per-unit state in this repo |
+| 1 | Baseline re-audit | `deno run -A .llm/tools/fitness/release-readiness.ts --out .llm/tmp/run/feat-package-quality--supervisor/audit --include-plugins` | current per-unit state in this repo |
 | 2 | Per-unit slow-types | `deno publish --dry-run --allow-dirty` in each wave unit | 0 slow-types |
 | 3 | Doc lint | `deno doc --lint <unit>/mod.ts` | clean |
-| 4 | Standards + doctrine | `tools/fitness/check-netscript-standards.ts` + `deno task arch:check` | clean for the wave |
+| 4 | Standards + doctrine | `.llm/tools/fitness/check-netscript-standards.ts` + `deno task arch:check` | clean for the wave |
 | 5 | Wave tests | `deno test --allow-all <wave units>` | green |
 | 6 | Post-merge workspace | `deno task check` on `feat/package-quality` | green |
 | 7 | Program exit | all 27 units publish-clean; workspace check + affected tests green | green |

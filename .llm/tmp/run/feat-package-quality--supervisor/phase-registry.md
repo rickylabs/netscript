@@ -46,7 +46,7 @@ sub-PR + evaluator pass).
 ### Pre-conditions
 
 - On `feat/package-quality` (off `feat/repo-genesis`); workspace `deno task check` green at baseline.
-- **Baseline re-audit run first** (`tools/fitness/release-readiness.ts`), delta vs the 2026-05 inventory logged in `drift.md`.
+- **Baseline re-audit run first** (`.llm/tools/fitness/release-readiness.ts`), delta vs the 2026-05 inventory logged in `drift.md`.
 
 ### Inherited debt
 

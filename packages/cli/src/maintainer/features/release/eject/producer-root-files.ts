@@ -18,7 +18,7 @@ const PRODUCER_TASKS = {
   'e2e:cli': 'deno run --allow-all packages/cli/e2e/cli.ts',
   fmt: 'deno fmt',
   lint: 'deno lint',
-  'arch:check': 'deno run --allow-read tools/fitness/check-doctrine.ts',
+  'arch:check': 'deno run --allow-read .llm/tools/fitness/check-doctrine.ts',
 } as const;
 
 interface DenoJson {

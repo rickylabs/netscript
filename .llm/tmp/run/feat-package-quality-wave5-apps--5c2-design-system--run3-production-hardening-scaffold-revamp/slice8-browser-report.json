@@ -1,0 +1,36 @@
+{
+  "ok": true,
+  "url": "http://127.0.0.1:5175/design/components",
+  "title": "Components — NetScript design system",
+  "desktop": {
+    "item": true,
+    "table": true,
+    "cellCount": 15,
+    "serviceLabel": true,
+    "cssLoaded": true,
+    "display": "block",
+    "themeBefore": "dark",
+    "themeAfterFirstFlip": "light",
+    "themeAfterSecondFlip": "dark"
+  },
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390,
+    "noHorizontalOverflow": true,
+    "offenders": [],
+    "firstCellDisplay": "grid",
+    "firstCellLabel": "Service"
+  },
+  "reducedMotion": {
+    "matches": true,
+    "tableVisible": true,
+    "scrollWidth": 390,
+    "width": 390
+  },
+  "screenshots": [
+    "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c2-design-system/.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-production-hardening-scaffold-revamp/slice8-responsive-table-desktop.png",
+    "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c2-design-system/.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-production-hardening-scaffold-revamp/slice8-responsive-table-mobile-390x844.png",
+    "C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c2-design-system/.llm/tmp/run/feat-package-quality-wave5-apps--5c2-design-system--run3-production-hardening-scaffold-revamp/slice8-responsive-table-reduced-motion.png"
+  ],
+  "issues": []
+}

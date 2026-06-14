@@ -25,7 +25,9 @@ function PaginationMeta({ children, class: className, ...props }: PaginationSect
   return <div {...props} class={cn('text-sm text-ns-muted-fg', className)}>{children}</div>;
 }
 
-function PaginationActions({ children, class: className, ...props }: PaginationSectionProps): VNode {
+function PaginationActions(
+  { children, class: className, ...props }: PaginationSectionProps,
+): VNode {
   return <div {...props} class={cn('ns-cluster ns-cluster--sm', className)}>{children}</div>;
 }
 

@@ -1,0 +1,5 @@
+[0m[3m[38;5;8mDefined in file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/popover/Popover.tsx:80:14
+
+[0m[0m[3m[38;5;8m[0m[0m[35mconst[0m [0m[1mPopover[0m: { [0m[35m[0m[0m[1mAnchor[0m[0m[35m[0m; [0m[35m[0m[0m[1mArrow[0m[0m[35m[0m; [0m[35m[0m[0m[1mArrowTip[0m[0m[35m[0m; [0m[35m[0m[0m[1mClose[0m[0m[35m[0m; [0m[35m[0m[0m[1mContent[0m[0m[35m[0m; [0m[35m[0m[0m[1mDescription[0m[0m[35m[0m; [0m[35m[0m[0m[1mPositioner[0m[0m[35m[0m; [0m[35m[0m[0m[1mRoot[0m[0m[35m[0m; [0m[35m[0m[0m[1mTitle[0m[0m[35m[0m; [0m[35m[0m[0m[1mTrigger[0m[0m[35m[0m; }
+  Compound popover namespace with root and positioning subcomponents.
+

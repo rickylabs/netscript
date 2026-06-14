@@ -9,7 +9,7 @@ across sessions; temporary investigation scripts belong under `.llm/tmp/`.
   pipelines when scanning this repo from a Windows MCP session.
 - Keep tool permissions explicit. Most scanners only need `--allow-read`.
 - Do not duplicate doctrine/package fitness gates here. The current repo keeps those under
-  `tools/fitness/`.
+  `.llm/tools/fitness/`.
 - The maintained full CLI E2E gate is `deno task e2e:cli`; the legacy scaffold tool is diagnostic
   only.
 

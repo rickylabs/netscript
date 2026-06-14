@@ -35,7 +35,7 @@ They were produced BEFORE the plugin-platform merge (`netscript-start` PR #98),
 so references and slow-type counts may be outdated. Step 1 is to re-derive against
 the current tree, not trust the 2026-05 numbers:
 
-    deno run -A tools/fitness/release-readiness.ts --out ./audit --include-plugins
+    deno run -A .llm/tools/fitness/release-readiness.ts --out ./audit --include-plugins
     deno publish --dry-run --allow-dirty   # in packages/shared: count real slow-types
 
 ## Quality bar
@@ -48,7 +48,7 @@ the current tree, not trust the 2026-05 numbers:
 
 - `deno publish --dry-run --allow-dirty` (no `--allow-slow-types`) -> 0 slow-types
 - `deno doc --lint packages/shared/mod.ts` -> clean
-- `tools/fitness/check-netscript-standards.ts` -> clean (README >= 150, `/docs`, barrel)
+- `.llm/tools/fitness/check-netscript-standards.ts` -> clean (README >= 150, `/docs`, barrel)
 - `deno test --allow-all packages/shared` -> green
 - separate evaluator session -> `PASS`
 

@@ -536,7 +536,7 @@ concept. (Added post-PLAN-EVAL per its procedural note #1.)
 | Changed | Added `.llm/tools/run-deno-check.ts` as the single Deno check wrapper/parser, deleted the old `parse-deno-check-errors.ts` path, made root `check`/`lint`/`fmt:check` use scoped wrapper tasks, and documented wrapper-first gate policy in AGENTS, harness/doctrine skills, platform lessons, static gates, and doctrine F-19. |
 | Gate(s) | Root scoped Deno check/lint/fmt |
 | Gate command | `deno check --unstable-kv .` from repo root |
-| Gate result | PASS, exit 0 after excluding `.llm/tmp/` scratch output from root Deno config and fixing stale `Finding.status` fields in `tools/fitness/check-cli-presentation.ts`. |
+| Gate result | PASS, exit 0 after excluding `.llm/tmp/` scratch output from root Deno config and fixing stale `Finding.status` fields in `.llm/tools/fitness/check-cli-presentation.ts`. |
 | Gate command | `deno task check` from repo root |
 | Gate result | PASS, exit 0; `run-deno-check.ts` selected 1,353 `.ts/.tsx` files under packages/plugins, defaulted to `--unstable-kv`, and produced 0 occurrences / 0 groups. Wave 5 app packages (`service`, `sdk`, `fresh-ui`, `fresh`), generated targets, and `node_modules` are excluded. |
 | Gate command | `deno task lint` from repo root |

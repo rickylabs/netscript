@@ -1,0 +1,1 @@
+[0m[32mTask[0m [0m[36mdev[0m vite --configLoader native "--host" "127.0.0.1" "--port" "5175"

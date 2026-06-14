@@ -18,7 +18,7 @@ Per the supervisor plan Validation Plan gate #1 ("Baseline re-audit"), run and
 record REAL current numbers before locking any decision:
 
 ```
-deno run -A tools/fitness/release-readiness.ts \
+deno run -A .llm/tools/fitness/release-readiness.ts \
   --out .llm/tmp/run/feat-package-quality-wave2-adapters--adapters/audit --include-plugins
 # then per unit, in dependency order:
 cd packages/<unit> && deno publish --dry-run --allow-dirty   # 0 slow types?

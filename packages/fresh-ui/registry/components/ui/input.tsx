@@ -8,8 +8,7 @@
 import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
-interface InputProps
-  extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'type' | 'class'> {
+interface InputProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'type' | 'class'> {
   type?: JSX.HTMLInputTypeAttribute;
   class?: string;
   error?: boolean;

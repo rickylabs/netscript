@@ -59,7 +59,7 @@ branches/PRs and out of scope for this verdict.
 | F-17 | Abstract-derived co-location      | N/A    | no abstract/derived split introduced                                                             |
 | F-18 | Sub-barrel lint                   | PASS   | exports route through package `mod.ts` / subpath barrels                                          |
 
-Scoped doctrine (`tools/fitness/check-doctrine.ts --root <pkg>`): kv `FAIL=0 WARN=5`, database
+Scoped doctrine (`.llm/tools/fitness/check-doctrine.ts --root <pkg>`): kv `FAIL=0 WARN=5`, database
 `FAIL=0 WARN=5`, prisma `FAIL=0 WARN=1`. All residuals are WARN-only and pre-existing
 (file size, one `any` in kvdex export, database script `Deno.exit`, database `export default`).
 

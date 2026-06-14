@@ -1,0 +1,400 @@
+    
+    It exports three narrowers:
+    
+    - `getInputProps(field, overrides?)`
+    - `getSelectProps(field, overrides?)`
+    - `getTextareaProps(field, overrides?)`
+    
+    Each reads the object returned by `field.controlProps(...)` and coerces 
+known keys to typed output:
+    
+    | Group | Keys read |
+    |---|---|
+    | Identity | `id`, `name`, `form` |
+    | Value | `defaultValue`, `defaultChecked` (input only) |
+    | ARIA | `aria-invalid`, `aria-describedby`, `aria-required` |
+    | Validation | `required`, `minLength`, `maxLength`, `min`, `max`, 
+`pattern`, `step`, `multiple` |
+    | Input-only | `type`, `placeholder`, `autocomplete` |
+    | Textarea-only | `placeholder`, `rows`, `cols` |
+    
+    `control-props.ts` does **not** read:
+    
+    - `data-field-path`
+    - `data-field-invalid`
+    - `data-field-dirty`
+    - `data-form-id`
+    - `data-intent`
+    - `data-collection-*`
+    
+    ### 3.4 fresh-ui L0 attribute contract
+    
+    From `l0-conventions.md`:
+    
+    - Interactive state is expressed with platform attributes, not classes.
+    - `data-part` names stable component parts.
+    - `data-state` names visual state.
+    - ARIA attributes describe accessibility state.
+    - L1 emits data attributes, ARIA attributes, refs, and handlers; it never 
+emits `ns-*` component classes.
+    - L0 and L2 may emit classes only where the class is part of the styling 
+contract.
+    
+    ### 3.5 Current RFC 15 `controlProps()` emission
+    
+    From `field-descriptors.ts` (lines 121–154), `controlProps()` returns:
+    
+    - identity: `id`, `name`, `form`
+    - value: `defaultValue` | `defaultChecked` (boolean branch)
+    - ARIA: `aria-invalid`, `aria-describedby`, `aria-required`
+    - validation: `required`, `minLength`, `maxLength`, `min`, `max`, `pattern`,
+`step`, `multiple`
+    - data attributes: `data-field-path`, `data-field-invalid`, 
+`data-field-dirty`, `data-form-id`
+    - plus merged `overrides`
+    
+    This already satisfies `control-props.ts` typed narrowers with one 
+exception: fresh-ui's `getInputProps` does not currently read `data-field-*`, so
+a fresh-ui consumer cannot today style on `data-field-dirty` or 
+`data-field-invalid` unless it reads the descriptor directly. This is acceptable
+because fresh-ui's contract is attribute-based and fresh can still emit the data
+attributes for L4 consumers.
+    
+    ### 3.6 What the form system must emit
+    
+    For a fresh-ui L2 field to render correctly with no internal imports from 
+either side:
+    
+    | fresh-ui prop | RFC 15 source |
+    |---|---|
+    | `label` | `fieldDescriptor.labelProps.for` + user-provided text |
+    | `name` | `fieldDescriptor.name` |
+    | `required` | `fieldDescriptor.required` |
+    | `error` | `fieldDescriptor.error` (first error string) |
+    | `helpText` | user-provided; fresh has `descriptionProps.id` but no 
+description text today |
+    | control identity | `getInputProps(fieldDescriptor)` / `getSelectProps` / 
+`getTextareaProps` |
+    | pending UX | `FormEnhancementState.pending` (not yet wired to `FormField`)
+|
+    | form-level errors | `FormEnhancementState.formErrors` or 
+`RuntimeFormState.formErrors` |
+    
+    **Open design question**: should fresh provide a `<Field />` wrapper that 
+maps descriptor → `FormField` + `getInputProps`? The umbrella says fresh must 
+consume fresh-ui seams without cross-package internal imports; a wrapper in 
+`@netscript/fresh/form` would import 
+`packages/fresh-ui/registry/components/ui/form-field.tsx` internals, which 
+violates the L2 import rule (L2 must not be imported by packages). Therefore the
+recommended contract is:
+    
+    - `@netscript/fresh/form` exposes typed descriptor state + `controlProps()`.
+    - The consumer app (L4) maps descriptor → fresh-ui `FormField` / 
+`getInputProps`.
+    - Optionally, a **registry block** (L3) in `fresh-ui` can ship a 
+`fresh-form-field.tsx` block that imports both `@netscript/fresh/form` and 
+`fresh-ui` L2 components. This lives in `fresh-ui/registry/blocks/`, not in 
+`@netscript/fresh`.
+    
+    ### 3.7 Pending / disabled state contract gap
+    
+    - fresh-ui `Input`/`Select` accept `disabled` and `error?: boolean` but no 
+`pending` prop.
+    - RFC 15 `FormEnhancementState` exposes `pending: boolean`.
+    - No canonical attribute today signals "form is submitting" to fresh-ui. A 
+L0/L1 enhancement would be to add `data-pending` or `aria-busy` on the 
+form/fieldset.
+    - Recommendation for plan: defer a dedicated pending field wrapper; in the 
+short term, apps disable controls via `field.controlProps({ disabled: 
+enhancement.pending })` and style with `data-field-pending` if fresh-ui later 
+adds it.
+    
+    ---
+    
+    ## 4. Standard Schema / schema adapter landscape
+    
+    ### 4.1 Current state
+    
+    - `schema-adapter.ts` is Zod-only and imports `z` from `zod`.
+    - `@netscript/fresh` already depends on `zod` (umbrella dependency 
+inherited).
+    - `FormSchemaAdapter<TValues, TOutput>` exposes:
+      - `parse(input)` — throws on failure
+      - `safeParse(input)` — returns normalized `FormSchemaParseResult`
+      - `getConstraints()` — `Partial<Record<string, FieldConstraints>>`
+      - `getDefaults()` — `Partial<TValues>`
+    
+    ### 4.2 Standard Schema option
+    
+    [Standard Schema](https://github.com/standard-schema/standard-schema) is a 
+cross-library contract supported by Zod ≥3.24, Valibot ≥0.42, ArkType, and 
+others. A Standard Schema adapter would replace the Zod-specific internals with:
+    
+    ```ts
+    interface StandardSchemaV1<Input = unknown, Output = unknown> {
+      '~standard': {
+        version: 1;
+        vendor: string;
+        validate(input: unknown): StandardSchemaV1Result<Output> | 
+Promise<StandardSchemaV1Result<Output>>;
+        types?: { input: Input; output: Output } | undefined;
+      };
+    }
+    ```
+    
+    ### 4.3 Pros / cons for this plan
+    
+    | Option | Pros | Cons | Risk |
+    |---|---|---|---|
+    | Keep Zod-only adapter | Smallest change; no new dep; constraints/defaults 
+logic already works | Per-library glue if we ever add Valibot/ArkType | Medium —
+diverges from "best DX" umbrella benchmark |
+    | Add Standard Schema adapter | One adapter for multiple schema libs; 
+market-aligned (TanStack Form uses Standard Schema) | Requires `zod` upgrade if 
+pinned below 3.24; constraints/defaults extraction may be less rich; adds a 
+dependency (`@standard-schema/spec`) | Medium-High — touches public validation 
+contract and dependency surface |
+    | Hybrid: `FormSchemaAdapter` stays, implement Standard Schema behind it | 
+Preserves public contract; future-proof | More code, not less | Low |
+    
+    ### 4.4 Recommendation
+    
+    The umbrella requires the plan to **evaluate** Standard Schema as the 
+adapter target. The safest plan that closes the package-quality issues while 
+keeping the door open is:
+    
+    1. Refactor `schema-adapter.ts` into a contract file 
+(`schema-adapter/types.ts`) + a Zod implementation (`schema-adapter/zod.ts`).
+    2. Keep `createZodAdapter` public behavior unchanged.
+    3. Add a research spike slice for Standard Schema feasibility: does the 
+current `getConstraints()` / `getDefaults()` extraction map to Standard Schema 
+metadata? Document the dependency decision as drift if we defer.
+    4. Do **not** add `@standard-schema/spec` in this plan unless the spike 
+proves we can preserve `getConstraints()` fidelity. Defer to a follow-up wave to
+avoid expanding scope.
+    
+    ---
+    
+    ## 5. Progressive enhancement market bar
+    
+    ### 5.1 What `./form` already has
+    
+    - No-JS submit: `Form` renders native `<form>` with `action`/`method`; CSRF 
+and submission-id hidden inputs are server-rendered.
+    - Intent system: `intent.ts` encodes collection operations in hidden 
+`__intent__` fields; works without JS.
+    - Server validation: `reply.ts` returns invalid/success/error/redirect 
+states; `state.ts` resolves runtime state.
+    - Island upgrade: `useFormEnhancement` adds 
+`onSubmit`/`onBlurCapture`/`onInputCapture` validation, `pending`, partial/Fresh
+partial attrs.
+    - Idempotency: `SUBMISSION_ID_FIELD_NAME` + `generateSubmissionId`.
+    
+    ### 5.2 Market comparison
+    
+    | Capability | Remix / React Router actions | Next.js server actions + 
+`useActionState` | TanStack Form | RFC 15 today |
+    |---|---|---|---|---|
+    | No-JS submit | ✅ `<Form>` + action route | ✅ server action bound to 
+`<form action>` | ❌ JS-only | ✅ native `<form>` |
+    | Server validation errors mapped to fields | ✅ `useActionData` / 
+`actionData` | ✅ `useActionState` returns `{ errors, message }` | ✅ via 
+`@tanstack/react-form` + server validators | ✅ `fieldErrors` / `formErrors` on 
+`RuntimeFormState` |
+    | Client validation before submit | ⚠️ route-level `clientAction` optional |
+⚠️ user wires own | ✅ built-in validators + Standard Schema | ✅ 
+`useFormEnhancement` `schema` option |
+    | Pending state | ✅ `useNavigation().formAction` | ✅ `useActionState` 
+pending | ✅ `form.state.isSubmitting` | ✅ `FormEnhancementState.pending` |
+    | Focus first invalid field | ❌ not built-in | ❌ not built-in | ✅ | ✅ 
+`focusOnError` |
+    | Optimistic updates | ✅ `useOptimistic` | ✅ `useOptimistic` | ✅ | ❌ not
+in RFC 15 |
+    | Form reset after success | ✅ redirect in action | ✅ `redirect()` or 
+manual | ✅ | ✅ `redirect` reply |
+    | Collection add/remove/reorder | ⚠️ user-built | ⚠️ user-built | ✅ field 
+arrays | ✅ `intent.ts` collection intents |
+    | Progressive file upload | ✅ via `FormData` in action | ✅ via `FormData` 
+| ✅ | ⚠️ not analyzed |
+    
+    ### 5.3 Gaps worth closing in 5d5
+    
+    1. **Real route validation** (A4-Browser obligation): playground routes 
+proving no-JS submit, enhanced submit, server errors through fresh-ui, 
+pending/idempotency, CSRF.
+    2. **Client-side focus on first error**: already implemented; needs browser 
+test.
+    3. **Pending visual state wired to fresh-ui**: gap — design a `data-pending`
+/ `aria-busy` contract or document the deferral.
+    4. **Documentation + doctests**: README and 
+`_fixtures/docs-examples_test.ts` per umbrella.
+    
+    ### 5.4 Gaps to defer
+    
+    1. **Optimistic updates** — out of scope; can be added later via signals 
+without public contract change.
+    2. **File upload progress** — out of scope.
+    3. **Standard Schema full migration** — research spike only; implementation 
+deferred if constraints fidelity is uncertain.
+    
+    ---
+    
+    ## 6. Reuse from prior run
+    
+    The prior run (`run-27442097563-1`) produced no committed artifacts, but its
+distilled findings in `summary.md` were accurate and reused here:
+    
+    - MEASURE-FIRST numbers (74 doc-lint, 60/11/3 split, over-cap files, 62 
+dry-run problems) were reused verbatim and not re-derived.
+    - The scoped `deno check` result (0 errors) was reused.
+    - The fresh-ui seam files and L0 contract were re-read independently to 
+verify.
+    - The public symbol list and internal decomposition raw material were 
+derived from current code.
+    
+    ---
+    
+    ## 7. Remaining gaps before design trigger
+    
+    1. **Read deeper `schema-adapter.ts` internals** — constraints/default 
+extraction strategy must be documented for decomposition.
+    2. **Read `state.ts` and `reply.ts`** — confirm public/internal split and 
+telemetry references.
+    3. **Read `intent.ts` collection operation details** — confirm decomposition
+boundaries.
+    4. **Read `.llm/harness/` archetype/gate files** — extract F-1 layer caps 
+and A4-Browser gate requirements.
+    5. **Read RFC 15** — confirm stated behavior against implementation.
+    6. **Read 5d1 plan (PR #34)** — error taxonomy / telemetry conventions 
+binding on 5d5.
+    7. **Start `drift.md`** — any divergence from umbrella goes here.
+    
+    ---
+    
+    ## 8. Notes
+    
+    - This file is append-only during the PLAN run. It will be committed to the 
+branch as the research artifact.
+    - Design.md and plan.md will be produced in a follow-up trigger after 
+supervisor review of research.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.83M • cache hit 95.27% •  reasoning 2.24K • ↓ output 14.65K • 
+$ 0.4729
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+❌ [An error occurred during execution.]
+[An error occurred during execution.]
+Invalid `path` parameter: 
+/home/runner/work/netscript/netscript/.llm/tmp/run/feat-package-quality-wave5-ap
+ps--5d5-form/research.md. File already exists at: 
+/home/runner/work/netscript/netscript/.llm/tmp/run/feat-package-quality-wave5-ap
+ps--5d5-form/research.md. Cannot overwrite files using command `create`.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check existing plan files
+
+$ ls -la .llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/
+
+Tokens: ↑ input 1.87M • cache hit 95.06% •  reasoning 2.24K • ↓ output 14.7K • $
+0.4849
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+total 268
+drwxr-xr-x  2 runner runner   4096 Jun 12 22:07 .
+drwxr-xr-x 29 runner runner   4096 Jun 12 22:04 ..
+-rw-r--r--  1 runner runner     73 Jun 12 22:04 commits.md
+-rw-r--r--  1 runner runner  32265 Jun 12 22:06 doc-lint-raw.txt
+-rw-r--r--  1 runner runner     68 Jun 12 22:05 drift.md
+-rw-r--r--  1 runner runner  38895 Jun 12 22:06 dry-run-raw.txt
+-rw-r--r--  1 runner runner 174743 Jun 12 22:07 form-doc.json
+-rw-r--r--  1 runner runner   1482 Jun 12 22:05 research.md
+-rw-r--r--  1 runner runner     69 Jun 12 22:04 worklog.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read existing plan artifacts
+
+$ cat .llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/research.md && echo
+'---' && cat .llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/drift.md && 
+echo '---' && cat 
+.llm/tmp/run/feat-package-quality-wave5-apps--5d5-form/commits.md
+
+Tokens: ↑ input 1.91M • cache hit 95.14% •  reasoning 2.24K • ↓ output 14.79K • 
+$ 0.4932
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# 5d5 `./form` PLAN-phase research
+
+Run: `feat/package-quality-wave5-apps-5d5-form` PR #38
+Trigger: RE-DISPATCH phase 1 of 2 — RESEARCH ONLY.
+Reused from prior trace 
+`.llm/tmp/run/openhands/pr-38/run-27442097563-1/summary.md` where noted.
+
+## 1. MEASURE-FIRST baseline
+
+> TODO: fill with current numbers from `deno doc --lint`, `deno check`, `deno 
+publish --dry-run`, file sizes, private-type-ref count.
+
+| Check | Command / scope | Result |
+|---|---|---|
+| Type check `./form` | TODO | TODO |
+| Root type check (excludes `packages/fresh`) | TODO | TODO |
+| Doc lint `./form` combined | TODO | TODO |
+| JSR dry-run `@netscript/fresh` | TODO | TODO |
+| Over-cap files | TODO | TODO |
+| Private-type-refs | TODO | TODO |
+
+## 2. `./form` public surface & internal seams
+
+> TODO: symbol map from `deno doc` + exports; decomposition raw material.
+
+## 3. fresh↔fresh-ui seam analysis
+
+> TODO: read `packages/fresh-ui/registry/components/ui/form-field.tsx`, 
+`registry/lib/control-props.ts`, `packages/fresh-ui/docs/l0-conventions.md`; 
+document state contract and `data-*`/ARIA expectations.
+
+## 4. Standard Schema landscape & market bar
+
+> TODO: zod/valibot/arktype interop sources; Remix/RR, Next.js server actions + 
+useActionState, TanStack Form gaps worth closing vs deferring.
+
+## 5. Reused findings from prior trace
+
+> TODO: distill what was valid from run-27442097563-1 and what we re-verified.
+
+## 6. Gaps / blockers
+
+> TODO: questions requiring supervisor/design trigger.
+
+---
+# 5d5 `./form` drift log
+
+Entries prefixed `D-5d5-n`. Append-only.
+
+---
+# Commits — 5d5-form
+
+Append-only hash record (repo + hash + subject).
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+

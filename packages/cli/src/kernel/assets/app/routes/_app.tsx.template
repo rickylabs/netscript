@@ -14,6 +14,7 @@ export default define.page(function AppShell({ Component }) {
           content='NetScript starter scaffold with Fresh 2, Aspire orchestration, contracts, and enterprise UI primitives.'
         />
         <title>{{name}} — {{appName}}</title>
+        <link rel='icon' href='data:,' />
         <link rel='preconnect' href='https://fonts.googleapis.com' />
         <link rel='preconnect' href='https://fonts.gstatic.com' crossOrigin='anonymous' />
         <link

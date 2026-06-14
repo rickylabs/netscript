@@ -20,23 +20,29 @@ interface SharedIconButtonProps {
 
 type IconButtonElementType = 'button' | 'submit' | 'reset';
 
-type IconButtonAsButtonProps = SharedIconButtonProps & Omit<
-  JSX.ButtonHTMLAttributes<HTMLButtonElement>,
-  'children' | 'class' | 'type'
-> & {
-  type?: IconButtonElementType;
-  href?: never;
-  clientNav?: never;
-};
+type IconButtonAsButtonProps =
+  & SharedIconButtonProps
+  & Omit<
+    JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+    'children' | 'class' | 'type'
+  >
+  & {
+    type?: IconButtonElementType;
+    href?: never;
+    clientNav?: never;
+  };
 
-type IconButtonAsLinkProps = SharedIconButtonProps & Omit<
-  JSX.AnchorHTMLAttributes<HTMLAnchorElement>,
-  'children' | 'class' | 'href' | 'type'
-> & {
-  type: 'link';
-  href: string;
-  clientNav?: boolean;
-};
+type IconButtonAsLinkProps =
+  & SharedIconButtonProps
+  & Omit<
+    JSX.AnchorHTMLAttributes<HTMLAnchorElement>,
+    'children' | 'class' | 'href' | 'type'
+  >
+  & {
+    type: 'link';
+    href: string;
+    clientNav?: boolean;
+  };
 
 type IconButtonProps = IconButtonAsButtonProps | IconButtonAsLinkProps;
 

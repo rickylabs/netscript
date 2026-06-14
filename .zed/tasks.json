@@ -1,0 +1,23 @@
+[
+  {
+    "label": "deno test current file",
+    "command": "deno test --allow-all \"$ZED_FILE\"",
+    "tags": ["js-test"]
+  },
+  {
+    "label": "deno check current file",
+    "command": "deno check --unstable-kv \"$ZED_FILE\""
+  },
+  {
+    "label": "deno task check",
+    "command": "deno task check"
+  },
+  {
+    "label": "deno task lint",
+    "command": "deno task lint"
+  },
+  {
+    "label": "deno task fmt:check",
+    "command": "deno task fmt:check"
+  }
+]
