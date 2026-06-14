@@ -13,3 +13,4 @@ Append-only hash record (repo + hash + subject).
 - `8cdf510`: chore(root): include fresh in quality wrappers
 - 4584b32: feat(fresh): add query hydration and app seams
 - 58ee48c: fix(fresh): log withForm mutate errors
+- 69f1615: docs(5d6): record final implementation closeout
