@@ -123,11 +123,11 @@
 
 ## In Progress
 
-- Commit and push Slice 10, then append the commit ledger and comment PR #38.
+- Push Slice 10 ledger commit and comment PR #38.
 
 ## Next Steps
 
-1. Commit and push Slice 10.
+1. Push Slice 10 ledger commit.
 2. Comment PR #38 with slice summary and next slice.
 3. Start Slice 11 schema introspector contract only if it remains additive and gates stay clean.
 
@@ -229,6 +229,7 @@
 - `abc70b7`: [5d5] Record slice 7 commit
 - `6fe4fbe`: [5d5] Slice 8 audit form public surface
 - `25e7bc2`: [5d5] Slice 9 add standard schema adapter
+- `22b964d`: [5d5] Slice 10 rebuild zod adapter
 
 ## Slice 9 Update
 

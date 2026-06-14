@@ -15,3 +15,4 @@ Append-only hash record (repo + hash + subject).
 | `91e8e17` | [5d5] Slice 7 align form telemetry |
 | `6fe4fbe` | [5d5] Slice 8 audit form public surface |
 | `25e7bc2` | [5d5] Slice 9 add standard schema adapter |
+| `22b964d` | [5d5] Slice 10 rebuild zod adapter |
