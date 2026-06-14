@@ -23,8 +23,10 @@
   with the original import path preserved as a compatibility facade.
 - Slice 5 is complete locally as a no-source-change verification slice: current public return
   annotations already satisfy the plan, and `packages/fresh` publish dry-run is clean.
-- Slice 6 is complete locally: public doc-lint remained clean; source changes are limited to
+- Slice 6 is pushed and PR-commented: public doc-lint remained clean; source changes are limited to
   formatting `state.ts`, `intent.ts`, `reply.ts`, and changing `config.ts` to a type-only Zod import.
+- Slice 7 is complete locally: `form/telemetry.ts` now delegates to shared Fresh telemetry, and the
+  duplicate submit-failure `console.error` was removed from the form builder path.
 - Current baseline after supervisor sync:
   - `deno doc --lint packages/fresh/form/mod.ts` passes with 0 errors.
   - Scoped form check passes with 0 occurrences.
@@ -46,6 +48,8 @@
   `deno publish --dry-run --allow-dirty` from `packages/fresh`.
 - Slice 6 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
   touched-file fmt/lint for the planned JSDoc-sweep files, and file-size scan.
+- Slice 7 gates passed: public doc-lint, narrow `deno check --unstable-kv`, scoped form check,
+  direct touched-file typecheck, touched-file fmt/lint, F-14 console scan, and file-size scan.
 
 ## Completed
 
@@ -82,16 +86,20 @@
   - No JSDoc additions were required because public doc-lint is clean.
   - Focused source hygiene edits were applied in `state.ts`, `intent.ts`, `reply.ts`, and
     `config.ts`.
+- Completed Slice 7 telemetry alignment:
+  - `packages/fresh/form/telemetry.ts` delegates to `../_internal/telemetry.ts`.
+  - `packages/fresh/builders/define-page/builder/mod.tsx` no longer logs form submit failures to
+    `console.error`; structured telemetry remains.
 
 ## In Progress
 
-- Commit slice 6 public-export sweep and harness artifacts, then append the commit ledger.
+- Commit slice 7 telemetry alignment and harness artifacts, then append the commit ledger.
 
 ## Next Steps
 
-1. Commit and push slice 6.
+1. Commit and push slice 7.
 2. Comment PR #38 with slice summary and next slice.
-3. Start slice 7 telemetry alignment.
+3. Start slice 8 `mod.ts` public surface audit.
 
 ## Key Decisions
 
@@ -145,6 +153,8 @@
 | `packages/fresh/form/intent.ts` | update | Slice 6 formatting |
 | `packages/fresh/form/reply.ts` | update | Slice 6 formatting |
 | `packages/fresh/form/config.ts` | update | Slice 6 type-only Zod import |
+| `packages/fresh/form/telemetry.ts` | update | Slice 7 shared telemetry convention |
+| `packages/fresh/builders/define-page/builder/mod.tsx` | update | Slice 7 remove duplicate console side effect |
 
 ## Gates
 
@@ -179,3 +189,5 @@
 - `c283d4b`: [5d5] Slice 3 split field descriptors
 - `7ed51f5`: [5d5] Slice 4 split schema adapter
 - `fb58a7d`: [5d5] Slice 5 verify return types
+- `2e790c5`: [5d5] Slice 6 public export sweep
+- `43be65f`: [5d5] Record slice 6 commit

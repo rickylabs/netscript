@@ -171,3 +171,29 @@ Append-only. One entry per slice / decision.
 | Touched-file format | `deno fmt --check packages/fresh/form/state.ts packages/fresh/form/pipeline.ts packages/fresh/form/intent.ts packages/fresh/form/reply.ts packages/fresh/form/errors.ts packages/fresh/form/csrf.ts packages/fresh/form/idempotency.ts packages/fresh/form/pagination.ts packages/fresh/form/config.ts packages/fresh/form/handler-context.ts` | PASS after formatting `state.ts`, `intent.ts`, and `reply.ts` |
 | Touched-file lint | `deno lint packages/fresh/form/state.ts packages/fresh/form/pipeline.ts packages/fresh/form/intent.ts packages/fresh/form/reply.ts packages/fresh/form/errors.ts packages/fresh/form/csrf.ts packages/fresh/form/idempotency.ts packages/fresh/form/pagination.ts packages/fresh/form/config.ts packages/fresh/form/handler-context.ts` | PASS after type-only import fix in `config.ts` |
 | File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -20` | PASS: no planned over-cap implementation files remain |
+
+## 2026-06-14 - Slice 7 telemetry alignment
+
+- Cut `packages/fresh/form/telemetry.ts` over from its deprecated-in-place tracer fork to the
+  shared 5d1 Fresh telemetry convention in `packages/fresh/_internal/telemetry.ts`.
+- Preserved the existing `withFormSpan` and `emitFormError` signatures used by
+  `packages/fresh/builders/define-page/builder/mod.tsx`.
+- Normalized form spans through `withFreshSpan` with `scope: 'form'`, `form.phase`, and
+  `netscript.operation` attributes.
+- Replaced form error emission with `emitFreshError`, preserving structured error telemetry while
+  removing duplicate direct tracer/event logic.
+- Removed the submit failure `console.error` from the form builder path; structured telemetry and
+  `normalizeFormError` remain the published failure behavior.
+
+### Slice 7 gates
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Public doc lint | `deno doc --lint packages/fresh/form/mod.ts` | PASS |
+| Narrow typecheck | `deno check --unstable-kv packages/fresh/form/mod.ts` | PASS |
+| Scoped form check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh/form --ext ts,tsx` | PASS: 0 occurrences |
+| Direct touched-file typecheck | `deno check --unstable-kv packages/fresh/form/telemetry.ts packages/fresh/builders/define-page/builder/mod.tsx` | PASS |
+| Touched-file format | `deno fmt --check packages/fresh/form/telemetry.ts packages/fresh/builders/define-page/builder/mod.tsx` | PASS |
+| Touched-file lint | `deno lint packages/fresh/form/telemetry.ts packages/fresh/builders/define-page/builder/mod.tsx` | PASS |
+| F-14 console scan | `grep -R "console\\." -n packages/fresh/form packages/fresh/builders/define-page/builder/mod.tsx \| head -80` | PASS: no matches |
+| File-size scan | `find packages/fresh/form -name '*.ts' -o -name '*.tsx' \| xargs wc -l \| sort -nr \| head -30` | PASS: `telemetry.ts` 64 LOC; no over-cap form files |
