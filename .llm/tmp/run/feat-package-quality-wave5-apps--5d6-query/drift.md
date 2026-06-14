@@ -64,3 +64,10 @@ Append-only. Reality vs RFC/doctrine/plan divergences.
 - Current measurement: `command -v rtk` fails and `~/.local/bin/rtk` does not exist.
 - Impact: rebaseline commands were run raw, increasing output volume only. Gate semantics and exit codes are unaffected.
 - Status: use raw commands until RTK becomes available; do not block implementation on output filtering.
+
+## D-5d6-10 - Query doc-lint required combining planned query type and hook-wrapper slices
+
+- Original plan: Slice 1 introduced query type aliases, Slice 2 rewrote hook wrappers, and Slice 3 handled query island/hydration explicit types.
+- Current implementation fact: `deno doc --lint packages/fresh/query/mod.ts` remained red until the public hook wrappers, `QueryIslandProps`, `getIslandQueryClient`, and hydration signatures all stopped referencing upstream public types together.
+- Impact: implementation Slice 2 combines the query public-type scaffold, hook wrappers, and query island/hydration public signature cleanup. No server/defer/form/builders scope was pulled into the slice.
+- Status: accepted as minor sequencing drift; gate evidence is stronger because the whole `@netscript/fresh/query` subpath is doc-lint clean after the slice.

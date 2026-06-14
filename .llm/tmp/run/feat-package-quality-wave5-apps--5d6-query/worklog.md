@@ -51,3 +51,33 @@ Append-only. One entry per slice / decision.
 ### Next slice
 
 Proceed to query bridge source work: add package-owned query public types and stop letting the query public surface depend on raw upstream private types.
+
+## 2026-06-14 - Slice 2 - Query bridge public types and wrappers
+
+- Changed `packages/fresh/query/query-types.ts` (new), `hooks.ts`, `mod.ts`, `query-client.ts`, `query-island.tsx`, and `hydration.ts`.
+- Replaced raw public re-exports of `@tanstack/preact-query` / `@tanstack/react-db` hooks with package-owned wrapper functions and structural result/options types.
+- Preserved backward-compatible hook names (`useQuery`, `useMutation`, `useInfiniteQuery`, etc.) as explicit NetScript-owned functions instead of upstream re-exports.
+- Moved public query-client, hydration, island-children, query-options, mutation-options, live-query, and loader-data signatures behind package-owned types.
+- Kept runtime delegation to TanStack internals via local casts inside the implementation only.
+
+### Slice 2 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Query doc-lint | PASS | `deno doc --lint packages/fresh/query/mod.ts` |
+| Query check | PASS | `deno check --unstable-kv packages/fresh/query/mod.ts` |
+| Combined touched entrypoint check | PASS | `deno check --unstable-kv packages/fresh/query/mod.ts packages/fresh/server.ts packages/fresh/mod.ts` |
+| Query fmt wrapper | PASS | `run-deno-fmt.ts --root packages/fresh/query --ext ts,tsx --ignore-line-endings` |
+| Query lint wrapper | PASS | `run-deno-lint.ts --root packages/fresh/query --ext ts,tsx` |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+| Server doc-lint regression check | FAIL expected | unchanged 4 streaming type private refs remain for next server slice |
+| Root doc-lint regression check | FAIL expected | unchanged 4 inherited utils cache-entry private refs remain |
+
+### Residual risk
+
+- Hook wrappers intentionally expose a package-owned subset of TanStack result/options shapes. This clears JSR public-surface leakage while preserving the common island hook path, but advanced upstream-only fields now require either `details`-style escape hatches in future APIs or direct upstream imports by consumers.
+- `QueryIslandProps.children` now uses `QueryIslandChildren`, a package-owned renderable union. Runtime rendering still delegates to Preact.
+
+### Next slice
+
+Proceed to server public surface cleanup: export or package-own the streaming renderable/renderer/boundary types used by `@netscript/fresh/server`.
