@@ -10,3 +10,4 @@ Append-only hash record (repo + hash + subject).
 | `4e3c0bcbf34692e55a03674628172d82abe95197` | [5d5] Slice 2 split form types |
 | `c283d4b` | [5d5] Slice 3 split field descriptors |
 | `7ed51f5` | [5d5] Slice 4 split schema adapter |
+| `fb58a7d` | [5d5] Slice 5 verify return types |
