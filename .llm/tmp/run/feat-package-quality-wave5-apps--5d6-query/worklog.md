@@ -183,3 +183,29 @@ Clean the narrow package fmt/lint residuals: format `server/define-fresh-app*` a
 ### Next slice
 
 Rebaseline root `deno task check`, `deno task fmt:check`, and `deno task lint` now that package-local quality gates are clean, then adjust root package inclusion only if the wrappers still exclude `packages/fresh` in a way that masks this package.
+
+## 2026-06-14 - Slice 7 - Root quality wrappers include `packages/fresh`
+
+- Changed root `deno.json` task exclude patterns so `packages/fresh` is included by root `check`, `fmt:check`, and `lint`.
+- Kept existing `packages/fresh-ui` and `packages/cli` exclusions where they were already present.
+- No package source changed in this slice.
+
+### Slice 7 gate table
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Root check before config edit | PASS but masked fresh | `deno task check` selected 1432 files and excluded `packages/fresh` |
+| Root fmt before config edit | PASS but masked fresh | `deno task fmt:check` selected 933 files and excluded `packages/fresh` |
+| Root lint before config edit | PASS but masked fresh | `deno task lint` selected 933 files and excluded `packages/fresh` |
+| Root check after config edit | PASS | `deno task check` selected 1572 files, including `packages/fresh` |
+| Root fmt after config edit | PASS | `deno task fmt:check` selected 1157 files, including `packages/fresh` |
+| Root lint after config edit | PASS | `deno task lint` selected 1073 files, including `packages/fresh` |
+| Package dry-run | PASS | `(cd packages/fresh && deno task dry-run)` |
+
+### Residual risk
+
+- Root wrappers still intentionally exclude other packages/folders already excluded before this slice (`fresh-ui`, `cli`, generated outputs, node_modules), but they no longer mask `packages/fresh`.
+
+### Next slice
+
+Run final package/root regression gates and update `context-pack.md` for READY-FOR-IMPL-EVAL unless a remaining consumer/runtime proof is required by the supervisor.

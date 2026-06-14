@@ -6,7 +6,7 @@
 - PR: `https://github.com/rickylabs/netscript/pull/39`
 - Agent role: implementation agent only; final IMPL-EVAL must be separate.
 - PLAN-EVAL: `APPROVED` in `plan-eval.md`.
-- Latest completed implementation slice: Slice 6 package fmt/lint cleanup.
+- Latest completed implementation slice: Slice 7 root quality wrappers include `packages/fresh`.
 
 ## Rebaseline Summary
 
@@ -15,7 +15,7 @@
 - Targeted `deno check --unstable-kv` for query/server/root passes.
 - Package check wrapper passes for `packages/fresh`.
 - Remaining expected failures:
-  - root wrappers may still exclude `packages/fresh`; Slice 7 should rebaseline root tasks and adjust only if needed.
+  - remaining final closeout: rerun package/root regression gates, record final context pack, and mark READY-FOR-IMPL-EVAL.
 
 ## Slice 2 Summary
 
@@ -57,6 +57,13 @@
 - Targeted server define-fresh-app and builder partial tests pass.
 - No lockfile churn observed.
 
+## Slice 7 Summary
+
+- Root `deno task check`, `deno task fmt:check`, and `deno task lint` now include `packages/fresh`.
+- All three root tasks pass after inclusion.
+- Package dry-run still passes.
+- No lockfile churn observed.
+
 ## Next Slice
 
-Rebaseline root check/fmt/lint wrappers and adjust root package inclusion only if required.
+Run final package/root regression gates and prepare READY-FOR-IMPL-EVAL handoff.
