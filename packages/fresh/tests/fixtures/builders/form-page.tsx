@@ -1,4 +1,4 @@
-import { definePage } from '../../../builders/mod.ts';
+import { definePage } from '../../../src/application/builders/mod.ts';
 import type { RuntimeFormState } from '../../../src/application/form/mod.ts';
 import { z } from 'zod';
 

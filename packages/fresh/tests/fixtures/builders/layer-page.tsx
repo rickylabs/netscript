@@ -1,4 +1,4 @@
-import { definePage } from '../../../builders/mod.ts';
+import { definePage } from '../../../src/application/builders/mod.ts';
 
 const page = definePage<{ requestId: string }>()
   .withLayer('panel', (props: { label: string }) => <section>{props.label}</section>, {

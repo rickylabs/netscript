@@ -1,4 +1,4 @@
-import { definePartial } from '../../../builders/mod.ts';
+import { definePartial } from '../../../src/application/builders/mod.ts';
 
 const partial = definePartial({
   name: 'builder-partial-fixture',

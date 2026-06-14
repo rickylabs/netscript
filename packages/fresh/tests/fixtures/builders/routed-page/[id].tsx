@@ -1,4 +1,4 @@
-import { definePage } from '../../../../builders/mod.ts';
+import { definePage } from '../../../../src/application/builders/mod.ts';
 import { z } from 'zod';
 
 const page = definePage<{ requestId: string }>()

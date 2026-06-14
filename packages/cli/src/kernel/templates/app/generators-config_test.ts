@@ -134,7 +134,10 @@ describe('generateAppDenoJson', () => {
       importMode: 'local',
       localBase: '../..',
     }));
-    assertEquals(config.imports['@netscript/fresh/vite'], '../../packages/fresh/config/vite.ts');
+    assertEquals(
+      config.imports['@netscript/fresh/vite'],
+      '../../packages/fresh/src/application/vite/vite.ts',
+    );
   });
 
   it('should match the validated copied-workspace app contract in local mode', () => {
@@ -149,12 +152,24 @@ describe('generateAppDenoJson', () => {
     assertEquals(config.imports['@netscript/fresh'], '../../packages/fresh/mod.ts');
     assertEquals(
       config.imports['@netscript/fresh/builders'],
-      '../../packages/fresh/builders/mod.ts',
+      '../../packages/fresh/src/application/builders/mod.ts',
     );
-    assertEquals(config.imports['@netscript/fresh/query'], '../../packages/fresh/query/mod.ts');
-    assertEquals(config.imports['@netscript/fresh/route'], '../../packages/fresh/route/mod.ts');
-    assertEquals(config.imports['@netscript/fresh/server'], '../../packages/fresh/server.ts');
-    assertEquals(config.imports['@netscript/fresh/vite'], '../../packages/fresh/config/vite.ts');
+    assertEquals(
+      config.imports['@netscript/fresh/query'],
+      '../../packages/fresh/src/application/query/mod.ts',
+    );
+    assertEquals(
+      config.imports['@netscript/fresh/route'],
+      '../../packages/fresh/src/application/route/mod.ts',
+    );
+    assertEquals(
+      config.imports['@netscript/fresh/server'],
+      '../../packages/fresh/src/runtime/server/mod.ts',
+    );
+    assertEquals(
+      config.imports['@netscript/fresh/vite'],
+      '../../packages/fresh/src/application/vite/vite.ts',
+    );
     assertEquals(config.imports['@netscript/fresh-ui'], '../../packages/fresh-ui/mod.ts');
     assertEquals(
       config.imports['@netscript/fresh-ui/interactive'],

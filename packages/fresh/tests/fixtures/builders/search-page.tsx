@@ -1,4 +1,4 @@
-import { definePage } from '../../../builders/mod.ts';
+import { definePage } from '../../../src/application/builders/mod.ts';
 import { paginationSearchSchema } from '../../../src/application/builders/define-page/mod.ts';
 
 const page = definePage<{ requestId: string }>()
