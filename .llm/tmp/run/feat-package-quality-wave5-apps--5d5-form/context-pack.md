@@ -201,3 +201,4 @@
 - `43be65f`: [5d5] Record slice 6 commit
 - `91e8e17`: [5d5] Slice 7 align form telemetry
 - `abc70b7`: [5d5] Record slice 7 commit
+- `6fe4fbe`: [5d5] Slice 8 audit form public surface

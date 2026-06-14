@@ -13,3 +13,4 @@ Append-only hash record (repo + hash + subject).
 | `fb58a7d` | [5d5] Slice 5 verify return types |
 | `2e790c5` | [5d5] Slice 6 public export sweep |
 | `91e8e17` | [5d5] Slice 7 align form telemetry |
+| `6fe4fbe` | [5d5] Slice 8 audit form public surface |
