@@ -8,6 +8,15 @@ Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetS
 applications. The package gives generated services a small entrypoint while preserving direct
 access to the underlying mountable service app.
 
+## Package Role
+
+`@netscript/service` follows the Arch-4 DSL/builder archetype with Archetype 3 runtime behavior
+folded in: callers compose a service through the fluent `createService()` builder (or the
+`defineService()` preset), and the builder materializes a Hono/oRPC runtime. Public exports are
+curated through `mod.ts`; role-named source folders (`builder/`, `primitives/`, `presets/`,
+`diagnostics/`) are internal and not part of the import contract. See `docs/architecture.md` for the
+layering rationale.
+
 ## Features
 
 - Fluent `createService()` builder for CORS, logging, OpenAPI, Scalar docs, RPC, health, and custom

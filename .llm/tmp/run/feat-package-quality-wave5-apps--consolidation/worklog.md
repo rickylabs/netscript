@@ -57,3 +57,12 @@ change.
 
 Validation: `deno check --unstable-kv` (4 files + whole package) EXIT=0; `deno test` service
 17 passed / 0 failed; `deno lint` + `deno fmt` clean.
+
+### A2 — service role layering + docs — DONE
+Role layering already canonical (`src/{builder,primitives,presets,diagnostics}` + `types.ts`); no
+moves needed. All four split files carry `@module` JSDoc. Added a `## Package Role` section to
+README declaring the Arch-4 DSL/builder archetype (+ Arch-3 runtime), matching the wave-2/3 `plugin`
+reference which leads with an explicit role/archetype section. `docs/architecture.md` already
+declared the archetype.
+Validation: `deno doc --lint packages/service/mod.ts` EXIT=0; `deno publish --dry-run --allow-dirty`
+EXIT=0. **Phase A complete.**

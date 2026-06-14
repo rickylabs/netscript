@@ -2,4 +2,5 @@
 
 Append `- <sha>: <message>` after each commit.
 
-(none yet — bootstrap artifacts committed with the plan)
+- 21c56d0: harness: bootstrap wave5 apps consolidation run + plan
+- a0e5bcc: refactor(service): split service-builder into impl + rpc + listener seams [A1]
