@@ -32,3 +32,9 @@ Append-only. One entry per slice / decision.
 - Extracted the public route type surface from route/mod.ts into route/types.ts and re-exported it from the route facade.
 - Reduced route/mod.ts from 755 LOC to 184 LOC. route/types.ts remains above the F-1 soft cap and is scheduled for the next type-group split.
 - Gates: deno doc --lint route mod/types/contract/manifest PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
+
+## 2026-06-14 - Slice 3: split pagination route types
+
+- Extracted pagination/search-schema public types from route/types.ts into route/pagination-types.ts.
+- route/types.ts now re-exports pagination types and is under the F-1 soft cap at 497 LOC.
+- Gates: deno doc --lint route mod/types/pagination-types/contract/manifest PASS; scoped route+builders deno check/lint/fmt PASS 0 findings; deno test --allow-all packages/fresh/route packages/fresh/builders PASS 52/0.
