@@ -20,7 +20,7 @@
   "tasks": {
     "check": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
     "test": "deno test --allow-all",
-    "publish:dry-run": "deno publish --dry-run --allow-dirty",
+    "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
     "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
     "fmt:check": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
