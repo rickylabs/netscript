@@ -10,12 +10,12 @@ export {
   DenoDefaultsSchema,
   NetScriptConfigSchema,
   OtelConfigSchema,
-  parseAppSettings,
   PluginEntrySchema,
   ResourceModeSchema,
   ServiceEntrySchema,
   ToolEntrySchema,
 } from '../../config.ts';
+export { parseAppSettings } from '../../config.ts';
 export type { ParseOptions, ParseResult } from '../../config.ts';
 export { generateAppSettingsJsonSchema } from '../../schema.ts';
 export {
