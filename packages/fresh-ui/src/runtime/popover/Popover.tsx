@@ -23,7 +23,7 @@ function usePopoverContext(partName: string): UsePopoverReturn {
   return requireFreshUiContext(useContext(PopoverContext), partName, 'Popover.Root');
 }
 
-function withChildren(children: ComponentChildren) {
+function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
@@ -77,8 +77,21 @@ function PopoverArrowTip({ children, ...props }: PopoverArrowTipProps): VNode {
   return <div {...popover.getArrowTipProps(props)}>{withChildren(children)}</div>;
 }
 
+type PopoverNamespace = Readonly<{
+  Anchor: typeof PopoverAnchor;
+  Arrow: typeof PopoverArrow;
+  ArrowTip: typeof PopoverArrowTip;
+  Close: typeof PopoverClose;
+  Content: typeof PopoverContent;
+  Description: typeof PopoverDescription;
+  Positioner: typeof PopoverPositioner;
+  Root: typeof PopoverRoot;
+  Title: typeof PopoverTitle;
+  Trigger: typeof PopoverTrigger;
+}>;
+
 /** Compound popover namespace with root and positioning subcomponents. */
-export const Popover = {
+export const Popover: PopoverNamespace = {
   Anchor: PopoverAnchor,
   Arrow: PopoverArrow,
   ArrowTip: PopoverArrowTip,

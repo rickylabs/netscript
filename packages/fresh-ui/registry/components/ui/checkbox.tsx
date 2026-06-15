@@ -5,7 +5,7 @@
  * @description Styled checkbox with inline label and optional helper copy.
  */
 
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
 export interface CheckboxProps
@@ -19,7 +19,7 @@ export interface CheckboxProps
 export function Checkbox(
   { children, class: className, description, disabled = false, error = false, ...props }:
     CheckboxProps,
-) {
+): VNode {
   return (
     <label
       class={cn(

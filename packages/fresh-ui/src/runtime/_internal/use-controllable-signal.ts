@@ -9,12 +9,12 @@ export interface UseControllableSignalOptions<T> {
 
 export function useControllableSignal<T>(
   { defaultValue, onChange, value }: UseControllableSignalOptions<T>,
-) {
+): readonly [T, (nextValue: T) => void] {
   const uncontrolledValue = useSignal(defaultValue);
   const currentValue = value === undefined ? uncontrolledValue.value : value;
 
   const setValue = useCallback(
-    (nextValue: T) => {
+    (nextValue: T): void => {
       if (value === undefined) {
         uncontrolledValue.value = nextValue;
       }

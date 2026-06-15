@@ -19,7 +19,7 @@ function useDrawerContext(partName: string): UseDrawerReturn {
   return requireFreshUiContext(useContext(DrawerContext), partName, 'Drawer.Root');
 }
 
-function withChildren(children: ComponentChildren) {
+function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
@@ -53,8 +53,17 @@ function DrawerClose({ children, ...props }: DrawerCloseProps): VNode {
   return <button {...drawer.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
+type DrawerNamespace = Readonly<{
+  Close: typeof DrawerClose;
+  Content: typeof DrawerContent;
+  Description: typeof DrawerDescription;
+  Root: typeof DrawerRoot;
+  Title: typeof DrawerTitle;
+  Trigger: typeof DrawerTrigger;
+}>;
+
 /** Compound drawer namespace with root and structural subcomponents. */
-export const Drawer = {
+export const Drawer: DrawerNamespace = {
   Close: DrawerClose,
   Content: DrawerContent,
   Description: DrawerDescription,

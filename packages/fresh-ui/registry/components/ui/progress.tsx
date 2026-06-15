@@ -5,7 +5,7 @@
  * @description Determinate or indeterminate progress indicator for jobs, uploads, and deferred flows.
  */
 
-import type { JSX } from 'preact';
+import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
 export type ProgressVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'destructive';
@@ -49,7 +49,7 @@ export function Progress({
   value = 0,
   variant = 'primary',
   ...props
-}: ProgressProps) {
+}: ProgressProps): VNode {
   const safeMax = max > 0 ? max : 100;
   const normalizedValue = clamp(value, 0, safeMax);
   const width = `${(normalizedValue / safeMax) * 100}%`;

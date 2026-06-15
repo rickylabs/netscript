@@ -17,7 +17,7 @@ function useTabsContext(partName: string): UseTabsReturn {
   return requireFreshUiContext(useContext(TabsContext), partName, 'Tabs.Root');
 }
 
-function withChildren(children: ComponentChildren) {
+function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
@@ -41,8 +41,15 @@ function TabsContent({ children, value, ...props }: TabsContentProps): VNode {
   return <div {...tabs.getContentProps(value, props)}>{withChildren(children)}</div>;
 }
 
+type TabsNamespace = Readonly<{
+  Content: typeof TabsContent;
+  List: typeof TabsList;
+  Root: typeof TabsRoot;
+  Trigger: typeof TabsTrigger;
+}>;
+
 /** Compound tabs namespace with root, list, trigger, and content subcomponents. */
-export const Tabs = {
+export const Tabs: TabsNamespace = {
   Content: TabsContent,
   List: TabsList,
   Root: TabsRoot,

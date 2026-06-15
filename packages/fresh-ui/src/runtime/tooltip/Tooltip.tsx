@@ -19,7 +19,7 @@ function useTooltipContext(partName: string): UseTooltipReturn {
   return requireFreshUiContext(useContext(TooltipContext), partName, 'Tooltip.Root');
 }
 
-function withChildren(children: ComponentChildren) {
+function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
@@ -53,8 +53,17 @@ function TooltipArrowTip({ children, ...props }: TooltipArrowTipProps): VNode {
   return <div {...tooltip.getArrowTipProps(props)}>{withChildren(children)}</div>;
 }
 
+type TooltipNamespace = Readonly<{
+  Arrow: typeof TooltipArrow;
+  ArrowTip: typeof TooltipArrowTip;
+  Content: typeof TooltipContent;
+  Positioner: typeof TooltipPositioner;
+  Root: typeof TooltipRoot;
+  Trigger: typeof TooltipTrigger;
+}>;
+
 /** Compound tooltip namespace with root and positioning subcomponents. */
-export const Tooltip = {
+export const Tooltip: TooltipNamespace = {
   Arrow: TooltipArrow,
   ArrowTip: TooltipArrowTip,
   Content: TooltipContent,

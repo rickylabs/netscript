@@ -3,7 +3,7 @@ import type { RegistryManifest } from './registry.schema.ts';
 /**
  * Copy-based registry manifest for the published `@netscript/fresh-ui` foundation package.
  */
-export const freshUiRegistryManifest = {
+export const freshUiRegistryManifest: RegistryManifest = {
   name: 'fresh-ui-foundation',
   version: '0.1.0',
   packageName: '@netscript/fresh-ui',

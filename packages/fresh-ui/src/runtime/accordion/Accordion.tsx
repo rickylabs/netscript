@@ -24,7 +24,7 @@ function useAccordionItemContext(partName: string): AccordionItemOptions {
   return requireFreshUiContext(useContext(AccordionItemContext), partName, 'Accordion.Item');
 }
 
-function withChildren(children: ComponentChildren) {
+function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
@@ -83,8 +83,16 @@ function AccordionItemContent({ children, ...props }: AccordionItemContentProps)
   return <div {...accordion.getItemContentProps(item, props)}>{withChildren(children)}</div>;
 }
 
+type AccordionNamespace = Readonly<{
+  Item: typeof AccordionItem;
+  ItemContent: typeof AccordionItemContent;
+  ItemIndicator: typeof AccordionItemIndicator;
+  ItemTrigger: typeof AccordionItemTrigger;
+  Root: typeof AccordionRoot;
+}>;
+
 /** Compound accordion namespace with root and item subcomponents. */
-export const Accordion = {
+export const Accordion: AccordionNamespace = {
   Item: AccordionItem,
   ItemContent: AccordionItemContent,
   ItemIndicator: AccordionItemIndicator,
