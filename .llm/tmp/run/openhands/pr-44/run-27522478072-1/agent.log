@@ -1,0 +1,400 @@
+boundary but decoupled at
++16|runtime** (Risk R-11), so the slice plan offers a default decoupled path 
+(slice 0 = Deno only,
++17|slice 1 = Aspire 13.4 GA) and a coupled fallback (slice 1b) for the case 
+where Aspire 13.4 ships
++18|still-preview relative to Deno 2.8.
++19|
++20|## Changes
++21|
++22|**Files created/modified (everything lives under the run-scoped dir):**
++23|
++24|| File | Status | Purpose |
++25||---|---|---|
++26|| `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/research.md` | 
+filled (was skeleton) | Full deliverable: discrepancy reconciliation with prior 
+notes + Sections A–G + end-to-end checklist |
++27|| `/home/runner/work/_temp/openhands/27522478072-1/summary.md` | created | 
+This run summary |
++28|
++29|**No source/config files were touched.** The hard scope boundaries from 
+`research-brief.md` were
++30|honoured: no `deno.json`/`deno.jsonc`, no `*.csproj`/`global.json`, no 
+lockfile, no `packages/`
++31|code. No `deno cache --reload`. No `deno upgrade`. No `git commit`/`push`.
++32|
++33|### `research.md` section structure
++34|
++35|- **Discrepancies vs prior notes** (D-1..D-5) — re-verified claims in
++36|  `…/master--public-release-program/notes/TOOLCHAIN-2.8.md` and 
+`…/ASPIRE-13.4-13.5.md` and
++37|  corrected the references to `packages/NetScript.Aspire.Hosting/` (does not
+exist) and the
++38|  "committed `dotnet/AppHost/AppHost.csproj`" (it is generated, not 
+committed).
++39|- **Section A — Deno 2.8 adoption matrix** (18 rows). 12 adopt-now (5 
+already adopted and
++40|  verified), 1 adopt-with-debt (the four `--allow-slow-types` carve-outs in
++41|  `contracts`/`triggers`/`service`/`plugin` → 4 `DEBT_ACCEPTED` rows in 
+`arch-debt.md`),
++42|  3 defer (OTel exporters, `deno pack`, Lume framework detection), 1 free 
+upgrade (TS 6.0.3).
++43|- **Section B — Deno 2.8 legacy removal** (8 rows). 1 partial deletion (B-3:
+hand-rolled
++44|  slow-type workarounds outside the four carve-outs), 4 audits (B-4 dead 
+lint suppressions,
++45|  B-6 `isolatedDeclarations: false` overrides, B-8 per-package `lib` 
+duplicates, B-1 verification
++46|  grep), 3 no-action (B-2, B-5, B-7).
++47|- **Section C — Aspire 13.4 adoption matrix** (9 rows). 5 adopt-now (C-1, 
+C-2, C-3 = version
++48|  bumps in `SCAFFOLD_VERSIONS`; C-6 = `aspire logs --search` in the e2e 
+smoke; C-7 = Aspire MCP
++49|  docs surface), 1 adopt-with-coordination (C-5 = `WithProcessCommand()` 
+joint with Wave 6 CLI),
++50|  1 defer to Wave 6 (C-4 = `apphost.mts` + `.aspire/modules/` path 
+realignment — explicitly
++51|  flagged as owned by the CLI research, not duplicated here per the brief's 
+overlap rule),
++52|  1 defer to 13.5 (C-8 = `aspire doctor` Deno reporting), 1 partial (C-9 — 
+version metadata
++53|  is via NuGet/npm, not the docs MCP).
++54|- **Section D — Aspire 13.4 legacy removal + 13.5 flip seam**. 8 legacy 
+rows: 2 outright
++55|  deletions (D.1-1, D.1-2 — both are version-pin consolidations; D.1-2 
+specifically removes
++56|  the duplicated `SCAFFOLD_COMMUNITY_TOOLKIT.VERSION = '13.2.1-beta.532'` 
+constant in
++57|  `scaffold-aspire.ts:11`), 2 deferrals to Wave 6 (D.1-3 `.modules/`, D.1-4 
+`apphost.ts`),
++58|  2 deferrals to 13.5 (D.1-6, D.1-8 — `_aspire-compat.ts` shim), 1 audit 
+(D.1-5 — tsx +
++59|  vscode-jsonrpc pin in `render-ts-apphost.ts:51-62`), 1 new wiring (C-5). 
+The 13.5
++60|  flip-seam design (D.2) mirrors the validation checklist from 
+`microsoft/aspire#16218`
++61|  (which we requested) — toolchain resolver, `aspire doctor` Deno line, CLI 
+E2E
++62|  restore/run/doctor. The single concrete 13.4 design choice that makes the 
+13.5 flip cheap:
++63|  ship stubbed `# [aspire-13.5]` blocks in the 13.4 `apphost.ts` template so
+the 13.5 diff is
++64|  fill-in-the-stubs, not a rewrite.
++65|- **Section E — Coordinated validation plan.** 9 per-PR gates (E-1 `deno 
+ci`, E-2 `deno audit`,
++66|  E-3 `deno task check`, E-4 lint, E-5 fmt:check, E-6 test, E-7 
+`arch:check`, E-8
++67|  `publish:dry-run`, E-9 per-function coverage); 3 nightly/release-only 
+(E-10
++68|  `e2e:cli run scaffold.runtime`, E-11 `aspire run` end-to-end with 
+`--search`, E-12 scaffold
++69|  version pin verification); 1 deferred to 13.5 (E-13 `aspire doctor` Deno 
+line). E-4 also
++70|  acts as the B-4 dead-suppression detector. E-4 is the cheap new gate. E-10
+is the one that
++71|  proves the Aspire 13.4 ↔ Deno 2.8 coupling is sane.
++72|- **Section F — Risk register** (16 risks, R-1..R-16, with L/M/H likelihood 
++ blast-radius +
++73|  owner). Highest-blast: R-7 (Aspire 13.4 preview pin — guarded by E-12 + 
+the "no preview"
++74|  CI test), R-11 (coupled Deno+Aspire upgrade — guarded by the slice plan's 
+single-PR coupled
++75|  fallback), R-2 (JSR publish gate — guarded by E-8). Highest-likelihood: 
+R-4 (carve-out scope
++76|  in the four heavy-generic packages — guarded by the 20-symbol cap in 
+A-12), R-6 (.NET 10 RC
++77|  shifts — guarded by `allowPrerelease: true` already in the generator), R-7
+(Aspire preview),
++78|  R-16 (`.modules/` path drift — guarded by the single-file ownership rule 
+in R-14). R-1, R-3,
++79|  R-9, R-10, R-12 are deferred to S5 or post-alpha.
++80|- **Section G — Upgrade slice plan** (5 branches; 4 default + 1 fallback).
++81|  - **Slice 0** `chore/deno-2.8-toolchain-pin-foundation` off 
+`feat/package-quality` —
++82|    Deno only. Pins `v2.8.x`, adds `catalog:`, removes dead suppressions, 
+normalizes
++83|    `isolatedDeclarations`/`lib`, applies the 4 carve-outs with paired 
+`arch-debt.md` rows,
++84|    adds `deno audit`, per-function coverage, `deno task --parallel`. Pass: 
+E-1..E-9.
++85|  - **Slice 1** `chore/aspire-13.4-version-bump` off `feat/package-quality` 
+— Aspire 13.4
++86|    decoupled. Updates the 3 `SCAFFOLD_VERSIONS` constants (C-1, C-2, C-3), 
+consolidates
++87|    `SCAFFOLD_COMMUNITY_TOOLKIT` (D.1-2), audits `tsx`/`vscode-jsonrpc` 
+(D.1-5), stubs the
++88|    13.5 blocks in the apphost template (D.2), wires `aspire logs --search` 
+(C-6). Pass:
++89|    E-1..E-9 + E-10 + E-12. **Path realignment deferred to Wave 6.**
++90|  - **Slice 1b** `chore/deno-2.8-aspire-13.4-coupled` — fallback when 13.4 
+ships preview-only.
++91|    Combines slice 0 + slice 1 in a single PR (R-11). Pass: E-1..E-12 
+together.
++92|  - **Slice 2** `chore/aspire-13.4-doctor-and-typed-commands` — joint with 
+Wave 6 CLI.
++93|    Wires `WithProcessCommand()` consuming the CLI typed-args schema (C-5, 
+R-15), documents
++94|    the Aspire MCP surface in `.agents/skills/aspire/SKILL.md` (C-7), adds 
+the `aspire doctor`
++95|    step (skip-when-13.4) to the e2e smoke (D.2/E-13).
++96|  - **Slice 3** `chore/aspire-13.5-native-deno-apphost` — post-13.5 GA, 
+**not a launch gate**.
++97|    Deletes the `_aspire-compat.ts` shim, fills the stubbed 13.5 blocks, 
+un-skips E-13.
++98|
++99|  Each slice is independently mergeable; the per-PR gates E-1..E-9 are 
+required for every
++100|  slice, the nightly gates E-10..E-12 are required only for the 
+Aspire-touching slices.
++101|
++102|### Cross-reference / non-duplication
++103|
++104|- **Wave 6 CLI research (PR #43)** owns the apphost scaffold + 
+`deploy`/command-registry
++105|  surface. This research explicitly **deferes to Wave 6** for: C-4 (path 
+realignment
++106|  `apphost.mts` + `.aspire/modules/`), C-5 (typed-args schema ownership), 
+and the path delta
++107|  in D.1-3 / D.1-4. The brief's hard rule — "this owns toolchain version + 
+feature adoption;
++108|  CLI owns apphost-scaffold/deploy seam" — is enforced via a single-file 
+ownership rule
++109|  (R-14): toolchain upgrade owns `scaffold-versions.ts` and 
+`copilot-setup-steps.yml`; CLI
++110|  Wave 6 owns `scaffold-files.ts` and `scaffold-aspire.ts` (for the 
+`APPHOST_TS` and
++111|  `SDK_IMPORT_FROM_HELPERS` paths). The two research strands are sequenced:
+toolchain pin
++112|  lands first, Wave 6 path migration consumes the new pin.
++113|
++114|## Validation
++115|
++116|This is a **research-only** phase, so the validation is **read-only 
+re-verification** rather
++117|than a gate run. The verification work performed:
++118|
++119|1. **Re-read both prior notes** (TOOLCHAIN-2.8.md, ASPIRE-13.4-13.5.md) to 
+confirm or refute
++120|   their claims. Found 5 discrepancies (D-1..D-5) — all recorded in the 
+artifact, not
++121|   silently re-derived.
++122|2. **Verified the current scaffold constants** at
++123|   `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`,
++124|   `scaffold-files.ts`, `scaffold-aspire.ts`, `scaffold-dirs.ts`, 
+`scaffold-defaults.ts`. The
++125|   claim that `SCAFFOLD_COMMUNITY_TOOLKIT.VERSION = '13.2.1-beta.532'` is 
+**duplicated state**
++126|   with `SCAFFOLD_VERSIONS.ASPIRE_HOSTING_DENO` is confirmed 
+(scaffold-aspire.ts:11) and is
++127|   the basis for D.1-2.
++128|3. **Verified the current CI pin** at
++129|   `.github/workflows/copilot-setup-steps.yml:42` (`deno-version: v2.x`) 
+and the Aspire CLI
++130|   install via `aspire.dev` install script (not `dotnet workload install`).
++131|4. **Verified the `dotnet/global.json` generator**
++132|   (`packages/cli/src/kernel/templates/aspire/generate-global-json.ts`) 
+emits
++133|   `allowPrerelease: true`, which is the basis for the R-6 mitigation.
++134|5. **Counted the workspace members** — 28 `deno.json` files in `packages/` 
++ `plugins/` —
++135|   to confirm the A-8 catalog-rewrite scope.
++136|6. **Surveyed @std/zod usage** — 354 files reference `@std/*`, 90 reference
+`zod` — to confirm
++137|   the A-8 catalog centralisation is the right shape.
++138|7. **Verified the `dotnet/net10.0` target** in
++139|   `ServiceDefaults.csproj.template` and the `tx`/`vscode-jsonrpc` pin in
++140|   `render-ts-apphost.ts:51-62` (basis for D.1-5).
++141|
++142|**No gate was run.** Per the brief, the impl phase runs the gates, not this
+research.
++143|
++144|## Responses to review comments or issue comments when relevant
++145|
++146|N/A — this is a fresh PR-comment trigger on a research branch. No prior 
+review comments
++147|apply. The artifact is the deliverable; review is the next step.
++148|
++149|## Remaining risks
++150|
++151|The top three "must watch" risks for the impl phase, in priority order:
++152|
++153|1. **R-7 (Aspire 13.4 is still pre-release).** The bump should not happen 
+until Aspire cuts
++154|   13.4.x GA. Guard with the E-12 "no preview" assertion in 
+`check-scaffold-versions.ts`.
++155|2. **R-11 (Deno+Aspire type-system coupling).** If Aspire 13.4's 
+regenerated SDK requires
++156|   TS 5.6+, slice 1 (decoupled) is invalid and the impl must use slice 1b 
+(coupled).
++157|   Verify by reading the Aspire 13.4 preview release notes *before* opening
+the impl
++158|   PR; if the SDK target is unclear, prefer the coupled slice as a safer 
+default.
++159|3. **R-16 (`.modules/` path drift).** Until Wave 6 lands the path 
+realignment, the
++160|   generated `aspire.config.json` references the legacy 
+`.modules/aspire.ts` path. The
++161|   13.4 SDK accepts the legacy path (forward-compatible per the live 13.2.2
+verification),
++162|   so this is **not** a launch blocker, but it is drift the maintainer 
+should be aware of
++163|   in PR review.
++164|
++165|**Medium risks to monitor in the impl phase:** R-4 (carve-out scope 
+explosion in the four
++166|heavy-generic packages — the 20-symbol cap is the guard), R-2 (JSR publish 
+gate rejecting
++167|Node-leaking types — guard with E-8 across all 28 member packages), R-6 
+(.NET 10 RC shifts —
++168|guard with `dotnet --list-sdks \| grep 10` in CI).
++169|
++170|**Deferred to post-alpha / S5:** R-1 (Fresh/Preact inference under TS 6.0.3
+— owned by S5),
++171|R-3 (Lume — out of scope), R-9 + R-10 (CI pin friction — re-evaluate at 
+beta), R-12
++172|(Aspire 13.4 SDK TS target — verify before opening the impl PR).
++173|
++174|---
++175|
++176|**RESEARCH COMPLETE**
++177|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Move summary into place
+
+$ cd /home/runner/work/netscript/netscript && mv 
+/home/runner/work/_temp/openhands/27522478072-1/summary.md.tmp 
+/home/runner/work/_temp/openhands/27522478072-1/summary.md && tail -5 
+/home/runner/work/_temp/openhands/27522478072-1/summary.md && echo "---" && wc 
+-l /home/runner/work/_temp/openhands/27522478072-1/summary.md
+
+Tokens: ↑ input 4.54M • cache hit 87.84% •  reasoning 3.76K • ↓ output 64.54K • 
+$ 0.4827
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+(Aspire 13.4 SDK TS target — verify before opening the impl PR).
+
+---
+
+**RESEARCH COMPLETE**
+---
+176 /home/runner/work/_temp/openhands/27522478072-1/summary.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final integrity check
+
+Thought:
+Summary file is in place at the correct path, ends with the required `RESEARCH 
+COMPLETE` line. Now let me do a final integrity check: verify no source/config 
+files were touched, and confirm git status only shows the new file in 
+`.llm/tmp/run/`.
+
+$ cd /home/runner/work/netscript/netscript && git status --short 2>/dev/null; 
+echo "---branch---"; git rev-parse --abbrev-ref HEAD 2>/dev/null; echo 
+"---base---"; git log -1 --oneline 2>/dev/null; echo "---all artifacts under run
+dir---"; find .llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research -type f 
+2>/dev/null; echo "---summary file present?---"; ls -la 
+/home/runner/work/_temp/openhands/27522478072-1/summary.md 2>/dev/null
+
+Tokens: ↑ input 4.6M • cache hit 88.00% •  reasoning 3.76K • ↓ output 64.79K • $
+0.4865
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+M .llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/research.md
+?? .llm/tmp/run/openhands/pr-44/
+---branch---
+chore/deno-2.8-aspire-13.4-upgrade
+---base---
+cd643d4 (HEAD -> chore/deno-2.8-aspire-13.4-upgrade, 
+origin/chore/deno-2.8-aspire-13.4-upgrade) docs(toolchain): scaffold Deno 2.8 + 
+Aspire 13.4 upgrade RESEARCH brief, context-pack, skeleton
+---all artifacts under run dir---
+.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/research-brief.md
+.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/research.md
+.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/context-pack.md
+---summary file present?---
+-rw------- 1 runner runner 11770 Jun 15 04:01 
+/home/runner/work/_temp/openhands/27522478072-1/summary.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Wrote toolchain-upgrade research artifact and summary
+
+Thought:
+Final state is clean and correct:
+
+- **Branch:** `chore/deno-2.8-aspire-13.4-upgrade` (the correct research 
+branch).
+- **Files modified (1) + created (1, by the runner):** only 
+`.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/research.md` (the 
+deliverable) is `M`-staged. The `?? .llm/tmp/run/openhands/pr-44/` is the 
+workflow's own trace dir, not mine.
+- **No source/config/lockfile touched** — confirmed by the diff scope.
+- **All artifacts live under the run-scoped dir.**
+- **Summary at the correct path** ending with `RESEARCH COMPLETE`.
+
+Finish with message:
+RESEARCH COMPLETE.
+
+Deliverable: 
+`.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/research.md` (487 
+lines, ~57 KB) — fully filled sections A (Deno 2.8 adoption matrix, 18 rows), B 
+(Deno 2.8 legacy removal, 8 rows), C (Aspire 13.4 adoption matrix, 9 rows), D 
+(Aspire 13.4 legacy removal + 13.5 native-Deno-apphost seam design), E 
+(coordinated validation plan, 9 per-PR + 3 nightly + 1 deferred gates), F 
+(16-row risk register R-1..R-16), G (5-branch slice plan: slice 0 Deno-only, 
+slice 1 Aspire-decoupled, slice 1b Aspire-coupled fallback, slice 2 
+Wave-6-joint, slice 3 post-13.5) + 5 discrepancy reconciliations against the 
+prior TOOLCHAIN-2.8.md / ASPIRE-13.4-13.5.md notes + end-to-end checklist.
+
+Run summary written to 
+`/home/runner/work/_temp/openhands/27522478072-1/summary.md`, ending with 
+`RESEARCH COMPLETE` as required.
+
+Scope honoured: zero source/config edits, zero lockfile changes, zero `deno 
+upgrade`/`deno cache --reload`. Only files touched are inside the run-scoped 
+`.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/` directory plus the 
+workflow summary path. `git status` confirms: 1 file modified (the research.md) 
++ the workflow's own trace dir.
+
+Key research findings:
+- The 13.4 upgrade is mostly a 3-line `SCAFFOLD_VERSIONS` bump in 
+`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts` (C-1, C-2, 
+C-3). The path realignment (`apphost.mts` + `.aspire/modules/`) is explicitly 
+owned by the Wave 6 CLI research, not duplicated here.
+- The 13.5 native-Deno-apphost seam is designed so the 13.4 apphost template 
+ships with stubbed `# [aspire-13.5]` blocks — the 13.5 diff becomes 
+fill-in-the-stubs, not a rewrite.
+- Highest-blast risks (R-7 Aspire 13.4 preview pin, R-11 Deno↔Aspire type-system
+coupling, R-2 JSR publish gate) are guarded by the slice plan + E-12/E-8 gates. 
+Highest-likelihood (R-4 carve-out scope, R-6 .NET 10 RC shifts, R-7 preview, 
+R-16 `.modules/` path drift) are guarded by the 20-symbol cap, `allowPrerelease:
+true`, E-12 "no preview" test, and the single-file ownership rule between 
+toolchain + Wave 6.
+- Two research strands sequenced: toolchain pin lands first, Wave 6 path 
+migration consumes the new pin.
+
+No implementation, no version bumps, no merging. The branch is ready for the 
+impl phase (or for a follow-up research pass if the maintainer wants a deeper 
+dive on any section).
+
+Tokens: ↑ input 4.66M • cache hit 88.14% •  reasoning 3.76K • ↓ output 65.69K • 
+$ 0.4913
+
