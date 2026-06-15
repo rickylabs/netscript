@@ -26,7 +26,7 @@ const page: FormPageDefinition = definePage<FormPageState>()
     schema,
     csrf: false,
     initial: () => ({ name: 'Ada' }),
-    mutate: (input) => ({ greeting: `Hello ${input.name}` }),
+    mutate: (input: z.input<typeof schema>) => ({ greeting: `Hello ${input.name}` }),
   })
   .withLayout((slots) => <main>{slots.form()}</main>)
   .build({ routePattern: '/playground/builders/form-page' });

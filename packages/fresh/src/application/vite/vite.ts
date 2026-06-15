@@ -297,7 +297,7 @@ export function createNetScriptVitePlugin(
 
       if (routeManifest) {
         server.watcher.add(routeManifest.routesDir);
-        server.watcher.on('all', (_event, filePath) => {
+        server.watcher.on('all', (_event: string, filePath: string) => {
           const watchedFilePath = resolveWatchedFilePath(appRoot, filePath);
           if (!isRouteManifestWatchPath(watchedFilePath, routeManifest)) {
             return;

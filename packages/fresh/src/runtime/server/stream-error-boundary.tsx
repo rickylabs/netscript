@@ -7,7 +7,7 @@
  * @module
  */
 
-import { Component } from 'preact';
+import { Component } from 'preact/compat';
 import type { ComponentChildren } from 'preact';
 
 /** Renderable content accepted by streaming error boundaries. */

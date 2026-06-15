@@ -111,11 +111,11 @@ const WorkersConfigObjectSchema = z.object({
   enabled: z.boolean().default(true),
 });
 
-const WorkersConfigZodSchema = WorkersConfigObjectSchema.transform((config) => ({
+const WorkersConfigZodSchema = WorkersConfigObjectSchema.transform((config: WorkersConfigData) => ({
   ...config,
-  groups: config.groups.map((group) => ({
+  groups: config.groups.map((group: WorkerGroupData) => ({
     ...group,
-    jobs: group.jobs.map((job) => ({
+    jobs: group.jobs.map((job: JobConfig) => ({
       ...job,
       topic: group.topic,
     })),

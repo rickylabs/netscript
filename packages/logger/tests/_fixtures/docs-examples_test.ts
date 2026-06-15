@@ -10,7 +10,7 @@ import {
   withContext,
 } from '../../mod.ts';
 import { loggerMiddleware, type LoggerMiddlewareEnv } from '../../middleware.ts';
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 
 Deno.test('logger docs examples: configure root service logging', async () => {
   await resetLogging();
@@ -28,7 +28,10 @@ Deno.test('logger docs examples: install Hono request middleware', async () => {
   const app = new Hono<LoggerMiddlewareEnv>();
 
   app.use('*', loggerMiddleware('users'));
-  app.get('/health', (ctx) => ctx.json({ ok: true, requestId: ctx.get('requestId') }));
+  app.get(
+    '/health',
+    (ctx: Context<LoggerMiddlewareEnv>) => ctx.json({ ok: true, requestId: ctx.get('requestId') }),
+  );
 
   const response = await app.request('http://localhost/health', {
     headers: { 'X-Request-ID': 'req-docs' },

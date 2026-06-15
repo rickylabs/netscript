@@ -9,8 +9,8 @@
     "./testing": "./src/testing/mod.ts"
   },
   "imports": {
-    "@durable-streams/client": "npm:@durable-streams/client@^0.2.3",
-    "@durable-streams/state": "npm:@durable-streams/state@^0.2.3",
+    "@durable-streams/client": "catalog:",
+    "@durable-streams/state": "catalog:",
     "@std/assert": "jsr:@std/assert@^1"
   },
   "tasks": {

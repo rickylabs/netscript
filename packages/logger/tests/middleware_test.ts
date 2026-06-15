@@ -1,12 +1,12 @@
 import { assertEquals } from '@std/assert';
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 import { loggerMiddleware, type LoggerMiddlewareEnv } from '../middleware.ts';
 
 Deno.test('loggerMiddleware injects request metadata into Hono context', async () => {
   const app = new Hono<LoggerMiddlewareEnv>();
 
   app.use('*', loggerMiddleware('users'));
-  app.get('/users', (ctx) =>
+  app.get('/users', (ctx: Context<LoggerMiddlewareEnv>) =>
     ctx.json({
       hasLogger: Boolean(ctx.get('logger')),
       requestId: ctx.get('requestId'),

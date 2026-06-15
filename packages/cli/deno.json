@@ -31,7 +31,7 @@
     "@std/semver": "jsr:@std/semver@^1.0.0",
     "@cliffy/prompt": "jsr:@cliffy/prompt@^1.0.0",
     "@david/dax": "jsr:@david/dax@^0.43.0",
-    "zod": "npm:zod@^4.3.6",
+    "zod": "catalog:",
     "@netscript/aspire": "../aspire/mod.ts",
     "@netscript/config": "../config/mod.ts",
     "@netscript/plugin": "../plugin/mod.ts",

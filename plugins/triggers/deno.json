@@ -39,11 +39,11 @@
     "@netscript/watchers": "../../packages/watchers/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1.0.0",
-    "@durable-streams/state": "npm:@durable-streams/state@^0.2.3",
-    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
-    "@orpc/server": "npm:@orpc/server@^1.13.5",
+    "@durable-streams/state": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:",
     "hono": "jsr:@hono/hono@^4",
-    "zod": "npm:zod@^4.3.6"
+    "zod": "catalog:"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",

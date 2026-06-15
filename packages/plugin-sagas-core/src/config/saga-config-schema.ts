@@ -93,7 +93,7 @@ export const SagaTimeoutConfigSchema: ConfigSchema<SagaConfigEntry['timeout']> =
   SagaTimeoutConfigZodSchema;
 
 const SagaEntryConfigSchema: z.ZodType<SagaConfigEntry> = z.object({
-  id: z.string().min(1).transform((id) => id as SagaId),
+  id: z.string().min(1).transform((id: string) => id as SagaId),
   topic: z.string().min(1).optional(),
   name: z.string().min(1),
   description: z.string().min(1).optional(),
@@ -155,11 +155,11 @@ const SagaConfigObjectSchema: z.ZodType<SagaConfigData> = z.object({
 
 /** Saga plugin configuration schema. */
 const SagaConfigZodSchema: z.ZodType<SagaConfigData | undefined> = SagaConfigObjectSchema
-  .transform((config) => ({
+  .transform((config: SagaConfigData) => ({
     ...config,
-    groups: config.groups.map((group) => ({
+    groups: config.groups.map((group: SagaGroupConfigData) => ({
       ...group,
-      sagas: group.sagas.map((saga) => ({
+      sagas: group.sagas.map((saga: SagaConfigEntry) => ({
         ...saga,
         topic: group.topic,
       })),

@@ -15,16 +15,16 @@ const INVALID_TRACE_ID = '00000000000000000000000000000000';
 const INVALID_SPAN_ID = '0000000000000000';
 
 const headersGetter: TextMapGetter<PropagationHeaders> = {
-  keys(carrier) {
+  keys(carrier: PropagationHeaders) {
     return Object.keys(carrier);
   },
-  get(carrier, key) {
+  get(carrier: PropagationHeaders, key: string) {
     return carrier[key.toLowerCase()];
   },
 };
 
 const headersSetter: TextMapSetter<PropagationHeaders> = {
-  set(carrier, key, value) {
+  set(carrier: PropagationHeaders, key: string, value: string) {
     carrier[key.toLowerCase()] = value;
   },
 };

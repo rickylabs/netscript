@@ -125,8 +125,8 @@ export function stringToNumber(
   outputSchema: ContractDefaultableSchema<number>,
 ): ContractSchema<number> {
   return z.codec(z.string().regex(z.regexes.number), outputSchema as z.ZodNumber, {
-    decode: (value) => Number.parseFloat(value),
-    encode: (value) => (value ?? 0).toString(),
+    decode: (value: string) => Number.parseFloat(value),
+    encode: (value: number) => (value ?? 0).toString(),
   }) as unknown as ContractSchema<number>;
 }
 
@@ -135,7 +135,7 @@ export function stringToInt(
   outputSchema: ContractDefaultableSchema<number>,
 ): ContractSchema<number> {
   return z.codec(z.string().regex(z.regexes.integer), outputSchema as z.ZodNumber, {
-    decode: (value) => Number.parseInt(value, 10),
-    encode: (value) => (value ?? 0).toString(),
+    decode: (value: string) => Number.parseInt(value, 10),
+    encode: (value: number) => (value ?? 0).toString(),
   }) as unknown as ContractSchema<number>;
 }

@@ -253,7 +253,7 @@ function createRouteReferenceBase<TPath extends object, TSearch extends object>(
   const getLinkPropsForReference: Reference['getLinkProps'] = (input) => {
     return getBoundLinkProps(reference, input);
   };
-  const RouteLink: Reference['Link'] = (props) => {
+  const RouteLink: Reference['Link'] = (props: BoundLinkProps<Reference>) => {
     return Link<Reference>({
       to: reference,
       ...(props as BoundLinkProps<Reference>),

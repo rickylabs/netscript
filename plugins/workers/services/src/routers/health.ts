@@ -54,7 +54,7 @@ export const health: Record<string, unknown> = {
   /**
    * Simple ping endpoint - for testing oRPC connectivity
    */
-  ping: healthContractV1.ping.handler(({ input }) => {
+  ping: healthContractV1.ping.handler(({ input }: { input?: { message?: string } }) => {
     return {
       message: input?.message ? `Pong: ${input.message}` : 'Pong!',
       timestamp: new Date().toISOString(),

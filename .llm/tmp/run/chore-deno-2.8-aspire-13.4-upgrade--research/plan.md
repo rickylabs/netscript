@@ -47,8 +47,10 @@ alpha). This run delivers the toolchain foundation that **Phase P** (JSR alpha p
 ## Execution Status (IMPL delta — 2026-06-15)
 
 The type foundation is **green**: `deno task check` = 0 errors, `deno task lint` clean
-(340 files), `deno task fmt --check` clean. `deno.lock` untouched; no `.md` edited by the
-generator. Status against the original slice table:
+(340 files), `deno task fmt --check` clean. As of the green-up, `deno.lock` was untouched;
+from **T2 onward this run intentionally rewrites `deno.lock`** (catalog harmonisation, the
+`@orpc/client` bump), which is the expected output of a toolchain upgrade — see **LD-11**. No
+`.md` edited by the generator. Status against the original slice table:
 
 **Done (on branch `chore/deno-2.8-aspire-13.4-upgrade`):**
 
@@ -66,19 +68,24 @@ generator. Status against the original slice table:
   restructure (LD-8), so it is carved out temporarily, not annotated. This is the **5th**
   carve-out, in addition to the four publish `--allow-slow-types` ones (LD-5).
 
+**Done (cont.):**
+
+- **T1** — `5458ea9` CI pin `v2.x → v2.8.x` (`copilot-setup-steps.yml`). ✅
+
 **Remaining (resequenced — generator resumes here):**
 
-1. **T1** — CI pin `v2.x → v2.8.x` (`copilot-setup-steps.yml`). (Authored once but never
-   committed; redo cleanly, LF-native.)
-2. **T2** — `catalog:` block + 28-member `deno.json` rewrite.
-3. **T4** — the four publish `--allow-slow-types` carve-outs + `arch-debt.md` rows, then
-   `publish:dry-run` across all 28 members (E-8). The isolatedDeclarations annotations above
+1. **T2** — `catalog:` block + member `deno.json` rewrite (npm deps only — `catalog:` is
+   npm-only; `jsr:`/`@std` stay as-is). `catalog:` in member `imports` requires Deno **2.8.3**
+   (PR #35168, merged 2026-06-13); 2.8.0 fails with `Unsupported scheme "catalog"`. The
+   harmonisation **rewrites `deno.lock`** (duplicate-specifier consolidation) — expected, not
+   drift (LD-11). Real member count is **27** `deno.json`, not 28 (the "28" was an estimate).
+2. **T4** — the four publish `--allow-slow-types` carve-outs + `arch-debt.md` rows, then
+   `publish:dry-run` across all members (E-8). The isolatedDeclarations annotations above
    reduce but do not formally close this; the carve-outs + debt rows are still required.
-4. **T5 (last)** — `deno ci` + per-fn coverage + `deno task --parallel` in CI, and the
+3. **T5 (last)** — `deno ci` + per-fn coverage + `deno task --parallel` in CI, and the
    **APPROVED** `deno audit` remediation: bump `@orpc/client` past the runtime-reachable
-   CRITICAL advisory (the one slice permitted to move `deno.lock`); `vite`/`esbuild`
-   advisories deferred as `DEBT_ACCEPTED` (dev-server / build-time only). `deno audit` runs
-   **last** so it reflects the final lockfile.
+   CRITICAL advisory; `vite`/`esbuild` advisories deferred as `DEBT_ACCEPTED` (dev-server /
+   build-time only). `deno audit` runs **last** so it reflects the final lockfile.
 
 **Delta-scoped gates:** only slices touched after this point re-run their gates; the green
 type state above does not need re-proving except where T2 (`catalog:`) or T4 (carve-outs)
@@ -138,13 +145,14 @@ worktree, and the generator runs in Linux (`/home/codex/repos`).
 | LD-8 | **Single-file ownership**: this run owns `scaffold-versions.ts` + `copilot-setup-steps.yml`; Wave 6 owns `scaffold-files.ts` + `scaffold-aspire.ts` apphost-path migration. | Prevents the two parallel programs from colliding on the same files. |
 | LD-9 | `lib.node` default-on is exploited as a capability; **do not** add `"node"` to `compilerOptions.lib`. | Preserves the `no-node-globals` guard for the multi-runtime library (A-11). |
 | LD-10 | `packages/cli` (+ `cli/e2e`) gets a temporary `isolatedDeclarations: false` carve-out (`DEBT_ACCEPTED`), not per-symbol annotation. | The CLI publish surface is Wave 6's (A6-v2); annotating now collides with that restructure (LD-8). 5th carve-out, additional to LD-5's four. |
+| LD-11 | **`deno.lock` mutation is expected and approved across the whole run** (T2 catalog harmonisation, T5 `@orpc/client` bump), not gated to a single slice. The generator commits the regenerated lock alongside each slice; lock churn is **never** "MAJOR drift". Block only on real gate failures (check/lint/test/publish). Still never delete the lock or run `deno cache --reload` without approval. | A toolchain upgrade's whole purpose is to move the lockfile; treating its churn as drift stalls the run. (Maintainer decision, 2026-06-15) |
 
 ## Open-Decision Sweep
 
 | Decision | Status | Notes |
 | -------- | ------ | ----- |
 | Is Aspire 13.4 GA today? | safe to defer (gated) | Resolved at impl time by E-12; plan carries both LD-6 forks, so deferral forces no rework. |
-| `catalog:` syntax — `imports` block vs new top-level `"catalog"` key | safe to defer | 2.8 supports both; pick at slice 0.2 against the live `deno --version` help. No structural impact. |
+| `catalog:` syntax — `imports` block vs new top-level `"catalog"` key | **resolved** | Root top-level `"catalog"` block + member `imports: "catalog:"`. **npm-only** (`jsr:` value → `Invalid version requirement`). Requires Deno **2.8.3** for member-`imports` resolution (PR #35168); 2.8.0 errors `Unsupported scheme "catalog"`. |
 | Per-function coverage CI artifact format | safe to defer | A-14 is a CI-signal add; the report shape is cosmetic, not a gate. |
 
 > No open decision forces rework if deferred → Plan-Gate "open-decision sweep" is satisfiable.
@@ -194,8 +202,8 @@ Phase T = one PR (`chore/deno-2.8-toolchain-pin-foundation`). Phase A = one PR
 | # | Slice | Proves | Gate | Files |
 | - | ----- | ------ | ---- | ----- |
 | T0 | ✅ **done** `f16b31f` Aspire barrel `dry-run` fix (LD-1) | `publish:dry-run` of `packages/aspire` goes green | E-8 | `packages/aspire/src/public/mod.ts` |
-| T1 | ⏳ CI pin `v2.8.x` (A-1) | CI runs Deno 2.8 | E-1..E-9 | `.github/workflows/copilot-setup-steps.yml` |
-| T2 | ⏳ `catalog:` block + 28-member rewrite (A-8) | dep harmonisation; members resolve via `catalog:` | E-3,E-4,E-5,E-6,E-8 | `deno.json` + 28 member `deno.json` |
+| T1 | ✅ **done** `5458ea9` CI pin `v2.8.x` (A-1) | CI runs Deno 2.8 | E-1..E-9 | `.github/workflows/copilot-setup-steps.yml` |
+| T2 | ⏳ `catalog:` block + 27-member rewrite, npm-only (A-8); rewrites `deno.lock` (LD-11) | dep harmonisation; members resolve via `catalog:` (Deno 2.8.3, #35168) | E-3,E-4,E-5,E-6,E-8 | `deno.json` + 27 member `deno.json` + `deno.lock` |
 | T3 | ✅ **done** `db11fb7`/`212189a`/`ac4ee94`/`b64dea1`/`f44c2da`/`939bbe9`/`03838d1` + cli carve-out `2d5e7ac` (LD-10): isolatedDeclarations normalization (B-4,B-6,B-8) | check=0, lint clean, fmt clean under 2.8 | E-3,E-4,E-7 | per-package `deno.json` + annotated `.ts` |
 | T4 | ⏳ Four `--allow-slow-types` carve-outs + debt rows (A-12, LD-5) | the four publish with recorded debt | E-7,E-8 | 4 `deno.json` + `arch-debt.md` |
 | T5 | ⏳ **last** `deno ci` + `deno audit` (APPROVED `@orpc/client` bump) + per-fn coverage + `--parallel` (A-7,A-9,A-14,A-17) | reproducible install + supply-chain + coverage signal | E-1,E-2,E-9 | CI workflow, `.llm/tools/*`, `deno.lock` (audit only) |

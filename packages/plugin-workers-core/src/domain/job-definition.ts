@@ -158,7 +158,7 @@ const JobResponseShape: JobResponseShape = JobResponseShapeValue;
 export const JobResponseSchema: z.ZodObject<typeof JobResponseShape> = z.object(JobResponseShape);
 
 /** API-safe job response. */
-export type JobResponse = typeof JobResponseSchema['_output'];
+export type JobResponse = z.output<typeof JobResponseSchema>;
 
 type ExecutionRecordShape = {
   id: z.ZodType<string>;
@@ -214,16 +214,28 @@ export const ExecutionRecordSchema: z.ZodObject<typeof ExecutionRecordShape> = z
 
 /** Execution record stored for real-time job and task state. */
 export type ExecutionRecord = Readonly<
-  & Omit<
-    typeof ExecutionRecordSchema['_output'],
-    'correlationId' | 'payload' | 'traceparent' | 'tracestate'
-  >
-  & Partial<
-    Pick<
-      typeof ExecutionRecordSchema['_output'],
-      'correlationId' | 'payload' | 'traceparent' | 'tracestate'
-    >
-  >
+  Record<string, unknown> & {
+    readonly id: string;
+    readonly concept: 'job' | 'task';
+    readonly jobId: string;
+    readonly topic: string;
+    readonly status: z.output<typeof ExecutionStatusSchema>;
+    readonly triggeredBy: z.output<typeof TriggerTypeSchema>;
+    readonly triggeredAt: string;
+    readonly startedAt: string | null;
+    readonly completedAt: string | null;
+    readonly exitCode: number | null;
+    readonly duration: number | null;
+    readonly error: string | null;
+    readonly result: Record<string, unknown> | null;
+    readonly workerId: string | null;
+    readonly attempt: number;
+    readonly maxAttempts: number;
+    readonly payload?: Record<string, unknown>;
+    readonly correlationId?: string;
+    readonly traceparent?: string;
+    readonly tracestate?: string;
+  }
 >;
 
 /** Lightweight execution state used by runtime inspectors. */

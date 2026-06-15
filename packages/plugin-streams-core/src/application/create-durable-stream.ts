@@ -71,8 +71,11 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
         headers,
         signal,
       });
-    } catch (error) {
-      if (error instanceof DurableStreamError && error.code === 'CONFLICT_EXISTS') {
+    } catch (error: unknown) {
+      if (
+        error instanceof DurableStreamError &&
+        (error as { readonly code?: unknown }).code === 'CONFLICT_EXISTS'
+      ) {
         handle = new DurableStream({ url, headers });
       } else {
         const wrapped = error instanceof Error ? error : new Error(String(error));

@@ -24,7 +24,7 @@
     "@std/collections": "jsr:@std/collections@^1",
     "@netscript/logger": "../logger/mod.ts",
     "@olli/kvdex": "jsr:@olli/kvdex@^3.5.0",
-    "ioredis": "npm:ioredis@^5.4.1"
+    "ioredis": "catalog:"
   },
   "publish": {
     "include": [

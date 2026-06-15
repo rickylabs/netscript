@@ -26,10 +26,10 @@
     "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1",
-    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
-    "@orpc/server": "npm:@orpc/server@^1.13.5",
-    "@standard-schema/spec": "npm:@standard-schema/spec@^1.1.0",
-    "zod": "npm:zod@^4.3.6"
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:",
+    "@standard-schema/spec": "catalog:",
+    "zod": "catalog:"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/contracts/v1/mod.ts src/registry/mod.ts src/state/mod.ts src/executor/mod.ts src/workflow/mod.ts src/streams/mod.ts src/presets/mod.ts src/shutdown/mod.ts src/domain/public-schema.ts src/telemetry/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/config/mod.ts src/runtime/mod.ts",

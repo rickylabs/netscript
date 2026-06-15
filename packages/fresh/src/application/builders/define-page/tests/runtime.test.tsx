@@ -1,6 +1,7 @@
 // Runtime seam tests split from ../define-page.test.tsx.
 import { definePage } from '../mod.ts';
 import { CSRF_COOKIE_NAME } from '../../../form/mod.ts';
+import type { CollectionDescriptor } from '../../../form/runtime/types.ts';
 import type { RuntimeFormState } from '../../../form/runtime/types.ts';
 import type { FormSubmissionResult } from '../../../form/runtime/types.ts';
 import { render as renderToString } from 'preact-render-to-string';
@@ -357,12 +358,15 @@ Deno.test('definePage withForm applies collection intents before returning runti
   await route.page(createRequestContext({ data }));
 
   assert(snapshot, 'Expected runtime form state after the intent round-trip');
+  const items = snapshot.fields.items as CollectionDescriptor<
+    { sku: string; quantity: string }
+  >;
   assert(
-    snapshot.fields.items.length === 2,
-    `Expected 2 collection rows, received: ${snapshot.fields.items.length}`,
+    items.length === 2,
+    `Expected 2 collection rows, received: ${items.length}`,
   );
   assert(
-    snapshot.fields.items.list[1]?.fields.quantity.controlProps({ type: 'number' }).defaultValue ===
+    items.list[1]?.fields.quantity.controlProps({ type: 'number' }).defaultValue ===
       '1',
     'Expected runtime field descriptors to expose the added row',
   );
