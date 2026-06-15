@@ -12,6 +12,8 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
+  type JobHandlerContext,
+  type JobResult,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { z } from 'zod';
@@ -29,7 +31,11 @@ const StagedCleanupPayloadSchema = z.object({
 // JOB HANDLER
 // ============================================================================
 
-const handler = defineJobHandler(async (ctx) => {
+type StagedCleanupJobHandler = (
+  context: JobHandlerContext,
+) => JobResult<unknown> | Promise<JobResult<unknown>>;
+
+const handler: StagedCleanupJobHandler = defineJobHandler(async (ctx) => {
   const payload = StagedCleanupPayloadSchema.parse(ctx.payload ?? {});
   const { log } = createJobTools(ctx);
   const { filePath, fileName } = payload;
@@ -57,4 +63,7 @@ const handler = defineJobHandler(async (ctx) => {
   }
 });
 
-export default Object.assign(handler, { id: 'triggers-plugin-staged-cleanup' });
+const stagedCleanupJob: StagedCleanupJobHandler & Readonly<{ id: 'triggers-plugin-staged-cleanup' }> =
+  Object.assign(handler, { id: 'triggers-plugin-staged-cleanup' as const });
+
+export default stagedCleanupJob;

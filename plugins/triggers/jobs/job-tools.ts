@@ -5,13 +5,32 @@ type Span = {
   addEvent(name: string, attributes?: Record<string, unknown>): void;
 };
 
+export type JobTools = Readonly<{
+  log: Readonly<{
+    info(...data: unknown[]): void;
+    warn(...data: unknown[]): void;
+    error(...data: unknown[]): void;
+    debug(...data: unknown[]): void;
+  }>;
+  progress(percent: number, message?: string): void | Promise<void>;
+  trace: Readonly<{
+    addEvent(name: string, attributes?: Record<string, unknown>): void;
+    recordProgress(current: number, total: number, unit?: string): void;
+    withChildSpan<T>(name: string, fn: (span: Span) => Promise<T>): Promise<T>;
+  }>;
+  traceContext: Readonly<{
+    traceparent?: string;
+    tracestate?: string;
+  }>;
+}>;
+
 const noopSpan: Span = {
   setAttribute: () => {},
   addEvent: () => {},
 };
 
 /** Local job runtime tools for migrated trigger plugin jobs. */
-export function createJobTools(ctx: JobHandlerContext) {
+export function createJobTools(ctx: JobHandlerContext): JobTools {
   return {
     log: {
       info: console.log,
