@@ -40,3 +40,35 @@ The upgrade is decomposed into four sequenced phases so `main` is green at every
 - No `apphost.mts`/`.aspire/modules/` GA path realignment (Wave 6).
 - No 13.5 native-Deno-apphost flip (post-GA, stubbed only).
 - No real `deno publish` (that is Phase P, a separate plan).
+
+## Implementation log
+
+### IMPL-1 — type foundation green-up (2026-06-15)
+
+Deno 2.8 ships TS 6.0.3, which enforces the repo's pre-existing `isolatedDeclarations: true`
+strictly. On first `deno task check` under 2.8 this surfaced a wave of TS90xx
+explicit-return-type gaps plus one genuine `TS2322`. These are **publish-surface annotation
+debt, not regressions** — the code was already correct; 2.8 simply requires the types be
+written explicitly. Resolved without suppressions:
+
+- `db11fb7` triggers, `212189a` workers, `ac4ee94` plugins (stream + saga checks),
+  `b64dea1` fresh builder fixtures, `f44c2da` fresh-ui — explicit-type annotations only.
+- `939bbe9` fresh: the one real bug — SSE keepalive timer typed `number` but assigned a
+  `setInterval` handle (`TS2322`). Fixed with an exported `SSEIntervalId =
+  ReturnType<typeof setInterval>` alias threaded through `SSEClock`. No `@ts-ignore`.
+- `2d5e7ac` cli + cli/e2e: `isolatedDeclarations: false` carve-out (LD-10) — see drift
+  IMPL-D-2. CLI publish surface is Wave 6's; annotating here would collide with A6-v2.
+- `03838d1` `deno fmt` of the 8 annotated files.
+- `f16b31f` (T0): aspire public-barrel value/type export split (LD-1 publish prerequisite).
+
+End state: `deno task check` = 0, `deno task lint` clean (340 files), `deno task fmt --check`
+clean. `deno.lock` untouched. No `.md` edited by the generator.
+
+### IMPL-2 — generator resumes here (handoff)
+
+Remaining Phase-T slices, resequenced: **T1** (CI pin `v2.8.x`) → **T2** (`catalog:` +
+28-member rewrite) → **T4** (four `--allow-slow-types` carve-outs + debt rows + 28-member
+`publish:dry-run`) → **T5 last** (`deno ci` + per-fn coverage + `--parallel`, and the
+APPROVED `deno audit` `@orpc/client` bump — the only slice permitted to move `deno.lock`).
+Phase A (A1–A4) stays gated on Aspire 13.4 GA (LD-7), out of this resume's scope. The
+generator runs as a supervised Codex session in WSL (`/home/codex/repos/netscript-deno28-upgrade`).

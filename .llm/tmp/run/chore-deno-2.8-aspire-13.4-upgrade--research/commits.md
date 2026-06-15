@@ -4,7 +4,24 @@ Plan-phase commit (this run, plan artifacts only — no `packages/` edits):
 
 | Commit | Branch | Scope |
 | ------ | ------ | ----- |
-| (pending) | `chore/deno-2.8-aspire-13.4-upgrade` | `docs(upgrade): plan + Phase-P publish plan + worklog Design + drift + plan-eval skeleton` |
+| `90a54e0` | `chore/deno-2.8-aspire-13.4-upgrade` | `docs(upgrade): plan + Phase-P publish plan + worklog Design + drift + plan-eval skeleton` |
+
+## IMPL-phase commits landed (green-up, 2026-06-15)
+
+| Commit | Scope | Slice |
+| ------ | ----- | ----- |
+| `f16b31f` | `fix(aspire): split public barrel value exports` | T0 |
+| `db11fb7` | `fix(triggers): add isolated declaration annotations` | T3 |
+| `212189a` | `fix(workers): add isolated declaration annotations` | T3 |
+| `ac4ee94` | `fix(plugins): add stream and saga check annotations` | T3 |
+| `b64dea1` | `fix(fresh): add builder fixture annotations` | T3 |
+| `939bbe9` | `fix(fresh): align sse timer handle type` (real `TS2322`) | T3 |
+| `f44c2da` | `fix(fresh-ui): add isolated declaration annotations` | T3 |
+| `2d5e7ac` | `fix(cli): temporarily carve out isolated declarations` | LD-10 |
+| `03838d1` | `style(packages,plugins): deno fmt isolatedDeclarations annotations` | T3 |
+
+Remaining IMPL slices (generator resumes): T1, T2, T4, T5 (audit last). See plan.md
+§Execution Status.
 
 ## Planned IMPL commit slices (executed in the impl phase, see plan.md §Commit Slices)
 
