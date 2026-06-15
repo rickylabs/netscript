@@ -19,6 +19,8 @@
     "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
+    // DEBT_ACCEPTED: temporary Wave 6 CLI E2E carve-out for Deno 2.8 isolatedDeclarations annotations.
+    "isolatedDeclarations": false,
     "lib": [
       "deno.ns",
       "dom"
