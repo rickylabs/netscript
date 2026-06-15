@@ -57,13 +57,15 @@ export function PanelFooter({ children, class: className, ...props }: PanelSecti
   return <div {...props} class={cn('ns-panel__footer', className)}>{children}</div>;
 }
 
-type PanelNamespace = typeof PanelRoot & Readonly<{
-  Header: typeof PanelHeader;
-  Title: typeof PanelTitle;
-  Description: typeof PanelDescription;
-  Body: typeof PanelBody;
-  Footer: typeof PanelFooter;
-}>;
+type PanelNamespace =
+  & typeof PanelRoot
+  & Readonly<{
+    Header: typeof PanelHeader;
+    Title: typeof PanelTitle;
+    Description: typeof PanelDescription;
+    Body: typeof PanelBody;
+    Footer: typeof PanelFooter;
+  }>;
 
 export const Panel: PanelNamespace = Object.assign(PanelRoot, {
   Header: PanelHeader,

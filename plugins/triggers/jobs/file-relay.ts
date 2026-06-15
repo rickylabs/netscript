@@ -161,7 +161,7 @@ const handler: FileRelayJobHandler = defineJobHandler(async (ctx) => {
   }
 });
 
-const fileRelayJob: FileRelayJobHandler & Readonly<{ id: 'triggers-plugin-file-relay' }> =
-  Object.assign(handler, { id: 'triggers-plugin-file-relay' as const });
+const fileRelayJob: FileRelayJobHandler & Readonly<{ id: 'triggers-plugin-file-relay' }> = Object
+  .assign(handler, { id: 'triggers-plugin-file-relay' as const });
 
 export default fileRelayJob;

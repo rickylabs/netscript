@@ -63,7 +63,10 @@ const handler: StagedCleanupJobHandler = defineJobHandler(async (ctx) => {
   }
 });
 
-const stagedCleanupJob: StagedCleanupJobHandler & Readonly<{ id: 'triggers-plugin-staged-cleanup' }> =
-  Object.assign(handler, { id: 'triggers-plugin-staged-cleanup' as const });
+const stagedCleanupJob:
+  & StagedCleanupJobHandler
+  & Readonly<{ id: 'triggers-plugin-staged-cleanup' }> = Object.assign(handler, {
+    id: 'triggers-plugin-staged-cleanup' as const,
+  });
 
 export default stagedCleanupJob;

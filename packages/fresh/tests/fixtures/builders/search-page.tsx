@@ -1,8 +1,5 @@
 import { definePage } from '../../../src/application/builders/mod.ts';
-import type {
-  PageHandlers,
-  RoutedPageDefinition,
-} from '../../../src/application/builders/mod.ts';
+import type { PageHandlers, RoutedPageDefinition } from '../../../src/application/builders/mod.ts';
 import {
   paginationSearchSchema,
   type PaginationSearchState,

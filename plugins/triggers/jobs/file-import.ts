@@ -171,7 +171,7 @@ const handler: FileImportJobHandler = defineJobHandler(async (ctx) => {
   });
 });
 
-const fileImportJob: FileImportJobHandler & Readonly<{ id: 'triggers-plugin-file-import' }> =
-  Object.assign(handler, { id: 'triggers-plugin-file-import' as const });
+const fileImportJob: FileImportJobHandler & Readonly<{ id: 'triggers-plugin-file-import' }> = Object
+  .assign(handler, { id: 'triggers-plugin-file-import' as const });
 
 export default fileImportJob;

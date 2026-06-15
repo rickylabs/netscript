@@ -1,4 +1,4 @@
-import { createContext, type Context } from 'preact';
+import { type Context, createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 import type {
   AnyDefinePageTypeState,

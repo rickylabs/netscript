@@ -1,8 +1,5 @@
 import { definePage } from '../../../src/application/builders/mod.ts';
-import type {
-  PageDefinition,
-  PageHandlers,
-} from '../../../src/application/builders/mod.ts';
+import type { PageDefinition, PageHandlers } from '../../../src/application/builders/mod.ts';
 
 type StaticPageState = { requestId: string };
 type StaticPageDefinition = PageDefinition<StaticPageState>;
