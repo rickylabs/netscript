@@ -53,3 +53,24 @@ Read only what the research needs; this is a RESEARCH-ONLY phase.
   bespoke local machinery they supersede.
 - The repo is at Deno 2.7.11 today; CI floats `v2.x`. Pinning to `2.8.x` is itself
   a decision to record.
+
+---
+
+## Plan-phase addendum (read for PLAN-EVAL)
+
+Definitive plan deliverables now in this dir:
+- `plan.md` — Phase T (Deno 2.8) + Phase A (Aspire 13.4 scaffold bump), 9 locked decisions,
+  10 commit slices, risk register, validation plan, E-12 preview guard.
+- `phase-p-jsr-alpha-publish-plan.md` — the in-between JSR alpha.0 publish milestone (all 28
+  members except `@netscript/cli`).
+- `drift.md` — discrepancies D-1..D-5 logged.
+
+Files the IMPL phase touches (ownership-scoped):
+- Owned here: `.github/workflows/copilot-setup-steps.yml:40-42`, root + 28 member `deno.json`,
+  `packages/cli/src/kernel/constants/scaffold-versions.ts`, `packages/aspire/src/public/mod.ts`,
+  `.llm/tools/check-scaffold-versions.ts` (new), `arch-debt.md`.
+- Owned by Wave 6 (DO NOT edit here): CLI restructure, `scaffold-files.ts`, apphost path migration.
+
+Generated-not-committed (edit the generator/constant, never the output):
+`dotnet/AppHost/AppHost.csproj`, `global.json` (via `generate-global-json.ts`, `allowPrerelease:
+true`).
