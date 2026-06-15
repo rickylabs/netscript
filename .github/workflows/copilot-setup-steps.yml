@@ -10,7 +10,7 @@
 #    deno task e2e:cli) without a local agent.
 #
 # Toolchain pinned to this repo's reality:
-#   - Deno 2.x  (deno.json uses unstable: kv, temporal, tsgo, worker-options, raw-imports)
+#   - Deno 2.8.x  (deno.json uses unstable: kv, temporal, tsgo, worker-options, raw-imports)
 #   - .NET SDK 10.x  (CLI scaffold AppHost/ServiceDefaults target net10.0)
 #   - Aspire CLI via aspire.dev install script (NOT `dotnet workload install aspire`,
 #     which was removed after Aspire 8 — Aspire ships as a standalone CLI now)
@@ -39,7 +39,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.x
+          deno-version: v2.8.x
 
       # --- .NET SDK 10 (Aspire AppHost / ServiceDefaults target net10.0) ---
       - name: Setup .NET SDK
