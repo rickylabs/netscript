@@ -21,14 +21,17 @@ import { getKv } from '@netscript/kv';
  */
 export type SSEKvKey = readonly Deno.KvKeyPart[];
 
+/** Timer identifier returned by the active runtime's interval scheduler. */
+export type SSEIntervalId = ReturnType<typeof setInterval>;
+
 /**
  * Clock port used by the SSE adapter for heartbeat and timestamp behavior.
  */
 export interface SSEClock {
   /** Schedule repeated heartbeat work. */
-  setInterval(callback: () => void, ms: number): number;
+  setInterval(callback: () => void, ms: number): SSEIntervalId;
   /** Clear a scheduled heartbeat. */
-  clearInterval(id: number): void;
+  clearInterval(id: SSEIntervalId): void;
   /** Return the current timestamp for emitted events. */
   now(): Date;
 }
@@ -164,7 +167,7 @@ export function createSSEStream(
 
   const abortController = new AbortController();
   let closed = false;
-  let keepaliveTimer: number | null = null;
+  let keepaliveTimer: SSEIntervalId | null = null;
 
   const disposeKeepalive = (): void => {
     if (keepaliveTimer !== null) {
