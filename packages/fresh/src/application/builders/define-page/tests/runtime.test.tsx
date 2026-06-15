@@ -358,7 +358,7 @@ Deno.test('definePage withForm applies collection intents before returning runti
   await route.page(createRequestContext({ data }));
 
   assert(snapshot, 'Expected runtime form state after the intent round-trip');
-  const items = snapshot.fields.items as CollectionDescriptor<
+  const items = snapshot.fields.items as unknown as CollectionDescriptor<
     { sku: string; quantity: string }
   >;
   assert(

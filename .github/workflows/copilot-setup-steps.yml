@@ -65,11 +65,29 @@ jobs:
           docker compose version
 
       # --- Pre-flight cache warming (full network is only available HERE) ---
-      - name: Warm Deno dependency cache
+      - name: Install Deno dependencies cleanly
         run: |
           deno --version
-          # Resolve + cache all workspace deps (jsr: + npm:) from the lockfile.
-          deno install || echo "deno install non-fatal during setup"
+          # Clean CI install from deno.lock; this must run before any deno task.
+          deno ci
+
+      - name: Run Deno quality gates concurrently
+        run: deno task ci:quality
+
+      - name: Generate per-function coverage artifact
+        run: deno task coverage:functions
+
+      - name: Upload function coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: deno-function-coverage
+          path: .llm/tmp/coverage/function-report.json
+
+      - name: Run publish dry-run
+        run: deno task publish:dry-run
+
+      - name: Run critical audit
+        run: deno task audit:critical
 
       - name: Warm .NET / NuGet (Aspire SDK packages)
         run: |

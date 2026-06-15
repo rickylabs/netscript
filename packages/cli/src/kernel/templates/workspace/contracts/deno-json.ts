@@ -9,8 +9,8 @@ import type { PackageDenoJsonOptions } from '../../../domain/scaffold/scaffold-o
  * packages regardless of import mode.
  */
 const CONTRACTS_DIRECT_DEPS: Readonly<Record<string, string>> = {
-  '@orpc/contract': 'npm:@orpc/contract@^1.13.5',
-  '@orpc/server': 'npm:@orpc/server@^1.13.5',
+  '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
+  '@orpc/server': 'npm:@orpc/server@^1.14.6',
   'zod': 'npm:zod@^4.3.6',
 };
 

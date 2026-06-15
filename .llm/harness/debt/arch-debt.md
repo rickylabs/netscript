@@ -91,6 +91,20 @@ Seeded from
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** F-6; close when `packages/contracts` dry-run passes without `--allow-slow-types`.
 
+## root toolchain — T5 deferred esbuild audit advisory
+
+- **Reason:** `deno audit` reports GHSA-gv7w-rqvm-qjhr for transitive `esbuild <0.28.1`.
+  The runtime-reachable critical `@orpc/client` advisory was remediated by moving ORPC imports to
+  `^1.14.6`; this remaining high advisory is deferred as approved toolchain debt because it is
+  tied to the Vite/esbuild stack rather than a NetScript runtime dependency path.
+- **Owner:** Toolchain upgrade T5 follow-up.
+- **Target:** Revisit when the Vite/esbuild dependency chain can move to `esbuild >=0.28.1`.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (A-9).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task audit:critical`; close when full `deno audit` passes without suppressing the
+  deferred high-severity advisory.
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.
