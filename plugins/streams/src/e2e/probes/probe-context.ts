@@ -1,3 +1,5 @@
+import type { StreamPayloadSchema } from '../../public/stream-api.ts';
+
 const DEFAULT_STREAMS_URL = 'http://127.0.0.1:4437';
 
 /** Resolve the streams service URL used by E2E probes. */
@@ -20,7 +22,7 @@ export function ignoreExpectedProbeCleanupError(error: unknown): void {
 }
 
 /** Pass-through Standard Schema-compatible validator for probe payloads. */
-export const probePayloadSchema = {
+export const probePayloadSchema: StreamPayloadSchema<unknown> = {
   '~standard': {
     version: 1,
     vendor: 'netscript',

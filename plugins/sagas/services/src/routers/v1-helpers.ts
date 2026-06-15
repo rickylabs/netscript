@@ -166,7 +166,7 @@ export function mapStateToInstance(
 /** Map a raw Prisma record to the saga instance API response shape. */
 export function mapPrismaRecordToInstance(
   record: PrismaRecord,
-  sagaName = record.sagaName,
+  sagaName: string = record.sagaName,
 ): SagaInstanceResponse {
   const state = (record.state ?? {}) as SagaInstanceState;
   return mapStateToInstance(sagaName, record.correlationId, {
