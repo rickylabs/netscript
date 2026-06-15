@@ -37,3 +37,21 @@ Read only what the research needs; this is a RESEARCH-ONLY phase.
 - Deno baseline in CI is floating `v2.x` (separate upgrade track handles Deno 2.8.x explicitly).
 - Wrap-don't-reinvent: prefer Aspire/Deno/`@std/*`/upstream APIs over local abstractions.
 - The CLI is the docs-site source of truth for S5; structure decisions should anticipate that.
+
+---
+
+## Plan-phase addendum (read for PLAN-EVAL)
+
+Definitive plan deliverables now in this dir:
+- `plan.md` — 7-slice A6-v1→A6-v2 promotion, 8 locked decisions, slice table (<30), risk register,
+  A6 gate set (F-CLI-3/4/27), validation plan. Closes AP-1.
+- `worklog.md` (§Design), `drift.md` (W-1..W-5), `plan-eval.md` (evaluator skeleton).
+
+Cross-program dependencies (PR #44 upgrade run):
+- Consumes Phase T `catalog:` baseline (slice 0) + aspire-barrel fix (T0).
+- Consumes Phase A Aspire 13.4 GA pins (slice 5).
+- Consumes Phase P published alpha.0 fixture (slice 4 `scaffold.published.runtime`).
+
+Ownership boundary (LD-8): this wave owns `scaffold-files.ts` + `scaffold-aspire.ts` apphost-path
+migration; the upgrade run owns `scaffold-versions.ts` + CI pin. `@netscript/cli` is NOT published in
+Phase P — it ships last (LD-7).
