@@ -39,9 +39,9 @@
     "@orpc/server": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/zod": "catalog:",
-    "hono": "jsr:@hono/hono@^4",
-    "@hono/hono": "jsr:@hono/hono@^4",
-    "zod": "catalog:",
+    "hono": "jsr:@hono/hono@4.12.24",
+    "@hono/hono": "jsr:@hono/hono@4.12.24",
+    "zod": "jsr:@zod/zod@4.4.3",
     "@tanstack/db": "catalog:",
     "@durable-streams/client": "catalog:",
     "@durable-streams/state": "catalog:"

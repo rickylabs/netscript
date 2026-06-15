@@ -14,9 +14,9 @@
     "publish:dry-run": "deno publish --dry-run --allow-dirty --allow-slow-types"
   },
   "imports": {
-    "hono": "catalog:",
-    "hono/cors": "npm:hono@^4.10.6/cors",
-    "hono/logger": "npm:hono@^4.10.6/logger",
+    "hono": "jsr:@hono/hono@4.12.24",
+    "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+    "hono/logger": "jsr:@hono/hono@4.12.24/logger",
     "@orpc/openapi": "catalog:",
     "@orpc/openapi/fetch": "npm:@orpc/openapi@^1.14.6/fetch",
     "@orpc/server": "catalog:",

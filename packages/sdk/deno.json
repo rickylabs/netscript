@@ -27,7 +27,7 @@
     "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
     "@netscript/telemetry": "../telemetry/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
-    "@standard-schema/spec": "catalog:",
+    "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@orpc/client": "catalog:",
     "@orpc/client/fetch": "npm:@orpc/client@^1.14.6/fetch",
     "@orpc/client/plugins": "npm:@orpc/client@^1.14.6/plugins",

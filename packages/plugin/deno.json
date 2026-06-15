@@ -15,9 +15,9 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
-    "@std/path": "jsr:@std/path@^1.0.0",
-    "zod": "catalog:",
-    "@standard-schema/spec": "catalog:"
+    "@std/path": "jsr:@std/path@^1",
+    "zod": "jsr:@zod/zod@4.4.3",
+    "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/abstracts/mod.ts src/config/mod.ts src/cli/mod.ts loader.ts src/sdk/mod.ts src/testing/mod.ts src/templates/mod.ts",

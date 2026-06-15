@@ -31,9 +31,9 @@
     "@orpc/contract": "catalog:",
     "@orpc/server": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
-    "hono": "jsr:@hono/hono@^4",
+    "hono": "jsr:@hono/hono@4.12.24",
     "ioredis": "catalog:",
-    "zod": "catalog:"
+    "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/domain/mod.ts src/ports/mod.ts src/runtime/mod.ts src/adapters/mod.ts src/transports/mod.ts src/stores/mod.ts src/middleware/mod.ts src/integration/workers/mod.ts src/integration/publisher/mod.ts src/telemetry/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/streams/mod.ts src/presets/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/agent/mod.ts",

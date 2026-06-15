@@ -17,11 +17,11 @@
     "@netscript/service": "../../packages/service/mod.ts",
     "@netscript/telemetry": "../../packages/telemetry/mod.ts",
     "@durable-streams/client": "catalog:",
-    "@std/net": "jsr:@std/net@^1.0.0",
+    "@std/net": "jsr:@std/net@^1",
     "@durable-streams/server": "catalog:",
-    "@standard-schema/spec": "catalog:",
-    "hono": "catalog:",
-    "hono/cors": "npm:hono@^4.10.6/cors"
+    "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
+    "hono": "jsr:@hono/hono@4.12.24",
+    "hono/cors": "jsr:@hono/hono@4.12.24/cors"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts verify-plugin.ts services/src/main.ts",

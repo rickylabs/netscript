@@ -27,7 +27,7 @@
     "@fedify/redis": "jsr:@fedify/redis@^1.0.0",
     "@fedify/amqp": "jsr:@fedify/amqp@^1.0.0",
     "@netscript/kv": "../kv/mod.ts",
-    "zod": "catalog:",
+    "zod": "jsr:@zod/zod@4.4.3",
     "ioredis": "catalog:",
     "amqplib": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",

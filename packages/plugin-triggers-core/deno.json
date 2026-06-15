@@ -21,7 +21,7 @@
     "@orpc/server": "catalog:",
     "@netscript/plugin-workers-core": "../plugin-workers-core/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
-    "zod": "catalog:"
+    "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/adapters/mod.ts src/builders/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/domain/mod.ts src/ports/mod.ts src/public/mod.ts src/runtime/mod.ts src/telemetry/mod.ts src/testing/mod.ts",

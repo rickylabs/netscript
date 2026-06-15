@@ -5,10 +5,10 @@
  * into a scaffolded project.
  */
 
-import { basename, join } from '@std/path';
+import { basename, join } from "@std/path";
 
-import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
-import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
+import { SCAFFOLD_DIRS } from "../../../../kernel/constants/scaffold/scaffold-dirs.ts";
+import { ScaffoldValidationError } from "../../../../kernel/domain/errors.ts";
 import {
   assertOfficialSourceRoot,
   canCopyOfficialPlugin,
@@ -19,7 +19,7 @@ import {
   type OfficialPluginDependency,
   type OfficialPluginSource,
   type PluginSourceMode,
-} from '../../../adapters/official-plugin-source.ts';
+} from "../../../adapters/official-plugin-source.ts";
 import {
   copyPluginDirectory,
   copyWorkspaceDirectory,
@@ -28,14 +28,19 @@ import {
   readPluginScaffoldRuntimeManifest,
   regenerateCopiedRuntimeRegistries,
   removeCopiedFiles,
-} from '../../../adapters/plugin-file-collector.ts';
+} from "../../../adapters/plugin-file-collector.ts";
 import {
+  readRootCatalog,
   rewriteCopiedDenoJsons,
   rewritePackagePathToJsr,
   toJsrSubpath,
-} from '../../../adapters/plugin-import-rewriter.ts';
+} from "../../../adapters/plugin-import-rewriter.ts";
 
-export { canCopyOfficialPlugin, findOfficialPluginSourceRoot, getOfficialPluginSource };
+export {
+  canCopyOfficialPlugin,
+  findOfficialPluginSourceRoot,
+  getOfficialPluginSource,
+};
 
 export type {
   CopyOfficialPluginOptions,
@@ -49,7 +54,10 @@ export type {
 export async function copyOfficialPlugin(
   options: CopyOfficialPluginOptions,
 ): Promise<OfficialPluginCopyResult> {
-  const source = await getOfficialPluginSource(options.sourceRoot, options.kind);
+  const source = await getOfficialPluginSource(
+    options.sourceRoot,
+    options.kind,
+  );
   if (source.canonicalName !== options.pluginName) {
     throw new ScaffoldValidationError(
       `Official ${options.kind} plugin source must use canonical name "${source.canonicalName}".`,
@@ -67,6 +75,7 @@ export async function copyOfficialPlugin(
   const filesCreated: string[] = [];
   const filesSkipped: string[] = [];
   const workspaceMembers: string[] = [];
+  const catalog = await readRootCatalog(options.sourceRoot);
 
   for (const dependency of source.dependencies) {
     const result = await copyPluginDirectory(
@@ -79,7 +88,7 @@ export async function copyOfficialPlugin(
     filesCreated.push(...result.filesCreated);
     filesSkipped.push(...result.filesSkipped);
 
-    await rewritePluginDenoJsons(options, dependency.pluginDir);
+    await rewritePluginDenoJsons(options, dependency.pluginDir, catalog);
   }
 
   const pluginCopy = await copyPluginDirectory(
@@ -92,7 +101,7 @@ export async function copyOfficialPlugin(
   filesCreated.push(...pluginCopy.filesCreated);
   filesSkipped.push(...pluginCopy.filesSkipped);
 
-  await rewritePluginDenoJsons(options, source.pluginDir);
+  await rewritePluginDenoJsons(options, source.pluginDir, catalog);
 
   let backgroundDir: string | null = null;
   if (source.backgroundDir) {
@@ -131,7 +140,8 @@ export async function copyOfficialPlugin(
       projectName: options.projectName,
       importMode: options.importMode,
       workspacePackageName: `@${options.projectName}/${source.backgroundDir}`,
-      localProjectRoot: '..',
+      localProjectRoot: "..",
+      catalog,
     });
     directoriesCreated.push(
       ...await ensureBackgroundRuntimeDirs(
@@ -155,7 +165,11 @@ export async function copyOfficialPlugin(
       durationMs: 0,
     },
     pluginName: source.canonicalName,
-    pluginDir: join(options.targetPath, SCAFFOLD_DIRS.PLUGINS, source.pluginDir),
+    pluginDir: join(
+      options.targetPath,
+      SCAFFOLD_DIRS.PLUGINS,
+      source.pluginDir,
+    ),
     backgroundDir,
     serviceConfigKey: source.serviceConfigKey,
     servicePort: source.servicePort,
@@ -193,12 +207,14 @@ async function resolveBackgroundSourceDir(
 function rewritePluginDenoJsons(
   options: CopyOfficialPluginOptions,
   pluginDir: string,
+  catalog?: Readonly<Record<string, string>>,
 ): Promise<void> {
   return rewriteCopiedDenoJsons({
     root: join(options.targetPath, SCAFFOLD_DIRS.PLUGINS, pluginDir),
     projectName: options.projectName,
     importMode: options.importMode,
     workspacePackageName: null,
+    catalog,
   });
 }
 

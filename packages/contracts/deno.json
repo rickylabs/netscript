@@ -10,7 +10,7 @@
     "./transform": "./transform.ts"
   },
   "imports": {
-    "zod": "catalog:",
+    "zod": "jsr:@zod/zod@4.4.3",
     "@orpc/server": "catalog:"
   },
   "tasks": {
