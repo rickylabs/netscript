@@ -23,7 +23,7 @@ Supervisor: Claude (Opus 4.8). Source of truth for live phase status. See `final
 
 | Slice | Eval | Status | Owner | Notes |
 | ----- | ---- | ------ | ----- | ----- |
-| R1 subpath pins + dax | C1/C3 | todo | codex-wsl | trivial |
+| R1 subpath pins + dax | C1/C3 | in_progress | codex-wsl | launched 2026-06-16 10:53Z via `codex exec` (session `019ecfa2`, bg `bbw1hawom`); worktree synced 794933e |
 | R2 dead imports | C5 | todo | codex-wsl | `deps:why`-driven |
 | R3 catalog → stable latest | C2 | todo | codex-wsl | fedify→2.2.5, logtape→2.1.5, preact↔Fresh; DEBT rows |
 | R4 scaffold parity + check-scaffold-versions.ts + init smoke | C6 | todo | codex-wsl | E-12 guard |
