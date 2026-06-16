@@ -25,4 +25,4 @@ Slice 2 blocks merge without green `scaffold.runtime`.
 
 ## Landed IMPL commits
 
-- 84033ed: Slice 0: prep hygiene gates green
+- 9695420: Slice 0: prep hygiene gates green

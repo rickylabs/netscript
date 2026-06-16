@@ -66,3 +66,20 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
   - `deno task lint` passed with 1,082 selected files and 0 findings.
   - `deno task publish:dry-run` passed; existing slow-type and dynamic-import warnings remain
     accepted upstream/package debt, not Slice 0 blockers.
+
+### Slice 1 — Standards Doc
+
+- Added `packages/cli/docs/standards.md` with the command contract, typed error model, IO/output
+  discipline, naming rules, testing tiers, public-surface/doc-lint rules, layer discipline, gate map,
+  and V-1..V-14 migration checklist with file:line evidence.
+- Fixed the CLI public doc-lint leaks discovered by the slice gate by adding type-only public exports
+  for `DbEngine`, `FileSystemPort`, `ScaffoldPlan`, and `ScaffoldServicePlan`, and by replacing the
+  upstream `PluginManifest` alias with a CLI-owned structural `PluginHostManifest`.
+- Validation:
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/cli --entrypoints ./mod.ts --entrypoints ./scaffolding.ts --entrypoints ./testing.ts --pretty`
+    passed with totalErrors=0, privateTypeRef=0, missingJSDoc=0.
+  - `wc -l packages/cli/README.md` reports 227 lines, so the README >=150 LOC gate remains green.
+  - `deno check --unstable-kv packages/cli/bin/netscript.ts packages/cli/bin/netscript-dev.ts packages/cli/mod.ts packages/cli/maintainer.ts packages/cli/scaffolding.ts packages/cli/testing.ts`
+    passed.
+  - `deno task lint` passed with 1,082 selected files and 0 findings.
+  - `deno task fmt:check` passed with 1,167 selected files and 0 findings.

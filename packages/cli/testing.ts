@@ -31,15 +31,17 @@ import type { ScaffoldPlan, ScaffoldServicePlan } from './src/public/domain/scaf
 export { MemoryFileSystemAdapter };
 export type { ScaffoldResult } from './src/kernel/domain/core-types.ts';
 export type { DirEntry, FileInfo, WalkEntry } from './src/kernel/domain/core-types.ts';
-export type { DbEngineChoice } from './src/kernel/domain/db-engine.ts';
+export type { DbEngine, DbEngineChoice } from './src/kernel/domain/db-engine.ts';
 export type {
   EditorChoice,
   InitPromptAnswers,
   InitResult,
 } from './src/kernel/domain/scaffold/workspace-config.ts';
+export type { FileSystemPort } from './src/kernel/ports/file-system-port.ts';
 export type { LoggerPort } from './src/kernel/ports/logger-port.ts';
 export type { ProcessPort, ProcessResult } from './src/kernel/ports/process-port.ts';
 export type { PromptPort } from './src/kernel/ports/prompt-port.ts';
+export type { ScaffoldPlan, ScaffoldServicePlan } from './src/public/domain/scaffold-plan.ts';
 
 /**
  * One recorded in-memory process invocation.
