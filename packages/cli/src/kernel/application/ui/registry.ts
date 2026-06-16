@@ -10,6 +10,8 @@ import {
 } from '@std/path';
 
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
+import { mergeDenoJsonImports } from './registry-deno-json.ts';
+import { writeStylesAggregator } from './registry-styles.ts';
 
 export type UiRegistryFile = {
   readonly source: string;
@@ -64,11 +66,6 @@ export type UiInstallResult = {
 type PlannedFile = {
   readonly source: string;
   readonly target: string;
-};
-
-const PREACT_IMPORTS: Readonly<Record<string, string>> = {
-  preact: 'npm:preact@^10.27.2',
-  'preact/hooks': 'npm:preact@^10.27.2/hooks',
 };
 
 const TARGET_PREFIXES: readonly [prefix: string, directory: string][] = [
@@ -269,35 +266,6 @@ function toImportSpecifier(path: string): string {
   return normalized.startsWith('.') ? normalized : `./${normalized}`;
 }
 
-async function writeStylesAggregator(input: {
-  readonly registryRoot: string;
-  readonly projectRoot: string;
-  readonly manifest: UiRegistryManifest;
-  readonly items: readonly UiRegistryItem[];
-  readonly fs: FileSystemPort;
-}): Promise<string> {
-  const themeItem = input.items.find((item) => item.kind === 'theme') ??
-    input.manifest.items.find((item) => item.kind === 'theme');
-  if (!themeItem) {
-    throw new Error('Fresh UI registry manifest does not declare a theme item.');
-  }
-  const themeStylesPath = themeEntryStylesSource(input.registryRoot, themeItem);
-  const themeStyles = await input.fs.readFile(themeStylesPath);
-  const cssImports = [
-    ...new Set(
-      input.items.flatMap((item) =>
-        item.css?.map((entry) => entry.content.trim()).filter((content) =>
-          content.startsWith('@import ')
-        ) ?? []
-      ),
-    ),
-  ];
-  const styles = composeStylesAggregator(themeStyles, cssImports);
-  const target = resolve(input.projectRoot, 'assets', 'styles.css');
-  await input.fs.writeFile(target, styles);
-  return target;
-}
-
 function requireThemeItem(manifest: UiRegistryManifest, name: string): UiRegistryItem {
   const item = manifest.items.find((candidate) => candidate.name === name);
   if (!item) {
@@ -307,78 +275,4 @@ function requireThemeItem(manifest: UiRegistryManifest, name: string): UiRegistr
     throw new Error(`Fresh UI registry item "${name}" is not a theme (kind: ${item.kind}).`);
   }
   return item;
-}
-
-function themeEntryStylesSource(registryRoot: string, themeItem: UiRegistryItem): string {
-  const entry = themeItem.files.find((file) => file.target.endsWith('styles.css'));
-  if (!entry) {
-    throw new Error(`Fresh UI theme "${themeItem.name}" does not ship a styles.css entry file.`);
-  }
-  return resolve(registryRoot, entry.source);
-}
-
-function composeStylesAggregator(themeStyles: string, cssImports: readonly string[]): string {
-  const lines = themeStyles.replace(/\r\n/g, '\n').split('\n');
-  const importLines: string[] = [];
-  let index = 0;
-  while (index < lines.length && lines[index].startsWith('@import ')) {
-    importLines.push(lines[index]);
-    index += 1;
-  }
-  while (index < lines.length && lines[index].trim() === '') index += 1;
-  const rest = lines.slice(index).join('\n').trimEnd();
-  const importBlock = [
-    ...importLines,
-    '',
-    '/* Per-item CSS - ui:init writes these @import lines. */',
-    ...cssImports,
-    '',
-  ].join('\n');
-  return `${importBlock}${rest}\n\n/* App-specific custom styles below. */\n`;
-}
-
-async function mergeDenoJsonImports(
-  projectRoot: string,
-  items: readonly UiRegistryItem[],
-  fs: FileSystemPort,
-): Promise<{ readonly path: string; readonly added: readonly string[] }> {
-  const path = resolve(projectRoot, 'deno.json');
-  const exists = await fs.exists(path);
-  const config = exists ? JSON.parse(await fs.readFile(path)) as Record<string, unknown> : {};
-  const imports = isRecord(config.imports) ? { ...config.imports } as Record<string, string> : {};
-  const candidates = new Map<string, string>(Object.entries(PREACT_IMPORTS));
-  for (const item of items) {
-    for (const dependency of item.dependencies ?? []) {
-      const key = importKeyForDependency(dependency);
-      if (key) candidates.set(key, dependency);
-    }
-  }
-
-  const added: string[] = [];
-  for (const [key, value] of candidates) {
-    if (imports[key] === undefined) {
-      imports[key] = value;
-      added.push(key);
-    }
-  }
-
-  config.imports = imports;
-  await fs.writeFile(path, `${JSON.stringify(config, null, 2)}\n`);
-  return { path, added };
-}
-
-function importKeyForDependency(specifier: string): string | undefined {
-  if (!specifier.startsWith('npm:') && !specifier.startsWith('jsr:')) return undefined;
-  const body = specifier.slice(4);
-  if (body.startsWith('@')) {
-    const parts = body.split('/');
-    if (parts.length < 2) return undefined;
-    const [scope, rest] = parts;
-    return `${scope}/${rest.replace(/@.+$/, '')}`;
-  }
-  return body.replace(/@.+$/, '');
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

@@ -111,3 +111,38 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
     above as the slice layer verdict.
   - `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "E2E_EXIT=$?"`
     passed: `Summary: passed=41 failed=0`, `database.init` PASS, `E2E_EXIT=0`.
+
+### Slice 3 — Surface Moves + File Splits
+
+- Split `kernel/application/ui/registry.ts` by extracting `registry-deno-json.ts` and
+  `registry-styles.ts`; the public `public/features/ui/registry.ts` export path remains unchanged.
+- Split `kernel/application/scaffold/writers/write-app-files.ts` by extracting seeded route manifest
+  generation to `writers/app-route-seeds.ts`; `writeNormalizedAppFiles` remains on its existing
+  import path.
+- Did not move app writers under `maintainer/features/codegen/*`: `orchestrate-init.ts` is a kernel
+  pipeline and moving these writers to a maintainer surface would force a kernel-to-maintainer import,
+  violating F-CLI-4. The safe split preserves the layer gate and is recorded in `drift.md`.
+- Validation:
+  - `wc -l` after split: `registry.ts` 278, `registry-deno-json.ts` 56, `registry-styles.ts` 62,
+    `write-app-files.ts` 288, `app-route-seeds.ts` 98.
+  - `deno check --unstable-kv packages/cli/src/kernel/application/ui/registry.ts packages/cli/src/kernel/application/scaffold/writers/write-app-files.ts`
+    passed.
+  - `deno test --unstable-kv --allow-read --allow-write --allow-env --allow-run packages/cli/src/public/features/ui/registry.test.ts packages/cli/src/kernel/application/scaffold/orchestrate-init_test.ts`
+    passed with 9 tests, 0 failed.
+  - `deno run --allow-read .llm/tools/fitness/check-cli-isolation.ts` passed
+    (F-CLI-3/F-CLI-4).
+  - `deno run --allow-read .llm/tools/fitness/check-cli-structure.ts` passed
+    (F-CLI-12/F-CLI-13).
+  - `deno run --allow-read .llm/tools/fitness/check-cliffy-containment.ts` passed (F-CLI-14).
+  - `deno run --allow-read .llm/tools/fitness/check-cli-file-size.ts` now reports only the
+    pre-existing large test-file baseline:
+    `copy-official-plugin-copy_test.ts` 446 lines and `route-templates_test.ts` 448 lines. The two
+    Slice 3 target files no longer appear in the findings.
+  - `deno task check` passed with 1,590 selected files and 0 findings.
+  - `deno task lint` passed with 1,082 selected files and 0 findings.
+  - `deno task fmt:check` passed with 1,167 selected files and 0 findings.
+  - `deno task test` was run and remains red outside this slice: 477 passed, 11 failed, 12 ignored;
+    failures are in existing config/plugin-registry/deploy-config fixtures, one sync plugin sample
+    test, runtime-schema Windows path expectations, `packages/config/workspace.test.ts`, plugin
+    workers Deno runtime adapter tests, plus the existing `catalog:` unsupported scheme error from
+    `packages/contracts/src/application/contract-primitives.ts`.

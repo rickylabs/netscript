@@ -39,3 +39,12 @@ Reality vs RFC/doctrine assumptions (from research):
 - Aspire 13.4 preview vs GA at slice 5 (consume coupled fallback if preview).
 - Any target-tree move changing a public export path.
 - Impl-vs-research divergence → `research-realized.md` (LD-5), never edit `research.md`.
+
+## Implementation Drift
+
+- **D-W6-3 — App writer split stayed in kernel.** Research/plan text suggested moving
+  `kernel/application/scaffold/writers/*` to `maintainer/features/codegen/*`, but
+  `kernel/application/scaffold/orchestrate-init.ts` owns the public init pipeline and imports
+  `scaffoldApp`. Moving app writers to a maintainer surface would introduce a kernel→maintainer
+  dependency and fail F-CLI-4. Slice 3 therefore split the two 384-line files in place and preserved
+  public export paths.
