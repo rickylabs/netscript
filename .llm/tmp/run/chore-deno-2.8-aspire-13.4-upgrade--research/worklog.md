@@ -81,3 +81,32 @@ generator runs as a supervised Codex session in WSL (`/home/codex/repos/netscrip
   Evidence: `deno task deps:latest --filter "preact*"` = 0 behind / 2 total;
   `deno task deps:latest --filter "@david/*"` = 0 behind / 1 total; targeted
   `deno check --no-lock --unstable-kv` passed for Fresh/Fresh UI entrypoints.
+
+### R2 — plugin dead import-map prune (2026-06-16)
+
+- `<pending-final-r2-hash>`: removed only the import-map entries that `deps:why` reported as
+  `likelyDeadImport=true` / `fullyRemovable=true` from `plugins/workers/deno.json` and
+  `plugins/sagas/deno.json`.
+- Removed evidence:
+  - `@hono/hono` (workers + sagas): `sourceUsed=false`, `sourceHitCount=0`,
+    `transitivelyPresent=false`, `likelyDeadImport=true`, `fullyRemovable=true`.
+  - `@netscript/plugin-workers-core/presets` (workers): `sourceUsed=false`, `sourceHitCount=0`,
+    `transitivelyPresent=false`, `likelyDeadImport=true`, `fullyRemovable=true`.
+  - `@netscript/plugin-workers-core/schemas` (workers): `sourceUsed=false`, `sourceHitCount=0`,
+    `transitivelyPresent=false`, `likelyDeadImport=true`, `fullyRemovable=true`.
+  - `@netscript/plugin-sagas-core/integration/publisher` (sagas): `sourceUsed=false`,
+    `sourceHitCount=0`, `transitivelyPresent=false`, `likelyDeadImport=true`,
+    `fullyRemovable=true`.
+  - `@netscript/plugin-sagas-core/streams` (sagas): `sourceUsed=false`, `sourceHitCount=0`,
+    `transitivelyPresent=false`, `likelyDeadImport=true`, `fullyRemovable=true`.
+- Kept candidate evidence: `hono` (`sourceUsed=true`, `sourceHitCount=13`), `zod`
+  (`sourceUsed=true`, `sourceHitCount=104`), `@tanstack/db` (`sourceUsed=true`,
+  `sourceHitCount=1`), and `@durable-streams/client` (`sourceUsed=true`, `sourceHitCount=2`).
+- Re-sweep evidence: all other `imports` members were checked with `deps:why`; only the four
+  additional entries above returned `fullyRemovable=true`.
+- Gates: scoped check passed with
+  `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --root plugins/sagas --ext ts,tsx`
+  (wrapper command: `deno check --quiet --unstable-kv <files>`, 127 files, 2 batches,
+  0 occurrences); scoped lint passed with
+  `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/workers --root plugins/sagas --ext ts,tsx`
+  (127 files, 0 occurrences).
