@@ -16,6 +16,24 @@ Reality vs RFC/doctrine assumptions (from research):
   (`DeployTargetKey`→port timing) is "must resolve now" and is resolved to slice 2. No deferral forces
   rework.
 
+## Post-#44-merge drift (supervisor, 2026-06-16)
+
+- **D-W6-1 — Slice 5 apphost migration pulled forward into #44 (R6).** Assumption W-4 / LD-8
+  assigned the Aspire 13.4 GA apphost-path realignment (`scaffold-files.ts`/`scaffold-aspire.ts`
+  → `apphost.mts` + `.aspire/modules/*.mts` + `tsconfig.apphost.json`) to **this wave, slice 5**.
+  Reality: #44's R5 runtime gate (`scaffold.runtime` E2E) failed at `database.init` because Aspire
+  13.4.4 demands the `.mts` shape, so R6 (`677d5405`+`a50d73f`) performed the migration **in #44**
+  to make that PR self-green. IMPL-EVAL APPROVED; merged `733388f`. **Impact:** slice 5 collapses
+  from *perform migration* to *verify inherited shape* + schema mirror + `WithProcessCommand`
+  flag-off. LD-8 amended in plan; W-4 effectively resolved (GA shape present, no preview fallback
+  needed). PLAN-EVAL must judge against the amended (verify-only) slice 5, not the original.
+- **D-W6-2 — freshness bump folded into slice 0.** Post-merge, the #44 IMPL-EVAL flagged
+  `tailwindcss`/`@tailwindcss/vite` → ^4.3.1 and `@preact/signals` → 2.9.2 (released within days of
+  R3, outside the `vite`-only DEBT_ACCEPTED). Folded into slice 0 (catalog-baseline consumption)
+  rather than a standalone chore PR, to land `feat/package-quality` at-latest before it reaches `main`.
+- **Rebased** this branch onto `733388f` (post-#44 `feat/package-quality`); was based on pre-#44
+  `fcef53d`. Docs-only branch, clean rebase.
+
 ## Watch items (impl phase logs here)
 
 - Aspire 13.4 preview vs GA at slice 5 (consume coupled fallback if preview).

@@ -50,12 +50,12 @@ publishes everything else) so the production `netscript init` is validated again
 
 | Slice | Title | Core change |
 | ----- | ----- | ----------- |
-| 0 | Prep / workspace hygiene | `e2e/` becomes a real workspace member (R-5, root `deno.json` one-liner); consume Phase T `catalog:` baseline; aspire-barrel dry-run already fixed upstream (T0). |
+| 0 | Prep / workspace hygiene | `e2e/` becomes a real workspace member (R-5, root `deno.json` one-liner); consume Phase T `catalog:` baseline; aspire-barrel dry-run already fixed upstream (T0). **Fold in the post-#44 freshness bump** (`tailwindcss`/`@tailwindcss/vite` → ^4.3.1, `@preact/signals` → 2.9.2) so the catalog is at-latest before `feat/package-quality` reaches `main`. |
 | 1 | Standards doc (parallel) | Author `packages/cli/docs/standards.md` (§S.1–S.7); catalogue V-1..V-14 as the closing checklist. |
 | 2 | **Command registry + DeployTargetPort** (load-bearing) | Concrete `CliCommandRegistry` over Cliffy `Command` (LD-2) closing V-1/F-CLI-27; `DeployTargetPort` + `DeployTargetRegistryPort` (LD-3 writers under `maintainer/features/codegen/`); fix `DeployTargetKey` union (V-9). |
 | 3 | Surface refactor / moves | Execute the bounded target-tree moves; split the two 384-LOC files (R-2); enforce F-CLI-3/F-CLI-4. |
 | 4 | Scaffold improvements | E.2.1–E.2.10 bounded improvements; assert against the **Phase P published fixture** (`scaffold.published.runtime`). |
-| 5 | Aspire 13.4 GA shape (parallel) | Adopt `apphost.mts` + `.aspire/modules/` GA path (owned here per LD-8); mirror the pinned schema URL (V-14/R-3); wire `WithProcessCommand()` flag-off joint slice (LD-4). |
+| 5 | Aspire 13.4 GA shape — **verify-only / inherited** (parallel) | The `apphost.mts` + `.aspire/modules/*.mts` + `tsconfig.apphost.json` GA migration **already landed in #44 (R6, `677d5405`+`a50d73f`)** to self-green `scaffold.runtime`. This slice no longer *performs* that migration — it **verifies** the inherited shape, mirrors the pinned schema URL (V-14/R-3), and wires `WithProcessCommand()` flag-off (LD-4). Net-new work collapses to schema mirror + flag-off seam. |
 | 6 | Verify + close AP-1 | Full A6 gate sweep; `research-realized.md` (LD-5); AP-1 verdict entry. |
 
 ## Non-Scope
@@ -73,8 +73,10 @@ publishes everything else) so the production `netscript init` is validated again
   (41/41)** — the PR template blocks merge without it.
 - `e2e/` is not currently a true workspace member (R-5) — a one-line root `deno.json` fix in slice 0
   is a prerequisite for the published-fixture e2e in slice 4.
-- The apphost GA realignment (slice 5) edits `scaffold-files.ts`/`scaffold-aspire.ts` apphost paths —
-  **owned here**, not by the upgrade run (LD-8 boundary).
+- ~~The apphost GA realignment (slice 5) edits `scaffold-files.ts`/`scaffold-aspire.ts` apphost paths —
+  owned here, not by the upgrade run (LD-8 boundary).~~ **SUPERSEDED:** R6 in #44 performed the
+  apphost realignment to make `scaffold.runtime` self-green; this wave inherits it (see LD-8 update +
+  drift D-W6-1). Slice 5 is now verify-only on the apphost path.
 
 ## Locked Decisions
 
@@ -87,7 +89,7 @@ publishes everything else) so the production `netscript init` is validated again
 | LD-5 | Impl-realized divergence is logged in a **separate `research-realized.md`**, keeping `research.md` immutable. | Doc-drift mitigation R-12 (decision #5). |
 | LD-6 | Aspire path consumed = **decoupled default** (13.4 GA pins from Phase A); coupled fallback only if upgrade run reports preview. | Mirrors upgrade LD-6/LD-7 (decision #6). |
 | LD-7 | `@netscript/cli` is **not published** in Phase P; ships last. | Production scaffold tested against published deps first (decision #7). |
-| LD-8 | This wave owns `scaffold-files.ts` + `scaffold-aspire.ts` apphost-path migration; the upgrade run owns `scaffold-versions.ts` + CI pin. | Single-file ownership; no cross-program collision. |
+| LD-8 | ~~This wave owns `scaffold-files.ts` + `scaffold-aspire.ts` apphost-path migration~~; the upgrade run owns `scaffold-versions.ts` + CI pin. **AMENDED (D-W6-1):** the apphost-path migration was pulled forward into #44/R6 to self-green `scaffold.runtime`; this wave now **verifies** the inherited shape rather than performing it. The upgrade run still owns `scaffold-versions.ts` + CI pin. | Single-file ownership preserved; the realignment moved to the program that needed it green. |
 
 ## Open-Decision Sweep
 
@@ -176,9 +178,12 @@ Universal F-1..F-18 (F-14 console-log = n/a, already zero) + A6-specific F-CLI-1
 
 ## Dependencies
 
-- **Phase T** (PR #44): `catalog:` baseline + aspire-barrel fix (slice 0).
-- **Phase A** (PR #44): Aspire 13.4 GA pins (slice 5).
-- **Phase P**: published alpha.0 fixture (slice 4 `scaffold.published.runtime`).
+- **Phase T + remediation R1–R6** (PR #44, **MERGED `733388f`** into `feat/package-quality`):
+  `catalog:` baseline + aspire-barrel fix (slice 0) **and** the Aspire 13.4 GA AppHost shape
+  (`apphost.mts` + `.aspire/modules/*.mts` + `tsconfig.apphost.json`) — inherited by slice 5 (D-W6-1).
+  Rebase base for this wave: `733388f`.
+- **Phase P**: published alpha.0 fixture (slice 4 `scaffold.published.runtime`). Run right after the
+  load-bearing slice 2 lands green so slice 4 exercises the real published `netscript init`.
 - External: Aspire 13.4 GA (LD-6); Cliffy `Command` API (LD-2).
 
 ## Drift Watch
