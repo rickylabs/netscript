@@ -122,3 +122,18 @@ current-state documentation.
 - **Action:** fix — Wave 0 re-runs `.llm/tools/fitness/release-readiness.ts` in this repo
   and supersedes the stale numbers before any wave refactors.
 - **Evidence:** to be produced by the Wave 0 baseline re-audit.
+
+## D-SUP-W6 — Wave 6 generator runs slices continuously (not strict per-slice eval-gate)
+
+- **Source:** maintainer directive (2026-06-16): sub-agents must respect a per-slice
+  commit→push→PR-comment pace and "work without interruption until fully done."
+- **Expected (harness default):** per slice — generator brief → impl → SEPARATE IMPL-EVAL →
+  supervisor re-verifies → next slice (generator idles between slices).
+- **Actual:** ONE Codex generator executes Slices 0,1,2,3,5 end-to-end, committing+pushing per
+  slice and not idling. IMPL-EVALs run as separate OpenHands sessions triggered by the supervisor
+  as slices land (in parallel / after), and the supervisor still independently re-verifies. The
+  hard merge gate is preserved: Slice 2 self-runs `scaffold.runtime` and stops if not 41/41.
+- **Severity:** minor (process cadence, not scope/quality). Dual-session evaluation and the
+  load-bearing gate are intact; only the inter-slice barrier is relaxed for momentum.
+- **Action:** accept. Supervisor posts per-slice PR #43 comments (gh unauth in WSL) and routes
+  IMPL-EVALs; any eval FAIL_FIX becomes a follow-up fix slice rather than blocking the run.

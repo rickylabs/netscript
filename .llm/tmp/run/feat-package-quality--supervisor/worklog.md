@@ -143,3 +143,24 @@ under `.worktrees/<name>`:
 - A single A4 unit is well under the `< 30` slice cap, so Wave 3 is **not** expected to need a
   sub-wave split; the umbrella exists for tracking-surface continuity (per
   `lessons/sub-wave-orchestration.md`: stand up the umbrella before merging anything).
+
+### Wave 6 (`@netscript/cli`, PR #43) — PLAN-EVAL PASS + generator launched (2026-06-16)
+
+- **PLAN-EVAL PASS** (cycle 1/1). Evaluator: MiniMax M3, OpenHands run `27650808441-1`,
+  comment `4723981498`. Genuineness verified: `agent-exit-code=0`, `summary_source=agent`,
+  `agent_outcome=success`; verdict committed to `…/wave6-cli--research/plan-eval.md`
+  (+ `plan-eval-v2.md`) at `1e299a72`. 11/11 plan-gate boxes; A6 scrutiny clean. 4 NON-blocking
+  gaps (Gap #1 plan L161 stale file-list, Gap #2 worklog §Design LD-8 prose, Gap #3 drift W-2
+  already-resolved, Gap #4 Phase-P dependency ack) folded into Slice 0.
+- **Generator launched** (Codex WSL, native ext4 worktree `/home/codex/repos/netscript-wave6-cli`,
+  remote-control CONNECTED, mobile thread `77d5db3f-7350-4715-a7d0-49681d5a43ee`). Brief committed
+  at `b631c1e1` (`…/sub-agent-briefs/brief-slices-0-1-2-3-5.md`). Assignment: **Slices 0,1,2,3,5
+  continuous**, per-slice commit→push, run-to-completion. Slice 2 self-gates on `scaffold.runtime`
+  41/41. Slices 4 (Phase-P-blocked) + 6 deferred to a second assignment.
+- **gh is NOT authenticated in WSL** → generator cannot post PR comments. Supervisor posts the
+  per-slice PR #43 comments from pushed commits (commit watcher `buaw7p3w6`), and triggers the
+  separate-session IMPL-EVALs. Generator carries gate evidence in commit messages + turn output.
+- **Next supervisor actions:** (1) per slice landed → post PR #43 comment + launch IMPL-EVAL
+  (separate OpenHands session) + independently re-verify raw evidence; (2) after Slice 2 green →
+  confirm Phase P scope/credentials with maintainer, run `chore/jsr-alpha-publish`; (3) after
+  Phase P → second generator assignment for Slices 4 + 6; (4) merge wave `--no-ff`, then closeout.
