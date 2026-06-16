@@ -83,3 +83,31 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
     passed.
   - `deno task lint` passed with 1,082 selected files and 0 findings.
   - `deno task fmt:check` passed with 1,167 selected files and 0 findings.
+
+### Slice 2 — Command Registry + DeployTargetPort
+
+- Replaced the hand-wired public root command `.command(...)` chain with a concrete
+  `CliCommandRegistry` over Cliffy `Command`, located at the public composition boundary so
+  F-CLI-14 Cliffy containment stays green.
+- Added `DeployTargetPort` and `DeployTargetRegistryPort` under `kernel/domain/deploy/*`, removed
+  the `DeployTargetKey` literal-union lock-in from `DeployTargetRegistry`, and added
+  `WindowsServiceDeployTarget` as the single concrete deploy target adapter.
+- Added four in-memory unit tests for command registry ordering, context passing, duplicate command
+  rejection, and string-keyed deploy target registration.
+- Validation:
+  - `deno check --unstable-kv packages/cli/src/public/features/root/public-command-tree.ts packages/cli/src/public/composition/cli-command-registry.ts packages/cli/src/kernel/application/registries/deploy-target-registry.ts packages/cli/src/public/features/root/command-registry_test.ts`
+    passed.
+  - `deno test --unstable-kv --allow-read --allow-write --allow-env --allow-run packages/cli/src/public/features/root/command-registry_test.ts packages/cli/src/local/composition/local-contributor-command-tree_test.ts`
+    passed with 5 tests, 0 failed.
+  - `deno run --allow-read .llm/tools/fitness/check-cli-isolation.ts` passed
+    (F-CLI-3/F-CLI-4).
+  - `deno run --allow-read .llm/tools/fitness/check-cliffy-containment.ts` passed (F-CLI-14).
+  - `deno run --allow-read .llm/tools/fitness/check-extension-points.ts` passed (F-CLI-31).
+  - `deno task check` passed with 1,587 selected files and 0 findings.
+  - `deno task lint` passed with 1,082 selected files and 0 findings.
+  - `deno task fmt:check` passed with 1,167 selected files and 0 findings.
+  - `deno task arch:check` remains red on the existing baseline (`FAIL=58 WARN=137 INFO=1`);
+    this slice removed its transient new finding and used the focused F-CLI-3/F-CLI-4 layer gate
+    above as the slice layer verdict.
+  - `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "E2E_EXIT=$?"`
+    passed: `Summary: passed=41 failed=0`, `database.init` PASS, `E2E_EXIT=0`.

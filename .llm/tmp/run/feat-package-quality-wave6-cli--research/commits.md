@@ -26,3 +26,4 @@ Slice 2 blocks merge without green `scaffold.runtime`.
 ## Landed IMPL commits
 
 - 9695420: Slice 0: prep hygiene gates green
+- fa3fe22: Slice 1: CLI standards doc doc-lint clean

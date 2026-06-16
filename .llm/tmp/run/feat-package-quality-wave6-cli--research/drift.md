@@ -6,7 +6,7 @@ Reality vs RFC/doctrine assumptions (from research):
 | -- | ---------- | ------- | ------ |
 | W-1 | CLI needs a full rewrite to reach A6-v2. | Already A6-correct shape; bounded moves only. | AP-1 closes as a 7-slice program, not a rewrite. |
 | W-2 | `e2e/` is a workspace member. | Already resolved on the current branch: root `deno.json` includes `packages/cli/e2e`. | Slice 0.1 is a verify-green check, not a workspace edit. |
-| W-3 | `DeployTargetKey` is already a port. | It is a literal-union lock-in (V-9). | `DeployTargetPort` in slice 2. |
+| W-3 | `DeployTargetKey` is already a port. | Slice 2 replaced the literal-union lock-in with `DeployTargetPort` + `DeployTargetRegistryPort`. | Resolved in Slice 2. |
 | W-4 | Aspire 13.4 native Deno apphost is released. | Not at research time; bump deferred to slice 5, consuming Phase A pins. | Slice 5 gated on upgrade-run GA status (LD-6). |
 | W-5 | Root `deno publish --dry-run` failure is a CLI bug. | Upstream `packages/aspire` barrel false-positive (R-1); fixed in Phase T (T0). | Not a CLI blocker. |
 

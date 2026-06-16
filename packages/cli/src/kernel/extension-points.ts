@@ -19,3 +19,10 @@ export { OutputRendererRegistry } from './application/registries/output-renderer
 
 /** Deployment target descriptors supported by deploy commands. */
 export { DeployTargetRegistry } from './application/registries/deploy-target-registry.ts';
+export type {
+  DeployTargetOperation,
+  DeployTargetPort,
+  DeployTargetRequest,
+  DeployTargetResult,
+} from './domain/deploy/deploy-target-port.ts';
+export type { DeployTargetRegistryPort } from './domain/deploy/deploy-target-registry-port.ts';
