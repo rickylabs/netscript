@@ -2,7 +2,7 @@
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
-import type { InfrastructureContext } from './register-infrastructure.ts';
+import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
   buildDatabaseUriEnvKey,
   buildOtelEnvVars,
@@ -16,8 +16,8 @@ type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutabl
  * Registers plugins with the Aspire SDK builder using a two-pass approach.
  *
  * - Pass 1: Create all plugin resources via `addExecutable()` with resolved
- *   permissions, working directory, HTTP endpoint, OTEL telemetry (3 vars
- *   via `denoApp` mode), infrastructure dependencies, and service references
+ *   permissions, working directory, HTTP endpoint, executable-mode OTEL
+ *   telemetry, infrastructure dependencies, and service references
  *   via endpoint env vars (`getEndpoint('http')` + `withEnvironment()`).
  * - Pass 2: Wire `PluginReferences` (plugin→plugin) via endpoint env vars
  *   (`getEndpoint('http')` + `withEnvironment()`) to avoid forward-reference

@@ -78,7 +78,7 @@ export class DbOperationRunner {
     database: DiscoveredDatabase,
   ): Promise<number> {
     const aspireDir = join(request.projectRoot, SCAFFOLD_DIRS.ASPIRE_TS);
-    const apphostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_TS);
+    const apphostPath = join(aspireDir, SCAFFOLD_FILES.APPHOST_MTS);
     const env = buildDbCliEnv(
       request.operation,
       database.configKey,
@@ -193,7 +193,15 @@ export class DbOperationRunner {
 
     while (Date.now() <= deadline) {
       const output = await this.runAspire(
-        ['ps', '--resources', '--format', 'Json', '--non-interactive', '--nologo'],
+        [
+          'describe',
+          '--apphost',
+          apphostPath,
+          '--format',
+          'Json',
+          '--non-interactive',
+          '--nologo',
+        ],
         { cwd: aspireDir },
       );
       const resource = findExecutableStatus(output.stdout, apphostPath, displayName);

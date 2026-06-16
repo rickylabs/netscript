@@ -58,7 +58,7 @@ export function generateReadme(options: ReadmeOptions): string {
     } else {
       lines.push('# Restore Aspire SDK modules (once), then start orchestration');
       lines.push(
-        '# (run from the aspire/ subfolder so `aspire` sees apphost.ts + aspire.config.json)',
+        '# (run from the aspire/ subfolder so `aspire` sees apphost.mts + aspire.config.json)',
       );
       lines.push('cd aspire && aspire restore');
       lines.push('aspire run');
@@ -86,9 +86,9 @@ export function generateReadme(options: ReadmeOptions): string {
     lines.push(
       '├── aspire/           # Aspire TypeScript orchestration (isolated Node.js runtime)',
     );
-    lines.push('│   ├── apphost.ts    # Entry point for `aspire run`');
-    lines.push('│   ├── .helpers/     # Generated register-*.ts helpers');
-    lines.push('│   ├── .modules/     # Aspire SDK modules (aspire restore output)');
+    lines.push('│   ├── apphost.mts   # Entry point for `aspire run`');
+    lines.push('│   ├── .helpers/     # Generated register-*.mts helpers');
+    lines.push('│   ├── .aspire/      # Aspire SDK modules (aspire restore output)');
     lines.push('│   └── package.json  # tsx + vscode-jsonrpc (isolated from the Deno workspace)');
   }
   lines.push('├── appsettings.json  # NetScript infrastructure config (Services/Databases/…)');

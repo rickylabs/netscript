@@ -60,7 +60,7 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
     '**/node_modules',
     'dotnet',
     '**/.git',
-    `${SCAFFOLD_DIRS.ASPIRE_TS}/${SCAFFOLD_DIRS.MODULES}`,
+    `${SCAFFOLD_DIRS.ASPIRE_TS}/${SCAFFOLD_DIRS.ASPIRE_GENERATED}`,
     `${SCAFFOLD_DIRS.ASPIRE_TS}/${SCAFFOLD_DIRS.HELPERS}`,
     '**/.generated',
   ];

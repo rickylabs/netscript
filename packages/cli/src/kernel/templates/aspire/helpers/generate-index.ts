@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/index.ts` — the barrel + orchestrator file that
+ * Generator for `.helpers/index.mts` — the barrel + orchestrator file that
  * exports `createNetScriptAppHost()`. This is the single entry point that
  * parses project configuration and registers all resources with the Aspire
  * SDK builder in the correct order following C# NuGet semantics.
@@ -27,7 +27,7 @@ import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../adapters/templates/template-asset.ts';
 
 /**
- * Generates the `.helpers/index.ts` file content — the barrel + orchestrator
+ * Generates the `.helpers/index.mts` file content — the barrel + orchestrator
  * that exports `createNetScriptAppHost()`.
  *
  * This generator takes no options because the index file always includes all
@@ -38,14 +38,14 @@ import { renderTemplateAssetSync } from '../../../adapters/templates/template-as
  */
 export function generateIndex(): string {
   // Derive module names without extensions for function import names
-  const configDashboardModule = `./${HELPERS_FILES.CONFIGURE_DASHBOARD}`;
-  const infraModule = `./${HELPERS_FILES.REGISTER_INFRASTRUCTURE}`;
-  const dbCliModeModule = `./${HELPERS_FILES.DB_CLI_MODE}`;
-  const servicesModule = `./${HELPERS_FILES.REGISTER_SERVICES}`;
-  const pluginsModule = `./${HELPERS_FILES.REGISTER_PLUGINS}`;
-  const backgroundModule = `./${HELPERS_FILES.REGISTER_BACKGROUND}`;
-  const appsModule = `./${HELPERS_FILES.REGISTER_APPS}`;
-  const toolsModule = `./${HELPERS_FILES.REGISTER_TOOLS}`;
+  const configDashboardModule = helperRuntimeImport(HELPERS_FILES.CONFIGURE_DASHBOARD);
+  const infraModule = helperRuntimeImport(HELPERS_FILES.REGISTER_INFRASTRUCTURE);
+  const dbCliModeModule = helperRuntimeImport(HELPERS_FILES.DB_CLI_MODE);
+  const servicesModule = helperRuntimeImport(HELPERS_FILES.REGISTER_SERVICES);
+  const pluginsModule = helperRuntimeImport(HELPERS_FILES.REGISTER_PLUGINS);
+  const backgroundModule = helperRuntimeImport(HELPERS_FILES.REGISTER_BACKGROUND);
+  const appsModule = helperRuntimeImport(HELPERS_FILES.REGISTER_APPS);
+  const toolsModule = helperRuntimeImport(HELPERS_FILES.REGISTER_TOOLS);
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateIndex1, {
     __slot0__: String(fileHeader(HELPERS_FILES.INDEX)),
@@ -60,4 +60,8 @@ export function generateIndex(): string {
     __slot9__: String(appsModule),
     __slot10__: String(toolsModule),
   });
+}
+
+function helperRuntimeImport(fileName: string): string {
+  return `./${fileName.replace(/\.mts$/, '.mjs')}`;
 }

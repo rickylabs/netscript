@@ -2,7 +2,9 @@ import type { DbOperationRequest } from '../../domain/db-engine.ts';
 
 interface AspireResourceStatus {
   readonly displayName?: string;
+  readonly name?: string;
   readonly exitCode?: number | null;
+  readonly type?: string;
   readonly resourceType?: string;
   readonly state?: string | null;
 }
@@ -54,29 +56,51 @@ export function buildExecutableDisplayName(
 }
 
 export function findExecutableStatus(
-  psJson: string,
+  statusJson: string,
   apphostPath: string,
   displayName: string,
 ): AspireResourceStatus | null {
-  const apphosts = parseAspirePsJson(psJson);
-  const apphost = apphosts.find((entry) =>
-    typeof entry.appHostPath === 'string' &&
-    normalisePath(entry.appHostPath) === normalisePath(apphostPath)
-  );
-  if (!apphost?.resources) {
-    return null;
-  }
-  return apphost.resources.find((resource) =>
-    resource.displayName === displayName && resource.resourceType === 'Executable'
+  return parseAspireResourceStatuses(statusJson, apphostPath).find((resource) =>
+    (resource.displayName === displayName || resource.name === displayName) &&
+    (resource.resourceType === 'Executable' || resource.type === 'Executable')
   ) ?? null;
 }
 
-function parseAspirePsJson(psJson: string): AspireAppHostStatus[] {
-  const parsed = JSON.parse(psJson) as unknown;
+function parseAspireResourceStatuses(
+  statusJson: string,
+  apphostPath: string,
+): AspireResourceStatus[] {
+  const parsed = JSON.parse(statusJson) as unknown;
   if (!Array.isArray(parsed)) {
-    throw new Error('Expected `aspire ps --resources --format Json` to return an array.');
+    if (isObjectWithResources(parsed)) {
+      return [...parsed.resources];
+    }
+    throw new Error('Expected Aspire resource JSON to return an array or object with resources.');
   }
-  return parsed as AspireAppHostStatus[];
+
+  if (parsed.every(isResourceStatus)) {
+    return parsed;
+  }
+
+  const apphost = (parsed as AspireAppHostStatus[]).find((entry) =>
+    typeof entry.appHostPath === 'string' &&
+    normalisePath(entry.appHostPath) === normalisePath(apphostPath)
+  );
+  return apphost?.resources ? [...apphost.resources] : [];
+}
+
+function isObjectWithResources(value: unknown): value is { resources: readonly AspireResourceStatus[] } {
+  return typeof value === 'object' && value !== null && Array.isArray(
+    (value as { resources?: unknown }).resources,
+  );
+}
+
+function isResourceStatus(value: unknown): value is AspireResourceStatus {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return typeof record.displayName === 'string' || typeof record.name === 'string';
 }
 
 function normalisePath(path: string): string {

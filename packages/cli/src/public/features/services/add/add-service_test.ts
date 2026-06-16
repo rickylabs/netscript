@@ -60,7 +60,7 @@ describe('public add service flow', () => {
         workspaceResolver: new ContractWorkspaceResolver(fs),
       }),
       serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.ts']),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 
     const serviceDenoJson = JSON.parse(

@@ -65,7 +65,7 @@ describe('local contributor add plugin flow', () => {
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
       findSourceRoot: () => Promise.resolve('/repo'),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.ts']),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 
     const pluginDenoJson = JSON.parse(
@@ -146,7 +146,7 @@ describe('local contributor add plugin flow', () => {
           pluginReferences: [],
           workspaceMembers: ['workers'],
         }),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.ts']),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 
     const appsettings = JSON.parse(await fs.readFile('/workspace/alpha/appsettings.json'));

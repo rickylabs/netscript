@@ -49,7 +49,7 @@ export class HelpersGeneratorPipeline {
 
     // 0. Tier 2: Aspire compat shim (D-7 Node.js workaround)
     files.push({
-      path: SCAFFOLD_DIRS.HELPERS + '/_aspire-compat.ts',
+      path: SCAFFOLD_DIRS.HELPERS + '/_aspire-compat.mts',
       content: templates.aspireCompatTemplate,
     });
 
@@ -144,7 +144,7 @@ export class HelpersGeneratorPipeline {
     };
   }
 
-  /** Generates `.helpers/db-cli-mode.ts` — database operation short-circuit mode. */
+  /** Generates `.helpers/db-cli-mode.mts` — database operation short-circuit mode. */
   buildDbCliMode(options: DbCliModeOptions): GeneratedFile {
     return {
       path: `${SCAFFOLD_DIRS.HELPERS}/${HELPERS_FILES.DB_CLI_MODE}`,
@@ -210,7 +210,7 @@ export class HelpersGeneratorPipeline {
       : renderSimple(resolvedTemplates.apphostTemplate, vars);
 
     return {
-      path: SCAFFOLD_FILES.APPHOST_TS,
+      path: SCAFFOLD_FILES.APPHOST_MTS,
       content,
     };
   }

@@ -27,7 +27,7 @@ describe('generateRegisterBackground', () => {
   it('should include the standard file header', () => {
     const output = generateRegisterBackground(emptyOptions);
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'register-background.ts');
+    assertStringIncludes(output, 'register-background.mts');
   });
 
   it('should export registerBackgroundProcessors async function', () => {
@@ -124,7 +124,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(output, '// Database dependency');
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
-    assertStringIncludes(output, "withEnvironmentConnectionString('DATABASE_URL'");
+    assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
   });
 
   it('should include KV cache dependency when RequiresKv is true', () => {
@@ -138,7 +138,7 @@ describe('generateRegisterBackground', () => {
     });
     assertStringIncludes(output, '// KV cache dependency');
     assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
-    assertStringIncludes(output, 'withReferenceEndpoint(infrastructure.primaryCacheEndpoint)');
+    assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
   });
 
   it('should handle empty processors', () => {
@@ -167,7 +167,7 @@ describe('generateRegisterApps', () => {
   it('should include the standard file header', () => {
     const output = generateRegisterApps(emptyOptions);
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'register-apps.ts');
+    assertStringIncludes(output, 'register-apps.mts');
   });
 
   it('should export registerApps async function', () => {
@@ -178,7 +178,7 @@ describe('generateRegisterApps', () => {
   it('should import buildViteEnvVarName from _aspire-compat', () => {
     const output = generateRegisterApps(emptyOptions);
     assertStringIncludes(output, 'buildViteEnvVarName,');
-    assertStringIncludes(output, "from './_aspire-compat.ts'");
+    assertStringIncludes(output, "from './_aspire-compat.mjs'");
   });
 
   it('should register app type via addExecutable with default entrypoint', () => {

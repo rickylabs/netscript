@@ -222,3 +222,109 @@ green under Aspire 13.4.4. Root cause is the deferred TypeScript AppHost GA path
 (`apphost.mts` + `.aspire/modules/`) versus the current generated scaffold shape (`apphost.ts` +
 `.modules/`). This is larger than an R5 evidence-only fix and crosses the documented Wave 6
 ownership boundary, so no product code was changed in R5.
+
+### R6 — Aspire 13.4 AppHost path migration (2026-06-16)
+
+Pre-flight:
+
+- Native WSL worktree: `/home/codex/repos/netscript-chore-deno-2.8-aspire-13.4-upgrade`.
+- Reset target: `origin/chore/deno-2.8-aspire-13.4-upgrade`.
+- Pre-edit HEAD: `dfebaee` (`docs(harness): R6 brief — Aspire 13.4 AppHost path migration (hotpatch R5 blocker) [C6]`).
+- Deno: `deno 2.8.3 (stable, release, x86_64-unknown-linux-gnu)`.
+- Aspire CLI: `13.4.4+ccc566c5ab3285c9beb8f38ede34734bb477c029`.
+
+Research checkpoint:
+
+- Aspire 13.4 docs confirm TypeScript AppHosts are GA and new TypeScript projects use
+  `apphost.mts`, import `createBuilder` from `./.aspire/modules/aspire.mjs`, and use generated SDK
+  modules under `.aspire/modules/`.
+- The legacy compatibility section documents the old pre-13.4 shape as `apphost.ts` plus
+  `./.modules/aspire.js`; migrating requires `appHost.path: "apphost.mts"`, `tsconfig.apphost.json`
+  entries for `apphost.mts` and `.aspire/modules/**/*.mts`, deleting `.modules`, regenerating with
+  `aspire restore`, and replacing `.gitignore` references to `.modules/`.
+- Repo search before edits found old-shape literals in scaffold constants, TS AppHost rendering,
+  helper templates/tests, workspace README generation, and E2E smoke expectations.
+
+Empirical Aspire 13.4.4 shape:
+
+- `aspire init --language typescript --non-interactive --nologo` in
+  `.llm/tmp/r6-empirical-aspire/upstream-ts` created `apphost.mts`, `aspire.config.json`,
+  `tsconfig.apphost.json`, `package.json`, `.gitignore`, and generated SDK modules under
+  `.aspire/modules/{aspire.mts,base.mts,transport.mts}`.
+- Upstream `apphost.mts` imports `createBuilder` from `./.aspire/modules/aspire.mjs`.
+- Upstream `aspire.config.json` sets `appHost.path` to `apphost.mts`.
+- Upstream `tsconfig.apphost.json` includes `apphost.mts` plus the explicit
+  `.aspire/modules/*.mts` files and excludes `node_modules`.
+- Upstream `.gitignore` ignores `.aspire/`, not `.modules/`.
+
+Implementation checkpoint:
+
+- NetScript scaffold now emits `aspire/apphost.mts`, `aspire/tsconfig.apphost.json`, and helper
+  sources under `aspire/.helpers/*.mts`.
+- Runtime imports use `.mjs` specifiers (`./.aspire/modules/aspire.mjs`,
+  `./.helpers/index.mjs`, and helper-to-helper `.mjs` imports) so NodeNext/tsx resolves the
+  generated `.mts` sources correctly.
+- Aspire integration NuGet package constants for Postgres/MySQL/MSSQL/Redis are aligned to
+  `13.4.4` with the `13.4.4` SDK.
+- Smoke scaffold `r6-smoke4` generated the new shape, `aspire restore --non-interactive --nologo`
+  restored `.aspire/modules/*.mts`, and `npm exec -- tsc -p tsconfig.apphost.json` passed.
+- Focused generator tests passed: 25 tests / 115 steps.
+- `deno check --unstable-kv packages/cli` passed.
+
+Runtime E2E diagnosis:
+
+- First full `scaffold.runtime` rerun after the path migration reached `database.init` but failed
+  with `E2E_EXIT=1`; pretty summary was `passed=9 failed=1`.
+- The generated project was `.llm/tmp/cli-e2e/plugin-smoke-20260616-162116`; Aspire child log
+  `/home/codex/.aspire/logs/cli_20260616T142122821_detach-child_b0823125a3424ab0b889b62d62e4d1f3.log`
+  showed TypeScript AppHost compile errors, not a database engine failure.
+- Root cause: full plugin/runtime scaffold emits background/plugin cache wiring through
+  `withReferenceEndpoint(...)`, but the Aspire 13.4 GA generated TypeScript SDK has no
+  `withReferenceEndpoint`; `withReference(...)` accepts `EndpointReference` directly.
+- Fixed `generate-register-background` and `generate-register-plugins` to emit
+  `withReference(infrastructure.primaryCacheEndpoint)` for endpoint references.
+- Focused rerun passed:
+  `deno test --allow-read packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts`
+  (4 tests / 49 steps).
+
+Second runtime E2E diagnosis:
+
+- Full `scaffold.runtime` rerun after the endpoint-reference fix passed AppHost type-check and then
+  failed `database.init` with `Error: aspire ps failed: Unrecognized command or argument
+  '--resources'.`
+- Aspire 13.4 `aspire ps --help` confirms `ps` now lists AppHosts only; resource inspection is
+  under `aspire describe --apphost <apphost> --format Json`.
+- Updated `DbOperationRunner` polling to call `aspire describe --apphost ... --format Json` and
+  kept the parser backward-compatible with the old `ps --resources` array shape.
+- Diagnostic normal AppHost start exposed another 13.4 runtime issue:
+  `Flushing 20 pending promise(s). Consider awaiting fluent calls to avoid implicit flushing.`
+  Fixed generated app/service/plugin/background/tool helpers so Aspire fluent side-effect calls are
+  awaited before build/run.
+- Removed temporary diagnostic Docker container `e13aeefe278c` (`postgres:18.3`) before rerunning
+  the acceptance gate.
+- Focused rerun passed:
+  `deno test --allow-read packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts packages/cli/src/kernel/adapters/database/operation-runner_test.ts`
+  (8 tests / 74 steps).
+- `deno check --unstable-kv packages/cli` passed.
+
+Third runtime E2E diagnosis:
+
+- Full `scaffold.runtime` rerun after the describe/fluent-await fixes still failed `database.init`
+  with `TS2741` in generated `.helpers/register-tools.mts`: `ExecutableResource` was assigned into a
+  local type still modeled as `ExecutableResourcePromise`.
+- Fixed the tool helper generator/template so tool resources are awaited immediately and the local
+  `ToolResource` type is `Awaited<ReturnType<DistributedApplicationBuilder['addExecutable']>>`.
+- Focused rerun passed:
+  `deno test --allow-read packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts packages/cli/src/kernel/adapters/database/operation-runner_test.ts`
+  (4 tests / 25 steps).
+- Broader scaffold generator/database suite passed:
+  `deno test --allow-read packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-config-infra_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts packages/cli/src/kernel/templates/workspace/generators_test.ts packages/cli/src/kernel/adapters/database/operation-runner_test.ts`
+  (25 tests / 115 steps).
+- Final `deno check --unstable-kv packages/cli` passed.
+- Final acceptance gate passed:
+  `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` ended with
+  `database.init` PASS, `Summary: passed=41 failed=0`, and `E2E_EXIT=0`.
+- `deno task check:scaffold-versions` passed after the migration (`E-12 OK — 10 scaffold pin(s)
+  are stable`).
+- Post-run Docker hygiene: stopped and removed leftover smoke container `49df3761fac1`
+  (`postgres:18.3`).

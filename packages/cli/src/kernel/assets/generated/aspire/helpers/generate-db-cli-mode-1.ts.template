@@ -3,7 +3,7 @@
 import { resolve } from 'node:path';
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
-import type { InfrastructureContext } from './register-infrastructure.ts';
+import type { InfrastructureContext } from './register-infrastructure.mjs';
 
 interface DbCliTarget {
   readonly configKey: string;
@@ -13,7 +13,7 @@ interface DbCliTarget {
   readonly engine: string;
   readonly taskSuffix: string;
   readonly workdir: string;
-  readonly resource: unknown;
+  readonly resource: InfrastructureContext['primaryDatabase'];
 }
 
 /**

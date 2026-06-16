@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/register-plugins.ts` — registers plugin resources
+ * Generator for `.helpers/register-plugins.mts` — registers plugin resources
  * with the Aspire SDK builder using a two-pass approach to resolve
  * plugin→plugin forward references.
  *
@@ -27,7 +27,7 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 
 /**
- * Generates the `register-plugins.ts` file content.
+ * Generates the `register-plugins.mts` file content.
  *
  * Produces a two-pass registration function that first creates every plugin
  * resource (with infrastructure deps and service references), then wires
@@ -77,7 +77,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
     );
     lines.push(
-      `    resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
+      `    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
     );
 
     // OTEL telemetry (full executable env set)
@@ -87,7 +87,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable', config.Otel.HttpEndpoint);`,
     );
     lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
-    lines.push(`      resource.withEnvironment(key, value);`);
+    lines.push(`      await resource.withEnvironment(key, value);`);
     lines.push(`    }`);
 
     // Database dependency
@@ -96,11 +96,11 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(`    // Database dependency`);
       lines.push(`    if (infrastructure.primaryDatabase) {`);
       lines.push(
-        `      let databaseBinding = resource.withEnvironmentConnectionString('DATABASE_URL', infrastructure.primaryDatabase);`,
+        `      let databaseBinding = resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`,
       );
       lines.push(`      if (databaseEnvKey) {`);
       lines.push(
-        `        databaseBinding = databaseBinding.withEnvironmentConnectionString(databaseEnvKey, infrastructure.primaryDatabase);`,
+        `        databaseBinding = databaseBinding.withEnvironment(databaseEnvKey, infrastructure.primaryDatabase);`,
       );
       lines.push(`      }`);
       lines.push(`      await databaseBinding`);
@@ -115,11 +115,11 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(`    // KV cache dependency`);
       lines.push(`    if (infrastructure.primaryCache) {`);
       lines.push(`      if (infrastructure.primaryCacheEndpoint) {`);
-      lines.push(`        resource.withReferenceEndpoint(infrastructure.primaryCacheEndpoint);`);
+      lines.push(`        await resource.withReference(infrastructure.primaryCacheEndpoint);`);
       lines.push(`      } else {`);
-      lines.push(`        resource.withReference(infrastructure.primaryCache);`);
+      lines.push(`        await resource.withReference(infrastructure.primaryCache);`);
       lines.push(`      }`);
-      lines.push(`      resource.waitFor(infrastructure.primaryCache);`);
+      lines.push(`      await resource.waitFor(infrastructure.primaryCache);`);
       lines.push(`    }`);
     }
 
@@ -138,7 +138,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
         );
         lines.push(`      if (${refId}Endpoint) {`);
         lines.push(
-          `        resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
+          `        await resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
         );
         lines.push(`      }`);
         lines.push(`    }`);
@@ -171,10 +171,10 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(
         `        const ${refId}Endpoint = await plugins.get('${ref}')?.getEndpoint('http');`,
       );
-      lines.push(`        if (${refId}Endpoint) {`);
-      lines.push(
-        `          resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
-      );
+        lines.push(`        if (${refId}Endpoint) {`);
+        lines.push(
+          `          await resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
+        );
       lines.push(`        }`);
       lines.push(`      }`);
     }
@@ -198,7 +198,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     : '  // No plugin→plugin cross-references to wire.';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterPlugins1, {
-    __slot0__: String(fileHeader('register-plugins.ts')),
+    __slot0__: String(fileHeader('register-plugins.mts')),
     __slot1__: String(aspireImport),
     __slot2__: String(aspirePackage),
     __slot3__: String(aspirePackage),

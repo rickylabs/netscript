@@ -35,7 +35,7 @@ export async function scaffoldTsAppHost(
   //
   // Pass the selected DB engine so the generator can declare the matching
   // Aspire Hosting NuGet (Postgres/MySql/etc.). Without it, `aspire restore`
-  // produces a `.modules/aspire.ts` SDK that lacks `builder.addPostgres`
+  // produces an `.aspire/modules/aspire.mts` SDK that lacks `builder.addPostgres`
   // and friends — and the generated `.helpers/register-infrastructure.ts`
   // throws "is not a function" at apphost start.
   const aspireConfigContent = generateTsAspireConfig({
@@ -48,7 +48,7 @@ export async function scaffoldTsAppHost(
     filesSkipped.push(aspireConfigPath);
   }
 
-  // 2. package.json — tsx + vscode-jsonrpc required by Aspire TS AppHost runtime.
+  // 2. package.json — Node/TypeScript dependencies required by Aspire TS AppHost runtime.
   //    Lives inside `aspire/` to keep the Node.js package graph isolated
   //    from the Deno workspace at the project root.
   const packageJsonContent = JSON.stringify(
@@ -57,9 +57,13 @@ export async function scaffoldTsAppHost(
       version: '1.0.0',
       private: true,
       type: 'module',
-      devDependencies: {
-        tsx: '4.21.0',
+      dependencies: {
         'vscode-jsonrpc': '8.2.0',
+      },
+      devDependencies: {
+        '@types/node': '^22.0.0',
+        tsx: '4.21.0',
+        typescript: '^5.9.3',
       },
     },
     null,
@@ -72,12 +76,46 @@ export async function scaffoldTsAppHost(
     filesSkipped.push(packageJsonPath);
   }
 
-  // 3. .helpers/ directory (inside aspire/)
+  // 3. tsconfig.apphost.json — Aspire 13.4 validates TypeScript AppHosts before startup.
+  const tsconfigApphostContent = JSON.stringify(
+    {
+      compilerOptions: {
+        target: 'ES2022',
+        module: 'NodeNext',
+        moduleResolution: 'NodeNext',
+        esModuleInterop: true,
+        forceConsistentCasingInFileNames: true,
+        strict: true,
+        skipLibCheck: true,
+        outDir: './dist/apphost',
+        rootDir: '.',
+      },
+      include: [
+        SCAFFOLD_FILES.APPHOST_MTS,
+        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/aspire.mts`,
+        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/base.mts`,
+        `${SCAFFOLD_DIRS.ASPIRE_GENERATED}/${SCAFFOLD_DIRS.MODULES}/transport.mts`,
+      ],
+      exclude: ['node_modules'],
+    },
+    null,
+    2,
+  ) + '\n';
+  const tsconfigApphostPath = join(aspireDir, SCAFFOLD_FILES.TSCONFIG_APPHOST);
+  if (
+    await context.scaffolder.writeFile(tsconfigApphostPath, tsconfigApphostContent, options.force)
+  ) {
+    filesCreated.push(tsconfigApphostPath);
+  } else {
+    filesSkipped.push(tsconfigApphostPath);
+  }
+
+  // 4. .helpers/ directory (inside aspire/)
   const helpersDir = join(aspireDir, SCAFFOLD_DIRS.HELPERS);
   await context.scaffolder.createDir(helpersDir);
   directoriesCreated.push(helpersDir);
 
-  // 4. Build NetScriptConfig for the helpers generator from validated options.
+  // 5. Build NetScriptConfig for the helpers generator from validated options.
   //    Mirrors what appsettings.json contains after scaffoldRoot writes it.
   const services: NetScriptConfig['Services'] = {};
   if (options.includeExampleService && options.serviceName && options.servicePort) {
@@ -180,8 +218,8 @@ export async function scaffoldTsAppHost(
     Tools: buildDefaultTools(primaryDatabase),
   };
 
-  // 5. Run helpers generator pipeline → apphost.ts + .helpers/*.ts
-  //    configPath is relative to `apphost.ts`'s location — which is inside
+  // 6. Run helpers generator pipeline → apphost.mts + .helpers/*.mts
+  //    configPath is relative to `apphost.mts`'s location — which is inside
   //    `aspire/`, so we need to walk one level up to hit the root
   //    `appsettings.json` written by `scaffoldRoot()`.
   const helpersPipeline = new HelpersGeneratorPipeline(context.templateAdapter);
@@ -191,7 +229,7 @@ export async function scaffoldTsAppHost(
     generateAppHost: true,
   });
 
-  // 6. Write all generated files under aspire/ (apphost.ts + .helpers/*.ts)
+  // 7. Write all generated files under aspire/ (apphost.mts + .helpers/*.mts)
   for (const file of generatedFiles) {
     const filePath = join(aspireDir, file.path);
     if (await context.scaffolder.writeFile(filePath, file.content, options.force)) {

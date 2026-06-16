@@ -20,7 +20,8 @@ export const SCAFFOLD_DIRS = {
   V1: 'v1',
   PROPERTIES: 'Properties',
   HELPERS: '.helpers',
-  MODULES: '.modules',
+  ASPIRE_GENERATED: '.aspire',
+  MODULES: 'modules',
   BACKGROUND: 'background',
   TOOLS: 'tools',
 } as const;

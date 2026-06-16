@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/register-background.ts` — registers background
+ * Generator for `.helpers/register-background.mts` — registers background
  * processors (workers, sagas, triggers, benchmark) with the Aspire SDK
  * builder via `addExecutable()`.
  *
@@ -26,7 +26,7 @@ import { renderTemplateAssetSync } from '../../../../adapters/templates/template
 const DEFAULT_BACKGROUND_ENTRYPOINT = 'bin/combined.ts';
 
 /**
- * Generates the register-background.ts file content.
+ * Generates the register-background.mts file content.
  *
  * @param options - Background processor entries, version, and Deno defaults from parsed config
  * @returns Generated TypeScript source as a string
@@ -73,7 +73,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['run', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, '${entrypoint}']);`,
     );
     lines.push(
-      `    ${id}.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', ${id}_bootstrapModule);`,
+      `    await ${id}.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', ${id}_bootstrapModule);`,
     );
 
     // Telemetry env vars
@@ -84,13 +84,13 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         `    const ${id}_otel = buildOtelEnvVars('${name}', config.Version, 'executable', config.Otel.HttpEndpoint);`,
       );
       lines.push(`    for (const [key, value] of Object.entries(${id}_otel)) {`);
-      lines.push(`      ${id}.withEnvironment(key, value);`);
+      lines.push(`      await ${id}.withEnvironment(key, value);`);
       lines.push(`    }`);
     } else {
       lines.push(``);
       lines.push(`    // Telemetry disabled — opt out explicitly`);
-      lines.push(`    ${id}.withEnvironment('OTEL_DENO', 'false');`);
-      lines.push(`    ${id}.withEnvironment('OTEL_TRACES_SAMPLER', 'always_off');`);
+      lines.push(`    await ${id}.withEnvironment('OTEL_DENO', 'false');`);
+      lines.push(`    await ${id}.withEnvironment('OTEL_TRACES_SAMPLER', 'always_off');`);
     }
 
     // Concurrency
@@ -98,7 +98,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(``);
       lines.push(`    // Concurrency`);
       lines.push(
-        `    ${id}.withEnvironment('${entry.ConcurrencyEnvVar}', String(${entry.Concurrency}));`,
+        `    await ${id}.withEnvironment('${entry.ConcurrencyEnvVar}', String(${entry.Concurrency}));`,
       );
     }
 
@@ -108,11 +108,11 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(`    // Database dependency`);
       lines.push(`    if (infrastructure.primaryDatabase) {`);
       lines.push(
-        `      let ${id}_databaseBinding = ${id}.withEnvironmentConnectionString('DATABASE_URL', infrastructure.primaryDatabase);`,
+        `      let ${id}_databaseBinding = ${id}.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`,
       );
       lines.push(`      if (databaseEnvKey) {`);
       lines.push(
-        `        ${id}_databaseBinding = ${id}_databaseBinding.withEnvironmentConnectionString(databaseEnvKey, infrastructure.primaryDatabase);`,
+        `        ${id}_databaseBinding = ${id}_databaseBinding.withEnvironment(databaseEnvKey, infrastructure.primaryDatabase);`,
       );
       lines.push(`      }`);
       lines.push(`      await ${id}_databaseBinding`);
@@ -126,11 +126,11 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(`    // KV cache dependency`);
       lines.push(`    if (infrastructure.primaryCache) {`);
       lines.push(`      if (infrastructure.primaryCacheEndpoint) {`);
-      lines.push(`        ${id}.withReferenceEndpoint(infrastructure.primaryCacheEndpoint);`);
+      lines.push(`        await ${id}.withReference(infrastructure.primaryCacheEndpoint);`);
       lines.push(`      } else {`);
-      lines.push(`        ${id}.withReference(infrastructure.primaryCache);`);
+      lines.push(`        await ${id}.withReference(infrastructure.primaryCache);`);
       lines.push(`      }`);
-      lines.push(`      ${id}.waitFor(infrastructure.primaryCache);`);
+      lines.push(`      await ${id}.waitFor(infrastructure.primaryCache);`);
       lines.push(`    }`);
     }
 
@@ -149,7 +149,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         );
         lines.push(`      if (${refId}Endpoint) {`);
         lines.push(
-          `        ${id}.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
+          `        await ${id}.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
         );
         lines.push(`      }`);
         lines.push(`    }`);
@@ -169,7 +169,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
         );
         lines.push(`      if (${refId}Endpoint) {`);
         lines.push(
-          `        ${id}.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
+          `        await ${id}.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
         );
         lines.push(`      }`);
         lines.push(`    }`);
@@ -184,7 +184,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
   }
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterBackground1, {
-    __slot0__: String(fileHeader('register-background.ts')),
+    __slot0__: String(fileHeader('register-background.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),

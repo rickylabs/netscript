@@ -11,6 +11,6 @@ export function createSmokeProject(options: RunOptions): SmokeProject {
     smokeRoot: options.smokeRoot,
     projectName: options.projectName,
     projectRoot,
-    appHost: join(projectRoot, 'aspire', 'apphost.ts'),
+    appHost: join(projectRoot, 'aspire', 'apphost.mts'),
   };
 }

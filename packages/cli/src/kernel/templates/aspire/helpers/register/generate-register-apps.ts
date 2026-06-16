@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/register-apps.ts` — registers application resources
+ * Generator for `.helpers/register-apps.mts` — registers application resources
  * (web apps, Tauri desktop apps, and task-based apps) with the Aspire SDK
  * builder.
  *
@@ -31,7 +31,7 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 
 /**
- * Generates the register-apps.ts file content.
+ * Generates the register-apps.mts file content.
  *
  * @param options - App entries, version, and Deno defaults from parsed config
  * @returns Generated TypeScript source as a string
@@ -68,14 +68,14 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       `    const ${id}_otel = buildOtelEnvVars('${name}', config.Version, 'executable', config.Otel.HttpEndpoint);`,
     );
     lines.push(`    for (const [key, value] of Object.entries(${id}_otel)) {`);
-    lines.push(`      ${id}.withEnvironment(key, value);`);
+    lines.push(`      await ${id}.withEnvironment(key, value);`);
     lines.push(`    }`);
 
     // --- Common: HTTP endpoint ---
     if (entry.Port) {
       lines.push(``);
       lines.push(`    // HTTP endpoint`);
-      lines.push(`    ${id}.withHttpEndpoint({ port: ${entry.Port}, env: 'PORT' });`);
+      lines.push(`    await ${id}.withHttpEndpoint({ port: ${entry.Port}, env: 'PORT' });`);
     }
 
     // --- Common: KV cache dependency ---
@@ -83,8 +83,8 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       lines.push(``);
       lines.push(`    // KV cache dependency`);
       lines.push(`    if (infrastructure.primaryCache) {`);
-      lines.push(`      ${id}.withReference(infrastructure.primaryCache);`);
-      lines.push(`      ${id}.waitFor(infrastructure.primaryCache);`);
+      lines.push(`      await ${id}.withReference(infrastructure.primaryCache);`);
+      lines.push(`      await ${id}.waitFor(infrastructure.primaryCache);`);
       lines.push(`    }`);
     }
 
@@ -105,9 +105,9 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
           `      const endpoint = await getResourceEndpoint(services.get('${ref}'), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
-        lines.push(`        ${id}.withEnvironment(vite.full, endpoint);`);
-        lines.push(`        ${id}.withEnvironment(vite.shorthand, endpoint);`);
-        lines.push(`        ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
+        lines.push(`        await ${id}.withEnvironment(vite.shorthand, endpoint);`);
+        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
         lines.push(`      }`);
         lines.push(`    }`);
       }
@@ -119,9 +119,9 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
           `      const endpoint = await getResourceEndpoint(plugins.get('${ref}'), 'http');`,
         );
         lines.push(`      if (endpoint) {`);
-        lines.push(`        ${id}.withEnvironment(vite.full, endpoint);`);
-        lines.push(`        ${id}.withEnvironment(vite.shorthand, endpoint);`);
-        lines.push(`        ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
+        lines.push(`        await ${id}.withEnvironment(vite.full, endpoint);`);
+        lines.push(`        await ${id}.withEnvironment(vite.shorthand, endpoint);`);
+        lines.push(`        await ${id}.withEnvironment('services__${ref}__http__0', endpoint);`);
         lines.push(`      }`);
         lines.push(`    }`);
       }
@@ -146,7 +146,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
       );
       lines.push(`      if (${remoteId}Endpoint) {`);
       lines.push(
-        `        ${id}.withEnvironment('services__${entry.Remote}__http__0', ${remoteId}Endpoint);`,
+        `        await ${id}.withEnvironment('services__${entry.Remote}__http__0', ${remoteId}Endpoint);`,
       );
       lines.push(`      }`);
       lines.push(`    }`);
@@ -160,7 +160,7 @@ export function generateRegisterApps(options: RegisterAppsOptions): string {
   }
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterApps1, {
-    __slot0__: String(fileHeader('register-apps.ts')),
+    __slot0__: String(fileHeader('register-apps.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
