@@ -54,9 +54,9 @@ Each IMPL slice = its own commit, LF-normalized, `-c core.autocrlf=false`, gate 
 | ------ | ----- | ----- |
 | `70a4904` | `docs(harness): lock final-plan + phase-registry for PR #44 remediation` | B0 |
 | `941eb08` | `feat(tools): deps toolbelt (latest/outdated/why/audit/prod-install) + tasks + entry.md` | B1 |
-| `<pending B2>` | `docs(skills): add netscript-deno-toolchain skill (native deno toolchain goldmine)` | B2 |
-| `<pending B3>` | `docs(skills): add netscript-pr skill (branch/PR/phase-comment/label house format)` | B3 |
-| _pending_ | `feat(tools): watch-run.ts + AGENTS.md toolbelt/skills/watch wiring` | B4+B5 |
+| `a39b513` | `docs(skills): add netscript-deno-toolchain skill (native deno toolchain goldmine)` | B2 |
+| `1d928d3` | `docs(skills): add netscript-pr skill (branch/PR/phase-comment/label house format)` | B3 |
+| `709d811` | `feat(tools): watch-run.ts + AGENTS.md toolbelt/skills/watch wiring` | B4+B5 |
 
 Phase 0 closeout: B6 (prod-install lane) delivered in B1 as `deps/prod-install.ts` +
 `deno task deps:prod-install`. watch-run.ts validated (exit 0 on change, exit 2 on timeout).
