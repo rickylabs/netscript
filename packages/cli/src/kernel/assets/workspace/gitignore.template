@@ -4,6 +4,7 @@ node_modules/
 # Build artifacts
 .deploy/
 *.exe
+.data/
 
 # IDE
 .idea/

@@ -12,7 +12,7 @@
 # Toolchain pinned to this repo's reality:
 #   - Deno 2.8.x  (deno.json uses unstable: kv, temporal, tsgo, worker-options, raw-imports)
 #   - .NET SDK 10.x  (CLI scaffold AppHost/ServiceDefaults target net10.0)
-#   - Aspire CLI via aspire.dev install script (NOT `dotnet workload install aspire`,
+#   - Aspire CLI 13.4.4 via aspire.dev install script (NOT `dotnet workload install aspire`,
 #     which was removed after Aspire 8 — Aspire ships as a standalone CLI now)
 #   - Docker (pre-installed on ubuntu-latest; AppHost resources need the engine)
 name: 'Copilot Setup Steps'
@@ -50,13 +50,13 @@ jobs:
       # --- Aspire CLI (standalone install script; adds $HOME/.aspire/bin to PATH) ---
       - name: Install Aspire CLI
         run: |
-          curl -fsSL https://aspire.dev/install.sh | bash
+          curl -fsSL https://aspire.dev/install.sh | bash -s -- --version 13.4.4
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Verify Aspire CLI
         run: |
           export PATH="$HOME/.aspire/bin:$PATH"
-          aspire --version
+          aspire --version | grep '^13\.4\.4'
 
       # --- Docker (AppHost container resources; engine is pre-installed) ---
       - name: Verify Docker

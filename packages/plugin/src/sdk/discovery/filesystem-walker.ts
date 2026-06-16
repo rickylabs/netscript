@@ -2,6 +2,7 @@ import type { WalkedFile, WalkerPort } from './ports/walker-port.ts';
 
 const DEFAULT_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mts', '.mjs']);
 const SKIPPED_SEGMENTS = new Set([
+  '.data',
   '.git',
   '.netscript',
   'node_modules',

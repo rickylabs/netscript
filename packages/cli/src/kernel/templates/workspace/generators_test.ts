@@ -22,6 +22,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   assertEquals(result.unstable, ['raw-imports', 'kv']);
   assertEquals(result.exclude, [
     '**/node_modules',
+    '**/.data',
     'dotnet',
     '**/.git',
     'aspire/.aspire',

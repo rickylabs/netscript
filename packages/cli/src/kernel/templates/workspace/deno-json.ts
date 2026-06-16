@@ -58,6 +58,7 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
 
   config.exclude = [
     '**/node_modules',
+    '**/.data',
     'dotnet',
     '**/.git',
     `${SCAFFOLD_DIRS.ASPIRE_TS}/${SCAFFOLD_DIRS.ASPIRE_GENERATED}`,
