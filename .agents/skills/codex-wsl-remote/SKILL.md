@@ -14,9 +14,24 @@ The verified path is:
 Codex Desktop/mobile -> SSH target codex-wsl -> WSL Ubuntu codex user -> codex app-server remote-control
 ```
 
-Do not use Windows `codex exec --json` threads as the sync mechanism for Desktop/mobile. Those
-threads can persist and resume locally, but Desktop deep links can hang while loading `codex_exec`
-sessions. Use the WSL app-server remote-control workflow for user-visible, steerable sessions.
+### Launch model (the one rule that matters)
+
+| Goal | Command | Visibility |
+| ---- | ------- | ---------- |
+| **Start a new session** | `codex debug app-server send-message-v2 "<prompt>"` (in the worktree, against the managed daemon) | **Mobile + Desktop visible, steerable** |
+| **Steer an existing session** | `codex exec resume <thread-id> "<follow-up>"` | continues the same thread |
+| Headless one-off (no phone) | `codex exec ...` (standalone) | **Desktop sync only — never reaches mobile** |
+
+- `send-message-v2` registers a thread with the running remote-control daemon, so it appears on
+  your phone. This is the correct launcher for supervisor/implementation sessions.
+- **Never run two `send-message-v2` calls against the same worktree concurrently.** Each call
+  spawns a *new* thread; two live threads in one worktree fork rival agents that fight over the
+  same files and git index (race / clobber). One active send per worktree, sequential.
+- To continue or correct a running session, **resume it** (`codex exec resume`) — do *not* fire a
+  second `send-message-v2`, which forks a rival rather than steering the original.
+- Bare `codex exec` (no resume) spawns a standalone process the daemon does not manage; it is
+  Desktop-sync only and never appears on mobile. Use it only for headless work you don't need to
+  watch from the phone.
 
 ## Verified Baseline
 
@@ -26,10 +41,12 @@ sessions. Use the WSL app-server remote-control workflow for user-visible, steer
 - SSH endpoint: `127.0.0.1:2222`
 - SSH identity: `C:\Users\chaut\.ssh\codex_wsl_ed25519`
 - WSL Codex home: `/home/codex/.codex`
-- Codex CLI/app-server: `0.139.0`
+- Codex CLI/app-server: `0.140.0` (managed daemon verified 2026-06-16)
 - App-server config: `approval_policy = "never"` and `sandbox_mode = "danger-full-access"`
 - Native WSL wave5 worktree root: `/home/codex/repos/netscript-wave5-apps`
-- Verified toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
+- Deno toolchain: `2.8.x` (PR #44 upgrade). Other tool versions below are the wave5 snapshot —
+  re-verify per branch with the toolchain command in [Verification Commands](#verification-commands).
+- Wave5 snapshot toolchain: Deno `2.7.11`, .NET SDK `10.0.109`, Aspire CLI `13.3.0`, Docker `29.1.3`, Node `18.19.1`, npm `9.2.0`
 
 The Windows-side helper lives at:
 
@@ -95,15 +112,22 @@ For passive health checks, prefer daemon status and process inspection:
 ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; codex app-server daemon version; ps -eo user,pid,ppid,etime,cmd | grep -E "[c]odex app-server|[a]pp-server daemon" || true'
 ```
 
-Do not use `codex debug app-server send-message-v2` as a routine health check after remote-control
-has been restored. On Codex CLI `0.139.0`, that debug client can leave the running app-server in a
-state where `codex remote-control start --json` later fails with:
+A single `codex debug app-server send-message-v2` against a managed daemon is **safe** and leaves
+remote-control managed — verified 2026-06-16 on Codex `0.140.0`: a no-edit smoke completed and
+`codex app-server daemon version` still reported the same managed pid with `--remote-control` and
+the control socket intact. `send-message-v2` is the *launcher* for mobile-visible sessions, not a
+forbidden command.
+
+The real hazard is **concurrency, not the command**: two `send-message-v2` calls live against the
+same worktree at once fork rival agents and can leave the daemon in an unmanaged state where
+`codex remote-control start --json` later fails with:
 
 ```text
 Error: app server is running but is not managed by codex app-server daemon
 ```
 
-Use Desktop/mobile itself to verify user-visible remote threads once the passive checks show
+So: one active send per worktree, sequential; steer with `codex exec resume`, never a second send.
+Use Desktop/mobile itself to confirm the new thread is user-visible once passive checks show
 remote-control is connected.
 
 Verify the native NetScript toolchain:
@@ -112,13 +136,17 @@ Verify the native NetScript toolchain:
 ssh.exe codex-wsl 'cd /home/codex/repos/netscript-wave5-apps; deno --version; dotnet --version; aspire --version; docker version --format "{{.Client.Version}} / {{.Server.Version}}"; node --version; npm --version; git status --short --branch'
 ```
 
-Only run a debug app-server turn when explicitly diagnosing app-server turn startup, and expect to
-restore remote-control afterward. The `thread/start` response should report
-`approvalPolicy: "never"` and `sandbox.type: "dangerFullAccess"`:
+A `send-message-v2` turn against a managed daemon is both the **launch path** for a mobile-visible
+session and, with a no-edit prompt, a connectivity smoke. The `thread/start` response should report
+`approvalPolicy: "never"` and `sandbox.type: "dangerFullAccess"`, emit a `threadId`, and end with
+`turn/completed` / `[codex app-server exited: exit status: 0]`:
 
 ```powershell
 ssh.exe codex-wsl 'cd /home/codex/repos/netscript-wave5-apps; codex debug app-server send-message-v2 "Remote smoke only. Do not edit files. Do not run validation. Reply with exactly CODEX_WSL_REMOTE_SMOKE_OK and no other prose."'
 ```
+
+Capture the `threadId` from the output — that is the handle for `codex exec resume <thread-id>` if
+you later need to steer the session. Confirm the thread on your phone to prove mobile visibility.
 
 ## Launching Supervisor Or Implementation Sessions
 
@@ -140,6 +168,17 @@ branch. The wave5 family uses these native worktrees:
 /home/codex/repos/netscript-wave5-apps-5d5-form
 /home/codex/repos/netscript-wave5-apps-5d6-query
 ```
+
+Launch one with a single `send-message-v2` carrying the full brief, run as a background SSH job so
+the supervisor turn is not blocked. Pattern (one per worktree, sequential):
+
+```powershell
+ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; cd <native-worktree>; codex debug app-server send-message-v2 "<full self-contained brief: use harness, activate skills, pre-flight git fetch+reset, task, constraints, reporting>"' 2>&1 | Tee-Object <log>
+```
+
+Supervise without polling: run `.llm/tools/watch-run.ts <run-dir>` as a background process — it
+wakes the supervisor when the sub-agent appends `commits.md`/`worklog.md`. Steer only with
+`codex exec resume <thread-id>`; never fire a second `send-message-v2` at the same worktree.
 
 For full CLI E2E, use the `netscript-cli` skill and run:
 
@@ -214,6 +253,9 @@ Safe recovery used:
 5. Confirmed remote-control output returned `"status":"connected"` and
    `"remoteControlEnabled":true`.
 
-Additional lesson: a later `codex debug app-server send-message-v2` smoke returned the expected
-marker, but immediately put remote-control back into the unmanaged state. Treat debug app-server
-turns as diagnostic only, not as the normal mobile-connectivity smoke.
+Corrected root cause (2026-06-16): the earlier write-up blamed the `send-message-v2` *command* for
+the unmanaged state. That was wrong. A single send against a managed daemon is safe and stays
+managed (re-verified on `0.140.0`). The unmanaged state comes from **concurrent/duplicate sends to
+the same worktree** forking rival app-server turns. The rule is therefore one active send per
+worktree at a time, steer existing sessions with `codex exec resume`, and reserve the
+anchored-PID + socket-removal repair above for an actually-unmanaged daemon.
