@@ -75,7 +75,7 @@ generator runs as a supervised Codex session in WSL (`/home/codex/repos/netscrip
 
 ### R1 — subpath pins + dax normalization (2026-06-16)
 
-- `<pending-final-r1-hash>`: aligned `packages/fresh` and `packages/fresh-ui` inline Preact
+- `104bfc5`: aligned `packages/fresh` and `packages/fresh-ui` inline Preact
   subpath specifiers with the root catalog (`preact ^10.29.2`,
   `preact-render-to-string ^6.7.0`) and normalized inline `@david/dax` pins to `^0.48`.
   Evidence: `deno task deps:latest --filter "preact*"` = 0 behind / 2 total;
@@ -84,7 +84,7 @@ generator runs as a supervised Codex session in WSL (`/home/codex/repos/netscrip
 
 ### R2 — plugin dead import-map prune (2026-06-16)
 
-- `<pending-final-r2-hash>`: removed only the import-map entries that `deps:why` reported as
+- `3e7368f`: removed only the import-map entries that `deps:why` reported as
   `likelyDeadImport=true` / `fullyRemovable=true` from `plugins/workers/deno.json` and
   `plugins/sagas/deno.json`.
 - Removed evidence:
