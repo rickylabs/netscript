@@ -64,3 +64,9 @@ Phase 0 closeout: B6 (prod-install lane) delivered in B1 as `deps/prod-install.t
 B1 evidence: `deno check --unstable-kv` clean on all five tools; `deno task deps:latest` →
 `26 behind / 52 total` with `jsr:@fedify/fedify ^1.5.0 → 2.2.5` (stable, proving the prerelease-trap
 fix); `deps:why @hono/hono` → `DEAD import` (confirms eval C5); `@std/path` → 140 source hits.
+
+## IMPL-EVAL remediation slices (2026-06-16)
+
+| Commit | Scope | Slice |
+| ------ | ----- | ----- |
+| `<pending-final-r1-hash>` | `fix(fresh,deps): align preact subpath pins to catalog + dax ^0.48`; evidence: `deps:latest --filter "preact*"` = 0 behind / 2 total, `deps:latest --filter "@david/*"` = 0 behind / 1 total, targeted `deno check --no-lock --unstable-kv` passed for Fresh/Fresh UI entrypoints. | R1 |

@@ -72,3 +72,12 @@ Remaining Phase-T slices, resequenced: **T1** (CI pin `v2.8.x`) → **T2** (`cat
 APPROVED `deno audit` `@orpc/client` bump — the only slice permitted to move `deno.lock`).
 Phase A (A1–A4) stays gated on Aspire 13.4 GA (LD-7), out of this resume's scope. The
 generator runs as a supervised Codex session in WSL (`/home/codex/repos/netscript-deno28-upgrade`).
+
+### R1 — subpath pins + dax normalization (2026-06-16)
+
+- `<pending-final-r1-hash>`: aligned `packages/fresh` and `packages/fresh-ui` inline Preact
+  subpath specifiers with the root catalog (`preact ^10.29.2`,
+  `preact-render-to-string ^6.7.0`) and normalized inline `@david/dax` pins to `^0.48`.
+  Evidence: `deno task deps:latest --filter "preact*"` = 0 behind / 2 total;
+  `deno task deps:latest --filter "@david/*"` = 0 behind / 1 total; targeted
+  `deno check --no-lock --unstable-kv` passed for Fresh/Fresh UI entrypoints.

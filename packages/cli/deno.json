@@ -31,7 +31,7 @@
     "@std/net": "jsr:@std/net@^1",
     "@std/semver": "jsr:@std/semver@^1",
     "@cliffy/prompt": "jsr:@cliffy/prompt@^1.0.0",
-    "@david/dax": "jsr:@david/dax@^0.43.0",
+    "@david/dax": "jsr:@david/dax@^0.48",
     "zod": "jsr:@zod/zod@4.4.3",
     "@netscript/aspire": "../aspire/mod.ts",
     "@netscript/config": "../config/mod.ts",
