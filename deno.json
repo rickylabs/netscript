@@ -29,6 +29,7 @@
     "deps:why": "deno run --allow-read --allow-run .llm/tools/deps/why.ts",
     "deps:audit": "deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level low --pretty",
     "deps:prod-install": "deno run --allow-read --allow-write --allow-net --allow-run --allow-env .llm/tools/deps/prod-install.ts --pretty",
+    "check:scaffold-versions": "deno run .llm/tools/check-scaffold-versions.ts --pretty",
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
     "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
