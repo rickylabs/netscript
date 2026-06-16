@@ -23,8 +23,8 @@ Supervisor: Claude (Opus 4.8). Source of truth for live phase status. See `final
 
 | Slice | Eval | Status | Owner | Notes |
 | ----- | ---- | ------ | ----- | ----- |
-| R1 subpath pins + dax | C1/C3 | in_progress | codex-wsl | launched 2026-06-16 10:53Z via `codex exec` (session `019ecfa2`, bg `bbw1hawom`); worktree synced 794933e |
-| R2 dead imports | C5 | todo | codex-wsl | `deps:why`-driven |
+| R1 subpath pins + dax | C1/C3 | done | codex-wsl | `104bfc5` — preact ^10.29.2 + render-to-string ^6.7.0 catalog-aligned, dax ^0.48 (cli+plugin-workers-core); deps:latest 0 behind, scoped check passed |
+| R2 dead imports | C5 | in_progress | codex-wsl | launched via `send-message-v2` (mobile-visible) 2026-06-16; brief `sub-agent-briefs/R2.md`; daemon-managed thread |
 | R3 catalog → stable latest | C2 | todo | codex-wsl | fedify→2.2.5, logtape→2.1.5, preact↔Fresh; DEBT rows |
 | R4 scaffold parity + check-scaffold-versions.ts + init smoke | C6 | todo | codex-wsl | E-12 guard |
 | R5 merge-readiness (ci + e2e native WSL) | C6 | todo | codex-wsl | scaffold.runtime |
