@@ -28,10 +28,12 @@ Supervisor: Claude (Opus 4.8). Source of truth for live phase status. See `final
 | R3 catalog → stable latest | C2 | done | codex-wsl | `211039d` + follow-up `3613a7d` (user-steered held-major bump); fedify→2.2.5, logtape→2.1.5, amqplib + durable-streams/state + fedify amqp/denokv/redis bumped; only `vite` held DEBT; check + publish:dry-run green |
 | R4 scaffold parity + check-scaffold-versions.ts + init smoke | C6 | done | codex-wsl | `b834f54` (thread `019ed00c-5501-73d0-a0e8-32a2fd144b02`); Aspire pins all GA (SDK 13.4.4, hosting-deno/sqlite 13.4.0, scalar 0.10.3, no prerelease); `generate-app-deno-json.ts` now sources `SCAFFOLD_APP_IMPORTS`/`SCAFFOLD_APP_CATALOG` (new) mirroring root catalog; init smoke PASS; guard + cli check + generator test green. Supervisor-verified diff + reran guard. |
 | R5 merge-readiness (ci + e2e native WSL) | C6 | blocked | codex-wsl | `CI_EXIT=0`; required pretty E2E `E2E_EXIT=1`, `passed=9 failed=1` at `database.init` with cleanup PASS. Local Aspire CLI was updated from 13.3.0 to 13.4.4, but rerun still failed because Aspire 13.4.4 expects `apphost.mts` + `.aspire/modules/*.mts` while the scaffold emits `apphost.ts` + `.modules/*.ts` (Wave 6-owned path realignment). |
+| R6 Aspire 13.4 AppHost path migration (make E2E green) | C6 | in_progress | codex-wsl | brief `sub-agent-briefs/R6.md`; maintainer chose in-branch hotpatch (not A/B/C). Migrate scaffold `apphost.ts`+`.modules/*.ts` → `apphost.mts`+`.aspire/modules/*.mts` (+`tsconfig.apphost.json`) per Aspire 13.4 GA; acceptance gate `scaffold.runtime` E2E `E2E_EXIT=0`, `database.init` PASS. Resolves R5 blocker. |
 
 ## Gate
 
-- IMPL-EVAL (separate session) after Phase 1 → expect `PASS` to clear `CHANGES_REQUESTED`.
+- R6 acceptance: `scaffold.runtime` E2E must reach `E2E_EXIT=0` (clears R5 BLOCKED).
+- IMPL-EVAL (separate session) after R6 green → expect `PASS` to clear `CHANGES_REQUESTED`.
 
 ## Escalations
 
