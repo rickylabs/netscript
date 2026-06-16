@@ -87,7 +87,7 @@
   "catalog": {
     "@durable-streams/client": "^0.2.6",
     "@durable-streams/server": "^0.3.7",
-    "@durable-streams/state": "^0.2.3",
+    "@durable-streams/state": "^0.3.1",
     "@opentelemetry/api": "^1.9.1",
     "@orpc/client": "^1.14.6",
     "@orpc/contract": "^1.14.6",
@@ -107,7 +107,7 @@
     "@tanstack/query-core": "^5.101.0",
     "@tanstack/query-db-collection": "^1.0.40",
     "@tanstack/react-db": "^0.1.86",
-    "amqplib": "^0.10.4",
+    "amqplib": "^2.0.1",
     "clsx": "^2.1.1",
     "ioredis": "^5.11.1",
     "mysql2": "^3.22.5",

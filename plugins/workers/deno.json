@@ -49,7 +49,8 @@
     "zod": "jsr:@zod/zod@4.4.3",
     "@tanstack/db": "catalog:",
     "@durable-streams/client": "catalog:",
-    "@durable-streams/state": "catalog:"
+    "@durable-streams/state": "catalog:",
+    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/aspire/mod.ts src/cli/composition/main.ts contracts/v1/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts worker/mod.ts",

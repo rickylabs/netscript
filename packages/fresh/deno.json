@@ -49,6 +49,7 @@
     "vite": "catalog:",
     "zod": "jsr:@zod/zod@4.4.3",
     "@durable-streams/state": "catalog:",
+    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db",
     "@tanstack/react-db": "catalog:"
   },
   "publish": {

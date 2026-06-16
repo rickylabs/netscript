@@ -139,17 +139,20 @@ R3 started from `8bb33b8` on `chore/deno-2.8-aspire-13.4-upgrade`; `deno --versi
 | BUMPED | `npm:mysql2` | `^3.22.3` | `^3.22.5` | patch; check + publish dry-run green |
 | BUMPED | `npm:pg` | `^8.13.1` | `^8.21.0` | minor; check + publish dry-run green |
 | BUMPED | `npm:tailwind-merge` | `^3.5.0` | `^3.6.0` | minor; check + publish dry-run green |
-| HELD | `jsr:@fedify/amqp` | `^1.0.0` | `2.2.5` | DEBT_ACCEPTED; unvetted major |
-| HELD | `jsr:@fedify/denokv` | `^1.0.0` | `2.2.5` | DEBT_ACCEPTED; unvetted major |
-| HELD | `jsr:@fedify/redis` | `^1.0.0` | `2.2.5` | DEBT_ACCEPTED; unvetted major |
-| HELD | `npm:@durable-streams/state` | `^0.2.3` | `0.3.1` | DEBT_ACCEPTED; trial failed check because `createStreamDB` moved off root export |
-| HELD | `npm:amqplib` | `^0.10.4` | `2.0.1` | DEBT_ACCEPTED; R3 default hold for unverified major |
+| BUMPED | `jsr:@fedify/amqp` | `^1.0.0` | `^2.2.5` | maintainer-approved follow-up; check + publish dry-run green |
+| BUMPED | `jsr:@fedify/denokv` | `^1.0.0` | `^2.2.5` | maintainer-approved follow-up; check + publish dry-run green |
+| BUMPED | `jsr:@fedify/redis` | `^1.0.0` | `^2.2.5` | maintainer-approved follow-up; check + publish dry-run green |
+| BUMPED | `npm:@durable-streams/state` | `^0.2.3` | `^0.3.1` | maintainer-approved follow-up; `createStreamDB` imports moved to `/db`; check + publish dry-run green |
+| BUMPED | `npm:amqplib` | `^0.10.4` | `^2.0.1` | maintainer-approved follow-up; check + publish dry-run green |
 | HELD | `npm:vite` | `7.2.2` | `8.0.16` | DEBT_ACCEPTED; unvetted major |
 
 R3 validation:
 
 | Gate | Result |
 | ---- | ------ |
-| `deno task deps:latest --behind-only --pretty` | 6 behind / 52 total; all six are documented HELD rows |
+| `deno task deps:latest --behind-only --pretty` | 1 behind / 52 total; only documented HELD row is `vite` |
 | `deno task check` | PASS: 1581 files, 14 batches, 0 occurrences |
 | `deno task publish:dry-run` | PASS: exit 0; warnings are the pre-existing slow-type / dynamic-import classes, not R3 dependency failures |
+
+R3 follow-up commit: maintainer approved bumping the five previously held non-Vite entries. The
+follow-up leaves `vite` as the only documented hold.

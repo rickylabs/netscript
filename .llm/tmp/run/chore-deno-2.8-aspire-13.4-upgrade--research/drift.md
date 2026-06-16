@@ -36,9 +36,9 @@ Discrepancies between the prior repo notes / RFC assumptions and verified realit
 
 | Status | Package | Reason | Revisit |
 | ------ | ------- | ------ | ------- |
-| DEBT_ACCEPTED | `jsr:@fedify/amqp` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue AMQP adapter compatibility tests |
-| DEBT_ACCEPTED | `jsr:@fedify/denokv` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue Deno KV adapter compatibility tests |
-| DEBT_ACCEPTED | `jsr:@fedify/redis` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue Redis adapter compatibility tests |
-| DEBT_ACCEPTED | `npm:@durable-streams/state` `^0.2.3`→`0.3.1` | named regression: `0.3.1` removed `createStreamDB` from the package root; `deno task check` failed in Fresh and plugin stream factories | intentional `@durable-streams/state/db` subpath migration |
-| DEBT_ACCEPTED | `npm:amqplib` `^0.10.4`→`2.0.1` | unvetted major; R3 rule names `amqplib` as HOLD unless clean major is verified | AMQP adapter runtime compatibility tests |
 | DEBT_ACCEPTED | `npm:vite` `7.2.2`→`8.0.16` | unvetted major; Vite 8 is outside R3's safe patch/minor bump rule | Fresh Vite integration and scaffold runtime validation |
+
+R3 follow-up: maintainer approved bumping `@fedify/amqp`, `@fedify/denokv`, `@fedify/redis`,
+`@durable-streams/state`, and `amqplib`; those rows were removed from debt and validated in the
+follow-up commit. `@durable-streams/state` required moving `createStreamDB` imports to the package's
+`/db` subpath.

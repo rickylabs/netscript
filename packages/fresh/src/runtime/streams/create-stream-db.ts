@@ -13,7 +13,7 @@
  * @module
  */
 
-import { createStreamDB } from '@durable-streams/state';
+import { createStreamDB } from '@durable-streams/state/db';
 import type { StateSchema, StreamStateDefinition } from '@durable-streams/state';
 import { buildStreamUrl, getStreamsAuth, getStreamsUrl } from '@netscript/plugin-streams-core';
 

@@ -23,9 +23,9 @@
   },
   "imports": {
     "@fedify/fedify": "jsr:@fedify/fedify@^2.2.5",
-    "@fedify/denokv": "jsr:@fedify/denokv@^1.0.0",
-    "@fedify/redis": "jsr:@fedify/redis@^1.0.0",
-    "@fedify/amqp": "jsr:@fedify/amqp@^1.0.0",
+    "@fedify/denokv": "jsr:@fedify/denokv@^2.2.5",
+    "@fedify/redis": "jsr:@fedify/redis@^2.2.5",
+    "@fedify/amqp": "jsr:@fedify/amqp@^2.2.5",
     "@netscript/kv": "../kv/mod.ts",
     "zod": "jsr:@zod/zod@4.4.3",
     "ioredis": "catalog:",
