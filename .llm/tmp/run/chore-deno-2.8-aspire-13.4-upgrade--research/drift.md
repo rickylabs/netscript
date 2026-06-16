@@ -42,3 +42,9 @@ R3 follow-up: maintainer approved bumping `@fedify/amqp`, `@fedify/denokv`, `@fe
 `@durable-streams/state`, and `amqplib`; those rows were removed from debt and validated in the
 follow-up commit. `@durable-streams/state` required moving `createStreamDB` imports to the package's
 `/db` subpath.
+
+## R5 merge-readiness blocker (2026-06-16)
+
+| Status | Observation | Impact | Required follow-up |
+| ------ | ----------- | ------ | ------------------ |
+| BLOCKED | Full `scaffold.runtime` E2E fails at `database.init` after the Aspire 13.4 GA pin. First failure was local Aspire CLI `13.3.0` versus generated SDK `13.4.4`; after updating the local CLI to `13.4.4`, the failure persists because Aspire 13.4.4 generates `tsconfig.apphost.json` for `apphost.mts` and `.aspire/modules/*.mts`, while the NetScript scaffold still emits `apphost.ts` and `.modules/*.ts`. | PR #44 is not merge-ready on the full runtime gate. This invalidates the plan assumption that Aspire 13.4 would accept the legacy TS AppHost path as forward-compatible. | Rescope/coordinate with Wave 6 to land the GA path realignment (`apphost.mts` + `.aspire/modules/`) or defer the Aspire 13.4 scaffold pin until that migration lands. R5 did not patch this because the run explicitly assigned the path migration to Wave 6 and the fix is broader than a few-line evidence-slice repair. |

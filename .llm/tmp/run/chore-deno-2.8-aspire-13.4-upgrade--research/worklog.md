@@ -194,3 +194,31 @@ R4 validation:
 | `deno check --unstable-kv packages/cli` | PASS |
 | `deno test --allow-read packages/cli/src/kernel/templates/app/generators-config_test.ts` | PASS: 2 suites / 15 steps |
 | `deno fmt --check --no-config --line-width=100 --indent-width=2 --single-quote=true --use-tabs=false <touched TS files>` | PASS: checked 4 files |
+
+### R5 — merge-readiness verification (2026-06-16)
+
+Pre-flight:
+
+- Native WSL worktree: `/home/codex/repos/netscript-chore-deno-2.8-aspire-13.4-upgrade`.
+- Reset target: `origin/chore/deno-2.8-aspire-13.4-upgrade`.
+- Pre-flight HEAD: `bf5c570` (`docs(harness): R4 done (b834f54) + R5 merge-readiness brief`).
+- Deno: `deno 2.8.3 (stable, release, x86_64-unknown-linux-gnu)`.
+
+Gate 1:
+
+| Gate | Raw exit | Result |
+| ---- | -------- | ------ |
+| `deno task ci ; echo "CI_EXIT=$?"` | `CI_EXIT=0` | PASS. `check`, `lint`, `fmt:check`, function coverage, `publish:dry-run`, and `audit:critical` completed. `audit:critical` reported one high advisory but no critical advisory, so the task exited 0. Publish dry-run warnings were the documented pre-existing slow-type / dynamic-import classes. |
+
+Gate 2:
+
+| Attempt | Raw exit | Pretty step summary | Result |
+| ------- | -------- | ------------------- | ------ |
+| Initial required pretty run | `E2E_EXIT=1` | `preflight.deno` PASS; `preflight.aspire` PASS; `scaffold.init` PASS; `scaffold.plugin.worker` PASS; `scaffold.plugin.saga` PASS; `scaffold.plugin.trigger` PASS; `scaffold.plugin.stream` PASS; `scaffold.plugin-list` PASS; `database.init` FAIL; `cleanup.aspire-stop` PASS. Summary: `passed=9 failed=1`. | Failed because local Aspire CLI was still `13.3.0` while generated AppHost config pinned SDK `13.4.4`; Aspire log showed `No code generator found for language: TypeScript`. |
+| Toolchain-aligned pretty rerun after `dotnet tool update -g Aspire.Cli --version 13.4.4` | `E2E_EXIT=1` | `preflight.deno` PASS; `preflight.aspire` PASS; `scaffold.init` PASS; `scaffold.plugin.worker` PASS; `scaffold.plugin.saga` PASS; `scaffold.plugin.trigger` PASS; `scaffold.plugin.stream` PASS; `scaffold.plugin-list` PASS; `database.init` FAIL; `cleanup.aspire-stop` PASS. Summary: `passed=9 failed=1`. | Still failed. JSON diagnostic showed Aspire CLI `13.4.4` generated `tsconfig.apphost.json` for `apphost.mts` and `.aspire/modules/*.mts`, but NetScript still generates `aspire/apphost.ts` and `.modules/*.ts`. This is the path realignment that plan/research assigned to Wave 6, now proven merge-blocking for the 13.4 full runtime gate. |
+
+Merge-readiness verdict: **BLOCKED**. CI is green, but the full `scaffold.runtime` E2E gate is not
+green under Aspire 13.4.4. Root cause is the deferred TypeScript AppHost GA path migration
+(`apphost.mts` + `.aspire/modules/`) versus the current generated scaffold shape (`apphost.ts` +
+`.modules/`). This is larger than an R5 evidence-only fix and crosses the documented Wave 6
+ownership boundary, so no product code was changed in R5.
