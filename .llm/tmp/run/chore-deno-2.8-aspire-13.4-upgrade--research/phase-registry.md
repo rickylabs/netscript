@@ -26,8 +26,8 @@ Supervisor: Claude (Opus 4.8). Source of truth for live phase status. See `final
 | R1 subpath pins + dax | C1/C3 | done | codex-wsl | `104bfc5` — preact ^10.29.2 + render-to-string ^6.7.0 catalog-aligned, dax ^0.48 (cli+plugin-workers-core); deps:latest 0 behind, scoped check passed |
 | R2 dead imports | C5 | done | codex-wsl | `3e7368f` — removed 5 dead entries (`@hono/hono` ×2 + 3 internal `@netscript/*` subpaths), all `fullyRemovable`; kept hono/zod/@tanstack/db/@durable-streams (used); scoped check+lint green (127 files) |
 | R3 catalog → stable latest | C2 | done | codex-wsl | `211039d` + follow-up `3613a7d` (user-steered held-major bump); fedify→2.2.5, logtape→2.1.5, amqplib + durable-streams/state + fedify amqp/denokv/redis bumped; only `vite` held DEBT; check + publish:dry-run green |
-| R4 scaffold parity + check-scaffold-versions.ts + init smoke | C6 | in_progress | codex-wsl | guard `.llm/tools/check-scaffold-versions.ts` + `check:scaffold-versions` task landed by supervisor (E-12 OK); brief `sub-agent-briefs/R4.md`; Aspire 13.4 GA-verify-or-HOLD + catalog-sourced `generate-app-deno-json.ts` + `netscript init` smoke |
-| R5 merge-readiness (ci + e2e native WSL) | C6 | todo | codex-wsl | scaffold.runtime |
+| R4 scaffold parity + check-scaffold-versions.ts + init smoke | C6 | done | codex-wsl | `b834f54` (thread `019ed00c-5501-73d0-a0e8-32a2fd144b02`); Aspire pins all GA (SDK 13.4.4, hosting-deno/sqlite 13.4.0, scalar 0.10.3, no prerelease); `generate-app-deno-json.ts` now sources `SCAFFOLD_APP_IMPORTS`/`SCAFFOLD_APP_CATALOG` (new) mirroring root catalog; init smoke PASS; guard + cli check + generator test green. Supervisor-verified diff + reran guard. |
+| R5 merge-readiness (ci + e2e native WSL) | C6 | in_progress | codex-wsl | brief `sub-agent-briefs/R5.md`; `deno task ci` + `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` from NATIVE WSL worktree (not /mnt/c); paste raw exit codes; final generator slice before separate-session IMPL-EVAL |
 
 ## Gate
 
