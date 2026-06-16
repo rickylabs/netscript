@@ -22,3 +22,7 @@ Plan-phase commit (this run, plan artifacts only — no `packages/` edits):
 
 Each slice = its own commit, LF-normalized, `-c core.autocrlf=false`; gate evidence in worklog.
 Slice 2 blocks merge without green `scaffold.runtime`.
+
+## Landed IMPL commits
+
+- 84033ed: Slice 0: prep hygiene gates green

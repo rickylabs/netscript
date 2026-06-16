@@ -33,9 +33,10 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
 3. **Deploy is a port, not a switch.** `DeployTargetPort` + registry; `WindowsServiceDeployTarget` is
    the one concrete adapter (Windows deploy is *not* Aspire). Future k8s/container/cloud adapters wrap
    `Aspire.Hosting.{Kubernetes,ContainerApps,AWS,Azure}` — seam only, no concrete impl this wave.
-4. **Single-file ownership with the upgrade run (LD-8).** This wave owns `scaffold-files.ts` +
-   `scaffold-aspire.ts` apphost-path migration; the upgrade run owns `scaffold-versions.ts` + CI pin.
-   No file is edited by both programs.
+4. **Single-file ownership with the upgrade run (LD-8).** This wave verifies the inherited
+   `apphost.mts` + `.aspire/modules/*.mts` + `tsconfig.apphost.json` shape that #44/R6 already
+   migrated, then adds the schema mirror and `WithProcessCommand()` flag-off seam. The upgrade run
+   owns `scaffold-versions.ts` + CI pin, and no file is edited by both programs.
 5. **Immutable research (LD-5).** Impl divergence goes in `research-realized.md`, never back-edited
    into `research.md`.
 
@@ -44,3 +45,24 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
 - Publish `@netscript/cli` (withheld; ships after this wave).
 - Set the Aspire/Deno version pins (upgrade run owns those; this wave consumes them).
 - Build concrete new deploy targets (port + seam only).
+
+## Implementation Log
+
+### Slice 0 — Prep / Hygiene
+
+- Verified `packages/cli/e2e` is already a root workspace member in `deno.json`; slice 0.1 is a
+  verify-green check, not a workspace edit.
+- Confirmed `packages/cli/deno.json` has no dependency currently represented in the root catalog,
+  so the catalog-baseline consumption has no package-local import rewrite in this slice.
+- Applied D-W6-2 catalog freshness bumps: `tailwindcss` and `@tailwindcss/vite` to `^4.3.1`, and
+  `@preact/signals` to `2.9.2`; left `vite` unchanged as DEBT_ACCEPTED.
+- Folded PLAN-EVAL gaps #1-#3 into `plan.md`, `worklog.md`, and `drift.md`.
+- Validation:
+  - `deno task check:packages --unstable-kv` is not defined on this branch; used the current
+    repo-native equivalent `deno task check`, which passed with 1,582 selected files and 0 findings.
+  - `deno check --unstable-kv packages/cli/bin/netscript.ts packages/cli/bin/netscript-dev.ts packages/cli/mod.ts packages/cli/maintainer.ts packages/cli/scaffolding.ts packages/cli/testing.ts`
+    passed.
+  - `deno task fmt:check` passed with 1,167 selected files and 0 findings.
+  - `deno task lint` passed with 1,082 selected files and 0 findings.
+  - `deno task publish:dry-run` passed; existing slow-type and dynamic-import warnings remain
+    accepted upstream/package debt, not Slice 0 blockers.

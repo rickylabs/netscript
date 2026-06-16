@@ -158,7 +158,7 @@ Universal F-1..F-18 (F-14 console-log = n/a, already zero) + A6-specific F-CLI-1
 | 2.G | `scaffold.runtime` rerun | 41/41 green (merge gate) | E2E | — |
 | 3.x | target-tree moves + split 2 files | layering clean; F-1 | F-CLI-3/4, F-1 | `src/**` moves |
 | 4.x | scaffold improvements E.2.1–E.2.10 | published fixture green | E2E published | `scaffold/**` |
-| 5.x | Aspire 13.4 GA apphost shape + schema mirror + flag-off cmds | apphost.mts path; 13.4 e2e | F-CLI, E2E | `scaffold-files.ts`, `scaffold-aspire.ts`, `assets/schema/*` |
+| 5.x | Aspire 13.4 GA apphost shape verification + schema mirror + flag-off cmds | inherited apphost.mts shape verified; 13.4 e2e | F-CLI, E2E | `assets/schema/*` + the `WithProcessCommand()` flag-off seam |
 | 6.x | full gate sweep + `research-realized.md` + AP-1 verdict | AP-1 closed | all | `arch-debt.md`, `research-realized.md` |
 
 (11 slice-groups, well under the <30 cap.)
