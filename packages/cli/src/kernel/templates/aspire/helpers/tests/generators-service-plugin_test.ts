@@ -27,7 +27,7 @@ describe('generateRegisterServices', () => {
   it('should include the standard file header', () => {
     const output = generateRegisterServices(emptyOptions);
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'register-services.ts');
+    assertStringIncludes(output, 'register-services.mts');
   });
 
   it('should export registerServices async function', () => {
@@ -40,7 +40,7 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'buildOtelEnvVars,');
     assertStringIncludes(output, 'resolvePermissions,');
     assertStringIncludes(output, 'resolveWorkspacePath,');
-    assertStringIncludes(output, "from './_aspire-compat.ts'");
+    assertStringIncludes(output, "from './_aspire-compat.mjs'");
   });
 
   it('should generate two-pass registration structure', () => {
@@ -92,11 +92,11 @@ describe('generateRegisterServices', () => {
     assertStringIncludes(output, 'if (infrastructure.primaryDatabase)');
     assertStringIncludes(
       output,
-      "resource.withEnvironmentConnectionString('DATABASE_URL', infrastructure.primaryDatabase)",
+      "resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase)",
     );
     assertStringIncludes(
       output,
-      'databaseBinding.withEnvironmentConnectionString(databaseEnvKey, infrastructure.primaryDatabase)',
+      'databaseBinding.withEnvironment(databaseEnvKey, infrastructure.primaryDatabase)',
     );
     assertStringIncludes(output, '.withReference(infrastructure.primaryDatabase)');
     assertStringIncludes(output, '.waitFor(infrastructure.primaryDatabase)');
@@ -154,7 +154,7 @@ describe('generateRegisterPlugins', () => {
   it('should include the standard file header', () => {
     const output = generateRegisterPlugins(emptyOptions);
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'register-plugins.ts');
+    assertStringIncludes(output, 'register-plugins.mts');
   });
 
   it('should export registerPlugins async function', () => {
@@ -233,7 +233,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(output, '// Database dependency');
     assertStringIncludes(output, 'infrastructure.primaryDatabase');
-    assertStringIncludes(output, "withEnvironmentConnectionString('DATABASE_URL'");
+    assertStringIncludes(output, "withEnvironment('DATABASE_URL'");
   });
 
   it('should handle RequiresKv dependency', () => {
@@ -244,7 +244,7 @@ describe('generateRegisterPlugins', () => {
     });
     assertStringIncludes(output, '// KV cache dependency');
     assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
-    assertStringIncludes(output, 'withReferenceEndpoint(infrastructure.primaryCacheEndpoint)');
+    assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
   });
 
   it('should handle empty plugins', () => {

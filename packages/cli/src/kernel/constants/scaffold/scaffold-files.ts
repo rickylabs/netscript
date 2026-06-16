@@ -18,7 +18,8 @@ export const SCAFFOLD_FILES = {
   EXTENSIONS_CS: 'Extensions.cs',
   TELEMETRY_DEFAULTS_CS: 'NetScriptTelemetryDefaults.cs',
   LAUNCH_SETTINGS: 'launchSettings.json',
-  APPHOST_TS: 'apphost.ts',
+  APPHOST_MTS: 'apphost.mts',
+  TSCONFIG_APPHOST: 'tsconfig.apphost.json',
 } as const;
 
 export type ScaffoldFileKey = keyof typeof SCAFFOLD_FILES;

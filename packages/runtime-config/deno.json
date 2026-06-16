@@ -7,7 +7,7 @@
     ".": "./mod.ts"
   },
   "imports": {
-    "@std/path": "jsr:@std/path@^1.0.0"
+    "@std/path": "jsr:@std/path@^1"
   },
   "compilerOptions": {
     "strict": true,

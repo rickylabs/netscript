@@ -357,12 +357,13 @@ Deno.test('definePage withForm applies collection intents before returning runti
   await route.page(createRequestContext({ data }));
 
   assert(snapshot, 'Expected runtime form state after the intent round-trip');
+  const items = snapshot.fields.items;
   assert(
-    snapshot.fields.items.length === 2,
-    `Expected 2 collection rows, received: ${snapshot.fields.items.length}`,
+    items.length === 2,
+    `Expected 2 collection rows, received: ${items.length}`,
   );
   assert(
-    snapshot.fields.items.list[1]?.fields.quantity.controlProps({ type: 'number' }).defaultValue ===
+    items.list[1]?.fields.quantity.controlProps({ type: 'number' }).defaultValue ===
       '1',
     'Expected runtime field descriptors to expose the added row',
   );

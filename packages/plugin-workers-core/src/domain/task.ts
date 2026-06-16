@@ -170,10 +170,10 @@ export const TaskDefinitionSchema: z.ZodObject<typeof TaskDefinitionShape> = z.o
 );
 
 /** User-editable task fields. */
-export type TaskEditable = typeof TaskEditableSchema['_output'];
+export type TaskEditable = z.output<typeof TaskEditableSchema>;
 
 /** System-managed task fields. */
-export type TaskSystem = typeof TaskSystemSchema['_output'];
+export type TaskSystem = z.output<typeof TaskSystemSchema>;
 
 /** Stored task definition. */
 export type StoredTaskDefinition = TaskEditable & TaskSystem;
@@ -184,8 +184,9 @@ export type TaskDefinition<
   TPayload = unknown,
   TResult = unknown,
 > = Readonly<
-  Omit<typeof TaskDefinitionSchema['_output'], 'id' | 'entrypoint'> & {
+  Omit<StoredTaskDefinition, 'id' | 'entrypoint'> & {
     id: TaskId<TId>;
+    type: z.output<typeof TaskTypeSchema>;
     entrypoint?: string;
     handler?: TaskHandler<TPayload, TResult>;
   }

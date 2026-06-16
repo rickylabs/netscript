@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/config-schema.ts` — a project-specific Zod schema
+ * Generator for `.helpers/config-schema.mts` — a project-specific Zod schema
  * with literal resource name keys enabling type-safe resource map access
  * via `KnownServices<ProjectConfig>`, `KnownPlugins<ProjectConfig>`, etc.
  */
@@ -11,7 +11,7 @@ import { fileHeader, hasEntries, quoteProperty } from './_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../constants/scaffold/scaffold-aspire.ts';
 
 /**
- * Generates the config-schema.ts file content with narrowed literal keys.
+ * Generates the config-schema.mts file content with narrowed literal keys.
  *
  * Only includes schema sections that have entries — empty sections are
  * omitted entirely (no `z.object({})`).
@@ -60,7 +60,7 @@ export function generateConfigSchema(options: ConfigSchemaOptions): string {
     sortedImports.map((i) => `  ${i},`).join('\n')
   }\n} from '${SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT}';`;
 
-  return `${fileHeader('config-schema.ts')}
+  return `${fileHeader('config-schema.mts')}
 
 import { z } from 'zod';
 ${aspireImport}

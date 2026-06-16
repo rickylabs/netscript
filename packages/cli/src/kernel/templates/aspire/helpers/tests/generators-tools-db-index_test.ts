@@ -21,7 +21,7 @@ describe('generateRegisterTools', () => {
   it('should include the standard file header', () => {
     const output = generateRegisterTools({ tools: {} });
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'register-tools.ts');
+    assertStringIncludes(output, 'register-tools.mts');
   });
 
   it('should export registerTools async function', () => {
@@ -33,7 +33,7 @@ describe('generateRegisterTools', () => {
     const output = generateRegisterTools({ tools: {} });
     assertStringIncludes(output, 'buildDatabaseUriEnvKey');
     assertStringIncludes(output, 'resolveWorkspacePath');
-    assertStringIncludes(output, "from './_aspire-compat.ts'");
+    assertStringIncludes(output, "from './_aspire-compat.mjs'");
   });
 
   it('should register tools via addExecutable with deno task', () => {
@@ -42,7 +42,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      "await builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', 'studio'])",
+      "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', 'studio'])",
     );
   });
 
@@ -105,7 +105,7 @@ describe('generateRegisterTools', () => {
     });
     assertStringIncludes(
       output,
-      ".withEnvironmentConnectionString('DATABASE_URL', databaseResource)",
+      ".withEnvironment('DATABASE_URL', databaseResource)",
     );
     assertStringIncludes(output, 'buildDatabaseUriEnvKey(config)');
     assertStringIncludes(output, '.withReference(databaseResource)');
@@ -205,7 +205,7 @@ describe('generateIndex', () => {
   it('should include the standard file header', () => {
     const output = generateIndex();
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'index.ts');
+    assertStringIncludes(output, 'index.mts');
   });
 
   it('should export createNetScriptAppHost async function with correct params', () => {
@@ -219,7 +219,7 @@ describe('generateIndex', () => {
     const output = generateIndex();
     assertStringIncludes(
       output,
-      "import { parseAppSettings } from './_aspire-compat.ts'",
+      "import { parseAppSettings } from './_aspire-compat.mjs'",
     );
   });
 
@@ -227,7 +227,7 @@ describe('generateIndex', () => {
     const output = generateIndex();
     assertStringIncludes(
       output,
-      "import type { DistributedApplicationBuilder } from '../.modules/aspire.ts'",
+      "import type { DistributedApplicationBuilder } from '../.aspire/modules/aspire.mjs'",
     );
   });
 
@@ -235,31 +235,31 @@ describe('generateIndex', () => {
     const output = generateIndex();
     assertStringIncludes(
       output,
-      "import { configureDashboard } from './configure-dashboard.ts'",
+      "import { configureDashboard } from './configure-dashboard.mjs'",
     );
     assertStringIncludes(
       output,
-      "import { registerInfrastructure } from './register-infrastructure.ts'",
+      "import { registerInfrastructure } from './register-infrastructure.mjs'",
     );
     assertStringIncludes(
       output,
-      "import { registerServices } from './register-services.ts'",
+      "import { registerServices } from './register-services.mjs'",
     );
     assertStringIncludes(
       output,
-      "import { registerPlugins } from './register-plugins.ts'",
+      "import { registerPlugins } from './register-plugins.mjs'",
     );
     assertStringIncludes(
       output,
-      "import { registerBackgroundProcessors } from './register-background.ts'",
+      "import { registerBackgroundProcessors } from './register-background.mjs'",
     );
     assertStringIncludes(
       output,
-      "import { registerApps } from './register-apps.ts'",
+      "import { registerApps } from './register-apps.mjs'",
     );
     assertStringIncludes(
       output,
-      "import { registerTools } from './register-tools.ts'",
+      "import { registerTools } from './register-tools.mjs'",
     );
   });
 
@@ -285,12 +285,12 @@ describe('generateIndex', () => {
   it('should parse config via parseAppSettings in function body', () => {
     const output = generateIndex();
     assertStringIncludes(output, 'await parseAppSettings(configPath)');
-    // apphost.ts lives in an isolated `aspire/` subfolder, so we shift
+    // apphost.mts lives in an isolated `aspire/` subfolder, so we shift
     // appHostDir up one level to the project root where services, apps,
     // and plugins declared in appsettings.json actually live.
     assertStringIncludes(
       output,
-      "const appHostDir = resolve(await builder.appHostDirectory.get(), '..')",
+      "const appHostDir = resolve(await builder.appHostDirectory(), '..')",
     );
   });
 });

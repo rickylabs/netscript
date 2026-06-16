@@ -8,7 +8,7 @@
  * @module
  */
 
-import { createStreamDB } from '@durable-streams/state';
+import { createStreamDB } from '@durable-streams/state/db';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
 import { type WorkerExecution, type WorkerJob, workersStreamSchema } from './schema.ts';
 

@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/register-infrastructure.ts` — registers databases
+ * Generator for `.helpers/register-infrastructure.mts` — registers databases
  * and caches with the Aspire SDK builder. Handles engine dispatch, container
  * vs external mode, persistent lifetime, data bind mounts, and primary
  * resource resolution.
@@ -30,7 +30,7 @@ const CACHE_CONTAINER_IMAGES: Record<string, { readonly image: string; readonly 
 const CACHE_DEFAULT_PORT = 6379;
 
 /**
- * Generates the register-infrastructure.ts file content.
+ * Generates the register-infrastructure.mts file content.
  *
  * @param options - Database and cache entries from parsed config
  * @returns Generated TypeScript source as a string
@@ -148,7 +148,7 @@ export function generateRegisterInfrastructure(options: RegisterInfrastructureOp
   return renderTemplateAssetSync(
     TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterInfrastructure1,
     {
-      __slot0__: String(fileHeader('register-infrastructure.ts')),
+      __slot0__: String(fileHeader('register-infrastructure.mts')),
       __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
       __slot2__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
       __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),

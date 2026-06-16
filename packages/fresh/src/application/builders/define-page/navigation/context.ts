@@ -1,4 +1,4 @@
-import { createContext } from 'preact';
+import { type Context, createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 import type {
   AnyDefinePageTypeState,
@@ -21,13 +21,16 @@ export interface DefinePageNavigationContextValue {
 }
 
 /** Preact context used by define-page navigation helpers. */
-export const DefinePageNavigationContext = createContext<
-  DefinePageNavigationContextValue | null
->(null);
+export const DefinePageNavigationContext: Context<DefinePageNavigationContextValue | null> =
+  createContext(null as DefinePageNavigationContextValue | null) as Context<
+    DefinePageNavigationContextValue | null
+  >;
 
 /** Read the required define-page navigation context or throw a caller-facing error. */
 export function useRequiredNavigationContext(): DefinePageNavigationContextValue {
-  const navigationContext = useContext(DefinePageNavigationContext);
+  const navigationContext = useContext(DefinePageNavigationContext) as
+    | DefinePageNavigationContextValue
+    | null;
 
   if (!navigationContext) {
     throw new Error(
@@ -41,7 +44,7 @@ export function useRequiredNavigationContext(): DefinePageNavigationContextValue
 /** Read the navigation context when hooks are available, otherwise return null. */
 export function readNavigationContext(): DefinePageNavigationContextValue | null {
   try {
-    return useContext(DefinePageNavigationContext);
+    return useContext(DefinePageNavigationContext) as DefinePageNavigationContextValue | null;
   } catch (error: unknown) {
     if (
       error instanceof Error &&

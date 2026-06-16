@@ -13,7 +13,7 @@
  * @module
  */
 
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { getAvailablePort } from '@std/net';
 import {
@@ -120,7 +120,7 @@ app.get(
 
 // Proxy everything else to the upstream DurableStreamTestServer.
 // Use /* to match all paths including nested routes like /v1/stream/...
-app.all('/*', async (c) => {
+app.all('/*', async (c: Context) => {
   const url = new URL(c.req.url);
   const target = `http://127.0.0.1:${internalPort}${url.pathname}${url.search}`;
   try {

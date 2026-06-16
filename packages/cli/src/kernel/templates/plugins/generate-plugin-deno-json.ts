@@ -8,7 +8,7 @@ import { resolveNetScriptImports } from '../../adapters/scaffold/import-resolver
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PluginKindProvider, PluginScaffoldOptions } from '../../domain/plugin-kind.ts';
 
-const ORPC_SERVER_SPECIFIER = 'npm:@orpc/server@^1.13.5';
+const ORPC_SERVER_SPECIFIER = 'npm:@orpc/server@^1.14.6';
 const ZOD_SPECIFIER = 'npm:zod@^4.3.6';
 
 /**

@@ -157,7 +157,7 @@ class MySqlQueryable implements SqlQueryable {
 
     try {
       // Map arguments to appropriate MySQL format
-      const values = args.map((arg, i) => mapArg(arg, argTypes[i]));
+      const values = args.map((arg: unknown, i: number) => mapArg(arg, argTypes[i]));
 
       // deno_mysql uses different methods for different query types:
       // - query() for SELECT returns rows
@@ -578,7 +578,7 @@ export class PrismaMySqlAdapterFactory {
    * Connect to the database and create an adapter instance.
    */
   async connect(): Promise<PrismaMySqlConnectedAdapter> {
-    const { createPool } = await import('mysql') as unknown as Mysql2Module;
+    const { createPool } = await import('mysql2') as unknown as Mysql2Module;
 
     let client: AnyClient;
     try {

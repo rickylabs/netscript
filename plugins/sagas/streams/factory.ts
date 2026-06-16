@@ -7,7 +7,7 @@
  * @module
  */
 
-import { createStreamDB } from '@durable-streams/state';
+import { createStreamDB } from '@durable-streams/state/db';
 import type { StreamStateDefinition as DurableStreamStateDefinition } from '@durable-streams/state';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
 import { type SagaInstance, sagasStreamSchema } from './schema.ts';

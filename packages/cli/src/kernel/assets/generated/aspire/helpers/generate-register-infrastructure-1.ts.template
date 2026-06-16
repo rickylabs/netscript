@@ -5,7 +5,9 @@ import { ContainerLifetime } from '{{__slot2__}}';
 import { resolveDataPath } from '{{__slot3__}}';
 import type { NetScriptConfig } from '{{__slot4__}}';
 
-type AspireResource = Parameters<ReturnType<DistributedApplicationBuilder['addExecutable']>['withReference']>[0];
+type AspireResource =
+  & Parameters<ReturnType<DistributedApplicationBuilder['addExecutable']>['waitFor']>[0]
+  & Parameters<ReturnType<DistributedApplicationBuilder['addExecutable']>['withEnvironment']>[1];
 type CacheContainerResource = Awaited<ReturnType<DistributedApplicationBuilder['addContainer']>>;
 type CacheResource = AspireResource | CacheContainerResource;
 

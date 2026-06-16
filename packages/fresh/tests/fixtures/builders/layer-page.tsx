@@ -1,6 +1,16 @@
 import { definePage } from '../../../src/application/builders/mod.ts';
+import type { PageHandlers, RoutedPageDefinition } from '../../../src/application/builders/mod.ts';
 
-const page = definePage<{ requestId: string }>()
+type LayerPageState = { requestId: string };
+type LayerPageDefinition = RoutedPageDefinition<
+  LayerPageState,
+  Record<string, never>,
+  Record<string, never>,
+  Record<string, never>,
+  { panel: { label: string } }
+>;
+
+const page: LayerPageDefinition = definePage<LayerPageState>()
   .withLayer('panel', (props: { label: string }) => <section>{props.label}</section>, {
     loader: () => ({ label: 'ready' }),
     partial: '/partials/playground/builders/layer-page/panel',
@@ -9,5 +19,6 @@ const page = definePage<{ requestId: string }>()
   .withLayout((slots) => <main>{slots.panel()}</main>)
   .build({ routePattern: '/playground/builders/layer-page' });
 
-export const handler = page.handler;
-export default page.default;
+export const handler: PageHandlers<LayerPageState> | undefined = page.handler;
+const defaultPage: LayerPageDefinition['default'] = page.default;
+export default defaultPage;

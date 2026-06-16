@@ -41,16 +41,16 @@ describe('HelpersGeneratorPipeline', () => {
     const paths = files.map((f) => f.path);
 
     const expectedHelpersPaths = [
-      '.helpers/configure-dashboard.ts',
-      '.helpers/config-schema.ts',
-      '.helpers/register-infrastructure.ts',
-      '.helpers/db-cli-mode.ts',
-      '.helpers/register-services.ts',
-      '.helpers/register-plugins.ts',
-      '.helpers/register-background.ts',
-      '.helpers/register-apps.ts',
-      '.helpers/register-tools.ts',
-      '.helpers/index.ts',
+      '.helpers/configure-dashboard.mts',
+      '.helpers/config-schema.mts',
+      '.helpers/register-infrastructure.mts',
+      '.helpers/db-cli-mode.mts',
+      '.helpers/register-services.mts',
+      '.helpers/register-plugins.mts',
+      '.helpers/register-background.mts',
+      '.helpers/register-apps.mts',
+      '.helpers/register-tools.mts',
+      '.helpers/index.mts',
     ];
 
     for (const expected of expectedHelpersPaths) {
@@ -61,50 +61,50 @@ describe('HelpersGeneratorPipeline', () => {
     }
   });
 
-  it('should include apphost.ts at root level (not in .helpers/)', async () => {
+  it('should include apphost.mts at root level (not in .helpers/)', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
     const paths = files.map((f) => f.path);
-    assert(paths.includes('apphost.ts'), 'should include apphost.ts at root');
+    assert(paths.includes('apphost.mts'), 'should include apphost.mts at root');
     assert(
-      !paths.includes('.helpers/apphost.ts'),
-      'apphost.ts should NOT be inside .helpers/',
+      !paths.includes('.helpers/apphost.mts'),
+      'apphost.mts should NOT be inside .helpers/',
     );
   });
 
-  it('should not include apphost.ts when generateAppHost is false', async () => {
+  it('should not include apphost.mts when generateAppHost is false', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({
       config: fixtures.POPULATED_CONFIG,
       generateAppHost: false,
     });
     const paths = files.map((f) => f.path);
-    assert(!paths.includes('apphost.ts'), 'should not include apphost.ts');
+    assert(!paths.includes('apphost.mts'), 'should not include apphost.mts');
   });
 
-  it('should render apphost.ts with correct template variables', async () => {
+  it('should render apphost.mts with correct template variables', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({
       config: fixtures.POPULATED_CONFIG,
       configPath: 'dotnet/AppHost/appsettings.json',
     });
-    const apphost = files.find((f) => f.path === 'apphost.ts');
-    assert(apphost, 'apphost.ts should exist in output');
+    const apphost = files.find((f) => f.path === 'apphost.mts');
+    assert(apphost, 'apphost.mts should exist in output');
     assertStringIncludes(apphost!.content, fixtures.FILE_HEADER);
     assertStringIncludes(apphost!.content, 'dotnet/AppHost/appsettings.json');
-    assertStringIncludes(apphost!.content, './.modules/aspire.ts');
-    assertStringIncludes(apphost!.content, './.helpers/index.ts');
+    assertStringIncludes(apphost!.content, './.aspire/modules/aspire.mjs');
+    assertStringIncludes(apphost!.content, './.helpers/index.mjs');
     assertStringIncludes(apphost!.content, 'createBuilder()');
     assertStringIncludes(apphost!.content, 'createNetScriptAppHost');
   });
 
-  it('should include configure-dashboard.ts from Tier 2 template', async () => {
+  it('should include configure-dashboard.mts from Tier 2 template', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
     const dashboard = files.find(
-      (f) => f.path === '.helpers/configure-dashboard.ts',
+      (f) => f.path === '.helpers/configure-dashboard.mts',
     );
-    assert(dashboard, 'configure-dashboard.ts should exist in output');
+    assert(dashboard, 'configure-dashboard.mts should exist in output');
     assertStringIncludes(dashboard!.content, 'export function configureDashboard');
     assertStringIncludes(
       dashboard!.content,
@@ -124,7 +124,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should mirror dashboard env constants in the Aspire compat helper', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
-    const compat = files.find((f) => f.path === '.helpers/_aspire-compat.ts');
+    const compat = files.find((f) => f.path === '.helpers/_aspire-compat.mts');
 
     assert(compat, 'compat helper should exist in output');
     assertStringIncludes(
@@ -144,7 +144,7 @@ describe('HelpersGeneratorPipeline', () => {
   it('should include the Aspire compat helper with VITE env-var export', async () => {
     const pipeline = new HelpersGeneratorPipeline();
     const files = await pipeline.execute({ config: fixtures.POPULATED_CONFIG });
-    const compat = files.find((f) => f.path === '.helpers/_aspire-compat.ts');
+    const compat = files.find((f) => f.path === '.helpers/_aspire-compat.mts');
 
     assert(compat, 'compat helper should exist in output');
     assertStringIncludes(compat!.content, 'export function buildViteEnvVarName(');
@@ -158,37 +158,37 @@ describe('HelpersGeneratorPipeline', () => {
 
     // Config schema should include our service key
     const configSchema = files.find(
-      (f) => f.path === '.helpers/config-schema.ts',
+      (f) => f.path === '.helpers/config-schema.mts',
     );
-    assert(configSchema, 'config-schema.ts should exist');
+    assert(configSchema, 'config-schema.mjs should exist');
     assertStringIncludes(configSchema!.content, 'users: ServiceEntrySchema');
 
     // Register services should include our service
     const regServices = files.find(
-      (f) => f.path === '.helpers/register-services.ts',
+      (f) => f.path === '.helpers/register-services.mts',
     );
-    assert(regServices, 'register-services.ts should exist');
+    assert(regServices, 'register-services.mjs should exist');
     assertStringIncludes(regServices!.content, "builder.addExecutable('users'");
 
     // Register infrastructure should include our database
     const regInfra = files.find(
-      (f) => f.path === '.helpers/register-infrastructure.ts',
+      (f) => f.path === '.helpers/register-infrastructure.mts',
     );
-    assert(regInfra, 'register-infrastructure.ts should exist');
+    assert(regInfra, 'register-infrastructure.mjs should exist');
     assertStringIncludes(regInfra!.content, "builder.addPostgres('main')");
 
     // Register plugins should include our plugin
     const regPlugins = files.find(
-      (f) => f.path === '.helpers/register-plugins.ts',
+      (f) => f.path === '.helpers/register-plugins.mts',
     );
-    assert(regPlugins, 'register-plugins.ts should exist');
+    assert(regPlugins, 'register-plugins.mjs should exist');
     assertStringIncludes(regPlugins!.content, "builder.addExecutable('auth'");
 
     // Register tools should include our tool
     const regTools = files.find(
-      (f) => f.path === '.helpers/register-tools.ts',
+      (f) => f.path === '.helpers/register-tools.mts',
     );
-    assert(regTools, 'register-tools.ts should exist');
+    assert(regTools, 'register-tools.mjs should exist');
     assertStringIncludes(
       regTools!.content,
       "builder.addExecutable('prisma-studio'",
@@ -201,27 +201,27 @@ describe('HelpersGeneratorPipeline', () => {
     assertEquals(files.length, 12);
 
     const regServices = files.find(
-      (f) => f.path === '.helpers/register-services.ts',
+      (f) => f.path === '.helpers/register-services.mts',
     );
-    assert(regServices, 'register-services.ts should exist');
+    assert(regServices, 'register-services.mjs should exist');
     assertStringIncludes(regServices!.content, '// No services configured');
 
     const regInfra = files.find(
-      (f) => f.path === '.helpers/register-infrastructure.ts',
+      (f) => f.path === '.helpers/register-infrastructure.mts',
     );
-    assert(regInfra, 'register-infrastructure.ts should exist');
+    assert(regInfra, 'register-infrastructure.mjs should exist');
     assertStringIncludes(regInfra!.content, '// No databases configured');
 
     const regApps = files.find(
-      (f) => f.path === '.helpers/register-apps.ts',
+      (f) => f.path === '.helpers/register-apps.mts',
     );
-    assert(regApps, 'register-apps.ts should exist');
+    assert(regApps, 'register-apps.mjs should exist');
     assertStringIncludes(regApps!.content, '// No apps configured');
 
     const regTools = files.find(
-      (f) => f.path === '.helpers/register-tools.ts',
+      (f) => f.path === '.helpers/register-tools.mts',
     );
-    assert(regTools, 'register-tools.ts should exist');
+    assert(regTools, 'register-tools.mjs should exist');
     assertStringIncludes(regTools!.content, '// No tools configured');
   });
 });
@@ -241,7 +241,7 @@ describe('generateHelpers', () => {
     });
     assertEquals(files.length, 11);
     const paths = files.map((f) => f.path);
-    assert(!paths.includes('apphost.ts'));
+    assert(!paths.includes('apphost.mts'));
   });
 
   it('should produce valid generated files with non-empty content', async () => {

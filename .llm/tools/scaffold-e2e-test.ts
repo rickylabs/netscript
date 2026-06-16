@@ -608,7 +608,7 @@ class SmokeRunner {
   }
 
   get appHost(): string {
-    return join(this.projectRoot, 'aspire', 'apphost.ts');
+    return join(this.projectRoot, 'aspire', 'apphost.mts');
   }
 
   get stopCommand(): string[] {

@@ -1,9 +1,9 @@
 export const SCAFFOLD_ASPIRE_MODULES = {
-  SDK_FILE: 'aspire.ts',
-  SDK_IMPORT_FROM_HELPERS: '../.modules/aspire.ts',
-  SDK_IMPORT_FROM_ROOT: './.modules/aspire.ts',
-  HELPERS_IMPORT_FROM_ROOT: './.helpers/index.ts',
-  ASPIRE_COMPAT_IMPORT: './_aspire-compat.ts',
+  SDK_FILE: 'aspire.mts',
+  SDK_IMPORT_FROM_HELPERS: '../.aspire/modules/aspire.mjs',
+  SDK_IMPORT_FROM_ROOT: './.aspire/modules/aspire.mjs',
+  HELPERS_IMPORT_FROM_ROOT: './.helpers/index.mjs',
+  ASPIRE_COMPAT_IMPORT: './_aspire-compat.mjs',
 } as const;
 
 export const SCAFFOLD_COMMUNITY_TOOLKIT = {
@@ -14,18 +14,18 @@ export const SCAFFOLD_COMMUNITY_TOOLKIT = {
 export const SCAFFOLD_ASPIRE_INTEGRATIONS = {
   POSTGRES: {
     PACKAGE_ID: 'Aspire.Hosting.PostgreSQL',
-    VERSION: '13.2.2',
+    VERSION: '13.4.4',
   },
   MYSQL: {
     PACKAGE_ID: 'Aspire.Hosting.MySql',
-    VERSION: '13.2.2',
+    VERSION: '13.4.4',
   },
   MSSQL: {
     PACKAGE_ID: 'Aspire.Hosting.SqlServer',
-    VERSION: '13.2.2',
+    VERSION: '13.4.4',
   },
   REDIS: {
     PACKAGE_ID: 'Aspire.Hosting.Redis',
-    VERSION: '13.2.2',
+    VERSION: '13.4.4',
   },
 } as const;

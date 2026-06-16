@@ -17,7 +17,7 @@ export interface CachedListEntryLike<TItem> {
 }
 
 /** Return whether an SDK cache entry is stale. */
-export const isCacheEntryStale = isSdkCacheEntryStale;
+export const isCacheEntryStale: typeof isSdkCacheEntryStale = isSdkCacheEntryStale;
 
 /** Return `true` when every supplied entry is present. */
 export function hasAllCacheEntries(

@@ -36,7 +36,7 @@ export function generateAspireConfig(options?: AspireConfigOptions): string {
  * Options controlling which NuGet integration packages are declared in the
  * TypeScript AppHost `aspire.config.json`. Each flag toggles an
  * `[AspireExport]`-annotated NuGet. Without the matching package,
- * `aspire restore` omits the capability from `.modules/aspire.ts`, and the
+ * `aspire restore` omits the capability from `.aspire/modules/aspire.mts`, and the
  * generated `.helpers/register-*.ts` call (e.g. `builder.addPostgres(...)`)
  * throws at runtime.
  *
@@ -63,10 +63,10 @@ export interface TsAspireConfigOptions {
  * Generate the contents of `aspire.config.json` for TypeScript AppHost mode.
  *
  * Produces the configuration for `aspire run` / `aspire restore` pointing
- * to `apphost.ts` as the TypeScript entry point. The `packages` section is
+ * to `apphost.mts` as the TypeScript entry point. The `packages` section is
  * populated based on `options` so every `builder.addXxx(...)` capability
  * emitted by the helpers generator has a matching SDK export after
- * `aspire restore` rebuilds `.modules/aspire.ts`.
+ * `aspire restore` rebuilds `.aspire/modules/aspire.mts`.
  *
  * @param options - Which integration packages the scaffold needs.
  * @returns Serialized JSON string with trailing newline.
@@ -81,8 +81,8 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
   // Mysql/addMySql, Mssql/addSqlServer, Sqlite/addConnectionString
   // (no NuGet needed)).
   // These are official Microsoft NuGets whose `[AspireExport]` wrappers are
-  // correctly re-emitted into `.modules/aspire.ts` by `aspire restore` under
-  // the `preview` channel, unlike the community Deno one — see the comment
+  // correctly re-emitted into `.aspire/modules/aspire.mts` by `aspire restore`,
+  // unlike the community Deno one — see the comment
   // on `TsAspireConfigOptions` above.
   for (const engine of dbEngines) {
     switch (engine) {
@@ -107,13 +107,12 @@ export function generateTsAspireConfig(options?: TsAspireConfigOptions): string 
 
   const config: Record<string, unknown> = {
     appHost: {
-      path: 'apphost.ts',
+      path: 'apphost.mts',
       language: 'typescript/nodejs',
     },
     sdk: {
       version: SCAFFOLD_VERSIONS.ASPIRE_SDK,
     },
-    channel: 'preview',
     profiles: {
       https: {
         applicationUrl: `https://localhost:${PORT_RANGES.ASPIRE_DASHBOARD};http://localhost:${

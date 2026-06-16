@@ -1,11 +1,19 @@
 import { definePartial } from '../../../src/application/builders/mod.ts';
+import type {
+  DefinedPartialRoute,
+  PartialRouteConfig,
+} from '../../../src/application/builders/mod.ts';
 
-const partial = definePartial({
+type PartialFixtureContext = unknown;
+type PartialFixtureRoute = DefinedPartialRoute<PartialFixtureContext>;
+
+const partial: PartialFixtureRoute = definePartial({
   name: 'builder-partial-fixture',
   loader: async () => await Promise.resolve({ label: 'partial-ready' }),
   component: (props: { label: string }) => <span>{props.label}</span>,
 });
 
-export const config = partial.config;
-export const handler = partial.handler;
-export default partial.default;
+export const config: PartialRouteConfig = partial.config;
+export const handler: PartialFixtureRoute['handler'] = partial.handler;
+const defaultPartial: PartialFixtureRoute['default'] = partial.default;
+export default defaultPartial;

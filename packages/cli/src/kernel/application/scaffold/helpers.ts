@@ -51,7 +51,7 @@ export function collectFormattableScaffoldFiles(
       if (
         normalizedPath.startsWith('packages/') ||
         normalizedPath.startsWith('aspire/node_modules/') ||
-        normalizedPath.startsWith('aspire/.modules/')
+        normalizedPath.startsWith('aspire/.aspire/')
       ) continue;
       if (!FORMATTABLE_EXTENSIONS.has(extname(normalizedPath).toLowerCase())) continue;
       files.add(normalizedPath);

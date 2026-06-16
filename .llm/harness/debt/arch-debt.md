@@ -79,6 +79,32 @@ Seeded from
 - **Status:** open, DEBT_ACCEPTED — locked decision L8 keeps `contracts/crud/` at package root.
 - **Gate:** F-5/F-6 remain green for `@netscript/contracts`; consumer validation in slices 25-27.
 
+## packages/contracts — T4 slow-type publish carve-out
+
+- **Reason:** Heavy Zod-derived contract helpers still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Narrow public contract helper return types before beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/contracts` dry-run passes without `--allow-slow-types`.
+
+## root toolchain — T5 deferred esbuild audit advisory
+
+- **Reason:** `deno audit` reports GHSA-gv7w-rqvm-qjhr for transitive `esbuild <0.28.1`.
+  The runtime-reachable critical `@orpc/client` advisory was remediated by moving ORPC imports to
+  `^1.14.6`; this remaining high advisory is deferred as approved toolchain debt because it is
+  tied to the Vite/esbuild stack rather than a NetScript runtime dependency path.
+- **Owner:** Toolchain upgrade T5 follow-up.
+- **Target:** Revisit when the Vite/esbuild dependency chain can move to `esbuild >=0.28.1`.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (A-9).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task audit:critical`; close when full `deno audit` passes without suppressing the
+  deferred high-severity advisory.
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.
@@ -149,6 +175,20 @@ Seeded from
 - **Created:** 2026-04-29
 - **Status:** open
 - **Gate:** F-3, F-11, F-13
+
+## packages/plugin-triggers-core — T4 slow-type publish carve-out
+
+- **Reason:** Trigger DSL and runtime inference types still require
+  `deno publish --allow-slow-types` under Deno 2.8 publish analysis. This is accepted
+  score-impacting debt for the toolchain upgrade, not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Split trigger inference types and publish explicit public definition interfaces before
+  beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/plugin-triggers-core` dry-run passes without
+  `--allow-slow-types`.
 
 ## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
 
@@ -230,6 +270,19 @@ Seeded from
   specifier, optional peer, or CDN-only flag) replaces the vendored file without breaking offline
   docs.
 
+## packages/service — T4 slow-type publish carve-out
+
+- **Reason:** Hono/oRPC service builder schemas still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Make Zod schemas source-of-truth behind explicit exported service interfaces before
+  beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/service` dry-run passes without `--allow-slow-types`.
+
 ## packages/plugin — AP-1 / doctrine verdict Restructure (types.ts 1,005 LOC)
 
 - **Reason:** `types.ts` should split per concept and introduce `domain/` plus `ports/`.
@@ -242,6 +295,19 @@ Seeded from
   `src/ports/`, `src/config/`, `src/cli/`, `src/sdk/`, `src/testing/`, and diagnostics surfaces
   through curated entrypoints. Remaining builder size debt is tracked separately below.
 - **Gate:** F-1, F-3, F-5, F-11
+
+## packages/plugin — T4 slow-type publish carve-out
+
+- **Reason:** Plugin manifest/builder generic helpers still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Reduce generic helper leakage behind explicit public plugin definition interfaces
+  before beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/plugin` dry-run passes without `--allow-slow-types`.
 
 ## packages/plugin/src/config/builders/plugin-builder.ts — F-1 size (360 LOC)
 
@@ -633,3 +699,19 @@ Seeded from
   consumers — `plugins/triggers` and `plugins/workers` — both pass `deno task check`, confirming the
   `interfaces/`→`ports/` and `./types`→`./ports` rename is non-breaking.
 - **Gate:** `deno check ./maintainer.ts` from `packages/cli` reports 0 TS9016/TS9027 errors.
+
+## root toolchain — R3 held dependency majors (`toolchain-r3-held-dependency-majors`)
+
+| Status | Package | Reason | Revisit |
+| ------ | ------- | ------ | ------- |
+| DEBT_ACCEPTED | `npm:vite` `7.2.2`→`8.0.16` | unvetted major; Vite 8 is outside R3's safe patch/minor bump rule | Fresh Vite integration and scaffold runtime validation |
+
+- **Owner:** Toolchain upgrade R3 follow-up.
+- **Target:** Before beta dependency freeze.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/sub-agent-briefs/R3.md`.
+- **Created:** 2026-06-16.
+- **Status:** open, DEBT_ACCEPTED. R3 follow-up removed `@fedify/amqp`, `@fedify/denokv`,
+  `@fedify/redis`, `@durable-streams/state`, and `amqplib` from this debt after maintainer approval
+  and green validation.
+- **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
+  targeted package checks and `deno task publish:dry-run` pass after each migration.

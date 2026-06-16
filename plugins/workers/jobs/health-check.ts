@@ -11,6 +11,8 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
+  type JobHandlerContext,
+  type JobResult,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { z } from 'zod';
@@ -38,7 +40,11 @@ interface HealthCheck {
 // JOB HANDLER
 // ============================================================================
 
-const handler = defineJobHandler(async (ctx) => {
+type HealthCheckJobHandler = (
+  context: JobHandlerContext,
+) => JobResult<unknown> | Promise<JobResult<unknown>>;
+
+const handler: HealthCheckJobHandler = defineJobHandler(async (ctx) => {
   const payload = HealthCheckPayloadSchema.parse(ctx.payload ?? {});
   const { log, progress, trace } = createJobTools(ctx);
   const { verbose } = payload;
@@ -215,4 +221,7 @@ const handler = defineJobHandler(async (ctx) => {
   }
 });
 
-export default Object.assign(handler, { id: 'workers-plugin-health-check' });
+const healthCheckJob: HealthCheckJobHandler & Readonly<{ id: 'workers-plugin-health-check' }> =
+  Object.assign(handler, { id: 'workers-plugin-health-check' as const });
+
+export default healthCheckJob;

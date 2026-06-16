@@ -1,8 +1,9 @@
-import { assert, assertEquals } from '@std/assert';
+import { assert, assertEquals, assertStrictEquals } from '@std/assert';
 import {
   createKvWatchSSE,
   createSSEStream,
   type SSEClock,
+  type SSEIntervalId,
   type SSEKvKey,
   type SSEWatchableKv,
 } from './sse.ts';
@@ -25,16 +26,18 @@ function neverIterable<T>(): AsyncIterable<T> {
 
 Deno.test('createSSEStream clears heartbeat when the external signal aborts', async () => {
   const controller = new AbortController();
-  let clearedInterval: number | undefined;
+  const intervalId: SSEIntervalId = setInterval(() => {}, 10_000);
+  let clearedInterval: SSEIntervalId | undefined;
 
   const clock: SSEClock = {
-    setInterval() {
-      return 42;
+    setInterval(): SSEIntervalId {
+      return intervalId;
     },
-    clearInterval(id) {
+    clearInterval(id: SSEIntervalId): void {
       clearedInterval = id;
+      clearInterval(id);
     },
-    now() {
+    now(): Date {
       return new Date('2026-06-13T00:00:00.000Z');
     },
   };
@@ -54,7 +57,7 @@ Deno.test('createSSEStream clears heartbeat when the external signal aborts', as
   controller.abort();
   await waitForMicrotask();
 
-  assertEquals(clearedInterval, 42);
+  assertStrictEquals(clearedInterval, intervalId);
   await reader.cancel();
 });
 

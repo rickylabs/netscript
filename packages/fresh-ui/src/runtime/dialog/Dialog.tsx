@@ -19,7 +19,7 @@ function useDialogContext(partName: string): UseDialogReturn {
   return requireFreshUiContext(useContext(DialogContext), partName, 'Dialog.Root');
 }
 
-function withChildren(children: ComponentChildren) {
+function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
@@ -53,8 +53,17 @@ function DialogClose({ children, ...props }: DialogCloseProps): VNode {
   return <button {...dialog.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
+type DialogNamespace = Readonly<{
+  Close: typeof DialogClose;
+  Content: typeof DialogContent;
+  Description: typeof DialogDescription;
+  Root: typeof DialogRoot;
+  Title: typeof DialogTitle;
+  Trigger: typeof DialogTrigger;
+}>;
+
 /** Compound dialog namespace with root and structural subcomponents. */
-export const Dialog = {
+export const Dialog: DialogNamespace = {
   Close: DialogClose,
   Content: DialogContent,
   Description: DialogDescription,

@@ -1,0 +1,400 @@
+  has imports: 17
+    @netscript/kv: ../kv/mod.ts
+    @netscript/plugin-streams-core: ../plugin-streams-core/mod.ts
+    @netscript/telemetry: ../telemetry/mod.ts
+    @orpc/client: catalog:
+    @orpc/client/fetch: npm:@orpc/client@^1.14.6/fetch
+    @orpc/client/plugins: npm:@orpc/client@^1.14.6/plugins
+    @orpc/client/standard: npm:@orpc/client@^1.14.6/standard
+    @orpc/contract: catalog:
+    @orpc/openapi: catalog:
+    @orpc/server: catalog:
+    @orpc/tanstack-query: catalog:
+    @orpc/zod: catalog:
+    @standard-schema/spec: jsr:@standard-schema/spec@1.1.0
+    @std/assert: jsr:@std/assert@^1
+    @tanstack/db: catalog:
+    @tanstack/query-core: catalog:
+    @tanstack/query-db-collection: catalog:
+===== ./packages/service/deno.json =====
+  has catalog block: False
+  has imports: 14
+    @netscript/logger: ../logger/mod.ts
+    @netscript/telemetry: ../telemetry/mod.ts
+    @orpc/client/plugins: npm:@orpc/client@^1.14.6/plugins
+    @orpc/openapi: catalog:
+    @orpc/openapi/fetch: npm:@orpc/openapi@^1.14.6/fetch
+    @orpc/server: catalog:
+    @orpc/server/fetch: npm:@orpc/server@^1.14.6/fetch
+    @orpc/server/plugins: npm:@orpc/server@^1.14.6/plugins
+    @orpc/zod: catalog:
+    @orpc/zod/zod4: npm:@orpc/zod@^1.14.6/zod4
+    @std/assert: jsr:@std/assert@^1
+    hono: jsr:@hono/hono@4.12.24
+    hono/cors: jsr:@hono/hono@4.12.24/cors
+    hono/logger: jsr:@hono/hono@4.12.24/logger
+===== ./packages/telemetry/deno.json =====
+  has catalog block: False
+  has imports: 3
+    @opentelemetry/api: catalog:
+    @orpc/contract: catalog:
+    @std/assert: jsr:@std/assert@^1
+===== ./packages/watchers/deno.json =====
+  has catalog block: False
+  has imports: 4
+    @std/assert: jsr:@std/assert@^1
+    @std/async: jsr:@std/async@^1
+    @std/fs: jsr:@std/fs@^1
+    @std/path: jsr:@std/path@^1
+===== ./plugins/sagas/deno.json =====
+  has catalog block: False
+  has imports: 27
+    @durable-streams/client: catalog:
+    @durable-streams/state: catalog:
+    @hono/hono: jsr:@hono/hono@4.12.24
+    @netscript/aspire: ../../packages/aspire/src/public/mod.ts
+    @netscript/contracts: ../../packages/contracts/mod.ts
+    @netscript/fresh/streams: ../../packages/fresh/src/runtime/streams/mod.ts
+    @netscript/kv: ../../packages/kv/mod.ts
+    @netscript/plugin: ../../packages/plugin/mod.ts
+    @netscript/plugin-sagas-core/domain: 
+../../packages/plugin-sagas-core/src/domain/mod.ts
+    @netscript/plugin-sagas-core/integration/publisher: 
+../../packages/plugin-sagas-core/src/integration/publisher/mod.ts
+    @netscript/plugin-sagas-core/runtime: 
+../../packages/plugin-sagas-core/src/runtime/mod.ts
+    @netscript/plugin-sagas-core/streams: 
+../../packages/plugin-sagas-core/src/streams/mod.ts
+    @netscript/plugin-streams: ../streams/mod.ts
+    @netscript/plugin-streams-core: ../../packages/plugin-streams-core/mod.ts
+    @netscript/plugin-workers: ../workers/mod.ts
+    @netscript/queue: ../../packages/queue/mod.ts
+    @netscript/service: ../../packages/service/mod.ts
+    @netscript/telemetry: ../../packages/telemetry/mod.ts
+    @netscript/telemetry/context: ../../packages/telemetry/context.ts
+    @orpc/contract: catalog:
+    @orpc/openapi: catalog:
+    @orpc/server: catalog:
+    @orpc/zod: catalog:
+    @std/async: jsr:@std/async@^1
+    @tanstack/db: catalog:
+    hono: jsr:@hono/hono@4.12.24
+    zod: jsr:@zod/zod@4.4.3
+===== ./plugins/streams/deno.json =====
+  has catalog block: False
+  has imports: 11
+    @durable-streams/client: catalog:
+    @durable-streams/server: catalog:
+    @netscript/aspire: ../../packages/aspire/src/public/mod.ts
+    @netscript/plugin: ../../packages/plugin/mod.ts
+    @netscript/plugin-streams-core: ../../packages/plugin-streams-core/mod.ts
+    @netscript/service: ../../packages/service/mod.ts
+    @netscript/telemetry: ../../packages/telemetry/mod.ts
+    @standard-schema/spec: jsr:@standard-schema/spec@1.1.0
+    @std/net: jsr:@std/net@^1
+    hono: jsr:@hono/hono@4.12.24
+    hono/cors: jsr:@hono/hono@4.12.24/cors
+===== ./plugins/triggers/deno.json =====
+  has catalog block: False
+  has imports: 28
+    @durable-streams/state: catalog:
+    @netscript/aspire: ../../packages/aspire/src/public/mod.ts
+    @netscript/contracts: ../../packages/contracts/mod.ts
+    @netscript/cron: ../../packages/cron/mod.ts
+    @netscript/plugin: ../../packages/plugin/mod.ts
+    @netscript/plugin-sagas-core: ../../packages/plugin-sagas-core/mod.ts
+    @netscript/plugin-streams-core: ../../packages/plugin-streams-core/mod.ts
+    @netscript/plugin-triggers-core: ../../packages/plugin-triggers-core/mod.ts
+    @netscript/plugin-triggers-core/adapters: 
+../../packages/plugin-triggers-core/src/adapters/mod.ts
+    @netscript/plugin-triggers-core/contracts/v1: 
+../../packages/plugin-triggers-core/src/contracts/v1/mod.ts
+    @netscript/plugin-triggers-core/domain: 
+../../packages/plugin-triggers-core/src/domain/mod.ts
+    @netscript/plugin-triggers-core/ports: 
+../../packages/plugin-triggers-core/src/ports/mod.ts
+    @netscript/plugin-triggers-core/runtime: 
+../../packages/plugin-triggers-core/src/runtime/mod.ts
+    @netscript/plugin-triggers-core/telemetry: 
+../../packages/plugin-triggers-core/src/telemetry/mod.ts
+    @netscript/plugin-triggers-core/testing: 
+../../packages/plugin-triggers-core/src/testing/mod.ts
+    @netscript/plugin-workers-core: ../../packages/plugin-workers-core/mod.ts
+    @netscript/plugin-workers-core/runtime: 
+../../packages/plugin-workers-core/src/runtime/mod.ts
+    @netscript/queue: ../../packages/queue/mod.ts
+    @netscript/service: ../../packages/service/mod.ts
+    @netscript/telemetry/instrumentation: 
+../../packages/telemetry/instrumentation.ts
+    @netscript/telemetry/tracer: ../../packages/telemetry/tracer.ts
+    @netscript/watchers: ../../packages/watchers/mod.ts
+    @orpc/contract: catalog:
+    @orpc/server: catalog:
+    @std/assert: jsr:@std/assert@^1
+    @std/path: jsr:@std/path@^1
+    hono: jsr:@hono/hono@4.12.24
+    zod: jsr:@zod/zod@4.4.3
+===== ./plugins/workers/deno.json =====
+  has catalog block: False
+  has imports: 38
+    @durable-streams/client: catalog:
+    @durable-streams/state: catalog:
+    @hono/hono: jsr:@hono/hono@4.12.24
+    @netscript/aspire: ../../packages/aspire/src/public/mod.ts
+    @netscript/contracts: ../../packages/contracts/mod.ts
+    @netscript/cron: ../../packages/cron/mod.ts
+    @netscript/fresh/streams: ../../packages/fresh/src/runtime/streams/mod.ts
+    @netscript/kv: ../../packages/kv/mod.ts
+    @netscript/plugin: ../../packages/plugin/mod.ts
+    @netscript/plugin-streams: ../streams/mod.ts
+    @netscript/plugin-streams-core: ../../packages/plugin-streams-core/mod.ts
+    @netscript/plugin-workers-core: ../../packages/plugin-workers-core/mod.ts
+    @netscript/plugin-workers-core/contracts/v1: 
+../../packages/plugin-workers-core/src/contracts/v1/mod.ts
+    @netscript/plugin-workers-core/executor: 
+../../packages/plugin-workers-core/src/executor/mod.ts
+    @netscript/plugin-workers-core/presets: 
+../../packages/plugin-workers-core/src/presets/mod.ts
+    @netscript/plugin-workers-core/registry: 
+../../packages/plugin-workers-core/src/registry/mod.ts
+    @netscript/plugin-workers-core/runtime: 
+../../packages/plugin-workers-core/src/runtime/mod.ts
+    @netscript/plugin-workers-core/schemas: 
+../../packages/plugin-workers-core/src/domain/public-schema.ts
+    @netscript/plugin-workers-core/state: 
+../../packages/plugin-workers-core/src/state/mod.ts
+    @netscript/plugin-workers-core/streams: 
+../../packages/plugin-workers-core/src/streams/mod.ts
+    @netscript/queue: ../../packages/queue/mod.ts
+    @netscript/service: ../../packages/service/mod.ts
+    @netscript/telemetry: ../../packages/telemetry/mod.ts
+    @orpc/contract: catalog:
+    @orpc/openapi: catalog:
+    @orpc/openapi/fetch: npm:@orpc/openapi@^1.14.6/fetch
+    @orpc/server: catalog:
+    @orpc/server/fetch: npm:@orpc/server@^1.14.6/fetch
+    @orpc/server/plugins: npm:@orpc/server@^1.14.6/plugins
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Show rest of plugins/workers
+
+$ cd /home/runner/work/netscript/netscript && python3 -c "
+import json
+d = json.load(open('./plugins/workers/deno.json'))
+imp = d.get('imports', {})
+for k, v in sorted(imp.items()):
+    print(f'    {k}: {v}')
+"
+
+Tokens: ↑ input 26M • cache hit 93.31% •  reasoning 9.81K • ↓ output 186.97K • $
+2.2015
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+@durable-streams/client: catalog:
+    @durable-streams/state: catalog:
+    @hono/hono: jsr:@hono/hono@4.12.24
+    @netscript/aspire: ../../packages/aspire/src/public/mod.ts
+    @netscript/contracts: ../../packages/contracts/mod.ts
+    @netscript/cron: ../../packages/cron/mod.ts
+    @netscript/fresh/streams: ../../packages/fresh/src/runtime/streams/mod.ts
+    @netscript/kv: ../../packages/kv/mod.ts
+    @netscript/plugin: ../../packages/plugin/mod.ts
+    @netscript/plugin-streams: ../streams/mod.ts
+    @netscript/plugin-streams-core: ../../packages/plugin-streams-core/mod.ts
+    @netscript/plugin-workers-core: ../../packages/plugin-workers-core/mod.ts
+    @netscript/plugin-workers-core/contracts/v1: 
+../../packages/plugin-workers-core/src/contracts/v1/mod.ts
+    @netscript/plugin-workers-core/executor: 
+../../packages/plugin-workers-core/src/executor/mod.ts
+    @netscript/plugin-workers-core/presets: 
+../../packages/plugin-workers-core/src/presets/mod.ts
+    @netscript/plugin-workers-core/registry: 
+../../packages/plugin-workers-core/src/registry/mod.ts
+    @netscript/plugin-workers-core/runtime: 
+../../packages/plugin-workers-core/src/runtime/mod.ts
+    @netscript/plugin-workers-core/schemas: 
+../../packages/plugin-workers-core/src/domain/public-schema.ts
+    @netscript/plugin-workers-core/state: 
+../../packages/plugin-workers-core/src/state/mod.ts
+    @netscript/plugin-workers-core/streams: 
+../../packages/plugin-workers-core/src/streams/mod.ts
+    @netscript/queue: ../../packages/queue/mod.ts
+    @netscript/service: ../../packages/service/mod.ts
+    @netscript/telemetry: ../../packages/telemetry/mod.ts
+    @orpc/contract: catalog:
+    @orpc/openapi: catalog:
+    @orpc/openapi/fetch: npm:@orpc/openapi@^1.14.6/fetch
+    @orpc/server: catalog:
+    @orpc/server/fetch: npm:@orpc/server@^1.14.6/fetch
+    @orpc/server/plugins: npm:@orpc/server@^1.14.6/plugins
+    @orpc/zod: catalog:
+    @orpc/zod/zod4: npm:@orpc/zod@^1.14.6/zod4
+    @standard-schema/spec: jsr:@standard-schema/spec@1.1.0
+    @std/async: jsr:@std/async@^1
+    @std/path: jsr:@std/path@^1
+    @tanstack/db: catalog:
+    hono: jsr:@hono/hono@4.12.24
+    hono/cors: jsr:@hono/hono@4.12.24/cors
+    zod: jsr:@zod/zod@4.4.3
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: View CLI deno.json
+
+$ cd /home/runner/work/netscript/netscript && cat packages/cli/deno.json
+
+Tokens: ↑ input 26.04M • cache hit 93.32% •  reasoning 9.81K • ↓ output 187.04K 
+• $ 2.2041
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+{
+  "name": "@netscript/cli",
+  "version": "0.0.1-alpha.0",
+  "description": "Public and maintainer command-line tooling for NetScript 
+workspaces.",
+  "license": "MIT",
+  "exports": {
+    ".": "./mod.ts",
+    "./scaffolding": "./scaffolding.ts",
+    "./testing": "./testing.ts"
+  },
+  "tasks": {
+    "dev": "deno run --allow-all bin/netscript.ts",
+    "build": "deno compile --allow-all --target=x86_64-pc-windows-msvc 
+--output=../../.deploy/windows/scripts/deploy-cli bin/netscript.ts",
+    "build:cli": "deno compile --allow-all --target=x86_64-pc-windows-msvc 
+--output=../../.deploy/windows/bin/netscript-cli bin/netscript.ts",
+    "install": "deno install --allow-all --name=netscript bin/netscript.ts",
+    "check": "deno check --unstable-kv bin/netscript.ts bin/netscript-dev.ts 
+mod.ts maintainer.ts scaffolding.ts testing.ts",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty --no-check=remote",
+    "test": "deno test --allow-all"
+  },
+  "imports": {
+    "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.7",
+    "@std/cli": "jsr:@std/cli@^1",
+    "@std/fmt": "jsr:@std/fmt@^1",
+    "@std/fs": "jsr:@std/fs@^1",
+    "@std/path": "jsr:@std/path@^1",
+    "@std/json": "jsr:@std/json@^1",
+    "@std/jsonc": "jsr:@std/jsonc@^1",
+    "@std/async": "jsr:@std/async@^1",
+    "@std/collections": "jsr:@std/collections@^1",
+    "@std/text": "jsr:@std/text@^1",
+    "@std/net": "jsr:@std/net@^1",
+    "@std/semver": "jsr:@std/semver@^1",
+    "@cliffy/prompt": "jsr:@cliffy/prompt@^1.0.0",
+    "@david/dax": "jsr:@david/dax@^0.43.0",
+    "zod": "jsr:@zod/zod@4.4.3",
+    "@netscript/aspire": "../aspire/mod.ts",
+    "@netscript/config": "../config/mod.ts",
+    "@netscript/plugin": "../plugin/mod.ts",
+    "@netscript/logger": "../logger/mod.ts"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    // DEBT_ACCEPTED: temporary Wave 6 CLI carve-out for Deno 2.8 
+isolatedDeclarations annotations.
+    "isolatedDeclarations": false,
+    "lib": [
+      "deno.ns",
+      "deno.unstable",
+      "dom"
+    ]
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "docs/**/*.md",
+      "deno.json",
+      "bin/netscript.ts",
+      "mod.ts",
+      "scaffolding.ts",
+      "testing.ts",
+      "src/**/*.ts",
+      "src/**/*.template"
+    ],
+    "exclude": [
+      "bin/netscript-dev.ts",
+      "maintainer.ts",
+      "e2e/",
+      "**/*_test.ts",
+      "**/*.test.ts",
+      "**/__snapshots__/**"
+    ]
+  }
+}
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: View CLI e2e deno.json
+
+$ cd /home/runner/work/netscript/netscript && cat packages/cli/e2e/deno.json
+
+Tokens: ↑ input 26.08M • cache hit 93.33% •  reasoning 9.81K • ↓ output 187.12K 
+• $ 2.2067
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+{
+  "name": "@netscript/cli-e2e",
+  "version": "0.0.1-alpha.0",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "tasks": {
+    "cli": "deno run --allow-all cli.ts",
+    "check": "deno check --unstable-kv mod.ts cli.ts",
+    "test": "deno test --allow-all tests/"
+  },
+  "imports": {
+    "@cliffy/command": "jsr:@cliffy/command@^1.0.0-rc.7",
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/fs": "jsr:@std/fs@^1",
+    "@std/path": "jsr:@std/path@^1"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    // DEBT_ACCEPTED: temporary Wave 6 CLI E2E carve-out for Deno 2.8 
+isolatedDeclarations annotations.
+    "isolatedDeclarations": false,
+    "lib": [
+      "deno.ns",
+      "dom"
+    ]
+  },
+  "publish": false
+}
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+{"asctime": "2026-06-16 00:02:45,685", "levelname": "ERROR", "name": "openhands.sdk.conversation.impl.local_conversation", "filename": "local_conversation.py", "lineno": 1265, "message": "Agent reached maximum iterations limit (800)."}
+{"asctime": "2026-06-16 00:02:45,685", "levelname": "WARNING", "name": "openhands.sdk.conversation.visualizer.default", "filename": "default.py", "lineno": 321, "message": "Event type ConversationErrorEvent is not registered in EVENT_VISUALIZATION_CONFIG. Skipping visualization."}
+{"asctime": "2026-06-16 00:02:45,695", "levelname": "ERROR", "name": "__main__", "filename": "agent_runner.py", "lineno": 195, "message": "Run ended at the iteration limit; reporting failure"}

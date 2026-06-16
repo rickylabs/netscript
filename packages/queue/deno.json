@@ -22,14 +22,14 @@
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
-    "@fedify/fedify": "jsr:@fedify/fedify@^1.5.0",
-    "@fedify/denokv": "jsr:@fedify/denokv@^1.0.0",
-    "@fedify/redis": "jsr:@fedify/redis@^1.0.0",
-    "@fedify/amqp": "jsr:@fedify/amqp@^1.0.0",
+    "@fedify/fedify": "jsr:@fedify/fedify@^2.2.5",
+    "@fedify/denokv": "jsr:@fedify/denokv@^2.2.5",
+    "@fedify/redis": "jsr:@fedify/redis@^2.2.5",
+    "@fedify/amqp": "jsr:@fedify/amqp@^2.2.5",
     "@netscript/kv": "../kv/mod.ts",
-    "zod": "npm:zod@^4.3.6",
-    "ioredis": "npm:ioredis@^5.4.1",
-    "amqplib": "npm:amqplib@^0.10.4",
+    "zod": "jsr:@zod/zod@4.4.3",
+    "ioredis": "catalog:",
+    "amqplib": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/async": "jsr:@std/async@^1"
   },

@@ -59,7 +59,7 @@ describe('public add plugin flow', () => {
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
-      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.ts']),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
     });
 
     const pluginDenoJson = JSON.parse(

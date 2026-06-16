@@ -4,6 +4,7 @@
 
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { SCAFFOLD_APP_IMPORTS } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { generateAppDenoJson } from '../../adapters/templates/app/generate-app-deno-json.ts';
 import { generateAppViteConfig } from '../../adapters/templates/app/generate-vite-config.ts';
 
@@ -124,7 +125,7 @@ describe('generateAppDenoJson', () => {
     ]);
     assertEquals(config.imports['@app/'], './');
     assertEquals(config.imports['@my-project/contracts'], '../../contracts/mod.ts');
-    assertEquals(config.imports['vite/client'], 'npm:vite@^7.1.4/client');
+    assertEquals(config.imports['vite/client'], SCAFFOLD_APP_IMPORTS['vite/client']);
   });
 
   it('should resolve @netscript/fresh/vite in local mode', () => {
@@ -183,9 +184,22 @@ describe('generateAppDenoJson', () => {
       '../../packages/sdk/query-client/mod.ts',
     );
     assertEquals(config.imports['@test/contracts'], '../../contracts/mod.ts');
-    assertEquals(config.imports['tailwindcss'], 'npm:tailwindcss@^4.2.2');
-    assertEquals(config.imports['vite/client'], 'npm:vite@^7.1.4/client');
+    assertEquals(config.imports['tailwindcss'], SCAFFOLD_APP_IMPORTS.tailwindcss);
+    assertEquals(config.imports['vite/client'], SCAFFOLD_APP_IMPORTS['vite/client']);
     assertEquals(config.compilerOptions.types, ['vite/client']);
+  });
+
+  it('sources external app dependency pins from the scaffold catalog', () => {
+    const config = JSON.parse(generateAppDenoJson({
+      projectName: 'test',
+      appName: 'dashboard',
+      importMode: 'local',
+      localBase: '../..',
+    }));
+
+    for (const [specifier, target] of Object.entries(SCAFFOLD_APP_IMPORTS)) {
+      assertEquals(config.imports[specifier], target);
+    }
   });
 });
 

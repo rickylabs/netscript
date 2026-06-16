@@ -10,13 +10,13 @@
     "./transform": "./transform.ts"
   },
   "imports": {
-    "zod": "npm:zod@^4.3.6",
-    "@orpc/server": "npm:@orpc/server@^1.13.5"
+    "zod": "jsr:@zod/zod@4.4.3",
+    "@orpc/server": "catalog:"
   },
   "tasks": {
     "check": "deno check mod.ts crud.ts query.ts transform.ts",
     "test": "deno test --allow-all",
-    "publish:dry-run": "deno publish --dry-run --allow-dirty"
+    "publish:dry-run": "deno publish --dry-run --allow-dirty --allow-slow-types"
   },
   "publish": {
     "include": [

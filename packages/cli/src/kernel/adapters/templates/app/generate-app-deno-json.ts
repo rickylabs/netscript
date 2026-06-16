@@ -8,6 +8,7 @@
  */
 
 import { resolveNetScriptImports } from '../../scaffold/import-resolver.ts';
+import { SCAFFOLD_APP_IMPORTS } from '../../../constants/scaffold/scaffold-app-catalog.ts';
 import { SCAFFOLD_PACKAGES } from '../../../constants/scaffold/scaffold-packages.ts';
 import type { JsrResolverPort } from '../../../ports/jsr-resolver-port.ts';
 import type { PackageSourceMode } from '../../../domain/scaffold/scaffold-options.ts';
@@ -122,15 +123,7 @@ export function generateAppDenoJson(options: AppDenoJsonOptions): string {
       '@app/': './',
       ...contractsImport,
       ...directNetScriptImports,
-      'fresh': 'jsr:@fresh/core@^2.3.0',
-      'preact': 'npm:preact@^10.29.1',
-      'preact/hooks': 'npm:preact@^10.29.1/hooks',
-      '@preact/signals': 'npm:@preact/signals@^2.9.0',
-      '@fresh/plugin-vite': 'jsr:@fresh/plugin-vite@^1.1.2',
-      '@tailwindcss/vite': 'npm:@tailwindcss/vite@^4.1.12',
-      'tailwindcss': 'npm:tailwindcss@^4.2.2',
-      'vite': 'npm:vite@^7.1.4',
-      'vite/client': 'npm:vite@^7.1.4/client',
+      ...SCAFFOLD_APP_IMPORTS,
     },
     compilerOptions: {
       lib: ['dom', 'dom.asynciterable', 'dom.iterable', 'deno.ns', 'deno.unstable'],

@@ -111,16 +111,18 @@ const WorkersConfigObjectSchema = z.object({
   enabled: z.boolean().default(true),
 });
 
-const WorkersConfigZodSchema = WorkersConfigObjectSchema.transform((config) => ({
-  ...config,
-  groups: config.groups.map((group) => ({
-    ...group,
-    jobs: group.jobs.map((job) => ({
-      ...job,
-      topic: group.topic,
+const WorkersConfigZodSchema = WorkersConfigObjectSchema.transform(
+  (config: z.output<typeof WorkersConfigObjectSchema>) => ({
+    ...config,
+    groups: config.groups.map((group: WorkerGroupData) => ({
+      ...group,
+      jobs: group.jobs.map((job: JobConfig) => ({
+        ...job,
+        topic: group.topic,
+      })),
     })),
-  })),
-})).optional() as unknown as z.ZodType<WorkersConfigData | undefined>;
+  }),
+).optional() as unknown as z.ZodType<WorkersConfigData | undefined>;
 
 /** Workers plugin configuration schema. */
 export const WorkersConfigSchema: ConfigSchema<WorkersConfigData | undefined> =

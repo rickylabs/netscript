@@ -25,15 +25,15 @@
     "./agent": "./src/agent/mod.ts"
   },
   "imports": {
-    "@saga-bus/core": "npm:@saga-bus/core@^0.2.2",
+    "@saga-bus/core": "catalog:",
     "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
     "@netscript/plugin-workers-core": "../plugin-workers-core/mod.ts",
-    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
-    "@orpc/server": "npm:@orpc/server@^1.13.5",
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
-    "hono": "jsr:@hono/hono@^4",
-    "ioredis": "npm:ioredis@^5.4.1",
-    "zod": "npm:zod@^4.3.6"
+    "hono": "jsr:@hono/hono@4.12.24",
+    "ioredis": "catalog:",
+    "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/builders/mod.ts src/domain/mod.ts src/ports/mod.ts src/runtime/mod.ts src/adapters/mod.ts src/transports/mod.ts src/stores/mod.ts src/middleware/mod.ts src/integration/workers/mod.ts src/integration/publisher/mod.ts src/telemetry/mod.ts src/config/mod.ts src/contracts/v1/mod.ts src/streams/mod.ts src/presets/mod.ts src/abstracts/mod.ts src/testing/mod.ts src/agent/mod.ts",
