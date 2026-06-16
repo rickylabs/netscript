@@ -9,6 +9,12 @@ Use `.agents/skills/netscript-cli` for CLI/scaffold/plugin/maintainer command wo
 `.agents/skills/netscript-tools` for repo tooling, validation evidence, OpenHands triggers, raw git
 verification, and lock-hygiene decisions.
 
+Use `.agents/skills/netscript-deno-toolchain` for any dependency, version, release, or API-inspection
+work — it maps the native Deno 2.8 toolchain (`outdated`, `why`, `audit`, `ci`/`ci --prod`,
+`bump-version`, `publish`, `doc`) and the repo's `.llm/tools/deps/` wrappers so you stop hand-rolling
+registry curls and version checks. Use `.agents/skills/netscript-pr` whenever creating a branch,
+opening/updating a PR, posting a phase summary comment, or applying labels.
+
 When the user says `use harness`, activate the harness workflow. The evaluator must be a separate
 session from the implementation session.
 
@@ -38,7 +44,9 @@ Read only what the task needs.
 7. focused code
 
 For internal `@netscript/*` package APIs, prefer `deno doc <module>` and
-`deno doc --filter <symbol>` before broad implementation reads.
+`deno doc --filter <symbol>` before broad implementation reads — **`deno doc` is your friend**: it
+is the cheapest way to learn a package's public surface without opening source. Likewise `deno why
+<pkg>` answers "what pulls this in" before you touch a dependency.
 
 ## Tooling
 
@@ -56,6 +64,21 @@ Preferred order:
 Use checked-in Deno scripts instead of complex one-off PowerShell when the logic is reusable.
 Temporary scratch/output belongs in `.llm/tmp/`; reusable helper scripts belong in `.llm/tools/` or
 `tools/` depending on whether they are harness/agent utilities or product-facing repo tooling.
+
+### Dependency decisions (use the toolbelt, not curl loops)
+
+For any "is this the latest / is this outdated / is this import dead / does the published surface
+install" question, use the `.llm/tools/deps/` wrappers (`deno task deps:latest|outdated|why|audit|
+prod-install`) — they emit structured output and encode the gotchas. **Never decide "latest" from
+`deno outdated --latest`**: it ignores semver and reports pre-release tags as latest (it once
+reported `@fedify/fedify 2.3.0-dev.*` while stable was `2.2.5`). `deps:latest` reads the registry
+stable channel and is the authority. See `.agents/skills/netscript-deno-toolchain`.
+
+### Supervisor wake (token-free)
+
+When supervising sub-agents, do not poll. Run `.llm/tools/watch-run.ts <run-dir>` as a **background**
+process: it `Deno.watchFs`-es `commits.md`/`worklog.md` and exits 0 on the next change (re-waking the
+supervisor turn), or exits 2 on a `--timeout-seconds` heartbeat if a sub-agent hangs without writing.
 
 ## Validation
 

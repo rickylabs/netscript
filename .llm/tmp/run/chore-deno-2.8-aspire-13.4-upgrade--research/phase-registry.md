@@ -15,9 +15,9 @@ Supervisor: Claude (Opus 4.8). Source of truth for live phase status. See `final
 | B1 deps toolbelt (`.llm/tools/deps/*`) + tasks | done | supervisor | latest/outdated/why/audit/prod-install + 5 deps:* tasks + entry.md; validated (fedify 2.2.5, @hono/hono dead) |
 | B2 `netscript-deno-toolchain` skill | done | supervisor | `.agents/skills/netscript-deno-toolchain/SKILL.md` — native deno toolchain map + prerelease trap + catalog rules; cross-links deps toolbelt + netscript-tools |
 | B3 `netscript-pr` skill (skill-creator) | done | supervisor | `.agents/skills/netscript-pr/SKILL.md` — branch/PR/phase-comment/label house format (Phase E seed). Authored per skill-creator guidance; benchmark eval-loop deferred to explicit request. |
-| B4 AGENTS.md updates | todo | supervisor | toolbelt default + deno doc/why + skills |
-| B5 `.llm/tools/watch-run.ts` | todo | supervisor | background-exec wake mechanism |
-| B6 prod-install lane (`deno ci --prod`) | todo | supervisor | additive to quality lane |
+| B4 AGENTS.md updates | done | supervisor | new skills + deps toolbelt default + prerelease trap + deno doc/why + watch-run |
+| B5 `.llm/tools/watch-run.ts` | done | supervisor | validated: exit 0 on change, exit 2 on timeout heartbeat |
+| B6 prod-install lane (`deno ci --prod`) | done | supervisor | delivered in B1 as `deps/prod-install.ts` + `deno task deps:prod-install` (additive lane) |
 
 ## Phase 1 — PR #44 remediation (Codex WSL, sequential)
 
