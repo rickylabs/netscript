@@ -164,3 +164,27 @@ under `.worktrees/<name>`:
   (separate OpenHands session) + independently re-verify raw evidence; (2) after Slice 2 green →
   confirm Phase P scope/credentials with maintainer, run `chore/jsr-alpha-publish`; (3) after
   Phase P → second generator assignment for Slices 4 + 6; (4) merge wave `--no-ff`, then closeout.
+
+## 2026-06-17 — Wave 6 generator Assignment 1 COMPLETE (Slices 0,1,2,3,5)
+
+- **What:** The continuous Codex WSL generator (thread `77d5db3f`, worktree
+  `/home/codex/repos/netscript-wave6-cli`) finished its assignment end-to-end, committing+pushing
+  per slice as briefed. Supervisor posted a PR #43 comment + independently re-verified each from
+  pushed evidence (gh unauth in WSL).
+  - Slice 0 prep hygiene `96954206` (comment 4724170091)
+  - Slice 1 CLI standards doc `fa3fe22b` (4724187857)
+  - Slice 2 command registry + deploy-port E2E `2e18ebd4` — **load-bearing `scaffold.runtime`
+    41/41 confirmed from raw logs** (4724270592)
+  - Slice 3 split registry + app writer `e53f0114` (4724304277); drift D-W6-3 (split-in-place to
+    avoid kernel→maintainer F-CLI-4 violation)
+  - Slice 5 Aspire verify-only + schema mirror + flag-off `WithProcessCommand` seam `443d69f5`
+    (4724348222); drift D-W6-4
+- **Open items before wave merge:**
+  1. **Batched dual-session IMPL-EVAL** over Slices 0–3,5 (separate OpenHands) — pending launch.
+  2. **RED test triage:** generator honestly flagged repo-wide `deno task test` = 477 passed /
+     11 failed / 12 ignored, outside CLI slice scope. Classify pre-existing-vs-regression.
+  3. **Phase P** JSR alpha.0 publish (28 members except `@netscript/cli`) — **BLOCKED on
+     maintainer scope/credential confirmation** (brief requirement). Slice 4 asserts against the
+     `scaffold.published.runtime` fixture that Phase P unlocks, so Assignment 2 (Slices 4+6)
+     cannot start until Phase P lands.
+- **Severity:** on-track. Dual-session eval + load-bearing gate intact.
