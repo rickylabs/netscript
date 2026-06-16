@@ -1,3 +1,8 @@
+---
+name: fresh-ui-horizontal
+description: Execute @netscript/fresh-ui design-system slices (registry → scaffolded UI page) under Harness v2 — follow the L0/theme/README authority chain and the run's LOCKED slice table; record divergence in drift.md, never improvise.
+---
+
 # SKILL: fresh-ui horizontal implementation (registry → scaffolded UI page)
 
 Audience: a follower model (e.g. GPT 5.5) executing design-system slices

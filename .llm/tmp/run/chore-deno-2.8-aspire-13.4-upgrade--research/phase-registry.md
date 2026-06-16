@@ -32,8 +32,24 @@ Supervisor: Claude (Opus 4.8). Source of truth for live phase status. See `final
 
 ## Gate
 
-- R6 acceptance: `scaffold.runtime` E2E must reach `E2E_EXIT=0` (clears R5 BLOCKED).
-- IMPL-EVAL (separate session) after R6 green → expect `PASS` to clear `CHANGES_REQUESTED`.
+- R6 acceptance: `scaffold.runtime` E2E reached `E2E_EXIT=0`, `database.init` PASS,
+  `passed=41 failed=0` (R6 `677d5405` + follow-up `a50d73f`). Clears R5 BLOCKED. ✅
+- IMPL-EVAL (separate session) — **CLEARED**. OpenHands cloud eval, model
+  `openrouter/qwen/qwen3.7-max` (Qwen3 Max), launched via PR #44 comment `4721989501`,
+  run `27638968689-1` (`agent-exit-code=0`, `summary-source=agent` — genuine, not a
+  cap fabrication). **Verdict: APPROVED (conditional)** — C1–C5 PASS, C6 STATIC PASS
+  (runtime UNVERIFIED in cloud sandbox, but green via codex native-WSL R6). Clears the
+  standing `CHANGES_REQUESTED`, unblocks merge. Report: `evaluate.md`; summary:
+  `.llm/tmp/run/openhands/pr-44/run-27638968689-1/summary.md`.
+- Follow-up (non-blocking, post-merge chore): minor freshness gaps the eval flagged —
+  `tailwindcss`/`@tailwindcss/vite` ^4.2.2/^4.1.12 → ^4.3.1, `@preact/signals` 2.9.1 →
+  2.9.2 (released within days of R3). Not covered by the `vite`-only DEBT_ACCEPTED.
+
+## Merge
+
+- PR #44 → `feat/package-quality`, `--no-ff` (supervisor model). Base parent PR is the
+  S1 supervisor PR **#2**. Sibling Wave 6 CLI PR **#43** (PLAN-EVAL pending) is the last
+  S1 wave and consumes this branch's `catalog:` + Aspire 13.4 GA scaffold baseline.
 
 ## Escalations
 
