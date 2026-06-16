@@ -156,3 +156,41 @@ R3 validation:
 
 R3 follow-up commit: maintainer approved bumping the five previously held non-Vite entries. The
 follow-up leaves `vite` as the only documented hold.
+
+### R4 — scaffold catalog parity + Aspire GA pins (2026-06-16)
+
+R4 commit: this commit; final hash reported after commit creation/push.
+
+| Aspire pin | Current | New | NuGet GA evidence |
+| ---------- | ------- | --- | ----------------- |
+| `ASPIRE_SDK` (`Aspire.AppHost.Sdk`) | `13.2.2` | `13.4.4` | NuGet flat-container lists stable `13.4.4` with no prerelease suffix |
+| `ASPIRE_HOSTING_DENO` (`CommunityToolkit.Aspire.Hosting.Deno`) | `13.1.0` | `13.4.0` | NuGet flat-container lists stable `13.4.0`; nuspec depends on `Aspire.Hosting` `13.4.0` |
+| `ASPIRE_HOSTING_SQLITE` (`CommunityToolkit.Aspire.Hosting.SQLite`) | `13.1.0` | `13.4.0` | NuGet flat-container lists stable `13.4.0`; nuspec depends on `Aspire.Hosting` `13.4.0` |
+| `SCALAR_ASPIRE` (`Scalar.Aspire`) | `0.7.3` | `0.10.3` | NuGet flat-container lists stable `0.10.3`; package line is not Aspire-versioned |
+
+Catalog sourcing summary:
+
+- Added `SCAFFOLD_APP_CATALOG` / `SCAFFOLD_APP_IMPORTS` under the scaffold constants layer.
+- `generate-app-deno-json.ts` now spreads `SCAFFOLD_APP_IMPORTS` instead of carrying inline Fresh,
+  Preact, Signals, Tailwind, and Vite literals.
+- Root `deno.json` catalog now includes scaffold-only npm pins for `@tailwindcss/vite` and
+  `tailwindcss`, so generated app npm imports match the catalog for `preact`, `preact/hooks`,
+  `@preact/signals`, `@tailwindcss/vite`, `tailwindcss`, `vite`, and `vite/client`.
+- JSR Fresh pins remain explicit in the scaffold catalog because Deno 2.8 catalogs are npm-only.
+
+Init smoke:
+
+| Check | Result |
+| ----- | ------ |
+| `deno run -A packages/cli/bin/netscript-dev.ts init r4-smoke --path .llm/tmp/r4-init-smoke --db sqlite --service --service-name users --service-port 3001 --editor zed --ci --yes --no-git --force` | PASS; scaffold completed, then `.llm/tmp/r4-init-smoke` was removed |
+| Generated `apps/dashboard/deno.json` npm pins | PASS; `preact`, `preact/hooks`, `@preact/signals`, `@tailwindcss/vite`, `tailwindcss`, `vite`, and `vite/client` matched the root catalog-derived expected values |
+| Generated Aspire pins | PASS; TypeScript AppHost mode generated `aspire/aspire.config.json` with SDK `13.4.4`; no generated `aspire/` semver prerelease pins found |
+
+R4 validation:
+
+| Gate | Result |
+| ---- | ------ |
+| `deno task check:scaffold-versions` | PASS: `E-12 OK — 10 scaffold pin(s) are stable (no prerelease suffix).` |
+| `deno check --unstable-kv packages/cli` | PASS |
+| `deno test --allow-read packages/cli/src/kernel/templates/app/generators-config_test.ts` | PASS: 2 suites / 15 steps |
+| `deno fmt --check --no-config --line-width=100 --indent-width=2 --single-quote=true --use-tabs=false <touched TS files>` | PASS: checked 4 files |
