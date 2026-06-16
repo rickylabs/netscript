@@ -699,3 +699,22 @@ Seeded from
   consumers — `plugins/triggers` and `plugins/workers` — both pass `deno task check`, confirming the
   `interfaces/`→`ports/` and `./types`→`./ports` rename is non-breaking.
 - **Gate:** `deno check ./maintainer.ts` from `packages/cli` reports 0 TS9016/TS9027 errors.
+
+## root toolchain — R3 held dependency majors (`toolchain-r3-held-dependency-majors`)
+
+| Status | Package | Reason | Revisit |
+| ------ | ------- | ------ | ------- |
+| DEBT_ACCEPTED | `jsr:@fedify/amqp` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue AMQP adapter compatibility tests |
+| DEBT_ACCEPTED | `jsr:@fedify/denokv` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue Deno KV adapter compatibility tests |
+| DEBT_ACCEPTED | `jsr:@fedify/redis` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue Redis adapter compatibility tests |
+| DEBT_ACCEPTED | `npm:@durable-streams/state` `^0.2.3`→`0.3.1` | named regression: `0.3.1` removed `createStreamDB` from the package root; `deno task check` failed in Fresh and plugin stream factories | intentional `@durable-streams/state/db` subpath migration |
+| DEBT_ACCEPTED | `npm:amqplib` `^0.10.4`→`2.0.1` | unvetted major; R3 rule names `amqplib` as HOLD unless clean major is verified | AMQP adapter runtime compatibility tests |
+| DEBT_ACCEPTED | `npm:vite` `7.2.2`→`8.0.16` | unvetted major; Vite 8 is outside R3's safe patch/minor bump rule | Fresh Vite integration and scaffold runtime validation |
+
+- **Owner:** Toolchain upgrade R3 follow-up.
+- **Target:** Before beta dependency freeze.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/sub-agent-briefs/R3.md`.
+- **Created:** 2026-06-16.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
+  targeted package checks and `deno task publish:dry-run` pass after each migration.

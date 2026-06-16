@@ -39,7 +39,7 @@
     "@std/http": "jsr:@std/http@^1",
     "@std/path": "jsr:@std/path@^1",
     "@std/text": "jsr:@std/text@^1",
-    "fresh": "jsr:@fresh/core@^2.3.0",
+    "fresh": "jsr:@fresh/core@^2.3.3",
     "preact": "catalog:",
     "preact/compat": "npm:preact@^10.29.2/compat",
     "preact/hooks": "npm:preact@^10.29.2/hooks",

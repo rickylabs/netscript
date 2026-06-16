@@ -110,3 +110,46 @@ generator runs as a supervised Codex session in WSL (`/home/codex/repos/netscrip
   0 occurrences); scoped lint passed with
   `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/workers --root plugins/sagas --ext ts,tsx`
   (127 files, 0 occurrences).
+
+### R3 — dependency inventory to stable latest (2026-06-16)
+
+R3 started from `8bb33b8` on `chore/deno-2.8-aspire-13.4-upgrade`; `deno --version` reported
+`deno 2.8.3`. Pre-edit authority was `deno task deps:latest --behind-only --pretty`:
+26 behind / 52 total.
+
+| Decision | Package | Before | After / target | Evidence |
+| -------- | ------- | ------ | -------------- | -------- |
+| BUMPED | `jsr:@fedify/fedify` | `^1.5.0` | `^2.2.5` | pre-approved major; check + publish dry-run green |
+| BUMPED | `jsr:@fresh/core` | `^2.3.0` | `^2.3.3` | patch; check + publish dry-run green |
+| BUMPED | `jsr:@olli/kvdex` | `^3.5.0` | `^3.6.7` | minor; check + publish dry-run green |
+| BUMPED | `npm:@durable-streams/client` | `^0.2.3` | `^0.2.6` | patch; check + publish dry-run green |
+| BUMPED | `npm:@durable-streams/server` | `^0.2.3` | `^0.3.7` | minor; check + publish dry-run green |
+| BUMPED | `npm:@preact/signals` | `^2.5.0` | `^2.9.1` | minor; `preact` held at `^10.29.2`; check + publish dry-run green |
+| BUMPED | `npm:@prisma/adapter-mssql` | `^7.4.2` | `^7.8.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:@prisma/adapter-pg` | `^7.4.2` | `^7.8.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:@prisma/client` | `^7.4.2` | `^7.8.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:@prisma/driver-adapter-utils` | `^7.4.2` | `^7.8.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:@prisma/instrumentation-contract` | `^7.4.2` | `^7.8.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:@tanstack/db` | `^0.6.1` | `^0.6.8` | patch; check + publish dry-run green |
+| BUMPED | `npm:@tanstack/preact-query` | `^5.75.5` | `^5.101.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:@tanstack/query-core` | `^5.75.5` | `^5.101.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:@tanstack/query-db-collection` | `^1.0.32` | `^1.0.40` | patch; check + publish dry-run green |
+| BUMPED | `npm:@tanstack/react-db` | `^0.1.79` | `^0.1.86` | patch; check + publish dry-run green |
+| BUMPED | `npm:ioredis` | `^5.4.1` | `^5.11.1` | minor; check + publish dry-run green |
+| BUMPED | `npm:mysql2` | `^3.22.3` | `^3.22.5` | patch; check + publish dry-run green |
+| BUMPED | `npm:pg` | `^8.13.1` | `^8.21.0` | minor; check + publish dry-run green |
+| BUMPED | `npm:tailwind-merge` | `^3.5.0` | `^3.6.0` | minor; check + publish dry-run green |
+| HELD | `jsr:@fedify/amqp` | `^1.0.0` | `2.2.5` | DEBT_ACCEPTED; unvetted major |
+| HELD | `jsr:@fedify/denokv` | `^1.0.0` | `2.2.5` | DEBT_ACCEPTED; unvetted major |
+| HELD | `jsr:@fedify/redis` | `^1.0.0` | `2.2.5` | DEBT_ACCEPTED; unvetted major |
+| HELD | `npm:@durable-streams/state` | `^0.2.3` | `0.3.1` | DEBT_ACCEPTED; trial failed check because `createStreamDB` moved off root export |
+| HELD | `npm:amqplib` | `^0.10.4` | `2.0.1` | DEBT_ACCEPTED; R3 default hold for unverified major |
+| HELD | `npm:vite` | `7.2.2` | `8.0.16` | DEBT_ACCEPTED; unvetted major |
+
+R3 validation:
+
+| Gate | Result |
+| ---- | ------ |
+| `deno task deps:latest --behind-only --pretty` | 6 behind / 52 total; all six are documented HELD rows |
+| `deno task check` | PASS: 1581 files, 14 batches, 0 occurrences |
+| `deno task publish:dry-run` | PASS: exit 0; warnings are the pre-existing slow-type / dynamic-import classes, not R3 dependency failures |

@@ -22,7 +22,7 @@
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
-    "@fedify/fedify": "jsr:@fedify/fedify@^1.5.0",
+    "@fedify/fedify": "jsr:@fedify/fedify@^2.2.5",
     "@fedify/denokv": "jsr:@fedify/denokv@^1.0.0",
     "@fedify/redis": "jsr:@fedify/redis@^1.0.0",
     "@fedify/amqp": "jsr:@fedify/amqp@^1.0.0",

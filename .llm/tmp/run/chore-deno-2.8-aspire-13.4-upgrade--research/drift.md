@@ -31,3 +31,14 @@ Discrepancies between the prior repo notes / RFC assumptions and verified realit
 - Aspire 13.4 GA flip → switch from fallback posture to decoupled default.
 - ~~`catalog:` rewrite altering any resolved version (could move `deno.lock`).~~ **Retired by LD-11**: `deno.lock` movement is expected this run, not drift. (Still flag a *breaking* resolved-version regression that fails a gate.)
 - Any carve-out exceeding the 20-symbol cap → `significant` drift, revisit surface.
+
+## R3 dependency holds (2026-06-16)
+
+| Status | Package | Reason | Revisit |
+| ------ | ------- | ------ | ------- |
+| DEBT_ACCEPTED | `jsr:@fedify/amqp` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue AMQP adapter compatibility tests |
+| DEBT_ACCEPTED | `jsr:@fedify/denokv` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue Deno KV adapter compatibility tests |
+| DEBT_ACCEPTED | `jsr:@fedify/redis` `^1.0.0`→`2.2.5` | unvetted major; R3 rule holds non-preapproved majors to keep the branch green | queue Redis adapter compatibility tests |
+| DEBT_ACCEPTED | `npm:@durable-streams/state` `^0.2.3`→`0.3.1` | named regression: `0.3.1` removed `createStreamDB` from the package root; `deno task check` failed in Fresh and plugin stream factories | intentional `@durable-streams/state/db` subpath migration |
+| DEBT_ACCEPTED | `npm:amqplib` `^0.10.4`→`2.0.1` | unvetted major; R3 rule names `amqplib` as HOLD unless clean major is verified | AMQP adapter runtime compatibility tests |
+| DEBT_ACCEPTED | `npm:vite` `7.2.2`→`8.0.16` | unvetted major; Vite 8 is outside R3's safe patch/minor bump rule | Fresh Vite integration and scaffold runtime validation |
