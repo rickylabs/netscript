@@ -53,7 +53,8 @@ Each IMPL slice = its own commit, LF-normalized, `-c core.autocrlf=false`, gate 
 | Commit | Scope | Slice |
 | ------ | ----- | ----- |
 | `70a4904` | `docs(harness): lock final-plan + phase-registry for PR #44 remediation` | B0 |
-| _pending_ | `feat(tools): deps toolbelt (latest/outdated/why/audit/prod-install) + tasks + entry.md` | B1 |
+| `941eb08` | `feat(tools): deps toolbelt (latest/outdated/why/audit/prod-install) + tasks + entry.md` | B1 |
+| _pending_ | `docs(skills): add netscript-deno-toolchain skill (native deno toolchain goldmine)` | B2 |
 
 B1 evidence: `deno check --unstable-kv` clean on all five tools; `deno task deps:latest` →
 `26 behind / 52 total` with `jsr:@fedify/fedify ^1.5.0 → 2.2.5` (stable, proving the prerelease-trap

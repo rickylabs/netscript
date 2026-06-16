@@ -13,7 +13,7 @@ Supervisor: Claude (Opus 4.8). Source of truth for live phase status. See `final
 | ----- | ------ | ----- | ----- |
 | B0 final-plan + phase-registry | in_progress | supervisor | this commit |
 | B1 deps toolbelt (`.llm/tools/deps/*`) + tasks | done | supervisor | latest/outdated/why/audit/prod-install + 5 deps:* tasks + entry.md; validated (fedify 2.2.5, @hono/hono dead) |
-| B2 `netscript-deno-toolchain` skill | todo | supervisor | seed from TOOLCHAIN-2.8.md + dep commands |
+| B2 `netscript-deno-toolchain` skill | done | supervisor | `.agents/skills/netscript-deno-toolchain/SKILL.md` — native deno toolchain map + prerelease trap + catalog rules; cross-links deps toolbelt + netscript-tools |
 | B3 `netscript-pr` skill (skill-creator) | todo | supervisor | |
 | B4 AGENTS.md updates | todo | supervisor | toolbelt default + deno doc/why + skills |
 | B5 `.llm/tools/watch-run.ts` | todo | supervisor | background-exec wake mechanism |
