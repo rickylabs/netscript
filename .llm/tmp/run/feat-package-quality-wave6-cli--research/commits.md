@@ -28,3 +28,4 @@ Slice 2 blocks merge without green `scaffold.runtime`.
 - 9695420: Slice 0: prep hygiene gates green
 - fa3fe22: Slice 1: CLI standards doc doc-lint clean
 - 2e18ebd: Slice 2: command registry deploy port E2E green
+- e53f011: Slice 3: split CLI registry and app writer

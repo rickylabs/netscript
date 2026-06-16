@@ -59,6 +59,7 @@
       "mod.ts",
       "scaffolding.ts",
       "testing.ts",
+      "assets/schema/**/*.json",
       "src/**/*.ts",
       "src/**/*.template"
     ],

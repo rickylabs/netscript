@@ -146,3 +146,34 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
     test, runtime-schema Windows path expectations, `packages/config/workspace.test.ts`, plugin
     workers Deno runtime adapter tests, plus the existing `catalog:` unsupported scheme error from
     `packages/contracts/src/application/contract-primitives.ts`.
+
+### Slice 5 — Aspire Verify + Schema Mirror
+
+- Verified the inherited Aspire 13.4 apphost path rather than re-performing the #44/R6 migration:
+  generated projects keep `apphost.mts`, `.aspire/modules/*.mts`, and `tsconfig.apphost.json`.
+- Added a pinned local Deno config schema asset at
+  `packages/cli/assets/schema/config-file.v1.json` and included it in the package publish include
+  list.
+- Updated editor config generation to emit `.netscript/schema/config-file.v1.json` into scaffolded
+  workspaces and point Zed/VS Code JSON schemas at that local mirror instead of a live
+  `raw.githubusercontent.com` URL.
+- Added the Aspire 13.4 `WithProcessCommand()` seam to generated tool resources behind the
+  flag-off `NETSCRIPT_ASPIRE_PROCESS_COMMANDS=1` opt-in. The seam is intentionally duck-typed and
+  returns the original resource so the default generated AppHost remains stable.
+- Validation:
+  - `deno check --unstable-kv packages/cli/src/kernel/adapters/scaffold/editor-config.ts packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-tools.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts`
+    passed.
+  - `deno test --unstable-kv --allow-read --allow-write --allow-env --allow-run packages/cli/src/kernel/templates/aspire/helpers/tests/generators-tools-db-index_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-pipeline_test.ts packages/cli/src/kernel/templates/aspire/generate-aspire-config_test.ts`
+    passed with 6 tests, 40 steps, 0 failed.
+  - `rg -n "raw\\.githubusercontent\\.com/denoland/deno|config-file\\.v1\\.json" packages/cli/src/kernel/adapters/scaffold packages/cli/src/kernel/assets/generated/aspire/helpers packages/cli/src/kernel/templates/aspire/helpers packages/cli/assets/schema`
+    shows no live raw GitHub schema URL in CLI source; only the local asset and scaffold-local
+    target remain.
+  - First `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "E2E_EXIT=$?"`
+    run failed at `database.init` with generated `.helpers/register-tools.mts` TS2352 because the
+    flag-off seam cast claimed an incompatible Aspire SDK return type.
+  - After tightening the seam to `unknown` and returning the original resource, `deno task check`
+    passed with 1,590 selected files and 0 findings.
+  - `deno task lint` passed with 1,082 selected files and 0 findings.
+  - `deno task fmt:check` passed with 1,167 selected files and 0 findings.
+  - Final required `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "E2E_EXIT=$?"`
+    passed: `Summary: passed=41 failed=0`, `E2E_EXIT=0`.

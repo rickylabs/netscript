@@ -7,7 +7,7 @@ Reality vs RFC/doctrine assumptions (from research):
 | W-1 | CLI needs a full rewrite to reach A6-v2. | Already A6-correct shape; bounded moves only. | AP-1 closes as a 7-slice program, not a rewrite. |
 | W-2 | `e2e/` is a workspace member. | Already resolved on the current branch: root `deno.json` includes `packages/cli/e2e`. | Slice 0.1 is a verify-green check, not a workspace edit. |
 | W-3 | `DeployTargetKey` is already a port. | Slice 2 replaced the literal-union lock-in with `DeployTargetPort` + `DeployTargetRegistryPort`. | Resolved in Slice 2. |
-| W-4 | Aspire 13.4 native Deno apphost is released. | Not at research time; bump deferred to slice 5, consuming Phase A pins. | Slice 5 gated on upgrade-run GA status (LD-6). |
+| W-4 | Aspire 13.4 native Deno apphost is released. | Resolved before this impl pass by #44/R6; Slice 5 verified the inherited GA `.mts` apphost shape. | Slice 5 is verify-only for apphost migration, plus schema mirror and flag-off process-command seam. |
 | W-5 | Root `deno publish --dry-run` failure is a CLI bug. | Upstream `packages/aspire` barrel false-positive (R-1); fixed in Phase T (T0). | Not a CLI blocker. |
 
 ## Plan-phase drift (this session)
@@ -48,3 +48,9 @@ Reality vs RFC/doctrine assumptions (from research):
   `scaffoldApp`. Moving app writers to a maintainer surface would introduce a kernel→maintainer
   dependency and fail F-CLI-4. Slice 3 therefore split the two 384-line files in place and preserved
   public export paths.
+- **D-W6-4 — `WithProcessCommand()` seam is flag-off and resource-preserving.** The first Slice 5
+  runtime smoke caught a generated AppHost type error because the seam claimed a concrete Aspire SDK
+  return type that is not part of the CLI-owned contract. The final implementation duck-types the
+  optional method through `unknown`, calls it only behind `NETSCRIPT_ASPIRE_PROCESS_COMMANDS=1`, and
+  returns the original tool resource. This keeps the seam discoverable without changing default
+  runtime topology.

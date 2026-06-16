@@ -8,6 +8,13 @@
 
 import type { EditorChoice } from '../../domain/scaffold/workspace-config.ts';
 
+const DENO_CONFIG_SCHEMA_SOURCE = new URL(
+  '../../../../assets/schema/config-file.v1.json',
+  import.meta.url,
+);
+const DENO_CONFIG_SCHEMA_TARGET = '.netscript/schema/config-file.v1.json';
+const DENO_CONFIG_SCHEMA_CONTENT = Deno.readTextFileSync(DENO_CONFIG_SCHEMA_SOURCE);
+
 /** A single editor config file to be written relative to the workspace root. */
 export interface EditorConfigFile {
   /** Root-relative path such as `.zed/settings.json`. */
@@ -18,6 +25,15 @@ export interface EditorConfigFile {
 
 function formatJson(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
+}
+
+function createDenoConfigSchemaFile(): EditorConfigFile {
+  return {
+    path: DENO_CONFIG_SCHEMA_TARGET,
+    content: DENO_CONFIG_SCHEMA_CONTENT.endsWith('\n')
+      ? DENO_CONFIG_SCHEMA_CONTENT
+      : `${DENO_CONFIG_SCHEMA_CONTENT}\n`,
+  };
 }
 
 function createZedSettings(): string {
@@ -38,8 +54,7 @@ function createZedSettings(): string {
             schemas: [
               {
                 fileMatch: ['deno.json', 'deno.jsonc'],
-                url:
-                  'https://raw.githubusercontent.com/denoland/deno/refs/heads/main/cli/schemas/config-file.v1.json',
+                url: `./${DENO_CONFIG_SCHEMA_TARGET}`,
               },
               {
                 fileMatch: ['package.json'],
@@ -111,8 +126,7 @@ function createVsCodeSettings(): string {
     'json.schemas': [
       {
         fileMatch: ['deno.json', 'deno.jsonc'],
-        url:
-          'https://raw.githubusercontent.com/denoland/deno/refs/heads/main/cli/schemas/config-file.v1.json',
+        url: `./${DENO_CONFIG_SCHEMA_TARGET}`,
       },
     ],
   });
@@ -177,12 +191,14 @@ export function generateEditorConfigFiles(editor: EditorChoice): EditorConfigFil
   switch (editor) {
     case 'zed':
       return [
+        createDenoConfigSchemaFile(),
         { path: '.zed/settings.json', content: createZedSettings() },
         { path: '.zed/debug.json', content: createZedDebug() },
         { path: '.zed/tasks.json', content: createZedTasks() },
       ];
     case 'vscode':
       return [
+        createDenoConfigSchemaFile(),
         { path: '.vscode/settings.json', content: createVsCodeSettings() },
         { path: '.vscode/extensions.json', content: createVsCodeExtensions() },
         { path: '.vscode/launch.json', content: createVsCodeLaunch() },

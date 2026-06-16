@@ -58,6 +58,7 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
     lines.push(
       `    let ${id} = await builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
     );
+    lines.push(`    ${id} = await maybeWithProcessCommand(${id}, '${name}', '${taskName}');`);
 
     // Database dependency — named database or primary fallback
     if (entry.Database) {
