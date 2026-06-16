@@ -12,6 +12,53 @@ across sessions; temporary investigation scripts belong under `.llm/tmp/`.
   `.llm/tools/fitness/`.
 - The maintained full CLI E2E gate is `deno task e2e:cli`; the legacy scaffold tool is diagnostic
   only.
+- For any "is this the latest version" decision use `deps:latest` (registry **stable** channel),
+  **never** `deno outdated --latest` — the native `--latest` view ignores semver and reports
+  pre-release tags as latest (it once reported `@fedify/fedify 2.3.0-dev.*` while stable was `2.2.5`).
+
+## Dependency toolbelt (`deps/`)
+
+Thin, structured wrappers over the Deno 2.8 dependency commands. They emit JSON by default
+(`--pretty` for human output) so agents read versions/advisories without scraping human tables and
+without re-querying registries by hand. See the `netscript-deno-toolchain` skill for the full
+command map.
+
+### `deps/latest.ts` — latest STABLE per registry (`deno task deps:latest`)
+
+- Purpose: report every workspace dependency (root catalog + member `imports`) against its
+  registry's **stable** channel (jsr `meta.json.latest` / npm `dist-tags.latest`), pre-release
+  filtered. This is the authority for "latest stable", fixing the `deno outdated --latest`
+  pre-release trap.
+- Flags: `--pretty`, `--behind-only`, `--filter "@fedify/*"`, `--allow-prerelease`,
+  `--fail-behind` (exit 1 when any dep is behind — for CI report lanes).
+- Example: `deno run --allow-read --allow-net .llm/tools/deps/latest.ts --behind-only --pretty`
+- Scope note: reads **declared** specifiers (what we bump). Use `deps/outdated.ts` for the
+  lock-aware / transitive view.
+
+### `deps/outdated.ts` — lock-aware inventory (`deno task deps:outdated`)
+
+- Purpose: wrap `deno outdated --recursive [--latest]`, parse the box-drawing table into JSON, and
+  flag rows whose "Latest" is a pre-release. Surfaces transitive/locked entries `latest.ts` omits.
+- Example: `deno run --allow-read --allow-run .llm/tools/deps/outdated.ts --latest --pretty`
+
+### `deps/why.ts` — dead-import detection (`deno task deps:why <pkg>`)
+
+- Purpose: combine **source usage** (greps `.ts/.tsx` imports) with **graph provenance**
+  (`deno why <pkg>`). `likelyDeadImport` = no direct source usage; `fullyRemovable` = also absent
+  from the graph (safe to prune). Drives the unused-import sweep.
+- Example: `deno run --allow-read --allow-run .llm/tools/deps/why.ts @hono/hono --pretty`
+
+### `deps/audit.ts` — advisory check (`deno task deps:audit`)
+
+- Purpose: wrap `deno audit --level <floor>`, normalize to JSON (exit code + advisory lines).
+- Flags: `--level critical|high|moderate|low`, `--pretty`, `--fail-on-find`.
+- Example: `deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level critical --pretty`
+
+### `deps/prod-install.ts` — published-surface install (`deno task deps:prod-install`)
+
+- Purpose: wrap `deno ci --prod --frozen` — proves the production (non-dev) surface installs against
+  a frozen lock. **Additive** to the quality lane (`check`/`lint` still need dev deps).
+- Flags: `--skip-types`, `--pretty`.
 
 ## Full CLI E2E
 

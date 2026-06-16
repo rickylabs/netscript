@@ -47,3 +47,14 @@ Phase A PR `chore/aspire-13.4-version-bump` (gated on E-12 GA check):
 - A4 (joint w/ Wave 6) WithProcessCommand flag-off + doctor skip + skill docs
 
 Each IMPL slice = its own commit, LF-normalized, `-c core.autocrlf=false`, gate evidence in worklog.
+
+## Phase 0 — Supervisor ground-work (post-IMPL-EVAL remediation, 2026-06-16)
+
+| Commit | Scope | Slice |
+| ------ | ----- | ----- |
+| `70a4904` | `docs(harness): lock final-plan + phase-registry for PR #44 remediation` | B0 |
+| _pending_ | `feat(tools): deps toolbelt (latest/outdated/why/audit/prod-install) + tasks + entry.md` | B1 |
+
+B1 evidence: `deno check --unstable-kv` clean on all five tools; `deno task deps:latest` →
+`26 behind / 52 total` with `jsr:@fedify/fedify ^1.5.0 → 2.2.5` (stable, proving the prerelease-trap
+fix); `deps:why @hono/hono` → `DEAD import` (confirms eval C5); `@std/path` → 140 source hits.
