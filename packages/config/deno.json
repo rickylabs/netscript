@@ -11,6 +11,7 @@
   },
   "imports": {
     "@std/fs": "jsr:@std/fs@^1",
+    "@std/jsonc": "jsr:@std/jsonc@^1",
     "@std/path": "jsr:@std/path@^1",
     "zod": "jsr:@zod/zod@4.4.3"
   },

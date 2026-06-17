@@ -5,6 +5,7 @@
  */
 
 import { expandGlob } from '@std/fs';
+import { parse as parseJsonc } from '@std/jsonc';
 import { join, relative, resolve } from '@std/path';
 
 /** Workspace member category inferred from its relative path. */
@@ -63,7 +64,7 @@ function classifyMember(path: string): WorkspaceMemberType {
 async function readJsonFile<T>(path: string): Promise<T | null> {
   try {
     const content = await Deno.readTextFile(path);
-    return JSON.parse(content) as T;
+    return parseJsonc(content) as T;
   } catch (error: unknown) {
     if (error instanceof Deno.errors.NotFound) {
       return null;
