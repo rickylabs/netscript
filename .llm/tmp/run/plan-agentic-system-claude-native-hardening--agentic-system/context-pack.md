@@ -31,4 +31,6 @@ Update after PLAN-EVAL + follow-up (2026-06-18):
   agentic:smoke-claude-remote, deno check .llm/tools/agentic/*.ts.
 - Branch is clean and at parity with origin (top commit: 6dc9140a).
 - commits.md updated with 6 commits total.
-- **Next step: IMPL-EVAL** — trigger via `@openhands-agent` comment on PR #50, qwen 3.7 max.
+- **Current step: IMPL-EVAL triggered** — @openhands-agent/qwen3.7-max comment posted on PR #50, 2026-06-18.
+  Comment: https://github.com/rickylabs/netscript/pull/50#issuecomment-4736384438
+- **Next step: await IMPL-EVAL verdict** (PASS / FAIL_FIX / FAIL_RESCOPE / FAIL_DEBT).
