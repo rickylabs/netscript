@@ -258,3 +258,16 @@ under `.worktrees/<name>`:
   2. **Step C** now actionable: resolve PR #2 dirty conflicts → merge `feat/package-quality` → `main`
      CI-green. (Wave 6 CLI PR #43 merges into `feat/package-quality` first.)
 - **Severity:** on-track. No framework code by supervisor; bookkeeping + `ci.yml` + dispatch only.
+
+- **CI GATE CORRECTION — `e2e:cli` removed from S1 minimal gate `2026-06-17T17:03Z`.** PR #43's CI
+  job (`check-test-e2e` @ `350fbd1`, run `27703623411`) went **red**. Root cause = supervisor gate
+  over-reach: my `ci.yml` ran `deno task e2e:cli` (`scaffold.runtime`), which spawns the `aspire`
+  CLI + `docker` + `postgres` — toolchain `ubuntu-latest` does **not** provision (WSL generator has
+  all three, so it passed there). Per locked scoping ("full CI = S2's job"), runtime e2e is **not** an
+  S1 pre-merge concern.
+  - Fix: dropped the `e2e:cli` step; renamed job `check-test-e2e`→`check-test`; S1 gate is now
+    repo-wide `deno check` + `deno test` only. Committed on `feat/package-quality` (LF,
+    `core.autocrlf=false`), pushed to origin.
+  - Re-triggered PR #43 via `update_pull_request_branch` (merges fixed `ci.yml` into
+    `feat/package-quality-wave6-cli`); fresh `check-test` run `27706047692` queued on new head.
+  - Merge of PR #43 → `feat/package-quality` proceeds once this run is green (honors user "b").
