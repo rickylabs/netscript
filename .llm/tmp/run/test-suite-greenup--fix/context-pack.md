@@ -16,7 +16,7 @@ FAILED | 473 passed (354 steps) | 11 failed (2 steps) | 12 ignored (27s)
 Active root-cause slices:
 
 1. JSONC parser bug in `packages/config/workspace.ts` — fixed in `a88e219`.
-2. Windows absolute path handling in runtime schema generation — fixed locally; commit pending.
-3. Newly surfaced plugin-workers-core Deno runtime adapter tests.
+2. Windows absolute path handling in runtime schema generation — fixed in `b7f130b`.
+3. Newly surfaced plugin-workers-core Deno runtime adapter tests — fixed locally; commit pending.
 4. CLI config fixture failures in plugin registry and compile tests.
 5. Official plugin sample fixture drift.

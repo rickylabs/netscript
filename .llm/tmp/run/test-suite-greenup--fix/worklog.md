@@ -50,3 +50,14 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
   `deno test --allow-all packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts`
   -> `ok | 1 passed (4 steps) | 0 failed (21ms)`.
 - Failure-count delta: expected 10 failed -> expected 9 failed, with both BDD step failures fixed.
+
+## Slice 3 — worker-runtime-adapter
+
+- Root cause: the newly surfaced adapter tests inherited a host `DENO_EXECUTABLE` pointing at
+  `/root/.dotnet/tools/deno`, so subprocess execution failed before exercising adapter behavior.
+- Change: made the tests pin `DENO_EXECUTABLE` to `Deno.execPath()` for the duration of each real
+  subprocess assertion, then restore the original environment.
+- Proof:
+  `deno test --allow-all packages/plugin-workers-core/tests/executor/deno-runtime-adapter_test.ts`
+  -> `ok | 2 passed | 0 failed (76ms)`.
+- Failure-count delta: expected 9 failed -> expected 7 failed.
