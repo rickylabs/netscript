@@ -83,3 +83,38 @@ Notes:
 - OpenHands remains mandatory for PLAN-EVAL and IMPL-EVAL.
 - Workflow output must be compact and durable: harness plan updates, slice briefs, evaluator prompts,
   or decision records. It must not leave hidden implementation state outside the harness artifacts.
+
+## IMPL-EVAL Readiness
+
+Date: 2026-06-18
+
+Status: **READY_FOR_IMPL_EVAL**
+
+### Gate Results
+
+| Gate | Result |
+| ---- | ------ |
+| `deno task agentic:sync-claude:check` | PASS |
+| `deno task agentic:check-claude` | PASS |
+| `deno task agentic:smoke-claude-remote` | PASS |
+| `deno check .llm/tools/agentic/*.ts` | PASS |
+
+All gates confirmed green locally after follow-up commits (`d77df74e`, `6dc9140a`).
+
+### Commits in Scope
+
+- 2857f552: docs(agentic): add Claude-native supervision surface
+- d77df74e: docs(agentic): incorporate plan eval workflow policy
+- c3a320bf: docs(harness): record agentic hardening commit
+- 25128601: chore(openhands): apply agent changes
+- b64b5e90: chore(openhands): record run trace 27721989442-1
+- 6dc9140a: docs(harness): record workflow policy follow-up
+
+### PLAN-EVAL
+
+- PASS — OpenHands/minimax M3, action run `27721989442`.
+- F-1/F-2/F-3/F-4 all addressed in follow-up commits.
+
+### Next Step
+
+Trigger IMPL-EVAL via `@openhands-agent` comment on PR #50 using qwen 3.7 max.
