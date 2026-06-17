@@ -11,6 +11,7 @@ results.push(await checkFileContains('CLAUDE.md', '@AGENTS.md'));
 results.push(await checkJson('.claude/settings.json'));
 results.push(await checkGitignore('.claude/settings.local.json'));
 results.push(await runSyncCheck());
+results.push(await runHookLockCheck());
 
 const ok = results.every((result) => result.ok);
 
@@ -77,4 +78,54 @@ async function runSyncCheck(): Promise<CheckResult> {
     ok: result.code === 0,
     detail: output || `sync check exited ${result.code}`,
   };
+}
+
+async function runHookLockCheck(): Promise<CheckResult> {
+  const lockBefore = await readOptional('deno.lock');
+  for (let i = 0; i < 3; i += 1) {
+    const command = new Deno.Command(Deno.execPath(), {
+      args: [
+        'run',
+        '--no-lock',
+        '--allow-env',
+        '--allow-read',
+        '--allow-write',
+        '.llm/tools/agentic/claude-hook-log.ts',
+      ],
+      stdin: 'piped',
+      stdout: 'piped',
+      stderr: 'piped',
+    });
+    const child = command.spawn();
+    const writer = child.stdin.getWriter();
+    await writer.write(new TextEncoder().encode(JSON.stringify({ hook_event_name: 'agentic-check', seq: i })));
+    await writer.close();
+    const result = await child.output();
+    if (result.code !== 0) {
+      const decoder = new TextDecoder();
+      return {
+        name: 'claude hook lock check',
+        ok: false,
+        detail: decoder.decode(result.stderr).trim() || `hook exited ${result.code}`,
+      };
+    }
+  }
+  const lockAfter = await readOptional('deno.lock');
+  const ok = lockBefore === lockAfter;
+  return {
+    name: 'claude hook lock check',
+    ok,
+    detail: ok ? 'deno.lock unchanged after 3 hook runs' : 'deno.lock changed after hook runs',
+  };
+}
+
+async function readOptional(path: string): Promise<string | null> {
+  try {
+    return await Deno.readTextFile(path);
+  } catch (error) {
+    if (error instanceof Deno.errors.NotFound) {
+      return null;
+    }
+    throw error;
+  }
 }

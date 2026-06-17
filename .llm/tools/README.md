@@ -57,6 +57,6 @@ deno task agentic:check-claude
 | `scaffold-e2e-test.ts`      | Legacy full scaffold smoke for CLI/plugin/DB/Aspire parity debugging.              |
 | `agentic/sync-claude-skills.ts` | Generate or check `.claude/skills` from `.agents/skills`.                      |
 | `agentic/validate-claude-surface.ts` | Validate `CLAUDE.md`, Claude settings, gitignore, and skill mirror.     |
-| `agentic/claude-remote-smoke.ts` | Fast Claude CLI/remote-control smoke, with optional live `--bg` launch.       |
+| `agentic/claude-remote-smoke.ts` | Fast Claude CLI/remote-control smoke, with env-aware skip and optional live `--bg` launch. |
 
 See `.llm/tools/entry.md` for examples and selection notes.

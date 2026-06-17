@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "deno run --allow-env --allow-read --allow-write .llm/tools/agentic/claude-hook-log.ts"
+            "command": "deno run --no-lock --allow-env --allow-read --allow-write .llm/tools/agentic/claude-hook-log.ts"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "deno run --allow-env --allow-read --allow-write .llm/tools/agentic/claude-hook-log.ts"
+            "command": "deno run --no-lock --allow-env --allow-read --allow-write .llm/tools/agentic/claude-hook-log.ts"
           }
         ]
       }

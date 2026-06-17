@@ -1,4 +1,5 @@
 interface Args {
+  envAware: boolean;
   live: boolean;
   promptPath: string | null;
   timeoutMs: number;
@@ -13,8 +14,10 @@ const checks = [
   await runClaude(['agents', '--help'], args.timeoutMs),
 ];
 
+const claudeMissing = checks.every((check) => check.missingExecutable);
+
 let liveResult: CommandResult | null = null;
-if (args.live) {
+if (args.live && !claudeMissing) {
   const prompt = args.promptPath ? await Deno.readTextFile(args.promptPath) : smokePrompt();
   liveResult = await runClaude([
     '--bg',
@@ -26,21 +29,32 @@ if (args.live) {
   ], args.timeoutMs);
 }
 
-const ok = checks.every((check) => check.code === 0) && (!liveResult || liveResult.code === 0);
+const skipped = args.envAware && claudeMissing;
+const ok = skipped || (checks.every((check) => check.code === 0) && (!liveResult || liveResult.code === 0));
 const report = {
   gate: 'agentic:smoke-claude-remote',
   ok,
+  skipped,
+  skipReason: skipped ? 'claude executable not found on PATH' : null,
+  environment: {
+    os: Deno.build.os,
+    arch: Deno.build.arch,
+    cwd: Deno.cwd(),
+  },
   live: args.live,
   checks,
   liveResult,
 };
 
 if (args.pretty) {
+  if (skipped) {
+    console.log('SKIP claude remote smoke: claude executable not found on PATH');
+  }
   for (const check of checks) {
-    console.log(`${check.ok ? 'OK' : 'FAIL'} claude ${check.args.join(' ')}`);
+    console.log(`${check.ok ? 'OK' : check.missingExecutable ? 'MISS' : 'FAIL'} claude ${check.args.join(' ')} exit=${check.code}`);
   }
   if (liveResult) {
-    console.log(`${liveResult.ok ? 'OK' : 'FAIL'} claude --bg live smoke`);
+    console.log(`${liveResult.ok ? 'OK' : 'FAIL'} claude --bg live smoke exit=${liveResult.code}`);
     console.log((liveResult.stdout || liveResult.stderr).trim());
   }
 } else {
@@ -56,6 +70,7 @@ interface CommandResult {
   stdout: string;
   stderr: string;
   timedOut: boolean;
+  missingExecutable: boolean;
 }
 
 async function runClaude(args: string[], timeoutMs: number): Promise<CommandResult> {
@@ -76,15 +91,21 @@ async function runClaude(args: string[], timeoutMs: number): Promise<CommandResu
       stdout: decoder.decode(output.stdout),
       stderr: decoder.decode(output.stderr),
       timedOut: false,
+      missingExecutable: false,
     };
   } catch (error) {
+    const message = String(error);
+    const missingExecutable = message.includes("Failed to spawn 'claude'") ||
+      message.includes('entity not found') ||
+      message.includes('program not found');
     return {
       args,
       code: 124,
       ok: false,
       stdout: '',
-      stderr: String(error),
+      stderr: message,
       timedOut: error instanceof DOMException && error.name === 'AbortError',
+      missingExecutable,
     };
   } finally {
     clearTimeout(timer);
@@ -104,6 +125,7 @@ function parseArgs(argv: string[]): Args {
     }
   }
   return {
+    envAware: argv.includes('--env-aware'),
     live: argv.includes('--live'),
     promptPath,
     timeoutMs,

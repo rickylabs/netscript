@@ -49,6 +49,25 @@ visible from Codex Desktop/mobile.
 | Debugging, self-evaluation, ambiguous fixes | `high` |
 | Explicit user request or unusually complex/high-risk design | `xhigh` |
 
+## Claude Workflows / Ultracode Policy
+
+Claude Code can orchestrate dynamic workflows for substantive tasks when Ultracode is enabled. This
+is powerful but can burn tokens quickly, so use it only where the extra orchestration changes the
+outcome.
+
+- Use Claude workflows for high-value supervisor work: cross-PR synthesis, slice graph planning,
+  evaluator prompt generation, workflow design, or ambiguity reduction before implementation.
+- Do not use Claude workflows as the default NetScript implementation agent. WSL Codex remains the
+  preferred implementation lane because it is daemon-attached, mobile-visible, and cheaper to steer
+  slice-by-slice.
+- Keep OpenHands as the evaluator. Claude workflows may prepare evaluator inputs, but they do not
+  replace PLAN-EVAL or IMPL-EVAL.
+- For cost control, launch workflow-oriented Claude sessions with `opusplan` or `high` only when
+  planning complexity justifies it; reserve Ultracode/xhigh for explicit user requests or extreme
+  design uncertainty.
+- A workflow output is acceptable only if it produces compact artifacts: updated harness plan,
+  slice briefs, agent prompts, or decision records. It should not leave hidden untracked work.
+
 ## Commands
 
 ```powershell

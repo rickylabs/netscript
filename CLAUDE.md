@@ -21,3 +21,13 @@
 - Use high effort when the agent must self-evaluate, debug an unclear failure, or choose among
   plausible fixes.
 - Use xhigh only when explicitly requested or when the task is unusually complex and high-risk.
+
+## Claude Workflow Policy
+
+- Treat Claude dynamic workflows / Ultracode as an expensive supervisor accelerator for hard
+  planning, research synthesis, and orchestration design.
+- Do not use Claude workflows as the default implementation lane for NetScript harness slices.
+- Prefer WSL Codex subagents for implementation so the work remains mobile-visible, daemon-attached,
+  and token-efficient.
+- When a workflow is justified, cap its role to producing a compact plan, agent briefs, or
+  evaluator prompts that are then handed to OpenHands or WSL Codex.

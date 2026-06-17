@@ -19,6 +19,12 @@
   `remote-control`, `agents --json`, project `.claude/settings.json`, hooks, and project skills.
 - Official Claude Code docs define `CLAUDE.md` memory, `.claude/skills`, project settings, hooks,
   remote control, and subagents as first-class surfaces.
+- Official Claude Code model docs describe `opusplan` as a hybrid planning/execution mode and
+  Ultracode as a session-only setting that applies xhigh reasoning plus dynamic workflows for
+  substantive tasks. That is useful for supervisor planning, but it is explicitly high-cost and
+  should not replace the repo's WSL Codex implementation lane.
+- The PLAN-EVAL review for PR #50 returned PASS and flagged two required follow-ups for the next
+  slice: add `--no-lock` to hook commands and make Claude smoke evidence environment-aware.
 
 ## Open Questions
 
@@ -26,3 +32,5 @@
   adds the tooling but does not claim replacement of WSL Codex implementation sessions.
 - OpenHands PLAN-EVAL/IMPL-EVAL still requires the GitHub Actions trigger path after the draft PR is
   opened.
+- Claude workflow adoption still needs a live supervisor smoke before it can be promoted from policy
+  to an automated harness command.

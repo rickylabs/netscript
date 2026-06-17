@@ -52,13 +52,34 @@ Change a repo skill in `.agents/skills`, run `deno task agentic:sync-claude`, th
 | ---- | ------ |
 | `deno task agentic:sync-claude:check` | PASS |
 | `deno task agentic:check-claude` | PASS |
-| `deno task agentic:smoke-claude-remote` | PASS |
+| `deno task agentic:smoke-claude-remote` | PASS/SKIP env-aware: PASS where `claude` is installed; SKIP with exit 0 when `claude` is absent |
 | `deno check .llm/tools/agentic/*.ts` | PASS |
 
 Notes:
 
-- `agentic:smoke-claude-remote` ran in non-live mode. It verified `claude --version`,
+- `agentic:smoke-claude-remote` runs in non-live mode by default. It verifies `claude --version`,
   `claude --help`, `claude remote-control --help`, and `claude agents --help` without launching a
-  real background session.
-- Agentic Deno tasks use `--no-lock` because the tools have no external imports and should not
-  normalize `deno.lock`.
+  real background session. With `--env-aware`, CI or evaluator hosts without `claude` on PATH report
+  `SKIP` and exit 0 instead of false-failing the tooling gate.
+- Agentic Deno tasks and Claude hooks use `--no-lock`; `agentic:check-claude` runs the hook three
+  times and verifies `deno.lock` remains unchanged.
+
+## PLAN-EVAL Follow-up
+
+- PLAN-EVAL PASS: OpenHands/minimax M3, action run `27721989442`.
+- F-1 fixed: `.claude/settings.json` hook commands now include `--no-lock`.
+- F-2 fixed: `claude-remote-smoke.ts` has `--env-aware` skip behavior and prints per-command exit
+  codes/environment.
+- F-3 cleaned locally before this follow-up commit: no unrelated `deno.lock` churn is included.
+- F-4 recorded as process debt: future harness work must not commit implementation before
+  PLAN-EVAL PASS unless the user explicitly waives the gate.
+
+## Claude Workflows Design Addendum
+
+- Claude dynamic workflows / Ultracode are allowed only for supervisor-side synthesis and planning
+  tasks where the extra orchestration materially reduces ambiguity.
+- WSL Codex remains the default implementation agent for NetScript slices because it is
+  daemon-attached, mobile-visible, and token-efficient.
+- OpenHands remains mandatory for PLAN-EVAL and IMPL-EVAL.
+- Workflow output must be compact and durable: harness plan updates, slice briefs, evaluator prompts,
+  or decision records. It must not leave hidden implementation state outside the harness artifacts.
