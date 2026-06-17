@@ -33,15 +33,8 @@
     "@netscript/service": "../../packages/service/mod.ts",
     "@netscript/contracts": "../../packages/contracts/mod.ts",
     "@std/async": "jsr:@std/async@^1",
-    "@orpc/contract": "npm:@orpc/contract@^1.14.6",
-    "@orpc/server": "npm:@orpc/server@^1.14.6",
-    "@orpc/openapi": "npm:@orpc/openapi@^1.14.6",
-    "@orpc/zod": "npm:@orpc/zod@^1.14.6",
     "hono": "jsr:@hono/hono@4.12.24",
     "zod": "jsr:@zod/zod@4.4.3",
-    "@tanstack/db": "npm:@tanstack/db@^0.6.8",
-    "@durable-streams/client": "npm:@durable-streams/client@^0.2.6",
-    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
     "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db"
   },
   "tasks": {

@@ -15,6 +15,8 @@
 - Divergence: After all listed failing tests were fixed, `deno task test` still exited 1 even though
   the summary showed `0 failed`, because Deno emitted `Unsupported scheme "catalog"` while resolving
   member package graphs.
-- Decision: Treat this as a green-gate blocker, not a test deletion/quarantine case. Materialize
-  member `catalog:` imports to `npm:` specifiers using the root catalog versions, matching the
-  existing publish dry-run policy.
+- Initial decision: Treat this as a green-gate blocker, not a test deletion/quarantine case.
+- Rejected decision: `103f9a8` materialized member `catalog:` imports to per-member `npm:`
+  specifiers; maintainer rejected that as the wrong model.
+- Corrected decision: root `deno.json` owns shared npm dependency resolution through `imports`, and
+  member `deno.json` files do not contain invalid `catalog:` import-map entries.

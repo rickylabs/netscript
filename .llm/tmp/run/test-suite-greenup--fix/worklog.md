@@ -89,21 +89,28 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
 - Root cause: after all test assertions were green, `deno task test` still exited 1 because multiple
   workspace member import maps contained bare `catalog:` values that Deno reported as an unsupported
   scheme at graph resolution time.
-- Change: materialized package/plugin member `catalog:` imports to explicit `npm:<specifier>@<root
-  catalog version>` specifiers, matching the repo's publish dry-run materialization policy.
-- Lock hygiene: `deno.lock` updated because previously unresolved npm catalog dependencies now
-  resolve in the test graph.
+- Rejected change: `103f9a8` materialized package/plugin member `catalog:` imports to explicit
+  per-member `npm:` specifiers. Maintainer rejected that as the wrong model.
+- Corrected change: reverted the per-member materialization, removed invalid member `catalog:`
+  import-map entries, and centralized the catalog dependencies in root `deno.json` `imports` as
+  `npm:<specifier>@<root catalog version>` specifiers.
+- Evidence: Deno's workspace catalog docs state that `catalog:` references are read from
+  `package.json` dependencies; shared Deno import-map dependencies belong in root `imports`.
+- Lock hygiene: `deno.lock` updated because previously unresolved npm dependencies now resolve
+  through the root import map.
 - Representative proofs:
   - `deno test --allow-all packages/contracts/tests/contracts_test.ts`
-    -> `ok | 2 passed | 0 failed (38ms)`.
+    -> `ok | 2 passed | 0 failed (28ms)`.
   - `deno test --allow-all packages/service/tests/handlers_test.ts`
-    -> `ok | 2 passed | 0 failed (19ms)`.
+    -> `ok | 2 passed | 0 failed (32ms)`.
   - `deno test --allow-all packages/fresh-ui/tests/consumer-render.test.tsx`
-    -> `ok | 1 passed | 0 failed (25ms)`.
+    -> `ok | 1 passed | 0 failed (30ms)`.
+  - `deno test --allow-all packages/plugin-workers-core/tests/streams/workers-streams_test.ts`
+    -> `ok | 3 passed | 0 failed (19ms)`.
 
 ## Final Gate
 
-- Command: `deno task test`
-- Captured in: `.llm/tmp/run/test-suite-greenup--fix/final-test-after-catalog.txt`
-- Result: `ok | 643 passed (356 steps) | 0 failed | 12 ignored (30s)`
+- Command: `set -o pipefail; deno task test 2>&1 | tee .llm/tmp/run/test-suite-greenup--fix/final-test-after-catalog-rework.txt`
+- Captured in: `.llm/tmp/run/test-suite-greenup--fix/final-test-after-catalog-rework.txt`
+- Result: `ok | 643 passed (356 steps) | 0 failed | 12 ignored (29s)`
 - Exit code: 0
