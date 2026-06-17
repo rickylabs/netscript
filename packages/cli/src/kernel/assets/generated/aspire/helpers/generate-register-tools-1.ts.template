@@ -6,6 +6,15 @@ import type { InfrastructureContext } from './register-infrastructure.mjs';
 import { buildDatabaseUriEnvKey, resolveWorkspacePath } from '{{__slot3__}}';
 
 type ToolResource = Awaited<ReturnType<DistributedApplicationBuilder['addExecutable']>>;
+type ProcessCommandCapable = {
+  readonly withProcessCommand?: (
+    name: string,
+    executable: string,
+    args: readonly string[],
+  ) => unknown;
+};
+
+const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS';
 
 /**
  * Registers development tools (e.g., Prisma Studio) with the Aspire SDK
@@ -63,6 +72,26 @@ async function attachToolDatabase(
   }
 
   return await databaseBinding.withReference(databaseResource).waitFor(databaseResource);
+}
+
+async function maybeWithProcessCommand(
+  resource: ToolResource,
+  name: string,
+  taskName: string,
+): Promise<ToolResource> {
+  if (process.env[PROCESS_COMMANDS_FLAG] !== '1') {
+    return resource;
+  }
+
+  const commandCapable = resource as unknown as ProcessCommandCapable;
+  const withProcessCommand = commandCapable.withProcessCommand;
+  if (typeof withProcessCommand !== 'function') {
+    return resource;
+  }
+
+  // Aspire 13.4 WithProcessCommand seam: wired, but disabled by default.
+  void withProcessCommand.call(resource, `Run ${name}`, 'deno', ['task', taskName]);
+  return resource;
 }
 
 function resolvePrismaStudioWorkdir(

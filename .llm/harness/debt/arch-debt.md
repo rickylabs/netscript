@@ -375,7 +375,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-17 — Wave 6 completed the bounded A6 promotion for `@netscript/cli`:
+  command registry/deploy target seams, scaffold/init pipeline split, JSON init output, preset
+  extension seam, schema mirror, and final F-CLI gate sweep. The local `scaffold.runtime` fixture
+  stayed `passed=41 failed=0`, CLI doc lint and CLI publish dry-run passed, and focused F-CLI gates
+  pass. The only remaining related sub-item is the deliberately deferred
+  `scaffold.published.runtime` proof, tracked to post-S3 step F rather than AP-1.
 - **Gate:** F-1, F-3, F-10, AP-18 manual review
 - **Slice 8 update:** `commands/init/pipeline.ts` was decomposed into
   `src/public/application/init/**`; this entry remains open for `official-plugin-copier.ts` and

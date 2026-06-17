@@ -1,13 +1,13 @@
-import { ScaffoldGitError } from '../../domain/errors.ts';
-import type { InitPipelineContext } from './context.ts';
+import { ScaffoldGitError } from '../../../domain/errors.ts';
+import type { InitPipelineContext } from '../context.ts';
 
+/** Initialize a git repository in the generated workspace. */
 export async function gitInit(context: InitPipelineContext, targetPath: string): Promise<void> {
   try {
     const initResult = await context.process.exec('git', ['init'], { cwd: targetPath });
     if (initResult.code !== 0) {
       throw new ScaffoldGitError(
-        initResult.stderr.trim() ||
-          'git init exited with non-zero status',
+        initResult.stderr.trim() || 'git init exited with non-zero status',
       );
     }
 
@@ -17,12 +17,8 @@ export async function gitInit(context: InitPipelineContext, targetPath: string):
       cwd: targetPath,
     });
   } catch (error: unknown) {
-    // Re-throw ScaffoldGitError as-is; wrap everything else (e.g. "git not
-    // found", invalid cwd) so callers always get the --no-git guidance.
     if (error instanceof ScaffoldGitError) throw error;
     const message = error instanceof Error ? error.message : String(error);
-    throw new ScaffoldGitError(
-      `${message} — is git installed? Use --no-git to skip.`,
-    );
+    throw new ScaffoldGitError(`${message} — is git installed? Use --no-git to skip.`);
   }
 }

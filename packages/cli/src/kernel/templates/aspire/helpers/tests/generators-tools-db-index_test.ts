@@ -44,6 +44,12 @@ describe('generateRegisterTools', () => {
       output,
       "builder.addExecutable('prisma-studio', 'deno', prisma_studio_workdir, ['task', 'studio'])",
     );
+    assertStringIncludes(
+      output,
+      "prisma_studio = await maybeWithProcessCommand(prisma_studio, 'prisma-studio', 'studio');",
+    );
+    assertStringIncludes(output, "const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS'");
+    assertStringIncludes(output, 'Aspire 13.4 WithProcessCommand seam');
   });
 
   it('should use resource name as TaskName fallback', () => {

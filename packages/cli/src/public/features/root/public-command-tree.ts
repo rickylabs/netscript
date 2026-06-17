@@ -1,5 +1,4 @@
-import { Command } from '@cliffy/command';
-
+import { CliCommandRegistry } from '../../composition/cli-command-registry.ts';
 import { contractCommand } from '../contracts/contracts-group.ts';
 import { createDbCommand } from '../db/db-group.ts';
 import { createDeployCommand } from '../deploy/deploy-group.ts';
@@ -10,7 +9,10 @@ import { createPluginCommand } from '../plugins/plugins-group.ts';
 import { createServiceCommand } from '../services/services-group.ts';
 import { createUiAddCommand } from '../ui/add/add-ui-command.ts';
 import { createUiInitCommand } from '../ui/init/init-ui-command.ts';
-import { createPublicCommandDependencies } from './public-command-dependencies.ts';
+import {
+  createPublicCommandDependencies,
+  type PublicCommandDependencies,
+} from './public-command-dependencies.ts';
 
 /** Host services supplied by the binary edge. */
 export interface PublicCliHost {
@@ -26,37 +28,79 @@ export interface PublicCliCommand {
   readonly parse: (args?: string[]) => Promise<unknown> | unknown;
 }
 
-/** Create the public NetScript CLI command tree. */
-export function createPublicCommandTree(host: PublicCliHost): PublicCliCommand {
-  const dependencies = createPublicCommandDependencies(host);
+/** Context passed to public command factories. */
+export interface PublicCommandContext {
+  /** Host services supplied by the binary edge. */
+  readonly host: PublicCliHost;
+  /** Shared dependencies for public commands. */
+  readonly dependencies: PublicCommandDependencies;
+}
 
-  return new Command()
-    .name('netscript')
-    .version('1.0.0')
-    .description('NetScript - enterprise-grade polyglot backend framework CLI')
-    .action(function () {
-      this.showHelp();
-    })
-    .command('deploy', createDeployCommand(dependencies))
-    .command('init', createInitCommand(dependencies.initCommandDependencies))
-    .command('contract', contractCommand)
-    .command('db', createDbCommand(host, dependencies))
-    .command('generate', createGenerateCommand(dependencies))
-    .command('marketplace', createMarketplaceCommand())
-    .command('plugin', createPluginCommand(dependencies))
-    .command('service', createServiceCommand(dependencies))
-    .command(
-      'ui:add',
+/** Create the registry of public command factories. */
+export function createPublicCommandRegistry(): CliCommandRegistry<PublicCommandContext> {
+  const registry = new CliCommandRegistry<PublicCommandContext>();
+
+  registry.register('deploy', {
+    id: 'deploy',
+    create: ({ dependencies }) => createDeployCommand(dependencies),
+  });
+  registry.register('init', {
+    id: 'init',
+    create: ({ dependencies }) => createInitCommand(dependencies.initCommandDependencies),
+  });
+  registry.register('contract', {
+    id: 'contract',
+    create: () => contractCommand,
+  });
+  registry.register('db', {
+    id: 'db',
+    create: ({ host, dependencies }) => createDbCommand(host, dependencies),
+  });
+  registry.register('generate', {
+    id: 'generate',
+    create: ({ dependencies }) => createGenerateCommand(dependencies),
+  });
+  registry.register('marketplace', {
+    id: 'marketplace',
+    create: () => createMarketplaceCommand(),
+  });
+  registry.register('plugin', {
+    id: 'plugin',
+    create: ({ dependencies }) => createPluginCommand(dependencies),
+  });
+  registry.register('service', {
+    id: 'service',
+    create: ({ dependencies }) => createServiceCommand(dependencies),
+  });
+  registry.register('ui:add', {
+    id: 'ui:add',
+    create: ({ dependencies }) =>
       createUiAddCommand({
         installDependencies: dependencies.uiInstallDependencies,
         resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
-    )
-    .command(
-      'ui:init',
+  });
+  registry.register('ui:init', {
+    id: 'ui:init',
+    create: ({ dependencies }) =>
       createUiInitCommand({
         installDependencies: dependencies.uiInstallDependencies,
         resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
-    );
+  });
+
+  return registry;
+}
+
+/** Create the public NetScript CLI command tree. */
+export function createPublicCommandTree(host: PublicCliHost): PublicCliCommand {
+  const dependencies = createPublicCommandDependencies(host);
+  const registry = createPublicCommandRegistry();
+
+  return registry.program({
+    name: 'netscript',
+    version: '1.0.0',
+    description: 'NetScript - enterprise-grade polyglot backend framework CLI',
+    context: { host, dependencies },
+  });
 }

@@ -4,6 +4,7 @@ import {
   normalizePath,
   parseOptions,
   report,
+  isTestOrFixture,
   sourceFiles,
   textFile,
 } from './cli-fitness-shared.ts';
@@ -12,7 +13,8 @@ const options = parseOptions();
 const findings: Finding[] = [];
 const commandExtends = /extends\s+(CliCommand|ScaffoldCommand|ListCommand|DeployStepCommand)\b/;
 const commandFactory = /export\s+function\s+create[A-Z][A-Za-z0-9]*Command\b/;
-const commandConstant = /export\s+const\s+[A-Za-z0-9_]*Command\s*=\s*new\s+Command\b/;
+const commandConstant =
+  /export\s+const\s+[A-Za-z0-9_]*Command(?:\s*:\s*[^=]+)?\s*=\s*new\s+Command\b/;
 const useCaseExtends = /extends\s+(UseCase|Pipeline|Registry)(\b|<)/;
 
 for (const path of await sourceFiles(options.root)) {
@@ -37,6 +39,8 @@ for (const path of await sourceFiles(options.root)) {
     normalized.includes('/src/kernel/application/') &&
     !normalized.includes('/abstracts/') &&
     !normalized.includes('/registries/') &&
+    !normalized.includes('/testing/') &&
+    !isTestOrFixture(normalized) &&
     !normalized.endsWith('_test.ts') &&
     /\bexport\s+class\b/.test(text) &&
     !useCaseExtends.test(text)

@@ -17,4 +17,6 @@ export interface InitCommandInput {
   readonly yes?: boolean;
   readonly path?: string;
   readonly dryRun?: boolean;
+  readonly json?: boolean;
+  readonly from?: string;
 }
