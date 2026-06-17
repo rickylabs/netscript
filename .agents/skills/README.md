@@ -17,6 +17,7 @@ operate this codebase end-to-end without re-deriving the API from documentation 
 | `jsr-audit`          | **CORE** — Audit packages for JSR readiness. Required Plan-Gate input for package/plugin waves.                   | active |
 | `deno-fresh`         | Frontend development with Fresh 2.x, Preact, and Tailwind CSS in Deno.                                            | active |
 | `rtk`                | Token-saving CLI proxy. Prefix read-heavy git/gh/grep/ls/docker commands with `rtk`; `rtk proxy` for `deno task`. | active |
+| `claude-manager`     | Operate Claude Code and WSL Codex sessions: discover, steer, monitor, MCP-bridge, and poll daemon status.         | active |
 
 > **Not yet in this repo.** These skills exist in the broader NetScript toolkit but are not present
 > in this repository yet — do not assume their guidance is loadable here: `deno-expert`,
@@ -33,6 +34,7 @@ If a prompt is vague, route it to the narrowest skill that fits:
 - JSR readiness or publish audit → `jsr-audit`
 - Fresh/Deno frontend → `deno-fresh`
 - Read-heavy git/gh/grep/ls/docker output, or tracking `deno task` runs → `rtk`
+- Claude Code, Zed ACP, or WSL Codex session steering/status → `claude-manager`
 - Anything else → ask for clarification rather than guess
 
 ---

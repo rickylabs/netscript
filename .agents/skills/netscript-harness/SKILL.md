@@ -33,6 +33,7 @@ this skill tells you what to load and in what order.
 | **8-phase model** | Bootstrap → Research → Plan & Design → Plan-Gate → Implement → Gate → Evaluate → Close. |
 | **PLAN-EVAL**     | First evaluator pass, before implementation. Hard stop.                                 |
 | **IMPL-EVAL**     | Final evaluator pass, after implementation.                                             |
+| **Supervisor**    | Claude coordinates only; OpenHands evaluates; Codex implements.                         |
 | **Plan-Gate**     | Checklist (`gates/plan-gate.md`) that PLAN-EVAL enforces.                               |
 | **Archetype**     | Package/plugin shape profile from `archetypes/ARCHETYPE-*.md`.                          |
 | **Scope overlay** | `SCOPE-frontend.md`, `SCOPE-service.md`, `SCOPE-docs.md`.                               |
@@ -54,12 +55,55 @@ this skill tells you what to load and in what order.
 11. **Run IMPL-EVAL (separate session).**
 12. Close: update `context-pack.md`, `arch-debt.md`, and promote lessons if warranted.
 
+## Agent Delegation Contract
+
+For supervised NetScript work:
+
+- Claude is the supervisor/coordinator only. It may gather state, write prompts,
+  launch/check agents, and update handoff artifacts, but it must not perform the
+  heavy implementation or certify its own work.
+- PLAN-EVAL must run in OpenHands with minimax M3 unless the run artifact
+  explicitly records why that launch path is unavailable.
+- IMPL-EVAL must run in OpenHands with qwen 3.7 max unless the run artifact
+  explicitly records why that launch path is unavailable.
+- Implementation/fix work must run in WSL Codex subagents attached to the Codex
+  daemon so the user can monitor and steer the work from Desktop/mobile.
+- Claude plugin helpers such as `codex:rescue`, `codex:codex-rescue`,
+  `codex-companion.mjs`, and Claude internal `general-purpose` agents are not
+  valid implementation subagents for supervised runs. They are local Claude tool
+  surfaces unless WSL daemon status proves a mobile-visible Codex thread.
+- A Codex implementation slice is launched only when the run artifacts include
+  the WSL worktree path, concrete Codex thread id, daemon-managed
+  `remote-control` proof, and the follow-up command for steering that same
+  thread. Without those, record the launch as failed/not attached.
+- Every implementation slice must be independently trackable: branch/worktree
+  identity, agent/thread identity, files touched, tests run, commit hash, push
+  status, and PR comment/status.
+- Every slice must commit, push, and comment on the PR before the next slice is
+  considered complete.
+- Merge, publish, or release gates require all relevant tests to be green with
+  required features intact. For catalog-related work, do not delete, skip,
+  de-catalog, or bypass tests unless the evaluator verdict explicitly classifies
+  the test as stale/irrelevant and the PR comment records the rationale.
+- If an OpenHands launch is blocked, record the missing launch mechanism in
+  `worklog.md`/`drift.md`, then proceed only with the appropriate
+  daemon-attached Codex implementation slice if the user has authorized that
+  fallback.
+
 ## Common Pitfalls
 
 - **Skipping Plan & Design** — The Plan-Gate is a hard stop. Implementation before PLAN-EVAL `PASS`
   is a process failure.
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
+- **Wrong evaluator surface** — Claude internal subagents are not PLAN-EVAL or
+  IMPL-EVAL. Use OpenHands with the required model, or record a blocked launch.
+- **Wrong implementation surface** — Claude should not do heavy implementation
+  during supervisor runs. Use WSL Codex daemon-attached subagents so the work is
+  mobile-visible and steerable.
+- **False attached-agent claims** — A Claude `codex:*` skill/helper is not a
+  WSL Codex daemon thread. Require daemon status plus thread id before claiming
+  the user can see or steer the subagent from phone/Desktop.
 - **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
 - **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
 - **Raw root CLI noise as a verdict** — Package-quality check/lint/fmt evidence should use the
@@ -115,6 +159,7 @@ There are **two** separate-session evaluator passes.
 
 **PLAN-EVAL** (before implementation):
 
+- Runs in OpenHands with minimax M3 unless blocked and recorded.
 - Reads `evaluator/plan-protocol.md` + `gates/plan-gate.md`.
 - Reads `research.md`, `plan.md`, and the `## Design` section.
 - Writes `plan-eval.md`.
@@ -123,6 +168,7 @@ There are **two** separate-session evaluator passes.
 
 **IMPL-EVAL** (final pass, after implementation):
 
+- Runs in OpenHands with qwen 3.7 max unless blocked and recorded.
 - Generator writes `worklog.md`, `context-pack.md`, `drift.md`, and `commits.md`.
 - Evaluator reads `.llm/harness/evaluator/protocol.md`, the plan, worklog, context pack, drift,
   commits, selected archetype, overlays, and gate docs.
@@ -133,10 +179,12 @@ There are **two** separate-session evaluator passes.
 
 When a run requires commits:
 
-1. commit by major section,
-2. append `.llm/tmp/run/<run-id>/commits.md`,
-3. update `context-pack.md`,
-4. continue to the next section.
+1. commit by implementation slice,
+2. push the branch,
+3. comment on the PR with slice scope, commit hash, and test evidence,
+4. append `.llm/tmp/run/<run-id>/commits.md`,
+5. update `context-pack.md`,
+6. continue to the next slice.
 
 Commit log format:
 
@@ -173,6 +221,7 @@ User says "use harness"
   -> two or more phase groups? read workflow/supervisor.md + escalation.md, keep phase-registry.md
   -> read gate matrix + plan-gate.md
   -> plan committed? run PLAN-EVAL (separate session); no slice before PASS
+  -> supervised? Claude coordinates, OpenHands evaluates, WSL Codex implements
   -> update run artifacts while working
   -> commit tracking required? append commits.md after every commit
   -> discovered violation not fixed? update arch-debt.md
@@ -201,5 +250,11 @@ User says "use harness"
 - [ ] Archetype and overlays are selected and justified.
 - [ ] Plan-Gate checklist (`gates/plan-gate.md`) was reviewed.
 - [ ] PLAN-EVAL returned `PASS` before any implementation slice.
+- [ ] PLAN-EVAL used OpenHands/minimax M3, or the blocked launch was recorded.
+- [ ] Implementation slices used WSL Codex daemon-attached subagents.
+- [ ] Each Codex slice recorded WSL daemon-managed proof, thread id, worktree,
+      and steering command.
 - [ ] Commits are appended to `commits.md` immediately after creation.
+- [ ] Each implementation slice was committed, pushed, and commented on the PR.
 - [ ] IMPL-EVAL is a separate session from the generator.
+- [ ] IMPL-EVAL used OpenHands/qwen 3.7 max, or the blocked launch was recorded.
