@@ -1,0 +1,45 @@
+name: ci
+
+# Minimal S1 pre-merge gate: repo-wide `deno check`, repo-wide `deno test`, and the
+# CLI end-to-end scaffold driver. Full CI (lint, fmt, doc-lint, publish dry-run, audit,
+# coverage, OIDC publish) is scoped to S2 (toolchain) + S3 (cicd-release). Keep this lean
+# so the `feat/package-quality` -> `main` merge is gated on health, not on tangential
+# advisories.
+
+on:
+  push:
+    branches: [main, "feat/package-quality"]
+  pull_request:
+    branches: [main, "feat/package-quality"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-test-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.8.3"
+
+      - name: Install workspace dependencies
+        run: deno install
+
+      - name: Repo-wide check
+        run: deno task check
+
+      - name: Repo-wide test
+        run: deno task test
+
+      - name: CLI end-to-end (scaffold.runtime)
+        run: deno task e2e:cli

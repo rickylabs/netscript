@@ -639,8 +639,8 @@ GitHub merge commit; base was `24720fe`).
 | Nested run ID | `feat-package-quality-wave6-cli--<suffix>` |
 | Units | `@netscript/cli` |
 | Archetype(s) | A6 — cli-tooling |
-| Status | **`unblocked`** — Waves 0–5 all `merged` (Wave 5 → track `82c1185`, 2026-06-14). **Last remaining S1 wave.** Generator (separate session) opens the wave6-cli worktree/branch off the current track head. |
-| Merge commit | — |
+| Status | **`active`** — PR **#43** (wave6-cli). Slices 0,1,2,3,5 landed (continuous Codex generator, D-SUP-W6); Slice 2 self-gated `scaffold.runtime` 41/41. **Remaining in S1: Slice 6 (A6 gate sweep + AP-1 close) + Slice 4a only.** |
+| Merge commit | — (pending Slice 6 + 4a, then merges into `feat/package-quality` ahead of the S1→`main` merge) |
 
 ### Pre-conditions
 
@@ -661,6 +661,15 @@ GitHub merge commit; base was `24720fe`).
 ### Notes
 
 - Shipped last by design. Do not bump scaffold templates to `jsr:` refs here — that is S3 (publish) territory; S1 stops at publish-clean.
+- **Slice 4 is SPLIT (locked, D-SUP-W8):** *4a* = scaffold improvements validated vs
+  `publish --dry-run` / local fixture — **stays in S1** (this wave, with Slice 6). *4b* =
+  `scaffold.published.runtime` E2E vs the **real** published `0.0.1-alpha.0` — **deferred to
+  post-S3** (program step F). No live JSR publish occurs in S1.
+- **Program sequencing (D-SUP-W8): merge-first / publish-second / finish-CLI-third.** S1 lands on
+  `main` behind the minimal `ci.yml` gate (`check`+`test`+`e2e:cli`); S2 finalizes the 2.8
+  toolchain; S3 publishes the **26 non-CLI** units via OIDC from `main`; then step F validates
+  Slice 4b against the real published set and publishes `@netscript/cli` last (LD-7), under a new
+  umbrella PR continuing PR #2.
 
 ---
 
@@ -675,7 +684,7 @@ GitHub merge commit; base was `24720fe`).
 | 3 — Plugin runner | `merged` (host #15 → umbrella #14 → track; IMPL-EVAL PASS) | 2 | plugin | `1423ab3` (PR #14) |
 | 4 — Runtimes & plugins | `active` (umbrella #16; 4a merged `2c24662` #18; 4b merged `1896f854` #19; 4c merged `8264a1c` #20; 4d LAST pulled forward `32637a9`, in Research/Plan #21) | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
 | 5 — Application surfaces | `prepared` (umbrella PR #17, blocked on 4) | 4 | sdk, service, fresh, fresh-ui | — |
-| 6 — Tooling | `planned` | 0–5 | cli | — |
+| 6 — Tooling | `active` (PR #43; slices 0,1,2,3,5 landed; remaining: Slice 6 + Slice 4a — Slice 4b deferred post-S3 per D-SUP-W8) | 0–5 | cli | — |
 
 Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 
