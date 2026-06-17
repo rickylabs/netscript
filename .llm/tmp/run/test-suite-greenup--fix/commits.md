@@ -7,3 +7,5 @@
 - a621a8c: test(greenup): official samples — align generated config assertions
 - 103f9a8: test(greenup): catalogs — materialize member npm imports
 - 9262399: test(greenup): catalogs — use root npm imports
+- 20d6b03: revert de-catalog; restore 67 catalog: refs + root imports {}; maintainer directive
+- 9b19c02: test(greenup): record catalog-preserving blocker

@@ -20,10 +20,23 @@ Active root-cause slices:
 3. Newly surfaced plugin-workers-core Deno runtime adapter tests — fixed in `023c758`.
 4. CLI config fixture failures in plugin registry and compile tests — fixed in `bb7a521`.
 5. Official plugin sample fixture drift — fixed in `a621a8c`.
-6. Catalog graph-resolution blocker — `103f9a8` rejected; reworked to root `imports` in `9262399`.
+6. Catalog graph-resolution blocker — `103f9a8` and `9262399` rejected by maintainer directive.
+   Catalog wiring restored in `20d6b03`: root imports `{}`, 67 member `catalog:` refs across 18
+   member `deno.json` files, root catalog retained.
 
-Final gate:
+Current hard-stop gate:
 
 ```text
-ok | 643 passed (356 steps) | 0 failed | 12 ignored (29s)
+ok | 484 passed (356 steps) | 0 failed | 12 ignored (46s)
+error: Unsupported scheme "catalog" for module "catalog:"
+at packages/contracts/src/application/contract-primitives.ts:1:20
 ```
+
+Narrow repro:
+
+```text
+deno run --allow-all packages/contracts/src/application/contract-primitives.ts
+```
+
+exits 1 with the same unsupported-scheme error. `deno check` of the same file exits 0, so the
+blocker is runtime module loading of restored member `deno.json` import-map `catalog:` values.

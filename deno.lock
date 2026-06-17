@@ -1156,6 +1156,7 @@
       "packages/config": {
         "dependencies": [
           "jsr:@std/fs@1",
+          "jsr:@std/jsonc@1",
           "jsr:@std/path@1",
           "jsr:@zod/zod@4.4.3"
         ]

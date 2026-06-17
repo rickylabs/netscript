@@ -91,13 +91,9 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
   scheme at graph resolution time.
 - Rejected change: `103f9a8` materialized package/plugin member `catalog:` imports to explicit
   per-member `npm:` specifiers. Maintainer rejected that as the wrong model.
-- Corrected change: reverted the per-member materialization, removed invalid member `catalog:`
-  import-map entries, and centralized the catalog dependencies in root `deno.json` `imports` as
-  `npm:<specifier>@<root catalog version>` specifiers.
-- Evidence: Deno's workspace catalog docs state that `catalog:` references are read from
-  `package.json` dependencies; shared Deno import-map dependencies belong in root `imports`.
-- Lock hygiene: `deno.lock` updated because previously unresolved npm dependencies now resolve
-  through the root import map.
+- Rejected change: `9262399` removed the member `catalog:` import-map entries and centralized the
+  catalog dependencies in root `deno.json` `imports`. Maintainer rejected this too: root imports
+  must return to `{}` and all 67 member `catalog:` refs must remain intact.
 - Representative proofs:
   - `deno test --allow-all packages/contracts/tests/contracts_test.ts`
     -> `ok | 2 passed | 0 failed (28ms)`.
@@ -114,3 +110,56 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
 - Captured in: `.llm/tmp/run/test-suite-greenup--fix/final-test-after-catalog-rework.txt`
 - Result: `ok | 643 passed (356 steps) | 0 failed | 12 ignored (29s)`
 - Exit code: 0
+
+## Supervisor Correction — catalog restoration
+
+- Directive read: `.llm/tmp/run/test-suite-greenup--fix/SUPERVISOR-CORRECTION.md`.
+- Required restoration: root `deno.json` `imports` restored to `{}`, all 67 member `catalog:` refs
+  restored across 18 member `deno.json` files, root `catalog` block retained, and `deno.lock`
+  restored away from the rejected de-catalog resolution churn.
+- Verification before commit:
+  - `git diff 733388f -- '**/deno.json' 'deno.json' | grep -E '^[-+].*catalog:' ; echo exit=$?`
+    -> `exit=1`.
+  - `git grep -c 'catalog:' -- '**/deno.json' | awk -F: '{s+=$NF} END{print s" refs across "NR" files"}'`
+    -> `67 refs across 18 files`.
+  - root `deno.json` imports -> `{}`; root catalog entries -> `33`.
+- Commit: `20d6b03 revert de-catalog; restore 67 catalog: refs + root imports {}; maintainer directive`.
+- Push: `git push origin chore/test-suite-green-up` succeeded (`30ed34b..20d6b03`).
+
+## Catalog-preserving retry
+
+- Environment confirmation:
+  - cwd: `/home/codex/repos/netscript-test-green-up`.
+  - `command -v deno`: `/usr/local/bin/deno`.
+  - `deno --version`: `deno 2.8.3 (stable, release, x86_64-unknown-linux-gnu)`,
+    V8 `14.9.207.2-rusty`, TypeScript `6.0.3`.
+  - `Deno.execPath()`: `/home/codex/.deno/bin/deno`.
+- Workspace/catalog checks:
+  - root workspace uses globs `packages/*`, `packages/cli/e2e`, `plugins/*`, `examples/*`,
+    `apps/*`; these include the member package/plugin directories with catalog refs.
+  - catalog completeness check found `18` catalog-ref files and no missing root catalog keys.
+  - `deno install` exited `0`; lock movement was only the additive `@std/jsonc` entry for
+    `packages/config`.
+- First restored-catalog test run:
+  - Command: `set -o pipefail; deno task test 2>&1 | tee .llm/tmp/run/test-suite-greenup--fix/final-test-after-catalog-restore.txt`.
+  - Exit code: `1`.
+  - Initial blocker: `packages/config/workspace.ts` imports `@std/jsonc`, but restoring
+    `packages/config/deno.json` to base removed the package-local `@std/jsonc` import declaration.
+- Catalog-preserving fix:
+  - Added `@std/jsonc: jsr:@std/jsonc@^1` back to `packages/config/deno.json`.
+  - Focused proof: `deno test --allow-all packages/config/workspace.test.ts`
+    -> `ok | 1 passed | 0 failed (65ms)`.
+- Final restored-catalog test attempt:
+  - Command: `set -o pipefail; deno task test 2>&1 | tee .llm/tmp/run/test-suite-greenup--fix/final-test-catalog-preserved.txt`.
+  - Exit code: `1`.
+  - Test assertions summary: `ok | 484 passed (356 steps) | 0 failed | 12 ignored (46s)`.
+  - Process blocker after summary:
+    `error: Unsupported scheme "catalog" for module "catalog:" ... at packages/contracts/src/application/contract-primitives.ts:1:20`.
+- Narrow reproduction:
+  - `deno test --allow-all packages/contracts/src/application/contract-primitives.ts`
+    -> `ok | 0 passed | 0 failed`, then the same `Unsupported scheme "catalog"` error.
+  - `deno check packages/contracts/src/application/contract-primitives.ts` -> exit `0`.
+  - `deno run --allow-all packages/contracts/src/application/contract-primitives.ts`
+    -> same `Unsupported scheme "catalog"` error.
+- Hard-stop status: unable to make `deno task test` exit `0` while leaving the restored member
+  `catalog:` import-map entries intact. Catalog remains intact.
