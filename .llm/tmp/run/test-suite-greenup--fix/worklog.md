@@ -72,3 +72,14 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
   `deno test --allow-all packages/cli/src/kernel/adapters/config/plugin-registry.test.ts packages/cli/src/kernel/adapters/windows/compile/compile.test.ts packages/cli/src/kernel/adapters/windows/compile/compile_test.ts`
   -> `ok | 6 passed | 0 failed (1s)`.
 - Failure-count delta: expected 7 failed -> expected 1 failed.
+
+## Slice 5 — official-plugin-samples
+
+- Root cause: the sample-copy test expected older standalone `defineJob(...)` output, while the
+  current registry generator emits worker job IDs inside `defineWorkers({ groups: ... })`.
+- Change: updated the stale assertions to check for the generated worker job IDs in the current
+  config shape, while preserving saga, trigger, and runtime JSON assertions.
+- Proof:
+  `deno test --allow-all packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts`
+  -> `ok | 2 passed | 0 failed (221ms)`.
+- Failure-count delta: expected 1 failed -> expected 0 failed.
