@@ -383,3 +383,11 @@ vite 7.2.2) all already landed on main `e2395bdf`. The one genuine missing piece
 
 **Next:** watch PR #49 `quality` lane → if green, report + offer to promote to required;
 then E (S3 OIDC publish 26 non-CLI) remains the user-dispatched step.
+
+**MERGED (2026-06-17):** PR #49 squash-merged → **main `531f2b46`**. All checks green on
+the PR head (`quality` 2m17s ✓ incl. publish:dry-run over all 27 units; `check-test` ✓;
+`deps-report` ✓). Branch `ci/s2-quality-lane` deleted, worktree removed. main now carries
+the S2 full quality lane. **D/S2 = COMPLETE.** NEXT = E (S3 OIDC publish 26 non-CLI at
+0.0.1-alpha.0 from main) — user-dispatched. Maintainer follow-ups (not blocking): promote
+`quality` to a required check via branch protection; decide on retiring/scoping the Copilot
+setup step now that OpenHands is the evaluator.
