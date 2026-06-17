@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deno run --allow-env --allow-read --allow-write .llm/tools/agentic/claude-hook-log.ts"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "deno run --allow-env --allow-read --allow-write .llm/tools/agentic/claude-hook-log.ts"
+          }
+        ]
+      }
+    ]
+  }
+}
