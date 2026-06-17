@@ -1,13 +1,24 @@
 name: ci
 
-# Minimal S1 pre-merge gate: repo-wide `deno check` + repo-wide `deno test` — the
-# service-free static + unit gates that run on a stock runner. The CLI runtime e2e
-# (`deno task e2e:cli` / scaffold.runtime) is intentionally NOT here: it spawns the
-# `aspire` CLI, `docker`, and `postgres`, which `ubuntu-latest` does not provision, so it
-# belongs in S2's full CI (which sets up the toolchain + services). Full CI (lint, fmt,
-# doc-lint, publish dry-run, audit, coverage, OIDC publish) is scoped to S2 (toolchain) +
-# S3 (cicd-release). Keep this lean so `feat/package-quality` -> `main` is gated on
-# service-free health, not on toolchain availability or tangential advisories.
+# S2 full CI. Lanes over the existing `deno task`s:
+#
+#   - `check-test` — the lean, required S1 pre-merge gate: repo-wide `deno check`
+#     + `deno test`, the service-free static + unit gates that run on a stock
+#     runner. Kept intentionally minimal so `feat/package-quality` -> `main` is
+#     gated on service-free health, not on toolchain availability or tangential
+#     advisories.
+#
+#   - `quality` — the S2 full quality lane the original header reserved: lint,
+#     fmt, scaffold-version guard, publish dry-run, and critical advisory audit.
+#     Additive and intended to become a required check (branch protection) once
+#     observed green; until then a red `quality` cannot block the merge gate.
+#
+#   - `deps-report` — non-blocking dependency-freshness report (informational).
+#
+# Still out of scope here (deferred Phase-2 "repo process automation" umbrella):
+# the toolchain-heavy CLI runtime e2e (`deno task e2e:cli` / scaffold.runtime,
+# which spawns `aspire` + `docker` + `postgres`), OIDC publish (S3), and the
+# label/Projects automation.
 
 on:
   push:
@@ -43,3 +54,52 @@ jobs:
 
       - name: Repo-wide test
         run: deno task test
+
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.8.3"
+
+      - name: Install workspace dependencies
+        run: deno install
+
+      - name: Lint
+        run: deno task lint
+
+      - name: Format check
+        run: deno task fmt:check
+
+      - name: Scaffold version guard (no preview pins)
+        run: deno task check:scaffold-versions
+
+      - name: Publish dry-run (0 slow-types across all units)
+        run: deno task publish:dry-run
+
+      - name: Critical advisory audit
+        run: deno task audit:critical
+
+  deps-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.8.3"
+
+      - name: Install workspace dependencies
+        run: deno install
+
+      - name: Dependency freshness (report-only)
+        run: deno task deps:latest
+        continue-on-error: true
