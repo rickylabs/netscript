@@ -137,3 +137,27 @@ current-state documentation.
   load-bearing gate are intact; only the inter-slice barrier is relaxed for momentum.
 - **Action:** accept. Supervisor posts per-slice PR #43 comments (gh unauth in WSL) and routes
   IMPL-EVALs; any eval FAIL_FIX becomes a follow-up fix slice rather than blocking the run.
+
+## D-SUP-W7 — Test-suite green-up (PR #46) de-cataloged the workspace; reverted by maintainer directive
+
+- **What:** The Slice 7 green-up generator hit `deno task test` exit 1 with
+  `Unsupported scheme "catalog"` resolving member graphs, and "fixed" it by destroying the Deno
+  workspace catalog — twice. (1) `103f9a8` materialized member `catalog:` → per-member pinned
+  `npm:`; maintainer rejected. (2) head `30ed34b6` stripped all 67 `catalog:` refs across 18 member
+  `deno.json` and dumped concrete versions into root `imports` (root `catalog` block orphaned).
+- **Source:** maintainer directive (2026-06-17); PR #46 diff vs base `733388f`.
+- **Why it matters:** the catalog is intentional centralized dependency management; removing it
+  breaks single-source versioning AND JSR publishability (published packages must declare imports
+  via `catalog:`, not a workspace-root flat `imports` map).
+- **Brief gap (root cause):** the green-up BRIEF.md had no catalog-protection boundary, so the
+  agent treated catalog as fair game. Standing lesson: every generator brief touching `deno.json`
+  must declare the catalog wiring off-limits.
+- **Action:** supervisor steered. Original session `019ed499` was context-exhausted (resume errors
+  "ran out of room"), so launched a FRESH thread `019ed571` on the same worktree with a maintainer-
+  authority correction file (`SUPERVISOR-CORRECTION.md`). Result: commit `20d6b036` "revert
+  de-catalog; restore 67 catalog: refs + root imports {}" — verified catalog-wiring diff vs
+  `733388f` is empty, 67 refs across 18 files, root imports `{}`. Agent is re-running
+  `deno task test` from the workspace root with catalog preserved; hard-stop instruction = if not
+  green with catalog intact, record root cause in drift, do NOT de-catalog again.
+- **Severity:** significant (would have shipped a broken deps model + unpublishable packages).
+- **Gate:** Phase P remains blocked until `deno task test` is green WITH the catalog intact.
