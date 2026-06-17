@@ -209,6 +209,22 @@ under `.worktrees/<name>`:
   - Session/thread: `019ed63b-a542-71c3-968d-f788eb7954c1`; launcher `/home/codex/run-wave6-4a6.sh`;
     log `/home/codex/wave6-4a6-run.jsonl`; started `2026-06-17T15:38:08Z` at head `4beb2d9`.
   - Steer via `codex exec resume` on that session — **never re-launch** (one active turn / worktree).
+- **RELAUNCH (mobile-visibility fix) `2026-06-17T15:49:10Z`:** the Assignment-2 session above was
+  launched with bare `codex exec` (Desktop-sync only, **never reached the phone**). Per the
+  `codex-wsl-remote` skill the managed-daemon path is `codex debug app-server send-message-v2`.
+  Fix applied: killed orphan exec (PID 13269 / session `019ed63b`); discarded its uncommitted WIP via
+  `git checkout -- packages/ && git clean -fd packages/` → pristine `4beb2d9`; ran the anchored
+  daemon repair (kill unmanaged app-server + `rm` stale control socket + `codex remote-control
+  start --json`) → daemon now **MANAGED + CONNECTED** (`status:connected`,
+  `remoteControlEnabled:true`, host `YogaBook9i`, managed v0.140.0).
+  - **New mobile-visible thread:** `019ed645-d204-7050-967e-f4d074f8f908` (session_id same), source
+    `VsCode`, model `gpt-5.5`, `cwd=/home/codex/repos/netscript-wave6-cli`, `approval=Never`,
+    `sandbox=DangerFullAccess`; launcher `/home/codex/run-wave6-4a6-mobile.sh` (reads
+    `/home/codex/wave6-4a6-message.txt`), log `/home/codex/wave6-4a6-mobile.jsonl`; rollout
+    `~/.codex/sessions/2026/06/17/rollout-…-019ed645-….jsonl`. Confirmed on-brief (pre-flight green,
+    reading plan rows + research + A6 gates). Orphan WIP cost: redone from scratch — acceptable.
+  - **This thread supersedes `019ed63b`.** Steer ONLY via `codex exec resume
+    019ed645-d204-7050-967e-f4d074f8f908`; **never** fire a second `send-message-v2` at this worktree.
   - `gh` still unauth in WSL → supervisor posts the per-slice PR #43 comments from pushed commits
     and triggers IMPL-EVALs (same as Assignment 1).
   - Tree prep: 7 CRLF-renorm `…/openhands/*/request.md` files set `--skip-worktree` so per-slice
