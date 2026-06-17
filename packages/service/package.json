@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:"
+  }
+}

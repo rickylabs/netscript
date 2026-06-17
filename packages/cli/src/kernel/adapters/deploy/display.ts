@@ -21,7 +21,7 @@ function resolveDefaultDeployDir(): string {
 }
 
 /** Standard CLI option defaults shared across operational commands. */
-export const OPTION_DEFAULTS = {
+export const OPTION_DEFAULTS: { readonly deployDir: string; readonly servyCli: string } = {
   deployDir: resolveDefaultDeployDir(),
   servyCli: DEFAULT_SERVY_CLI_PATH,
 } as const;

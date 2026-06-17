@@ -1,0 +1,275 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/use-tooltip.ts": {
+      "imports": [
+        {
+          "importedName": "JSX",
+          "originalName": "JSX",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/src/index.d.ts"
+        },
+        {
+          "importedName": "useSignal",
+          "originalName": "useSignal",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@preact/signals/2.9.1/dist/signals.d.ts"
+        },
+        {
+          "importedName": "useCallback",
+          "originalName": "useCallback",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/hooks/src/index.d.ts"
+        },
+        {
+          "importedName": "useEffect",
+          "originalName": "useEffect",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/hooks/src/index.d.ts"
+        },
+        {
+          "importedName": "useId",
+          "originalName": "useId",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/hooks/src/index.d.ts"
+        },
+        {
+          "importedName": "useRef",
+          "originalName": "useRef",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/hooks/src/index.d.ts"
+        },
+        {
+          "importedName": "composeEventHandlers",
+          "originalName": "composeEventHandlers",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/compose-event-handlers.ts"
+        },
+        {
+          "importedName": "composeRefs",
+          "originalName": "composeRefs",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/compose-refs.ts"
+        },
+        {
+          "importedName": "getPlatformAnchorName",
+          "originalName": "getPlatformAnchorName",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/platform-popover.ts"
+        },
+        {
+          "importedName": "getPositionArea",
+          "originalName": "getPositionArea",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/platform-popover.ts"
+        },
+        {
+          "importedName": "isPopoverOpen",
+          "originalName": "isPopoverOpen",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/platform-popover.ts"
+        },
+        {
+          "importedName": "mergePlatformStyle",
+          "originalName": "mergePlatformStyle",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/platform-popover.ts"
+        },
+        {
+          "importedName": "useSyncedPopover",
+          "originalName": "useSyncedPopover",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/platform-popover.ts"
+        },
+        {
+          "importedName": "useDismissableLayer",
+          "originalName": "useDismissableLayer",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/use-dismissable-layer.ts"
+        },
+        {
+          "importedName": "TooltipArrowElementProps",
+          "originalName": "TooltipArrowElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        },
+        {
+          "importedName": "TooltipArrowTipElementProps",
+          "originalName": "TooltipArrowTipElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        },
+        {
+          "importedName": "TooltipContentElementProps",
+          "originalName": "TooltipContentElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        },
+        {
+          "importedName": "TooltipOpenChangeReason",
+          "originalName": "TooltipOpenChangeReason",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        },
+        {
+          "importedName": "TooltipPositionerElementProps",
+          "originalName": "TooltipPositionerElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        },
+        {
+          "importedName": "TooltipTriggerElementProps",
+          "originalName": "TooltipTriggerElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        },
+        {
+          "importedName": "UseTooltipOptions",
+          "originalName": "UseTooltipOptions",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        },
+        {
+          "importedName": "UseTooltipReturn",
+          "originalName": "UseTooltipReturn",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/tooltip.types.ts"
+        }
+      ],
+      "symbols": [
+        {
+          "name": "getTooltipDataState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/use-tooltip.ts",
+                "line": 24,
+                "col": 0,
+                "byteIndex": 785
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "open",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  }
+                ],
+                "returnType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "open",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "open"
+                      }
+                    },
+                    {
+                      "repr": "closed",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "closed"
+                      }
+                    }
+                  ]
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "useTooltip",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/tooltip/use-tooltip.ts",
+                "line": 28,
+                "col": 0,
+                "byteIndex": 895
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "assign",
+                    "left": {
+                      "kind": "object",
+                      "props": [
+                        {
+                          "kind": "assign",
+                          "key": "closeDelay",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "defaultOpen",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "disabled",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "id",
+                          "value": null
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "interactive",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "onOpenChange",
+                          "value": null
+                        },
+                        {
+                          "kind": "keyValue",
+                          "key": "open",
+                          "value": {
+                            "kind": "identifier",
+                            "name": "controlledOpen",
+                            "optional": false
+                          }
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "openDelay",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "placement",
+                          "value": "[UNSUPPORTED]"
+                        }
+                      ],
+                      "optional": false,
+                      "tsType": {
+                        "repr": "UseTooltipOptions",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "UseTooltipOptions",
+                          "resolution": {
+                            "kind": "import",
+                            "specifier": "./tooltip.types.ts",
+                            "name": "UseTooltipOptions"
+                          }
+                        }
+                      }
+                    },
+                    "right": "[UNSUPPORTED]"
+                  }
+                ],
+                "returnType": {
+                  "repr": "UseTooltipReturn",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "UseTooltipReturn",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "./tooltip.types.ts",
+                      "name": "UseTooltipReturn"
+                    }
+                  }
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

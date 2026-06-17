@@ -1,0 +1,11 @@
+{
+  "command": "deno run -A --no-lock main.tsx",
+  "url": "http://127.0.0.1:8071/",
+  "statusCode": 200,
+  "containsSsrMarker": true,
+  "containsZagScope": true,
+  "containsSelectedCity": true,
+  "containsHydrationScript": false,
+  "htmlBytes": 2222,
+  "timestampUtc": "2026-06-11T17:10:07.9159888Z"
+}

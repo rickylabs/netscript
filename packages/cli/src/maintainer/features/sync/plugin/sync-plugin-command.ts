@@ -23,7 +23,7 @@ export interface SyncPluginCommandDependencies {
 /** Create the maintainer `sync plugin` command. */
 export function createSyncPluginCommand(
   dependencies: SyncPluginCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   const resolveProjectName = dependencies.resolveProjectName ??
     ((projectRoot: string) => basename(projectRoot));

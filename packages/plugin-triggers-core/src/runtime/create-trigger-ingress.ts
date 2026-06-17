@@ -1,6 +1,5 @@
 import {
   TRIGGER_INGRESS_MAX_RESPONSE_MS,
-  type TriggerDefinition,
   type TriggerEvent,
   type TriggerEventId,
   type TriggerId,
@@ -24,7 +23,8 @@ export type TriggerIngressEventIdFactory = (
   definition: RuntimeWebhookDefinition,
 ) => TriggerEventId;
 
-type RuntimeWebhookDefinition = WebhookDefinition<string, never, never>;
+/** Webhook definition shape accepted by the trigger ingress runtime. */
+export type RuntimeWebhookDefinition = WebhookDefinition<string, never, never>;
 
 /** Options accepted by the trigger ingress composition root. */
 export type TriggerIngressOptions = Readonly<{
@@ -94,7 +94,7 @@ class DefaultTriggerIngress implements TriggerIngressPort {
       );
     }
 
-    const event = await this.#createEvent(request, definition, body, verification.idempotencyKey);
+    const event = this.#createEvent(request, definition, body, verification.idempotencyKey);
     await this.#eventStore.save(event);
     this.#processLater(event, definition);
 
@@ -123,12 +123,12 @@ class DefaultTriggerIngress implements TriggerIngressPort {
     return definition;
   }
 
-  async #createEvent(
+  #createEvent(
     request: TriggerIngressRequest,
     definition: RuntimeWebhookDefinition,
     body: Uint8Array,
     idempotencyKey: string | undefined,
-  ): Promise<TriggerEvent<'webhook', WebhookTriggerPayload>> {
+  ): TriggerEvent<'webhook', WebhookTriggerPayload> {
     const now = this.#now().toISOString();
     const headers = headersToRecord(request.request.headers);
     const payloadBody = parseWebhookBody(body, request.request.headers);

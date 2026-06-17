@@ -14,5 +14,6 @@ export type WebhookVerificationResult = Readonly<{
 
 /** Verifies inbound webhook authenticity and extracts provider event ids. */
 export interface WebhookVerifierPort {
+  /** Verify an inbound webhook request. */
   verify(request: WebhookVerificationRequest): Promise<WebhookVerificationResult>;
 }

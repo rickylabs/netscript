@@ -18,7 +18,7 @@ import type {
   ListenOptions,
   MessageContext,
   MessageQueue,
-} from '../interfaces/message-queue.ts';
+} from '../ports/message-queue.ts';
 
 /**
  * Role for distributed queue mode.

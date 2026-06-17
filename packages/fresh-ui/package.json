@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@preact/signals": "catalog:",
+    "clsx": "catalog:",
+    "preact": "catalog:",
+    "tailwind-merge": "catalog:"
+  }
+}

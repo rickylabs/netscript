@@ -16,8 +16,9 @@
  *
  * Copying packages *into* the scaffold makes them first-class workspace
  * members whose own `deno.json` imports maps participate in resolution.
- * The result is a zero-imports root `deno.json` — the workspace is a
- * workspace manifest, not a dependency manager.
+ * The generated root `deno.json` remains a workspace manifest, but it also
+ * mirrors the producer catalog so copied package-level `catalog:` imports
+ * resolve inside the consumer workspace.
  *
  * ## Filters
  *
@@ -36,40 +37,45 @@
  * scaffold.
  */
 
-import { ensureDir } from '@std/fs';
-import { join, relative } from '@std/path';
-import { SCAFFOLD_DIRS } from '../../kernel/constants/scaffold/scaffold-dirs.ts';
+import { ensureDir } from "@std/fs";
+import { join, relative } from "@std/path";
+import { SCAFFOLD_DIRS } from "../../kernel/constants/scaffold/scaffold-dirs.ts";
 import {
   SCAFFOLD_ENGINE_WORKSPACE_PACKAGES,
   SCAFFOLD_WORKSPACE_PACKAGES,
-} from '../../kernel/constants/scaffold/scaffold-workspace-packages.ts';
-import { copyDirectoryFiltered } from '../../kernel/adapters/scaffold/directory-copier.ts';
+} from "../../kernel/constants/scaffold/scaffold-workspace-packages.ts";
+import { copyDirectoryFiltered } from "../../kernel/adapters/scaffold/directory-copier.ts";
+import {
+  readRootCatalog,
+  rewriteCopiedDenoJsons,
+} from "./plugin-import-rewriter.ts";
 import type {
   CopyLocalPackagesOptions,
   CopyLocalPackagesResult,
   PackageCopierPort,
-} from '../ports/package-copier-port.ts';
+} from "../ports/package-copier-port.ts";
 
 /** Directory names that must never be copied into a scaffold. */
 const SKIP_DIRS: readonly string[] = [
-  'node_modules',
-  '.deno',
-  '__snapshots__',
-  '_fresh',
+  "node_modules",
+  ".deno",
+  "__snapshots__",
+  "_fresh",
 ];
 
 /** Test-file suffixes that are stripped from the copied package. */
 const TEST_FILE_SUFFIXES: readonly string[] = [
-  '_test.ts',
-  '_test.tsx',
-  '.test.ts',
-  '.test.tsx',
+  "_test.ts",
+  "_test.tsx",
+  ".test.ts",
+  ".test.tsx",
 ];
 
-const MYSQL_ADAPTER_PACKAGE = 'prisma-adapter-mysql';
+const MYSQL_ADAPTER_PACKAGE = "prisma-adapter-mysql";
 
 interface RootDenoJson {
   workspace?: unknown;
+  catalog?: unknown;
 }
 
 interface PackageDenoJson {
@@ -97,6 +103,7 @@ export async function copyLocalPackages(
   );
   const selectedPackages = options.packageNames ?? SCAFFOLD_WORKSPACE_PACKAGES;
   const allPackages = [...new Set([...selectedPackages, ...enginePackages])];
+  const sourceCatalog = await readRootCatalog(options.sourceRoot);
 
   for (const pkg of allPackages) {
     const sourcePkgDir = join(options.sourceRoot, SCAFFOLD_DIRS.PACKAGES, pkg);
@@ -125,9 +132,21 @@ export async function copyLocalPackages(
     });
     directoriesCreated.push(...copyResult.directoriesCreated);
     filesCreated.push(...copyResult.filesCreated);
+
+    await rewriteCopiedDenoJsons({
+      root: destPkgDir,
+      projectName: "",
+      importMode: "local",
+      workspacePackageName: null,
+      catalog: sourceCatalog,
+    });
   }
 
-  await addWorkspaceMembers(options.targetPath, allPackages);
+  await updateRootWorkspaceConfig(
+    options.targetPath,
+    allPackages,
+    sourceCatalog,
+  );
 
   if (!allPackages.includes(MYSQL_ADAPTER_PACKAGE)) {
     await pruneMysqlAdapterFromDatabasePackage(destPackagesRoot, filesCreated);
@@ -146,13 +165,14 @@ export function createPackageCopier(): PackageCopierPort {
 }
 
 /** Unused; retained to expose {@link relative} for tests in future slices. */
-export const _internal = { relative };
+export const _internal: Record<string, unknown> = { relative };
 
-async function addWorkspaceMembers(
+async function updateRootWorkspaceConfig(
   targetPath: string,
   packageNames: readonly string[],
+  sourceCatalog?: Readonly<Record<string, string>>,
 ): Promise<void> {
-  const denoJsonPath = join(targetPath, 'deno.json');
+  const denoJsonPath = join(targetPath, "deno.json");
   let root: RootDenoJson;
   try {
     root = JSON.parse(await Deno.readTextFile(denoJsonPath)) as RootDenoJson;
@@ -163,22 +183,33 @@ async function addWorkspaceMembers(
     throw error;
   }
 
+  if (sourceCatalog) {
+    root.catalog = sourceCatalog;
+  }
+
   const existing = Array.isArray(root.workspace) ? root.workspace : [];
-  const workspace = existing.filter((member): member is string => typeof member === 'string');
+  const workspace = existing.filter((member): member is string =>
+    typeof member === "string"
+  );
   const next = new Set(workspace);
   for (const packageName of packageNames) {
     next.add(`./${SCAFFOLD_DIRS.PACKAGES}/${packageName}`);
   }
 
   root.workspace = [...next];
-  await Deno.writeTextFile(denoJsonPath, JSON.stringify(root, null, 2) + '\n');
+  await Deno.writeTextFile(denoJsonPath, JSON.stringify(root, null, 2) + "\n");
 }
 
 async function pruneMysqlAdapterFromDatabasePackage(
   destPackagesRoot: string,
   filesCreated: string[],
 ): Promise<void> {
-  const adapterPath = join(destPackagesRoot, 'database', 'adapters', 'mysql.adapter.ts');
+  const adapterPath = join(
+    destPackagesRoot,
+    "database",
+    "adapters",
+    "mysql.adapter.ts",
+  );
   try {
     await Deno.remove(adapterPath);
     removeCreatedFile(filesCreated, adapterPath);
@@ -188,12 +219,14 @@ async function pruneMysqlAdapterFromDatabasePackage(
     }
   }
 
-  const denoJsonPath = join(destPackagesRoot, 'database', 'deno.json');
-  const raw = JSON.parse(await Deno.readTextFile(denoJsonPath)) as PackageDenoJson;
+  const denoJsonPath = join(destPackagesRoot, "database", "deno.json");
+  const raw = JSON.parse(
+    await Deno.readTextFile(denoJsonPath),
+  ) as PackageDenoJson;
   if (raw.exports) {
-    delete raw.exports['./adapters/mysql'];
+    delete raw.exports["./adapters/mysql"];
   }
-  await Deno.writeTextFile(denoJsonPath, JSON.stringify(raw, null, 2) + '\n');
+  await Deno.writeTextFile(denoJsonPath, JSON.stringify(raw, null, 2) + "\n");
 }
 
 function removeCreatedFile(filesCreated: string[], path: string): void {

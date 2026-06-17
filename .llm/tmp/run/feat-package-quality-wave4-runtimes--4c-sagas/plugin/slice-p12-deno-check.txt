@@ -1,0 +1,14 @@
+Check mod.ts
+Check src/public/mod.ts
+Check src/plugin/mod.ts
+Check src/cli/mod.ts
+Check src/scaffolding/mod.ts
+Check src/e2e/mod.ts
+Check src/aspire/mod.ts
+Check src/runtime/mod.ts
+Check contracts/v1/mod.ts
+Check services/src/main.ts
+Check streams/mod.ts
+Check streams/server.ts
+Check tests/aspire/sagas-contribution_test.ts
+Check tests/e2e/sagas-gates_test.ts

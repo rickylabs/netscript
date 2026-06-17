@@ -18,7 +18,7 @@ const PRODUCER_TASKS = {
   'e2e:cli': 'deno run --allow-all packages/cli/e2e/cli.ts',
   fmt: 'deno fmt',
   lint: 'deno lint',
-  'arch:check': 'deno run --allow-read tools/fitness/check-doctrine.ts',
+  'arch:check': 'deno run --allow-read .llm/tools/fitness/check-doctrine.ts',
 } as const;
 
 interface DenoJson {
@@ -104,22 +104,6 @@ export async function removeScaffoldOnlyRoots(
     if (await fs.exists(path)) {
       await fs.remove(path);
     }
-  }
-}
-
-export async function markExamplesNonPublishable(
-  targetPath: string,
-  fs: FileSystemPort,
-): Promise<void> {
-  const examplesRoot = join(targetPath, 'examples');
-  if (!await fs.exists(examplesRoot)) return;
-  for (const entry of await fs.readDir(examplesRoot)) {
-    if (!entry.isDirectory || entry.name.startsWith('.')) continue;
-    const denoJsonPath = join(examplesRoot, entry.name, 'deno.json');
-    if (!await fs.exists(denoJsonPath)) continue;
-    const json = JSON.parse(await fs.readFile(denoJsonPath)) as DenoJson;
-    json.publish = false;
-    await fs.writeFile(denoJsonPath, JSON.stringify(json, null, 2) + '\n');
   }
 }
 

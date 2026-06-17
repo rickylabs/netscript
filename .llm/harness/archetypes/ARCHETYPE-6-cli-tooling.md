@@ -9,12 +9,12 @@
 
 - Axioms: A1, A2, A4, A5, A6, A7, A8, A9, A10, A11, A13, A14.
 - Primary sections:
-  - `doctrine/02-public-surface.md`
-  - `doctrine/03-base-and-derived-classes.md` (incl. R-BASE-L2)
-  - `doctrine/05-folder-structure.md` (incl. R-FOLD-CARD, R-FOLD-LAYERING-MODE, R-FOLD-AD-COLOC)
-  - `doctrine/06-archetypes.md#archetype-6--cli--tooling-package`
-  - `doctrine/07-composition-and-extension.md` (incl. R-COMP-DECL, R-COMP-EXT-MANIFEST)
-  - `doctrine/09-anti-patterns-and-fitness-functions.md`
+  - `docs/architecture/doctrine/02-public-surface.md`
+  - `docs/architecture/doctrine/03-base-and-derived-classes.md` (incl. R-BASE-L2)
+  - `docs/architecture/doctrine/05-folder-structure.md` (incl. R-FOLD-CARD, R-FOLD-LAYERING-MODE, R-FOLD-AD-COLOC)
+  - `docs/architecture/doctrine/06-archetypes.md#archetype-6--cli--tooling-package`
+  - `docs/architecture/doctrine/07-composition-and-extension.md` (incl. R-COMP-DECL, R-COMP-EXT-MANIFEST)
+  - `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`
 - Anti-patterns: AP-1, AP-2, AP-3, AP-4, AP-5, AP-6, AP-7, AP-8, AP-9, AP-11, AP-13, AP-14, AP-15,
   AP-16, AP-18, AP-19, AP-20, AP-21, AP-22, AP-23, AP-24, AP-25.
 - Universal fitness functions: F-1, F-2, F-3, F-4, F-5, F-6, F-7, F-8, F-9, F-10, F-11, F-12, F-15,
@@ -244,10 +244,10 @@ Implementation lives in `.llm/tools/fitness/check-cli-*.ts`. Phase A runs may re
 
 ## Read First
 
-1. `doctrine/06-archetypes.md#archetype-6--cli--tooling-package`.
-2. `doctrine/05-folder-structure.md` (incl. R-FOLD-CARD, R-FOLD-LAYERING-MODE, R-FOLD-AD-COLOC).
-3. `doctrine/03-base-and-derived-classes.md` (incl. R-BASE-L2).
-4. `doctrine/07-composition-and-extension.md` (incl. R-COMP-DECL, R-COMP-EXT-MANIFEST).
+1. `docs/architecture/doctrine/06-archetypes.md#archetype-6--cli--tooling-package`.
+2. `docs/architecture/doctrine/05-folder-structure.md` (incl. R-FOLD-CARD, R-FOLD-LAYERING-MODE, R-FOLD-AD-COLOC).
+3. `docs/architecture/doctrine/03-base-and-derived-classes.md` (incl. R-BASE-L2).
+4. `docs/architecture/doctrine/07-composition-and-extension.md` (incl. R-COMP-DECL, R-COMP-EXT-MANIFEST).
 5. The CLI's `mod.ts`, `maintainer.ts`, both `bin/*.ts`, both `<surface>/composition.ts`, the kernel
    `extension-points.ts`.
 6. The current feature most relevant to the slice (one folder under

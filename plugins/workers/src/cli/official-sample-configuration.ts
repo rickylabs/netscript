@@ -378,7 +378,11 @@ function generateCreateUserSettingsJob(): string {
 import { createSagaPublisher } from '@netscript/plugin-sagas/runtime';
 import { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
 import { z } from 'zod';
-import type { UserRegistrationMessage } from '../../../workers/saga-message-types.ts';
+
+type UserRegistrationMessage = {
+  type: 'UserSettingsCreated';
+  payload: { userId: string };
+};
 
 const CreateUserSettingsPayloadSchema = z.object({
   userId: z.string().min(1, 'userId is required'),

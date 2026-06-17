@@ -7,6 +7,9 @@
     "examples/*",
     "apps/*"
   ],
+  "exclude": [
+    ".llm/tmp/"
+  ],
   "unstable": [
     "kv",
     "temporal",
@@ -15,13 +18,24 @@
     "raw-imports"
   ],
   "tasks": {
-    "check": "deno check --unstable-kv ./packages ./plugins",
+    "ci": "deno ci && deno task ci:quality && deno task coverage:functions && deno task publish:dry-run && deno task audit:critical",
+    "ci:quality": "deno run --allow-run .llm/tools/run-parallel-tasks.ts check lint fmt:check",
+    "check": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
     "test": "deno test --allow-all",
-    "publish:dry-run": "deno publish --dry-run --allow-dirty",
+    "coverage:functions": "rm -rf .llm/tmp/coverage/functions && deno test --allow-all --coverage=.llm/tmp/coverage/functions --coverage-raw-data-only packages/contracts/tests/errors_test.ts packages/service/tests/_fixtures/readme-examples_test.ts && deno run --allow-read --allow-write .llm/tools/report-function-coverage.ts --coverage .llm/tmp/coverage/functions --out .llm/tmp/coverage/function-report.json --package packages/contracts --package packages/plugin-triggers-core --package packages/service --package packages/plugin",
+    "audit:critical": "deno audit --level critical",
+    "deps:latest": "deno run --allow-read --allow-net .llm/tools/deps/latest.ts --pretty --behind-only",
+    "deps:outdated": "deno run --allow-read --allow-run .llm/tools/deps/outdated.ts --latest --pretty",
+    "deps:why": "deno run --allow-read --allow-run .llm/tools/deps/why.ts",
+    "deps:audit": "deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level low --pretty",
+    "deps:prod-install": "deno run --allow-read --allow-write --allow-net --allow-run --allow-env .llm/tools/deps/prod-install.ts --pretty",
+    "check:scaffold-versions": "deno run .llm/tools/check-scaffold-versions.ts --pretty",
+    "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
-    "fmt": "deno fmt",
-    "lint": "deno lint",
-    "arch:check": "deno run --allow-read tools/fitness/check-doctrine.ts"
+    "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
+    "fmt:check": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
+    "lint": "deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+    "arch:check": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
   },
   "imports": {},
   "compilerOptions": {
@@ -36,6 +50,11 @@
     ]
   },
   "lint": {
+    "exclude": [
+      ".llm/",
+      "tools/",
+      "packages/cli/"
+    ],
     "rules": {
       "tags": [
         "recommended",
@@ -48,11 +67,57 @@
     }
   },
   "fmt": {
+    "include": [
+      "packages/**/*.ts",
+      "packages/**/*.tsx",
+      "plugins/**/*.ts",
+      "plugins/**/*.tsx"
+    ],
+    "exclude": [
+      "packages/cli/",
+      "**/.generated/",
+      "**/node_modules/"
+    ],
     "useTabs": false,
     "lineWidth": 100,
     "indentWidth": 2,
     "semiColons": true,
     "singleQuote": true
   },
-  "publish": false
+  "publish": false,
+  "catalog": {
+    "@durable-streams/client": "^0.2.6",
+    "@durable-streams/server": "^0.3.7",
+    "@durable-streams/state": "^0.3.1",
+    "@opentelemetry/api": "^1.9.1",
+    "@orpc/client": "^1.14.6",
+    "@orpc/contract": "^1.14.6",
+    "@orpc/openapi": "^1.14.6",
+    "@orpc/server": "^1.14.6",
+    "@orpc/tanstack-query": "^1.14.6",
+    "@orpc/zod": "^1.14.6",
+    "@preact/signals": "2.9.2",
+    "@prisma/adapter-mssql": "^7.8.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@prisma/driver-adapter-utils": "^7.8.0",
+    "@prisma/instrumentation-contract": "^7.8.0",
+    "@saga-bus/core": "^0.2.2",
+    "@tanstack/db": "^0.6.8",
+    "@tanstack/preact-query": "^5.101.0",
+    "@tanstack/query-core": "^5.101.0",
+    "@tanstack/query-db-collection": "^1.0.40",
+    "@tanstack/react-db": "^0.1.86",
+    "@tailwindcss/vite": "^4.3.1",
+    "amqplib": "^2.0.1",
+    "clsx": "^2.1.1",
+    "ioredis": "^5.11.1",
+    "mysql2": "^3.22.5",
+    "pg": "^8.21.0",
+    "preact": "^10.29.2",
+    "preact-render-to-string": "^6.7.0",
+    "tailwindcss": "^4.3.1",
+    "tailwind-merge": "^3.6.0",
+    "vite": "7.2.2"
+  }
 }

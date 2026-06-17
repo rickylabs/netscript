@@ -29,8 +29,12 @@ export type SagaHistoryEvent<TState extends SagaState = SagaState> = Readonly<{
 
 /** Reserved T3 port for deterministic replay and audit history. */
 export interface SagaHistoryStorePort {
+  /** Stable adapter identifier used by runtime diagnostics and plugin registration. */
   readonly id: string;
+  /** Append a replayable history event. */
   append<TState extends SagaState>(event: SagaHistoryEvent<TState>): Promise<void>;
+  /** Read all retained history events for an instance. */
   read(instanceId: SagaInstanceId): Promise<readonly SagaHistoryEvent[]>;
+  /** Read retained history events after a sequence number. */
   readAfter(instanceId: SagaInstanceId, sequence: number): Promise<readonly SagaHistoryEvent[]>;
 }

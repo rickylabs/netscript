@@ -25,7 +25,7 @@
  */
 
 import { RedisKvAdapter } from './adapters/redis.adapter.ts';
-import { registerKvAdapter } from './core/shared.ts';
+import { registerKvAdapter } from './application/shared.ts';
 
 // ---------------------------------------------------------------------------
 // Self-registration — runs once on first import of this module.

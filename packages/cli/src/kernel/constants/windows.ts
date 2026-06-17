@@ -46,12 +46,12 @@ export const DEFAULT_V8_HEAP_MB = {
 /**
  * Default compile timeout per service in milliseconds.
  */
-export const DEFAULT_COMPILE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+export const DEFAULT_COMPILE_TIMEOUT_MS: number = 5 * 60 * 1000; // 5 minutes
 
 /**
  * Default bundle timeout per service in milliseconds.
  */
-export const DEFAULT_BUNDLE_TIMEOUT_MS = 60 * 1000; // 60 seconds
+export const DEFAULT_BUNDLE_TIMEOUT_MS: number = 60 * 1000; // 60 seconds
 
 /**
  * Servy XML StartupType integer values.
@@ -151,8 +151,8 @@ export const DEFAULT_BUNDLE_EXTERNAL_IMPORTS: Record<string, string> = {
   'rdf-canonize-native': 'npm:rdf-canonize-native@^2.0.0',
   'ioredis': 'npm:ioredis@^5',
   'pg': 'npm:pg@^8.13.1',
-  '@orpc/server': 'npm:@orpc/server@^1.13.5',
-  '@orpc/contract': 'npm:@orpc/contract@^1.13.5',
+  '@orpc/server': 'npm:@orpc/server@^1.14.6',
+  '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
   'lmdb': 'npm:lmdb@^3.5.3',
   '@durable-streams/server': 'npm:@durable-streams/server@^0.2.3',
 };
@@ -175,7 +175,7 @@ export const DEFAULT_BUNDLE_EXTERNAL_IMPORTS: Record<string, string> = {
  * Workspace members are injected at build time from the discovered Deno
  * workspace (or an explicit deploy.windows.workspace override).
  */
-export const COMPILE_CONFIG = {
+export const COMPILE_CONFIG: { readonly content: string } = {
   /**
    * JSON content for the per-target temp compile config.
    * Written as `.compile-<target>.json` in projectRoot during build (cleaned up after).
@@ -190,8 +190,8 @@ export const COMPILE_CONFIG = {
         'rdf-canonize-native': 'npm:rdf-canonize-native@^2.0.0',
         'ioredis': 'npm:ioredis@^5',
         'pg': 'npm:pg@^8.13.1',
-        '@orpc/server': 'npm:@orpc/server@^1.13.5',
-        '@orpc/contract': 'npm:@orpc/contract@^1.13.5',
+        '@orpc/server': 'npm:@orpc/server@^1.14.6',
+        '@orpc/contract': 'npm:@orpc/contract@^1.14.6',
         'lmdb': 'npm:lmdb@^3.5.3',
         '@durable-streams/server': 'npm:@durable-streams/server@^0.2.3',
       },
@@ -215,18 +215,18 @@ export const COMPILE_CONFIG = {
 // names. They will be removed once all consumers are updated.
 // ============================================================================
 /** @deprecated Use DEFAULT_SERVY_CLI_PATH */
-export const SERVY_CLI_PATH = DEFAULT_SERVY_CLI_PATH;
+export const SERVY_CLI_PATH: string = DEFAULT_SERVY_CLI_PATH;
 /** @deprecated Use DEFAULT_COMPILE_TARGET */
-export const WINDOWS_TARGET = DEFAULT_COMPILE_TARGET;
+export const WINDOWS_TARGET: string = DEFAULT_COMPILE_TARGET;
 /** @deprecated Use DEFAULT_SERVICE_PREFIX */
-export const WINDOWS_SERVICE_PREFIX = DEFAULT_SERVICE_PREFIX;
+export const WINDOWS_SERVICE_PREFIX: string = DEFAULT_SERVICE_PREFIX;
 /** @deprecated Use DEFAULT_BUNDLE_EXTERNAL */
-export const BUNDLE_EXTERNAL_PACKAGES = DEFAULT_BUNDLE_EXTERNAL;
+export const BUNDLE_EXTERNAL_PACKAGES: readonly string[] = DEFAULT_BUNDLE_EXTERNAL;
 /** @deprecated Use DEFAULT_BUNDLE_EXTERNAL_IMPORTS */
-export const BUNDLE_EXTERNAL_IMPORTS = DEFAULT_BUNDLE_EXTERNAL_IMPORTS;
+export const BUNDLE_EXTERNAL_IMPORTS: Record<string, string> = DEFAULT_BUNDLE_EXTERNAL_IMPORTS;
 /** @deprecated Use DEFAULT_COMPILE_TIMEOUT_MS */
-export const COMPILE_TIMEOUT_MS = DEFAULT_COMPILE_TIMEOUT_MS;
+export const COMPILE_TIMEOUT_MS: number = DEFAULT_COMPILE_TIMEOUT_MS;
 /** @deprecated Use DEFAULT_BUNDLE_TIMEOUT_MS */
-export const BUNDLE_TIMEOUT_MS = DEFAULT_BUNDLE_TIMEOUT_MS;
+export const BUNDLE_TIMEOUT_MS: number = DEFAULT_BUNDLE_TIMEOUT_MS;
 /** @deprecated Use DEFAULT_V8_HEAP_MB */
-export const V8_HEAP_MB = DEFAULT_V8_HEAP_MB;
+export const V8_HEAP_MB: typeof DEFAULT_V8_HEAP_MB = DEFAULT_V8_HEAP_MB;

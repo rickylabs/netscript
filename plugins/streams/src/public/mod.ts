@@ -1,10 +1,11 @@
-import { definePlugin } from '@netscript/plugin';
+import { definePlugin, PLUGIN_TYPES } from '@netscript/plugin';
 import type { PluginManifest } from '@netscript/plugin';
 import {
   defineStreamConsumer,
   defineStreamProducer,
   defineStreamTopic,
   type StreamConsumerHandle,
+  type StreamPayloadSchema,
   type StreamProducerHandle,
   type StreamTopicDefinition,
 } from './stream-api.ts';
@@ -138,7 +139,29 @@ export {
   defineStreamConsumer,
   defineStreamProducer,
   defineStreamTopic,
+  PLUGIN_TYPES,
   type StreamConsumerHandle,
+  type StreamPayloadSchema,
   type StreamProducerHandle,
   type StreamTopicDefinition,
 };
+export type {
+  BackgroundProcessorContribution,
+  ContractVersionContribution,
+  DbSchemaContribution,
+  E2eContribution,
+  MigrationContribution,
+  PluginContext,
+  PluginContributions,
+  PluginDependencies,
+  PluginLifecycleHooks,
+  PluginLogger,
+  PluginManifest,
+  PluginMetadata,
+  PluginMetadataValue,
+  PluginType,
+  RuntimeConfigTopicContribution,
+  ServiceContribution,
+  StreamTopicContribution,
+  TelemetryContribution,
+} from '@netscript/plugin';

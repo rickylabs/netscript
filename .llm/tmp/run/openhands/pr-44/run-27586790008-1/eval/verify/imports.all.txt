@@ -1,0 +1,416 @@
+=== deno.json ===
+# name: 
+# catalog_entries: 31
+  CAT @durable-streams/client ^0.2.3
+  CAT @durable-streams/server ^0.2.3
+  CAT @durable-streams/state ^0.2.3
+  CAT @opentelemetry/api ^1.9.1
+  CAT @orpc/client ^1.14.6
+  CAT @orpc/contract ^1.14.6
+  CAT @orpc/openapi ^1.14.6
+  CAT @orpc/server ^1.14.6
+  CAT @orpc/tanstack-query ^1.14.6
+  CAT @orpc/zod ^1.14.6
+  CAT @preact/signals ^2.5.0
+  CAT @prisma/adapter-mssql ^7.4.2
+  CAT @prisma/adapter-pg ^7.4.2
+  CAT @prisma/client ^7.4.2
+  CAT @prisma/driver-adapter-utils ^7.4.2
+  CAT @prisma/instrumentation-contract ^7.4.2
+  CAT @saga-bus/core ^0.2.2
+  CAT @tanstack/db ^0.6.1
+  CAT @tanstack/preact-query ^5.75.5
+  CAT @tanstack/query-core ^5.75.5
+  CAT @tanstack/query-db-collection ^1.0.32
+  CAT @tanstack/react-db ^0.1.79
+  CAT amqplib ^0.10.4
+  CAT clsx ^2.1.1
+  CAT ioredis ^5.4.1
+  CAT mysql2 ^3.22.3
+  CAT pg ^8.13.1
+  CAT preact ^10.29.2
+  CAT preact-render-to-string ^6.7.0
+  CAT tailwind-merge ^3.5.0
+  CAT vite 7.2.2
+# import_entries: 0
+=== packages/service/deno.json ===
+# name: @netscript/service
+# catalog_entries: 0
+# import_entries: 14
+  IMP @netscript/logger ../logger/mod.ts
+  IMP @netscript/telemetry ../telemetry/mod.ts
+  IMP @orpc/client/plugins npm:@orpc/client@^1.14.6/plugins
+  IMP @orpc/openapi catalog:
+  IMP @orpc/openapi/fetch npm:@orpc/openapi@^1.14.6/fetch
+  IMP @orpc/server catalog:
+  IMP @orpc/server/fetch npm:@orpc/server@^1.14.6/fetch
+  IMP @orpc/server/plugins npm:@orpc/server@^1.14.6/plugins
+  IMP @orpc/zod catalog:
+  IMP @orpc/zod/zod4 npm:@orpc/zod@^1.14.6/zod4
+  IMP @std/assert jsr:@std/assert@^1
+  IMP hono jsr:@hono/hono@4.12.24
+  IMP hono/cors jsr:@hono/hono@4.12.24/cors
+  IMP hono/logger jsr:@hono/hono@4.12.24/logger
+=== packages/plugin-sagas-core/deno.json ===
+# name: @netscript/plugin-sagas-core
+# catalog_entries: 0
+# import_entries: 9
+  IMP @netscript/plugin-streams-core ../plugin-streams-core/mod.ts
+  IMP @netscript/plugin-workers-core ../plugin-workers-core/mod.ts
+  IMP @orpc/contract catalog:
+  IMP @orpc/server catalog:
+  IMP @saga-bus/core catalog:
+  IMP @std/assert jsr:@std/assert@^1
+  IMP hono jsr:@hono/hono@4.12.24
+  IMP ioredis catalog:
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/fresh/deno.json ===
+# name: @netscript/fresh
+# catalog_entries: 0
+# import_entries: 23
+  IMP @durable-streams/state catalog:
+  IMP @netscript/logger ../logger/mod.ts
+  IMP @netscript/plugin-streams-core ../plugin-streams-core/mod.ts
+  IMP @netscript/sdk ../sdk/mod.ts
+  IMP @netscript/sdk/query-client ../sdk/src/query-client/mod.ts
+  IMP @netscript/telemetry ../telemetry/mod.ts
+  IMP @preact/signals catalog:
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/http jsr:@std/http@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP @std/text jsr:@std/text@^1
+  IMP @tanstack/preact-query catalog:
+  IMP @tanstack/query-core catalog:
+  IMP @tanstack/react-db catalog:
+  IMP fresh jsr:@fresh/core@^2.3.0
+  IMP preact catalog:
+  IMP preact-render-to-string catalog:
+  IMP preact-render-to-string/stream npm:preact-render-to-string@^6.6.5/stream
+  IMP preact/compat npm:preact@^10.29.1/compat
+  IMP preact/hooks npm:preact@^10.29.1/hooks
+  IMP preact/jsx-runtime npm:preact@^10.29.1/jsx-runtime
+  IMP vite catalog:
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/sdk/deno.json ===
+# name: @netscript/sdk
+# catalog_entries: 0
+# import_entries: 17
+  IMP @netscript/kv ../kv/mod.ts
+  IMP @netscript/plugin-streams-core ../plugin-streams-core/mod.ts
+  IMP @netscript/telemetry ../telemetry/mod.ts
+  IMP @orpc/client catalog:
+  IMP @orpc/client/fetch npm:@orpc/client@^1.14.6/fetch
+  IMP @orpc/client/plugins npm:@orpc/client@^1.14.6/plugins
+  IMP @orpc/client/standard npm:@orpc/client@^1.14.6/standard
+  IMP @orpc/contract catalog:
+  IMP @orpc/openapi catalog:
+  IMP @orpc/server catalog:
+  IMP @orpc/tanstack-query catalog:
+  IMP @orpc/zod catalog:
+  IMP @standard-schema/spec jsr:@standard-schema/spec@1.1.0
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @tanstack/db catalog:
+  IMP @tanstack/query-core catalog:
+  IMP @tanstack/query-db-collection catalog:
+=== packages/logger/deno.json ===
+# name: @netscript/logger
+# catalog_entries: 0
+# import_entries: 4
+  IMP @logtape/logtape jsr:@logtape/logtape@^2.0
+  IMP @orpc/server/plugins npm:@orpc/server@^1.14.6/plugins
+  IMP @std/assert jsr:@std/assert@^1
+  IMP hono jsr:@hono/hono@4.12.24
+=== packages/cron/deno.json ===
+# name: @netscript/cron
+# catalog_entries: 0
+# import_entries: 2
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/async jsr:@std/async@^1
+=== packages/fresh-ui/deno.json ===
+# name: @netscript/fresh-ui
+# catalog_entries: 0
+# import_entries: 7
+  IMP @preact/signals catalog:
+  IMP @std/assert jsr:@std/assert@^1
+  IMP clsx catalog:
+  IMP preact catalog:
+  IMP preact/hooks npm:preact@^10.29.1/hooks
+  IMP preact/jsx-runtime npm:preact@^10.29.1/jsx-runtime
+  IMP tailwind-merge catalog:
+=== packages/runtime-config/deno.json ===
+# name: @netscript/runtime-config
+# catalog_entries: 0
+# import_entries: 1
+  IMP @std/path jsr:@std/path@^1
+=== packages/plugin-streams-core/deno.json ===
+# name: @netscript/plugin-streams-core
+# catalog_entries: 0
+# import_entries: 3
+  IMP @durable-streams/client catalog:
+  IMP @durable-streams/state catalog:
+  IMP @std/assert jsr:@std/assert@^1
+=== packages/watchers/deno.json ===
+# name: @netscript/watchers
+# catalog_entries: 0
+# import_entries: 4
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/async jsr:@std/async@^1
+  IMP @std/fs jsr:@std/fs@^1
+  IMP @std/path jsr:@std/path@^1
+=== packages/config/deno.json ===
+# name: @netscript/config
+# catalog_entries: 0
+# import_entries: 3
+  IMP @std/fs jsr:@std/fs@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/plugin-triggers-core/deno.json ===
+# name: @netscript/plugin-triggers-core
+# catalog_entries: 0
+# import_entries: 5
+  IMP @netscript/plugin-workers-core ../plugin-workers-core/mod.ts
+  IMP @orpc/contract catalog:
+  IMP @orpc/server catalog:
+  IMP @std/assert jsr:@std/assert@^1
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/plugin-workers-core/deno.json ===
+# name: @netscript/plugin-workers-core
+# catalog_entries: 0
+# import_entries: 8
+  IMP @david/dax jsr:@david/dax@^0.43
+  IMP @netscript/plugin-streams-core ../plugin-streams-core/mod.ts
+  IMP @orpc/contract catalog:
+  IMP @orpc/server catalog:
+  IMP @standard-schema/spec jsr:@standard-schema/spec@1.1.0
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/telemetry/deno.json ===
+# name: @netscript/telemetry
+# catalog_entries: 0
+# import_entries: 3
+  IMP @opentelemetry/api catalog:
+  IMP @orpc/contract catalog:
+  IMP @std/assert jsr:@std/assert@^1
+=== packages/database/deno.json ===
+# name: @netscript/database
+# catalog_entries: 0
+# import_entries: 6
+  IMP @opentelemetry/api catalog:
+  IMP @prisma/adapter-mssql catalog:
+  IMP @prisma/adapter-pg catalog:
+  IMP @prisma/client catalog:
+  IMP @prisma/instrumentation-contract catalog:
+  IMP pg catalog:
+=== packages/plugin/deno.json ===
+# name: @netscript/plugin
+# catalog_entries: 0
+# import_entries: 4
+  IMP @standard-schema/spec jsr:@standard-schema/spec@1.1.0
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/plugin/src/templates/skeleton/deno.json.template ===
+# name: {{pluginName}}
+# catalog_entries: 0
+# import_entries: 3
+  IMP @netscript/aspire jsr:@netscript/aspire@^0.0.1-alpha.0
+  IMP @netscript/plugin jsr:@netscript/plugin@^0.0.1-alpha.0
+  IMP @std/assert jsr:@std/assert@^1
+=== packages/queue/deno.json ===
+# name: @netscript/queue
+# catalog_entries: 0
+# import_entries: 10
+  IMP @fedify/amqp jsr:@fedify/amqp@^1.0.0
+  IMP @fedify/denokv jsr:@fedify/denokv@^1.0.0
+  IMP @fedify/fedify jsr:@fedify/fedify@^1.5.0
+  IMP @fedify/redis jsr:@fedify/redis@^1.0.0
+  IMP @netscript/kv ../kv/mod.ts
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/async jsr:@std/async@^1
+  IMP amqplib catalog:
+  IMP ioredis catalog:
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/kv/deno.json ===
+# name: @netscript/kv
+# catalog_entries: 0
+# import_entries: 8
+  IMP @netscript/logger ../logger/mod.ts
+  IMP @olli/kvdex jsr:@olli/kvdex@^3.5.0
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/async jsr:@std/async@^1
+  IMP @std/collections jsr:@std/collections@^1
+  IMP @std/data-structures jsr:@std/data-structures@^1
+  IMP @std/ulid jsr:@std/ulid@^1
+  IMP ioredis catalog:
+=== packages/cli/deno.json ===
+# name: @netscript/cli
+# catalog_entries: 0
+# import_entries: 19
+  IMP @cliffy/command jsr:@cliffy/command@^1.0.0-rc.7
+  IMP @cliffy/prompt jsr:@cliffy/prompt@^1.0.0
+  IMP @david/dax jsr:@david/dax@^0.43.0
+  IMP @netscript/aspire ../aspire/mod.ts
+  IMP @netscript/config ../config/mod.ts
+  IMP @netscript/logger ../logger/mod.ts
+  IMP @netscript/plugin ../plugin/mod.ts
+  IMP @std/async jsr:@std/async@^1
+  IMP @std/cli jsr:@std/cli@^1
+  IMP @std/collections jsr:@std/collections@^1
+  IMP @std/fmt jsr:@std/fmt@^1
+  IMP @std/fs jsr:@std/fs@^1
+  IMP @std/json jsr:@std/json@^1
+  IMP @std/jsonc jsr:@std/jsonc@^1
+  IMP @std/net jsr:@std/net@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP @std/semver jsr:@std/semver@^1
+  IMP @std/text jsr:@std/text@^1
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/cli/e2e/deno.json ===
+# name: @netscript/cli-e2e
+# catalog_entries: 0
+# import_entries: 4
+  IMP @cliffy/command jsr:@cliffy/command@^1.0.0-rc.7
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/fs jsr:@std/fs@^1
+  IMP @std/path jsr:@std/path@^1
+=== packages/prisma-adapter-mysql/deno.json ===
+# name: @netscript/prisma-adapter-mysql
+# catalog_entries: 0
+# import_entries: 2
+  IMP @prisma/driver-adapter-utils catalog:
+  IMP mysql2 catalog:
+=== packages/aspire/deno.json ===
+# name: @netscript/aspire
+# catalog_entries: 0
+# import_entries: 4
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/fs jsr:@std/fs@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP zod jsr:@zod/zod@4.4.3
+=== packages/contracts/deno.json ===
+# name: @netscript/contracts
+# catalog_entries: 0
+# import_entries: 2
+  IMP @orpc/server catalog:
+  IMP zod jsr:@zod/zod@4.4.3
+=== plugins/triggers/deno.json ===
+# name: @netscript/plugin-triggers
+# catalog_entries: 0
+# import_entries: 28
+  IMP @durable-streams/state catalog:
+  IMP @netscript/aspire ../../packages/aspire/src/public/mod.ts
+  IMP @netscript/contracts ../../packages/contracts/mod.ts
+  IMP @netscript/cron ../../packages/cron/mod.ts
+  IMP @netscript/plugin ../../packages/plugin/mod.ts
+  IMP @netscript/plugin-sagas-core ../../packages/plugin-sagas-core/mod.ts
+  IMP @netscript/plugin-streams-core ../../packages/plugin-streams-core/mod.ts
+  IMP @netscript/plugin-triggers-core ../../packages/plugin-triggers-core/mod.ts
+  IMP @netscript/plugin-triggers-core/adapters ../../packages/plugin-triggers-core/src/adapters/mod.ts
+  IMP @netscript/plugin-triggers-core/contracts/v1 ../../packages/plugin-triggers-core/src/contracts/v1/mod.ts
+  IMP @netscript/plugin-triggers-core/domain ../../packages/plugin-triggers-core/src/domain/mod.ts
+  IMP @netscript/plugin-triggers-core/ports ../../packages/plugin-triggers-core/src/ports/mod.ts
+  IMP @netscript/plugin-triggers-core/runtime ../../packages/plugin-triggers-core/src/runtime/mod.ts
+  IMP @netscript/plugin-triggers-core/telemetry ../../packages/plugin-triggers-core/src/telemetry/mod.ts
+  IMP @netscript/plugin-triggers-core/testing ../../packages/plugin-triggers-core/src/testing/mod.ts
+  IMP @netscript/plugin-workers-core ../../packages/plugin-workers-core/mod.ts
+  IMP @netscript/plugin-workers-core/runtime ../../packages/plugin-workers-core/src/runtime/mod.ts
+  IMP @netscript/queue ../../packages/queue/mod.ts
+  IMP @netscript/service ../../packages/service/mod.ts
+  IMP @netscript/telemetry/instrumentation ../../packages/telemetry/instrumentation.ts
+  IMP @netscript/telemetry/tracer ../../packages/telemetry/tracer.ts
+  IMP @netscript/watchers ../../packages/watchers/mod.ts
+  IMP @orpc/contract catalog:
+  IMP @orpc/server catalog:
+  IMP @std/assert jsr:@std/assert@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP hono jsr:@hono/hono@4.12.24
+  IMP zod jsr:@zod/zod@4.4.3
+=== plugins/workers/deno.json ===
+# name: @netscript/plugin-workers
+# catalog_entries: 0
+# import_entries: 38
+  IMP @durable-streams/client catalog:
+  IMP @durable-streams/state catalog:
+  IMP @hono/hono jsr:@hono/hono@4.12.24
+  IMP @netscript/aspire ../../packages/aspire/src/public/mod.ts
+  IMP @netscript/contracts ../../packages/contracts/mod.ts
+  IMP @netscript/cron ../../packages/cron/mod.ts
+  IMP @netscript/fresh/streams ../../packages/fresh/src/runtime/streams/mod.ts
+  IMP @netscript/kv ../../packages/kv/mod.ts
+  IMP @netscript/plugin ../../packages/plugin/mod.ts
+  IMP @netscript/plugin-streams ../streams/mod.ts
+  IMP @netscript/plugin-streams-core ../../packages/plugin-streams-core/mod.ts
+  IMP @netscript/plugin-workers-core ../../packages/plugin-workers-core/mod.ts
+  IMP @netscript/plugin-workers-core/contracts/v1 ../../packages/plugin-workers-core/src/contracts/v1/mod.ts
+  IMP @netscript/plugin-workers-core/executor ../../packages/plugin-workers-core/src/executor/mod.ts
+  IMP @netscript/plugin-workers-core/presets ../../packages/plugin-workers-core/src/presets/mod.ts
+  IMP @netscript/plugin-workers-core/registry ../../packages/plugin-workers-core/src/registry/mod.ts
+  IMP @netscript/plugin-workers-core/runtime ../../packages/plugin-workers-core/src/runtime/mod.ts
+  IMP @netscript/plugin-workers-core/schemas ../../packages/plugin-workers-core/src/domain/public-schema.ts
+  IMP @netscript/plugin-workers-core/state ../../packages/plugin-workers-core/src/state/mod.ts
+  IMP @netscript/plugin-workers-core/streams ../../packages/plugin-workers-core/src/streams/mod.ts
+  IMP @netscript/queue ../../packages/queue/mod.ts
+  IMP @netscript/service ../../packages/service/mod.ts
+  IMP @netscript/telemetry ../../packages/telemetry/mod.ts
+  IMP @orpc/contract catalog:
+  IMP @orpc/openapi catalog:
+  IMP @orpc/openapi/fetch npm:@orpc/openapi@^1.14.6/fetch
+  IMP @orpc/server catalog:
+  IMP @orpc/server/fetch npm:@orpc/server@^1.14.6/fetch
+  IMP @orpc/server/plugins npm:@orpc/server@^1.14.6/plugins
+  IMP @orpc/zod catalog:
+  IMP @orpc/zod/zod4 npm:@orpc/zod@^1.14.6/zod4
+  IMP @standard-schema/spec jsr:@standard-schema/spec@1.1.0
+  IMP @std/async jsr:@std/async@^1
+  IMP @std/path jsr:@std/path@^1
+  IMP @tanstack/db catalog:
+  IMP hono jsr:@hono/hono@4.12.24
+  IMP hono/cors jsr:@hono/hono@4.12.24/cors
+  IMP zod jsr:@zod/zod@4.4.3
+=== plugins/sagas/deno.json ===
+# name: @netscript/plugin-sagas
+# catalog_entries: 0
+# import_entries: 27
+  IMP @durable-streams/client catalog:
+  IMP @durable-streams/state catalog:
+  IMP @hono/hono jsr:@hono/hono@4.12.24
+  IMP @netscript/aspire ../../packages/aspire/src/public/mod.ts
+  IMP @netscript/contracts ../../packages/contracts/mod.ts
+  IMP @netscript/fresh/streams ../../packages/fresh/src/runtime/streams/mod.ts
+  IMP @netscript/kv ../../packages/kv/mod.ts
+  IMP @netscript/plugin ../../packages/plugin/mod.ts
+  IMP @netscript/plugin-sagas-core/domain ../../packages/plugin-sagas-core/src/domain/mod.ts
+  IMP @netscript/plugin-sagas-core/integration/publisher ../../packages/plugin-sagas-core/src/integration/publisher/mod.ts
+  IMP @netscript/plugin-sagas-core/runtime ../../packages/plugin-sagas-core/src/runtime/mod.ts
+  IMP @netscript/plugin-sagas-core/streams ../../packages/plugin-sagas-core/src/streams/mod.ts
+  IMP @netscript/plugin-streams ../streams/mod.ts
+  IMP @netscript/plugin-streams-core ../../packages/plugin-streams-core/mod.ts
+  IMP @netscript/plugin-workers ../workers/mod.ts
+  IMP @netscript/queue ../../packages/queue/mod.ts
+  IMP @netscript/service ../../packages/service/mod.ts
+  IMP @netscript/telemetry ../../packages/telemetry/mod.ts
+  IMP @netscript/telemetry/context ../../packages/telemetry/context.ts
+  IMP @orpc/contract catalog:
+  IMP @orpc/openapi catalog:
+  IMP @orpc/server catalog:
+  IMP @orpc/zod catalog:
+  IMP @std/async jsr:@std/async@^1
+  IMP @tanstack/db catalog:
+  IMP hono jsr:@hono/hono@4.12.24
+  IMP zod jsr:@zod/zod@4.4.3
+=== plugins/streams/deno.json ===
+# name: @netscript/plugin-streams
+# catalog_entries: 0
+# import_entries: 11
+  IMP @durable-streams/client catalog:
+  IMP @durable-streams/server catalog:
+  IMP @netscript/aspire ../../packages/aspire/src/public/mod.ts
+  IMP @netscript/plugin ../../packages/plugin/mod.ts
+  IMP @netscript/plugin-streams-core ../../packages/plugin-streams-core/mod.ts
+  IMP @netscript/service ../../packages/service/mod.ts
+  IMP @netscript/telemetry ../../packages/telemetry/mod.ts
+  IMP @standard-schema/spec jsr:@standard-schema/spec@1.1.0
+  IMP @std/net jsr:@std/net@^1
+  IMP hono jsr:@hono/hono@4.12.24
+  IMP hono/cors jsr:@hono/hono@4.12.24/cors

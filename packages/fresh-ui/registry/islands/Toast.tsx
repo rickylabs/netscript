@@ -7,11 +7,7 @@
 
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { VNode } from 'preact';
-import {
-  type RegistryToast,
-  type RegistryToastType,
-  stripToastFromUrl,
-} from '../lib/toast.ts';
+import { type RegistryToast, type RegistryToastType, stripToastFromUrl } from '../lib/toast.ts';
 
 interface ToastIslandProps extends Partial<RegistryToast> {
   cleanUrl?: string;
@@ -52,33 +48,34 @@ export default function Toast(
 
   const cleanup = () => {
     if (exitTimeoutRef.current) {
-      window.clearTimeout(exitTimeoutRef.current);
+      globalThis.clearTimeout(exitTimeoutRef.current);
     }
 
     if (hideTimeoutRef.current) {
-      window.clearTimeout(hideTimeoutRef.current);
+      globalThis.clearTimeout(hideTimeoutRef.current);
     }
 
     if (urlCleanupTimeoutRef.current) {
-      window.clearTimeout(urlCleanupTimeoutRef.current);
+      globalThis.clearTimeout(urlCleanupTimeoutRef.current);
     }
   };
 
   const normalizeBrowserUrl = () => {
-    const targetUrl = cleanUrl ?? stripToastFromUrl(new URL(window.location.href));
+    const targetUrl = cleanUrl ?? stripToastFromUrl(new URL(globalThis.location.href));
     let attempts = 0;
 
     const applyCleanUrl = () => {
-      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      const currentUrl =
+        `${globalThis.location.pathname}${globalThis.location.search}${globalThis.location.hash}`;
 
       if (currentUrl !== targetUrl) {
-        window.history.replaceState(window.history.state, '', targetUrl);
+        globalThis.history.replaceState(globalThis.history.state, '', targetUrl);
       }
 
       attempts += 1;
 
       if (attempts < 10) {
-        urlCleanupTimeoutRef.current = window.setTimeout(applyCleanUrl, 50);
+        urlCleanupTimeoutRef.current = globalThis.setTimeout(applyCleanUrl, 50);
       }
     };
 
@@ -88,7 +85,7 @@ export default function Toast(
   const dismiss = () => {
     cleanup();
     setExiting(true);
-    hideTimeoutRef.current = window.setTimeout(() => setVisible(false), 220);
+    hideTimeoutRef.current = globalThis.setTimeout(() => setVisible(false), 220);
   };
 
   const scheduleDismiss = (delay: number) => {
@@ -98,7 +95,7 @@ export default function Toast(
     }
 
     countdownStartedAtRef.current = Date.now();
-    exitTimeoutRef.current = window.setTimeout(() => dismiss(), delay);
+    exitTimeoutRef.current = globalThis.setTimeout(() => dismiss(), delay);
   };
 
   const pauseDismiss = () => {
@@ -109,7 +106,7 @@ export default function Toast(
     if (exitTimeoutRef.current) {
       const elapsed = Date.now() - countdownStartedAtRef.current;
       remainingTimeRef.current = Math.max(remainingTimeRef.current - elapsed, 0);
-      window.clearTimeout(exitTimeoutRef.current);
+      globalThis.clearTimeout(exitTimeoutRef.current);
       exitTimeoutRef.current = undefined;
     }
 
@@ -149,8 +146,15 @@ export default function Toast(
   }
 
   return (
-    <div key={instanceKey} class={`ns-toast-wrapper ${exiting ? 'ns-toast-exit' : 'ns-toast-enter'}`}>
-      <div class={`ns-toast ns-toast--${type}`} onMouseEnter={pauseDismiss} onMouseLeave={resumeDismiss}>
+    <div
+      key={instanceKey}
+      class={`ns-toast-wrapper ${exiting ? 'ns-toast-exit' : 'ns-toast-enter'}`}
+    >
+      <div
+        class={`ns-toast ns-toast--${type}`}
+        onMouseEnter={pauseDismiss}
+        onMouseLeave={resumeDismiss}
+      >
         <div class='ns-toast__progress-track'>
           <div
             class='ns-toast__progress-bar'

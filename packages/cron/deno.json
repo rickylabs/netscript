@@ -6,11 +6,15 @@
   "exports": {
     ".": "./mod.ts",
     "./adapters": "./adapters/mod.ts",
-    "./types": "./interfaces/types.ts"
+    "./ports": "./ports/mod.ts",
+    "./testing": "./testing/mod.ts"
   },
   "tasks": {
-    "check": "deno check ./mod.ts ./adapters/mod.ts ./interfaces/mod.ts",
-    "test": "deno test ./tests/"
+    "check": "deno check ./mod.ts ./adapters/mod.ts ./ports/mod.ts ./testing/mod.ts",
+    "test": "deno test ./tests/",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
     "@std/async": "jsr:@std/async@^1",
@@ -19,6 +23,7 @@
   "publish": {
     "include": [
       "**/*.ts",
+      "docs/**/*.md",
       "deno.json",
       "README.md"
     ],

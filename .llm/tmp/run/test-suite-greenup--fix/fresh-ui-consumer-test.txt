@@ -1,0 +1,13 @@
+Check packages/fresh-ui/tests/consumer-render.test.tsx
+
+ok | 0 passed | 0 failed (0ms)
+
+error: Unsupported scheme "catalog" for module "catalog:". Supported schemes:
+ - "blob"
+ - "data"
+ - "file"
+ - "http"
+ - "https"
+ - "jsr"
+ - "npm"
+    at file:///home/codex/repos/netscript-test-green-up/packages/fresh-ui/src/runtime/accordion/Accordion.tsx:1:31

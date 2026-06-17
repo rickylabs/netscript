@@ -12,41 +12,69 @@
 
 /** Standard scaffold directory names used by NetScript generators. */
 export interface ScaffoldDirs {
+  /** Directory containing project plugin sources. */
   readonly PLUGINS: 'plugins';
+  /** Directory containing service sources. */
   readonly SERVICES: 'services';
+  /** Directory containing database schemas and migrations. */
   readonly DATABASE: 'database';
+  /** Directory containing contract definitions. */
   readonly CONTRACTS: 'contracts';
+  /** Directory containing app projects. */
   readonly APPS: 'apps';
+  /** Directory containing package projects. */
   readonly PACKAGES: 'packages';
+  /** Directory containing worker runtime files. */
   readonly WORKERS: 'workers';
+  /** Directory containing saga runtime files. */
   readonly SAGAS: 'sagas';
+  /** Directory containing trigger runtime files. */
   readonly TRIGGERS: 'triggers';
+  /** Directory containing task definitions. */
   readonly TASKS: 'tasks';
+  /** Directory containing Windows deployment output. */
   readonly DEPLOY: '.deploy/windows';
 }
 
 /** Standard scaffold file names used by NetScript generators. */
 export interface ScaffoldFiles {
+  /** Deno workspace manifest file name. */
   readonly DENO_JSON: 'deno.json';
+  /** Deno lockfile name. */
   readonly DENO_LOCK: 'deno.lock';
+  /** NetScript project config file name. */
   readonly NETSCRIPT_CONFIG: 'netscript.config.ts';
+  /** Aspire appsettings file name. */
   readonly APPSETTINGS: 'appsettings.json';
+  /** Generated plugin registry file name. */
   readonly REGISTRY: 'registry.ts';
+  /** TypeScript module barrel file name. */
   readonly MOD: 'mod.ts';
+  /** Package README file name. */
   readonly README: 'README.md';
+  /** Git ignore file name. */
   readonly GITIGNORE: '.gitignore';
 }
 
 /** Standard Deno permission groups used by generated package commands. */
 export interface PermissionGroups {
+  /** Network access permission flags. */
   readonly network: readonly ['--allow-net'];
+  /** Read access permission flags. */
   readonly read: readonly ['--allow-read'];
+  /** Write access permission flags. */
   readonly write: readonly ['--allow-write'];
+  /** Environment access permission flags. */
   readonly env: readonly ['--allow-env'];
+  /** Subprocess execution permission flags. */
   readonly run: readonly ['--allow-run'];
+  /** System information permission flags. */
   readonly sys: readonly ['--allow-sys'];
+  /** Full permission flags. */
   readonly all: readonly ['--allow-all'];
+  /** Default permission flags for generated services. */
   readonly serviceDefault: readonly ['--allow-net', '--allow-env', '--allow-read'];
+  /** Default permission flags for generated workers. */
   readonly workerDefault: readonly [
     '--allow-net',
     '--allow-env',

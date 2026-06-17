@@ -5,7 +5,7 @@
  * @description CSS-first toggle switch built on a native checkbox input.
  */
 
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
 export interface SwitchProps
@@ -19,7 +19,7 @@ export interface SwitchProps
 export function Switch(
   { children, class: className, description, disabled = false, error = false, ...props }:
     SwitchProps,
-) {
+): VNode {
   return (
     <label
       class={cn(

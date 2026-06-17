@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/register-tools.ts` — registers development tools
+ * Generator for `.helpers/register-tools.mts` — registers development tools
  * (e.g., Prisma Studio) with the Aspire SDK builder via `addExecutable()`.
  *
  * Tools are simple `deno task` wrappers and do NOT use `addDenoApp()`.
@@ -22,7 +22,7 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 
 /**
- * Generates the register-tools.ts file content.
+ * Generates the register-tools.mts file content.
  *
  * @param options - Tool entries from parsed config
  * @returns Generated TypeScript source as a string
@@ -58,6 +58,7 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
     lines.push(
       `    let ${id} = await builder.addExecutable('${name}', 'deno', ${id}_workdir, ['task', '${taskName}']);`,
     );
+    lines.push(`    ${id} = await maybeWithProcessCommand(${id}, '${name}', '${taskName}');`);
 
     // Database dependency — named database or primary fallback
     if (entry.Database) {
@@ -78,7 +79,7 @@ export function generateRegisterTools(options: RegisterToolsOptions): string {
   }
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterTools1, {
-    __slot0__: String(fileHeader('register-tools.ts')),
+    __slot0__: String(fileHeader('register-tools.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),

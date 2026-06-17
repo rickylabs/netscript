@@ -8,8 +8,7 @@
 import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
-interface TextareaProps
-  extends Omit<JSX.TextareaHTMLAttributes<HTMLTextAreaElement>, 'class'> {
+interface TextareaProps extends Omit<JSX.TextareaHTMLAttributes<HTMLTextAreaElement>, 'class'> {
   class?: string;
   error?: boolean;
 }

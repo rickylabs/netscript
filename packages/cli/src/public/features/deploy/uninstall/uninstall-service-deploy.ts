@@ -1,6 +1,9 @@
 import { DEFAULT_SERVICE_PREFIX } from '../../../../kernel/constants/windows.ts';
 import { Pipeline } from '../../../../kernel/application/abstracts/pipeline.ts';
-import { PipelineStep } from '../../../../kernel/application/abstracts/pipeline-step.ts';
+import {
+  PipelineStep,
+  type PipelineStepInspection,
+} from '../../../../kernel/application/abstracts/pipeline-step.ts';
 import type {
   ResolvedServiceManifest,
   ServiceManifestPort,
@@ -52,7 +55,7 @@ export class UninstallServiceDeployStep
     super();
   }
 
-  inspect(input: UninstallServiceDeployRequest) {
+  inspect(input: UninstallServiceDeployRequest): PipelineStepInspection {
     return {
       id: this.id,
       label: 'Uninstall Windows services',

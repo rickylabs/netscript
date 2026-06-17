@@ -22,9 +22,13 @@ export type SagaScheduledMessageRecord = Readonly<{
 
 /** Store boundary for Redis sorted-set, KV TTL, or database scheduler backends. */
 export interface SagaSchedulerStorePort {
+  /** Persist a scheduled message record. */
   save(record: SagaScheduledMessageRecord): Promise<void>;
+  /** Claim due scheduled messages for dispatch. */
   claimDue(now: Date, limit: number): Promise<readonly SagaScheduledMessageRecord[]>;
+  /** Mark a scheduled message as dispatched. */
   markDispatched(id: SagaMessageId, dispatchedAt: Date): Promise<void>;
+  /** Mark a scheduled message as failed. */
   markFailed(id: SagaMessageId, failedAt: Date, error: string): Promise<void>;
 }
 
@@ -60,6 +64,7 @@ export type SagaSchedulerDrainResult = Readonly<{
 
 /** Durable timer scheduler for `schedule()` cascaded messages. */
 export class SagaScheduler {
+  /** Stable scheduler identifier. */
   readonly id: string;
   readonly #clock: SagaClockPort;
   readonly #store: SagaSchedulerStorePort;
@@ -68,6 +73,7 @@ export class SagaScheduler {
   readonly #batchSize: number;
   #running = false;
 
+  /** Create a durable saga scheduler. */
   constructor(options: SagaSchedulerOptions) {
     if (
       options.batchSize !== undefined &&
@@ -83,16 +89,19 @@ export class SagaScheduler {
     this.#batchSize = options.batchSize ?? 100;
   }
 
+  /** Start the scheduler drain loop boundary. */
   start(): Promise<void> {
     this.#running = true;
     return Promise.resolve();
   }
 
+  /** Stop the scheduler drain loop boundary. */
   stop(): Promise<void> {
     this.#running = false;
     return Promise.resolve();
   }
 
+  /** Persist a message for future dispatch. */
   async schedule(
     message: SagaMessage | CascadedMessage,
     scheduledFor: Date,
@@ -115,12 +124,14 @@ export class SagaScheduler {
     return record;
   }
 
+  /** Persist a scheduled cascade message for future dispatch. */
   async scheduleCascaded(
     message: CascadedMessage<'scheduled'>,
   ): Promise<SagaScheduledMessageRecord> {
     return await this.schedule(message.message, message.scheduledFor);
   }
 
+  /** Claim and dispatch due scheduled messages once. */
   async drainDue(): Promise<SagaSchedulerDrainResult> {
     if (!this.#running) {
       throw SagasError.validationFailed(

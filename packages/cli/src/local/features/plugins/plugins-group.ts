@@ -12,7 +12,7 @@ import { createLocalPluginAddCommand } from './add/add-local-plugin-command.ts';
 export function createLocalPluginCommand(
   dependencies: PublicCommandDependencies,
   sourceRootStartDir: string,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('plugin')
     .description('Manage NetScript plugins in a local contributor workspace')

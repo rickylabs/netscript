@@ -1,7 +1,7 @@
 /**
  * @module
  *
- * Generator for `.helpers/register-services.ts` — registers service resources
+ * Generator for `.helpers/register-services.mts` — registers service resources
  * with the Aspire SDK builder via `addExecutable()`.
  *
  * Uses a **two-pass cross-reference pattern** to avoid forward-reference issues
@@ -28,7 +28,7 @@ import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
 import { renderTemplateAssetSync } from '../../../../adapters/templates/template-asset.ts';
 
 /**
- * Generates the `register-services.ts` file content for a scaffolded Aspire
+ * Generates the `register-services.mts` file content for a scaffolded Aspire
  * project. Produces a two-pass registration function that creates all service
  * resources first, then wires cross-references in a second pass.
  *
@@ -81,20 +81,16 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
       `    const otel = buildOtelEnvVars('${name}', config.Version, 'executable', config.Otel.HttpEndpoint);`,
     );
     lines.push(`    for (const [key, value] of Object.entries(otel)) {`);
-    lines.push(`      resource.withEnvironment(key, value);`);
+    lines.push(`      await resource.withEnvironment(key, value);`);
     lines.push(`    }`);
 
     // Database dependency — all services wait for primary DB (C# parity)
     lines.push(``);
     lines.push(`    // Database dependency — all services wait for primary DB (C# parity)`);
     lines.push(`    if (infrastructure.primaryDatabase) {`);
-    lines.push(
-      `      let databaseBinding = resource.withEnvironmentConnectionString('DATABASE_URL', infrastructure.primaryDatabase);`,
-    );
+    lines.push(`      let databaseBinding = resource.withEnvironment('DATABASE_URL', infrastructure.primaryDatabase);`);
     lines.push(`      if (databaseEnvKey) {`);
-    lines.push(
-      `        databaseBinding = databaseBinding.withEnvironmentConnectionString(databaseEnvKey, infrastructure.primaryDatabase);`,
-    );
+    lines.push(`        databaseBinding = databaseBinding.withEnvironment(databaseEnvKey, infrastructure.primaryDatabase);`);
     lines.push(`      }`);
     lines.push(`      await databaseBinding`);
     lines.push(`        .withReference(infrastructure.primaryDatabase)`);
@@ -128,7 +124,7 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
       );
       lines.push(`      if (${refId}Endpoint) {`);
       lines.push(
-        `        resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
+        `        await resource.withEnvironment('services__${ref}__http__0', ${refId}Endpoint);`,
       );
       lines.push(`      }`);
     }
@@ -149,7 +145,7 @@ export function generateRegisterServices(options: RegisterServicesOptions): stri
     : '  // No cross-references to wire';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateRegisterServices1, {
-    __slot0__: String(fileHeader('register-services.ts')),
+    __slot0__: String(fileHeader('register-services.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot3__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),

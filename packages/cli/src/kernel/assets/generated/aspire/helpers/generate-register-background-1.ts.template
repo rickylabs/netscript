@@ -2,7 +2,7 @@
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
-import type { InfrastructureContext } from './register-infrastructure.ts';
+import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
   buildDatabaseUriEnvKey,
   buildOtelEnvVars,
@@ -20,8 +20,8 @@ type ExecutableResource = ReturnType<DistributedApplicationBuilder['addExecutabl
  * with the Aspire SDK builder.
  *
  * Each processor is registered via `addExecutable()` from the Aspire SDK.
- * Telemetry-enabled entries receive 3 OTEL env vars (`denoApp`
- * mode); telemetry-disabled entries receive explicit opt-out vars.
+ * Telemetry-enabled entries receive the full executable OTEL env set;
+ * telemetry-disabled entries receive explicit opt-out vars.
  *
  * Background processors do not cross-reference each other, so no two-pass
  * registration is needed.

@@ -1,11 +1,14 @@
 import type {
-  PermissionPreset,
+  TaskDefinition as DomainTaskDefinition,
+  TaskHandler as DomainTaskHandler,
+  TaskId as DomainTaskId,
+} from '../domain/mod.ts';
+import type {
+  BuilderPermissions,
+  BuilderTaskType,
   TaskDefinition,
   TaskHandler,
-  TaskId,
-  TaskPermissions,
-  TaskType,
-} from '../domain/mod.ts';
+} from './builder-types.ts';
 
 /** Task builder state used to gate `build()`. */
 export type TaskBuilderState = 'initial' | 'entrypoint-set' | 'handler-set';
@@ -18,7 +21,7 @@ export interface TaskBuilder<
   TResult,
 > {
   /** Set the task runtime. */
-  runtime(type: TaskType): this;
+  runtime(type: BuilderTaskType): this;
   /** Set the module, script, or executable entrypoint. */
   entrypoint(path: string): TaskBuilder<TId, 'entrypoint-set', TPayload, TResult>;
   /** Set an in-process task handler. */
@@ -32,7 +35,7 @@ export interface TaskBuilder<
   /** Set the maximum retry count. */
   retry(maxRetries: number): this;
   /** Set execution permissions for this task. */
-  permissions(perms: PermissionPreset | TaskPermissions): this;
+  permissions(perms: BuilderPermissions): this;
   /** Append command-line arguments. */
   args(...args: string[]): this;
   /** Merge environment variables. */
@@ -58,12 +61,12 @@ class TaskBuilderImpl<
   TResult,
 > implements TaskBuilder<TId, TConfigured, TPayload, TResult> {
   readonly #id: TId;
-  #runtime: TaskType = 'deno';
+  #runtime: BuilderTaskType = 'deno';
   #entrypoint?: string;
-  #handler?: TaskHandler<TPayload, TResult>;
+  #handler?: DomainTaskHandler<TPayload, TResult>;
   #timeout = 300_000;
   #maxRetries = 1;
-  #permissions?: PermissionPreset | TaskPermissions;
+  #permissions?: BuilderPermissions;
   #args: string[] = [];
   #env?: Record<string, string>;
   #cwd?: string;
@@ -75,7 +78,7 @@ class TaskBuilderImpl<
     this.#id = id;
   }
 
-  runtime(type: TaskType): this {
+  runtime(type: BuilderTaskType): this {
     this.#runtime = type;
     return this;
   }
@@ -88,7 +91,7 @@ class TaskBuilderImpl<
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: TaskHandler<TNextPayload, TNextResult>,
   ): TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
-    this.#handler = fn as unknown as TaskHandler<TPayload, TResult>;
+    this.#handler = fn as unknown as DomainTaskHandler<TPayload, TResult>;
     return this as unknown as TaskBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   }
 
@@ -106,7 +109,7 @@ class TaskBuilderImpl<
     return this;
   }
 
-  permissions(perms: PermissionPreset | TaskPermissions): this {
+  permissions(perms: BuilderPermissions): this {
     this.#permissions = perms;
     return this;
   }
@@ -148,8 +151,8 @@ class TaskBuilderImpl<
       throw new Error(`Task "${this.#id}" requires an entrypoint or handler before build().`);
     }
 
-    const definition: TaskDefinition<TId, TPayload, TResult> = Object.freeze({
-      id: this.#id as TaskId<TId>,
+    const definition = Object.freeze({
+      id: this.#id as DomainTaskId<TId>,
       topic: 'default',
       name: this.#id,
       type: this.#runtime,
@@ -170,9 +173,9 @@ class TaskBuilderImpl<
       maxConcurrency: 1,
       persist: true,
       handler: this.#handler,
-    });
+    }) as unknown as DomainTaskDefinition<TId, TPayload, TResult>;
 
-    return definition as TConfigured extends 'entrypoint-set' | 'handler-set'
+    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set'
       ? TaskDefinition<TId, TPayload, TResult>
       : never;
   }

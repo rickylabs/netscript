@@ -1,5 +1,5 @@
 import type { ExecutionRecord } from '@netscript/plugin-workers-core/runtime';
-import { notFound } from '@shared/utils';
+import { notFound } from '@netscript/contracts';
 import { getWorkersRuntime, router } from './router-context.ts';
 
 type ExecutionStatus =
@@ -11,7 +11,7 @@ type ExecutionStatus =
   | 'cancelled'
   | 'timeout';
 
-export const executionHandlers = {
+export const executionHandlers: Record<string, unknown> = {
   listExecutions: router.listExecutions.handler(async ({ input, context }) => {
     const { limit, jobId, status, topic } = input;
     const { executionState: state, jobRegistry: registry } = getWorkersRuntime(context);

@@ -37,7 +37,7 @@ export class PluginVerbCommand extends CliCommand<Command> {
   }
 
   /** Build the command definition consumed by the CLI runner. */
-  define(): Command {
+  define(): Command<any, any, any, any, any, any, any, any> {
     const dispatch = this.dependencies.dispatch ?? dispatchPluginVerb;
     const print = this.dependencies.print ?? outputText;
     return new Command()
@@ -67,6 +67,6 @@ export class PluginVerbCommand extends CliCommand<Command> {
 /** Create a framework plugin verb command. */
 export function createPluginVerbCommand(
   dependencies: PluginVerbCommandDependencies,
-): Command {
+): Command<any, any, any, any, any, any, any, any> {
   return new PluginVerbCommand(dependencies).define();
 }

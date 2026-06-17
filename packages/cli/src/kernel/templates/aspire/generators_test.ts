@@ -118,6 +118,7 @@ describe('generateAppsettings', () => {
     assertEquals(config.NetScript.Databases.postgres.Engine, 'Postgres');
     assertEquals(config.NetScript.Databases.postgres.Mode, 'Container');
     assertEquals(config.NetScript.Databases.postgres.Persistent, true);
+    assertEquals(config.NetScript.Databases.postgres.DataPath, '.data/postgres');
     assertEquals(config.NetScript.Tools['prisma-studio'].Enabled, true);
     assertEquals(config.NetScript.Tools['prisma-studio'].TaskName, 'db:studio');
     assertEquals(config.NetScript.Tools['prisma-studio'].Database, 'postgres');
@@ -203,6 +204,7 @@ describe('generateAppsettings', () => {
       'Mode',
       'DatabaseName',
       'Persistent',
+      'DataPath',
     ]);
     assertEquals(Object.keys(config.NetScript.Services), ['users']);
     assertEquals(Object.keys(config.NetScript.Apps), ['dashboard']);

@@ -54,7 +54,7 @@ makes this cheap: the release machinery the prior plan wanted to hand-roll
 | 4 | Aspire | **Bump 13.2.2 → 13.4 now** (TS apphost already scaffolded by the CLI); **full-runtime / native-Deno-apphost refactor at 13.5** | Tracks `microsoft/aspire#16218` (milestone 13.5; rickylabs is the upstream requester). |
 | 5 | Extraction mechanism | **Reuse the `netscript-dev` maintainer CLI** (`sync packages` / `sync plugin` / `sync templates` / `init` from local sources) composed into a `release eject` orchestrator | The source-copy engine already exists; S0 is a thin orchestrator + governance allowlist + clean-room git, not a from-scratch tool. |
 | 6 | Agent rules | Add **`.agents/rules/*.mdc`** modeled on `prisma/prisma-next/.agents/rules` | Distill doctrine + STANDARDS + PUBLIC-SURFACE-PATTERNS into machine-enforced, IDE-native guardrails. |
-| 7 | Dev tooling migration | Carry **`.llm/harness/`** + `netscript-*` / `jsr-audit` / `deno-fresh` **skills** + doctrine + `tools/fitness/*` into the public repo | The new repo stays harnessable; contributors use the same operating model. |
+| 7 | Dev tooling migration | Carry **`.llm/harness/`** + `netscript-*` / `jsr-audit` / `deno-fresh` **skills** + doctrine + `.llm/tools/fitness/*` into the public repo | The new repo stays harnessable; contributors use the same operating model. |
 | 8 | prisma-next | **Tracked strategic dependency** → pre-staged post-alpha supervisor **S7** | Shares NetScript's DSL vocabulary; its TS-native, Standard-Schema-compatible schema DSL is a major upgrade path for `contracts` / `database` / `prisma-adapter-mysql`. |
 | 9 | Playground fate | **Keep & archive-as-bench**; curated `examples/` only in the public repo | `rickylabs/netscript-start` stays the integration showbench / Aspire fixture source. |
 
@@ -148,7 +148,7 @@ The source-copy engine already exists in `netscript-dev`
 | Already exists (reuse) | S0 adds (the `release eject` orchestrator) |
 |---|---|
 | `netscript-dev init --target` (scaffold from **local sources**) | Compose `init` + `sync packages` + `sync plugin`×5 + `sync templates` into `netscript-dev release eject --target .genesis/netscript` |
-| `sync packages` / `sync plugin` (source robocopy) | **Governance allowlist** copy: `.llm/harness/`, skills → `.agents/skills/`, doctrine, `tools/fitness/*`, CLI docs, LICENSE |
+| `sync packages` / `sync plugin` (source robocopy) | **Governance allowlist** copy: `.llm/harness/`, skills → `.agents/skills/`, doctrine, `.llm/tools/fitness/*`, CLI docs, LICENSE |
 | `probe monorepo` (source-root validation) | Producer-shaped root `deno.json` (workspace, `catalog:`, `isolatedDeclarations`, lint `jsr`, `publish`) |
 | `test scaffold --fixture` (validation harness) | Lockstep version reset to `0.0.1-alpha.0`; seed `.agents/rules/*.mdc` + `.github/workflows/` |
 | public `netscript init` (consumer scaffold, JSR refs) | Emit `examples/playground` (Aspire fixture); clean-room `git init` + `gitleaks` secret scan |
@@ -218,7 +218,7 @@ Two workflows, least-privilege split:
 - **`ci.yml`** (`contents: read`, on PR + push): `deno ci` → `deno fmt --check`
   → `deno lint` → `deno check --unstable-kv` → **`deno doc --lint`** →
   `deno test --coverage` → `deno coverage` → `deno audit` →
-  **`deno publish --dry-run`** (validates all 29 members) → `tools/fitness/*` +
+  **`deno publish --dry-run`** (validates all 29 members) → `.llm/tools/fitness/*` +
   `deno task arch:check`.
 - **`publish.yml`** (`contents: read` + **`id-token: write`**, on `v*` tag):
   re-run cheap gates → `deno publish`. OIDC = no tokens; **SLSA provenance +
@@ -372,7 +372,7 @@ is 7 (the waves). Compare PR #96: the whole plugin platform was 8 groups.
 - **Integration branch**: `feat/cicd-release`
 - **Archetype**: CI config + tools → **ARCHETYPE-6** concerns + `SCOPE-docs.md`
 - **Phase groups** (the two independent workflows PR #96's body explicitly called for):
-  - **A — Workspace CI** (`feat/cicd-release/workspace-ci`): `ci.yml` = `deno ci` → fmt/lint/check/`doc --lint`/test+coverage/audit/`publish --dry-run` + `tools/fitness/*` + `arch:check`.
+  - **A — Workspace CI** (`feat/cicd-release/workspace-ci`): `ci.yml` = `deno ci` → fmt/lint/check/`doc --lint`/test+coverage/audit/`publish --dry-run` + `.llm/tools/fitness/*` + `arch:check`.
   - **B — Publish & release** (`feat/cicd-release/publish`): `publish.yml` OIDC + provenance; `deno bump-version` release wiring; JSR scope onboarding (create+link 29 packages); npm mirror via `deno pack` *(stretch)*.
 - **Gates**: green CI on a PR · dry-run publish in CI · OIDC publish path verified on a throwaway version
 - **Depends on**: S0, S2

@@ -13,7 +13,7 @@ import type {
   DatabaseConnectionOptions,
   DatabaseConnectionStatus,
   IsolationLevel,
-} from '../interfaces/database-client.ts';
+} from '../ports/database-client.ts';
 
 // ============================================================================
 // MSSQL ADAPTER CONFIG TYPE
@@ -22,28 +22,45 @@ import type {
 /**
  * Configuration object for @prisma/adapter-mssql.
  * This is what the PrismaMssql adapter expects.
- * 
+ *
  * Note: Windows Authentication (trustedConnection) requires the `tedious` driver
  * to be configured with NTLM authentication type, which is only supported on Windows.
  * For cross-platform compatibility, use SQL Server authentication (user/password).
  */
 export interface MssqlAdapterConfig {
+  /** SQL Server host name or address. */
   server: string;
+  /** SQL Server port. */
   port?: number;
+  /** Database name. */
   database: string;
+  /** SQL Server login user. */
   user?: string;
+  /** SQL Server login password. */
   password?: string;
   /** Authentication configuration for tedious */
   authentication?: {
-    type: 'default' | 'ntlm' | 'azure-active-directory-password' | 'azure-active-directory-access-token';
+    /** Tedious authentication mode. */
+    type:
+      | 'default'
+      | 'ntlm'
+      | 'azure-active-directory-password'
+      | 'azure-active-directory-access-token';
+    /** Authentication credentials for the selected tedious mode. */
     options?: {
+      /** Login user name. */
       userName?: string;
+      /** Login password. */
       password?: string;
+      /** Windows domain for NTLM authentication. */
       domain?: string;
     };
   };
+  /** Driver-level TLS and authentication options. */
   options?: {
+    /** Whether to encrypt the connection. */
     encrypt?: boolean;
+    /** Whether to trust the server certificate. */
     trustServerCertificate?: boolean;
     /** @deprecated Use authentication.type = 'ntlm' instead */
     trustedConnection?: boolean;
@@ -70,19 +87,29 @@ export interface MssqlConnectionOptions extends DatabaseConnectionOptions {
   requestTimeout?: number;
 }
 
+/**
+ * Public structural type returned by SQL Server driver adapter factories.
+ */
+export interface MssqlDriverAdapter {
+  /** Database provider identity. */
+  readonly provider?: string;
+  /** Open a Prisma driver connection. */
+  connect(): Promise<unknown>;
+}
+
 // ============================================================================
 // ADO.NET CONNECTION STRING PARSER
 // ============================================================================
 
 /**
  * Parses an ADO.NET connection string into a config object for @prisma/adapter-mssql.
- * 
+ *
  * ADO.NET format: Server=host,port;Database=name;Integrated Security=True;TrustServerCertificate=True
  * Config format: { server: 'host', port: 1433, database: 'name', options: { ... } }
- * 
+ *
  * @param connectionString - ADO.NET format connection string
  * @returns MssqlAdapterConfig object for PrismaMssql
- * 
+ *
  * @example
  * ```typescript
  * const config = parseAdoNetConnectionString(
@@ -116,11 +143,9 @@ export function parseAdoNetConnectionString(connectionString: string): MssqlAdap
   }
 
   const database = params['database'] || params['initial catalog'] || 'master';
-  const integratedSecurity =
-    params['integrated security']?.toLowerCase() === 'true' ||
+  const integratedSecurity = params['integrated security']?.toLowerCase() === 'true' ||
     params['trusted_connection']?.toLowerCase() === 'true';
-  const trustServerCertificate =
-    params['trustservercertificate']?.toLowerCase() === 'true' ||
+  const trustServerCertificate = params['trustservercertificate']?.toLowerCase() === 'true' ||
     params['trust server certificate']?.toLowerCase() === 'true';
 
   const config: MssqlAdapterConfig = {
@@ -139,7 +164,6 @@ export function parseAdoNetConnectionString(connectionString: string): MssqlAdap
   if (integratedSecurity) {
     // Windows Authentication using NTLM
     // This requires the tedious driver to use NTLM authentication type
-    console.log('⚠️  Windows Authentication (NTLM) requested from connection string');
     config.authentication = {
       type: 'ntlm',
       options: {
@@ -175,7 +199,7 @@ export function parseAdoNetConnectionString(connectionString: string): MssqlAdap
  *   - MSSQL_TRUST_SERVER_CERTIFICATE
  *   - MSSQL_USER (optional)
  *   - MSSQL_PASSWORD (optional)
- * 
+ *
  * @param resourceName - The resource name prefix (default: 'MSSQL')
  * @returns MssqlAdapterConfig or null if required vars not set
  */
@@ -198,8 +222,10 @@ export function getMssqlConfigFromEnv(resourceName = 'MSSQL'): MssqlAdapterConfi
     }
   }
 
-  const integratedSecurity = Deno.env.get(`${prefix}_INTEGRATED_SECURITY`)?.toLowerCase() === 'true';
-  const trustServerCertificate = Deno.env.get(`${prefix}_TRUST_SERVER_CERTIFICATE`)?.toLowerCase() === 'true';
+  const integratedSecurity =
+    Deno.env.get(`${prefix}_INTEGRATED_SECURITY`)?.toLowerCase() === 'true';
+  const trustServerCertificate =
+    Deno.env.get(`${prefix}_TRUST_SERVER_CERTIFICATE`)?.toLowerCase() === 'true';
   const user = Deno.env.get(`${prefix}_USER`);
   const password = Deno.env.get(`${prefix}_PASSWORD`);
 
@@ -220,7 +246,6 @@ export function getMssqlConfigFromEnv(resourceName = 'MSSQL'): MssqlAdapterConfi
     // Windows Authentication using NTLM
     // This requires the tedious driver to use NTLM authentication type
     // Note: This only works on Windows
-    console.log('⚠️  Windows Authentication (NTLM) requested - this only works on Windows');
     config.authentication = {
       type: 'ntlm',
       options: {
@@ -244,17 +269,17 @@ export function getMssqlConfigFromEnv(resourceName = 'MSSQL'): MssqlAdapterConfi
  * Gets MSSQL adapter configuration from environment.
  * Prefers structured env vars (MSSQL_SERVER, etc.) but falls back to
  * parsing ADO.NET connection string from the specified env var.
- * 
+ *
  * @param connectionStringEnvVar - Name of env var containing ADO.NET connection string (default: 'MSSQLDB_URI')
  * @returns MssqlAdapterConfig
  * @throws Error if no configuration is found
- * 
+ *
  * @example
  * ```typescript
  * // With structured env vars:
  * // MSSQL_SERVER=localhost, MSSQL_PORT=1433, MSSQL_DATABASE=mydb
  * const config = getMssqlConfig();
- * 
+ *
  * // Or with connection string:
  * // MSSQLDB_URI=Server=localhost,1433;Database=mydb;...
  * const config = getMssqlConfig('MSSQLDB_URI');
@@ -264,7 +289,6 @@ export function getMssqlConfig(connectionStringEnvVar = 'MSSQLDB_URI'): MssqlAda
   // Try structured env vars first
   const structuredConfig = getMssqlConfigFromEnv();
   if (structuredConfig) {
-    console.log(`📡 MSSQL config from env: ${structuredConfig.server}:${structuredConfig.port ?? 1433}/${structuredConfig.database}`);
     return structuredConfig;
   }
 
@@ -278,7 +302,6 @@ export function getMssqlConfig(connectionStringEnvVar = 'MSSQLDB_URI'): MssqlAda
   }
 
   const parsedConfig = parseAdoNetConnectionString(connectionString);
-  console.log(`📡 MSSQL config from ADO.NET: ${parsedConfig.server}:${parsedConfig.port ?? 1433}/${parsedConfig.database}`);
   return parsedConfig;
 }
 
@@ -314,20 +337,28 @@ export type MssqlIsolationLevel = IsolationLevel | 'Snapshot';
  * const client = new PrismaClient({ adapter: adapter.getDriverAdapter() });
  * ```
  */
-export class MssqlAdapter<TClient extends {
-  $connect(): Promise<void>;
-  $disconnect(): Promise<void>;
-  $queryRaw: unknown;
-  $executeRaw: unknown;
-  $executeRawUnsafe: unknown;
-}> implements DatabaseAdapter<TClient> {
+export class MssqlAdapter<
+  TClient extends {
+    $connect(): Promise<void>;
+    $disconnect(): Promise<void>;
+    $queryRaw: unknown;
+    $executeRaw: unknown;
+    $executeRawUnsafe: unknown;
+  },
+> implements DatabaseAdapter<TClient> {
+  /** Database provider identity for status reporting. */
   readonly provider = 'mssql' as const;
 
   private client: TClient | null = null;
-  private driverAdapter: PrismaMssql | null = null;
+  private driverAdapter: MssqlDriverAdapter | null = null;
   private readonly options: MssqlConnectionOptions;
   private lastConnected?: Date;
 
+  /**
+   * Create a SQL Server adapter from connection options.
+   *
+   * @param options - SQL Server connection options.
+   */
   constructor(options: MssqlConnectionOptions) {
     this.options = options;
   }
@@ -336,10 +367,10 @@ export class MssqlAdapter<TClient extends {
    * Get the Prisma driver adapter for use in client initialization
    * Uses config object format required by @prisma/adapter-mssql
    */
-  getDriverAdapter(): PrismaMssql {
+  getDriverAdapter(): MssqlDriverAdapter {
     if (!this.driverAdapter) {
       const config = this.buildAdapterConfig();
-      this.driverAdapter = new PrismaMssql(config);
+      this.driverAdapter = new PrismaMssql(config) as MssqlDriverAdapter;
     }
     return this.driverAdapter;
   }
@@ -399,6 +430,7 @@ export class MssqlAdapter<TClient extends {
     this.client = client;
   }
 
+  /** Return the configured Prisma client instance. */
   getClient(): TClient {
     if (!this.client) {
       throw new Error(
@@ -408,6 +440,7 @@ export class MssqlAdapter<TClient extends {
     return this.client;
   }
 
+  /** Open the configured Prisma client connection. */
   async connect(): Promise<void> {
     if (!this.client) {
       throw new Error('SQL Server client not set. Call setClient() first.');
@@ -416,12 +449,14 @@ export class MssqlAdapter<TClient extends {
     this.lastConnected = new Date();
   }
 
+  /** Close the configured Prisma client connection. */
   async disconnect(): Promise<void> {
     if (this.client) {
       await this.client.$disconnect();
     }
   }
 
+  /** Probe the database connection with a lightweight query. */
   async healthCheck(): Promise<boolean> {
     try {
       const client = this.getClient();
@@ -437,6 +472,7 @@ export class MssqlAdapter<TClient extends {
     }
   }
 
+  /** Return a status snapshot for the current database connection. */
   async getStatus(): Promise<DatabaseConnectionStatus> {
     const healthy = await this.healthCheck();
     return {
@@ -449,6 +485,7 @@ export class MssqlAdapter<TClient extends {
     };
   }
 
+  /** Execute a raw query through the configured Prisma client. */
   executeRaw<T = unknown>(query: string, ...params: unknown[]): Promise<T> {
     const client = this.getClient();
     const $queryRaw = client.$queryRaw as (
@@ -458,6 +495,7 @@ export class MssqlAdapter<TClient extends {
     return $queryRaw(query as unknown as TemplateStringsArray, ...params);
   }
 
+  /** Execute an unsafe raw command through the configured Prisma client. */
   executeRawUnsafe<T = unknown>(query: string, ...params: unknown[]): Promise<T> {
     const client = this.getClient();
     const $executeRawUnsafe = client.$executeRawUnsafe as (
@@ -471,12 +509,14 @@ export class MssqlAdapter<TClient extends {
 /**
  * Create a SQL Server adapter
  */
-export function createMssqlAdapter<TClient extends {
-  $connect(): Promise<void>;
-  $disconnect(): Promise<void>;
-  $queryRaw: unknown;
-  $executeRaw: unknown;
-  $executeRawUnsafe: unknown;
-}>(options: MssqlConnectionOptions): MssqlAdapter<TClient> {
+export function createMssqlAdapter<
+  TClient extends {
+    $connect(): Promise<void>;
+    $disconnect(): Promise<void>;
+    $queryRaw: unknown;
+    $executeRaw: unknown;
+    $executeRawUnsafe: unknown;
+  },
+>(options: MssqlConnectionOptions): MssqlAdapter<TClient> {
   return new MssqlAdapter<TClient>(options);
 }

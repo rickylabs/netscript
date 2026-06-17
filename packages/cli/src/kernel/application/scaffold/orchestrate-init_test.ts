@@ -1,5 +1,8 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
+import { join } from 'jsr:@std/path@^1';
+import { InMemoryScaffolder } from '../testing/in-memory-scaffolder.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
+import type { ScaffoldResult } from '../../domain/core-types.ts';
 import { initNextSteps } from './orchestrate-init.ts';
 
 function baseOptions(overrides: Partial<ValidatedInitOptions> = {}): ValidatedInitOptions {
@@ -36,6 +39,27 @@ Deno.test('initNextSteps includes public database preparation steps for JSR init
     'aspire run  # start TypeScript AppHost',
     '# Postgres provisioned by Aspire (see "Databases" in appsettings.json)',
   ]);
+});
+
+Deno.test('InMemoryScaffolder writes rendered files without a temp directory', async () => {
+  const started = performance.now();
+  const scaffolder = new InMemoryScaffolder();
+
+  await scaffolder.createDir('/workspace');
+  const wrote = await scaffolder.scaffoldFile('name={{name}}', join('/workspace', 'app.txt'), {
+    name: 'alpha',
+  });
+  const result: ScaffoldResult = await scaffolder.scaffold({
+    templatePath: '/templates',
+    targetPath: '/workspace/generated',
+    variables: {},
+  });
+
+  assertEquals(wrote, true);
+  assertEquals(await scaffolder.exists('/workspace/app.txt'), true);
+  assertEquals(scaffolder.files.get('/workspace/app.txt'), 'name=alpha');
+  assertEquals(result.directoriesCreated, ['/workspace/generated']);
+  assertEquals(performance.now() - started < 100, true);
 });
 
 Deno.test('initNextSteps includes local database preparation steps for maintainer init', () => {

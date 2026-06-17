@@ -3,6 +3,7 @@ import { DB_ENGINE_CHOICES, type DbEngineChoice } from '../../../kernel/domain/d
 import type { EditorChoice } from '../../../kernel/domain/scaffold/workspace-config.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
 import { executeInit } from '../../../kernel/application/scaffold/orchestrate-init.ts';
+import { PresetRegistry } from '../../../kernel/application/registries/preset-registry.ts';
 import type { ProjectNameResolver } from '../../presentation/support.ts';
 import type { InitCommandInput } from './init-input.ts';
 
@@ -35,7 +36,9 @@ function editor(raw: string | undefined): EditorChoice | undefined {
 }
 
 /** Create the public `init` command. */
-export function createInitCommand(dependencies: InitCommandDependencies) {
+export function createInitCommand(
+  dependencies: InitCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('init')
     .description('Scaffold a new NetScript workspace')
@@ -54,7 +57,18 @@ export function createInitCommand(dependencies: InitCommandDependencies) {
     .option('-y, --yes', 'Accept defaults without prompting', { default: false })
     .option('--path <path:string>', 'Target directory for scaffold output')
     .option('--dry-run', 'Preview scaffold plan without writing files', { default: false })
+    .option('--json', 'Emit a single machine-readable JSON result', { default: false })
+    .option('--from <preset:string>', 'Apply a named scaffold preset')
     .action(async (options: InitCommandInput, nameArg?: string): Promise<void> => {
+      if (options.from !== undefined) {
+        const presets = new PresetRegistry();
+        if (presets.entries().length === 0) {
+          throw new Error('no presets registered');
+        }
+        if (presets.get(options.from) === undefined) {
+          throw new Error(`preset "${options.from}" is not registered`);
+        }
+      }
       const includeService = options.service === true ||
         options.serviceName !== undefined ||
         options.servicePort !== undefined;
@@ -68,6 +82,8 @@ export function createInitCommand(dependencies: InitCommandDependencies) {
         ci: options.ci ?? false,
         yes: options.yes ?? false,
         dryRun: options.dryRun ?? false,
+        json: options.json ?? false,
+        from: options.from,
         noGit: options.git === false,
         noAspire: options.aspire === false,
         legacyAspire: options.legacyAspire ?? false,

@@ -1,7 +1,7 @@
 # Archetype Gate Matrix
 
 This matrix is the source of truth for required gates per archetype. It mirrors the Phase A plan and
-points back to `doctrine/09-anti-patterns-and-fitness-functions.md`.
+points back to `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`.
 
 Legend:
 

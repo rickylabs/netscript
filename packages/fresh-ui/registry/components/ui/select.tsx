@@ -57,8 +57,10 @@ export function Select({
       defaultValue={defaultValue}
       class={cn('ns-select', error && 'ns-select--error', className)}
     >
-      {/* Keep option-level selected attributes for SSR so the initial HTML is correct
-          before hydration or browser reconciliation touches the control. */}
+      {
+        /* Keep option-level selected attributes for SSR so the initial HTML is correct
+          before hydration or browser reconciliation touches the control. */
+      }
       {placeholder
         ? <option value='' selected={resolvedSelectedValues.size === 0}>{placeholder}</option>
         : null}

@@ -3,7 +3,7 @@ import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/den
 import { relative } from '@std/path';
 import { Scaffolder } from '../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../kernel/adapters/scaffold/template-adapter.ts';
-import { emptyScaffoldResult } from '../../../kernel/application/scaffold/helpers.ts';
+import { emptyScaffoldResult } from '../../../kernel/application/scaffold/support/helpers.ts';
 import { executeInit } from '../../../kernel/application/scaffold/orchestrate-init.ts';
 import { JsrImportResolver } from '../../../public/adapters/jsr-import-resolver.ts';
 import { createOfficialPluginCopier } from '../../infra/official-plugin-copier.ts';

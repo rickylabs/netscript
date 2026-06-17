@@ -62,6 +62,7 @@ export class DatabaseWorkspaceMutator {
       Mode: database.engine === 'sqlite' ? undefined : 'Container',
       DatabaseName: database.databaseName,
       ...(database.engine === 'sqlite' ? {} : { Persistent: true }),
+      ...(database.engine === 'sqlite' ? {} : { DataPath: `.data/${database.configKey}` }),
     };
     if (typeof netScript.PrimaryDatabase !== 'string') {
       netScript.PrimaryDatabase = database.configKey;

@@ -16,14 +16,14 @@ Run consumer gates when any of these change:
 
 ## Gate Definitions
 
-| Consumer type | Validation |
-|---------------|------------|
-| Package imports | A focused downstream `deno check` or `deno doc` import test |
-| Plugin host | Host loader or plugin verification check |
-| Frontend | Route/client typecheck and browser validation for affected flow |
-| Service | Contract/client check and representative request path |
+| Consumer type         | Validation                                                        |
+| --------------------- | ----------------------------------------------------------------- |
+| Package imports       | A focused downstream `deno check` or `deno doc` import test       |
+| Plugin host           | Host loader or plugin verification check                          |
+| Frontend              | Route/client typecheck and browser validation for affected flow   |
+| Service               | Contract/client check and representative request path             |
 | CLI generated project | Scaffold smoke check, generated file existence, focused typecheck |
-| README examples | Copyable example compiles or has a documented reason it cannot |
+| README examples       | Copyable example compiles or has a documented reason it cannot    |
 
 ## Evidence
 
@@ -36,6 +36,6 @@ Record:
 
 ## Failure Handling
 
-If a consumer gate fails because the public contract changed intentionally but
-the migration is not documented, the verdict is `FAIL_FIX`. If many consumers
-must be migrated and the plan omitted that work, use `FAIL_RESCOPE`.
+If a consumer gate fails because the public contract changed intentionally but the migration is not
+documented, the verdict is `FAIL_FIX`. If many consumers must be migrated and the plan omitted that
+work, use `FAIL_RESCOPE`.

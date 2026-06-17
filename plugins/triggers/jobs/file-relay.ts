@@ -15,6 +15,8 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
+  type JobHandlerContext,
+  type JobResult,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { createQueue } from '@netscript/queue';
@@ -49,9 +51,13 @@ const FileRelayPayloadSchema = z.object({
 // JOB HANDLER
 // ============================================================================
 
-const handler = defineJobHandler(async (ctx) => {
+type FileRelayJobHandler = (
+  context: JobHandlerContext,
+) => JobResult<unknown> | Promise<JobResult<unknown>>;
+
+const handler: FileRelayJobHandler = defineJobHandler(async (ctx) => {
   const payload = FileRelayPayloadSchema.parse(ctx.payload ?? {});
-  const { log, progress, trace, traceContext } = createJobTools(ctx);
+  const { log, progress, trace } = createJobTools(ctx);
   const { filePath, fileName, contentHash, target } = payload;
 
   log.info('Starting file relay', { filePath, fileName, targetType: target.type });
@@ -155,4 +161,7 @@ const handler = defineJobHandler(async (ctx) => {
   }
 });
 
-export default Object.assign(handler, { id: 'triggers-plugin-file-relay' });
+const fileRelayJob: FileRelayJobHandler & Readonly<{ id: 'triggers-plugin-file-relay' }> = Object
+  .assign(handler, { id: 'triggers-plugin-file-relay' as const });
+
+export default fileRelayJob;

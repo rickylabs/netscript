@@ -2,7 +2,7 @@
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
-import type { InfrastructureContext } from './register-infrastructure.ts';
+import type { InfrastructureContext } from './register-infrastructure.mjs';
 import {
   buildDatabaseUriEnvKey,
   buildOtelEnvVars,

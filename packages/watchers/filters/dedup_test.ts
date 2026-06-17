@@ -1,6 +1,6 @@
 import { assertEquals, assertNotEquals } from '@std/assert';
-import { computeContentHash, DedupFilter } from './dedup.ts';
-import type { WatchEvent } from '../types.ts';
+import { computeContentHash, DedupFilter } from '../src/filters/dedup.ts';
+import type { WatchEvent } from '../src/types.ts';
 
 Deno.test('computeContentHash — produces consistent SHA-256 hex', async () => {
   const tmpDir = await Deno.makeTempDir();

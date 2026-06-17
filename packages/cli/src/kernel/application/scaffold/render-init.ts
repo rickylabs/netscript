@@ -28,7 +28,7 @@ export async function scaffoldAspire(
     };
   }
 
-  // TS AppHost mode: generate aspire.config.json, package.json, apphost.ts, .helpers/
+  // TS AppHost mode: generate aspire.config.json, package.json, apphost.mts, .helpers/
   if (!options.legacyAspire) {
     return await scaffoldTsAppHost(context, options);
   }

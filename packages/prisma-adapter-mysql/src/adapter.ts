@@ -13,7 +13,6 @@ import type {
   ConnectionInfo,
   IsolationLevel,
   SqlDriverAdapter,
-  SqlDriverAdapterFactory,
   SqlQuery,
   SqlQueryable,
   SqlResultSet,
@@ -158,7 +157,7 @@ class MySqlQueryable implements SqlQueryable {
 
     try {
       // Map arguments to appropriate MySQL format
-      const values = args.map((arg, i) => mapArg(arg, argTypes[i]));
+      const values = args.map((arg: unknown, i: number) => mapArg(arg, argTypes[i]));
 
       // deno_mysql uses different methods for different query types:
       // - query() for SELECT returns rows
@@ -330,7 +329,7 @@ class MySqlTransaction extends MySqlQueryable implements Transaction {
  * const prisma = new PrismaClient({ adapter });
  * ```
  */
-export class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
+class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapter {
   constructor(
     client: AnyClient,
     private readonly capabilities: MySqlCapabilities,
@@ -454,18 +453,120 @@ export class PrismaMySqlAdapter extends MySqlQueryable implements SqlDriverAdapt
  * const prisma = new PrismaClient({ adapter });
  * ```
  */
-export class PrismaMySqlAdapterFactory implements SqlDriverAdapterFactory {
-  readonly provider = 'mysql' as const;
-  readonly adapterName = PACKAGE_NAME;
+export interface PrismaMySqlQuery {
+  /** SQL statement to execute. */
+  sql: string;
+  /** Positional query arguments. */
+  args: unknown[];
+  /** Prisma argument metadata for each argument. */
+  argTypes: Array<{
+    /** Prisma scalar type name. */
+    scalarType: string;
+    /** Database-specific type name. */
+    dbType: string;
+    /** Whether the argument is a scalar or list. */
+    arity?: 'scalar' | 'list';
+  }>;
+}
+
+/**
+ * Result set returned by Prisma MySQL raw queries.
+ */
+export interface PrismaMySqlResultSet {
+  /** Column names in result order. */
+  columnNames: string[];
+  /** Prisma column type numbers in result order. */
+  columnTypes: number[];
+  /** Result rows in column order. */
+  rows: unknown[][];
+  /** Last inserted ID when reported by MySQL. */
+  lastInsertId?: string;
+}
+
+/**
+ * Transaction isolation levels accepted by the MySQL adapter.
+ */
+export type PrismaMySqlIsolationLevel =
+  | 'READ UNCOMMITTED'
+  | 'READ COMMITTED'
+  | 'REPEATABLE READ'
+  | 'SNAPSHOT'
+  | 'SERIALIZABLE';
+
+/**
+ * Connection details reported to Prisma.
+ */
+export interface PrismaMySqlConnectionInfo {
+  /** Database schema name. */
+  schemaName?: string;
+  /** Whether the server supports relation joins. */
+  supportsRelationJoins: boolean;
+}
+
+/**
+ * Connected transaction adapter returned by `startTransaction`.
+ */
+export interface PrismaMySqlTransactionAdapter {
+  /** Database provider identity. */
+  readonly provider: 'mysql';
+  /** Adapter package name. */
+  readonly adapterName: string;
+  /** Execute a raw SQL query. */
+  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
+  /** Execute a raw SQL statement and return affected rows. */
+  executeRaw(query: PrismaMySqlQuery): Promise<number>;
+  /** Commit the transaction. */
+  commit(): Promise<void>;
+  /** Roll back the transaction. */
+  rollback(): Promise<void>;
+}
+
+/**
+ * Connected MySQL adapter returned by {@linkcode PrismaMySqlAdapterFactory.connect}.
+ */
+export interface PrismaMySqlConnectedAdapter {
+  /** Database provider identity. */
+  readonly provider: 'mysql';
+  /** Adapter package name. */
+  readonly adapterName: string;
+  /** Execute a raw SQL query. */
+  queryRaw(query: PrismaMySqlQuery): Promise<PrismaMySqlResultSet>;
+  /** Execute a raw SQL statement and return affected rows. */
+  executeRaw(query: PrismaMySqlQuery): Promise<number>;
+  /** Execute a SQL script. */
+  executeScript(script: string): Promise<void>;
+  /** Return connection details used by Prisma. */
+  getConnectionInfo(): PrismaMySqlConnectionInfo;
+  /** Start a transaction. */
+  startTransaction(
+    isolationLevel?: PrismaMySqlIsolationLevel,
+  ): Promise<PrismaMySqlTransactionAdapter>;
+  /** Close the underlying driver resources. */
+  dispose(): Promise<void>;
+  /** Return the underlying driver object. */
+  underlyingDriver(): unknown;
+}
+
+/**
+ * Factory for creating Prisma MySQL adapter instances.
+ */
+export class PrismaMySqlAdapterFactory {
+  /** Database provider identity. */
+  readonly provider: 'mysql' = 'mysql';
+  /** Adapter package name. */
+  readonly adapterName: string = PACKAGE_NAME;
 
   #capabilities?: MySqlCapabilities;
   #config: MySqlConnectionConfig;
   #options?: PrismaMySqlOptions;
 
-  constructor(
-    config: MySqlConnectionConfig,
-    options?: PrismaMySqlOptions,
-  ) {
+  /**
+   * Create a MySQL adapter factory.
+   *
+   * @param config - MySQL connection configuration.
+   * @param options - Adapter options passed to Prisma.
+   */
+  constructor(config: MySqlConnectionConfig, options?: PrismaMySqlOptions) {
     this.#config = config;
     this.#options = {
       ...options,
@@ -476,8 +577,8 @@ export class PrismaMySqlAdapterFactory implements SqlDriverAdapterFactory {
   /**
    * Connect to the database and create an adapter instance.
    */
-  async connect(): Promise<PrismaMySqlAdapter> {
-    const { createPool } = await import('mysql') as unknown as Mysql2Module;
+  async connect(): Promise<PrismaMySqlConnectedAdapter> {
+    const { createPool } = await import('mysql2') as unknown as Mysql2Module;
 
     let client: AnyClient;
     try {
@@ -501,14 +602,14 @@ export class PrismaMySqlAdapterFactory implements SqlDriverAdapterFactory {
       client,
       this.#capabilities,
       this.#options,
-    );
+    ) as PrismaMySqlConnectedAdapter;
   }
 }
 
 function createMysql2Client(pool: Mysql2Pool): AnyClient {
   return {
-    async connect(): Promise<AnyClient> {
-      return this;
+    connect(): Promise<AnyClient> {
+      return Promise.resolve(this);
     },
     async query(sql: string, values?: readonly unknown[]): Promise<Record<string, unknown>[]> {
       const [rows] = await pool.query(sql, values);
@@ -616,7 +717,8 @@ export function inferCapabilities(version: unknown): MySqlCapabilities {
   // No relation-joins support for mysql < 8.0.13 or mariadb
   const isMariaDB = suffix?.toLowerCase()?.includes('mariadb') ?? false;
   const supportsRelationJoins = !isMariaDB &&
-    (major > 8 || (major === 8 && minor >= 0 && patch >= 13));
+    (major > 8 ||
+      (major === 8 && (minor > 0 || (minor === 0 && patch >= 13))));
 
   return { supportsRelationJoins };
 }

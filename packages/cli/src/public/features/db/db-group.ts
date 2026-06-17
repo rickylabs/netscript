@@ -13,7 +13,10 @@ import type { PublicCliHost } from '../root/public-command-tree.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
 /** Create the public database command group. */
-export function createDbCommand(host: PublicCliHost, dependencies: PublicCommandDependencies) {
+export function createDbCommand(
+  host: PublicCliHost,
+  dependencies: PublicCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('db')
     .description('Database lifecycle management')

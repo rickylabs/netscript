@@ -6,8 +6,13 @@
 
 import { delay } from '@std/async';
 import { BinaryHeap } from '@std/data-structures';
-import { KvClosedError } from '../core/errors.ts';
-import { compareKeys, generateVersionstamp, keyHasPrefix, keyToString } from '../core/keys.ts';
+import { KvClosedError } from '../application/errors.ts';
+import {
+  compareKeys,
+  generateVersionstamp,
+  keyHasPrefix,
+  keyToString,
+} from '../application/keys.ts';
 import type { AtomicMutation } from '../types/kv-store.ts';
 import type { WatchableKv } from '../types/watchable-kv.ts';
 import type {

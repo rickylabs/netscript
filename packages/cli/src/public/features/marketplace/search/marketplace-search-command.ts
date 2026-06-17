@@ -20,7 +20,7 @@ export interface MarketplaceSearchCommandDependencies {
 /** Create the public marketplace search stub command. */
 export function createMarketplaceSearchCommand(
   dependencies: MarketplaceSearchCommandDependencies = {},
-): Command {
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('search')

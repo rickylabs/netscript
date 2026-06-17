@@ -48,14 +48,14 @@ const response = await durableStream({
   signal: AbortSignal.timeout(5_000),
 });
 
-const items = await response.json<unknown>();
+const items = await response.json<unknown>() as unknown[];
 response.cancel();
 // The probe has already consumed the validation payload; cleanup errors should
 // not mask the subscription assertion below.
 await response.closed.catch(ignoreExpectedProbeCleanupError);
 await producer.close();
 
-const received = items.some((item) => hasExpectedKey(item, expectedId));
+const received = items.some((item: unknown) => hasExpectedKey(item, expectedId));
 if (!received) {
   throw new Error(`Streams subscribe probe did not receive expected event ${expectedId}`);
 }

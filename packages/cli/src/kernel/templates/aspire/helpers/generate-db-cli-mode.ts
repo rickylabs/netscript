@@ -1,7 +1,7 @@
 /**
  * @module templates/aspire/helpers/generate-db-cli-mode
  *
- * Generator for `.helpers/db-cli-mode.ts`, the AppHost short-circuit used by
+ * Generator for `.helpers/db-cli-mode.mts`, the AppHost short-circuit used by
  * `netscript db <operation>` commands.
  */
 
@@ -24,14 +24,14 @@ export function generateDbCliMode(options: DbCliModeOptions): string {
       engine: '${entry.Engine}',
       taskSuffix: '${engineTaskSuffix(entry.Engine)}',
       workdir: resolve(appHostDir, 'database', '${engineDir(entry.Engine)}'),
-      resource: infrastructure.databases.get('${name}'),
+      resource: infrastructure.databases.get('${name}') ?? null,
     }`;
   });
 
   const targets = targetCases.length > 0 ? targetCases.join(',\n') : '';
 
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedAspireHelpersGenerateDbCliMode1, {
-    __slot0__: String(fileHeader('db-cli-mode.ts')),
+    __slot0__: String(fileHeader('db-cli-mode.mts')),
     __slot1__: String(SCAFFOLD_ASPIRE_MODULES.SDK_IMPORT_FROM_HELPERS),
     __slot2__: String(SCAFFOLD_ASPIRE_MODULES.ASPIRE_COMPAT_IMPORT),
     __slot3__: String(targets),

@@ -13,7 +13,7 @@
  * @module
  */
 
-import { Hono } from 'hono';
+import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { getAvailablePort } from '@std/net';
 import {
@@ -32,9 +32,7 @@ const dataDir = Deno.env.get('STREAMS_DATA_DIR');
 
 // ── Start the upstream streams server on an internal port ─────────────
 const internalPortOverride = Deno.env.get('STREAMS_INTERNAL_PORT');
-const preferredInternalPort = internalPortOverride
-  ? parseInt(internalPortOverride, 10)
-  : undefined;
+const preferredInternalPort = internalPortOverride ? parseInt(internalPortOverride, 10) : undefined;
 const internalPort = await getAvailablePort({
   preferredPort: preferredInternalPort,
 });
@@ -65,35 +63,38 @@ const upstreamCheck = healthChecks.custom('durable-streams-server', async () => 
 // ── Hono app with health + proxy ──────────────────────────────────────
 const app = new Hono();
 
-app.use('*', cors({
-  origin: '*',
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
-  allowHeaders: [
-    'Content-Type',
-    'Authorization',
-    'Stream-Seq',
-    'Stream-TTL',
-    'Stream-Expires-At',
-    'Stream-Closed',
-    'Producer-Id',
-    'Producer-Epoch',
-    'Producer-Seq',
-  ],
-  exposeHeaders: [
-    'Stream-Next-Offset',
-    'Stream-Cursor',
-    'Stream-Up-To-Date',
-    'Stream-Closed',
-    'Producer-Epoch',
-    'Producer-Seq',
-    'Producer-Expected-Seq',
-    'Producer-Received-Seq',
-    'etag',
-    'content-type',
-    'content-encoding',
-    'vary',
-  ],
-}));
+app.use(
+  '*',
+  cors({
+    origin: '*',
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
+    allowHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Stream-Seq',
+      'Stream-TTL',
+      'Stream-Expires-At',
+      'Stream-Closed',
+      'Producer-Id',
+      'Producer-Epoch',
+      'Producer-Seq',
+    ],
+    exposeHeaders: [
+      'Stream-Next-Offset',
+      'Stream-Cursor',
+      'Stream-Up-To-Date',
+      'Stream-Closed',
+      'Producer-Epoch',
+      'Producer-Seq',
+      'Producer-Expected-Seq',
+      'Producer-Received-Seq',
+      'etag',
+      'content-type',
+      'content-encoding',
+      'vary',
+    ],
+  }),
+);
 
 app.get(
   '/health',
@@ -119,7 +120,7 @@ app.get(
 
 // Proxy everything else to the upstream DurableStreamTestServer.
 // Use /* to match all paths including nested routes like /v1/stream/...
-app.all('/*', async (c) => {
+app.all('/*', async (c: Context) => {
   const url = new URL(c.req.url);
   const target = `http://127.0.0.1:${internalPort}${url.pathname}${url.search}`;
   try {

@@ -45,6 +45,7 @@ interface DatabaseBlock {
   readonly Mode?: 'Container' | 'External';
   readonly DatabaseName?: string;
   readonly Persistent?: boolean;
+  readonly DataPath?: string;
 }
 
 interface ToolBlock {
@@ -129,6 +130,7 @@ function buildDatabaseBlock(
           Mode: 'Container',
           DatabaseName: kebabDbName,
           Persistent: true,
+          DataPath: '.data/postgres',
         },
       };
     case 'mysql':
@@ -139,6 +141,7 @@ function buildDatabaseBlock(
           Mode: 'Container',
           DatabaseName: kebabDbName,
           Persistent: true,
+          DataPath: '.data/mysql',
         },
       };
     case 'mssql':
@@ -149,6 +152,7 @@ function buildDatabaseBlock(
           Mode: 'Container',
           DatabaseName: kebabDbName,
           Persistent: true,
+          DataPath: '.data/mssql',
         },
       };
     case 'sqlite':

@@ -23,6 +23,8 @@ import { registerPluginJobs } from './init.ts';
 import { startWorkersStreamMirror } from '../../streams/server.ts';
 import { createWorkersServiceRuntime } from './service-runtime.ts';
 
+export type { PluginServiceContext } from '@netscript/plugin/sdk';
+
 type ServiceDatabaseClient = Record<string, unknown>;
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;

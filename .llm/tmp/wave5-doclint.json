@@ -1,0 +1,53 @@
+{
+  "at": "dfab7a4",
+  "results": {
+    "service": {
+      "docLintCombinedTotal": 23,
+      "breakdown": {
+        "privateTypeRef": 14,
+        "missingReturnType": 8,
+        "missingJsDoc": 1,
+        "missingExplicitType": 0
+      },
+      "docLintBarrelTotal": 23,
+      "dryRunExit": 1,
+      "dryRunSlowTypes": null
+    },
+    "sdk": {
+      "docLintCombinedTotal": 29,
+      "breakdown": {
+        "privateTypeRef": 9,
+        "missingReturnType": 2,
+        "missingJsDoc": 18,
+        "missingExplicitType": 0
+      },
+      "docLintBarrelTotal": 20,
+      "dryRunExit": 1,
+      "dryRunSlowTypes": null
+    },
+    "fresh-ui": {
+      "docLintCombinedTotal": null,
+      "breakdown": {
+        "privateTypeRef": 0,
+        "missingReturnType": 0,
+        "missingJsDoc": 0,
+        "missingExplicitType": 0
+      },
+      "docLintBarrelTotal": null,
+      "dryRunExit": 1,
+      "dryRunSlowTypes": null
+    },
+    "fresh": {
+      "docLintCombinedTotal": 276,
+      "breakdown": {
+        "privateTypeRef": 115,
+        "missingReturnType": 4,
+        "missingJsDoc": 157,
+        "missingExplicitType": 0
+      },
+      "docLintBarrelTotal": 23,
+      "dryRunExit": 1,
+      "dryRunSlowTypes": null
+    }
+  }
+}

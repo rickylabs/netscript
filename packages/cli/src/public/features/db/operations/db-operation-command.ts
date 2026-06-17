@@ -61,7 +61,7 @@ export function createDbOperationCommand(
   operation: DbOperation,
   description: string,
   dependencies: DbOperationCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   return new DbOperationCommand(operation, description, dependencies).define();
 }
 

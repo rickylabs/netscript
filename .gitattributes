@@ -1,4 +1,27 @@
-*.sh text eol=lf
-*.bash text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
+# Enforce LF for text source so Windows-side checkouts/edits never introduce CRLF
+# churn. The lead authors `.md` from both Windows and WSL; generators run in Linux
+# (`/home/codex/repos`). Existing files on ext4 are already LF, so this normalizes
+# new commits only — no mass renormalization is triggered.
+*.md      text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.js      text eol=lf
+*.jsonc   text eol=lf
+*.json    text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.toml    text eol=lf
+*.sh      text eol=lf
+*.bash    text eol=lf
+*.cs      text eol=lf
+*.csproj  text eol=lf
+
+# Binary assets — never touch line endings.
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.webp    binary
+*.woff     binary
+*.woff2   binary

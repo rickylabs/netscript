@@ -7,6 +7,7 @@ export const LOCAL_PACKAGE_PATHS = {
   aspire: 'packages/aspire',
   cli: 'packages/cli',
   config: 'packages/config',
+  contracts: 'packages/contracts',
   cron: 'packages/cron',
   database: 'packages/database',
   fresh: 'packages/fresh',
@@ -20,7 +21,6 @@ export const LOCAL_PACKAGE_PATHS = {
   'runtime-config': 'packages/runtime-config',
   sdk: 'packages/sdk',
   service: 'packages/service',
-  shared: 'packages/shared',
   'plugin-streams-core': 'packages/plugin-streams-core',
   telemetry: 'packages/telemetry',
   watchers: 'packages/watchers',
@@ -31,6 +31,6 @@ export const LOCAL_PACKAGE_PATHS = {
 export type LocalPackageName = keyof typeof LOCAL_PACKAGE_PATHS;
 
 /** Engine-specific local packages copied only for selected database engines. */
-export const ENGINE_LOCAL_PACKAGE_PATHS = {
+export const ENGINE_LOCAL_PACKAGE_PATHS: Record<string, readonly string[]> = {
   mysql: ['packages/prisma-adapter-mysql'],
 } as const satisfies Readonly<Record<string, readonly string[]>>;

@@ -15,10 +15,15 @@ Deno.test({
   fn: async () => {
     const root = await Deno.makeTempDir();
     await Deno.mkdir(join(root, 'jobs'));
+    await Deno.mkdir(join(root, '.data'));
     await Deno.mkdir(join(root, '.netscript'));
     await Deno.writeTextFile(join(root, 'mod.ts'), 'export const plugin = true;');
     await Deno.writeTextFile(join(root, 'jobs', 'send-email.ts'), 'export default {};');
     await Deno.writeTextFile(join(root, 'README.md'), '# ignored');
+    await Deno.writeTextFile(
+      join(root, '.data', 'container-output.ts'),
+      'export const ignored = true;',
+    );
     await Deno.writeTextFile(
       join(root, '.netscript', 'generated.ts'),
       'export const ignored = true;',

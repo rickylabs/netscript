@@ -13,7 +13,9 @@ type DetailLayoutComponent = ((props: DetailLayoutSectionProps) => VNode) & {
   Aside: (props: DetailLayoutSectionProps) => VNode;
 };
 
-function DetailLayoutRoot({ children, class: className, ...props }: DetailLayoutSectionProps): VNode {
+function DetailLayoutRoot(
+  { children, class: className, ...props }: DetailLayoutSectionProps,
+): VNode {
   return (
     <div
       {...props}
@@ -24,11 +26,15 @@ function DetailLayoutRoot({ children, class: className, ...props }: DetailLayout
   );
 }
 
-function DetailLayoutMain({ children, class: className, ...props }: DetailLayoutSectionProps): VNode {
+function DetailLayoutMain(
+  { children, class: className, ...props }: DetailLayoutSectionProps,
+): VNode {
   return <div {...props} class={cn('ns-stack ns-stack--md', className)}>{children}</div>;
 }
 
-function DetailLayoutAside({ children, class: className, ...props }: DetailLayoutSectionProps): VNode {
+function DetailLayoutAside(
+  { children, class: className, ...props }: DetailLayoutSectionProps,
+): VNode {
   return <div {...props} class={cn('ns-stack ns-stack--md', className)}>{children}</div>;
 }
 

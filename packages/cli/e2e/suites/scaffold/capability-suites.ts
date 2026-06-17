@@ -40,7 +40,19 @@ const INFRASTRUCTURE_GATES = [
 ] as const;
 
 const RUNTIME_GATES = [
+  GATE.PREFLIGHT_DENO,
   GATE.PREFLIGHT_ASPIRE,
+  GATE.SCAFFOLD_INIT,
+  'scaffold.plugin.worker',
+  'scaffold.plugin.saga',
+  'scaffold.plugin.trigger',
+  'scaffold.plugin.stream',
+  GATE.SCAFFOLD_PLUGIN_LIST,
+  GATE.DATABASE_INIT,
+  GATE.DATABASE_GENERATE,
+  GATE.DATABASE_SEED,
+  GATE.GENERATED_PLUGINS_CHECK,
+  GATE.GENERATED_DENO_CHECK,
   GATE.RUNTIME_ASPIRE_RESTORE,
   GATE.RUNTIME_ASPIRE_START,
   GATE.RUNTIME_WAIT_POSTGRES,
@@ -53,7 +65,20 @@ const RUNTIME_GATES = [
   GATE.RUNTIME_WAIT_TRIGGERS,
   GATE.RUNTIME_ASPIRE_DESCRIBE,
   GATE.BEHAVIOR_WORKERS_HEALTH,
+  GATE.BEHAVIOR_WORKERS_JOBS,
+  GATE.BEHAVIOR_WORKERS_TASKS,
+  GATE.BEHAVIOR_WORKERS_SEED,
+  GATE.BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB,
+  GATE.BEHAVIOR_WORKERS_EXECUTIONS,
   GATE.BEHAVIOR_SAGAS_HEALTH,
+  GATE.BEHAVIOR_SAGAS_LIST,
+  GATE.BEHAVIOR_SAGAS_INSTANCES,
+  GATE.BEHAVIOR_TRIGGERS_HEALTH,
+  GATE.BEHAVIOR_TRIGGERS_WEBHOOK,
+  GATE.BEHAVIOR_TRIGGERS_EVENTS,
+  GATE.BEHAVIOR_PLUGINS_HEALTH,
+  GATE.BEHAVIOR_OTEL_WEBHOOK,
+  GATE.BEHAVIOR_OTEL_TRACES,
   GATE.CLEANUP_ASPIRE_STOP,
 ] as const;
 
@@ -138,10 +163,14 @@ export function createScaffoldCapabilitySuite(
 
   if (capability.gates.length === 0) return suite;
 
-  const selected = new Set<GateId>(capability.gates);
+  const gatesById = new Map(suite.gates.map((gate) => [gate.id, gate]));
   return {
     ...suite,
-    gates: suite.gates.filter((gate) => selected.has(gate.id)),
+    gates: capability.gates.map((id) => {
+      const gate = gatesById.get(id);
+      if (!gate) throw new Error(`Gate "${id}" is not registered for suite "${capability.id}".`);
+      return gate;
+    }),
   };
 }
 

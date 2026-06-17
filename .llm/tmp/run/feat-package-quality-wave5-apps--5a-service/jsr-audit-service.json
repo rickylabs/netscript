@@ -1,0 +1,77 @@
+{
+  "pkg": {
+    "name": "@netscript/service",
+    "version": "0.0.1-alpha.0",
+    "description": "Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.",
+    "root": "packages/service"
+  },
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "files": {
+    "total": 14,
+    "loc": 2351,
+    "entries": [
+      {
+        "path": "mod.ts",
+        "bytes": 3580
+      }
+    ]
+  },
+  "docs": {
+    "hasReadme": true,
+    "readmeLines": 235,
+    "hasDocsFolder": true,
+    "moduleTagOnEntries": {
+      ".": true
+    },
+    "descriptionLen": 99
+  },
+  "surface": {
+    ".": {
+      "exported": [
+        "HEALTH_STATUS",
+        "createErrorHandler",
+        "createHealthHandler",
+        "createLivenessHandler",
+        "createNotFoundHandler",
+        "createOpenAPIHandler",
+        "createOpenAPISpec",
+        "createRPCHandler",
+        "createRPCPlugins",
+        "createReadinessHandler",
+        "createScalarDocs",
+        "createScalarJs",
+        "createService",
+        "defineService",
+        "healthChecks"
+      ],
+      "rawCount": 15
+    }
+  },
+  "tests": {
+    "fileCount": 6,
+    "files": [
+      "tests\\handlers_test.ts",
+      "tests\\health_test.ts",
+      "tests\\runtime_test.ts",
+      "tests\\service-builder_test.ts",
+      "tests\\type-assignability_test.ts",
+      "tests\\_fixtures\\readme-examples_test.ts"
+    ]
+  },
+  "gates": [
+    {
+      "gate": "F-JSR-7 slow-types",
+      "level": "WARN",
+      "message": "Checking for slow types in the public API..."
+    }
+  ],
+  "slowTypes": {
+    "ok": true,
+    "warnings": [
+      "Checking for slow types in the public API..."
+    ],
+    "rawTail": "\nChecking for slow types in the public API...\n\u001b[0m\u001b[1m\u001b[32mSimulating publish\u001b[0m of \u001b[0m\u001b[38;5;245m@netscript/service@0.0.1-alpha.0\u001b[0m with files:\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/README.md (6.2KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/assets/scalar.min.js (3.3MB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/deno.json (1.42KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/docs/architecture.md (925B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/docs/concepts.md (668B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/docs/getting-started.md (561B)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/mod.ts (3.51KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/src/builder/service-builder.ts (16.87KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/src/diagnostics/database-connectivity.ts (12.45KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/src/presets/define-service.ts (4.04KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/src/primitives/handlers.ts (5.72KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/src/primitives/health.ts (6.32KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/src/primitives/openapi.ts (4.17KB)\n   file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5a-service/packages/service/src/types.ts (4.86KB)\n\u001b[0m\u001b[32mSuccess\u001b[0m Dry run complete\n"
+  }
+}

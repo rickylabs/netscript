@@ -6,6 +6,7 @@
 export type NetscriptPackage =
   | 'aspire'
   | 'config'
+  | 'contracts'
   | 'database'
   | 'fresh'
   | 'fresh-ui'
@@ -24,6 +25,7 @@ export type NetscriptPackage =
 export const JSR_SPECIFIERS: Readonly<Record<NetscriptPackage, string>> = {
   aspire: 'jsr:@netscript/aspire@^1.0.0',
   config: 'jsr:@netscript/config@^1.0.0',
+  contracts: 'jsr:@netscript/contracts@^1.0.0',
   database: 'jsr:@netscript/database@^1.0.0',
   fresh: 'jsr:@netscript/fresh@^1.0.0',
   'fresh-ui': 'jsr:@netscript/fresh-ui@^1.0.0',

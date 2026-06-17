@@ -10,9 +10,10 @@
 #    deno task e2e:cli) without a local agent.
 #
 # Toolchain pinned to this repo's reality in .github/toolchain.env:
-#   - Deno 2.7.x
+#   - Deno 2.8.x
 #   - .NET SDK 10.x (CLI scaffold AppHost/ServiceDefaults target net10.0)
-#   - Aspire CLI 13.2.x (matches scaffold Aspire SDK/package constants)
+#   - Aspire CLI 13.4.0 (installable standalone CLI release)
+#   - Aspire SDK 13.4.4 (matches scaffold SDK/package constants)
 #   - Docker latest stable (AppHost resources need the engine)
 name: 'Copilot Setup Steps'
 
@@ -45,7 +46,8 @@ jobs:
           echo "deno-version=${NETSCRIPT_DENO_VERSION}" >> "$GITHUB_OUTPUT"
           echo "dotnet-version=${NETSCRIPT_DOTNET_VERSION}" >> "$GITHUB_OUTPUT"
           echo "aspire-version=${NETSCRIPT_ASPIRE_CLI_VERSION}" >> "$GITHUB_OUTPUT"
-          grep -F "ASPIRE_SDK: '${NETSCRIPT_ASPIRE_CLI_VERSION}'" \
+          echo "aspire-sdk-version=${NETSCRIPT_ASPIRE_SDK_VERSION}" >> "$GITHUB_OUTPUT"
+          grep -F "ASPIRE_SDK: '${NETSCRIPT_ASPIRE_SDK_VERSION}'" \
             packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts
 
       # --- Deno (primary toolchain) ---
@@ -80,7 +82,7 @@ jobs:
           export PATH="$HOME/.aspire/bin:$PATH"
           actual="$(aspire --version)"
           echo "$actual"
-          test "$actual" = "${{ steps.toolchain.outputs.aspire-version }}"
+          test "${actual%%+*}" = "${{ steps.toolchain.outputs.aspire-version }}"
 
       # --- Docker (AppHost container resources) ---
       - name: Setup Docker

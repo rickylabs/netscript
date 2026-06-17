@@ -30,14 +30,14 @@ describe('generateConfigSchema', () => {
   it('should include the standard file header', () => {
     const output = generateConfigSchema(emptyOptions);
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'config-schema.ts');
+    assertStringIncludes(output, 'config-schema.mts');
   });
 
   it('should import zod and NetScriptConfigSchema from _aspire-compat', () => {
     const output = generateConfigSchema(emptyOptions);
     assertStringIncludes(output, "import { z } from 'zod'");
     assertStringIncludes(output, 'NetScriptConfigSchema,');
-    assertStringIncludes(output, "from './_aspire-compat.ts'");
+    assertStringIncludes(output, "from './_aspire-compat.mjs'");
   });
 
   it('should export ProjectConfigSchema and ProjectConfig type', () => {
@@ -115,7 +115,7 @@ describe('generateRegisterInfrastructure', () => {
   it('should include the standard file header', () => {
     const output = generateRegisterInfrastructure(emptyOptions);
     assertStringIncludes(output, fixtures.FILE_HEADER);
-    assertStringIncludes(output, 'register-infrastructure.ts');
+    assertStringIncludes(output, 'register-infrastructure.mts');
   });
 
   it('should export registerInfrastructure async function', () => {
@@ -126,7 +126,8 @@ describe('generateRegisterInfrastructure', () => {
   it('should export InfrastructureContext interface', () => {
     const output = generateRegisterInfrastructure(emptyOptions);
     assertStringIncludes(output, 'export interface InfrastructureContext');
-    assertStringIncludes(output, 'type AspireResource = Parameters<');
+    assertStringIncludes(output, 'type AspireResource =');
+    assertStringIncludes(output, '& Parameters<');
     assertStringIncludes(output, 'readonly databases: Map<string, AspireResource>');
     assertStringIncludes(output, 'type CacheResource = AspireResource | CacheContainerResource;');
     assertStringIncludes(output, 'readonly caches: Map<string, CacheResource>');
@@ -138,8 +139,8 @@ describe('generateRegisterInfrastructure', () => {
 
   it('should import ContainerLifetime and resolveDataPath', () => {
     const output = generateRegisterInfrastructure(emptyOptions);
-    assertStringIncludes(output, "import { ContainerLifetime } from '../.modules/aspire.ts'");
-    assertStringIncludes(output, "import { resolveDataPath } from './_aspire-compat.ts'");
+    assertStringIncludes(output, "import { ContainerLifetime } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(output, "import { resolveDataPath } from './_aspire-compat.mjs'");
   });
 
   it('should use addPostgres for Postgres Container mode', () => {

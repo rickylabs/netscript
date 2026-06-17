@@ -1,0 +1,19 @@
+# Commits — Wave 5 Apps Consolidation
+
+Append `- <sha>: <message>` after each commit.
+
+- 21c56d0: harness: bootstrap wave5 apps consolidation run + plan
+- a0e5bcc: refactor(service): split service-builder into impl + rpc + listener seams [A1]
+- e67edf1: docs(service): add Package Role archetype section to README [A2] — Phase A done
+- 5367093: refactor(sdk): collapse root barrels into src/ (single source root) [B3] — Phase B done
+- 29bcc30: refactor(fresh-ui): introduce src/ as single source root [C1] — runtime→src/runtime, primitives→src/presentation, root shells kept; manifest/registry/tokens stay at root (CLI contract); C2 deferred (drift). Phase C done.
+- bcbdf55: docs(fresh-ui,sdk): align archetype docs with doctrine [C-docs] — fresh-ui A3→A4 (DSL/Builder, A3 folded in); explicit Archetype 4 naming added to fresh-ui + sdk READMEs (service already named). Docs only.
+- 43ffcc7: refactor(fresh): introduce src role layering [D1] — codex (WSL native worktree). 157 files, +2413/-2423, almost entirely 100%-similarity renames into `src/`. builders/route/form/query/defer/config/vite + cache helpers → `src/application/`; server/streams/interactive → `src/runtime/`; error → `src/diagnostics/error/`; telemetry → `src/internal/package-telemetry/`; testing → `src/testing/`. Split page-compat (1111 LOC) into 7 type modules; split builder/mod.tsx → form-support+route-support. `deno.json` exports rationalized to 12 keys (`./utils` REMOVED); root shells kept for CLI import-map (server.ts, builders/mod.ts, route/mod.ts, query/mod.ts, config/vite.ts). plugins/workers + plugins/sagas deno.json repointed `@netscript/fresh/streams` into src/. Deleted 4 test-jsx* scratch files. Phase D structural done.
+- 09ab17d: docs(fresh): rewrite README/architecture + co-locate module docs [D-docs] — lead-owned. README rewrite (Archetype 4 + 12-row entry-point table, `./utils` dropped), `architecture.md` (src/ layout + subpath conventions), 3 orphan module READMEs (builders/define-page, form, vite) co-located into `src/` with repaired links.
+- c47fb46: refactor(fresh): delete root re-export shells, repoint CLI import-map to src/ [D2] — codex (WSL native worktree). Eliminated all 5 root re-export shells (server.ts, builders/mod.ts, route/mod.ts, query/mod.ts, config/vite.ts) + emptied dirs. Root mod.ts reduced to cache-entry helpers only (error re-export dropped — lives solely on `./error`). Repointed both CLI `PACKAGE_TO_LOCAL_PATH` maps (maintainer/adapters/local-import-resolver.ts + kernel/adapters/scaffold/import-resolver.ts), generators-config_test assertions, deno.json check/fmt/fmt:check/lint tasks, and 7 builders test fixtures to the real src/ targets. JSR `exports` unchanged. 17 files, +48/-55. **Scaffold E2E `scaffold.runtime` passed 41/41** with the repointed import-map.
+- c5f1f0e: docs(fresh): drop shell references, root surface is cache-only [D2-docs] — lead-owned. README/architecture.md/vite README updated to the no-shell, no-backward-compat reality; entry-point root row lists only cache helpers; LF-normalized (initial CRLF mis-commit b5512dc amended out before any downstream build).
+- (openhands traces, MiniMax M3 IMPL-EVALs — committed by the OpenHands workflow on the branch):
+  - ca09c44 + ccde9f9: fresh IMPL-EVAL run 27507518739 — VERDICT APPROVED (impl-eval.md, 8/8 PASS, E2E 41/41).
+  - 3254d4e + 8a6b05f: service IMPL-EVAL run 27508042691 — VERDICT APPROVED (impl-eval-service.md, 7/7 PASS, max 408 LOC).
+  - 78cc11f + a0abd27: sdk IMPL-EVAL run 27511443802 — VERDICT APPROVED (impl-eval-sdk.md, 7/7 PASS, byte-stable surface).
+- [E] Phase E closeout (lead-owned): `eval-results.md` records all 3 APPROVED verdicts + evidence; `arch-debt.md` marks `packages/fresh` AP-1 (builders split) + F-7 (doc-lint) RESOLVED with eval evidence. All 3 Wave 5 app packages clear the Archetype 4 gate + independent IMPL-EVAL bar.

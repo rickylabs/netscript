@@ -12,10 +12,12 @@ export class MemoryTriggerIdempotencyStore implements TriggerIdempotencyPort {
   readonly #active = new Set<string>();
   readonly #now: () => Date;
 
+  /** Create an in-memory idempotency store with an optional clock hook. */
   constructor(options: Readonly<{ now?: () => Date }> = {}) {
     this.#now = options.now ?? (() => new Date());
   }
 
+  /** Resolve and claim an idempotency key. */
   async resolveKey(input: TriggerIdempotencyKeyInput): Promise<TriggerIdempotencyClaim> {
     const resolved = await resolveKey(input);
     this.#deleteExpired();
@@ -26,17 +28,20 @@ export class MemoryTriggerIdempotencyStore implements TriggerIdempotencyPort {
     return { ...resolved, claimed: true };
   }
 
+  /** Mark a key as completed for the TTL window. */
   markCompleted(key: string, ttlMs: number): Promise<void> {
     this.#active.delete(key);
     this.#completed.set(key, { expiresAt: this.#now().getTime() + ttlMs });
     return Promise.resolve();
   }
 
+  /** Release an active key claim. */
   release(key: string): Promise<void> {
     this.#active.delete(key);
     return Promise.resolve();
   }
 
+  /** Clear active and completed key state. */
   clear(): void {
     this.#completed.clear();
     this.#active.clear();

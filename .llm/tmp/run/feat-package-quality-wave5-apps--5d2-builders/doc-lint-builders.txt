@@ -1,0 +1,428 @@
+error[private-type-ref]: public type 'InferDefinePageLayerLoaderProps' references private type 'ResolveDefinePageLayerLoaderOutput'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:417:1
+    | 
+417 | export type InferDefinePageLayerLoaderProps<TLoader extends (...args: never[]) => unknown> =
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+413 | type ResolveDefinePageLayerLoaderOutput<TOutput> = TOutput extends CacheEntryLike<infer TProps>
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'InferDefinePageLayerLoaderProps' references private type 'DefinePageLayerProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:417:1
+    | 
+417 | export type InferDefinePageLayerLoaderProps<TLoader extends (...args: never[]) => unknown> =
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 20 | export type DefinePageLayerProps = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/define-page/types.ts:417:1
+    | 
+417 | export type InferDefinePageLayerLoaderProps<TLoader extends (...args: never[]) => unknown> =
+    | ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:332:1
+    | 
+332 | export interface RuntimeFormState<TValues extends FormValues> {
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:332:1
+    | 
+332 | export interface RuntimeFormState<TValues extends FormValues> {
+    | ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:333:3
+    | 
+333 |   readonly id: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:334:3
+    | 
+334 |   readonly action: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:335:3
+    | 
+335 |   readonly method: 'POST' | 'PUT' | 'PATCH';
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:336:3
+    | 
+336 |   readonly values: TValues;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:337:3
+    | 
+337 |   readonly initialValues: Partial<TValues>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["fieldErrors"]' references private type 'FormFieldErrors'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:338:3
+    | 
+338 |   readonly fieldErrors: FormFieldErrors<TValues>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 43 | export type FormFieldErrors<TValues extends FormValues> =
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:338:3
+    | 
+338 |   readonly fieldErrors: FormFieldErrors<TValues>;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:339:3
+    | 
+339 |   readonly formErrors: readonly string[];
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:340:3
+    | 
+340 |   readonly hasErrors: boolean;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:341:3
+    | 
+341 |   readonly submitted: boolean;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["intent"]' references private type 'FormIntent'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:342:3
+    | 
+342 |   readonly intent: FormIntent | null;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+159 | export interface FormIntent {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:342:3
+    | 
+342 |   readonly intent: FormIntent | null;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:343:3
+    | 
+343 |   readonly submissionId: string;
+    |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:344:3
+    | 
+344 |   readonly csrfToken: string;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["fields"]' references private type 'FieldDescriptorMap'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
+    | 
+345 |   readonly fields: FieldDescriptorMap<TValues>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+325 | export type FieldDescriptorMap<T> = {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:345:3
+    | 
+345 |   readonly fields: FieldDescriptorMap<TValues>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["constraints"]' references private type 'FieldConstraints'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
+    | 
+346 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 49 | export interface FieldConstraints {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:346:3
+    | 
+346 |   readonly constraints: Record<string, FieldConstraints>;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["formProps"]' references private type 'FormElementProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
+    | 
+347 |   readonly formProps: FormElementProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 62 | export interface FormElementProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:347:3
+    | 
+347 |   readonly formProps: FormElementProps;
+    |   ^
+
+
+error[private-type-ref]: public type 'RuntimeFormState["csrfInputProps"]' references private type 'FormCsrfInputProps'
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
+    | 
+348 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 69 | export interface FormCsrfInputProps {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/form/types.ts:348:3
+    | 
+348 |   readonly csrfInputProps: FormCsrfInputProps;
+    |   ^
+
+
+error[private-type-ref]: public type 'PageFormHandlerContext' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:556:1
+    | 
+556 | export interface PageFormHandlerContext<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormHandlerContext["form"]' references private type 'FormReplyHelpers'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:566:3
+    | 
+566 |   readonly form: {
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+414 | export interface FormReplyHelpers<TValues extends FormValues, TOutput = unknown> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormHandlerContext["form"]' references private type 'FormIntent'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:566:3
+    | 
+566 |   readonly form: {
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+159 | export interface FormIntent {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:566:3
+    | 
+566 |   readonly form: {
+    |   ^
+
+
+error[private-type-ref]: public type 'PageFormConfig' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:591:1
+    | 
+591 | export interface PageFormConfig<
+    | ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["initial"]' references private type 'input'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:604:3
+    | 
+604 |   readonly initial?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 50 | export type input<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["initial"]' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:604:3
+    | 
+604 |   readonly initial?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["mutate"]' references private type 'output'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:608:3
+    | 
+608 |   readonly mutate: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 55 | export type output<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["onIntent"]' references private type 'FormIntent'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:622:3
+    | 
+622 |   readonly onIntent?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+159 | export interface FormIntent {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageFormConfig["onIntent"]' references private type 'FormIntentResult'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:622:3
+    | 
+622 |   readonly onIntent?: (
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+166 | export interface FormIntentResult<TValues extends FormValues> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageBuilder["withForm"]' references private type 'ZodType'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:953:3
+    | 
+953 |   withForm<K extends string, TSchema extends z.ZodTypeAny, TOutput = unknown>(
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+  6 | export interface ZodType<out Output = unknown, out Input = unknown, out Internals extends core.$ZodTypeInternals<Output, Input> = core.$ZodTypeInternals<Output, Input>> extends core.$ZodType<Output, Input, Internals> {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageBuilder["withForm"]' references private type 'input'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:953:3
+    | 
+953 |   withForm<K extends string, TSchema extends z.ZodTypeAny, TOutput = unknown>(
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 50 | export type input<T> = T extends {
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'PageBuilder["withForm"]' references private type 'FormValues'
+   --> /home/runner/work/netscript/netscript/packages/fresh/builders/mod.ts:953:3
+    | 
+953 |   withForm<K extends string, TSchema extends z.ZodTypeAny, TOutput = unknown>(
+    |   ^
+    = hint: make the referenced type public or remove the reference
+    | 
+ 30 | export type FormValues = object;
+    | - this is the referenced type
+    | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error: Found 40 documentation lint errors.

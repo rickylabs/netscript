@@ -8,16 +8,19 @@
 
 export {
   fixZodImports,
-  runFixZodImports,
   type FixZodImportsOptions,
   type FixZodImportsResult,
+  runFixZodImports,
 } from './fix-zod-imports.ts';
 export {
   patchPrismaClient,
-  runPatchPrismaClient,
   type PatchPrismaClientOptions,
   type PatchPrismaClientResult,
+  runPatchPrismaClient,
 } from './patch-prisma-client.ts';
-export { generateZodSchemas, generateZodSchemasCli, type GenerateZodOptions } from './generate-zod.ts';
-export { runMigration, runMigrationCli, type MigrationOptions } from './migrate.ts';
-
+export {
+  type GenerateZodOptions,
+  generateZodSchemas,
+  generateZodSchemasCli,
+} from './generate-zod.ts';
+export { type MigrationOptions, runMigration, runMigrationCli } from './migrate.ts';

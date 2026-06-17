@@ -18,14 +18,14 @@ describe('public generate application flows', () => {
       templateAdapter: {} as TemplatePort,
       regenerateHelpers: (projectRoot) =>
         Promise.resolve([
-          `${projectRoot}/.aspire/apphost.ts`,
-          `${projectRoot}/.aspire/config-schema.ts`,
+          `${projectRoot}/.aspire/apphost.mts`,
+          `${projectRoot}/.aspire/config-schema.mjs`,
         ]),
     });
 
     assertEquals(result.helperFiles, [
-      'C:/workspace/alpha/.aspire/apphost.ts',
-      'C:/workspace/alpha/.aspire/config-schema.ts',
+      'C:/workspace/alpha/.aspire/apphost.mts',
+      'C:/workspace/alpha/.aspire/config-schema.mjs',
     ]);
   });
 

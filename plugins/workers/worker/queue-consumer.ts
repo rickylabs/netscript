@@ -5,7 +5,7 @@ import {
   type JobMessage,
   type TaskMessage,
 } from '@netscript/plugin-workers-core/runtime';
-import { type TracedMessageContext, TracedQueue } from '@netscript/telemetry/instrumentation';
+import type { TracedMessageContext, TracedQueue } from '@netscript/telemetry/instrumentation';
 import type {
   QueueTriggerConfig,
   WorkerDispatchContext,

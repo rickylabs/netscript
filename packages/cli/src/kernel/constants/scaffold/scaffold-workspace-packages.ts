@@ -14,7 +14,7 @@ export const SCAFFOLD_WORKSPACE_PACKAGES = [
   'runtime-config',
   'sdk',
   'service',
-  'shared',
+  'contracts',
   'plugin-workers-core',
   'plugin-streams-core',
   'plugin-triggers-core',

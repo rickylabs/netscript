@@ -1,0 +1,17 @@
+{
+  "gate": "manifest-integrity",
+  "status": "PASS",
+  "itemCount": 42,
+  "collectionCount": 6,
+  "claimedFileCount": 62,
+  "registryFileCount": 62,
+  "excludedFileCount": 4,
+  "missingFiles": [],
+  "unclaimedFiles": [],
+  "duplicateItems": [],
+  "duplicateSources": [],
+  "unknownCollectionItems": [],
+  "unknownRegistryDependencies": [],
+  "invalidTargets": [],
+  "authorlessItems": []
+}

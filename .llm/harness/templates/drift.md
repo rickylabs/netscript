@@ -1,7 +1,7 @@
 # Drift Log: <target>
 
-Drift is append-only. Record facts that diverge from the plan, RFC, doctrine,
-or current-state documentation.
+Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or current-state
+documentation.
 
 ## <YYYY-MM-DD> — <title>
 

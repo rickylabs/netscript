@@ -2,7 +2,9 @@ import type { PluginCliArgs, PluginCliCommand, PluginCliResult } from '../types.
 
 /** Abstract base class for plugin-owned CLI command groups. */
 export abstract class PluginCli {
+  /** Plugin CLI group name. */
   abstract readonly name: string;
+  /** Plugin CLI group description. */
   abstract readonly description: string;
 
   /**

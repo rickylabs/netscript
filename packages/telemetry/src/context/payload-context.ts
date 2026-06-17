@@ -1,7 +1,10 @@
-import type { Context } from '@opentelemetry/api';
+import type { Context } from '../core/mod.ts';
 import { extractContext, extractFromTraceContext, resolveTraceContext } from './w3c.ts';
 import type { JobTraceEnv, PropagationHeaders, SerializedTraceContext } from './types.ts';
 
+/**
+ * Create environment variables carrying trace context for a job subprocess.
+ */
 export function createJobTraceEnv(ctx?: Context): JobTraceEnv {
   const traceContext = resolveTraceContext(ctx);
   if (!traceContext) {
@@ -18,6 +21,9 @@ export function createJobTraceEnv(ctx?: Context): JobTraceEnv {
   return env;
 }
 
+/**
+ * Extract a parent context from job subprocess environment variables.
+ */
 export function extractJobTraceContext(): Context | null {
   const jsonContext = Deno.env.get('JOB_TRACE_CONTEXT');
   if (jsonContext) {

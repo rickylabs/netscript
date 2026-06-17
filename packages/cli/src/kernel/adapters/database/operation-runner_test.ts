@@ -80,7 +80,7 @@ function createRequest(
 
 describe('DbOperationRunner', () => {
   it('runs one-shot operations through detached Aspire start and resource polling', async () => {
-    const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.ts');
+    const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');
     const executor = new FakeAspireExecutor([
       { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
       { code: 0, stdout: '[]', stderr: '' },
@@ -138,7 +138,15 @@ describe('DbOperationRunner', () => {
     assertEquals(executor.outputCalls[0].args[0], 'start');
     assertEquals(executor.outputCalls[0].args.includes('--isolated'), false);
     assertEquals(executor.outputCalls[0].args.includes('--'), false);
-    assertEquals(executor.outputCalls[1].args[0], 'ps');
+    assertEquals(executor.outputCalls[1].args, [
+      'describe',
+      '--apphost',
+      apphostPath,
+      '--format',
+      'Json',
+      '--non-interactive',
+      '--nologo',
+    ]);
     assertEquals(executor.outputCalls[4].args[0], 'logs');
     assertEquals(executor.outputCalls[5].args[0], 'stop');
     assertEquals(

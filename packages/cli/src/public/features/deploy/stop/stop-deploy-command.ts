@@ -28,7 +28,7 @@ import {
   servyLifecycleArgs,
 } from '../../../../kernel/adapters/deploy/shared.ts';
 
-export const stopCommand = new Command()
+export const stopCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('stop')
   .description('Stop registered services via Servy (requires admin)')
   .arguments('[service:string]')

@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@durable-streams/state": "catalog:",
+    "@preact/signals": "catalog:",
+    "@tanstack/preact-query": "catalog:",
+    "@tanstack/query-core": "catalog:",
+    "@tanstack/react-db": "catalog:",
+    "preact": "catalog:",
+    "preact-render-to-string": "catalog:",
+    "vite": "catalog:"
+  }
+}

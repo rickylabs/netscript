@@ -1,0 +1,58 @@
+[0m[32mInitialize[0m @zag-js/combobox@1.41.2
+[0m[32mInitialize[0m @zag-js/preact@1.41.2
+[0m[32mInitialize[0m @esbuild/win32-x64@0.25.12
+[0m[32mInitialize[0m @zag-js/collection@1.41.2
+[0m[32mInitialize[0m @zag-js/live-region@1.41.2
+[0m[32mInitialize[0m @zag-js/dom-query@1.41.2
+[0m[32mInitialize[0m @zag-js/dismissable@1.41.2
+[0m[32mInitialize[0m @zag-js/popper@1.41.2
+[0m[32mInitialize[0m @zag-js/core@1.41.2
+[0m[32mInitialize[0m @zag-js/focus-visible@1.41.2
+[0m[32mInitialize[0m @zag-js/anatomy@1.41.2
+[0m[32mInitialize[0m @zag-js/types@1.41.2
+[0m[32mInitialize[0m @zag-js/utils@1.41.2
+[0m[32mInitialize[0m @zag-js/store@1.41.2
+[0m[32mInitialize[0m @esbuild/win32-x64@0.27.7
+[0m[32mInitialize[0m source-map-js@1.2.1
+[0m[32mInitialize[0m @rollup/rollup-win32-x64-msvc@4.61.1
+[0m[32mInitialize[0m @rollup/rollup-win32-x64-gnu@4.61.1
+[0m[32mInitialize[0m @types/estree@1.0.9
+[0m[32mInitialize[0m @zag-js/interact-outside@1.41.2
+[0m[32mInitialize[0m @floating-ui/dom@1.7.6
+[0m[32mInitialize[0m proxy-compare@3.0.1
+[0m[32mInitialize[0m @floating-ui/core@1.7.5
+[0m[32mInitialize[0m @floating-ui/utils@0.2.11
+[0m[32mInitialize[0m @zag-js/combobox@1.41.2
+[0m[32mInitialize[0m @zag-js/preact@1.41.2
+[0m[32mInitialize[0m @zag-js/focus-visible@1.41.2
+[0m[32mInitialize[0m @zag-js/core@1.41.2
+[0m[32mInitialize[0m @zag-js/popper@1.41.2
+[0m[32mInitialize[0m @zag-js/utils@1.41.2
+[0m[32mInitialize[0m @zag-js/live-region@1.41.2
+[0m[32mInitialize[0m @zag-js/anatomy@1.41.2
+[0m[32mInitialize[0m @zag-js/collection@1.41.2
+[0m[32mInitialize[0m @zag-js/dismissable@1.41.2
+[0m[32mInitialize[0m @zag-js/dom-query@1.41.2
+[0m[32mInitialize[0m @zag-js/types@1.41.2
+[0m[32mInitialize[0m @esbuild/win32-x64@0.25.12
+[0m[32mInitialize[0m @zag-js/store@1.41.2
+[0m[32mInitialize[0m @esbuild/win32-x64@0.27.7
+[0m[32mInitialize[0m @types/estree@1.0.9
+[0m[32mInitialize[0m @rollup/rollup-win32-x64-msvc@4.61.1
+[0m[32mInitialize[0m @rollup/rollup-win32-x64-gnu@4.61.1
+[0m[32mInitialize[0m source-map-js@1.2.1
+[0m[32mInitialize[0m @floating-ui/dom@1.7.6
+[0m[32mInitialize[0m @zag-js/interact-outside@1.41.2
+[0m[32mInitialize[0m proxy-compare@3.0.1
+[0m[32mInitialize[0m @floating-ui/core@1.7.5
+[0m[32mInitialize[0m @floating-ui/utils@0.2.11
+[31mfailed to load config from C:\Dev\repos\netscript\output\test-app\worktrees\repo-genesis\.genesis\netscript\.worktrees\wave5-apps-5c1-ui-foundation\.llm\tmp\run\feat-package-quality-wave5-apps--5c1-ui-foundation\slice-10-zag-fresh-spike\vite.config.ts[39m
+[31merror when starting dev server:
+TypeError: Cannot read properties of undefined (reading 'unref')
+    at ChildProcess.unref (ext:deno_node/internal/child_process.ts:501:19)
+    at ensureServiceIsRunning (file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-fresh-spike/node_modules/.deno/esbuild@0.27.7/node_modules/esbuild/lib/main.js:2299:9)
+    at transform (file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-fresh-spike/node_modules/.deno/esbuild@0.27.7/node_modules/esbuild/lib/main.js:2168:37)
+    at transformWithEsbuild (file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-fresh-spike/node_modules/.deno/vite@7.3.5/node_modules/vite/dist/node/chunks/config.js:6123:24)
+    at async TransformPluginContext.transform (file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-fresh-spike/node_modules/.deno/vite@7.3.5/node_modules/vite/dist/node/chunks/config.js:6172:20)
+    at async EnvironmentPluginContainer.transform (file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-fresh-spike/node_modules/.deno/vite@7.3.5/node_modules/vite/dist/node/chunks/config.js:28877:14)
+    at async loadAndTransform (file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/.llm/tmp/run/feat-package-quality-wave5-apps--5c1-ui-foundation/slice-10-zag-fresh-spike/node_modules/.deno/vite@7.3.5/node_modules/vite/dist/node/chunks/config.js:22746:26)[39m

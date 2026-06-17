@@ -9,7 +9,7 @@ import { contractAddCommand } from './add/add-contract-command.ts';
 import { contractListCommand } from './list/list-contracts-command.ts';
 
 /** Root `netscript contract` command group. */
-export const contractCommand = new Command()
+export const contractCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('contract')
   .description('Manage NetScript workspace contracts')
   .action(function () {

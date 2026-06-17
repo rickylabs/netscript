@@ -14,7 +14,7 @@ import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { ListServicesInput } from './list-services-input.ts';
 
 /** `netscript service list` command. */
-export const serviceListCommand = new Command()
+export const serviceListCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('list')
   .description('List configured NetScript services')
   .option('--project-root <path:string>', 'Project root directory')

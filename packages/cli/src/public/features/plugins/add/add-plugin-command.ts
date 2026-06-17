@@ -20,7 +20,9 @@ export interface PluginAddCommandDependencies {
 }
 
 /** Create the public `plugin add` command. */
-export function createPluginAddCommand(dependencies: PluginAddCommandDependencies) {
+export function createPluginAddCommand(
+  dependencies: PluginAddCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   const print = dependencies.print ?? outputText;
   return new Command()
     .name('add')

@@ -29,10 +29,13 @@ export class StaticSagasCliBackend implements SagasCliBackend {
 
 /** Base command wrapper for sagas plugin CLI commands. */
 export abstract class SagasCliCommand {
+  /** Static command metadata used by the host CLI. */
   readonly definition: SagasCliCommandDefinition;
+  /** Grouping category used by help and discovery output. */
   readonly category: SagasCliCategory;
   private readonly backend: SagasCliBackend;
 
+  /** Create a sagas CLI command with optional backend injection. */
   protected constructor(
     definition: SagasCliCommandDefinition,
     backend: SagasCliBackend = new LocalSagasCliBackend(),
@@ -67,6 +70,7 @@ export abstract class SagasCliCommand {
 
 /** Generate the static saga registry. */
 export class GenerateRegistryCommand extends SagasCliCommand {
+  /** Create the registry-generation command wrapper. */
   constructor(backend?: SagasCliBackend) {
     super({
       name: 'generate-registry',
@@ -84,6 +88,7 @@ export class GenerateRegistryCommand extends SagasCliCommand {
 
 /** Inspect saga definitions discovered in project source. */
 export class InspectCommand extends SagasCliCommand {
+  /** Create the saga-inspection command wrapper. */
   constructor(backend?: SagasCliBackend) {
     super({
       name: 'inspect',
@@ -97,6 +102,7 @@ export class InspectCommand extends SagasCliCommand {
 
 /** Rewrite legacy `@netscript/sagas` imports. */
 export class CodemodCommand extends SagasCliCommand {
+  /** Create the sagas import-codemod command wrapper. */
   constructor(backend?: SagasCliBackend) {
     super({
       name: 'codemod',

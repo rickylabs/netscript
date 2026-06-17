@@ -51,6 +51,8 @@ export class AddDbCommand extends ScaffoldCommand<AnyCliffyCommand> {
 }
 
 /** Create the public `db add` command. */
-export function createDbAddCommand(dependencies: DbAddCommandDependencies) {
+export function createDbAddCommand(
+  dependencies: DbAddCommandDependencies,
+): Command<any, any, any, any, any, any, any, any> {
   return new AddDbCommand(dependencies).define();
 }

@@ -1,0 +1,54 @@
+{
+  "lsp": {
+    "deno": {
+      "settings": {
+        "deno": {
+          "enable": true,
+          "config": "./deno.json",
+          "unstable": true,
+          "documentPreloadLimit": 5000
+        }
+      }
+    },
+    "json-language-server": {
+      "settings": {
+        "json": {
+          "schemas": [
+            {
+              "fileMatch": ["deno.json", "deno.jsonc", "**/deno.json", "**/deno.jsonc"],
+              "url": "https://raw.githubusercontent.com/denoland/deno/refs/heads/main/cli/schemas/config-file.v1.json"
+            },
+            {
+              "fileMatch": ["package.json"],
+              "url": "https://www.schemastore.org/package"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "languages": {
+    "JavaScript": {
+      "language_servers": ["deno", "!typescript-language-server", "!vtsls", "!eslint"],
+      "formatter": "language_server"
+    },
+    "TypeScript": {
+      "language_servers": ["deno", "!typescript-language-server", "!vtsls", "!eslint"],
+      "formatter": "language_server"
+    },
+    "TSX": {
+      "language_servers": ["deno", "!typescript-language-server", "!vtsls", "!eslint"],
+      "formatter": "language_server"
+    },
+    "JSON": {
+      "formatter": "language_server"
+    },
+    "JSONC": {
+      "formatter": "language_server"
+    },
+    "CSharp": {
+      "format_on_save": "on",
+      "tab_size": 2
+    }
+  }
+}

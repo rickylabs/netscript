@@ -3,6 +3,9 @@ import type { StateSchema, StreamStateDefinition } from '../domain/stream-schema
 import type { StreamProducerPort } from '../ports/stream-producer-port.ts';
 import { buildStreamUrl, getStreamsAuth } from './stream-url-resolver.ts';
 
+export type { StateSchema, StreamStateDefinition } from '../domain/stream-schema.ts';
+export type { StreamProducerPort } from '../ports/stream-producer-port.ts';
+
 /** Options accepted by {@link DurableStreamProducer}. */
 export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition> {
   /** Stream path relative to the base URL, for example `/workers/executions`. */
@@ -17,6 +20,9 @@ export interface DurableStreamProducerOptions<TDef extends StreamStateDefinition
 
 /**
  * Server-side writer for a named durable stream.
+ *
+ * @remarks Uses `console.warn` for current alpha operator visibility; tracked as AP-13
+ * architecture debt until the telemetry-integration wave supplies a structured reporter.
  *
  * @example
  * ```ts
@@ -65,8 +71,11 @@ export class DurableStreamProducer<TDef extends StreamStateDefinition>
         headers,
         signal,
       });
-    } catch (error) {
-      if (error instanceof DurableStreamError && error.code === 'CONFLICT_EXISTS') {
+    } catch (error: unknown) {
+      if (
+        error instanceof DurableStreamError &&
+        (error as { readonly code?: unknown }).code === 'CONFLICT_EXISTS'
+      ) {
         handle = new DurableStream({ url, headers });
       } else {
         const wrapped = error instanceof Error ? error : new Error(String(error));

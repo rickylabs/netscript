@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@opentelemetry/api": "catalog:",
+    "@orpc/contract": "catalog:"
+  }
+}

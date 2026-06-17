@@ -30,10 +30,13 @@ const defaultBackend: TriggersCliBackend = new StaticTriggersCliBackend();
 
 /** Base command wrapper for triggers plugin CLI commands. */
 export abstract class TriggersCliCommand {
+  /** Static command metadata used by help and backend dispatch. */
   readonly definition: TriggersCliCommandDefinition;
+  /** Category used by grouped help and command discovery. */
   readonly category: TriggersCliCategory;
   private readonly backend: TriggersCliBackend;
 
+  /** Create a command wrapper over the supplied command metadata. */
   protected constructor(
     definition: TriggersCliCommandDefinition,
     backend: TriggersCliBackend = defaultBackend,
@@ -68,6 +71,7 @@ export abstract class TriggersCliCommand {
 
 /** Create a webhook trigger definition file. */
 export class AddWebhookCommand extends TriggersCliCommand {
+  /** Create the webhook scaffolding command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'add-webhook',
@@ -86,6 +90,7 @@ export class AddWebhookCommand extends TriggersCliCommand {
 
 /** Create a file-watch trigger definition file. */
 export class AddFileWatchCommand extends TriggersCliCommand {
+  /** Create the file-watch scaffolding command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'add-file-watch',
@@ -104,6 +109,7 @@ export class AddFileWatchCommand extends TriggersCliCommand {
 
 /** Create a scheduled trigger definition file. */
 export class AddScheduledCommand extends TriggersCliCommand {
+  /** Create the scheduled-trigger scaffolding command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'add-scheduled',
@@ -122,6 +128,7 @@ export class AddScheduledCommand extends TriggersCliCommand {
 
 /** List trigger definitions and runtime state. */
 export class ListTriggersCommand extends TriggersCliCommand {
+  /** Create the trigger listing command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'list',
@@ -138,6 +145,7 @@ export class ListTriggersCommand extends TriggersCliCommand {
 
 /** Test a trigger definition without dispatching durable work. */
 export class TestTriggerCommand extends TriggersCliCommand {
+  /** Create the trigger test command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'test',
@@ -151,6 +159,7 @@ export class TestTriggerCommand extends TriggersCliCommand {
 
 /** Fire a trigger through the runtime processor. */
 export class FireTriggerCommand extends TriggersCliCommand {
+  /** Create the trigger fire command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'fire',
@@ -167,6 +176,7 @@ export class FireTriggerCommand extends TriggersCliCommand {
 
 /** Preview scheduled trigger fire times. */
 export class PreviewScheduleCommand extends TriggersCliCommand {
+  /** Create the scheduled-trigger preview command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'preview',
@@ -180,6 +190,7 @@ export class PreviewScheduleCommand extends TriggersCliCommand {
 
 /** Enable a trigger definition at runtime. */
 export class EnableTriggerCommand extends TriggersCliCommand {
+  /** Create the trigger enable command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'enable',
@@ -192,6 +203,7 @@ export class EnableTriggerCommand extends TriggersCliCommand {
 
 /** Disable a trigger definition at runtime. */
 export class DisableTriggerCommand extends TriggersCliCommand {
+  /** Create the trigger disable command. */
   constructor(backend?: TriggersCliBackend) {
     super({
       name: 'disable',

@@ -13,8 +13,7 @@ import { cn } from '../../lib/cn.ts';
  */
 export type SpinnerSize = 'sm' | 'md' | 'lg';
 
-interface SpinnerProps
-  extends Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class' | 'children'> {
+interface SpinnerProps extends Omit<JSX.HTMLAttributes<HTMLSpanElement>, 'class' | 'children'> {
   class?: string;
   label?: string;
   size?: SpinnerSize;

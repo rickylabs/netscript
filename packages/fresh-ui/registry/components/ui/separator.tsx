@@ -8,8 +8,7 @@
 import type { JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
-interface SeparatorProps
-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
+interface SeparatorProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'class' | 'children'> {
   class?: string;
   orientation?: 'horizontal' | 'vertical';
 }

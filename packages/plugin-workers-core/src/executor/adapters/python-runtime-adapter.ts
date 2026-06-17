@@ -4,6 +4,7 @@ import { RuntimeAdapterBase } from './runtime-adapter-base.ts';
 
 /** Runtime adapter for Python task scripts. */
 export class PythonRuntimeAdapter extends RuntimeAdapterBase {
+  /** Create a Python adapter with an optional custom process runner. */
   constructor(options: { runner?: ProcessRunner } = {}) {
     super({
       id: 'python-runtime-adapter',

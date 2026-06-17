@@ -22,9 +22,10 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   assertEquals(result.unstable, ['raw-imports', 'kv']);
   assertEquals(result.exclude, [
     '**/node_modules',
+    '**/.data',
     'dotnet',
     '**/.git',
-    'aspire/.modules',
+    'aspire/.aspire',
     'aspire/.helpers',
     '**/.generated',
   ]);
@@ -146,7 +147,7 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, '# AlphaApp');
   assertStringIncludes(md, 'aspire restore');
   assertStringIncludes(md, 'aspire run');
-  assertStringIncludes(md, 'apphost.ts');
+  assertStringIncludes(md, 'apphost.mts');
   assertStringIncludes(md, 'services/users');
   assertStringIncludes(md, 'PostgreSQL');
   assertStringIncludes(md, 'appsettings.json');

@@ -3,6 +3,37 @@ import { eventIterator, implement } from '@orpc/server';
 import { z } from 'zod';
 import { SAGA_DURABILITY_TIERS, SAGA_INSTANCE_STATUSES } from '../../domain/mod.ts';
 
+/** Result returned by contract schema validation. */
+export type ContractSchemaResult<TOutput> =
+  | { readonly success: true; readonly data: TOutput }
+  | { readonly success: false; readonly error: unknown };
+
+/** Package-owned structural schema surface for saga contracts. */
+export interface ContractSchema<TOutput = unknown, TInput = unknown> {
+  /** Parse an input value or throw a validation error. */
+  parse(input: TInput): TOutput;
+  /** Parse an input value and return a result object instead of throwing. */
+  safeParse(input: TInput): ContractSchemaResult<TOutput>;
+}
+
+/** Structural Standard Schema reference used by contract metadata. */
+export type StandardSchemaLike<TInput = unknown, TOutput = TInput> = Readonly<{
+  '~standard': Readonly<{
+    types?: Readonly<{
+      input: TInput;
+      output: TOutput;
+    }>;
+  }>;
+}>;
+
+/** Structural oRPC procedure reference used by saga contracts. */
+export type ContractProcedureLike<TInput = unknown, TOutput = unknown> = Readonly<{
+  '~orpc': Readonly<{
+    inputSchema?: StandardSchemaLike<TInput>;
+    outputSchema?: StandardSchemaLike<unknown, TOutput>;
+  }>;
+}>;
+
 const nonNegativeInt = (description: string): z.ZodNumber =>
   z.number().int().nonnegative().describe(description);
 
@@ -17,8 +48,11 @@ const OffsetPaginationQueryShape: z.ZodRawShape = {
   offset: z.coerce.number().int().nonnegative().default(0),
 };
 
-export const OffsetPaginationQuerySchema: z.ZodObject<typeof OffsetPaginationQueryShape> = z
+const OffsetPaginationQueryZodSchema: z.ZodObject<typeof OffsetPaginationQueryShape> = z
   .object(OffsetPaginationQueryShape);
+
+/** Offset pagination query schema shared by list endpoints. */
+export const OffsetPaginationQuerySchema: ContractSchema = OffsetPaginationQueryZodSchema;
 
 const baseContract = oc.errors({
   NOT_FOUND: {
@@ -39,6 +73,7 @@ const baseContract = oc.errors({
   },
 });
 
+/** Public response returned for a configured saga definition. */
 export type SagaDefinitionResponse = Readonly<{
   id: string;
   name: string;
@@ -58,6 +93,7 @@ export type SagaDefinitionResponse = Readonly<{
   }>;
 }>;
 
+/** Public response returned for a persisted saga instance. */
 export type SagaInstanceResponse = Readonly<{
   sagaName: string;
   sagaId?: string;
@@ -74,6 +110,7 @@ export type SagaInstanceResponse = Readonly<{
   lastMessageType?: string;
 }>;
 
+/** Input accepted by the publish endpoint. */
 export type PublishMessageInput = Readonly<{
   type: string;
   payload?: Readonly<Record<string, unknown>>;
@@ -86,6 +123,7 @@ export type PublishMessageInput = Readonly<{
   tracestate?: string;
 }>;
 
+/** Response returned after a saga message publish attempt. */
 export type PublishMessageResponse = Readonly<{
   published: boolean;
   messageType: string;
@@ -94,6 +132,7 @@ export type PublishMessageResponse = Readonly<{
   messageId?: string;
 }>;
 
+/** Server-sent event kinds emitted by the saga service. */
 export type SagaSSEEventType =
   | 'saga:started'
   | 'saga:message_received'
@@ -103,6 +142,7 @@ export type SagaSSEEventType =
   | 'saga:compensating'
   | 'heartbeat';
 
+/** Server-sent event payload emitted by saga subscriptions. */
 export type SagaSSEEvent = Readonly<{
   type: SagaSSEEventType;
   timestamp: string;
@@ -114,19 +154,22 @@ export type SagaSSEEvent = Readonly<{
   data?: Readonly<Record<string, unknown>>;
 }>;
 
-type SagaFilters = Readonly<{
+/** Query filters accepted by the list-sagas endpoint. */
+export type SagaFilters = Readonly<{
   topic?: string;
   enabled?: boolean;
   tags?: string;
 }>;
 
-type InstanceFilters = Readonly<{
+/** Query filters accepted by the list-instances endpoint. */
+export type InstanceFilters = Readonly<{
   sagaName?: string;
   sagaId?: string;
   status?: (typeof SAGA_INSTANCE_STATUSES)[number] | null;
   topic?: string;
 }>;
 
+/** Public history entry returned for saga state transitions. */
 export type SagaHistoryEntry = Readonly<{
   id: string;
   sagaName: string;
@@ -144,7 +187,7 @@ export type SagaHistoryEntry = Readonly<{
   transitionAt: string;
 }>;
 
-export const SagaDefinitionResponseSchema: z.ZodType<SagaDefinitionResponse> = z.object({
+const SagaDefinitionResponseZodSchema: z.ZodType<SagaDefinitionResponse> = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
@@ -163,7 +206,11 @@ export const SagaDefinitionResponseSchema: z.ZodType<SagaDefinitionResponse> = z
   }).optional(),
 });
 
-export const SagaInstanceResponseSchema: z.ZodType<SagaInstanceResponse> = z.object({
+/** Schema for saga definition responses. */
+export const SagaDefinitionResponseSchema: ContractSchema<SagaDefinitionResponse> =
+  SagaDefinitionResponseZodSchema;
+
+const SagaInstanceResponseZodSchema: z.ZodType<SagaInstanceResponse> = z.object({
   sagaName: z.string(),
   sagaId: z.string().optional(),
   instanceId: z.string().optional(),
@@ -179,7 +226,11 @@ export const SagaInstanceResponseSchema: z.ZodType<SagaInstanceResponse> = z.obj
   lastMessageType: z.string().optional(),
 });
 
-export const PublishMessageInputSchema: z.ZodType<PublishMessageInput> = z.object({
+/** Schema for saga instance responses. */
+export const SagaInstanceResponseSchema: ContractSchema<SagaInstanceResponse> =
+  SagaInstanceResponseZodSchema;
+
+const PublishMessageInputZodSchema: z.ZodType<PublishMessageInput> = z.object({
   type: z.string().min(1).describe('Message type identifier'),
   payload: z.record(z.string(), z.unknown()).optional().describe('Message payload'),
   correlationId: z.string().optional().describe('Compatibility correlation identifier'),
@@ -191,7 +242,11 @@ export const PublishMessageInputSchema: z.ZodType<PublishMessageInput> = z.objec
   tracestate: z.string().optional(),
 });
 
-export const PublishMessageResponseSchema: z.ZodType<PublishMessageResponse> = z.object({
+/** Schema for publish endpoint input. */
+export const PublishMessageInputSchema: ContractSchema<PublishMessageInput> =
+  PublishMessageInputZodSchema;
+
+const PublishMessageResponseZodSchema: z.ZodType<PublishMessageResponse> = z.object({
   published: z.boolean(),
   messageType: z.string(),
   correlationId: z.string().optional(),
@@ -199,7 +254,11 @@ export const PublishMessageResponseSchema: z.ZodType<PublishMessageResponse> = z
   messageId: z.string().optional(),
 });
 
-export const SagaSSEEventTypeSchema: z.ZodType<SagaSSEEventType> = z.enum([
+/** Schema for publish endpoint responses. */
+export const PublishMessageResponseSchema: ContractSchema<PublishMessageResponse> =
+  PublishMessageResponseZodSchema;
+
+const SagaSSEEventTypeZodSchema: z.ZodType<SagaSSEEventType> = z.enum([
   'saga:started',
   'saga:message_received',
   'saga:state_changed',
@@ -209,8 +268,11 @@ export const SagaSSEEventTypeSchema: z.ZodType<SagaSSEEventType> = z.enum([
   'heartbeat',
 ]);
 
-export const SagaSSEEventSchema: z.ZodType<SagaSSEEvent> = z.object({
-  type: SagaSSEEventTypeSchema,
+/** Schema for saga SSE event type values. */
+export const SagaSSEEventTypeSchema: ContractSchema<SagaSSEEventType> = SagaSSEEventTypeZodSchema;
+
+const SagaSSEEventZodSchema: z.ZodType<SagaSSEEvent> = z.object({
+  type: SagaSSEEventTypeZodSchema,
   timestamp: z.string().datetime(),
   sagaName: z.string().optional(),
   sagaId: z.string().optional(),
@@ -226,7 +288,13 @@ const SagaFiltersShape: z.ZodRawShape = {
   tags: z.string().optional(),
 };
 
-export const SagaFiltersSchema: z.ZodType<SagaFilters> = z.object(SagaFiltersShape);
+/** Schema for saga subscription event payloads. */
+export const SagaSSEEventSchema: ContractSchema<SagaSSEEvent> = SagaSSEEventZodSchema;
+
+const SagaFiltersZodSchema: z.ZodType<SagaFilters> = z.object(SagaFiltersShape);
+
+/** Schema for list-sagas query filters. */
+export const SagaFiltersSchema: ContractSchema<SagaFilters> = SagaFiltersZodSchema;
 
 const InstanceFiltersShape: z.ZodRawShape = {
   sagaName: z.string().optional(),
@@ -235,9 +303,12 @@ const InstanceFiltersShape: z.ZodRawShape = {
   topic: z.string().optional(),
 };
 
-export const InstanceFiltersSchema: z.ZodType<InstanceFilters> = z.object(InstanceFiltersShape);
+const InstanceFiltersZodSchema: z.ZodType<InstanceFilters> = z.object(InstanceFiltersShape);
 
-export const SagaHistoryEntrySchema: z.ZodType<SagaHistoryEntry> = z.object({
+/** Schema for list-instances query filters. */
+export const InstanceFiltersSchema: ContractSchema<InstanceFilters> = InstanceFiltersZodSchema;
+
+const SagaHistoryEntryZodSchema: z.ZodType<SagaHistoryEntry> = z.object({
   id: z.string(),
   sagaName: z.string(),
   sagaId: z.string(),
@@ -258,9 +329,9 @@ function createSagasContractDefinition(): Parameters<typeof implement>[0] {
   return {
     listSagas: baseContract
       .route({ method: 'GET', path: '/sagas' })
-      .input(OffsetPaginationQuerySchema.extend(SagaFiltersShape))
+      .input(OffsetPaginationQueryZodSchema.extend(SagaFiltersShape))
       .output(z.object({
-        sagas: z.array(SagaDefinitionResponseSchema),
+        sagas: z.array(SagaDefinitionResponseZodSchema),
         total: nonNegativeInt('Total count'),
         limit: paginationLimit('Results per page'),
         offset: paginationOffset('Current offset'),
@@ -269,13 +340,13 @@ function createSagasContractDefinition(): Parameters<typeof implement>[0] {
     getSaga: baseContract
       .route({ method: 'GET', path: '/sagas/{id}' })
       .input(z.object({ id: z.string() }))
-      .output(SagaDefinitionResponseSchema),
+      .output(SagaDefinitionResponseZodSchema),
 
     listInstances: baseContract
       .route({ method: 'GET', path: '/instances' })
-      .input(OffsetPaginationQuerySchema.extend(InstanceFiltersShape))
+      .input(OffsetPaginationQueryZodSchema.extend(InstanceFiltersShape))
       .output(z.object({
-        instances: z.array(SagaInstanceResponseSchema),
+        instances: z.array(SagaInstanceResponseZodSchema),
         total: nonNegativeInt('Total count'),
         limit: paginationLimit('Results per page'),
         offset: paginationOffset('Current offset'),
@@ -284,7 +355,7 @@ function createSagasContractDefinition(): Parameters<typeof implement>[0] {
     getInstance: baseContract
       .route({ method: 'GET', path: '/instances/{sagaName}/{correlationId}' })
       .input(z.object({ sagaName: z.string(), correlationId: z.string() }))
-      .output(SagaInstanceResponseSchema),
+      .output(SagaInstanceResponseZodSchema),
 
     getInstanceHistory: baseContract
       .route({ method: 'GET', path: '/instances/{sagaName}/{correlationId}/history' })
@@ -295,14 +366,14 @@ function createSagasContractDefinition(): Parameters<typeof implement>[0] {
         offset: z.coerce.number().int().nonnegative().default(0).optional(),
       }))
       .output(z.object({
-        history: z.array(SagaHistoryEntrySchema),
+        history: z.array(SagaHistoryEntryZodSchema),
         total: nonNegativeInt('Total count'),
       })),
 
     publish: baseContract
       .route({ method: 'POST', path: '/publish' })
-      .input(PublishMessageInputSchema)
-      .output(PublishMessageResponseSchema),
+      .input(PublishMessageInputZodSchema)
+      .output(PublishMessageResponseZodSchema),
 
     subscribe: oc
       .route({ method: 'GET', path: '/subscribe' })
@@ -314,11 +385,43 @@ function createSagasContractDefinition(): Parameters<typeof implement>[0] {
           streaming: z.coerce.boolean().optional(),
         }).optional(),
       )
-      .output(eventIterator(SagaSSEEventSchema)),
+      .output(eventIterator(SagaSSEEventZodSchema)),
   } satisfies Parameters<typeof implement>[0];
 }
 
-type SagasContractDefinition = ReturnType<typeof createSagasContractDefinition>;
+/** Schema for saga transition history entries. */
+export const SagaHistoryEntrySchema: ContractSchema<SagaHistoryEntry> = SagaHistoryEntryZodSchema;
 
-export const sagasContract: SagasContractDefinition = createSagasContractDefinition();
-export const sagasContractV1: ReturnType<typeof implement> = implement(sagasContract);
+/** Explicit public contract shape for saga service clients. */
+export type SagasContractDefinition = Readonly<{
+  listSagas: ContractProcedureLike;
+  getSaga: ContractProcedureLike;
+  listInstances: ContractProcedureLike;
+  getInstance: ContractProcedureLike;
+  getInstanceHistory: ContractProcedureLike;
+  publish: ContractProcedureLike<PublishMessageInput, PublishMessageResponse>;
+  subscribe: ContractProcedureLike;
+}>;
+
+/** Structural route handler exposed by the implemented saga router. */
+export type SagasRouteHandler = Readonly<{
+  // deno-lint-ignore no-explicit-any -- structural oRPC server-contract export keeps JSR slow types contained.
+  handler: <THandler extends (options: any) => unknown>(handler: THandler) => ReturnType<THandler>;
+}>;
+
+/** Structural saga router returned after binding a context. */
+export type SagasRouter = Readonly<{ [TKey in keyof SagasContractDefinition]: SagasRouteHandler }>;
+
+/** Context-binding contract wrapper for the v1 saga contract. */
+export type SagasContractV1 = Readonly<{ $context: <TContext>() => SagasRouter }>;
+
+const sagasContractDefinition = createSagasContractDefinition();
+
+/** oRPC contract definition for the saga service API. */
+export const sagasContract: SagasContractDefinition =
+  sagasContractDefinition as unknown as SagasContractDefinition;
+
+/** Implemented saga service contract with structural context binding. */
+export const sagasContractV1: SagasContractV1 = implement(
+  sagasContractDefinition,
+) as unknown as SagasContractV1;

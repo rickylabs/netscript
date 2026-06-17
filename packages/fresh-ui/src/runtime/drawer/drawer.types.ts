@@ -1,0 +1,17 @@
+export type {
+  DialogCloseElementProps as DrawerCloseElementProps,
+  DialogCloseProps as DrawerCloseProps,
+  DialogContentElementProps as DrawerContentElementProps,
+  DialogContentProps as DrawerContentProps,
+  DialogDescriptionElementProps as DrawerDescriptionElementProps,
+  DialogDescriptionProps as DrawerDescriptionProps,
+  DialogOpenChangeDetails as DrawerOpenChangeDetails,
+  DialogOpenChangeReason as DrawerOpenChangeReason,
+  DialogRootProps as DrawerRootProps,
+  DialogTitleElementProps as DrawerTitleElementProps,
+  DialogTitleProps as DrawerTitleProps,
+  DialogTriggerElementProps as DrawerTriggerElementProps,
+  DialogTriggerProps as DrawerTriggerProps,
+  UseDialogOptions as UseDrawerOptions,
+  UseDialogReturn as UseDrawerReturn,
+} from '../dialog/dialog.types.ts';

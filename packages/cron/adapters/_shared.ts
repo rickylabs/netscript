@@ -13,8 +13,8 @@ import type {
   JobRunEvent,
   ScheduledJob,
   SchedulerEventMap,
-} from '../interfaces/types.ts';
-import type { JobEventListener, SchedulerEvent } from '../interfaces/scheduler.ts';
+} from '../ports/types.ts';
+import type { JobEventListener, SchedulerEvent } from '../ports/scheduler.ts';
 
 type ListenerMap = Map<SchedulerEvent, Set<JobEventListener<SchedulerEvent>>>;
 

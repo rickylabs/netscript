@@ -4,7 +4,7 @@ import {
   getDenoKvConnectionFromEnv,
   getRedisConnectionFromEnv,
   maskRedisUrl,
-} from '../core/auto-detect.ts';
+} from '../application/auto-detect.ts';
 
 async function withEnv(
   values: Record<string, string | undefined>,
@@ -55,6 +55,16 @@ Deno.test('Redis connection discovery handles direct URLs and Aspire connection 
     },
     () => {
       assertEquals(getRedisConnectionFromEnv(), 'redis://:secret@example:6379');
+    },
+  );
+
+  await withEnv(
+    {
+      ConnectionStrings__redis: undefined,
+      GARNET_TCP: 'tcp://localhost:6379',
+    },
+    () => {
+      assertEquals(getRedisConnectionFromEnv(), 'redis://localhost:6379');
     },
   );
 });

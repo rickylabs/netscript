@@ -25,5 +25,5 @@ export type {
   ScheduledJob,
   ScheduleOptions,
   SchedulerEvent,
-} from '../interfaces/mod.ts';
-export { CronPresets, isValidCronExpression, parseCronExpression } from '../interfaces/mod.ts';
+} from '../ports/mod.ts';
+export { CronPresets, isValidCronExpression, parseCronExpression } from '../ports/mod.ts';

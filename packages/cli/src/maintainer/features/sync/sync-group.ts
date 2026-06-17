@@ -10,7 +10,7 @@ import type { MaintainerCommandDependencies } from '../root/maintainer-command-d
 export function createSyncCommand(
   host: MaintainerCliHost,
   dependencies: MaintainerCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('sync')
     .description('Sync local monorepo assets into a scaffolded workspace')

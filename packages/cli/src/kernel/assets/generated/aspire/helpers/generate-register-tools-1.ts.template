@@ -2,10 +2,19 @@
 
 import type { DistributedApplicationBuilder } from '{{__slot1__}}';
 import type { NetScriptConfig } from '{{__slot2__}}';
-import type { InfrastructureContext } from './register-infrastructure.ts';
+import type { InfrastructureContext } from './register-infrastructure.mjs';
 import { buildDatabaseUriEnvKey, resolveWorkspacePath } from '{{__slot3__}}';
 
 type ToolResource = Awaited<ReturnType<DistributedApplicationBuilder['addExecutable']>>;
+type ProcessCommandCapable = {
+  readonly withProcessCommand?: (
+    name: string,
+    executable: string,
+    args: readonly string[],
+  ) => unknown;
+};
+
+const PROCESS_COMMANDS_FLAG = 'NETSCRIPT_ASPIRE_PROCESS_COMMANDS';
 
 /**
  * Registers development tools (e.g., Prisma Studio) with the Aspire SDK
@@ -56,13 +65,33 @@ async function attachToolDatabase(
     return resource;
   }
 
-  let databaseBinding = resource.withEnvironmentConnectionString('DATABASE_URL', databaseResource);
+  let databaseBinding = resource.withEnvironment('DATABASE_URL', databaseResource);
   const databaseEnvKey = buildDatabaseUriEnvKey(config);
   if (databaseEnvKey) {
-    databaseBinding = databaseBinding.withEnvironmentConnectionString(databaseEnvKey, databaseResource);
+    databaseBinding = databaseBinding.withEnvironment(databaseEnvKey, databaseResource);
   }
 
   return await databaseBinding.withReference(databaseResource).waitFor(databaseResource);
+}
+
+async function maybeWithProcessCommand(
+  resource: ToolResource,
+  name: string,
+  taskName: string,
+): Promise<ToolResource> {
+  if (process.env[PROCESS_COMMANDS_FLAG] !== '1') {
+    return resource;
+  }
+
+  const commandCapable = resource as unknown as ProcessCommandCapable;
+  const withProcessCommand = commandCapable.withProcessCommand;
+  if (typeof withProcessCommand !== 'function') {
+    return resource;
+  }
+
+  // Aspire 13.4 WithProcessCommand seam: wired, but disabled by default.
+  void withProcessCommand.call(resource, `Run ${name}`, 'deno', ['task', taskName]);
+  return resource;
 }
 
 function resolvePrismaStudioWorkdir(

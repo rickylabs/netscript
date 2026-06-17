@@ -54,6 +54,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     }
   }
 
+  /** Dispatch a validated command definition to its local handler. */
   private async handleChecked(
     definition: TriggersCliCommandDefinition,
     args: PluginCliArgs,
@@ -80,6 +81,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     }
   }
 
+  /** Scaffold one trigger definition and refresh the generated registry. */
   private async addTrigger(
     kind: TriggerScaffoldKind,
     args: PluginCliArgs,
@@ -102,6 +104,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     });
   }
 
+  /** List discovered trigger definitions with optional filters. */
   private async listTriggers(args: PluginCliArgs): Promise<PluginCliResult> {
     const kind = flag(args, 'kind');
     const enabledOnly = booleanFlag(args, 'enabled-only');
@@ -122,6 +125,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     return ok(`Found ${triggers.length} trigger definitions.`, { triggers });
   }
 
+  /** Invoke a trigger handler in test or fire mode. */
   private async invokeTrigger(
     args: PluginCliArgs,
     mode: 'test' | 'fire',
@@ -143,6 +147,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     });
   }
 
+  /** Preview upcoming fire times for a scheduled trigger. */
   private async previewSchedule(args: PluginCliArgs): Promise<PluginCliResult> {
     const id = requiredValue(args, 'trigger id');
     const definition = await this.loadTriggerDefinition(id);
@@ -161,6 +166,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     });
   }
 
+  /** Persist the enabled state for a trigger id. */
   private async setTriggerEnabled(
     args: PluginCliArgs,
     enabled: boolean,
@@ -176,6 +182,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     return ok(enabled ? 'Trigger enabled.' : 'Trigger disabled.', { id, enabled, path });
   }
 
+  /** Load a trigger definition module by trigger id. */
   private async loadTriggerDefinition(id: string): Promise<TriggerDefinition> {
     const path = await this.findTriggerPath(id);
     if (path === undefined) {
@@ -189,6 +196,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     return definition;
   }
 
+  /** Find the project-relative module path for a trigger id. */
   private async findTriggerPath(id: string): Promise<string | undefined> {
     const conventional = `triggers/${toTriggerFileStem(id)}-trigger.ts`;
     if (await this.files.readTextFile(conventional) !== undefined) {
@@ -204,6 +212,7 @@ export class LocalTriggersCliBackend implements TriggersCliBackend {
     return undefined;
   }
 
+  /** Read runtime trigger configuration, defaulting to an empty config. */
   private async readRuntimeConfig(): Promise<TriggersRuntimeConfig> {
     const content = await this.files.readTextFile('.netscript/runtime/triggers.json');
     return content === undefined ? { triggers: {} } : JSON.parse(content) as TriggersRuntimeConfig;

@@ -22,7 +22,9 @@ export interface MySqlConnectionConfig {
   timeout?: number;
   /** TLS configuration */
   tls?: {
-    mode?: "disabled" | "verify_identity";
+    /** TLS verification mode. */
+    mode?: 'disabled' | 'verify_identity';
+    /** CA certificates used by TLS verification. */
     caCerts?: string[];
   };
 }
@@ -49,7 +51,9 @@ export interface MySqlCapabilities {
  * Result from execute() call - for INSERT/UPDATE/DELETE
  */
 export interface ExecuteResult {
+  /** Number of rows affected by the statement. */
   affectedRows?: number;
+  /** Last inserted auto-increment ID, when MySQL reports one. */
   lastInsertId?: number | bigint;
 }
 
@@ -83,21 +87,27 @@ export interface FieldInfo {
  * deno_mysql Client interface
  */
 export interface DenoMySqlClient {
+  /** Connect using the provided MySQL configuration. */
   connect(config: MySqlConnectionConfig): Promise<DenoMySqlClient>;
+  /** Execute a query and return row objects. */
   query<T = Record<string, unknown>>(
     sql: string,
     params?: unknown[],
   ): Promise<T[]>;
+  /** Execute a statement and return execution metadata. */
   execute(
     sql: string,
     params?: unknown[],
   ): Promise<ExecuteResult & { rows?: unknown[] }>;
+  /** Run a callback inside a driver-managed transaction. */
   transaction<T>(
     fn: (conn: DenoMySqlConnection) => Promise<T>,
   ): Promise<T>;
+  /** Run a callback with a checked-out pooled connection. */
   useConnection<T>(
     fn: (conn: DenoMySqlConnection) => Promise<T>,
   ): Promise<T>;
+  /** Close the client and release resources. */
   close(): Promise<void>;
 }
 
@@ -105,10 +115,12 @@ export interface DenoMySqlClient {
  * Connection interface for transactions
  */
 export interface DenoMySqlConnection {
+  /** Execute a query on this connection and return row objects. */
   query<T = Record<string, unknown>>(
     sql: string,
     params?: unknown[],
   ): Promise<T[]>;
+  /** Execute a statement on this connection and return execution metadata. */
   execute(
     sql: string,
     params?: unknown[],

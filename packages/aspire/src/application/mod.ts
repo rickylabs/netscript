@@ -17,3 +17,6 @@ export {
   extractPluginReferences,
   extractServiceReferences,
 } from './resolve-references.ts';
+export type { AspireResource, AspireResourceKind, ContributionContext } from '../domain/mod.ts';
+export type { AspireBuilder } from '../ports/mod.ts';
+export { ContributionRegistry } from '../runtime/mod.ts';

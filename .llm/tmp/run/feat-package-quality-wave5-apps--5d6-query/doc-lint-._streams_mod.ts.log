@@ -1,0 +1,393 @@
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'Context'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:61:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m61 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m30 | [0mexport interface Context {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'InitialQueryBuilder'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:61:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m61 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m428 | [0mexport type InitialQueryBuilder = Pick<BaseQueryBuilder<Context>, `from` | `unionAll`>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'QueryBuilder'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:61:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m61 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m430 | [0mexport type QueryBuilder<TContext extends Context> = Omit<BaseQueryBuilder<TContext>, `from` | `unionAll` | `_getQuery`>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'GetResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:61:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m61 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m587 | [0mexport type GetResult<TContext extends Context> = Prettify<ResultValue<TContext>>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'InferResultType'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:61:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m61 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m541 | [0mexport type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'Collection'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:61:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m61 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m20 | [0mexport interface Collection<T extends object = Record<string, unknown>, TKey extends string | number = string | number, TUtils extends UtilsRecord = UtilsRecord, TSchema extends StandardSchemaV1 = StandardSchemaV1, TInsertInput extends object = T> extends CollectionImpl<T, TKey, TUtils, TSchema, TInsertInput> {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'CollectionStatus'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:61:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m61 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m368 | [0mexport type CollectionStatus = 
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'UseLiveQueryStatus'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:73:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m73 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext> | undefined | null, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+ [0m[38;5;12m2 | [0mexport type UseLiveQueryStatus = CollectionStatus | `disabled`;
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:73:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m73 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext> | undefined | null, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'LiveQueryCollectionConfig'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:85:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m85 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => LiveQueryCollectionConfig<TContext> | undefined | null, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m45 | [0mexport interface LiveQueryCollectionConfig<TContext extends Context, TResult extends object = RootQueryResult<TContext>> {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:85:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m85 | [0mexport declare function useLiveQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => LiveQueryCollectionConfig<TContext> | undefined | null, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:97:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m97 | [0mexport declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(queryFn: (q: InitialQueryBuilder) => Collection<TResult, TKey, TUtils> | undefined | null, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:109:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m109 | [0mexport declare function useLiveQuery<TContext extends Context, TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext> | LiveQueryCollectionConfig<TContext> | Collection<TResult, TKey, TUtils> | undefined | null, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'NonSingleResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:195:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m195 | [0mexport declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & NonSingleResult): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m596 | [0mexport type NonSingleResult = {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveQuery' references private type 'SingleResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:207:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m207 | [0mexport declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m593 | [0mexport type SingleResult = {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveQuery.d.ts[0m[0m[33m:207:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m207 | [0mexport declare function useLiveQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'Context'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:95:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m95 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m30 | [0mexport interface Context {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'InitialQueryBuilder'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:95:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m95 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m428 | [0mexport type InitialQueryBuilder = Pick<BaseQueryBuilder<Context>, `from` | `unionAll`>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'QueryBuilder'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:95:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m95 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m430 | [0mexport type QueryBuilder<TContext extends Context> = Omit<BaseQueryBuilder<TContext>, `from` | `unionAll` | `_getQuery`>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'GetResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:95:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m95 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m587 | [0mexport type GetResult<TContext extends Context> = Prettify<ResultValue<TContext>>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'InferResultType'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:95:1[0m
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m95 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m541 | [0mexport type InferResultType<TContext extends Context> = TContext extends SingleResult ? GetResult<TContext> | undefined : Array<GetResult<TContext>>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'Collection'[0m
+  [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:95:1[0m
+  [0m[38;5;12m | [0m
+[0m[38;5;12m95 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(queryFn: (q: InitialQueryBuilder) => QueryBuilder<TContext>, deps?: Array<unknown>): {
+  [0m[38;5;12m | [0m[0m[1m[31m^[0m
+   [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+  [0m[38;5;12m | [0m
+[0m[38;5;12m20 | [0mexport interface Collection<T extends object = Record<string, unknown>, TKey extends string | number = string | number, TUtils extends UtilsRecord = UtilsRecord, TSchema extends StandardSchemaV1 = StandardSchemaV1, TInsertInput extends object = T> extends CollectionImpl<T, TKey, TUtils, TSchema, TInsertInput> {
+  [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+  [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'LiveQueryCollectionConfig'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:100:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(config: LiveQueryCollectionConfig<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m45 | [0mexport interface LiveQueryCollectionConfig<TContext extends Context, TResult extends object = RootQueryResult<TContext>> {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:100:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m100 | [0mexport declare function useLiveSuspenseQuery<TContext extends Context>(config: LiveQueryCollectionConfig<TContext>, deps?: Array<unknown>): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'NonSingleResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:105:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m105 | [0mexport declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & NonSingleResult): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m596 | [0mexport type NonSingleResult = {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:105:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m105 | [0mexport declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & NonSingleResult): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'useLiveSuspenseQuery' references private type 'SingleResult'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:110:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m110 | [0mexport declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m593 | [0mexport type SingleResult = {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[missing-jsdoc][0m: [0m[1mexported symbol is missing JSDoc documentation[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@tanstack/react-db/0.1.85/dist/esm/useLiveSuspenseQuery.d.ts[0m[0m[33m:110:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m110 | [0mexport declare function useLiveSuspenseQuery<TResult extends object, TKey extends string | number, TUtils extends Record<string, any>>(liveQueryCollection: Collection<TResult, TKey, TUtils> & SingleResult): {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'CollectionDefinition["schema"]' references private type 'StandardSchemaV1'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@durable-streams/state/0.2.3/dist/index.d.ts[0m[0m[33m:111:3[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m111 | [0m  schema: StandardSchemaV1<T>;
+   [0m[38;5;12m | [0m  [0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+ [0m[38;5;12m29 | [0minterface StandardSchemaV1<Input = unknown, Output = Input> {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'StateSchema' references private type 'CollectionWithHelpers'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@durable-streams/state/0.2.3/dist/index.d.ts[0m[0m[33m:166:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m166 | [0mtype StateSchema<T extends Record<string, CollectionDefinition>> = { [K in keyof T]: CollectionWithHelpers<T[K] extends CollectionDefinition<infer U> ? U : unknown> };
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m158 | [0mtype CollectionWithHelpers<T = unknown> = CollectionDefinition<T> & CollectionEventHelpers<T>;
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'StreamDB' references private type 'CollectionMap'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@durable-streams/state/0.2.3/dist/index.d.ts[0m[0m[33m:207:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m207 | [0mtype StreamDB<TDef extends StreamStateDefinition> = {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m203 | [0mtype CollectionMap<TDef extends StreamStateDefinition> = { [K in keyof TDef]: Collection$1<ExtractCollectionType<TDef[K]> & object, string> };
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[private-type-ref][0m: [0m[1mpublic type 'StreamDB' references private type 'StreamDBMethods'[0m
+   [0m[38;5;12m-->[0m [0m[36m/home/runner/.cache/deno/npm/registry.npmjs.org/@durable-streams/state/0.2.3/dist/index.d.ts[0m[0m[33m:207:1[0m
+   [0m[38;5;12m | [0m
+[0m[38;5;12m207 | [0mtype StreamDB<TDef extends StreamStateDefinition> = {
+   [0m[38;5;12m | [0m[0m[1m[31m^[0m
+    [0m[38;5;12m=[0m [0m[1mhint[0m: make the referenced type public or remove the reference
+   [0m[38;5;12m | [0m
+[0m[38;5;12m231 | [0minterface StreamDBMethods {
+   [0m[38;5;12m | [0m[0m[38;5;12m-[0m [0m[38;5;12mthis is the referenced type[0m
+   [0m[38;5;12m | [0m
+
+  [0m[38;5;12minfo[0m: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+[0m[1m[31merror[0m: Found [0m[1m32[0m documentation lint errors.

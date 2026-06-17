@@ -1,0 +1,256 @@
+{
+  "version": 2,
+  "nodes": {
+    "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/use-accordion.ts": {
+      "imports": [
+        {
+          "importedName": "JSX",
+          "originalName": "JSX",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/src/index.d.ts"
+        },
+        {
+          "importedName": "useSignal",
+          "originalName": "useSignal",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/@preact/signals/2.9.1/dist/signals.d.ts"
+        },
+        {
+          "importedName": "useCallback",
+          "originalName": "useCallback",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/hooks/src/index.d.ts"
+        },
+        {
+          "importedName": "useId",
+          "originalName": "useId",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/hooks/src/index.d.ts"
+        },
+        {
+          "importedName": "useRef",
+          "originalName": "useRef",
+          "src": "file:///C:/Users/chaut/AppData/Local/deno/npm/registry.npmjs.org/preact/10.29.2/hooks/src/index.d.ts"
+        },
+        {
+          "importedName": "getNextCollectionIndex",
+          "originalName": "getNextCollectionIndex",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/collection-navigation.ts"
+        },
+        {
+          "importedName": "composeEventHandlers",
+          "originalName": "composeEventHandlers",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/compose-event-handlers.ts"
+        },
+        {
+          "importedName": "composeRefs",
+          "originalName": "composeRefs",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/compose-refs.ts"
+        },
+        {
+          "importedName": "useControllableSignal",
+          "originalName": "useControllableSignal",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/_internal/use-controllable-signal.ts"
+        },
+        {
+          "importedName": "AccordionItemContentElementProps",
+          "originalName": "AccordionItemContentElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "AccordionItemIndicatorElementProps",
+          "originalName": "AccordionItemIndicatorElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "AccordionItemOptions",
+          "originalName": "AccordionItemOptions",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "AccordionItemElementProps",
+          "originalName": "AccordionItemElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "AccordionItemState",
+          "originalName": "AccordionItemState",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "AccordionItemTriggerElementProps",
+          "originalName": "AccordionItemTriggerElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "AccordionOrientation",
+          "originalName": "AccordionOrientation",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "AccordionRootElementProps",
+          "originalName": "AccordionRootElementProps",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "UseAccordionOptions",
+          "originalName": "UseAccordionOptions",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        },
+        {
+          "importedName": "UseAccordionReturn",
+          "originalName": "UseAccordionReturn",
+          "src": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/accordion.types.ts"
+        }
+      ],
+      "symbols": [
+        {
+          "name": "getAccordionDataState",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/use-accordion.ts",
+                "line": 20,
+                "col": 0,
+                "byteIndex": 788
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "expanded",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  }
+                ],
+                "returnType": {
+                  "kind": "union",
+                  "value": [
+                    {
+                      "repr": "open",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "open"
+                      }
+                    },
+                    {
+                      "repr": "closed",
+                      "kind": "literal",
+                      "value": {
+                        "kind": "string",
+                        "string": "closed"
+                      }
+                    }
+                  ]
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "useAccordion",
+          "declarations": [
+            {
+              "location": {
+                "filename": "file:///C:/Dev/repos/netscript/output/test-app/worktrees/repo-genesis/.genesis/netscript/.worktrees/wave5-apps-5c1-ui-foundation/packages/fresh-ui/runtime/accordion/use-accordion.ts",
+                "line": 24,
+                "col": 0,
+                "byteIndex": 912
+              },
+              "declarationKind": "export",
+              "kind": "function",
+              "def": {
+                "params": [
+                  {
+                    "kind": "assign",
+                    "left": {
+                      "kind": "object",
+                      "props": [
+                        {
+                          "kind": "assign",
+                          "key": "collapsible",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "defaultValue",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "disabled",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "id",
+                          "value": null
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "multiple",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "onFocusChange",
+                          "value": null
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "onValueChange",
+                          "value": null
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "orientation",
+                          "value": "[UNSUPPORTED]"
+                        },
+                        {
+                          "kind": "assign",
+                          "key": "value",
+                          "value": null
+                        }
+                      ],
+                      "optional": false,
+                      "tsType": {
+                        "repr": "UseAccordionOptions",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "UseAccordionOptions",
+                          "resolution": {
+                            "kind": "import",
+                            "specifier": "./accordion.types.ts",
+                            "name": "UseAccordionOptions"
+                          }
+                        }
+                      }
+                    },
+                    "right": "[UNSUPPORTED]"
+                  }
+                ],
+                "returnType": {
+                  "repr": "UseAccordionReturn",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "UseAccordionReturn",
+                    "resolution": {
+                      "kind": "import",
+                      "specifier": "./accordion.types.ts",
+                      "name": "UseAccordionReturn"
+                    }
+                  }
+                },
+                "hasBody": true
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

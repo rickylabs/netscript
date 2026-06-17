@@ -64,7 +64,7 @@ describe('maintainer application services', () => {
       steps: [
         {
           name: 'aspire',
-          run: () => Promise.resolve(['/repo/fixture/aspire/apphost.ts']),
+          run: () => Promise.resolve(['/repo/fixture/aspire/apphost.mts']),
         },
         {
           name: 'registry',

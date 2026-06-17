@@ -36,7 +36,8 @@ import { sagasV1 } from './routers/v1.ts';
  *
  * Uses .prefix('/v1/sagas') to prepend versioned path to all OpenAPI routes.
  */
-export const v1 = {
+// deno-lint-ignore no-explicit-any
+export const v1: any = {
   health,
   // deno-lint-ignore no-explicit-any
   sagas: os.prefix('/v1/sagas').router(sagasV1 as any),
@@ -67,7 +68,8 @@ export const v1 = {
  * - v1.sagas.publish
  * - v1.sagas.subscribe
  */
-export const router = os.router({
+// deno-lint-ignore no-explicit-any
+export const router: any = os.router({
   v1,
   // Future: v2, v3, etc.
 });

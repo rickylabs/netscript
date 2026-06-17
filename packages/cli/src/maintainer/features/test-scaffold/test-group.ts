@@ -8,7 +8,7 @@ import type { MaintainerCommandDependencies } from '../root/maintainer-command-d
 export function createTestCommand(
   host: MaintainerCliHost,
   dependencies: MaintainerCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('test')
     .description('Run maintainer validation suites')

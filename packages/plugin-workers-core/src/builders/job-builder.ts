@@ -1,8 +1,11 @@
 import { DEFAULT_TOPIC } from '../domain/constants.ts';
 import type { CronExpression } from '../domain/cron.ts';
-import type { JobDefinition, JobHandler, JobId } from '../domain/mod.ts';
-import type { PermissionPreset } from '../domain/permissions.ts';
-import type { TaskPermissions } from '../domain/task.ts';
+import type {
+  JobDefinition as DomainJobDefinition,
+  JobHandler as DomainJobHandler,
+  JobId as DomainJobId,
+} from '../domain/mod.ts';
+import type { BuilderPermissions, JobDefinition, JobHandler } from './builder-types.ts';
 
 /** Job builder state used to gate `build()`. */
 export type JobBuilderState = 'initial' | 'entrypoint-set' | 'handler-set';
@@ -52,7 +55,7 @@ export interface JobBuilder<
   /** Set retry count and optional retry behavior. */
   retry(maxRetries: number, options?: RetryOptions): this;
   /** Set execution permissions for this job. */
-  permissions(perms: PermissionPreset | TaskPermissions): this;
+  permissions(perms: BuilderPermissions): this;
   /** Add tags to this job definition. */
   tags(...tags: string[]): this;
   /** Merge metadata into this job definition. */
@@ -81,12 +84,12 @@ class JobBuilderImpl<
   #name?: string;
   #description?: string;
   #entrypoint?: string;
-  #handler?: JobHandler<TPayload, TResult>;
+  #handler?: DomainJobHandler<TPayload, TResult>;
   #schedule: string | undefined;
   #timezone = 'UTC';
   #timeout = 300_000;
   #maxRetries = 3;
-  #permissions?: PermissionPreset | TaskPermissions;
+  #permissions?: BuilderPermissions;
   #tags: string[] = [];
   #metadata: Record<string, unknown> = {};
   #retention?: Record<string, unknown>;
@@ -116,7 +119,7 @@ class JobBuilderImpl<
   handler<TNextPayload = TPayload, TNextResult = TResult>(
     fn: JobHandler<TNextPayload, TNextResult>,
   ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult> {
-    this.#handler = fn as unknown as JobHandler<TPayload, TResult>;
+    this.#handler = fn as unknown as DomainJobHandler<TPayload, TResult>;
     return this as unknown as JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   }
 
@@ -146,7 +149,7 @@ class JobBuilderImpl<
     return this;
   }
 
-  permissions(perms: PermissionPreset | TaskPermissions): this {
+  permissions(perms: BuilderPermissions): this {
     this.#permissions = perms;
     return this;
   }
@@ -197,7 +200,7 @@ class JobBuilderImpl<
       ? { ...this.#metadata, queueTrigger: this.#queueTrigger }
       : this.#metadata;
     const definition = Object.freeze({
-      id: this.#id as JobId<TId>,
+      id: this.#id as DomainJobId<TId>,
       topic: this.#topic,
       name: this.#name ?? this.#id,
       description: this.#description,
@@ -218,9 +221,9 @@ class JobBuilderImpl<
       permissions: this.#permissions,
       retention: this.#retention,
       handler: this.#handler,
-    }) as unknown as JobDefinition<TId, TPayload, TResult>;
+    }) as unknown as DomainJobDefinition<TId, TPayload, TResult>;
 
-    return definition as TConfigured extends 'entrypoint-set' | 'handler-set'
+    return definition as unknown as TConfigured extends 'entrypoint-set' | 'handler-set'
       ? JobDefinition<TId, TPayload, TResult>
       : never;
   }

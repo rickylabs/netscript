@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from 'jsr:@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import { AspireNSPluginContribution, ContributionRegistry } from '../../src/runtime/mod.ts';
 import { DuplicateContributionError } from '../../src/domain/mod.ts';
 import type { AspireResource, ContributionContext } from '../../src/domain/mod.ts';

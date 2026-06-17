@@ -2,16 +2,16 @@
  * File names generated into the `.helpers/` directory.
  */
 export const HELPERS_FILES = {
-  INDEX: 'index.ts',
-  CONFIG_SCHEMA: 'config-schema.ts',
-  REGISTER_INFRASTRUCTURE: 'register-infrastructure.ts',
-  REGISTER_SERVICES: 'register-services.ts',
-  REGISTER_PLUGINS: 'register-plugins.ts',
-  REGISTER_BACKGROUND: 'register-background.ts',
-  REGISTER_APPS: 'register-apps.ts',
-  REGISTER_TOOLS: 'register-tools.ts',
-  DB_CLI_MODE: 'db-cli-mode.ts',
-  CONFIGURE_DASHBOARD: 'configure-dashboard.ts',
+  INDEX: 'index.mts',
+  CONFIG_SCHEMA: 'config-schema.mts',
+  REGISTER_INFRASTRUCTURE: 'register-infrastructure.mts',
+  REGISTER_SERVICES: 'register-services.mts',
+  REGISTER_PLUGINS: 'register-plugins.mts',
+  REGISTER_BACKGROUND: 'register-background.mts',
+  REGISTER_APPS: 'register-apps.mts',
+  REGISTER_TOOLS: 'register-tools.mts',
+  DB_CLI_MODE: 'db-cli-mode.mts',
+  CONFIGURE_DASHBOARD: 'configure-dashboard.mts',
 } as const;
 
 export type HelpersFileKey = keyof typeof HELPERS_FILES;

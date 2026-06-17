@@ -34,11 +34,11 @@ export async function createNetScriptAppHost(
   configPath: string,
 ): Promise<void> {
   const { config } = await parseAppSettings(configPath);
-  // apphost.ts lives under `aspire/` to keep the Node.js package graph
+  // apphost.mts lives under `aspire/` to keep the Node.js package graph
   // isolated from the Deno workspace root. Workspace paths declared in
   // appsettings.json (services, apps, plugins, workers) are relative to the
   // project root — which is one level up from `builder.appHostDirectory`.
-  const appHostDir = resolve(await builder.appHostDirectory.get(), '..');
+  const appHostDir = resolve(await builder.appHostDirectory(), '..');
 
   // 1. Configure dashboard OTLP endpoint
   configureDashboard(config);

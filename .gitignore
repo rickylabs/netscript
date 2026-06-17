@@ -8,6 +8,8 @@ dist/
 # Local git worktrees for parallel harness supervisor/wave runs
 .worktrees/
 
+.llm/tmp/cli-e2e/
+
 # Runtime-only OpenHands Actions scratch space. Durable run evidence belongs under
 # .llm/tmp/run/openhands/<source>/run-<id>-<attempt>/ or GitHub Actions artifacts.
 .llm/tmp/openhands/

@@ -1,7 +1,7 @@
 # Architecture Debt Registry
 
 Seeded from
-`.llm/research/architecture-doctrine-docs-v2/doctrine/10-codebase-verdict-and-handoff.md` on
+`docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on
 2026-04-29. Entries track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts.
 `Keep` and `Defer` verdicts are not seeded here.
 
@@ -16,6 +16,11 @@ Seeded from
   feature slices, kernel adapters, template assets, binary edges, and executable CLI fitness gates
   now cover the former monoliths.
 - **Gate:** F-1, F-5, F-6, F-7
+- **Wave 1 closure evidence:** `feat-package-quality-wave1-contracts--contracts` slice 10 split
+  `packages/runtime-config/mod.ts` into `src/domain/types.ts`, `src/application/loader.ts`,
+  `src/application/watcher.ts`, and `src/diagnostics/summary.ts`; `deno check`, `deno doc --lint`,
+  `deno publish --dry-run --allow-dirty`, `deno test --allow-all`, `deno lint`, and
+  `deno fmt --check` pass for the package.
 
 ## packages/config — AP-1 / doctrine verdict Refactor (schema.ts 945 LOC)
 
@@ -28,6 +33,78 @@ Seeded from
   maintainer command graph; `deno task arch:check` enforces public/maintainer isolation.
 - **Gate:** F-1, F-5, F-10
 
+## packages/config — AP-16 root helpers.ts
+
+- **Reason:** Root `helpers.ts` held saga authoring input types behind a generic helper name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slice 11 renamed `helpers.ts` to
+  `src/domain/saga-inputs.ts` and kept the public `defineSagas`/input type exports stable through
+  `src/public/mod.ts`.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
+## packages/config/src/domain/mod.ts — justified domain barrel
+
+- **Reason:** `src/domain/mod.ts` is a sub-barrel, but it intentionally curates the domain schema
+  surface consumed by `src/public/mod.ts` and future docs/reference generation.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when generated reference tooling can crawl individual schema modules.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — slice 17 added `arch:barrel-ok` justification in the file.
+- **Gate:** F-18, `Select-String -Path src/domain/mod.ts -Pattern 'arch:barrel-ok'`
+
+## packages/contracts — AP-16 helpers directory
+
+- **Reason:** Root `helpers/` held query and transform helpers behind a generic folder name.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** S1 alpha package-quality wave.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** closed 2026-06-06 — slices 19 and 20 moved `paginated-query.ts` and
+  `transform.ts` into `src/application/` as role-named modules and removed the `helpers/`
+  directory.
+- **Gate:** F-11, AP-16, `deno check mod.ts`
+
+## packages/contracts/crud — accepted root subpath layout
+
+- **Reason:** `crud/` remains at the package root to preserve the established `./crud` subpath
+  export and avoid broad downstream import churn during S1.
+- **Owner:** Wave 1 contracts and schemas.
+- **Target:** Revisit when subpath exports can move without consumer breakage.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
+- **Created:** 2026-06-06
+- **Status:** open, DEBT_ACCEPTED — locked decision L8 keeps `contracts/crud/` at package root.
+- **Gate:** F-5/F-6 remain green for `@netscript/contracts`; consumer validation in slices 25-27.
+
+## packages/contracts — T4 slow-type publish carve-out
+
+- **Reason:** Heavy Zod-derived contract helpers still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Narrow public contract helper return types before beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/contracts` dry-run passes without `--allow-slow-types`.
+
+## root toolchain — T5 deferred esbuild audit advisory
+
+- **Reason:** `deno audit` reports GHSA-gv7w-rqvm-qjhr for transitive `esbuild <0.28.1`.
+  The runtime-reachable critical `@orpc/client` advisory was remediated by moving ORPC imports to
+  `^1.14.6`; this remaining high advisory is deferred as approved toolchain debt because it is
+  tied to the Vite/esbuild stack rather than a NetScript runtime dependency path.
+- **Owner:** Toolchain upgrade T5 follow-up.
+- **Target:** Revisit when the Vite/esbuild dependency chain can move to `esbuild >=0.28.1`.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (A-9).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task audit:critical`; close when full `deno audit` passes without suppressing the
+  deferred high-severity advisory.
+
 ## packages/cron — AP-17 / doctrine verdict Refactor
 
 - **Reason:** `interfaces/` should become `ports/`; adapter classes should be named by technology.
@@ -35,8 +112,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** closed 2026-05-01 — CLI permission expectations are documented in
-  `packages/cli/docs/permissions.md` and linked from `packages/cli/README.md`.
+- **Status:** closed 2026-06-07 — corrected during Wave 2c after the previous
+  2026-05-01 closure note was found to reference unrelated CLI permission
+  documentation while `packages/cron/interfaces/` still existed. Real evidence:
+  `packages/cron/interfaces/` was renamed to `packages/cron/ports/`, the public
+  `./types` export was replaced with `./ports`, and `tasks.check` now checks
+  `ports/mod.ts`.
 - **Gate:** F-3, F-11
 
 ## packages/database — AP-17 / doctrine verdict Refactor
@@ -51,12 +132,18 @@ Seeded from
 
 ## packages/queue — AP-16 / doctrine verdict Refactor
 
-- **Reason:** `internal/` and `utils/` need role-named placement under the doctrine vocabulary.
+- **Reason:** `utils/` needed role-named placement under the doctrine vocabulary; the carried-in
+  `internal/` concern is not debt because F-11 and doctrine folder vocabulary explicitly allow
+  `internal/`.
 - **Owner:** Architecture doctrine follow-up.
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-07 — Wave 2c slice 1 renamed `packages/queue/utils/` to
+  `packages/queue/validation/` and `packages/queue/interfaces/` to `packages/queue/ports/`.
+  `packages/queue/internal/` is retained as F-11-allowed. The older doctrine handoff wording that
+  said to lift `internal/` conflicts with the F-11 allow-list; the gate is the source of truth for
+  this closure.
 - **Gate:** F-3, F-11
 
 ## packages/kv — AP-1 / doctrine verdict Refactor (bridge_test.ts 1,039 LOC)
@@ -89,6 +176,20 @@ Seeded from
 - **Status:** open
 - **Gate:** F-3, F-11, F-13
 
+## packages/plugin-triggers-core — T4 slow-type publish carve-out
+
+- **Reason:** Trigger DSL and runtime inference types still require
+  `deno publish --allow-slow-types` under Deno 2.8 publish analysis. This is accepted
+  score-impacting debt for the toolchain upgrade, not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Split trigger inference types and publish explicit public definition interfaces before
+  beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/plugin-triggers-core` dry-run passes without
+  `--allow-slow-types`.
+
 ## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
 
 - **Reason:** `task-executor.ts` needs supervisor/executor/dispatcher split.
@@ -106,7 +207,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-09 — Wave 4c slice C13 split the saga transport monoliths in
+  `@netscript/plugin-sagas-core`: `src/transports/list-transport.ts` now owns the transport class
+  and stable public re-exports while list command/key/recovery mechanics live in
+  `src/transports/list-transport-commands.ts`; `src/transports/redis-transport.ts` was split the
+  same way into `src/transports/redis-transport-commands.ts`. All four files are below the F-1 cap
+  and the transport entrypoint still passes raw `deno check --unstable-kv`.
 - **Gate:** F-1, F-13
 
 ## packages/fresh — AP-1 / doctrine verdict Restructure (builders/mod.ts 1,110 LOC)
@@ -116,8 +222,28 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** RESOLVED 2026-06-14 — Wave 5 consolidation Phase D split `builders/mod.ts` (1,110 LOC)
+  into `src/application/builders/` per-concern modules; max file now 497 LOC (< 500). Independent
+  IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED) confirmed F-1/F-5/F-11 PASS.
 - **Gate:** F-1, F-5, F-11
+
+## packages/fresh — F-7 full package doc-lint residue after 5d1
+
+- **Reason:** 5d1 support-spine FAIL_FIX cannot make broad `deno task doc-lint` pass without
+  implementing later 5d-owned public surfaces. The remaining diagnostics are concentrated in
+  builders/defer/form/streams/query, including direct upstream TanStack/durable-streams public type
+  exposure and missing JSDoc on later-slice symbols.
+- **Owner:** Wave 5d `@netscript/fresh` chain; final closeout owner is 5d6 query/server/package
+  surface.
+- **Target:** Close before merging 5d into Wave 5 apps; 5d6 must prove `deno task doc-lint` passes
+  from `packages/fresh`.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5d-fresh/plan.md`;
+  `.llm/tmp/run/feat-package-quality-wave5-apps--5d1-support/escalations/failfix-doc-lint.md`.
+- **Created:** 2026-06-13
+- **Status:** RESOLVED 2026-06-14 — `deno task doc-lint` now passes from `packages/fresh` (0
+  findings, 12 entrypoints). Independent IMPL-EVAL (run 27507518739, MiniMax M3, VERDICT APPROVED)
+  confirmed F-7/F-5 PASS at HEAD.
+- **Gate:** F-7, F-5, `deno task doc-lint` from `packages/fresh`.
 
 ## packages/service — doctrine verdict Refactor
 
@@ -129,6 +255,34 @@ Seeded from
 - **Status:** open
 - **Gate:** F-3, F-11
 
+## packages/service — assets/scalar.min.js (3.3 MB vendored in publish)
+
+- **Reason:** `assets/scalar.min.js` (3.3 MB) is vendored and included in the JSR publish so that
+  offline/no-CDN Scalar docs work for JSR-installed consumers. The size is acceptable for alpha but
+  should be revisited before beta (lazy npm specifier, optional peer dependency, or CDN-only mode).
+- **Owner:** Wave 5a `@netscript/service` generator (D-9).
+- **Target:** Revisit before beta; no 2027-Q1 commitment unless publish-size limits change.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave5-apps--5a-service/plan.md` (D-9).
+- **Created:** 2026-06-15 (PLAN-EVAL advisory finding #2).
+- **Status:** open, DEBT_ACCEPTED. Locked decision D-9 keeps the vendored asset; this entry tracks
+  the revisit.
+- **Gate:** F-14, JSR publish-size limits; close when an alternative delivery mechanism (lazy
+  specifier, optional peer, or CDN-only flag) replaces the vendored file without breaking offline
+  docs.
+
+## packages/service — T4 slow-type publish carve-out
+
+- **Reason:** Hono/oRPC service builder schemas still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Make Zod schemas source-of-truth behind explicit exported service interfaces before
+  beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/service` dry-run passes without `--allow-slow-types`.
+
 ## packages/plugin — AP-1 / doctrine verdict Restructure (types.ts 1,005 LOC)
 
 - **Reason:** `types.ts` should split per concept and introduce `domain/` plus `ports/`.
@@ -136,8 +290,36 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-08 — Wave 3 `@netscript/plugin` host track verified the old
+  monolithic `types.ts` no longer exists. The package now exposes role-named `src/domain/`,
+  `src/ports/`, `src/config/`, `src/cli/`, `src/sdk/`, `src/testing/`, and diagnostics surfaces
+  through curated entrypoints. Remaining builder size debt is tracked separately below.
 - **Gate:** F-1, F-3, F-5, F-11
+
+## packages/plugin — T4 slow-type publish carve-out
+
+- **Reason:** Plugin manifest/builder generic helpers still require `deno publish --allow-slow-types`
+  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
+  not a workspace default.
+- **Owner:** Toolchain upgrade T4 follow-up.
+- **Target:** Reduce generic helper leakage behind explicit public plugin definition interfaces
+  before beta.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (LD-5).
+- **Created:** 2026-06-15
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-6; close when `packages/plugin` dry-run passes without `--allow-slow-types`.
+
+## packages/plugin/src/config/builders/plugin-builder.ts — F-1 size (360 LOC)
+
+- **Reason:** `plugin-builder.ts` remains above the doctrine 300 LOC planning cap (343 LOC at base
+  `89071df`, 360 LOC after Wave 3 added public JSDoc in slice 4). It is a typestate-generic fluent
+  builder and splitting it during Wave 3 risks breaking the public chain.
+- **Owner:** Wave 3 `@netscript/plugin` host generator.
+- **Target:** Pre-beta builder refactor.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave3-plugin--host/plan.md` (LD-3, slice 19).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED
+- **Gate:** F-1, A4 builder split follow-up
 
 ## packages/plugin/src/sdk/discovery/ast-extractor.ts — PLG-WALKER-AST (extractor precision)
 
@@ -153,6 +335,38 @@ Seeded from
 - **Status:** open
 - **Gate:** PLG-WALKER-AST, F-5, F-11
 
+## packages/plugin-streams-core — AP-13 console.warn runtime reporting
+
+- **Reason:** `DurableStreamProducer` currently uses `console.warn` for connection, pending-event,
+  serialization, and primary-key visibility in published runtime code. The warnings are intentionally
+  retained for alpha operator visibility; replacing them correctly requires a structured telemetry or
+  logger dependency that is outside Wave 4a's package-quality scope.
+- **Owner:** `@netscript/plugin-streams-core` maintainers.
+- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
+  (D6, slice 4).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-14, AP-13; close when `DurableStreamProducer` emits through a structured reporter and
+  `console.warn` is absent from
+  `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
+
+## packages/watchers — AP-13 console.warn runtime reporting
+
+- **Reason:** `FileWatcher` and `HybridWatchStrategy` currently use `console.warn` for native
+  watcher fallback and runtime access-failure visibility. The warnings are intentionally retained
+  for alpha operator diagnostics; replacing them correctly requires a structured telemetry or logger
+  dependency that is outside Wave 4a's package-quality scope.
+- **Owner:** `@netscript/watchers` maintainers.
+- **Target:** Telemetry-integration wave before beta runtime stabilization.
+- **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
+  (S23 final debt sweep).
+- **Created:** 2026-06-08
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** F-14, AP-13; close when watcher runtime warnings emit through a structured reporter and
+  `console.warn` is absent from `packages/watchers/src/file-watcher.ts` and
+  `packages/watchers/src/strategies/hybrid.ts`.
+
 ## packages/cli — AP-1 / doctrine verdict Restructure
 
 - **Reason:** `pipeline.ts` and `official-plugin-copier.ts` are monoliths; package should move
@@ -161,7 +375,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
+- **Status:** closed 2026-06-17 — Wave 6 completed the bounded A6 promotion for `@netscript/cli`:
+  command registry/deploy target seams, scaffold/init pipeline split, JSON init output, preset
+  extension seam, schema mirror, and final F-CLI gate sweep. The local `scaffold.runtime` fixture
+  stayed `passed=41 failed=0`, CLI doc lint and CLI publish dry-run passed, and focused F-CLI gates
+  pass. The only remaining related sub-item is the deliberately deferred
+  `scaffold.published.runtime` proof, tracked to post-S3 step F rather than AP-1.
 - **Gate:** F-1, F-3, F-10, AP-18 manual review
 - **Slice 8 update:** `commands/init/pipeline.ts` was decomposed into
   `src/public/application/init/**`; this entry remains open for `official-plugin-copier.ts` and
@@ -226,8 +445,12 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** open
-- **Gate:** F-1, F-2, F-11
+- **Status:** partially closed 2026-06-05 — `utils/datetime.ts` was deleted in Wave 0 and the
+  published surface remains free of generic datetime helpers. Residual unpublished `utils/`
+  compatibility for `@shared/utils` consumers is tracked in the Wave 0 drift registry until later
+  plugin waves migrate those imports.
+- **Gate:** F-1 and F-2 closed for datetime; F-11 remains deferred for residual unpublished `utils/`
+  compatibility
 
 ## plugins/triggers — doctrine verdict Refactor
 
@@ -333,7 +556,10 @@ Seeded from
 - **Linked plan:** `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/plan.md` and
   `.llm/tmp/run/feat-plat-impl-foundation--plan-and-impl/drift.md`.
 - **Created:** 2026-05-08
-- **Status:** open, DEBT_ACCEPTED for Foundation alpha only.
+- **Status:** closed 2026-06-07 — Wave 2a slice 8 (`37665e2`) removed the `./helpers` export from
+  `packages/aspire/deno.json`; grep for `@netscript/aspire/helpers` across `packages/` and
+  `plugins/` returns zero consumers. F-5 (public surface matches export map), F-7 (doc-lint clean on
+  all 8 entrypoints), F-11 (no `helpers/` folder) verified by IMPL-EVAL.
 - **Gate:** F-5, F-7, F-11, F-18
 
 ## runtime — Aspire OTEL CLI Dashboard API discovery fails (`aspire-otel-cli-discovery`)
@@ -460,3 +686,37 @@ Seeded from
 - **Status:** open, DEBT_ACCEPTED for Group D merge.
 - **Gate:** core/plugin `deno publish --dry-run --allow-dirty` stays at 0 slow-type errors, then
   remove the structural contract shim without reintroducing service-router casts or slow types.
+
+## packages/cli — maintainer sync isolated-declarations slow types (`cli-maintainer-sync-isolated-declarations`)
+
+- **Reason:** `deno check` on the `@netscript/cli` public graph (task `check`, via `maintainer.ts`)
+  reports 3 isolated-declarations slow-type errors (TS9016/TS9027) on the shorthand `_internal`
+  object export in
+  `packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin.ts:205`. The object needs
+  an explicit type annotation (or non-shorthand entries) to satisfy `--isolatedDeclarations`.
+- **Owner:** `@netscript/cli` maintainers / CLI doctrine track (Archetype 6).
+- **Target:** Next CLI package-quality wave; not the Wave 2c messaging sub-wave.
+- **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md` (CLI track).
+- **Created:** 2026-06-07 (Wave 2c IMPL-EVAL).
+- **Status:** open, DEBT_ACCEPTED for Wave 2c. Pre-existing on base `55f6108`; the file is
+  byte-identical to base and imports neither `@netscript/queue` nor `@netscript/cron`, so it is
+  unrelated to the 2c rename. The 2c slice-16 consumer gate surfaced it. The actual queue/cron
+  consumers — `plugins/triggers` and `plugins/workers` — both pass `deno task check`, confirming the
+  `interfaces/`→`ports/` and `./types`→`./ports` rename is non-breaking.
+- **Gate:** `deno check ./maintainer.ts` from `packages/cli` reports 0 TS9016/TS9027 errors.
+
+## root toolchain — R3 held dependency majors (`toolchain-r3-held-dependency-majors`)
+
+| Status | Package | Reason | Revisit |
+| ------ | ------- | ------ | ------- |
+| DEBT_ACCEPTED | `npm:vite` `7.2.2`→`8.0.16` | unvetted major; Vite 8 is outside R3's safe patch/minor bump rule | Fresh Vite integration and scaffold runtime validation |
+
+- **Owner:** Toolchain upgrade R3 follow-up.
+- **Target:** Before beta dependency freeze.
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/sub-agent-briefs/R3.md`.
+- **Created:** 2026-06-16.
+- **Status:** open, DEBT_ACCEPTED. R3 follow-up removed `@fedify/amqp`, `@fedify/denokv`,
+  `@fedify/redis`, `@durable-streams/state`, and `amqplib` from this debt after maintainer approval
+  and green validation.
+- **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
+  targeted package checks and `deno task publish:dry-run` pass after each migration.

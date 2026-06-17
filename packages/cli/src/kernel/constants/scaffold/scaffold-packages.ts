@@ -5,7 +5,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_CONFIG: '@netscript/config',
   NETSCRIPT_SERVICE: '@netscript/service',
   NETSCRIPT_PLUGIN: '@netscript/plugin',
-  NETSCRIPT_SHARED: '@netscript/shared',
+  NETSCRIPT_CONTRACTS: '@netscript/contracts',
   NETSCRIPT_SDK: '@netscript/sdk',
   NETSCRIPT_LOGGER: '@netscript/logger',
   NETSCRIPT_LOGGER_MIDDLEWARE: '@netscript/logger/middleware',
@@ -33,6 +33,7 @@ export const SCAFFOLD_PACKAGES = {
   NETSCRIPT_FRESH_VITE: '@netscript/fresh/vite',
   NETSCRIPT_KV: '@netscript/kv',
   NETSCRIPT_FRESH_UI: '@netscript/fresh-ui',
+  NETSCRIPT_FRESH_UI_INTERACTIVE: '@netscript/fresh-ui/interactive',
   ZOD: 'zod',
 } as const;
 

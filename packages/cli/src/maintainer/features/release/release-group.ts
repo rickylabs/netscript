@@ -8,7 +8,7 @@ import type { MaintainerCommandDependencies } from '../root/maintainer-command-d
 export function createReleaseCommand(
   host: MaintainerCliHost,
   dependencies: MaintainerCommandDependencies,
-) {
+): Command<any, any, any, any, any, any, any, any> {
   return new Command()
     .name('release')
     .description('Release and public-repository maintainer workflows')

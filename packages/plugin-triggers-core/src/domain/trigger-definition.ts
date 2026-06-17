@@ -1,4 +1,4 @@
-import type { TriggerDurabilityTier, TriggerKind, TriggerRuntimeKind } from './constants.ts';
+import type { TriggerDurabilityTier, TriggerKind } from './constants.ts';
 import type { ScheduledTriggerSpec } from './scheduled-spec.ts';
 import type { TriggerActionResult } from './trigger-action.ts';
 import type { TriggerId, WebhookId } from './ids.ts';
@@ -36,7 +36,7 @@ export type TriggerDefinitionBase<
 }>;
 
 /** Webhook verifier selector declared by a webhook trigger. */
-export type WebhookVerifierKind = 'hmac-sha256' | 'memory' | (string & {});
+export type WebhookVerifierKind = 'hmac-sha256' | 'memory' | (string & Record<never, never>);
 
 /** Webhook trigger definition discovered by the runtime walker. */
 export type WebhookDefinition<

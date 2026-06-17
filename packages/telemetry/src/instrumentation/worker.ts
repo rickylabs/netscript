@@ -7,13 +7,16 @@
  * @module
  */
 
-import { type Attributes, type Context, type Span, SpanKind } from '@opentelemetry/api';
 import {
   addSpanEvent,
+  type Attributes,
+  type Context,
   createSpan,
   getActiveSpan,
   getJobTracer,
   getWorkerTracer,
+  type Span,
+  SpanKind,
   withSpan,
 } from '../core/mod.ts';
 import {
@@ -40,13 +43,21 @@ import { getOtelEnvVars } from '../config/mod.ts';
  * Job definition for tracing
  */
 export interface TracedJobDefinition {
+  /** Job identifier. */
   id: string;
+  /** Human-readable job name. */
   name?: string;
+  /** Script or command entrypoint. */
   entrypoint?: string;
+  /** Execution timeout in milliseconds. */
   timeout?: number;
+  /** Maximum retry attempts. */
   maxRetries?: number;
+  /** Queue priority hint. */
   priority?: number;
+  /** Scheduling or routing tags. */
   tags?: string[];
+  /** Time zone used for scheduled jobs. */
   timezone?: string;
 }
 
@@ -54,11 +65,17 @@ export interface TracedJobDefinition {
  * Job execution context for tracing
  */
 export interface TracedJobExecution {
+  /** Execution identifier. */
   executionId: string;
+  /** Job identifier. */
   jobId: string;
+  /** Attempt number for retryable executions. */
   attempt?: number;
+  /** Source that triggered the execution. */
   triggeredBy?: string;
+  /** Correlation identifier propagated through related systems. */
   correlationId?: string;
+  /** Execution start time. */
   startedAt?: Date;
 }
 
@@ -103,8 +120,11 @@ export interface TracedJobResult {
  * Worker configuration for tracing
  */
 export interface TracedWorkerConfig {
+  /** Worker process identifier. */
   workerId: string;
+  /** Queue consumed by the worker. */
   queueName: string;
+  /** Number of jobs the worker may process concurrently. */
   concurrency?: number;
 }
 

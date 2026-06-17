@@ -68,4 +68,4 @@ export class TemplateRegistry extends Manifest<TemplateKey, TemplateValue> {
   }
 }
 
-export const DEFAULT_TEMPLATE_REGISTRY = new TemplateRegistry();
+export const DEFAULT_TEMPLATE_REGISTRY: TemplateRegistry = new TemplateRegistry();

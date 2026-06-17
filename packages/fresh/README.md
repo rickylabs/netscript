@@ -5,31 +5,82 @@
 [![Fresh](https://img.shields.io/badge/framework-Fresh-ffdb1e?logo=deno&logoColor=111111)](https://fresh.deno.dev/)
 [![License](https://img.shields.io/badge/license-MIT-0f172a)](https://opensource.org/licenses/MIT)
 
-Page builders, route contracts, form helpers, and deferred rendering primitives for Fresh applications in the NetScript ecosystem.
+Page builders, typed route contracts, form helpers, durable-stream and query islands, and deferred
+rendering primitives for Fresh applications in the NetScript ecosystem.
 
-## Features
+## Package role
 
-- **`definePage()` builder** — Composable page definitions with typed route contracts, metadata, and layout layers
-- **Route contracts** — Typed route patterns, path parameters, pagination schemas, and typed link generation
-- **Form helpers** — Parse form data, normalize validation errors, and resolve form state
-- **Deferred rendering** — Suspense-style partial loading with `<Deferred>` and `<DeferPage>` components
-- **Error normalization** — Unified error extraction across form submissions and API responses
-- **App bootstrapping** — `defineFreshApp()` for server-side Fresh app configuration
-- **Vite integration** — Pre-configured Vite setup for NetScript Fresh workspaces
-- **Subpath-first** — Import only the framework layer you need
+`@netscript/fresh` is an **Archetype 4 (DSL/Builder)** package (see the doctrine archetype map and
+[`docs/architecture.md`](./docs/architecture.md)). Its public product is a set of builders and typed
+contracts — `definePage()`, `defineRouteContract()`, `defineFreshApp()`, plus form, query, and defer
+factories — that turn page and route intent into Fresh runtime wiring.
+
+The implementation lives under `src/` in doctrine role folders:
+
+- `src/application/` — the builder DSLs and their contracts: `builders/`, `route/`, `form/`,
+  `query/`, `defer/`, `vite/`, and the `cache-entries/` loader helpers.
+- `src/runtime/` — behavior that runs: `server/` app bootstrap, `streams/` durable-stream client,
+  and `interactive/` promise hooks.
+- `src/diagnostics/` — `error/` normalization and display primitives.
+- `src/testing/` — route and defer test fixtures.
+- `src/internal/` — package-private telemetry.
+
+The package root holds only `mod.ts`. Every published subpath in `deno.json` resolves directly into
+`src/` — there are no re-export shells and no backward-compatibility surface. Each import you write
+points at the module that actually implements it.
 
 ## Install
 
-```ts
+```jsonc
 // deno.json
 {
   "imports": {
-    "@netscript/fresh": "jsr:@netscript/fresh@^1.0.0"
+    "@netscript/fresh": "jsr:@netscript/fresh@^0.0.1-alpha.0",
+    "@netscript/fresh/": "jsr:@netscript/fresh@^0.0.1-alpha.0/"
   }
 }
 ```
 
-## Quick Start
+The package is Deno-first and built for Fresh 2.
+
+## Required permissions
+
+`@netscript/fresh` is mostly a framework helper package, but several streaming and deferred
+rendering helpers touch platform capabilities when used at runtime:
+
+- `--allow-net` for deferred partial prewarm requests and durable stream endpoints.
+- `--allow-env` when `@netscript/plugin-streams-core` resolves stream server URL or auth settings
+  from environment variables.
+- `--unstable-kv` for server-side SSE helpers that watch `Deno.Kv` keys or prefixes.
+
+Type-checking package entrypoints should include `--unstable-kv` because the streaming server
+helpers expose KV-aware types.
+
+## Entry points
+
+Import only the layer you need — the package is subpath-first.
+
+| Import                          | Role        | Use it for                                  | Main exports                                                                                |
+| ------------------------------- | ----------- | ------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `@netscript/fresh`              | root        | Cross-cutting page-loader cache helpers     | `hasAllCacheEntries`, `minCachedAt`, `projectCachedItemFromList`                            |
+| `@netscript/fresh/builders`     | application | Page and partial builders                   | `definePage`, `definePartial`, `defineStatsPartial`                                         |
+| `@netscript/fresh/route`        | application | Typed route contracts and links             | `defineRouteContract`, `paginationSearchSchema`, `createRouteReference`, `bindRoutePattern` |
+| `@netscript/fresh/form`         | application | Form state, errors, and data pipeline       | `resolveFormState`, `toFormErrors`, `normalizeFormValues`, `createEmptyFormErrors`          |
+| `@netscript/fresh/defer`        | application | Suspense-style deferred rendering           | `Deferred`, `DeferPage`, `DeferComponent`, `resolveDetailDeferConfig`                       |
+| `@netscript/fresh/query`        | application | TanStack Query for Fresh islands            | `QueryIsland`, `getIslandQueryClient`, `useIslandQuery`, `useIslandMutation`, `useLiveQuery` |
+| `@netscript/fresh/error`        | diagnostics | Normalized error extraction                 | `extractErrorData`, `ErrorData`, `ErrorPrimitives`                                          |
+| `@netscript/fresh/streams`      | runtime     | Durable-stream client for E2E state         | `createNetScriptStreamDB`, `useLiveQuery`, `useLiveSuspenseQuery`                           |
+| `@netscript/fresh/server`       | runtime     | Fresh app bootstrapping                      | `defineFreshApp`, `App`, `FreshConfig`                                                      |
+| `@netscript/fresh/interactive`  | runtime     | Promise utilities for interactive flows     | `usePromise`, `resolvedPromise`                                                             |
+| `@netscript/fresh/vite`         | application | NetScript Vite integration                  | `createNetScriptVitePlugin`                                                                 |
+| `@netscript/fresh/testing`      | testing     | Route and defer test fixtures               | `createMockRouteContext`, `createMockDeferPolicy`                                           |
+
+The root entrypoint stays intentionally minimal: it exposes only the page-loader cache helpers, which
+are cross-cutting and belong to no single feature subpath. Every other capability — error handling
+included (`@netscript/fresh/error`) — lives on a named subpath. Reach for the subpath that owns the
+behavior you need.
+
+## Quick start
 
 Define a page with a typed route contract and pagination:
 
@@ -54,136 +105,7 @@ export const ordersPage = definePage()
   .build();
 ```
 
-## Entry Points
-
-### Root
-
-The root entrypoint re-exports a curated set of commonly used helpers including error handling, defer primitives, and cache-entry utilities.
-
-```ts
-import {
-  DeferComponent,
-  DeferPage,
-  extractErrorData,
-  hasAllCacheEntries,
-  minCachedAt,
-} from "@netscript/fresh";
-```
-
-### Builders
-
-Page and partial builders for Fresh applications.
-
-```tsx
-import { definePage, definePartial, defineStatsPartial } from "@netscript/fresh/builders";
-```
-
-### Route
-
-Route contracts, references, typed links, and pagination and search helpers.
-
-```ts
-import {
-  bindRoutePattern,
-  createRouteReference,
-  defineRouteContract,
-  enumPathParamSchema,
-  fallback,
-  paginationSearchSchema,
-} from "@netscript/fresh/route";
-```
-
-### Form
-
-Form state, error normalization, data pipeline helpers, and pagination state.
-
-```ts
-import {
-  buildPaginationState,
-  createEmptyFormErrors,
-  firstFieldError,
-  formDataToRawValues,
-  normalizeFormValues,
-  resolveFormState,
-  toFormErrors,
-} from "@netscript/fresh/form";
-```
-
-### Error
-
-Normalized error extraction and shared error display types.
-
-```ts
-import { extractErrorData, type ErrorData, type ErrorPrimitives } from "@netscript/fresh/error";
-```
-
-### Defer
-
-Deferred rendering and refresh helpers.
-
-```tsx
-import { DeferComponent, DeferPage, Deferred } from "@netscript/fresh/defer";
-```
-
-### Interactive
-
-Promise utilities for package-owned interactive flows.
-
-```ts
-import { resolvedPromise, usePromise } from "@netscript/fresh/interactive";
-```
-
-### Server
-
-Fresh app bootstrapping helpers.
-
-```ts
-import { defineFreshApp, type App, type FreshConfig } from "@netscript/fresh/server";
-```
-
-### Utils
-
-Cache-entry utilities shared by page loaders.
-
-```ts
-import {
-  hasAllCacheEntries,
-  minCachedAt,
-  projectCachedItemFromList,
-} from "@netscript/fresh/utils";
-```
-
-### Vite
-
-NetScript Vite integration.
-
-```ts
-import { ... } from "@netscript/fresh/vite";
-```
-
 ## Usage
-
-### `definePage()` with pagination
-
-Define a page that parses and validates search parameters:
-
-```tsx
-import { definePage } from "@netscript/fresh/builders";
-import { defineRouteContract, paginationSearchSchema } from "@netscript/fresh/route";
-
-const productsRoute = defineRouteContract({
-  searchSchema: paginationSearchSchema({
-    defaultLimit: 25,
-    defaultSort: "name",
-    defaultOrder: "asc",
-  }),
-});
-
-export const productsPage = definePage()
-  .withRoute(productsRoute)
-  .withMeta(() => ({ title: "Products" }))
-  .build();
-```
 
 ### Form error normalization
 
@@ -240,6 +162,31 @@ const href = userRef.href({ id: "usr_1" }); // "/users/usr_1"
 const props = userRef.getLinkProps({ id: "usr_1" });
 ```
 
+### Query islands
+
+Island code imports TanStack Query through `@netscript/fresh/query` rather than
+`@tanstack/preact-query` directly, so the dependency stays centralized:
+
+```tsx
+import { QueryIsland, useIslandQuery } from "@netscript/fresh/query";
+
+function OrderCount() {
+  const { data } = useIslandQuery({
+    queryKey: ["orders", "count"],
+    queryFn: () => fetch("/api/orders/count").then((r) => r.json()),
+  });
+  return <span>{data?.count ?? "…"}</span>;
+}
+
+export default function OrdersIsland() {
+  return (
+    <QueryIsland>
+      <OrderCount />
+    </QueryIsland>
+  );
+}
+```
+
 ### Bootstrap a Fresh app
 
 ```ts
@@ -250,10 +197,34 @@ export default defineFreshApp({
 });
 ```
 
+## Validation
+
+From the package directory:
+
+```sh
+deno task check      # type-check the root + every src entrypoint (no-slow-types-safe public surface)
+deno task test       # unit tests across ./src and ./tests
+deno task lint
+deno task fmt:check
+deno task doc-lint   # JSDoc lint for the public entrypoints
+deno task dry-run    # deno publish --dry-run
+```
+
+## Docs
+
+- [`docs/architecture.md`](./docs/architecture.md) — archetype, `src/` role layering, and subpath
+  conventions
+- [`docs/concepts.md`](./docs/concepts.md) — builders, route contracts, forms, and deferred
+  rendering
+- [`docs/getting-started.md`](./docs/getting-started.md) — first page and route
+- [`docs/form/`](./docs/form/) — the form subsystem in depth
+
 ## Resources
 
-- [`@netscript/fresh-ui`](https://jsr.io/@netscript/fresh-ui) — Interactive UI primitives and copy-source registry components
-- [`@netscript/sdk`](https://jsr.io/@netscript/sdk) — Service clients and cache-backed queries used in page loaders
+- [`@netscript/fresh-ui`](https://jsr.io/@netscript/fresh-ui) — interactive UI primitives and
+  copy-source registry components
+- [`@netscript/sdk`](https://jsr.io/@netscript/sdk) — service clients and cache-backed queries used
+  in page loaders
 - [Fresh documentation](https://fresh.deno.dev/docs/)
 - [Preact documentation](https://preactjs.com/guide/v10/getting-started)
 

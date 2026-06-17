@@ -29,7 +29,7 @@ import { PluginWorkspaceMutator } from '../../../kernel/adapters/plugin/workspac
 import { PortAllocator } from '../../../kernel/adapters/service/port-allocator.ts';
 import { ServiceScaffolder } from '../../../kernel/adapters/service/scaffolder.ts';
 import { ServiceWorkspaceResolver } from '../../../kernel/adapters/service/workspace-resolver.ts';
-import { emptyScaffoldResult } from '../../../kernel/application/scaffold/helpers.ts';
+import { emptyScaffoldResult } from '../../../kernel/application/scaffold/support/helpers.ts';
 import { DbEngineRegistry } from '../../../kernel/application/registries/db-engine-registry.ts';
 import { PluginKindRegistry } from '../../../kernel/application/registries/plugin-kind-registry.ts';
 import { DEFAULT_SERVY_CLI_PATH } from '../../../kernel/constants/windows.ts';
@@ -80,6 +80,10 @@ export interface PublicCommandDependencies {
       readonly packagesAsWorkspaceMembers: () => false;
       readonly scaffoldWorkspacePackages: () => Promise<ReturnType<typeof emptyScaffoldResult>>;
     };
+  };
+  /** Dependencies for Fresh UI registry installation commands. */
+  readonly uiInstallDependencies: {
+    readonly fs: DenoFileSystem;
   };
   /** Dependencies for DB lifecycle commands. */
   readonly dbOperationDependencies: { readonly cwd: () => string };
@@ -212,6 +216,7 @@ export function createPublicCommandDependencies(
         scaffoldWorkspacePackages: () => Promise.resolve(emptyScaffoldResult()),
       },
     },
+    uiInstallDependencies: { fs },
     dbOperationDependencies: { cwd: host.cwd },
     dbAddDependencies: {
       fs,

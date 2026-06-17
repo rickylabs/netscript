@@ -5,7 +5,7 @@
  * @description Dense secondary surface for sidebars, filter rails, and grouped dashboard controls.
  */
 
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { cn } from '../../lib/cn.ts';
 
 export type PanelTone = 'default' | 'muted' | 'raised';
@@ -21,7 +21,8 @@ interface PanelSectionProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'cl
   class?: string;
 }
 
-interface PanelTextProps extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
+interface PanelTextProps
+  extends Omit<JSX.HTMLAttributes<HTMLParagraphElement>, 'class' | 'children'> {
   children: ComponentChildren;
   class?: string;
 }
@@ -32,31 +33,41 @@ const TONE_CLASSES: Record<PanelTone, string | undefined> = {
   raised: 'ns-panel--raised',
 };
 
-function PanelRoot({ children, class: className, tone = 'default', ...props }: PanelProps) {
+function PanelRoot({ children, class: className, tone = 'default', ...props }: PanelProps): VNode {
   return <div {...props} class={cn('ns-panel', TONE_CLASSES[tone], className)}>{children}</div>;
 }
 
-export function PanelHeader({ children, class: className, ...props }: PanelSectionProps) {
+export function PanelHeader({ children, class: className, ...props }: PanelSectionProps): VNode {
   return <div {...props} class={cn('ns-panel__header', className)}>{children}</div>;
 }
 
-export function PanelTitle({ children, class: className, ...props }: PanelTextProps) {
+export function PanelTitle({ children, class: className, ...props }: PanelTextProps): VNode {
   return <p {...props} class={cn('ns-panel__title', className)}>{children}</p>;
 }
 
-export function PanelDescription({ children, class: className, ...props }: PanelTextProps) {
+export function PanelDescription({ children, class: className, ...props }: PanelTextProps): VNode {
   return <p {...props} class={cn('ns-panel__description', className)}>{children}</p>;
 }
 
-export function PanelBody({ children, class: className, ...props }: PanelSectionProps) {
+export function PanelBody({ children, class: className, ...props }: PanelSectionProps): VNode {
   return <div {...props} class={cn('ns-panel__body', className)}>{children}</div>;
 }
 
-export function PanelFooter({ children, class: className, ...props }: PanelSectionProps) {
+export function PanelFooter({ children, class: className, ...props }: PanelSectionProps): VNode {
   return <div {...props} class={cn('ns-panel__footer', className)}>{children}</div>;
 }
 
-export const Panel = Object.assign(PanelRoot, {
+type PanelNamespace =
+  & typeof PanelRoot
+  & Readonly<{
+    Header: typeof PanelHeader;
+    Title: typeof PanelTitle;
+    Description: typeof PanelDescription;
+    Body: typeof PanelBody;
+    Footer: typeof PanelFooter;
+  }>;
+
+export const Panel: PanelNamespace = Object.assign(PanelRoot, {
   Header: PanelHeader,
   Title: PanelTitle,
   Description: PanelDescription,

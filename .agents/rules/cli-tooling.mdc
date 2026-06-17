@@ -14,4 +14,4 @@ alwaysApply: false
   behind injected ports or adapters, as required by `docs/architecture/doctrine/09-anti-patterns-and-fitness-functions.md`.
 - Composition roots wire command groups and dependencies; they should reference feature commands
   rather than contain inline command bodies.
-- Use `tools/fitness/check-cli-*.ts` gates when available before merging CLI structure changes.
+- Use `.llm/tools/fitness/check-cli-*.ts` gates when available before merging CLI structure changes.

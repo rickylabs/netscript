@@ -24,7 +24,7 @@ import {
   servyLifecycleArgs,
 } from '../../../../kernel/adapters/deploy/shared.ts';
 
-export const statusCommand = new Command()
+export const statusCommand: Command<any, any, any, any, any, any, any, any> = new Command()
   .name('status')
   .description('Show running status of all registered services')
   .arguments('[service:string]')

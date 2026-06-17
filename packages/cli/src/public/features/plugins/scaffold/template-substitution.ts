@@ -5,7 +5,7 @@
  */
 
 /** Template variable matcher for `{{var}}` placeholders. */
-export const TEMPLATE_VARIABLE_PATTERN = /\{\{([\w-]+)\}\}/g;
+export const TEMPLATE_VARIABLE_PATTERN: RegExp = /\{\{([\w-]+)\}\}/g;
 
 /** Variables available to plugin skeleton templates. */
 export type TemplateVariables = Readonly<Record<string, string>> & {

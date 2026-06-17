@@ -10,8 +10,10 @@ baseline while the product-grade suite matures.
 
 ```bash
 deno task e2e:cli suites
+deno task e2e:cli
 deno task e2e:cli run scaffold.service --format pretty
-deno task e2e:cli run scaffold.plugins --cleanup --format pretty
+deno task e2e:cli run scaffold.plugins --format pretty
+deno task e2e:cli run scaffold.runtime --cleanup --format pretty
 ```
 
 Programmatic use:
@@ -28,25 +30,36 @@ const suite = defineCliE2eSuite()
 
 ## Command Surface
 
-| Command               | Purpose                    |
-| --------------------- | -------------------------- |
-| `suites`              | List built-in suites       |
-| `gates <suite>`       | List suite gates           |
-| `run <suite>`         | Run a complete suite       |
-| `gate <suite> <gate>` | Run one gate for debugging |
+| Command               | Purpose                                         |
+| --------------------- | ----------------------------------------------- |
+| _(no subcommand)_     | Run the full merge-readiness suite with cleanup |
+| `suites`              | List built-in suites                            |
+| `gates <suite>`       | List suite gates                                |
+| `run <suite>`         | Run a complete suite                            |
+| `gate <suite> <gate>` | Run one gate for debugging                      |
 
-The first complete scenario is `scaffold.plugins`. It validates generated project scaffolding,
-official plugin addition, database workflow, Aspire runtime boot, HTTP behavior checks, and cleanup.
+The bare `deno task e2e:cli` command runs `scaffold.runtime` with cleanup enabled. That full
+merge-readiness scenario validates generated project scaffolding, official plugin addition, database
+workflow, generated type checks, Aspire runtime boot, HTTP behavior checks, OTEL behavior, and
+cleanup. The narrower `scaffold.plugins` suite stops after plugin scaffold and host-diagnostic
+checks.
+
+`gate <suite> <gate>` is a narrow debugging command. It does not automatically run prerequisite
+gates, so dependent gates such as `database.init`, `database.generate`, runtime waits, and behavior
+checks require an existing generated project via matching `--smoke-root` and `--name` options. CI
+and requested PR checks should use
+`deno task e2e:cli run scaffold.runtime --cleanup --format pretty` instead of invoking
+`database.init` directly.
 
 ## Built-in Suites
 
-| Suite                     | Coverage                                      |
-| ------------------------- | --------------------------------------------- |
-| `scaffold.service`        | init, generated service discovery, typecheck  |
-| `scaffold.contracts`      | init, generated contract discovery, typecheck |
-| `scaffold.infrastructure` | init, database init/generate/seed, typecheck  |
-| `scaffold.plugins`        | full scaffold, plugins, DB, runtime behavior  |
-| `scaffold.runtime`        | full scaffold runtime behavior path           |
+| Suite                     | Coverage                                                   |
+| ------------------------- | ---------------------------------------------------------- |
+| `scaffold.service`        | init, generated service discovery, typecheck               |
+| `scaffold.contracts`      | init, generated contract discovery, typecheck              |
+| `scaffold.infrastructure` | init, database init/generate/seed, typecheck               |
+| `scaffold.plugins`        | init, official plugins, registry generation, plugin doctor |
+| `scaffold.runtime`        | full scaffold runtime behavior path                        |
 
 ## Required Permissions
 

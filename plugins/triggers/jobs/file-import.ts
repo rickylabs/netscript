@@ -14,6 +14,8 @@ import {
   createFailureResult,
   createSuccessResult,
   defineJobHandler,
+  type JobHandlerContext,
+  type JobResult,
 } from '@netscript/plugin-workers-core';
 import { createJobTools } from './job-tools.ts';
 import { z } from 'zod';
@@ -66,9 +68,13 @@ function parseCsv(
 // JOB HANDLER
 // ============================================================================
 
-const handler = defineJobHandler(async (ctx) => {
+type FileImportJobHandler = (
+  context: JobHandlerContext,
+) => JobResult<unknown> | Promise<JobResult<unknown>>;
+
+const handler: FileImportJobHandler = defineJobHandler(async (ctx) => {
   const payload = FileImportPayloadSchema.parse(ctx.payload ?? {});
-  const { log, progress, trace, traceContext } = createJobTools(ctx);
+  const { log, progress, trace } = createJobTools(ctx);
   const { filePath, fileName, contentHash, format, sagaMessageType, csvDelimiter } = payload;
 
   log.info('Starting file import', { filePath, fileName, format });
@@ -165,4 +171,7 @@ const handler = defineJobHandler(async (ctx) => {
   });
 });
 
-export default Object.assign(handler, { id: 'triggers-plugin-file-import' });
+const fileImportJob: FileImportJobHandler & Readonly<{ id: 'triggers-plugin-file-import' }> = Object
+  .assign(handler, { id: 'triggers-plugin-file-import' as const });
+
+export default fileImportJob;

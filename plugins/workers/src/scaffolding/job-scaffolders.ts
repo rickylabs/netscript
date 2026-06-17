@@ -8,8 +8,11 @@ import {
 
 /** Scaffold a standalone worker job handler module. */
 export class JobHandlerScaffolder extends WorkersItemScaffolder<WorkersScaffoldInput> {
+  /** Stable scaffolder identifier for job handler files. */
   readonly id = 'job-handler';
+  /** Workers item kind produced by this scaffolder. */
   readonly kind = 'job';
+  /** Template path associated with job handler scaffolds. */
   readonly templatePath = './templates/job-handler.ts.template';
 
   /** Generate TypeScript source for a job handler. */
@@ -38,8 +41,11 @@ export class JobHandlerScaffolder extends WorkersItemScaffolder<WorkersScaffoldI
 
 /** Scaffold a worker job builder module. */
 export class JobBuilderScaffolder extends WorkersItemScaffolder<WorkersScaffoldInput> {
+  /** Stable scaffolder identifier for job builder files. */
   readonly id = 'job-builder';
+  /** Workers item kind produced by this scaffolder. */
   readonly kind = 'job';
+  /** Template path associated with job builder scaffolds. */
   readonly templatePath = './templates/job-builder.ts.template';
 
   /** Generate TypeScript source for a job definition. */

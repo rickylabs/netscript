@@ -11,8 +11,9 @@
   },
   "imports": {
     "@std/fs": "jsr:@std/fs@^1",
+    "@std/jsonc": "jsr:@std/jsonc@^1",
     "@std/path": "jsr:@std/path@^1",
-    "zod": "npm:zod@^4.3.6"
+    "zod": "jsr:@zod/zod@4.4.3"
   },
   "compilerOptions": {
     "strict": true,

@@ -61,6 +61,7 @@ type ConcurrencySlot = Readonly<{
 
 /** Native saga engine with indexed dispatch and per-key concurrency throttling. */
 export class SagaEngine implements SagaBusPort {
+  /** Stable engine identifier. */
   readonly id: string;
   readonly #retryPolicy: RetryPolicy;
   readonly #store?: SagaStorePort;
@@ -69,23 +70,27 @@ export class SagaEngine implements SagaBusPort {
   readonly #concurrency = new Map<string, ConcurrencySlot>();
   #running = false;
 
+  /** Create a native saga engine. */
   constructor(options: SagaEngineOptions = {}) {
     this.id = options.id ?? 'saga-engine';
     this.#retryPolicy = options.defaultRetryPolicy ?? DEFAULT_RETRY_POLICY;
     this.#store = options.store;
   }
 
+  /** Start accepting saga messages. */
   start(): Promise<void> {
     this.#running = true;
     return Promise.resolve();
   }
 
+  /** Stop accepting saga messages and clear transient concurrency state. */
   stop(_reason?: string): Promise<void> {
     this.#running = false;
     this.#concurrency.clear();
     return Promise.resolve();
   }
 
+  /** Register saga definitions and rebuild the dispatch index. */
   register(definitions: readonly SagaDefinition[]): Promise<void> {
     for (const definition of definitions) {
       this.#definitions.set(definition.id, definition);
@@ -94,10 +99,12 @@ export class SagaEngine implements SagaBusPort {
     return Promise.resolve();
   }
 
+  /** Publish a message directly into the native handler pipeline. */
   async publish(message: SagaMessage, _options: SagaPublishOptions = {}): Promise<void> {
     await this.handle(message);
   }
 
+  /** Dispatch cascaded send messages through the native engine. */
   async dispatchCascaded(messages: readonly CascadedMessage[]): Promise<void> {
     for (const message of messages) {
       if (message.kind !== 'send') {
@@ -113,6 +120,7 @@ export class SagaEngine implements SagaBusPort {
     }
   }
 
+  /** Dispatch a signal; deferred until the signal runtime is implemented. */
   signal<TPayload, TName extends string>(
     _dispatch: SagaSignalDispatch<TPayload, TName>,
   ): Promise<void> {
@@ -121,6 +129,7 @@ export class SagaEngine implements SagaBusPort {
     );
   }
 
+  /** Dispatch a query; deferred until the query runtime is implemented. */
   query<TResult, TName extends string>(
     _dispatch: SagaQueryDispatch<TResult, TName>,
   ): Promise<TResult> {

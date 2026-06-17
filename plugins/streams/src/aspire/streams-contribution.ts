@@ -1,6 +1,6 @@
 import {
-  AspireNSPluginContribution,
   type AspireBuilder,
+  AspireNSPluginContribution,
   type AspireResource,
   type ContributionContext,
   type EnvSource,

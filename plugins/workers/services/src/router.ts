@@ -34,7 +34,8 @@ import { workersV1 } from './routers/v1.ts';
  *
  * Uses .prefix('/v1/workers') to prepend versioned path to all OpenAPI routes.
  */
-export const v1 = {
+// deno-lint-ignore no-explicit-any
+export const v1: any = {
   health,
   // deno-lint-ignore no-explicit-any
   workers: os.prefix('/v1/workers').router(workersV1 as any),
@@ -80,7 +81,8 @@ export const v1 = {
  * - v1.workers.seed
  * - v1.workers.subscribe
  */
-export const router = os.router({
+// deno-lint-ignore no-explicit-any
+export const router: any = os.router({
   v1,
   // Future: v2, v3, etc.
 });

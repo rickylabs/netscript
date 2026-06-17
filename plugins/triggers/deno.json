@@ -33,20 +33,20 @@
     "@netscript/plugin-workers-core/runtime": "../../packages/plugin-workers-core/src/runtime/mod.ts",
     "@netscript/queue": "../../packages/queue/mod.ts",
     "@netscript/service": "../../packages/service/mod.ts",
-    "@netscript/shared": "../../packages/shared/mod.ts",
+    "@netscript/contracts": "../../packages/contracts/mod.ts",
+    "@netscript/telemetry/instrumentation": "../../packages/telemetry/instrumentation.ts",
     "@netscript/telemetry/tracer": "../../packages/telemetry/tracer.ts",
     "@netscript/watchers": "../../packages/watchers/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
-    "@std/path": "jsr:@std/path@^1.0.0",
-    "@durable-streams/state": "npm:@durable-streams/state@^0.2.3",
-    "@orpc/contract": "npm:@orpc/contract@^1.13.5",
-    "@orpc/server": "npm:@orpc/server@^1.13.5",
-    "hono": "jsr:@hono/hono@^4",
-    "zod": "npm:zod@^4.3.6"
+    "@std/path": "jsr:@std/path@^1",
+    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db",
+    "hono": "jsr:@hono/hono@4.12.24",
+    "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts",
+    "check": "deno check --unstable-kv mod.ts src/aspire/mod.ts src/cli/composition/main.ts src/public/mod.ts src/plugin/mod.ts src/runtime/mod.ts src/scaffolding/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --allow-all --unstable-kv",
+    "triggers:e2e": "deno test --allow-net --allow-env --unstable-kv tests/e2e",
     "dev": "deno run --unstable-kv --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --unstable-kv --allow-net --allow-env --allow-read services/src/main.ts",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"

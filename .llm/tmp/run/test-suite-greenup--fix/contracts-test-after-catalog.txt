@@ -1,0 +1,7 @@
+Check packages/contracts/tests/contracts_test.ts
+running 2 tests from ./packages/contracts/tests/contracts_test.ts
+contracts root exposes pagination and diagnostics primitives ... ok (27ms)
+contracts root exposes schema helper factories ... ok (1ms)
+
+ok | 2 passed | 0 failed (38ms)
+

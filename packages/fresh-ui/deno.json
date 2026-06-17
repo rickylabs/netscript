@@ -1,38 +1,46 @@
 {
   "name": "@netscript/fresh-ui",
-  "version": "0.0.1-alpha.0",
+  "version": "0.1.0",
   "description": "Fresh UI registry seams and interactive foundations for NetScript.",
   "license": "MIT",
+  "exclude": [],
   "exports": {
     ".": "./mod.ts",
-    "./interactive": "./interactive.ts"
+    "./interactive": "./interactive.ts",
+    "./primitives": "./primitives.tsx"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
-    "clsx": "npm:clsx@^2.1.1",
-    "preact": "npm:preact@^10.27.2",
-    "preact/hooks": "npm:preact@^10.27.2/hooks",
-    "@preact/signals": "npm:@preact/signals@^2.5.0",
-    "tailwind-merge": "npm:tailwind-merge@^3.5.0"
+    "preact/hooks": "npm:preact@^10.29.2/hooks",
+    "preact/jsx-runtime": "npm:preact@^10.29.2/jsx-runtime"
   },
   "publish": {
     "include": [
       "**/*.ts",
       "**/*.tsx",
       "**/*.css",
+      "registry/**/*.json",
+      "docs/**/*.md",
       "deno.json",
       "README.md"
     ],
     "exclude": [
-      "**/*_test.ts",
-      "**/*_test.tsx",
-      "**/*.test.ts",
-      "**/*.test.tsx"
+      "!**/*.ts",
+      "!**/*.tsx",
+      "!**/*.css",
+      "!registry/**/*.json",
+      "!docs/**/*.md",
+      "!deno.json",
+      "!README.md",
+      "scripts/**",
+      "tests/**"
     ]
   },
   "tasks": {
-    "check": "deno check mod.ts interactive.ts registry/manifest.ts registry/components/ui/button.tsx registry/components/ui/icon-button.tsx registry/components/ui/input.tsx registry/components/ui/textarea.tsx registry/components/ui/checkbox.tsx registry/components/ui/switch.tsx registry/components/ui/label.tsx registry/components/ui/select.tsx registry/components/ui/control-props.ts registry/components/ui/form-field.tsx registry/components/ui/card.tsx registry/components/ui/panel.tsx registry/components/ui/badge.tsx registry/components/ui/breadcrumb.tsx registry/components/ui/data-table.tsx registry/components/ui/detail-layout.tsx registry/components/ui/empty-state.tsx registry/components/ui/filter-form.tsx registry/components/ui/page-header.tsx registry/components/ui/pagination.tsx registry/components/ui/section-divider.tsx registry/components/ui/separator.tsx registry/components/ui/sidebar-shell.tsx registry/components/ui/alert.tsx registry/components/ui/inline-notice.tsx registry/components/ui/spinner.tsx registry/components/ui/progress.tsx registry/components/ui/skeleton.tsx registry/components/ui/stats-grid.tsx registry/islands/SidebarToggle.tsx registry/islands/ThemeToggle.tsx registry/islands/Toast.tsx registry/lib/toast.ts runtime/accordion/use-accordion.ts runtime/accordion/Accordion.tsx runtime/dialog/use-dialog.ts runtime/dialog/Dialog.tsx runtime/drawer/use-drawer.ts runtime/drawer/Drawer.tsx runtime/popover/use-popover.ts runtime/popover/Popover.tsx runtime/tabs/use-tabs.ts runtime/tabs/Tabs.tsx runtime/tooltip/use-tooltip.ts runtime/tooltip/Tooltip.tsx",
-    "test": "deno test registry/lib/toast.test.ts registry/components/ui/foundation.test.tsx runtime/_internal/collection-navigation.test.ts runtime/accordion/accordion.test.ts runtime/dialog/dialog.test.ts runtime/drawer/drawer.test.ts runtime/popover/popover.test.ts runtime/tabs/tabs.utils.test.ts runtime/tooltip/tooltip.test.ts"
+    "check": "deno check --lock=deno.lock --unstable-kv \"**/*.ts\" \"**/*.tsx\"",
+    "test": "deno test --lock=deno.lock --unstable-kv \"tests/**/*.ts\" \"tests/**/*.tsx\"",
+    "tokens:build": "deno run --lock=deno.lock --allow-read=. --allow-write=registry/theme --allow-env --allow-net=registry.npmjs.org scripts/build-tokens.ts",
+    "tokens:check": "deno task tokens:build && git diff --exit-code registry/theme/tokens.css registry/theme/theme-bridge.css registry/theme/tokens.json"
   },
   "compilerOptions": {
     "lib": [
@@ -59,5 +67,18 @@
       "noscript",
       "template"
     ]
+  },
+  "fmt": {
+    "include": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.css",
+      "**/*.md"
+    ],
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true
   }
 }

@@ -2,13 +2,13 @@
 
 ## Run Metadata
 
-| Field | Value |
-|-------|-------|
-| Run ID | `<run-id>` |
-| Branch | `<branch>` |
-| Current phase | `<plan/implement/evaluate/close>` |
-| Archetype | `<N - name | N/A>` |
-| Scope overlays | `<frontend/service/docs/none>` |
+| Field          | Value                                            |
+| -------------- | ------------------------------------------------ |
+| Run ID         | `<run-id>`                                       |
+| Branch         | `<branch>`                                       |
+| Current phase  | `<plan/plan-eval/implement/gate/evaluate/close>` |
+| Archetype      | `<N - name or N/A>`                              |
+| Scope overlays | `<frontend/service/docs/none>`                   |
 
 ## Current State
 
@@ -28,24 +28,24 @@
 
 ## Key Decisions
 
-| Decision | Source | Notes |
-|----------|--------|-------|
+| Decision     | Source                 | Notes     |
+| ------------ | ---------------------- | --------- |
 | `<decision>` | `<plan/doctrine/code>` | `<notes>` |
 
 ## Files Changed
 
-| Path | Status | Notes |
-|------|--------|-------|
+| Path     | Status                  | Notes     |
+| -------- | ----------------------- | --------- |
 | `<path>` | `<changed/new/deleted>` | `<notes>` |
 
 ## Gates
 
-| Gate family | Current status | Evidence |
-|-------------|----------------|----------|
-| Static | `<status>` | `<evidence>` |
-| Fitness | `<status>` | `<evidence>` |
-| Runtime | `<status>` | `<evidence>` |
-| Consumer | `<status>` | `<evidence>` |
+| Gate family | Current status | Evidence     |
+| ----------- | -------------- | ------------ |
+| Static      | `<status>`     | `<evidence>` |
+| Fitness     | `<status>`     | `<evidence>` |
+| Runtime     | `<status>`     | `<evidence>` |
+| Consumer    | `<status>`     | `<evidence>` |
 
 ## Open Questions
 

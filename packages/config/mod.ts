@@ -41,7 +41,7 @@
  *
  * const config = await initConfig();
  * const report = inspectConfig(config);
- * console.log(report.summary);
+ * const summary = report.summary;
  * ```
  *
  * @see README.md
@@ -63,7 +63,7 @@ export {
 
 // Builders
 export { defineSagas } from './src/public/mod.ts';
-export type { SagaDefinitionInput, SagasConfigInput } from './src/public/mod.ts';
+export type { SagaDefinitionInput, SagaGroupInput, SagasConfigInput } from './src/public/mod.ts';
 
 // Adapters
 export {
@@ -106,10 +106,13 @@ export type {
   SdkConfig,
   ServiceConfig,
   TriggerDefinitionConfig,
+  TriggerDefinitionConfigInput,
   TriggerGroup,
+  TriggerGroupInput,
   TriggerRetentionConfig,
   TriggerScalingConfig,
   TriggersConfig,
+  TriggersConfigInput,
   WebhookConfig,
   WindowsDeployConfig,
   WorkspaceMap,
