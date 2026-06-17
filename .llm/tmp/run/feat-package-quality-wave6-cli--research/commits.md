@@ -31,3 +31,4 @@ Slice 2 blocks merge without green `scaffold.runtime`.
 - e53f011: Slice 3: split CLI registry and app writer
 
 - 43e8ea4: Slice 4a: finish local CLI scaffold improvements
+- f49af63: Slice 6: close CLI A6 gate sweep
