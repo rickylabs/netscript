@@ -391,3 +391,15 @@ the S2 full quality lane. **D/S2 = COMPLETE.** NEXT = E (S3 OIDC publish 26 non-
 0.0.1-alpha.0 from main) — user-dispatched. Maintainer follow-ups (not blocking): promote
 `quality` to a required check via branch protection; decide on retiring/scoping the Copilot
 setup step now that OpenHands is the evaluator.
+
+### Copilot setup step removed (2026-06-18, maintainer-authorized)
+
+PR #51 squash-merged → **main `a76414c5`**. Deleted
+`.github/workflows/copilot-setup-steps.yml` (superseded by OpenHands evaluator).
+`.github/toolchain.env` RETAINED — live consumer is `openhands-agent.yml`
+(fetch + source) + `.openhands/setup.sh` (source). All checks green
+(check-test ✓ 3m, quality ✓ 2m, deps-report ✓). Branch deleted.
+
+**Maintainer follow-up (flagged, not auto-doable):** if `copilot-setup-steps`
+is a required status check in `main` branch protection, drop it there too or new
+PRs hang on a check that no longer runs.
