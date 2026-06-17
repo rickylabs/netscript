@@ -1,4 +1,4 @@
-import { dirname, fromFileUrl, join, resolve } from '@std/path';
+import { join, resolve } from '@std/path';
 import { loadDeployConfig } from '../../config/deploy-config.ts';
 import { extractCompileTargets } from './compile-targets.ts';
 
@@ -8,17 +8,23 @@ function assert(condition: unknown, message: string): asserts condition {
   }
 }
 
-const REPO_ROOT = resolve(dirname(fromFileUrl(import.meta.url)), '../../../../../../..');
 let configPromise: ReturnType<typeof loadDeployConfig> | undefined;
+let projectRootPromise: Promise<string> | undefined;
 
-function getConfig() {
-  configPromise ??= loadDeployConfig({ projectRoot: REPO_ROOT, quiet: true });
+function getProjectRoot(): Promise<string> {
+  projectRootPromise ??= createCompileProject();
+  return projectRootPromise;
+}
+
+async function getConfig() {
+  configPromise ??= loadDeployConfig({ projectRoot: await getProjectRoot(), quiet: true });
   return configPromise;
 }
 
 async function getConfiguredTriggerWatchDirs(): Promise<string[]> {
+  const projectRoot = await getProjectRoot();
   const appsettings = JSON.parse(
-    await Deno.readTextFile(join(REPO_ROOT, 'dotnet', 'AppHost', 'appsettings.json')),
+    await Deno.readTextFile(join(projectRoot, 'dotnet', 'AppHost', 'appsettings.json')),
   ) as {
     NetScript?: {
       BackgroundProcessors?: {
@@ -59,6 +65,62 @@ Deno.test('loadDeployConfig resolves unified background processors from appsetti
     'triggers watchDirs should match BackgroundProcessors.triggers.WatchDirs from appsettings',
   );
 });
+
+async function createCompileProject(): Promise<string> {
+  const projectRoot = await Deno.makeTempDir();
+  await Deno.mkdir(resolve(projectRoot, 'dotnet', 'AppHost'), { recursive: true });
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: [
+    '@netscript/plugin-workers',
+    '@netscript/plugin-sagas',
+    '@netscript/plugin-triggers',
+  ],
+};
+`,
+  );
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'dotnet', 'AppHost', 'appsettings.json'),
+    JSON.stringify({
+      NetScript: {
+        Plugins: {
+          'workers-api': {
+            Enabled: true,
+            Workdir: 'plugins/workers',
+            Entrypoint: 'services/src/main.ts',
+          },
+        },
+        BackgroundProcessors: {
+          workers: {
+            Enabled: true,
+            Workdir: 'workers',
+            Entrypoint: 'bin/combined.ts',
+            Concurrency: 2,
+            ConcurrencyEnvVar: 'WORKER_CONCURRENCY',
+          },
+          sagas: {
+            Enabled: true,
+            Workdir: 'sagas',
+            Entrypoint: 'bin/combined.ts',
+            ConcurrencyEnvVar: 'SAGA_CONCURRENCY',
+          },
+          triggers: {
+            Enabled: true,
+            Workdir: 'plugins/triggers',
+            Entrypoint: 'src/runtime/trigger-processor.ts',
+            Concurrency: 10,
+            ConcurrencyEnvVar: 'TRIGGER_CONCURRENCY',
+            WatchDirs: ['plugins/triggers/events'],
+          },
+        },
+      },
+    }, null, 2),
+  );
+  return projectRoot;
+}
 
 Deno.test('extractCompileTargets emits metadata-driven background processor targets', async () => {
   const config = await getConfig();

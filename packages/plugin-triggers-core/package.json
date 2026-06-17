@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:"
+  }
+}

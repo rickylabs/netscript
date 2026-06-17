@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:",
+    "@saga-bus/core": "catalog:",
+    "ioredis": "catalog:"
+  }
+}

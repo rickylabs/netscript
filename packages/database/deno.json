@@ -22,14 +22,7 @@
     "fmt": "deno fmt --check",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
-  "imports": {
-    "@prisma/client": "catalog:",
-    "@prisma/instrumentation-contract": "catalog:",
-    "@opentelemetry/api": "catalog:",
-    "@prisma/adapter-pg": "catalog:",
-    "@prisma/adapter-mssql": "catalog:",
-    "pg": "catalog:"
-  },
+  "imports": {},
   "publish": {
     "include": [
       "README.md",

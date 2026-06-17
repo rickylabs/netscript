@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@durable-streams/state": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:"
+  }
+}

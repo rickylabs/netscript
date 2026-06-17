@@ -11,12 +11,8 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
-    "clsx": "catalog:",
-    "preact": "catalog:",
     "preact/hooks": "npm:preact@^10.29.2/hooks",
-    "preact/jsx-runtime": "npm:preact@^10.29.2/jsx-runtime",
-    "@preact/signals": "catalog:",
-    "tailwind-merge": "catalog:"
+    "preact/jsx-runtime": "npm:preact@^10.29.2/jsx-runtime"
   },
   "publish": {
     "include": [

@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@orpc/client": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/tanstack-query": "catalog:",
+    "@orpc/zod": "catalog:",
+    "@tanstack/db": "catalog:",
+    "@tanstack/query-core": "catalog:",
+    "@tanstack/query-db-collection": "catalog:"
+  }
+}

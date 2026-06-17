@@ -53,8 +53,8 @@ Deno.test('copyOfficialPlugin wires sample config and runtime files for scaffold
   const officialConfig = await Deno.readTextFile(
     join(targetPath, 'config/official-plugins/mod.ts'),
   );
-  assertEquals(officialConfig.includes("defineJob('process-webhook-payload'"), true);
-  assertEquals(officialConfig.includes("defineJob('send-welcome-email'"), true);
+  assertEquals(officialConfig.includes("id: 'process-webhook-payload'"), true);
+  assertEquals(officialConfig.includes("id: 'send-welcome-email'"), true);
   assertEquals(officialConfig.includes('UserRegistrationSaga'), true);
   assertEquals(officialConfig.includes('webhook-validate-data'), true);
 
