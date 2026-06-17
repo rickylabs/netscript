@@ -29,7 +29,7 @@ import { PluginWorkspaceMutator } from '../../../kernel/adapters/plugin/workspac
 import { PortAllocator } from '../../../kernel/adapters/service/port-allocator.ts';
 import { ServiceScaffolder } from '../../../kernel/adapters/service/scaffolder.ts';
 import { ServiceWorkspaceResolver } from '../../../kernel/adapters/service/workspace-resolver.ts';
-import { emptyScaffoldResult } from '../../../kernel/application/scaffold/helpers.ts';
+import { emptyScaffoldResult } from '../../../kernel/application/scaffold/support/helpers.ts';
 import { DbEngineRegistry } from '../../../kernel/application/registries/db-engine-registry.ts';
 import { PluginKindRegistry } from '../../../kernel/application/registries/plugin-kind-registry.ts';
 import { DEFAULT_SERVY_CLI_PATH } from '../../../kernel/constants/windows.ts';

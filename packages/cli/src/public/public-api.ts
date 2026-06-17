@@ -9,7 +9,6 @@
  * @module
  */
 
-import type { PluginManifest } from '@netscript/plugin';
 import type { PublicCliCommand } from './composition/create-public-cli.ts';
 import {
   createPluginHostLoader as createInternalPluginHostLoader,
@@ -62,7 +61,18 @@ export type { PublicCliRuntime } from './composition/run-public-cli.ts';
  * Plugin host loader factory.
  */
 /** Plugin manifest value returned by public host loader contracts. */
-export type PluginHostManifest = PluginManifest;
+export interface PluginHostManifest {
+  /** Plugin package name. */
+  readonly name: string;
+  /** Plugin semantic version. */
+  readonly version: string;
+  /** Optional human-readable description. */
+  readonly description?: string;
+  /** Runtime contribution payload owned by the plugin package. */
+  readonly contributions?: unknown;
+  /** Additional plugin manifest fields preserved for host integrations. */
+  readonly [key: string]: unknown;
+}
 
 /**
  * Plugin host loader contracts.

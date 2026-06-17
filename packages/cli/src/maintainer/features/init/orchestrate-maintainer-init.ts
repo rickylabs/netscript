@@ -23,6 +23,10 @@ export interface MaintainerInitRequest {
   readonly yes: boolean;
   /** Preview scaffold changes without writing files. */
   readonly dryRun: boolean;
+  /** Emit a single machine-readable init result object. */
+  readonly json?: boolean;
+  /** Named scaffold preset to apply before generation. */
+  readonly from?: string;
   /** Skip `git init` after scaffolding. */
   readonly noGit: boolean;
   /** Skip Aspire orchestration output. */

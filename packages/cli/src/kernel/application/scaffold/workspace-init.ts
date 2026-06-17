@@ -7,7 +7,7 @@ import { PluginRegistryScaffolder } from '../../adapters/plugin/registry-scaffol
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
 import type { InitPipelineContext } from './context.ts';
-import { adjustLocalBase, emptyScaffoldResult, isDbEngine } from './helpers.ts';
+import { adjustLocalBase, emptyScaffoldResult, isDbEngine } from './support/helpers.ts';
 
 export async function scaffoldDatabase(
   context: InitPipelineContext,
