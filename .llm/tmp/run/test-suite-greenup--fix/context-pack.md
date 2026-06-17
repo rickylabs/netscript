@@ -20,7 +20,7 @@ Active root-cause slices:
 3. Newly surfaced plugin-workers-core Deno runtime adapter tests — fixed in `023c758`.
 4. CLI config fixture failures in plugin registry and compile tests — fixed in `bb7a521`.
 5. Official plugin sample fixture drift — fixed in `a621a8c`.
-6. Catalog graph-resolution blocker — `103f9a8` rejected; reworked to root `imports`, commit pending.
+6. Catalog graph-resolution blocker — `103f9a8` rejected; reworked to root `imports` in `9262399`.
 
 Final gate:
 
