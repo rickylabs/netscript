@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@prisma/driver-adapter-utils": "catalog:",
+    "mysql2": "catalog:"
+  }
+}

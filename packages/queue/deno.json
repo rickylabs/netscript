@@ -28,8 +28,6 @@
     "@fedify/amqp": "jsr:@fedify/amqp@^2.2.5",
     "@netscript/kv": "../kv/mod.ts",
     "zod": "jsr:@zod/zod@4.4.3",
-    "ioredis": "catalog:",
-    "amqplib": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/async": "jsr:@std/async@^1"
   },

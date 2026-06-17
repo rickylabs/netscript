@@ -25,14 +25,10 @@
     "./agent": "./src/agent/mod.ts"
   },
   "imports": {
-    "@saga-bus/core": "catalog:",
     "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
     "@netscript/plugin-workers-core": "../plugin-workers-core/mod.ts",
-    "@orpc/contract": "catalog:",
-    "@orpc/server": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
     "hono": "jsr:@hono/hono@4.12.24",
-    "ioredis": "catalog:",
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {

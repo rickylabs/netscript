@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@durable-streams/client": "catalog:",
+    "@durable-streams/server": "catalog:"
+  }
+}

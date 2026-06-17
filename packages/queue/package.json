@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "amqplib": "catalog:",
+    "ioredis": "catalog:"
+  }
+}

@@ -28,18 +28,9 @@
     "@netscript/telemetry": "../telemetry/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
-    "@orpc/client": "catalog:",
     "@orpc/client/fetch": "npm:@orpc/client@^1.14.6/fetch",
     "@orpc/client/plugins": "npm:@orpc/client@^1.14.6/plugins",
-    "@orpc/client/standard": "npm:@orpc/client@^1.14.6/standard",
-    "@orpc/contract": "catalog:",
-    "@orpc/openapi": "catalog:",
-    "@orpc/server": "catalog:",
-    "@orpc/tanstack-query": "catalog:",
-    "@orpc/zod": "catalog:",
-    "@tanstack/db": "catalog:",
-    "@tanstack/query-core": "catalog:",
-    "@tanstack/query-db-collection": "catalog:"
+    "@orpc/client/standard": "npm:@orpc/client@^1.14.6/standard"
   },
   "publish": {
     "include": [

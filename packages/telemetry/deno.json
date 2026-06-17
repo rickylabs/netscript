@@ -19,9 +19,7 @@
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
-    "@opentelemetry/api": "catalog:",
-    "@std/assert": "jsr:@std/assert@^1",
-    "@orpc/contract": "catalog:"
+    "@std/assert": "jsr:@std/assert@^1"
   },
   "publish": {
     "include": [

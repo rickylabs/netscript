@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@durable-streams/client": "catalog:",
+    "@durable-streams/state": "catalog:",
+    "@orpc/contract": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
+    "@tanstack/db": "catalog:"
+  }
+}

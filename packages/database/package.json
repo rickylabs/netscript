@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@opentelemetry/api": "catalog:",
+    "@prisma/adapter-mssql": "catalog:",
+    "@prisma/adapter-pg": "catalog:",
+    "@prisma/client": "catalog:",
+    "@prisma/instrumentation-contract": "catalog:",
+    "pg": "catalog:"
+  }
+}

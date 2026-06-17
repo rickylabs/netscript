@@ -33,15 +33,8 @@
     "@netscript/service": "../../packages/service/mod.ts",
     "@netscript/contracts": "../../packages/contracts/mod.ts",
     "@std/async": "jsr:@std/async@^1",
-    "@orpc/contract": "catalog:",
-    "@orpc/server": "catalog:",
-    "@orpc/openapi": "catalog:",
-    "@orpc/zod": "catalog:",
     "hono": "jsr:@hono/hono@4.12.24",
     "zod": "jsr:@zod/zod@4.4.3",
-    "@tanstack/db": "catalog:",
-    "@durable-streams/client": "catalog:",
-    "@durable-streams/state": "catalog:",
     "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db"
   },
   "tasks": {
