@@ -6,3 +6,4 @@
 - 25128601: chore(openhands): apply agent changes
 - b64b5e90: chore(openhands): record run trace 27721989442-1
 - 6dc9140a: docs(harness): record workflow policy follow-up
+- 6c6a4091: chore(harness): record IMPL-EVAL readiness + missing commits
