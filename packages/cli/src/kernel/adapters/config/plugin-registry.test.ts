@@ -2,9 +2,8 @@ import { resolve } from '@std/path';
 import { loadConfig } from '@netscript/config';
 import { loadRegisteredPlugins } from './plugin-registry.ts';
 
-const projectRoot = resolve(import.meta.dirname ?? '.', '..', '..', '..', '..', '..', '..');
-
 Deno.test('loadRegisteredPlugins returns normalized background processor metadata', async () => {
+  const projectRoot = await createPluginRegistryProject();
   const config = await loadConfig({ cwd: projectRoot });
   const plugins = await loadRegisteredPlugins(projectRoot, config);
 
@@ -35,6 +34,7 @@ Deno.test('loadRegisteredPlugins returns normalized background processor metadat
 });
 
 Deno.test('loadRegisteredPlugins loads plugin specs from netscript config when omitted', async () => {
+  const projectRoot = await createPluginRegistryProject();
   const plugins = await loadRegisteredPlugins(projectRoot);
 
   if (!plugins.workers || !plugins.sagas || !plugins.triggers || !plugins.streams) {
@@ -47,10 +47,11 @@ Deno.test('loadRegisteredPlugins loads plugin specs from netscript config when o
 });
 
 Deno.test('loadRegisteredPlugins preserves registry output shape from explicit config specs', async () => {
+  const projectRoot = await createPluginRegistryProject();
   const config = await loadConfig({ cwd: projectRoot });
   const plugins = await loadRegisteredPlugins(projectRoot, {
     ...config,
-    plugins: ['@netscript/plugin-workers', './plugins/streams/mod.ts'],
+    plugins: ['@netscript/plugin-workers', '@netscript/plugin-streams'],
   });
 
   const workers = plugins.workers;
@@ -70,3 +71,22 @@ Deno.test('loadRegisteredPlugins preserves registry output shape from explicit c
     throw new Error('Expected plugin service contribution to preserve entrypoint metadata');
   }
 });
+
+async function createPluginRegistryProject(): Promise<string> {
+  const projectRoot = await Deno.makeTempDir();
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: [
+    '@netscript/plugin-workers',
+    '@netscript/plugin-sagas',
+    '@netscript/plugin-triggers',
+    '@netscript/plugin-streams',
+  ],
+};
+`,
+  );
+  return projectRoot;
+}

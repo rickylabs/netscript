@@ -61,3 +61,14 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
   `deno test --allow-all packages/plugin-workers-core/tests/executor/deno-runtime-adapter_test.ts`
   -> `ok | 2 passed | 0 failed (76ms)`.
 - Failure-count delta: expected 9 failed -> expected 7 failed.
+
+## Slice 4 — cli-config-fixtures
+
+- Root cause: plugin registry and Windows compile tests loaded config from the repository root, but
+  this branch no longer carries a root `netscript.config.ts` or `dotnet/AppHost/appsettings.json`.
+- Change: rewrote the affected tests to create hermetic temp project fixtures with minimal
+  `netscript.config.ts` and, for compile tests, local `dotnet/AppHost/appsettings.json`.
+- Proof:
+  `deno test --allow-all packages/cli/src/kernel/adapters/config/plugin-registry.test.ts packages/cli/src/kernel/adapters/windows/compile/compile.test.ts packages/cli/src/kernel/adapters/windows/compile/compile_test.ts`
+  -> `ok | 6 passed | 0 failed (1s)`.
+- Failure-count delta: expected 7 failed -> expected 1 failed.
