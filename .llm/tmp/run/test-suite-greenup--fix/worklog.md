@@ -83,3 +83,27 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
   `deno test --allow-all packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-samples_test.ts`
   -> `ok | 2 passed | 0 failed (221ms)`.
 - Failure-count delta: expected 1 failed -> expected 0 failed.
+
+## Slice 6 — catalog-resolution
+
+- Root cause: after all test assertions were green, `deno task test` still exited 1 because multiple
+  workspace member import maps contained bare `catalog:` values that Deno reported as an unsupported
+  scheme at graph resolution time.
+- Change: materialized package/plugin member `catalog:` imports to explicit `npm:<specifier>@<root
+  catalog version>` specifiers, matching the repo's publish dry-run materialization policy.
+- Lock hygiene: `deno.lock` updated because previously unresolved npm catalog dependencies now
+  resolve in the test graph.
+- Representative proofs:
+  - `deno test --allow-all packages/contracts/tests/contracts_test.ts`
+    -> `ok | 2 passed | 0 failed (38ms)`.
+  - `deno test --allow-all packages/service/tests/handlers_test.ts`
+    -> `ok | 2 passed | 0 failed (19ms)`.
+  - `deno test --allow-all packages/fresh-ui/tests/consumer-render.test.tsx`
+    -> `ok | 1 passed | 0 failed (25ms)`.
+
+## Final Gate
+
+- Command: `deno task test`
+- Captured in: `.llm/tmp/run/test-suite-greenup--fix/final-test-after-catalog.txt`
+- Result: `ok | 643 passed (356 steps) | 0 failed | 12 ignored (30s)`
+- Exit code: 0

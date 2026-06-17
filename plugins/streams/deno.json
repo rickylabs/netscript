@@ -16,9 +16,9 @@
     "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
     "@netscript/service": "../../packages/service/mod.ts",
     "@netscript/telemetry": "../../packages/telemetry/mod.ts",
-    "@durable-streams/client": "catalog:",
+    "@durable-streams/client": "npm:@durable-streams/client@^0.2.6",
     "@std/net": "jsr:@std/net@^1",
-    "@durable-streams/server": "catalog:",
+    "@durable-streams/server": "npm:@durable-streams/server@^0.3.7",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "hono": "jsr:@hono/hono@4.12.24",
     "hono/cors": "jsr:@hono/hono@4.12.24/cors"

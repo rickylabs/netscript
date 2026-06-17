@@ -11,7 +11,7 @@
   },
   "imports": {
     "zod": "jsr:@zod/zod@4.4.3",
-    "@orpc/server": "catalog:"
+    "@orpc/server": "npm:@orpc/server@^1.14.6"
   },
   "tasks": {
     "check": "deno check mod.ts crud.ts query.ts transform.ts",

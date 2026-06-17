@@ -7,8 +7,8 @@
     ".": "./mod.ts"
   },
   "imports": {
-    "@prisma/driver-adapter-utils": "catalog:",
-    "mysql2": "catalog:"
+    "@prisma/driver-adapter-utils": "npm:@prisma/driver-adapter-utils@^7.8.0",
+    "mysql2": "npm:mysql2@^3.22.5"
   },
   "tasks": {
     "check": "deno check --unstable-kv ./mod.ts",

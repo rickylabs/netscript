@@ -4,3 +4,4 @@
 - b7f130b: test(greenup): platform paths — preserve windows schema roots
 - 023c758: test(greenup): worker runtime — pin deno executable fixture
 - bb7a521: test(greenup): cli fixtures — isolate config-dependent tests
+- a621a8c: test(greenup): official samples — align generated config assertions

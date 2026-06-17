@@ -19,4 +19,11 @@ Active root-cause slices:
 2. Windows absolute path handling in runtime schema generation — fixed in `b7f130b`.
 3. Newly surfaced plugin-workers-core Deno runtime adapter tests — fixed in `023c758`.
 4. CLI config fixture failures in plugin registry and compile tests — fixed in `bb7a521`.
-5. Official plugin sample fixture drift — fixed locally; commit pending.
+5. Official plugin sample fixture drift — fixed in `a621a8c`.
+6. Catalog graph-resolution blocker — fixed locally; commit pending.
+
+Final gate:
+
+```text
+ok | 643 passed (356 steps) | 0 failed | 12 ignored (30s)
+```
