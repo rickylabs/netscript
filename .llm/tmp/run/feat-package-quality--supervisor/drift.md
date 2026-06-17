@@ -161,3 +161,40 @@ current-state documentation.
   green with catalog intact, record root cause in drift, do NOT de-catalog again.
 - **Severity:** significant (would have shipped a broken deps model + unpublishable packages).
 - **Gate:** Phase P remains blocked until `deno task test` is green WITH the catalog intact.
+
+## D-SUP-W8 — Program reordered: merge-first / publish-second / finish-CLI-third; no JSR publish inside S1
+
+- **What:** The original Wave 6 critical chain (merge #46 → rebase #43 → **Phase P: manual
+  Codex publish of 26 members to JSR mid-S1** → Slice 4 `scaffold.published.runtime` E2E vs the
+  freshly-published alpha.0 → Slice 6 → IMPL-EVAL → merge #43 → mark #2 READY) is superseded by
+  a maintainer-locked strategy (2026-06-17, verbatim: *"decision locked update harness doc and pr
+  accordingly and proceed"*).
+- **Why the original was wrong:** "Phase P = manual publish to JSR during S1" contradicts the S1
+  (package-quality) charter, which owns NO publish — publish/OIDC is S3 (cicd-release). It also
+  inverted the dependency order: a real JSR publish must come **from a CI-green `main`** (JSR
+  versions are immutable with a 72h unpublish window; the release uses OIDC `id-token: write` from
+  a GitHub Actions run on `main`), so publishing before merging S1 to `main` is not viable. And it
+  forced the CLI's published-fixture validation to run against versions not yet on a trusted base.
+- **Locked replacement (A→F):**
+  - **A — minimal interim CI gate (this entry's commit):** `.github/workflows/ci.yml` runs
+    `deno task check` + `deno task test` + `deno task e2e:cli` on `push`/`pull_request` for
+    `main` and `feat/package-quality`. Lands on `feat/package-quality` so PR #2 itself starts
+    gating. Full CI (lint, fmt, `deno doc --lint`, publish dry-run, `deno audit`, coverage) is
+    **scoped to S2/S3**, not duplicated here. See `TOOLCHAIN-2.8.md` ("`deno ci` … first step of
+    both CI workflows"; "`deno audit` … gate in `ci.yml`") — that fuller `ci.yml` is S2's.
+  - **B — finish Wave 6 (#43) to publish-clean:** Slice 6 (A6 gate sweep + AP-1 close) **plus
+    Slice 4a only**. **Slice 4 is SPLIT (locked):** *4a* = scaffold improvements validated vs
+    `publish --dry-run` / local fixture (stays in S1); *4b* = `scaffold.published.runtime` E2E vs
+    the **real** published alpha.0, **deferred to post-S3** (step F). No live publish in S1.
+  - **C — merge S1 to `main`:** resolve PR #2 conflicts (currently dirty), merge
+    `feat/package-quality` → `main` with the new CI green.
+  - **D+E — S2 toolchain finalize + S3 publish:** finalize the 2.8 toolchain (most already in
+    repo), then publish the **26 non-CLI** units at `0.0.1-alpha.0` via OIDC from `main`
+    (topological order per `RELEASE-PIPELINE.md`). This is the FIRST real JSR publish in the program.
+  - **F — CLI last (LD-7):** validate Slice 4b `scaffold.published.runtime` against the real
+    published 26, then publish `@netscript/cli` last, under a new umbrella PR continuing PR #2.
+- **Severity:** significant (program-level sequencing + S1 scope correction).
+- **Action:** accept + proceed. Supervisor authored `ci.yml`, updated this drift log and
+  `phase-registry.md`, and posted the reordering to PR #2 and PR #43. Tracker steps A–F = tasks #3–#7.
+- **Boundary preserved:** still no framework code written by the supervisor; `ci.yml` + doc/PR
+  bookkeeping only. Option-A catalog law and the dual-session evaluator rule are unchanged.

@@ -188,3 +188,73 @@ under `.worktrees/<name>`:
      `scaffold.published.runtime` fixture that Phase P unlocks, so Assignment 2 (Slices 4+6)
      cannot start until Phase P lands.
 - **Severity:** on-track. Dual-session eval + load-bearing gate intact.
+
+## 2026-06-17 — Program reorder locked (D-SUP-W8); CI gate landed; Wave 6 Assignment 2 (4a+6) dispatched
+
+- **Reorder (D-SUP-W8):** maintainer locked **merge-first / publish-second / finish-CLI-third**;
+  **no JSR publish inside S1**. The old "Phase P = manual publish mid-S1" step (open item #3 above)
+  is **dead**: it contradicted the S1 charter and inverted the publish-from-CI-green-`main`
+  dependency. Recorded in `drift.md` (D-SUP-W8) + `phase-registry.md`; posted to PR #2 + PR #43.
+- **Step A — minimal CI gate landed:** `.github/workflows/ci.yml` (`deno task check` + `test` +
+  `e2e:cli`, push/PR on `main` + `feat/package-quality`) committed `78e18435` on
+  `feat/package-quality`. Full CI scoped to S2/S3. PR #2 + #43 now gate on it.
+- **Slice 4 SPLIT (locked):** *4a* = scaffold-improvement CODE (plan rows 4.1–4.6 / E.2.2,
+  E.2.4, E.2.6, E.2.7, E.2.8, E.2.9), validated against the **local** `scaffold.runtime` fixture —
+  **unblocked now** (needs no published alpha.0). *4b* = `scaffold.published.runtime` vs the real
+  published alpha.0 — **deferred to post-S3 (program step F)**. This supersedes open item #3.
+- **Assignment 2 dispatched (Step B):** Codex WSL generator launched on the wave6-cli worktree
+  (native ext4) for **Slice 4a → Slice 6** continuous.
+  - Brief: `…wave6-cli--research/sub-agent-briefs/brief-slices-4a-6.md` (adds §2 CATALOG-OFF-LIMITS
+    boundary from the D-SUP-W7 lesson; §0 locked-reorder context; explicit 4b deferral).
+  - Session/thread: `019ed63b-a542-71c3-968d-f788eb7954c1`; launcher `/home/codex/run-wave6-4a6.sh`;
+    log `/home/codex/wave6-4a6-run.jsonl`; started `2026-06-17T15:38:08Z` at head `4beb2d9`.
+  - Steer via `codex exec resume` on that session — **never re-launch** (one active turn / worktree).
+- **RELAUNCH (mobile-visibility fix) `2026-06-17T15:49:10Z`:** the Assignment-2 session above was
+  launched with bare `codex exec` (Desktop-sync only, **never reached the phone**). Per the
+  `codex-wsl-remote` skill the managed-daemon path is `codex debug app-server send-message-v2`.
+  Fix applied: killed orphan exec (PID 13269 / session `019ed63b`); discarded its uncommitted WIP via
+  `git checkout -- packages/ && git clean -fd packages/` → pristine `4beb2d9`; ran the anchored
+  daemon repair (kill unmanaged app-server + `rm` stale control socket + `codex remote-control
+  start --json`) → daemon now **MANAGED + CONNECTED** (`status:connected`,
+  `remoteControlEnabled:true`, host `YogaBook9i`, managed v0.140.0).
+  - **New mobile-visible thread:** `019ed645-d204-7050-967e-f4d074f8f908` (session_id same), source
+    `VsCode`, model `gpt-5.5`, `cwd=/home/codex/repos/netscript-wave6-cli`, `approval=Never`,
+    `sandbox=DangerFullAccess`; launcher `/home/codex/run-wave6-4a6-mobile.sh` (reads
+    `/home/codex/wave6-4a6-message.txt`), log `/home/codex/wave6-4a6-mobile.jsonl`; rollout
+    `~/.codex/sessions/2026/06/17/rollout-…-019ed645-….jsonl`. Confirmed on-brief (pre-flight green,
+    reading plan rows + research + A6 gates). Orphan WIP cost: redone from scratch — acceptable.
+  - **This thread supersedes `019ed63b`.** Steer ONLY via `codex exec resume
+    019ed645-d204-7050-967e-f4d074f8f908`; **never** fire a second `send-message-v2` at this worktree.
+  - `gh` still unauth in WSL → supervisor posts the per-slice PR #43 comments from pushed commits
+    and triggers IMPL-EVALs (same as Assignment 1).
+  - Tree prep: 7 CRLF-renorm `…/openhands/*/request.md` files set `--skip-worktree` so per-slice
+    commits stay clean (recurring Windows-side churn).
+- **STEP B COMPLETE — Wave 6 finished to publish-clean `2026-06-17T16:22:27Z`** (session exited
+  `EXIT_CODE=0`, clean turn). Generator thread `019ed645` ran Slice 4a → Slice 6 continuous and
+  pushed `feat/package-quality-wave6-cli` @ `350fbd1` (clean tree). Commits since base `4beb2d9`:
+  - `43e8ea4` **Slice 4a** (local scaffold improvements, rows 4.1–4.6) + `5f234b0` harness record.
+  - `f49af63` **Slice 6** (A6 gate sweep + `research-realized.md` + AP-1 close) + `350fbd1` record.
+  - **Gates green** (both slices): `scaffold.runtime` 41/41 + `database.init` PASS + `E2E_EXIT=0`;
+    check 1597/0; lint 1082/0; fmt 1167/0; **test 650 passed / 0 failed / 12 ignored**;
+    `audit:critical` 0; `packages/cli` check PASS; CLI doc-lint `totalErrors=0`; `cli`
+    publish:dry-run exit 0 (`@netscript/cli@0.0.1-alpha.0` simulated, dynamic-import warnings only);
+    F-CLI focused sweep all PASS. Repo-wide `arch:check` baseline stays red (FAIL=58) — **pre-existing,
+    no new CLI blocker**.
+  - **AP-1 (Restructure) CLOSED** in `.llm/harness/debt/arch-debt.md`. Single deferred sub-item =
+    **Slice 4b** (`scaffold.published.runtime` vs real alpha.0) → post-S3 program **step F** (D-SUP-W8).
+  - Boundaries respected: no catalog/`catalog:`/version-pin/`scaffold-versions.ts`/`aspire mod.ts`
+    touched; `deno.lock` restored after mutating commands. No CRLF churn.
+  - PR #43 supervisor comments posted (gh unauth WSL-side): Slice 4a `#issuecomment-4732727503`,
+    final 4a+6 summary `#issuecomment-4732793654`.
+  - **Mobile-visibility fix validated end-to-end:** the `send-message-v2` managed-daemon relaunch was
+    steerable + mobile-visible for the whole run; supervised via commit/push background watchers
+    (no hand-polling). Confirms the corrected launch path from the `codex-wsl-remote` skill.
+- **RED test triage RESOLVED:** repo-wide `deno task test` is now **650 passed / 0 failed** on this
+  branch (was 477/11 at Slice 5). The `ci.yml`-gated `deno task test` is green → **S1→main merge
+  unblocked** on the test axis.
+- **Still open (carried):**
+  1. **Batched dual-session IMPL-EVAL** over Slices 0–3,5 + 4a,6 — pending launch (separate
+     OpenHands evaluator session, never the generator).
+  2. **Step C** now actionable: resolve PR #2 dirty conflicts → merge `feat/package-quality` → `main`
+     CI-green. (Wave 6 CLI PR #43 merges into `feat/package-quality` first.)
+- **Severity:** on-track. No framework code by supervisor; bookkeeping + `ci.yml` + dispatch only.
