@@ -1,10 +1,13 @@
 name: ci
 
-# Minimal S1 pre-merge gate: repo-wide `deno check`, repo-wide `deno test`, and the
-# CLI end-to-end scaffold driver. Full CI (lint, fmt, doc-lint, publish dry-run, audit,
-# coverage, OIDC publish) is scoped to S2 (toolchain) + S3 (cicd-release). Keep this lean
-# so the `feat/package-quality` -> `main` merge is gated on health, not on tangential
-# advisories.
+# Minimal S1 pre-merge gate: repo-wide `deno check` + repo-wide `deno test` — the
+# service-free static + unit gates that run on a stock runner. The CLI runtime e2e
+# (`deno task e2e:cli` / scaffold.runtime) is intentionally NOT here: it spawns the
+# `aspire` CLI, `docker`, and `postgres`, which `ubuntu-latest` does not provision, so it
+# belongs in S2's full CI (which sets up the toolchain + services). Full CI (lint, fmt,
+# doc-lint, publish dry-run, audit, coverage, OIDC publish) is scoped to S2 (toolchain) +
+# S3 (cicd-release). Keep this lean so `feat/package-quality` -> `main` is gated on
+# service-free health, not on toolchain availability or tangential advisories.
 
 on:
   push:
@@ -20,7 +23,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-test-e2e:
+  check-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -40,6 +43,3 @@ jobs:
 
       - name: Repo-wide test
         run: deno task test
-
-      - name: CLI end-to-end (scaffold.runtime)
-        run: deno task e2e:cli
