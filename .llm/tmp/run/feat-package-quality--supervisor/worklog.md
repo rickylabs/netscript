@@ -188,3 +188,34 @@ under `.worktrees/<name>`:
      `scaffold.published.runtime` fixture that Phase P unlocks, so Assignment 2 (Slices 4+6)
      cannot start until Phase P lands.
 - **Severity:** on-track. Dual-session eval + load-bearing gate intact.
+
+## 2026-06-17 — Program reorder locked (D-SUP-W8); CI gate landed; Wave 6 Assignment 2 (4a+6) dispatched
+
+- **Reorder (D-SUP-W8):** maintainer locked **merge-first / publish-second / finish-CLI-third**;
+  **no JSR publish inside S1**. The old "Phase P = manual publish mid-S1" step (open item #3 above)
+  is **dead**: it contradicted the S1 charter and inverted the publish-from-CI-green-`main`
+  dependency. Recorded in `drift.md` (D-SUP-W8) + `phase-registry.md`; posted to PR #2 + PR #43.
+- **Step A — minimal CI gate landed:** `.github/workflows/ci.yml` (`deno task check` + `test` +
+  `e2e:cli`, push/PR on `main` + `feat/package-quality`) committed `78e18435` on
+  `feat/package-quality`. Full CI scoped to S2/S3. PR #2 + #43 now gate on it.
+- **Slice 4 SPLIT (locked):** *4a* = scaffold-improvement CODE (plan rows 4.1–4.6 / E.2.2,
+  E.2.4, E.2.6, E.2.7, E.2.8, E.2.9), validated against the **local** `scaffold.runtime` fixture —
+  **unblocked now** (needs no published alpha.0). *4b* = `scaffold.published.runtime` vs the real
+  published alpha.0 — **deferred to post-S3 (program step F)**. This supersedes open item #3.
+- **Assignment 2 dispatched (Step B):** Codex WSL generator launched on the wave6-cli worktree
+  (native ext4) for **Slice 4a → Slice 6** continuous.
+  - Brief: `…wave6-cli--research/sub-agent-briefs/brief-slices-4a-6.md` (adds §2 CATALOG-OFF-LIMITS
+    boundary from the D-SUP-W7 lesson; §0 locked-reorder context; explicit 4b deferral).
+  - Session/thread: `019ed63b-a542-71c3-968d-f788eb7954c1`; launcher `/home/codex/run-wave6-4a6.sh`;
+    log `/home/codex/wave6-4a6-run.jsonl`; started `2026-06-17T15:38:08Z` at head `4beb2d9`.
+  - Steer via `codex exec resume` on that session — **never re-launch** (one active turn / worktree).
+  - `gh` still unauth in WSL → supervisor posts the per-slice PR #43 comments from pushed commits
+    and triggers IMPL-EVALs (same as Assignment 1).
+  - Tree prep: 7 CRLF-renorm `…/openhands/*/request.md` files set `--skip-worktree` so per-slice
+    commits stay clean (recurring Windows-side churn).
+- **Still open (carried, now post-merge-ordered):**
+  1. **Batched dual-session IMPL-EVAL** over Slices 0–3,5 (+ 4a,6 when they land) — pending launch.
+  2. **RED test triage:** generator-reported repo-wide `deno task test` = 477 passed / 11 failed /
+     12 ignored at Slice 5. Must be green or quarantined **before the S1→main merge** — the new
+     `ci.yml` runs `deno task test`, so these 11 will gate PR #2.
+- **Severity:** on-track. No framework code by supervisor; bookkeeping + `ci.yml` + dispatch only.
