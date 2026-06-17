@@ -10,7 +10,8 @@
     "./transform": "./transform.ts"
   },
   "imports": {
-    "zod": "jsr:@zod/zod@4.4.3"
+    "zod": "jsr:@zod/zod@4.4.3",
+    "@orpc/server": "catalog:"
   },
   "tasks": {
     "check": "deno check mod.ts crud.ts query.ts transform.ts",

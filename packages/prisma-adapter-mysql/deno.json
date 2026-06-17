@@ -6,6 +6,10 @@
   "exports": {
     ".": "./mod.ts"
   },
+  "imports": {
+    "@prisma/driver-adapter-utils": "catalog:",
+    "mysql2": "catalog:"
+  },
   "tasks": {
     "check": "deno check --unstable-kv ./mod.ts",
     "test": "deno test --allow-net --allow-env ./tests/",

@@ -23,7 +23,8 @@
     "@std/ulid": "jsr:@std/ulid@^1",
     "@std/collections": "jsr:@std/collections@^1",
     "@netscript/logger": "../logger/mod.ts",
-    "@olli/kvdex": "jsr:@olli/kvdex@^3.6.7"
+    "@olli/kvdex": "jsr:@olli/kvdex@^3.6.7",
+    "ioredis": "catalog:"
   },
   "publish": {
     "include": [

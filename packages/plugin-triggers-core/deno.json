@@ -17,6 +17,8 @@
     "./testing": "./src/testing/mod.ts"
   },
   "imports": {
+    "@orpc/contract": "catalog:",
+    "@orpc/server": "catalog:",
     "@netscript/plugin-workers-core": "../plugin-workers-core/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
     "zod": "jsr:@zod/zod@4.4.3"

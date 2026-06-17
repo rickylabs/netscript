@@ -32,17 +32,25 @@
     "@netscript/sdk": "../sdk/mod.ts",
     "@netscript/sdk/query-client": "../sdk/src/query-client/mod.ts",
     "@netscript/telemetry": "../telemetry/mod.ts",
+    "@preact/signals": "catalog:",
+    "@tanstack/preact-query": "catalog:",
+    "@tanstack/query-core": "catalog:",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/http": "jsr:@std/http@^1",
     "@std/path": "jsr:@std/path@^1",
     "@std/text": "jsr:@std/text@^1",
     "fresh": "jsr:@fresh/core@^2.3.3",
+    "preact": "catalog:",
     "preact/compat": "npm:preact@^10.29.2/compat",
     "preact/hooks": "npm:preact@^10.29.2/hooks",
     "preact/jsx-runtime": "npm:preact@^10.29.2/jsx-runtime",
+    "preact-render-to-string": "catalog:",
     "preact-render-to-string/stream": "npm:preact-render-to-string@^6.7.0/stream",
+    "vite": "catalog:",
     "zod": "jsr:@zod/zod@4.4.3",
-    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db"
+    "@durable-streams/state": "catalog:",
+    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db",
+    "@tanstack/react-db": "catalog:"
   },
   "publish": {
     "include": [
