@@ -39,3 +39,14 @@ Deferred scope: no JSR publish, no branch rebasing or merge from main, no repo-w
 - Proof: `deno test --allow-all packages/config/workspace.test.ts`
   -> `ok | 1 passed | 0 failed (44ms)`.
 - Failure-count delta: current full-suite baseline 11 failed -> expected 10 failed.
+
+## Slice 2 — platform-paths
+
+- Root cause: `planConfigSchemaWrites` called POSIX `resolve()` for Windows-style project roots,
+  causing `C:/workspace/...` to be treated as relative under Linux.
+- Change: added a local project-path resolver that preserves Windows absolute roots and configured
+  Windows absolute schema paths while retaining `@std/path.resolve` for native paths.
+- Proof:
+  `deno test --allow-all packages/cli/src/public/features/generate/runtime-schemas/generate-runtime-schemas_test.ts`
+  -> `ok | 1 passed (4 steps) | 0 failed (21ms)`.
+- Failure-count delta: expected 10 failed -> expected 9 failed, with both BDD step failures fixed.

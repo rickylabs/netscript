@@ -2,6 +2,8 @@ import { dirname, resolve } from '@std/path';
 import { UseCase } from '../../../../kernel/application/abstracts/use-case.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
 
+const WINDOWS_ABSOLUTE_PATH_PATTERN = /^[A-Za-z]:[\\/]/;
+
 /** Runtime config schema declared by a plugin. */
 export interface RuntimeConfigSchemaContribution {
   /** Runtime config topic name. */
@@ -150,8 +152,8 @@ export function planConfigSchemaWrites(
 
       const configured = request.runtimeConfigPaths[schema.topic];
       const outputPath = configured
-        ? resolve(request.projectRoot, configured.schemaPath)
-        : resolve(request.projectRoot, schema.topic, 'runtime', 'schema.json');
+        ? resolveProjectPath(request.projectRoot, configured.schemaPath)
+        : resolveProjectPath(request.projectRoot, schema.topic, 'runtime', 'schema.json');
 
       files.push({
         topic: schema.topic,
@@ -171,4 +173,22 @@ export function planConfigSchemaWrites(
   }
 
   return files;
+}
+
+function resolveProjectPath(projectRoot: string, ...segments: string[]): string {
+  const firstSegment = segments[0];
+  if (firstSegment && WINDOWS_ABSOLUTE_PATH_PATTERN.test(firstSegment)) {
+    return firstSegment.replaceAll('\\', '/');
+  }
+
+  if (!WINDOWS_ABSOLUTE_PATH_PATTERN.test(projectRoot)) {
+    return resolve(projectRoot, ...segments);
+  }
+
+  const normalizedRoot = projectRoot.replaceAll('\\', '/').replace(/\/+$/, '');
+  const normalizedSegments = segments
+    .map((segment) => segment.replaceAll('\\', '/').replace(/^\/+/, '').replace(/\/+$/, ''))
+    .filter((segment) => segment.length > 0);
+
+  return [normalizedRoot, ...normalizedSegments].join('/');
 }
