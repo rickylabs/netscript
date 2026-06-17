@@ -44,6 +44,8 @@ how an agent uses it during a run.
 - The evaluator verifies design evidence and slice alignment.
 - Every package or plugin run identifies the doctrine archetype before work.
 - Every deferred doctrine violation is recorded in `debt/arch-debt.md`.
+- Cross-agent handoffs use `workflow/agent-handoff.md`; GitHub comments remain evidence, not a
+  replacement for harness artifacts.
 
 ## Run Artifacts
 

@@ -9,21 +9,22 @@
 #    audit-fix passes (deno publish --dry-run, deno doc --lint, deno task check,
 #    deno task e2e:cli) without a local agent.
 #
-# Toolchain pinned to this repo's reality:
-#   - Deno 2.8.x  (deno.json uses unstable: kv, temporal, tsgo, worker-options, raw-imports)
-#   - .NET SDK 10.x  (CLI scaffold AppHost/ServiceDefaults target net10.0)
-#   - Aspire CLI 13.4.4 via aspire.dev install script (NOT `dotnet workload install aspire`,
-#     which was removed after Aspire 8 — Aspire ships as a standalone CLI now)
-#   - Docker (pre-installed on ubuntu-latest; AppHost resources need the engine)
+# Toolchain pinned to this repo's reality in .github/toolchain.env:
+#   - Deno 2.7.x
+#   - .NET SDK 10.x (CLI scaffold AppHost/ServiceDefaults target net10.0)
+#   - Aspire CLI 13.2.x (matches scaffold Aspire SDK/package constants)
+#   - Docker latest stable (AppHost resources need the engine)
 name: 'Copilot Setup Steps'
 
 on:
   workflow_dispatch:
   push:
     paths:
+      - .github/toolchain.env
       - .github/workflows/copilot-setup-steps.yml
   pull_request:
     paths:
+      - .github/toolchain.env
       - .github/workflows/copilot-setup-steps.yml
 
 jobs:
@@ -35,59 +36,86 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Load NetScript toolchain
+        id: toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          source .github/toolchain.env
+          echo "deno-version=${NETSCRIPT_DENO_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "dotnet-version=${NETSCRIPT_DOTNET_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "aspire-version=${NETSCRIPT_ASPIRE_CLI_VERSION}" >> "$GITHUB_OUTPUT"
+          grep -F "ASPIRE_SDK: '${NETSCRIPT_ASPIRE_CLI_VERSION}'" \
+            packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts
+
       # --- Deno (primary toolchain) ---
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v2.8.x
+          deno-version: ${{ steps.toolchain.outputs.deno-version }}
+          cache-hash: ${{ hashFiles('**/deno.json') }}
 
       # --- .NET SDK 10 (Aspire AppHost / ServiceDefaults target net10.0) ---
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ steps.toolchain.outputs.dotnet-version }}
 
       # --- Aspire CLI (standalone install script; adds $HOME/.aspire/bin to PATH) ---
       - name: Install Aspire CLI
         run: |
-          curl -fsSL https://aspire.dev/install.sh | bash -s -- --version 13.4.4
+          set -euo pipefail
+          aspire_version="${{ steps.toolchain.outputs.aspire-version }}"
+          installer_url="https://aspire.dev/install.sh"
+          installer="$(mktemp)"
+          trap 'rm -f "$installer"' EXIT
+          curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 \
+            --output "$installer" "$installer_url"
+          bash "$installer" --version "$aspire_version" --install-path "$HOME/.aspire/bin" --skip-path
           echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
 
       - name: Verify Aspire CLI
         run: |
+          set -euo pipefail
           export PATH="$HOME/.aspire/bin:$PATH"
-          aspire --version | grep '^13\.4\.4'
+          actual="$(aspire --version)"
+          echo "$actual"
+          test "$actual" = "${{ steps.toolchain.outputs.aspire-version }}"
 
-      # --- Docker (AppHost container resources; engine is pre-installed) ---
+      # --- Docker (AppHost container resources) ---
+      - name: Setup Docker
+        uses: docker/setup-docker-action@v5
+        with:
+          version: latest
+
       - name: Verify Docker
         run: |
           docker --version
           docker compose version
 
       # --- Pre-flight cache warming (full network is only available HERE) ---
-      - name: Install Deno dependencies cleanly
+      - name: Warm Deno dependency cache
         run: |
+          set -euo pipefail
           deno --version
-          # Clean CI install from deno.lock; this must run before any deno task.
-          deno ci
-
-      - name: Run Deno quality gates concurrently
-        run: deno task ci:quality
-
-      - name: Generate per-function coverage artifact
-        run: deno task coverage:functions
-
-      - name: Upload function coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: deno-function-coverage
-          path: .llm/tmp/coverage/function-report.json
-
-      - name: Run publish dry-run
-        run: deno task publish:dry-run
-
-      - name: Run critical audit
-        run: deno task audit:critical
+          # Resolve + cache package/plugin source dependencies (jsr: + npm:).
+          deno_source_dirs=(packages plugins)
+          missing_dirs=()
+          for dir in "${deno_source_dirs[@]}"; do
+            [[ -d "$dir" ]] || missing_dirs+=("$dir")
+          done
+          if ((${#missing_dirs[@]})); then
+            echo "::warning::Expected Deno source directories missing (${missing_dirs[*]}); skipping Deno cache warming."
+            exit 0
+          fi
+          mapfile -d '' deno_sources < <(find "${deno_source_dirs[@]}" -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' \) -print0)
+          if ((${#deno_sources[@]})); then
+            # 50 files is a conservative margin for typical ~128 KB command-line limits.
+            # --no-lock avoids mutating the checkout; this is only cache warming.
+            if ! printf '%s\0' "${deno_sources[@]}" | xargs -0 -r -n 50 deno cache --config deno.json --no-lock; then
+              echo "::warning::Deno cache warming failed. Non-fatal, but may affect firewalled sessions."
+            fi
+          fi
 
       - name: Warm .NET / NuGet (Aspire SDK packages)
         run: |

@@ -40,7 +40,25 @@ this skill tells you what to load and in what order.
 | **Run artifact**  | File in `.llm/tmp/run/<run-id>/` that preserves state across sessions.                  |
 | **Debt**          | Recorded in `.llm/harness/debt/arch-debt.md`.                                           |
 
+For a **supervisor run** (two or more capability-scoped phase groups), also read
+`.llm/harness/workflow/supervisor.md` and `.llm/harness/workflow/escalation.md`, and track the
+groups in `phase-registry.md`.
+
+For OpenHands, Copilot, Augment, or local-agent handoffs during a run, also read
+`.llm/harness/workflow/agent-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
+
 ## Workflow
+
+The user may still write `profile: package`, `profile: docs`, or similar. In v2 that field is an
+intent hint, not the final profile.
+
+| User hint                  | v2 selection                                                |
+| -------------------------- | ----------------------------------------------------------- |
+| `package`                  | identify `ARCHETYPE-1` through `ARCHETYPE-6`                |
+| `plugin`                   | normally `ARCHETYPE-5`, unless sibling packages also change |
+| `frontend`                 | affected archetype(s) plus `SCOPE-frontend.md`              |
+| `service`                  | affected archetype(s) plus `SCOPE-service.md`               |
+| `docs` or `knowledge-base` | `SCOPE-docs.md` plus any described archetypes               |
 
 1. Read `workflow/activation.md` and `workflow/run-loop.md`.
 2. If resuming, read `.llm/tmp/run/<run-id>/context-pack.md`.
@@ -116,6 +134,8 @@ For supervised NetScript work:
 ## Run Artifacts
 
 Run artifacts live under `.llm/tmp/run/<run-id>/` and use templates from `.llm/harness/templates/`.
+
+`<run-id>` is the current branch name with `/` replaced by `-`, followed by `--<suffix>`.
 
 | File                | Purpose                                                     |
 | ------------------- | ----------------------------------------------------------- |
@@ -206,7 +226,7 @@ Record rescope evidence in `drift.md` with severity `significant` or `architectu
 | Generic run mechanics                         | `.llm/harness/workflow/`             |
 | Archetype-specific gates or false-done states | `.llm/harness/archetypes/`           |
 | Stable repeated cross-run lessons             | `.llm/harness/lessons/`              |
-| Package/plugin doctrine navigation            | `.agents/skills/netscript-doctrine/` |
+| Package/plugin doctrine navigation            | `.claude/skills/netscript-doctrine/` |
 | Deep domain expertise                         | a focused skill                      |
 | Deferred doctrine violations                  | `.llm/harness/debt/arch-debt.md`     |
 
@@ -222,6 +242,7 @@ User says "use harness"
   -> read gate matrix + plan-gate.md
   -> plan committed? run PLAN-EVAL (separate session); no slice before PASS
   -> supervised? Claude coordinates, OpenHands evaluates, WSL Codex implements
+  -> OpenHands/local/cloud handoff? read workflow/agent-handoff.md
   -> update run artifacts while working
   -> commit tracking required? append commits.md after every commit
   -> discovered violation not fixed? update arch-debt.md
