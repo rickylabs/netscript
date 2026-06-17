@@ -17,6 +17,9 @@ export { TemplateRegistry } from './application/registries/template-registry.ts'
 /** Output renderers available at CLI presentation edges. */
 export { OutputRendererRegistry } from './application/registries/output-renderer-registry.ts';
 
+/** Scaffold presets available to init command composition. */
+export { PresetRegistry } from './application/registries/preset-registry.ts';
+
 /** Deployment target descriptors supported by deploy commands. */
 export { DeployTargetRegistry } from './application/registries/deploy-target-registry.ts';
 export type {

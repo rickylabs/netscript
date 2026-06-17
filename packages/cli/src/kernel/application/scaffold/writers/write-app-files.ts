@@ -11,7 +11,7 @@ import {
 } from '../../../adapters/templates/scaffold-template-assets.ts';
 import { DEFAULT_UI_INIT_ITEMS, installUiRegistryItems } from '../../ui/registry.ts';
 import type { InitPipelineContext } from '../context.ts';
-import { adjustLocalBase } from '../helpers.ts';
+import { adjustLocalBase } from '../support/helpers.ts';
 import { createScaffoldPlan } from '../../../domain/scaffold/scaffold-plan.ts';
 import { generateRouteManifestSeed, generateRoutesSeed } from './app-route-seeds.ts';
 import { writeExampleServiceAppFiles } from './write-example-service-app-files.ts';

@@ -1,7 +1,7 @@
 import { extname, relative } from '@std/path';
-import type { ScaffoldResult } from '../../domain/core-types.ts';
-import type { ValidatedInitOptions } from '../../domain/scaffold/scaffold-options.ts';
-import type { DbEngine } from '../../domain/db-engine.ts';
+import type { ScaffoldResult } from '../../../domain/core-types.ts';
+import type { ValidatedInitOptions } from '../../../domain/scaffold/scaffold-options.ts';
+import type { DbEngine } from '../../../domain/db-engine.ts';
 
 /** Return true when the init options selected a concrete database engine. */
 export function isDbEngine(value: ValidatedInitOptions['dbEngine']): value is DbEngine {

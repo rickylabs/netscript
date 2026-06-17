@@ -15,8 +15,8 @@ import {
 } from './workspace-init.ts';
 import { scaffoldAspire } from './render-init.ts';
 import { scaffoldApp } from './writers/write-init.ts';
-import { formatOutput } from './post-scripts-init.ts';
-import { gitInit } from './git-init.ts';
+import { formatOutput } from './support/post-scripts-init.ts';
+import { gitInit } from './support/git-init.ts';
 
 /** Options for the init pipeline renderer side effects. */
 export interface InitPipelineRunOptions {

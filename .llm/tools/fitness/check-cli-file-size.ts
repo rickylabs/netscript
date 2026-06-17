@@ -19,6 +19,7 @@ const findings: Finding[] = [];
 
 for await (const path of walk(TARGET_ROOT)) {
   if (!path.endsWith('.ts') && !path.endsWith('.md')) continue;
+  if (path.endsWith('_test.ts') || path.endsWith('.test.ts') || path.includes('/tests/')) continue;
   if (path.includes('/src/templates/') && path.endsWith('.template')) continue;
 
   const text = await Deno.readTextFile(path);

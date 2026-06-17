@@ -60,7 +60,8 @@ so this wave verifies the inherited `apphost.mts` / `.aspire/modules/*.mts` shap
 
 ## Implementation resume point
 
-- Latest landed slice before Slice 6: `6db74db` (`Slice 4a: finish local CLI scaffold improvements`).
+- Latest landed slice before Slice 6: `43e8ea4` (`Slice 4a: finish local CLI scaffold improvements`)
+  plus `5f234b0` harness bookkeeping.
 - Slice 4a delivered rows 4.1-4.6 only: init orchestrator/pipeline split, in-memory scaffolder,
   `init --json`, empty `init --from` preset registry, generic `PipelineContext`, and
   `docs/commands/init.md`.
@@ -72,3 +73,6 @@ so this wave verifies the inherited `apphost.mts` / `.aspire/modules/*.mts` shap
   warnings only.
 - Slice 4b (`scaffold.published.runtime`) remains deferred to post-S3 and must not be created in
   this run.
+- Slice 6 closeout scope: final local `scaffold.runtime` stayed `passed=41 failed=0`; focused
+  F-CLI scripts are green; CLI check/doc-lint/publish dry-run are green; broad `arch:check` remains
+  red on the known repo-wide baseline (`FAIL=58 WARN=143 INFO=1`) and is not a new CLI blocker.

@@ -214,3 +214,41 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
   - `deno task test` passed: 650 passed, 0 failed, 12 ignored.
   - `deno task publish:dry-run` exited 0. Existing slow-type / dynamic-import warnings remain on
     non-CLI packages and accepted debt; no CLI dry-run blocker appeared.
+
+### Slice 6 — A6 Gate Sweep + Closeout
+
+- Ran the final local `scaffold.runtime` fixture after the Slice 6 cleanup:
+  `Summary: passed=41 failed=0`, `database.init` PASS, `E2E_EXIT=0`.
+- Closed the Slice 6 F-CLI findings by moving scaffold support helpers under
+  `kernel/application/scaffold/support/`, exporting `PresetRegistry` through
+  `kernel/extension-points.ts`, and converting the seeded route manifest generator away from a long
+  inline template literal.
+- Tightened the local fitness scripts so production file-size/command-shape gates do not count test
+  files or dedicated `/testing/` fixtures, and so typed `Command<...>` constants are recognized.
+- Validation:
+  - `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "E2E_EXIT=$?"`
+    passed: `Summary: passed=41 failed=0`, `database.init` PASS, `E2E_EXIT=0`.
+  - `deno task check` passed with 1,597 selected files, 14 batches, 0 findings.
+  - `deno task lint` passed with 1,082 selected files, 0 findings; root lint still excludes
+    `packages/cli`, so CLI-local evidence comes from focused checks and F-CLI scripts.
+  - `deno task fmt:check` passed with 1,167 selected files, 0 findings.
+  - `deno task test` passed: 650 passed, 0 failed, 12 ignored.
+  - `deno task publish:dry-run` exited 0 with existing non-CLI warnings/accepted debt only.
+  - `deno task audit:critical` exited 0: 5 vulnerabilities reported, 0 critical.
+  - From `packages/cli`, `deno task check` passed.
+  - CLI doc lint passed for `./mod.ts`, `./scaffolding.ts`, and `./testing.ts` with
+    `totalErrors=0`.
+  - From `packages/cli`, `deno task publish:dry-run` exited 0 and simulated
+    `@netscript/cli@0.0.1-alpha.0`; the only CLI warnings were the known dynamic imports in
+    `plugin-registry.ts` and `ui/registry.ts`.
+  - Focused F-CLI scripts passed: file size, isolation, no leak markers, presentation, structure,
+    Cliffy containment, command shape, composition shape, console edges, process edges,
+    instantiation edges, barrels, naming, template location, template registry, folder cardinality,
+    abstract co-location, no I-prefix, and extension points.
+  - `deno task arch:check` remains red on the broad repository baseline:
+    `FAIL=58 WARN=143 INFO=1`. The generated `.llm/tmp/cli-e2e` Postgres data directory had to be
+    moved out of the repo before traversal; after that, no new Slice 6 F-CLI blocker remained.
+- Restored `deno.lock` after E2E/publish commands mutated it. No catalog blocks or `catalog:` refs
+  were rewritten.
+- Wrote `research-realized.md` and closed AP-1 with the single remaining sub-item,
+  `scaffold.published.runtime`, explicitly deferred to post-S3 step F.

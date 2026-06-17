@@ -54,3 +54,11 @@ Reality vs RFC/doctrine assumptions (from research):
   optional method through `unknown`, calls it only behind `NETSCRIPT_ASPIRE_PROCESS_COMMANDS=1`, and
   returns the original tool resource. This keeps the seam discoverable without changing default
   runtime topology.
+- **D-W6-5 — Slice 4b remains deferred.** The original research plan grouped published-runtime
+  scaffold proof with Slice 4, but this run is explicitly Slice 4a only. No
+  `scaffold.published.runtime` suite, fixture, or wiring was added. The single remaining sub-item is
+  tracked to the post-S3 step F follow-up.
+- **D-W6-6 — Broad architecture gate remains baseline-red while focused A6 gates pass.**
+  `deno task arch:check` still reports repo-wide legacy findings (`FAIL=58 WARN=143 INFO=1` after
+  moving generated E2E data out of the traversal path). Slice 6 uses the focused F-CLI scripts as the
+  A6 verdict for this package; all focused F-CLI scripts pass.
