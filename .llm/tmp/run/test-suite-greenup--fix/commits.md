@@ -5,3 +5,4 @@
 - 023c758: test(greenup): worker runtime — pin deno executable fixture
 - bb7a521: test(greenup): cli fixtures — isolate config-dependent tests
 - a621a8c: test(greenup): official samples — align generated config assertions
+- 103f9a8: test(greenup): catalogs — materialize member npm imports
