@@ -229,9 +229,32 @@ under `.worktrees/<name>`:
     and triggers IMPL-EVALs (same as Assignment 1).
   - Tree prep: 7 CRLF-renorm `…/openhands/*/request.md` files set `--skip-worktree` so per-slice
     commits stay clean (recurring Windows-side churn).
-- **Still open (carried, now post-merge-ordered):**
-  1. **Batched dual-session IMPL-EVAL** over Slices 0–3,5 (+ 4a,6 when they land) — pending launch.
-  2. **RED test triage:** generator-reported repo-wide `deno task test` = 477 passed / 11 failed /
-     12 ignored at Slice 5. Must be green or quarantined **before the S1→main merge** — the new
-     `ci.yml` runs `deno task test`, so these 11 will gate PR #2.
+- **STEP B COMPLETE — Wave 6 finished to publish-clean `2026-06-17T16:22:27Z`** (session exited
+  `EXIT_CODE=0`, clean turn). Generator thread `019ed645` ran Slice 4a → Slice 6 continuous and
+  pushed `feat/package-quality-wave6-cli` @ `350fbd1` (clean tree). Commits since base `4beb2d9`:
+  - `43e8ea4` **Slice 4a** (local scaffold improvements, rows 4.1–4.6) + `5f234b0` harness record.
+  - `f49af63` **Slice 6** (A6 gate sweep + `research-realized.md` + AP-1 close) + `350fbd1` record.
+  - **Gates green** (both slices): `scaffold.runtime` 41/41 + `database.init` PASS + `E2E_EXIT=0`;
+    check 1597/0; lint 1082/0; fmt 1167/0; **test 650 passed / 0 failed / 12 ignored**;
+    `audit:critical` 0; `packages/cli` check PASS; CLI doc-lint `totalErrors=0`; `cli`
+    publish:dry-run exit 0 (`@netscript/cli@0.0.1-alpha.0` simulated, dynamic-import warnings only);
+    F-CLI focused sweep all PASS. Repo-wide `arch:check` baseline stays red (FAIL=58) — **pre-existing,
+    no new CLI blocker**.
+  - **AP-1 (Restructure) CLOSED** in `.llm/harness/debt/arch-debt.md`. Single deferred sub-item =
+    **Slice 4b** (`scaffold.published.runtime` vs real alpha.0) → post-S3 program **step F** (D-SUP-W8).
+  - Boundaries respected: no catalog/`catalog:`/version-pin/`scaffold-versions.ts`/`aspire mod.ts`
+    touched; `deno.lock` restored after mutating commands. No CRLF churn.
+  - PR #43 supervisor comments posted (gh unauth WSL-side): Slice 4a `#issuecomment-4732727503`,
+    final 4a+6 summary `#issuecomment-4732793654`.
+  - **Mobile-visibility fix validated end-to-end:** the `send-message-v2` managed-daemon relaunch was
+    steerable + mobile-visible for the whole run; supervised via commit/push background watchers
+    (no hand-polling). Confirms the corrected launch path from the `codex-wsl-remote` skill.
+- **RED test triage RESOLVED:** repo-wide `deno task test` is now **650 passed / 0 failed** on this
+  branch (was 477/11 at Slice 5). The `ci.yml`-gated `deno task test` is green → **S1→main merge
+  unblocked** on the test axis.
+- **Still open (carried):**
+  1. **Batched dual-session IMPL-EVAL** over Slices 0–3,5 + 4a,6 — pending launch (separate
+     OpenHands evaluator session, never the generator).
+  2. **Step C** now actionable: resolve PR #2 dirty conflicts → merge `feat/package-quality` → `main`
+     CI-green. (Wave 6 CLI PR #43 merges into `feat/package-quality` first.)
 - **Severity:** on-track. No framework code by supervisor; bookkeeping + `ci.yml` + dispatch only.

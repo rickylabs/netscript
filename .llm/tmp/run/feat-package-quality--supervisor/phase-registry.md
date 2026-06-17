@@ -639,8 +639,8 @@ GitHub merge commit; base was `24720fe`).
 | Nested run ID | `feat-package-quality-wave6-cli--<suffix>` |
 | Units | `@netscript/cli` |
 | Archetype(s) | A6 — cli-tooling |
-| Status | **`active`** — PR **#43** (wave6-cli). Slices 0,1,2,3,5 landed (continuous Codex generator, D-SUP-W6); Slice 2 self-gated `scaffold.runtime` 41/41. **Remaining in S1: Slice 6 (A6 gate sweep + AP-1 close) + Slice 4a only.** |
-| Merge commit | — (pending Slice 6 + 4a, then merges into `feat/package-quality` ahead of the S1→`main` merge) |
+| Status | **`impl-complete`** — PR **#43** (wave6-cli) @ `350fbd1`, publish-clean. All S1 slices landed: 0,1,2,3,5 (D-SUP-W6) + **4a `43e8ea4`** + **6 `f49af63`** (`2026-06-17`, session `019ed645` exited clean). `scaffold.runtime` 41/41; repo `test` 650/0; **AP-1 CLOSED**. Slice **4b deferred → post-S3 step F** (D-SUP-W8). Next: merge #43 into `feat/package-quality`, then S1→`main`. |
+| Merge commit | — (impl complete; merges into `feat/package-quality` ahead of the S1→`main` merge) |
 
 ### Pre-conditions
 
@@ -684,7 +684,7 @@ GitHub merge commit; base was `24720fe`).
 | 3 — Plugin runner | `merged` (host #15 → umbrella #14 → track; IMPL-EVAL PASS) | 2 | plugin | `1423ab3` (PR #14) |
 | 4 — Runtimes & plugins | `active` (umbrella #16; 4a merged `2c24662` #18; 4b merged `1896f854` #19; 4c merged `8264a1c` #20; 4d LAST pulled forward `32637a9`, in Research/Plan #21) | 3 | plugin-{streams,workers,sagas,triggers}-core, watchers, plugin-{streams,workers,sagas,triggers} | — |
 | 5 — Application surfaces | `prepared` (umbrella PR #17, blocked on 4) | 4 | sdk, service, fresh, fresh-ui | — |
-| 6 — Tooling | `active` (PR #43; slices 0,1,2,3,5 landed; remaining: Slice 6 + Slice 4a — Slice 4b deferred post-S3 per D-SUP-W8) | 0–5 | cli | — |
+| 6 — Tooling | `impl-complete` (PR #43 @ `350fbd1` publish-clean; all S1 slices 0–3,4a,5,6 landed; AP-1 closed; 4b deferred post-S3 step F per D-SUP-W8) | 0–6 (4a) | cli | — |
 
 Unit count: 1 + 3 + 8 + 1 + 9 + 4 + 1 = **27**.
 
