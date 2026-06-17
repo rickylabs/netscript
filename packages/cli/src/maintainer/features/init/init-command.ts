@@ -6,6 +6,7 @@ import {
   type MaintainerInitDependencies,
   orchestrateMaintainerInit,
 } from './orchestrate-maintainer-init.ts';
+import { PresetRegistry } from '../../../kernel/application/registries/preset-registry.ts';
 
 const DB_ENGINE_CHOICES: readonly DbEngineChoice[] = [
   'postgres',
@@ -65,7 +66,18 @@ export function createMaintainerInitCommand(
     .option('-y, --yes', 'Accept defaults without prompting', { default: false })
     .option('--path <path:string>', 'Target directory for scaffold output')
     .option('--dry-run', 'Preview scaffold plan without writing files', { default: false })
+    .option('--json', 'Emit a single machine-readable JSON result', { default: false })
+    .option('--from <preset:string>', 'Apply a named scaffold preset')
     .action(async (options, name: string): Promise<void> => {
+      if (options.from !== undefined) {
+        const presets = new PresetRegistry();
+        if (presets.entries().length === 0) {
+          throw new Error('no presets registered');
+        }
+        if (presets.get(options.from) === undefined) {
+          throw new Error(`preset "${options.from}" is not registered`);
+        }
+      }
       const includeService = options.service === true ||
         options.serviceName !== undefined ||
         options.servicePort !== undefined;
@@ -78,6 +90,8 @@ export function createMaintainerInitCommand(
         ci: options.ci ?? false,
         yes: options.yes ?? false,
         dryRun: options.dryRun ?? false,
+        json: options.json ?? false,
+        from: options.from,
         noGit: options.git === false,
         noAspire: options.aspire === false,
         legacyAspire: options.legacyAspire ?? false,
@@ -87,6 +101,7 @@ export function createMaintainerInitCommand(
         servicePort: options.servicePort,
       }, dependencies.initDependencies);
 
+      if (options.json === true) return;
       print(`Maintainer scaffold root: ${result.init.targetPath}`);
       print(`Monorepo root: ${result.sourceRoot}`);
       if (result.packageSync) {

@@ -1,6 +1,7 @@
 # Wave 6 CLI research — context pack (read order)
 
-Read only what the research needs; this is a RESEARCH-ONLY phase.
+Read only what the current implementation/evaluation phase needs. Research and plan are complete;
+Slice 4a landed after Slices 0, 1, 2, 3, and 5.
 
 ## 1. Harness + activation
 - `.agents/skills/netscript-harness/SKILL.md`
@@ -52,6 +53,22 @@ Cross-program dependencies (PR #44 upgrade run):
 - Consumes Phase A Aspire 13.4 GA pins (slice 5).
 - Consumes Phase P published alpha.0 fixture (slice 4 `scaffold.published.runtime`).
 
-Ownership boundary (LD-8): this wave owns `scaffold-files.ts` + `scaffold-aspire.ts` apphost-path
-migration; the upgrade run owns `scaffold-versions.ts` + CI pin. `@netscript/cli` is NOT published in
-Phase P — it ships last (LD-7).
+Ownership boundary (LD-8, amended by D-W6-1): #44/R6 already performed the apphost-path migration,
+so this wave verifies the inherited `apphost.mts` / `.aspire/modules/*.mts` shape and does not edit
+`scaffold-files.ts`, `scaffold-aspire.ts`, `scaffold-versions.ts`, or CI/toolchain pins.
+`@netscript/cli` is NOT published in Phase P — it ships last (LD-7).
+
+## Implementation resume point
+
+- Latest landed slice before Slice 6: `6db74db` (`Slice 4a: finish local CLI scaffold improvements`).
+- Slice 4a delivered rows 4.1-4.6 only: init orchestrator/pipeline split, in-memory scaffolder,
+  `init --json`, empty `init --from` preset registry, generic `PipelineContext`, and
+  `docs/commands/init.md`.
+- Load-bearing local runtime gate stayed green: `scaffold.runtime` `passed=41 failed=0`,
+  `database.init` PASS, `E2E_EXIT=0`.
+- Full Slice 4a sweep also passed: `deno task check` 1,597 files/0 findings, `deno task lint`
+  1,082 files/0 findings, `deno task fmt:check` 1,167 files/0 findings, `deno task test`
+  650 passed/0 failed/12 ignored, and `deno task publish:dry-run` exit 0 with existing non-CLI
+  warnings only.
+- Slice 4b (`scaffold.published.runtime`) remains deferred to post-S3 and must not be created in
+  this run.

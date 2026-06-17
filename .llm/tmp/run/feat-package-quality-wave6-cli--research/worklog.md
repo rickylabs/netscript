@@ -177,3 +177,40 @@ literal-union lock-in (V-9) and the two changes share the command-dispatch surfa
   - `deno task fmt:check` passed with 1,167 selected files and 0 findings.
   - Final required `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "E2E_EXIT=$?"`
     passed: `Summary: passed=41 failed=0`, `E2E_EXIT=0`.
+
+### Slice 4a — Local Scaffold Improvements
+
+- Verified Slice 3 already landed the prior scaffold/codegen moves relevant to E.2.1, E.2.5, and
+  E.2.10, so Slice 4a did not redo the deferred writer/template relocation work.
+- Split `kernel/application/scaffold/orchestrate-init.ts` into the compatibility re-export plus
+  `init-orchestrator.ts` (119 LOC) and `init-pipeline.ts` (98 LOC). Behavior is preserved through
+  the existing `executeInit` and `initNextSteps` import path.
+- Added `kernel/application/testing/in-memory-scaffolder.ts` (46 LOC) and a fast unit assertion in
+  `orchestrate-init_test.ts`; the focused test run reports the in-memory scaffolder test at `0ms`.
+- Added `init --json` for both public and maintainer init commands. The JSON mode suppresses human
+  progress and emits one serialized object with project, phase, plugin, Aspire, total, and next-step
+  fields. Added a local e2e smoke at `packages/cli/e2e/tests/presentation/init-json_test.ts`.
+- Added the empty Wave 6 preset seam: `init --from <preset>` plus
+  `kernel/application/registries/preset-registry.ts`; any preset currently fails with
+  `no presets registered`.
+- Typed `PipelineContext<TStepOutput>` in `kernel/application/abstracts/pipeline.ts` and threaded the
+  generic through `PipelineResult`.
+- Added `packages/cli/docs/commands/init.md` with typed input, pipeline phases, JSON shape, and exit
+  code categories.
+- Validation:
+  - `deno check --unstable-kv packages/cli/src/public/features/init/init-command.ts packages/cli/src/maintainer/features/init/init-command.ts packages/cli/src/maintainer/features/init/orchestrate-maintainer-init.ts packages/cli/src/kernel/application/scaffold/orchestrate-init.ts packages/cli/src/kernel/application/scaffold/init-orchestrator.ts packages/cli/src/kernel/application/scaffold/init-pipeline.ts packages/cli/src/kernel/application/output/renderers/init-json-renderer.ts packages/cli/src/kernel/application/testing/in-memory-scaffolder.ts packages/cli/src/kernel/application/abstracts/pipeline.ts packages/cli/src/public/features/init/init-command_test.ts packages/cli/e2e/tests/presentation/init-json_test.ts`
+    passed.
+  - `deno test --unstable-kv --allow-read --allow-write --allow-env --allow-run packages/cli/src/kernel/application/scaffold/orchestrate-init_test.ts packages/cli/src/public/features/init/init-command_test.ts packages/cli/e2e/tests/presentation/init-json_test.ts`
+    passed with 5 tests, 0 failed.
+  - `deno task e2e:cli run scaffold.runtime --cleanup --format pretty ; echo "E2E_EXIT=$?"`
+    passed: `Summary: passed=41 failed=0`, `database.init` PASS, `E2E_EXIT=0`.
+  - `deno task check:packages --unstable-kv` is not defined on this branch; `deno task check`
+    passed with 1,597 selected files, 14 batches, 0 findings.
+  - `deno task lint` passed with 1,082 selected files and 0 findings; this configured root task
+    excludes `packages/cli`, so focused `deno check` and targeted tests above are the CLI-local
+    verdicts.
+  - `deno task fmt:check` passed with 1,167 selected files, 0 findings. The branch does not define a
+    non-mutating `deno task fmt --check`; root `fmt` is mutating and was not run.
+  - `deno task test` passed: 650 passed, 0 failed, 12 ignored.
+  - `deno task publish:dry-run` exited 0. Existing slow-type / dynamic-import warnings remain on
+    non-CLI packages and accepted debt; no CLI dry-run blocker appeared.
