@@ -74,7 +74,7 @@ wrapper.
 |----------|--------|-------|
 | Confirm member `catalog:` refs resolve on Deno 2.8.3 | **RESOLVED (present)** | Members declare npm deps as `catalog:` in `package.json` (verified, D-G2-2); generator still runs an install/resolve smoke as gate-0 before edits. |
 | Scanner home + `arch:check` integration contract | **RESOLVED** | `.llm/tools/deps/`; workspace-wide sibling fitness gate emitting `Finding[]` + non-zero exit, wired into `ci` (`arch:check` is per-package + not in `ci` today). |
-| Divergent-JSR-version policy (hard FAIL vs allow-list) | must resolve now | Affects scanner semantics + the slice list. |
+| Divergent-JSR-version policy (hard FAIL vs allow-list) | **RESOLVED (Design)** | report-only first → converge tree (or explicit allow-list + arch-debt entry) → flip to FAIL; never relax the catalog law. |
 | Whether `deps:*` wrappers already cover part of this (`deps:latest|outdated|why|audit|prod-install`) | safe to defer | Inventory in research; reuse, don't duplicate. |
 
 ## Risk Register
