@@ -32,3 +32,15 @@ Append-only. Severity ∈ {minor, significant, architectural}.
   seven deprecated `windows.ts` aliases). Deferred `V8_HEAP_MB` and `updatePluginRegistry` for a
   later cleanup/refactor slice.
 - **Status:** Deferred; no functional change in this run.
+
+## D-G1-3a — database doc-lint pre-existing failures (minor)
+
+- **Observed:** After removing the deprecated `buildConnectionString` alias,
+  `deno doc --lint packages/database/mod.ts` failed on pre-existing public-surface lint issues:
+  `PostgresAdapter.prototype.getDriverAdapter` references `PostgresDriverAdapter`, and the still
+  present `mssqlJsonExtension` references private extension types.
+- **Impact:** The G1-3a alias removal did not introduce these diagnostics, and fixing them would
+  require widening this subtractive slice into unrelated public-surface additions/signature changes.
+- **Resolution:** Recorded the doc-lint failure as drift. The slice still ran the scoped database
+  check, database tests, full `publish:dry-run`, and `scaffold.runtime` smoke; all passed.
+- **Status:** Deferred to the relevant database public-surface cleanup.

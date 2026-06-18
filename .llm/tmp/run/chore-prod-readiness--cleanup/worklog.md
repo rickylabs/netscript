@@ -74,6 +74,12 @@ are untouched. Slices run low→high blast radius.
 | 2026-06-18 | G1-2 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/telemetry --ext ts,tsx` | PASS | 58 files selected, 1 batch, 0 failed batches, 0 diagnostics. |
 | 2026-06-18 | G1-2 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS | 515 files selected, 5 batches, 0 failed batches, 0 diagnostics. |
 | 2026-06-18 | G1-2 | `deno test -A --unstable-kv packages/telemetry/tests/context/job_test.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/kernel/adapters/windows/runtime` | PASS | 8 passed, 0 failed. |
+| 2026-06-18 | G1-3a | Consumer scan | PASS | `buildConnectionString` had no live consumers outside its deprecated export; same-name private adapter methods were unrelated. |
+| 2026-06-18 | G1-3a | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/database --ext ts,tsx` | PASS | 19 files selected, 1 batch, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-3a | `deno test -A --unstable-kv packages/database` | PASS | 3 passed, 0 failed. |
+| 2026-06-18 | G1-3a | `deno doc --lint packages/database/mod.ts` | FAIL (pre-existing) | 3 private-type-ref diagnostics; recorded as `D-G1-3a` because fixing them would widen this subtractive alias-removal slice. |
+| 2026-06-18 | G1-3a | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/database` dry-run completed successfully in the 27-unit workspace pass. |
+| 2026-06-18 | G1-3a | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
 
 ## Handoff Notes
 

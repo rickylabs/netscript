@@ -247,11 +247,3 @@ export function buildMssqlConnectionString(parts: {
 
   return `sqlserver://${server};${params.join(';')}`;
 }
-
-/**
- * Backward-compatible alias for PostgreSQL connection string construction.
- *
- * @deprecated Use buildPostgresConnectionString instead
- */
-export const buildConnectionString: typeof buildPostgresConnectionString =
-  buildPostgresConnectionString;
