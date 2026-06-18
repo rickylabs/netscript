@@ -64,7 +64,12 @@ are untouched. Slices run low→high blast radius.
 
 ## Gate Results
 
-(none yet — see `plan.md` Validation Plan)
+| Time | Slice | Gate | Result | Evidence |
+|------|-------|------|--------|----------|
+| 2026-06-18 | G1-0 | `deno run --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts` | PASS | `agentic:check-claude` ok; `.claude/skills` mirror ok (`17 skill(s), 17 mirrored file(s)`); `deno.lock` unchanged after hook runs. |
+| 2026-06-18 | G1-0 | Dangling-reference scan | PASS | `rg -n "AGENTS-handoff\\.md|agents-handover\\.md" .agents .claude .llm/harness/workflow docs packages plugins ops .github .openhands README.md AGENTS.md CLAUDE.md` returned no matches. |
+| 2026-06-18 | G1-1 | Tracked-cruft scan | PASS | Deleted 10 unreferenced tracked scratch files under `.llm/temp/` and `.llm/tmp/` outside durable `.llm/tmp/run/**` and `.llm/tmp/docs/**`; source `build/` hits were real CLI deploy modules and left intact. |
+| 2026-06-18 | G1-1 | Reference scan | PASS | `rg -n "measure-5a-service|measure-5b-sdk|ui-init-smoke|doc-lint-builders-raw|doc-lint-fresh-rev2|doc-lint-fresh|measure-doclint|measure-wave5-rebaseline|wave5-doclint|wave5-rebaseline" .` returned no matches. |
 
 ## Handoff Notes
 

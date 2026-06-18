@@ -8,5 +8,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - a47d7e62: chore(openhands): apply agent changes (PLAN-EVAL cycle-2 verdict)
 - 55102113: chore(openhands): record run trace 27755852001-1
 - b44dafe7: chore(harness): record PLAN-EVAL cycle-2 PASS for chore/prod-readiness
+- 1c98fa1c813dbc741472a3e498f41a645423daa2: chore(prod-readiness): G1-0 — relocate OpenHands handoff protocol
 
 <!-- appended after each commit -->
