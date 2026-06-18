@@ -11,3 +11,4 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 684d73fa: chore(harness): mark G1/G2 active — branches + draft sub-PRs #54/#55 launched
 
 <!-- appended after each commit -->
+- 8197afad: ci(pages): GitHub Pages deploy workflow for docs/site + verification deploy (live at /netscript/), reverted to main-only
