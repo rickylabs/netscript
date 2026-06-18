@@ -82,7 +82,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | A6-adjacent for the scanner scripts (cli-tooling); otherwise N/A repo tooling |
 | Scope overlay | none |
 | Sub-PR | #55 (draft, base `release/jsr-readiness`) |
-| Status | `active` — **IMPL IN PROGRESS** (WSL Codex launched 2026-06-18; PLAN-EVAL PASS @ cycle 1, run 27755191977; D-2 NIT carried into brief). |
+| Status | `evaluating` — **IMPL COMPLETE** (D-1…D-7, WSL Codex thread `019edaa8-af32…`); **IMPL-EVAL dispatched** on PR #55 (OpenHands qwen-3.7-max). Supervisor steered a final slice **D-7** (enforcement wiring: `deps:check` → `ci:quality` + `arch:check`, FAIL-on-violation for jsr/file-link, npm report-only census) after the agent stopped at D-6 with scanners unwired — DH-3/deliverables #1/#2 require enforcement. `deno task deps:check` exits 0 on clean tree. |
 | Impl thread | `019edaa8-af32-7011-899c-00e14f730ef1` (Codex, daemon-managed, mobile-visible) |
 | Impl worktree | `/home/codex/repos/netscript-deps-hygiene` (ext4 native, `chore/deps-hygiene` @ launch base `b6985c6`) |
 | Steering | `codex exec resume 019edaa8-af32-7011-899c-00e14f730ef1 "<follow-up>"` (NEVER a 2nd `send-message-v2` on this worktree) |
