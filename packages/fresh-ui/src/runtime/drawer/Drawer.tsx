@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, VNode } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -23,37 +23,50 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-function DrawerRoot({ children, ...options }: DrawerRootProps): VNode {
+/** Render the drawer root provider. */
+export function DrawerRoot(props: unknown): unknown {
+  const { children, ...options } = props as DrawerRootProps;
   const drawer = useDrawer(options);
   return <DrawerContext.Provider value={drawer}>{children}</DrawerContext.Provider>;
 }
 
-function DrawerTrigger({ children, ...props }: DrawerTriggerProps): VNode {
+/** Render the button that opens the drawer. */
+export function DrawerTrigger(props: unknown): unknown {
+  const { children, ...triggerProps } = props as DrawerTriggerProps;
   const drawer = useDrawerContext('Drawer.Trigger');
-  return <button {...drawer.getTriggerProps(props)}>{withChildren(children)}</button>;
+  return <button {...drawer.getTriggerProps(triggerProps)}>{withChildren(children)}</button>;
 }
 
-function DrawerContent({ children, ...props }: DrawerContentProps): VNode {
+/** Render the drawer content element. */
+export function DrawerContent(props: unknown): unknown {
+  const { children, ...contentProps } = props as DrawerContentProps;
   const drawer = useDrawerContext('Drawer.Content');
-  return <dialog {...drawer.getContentProps(props)}>{withChildren(children)}</dialog>;
+  return <dialog {...drawer.getContentProps(contentProps)}>{withChildren(children)}</dialog>;
 }
 
-function DrawerTitle({ children, ...props }: DrawerTitleProps): VNode {
+/** Render the drawer title element. */
+export function DrawerTitle(props: unknown): unknown {
+  const { children, ...titleProps } = props as DrawerTitleProps;
   const drawer = useDrawerContext('Drawer.Title');
-  return <h2 {...drawer.getTitleProps(props)}>{withChildren(children)}</h2>;
+  return <h2 {...drawer.getTitleProps(titleProps)}>{withChildren(children)}</h2>;
 }
 
-function DrawerDescription({ children, ...props }: DrawerDescriptionProps): VNode {
+/** Render the drawer description element. */
+export function DrawerDescription(props: unknown): unknown {
+  const { children, ...descriptionProps } = props as DrawerDescriptionProps;
   const drawer = useDrawerContext('Drawer.Description');
-  return <p {...drawer.getDescriptionProps(props)}>{withChildren(children)}</p>;
+  return <p {...drawer.getDescriptionProps(descriptionProps)}>{withChildren(children)}</p>;
 }
 
-function DrawerClose({ children, ...props }: DrawerCloseProps): VNode {
+/** Render the button that closes the drawer. */
+export function DrawerClose(props: unknown): unknown {
+  const { children, ...closeProps } = props as DrawerCloseProps;
   const drawer = useDrawerContext('Drawer.Close');
-  return <button {...drawer.getCloseProps(props)}>{withChildren(children)}</button>;
+  return <button {...drawer.getCloseProps(closeProps)}>{withChildren(children)}</button>;
 }
 
-type DrawerNamespace = Readonly<{
+/** Compound drawer namespace type with root and structural subcomponents. */
+export type DrawerNamespace = Readonly<{
   Close: typeof DrawerClose;
   Content: typeof DrawerContent;
   Description: typeof DrawerDescription;

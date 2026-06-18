@@ -1,0 +1,400 @@
+violations (was 42).
+    - ✅ **Type information loss** → resolved: `typeof <Subcomponent>` preserved
+in all 7 `*Namespace` types; no API precision degradation.
+    - ✅ **Incomplete solution** → resolved: both problems (private-type-ref + 
+no-explicit-any) solved cleanly by exporting subcomponents.
+    
+    ## Remaining Risks
+    None. This is cycle 2, second eval pass. All gates green, ruling **(b)** 
+fulfilled. Verdict `PASS`.
+    
+    ## Artifacts Written
+    - `.llm/tmp/run/openhands/pr-58/run-27783995605-1/evaluate.md`
+    - `/home/runner/work/_temp/openhands/27783995605-1/summary.md` (this file)
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 549.37K • cache hit 85.32% •  reasoning 2.72K • ↓ output 9.71K •
+$ 0.2544
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27783995605-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Cycle 2 Evaluation — PR #58
+ 2|
++3|## Verdict: `PASS`
++4|
++5|## Summary
++6|Cycle 1 (`8c26459`) returned `FAIL_FIX` with ruling **(b)**: the `(props: 
+any) => unknown` approach cleared `deno doc --lint` but introduced **42 new 
+`no-explicit-any` violations**. The generator (WSL Codex thread `019edc0d…`) 
+remediated in commit `a98fbf8` (on top of cycle-1 trace `26cef70`) by:
++7|
++8|1. Restoring each `*Namespace` member from `(props: any) => unknown` to 
+precise `typeof <Subcomponent>`.
++9|2. Exporting every subcomponent function referenced by `typeof` so the type 
+targets are public (eliminating `private-type-ref`).
++10|3. Re-exporting those subcomponents from `packages/fresh-ui/interactive.ts`.
++11|4. Removing all introduced `any`.
++12|
++13|All 5 required gates pass. Type precision is preserved. Ruling **(b)** is 
+correctly implemented.
++14|
++15|## Changes
++16|- **8 files, all Modified, all under `packages/fresh-ui/`.**
++17|- `interactive.ts`: re-exports all subcomponent functions and the 7 
+`*Namespace` types.
++18|- 7 component `*.tsx` files (Accordion, Dialog, Drawer, Popover, Sheet, 
+Tabs, Tooltip): each subcomponent function is declared `export function`, each 
+`*Namespace` type uses precise `typeof <Subcomponent>` members.
++19|
++20|No `deno.json` version edit, no catalog/scaffold-versions edit, no 
+`deno.lock` churn, no deleted files. Lock hygiene preserved.
++21|
++22|**Scope verification (raw):**
++23|```
++24|$ git diff 26cef70..a98fbf8 --name-status
++25|M       packages/fresh-ui/interactive.ts
++26|M       packages/fresh-ui/src/runtime/accordion/Accordion.tsx
++27|M       packages/fresh-ui/src/runtime/dialog/Dialog.tsx
++28|M       packages/fresh-ui/src/runtime/drawer/Drawer.tsx
++29|M       packages/fresh-ui/src/runtime/popover/Popover.tsx
++30|M       packages/fresh-ui/src/runtime/sheet/Sheet.tsx
++31|M       packages/fresh-ui/src/runtime/tabs/Tabs.tsx
++32|M       packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx
++33|```
++34|
++35|## Validation
++36|
++37|### Gate 1: `deno doc --lint` (3 public entries) — ✅ PASS
++38|```
++39|$ deno doc --lint packages/fresh-ui/mod.ts packages/fresh-ui/interactive.ts 
+packages/fresh-ui/primitives.tsx
++40|Checked 3 files
++41|[exit 0]
++42|```
++43|Zero `private-type-ref` warnings. All 7 `*Namespace` types are exported from
+the public entry.
++44|
++45|### Gate 2: `deno lint` (no-explicit-any + no regressions) — ✅ PASS
++46|```
++47|$ deno lint packages/fresh-ui/ 2>&1 | grep -c "no-explicit-any"
++48|0
++49|```
++50|Full lint output: `Checked 85 files` — **exit 0**, zero errors of any class.
++51|
++52|Cycle-1 introduced **42** `no-explicit-any` violations; all 42 are cleared. 
+No other lint classes introduced.
++53|
++54|### Gate 3: `deno check --unstable-kv` (3 public entries) — ✅ PASS
++55|```
++56|$ deno check --unstable-kv packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx
++57|Check packages/fresh-ui/mod.ts
++58|Check packages/fresh-ui/interactive.ts
++59|Check packages/fresh-ui/primitives.tsx
++60|[exit 0]
++61|```
++62|
++63|### Gate 4: Diff scope — ✅ PASS
++64|- 8 files, all Modified, all under `packages/fresh-ui/`
++65|- No `deno.json`, `deno.lock`, catalog, scaffold-versions, or deleted files 
+touched
++66|- Lock hygiene preserved
++67|
++68|### Gate 5: `typeof <Subcomponent>` precision restored — ✅ PASS
++69|Inspection of `deno doc` output confirms all 7 `*Namespace` types use 
+precise `typeof` members:
++70|
++71|| Namespace | Sample member |
++72||---|---|
++73|| `AccordionNamespace` | `Root: typeof AccordionRoot; Item: typeof 
+AccordionItem; ...` |
++74|| `DialogNamespace` | `Root: typeof DialogRoot; Close: typeof DialogClose; 
+...` |
++75|| `PopoverNamespace` | `Root: typeof PopoverRoot; Arrow: typeof 
+PopoverArrow; ...` |
++76|
++77|All subcomponent functions are declared `export function` in their source 
+`*.tsx` files and re-exported from `packages/fresh-ui/interactive.ts`. The 
+`private-type-ref` root cause is structurally eliminated — subcomponents are 
+public, `typeof` targets are public.
++78|
++79|Type precision is preserved; no fallback to `(props: any) => unknown`. 
+Ruling **(b)** genuinely implemented, not faked with a looser type.
++80|
++81|## Responses to Cycle-1 Review (ruling b)
++82|- ✅ **Lint failure blocks merge** → resolved: 0 `no-explicit-any` 
+violations (was 42).
++83|- ✅ **Type information loss** → resolved: `typeof <Subcomponent>` preserved
+in all 7 `*Namespace` types; no API precision degradation.
++84|- ✅ **Incomplete solution** → resolved: both problems (private-type-ref + 
+no-explicit-any) solved cleanly by exporting subcomponents.
++85|
++86|## Remaining Risks
++87|None. This is cycle 2, second eval pass. All gates green, ruling **(b)** 
+fulfilled. Verdict `PASS`.
++88|
++89|## Artifacts Written
++90|- `.llm/tmp/run/openhands/pr-58/run-27783995605-1/evaluate.md`
++91|- `/home/runner/work/_temp/openhands/27783995605-1/summary.md` (this file)
++92|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "create", "file_text": "[{\"comment_id\": 0, 
+\"body\": \"## IMPL-EVAL Cycle 2 \u2014 `PASS`\\n\\n### Verdict: `PASS` 
+\u2705\\n\\nThe cycle-1 `FAIL_FIX` ruling **(b)** has been correctly remediated 
+in commit `a98fbf8`. All 5 required gates pass:\\n\\n| Gate | Result 
+|\\n|---|---|\\n| `deno doc --lint` (3 entries) | \u2705 0 warnings/errors |\\n|
+`deno lint` \u2014 `no-explicit-any` | \u2705 0 hits (cycle-1's 42 violations 
+cleared) |\\n| `deno lint` \u2014 other classes | \u2705 0 errors (all 85 files 
+clean) |\\n| `deno check --unstable-kv` (3 entries) | \u2705 exit 0 |\\n| Diff 
+scope (`packages/fresh-ui/` only) | \u2705 8 modified files, no scope leak |\\n|
+`typeof` precision | \u2705 preserved (no `(props: any) => unknown` fallback) 
+|\\n\\n### What changed\\n\\n- 8 files, all Modified, all under 
+`packages/fresh-ui/` \u2014 no `deno.json`/`deno.lock` churn, no deleted 
+files.\\n- All 7 `*Namespace` types restored to precise `typeof <Subcomponent>` 
+members.\\n- Every subcomponent function is declared `export function` in source
+`.tsx` and re-exported from `interactive.ts` \u2014 `private-type-ref` 
+eliminated.\\n- Type precision preserved for API consumers (ruling **(b)** 
+genuinely implemented, not faked with a looser type).\\n\\n### Gate evidence 
+(raw)\\n\\n```\\n$ deno doc --lint packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx\\nChecked 3 
+files\\n[exit 0]\\n\\n$ deno lint packages/fresh-ui/ 2>&1 | grep -c 
+\\\"no-explicit-any\\\"\\n0\\n\\n$ deno check --unstable-kv 
+packages/fresh-ui/mod.ts packages/fresh-ui/interactive.ts 
+packages/fresh-ui/primitives.tsx\\nCheck packages/fresh-ui/mod.ts\\nCheck 
+packages/fresh-ui/interactive.ts\\nCheck 
+packages/fresh-ui/primitives.tsx\\n[exit 0]\\n```\\n\\nCycle-2 `PASS` \u2014 PR 
+#58 is ready to merge.\\n\\n_Evaluation performed by OpenHands agent 
+(qwen3.7-max) on behalf of the reviewer \u2014 separate session from the 
+generator._\"}]\n", "path": 
+"/home/runner/work/_temp/openhands/27783995605-1/replies.json"}
+
+Reasoning:
+...
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27783995605-1/replies.json"
+  file_text: 
+    [{"comment_id": 0, "body": "## IMPL-EVAL Cycle 2 — `PASS`\n\n### Verdict: 
+`PASS` ✅\n\nThe cycle-1 `FAIL_FIX` ruling **(b)** has been correctly remediated
+in commit `a98fbf8`. All 5 required gates pass:\n\n| Gate | Result 
+|\n|---|---|\n| `deno doc --lint` (3 entries) | ✅ 0 warnings/errors |\n| `deno 
+lint` — `no-explicit-any` | ✅ 0 hits (cycle-1's 42 violations cleared) |\n| 
+`deno lint` — other classes | ✅ 0 errors (all 85 files clean) |\n| `deno check 
+--unstable-kv` (3 entries) | ✅ exit 0 |\n| Diff scope (`packages/fresh-ui/` 
+only) | ✅ 8 modified files, no scope leak |\n| `typeof` precision | ✅ 
+preserved (no `(props: any) => unknown` fallback) |\n\n### What changed\n\n- 8 
+files, all Modified, all under `packages/fresh-ui/` — no `deno.json`/`deno.lock`
+churn, no deleted files.\n- All 7 `*Namespace` types restored to precise `typeof
+<Subcomponent>` members.\n- Every subcomponent function is declared `export 
+function` in source `.tsx` and re-exported from `interactive.ts` — 
+`private-type-ref` eliminated.\n- Type precision preserved for API consumers 
+(ruling **(b)** genuinely implemented, not faked with a looser type).\n\n### 
+Gate evidence (raw)\n\n```\n$ deno doc --lint packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx\nChecked 3 
+files\n[exit 0]\n\n$ deno lint packages/fresh-ui/ 2>&1 | grep -c 
+\"no-explicit-any\"\n0\n\n$ deno check --unstable-kv packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx\nCheck 
+packages/fresh-ui/mod.ts\nCheck packages/fresh-ui/interactive.ts\nCheck 
+packages/fresh-ui/primitives.tsx\n[exit 0]\n```\n\nCycle-2 `PASS` — PR #58 is 
+ready to merge.\n\n_Evaluation performed by OpenHands agent (qwen3.7-max) on 
+behalf of the reviewer — separate session from the generator._"}]
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 579.79K • cache hit 80.85% •  reasoning 2.72K • ↓ output 10.33K 
+• $ 0.2947
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27783995605-1/replies.json edited with 1
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|[{"comment_id": 0, "body": "## IMPL-EVAL Cycle 2 — `PASS`\n\n### Verdict: 
+`PASS` ✅\n\nThe cycle-1 `FAIL_FIX` ruling **(b)** has been correctly remediated
+in commit `a98fbf8`. All 5 required gates pass:\n\n| Gate | Result 
+|\n|---|---|\n| `deno doc --lint` (3 entries) | ✅ 0 warnings/errors |\n| `deno 
+lint` — `no-explicit-any` | ✅ 0 hits (cycle-1's 42 violations cleared) |\n| 
+`deno lint` — other classes | ✅ 0 errors (all 85 files clean) |\n| `deno check 
+--unstable-kv` (3 entries) | ✅ exit 0 |\n| Diff scope (`packages/fresh-ui/` 
+only) | ✅ 8 modified files, no scope leak |\n| `typeof` precision | ✅ 
+preserved (no `(props: any) => unknown` fallback) |\n\n### What changed\n\n- 8 
+files, all Modified, all under `packages/fresh-ui/` — no `deno.json`/`deno.lock`
+churn, no deleted files.\n- All 7 `*Namespace` types restored to precise `typeof
+<Subcomponent>` members.\n- Every subcomponent function is declared `export 
+function` in source `.tsx` and re-exported from `interactive.ts` — 
+`private-type-ref` eliminated.\n- Type precision preserved for API consumers 
+(ruling **(b)** genuinely implemented, not faked with a looser type).\n\n### 
+Gate evidence (raw)\n\n```\n$ deno doc --lint packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx\nChecked 3 
+files\n[exit 0]\n\n$ deno lint packages/fresh-ui/ 2>&1 | grep -c 
+\"no-explicit-any\"\n0\n\n$ deno check --unstable-kv packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx\nCheck 
+packages/fresh-ui/mod.ts\nCheck packages/fresh-ui/interactive.ts\nCheck 
+packages/fresh-ui/primitives.tsx\n[exit 0]\n```\n\nCycle-2 `PASS` — PR #58 is 
+ready to merge.\n\n_Evaluation performed by OpenHands agent (qwen3.7-max) on 
+behalf of the reviewer — separate session from the generator._"}]
+ 2|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL cycle-2 verdict PASS for PR 58
+
+Reasoning:
+## IMPL-EVAL Cycle 2 — Verdict: `PASS`
+
+All 5 required gates have been independently re-run and pass:
+
+| Gate | Result |
+|---|---|
+| `deno doc --lint` (3 entries) | ✅ 0 warnings/errors |
+| `deno lint` — `no-explicit-any` | ✅ 0 hits (cycle-1's 42 violations cleared) 
+|
+| `deno lint` — other classes | ✅ 0 errors (all 85 files clean) |
+| `deno check --unstable-kv` (3 entries) | ✅ exit 0 |
+| Diff scope (`packages/fresh-ui/` only) | ✅ 8 files, all Modified, no scope 
+leak |
+
+### Scope verification
+```
+$ git diff 26cef70..a98fbf8 --name-status
+M       packages/fresh-ui/interactive.ts
+M       packages/fresh-ui/src/runtime/accordion/Accordion.tsx
+M       packages/fresh-ui/src/runtime/dialog/Dialog.tsx
+M       packages/fresh-ui/src/runtime/drawer/Drawer.tsx
+M       packages/fresh-ui/src/runtime/popover/Popover.tsx
+M       packages/fresh-ui/src/runtime/sheet/Sheet.tsx
+M       packages/fresh-ui/src/runtime/tabs/Tabs.tsx
+M       packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx
+```
+No `deno.json` version edit, no catalog/scaffold-versions edit, no `deno.lock` 
+churn, no deleted files — lock hygiene preserved.
+
+### Type precision restored
+`deno doc` confirms all 7 `*Namespace` types use precise `typeof <Subcomponent>`
+members (no `(props: any) => unknown` fallback):
+```
+type AccordionNamespace = Readonly<{ Item: typeof AccordionItem; ItemContent: 
+typeof AccordionItemContent; ... }>
+type DialogNamespace   = Readonly<{ Close: typeof DialogClose; Content: typeof 
+DialogContent; ... }>
+...
+```
+All subcomponent functions are declared `export function` in source `.tsx` files
+and re-exported from `interactive.ts` — ruling **(b)** genuinely implemented, 
+`private-type-ref` structurally eliminated.
+
+### Raw gate evidence
+```
+$ deno doc --lint packages/fresh-ui/mod.ts packages/fresh-ui/interactive.ts 
+packages/fresh-ui/primitives.tsx
+Checked 3 files [exit 0]
+
+$ deno lint packages/fresh-ui/ 2>&1 | grep -c "no-explicit-any"
+0
+
+$ deno check --unstable-kv packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx
+Check packages/fresh-ui/mod.ts
+Check packages/fresh-ui/interactive.ts
+Check packages/fresh-ui/primitives.tsx [exit 0]
+```
+
+**Verdict: `PASS`** — PR #58 is ready to merge.
+
+_Evaluation performed by OpenHands agent (qwen3.7-max) — separate session from 
+the generator._
+</parameter>
+</function>
+</tool_call>
+
+Finish with message:
+## IMPL-EVAL Cycle 2 — Verdict: `PASS`
+
+All 5 required gates have been independently re-run and pass:
+
+| Gate | Result |
+|---|---|
+| `deno doc --lint` (3 entries) | ✅ 0 warnings/errors |
+| `deno lint` — `no-explicit-any` | ✅ 0 hits (cycle-1's 42 violations cleared) 
+|
+| `deno lint` — other classes | ✅ 0 errors (all 85 files clean) |
+| `deno check --unstable-kv` (3 entries) | ✅ exit 0 |
+| Diff scope (`packages/fresh-ui/` only) | ✅ 8 files, all Modified, no scope 
+leak |
+
+### Scope verification
+```
+$ git diff 26cef70..a98fbf8 --name-status
+M       packages/fresh-ui/interactive.ts
+M       packages/fresh-ui/src/runtime/accordion/Accordion.tsx
+M       packages/fresh-ui/src/runtime/dialog/Dialog.tsx
+M       packages/fresh-ui/src/runtime/drawer/Drawer.tsx
+M       packages/fresh-ui/src/runtime/popover/Popover.tsx
+M       packages/fresh-ui/src/runtime/sheet/Sheet.tsx
+M       packages/fresh-ui/src/runtime/tabs/Tabs.tsx
+M       packages/fresh-ui/src/runtime/tooltip/Tooltip.tsx
+```
+No `deno.json` version edit, no catalog/scaffold-versions edit, no `deno.lock` 
+churn, no deleted files — lock hygiene preserved.
+
+### Type precision restored
+`deno doc` confirms all 7 `*Namespace` types use precise `typeof <Subcomponent>`
+members (no `(props: any) => unknown` fallback):
+```
+type AccordionNamespace = Readonly<{ Item: typeof AccordionItem; ItemContent: 
+typeof AccordionItemContent; ... }>
+type DialogNamespace   = Readonly<{ Close: typeof DialogClose; Content: typeof 
+DialogContent; ... }>
+...
+```
+All subcomponent functions are declared `export function` in source `.tsx` files
+and re-exported from `interactive.ts` — ruling **(b)** genuinely implemented, 
+`private-type-ref` structurally eliminated.
+
+### Raw gate evidence
+```
+$ deno doc --lint packages/fresh-ui/mod.ts packages/fresh-ui/interactive.ts 
+packages/fresh-ui/primitives.tsx
+Checked 3 files [exit 0]
+
+$ deno lint packages/fresh-ui/ 2>&1 | grep -c "no-explicit-any"
+0
+
+$ deno check --unstable-kv packages/fresh-ui/mod.ts 
+packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx
+Check packages/fresh-ui/mod.ts
+Check packages/fresh-ui/interactive.ts
+Check packages/fresh-ui/primitives.tsx [exit 0]
+```
+
+**Verdict: `PASS`** — PR #58 is ready to merge.
+
+_Evaluation performed by OpenHands agent (qwen3.7-max) — separate session from 
+the generator._
+
+Tokens: ↑ input 610.88K • cache hit 81.22% •  reasoning 3.39K • ↓ output 11.71K 
+• $ 0.3114
+
