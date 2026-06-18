@@ -79,6 +79,9 @@ entry*, never by relaxing the catalog law.
 | D-3 | JSR centralization scanner (report-only) | `deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --json` / `deno task deps:check:jsr-centralization` | PASS exit 0: zero findings; equivalent `1`/`^1` major-only ranges normalized |
 | D-3 | Tooling check | `deno check .llm/tools/deps/scan-jsr-centralization.ts .llm/tools/deps/workspace.ts` | PASS |
 | D-3 | Tooling lint | `deno lint --no-config .llm/tools/deps/scan-jsr-centralization.ts .llm/tools/deps/workspace.ts` | PASS |
+| D-4 | file/link audit (report-only) | `deno run --allow-read .llm/tools/deps/audit-file-link.ts --json` / `deno task deps:audit:file-link` | PASS exit 0: zero findings |
+| D-4 | Tooling check | `deno check .llm/tools/deps/audit-file-link.ts .llm/tools/deps/workspace.ts` | PASS |
+| D-4 | Tooling lint | `deno lint --no-config .llm/tools/deps/audit-file-link.ts .llm/tools/deps/workspace.ts` | PASS |
 
 ## Handoff Notes
 

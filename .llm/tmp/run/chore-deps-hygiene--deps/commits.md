@@ -8,5 +8,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - dcc5c87: chore(deps-hygiene): D-1 — add dependency census baseline
 - 6648177: chore(deps-hygiene): D-2 — add npm catalog scanner
 - 355cf1a: chore(deps-hygiene): D-3 — add JSR centralization scanner
+- 041e3d2: chore(deps-hygiene): D-4 — add file link audit
 
 <!-- appended after each commit -->
