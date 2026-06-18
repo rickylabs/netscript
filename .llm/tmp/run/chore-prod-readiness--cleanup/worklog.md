@@ -92,6 +92,12 @@ are untouched. Slices run low→high blast radius.
 | 2026-06-18 | G1-3c | `deno doc --lint packages/database/mod.ts` | FAIL (pre-existing) | Remaining private-type-ref is `PostgresAdapter.prototype.getDriverAdapter` → `PostgresDriverAdapter`; covered by `D-G1-3a`. |
 | 2026-06-18 | G1-3c | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/database` dry-run completed successfully in the 27-unit workspace pass; no lock churn retained. |
 | 2026-06-18 | G1-3c | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
+| 2026-06-18 | G1-4 | Consumer scan | PASS | `rg -n "serveStaticFiles|registerFsRoutes" packages/fresh .llm/tmp/run/chore-prod-readiness--cleanup docs/architecture/doctrine .agents` returned no matches after removal/rename. |
+| 2026-06-18 | G1-4 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS | 147 files selected, 2 batches, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-4 | `deno test -A --unstable-kv packages/fresh/src/runtime/server/define-fresh-app.test.ts` | PASS | 7 passed, 0 failed. |
+| 2026-06-18 | G1-4 | `deno doc --lint packages/fresh/mod.ts` | PASS | Checked 1 file. |
+| 2026-06-18 | G1-4 | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/fresh` dry-run completed successfully in the 27-unit workspace pass. |
+| 2026-06-18 | G1-4 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
 
 ## Handoff Notes
 
