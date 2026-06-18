@@ -9,5 +9,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 55102113: chore(openhands): record run trace 27755852001-1
 - b44dafe7: chore(harness): record PLAN-EVAL cycle-2 PASS for chore/prod-readiness
 - 1c98fa1c813dbc741472a3e498f41a645423daa2: chore(prod-readiness): G1-0 — relocate OpenHands handoff protocol
+- 3f683a053f9bbbb5b3a45b4e27c35a554636cab9: chore(prod-readiness): G1-1 — remove tracked scratch cruft
 
 <!-- appended after each commit -->

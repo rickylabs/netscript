@@ -70,6 +70,10 @@ are untouched. Slices run low→high blast radius.
 | 2026-06-18 | G1-0 | Dangling-reference scan | PASS | `rg -n "AGENTS-handoff\\.md|agents-handover\\.md" .agents .claude .llm/harness/workflow docs packages plugins ops .github .openhands README.md AGENTS.md CLAUDE.md` returned no matches. |
 | 2026-06-18 | G1-1 | Tracked-cruft scan | PASS | Deleted 10 unreferenced tracked scratch files under `.llm/temp/` and `.llm/tmp/` outside durable `.llm/tmp/run/**` and `.llm/tmp/docs/**`; source `build/` hits were real CLI deploy modules and left intact. |
 | 2026-06-18 | G1-1 | Reference scan | PASS | `rg -n "measure-5a-service|measure-5b-sdk|ui-init-smoke|doc-lint-builders-raw|doc-lint-fresh-rev2|doc-lint-fresh|measure-doclint|measure-wave5-rebaseline|wave5-doclint|wave5-rebaseline" .` returned no matches. |
+| 2026-06-18 | G1-2 | Consumer scan | PASS with drift | `telemetry/src/context/job.ts` and seven `windows.ts` aliases had zero live consumers; `V8_HEAP_MB` and `updatePluginRegistry` had live consumers and were deferred in `drift.md` (`D-G1-2`). |
+| 2026-06-18 | G1-2 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/telemetry --ext ts,tsx` | PASS | 58 files selected, 1 batch, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-2 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS | 515 files selected, 5 batches, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-2 | `deno test -A --unstable-kv packages/telemetry/tests/context/job_test.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/kernel/adapters/windows/runtime` | PASS | 8 passed, 0 failed. |
 
 ## Handoff Notes
 
