@@ -90,4 +90,19 @@ Append-only. Severity ∈ {minor, significant, architectural}.
   `/home/codex/repos/` for `release/jsr-readiness` or its sub-branches (`chore/prod-readiness`,
   `chore/deps-hygiene`, `docs/user-site`, `docs/internal-overhaul`). One must be created on ext4
   (NOT `/mnt/c`) before the first generator slice launches; until then there is nothing for a
-  sub-run thread to attach to.
+  sub-run thread to attach to. **(This applies only to the `@netscript/fresh-ui` source slice — the
+  one remaining Codex item. Docs authoring is now the Claude-workflow lane per LD-DOCS-LANE and does
+  NOT need a WSL worktree.)**
+
+## D-4 — Scorecard denominator stale vs. locked census (reconciled)
+
+- **Severity:** minor (exit-gate accuracy; no decision change).
+- **Observed (2026-06-18):** `scorecard.md` (written 12:11, before the census lock) said publish
+  **"E = 26 non-CLI"** and B1 **"all 27 units"** — contradicting the LOCKED census (US-5 + G2 eval
+  follow-up #1, RESOLVED 2026-06-18): **27 declare `name`+`exports`**, canonical `publish:dry-run`
+  simulates **25**, real denominator **26 = 25 E-wave non-CLI + F=`@netscript/cli`**, `cli-e2e`
+  (`publish:false`) excluded.
+- **Resolution:** supervisor reconciled the scorecard's factual denominator note + B1 + exit line to
+  the evaluator-established census (this is fact-alignment, NOT box-grading — all A–F checkboxes and
+  verdicts remain evaluator-owned). Added the F-wave dry-run blind-spot note to B1 (G2 follow-up
+  #1b). No locked decision changed.

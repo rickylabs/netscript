@@ -6,11 +6,13 @@ OpenHands session — never self-graded by the supervisor or any generator). Eac
 four sub-runs *additionally* passes its own PLAN-EVAL and IMPL-EVAL; the scorecard is the
 final program-level gate that confirms the sub-runs together produced a publishable repo.
 
-> Denominator note: S1 declared **27 publishable units** (`packages/*`, `plugins/*`,
-> `examples/*`, `apps/*`, `packages/cli/e2e`). Publish batch **E = 26 non-CLI**, batch
-> **F = `@netscript/cli`** (last, LD-7). Reference-doc depth is per unit *class* (library
-> packages/plugins get full reference; `examples/`/`apps/`/`e2e` get appropriate-level
-> docs). The exact per-dimension denominator is pinned in `docs/user-site` research.
+> Denominator note (reconciled 2026-06-18 to the locked census — US-5 + G2 eval follow-up #1):
+> **27 members declare `name`+`exports`**; the canonical `deno task publish:dry-run` simulates
+> **25**. The real **publish denominator = 26** = **batch E = 25 non-CLI** (OIDC, `0.0.1-alpha.0`)
+> + **batch F = `@netscript/cli`** (last, LD-7). **`@netscript/cli-e2e` (`publish:false`) is NEVER
+> published** and is excluded. Reference-doc depth is per unit *class* (library packages/plugins get
+> full reference; `examples/`/`apps/` get appropriate-level docs). Per-dimension denominator pinned
+> in `docs/user-site` research/plan. (Prior text said "E = 26 non-CLI / all 27" — stale; superseded.)
 
 ## Dimensions
 
@@ -25,8 +27,11 @@ final program-level gate that confirms the sub-runs together produced a publisha
       Pages** and deploying green.
 
 ### B — Publishability (carried from S1; must not regress)
-- [ ] **B1** `deno task publish:dry-run` passes for **all 27 units with 0 slow types**
-      on the umbrella branch (already green on `main` — the umbrella must hold it).
+- [ ] **B1** `deno task publish:dry-run` passes with **0 slow types** for the canonical
+      **25-unit** simulation on the umbrella branch (already green on `main` — the umbrella must
+      hold it). NOTE the F-wave blind spot (G2 eval follow-up #1b): the batch dry-run does not
+      emit a `@netscript/cli` simulation, so the **F dispatch must run cli's own
+      `deno publish --dry-run`** before the real publish.
 
 ### C — Repo cleanliness (`chore/prod-readiness`)
 - [ ] **C1** **Zero** dead code, temp/garbage/build cruft, and stray root files; **all**
@@ -65,5 +70,5 @@ final program-level gate that confirms the sub-runs together produced a publisha
 - Every sub-run shows `plan-eval.md = PASS` **and** `evaluate.md = PASS`.
 - No unresolved `architectural` drift; no open `FAIL_*` verdict.
 
-Only then is publishing (E = 26 non-CLI via OIDC at `0.0.1-alpha.0`, then F = `@netscript/cli`
+Only then is publishing (E = **25** non-CLI via OIDC at `0.0.1-alpha.0`, then F = `@netscript/cli`
 last) unblocked — and only on **explicit user dispatch** (publishing is permanent/outward).
