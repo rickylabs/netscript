@@ -147,3 +147,41 @@ Deliverables produced this stage: this doc (`09`) + the authoring brief set unde
 challenge: (a) the five engine decision points §3, (b) whether the §5 exemplar assignments raise the
 bar enough vs. each named competitor, (c) any locked decision the research suggests revisiting, and
 (d) the phase sequencing under the added engine work. In-run plan refinements are authorized.
+
+## 8. Adversarial PLAN-EVAL hooks (M3 review, separate session, FAIL_PLAN pending)
+
+The PLAN-EVAL verdict (`.llm/tmp/run/docs-content-architecture--planeval/plan-eval.md`) is **FAIL_PLAN**
+pending three blocking-gap fixes before re-evaluation:
+
+- **B1 — watchers coverage.** `briefs/00-INDEX.md §Phase 3` explicitly excludes `@netscript/watchers`
+  from the hub clusters with a footnote framing it as "internal/dev-tooling." Verified against
+  `packages/watchers/{mod.ts,README.md,deno.json}` it is a fully publish-configured, README-instrumented
+  JSR-installable package (`createWatcher`, `FileWatcher`, stability/polling/stop). It belongs in a
+  capability hub (proposed: "File watching & ingestion") or as an explicit cluster card on an existing
+  hub. This conflicts with the user north-star ("EVERY public capability gets a reachable, intent-named
+  home") and with this doc's §2a inventory. **Required fix:** add a 10th hub (or explicit cluster card)
+  for `@netscript/watchers` and remove the "internal/dev-tooling" framing.
+- **B2 — accuracy guardrail without teeth.** §2c above names the rule; the briefs echo it as Global
+  Acceptance Bar #1. There is no gate, no scripted check, no per-page worklog. **Required fix:** author
+  `.llm/tools/docs/api-cite.ts` (reads each Markdown page's fenced code blocks, extracts every
+  `import { … } from '@netscript/…'`, runs `deno doc --json` per module, fails the PR on unknown
+  symbols), and add a per-page `docs/site/_plan/worklog/<page>.md` recording the exact `deno doc
+  --filter <symbol>` invocation + commit sha. The supervisor will land both as Stage-4 prep slices,
+  not in this run.
+- **B3 — Phase 0 overloaded.** Components + nav + Shiki + toc + sitemap + callout shim +
+  `comp.breadcrumb` + `comp.nextPrev` ship as one bundle blocking all Phase-1 `.vto` pages. **Required
+  fix:** split into Phase 0a (chrome-only: components + nav + breadcrumb/nextPrev, shippable to Pages)
+  and Phase 0b (engine config: Shiki, toc, sitemap, callout shim). Phase 1 prose can ship against 0a.
+
+Non-blocking refinements recorded in the verdict but not blocking re-PASS:
+
+- §2b queue-adapter list should be tightened: Nitro is not a queue adapter (verified
+  `deno doc @netscript/queue`); queue adapters are **Deno KV + Redis + RabbitMQ**. KV adapters are
+  **Deno KV + Redis + memory** (`packages/kv/adapters/{deno-kv,redis,memory}.adapter.ts`); kvdex and
+  denokv-bridge are helpers, not adapters. Authors must use `deno doc`, not this prose, for the
+  authoritative list.
+- §5 exemplar "match vs beat" gap is closed by the B2 gate script + the rule that every hub page
+  contains at least one annotated, runnable, JSR-import-realistic `comp.tabbedCode` proof (the
+  single most important bar-raising change demanded by the verdict).
+- §3 D-E2 (Shiki) condition should be promoted from prose to a Phase-0b acceptance line (chrome
+  composes with pagefind + base_path + theme tokens; else fall back to Prism).
