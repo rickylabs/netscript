@@ -68,6 +68,7 @@ onboarding — built with **Lume** and deployed to **GitHub Pages**.
 | US-4 | `deno doc --lint` must be **0 on full export** per unit (A1). | Scorecard exit; JSR quality bar. |
 | US-5 | Reference **denominator = 26 publish targets** (25 E-wave + `@netscript/cli`); `@netscript/cli-e2e` excluded (`publish:false`). | Matches the canonical `publish:dry-run` + publish E/F split; see research finding #6. |
 | US-6 | The single `deno doc --lint` debt (`@netscript/fresh-ui`, 7 `private-type-ref`) is fixed by a **WSL Codex source slice** (export the `*Namespace` types), not supervisor doc edits. | Role boundary: supervisor does not write `packages/` code; fix is TS not Markdown. |
+| US-7 | **Pages target = project subpath `https://rickylabs.github.io/netscript/`** (user decision 2026-06-18). Lume `location` MUST be set to this base path; the deploy slice still needs a `workflow`-scoped token (user-provided). | Default GitHub project Pages; no DNS. Base-path config is mandatory or all asset/links break (research §subpath risk). |
 
 ## Open-Decision Sweep
 
@@ -76,7 +77,7 @@ onboarding — built with **Lume** and deployed to **GitHub Pages**.
 | Reference denominator (which units) | **RESOLVED** (US-5) | 26 publish targets; cli-e2e excluded. |
 | Where `deno doc --lint` fixes live | **RESOLVED** (US-6) | 25/26 clean; fresh-ui = 1 Codex source slice (7 edits). |
 | Reference **depth** per unit (fold `*-core` vs full pages) | resolve in Design | Denominator fixed; only presentation depth open. |
-| Pages domain/subpath + Lume `location` config | **user-gated** | Default = project Pages subpath `https://rickylabs.github.io/netscript/`; confirm domain choice. Breaks links if wrong. |
+| Pages domain/subpath + Lume `location` config | **RESOLVED** (US-7) | Project subpath `https://rickylabs.github.io/netscript/`; Lume `location` set to it. |
 | Pages CI YAML push needs `workflow`-scoped token | **user-gated** | Current PAT lacks effective workflow scope; user provides before the deploy slice. |
 | README generation vs hand-authored-with-check | safe to defer | Resolve in Design. |
 
