@@ -29,6 +29,7 @@
     "deps:why": "deno run --allow-read --allow-run .llm/tools/deps/why.ts",
     "deps:audit": "deno run --allow-read --allow-net --allow-run .llm/tools/deps/audit.ts --level low --pretty",
     "deps:prod-install": "deno run --allow-read --allow-write --allow-net --allow-run --allow-env .llm/tools/deps/prod-install.ts --pretty",
+    "deps:census": "deno run --allow-read .llm/tools/deps/census.ts",
     "agentic:sync-claude": "deno run --no-lock --allow-read --allow-write .llm/tools/agentic/sync-claude-skills.ts --pretty",
     "agentic:sync-claude:check": "deno run --no-lock --allow-read .llm/tools/agentic/sync-claude-skills.ts --check --pretty",
     "agentic:check-claude": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts --pretty",
