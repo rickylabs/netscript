@@ -15,5 +15,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 7420344d2675d3f87ec9abe97bab6cb33fb72a18: chore(prod-readiness): G1-3b — remove MSSQL JSON alias
 - 9772843488a0eb3def793c8a66ea4014b6964b45: chore(prod-readiness): G1-3c — migrate MSSQL integrated auth
 - 51c3b60d2d880065d251df860d2790cedee66947: chore(prod-readiness): G1-4 — remove Fresh deprecated options
+- fcd41059c9aa27c016b03fc227c620f9292c635a: chore(prod-readiness): G1-5 — remove workers recurring job API
 
 <!-- appended after each commit -->

@@ -104,6 +104,10 @@ are untouched. Slices run low→high blast radius.
 | 2026-06-18 | G1-5 | `deno doc --lint packages/plugin-workers-core/mod.ts` | PASS | Checked 1 file. |
 | 2026-06-18 | G1-5 | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/plugin-workers-core` and `@netscript/plugin-workers` dry-runs completed successfully in the workspace pass. |
 | 2026-06-18 | G1-5 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0; generated workspace type-check passed after removing scaffolder `.schedule(...)` output. |
+| 2026-06-18 | G1-6 | Bounded dead-code proof sweep | PASS | Ran `deno info --json` for touched package/plugin entrypoints, `find-import-patterns.ts` over G1-0..G1-5 roots + `.llm/tools`, and `find-symbol-usages.ts` for removed symbols. No in-scope candidate met the zero-reference removal threshold; remaining `schedule` hits are runtime/config scheduler plumbing or retained CLI input, and `buildConnectionString` hits are unrelated private adapter methods. No code deleted. |
+| 2026-06-18 | G1-6 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/telemetry --root packages/database --root packages/fresh --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx` | PASS | 401 files selected, 4 batches, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-6 | `deno test -A --unstable-kv packages/telemetry/tests/context/job_test.ts packages/database packages/fresh/src/runtime/server/define-fresh-app.test.ts packages/plugin-workers-core/tests plugins/workers/tests` | PASS | 35 passed, 0 failed. |
+| 2026-06-18 | G1-6 | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; workspace dry-run completed successfully with existing non-fatal dynamic-import/slow-type warnings. |
 
 ## Handoff Notes
 
