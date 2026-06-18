@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/service · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/service</h1>
+      <h1><code>@netscript/service</code></h1>
+<p>Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript
+applications. This page is generated from the package's public surface with <code>deno doc</code>
+(US-2). For the full index of packages and plugins return to the
+<a href="/reference/">reference overview</a>.</p>
+<p>The package has three layers. <strong>Layer 1</strong> exposes small primitives for health, error, RPC,
+OpenAPI, and Scalar docs handlers. <strong>Layer 2</strong> exposes <code>createService()</code>, a fluent builder
+that materializes a mountable <code>ServiceApp</code> or starts a listener. <strong>Layer 3</strong> exposes
+<code>defineService()</code>, the preset used by generated service entrypoints.</p>
+<p>The service router is always an input to the builder. <code>build()</code> returns a non-listening
+<code>ServiceApp</code>, which keeps the RFC 14 unified-platform seam open for callers that mount
+service apps into another host. <code>serve()</code> starts a Deno listener and returns a
+<code>RunningService</code> handle with <code>stop()</code> for tests, local development, and process supervisors.</p>
+<p>Public types are package-owned structural mirrors: callers do not need to import Hono or oRPC
+types to describe a service surface. Runtime interoperability still uses the real Hono app and
+oRPC handlers internally. <code>LoggerMiddlewareOptions</code> is re-exported from the sibling
+<a href="/reference/logger/"><code>@netscript/logger/middleware</code></a> package because it is a first-party
+<code>@netscript/*</code> contract, not an upstream vendor surface.</p>
+<h2>Builder and presets</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createService</code></td>
+<td><code>function createService&lt;T extends ServiceRouter&gt;(router: T, config: ServiceConfig): ServiceBuilder&lt;T&gt;</code></td>
+<td>Factory function to create a new service builder.</td>
+</tr>
+<tr>
+<td><code>defineService</code></td>
+<td><code>async function defineService&lt;T extends ServiceRouter&gt;(router: T, options: DefineServiceOptions): Promise&lt;RunningService&gt;</code></td>
+<td>One-liner preset for creating a fully-configured service.</td>
+</tr>
+</tbody>
+</table>
+<h2>Health primitives</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createHealthHandler</code></td>
+<td><code>function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler</code></td>
+<td>Creates a comprehensive health check handler that runs all checks in parallel.</td>
+</tr>
+<tr>
+<td><code>createLivenessHandler</code></td>
+<td><code>function createLivenessHandler(): ServiceHandler</code></td>
+<td>Creates a simple liveness check handler.</td>
+</tr>
+<tr>
+<td><code>createReadinessHandler</code></td>
+<td><code>function createReadinessHandler(checks: Array&lt;() =&gt; Promise&lt;boolean&gt;&gt;): ServiceHandler</code></td>
+<td>Creates a readiness check handler that runs multiple async checks.</td>
+</tr>
+<tr>
+<td><code>healthChecks</code></td>
+<td><code>const healthChecks: { database; kv; service; custom }</code></td>
+<td>Pre-built health checks for common dependencies (<code>database</code>, <code>kv</code>, <code>service</code>, <code>custom</code>).</td>
+</tr>
+<tr>
+<td><code>HEALTH_STATUS</code></td>
+<td><code>const HEALTH_STATUS: { healthy; degraded; unhealthy }</code></td>
+<td>Health status values emitted by service health handlers.</td>
+</tr>
+</tbody>
+</table>
+<h2>RPC, OpenAPI, and docs handlers</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createRPCHandler</code></td>
+<td><code>function createRPCHandler&lt;T extends ServiceRouter&gt;(router: T, config?: RPCHandlerConfig): FetchHandler</code></td>
+<td>Creates an oRPC RPC handler for type-safe client communication.</td>
+</tr>
+<tr>
+<td><code>createRPCPlugins</code></td>
+<td><code>function createRPCPlugins(config: RPCHandlerConfig): ServiceHandlerPlugin[]</code></td>
+<td>Creates the standard set of oRPC plugins.</td>
+</tr>
+<tr>
+<td><code>createOpenAPIHandler</code></td>
+<td><code>function createOpenAPIHandler&lt;T extends ServiceRouter&gt;(router: T, config?: RPCHandlerConfig): FetchHandler</code></td>
+<td>Creates an oRPC OpenAPI handler for REST-style API access.</td>
+</tr>
+<tr>
+<td><code>createOpenAPISpec</code></td>
+<td><code>function createOpenAPISpec&lt;T extends ServiceRouter&gt;(router: T, config: OpenAPIConfig): ServiceHandler</code></td>
+<td>Creates an OpenAPI specification endpoint handler.</td>
+</tr>
+<tr>
+<td><code>createScalarDocs</code></td>
+<td><code>function createScalarDocs(options: ScalarDocsOptions): ServiceHandler</code></td>
+<td>Creates a Scalar API documentation UI handler.</td>
+</tr>
+<tr>
+<td><code>createScalarJs</code></td>
+<td><code>function createScalarJs(): ServiceHandler</code></td>
+<td>Creates a handler to serve the bundled Scalar JS file.</td>
+</tr>
+</tbody>
+</table>
+<h2>Error and routing handlers</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createErrorHandler</code></td>
+<td><code>function createErrorHandler(serviceName: string): ServiceErrorHandler</code></td>
+<td>Creates a global error handler for uncaught exceptions.</td>
+</tr>
+<tr>
+<td><code>createNotFoundHandler</code></td>
+<td><code>function createNotFoundHandler(serviceName: string): ServiceHandler</code></td>
+<td>Creates a 404 Not Found handler for unmatched routes.</td>
+</tr>
+</tbody>
+</table>
+<h2>Configuration and option types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ServiceConfig</code></td>
+<td>interface</td>
+<td>Service configuration options (input to <code>createService</code>).</td>
+</tr>
+<tr>
+<td><code>DefineServiceOptions</code></td>
+<td>interface</td>
+<td>Options for the <code>defineService</code> preset.</td>
+</tr>
+<tr>
+<td><code>ServeOptions</code></td>
+<td>interface</td>
+<td>Options for starting a service listener.</td>
+</tr>
+<tr>
+<td><code>CorsOptions</code></td>
+<td>interface</td>
+<td>CORS options supported by <code>withCors()</code>.</td>
+</tr>
+<tr>
+<td><code>OpenAPIConfig</code></td>
+<td>interface</td>
+<td>Configuration for OpenAPI spec generation.</td>
+</tr>
+<tr>
+<td><code>RPCHandlerConfig</code></td>
+<td>interface</td>
+<td>Configuration options for RPC handlers.</td>
+</tr>
+<tr>
+<td><code>ScalarDocsOptions</code></td>
+<td>interface</td>
+<td>Configuration for the Scalar docs UI.</td>
+</tr>
+<tr>
+<td><code>HealthHandlerOptions</code></td>
+<td>interface</td>
+<td>Options for <code>createHealthHandler</code>.</td>
+</tr>
+<tr>
+<td><code>LoggerMiddlewareOptions</code></td>
+<td>interface</td>
+<td>Options for the logger middleware (re-exported from <code>@netscript/logger/middleware</code>).</td>
+</tr>
+</tbody>
+</table>
+<h2>Service surface types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ServiceBuilder</code></td>
+<td>interface</td>
+<td>Fluent builder for configuring and materializing a NetScript service.</td>
+</tr>
+<tr>
+<td><code>ServiceApp</code></td>
+<td>interface</td>
+<td>Minimal mountable service application returned by <code>build()</code>.</td>
+</tr>
+<tr>
+<td><code>RunningService</code></td>
+<td>interface</td>
+<td>Running service handle returned by <code>serve()</code> and <code>defineService()</code>.</td>
+</tr>
+<tr>
+<td><code>RunningServiceAddress</code></td>
+<td>interface</td>
+<td>Network address assigned to a running service listener.</td>
+</tr>
+<tr>
+<td><code>ServiceContext</code></td>
+<td>interface</td>
+<td>Minimal context shape exposed to service middleware and handlers.</td>
+</tr>
+<tr>
+<td><code>ServiceRequest</code></td>
+<td>interface</td>
+<td>Minimal request shape exposed to service middleware and handlers.</td>
+</tr>
+<tr>
+<td><code>ServiceMiddleware</code></td>
+<td>interface</td>
+<td>Middleware function accepted by the service builder.</td>
+</tr>
+<tr>
+<td><code>ServiceHandler</code></td>
+<td>interface</td>
+<td>Service route handler accepted by the builder route API.</td>
+</tr>
+<tr>
+<td><code>ServiceHandlerPlugin</code></td>
+<td>interface</td>
+<td>Structural oRPC plugin accepted by service handler factories.</td>
+</tr>
+<tr>
+<td><code>ServiceErrorHandler</code></td>
+<td>interface</td>
+<td>Error handler used by service applications.</td>
+</tr>
+<tr>
+<td><code>FetchHandler</code></td>
+<td>interface</td>
+<td>Structural fetch handler used by RPC and OpenAPI service adapters.</td>
+</tr>
+<tr>
+<td><code>FetchHandlerResult</code></td>
+<td>interface</td>
+<td>Result returned by oRPC-compatible fetch handlers.</td>
+</tr>
+</tbody>
+</table>
+<h2>Health types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HealthCheck</code></td>
+<td>interface</td>
+<td>A single health check definition.</td>
+</tr>
+<tr>
+<td><code>HealthResponse</code></td>
+<td>interface</td>
+<td>Response format for the health endpoint.</td>
+</tr>
+<tr>
+<td><code>Database</code></td>
+<td>interface</td>
+<td>Database client capable of a health-check query.</td>
+</tr>
+<tr>
+<td><code>HealthStatus</code></td>
+<td>type alias</td>
+<td>Health status emitted by the service health endpoint (<code>typeof HEALTH_STATUS[keyof typeof HEALTH_STATUS]</code>).</td>
+</tr>
+</tbody>
+</table>
+<h2>Router and context type aliases</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ServiceRouter</code></td>
+<td><code>type ServiceRouter = Record&lt;string, unknown&gt;</code></td>
+<td>Router definition accepted by the service builder and handler factories.</td>
+</tr>
+<tr>
+<td><code>ContextFactory</code></td>
+<td><code>type ContextFactory = (context: ServiceContext) =&gt; Record&lt;string, unknown&gt;</code></td>
+<td>Creates per-request service handler context.</td>
+</tr>
+<tr>
+<td><code>DbContext</code></td>
+<td><code>type DbContext = Record&lt;string, unknown&gt;</code></td>
+<td>Database context injected into service handler context.</td>
+</tr>
+</tbody>
+</table>
+<h2>Exports</h2>
+<p><code>@netscript/service</code> publishes a single root entrypoint. There are no sub-path exports.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/service</code></td>
+<td><code>./mod.ts</code></td>
+<td>Full service surface (documented above).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

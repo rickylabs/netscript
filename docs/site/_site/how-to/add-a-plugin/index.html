@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Add a first-party plugin · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>Add a first-party plugin</h1>
+      <h1>Add a first-party plugin</h1>
+<p><strong>Goal:</strong> add one of NetScript's first-party plugins — workers, sagas, triggers, or
+streams — to an existing workspace, register it, and confirm it is wired up.</p>
+<p>This is a task-oriented recipe. It assumes you already have a NetScript workspace
+(created with <code>netscript init</code>) and that the <code>netscript</code> command is on your path. For the
+exact APIs each plugin exposes, follow the reference links at the end. For the design
+behind the plugin model, see the <a href="/explanation/">explanation</a> section.</p>
+<h2>Before you start</h2>
+<p>You need:</p>
+<ul>
+<li>An existing NetScript workspace. If you do not have one yet, create it first
+(<code>netscript init</code>) — see the <a href="/tutorials/">tutorials</a>.</li>
+<li>The <code>netscript</code> command available. Run <code>netscript --help</code> to confirm, and
+<code>netscript plugin --help</code> for the option spelling in your installed version.</li>
+</ul>
+<p>Throughout this guide, run commands from your workspace root. Where a command needs to
+target a specific project, pass <code>--project-root &lt;path&gt;</code> (it defaults to the current
+directory).</p>
+<h2>Step 1 — Choose the plugin kind</h2>
+<p>Each first-party plugin has a <em>kind</em> you pass to the command and a conventional installed
+<em>name</em>:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Conventional name</th>
+<th>JSR package</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>worker</code></td>
+<td><code>workers</code></td>
+<td><code>@netscript/plugin-workers</code></td>
+</tr>
+<tr>
+<td><code>saga</code></td>
+<td><code>sagas</code></td>
+<td><code>@netscript/plugin-sagas</code></td>
+</tr>
+<tr>
+<td><code>trigger</code></td>
+<td><code>triggers</code></td>
+<td><code>@netscript/plugin-triggers</code></td>
+</tr>
+<tr>
+<td><code>stream</code></td>
+<td><code>streams</code></td>
+<td><code>@netscript/plugin-streams</code></td>
+</tr>
+</tbody>
+</table>
+<p>Pick the kind for the capability you need:</p>
+<ul>
+<li><strong>workers</strong> — background job scheduling, task execution, and worker API endpoints.</li>
+<li><strong>sagas</strong> — durable saga orchestration and workflow APIs.</li>
+<li><strong>triggers</strong> — trigger ingress, scheduling, and file watching.</li>
+<li><strong>streams</strong> — durable, change-data stream services.</li>
+</ul>
+<h2>Step 2 — Add the plugin</h2>
+<p>Run <code>netscript plugin add</code> with the kind. This scaffolds the plugin package and updates
+your workspace plugin registration:</p>
+<pre><code class="language-bash">netscript plugin add worker --name workers
+</code></pre>
+<p>Useful options (run <code>netscript plugin add --help</code> for the full, version-accurate list):</p>
+<ul>
+<li><code>--name &lt;name&gt;</code> — the installed plugin name (use the conventional name above unless you
+have a reason to differ).</li>
+<li><code>--samples</code> / <code>--no-samples</code> — include or omit sample/example code.</li>
+<li><code>--project-root &lt;path&gt;</code> — target a workspace other than the current directory.</li>
+<li><code>--port &lt;port&gt;</code> — set the plugin service port where applicable.</li>
+<li><code>--service-refs &lt;refs&gt;</code> / <code>--plugin-refs &lt;refs&gt;</code> — wire references to existing services
+or plugins.</li>
+<li><code>--db &lt;engine-or-key&gt;</code> / <code>--no-db</code> — configure or skip database wiring.</li>
+<li><code>--force</code> — overwrite existing files when re-running.</li>
+</ul>
+<p>To add the other plugins, repeat with the matching kind, for example:</p>
+<pre><code class="language-bash">netscript plugin add saga --name sagas
+netscript plugin add trigger --name triggers
+netscript plugin add stream --name streams
+</code></pre>
+<h2>Step 3 — Generate the plugin registry</h2>
+<p>After adding plugins, regenerate the plugin registries so the runtime can discover them:</p>
+<pre><code class="language-bash">netscript generate plugins
+</code></pre>
+<p>If a plugin contributes runtime configuration schemas, also run:</p>
+<pre><code class="language-bash">netscript generate runtime-schemas
+</code></pre>
+<h2>Step 4 — Verify the plugin is registered</h2>
+<p>List the registered plugins to confirm your new plugin appears:</p>
+<pre><code class="language-bash">netscript plugin list
+</code></pre>
+<p>Then run the health check:</p>
+<pre><code class="language-bash">netscript plugin doctor
+</code></pre>
+<p><code>plugin doctor</code> checks installed NetScript plugin health and reports wiring problems. A
+clean run means the plugin is registered and ready to use.</p>
+<h2>Next steps</h2>
+<ul>
+<li>Use the plugin's APIs — see its reference page:
+<a href="/reference/workers/"><code>@netscript/plugin-workers</code></a>,
+<a href="/reference/sagas/"><code>@netscript/plugin-sagas</code></a>,
+<a href="/reference/triggers/"><code>@netscript/plugin-triggers</code></a>, and
+<a href="/reference/streams/"><code>@netscript/plugin-streams</code></a>.</li>
+<li>Manage plugins later with <code>netscript plugin info</code>, <code>netscript plugin update</code>, and
+<code>netscript plugin remove</code> (run <code>netscript plugin --help</code> for details).</li>
+<li>Browse the full package and plugin index in the <a href="/reference/">reference</a>, or read the
+<a href="/explanation/">explanation</a> for the concepts behind the plugin model.</li>
+</ul>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

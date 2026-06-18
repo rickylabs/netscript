@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/plugin · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/plugin</h1>
+      <h1><code>@netscript/plugin</code></h1>
+<p>Plugin manifest, validation, discovery, and host-context contracts for NetScript. This page
+is generated from the package's public surface with <code>deno doc</code> (US-2). For the full index of
+packages and plugins return to the <a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/plugin</code>) is the plugin authoring contract: the
+<code>definePlugin</code> builder DSL, the manifest and contribution types, the plugin error classes,
+the contribution base class, and the <code>inspectPlugin</code> diagnostic. Host tooling, CLI
+integration, SDK discovery, abstract contribution bases, runtime loaders, testing fixtures,
+and template assets live on the sub-path exports listed at the end of this page.</p>
+<h2>Plugin definition</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>definePlugin</code></td>
+<td><code>function definePlugin&lt;TName, TVersion&gt;(name: TName, version: TVersion): PluginBuilder</code></td>
+<td>Start a new plugin manifest builder chain.</td>
+</tr>
+<tr>
+<td><code>PluginBuilder</code></td>
+<td><code>class PluginBuilder</code></td>
+<td>Fluent builder for assembling plugin manifests.</td>
+</tr>
+<tr>
+<td><code>PluginBuilderState</code></td>
+<td><code>interface PluginBuilderState</code></td>
+<td>Immutable state accumulated by the plugin builder chain.</td>
+</tr>
+<tr>
+<td><code>PLUGIN_TYPES</code></td>
+<td><code>variable PLUGIN_TYPES</code></td>
+<td>Supported plugin categories.</td>
+</tr>
+</tbody>
+</table>
+<h2>Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inspectPlugin</code></td>
+<td><code>function inspectPlugin(target): InspectionReport</code></td>
+<td>Inspect a plugin manifest, registry, or path-like target.</td>
+</tr>
+<tr>
+<td><code>InspectionReport</code></td>
+<td><code>interface InspectionReport</code></td>
+<td>JSON-stable diagnostic report returned by plugin inspectors.</td>
+</tr>
+<tr>
+<td><code>InspectablePluginManifest</code></td>
+<td><code>interface InspectablePluginManifest</code></td>
+<td>Minimal plugin manifest shape accepted by the plugin inspector.</td>
+</tr>
+<tr>
+<td><code>InspectablePluginRegistry</code></td>
+<td><code>interface InspectablePluginRegistry</code></td>
+<td>Minimal registry shape accepted by the plugin inspector.</td>
+</tr>
+</tbody>
+</table>
+<h2>Errors</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PluginError</code></td>
+<td>class</td>
+<td>Base error for plugin package failures.</td>
+</tr>
+<tr>
+<td><code>PluginValidationError</code></td>
+<td>class</td>
+<td>Error thrown when a plugin definition is invalid.</td>
+</tr>
+<tr>
+<td><code>DuplicatePluginError</code></td>
+<td>class</td>
+<td>Error thrown when a plugin name is registered more than once.</td>
+</tr>
+</tbody>
+</table>
+<h2>Contributions</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PluginContribution</code></td>
+<td>class</td>
+<td>Base class for plugin contribution extension axes.</td>
+</tr>
+<tr>
+<td><code>ContributionAxis</code></td>
+<td>type alias</td>
+<td>Supported plugin contribution axes.</td>
+</tr>
+<tr>
+<td><code>ContributionInput</code></td>
+<td>type alias</td>
+<td>Contribution value or callback resolved by the plugin builder.</td>
+</tr>
+<tr>
+<td><code>PluginContributions</code></td>
+<td>interface</td>
+<td>Contribution groups supported by plugin manifests.</td>
+</tr>
+<tr>
+<td><code>BackgroundProcessorContribution</code></td>
+<td>interface</td>
+<td>Background processor contributed by a plugin.</td>
+</tr>
+<tr>
+<td><code>ContractVersionContribution</code></td>
+<td>interface</td>
+<td>Contract version contributed by a plugin.</td>
+</tr>
+<tr>
+<td><code>DbSchemaContribution</code></td>
+<td>interface</td>
+<td>Database schema file contributed by a plugin.</td>
+</tr>
+<tr>
+<td><code>E2eContribution</code></td>
+<td>interface</td>
+<td>End-to-end test contribution.</td>
+</tr>
+<tr>
+<td><code>MigrationContribution</code></td>
+<td>interface</td>
+<td>Data or schema migration contribution.</td>
+</tr>
+<tr>
+<td><code>RuntimeConfigTopicContribution</code></td>
+<td>interface</td>
+<td>Runtime config topic contributed by a plugin.</td>
+</tr>
+<tr>
+<td><code>ServiceContribution</code></td>
+<td>interface</td>
+<td>Service contributed by a plugin.</td>
+</tr>
+<tr>
+<td><code>StreamTopicContribution</code></td>
+<td>interface</td>
+<td>Stream topic contributed by a plugin.</td>
+</tr>
+<tr>
+<td><code>TelemetryContribution</code></td>
+<td>interface</td>
+<td>Telemetry instrumentation contribution.</td>
+</tr>
+</tbody>
+</table>
+<h2>Manifest types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PluginManifest</code></td>
+<td>interface</td>
+<td>Plugin manifest consumed by NetScript hosts and tooling.</td>
+</tr>
+<tr>
+<td><code>PluginManifestParser</code></td>
+<td>interface</td>
+<td>Minimal parser shape for manifest validators exposed by this package.</td>
+</tr>
+<tr>
+<td><code>PluginMetadata</code></td>
+<td>type alias</td>
+<td>Metadata attached to plugin manifests.</td>
+</tr>
+<tr>
+<td><code>PluginMetadataValue</code></td>
+<td>type alias</td>
+<td>Runtime-safe metadata values.</td>
+</tr>
+<tr>
+<td><code>PluginType</code></td>
+<td>type alias</td>
+<td>Supported plugin categories.</td>
+</tr>
+<tr>
+<td><code>PluginDependencies</code></td>
+<td>type alias</td>
+<td>Typed plugin dependency record keyed by caller-chosen aliases.</td>
+</tr>
+<tr>
+<td><code>DependencyContext</code></td>
+<td>type alias</td>
+<td>Dependency context supplied to contribution callback inputs.</td>
+</tr>
+</tbody>
+</table>
+<h2>Lifecycle and context</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PluginLifecycleHooks</code></td>
+<td>interface</td>
+<td>Lifecycle hooks supported by plugin definitions.</td>
+</tr>
+<tr>
+<td><code>PluginContext</code></td>
+<td>interface</td>
+<td>Context supplied to plugin lifecycle hooks.</td>
+</tr>
+<tr>
+<td><code>PluginLogger</code></td>
+<td>interface</td>
+<td>Logger shape supplied to plugin lifecycle hooks.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export. Their public surfaces are
+generated separately from their own <code>deno doc</code> output and summarized below.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/plugin</code></td>
+<td><code>./mod.ts</code></td>
+<td>Plugin authoring contract (documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin/config</code></td>
+<td><code>./src/config/mod.ts</code></td>
+<td>Builder, manifest schema, and contribution type contracts.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin/abstracts</code></td>
+<td><code>./src/abstracts/mod.ts</code></td>
+<td>Abstract contribution base classes per axis.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin/cli</code></td>
+<td><code>./src/cli/mod.ts</code></td>
+<td>Plugin CLI base classes, command mounting, and doctor reports.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin/sdk</code></td>
+<td><code>./src/sdk/mod.ts</code></td>
+<td>Discovery ports, alpha adapters, and runtime host stubs.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin/loader</code></td>
+<td><code>./loader.ts</code></td>
+<td>Host-side plugin service bootstrap helpers.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin/testing</code></td>
+<td><code>./src/testing/mod.ts</code></td>
+<td>In-memory adapters, fixtures, and the CLI contract harness.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin/templates</code></td>
+<td><code>./src/templates/mod.ts</code></td>
+<td>Plugin skeleton template asset paths.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/plugin/config</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>definePlugin</code></td>
+<td><code>function definePlugin&lt;TName, TVersion&gt;(name, version): PluginBuilder</code></td>
+<td>Start a new plugin manifest builder chain.</td>
+</tr>
+<tr>
+<td><code>mergeContributions</code></td>
+<td><code>function mergeContributions(base, overrides): PluginContributions</code></td>
+<td>Merge plugin contribution groups without mutating inputs.</td>
+</tr>
+<tr>
+<td><code>isContributionAxis</code></td>
+<td><code>function isContributionAxis(value: string): boolean</code></td>
+<td>Check whether a value is a supported contribution axis.</td>
+</tr>
+<tr>
+<td><code>isReservedPluginName</code></td>
+<td><code>function isReservedPluginName(name: string): boolean</code></td>
+<td>Return true when a plugin name is reserved by NetScript.</td>
+</tr>
+<tr>
+<td><code>PluginManifestSchema</code></td>
+<td><code>variable PluginManifestSchema</code></td>
+<td>Zod schema for plugin manifests.</td>
+</tr>
+<tr>
+<td><code>CONTRIBUTION_AXES</code></td>
+<td><code>variable CONTRIBUTION_AXES</code></td>
+<td>Supported plugin contribution axes.</td>
+</tr>
+<tr>
+<td><code>PLUGIN_TYPES</code></td>
+<td><code>variable PLUGIN_TYPES</code></td>
+<td>Supported plugin categories.</td>
+</tr>
+</tbody>
+</table>
+<p>This entrypoint also re-exports the manifest, contribution, and builder types documented in
+the root sections above.</p>
+<h3><code>@netscript/plugin/abstracts</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PluginContribution</code></td>
+<td>class</td>
+<td>Base class for plugin contribution extension axes.</td>
+</tr>
+<tr>
+<td><code>PluginAspireContribution</code></td>
+<td>class</td>
+<td>Base class for Aspire contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginBackgroundProcessorContribution</code></td>
+<td>class</td>
+<td>Base class for background processor contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginContractVersionContribution</code></td>
+<td>class</td>
+<td>Base class for contract version contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginDbSchemaContribution</code></td>
+<td>class</td>
+<td>Base class for database schema contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginE2eContribution</code></td>
+<td>class</td>
+<td>Base class for end-to-end contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginMigrationContribution</code></td>
+<td>class</td>
+<td>Base class for migration contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginRuntimeConfigTopicContribution</code></td>
+<td>class</td>
+<td>Base class for runtime config topic contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginServiceContribution</code></td>
+<td>class</td>
+<td>Base class for service contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginStreamTopicContribution</code></td>
+<td>class</td>
+<td>Base class for stream topic contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginTelemetryContribution</code></td>
+<td>class</td>
+<td>Base class for telemetry contribution implementations.</td>
+</tr>
+<tr>
+<td><code>PluginPayloadSchema</code></td>
+<td>interface</td>
+<td>Minimal Standard Schema-compatible shape accepted by plugin contribution contracts.</td>
+</tr>
+<tr>
+<td><code>PluginSchemaIssue</code></td>
+<td>interface</td>
+<td>Validation issue reported by package-owned schema contracts.</td>
+</tr>
+<tr>
+<td><code>PluginSchemaResult</code></td>
+<td>type alias</td>
+<td>Validation result returned by package-owned schema contracts.</td>
+</tr>
+<tr>
+<td><code>ContributionAxis</code></td>
+<td>type alias</td>
+<td>Supported plugin contribution axes.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/plugin/cli</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PluginCli</code></td>
+<td><code>class PluginCli</code></td>
+<td>Abstract base class for plugin-owned CLI command groups.</td>
+</tr>
+<tr>
+<td><code>PluginItemScaffolder</code></td>
+<td><code>class PluginItemScaffolder</code></td>
+<td>Abstract base for plugin item scaffolders (the <code>add &lt;item&gt;</code> command).</td>
+</tr>
+<tr>
+<td><code>PluginRuntimeConfigCli</code></td>
+<td><code>class PluginRuntimeConfigCli</code></td>
+<td>Abstract base for plugin runtime configuration commands.</td>
+</tr>
+<tr>
+<td><code>mountPluginCli</code></td>
+<td><code>function mountPluginCli(clis)</code></td>
+<td>Mount plugin CLI command groups into a flat command list.</td>
+</tr>
+<tr>
+<td><code>runMountedCommand</code></td>
+<td><code>async function runMountedCommand(commands, args: PluginCliArgs): Promise</code></td>
+<td>Run a mounted command list without depending on Cliffy at package level.</td>
+</tr>
+<tr>
+<td><code>routeVerb</code></td>
+<td><code>async function routeVerb(commands, args: PluginCliArgs): Promise</code></td>
+<td>Route a command by verb name.</td>
+</tr>
+<tr>
+<td><code>formatPluginHelp</code></td>
+<td><code>function formatPluginHelp(commands): string</code></td>
+<td>Format command help text for a mounted plugin CLI.</td>
+</tr>
+<tr>
+<td><code>isDoctorReportPassing</code></td>
+<td><code>function isDoctorReportPassing(report: DoctorReport): boolean</code></td>
+<td>Return true when every doctor check is passing.</td>
+</tr>
+<tr>
+<td><code>PluginCliArgs</code></td>
+<td><code>interface PluginCliArgs</code></td>
+<td>Command arguments passed to plugin CLI handlers.</td>
+</tr>
+<tr>
+<td><code>PluginCliCommand</code></td>
+<td><code>interface PluginCliCommand</code></td>
+<td>A mounted CLI command handler.</td>
+</tr>
+<tr>
+<td><code>PluginCliResult</code></td>
+<td><code>interface PluginCliResult</code></td>
+<td>Result returned by plugin CLI handlers.</td>
+</tr>
+<tr>
+<td><code>PluginScaffoldResult</code></td>
+<td><code>interface PluginScaffoldResult</code></td>
+<td>Result returned by plugin item scaffolders.</td>
+</tr>
+<tr>
+<td><code>DoctorCheck</code></td>
+<td><code>interface DoctorCheck</code></td>
+<td>Diagnostic entry produced by plugin doctor commands.</td>
+</tr>
+<tr>
+<td><code>DoctorReport</code></td>
+<td><code>interface DoctorReport</code></td>
+<td>Aggregate doctor report for a plugin CLI.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/plugin/sdk</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>runWalkerPipeline</code></td>
+<td><code>async function runWalkerPipeline(options: RunWalkerPipelineOptions): Promise</code></td>
+<td>Run the plugin SDK discovery pipeline.</td>
+</tr>
+<tr>
+<td><code>startWalker</code></td>
+<td><code>function startWalker(root: string): Promise</code></td>
+<td>Start a one-shot SDK walker with default alpha adapters.</td>
+</tr>
+<tr>
+<td><code>startWatcher</code></td>
+<td><code>function startWatcher(): WatcherHandle</code></td>
+<td>Start a no-op alpha watcher for plugin SDK discovery.</td>
+</tr>
+<tr>
+<td><code>createSourceGraph</code></td>
+<td><code>function createSourceGraph(files, contributions): SourceGraph</code></td>
+<td>Create a source graph snapshot from walked files and extracted contributions.</td>
+</tr>
+<tr>
+<td><code>createWatcherHandle</code></td>
+<td><code>function createWatcherHandle(): WatcherHandle</code></td>
+<td>Create a no-op watcher handle for alpha SDK discovery.</td>
+</tr>
+<tr>
+<td><code>createInstrumentationBridge</code></td>
+<td><code>function createInstrumentationBridge()</code></td>
+<td>Create a recording instrumentation bridge.</td>
+</tr>
+<tr>
+<td><code>createPluginContext</code></td>
+<td><code>function createPluginContext(projectRoot: string): PluginContext</code></td>
+<td>Create a minimal plugin context for SDK runtime helpers.</td>
+</tr>
+<tr>
+<td><code>createPluginHostBootstrap</code></td>
+<td><code>function createPluginHostBootstrap(plugins): PluginHostBootstrap</code></td>
+<td>Create a plugin host bootstrap snapshot.</td>
+</tr>
+<tr>
+<td><code>runDoctorReport</code></td>
+<td><code>function runDoctorReport(plugin: string, checks): DoctorReport</code></td>
+<td>Run plugin doctor checks and return an aggregate report.</td>
+</tr>
+<tr>
+<td><code>AstExtractor</code></td>
+<td>class</td>
+<td>Extractor for exported plugin contribution builder call sites.</td>
+</tr>
+<tr>
+<td><code>FilesystemWalker</code></td>
+<td>class</td>
+<td>Filesystem walker for plugin source discovery.</td>
+</tr>
+<tr>
+<td><code>MemoryManifestResolver</code></td>
+<td>class</td>
+<td>In-memory manifest resolver used by tests and alpha SDK stubs.</td>
+</tr>
+<tr>
+<td><code>ModuleManifestResolver</code></td>
+<td>class</td>
+<td>Manifest resolver backed by dynamic imports.</td>
+</tr>
+<tr>
+<td><code>RegistryEmitter</code></td>
+<td>class</td>
+<td>Registry emitter that writes one generated TypeScript module per contribution axis.</td>
+</tr>
+<tr>
+<td><code>EmitterPort</code></td>
+<td>interface</td>
+<td>Port for emitting generated plugin registry files.</td>
+</tr>
+<tr>
+<td><code>ExtractorPort</code></td>
+<td>interface</td>
+<td>Port for extracting plugin contributions from walked files.</td>
+</tr>
+<tr>
+<td><code>ManifestResolverPort</code></td>
+<td>interface</td>
+<td>Port for resolving a plugin manifest from a package or module specifier.</td>
+</tr>
+<tr>
+<td><code>WalkerPort</code></td>
+<td>interface</td>
+<td>Port for discovering plugin source files.</td>
+</tr>
+<tr>
+<td><code>WalkedFile</code></td>
+<td>interface</td>
+<td>File discovered by a plugin source walker.</td>
+</tr>
+<tr>
+<td><code>SourceGraph</code></td>
+<td>interface</td>
+<td>Source graph snapshot produced by discovery.</td>
+</tr>
+<tr>
+<td><code>RegistryEmission</code></td>
+<td>interface</td>
+<td>Output emitted by the registry emitter.</td>
+</tr>
+<tr>
+<td><code>ExtractedContribution</code></td>
+<td>interface</td>
+<td>Extracted contribution candidate from source.</td>
+</tr>
+<tr>
+<td><code>WatcherHandle</code></td>
+<td>interface</td>
+<td>Watcher handle returned by SDK watch presets.</td>
+</tr>
+<tr>
+<td><code>ModuleManifestResolverOptions</code></td>
+<td>interface</td>
+<td>Options for resolving manifests from importable module specifiers.</td>
+</tr>
+<tr>
+<td><code>RunWalkerPipelineOptions</code></td>
+<td>interface</td>
+<td>Options for running the SDK walker pipeline.</td>
+</tr>
+<tr>
+<td><code>InstrumentationBridge</code></td>
+<td>interface</td>
+<td>Bridge between plugin runtime and telemetry instrumentation.</td>
+</tr>
+<tr>
+<td><code>PluginHostBootstrap</code></td>
+<td>interface</td>
+<td>Result of bootstrapping plugin host state.</td>
+</tr>
+<tr>
+<td><code>PluginServiceContext</code></td>
+<td>interface</td>
+<td>Context supplied to a plugin service at runtime.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/plugin/loader</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createPluginLogger</code></td>
+<td><code>function createPluginLogger(pluginName: string): PluginLogger</code></td>
+<td>Create a logger scoped to a plugin service process.</td>
+</tr>
+<tr>
+<td><code>PluginLogger</code></td>
+<td><code>interface PluginLogger</code></td>
+<td>Minimal logger shape supplied to plugin service contexts.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/plugin/testing</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createPluginManifestFixture</code></td>
+<td><code>function createPluginManifestFixture(overrides?): PluginManifest</code></td>
+<td>Example plugin manifest fixture.</td>
+</tr>
+<tr>
+<td><code>createWalkedFileFixture</code></td>
+<td><code>function createWalkedFileFixture(overrides?): WalkedFile</code></td>
+<td>Example walked file fixture.</td>
+</tr>
+<tr>
+<td><code>runPluginCliContract</code></td>
+<td><code>function runPluginCliContract(cli: PluginCli): boolean</code></td>
+<td>Run the shared plugin CLI contract against a CLI instance.</td>
+</tr>
+<tr>
+<td><code>MemoryManifestResolver</code></td>
+<td>class</td>
+<td>In-memory manifest resolver used by tests and alpha SDK stubs.</td>
+</tr>
+<tr>
+<td><code>MemoryWalker</code></td>
+<td>class</td>
+<td>In-memory walker for plugin source discovery.</td>
+</tr>
+<tr>
+<td><code>MemoryEmitter</code></td>
+<td>class</td>
+<td>In-memory registry emitter for plugin tests.</td>
+</tr>
+<tr>
+<td><code>MemoryFileSystemAdapter</code></td>
+<td>class</td>
+<td>In-memory file system adapter for plugin tests.</td>
+</tr>
+<tr>
+<td><code>FileSystemPort</code></td>
+<td>interface</td>
+<td>Minimal file system port used by plugin scaffolding.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/plugin/templates</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PLUGIN_SKELETON_TEMPLATES</code></td>
+<td>variable</td>
+<td>Paths for plugin skeleton template assets.</td>
+</tr>
+<tr>
+<td><code>PluginSkeletonTemplatePath</code></td>
+<td>type alias</td>
+<td>Plugin skeleton template path.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

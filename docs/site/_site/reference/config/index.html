@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/config · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/config</h1>
+      <h1><code>@netscript/config</code></h1>
+<p>Typed NetScript project configuration: schemas, loaders, environment helpers, workspace discovery, diagnostics, and scaffold constants. This page is generated from the package public surface with <code>deno doc</code> (US-2). For the full index of packages and plugins return to the <a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/config</code>) exposes the authoring, loading, environment, workspace, and diagnostic contract. The usual path is to define a project config once with <code>defineConfig</code> in <code>netscript.config.ts</code>, load it at process startup with <code>initConfig</code>, and read the validated <code>NetScriptConfig</code> synchronously with <code>getConfig</code>. Schema-only APIs live on sub-paths so the public root surface does not leak Zod internals:</p>
+<ul>
+<li><a href="#sub-path-config-merge"><code>@netscript/config/merge</code></a> merges plugin-contributed partial config fragments.</li>
+<li><a href="#sub-path-config-paths"><code>@netscript/config/paths</code></a> exposes scaffold directory, file, and permission constants.</li>
+<li><a href="#sub-path-config-schema-plugins"><code>@netscript/config/schema/plugins</code></a> exposes appsettings plugin-entry validation schemas.</li>
+</ul>
+<h2>Authoring</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>defineConfig</code></td>
+<td><code>function defineConfig(config: NetScriptConfigInput): NetScriptConfig</code></td>
+<td>Type-safe configuration definition with validation.</td>
+</tr>
+<tr>
+<td><code>defineConfigAsync</code></td>
+<td><code>function defineConfigAsync(configFn): () =&gt; Promise&lt;NetScriptConfig&gt;</code></td>
+<td>Configuration definition for async/environment-based configs.</td>
+</tr>
+<tr>
+<td><code>defineSagas</code></td>
+<td><code>function defineSagas(config: SagasConfigInput): SagasConfigInput</code></td>
+<td>Define a split saga config module.</td>
+</tr>
+</tbody>
+</table>
+<h2>Loading and runtime cache</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>loadConfig</code></td>
+<td><code>async function loadConfig(options?: LoadConfigOptions): Promise&lt;NetScriptConfig&gt;</code></td>
+<td>Load and validate a NetScript configuration file.</td>
+</tr>
+<tr>
+<td><code>initConfig</code></td>
+<td><code>async function initConfig(options?: LoadConfigOptions): Promise&lt;NetScriptConfig&gt;</code></td>
+<td>Initialize and cache the configuration.</td>
+</tr>
+<tr>
+<td><code>getConfig</code></td>
+<td><code>function getConfig(): NetScriptConfig</code></td>
+<td>Get the cached configuration synchronously after initialization.</td>
+</tr>
+<tr>
+<td><code>isConfigLoaded</code></td>
+<td><code>function isConfigLoaded(): boolean</code></td>
+<td>Check whether configuration has been loaded.</td>
+</tr>
+<tr>
+<td><code>clearConfigCache</code></td>
+<td><code>function clearConfigCache(): void</code></td>
+<td>Clear the cached configuration.</td>
+</tr>
+</tbody>
+</table>
+<h2>Environment</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getEnv</code></td>
+<td><code>function getEnv&lt;T extends EnvDef&gt;(name: string, options?: T): ResolvedEnvType&lt;T&gt;</code></td>
+<td>Get a single environment variable with type coercion.</td>
+</tr>
+<tr>
+<td><code>resolveEnv</code></td>
+<td><code>function resolveEnv&lt;T extends Record&lt;string, EnvDef&gt;&gt;(schema: T)</code></td>
+<td>Resolve environment variables with type coercion and defaults.</td>
+</tr>
+<tr>
+<td><code>hasEnv</code></td>
+<td><code>function hasEnv(name: string): boolean</code></td>
+<td>Check if an environment variable is set.</td>
+</tr>
+<tr>
+<td><code>getMode</code></td>
+<td><code>function getMode(): &quot;development&quot; | &quot;production&quot; | &quot;test&quot;</code></td>
+<td>Get the current environment mode.</td>
+</tr>
+<tr>
+<td><code>isDev</code></td>
+<td><code>function isDev(): boolean</code></td>
+<td>Check if running in development mode.</td>
+</tr>
+<tr>
+<td><code>isProd</code></td>
+<td><code>function isProd(): boolean</code></td>
+<td>Check if running in production mode.</td>
+</tr>
+<tr>
+<td><code>isTest</code></td>
+<td><code>function isTest(): boolean</code></td>
+<td>Check if running in test mode.</td>
+</tr>
+</tbody>
+</table>
+<h2>Workspace discovery</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>discoverWorkspace</code></td>
+<td><code>async function discoverWorkspace(rootDir?: string): Promise&lt;WorkspaceMap&gt;</code></td>
+<td>Discover and classify Deno workspace members.</td>
+</tr>
+<tr>
+<td><code>findWorkspaceRoot</code></td>
+<td><code>async function findWorkspaceRoot(startDir: string): Promise&lt;string&gt;</code></td>
+<td>Find the nearest Deno workspace root from a starting directory.</td>
+</tr>
+<tr>
+<td><code>findMember</code></td>
+<td><code>function findMember(workspace: WorkspaceMap, memberName: string): WorkspaceMember | undefined</code></td>
+<td>Find a workspace member by package name or relative path.</td>
+</tr>
+<tr>
+<td><code>getMemberEntrypoint</code></td>
+<td><code>function getMemberEntrypoint(member: WorkspaceMember): string</code></td>
+<td>Resolve the default entrypoint for a workspace member.</td>
+</tr>
+</tbody>
+</table>
+<h2>Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inspectConfig</code></td>
+<td><code>function inspectConfig(target): InspectionReport</code></td>
+<td>Inspect a config target and return a JSON-stable diagnostic report.</td>
+</tr>
+</tbody>
+</table>
+<h2>Types</h2>
+<p>Core authoring/validation contract and per-section configuration shapes exported from the root.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NetScriptConfig</code></td>
+<td>interface</td>
+<td>Fully validated NetScript configuration.</td>
+</tr>
+<tr>
+<td><code>NetScriptConfigInput</code></td>
+<td>interface</td>
+<td>Authoring form accepted by <code>defineConfig</code> and <code>loadConfig</code>.</td>
+</tr>
+<tr>
+<td><code>ConfigEnv</code></td>
+<td>interface</td>
+<td>Environment context provided to async config functions.</td>
+</tr>
+<tr>
+<td><code>LoadConfigOptions</code></td>
+<td>interface</td>
+<td>Options for loading configuration files.</td>
+</tr>
+<tr>
+<td><code>InspectionReport</code></td>
+<td>interface</td>
+<td>JSON-stable diagnostic report returned by config inspectors.</td>
+</tr>
+<tr>
+<td><code>EnvDef</code></td>
+<td>interface</td>
+<td>Environment variable definition for <code>resolveEnv</code>.</td>
+</tr>
+<tr>
+<td><code>ResolvedEnvType</code></td>
+<td>type alias</td>
+<td>Resolved environment variable type based on an <code>EnvDef</code>.</td>
+</tr>
+<tr>
+<td><code>ServiceConfig</code></td>
+<td>interface</td>
+<td>Service configuration definition.</td>
+</tr>
+<tr>
+<td><code>AppConfig</code></td>
+<td>interface</td>
+<td>Frontend application configuration definition.</td>
+</tr>
+<tr>
+<td><code>DatabaseConfig</code></td>
+<td>interface</td>
+<td>Database configuration definition.</td>
+</tr>
+<tr>
+<td><code>DatabasesConfig</code></td>
+<td>interface</td>
+<td>Database section with optional active provider selector.</td>
+</tr>
+<tr>
+<td><code>DatabaseProvider</code></td>
+<td>type alias</td>
+<td>Database provider accepted by project configuration.</td>
+</tr>
+<tr>
+<td><code>GatewayConfig</code></td>
+<td>interface</td>
+<td>Gateway configuration section.</td>
+</tr>
+<tr>
+<td><code>LoggingConfig</code></td>
+<td>interface</td>
+<td>Logging configuration used by runtime and CLI entrypoints.</td>
+</tr>
+<tr>
+<td><code>PathsConfig</code></td>
+<td>interface</td>
+<td>Workspace-aware path conventions used by CLI and generators.</td>
+</tr>
+<tr>
+<td><code>SdkConfig</code></td>
+<td>interface</td>
+<td>SDK generation configuration section.</td>
+</tr>
+<tr>
+<td><code>AspireConfig</code></td>
+<td>interface</td>
+<td>Aspire orchestration settings for generated AppHost projects.</td>
+</tr>
+<tr>
+<td><code>DeployConfig</code></td>
+<td>interface</td>
+<td>Top-level deployment configuration type.</td>
+</tr>
+<tr>
+<td><code>WindowsDeployConfig</code></td>
+<td>interface</td>
+<td>Windows-specific deployment configuration type.</td>
+</tr>
+<tr>
+<td><code>WebhookConfig</code></td>
+<td>interface</td>
+<td>Webhook configuration type.</td>
+</tr>
+<tr>
+<td><code>PermissionConfig</code></td>
+<td>interface</td>
+<td>Permission flags for jobs and task execution.</td>
+</tr>
+<tr>
+<td><code>PermissionValue</code></td>
+<td>type alias</td>
+<td>Permission value accepted by Deno-style runtime permission fields.</td>
+</tr>
+<tr>
+<td><code>RuntimeConfigSection</code></td>
+<td>interface</td>
+<td>Runtime schema/config section type.</td>
+</tr>
+<tr>
+<td><code>RuntimeConfigPathEntry</code></td>
+<td>interface</td>
+<td>Runtime schema/config output path entry type.</td>
+</tr>
+<tr>
+<td><code>WorkspaceMap</code></td>
+<td>interface</td>
+<td>Classified snapshot of a Deno workspace.</td>
+</tr>
+<tr>
+<td><code>WorkspaceMember</code></td>
+<td>interface</td>
+<td>Deno workspace member discovered from a member deno.json file.</td>
+</tr>
+<tr>
+<td><code>WorkspaceMemberType</code></td>
+<td>type alias</td>
+<td>Workspace member category inferred from its relative path.</td>
+</tr>
+</tbody>
+</table>
+<h3>Sagas and triggers section types</h3>
+<p>The <code>sagas</code> and <code>triggers</code> configuration sections have dedicated validated and authoring-form types exported from the root.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SagasConfig</code></td>
+<td>interface</td>
+<td>Sagas configuration section.</td>
+</tr>
+<tr>
+<td><code>SagasConfigInput</code></td>
+<td>interface</td>
+<td>Authoring form for split saga config files.</td>
+</tr>
+<tr>
+<td><code>SagaGroup</code></td>
+<td>interface</td>
+<td>Saga group configuration for a topic.</td>
+</tr>
+<tr>
+<td><code>SagaGroupInput</code></td>
+<td>interface</td>
+<td>Authoring form for a saga group.</td>
+</tr>
+<tr>
+<td><code>SagaDefinition</code></td>
+<td>interface</td>
+<td>Saga definition configuration.</td>
+</tr>
+<tr>
+<td><code>SagaDefinitionInput</code></td>
+<td>interface</td>
+<td>Authoring form for a saga definition.</td>
+</tr>
+<tr>
+<td><code>SagaRetryConfig</code></td>
+<td>interface</td>
+<td>Saga retry configuration.</td>
+</tr>
+<tr>
+<td><code>SagaTimeoutConfig</code></td>
+<td>interface</td>
+<td>Saga timeout configuration.</td>
+</tr>
+<tr>
+<td><code>SagaScalingConfig</code></td>
+<td>interface</td>
+<td>Per-topic saga scaling configuration.</td>
+</tr>
+<tr>
+<td><code>SagaRetentionConfig</code></td>
+<td>interface</td>
+<td>Per-topic saga retention configuration.</td>
+</tr>
+<tr>
+<td><code>SagaStoreProvider</code></td>
+<td>type alias</td>
+<td>Saga store backend provider selector.</td>
+</tr>
+<tr>
+<td><code>SagaTransportProvider</code></td>
+<td>type alias</td>
+<td>Saga transport backend provider selector.</td>
+</tr>
+<tr>
+<td><code>TriggersConfig</code></td>
+<td>interface</td>
+<td>Triggers configuration section.</td>
+</tr>
+<tr>
+<td><code>TriggersConfigInput</code></td>
+<td>interface</td>
+<td>Authoring form for trigger config.</td>
+</tr>
+<tr>
+<td><code>TriggerGroup</code></td>
+<td>interface</td>
+<td>Trigger group type.</td>
+</tr>
+<tr>
+<td><code>TriggerGroupInput</code></td>
+<td>type alias</td>
+<td>Authoring form for a trigger group.</td>
+</tr>
+<tr>
+<td><code>TriggerDefinitionConfig</code></td>
+<td>interface</td>
+<td>Trigger definition config type.</td>
+</tr>
+<tr>
+<td><code>TriggerDefinitionConfigInput</code></td>
+<td>type alias</td>
+<td>Authoring form for a trigger definition.</td>
+</tr>
+<tr>
+<td><code>TriggerScalingConfig</code></td>
+<td>interface</td>
+<td>Trigger group scaling configuration.</td>
+</tr>
+<tr>
+<td><code>TriggerRetentionConfig</code></td>
+<td>interface</td>
+<td>Trigger group retention configuration.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/config</code></td>
+<td><code>./mod.ts</code></td>
+<td>Core configuration surface (documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/config/merge</code></td>
+<td><code>./src/merge/mod.ts</code></td>
+<td>Merge plugin-contributed partial config fragments.</td>
+</tr>
+<tr>
+<td><code>@netscript/config/paths</code></td>
+<td><code>./src/paths/mod.ts</code></td>
+<td>Scaffold directory, file, and permission constants.</td>
+</tr>
+<tr>
+<td><code>@netscript/config/schema/plugins</code></td>
+<td><code>./src/schema/plugins/mod.ts</code></td>
+<td>Appsettings plugin-entry validation schemas.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sub-path-config-merge"><code>@netscript/config/merge</code></h3>
+<p>Folds a plugin-contributed partial config fragment into an already-validated project config.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mergePartialConfig</code></td>
+<td><code>function mergePartialConfig(base: NetScriptConfig, contribution: PartialConfig): NetScriptConfig</code></td>
+<td>Merge a plugin-contributed partial config into a validated NetScript config.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PartialConfig</code></td>
+<td>interface</td>
+<td>Partial NetScript config fragment contributed by a plugin manifest.</td>
+</tr>
+<tr>
+<td><code>AppContributionEntry</code></td>
+<td>type alias</td>
+<td>Application config entry accepted in plugin contribution fragments.</td>
+</tr>
+<tr>
+<td><code>ServiceContributionEntry</code></td>
+<td>type alias</td>
+<td>Service config entry accepted in plugin contribution fragments.</td>
+</tr>
+<tr>
+<td><code>DatabaseEntry</code></td>
+<td>type alias</td>
+<td>Database config entry accepted in plugin contribution fragments.</td>
+</tr>
+</tbody>
+</table>
+<p>This entrypoint also re-exports the shared section types (<code>NetScriptConfig</code>, <code>ServiceConfig</code>, <code>DatabaseConfig</code>, the saga/trigger config types, and related shapes) documented under the root <a href="#types">Types</a> section.</p>
+<h3 id="sub-path-config-paths"><code>@netscript/config/paths</code></h3>
+<p>Standard scaffold constants consumed by NetScript generators and CLI commands.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PERMISSIONS</code></td>
+<td><code>const PERMISSIONS: PermissionGroups</code></td>
+<td>Standard Deno permission flags grouped by intent.</td>
+</tr>
+<tr>
+<td><code>SCAFFOLD_DIRS</code></td>
+<td><code>const SCAFFOLD_DIRS: ScaffoldDirs</code></td>
+<td>Standard scaffold directory names.</td>
+</tr>
+<tr>
+<td><code>SCAFFOLD_FILES</code></td>
+<td><code>const SCAFFOLD_FILES: ScaffoldFiles</code></td>
+<td>Standard scaffold file names.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PermissionGroups</code></td>
+<td>interface</td>
+<td>Standard Deno permission groups used by generated package commands.</td>
+</tr>
+<tr>
+<td><code>ScaffoldDirs</code></td>
+<td>interface</td>
+<td>Standard scaffold directory names used by NetScript generators.</td>
+</tr>
+<tr>
+<td><code>ScaffoldFiles</code></td>
+<td>interface</td>
+<td>Standard scaffold file names used by NetScript generators.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sub-path-config-schema-plugins"><code>@netscript/config/schema/plugins</code></h3>
+<p>Validation schemas for plugin-backed entries written into generated appsettings.json.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pluginEntrySchema</code></td>
+<td><code>const pluginEntrySchema: PluginSettingsSchema&lt;PluginEntry&gt;</code></td>
+<td>Validates a NetScript.Plugins.<key> appsettings entry.</td>
+</tr>
+<tr>
+<td><code>backgroundProcessorEntrySchema</code></td>
+<td><code>const backgroundProcessorEntrySchema: PluginSettingsSchema&lt;BackgroundProcessorEntry&gt;</code></td>
+<td>Validates a NetScript.BackgroundProcessors.<key> appsettings entry.</td>
+</tr>
+<tr>
+<td><code>installedVersionSchema</code></td>
+<td><code>const installedVersionSchema: PluginSettingsSchema&lt;InstalledVersionFields&gt;</code></td>
+<td>Validates installed plugin version metadata stored on appsettings entries.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PluginEntry</code></td>
+<td>interface</td>
+<td>Configuration for a plugin-backed HTTP service in appsettings.json.</td>
+</tr>
+<tr>
+<td><code>BackgroundProcessorEntry</code></td>
+<td>interface</td>
+<td>Configuration for a plugin-backed background processor in appsettings.json.</td>
+</tr>
+<tr>
+<td><code>InstalledVersionFields</code></td>
+<td>interface</td>
+<td>Installed plugin version fields stored in appsettings.json.</td>
+</tr>
+<tr>
+<td><code>PluginSettingsSchema</code></td>
+<td>interface</td>
+<td>Minimal public validation contract for plugin appsettings schemas.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

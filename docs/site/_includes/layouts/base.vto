@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title }} · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="{{ "/" |> url }}"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="{{ "/tutorials/" |> url }}">Tutorials</a></li>
+          <li><a href="{{ "/how-to/" |> url }}">How-to guides</a></li>
+          <li><a href="{{ "/reference/" |> url }}">Reference</a></li>
+          <li><a href="{{ "/explanation/" |> url }}">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>{{ title }}</h1>
+      {{ content }}
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

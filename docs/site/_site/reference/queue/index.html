@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/queue · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/queue</h1>
+      <h1><code>@netscript/queue</code></h1>
+<p>Provider-agnostic message queue abstraction for NetScript applications. It wraps
+<a href="https://fedify.dev/">Fedify</a> battle-tested queue adapters behind a single, unified
+<code>MessageQueue</code> interface with optional Zod validation and Aspire-based backend
+auto-discovery. This page is generated from the package public surface with <code>deno doc</code>
+(US-2). For the full index of packages and plugins return to the
+<a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/queue</code>) re-exports the factory functions, the port
+contracts (<code>./ports</code>), the error hierarchy (<code>./errors</code>), and the validation helpers
+(<code>./validation</code>). The remaining sub-path exports carry the concrete provider adapters and a
+test double:</p>
+<ul>
+<li><a href="#sub-path-exports"><code>@netscript/queue/ports</code></a> — the core interfaces and enums.</li>
+<li><a href="#sub-path-exports"><code>@netscript/queue/errors</code></a> — the queue error classes and codes.</li>
+<li><a href="#sub-path-exports"><code>@netscript/queue/validation</code></a> — Zod validation helpers.</li>
+<li><a href="#sub-path-exports"><code>@netscript/queue/adapters/deno-kv</code></a> — Deno KV adapter.</li>
+<li><a href="#sub-path-exports"><code>@netscript/queue/adapters/redis</code></a> — Redis adapter.</li>
+<li><a href="#sub-path-exports"><code>@netscript/queue/adapters/amqp</code></a> — RabbitMQ (AMQP) adapter.</li>
+<li><a href="#sub-path-exports"><code>@netscript/queue/adapters/kv-polling</code></a> — KV-polling adapter for KV Connect.</li>
+<li><a href="#sub-path-exports"><code>@netscript/queue/testing</code></a> — in-memory adapter for tests.</li>
+</ul>
+<h2>Factory functions</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createQueue</code></td>
+<td><code>function createQueue&lt;T = unknown&gt;(name: string, options?: QueueOptions): MessageQueue&lt;T&gt;</code></td>
+<td>Create a message queue instance with auto-discovery (RabbitMQ, then Redis, then Deno KV).</td>
+</tr>
+<tr>
+<td><code>createTypedQueue</code></td>
+<td><code>function createTypedQueue&lt;T&gt;(name: string, schema: ValidationSchema&lt;T&gt;, options?: TypedQueueOptions): TypedMessageQueue&lt;T&gt;</code></td>
+<td>Create a type-safe message queue with Zod validation at enqueue and dequeue time.</td>
+</tr>
+<tr>
+<td><code>createParallelQueue</code></td>
+<td><code>function createParallelQueue&lt;T = unknown&gt;(name: string, options?: ParallelQueueOptions): MessageQueue&lt;T&gt;</code></td>
+<td>Create a queue with concurrent processing via Fedify ParallelMessageQueue.</td>
+</tr>
+</tbody>
+</table>
+<h2>Port contracts</h2>
+<p>Exported from the root and from <a href="#sub-path-exports"><code>@netscript/queue/ports</code></a>.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MessageQueue</code></td>
+<td>interface</td>
+<td>Core message queue interface that all adapters implement (<code>enqueue</code>, <code>listen</code>).</td>
+</tr>
+<tr>
+<td><code>TypedMessageQueue</code></td>
+<td>interface</td>
+<td><code>MessageQueue</code> extended with runtime schema validation.</td>
+</tr>
+<tr>
+<td><code>MessageContext</code></td>
+<td>interface</td>
+<td>Metadata and acknowledgment controls passed to handlers during processing.</td>
+</tr>
+<tr>
+<td><code>EnqueueOptions</code></td>
+<td>interface</td>
+<td>Options for enqueueing messages (for example, delay).</td>
+</tr>
+<tr>
+<td><code>ListenOptions</code></td>
+<td>interface</td>
+<td>Options for listening to messages.</td>
+</tr>
+<tr>
+<td><code>QueueOptions</code></td>
+<td>interface</td>
+<td>Base options for creating a queue.</td>
+</tr>
+<tr>
+<td><code>TypedQueueOptions</code></td>
+<td>interface</td>
+<td>Options for a typed queue with Zod validation.</td>
+</tr>
+<tr>
+<td><code>ParallelQueueOptions</code></td>
+<td>interface</td>
+<td>Options for a parallel queue (concurrency).</td>
+</tr>
+<tr>
+<td><code>QueueConnectionOptions</code></td>
+<td>interface</td>
+<td>Provider-specific connection options.</td>
+</tr>
+<tr>
+<td><code>QueueProvider</code></td>
+<td>enum</td>
+<td>Supported queue providers (Deno KV, Redis, RabbitMQ).</td>
+</tr>
+</tbody>
+</table>
+<h2>Errors</h2>
+<p>Exported from the root and from <a href="#sub-path-exports"><code>@netscript/queue/errors</code></a>.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>QueueError</code></td>
+<td>class</td>
+<td>Base error class for all queue operations.</td>
+</tr>
+<tr>
+<td><code>QueueConnectionError</code></td>
+<td>class</td>
+<td>Thrown when a queue connection fails.</td>
+</tr>
+<tr>
+<td><code>QueueConfigurationError</code></td>
+<td>class</td>
+<td>Thrown when queue configuration is invalid.</td>
+</tr>
+<tr>
+<td><code>QueueHandlerError</code></td>
+<td>class</td>
+<td>Thrown when a message handler fails.</td>
+</tr>
+<tr>
+<td><code>QueueValidationError</code></td>
+<td>class</td>
+<td>Thrown when message validation fails.</td>
+</tr>
+<tr>
+<td><code>QueueErrorCode</code></td>
+<td>enum</td>
+<td>Error codes for queue operations.</td>
+</tr>
+</tbody>
+</table>
+<h2>Validation</h2>
+<p>Exported from the root and from <a href="#sub-path-exports"><code>@netscript/queue/validation</code></a>.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>safeValidate</code></td>
+<td><code>function safeValidate&lt;T&gt;(schema: ValidationSchema&lt;T&gt;, message: unknown): ValidationResult&lt;T&gt;</code></td>
+<td>Validate a message against a schema, returning a result object instead of throwing.</td>
+</tr>
+<tr>
+<td><code>validateOrThrow</code></td>
+<td><code>function validateOrThrow&lt;T&gt;(schema: ValidationSchema&lt;T&gt;, message: unknown, context?: Record): T</code></td>
+<td>Validate a message and throw <code>QueueValidationError</code> if invalid.</td>
+</tr>
+<tr>
+<td><code>withValidation</code></td>
+<td><code>function withValidation&lt;T&gt;(schema: ValidationSchema&lt;T&gt;, handler)</code></td>
+<td>Wrap a handler so messages are validated before it runs.</td>
+</tr>
+<tr>
+<td><code>ValidationSchema</code></td>
+<td>interface</td>
+<td>Minimal schema contract supported by the validation helpers.</td>
+</tr>
+<tr>
+<td><code>ValidationResult</code></td>
+<td>interface</td>
+<td>Result type returned by <code>safeValidate</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Adapters</h2>
+<p>Each provider adapter is published under its own sub-path and implements the
+<code>MessageQueue</code> contract directly. Most applications use <code>createQueue</code> and never import an
+adapter explicitly.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Entrypoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DenoKvAdapter</code></td>
+<td>class</td>
+<td><code>@netscript/queue/adapters/deno-kv</code></td>
+<td>Deno KV queue adapter (default backend).</td>
+</tr>
+<tr>
+<td><code>DenoKvAdapterOptions</code></td>
+<td>interface</td>
+<td><code>@netscript/queue/adapters/deno-kv</code></td>
+<td>Options for <code>DenoKvAdapter</code>.</td>
+</tr>
+<tr>
+<td><code>RedisAdapter</code></td>
+<td>class</td>
+<td><code>@netscript/queue/adapters/redis</code></td>
+<td>Redis queue adapter.</td>
+</tr>
+<tr>
+<td><code>AmqpAdapter</code></td>
+<td>class</td>
+<td><code>@netscript/queue/adapters/amqp</code></td>
+<td>AMQP (RabbitMQ) queue adapter.</td>
+</tr>
+<tr>
+<td><code>KvPollingAdapter</code></td>
+<td>class</td>
+<td><code>@netscript/queue/adapters/kv-polling</code></td>
+<td>KV-polling adapter for remote KV Connect (HTTP) backends.</td>
+</tr>
+<tr>
+<td><code>KvPollingAdapterOptions</code></td>
+<td>interface</td>
+<td><code>@netscript/queue/adapters/kv-polling</code></td>
+<td>Options for <code>KvPollingAdapter</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>kv-polling</code> adapter additionally re-exports the portable KV store contracts from
+<a href="/reference/"><code>@netscript/kv</code></a>: <code>KvStore</code>, <code>WatchableKv</code>, <code>KvEntry</code>, <code>KvKey</code>,
+<code>AtomicMutation</code>, <code>AtomicCheck</code>, <code>AtomicResult</code>, <code>WatchEvent</code>, and their option interfaces
+(<code>KvListOptions</code>, <code>KvSetOptions</code>, <code>WatchOptions</code>, <code>WatchPrefixOptions</code>), so KV-Connect
+consumers can type their backing store without a second import.</p>
+<h2>Testing</h2>
+<p>Exported from <a href="#sub-path-exports"><code>@netscript/queue/testing</code></a>.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MemoryQueueAdapter</code></td>
+<td>class</td>
+<td>In-memory <code>MessageQueue</code> implementation for port-contract tests.</td>
+</tr>
+<tr>
+<td><code>MemoryQueueAdapterOptions</code></td>
+<td>interface</td>
+<td>Options for <code>MemoryQueueAdapter</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export. Their symbols are
+documented in the sections above.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/queue</code></td>
+<td><code>./mod.ts</code></td>
+<td>Factories plus re-exported ports, errors, and validation.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/ports</code></td>
+<td><code>./ports/mod.ts</code></td>
+<td>Core interfaces and enums.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/errors</code></td>
+<td><code>./ports/errors.ts</code></td>
+<td>Error classes and codes.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/validation</code></td>
+<td><code>./validation/mod.ts</code></td>
+<td>Zod validation helpers.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/testing</code></td>
+<td><code>./testing/mod.ts</code></td>
+<td>In-memory adapter for tests.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/adapters/deno-kv</code></td>
+<td><code>./adapters/deno-kv.adapter.ts</code></td>
+<td>Deno KV adapter.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/adapters/redis</code></td>
+<td><code>./adapters/redis.adapter.ts</code></td>
+<td>Redis adapter.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/adapters/amqp</code></td>
+<td><code>./adapters/amqp.adapter.ts</code></td>
+<td>RabbitMQ (AMQP) adapter.</td>
+</tr>
+<tr>
+<td><code>@netscript/queue/adapters/kv-polling</code></td>
+<td><code>./adapters/kv-polling.adapter.ts</code></td>
+<td>KV-polling adapter for KV Connect.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

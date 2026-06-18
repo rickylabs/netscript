@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/kv · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/kv</h1>
+      <h1><code>@netscript/kv</code></h1>
+<p>Reactive key-value storage with a unified API across Deno KV, Redis, and in-memory
+backends. This page is generated from the package's public surface with <code>deno doc</code>
+(US-2). For the full index of packages and plugins return to the
+<a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/kv</code>) exposes the stable shared lifecycle API, the
+portable KV types, and the lightweight Deno KV and in-memory adapters. Three sub-path
+exports carry the heavier integrations:</p>
+<ul>
+<li><a href="#sub-path-exports"><code>@netscript/kv/redis</code></a> — the Redis-backed adapter (self-registers
+the <code>'redis'</code> provider on import).</li>
+<li><a href="#sub-path-exports"><code>@netscript/kv/kvdex</code></a> — the <a href="https://jsr.io/@olli/kvdex">kvdex</a>
+bridge factory and re-exported kvdex core APIs.</li>
+<li><a href="#sub-path-exports"><code>@netscript/kv/testing</code></a> — the shared KV port contract harness for
+adapter authors.</li>
+</ul>
+<h2>Shared lifecycle</h2>
+<p>The shared singleton resolves a provider once (auto-detecting from the environment) and
+hands back a <code>WatchableKv</code> for the rest of the process.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getKv</code></td>
+<td><code>function getKv(config?: SharedKvConfig): Promise&lt;WatchableKv&gt;</code></td>
+<td>Resolve the shared <code>WatchableKv</code> singleton, initializing on first access.</td>
+</tr>
+<tr>
+<td><code>getRawKv</code></td>
+<td><code>async function getRawKv(config?: SharedKvConfig): Promise&lt;Deno.Kv&gt;</code></td>
+<td>Resolve the raw <code>Deno.Kv</code> instance when the shared provider is Deno KV.</td>
+</tr>
+<tr>
+<td><code>getActiveProvider</code></td>
+<td><code>function getActiveProvider(): KvProvider | null</code></td>
+<td>Return the currently active provider, or <code>null</code> before initialization.</td>
+</tr>
+<tr>
+<td><code>getKvPath</code></td>
+<td><code>function getKvPath(): string | undefined</code></td>
+<td>Return the Deno KV path currently in use, or the discovered default.</td>
+</tr>
+<tr>
+<td><code>getRedisConnectionFromEnv</code></td>
+<td><code>function getRedisConnectionFromEnv(): string | undefined</code></td>
+<td>Read a normalized Redis connection string from the environment.</td>
+</tr>
+<tr>
+<td><code>isKvInitialized</code></td>
+<td><code>function isKvInitialized(): boolean</code></td>
+<td>Check whether the shared adapter has been initialized.</td>
+</tr>
+<tr>
+<td><code>isWatchable</code></td>
+<td><code>function isWatchable(store: KvStore): store is WatchableKv</code></td>
+<td>Type guard for stores that implement the <code>WatchableKv</code> contract.</td>
+</tr>
+<tr>
+<td><code>resetKv</code></td>
+<td><code>async function resetKv(): Promise&lt;void&gt;</code></td>
+<td>Reset the shared state for tests or isolated validation runs.</td>
+</tr>
+<tr>
+<td><code>closeKv</code></td>
+<td><code>async function closeKv(): Promise&lt;void&gt;</code></td>
+<td>Close and clear the shared adapter state.</td>
+</tr>
+</tbody>
+</table>
+<h2>Adapters</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DenoKvAdapter</code></td>
+<td>class</td>
+<td><code>class DenoKvAdapter implements WatchableKv</code></td>
+<td>Deno-native adapter backed by <code>Deno.Kv</code>, with native watch support.</td>
+</tr>
+<tr>
+<td><code>MemoryKvAdapter</code></td>
+<td>class</td>
+<td><code>class MemoryKvAdapter implements WatchableKv</code></td>
+<td>Volatile adapter that keeps all data in process memory.</td>
+</tr>
+</tbody>
+</table>
+<h2>Store contracts</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KvStore</code></td>
+<td>interface</td>
+<td><code>interface KvStore extends AsyncDisposable</code></td>
+<td>Base key-value storage contract (<code>get</code>/<code>set</code>/<code>delete</code>/<code>has</code>/<code>list</code>/<code>atomic</code>/<code>close</code>).</td>
+</tr>
+<tr>
+<td><code>WatchableKv</code></td>
+<td>interface</td>
+<td><code>interface WatchableKv extends KvStore</code></td>
+<td>Extends <code>KvStore</code> with reactive <code>watch</code> and <code>watchPrefix</code> capabilities.</td>
+</tr>
+<tr>
+<td><code>SharedKvConfig</code></td>
+<td>interface</td>
+<td><code>interface SharedKvConfig</code></td>
+<td>Options for configuring the shared KV instance.</td>
+</tr>
+</tbody>
+</table>
+<h2>Keys, entries, and options</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KvKey</code></td>
+<td>type alias</td>
+<td><code>type KvKey = readonly Deno.KvKeyPart[]</code></td>
+<td>Portable key format shared by all adapters.</td>
+</tr>
+<tr>
+<td><code>KvEntry</code></td>
+<td>interface</td>
+<td><code>interface KvEntry&lt;T&gt;</code></td>
+<td>Key-value entry returned from <code>get()</code> and <code>list()</code>.</td>
+</tr>
+<tr>
+<td><code>KvSetOptions</code></td>
+<td>interface</td>
+<td><code>interface KvSetOptions</code></td>
+<td>Options for <code>KvStore.set()</code> (for example <code>expireIn</code>).</td>
+</tr>
+<tr>
+<td><code>KvListOptions</code></td>
+<td>interface</td>
+<td><code>interface KvListOptions</code></td>
+<td>Selector and pagination options for <code>KvStore.list()</code>.</td>
+</tr>
+<tr>
+<td><code>KvProvider</code></td>
+<td>type alias</td>
+<td><code>type KvProvider = 'redis' | 'deno-kv' | 'nitro' | 'auto'</code></td>
+<td>Providers supported by the shared KV lifecycle helpers.</td>
+</tr>
+</tbody>
+</table>
+<h2>Atomic operations</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AtomicCheck</code></td>
+<td>interface</td>
+<td><code>interface AtomicCheck</code></td>
+<td>Versionstamp check used by atomic compare-and-swap operations.</td>
+</tr>
+<tr>
+<td><code>AtomicMutation</code></td>
+<td>type alias</td>
+<td><code>type AtomicMutation = { type: 'set'; key: KvKey; value: unknown; expireIn?: number } | { type: 'delete'; key: KvKey } | { type: 'sum' | 'min' | 'max'; key: KvKey; value: bigint }</code></td>
+<td>Mutation operations accepted by <code>KvStore.atomic()</code>.</td>
+</tr>
+<tr>
+<td><code>AtomicResult</code></td>
+<td>interface</td>
+<td><code>interface AtomicResult</code></td>
+<td>Result returned from an atomic operation.</td>
+</tr>
+</tbody>
+</table>
+<h2>Watch events</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WatchEvent</code></td>
+<td>interface</td>
+<td><code>interface WatchEvent&lt;T&gt;</code></td>
+<td>Event emitted when an observed key changes.</td>
+</tr>
+<tr>
+<td><code>WatchOptions</code></td>
+<td>interface</td>
+<td><code>interface WatchOptions</code></td>
+<td>Options for <code>WatchableKv.watch()</code>.</td>
+</tr>
+<tr>
+<td><code>WatchPrefixOptions</code></td>
+<td>interface</td>
+<td><code>interface WatchPrefixOptions extends WatchOptions</code></td>
+<td>Options for <code>WatchableKv.watchPrefix()</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export. Each is generated from
+its own <code>deno doc</code> surface.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/kv</code></td>
+<td><code>./mod.ts</code></td>
+<td>Shared lifecycle, adapters, and types (documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/kv/redis</code></td>
+<td><code>./redis.ts</code></td>
+<td>Redis adapter (documented below).</td>
+</tr>
+<tr>
+<td><code>@netscript/kv/kvdex</code></td>
+<td><code>./kvdex.ts</code></td>
+<td>kvdex bridge factory + re-exported kvdex core (documented below).</td>
+</tr>
+<tr>
+<td><code>@netscript/kv/testing</code></td>
+<td><code>./src/testing/mod.ts</code></td>
+<td>Shared KV port contract harness (documented below).</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/kv/redis</code></h3>
+<p>Importing this module re-exports the Redis adapter <strong>and</strong> self-registers the <code>'redis'</code>
+provider factory with the shared lifecycle. It also re-exports the shared store contracts
+(<code>KvStore</code>, <code>WatchableKv</code>, <code>KvKey</code>, <code>KvEntry</code>, <code>KvListOptions</code>, <code>KvSetOptions</code>,
+<code>AtomicCheck</code>, <code>AtomicMutation</code>, <code>AtomicResult</code>, <code>WatchEvent</code>, <code>WatchOptions</code>,
+<code>WatchPrefixOptions</code>).</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RedisKvAdapter</code></td>
+<td>class</td>
+<td><code>class RedisKvAdapter implements WatchableKv</code></td>
+<td>Distributed Redis adapter for <code>@netscript/kv</code>.</td>
+</tr>
+<tr>
+<td><code>RedisKvOptions</code></td>
+<td>interface</td>
+<td><code>interface RedisKvOptions</code></td>
+<td>Redis connection options for the adapter.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/kv/kvdex</code></h3>
+<p>The kvdex bridge factory plus a curated re-export of the <a href="https://jsr.io/@olli/kvdex">kvdex</a>
+core APIs and Deno-KV-compatible types.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createNetscriptDb</code></td>
+<td>function</td>
+<td><code>async function createNetscriptDb&lt;T&gt;(schema: T, options?: CreateNetscriptDbOptions): Promise&lt;ReturnType&lt;kvdex&gt;&gt;</code></td>
+<td>Create a kvdex database backed by the active <code>@netscript/kv</code> provider.</td>
+</tr>
+<tr>
+<td><code>CreateNetscriptDbOptions</code></td>
+<td>interface</td>
+<td><code>interface CreateNetscriptDbOptions</code></td>
+<td>Options for <code>createNetscriptDb</code>.</td>
+</tr>
+<tr>
+<td><code>WatchableKvBridge</code></td>
+<td>class</td>
+<td><code>class WatchableKvBridge</code></td>
+<td>Adapts a <code>WatchableKv</code> to the <code>DenoKv</code> interface kvdex expects.</td>
+</tr>
+<tr>
+<td><code>KvdexSchema</code></td>
+<td>type alias</td>
+<td><code>type KvdexSchema = Record&lt;string, any&gt;</code></td>
+<td>Accepted schema shape, structurally compatible with kvdex's <code>SchemaDefinition</code>.</td>
+</tr>
+<tr>
+<td><code>kvdex</code></td>
+<td>function</td>
+<td><code>function kvdex&lt;TSchema&gt;(options: KvdexOptions&lt;TSchema&gt;): Database&lt;TSchema&gt;</code></td>
+<td>Re-exported kvdex database factory.</td>
+</tr>
+<tr>
+<td><code>collection</code></td>
+<td>function</td>
+<td><code>function collection&lt;TInput, TOutput, TOptions&gt;(model, options?): BuilderFn</code></td>
+<td>Re-exported kvdex collection builder.</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td>function</td>
+<td><code>function model&lt;TOutput, TInput&gt;(transform?): Model&lt;TInput, TOutput&gt;</code></td>
+<td>Re-exported kvdex model factory.</td>
+</tr>
+</tbody>
+</table>
+<p>This entrypoint also re-exports the kvdex Deno-KV compatibility types: <code>KvProvider</code>,
+<code>KvObject</code>, <code>DenoAtomicCheck</code>, <code>DenoAtomicOperation</code>, <code>DenoKvCommitError</code>,
+<code>DenoKvCommitResult</code>, <code>DenoKvEnqueueOptions</code>, <code>DenoKvEntryMaybe</code>, <code>DenoKvGetOptions</code>,
+<code>DenoKvKeyPart</code>, <code>DenoKvListIterator</code>, <code>DenoKvListOptions</code>, <code>DenoKvListSelector</code>,
+<code>DenoKvSetOptions</code>, <code>DenoKvStrictKey</code>, and <code>DenoKvWatchOptions</code>.</p>
+<h3><code>@netscript/kv/testing</code></h3>
+<p>A reusable contract harness for adapter authors. Re-exports the shared <code>KvStore</code> and
+<code>WatchableKv</code> contracts alongside the test helpers.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>runKvStoreContract</code></td>
+<td>function</td>
+<td><code>function runKvStoreContract(options: KvStoreContractOptions): void</code></td>
+<td>Register the canonical KV store contract tests against an adapter.</td>
+</tr>
+<tr>
+<td><code>KvStoreContractOptions</code></td>
+<td>interface</td>
+<td><code>interface KvStoreContractOptions</code></td>
+<td>Options for <code>runKvStoreContract</code>.</td>
+</tr>
+<tr>
+<td><code>createMemoryKvAdapter</code></td>
+<td>function</td>
+<td><code>function createMemoryKvAdapter(): MemoryKvAdapter</code></td>
+<td>Factory for a clean in-memory KV adapter for downstream tests.</td>
+</tr>
+<tr>
+<td><code>MemoryKvAdapter</code></td>
+<td>class</td>
+<td><code>class MemoryKvAdapter implements WatchableKv</code></td>
+<td>Volatile in-memory adapter (re-exported from the root).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

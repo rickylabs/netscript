@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/fresh-ui · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/fresh-ui</h1>
+      <h1><code>@netscript/fresh-ui</code></h1>
+<p>Fresh UI registry seams and interactive foundations for NetScript. This page is generated
+from the package public surface with <code>deno doc</code> (US-2). For the full index of packages and
+plugins return to the <a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/fresh-ui</code>) intentionally stays small: copy-based registry
+components and islands remain on workspace-local deep paths so applications can own and evolve
+them after copy. The root module exposes only the supported helper utilities that are safe to
+consume as package runtime dependencies. Two sub-path exports carry the runtime seams:</p>
+<ul>
+<li><a href="#sub-path-exports"><code>@netscript/fresh-ui/interactive</code></a> — package-owned interactive
+namespaces for stateful, accessible primitives.</li>
+<li><a href="#sub-path-exports"><code>@netscript/fresh-ui/primitives</code></a> — L0 platform-contract primitives.</li>
+</ul>
+<h2>Class-name helper</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cn</code></td>
+<td><code>function cn(...inputs: ClassValue[]): string</code></td>
+<td>Combines clsx and tailwind-merge for optimal class merging.</td>
+</tr>
+</tbody>
+</table>
+<h2>Redirect-flash (toast) helpers</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>getToast</code></td>
+<td><code>function getToast(url: URL): RegistryToast | undefined</code></td>
+<td>Reads a toast payload from a URL when redirect-flash query parameters are present.</td>
+</tr>
+<tr>
+<td><code>withToast</code></td>
+<td><code>function withToast(path: string, toast: RegistryToast): string</code></td>
+<td>Appends a toast payload to a relative application path.</td>
+</tr>
+<tr>
+<td><code>stripToastFromUrl</code></td>
+<td><code>function stripToastFromUrl(url: URL): string</code></td>
+<td>Removes all toast query parameters from a URL while preserving path and hash.</td>
+</tr>
+<tr>
+<td><code>REGISTRY_TOAST_QUERY_KEYS</code></td>
+<td><code>const REGISTRY_TOAST_QUERY_KEYS: { message: string; title: string; type: string }</code></td>
+<td>Query-string keys reserved by the redirect-flash helpers.</td>
+</tr>
+</tbody>
+</table>
+<h3>Toast types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RegistryToast</code></td>
+<td>interface</td>
+<td>Redirect-flash payload persisted in URL query parameters (<code>message</code>, optional <code>title</code>, <code>type</code>).</td>
+</tr>
+<tr>
+<td><code>RegistryToastType</code></td>
+<td>type alias</td>
+<td>Toast semantic variants: <code>&quot;success&quot; | &quot;error&quot; | &quot;warning&quot; | &quot;info&quot;</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Interactive namespaces</h2>
+<p>Exported from the <a href="#sub-path-exports"><code>@netscript/fresh-ui/interactive</code></a> sub-path. Each is a
+compound namespace bundling a root component with its structural subcomponents. The namespace
+types are package-internal (see note below).</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Accordion</code></td>
+<td><code>const Accordion: AccordionNamespace</code></td>
+<td>Compound accordion namespace with root and item subcomponents.</td>
+</tr>
+<tr>
+<td><code>Dialog</code></td>
+<td><code>const Dialog: DialogNamespace</code></td>
+<td>Compound dialog namespace with root and structural subcomponents.</td>
+</tr>
+<tr>
+<td><code>Drawer</code></td>
+<td><code>const Drawer: DrawerNamespace</code></td>
+<td>Compound drawer namespace with root and structural subcomponents.</td>
+</tr>
+<tr>
+<td><code>Popover</code></td>
+<td><code>const Popover: PopoverNamespace</code></td>
+<td>Compound popover namespace with root and positioning subcomponents.</td>
+</tr>
+<tr>
+<td><code>Sheet</code></td>
+<td><code>const Sheet: SheetNamespace</code></td>
+<td>Compound sheet namespace — side-docked inspection panel.</td>
+</tr>
+<tr>
+<td><code>Tabs</code></td>
+<td><code>const Tabs: TabsNamespace</code></td>
+<td>Compound tabs namespace with root, list, trigger, and content subcomponents.</td>
+</tr>
+<tr>
+<td><code>Tooltip</code></td>
+<td><code>const Tooltip: TooltipNamespace</code></td>
+<td>Compound tooltip namespace with root and positioning subcomponents.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Surface note:</strong> the <code>*Namespace</code> types backing these exports are currently package-internal.
+<code>deno doc --lint</code> reports them as <code>private-type-ref</code> errors; making them public is tracked in
+PR #58. The runtime exports themselves are stable.</p>
+</blockquote>
+<h2>L0 primitives</h2>
+<p>Exported from the <a href="#sub-path-exports"><code>@netscript/fresh-ui/primitives</code></a> sub-path. L0 stays small:
+prefer Preact intrinsic elements and platform attributes, using these helpers only where they
+encapsulate real behavior.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Show</code></td>
+<td><code>function Show&lt;T&gt;({ when, fallback, children }: ShowProps&lt;T&gt;): PrimitiveChildren</code></td>
+<td>Conditionally renders children without introducing an extra DOM wrapper.</td>
+</tr>
+<tr>
+<td><code>VisuallyHidden</code></td>
+<td><code>function VisuallyHidden({ children, style, ...props }: VisuallyHiddenProps): PrimitiveNode</code></td>
+<td>Renders content for assistive technology while keeping it visually hidden.</td>
+</tr>
+<tr>
+<td><code>SrOnly</code></td>
+<td><code>function SrOnly(props: VisuallyHiddenProps): PrimitiveNode</code></td>
+<td>Alias for <code>VisuallyHidden</code> using the common screen-reader naming.</td>
+</tr>
+</tbody>
+</table>
+<h3>Primitive types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PrimitiveNode</code></td>
+<td>interface</td>
+<td>Structural node returned by element-producing L0 primitives (<code>type</code>, <code>props</code>, <code>key</code>).</td>
+</tr>
+<tr>
+<td><code>ShowProps&lt;T&gt;</code></td>
+<td>interface</td>
+<td>Props accepted by <code>Show</code> (<code>when</code>, optional <code>fallback</code>, <code>children</code>).</td>
+</tr>
+<tr>
+<td><code>VisuallyHiddenProps</code></td>
+<td>interface</td>
+<td>Props accepted by <code>VisuallyHidden</code> and <code>SrOnly</code> (<code>children</code>, <code>style</code>, arbitrary attributes).</td>
+</tr>
+<tr>
+<td><code>PrimitiveChild</code></td>
+<td>type alias</td>
+<td>Primitive value that can be rendered by an L0 helper.</td>
+</tr>
+<tr>
+<td><code>PrimitiveChildren</code></td>
+<td>type alias</td>
+<td>Renderable content accepted by L0 primitives (a child or readonly array of children).</td>
+</tr>
+<tr>
+<td><code>VisuallyHiddenStyle</code></td>
+<td>type alias</td>
+<td>Inline style accepted by visually-hidden primitives.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/fresh-ui</code></td>
+<td><code>./mod.ts</code></td>
+<td>Stable runtime helpers (<code>cn</code>, redirect-flash toast helpers — documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh-ui/interactive</code></td>
+<td><code>./interactive.ts</code></td>
+<td>Package-owned interactive namespaces (documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh-ui/primitives</code></td>
+<td><code>./primitives.tsx</code></td>
+<td>L0 platform-contract primitives (documented above).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

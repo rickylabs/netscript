@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/contracts · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/contracts</h1>
+      <h1><code>@netscript/contracts</code></h1>
+<p>Contract vocabulary shared across NetScript package and plugin boundaries: the oRPC base
+contract, common error data, pagination schemas, result types, and schema helper factories.
+This page is generated from the package's public surface with <code>deno doc</code> (US-2). For the full
+index of packages and plugins return to the <a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/contracts</code>) carries the core contract primitives. Three
+sub-path exports add higher-level builders:</p>
+<ul>
+<li><a href="#sub-path-exports"><code>@netscript/contracts/crud</code></a> — CRUD contract generators.</li>
+<li><a href="#sub-path-exports"><code>@netscript/contracts/query</code></a> — query, filter, and pagination helpers.</li>
+<li><a href="#sub-path-exports"><code>@netscript/contracts/transform</code></a> — typed transformer factories.</li>
+</ul>
+<h2>Base contract</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>baseContract</code></td>
+<td>const</td>
+<td><code>const baseContract: BaseContract</code></td>
+<td>Common oRPC contract primitive with NetScript's standard error map applied.</td>
+</tr>
+<tr>
+<td><code>BaseContract</code></td>
+<td>type alias</td>
+<td><code>type BaseContract = Readonly&lt;{ route(options): BaseContractRouteBuilder; }&gt;</code></td>
+<td>Common oRPC contract primitive with NetScript's standard error map applied.</td>
+</tr>
+<tr>
+<td><code>BaseContractRouteOptions</code></td>
+<td>type alias</td>
+<td><code>type BaseContractRouteOptions = Readonly&lt;{ method: &quot;HEAD&quot; | &quot;GET&quot; | &quot;POST&quot; | &quot;PUT&quot; | &quot;DELETE&quot; | &quot;PATCH&quot;; path: string; }&gt;</code></td>
+<td>HTTP route options accepted by the base contract.</td>
+</tr>
+<tr>
+<td><code>BaseContractRouteBuilder</code></td>
+<td>type alias</td>
+<td><code>type BaseContractRouteBuilder = Readonly&lt;{ input(schema); output(schema); }&gt;</code></td>
+<td>Builder returned after binding a route to the base contract.</td>
+</tr>
+<tr>
+<td><code>BaseContractOutputBuilder</code></td>
+<td>type alias</td>
+<td><code>type BaseContractOutputBuilder&lt;TInput&gt; = Readonly&lt;{ output(schema): BaseContractProcedure; }&gt;</code></td>
+<td>Builder returned after binding input to the base contract.</td>
+</tr>
+<tr>
+<td><code>BaseContractProcedure</code></td>
+<td>type alias</td>
+<td><code>type BaseContractProcedure = Readonly&lt;{ ~orpc: any; }&gt;</code></td>
+<td>Opaque procedure returned by oRPC after contract composition.</td>
+</tr>
+</tbody>
+</table>
+<h2>Schema helper factories</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>boundedString</code></td>
+<td><code>function boundedString(options: BoundedStringSchemaOptions): ContractStringSchema</code></td>
+<td>Creates a bounded string schema.</td>
+</tr>
+<tr>
+<td><code>positiveInt</code></td>
+<td><code>function positiveInt(options: IntegerSchemaOptions): ContractNumberSchema</code></td>
+<td>Creates a positive integer schema with NetScript's default integer cap.</td>
+</tr>
+<tr>
+<td><code>nonNegativeInt</code></td>
+<td><code>function nonNegativeInt(options: IntegerSchemaOptions): ContractNumberSchema</code></td>
+<td>Creates a non-negative integer schema with NetScript's default integer cap.</td>
+</tr>
+<tr>
+<td><code>positiveNumber</code></td>
+<td><code>function positiveNumber(options: StringSchemaOptions): ContractNumberSchema</code></td>
+<td>Creates a positive decimal-number schema.</td>
+</tr>
+<tr>
+<td><code>nonNegativeNumber</code></td>
+<td><code>function nonNegativeNumber(options: StringSchemaOptions): ContractNumberSchema</code></td>
+<td>Creates a non-negative decimal-number schema.</td>
+</tr>
+<tr>
+<td><code>paginationLimit</code></td>
+<td><code>function paginationLimit(options: DefaultedIntegerSchemaOptions): ContractNumberSchema</code></td>
+<td>Creates a defaulted pagination-limit schema.</td>
+</tr>
+<tr>
+<td><code>paginationOffset</code></td>
+<td><code>function paginationOffset(options: DefaultedIntegerSchemaOptions): ContractNumberSchema</code></td>
+<td>Creates a defaulted pagination-offset schema.</td>
+</tr>
+<tr>
+<td><code>stringToInt</code></td>
+<td><code>function stringToInt(outputSchema: ContractDefaultableSchema&lt;number&gt;): ContractSchema&lt;number&gt;</code></td>
+<td>Coerces an integer string into a number and validates it with <code>outputSchema</code>.</td>
+</tr>
+<tr>
+<td><code>stringToNumber</code></td>
+<td><code>function stringToNumber(outputSchema: ContractDefaultableSchema&lt;number&gt;): ContractSchema&lt;number&gt;</code></td>
+<td>Coerces a numeric string into a number and validates it with <code>outputSchema</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Errors</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>notFound</code></td>
+<td>function</td>
+<td><code>function notFound(options: NotFoundOptions): never</code></td>
+<td>Throws the contract <code>NOT_FOUND</code> oRPC error with inferred resource context.</td>
+</tr>
+<tr>
+<td><code>getResourceType</code></td>
+<td>function</td>
+<td><code>function getResourceType(options: { path?: readonly string[]; }): string</code></td>
+<td>Resolves a singular resource name from an oRPC handler path.</td>
+</tr>
+<tr>
+<td><code>COMMON_ERROR_CODES</code></td>
+<td>const</td>
+<td><code>const COMMON_ERROR_CODES: Readonly&lt;{ notFound; validationError; unauthorized; forbidden; rateLimited; serviceUnavailable; }&gt;</code></td>
+<td>Common oRPC error codes shared by NetScript service contracts.</td>
+</tr>
+<tr>
+<td><code>NotFoundErrorSchema</code></td>
+<td>const</td>
+<td><code>const NotFoundErrorSchema: ContractSchema&lt;NotFoundError&gt;</code></td>
+<td>Common not-found error schema.</td>
+</tr>
+<tr>
+<td><code>ValidationErrorSchema</code></td>
+<td>const</td>
+<td><code>const ValidationErrorSchema: ContractSchema&lt;ValidationError&gt;</code></td>
+<td>Common validation error schema.</td>
+</tr>
+<tr>
+<td><code>UnauthorizedErrorSchema</code></td>
+<td>const</td>
+<td><code>const UnauthorizedErrorSchema: ContractSchema&lt;UnauthorizedError&gt;</code></td>
+<td>Common unauthorized error schema.</td>
+</tr>
+<tr>
+<td><code>ForbiddenErrorSchema</code></td>
+<td>const</td>
+<td><code>const ForbiddenErrorSchema: ContractSchema&lt;ForbiddenError&gt;</code></td>
+<td>Common forbidden error schema.</td>
+</tr>
+<tr>
+<td><code>RateLimitErrorSchema</code></td>
+<td>const</td>
+<td><code>const RateLimitErrorSchema: ContractSchema&lt;RateLimitError&gt;</code></td>
+<td>Common rate-limit error schema.</td>
+</tr>
+<tr>
+<td><code>ServiceUnavailableErrorSchema</code></td>
+<td>const</td>
+<td><code>const ServiceUnavailableErrorSchema: ContractSchema&lt;ServiceUnavailableError&gt;</code></td>
+<td>Common service-unavailable error schema.</td>
+</tr>
+<tr>
+<td><code>SuccessSchema</code></td>
+<td>const</td>
+<td><code>const SuccessSchema: ContractSchema&lt;SuccessResponse&gt;</code></td>
+<td>Common success response schema.</td>
+</tr>
+</tbody>
+</table>
+<h2>Pagination schemas</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OffsetPaginationQuerySchema</code></td>
+<td><code>const OffsetPaginationQuerySchema: ContractObjectSchema&lt;OffsetPaginationQuery&gt;</code></td>
+<td>Offset pagination schema for URL query parameters.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginationInputSchema</code></td>
+<td><code>const OffsetPaginationInputSchema: ContractObjectSchema&lt;OffsetPaginationInput&gt;</code></td>
+<td>Offset pagination schema for request bodies.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginationMetaSchema</code></td>
+<td><code>const OffsetPaginationMetaSchema: ContractObjectSchema&lt;OffsetPaginationMeta&gt;</code></td>
+<td>Offset pagination metadata schema for responses.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationQuerySchema</code></td>
+<td><code>const CursorPaginationQuerySchema: ContractObjectSchema&lt;CursorPaginationQuery&gt;</code></td>
+<td>Cursor pagination schema for URL query parameters.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationInputSchema</code></td>
+<td><code>const CursorPaginationInputSchema: ContractObjectSchema&lt;CursorPaginationInput&gt;</code></td>
+<td>Cursor pagination schema for request bodies.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationMetaSchema</code></td>
+<td><code>const CursorPaginationMetaSchema: ContractObjectSchema&lt;CursorPaginationMeta&gt;</code></td>
+<td>Cursor pagination metadata schema for responses.</td>
+</tr>
+</tbody>
+</table>
+<h2>Constants</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DEFAULT_INTEGER_MAX</code></td>
+<td><code>2147483647</code></td>
+<td>Maximum integer used by contract numeric schemas.</td>
+</tr>
+<tr>
+<td><code>DEFAULT_PAGINATION_LIMIT</code></td>
+<td><code>10</code></td>
+<td>Default page size for contract pagination schemas.</td>
+</tr>
+<tr>
+<td><code>DEFAULT_PAGINATION_LIMIT_MAX</code></td>
+<td><code>1000</code></td>
+<td>Maximum page size accepted by contract pagination schemas.</td>
+</tr>
+<tr>
+<td><code>DEFAULT_PAGINATION_OFFSET</code></td>
+<td><code>0</code></td>
+<td>Default offset for contract offset-pagination schemas.</td>
+</tr>
+</tbody>
+</table>
+<h2>Diagnostics</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inspectContracts</code></td>
+<td><code>function inspectContracts(target: ContractsInspectionTarget): InspectionReport</code></td>
+<td>Builds a JSON-stable inspection report for a contract primitive.</td>
+</tr>
+</tbody>
+</table>
+<h2>Result and error types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Result</code></td>
+<td><code>type Result&lt;TValue, TError&gt; = OkResult&lt;TValue&gt; | ErrorResult&lt;TError&gt;</code></td>
+<td>Discriminated success/error result union.</td>
+</tr>
+<tr>
+<td><code>OkResult</code></td>
+<td><code>type OkResult&lt;TValue&gt; = Readonly&lt;{ ok: true; value: TValue; }&gt;</code></td>
+<td>Success arm of <code>Result</code>.</td>
+</tr>
+<tr>
+<td><code>ErrorResult</code></td>
+<td><code>type ErrorResult&lt;TError&gt; = Readonly&lt;{ ok: false; error: TError; }&gt;</code></td>
+<td>Error arm of <code>Result</code>.</td>
+</tr>
+<tr>
+<td><code>SuccessResponse</code></td>
+<td><code>type SuccessResponse = Readonly&lt;{ success: boolean; message?: string; }&gt;</code></td>
+<td>Common success response payload.</td>
+</tr>
+<tr>
+<td><code>NotFoundError</code></td>
+<td><code>type NotFoundError = Readonly&lt;{ resourceType: string; resourceId: string | number; }&gt;</code></td>
+<td>Not-found error data.</td>
+</tr>
+<tr>
+<td><code>ValidationError</code></td>
+<td><code>type ValidationError = Readonly&lt;{ formErrors: string[]; fieldErrors: Record&lt;string, string[] | undefined&gt;; }&gt;</code></td>
+<td>Validation error data.</td>
+</tr>
+<tr>
+<td><code>UnauthorizedError</code></td>
+<td><code>type UnauthorizedError = Readonly&lt;{ reason?: &quot;missing_token&quot; | &quot;invalid_token&quot; | &quot;expired_token&quot;; }&gt;</code></td>
+<td>Unauthorized error data.</td>
+</tr>
+<tr>
+<td><code>ForbiddenError</code></td>
+<td><code>type ForbiddenError = Readonly&lt;{ requiredRole?: string; userRole?: string; }&gt;</code></td>
+<td>Forbidden error data.</td>
+</tr>
+<tr>
+<td><code>RateLimitError</code></td>
+<td><code>type RateLimitError = Readonly&lt;{ retryAfter: number; limit: number; }&gt;</code></td>
+<td>Rate-limit error data.</td>
+</tr>
+<tr>
+<td><code>ServiceUnavailableError</code></td>
+<td><code>type ServiceUnavailableError = Readonly&lt;{ retryAfter?: number; reason?: string; }&gt;</code></td>
+<td>Service-unavailable error data.</td>
+</tr>
+</tbody>
+</table>
+<h2>Schema and pagination types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ContractSchema</code></td>
+<td><code>type ContractSchema&lt;TOutput = unknown&gt;</code></td>
+<td>Minimal schema contract (<code>parse</code>, <code>safeParse</code>, <code>optional</code>, <code>describe</code>).</td>
+</tr>
+<tr>
+<td><code>ContractObjectSchema</code></td>
+<td><code>type ContractObjectSchema&lt;TOutput = unknown&gt;</code></td>
+<td>Object schema contract with <code>extend</code>/<code>merge</code>.</td>
+</tr>
+<tr>
+<td><code>ContractDefaultableSchema</code></td>
+<td><code>type ContractDefaultableSchema&lt;TOutput&gt;</code></td>
+<td>Schema contract with a <code>default(value)</code> helper.</td>
+</tr>
+<tr>
+<td><code>ContractNumberSchema</code></td>
+<td><code>type ContractNumberSchema = ContractDefaultableSchema&lt;number&gt;</code></td>
+<td>Numeric schema contract.</td>
+</tr>
+<tr>
+<td><code>ContractStringSchema</code></td>
+<td><code>type ContractStringSchema = ContractDefaultableSchema&lt;string&gt;</code></td>
+<td>String schema contract.</td>
+</tr>
+<tr>
+<td><code>ContractParseResult</code></td>
+<td><code>type ContractParseResult&lt;TOutput&gt;</code></td>
+<td>Result returned by <code>safeParse</code>.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginationQuery</code></td>
+<td><code>type OffsetPaginationQuery = Readonly&lt;{ limit: number; offset: number; }&gt;</code></td>
+<td>Offset pagination query shape.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginationInput</code></td>
+<td><code>type OffsetPaginationInput = Readonly&lt;{ limit: number; offset: number; }&gt;</code></td>
+<td>Offset pagination input shape.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginationMeta</code></td>
+<td><code>type OffsetPaginationMeta = Readonly&lt;{ total: number; limit: number; offset: number; hasMore: boolean; }&gt;</code></td>
+<td>Offset pagination response metadata.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationQuery</code></td>
+<td><code>type CursorPaginationQuery = Readonly&lt;{ limit: number; cursor?: string; }&gt;</code></td>
+<td>Cursor pagination query shape.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationInput</code></td>
+<td><code>type CursorPaginationInput = Readonly&lt;{ limit: number; cursor?: string; }&gt;</code></td>
+<td>Cursor pagination input shape.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationMeta</code></td>
+<td><code>type CursorPaginationMeta = Readonly&lt;{ limit: number; nextCursor: string | null; hasMore: boolean; }&gt;</code></td>
+<td>Cursor pagination response metadata.</td>
+</tr>
+</tbody>
+</table>
+<h2>Schema option types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>StringSchemaOptions</code></td>
+<td><code>type StringSchemaOptions = Readonly&lt;{ description?: string; }&gt;</code></td>
+<td>Options for string-derived schema factories.</td>
+</tr>
+<tr>
+<td><code>BoundedStringSchemaOptions</code></td>
+<td><code>type BoundedStringSchemaOptions = StringSchemaOptions &amp; Readonly&lt;{ min?: number; max: number; }&gt;</code></td>
+<td>Options for <code>boundedString</code>.</td>
+</tr>
+<tr>
+<td><code>IntegerSchemaOptions</code></td>
+<td><code>type IntegerSchemaOptions = Readonly&lt;{ min?: number; max?: number; description?: string; }&gt;</code></td>
+<td>Options for integer schema factories.</td>
+</tr>
+<tr>
+<td><code>DefaultedIntegerSchemaOptions</code></td>
+<td><code>type DefaultedIntegerSchemaOptions = IntegerSchemaOptions &amp; Readonly&lt;{ default?: number; }&gt;</code></td>
+<td>Options for defaulted integer factories.</td>
+</tr>
+<tr>
+<td><code>NotFoundOptions</code></td>
+<td><code>type NotFoundOptions = Readonly&lt;{ errors: unknown; path?: readonly string[]; resourceId?: string | number; message?: string; }&gt;</code></td>
+<td>Options accepted by <code>notFound</code>.</td>
+</tr>
+<tr>
+<td><code>ContractsInspectionTarget</code></td>
+<td><code>type ContractsInspectionTarget = unknown</code></td>
+<td>Target accepted by <code>inspectContracts</code>.</td>
+</tr>
+<tr>
+<td><code>InspectionReport</code></td>
+<td><code>type InspectionReport</code></td>
+<td>JSON-stable report returned by <code>inspectContracts</code>.</td>
+</tr>
+<tr>
+<td><code>InspectionStatus</code></td>
+<td><code>type InspectionStatus = &quot;ok&quot; | &quot;warning&quot; | &quot;error&quot;</code></td>
+<td>Status field of <code>InspectionReport</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export. Their symbols are generated
+from their own <code>deno doc</code> surface.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/contracts</code></td>
+<td><code>./mod.ts</code></td>
+<td>Core contract surface (documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/contracts/crud</code></td>
+<td><code>./crud.ts</code></td>
+<td>CRUD contract generators.</td>
+</tr>
+<tr>
+<td><code>@netscript/contracts/query</code></td>
+<td><code>./query.ts</code></td>
+<td>Query, filter, and pagination helpers.</td>
+</tr>
+<tr>
+<td><code>@netscript/contracts/transform</code></td>
+<td><code>./transform.ts</code></td>
+<td>Typed transformer factories.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/contracts/crud</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createCrudContract</code></td>
+<td>function</td>
+<td><code>function createCrudContract&lt;TEntity, TCreate, TUpdate&gt;(options: CrudContractOptions&lt;...&gt;): CrudContract</code></td>
+<td>Generates a full list/get/create/update/delete oRPC CRUD contract.</td>
+</tr>
+<tr>
+<td><code>createReadOnlyContract</code></td>
+<td>function</td>
+<td><code>function createReadOnlyContract&lt;TEntity&gt;(options: { resource; entitySchema; idSchema?; filterSchema?; }): CrudContract</code></td>
+<td>Generates a read-only (list + get) CRUD contract.</td>
+</tr>
+<tr>
+<td><code>createListOnlyContract</code></td>
+<td>function</td>
+<td><code>function createListOnlyContract&lt;TEntity&gt;(options: { resource; entitySchema; filterSchema?; }): CrudContract</code></td>
+<td>Generates a list-only CRUD contract.</td>
+</tr>
+<tr>
+<td><code>CrudContract</code></td>
+<td>type alias</td>
+<td><code>type CrudContract = Readonly&lt;{ list?; getById?; create?; update?; delete?; }&gt;</code></td>
+<td>The generated CRUD contract map of operations.</td>
+</tr>
+<tr>
+<td><code>CrudContractOperation</code></td>
+<td>type alias</td>
+<td><code>type CrudContractOperation = BaseContractProcedure</code></td>
+<td>A single generated CRUD operation procedure.</td>
+</tr>
+<tr>
+<td><code>CrudContractOptions</code></td>
+<td>interface</td>
+<td><code>interface CrudContractOptions&lt;TEntity, TCreate, TUpdate&gt;</code></td>
+<td>Options accepted by <code>createCrudContract</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/contracts/query</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>buildPrismaWhere</code></td>
+<td>function</td>
+<td><code>function buildPrismaWhere(filters: FilterCondition[]): Record&lt;string, unknown&gt;</code></td>
+<td>Builds a Prisma <code>where</code> clause from filter conditions.</td>
+</tr>
+<tr>
+<td><code>buildSearchCondition</code></td>
+<td>function</td>
+<td><code>function buildSearchCondition(query: string, fields: string[]): Record&lt;string, unknown&gt; | null</code></td>
+<td>Builds a Prisma search condition across the given fields.</td>
+</tr>
+<tr>
+<td><code>combineConditions</code></td>
+<td>function</td>
+<td><code>function combineConditions(options: { filters?; search?; searchFields?; }): Record&lt;string, unknown&gt;</code></td>
+<td>Combines filter and search conditions into one Prisma clause.</td>
+</tr>
+<tr>
+<td><code>createPaginatedOutput</code></td>
+<td>function</td>
+<td><code>function createPaginatedOutput&lt;T&gt;(itemSchema: ContractSchema&lt;T&gt;): ContractObjectSchema&lt;PaginatedResult&lt;T&gt;&gt;</code></td>
+<td>Wraps an item schema in an offset-paginated output schema.</td>
+</tr>
+<tr>
+<td><code>createCursorPaginatedOutput</code></td>
+<td>function</td>
+<td><code>function createCursorPaginatedOutput&lt;T&gt;(itemSchema: ContractSchema&lt;T&gt;): ContractObjectSchema&lt;CursorPaginatedResult&lt;T&gt;&gt;</code></td>
+<td>Wraps an item schema in a cursor-paginated output schema.</td>
+</tr>
+<tr>
+<td><code>PaginationInputSchema</code></td>
+<td>const</td>
+<td><code>const PaginationInputSchema: ContractObjectSchema&lt;PaginationInput&gt;</code></td>
+<td>Page/limit pagination input schema.</td>
+</tr>
+<tr>
+<td><code>PaginationOutputSchema</code></td>
+<td>const</td>
+<td><code>const PaginationOutputSchema: ContractObjectSchema&lt;PaginationOutput&gt;</code></td>
+<td>Page pagination output metadata schema.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginationInputSchema</code></td>
+<td>const</td>
+<td><code>const OffsetPaginationInputSchema: ContractObjectSchema&lt;OffsetPaginationInput&gt;</code></td>
+<td>Offset/limit pagination input schema.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationInputSchema</code></td>
+<td>const</td>
+<td><code>const CursorPaginationInputSchema: ContractObjectSchema&lt;CursorPaginationInput&gt;</code></td>
+<td>Cursor pagination input schema.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationOutputSchema</code></td>
+<td>const</td>
+<td><code>const CursorPaginationOutputSchema: ContractObjectSchema&lt;CursorPaginationOutput&gt;</code></td>
+<td>Cursor pagination output metadata schema.</td>
+</tr>
+<tr>
+<td><code>SearchInputSchema</code></td>
+<td>const</td>
+<td><code>const SearchInputSchema: ContractObjectSchema&lt;SearchInput&gt;</code></td>
+<td>Search/filter input schema.</td>
+</tr>
+<tr>
+<td><code>FilterConditionSchema</code></td>
+<td>const</td>
+<td><code>const FilterConditionSchema: ContractObjectSchema&lt;FilterCondition&gt;</code></td>
+<td>Single filter condition schema.</td>
+</tr>
+<tr>
+<td><code>FiltersSchema</code></td>
+<td>const</td>
+<td><code>const FiltersSchema: ContractSchema&lt;Filters&gt;</code></td>
+<td>Array-of-filters schema.</td>
+</tr>
+<tr>
+<td><code>FilterOperatorSchema</code></td>
+<td>const</td>
+<td><code>const FilterOperatorSchema: ContractSchema&lt;FilterOperator&gt;</code></td>
+<td>Filter operator enum schema.</td>
+</tr>
+<tr>
+<td><code>PaginationInput</code></td>
+<td>type alias</td>
+<td><code>type PaginationInput = Readonly&lt;{ page; limit; sortBy?; sortOrder; }&gt;</code></td>
+<td>Page/limit pagination input.</td>
+</tr>
+<tr>
+<td><code>PaginationOutput</code></td>
+<td>type alias</td>
+<td><code>type PaginationOutput = Readonly&lt;{ page; limit; total; totalPages; hasNext; hasPrev; }&gt;</code></td>
+<td>Page pagination output metadata.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginationInput</code></td>
+<td>type alias</td>
+<td><code>type OffsetPaginationInput = Readonly&lt;{ offset; limit; sortBy?; sortOrder; }&gt;</code></td>
+<td>Offset/limit pagination input.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationInput</code></td>
+<td>type alias</td>
+<td><code>type CursorPaginationInput = Readonly&lt;{ cursor?; limit; direction; }&gt;</code></td>
+<td>Cursor pagination input.</td>
+</tr>
+<tr>
+<td><code>CursorPaginationOutput</code></td>
+<td>type alias</td>
+<td><code>type CursorPaginationOutput = Readonly&lt;{ nextCursor; prevCursor; hasMore; }&gt;</code></td>
+<td>Cursor pagination output metadata.</td>
+</tr>
+<tr>
+<td><code>FilterCondition</code></td>
+<td>type alias</td>
+<td><code>type FilterCondition = Readonly&lt;{ field; operator; value?; }&gt;</code></td>
+<td>Single filter condition.</td>
+</tr>
+<tr>
+<td><code>Filters</code></td>
+<td>type alias</td>
+<td><code>type Filters = readonly FilterCondition[]</code></td>
+<td>Ordered list of filter conditions.</td>
+</tr>
+<tr>
+<td><code>FilterOperator</code></td>
+<td>type alias</td>
+<td><code>type FilterOperator</code></td>
+<td>Supported filter operators (equals, contains, gt, in, isNull, and so on).</td>
+</tr>
+<tr>
+<td><code>SearchInput</code></td>
+<td>type alias</td>
+<td><code>type SearchInput = Readonly&lt;{ search?; searchFields?; filters?; }&gt;</code></td>
+<td>Search + filter input.</td>
+</tr>
+<tr>
+<td><code>PaginatedResult</code></td>
+<td>interface</td>
+<td><code>interface PaginatedResult&lt;T&gt;</code></td>
+<td>Offset-paginated result shape.</td>
+</tr>
+<tr>
+<td><code>CursorPaginatedResult</code></td>
+<td>interface</td>
+<td><code>interface CursorPaginatedResult&lt;T&gt;</code></td>
+<td>Cursor-paginated result shape.</td>
+</tr>
+<tr>
+<td><code>PaginatedQueryOptions</code></td>
+<td>interface</td>
+<td><code>interface PaginatedQueryOptions extends Partial&lt;PaginationInput&gt;</code></td>
+<td>Options for an offset-paginated query.</td>
+</tr>
+<tr>
+<td><code>OffsetPaginatedQueryOptions</code></td>
+<td>interface</td>
+<td><code>interface OffsetPaginatedQueryOptions</code></td>
+<td>Options for an offset-paginated query.</td>
+</tr>
+<tr>
+<td><code>CursorPaginatedQueryOptions</code></td>
+<td>interface</td>
+<td><code>interface CursorPaginatedQueryOptions</code></td>
+<td>Options for a cursor-paginated query.</td>
+</tr>
+<tr>
+<td><code>PrismaModelDelegate</code></td>
+<td>interface</td>
+<td><code>interface PrismaModelDelegate</code></td>
+<td>Minimal Prisma delegate contract used by query helpers.</td>
+</tr>
+</tbody>
+</table>
+<h3><code>@netscript/contracts/transform</code></h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createTransformer</code></td>
+<td>function</td>
+<td><code>function createTransformer&lt;TInput, TOutput&gt;(transform: TransformFn&lt;TInput, TOutput&gt;): Transformer&lt;TInput, TOutput&gt;</code></td>
+<td>Wraps a transform function into a composable <code>Transformer</code>.</td>
+</tr>
+<tr>
+<td><code>composeTransformers</code></td>
+<td>function</td>
+<td><code>function composeTransformers(...transformers): Transformer</code></td>
+<td>Composes 2-4 transformers left-to-right into one transformer.</td>
+</tr>
+<tr>
+<td><code>createPickTransformer</code></td>
+<td>function</td>
+<td><code>function createPickTransformer&lt;T&gt;(): PickTransformerFactory&lt;T&gt;</code></td>
+<td>Creates a factory producing transformers that pick keys.</td>
+</tr>
+<tr>
+<td><code>createOmitTransformer</code></td>
+<td>function</td>
+<td><code>function createOmitTransformer&lt;T&gt;(): OmitTransformerFactory&lt;T&gt;</code></td>
+<td>Creates a factory producing transformers that omit keys.</td>
+</tr>
+<tr>
+<td><code>Transformer</code></td>
+<td>interface</td>
+<td><code>interface Transformer&lt;TInput, TOutput&gt;</code></td>
+<td>A composable input-to-output transformer.</td>
+</tr>
+<tr>
+<td><code>TransformFn</code></td>
+<td>type alias</td>
+<td><code>type TransformFn&lt;TInput, TOutput&gt; = (input: TInput) =&gt; TOutput</code></td>
+<td>The underlying transform function signature.</td>
+</tr>
+<tr>
+<td><code>PickTransformerFactory</code></td>
+<td>type alias</td>
+<td><code>type PickTransformerFactory&lt;T&gt; = (...keys) =&gt; Transformer&lt;T, Pick&lt;T, K&gt;&gt;</code></td>
+<td>Factory returned by <code>createPickTransformer</code>.</td>
+</tr>
+<tr>
+<td><code>OmitTransformerFactory</code></td>
+<td>type alias</td>
+<td><code>type OmitTransformerFactory&lt;T&gt; = (...keys) =&gt; Transformer&lt;T, Omit&lt;T, K&gt;&gt;</code></td>
+<td>Factory returned by <code>createOmitTransformer</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

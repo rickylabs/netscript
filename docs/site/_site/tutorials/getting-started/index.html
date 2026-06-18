@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Getting started · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>Getting started</h1>
+      <h1>Getting started</h1>
+<p>This tutorial takes you from an empty directory to a running NetScript workspace. Follow
+each step in order and you will end with a scaffolded project you can type-check and explore.
+It is a guided happy path — not an exhaustive option list. When you want the precise spelling
+of a command or flag, the <a href="/reference/cli/"><code>@netscript/cli</code> reference</a> is the source of truth;
+to understand <em>why</em> the workspace is laid out the way it is, read the
+<a href="/explanation/">explanation</a>.</p>
+<h2>Before you begin</h2>
+<p>You will need:</p>
+<ul>
+<li><strong><a href="https://deno.com/">Deno</a> 2.x</strong> on your <code>PATH</code>. Check with <code>deno --version</code>.</li>
+<li>A terminal and an empty working directory.</li>
+</ul>
+<p>NetScript ships its tooling as the <code>@netscript/cli</code> package on JSR. Everything in this
+tutorial runs through the public <code>netscript</code> command, which operates on ordinary generated
+workspaces backed by published <code>@netscript/*</code> packages — you do not need a checkout of the
+NetScript repository.</p>
+<h2>Step 1 — Install the CLI</h2>
+<p>Install the <code>netscript</code> command from JSR:</p>
+<pre><code class="language-sh">deno install --global --allow-all --name netscript jsr:@netscript/cli/bin
+</code></pre>
+<p>Confirm it is available and inspect the command groups:</p>
+<pre><code class="language-sh">netscript --help
+</code></pre>
+<p>You should see the public command groups: <code>init</code>, <code>contract</code>, <code>db</code>, <code>deploy</code>, <code>generate</code>,
+<code>plugin</code>, and <code>service</code>.</p>
+<blockquote>
+<p>If you prefer not to install globally, you can run the same command tree ad-hoc with
+<code>deno run -A jsr:@netscript/cli/bin &lt;command&gt;</code>. The rest of this tutorial assumes the
+installed <code>netscript</code> form.</p>
+</blockquote>
+<h2>Step 2 — Preview the scaffold with a dry run</h2>
+<p>Before writing any files, ask the CLI what it <em>would</em> create. The <code>--dry-run</code> flag plans the
+scaffold and prints the result without touching disk:</p>
+<pre><code class="language-sh">netscript init my-app --dry-run
+</code></pre>
+<p><code>netscript init</code> validates your options, then runs an ordered pipeline that lays down the
+project root, Aspire orchestration, contracts, the Fresh app workspace, an empty plugin
+registry, and (optionally) a database workspace and an example service. The dry run reports
+the file and directory totals for each phase, so you can see the shape of the project before
+committing to it.</p>
+<h2>Step 3 — Create the workspace</h2>
+<p>When the plan looks right, create the project for real:</p>
+<pre><code class="language-sh">netscript init my-app
+</code></pre>
+<p>This scaffolds a <code>my-app/</code> workspace, formats the generated output with <code>deno fmt</code>, and
+initializes a git repository. On completion the CLI prints a <strong>next steps</strong> summary — the
+sequence of commands tailored to the options you chose. Keep that summary handy; the steps
+below mirror the common path.</p>
+<p>A few options you will reach for early (run <code>netscript init --help</code> for the full list):</p>
+<ul>
+<li><code>--service --service-name &lt;name&gt; --service-port &lt;port&gt;</code> — include an example service.</li>
+<li><code>--db &lt;engine&gt;</code> — scaffold a database workspace for the given engine (omit, or use
+<code>--db none</code>, to skip database tooling).</li>
+<li><code>--no-aspire</code> — skip the Aspire orchestration files.</li>
+<li><code>--editor &lt;none|zed|vscode&gt;</code> — generate editor settings.</li>
+</ul>
+<p>Then enter the workspace:</p>
+<pre><code class="language-sh">cd my-app
+</code></pre>
+<h2>Step 4 — Add a plugin</h2>
+<p>NetScript background-processing capabilities are delivered as plugins. Add a worker plugin to
+the workspace:</p>
+<pre><code class="language-sh">netscript plugin add worker --name workers --samples
+</code></pre>
+<p>The supported first-party plugin kinds and their conventional installed names are:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Conventional name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>worker</code></td>
+<td><code>workers</code></td>
+</tr>
+<tr>
+<td><code>saga</code></td>
+<td><code>sagas</code></td>
+</tr>
+<tr>
+<td><code>trigger</code></td>
+<td><code>triggers</code></td>
+</tr>
+<tr>
+<td><code>stream</code></td>
+<td><code>streams</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>--samples</code> includes example code so you have something to read and run. List what is
+registered at any time:</p>
+<pre><code class="language-sh">netscript plugin list
+</code></pre>
+<h2>Step 5 — Generate the plugin registry</h2>
+<p>After adding or changing plugins, regenerate the registry the runtime reads:</p>
+<pre><code class="language-sh">netscript generate plugins
+</code></pre>
+<p>If your workspace declares runtime configuration schemas, you can also regenerate those:</p>
+<pre><code class="language-sh">netscript generate runtime-schemas
+</code></pre>
+<h2>Step 6 — Verify the workspace type-checks</h2>
+<p>A freshly scaffolded NetScript workspace is meant to type-check cleanly. From the project
+root, run the Deno checker over the generated workspace members:</p>
+<pre><code class="language-sh">deno check --unstable-kv ./packages ./plugins ./services
+</code></pre>
+<p>(Adjust the member list to match the directories your chosen options created — for example
+add <code>./workers</code> after Step 4, or <code>./database</code> if you scaffolded with <code>--db</code>.) A clean check
+confirms the scaffold, the plugin you added, and the regenerated registry all line up.</p>
+<h2>Step 7 — Check plugin health</h2>
+<p>Finally, run the plugin doctor to confirm the installed plugins are wired correctly:</p>
+<pre><code class="language-sh">netscript plugin doctor
+</code></pre>
+<h2>What you built</h2>
+<p>You now have a working NetScript workspace: a scaffolded project with contracts and a Fresh
+app, a worker plugin with sample code, a generated plugin registry, and a clean type-check.</p>
+<h2>Where to go next</h2>
+<ul>
+<li><strong>Solve a specific task</strong> — see the <a href="/how-to/">how-to guides</a> for focused recipes such as
+adding services, databases, and deployments.</li>
+<li><strong>Look up an exact API</strong> — every public package and plugin has generated API docs in the
+<a href="/reference/">reference</a>; start with the <a href="/reference/cli/"><code>@netscript/cli</code> reference</a>.</li>
+<li><strong>Understand the design</strong> — the <a href="/explanation/">explanation</a> covers the NetScript plugin
+model, contracts, and orchestration choices.</li>
+</ul>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

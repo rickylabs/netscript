@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/aspire · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/aspire</h1>
+      <h1><code>@netscript/aspire</code></h1>
+<p>SDK-neutral Aspire diagnostics, config parsing, contribution ports, and TypeScript AppHost
+generation for NetScript plugin packages. This page is generated from the package's public
+surface with <code>deno doc</code> (US-2). For the full index of packages and plugins return to the
+<a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/aspire</code>) exposes the diagnostic contract only. Composition,
+config, schema, type, adapter, and testing APIs live on typed sub-path exports:</p>
+<ul>
+<li><a href="#sub-path-exports"><code>@netscript/aspire/config</code></a> — <code>appsettings.json</code> parsing, Zod schemas, and entry interfaces.</li>
+<li><a href="#sub-path-exports"><code>@netscript/aspire/schema</code></a> — JSON Schema generation from the Zod config schema.</li>
+<li><a href="#sub-path-exports"><code>@netscript/aspire/types</code></a> — inferred config types and known-name extractors.</li>
+<li><a href="#sub-path-exports"><code>@netscript/aspire/constants</code></a> — config keys, sections, and runtime defaults.</li>
+<li><a href="#sub-path-exports"><code>@netscript/aspire/application</code></a> — AppHost composition, the contribution registry, and resolver helpers.</li>
+<li><a href="#sub-path-exports"><code>@netscript/aspire/adapters</code></a> — the SDK-neutral TypeScript builder adapter.</li>
+<li><a href="#sub-path-exports"><code>@netscript/aspire/testing</code></a> — in-memory builder, contribution base class, and test fixtures.</li>
+</ul>
+<h2>Diagnostics (root export)</h2>
+<p>The root <code>@netscript/aspire</code> entrypoint exposes the diagnostic contract.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inspectAspire</code></td>
+<td>function</td>
+<td><code>function inspectAspire(target: string | readonly InspectableAspireResource[] | InspectableAspireBuilder): InspectionReport</code></td>
+<td>Inspect an Aspire target and return a JSON-stable diagnostic report.</td>
+</tr>
+<tr>
+<td><code>InspectableAspireBuilder</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Minimal builder shape accepted by the Aspire inspector.</td>
+</tr>
+<tr>
+<td><code>InspectableAspireResource</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Minimal resource shape accepted by the Aspire inspector.</td>
+</tr>
+<tr>
+<td><code>InspectionReport</code></td>
+<td>interface</td>
+<td>—</td>
+<td>JSON-stable diagnostic report returned by Aspire inspectors.</td>
+</tr>
+</tbody>
+</table>
+<h2>Config parsing (<code>@netscript/aspire/config</code>)</h2>
+<p>Parses and validates <code>appsettings.json</code> against the Zod schema.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>parseAppSettings</code></td>
+<td>function</td>
+<td><code>async function parseAppSettings(filePath: string, options?: ParseOptions): Promise&lt;ParseResult&lt;NetScriptConfig&gt;&gt;</code></td>
+<td>Parse an <code>appsettings.json</code> file and validate it against the Zod schema.</td>
+</tr>
+</tbody>
+</table>
+<h3>Config interfaces</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AppSettings</code></td>
+<td>Top-level <code>appsettings.json</code> structure.</td>
+</tr>
+<tr>
+<td><code>NetScriptConfig</code></td>
+<td>Root NetScript configuration section.</td>
+</tr>
+<tr>
+<td><code>BaseEntry</code></td>
+<td>Common fields shared by resource entries.</td>
+</tr>
+<tr>
+<td><code>ReferenceEntry</code></td>
+<td>Reference fields for resources that depend on services or plugins.</td>
+</tr>
+<tr>
+<td><code>ServiceEntry</code></td>
+<td>Backend service resource entry.</td>
+</tr>
+<tr>
+<td><code>PluginEntry</code></td>
+<td>Plugin service resource entry.</td>
+</tr>
+<tr>
+<td><code>DatabaseEntry</code></td>
+<td>Database resource entry.</td>
+</tr>
+<tr>
+<td><code>CacheEntry</code></td>
+<td>Cache resource entry.</td>
+</tr>
+<tr>
+<td><code>BackgroundProcessorEntry</code></td>
+<td>Background processor resource entry.</td>
+</tr>
+<tr>
+<td><code>AppEntry</code></td>
+<td>Frontend, desktop, or task application entry.</td>
+</tr>
+<tr>
+<td><code>ToolEntry</code></td>
+<td>Development tool entry.</td>
+</tr>
+<tr>
+<td><code>DefaultsConfig</code></td>
+<td>Defaults section wrapper.</td>
+</tr>
+<tr>
+<td><code>DenoDefaults</code></td>
+<td>Global Deno runtime defaults.</td>
+</tr>
+<tr>
+<td><code>LoggingConfig</code></td>
+<td>ASP.NET Core logging configuration.</td>
+</tr>
+<tr>
+<td><code>OtelConfig</code></td>
+<td>OpenTelemetry endpoint configuration.</td>
+</tr>
+<tr>
+<td><code>ParseOptions</code></td>
+<td>Options for controlling parser behavior.</td>
+</tr>
+<tr>
+<td><code>ParseResult</code></td>
+<td>Result of parsing <code>appsettings.json</code>.</td>
+</tr>
+<tr>
+<td><code>AspireSchema</code></td>
+<td>Public parser contract exposed by Aspire schema constants.</td>
+</tr>
+<tr>
+<td><code>AspireSafeParseSuccess</code></td>
+<td>Successful result from <code>AspireSchema.safeParse</code>.</td>
+</tr>
+<tr>
+<td><code>AspireSafeParseFailure</code></td>
+<td>Failed result from <code>AspireSchema.safeParse</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3>Config type aliases</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AppType</code></td>
+<td>Application entry variants supported by the AppHost config.</td>
+</tr>
+<tr>
+<td><code>CacheEngine</code></td>
+<td>Cache engine variants supported by Aspire hosting integrations.</td>
+</tr>
+<tr>
+<td><code>DatabaseEngine</code></td>
+<td>Database engine variants supported by Aspire hosting integrations.</td>
+</tr>
+<tr>
+<td><code>ResourceMode</code></td>
+<td>Resource provisioning mode for managed resources.</td>
+</tr>
+<tr>
+<td><code>AspireSafeParseResult</code></td>
+<td>Result from <code>AspireSchema.safeParse</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3>Config Zod schemas</h3>
+<p>These exported Zod schema values back the config contract above.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AppSettingsSchema</code></td>
+<td>Top-level <code>appsettings.json</code> schema.</td>
+</tr>
+<tr>
+<td><code>NetScriptConfigSchema</code></td>
+<td>Root NetScript configuration schema.</td>
+</tr>
+<tr>
+<td><code>ServiceEntrySchema</code></td>
+<td>Service entry schema.</td>
+</tr>
+<tr>
+<td><code>PluginEntrySchema</code></td>
+<td>Plugin entry schema.</td>
+</tr>
+<tr>
+<td><code>DatabaseEntrySchema</code></td>
+<td>Database entry schema.</td>
+</tr>
+<tr>
+<td><code>CacheEntrySchema</code></td>
+<td>Cache entry schema.</td>
+</tr>
+<tr>
+<td><code>BackgroundProcessorEntrySchema</code></td>
+<td>Background processor entry schema.</td>
+</tr>
+<tr>
+<td><code>AppEntrySchema</code></td>
+<td>Application entry schema.</td>
+</tr>
+<tr>
+<td><code>ToolEntrySchema</code></td>
+<td>Development tool entry schema.</td>
+</tr>
+<tr>
+<td><code>DefaultsSchema</code></td>
+<td>Defaults section schema.</td>
+</tr>
+<tr>
+<td><code>DenoDefaultsSchema</code></td>
+<td>Global Deno runtime defaults schema.</td>
+</tr>
+<tr>
+<td><code>OtelConfigSchema</code></td>
+<td>OpenTelemetry endpoint configuration schema.</td>
+</tr>
+<tr>
+<td><code>AppTypeSchema</code></td>
+<td>Application type schema.</td>
+</tr>
+<tr>
+<td><code>CacheEngineSchema</code></td>
+<td>Cache engine schema.</td>
+</tr>
+<tr>
+<td><code>DatabaseEngineSchema</code></td>
+<td>Database engine schema.</td>
+</tr>
+<tr>
+<td><code>ResourceModeSchema</code></td>
+<td>Resource provisioning mode schema.</td>
+</tr>
+</tbody>
+</table>
+<h2>Schema generation (<code>@netscript/aspire/schema</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>generateAppSettingsJsonSchema</code></td>
+<td>function</td>
+<td><code>function generateAppSettingsJsonSchema(): Record&lt;string, unknown&gt;</code></td>
+<td>Generate a JSON Schema (draft-7) from the Zod <code>AppSettingsSchema</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2>Config types (<code>@netscript/aspire/types</code>)</h2>
+<p>Inferred config types and helpers that extract known resource names as literal unions from a
+config type.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AppSettings</code></td>
+<td>type alias</td>
+<td>Full <code>appsettings.json</code> structure.</td>
+</tr>
+<tr>
+<td><code>NetScriptConfig</code></td>
+<td>type alias</td>
+<td>Root <code>NetScript</code> configuration section.</td>
+</tr>
+<tr>
+<td><code>ServiceEntry</code></td>
+<td>type alias</td>
+<td>A service resource entry.</td>
+</tr>
+<tr>
+<td><code>PluginEntry</code></td>
+<td>type alias</td>
+<td>A plugin resource entry.</td>
+</tr>
+<tr>
+<td><code>DatabaseEntry</code></td>
+<td>type alias</td>
+<td>A database resource entry.</td>
+</tr>
+<tr>
+<td><code>CacheEntry</code></td>
+<td>type alias</td>
+<td>A cache resource entry.</td>
+</tr>
+<tr>
+<td><code>BackgroundProcessorEntry</code></td>
+<td>type alias</td>
+<td>A background processor entry (worker, saga, or trigger).</td>
+</tr>
+<tr>
+<td><code>AppEntry</code></td>
+<td>type alias</td>
+<td>An application resource entry.</td>
+</tr>
+<tr>
+<td><code>ToolEntry</code></td>
+<td>type alias</td>
+<td>A development tool entry.</td>
+</tr>
+<tr>
+<td><code>DenoDefaults</code></td>
+<td>type alias</td>
+<td>Global Deno runtime defaults.</td>
+</tr>
+<tr>
+<td><code>OtelConfig</code></td>
+<td>type alias</td>
+<td>OpenTelemetry exporter configuration.</td>
+</tr>
+<tr>
+<td><code>AppType</code></td>
+<td>type alias</td>
+<td>Application type variant.</td>
+</tr>
+<tr>
+<td><code>CacheEngine</code></td>
+<td>type alias</td>
+<td>Supported cache engine types.</td>
+</tr>
+<tr>
+<td><code>DatabaseEngine</code></td>
+<td>type alias</td>
+<td>Supported database engine types.</td>
+</tr>
+<tr>
+<td><code>ResourceMode</code></td>
+<td>type alias</td>
+<td>Resource provisioning mode.</td>
+</tr>
+<tr>
+<td><code>ResourceDependencies</code></td>
+<td>interface</td>
+<td>Extracted dependency requirements from a resource entry.</td>
+</tr>
+<tr>
+<td><code>AppEntryOf</code></td>
+<td>type alias</td>
+<td>The typed app entry for a known app name.</td>
+</tr>
+<tr>
+<td><code>ServiceEntryOf</code></td>
+<td>type alias</td>
+<td>The typed service entry for a known service name.</td>
+</tr>
+<tr>
+<td><code>PluginEntryOf</code></td>
+<td>type alias</td>
+<td>The typed plugin entry for a known plugin name.</td>
+</tr>
+<tr>
+<td><code>DatabaseEntryOf</code></td>
+<td>type alias</td>
+<td>The typed database entry for a known database name.</td>
+</tr>
+<tr>
+<td><code>CacheEntryOf</code></td>
+<td>type alias</td>
+<td>The typed cache entry for a known cache name.</td>
+</tr>
+<tr>
+<td><code>BackgroundProcessorEntryOf</code></td>
+<td>type alias</td>
+<td>The typed background processor entry for a known processor name.</td>
+</tr>
+<tr>
+<td><code>KnownApps</code></td>
+<td>type alias</td>
+<td>Extract known app names as a literal union from a config type.</td>
+</tr>
+<tr>
+<td><code>KnownServices</code></td>
+<td>type alias</td>
+<td>Extract known service names as a literal union from a config type.</td>
+</tr>
+<tr>
+<td><code>KnownPlugins</code></td>
+<td>type alias</td>
+<td>Extract known plugin names as a literal union from a config type.</td>
+</tr>
+<tr>
+<td><code>KnownDatabases</code></td>
+<td>type alias</td>
+<td>Extract known database names as a literal union from a config type.</td>
+</tr>
+<tr>
+<td><code>KnownCaches</code></td>
+<td>type alias</td>
+<td>Extract known cache names as a literal union from a config type.</td>
+</tr>
+<tr>
+<td><code>KnownBackgroundProcessors</code></td>
+<td>type alias</td>
+<td>Extract known background processor names as a literal union from a config type.</td>
+</tr>
+</tbody>
+</table>
+<h2>Constants (<code>@netscript/aspire/constants</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONFIG_KEYS</code></td>
+<td>const</td>
+<td>Configuration key constants used in <code>IConfiguration</code> binding.</td>
+</tr>
+<tr>
+<td><code>CONFIG_SECTIONS</code></td>
+<td>const</td>
+<td>ASP.NET Core <code>IConfiguration</code> section paths for NetScript config sections.</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_ENV_VARS</code></td>
+<td>const</td>
+<td>Aspire dashboard environment variable names.</td>
+</tr>
+<tr>
+<td><code>DEFAULT_PERMISSIONS</code></td>
+<td>const</td>
+<td>Default Deno permission flags applied to all resources.</td>
+</tr>
+<tr>
+<td><code>OTEL_DEFAULTS</code></td>
+<td>const</td>
+<td>OpenTelemetry default values.</td>
+</tr>
+<tr>
+<td><code>OTEL_ENV_VARS</code></td>
+<td>const</td>
+<td>OpenTelemetry environment variable names.</td>
+</tr>
+<tr>
+<td><code>RESOURCE_DEFAULTS</code></td>
+<td>const</td>
+<td>Default values for resource configuration.</td>
+</tr>
+</tbody>
+</table>
+<h2>Composition (<code>@netscript/aspire/application</code>)</h2>
+<p>AppHost composition, the plugin contribution registry, and the resolver helpers that turn config
+entries into Aspire resources.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>composeAppHost</code></td>
+<td>function</td>
+<td><code>function composeAppHost(options: ComposeAppHostOptions): ComposeAppHostResult</code></td>
+<td>Compose plugin Aspire contributions into a supplied builder.</td>
+</tr>
+<tr>
+<td><code>ContributionRegistry</code></td>
+<td>class</td>
+<td>—</td>
+<td>Registry of Aspire plugin contributions for one AppHost composition.</td>
+</tr>
+<tr>
+<td><code>createPortAllocator</code></td>
+<td>function</td>
+<td><code>function createPortAllocator(options: PortAllocationOptions): (key: string, fallback?: number) =&gt; number</code></td>
+<td>Create a deterministic port allocator for plugin resources.</td>
+</tr>
+<tr>
+<td><code>buildOtelEnvVars</code></td>
+<td>function</td>
+<td><code>function buildOtelEnvVars(serviceName: string, serviceVersion: string, mode: OtelMode, otlpEndpoint: string): Record&lt;string, string&gt;</code></td>
+<td>Build OpenTelemetry environment variables for a Deno resource.</td>
+</tr>
+<tr>
+<td><code>buildViteEnvVarName</code></td>
+<td>function</td>
+<td><code>function buildViteEnvVarName(resourceName: string, endpointName: string): ViteEnvVarNames</code></td>
+<td>Generate VITE-prefixed environment variable names for a resource.</td>
+</tr>
+<tr>
+<td><code>extractDependencies</code></td>
+<td>function</td>
+<td><code>function extractDependencies(entry): ResourceDependencies</code></td>
+<td>Extract infrastructure dependency flags from a resource entry.</td>
+</tr>
+<tr>
+<td><code>extractPluginReferences</code></td>
+<td>function</td>
+<td><code>function extractPluginReferences(entry): string[]</code></td>
+<td>Extract plugin references from a resource entry.</td>
+</tr>
+<tr>
+<td><code>extractServiceReferences</code></td>
+<td>function</td>
+<td><code>function extractServiceReferences(entry): string[]</code></td>
+<td>Extract and deduplicate service references from a resource entry.</td>
+</tr>
+<tr>
+<td><code>resolveDataPath</code></td>
+<td>function</td>
+<td><code>function resolveDataPath(appHostDir: string, dataPath: string | undefined, resourceName: string): string</code></td>
+<td>Resolve the data path for a persistent resource (database, cache).</td>
+</tr>
+<tr>
+<td><code>resolvePermissions</code></td>
+<td>function</td>
+<td><code>function resolvePermissions(entryPermissions: readonly string[] | undefined, defaultPermissions: readonly string[], watchMode: boolean, watchFlag: string): string[]</code></td>
+<td>Resolve the effective Deno permission flags for a resource.</td>
+</tr>
+<tr>
+<td><code>resolveWorkdir</code></td>
+<td>function</td>
+<td><code>function resolveWorkdir(section: string, key: string, explicitWorkdir?: string): string</code></td>
+<td>Resolve the default working directory for a resource entry.</td>
+</tr>
+<tr>
+<td><code>resolveWorkspacePath</code></td>
+<td>function</td>
+<td><code>function resolveWorkspacePath(appHostDir: string, relativePath: string): string</code></td>
+<td>Resolve a workspace-relative path from the AppHost directory.</td>
+</tr>
+</tbody>
+</table>
+<h3>Composition interfaces and type aliases</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AspireBuilder</code></td>
+<td>interface</td>
+<td>Port implemented by adapters that emit Aspire AppHost resources.</td>
+</tr>
+<tr>
+<td><code>AspireResource</code></td>
+<td>interface</td>
+<td>Resource descriptor returned by Aspire builder ports.</td>
+</tr>
+<tr>
+<td><code>ComposeAppHostOptions</code></td>
+<td>interface</td>
+<td>Options for composing plugin Aspire contributions into an AppHost builder.</td>
+</tr>
+<tr>
+<td><code>ComposeAppHostResult</code></td>
+<td>interface</td>
+<td>Result of composing an AppHost from plugin Aspire contributions.</td>
+</tr>
+<tr>
+<td><code>ComposePluginManifest</code></td>
+<td>interface</td>
+<td>Minimal manifest shape consumed by Aspire composition.</td>
+</tr>
+<tr>
+<td><code>ContributionContext</code></td>
+<td>interface</td>
+<td>Context passed to plugin Aspire contributions during AppHost composition.</td>
+</tr>
+<tr>
+<td><code>PortAllocationOptions</code></td>
+<td>interface</td>
+<td>Port allocation options for Aspire composition.</td>
+</tr>
+<tr>
+<td><code>ViteEnvVarNames</code></td>
+<td>interface</td>
+<td>Generated VITE environment variable name pair.</td>
+</tr>
+<tr>
+<td><code>AspireResourceKind</code></td>
+<td>type alias</td>
+<td>Aspire resource kinds produced by plugin contributions.</td>
+</tr>
+<tr>
+<td><code>OtelMode</code></td>
+<td>type alias</td>
+<td>Registration mode determining which OTEL env vars are needed.</td>
+</tr>
+</tbody>
+</table>
+<h2>Adapters (<code>@netscript/aspire/adapters</code>)</h2>
+<p>The SDK-neutral TypeScript builder adapter used to compose an AppHost.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AspireTypeScriptBuilder</code></td>
+<td>class</td>
+<td><code>class AspireTypeScriptBuilder extends MemoryAspireBuilder</code></td>
+<td>SDK-neutral builder adapter for TypeScript AppHost composition tests.</td>
+</tr>
+<tr>
+<td><code>createPortAllocator</code></td>
+<td>function</td>
+<td><code>function createPortAllocator(options: PortAllocationOptions): (key: string, fallback?: number) =&gt; number</code></td>
+<td>Create a deterministic port allocator for plugin resources.</td>
+</tr>
+<tr>
+<td><code>resolveEnvSource</code></td>
+<td>function</td>
+<td><code>function resolveEnvSource(source: EnvSource | string, options: ResolveEnvSourceOptions): string</code></td>
+<td>Resolve an environment source into a concrete string.</td>
+</tr>
+<tr>
+<td><code>AspireResource</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Resource descriptor returned by Aspire builder ports.</td>
+</tr>
+<tr>
+<td><code>PortAllocationOptions</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Port allocation options for Aspire composition.</td>
+</tr>
+<tr>
+<td><code>ResolveEnvSourceOptions</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Options for resolving plugin environment variable sources.</td>
+</tr>
+<tr>
+<td><code>EnvSource</code></td>
+<td>type alias</td>
+<td>—</td>
+<td>Source for an environment variable value in an AppHost composition.</td>
+</tr>
+</tbody>
+</table>
+<h2>Testing (<code>@netscript/aspire/testing</code>)</h2>
+<p>In-memory builder, the plugin contribution base class, and deterministic fixtures for plugin
+authors writing Aspire composition tests.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AspireNSPluginContribution</code></td>
+<td>class</td>
+<td>—</td>
+<td>Base class plugins extend to contribute Aspire resources to an AppHost.</td>
+</tr>
+<tr>
+<td><code>MemoryAspireBuilder</code></td>
+<td>class</td>
+<td><code>class MemoryAspireBuilder implements AspireBuilder</code></td>
+<td>In-memory Aspire builder used by tests and examples.</td>
+</tr>
+<tr>
+<td><code>ExampleAspireContribution</code></td>
+<td>class</td>
+<td><code>class ExampleAspireContribution extends AspireNSPluginContribution</code></td>
+<td>Example contribution used by public tests and README snippets.</td>
+</tr>
+<tr>
+<td><code>createContributionContextFixture</code></td>
+<td>function</td>
+<td><code>function createContributionContextFixture(overrides: Partial&lt;ContributionContext&gt;): ContributionContext</code></td>
+<td>Create a deterministic contribution context for Aspire tests.</td>
+</tr>
+<tr>
+<td><code>AspireBuilder</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Port implemented by adapters that emit Aspire AppHost resources.</td>
+</tr>
+<tr>
+<td><code>AspireResource</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Resource descriptor returned by Aspire builder ports.</td>
+</tr>
+<tr>
+<td><code>ContributionContext</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Context passed to plugin Aspire contributions during AppHost composition.</td>
+</tr>
+<tr>
+<td><code>CacheSpec</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Cache resource spec consumed by <code>AspireBuilder</code>.</td>
+</tr>
+<tr>
+<td><code>ContainerSpec</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Container resource spec consumed by <code>AspireBuilder</code>.</td>
+</tr>
+<tr>
+<td><code>DatabaseSpec</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Database resource spec consumed by <code>AspireBuilder</code>.</td>
+</tr>
+<tr>
+<td><code>DenoServiceSpec</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Deno service resource spec consumed by <code>AspireBuilder</code>.</td>
+</tr>
+<tr>
+<td><code>DenoBackgroundSpec</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Deno background process spec consumed by <code>AspireBuilder</code>.</td>
+</tr>
+<tr>
+<td><code>HealthCheckSpec</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Health check expectation declared by a plugin contribution.</td>
+</tr>
+<tr>
+<td><code>MemoryAspireReference</code></td>
+<td>interface</td>
+<td>—</td>
+<td>Recorded relationship between two in-memory Aspire resources.</td>
+</tr>
+<tr>
+<td><code>AspireResourceKind</code></td>
+<td>type alias</td>
+<td>—</td>
+<td>Aspire resource kinds produced by plugin contributions.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export. Each is generated from its own
+<code>deno doc</code> surface and documented in the sections above.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/aspire</code></td>
+<td><code>./mod.ts</code></td>
+<td>Diagnostic contract (<code>inspectAspire</code>).</td>
+</tr>
+<tr>
+<td><code>@netscript/aspire/config</code></td>
+<td><code>./config.ts</code></td>
+<td><code>appsettings.json</code> parsing, Zod schemas, and entry interfaces.</td>
+</tr>
+<tr>
+<td><code>@netscript/aspire/schema</code></td>
+<td><code>./schema.ts</code></td>
+<td>JSON Schema generation from the Zod config schema.</td>
+</tr>
+<tr>
+<td><code>@netscript/aspire/types</code></td>
+<td><code>./types.ts</code></td>
+<td>Inferred config types and known-name extractors.</td>
+</tr>
+<tr>
+<td><code>@netscript/aspire/constants</code></td>
+<td><code>./constants.ts</code></td>
+<td>Config keys, sections, and runtime defaults.</td>
+</tr>
+<tr>
+<td><code>@netscript/aspire/application</code></td>
+<td><code>./src/application/mod.ts</code></td>
+<td>AppHost composition, contribution registry, and resolvers.</td>
+</tr>
+<tr>
+<td><code>@netscript/aspire/adapters</code></td>
+<td><code>./src/adapters/mod.ts</code></td>
+<td>SDK-neutral TypeScript builder adapter.</td>
+</tr>
+<tr>
+<td><code>@netscript/aspire/testing</code></td>
+<td><code>./src/testing/mod.ts</code></td>
+<td>In-memory builder, contribution base class, and fixtures.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

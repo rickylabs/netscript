@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/plugin-triggers · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/plugin-triggers</h1>
+      <h1><code>@netscript/plugin-triggers</code></h1>
+<p>NetScript plugin for trigger ingress, scheduling, file watching, and the trigger runtime APIs.
+This page is generated from the package's public surface with <code>deno doc</code> (US-2). For the full
+index of packages and plugins return to the <a href="/reference/">reference overview</a>.</p>
+<p>The plugin's root entrypoint (<code>@netscript/plugin-triggers</code>) exposes the public <strong>plugin manifest</strong>
+surface — the manifest value, its metadata constants, the inspection helper, and the manifest
+types. The handler-first authoring DSL (<code>defineWebhook</code>, <code>defineScheduledTrigger</code>,
+<code>defineFileWatch</code>, <code>enqueueJob</code>) and the runtime ports live in the sibling core package and are
+documented in <a href="#internals">Internals</a> below.</p>
+<p>Additional integration entrypoints are published as <a href="#sub-path-exports">sub-path exports</a>:
+<code>./public</code>, <code>./plugin</code>, <code>./runtime</code>, <code>./scaffolding</code>, <code>./aspire</code>, <code>./cli</code>, <code>./services</code>,
+<code>./streams</code>, and <code>./streams/server</code>. Their reference detail is generated from their own
+<code>deno doc</code> surface.</p>
+<h2>Plugin manifest</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>triggersPlugin</code></td>
+<td><code>const triggersPlugin: TriggersPluginManifest</code></td>
+<td>Plugin manifest for NetScript triggers.</td>
+</tr>
+<tr>
+<td><code>inspectTriggers</code></td>
+<td><code>function inspectTriggers(manifest: TriggersPluginManifest): TriggersPluginInspection</code></td>
+<td>Inspect the triggers plugin manifest without invoking lifecycle hooks.</td>
+</tr>
+</tbody>
+</table>
+<h2>Manifest constants</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TRIGGERS_PLUGIN_ID</code></td>
+<td><code>const TRIGGERS_PLUGIN_ID = &quot;triggers&quot;</code></td>
+<td>Stable plugin identifier for NetScript triggers.</td>
+</tr>
+<tr>
+<td><code>TRIGGERS_PLUGIN_VERSION</code></td>
+<td><code>const TRIGGERS_PLUGIN_VERSION = &quot;0.1.0&quot;</code></td>
+<td>Initial plugin package version.</td>
+</tr>
+<tr>
+<td><code>TRIGGERS_API_SERVICE_NAME</code></td>
+<td><code>const TRIGGERS_API_SERVICE_NAME = &quot;triggers-api&quot;</code></td>
+<td>Default HTTP service name for trigger ingress and management APIs.</td>
+</tr>
+<tr>
+<td><code>TRIGGERS_API_DEFAULT_PORT</code></td>
+<td><code>const TRIGGERS_API_DEFAULT_PORT = 8093</code></td>
+<td>Default HTTP port for trigger ingress and management APIs.</td>
+</tr>
+</tbody>
+</table>
+<h2>Manifest types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TriggersPluginManifest</code></td>
+<td>interface</td>
+<td>Public manifest shape for the triggers plugin.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginInspection</code></td>
+<td>interface</td>
+<td>Inspection summary for the triggers plugin manifest.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginContributions</code></td>
+<td>interface</td>
+<td>Public contribution groups exposed by the triggers plugin.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginServiceContribution</code></td>
+<td>interface</td>
+<td>Service contribution shape exposed by the triggers manifest.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginDependencyManifest</code></td>
+<td>interface</td>
+<td>Plugin manifest shape needed by trigger dependency declarations.</td>
+</tr>
+<tr>
+<td><code>TriggersStreamProducerPort</code></td>
+<td>interface</td>
+<td>Stream producer capability consumed by trigger actions.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginMetadata</code></td>
+<td>type alias</td>
+<td>Runtime-safe metadata attached to trigger plugin manifests.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginDependencies</code></td>
+<td>type alias</td>
+<td>Typed plugin dependency manifests for sibling core packages.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginCoreDependencies</code></td>
+<td>type alias</td>
+<td>Type-only sibling-core capabilities consumed by trigger actions and adapters.</td>
+</tr>
+<tr>
+<td><code>TriggersDefineSaga</code></td>
+<td>type alias</td>
+<td>Saga definition factory accepted by trigger plugin integrations.</td>
+</tr>
+<tr>
+<td><code>TriggersWorkerJobDefinition</code></td>
+<td>type alias</td>
+<td>Worker job shape consumed by trigger actions.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginId</code></td>
+<td>type alias</td>
+<td>Literal type for the triggers plugin id.</td>
+</tr>
+<tr>
+<td><code>TriggersPluginVersion</code></td>
+<td>type alias</td>
+<td>Literal type for the triggers plugin version.</td>
+</tr>
+<tr>
+<td><code>TriggersApiServiceName</code></td>
+<td>type alias</td>
+<td>Literal type for the triggers API service name.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/plugin-triggers</code></td>
+<td><code>./mod.ts</code></td>
+<td>Public plugin manifest surface (documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/public</code></td>
+<td><code>./src/public/mod.ts</code></td>
+<td>Public manifest re-export (identical to the root surface).</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/plugin</code></td>
+<td><code>./src/plugin/mod.ts</code></td>
+<td>Plugin lifecycle composition.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/runtime</code></td>
+<td><code>./src/runtime/mod.ts</code></td>
+<td>Trigger runtime wiring.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/scaffolding</code></td>
+<td><code>./src/scaffolding/mod.ts</code></td>
+<td>Handler-first trigger definition scaffolders (webhook, scheduled, file-watch).</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/aspire</code></td>
+<td><code>./src/aspire/mod.ts</code></td>
+<td>Aspire contribution for trigger services and background workers.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/cli</code></td>
+<td><code>./src/cli/composition/main.ts</code></td>
+<td>Trigger CLI composition root.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/services</code></td>
+<td><code>./services/src/main.ts</code></td>
+<td>Trigger ingress/management HTTP service entrypoint.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/streams</code></td>
+<td><code>./streams/mod.ts</code></td>
+<td>Stream integration surface.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers/streams/server</code></td>
+<td><code>./streams/server.ts</code></td>
+<td>Stream server entrypoint.</td>
+</tr>
+</tbody>
+</table>
+<h3>Scaffolding (<code>./scaffolding</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>triggerScaffolder</code></td>
+<td><code>function triggerScaffolder(kind): TriggerDefinitionScaffolder</code></td>
+<td>Resolve the concrete scaffolder for a trigger kind.</td>
+</tr>
+<tr>
+<td><code>WebhookTriggerScaffolder</code></td>
+<td>class</td>
+<td>Scaffold a webhook trigger definition module.</td>
+</tr>
+<tr>
+<td><code>ScheduledTriggerScaffolder</code></td>
+<td>class</td>
+<td>Scaffold a scheduled trigger definition module.</td>
+</tr>
+<tr>
+<td><code>FileWatchTriggerScaffolder</code></td>
+<td>class</td>
+<td>Scaffold a file-watch trigger definition module.</td>
+</tr>
+<tr>
+<td><code>TriggerDefinitionScaffolder</code></td>
+<td>interface</td>
+<td>Generate handler-first trigger definition modules.</td>
+</tr>
+<tr>
+<td><code>TriggerScaffoldInput</code></td>
+<td>type alias</td>
+<td>Input shared by trigger definition scaffolders.</td>
+</tr>
+<tr>
+<td><code>TriggerScaffoldKind</code></td>
+<td>type alias</td>
+<td>Trigger kinds supported by the F29 scaffolders.</td>
+</tr>
+<tr>
+<td><code>toTriggerExportName</code></td>
+<td><code>function toTriggerExportName(id: string): string</code></td>
+<td>Convert a trigger id into a stable TypeScript identifier prefix.</td>
+</tr>
+<tr>
+<td><code>toTriggerFileStem</code></td>
+<td><code>function toTriggerFileStem(id: string): string</code></td>
+<td>Convert a trigger id into the project file stem convention.</td>
+</tr>
+<tr>
+<td><code>renderStringArray</code></td>
+<td><code>function renderStringArray(values): string</code></td>
+<td>Render an immutable string array expression.</td>
+</tr>
+</tbody>
+</table>
+<h3>Aspire (<code>./aspire</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TriggersAspireContribution</code></td>
+<td>class</td>
+<td>Aspire contribution for the NetScript triggers plugin.</td>
+</tr>
+<tr>
+<td><code>TRIGGERS_PLUGIN_PACKAGE_NAME</code></td>
+<td>const</td>
+<td>Package name reported by the triggers Aspire contribution.</td>
+</tr>
+<tr>
+<td><code>TriggersAspireBuilder</code></td>
+<td>interface</td>
+<td>Aspire builder methods required by the triggers contribution.</td>
+</tr>
+<tr>
+<td><code>TriggersAspireResource</code></td>
+<td>interface</td>
+<td>Resource returned by the triggers Aspire builder boundary.</td>
+</tr>
+<tr>
+<td><code>TriggersContributionContext</code></td>
+<td>interface</td>
+<td>Contribution context required by the triggers Aspire contribution.</td>
+</tr>
+<tr>
+<td><code>TriggersDenoServiceSpec</code></td>
+<td>interface</td>
+<td>Deno service resource spec used by the triggers Aspire contribution.</td>
+</tr>
+<tr>
+<td><code>TriggersDenoBackgroundSpec</code></td>
+<td>interface</td>
+<td>Deno background resource spec used by the triggers Aspire contribution.</td>
+</tr>
+<tr>
+<td><code>TriggersHealthCheckSpec</code></td>
+<td>interface</td>
+<td>Health check declaration emitted by the triggers Aspire contribution.</td>
+</tr>
+<tr>
+<td><code>TriggersEnvSource</code></td>
+<td>type alias</td>
+<td>Environment source reference accepted by triggers Aspire declarations.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>Internals</h2>
+<blockquote>
+<p><strong>Internals — <code>@netscript/plugin-triggers-core</code>.</strong> This section documents the sibling <strong>core</strong>
+package that backs the triggers plugin. It is the implementation surface: the handler-first
+trigger DSL, the trigger runtime (ingress + processor), the runtime ports, configuration
+schemas, and deterministic testing primitives. Application code that authors trigger
+definitions imports the DSL from here; everything below is generated from
+<code>@netscript/plugin-triggers-core</code>'s own <code>deno doc</code> surface (US-8).</p>
+</blockquote>
+<h3>Authoring DSL</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>defineWebhook</code></td>
+<td><code>function defineWebhook(handler: WebhookHandler, spec: WebhookSpec): WebhookDefinition</code></td>
+<td>Define a webhook trigger from a handler and static spec.</td>
+</tr>
+<tr>
+<td><code>defineScheduledTrigger</code></td>
+<td><code>function defineScheduledTrigger(handler: ScheduledTriggerHandler, spec: DefineScheduledTriggerSpec): ScheduledTriggerDefinition</code></td>
+<td>Define a scheduled trigger from a handler and static cron spec.</td>
+</tr>
+<tr>
+<td><code>defineFileWatch</code></td>
+<td><code>function defineFileWatch(handler: FileWatchHandler, spec: FileWatchSpec): FileWatchDefinition</code></td>
+<td>Define a file-watch trigger from a handler and static spec.</td>
+</tr>
+<tr>
+<td><code>enqueueJob</code></td>
+<td><code>function enqueueJob(job: JobDefinition, options: EnqueueJobOptions): EnqueueJobAction</code></td>
+<td>Create an action that enqueues a typed worker job from a trigger handler.</td>
+</tr>
+</tbody>
+</table>
+<h3>Runtime</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createTriggerIngress</code></td>
+<td><code>function createTriggerIngress(options: TriggerIngressOptions): TriggerIngressPort</code></td>
+<td>Create an ack-then-process webhook ingress boundary.</td>
+</tr>
+<tr>
+<td><code>createTriggerProcessor</code></td>
+<td><code>function createTriggerProcessor(options: TriggerProcessorOptions): TriggerProcessor</code></td>
+<td>Create a trigger processor runtime from explicit dependencies.</td>
+</tr>
+<tr>
+<td><code>TriggerProcessor</code></td>
+<td>class</td>
+<td>T1 trigger processor with idempotency, retry, concurrency, DLQ, and circuit breaker handling.</td>
+</tr>
+</tbody>
+</table>
+<h3>Runtime ports</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TriggerIngressPort</code></td>
+<td>interface</td>
+<td>Fast ack-then-process ingress boundary.</td>
+</tr>
+<tr>
+<td><code>TriggerProcessorPort</code></td>
+<td>interface</td>
+<td>Processes unified trigger events through the T1 dispatch pipeline.</td>
+</tr>
+<tr>
+<td><code>TriggerSchedulerPort</code></td>
+<td>interface</td>
+<td>Scheduler boundary for scheduled trigger definitions.</td>
+</tr>
+<tr>
+<td><code>TriggerEventStorePort</code></td>
+<td>interface</td>
+<td>Persistent trigger event store boundary.</td>
+</tr>
+<tr>
+<td><code>TriggerIdempotencyPort</code></td>
+<td>interface</td>
+<td>Event-boundary idempotency store with a TTL window.</td>
+</tr>
+<tr>
+<td><code>TriggerDlqPort</code></td>
+<td>interface</td>
+<td>Dead-letter queue boundary for exhausted trigger events.</td>
+</tr>
+<tr>
+<td><code>WebhookVerifierPort</code></td>
+<td>interface</td>
+<td>Verifies inbound webhook authenticity and extracts provider event ids.</td>
+</tr>
+<tr>
+<td><code>LoggerPort</code></td>
+<td>interface</td>
+<td>Structured logger boundary consumed by trigger runtime code.</td>
+</tr>
+<tr>
+<td><code>TriggerActionDispatcher</code></td>
+<td>type alias</td>
+<td>Dispatches actions emitted by trigger handlers.</td>
+</tr>
+<tr>
+<td><code>TriggerIngressEventIdFactory</code></td>
+<td>type alias</td>
+<td>Generates event ids for accepted ingress events.</td>
+</tr>
+<tr>
+<td><code>TriggerIngressOptions</code></td>
+<td>type alias</td>
+<td>Options accepted by the trigger ingress composition root.</td>
+</tr>
+<tr>
+<td><code>TriggerProcessorOptions</code></td>
+<td>type alias</td>
+<td>Options accepted by the trigger processor runtime.</td>
+</tr>
+</tbody>
+</table>
+<h3>Trigger definitions and payloads</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TriggerDefinition</code></td>
+<td>type alias</td>
+<td>Trigger definitions known by the Group F public surface.</td>
+</tr>
+<tr>
+<td><code>RuntimeTriggerDefinition</code></td>
+<td>type alias</td>
+<td>Trigger definitions implemented by the Group F runtime.</td>
+</tr>
+<tr>
+<td><code>ProcessableTriggerDefinition</code></td>
+<td>type alias</td>
+<td>Trigger definition accepted by runtime processor ports.</td>
+</tr>
+<tr>
+<td><code>WebhookDefinition</code></td>
+<td>type alias</td>
+<td>Webhook trigger definition discovered by the runtime walker.</td>
+</tr>
+<tr>
+<td><code>ScheduledTriggerDefinition</code></td>
+<td>type alias</td>
+<td>Scheduled trigger definition discovered by the runtime walker.</td>
+</tr>
+<tr>
+<td><code>FileWatchDefinition</code></td>
+<td>type alias</td>
+<td>File-watch trigger definition discovered by the runtime walker.</td>
+</tr>
+<tr>
+<td><code>ManualTriggerDefinition</code></td>
+<td>type alias</td>
+<td>Reserved manual trigger definition for CLI/API fire paths.</td>
+</tr>
+<tr>
+<td><code>QueueTriggerDefinition</code></td>
+<td>type alias</td>
+<td>Reserved queue-source trigger definition. Runtime execution is deferred.</td>
+</tr>
+<tr>
+<td><code>StreamTriggerDefinition</code></td>
+<td>type alias</td>
+<td>Reserved stream-source trigger definition. Runtime execution is deferred.</td>
+</tr>
+<tr>
+<td><code>TriggerDefinitionBase</code></td>
+<td>type alias</td>
+<td>Common immutable fields shared by trigger definitions.</td>
+</tr>
+<tr>
+<td><code>WebhookSpec</code></td>
+<td>type alias</td>
+<td>Webhook definition fields accepted by <code>defineWebhook</code>.</td>
+</tr>
+<tr>
+<td><code>ScheduledTriggerSpec</code></td>
+<td>type alias</td>
+<td>Static scheduled trigger spec consumed by scheduler ports and builders.</td>
+</tr>
+<tr>
+<td><code>DefineScheduledTriggerSpec</code></td>
+<td>type alias</td>
+<td>Scheduled trigger definition fields accepted by <code>defineScheduledTrigger</code>.</td>
+</tr>
+<tr>
+<td><code>FileWatchSpec</code></td>
+<td>type alias</td>
+<td>File-watch definition fields accepted by <code>defineFileWatch</code>.</td>
+</tr>
+<tr>
+<td><code>WebhookHandler</code></td>
+<td>type alias</td>
+<td>Webhook handler signature used by <code>defineWebhook</code>.</td>
+</tr>
+<tr>
+<td><code>ScheduledTriggerHandler</code></td>
+<td>type alias</td>
+<td>Scheduled trigger handler signature used by <code>defineScheduledTrigger</code>.</td>
+</tr>
+<tr>
+<td><code>FileWatchHandler</code></td>
+<td>type alias</td>
+<td>File-watch handler signature used by <code>defineFileWatch</code>.</td>
+</tr>
+<tr>
+<td><code>TriggerHandler</code></td>
+<td>type alias</td>
+<td>Handler invoked by the processor for a trigger event.</td>
+</tr>
+<tr>
+<td><code>TriggerContext</code></td>
+<td>type alias</td>
+<td>Context passed to trigger handlers by the processor.</td>
+</tr>
+<tr>
+<td><code>TriggerEvent</code></td>
+<td>type alias</td>
+<td>Unified event envelope consumed by every trigger processor path.</td>
+</tr>
+<tr>
+<td><code>TriggerPayload</code></td>
+<td>type alias</td>
+<td>Payload union for known Group F trigger kinds.</td>
+</tr>
+<tr>
+<td><code>WebhookTriggerPayload</code></td>
+<td>type alias</td>
+<td>HTTP payload captured by webhook ingress before processing.</td>
+</tr>
+<tr>
+<td><code>ScheduledTriggerPayload</code></td>
+<td>type alias</td>
+<td>Scheduled payload emitted by a scheduler adapter.</td>
+</tr>
+<tr>
+<td><code>FileWatchTriggerPayload</code></td>
+<td>type alias</td>
+<td>Filesystem payload captured by a file-watch adapter.</td>
+</tr>
+<tr>
+<td><code>ManualTriggerPayload</code></td>
+<td>type alias</td>
+<td>Reserved manual-fire payload for CLI and API dispatch.</td>
+</tr>
+<tr>
+<td><code>QueueTriggerPayload</code></td>
+<td>type alias</td>
+<td>Reserved queue-source payload. Runtime execution is deferred.</td>
+</tr>
+<tr>
+<td><code>StreamTriggerPayload</code></td>
+<td>type alias</td>
+<td>Reserved stream-source payload. Runtime execution is deferred.</td>
+</tr>
+<tr>
+<td><code>FileWatchLifecycle</code></td>
+<td>type alias</td>
+<td>File lifecycle event names supported by file-watch triggers.</td>
+</tr>
+<tr>
+<td><code>FileWatchStabilityThreshold</code></td>
+<td>type alias</td>
+<td>Stability threshold for network-filesystem tolerant file-watch triggers.</td>
+</tr>
+</tbody>
+</table>
+<h3>Actions, policies, and branded ids</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TriggerActionResult</code></td>
+<td>type alias</td>
+<td>Action result emitted by trigger handlers.</td>
+</tr>
+<tr>
+<td><code>EnqueueJobAction</code></td>
+<td>type alias</td>
+<td>Action emitted when a trigger should enqueue a worker job.</td>
+</tr>
+<tr>
+<td><code>EnqueueJobOptions</code></td>
+<td>type alias</td>
+<td>Options for dispatching a worker job from a trigger handler.</td>
+</tr>
+<tr>
+<td><code>DeferAction</code></td>
+<td>type alias</td>
+<td>Action emitted when a trigger yields without holding a worker slot.</td>
+</tr>
+<tr>
+<td><code>JobDefinition</code></td>
+<td>type alias</td>
+<td>Root-surface job definition derived from the thin public schema.</td>
+</tr>
+<tr>
+<td><code>TriggerRetryPolicy</code></td>
+<td>type alias</td>
+<td>Retry policy applied by the trigger processor before DLQ handoff.</td>
+</tr>
+<tr>
+<td><code>TriggerCircuitBreakerSpec</code></td>
+<td>type alias</td>
+<td>Circuit breaker policy for repeated trigger dispatch failures.</td>
+</tr>
+<tr>
+<td><code>TriggerConcurrencySpec</code></td>
+<td>type alias</td>
+<td>Bounded dispatch concurrency for a trigger definition.</td>
+</tr>
+<tr>
+<td><code>TriggerDeduplicationSpec</code></td>
+<td>type alias</td>
+<td>Event-boundary deduplication policy.</td>
+</tr>
+<tr>
+<td><code>TriggerBackfillSpec</code></td>
+<td>type alias</td>
+<td>Quartz-style misfire handling for scheduled trigger backfill.</td>
+</tr>
+<tr>
+<td><code>TriggerBackfillPolicy</code></td>
+<td>type alias</td>
+<td>Scheduled trigger backfill misfire policy.</td>
+</tr>
+<tr>
+<td><code>TriggerDurabilityTier</code></td>
+<td>type alias</td>
+<td>Trigger durability tier.</td>
+</tr>
+<tr>
+<td><code>CronExpression</code></td>
+<td>type alias</td>
+<td>Cron expression accepted by scheduled trigger definitions.</td>
+</tr>
+<tr>
+<td><code>TriggerKind</code></td>
+<td>type alias</td>
+<td>Open trigger discriminator.</td>
+</tr>
+<tr>
+<td><code>TriggerKnownKind</code></td>
+<td>type alias</td>
+<td>Canonical known trigger kind.</td>
+</tr>
+<tr>
+<td><code>TriggerEventStatus</code></td>
+<td>type alias</td>
+<td>Trigger event lifecycle status.</td>
+</tr>
+<tr>
+<td><code>TriggerId</code></td>
+<td>type alias</td>
+<td>Branded trigger definition identifier.</td>
+</tr>
+<tr>
+<td><code>TriggerEventId</code></td>
+<td>type alias</td>
+<td>Branded trigger event identifier.</td>
+</tr>
+<tr>
+<td><code>WebhookId</code></td>
+<td>type alias</td>
+<td>Branded webhook definition identifier.</td>
+</tr>
+<tr>
+<td><code>JobId</code></td>
+<td>type alias</td>
+<td>Branded worker job identifier.</td>
+</tr>
+<tr>
+<td><code>WebhookVerifierKind</code></td>
+<td>type alias</td>
+<td>Webhook verifier selector declared by a webhook trigger.</td>
+</tr>
+<tr>
+<td><code>RuntimeWebhookDefinition</code></td>
+<td>type alias</td>
+<td>Webhook definition shape accepted by the trigger ingress runtime.</td>
+</tr>
+</tbody>
+</table>
+<h3>Runtime constants</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TRIGGER_KINDS</code></td>
+<td>Canonical trigger kinds known by Group F.</td>
+</tr>
+<tr>
+<td><code>TRIGGER_EVENT_STATUSES</code></td>
+<td>Trigger event lifecycle statuses.</td>
+</tr>
+<tr>
+<td><code>TRIGGER_DURABILITY_TIERS</code></td>
+<td>Durability tiers supported by trigger definitions.</td>
+</tr>
+<tr>
+<td><code>TRIGGER_BACKFILL_POLICIES</code></td>
+<td>Scheduled trigger backfill misfire policies.</td>
+</tr>
+</tbody>
+</table>
+<h3>DLQ, event-store, and idempotency support types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TriggerDlqEntry</code></td>
+<td>type alias</td>
+<td>Dead-letter entry recorded after trigger retry exhaustion.</td>
+</tr>
+<tr>
+<td><code>TriggerDlqListOptions</code></td>
+<td>type alias</td>
+<td>Dead-letter list filters.</td>
+</tr>
+<tr>
+<td><code>TriggerEventListOptions</code></td>
+<td>type alias</td>
+<td>Event store list filters.</td>
+</tr>
+<tr>
+<td><code>TriggerIdempotencyClaim</code></td>
+<td>type alias</td>
+<td>Idempotency claim result.</td>
+</tr>
+<tr>
+<td><code>TriggerIdempotencyKeyInput</code></td>
+<td>type alias</td>
+<td>Idempotency key resolution input.</td>
+</tr>
+<tr>
+<td><code>TriggerIngressRequest</code></td>
+<td>type alias</td>
+<td>Ingress request passed to trigger ingress adapters.</td>
+</tr>
+<tr>
+<td><code>TriggerIngressResponse</code></td>
+<td>type alias</td>
+<td>Fast ack response returned by ingress adapters.</td>
+</tr>
+<tr>
+<td><code>TriggerProcessResult</code></td>
+<td>type alias</td>
+<td>Result returned after processing a trigger event.</td>
+</tr>
+<tr>
+<td><code>TriggerProcessorStopOptions</code></td>
+<td>type alias</td>
+<td>Stop options for processor drain.</td>
+</tr>
+<tr>
+<td><code>TriggerSchedulerStopOptions</code></td>
+<td>type alias</td>
+<td>Scheduler stop options.</td>
+</tr>
+<tr>
+<td><code>ScheduledTriggerHandle</code></td>
+<td>type alias</td>
+<td>Scheduled trigger handle returned by scheduler adapters.</td>
+</tr>
+<tr>
+<td><code>WebhookVerificationRequest</code></td>
+<td>type alias</td>
+<td>Request shape passed to a webhook verifier adapter.</td>
+</tr>
+<tr>
+<td><code>WebhookVerificationResult</code></td>
+<td>type alias</td>
+<td>Result returned by a webhook verifier adapter.</td>
+</tr>
+</tbody>
+</table>
+<h3>Internals sub-path exports</h3>
+<p>The core package publishes the following sub-path entrypoints. Each is generated from its own
+<code>deno doc</code> surface.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/plugin-triggers-core</code></td>
+<td><code>./mod.ts</code></td>
+<td>Curated root surface (DSL, runtime, ports, types — documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/public</code></td>
+<td><code>./src/public/mod.ts</code></td>
+<td>Public root re-export.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/builders</code></td>
+<td><code>./src/builders/mod.ts</code></td>
+<td>Handler-first definition builders (<code>defineWebhook</code>, <code>defineScheduledTrigger</code>, <code>defineFileWatch</code>, <code>enqueueJob</code>) and <code>TRIGGER_*</code> constants.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/config</code></td>
+<td><code>./src/config/mod.ts</code></td>
+<td><code>netscript.config.ts</code> trigger schemas and <code>defineTriggers</code>.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/domain</code></td>
+<td><code>./src/domain/mod.ts</code></td>
+<td>Domain definitions, payloads, and branded ids.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/ports</code></td>
+<td><code>./src/ports/mod.ts</code></td>
+<td>Runtime port boundaries.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/runtime</code></td>
+<td><code>./src/runtime/mod.ts</code></td>
+<td>Ingress and processor runtime.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/adapters</code></td>
+<td><code>./src/adapters/mod.ts</code></td>
+<td>Concrete port adapters.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/telemetry</code></td>
+<td><code>./src/telemetry/mod.ts</code></td>
+<td>Trigger telemetry instrumentation.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/contracts/v1</code></td>
+<td><code>./src/contracts/v1/mod.ts</code></td>
+<td>Versioned wire contracts.</td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers-core/testing</code></td>
+<td><code>./src/testing/mod.ts</code></td>
+<td>Deterministic in-memory adapters, stores, and clock for trigger tests.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,2385 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/fresh · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/fresh</h1>
+      <h1><code>@netscript/fresh</code></h1>
+<p>Fresh runtime extensions, builders, forms, defer primitives, and route contracts for NetScript. This page is generated from the public surface of the package with <code>deno doc</code> (US-2). For the full index of packages and plugins return to the <a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/fresh</code>) exposes only the cross-cutting page-loader cache helpers. Every other capability lives on an explicit sub-path export. The sub-paths and their reference sections are:</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/fresh</code></td>
+<td><code>./mod.ts</code></td>
+<td>Page-loader cache helpers (documented below).</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/server</code></td>
+<td><code>./src/runtime/server/mod.ts</code></td>
+<td>Fresh app factory and streaming SSR.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/builders</code></td>
+<td><code>./src/application/builders/mod.ts</code></td>
+<td>Fluent page and partial builders.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/route</code></td>
+<td><code>./src/application/route/mod.ts</code></td>
+<td>Typed route contracts and navigation.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/defer</code></td>
+<td><code>./src/application/defer/mod.ts</code></td>
+<td>Deferred rendering primitives.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/form</code></td>
+<td><code>./src/application/form/mod.ts</code></td>
+<td>Managed forms and validation.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/error</code></td>
+<td><code>./src/diagnostics/error/mod.ts</code></td>
+<td>Error normalization and display.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/streams</code></td>
+<td><code>./src/runtime/streams/mod.ts</code></td>
+<td>Durable streams client SDK.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/query</code></td>
+<td><code>./src/application/query/mod.ts</code></td>
+<td>Island TanStack Query hooks.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/interactive</code></td>
+<td><code>./src/runtime/interactive/mod.ts</code></td>
+<td>Suspense promise helpers.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/vite</code></td>
+<td><code>./src/application/vite/vite.ts</code></td>
+<td>NetScript Fresh Vite plugin.</td>
+</tr>
+<tr>
+<td><code>@netscript/fresh/testing</code></td>
+<td><code>./src/testing/mod.ts</code></td>
+<td>Test fixtures.</td>
+</tr>
+</tbody>
+</table>
+<h2>Root entrypoint</h2>
+<p>Cross-cutting page-loader cache helpers. Every other capability lives on an explicit sub-path export listed below.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hasAllCacheEntries</code></td>
+<td><code>hasAllCacheEntries(entries: ReadonlyArray): boolean</code></td>
+<td>Return <code>true</code> when every supplied entry is present.</td>
+</tr>
+<tr>
+<td><code>minCachedAt</code></td>
+<td><code>minCachedAt(entries: ReadonlyArray)</code></td>
+<td>Return the oldest <code>cachedAt</code> timestamp across the supplied entries.</td>
+</tr>
+<tr>
+<td><code>projectCachedItemFromList</code></td>
+<td><code>projectCachedItemFromList(listEntry, predicate)</code></td>
+<td>Project a single cached item from a cached list response while preserving the list timestamp.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CacheEntryLike</code></td>
+<td>interface</td>
+<td>Cached-entry shape shared by page loaders and partial orchestration.</td>
+</tr>
+<tr>
+<td><code>CachedListEntryLike</code></td>
+<td>interface</td>
+<td>Cached list-entry shape used when projecting a single list item.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/server</code></h2>
+<p>Server-only utilities: the NetScript-managed Fresh app factory and Preact streaming SSR primitives.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>StreamErrorBoundary</code></td>
+<td><code>StreamErrorBoundary(props: StreamErrorBoundaryProps): object</code></td>
+<td>Preact class component that catches rendering errors within its subtree.</td>
+</tr>
+<tr>
+<td><code>createStreamingResponse</code></td>
+<td><code>createStreamingResponse(vnode: StreamingRenderable, _): Response</code></td>
+<td>Create a streaming HTTP <code>Response</code> from a Preact VNode tree.</td>
+</tr>
+<tr>
+<td><code>defineFreshApp</code></td>
+<td><code>defineFreshApp(_): App</code></td>
+<td>Create a NetScript-managed Fresh app with the baseline bootstrap defaults.</td>
+</tr>
+<tr>
+<td><code>renderToStream</code></td>
+<td><code>renderToStream(vnode: StreamingRenderable, _): StreamRenderResult</code></td>
+<td>Render a Preact VNode tree to a <code>ReadableStream</code> with Suspense streaming.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>App</code></td>
+<td>class</td>
+<td>Create an application instance that passes the incoming <code>Request</code></td>
+</tr>
+<tr>
+<td><code>DefineFreshAppOptions</code></td>
+<td>interface</td>
+<td>Contract for NetScript-managed Fresh app bootstrap.</td>
+</tr>
+<tr>
+<td><code>FreshAppFactory</code></td>
+<td>typeAlias</td>
+<td>Factory callback that constructs the Fresh app instance.</td>
+</tr>
+<tr>
+<td><code>FreshAppFsRoutes</code></td>
+<td>typeAlias</td>
+<td>Adapter callback that registers file-system routes on a Fresh app.</td>
+</tr>
+<tr>
+<td><code>FreshAppTelemetryAttribute</code></td>
+<td>typeAlias</td>
+<td>Attribute value accepted by Fresh app telemetry bootstrap options.</td>
+</tr>
+<tr>
+<td><code>FreshAppTelemetryOptions</code></td>
+<td>interface</td>
+<td>Backward-compatible telemetry bootstrap options for <code>defineFreshApp</code>.</td>
+</tr>
+<tr>
+<td><code>FreshConfig</code></td>
+<td>interface</td>
+<td></td>
+</tr>
+<tr>
+<td><code>Middleware</code></td>
+<td>typeAlias</td>
+<td>A middleware function is the basic building block of Fresh. It allows you</td>
+</tr>
+<tr>
+<td><code>StreamBoundaryRenderable</code></td>
+<td>typeAlias</td>
+<td>Renderable content accepted by streaming error boundaries.</td>
+</tr>
+<tr>
+<td><code>StreamErrorBoundaryProps</code></td>
+<td>interface</td>
+<td>Props for {@link StreamErrorBoundary}.</td>
+</tr>
+<tr>
+<td><code>StreamRenderOptions</code></td>
+<td>interface</td>
+<td>Options for streaming HTML rendering.</td>
+</tr>
+<tr>
+<td><code>StreamRenderResult</code></td>
+<td>interface</td>
+<td>Result of a streaming render operation.</td>
+</tr>
+<tr>
+<td><code>StreamingRenderStream</code></td>
+<td>interface</td>
+<td>Readable stream returned by the Preact streaming renderer.</td>
+</tr>
+<tr>
+<td><code>StreamingRenderable</code></td>
+<td>typeAlias</td>
+<td>Renderable Preact tree accepted by Fresh streaming helpers.</td>
+</tr>
+<tr>
+<td><code>StreamingRenderer</code></td>
+<td>typeAlias</td>
+<td>Renderer port used by <code>renderToStream</code> to create an HTML byte stream.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/builders</code></h2>
+<p>Fluent, typed page and partial builder surface (definePage, definePartial).</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>definePage</code></td>
+<td><code>definePage(): PageRootBuilder</code></td>
+<td>Start a new typed page builder chain.</td>
+</tr>
+<tr>
+<td><code>definePartial</code></td>
+<td><code>definePartial(options: DefinePartialOptions): DefinedPartialRoute</code></td>
+<td>Define a framework-owned partial route backed by an async loader.</td>
+</tr>
+<tr>
+<td><code>defineStatsPartial</code></td>
+<td><code>defineStatsPartial(options: DefineStatsPartialOptions): DefinedPartialRoute</code></td>
+<td>Define a stats-only partial route backed by a context-free query function.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CollectionDescriptor</code></td>
+<td>interface</td>
+<td>Descriptor for a collection field and its item intent buttons.</td>
+</tr>
+<tr>
+<td><code>CollectionItem</code></td>
+<td>interface</td>
+<td>Descriptor for one item in a collection field.</td>
+</tr>
+<tr>
+<td><code>CollectionKeyInputProps</code></td>
+<td>interface</td>
+<td>Props for a hidden collection-key input.</td>
+</tr>
+<tr>
+<td><code>CollectionKeyMap</code></td>
+<td>typeAlias</td>
+<td>Stable collection item keys by collection field path.</td>
+</tr>
+<tr>
+<td><code>ComponentLike</code></td>
+<td>interface</td>
+<td>Minimal component contract accepted by page and partial builders.</td>
+</tr>
+<tr>
+<td><code>ControlProps</code></td>
+<td>interface</td>
+<td>Props applied to an input, select, textarea, or compatible control.</td>
+</tr>
+<tr>
+<td><code>DefinePartialOptions</code></td>
+<td>interface</td>
+<td>Options for creating a framework-owned partial route.</td>
+</tr>
+<tr>
+<td><code>DefineStatsPartialOptions</code></td>
+<td>interface</td>
+<td>Options for creating a stats-only partial route.</td>
+</tr>
+<tr>
+<td><code>DefinedPartialRoute</code></td>
+<td>interface</td>
+<td>Materialized partial route contract returned by <code>definePartial()</code>.</td>
+</tr>
+<tr>
+<td><code>DescriptionProps</code></td>
+<td>interface</td>
+<td>Props applied to a field description element.</td>
+</tr>
+<tr>
+<td><code>EmptyRecord</code></td>
+<td>typeAlias</td>
+<td>Empty object shape used by page builders without typed state.</td>
+</tr>
+<tr>
+<td><code>ErrorFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct an errored form reply.</td>
+</tr>
+<tr>
+<td><code>ErrorProps</code></td>
+<td>interface</td>
+<td>Props applied to a field error element.</td>
+</tr>
+<tr>
+<td><code>FieldConstraints</code></td>
+<td>interface</td>
+<td>HTML constraint attributes derived from a schema field.</td>
+</tr>
+<tr>
+<td><code>FieldDescriptor</code></td>
+<td>interface</td>
+<td>Descriptor for one form field and its generated props.</td>
+</tr>
+<tr>
+<td><code>FieldDescriptorMap</code></td>
+<td>typeAlias</td>
+<td>Field descriptors keyed by form value path.</td>
+</tr>
+<tr>
+<td><code>FormCsrfInputProps</code></td>
+<td>interface</td>
+<td>Props for the hidden CSRF token input.</td>
+</tr>
+<tr>
+<td><code>FormElementProps</code></td>
+<td>interface</td>
+<td>Props applied to the root form element.</td>
+</tr>
+<tr>
+<td><code>FormErrorMessages</code></td>
+<td>typeAlias</td>
+<td>Ordered validation messages for a field or form.</td>
+</tr>
+<tr>
+<td><code>FormFieldErrors</code></td>
+<td>typeAlias</td>
+<td>Canonical field and form error map for submitted values.</td>
+</tr>
+<tr>
+<td><code>FormFieldPath</code></td>
+<td>typeAlias</td>
+<td>Dot-path name for a field in nested form values.</td>
+</tr>
+<tr>
+<td><code>FormIntent</code></td>
+<td>interface</td>
+<td>Structured representation of an encoded form intent.</td>
+</tr>
+<tr>
+<td><code>FormIntentResult</code></td>
+<td>interface</td>
+<td>Result returned after applying an encoded form intent.</td>
+</tr>
+<tr>
+<td><code>FormReplyHelpers</code></td>
+<td>interface</td>
+<td>Factory helpers for constructing typed form submission results.</td>
+</tr>
+<tr>
+<td><code>FormReplyInit</code></td>
+<td>interface</td>
+<td>Base input used to construct a form reply state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionErrorResult</code></td>
+<td>interface</td>
+<td>Errored form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionInitialResult</code></td>
+<td>interface</td>
+<td>Initial form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionInvalidResult</code></td>
+<td>interface</td>
+<td>Invalid form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionRedirectResult</code></td>
+<td>interface</td>
+<td>Redirect form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionResult</code></td>
+<td>typeAlias</td>
+<td>Union of all form submission result states.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionSuccessResult</code></td>
+<td>interface</td>
+<td>Successful form submission state.</td>
+</tr>
+<tr>
+<td><code>FormValues</code></td>
+<td>typeAlias</td>
+<td>Generic constraint for form value objects.</td>
+</tr>
+<tr>
+<td><code>InferDefinePageLayerLoaderProps</code></td>
+<td>typeAlias</td>
+<td></td>
+</tr>
+<tr>
+<td><code>IntentButtonProps</code></td>
+<td>interface</td>
+<td>Props for an intent submit button generated by a form field helper.</td>
+</tr>
+<tr>
+<td><code>InvalidFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct an invalid form reply.</td>
+</tr>
+<tr>
+<td><code>LabelProps</code></td>
+<td>interface</td>
+<td>Props applied to a field label.</td>
+</tr>
+<tr>
+<td><code>PageBuildOptions</code></td>
+<td>interface</td>
+<td>Build options accepted by <code>page.build(...)</code>.</td>
+</tr>
+<tr>
+<td><code>PageBuilder</code></td>
+<td>interface</td>
+<td>Public fluent page builder surface.</td>
+</tr>
+<tr>
+<td><code>PageCacheEntry</code></td>
+<td>interface</td>
+<td>Minimal cache-entry shape accepted by page layer loaders.</td>
+</tr>
+<tr>
+<td><code>PageContext</code></td>
+<td>interface</td>
+<td>Runtime context shared by loaders, handlers, layouts, and metadata resolvers.</td>
+</tr>
+<tr>
+<td><code>PageDeferPolicyInput</code></td>
+<td>interface</td>
+<td>Typed defer policy override accepted by <code>withPolicy()</code>.</td>
+</tr>
+<tr>
+<td><code>PageDeferPolicyProfile</code></td>
+<td>typeAlias</td>
+<td>Typed defer policy profile accepted by <code>withPolicy()</code>.</td>
+</tr>
+<tr>
+<td><code>PageDefinition</code></td>
+<td>interface</td>
+<td>Unrouted page definition returned by <code>build()</code> without a route.</td>
+</tr>
+<tr>
+<td><code>PageErrorPrimitives</code></td>
+<td>interface</td>
+<td>Minimal error payload accepted by builder-owned partial error components.</td>
+</tr>
+<tr>
+<td><code>PageFormConfig</code></td>
+<td>interface</td>
+<td>Configuration for the <code>withForm()</code> builder method (legacy <code>PageBuilder</code></td>
+</tr>
+<tr>
+<td><code>PageFormHandlerContext</code></td>
+<td>interface</td>
+<td>Extended context exposed to <code>withForm()</code> callbacks.</td>
+</tr>
+<tr>
+<td><code>PageHandlers</code></td>
+<td>typeAlias</td>
+<td>Built page handlers returned by <code>build()</code>.</td>
+</tr>
+<tr>
+<td><code>PageHeaderResolver</code></td>
+<td>typeAlias</td>
+<td>Header resolver accepted by <code>withHeader()</code>.</td>
+</tr>
+<tr>
+<td><code>PageHooks</code></td>
+<td>interface</td>
+<td>Hook bundle returned on routed page definitions.</td>
+</tr>
+<tr>
+<td><code>PageLayerConfig</code></td>
+<td>interface</td>
+<td>Config object accepted by <code>withLayer()</code>.</td>
+</tr>
+<tr>
+<td><code>PageLayerDelivery</code></td>
+<td>typeAlias</td>
+<td>Delivery mode for a deferred page layer.</td>
+</tr>
+<tr>
+<td><code>PageLayerLoader</code></td>
+<td>typeAlias</td>
+<td>Async loader accepted by <code>withLayer()</code>.</td>
+</tr>
+<tr>
+<td><code>PageLayerMap</code></td>
+<td>typeAlias</td>
+<td>Layer props keyed by layer id.</td>
+</tr>
+<tr>
+<td><code>PageLayout</code></td>
+<td>typeAlias</td>
+<td>Layout function accepted by <code>withLayout()</code>.</td>
+</tr>
+<tr>
+<td><code>PageLayoutContext</code></td>
+<td>interface</td>
+<td>Runtime context variant used for page layouts and metadata.</td>
+</tr>
+<tr>
+<td><code>PageLinkProps</code></td>
+<td>interface</td>
+<td>Link props returned by builder-owned route helpers.</td>
+</tr>
+<tr>
+<td><code>PageMetaDescriptor</code></td>
+<td>interface</td>
+<td>Metadata descriptor accepted by <code>withMeta()</code>.</td>
+</tr>
+<tr>
+<td><code>PageMetaResolver</code></td>
+<td>typeAlias</td>
+<td>Metadata resolver accepted by <code>withMeta()</code>.</td>
+</tr>
+<tr>
+<td><code>PageMethod</code></td>
+<td>typeAlias</td>
+<td>HTTP methods accepted by <code>withHandler()</code>.</td>
+</tr>
+<tr>
+<td><code>PageMethodHandler</code></td>
+<td>typeAlias</td>
+<td>Handler function accepted by <code>withHandler()</code>.</td>
+</tr>
+<tr>
+<td><code>PagePairedRouteHrefInput</code></td>
+<td>typeAlias</td>
+<td>Input accepted by paired page/partial route helpers.</td>
+</tr>
+<tr>
+<td><code>PagePairedRouteTarget</code></td>
+<td>interface</td>
+<td>Combined page/partial route helper returned by <code>route.withPartial(...)</code>.</td>
+</tr>
+<tr>
+<td><code>PagePartialLinkProps</code></td>
+<td>interface</td>
+<td>Link props produced by paired page/partial route helpers.</td>
+</tr>
+<tr>
+<td><code>PagePathParamInput</code></td>
+<td>typeAlias</td>
+<td>Raw path input keyed by dynamic segment name.</td>
+</tr>
+<tr>
+<td><code>PagePathSchema</code></td>
+<td>interface</td>
+<td>Minimal path schema contract accepted by <code>definePage()</code>.</td>
+</tr>
+<tr>
+<td><code>PageRenderContext</code></td>
+<td>interface</td>
+<td>Request context variant used when a page can call <code>ctx.render()</code>.</td>
+</tr>
+<tr>
+<td><code>PageRenderable</code></td>
+<td>typeAlias</td>
+<td>Renderable content accepted by builder-owned components, layouts, and slots.</td>
+</tr>
+<tr>
+<td><code>PageRequestContext</code></td>
+<td>interface</td>
+<td>Typed request context exposed to page builders.</td>
+</tr>
+<tr>
+<td><code>PageResourceFactory</code></td>
+<td>typeAlias</td>
+<td>Resource factory accepted by <code>withResource()</code> and <code>withResources()</code>.</td>
+</tr>
+<tr>
+<td><code>PageRootBuilder</code></td>
+<td>interface</td>
+<td>Root page builder returned by <code>definePage()</code>.</td>
+</tr>
+<tr>
+<td><code>PageRouteGetLinkPropsInput</code></td>
+<td>typeAlias</td>
+<td>Input accepted by builder-owned bound route link-prop helpers.</td>
+</tr>
+<tr>
+<td><code>PageRouteHrefInput</code></td>
+<td>typeAlias</td>
+<td>Input accepted by builder-owned route href helpers.</td>
+</tr>
+<tr>
+<td><code>PageRouteLinkComponentProps</code></td>
+<td>typeAlias</td>
+<td>Props accepted by builder-owned route link components.</td>
+</tr>
+<tr>
+<td><code>PageRouteNavigation</code></td>
+<td>interface</td>
+<td>Typed route navigation surface exposed by routed pages.</td>
+</tr>
+<tr>
+<td><code>PageRoutePath</code></td>
+<td>typeAlias</td>
+<td>Infer the typed path state from a route target.</td>
+</tr>
+<tr>
+<td><code>PageRouteReference</code></td>
+<td>interface</td>
+<td>Minimal route reference accepted by <code>withRoute()</code>.</td>
+</tr>
+<tr>
+<td><code>PageRouteSearch</code></td>
+<td>typeAlias</td>
+<td>Infer the typed search state from a route target.</td>
+</tr>
+<tr>
+<td><code>PageRouteTarget</code></td>
+<td>interface</td>
+<td>Minimal route target accepted by <code>withRoute()</code>.</td>
+</tr>
+<tr>
+<td><code>PageSchemaParseFailure</code></td>
+<td>interface</td>
+<td>Failure result returned by page-owned schemas.</td>
+</tr>
+<tr>
+<td><code>PageSchemaParseResult</code></td>
+<td>typeAlias</td>
+<td>Result returned by page-owned path and search schemas.</td>
+</tr>
+<tr>
+<td><code>PageSchemaParseSuccess</code></td>
+<td>interface</td>
+<td>Success result returned by page-owned schemas.</td>
+</tr>
+<tr>
+<td><code>PageSearchParamInput</code></td>
+<td>typeAlias</td>
+<td>Raw search input keyed by query param name.</td>
+</tr>
+<tr>
+<td><code>PageSearchParamValue</code></td>
+<td>typeAlias</td>
+<td>Raw search-param value accepted by route helpers.</td>
+</tr>
+<tr>
+<td><code>PageSearchSchema</code></td>
+<td>interface</td>
+<td>Minimal search schema contract accepted by <code>definePage()</code>.</td>
+</tr>
+<tr>
+<td><code>PageSlot</code></td>
+<td>typeAlias</td>
+<td>Slot function exposed to layouts for a resolved layer.</td>
+</tr>
+<tr>
+<td><code>PageSlots</code></td>
+<td>typeAlias</td>
+<td>Slot map exposed to layouts.</td>
+</tr>
+<tr>
+<td><code>PageTelemetryConfig</code></td>
+<td>interface</td>
+<td>Typed telemetry configuration accepted by <code>withTelemetry()</code>.</td>
+</tr>
+<tr>
+<td><code>PartialRouteConfig</code></td>
+<td>interface</td>
+<td>Minimal route config surface emitted by framework partial routes.</td>
+</tr>
+<tr>
+<td><code>RedirectFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct a redirect form reply.</td>
+</tr>
+<tr>
+<td><code>RoutedPageDefinition</code></td>
+<td>interface</td>
+<td>Routed page definition returned by <code>build()</code> with route metadata.</td>
+</tr>
+<tr>
+<td><code>RuntimeFormState</code></td>
+<td>interface</td>
+<td>Runtime state passed to a form layer component.</td>
+</tr>
+<tr>
+<td><code>SchemaInput</code></td>
+<td>typeAlias</td>
+<td>Infer the input object accepted by a schema-like value.</td>
+</tr>
+<tr>
+<td><code>SchemaOutput</code></td>
+<td>typeAlias</td>
+<td>Infer the output object carried by a schema-like value.</td>
+</tr>
+<tr>
+<td><code>Simplify</code></td>
+<td>typeAlias</td>
+<td>Flatten mapped and intersected object types for cleaner IntelliSense.</td>
+</tr>
+<tr>
+<td><code>SuccessFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct a successful form reply.</td>
+</tr>
+<tr>
+<td><code>UnknownRecord</code></td>
+<td>typeAlias</td>
+<td>Generic object map used by resources and layer registries.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/route</code></h2>
+<p>Explicit, typed route-contract surface: route contracts, path and search schemas, and navigation helpers.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bindRoutePattern</code></td>
+<td><code>bindRoutePattern(contract: DefineRouteContract, routePattern: string, metadata?: RouteReferenceOptions): BoundRouteContract</code></td>
+<td>Bind a route contract to a concrete Fresh route pattern.</td>
+</tr>
+<tr>
+<td><code>createRouteReference</code></td>
+<td><code>createRouteReference(routePattern: TRoutePattern, metadata?: RouteReferenceOptions): RouteReference</code></td>
+<td>Build a route reference directly from a Fresh route pattern.</td>
+</tr>
+<tr>
+<td><code>defineEnumPathParam</code></td>
+<td><code>defineEnumPathParam(paramName: TParamName, values: TValues): EnumPathParamDefinition</code></td>
+<td>Create a reusable enum-backed path param helper.</td>
+</tr>
+<tr>
+<td><code>defineRouteContract</code></td>
+<td><code>defineRouteContract(_): DefineRouteContract</code></td>
+<td>Define a typed route contract around optional path and search schemas.</td>
+</tr>
+<tr>
+<td><code>enumPathParamSchema</code></td>
+<td><code>enumPathParamSchema(paramName: TParamName, values: TValues): PathParamSchema</code></td>
+<td>Create an enum-backed path schema for a single dynamic route segment.</td>
+</tr>
+<tr>
+<td><code>fallback</code></td>
+<td><code>fallback(schema: TSchema, defaultValue: SchemaFieldOutput): TSchema</code></td>
+<td>Apply a fallback value to a Zod search-param field.</td>
+</tr>
+<tr>
+<td><code>paginationSearchSchema</code></td>
+<td><code>paginationSearchSchema(_): PaginationSearchSchema</code></td>
+<td>Create a pagination-aware search schema with typed defaults.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BoundRouteContract</code></td>
+<td>typeAlias</td>
+<td>Bound route reference created from a route contract and concrete route pattern.</td>
+</tr>
+<tr>
+<td><code>DefineRouteContract</code></td>
+<td>interface</td>
+<td>Public route contract produced by <code>defineRouteContract()</code>.</td>
+</tr>
+<tr>
+<td><code>DefineRouteContractOptions</code></td>
+<td>interface</td>
+<td>Contract options for defining typed route path and search schemas.</td>
+</tr>
+<tr>
+<td><code>EmptyRecord</code></td>
+<td>typeAlias</td>
+<td>Empty object shape used by route helpers without typed params.</td>
+</tr>
+<tr>
+<td><code>EnumPathParamDefinition</code></td>
+<td>interface</td>
+<td>Enum-backed path param definition returned by <code>defineEnumPathParam()</code>.</td>
+</tr>
+<tr>
+<td><code>FreshLinkAttributes</code></td>
+<td>interface</td>
+<td>Fresh-compatible anchor attributes returned by route helpers.</td>
+</tr>
+<tr>
+<td><code>FreshPartialLinkAttributes</code></td>
+<td>interface</td>
+<td>Fresh-compatible partial link attributes returned by paired routes.</td>
+</tr>
+<tr>
+<td><code>InferRouteContractPath</code></td>
+<td>typeAlias</td>
+<td>Infer the typed path state carried by a route contract or route reference.</td>
+</tr>
+<tr>
+<td><code>InferRouteContractSearch</code></td>
+<td>typeAlias</td>
+<td>Infer the typed search state carried by a route contract or route reference.</td>
+</tr>
+<tr>
+<td><code>InferRoutePatternPath</code></td>
+<td>typeAlias</td>
+<td>Infer typed path params directly from a Fresh route pattern.</td>
+</tr>
+<tr>
+<td><code>InferRoutePatternPathSegments</code></td>
+<td>typeAlias</td>
+<td>Infer typed path params from the stripped Fresh route pattern.</td>
+</tr>
+<tr>
+<td><code>InferRoutePatternSegment</code></td>
+<td>typeAlias</td>
+<td>Infer one typed path segment from a Fresh route pattern segment.</td>
+</tr>
+<tr>
+<td><code>PaginationSearchBaseShape</code></td>
+<td>interface</td>
+<td>Base schema shape returned by <code>paginationSearchSchema()</code>.</td>
+</tr>
+<tr>
+<td><code>PaginationSearchSchema</code></td>
+<td>interface</td>
+<td>Public facade for pagination-aware query string parsing.</td>
+</tr>
+<tr>
+<td><code>PaginationSearchSchemaOptions</code></td>
+<td>interface</td>
+<td>Options for the default pagination search schema.</td>
+</tr>
+<tr>
+<td><code>PaginationSearchState</code></td>
+<td>interface</td>
+<td>Typed output produced by pagination search schemas.</td>
+</tr>
+<tr>
+<td><code>PairedRouteHrefArgs</code></td>
+<td>typeAlias</td>
+<td>Variadic args accepted by paired route href builders.</td>
+</tr>
+<tr>
+<td><code>PairedRouteHrefInput</code></td>
+<td>typeAlias</td>
+<td>Input accepted by paired page/partial route helpers.</td>
+</tr>
+<tr>
+<td><code>PairedRouteLinkPropsInput</code></td>
+<td>typeAlias</td>
+<td>Input accepted by paired-route <code>getLinkProps()</code>.</td>
+</tr>
+<tr>
+<td><code>PairedRouteTarget</code></td>
+<td>interface</td>
+<td>Combined page/partial route helper returned by <code>route.withPartial(...)</code>.</td>
+</tr>
+<tr>
+<td><code>PathParamInput</code></td>
+<td>typeAlias</td>
+<td>Raw path input keyed by dynamic segment name.</td>
+</tr>
+<tr>
+<td><code>PathParamSchema</code></td>
+<td>interface</td>
+<td>Minimal schema contract accepted for route path params.</td>
+</tr>
+<tr>
+<td><code>RouteContractTypeCarrier</code></td>
+<td>interface</td>
+<td>Public type carrier used by route contracts and route references.</td>
+</tr>
+<tr>
+<td><code>RouteHrefArgs</code></td>
+<td>typeAlias</td>
+<td>Variadic args accepted by route href builders.</td>
+</tr>
+<tr>
+<td><code>RouteHrefInput</code></td>
+<td>typeAlias</td>
+<td>Input accepted by <code>route.nav.makeHref()</code>.</td>
+</tr>
+<tr>
+<td><code>RouteLinkComponentProps</code></td>
+<td>typeAlias</td>
+<td>Props accepted by the route-bound Fresh link component.</td>
+</tr>
+<tr>
+<td><code>RouteLinkPropsInput</code></td>
+<td>typeAlias</td>
+<td>Input accepted by <code>route.getLinkProps()</code>.</td>
+</tr>
+<tr>
+<td><code>RouteNavigation</code></td>
+<td>interface</td>
+<td>Minimal typed route navigation API exposed to consumers.</td>
+</tr>
+<tr>
+<td><code>RoutePathInput</code></td>
+<td>typeAlias</td>
+<td>Path input accepted by route href builders.</td>
+</tr>
+<tr>
+<td><code>RouteReference</code></td>
+<td>interface</td>
+<td>Stable route reference returned by route contracts and generated manifests.</td>
+</tr>
+<tr>
+<td><code>RouteReferenceKind</code></td>
+<td>typeAlias</td>
+<td>Route metadata classification used by generated route manifests.</td>
+</tr>
+<tr>
+<td><code>RouteReferenceOptions</code></td>
+<td>interface</td>
+<td>Optional metadata attached to generated route references.</td>
+</tr>
+<tr>
+<td><code>RouteSearchUpdate</code></td>
+<td>typeAlias</td>
+<td>Input used when partially updating typed search state.</td>
+</tr>
+<tr>
+<td><code>SchemaField</code></td>
+<td>interface</td>
+<td>Structural schema contract accepted by pagination search helpers.</td>
+</tr>
+<tr>
+<td><code>SchemaFieldOutput</code></td>
+<td>typeAlias</td>
+<td>Infer the output carried by a schema-like field.</td>
+</tr>
+<tr>
+<td><code>SchemaOutput</code></td>
+<td>typeAlias</td>
+<td>Infer the output object carried by a route schema.</td>
+</tr>
+<tr>
+<td><code>SchemaParseFailure</code></td>
+<td>interface</td>
+<td>Failed schema parse result.</td>
+</tr>
+<tr>
+<td><code>SchemaParseResult</code></td>
+<td>typeAlias</td>
+<td>Result returned by route path and search schemas.</td>
+</tr>
+<tr>
+<td><code>SchemaParseSuccess</code></td>
+<td>interface</td>
+<td>Successful schema parse result.</td>
+</tr>
+<tr>
+<td><code>SearchParamInput</code></td>
+<td>typeAlias</td>
+<td>Raw search input keyed by query param name.</td>
+</tr>
+<tr>
+<td><code>SearchParamSchema</code></td>
+<td>interface</td>
+<td>Minimal schema contract accepted for route search params.</td>
+</tr>
+<tr>
+<td><code>SearchParamValue</code></td>
+<td>typeAlias</td>
+<td>Primitive search-param value accepted by route helpers.</td>
+</tr>
+<tr>
+<td><code>ShapeOutput</code></td>
+<td>typeAlias</td>
+<td>Infer the resolved object output carried by a pagination schema shape.</td>
+</tr>
+<tr>
+<td><code>StripLeadingSlash</code></td>
+<td>typeAlias</td>
+<td>Strip a leading slash from a Fresh route pattern.</td>
+</tr>
+<tr>
+<td><code>ValidatedRouteHref</code></td>
+<td>typeAlias</td>
+<td>Stable href string returned by validated route navigation helpers.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/defer</code></h2>
+<p>Deferred rendering primitives: server and island defer wrappers, policy resolution, and telemetry spans.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DeferComponent</code></td>
+<td><code>DeferComponent(props: DeferComponentProps): object</code></td>
+<td>Hidden client-side form that revalidates deferred regions when policy allows it.</td>
+</tr>
+<tr>
+<td><code>DeferPage</code></td>
+<td><code>DeferPage(props: DeferPageProps): object</code></td>
+<td>Render a deferred region with optional server prewarm and telemetry hooks.</td>
+</tr>
+<tr>
+<td><code>Deferred</code></td>
+<td><code>Deferred(props: DeferredProps): DeferredRenderable</code></td>
+<td>Promise-prop consumer for RFC-style deferred data.</td>
+</tr>
+<tr>
+<td><code>buildDeferFormState</code></td>
+<td><code>buildDeferFormState(searchParams?: string, partialSearchParams?: string)</code></td>
+<td>Build the hidden form state used by the defer island.</td>
+</tr>
+<tr>
+<td><code>decideDeferClientAction</code></td>
+<td><code>decideDeferClientAction(input: DeferClientDecisionInput): DeferClientDecision</code></td>
+<td>Decide whether the client island should submit or skip its deferred refresh form.</td>
+</tr>
+<tr>
+<td><code>emitDeferCacheReadSpan</code></td>
+<td><code>emitDeferCacheReadSpan(input: DeferCacheReadSpanInput): Promise</code></td>
+<td>Emit a span for reading a defer region from cache.</td>
+</tr>
+<tr>
+<td><code>emitDeferClientDecisionSpan</code></td>
+<td><code>emitDeferClientDecisionSpan(attributes: FreshDeferTelemetryAttributes): Promise</code></td>
+<td>Emit a span for a client-side defer decision.</td>
+</tr>
+<tr>
+<td><code>emitDeferPrewarmDispatchSpan</code></td>
+<td><code>emitDeferPrewarmDispatchSpan(input: DeferPrewarmSpanInput, run): Promise</code></td>
+<td>Emit a span that wraps a defer prewarm dispatch operation.</td>
+</tr>
+<tr>
+<td><code>emitStreamRenderSpan</code></td>
+<td><code>emitStreamRenderSpan(input: StreamRenderSpanInput, run): Promise</code></td>
+<td>Emit an OpenTelemetry span that wraps a streaming SSR render.</td>
+</tr>
+<tr>
+<td><code>resolveDeferPolicy</code></td>
+<td><code>resolveDeferPolicy(policy, staleTimeOverrideMs, staleStrategy): DeferPolicyResolved</code></td>
+<td>Resolve user policy input, stale overrides, and legacy strategy into a complete policy.</td>
+</tr>
+<tr>
+<td><code>resolveDetailDeferConfig</code></td>
+<td><code>resolveDetailDeferConfig(hasCompleteCache: boolean)</code></td>
+<td>Resolve the detail-page stale window and defer policy for the current cache state.</td>
+</tr>
+<tr>
+<td><code>sanitizeDeferSearchParams</code></td>
+<td><code>sanitizeDeferSearchParams(searchParams?: string)</code></td>
+<td>Remove Fresh transport-only query parameters from a serialized query string.</td>
+</tr>
+</tbody>
+</table>
+<h3>Constants</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DEFER_POLICY</code></td>
+<td></td>
+<td>Conventional defer policy profiles used by generated pages.</td>
+</tr>
+<tr>
+<td><code>DEFER_STALE_MS</code></td>
+<td></td>
+<td>Conventional stale windows used by generated CRUD pages.</td>
+</tr>
+<tr>
+<td><code>DETAIL_FORCE_REFRESH_POLICY</code></td>
+<td><code>DeferPolicyInput</code></td>
+<td>Detail-page policy that preserves immediate consistency after navigation.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DeferCacheReadSpanInput</code></td>
+<td>interface</td>
+<td>Input attributes used by a defer cache-read span.</td>
+</tr>
+<tr>
+<td><code>DeferClientDecision</code></td>
+<td>interface</td>
+<td>Client-side deferred refresh decision.</td>
+</tr>
+<tr>
+<td><code>DeferClientDecisionInput</code></td>
+<td>interface</td>
+<td>Inputs used to decide whether a deferred region should refresh on the client.</td>
+</tr>
+<tr>
+<td><code>DeferClientDecisionReason</code></td>
+<td>typeAlias</td>
+<td>Reasons the client island can choose to submit or skip a deferred refresh.</td>
+</tr>
+<tr>
+<td><code>DeferComponentProps</code></td>
+<td>interface</td>
+<td>Props consumed by the hidden client-side defer form.</td>
+</tr>
+<tr>
+<td><code>DeferPagePolicyInput</code></td>
+<td>interface</td>
+<td>Policy overrides accepted by the page wrapper.</td>
+</tr>
+<tr>
+<td><code>DeferPagePolicyProfile</code></td>
+<td>typeAlias</td>
+<td>Named defer policy profiles accepted by the page wrapper.</td>
+</tr>
+<tr>
+<td><code>DeferPageProps</code></td>
+<td>interface</td>
+<td>Props for the <code>DeferPage</code> server wrapper.</td>
+</tr>
+<tr>
+<td><code>DeferPageRenderable</code></td>
+<td>typeAlias</td>
+<td>Renderable content accepted by deferred page slots.</td>
+</tr>
+<tr>
+<td><code>DeferPageRequestContextLike</code></td>
+<td>interface</td>
+<td>Fresh request fields consumed by <code>DeferPage</code> without depending on app-local ctx types.</td>
+</tr>
+<tr>
+<td><code>DeferPolicyInput</code></td>
+<td>interface</td>
+<td>Policy overrides that tune when deferred regions refresh.</td>
+</tr>
+<tr>
+<td><code>DeferPolicyProfile</code></td>
+<td>typeAlias</td>
+<td>Named policy profiles for deferred rendering freshness behavior.</td>
+</tr>
+<tr>
+<td><code>DeferPolicyResolved</code></td>
+<td>interface</td>
+<td>Fully resolved defer policy used by server and island renderers.</td>
+</tr>
+<tr>
+<td><code>DeferPrewarmResult</code></td>
+<td>interface</td>
+<td>Result metrics captured by a defer prewarm dispatch.</td>
+</tr>
+<tr>
+<td><code>DeferPrewarmSpanInput</code></td>
+<td>interface</td>
+<td>Input attributes used by a defer prewarm dispatch span.</td>
+</tr>
+<tr>
+<td><code>DeferredProps</code></td>
+<td>interface</td>
+<td>Props for the <code>Deferred</code> Suspense helper.</td>
+</tr>
+<tr>
+<td><code>DeferredRenderFunction</code></td>
+<td>typeAlias</td>
+<td>Render function used to turn resolved deferred data into content.</td>
+</tr>
+<tr>
+<td><code>DeferredRenderable</code></td>
+<td>typeAlias</td>
+<td>Renderable content accepted by deferred Suspense slots.</td>
+</tr>
+<tr>
+<td><code>FreshDeferTelemetryAttributes</code></td>
+<td>typeAlias</td>
+<td>Attribute map accepted by Fresh defer telemetry helpers.</td>
+</tr>
+<tr>
+<td><code>LegacyStaleStrategy</code></td>
+<td>typeAlias</td>
+<td>Legacy stale strategy accepted by older defer call sites.</td>
+</tr>
+<tr>
+<td><code>StreamRenderSpanInput</code></td>
+<td>interface</td>
+<td>Input for a streaming render telemetry span.</td>
+</tr>
+<tr>
+<td><code>StreamRenderSpanResult</code></td>
+<td>interface</td>
+<td>Result metrics captured after the streaming render completes.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/form</code></h2>
+<p>Managed forms: CSRF, intents, progressive enhancement, pagination, and Standard Schema validation.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Form</code></td>
+<td><code>Form(props: FormProps): object</code></td>
+<td>Render a managed form element with submission and CSRF hidden inputs.</td>
+</tr>
+<tr>
+<td><code>FormRegion</code></td>
+<td><code>FormRegion(props: FormRegionProps): object</code></td>
+<td>Render a Fresh partial boundary for form-driven updates.</td>
+</tr>
+<tr>
+<td><code>applyCollectionStrategy</code></td>
+<td><code>applyCollectionStrategy(props: TProps, strategy)</code></td>
+<td>Apply collection update navigation metadata to intent button props.</td>
+</tr>
+<tr>
+<td><code>applyIntentOperation</code></td>
+<td><code>applyIntentOperation(intent, values: TValues): TValues</code></td>
+<td>Apply a collection intent to the submitted values.</td>
+</tr>
+<tr>
+<td><code>buildPaginationState</code></td>
+<td><code>buildPaginationState(searchParams: URLSearchParams, total: number, hasMore: boolean, defaultLimit: number): PaginationState</code></td>
+<td>Build a complete pagination state from URLSearchParams and query results.</td>
+</tr>
+<tr>
+<td><code>collectionIntent</code></td>
+<td><code>collectionIntent(action, name: string, _): string</code></td>
+<td>Serialize a collection intent into the native field value shape.</td>
+</tr>
+<tr>
+<td><code>createEmptyFormErrors</code></td>
+<td><code>createEmptyFormErrors(): FormErrors</code></td>
+<td>Create an empty form error map.</td>
+</tr>
+<tr>
+<td><code>createFormEnhancementSnapshot</code></td>
+<td><code>createFormEnhancementSnapshot(state: RuntimeFormState): FormEnhancementSnapshot</code></td>
+<td>Create a serializable client enhancement snapshot from runtime form state.</td>
+</tr>
+<tr>
+<td><code>createStandardSchemaAdapter</code></td>
+<td><code>createStandardSchemaAdapter(schema: TSchema): FormSchemaAdapter</code></td>
+<td>Create a form schema adapter from any Standard Schema v1 compatible schema.</td>
+</tr>
+<tr>
+<td><code>firstFieldError</code></td>
+<td><code>firstFieldError(errors: FormErrors, field: Extract)</code></td>
+<td>Return the first error message for a field, if present.</td>
+</tr>
+<tr>
+<td><code>formDataToRawValues</code></td>
+<td><code>formDataToRawValues(formData: FormData): Record</code></td>
+<td>Parse a <code>FormData</code> instance into a nested object.</td>
+</tr>
+<tr>
+<td><code>generateCsrfToken</code></td>
+<td><code>generateCsrfToken(): string</code></td>
+<td>Generate a new CSRF token for a rendered form.</td>
+</tr>
+<tr>
+<td><code>generateSubmissionId</code></td>
+<td><code>generateSubmissionId(): string</code></td>
+<td>Create a new form submission identifier.</td>
+</tr>
+<tr>
+<td><code>getSubmissionHiddenInputProps</code></td>
+<td><code>getSubmissionHiddenInputProps(submissionId: string)</code></td>
+<td>Return the hidden input props for carrying an idempotent submission id.</td>
+</tr>
+<tr>
+<td><code>normalizeFormValues</code></td>
+<td><code>normalizeFormValues(rawValues: Record): Partial</code></td>
+<td>Normalize raw form values by converting empty strings to <code>undefined</code>.</td>
+</tr>
+<tr>
+<td><code>parseFormIntent</code></td>
+<td><code>parseFormIntent(rawValues: Record)</code></td>
+<td>Parse an encoded form intent from raw posted values.</td>
+</tr>
+<tr>
+<td><code>readCsrfToken</code></td>
+<td><code>readCsrfToken(request: Request)</code></td>
+<td>Read the current CSRF token from a request cookie header.</td>
+</tr>
+<tr>
+<td><code>resolveFormState</code></td>
+<td><code>resolveFormState(data: unknown, _): FormState</code></td>
+<td>Resolve form state from route handler data.</td>
+</tr>
+<tr>
+<td><code>resolvePagination</code></td>
+<td><code>resolvePagination(searchParams: URLSearchParams, defaultLimit: number): PaginationInput</code></td>
+<td>Resolve pagination input from URLSearchParams.</td>
+</tr>
+<tr>
+<td><code>setCsrfCookie</code></td>
+<td><code>setCsrfCookie(headers: Headers, token: string, requestUrl?: URL): void</code></td>
+<td>Set the CSRF cookie on response headers.</td>
+</tr>
+<tr>
+<td><code>submitIntent</code></td>
+<td><code>submitIntent(_): string</code></td>
+<td>Serialize a submit intent into the native field value shape.</td>
+</tr>
+<tr>
+<td><code>toFormErrors</code></td>
+<td><code>toFormErrors(error: FormSchemaValidationError): FormErrors</code></td>
+<td>Convert a Zod-like validation error into the canonical <code>FormErrors&lt;T&gt;</code> shape.</td>
+</tr>
+<tr>
+<td><code>useFormEnhancement</code></td>
+<td><code>useFormEnhancement(snapshot: FormEnhancementSnapshot, _): FormEnhancementState</code></td>
+<td>Manage progressive form enhancement state and client-side validation handlers.</td>
+</tr>
+<tr>
+<td><code>verifyCsrfToken</code></td>
+<td><code>verifyCsrfToken(cookieToken, formToken): boolean</code></td>
+<td>Verify that the submitted token matches the cookie token.</td>
+</tr>
+</tbody>
+</table>
+<h3>Constants</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CSRF_COOKIE_NAME</code></td>
+<td><code>ns_form_csrf</code></td>
+<td>Cookie used to persist the current CSRF token between GET and POST.</td>
+</tr>
+<tr>
+<td><code>CSRF_FIELD_NAME</code></td>
+<td><code>__csrf__</code></td>
+<td>Hidden input field used to submit the CSRF token with the form payload.</td>
+</tr>
+<tr>
+<td><code>INTENT_FIELD_NAME</code></td>
+<td><code>__intent__</code></td>
+<td>Field name reserved for encoded form intents.</td>
+</tr>
+<tr>
+<td><code>SUBMISSION_ID_FIELD_NAME</code></td>
+<td><code>__submission_id__</code></td>
+<td>Hidden field used to round-trip a submission identifier through form POSTs.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CollectionDescriptor</code></td>
+<td>interface</td>
+<td>Descriptor for a collection field and its item intent buttons.</td>
+</tr>
+<tr>
+<td><code>CollectionItem</code></td>
+<td>interface</td>
+<td>Descriptor for one item in a collection field.</td>
+</tr>
+<tr>
+<td><code>CollectionKeyInputProps</code></td>
+<td>interface</td>
+<td>Props for a hidden collection-key input.</td>
+</tr>
+<tr>
+<td><code>CollectionKeyMap</code></td>
+<td>typeAlias</td>
+<td>Stable collection item keys by collection field path.</td>
+</tr>
+<tr>
+<td><code>ControlProps</code></td>
+<td>interface</td>
+<td>Props applied to an input, select, textarea, or compatible control.</td>
+</tr>
+<tr>
+<td><code>DescriptionProps</code></td>
+<td>interface</td>
+<td>Props applied to a field description element.</td>
+</tr>
+<tr>
+<td><code>EnhancedFormProps</code></td>
+<td>interface</td>
+<td>Form element props after progressive enhancement handlers are attached.</td>
+</tr>
+<tr>
+<td><code>ErrorFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct an errored form reply.</td>
+</tr>
+<tr>
+<td><code>ErrorProps</code></td>
+<td>interface</td>
+<td>Props applied to a field error element.</td>
+</tr>
+<tr>
+<td><code>FieldConstraints</code></td>
+<td>interface</td>
+<td>HTML constraint attributes derived from a schema field.</td>
+</tr>
+<tr>
+<td><code>FieldDescriptor</code></td>
+<td>interface</td>
+<td>Descriptor for one form field and its generated props.</td>
+</tr>
+<tr>
+<td><code>FieldDescriptorMap</code></td>
+<td>typeAlias</td>
+<td>Field descriptors keyed by form value path.</td>
+</tr>
+<tr>
+<td><code>FormCollectionStrategy</code></td>
+<td>interface</td>
+<td>Client/server ownership policy for a collection field.</td>
+</tr>
+<tr>
+<td><code>FormCollectionStrategyMode</code></td>
+<td>typeAlias</td>
+<td>Progressive enhancement strategy for collection fields.</td>
+</tr>
+<tr>
+<td><code>FormContent</code></td>
+<td>typeAlias</td>
+<td>Renderable content accepted by form helper components.</td>
+</tr>
+<tr>
+<td><code>FormCsrfInputProps</code></td>
+<td>interface</td>
+<td>Props for the hidden CSRF token input.</td>
+</tr>
+<tr>
+<td><code>FormElementProps</code></td>
+<td>interface</td>
+<td>Props applied to the root form element.</td>
+</tr>
+<tr>
+<td><code>FormEnhancementOptions</code></td>
+<td>interface</td>
+<td>Options used to progressively enhance a rendered form.</td>
+</tr>
+<tr>
+<td><code>FormEnhancementSnapshot</code></td>
+<td>interface</td>
+<td>Snapshot consumed by progressive enhancement code for one form.</td>
+</tr>
+<tr>
+<td><code>FormEnhancementState</code></td>
+<td>interface</td>
+<td>Runtime state returned by the progressive form enhancement hook.</td>
+</tr>
+<tr>
+<td><code>FormErrorMessages</code></td>
+<td>typeAlias</td>
+<td>Ordered validation messages for a field or form.</td>
+</tr>
+<tr>
+<td><code>FormErrors</code></td>
+<td>typeAlias</td>
+<td>Field-level error map produced by validation or error normalization.</td>
+</tr>
+<tr>
+<td><code>FormFieldErrors</code></td>
+<td>typeAlias</td>
+<td>Canonical field and form error map for submitted values.</td>
+</tr>
+<tr>
+<td><code>FormFieldPath</code></td>
+<td>typeAlias</td>
+<td>Dot-path name for a field in nested form values.</td>
+</tr>
+<tr>
+<td><code>FormIntent</code></td>
+<td>interface</td>
+<td>Structured representation of an encoded form intent.</td>
+</tr>
+<tr>
+<td><code>FormIntentResult</code></td>
+<td>interface</td>
+<td>Result returned after applying an encoded form intent.</td>
+</tr>
+<tr>
+<td><code>FormPageInvalidateContext</code></td>
+<td>interface</td>
+<td>Invalidation context passed to app-owned cache invalidators after a</td>
+</tr>
+<tr>
+<td><code>FormPageMode</code></td>
+<td>typeAlias</td>
+<td>Mode used by page-owned create/edit forms in the playground consumer.</td>
+</tr>
+<tr>
+<td><code>FormPageProps</code></td>
+<td>interface</td>
+<td>Transitional page-form props still consumed by the playground routes while</td>
+</tr>
+<tr>
+<td><code>FormProps</code></td>
+<td>interface</td>
+<td>Props accepted by the managed form component.</td>
+</tr>
+<tr>
+<td><code>FormRegionProps</code></td>
+<td>interface</td>
+<td>Props accepted by the form partial-region helper.</td>
+</tr>
+<tr>
+<td><code>FormReplyHelpers</code></td>
+<td>interface</td>
+<td>Factory helpers for constructing typed form submission results.</td>
+</tr>
+<tr>
+<td><code>FormReplyInit</code></td>
+<td>interface</td>
+<td>Base input used to construct a form reply state.</td>
+</tr>
+<tr>
+<td><code>FormSchemaAdapter</code></td>
+<td>interface</td>
+<td>Validation boundary abstraction for forms.</td>
+</tr>
+<tr>
+<td><code>FormSchemaParseFailure</code></td>
+<td>interface</td>
+<td>Failed schema parse result normalized for the form runtime.</td>
+</tr>
+<tr>
+<td><code>FormSchemaParseResult</code></td>
+<td>typeAlias</td>
+<td>Adapter-safe parse result used by the canonical form runtime.</td>
+</tr>
+<tr>
+<td><code>FormSchemaParseSuccess</code></td>
+<td>interface</td>
+<td>Successful schema parse result.</td>
+</tr>
+<tr>
+<td><code>FormSchemaValidationError</code></td>
+<td>interface</td>
+<td>Minimal contract for a validation error that can be flattened into</td>
+</tr>
+<tr>
+<td><code>FormState</code></td>
+<td>interface</td>
+<td>Lightweight form state used by the currently shipped helper surface.</td>
+</tr>
+<tr>
+<td><code>FormStateLike</code></td>
+<td>typeAlias</td>
+<td>Server or client snapshot state accepted by the managed form component.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionErrorResult</code></td>
+<td>interface</td>
+<td>Errored form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionInitialResult</code></td>
+<td>interface</td>
+<td>Initial form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionInvalidResult</code></td>
+<td>interface</td>
+<td>Invalid form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionRedirectResult</code></td>
+<td>interface</td>
+<td>Redirect form submission state.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionResult</code></td>
+<td>typeAlias</td>
+<td>Union of all form submission result states.</td>
+</tr>
+<tr>
+<td><code>FormSubmissionSuccessResult</code></td>
+<td>interface</td>
+<td>Successful form submission state.</td>
+</tr>
+<tr>
+<td><code>FormValues</code></td>
+<td>typeAlias</td>
+<td>Generic constraint for form value objects.</td>
+</tr>
+<tr>
+<td><code>IntentButtonProps</code></td>
+<td>interface</td>
+<td>Props for an intent submit button generated by a form field helper.</td>
+</tr>
+<tr>
+<td><code>InvalidFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct an invalid form reply.</td>
+</tr>
+<tr>
+<td><code>LabelProps</code></td>
+<td>interface</td>
+<td>Props applied to a field label.</td>
+</tr>
+<tr>
+<td><code>PaginationInput</code></td>
+<td>interface</td>
+<td>Parsed pagination input derived from URLSearchParams.</td>
+</tr>
+<tr>
+<td><code>PaginationState</code></td>
+<td>interface</td>
+<td>Full pagination state including total count and original search params.</td>
+</tr>
+<tr>
+<td><code>RedirectFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct a redirect form reply.</td>
+</tr>
+<tr>
+<td><code>RuntimeFormState</code></td>
+<td>interface</td>
+<td>Runtime state passed to a form layer component.</td>
+</tr>
+<tr>
+<td><code>SchemaIntrospector</code></td>
+<td>interface</td>
+<td>Vendor-specific schema metadata extractor.</td>
+</tr>
+<tr>
+<td><code>StandardSchemaInput</code></td>
+<td>typeAlias</td>
+<td>Infer the input value type from a Standard Schema.</td>
+</tr>
+<tr>
+<td><code>StandardSchemaIssue</code></td>
+<td>interface</td>
+<td>Validation issue reported by a Standard Schema compatible library.</td>
+</tr>
+<tr>
+<td><code>StandardSchemaOutput</code></td>
+<td>typeAlias</td>
+<td>Infer the output value type from a Standard Schema.</td>
+</tr>
+<tr>
+<td><code>StandardSchemaPathSegment</code></td>
+<td>typeAlias</td>
+<td>Path segment shape accepted by Standard Schema issues.</td>
+</tr>
+<tr>
+<td><code>StandardSchemaResult</code></td>
+<td>typeAlias</td>
+<td>Validation result returned by a Standard Schema compatible schema.</td>
+</tr>
+<tr>
+<td><code>StandardSchemaV1</code></td>
+<td>interface</td>
+<td>Structural Standard Schema v1 contract consumed by the form adapter.</td>
+</tr>
+<tr>
+<td><code>SuccessFormReplyInit</code></td>
+<td>interface</td>
+<td>Input used to construct a successful form reply.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/error</code></h2>
+<p>Explicit error-handling surface: normalized error payloads, loader fallbacks, and error display components.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ErrorDisplay</code></td>
+<td><code>ErrorDisplay(props: ErrorDisplayProps): ErrorDisplayContent</code></td>
+<td>Render normalized Fresh error data with an overridable presentation slot.</td>
+</tr>
+<tr>
+<td><code>InlineError</code></td>
+<td><code>InlineError(props): ErrorDisplayContent</code></td>
+<td>Render normalized Fresh error data in a compact inline layout.</td>
+</tr>
+<tr>
+<td><code>classifyErrorType</code></td>
+<td><code>classifyErrorType(status: number): ErrorType</code></td>
+<td>Classify an HTTP status code into the Fresh error taxonomy.</td>
+</tr>
+<tr>
+<td><code>errorHandler</code></td>
+<td><code>errorHandler(loader, fallback: T)</code></td>
+<td>Wrap a loader and return fallback data when it throws.</td>
+</tr>
+<tr>
+<td><code>extractData</code></td>
+<td><code>extractData(result: LoaderResult): T</code></td>
+<td>Extract success data after the caller has checked <code>hasError()</code>.</td>
+</tr>
+<tr>
+<td><code>extractDataWithFallback</code></td>
+<td><code>extractDataWithFallback(result: LoaderResult): T</code></td>
+<td>Extract fallback data from an errored loader result.</td>
+</tr>
+<tr>
+<td><code>extractErrorData</code></td>
+<td><code>extractErrorData(error: unknown): ErrorData</code></td>
+<td>Extract a normalized Fresh error payload from any thrown value.</td>
+</tr>
+<tr>
+<td><code>extractErrorWithFallback</code></td>
+<td><code>extractErrorWithFallback(result: LoaderResult)</code></td>
+<td>Extract normalized error data and fallback data from an errored loader result.</td>
+</tr>
+<tr>
+<td><code>getDefaultMessage</code></td>
+<td><code>getDefaultMessage(status: number): string</code></td>
+<td>Return the default user-facing message for a known HTTP status code.</td>
+</tr>
+<tr>
+<td><code>hasError</code></td>
+<td><code>hasError(result: LoaderResult): result is </code></td>
+<td>Return whether a loader result contains normalized error data and fallback data.</td>
+</tr>
+<tr>
+<td><code>isRetryable</code></td>
+<td><code>isRetryable(status: number, type: ErrorType): boolean</code></td>
+<td>Return whether a status and type combination should offer retry affordances.</td>
+</tr>
+<tr>
+<td><code>safeParseData</code></td>
+<td><code>safeParseData(result: LoaderResult)</code></td>
+<td>Return success data or <code>null</code> when the loader result contains an error.</td>
+</tr>
+<tr>
+<td><code>safeParseDataWithFallback</code></td>
+<td><code>safeParseDataWithFallback(result: LoaderResult): T</code></td>
+<td>Return success data or fallback data from a loader result.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ErrorData</code></td>
+<td>interface</td>
+<td>Normalized error payload for loaders, handlers, and error displays.</td>
+</tr>
+<tr>
+<td><code>ErrorDisplayContent</code></td>
+<td>typeAlias</td>
+<td>Renderable content accepted and returned by Fresh error display helpers.</td>
+</tr>
+<tr>
+<td><code>ErrorDisplayProps</code></td>
+<td>interface</td>
+<td>Props accepted by the default Fresh error display component.</td>
+</tr>
+<tr>
+<td><code>ErrorPrimitives</code></td>
+<td>interface</td>
+<td>Shared error-display payload used by package-owned and app-owned error views.</td>
+</tr>
+<tr>
+<td><code>ErrorType</code></td>
+<td>typeAlias</td>
+<td>HTTP-derived error category used by Fresh error rendering helpers.</td>
+</tr>
+<tr>
+<td><code>LoaderResult</code></td>
+<td>typeAlias</td>
+<td>Loader result returned by <code>errorHandler()</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/streams</code></h2>
+<p>Client SDK for end-to-end durable streams backed by a TanStack DB StreamDB.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createNetScriptStreamDB</code></td>
+<td><code>createNetScriptStreamDB(options: NetScriptStreamDBOptions): NetScriptStreamDB</code></td>
+<td>Create a NetScript-configured TanStack DB-backed StreamDB.</td>
+</tr>
+<tr>
+<td><code>useLiveQuery</code></td>
+<td><code>useLiveQuery(queryFactory: NetScriptLiveQueryFactory, deps?): NetScriptLiveQueryResult</code></td>
+<td>Run a TanStack DB live query through the NetScript Fresh streams surface.</td>
+</tr>
+<tr>
+<td><code>useLiveSuspenseQuery</code></td>
+<td><code>useLiveSuspenseQuery(queryFactory: NetScriptLiveQueryFactory, deps?): NetScriptLiveQueryResult</code></td>
+<td>Run a TanStack DB suspense live query through the NetScript Fresh streams surface.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NetScriptLiveQueryFactory</code></td>
+<td>typeAlias</td>
+<td>Function that builds a live query from the upstream query builder.</td>
+</tr>
+<tr>
+<td><code>NetScriptLiveQueryResult</code></td>
+<td>interface</td>
+<td>Result returned by NetScript live-query wrappers.</td>
+</tr>
+<tr>
+<td><code>NetScriptStateSchema</code></td>
+<td>typeAlias</td>
+<td>NetScript-owned state schema accepted by the stream DB factory.</td>
+</tr>
+<tr>
+<td><code>NetScriptStreamDB</code></td>
+<td>interface</td>
+<td>NetScript-owned stream database handle returned by the factory.</td>
+</tr>
+<tr>
+<td><code>NetScriptStreamDBFactory</code></td>
+<td>typeAlias</td>
+<td>Factory port used to create a durable stream DB handle.</td>
+</tr>
+<tr>
+<td><code>NetScriptStreamDBFactoryInput</code></td>
+<td>interface</td>
+<td>Input passed to the underlying stream DB factory port.</td>
+</tr>
+<tr>
+<td><code>NetScriptStreamDBOptions</code></td>
+<td>interface</td>
+<td>Options for <code>createNetScriptStreamDB</code>.</td>
+</tr>
+<tr>
+<td><code>NetScriptStreamStateDefinition</code></td>
+<td>typeAlias</td>
+<td>NetScript-owned durable stream state definition.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/query</code></h2>
+<p>TanStack Query hooks and hydration helpers scoped to Fresh islands.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HydrationBoundary</code></td>
+<td><code>HydrationBoundary(props: HydrationBoundaryProps): object</code></td>
+<td>Hydrate the island QueryClient from direct state or a JSON script tag.</td>
+</tr>
+<tr>
+<td><code>QueryHydrationScript</code></td>
+<td><code>QueryHydrationScript(props: QueryHydrationScriptProps): object</code></td>
+<td>Render a JSON script tag containing dehydrated query state.</td>
+</tr>
+<tr>
+<td><code>QueryIsland</code></td>
+<td><code>QueryIsland(props: QueryIslandProps): object</code></td>
+<td>Island-level TanStack Query provider.</td>
+</tr>
+<tr>
+<td><code>dehydrateQueryClient</code></td>
+<td><code>dehydrateQueryClient(queryClient: IslandQueryClient): DehydratedState</code></td>
+<td>Dehydrate a QueryClient into a serializable state object.</td>
+</tr>
+<tr>
+<td><code>getIslandQueryClient</code></td>
+<td><code>getIslandQueryClient(): IslandQueryClient</code></td>
+<td>Get (or create) the shared island <code>QueryClient</code>.</td>
+</tr>
+<tr>
+<td><code>hydrateFromDehydrated</code></td>
+<td><code>hydrateFromDehydrated(queryClient: IslandQueryClient, dehydratedState: DehydratedState): void</code></td>
+<td>Hydrate a client-side QueryClient from a server-dehydrated state.</td>
+</tr>
+<tr>
+<td><code>resetIslandQueryClient</code></td>
+<td><code>resetIslandQueryClient(): void</code></td>
+<td>Reset the island QueryClient singleton.</td>
+</tr>
+<tr>
+<td><code>useInfiniteQuery</code></td>
+<td><code>useInfiniteQuery(options: IslandInfiniteQueryOptions): IslandInfiniteQueryResult</code></td>
+<td>Backward-compatible alias for <code>useIslandInfiniteQuery</code>.</td>
+</tr>
+<tr>
+<td><code>useIsFetching</code></td>
+<td><code>useIsFetching(filters?: IslandQueryFilters): number</code></td>
+<td>Count active island queries matching the optional filters.</td>
+</tr>
+<tr>
+<td><code>useIsMutating</code></td>
+<td><code>useIsMutating(filters?: IslandQueryFilters): number</code></td>
+<td>Count active island mutations matching the optional filters.</td>
+</tr>
+<tr>
+<td><code>useIslandInfiniteQuery</code></td>
+<td><code>useIslandInfiniteQuery(options: IslandInfiniteQueryOptions): IslandInfiniteQueryResult</code></td>
+<td>Run an island infinite query through the shared NetScript Fresh QueryClient.</td>
+</tr>
+<tr>
+<td><code>useIslandMutation</code></td>
+<td><code>useIslandMutation(options: IslandMutationOptions): IslandMutationResult</code></td>
+<td>Run an island mutation through the shared NetScript Fresh QueryClient.</td>
+</tr>
+<tr>
+<td><code>useIslandQuery</code></td>
+<td><code>useIslandQuery(options: IslandQueryOptions): IslandQueryResult</code></td>
+<td>Run an island query through the shared NetScript Fresh QueryClient.</td>
+</tr>
+<tr>
+<td><code>useIslandSuspenseInfiniteQuery</code></td>
+<td><code>useIslandSuspenseInfiniteQuery(options: IslandInfiniteQueryOptions): IslandInfiniteQueryResult</code></td>
+<td>Run a suspense island infinite query through the shared NetScript Fresh QueryClient.</td>
+</tr>
+<tr>
+<td><code>useIslandSuspenseQuery</code></td>
+<td><code>useIslandSuspenseQuery(options: IslandQueryOptions): IslandSuspenseQueryResult</code></td>
+<td>Run a suspense island query through the shared NetScript Fresh QueryClient.</td>
+</tr>
+<tr>
+<td><code>useLiveQuery</code></td>
+<td><code>useLiveQuery(queryFactory: IslandLiveQueryFactory, deps?): IslandLiveQueryResult</code></td>
+<td>Run an island live query through the NetScript Fresh query surface.</td>
+</tr>
+<tr>
+<td><code>useLiveSuspenseQuery</code></td>
+<td><code>useLiveSuspenseQuery(queryFactory: IslandLiveQueryFactory, deps?): IslandLiveQueryResult</code></td>
+<td>Run an island suspense live query through the NetScript Fresh query surface.</td>
+</tr>
+<tr>
+<td><code>useMutation</code></td>
+<td><code>useMutation(options: IslandMutationOptions): IslandMutationResult</code></td>
+<td>Backward-compatible alias for <code>useIslandMutation</code>.</td>
+</tr>
+<tr>
+<td><code>useQuery</code></td>
+<td><code>useQuery(options: IslandQueryOptions): IslandQueryResult</code></td>
+<td>Backward-compatible alias for <code>useIslandQuery</code>.</td>
+</tr>
+<tr>
+<td><code>useQueryClient</code></td>
+<td><code>useQueryClient(): IslandQueryClient</code></td>
+<td>Return the active island QueryClient handle.</td>
+</tr>
+<tr>
+<td><code>useSuspenseInfiniteQuery</code></td>
+<td><code>useSuspenseInfiniteQuery(options: IslandInfiniteQueryOptions): IslandInfiniteQueryResult</code></td>
+<td>Backward-compatible alias for <code>useIslandSuspenseInfiniteQuery</code>.</td>
+</tr>
+<tr>
+<td><code>useSuspenseQuery</code></td>
+<td><code>useSuspenseQuery(options: IslandQueryOptions): IslandSuspenseQueryResult</code></td>
+<td>Backward-compatible alias for <code>useIslandSuspenseQuery</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3>Constants</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DEFAULT_QUERY_HYDRATION_SCRIPT_ID</code></td>
+<td><code>__netscript_query_state__</code></td>
+<td>Default script id used for serialized NetScript query state.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DehydratedState</code></td>
+<td>interface</td>
+<td>State produced by server-side query dehydration.</td>
+</tr>
+<tr>
+<td><code>HydrationBoundaryProps</code></td>
+<td>interface</td>
+<td>Props for <code>HydrationBoundary</code>.</td>
+</tr>
+<tr>
+<td><code>InitialDataFor</code></td>
+<td>typeAlias</td>
+<td>Extract initial data from a query-options object.</td>
+</tr>
+<tr>
+<td><code>IslandInfiniteQueryOptions</code></td>
+<td>interface</td>
+<td>Options accepted by <code>useIslandInfiniteQuery</code>.</td>
+</tr>
+<tr>
+<td><code>IslandInfiniteQueryResult</code></td>
+<td>interface</td>
+<td>Result of an island infinite query hook call.</td>
+</tr>
+<tr>
+<td><code>IslandLiveQueryFactory</code></td>
+<td>typeAlias</td>
+<td>Function that builds a live query from the upstream query builder.</td>
+</tr>
+<tr>
+<td><code>IslandLiveQueryResult</code></td>
+<td>interface</td>
+<td>Result returned by NetScript live-query wrappers.</td>
+</tr>
+<tr>
+<td><code>IslandMutationOptions</code></td>
+<td>interface</td>
+<td>Options accepted by <code>useIslandMutation</code>.</td>
+</tr>
+<tr>
+<td><code>IslandMutationResult</code></td>
+<td>interface</td>
+<td>Result of an island mutation hook call.</td>
+</tr>
+<tr>
+<td><code>IslandQueryClient</code></td>
+<td>interface</td>
+<td>Client handle returned by the island query-client factory.</td>
+</tr>
+<tr>
+<td><code>IslandQueryFilters</code></td>
+<td>interface</td>
+<td>Filters accepted by query/mutation activity counters.</td>
+</tr>
+<tr>
+<td><code>IslandQueryOptions</code></td>
+<td>interface</td>
+<td>Options accepted by <code>useIslandQuery</code>.</td>
+</tr>
+<tr>
+<td><code>IslandQueryResult</code></td>
+<td>interface</td>
+<td>Result of an island query hook call.</td>
+</tr>
+<tr>
+<td><code>IslandSuspenseQueryResult</code></td>
+<td>interface</td>
+<td>Result of a suspense island query hook call.</td>
+</tr>
+<tr>
+<td><code>LoaderData</code></td>
+<td>typeAlias</td>
+<td>Resolve the awaited return value from a Fresh route loader.</td>
+</tr>
+<tr>
+<td><code>QueryHydrationScriptProps</code></td>
+<td>interface</td>
+<td>Props for <code>QueryHydrationScript</code>.</td>
+</tr>
+<tr>
+<td><code>QueryIslandChildren</code></td>
+<td>typeAlias</td>
+<td>Renderable children accepted by the query island provider.</td>
+</tr>
+<tr>
+<td><code>QueryIslandProps</code></td>
+<td>interface</td>
+<td>Props for the <code>QueryIsland</code> wrapper.</td>
+</tr>
+<tr>
+<td><code>QueryJsonValue</code></td>
+<td>typeAlias</td>
+<td>JSON-compatible value accepted by island query hydration helpers.</td>
+</tr>
+<tr>
+<td><code>QueryKey</code></td>
+<td>typeAlias</td>
+<td>Stable query key shape used by NetScript Fresh query wrappers.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/interactive</code></h2>
+<p>Browser-facing interactive helpers using the Suspense throw-promise protocol.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resolvedPromise</code></td>
+<td><code>resolvedPromise(value: T): Promise</code></td>
+<td>Create a promise already primed as fulfilled for <code>usePromise()</code>.</td>
+</tr>
+<tr>
+<td><code>usePromise</code></td>
+<td><code>usePromise(promise: Promise): T</code></td>
+<td>Read a promise using the Suspense throw-promise protocol.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/vite</code></h2>
+<p>The NetScript Fresh Vite plugin for aliases, env mapping, and route manifest generation.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createNetScriptVitePlugin</code></td>
+<td><code>createNetScriptVitePlugin(_): NetScriptVitePlugin</code></td>
+<td>Create the NetScript Fresh Vite plugin for aliases, env mapping, and route manifests.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NetScriptRouteManifestOptions</code></td>
+<td>interface</td>
+<td>Options controlling the NetScript route manifest generator.</td>
+</tr>
+<tr>
+<td><code>NetScriptViteAlias</code></td>
+<td>interface</td>
+<td>Resolved Vite alias entry generated or accepted by the NetScript Vite plugin.</td>
+</tr>
+<tr>
+<td><code>NetScriptViteEnvMapping</code></td>
+<td>interface</td>
+<td>Environment variable mapping injected into <code>import.meta.env</code>.</td>
+</tr>
+<tr>
+<td><code>NetScriptVitePlugin</code></td>
+<td>interface</td>
+<td>Package-owned view of the Vite plugin hooks used by NetScript Fresh.</td>
+</tr>
+<tr>
+<td><code>NetScriptVitePluginOptions</code></td>
+<td>interface</td>
+<td>Options accepted by the NetScript Fresh Vite plugin.</td>
+</tr>
+</tbody>
+</table>
+<h2><code>@netscript/fresh/testing</code></h2>
+<p>Testing fixtures: mock route contexts and defer policies for consumer tests.</p>
+<h3>Functions and components</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createMockDeferPolicy</code></td>
+<td><code>createMockDeferPolicy(_)</code></td>
+<td>Create a defer policy fixture accepted by defer-region helpers.</td>
+</tr>
+<tr>
+<td><code>createMockRouteContext</code></td>
+<td><code>createMockRouteContext(_): MockRouteContext</code></td>
+<td>Create a minimal page context fixture for route, loader, and layout tests.</td>
+</tr>
+</tbody>
+</table>
+<h3>Types</h3>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MockDeferPolicyInput</code></td>
+<td>interface</td>
+<td>Mock defer policy override accepted by defer test fixtures.</td>
+</tr>
+<tr>
+<td><code>MockDeferPolicyProfile</code></td>
+<td>typeAlias</td>
+<td>Mock defer policy profile names accepted by defer test fixtures.</td>
+</tr>
+<tr>
+<td><code>MockRouteContext</code></td>
+<td>interface</td>
+<td>Mock route context returned by <code>createMockRouteContext()</code>.</td>
+</tr>
+<tr>
+<td><code>MockRouteContextOptions</code></td>
+<td>interface</td>
+<td>Options used to construct a route context fixture.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

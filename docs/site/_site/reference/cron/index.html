@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@netscript/cron · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>@netscript/cron</h1>
+      <h1><code>@netscript/cron</code></h1>
+<p>Runtime-agnostic cron scheduling abstraction for NetScript applications. Provides a
+consistent interface across different backends (native <code>Deno.cron</code> and an in-memory
+scheduler) with timezone support, job-lifecycle event emission, and runtime
+auto-detection. This page is generated from the package public surface with <code>deno doc</code>
+(US-2). For the full index of packages and plugins return to the
+<a href="/reference/">reference overview</a>.</p>
+<p>The root entrypoint (<code>@netscript/cron</code>) exposes the scheduler factory, the shared-instance
+helpers, the cron-expression utilities, and the full port contract (interfaces and type
+aliases). Three sub-path exports carry the rest of the surface:</p>
+<ul>
+<li><a href="#sub-path-exports"><code>@netscript/cron/ports</code></a> - the port contract types only (no factory).</li>
+<li><a href="#sub-path-exports"><code>@netscript/cron/adapters</code></a> - the concrete adapter classes.</li>
+<li><a href="#sub-path-exports"><code>@netscript/cron/testing</code></a> - the in-memory adapter for tests.</li>
+</ul>
+<h2>Scheduler factory</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>createScheduler</code></td>
+<td><code>function createScheduler(options?: CreateSchedulerOptions): CronScheduler</code></td>
+<td>Create a cron scheduler, auto-detecting the runtime (native <code>Deno.cron</code>, or in-memory for tests).</td>
+</tr>
+<tr>
+<td><code>getScheduler</code></td>
+<td><code>function getScheduler(options?: CreateSchedulerOptions): CronScheduler</code></td>
+<td>Get the default shared scheduler instance, creating it on first call (options only used on first call).</td>
+</tr>
+<tr>
+<td><code>stopScheduler</code></td>
+<td><code>async function stopScheduler(): Promise&lt;void&gt;</code></td>
+<td>Stop and reset the default scheduler so the next <code>getScheduler()</code> creates a fresh instance.</td>
+</tr>
+</tbody>
+</table>
+<h2>Cron expression utilities</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>isValidCronExpression</code></td>
+<td><code>function isValidCronExpression(expression: string): boolean</code></td>
+<td>Validate a cron expression, returning <code>true</code> if valid.</td>
+</tr>
+<tr>
+<td><code>parseCronExpression</code></td>
+<td><code>function parseCronExpression(expression: string): ParsedCronExpression | null</code></td>
+<td>Parse a cron expression string into its component parts, or <code>null</code> if invalid.</td>
+</tr>
+</tbody>
+</table>
+<h2>Constants</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CronPresets</code></td>
+<td>const</td>
+<td>Common cron presets (<code>EVERY_MINUTE</code>, <code>EVERY_5_MINUTES</code>, <code>EVERY_HOUR</code>, <code>EVERY_DAY</code>, <code>WEEKDAYS_9AM</code>, <code>WEEKENDS_NOON</code>, and more).</td>
+</tr>
+<tr>
+<td><code>CronProviders</code></td>
+<td>const</td>
+<td>Canonical provider identifiers supported by the built-in factory.</td>
+</tr>
+</tbody>
+</table>
+<h2>Scheduler contract</h2>
+<p>The core scheduling interface implemented by every adapter.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CronScheduler</code></td>
+<td>interface</td>
+<td>Runtime-agnostic scheduling abstraction: <code>schedule</code>, <code>unschedule</code>, <code>list</code>, <code>get</code>, <code>has</code>, <code>enable</code>, <code>disable</code>, <code>trigger</code>, <code>isValid</code>, <code>on</code>/<code>off</code>, and <code>stop</code>, plus <code>provider</code> and <code>isRunning</code>.</td>
+</tr>
+<tr>
+<td><code>CreateSchedulerOptions</code></td>
+<td>interface</td>
+<td>Options for creating a scheduler (<code>provider</code>, <code>tickInterval</code>).</td>
+</tr>
+<tr>
+<td><code>ScheduleOptions</code></td>
+<td>interface</td>
+<td>Options for scheduling a job (timezone, run-on-init, retries).</td>
+</tr>
+<tr>
+<td><code>ScheduledJob</code></td>
+<td>interface</td>
+<td>Scheduled-job metadata.</td>
+</tr>
+<tr>
+<td><code>JobContext</code></td>
+<td>interface</td>
+<td>Job execution context passed to contextual handlers.</td>
+</tr>
+<tr>
+<td><code>JobExecutionResult</code></td>
+<td>interface</td>
+<td>Result of a single job execution.</td>
+</tr>
+<tr>
+<td><code>JobRunEvent</code></td>
+<td>interface</td>
+<td>Event emitted when a job runs.</td>
+</tr>
+<tr>
+<td><code>JobLifecycleEvent</code></td>
+<td>interface</td>
+<td>Event emitted when a job is scheduled or unscheduled.</td>
+</tr>
+<tr>
+<td><code>SchedulerEventMap</code></td>
+<td>interface</td>
+<td>Typed scheduler event-payload map.</td>
+</tr>
+<tr>
+<td><code>ParsedCronExpression</code></td>
+<td>interface</td>
+<td>A cron expression parsed into its component parts.</td>
+</tr>
+</tbody>
+</table>
+<h2>Types</h2>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CronExpression</code></td>
+<td>type alias</td>
+<td>Cron expression string.</td>
+</tr>
+<tr>
+<td><code>JobHandler</code></td>
+<td>type alias</td>
+<td>Job handler function signature.</td>
+</tr>
+<tr>
+<td><code>ContextualJobHandler</code></td>
+<td>type alias</td>
+<td>Job handler that receives a <code>JobContext</code>.</td>
+</tr>
+<tr>
+<td><code>JobEventListener</code></td>
+<td>type alias</td>
+<td>Event listener for scheduler events.</td>
+</tr>
+<tr>
+<td><code>SchedulerEvent</code></td>
+<td>type alias</td>
+<td>Scheduler event-name union.</td>
+</tr>
+<tr>
+<td><code>CronProvider</code></td>
+<td>type alias</td>
+<td>Cron provider identifier (built-in providers runtime-validated by <code>createScheduler()</code>).</td>
+</tr>
+<tr>
+<td><code>KnownCronProvider</code></td>
+<td>type alias</td>
+<td>Union of the known built-in provider identifiers.</td>
+</tr>
+<tr>
+<td><code>CronProviderRegistry</code></td>
+<td>type alias</td>
+<td>Canonical provider-identifier registry shape.</td>
+</tr>
+<tr>
+<td><code>BackoffStrategy</code></td>
+<td>type alias</td>
+<td>Backoff strategy for retry logic.</td>
+</tr>
+</tbody>
+</table>
+<h2>Adapters</h2>
+<p>Concrete implementations of <code>CronScheduler</code>, exported from <code>@netscript/cron/adapters</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Kind</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DenoCronAdapter</code></td>
+<td>class</td>
+<td>Uses the native <code>Deno.cron</code> runtime; works on Deno Deploy and local Deno.</td>
+</tr>
+<tr>
+<td><code>MemoryCronAdapter</code></td>
+<td>class</td>
+<td><code>setInterval</code>-based in-memory scheduler with test helpers (<code>triggerAll</code>, <code>waitForExecutions</code>, <code>getExecutionCount</code>, <code>setTickInterval</code>). Ideal for tests and development.</td>
+</tr>
+</tbody>
+</table>
+<h2>Sub-path exports</h2>
+<p>The following entrypoints are published alongside the root export. Their reference surface is
+generated from their own <code>deno doc</code> output.</p>
+<table>
+<thead>
+<tr>
+<th>Export</th>
+<th>Entrypoint</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/cron</code></td>
+<td><code>./mod.ts</code></td>
+<td>Scheduler factory, expression utilities, constants, and the full port contract (documented above).</td>
+</tr>
+<tr>
+<td><code>@netscript/cron/ports</code></td>
+<td><code>./ports/mod.ts</code></td>
+<td>The port contract only - every interface and type alias above, without the factory functions.</td>
+</tr>
+<tr>
+<td><code>@netscript/cron/adapters</code></td>
+<td><code>./adapters/mod.ts</code></td>
+<td>The concrete <code>DenoCronAdapter</code> and <code>MemoryCronAdapter</code> classes (plus re-exported contract types and utilities).</td>
+</tr>
+<tr>
+<td><code>@netscript/cron/testing</code></td>
+<td><code>./testing/mod.ts</code></td>
+<td>The <code>MemoryCronAdapter</code> for tests.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Back to the <a href="/reference/">reference overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>

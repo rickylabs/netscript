@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The plugin model · NetScript Docs</title>
+  </head>
+  <body>
+    <header>
+      <a href="/netscript/"><strong>NetScript</strong></a>
+      <nav aria-label="Diátaxis sections">
+        <ul>
+          <li><a href="/netscript/tutorials/">Tutorials</a></li>
+          <li><a href="/netscript/how-to/">How-to guides</a></li>
+          <li><a href="/netscript/reference/">Reference</a></li>
+          <li><a href="/netscript/explanation/">Explanation</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <h1>The plugin model</h1>
+      <h1>The plugin model</h1>
+<p>This page is <strong>understanding-oriented</strong>: it explains <em>how</em> NetScript plugins are put
+together and <em>why</em> the design is split the way it is. It is for reading and reflection,
+not step-by-step doing. To actually add a plugin, follow the
+<a href="/how-to/add-a-plugin/">how-to guide</a>; to look up the exact symbols, use the
+<a href="/reference/">reference</a>.</p>
+<h2>What a plugin is</h2>
+<p>A NetScript plugin is a package under <code>plugins/</code> that contributes capability to a host
+workspace without the host having to hard-code knowledge of that capability. The
+first-party plugins are:</p>
+<table>
+<thead>
+<tr>
+<th>Plugin</th>
+<th>JSR package</th>
+<th>Capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>workers</td>
+<td><code>@netscript/plugin-workers</code></td>
+<td>Background job scheduling and task execution.</td>
+</tr>
+<tr>
+<td>sagas</td>
+<td><code>@netscript/plugin-sagas</code></td>
+<td>Durable saga orchestration and workflow APIs.</td>
+</tr>
+<tr>
+<td>triggers</td>
+<td><code>@netscript/plugin-triggers</code></td>
+<td>Trigger ingress, scheduling, and file watching.</td>
+</tr>
+<tr>
+<td>streams</td>
+<td><code>@netscript/plugin-streams</code></td>
+<td>Durable change-data stream services.</td>
+</tr>
+</tbody>
+</table>
+<p>Each is its own publishable unit with its own reference page:
+<a href="/reference/workers/"><code>@netscript/plugin-workers</code></a>,
+<a href="/reference/sagas/"><code>@netscript/plugin-sagas</code></a>,
+<a href="/reference/triggers/"><code>@netscript/plugin-triggers</code></a>, and
+<a href="/reference/streams/"><code>@netscript/plugin-streams</code></a>.</p>
+<h2>Plugins versus their core packages</h2>
+<p>The most important thing to understand about a NetScript plugin is that it is <em>two
+packages, not one</em>. Every public plugin has a sibling <strong>core</strong> package:</p>
+<table>
+<thead>
+<tr>
+<th>Public plugin</th>
+<th>Sibling core package</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@netscript/plugin-workers</code></td>
+<td><code>@netscript/plugin-workers-core</code></td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-sagas</code></td>
+<td><code>@netscript/plugin-sagas-core</code></td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-triggers</code></td>
+<td><code>@netscript/plugin-triggers-core</code></td>
+</tr>
+<tr>
+<td><code>@netscript/plugin-streams</code></td>
+<td><code>@netscript/plugin-streams-core</code></td>
+</tr>
+</tbody>
+</table>
+<p>The split follows the architecture doctrine's separation of <em>behavior</em> from
+<em>integration</em>:</p>
+<ul>
+<li>The <strong>core</strong> package implements the capability itself — the authoring DSL (for example
+the saga and trigger definition builders), the runtime, the ports it depends on, the
+adapters, telemetry, and the versioned contract types. This is where the long-running
+behavior and state live.</li>
+<li>The <strong>plugin</strong> package is a thin integration layer (the doctrine's <em>Plugin Package</em>
+archetype). Its <code>mod.ts</code> is small. It re-exports the userland surface from its core
+sibling rather than redefining it, and it adds the one thing the core cannot supply on
+its own: a <strong>manifest</strong> that tells a host <em>what</em> this plugin contributes and <em>how</em> to
+wire it up.</li>
+</ul>
+<p>Because of this split, the core packages are documented as an <strong>Internals</strong> subsection on
+each plugin's reference page rather than as separate top-level entries: application authors
+normally reach the core symbols <em>through</em> the public plugin, so the public plugin is the
+surface users consume.</p>
+<p>This is why you will see, for example, the saga DSL exported from
+<code>@netscript/plugin-sagas/runtime</code> even though it is authored in
+<code>@netscript/plugin-sagas-core</code> — the plugin package re-exports the core's contract and
+runtime, keeping a single import path for consumers while preserving the
+behavior/integration boundary in the source.</p>
+<h2>Manifests and contributions</h2>
+<p>A plugin describes itself with a typed <strong>manifest</strong>, assembled through the
+<code>definePlugin()</code> builder in <a href="/reference/plugin/"><code>@netscript/plugin</code></a>. The manifest is a
+declaration, not executable wiring: it names the plugin, its version, and the set of
+<strong>contributions</strong> the plugin makes along well-defined <strong>extension axes</strong>.</p>
+<p>Contributions are the vocabulary the host understands. The plugin contract defines a fixed
+set of contribution shapes — among them service contributions, background-processor
+contributions, database-schema contributions, stream-topic contributions, contract-version
+contributions, runtime-config-topic contributions, and telemetry contributions. A workers
+plugin contributes worker job definitions; a sagas plugin contributes saga definitions; a
+streams plugin contributes stream topics and a service. The host does not need to know the
+internals of any plugin — it only needs to understand these contribution shapes.</p>
+<p>This is the doctrine's principle of <strong>registration over inheritance</strong> for cross-package
+extension: a plugin <em>registers</em> named contributions against open extension axes instead of
+subclassing host internals. Registration scales because the host can validate a
+registration at composition time, log it, and reject conflicts — for example, duplicate
+plugin names are rejected with a structured error that references both contributors.</p>
+<h2>Discovery, loading, and registries</h2>
+<p>NetScript does not auto-discover plugins from <code>node_modules</code>. Plugins use <strong>file-system
+based discovery</strong> under <code>plugins/</code>, and the host loader resolves them <strong>explicitly</strong>. Two
+properties of the loader matter for understanding the model:</p>
+<ul>
+<li><strong>Load order is deterministic.</strong> Plugins must not depend on the order in which other
+plugins load; the doctrine forbids order-dependence and asserts against it.</li>
+<li><strong>Each load contributes named registrations</strong> against one or more extension axes, and
+duplicate names across plugins are rejected.</li>
+</ul>
+<p>Between <em>declaring</em> a plugin and the <em>runtime</em> being able to use it sits a generated
+<strong>registry</strong>. Rather than scanning the file system at runtime, NetScript emits static
+registry modules — one generated TypeScript module per contribution axis — that the
+runtime imports directly. (The plugin package exposes the emitter and port types behind
+this on its reference page, and each plugin can load its definitions from the generated
+static registry module.) Regenerating the registry is what makes a freshly added plugin
+visible to the runtime; the practical command sequence for this is covered in the
+<a href="/how-to/add-a-plugin/">add-a-plugin how-to</a>.</p>
+<h2>Why the model looks like this</h2>
+<p>The shape exists to keep three concerns from leaking into each other:</p>
+<ol>
+<li><strong>Capability authors</strong> work in a core package and think only about behavior, ports, and
+contracts — never about how a host discovers them.</li>
+<li><strong>Plugin packages</strong> stay small: they translate a capability into a manifest of
+contributions, which is the only thing a host has to understand.</li>
+<li><strong>Hosts</strong> depend on a stable, finite set of contribution shapes and a deterministic
+loader, so adding a plugin never requires editing host code — it requires a manifest
+and a regenerated registry.</li>
+</ol>
+<p>The result is that capabilities compose. A host can add workers, sagas, triggers, and
+streams in any combination, and each plugin contributes its services, background
+processors, schemas, and topics through the same contribution vocabulary.</p>
+<h2>Where to go next</h2>
+<ul>
+<li><strong>Do it:</strong> <a href="/how-to/add-a-plugin/">Add a first-party plugin</a> — the task-oriented recipe.</li>
+<li><strong>Look it up:</strong> the plugin authoring contract in
+<a href="/reference/plugin/"><code>@netscript/plugin</code></a>, and each plugin's surface —
+<a href="/reference/workers/">workers</a>, <a href="/reference/sagas/">sagas</a>,
+<a href="/reference/triggers/">triggers</a>, <a href="/reference/streams/">streams</a>.</li>
+<li><strong>Read more:</strong> the other <a href="/explanation/">explanation</a> pages for the wider architecture.</li>
+</ul>
+<hr>
+<p>Back to the <a href="/explanation/">explanation overview</a>.</p>
+
+    </main>
+    <footer>
+      <p>NetScript user documentation.</p>
+    </footer>
+  </body>
+</html>
