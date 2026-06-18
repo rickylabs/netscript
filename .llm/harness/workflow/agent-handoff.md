@@ -23,7 +23,7 @@ Preferred triggers:
 - commit message `[openhands model=<provider/model> output=<mode>] ...`,
 - manual `OpenHands Agent` workflow dispatch.
 
-The canonical details live in `AGENTS-handoff.md` and `.agents/skills/openhands-handoff/SKILL.md`.
+The canonical details live in `.agents/skills/openhands-handoff/SKILL.md`.
 
 ## Harness Rules
 
