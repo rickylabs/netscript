@@ -82,6 +82,9 @@ entry*, never by relaxing the catalog law.
 | D-4 | file/link audit (report-only) | `deno run --allow-read .llm/tools/deps/audit-file-link.ts --json` / `deno task deps:audit:file-link` | PASS exit 0: zero findings |
 | D-4 | Tooling check | `deno check .llm/tools/deps/audit-file-link.ts .llm/tools/deps/workspace.ts` | PASS |
 | D-4 | Tooling lint | `deno lint --no-config .llm/tools/deps/audit-file-link.ts .llm/tools/deps/workspace.ts` | PASS |
+| D-5 | Fresh task prune | `(cd packages/fresh && deno task publish:dry-run)` | PASS: canonical task succeeds, 0 slow types |
+| D-5 | Task census | `deno run --allow-read .llm/tools/deps/census.ts --json` filtered to `packages/fresh` | PASS: `dry-run` alias absent; `publish:dry-run` present |
+| D-5 | Reference check | `rg 'deno task dry-run|"dry-run"' packages/fresh/deno.json packages/fresh/README.md` | PASS: no matches |
 
 ## Handoff Notes
 

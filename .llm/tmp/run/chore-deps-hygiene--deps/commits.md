@@ -9,5 +9,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 6648177: chore(deps-hygiene): D-2 — add npm catalog scanner
 - 355cf1a: chore(deps-hygiene): D-3 — add JSR centralization scanner
 - 041e3d2: chore(deps-hygiene): D-4 — add file link audit
+- 587de5d: chore(deps-hygiene): D-5 — prune Fresh dry-run task alias
 
 <!-- appended after each commit -->
