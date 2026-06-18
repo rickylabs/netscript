@@ -35,6 +35,13 @@ last). Claude supervises; OpenHands evaluates (separate session); Codex WSL impl
     `Checked 3 files`.
   - `deno task check` from repo root: exit 0, `1598` files, `0` occurrences.
   - Scoped fresh-ui check/lint wrappers: exit 0, `0` occurrences.
+- Formatting-only CI quality slice landed in
+  `6350b544e3b6f66d954c86597dabf5e7d9c8fbef`.
+- `deno task fmt:check` reported exactly one file:
+  `packages/fresh/src/runtime/server/define-fresh-app.ts`; that file was formatted with `deno fmt`.
+- Gate evidence for the formatting slice:
+  - `deno task fmt:check` from repo root: exit 0, `1169` files selected, `0` findings.
+  - `deno task check` from repo root: exit 0, `1598` files selected, `0` occurrences.
 
 ## Blockers
 
