@@ -12,3 +12,4 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 
 <!-- appended after each commit -->
 - 8197afad: ci(pages): GitHub Pages deploy workflow for docs/site + verification deploy (live at /netscript/), reverted to main-only
+- 7c29de5c33d5597d995eb700306a1092bf2e9934: fix(fresh-ui): restore interactive JSX prop surface
