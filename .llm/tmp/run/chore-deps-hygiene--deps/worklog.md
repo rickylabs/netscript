@@ -73,6 +73,9 @@ entry*, never by relaxing the catalog law.
 | D-1 | Census JSON | `deno run --allow-read .llm/tools/deps/census.ts --json` | PASS: 27 members, 33 catalog entries, 61 dependency keys, 324 dependency uses, 148 tasks |
 | D-1 | Tooling check | `deno check .llm/tools/deps/census.ts .llm/tools/deps/workspace.ts .llm/tools/deps/prod-install.ts` | PASS |
 | D-1 | Tooling lint | `deno lint --no-config .llm/tools/deps/census.ts .llm/tools/deps/workspace.ts .llm/tools/deps/prod-install.ts` | PASS |
+| D-2 | npm catalog scanner (report-only) | `deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts --json` / `deno task deps:check:npm-catalog` | PASS exit 0: 27 WARN findings on real dependency surfaces, including `packages/queue/adapters/amqp.adapter.ts:10`; evaluator-named string-literal sites were not reported |
+| D-2 | Tooling check | `deno check .llm/tools/deps/scan-npm-catalog-compliance.ts .llm/tools/deps/workspace.ts` | PASS |
+| D-2 | Tooling lint | `deno lint --no-config .llm/tools/deps/scan-npm-catalog-compliance.ts .llm/tools/deps/workspace.ts` | PASS |
 
 ## Handoff Notes
 
