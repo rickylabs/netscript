@@ -111,10 +111,14 @@ are untouched. Slices run low→high blast radius.
 
 ## Handoff Notes
 
-- PLAN-EVAL cycle 1 = `FAIL_PLAN` → cycle-1 remediation applied → **PLAN-EVAL cycle 2 = `PASS`**
-  (run 27755852001, separate OpenHands minimax-M3 session). Plan-Gate cleared.
-- **Implementation lane (when dispatched):** WSL Codex daemon-attached subagent (mobile-visible), one
-  slice per commit, slices G1-0 → G1-6 (G1-3 = G1-3a/b/c). Each slice: consumer scan → remove/refactor
-  → gate (scoped check/test + `scaffold.runtime` smoke on public slices) → commit → push → PR comment
-  → append `commits.md`. IMPL-EVAL = OpenHands qwen 3.7 max, separate session.
-- **Gate before launch:** user reviews plans + explicitly dispatches; G2 also at PLAN-EVAL PASS.
+- **Implementation complete:** G1-0 through G1-6 are landed and pushed on `chore/prod-readiness`,
+  with per-slice gate evidence above. This run is ready for a **separate OpenHands IMPL-EVAL**
+  (`qwen 3.7 max`). Do not treat this worklog as self-certification.
+- **Hard line upheld:** no edits to `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`,
+  `packages/aspire/src/public/mod.ts`, version pins, or catalog/`catalog:` refs; no lockfile/cache
+  deletion; PR-7 deprecate-before-remove was honored on public surfaces; G1-6 deleted no code because
+  no bounded candidate met the zero-reference threshold.
+- **Recorded drift/debt for evaluator review:** `D-G1-1` root handoff doc relocated into the
+  OpenHands skill; `D-G1-2` deferred live internal consumers (`V8_HEAP_MB`,
+  `updatePluginRegistry`); `D-G1-3a` deferred pre-existing database doc-lint private-type-ref;
+  `D-G1-5` resolved extra recurring-job stream/docs/template consumers found during removal.
