@@ -1,5 +1,5 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, VNode } from 'preact';
+import type { ComponentChildren } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
 import type {
@@ -27,68 +27,88 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-function PopoverRoot({ children, ...options }: PopoverRootProps): VNode {
+/** Render the popover root provider. */
+export function PopoverRoot(props: unknown): unknown {
+  const { children, ...options } = props as PopoverRootProps;
   const popover = usePopover(options);
   return <PopoverContext.Provider value={popover}>{children}</PopoverContext.Provider>;
 }
 
-function PopoverTrigger({ children, ...props }: PopoverTriggerProps): VNode {
+/** Render the button that toggles the popover. */
+export function PopoverTrigger(props: unknown): unknown {
+  const { children, ...triggerProps } = props as PopoverTriggerProps;
   const popover = usePopoverContext('Popover.Trigger');
-  return <button {...popover.getTriggerProps(props)}>{withChildren(children)}</button>;
+  return <button {...popover.getTriggerProps(triggerProps)}>{withChildren(children)}</button>;
 }
 
-function PopoverAnchor({ children, ...props }: PopoverAnchorProps): VNode {
+/** Render the popover anchor element. */
+export function PopoverAnchor(props: unknown): unknown {
+  const { children, ...anchorProps } = props as PopoverAnchorProps;
   const popover = usePopoverContext('Popover.Anchor');
-  return <div {...popover.getAnchorProps(props)}>{withChildren(children)}</div>;
+  return <div {...popover.getAnchorProps(anchorProps)}>{withChildren(children)}</div>;
 }
 
-function PopoverPositioner({ children, ...props }: PopoverPositionerProps): VNode {
+/** Render the popover positioning element. */
+export function PopoverPositioner(props: unknown): unknown {
+  const { children, ...positionerProps } = props as PopoverPositionerProps;
   const popover = usePopoverContext('Popover.Positioner');
-  return <div {...popover.getPositionerProps(props)}>{withChildren(children)}</div>;
+  return <div {...popover.getPositionerProps(positionerProps)}>{withChildren(children)}</div>;
 }
 
-function PopoverContent({ children, ...props }: PopoverContentProps): VNode {
+/** Render the popover content element. */
+export function PopoverContent(props: unknown): unknown {
+  const { children, ...contentProps } = props as PopoverContentProps;
   const popover = usePopoverContext('Popover.Content');
-  return <div {...popover.getContentProps(props)}>{withChildren(children)}</div>;
+  return <div {...popover.getContentProps(contentProps)}>{withChildren(children)}</div>;
 }
 
-function PopoverTitle({ children, ...props }: PopoverTitleProps): VNode {
+/** Render the popover title element. */
+export function PopoverTitle(props: unknown): unknown {
+  const { children, ...titleProps } = props as PopoverTitleProps;
   const popover = usePopoverContext('Popover.Title');
-  return <h2 {...popover.getTitleProps(props)}>{withChildren(children)}</h2>;
+  return <h2 {...popover.getTitleProps(titleProps)}>{withChildren(children)}</h2>;
 }
 
-function PopoverDescription({ children, ...props }: PopoverDescriptionProps): VNode {
+/** Render the popover description element. */
+export function PopoverDescription(props: unknown): unknown {
+  const { children, ...descriptionProps } = props as PopoverDescriptionProps;
   const popover = usePopoverContext('Popover.Description');
-  return <p {...popover.getDescriptionProps(props)}>{withChildren(children)}</p>;
+  return <p {...popover.getDescriptionProps(descriptionProps)}>{withChildren(children)}</p>;
 }
 
-function PopoverClose({ children, ...props }: PopoverCloseProps): VNode {
+/** Render the button that closes the popover. */
+export function PopoverClose(props: unknown): unknown {
+  const { children, ...closeProps } = props as PopoverCloseProps;
   const popover = usePopoverContext('Popover.Close');
-  return <button {...popover.getCloseProps(props)}>{withChildren(children)}</button>;
+  return <button {...popover.getCloseProps(closeProps)}>{withChildren(children)}</button>;
 }
 
-function PopoverArrow({ children, ...props }: PopoverArrowProps): VNode {
+/** Render the popover arrow element. */
+export function PopoverArrow(props: unknown): unknown {
+  const { children, ...arrowProps } = props as PopoverArrowProps;
   const popover = usePopoverContext('Popover.Arrow');
-  return <div {...popover.getArrowProps(props)}>{withChildren(children)}</div>;
+  return <div {...popover.getArrowProps(arrowProps)}>{withChildren(children)}</div>;
 }
 
-function PopoverArrowTip({ children, ...props }: PopoverArrowTipProps): VNode {
+/** Render the popover arrow tip element. */
+export function PopoverArrowTip(props: unknown): unknown {
+  const { children, ...arrowTipProps } = props as PopoverArrowTipProps;
   const popover = usePopoverContext('Popover.ArrowTip');
-  return <div {...popover.getArrowTipProps(props)}>{withChildren(children)}</div>;
+  return <div {...popover.getArrowTipProps(arrowTipProps)}>{withChildren(children)}</div>;
 }
 
 /** Compound popover namespace type with root and positioning subcomponents. */
 export type PopoverNamespace = Readonly<{
-  Anchor: (props: any) => unknown;
-  Arrow: (props: any) => unknown;
-  ArrowTip: (props: any) => unknown;
-  Close: (props: any) => unknown;
-  Content: (props: any) => unknown;
-  Description: (props: any) => unknown;
-  Positioner: (props: any) => unknown;
-  Root: (props: any) => unknown;
-  Title: (props: any) => unknown;
-  Trigger: (props: any) => unknown;
+  Anchor: typeof PopoverAnchor;
+  Arrow: typeof PopoverArrow;
+  ArrowTip: typeof PopoverArrowTip;
+  Close: typeof PopoverClose;
+  Content: typeof PopoverContent;
+  Description: typeof PopoverDescription;
+  Positioner: typeof PopoverPositioner;
+  Root: typeof PopoverRoot;
+  Title: typeof PopoverTitle;
+  Trigger: typeof PopoverTrigger;
 }>;
 
 /** Compound popover namespace with root and positioning subcomponents. */
