@@ -720,3 +720,22 @@ Seeded from
   and green validation.
 - **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
   targeted package checks and `deno task publish:dry-run` pass after each migration.
+
+## packages/cli + packages/service — legacy connection-string env alias (`database-connectivity-legacy-connstring-alias`)
+
+- **Reason:** The servy/env-file generators emit a `ConnectionStrings__{provider}db` env var labelled
+  a "legacy alias" (`packages/cli/src/kernel/adapters/windows/servy/servy-environment.ts:139`,
+  `env-file-values.ts:130`, `env-file-content.ts:98`). It is **not** back-compat cruft: it is a live
+  runtime contract **read** by `@netscript/service` DB diagnostics
+  (`packages/service/src/diagnostics/database-connectivity.ts:48,71,94` —
+  `ConnectionStrings__mysqldb`/`postgresdb`/`mssqldb`). The `chore/prod-readiness` cleanup classifies
+  it FUNCTIONAL / OFF-LIMITS (F3) and records it here rather than removing it.
+- **Owner:** CLI env-generation + `@netscript/service` diagnostics maintainers.
+- **Target:** Consolidate the `{provider}db` alias and its reader onto a single canonical
+  `ConnectionStrings__{resource}` form once the env-var contract is unified; out of cleanup scope.
+- **Linked plan:** `.llm/tmp/run/chore-prod-readiness--cleanup/plan.md` (PR-5, F3);
+  `.llm/tmp/run/chore-prod-readiness--cleanup/research.md` (F3 row + open-questions).
+- **Created:** 2026-06-18 (PLAN-EVAL cycle-1 finding).
+- **Status:** open, DEBT_ACCEPTED. Removing the alias would break DB connectivity diagnostics.
+- **Gate:** grep parity between the writers above and the `connStringEnv` readers in
+  `database-connectivity.ts`; close when both sides move to a single canonical key.
