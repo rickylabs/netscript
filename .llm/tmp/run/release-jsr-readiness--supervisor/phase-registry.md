@@ -111,7 +111,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Surface | External user docs: per-package reference (`deno doc` + standardized README, `deno doc --lint` clean) + conceptual onboarding; Lume → GitHub Pages |
 | Archetype | N/A — docs (touches every unit's doc/README surface) |
 | Scope overlay | `SCOPE-docs.md` |
-| Status | `planned` (Research+Plan may run in parallel with Groups 1/2; **IMPL gated on 1+2 merged**) |
+| Status | **Plan READY for PLAN-EVAL** (2026-06-18) — branch `docs/user-site` created off umbrella `91306142`; IMPL gate satisfied (1+2 merged). Big decisions resolved: denominator=26 (US-5), `deno doc --lint` baseline 25/26 clean + fresh-ui = 1 Codex source slice (US-6). User-gated (downstream, not blocking PLAN-EVAL): Pages domain/subpath + `workflow`-scoped token. PLAN-EVAL not yet dispatched. |
 
 ### Deliverables
 - Diátaxis-structured site (tutorial + how-to + reference + explanation); per-package reference generated from `deno doc`; standardized READMEs; Lume site + GitHub Pages CI.
@@ -131,7 +131,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Surface | Internal/contributor docs: harness, doctrine, `.llm/` architecture, `AGENTS.md`/`CLAUDE.md` surface, root ops docs; document `deno doc` in harness + `jsr-audit` skills |
 | Archetype | N/A — docs/internal |
 | Scope overlay | `SCOPE-docs.md` |
-| Status | `planned` (Research+Plan may run in parallel; **IMPL gated on 1+2 merged**) |
+| Status | **Plan READY for PLAN-EVAL** (2026-06-18) — branch `docs/internal-overhaul` created off umbrella `91306142`; IMPL gate satisfied (1+2 merged). All resolve-now decisions closed: IO-5 (functional IA, not Diátaxis), IO-6 (canonical-home rubric), Group-1 deletion coordination (only `AGENTS-handoff.md`). No user-gated blockers. PLAN-EVAL not yet dispatched. |
 
 ### Deliverables
 - Consolidated, de-duplicated, prod-ready internal docs; `deno doc` documented (npm rendering, JSX/TSX highlighting, npm-without-types fixes) in the harness + `jsr-audit` skills.
