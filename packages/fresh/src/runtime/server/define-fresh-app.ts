@@ -102,7 +102,10 @@ function shouldRegisterStaticFiles<State>(options: DefineFreshAppOptions<State>)
   return options.staticFiles !== false;
 }
 
-function registerFileSystemRoutes<State>(app: App<State>, options: DefineFreshAppOptions<State>): void {
+function registerFileSystemRoutes<State>(
+  app: App<State>,
+  options: DefineFreshAppOptions<State>,
+): void {
   if (options.fsRoutes === false) {
     return;
   }
