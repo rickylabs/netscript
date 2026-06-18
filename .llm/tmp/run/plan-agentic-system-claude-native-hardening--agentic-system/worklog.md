@@ -134,3 +134,34 @@ Claude supervisor session status: re-baselined, artifacts verified, IMPL-EVAL tr
 No implementation slices were needed — this is a docs/tooling PR with no remaining heavy work.
 - Comment ID: 4736384438
 - Comment URL: https://github.com/rickylabs/netscript/pull/50#issuecomment-4736384438
+
+## Implementation Coverage Matrix (supervisor re-verification, 2026-06-18)
+
+User challenged whether the IMPL-EVAL trigger was premature. Replacement supervisor session
+re-verified all plan slices against actual file evidence. Matrix below.
+
+| Plan Slice | Planned Concept | File Evidence | Commit | Gap Verdict |
+| ---------- | --------------- | ------------- | ------ | ----------- |
+| S1 | CLAUDE.md — Claude bootstrap + @AGENTS.md include | `CLAUDE.md` line 1-4: `@AGENTS.md`, supervisor rules, reasoning policy, workflow policy | 2857f552 | **NONE** |
+| S1 | .claude/settings.json — hooks with --no-lock | `.claude/settings.json`: PreToolUse + Stop hooks, both use `--no-lock` flag | 2857f552 | **NONE** |
+| S2 | sync-claude-skills.ts — skill mirror generator | `.llm/tools/agentic/sync-claude-skills.ts`: 140-line Deno script, collectSkills + diffMaps, `deno task agentic:sync-claude` registered in deno.json | 2857f552 | **NONE** |
+| S2 | validate-claude-surface.ts — surface validator | `.llm/tools/agentic/validate-claude-surface.ts`: 132-line Deno script, checks CLAUDE.md, settings.json, .gitignore, sync check, hook lock regression; `deno task agentic:check-claude` in deno.json | 2857f552 | **NONE** |
+| S2 | .claude/skills/ — mirrored skill directory | 15 mirrored SKILL.md files present in `.claude/skills/` (aspire, claude-manager, codex-wsl-remote, deno-fresh, design, fresh-ui-horizontal, impeccable, jsr-audit, netscript-cli, netscript-deno-toolchain, netscript-doctrine, netscript-harness, netscript-pr, netscript-tools, openhands-handoff, rtk, skill-creator) | 2857f552 | **NONE** |
+| S3 | claude-manager skill | `.agents/skills/claude-manager/SKILL.md`: substantive skill with delegation contract, reasoning policy table, workflow steps | 2857f552 | **NONE** |
+| S3 | codex-wsl-remote skill update | `.agents/skills/codex-wsl-remote/SKILL.md`: updated with launch model table, medium reasoning defaults | 2857f552 | **NONE** |
+| S3 | .agents/skills/README.md — aspire entry fix | `.agents/skills/README.md` updated | 2857f552 | **NONE** |
+| S4 | Reasoning policy in CLAUDE.md | `CLAUDE.md` lines 18-23: low/medium/high/xhigh policy table | 2857f552 | **NONE** |
+| S5 | Hook --no-lock + lock regression check | validate-claude-surface.ts `runHookLockCheck()` runs hook 3x, compares deno.lock before/after | d77df74e | **NONE** |
+| S5 | claude-remote-smoke.ts --env-aware | `.llm/tools/agentic/claude-remote-smoke.ts`: 144-line Deno script, `--env-aware` skip path, per-command exit code, `deno task agentic:smoke-claude-remote` in deno.json | d77df74e | **NONE** |
+| S5 | claude-hook-log.ts | `.llm/tools/agentic/claude-hook-log.ts`: 44-line JSONL logger, writes `.llm/tmp/claude/hooks/` | 2857f552 | **NONE** |
+| S6 | Claude workflow policy | `CLAUDE.md` lines 26-33: workflow policy section; worklog Claude Workflows Design Addendum | 6dc9140a | **NONE** |
+| S7 | Harness artifacts + IMPL-EVAL handoff | All run artifacts committed; PLAN-EVAL PASS recorded; gates PASS; IMPL-EVAL triggered | 6c6a4091 / a1e08661 | **NONE** |
+
+**Overall verdict: No implementation gap. IMPL-EVAL trigger was valid, not premature.**
+
+All 7 plan slices are concretely implemented in working Deno TypeScript files, settings, and skill
+docs. The prior supervisor session did not self-certify — it ran all 4 local gates and reported
+them green before triggering IMPL-EVAL. The challenge was resolved by reading actual file content;
+no WSL Codex implementation slice is needed.
+
+Next action: monitor IMPL-EVAL comment at https://github.com/rickylabs/netscript/pull/50#issuecomment-4736384438.
