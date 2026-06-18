@@ -14,7 +14,24 @@ branch + worktree + nested run + sub-PR + evaluator pass). The umbrella exit gat
 | Base branch | `main` |
 | Surface | JSR-readiness of the **26 publish targets** (27 declare name+exports; `cli-e2e` is `publish:false`); waves E=25 non-CLI + F=`@netscript/cli`. Exit = `scorecard.md` PASS |
 | Exit gate | `scorecard.md` (evaluator-owned, separate session) |
-| Roles | Claude supervises · OpenHands evaluates (separate session) · Codex WSL implements (mobile-visible) |
+| Roles | Claude supervises · OpenHands evaluates (separate session) · Codex WSL implements **framework/source** (mobile-visible) · **docs authoring → Claude dynamic workflow** (harness-skill-driven agents; OpenHands validates per-package/per-domain) per LD-DOCS-LANE |
+
+### LD-DOCS-LANE — docs-authoring implementation lane (decided 2026-06-18, user)
+
+- **Docs authoring** (Lume content, per-package README + reference prose, internal-doc consolidation)
+  is implemented by a **Claude dynamic workflow**, NOT WSL Codex. Rationale: language-dominated work
+  where Opus 4.8 ≫ Codex/GPT-5.5, and it touches **no `packages/`/`plugins/` source**.
+- Authoring agents run **under the harness SKILL** (`netscript-harness` + `jsr-audit` /
+  `netscript-doctrine` / `deno-fresh` as relevant). Model routing per slice: Opus med (reference /
+  concepts), Opus low (README standardization), Sonnet 4.6 (trivial link/cleanup).
+- **Validation = OpenHands (qwen 3.7 max, separate session) with a per-package / per-domain verdict.**
+  The workflow is generator-only; it does not self-certify. (See cost note below — realized as a
+  per-group IMPL-EVAL emitting a per-unit verdict table, not one Actions run per package, unless the
+  user directs otherwise.)
+- **`@netscript/fresh-ui` `*Namespace` source slice stays WSL Codex** (framework code, public-API,
+  off-limits to the workflow). Group-3 IMPL = Claude-workflow doc authoring + 1 Codex source slice.
+- Amends `CLAUDE.md` Workflow Policy (docs-authoring exception recorded there). Gate unchanged: no
+  authoring run launches until **both** docs PLAN-EVALs PASS and plans+scorecard are presented.
 
 ## Status Legend
 
