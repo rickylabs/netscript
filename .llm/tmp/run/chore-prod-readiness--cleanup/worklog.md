@@ -4,13 +4,14 @@
 |-------|-------|
 | Run ID | `chore-prod-readiness--cleanup` |
 | Branch | `chore/prod-readiness` (off `release/jsr-readiness`) |
-| Status | `planned` (skeleton; not launched) |
+| Status | `active` (group branch launched; Plan-Gate pending) |
 
 ## Progress Log
 
 | Time | Phase | Step | Notes |
 |------|-------|------|-------|
 | 2026-06-18 | bootstrap | skeleton scaffolded | Supervisor created run dir + draft `plan.md`/`research.md`. No branch/worktree/generator yet (present-for-review gate). |
+| 2026-06-18 | plan-gate | group branch launched | Branched off umbrella @ `1f4cafa3` for the Plan-Gate. Plan/research/Design ready (inherited from umbrella). Draft sub-PR → `release/jsr-readiness` + PLAN-EVAL dispatch (OpenHands/minimax M3, separate session) follow. Worktree deferred to implementation launch (WSL Codex, ext4). |
 
 ## Design
 
