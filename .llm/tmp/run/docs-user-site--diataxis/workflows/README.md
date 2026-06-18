@@ -57,3 +57,24 @@ Workflow({ scriptPath: ".../docs-user-site--diataxis/workflows/g3-user-docs-fano
 # resume with cached completed agents after an edit:
 Workflow({ scriptPath: "...", resumeFromRunId: "wf_910e9292-7b7" })
 ```
+
+## Companion: `g3-user-docs-scaffold-pilot.js` (run this FIRST)
+
+The fan-out above is the *second* half of the recommended lifecycle. The first half is
+`g3-user-docs-scaffold-pilot.js` (run `wf_b885234c-937`), which:
+
+1. **Scaffold** phase — stands up the Lume skeleton + Diátaxis sections + the README standard and
+   its `check-readme-standard.ts` checker (two agents, `parallel()` barrier).
+2. **Pilot** phase — generates the reference page **and** standardized README for **one** unit
+   (`@netscript/logger`) to PROVE the `deno doc` → page pipeline end-to-end.
+3. **Verify** phase — builds the site, confirms the pilot page rendered, and runs the gates.
+
+It demonstrates the parts the fan-out assumes already exist: **staged `phase()` barriers**
+(Scaffold → Pilot → Verify, each a `parallel()` that must finish before the next) and the
+**prove-on-one-before-spending-tokens-on-N** discipline. The pattern for any docs effort is:
+**scaffold + pilot one unit → inspect the green Verify → only then fan out.** Cheap insurance — a
+broken `deno doc` mapping or Lume `location` is caught on 1 unit, not 50.
+
+```
+Workflow({ scriptPath: ".../docs-user-site--diataxis/workflows/g3-user-docs-scaffold-pilot.js" })
+```
