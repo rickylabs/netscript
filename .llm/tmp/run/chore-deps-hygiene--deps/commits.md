@@ -10,5 +10,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 355cf1a: chore(deps-hygiene): D-3 — add JSR centralization scanner
 - 041e3d2: chore(deps-hygiene): D-4 — add file link audit
 - 587de5d: chore(deps-hygiene): D-5 — prune Fresh dry-run task alias
+- ec50a3d: chore(deps-hygiene): D-6 — wrap deno bump-version
 
 <!-- appended after each commit -->

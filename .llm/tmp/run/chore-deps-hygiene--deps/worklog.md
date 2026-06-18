@@ -85,6 +85,27 @@ entry*, never by relaxing the catalog law.
 | D-5 | Fresh task prune | `(cd packages/fresh && deno task publish:dry-run)` | PASS: canonical task succeeds, 0 slow types |
 | D-5 | Task census | `deno run --allow-read .llm/tools/deps/census.ts --json` filtered to `packages/fresh` | PASS: `dry-run` alias absent; `publish:dry-run` present |
 | D-5 | Reference check | `rg 'deno task dry-run|"dry-run"' packages/fresh/deno.json packages/fresh/README.md` | PASS: no matches |
+| D-6 | bump wrapper parity | `deno task version:bump:test` | PASS: native `deno bump-version patch --dry-run` stdout/stderr/exit code preserved |
+| D-6 | bump wrapper smoke | `deno task version:bump --cwd <tmp> --json patch --dry-run` | PASS: JSON wrapper reported `ok=true`, exit 0, `1.2.3 -> 1.2.4`; scratch dir removed |
+| D-6 | Tooling check | `deno check .llm/tools/deps/bump-version.ts .llm/tools/deps/bump-version_test.ts` | PASS |
+| D-6 | Tooling lint | `deno lint --no-config .llm/tools/deps/bump-version.ts .llm/tools/deps/bump-version_test.ts` | PASS |
+| Final | Scanner reports | npm catalog: 27 report-only WARN findings; JSR centralization: `[]`; file/link audit: `[]` | PASS for report-only scanner landing |
+| Final | Publish dry-run | `deno task publish:dry-run` | PASS: all publishable units completed dry-run; existing slow-type carve-out warnings only |
+| Final | Doctrine gate | `deno task arch:check` | FAIL: pre-existing repository-wide doctrine baseline (`FAIL=58 WARN=147 INFO=1`), not caused by dependency-shape scanner wiring |
+
+## Handoff Summary
+
+- D-1 through D-6 are implemented and pushed on `chore/deps-hygiene`.
+- Scanners are report-only by default with `--json`; D-2/D-3/D-4 expose `--fail-on-violation` for
+  the future enforcement flip once npm catalog findings are converged or explicitly allow-listed.
+- The npm scanner reports 27 current WARN findings on real dependency surfaces. It does not report
+  the evaluator-named non-import string literal sites in `windows.ts` or `registry.manifest.ts`.
+- No dependency versions, catalog pins, lock files, caches, `scaffold-versions.ts`, or release-time
+  transforms were changed.
+- `arch:check` remains red on the pre-existing global doctrine baseline. No new scanner was wired
+  into `arch:check` in this implementation pass because the npm report is intentionally not yet
+  enforceable.
+- Worktree was clean after D-6 implementation and final publish dry-run before this artifact update.
 
 ## Handoff Notes
 
