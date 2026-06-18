@@ -543,30 +543,11 @@ export function sqlJsonExtension<
   return Prisma.defineExtension(config);
 }
 
-// ============================================================================
-// LEGACY COMPATIBILITY - mssqlJsonExtension alias
-// ============================================================================
-
-/**
- * Creates a Prisma extension for MSSQL JSON serialization.
- * This is an alias for `sqlJsonExtension` with `databaseType: 'mssql'`.
- *
- * @deprecated Use `sqlJsonExtension` instead.
- */
-export function mssqlJsonExtension<
-  P extends {
-    defineExtension: (config: PrismaExtensionConfig) => ReturnType<P['defineExtension']>;
-  },
->(
-  Prisma: P,
-  options: Omit<SqlJsonExtensionOptions, 'databaseType'> = {},
-): ReturnType<P['defineExtension']> {
-  return sqlJsonExtension(Prisma, { ...options, databaseType: 'mssql' });
-}
-
 /**
  * Creates a Prisma extension for MySQL JSON serialization.
  * This is an alias for `sqlJsonExtension` with `databaseType: 'mysql'`.
+ *
+ * @deprecated Use `sqlJsonExtension` instead.
  */
 export function mysqlJsonExtension<
   P extends {

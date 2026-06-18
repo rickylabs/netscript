@@ -28,20 +28,29 @@
 | S1 | `packages/telemetry/src/context/job.ts` (whole file) | `@deprecated` pure re-export of `payload-context.ts` | **REMOVE** (back-compat shim) | importers of `createJobTraceEnv`/`extractJobTraceContext` from `job.ts` |
 | S2 | `packages/cli/src/kernel/constants/windows.ts:217–231` | 8 `@deprecated` constant aliases (`DEFAULT_SERVY_CLI_PATH`…`DEFAULT_V8_HEAP_MB`) | **REMOVE** (internal) | CLI usages; **not** `scaffold-versions.ts` |
 | S3 | `packages/database/mod.ts:254` | `@deprecated` fn alias → `buildPostgresConnectionString` | REMOVE (public) | doc:lint + dry-run for `@netscript/database` |
-| S4 | `packages/database/extensions/sql-json.extension.ts:554` | `@deprecated` alias → `sqlJsonExtension` | REMOVE (public) | importers |
-| S5 | `packages/database/adapters/mssql.adapter.ts:65` | `@deprecated` auth option (`type='ntlm'`) | REMOVE (public option) | option consumers |
-| S6 | `packages/plugin-workers-core/{streams/schema.ts:106, builders/job-builder.ts:48,130, public/root.ts:179}` | `@deprecated` recurring-job API | **REMOVE — PUBLIC, highest risk** | scaffold templates + `e2e:cli`; recurring→scheduled-trigger migration |
+| S4 | `packages/database/extensions/sql-json.extension.ts:556` (`mssqlJsonExtension`, **`@deprecated` @554**) | deprecated alias → `sqlJsonExtension` | REMOVE (public, already deprecated) | importers |
+| S4′ | `packages/database/extensions/sql-json.extension.ts:571` (`mysqlJsonExtension`) | sibling back-compat alias → `sqlJsonExtension` — **NOT `@deprecated`** (docstring @567–570 carries no tag) | **DEPRECATE-FIRST, DEFER removal** | deleting it now is a *silent* public-API break; mark `@deprecated` this run, remove in a later cycle |
+| S5 | `packages/database/adapters/mssql.adapter.ts:66` (`@deprecated`), **live internal writer @415–416** (`config.options!.trustedConnection = true`) | deprecated public option (`trustedConnection`) backed by an active code path | **REFACTOR + REMOVE — not a delete** | option consumers **+** migrate the internal writer to `authentication.type = 'ntlm'` (interface @53–57); needs the mssql adapter's own behavioural test |
+| S6 | `packages/plugin-workers-core/{streams/schema.ts:106, builders/job-builder.ts:48,130, public/root.ts:179}` **+ generated-output consumer `plugins/workers/src/scaffolding/job-scaffolders.ts:64–65`** (emits `.schedule(...)` into scaffolded job modules) | `@deprecated` recurring-job API | **REMOVE — PUBLIC, highest risk** | scaffold templates + the scaffolder above + `e2e:cli scaffold.runtime`; the recurring→scheduled-trigger migration must update the scaffolder **and** its test fixture or generated output references a removed method |
 | S7 | `packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts:250` | `@deprecated` config path | REMOVE | importers / scaffold |
 | S8 | `packages/fresh/src/runtime/server/define-fresh-app.ts:48,71` | `@deprecated` options (`staticFiles`/`fsRoutes`) | REMOVE (public option) | option consumers + fresh examples |
 | F1 | `packages/cli/src/kernel/templates/aspire/helpers/helpers-generator-pipeline.ts:50` | "Aspire **compat shim** (D-7 Node.js workaround)" | **OFF-LIMITS — functional** | upstream workaround, not back-compat |
 | F2 | `packages/cli/src/kernel/adapters/windows/compile/compile-bundler.ts:41,124,125,141` | esbuild "CJS **shim**" patch | **OFF-LIMITS — functional** | bundler-correctness fix |
-| F3 | `packages/cli/src/kernel/adapters/windows/servy/servy-environment.ts:139` | "legacy alias" connection-string env var | **VERIFY (likely functional)** | may be required by deployed services — confirm before touching |
+| F3 | `packages/cli/src/kernel/adapters/windows/servy/servy-environment.ts:139` (writer) + `env-file-values.ts:130`, `env-file-content.ts:98` (writers) | "legacy alias" `ConnectionStrings__{provider}db` env var | **OFF-LIMITS — FUNCTIONAL (confirmed)** | **read by** `packages/service/src/diagnostics/database-connectivity.ts:48,71,94` (`ConnectionStrings__mysqldb`/`postgresdb`/`mssqldb`) — removing it breaks `@netscript/service` DB diagnostics. Tracked as arch-debt `database-connectivity-legacy-connstring-alias`. |
 
-> Removing the **public** deprecated API (S3–S6, S8) is a breaking change. That is acceptable at the
-> target `0.0.1-alpha.0` (pre-1.0), but each requires the unit's archetype gates: consumer scan
+> Removing the **public** deprecated API (S3, S4, S6, S8) is a breaking change. That is acceptable at
+> the target `0.0.1-alpha.0` (pre-1.0), but each requires the unit's archetype gates: consumer scan
 > (incl. scaffold templates), `deno doc --lint` clean, and `publish:dry-run` non-regression. S6
 > (plugin-workers-core recurring jobs) is the single highest-risk removal — scaffold output may emit
 > recurring-job code, so it is gated on a full `e2e:cli scaffold.runtime` pass.
+>
+> **Deprecate-before-remove rule (PLAN-EVAL fix, cycle 1):** a public symbol may only be *removed*
+> this run if it already carries an `@deprecated` marker on `main`. An un-marked public alias
+> (**S4′ `mysqlJsonExtension`**) must be *deprecated this run and its removal deferred* — silently
+> deleting it would be an unannounced breaking change even at alpha. **S5 `trustedConnection`** is
+> not a symbol delete at all: the option is consumed by a live internal writer
+> (`mssql.adapter.ts:415–416`), so removing the public option is a *behavioural refactor* (migrate
+> the writer to `authentication.type = 'ntlm'`) carrying its own adapter test, not a deletion.
 
 ## Root-doc relocation — `AGENTS-handoff.md` → `openhands-handoff` skill
 
@@ -80,3 +89,13 @@
   generated-consumer surface to scan).
 - Which compat shims exist / who consumes them — **RESOLVED** (inventory above; generator verifies
   each candidate's consumers before removal).
+- **F3 `ConnectionStrings__{provider}db` legacy alias — RESOLVED (functional, off-limits).** Written
+  by `servy-environment.ts:139` / `env-file-values.ts:130` / `env-file-content.ts:98`; **read** by
+  `packages/service/src/diagnostics/database-connectivity.ts:48,71,94`. It is a load-bearing runtime
+  contract, not back-compat debt. Filed as arch-debt `database-connectivity-legacy-connstring-alias`
+  for eventual consolidation (out of this run's scope).
+- **S4′ vs S4 (deprecate-first) — RESOLVED.** `mssqlJsonExtension` is `@deprecated` → removable;
+  `mysqlJsonExtension` is not → deprecate-this-run, defer removal. See the deprecate-before-remove
+  rule above.
+- **S5 `trustedConnection` shape — RESOLVED.** Behavioural refactor (live internal writer at
+  `mssql.adapter.ts:415–416`), not a delete.

@@ -103,8 +103,6 @@ export type WorkerJob = Readonly<{
   topic?: string;
   /** Whether the job is enabled. */
   enabled?: boolean;
-  /** @deprecated Recurring jobs are modelled as scheduled triggers. */
-  schedule?: unknown;
   /** Human-readable job description. */
   description?: string;
 }>;
@@ -150,13 +148,11 @@ const WorkerJobZodSchema: AnyZodObject = JobResponseSchema.pick({
   name: true,
   topic: true,
   enabled: true,
-  schedule: true,
   description: true,
 }).partial({
   name: true,
   topic: true,
   enabled: true,
-  schedule: true,
   description: true,
 });
 /** Stream entity schema for worker jobs. */

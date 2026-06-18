@@ -5,7 +5,6 @@ export {
   type JsonFieldConfig,
   jsonUtils,
   // Database-specific aliases
-  mssqlJsonExtension,
   mysqlJsonExtension,
   type PrismaExtensionConfig,
   type PrismaQueryContext,

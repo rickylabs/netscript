@@ -92,7 +92,6 @@ import { defineJob } from '@netscript/plugin-workers-core';
 
 const job = defineJob('sync-catalog')
   .entrypoint('./workers/jobs/sync-catalog.ts')
-  .schedule('*/15 * * * *')
   .timeout(120_000)
   .retry(2)
   .permissions({ net: true, read: true })

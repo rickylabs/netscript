@@ -175,10 +175,6 @@ export interface JobBuilder<
   ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   /** Narrow the payload type carried by this job definition. */
   payload<TNextPayload>(): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
-  /** Set the cron schedule expression for this job.
-   * @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`.
-   */
-  schedule(expression: string): this;
   /** Set the schedule timezone. */
   timezone(value: string): this;
   /** Set the execution timeout in milliseconds. */

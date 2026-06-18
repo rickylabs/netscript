@@ -1,0 +1,400 @@
+G1-5 flagged for sub-split if >30 LOC. Per-slice file list + LOC budget present.
+|
+39:| Risk register | **PASS** | 8 risks with mitigations: shim-breaks-consumer, 
+doc-link-references, root-doc-stray, `publish:dry-run` regression, 
+functional-workaround, S4′ silent-delete, S5 internal-writer, S6 
+scaffolder-emit. Each mitigation ties to a PR-# or a specific slice. |
+40:| Gate set selected | **PASS** | `publish:dry-run`, scoped `check`, `test`, 
+`lint/fmt`, `validate-claude-surface` (G1-0), `arch:check`, `scaffold.runtime` 
+smoke (G1-3a/b/c, G1-4, G1-5), full `e2e:cli scaffold.runtime` (G1-5 + eval 
+pass). All required for chore-cleanup. |
+41:| Deferred scope explicit | **PASS** | `## Non-Scope` (doc content, dep 
+hygiene, version pins, catalog, F1–F3 functional, new abstractions). `## Hidden 
+Scope` (scaffold templates as consumer surface, "dead" requires proof, 
+`.llm/tmp/` mix). `PR-6` bounds G1-6. `PR-7` defers S4′ removal. Drift Watch 
+section names escalation paths. |
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify cycle-2 verdict in plan-eval.md
+
+$ grep -n "^## Cycle-2 verdict\|^\*\*\`PASS\`\*\*\|^\*\*\`FAIL_PLAN\`\*\*" 
+/home/runner/work/netscript/netscript/.llm/tmp/run/chore-prod-readiness--cleanup
+/plan-eval.md 2>&1
+
+Tokens: ↑ input 2.36M • cache hit 93.29% •  reasoning 1.24K • ↓ output 30.21K • 
+$ 0.2201
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+66:## Cycle-2 verdict
+68:**`PASS`**
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify summary has all required sections
+
+Thought:
+Verdict is `PASS` on line 68, exactly as required. Let me verify the summary 
+file too:
+
+$ grep -n "^## Verdict\|^\*\*\`PASS\`\*\*\|## Summary\|## Changes\|## 
+Validation\|## Responses\|## Remaining risks" 
+/home/runner/work/_temp/openhands/27755852001-1/summary.md 2>&1
+
+Tokens: ↑ input 2.41M • cache hit 93.42% •  reasoning 1.24K • ↓ output 30.34K • 
+$ 0.2232
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+3:## Verdict
+5:**`PASS`**
+11:## Summary
+47:## Changes
+53:## Validation
+77:## Responses to review comments or issue comments
+81:## Remaining risks
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify cycle-1 verdict fully replaced
+
+Thought:
+All required sections in the summary file. Let me also do a final check to make 
+sure the cycle-1 file is fully overwritten (not appended) and there are no 
+leftover cycle-1 `FAIL_PLAN` markers:
+
+$ grep -c "FAIL_PLAN" 
+/home/runner/work/netscript/netscript/.llm/tmp/run/chore-prod-readiness--cleanup
+/plan-eval.md 2>&1; echo "---"; head -80 
+/home/runner/work/netscript/netscript/.llm/tmp/run/chore-prod-readiness--cleanup
+/plan-eval.md | tail -20
+
+Tokens: ↑ input 2.46M • cache hit 93.55% •  reasoning 1.24K • ↓ output 30.52K • 
+$ 0.2265
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+2
+---
+1. **Scaffolder test fixture is new.** The plan's G1-5 touch list includes a 
+scaffolder test fixture that does not pre-exist in the tree. The implementer 
+must create it as part of G1-5. This is the correct plan decision (alternative: 
+defer G1-5, but that strands S6 recurring-job API as a no-progress). Not a plan 
+defect.
+2. **`mysqljsonextension-deprecated-removal-deferred` arch-debt entry is not 
+pre-existing.** The plan's Arch-Debt Implications table correctly marks it 
+"add". The implementer adds the entry alongside the `@deprecated` marker in 
+G1-3b. Acceptable.
+3. **`mssql.adapter.ts` writer line numbers.** Plan says `:415-416`; actual 
+writer body is at L414-415 (`if (integratedSecurity || (!username && !password))
+{ config.options!.trustedConnection = true; }`). One-line offset. Substantive 
+content matches. The cycle-1 fix said the plan must name the specific lines — 
+the plan does. Not a defect.
+4. **`mod.ts` line number.** Plan says `:254` for `buildConnectionString`; 
+actual location is L252-256 (the JSDoc `@deprecated` starts at L252, the 
+function declaration is L256). The cycle-1 fix said "name the symbol" — the plan
+does. Minor offset, not a defect.
+
+## Cycle-2 verdict
+
+**`PASS`**
+
+### Rationale (one paragraph)
+
+All 7 cycle-1 required fixes are resolved — each is visible in the plan 
+(`plan.md`), the design section of `worklog.md`, and the tree at `cc3b8731`. F3 
+is recorded as functional with an arch-debt entry that names readers, writers, 
+owner, reason, and target. S4′ is governed by the new PR-7 
+deprecate-before-remove rule and split into G1-3b (deprecate-only this run, 
+removal deferred). S5 is correctly classified as a G1-3c behavioural refactor 
+with the internal writer at `mssql.adapter.ts:415-416` named, plus an adapter 
+behavioural test gate. S6's scaffolder consumer at `job-scaffolders.ts:64-65` is
+now in G1-5's touch list with the scaffolder test fixture. Every public-surface 
+slice (G1-3a/b/c, G1-4, G1-5) carries a `scaffold.runtime` smoke. Per-slice file
+lists + LOC budgets are present, and G1-5 is explicitly flagged for sub-split if
+its migration exceeds ~30 LOC. G1-6 is bounded to G1-0..G1-5 surfaces + 
+`.llm/tools/`, with newly-discovered dead surfaces recorded + deferred, not 
+removed. The off-limits guardrail holds: `packages/aspire/src/public/mod.ts`, 
+`scaffold-versions.ts`, version pins, and `catalog:` references appear only in 
+the plan's Non-Scope exclusion rows, never in a touch list. All 8 `plan-gate.md`
+checklist boxes are satisfied; no open decision would force rework if deferred. 
+Implementation may begin.
+
+### Subtle plan-level note for the implementer (not gate-blocking)
+
+- The `mysqljsonextension-deprecated-removal-deferred` arch-debt entry must be 
+**added** by the implementer in G1-3b (alongside the `@deprecated` marker on 
+`mysqlJsonExtension` at `sql-json.extension.ts:571`), not pre-existing. The plan
+correctly identifies this as an "add" row.
+- The scaffolder test fixture for G1-5 is a new file the implementer must 
+create; the plan correctly lists it as part of the touch list but it has no 
+predecessor in the tree.
+- Line numbers in the plan are off by 1 in two places 
+(`mssql.adapter.ts:415-416` actual 414-415; `mod.ts:254` actual 252-256). 
+Substantive content matches; implementer should grep for the symbol, not the 
+line number.
+
+No implementation slice may begin before this verdict. This is the cycle-2 
+verdict — per `plan-protocol.md` §"Loop limit", two `FAIL_PLAN` cycles are 
+allowed and the second escalates to the user. This run passes on the second 
+cycle, so implementation proceeds.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check git status
+
+Thought:
+The two `FAIL_PLAN` matches in the file are:
+1. Header reference: "post-`FAIL_PLAN` cycle 1" (contextual, fine)
+2. The "Loop limit" reference (contextual, fine)
+
+No actual cycle-1 `FAIL_PLAN` verdict remains. The cycle-2 verdict is 
+**`PASS`**.
+
+Let me also check git status to confirm only the run-scoped file is touched:
+
+$ cd /home/runner/work/netscript/netscript && git status 2>&1 | head -20
+
+Tokens: ↑ input 2.52M • cache hit 93.64% •  reasoning 1.24K • ↓ output 30.69K • 
+$ 0.2300
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+On branch chore/prod-readiness
+Your branch is up to date with 'origin/chore/prod-readiness'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   .llm/tmp/run/chore-prod-readiness--cleanup/plan-eval.md
+        modified:   .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+        modified:   deno.lock
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/openhands/pr-54/run-27755852001-1/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check the run directory
+
+Thought:
+The `plan-eval.md` modification is the cycle-2 verdict. Other modifications 
+(`deno.lock`, other `request.md` files, etc.) appear to be pre-existing 
+uncommitted changes from prior runs — not introduced by this session.
+
+Let me also confirm the untracked run dir is the right one:
+
+$ ls -la 
+/home/runner/work/netscript/netscript/.llm/tmp/run/openhands/pr-54/run-277558520
+01-1/ 2>&1 | head -10
+
+Tokens: ↑ input 2.57M • cache hit 93.76% •  reasoning 1.24K • ↓ output 30.84K • 
+$ 0.2334
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+total 16
+drwxr-xr-x 2 runner runner 4096 Jun 18 11:19 .
+drwxr-xr-x 4 runner runner 4096 Jun 18 11:19 ..
+-rw-r--r-- 1 runner runner 5151 Jun 18 11:19 request.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final task list update
+
+Thought:
+Good. The run dir is the trace-metadata holder (already exists). The workflow 
+records the durable trace metadata there.
+
+Final summary:
+
+📋 Update Task List (13 tasks)
+
+Tokens: ↑ input 2.62M • cache hit 93.87% •  reasoning 1.24K • ↓ output 32.04K • 
+$ 0.2380
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 13 done
+
+✅ 1. Verify F3 fix #1 (legacy `${provider}db` connection-string alias 
+arch-debt)
+   Notes: VERIFIED — writers at servy-environment.ts:138-139, 
+env-file-values.ts:130, env-file-content.ts:98; readers at 
+database-connectivity.ts:48,71,94. arch-debt.md has full entry with all 7 
+fields. research.md + plan.md both carry F3 RESOLVED marker.
+✅ 2. Verify G1-3a (buildConnectionString deprecated alias)
+   Notes: VERIFIED — mod.ts:252-256 has @deprecated JSDoc on 
+buildConnectionString
+✅ 3. Verify G1-4 (serveStaticFiles/registerFsRoutes deprecations)
+   Notes: VERIFIED — define-fresh-app.ts:48,71 have @deprecated
+✅ 4. Verify G1-5 (S6 deprecated recurring-job API)
+   Notes: VERIFIED — streams/schema.ts:106 (schedule? @deprecated), 
+builders/job-builder.ts:48,130 (.schedule() @deprecated), public/root.ts:179 
+(.schedule() @deprecated); scaffolder emits .schedule(...) at 
+job-scaffolders.ts:64-65. Scaffolder test fixture does not pre-exist (must be 
+created).
+✅ 5. Verify G1-3b (mssqlJsonExtension removal + mysqlJsonExtension deprecate)
+   Notes: VERIFIED — mssqlJsonExtension @554 @deprecated; mysqlJsonExtension 
+@571 NOT @deprecated; plan G1-3b correctly deprecates mysqlJsonExtension and 
+defers removal (PR-7)
+✅ 6. Verify G1-3c (trustedConnection refactor)
+   Notes: VERIFIED — mssql.adapter.ts:65-66 @deprecated; live writer at L414-415
+sets config.options!.trustedConnection. Plan G1-3c correctly classifies as 
+refactor (migrate writer to authentication.type='ntlm'), not delete.
+✅ 7. Verify G1-6 bounded dead-code sweep
+   Notes: VERIFIED — plan PR-6 + G1-6 row + Per-slice file list + worklog Design
+all bound G1-6 to G1-0..G1-5 surfaces + .llm/tools/; new dead surfaces recorded 
++ deferred
+✅ 8. Verify scaffold.runtime smoke on every public slice (G1-3a/b/c, G1-4, 
+G1-5)
+   Notes: VERIFIED — plan Slice table + Fitness Gates + prose all confirm smoke 
+on every public slice
+✅ 9. Verify per-slice file list + LOC budget
+   Notes: VERIFIED — plan §Per-slice file list + LOC budget present with full 
+table; G1-5 explicitly flagged for sub-split
+✅ 10. Verify off-limits guardrail
+   Notes: VERIFIED — packages/aspire/src/public/mod.ts, scaffold-versions.ts, 
+version pins, catalog: appear only in plan Non-Scope exclusion rows; never in 
+touch lists
+✅ 11. Walk full Plan-Gate checklist (8 boxes)
+   Notes: All 8 boxes checked: Research, Decisions, Open-decision, Slices, Risk,
+Gates, Deferred, jsr-audit
+✅ 12. Write cycle-2 verdict to plan-eval.md
+   Notes: Wrote PASS verdict with full verification matrix, plan-gate walk, 
+open-decision sweep, and subtle observations. 80 lines. Overwrote cycle-1 file.
+✅ 13. Write OPENHANDS_SUMMARY_PATH summary.md
+   Notes: Wrote to /home/runner/work/_temp/openhands/27755852001-1/summary.md 
+with Verdict, Summary, Changes, Validation, Responses, Remaining risks sections.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL cycle 2 verdict: PASS for chore/prod-readiness
+
+Finish with message:
+PLAN-EVAL cycle 2 verdict: **`PASS`**
+
+## Summary
+
+I was the cycle-2 PLAN-EVAL evaluator for the `chore/prod-readiness` cleanup 
+group of the `release/jsr-readiness` umbrella. Cycle 1 returned `FAIL_PLAN` with
+7 mechanical fixes; the supervisor applied the remediation (commit 9ed3791b). I 
+re-walked each cycle-1 fix against the actual tree on `chore/prod-readiness` @ 
+`cc3b8731` and re-walked the full `plan-gate.md` checklist.
+
+## All 7 cycle-1 fixes verified against the tree
+
+1. **F3 record the resolution** — writers at `servy-environment.ts:138-139`, 
+`env-file-values.ts:130`, `env-file-content.ts:98`; readers at 
+`database-connectivity.ts:48,71,94`; arch-debt entry 
+`database-connectivity-legacy-connstring-alias` present with all 7 fields.
+2. **S4 deprecate-first (PR-7) → G1-3 split** — `mssqlJsonExtension` is 
+`@deprecated` at L554; `mysqlJsonExtension` is NOT at L571 (the asymmetric state
+PR-7 hinges on); plan G1-3b correctly deprecates + defers.
+3. **S5 name the internal rewrite (G1-3c refactor, not delete)** — 
+`mssql.adapter.ts:65-66` `@deprecated`; live writer at L414-415 sets 
+`config.options!.trustedConnection`; plan G1-3c correctly classifies as 
+refactor.
+4. **S6 scaffolder consumer in G1-5** — `job-scaffolders.ts:64-65` emits 
+`.schedule(...)` into generated worker modules; plan G1-5 names scaffolder + 
+fixture in touch list.
+5. **`scaffold.runtime` smoke on every public slice** — verified in plan Slice 
+table + Fitness Gates + prose (G1-3a/b/c, G1-4, G1-5 all carry smoke).
+6. **Per-slice file list + LOC budget** — present in `plan.md` §"Per-slice file 
+list + LOC budget (PLAN-EVAL fix, cycle 1)"; G1-5 explicitly flagged for 
+sub-split.
+7. **G1-6 bounded** — bounded to G1-0..G1-5 surfaces + `.llm/tools/`; 
+newly-discovered dead surfaces recorded + deferred.
+
+**Off-limits guardrail PASS**: `packages/aspire/src/public/mod.ts`, 
+`scaffold-versions.ts`, version pins, and `catalog:` appear only in Non-Scope 
+exclusion rows; never in touch lists.
+
+## All 8 plan-gate boxes checked
+
+Research ✓, Decisions ✓, Open-decision sweep ✓, Commit slices ✓, Risk register 
+✓, Gate set ✓, Deferred scope ✓, jsr-audit ✓. No open decision would force 
+rework if deferred.
+
+## Subtle observations (informational, not gate-blocking)
+
+- `mysqljsonextension-deprecated-removal-deferred` arch-debt entry is listed as 
+"add" but not pre-existing — implementer adds it in G1-3b alongside the 
+`@deprecated` marker. Plan is correct.
+- Scaffolder test fixture for G1-5 is a new file the implementer must create; 
+plan correctly names it.
+- Two minor line-number offsets: `mssql.adapter.ts:415-416` (actual 414-415); 
+`mod.ts:254` (actual 252-256). Substantive content matches; implementer should 
+grep by symbol, not by line number.
+
+## Deliverables
+
+- **Verdict file (overwrites cycle-1)**: 
+`.llm/tmp/run/chore-prod-readiness--cleanup/plan-eval.md` — 80 lines, cycle-2 
+verdict = `PASS` (line 68).
+- **Run summary**: `/home/runner/work/_temp/openhands/27755852001-1/summary.md` 
+— Verdict, Summary, Changes, Validation, Responses to review comments, Remaining
+risks sections.
+
+## What I did NOT do (per protocol)
+
+- Did not implement, edit framework code, or rewrite the plan (PLAN-EVAL judges 
+the plan only).
+- Did not run lints, tests, builds (PLAN-EVAL is pre-implementation; per 
+`plan-protocol.md`: "Do not evaluate code, run the implementation gate set, or 
+comment on slices that do not yet exist.").
+- Did not post a PR comment — the workflow owns PR comments per the trigger 
+comment.
+- Did not commit the plan-eval.md change — the workflow commits the run-scoped 
+file back to the branch automatically.
+
+Implementation may now begin on G1-0 → G1-6.
+
+Tokens: ↑ input 2.67M • cache hit 93.99% •  reasoning 1.24K • ↓ output 33.1K • $
+0.2424
+

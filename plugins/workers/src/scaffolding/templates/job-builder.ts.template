@@ -3,7 +3,6 @@ import { defineJob } from '@netscript/plugin-workers-core';
 export const {{exportName}} = defineJob('{{id}}')
   .entrypoint('{{entrypoint}}')
   .topic('{{topic}}')
-  .schedule('{{schedule}}')
   .timeout({{timeoutMs}})
   .retry({{maxRetries}})
   .tags(...{{tags}})

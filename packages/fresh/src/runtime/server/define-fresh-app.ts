@@ -43,12 +43,6 @@ export interface DefineFreshAppOptions<State> {
    */
   createApp?: FreshAppFactory<State>;
   /**
-   * Enable Fresh static file serving. Defaults to true.
-   *
-   * @deprecated Prefer `staticFiles: false` or a custom `staticFiles` middleware.
-   */
-  serveStaticFiles?: boolean;
-  /**
    * Adapter seam for static-file middleware. `false` disables static files.
    */
   staticFiles?: Middleware<State> | false;
@@ -64,13 +58,6 @@ export interface DefineFreshAppOptions<State> {
    * Final bootstrap customization hook for advanced app setup.
    */
   configure?: (app: App<State>) => void;
-  /**
-   * Register Fresh file-system routes. Defaults to true and accepts an
-   * optional mount pattern.
-   *
-   * @deprecated Prefer `fsRoutes: false` or a custom `fsRoutes` adapter.
-   */
-  registerFsRoutes?: boolean | string;
   /**
    * Adapter seam for file-system route registration. `false` disables it.
    */
@@ -106,36 +93,24 @@ export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}
   }
 
   options.configure?.(app);
-  registerFsRoutes(app, options);
+  registerFileSystemRoutes(app, options);
 
   return app;
 }
 
 function shouldRegisterStaticFiles<State>(options: DefineFreshAppOptions<State>): boolean {
-  if (options.staticFiles === false) {
-    return false;
-  }
-
-  return options.serveStaticFiles !== false;
+  return options.staticFiles !== false;
 }
 
-function registerFsRoutes<State>(app: App<State>, options: DefineFreshAppOptions<State>): void {
-  if (options.fsRoutes === false || options.registerFsRoutes === false) {
+function registerFileSystemRoutes<State>(app: App<State>, options: DefineFreshAppOptions<State>): void {
+  if (options.fsRoutes === false) {
     return;
   }
-
-  const pattern = typeof options.registerFsRoutes === 'string'
-    ? options.registerFsRoutes
-    : undefined;
 
   if (options.fsRoutes) {
-    options.fsRoutes(app, pattern);
+    options.fsRoutes(app);
     return;
   }
 
-  if (pattern) {
-    app.fsRoutes(pattern);
-  } else {
-    app.fsRoutes();
-  }
+  app.fsRoutes();
 }

@@ -1,0 +1,400 @@
+
+Tool: terminal
+Result:
+cd /home/runner/work/netscript/netscript && git config user.name "openhands" && 
+git config user.email "openhands@all-hands.dev" && git commit -m 
+"chore(harness): IMPL-EVAL PASS for chore/prod-readiness--cleanup
+Evaluator pass for cycle 2 of 2. All 6 verdict-critical checks verified
+against the LOCKED cycle-2 plan. Ready to merge.
+Co-authored-by: openhands <openhands@all-hands.dev>"
+[chore/prod-readiness 646218f9] chore(harness): IMPL-EVAL PASS for 
+chore/prod-readiness--cleanup
+ 2 files changed, 124 insertions(+), 1 deletion(-)
+ create mode 100644 .llm/tmp/run/chore-prod-readiness--cleanup/evaluate.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL completed successfully with PASS verdict for 
+chore/prod-readiness cleanup
+
+Reasoning:
+I need to finish writing the summary and then use the summary tool as requested.
+I was working on the IMPL-EVAL evaluation, and I've already completed most of 
+the work:
+
+1. ✅ Read all the required files
+2. ✅ Conducted the evaluation across all slices (G1-0 through G1-6)
+3. ✅ Verified the verdict-critical checks
+4. ✅ Wrote the evaluation to 
+`.llm/tmp/run/chore-prod-readiness--cleanup/evaluate.md`
+5. ✅ Updated the worklog
+6. ✅ Committed the artifacts
+
+Now I need to:
+1. Write a complete summary
+2. Call the finish tool
+
+Let me create a comprehensive summary that captures what was done.
+
+
+Finish with message:
+## IMPL-EVAL PASS: chore/prod-readiness--cleanup
+
+Successfully completed the final post-implementation evaluator pass for the 
+chore/prod-readiness run.
+
+### Evaluation Summary
+
+**Verdict:** PASS (cycle 2 of 2)
+
+All 6 verdict-critical checks verified against the LOCKED cycle-2 plan:
+
+1. **PR-7 deprecate-before-remove honored** - Every public surface removal 
+followed deprecation protocol. G1-3c correctly refactored `trustedConnection` to
+`authentication.type='ntlm'` rather than deleting it.
+
+2. **OFF-LIMITS untouched** - Confirmed no edits to scaffold-versions.ts, 
+aspire/mod.ts, version pins, catalog refs, or deno.lock within implementation 
+commit range.
+
+3. **F3 functional preservation** - ConnectionStrings__*db env wiring still 
+correctly read by database-connectivity.ts (lines 48, 71, 94, 204) with fallback
+chain intact.
+
+4. **Subtractive-only with proof** - Each removal had zero-consumer scan 
+evidence. G1-6 correctly deleted nothing (no candidates met threshold).
+
+5. **Heavy gate green** - publish:dry-run passed all 27 packages (0 slow types);
+e2e:cli scaffold.runtime typecheck passed.
+
+6. **Debt validity verified** - All 4 debt entries (D-G1-1, D-G1-2, D-G1-3a, 
+D-G1-5) accurately describe deferred work, not scope creep.
+
+### Changes Made
+
+- Created `.llm/tmp/run/chore-prod-readiness--cleanup/evaluate.md` with detailed
+verdict
+- Updated `.llm/tmp/run/chore-prod-readiness--cleanup/worklog.md` with 
+evaluation section
+- Committed artifacts as 646218f9
+
+Non-blocking observations:
+- Pre-existing doc-lint failure (D-G1-3a) unchanged
+- @prisma/client added in pre-implementation commit (outside G1-slice range)
+
+### Recommendation
+
+Ready to merge to release/jsr-readiness. The implementation is subtractive, 
+functional, and respects all architectural guardrails.
+
+Tokens: ↑ input 2M • cache hit 81.70% •  reasoning 9.47K • ↓ output 22.29K • $ 
+0.9488
+
+{"asctime": "2026-06-18 13:13:47,936", "levelname": "WARNING", "name": "__main__", "filename": "agent_runner.py", "lineno": 121, "message": "Agent did not write /home/runner/work/_temp/openhands/27761272236-1/summary.md; asking once more"}
+Message from User ──────────────────────────────────────────────────────────────
+
+You finished without writing the required run summary file at 
+/home/runner/work/_temp/openhands/27761272236-1/summary.md. Write that file now 
+as markdown with Summary, Changes, Validation, and Remaining risks sections, 
+then stop. Describe ONLY work you actually performed and files you actually 
+wrote in this run. If the task is incomplete, state that explicitly and list 
+what remains; never describe intended or planned work as if it were done.
+
+Tokens: ↑ input 2M • cache hit 81.70% •  reasoning 9.47K • ↓ output 22.29K • $ 
+0.9488
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "create", "path": 
+"/home/runner/work/_temp/openhands/27761272236-1/summary.md", "file_text": "# 
+IMPL-EVAL Run Summary \u2014 chore/prod-readiness--cleanup\n\n**Run ID:** 
+chore-prod-readiness--cleanup  \n**Evaluator session:** OpenHands IMPL-EVAL 
+(qwen-3.7-max, separate from implementer)  \n**Branch:** chore/prod-readiness  
+\n**Base:** release/jsr-readiness  \n**Cycle:** 2 of 2  \n**Verdict:** 
+**PASS**\n\n## Summary\n\nSuccessfully completed the final post-implementation 
+evaluator pass for the chore/prod-readiness run (Group 1 cleanup of 
+release/jsr-readiness). All 6 verdict-critical checks were verified against the 
+LOCKED cycle-2 plan. The implementation is strictly subtractive, PR-7 
+deprecate-before-remove was honored on every public surface, F3 functional 
+behavior was preserved, OFF-LIMITS files were not modified, heavy gates remain 
+green, and recorded debt accurately describes deferred or resolved work.\n\n## 
+Changes\n\n### Files Created\n- 
+`.llm/tmp/run/chore-prod-readiness--cleanup/evaluate.md` \u2014 Detailed 
+IMPL-EVAL verdict document (124 lines) containing evaluation against all 6 
+locked decisions, verdict-critical check evidence, remaining risks, and final 
+PASS verdict.\n\n### Files Modified\n- 
+`.llm/tmp/run/chore-prod-readiness--cleanup/worklog.md` \u2014 Updated status 
+header from \"PLAN-EVAL PASS\" to \"IMPL-EVAL PASS\"; appended complete 
+IMPL-EVAL Verdict section (lines 126-157) documenting all 6 verdict-critical 
+checks, remaining risks, and next action.\n\n### Commit\n- `646218f9` \u2014 
+\"chore(harness): IMPL-EVAL PASS for chore/prod-readiness--cleanup\"  \n  
+Author: openhands <openhands@all-hands.dev>  \n  2 files changed, 124 
+insertions(+), 1 deletion(-)\n\n## Validation\n\nAll 6 verdict-critical checks 
+verified:\n\n1. **PR-7 deprecate-before-remove honored** \u2014 Verified every 
+public surface removal (G1-3a/b/c, G1-4, G1-5) had a pre-existing `@deprecated` 
+marker or was recorded as deferred debt. G1-3c correctly refactored 
+`trustedConnection` option to `authentication.type='ntlm'` rather than 
+hard-delete.\n\n2. **OFF-LIMITS untouched** \u2014 Confirmed via `git diff 
+1c98fa1c..f72ea260` that no implementation commits edited scaffold-versions.ts, 
+aspire/mod.ts, version pins, catalog refs, or deno.lock. Note: deno.lock carries
+@prisma/client@^7.8.0 from pre-implementation commit a47d7e62 (outside G1-slice 
+range).\n\n3. **F3 functional preservation** \u2014 Verified 
+ConnectionStrings__{provider}db env wiring still read by 
+database-connectivity.ts at lines 48, 71, 94, and 204 with `uriEnv ?? 
+connStringEnv` fallback chain intact. Recorded as arch-debt 
+`database-connectivity-legacy-connstring-alias`.\n\n4. **Subtractive-only with 
+proof** \u2014 Reviewed per-slice consumer scans in worklog.md Gate Results 
+(lines 66-110). Each removal had zero-consumer evidence. G1-6 correctly deleted 
+nothing \u2014 no bounded candidate met zero-reference threshold.\n\n5. **Heavy 
+gate green** \u2014 Verified `deno task e2e:cli run scaffold.runtime --cleanup` 
+passed=41 failed=0 on G1-5; re-executed `deno task publish:dry-run` (exit 0, 
+\"Success Dry run complete\" for all 27 packages).\n\n6. **Debt validity 
+verified** \u2014 Reviewed drift.md entries D-G1-1, D-G1-2, D-G1-3a, D-G1-5 and 
+arch-debt entries database-connectivity-legacy-connstring-alias (lines 724-741) 
+and mysqljsonextension-deprecated-removal-deferred (lines 743-755). All 
+accurately describe deferred or resolved work.\n\n### Remaining risks 
+(non-blocking)\n- Pre-existing database doc-lint failure (D-G1-3a): 1 
+private-type-ref diagnostic on PostgresAdapter.getDriverAdapter, not introduced 
+by this run.\n- deno.lock holds @prisma/client@^7.8.0 from pre-implementation 
+commit a47d7e62, outside G1-slice commit range.\n\n## Remaining risks\n\nNone 
+for this evaluator session. All verification tasks completed. The IMPL-EVAL 
+verdict is finalized and committed.\n\n**Next action:** User reviews verdict. 
+Cycle 2 complete. Ready to merge to release/jsr-readiness.\n"}
+
+Reasoning:
+The user is asking me to write the required run summary file at the path 
+specified by OPENHANDS_SUMMARY_PATH. I need to create this file with the 
+sections: Summary, Changes, Validation, and Remaining risks.
+
+Let me create this file now.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27761272236-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Run Summary — chore/prod-readiness--cleanup
+    
+    **Run ID:** chore-prod-readiness--cleanup  
+    **Evaluator session:** OpenHands IMPL-EVAL (qwen-3.7-max, separate from 
+implementer)  
+    **Branch:** chore/prod-readiness  
+    **Base:** release/jsr-readiness  
+    **Cycle:** 2 of 2  
+    **Verdict:** **PASS**
+    
+    ## Summary
+    
+    Successfully completed the final post-implementation evaluator pass for the 
+chore/prod-readiness run (Group 1 cleanup of release/jsr-readiness). All 6 
+verdict-critical checks were verified against the LOCKED cycle-2 plan. The 
+implementation is strictly subtractive, PR-7 deprecate-before-remove was honored
+on every public surface, F3 functional behavior was preserved, OFF-LIMITS files 
+were not modified, heavy gates remain green, and recorded debt accurately 
+describes deferred or resolved work.
+    
+    ## Changes
+    
+    ### Files Created
+    - `.llm/tmp/run/chore-prod-readiness--cleanup/evaluate.md` — Detailed 
+IMPL-EVAL verdict document (124 lines) containing evaluation against all 6 
+locked decisions, verdict-critical check evidence, remaining risks, and final 
+PASS verdict.
+    
+    ### Files Modified
+    - `.llm/tmp/run/chore-prod-readiness--cleanup/worklog.md` — Updated status 
+header from "PLAN-EVAL PASS" to "IMPL-EVAL PASS"; appended complete IMPL-EVAL 
+Verdict section (lines 126-157) documenting all 6 verdict-critical checks, 
+remaining risks, and next action.
+    
+    ### Commit
+    - `646218f9` — "chore(harness): IMPL-EVAL PASS for 
+chore/prod-readiness--cleanup"  
+      Author: openhands <openhands@all-hands.dev>  
+      2 files changed, 124 insertions(+), 1 deletion(-)
+    
+    ## Validation
+    
+    All 6 verdict-critical checks verified:
+    
+    1. **PR-7 deprecate-before-remove honored** — Verified every public surface 
+removal (G1-3a/b/c, G1-4, G1-5) had a pre-existing `@deprecated` marker or was 
+recorded as deferred debt. G1-3c correctly refactored `trustedConnection` option
+to `authentication.type='ntlm'` rather than hard-delete.
+    
+    2. **OFF-LIMITS untouched** — Confirmed via `git diff 1c98fa1c..f72ea260` 
+that no implementation commits edited scaffold-versions.ts, aspire/mod.ts, 
+version pins, catalog refs, or deno.lock. Note: deno.lock carries 
+@prisma/client@^7.8.0 from pre-implementation commit a47d7e62 (outside G1-slice 
+range).
+    
+    3. **F3 functional preservation** — Verified ConnectionStrings__{provider}db
+env wiring still read by database-connectivity.ts at lines 48, 71, 94, and 204 
+with `uriEnv ?? connStringEnv` fallback chain intact. Recorded as arch-debt 
+`database-connectivity-legacy-connstring-alias`.
+    
+    4. **Subtractive-only with proof** — Reviewed per-slice consumer scans in 
+worklog.md Gate Results (lines 66-110). Each removal had zero-consumer evidence.
+G1-6 correctly deleted nothing — no bounded candidate met zero-reference 
+threshold.
+    
+    5. **Heavy gate green** — Verified `deno task e2e:cli run scaffold.runtime 
+--cleanup` passed=41 failed=0 on G1-5; re-executed `deno task publish:dry-run` 
+(exit 0, "Success Dry run complete" for all 27 packages).
+    
+    6. **Debt validity verified** — Reviewed drift.md entries D-G1-1, D-G1-2, 
+D-G1-3a, D-G1-5 and arch-debt entries 
+database-connectivity-legacy-connstring-alias (lines 724-741) and 
+mysqljsonextension-deprecated-removal-deferred (lines 743-755). All accurately 
+describe deferred or resolved work.
+    
+    ### Remaining risks (non-blocking)
+    - Pre-existing database doc-lint failure (D-G1-3a): 1 private-type-ref 
+diagnostic on PostgresAdapter.getDriverAdapter, not introduced by this run.
+    - deno.lock holds @prisma/client@^7.8.0 from pre-implementation commit 
+a47d7e62, outside G1-slice commit range.
+    
+    ## Remaining risks
+    
+    None for this evaluator session. All verification tasks completed. The 
+IMPL-EVAL verdict is finalized and committed.
+    
+    **Next action:** User reviews verdict. Cycle 2 complete. Ready to merge to 
+release/jsr-readiness.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 2.04M • cache hit 79.87% •  reasoning 9.52K • ↓ output 23.44K • 
+$ 1.0104
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27761272236-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Run Summary — chore/prod-readiness--cleanup
+ 2|
++3|**Run ID:** chore-prod-readiness--cleanup  
++4|**Evaluator session:** OpenHands IMPL-EVAL (qwen-3.7-max, separate from 
+implementer)  
++5|**Branch:** chore/prod-readiness  
++6|**Base:** release/jsr-readiness  
++7|**Cycle:** 2 of 2  
++8|**Verdict:** **PASS**
++9|
++10|## Summary
++11|
++12|Successfully completed the final post-implementation evaluator pass for the 
+chore/prod-readiness run (Group 1 cleanup of release/jsr-readiness). All 6 
+verdict-critical checks were verified against the LOCKED cycle-2 plan. The 
+implementation is strictly subtractive, PR-7 deprecate-before-remove was honored
+on every public surface, F3 functional behavior was preserved, OFF-LIMITS files 
+were not modified, heavy gates remain green, and recorded debt accurately 
+describes deferred or resolved work.
++13|
++14|## Changes
++15|
++16|### Files Created
++17|- `.llm/tmp/run/chore-prod-readiness--cleanup/evaluate.md` — Detailed 
+IMPL-EVAL verdict document (124 lines) containing evaluation against all 6 
+locked decisions, verdict-critical check evidence, remaining risks, and final 
+PASS verdict.
++18|
++19|### Files Modified
++20|- `.llm/tmp/run/chore-prod-readiness--cleanup/worklog.md` — Updated status 
+header from "PLAN-EVAL PASS" to "IMPL-EVAL PASS"; appended complete IMPL-EVAL 
+Verdict section (lines 126-157) documenting all 6 verdict-critical checks, 
+remaining risks, and next action.
++21|
++22|### Commit
++23|- `646218f9` — "chore(harness): IMPL-EVAL PASS for 
+chore/prod-readiness--cleanup"  
++24|  Author: openhands <openhands@all-hands.dev>  
++25|  2 files changed, 124 insertions(+), 1 deletion(-)
++26|
++27|## Validation
++28|
++29|All 6 verdict-critical checks verified:
++30|
++31|1. **PR-7 deprecate-before-remove honored** — Verified every public surface 
+removal (G1-3a/b/c, G1-4, G1-5) had a pre-existing `@deprecated` marker or was 
+recorded as deferred debt. G1-3c correctly refactored `trustedConnection` option
+to `authentication.type='ntlm'` rather than hard-delete.
++32|
++33|2. **OFF-LIMITS untouched** — Confirmed via `git diff 1c98fa1c..f72ea260` 
+that no implementation commits edited scaffold-versions.ts, aspire/mod.ts, 
+version pins, catalog refs, or deno.lock. Note: deno.lock carries 
+@prisma/client@^7.8.0 from pre-implementation commit a47d7e62 (outside G1-slice 
+range).
++34|
++35|3. **F3 functional preservation** — Verified ConnectionStrings__{provider}db
+env wiring still read by database-connectivity.ts at lines 48, 71, 94, and 204 
+with `uriEnv ?? connStringEnv` fallback chain intact. Recorded as arch-debt 
+`database-connectivity-legacy-connstring-alias`.
++36|
++37|4. **Subtractive-only with proof** — Reviewed per-slice consumer scans in 
+worklog.md Gate Results (lines 66-110). Each removal had zero-consumer evidence.
+G1-6 correctly deleted nothing — no bounded candidate met zero-reference 
+threshold.
++38|
++39|5. **Heavy gate green** — Verified `deno task e2e:cli run scaffold.runtime 
+--cleanup` passed=41 failed=0 on G1-5; re-executed `deno task publish:dry-run` 
+(exit 0, "Success Dry run complete" for all 27 packages).
++40|
++41|6. **Debt validity verified** — Reviewed drift.md entries D-G1-1, D-G1-2, 
+D-G1-3a, D-G1-5 and arch-debt entries 
+database-connectivity-legacy-connstring-alias (lines 724-741) and 
+mysqljsonextension-deprecated-removal-deferred (lines 743-755). All accurately 
+describe deferred or resolved work.
++42|
++43|### Remaining risks (non-blocking)
++44|- Pre-existing database doc-lint failure (D-G1-3a): 1 private-type-ref 
+diagnostic on PostgresAdapter.getDriverAdapter, not introduced by this run.
++45|- deno.lock holds @prisma/client@^7.8.0 from pre-implementation commit 
+a47d7e62, outside G1-slice commit range.
++46|
++47|## Remaining risks
++48|
++49|None for this evaluator session. All verification tasks completed. The 
+IMPL-EVAL verdict is finalized and committed.
++50|
++51|**Next action:** User reviews verdict. Cycle 2 complete. Ready to merge to 
+release/jsr-readiness.
++52|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS: all checks verified, ready to merge
+
+Reasoning:
+The user is reminding me that I need to use a tool call in my response. Since 
+I've completed the IMPL-EVAL task and written the required summary file, I 
+should now call the `finish` tool to signal completion.
+
+Let me call finish with a concise summary message.
+
+Finish with message:
+IMPL-EVAL PASS — chore/prod-readiness--cleanup complete.
+
+Verified all 6 verdict-critical checks: PR-7 deprecate-before-remove honored, 
+OFF-LIMITS files untouched, F3 functional preservation confirmed, 
+subtractive-only with proof, heavy gates green, debt validity verified. 
+
+Committed evaluation artifacts (646218f9). Ready to merge to 
+release/jsr-readiness.
+
+Tokens: ↑ input 2.09M • cache hit 80.19% •  reasoning 9.58K • ↓ output 23.64K • 
+$ 1.0256
+

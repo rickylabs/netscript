@@ -61,9 +61,6 @@ export class JobBuilderScaffolder extends WorkersItemScaffolder<WorkersScaffoldI
     if (input.topic) {
       lines.push(`  .topic(${JSON.stringify(input.topic)})`);
     }
-    if (input.schedule) {
-      lines.push(`  .schedule(${JSON.stringify(input.schedule)})`);
-    }
     if (input.timeoutMs !== undefined) {
       lines.push(`  .timeout(${input.timeoutMs})`);
     }
