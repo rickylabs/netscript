@@ -41,11 +41,12 @@ function TabsContent({ children, value, ...props }: TabsContentProps): VNode {
   return <div {...tabs.getContentProps(value, props)}>{withChildren(children)}</div>;
 }
 
-type TabsNamespace = Readonly<{
-  Content: typeof TabsContent;
-  List: typeof TabsList;
-  Root: typeof TabsRoot;
-  Trigger: typeof TabsTrigger;
+/** Compound tabs namespace type with root, list, trigger, and content subcomponents. */
+export type TabsNamespace = Readonly<{
+  Content: (props: any) => unknown;
+  List: (props: any) => unknown;
+  Root: (props: any) => unknown;
+  Trigger: (props: any) => unknown;
 }>;
 
 /** Compound tabs namespace with root, list, trigger, and content subcomponents. */

@@ -83,12 +83,13 @@ function AccordionItemContent({ children, ...props }: AccordionItemContentProps)
   return <div {...accordion.getItemContentProps(item, props)}>{withChildren(children)}</div>;
 }
 
-type AccordionNamespace = Readonly<{
-  Item: typeof AccordionItem;
-  ItemContent: typeof AccordionItemContent;
-  ItemIndicator: typeof AccordionItemIndicator;
-  ItemTrigger: typeof AccordionItemTrigger;
-  Root: typeof AccordionRoot;
+/** Compound accordion namespace type with root and item subcomponents. */
+export type AccordionNamespace = Readonly<{
+  Item: (props: any) => unknown;
+  ItemContent: (props: any) => unknown;
+  ItemIndicator: (props: any) => unknown;
+  ItemTrigger: (props: any) => unknown;
+  Root: (props: any) => unknown;
 }>;
 
 /** Compound accordion namespace with root and item subcomponents. */

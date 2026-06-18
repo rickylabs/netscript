@@ -53,13 +53,14 @@ function DrawerClose({ children, ...props }: DrawerCloseProps): VNode {
   return <button {...drawer.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
-type DrawerNamespace = Readonly<{
-  Close: typeof DrawerClose;
-  Content: typeof DrawerContent;
-  Description: typeof DrawerDescription;
-  Root: typeof DrawerRoot;
-  Title: typeof DrawerTitle;
-  Trigger: typeof DrawerTrigger;
+/** Compound drawer namespace type with root and structural subcomponents. */
+export type DrawerNamespace = Readonly<{
+  Close: (props: any) => unknown;
+  Content: (props: any) => unknown;
+  Description: (props: any) => unknown;
+  Root: (props: any) => unknown;
+  Title: (props: any) => unknown;
+  Trigger: (props: any) => unknown;
 }>;
 
 /** Compound drawer namespace with root and structural subcomponents. */

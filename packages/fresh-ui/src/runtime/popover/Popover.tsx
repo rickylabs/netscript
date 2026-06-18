@@ -77,17 +77,18 @@ function PopoverArrowTip({ children, ...props }: PopoverArrowTipProps): VNode {
   return <div {...popover.getArrowTipProps(props)}>{withChildren(children)}</div>;
 }
 
-type PopoverNamespace = Readonly<{
-  Anchor: typeof PopoverAnchor;
-  Arrow: typeof PopoverArrow;
-  ArrowTip: typeof PopoverArrowTip;
-  Close: typeof PopoverClose;
-  Content: typeof PopoverContent;
-  Description: typeof PopoverDescription;
-  Positioner: typeof PopoverPositioner;
-  Root: typeof PopoverRoot;
-  Title: typeof PopoverTitle;
-  Trigger: typeof PopoverTrigger;
+/** Compound popover namespace type with root and positioning subcomponents. */
+export type PopoverNamespace = Readonly<{
+  Anchor: (props: any) => unknown;
+  Arrow: (props: any) => unknown;
+  ArrowTip: (props: any) => unknown;
+  Close: (props: any) => unknown;
+  Content: (props: any) => unknown;
+  Description: (props: any) => unknown;
+  Positioner: (props: any) => unknown;
+  Root: (props: any) => unknown;
+  Title: (props: any) => unknown;
+  Trigger: (props: any) => unknown;
 }>;
 
 /** Compound popover namespace with root and positioning subcomponents. */

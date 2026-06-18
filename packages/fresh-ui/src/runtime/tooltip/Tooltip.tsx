@@ -53,13 +53,14 @@ function TooltipArrowTip({ children, ...props }: TooltipArrowTipProps): VNode {
   return <div {...tooltip.getArrowTipProps(props)}>{withChildren(children)}</div>;
 }
 
-type TooltipNamespace = Readonly<{
-  Arrow: typeof TooltipArrow;
-  ArrowTip: typeof TooltipArrowTip;
-  Content: typeof TooltipContent;
-  Positioner: typeof TooltipPositioner;
-  Root: typeof TooltipRoot;
-  Trigger: typeof TooltipTrigger;
+/** Compound tooltip namespace type with root and positioning subcomponents. */
+export type TooltipNamespace = Readonly<{
+  Arrow: (props: any) => unknown;
+  ArrowTip: (props: any) => unknown;
+  Content: (props: any) => unknown;
+  Positioner: (props: any) => unknown;
+  Root: (props: any) => unknown;
+  Trigger: (props: any) => unknown;
 }>;
 
 /** Compound tooltip namespace with root and positioning subcomponents. */

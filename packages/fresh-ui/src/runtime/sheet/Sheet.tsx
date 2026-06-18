@@ -53,13 +53,14 @@ function SheetClose({ children, ...props }: SheetCloseProps): VNode {
   return <button {...sheet.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
-type SheetNamespace = Readonly<{
-  Close: typeof SheetClose;
-  Content: typeof SheetContent;
-  Description: typeof SheetDescription;
-  Root: typeof SheetRoot;
-  Title: typeof SheetTitle;
-  Trigger: typeof SheetTrigger;
+/** Compound sheet namespace type with root and structural subcomponents. */
+export type SheetNamespace = Readonly<{
+  Close: (props: any) => unknown;
+  Content: (props: any) => unknown;
+  Description: (props: any) => unknown;
+  Root: (props: any) => unknown;
+  Title: (props: any) => unknown;
+  Trigger: (props: any) => unknown;
 }>;
 
 /** Compound Sheet namespace — side-docked inspection panel. */

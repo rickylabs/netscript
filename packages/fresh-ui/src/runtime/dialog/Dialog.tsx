@@ -53,13 +53,14 @@ function DialogClose({ children, ...props }: DialogCloseProps): VNode {
   return <button {...dialog.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
-type DialogNamespace = Readonly<{
-  Close: typeof DialogClose;
-  Content: typeof DialogContent;
-  Description: typeof DialogDescription;
-  Root: typeof DialogRoot;
-  Title: typeof DialogTitle;
-  Trigger: typeof DialogTrigger;
+/** Compound dialog namespace type with root and structural subcomponents. */
+export type DialogNamespace = Readonly<{
+  Close: (props: any) => unknown;
+  Content: (props: any) => unknown;
+  Description: (props: any) => unknown;
+  Root: (props: any) => unknown;
+  Title: (props: any) => unknown;
+  Trigger: (props: any) => unknown;
 }>;
 
 /** Compound dialog namespace with root and structural subcomponents. */
