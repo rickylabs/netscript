@@ -55,7 +55,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | N/A — cross-cutting repo hygiene (no public-API archetype). Touches many surfaces; adds/removes no API |
 | Scope overlay | partial `SCOPE-docs.md` (deletes dead doc *files*; does **not** rewrite doc *content*) |
 | Sub-PR | #54 (draft, base `release/jsr-readiness`) |
-| Status | `evaluating` — **IMPL-EVAL PASS** ✅ (run 27761272236, OpenHands qwen-3.7-max, evaluate.md `646218f9` on `chore/prod-readiness`). **Merge-ready, holding for user go-ahead.** All 6 cycle-2 decisions VERIFIED: PR-7, OFF-LIMITS, F3 functional (legacy connstring alias kept → arch-debt `database-connectivity-legacy-connstring-alias`), subtractive-with-proof, heavy gate `scaffold.runtime` 41/0, debt validity. Evaluator: no over-deletion / silent break / scope creep. Debt: D-G1-1/2/3a/5. |
+| Status | `merged` ✅ — IMPL-EVAL PASS (run 27761272236, evaluate.md `646218f9`); **merged into `release/jsr-readiness` via PR #54 (merge_sha `a4db5527`, --no-ff)** on 2026-06-18 per user go-ahead. All 6 cycle-2 decisions VERIFIED. Debt: D-G1-1/2/3a/5 + `database-connectivity-legacy-connstring-alias`. |
 | Impl thread | `019edaa8-3b82-70a1-9a38-129f189ca807` (Codex, daemon-managed, mobile-visible) |
 | Impl worktree | `/home/codex/repos/netscript-prod-readiness` (ext4 native, `chore/prod-readiness` @ launch base `0f352ea`) |
 | Steering | `codex exec resume 019edaa8-3b82-70a1-9a38-129f189ca807 "<follow-up>"` (NEVER a 2nd `send-message-v2` on this worktree) |
@@ -82,7 +82,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | A6-adjacent for the scanner scripts (cli-tooling); otherwise N/A repo tooling |
 | Scope overlay | none |
 | Sub-PR | #55 (draft, base `release/jsr-readiness`) |
-| Status | `evaluating` — **IMPL-EVAL PASS** ✅ (run 27760239494, OpenHands qwen-3.7-max, evaluate.md on `chore/deps-hygiene`). **Merge-ready, holding for user go-ahead.** D-1…D-7 all PASS; publish:dry-run regression clean; enforcement behavior verified; catalog law diff-clean. Supervisor had steered final slice **D-7** (enforcement wiring → `ci:quality` + `arch:check`, FAIL-on-violation jsr/file-link, npm report-only census). |
+| Status | `merged` ✅ — IMPL-EVAL PASS (run 27760239494); **merged into `release/jsr-readiness` via PR #55 (merge_sha `4380203c`, --no-ff)** on 2026-06-18 per user go-ahead. Only conflict was an append-collision in `arch-debt.md` (resolved as union of both groups' debt entries). Post-merge `deno task deps:check` exits 0 on the umbrella. D-1…D-7 all PASS; D-7 enforcement wiring (`deps:check` → `ci:quality` + `arch:check`). |
 | G2 eval follow-ups | (1) **Unit count drift:** plan says "27 units" but `publish:dry-run` reports **25** on BOTH baseline and feature — doc drift, not a regression; **reconcile real publishable count before publish dispatch (E/F)**. (2) **Non-blocking debt:** add arch-debt note for `queue`/`amqplib` `^0.10.3 vs ^2.0.1` divergence for a future convergence slice. (3) Pre-existing `arch:check` doctrine baseline red (58 FAIL/147 WARN) — NOT attributable to G2; `deps:check` step itself green. |
 | Impl thread | `019edaa8-af32-7011-899c-00e14f730ef1` (Codex, daemon-managed, mobile-visible) |
 | Impl worktree | `/home/codex/repos/netscript-deps-hygiene` (ext4 native, `chore/deps-hygiene` @ launch base `b6985c6`) |
