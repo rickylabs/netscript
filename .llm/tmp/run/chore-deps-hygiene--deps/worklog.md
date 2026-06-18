@@ -4,7 +4,7 @@
 |-------|-------|
 | Run ID | `chore-deps-hygiene--deps` |
 | Branch | `chore/deps-hygiene` (off `release/jsr-readiness`) |
-| Status | `active` (group branch launched; Plan-Gate pending) |
+| Status | `active` (**PLAN-EVAL PASS @ cycle 1**; implementation gated on user dispatch — G1 also PASS) |
 
 ## Progress Log
 
@@ -12,6 +12,7 @@
 |------|-------|------|-------|
 | 2026-06-18 | bootstrap | skeleton scaffolded | Supervisor created run dir + draft `plan.md`/`research.md` (5 deliverables: 3 scanners, task prune, bump wrapper). No branch/worktree/generator yet. |
 | 2026-06-18 | plan-gate | group branch launched | Branched off umbrella @ `1f4cafa3` for the Plan-Gate. Plan/research/Design ready (inherited; catalog premise corrected via D-G2-2). Draft sub-PR → `release/jsr-readiness` + PLAN-EVAL dispatch (OpenHands/minimax M3, separate session) follow. Worktree deferred to implementation launch (WSL Codex, ext4). |
+| 2026-06-18 | plan-gate | PLAN-EVAL cycle 1 = **PASS** | OpenHands minimax M3 (run 27755191977, separate session) → `plan-eval.md`. All 8 plan-gate boxes PASS (jsr-audit N/A — tooling wave); catalog live-invariant spot-check (8 points) confirmed against tree; off-limits/catalog guardrail PASS. DRAFT marker flipped → ready. **Non-blocking NIT (D-2):** compliance scanner must anchor on real `from "npm:…"` import statements + `deno.json` imports/scopes, NOT substring `npm:` — allow-list `windows.ts` (bundle-external map) + `registry.manifest.ts` (manifest dependency array). **Plan-Gate cleared — implementation may begin (gated on user dispatch; G1 also PASS).** |
 
 ## Design
 
