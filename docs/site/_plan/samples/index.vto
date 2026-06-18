@@ -1,0 +1,58 @@
+{{# SAMPLE landing page — illustrative draft of docs/site/index.md rewritten as .vto.
+   Shows the TARGET BAR (hero + feature grid + audience + learning path + CTAs), not final copy.
+   Hero one-liner pending Q1; competitor framing pending Q4. Code sample is lifted verbatim from
+   packages/service/README.md so it does not drift. Components referenced (comp.hero, comp.featureGrid,
+   comp.card, comp.tabbedCode) are specified in ../04-engine-and-components.md. #}}
+---
+layout: layouts/base.vto
+title: NetScript — durable, observable TypeScript backends
+---
+
+{{ comp.hero({
+  tagline: "From `netscript init` to a running, type-checked, OpenTelemetry-traced backend — services, durable workflows, and a Fresh UI in one workspace.",
+  subhead: "A Deno-native backend framework where the contract you define is the client you call.",
+  ctas: [
+    { label: "Quickstart — 5 min", href: "/quickstart/", primary: true },
+    { label: "Why NetScript", href: "/why/" },
+    { label: "Browse the API reference", href: "/reference/" }
+  ]
+}) }}
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Define a service", lang: "ts", code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});" },
+  { label: "Install the CLI", lang: "sh", code: "deno install --global --allow-all --name netscript jsr:@netscript/cli/bin\nnetscript init my-app" }
+] }) }}
+
+{{ comp.callout({ type: "note" }) }}
+NetScript is a backend framework and workspace generator — not a hosted service. You run it on Deno
+and own all the generated code.
+{{ /comp }}
+
+## Build real systems, not just CRUD
+
+{{ comp.featureGrid({ items: [
+  { title: "Contract-first, type-safe", body: "oRPC contracts flow from service to client to UI with no codegen drift. The type checker is your integration test.", href: "/concepts/contracts/" },
+  { title: "Durable workflows by design", body: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence, and supervised crash boundaries.", href: "/capabilities/sagas/" },
+  { title: "Observable by default", body: "OpenTelemetry tracing and structured logs are wired into jobs, queues, RPC, and SSE from line one.", href: "/concepts/observability/" },
+  { title: "Orchestrated with Aspire", body: "One workspace, many resources, a real dashboard — local and deployed. Opt out with --no-aspire.", href: "/concepts/aspire/" },
+  { title: "Composable plugins", body: "Add workers, sagas, triggers, and streams in any combination. The host never changes.", href: "/concepts/plugin-model/" },
+  { title: "You own your UI", body: "fresh-ui is copy-source: the CLI copies components into your repo. After that, the code is yours.", href: "/capabilities/fresh-ui/" }
+] }) }}
+
+## Who it's for
+
+{{ comp.featureGrid({ items: [
+  { title: "Full-stack TS engineers", body: "Stay in TypeScript end to end while building durable, production-grade backends." },
+  { title: "Platform engineers", body: "Standardize internal services on a coherent Deno + Aspire baseline." },
+  { title: "Plugin authors", body: "Extend the framework by registering contributions — no host edits." }
+] }) }}
+
+## Start the learning path
+
+{{ comp.learningPath({ steps: [
+  { label: "Quickstart", href: "/quickstart/" },
+  { label: "Your first workspace", href: "/tutorials/first-workspace/" },
+  { label: "Build a service", href: "/tutorials/build-a-service/" },
+  { label: "Add background jobs", href: "/tutorials/background-jobs/" },
+  { label: "A durable workflow", href: "/tutorials/durable-workflow/" }
+] }) }}
