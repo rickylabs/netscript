@@ -55,7 +55,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | N/A — cross-cutting repo hygiene (no public-API archetype). Touches many surfaces; adds/removes no API |
 | Scope overlay | partial `SCOPE-docs.md` (deletes dead doc *files*; does **not** rewrite doc *content*) |
 | Sub-PR | #54 (draft, base `release/jsr-readiness`) |
-| Status | `evaluating` — **IMPL COMPLETE** (G1-0…G1-6 + G1-close handoff, head `9c2e63c6`); **IMPL-EVAL dispatched** on PR #54 (OpenHands qwen-3.7-max, comment 4742180096). PR-7 honored on all public surfaces; G1-6 deleted nothing (no zero-ref candidate); full `scaffold.runtime` green on G1-5; OFF-LIMITS untouched. Debt: D-G1-1/2/3a/5. |
+| Status | `evaluating` — **IMPL-EVAL PASS** ✅ (run 27761272236, OpenHands qwen-3.7-max, evaluate.md `646218f9` on `chore/prod-readiness`). **Merge-ready, holding for user go-ahead.** All 6 cycle-2 decisions VERIFIED: PR-7, OFF-LIMITS, F3 functional (legacy connstring alias kept → arch-debt `database-connectivity-legacy-connstring-alias`), subtractive-with-proof, heavy gate `scaffold.runtime` 41/0, debt validity. Evaluator: no over-deletion / silent break / scope creep. Debt: D-G1-1/2/3a/5. |
 | Impl thread | `019edaa8-3b82-70a1-9a38-129f189ca807` (Codex, daemon-managed, mobile-visible) |
 | Impl worktree | `/home/codex/repos/netscript-prod-readiness` (ext4 native, `chore/prod-readiness` @ launch base `0f352ea`) |
 | Steering | `codex exec resume 019edaa8-3b82-70a1-9a38-129f189ca807 "<follow-up>"` (NEVER a 2nd `send-message-v2` on this worktree) |
