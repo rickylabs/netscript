@@ -6,7 +6,10 @@ Architecture Doctrine.
 
 Authoritative doctrine:
 
-- `docs/architecture/doctrine/`
+- `docs/architecture/doctrine/` — the doctrine itself (the source of truth).
+- [`DOCTRINE-REF.md`](./DOCTRINE-REF.md) — the navigable index that enumerates every doctrine page,
+  maps the harness files to doctrine, and carries the axiom digest. Start here to find the doctrine
+  home for a concept.
 
 Do not copy doctrine passages into harness files. Harness files point to the doctrine and explain
 how an agent uses it during a run.

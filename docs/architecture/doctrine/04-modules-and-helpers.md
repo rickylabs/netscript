@@ -23,8 +23,8 @@ A helper exists only if it does at least one of:
    tested.
 4. **Reduces a frequent, identical multi-line pattern.** *And* the
    pattern is identical, not "similar" (cf. the Wet Codebase
-   doctrine — see
-   [`../phase-0-research/03-frameworks-and-progressive-tradeoffs.md`](../phase-0-research/03-frameworks-and-progressive-tradeoffs.md)).
+   doctrine — see phase-0 research
+   `phase-0-research/03-frameworks-and-progressive-tradeoffs.md`).
 
 A helper that merely renames a Web Platform or `@std/*` primitive
 is a regression and must be deleted.
@@ -244,9 +244,9 @@ upgrades come for free.
 
 ## Sources
 
-- Wet Codebase, Sandi Metz / Dan Abramov — see
-  [`../phase-0-research/03-frameworks-and-progressive-tradeoffs.md`](../phase-0-research/03-frameworks-and-progressive-tradeoffs.md).
-- `@std/*` enumeration — see
-  [`../phase-0-research/08-deno-and-jsr-as-target.md`](../phase-0-research/08-deno-and-jsr-as-target.md).
-- Cockburn's port/adapter — see
-  [`../phase-0-research/04-enterprise-pattern-canon.md`](../phase-0-research/04-enterprise-pattern-canon.md).
+- Wet Codebase, Sandi Metz / Dan Abramov — see phase-0 research
+  `phase-0-research/03-frameworks-and-progressive-tradeoffs.md`.
+- `@std/*` enumeration — see phase-0 research
+  `phase-0-research/08-deno-and-jsr-as-target.md`.
+- Cockburn's port/adapter — see phase-0 research
+  `phase-0-research/04-enterprise-pattern-canon.md`.
