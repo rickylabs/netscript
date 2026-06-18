@@ -11,7 +11,10 @@ name: pages
 
 on:
   push:
-    branches: [main]
+    # NOTE: `release/jsr-readiness` is a TEMPORARY entry to publish a
+    # verification deploy from the in-flight release branch before it lands on
+    # main. Reverted to `[main]` once the live site is confirmed.
+    branches: [main, release/jsr-readiness]
     paths:
       - "docs/site/**"
       - ".github/workflows/pages.yml"
