@@ -774,3 +774,23 @@ Seeded from
   file/link invariants.
 - **Gate:** when a separately approved migration converges member npm dependency surfaces, flip
   `scan-npm-catalog-compliance` to `--fail-on-violation` inside `deps:check`.
+
+## internal-doc link rot — `impeccable` skill dead reference links (`impeccable-dead-reference-links`)
+
+- **Reason:** The new internal-doc link gate (`deno task docs:links`, Group 4 slice S7) surfaced **26
+  pre-existing broken links** in `.agents/skills/impeccable/SKILL.md` pointing at
+  `.agents/skills/impeccable/reference/*.md` files that do not exist in this repo. `impeccable` is a
+  general-purpose authoring skill vendored into `.agents/skills/`; its `reference/` subtree was never
+  added. These links were **not introduced by the internal-docs-overhaul run** and the `impeccable`
+  skill is **outside Group 4's file scope** (Group 4 governs harness/doctrine/`.llm/`/`AGENTS`/`CLAUDE`/
+  root-ops docs).
+- **Impact:** `deno task docs:maintenance` (the composite gate) is RED solely because of these 26
+  `impeccable` links; the harness/doctrine/`.llm`/agent-surface that Group 4 owns is link-clean.
+- **Owner:** skill maintainers (whoever owns `impeccable`).
+- **Resolution options (IMPL-EVAL to rule):** (a) scope `check-internal-doc-links.ts` to exclude the
+  `impeccable` skill (an incomplete vendored authoring skill, not NetScript internal-doc surface);
+  (b) complete or prune `impeccable`'s `reference/*.md` links in a separate slice; (c) accept as
+  recorded debt and gate only Group-4-owned surfaces.
+- **Created:** 2026-06-18.
+- **Status:** open, surfaced by S7. The gate behaves correctly (it detects real rot); the redness is
+  pre-existing/out-of-scope, not a wiring defect.

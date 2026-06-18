@@ -39,6 +39,8 @@
     "agentic:sync-claude": "deno run --no-lock --allow-read --allow-write .llm/tools/agentic/sync-claude-skills.ts --pretty",
     "agentic:sync-claude:check": "deno run --no-lock --allow-read .llm/tools/agentic/sync-claude-skills.ts --check --pretty",
     "agentic:check-claude": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts --pretty",
+    "docs:links": "deno run --no-lock --allow-read .llm/tools/check-internal-doc-links.ts --pretty",
+    "docs:maintenance": "deno task docs:links && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude-remote-smoke.ts --env-aware --pretty",
     "check:scaffold-versions": "deno run .llm/tools/check-scaffold-versions.ts --pretty",
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",

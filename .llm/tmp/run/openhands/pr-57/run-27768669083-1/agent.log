@@ -1,0 +1,400 @@
++95|overwrites that file with the `PASS` verdict on the cycle-2 remediation.
++96|
++97|## Remaining risks
++98|
++99|1. **Slice granularity.** S1 (jsr-audit `deno doc` section) and S2 (harness 
+`deno doc` section) both
++100|   add a substantive section to a `.md` file; if either turns out to be 
+larger than expected, the
++101|   `plan.md:134` note "the implementer may re-split a slice for smaller, 
+more verifiable chunks;
++102|   each slice must carry at least one Fitness Gate" allows finer slicing. 
+No gate is bypassed by
++103|   re-splitting.
++104|2. **G-links has no dedicated script.** Cycle-1 marked this 
+`PENDING_SCRIPT` per
++105|   `gates/fitness-gates.md` §"Phase A Reporting"; manual evidence is the 
+narrowest link/anchor
++106|   check. The cycle-2 verdict inherits this with no new script appearing. 
+Not a cycle-2 defect.
++107|3. **G-doctrine is a docs-surface surrogate.** No dedicated fitness-gate 
+script; manual
++108|   doctrine spot-check (Validation Plan row 4). Acceptable for an 
+internal-docs run.
++109|4. **LD-DOCS-LANE is novel for this run.** Authoring is via the Claude 
+dynamic workflow
++110|   (per-domain agents); validation is via OpenHands (qwen 3.7 max, 
+per-domain). The implementer
++111|   should keep each slice's commit + push + per-domain OpenHands validation
+cycle strictly
++112|   sequential — a skipped validation pass would invalidate the gate-key 
+claims.
++113|5. **Off-limits guardrail is repeated in the slice preamble but not in 
+every slice.** An
++114|   implementer who reads only the slice table could miss the guardrail; the
+implementer should
++115|   re-read the preamble before each slice.
++116|6. **Group-1 / Group-4 field is currently clean** (G1 deleted only 
+`AGENTS-handoff.md`,
++117|   relocated into `openhands-handoff` skill). If Group 1 ships additional 
+doc-file deletions on
++118|   `release/jsr-readiness` before IMPL, the `## Dependencies` row 
+"Coordinates with Group 1 on
++119|   doc-file ownership" must be re-checked; a new deletion could land S3 in 
+a cross-reference
++120|   rework.
++121|
++122|No blocker for IMPL; cycle-2 PASS is in effect.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm both deliverables written
+
+$ cd /home/runner/work/netscript/netscript && ls -la 
+/home/runner/work/_temp/openhands/27768669083-1/summary.md && echo "---" && wc 
+-l /home/runner/work/_temp/openhands/27768669083-1/summary.md 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md && echo "---" && 
+head -5 /home/runner/work/_temp/openhands/27768669083-1/summary.md
+
+Tokens: ↑ input 968.19K • cache hit 87.24% •  reasoning 323 • ↓ output 12.79K • 
+$ 0.1128
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+-rw------- 1 runner runner 7991 Jun 18 15:10 
+/home/runner/work/_temp/openhands/27768669083-1/summary.md
+---
+  121 /home/runner/work/_temp/openhands/27768669083-1/summary.md
+  198 .llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md
+  319 total
+---
+# OpenHands Run Summary — PLAN-EVAL cycle 2 (Group 4, internal-overhaul)
+
+## Verdict
+
+**`PASS`** (cycle 2 of 2 for `docs-internal-overhaul--contributor`)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Show final plan-eval.md
+
+$ cd /home/runner/work/netscript/netscript && tail -50 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md
+
+Tokens: ↑ input 1.02M • cache hit 87.86% •  reasoning 323 • ↓ output 12.88K • $ 
+0.1161
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+This is appropriate: S0 is a bootstrap sanity check, S7 is a gate wiring, S8 is 
+a final
+   four-gate sweep — none of them carries new doc content.
+4. **The slice preamble re-states the off-limits guardrails** ("no slice edits 
+framework code,
+   deletes doc *files* … changes doctrine *decisions*, or hand-edits 
+`.claude/skills/`"). This is a
+   positive signal that the implementer internalized the cycle-1 boundary 
+findings.
+5. **The `deno doc` doc surface** (IO-3) is split across two slices (S1 
+`jsr-audit` skill, S2
+   harness docs). Each carries the gates appropriate to the surface (S1 also 
+covers G-surface /
+   G-mirror because it edits an `.agents/skills/` SKILL.md and triggers a 
+`.claude/skills/` regen;
+   S2 is link-only so it carries G-links). This is the right granularity.
+6. **No off-limits violation introduced by the slice list.** Off-limits 
+guardrail re-check is
+   clean (no `packages/`, no version pins, no catalog references in any slice 
+file target; no
+   framework-code edits; no doctrine-decision changes; no `.claude/skills/` 
+hand-edits).
+
+## Cycle-2 verdict
+
+**`PASS`**
+
+### Rationale (one paragraph)
+
+The remediation under review (`565e672b`, +44/−4 across `plan.md` + 
+`worklog.md`) is the minimum
+fix needed to close the cycle-1 `FAIL_PLAN`: it adds a `## Commit Slices` 
+section at `plan.md:105–135`
+that is ordered (S0–S8, well under the < 30 cap), names a concrete 
+**what-it-proves** outcome per
+slice, cites a **proving gate** per slice (from the existing Fitness Gates 
+table, with the four
+gate keys G-surface / G-mirror / G-links / G-doctrine explicitly defined at 
+`plan.md:117–119`), and
+names **path-level files** per slice. The nine slices cover every item in the 
+plan's `## Scope`
+(consolidate/de-dup → S3, `deno doc` doc → S1+S2, agent-surface coherence → 
+S1+S3+S6, doc-maintenance
+gate E1 → S7) and explicitly inherit the cycle-1 guardrails (no framework-code 
+edits, no doc-file
+deletions, no doctrine-decision changes, no `.claude/skills/` hand-edits). No 
+locked decision
+(IO-1…IO-6), scope/non-scope row, gate-set entry, validation-plan row, 
+risk-register row, or
+drift-watch item was modified; the slice list is a faithful decomposition of the
+already-VERIFIED
+plan, not new scope. The off-limits guardrail re-checks clean — 
+`packages/aspire/src/public/mod.ts`,
+`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version pins,
+and catalog
+references do not appear in any slice file target, and the on-tree `git diff 
+docs/internal-overhaul
+-- <off-limits-path>` is empty. All 8 Plan-Gate boxes now resolve (7 PASS + 1 
+N/A). Implementation
+may begin; no slice before this PASS existed, and none should remain blocked on 
+the second-cycle
+escalation gate.
+
+### Notes
+
+- No implementation slice may be committed before PASS. PASS is now in effect.
+- This was **cycle 2 of 2**; per `plan-protocol.md` §"Loop limit", a second 
+`FAIL_PLAN` would have
+  escalated to the user. The cycle-2 verdict is `PASS`, so escalation is not 
+triggered.
+- The off-limits guardrail PASS holds; any future slice that would re-introduce 
+framework-code
+  edits, doc-file deletions, doctrine-decision changes, or `.claude/skills/` 
+hand-edits is a
+  `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT` trigger and must not ship under this
+plan.
+- The `deno doc` section scope (IO-3 default = harness doc + `jsr-audit` skill 
+section) is the
+  locked default; S1 and S2 respect it.
+- LD-DOCS-LANE: authoring via the Claude dynamic workflow (per-domain agents 
+under the harness
+  SKILL); validation via OpenHands (qwen 3.7 max, per-domain). No 
+framework-source slice in this
+  group (Group 4 is doc-only).
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify only plan-eval.md changed
+
+Thought:
+Both deliverables are in place. Let me also verify the final state is 
+well-formed and that I haven't introduced any PR-comment file (the workflow owns
+GitHub comments).
+
+$ cd /home/runner/work/netscript/netscript && git status 2>&1 | head -20 && echo
+"---" && git diff --stat 2>&1 | head -10
+
+Tokens: ↑ input 1.07M • cache hit 88.37% •  reasoning 323 • ↓ output 13K • $ 
+0.1198
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+On branch docs/internal-overhaul
+Your branch is up to date with 'origin/docs/internal-overhaul'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/openhands/pr-57/run-27768669083-1/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+---
+ .../plan-eval.md                                   | 269 +++++++++++++--------
+ 1 file changed, 174 insertions(+), 95 deletions(-)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Spot-check plan-eval.md has no off-limits paths
+
+Thought:
+Only `plan-eval.md` is modified (the trace metadata dir is untracked — 
+harness-managed). The workflow will commit `plan-eval.md` back. No PR comment 
+posted (workflow owns). Let me confirm I didn't accidentally touch anything 
+off-limits.
+
+$ cd /home/runner/work/netscript/netscript && grep -n 
+"packages/\|catalog:\|version pin" 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md 2>&1 | head -10
+
+Tokens: ↑ input 1.13M • cache hit 88.90% •  reasoning 323 • ↓ output 13.17K • $ 
+0.1233
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+8:- Off-limits guardrail: `packages/aspire/src/public/mod.ts`, 
+`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version pins,
+catalog/`catalog:` references; no framework-code edits; no doctrine-**decision**
+changes (doc hygiene only)
+37:| Boundary (Non-Scope vs Group 3; no framework-code edits; no 
+doctrine-decision changes) | **Holds** | `plan.md:42–48` Non-Scope unchanged. 
+Slice file targets are all in `.llm/`, `docs/`, `AGENTS.md`, `CLAUDE.md`, 
+`deno.json` — no `packages/` |
+44:| Off-limits guardrail | **PASS (re-confirmed below)** | No slice file target
+is in `packages/`, no version pin, no catalog reference |
+90:  `.llm/harness/gates/*`, `deno.json` — none references `packages/` or 
+`plugins/`. **Clean.**
+102:- `packages/aspire/src/public/mod.ts` exists on tree but **does not appear 
+in any slice file
+104:- `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts` likewise
+absent from any slice
+106:- No version-pin or catalog/`catalog:` reference appears in any slice file 
+target. The only
+160:   clean (no `packages/`, no version pins, no catalog references in any 
+slice file target; no
+180:plan, not new scope. The off-limits guardrail re-checks clean — 
+`packages/aspire/src/public/mod.ts`,
+181:`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version 
+pins, and catalog
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm trace dir exists and verdict line
+
+Thought:
+All references to off-limits paths in my plan-eval.md are **about** the 
+guardrail (forbidden items being checked for absence) — none of them are 
+implementation targets. Clean.
+
+Let me do one final sanity check that the verdict file is properly 
+self-contained and the OpenHands trace dir was created correctly.
+
+$ cd /home/runner/work/netscript/netscript && ls -la 
+.llm/tmp/run/openhands/pr-57/run-27768669083-1/ 2>&1 | head -10 && echo 
+"---FINAL VERDICT---" && grep -n "Cycle-2 verdict\|\`PASS\`\|\`FAIL_PLAN\`" 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md | head -5
+
+Tokens: ↑ input 1.18M • cache hit 89.37% •  reasoning 323 • ↓ output 13.38K • $ 
+0.1269
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+total 16
+drwxr-xr-x 2 runner runner 4096 Jun 18 15:01 .
+drwxr-xr-x 4 runner runner 4096 Jun 18 15:01 ..
+-rw-r--r-- 1 runner runner 5493 Jun 18 15:01 request.md
+---FINAL VERDICT---
+5:- Cycle: **2 of 2** (cycle-2 verdict; cycle-1 run `27766416302-1` emitted 
+`FAIL_PLAN` on the single missing `## Commit Slices` box; per `plan-protocol.md`
+§"Loop limit", a second `FAIL_PLAN` would escalate to the user)
+163:## Cycle-2 verdict
+165:**`PASS`**
+170:fix needed to close the cycle-1 `FAIL_PLAN`: it adds a `## Commit Slices` 
+section at `plan.md:105–135`
+190:- This was **cycle 2 of 2**; per `plan-protocol.md` §"Loop limit", a second 
+`FAIL_PLAN` would have
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Cycle-2 PLAN-EVAL verdict: PASS
+
+Thought:
+Verdict at line 165 of `plan-eval.md` is `**`PASS`**`. Trace dir exists. 
+Everything is in place.
+
+Finish with message:
+## Cycle-2 PLAN-EVAL verdict: `PASS`
+
+I re-walked the `## Commit Slices` section added by the cycle-1 remediation 
+(`565e672b`, +44/−4 across `plan.md` + `worklog.md`) and the seven other 
+Plan-Gate boxes from cycle 1 against the post-remediation `plan.md` and the tree
+at branch tip `565e672b`.
+
+### What was checked (per the cycle-2 brief)
+
+1. **Commit-slices box (the failed box).** `plan.md:105–135` `## Commit Slices` 
+exists, is ordered (S0 → S8, 9 entries, well under < 30), and each slice names a
+**what-it-proves** outcome, a **proving gate** (drawn from the existing Fitness 
+Gates table — gate keys `G-surface` / `G-mirror` / `G-links` / `G-doctrine` are 
+defined explicitly at `plan.md:117–119` and are aliases for Fitness-Gates rows 
+1/3/2 + Validation-Plan row 4), and **path-level files**. The nine slices cover 
+every `## Scope` item (consolidate/de-dup → S3; `deno doc` doc → S1+S2; 
+agent-surface coherence → S1+S3+S6; doc-maintenance gate E1 → S7), and each gate
+cited is real (the `validate-claude-surface.ts` script and the `.claude/skills/`
+regen workflow both exist on tree).
+
+2. **No regression.** Verified by `git show 565e672b`: the only `plan.md` 
+changes are the header preamble + the new `## Commit Slices` + a `## 
+Dependencies` `LD-DOCS-LANE` note. Locked decisions IO-1…IO-6, Scope/Non-Scope, 
+Hidden Scope, Drift Watch, the Fitness Gates table, the Validation Plan, and the
+Risk Register are byte-identical to cycle 1. Spot-check: no slice edits 
+framework code (`packages/`/`plugins/` absent from every slice file target); no 
+slice deletes doc *files* (S1/S3 regen mirrors, they don't delete them); no 
+slice changes a doctrine *decision* (S4 says "link/index-only" and "decisions 
+unchanged (IO-4 boundary)"); no slice hand-edits `.claude/skills/` (preamble + 
+S1 + S3 all say "regenerate from `.agents/skills/`").
+
+3. **Off-limits guardrail re-confirmed.** No slice file target is 
+`packages/aspire/src/public/mod.ts`, 
+`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, a version 
+pin, or a catalog/`catalog:` reference. `git diff docs/internal-overhaul -- 
+<off-limits-path>` is empty for both framework paths.
+
+### Plan-Gate checklist (cycle 2)
+
+| Box | Result |
+|-----|--------|
+| Research present and current | PASS |
+| Decisions locked | PASS |
+| Open-decision sweep | PASS |
+| **Commit slices (< 30, gate + files each)** | **PASS** (was FAIL cycle 1) |
+| Risk register | PASS |
+| Gate set selected | PASS |
+| Deferred scope explicit | PASS |
+| jsr-audit surface scan (pkg/plugin) | N/A |
+
+**8 of 8 boxes resolved (7 PASS + 1 N/A).**
+
+### Deliverables written (separate from the remediator's `565e672b`)
+
+- `.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md` — overwritten 
+with the cycle-2 verdict (`PASS`, line 165), full re-walk of the 
+previously-failing box sub-requirement by sub-requirement, no-regression 
+evidence per cycle-1 verified row, off-limits guardrail re-confirmation, and the
+full Plan-Gate checklist table. The workflow commits it back.
+- `/home/runner/work/_temp/openhands/27768669083-1/summary.md` — run-scoped 
+summary with `Summary`, `Changes`, `Validation`, `Rationale`, `Plan-Gate 
+checklist`, `Responses to review comments`, `Remaining risks`.
+
+No PR comment was posted (the workflow owns GitHub comments per the operational 
+contract). No implementation slice may begin before this PASS existed; PASS is 
+now in effect, so IMPL is unblocked. No user escalation triggered — this was 
+cycle 2 of 2 and the verdict is PASS.
+
+Tokens: ↑ input 1.24M • cache hit 89.82% •  reasoning 323 • ↓ output 14.39K • $ 
+0.1315
+
