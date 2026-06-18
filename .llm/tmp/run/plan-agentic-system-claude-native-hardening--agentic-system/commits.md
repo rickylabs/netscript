@@ -9,3 +9,4 @@
 - 6c6a4091: chore(harness): record IMPL-EVAL readiness + missing commits
 - 806790c4: chore(harness): append 6c6a4091 to commits.md
 - a1e08661: chore(harness): record IMPL-EVAL trigger for PR #50
+- 7539cc78: chore(harness): record impl coverage matrix — IMPL-EVAL confirmed valid
