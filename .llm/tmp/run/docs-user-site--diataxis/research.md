@@ -21,11 +21,38 @@
 | 6 | **Reconciled census (2026-06-18, post 1+2 merge):** 27 members declare `name`+`exports`, but the canonical `deno task publish:dry-run` simulates **25** and the real publish denominator is **26**. The 2 not in the dry-run batch: `@netscript/cli-e2e` (`publish:false`, internal e2e — **never published**, drop from reference) and `@netscript/cli` (publishable but excluded from the batch; the LD-7 **publish-last/F-wave** unit). → **Docs reference denominator = 26 units** (the 25 E-wave + `@netscript/cli`); `cli-e2e` excluded. | `deno task publish:dry-run` (25 `Simulating publish` lines, captured `$JOB/tmp/dryrun.out`); `packages/cli/e2e/deno.json publish:false`; census `unit-census.py`. |
 | 6b | Within the 26: 4 `*-core` packages (`plugin-{sagas,streams,triggers,workers}-core`) are internal substrate behind their public plugin; `fresh-ui` is the only unit at `v0.1.0` (rest `0.0.1-alpha.0`). Reference **depth** (full page vs folded-under-plugin) is a Design decision, but all 26 are in the denominator. | census version column. |
 
+## `deno doc --lint` baseline — RESOLVED 2026-06-18 (post 1+2 merge)
+
+Ran `deno doc --lint` against the full export map of all **26** publish targets
+(`doc-lint-census.py`, captured `$JOB/tmp/doc-lint-census.out`). Result:
+
+- **25 / 26 units are already CLEAN (exit 0)** at baseline — A1 ("`deno doc --lint` 0 per unit")
+  is essentially already met across the framework.
+- **Only `@netscript/fresh-ui` fails** (exit 1) with **7 `error[private-type-ref]`** — uniform
+  pattern: a public component const is annotated with a private `*Namespace` type:
+  | public const | private type | file |
+  |---|---|---|
+  | `Accordion` | `AccordionNamespace` | `packages/fresh-ui/src/runtime/accordion/Accordion.tsx:95` |
+  | `Dialog` | `DialogNamespace` | `.../dialog/Dialog.tsx:66` |
+  | `Drawer` | `DrawerNamespace` | `.../drawer/Drawer.tsx:66` |
+  | `Popover` | `PopoverNamespace` | `.../popover/Popover.tsx:94` |
+  | `Sheet` | `SheetNamespace` | `.../sheet/Sheet.tsx:66` |
+  | `Tabs` | `TabsNamespace` | `.../tabs/Tabs.tsx:52` |
+  | `Tooltip` | `TooltipNamespace` | `.../tooltip/Tooltip.tsx:66` |
+- **Fix classification = SOURCE/TypeScript (NOT doc-only):** each error is fixed by exporting the
+  `*Namespace` type (make it public) or removing the annotation. This is a `packages/fresh-ui/src/`
+  code change → **must be a WSL Codex slice** (supervisor does not write framework code). It is a
+  public-API surface change (doctrine-relevant): recommended fix = `export` the 7 `*Namespace`
+  types (they are the real public component-API shape and that is what the linter wants). Final
+  fix-shape is the slice's Design call. Frontend package → SCOPE-frontend applies to this slice.
+
+→ **Open-decision "where do `deno doc --lint` fixes live" is RESOLVED:** 25 units need nothing;
+fresh-ui needs ONE small uniform Codex source slice (7 type-export edits). Group 3 IMPL is therefore
+≈ doc-authoring (Lume + READMEs) + one tiny fresh-ui code slice.
+
 ## Census to build (generator/Design)
 
 - **Unit classification:** library vs example vs app vs e2e → reference depth per class.
-- **`deno doc --lint` baseline:** run per candidate unit; count diagnostics; classify doc-only vs
-  source-JSDoc fixes.
 - **README inventory:** current README shapes → define the standard template + checker.
 - **Lume site skeleton:** nav = Diátaxis sections; `location` for the Pages subpath.
 

@@ -1,8 +1,9 @@
 # Plan: docs/internal-overhaul (internal/contributor documentation)
 
-> **DRAFT** — Research+Plan may proceed in parallel with Groups 1/2; **IMPL is gated on
-> `chore/prod-readiness` AND `chore/deps-hygiene` merged** (internal docs describe the cleaned
-> harness/tooling surface). PLAN-EVAL (separate session) required before any slice.
+> **READY FOR PLAN-EVAL** (2026-06-18) — Groups 1+2 are now **merged**, so the IMPL gate is
+> satisfied; all three "resolve-now" open decisions (contributor IA, canonical-home rubric, Group-1
+> file-deletion coordination) are resolved below. PLAN-EVAL (separate OpenHands/minimax-M3 session)
+> required before any slice. No user-gated items block this run.
 
 ## Run Metadata
 
@@ -60,15 +61,17 @@ must stay green.
 | IO-2 | `.claude/skills/` regenerated from `.agents/skills/`; never hand-edited. | CLAUDE.md rule; `validate-claude-surface.ts` enforces. |
 | IO-3 | `deno doc` is documented as the canonical internal-API surface tool (+ `--lint` as the publish bar). | AGENTS.md "deno doc is your friend"; supports Group 3 + jsr-audit. |
 | IO-4 | Consolidation rewrites **content**; file **deletion** of dead docs is Group 1's job. | Clean role split with `prod-readiness`. |
+| IO-5 | **No Diátaxis for internal docs.** Keep the existing **functional/role-based** structure (harness mechanics · architecture doctrine · domain skills · agent surface `AGENTS`/`CLAUDE` · root ops) as a navigable index with one-home-per-concept + cross-links. Diátaxis is the *user* site (Group 3) only. | Internal docs are reference/procedure for contributors, already function-organized; imposing tutorial/explanation quadrants adds churn without value. |
+| IO-6 | **Canonical-home rubric:** architecture *decisions* → `docs/architecture/doctrine/`; cross-agent operating rules/entry → `AGENTS.md`; domain procedure → the matching `.agents/skills/<name>`; Claude-only startup → `CLAUDE.md`; run/orchestration mechanics → `.llm/harness/`. Everything else links to the one home; never restate. | Matches CLAUDE.md Supervisor Rules + AGENTS.md Read Order; gives every concept a deterministic home so the exhaustive concept→home map (Design deliverable) is mechanical. |
 
 ## Open-Decision Sweep
 
 | Decision | Status | Notes |
 |----------|--------|-------|
-| Diátaxis (or a lighter contributor-doc IA) for internal docs | must resolve now | Determines the consolidation target structure. |
-| Canonical home for each duplicated concept (harness vs doctrine vs skill) | must resolve now | Drives the merge slices. |
-| Scope of `deno doc` doc (harness only vs harness + jsr-audit + a standalone reference) | safe to defer | Resolve in Design. |
-| Coordination with Group 1 on which doc files are deleted vs consolidated | must resolve now | Avoid both runs touching the same file. |
+| Contributor-doc IA (Diátaxis vs lighter) | **RESOLVED** (IO-5) | Functional/role-based index, not Diátaxis. |
+| Canonical home per concept | **RESOLVED** (IO-6) | Rubric locked; exhaustive concept→home map is a Design deliverable. |
+| Group-1 file-deletion coordination | **RESOLVED** | G1 (merged) deleted only `AGENTS-handoff.md` (relocated into `openhands-handoff` skill). Clean field — consolidation references the skill, not the deleted root file. See research. |
+| Scope of `deno doc` doc (harness only vs harness + jsr-audit + standalone) | resolve in Design | Default = harness doc + `jsr-audit` skill section (IO-3). |
 
 ## Risk Register
 
