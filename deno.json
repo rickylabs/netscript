@@ -33,6 +33,8 @@
     "deps:check:npm-catalog": "deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts",
     "deps:check:jsr-centralization": "deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts",
     "deps:audit:file-link": "deno run --allow-read .llm/tools/deps/audit-file-link.ts",
+    "version:bump": "deno run --allow-read --allow-run --allow-env .llm/tools/deps/bump-version.ts",
+    "version:bump:test": "deno test --allow-read --allow-write --allow-run --allow-env .llm/tools/deps/bump-version_test.ts",
     "agentic:sync-claude": "deno run --no-lock --allow-read --allow-write .llm/tools/agentic/sync-claude-skills.ts --pretty",
     "agentic:sync-claude:check": "deno run --no-lock --allow-read .llm/tools/agentic/sync-claude-skills.ts --check --pretty",
     "agentic:check-claude": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/validate-claude-surface.ts --pretty",
