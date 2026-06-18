@@ -60,9 +60,12 @@ Ground-truth grep on `packages/` confirmed the research's stack claims are groun
 - **Fedify** — real dependency referenced in `packages/queue` and `packages/kv` (11 files). The
   parallel-queue claim is grounded; verify the exact mechanism/wording via `deno doc @netscript/queue`
   before asserting "concurrent execution buffers".
-- **Nitro** — real driver reference in `packages/kv` (3 files). KV provider matrix may include it;
-  confirm the exact adapter list via `deno doc @netscript/kv` (do not assert Redis/Nitro/memory from
-  prose alone).
+- **Adapter lists (CORRECTED — PLAN-EVAL B2/§8, verified via `deno doc`):** **Nitro is NOT an
+  adapter** for either lane. **Queue adapters** are **Deno KV + Redis + RabbitMQ** (`deno doc
+  @netscript/queue`). **KV adapters** are **Deno KV + Redis + memory**
+  (`packages/kv/adapters/{deno-kv,redis,memory}.adapter.ts`); kvdex and denokv-bridge are helpers,
+  not adapters. Any earlier "Nitro/provider matrix" speculation is superseded by these verified
+  lists — authors use `deno doc`, never prose, for the canonical adapter set. See §8.
 - **Prisma** — confirmed by `@netscript/prisma-adapter-mysql` existing; database lane is Prisma-backed
   (matches `01`).
 
@@ -88,6 +91,16 @@ they are open for PLAN-EVAL. None blocks Phase-0 component work; they layer onto
 | D-E4 | SEO sitemap | Absent | `lume/plugins/sitemap.ts` | **Adopt** (cheap, post-Pages-deploy SEO; finding, low-leverage but free). Confirm base_path correctness in emitted URLs. |
 | D-E5 | Auto-rendered index cards | Manual `comp.card` lists on zone indexes | `lume/plugins/search.ts` + `search.pages(...)` | **Defer to wave 2.** The manual `comp.featureGrid`/`comp.card` already covers Phase 1–3; auto-cards are a nice-to-have that can replace hand lists once the taxonomy/front-matter tags stabilize. |
 
+**PLAN-EVAL adjudication (Minimax-M3 cycle-1, see §8):** 4-of-5 adopt; D-E5 defer is correct.
+Firm caveats now binding on the dispatch (`briefs/00-INDEX.md` Phase 0b):
+- **D-E1** — `nav.ts` is enabled for the **Reference sub-tree ONLY**, never globally; the curated
+  `navSections` owns the top-level learning-curve ladder. Global `nav.ts` would invert the locked
+  ordering and is prohibited.
+- **D-E2** — Shiki adopt is **conditioned on a Phase-0b acceptance line** (verify it composes with
+  pagefind + `base_path` + anti-flash theme tokens) — promoted from prose safeguard to a slice
+  acceptance criterion in `05` + the dispatch. Prism fallback only if it breaks the chrome.
+- **D-E4** — sitemap acceptance: emitted URLs must honor `base_path` (`rickylabs.github.io/netscript`).
+
 Component mechanism note: `04` uses Lume **`_components/`** (global `comp.*`); the research describes
 Vento **`{{ include }}`** templates. These are two routes to the same outcome. Keep `04`'s
 `_components/` decision as primary (auto CSS/JS collection is a real benefit); `{{ include }}` is an
@@ -100,10 +113,10 @@ lands:
 
 | Finding | Lands in | Action |
 | ------- | -------- | ------ |
-| #1 Plain-English hub labels | Phase 0 (`navSections`) | Already locked `08` Q14; enforce in nav + hub titles. |
-| #2 `nav.ts` dynamic sidebar | Phase 0 | **D-E1** (hybrid; PLAN-EVAL). |
-| #3 `toc.ts` sticky on-page TOC | Phase 0 (layout) | **D-E3** adopt; wire into base layout. |
-| #4 Shiki highlighting | Phase 0 (`_config.ts`) | **D-E2** adopt (with chrome-compat check). |
+| #1 Plain-English hub labels | Phase 0a (`navSections`) | Already locked `08` Q14; enforce in nav + hub titles. |
+| #2 `nav.ts` dynamic sidebar | Phase 0a/0b | **D-E1** (hybrid; Reference sub-tree ONLY — see §3 adjudication). |
+| #3 `toc.ts` sticky on-page TOC | Phase 0b (layout) | **D-E3** adopt; wire into base layout. |
+| #4 Shiki highlighting | Phase 0b (`_config.ts`) | **D-E2** adopt (Phase-0b chrome-compat acceptance line). |
 | #5 Aspire USP + `--no-aspire` | Phase 1 (landing/why) + Phase 3 (Aspire concept) | Locked `08` Q7; foreground on front door, explicit opt-out callout. |
 | #6 Alpha / React-Native posture | Phase 1 (why) + global maturity badge | Locked `08` Q5; honest label, target Beta end-2026. |
 | #7 Outcome-led hero | Phase 1 (landing) | Locked `08` Q1; verbatim hero. |
@@ -185,3 +198,29 @@ Non-blocking refinements recorded in the verdict but not blocking re-PASS:
   single most important bar-raising change demanded by the verdict).
 - §3 D-E2 (Shiki) condition should be promoted from prose to a Phase-0b acceptance line (chrome
   composes with pagefind + base_path + theme tokens; else fall back to Prism).
+
+### 8a. Supervisor resolution (PLAN-EVAL cycle-1 close)
+
+All three blocking gaps closed in this revision (no source touched; `docs/site/_plan/**` only):
+
+- **B1 — RESOLVED.** `briefs/00-INDEX.md §Phase 3` now lists a **10th hub "File watching & ingestion"**
+  (`@netscript/watchers`); the "internal/dev-tooling" framing and the open-question footnote are
+  removed; the coverage note states all 21 packages + 4 plugins are covered with no exclusions and
+  marks `09 §2a` as the binding surface authority. `05` Phase 3 + artifact table updated to 10 hubs.
+- **B2 — RESOLVED (plan-level).** `briefs/00-INDEX.md` Global Acceptance Bar #1 now defines a two-tier
+  enforced gate: **target** `.llm/tools/docs/api-cite.ts` (extract `@netscript/*` imports/symbols →
+  `deno doc --json` → fail PR on unknown symbol; wire into `archetype-gate-matrix.md` docs lane) and a
+  mandatory **floor** per-page worklog `docs/site/_plan/worklog/<page>.md` (exact `deno doc --filter`
+  command + output/hash + `09 §2a` sha) with no merge without it. Added Global Bar #2 requiring ≥1
+  annotated runnable JSR-import-realistic `comp.tabbedCode` proof per hub/landing/why page. The gate
+  script + shim are Phase-0b Codex slices (repo tooling, not framework source). Brief template carries
+  a mandatory WORKLOG line.
+- **B3 — RESOLVED.** Phase 0 split into **0a** (components + nav + breadcrumb/nextPrev — shippable
+  Pages preview, with a 0a merge-gate acceptance) and **0b** (Shiki/toc/sitemap/callout shim +
+  `api-cite.ts` — Codex config, does not block prose) in both `briefs/00-INDEX.md` and `05`. Phase-1
+  prose may begin against 0a in parallel.
+- **Engine caveats locked** in `09 §3`: D-E1 `nav.ts` Reference-sub-tree-only (never global); D-E2
+  Shiki conditioned on the Phase-0b compatibility acceptance line; D-E4 sitemap `base_path` acceptance.
+- **Accuracy nits folded in:** §2b adapter lists corrected (Nitro is NOT an adapter; queue = Deno KV +
+  Redis + RabbitMQ, KV = deno-kv + redis + memory). **R5 Aspire framing** added as Global Bar #8
+  (TypeScript AppHost inspection/diagnostics — `inspectAspire`, not the .NET Aspire orchestrator).

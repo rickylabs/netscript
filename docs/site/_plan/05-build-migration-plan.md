@@ -13,16 +13,30 @@ phase.** Each phase is independently shippable to GitHub Pages.
   anchors intact. Validate doc samples compile where feasible (samples mirror published surfaces).
 - Lock tone/positioning (questions in `07-`) **before** Phase 1 authoring of the landing/why pages.
 
-## Phase 0 — Foundations (engine + IA scaffolding) · **M**
-Produces the skeleton everything else fills.
+## Phase 0 — Foundations · split 0a / 0b (PLAN-EVAL B3)
+Produces the skeleton everything else fills. **Split so the chrome ships independently of engine
+config and Phase-1 prose is never wedged behind the whole bundle.**
+
+### Phase 0a — Component + nav chrome (shippable preview) · **S–M**
 - Add `docs/site/_components/` with P0 components: `callout`, `tabbedCode`, `hero`, `card` +
   `featureGrid`. Token-styled.
-- Add the markdown-it GitHub-callout shim to `_config.ts`.
 - Restructure `_data.ts` `navSections` to the new ladder (Start here / Learn / Core concepts /
   Capabilities / How-to / Reference / Resources). Add per-group subtitles.
 - Add `comp.breadcrumb` + `comp.nextPrev` to the base layout.
-- **Ship:** same content, new chrome/nav + working components (verified with the samples in
-  `_plan/samples/`).
+- **Ship (0a merge gate):** same content, new chrome/nav + working components deploy to Pages as a
+  chrome-only preview; pagefind/base_path/`--ns-*` intact (verified with `_plan/samples/`). Phase-1
+  prose may begin against 0a in parallel.
+
+### Phase 0b — Engine config (Codex slice; does NOT block prose) · **M**
+- Add the markdown-it GitHub-callout shim to `_config.ts`.
+- **D-E2 Shiki** — adopt. **Acceptance line:** verify Shiki composes with pagefind + `base_path` +
+  anti-flash theme tokens *before locking*; Prism fallback only if it breaks the chrome.
+- **D-E3 toc** — adopt (sticky on-page TOC), wire into base layout.
+- **D-E4 sitemap** — adopt. **Acceptance:** emitted URLs honor `base_path`
+  (`rickylabs.github.io/netscript`).
+- **D-E1 nav.ts** — Reference sub-tree ONLY (never global; see `09 §3`).
+- **`.llm/tools/docs/api-cite.ts`** accuracy gate (B2 target) + wire into the docs lane gate set.
+- D-E5 (auto-cards) deferred to wave 2.
 
 ## Phase 1 — The front door (highest user-visible ROI) · **M**
 - Rewrite `index.md` → `.vto` landing (hero, feature grid, audience cards, learning-path, CTAs).
@@ -38,8 +52,9 @@ Produces the skeleton everything else fills.
 - **Ship:** a guaranteed-success path from zero to a service + a job + a saga.
 
 ## Phase 3 — Capability hubs + remaining core concepts · **L**
-- 9 capability hubs (services/contracts, workers, sagas, triggers, streams, database, kv/queue/cron,
-  telemetry/logging, fresh-ui) — each the thin concept + headline API + Diátaxis router card.
+- 10 capability hubs (services/contracts, workers, sagas, triggers, streams, database, kv/queue/cron,
+  **file watching & ingestion (watchers)**, telemetry/logging, fresh-ui) — each the thin concept +
+  headline API + Diátaxis router card.
 - Core-concept pages: Contracts & the type flow, Durable workflows, Observability, Aspire.
 - **Ship:** every package reachable by *intent*, not just by name in the reference list.
 
@@ -56,7 +71,8 @@ Produces the skeleton everything else fills.
 
 ## Sequencing rationale
 - Phase 1 first because the landing is the worst current offender and the cheapest big win.
-- Components (Phase 0) precede everything because every later page depends on them.
+- Components (Phase 0a) precede everything because every later page depends on them; **engine config
+  (0b) runs in parallel and does not block prose** (Markdown + callout shim only).
 - Tutorials before capability hubs because hubs *link into* tutorials (the Diátaxis router cards need
   destinations).
 - How-to last of the substantive phases because recipes assume the concepts/tutorials exist to link.
@@ -64,9 +80,10 @@ Produces the skeleton everything else fills.
 ## What each phase produces (artifact summary)
 | Phase | New/changed pages | New components | Net-new authoring |
 | --- | --- | --- | --- |
-| 0 | `_data.ts`, base layout | callout, tabbedCode, hero, card, featureGrid, breadcrumb, nextPrev | none |
+| 0a | `_data.ts`, base layout | callout, tabbedCode, hero, card, featureGrid, breadcrumb, nextPrev | none |
+| 0b | `_config.ts` (Shiki/toc/sitemap/callout shim) + `.llm/tools/docs/api-cite.ts` | — | none (Codex config/tooling) |
 | 1 | landing, why, quickstart, 2 re-homed concepts | — | high (landing+why) |
 | 2 | 4 tutorials + track index | learningPath | high |
-| 3 | 9 hubs + 4 concepts | apiTable | high |
+| 3 | 10 hubs + 4 concepts | apiTable | high |
 | 4 | 6–7 how-tos, glossary, CLI ref | — | medium |
 | 5 | wave-2 pages + polish | versionBadge | medium |
