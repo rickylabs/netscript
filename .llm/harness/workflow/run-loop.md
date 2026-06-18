@@ -95,7 +95,9 @@ before escalation to the user.
 
 ## 5. Implement
 
-1. Implement one commit slice at a time in the Design order.
+1. Implement one commit slice at a time in the Design order. For internal `@netscript/*` package
+   surfaces, reach for `deno doc` before broad source reads — see
+   [`../tools-and-commands.md`](../tools-and-commands.md).
 2. After each slice:
    - run the slice's named gate,
    - commit with a message that names what the slice proves,
