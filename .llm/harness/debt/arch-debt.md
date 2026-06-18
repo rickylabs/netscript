@@ -720,3 +720,23 @@ Seeded from
   and green validation.
 - **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
   targeted package checks and `deno task publish:dry-run` pass after each migration.
+
+## root dependency hygiene — npm catalog compliance census (`deps-hygiene-npm-catalog-census`)
+
+- **Reason:** `scan-npm-catalog-compliance` is intentionally wired as a report-only adoption census
+  while the enforceable D-7 dependency gate fails only on JSR centralization drift and publishable
+  `file:`/`link:` specifiers. Current WARN findings identify member inline `npm:` pins and package
+  dependency surfaces that should converge toward root `catalog:` usage, but failing this scanner
+  today would pressure maintainers to de-catalog or edit pins outside the accepted D-G2-1/D-G2-2
+  scope.
+- **Owner:** dependency hygiene/toolchain maintainers.
+- **Target:** members inline-pin npm dependencies through the catalog where scoped and reviewed;
+  full member-to-catalog migration is a separate dependency-shape decision.
+- **Linked plan:** `.llm/tmp/run/chore-deps-hygiene--deps/plan.md` (D-7 enforcement wiring and
+  D-G2-1/D-G2-2 catalog-premise reframe).
+- **Created:** 2026-06-18.
+- **Status:** open, DEBT_ACCEPTED for D-7. `deno task deps:check` runs npm catalog compliance
+  without `--fail-on-violation`, preserving WARN-only evidence while enforcing the clean JSR and
+  file/link invariants.
+- **Gate:** when a separately approved migration converges member npm dependency surfaces, flip
+  `scan-npm-catalog-compliance` to `--fail-on-violation` inside `deps:check`.
