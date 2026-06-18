@@ -54,7 +54,8 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Surface | Repo-wide, incl. root: dead code, ALL backward-compat shims, temp/garbage/build cruft, stray root files |
 | Archetype | N/A — cross-cutting repo hygiene (no public-API archetype). Touches many surfaces; adds/removes no API |
 | Scope overlay | partial `SCOPE-docs.md` (deletes dead doc *files*; does **not** rewrite doc *content*) |
-| Status | `planned` |
+| Sub-PR | #54 (draft, base `release/jsr-readiness`) |
+| Status | `active` (branch + draft sub-PR launched 2026-06-18; Plan-Gate pending) |
 
 ### Pre-conditions
 - Umbrella branch current with `main`.
@@ -77,7 +78,8 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Surface | `deno.json` task/dep hygiene + dependency-shape **tooling** (scanners). Ships tooling; does **NOT** restructure the catalog |
 | Archetype | A6-adjacent for the scanner scripts (cli-tooling); otherwise N/A repo tooling |
 | Scope overlay | none |
-| Status | `planned` |
+| Sub-PR | #55 (draft, base `release/jsr-readiness`) |
+| Status | `active` (branch + draft sub-PR launched 2026-06-18; Plan-Gate pending) |
 
 ### Deliverables
 1. **JSR-dep centralization scanner** — flags any `jsr:` dep used by >1 member with divergent versions; structured JSON; wired into CI + `arch:check`.
@@ -134,5 +136,6 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 
 ## Open umbrella-level items
 
-- **GitHub access gap (BLOCKER for PR/comment/trigger/merge machinery):** `gh` not installed; no GitHub MCP connected to this session (it is enabled only in Zed, a separate scope). Recorded in `drift.md`. Needs a user decision before any sub-PR / OpenHands PR-comment trigger / merge can happen.
-- Sub-branches/worktrees + draft sub-PRs are created at **group-launch time**, not at bootstrap (no generator launched yet — handover §5.5).
+- **GitHub access (RESOLVED 2026-06-18):** `gh`/GitHub MCP absent, but the rickylabs PAT in Windows Credential Manager (repo+workflow) drives the REST API directly via `git credential fill` + `curl`. Draft sub-PRs #54/#55 were created this way; PR-comment triggers + merges use the same path. (PAT is in the chat transcript — rotate/revoke after the program.)
+- **Groups 1 & 2 launched (2026-06-18):** branches `chore/prod-readiness` + `chore/deps-hygiene` off the umbrella; draft sub-PRs #54 + #55; plan/research/Design ready on each (inherited from the umbrella + a launch entry in each group worklog). Worktrees deferred to **implementation launch** (WSL Codex, native ext4 — not local Windows `.worktrees/`); recorded as a reasoned deviation from supervisor.md §2. Next: PLAN-EVAL per sub-PR (OpenHands/minimax M3, separate session), Group 1 then Group 2 (sequential).
+- Groups 3 & 4 (docs) not yet launched — branches/sub-PRs created when their Research+Plan starts (handover §5.5).
