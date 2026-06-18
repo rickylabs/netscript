@@ -89,26 +89,40 @@ entry*, never by relaxing the catalog law.
 | D-6 | bump wrapper smoke | `deno task version:bump --cwd <tmp> --json patch --dry-run` | PASS: JSON wrapper reported `ok=true`, exit 0, `1.2.3 -> 1.2.4`; scratch dir removed |
 | D-6 | Tooling check | `deno check .llm/tools/deps/bump-version.ts .llm/tools/deps/bump-version_test.ts` | PASS |
 | D-6 | Tooling lint | `deno lint --no-config .llm/tools/deps/bump-version.ts .llm/tools/deps/bump-version_test.ts` | PASS |
+| D-7 | Enforcement wiring | `deno task deps:check` | PASS exit 0: JSR centralization and file/link audit run with `--fail-on-violation` and emit no findings; npm catalog scanner runs report-only and emits 27 WARN findings |
+| D-7 | Publish dry-run | `rtk proxy deno task publish:dry-run` | PASS: all publishable units completed dry-run; existing slow-type/dynamic-import warnings only |
+| D-7 | Arch wiring | `rtk proxy deno task arch:check` | FAIL after dependency gate PASS: `deps:check` runs first and exits 0, then pre-existing doctrine baseline fails with `FAIL=58 WARN=147 INFO=1` |
 | Final | Scanner reports | npm catalog: 27 report-only WARN findings; JSR centralization: `[]`; file/link audit: `[]` | PASS for report-only scanner landing |
 | Final | Publish dry-run | `deno task publish:dry-run` | PASS: all publishable units completed dry-run; existing slow-type carve-out warnings only |
 | Final | Doctrine gate | `deno task arch:check` | FAIL: pre-existing repository-wide doctrine baseline (`FAIL=58 WARN=147 INFO=1`), not caused by dependency-shape scanner wiring |
 
 ## Handoff Summary
 
-- D-1 through D-6 are implemented and pushed on `chore/deps-hygiene`.
-- Scanners are report-only by default with `--json`; D-2/D-3/D-4 expose `--fail-on-violation` for
-  the future enforcement flip once npm catalog findings are converged or explicitly allow-listed.
-- The npm scanner reports 27 current WARN findings on real dependency surfaces. It does not report
-  the evaluator-named non-import string literal sites in `windows.ts` or `registry.manifest.ts`.
+- D-1 through D-7 are implemented on `chore/deps-hygiene`.
+- D-1 added the dependency/task census and fixed drift D-G2-3 by removing the unsupported
+  `--frozen` flag from the `deps:prod-install` wrapper while preserving lock hygiene.
+- D-2 added the npm catalog-compliance scanner with the PLAN-EVAL NIT applied: it scans real
+  dependency surfaces (`package.json`, `deno.json` imports/scopes, and source import/export
+  specifiers) and does not flag the non-import string-literal sites in `windows.ts` or
+  `registry.manifest.ts`.
+- D-3 added JSR centralization scanning; D-4 added publishable `file:`/`link:` auditing; D-5 pruned
+  the Fresh `dry-run` task alias; D-6 wrapped native `deno bump-version` with parity tests.
+- D-7 added root `deps:check`, wired it into `ci:quality`, and made `arch:check` run `deps:check`
+  as a distinct first step before `check-doctrine.ts`.
+- `deps:check` enforces JSR centralization and file/link audits with `--fail-on-violation`.
+  `scan-npm-catalog-compliance` is intentionally report-only: it is an adoption/divergence census
+  for member inline-pin npm usage, and full member-to-catalog migration is a separate scoped
+  decision. This rationale is recorded in `.llm/harness/debt/arch-debt.md`.
+- Gates run: `deno task deps:check` PASS; `rtk proxy deno task publish:dry-run` PASS;
+  `rtk proxy deno task arch:check` FAIL only after the dependency gate passes, due to the
+  pre-existing doctrine baseline (`FAIL=58 WARN=147 INFO=1`).
 - No dependency versions, catalog pins, lock files, caches, `scaffold-versions.ts`, or release-time
   transforms were changed.
-- `arch:check` remains red on the pre-existing global doctrine baseline. No new scanner was wired
-  into `arch:check` in this implementation pass because the npm report is intentionally not yet
-  enforceable.
-- Worktree was clean after D-6 implementation and final publish dry-run before this artifact update.
 
 ## Handoff Notes
 
-- Next: confirm catalog resolution (gate 0), deepen dep/task census, then PLAN-EVAL (separate
-  OpenHands session). No implementation slice before PLAN-EVAL `PASS`.
-- HARD LINE: never de-catalog / edit version pins / `scaffold-versions.ts` to satisfy a scanner.
+- Implementation is ready for separate OpenHands IMPL-EVAL. Do not self-certify this run.
+- HARD LINE remains: never de-catalog, edit version pins, touch `scaffold-versions.ts`, delete
+  lock/cache files, or use dependency upgrades to satisfy a scanner.
+- The npm scanner's 27 WARN findings are evidence for a future convergence decision, not a D-7
+  fail gate.
