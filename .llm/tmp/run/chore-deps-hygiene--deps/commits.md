@@ -7,5 +7,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 76dbf44c: chore(openhands): record run trace 27755191977-1
 - dcc5c87: chore(deps-hygiene): D-1 — add dependency census baseline
 - 6648177: chore(deps-hygiene): D-2 — add npm catalog scanner
+- 355cf1a: chore(deps-hygiene): D-3 — add JSR centralization scanner
 
 <!-- appended after each commit -->

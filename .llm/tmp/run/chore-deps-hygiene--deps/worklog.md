@@ -76,6 +76,9 @@ entry*, never by relaxing the catalog law.
 | D-2 | npm catalog scanner (report-only) | `deno run --allow-read .llm/tools/deps/scan-npm-catalog-compliance.ts --json` / `deno task deps:check:npm-catalog` | PASS exit 0: 27 WARN findings on real dependency surfaces, including `packages/queue/adapters/amqp.adapter.ts:10`; evaluator-named string-literal sites were not reported |
 | D-2 | Tooling check | `deno check .llm/tools/deps/scan-npm-catalog-compliance.ts .llm/tools/deps/workspace.ts` | PASS |
 | D-2 | Tooling lint | `deno lint --no-config .llm/tools/deps/scan-npm-catalog-compliance.ts .llm/tools/deps/workspace.ts` | PASS |
+| D-3 | JSR centralization scanner (report-only) | `deno run --allow-read .llm/tools/deps/scan-jsr-centralization.ts --json` / `deno task deps:check:jsr-centralization` | PASS exit 0: zero findings; equivalent `1`/`^1` major-only ranges normalized |
+| D-3 | Tooling check | `deno check .llm/tools/deps/scan-jsr-centralization.ts .llm/tools/deps/workspace.ts` | PASS |
+| D-3 | Tooling lint | `deno lint --no-config .llm/tools/deps/scan-jsr-centralization.ts .llm/tools/deps/workspace.ts` | PASS |
 
 ## Handoff Notes
 
