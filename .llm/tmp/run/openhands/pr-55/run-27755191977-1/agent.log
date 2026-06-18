@@ -1,0 +1,400 @@
+Now let me also create the OPENHANDS_SUMMARY_PATH file. First, ensure the 
+directory exists:
+
+$ mkdir -p /home/runner/work/_temp/openhands/27755191977-1/
+
+Tokens: ↑ input 8.81M • cache hit 91.64% •  reasoning 5.31K • ↓ output 57.87K • 
+$ 0.7988
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write summary file
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27755191977-1/summary.md"
+  file_text: 
+    # PLAN-EVAL verdict — chore-deps-hygiene--deps
+    
+    ## Verdict
+    
+    **`PASS`**
+    
+    ## One-paragraph rationale
+    
+    The plan (`chore/deps-hygiene` Group 2 of `release/jsr-readiness`) passes 
+the Plan-Gate: research is present and rebaselined (with D-G2-1 explicitly 
+superseded by D-G2-2 confirming the npm `catalog:` protocol IS live), all four 
+locked decisions (DH-1..DH-4) are concrete with rationale, the open-decision 
+sweep resolves every entry (the one deferred item is performed inside the 
+catalog-census slice), the six commit slices (D-1 census, D-2 npm compliance, 
+D-3 JSR centralization, D-4 file/link audit, D-5 task prune, D-6 bump wrapper) 
+are each single-concern, name a proving gate, and stay under ~30 LOC; the risk 
+register explicitly mitigates scanner false-positive lockout via report-only → 
+FAIL sequencing. The load-bearing spot-check for this group — that workspace 
+members declare npm deps as `catalog:` in each member's `package.json` (the Deno
+2.8 protocol), resolved against the root `deno.json` `catalog` block — was 
+verified live (18 member `package.json` files using `catalog:`; root catalog 
+defines `amqplib: "^2.0.1"`, `ioredis`, `@preact/signals`, `clsx`, `preact`, 
+`tailwind-merge`, etc.), the planned compliance scanner correctly targets the 
+only real inline `npm:` pin in source (`packages/queue/adapters/amqp.adapter.ts`
+— `npm:amqplib@^0.10.3` vs catalog `^2.0.1`), and the JSR-centralization scanner
+finds zero cross-member divergences on the current tree (clean baseline, so the 
+report→FAIL flip has zero CI-lockout risk). One non-blocking NIT for the D-2 
+implementer: explicitly handle (via parser design or allow-list) the two 
+string-literal sites that contain `"npm:…"` substrings but are not real Deno 
+imports — `packages/cli/src/kernel/constants/windows.ts` (compile-bundle 
+external map) and `packages/fresh-ui/registry.manifest.ts` (user-facing 
+dependency array). The plan correctly forbids catalog restructuring, version-pin
+edits, and any touch to `scaffold-versions.ts` (DH-1 / Non-Scope). 
+Implementation may begin.
+    
+    ## Summary
+    
+    - Session role: PLAN-EVAL (separate evaluator session; no implementation)
+    - Deliverable: `.llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md` 
+(rendered, verdict `PASS`)
+    - Branch under eval: `chore/deps-hygiene` (off `release/jsr-readiness`)
+    - Drift active: D-G2-2 supersedes D-G2-1
+    
+    ## Changes
+    
+    - Created `.llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md` with full 
+checklist + verdict
+    - No source edits, no version-control operations, no PR comments (workflow 
+owns PR comments per trigger contract)
+    
+    ## Validation
+    
+    - Read `.llm/harness/evaluator/plan-protocol.md`, 
+`.llm/harness/gates/plan-gate.md`, 
+`.llm/harness/evaluator/verdict-definitions.md`
+    - Read all run artifacts: `research.md`, `plan.md`, `worklog.md`, `drift.md`
+    - Confirmed D-G2-2 supersedes D-G2-1 (`catalog:` protocol IS live)
+    - Verified 18 `package.json` files use `catalog:` protocol
+    - Verified root `deno.json` `catalog` block defines versions (lines 92-126)
+    - Inspected inline `npm:` sites in source — one real (`amqp.adapter.ts:10`),
+two string-literal (windows.ts, registry.manifest.ts)
+    - Verified cross-member JSR version invariants (no divergence: 
+`jsr:@zod/zod@4.4.3` ×13, `jsr:@hono/hono@4.12.24` ×7, 
+`jsr:@standard-schema/spec@1.1.0` ×5)
+    - Verified zero `file:`/`link:` specifiers in workspace members
+    - Confirmed `arch:check` is per-package + not in `ci` today; plan correctly 
+addresses both
+    - Confirmed `deno task ci` = `deno ci && deno task ci:quality && deno task 
+coverage:functions && deno task publish:dry-run && deno task audit:critical`
+    
+    ## Responses to review comments or issue comments
+    
+    (n/a — evaluator session; the workflow posts the verdict to the PR, not this
+session)
+    
+    ## Remaining risks
+    
+    - One non-blocking NIT for the D-2 implementer: detection rule for inline 
+`npm:` specifiers should anchor on `import`/`export … from "npm:…"` statement 
+contexts (and the `imports`/`scopes` keys of `deno.json`), not on substring 
+`npm:` inside arbitrary string literals. Known string-literal false-positive 
+sites: `packages/cli/src/kernel/constants/windows.ts` (compile-bundle external 
+map), `packages/fresh-ui/registry.manifest.ts` (user-facing dependency array). 
+Plan slice D-2 should name these as known-allow-listed at landing.
+    - Catalog `amqplib: "^2.0.1"` entry is the load-bearing case the compliance 
+scanner must surface (real pin in `amqp.adapter.ts` is `^0.10.3`). Plan 
+correctly identifies this as the canonical scanner case but does not pre-write 
+the fix.
+    - The bespoke bump tool the D-6 wrapper replaces was not located in 
+`.llm/tools/` at quick scan — implementer must find it before snapshotting 
+parity. Plan text is sufficient ("wrap native, preserve structured output, 
+snapshot parity test").
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 8.83M • cache hit 91.67% •  reasoning 5.31K • ↓ output 59.2K • $
+0.8021
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27755191977-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL verdict — chore-deps-hygiene--deps
+ 2|
++3|## Verdict
++4|
++5|**`PASS`**
++6|
++7|## One-paragraph rationale
++8|
++9|The plan (`chore/deps-hygiene` Group 2 of `release/jsr-readiness`) passes the
+Plan-Gate: research is present and rebaselined (with D-G2-1 explicitly 
+superseded by D-G2-2 confirming the npm `catalog:` protocol IS live), all four 
+locked decisions (DH-1..DH-4) are concrete with rationale, the open-decision 
+sweep resolves every entry (the one deferred item is performed inside the 
+catalog-census slice), the six commit slices (D-1 census, D-2 npm compliance, 
+D-3 JSR centralization, D-4 file/link audit, D-5 task prune, D-6 bump wrapper) 
+are each single-concern, name a proving gate, and stay under ~30 LOC; the risk 
+register explicitly mitigates scanner false-positive lockout via report-only → 
+FAIL sequencing. The load-bearing spot-check for this group — that workspace 
+members declare npm deps as `catalog:` in each member's `package.json` (the Deno
+2.8 protocol), resolved against the root `deno.json` `catalog` block — was 
+verified live (18 member `package.json` files using `catalog:`; root catalog 
+defines `amqplib: "^2.0.1"`, `ioredis`, `@preact/signals`, `clsx`, `preact`, 
+`tailwind-merge`, etc.), the planned compliance scanner correctly targets the 
+only real inline `npm:` pin in source (`packages/queue/adapters/amqp.adapter.ts`
+— `npm:amqplib@^0.10.3` vs catalog `^2.0.1`), and the JSR-centralization scanner
+finds zero cross-member divergences on the current tree (clean baseline, so the 
+report→FAIL flip has zero CI-lockout risk). One non-blocking NIT for the D-2 
+implementer: explicitly handle (via parser design or allow-list) the two 
+string-literal sites that contain `"npm:…"` substrings but are not real Deno 
+imports — `packages/cli/src/kernel/constants/windows.ts` (compile-bundle 
+external map) and `packages/fresh-ui/registry.manifest.ts` (user-facing 
+dependency array). The plan correctly forbids catalog restructuring, version-pin
+edits, and any touch to `scaffold-versions.ts` (DH-1 / Non-Scope). 
+Implementation may begin.
++10|
++11|## Summary
++12|
++13|- Session role: PLAN-EVAL (separate evaluator session; no implementation)
++14|- Deliverable: `.llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md` 
+(rendered, verdict `PASS`)
++15|- Branch under eval: `chore/deps-hygiene` (off `release/jsr-readiness`)
++16|- Drift active: D-G2-2 supersedes D-G2-1
++17|
++18|## Changes
++19|
++20|- Created `.llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md` with full 
+checklist + verdict
++21|- No source edits, no version-control operations, no PR comments (workflow 
+owns PR comments per trigger contract)
++22|
++23|## Validation
++24|
++25|- Read `.llm/harness/evaluator/plan-protocol.md`, 
+`.llm/harness/gates/plan-gate.md`, 
+`.llm/harness/evaluator/verdict-definitions.md`
++26|- Read all run artifacts: `research.md`, `plan.md`, `worklog.md`, `drift.md`
++27|- Confirmed D-G2-2 supersedes D-G2-1 (`catalog:` protocol IS live)
++28|- Verified 18 `package.json` files use `catalog:` protocol
++29|- Verified root `deno.json` `catalog` block defines versions (lines 92-126)
++30|- Inspected inline `npm:` sites in source — one real (`amqp.adapter.ts:10`),
+two string-literal (windows.ts, registry.manifest.ts)
++31|- Verified cross-member JSR version invariants (no divergence: 
+`jsr:@zod/zod@4.4.3` ×13, `jsr:@hono/hono@4.12.24` ×7, 
+`jsr:@standard-schema/spec@1.1.0` ×5)
++32|- Verified zero `file:`/`link:` specifiers in workspace members
++33|- Confirmed `arch:check` is per-package + not in `ci` today; plan correctly 
+addresses both
++34|- Confirmed `deno task ci` = `deno ci && deno task ci:quality && deno task 
+coverage:functions && deno task publish:dry-run && deno task audit:critical`
++35|
++36|## Responses to review comments or issue comments
++37|
++38|(n/a — evaluator session; the workflow posts the verdict to the PR, not this
+session)
++39|
++40|## Remaining risks
++41|
++42|- One non-blocking NIT for the D-2 implementer: detection rule for inline 
+`npm:` specifiers should anchor on `import`/`export … from "npm:…"` statement 
+contexts (and the `imports`/`scopes` keys of `deno.json`), not on substring 
+`npm:` inside arbitrary string literals. Known string-literal false-positive 
+sites: `packages/cli/src/kernel/constants/windows.ts` (compile-bundle external 
+map), `packages/fresh-ui/registry.manifest.ts` (user-facing dependency array). 
+Plan slice D-2 should name these as known-allow-listed at landing.
++43|- Catalog `amqplib: "^2.0.1"` entry is the load-bearing case the compliance 
+scanner must surface (real pin in `amqp.adapter.ts` is `^0.10.3`). Plan 
+correctly identifies this as the canonical scanner case but does not pre-write 
+the fix.
++44|- The bespoke bump tool the D-6 wrapper replaces was not located in 
+`.llm/tools/` at quick scan — implementer must find it before snapshotting 
+parity. Plan text is sufficient ("wrap native, preserve structured output, 
+snapshot parity test").
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify deliverables exist
+
+Thought:
+Let me verify the deliverables exist:
+
+$ cd /home/runner/work/netscript/netscript && ls -la 
+.llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md 
+/home/runner/work/_temp/openhands/27755191977-1/summary.md && echo "---plan-eval
+head---" && head -20 .llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md
+
+Tokens: ↑ input 8.86M • cache hit 91.69% •  reasoning 5.31K • ↓ output 59.35K • 
+$ 0.8040
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+-rw------- 1 runner runner 11042 Jun 18 11:50 
+.llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md
+-rw------- 1 runner runner  4779 Jun 18 11:50 
+/home/runner/work/_temp/openhands/27755191977-1/summary.md
+---plan-eval head---
+# PLAN-EVAL — chore-deps-hygiene--deps
+
+- Plan evaluator session: PLAN-EVAL evaluator (this session, 2026-01)
+- Run: `chore-deps-hygiene--deps`
+- Branch under eval: `chore/deps-hygiene` (off `release/jsr-readiness`)
+- Surface / archetype: A6-adjacent (cli-tooling) for the scanner scripts; 
+otherwise repo tooling. No scope overlays.
+- Drift active: **D-G2-2** supersedes D-G2-1 — npm `catalog:` protocol IS 
+implemented (each workspace member declares npm deps as a `catalog:` value in 
+its own `package.json`, resolved against the root `deno.json` `catalog` block, 
+not via member `deno.json`). Catalog-shape work is therefore 
+hygiene/enforcement, not restructuring.
+
+## Checklist results
+
+| Plan-Gate item                                | Result | Evidence / location |
+| --------------------------------------------- | ------ | ------------------- |
+| Research present and current                  | PASS   | `research.md` exists,
+rebaselined against current `main` (commit refs in worklog). `drift.md` updated;
+D-G2-1 superseded by D-G2-2. Catalog `catalog:` resolution confirmed live in the
+tree (verified by evaluator — see "Catalog live-invariant spot-check" below). |
+| Decisions locked                              | PASS   | Locked Decisions 
+table (DH-1..DH-4) with rationale; decisions are concrete (catalog law stays, 
+scanners FAIL the build, wrapper replaces bespoke bump, divergent JSR policy is 
+report→converge→FAIL). |
+| Open-decision sweep                           | PASS   | Open-Decision Sweep 
+table resolves all four items: 3 RESOLVED, 1 deferred ("safe to defer: inventory
+existing `deps:*` wrappers") because the inventory is performed in the 
+catalog-census slice (D-1) before any new wrapper is written. No decision 
+deferred that would force rework. |
+| Commit slices (< 30, gate + files each)       | PASS   | Slice list (worklog 
+`## Design`): D-1 (catalog census), D-2 (catalog compliance scanner), D-3 (JSR 
+centralization scanner), D-4 (`file:`/`link:` audit), D-5 (task prune), D-6 
+(bump wrapper) — all single-concern, all name a proving gate (catalog census / 
+FAIL-on-violation under `arch:check` + `ci` / parity test for wrapper). All < 30
+LOC of net behaviour each (scanners are CLI scripts with pure cores; wrapper is 
+a thin shim). |
+| Risk register                                 | PASS   | Four risks, each with
+mitigation: false-positive lockout → report-only first, flip later; pruning a 
+referenced task → grep all references before removal; bump parity → snapshot 
+current output, assert wrapper parity in test; `deno.json` perturbation → scope 
+edits to tasks only, diff-review every hunk. |
+| Gate set selected                             | PASS   | Fitness Gates table 
+maps to existing harness: scanner runs as workspace-wide sibling of 
+`check-doctrine.ts` under `arch:check`; wired into `ci` (currently `arch:check` 
+is NOT in `ci`, plan addresses this); publish:dry-run (27 units / 0 slow types) 
+kept green; bump parity test gates wrapper replacement. |
+| Deferred scope explicit                       | PASS   | "Non-Scope (LOCKED — 
+never)" explicitly enumerates: no catalog restructuring, no version-pin edits, 
+no `scaffold-versions.ts` touch, no release-time `deno.json` transform, no dep 
+upgrade, no `file:`/`link:` adoption. "Hidden Scope" enumerates four caveats 
+each addressed by an explicit slice/risk. |
+| jsr-audit (package/plugin waves)              | N/A    | This wave ships 
+**scanner tooling**, not publishable units. No public-surface change in any 
+`@netscript/*` package. Audit-only consumers of the catalog/JSR shape. (Reason: 
+tooling wave.) |
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Mark tasks done
+
+Thought:
+Both deliverables are in place. Let me update the task tracker and finish:
+
+📋 Update Task List (6 tasks)
+
+Tokens: ↑ input 8.89M • cache hit 91.71% •  reasoning 5.31K • ↓ output 59.65K • 
+$ 0.8064
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 6 done
+
+✅ 1. plan-eval: gather harness protocol + run artifacts
+✅ 2. plan-eval: spot-check catalog/catalog: + inline npm: pin detection
+✅ 3. plan-eval: verify JSR-version cross-member invariants
+✅ 4. plan-eval: verify arch:check contract and ci wiring
+✅ 5. draft-verdict: render plan-eval.md with checklist + verdict
+✅ 6. write OPENHANDS_SUMMARY_PATH summary.md
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict PASS for chore/deps-hygiene
+
+Finish with message:
+## Verdict: PASS
+
+PLAN-EVAL session for `chore/deps-hygiene` (Group 2 of `release/jsr-readiness`) 
+renders **PASS**.
+
+**Deliverables written:**
+- `.llm/tmp/run/chore-deps-hygiene--deps/plan-eval.md` — full Plan-Gate 
+checklist with concrete evidence + verdict
+- `/home/runner/work/_temp/openhands/27755191977-1/summary.md` — 
+`OPENHANDS_SUMMARY_PATH` summary (verdict + one-paragraph rationale)
+
+**Plan-Gate checklist (all boxes checked):**
+- Research present and current: PASS — `research.md` rebaselined; D-G2-1 
+explicitly superseded by D-G2-2 (npm `catalog:` protocol IS live)
+- Decisions locked: PASS — DH-1..DH-4 with rationale (catalog law stays; 
+scanners FAIL build; wrapper replaces bespoke bump; divergent JSR policy is 
+report→converge→FAIL)
+- Open-decision sweep: PASS — 3 RESOLVED, 1 deferred ("inventory `deps:*` 
+wrappers") and performed inside D-1 (catalog census)
+- Commit slices: PASS — D-1 catalog census / D-2 npm compliance scanner / D-3 
+JSR centralization scanner / D-4 file-link audit / D-5 task prune / D-6 bump 
+wrapper — each single-concern, < 30 LOC, names a proving gate
+- Risk register: PASS — false-positive lockout → report-only → FAIL (DH-3); 
+prune references via grep; bump parity via snapshot test; `deno.json` 
+hunk-scoped diff-review
+- Gate set selected: PASS — sibling of `check-doctrine.ts` (per-package) + wired
+into `ci` (where `arch:check` is NOT today)
+- Deferred scope explicit: PASS — Non-Scope (LOCKED — never) enumerates catalog 
+restructuring, pin edits, `scaffold-versions.ts` touch, release-time transform, 
+dep upgrade, file/link adoption
+- jsr-audit: N/A — this wave ships scanner tooling, no public-surface change
+
+**Load-bearing spot-check (D-G2-2):**
+- 18 member `package.json` files declare npm deps as `catalog:` (Deno 2.8 
+protocol), resolved against root `deno.json` `catalog` block (lines 92-126)
+- Real inline `npm:` pin in source = exactly one: 
+`packages/queue/adapters/amqp.adapter.ts:10` — `npm:amqplib@^0.10.3` (catalog 
+says `^2.0.1`). This is the canonical scanner case.
+- Two string-literal sites containing `"npm:…"` substrings that are NOT real 
+imports: `packages/cli/src/kernel/constants/windows.ts` (compile-bundle external
+map), `packages/fresh-ui/registry.manifest.ts` (user-facing manifest). Naive 
+substring grep would false-positive — non-blocking NIT for the D-2 implementer 
+(parse `import … from "npm:…"` contexts, not arbitrary string literals; document
+allow-list).
+- Cross-member JSR invariants hold (no divergence): `jsr:@zod/zod@4.4.3` ×13, 
+`jsr:@hono/hono@4.12.24` ×7, `jsr:@standard-schema/spec@1.1.0` ×5 — clean 
+baseline, JSR-centralization scanner report→FAIL flip has zero CI-lockout risk
+- Zero `file:`/`link:` specifiers anywhere in workspace members
+- Nothing in plan de-catalogs, edits pins, or touches `scaffold-versions.ts`
+
+**Implementation may begin.** No PR comment posted (workflow owns it per trigger
+contract).
+
+Tokens: ↑ input 8.92M • cache hit 91.73% •  reasoning 5.31K • ↓ output 60.48K • 
+$ 0.8092
+
