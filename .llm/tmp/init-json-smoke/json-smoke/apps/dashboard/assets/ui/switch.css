@@ -1,0 +1,41 @@
+.ns-switch__track {
+  display: inline-flex;
+  width: 2.35rem;
+  height: 1.35rem;
+  align-items: center;
+  padding-inline: 2px;
+  border: 1px solid var(--ns-input-border);
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-muted);
+  transition:
+    background var(--ns-ease-normal),
+    border-color var(--ns-ease-normal),
+    box-shadow var(--ns-ease-normal);
+}
+
+.ns-switch:hover + .ns-switch__track {
+  border-color: var(--ns-border-hover);
+}
+
+.ns-switch__thumb {
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: var(--ns-radius-full);
+  background: var(--ns-card-fg);
+  box-shadow: var(--ns-shadow-xs);
+  transition: transform var(--ns-ease-normal), background var(--ns-ease-normal);
+}
+
+.ns-switch:checked + .ns-switch__track {
+  border-color: var(--ns-primary);
+  background: var(--ns-primary);
+}
+
+.ns-switch:checked + .ns-switch__track .ns-switch__thumb {
+  transform: translateX(1rem);
+  background: var(--ns-primary-fg);
+}
+
+.ns-choice--error .ns-switch__track {
+  border-color: var(--ns-destructive);
+}
