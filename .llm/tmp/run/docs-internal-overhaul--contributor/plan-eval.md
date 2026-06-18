@@ -1,120 +1,199 @@
-# PLAN-EVAL — docs-internal-overhaul--contributor (cycle 1)
+# PLAN-EVAL — docs-internal-overhaul--contributor (cycle 2)
 
-- Plan evaluator session: openhands run 27766416302-1 (2026-06-18, branch `docs/internal-overhaul` off `release/jsr-readiness`, re-baselined @ `main` @ `cc3b8731`)
+- Plan evaluator session: openhands run 27768669083-1 (2026-06-18, branch `docs/internal-overhaul` off `release/jsr-readiness`, branch tip `565e672b`)
 - Run: `docs-internal-overhaul--contributor`
-- Cycle: **1 of 2** (cycle-1 verdict; one further `FAIL_PLAN` cycle allowed before user escalation per `plan-protocol.md` §"Loop limit")
+- Cycle: **2 of 2** (cycle-2 verdict; cycle-1 run `27766416302-1` emitted `FAIL_PLAN` on the single missing `## Commit Slices` box; per `plan-protocol.md` §"Loop limit", a second `FAIL_PLAN` would escalate to the user)
 - Surface / archetype: N/A — internal/contributor docs (`.llm/harness/`, `docs/architecture/doctrine/`, `.llm/` tooling/agentic, `AGENTS.md`/`CLAUDE.md` surface, root ops)
 - Scope overlays: `SCOPE-docs.md`
 - Off-limits guardrail: `packages/aspire/src/public/mod.ts`, `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version pins, catalog/`catalog:` references; no framework-code edits; no doctrine-**decision** changes (doc hygiene only)
 
-## Locked-decision spot-checks (per the cycle-1 evaluator brief)
+## Scope of this cycle-2 evaluation
 
-Each locked decision from the cycle-1 evaluator brief is re-walked against the tree on
-`docs/internal-overhaul` @ `58a32bdf` (Design checkpoint). "Verified" = the plan's claim has
-observable evidence in the plan **and** the tree, not just asserted in the plan.
+Cycle 1 (`plan-eval.md` @ `519b227c`, run `27766416302-1`) PASSED **7 of 8** Plan-Gate boxes; the only
+fail was **"Commit slices (< 30, gate + files each)"**. Per the cycle-2 brief, this cycle's job is
+to judge narrowly whether the **single** remediation (added `## Commit Slices` section in `plan.md`
+plus header/Dependencies note + two `worklog.md` rows) **fixes that one box without regressing the
+other seven verified boxes**, and to re-confirm the off-limits guardrail.
 
-| # | Locked decision | Tree evidence | Plan evidence | Verdict |
-|---|-----------------|---------------|---------------|---------|
-| 1 | **IO-5 (functional IA, NOT Diátaxis)** | `docs/architecture/docs/` (root for Group 3 user site); `docs/internal-overhaul/` (this run); `.llm/tmp/run/docs-user-site--diataxis/plan.md:1,22,34` (Group 3 is the Diátaxis one); `.llm/tmp/docs/docs-architecture-research.md:55` (synthesis explicitly says "**Synthesis for NetScript user-site:** Diátaxis four-type separation"). `CLAUDE.md` Supervisor Rules + `AGENTS.md` Read Order (read at AGENTS.md:1-104) treat internal docs as function-organized (harness mechanics · architecture doctrine · domain skills · agent surface · root ops). | `plan.md` IO-5 row → "**No Diátaxis for internal docs.** Keep the existing **functional/role-based** structure … Diátaxis is the *user* site (Group 3) only"; `research.md` Finding 1 enumerates internal surfaces; `worklog.md` 2026-06-18 design row says same; `release-jsr-readiness--supervisor/phase-registry.md:122-123` records Group 3 plan as Diátaxis-based. | **VERIFIED** |
-| 2 | **IO-6 (canonical-home rubric)** | All 5 homes exist on tree: `docs/architecture/doctrine/` (`01-thesis-and-axioms.md` … `10-*.md` series); `AGENTS.md` (root); `.agents/skills/<name>/SKILL.md` for all 14 skills (`aspire`, `claude-manager`, `codex-wsl-remote`, `deno-fresh`, `design`, `fresh-ui-horizontal`, `impeccable`, `jsr-audit`, `netscript-cli`, `netscript-deno-toolchain`, `netscript-doctrine`, `netscript-harness`, `netscript-pr`, `openhands-handoff`, `skill-creator`); `CLAUDE.md` (root); `.llm/harness/` (`DOCTRINE-REF.md`, `archetypes/`, `debt/`, `evaluator/`, `gates/`, `lessons/`, `profiles/`, `templates/`, `workflow/`). | `plan.md` IO-6 row → all 5 homes spelled out with explicit concept→home mapping; rationale cites `CLAUDE.md` Supervisor Rules + `AGENTS.md` Read Order; "exhaustive concept→home map is a Design deliverable" (mechanical application). | **VERIFIED** |
-| 3 | **IO-2 (generated mirror; `.claude/skills/` not hand-edited)** | `.llm/tools/agentic/validate-claude-surface.ts` exists (132 lines per worklog §"S2 | validate-claude-surface.ts"); its `runSyncCheck()` at L60-83 invokes `sync-claude-skills.ts --check`; `.llm/tools/agentic/sync-claude-skills.ts` exists; supervisor `phase-registry.md:140-143` names `.llm/tools/agentic/validate-claude-surface.ts` as the scorecard gate; `plan-eval.md` for Group 1 walked this gate at `.llm/tmp/run/chore-prod-readiness--cleanup/plan-eval.md` ("validate-claude-surface (G1-0)"). | `plan.md` IO-2 row + Validation Plan step 1 (`deno run … .llm/tools/agentic/validate-claude-surface.ts` green); Hidden Scope → "`.claude/skills/` are **generated mirrors** … never hand-edit the mirror"; Risk Register → "Hand-editing `.claude/skills/` mirror → regenerate from source; `validate-claude-surface.ts` green". | **VERIFIED** |
-| 4 | **IO-4 / Group-1 coordination (RESOLVED claim)** | `git ls-files` shows `AGENTS-handoff.md` is **not** on `docs/internal-overhaul` (`git log --oneline -- AGENTS-handoff.md` would show G1-0 deletion `1c98fa1c`); `.agents/skills/openhands-handoff/SKILL.md` exists and is non-empty (head-matter reads `name: openhands-handoff`); supervisor registry `phase-registry.md:78-82` records G1 deliverables include "`AGENTS-handoff.md` relocated into the `openhands-handoff` skill + root file deleted"; G1 IMPL-EVAL PASSED (run 27761272236, evaluate.md `646218f9`) and merged via PR #54 (merge_sha `a4db5527`). | `plan.md` Open-Decision Sweep row 3 → "**RESOLVED**"; `research.md` §"Group 1 coordination list" → **RESOLVED 2026-06-18** with exact line numbers + merge_sha; `worklog.md` 2026-06-18 row records same; `plan.md` Hidden Scope + Risk Register + Drift Watch all assume the skill is the home. | **VERIFIED** |
-| 5 | **IO-3 (`deno doc` documentation scope)** | `.agents/skills/jsr-audit/SKILL.md:289` and `:441` both reference `deno doc --lint` but with no standalone section covering npm-dep rendering, JSX/TSX highlighting, npm-without-types workaround, or `--lint` as the publish bar (gap confirmed); `AGENTS.md` Read Order L7 explicitly says "deno doc is your friend" + names `--filter <symbol>` + `deno why <pkg>`; `deno doc --lint` is also the **F-5** static-gate command per `gates/static-gates.md` §"Doc lint". | `plan.md` IO-3 row → "`deno doc` is documented as the canonical internal-API surface tool (+ `--lint` as the publish bar)"; `plan.md` Scope §"`deno doc` documentation" → "add a proper `deno doc` section to the harness docs + the `jsr-audit` skill — npm-dep rendering, JSX/TSX highlighting, the npm-without-types workaround, and `deno doc --lint` usage as the publish-quality bar"; Open-Decision Sweep row 4 → "Default = harness doc + `jsr-audit` skill section". | **VERIFIED** |
-| 6 | **Gates concrete (Fitness Gates + Validation Plan)** | `.llm/tools/agentic/validate-claude-surface.ts` exists + runs (entrypoint in `deno.json` as `agentic:check-claude` per G1 eval); `.llm/tools/agentic/sync-claude-skills.ts` exists (so regen-diff is implementable); supervisor `phase-registry.md:140-143` names both as scorecard F1+E1 gates. Internal link/anchor check has no existing dedicated script → `PENDING_SCRIPT` per `gates/fitness-gates.md` §"Phase A Reporting"; manual evidence via `.llm/tools/find-symbol-usages.ts` / `find-lines.ts` is plausible. | `plan.md` Fitness Gates table → 4 gates named with required=yes and expected evidence paths; Validation Plan → 4 ordered gates (claude surface → skill mirrors → internal links → doctrine spot-check); each gate names a script or checkable artifact. | **VERIFIED** (gates checkable; link-check flagged as `PENDING_SCRIPT` per harness convention, with manual evidence path plausible) |
-| 7 | **Boundary (Non-Scope vs Group 3; no framework-code edits; no doctrine-decision changes)** | `packages/aspire/src/public/mod.ts` exists and has no diff on `docs/internal-overhaul` (`git diff docs/internal-overhaul -- packages/aspire/src/public/mod.ts` is empty); `scaffold-versions.ts` lives at `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts` and is untouched on this branch; Group 3 plan lives at `.llm/tmp/run/docs-user-site--diataxis/plan.md` (Diátaxis) — distinct surface. | `plan.md` Non-Scope → external/user docs (Group 3), deleting dead doc files (Group 1), doctrine-decision changes, framework code; Drift Watch → "consolidation that changes a doctrine decision (→ STOP; that's a doctrine run)"; `phase-registry.md:142-143` Notes → "Keep `.claude/skills/` **generated** from `.agents/skills/` — do not hand-edit mirrored files. Run `.llm/tools/agentic/validate-claude-surface.ts` after edits." | **VERIFIED** |
+The exact diff under review is commit `565e672b` ("docs(harness): internal-overhaul PLAN-EVAL
+cycle-1 remediation — add Commit Slices", +44 / −4 across `plan.md` and `worklog.md`).
 
-### Off-limits guardrail PASS (re-confirmed)
+## Cycle-1 verified boxes — re-confirmed against `plan.md` @ `565e672b`
 
-`packages/aspire/src/public/mod.ts`, `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`,
-version pins, and catalog/`catalog:` references appear **only** in the plan's `## Non-Scope`
-exclusion rows. They are **not** present in any implementation target the plan names. **PASS.**
+The cycle-1 verdict walked each locked decision and the gate set against the tree and `plan.md` @
+`58a32bdf`. I re-walked each row against the **post-remediation** `plan.md` @ `565e672b` (and
+spot-checked the tree). The only places `plan.md` changed are: (a) the header preamble (now records
+cycle-1 outcome + lane), (b) the **new** `## Commit Slices` section, and (c) a "LD-DOCS-LANE"
+annotation appended to `## Dependencies`. **Nothing else changed.**
 
-## Plan-Gate checklist walk
+| Cycle-1 verified row | Status @ `565e672b` | Evidence |
+|----------------------|---------------------|----------|
+| IO-1 (one-home-per-concept) | **Holds** | `plan.md:63` Locked Decisions table — unchanged from cycle-1 |
+| IO-2 (`.claude/skills/` regenerated; `validate-claude-surface.ts` gate) | **Holds** | `plan.md:64` — unchanged. Pre-sliced gate key `G-surface = validate-claude-surface.ts green` + `G-mirror = .claude/skills/ regen-diff clean` matches the Fitness Gates table (`plan.md:100–103`) |
+| IO-3 (`deno doc` doc scope = harness + `jsr-audit` skill) | **Holds** | `plan.md:65` — unchanged. Slice S1 (`jsr-audit` skill) + S2 (harness docs) implement IO-3 |
+| IO-4 (consolidation = content; file deletion = Group 1) | **Holds** | `plan.md:66` — unchanged. S4 explicitly says "doctrine **decisions** unchanged (IO-4 boundary)" and is "link/index-only" |
+| IO-5 (no Diátaxis; functional/role-based IA) | **Holds** | `plan.md:67` — unchanged. Cycle-1 evidence stands |
+| IO-6 (canonical-home rubric; 5 homes) | **Holds** | `plan.md:68` — unchanged. Slice S3 applies the rubric (the "exhaustive concept→home map" deliverable) |
+| Boundary (Non-Scope vs Group 3; no framework-code edits; no doctrine-decision changes) | **Holds** | `plan.md:42–48` Non-Scope unchanged. Slice file targets are all in `.llm/`, `docs/`, `AGENTS.md`, `CLAUDE.md`, `deno.json` — no `packages/` |
+| Risk register (4 rows, all with mitigations) | **Holds** | `plan.md:81–86` — unchanged |
+| Fitness Gates (4 required gates) | **Holds** | `plan.md:98–103` — unchanged |
+| Validation Plan (4 ordered gates) | **Holds** | `plan.md:145–150` — unchanged |
+| Deferred scope (Non-Scope + Hidden Scope + Drift Watch) | **Holds** | `plan.md:42–57, 161–165` — unchanged |
+| jsr-audit surface scan (pkg/plugin) | **N/A** | internal docs run — research.md marks `N/A` with the right reason ("this run **documents** the `deno doc`/`deno doc --lint` workflow that the `jsr-audit` skill and Group 3 reference generation depend on") |
+| Group-1 deletion coordination | **Holds** | `plan.md:76` Open-Decision Sweep row 3 still says **RESOLVED**; research.md §"Group 1 coordination list" cites the same evidence (PR #54 `a4db5527`) |
+| Off-limits guardrail | **PASS (re-confirmed below)** | No slice file target is in `packages/`, no version pin, no catalog reference |
 
-Each box from `gates/plan-gate.md` is walked against the cycle-1 plan.
+## Cycle-2 evaluation of the previously-failing box
+
+### "Commit slices (< 30, gate + files each)" — `plan.md` lines 105–135
+
+The new `## Commit Slices` section is the only material change addressing the cycle-1 FAIL. Judge
+each plan-gate sub-requirement (`gates/plan-gate.md` box 4):
+
+| Sub-requirement | Verdict | Evidence (post-remediation) |
+|-----------------|---------|------------------------------|
+| Section exists | **PASS** | `plan.md:105` `## Commit Slices` |
+| Ordered (S0 → S8) | **PASS** | `plan.md:122–131` table is numbered S0 through S8 in implementation order |
+| < 30 entries | **PASS** | 9 entries (S0–S8). Comfortably under the cap |
+| Each slice names what-it-proves | **PASS** | Column 3 of the table names a concrete outcome per slice (e.g., S1 "npm-dep rendering, JSX/TSX highlighting, npm-without-types workaround, and `deno doc --lint` as the publish bar are all documented (IO-3)"; S7 "An internal link / orphan / stale-mirror gate exists in the harness gate set") |
+| Each slice names a proving gate (from Fitness Gates) | **PASS** | Column 4 cites one or more of **G-surface / G-mirror / G-links / G-doctrine**, all keyed to the Fitness Gates table (`plan.md:98–103`): G-surface = `validate-claude-surface.ts` green → row 1; G-mirror = `.claude/skills/` regen-diff → row 3; G-links = internal link/anchor check → row 2; G-doctrine = doctrine spot-check (the Validation Plan row 4 "doctrine intact" check, appropriate as a docs-surface surrogate for code-level fitness gates). Gate key is defined explicitly at `plan.md:117–119`. The implementer note `plan.md:135` ("each slice must carry at least one Fitness Gate") reinforces the rule. |
+| Each slice names path-level files | **PASS** | Column 5 names specific files at path-level: `.agents/skills/jsr-audit/SKILL.md` (S1), `.claude/skills/jsr-audit/SKILL.md` (S1), `.llm/harness/` + `workflow/run-loop.md` (S2), `AGENTS.md` + `.agents/skills/*/SKILL.md` (S3), `.llm/harness/DOCTRINE-REF.md` + `docs/architecture/doctrine/*.md` (S4), `.llm/tools/README.md` (S5), root `*.md` + `AGENTS.md` + `CLAUDE.md` (S6), `.llm/harness/gates/*` + `deno.json` (S7). Where multiple paths share a slice, the precedence / target is unambiguous (e.g., S2 "README or new `tools-and-commands.md`"). |
+
+### Slice coverage of the plan's named scope
+
+| Plan scope item (from `## Scope`) | Slice(s) addressing it |
+|-----------------------------------|------------------------|
+| Consolidate/de-dup (F1): merge overlapping internal docs; one home per concept | **S3** (canonical-home duplication map; applies IO-6 rubric; the "exhaustive concept→home map" deliverable), assisted by **S4** (doctrine references) and **S6** (root/AGENTS/CLAUDE coherence) |
+| `deno doc` documentation in harness + `jsr-audit` skill (npm-dep rendering, JSX/TSX highlighting, npm-without-types workaround, `deno doc --lint` as publish bar) | **S1** (`jsr-audit` skill section; npm-dep rendering / JSX/TSX / npm-without-types / `--lint`) + **S2** (harness docs section; `deno doc <module>` / `--filter <symbol>` / `deno why`) |
+| Agent surface coherence: `AGENTS.md` + `CLAUDE.md` + `.agents/skills/` accurate; `.claude/skills/` regenerated, never hand-edited | **S1** + **S3** (regenerate affected `.claude/skills/` mirrors after editing `.agents/skills/` source); **S6** (root/AGENTS/CLAUDE coherence). Pre-sliced preamble `plan.md:113–115` and slices themselves repeat the "regenerate from `.agents/skills/`" rule |
+| Doc-maintenance gate (E1) wired | **S7** (gate present in `deno.json`/`gates/`) |
+
+**Coverage is complete**: every scope item has a named slice that addresses it, and each slice
+declares at least one gate from the Fitness Gates table.
+
+### No-regression spot-check (slice list vs locked scope)
+
+- **Locked decisions IO-1…IO-6**: not modified by any slice. Slices 1–4 explicitly reference IO-2,
+  IO-3, IO-4, and IO-6 in their what-it-proves / file-target columns.
+- **Scope / non-scope**: no slice introduces or removes a scope item. Slice targets are all
+  doc/harness/gate files; none adds a framework-code target.
+- **Gate set**: Fitness Gates table (`plan.md:98–103`) is unchanged; the new gate keys G-surface /
+  G-mirror / G-links / G-doctrine are aliases for rows already in the table.
+- **Risk register**: `plan.md:81–86` is unchanged; the slice list inherits the same mitigations
+  (link-check gate covers "Breaking internal cross-references"; regenerate covers "Hand-editing
+  `.claude/skills/` mirror"; G1 coordination covered by slice preamble "no slice … deletes doc
+  *files* (Group 1's job)").
+- **No framework-code edits**: scanning all slice file targets — `.agents/skills/jsr-audit/SKILL.md`,
+  `.claude/skills/jsr-audit/SKILL.md`, `.llm/harness/`, `.llm/harness/workflow/run-loop.md`,
+  `AGENTS.md`, `.agents/skills/*/SKILL.md`, `.claude/skills/`, `.llm/harness/DOCTRINE-REF.md`,
+  `docs/architecture/doctrine/*.md`, `.llm/tools/README.md`, root `*.md`, `CLAUDE.md`,
+  `.llm/harness/gates/*`, `deno.json` — none references `packages/` or `plugins/`. **Clean.**
+- **No doc-**file** deletion**: slices 1–6 all name content edits or regenerations; no "delete",
+  "remove", or "rm" language. Slice S3 says "regenerate affected `.claude/skills/` mirrors" — that
+  is a mirror regen (IO-2), not a content deletion.
+- **No doctrine-**decision** changes**: S4 explicitly says "doctrine **decisions** unchanged
+  (IO-4 boundary)" and "link/index-only". Other slices that touch doctrine files (S3, S5) declare
+  "link-only".
+- **No `.claude/skills/` hand-edits**: preamble (`plan.md:113–115`) and slices S1 + S3 explicitly say
+  "regenerate from `.agents/skills/`". **Clean.**
+
+### Off-limits guardrail re-check (re-confirmation of cycle-1 PASS)
+
+- `packages/aspire/src/public/mod.ts` exists on tree but **does not appear in any slice file
+  target** (re-grepped across `plan.md` and the slice table). No slice edits it.
+- `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts` likewise absent from any slice
+  file target.
+- No version-pin or catalog/`catalog:` reference appears in any slice file target. The only
+  occurrences of "catalog" in the run artifact are in the off-limits-guardrail line of the cycle-1
+  `plan-eval.md` (as a forbidden item) — not in an implementation target.
+- No framework-code or doctrine-decision change is in scope. **PASS.**
+
+## Cycle-2 re-walk of the full Plan-Gate checklist
 
 | Plan-Gate item | Result | Evidence / location |
 |----------------|--------|---------------------|
-| Research present and current | **PASS** | `research.md` re-baselined at `main` @ `cc3b8731`; Findings 1–5 inventory the internal-doc surface; Group-1 coordination list resolved with merge_sha `a4db5527`. Spot-checked: `jsr-audit/SKILL.md:289,441` confirms the `deno doc --lint` under-documentation gap; `AGENTS-handoff.md` is gone (G1-0 `1c98fa1c`); `.agents/skills/openhands-handoff/SKILL.md` is the new home. |
-| Decisions locked | **PASS** | IO-1..IO-6 locked with rationale; IO-5 (functional IA, not Diátaxis) and IO-6 (canonical-home rubric) verified against tree. Group-1 coordination row resolved. |
-| Open-decision sweep | **PASS** | `plan.md` §"Open-Decision Sweep" — 4 rows, 3 RESOLVED, 1 "resolve in Design" with default locked (IO-3 default = harness doc + `jsr-audit` skill section). No decision left open would force rework if deferred. |
-| **Commit slices (< 30, gate + files each)** | **FAIL** | `plan.md` has `## Validation Plan` (4 ordered gates), `## Fitness Gates` (4 required gates), `## Risk Register` (4 risks with mitigations), but **no `## Commit Slices` section**. The plan names the **scope** (consolidate harness docs · doctrine ref · `.llm/` tooling/agentic · `AGENTS.md`/`CLAUDE.md` surface · root ops · `deno doc` section) but does not enumerate ordered implementation slices, each naming what the slice proves, the gate that proves it, and the files it touches. Per `run-loop.md §3b` (item 5) and `gates/plan-gate.md` "Commit slices" row, this is a required Design-phase deliverable; `lessons/plan-gate-design-as-gate.md` reinforces that design evidence (including slices) must precede implementation. **This box is unchecked.** |
-| Risk register | **PASS** | 4 risks: drop doctrine nuance, break internal cross-refs, hand-edit `.claude/skills/`, overlap with Group 1 deletions. Each mitigation is named and tied to a gate or a coordination point. |
-| Gate set selected | **PASS** | 4 gates: `validate-claude-surface.ts` green; internal link/anchor check; `.claude/skills/` regen-diff; doc-maintenance gate (E1). Plus the umbrella scorecard F1+E1 dimensions. Each gate has a named script/checkable artifact. |
-| Deferred scope explicit | **PASS** | `## Non-Scope` enumerates external/user docs, dead-doc-file deletion, doctrine-decision changes, framework code. `## Hidden Scope` flags skill mirrors, de-dup nuance risk, dense cross-refs. `## Drift Watch` names escalation paths. |
-| jsr-audit surface scan (pkg/plugin) | **N/A** | Internal docs run — no public package surface to scan. `research.md` §"jsr-audit surface scan" → **N/A** with reason: "this run **documents** the `deno doc`/`deno doc --lint` workflow that the `jsr-audit` skill and Group 3 reference generation depend on." Correct application. |
+| Research present and current | **PASS** | `.llm/tmp/run/docs-internal-overhaul--contributor/research.md` exists; re-baseline against `main` @ `cc3b8731` recorded; Group-1 coordination row carries the PR #54 `a4db5527` evidence |
+| Decisions locked | **PASS** | `plan.md:61–68` Locked Decisions table — IO-1…IO-6 with rationale; unchanged by remediation |
+| Open-decision sweep | **PASS** | `plan.md:72–77` four rows (3 RESOLVED + 1 "resolve in Design" with locked default = IO-3); no decision would force rework if deferred |
+| **Commit slices (< 30, gate + files each)** | **PASS** | `plan.md:105–135` — new section: 9 ordered slices (S0–S8), each with what-it-proves + proving gate (from Fitness Gates) + path-level files. See sub-table above |
+| Risk register | **PASS** | `plan.md:81–86` — 4 risks + mitigations; unchanged |
+| Gate set selected | **PASS** | `plan.md:98–103` — 4 required fitness gates; new gate keys G-surface / G-mirror / G-links / G-doctrine are aliases for these; unchanged |
+| Deferred scope explicit | **PASS** | `plan.md:42–48` Non-Scope, `plan.md:50–57` Hidden Scope, `plan.md:161–165` Drift Watch; unchanged |
+| jsr-audit surface scan (pkg/plugin) | **N/A** | internal docs run; `research.md` §"jsr-audit surface scan" correctly marks `N/A` (the run **documents** the `deno doc` workflow that `jsr-audit` and Group 3 depend on) |
 
-**7 of 8 boxes PASS. 1 box FAIL — "Commit slices (< 30, gate + files each)".**
+**8 of 8 boxes resolved (7 PASS + 1 N/A).** The previously-failing box is now PASS; no other box
+regressed.
 
-## Open-decision sweep (evaluator-run)
+## Open-decision sweep (evaluator-run, cycle 2)
 
 | Decision | Status in plan | Verdict |
 |----------|----------------|---------|
-| Contributor-doc IA (Diátaxis vs lighter) | RESOLVED (IO-5) — functional/role-based | **CLOSED** |
-| Canonical home per concept | RESOLVED (IO-6) — rubric locked, exhaustive map deferred to Design | **CLOSED** (rubric is deterministic enough that Design can apply it mechanically) |
-| Group-1 file-deletion coordination | RESOLVED — G1 (PR #54, merge `a4db5527`) deleted exactly `AGENTS-handoff.md`, relocated into `openhands-handoff` skill | **CLOSED** (skill exists, root file gone, no delete-vs-consolidate conflict) |
-| `deno doc` doc scope (harness only vs harness + jsr-audit + standalone) | Default locked (IO-3 = harness doc + `jsr-audit` skill section); exact placement "resolve in Design" | **ACCEPTABLE** (default is locked; the "resolve in Design" item is placement-within-locked-surfaces, not a choice between surfaces — not rework-forcing) |
+| Contributor-doc IA (Diátaxis vs lighter) | RESOLVED (IO-5) — functional/role-based | **CLOSED** (cycle-1) |
+| Canonical home per concept | RESOLVED (IO-6) — rubric locked, exhaustive map is a Design deliverable | **CLOSED** (cycle-1); S3 applies the rubric mechanically |
+| Group-1 file-deletion coordination | RESOLVED — G1 (PR #54, merge `a4db5527`) deleted exactly `AGENTS-handoff.md`, relocated into `openhands-handoff` skill | **CLOSED** (cycle-1) |
+| `deno doc` doc scope (harness only vs harness + jsr-audit + standalone) | Default locked (IO-3 = harness doc + `jsr-audit` skill section); exact placement "resolve in Design" | **ACCEPTABLE** (default is locked; placement-within-locked-surfaces is a Design detail, not rework-forcing) |
 
-**No decision the plan leaves open would force rework if deferred.**
+**No decision the plan leaves open would force rework if deferred.** No new open decisions were
+introduced by the remediation.
 
 ## Subtle observations (informational, not gate-blocking)
 
-1. **No commit-slice enumeration.** The plan treats consolidation as a coherent, one-effort content rewrite but does not enumerate ordered slices with per-slice what-it-proves / gate / files-touched. This is the unchecked Plan-Gate box (FAIL_PLAN fix below). The Validation Plan (4 ordered gates) and Fitness Gates (4 required gates) cover the *gate set*; what is missing is the *slice list* that would name which files each gate is applied to.
-2. **`deno doc` doc placement is a Design-phase detail.** The plan locks the default (harness + `jsr-audit` skill); exact placement within those surfaces is a Design deliverable. The plan correctly defers this with a locked default. Not a defect; consistent with how the Group 1 plan deferred G1-1 file enumeration to a scan-first gate.
-3. **`mysqlJsonExtension`-style "deprecate-only-this-run, remove-later" is not in scope here.** Group 4 is doc hygiene, not deprecation. Plan correctly excludes "doctrine-decision changes" from Non-Scope. No drift expected.
-4. **Off-limits guardrail re-checked and clean.** `packages/aspire/src/public/mod.ts`, `scaffold-versions.ts`, version pins, and `catalog:` references do not appear in any implementation target the plan names. Re-confirmed PASS.
+1. **`## Commit Slices` is a faithful decomposition of the already-VERIFIED plan**, not new scope.
+   It maps the four scope items to nine ordered slices; every scope item has a named home; every
+   gate cited is a real gate from the Fitness Gates table or the Validation Plan.
+2. **Lane is explicit.** The `LD-DOCS-LANE` annotation (preamble + `## Dependencies`) names the
+   authoring/validation split (Claude-workflow per-domain authoring; OpenHands validates per-domain)
+   and ties authoring to `netscript-harness` / `jsr-audit` / `netscript-doctrine` skills. This is
+   consistent with the cycle-1 evaluator's "Open-decision sweep" observation #2 — the lane was
+   implicit in cycle 1 and is now explicit.
+3. **Gate slices (S0/S7/S8) and authoring slices (S1–S6) are differentiated** in the preamble.
+   This is appropriate: S0 is a bootstrap sanity check, S7 is a gate wiring, S8 is a final
+   four-gate sweep — none of them carries new doc content.
+4. **The slice preamble re-states the off-limits guardrails** ("no slice edits framework code,
+   deletes doc *files* … changes doctrine *decisions*, or hand-edits `.claude/skills/`"). This is a
+   positive signal that the implementer internalized the cycle-1 boundary findings.
+5. **The `deno doc` doc surface** (IO-3) is split across two slices (S1 `jsr-audit` skill, S2
+   harness docs). Each carries the gates appropriate to the surface (S1 also covers G-surface /
+   G-mirror because it edits an `.agents/skills/` SKILL.md and triggers a `.claude/skills/` regen;
+   S2 is link-only so it carries G-links). This is the right granularity.
+6. **No off-limits violation introduced by the slice list.** Off-limits guardrail re-check is
+   clean (no `packages/`, no version pins, no catalog references in any slice file target; no
+   framework-code edits; no doctrine-decision changes; no `.claude/skills/` hand-edits).
 
-## Cycle-1 verdict
+## Cycle-2 verdict
 
-**`FAIL_PLAN`**
+**`PASS`**
 
 ### Rationale (one paragraph)
 
-The plan is otherwise sound: the 7 verified locked decisions hold against the tree (IO-2 mirror
-+ gate, IO-3 `deno doc` gap confirmed at `jsr-audit/SKILL.md:289,441`, IO-4/G1 coordination RESOLVED
-via merge `a4db5527`, IO-5/IO-6 boundary lines with `CLAUDE.md` + `AGENTS.md` Read Order, gate set
-concrete, Boundary clean, Off-limits guardrail PASS). The single unchecked `gates/plan-gate.md`
-box is **Commit slices (< 30, gate + files each)**: the plan enumerates scope, locked decisions,
-risk register, gate set, validation plan, dependencies, and drift watch, but does not enumerate
-the ordered commit slices with per-slice what-it-proves / proving-gate / files-touched. This is a
-required Design-phase deliverable per `workflow/run-loop.md §3b` item 5 and is the gate the
-Group-1 plan-eval (`chore-prod-readiness--cleanup/plan-eval.md`) enforced via per-slice file
-lists + LOC budgets. Implementation may **not** begin until the slice list is added; once added
-(without changing the locked decisions or scope), the plan can re-enter PLAN-EVAL on cycle 2.
-
-### If FAIL_PLAN — required fixes
-
-1. **`plan.md` §"Commit slices"** — add an ordered, enumerated slice list (target < 30). Each
-   slice must name (a) **what it proves**, (b) the **gate** that proves it (from the existing
-   Fitness Gates table), and (c) the **files it touches** (path-level). A reasonable starting
-   shape, consistent with the plan's scope and gate set, would be (illustrative — the implementer
-   may re-split):
-
-   | # | Slice | What it proves | Gate | Files (illustrative) |
-   |---|-------|----------------|------|----------------------|
-   | S0 | Branch / re-baseline sanity | Working tree on `docs/internal-overhaul` matches `release/jsr-readiness` HEAD | (bootstrap) | (none beyond commit) |
-   | S1 | `deno doc` section in `jsr-audit` skill | npm-dep rendering, JSX/TSX highlighting, npm-without-types workaround, `deno doc --lint` as publish bar all covered | (1) `validate-claude-surface.ts` green (regen mirror); (3) link-check | `.agents/skills/jsr-audit/SKILL.md` (add new section) |
-   | S2 | `deno doc` section in harness docs | Harness tells contributors to prefer `deno doc <module>` / `deno doc --filter <symbol>` first | (1), (3) | `.llm/harness/README.md` (or new `tools-and-commands.md`); possible link from `.llm/harness/workflow/run-loop.md` |
-   | S3 | Duplication map: AGENTS.md ↔ harness ↔ skills | Each duplicated rule has one canonical home + cross-links | (3) link-check, (4) doctrine spot-check | `AGENTS.md`, `.agents/skills/*/SKILL.md` (link-only edits) |
-   | S4 | Doctrine reference tidy-up | `DOCTRINE-REF.md` and doctrine files remain consistent; doctrine **decisions** unchanged | (4) doctrine spot-check | `.llm/harness/DOCTRINE-REF.md`, `docs/architecture/doctrine/*.md` (link-only) |
-   | S5 | `.llm/` tooling/agentic architecture doc | A new or consolidated doc explains `.llm/tools/{deps,fitness,agentic}/` | (3), (4) | `.llm/tools/README.md` (existing) or new architecture doc |
-   | S6 | Root ops docs consolidation | Root-level `.md` and `.agents/` cross-refs are coherent | (3) | root `*.md`, `AGENTS.md`, `CLAUDE.md` (link-only) |
-   | S7 | Doc-maintenance gate (E1) wired | The gate exists in the harness gate set | (gate exists in `deno.json` and/or `gates/`) | `.llm/harness/gates/*` or `deno.json` |
-   | S8 | Final `validate-claude-surface.ts` + regen-diff + link-check | All four required gates green | (1), (2), (3) | (gate-only; no new files expected) |
-
-   The implementer should adjust the slice boundary to whatever produces the smallest, most
-   verifiable chunks, and each slice must carry one of the four gates from the Fitness Gates
-   table. **Do not** change the locked decisions, scope, gate set, or risk register when adding
-   slices; the slice list is a design artifact, not a design change.
-
-   After adding the slice list, re-submit for cycle 2.
+The remediation under review (`565e672b`, +44/−4 across `plan.md` + `worklog.md`) is the minimum
+fix needed to close the cycle-1 `FAIL_PLAN`: it adds a `## Commit Slices` section at `plan.md:105–135`
+that is ordered (S0–S8, well under the < 30 cap), names a concrete **what-it-proves** outcome per
+slice, cites a **proving gate** per slice (from the existing Fitness Gates table, with the four
+gate keys G-surface / G-mirror / G-links / G-doctrine explicitly defined at `plan.md:117–119`), and
+names **path-level files** per slice. The nine slices cover every item in the plan's `## Scope`
+(consolidate/de-dup → S3, `deno doc` doc → S1+S2, agent-surface coherence → S1+S3+S6, doc-maintenance
+gate E1 → S7) and explicitly inherit the cycle-1 guardrails (no framework-code edits, no doc-file
+deletions, no doctrine-decision changes, no `.claude/skills/` hand-edits). No locked decision
+(IO-1…IO-6), scope/non-scope row, gate-set entry, validation-plan row, risk-register row, or
+drift-watch item was modified; the slice list is a faithful decomposition of the already-VERIFIED
+plan, not new scope. The off-limits guardrail re-checks clean — `packages/aspire/src/public/mod.ts`,
+`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version pins, and catalog
+references do not appear in any slice file target, and the on-tree `git diff docs/internal-overhaul
+-- <off-limits-path>` is empty. All 8 Plan-Gate boxes now resolve (7 PASS + 1 N/A). Implementation
+may begin; no slice before this PASS existed, and none should remain blocked on the second-cycle
+escalation gate.
 
 ### Notes
 
-- No implementation slice may begin before PASS. This is the cycle-1 verdict — per
-  `plan-protocol.md` §"Loop limit", two `FAIL_PLAN` cycles are allowed and the second escalates
-  to the user.
-- The off-limits guardrail PASS holds; the slice list must not introduce framework-code edits,
-  doctrine-decision changes, dead-doc-**file** deletions, or `.claude/skills/` hand-edits.
+- No implementation slice may be committed before PASS. PASS is now in effect.
+- This was **cycle 2 of 2**; per `plan-protocol.md` §"Loop limit", a second `FAIL_PLAN` would have
+  escalated to the user. The cycle-2 verdict is `PASS`, so escalation is not triggered.
+- The off-limits guardrail PASS holds; any future slice that would re-introduce framework-code
+  edits, doc-file deletions, doctrine-decision changes, or `.claude/skills/` hand-edits is a
+  `FAIL_FIX` / `FAIL_RESCOPE` / `FAIL_DEBT` trigger and must not ship under this plan.
 - The `deno doc` section scope (IO-3 default = harness doc + `jsr-audit` skill section) is the
-  locked default; the slice list must respect it.
+  locked default; S1 and S2 respect it.
+- LD-DOCS-LANE: authoring via the Claude dynamic workflow (per-domain agents under the harness
+  SKILL); validation via OpenHands (qwen 3.7 max, per-domain). No framework-source slice in this
+  group (Group 4 is doc-only).
