@@ -16,5 +16,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 9772843488a0eb3def793c8a66ea4014b6964b45: chore(prod-readiness): G1-3c — migrate MSSQL integrated auth
 - 51c3b60d2d880065d251df860d2790cedee66947: chore(prod-readiness): G1-4 — remove Fresh deprecated options
 - fcd41059c9aa27c016b03fc227c620f9292c635a: chore(prod-readiness): G1-5 — remove workers recurring job API
+- f72ea265d0f08a597ebc9d6229ff226312d65bfa: chore(prod-readiness): G1-6 — prove bounded dead-code sweep
 
 <!-- appended after each commit -->
