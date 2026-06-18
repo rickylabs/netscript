@@ -86,6 +86,12 @@ are untouched. Slices run low→high blast radius.
 | 2026-06-18 | G1-3b | `deno doc --lint packages/database/mod.ts` | FAIL (pre-existing) | Remaining private-type-ref is `PostgresAdapter.prototype.getDriverAdapter` → `PostgresDriverAdapter`; covered by `D-G1-3a`. |
 | 2026-06-18 | G1-3b | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/database` dry-run completed successfully in the 27-unit workspace pass. |
 | 2026-06-18 | G1-3b | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
+| 2026-06-18 | G1-3c | Consumer scan | PASS | `trustedConnection` references were limited to the MSSQL adapter option/writer; post-edit scan found only `authentication.type = 'ntlm'` paths. |
+| 2026-06-18 | G1-3c | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/database --ext ts,tsx` | PASS | 20 files selected, 1 batch, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-3c | `deno test -A --unstable-kv packages/database` | PASS | 4 passed, 0 failed; includes new `packages/database/tests/mssql-adapter_test.ts`. |
+| 2026-06-18 | G1-3c | `deno doc --lint packages/database/mod.ts` | FAIL (pre-existing) | Remaining private-type-ref is `PostgresAdapter.prototype.getDriverAdapter` → `PostgresDriverAdapter`; covered by `D-G1-3a`. |
+| 2026-06-18 | G1-3c | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/database` dry-run completed successfully in the 27-unit workspace pass; no lock churn retained. |
+| 2026-06-18 | G1-3c | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
 
 ## Handoff Notes
 

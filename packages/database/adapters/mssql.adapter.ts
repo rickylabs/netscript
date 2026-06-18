@@ -23,7 +23,7 @@ import type {
  * Configuration object for @prisma/adapter-mssql.
  * This is what the PrismaMssql adapter expects.
  *
- * Note: Windows Authentication (trustedConnection) requires the `tedious` driver
+ * Note: Windows Authentication requires the `tedious` driver
  * to be configured with NTLM authentication type, which is only supported on Windows.
  * For cross-platform compatibility, use SQL Server authentication (user/password).
  */
@@ -62,8 +62,6 @@ export interface MssqlAdapterConfig {
     encrypt?: boolean;
     /** Whether to trust the server certificate. */
     trustServerCertificate?: boolean;
-    /** @deprecated Use authentication.type = 'ntlm' instead */
-    trustedConnection?: boolean;
   };
 }
 
@@ -413,7 +411,10 @@ export class MssqlAdapter<
     }
 
     if (integratedSecurity || (!username && !password)) {
-      config.options!.trustedConnection = true;
+      config.authentication = {
+        type: 'ntlm',
+        options: {},
+      };
     } else {
       config.user = username;
       config.password = password;
