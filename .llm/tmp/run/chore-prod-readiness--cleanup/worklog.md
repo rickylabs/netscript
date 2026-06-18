@@ -4,7 +4,7 @@
 |-------|-------|
 | Run ID | `chore-prod-readiness--cleanup` |
 | Branch | `chore/prod-readiness` (off `release/jsr-readiness`) |
-| Status | `active` (**PLAN-EVAL PASS @ cycle 2**; implementation gated on user dispatch + G2 PASS) |
+| Status | **IMPL-EVAL PASS** (cycle 2 of 2 — evaluated by separate OpenHands session qwen-3.7-max). Ready to merge. |
 
 ## Progress Log
 
@@ -122,3 +122,36 @@ are untouched. Slices run low→high blast radius.
   OpenHands skill; `D-G1-2` deferred live internal consumers (`V8_HEAP_MB`,
   `updatePluginRegistry`); `D-G1-3a` deferred pre-existing database doc-lint private-type-ref;
   `D-G1-5` resolved extra recurring-job stream/docs/template consumers found during removal.
+
+## IMPL-EVAL Verdict (cycle 2 of 2)
+
+**Evaluator:** OpenHands IMPL-EVAL session (qwen-3.7-max, separate from implementer)
+**Verdict:** **PASS**
+**Evaluator session:** run 27761272236
+**Verdict file:** `.llm/tmp/run/chore-prod-readiness--cleanup/evaluate.md`
+
+All 6 verdict-critical checks verified against the LOCKED cycle-2 plan:
+
+1. **PR-7 deprecate-before-remove honored** — every public surface removal had a pre-existing
+   `@deprecated` marker or was recorded as deferred debt (`mysqljsonextension-deprecated-removal-deferred`).
+   G1-3c correctly refactored `trustedConnection` → `authentication.type='ntlm'`, not hard delete.
+2. **OFF-LIMITS untouched** — `git diff 1c98fa1c..f72ea260` shows no edits to `scaffold-versions.ts`,
+   `aspire/mod.ts`, version pins, catalog refs, or `deno.lock` within the G1-slice commit range.
+3. **F3 functional preservation** — `ConnectionStrings__{provider}db` env wiring still read by
+   `database-connectivity.ts:48,71,94,204` with `uriEnv ?? connStringEnv` fallback intact.
+4. **Subtractive-only with proof** — each removal had zero-consumer scan; G1-6 correctly deleted
+   nothing because no bounded candidate met the zero-reference threshold.
+5. **Heavy gate green** — `deno task e2e:cli run scaffold.runtime --cleanup` passed=41 failed=0 on
+   G1-5; `deno task publish:dry-run` re-executed by evaluator and returned exit 0 / "Success Dry run
+   complete".
+6. **Debt validity verified** — `D-G1-1`, `D-G1-2`, `D-G1-3a`, `D-G1-5`, and arch-debt entries
+   `database-connectivity-legacy-connstring-alias` and `mysqljsonextension-deprecated-removal-deferred`
+   accurately describe deferred or resolved work, not a dodge for in-scope deletions.
+
+**Remaining risks (non-blocking):**
+- Pre-existing database doc-lint failure (`D-G1-3a`): 1 private-type-ref diagnostic, not
+  introduced by this run.
+- `deno.lock` holds `@prisma/client@^7.8.0` introduced at pre-implementation commit `a47d7e62`
+  (PLAN-EVAL `apply agent changes`), outside the G1-slice range.
+
+**Next action:** User reviews this verdict. Cycle 2 complete. Ready to merge to `release/jsr-readiness`.
