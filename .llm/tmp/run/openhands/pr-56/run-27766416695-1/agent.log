@@ -1,0 +1,400 @@
++72|- Version pins — NOT touched.
++73|- `catalog:` — NOT touched.
++74|- Only framework-code change is the fresh-ui Codex slice (7 `*.tsx` 
+exports).
++75|
++76|### Open-decision sweep (evaluator-run)
++77|
++78|- Reference depth per unit-class (fold `*-core` substrate under public 
+plugin
++79|  vs full pages) — slotted to Design. Presentation-only; no rework risk.
++80|- README generated-vs-authored-with-check — slotted to Design. Either is
++81|  implementable against A2; no rework risk.
++82|- Pages CI YAML `workflow`-scoped token — user-gated. Non-blocking for
++83|  PLAN-EVAL (per the harness protocol).
++84|
++85|None of these would force rework when deferred.
++86|
++87|## Verdict
++88|
++89|`PASS`
++90|
++91|## Notes
++92|
++93|- IMPL gate is satisfied (Groups 1 + 2 merged). PLAN-EVAL is a 
+plan-readiness
++94|  gate only.
++95|- Two user-gated items remain (Pages subpath value + `workflow`-scoped 
+token)
++96|  but neither blocks this verdict per `evaluator/plan-protocol.md`.
++97|- The fresh-ui Codex source slice is the only framework-code touchpoint and
++98|  is correctly scoped to SCOPE-frontend, not the docs supervisor.
++99|- Cycle 1 of 2 before escalation.
++100|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Get OPENHANDS_SUMMARY_PATH
+
+$ echo "OPENHANDS_SUMMARY_PATH=$OPENHANDS_SUMMARY_PATH"; echo "---"; env | grep 
+-i openhands
+
+Tokens: ↑ input 1.26M • cache hit 86.09% •  reasoning 3.66K • ↓ output 17.23K • 
+$ 0.1726
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+OPENHANDS_SUMMARY_PATH=/home/runner/work/_temp/openhands/27766416695-1/summary.m
+d
+---
+OPENHANDS_METADATA_PATH=/home/runner/work/_temp/openhands/27766416695-1/metadata
+.json
+OPENHANDS_TRACE_DIR=.llm/tmp/run/openhands/pr-56/run-27766416695-1
+TMUX=/tmp/tmux-1001/openhands,3569,0
+OPENHANDS_AGENT_LOG_PATH=/home/runner/work/_temp/openhands/27766416695-1/agent.l
+og
+OPENHANDS_PR_REVIEW_COMMENTS_PATH=/home/runner/work/_temp/openhands/27766416695-
+1/pr-review-comments.json
+OPENHANDS_REQUEST_PATH=/home/runner/work/_temp/openhands/27766416695-1/request.m
+d
+OPENHANDS_SUMMARY_PATH=/home/runner/work/_temp/openhands/27766416695-1/summary.m
+d
+GITHUB_WORKFLOW_REF=rickylabs/netscript/.github/workflows/openhands-agent.yml@re
+fs/heads/main
+OPENHANDS_COMMENT_JSON_PATH=/home/runner/work/_temp/openhands/27766416695-1/comm
+ent.json
+OPENHANDS_COMMENT_PATH=/home/runner/work/_temp/openhands/27766416695-1/comment.m
+d
+OPENHANDS_REPLIES_PATH=/home/runner/work/_temp/openhands/27766416695-1/replies.j
+son
+DEFAULT_OPENHANDS_MODEL=openrouter/moonshotai/kimi-k2.6
+OPENHANDS_MAX_ITERATIONS=500
+OPENHANDS_ISSUE_COMMENTS_PATH=/home/runner/work/_temp/openhands/27766416695-1/is
+sue-comments.json
+GITHUB_WORKFLOW=OpenHands Agent
+OPENHANDS_RUN_DIR=/home/runner/work/_temp/openhands/27766416695-1
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write run-scoped summary with PASS verdict
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27766416695-1/summary.md"
+  file_text: 
+    # PLAN-EVAL — docs-user-site--diataxis (cycle 1)
+    
+    ## Summary
+    
+    **Verdict: PASS** for `docs-user-site--diataxis` (Group 3, external/user 
+docs) on the
+    `docs/user-site` branch of the `release/jsr-readiness` umbrella. The plan 
+satisfies every
+    Plan-Gate checklist box (`research current`, `decisions locked`, 
+`open-decision sweep`,
+    `commit slices < 30`, `risk register`, `gate set selected`, `deferred scope 
+explicit`,
+    `jsr-audit` N/A for docs). Hard evidence in `research.md` and 
+`doc-lint-census.md` confirms
+    US-5 (denominator = 26, `cli-e2e` excluded) and US-6 (single lint-debt unit
+    `@netscript/fresh-ui`, 7 `error[private-type-ref]`, source-fixable in 
+TypeScript not
+    Markdown). US-7 (Lume `location` for project subpath) is correctly locked 
+with the
+    `workflow`-scoped token flagged user-gated and non-blocking for PLAN-EVAL. 
+The
+    off-limits guardrail passes — the only framework-code change is the fresh-ui
+Codex slice
+    (7 `*.tsx` exports of `*Namespace` types); 
+`packages/aspire/src/public/mod.ts`,
+    `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version 
+pins, and
+    `catalog:` are untouched. Three remaining open items (reference depth per 
+unit-class,
+    README generated-vs-authored, workflow-token) are properly slotted to 
+Design/user — none
+    would force rework when deferred. Implementation may begin; no slice was 
+committed
+    during this read-only evaluator session. Cycle 1 of 2 before escalation.
+    
+    ## Changes
+    
+    - `/.llm/tmp/run/docs-user-site--diataxis/plan-eval.md` — new PLAN-EVAL 
+deliverable
+      following `templates/plan-eval.md` with checklist results, spot-check 
+evidence
+      (US-5 / US-6 / US-7), boundary / off-limits confirmation, and the PASS 
+verdict.
+    - No other files created or modified. This was a read-only evaluator 
+session.
+    
+    ## Validation
+    
+    - Read `.llm/harness/evaluator/plan-protocol.md`, 
+`.llm/harness/gates/plan-gate.md`,
+      `.llm/harness/evaluator/verdict-definitions.md`, 
+`.llm/harness/archetypes/SCOPE-docs.md`.
+    - Read `.llm/tmp/run/docs-user-site--diataxis/{research.md, plan.md, 
+worklog.md}`.
+    - Verified US-5 spot-check: `packages/cli/e2e/deno.json` has `"publish": 
+false` (excluded);
+      `packages/cli/deno.json` has `name`+`exports`+`publish` block (26th, 
+F-wave). 22 packages +
+      4 plugins = 26 publishable members; the "25 simulated" framing matches the
+E-wave.
+    - Verified US-6 spot-check: `deno doc --lint 
+packages/fresh-ui/interactive.ts` produces
+      exactly 7 `error[private-type-ref]` diagnostics on 
+`Accordion/Dialog/Drawer/Popover/
+      Sheet/Tabs/Tooltip`; each names the corresponding private `*Namespace` 
+type. Fix is
+      `type XNamespace` → `export type XNamespace` in 7 `*.tsx` files 
+(source/TS, not Markdown).
+    - Verified US-7 spot-check: plan locks Lume `location` to 
+`https://rickylabs.github.io/netscript/`
+      and flags the `workflow`-scoped token user-gated (non-blocking for 
+PLAN-EVAL).
+    - Verified gates are concrete: Fitness Gates table (5 rows) + Validation 
+Plan
+      (5 ordered checks with commands and expected evidence).
+    - Verified boundary: Non-Scope explicitly excludes internal docs (Group 4) 
+and framework
+      changes; only framework-code touch is the fresh-ui Codex slice.
+    - Verified off-limits guardrail: `packages/aspire/src/public/mod.ts`,
+      `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version
+pins, and
+      `catalog:` are NOT in the plan's slice surface.
+    
+    ## Responses to review comments or issue comments
+    
+    - No PR/issue comment was posted by this evaluator (the workflow owns GitHub
+comments).
+    - The workflow will commit `plan-eval.md` back to the branch and emit the 
+status comment.
+    
+    ## Remaining risks
+    
+    - The `workflow`-scoped token for Pages CI YAML must be supplied by the user
+before the
+      deploy slice (correctly flagged user-gated, non-blocking for PLAN-EVAL).
+    - Reference depth per unit-class (fold `*-core` substrate vs full pages) and
+      README generated-vs-authored remain open for Design; both are 
+presentation-only and
+      do not force rework when deferred.
+    - The fresh-ui Codex slice is the only framework-code touchpoint; supervisor
+does not
+      write `packages/` code, so this slice must be handed to a Codex agent 
+(SCOPE-frontend),
+      not the supervisor.
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.28M • cache hit 86.34% •  reasoning 3.66K • ↓ output 18.4K • $
+0.1757
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27766416695-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL — docs-user-site--diataxis (cycle 1)
+ 2|
++3|## Summary
++4|
++5|**Verdict: PASS** for `docs-user-site--diataxis` (Group 3, external/user 
+docs) on the
++6|`docs/user-site` branch of the `release/jsr-readiness` umbrella. The plan 
+satisfies every
++7|Plan-Gate checklist box (`research current`, `decisions locked`, 
+`open-decision sweep`,
++8|`commit slices < 30`, `risk register`, `gate set selected`, `deferred scope 
+explicit`,
++9|`jsr-audit` N/A for docs). Hard evidence in `research.md` and 
+`doc-lint-census.md` confirms
++10|US-5 (denominator = 26, `cli-e2e` excluded) and US-6 (single lint-debt unit
++11|`@netscript/fresh-ui`, 7 `error[private-type-ref]`, source-fixable in 
+TypeScript not
++12|Markdown). US-7 (Lume `location` for project subpath) is correctly locked 
+with the
++13|`workflow`-scoped token flagged user-gated and non-blocking for PLAN-EVAL. 
+The
++14|off-limits guardrail passes — the only framework-code change is the fresh-ui
+Codex slice
++15|(7 `*.tsx` exports of `*Namespace` types); 
+`packages/aspire/src/public/mod.ts`,
++16|`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version 
+pins, and
++17|`catalog:` are untouched. Three remaining open items (reference depth per 
+unit-class,
++18|README generated-vs-authored, workflow-token) are properly slotted to 
+Design/user — none
++19|would force rework when deferred. Implementation may begin; no slice was 
+committed
++20|during this read-only evaluator session. Cycle 1 of 2 before escalation.
++21|
++22|## Changes
++23|
++24|- `/.llm/tmp/run/docs-user-site--diataxis/plan-eval.md` — new PLAN-EVAL 
+deliverable
++25|  following `templates/plan-eval.md` with checklist results, spot-check 
+evidence
++26|  (US-5 / US-6 / US-7), boundary / off-limits confirmation, and the PASS 
+verdict.
++27|- No other files created or modified. This was a read-only evaluator 
+session.
++28|
++29|## Validation
++30|
++31|- Read `.llm/harness/evaluator/plan-protocol.md`, 
+`.llm/harness/gates/plan-gate.md`,
++32|  `.llm/harness/evaluator/verdict-definitions.md`, 
+`.llm/harness/archetypes/SCOPE-docs.md`.
++33|- Read `.llm/tmp/run/docs-user-site--diataxis/{research.md, plan.md, 
+worklog.md}`.
++34|- Verified US-5 spot-check: `packages/cli/e2e/deno.json` has `"publish": 
+false` (excluded);
++35|  `packages/cli/deno.json` has `name`+`exports`+`publish` block (26th, 
+F-wave). 22 packages +
++36|  4 plugins = 26 publishable members; the "25 simulated" framing matches the
+E-wave.
++37|- Verified US-6 spot-check: `deno doc --lint 
+packages/fresh-ui/interactive.ts` produces
++38|  exactly 7 `error[private-type-ref]` diagnostics on 
+`Accordion/Dialog/Drawer/Popover/
++39|  Sheet/Tabs/Tooltip`; each names the corresponding private `*Namespace` 
+type. Fix is
++40|  `type XNamespace` → `export type XNamespace` in 7 `*.tsx` files 
+(source/TS, not Markdown).
++41|- Verified US-7 spot-check: plan locks Lume `location` to 
+`https://rickylabs.github.io/netscript/`
++42|  and flags the `workflow`-scoped token user-gated (non-blocking for 
+PLAN-EVAL).
++43|- Verified gates are concrete: Fitness Gates table (5 rows) + Validation 
+Plan
++44|  (5 ordered checks with commands and expected evidence).
++45|- Verified boundary: Non-Scope explicitly excludes internal docs (Group 4) 
+and framework
++46|  changes; only framework-code touch is the fresh-ui Codex slice.
++47|- Verified off-limits guardrail: `packages/aspire/src/public/mod.ts`,
++48|  `packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version
+pins, and
++49|  `catalog:` are NOT in the plan's slice surface.
++50|
++51|## Responses to review comments or issue comments
++52|
++53|- No PR/issue comment was posted by this evaluator (the workflow owns GitHub
+comments).
++54|- The workflow will commit `plan-eval.md` back to the branch and emit the 
+status comment.
++55|
++56|## Remaining risks
++57|
++58|- The `workflow`-scoped token for Pages CI YAML must be supplied by the user
+before the
++59|  deploy slice (correctly flagged user-gated, non-blocking for PLAN-EVAL).
++60|- Reference depth per unit-class (fold `*-core` substrate vs full pages) and
++61|  README generated-vs-authored remain open for Design; both are 
+presentation-only and
++62|  do not force rework when deferred.
++63|- The fresh-ui Codex slice is the only framework-code touchpoint; supervisor
+does not
++64|  write `packages/` code, so this slice must be handed to a Codex agent 
+(SCOPE-frontend),
++65|  not the supervisor.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify deliverables exist
+
+$ ls -la /home/runner/work/_temp/openhands/27766416695-1/summary.md 
+/home/runner/work/netscript/netscript/.llm/tmp/run/docs-user-site--diataxis/plan
+-eval.md 2>&1; echo "---"; head -3 
+/home/runner/work/netscript/netscript/.llm/tmp/run/docs-user-site--diataxis/plan
+-eval.md
+
+Tokens: ↑ input 1.31M • cache hit 86.62% •  reasoning 3.66K • ↓ output 18.54K • 
+$ 0.1776
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+-rw------- 1 runner runner 4151 Jun 18 14:44 
+/home/runner/work/_temp/openhands/27766416695-1/summary.md
+-rw------- 1 runner runner 5584 Jun 18 14:43 
+/home/runner/work/netscript/netscript/.llm/tmp/run/docs-user-site--diataxis/plan
+-eval.md
+---
+# PLAN-EVAL — docs-user-site--diataxis
+
+- Plan evaluator session: OpenHands / openrouter/minimax/minimax-m3 (cycle 1)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.13/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Wrote plan-eval.md (PASS) and summary for PLAN-EVAL cycle 1
+
+Thought:
+Both deliverables are in place. Calling finish:
+
+Finish with message:
+PLAN-EVAL cycle 1 verdict: **PASS** for `docs-user-site--diataxis` (Group 3, 
+external/user docs on `docs/user-site`).
+
+Deliverables written:
+- `.llm/tmp/run/docs-user-site--diataxis/plan-eval.md` — checklist results, 
+spot-check evidence, and the PASS verdict (per `templates/plan-eval.md`).
+- `/home/runner/work/_temp/openhands/27766416695-1/summary.md` — run-scoped 
+summary with Summary, Changes, Validation, and Remaining risks.
+
+Spot-check evidence (verdict-definitions `PASS` is met):
+1. **US-5 denominator = 26** — `packages/cli/e2e/deno.json` has `"publish": 
+false` (correctly excluded); `packages/cli/deno.json` has 
+`name`+`exports`+`publish` (the 26th, F-wave publish-last). 22 packages + 4 
+plugins = 26 publishable members; the "25 simulated" framing matches the E-wave.
+2. **US-6 lint debt = 1 unit, source-fix** — `deno doc --lint 
+packages/fresh-ui/interactive.ts` produces exactly 7 `error[private-type-ref]` 
+diagnostics on `Accordion/Dialog/Drawer/Popover/Sheet/Tabs/Tooltip` namespaces; 
+the fix is exporting the `*Namespace` types in 7 `*.tsx` files (TypeScript 
+source, not Markdown) → correctly carved out as a WSL Codex slice 
+(SCOPE-frontend), NOT supervisor doc work.
+3. **US-7 Pages subpath** — plan locks Lume `location` to 
+`https://rickylabs.github.io/netscript/` and flags the `workflow`-scoped token 
+user-gated (non-blocking for PLAN-EVAL).
+4. **Gates concrete** — Fitness Gates table (5 rows, `Required` + `Expected 
+evidence`) + Validation Plan (5 ordered checks with commands and expected 
+output).
+5. **Boundary clean** — Non-Scope explicitly excludes internal docs (Group 4) 
+and framework changes; only framework-code touch is the fresh-ui Codex slice. 
+Off-limits guardrail passes: `packages/aspire/src/public/mod.ts`, 
+`packages/cli/src/kernel/constants/scaffold/scaffold-versions.ts`, version pins,
+and `catalog:` are NOT touched.
+6. **Open-decision sweep** — reference depth per unit-class, README 
+generated-vs-authored, workflow-token — all slotted to Design/user; none forces 
+rework when deferred.
+
+No implementation slice was committed during this read-only evaluator session. 
+No PR/issue comment was posted (the workflow owns GitHub comments). This is 
+cycle 1 of 2 before escalation.
+
+Tokens: ↑ input 1.34M • cache hit 86.89% •  reasoning 3.66K • ↓ output 19.17K • 
+$ 0.1802
+
