@@ -48,3 +48,14 @@ Append-only. Severity ∈ {minor, significant, architectural}.
 - **Lesson (→ `netscript-deno-toolchain`):** Deno 2.8 catalog membership lives in member
   `package.json`, not `deno.json` — check both.
 - **Status:** RESOLVED.
+
+## D-G2-3 — `deps:prod-install` wrapper passed an unsupported `--frozen` flag (minor)
+
+- **Observed (2026-06-18, D-1 Gate-0):** `deno task deps:prod-install` failed before resolving the
+  graph because `.llm/tools/deps/prod-install.ts` invoked `deno ci --prod --frozen`. Deno 2.8.3
+  rejects `--frozen` for `deno ci`; `deno ci` is already lockfile-strict.
+- **Effect:** The documented Gate-0 wrapper was unusable even though raw `deno ci --prod` resolved
+  successfully with no lockfile churn.
+- **Adaptation:** D-1 removes the redundant `--frozen` argument from the wrapper and keeps the
+  no-reload/no-lock-delete behavior intact.
+- **Status:** RESOLVED in D-1.

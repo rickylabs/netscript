@@ -1,6 +1,12 @@
 # Plan: chore/deps-hygiene (dependency-shape tooling + task hygiene)
 
-> **DRAFT** — pending research (catalog-resolution confirm + dep census) + PLAN-EVAL (separate session).
+> **READY FOR IMPLEMENTATION** — PLAN-EVAL `PASS` (cycle 1, run 27755191977, separate OpenHands
+> minimax-M3 session, 2026-06-18). Catalog live-invariant spot-check (8 points) confirmed; off-limits
+> guardrail PASS. One non-blocking NIT for D-2: the compliance scanner must anchor on real
+> `import/export … from "npm:…"` statements (and `deno.json` `imports`/`scopes` keys), NOT substring
+> `npm:` in string literals — allow-list `packages/cli/src/kernel/constants/windows.ts` (bundle-external
+> map) and `packages/fresh-ui/registry.manifest.ts` (user-facing dependency array). Implementation
+> gated on user dispatch + Group 1 PASS (both now PASS).
 
 ## Run Metadata
 
@@ -8,7 +14,7 @@
 |-------|-------|
 | Run ID | `chore-deps-hygiene--deps` |
 | Branch | `chore/deps-hygiene` (off `release/jsr-readiness`) |
-| Phase | `plan` (draft) |
+| Phase | `plan` (PLAN-EVAL PASS — ready for implementation) |
 | Target | `deno.json` task/dep hygiene + dependency-shape **scanners** |
 | Archetype | A6-adjacent (cli-tooling) for the scanner scripts; otherwise repo tooling |
 | Scope overlays | none |

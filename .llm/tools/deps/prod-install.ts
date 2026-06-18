@@ -8,8 +8,8 @@
  * `check`/`lint`/`fmt` still need dev deps, so this does not replace the plain
  * `deno ci` in the `ci` task.
  *
- * `--frozen` (implied by `ci`) fails if the lockfile would change — exactly the
- * signal we want in CI: the prod graph must already be locked.
+ * `deno ci` fails if the lockfile would change — exactly the signal we want
+ * in CI: the prod graph must already be locked.
  *
  * Usage:
  *   deno run --allow-read --allow-write --allow-net --allow-run --allow-env \
@@ -25,7 +25,7 @@ function parseArgs(argv: string[]): { skipTypes: boolean; pretty: boolean } {
 
 async function main() {
   const args = parseArgs(Deno.args);
-  const cmdArgs = ['ci', '--prod', '--frozen'];
+  const cmdArgs = ['ci', '--prod'];
   if (args.skipTypes) cmdArgs.push('--skip-types');
 
   const start = performance.now();
