@@ -1,0 +1,400 @@
+:[{"name":"@netscript/contracts","dir":"packages/contracts","entrypoints":[{"pat
+h":"./crud.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":
+"./mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./q
+uery.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./tra
+nsform.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0}],"files":[],
+"combinedTotal":0,"combinedPrivateTypeRef":0,"combinedMissingJSDoc":0,"combinedO
+ther":0}]}
+=== packages/sdk ===
+{"source":{"mode":"auto","root":"packages/sdk","entrypoints":["./mod.ts","./src/
+cache/mod.ts","./src/client/mod.ts","./src/collections/mod.ts","./src/discovery/
+mod.ts","./src/ports/mod.ts","./src/query-client/mod.ts","./src/query/mod.ts",".
+/src/streams.ts","./src/telemetry/mod.ts"]},"summary":{"totalPackages":1,"totalE
+rrors":0,"totalPrivateTypeRef":0,"totalMissingJSDoc":0,"totalOther":0},"packages
+":[{"name":"@netscript/sdk","dir":"packages/sdk","entrypoints":[{"path":"./mod.t
+s","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/cache
+/mod.ts","privateTypeRef":3,"missingJSDoc":0,"other":0,"total":3},{"path":"./src
+/client/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path"
+:"./src/collections/mod.ts","privateTypeRef":1,"missingJSDoc":0,"other":0,"total
+":1},{"path":"./src/discovery/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other
+":0,"total":0},{"path":"./src/ports/mod.ts","privateTypeRef":0,"missingJSDoc":0,
+"other":0,"total":0},{"path":"./src/query-client/mod.ts","privateTypeRef":8,"mis
+singJSDoc":0,"other":0,"total":8},{"path":"./src/query/mod.ts","privateTypeRef":
+30,"missingJSDoc":0,"other":0,"total":30},{"path":"./src/streams.ts","privateTyp
+eRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/telemetry/mod.ts","
+privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0}],"files":[],"combinedTot
+al":0,"combinedPrivateTypeRef":0,"combinedMissingJSDoc":0,"combinedOther":0}]}
+=== plugins/workers ===
+{"source":{"mode":"auto","root":"plugins/workers","entrypoints":["./contracts/v1
+/mod.ts","./mod.ts","./services/src/main.ts","./src/aspire/mod.ts","./src/cli/co
+mposition/main.ts","./src/scaffolding/mod.ts","./streams/mod.ts","./streams/serv
+er.ts","./worker/mod.ts"]},"summary":{"totalPackages":1,"totalErrors":0,"totalPr
+ivateTypeRef":0,"totalMissingJSDoc":0,"totalOther":0},"packages":[{"name":"@nets
+cript/plugin-workers","dir":"plugins/workers","entrypoints":[{"path":"./contract
+s/v1/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":".
+/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./ser
+vices/src/main.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"pa
+th":"./src/aspire/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":
+0},{"path":"./src/cli/composition/main.ts","privateTypeRef":0,"missingJSDoc":0,"
+other":0,"total":0},{"path":"./src/scaffolding/mod.ts","privateTypeRef":0,"missi
+ngJSDoc":0,"other":0,"total":0},{"path":"./streams/mod.ts","privateTypeRef":0,"m
+issingJSDoc":0,"other":0,"total":0},{"path":"./streams/server.ts","privateTypeRe
+f":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./worker/mod.ts","privateTyp
+eRef":0,"missingJSDoc":0,"other":0,"total":0}],"files":[],"combinedTotal":0,"com
+binedPrivateTypeRef":0,"combinedMissingJSDoc":0,"combinedOther":0}]}
+=== plugins/triggers ===
+{"source":{"mode":"auto","root":"plugins/triggers","entrypoints":["./mod.ts","./
+services/src/main.ts","./src/aspire/mod.ts","./src/cli/composition/main.ts","./s
+rc/plugin/mod.ts","./src/public/mod.ts","./src/runtime/mod.ts","./src/scaffoldin
+g/mod.ts","./streams/mod.ts","./streams/server.ts"]},"summary":{"totalPackages":
+1,"totalErrors":0,"totalPrivateTypeRef":0,"totalMissingJSDoc":0,"totalOther":0},
+"packages":[{"name":"@netscript/plugin-triggers","dir":"plugins/triggers","entry
+points":[{"path":"./mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total
+":0},{"path":"./services/src/main.ts","privateTypeRef":0,"missingJSDoc":0,"other
+":0,"total":0},{"path":"./src/aspire/mod.ts","privateTypeRef":0,"missingJSDoc":0
+,"other":0,"total":0},{"path":"./src/cli/composition/main.ts","privateTypeRef":0
+,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/plugin/mod.ts","privateTyp
+eRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/public/mod.ts","pri
+vateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/runtime/mod.
+ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/scaf
+folding/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path"
+:"./streams/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"p
+ath":"./streams/server.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total"
+:0}],"files":[],"combinedTotal":0,"combinedPrivateTypeRef":0,"combinedMissingJSD
+oc":0,"combinedOther":0}]}
+=== plugins/sagas ===
+{"source":{"mode":"auto","root":"plugins/sagas","entrypoints":["./contracts/v1/m
+od.ts","./mod.ts","./services/src/main.ts","./src/aspire/mod.ts","./src/cli/mod.
+ts","./src/e2e/mod.ts","./src/plugin/mod.ts","./src/public/mod.ts","./src/runtim
+e/mod.ts","./src/scaffolding/mod.ts","./streams/mod.ts","./streams/server.ts"]},
+"summary":{"totalPackages":1,"totalErrors":0,"totalPrivateTypeRef":0,"totalMissi
+ngJSDoc":0,"totalOther":0},"packages":[{"name":"@netscript/plugin-sagas","dir":"
+plugins/sagas","entrypoints":[{"path":"./contracts/v1/mod.ts","privateTypeRef":0
+,"missingJSDoc":0,"other":0,"total":0},{"path":"./mod.ts","privateTypeRef":0,"mi
+ssingJSDoc":0,"other":0,"total":0},{"path":"./services/src/main.ts","privateType
+Ref":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/aspire/mod.ts","priv
+ateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/cli/mod.ts","
+privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/e2e/mod.t
+s","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/plugi
+n/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./sr
+c/public/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path
+":"./src/runtime/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0
+},{"path":"./src/scaffolding/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other"
+:0,"total":0},{"path":"./streams/mod.ts","privateTypeRef":0,"missingJSDoc":0,"ot
+her":0,"total":0},{"path":"./streams/server.ts","privateTypeRef":4,"missingJSDoc
+":0,"other":0,"total":4}],"files":[],"combinedTotal":0,"combinedPrivateTypeRef":
+0,"combinedMissingJSDoc":0,"combinedOther":0}]}
+=== plugins/streams ===
+{"source":{"mode":"auto","root":"plugins/streams","entrypoints":["./mod.ts","./s
+rc/aspire/mod.ts","./src/cli/composition/main.ts","./src/e2e/mod.ts","./src/scaf
+folding/mod.ts"]},"summary":{"totalPackages":1,"totalErrors":0,"totalPrivateType
+Ref":0,"totalMissingJSDoc":0,"totalOther":0},"packages":[{"name":"@netscript/plu
+gin-streams","dir":"plugins/streams","entrypoints":[{"path":"./mod.ts","privateT
+ypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/aspire/mod.ts","p
+rivateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":"./src/cli/compos
+ition/main.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"path":
+"./src/e2e/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"total":0},{"pa
+th":"./src/scaffolding/mod.ts","privateTypeRef":0,"missingJSDoc":0,"other":0,"to
+tal":0}],"files":[],"combinedTotal":0,"combinedPrivateTypeRef":0,"combinedMissin
+gJSDoc":0,"combinedOther":0}]}
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Raw doc-lint on config/merge
+
+Reasoning:
+Interesting results from doc-lint on 9 sample units:
+- `packages/fresh-ui`: 0 warnings ✅ (the prior blocker fix confirmed)
+- `packages/fresh`: 0 warnings ✅  
+- `packages/config`: `combinedTotal: 0` but per-entrypoint shows 
+`src/merge/mod.ts: 2 privateTypeRef` — wait, but combinedTotal is 0. Let me look
+at the tool more carefully. Looking at `entrypoints[1].total: 2` but 
+`combinedTotal: 0`. This seems like a bug or the "combinedTotal" is filtered. 
+Let me re-read.
+
+Actually looking again: the tool reports entrypoints have their own counts, but 
+`combinedTotal: 0`. That's confusing. The individual entrypoint `total` fields 
+show: `src/merge/mod.ts: 2`. But the combined says 0. This looks like a counting
+bug in the tool, OR the combined filtering is different.
+
+But wait — looking at `deno task check` which already passes, and the scorecard 
+says "0 warnings over the unit's FULL export map (not root mod.ts alone — 
+sibling re-exports must be linted or they false-flag/mask)". The question is: 
+are these `private-type-ref` warnings actual issues, or noise that's already 
+filtered?
+
+Let me check more carefully. The `deno doc --lint` output in the raw shows 
+warnings but the tool's `combinedTotal` shows 0. This may be because 
+private-type-ref warnings at per-entrypoint level are not considered failures by
+the tool (it only counts them as "findings" if they are actually errors vs 
+warnings).
+
+Actually re-reading the tool output: entrypoints show `src/merge/mod.ts: 2`, 
+`src/query-client/mod.ts: 8`, `src/query/mod.ts: 30` private-type-ref items. But
+`combinedTotal: 0`. So "combined" may be counting only errors that fail the 
+doc-lint (not warnings).
+
+Given `deno task check` passes (exit 0 over 1598 files), I'll treat this as PASS
+on A1 unless the doc-lint tool's entrypoint-level findings are actual errors. 
+Let me verify by running raw `deno doc --lint` on those packages to see actual 
+output.
+
+Actually, looking at this more carefully — `deno doc --lint` on these units 
+shows private-type-ref warnings on re-exported types from other packages (e.g., 
+`config/merge` re-exports `@netscript/contracts` types, `sdk/query` has complex 
+generics with private-type refs). But the "0 errors" in `combinedTotal` tells me
+these are warnings that don't fail doc-lint.
+
+Let me verify by running raw `deno doc --lint` on config to see what the 
+warnings say:
+
+Thought:
+The doc-lint tool shows `combinedTotal: 0` even when per-entrypoint counts are 
+nonzero, suggesting private-type-ref items are non-error warnings. Let me verify
+raw output on a couple of packages:
+
+
+
+$ cd /home/runner/work/netscript/netscript && deno doc --lint 
+packages/config/src/merge/mod.ts 2>&1 | tail -20; echo "EXIT:$?" [timeout: 
+60.0s]
+
+Tokens: ↑ input 1.49M • cache hit 80.78% •  reasoning 7.73K • ↓ output 14.08K • 
+$ 0.7134
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+|
+
+  info: to ensure documentation is complete all types that are exposed in the 
+public API must be public
+
+
+error[private-type-ref]: public type 'NetScriptConfigInput["triggers"]' 
+references private type 'TriggersConfigInput'
+  --> 
+/home/runner/work/netscript/netscript/packages/config/src/domain/config-root-typ
+es.ts:98:3
+   |
+98 |   triggers?: TriggersConfigInput;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   |
+34 | export interface TriggersConfigInput extends Partial<Omit<TriggersConfig, 
+'groups'>> {
+   | - this is the referenced type
+   |
+
+  info: to ensure documentation is complete all types that are exposed in the 
+public API must be public
+
+
+error: Found 2 documentation lint errors.
+EXIT:0
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Restore stashed changes
+
+Reasoning:
+Let me check the scorecard more carefully to see the threshold for A1.
+
+$ cd /home/runner/work/netscript/netscript && git stash pop 2>&1 | tail -2 && 
+git status -s | head -5
+
+Tokens: ↑ input 1.53M • cache hit 81.15% •  reasoning 7.74K • ↓ output 14.18K • 
+$ 0.7233
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+no changes added to commit (use "git add" and/or "git commit -a")
+The stash entry is kept in case you need it again.
+ M .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+ M .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+ M .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: terminal: {"command": "cd /home/runner/work/netscript/netscript && cat 
+.llm/tmp/run/release-jsr-readiness--supervisor/scorecard.md 2>&1 | head -80", 
+"timeout": 10}
+
+Reasoning:
+The doc-lint tool seems to be parsing the output but the exit code is 0 even 
+when errors are found (Deno exits 0 on doc-lint errors). The "combinedTotal: 0" 
+in the JSON output is confusing - let me look at the tool's code more carefully.
+But wait, looking at the tool output more carefully:
+
+- config: `combinedTotal: 0` but entrypoint `./src/merge/mod.ts` has 
+`privateTypeRef: 2`
+- sdk: `combinedTotal: 0` but entrypoints show `privateTypeRef: 42` total across
+multiple entrypoints
+
+
+- So the tool distinguishes "errors" from "warnings/info" — `privateTypeRef` is 
+counted at the entrypoint level but doesn't roll up into `combinedTotal`. The 
+underlying `deno doc --lint` exits 0, which means these private-type-ref issues 
+are actually just informational warnings, not blocking errors. The doc-lint tool
+is parsing these from stderr and categorizing them accordingly.
+
+But wait, the actual `deno doc --lint` output shows `error[private-type-ref]` 
+and `error: Found 2 documentation lint errors`. So they ARE errors technically, 
+even though deno exits 0. Now I'm noticing the scorecard requires "0 warnings 
+over the unit's FULL export map" — so I need to check whether these lint errors 
+existed on main as well, since the A1 fix specifically targeted making the UI 
+JSX safe without introducing new doc-lint errors. Let me look at the existing 
+scorecard status to understand the baseline.
+
+Thought:
+Let me check if these doc-lint warnings are pre-existing vs umbrella changes, 
+and read the existing evaluation context:
+
+
+
+$ cd /home/runner/work/netscript/netscript && cat 
+.llm/tmp/run/release-jsr-readiness--supervisor/scorecard.md 2>&1 | head -80 
+[timeout: 10.0s]
+
+Tokens: ↑ input 1.56M • cache hit 81.49% •  reasoning 8.08K • ↓ output 14.62K • 
+$ 0.7349
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# JSR-Readiness Scorecard — umbrella exit gate (`release/jsr-readiness`)
+
+**This is the umbrella exit gate.** Publishing (program steps E + F) is blocked 
+until
+**every dimension below PASSES**. The verdict is **evaluator-owned** (a separate
+OpenHands session — never self-graded by the supervisor or any generator). Each 
+of the
+four sub-runs *additionally* passes its own PLAN-EVAL and IMPL-EVAL; the 
+scorecard is the
+final program-level gate that confirms the sub-runs together produced a 
+publishable repo.
+
+> Denominator note (reconciled 2026-06-18 to the locked census — US-5 + G2 eval 
+follow-up #1):
+> **27 members declare `name`+`exports`**; the canonical `deno task 
+publish:dry-run` simulates
+> **25**. The real **publish denominator = 26** = **batch E = 25 non-CLI** 
+(OIDC, `0.0.1-alpha.0`)
+> + **batch F = `@netscript/cli`** (last, LD-7). **`@netscript/cli-e2e` 
+(`publish:false`) is NEVER
+> published** and is excluded. Reference-doc depth is per unit *class* (library 
+packages/plugins get
+> full reference; `examples/`/`apps/` get appropriate-level docs). Per-dimension
+denominator pinned
+> in `docs/user-site` research/plan. (Prior text said "E = 26 non-CLI / all 27" 
+— stale; superseded.)
+
+## Dimensions
+
+### A — User reference & onboarding docs (`docs/user-site`)
+- [ ] **A1** Every library package/plugin has reference docs meeting the 
+standardized
+      template, and `deno doc --lint` is **0 warnings** for that unit 
+(full-export sweep,
+      not root-only — per the Wave 2/4 merged-barrel lesson).
+- [ ] **A2** Every such unit's **README** meets the standard (structure + 
+threshold +
+      doctested examples that compile).
+- [ ] **A3** A **conceptual onboarding** doc set exists and covers the ecosystem
+      (Diátaxis: tutorial + explanation + how-to recipes), built with **Lume → 
+GitHub
+      Pages** and deploying green.
+
+### B — Publishability (carried from S1; must not regress)
+- [ ] **B1** `deno task publish:dry-run` passes with **0 slow types** for the 
+canonical
+      **25-unit** simulation on the umbrella branch (already green on `main` — 
+the umbrella must
+      hold it). NOTE the F-wave blind spot (G2 eval follow-up #1b): the batch 
+dry-run does not
+      emit a `@netscript/cli` simulation, so the **F dispatch must run cli's own
+      `deno publish --dry-run`** before the real publish.
+
+### C — Repo cleanliness (`chore/prod-readiness`)
+- [ ] **C1** **Zero** dead code, temp/garbage/build cruft, and stray root files;
+**all**
+      backward-compat shims/aliases removed (functional workarounds excluded); 
+`AGENTS-handoff.md`
+      relocated into the `openhands-handoff` skill and the root file deleted; 
+dead doc
+      *files* deleted. No doc *content* rewrites (owned by the docs sub-runs).
+
+### D — Dependency hygiene & catalog law (`chore/deps-hygiene`)
+- [ ] **D1** **0 JSR-version drift** across members: the JSR-dep centralization 
+**scanner**
+      is green (any `jsr:` dep used by >1 member must agree on version) and 
+wired into the
+      CI quality job **and** `arch:check`.
+- [ ] **D2** **0 inline-npm-pin violations** of the catalog law: the npm 
+catalog-compliance
+      **scanner** is green (any `npm:` dep used by >1 member, or not bound to a 
+single
+      member, must be a `catalog:` ref) and wired into CI + `arch:check`.
+- [ ] **D3** **0 `file:`/`link:` specifiers** in any publishable unit (audit 
+green, wired in).
+- [ ] **D4** `deno task` set pruned to production-grade tasks only (no dead/dup 
+tasks).
+- [ ] **D5** Version-bump tooling is a **thin wrapper over `deno bump-version`**
+      (Conventional-Commit-derived), replacing the bespoke internal bump tool, 
+preserving
+      structured output.
+
+### E — Durability (harness integration; docs + deps shape can't rot)
+- [ ] **E1** A **doc-maintenance gate** + **doc-freshness fitness gate** are 
+wired into the
+      harness gate set so docs cannot silently rot.
+- [ ] **E2** The D1/D2 scanners + D3 audit are wired into the **quality job + 
+`arch:check`**
+      so the dependency shape self-enforces as new deps land.
+
+### F — Internal/contributor docs (`docs/internal-overhaul`)
+- [ ] **F1** Internal docs (harness, doctrine, `.llm/` architecture, 
+`AGENTS.md`/`CLAUDE.md`
+      surface, root ops docs) consolidated, de-duplicated, prod-ready; `deno 
+doc` documented
+      properly in the harness + `jsr-audit` skills; `validate-claude-surface.ts`
+green.
+
+## Exit rule
+
+- All A–F boxes checked, each with **evaluator-verified** evidence (raw command 
+output,
+  not a generator's self-report).
+- Every sub-run shows `plan-eval.md = PASS` **and** `evaluate.md = PASS`.
+- No unresolved `architectural` drift; no open `FAIL_*` verdict.
+
+Only then is publishing (E = **25** non-CLI via OIDC at `0.0.1-alpha.0`, then F 
+= `@netscript/cli`
+last) unblocked — and only on **explicit user dispatch** (publishing is 
+permanent/outward).
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+{"asctime": "2026-06-18 23:26:14,458", "levelname": "ERROR", "name": "openhands.sdk.conversation.impl.local_conversation", "filename": "local_conversation.py", "lineno": 1336, "message": "Agent reached maximum iterations limit (50)."}
+{"asctime": "2026-06-18 23:26:14,458", "levelname": "WARNING", "name": "openhands.sdk.conversation.visualizer.default", "filename": "default.py", "lineno": 321, "message": "Event type ConversationErrorEvent is not registered in EVENT_VISUALIZATION_CONFIG. Skipping visualization."}
+{"asctime": "2026-06-18 23:26:14,460", "levelname": "ERROR", "name": "__main__", "filename": "agent_runner.py", "lineno": 195, "message": "Run ended at the iteration limit; reporting failure"}
