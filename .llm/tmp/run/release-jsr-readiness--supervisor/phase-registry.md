@@ -55,7 +55,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | N/A — cross-cutting repo hygiene (no public-API archetype). Touches many surfaces; adds/removes no API |
 | Scope overlay | partial `SCOPE-docs.md` (deletes dead doc *files*; does **not** rewrite doc *content*) |
 | Sub-PR | #54 (draft, base `release/jsr-readiness`) |
-| Status | `active` (branch + draft sub-PR launched 2026-06-18; Plan-Gate pending) |
+| Status | `active` — **PLAN-EVAL PASS @ cycle 2** (run 27755852001; cycle 1 = FAIL_PLAN, 7 fixes applied). Plan-Gate cleared. IMPL gated on user dispatch. |
 
 ### Pre-conditions
 - Umbrella branch current with `main`.
@@ -79,7 +79,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | A6-adjacent for the scanner scripts (cli-tooling); otherwise N/A repo tooling |
 | Scope overlay | none |
 | Sub-PR | #55 (draft, base `release/jsr-readiness`) |
-| Status | `active` (branch + draft sub-PR launched 2026-06-18; Plan-Gate pending) |
+| Status | `active` — **PLAN-EVAL PASS @ cycle 1** (run 27755191977; catalog live-invariant spot-check confirmed; 1 non-blocking NIT for D-2). Plan-Gate cleared. IMPL gated on user dispatch. |
 
 ### Deliverables
 1. **JSR-dep centralization scanner** — flags any `jsr:` dep used by >1 member with divergent versions; structured JSON; wired into CI + `arch:check`.
@@ -137,5 +137,9 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 ## Open umbrella-level items
 
 - **GitHub access (RESOLVED 2026-06-18):** `gh`/GitHub MCP absent, but the rickylabs PAT in Windows Credential Manager (repo+workflow) drives the REST API directly via `git credential fill` + `curl`. Draft sub-PRs #54/#55 were created this way; PR-comment triggers + merges use the same path. (PAT is in the chat transcript — rotate/revoke after the program.)
-- **Groups 1 & 2 launched (2026-06-18):** branches `chore/prod-readiness` + `chore/deps-hygiene` off the umbrella; draft sub-PRs #54 + #55; plan/research/Design ready on each (inherited from the umbrella + a launch entry in each group worklog). Worktrees deferred to **implementation launch** (WSL Codex, native ext4 — not local Windows `.worktrees/`); recorded as a reasoned deviation from supervisor.md §2. Next: PLAN-EVAL per sub-PR (OpenHands/minimax M3, separate session), Group 1 then Group 2 (sequential).
+- **Groups 1 & 2 launched (2026-06-18):** branches `chore/prod-readiness` + `chore/deps-hygiene` off the umbrella; draft sub-PRs #54 + #55; plan/research/Design ready on each (inherited from the umbrella + a launch entry in each group worklog). Worktrees deferred to **implementation launch** (WSL Codex, native ext4 — not local Windows `.worktrees/`); recorded as a reasoned deviation from supervisor.md §2.
+- **PLAN-EVAL complete for Groups 1 & 2 (2026-06-18) — BOTH PASS:** ran in parallel (user-authorized), each a separate OpenHands minimax-M3 session.
+  - **Group 1** (`chore/prod-readiness`, PR #54): cycle 1 = `FAIL_PLAN` (7 mechanical fixes — F3 functional/off-limits + arch-debt, S4′ deprecate-not-delete, S5 refactor-not-delete, S6 scaffolder consumer, scaffold.runtime smoke per public slice, per-slice LOC budget, bounded G1-6). Supervisor applied all 7 in-role → cycle 2 = **PASS** (run 27755852001). Two FAIL_PLAN cycles allowed; passed on cycle 2.
+  - **Group 2** (`chore/deps-hygiene`, PR #55): cycle 1 = **PASS** (run 27755191977). Catalog live-invariant spot-check (8 points) confirmed against tree; off-limits/catalog guardrail PASS. One non-blocking NIT for D-2 (compliance scanner anchors on real `from "npm:…"` imports + `deno.json` imports/scopes, NOT substring; allow-list `windows.ts` bundle-external map + `registry.manifest.ts` dependency array) recorded in plan.md.
+  - **Both Plan-Gates cleared. NO implementation slice starts until the user reviews both plans and explicitly dispatches the generators (WSL Codex, daemon-attached, mobile-visible).** IMPL-EVAL (post-impl) = OpenHands qwen 3.7 max, separate session.
 - Groups 3 & 4 (docs) not yet launched — branches/sub-PRs created when their Research+Plan starts (handover §5.5).
