@@ -44,3 +44,18 @@ Append-only. Severity ∈ {minor, significant, architectural}.
 - **Resolution:** Recorded the doc-lint failure as drift. The slice still ran the scoped database
   check, database tests, full `publish:dry-run`, and `scaffold.runtime` smoke; all passed.
 - **Status:** Deferred to the relevant database public-surface cleanup.
+
+## D-G1-5 — recurring-job API consumers beyond initial line list (minor)
+
+- **Observed:** Removing the S6 stream `WorkerJob.schedule` field exposed one additional live
+  stream-entity emitter in `plugins/workers/services/src/init.ts`. The generated-output scan also
+  found stale `.schedule(...)` examples in the workers job-builder template and
+  `packages/plugin-workers-core` docs.
+- **Impact:** Leaving these references would either fail the scoped workers check or preserve
+  consumer-facing examples/templates for a removed builder method.
+- **Resolution:** Removed `schedule` from the stream entity payload, deleted the stale generated
+  template/docs calls, and added `plugins/workers/tests/scaffolding/job-scaffolders_test.ts` to prove
+  schedule input no longer emits the removed builder API. Runtime scheduler/config `schedule` fields
+  were left intact because they are functional cron scheduler plumbing, not the deprecated builder
+  creation surface.
+- **Status:** Resolved in G1-5.

@@ -1,5 +1,4 @@
 import { DEFAULT_TOPIC } from '../domain/constants.ts';
-import type { CronExpression } from '../domain/cron.ts';
 import type {
   JobDefinition as DomainJobDefinition,
   JobHandler as DomainJobHandler,
@@ -44,10 +43,6 @@ export interface JobBuilder<
   ): JobBuilder<TId, 'handler-set', TNextPayload, TNextResult>;
   /** Narrow the payload type carried by this job definition. */
   payload<TNextPayload>(): JobBuilder<TId, TConfigured, TNextPayload, TResult>;
-  /** Set the cron schedule expression for this job.
-   * @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`.
-   */
-  schedule(expression: CronExpression | string): this;
   /** Set the schedule timezone. */
   timezone(value: string): this;
   /** Set the execution timeout in milliseconds. */
@@ -85,7 +80,6 @@ class JobBuilderImpl<
   #description?: string;
   #entrypoint?: string;
   #handler?: DomainJobHandler<TPayload, TResult>;
-  #schedule: string | undefined;
   #timezone = 'UTC';
   #timeout = 300_000;
   #maxRetries = 3;
@@ -125,12 +119,6 @@ class JobBuilderImpl<
 
   payload<TNextPayload>(): JobBuilder<TId, TConfigured, TNextPayload, TResult> {
     return this as unknown as JobBuilder<TId, TConfigured, TNextPayload, TResult>;
-  }
-
-  /** @deprecated Define recurring work with `defineScheduledTrigger(...).enqueueJob(...)`. */
-  schedule(expression: CronExpression | string): this {
-    this.#schedule = expression;
-    return this;
   }
 
   timezone(value: string): this {
@@ -205,7 +193,6 @@ class JobBuilderImpl<
       name: this.#name ?? this.#id,
       description: this.#description,
       entrypoint: this.#entrypoint,
-      schedule: this.#schedule,
       timezone: this.#timezone,
       timeout: this.#timeout,
       maxRetries: this.#maxRetries,

@@ -19,6 +19,5 @@ import { defineJob } from '@netscript/plugin-workers-core';
 
 export const reportJob = defineJob('nightly-report')
   .entrypoint('./workers/jobs/nightly-report.ts')
-  .schedule('0 2 * * *')
   .build();
 ```

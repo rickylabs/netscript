@@ -98,6 +98,12 @@ are untouched. Slices run low→high blast radius.
 | 2026-06-18 | G1-4 | `deno doc --lint packages/fresh/mod.ts` | PASS | Checked 1 file. |
 | 2026-06-18 | G1-4 | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/fresh` dry-run completed successfully in the 27-unit workspace pass. |
 | 2026-06-18 | G1-4 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
+| 2026-06-18 | G1-5 | Consumer/generated-output scan | PASS with drift | Deprecated builder method/stream field and generated `.schedule(...)` references removed; only remaining `.schedule(` hit is functional `plugins/workers/worker/scheduler-scheduling.ts` cron-scheduler plumbing. Extra stream/docs/template consumers recorded as `D-G1-5`. |
+| 2026-06-18 | G1-5 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-workers-core --root plugins/workers --ext ts,tsx` | PASS | First run exposed `plugins/workers/services/src/init.ts` stream payload consumer; after removal, 176 files selected, 2 batches, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-5 | `deno test -A --unstable-kv packages/plugin-workers-core/tests plugins/workers/tests` | PASS | 22 passed, 0 failed; includes new `plugins/workers/tests/scaffolding/job-scaffolders_test.ts`. |
+| 2026-06-18 | G1-5 | `deno doc --lint packages/plugin-workers-core/mod.ts` | PASS | Checked 1 file. |
+| 2026-06-18 | G1-5 | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/plugin-workers-core` and `@netscript/plugin-workers` dry-runs completed successfully in the workspace pass. |
+| 2026-06-18 | G1-5 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0; generated workspace type-check passed after removing scaffolder `.schedule(...)` output. |
 
 ## Handoff Notes
 

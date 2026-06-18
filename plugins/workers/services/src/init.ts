@@ -93,7 +93,6 @@ export async function registerPluginJobs(runtime: WorkersServiceRuntime): Promis
         name: job.name,
         topic: job.topic,
         enabled: job.enabled,
-        schedule: job.schedule,
         description: job.description,
       });
     } catch (e) {
