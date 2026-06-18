@@ -5,9 +5,12 @@ coverage/
 .deno/
 dist/
 
+.claude/settings.local.json
+
 # Local git worktrees for parallel harness supervisor/wave runs
 .worktrees/
 
+.llm/tmp/claude/
 .llm/tmp/cli-e2e/
 
 # Runtime-only OpenHands Actions scratch space. Durable run evidence belongs under

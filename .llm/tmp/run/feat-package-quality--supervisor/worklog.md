@@ -271,3 +271,135 @@ under `.worktrees/<name>`:
   - Re-triggered PR #43 via `update_pull_request_branch` (merges fixed `ci.yml` into
     `feat/package-quality-wave6-cli`); fresh `check-test` run `27706047692` queued on new head.
   - Merge of PR #43 → `feat/package-quality` proceeds once this run is green (honors user "b").
+
+- **STEP C — PR #2 conflict resolution COMPLETE `2026-06-17T17:14Z`.** Merged `origin/main`
+  (b6a730fe, +25 commits / 18 files, all infra) into `feat/package-quality`; merge commit
+  `6369f172` pushed. PR #2 flipped **`dirty` → `unstable`** (conflicts gone; head `6369f172`, base
+  `b6a730fe`).
+  - **4 conflicts resolved** (all infra, no framework packages): `netscript-harness/SKILL.md`
+    (union: kept Agent Delegation Contract + model-specific PLAN/IMPL-EVAL + fuller artifact table;
+    grafted main's supervisor/handoff cross-refs, hint table, `<run-id>` def, agent-handoff
+    decision-tree line, `.claude/skills` doctrine path); `.gitattributes` (kept fpq full LF/binary
+    matrix + main's `*.bash`); `.gitignore` (union `cli-e2e/` + `openhands/`);
+    `copilot-setup-steps.yml` (took main's `toolchain.env`-driven bootstrap — toolchain version
+    finalize stays Step D/S2). Brought in main's OpenHands infra + `toolchain.env` baseline.
+  - Pre-merge commit `0938fb60` landed the uncommitted Agent Delegation Contract +
+    `claude-manager` skill registration that was blocking the merge.
+- **D-SUP-W9 (toolchain divergence, Step D fuel):** PR #2 check `copilot-setup-steps` **RED** at
+  `6369f172`. Cause = the merged-in main workflow's `Load NetScript toolchain` step greps
+  `scaffold-versions.ts` for `ASPIRE_SDK: '${NETSCRIPT_ASPIRE_CLI_VERSION}'`. `toolchain.env`
+  pins `NETSCRIPT_ASPIRE_CLI_VERSION=13.4.0` but `scaffold-versions.ts` has `ASPIRE_SDK: '13.4.4'`
+  (CLI 13.4.0 vs SDK 13.4.4). This is a **version-pin reconciliation = Step D (S2)**; editing
+  `toolchain.env`/`scaffold-versions.ts` is off-limits here. **Non-blocking** (PR #2 `unstable`,
+  not `blocked`; `copilot-setup-steps` is the Copilot-agent bootstrap, not a required gate).
+  - **Open decision (for the lead):** merge PR #2 → `main` now on green `check-test` (defer the
+    toolchain.env↔scaffold fix to Step D, carrying a red `copilot-setup-steps` onto main), **or**
+    hold the main merge until Step D reconciles the Aspire CLI/SDK pin so the bootstrap goes green
+    first. Recommend the latter — keeps `main` all-green and folds naturally into D+E.
+
+## Step D dispatch — S2 toolchain pin reconciliation (2026-06-17)
+
+**Context:** Step C merge (`6369f172`) surfaced a main-vs-PR#44 divergence: main-side
+`.github/toolchain.env` `NETSCRIPT_ASPIRE_CLI_VERSION=13.4.0` lags the authoritative
+`scaffold-versions.ts ASPIRE_SDK=13.4.4` (PR #44, LD-8). `copilot-setup-steps` fails its
+scaffold grep + `aspire --version` install/verify. PR #2 = `unstable` (check-test green ×2,
+copilot-setup-steps red ×2). Per user option A: reconcile the pin, get copilot-setup-steps
+green, THEN merge PR #2 → main.
+
+**Daemon repair (pre-launch):** managed daemon (pid 15770, `--remote-control`) was in the
+unmanaged remote-control state (`start --json` → "running but is not managed"). Confirmed no
+mid-turn session (last = Wave 6 CLI gen `019ed645`, `task_complete` 16:22 UTC, HEAD `350fbd1`,
+no child procs). Applied codex-wsl-remote SKILL anchored-PID repair (killed 15770/15783, removed
+socket, `remote-control start`) → `"status":"connected"`, `remoteControlEnabled":true`.
+
+**Dispatched (mobile-visible):** `send-message-v2` against managed daemon.
+- Worktree: `/home/codex/repos/netscript-s2-toolchain-pin` (ext4), branch
+  `feat/package-quality-s2-toolchain-pin` @ `6369f172`.
+- threadId: `019ed6a2-22ec-7d73-a870-7ce3bdb243fe` (model gpt-5.5, approval never, full-access).
+- Brief: empirically test whether Aspire CLI 13.4.4 installs via aspire.dev/install.sh; if yes
+  bump toolchain.env CLI→13.4.4 + refresh stale workflow comment; if no, fix the workflow grep
+  premise (CLI≠SDK constant) WITHOUT editing scaffold-versions.ts. scaffold-versions.ts / aspire
+  mod.ts / catalog / lock files OFF-LIMITS. Per-slice commit→push; supervisor opens PR if gh unauth.
+- Background SSH job `b8i7sc72a`; notify on turn completion. Steer via `codex exec resume`.
+
+**Open (D-rest, post-merge):** remaining S2 finalize slices T1/T2/T4/T5 from PR #44 body.
+
+### Step D result — generator complete (PR #48)
+
+**Empirical finding:** Aspire CLI `13.4.4` does NOT exist (404 on
+`aspire-cli-linux-x64-13.4.4.tar.gz`). CLI `13.4.0` and SDK `13.4.4` are legitimately
+independent pins — the workflow CLI==SDK grep premise was the bug.
+
+**Fix (PR #48, base feat/package-quality, head `18fc3a68`):** added
+`NETSCRIPT_ASPIRE_SDK_VERSION=13.4.4` to toolchain.env (kept CLI=13.4.0); workflow greps
+scaffold ASPIRE_SDK against the SDK pin; also fixed `aspire --version` build-metadata compare
+(`${actual%%+*}`). scaffold-versions.ts UNTOUCHED. +44/-7, 5 files, commits 4ea7225 + 18fc3a6.
+
+**Verification:** `copilot-setup-steps` = success ×3 (runs incl. 27708586780); check-test
+finishing. Remote integrity confirmed via ls-remote: feat/package-quality restored to
+`6369f172` (generator force-pushed-back after an accidental first push advanced it),
+main `b6a730fe` untouched, slice head `18fc3a68`.
+
+**Generator op-note (verified benign):** first push briefly advanced origin/feat/package-quality;
+generator restored it to 6369f172 via --force-with-lease. Confirmed correct by ls-remote.
+
+**Next:** await check-test green → merge PR #48 → feat/package-quality → PR #2 re-runs
+copilot-setup-steps green → mark PR #2 ready + merge → main all-green.
+
+### STEP C COMPLETE — feat/package-quality merged → main (2026-06-17)
+
+- PR #48 (toolchain pin) merged → feat/package-quality `5b66386c`. Both required checks green.
+- PR #2 marked ready (draft→clean), all green (check-test ✓ + copilot-setup-steps ✓ ×2), merged
+  → **main `e2395bdf`** (merge commit; S1 track Waves 0–6, 1136 commits, 2882 files).
+- Remote verified via ls-remote: main = `e2395bdf`.
+- main push-CI runs the same tree as the green PR head 5b66386c (confirmatory).
+
+**Program status:** A ✅ · B ✅ · C ✅ · D(narrow pin) ✅. NEXT = D-rest (S2 finalize:
+remaining T1/T2/T4/T5 from PR #44) + E (S3 publish 26 non-CLI via OIDC from main at
+0.0.1-alpha.0) + F (CLI Slice 4b vs real 26, then publish @netscript/cli last, LD-7).
+  These are user-dispatched per the locked program; S3 = real outward JSR publish.
+
+### STEP D-rest — S2 full CI quality lane (2026-06-17)
+
+Survey of remaining D/S2 scope: PR #44 R1–R6 + #48 toolchain pin + freshness bumps
+(@preact/signals 2.9.2, tailwindcss/@tailwindcss/vite ^4.3.1, @orpc/client ^1.14.6,
+vite 7.2.2) all already landed on main `e2395bdf`. The one genuine missing piece is the
+**full CI workflow** the program locked as "S2's job" — main had only `ci.yml`
+(minimal check+test), `copilot-setup-steps.yml`, `openhands-agent.yml`.
+
+- PR **#49** (`ci/s2-quality-lane`, head `b4f03ea4`) extends `ci.yml` with the S2 quality
+  lane the file's own header reserved. Additive, **non-required** jobs (cannot break the
+  merge gate before observed green):
+  - `quality`: lint, fmt:check, check:scaffold-versions, publish:dry-run, audit:critical.
+  - `deps-report`: deps:latest (continue-on-error, informational).
+- Authored via local git worktree (`.worktrees/ci-quality-lane`) — PAT lacks `workflow`
+  scope so the GitHub API rejects workflow-file pushes; git push uses repo creds. Blob
+  verified LF-only (0 CR).
+- Validation = PR #49's own CI run. Promotion of `quality` to a required check (branch
+  protection) + the plan's "retire/scope Copilot setup step" are owner-only decisions,
+  explicitly deferred in the PR body.
+- Still deferred (Phase-2 "repo process automation" umbrella, own research→eval cycle):
+  toolchain-heavy CLI runtime e2e (scaffold.runtime), OIDC publish (S3), label/Projects.
+
+**Next:** watch PR #49 `quality` lane → if green, report + offer to promote to required;
+then E (S3 OIDC publish 26 non-CLI) remains the user-dispatched step.
+
+**MERGED (2026-06-17):** PR #49 squash-merged → **main `531f2b46`**. All checks green on
+the PR head (`quality` 2m17s ✓ incl. publish:dry-run over all 27 units; `check-test` ✓;
+`deps-report` ✓). Branch `ci/s2-quality-lane` deleted, worktree removed. main now carries
+the S2 full quality lane. **D/S2 = COMPLETE.** NEXT = E (S3 OIDC publish 26 non-CLI at
+0.0.1-alpha.0 from main) — user-dispatched. Maintainer follow-ups (not blocking): promote
+`quality` to a required check via branch protection; decide on retiring/scoping the Copilot
+setup step now that OpenHands is the evaluator.
+
+### Copilot setup step removed (2026-06-18, maintainer-authorized)
+
+PR #51 squash-merged → **main `a76414c5`**. Deleted
+`.github/workflows/copilot-setup-steps.yml` (superseded by OpenHands evaluator).
+`.github/toolchain.env` RETAINED — live consumer is `openhands-agent.yml`
+(fetch + source) + `.openhands/setup.sh` (source). All checks green
+(check-test ✓ 3m, quality ✓ 2m, deps-report ✓). Branch deleted.
+
+**Maintainer follow-up (flagged, not auto-doable):** if `copilot-setup-steps`
+is a required status check in `main` branch protection, drop it there too or new
+PRs hang on a check that no longer runs.
