@@ -1,75 +1,19 @@
 # @netscript/plugin-workers
 
-`@netscript/plugin-workers` is the Tier 2 NetScript plugin for background jobs, task execution,
-workflow orchestration, service APIs, CLI commands, scaffolding, streams, database schema
-contribution, and Aspire process wiring.
+NetScript plugin for background job scheduling, task execution, and worker API endpoints.
 
-The reusable worker definitions and runtime primitives live in `@netscript/plugin-workers-core`.
-This package binds those primitives to the host plugin system.
+`@netscript/plugin-workers` is the Tier 2 deployable plugin that binds the reusable worker
+primitives in `@netscript/plugin-workers-core` to the host plugin system. It contributes a Workers
+API service, background processors, stream topics, database schema, versioned API contracts, CLI
+commands, scaffolding assets, and Aspire process wiring.
 
-## 1. Package Role
+## Install
 
-This package owns the deployable workers plugin manifest.
-
-It contributes:
-
-- a Workers API service
-- background processor entries
-- stream topics for jobs, tasks, and workflows
-- database schema metadata
-- versioned API contracts
-- runtime config topic metadata
-- E2E gate metadata
-- CLI commands mounted by the host CLI walker
-- scaffolding assets for jobs, tasks, and workflows
-- Aspire resource contribution metadata
-
-It does not own the core job DSL, task runtime contracts, workflow state contracts, or memory
-testing adapters. Import those from `@netscript/plugin-workers-core`.
-
-## 2. Install
-
-Use the workspace import while developing inside this repository:
-
-```ts
-import { workersPlugin } from '@netscript/plugin-workers';
+```sh
+deno add jsr:@netscript/plugin-workers
 ```
 
-After publishing, consumers should use the published JSR package specifier with the same exported
-subpaths.
-
-## 3. Configure
-
-Register the plugin in `netscript.config.ts`.
-
-```ts
-export default {
-  plugins: ['./plugins/workers/mod.ts'],
-};
-```
-
-The host loader imports the named `workersPlugin` manifest. Loading the package does not start a
-worker process.
-
-## 4. Manifest Surface
-
-The root entrypoint exports:
-
-- `workersPlugin`
-- `inspectWorkers`
-- manifest contribution types
-
-The manifest is authored with `definePlugin(name, version).with*().build()` and declares typed
-dependencies with:
-
-```ts
-.withDependencies({ streams: streamsPlugin })
-```
-
-The root remains intentionally small. Use subpaths for CLI, Aspire, contracts, streams, services,
-worker process classes, and scaffolding.
-
-## 5. Public Subpaths
+The plugin exposes focused subpaths for each axis of the workers surface:
 
 | Subpath            | Purpose                                |
 | ------------------ | -------------------------------------- |
@@ -83,177 +27,32 @@ worker process classes, and scaffolding.
 | `./streams/server` | Stream mirror server integration       |
 | `./worker`         | Worker and scheduler process classes   |
 
-Subpaths keep the root barrel below the package surface budget while still making plugin axes
-addressable by the host.
+## Quick example
 
-## 6. Contribution Axes
+Register the plugin in `netscript.config.ts`, then inspect the manifest without invoking any
+lifecycle hooks:
 
-The plugin declares these contribution groups:
+```ts
+import { inspectWorkers, workersPlugin } from '@netscript/plugin-workers';
 
-- `services`
-- `backgroundProcessors`
-- `streamTopics`
-- `databaseSchemas`
-- `runtimeConfigTopics`
-- `contractVersions`
-- `e2e`
-- `aspire`
+// Register the manifest with the host loader.
+export default {
+  plugins: [workersPlugin],
+};
 
-Each group is data on the manifest. Runtime work begins only when the host invokes a service,
-background entrypoint, CLI command, or Aspire contribution.
-
-## 7. Service
-
-The service entrypoint is `./services/src/main.ts`.
-
-The manifest contributes it as `workers-api` on port `8091`. The service owns HTTP routing for jobs,
-runs, tasks, administrative actions, server-sent events, and stream subscription endpoints.
-
-Database access is supplied by the host service context. The service should not create its own
-global database client.
-
-## 8. Background Processors
-
-The manifest contributes three runnable background entrypoints:
-
-- `./bin/combined.ts`
-- `./bin/worker.ts`
-- `./bin/scheduler.ts`
-
-`workers-combined` starts worker and scheduler behavior together. `workers-worker` only consumes and
-executes queued work. `workers-scheduler` only schedules due work.
-
-The wrappers exist so Aspire and process supervisors can launch concrete files instead of importing
-an export-only module.
-
-## 9. CLI
-
-The CLI subpath exports `WorkersCli` and command classes for:
-
-- `add-job`
-- `add-task`
-- `list-jobs`
-- `list-tasks`
-- `run`
-- `logs`
-- `config-edit`
-- `config-publish`
-- `enable`
-- `disable`
-- `compile-registry`
-
-Command execution is backend-injected. The local backend writes source files, scans project jobs,
-and emits a generated static registry at `.netscript/generated/plugin-workers/job-registry.ts`.
-
-## 10. Scaffolding
-
-The scaffolding subpath exposes side-effect-free scaffolders for:
-
-- job handlers
-- job builders
-- Deno tasks
-- Python tasks
-- shell tasks
-- PowerShell tasks
-- workflows
-
-Template assets live under `src/scaffolding/templates/` and are included in the publish allowlist.
-
-## 11. Streams
-
-The stream integration is backed by `@netscript/plugin-workers-core/streams`.
-
-Use `emitJobToStream()` for job event publication. The older `publishJobToStream()` name has been
-removed from the plugin surface.
-
-The plugin stream server also mirrors legacy execution-state mutations while the remaining consumer
-migration slices are in progress. That bridge is temporary and should disappear when the legacy
-workers package is removed.
-
-## 12. Aspire
-
-The Aspire subpath exports `WorkersAspireContribution`.
-
-It contributes:
-
-- `workers-api`
-- `workers-combined`
-- `workers-worker`
-- `workers-scheduler`
-
-The contribution records service ports, health endpoints, and background process entrypoints as data
-for the AppHost integration layer.
-
-## 13. Contracts
-
-The contracts subpath exposes Workers API contract v1.
-
-The plugin service uses the contract shape from workers core and presents it through the service
-package boundary. Contract schemas are Zod-derived where they define public or domain payloads.
-
-## 14. Package Tree
-
-```text
-plugins/workers/
-  bin/                 runnable background processor entrypoints
-  contracts/           v1 contract entrypoint
-  database/            Prisma schema contribution
-  services/            Workers API service process
-  src/aspire/          Aspire contribution
-  src/cli/             CLI commands, backend, registry compiler
-  src/e2e/             E2E gate metadata and probes
-  src/public/          manifest composition
-  src/scaffolding/     source scaffolders and templates
-  streams/             stream mirror integration
-  tests/               focused plugin tests and smoke tests
-  worker/              worker and scheduler process classes
+// Inspect declared dependencies and contribution axes (no runtime work runs).
+const inspection = inspectWorkers(workersPlugin);
+console.log(inspection.name, inspection.version);
+console.log('axes:', inspection.axes.join(', '));
 ```
 
-## 15. Permissions
+`workersPlugin` is the typed manifest authored with `definePlugin().with*().build()`. Loading the
+package does not start a worker process; runtime work begins only when the host invokes a service,
+background entrypoint, CLI command, or Aspire contribution. The core job DSL, task runtime
+contracts, and workflow state contracts live in `@netscript/plugin-workers-core`.
 
-The plugin manifest declares the permissions needed by service and background runtime paths:
+## Docs
 
-- `--allow-net`
-- `--unstable-kv`
-- `--allow-env`
-- `--allow-read`
-- `--allow-write`
-- `--allow-run`
-
-Narrower permissions can be supplied by process-specific launchers when the host owns command
-construction.
-
-## 16. Testing
-
-Focused tests exist for:
-
-- plugin manifest shape
-- CLI command surface
-- Aspire contribution data
-- E2E gate metadata
-
-Run the plugin checks from the repository root:
-
-```powershell
-deno check --unstable-kv plugins/workers/mod.ts plugins/workers/src/aspire/mod.ts plugins/workers/src/cli/composition/main.ts plugins/workers/contracts/v1/mod.ts plugins/workers/src/scaffolding/mod.ts plugins/workers/services/src/main.ts plugins/workers/streams/mod.ts plugins/workers/streams/server.ts plugins/workers/worker/mod.ts
-deno test --allow-all plugins/workers/tests/
-deno run --allow-read plugins/workers/verify-plugin.ts
-```
-
-## 17. Migration Status
-
-The plugin now depends on `@netscript/plugin-workers-core` for manifest payload schemas, stream
-schemas, and stream producer primitives.
-
-Process wrappers now compose the plugin worker runtime through `@netscript/plugin-workers-core` and
-the plugin service runtime. Slice D32 removed the legacy worker package.
-
-## 18. See Also
-
-Read:
-
-- `docs/README.md`
-- `docs/architecture.md`
-- `docs/getting-started.md`
-- `docs/operations.md`
-- `@netscript/plugin-workers-core` for core definitions and runtime contracts
+- [API reference](https://rickylabs.github.io/netscript/reference/workers/)
+- [Concepts & guides](https://rickylabs.github.io/netscript/)
+- [Workers core package](https://rickylabs.github.io/netscript/reference/workers-core/)
