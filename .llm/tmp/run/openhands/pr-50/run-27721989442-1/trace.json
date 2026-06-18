@@ -1,0 +1,32 @@
+{
+  "event": "issue_comment",
+  "issue_or_pr": 50,
+  "is_pr": true,
+  "output_mode": "pr-comment",
+  "selected_model": "openrouter/minimax/minimax-m3",
+  "selected_provider": "OPENROUTER",
+  "action_run": "https://github.com/rickylabs/netscript/actions/runs/27721989442",
+  "role": "PLAN-EVAL",
+  "evaluator": "openhands",
+  "model": "openrouter/minimax/minimax-m3",
+  "verdict": "PASS",
+  "verdict_source": ".llm/tmp/run/plan-agentic-system-claude-native-hardening--agentic-system/plan-eval.md",
+  "pr_comment_body": ".llm/tmp/run/plan-agentic-system-claude-native-hardening--agentic-system/pr-comment-body.md",
+  "summary_path": "/home/runner/work/_temp/openhands/27721989442-1/summary.md",
+  "slice_evaluated": "2857f552",
+  "plan_gate_items_total": 8,
+  "plan_gate_items_pass": 7,
+  "plan_gate_items_na": 1,
+  "findings": [
+    { "id": "F-1", "severity": "low", "category": "lockfile-churn", "blocks_plan_gate": false, "summary": "Hook deno run is missing --no-lock; latent forward-looking hazard; current scripts have no imports so no immediate churn." },
+    { "id": "F-2", "severity": "medium", "category": "wrong-evaluator-surface", "blocks_plan_gate": false, "summary": "agentic:smoke-claude-remote gate evidence does not record actual exit code or environment; tool returns EXIT=1 in CI without claude on PATH." },
+    { "id": "F-3", "severity": "residual", "category": "lockfile-churn", "blocks_plan_gate": false, "summary": "Uncommitted deno.lock churn (281 lines) in this worktree; not in the 2857f552 commit; should be git restored before next slice." },
+    { "id": "F-4", "severity": "process", "category": "process-discipline", "blocks_plan_gate": false, "summary": "Slice 2857f552 was committed before PLAN-EVAL ran; violates run-loop.md § 4 / plan-gate.md 'Why this gate exists'. Slice itself is sound; workflow-level fix." }
+  ],
+  "gates_rerun": {
+    "agentic:sync-claude:check": "PASS",
+    "agentic:check-claude": "PASS",
+    "agentic:smoke-claude-remote": "EXIT=1 (no claude on PATH in evaluator env; F-2 evidence)",
+    "deno check .llm/tools/agentic/*.ts": "PASS (script-mode tools, --no-lock)"
+  }
+}
