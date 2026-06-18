@@ -207,7 +207,7 @@ deno task test       # unit tests across ./src and ./tests
 deno task lint
 deno task fmt:check
 deno task doc-lint   # JSDoc lint for the public entrypoints
-deno task dry-run    # deno publish --dry-run
+deno task publish:dry-run # deno publish --dry-run
 ```
 
 ## Docs
