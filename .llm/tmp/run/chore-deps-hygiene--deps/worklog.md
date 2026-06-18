@@ -67,7 +67,12 @@ entry*, never by relaxing the catalog law.
 
 ## Gate Results
 
-(none yet — see `plan.md` Validation Plan; gate 0 = confirm `catalog:` resolves on Deno 2.8.3)
+| Slice | Gate | Command / Evidence | Result |
+|-------|------|--------------------|--------|
+| D-1 | Gate-0 catalog resolution | `deno task deps:prod-install` after wrapper fix (`deno ci --prod` under Deno 2.8.3) | PASS: prod graph resolved, no lockfile churn |
+| D-1 | Census JSON | `deno run --allow-read .llm/tools/deps/census.ts --json` | PASS: 27 members, 33 catalog entries, 61 dependency keys, 324 dependency uses, 148 tasks |
+| D-1 | Tooling check | `deno check .llm/tools/deps/census.ts .llm/tools/deps/workspace.ts .llm/tools/deps/prod-install.ts` | PASS |
+| D-1 | Tooling lint | `deno lint --no-config .llm/tools/deps/census.ts .llm/tools/deps/workspace.ts .llm/tools/deps/prod-install.ts` | PASS |
 
 ## Handoff Notes
 
