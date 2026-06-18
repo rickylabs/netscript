@@ -25,3 +25,11 @@
 - Coordinate doc-file ownership with Group 1 (`prod-readiness` deletes dead doc files; this run
   consolidates surviving content).
 - `.claude/skills/` regenerated from `.agents/skills/` — never hand-edit. PLAN-EVAL before any slice.
+
+## Implementation (LD-DOCS-LANE — Claude dynamic workflow, 2026-06-18)
+
+| Time | Phase | Step | Notes |
+|------|-------|------|-------|
+| 2026-06-18 | implement | **Authoring workflow run** `wf_ea6d8234-e50` | 7 slices authored by the Claude dynamic workflow (Opus; S3 high, rest medium), under the harness SKILL. S1 `deno doc` section in `jsr-audit/SKILL.md`; S2 `.llm/harness/tools-and-commands.md` + `run-loop.md` pointer; S3 canonical-home de-dup (`AGENTS.md` + `netscript-harness/SKILL.md`); S4 doctrine-ref tidy (`.llm/harness/README.md` + doctrine 01/04 dead-link de-link, **no decision text changed**); S5 `.llm/tools/README.md` tooling home; S6 root-ops coherence (`README.md` + `CONTRIBUTING.md`); S7 doc-maintenance gate (`check-internal-doc-links.ts` + `docs:links`/`docs:maintenance` tasks + `static-gates.md`). |
+| 2026-06-18 | implement | **Worktree-pin reconciliation (supervisor)** | Workflow subagents inherited the parent session's worktree pin (`release+jsr-readiness`); 5/7 slices (S2,S3,S5,S6,S7) detected it and wrote into `g4-internal` via Bash, but S1+S4 used Edit and leaked into the umbrella worktree. Supervisor patched the 4 leaked files (`jsr-audit/SKILL.md`, `harness/README.md`, doctrine 01/04) onto `docs/internal-overhaul` (base byte-identical across branches; `git apply --check` clean) and reverted them in the umbrella checkout. Net: all 7 slices now on `docs/internal-overhaul`; umbrella clean. See drift. |
+| 2026-06-18 | gate | **Mirror regen + gates** | `agentic:sync-claude` regenerated 2 stale mirrors (`.claude/skills/{jsr-audit,netscript-harness}/SKILL.md`, matching S1+S3 source). **G-mirror** `agentic:sync-claude:check` = PASS (17 skills OK). **G-surface** `agentic:check-claude` = PASS (CLAUDE.md @AGENTS.md, settings JSON, gitignore, mirror, hook-lock all OK). **G-links** `docs:links` = 26 broken links, ALL pre-existing in the unrelated `impeccable` skill (doctrine `phase-0-research` links fixed by S4; Group-4-owned surface is link-clean). Recorded as arch-debt `impeccable-dead-reference-links`; `docs:maintenance` redness is pre-existing/out-of-scope, flagged for IMPL-EVAL. |
