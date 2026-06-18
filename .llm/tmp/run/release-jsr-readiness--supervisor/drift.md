@@ -106,3 +106,24 @@ Append-only. Severity ∈ {minor, significant, architectural}.
   the evaluator-established census (this is fact-alignment, NOT box-grading — all A–F checkboxes and
   verdicts remain evaluator-owned). Added the F-wave dry-run blind-spot note to B1 (G2 follow-up
   #1b). No locked decision changed.
+
+## D-N — Blocker A "3 extra A1 failures" was a measurement artifact (WITHDRAWN)
+
+- **Severity:** significant (nearly expanded scope to an unnecessary framework-source Codex slice on
+  3 units; caught before launch).
+- **Observed:** the G3 doc fan-out Verify agent tallied `deno doc --lint` per package `mod.ts` in
+  isolation and reported `packages/plugin` (`ContributionAxis`→`CONTRIBUTION_AXES`),
+  `packages/telemetry` (`initJobTracing`/`runTracedJob`→`Context`/`Span`), `packages/database`
+  (`getDriverAdapter`→`PostgresDriverAdapter`) as `private-type-ref` A1 failures.
+- **Verification (supervisor, 2026-06-18):** linting each unit's FULL export map together (the way
+  JSR evaluates a package) shows all three CLEAN — the "private" types are exported from sibling
+  entries (`config/mod.ts`, `context/mod.ts`, `adapters/postgres.adapter.ts`). `deno publish
+  --dry-run` passes all three (slow-types check exit 0). Authoritative full-export-set census over
+  all 26 units = **25 CLEAN, 1 FAIL (fresh-ui only, 7 `private-type-ref`)** → 26/26 once PR #58
+  merges. fresh-ui's failures DO reproduce under full-export-set lint (its `*Namespace` types are
+  exported nowhere), so PR #58 was genuinely warranted.
+- **Resolution:** Blocker A withdrawn; no Codex slice launched. User had authorized one; supervisor
+  reported the false premise back instead of spending it. Methodology lesson recorded in
+  `.llm/harness/lessons/validation.md` ("A1 doc-lint MUST be measured over the FULL export map").
+- **Consequence for merge plan:** the "A1 batch" the user chose to hold PR #58 for has collapsed to
+  PR #58 alone (no 3-unit fix exists). Re-confirming merge timing with the user.

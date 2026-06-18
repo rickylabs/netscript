@@ -90,3 +90,25 @@ generated-trigger track).
 - Targeted `deno check` for these packages must pass `--unstable-kv`.
 - cron pins `deno.unstable` in `compilerOptions.lib`; queue passes `--unstable-kv`.
   No `skipLibCheck`.
+
+## A1 doc-lint MUST be measured over the FULL export map, never one entry
+
+`deno doc --lint` reports `error[private-type-ref]` for a public type that
+references a type which is private **within the set of files passed to that
+single invocation**. A type re-exported from a *sibling* export entry (e.g.
+`./config`, `./context`) is public for the package, but linting `mod.ts`
+**in isolation** can't see that sibling export and falsely flags it.
+
+Rule: the A1 (JSR doc-lint) gate for a unit is `deno doc --lint <all export-map
+entry files together>` — the way JSR evaluates the package — NOT per-`mod.ts`.
+Cross-check with `deno publish --dry-run` (the authoritative "slow types / public
+API" simulation). 2c (2026-06-18, jsr-readiness G3): a fan-out Verify agent
+linted each `mod.ts` alone and reported `plugin`/`telemetry`/`database` as
+`private-type-ref` failures (`ContributionAxis`→`CONTRIBUTION_AXES`,
+`initJobTracing`/`runTracedJob`→`Context`/`Span`,
+`getDriverAdapter`→`PostgresDriverAdapter`). Full-export-set lint + `deno publish
+--dry-run` showed **all three CLEAN** — those types are exported via
+`config/mod.ts` / `context/mod.ts` / `adapters/postgres.adapter.ts`. The only
+genuine A1 failure was `fresh-ui` (7 `*Namespace` types exported nowhere), which
+*does* fail the full-export-set lint too. A per-entry tally nearly triggered an
+unnecessary framework-source Codex slice on 3 false positives.
