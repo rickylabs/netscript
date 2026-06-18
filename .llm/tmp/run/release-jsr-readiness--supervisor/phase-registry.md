@@ -60,7 +60,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 - Umbrella branch current with `main`.
 
 ### Deliverables
-- Zero dead/temp/garbage/build cruft; all compat shims/aliases removed; dead doc files deleted; stray root files removed (e.g. `agents-handover.md`).
+- Zero dead/temp/garbage/build cruft; all back-compat shims/aliases removed (functional workarounds excluded); dead doc files deleted; `AGENTS-handoff.md` relocated into the `openhands-handoff` skill + root file deleted (no other stray root files exist).
 
 ### Success criteria
 - Scorecard **C1**. `publish:dry-run` 0 slow types (27) still green; `check`/`test`/`lint`/`fmt` green; `arch:check` not regressed; `e2e:cli` at merge-readiness.

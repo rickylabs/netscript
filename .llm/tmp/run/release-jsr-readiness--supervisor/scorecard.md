@@ -29,8 +29,9 @@ final program-level gate that confirms the sub-runs together produced a publisha
       on the umbrella branch (already green on `main` — the umbrella must hold it).
 
 ### C — Repo cleanliness (`chore/prod-readiness`)
-- [ ] **C1** **Zero** dead code, temp/garbage/build cruft, and stray root files (e.g.
-      `agents-handover.md`); **all** backward-compat shims/aliases removed; dead doc
+- [ ] **C1** **Zero** dead code, temp/garbage/build cruft, and stray root files; **all**
+      backward-compat shims/aliases removed (functional workarounds excluded); `AGENTS-handoff.md`
+      relocated into the `openhands-handoff` skill and the root file deleted; dead doc
       *files* deleted. No doc *content* rewrites (owned by the docs sub-runs).
 
 ### D — Dependency hygiene & catalog law (`chore/deps-hygiene`)
