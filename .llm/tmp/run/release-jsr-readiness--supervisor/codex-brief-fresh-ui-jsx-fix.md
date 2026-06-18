@@ -1,92 +1,105 @@
 # WSL Codex brief — fresh-ui interactive JSX-component type fix (check-test regression)
 
-> Lane: WSL Codex daemon-attached subagent (framework src). Supervisor (Claude) does NOT write
-> this fix. Launch only with daemon proof: WSL worktree path, Codex thread id, daemon-managed
-> remote-control proof, and the `codex exec resume <thread-id>` steering command. Without those,
-> record the launch as failed/not-attached in worklog.md/drift.md.
+> Lane: WSL Codex daemon-attached subagent (framework src + public surface). Supervisor (Claude)
+> does NOT write this fix. Launch only with daemon proof: WSL worktree path, Codex thread id,
+> daemon-managed remote-control proof, and the `codex exec resume <thread-id>` steering command.
+>
+> UPDATED 2026-06-19 after supervisor empirically reproduced the gate conflict on the umbrella.
+> The earlier "swap to `JSX.Element`" guidance was WRONG — see Root Cause + Fix below.
 
 ## Branch / worktree
 
-- Base branch: `release/jsr-readiness` (umbrella PR #53 → main). Current tip `c1a83149`.
-- One active Codex turn per worktree. Steer the same thread with `codex exec resume <thread-id>`;
-  never open a second send.
+- Base branch: `release/jsr-readiness` (umbrella PR #53 → main). Tip at brief update: `7fa2e9ee`.
+- Files are under `packages/fresh-ui/`. One active Codex turn per worktree; steer the same thread
+  with `codex exec resume <thread-id>`, never a second send.
 
-## Problem (root-caused)
+## Problem (the blocker)
 
-PR #58's fresh-ui A1 (`deno doc --lint`) fix gave the 7 interactive runtime component families
-explicit signatures — but used the over-broad `(props: unknown): unknown` to silence the
-`no-slow-types` lint. That satisfies A1/doc-lint but makes every component an invalid JSX element
-type (`(props: unknown) => unknown` is "not a valid JSX component"). The package's own guard
-`packages/fresh-ui/tests/consumer-render.test.tsx` (drift D-5c2-2) plus `_fixtures/
-docs-examples_test.ts`, `primitives.test.tsx`, `foundation.test.tsx` now fail type-checking.
+`check-test` (`deno task test`, which type-checks test files) is GREEN on `main` (`cc3b8731`) but
+RED on the umbrella: "Found 92 errors" — ~86 fresh-ui JSX errors (44× TS2786, 37× TS2559,
+5× TS2322; 6× TS2769/2771 in the docs-examples fixture). The interactive runtime components are
+typed `(props: unknown) => unknown`, which is not a valid JSX element type, so the package's own
+guard `packages/fresh-ui/tests/consumer-render.test.tsx` (drift D-5c2-2), plus
+`_fixtures/docs-examples_test.ts`, `primitives.test.tsx`, `foundation.test.tsx`, fail.
 
-Result: `check-test` (`deno task test`, which type-checks test files) is GREEN on `main`
-(`cc3b8731`) but RED on the umbrella — "Found 92 errors" (≈86 fresh-ui JSX errors: 44× TS2786,
-37× TS2559, 5× TS2322; 6× TS2769/2771 in the docs-examples fixture). This blocks the scorecard.
+## Root cause (verified empirically by the supervisor)
 
-## Files (7 component families)
+PR #58 made TWO changes to the 7 interactive component families
+(`packages/fresh-ui/src/runtime/{accordion,dialog,drawer,popover,sheet,tabs,tooltip}/*.tsx`):
 
-`packages/fresh-ui/src/runtime/{accordion,dialog,drawer,popover,sheet,tabs,tooltip}/*.tsx`
+1. It **added individual `export`s of each part-function** to `packages/fresh-ui/interactive.ts`
+   (e.g. `export { AccordionRoot, AccordionItem, ... }`). On `main`, the part-functions were NOT
+   exported — only the namespace consts (`Accordion`, `Dialog`, …) were public, and the
+   part-functions returned `VNode` with concrete prop types.
+2. Exposing the part-functions made their signatures PUBLIC API, which made `deno doc --lint`
+   (A1) emit `private-type-ref` errors. To silence those, #58 rewrote every signature to
+   `(props: unknown): unknown`. `unknown` is public ⇒ doc-lint clean, but ⇒ invalid JSX ⇒
+   check-test red.
 
-Each exports several `export function XxxYyy(props: unknown): unknown { const { ... } = props as
-XxxYyyProps; ... return ( <jsx/> ); }`. The correct per-part prop types ALREADY EXIST and are
-ALREADY IMPORTED in each file (e.g. `accordion/accordion.types.ts` exports `AccordionRootProps`,
-`AccordionItemProps`, `AccordionItemTriggerProps`, `AccordionItemIndicatorProps`,
-`AccordionItemContentProps`). `JSX` is already imported `from 'preact'` in these files.
+Empirical reproduction (supervisor, on Accordion.tsx): changing back to
+`(props: AccordionRootProps): JSX.Element` produced THREE `private-type-ref` doc-lint errors on
+the now-public `AccordionRoot`:
+- references private type `AccordionRootProps` (the prop type is not exported),
+- references private type `JSXInternal` and `JSXInternal.Element` — **Preact's `JSX.Element`
+  resolves to the internal `JSXInternal.Element`, which doc-lint treats as private. Do NOT use
+  `JSX.Element` as a public return type. Use `VNode` (a public preact type), as `main` did.**
 
-## The fix (mechanical, type-only — no behavior change)
+Baseline `deno doc --lint ./mod.ts ./interactive.ts ./primitives.tsx` is exit 0 today (the
+`unknown` stamp); the fix must keep it exit 0 while making check-test green.
 
-For every exported component function in those 7 families:
+## The fix — reconcile BOTH gates (this is the whole point of the slice)
 
-1. Replace the parameter type `props: unknown` with the concrete already-imported prop type for
-   that part (e.g. `props: AccordionRootProps`).
-2. Replace the return type `: unknown` with `: JSX.Element` (preact's `JSX` is already imported;
-   if a given file isn't importing it, add `import type { JSX } from 'preact';`).
-3. Remove the now-redundant `props as XxxYyyProps` cast inside the body (destructure `props`
-   directly). Keep all runtime logic identical.
+Target design: interactive components are valid JSX (concrete props + `VNode` return) AND every
+type they expose on the public surface is itself public.
 
-Example (Accordion.tsx):
+1. For all 7 families, restore the component bodies/signatures to the `main` shape:
+   `function XxxPart({ ... }: XxxPartProps): VNode { ... }` — concrete prop type in, `VNode` out
+   (import `type { VNode } from 'preact'`). Reuse `main` as the reference (e.g.
+   `git show origin/main:packages/fresh-ui/src/runtime/accordion/Accordion.tsx`). Type-only /
+   shape-only; no behavior change.
+2. Decide the public surface deliberately and make it doc-lint clean. Because an exported
+   namespace const must be explicitly typed (slow-types) and its type references the part
+   functions (and thus their prop types) via `typeof`, the referenced types MUST be exported.
+   So EXPORT, from `packages/fresh-ui/interactive.ts` (and/or `mod.ts` as appropriate), the
+   component **prop types** (`AccordionRootProps`, `AccordionItemProps`, … for all 7 families)
+   and the **namespace types** (`AccordionNamespace`, …). This intentionally expands the public
+   API to include the component prop types — correct for a published UI library (consumers need
+   them). The supervisor + user approved this surface expansion (routed to Codex on 2026-06-19).
+3. Choose whether the individual part-functions stay individually exported or revert to
+   namespace-only (as `main`). Either is acceptable IF doc-lint is clean; prefer the smaller,
+   intentional surface. Whatever you choose, do NOT leave any public signature referencing a
+   private type, and do NOT use `unknown`/`any` to dodge it.
 
-```diff
--export function AccordionRoot(props: unknown): unknown {
--  const { children, ...options } = props as AccordionRootProps;
-+export function AccordionRoot(props: AccordionRootProps): JSX.Element {
-+  const { children, ...options } = props;
-   const accordion = useAccordion(options);
-   return ( <AccordionContext.Provider value={accordion}> ... </AccordionContext.Provider> );
- }
-```
+## Both gates MUST be green (acceptance criteria)
 
-Do this for every exported part in all 7 families. If a component returns `null` in some branch,
-use `: JSX.Element | null`. Do not introduce `any`; do not re-broaden to `unknown`.
-
-## Both gates MUST be green (this is the whole point of the slice)
-
-1. `deno task test` — fresh-ui consumer-render guard + fixtures type-check clean (check-test
-   regression resolved; verify "0 errors" for the fresh-ui test files).
-2. `deno doc --lint` for fresh-ui stays clean (A1 no-slow-types, full export set 26/26 — see
-   memory `[[jsr-doc-lint-full-export-set]]`: lint the unit's full export map, not mod.ts alone).
-   `JSX.Element` is a concrete referenced type and is slow-types-safe; confirm no new warnings.
-3. Scoped wrappers for evidence: `.llm/tools/run-deno-check.ts` / `run-deno-lint.ts` with
+1. `deno task test` — fresh-ui consumer-render guard + fixtures type-check clean (the check-test
+   regression is gone; confirm 0 errors for the fresh-ui test files).
+2. `deno doc --lint ./mod.ts ./interactive.ts ./primitives.tsx` (run from `packages/fresh-ui/`)
+   — exit 0, on the FULL export map, not mod.ts alone (memory `jsr-doc-lint-full-export-set`:
+   sibling re-exports false-flag as private-type-ref if you lint a partial map).
+3. Scoped evidence wrappers: `.llm/tools/run-deno-check.ts` / `run-deno-lint.ts` with
    `--root packages/fresh-ui --ext ts,tsx`.
+4. Re-run repo `deno task check` (1598 files) to confirm no collateral type regressions.
 
-## Secondary (fold in if cheap, else note)
+## Secondary (fold in only if cheap)
 
-The non-blocking `quality` `fmt:check` is red (pre-existing on parent `b4e15113`, packages/plugins
-TS drift, not docs). If the touched fresh-ui files need `deno fmt`, format only those; do not run
-the mutating repo-wide `deno task fmt`. Leave broader fmt drift for a dedicated pass and note it.
+Non-blocking `quality` `fmt:check` is red (pre-existing on parent `b4e15113`, packages/plugins TS
+drift, not docs). If your touched files need formatting, format ONLY those; do not run the
+mutating repo-wide `deno task fmt`. Leave broader fmt drift to a dedicated pass; note it.
 
 ## Constraints (binding)
 
 - Do NOT touch `packages/aspire/src/public/mod.ts`, `scaffold-versions.ts`, or any version pins
   (LD-8). Do NOT de-catalog (Option-A catalog law). Do NOT delete lock files/caches or run
   `deno cache --reload`.
-- Type-only change; no runtime/behavior change; do not weaken or skip the consumer-render guard.
+- Type/surface-only change; no runtime/behavior change; do NOT weaken, skip, or delete the
+  consumer-render guard or any test (it exists to catch exactly this regression).
 
 ## Slice completion contract (per harness)
 
 Commit by slice → push `release/jsr-readiness` → comment on PR #53 with slice scope, commit hash,
-and both-gates test evidence → append `.llm/tmp/run/release-jsr-readiness--supervisor/commits.md`
-→ update `context-pack.md`. Then supervisor assembles evidence and hands the umbrella to a SEPARATE
-OpenHands scorecard-eval session (verdict owner). No publish until scorecard PASS + explicit user
-dispatch (E: 25 non-CLI OIDC 0.0.1-alpha.0, then F: `@netscript/cli` last; cli-e2e never published).
+and BOTH-gates evidence (the `deno task test` pass + the `deno doc --lint` exit 0) → append
+`.llm/tmp/run/release-jsr-readiness--supervisor/commits.md` → update `context-pack.md`. Then the
+supervisor assembles evidence and hands the umbrella to a SEPARATE OpenHands scorecard-eval
+session (verdict owner). No publish until scorecard PASS + explicit user dispatch (E: 25 non-CLI
+OIDC 0.0.1-alpha.0, then F: `@netscript/cli` last; cli-e2e never published).
