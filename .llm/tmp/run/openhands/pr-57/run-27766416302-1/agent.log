@@ -1,0 +1,400 @@
+    Design-phase deliverable per `workflow/run-loop.md §3b` item 5 — the same 
+box that the
+    Group 1 plan-eval (`chore-prod-readiness--cleanup/plan-eval.md`) enforced 
+via per-slice file
+    lists + LOC budgets. The required fix is a single `plan.md` §"Commit slices"
+addition (an
+    ordered, enumerated slice list, < 30, each row naming (a) what the slice 
+proves, (b) the
+    proving gate, (c) the files it touches). The locked decisions, scope, gate 
+set, and risk
+    register must not change when slices are added; the slice list is a design 
+artifact, not a
+    design change. After the fix, the plan re-enters PLAN-EVAL on cycle 2.
+    
+    ## Changes
+    
+    No code, no docs, no plan edits this session. The single deliverable is the
+    **PLAN-EVAL verdict file**:
+    
+    - `.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md` — full 
+verdict report
+      with the 7-item locked-decision spot-check table (each verified against 
+the tree), the
+      Plan-Gate checklist walk (7 PASS, 1 FAIL), the open-decision sweep (no 
+rework-forcing
+      decisions left open), the cycle-1 rationale, and the required fix 
+(illustrative slice
+      sketch S0–S8 respecting the locked default for IO-3).
+    
+    No PR comment posted; the workflow owns GitHub comments.
+    
+    ## Validation
+    
+    Read-only verification only (no tests executed in PLAN-EVAL):
+    
+    - `git --no-pager log` / `git --no-pager show` — confirmed branch state 
+(`docs/internal-overhaul`
+      HEAD `58a32bdf`, integration `release/jsr-readiness` @ `dd712b1e`, base 
+`main` @ `cc3b8731`),
+      G1 merge_sha `a4db5527`, G1-0 deletion commit `1c98fa1c`.
+    - `find` / `ls` — verified all five IO-6 canonical homes exist on tree; 
+verified
+      `validate-claude-surface.ts`, `sync-claude-skills.ts` exist at 
+`.llm/tools/agentic/`.
+    - `grep` — confirmed `AGENTS-handoff.md` is **not** in `git ls-files` on
+      `docs/internal-overhaul`; confirmed 
+`.agents/skills/openhands-handoff/SKILL.md` exists;
+      confirmed the IO-3 `deno doc` documentation gap (two `deno doc --lint` 
+mentions at
+      `jsr-audit/SKILL.md:289,441` with no standalone section).
+    - Off-limits guardrail: `packages/aspire/src/public/mod.ts`, 
+`scaffold-versions.ts`,
+      version pins, `catalog:` — confirmed absent from any implementation target
+the plan
+      names.
+    
+    ## Responses to review comments or issue comments
+    
+    None (PLAN-EVAL session — workflow posts the verdict on the PR).
+    
+    ## Remaining risks
+    
+    - The implementation slice list is not yet enumerated; the implementer must 
+add it
+      (illustrative S0–S8 sketch in the verdict file) before cycle-2 PLAN-EVAL.
+    - The `deno doc` documentation placement is a Design-phase detail (default 
+locked
+      = harness doc + `jsr-audit` skill section; exact placement within those 
+surfaces is
+      Design work). Not rework-forcing, but the implementer should pick the 
+smallest
+      co-located target for each topic.
+    - The internal link/anchor check (Validation Plan gate 3) has no existing 
+dedicated
+      script — reported as `PENDING_SCRIPT` per the `gates/fitness-gates.md` 
+"Phase A
+      Reporting" rule. The implementer may need to add a small wrapper script 
+under
+      `.llm/tools/` to make this gate mechanically checkable.
+    - This is cycle 1 of 2 before user escalation. The next PLAN-EVAL cycle is 
+expected
+      to PASS once the commit-slice list is added.
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.81M • cache hit 91.90% •  reasoning 721 • ↓ output 18.97K • $ 
+0.1669
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27766416302-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# OpenHands Run Summary — PLAN-EVAL cycle 1 — 
+`docs-internal-overhaul--contributor`
+ 2|
++3|**Verdict: FAIL_PLAN** (cycle 1 of 2; one further `FAIL_PLAN` cycle allowed 
+before user escalation per `plan-protocol.md` §"Loop limit")
++4|
++5|## Summary
++6|
++7|This was a **PLAN-EVAL** session (read-only verification, no implementation) 
+on the
++8|`docs/internal-overhaul` branch of the `release/jsr-readiness` umbrella. 
+Group 4 consolidates
++9|internal/contributor docs and adds a `deno doc` documentation section. The 
+plan is
++10|otherwise sound — all locked decisions (IO-2 mirror + gate, IO-3 `deno doc` 
+gap, IO-4/G1
++11|coordination, IO-5 functional IA vs Diátaxis, IO-6 canonical-home rubric), 
+the gate set,
++12|the boundary (Non-Scope vs Group 3; no framework-code edits; no 
+doctrine-decision changes),
++13|and the off-limits guardrail all hold against the tree at `58a32bdf` on
++14|`docs/internal-overhaul` (off `release/jsr-readiness` @ `dd712b1e` off 
+`main` @ `cc3b8731`).
++15|The single unchecked `gates/plan-gate.md` box is **Commit slices (< 30, gate
++ files
++16|each)**: the plan enumerates scope, locked decisions, risk register, gate 
+set, validation
++17|plan, dependencies, and drift watch, but does not enumerate ordered 
+implementation slices
++18|with per-slice what-it-proves / proving-gate / files-touched. This is a 
+required
++19|Design-phase deliverable per `workflow/run-loop.md §3b` item 5 — the same 
+box that the
++20|Group 1 plan-eval (`chore-prod-readiness--cleanup/plan-eval.md`) enforced 
+via per-slice file
++21|lists + LOC budgets. The required fix is a single `plan.md` §"Commit slices"
+addition (an
++22|ordered, enumerated slice list, < 30, each row naming (a) what the slice 
+proves, (b) the
++23|proving gate, (c) the files it touches). The locked decisions, scope, gate 
+set, and risk
++24|register must not change when slices are added; the slice list is a design 
+artifact, not a
++25|design change. After the fix, the plan re-enters PLAN-EVAL on cycle 2.
++26|
++27|## Changes
++28|
++29|No code, no docs, no plan edits this session. The single deliverable is the
++30|**PLAN-EVAL verdict file**:
++31|
++32|- `.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md` — full 
+verdict report
++33|  with the 7-item locked-decision spot-check table (each verified against 
+the tree), the
++34|  Plan-Gate checklist walk (7 PASS, 1 FAIL), the open-decision sweep (no 
+rework-forcing
++35|  decisions left open), the cycle-1 rationale, and the required fix 
+(illustrative slice
++36|  sketch S0–S8 respecting the locked default for IO-3).
++37|
++38|No PR comment posted; the workflow owns GitHub comments.
++39|
++40|## Validation
++41|
++42|Read-only verification only (no tests executed in PLAN-EVAL):
++43|
++44|- `git --no-pager log` / `git --no-pager show` — confirmed branch state 
+(`docs/internal-overhaul`
++45|  HEAD `58a32bdf`, integration `release/jsr-readiness` @ `dd712b1e`, base 
+`main` @ `cc3b8731`),
++46|  G1 merge_sha `a4db5527`, G1-0 deletion commit `1c98fa1c`.
++47|- `find` / `ls` — verified all five IO-6 canonical homes exist on tree; 
+verified
++48|  `validate-claude-surface.ts`, `sync-claude-skills.ts` exist at 
+`.llm/tools/agentic/`.
++49|- `grep` — confirmed `AGENTS-handoff.md` is **not** in `git ls-files` on
++50|  `docs/internal-overhaul`; confirmed 
+`.agents/skills/openhands-handoff/SKILL.md` exists;
++51|  confirmed the IO-3 `deno doc` documentation gap (two `deno doc --lint` 
+mentions at
++52|  `jsr-audit/SKILL.md:289,441` with no standalone section).
++53|- Off-limits guardrail: `packages/aspire/src/public/mod.ts`, 
+`scaffold-versions.ts`,
++54|  version pins, `catalog:` — confirmed absent from any implementation target
+the plan
++55|  names.
++56|
++57|## Responses to review comments or issue comments
++58|
++59|None (PLAN-EVAL session — workflow posts the verdict on the PR).
++60|
++61|## Remaining risks
++62|
++63|- The implementation slice list is not yet enumerated; the implementer must 
+add it
++64|  (illustrative S0–S8 sketch in the verdict file) before cycle-2 PLAN-EVAL.
++65|- The `deno doc` documentation placement is a Design-phase detail (default 
+locked
++66|  = harness doc + `jsr-audit` skill section; exact placement within those 
+surfaces is
++67|  Design work). Not rework-forcing, but the implementer should pick the 
+smallest
++68|  co-located target for each topic.
++69|- The internal link/anchor check (Validation Plan gate 3) has no existing 
+dedicated
++70|  script — reported as `PENDING_SCRIPT` per the `gates/fitness-gates.md` 
+"Phase A
++71|  Reporting" rule. The implementer may need to add a small wrapper script 
+under
++72|  `.llm/tools/` to make this gate mechanically checkable.
++73|- This is cycle 1 of 2 before user escalation. The next PLAN-EVAL cycle is 
+expected
++74|  to PASS once the commit-slice list is added.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify deliverable files
+
+Thought:
+Now let me verify everything is in place and the verdict file is consistent:
+
+$ cd /home/runner/work/netscript/netscript && ls -la 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md 
+/home/runner/work/_temp/openhands/27766416302-1/summary.md 2>&1; echo 
+"---verdict marker---"; grep -c "^## Cycle-1 verdict\|^### Rationale" 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md; echo "---verdict 
+string---"; grep -n "\*\*FAIL_PLAN\*\*\|\*\*PASS\*\*" 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md 
+/home/runner/work/_temp/openhands/27766416302-1/summary.md
+
+Tokens: ↑ input 1.85M • cache hit 90.27% •  reasoning 721 • ↓ output 19.19K • $ 
+0.1769
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+-rw------- 1 runner runner 18218 Jun 18 14:39 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md
+-rw------- 1 runner runner  4508 Jun 18 14:41 
+/home/runner/work/_temp/openhands/27766416302-1/summary.md
+---verdict marker---
+2
+---verdict string---
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md:38:| Research 
+present and current | **PASS** | `research.md` re-baselined at `main` @ 
+`cc3b8731`; Findings 1–5 inventory the internal-doc surface; Group-1 
+coordination list resolved with merge_sha `a4db5527`. Spot-checked: 
+`jsr-audit/SKILL.md:289,441` confirms the `deno doc --lint` under-documentation 
+gap; `AGENTS-handoff.md` is gone (G1-0 `1c98fa1c`); 
+`.agents/skills/openhands-handoff/SKILL.md` is the new home. |
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md:39:| Decisions 
+locked | **PASS** | IO-1..IO-6 locked with rationale; IO-5 (functional IA, not 
+Diátaxis) and IO-6 (canonical-home rubric) verified against tree. Group-1 
+coordination row resolved. |
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md:40:| Open-decision
+sweep | **PASS** | `plan.md` §"Open-Decision Sweep" — 4 rows, 3 RESOLVED, 1 
+"resolve in Design" with default locked (IO-3 default = harness doc + 
+`jsr-audit` skill section). No decision left open would force rework if 
+deferred. |
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md:42:| Risk register
+| **PASS** | 4 risks: drop doctrine nuance, break internal cross-refs, hand-edit
+`.claude/skills/`, overlap with Group 1 deletions. Each mitigation is named and 
+tied to a gate or a coordination point. |
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md:43:| Gate set 
+selected | **PASS** | 4 gates: `validate-claude-surface.ts` green; internal 
+link/anchor check; `.claude/skills/` regen-diff; doc-maintenance gate (E1). Plus
+the umbrella scorecard F1+E1 dimensions. Each gate has a named script/checkable 
+artifact. |
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md:44:| Deferred 
+scope explicit | **PASS** | `## Non-Scope` enumerates external/user docs, 
+dead-doc-file deletion, doctrine-decision changes, framework code. `## Hidden 
+Scope` flags skill mirrors, de-dup nuance risk, dense cross-refs. `## Drift 
+Watch` names escalation paths. |
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify verdict header lines
+
+$ cd /home/runner/work/netscript/netscript && grep -n "## Cycle-1 verdict\|^# 
+PLAN-EVAL" .llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md; echo 
+"---FAIL marker---"; grep -c "FAIL_PLAN" 
+.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md; echo "---summary 
+PASS/FAIL---"; grep -n "FAIL_PLAN\|PASS\|Verdict:" 
+/home/runner/work/_temp/openhands/27766416302-1/summary.md
+
+Tokens: ↑ input 1.88M • cache hit 90.41% •  reasoning 721 • ↓ output 19.37K • $ 
+0.1794
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+1:# PLAN-EVAL — docs-internal-overhaul--contributor (cycle 1)
+67:## Cycle-1 verdict
+---FAIL marker---
+5
+---summary PASS/FAIL---
+3:**Verdict: FAIL_PLAN** (cycle 1 of 2; one further `FAIL_PLAN` cycle allowed 
+before user escalation per `plan-protocol.md` §"Loop limit")
+34:  Plan-Gate checklist walk (7 PASS, 1 FAIL), the open-decision sweep (no 
+rework-forcing
+74:  to PASS once the commit-slice list is added.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Plan-Eval cycle 1 verdict FAIL_PLAN on docs-internal-overhaul
+
+Thought:
+Both files are in place. The verdict file structure is:
+
+- Header (PLAN-EVAL cycle 1, surface, scope, off-limits guardrail) ✓
+- Locked-decision spot-checks (7 verified items in a table) ✓
+- Off-limits guardrail PASS re-confirmed ✓
+- Plan-Gate checklist walk (7 PASS, 1 FAIL — "Commit slices") ✓
+- Open-decision sweep ✓
+- Subtle observations ✓
+- Cycle-1 verdict header + Rationale + Required fix ✓
+
+Summary file: verdict is unambiguous (FAIL_PLAN), rationale paragraph is 
+present, remaining risks listed, no PR comment posted.
+
+Finish with message:
+PLAN-EVAL cycle 1 verdict: **FAIL_PLAN**
+
+Plan-verdict file written: 
+`.llm/tmp/run/docs-internal-overhaul--contributor/plan-eval.md`
+OpenHands summary: `/home/runner/work/_temp/openhands/27766416302-1/summary.md`
+No implementation slice may begin before PASS. This is cycle 1 of 2 — one 
+further `FAIL_PLAN` cycle is allowed before the verdict escalates to the user 
+per `plan-protocol.md` §"Loop limit".
+
+**Spot-check results (each verified against the tree on `docs/internal-overhaul`
+@ `58a32bdf`, off `release/jsr-readiness` @ `dd712b1e` off `main` @ 
+`cc3b8731`):**
+
+1. **IO-5 (functional IA, NOT Diátaxis)** — VERIFIED. Diátaxis is Group 3 
+(`docs-user-site--diataxis/plan.md`); internal docs stay function-organized; 
+consistent with `CLAUDE.md` Supervisor Rules + `AGENTS.md` Read Order.
+2. **IO-6 (canonical-home rubric)** — VERIFIED. All 5 homes 
+(`docs/architecture/doctrine/`, `AGENTS.md`, `.agents/skills/<name>/`, 
+`CLAUDE.md`, `.llm/harness/`) exist on tree; rubric is deterministic enough that
+the exhaustive concept→home map can be a mechanical Design deliverable.
+3. **IO-2 (generated mirrors)** — VERIFIED. 
+`.llm/tools/agentic/validate-claude-surface.ts` exists and is named as the 
+scorecard gate (F1+E1 in `phase-registry.md:140-143`); 
+`.llm/tools/agentic/sync-claude-skills.ts` exists; `.claude/skills/` is a 
+generated mirror — plan correctly forbids hand-editing.
+4. **IO-4 / Group-1 coordination (RESOLVED claim)** — VERIFIED. 
+`AGENTS-handoff.md` is gone (G1-0 `1c98fa1c`); 
+`.agents/skills/openhands-handoff/SKILL.md` is the new home; G1 merged via PR 
+#54 (merge `a4db5527`); no delete-vs-consolidate conflict.
+5. **IO-3 (`deno doc` documentation scope)** — VERIFIED. Confirmed gap at 
+`.agents/skills/jsr-audit/SKILL.md:289,441` (two `deno doc --lint` mentions with
+no standalone section); plan's locked default (harness doc + `jsr-audit` skill 
+section) is concrete and actionable.
+6. **Gates concrete** — VERIFIED. 4 gates named: `validate-claude-surface.ts`, 
+internal link/anchor check (flagged `PENDING_SCRIPT` per harness Phase A 
+Reporting rule), `.claude/skills/` regen-diff via `sync-claude-skills.ts`, 
+doc-maintenance gate (E1).
+7. **Boundary** — VERIFIED. Non-Scope vs Group 3 is clean; no framework-code 
+edits; no doctrine-decision changes; off-limits guardrail PASS (no recent diff 
+against `packages/aspire/src/public/mod.ts`, `scaffold-versions.ts`, version 
+pins, or catalog/`catalog:`).
+
+**Plan-Gate walk: 7 of 8 boxes PASS. 1 FAIL — "Commit slices (< 30, gate + files
+each)".**
+
+The plan enumerates scope, locked decisions, risk register, gate set, validation
+plan, dependencies, and drift watch — but **does not enumerate ordered 
+implementation slices** with per-slice what-it-proves / proving-gate / 
+files-touched. This is a required Design-phase deliverable per 
+`workflow/run-loop.md §3b` item 5 and is the same box that the Group 1 plan-eval
+(`chore-prod-readiness--cleanup/plan-eval.md`) enforced via per-slice file lists
++ LOC budgets.
+
+**Required fix (single, targeted):** Add a `## Commit Slices` section to 
+`plan.md` — ordered, enumerated, < 30 slices, each row naming (a) what it 
+proves, (b) the proving gate from the existing Fitness Gates table, and (c) the 
+files it touches (path-level). The verdict file includes an illustrative S0–S8 
+sketch (deno doc section in `jsr-audit` skill · deno doc section in harness docs
+· duplication map AGENTS↔skills · doctrine ref tidy-up · `.llm/` tooling 
+architecture doc · root ops consolidation · doc-maintenance gate wired · final 
+all-gates-green), but the implementer may re-split. **Locked decisions, scope, 
+gate set, and risk register must not change** when slices are added; the slice 
+list is a design artifact, not a design change. After the fix, the plan 
+re-enters PLAN-EVAL on cycle 2.
+
+No PR comment posted (the workflow owns GitHub comments).
+
+Tokens: ↑ input 1.91M • cache hit 90.44% •  reasoning 721 • ↓ output 20.6K • $ 
+0.1835
+
