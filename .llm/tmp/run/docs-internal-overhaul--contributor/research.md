@@ -26,6 +26,12 @@
 - **`deno doc` doc gaps:** what the harness + `jsr-audit` skills currently say (likely little) vs
   the needed section (npm rendering, JSX/TSX highlighting, npm-without-types, `--lint`).
 - **Group 1 coordination list:** doc files Group 1 plans to delete vs files this run consolidates.
+  - **RESOLVED 2026-06-18 (Group 1 MERGED, PR #54 `a4db5527`):** Group 1's entire run deleted exactly
+    **one** `.md` file across the umbrella vs `main` — `AGENTS-handoff.md` (relocated into
+    `.agents/skills/openhands-handoff/SKILL.md`). No other doc files were deleted. → Group 4 has a
+    clean field: the only file-ownership coordination point is that the old root `AGENTS-handoff.md`
+    is gone and its content now lives in the openhands-handoff skill; consolidation should reference
+    the skill, not the deleted root file. No remaining delete-vs-consolidate conflict.
 
 ## jsr-audit surface scan
 

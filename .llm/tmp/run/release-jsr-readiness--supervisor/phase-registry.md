@@ -12,7 +12,7 @@ branch + worktree + nested run + sub-PR + evaluator pass). The umbrella exit gat
 | Supervisor run ID | `release-jsr-readiness--supervisor` |
 | Integration branch | `release/jsr-readiness` (off `main` @ `cc3b8731`) |
 | Base branch | `main` |
-| Surface | JSR-readiness of the 27 publishable units; exit = `scorecard.md` PASS |
+| Surface | JSR-readiness of the **26 publish targets** (27 declare name+exports; `cli-e2e` is `publish:false`); waves E=25 non-CLI + F=`@netscript/cli`. Exit = `scorecard.md` PASS |
 | Exit gate | `scorecard.md` (evaluator-owned, separate session) |
 | Roles | Claude supervises · OpenHands evaluates (separate session) · Codex WSL implements (mobile-visible) |
 
@@ -38,7 +38,8 @@ docs/* RESEARCH+PLAN  ┘
 docs/user-site IMPL · docs/internal-overhaul IMPL
         │
         ▼
-scorecard PASS (evaluator) ──► publish prep: E (26 non-CLI OIDC) ──► F (@netscript/cli last, LD-7)
+scorecard PASS (evaluator) ──► publish prep: E (25 non-CLI OIDC) ──► F (@netscript/cli last, LD-7)
+                                                  └─ cli-e2e (publish:false) is NEVER published
 ```
 
 Forced order: **docs IMPL** does not start until `chore/prod-readiness` **and**
@@ -67,7 +68,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 - Zero dead/temp/garbage/build cruft; all back-compat shims/aliases removed (functional workarounds excluded); dead doc files deleted; `AGENTS-handoff.md` relocated into the `openhands-handoff` skill + root file deleted (no other stray root files exist).
 
 ### Success criteria
-- Scorecard **C1**. `publish:dry-run` 0 slow types (27) still green; `check`/`test`/`lint`/`fmt` green; `arch:check` not regressed; `e2e:cli` at merge-readiness.
+- Scorecard **C1**. `publish:dry-run` 0 slow types (25-unit batch) still green; `check`/`test`/`lint`/`fmt` green; `arch:check` not regressed; `e2e:cli` at merge-readiness.
 
 ### Notes
 - Off-limits: `packages/aspire/src/public/mod.ts`, `scaffold-versions.ts`, version pins, catalog/`catalog:` (LD-7/LD-8 + Option-A law). Deletes only — **no new aliases**. Removing a shim requires a consumer scan first.
@@ -83,7 +84,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Scope overlay | none |
 | Sub-PR | #55 (draft, base `release/jsr-readiness`) |
 | Status | `merged` ✅ — IMPL-EVAL PASS (run 27760239494); **merged into `release/jsr-readiness` via PR #55 (merge_sha `4380203c`, --no-ff)** on 2026-06-18 per user go-ahead. Only conflict was an append-collision in `arch-debt.md` (resolved as union of both groups' debt entries). Post-merge `deno task deps:check` exits 0 on the umbrella. D-1…D-7 all PASS; D-7 enforcement wiring (`deps:check` → `ci:quality` + `arch:check`). |
-| G2 eval follow-ups | (1) **Unit count drift:** plan says "27 units" but `publish:dry-run` reports **25** on BOTH baseline and feature — doc drift, not a regression; **reconcile real publishable count before publish dispatch (E/F)**. (2) **Non-blocking debt:** add arch-debt note for `queue`/`amqplib` `^0.10.3 vs ^2.0.1` divergence for a future convergence slice. (3) Pre-existing `arch:check` doctrine baseline red (58 FAIL/147 WARN) — NOT attributable to G2; `deps:check` step itself green. |
+| G2 eval follow-ups | (1) **Unit count drift — RESOLVED 2026-06-18:** 27 members declare `name`+`exports`; canonical `publish:dry-run` simulates **25**; real publish denominator **26**. The 2 not in the batch: `@netscript/cli-e2e` (`publish:false`, nested under `packages/cli` — **never published**) and `@netscript/cli` (publishable; LD-7 publish-last/F-wave). Corrected waves: **E = 25 non-CLI**, **F = `@netscript/cli`**, cli-e2e excluded. (1b) **Publish-gate blind spot (NEW, publish-phase action):** the batch `publish:dry-run` scanner discovers `packages/cli` but emits no cli simulation (25 not 26) while exiting 0 — yet a **standalone** `deno publish --dry-run` in `packages/cli` succeeds (EXIT=0, only non-fatal `unanalyzable-dynamic-import` warnings from runtime plugin loading). → CI's dry-run does NOT validate the F-wave unit; the F dispatch MUST run cli's own `deno publish --dry-run` before the real publish. Root cause of the batch omission unconfirmed (likely catalog-materialization/workspace-resolution interaction); investigate at publish-phase, candidate arch-debt. (2) **Non-blocking debt:** add arch-debt note for `queue`/`amqplib` `^0.10.3 vs ^2.0.1` divergence for a future convergence slice. (3) Pre-existing `arch:check` doctrine baseline red (58 FAIL/147 WARN) — NOT attributable to G2; `deps:check` step itself green. |
 | Impl thread | `019edaa8-af32-7011-899c-00e14f730ef1` (Codex, daemon-managed, mobile-visible) |
 | Impl worktree | `/home/codex/repos/netscript-deps-hygiene` (ext4 native, `chore/deps-hygiene` @ launch base `b6985c6`) |
 | Steering | `codex exec resume 019edaa8-af32-7011-899c-00e14f730ef1 "<follow-up>"` (NEVER a 2nd `send-message-v2` on this worktree) |

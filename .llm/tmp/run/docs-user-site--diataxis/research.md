@@ -18,7 +18,8 @@
 | 3 | **Subpath gap**: project Pages (`<user>.github.io/netscript`) needs Lume `location` config or links/assets break. | `docs-architecture-research.md` §Lume risk. |
 | 4 | **Reference source = `deno doc`** (+ `deno doc --lint`): the JSR-native surface description; `deno doc --lint` is the publish-quality bar. AGENTS.md: "`deno doc` is your friend". | `deno doc --help`; AGENTS.md Read Order. |
 | 5 | Comparators: Laravel (versioned, task + reference split), TanStack (per-package docs, framework-adapter matrix), MedusaJS (concepts vs reference vs how-to separation). | `docs-architecture-research.md` §comparators. |
-| 6 | 27 publishable units exist; not all are library packages (examples/apps/e2e) — reference denominator must be decided. | `deno task publish:dry-run` unit list. |
+| 6 | **Reconciled census (2026-06-18, post 1+2 merge):** 27 members declare `name`+`exports`, but the canonical `deno task publish:dry-run` simulates **25** and the real publish denominator is **26**. The 2 not in the dry-run batch: `@netscript/cli-e2e` (`publish:false`, internal e2e — **never published**, drop from reference) and `@netscript/cli` (publishable but excluded from the batch; the LD-7 **publish-last/F-wave** unit). → **Docs reference denominator = 26 units** (the 25 E-wave + `@netscript/cli`); `cli-e2e` excluded. | `deno task publish:dry-run` (25 `Simulating publish` lines, captured `$JOB/tmp/dryrun.out`); `packages/cli/e2e/deno.json publish:false`; census `unit-census.py`. |
+| 6b | Within the 26: 4 `*-core` packages (`plugin-{sagas,streams,triggers,workers}-core`) are internal substrate behind their public plugin; `fresh-ui` is the only unit at `v0.1.0` (rest `0.0.1-alpha.0`). Reference **depth** (full page vs folded-under-plugin) is a Design decision, but all 26 are in the denominator. | census version column. |
 
 ## Census to build (generator/Design)
 
