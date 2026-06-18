@@ -1,7 +1,8 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
+import type { FreshUiChild } from '../_internal/public-props.ts';
 import type {
   SheetCloseProps,
   SheetContentProps,
@@ -23,56 +24,64 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-/** Render the sheet root provider. */
-export function SheetRoot(props: unknown): unknown {
-  const { children, ...options } = props as SheetRootProps;
+function SheetRoot({ children, ...options }: SheetRootProps): VNode {
   const sheet = useSheet(options);
   return <SheetContext.Provider value={sheet}>{children}</SheetContext.Provider>;
 }
 
-/** Render the button that opens the sheet. */
-export function SheetTrigger(props: unknown): unknown {
-  const { children, ...triggerProps } = props as SheetTriggerProps;
+function SheetTrigger({ children, ...props }: SheetTriggerProps): VNode {
   const sheet = useSheetContext('Sheet.Trigger');
-  return <button {...sheet.getTriggerProps(triggerProps)}>{withChildren(children)}</button>;
+  return (
+    <button {...sheet.getTriggerProps(props as JSX.ButtonHTMLAttributes<HTMLButtonElement>)}>
+      {withChildren(children)}
+    </button>
+  );
 }
 
-/** Render the sheet content element. */
-export function SheetContent(props: unknown): unknown {
-  const { children, ...contentProps } = props as SheetContentProps;
+function SheetContent({ children, ...props }: SheetContentProps): VNode {
   const sheet = useSheetContext('Sheet.Content');
-  return <dialog {...sheet.getContentProps(contentProps)}>{withChildren(children)}</dialog>;
+  return (
+    <dialog {...sheet.getContentProps(props as JSX.HTMLAttributes<HTMLDialogElement>)}>
+      {withChildren(children)}
+    </dialog>
+  );
 }
 
-/** Render the sheet title element. */
-export function SheetTitle(props: unknown): unknown {
-  const { children, ...titleProps } = props as SheetTitleProps;
+function SheetTitle({ children, ...props }: SheetTitleProps): VNode {
   const sheet = useSheetContext('Sheet.Title');
-  return <h2 {...sheet.getTitleProps(titleProps)}>{withChildren(children)}</h2>;
+  return (
+    <h2 {...sheet.getTitleProps(props as JSX.HTMLAttributes<HTMLHeadingElement>)}>
+      {withChildren(children)}
+    </h2>
+  );
 }
 
-/** Render the sheet description element. */
-export function SheetDescription(props: unknown): unknown {
-  const { children, ...descriptionProps } = props as SheetDescriptionProps;
+function SheetDescription({ children, ...props }: SheetDescriptionProps): VNode {
   const sheet = useSheetContext('Sheet.Description');
-  return <p {...sheet.getDescriptionProps(descriptionProps)}>{withChildren(children)}</p>;
+  return (
+    <p {...sheet.getDescriptionProps(props as JSX.HTMLAttributes<HTMLParagraphElement>)}>
+      {withChildren(children)}
+    </p>
+  );
 }
 
-/** Render the button that closes the sheet. */
-export function SheetClose(props: unknown): unknown {
-  const { children, ...closeProps } = props as SheetCloseProps;
+function SheetClose({ children, ...props }: SheetCloseProps): VNode {
   const sheet = useSheetContext('Sheet.Close');
-  return <button {...sheet.getCloseProps(closeProps)}>{withChildren(children)}</button>;
+  return (
+    <button {...sheet.getCloseProps(props as JSX.ButtonHTMLAttributes<HTMLButtonElement>)}>
+      {withChildren(children)}
+    </button>
+  );
 }
 
 /** Compound sheet namespace type with root and structural subcomponents. */
 export type SheetNamespace = Readonly<{
-  Close: typeof SheetClose;
-  Content: typeof SheetContent;
-  Description: typeof SheetDescription;
-  Root: typeof SheetRoot;
-  Title: typeof SheetTitle;
-  Trigger: typeof SheetTrigger;
+  Close: (props: SheetCloseProps) => FreshUiChild;
+  Content: (props: SheetContentProps) => FreshUiChild;
+  Description: (props: SheetDescriptionProps) => FreshUiChild;
+  Root: (props: SheetRootProps) => FreshUiChild;
+  Title: (props: SheetTitleProps) => FreshUiChild;
+  Trigger: (props: SheetTriggerProps) => FreshUiChild;
 }>;
 
 /** Compound Sheet namespace — side-docked inspection panel. */

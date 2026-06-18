@@ -1,5 +1,6 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
+import type { FreshUiChildren, FreshUiElementProps } from '../_internal/public-props.ts';
 
 export type AccordionRootElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
 export type AccordionItemElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
@@ -40,9 +41,9 @@ export interface UseAccordionOptions {
   disabled?: boolean;
   id?: string;
   multiple?: boolean;
-  onFocusChange?: (details: AccordionFocusChangeDetails) => void;
-  onValueChange?: (details: AccordionValueChangeDetails) => void;
-  orientation?: AccordionOrientation;
+  onFocusChange?: (details: { value: string | null }) => void;
+  onValueChange?: (details: { value: string[] }) => void;
+  orientation?: 'horizontal' | 'vertical';
   value?: string[];
 }
 
@@ -70,26 +71,38 @@ export interface UseAccordionReturn {
   value: string[];
 }
 
-export interface AccordionRootProps extends UseAccordionOptions {
-  children: ComponentChildren;
-}
+/** Props for the compound accordion root component. */
+export type AccordionRootProps = FreshUiElementProps & {
+  children?: FreshUiChildren;
+  collapsible?: boolean;
+  defaultValue?: string[];
+  disabled?: boolean;
+  multiple?: boolean;
+  onFocusChange?: (details: { value: string | null }) => void;
+  onValueChange?: (details: { value: string[] }) => void;
+  orientation?: 'horizontal' | 'vertical';
+  value?: string[];
+};
 
-export interface AccordionItemProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children: ComponentChildren;
+/** Props for an accordion item component. */
+export type AccordionItemProps = FreshUiElementProps & {
+  children: FreshUiChildren;
   disabled?: boolean;
   value: string;
-}
+};
 
-export interface AccordionItemTriggerProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for an accordion item trigger component. */
+export type AccordionItemTriggerProps = FreshUiElementProps & {
+  children: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
 
-export interface AccordionItemIndicatorProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for an accordion item indicator component. */
+export type AccordionItemIndicatorProps = FreshUiElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface AccordionItemContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for an accordion item content component. */
+export type AccordionItemContentProps = FreshUiElementProps & {
+  children?: FreshUiChildren;
+};

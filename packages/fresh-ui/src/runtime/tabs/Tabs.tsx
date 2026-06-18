@@ -1,7 +1,8 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
+import type { FreshUiChild } from '../_internal/public-props.ts';
 import type {
   TabsContentProps,
   TabsListProps,
@@ -21,40 +22,44 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-/** Render the tabs root provider. */
-export function TabsRoot(props: unknown): unknown {
-  const { children, ...options } = props as TabsRootProps;
+function TabsRoot({ children, ...options }: TabsRootProps): VNode {
   const tabs = useTabs(options);
   return <TabsContext.Provider value={tabs}>{children}</TabsContext.Provider>;
 }
 
-/** Render the tabs list element. */
-export function TabsList(props: unknown): unknown {
-  const { children, ...listProps } = props as TabsListProps;
+function TabsList({ children, ...props }: TabsListProps): VNode {
   const tabs = useTabsContext('Tabs.List');
-  return <div {...tabs.getListProps(listProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...tabs.getListProps(props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
-/** Render a tabs trigger for a value. */
-export function TabsTrigger(props: unknown): unknown {
-  const { children, value, ...triggerProps } = props as TabsTriggerProps;
+function TabsTrigger({ children, value, ...props }: TabsTriggerProps): VNode {
   const tabs = useTabsContext('Tabs.Trigger');
-  return <button {...tabs.getTriggerProps(value, triggerProps)}>{withChildren(children)}</button>;
+  return (
+    <button {...tabs.getTriggerProps(value, props as JSX.ButtonHTMLAttributes<HTMLButtonElement>)}>
+      {withChildren(children)}
+    </button>
+  );
 }
 
-/** Render a tabs content panel for a value. */
-export function TabsContent(props: unknown): unknown {
-  const { children, value, ...contentProps } = props as TabsContentProps;
+function TabsContent({ children, value, ...props }: TabsContentProps): VNode {
   const tabs = useTabsContext('Tabs.Content');
-  return <div {...tabs.getContentProps(value, contentProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...tabs.getContentProps(value, props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
 /** Compound tabs namespace type with root, list, trigger, and content subcomponents. */
 export type TabsNamespace = Readonly<{
-  Content: typeof TabsContent;
-  List: typeof TabsList;
-  Root: typeof TabsRoot;
-  Trigger: typeof TabsTrigger;
+  Content: (props: TabsContentProps) => FreshUiChild;
+  List: (props: TabsListProps) => FreshUiChild;
+  Root: (props: TabsRootProps) => FreshUiChild;
+  Trigger: (props: TabsTriggerProps) => FreshUiChild;
 }>;
 
 /** Compound tabs namespace with root, list, trigger, and content subcomponents. */

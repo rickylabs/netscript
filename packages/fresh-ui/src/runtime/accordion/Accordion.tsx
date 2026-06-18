@@ -1,7 +1,8 @@
 import { createContext } from 'preact';
-import type { ComponentChildren, JSX } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
+import type { FreshUiChild } from '../_internal/public-props.ts';
 import type {
   AccordionItemContentProps,
   AccordionItemIndicatorProps,
@@ -28,9 +29,7 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-/** Render the accordion root provider and container. */
-export function AccordionRoot(props: unknown): unknown {
-  const { children, ...options } = props as AccordionRootProps;
+function AccordionRoot({ children, ...options }: AccordionRootProps): VNode {
   const accordion = useAccordion(options);
   return (
     <AccordionContext.Provider value={accordion}>
@@ -39,16 +38,17 @@ export function AccordionRoot(props: unknown): unknown {
   );
 }
 
-/** Render an accordion item bound to a value. */
-export function AccordionItem(props: unknown): unknown {
-  const { children, disabled, value, ...itemProps } = props as AccordionItemProps;
+function AccordionItem({ children, disabled, value, ...props }: AccordionItemProps): VNode {
   const accordion = useAccordionContext('Accordion.Item');
   const item = { disabled, value };
 
   return (
     <AccordionItemContext.Provider value={item}>
       <details
-        {...(accordion.getItemProps(item, itemProps) as JSX.HTMLAttributes<HTMLDetailsElement>)}
+        {...(accordion.getItemProps(
+          item,
+          props as JSX.HTMLAttributes<HTMLDivElement>,
+        ) as JSX.HTMLAttributes<HTMLDetailsElement>)}
       >
         {withChildren(children)}
       </details>
@@ -56,12 +56,13 @@ export function AccordionItem(props: unknown): unknown {
   );
 }
 
-/** Render the trigger for the current accordion item. */
-export function AccordionItemTrigger(props: unknown): unknown {
-  const { children, ...triggerOptions } = props as AccordionItemTriggerProps;
+function AccordionItemTrigger({ children, ...props }: AccordionItemTriggerProps): VNode {
   const accordion = useAccordionContext('Accordion.ItemTrigger');
   const item = useAccordionItemContext('Accordion.ItemTrigger');
-  const triggerProps = accordion.getItemTriggerProps(item, triggerOptions);
+  const triggerProps = accordion.getItemTriggerProps(
+    item,
+    props as JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+  );
   const { disabled, onClick, type: _type, ...summaryProps } = triggerProps;
 
   return (
@@ -79,29 +80,33 @@ export function AccordionItemTrigger(props: unknown): unknown {
   );
 }
 
-/** Render the indicator for the current accordion item. */
-export function AccordionItemIndicator(props: unknown): unknown {
-  const { children, ...indicatorProps } = props as AccordionItemIndicatorProps;
+function AccordionItemIndicator({ children, ...props }: AccordionItemIndicatorProps): VNode {
   const accordion = useAccordionContext('Accordion.ItemIndicator');
   const item = useAccordionItemContext('Accordion.ItemIndicator');
-  return <div {...accordion.getItemIndicatorProps(item, indicatorProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...accordion.getItemIndicatorProps(item, props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
-/** Render the content panel for the current accordion item. */
-export function AccordionItemContent(props: unknown): unknown {
-  const { children, ...contentProps } = props as AccordionItemContentProps;
+function AccordionItemContent({ children, ...props }: AccordionItemContentProps): VNode {
   const accordion = useAccordionContext('Accordion.ItemContent');
   const item = useAccordionItemContext('Accordion.ItemContent');
-  return <div {...accordion.getItemContentProps(item, contentProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...accordion.getItemContentProps(item, props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
 /** Compound accordion namespace type with root and item subcomponents. */
 export type AccordionNamespace = Readonly<{
-  Item: typeof AccordionItem;
-  ItemContent: typeof AccordionItemContent;
-  ItemIndicator: typeof AccordionItemIndicator;
-  ItemTrigger: typeof AccordionItemTrigger;
-  Root: typeof AccordionRoot;
+  Item: (props: AccordionItemProps) => FreshUiChild;
+  ItemContent: (props: AccordionItemContentProps) => FreshUiChild;
+  ItemIndicator: (props: AccordionItemIndicatorProps) => FreshUiChild;
+  ItemTrigger: (props: AccordionItemTriggerProps) => FreshUiChild;
+  Root: (props: AccordionRootProps) => FreshUiChild;
 }>;
 
 /** Compound accordion namespace with root and item subcomponents. */

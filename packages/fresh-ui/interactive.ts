@@ -8,74 +8,83 @@
  * for stateful accessibility primitives.
  */
 
-export {
-  Accordion,
-  AccordionItem,
-  AccordionItemContent,
-  AccordionItemIndicator,
-  AccordionItemTrigger,
-  AccordionRoot,
-} from './src/runtime/accordion/Accordion.tsx';
+export type {
+  FreshUiAttributeValue,
+  FreshUiChild,
+  FreshUiChildren,
+  FreshUiElementProps,
+  FreshUiEventHandler,
+  FreshUiStyle,
+} from './src/runtime/_internal/public-props.ts';
+
+export { Accordion } from './src/runtime/accordion/Accordion.tsx';
 export type { AccordionNamespace } from './src/runtime/accordion/Accordion.tsx';
-export {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-} from './src/runtime/dialog/Dialog.tsx';
+export type {
+  AccordionItemContentProps,
+  AccordionItemIndicatorProps,
+  AccordionItemProps,
+  AccordionItemTriggerProps,
+  AccordionRootProps,
+} from './src/runtime/accordion/accordion.types.ts';
+export { Dialog } from './src/runtime/dialog/Dialog.tsx';
 export type { DialogNamespace } from './src/runtime/dialog/Dialog.tsx';
-export {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerRoot,
-  DrawerTitle,
-  DrawerTrigger,
-} from './src/runtime/drawer/Drawer.tsx';
+export type {
+  DialogCloseProps,
+  DialogContentProps,
+  DialogDescriptionProps,
+  DialogRootProps,
+  DialogTitleProps,
+  DialogTriggerProps,
+} from './src/runtime/dialog/dialog.types.ts';
+export { Drawer } from './src/runtime/drawer/Drawer.tsx';
 export type { DrawerNamespace } from './src/runtime/drawer/Drawer.tsx';
-export {
-  Popover,
-  PopoverAnchor,
-  PopoverArrow,
-  PopoverArrowTip,
-  PopoverClose,
-  PopoverContent,
-  PopoverDescription,
-  PopoverPositioner,
-  PopoverRoot,
-  PopoverTitle,
-  PopoverTrigger,
-} from './src/runtime/popover/Popover.tsx';
+export type {
+  DrawerCloseProps,
+  DrawerContentProps,
+  DrawerDescriptionProps,
+  DrawerRootProps,
+  DrawerTitleProps,
+  DrawerTriggerProps,
+} from './src/runtime/drawer/drawer.types.ts';
+export { Popover } from './src/runtime/popover/Popover.tsx';
 export type { PopoverNamespace } from './src/runtime/popover/Popover.tsx';
-export {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetRoot,
-  SheetTitle,
-  SheetTrigger,
-} from './src/runtime/sheet/Sheet.tsx';
+export type {
+  PopoverAnchorProps,
+  PopoverArrowProps,
+  PopoverArrowTipProps,
+  PopoverCloseProps,
+  PopoverContentProps,
+  PopoverDescriptionProps,
+  PopoverPositionerProps,
+  PopoverRootProps,
+  PopoverTitleProps,
+  PopoverTriggerProps,
+} from './src/runtime/popover/popover.types.ts';
+export { Sheet } from './src/runtime/sheet/Sheet.tsx';
 export type { SheetNamespace } from './src/runtime/sheet/Sheet.tsx';
-export {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsRoot,
-  TabsTrigger,
-} from './src/runtime/tabs/Tabs.tsx';
+export type {
+  SheetCloseProps,
+  SheetContentProps,
+  SheetDescriptionProps,
+  SheetRootProps,
+  SheetTitleProps,
+  SheetTriggerProps,
+} from './src/runtime/sheet/sheet.types.ts';
+export { Tabs } from './src/runtime/tabs/Tabs.tsx';
 export type { TabsNamespace } from './src/runtime/tabs/Tabs.tsx';
-export {
-  Tooltip,
-  TooltipArrow,
-  TooltipArrowTip,
-  TooltipContent,
-  TooltipPositioner,
-  TooltipRoot,
-  TooltipTrigger,
-} from './src/runtime/tooltip/Tooltip.tsx';
+export type {
+  TabsContentProps,
+  TabsListProps,
+  TabsRootProps,
+  TabsTriggerProps,
+} from './src/runtime/tabs/tabs.types.ts';
+export { Tooltip } from './src/runtime/tooltip/Tooltip.tsx';
 export type { TooltipNamespace } from './src/runtime/tooltip/Tooltip.tsx';
+export type {
+  TooltipArrowProps,
+  TooltipArrowTipProps,
+  TooltipContentProps,
+  TooltipPositionerProps,
+  TooltipRootProps,
+  TooltipTriggerProps,
+} from './src/runtime/tooltip/tooltip.types.ts';

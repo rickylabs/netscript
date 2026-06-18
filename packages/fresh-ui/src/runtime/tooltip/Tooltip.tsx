@@ -1,7 +1,8 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
+import type { FreshUiChild } from '../_internal/public-props.ts';
 import type {
   TooltipArrowProps,
   TooltipArrowTipProps,
@@ -23,56 +24,64 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-/** Render the tooltip root provider. */
-export function TooltipRoot(props: unknown): unknown {
-  const { children, ...options } = props as TooltipRootProps;
+function TooltipRoot({ children, ...options }: TooltipRootProps): VNode {
   const tooltip = useTooltip(options);
   return <TooltipContext.Provider value={tooltip}>{children}</TooltipContext.Provider>;
 }
 
-/** Render the button that triggers the tooltip. */
-export function TooltipTrigger(props: unknown): unknown {
-  const { children, ...triggerProps } = props as TooltipTriggerProps;
+function TooltipTrigger({ children, ...props }: TooltipTriggerProps): VNode {
   const tooltip = useTooltipContext('Tooltip.Trigger');
-  return <button {...tooltip.getTriggerProps(triggerProps)}>{withChildren(children)}</button>;
+  return (
+    <button {...tooltip.getTriggerProps(props as JSX.ButtonHTMLAttributes<HTMLButtonElement>)}>
+      {withChildren(children)}
+    </button>
+  );
 }
 
-/** Render the tooltip positioning element. */
-export function TooltipPositioner(props: unknown): unknown {
-  const { children, ...positionerProps } = props as TooltipPositionerProps;
+function TooltipPositioner({ children, ...props }: TooltipPositionerProps): VNode {
   const tooltip = useTooltipContext('Tooltip.Positioner');
-  return <div {...tooltip.getPositionerProps(positionerProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...tooltip.getPositionerProps(props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
-/** Render the tooltip content element. */
-export function TooltipContent(props: unknown): unknown {
-  const { children, ...contentProps } = props as TooltipContentProps;
+function TooltipContent({ children, ...props }: TooltipContentProps): VNode {
   const tooltip = useTooltipContext('Tooltip.Content');
-  return <div {...tooltip.getContentProps(contentProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...tooltip.getContentProps(props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
-/** Render the tooltip arrow element. */
-export function TooltipArrow(props: unknown): unknown {
-  const { children, ...arrowProps } = props as TooltipArrowProps;
+function TooltipArrow({ children, ...props }: TooltipArrowProps): VNode {
   const tooltip = useTooltipContext('Tooltip.Arrow');
-  return <div {...tooltip.getArrowProps(arrowProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...tooltip.getArrowProps(props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
-/** Render the tooltip arrow tip element. */
-export function TooltipArrowTip(props: unknown): unknown {
-  const { children, ...arrowTipProps } = props as TooltipArrowTipProps;
+function TooltipArrowTip({ children, ...props }: TooltipArrowTipProps): VNode {
   const tooltip = useTooltipContext('Tooltip.ArrowTip');
-  return <div {...tooltip.getArrowTipProps(arrowTipProps)}>{withChildren(children)}</div>;
+  return (
+    <div {...tooltip.getArrowTipProps(props as JSX.HTMLAttributes<HTMLDivElement>)}>
+      {withChildren(children)}
+    </div>
+  );
 }
 
-/** Compound tooltip namespace type with root and positioning subcomponents. */
+/** Compound tooltip namespace type with root, trigger, positioning, and content subcomponents. */
 export type TooltipNamespace = Readonly<{
-  Arrow: typeof TooltipArrow;
-  ArrowTip: typeof TooltipArrowTip;
-  Content: typeof TooltipContent;
-  Positioner: typeof TooltipPositioner;
-  Root: typeof TooltipRoot;
-  Trigger: typeof TooltipTrigger;
+  Arrow: (props: TooltipArrowProps) => FreshUiChild;
+  ArrowTip: (props: TooltipArrowTipProps) => FreshUiChild;
+  Content: (props: TooltipContentProps) => FreshUiChild;
+  Positioner: (props: TooltipPositionerProps) => FreshUiChild;
+  Root: (props: TooltipRootProps) => FreshUiChild;
+  Trigger: (props: TooltipTriggerProps) => FreshUiChild;
 }>;
 
 /** Compound tooltip namespace with root and positioning subcomponents. */

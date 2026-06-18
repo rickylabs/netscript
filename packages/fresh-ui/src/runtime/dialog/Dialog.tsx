@@ -1,7 +1,8 @@
 import { createContext } from 'preact';
-import type { ComponentChildren } from 'preact';
+import type { ComponentChildren, JSX, VNode } from 'preact';
 import { useContext } from 'preact/hooks';
 import { requireFreshUiContext } from '../_internal/context-error.ts';
+import type { FreshUiChild } from '../_internal/public-props.ts';
 import type {
   DialogCloseProps,
   DialogContentProps,
@@ -23,56 +24,64 @@ function withChildren(children: ComponentChildren): ComponentChildren {
   return children;
 }
 
-/** Render the dialog root provider. */
-export function DialogRoot(props: unknown): unknown {
-  const { children, ...options } = props as DialogRootProps;
+function DialogRoot({ children, ...options }: DialogRootProps): VNode {
   const dialog = useDialog(options);
   return <DialogContext.Provider value={dialog}>{children}</DialogContext.Provider>;
 }
 
-/** Render the button that opens the dialog. */
-export function DialogTrigger(props: unknown): unknown {
-  const { children, ...triggerProps } = props as DialogTriggerProps;
+function DialogTrigger({ children, ...props }: DialogTriggerProps): VNode {
   const dialog = useDialogContext('Dialog.Trigger');
-  return <button {...dialog.getTriggerProps(triggerProps)}>{withChildren(children)}</button>;
+  return (
+    <button {...dialog.getTriggerProps(props as JSX.ButtonHTMLAttributes<HTMLButtonElement>)}>
+      {withChildren(children)}
+    </button>
+  );
 }
 
-/** Render the dialog content element. */
-export function DialogContent(props: unknown): unknown {
-  const { children, ...contentProps } = props as DialogContentProps;
+function DialogContent({ children, ...props }: DialogContentProps): VNode {
   const dialog = useDialogContext('Dialog.Content');
-  return <dialog {...dialog.getContentProps(contentProps)}>{withChildren(children)}</dialog>;
+  return (
+    <dialog {...dialog.getContentProps(props as JSX.HTMLAttributes<HTMLDialogElement>)}>
+      {withChildren(children)}
+    </dialog>
+  );
 }
 
-/** Render the dialog title element. */
-export function DialogTitle(props: unknown): unknown {
-  const { children, ...titleProps } = props as DialogTitleProps;
+function DialogTitle({ children, ...props }: DialogTitleProps): VNode {
   const dialog = useDialogContext('Dialog.Title');
-  return <h2 {...dialog.getTitleProps(titleProps)}>{withChildren(children)}</h2>;
+  return (
+    <h2 {...dialog.getTitleProps(props as JSX.HTMLAttributes<HTMLHeadingElement>)}>
+      {withChildren(children)}
+    </h2>
+  );
 }
 
-/** Render the dialog description element. */
-export function DialogDescription(props: unknown): unknown {
-  const { children, ...descriptionProps } = props as DialogDescriptionProps;
+function DialogDescription({ children, ...props }: DialogDescriptionProps): VNode {
   const dialog = useDialogContext('Dialog.Description');
-  return <p {...dialog.getDescriptionProps(descriptionProps)}>{withChildren(children)}</p>;
+  return (
+    <p {...dialog.getDescriptionProps(props as JSX.HTMLAttributes<HTMLParagraphElement>)}>
+      {withChildren(children)}
+    </p>
+  );
 }
 
-/** Render the button that closes the dialog. */
-export function DialogClose(props: unknown): unknown {
-  const { children, ...closeProps } = props as DialogCloseProps;
+function DialogClose({ children, ...props }: DialogCloseProps): VNode {
   const dialog = useDialogContext('Dialog.Close');
-  return <button {...dialog.getCloseProps(closeProps)}>{withChildren(children)}</button>;
+  return (
+    <button {...dialog.getCloseProps(props as JSX.ButtonHTMLAttributes<HTMLButtonElement>)}>
+      {withChildren(children)}
+    </button>
+  );
 }
 
 /** Compound dialog namespace type with root and structural subcomponents. */
 export type DialogNamespace = Readonly<{
-  Close: typeof DialogClose;
-  Content: typeof DialogContent;
-  Description: typeof DialogDescription;
-  Root: typeof DialogRoot;
-  Title: typeof DialogTitle;
-  Trigger: typeof DialogTrigger;
+  Close: (props: DialogCloseProps) => FreshUiChild;
+  Content: (props: DialogContentProps) => FreshUiChild;
+  Description: (props: DialogDescriptionProps) => FreshUiChild;
+  Root: (props: DialogRootProps) => FreshUiChild;
+  Title: (props: DialogTitleProps) => FreshUiChild;
+  Trigger: (props: DialogTriggerProps) => FreshUiChild;
 }>;
 
 /** Compound dialog namespace with root and structural subcomponents. */

@@ -1,5 +1,6 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
+import type { FreshUiChildren, FreshUiElementProps } from '../_internal/public-props.ts';
 
 // ---------------------------------------------------------------------------
 // Element-level prop types (returned by hook getters)
@@ -83,29 +84,52 @@ export interface UseSheetReturn {
 // Component-level props
 // ---------------------------------------------------------------------------
 
-export interface SheetRootProps extends UseSheetOptions {
-  children: ComponentChildren;
-}
+/** Props for the compound sheet root component. */
+export type SheetRootProps = FreshUiElementProps & {
+  children: FreshUiChildren;
+  closeOnEscape?: boolean;
+  closeOnInteractOutside?: boolean;
+  defaultOpen?: boolean;
+  modal?: boolean;
+  onOpenChange?: (
+    open: boolean,
+    details: {
+      reason:
+        | 'trigger'
+        | 'close-button'
+        | 'escape-key'
+        | 'interact-outside'
+        | 'native-close'
+        | 'programmatic';
+    },
+  ) => void;
+  open?: boolean;
+  side?: 'right' | 'bottom';
+};
 
-export interface SheetTriggerProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for the sheet trigger component. */
+export type SheetTriggerProps = FreshUiElementProps & {
+  children: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
 
-export interface SheetContentProps extends JSX.HTMLAttributes<HTMLDialogElement> {
-  children: ComponentChildren;
-}
+/** Props for the sheet content component. */
+export type SheetContentProps = FreshUiElementProps & {
+  children: FreshUiChildren;
+};
 
-export interface SheetTitleProps extends JSX.HTMLAttributes<HTMLHeadingElement> {
-  children: ComponentChildren;
-}
+/** Props for the sheet title component. */
+export type SheetTitleProps = FreshUiElementProps & {
+  children: FreshUiChildren;
+};
 
-export interface SheetDescriptionProps extends JSX.HTMLAttributes<HTMLParagraphElement> {
-  children: ComponentChildren;
-}
+/** Props for the sheet description component. */
+export type SheetDescriptionProps = FreshUiElementProps & {
+  children: FreshUiChildren;
+};
 
-export interface SheetCloseProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for the sheet close component. */
+export type SheetCloseProps = FreshUiElementProps & {
+  children: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
