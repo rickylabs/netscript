@@ -55,7 +55,10 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | N/A — cross-cutting repo hygiene (no public-API archetype). Touches many surfaces; adds/removes no API |
 | Scope overlay | partial `SCOPE-docs.md` (deletes dead doc *files*; does **not** rewrite doc *content*) |
 | Sub-PR | #54 (draft, base `release/jsr-readiness`) |
-| Status | `active` — **PLAN-EVAL PASS @ cycle 2** (run 27755852001; cycle 1 = FAIL_PLAN, 7 fixes applied). Plan-Gate cleared. IMPL gated on user dispatch. |
+| Status | `active` — **IMPL IN PROGRESS** (WSL Codex launched 2026-06-18; PLAN-EVAL PASS @ cycle 2, run 27755852001). |
+| Impl thread | `019edaa8-3b82-70a1-9a38-129f189ca807` (Codex, daemon-managed, mobile-visible) |
+| Impl worktree | `/home/codex/repos/netscript-prod-readiness` (ext4 native, `chore/prod-readiness` @ launch base `0f352ea`) |
+| Steering | `codex exec resume 019edaa8-3b82-70a1-9a38-129f189ca807 "<follow-up>"` (NEVER a 2nd `send-message-v2` on this worktree) |
 
 ### Pre-conditions
 - Umbrella branch current with `main`.
@@ -79,7 +82,10 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | A6-adjacent for the scanner scripts (cli-tooling); otherwise N/A repo tooling |
 | Scope overlay | none |
 | Sub-PR | #55 (draft, base `release/jsr-readiness`) |
-| Status | `active` — **PLAN-EVAL PASS @ cycle 1** (run 27755191977; catalog live-invariant spot-check confirmed; 1 non-blocking NIT for D-2). Plan-Gate cleared. IMPL gated on user dispatch. |
+| Status | `active` — **IMPL IN PROGRESS** (WSL Codex launched 2026-06-18; PLAN-EVAL PASS @ cycle 1, run 27755191977; D-2 NIT carried into brief). |
+| Impl thread | `019edaa8-af32-7011-899c-00e14f730ef1` (Codex, daemon-managed, mobile-visible) |
+| Impl worktree | `/home/codex/repos/netscript-deps-hygiene` (ext4 native, `chore/deps-hygiene` @ launch base `b6985c6`) |
+| Steering | `codex exec resume 019edaa8-af32-7011-899c-00e14f730ef1 "<follow-up>"` (NEVER a 2nd `send-message-v2` on this worktree) |
 
 ### Deliverables
 1. **JSR-dep centralization scanner** — flags any `jsr:` dep used by >1 member with divergent versions; structured JSON; wired into CI + `arch:check`.
@@ -142,4 +148,11 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
   - **Group 1** (`chore/prod-readiness`, PR #54): cycle 1 = `FAIL_PLAN` (7 mechanical fixes — F3 functional/off-limits + arch-debt, S4′ deprecate-not-delete, S5 refactor-not-delete, S6 scaffolder consumer, scaffold.runtime smoke per public slice, per-slice LOC budget, bounded G1-6). Supervisor applied all 7 in-role → cycle 2 = **PASS** (run 27755852001). Two FAIL_PLAN cycles allowed; passed on cycle 2.
   - **Group 2** (`chore/deps-hygiene`, PR #55): cycle 1 = **PASS** (run 27755191977). Catalog live-invariant spot-check (8 points) confirmed against tree; off-limits/catalog guardrail PASS. One non-blocking NIT for D-2 (compliance scanner anchors on real `from "npm:…"` imports + `deno.json` imports/scopes, NOT substring; allow-list `windows.ts` bundle-external map + `registry.manifest.ts` dependency array) recorded in plan.md.
   - **Both Plan-Gates cleared. NO implementation slice starts until the user reviews both plans and explicitly dispatches the generators (WSL Codex, daemon-attached, mobile-visible).** IMPL-EVAL (post-impl) = OpenHands qwen 3.7 max, separate session.
+- **Groups 1 & 2 implementation LAUNCHED (2026-06-18) — WSL Codex daemon-attached, mobile-visible, in parallel (user-authorized "Dispatch both in parallel"):**
+  - **Daemon health (pre-launch gate, user-requested):** `codex remote-control start --json` → `status: connected`, `remoteControlEnabled: true`; managed pair (app-server `--remote-control` + `daemon pid-update-loop`) confirmed; held `connected` on an idle re-check. The transient `not managed` seen earlier is reported only *while a turn is in-flight* (app-server busy), not a daemon fault — verified on codex-cli 0.141.0.
+  - **G1** thread `019edaa8-3b82-70a1-9a38-129f189ca807`, worktree `/home/codex/repos/netscript-prod-readiness`, brief `…/chore-prod-readiness--cleanup/implement.md` (committed `0f352ea`). Attach proof: `approval_policy: Never`, `sandbox: DangerFullAccess`, cwd matches, turn InProgress. Slices G1-0…G1-6.
+  - **G2** thread `019edaa8-af32-7011-899c-00e14f730ef1`, worktree `/home/codex/repos/netscript-deps-hygiene`, brief `…/chore-deps-hygiene--deps/implement.md` (committed `b6985c6`). Attach proof: `approval_policy: Never`, cwd matches, turn InProgress. Slices D-1…D-6.
+  - **Steering (not a 2nd send):** `codex exec resume <thread-id> "<follow-up>"`. One active turn per worktree.
+  - **PR-comment division:** Codex pushes per slice + maintains `commits.md`/`worklog.md` (no `gh` auth in WSL); supervisor mirrors slice progress to PR #54 / #55 via the rickylabs PAT. IMPL-EVAL (post-impl) = OpenHands qwen 3.7 max, separate session.
+  - **DO NOT push to `chore/prod-readiness` or `chore/deps-hygiene` from any other clone while Codex is live** — it would non-fast-forward the per-slice pushes. Supervisor bookkeeping during impl stays on this umbrella branch.
 - Groups 3 & 4 (docs) not yet launched — branches/sub-PRs created when their Research+Plan starts (handover §5.5).
