@@ -55,7 +55,7 @@ parallel with cleanup/hygiene. All four sub-runs branch off the umbrella and PR 
 | Archetype | N/A — cross-cutting repo hygiene (no public-API archetype). Touches many surfaces; adds/removes no API |
 | Scope overlay | partial `SCOPE-docs.md` (deletes dead doc *files*; does **not** rewrite doc *content*) |
 | Sub-PR | #54 (draft, base `release/jsr-readiness`) |
-| Status | `active` — **IMPL IN PROGRESS** (WSL Codex launched 2026-06-18; PLAN-EVAL PASS @ cycle 2, run 27755852001). |
+| Status | `evaluating` — **IMPL COMPLETE** (G1-0…G1-6 + G1-close handoff, head `9c2e63c6`); **IMPL-EVAL dispatched** on PR #54 (OpenHands qwen-3.7-max, comment 4742180096). PR-7 honored on all public surfaces; G1-6 deleted nothing (no zero-ref candidate); full `scaffold.runtime` green on G1-5; OFF-LIMITS untouched. Debt: D-G1-1/2/3a/5. |
 | Impl thread | `019edaa8-3b82-70a1-9a38-129f189ca807` (Codex, daemon-managed, mobile-visible) |
 | Impl worktree | `/home/codex/repos/netscript-prod-readiness` (ext4 native, `chore/prod-readiness` @ launch base `0f352ea`) |
 | Steering | `codex exec resume 019edaa8-3b82-70a1-9a38-129f189ca807 "<follow-up>"` (NEVER a 2nd `send-message-v2` on this worktree) |
