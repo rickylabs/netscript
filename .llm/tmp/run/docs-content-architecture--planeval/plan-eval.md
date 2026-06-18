@@ -125,3 +125,28 @@ Option A is the gold standard; Option B is a defensible floor. PLAN-EVAL recomme
 
 - **Outcome:** `FAIL_PLAN` — three blocking gaps (B1, B2, B3) must close before `PASS`. Two `FAIL_PLAN` cycles permitted before user escalation per `plan-protocol.md`.
 - **Single most important bar-raising change I demand:** every authored hub page must contain **at least one annotated, runnable, JSR-import-realistic code proof** (verified against `deno doc`) inside `comp.tabbedCode`. This is the change that lifts the docs from "matches the named exemplars" to "beats them," and it directly serves the user north-star of "EVERY public capability gets a reachable, intent-named home — and a working code path that proves it." It's also the change that turns the B2 accuracy guardrail from policy into practice, since every proof is a citation the gate script can check.
+
+---
+
+## Cycle 2 — re-evaluation after supervisor revision `0e049f7a`
+
+Full cycle-2 verdict written to `plan-eval.cycle2.md` (sibling file in this run dir). VERDICT
+front-loaded:
+
+**`PLAN-EVAL: PASS`** — all three blocking gaps (B1 watchers, B2 accuracy guardrail, B3 Phase 0
+overload) are genuinely closed at the plan level. Engine caveats (D-E1 nav.ts Reference-only;
+D-E2 Shiki Phase-0b acceptance line; D-E4 sitemap base_path acceptance) are now binding in
+`09 §3` + `05`. §2b adapter lists corrected (Nitro explicitly removed; queue = Deno KV + Redis
++ RabbitMQ; KV = deno-kv + redis + memory). R5 Aspire framing precision is now Global Bar #8.
+Locked `08` decisions remain respected (Q1, Q5, Q7, Q14 + others, no Q reopened). Lane
+discipline respected (only `09`, `05`, `briefs/00-INDEX.md` edited, plus prior cycle-1 trace
+artifacts under `.llm/tmp/run/`). Plan-Gate PARTIAL items re-walked: open-decision sweep PASS
+(watchers resolved by B1 hub); gate set selected PASS (`api-cite.ts` → `archetype-gate-matrix.md`
+as `docs-content-gate`); risk register remains PARTIAL (non-blocking per cycle-1).
+
+Plan is implementation-ready; authoring dispatch may begin against Phase 0a. Single
+non-blocking concern: track `api-cite.ts` (Phase-0b slice) as a top-level deliverable so its
+slippage is visible — the worklog floor is the safety net until it lands.
+
+- **Cycle-2 outcome:** `PASS` — cycle-1 closures verified; gate satisfied.
+- **See:** `plan-eval.cycle2.md` for the full per-closure evidence table.
