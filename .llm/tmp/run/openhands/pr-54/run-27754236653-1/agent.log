@@ -1,0 +1,400 @@
+box-by-box, performed an open-decision sweep, spot-checked the S1–S8 consumer 
+claims against the actual tree, and verified the off-limits guardrail. The 
+plan's overall shape is sound (off-limits fence, consumer-scan-first, 
+scaffold.runtime E2E on the high-risk slice) but the per-slice touch lists and 
+gate coverage understate the work in three places. Verdict committed and pushed 
+to `chore/prod-readiness` as `3e305a82`.
+    
+    ## Changes
+    
+    - **Wrote** `.llm/tmp/run/chore-prod-readiness--cleanup/plan-eval.md` (102 
+lines) — full verdict with checklist, open-decision sweep, S1–S8 spot-check 
+table, off-limits guardrail check, per-slice remediation matrix, and seven 
+required fixes.
+    - **Committed and pushed** to `chore/prod-readiness` (commit `3e305a82`). 
+Off-limits `deno.lock` drift from earlier grep operations reverted before 
+commit.
+    - **Did not** implement any slice (PLAN-EVAL mode forbids).
+    
+    ## Key findings
+    
+    | ID  | Symbol                                       | Plan claim          |
+Verifier finding                                                                
+|
+    | --- | -------------------------------------------- | ------------------- |
+--------------------------------------------------------------------------------
+----------------------------------------- |
+    | F1  | Aspire D-7 `_aspire-compat.mts` shim        | off-limits 
+(functional) | Confirmed functional at `helpers-generator-pipeline.ts:42-55`; 
+emitted into generated scaffold. Plan fence correct.         |
+    | F2  | esbuild CJS post-bundle fixup               | off-limits 
+(functional) | Confirmed functional at `compile-bundler.ts:30-60,120-145`; 
+~879MB → ~97MB binary fix. Plan fence correct.                  |
+    | F3  | Servy `ConnectionStrings__${provider}db` alias | off-limits 
+(inherited verify) | Confirmed functional (3 readers in 
+`database-connectivity.ts:48,71,94` + 2 writers in `env-file-*.ts` + 1 in 
+`servy-environment.ts:139`). **Plan must record this resolution and add an 
+`arch-debt.md` entry** to make the fence auditable. |
+    | **S4** | `database/extensions/sql-json.extension.ts` `mysqlJsonExtension` 
+| "deprecated alias" | **DRIFT.** The export has no `@deprecated` docstring and 
+no `LEGACY COMPATIBILITY` header. `mssqlJsonExtension` in the same file is 
+correctly marked; `mysqlJsonExtension` is not. Removing it is a silent 
+public-API break. |
+    | **S5** | `mssql.adapter.ts:66` `options.trustedConnection` | "deprecated 
+alias, remove" | **DRIFT.** Internal writer at line 416 sets 
+`config.options!.trustedConnection = true` and the `integratedSecurity` mapping 
+at line ~414-419 must be rewritten to `authentication.type = 'ntlm'`. This is a 
+behavioural refactor (~10-15 LOC), not a symbol delete. |
+    | **S6** | `JobBuilder.schedule` | scaffold-template scan | **DRIFT.** 
+Confirmed additional live consumer at 
+`plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` which **injects 
+`.schedule(...)` calls into generated worker modules**. Scaffolder must be 
+updated before the public surface can be removed. |
+    | G1-3 / G1-4 | public-surface removals | primary gate = `publish:dry-run` +
+scoped `check` | **DRIFT.** Per `plan-protocol.md` task 4, all public-surface 
+removals should be gated behind `e2e:cli run scaffold.runtime` as a regression 
+guard. G1-3 and G1-4 currently lack this. |
+    | Per-slice LOC + file list | — | not provided | **DRIFT.** Plan uses 
+per-group gates only; `plan-protocol.md` requires per-slice file list + LOC 
+estimate. |
+    | G1-6 | "remaining dead code sweep" | open list | **DRIFT.** Either 
+enumerate candidates with evidence or defer to a follow-up run. |
+    | Off-limits guardrail (aspire public, scaffold-versions, version pins, 
+catalog) | respected | PASS. None appear in any slice's touch list. |
+    | F1, F2, F3 fence | off-limits | PASS in intent; F3 must be documented (see
+above). |
+    
+    ## Required fixes (each in `plan.md` and `research.md`; resubmit to 
+PLAN-EVAL)
+    
+    1. **F3 — record the resolution.** Update `research.md` to mark F3 
+functional with the 3-reader / 3-writer evidence. Add an `arch-debt.md` entry 
+`database-connectivity-legacy-connstring-alias` with a post-release removal 
+target.
+    2. **S4 — deprecate first, then remove.** Split G1-3 into G1-3a (clean S3) +
+G1-3b (deprecate `mysqlJsonExtension` to mirror `mssqlJsonExtension`) + G1-3c 
+(refactor S5 + remove both).
+    3. **S5 — name the internal rewrite.** Plan must explicitly state G1-3c 
+touches `mssql.adapter.ts:414-419` (the `integratedSecurity`/`trustedConnection`
+mapping) and that the deprecated field's removal is a refactor, not a symbol 
+delete.
+    4. **S6 — add the scaffolder consumer.** G1-5 touch list must include 
+`plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` and the corresponding
+scaffolder test fixture.
+    5. **G1-3 and G1-4 — add the scaffold.runtime smoke gate.** Per 
+`plan-protocol.md` task 4.
+    6. **Per-slice LOC + file list.** Each of G1-0…G1-6 must name the files and 
+a LOC estimate.
+    7. **G1-6 — scope or defer.** Enumerate candidates with evidence, or move to
+a follow-up run with a `## Deferred scope` reference.
+    
+    ## Validation
+    
+    - `git status` confirmed clean after the `deno.lock` revert (only 
+`plan-eval.md` is added).
+    - `git log -1` and `git show 3e305a82` confirmed the commit is on 
+`chore/prod-readiness` and includes the Co-authored-by trailer.
+    - `git push` output: `fc70df26..3e305a82  chore/prod-readiness -> 
+chore/prod-readiness` — push succeeded.
+    - All S1–S8 / F1–F3 verifications cross-checked against the actual tree 
+(paths cited in the plan-eval.md).
+    
+    ## Responses to review comments or issue comments
+    
+    - No PR review-thread or issue-comment replies requested (`output_mode: 
+pr-comment`; the workflow owns the status post). No `replies.json` was written.
+    
+    ## Remaining risks
+    
+    - **None for this evaluator session.** The plan must address the seven 
+required fixes before resubmission. The off-limits guardrail is correctly 
+respected — no drift detected in `packages/aspire/src/public/mod.ts`, 
+`scaffold-versions.ts`, version pins, or catalog/`catalog:` references.
+    - The G1-3 / G1-4 gate-coverage gap is the most likely source of a follow-up
+re-evaluation; the e2e:cli smoke is the cheapest way to confirm that 
+public-surface removals do not regress scaffold-generated users.
+    - Recommend adding a `.llm/tools/check-deprecation-coverage.ts` script to 
+the harness so the S4-style "missing `@deprecated` marker" gap is caught at the 
+research stage, not at the plan-eval stage.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 5.05M • cache hit 93.83% •  reasoning 2.7K • ↓ output 44.04K • $
+0.4304
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27754236653-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# Summary
+ 2|
++3|## Verdict: **FAIL_PLAN**
++4|
++5|PLAN-EVAL evaluator session for `chore-prod-readiness--cleanup` (group 1 of 
+the `release/jsr-readiness` umbrella). I walked the plan-gate checklist 
+box-by-box, performed an open-decision sweep, spot-checked the S1–S8 consumer 
+claims against the actual tree, and verified the off-limits guardrail. The 
+plan's overall shape is sound (off-limits fence, consumer-scan-first, 
+scaffold.runtime E2E on the high-risk slice) but the per-slice touch lists and 
+gate coverage understate the work in three places. Verdict committed and pushed 
+to `chore/prod-readiness` as `3e305a82`.
++6|
++7|## Changes
++8|
++9|- **Wrote** `.llm/tmp/run/chore-prod-readiness--cleanup/plan-eval.md` (102 
+lines) — full verdict with checklist, open-decision sweep, S1–S8 spot-check 
+table, off-limits guardrail check, per-slice remediation matrix, and seven 
+required fixes.
++10|- **Committed and pushed** to `chore/prod-readiness` (commit `3e305a82`). 
+Off-limits `deno.lock` drift from earlier grep operations reverted before 
+commit.
++11|- **Did not** implement any slice (PLAN-EVAL mode forbids).
++12|
++13|## Key findings
++14|
++15|| ID  | Symbol                                       | Plan claim          |
+Verifier finding                                                                
+|
++16|| --- | -------------------------------------------- | ------------------- |
+--------------------------------------------------------------------------------
+----------------------------------------- |
++17|| F1  | Aspire D-7 `_aspire-compat.mts` shim        | off-limits 
+(functional) | Confirmed functional at `helpers-generator-pipeline.ts:42-55`; 
+emitted into generated scaffold. Plan fence correct.         |
++18|| F2  | esbuild CJS post-bundle fixup               | off-limits 
+(functional) | Confirmed functional at `compile-bundler.ts:30-60,120-145`; 
+~879MB → ~97MB binary fix. Plan fence correct.                  |
++19|| F3  | Servy `ConnectionStrings__${provider}db` alias | off-limits 
+(inherited verify) | Confirmed functional (3 readers in 
+`database-connectivity.ts:48,71,94` + 2 writers in `env-file-*.ts` + 1 in 
+`servy-environment.ts:139`). **Plan must record this resolution and add an 
+`arch-debt.md` entry** to make the fence auditable. |
++20|| **S4** | `database/extensions/sql-json.extension.ts` `mysqlJsonExtension` 
+| "deprecated alias" | **DRIFT.** The export has no `@deprecated` docstring and 
+no `LEGACY COMPATIBILITY` header. `mssqlJsonExtension` in the same file is 
+correctly marked; `mysqlJsonExtension` is not. Removing it is a silent 
+public-API break. |
++21|| **S5** | `mssql.adapter.ts:66` `options.trustedConnection` | "deprecated 
+alias, remove" | **DRIFT.** Internal writer at line 416 sets 
+`config.options!.trustedConnection = true` and the `integratedSecurity` mapping 
+at line ~414-419 must be rewritten to `authentication.type = 'ntlm'`. This is a 
+behavioural refactor (~10-15 LOC), not a symbol delete. |
++22|| **S6** | `JobBuilder.schedule` | scaffold-template scan | **DRIFT.** 
+Confirmed additional live consumer at 
+`plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` which **injects 
+`.schedule(...)` calls into generated worker modules**. Scaffolder must be 
+updated before the public surface can be removed. |
++23|| G1-3 / G1-4 | public-surface removals | primary gate = `publish:dry-run` +
+scoped `check` | **DRIFT.** Per `plan-protocol.md` task 4, all public-surface 
+removals should be gated behind `e2e:cli run scaffold.runtime` as a regression 
+guard. G1-3 and G1-4 currently lack this. |
++24|| Per-slice LOC + file list | — | not provided | **DRIFT.** Plan uses 
+per-group gates only; `plan-protocol.md` requires per-slice file list + LOC 
+estimate. |
++25|| G1-6 | "remaining dead code sweep" | open list | **DRIFT.** Either 
+enumerate candidates with evidence or defer to a follow-up run. |
++26|| Off-limits guardrail (aspire public, scaffold-versions, version pins, 
+catalog) | respected | PASS. None appear in any slice's touch list. |
++27|| F1, F2, F3 fence | off-limits | PASS in intent; F3 must be documented (see
+above). |
++28|
++29|## Required fixes (each in `plan.md` and `research.md`; resubmit to 
+PLAN-EVAL)
++30|
++31|1. **F3 — record the resolution.** Update `research.md` to mark F3 
+functional with the 3-reader / 3-writer evidence. Add an `arch-debt.md` entry 
+`database-connectivity-legacy-connstring-alias` with a post-release removal 
+target.
++32|2. **S4 — deprecate first, then remove.** Split G1-3 into G1-3a (clean S3) +
+G1-3b (deprecate `mysqlJsonExtension` to mirror `mssqlJsonExtension`) + G1-3c 
+(refactor S5 + remove both).
++33|3. **S5 — name the internal rewrite.** Plan must explicitly state G1-3c 
+touches `mssql.adapter.ts:414-419` (the `integratedSecurity`/`trustedConnection`
+mapping) and that the deprecated field's removal is a refactor, not a symbol 
+delete.
++34|4. **S6 — add the scaffolder consumer.** G1-5 touch list must include 
+`plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` and the corresponding
+scaffolder test fixture.
++35|5. **G1-3 and G1-4 — add the scaffold.runtime smoke gate.** Per 
+`plan-protocol.md` task 4.
++36|6. **Per-slice LOC + file list.** Each of G1-0…G1-6 must name the files and 
+a LOC estimate.
++37|7. **G1-6 — scope or defer.** Enumerate candidates with evidence, or move to
+a follow-up run with a `## Deferred scope` reference.
++38|
++39|## Validation
++40|
++41|- `git status` confirmed clean after the `deno.lock` revert (only 
+`plan-eval.md` is added).
++42|- `git log -1` and `git show 3e305a82` confirmed the commit is on 
+`chore/prod-readiness` and includes the Co-authored-by trailer.
++43|- `git push` output: `fc70df26..3e305a82  chore/prod-readiness -> 
+chore/prod-readiness` — push succeeded.
++44|- All S1–S8 / F1–F3 verifications cross-checked against the actual tree 
+(paths cited in the plan-eval.md).
++45|
++46|## Responses to review comments or issue comments
++47|
++48|- No PR review-thread or issue-comment replies requested (`output_mode: 
+pr-comment`; the workflow owns the status post). No `replies.json` was written.
++49|
++50|## Remaining risks
++51|
++52|- **None for this evaluator session.** The plan must address the seven 
+required fixes before resubmission. The off-limits guardrail is correctly 
+respected — no drift detected in `packages/aspire/src/public/mod.ts`, 
+`scaffold-versions.ts`, version pins, or catalog/`catalog:` references.
++53|- The G1-3 / G1-4 gate-coverage gap is the most likely source of a follow-up
+re-evaluation; the e2e:cli smoke is the cheapest way to confirm that 
+public-surface removals do not regress scaffold-generated users.
++54|- Recommend adding a `.llm/tools/check-deprecation-coverage.ts` script to 
+the harness so the S4-style "missing `@deprecated` marker" gap is caught at the 
+research stage, not at the plan-eval stage.
++55|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify final state
+
+$ cd /home/runner/work/netscript/netscript && git log --oneline -3 && echo "---"
+&& git status
+
+Tokens: ↑ input 5.07M • cache hit 93.86% •  reasoning 2.7K • ↓ output 44.12K • $
+0.4320
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+3e305a82 (HEAD -> chore/prod-readiness, origin/chore/prod-readiness) 
+chore(harness): PLAN-EVAL verdict for chore/prod-readiness (FAIL_PLAN)
+fc70df26 chore(harness): launch chore/prod-readiness group branch (Plan-Gate)
+1f4cafa3 chore(harness): append 441f0229 to commits.md
+---
+On branch chore/prod-readiness
+Your branch is up to date with 'origin/chore/prod-readiness'.
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/openhands/pr-54/
+
+nothing added to commit but untracked files present (use "git add" to track)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Mark final tasks done
+
+Thought:
+The `.llm/tmp/run/openhands/pr-54/` is the workflow's own metadata directory; 
+it's correctly untracked. The plan-eval is committed and pushed.
+
+📋 Update Task List (9 tasks)
+
+Tokens: ↑ input 5.1M • cache hit 93.88% •  reasoning 2.7K • ↓ output 44.54K • $ 
+0.4341
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 9 done
+
+✅ 1. Read evaluator protocol + plan-gate + verdict definitions
+✅ 2. Read run artifacts: research, plan, worklog, drift
+✅ 3. Verify off-limits guardrail (F1 Aspire D-7, F2 esbuild CJS, F3 servy)
+✅ 4. Verify each slice's consumer claims against actual tree
+✅ 5. Open-decision sweep: verify all open questions are resolved
+✅ 6. Verify slice ordering, sizing, and named gates
+✅ 7. Compose plan-eval.md verdict
+✅ 8. Commit and push plan-eval.md to chore/prod-readiness branch
+✅ 9. Write OPENHANDS_SUMMARY_PATH
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict emitted: FAIL_PLAN
+
+Finish with message:
+**Verdict: FAIL_PLAN**
+
+PLAN-EVAL evaluator session for `chore-prod-readiness--cleanup` is complete. I 
+walked the plan-gate checklist box-by-box, ran an open-decision sweep, 
+spot-checked the S1–S8 consumer claims against the actual tree, and verified the
+off-limits guardrail. The plan's overall shape is sound, but seven required 
+fixes must be made in `plan.md` / `research.md` before PASS.
+
+## Deliverables
+
+- **`.llm/tmp/run/chore-prod-readiness--cleanup/plan-eval.md`** — written and 
+committed (`3e305a82`) to `chore/prod-readiness`, pushed to 
+`origin/chore/prod-readiness`.
+- **`/home/runner/work/_temp/openhands/27754236653-1/summary.md`** — full 
+summary with verdict, key findings, and remaining risks.
+
+## Key findings
+
+| ID  | Plan claim | Verifier finding |
+| --- | ---------- | ---------------- |
+| F1 (Aspire D-7 shim) | off-limits (functional) | Confirmed functional; fence 
+correct. |
+| F2 (esbuild post-bundle fixup) | off-limits (functional) | Confirmed 
+functional; fence correct. |
+| F3 (`ConnectionStrings__${provider}db`) | off-limits (inherited verify) | 
+**Fence correct but the verification step is not recorded.** Plan must mark F3 
+functional and add an `arch-debt.md` entry. |
+| **S4 (mysqlJsonExtension)** | "deprecated alias, remove" | **DRIFT.** No 
+`@deprecated` docstring on the export (only `mssqlJsonExtension` has one). 
+Removing it is a silent public-API break. |
+| **S5 (mssql trustedConnection)** | "deprecated alias, remove" | **DRIFT.** 
+Internal writer at `mssql.adapter.ts:416` and the `integratedSecurity` mapping 
+at lines 414-419 must be rewritten to `authentication.type = 'ntlm'`. This is a 
+refactor, not a symbol delete. |
+| **S6 (JobBuilder.schedule)** | scaffold-template scan | **DRIFT.** Missed 
+consumer: `plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` injects 
+`.schedule(...)` into generated worker modules. Scaffolder must be updated 
+before the public symbol is removed. |
+| G1-3 / G1-4 (public removals) | primary gate = `publish:dry-run` + scoped 
+`check` | **DRIFT.** Per `plan-protocol.md` task 4, all public-surface removals 
+need the `e2e:cli run scaffold.runtime` smoke as a regression guard. |
+| Per-slice LOC + file list | not provided | **DRIFT.** `plan-protocol.md` 
+requires per-slice file list + LOC. Plan uses per-group gates only. |
+| G1-6 (open dead-code sweep) | open list | **DRIFT.** Enumerate candidates with
+evidence, or defer to a follow-up run. |
+| Off-limits guardrail (aspire public, scaffold-versions, version pins, catalog)
+| respected | **PASS.** None appear in any slice's touch list. |
+
+## Required fixes (each must be made in `plan.md` and `research.md`; resubmit to
+PLAN-EVAL)
+
+1. **F3** — record the resolution (functional) with 3-reader / 3-writer 
+evidence; add an `arch-debt.md` entry.
+2. **S4** — deprecate first, then remove. Split G1-3 into G1-3a (clean S3) + 
+G1-3b (deprecate `mysqlJsonExtension`) + G1-3c (refactor S5 + remove both).
+3. **S5** — name the internal rewrite at `mssql.adapter.ts:414-419` (the 
+`integratedSecurity`/`trustedConnection` mapping) explicitly.
+4. **S6** — add `plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` and 
+the scaffolder test fixture to the touch list.
+5. **G1-3 + G1-4** — add `e2e:cli run scaffold.runtime` smoke as a regression 
+guard.
+6. **Per-slice LOC + file list** — per `plan-protocol.md`.
+7. **G1-6** — scope the open-ended sweep or defer to a follow-up run.
+
+## Summary verdict
+
+The plan is close to PASS; the fixes are mechanical. No implementation slice may
+begin before PASS.
+
+Tokens: ↑ input 5.12M • cache hit 93.91% •  reasoning 2.7K • ↓ output 45.56K • $
+0.4369
+
