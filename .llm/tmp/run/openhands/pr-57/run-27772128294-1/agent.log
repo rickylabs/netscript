@@ -1,0 +1,400 @@
+packages/plugins \u2713 |\n| S2 | `ade81736` | PASS | G-links \u2713 | no 
+packages/plugins \u2713 |\n| S3 | `95b14136` | PASS | G-links \u2713 G-doctrine 
+\u2713 | no packages/plugins \u2713 |\n| S4 | `b7baca34` | PASS | G-doctrine 
+\u2713 (dead-link de-link only, decisions preserved) | no packages/plugins 
+\u2713 |\n| S5 | `8073bb57` | PASS | G-links \u2713 G-doctrine \u2713 | no 
+packages/plugins \u2713 |\n| S6 | `ad6d559f` | PASS | G-links \u2713 | no 
+packages/plugins \u2713 |\n| S7 | `42da427b` | PASS | gate wired \u2713 | no 
+packages/plugins \u2713 |\n\n## Gate Re-verification (raw output)\n\n- 
+**G-mirror** `deno task agentic:sync-claude:check` \u2192 exit 0: 
+`agentic:sync-claude OK: 17 skill(s), 17 mirrored file(s)`\n- **G-surface** 
+`deno task agentic:check-claude` \u2192 exit 0: CLAUDE.md @AGENTS.md \u2713, 
+settings JSON \u2713, gitignore \u2713, mirror \u2713, hook-lock \u2713\n- 
+**G-links** `deno task docs:links` \u2192 exit 1: 99 docs, **26 broken links 
+\u2014 ALL in `.agents/skills/impeccable/SKILL.md`** (pre-existing, outside 
+Group 4 scope). Group-4-owned surface is link-clean.\n- **G-doctrine** manual 
+diff review \u2192 S4 only removes dead `phase-0-research/*.md` links; no 
+doctrine decision text changed.\n- **Boundary** `git diff 17f658ed~1..7a8b1c38 
+--name-only | grep packages/` \u2192 empty; no doc files deleted.\n\n## Open 
+Question Ruling\n\n**Question:** `docs:maintenance` (S7 composite) is RED solely
+due to 26 pre-existing `impeccable`-skill dead links. Resolution options: (a) 
+scope gate to exclude `impeccable`, (b) fix/prune in follow-up, (c) accept as 
+recorded debt.\n\n**Ruling: (c) accept as recorded debt; does NOT block 
+PASS.**\n\n**Rationale:** The arch-debt entry `impeccable-dead-reference-links` 
+is properly formed with all required fields (owner, target, reason, linked plan,
+status, gate). The gate correctly detects real rot \u2014 the redness is 
+pre-existing/out-of-scope, not a wiring defect. Option (a) would weaken an 
+honest gate. Option (b) would add scope to Group 4 that the plan explicitly 
+excludes. The `impeccable` skill maintainers can close the debt when they 
+complete/prune the `reference/*.md` subtree in a separate follow-up.\n\n## Minor
+Finding (non-blocking)\n\n**Worktree-pin reconciliation drift not recorded:** 
+The worklog documents that Claude workflow subagents initially wrote 5/7 slices 
+into the wrong worktree (`release+jsr-readiness` instead of 
+`docs/internal-overhaul`), requiring supervisor patching. This incident is 
+recorded in `worklog.md` but **not in `drift.md`** (which remains empty: \"none 
+yet\"). Per protocol \u00a7 5 (\"Drift is explicit\"), this should be logged in 
+the canonical drift file. The branch is correct and all slices landed on 
+`docs/internal-overhaul`, so this is a bookkeeping gap, not an implementation 
+defect. **Recommendation:** append a `minor` severity entry to `drift.md` 
+describing the worktree-pin incident and its successful reconciliation.\n\n## 
+Locked Decisions Compliance\n\n- **IO-1** (one home per concept) \u2014 OK: S3 
+applied canonical-home rubric to AGENTS.md + harness skill.\n- **IO-2** (mirrors
+regenerated, never hand-edited) \u2014 OK: jsr-audit + netscript-harness mirrors
+regenerated; `diff` clean.\n- **IO-3** (`deno doc` documented) \u2014 OK: S1 
+added section to jsr-audit skill; S2 added tools-and-commands index.\n- **IO-4**
+(no file deletion; content rewrite only) \u2014 OK: no doc files deleted (`git 
+log --diff-filter=D` empty).\n- **IO-5** (no Di\u00e1taxis for internal docs) 
+\u2014 OK: all slices maintain functional/role-based IA.\n- **IO-6** 
+(canonical-home rubric) \u2014 OK: S3 applied rubric; AGENTS.md updated with 
+concept\u2192home map.\n\n## Process Notes\n\n- **PLAN-EVAL cycle 1 \u2192 2:** 
+Cycle-1 FAIL_PLAN (missing commit slices) \u2192 remediation added S0-S8 \u2192 
+cycle-2 PASS. No locked decision changed.\n- **LD-DOCS-LANE compliance:** 
+Generator (Claude Opus workflow) and evaluator (OpenHands Qwen, this session) 
+are separate sessions.\n- **No `deno.lock` committed:** Lock hygiene 
+preserved.\n\n## Trace\n\nFull evaluation recorded: 
+`.llm/tmp/run/docs-internal-overhaul--contributor/evaluate.md`\nAction run: 
+https://github.com/rickylabs/netscript/actions/runs/27772128294\nPR: #57\n"}
+
+Reasoning:
+The evaluator wants me to rule on the open question about the impeccable skill 
+links and provide a per-slice verdict table. I've created the evaluation 
+document with a PASS verdict. However, the user said "Do not post GitHub issue 
+or PR comments directly" — but the output mode is pr-comment. Looking at the 
+operational contract more carefully:
+
+"The workflow records durable trace metadata under 
+.llm/tmp/run/openhands/pr-57/run-27772128294-1."
+"Do not post GitHub issue or PR comments directly. The workflow owns GitHub 
+comments."
+
+So I should NOT post the PR comment directly. Instead, I should write the 
+summary.md file at the specified path and the workflow will pick it up and post 
+it as a PR comment.
+
+Let me write the summary file now.
+
+Thought:
+Now I need to write the summary file at the specified path. Let me check the 
+metadata directory and write the summary:
+
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27772128294-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Verdict: PASS
+    
+    **Branch:** `docs/internal-overhaul` @ `7a8b1c38`
+    **Group:** 4 (internal/contributor docs)
+    **Evaluator:** OpenHands (Qwen 3.7 max, separate session from generator)
+    **Protocol:** `.llm/harness/evaluator/protocol.md` + 
+`verdict-definitions.md`
+    
+    ## Overall Verdict: **PASS**
+    
+    All 7 authoring slices (S1-S7) satisfy their proving gates, commit-slice 
+contracts, and locked decisions (IO-1…IO-6). No off-limits boundary crossed. All
+gates independently re-verified.
+    
+    ## Per-Slice Verdict Table
+    
+    | Slice | Commit | Verdict | Gate(s) Pass | Boundary Clean |
+    |-------|--------|---------|--------------|----------------|
+    | S1 | `17f658ed` | **PASS** | G-surface ✓ G-mirror ✓ G-links ✓ | no 
+packages/plugins ✓ |
+    | S2 | `ade81736` | PASS | G-links ✓ | no packages/plugins ✓ |
+    | S3 | `95b14136` | PASS | G-links ✓ G-doctrine ✓ | no packages/plugins ✓ |
+    | S4 | `b7baca34` | PASS | G-doctrine ✓ (dead-link de-link only, decisions 
+preserved) | no packages/plugins ✓ |
+    | S5 | `8073bb57` | PASS | G-links ✓ G-doctrine ✓ | no packages/plugins ✓ |
+    | S6 | `ad6d559f` | PASS | G-links ✓ | no packages/plugins ✓ |
+    | S7 | `42da427b` | PASS | gate wired ✓ | no packages/plugins ✓ |
+    
+    ## Gate Re-verification (raw output)
+    
+    - **G-mirror** `deno task agentic:sync-claude:check` → exit 0: 
+`agentic:sync-claude OK: 17 skill(s), 17 mirrored file(s)`
+    - **G-surface** `deno task agentic:check-claude` → exit 0: CLAUDE.md 
+@AGENTS.md ✓, settings JSON ✓, gitignore ✓, mirror ✓, hook-lock ✓
+    - **G-links** `deno task docs:links` → exit 1: 99 docs, **26 broken links — 
+ALL in `.agents/skills/impeccable/SKILL.md`** (pre-existing, outside Group 4 
+scope). Group-4-owned surface is link-clean.
+    - **G-doctrine** manual diff review → S4 only removes dead 
+`phase-0-research/*.md` links; no doctrine decision text changed.
+    - **Boundary** `git diff 17f658ed~1..7a8b1c38 --name-only | grep packages/` 
+→ empty; no doc files deleted.
+    
+    ## Open Question Ruling
+    
+    **Question:** `docs:maintenance` (S7 composite) is RED solely due to 26 
+pre-existing `impeccable`-skill dead links. Resolution options: (a) scope gate 
+to exclude `impeccable`, (b) fix/prune in follow-up, (c) accept as recorded 
+debt.
+    
+    **Ruling: (c) accept as recorded debt; does NOT block PASS.**
+    
+    **Rationale:** The arch-debt entry `impeccable-dead-reference-links` is 
+properly formed with all required fields (owner, target, reason, linked plan, 
+status, gate). The gate correctly detects real rot — the redness is 
+pre-existing/out-of-scope, not a wiring defect. Option (a) would weaken an 
+honest gate. Option (b) would add scope to Group 4 that the plan explicitly 
+excludes. The `impeccable` skill maintainers can close the debt when they 
+complete/prune the `reference/*.md` subtree in a separate follow-up.
+    
+    ## Minor Finding (non-blocking)
+    
+    **Worktree-pin reconciliation drift not recorded:** The worklog documents 
+that Claude workflow subagents initially wrote 5/7 slices into the wrong 
+worktree (`release+jsr-readiness` instead of `docs/internal-overhaul`), 
+requiring supervisor patching. This incident is recorded in `worklog.md` but 
+**not in `drift.md`** (which remains empty: "none yet"). Per protocol § 5 
+("Drift is explicit"), this should be logged in the canonical drift file. The 
+branch is correct and all slices landed on `docs/internal-overhaul`, so this is 
+a bookkeeping gap, not an implementation defect. **Recommendation:** append a 
+`minor` severity entry to `drift.md` describing the worktree-pin incident and 
+its successful reconciliation.
+    
+    ## Locked Decisions Compliance
+    
+    - **IO-1** (one home per concept) — OK: S3 applied canonical-home rubric to 
+AGENTS.md + harness skill.
+    - **IO-2** (mirrors regenerated, never hand-edited) — OK: jsr-audit + 
+netscript-harness mirrors regenerated; `diff` clean.
+    - **IO-3** (`deno doc` documented) — OK: S1 added section to jsr-audit 
+skill; S2 added tools-and-commands index.
+    - **IO-4** (no file deletion; content rewrite only) — OK: no doc files 
+deleted (`git log --diff-filter=D` empty).
+    - **IO-5** (no Diátaxis for internal docs) — OK: all slices maintain 
+functional/role-based IA.
+    - **IO-6** (canonical-home rubric) — OK: S3 applied rubric; AGENTS.md 
+updated with concept→home map.
+    
+    ## Process Notes
+    
+    - **PLAN-EVAL cycle 1 → 2:** Cycle-1 FAIL_PLAN (missing commit slices) → 
+remediation added S0-S8 → cycle-2 PASS. No locked decision changed.
+    - **LD-DOCS-LANE compliance:** Generator (Claude Opus workflow) and 
+evaluator (OpenHands Qwen, this session) are separate sessions.
+    - **No `deno.lock` committed:** Lock hygiene preserved.
+    
+    ## Trace
+    
+    Full evaluation recorded: 
+`.llm/tmp/run/docs-internal-overhaul--contributor/evaluate.md`
+    Action run: https://github.com/rickylabs/netscript/actions/runs/27772128294
+    PR: #57
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 693.09K • cache hit 80.08% •  reasoning 2.85K • ↓ output 11.29K 
+• $ 0.3537
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27772128294-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Verdict: PASS
+ 2|
++3|**Branch:** `docs/internal-overhaul` @ `7a8b1c38`
++4|**Group:** 4 (internal/contributor docs)
++5|**Evaluator:** OpenHands (Qwen 3.7 max, separate session from generator)
++6|**Protocol:** `.llm/harness/evaluator/protocol.md` + `verdict-definitions.md`
++7|
++8|## Overall Verdict: **PASS**
++9|
++10|All 7 authoring slices (S1-S7) satisfy their proving gates, commit-slice 
+contracts, and locked decisions (IO-1…IO-6). No off-limits boundary crossed. All
+gates independently re-verified.
++11|
++12|## Per-Slice Verdict Table
++13|
++14|| Slice | Commit | Verdict | Gate(s) Pass | Boundary Clean |
++15||-------|--------|---------|--------------|----------------|
++16|| S1 | `17f658ed` | **PASS** | G-surface ✓ G-mirror ✓ G-links ✓ | no 
+packages/plugins ✓ |
++17|| S2 | `ade81736` | PASS | G-links ✓ | no packages/plugins ✓ |
++18|| S3 | `95b14136` | PASS | G-links ✓ G-doctrine ✓ | no packages/plugins ✓ |
++19|| S4 | `b7baca34` | PASS | G-doctrine ✓ (dead-link de-link only, decisions 
+preserved) | no packages/plugins ✓ |
++20|| S5 | `8073bb57` | PASS | G-links ✓ G-doctrine ✓ | no packages/plugins ✓ |
++21|| S6 | `ad6d559f` | PASS | G-links ✓ | no packages/plugins ✓ |
++22|| S7 | `42da427b` | PASS | gate wired ✓ | no packages/plugins ✓ |
++23|
++24|## Gate Re-verification (raw output)
++25|
++26|- **G-mirror** `deno task agentic:sync-claude:check` → exit 0: 
+`agentic:sync-claude OK: 17 skill(s), 17 mirrored file(s)`
++27|- **G-surface** `deno task agentic:check-claude` → exit 0: CLAUDE.md 
+@AGENTS.md ✓, settings JSON ✓, gitignore ✓, mirror ✓, hook-lock ✓
++28|- **G-links** `deno task docs:links` → exit 1: 99 docs, **26 broken links — 
+ALL in `.agents/skills/impeccable/SKILL.md`** (pre-existing, outside Group 4 
+scope). Group-4-owned surface is link-clean.
++29|- **G-doctrine** manual diff review → S4 only removes dead 
+`phase-0-research/*.md` links; no doctrine decision text changed.
++30|- **Boundary** `git diff 17f658ed~1..7a8b1c38 --name-only | grep packages/` 
+→ empty; no doc files deleted.
++31|
++32|## Open Question Ruling
++33|
++34|**Question:** `docs:maintenance` (S7 composite) is RED solely due to 26 
+pre-existing `impeccable`-skill dead links. Resolution options: (a) scope gate 
+to exclude `impeccable`, (b) fix/prune in follow-up, (c) accept as recorded 
+debt.
++35|
++36|**Ruling: (c) accept as recorded debt; does NOT block PASS.**
++37|
++38|**Rationale:** The arch-debt entry `impeccable-dead-reference-links` is 
+properly formed with all required fields (owner, target, reason, linked plan, 
+status, gate). The gate correctly detects real rot — the redness is 
+pre-existing/out-of-scope, not a wiring defect. Option (a) would weaken an 
+honest gate. Option (b) would add scope to Group 4 that the plan explicitly 
+excludes. The `impeccable` skill maintainers can close the debt when they 
+complete/prune the `reference/*.md` subtree in a separate follow-up.
++39|
++40|## Minor Finding (non-blocking)
++41|
++42|**Worktree-pin reconciliation drift not recorded:** The worklog documents 
+that Claude workflow subagents initially wrote 5/7 slices into the wrong 
+worktree (`release+jsr-readiness` instead of `docs/internal-overhaul`), 
+requiring supervisor patching. This incident is recorded in `worklog.md` but 
+**not in `drift.md`** (which remains empty: "none yet"). Per protocol § 5 
+("Drift is explicit"), this should be logged in the canonical drift file. The 
+branch is correct and all slices landed on `docs/internal-overhaul`, so this is 
+a bookkeeping gap, not an implementation defect. **Recommendation:** append a 
+`minor` severity entry to `drift.md` describing the worktree-pin incident and 
+its successful reconciliation.
++43|
++44|## Locked Decisions Compliance
++45|
++46|- **IO-1** (one home per concept) — OK: S3 applied canonical-home rubric to 
+AGENTS.md + harness skill.
++47|- **IO-2** (mirrors regenerated, never hand-edited) — OK: jsr-audit + 
+netscript-harness mirrors regenerated; `diff` clean.
++48|- **IO-3** (`deno doc` documented) — OK: S1 added section to jsr-audit 
+skill; S2 added tools-and-commands index.
++49|- **IO-4** (no file deletion; content rewrite only) — OK: no doc files 
+deleted (`git log --diff-filter=D` empty).
++50|- **IO-5** (no Diátaxis for internal docs) — OK: all slices maintain 
+functional/role-based IA.
++51|- **IO-6** (canonical-home rubric) — OK: S3 applied rubric; AGENTS.md 
+updated with concept→home map.
++52|
++53|## Process Notes
++54|
++55|- **PLAN-EVAL cycle 1 → 2:** Cycle-1 FAIL_PLAN (missing commit slices) → 
+remediation added S0-S8 → cycle-2 PASS. No locked decision changed.
++56|- **LD-DOCS-LANE compliance:** Generator (Claude Opus workflow) and 
+evaluator (OpenHands Qwen, this session) are separate sessions.
++57|- **No `deno.lock` committed:** Lock hygiene preserved.
++58|
++59|## Trace
++60|
++61|Full evaluation recorded: 
+`.llm/tmp/run/docs-internal-overhaul--contributor/evaluate.md`
++62|Action run: https://github.com/rickylabs/netscript/actions/runs/27772128294
++63|PR: #57
++64|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL verdict PASS for Group 4 internal-overhaul PR #57
+
+Reasoning:
+The task is complete. Let me verify that I haven't missed anything:
+
+1. ✅ Read AGENTS.md
+2. ✅ Read evaluator protocol + verdict definitions
+3. ✅ Read plan.md, worklog.md, commits.md, drift.md
+4. ✅ Verified branch tip `7a8b1c38`
+5. ✅ Re-ran all gates:
+   - G-mirror: PASS (17 skills, 17 mirrors, exit 0)
+   - G-surface: PASS (all checks OK, exit 0)
+   - G-links: exit 1, 26 broken links ALL in impeccable (pre-existing, out of 
+Group 4 scope)
+   - G-doctrine: manual diff review, S4 only dead-link de-link, decisions 
+preserved
+6. ✅ Verified boundaries (no packages/plugins, no doc deletion, no hand-edited 
+mirrors, no decision changes)
+7. ✅ Ruled on the open question: (c) accept as recorded debt, does NOT block 
+PASS
+8. ✅ Identified the minor bookkeeping gap (drift.md not updated for worktree 
+reconciliation incident)
+9. ✅ Wrote evaluate.md with per-slice verdicts
+10. ✅ Wrote summary.md at OPENHANDS_SUMMARY_PATH
+
+All slices S1-S7 are PASS. Overall verdict: PASS.
+
+The minor finding about drift.md is non-blocking and is flagged as a 
+recommendation. The arch-debt for impeccable is properly recorded with all 
+required fields.
+
+Finish with message:
+## IMPL-EVAL Verdict: **PASS**
+
+**Branch:** `docs/internal-overhaul` @ `7a8b1c38` (Group 4 — 
+internal/contributor docs)
+
+### Per-Slice Results (all PASS)
+
+| Slice | Commit | Gate(s) | Verdict |
+|-------|--------|---------|---------|
+| S1 | `17f658ed` | G-surface ✓ G-mirror ✓ G-links ✓ | PASS |
+| S2 | `ade81736` | G-links ✓ | PASS |
+| S3 | `95b14136` | G-links ✓ G-doctrine ✓ | PASS |
+| S4 | `b7baca34` | G-doctrine ✓ (dead-link de-link only; decisions preserved) |
+PASS |
+| S5 | `8073bb57` | G-links ✓ | PASS |
+| S6 | `ad6d559f` | G-links ✓ | PASS |
+| S7 | `42da427b` | gate wired ✓ | PASS |
+
+### Gate Re-verification (raw output)
+
+- **G-mirror** `agentic:sync-claude:check` → exit 0: `17 skill(s), 17 mirrored 
+file(s)` OK
+- **G-surface** `agentic:check-claude` → exit 0: CLAUDE.md @AGENTS.md, settings 
+JSON, gitignore, mirror, hook-lock all OK
+- **G-links** `docs:links` → exit 1: 26 broken links, **ALL** in 
+`.agents/skills/impeccable/SKILL.md` (pre-existing, outside Group 4 scope). 
+Group-4-owned surface is link-clean.
+- **G-doctrine** manual diff review: S4 only removes dead 
+`phase-0-research/*.md` links; no doctrine decision text changed.
+- **Boundary**: no `packages/`/`plugins/` source edited; no doc files deleted; 
+no hand-edited `.claude/skills/` mirrors.
+
+### Open Question Ruling
+
+**Resolution: (c) accept as recorded debt — does NOT block PASS.**
+
+The arch-debt entry `impeccable-dead-reference-links` is properly formed (owner,
+target, reason, linked plan, status, gate). The gate detects real rot; the 
+redness is pre-existing/out-of-scope, not a wiring defect. The `impeccable` 
+skill maintainers can close in a separate follow-up.
+
+### Minor Finding (non-blocking)
+
+Worktree-pin reconciliation drift not recorded in `drift.md` (worklog-only). 
+Bookkeeping gap flagged as recommendation, not a failure.
+
+### Artifacts Written
+
+- `.llm/tmp/run/docs-internal-overhaul--contributor/evaluate.md` (full 
+evaluation with per-slice verdicts, gate output, concept-of-done)
+- `/home/runner/work/_temp/openhands/27772128294-1/summary.md` (summary for 
+workflow)
+
+All 8 bookkeeping commits (`6ae41fc3`/`7a8b1c38`) PASS.
+
+Tokens: ↑ input 735.46K • cache hit 80.91% •  reasoning 3.17K • ↓ output 12.36K 
+• $ 0.3706
+
