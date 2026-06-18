@@ -97,7 +97,7 @@ export {
 // EXTENSIONS EXPORTS
 // ============================================================================
 
-export { jsonUtils, mssqlJsonExtension, registerJsonFields } from './extensions/mod.ts';
+export { jsonUtils, registerJsonFields } from './extensions/mod.ts';
 
 // ============================================================================
 // TRANSACTION HELPERS

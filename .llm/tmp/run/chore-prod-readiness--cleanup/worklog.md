@@ -80,6 +80,12 @@ are untouched. Slices run low→high blast radius.
 | 2026-06-18 | G1-3a | `deno doc --lint packages/database/mod.ts` | FAIL (pre-existing) | 3 private-type-ref diagnostics; recorded as `D-G1-3a` because fixing them would widen this subtractive alias-removal slice. |
 | 2026-06-18 | G1-3a | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/database` dry-run completed successfully in the 27-unit workspace pass. |
 | 2026-06-18 | G1-3a | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
+| 2026-06-18 | G1-3b | Consumer scan | PASS | `mssqlJsonExtension` references were limited to the database export chain; `mysqlJsonExtension` had no live consumers and was deprecated, not removed. |
+| 2026-06-18 | G1-3b | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/database --ext ts,tsx` | PASS | 19 files selected, 1 batch, 0 failed batches, 0 diagnostics. |
+| 2026-06-18 | G1-3b | `deno test -A --unstable-kv packages/database` | PASS | 3 passed, 0 failed. |
+| 2026-06-18 | G1-3b | `deno doc --lint packages/database/mod.ts` | FAIL (pre-existing) | Remaining private-type-ref is `PostgresAdapter.prototype.getDriverAdapter` → `PostgresDriverAdapter`; covered by `D-G1-3a`. |
+| 2026-06-18 | G1-3b | `rtk proxy deno task publish:dry-run` | PASS | Exit 0; `@netscript/database` dry-run completed successfully in the 27-unit workspace pass. |
+| 2026-06-18 | G1-3b | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS | Summary: passed=41 failed=0. |
 
 ## Handoff Notes
 

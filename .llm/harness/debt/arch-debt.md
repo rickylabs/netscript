@@ -739,3 +739,18 @@ Seeded from
 - **Status:** open, DEBT_ACCEPTED. Removing the alias would break DB connectivity diagnostics.
 - **Gate:** grep parity between the writers above and the `connStringEnv` readers in
   `database-connectivity.ts`; close when both sides move to a single canonical key.
+
+## packages/database — MySQL JSON extension alias removal deferred (`mysqljsonextension-deprecated-removal-deferred`)
+
+- **Reason:** `mysqlJsonExtension` was a public alias for `sqlJsonExtension` without an existing
+  `@deprecated` marker. The `chore/prod-readiness` cleanup follows deprecate-before-remove for
+  public symbols, so this run marks the alias deprecated and defers physical removal.
+- **Owner:** `@netscript/database` maintainers.
+- **Target:** Remove `mysqlJsonExtension` in a later post-alpha cleanup after the deprecation marker
+  has shipped.
+- **Linked plan:** `.llm/tmp/run/chore-prod-readiness--cleanup/plan.md` (PR-7, G1-3b);
+  `.llm/tmp/run/chore-prod-readiness--cleanup/research.md` (S4/S4′).
+- **Created:** 2026-06-18 (G1-3b implementation).
+- **Status:** open, DEBT_ACCEPTED. Removal is intentionally deferred.
+- **Gate:** consumer scan for `mysqlJsonExtension` across packages, plugins, scaffold templates,
+  docs, ops, and `.llm/tools/`; remove only when zero live consumers remain.

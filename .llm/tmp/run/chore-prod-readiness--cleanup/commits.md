@@ -11,5 +11,6 @@ Append-only. Format: `- <commit-sha>: <commit message>`
 - 1c98fa1c813dbc741472a3e498f41a645423daa2: chore(prod-readiness): G1-0 — relocate OpenHands handoff protocol
 - 3f683a053f9bbbb5b3a45b4e27c35a554636cab9: chore(prod-readiness): G1-1 — remove tracked scratch cruft
 - 105245f086028786d765cd009342b7dbcfd5fe63: chore(prod-readiness): G1-2 — remove internal compatibility shims
+- 87317232736f174351d3068c00908c17364f7559: chore(prod-readiness): G1-3a — remove database connection-string alias
 
 <!-- appended after each commit -->
