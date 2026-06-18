@@ -4,7 +4,7 @@
 |-------|-------|
 | Run ID | `chore-prod-readiness--cleanup` |
 | Branch | `chore/prod-readiness` (off `release/jsr-readiness`) |
-| Status | `active` (group branch launched; Plan-Gate pending) |
+| Status | `active` (**PLAN-EVAL PASS @ cycle 2**; implementation gated on user dispatch + G2 PASS) |
 
 ## Progress Log
 
@@ -14,6 +14,7 @@
 | 2026-06-18 | plan-gate | group branch launched | Branched off umbrella @ `1f4cafa3` for the Plan-Gate. Plan/research/Design ready (inherited from umbrella). Draft sub-PR → `release/jsr-readiness` + PLAN-EVAL dispatch (OpenHands/minimax M3, separate session) follow. Worktree deferred to implementation launch (WSL Codex, ext4). |
 | 2026-06-18 | plan-gate | PLAN-EVAL cycle 1 = **FAIL_PLAN** | OpenHands minimax M3 (run 27754236653, separate session) → `plan-eval.md`. 7 mechanical fixes; off-limits/catalog guardrail PASS; "close to PASS". |
 | 2026-06-18 | plan-gate | cycle-1 remediation applied (supervisor) | All 7 fixes transcribed into `plan.md`/`research.md`: **PR-7** deprecate-before-remove (S4′ `mysqlJsonExtension` deprecate+defer; S5 `trustedConnection` refactor not delete); **F3** confirmed functional (read by `database-connectivity.ts:48,71,94`) + arch-debt `database-connectivity-legacy-connstring-alias` added; **G1-3 split** → G1-3a/b/c; **S6 scaffolder consumer** `job-scaffolders.ts:64–65`+fixture added to G1-5; `scaffold.runtime` smoke on every public slice; **G1-6 bounded**; per-slice file list + LOC budget. Re-dispatching PLAN-EVAL cycle 2. |
+| 2026-06-18 | plan-gate | PLAN-EVAL cycle 2 = **PASS** | OpenHands minimax M3 (run 27755852001, separate session) → `plan-eval.md` overwritten with cycle-2 PASS. All 7 fixes VERIFIED against tree; all 8 plan-gate boxes PASS; off-limits guardrail re-confirmed. Implementer notes (not blocking): G1-5 scaffolder test fixture is net-new; `mysqljsonextension-deprecated-removal-deferred` arch-debt entry added in G1-3b; two ±1 line offsets (`mssql.adapter.ts` writer 414-415; `mod.ts` 252-256) — grep the symbol, not the line. **Plan-Gate cleared — implementation may begin (gated on user dispatch + G2 PASS).** |
 
 ## Design
 
@@ -67,7 +68,10 @@ are untouched. Slices run low→high blast radius.
 
 ## Handoff Notes
 
-- PLAN-EVAL cycle 1 returned `FAIL_PLAN` (7 mechanical fixes; `plan-eval.md`). Cycle-1 remediation is
-  applied to `plan.md`/`research.md`/`arch-debt.md` (see progress log). **Re-dispatching PLAN-EVAL
-  cycle 2** (OpenHands minimax M3, separate session). No implementation slice before PLAN-EVAL
-  `PASS`. Two FAIL_PLAN cycles then escalate — this is cycle 2 of 2.
+- PLAN-EVAL cycle 1 = `FAIL_PLAN` → cycle-1 remediation applied → **PLAN-EVAL cycle 2 = `PASS`**
+  (run 27755852001, separate OpenHands minimax-M3 session). Plan-Gate cleared.
+- **Implementation lane (when dispatched):** WSL Codex daemon-attached subagent (mobile-visible), one
+  slice per commit, slices G1-0 → G1-6 (G1-3 = G1-3a/b/c). Each slice: consumer scan → remove/refactor
+  → gate (scoped check/test + `scaffold.runtime` smoke on public slices) → commit → push → PR comment
+  → append `commits.md`. IMPL-EVAL = OpenHands qwen 3.7 max, separate session.
+- **Gate before launch:** user reviews plans + explicitly dispatches; G2 also at PLAN-EVAL PASS.
