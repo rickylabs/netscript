@@ -1,0 +1,64 @@
+# GitHub Pages deploy for the NetScript external docs site (Lume static site,
+# docs/site/**). Builds with the same Deno toolchain pin as CI (2.8.3) and
+# publishes docs/site/_site to the project Pages site at
+# https://rickylabs.github.io/netscript/. The Lume `location` is hardcoded to
+# that base URL and the `base_path` plugin prefixes every href/src, so the
+# artifact root maps cleanly onto the /netscript/ subpath.
+#
+# Triggers: push to main touching docs/site (auto-deploy once release lands on
+# main) and workflow_dispatch (manual verification deploy from any branch).
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one in-flight Pages deploy at a time; do not cancel a running deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.8.3"
+
+      - name: Install docs dependencies
+        working-directory: docs/site
+        run: deno install
+
+      - name: Build Lume site
+        working-directory: docs/site
+        run: deno task build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/site/_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
