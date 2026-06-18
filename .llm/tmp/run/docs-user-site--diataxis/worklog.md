@@ -23,3 +23,16 @@
 - Supervisor must **ping the user for a `workflow`-scoped token** when the Pages workflow YAML slice
   is reached (current PAT lacks `workflow` scope).
 - PLAN-EVAL (separate OpenHands session) before any slice.
+
+
+## Design checkpoint — Group 3 IMPL launch prep (2026-06-18)
+
+PR #57 (Group 4) merged into the umbrella (`2a2aec70`); the G4/LD-DOCS-LANE lane is verified green, satisfying the "hold G3 until lane validated" gate. User dispatched "proceed".
+
+Resolved the two remaining open Design decisions:
+- **US-8 (reference depth):** 22 primary reference pages; the 4 `*-core` substrate packages fold as Internals subsections under their public plugin. All 26 stay in the A1 lint denominator.
+- **US-9 (READMEs):** standardized template, generated per unit + README-conformance checker (A2).
+
+Enumerated `## Commit Slices` G3-0..G3-6 (doc-authoring lane) + G3-FUI (fresh-ui WSL Codex source slice) + G3-DEPLOY (Pages CI, user-gated workflow token). 26-unit census captured. Worktree `.claude/worktrees/g3-user-site` created on `docs/user-site` @ `6c6f2672`.
+
+Pending user input before generator launch (per "present plans before launching any generator"): Pages `workflow`-scoped token approach (US-7/G3-DEPLOY) + fresh-ui WSL Codex go-ahead (US-6/G3-FUI). The G3-0..G3-6 doc bulk is independent of both.
