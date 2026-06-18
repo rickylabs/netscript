@@ -22,8 +22,11 @@
  * .claude/skills/ mirror (regenerated from .agents/skills/; staleness is the job
  * of `deno task agentic:sync-claude:check`) or the user/external doc site.
  *
- * External links (http(s)://, mailto:), and links into out-of-scope trees are
- * skipped rather than flagged.
+ * External links (http(s)://, mailto:) are skipped. Relative link targets are
+ * always existence-checked regardless of whether the target lives under a scanned
+ * root -- so a source doc that links to a never-created out-of-scope file IS
+ * flagged as a broken link (e.g. the pre-existing `impeccable` skill's missing
+ * reference/*.md subtree, tracked as arch-debt rather than silently skipped).
  *
  * Usage:
  *   deno run --allow-read .llm/tools/check-internal-doc-links.ts --pretty
@@ -266,7 +269,12 @@ async function main(): Promise<void> {
           continue;
         }
 
-        const targetRel = norm(join(docDir, pathPart));
+        // A leading "/" denotes a repo-root-relative link; resolve it from the
+        // repo root rather than the doc's directory (join() would otherwise nest
+        // it under docDir and mis-report a broken link).
+        const targetRel = pathPart.startsWith('/')
+          ? norm(pathPart.slice(1))
+          : norm(join(docDir, pathPart));
         const targetAbs = join(REPO_ROOT, targetRel);
 
         if (!(await exists(targetAbs))) {

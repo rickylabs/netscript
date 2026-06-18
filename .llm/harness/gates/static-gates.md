@@ -30,9 +30,9 @@ surface from silently rotting. It runs three checks in order and fails on the fi
 
 | Step | Task                          | Proves                                                                 |
 | ---- | ----------------------------- | ---------------------------------------------------------------------- |
-| 1    | `agentic:check-claude`        | the generated Claude agent surface validates (`validate-claude-surface.ts`) |
+| 1    | `docs:links`                  | internal Markdown links and `#anchor` fragments resolve to real files/headings |
 | 2    | `agentic:sync-claude:check`   | `.claude/skills/` mirrors are in sync with `.agents/skills/` source (no stale mirror) |
-| 3    | `docs:links`                  | internal Markdown links and `#anchor` fragments resolve to real files/headings |
+| 3    | `agentic:check-claude`        | the generated Claude agent surface validates (`validate-claude-surface.ts`) |
 
 Run order in the task is `docs:links && agentic:sync-claude:check && agentic:check-claude`. The
 link checker (`.llm/tools/check-internal-doc-links.ts`) scans `.llm/harness/`,
