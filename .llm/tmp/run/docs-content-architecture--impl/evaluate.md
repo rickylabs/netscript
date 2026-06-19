@@ -52,3 +52,15 @@
 - `--no-aspire` CLI flag verification + doc grounding.
 - Alpha-badge guardrail; footer edit-links. (NOTE: these touch chrome/_config — the plan
   scoped chrome OUT of the authoring run; confirm with user before Codex edits chrome.)
+
+---
+
+## FINAL IMPL-EVAL (Step 7) — qwen3.7-max — PASS (2026-06-19)
+
+- **Evaluator:** OpenHands `openrouter/qwen/qwen3.7-max`, separate session, on PR #59 tip `15ccc571`.
+- **Verdict: PASS** — final merge-readiness gate for the docs-site rebuild (Track B).
+- **Build gate:** `deno task --cwd docs/site build` exit 0, 148 files; `Unknown language: "no-highlight"` warnings = **0 (RESOLVED)** via Step-6 `_config.ts` plaintext alias registration.
+- **Step-6 acceptance:** all 5 items PASS — watchers/config-intent grounded in real surface (no invented APIs); `--no-aspire` docs-site copy accurate (deferred `packages/cli` scaffold contradiction correctly excluded from this docs PR); highlighter fixed; alpha badge; footer edit-links resolve correctly + skip `/reference/**`.
+- **No regressions** vs cycle-2 PASS; fil d'Ariane + navSections + prev/next intact.
+- Trace committed to branch: `.llm/tmp/run/openhands/pr-59/run-27817301122-1`.
+- **PR #59 is merge-ready (base `docs/user-site`); held for explicit user merge authorization.**
