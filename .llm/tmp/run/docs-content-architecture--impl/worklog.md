@@ -127,3 +127,14 @@ skips generated pages and `/reference/**` sources.
 `docs/site/_site/index.html` links to `docs/site/index.vto`, `docs/site/_site/quickstart/index.html`
 links to `docs/site/quickstart.vto`, and `docs/site/_site/reference/config/index.html` contains no
 `Edit this page` link.
+
+## Step-6 completion — 2026-06-19
+
+All five Step-6 items were completed or handled per supervisor steering. Items 1, 3, 4, and 5 made
+docs-site/chrome changes. Item 2 made the only necessary docs-site correction after steering:
+no-Aspire docs now avoid claiming generated no-Aspire README/nextSteps coherence. The separate
+CLI/scaffold-template no-Aspire README/nextSteps contradiction remains recorded in `drift.md` for a
+future packages/cli PR.
+
+**Final slice evidence.** The last per-item build was item 5:
+`deno task --cwd docs/site build` exited 0 and generated 148 files.

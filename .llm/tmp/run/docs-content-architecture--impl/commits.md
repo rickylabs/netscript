@@ -19,6 +19,7 @@
 - 21531a3: docs(site): ground no-aspire docs behavior
 - 2710e23: fix(site): register plaintext highlighter aliases
 - a2aa9b0: feat(site): show alpha status in docs chrome
+- e049cd8: feat(site): add GitHub edit links
 
 <!--
 Step-4 authoring wave: 27 pages authored via Claude workflow (run wtdd6daob, 27/27 authored,
