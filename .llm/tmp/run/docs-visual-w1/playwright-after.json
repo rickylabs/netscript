@@ -1,0 +1,477 @@
+{
+  "generatedAt": "2026-06-19T13:23:55.442Z",
+  "results": [
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "route": "home",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 2,
+        "tokenSpans": 20,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "route": "quickstart",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 8,
+        "tokenSpans": 21,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "route": "database",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 10,
+        "tokenSpans": 40,
+        "pageOverflow": false,
+        "tables": 1,
+        "tableBorders": [
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 798
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "route": "tutorial-build-service",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 13,
+        "tokenSpans": 273,
+        "pageOverflow": false,
+        "tables": 2,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 798
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "route": "cli-reference",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 4,
+        "tokenSpans": 5,
+        "pageOverflow": false,
+        "tables": 8,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 798
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "light",
+      "route": "reference-watchers",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 1,
+        "tokenSpans": 26,
+        "pageOverflow": false,
+        "tables": 7,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 800
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "route": "home",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 2,
+        "tokenSpans": 20,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "route": "quickstart",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 8,
+        "tokenSpans": 21,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "route": "database",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 10,
+        "tokenSpans": 40,
+        "pageOverflow": false,
+        "tables": 1,
+        "tableBorders": [
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 798
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "route": "tutorial-build-service",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 13,
+        "tokenSpans": 273,
+        "pageOverflow": false,
+        "tables": 2,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 798
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "route": "cli-reference",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 4,
+        "tokenSpans": 5,
+        "pageOverflow": false,
+        "tables": 8,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 798
+      },
+      "failures": []
+    },
+    {
+      "viewport": "desktop",
+      "theme": "dark",
+      "route": "reference-watchers",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 1,
+        "tokenSpans": 26,
+        "pageOverflow": false,
+        "tables": 7,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": false,
+        "minTableWidth": 800
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "light",
+      "route": "home",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 2,
+        "tokenSpans": 20,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "light",
+      "route": "quickstart",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 8,
+        "tokenSpans": 21,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "light",
+      "route": "database",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 10,
+        "tokenSpans": 40,
+        "pageOverflow": false,
+        "tables": 1,
+        "tableBorders": [
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "light",
+      "route": "tutorial-build-service",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 13,
+        "tokenSpans": 273,
+        "pageOverflow": false,
+        "tables": 2,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "light",
+      "route": "cli-reference",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 4,
+        "tokenSpans": 5,
+        "pageOverflow": false,
+        "tables": 8,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "light",
+      "route": "reference-watchers",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 1,
+        "tokenSpans": 26,
+        "pageOverflow": false,
+        "tables": 7,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "dark",
+      "route": "home",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 2,
+        "tokenSpans": 20,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "dark",
+      "route": "quickstart",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 8,
+        "tokenSpans": 21,
+        "pageOverflow": false,
+        "tables": 0,
+        "tableBorders": [],
+        "internalScroll": false,
+        "minTableWidth": 0
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "dark",
+      "route": "database",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 10,
+        "tokenSpans": 40,
+        "pageOverflow": false,
+        "tables": 1,
+        "tableBorders": [
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "dark",
+      "route": "tutorial-build-service",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 13,
+        "tokenSpans": 273,
+        "pageOverflow": false,
+        "tables": 2,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "dark",
+      "route": "cli-reference",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 4,
+        "tokenSpans": 5,
+        "pageOverflow": false,
+        "tables": 8,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    },
+    {
+      "viewport": "mobile",
+      "theme": "dark",
+      "route": "reference-watchers",
+      "consoleErrors": [],
+      "metrics": {
+        "codeBlocks": 1,
+        "tokenSpans": 26,
+        "pageOverflow": false,
+        "tables": 7,
+        "tableBorders": [
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px",
+          "1px 12px"
+        ],
+        "internalScroll": true,
+        "minTableWidth": 672
+      },
+      "failures": []
+    }
+  ]
+}
