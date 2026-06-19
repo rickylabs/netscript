@@ -30,6 +30,11 @@ function slugify(str: string): string {
     .replace(/\s+/g, "-");
 }
 
+const plaintextLanguage = () => ({
+  name: "Plain text",
+  contains: [],
+});
+
 const site = lume({
   location: new URL("https://rickylabs.github.io/netscript/"),
   src: ".",
@@ -45,7 +50,14 @@ site.copy("styles");
 site.copy("favicon.svg");
 
 // Syntax highlighting for fenced code blocks (TD-6).
-site.use(codeHighlight());
+site.use(codeHighlight({
+  languages: {
+    text: plaintextLanguage,
+    plaintext: plaintextLanguage,
+    "no-highlight": plaintextLanguage,
+    prisma: plaintextLanguage,
+  },
+}));
 
 // Static client-side search; mounts the pagefind UI into #search (TD-5).
 site.use(pagefind({

@@ -16,6 +16,7 @@
 - 0821adf5: chore(openhands): record run trace 27812125012-1 (IMPL-EVAL minimax-m3)
 - 05f04513: docs(site): retire stale getting-started tutorial; relink index to the 5-rung ladder
 - f7a7e6b: docs(site): surface watchers and config intent
+- 21531a3: docs(site): ground no-aspire docs behavior
 
 <!--
 Step-4 authoring wave: 27 pages authored via Claude workflow (run wtdd6daob, 27/27 authored,

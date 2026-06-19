@@ -52,6 +52,23 @@ your own connection strings.
 pre-existing highlighter diagnostics for `no-highlight`/`prisma` remained; item 3 owns that chrome
 fix. No `TemplateError` or `TransformError`.
 
+## Step-6 item 3 — Highlighter plaintext registration — 2026-06-19
+
+**Ground truth read before editing.** Inspected Lume's cached
+`lume@v2.5.4/plugins/code_highlight.ts`; the plugin supports a `languages` map of
+highlight.js language functions and registers each entry before processing pages. Scanned
+non-reference docs for `text`, `prisma`, and `no-highlight` code-fence usage.
+
+**Change.** Updated `docs/site/_config.ts` only. Added a tiny plaintext language function and
+registered `text`, `plaintext`, `no-highlight`, and `prisma` to it through
+`codeHighlight({ languages })`. This keeps existing `text` and Prisma fences unchanged while
+preventing highlight.js from falling back to the unregistered `no-highlight` mode.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Captured
+output contained no `Unknown language`, no `Could not find the language`, no
+`Falling back to no-highlight`, and no `Error highlighting code block` diagnostics. Root
+`deno.lock` was restored after Deno inspection touched it; no lockfile changes remain.
+
 ## Phase 0a — chrome + components + landing (GREEN build) — 2026-06-19
 
 **Generator:** Stage-4 wave-1 dynamic workflow (5 agents: components, chrome, index,
