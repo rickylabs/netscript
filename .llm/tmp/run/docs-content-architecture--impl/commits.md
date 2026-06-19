@@ -18,6 +18,7 @@
 - f7a7e6b: docs(site): surface watchers and config intent
 - 21531a3: docs(site): ground no-aspire docs behavior
 - 2710e23: fix(site): register plaintext highlighter aliases
+- a2aa9b0: feat(site): show alpha status in docs chrome
 
 <!--
 Step-4 authoring wave: 27 pages authored via Claude workflow (run wtdd6daob, 27/27 authored,

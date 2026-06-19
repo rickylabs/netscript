@@ -133,6 +133,16 @@
             {{ content }}
           </article>
           {{ comp.nextPrev({ prev, next }) }}
+          {{ set editSourcePath = page.sourcePath }}
+          {{ if editSourcePath && editSourcePath !== "(generated)" && !editSourcePath.startsWith("/reference/") }}
+            {{ set editHref = "https://github.com/rickylabs/netscript/edit/main/docs/site" + editSourcePath }}
+            <footer class="ns-nextprev" aria-label="Page source">
+              <a class="ns-nextprev__link" href="{{ editHref }}" target="_blank" rel="noreferrer">
+                <span class="ns-nextprev__dir" aria-hidden="true">GitHub</span>
+                <span class="ns-nextprev__label">Edit this page</span>
+              </a>
+            </footer>
+          {{ /if }}
         </main>
       </div>
     </div>

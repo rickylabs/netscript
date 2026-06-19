@@ -110,3 +110,20 @@ that use each component.
 
 **Gate status.** Phase-0a build gate: PASS. Markdown/prose pages: deferred to Phase 0b
 (engine) + wave-1b (re-author) — see drift.md. IMPL-EVAL deferred until front door renders.
+
+## Step-6 item 5 — Footer edit links — 2026-06-19
+
+**Ground truth read before editing.** Inspected Lume's cached `page.ts` implementation and confirmed
+`page.sourcePath` is exposed to templates through `data.page`. Generated pages report
+`(generated)`, while authored docs expose their source path such as `/quickstart.vto` or
+`/explanation/aspire.md`.
+
+**Change.** Updated `docs/site/_includes/layouts/base.vto` only. Added a footer edit link after the
+existing previous/next navigation for authored non-reference pages. The link targets
+`https://github.com/rickylabs/netscript/edit/main/docs/site/<sourcePath>`, opens in a new tab, and
+skips generated pages and `/reference/**` sources.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Verified
+`docs/site/_site/index.html` links to `docs/site/index.vto`, `docs/site/_site/quickstart/index.html`
+links to `docs/site/quickstart.vto`, and `docs/site/_site/reference/config/index.html` contains no
+`Edit this page` link.
