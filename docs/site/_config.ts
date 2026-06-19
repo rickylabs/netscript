@@ -3,6 +3,9 @@ import basePath from "lume/plugins/base_path.ts";
 import pagefind from "lume/plugins/pagefind.ts";
 import codeHighlight from "lume/plugins/code_highlight.ts";
 import anchor from "npm:markdown-it-anchor@9.2.0";
+import langBash from "npm:highlight.js@11.11.1/lib/languages/bash";
+import langJson from "npm:highlight.js@11.11.1/lib/languages/json";
+import langTypescript from "npm:highlight.js@11.11.1/lib/languages/typescript";
 
 /**
  * NetScript external user documentation site (Diátaxis IA).
@@ -52,6 +55,13 @@ site.copy("favicon.svg");
 // Syntax highlighting for fenced code blocks (TD-6).
 site.use(codeHighlight({
   languages: {
+    bash: langBash,
+    sh: langBash,
+    shell: langBash,
+    json: langJson,
+    ts: langTypescript,
+    tsx: langTypescript,
+    typescript: langTypescript,
     text: plaintextLanguage,
     plaintext: plaintextLanguage,
     "no-highlight": plaintextLanguage,

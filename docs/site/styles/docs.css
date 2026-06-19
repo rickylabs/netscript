@@ -513,6 +513,9 @@ html[data-theme="light"] .ns-theme-toggle .ns-icon-moon {
   font-size: 0.95rem;
   line-height: var(--ns-leading-relaxed);
   color: var(--ns-fg);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ns-border-strong) transparent;
 }
 
 .ns-prose > :first-child {
@@ -606,62 +609,189 @@ html[data-theme="light"] .ns-theme-toggle .ns-icon-moon {
   font-family: var(--ns-font-mono);
   font-size: var(--ns-text-sm);
   line-height: var(--ns-leading-normal);
-  background: var(--ns-gray-11);
-  border: 1px solid var(--ns-border-hover);
+  background: color-mix(in srgb, var(--ns-gray-11) 94%, var(--ns-copper-8));
+  border: 1px solid var(--ns-border-strong);
   border-radius: var(--ns-radius-lg);
   padding: var(--ns-space-4) var(--ns-space-5);
   overflow-x: auto;
   margin: 0 0 var(--ns-space-5);
   box-shadow: var(--ns-shadow-sm);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ns-border-strong) transparent;
 }
 
 [data-theme="light"] .ns-prose pre {
-  background: var(--ns-gray-2);
+  background: color-mix(in srgb, var(--ns-gray-2) 88%, var(--ns-slate-1));
 }
 
 .ns-prose pre code {
   background: none;
   border: none;
   padding: 0;
-  color: var(--ns-fg);
+  color: var(--ns-gray-2);
   font-size: inherit;
   overflow-wrap: normal;
   word-break: normal;
+}
+
+[data-theme="light"] .ns-prose pre code {
+  color: var(--ns-gray-11);
+}
+
+.ns-prose pre code.hljs {
+  display: block;
+}
+
+.ns-prose pre .hljs-comment,
+.ns-prose pre .hljs-quote {
+  color: var(--ns-slate-4);
+  font-style: italic;
+}
+
+.ns-prose pre .hljs-keyword,
+.ns-prose pre .hljs-selector-tag,
+.ns-prose pre .hljs-built_in,
+.ns-prose pre .hljs-literal,
+.ns-prose pre .hljs-type {
+  color: var(--ns-copper-3);
+}
+
+.ns-prose pre .hljs-string,
+.ns-prose pre .hljs-regexp,
+.ns-prose pre .hljs-template-variable {
+  color: var(--ns-teal-2);
+}
+
+.ns-prose pre .hljs-number,
+.ns-prose pre .hljs-attr,
+.ns-prose pre .hljs-variable,
+.ns-prose pre .hljs-property {
+  color: var(--ns-amber-4);
+}
+
+.ns-prose pre .hljs-title,
+.ns-prose pre .hljs-title.function_,
+.ns-prose pre .hljs-title.class_,
+.ns-prose pre .hljs-function,
+.ns-prose pre .hljs-params {
+  color: var(--ns-slate-2);
+}
+
+.ns-prose pre .hljs-punctuation,
+.ns-prose pre .hljs-operator,
+.ns-prose pre .hljs-subst {
+  color: var(--ns-gray-4);
+}
+
+.ns-prose pre .hljs-meta,
+.ns-prose pre .hljs-doctag,
+.ns-prose pre .hljs-section,
+.ns-prose pre .hljs-name {
+  color: var(--ns-red-4);
+}
+
+[data-theme="light"] .ns-prose pre .hljs-comment,
+[data-theme="light"] .ns-prose pre .hljs-quote {
+  color: var(--ns-slate-6);
+}
+
+[data-theme="light"] .ns-prose pre .hljs-keyword,
+[data-theme="light"] .ns-prose pre .hljs-selector-tag,
+[data-theme="light"] .ns-prose pre .hljs-built_in,
+[data-theme="light"] .ns-prose pre .hljs-literal,
+[data-theme="light"] .ns-prose pre .hljs-type {
+  color: var(--ns-copper-7);
+}
+
+[data-theme="light"] .ns-prose pre .hljs-string,
+[data-theme="light"] .ns-prose pre .hljs-regexp,
+[data-theme="light"] .ns-prose pre .hljs-template-variable {
+  color: var(--ns-teal-7);
+}
+
+[data-theme="light"] .ns-prose pre .hljs-number,
+[data-theme="light"] .ns-prose pre .hljs-attr,
+[data-theme="light"] .ns-prose pre .hljs-variable,
+[data-theme="light"] .ns-prose pre .hljs-property {
+  color: var(--ns-amber-6);
+}
+
+[data-theme="light"] .ns-prose pre .hljs-title,
+[data-theme="light"] .ns-prose pre .hljs-title.function_,
+[data-theme="light"] .ns-prose pre .hljs-title.class_,
+[data-theme="light"] .ns-prose pre .hljs-function,
+[data-theme="light"] .ns-prose pre .hljs-params {
+  color: var(--ns-slate-7);
+}
+
+[data-theme="light"] .ns-prose pre .hljs-punctuation,
+[data-theme="light"] .ns-prose pre .hljs-operator,
+[data-theme="light"] .ns-prose pre .hljs-subst {
+  color: var(--ns-gray-7);
+}
+
+[data-theme="light"] .ns-prose pre .hljs-meta,
+[data-theme="light"] .ns-prose pre .hljs-doctag,
+[data-theme="light"] .ns-prose pre .hljs-section,
+[data-theme="light"] .ns-prose pre .hljs-name {
+  color: var(--ns-red-6);
 }
 
 /* ─── Tables ─────────────────────────────────────────────────── */
 
 .ns-prose table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: 42rem;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 0 0 var(--ns-space-5);
   font-size: var(--ns-text-sm);
   display: block;
   overflow-x: auto;
+  border: 1px solid var(--ns-border-strong);
+  border-radius: var(--ns-radius-lg);
+  line-height: var(--ns-leading-normal);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ns-border-strong) transparent;
 }
 
 .ns-prose th {
-  border-bottom: 1px solid var(--ns-border-hover);
-  background: var(--ns-card);
-  padding: var(--ns-space-2-5, 0.625rem) var(--ns-space-4);
+  border-bottom: 1px solid var(--ns-border-strong);
+  border-right: 1px solid var(--ns-border);
+  background: color-mix(in srgb, var(--ns-surface-raised) 82%, var(--ns-primary-subtle));
+  padding: var(--ns-space-3) var(--ns-space-4);
   text-align: left;
   font-size: var(--ns-text-xs);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: var(--ns-tracking-wide);
-  color: var(--ns-muted-fg);
+  color: var(--ns-fg);
   white-space: nowrap;
 }
 
 .ns-prose td {
   border-bottom: 1px solid var(--ns-border);
-  padding: var(--ns-space-2-5, 0.625rem) var(--ns-space-4);
+  border-right: 1px solid var(--ns-border);
+  padding: var(--ns-space-3) var(--ns-space-4);
   color: var(--ns-fg);
   vertical-align: top;
 }
 
+.ns-prose th:last-child,
+.ns-prose td:last-child {
+  border-right: 0;
+}
+
+.ns-prose tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--ns-surface-raised) 34%, transparent);
+}
+
+.ns-prose tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .ns-prose tbody tr:hover td {
-  background: color-mix(in srgb, var(--ns-fg) 2%, transparent);
+  background: color-mix(in srgb, var(--ns-primary-subtle) 70%, transparent);
 }
 
 /* ─── Blockquotes ────────────────────────────────────────────── */
@@ -955,40 +1085,57 @@ a.ns-card:focus-visible {
 .ns-api-table-wrap {
   overflow-x: auto;
   margin: 1.5rem 0;
-  border: 1px solid var(--ns-border, rgba(255, 255, 255, 0.12));
-  border-radius: var(--ns-radius-md, 8px);
+  border: 1px solid var(--ns-border-strong, rgba(255, 255, 255, 0.18));
+  border-radius: var(--ns-radius-lg, 8px);
+  background: color-mix(in srgb, var(--ns-surface) 90%, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ns-border-strong) transparent;
 }
 
 .ns-api-table {
   width: 100%;
-  border-collapse: collapse;
+  min-width: 44rem;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: var(--ns-text-sm, 0.92rem);
+  line-height: var(--ns-leading-normal, 1.5);
 }
 
 .ns-api-table caption {
   caption-side: top;
   text-align: left;
-  padding: 0.65rem 0.9rem;
+  padding: 0.75rem 1rem;
   font-weight: 600;
   color: var(--ns-fg, inherit);
-  border-bottom: 1px solid var(--ns-border, rgba(255, 255, 255, 0.12));
+  border-bottom: 1px solid var(--ns-border-strong, rgba(255, 255, 255, 0.18));
+  background: color-mix(in srgb, var(--ns-card) 70%, transparent);
 }
 
 .ns-api-table th,
 .ns-api-table td {
   text-align: left;
-  padding: 0.6rem 0.9rem;
+  padding: 0.75rem 1rem;
   vertical-align: top;
   border-bottom: 1px solid var(--ns-border, rgba(255, 255, 255, 0.08));
+  border-right: 1px solid var(--ns-border, rgba(255, 255, 255, 0.08));
 }
 
 .ns-api-table thead th {
-  font-weight: 600;
-  color: var(--ns-muted-fg, rgba(255, 255, 255, 0.7));
-  background: var(--ns-surface-2, var(--ns-surface, rgba(255, 255, 255, 0.02)));
+  font-weight: 700;
+  color: var(--ns-fg, inherit);
+  background: color-mix(in srgb, var(--ns-surface-raised) 82%, var(--ns-primary-subtle));
   font-size: var(--ns-text-xs, 0.78rem);
   text-transform: uppercase;
   letter-spacing: var(--ns-tracking-wide, 0.04em);
+}
+
+.ns-api-table th:last-child,
+.ns-api-table td:last-child {
+  border-right: 0;
+}
+
+.ns-api-table tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--ns-surface-raised) 34%, transparent);
 }
 
 .ns-api-table tbody tr:last-child td {
@@ -1008,7 +1155,7 @@ a.ns-card:focus-visible {
 }
 
 .ns-api-table__desc {
-  color: var(--ns-muted-fg, rgba(255, 255, 255, 0.8));
+  color: var(--ns-fg, inherit);
   line-height: var(--ns-leading-normal, 1.5);
 }
 
