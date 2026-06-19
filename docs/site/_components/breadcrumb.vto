@@ -4,18 +4,6 @@
    rule as the sidebar active-highlight). On the home page the trail collapses
    to just "Home" (rendered as plain text, no link). All colors key off the
    existing fresh-ui --ns-* tokens. #}}
----
-css: |
-  .ns-breadcrumb { margin:0 0 1rem; font-size:.85rem; }
-  .ns-breadcrumb__list { list-style:none; display:flex; flex-wrap:wrap; align-items:center;
-    gap:.35rem; margin:0; padding:0; }
-  .ns-breadcrumb__item { display:inline-flex; align-items:center; gap:.35rem;
-    color:var(--ns-text-muted,rgba(255,255,255,.6)); }
-  .ns-breadcrumb__sep { color:var(--ns-border,rgba(255,255,255,.3)); }
-  .ns-breadcrumb a { color:var(--ns-text-muted,rgba(255,255,255,.6)); text-decoration:none; }
-  .ns-breadcrumb a:hover { color:var(--ns-accent,#5b8def); text-decoration:underline; }
-  .ns-breadcrumb__item[aria-current="page"] { color:var(--ns-text,inherit); font-weight:500; }
----
 {{ set homeUrl = "/" |> url }}
 {{ set pageUrl = url |> url }}
 

@@ -181,5 +181,60 @@
         if (backdrop) backdrop.addEventListener("click", close);
       })();
     </script>
+
+    {{# Tabbed code enhancement; with JS disabled, every panel remains visible. #}}
+    <script>
+      (function () {
+        function setup(root) {
+          var tabs = Array.prototype.slice.call(root.querySelectorAll(".ns-tabbed__tab"));
+          var panels = Array.prototype.slice.call(root.querySelectorAll(".ns-tabbed__panel"));
+          if (!tabs.length || !panels.length) return;
+
+          function activate(index) {
+            tabs.forEach(function (tab, i) {
+              var on = i === index;
+              tab.classList.toggle("is-active", on);
+              tab.setAttribute("aria-selected", on ? "true" : "false");
+              tab.setAttribute("tabindex", on ? "0" : "-1");
+            });
+            panels.forEach(function (panel, i) {
+              if (i === index) panel.removeAttribute("hidden");
+              else panel.setAttribute("hidden", "");
+            });
+          }
+
+          tabs.forEach(function (tab, i) {
+            tab.addEventListener("click", function () {
+              activate(i);
+            });
+            tab.addEventListener("keydown", function (e) {
+              var next = null;
+              if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (i + 1) % tabs.length;
+              else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                next = (i - 1 + tabs.length) % tabs.length;
+              } else if (e.key === "Home") next = 0;
+              else if (e.key === "End") next = tabs.length - 1;
+              if (next === null) return;
+              e.preventDefault();
+              activate(next);
+              tabs[next].focus();
+            });
+          });
+
+          root.classList.add("is-enhanced");
+          activate(0);
+        }
+
+        function init() {
+          Array.prototype.slice.call(document.querySelectorAll(".ns-tabbed")).forEach(setup);
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", init);
+        } else {
+          init();
+        }
+      })();
+    </script>
   </body>
 </html>
