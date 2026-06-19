@@ -68,3 +68,9 @@ After sweep:
 Build still prints pre-existing highlight.js unescaped-HTML warnings during static generation. The
 Playwright browser console check across the audited pages reports zero errors.
 
+## Completion Entry
+
+- Implementation commit: `c911e97`.
+- Final verdict from implementation session: source fix applied, visual sweep green, screenshots and
+  report saved under `.llm/tmp/run/docs-visual-fix/`.
+- Ready for separate evaluator session; not merged.
