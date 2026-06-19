@@ -95,3 +95,5 @@ in `drift.md`; they are not part of this slice.
 - Final `deno.lock` diff contains only:
   - `npm:pg@^8.21.0: 8.21.0`
   - `packages/queue` dependency list now includes `npm:pg@^8.21.0`
+
+DONE 69dc820 - gates PASS: focused Postgres adapter tests, scoped check, scoped lint, scoped fmt; lock delta pg-only.
