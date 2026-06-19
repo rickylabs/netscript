@@ -21,6 +21,22 @@ Deno.test('defineConfig: applies defaults to validated saga and trigger sections
   assertEquals(config.triggers?.enabled, true);
 });
 
+Deno.test('defineConfig: accepts legacy project and TS entrypoint AppHost paths', () => {
+  const legacy = defineConfig({
+    name: 'legacy',
+    databases: { config: [] },
+    aspire: { appHost: 'dotnet/AppHost' },
+  });
+  const modern = defineConfig({
+    name: 'modern',
+    databases: { config: [] },
+    aspire: { appHost: 'aspire/apphost.mts' },
+  });
+
+  assertEquals(legacy.aspire?.appHost, 'dotnet/AppHost');
+  assertEquals(modern.aspire?.appHost, 'aspire/apphost.mts');
+});
+
 Deno.test('defineConfig: rejects unrelated saga and trigger section shapes', () => {
   assertThrows(() =>
     defineConfig(

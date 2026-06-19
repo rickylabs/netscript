@@ -63,9 +63,9 @@ export interface PathsConfig {
   deploy: string;
 }
 
-/** Aspire orchestration settings for generated AppHost projects. */
+/** Aspire orchestration settings for generated AppHost projects or entrypoints. */
 export interface AspireConfig {
-  /** Path to the AppHost project. */
+  /** Path to a legacy AppHost project directory or modern TS AppHost entrypoint file. */
   appHost: string;
   /** Local Aspire dashboard port. */
   dashboardPort: number;
