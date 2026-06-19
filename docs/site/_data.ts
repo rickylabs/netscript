@@ -64,11 +64,57 @@ export const navSections: NavSection[] = [
     ],
   },
   {
+    // Tutorials \u2014 learning-oriented ladder. Zone index first so deeper pages
+    // win the breadcrumb's deepest-prefix match.
     label: "Learn",
     items: [
       { href: "/tutorials/", label: "Tutorials", icon: "T" },
+      { href: "/tutorials/first-workspace/", label: "1 \u00B7 Your first workspace", icon: "1" },
+      { href: "/tutorials/build-a-service/", label: "2 \u00B7 Build a service", icon: "2" },
+      { href: "/tutorials/background-jobs/", label: "3 \u00B7 Add background jobs", icon: "3" },
+      { href: "/tutorials/durable-workflow/", label: "4 \u00B7 A durable workflow", icon: "4" },
+      { href: "/tutorials/ingest-webhook/", label: "5 \u00B7 Ingest a webhook", icon: "5" },
+    ],
+  },
+  {
+    label: "How-to guides",
+    items: [
       { href: "/how-to/", label: "How-to guides", icon: "H" },
+      { href: "/how-to/add-a-plugin/", label: "Add a plugin", icon: "\u00B7" },
+      { href: "/how-to/add-a-service/", label: "Add a service", icon: "\u00B7" },
+      { href: "/how-to/database-migration/", label: "Database & migration", icon: "\u00B7" },
+      { href: "/how-to/queue-kv-cron/", label: "Queue / KV / cron", icon: "\u00B7" },
+      { href: "/how-to/add-opentelemetry/", label: "Add OpenTelemetry", icon: "\u00B7" },
+      { href: "/how-to/customize-fresh-ui/", label: "Customize Fresh UI", icon: "\u00B7" },
+      { href: "/how-to/deploy/", label: "Deploy", icon: "\u00B7" },
+      { href: "/how-to/author-a-plugin/", label: "Author a plugin", icon: "\u00B7" },
+    ],
+  },
+  {
+    label: "Core concepts",
+    items: [
       { href: "/explanation/", label: "Explanation", icon: "E" },
+      { href: "/explanation/architecture/", label: "Architecture", icon: "\u00B7" },
+      { href: "/explanation/contracts/", label: "Contracts & type flow", icon: "\u00B7" },
+      { href: "/explanation/plugin-model/", label: "The plugin model", icon: "\u00B7" },
+      { href: "/explanation/durable-workflows/", label: "Durable workflows", icon: "\u00B7" },
+      { href: "/explanation/observability/", label: "Observability", icon: "\u00B7" },
+      { href: "/explanation/aspire/", label: "Orchestration with Aspire", icon: "\u00B7" },
+    ],
+  },
+  {
+    label: "Capabilities",
+    items: [
+      { href: "/capabilities/", label: "Capabilities", icon: "\u25C9" },
+      { href: "/capabilities/services/", label: "Services & contracts", icon: "\u00B7" },
+      { href: "/capabilities/background-jobs/", label: "Background jobs", icon: "\u00B7" },
+      { href: "/capabilities/durable-sagas/", label: "Durable sagas", icon: "\u00B7" },
+      { href: "/capabilities/triggers/", label: "Triggers & ingress", icon: "\u00B7" },
+      { href: "/capabilities/streams/", label: "Durable streams", icon: "\u00B7" },
+      { href: "/capabilities/database/", label: "Database & Prisma", icon: "\u00B7" },
+      { href: "/capabilities/kv-queues-cron/", label: "KV, queues & cron", icon: "\u00B7" },
+      { href: "/capabilities/telemetry/", label: "Telemetry & logging", icon: "\u00B7" },
+      { href: "/capabilities/fresh-ui/", label: "Fresh UI & design", icon: "\u00B7" },
     ],
   },
   {
@@ -80,5 +126,12 @@ export const navSections: NavSection[] = [
   {
     label: "Reference units",
     items: referenceUnits,
+  },
+  {
+    label: "Resources",
+    items: [
+      { href: "/glossary/", label: "Glossary", icon: "G" },
+      { href: "/cli-reference/", label: "CLI reference", icon: "C" },
+    ],
   },
 ];
