@@ -82,3 +82,18 @@ Deno.test('initNextSteps includes local database preparation steps for maintaine
     '# Postgres provisioned by Aspire (see "Databases" in appsettings.json)',
   ]);
 });
+
+Deno.test('initNextSteps tells no-Aspire Postgres users to self-provision', () => {
+  const steps = initNextSteps(baseOptions({
+    noAspire: true,
+    dbEngine: 'postgres',
+  }));
+
+  assertEquals(steps, [
+    'cd smoke-test',
+    'netscript db generate  # generate database client after configuring DATABASE_URL',
+    'netscript db seed  # seed after the generated client exists',
+    'deno task --cwd apps/frontend dev  # start Fresh dev server',
+    '# Provision Postgres yourself and set POSTGRES_URI or DATABASE_URL',
+  ]);
+});
