@@ -278,3 +278,14 @@ planning artifacts and leaves these for the gated authoring waves.
 **PLAN-EVAL dispatched (HARD GATE).** OpenHands `openrouter/minimax/minimax-m3`, `output=pr-comment`,
 separate session, adversarial against `gates/plan-gate.md`, on PR #59. No authoring workflow launches
 until it returns PASS and the owner gives explicit GO.
+
+**PLAN-EVAL PASS + owner GO → corrections folded (commit 045e2892).** Four corrections applied to
+doc-architecture-v2.md before authoring: (1) §5 callout now mandates the tag-form opener
+`{{ comp callout { type, title } }}` and flags `{{ comp.callout({...}) }}` as BUILD-BREAKING —
+verified against shipped index/why/quickstart .vto which all use tag form; the other comps
+(hero/featureGrid/apiTable/tabbedCode/card) correctly stay function-call form (verified in
+quickstart.vto). (2) §0 prev/next reworded to §7's operational scope (ladder + zone-sequence pages,
+not every leaf). (3) §9 jsr-audit declared N/A (docs surface). (4) §9 notes static/fitness gate
+boxes are subsumed by the single `deno task --cwd docs/site build` gate. NOTE: the uncommitted
+`first-workspace.md` groundwork uses the BUILD-BREAKING `{{ comp.callout({...}) }}` form and will be
+fixed to tag-form during Wave B authoring/reconciliation. Authoring workflow launches next.
