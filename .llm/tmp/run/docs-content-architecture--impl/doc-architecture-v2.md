@@ -21,7 +21,8 @@ the level of Medusa / TanStack / Laravel / Astro — explicitly **not minimalist
    `docs/site/reference/**` (generated `deno doc`, 22 units) which is **KEPT UNTOUCHED**.
 2. **Fil d'Ariane (the learning thread).** A reader can travel Home → Quickstart → Tutorials ladder
    → How-to → Explanation → Capabilities → Reference without a dead end: every body page has a
-   correct breadcrumb (it is a `navSections` item) and a `prev`/`next` chain; tutorials form one
+   correct breadcrumb (it is a `navSections` item); **ladder and zone-sequence pages additionally
+   carry a `prev`/`next` chain** (operational scope per §7 — not every leaf page); tutorials form one
    continuous narrative building a single app.
 3. **Reality-grounded.** Every command, flag, port, endpoint, import specifier, file path, and code
    shape is copied from the ground-truth artifacts — never invented. Each page brief carries
@@ -207,10 +208,13 @@ ground-truth and the evaluator must verify. Status: SHIPPED / EXISTS (refresh) /
 - **nextPrev** auto-rendered `{{ comp.nextPrev({ prev, next }) }}` from front-matter
   `prev:{label,href}` / `next:{label,href}` → each body page sets these.
 - **learningPath** `{{ comp.learningPath({ steps:[{label,href}] }) }}` on zone indexes + ladder.
-- **callout** body form `{{ comp.callout({ type, title }) }}…inline HTML…{{ /comp }}` (type
-  note|tip|important|warning). **markdown-it does NOT process markdown inside emitted HTML** → callout
-  bodies are inline HTML.
-- **hero/featureGrid/apiTable/tabbedCode/card** function-call form `{{ comp.NAME({...}) }}`.
+- **callout** body form uses the **tag-form opener** `{{ comp callout { type, title } }}…inline HTML…{{ /comp }}`
+  (type note|tip|important|warning). The function-call opener `{{ comp.callout({...}) }}…{{ /comp }}` is
+  **BUILD-BREAKING** and must never be used — the shipped, building front-door pages (`index.vto`,
+  `why.vto`, `quickstart.vto`) all use the tag form. **markdown-it does NOT process markdown inside
+  emitted HTML** → callout bodies are inline HTML.
+- **hero/featureGrid/apiTable/tabbedCode/card** take all content through args (no body slot) and use the
+  function-call form `{{ comp.NAME({...}) }}` (confirmed in shipped `quickstart.vto`).
 - **LANDMINE:** the literal keyword `function` inside ANY comp-tag arg aborts the build. Use
   arrow/`const` in code samples (memory `lume-vento-function-keyword-landmine`).
 - Pages mixing comps + markdown need front matter `templateEngine: [vento, md]`.
@@ -265,6 +269,12 @@ PR #59 comment (page list + build result) → append `commits.md`. **No merge.**
 ---
 
 ## 9. Evaluation Plan (un-narrowed, whole-tree)
+
+**Gate applicability for the docs surface.** `jsr-audit: N/A — documentation surface, no public API to
+audit.` The `static-gates.md` / `fitness-gates.md` boxes from `archetype-gate-matrix.md` (type-check,
+lint, fmt of product code) do not apply to authored prose; for this run they are **subsumed by the
+single `deno task --cwd docs/site build` gate** (Lume build = 0 errors), which is the authoritative
+build-clean verdict per §0.5 and §8.
 
 - **PLAN-EVAL (this step, HARD GATE):** OpenHands `openrouter/minimax/minimax-m3`, adversarial,
   against `.llm/harness/gates/plan-gate.md`. Verifies IA completeness, page-type rigor, accuracy
