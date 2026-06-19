@@ -9,7 +9,8 @@ export const SCAFFOLD_DEFAULTS = {
   SERVICE_NAME: 'users',
   DB_ENGINE: 'none' as const,
   EDITOR: 'none' as const,
-  ASPIRE_APPHOST_PATH: 'dotnet/AppHost',
+  ASPIRE_LEGACY_APPHOST_PATH: 'dotnet/AppHost',
+  ASPIRE_TS_APPHOST_PATH: 'aspire/apphost.mts',
   COMPILER_OPTIONS: {
     strict: true,
     lib: ['dom', 'deno.ns', 'deno.unstable'],
