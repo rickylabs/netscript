@@ -1,0 +1,15 @@
+{{# Lume component — docs/site/_components/featureGrid.vto
+   Responsive grid of cards; reuses comp.card markup so a card is standalone or a grid item.
+   Invoke:  {{ comp.featureGrid({ items: [{ title, body, href?, icon? }, …] }) }}
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+---
+css: |
+  .ns-feature-grid { display:grid; gap:1rem; margin:1.5rem 0;
+    grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); }
+---
+{{ set cells = items || [] }}
+<div class="ns-feature-grid" role="list">
+  {{ for item of cells }}
+    <div role="listitem">{{ comp.card(item) }}</div>
+  {{ /for }}
+</div>

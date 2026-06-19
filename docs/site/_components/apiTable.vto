@@ -1,0 +1,48 @@
+{{# Lume component — docs/site/_components/apiTable.vto
+   Styled, responsive table for API rows / adapter matrices. Invoke:
+     {{ comp.apiTable({ caption: "Props", rows: [{ name, type, desc }, …] }) }}
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+---
+css: |
+  .ns-api-table-wrap { overflow-x:auto; margin:1.5rem 0;
+    border:1px solid var(--ns-border,rgba(255,255,255,.12)); border-radius:var(--ns-radius-md,8px); }
+  .ns-api-table { width:100%; border-collapse:collapse; font-size:var(--ns-text-sm,.92rem); }
+  .ns-api-table caption { caption-side:top; text-align:left; padding:.65rem .9rem;
+    font-weight:600; color:var(--ns-fg,inherit);
+    border-bottom:1px solid var(--ns-border,rgba(255,255,255,.12)); }
+  .ns-api-table th, .ns-api-table td { text-align:left; padding:.6rem .9rem; vertical-align:top;
+    border-bottom:1px solid var(--ns-border,rgba(255,255,255,.08)); }
+  .ns-api-table thead th { font-weight:600; color:var(--ns-muted-fg,rgba(255,255,255,.7));
+    background:var(--ns-surface-2,var(--ns-surface,rgba(255,255,255,.02)));
+    font-size:var(--ns-text-xs,.78rem); text-transform:uppercase;
+    letter-spacing:var(--ns-tracking-wide,.04em); }
+  .ns-api-table tbody tr:last-child td { border-bottom:0; }
+  .ns-api-table__name { font-family:var(--ns-font-mono,ui-monospace,monospace); font-weight:600;
+    color:var(--ns-fg,inherit); white-space:nowrap; }
+  .ns-api-table__type { font-family:var(--ns-font-mono,ui-monospace,monospace);
+    color:var(--ns-accent,#5b8def); }
+  .ns-api-table__desc { color:var(--ns-muted-fg,rgba(255,255,255,.8));
+    line-height:var(--ns-leading-normal,1.5); }
+---
+{{ set items = rows || [] }}
+<div class="ns-api-table-wrap">
+  <table class="ns-api-table">
+    {{ if caption }}<caption>{{ caption }}</caption>{{ /if }}
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Type</th>
+        <th scope="col">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ for row of items }}
+        <tr>
+          <td class="ns-api-table__name"><code>{{ row.name }}</code></td>
+          <td class="ns-api-table__type"><code>{{ row.type }}</code></td>
+          <td class="ns-api-table__desc">{{ row.desc }}</td>
+        </tr>
+      {{ /for }}
+    </tbody>
+  </table>
+</div>

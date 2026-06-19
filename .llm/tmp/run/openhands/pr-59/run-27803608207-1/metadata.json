@@ -1,0 +1,17 @@
+{
+  "run_id": "27803608207",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27803608207",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "skipped",
+  "verdict": "not-run",
+  "summary_source": "none",
+  "model": "google/gemini-3.5-flash",
+  "provider": "GEMINI",
+  "output_mode": "pr-comment",
+  "issue_number": "59",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "docs/content-architecture",
+  "summary_path": "/home/runner/work/_temp/openhands/27803608207-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-59/run-27803608207-1"
+}

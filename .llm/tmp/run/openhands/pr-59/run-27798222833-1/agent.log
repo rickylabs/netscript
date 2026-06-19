@@ -1,0 +1,400 @@
+dvar--ns-surface-2var--ns-cardrgba25525525503-ns-callout__icon-flex0-0-auto-font
+-weight600-line-heightvar--ns-leading-normal15-ns-callout__title-font-weight600-
+margin0-0-25rem-ns-callout__body-min-width0-ns-callout__body-first-child-margin-
+top0-ns-callout__body-last-child-margin-bottom0-ns-callout--note-border-left3px-
+solid-var--ns-accent5b8def-ns-callout--tip-border-left3px-solid-var--ns-success3
+fb950-ns-callout--important-border-left3px-solid-var--ns-primary8957e5-ns-callou
+t--warning-1" tabindex="-1">css: |
+744:<aside class="ns-callout ns-callout--tip" role="note">
+759:<h2 
+id="css-ns-api-table-wrap-overflow-xauto-margin15rem-0border1px-solid-var--ns-bo
+rderrgba25525525512-border-radiusvar--ns-radius-md8px-ns-api-table-width100-bord
+er-collapsecollapse-font-sizevar--ns-text-sm92rem-ns-api-table-caption-caption-s
+idetop-text-alignleft-padding65rem-9remfont-weight600-colorvar--ns-fginheritbord
+er-bottom1px-solid-var--ns-borderrgba25525525512-ns-api-table-th-ns-api-table-td
+-text-alignleft-padding6rem-9rem-vertical-aligntopborder-bottom1px-solid-var--ns
+-borderrgba25525525508-ns-api-table-thead-th-font-weight600-colorvar--ns-muted-f
+grgba2552552557backgroundvar--ns-surface-2var--ns-surfacergba25525525502font-siz
+evar--ns-text-xs78rem-text-transformuppercaseletter-spacingvar--ns-tracking-wide
+04em-ns-api-table-tbody-trlast-child-td-border-bottom0-ns-api-table__name-font-f
+amilyvar--ns-font-monoui-monospacemonospace-font-weight600colorvar--ns-fginherit
+-white-spacenowrap-ns-api-table__type-font-familyvar--ns-font-monoui-monospacemo
+nospacecolorvar--ns-accent5b8def-ns-api-table__desc-colorvar--ns-muted-fgrgba255
+2552558line-heightvar--ns-leading-normal15--1" tabindex="-1">css: |
+821:<h2 font-weight:600;="" 
+id="css-ns-nextprev-displayflex-gap1rem-justify-contentspace-between-margin25rem
+-0-0padding-top15rem-border-top1px-solid-var--ns-borderrgba25525525512-ns-nextpr
+ev__link-displayflex-flex-directioncolumn-gap2rem-flex1-1-0-min-width0padding75r
+em-1rem-border-radiusvar--ns-radius-md8pxborder1px-solid-var--ns-borderrgba25525
+525512backgroundvar--ns-surface-2rgba25525525503-text-decorationnonecolorvar--ns
+-textinherit-transitionborder-color-15s-ease-ns-nextprev__linkhover-border-color
+var--ns-accent5b8def-ns-nextprev__link--next-text-alignright-align-itemsflex-end
+-ns-nextprev__dir-font-size75rem-text-transformuppercase-letter-spacing05emcolor
+var--ns-text-mutedrgba25525525555-ns-nextprev__label" tabindex="-1">css: |
+844:css: |
+---MIDDLE OF WHY---
+          <div class="ns-dashboard__sidebar-env">
+            <span class="ns-dashboard__sidebar-env-label">netscript docs</span>
+          </div>
+        </div>
+      </aside>
+
+      <div class="ns-dashboard__main">
+        <header class="ns-dashboard__topbar">
+          <div class="ns-cluster">
+            <button type="button" class="ns-icon-btn ns-mobile-trigger" 
+data-sidebar-toggle="" aria-label="Toggle navigation">
+              <svg width="18" height="18" viewbox="0 0 24 24" fill="none" 
+stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <div class="ns-search" id="search"></div>
+          </div>
+          <div class="ns-cluster ns-cluster--end">
+            <button type="button" class="ns-icon-btn ns-theme-toggle" 
+data-theme-toggle="" aria-label="Toggle dark / light theme" title="Toggle dark /
+light theme">
+              <span class="ns-icon-sun" aria-hidden="true">
+                <svg width="16" height="16" viewbox="0 0 24 24" fill="none" 
+stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" 
+y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" 
+y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              </span>
+              <span class="ns-icon-moon" aria-hidden="true">
+                <svg width="16" height="16" viewbox="0 0 24 24" fill="none" 
+stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+stroke-linejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 
+12.79z"></path>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </header>
+
+        <main class="ns-dashboard__content" id="main-content" tabindex="-1">
+
+---
+css: |
+  .ns-breadcrumb { margin:0 0 1rem; font-size:.85rem; }
+  .ns-breadcrumb__list { list-style:none; display:flex; flex-wrap:wrap; 
+align-items:center;
+    gap:.35rem; margin:0; padding:0; }
+  .ns-breadcrumb__item { display:inline-flex; align-items:center; gap:.35rem;
+    color:var(--ns-text-muted,rgba(255,255,255,.6)); }
+  .ns-breadcrumb__sep { color:var(--ns-border,rgba(255,255,255,.3)); }
+  .ns-breadcrumb a { color:var(--ns-text-muted,rgba(255,255,255,.6)); 
+text-decoration:none; }
+
+📁 Working directory: /home/runner/work/netscript/netscript/docs/site
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm CSS leak
+
+$ sed -n '242,250p' _site/why/index.html && echo "---AROUND 336---" && sed -n 
+'335,345p' _site/why/index.html
+
+Tokens: ↑ input 3.35M • cache hit 93.70% •  reasoning 1.42K • ↓ output 15.95K • 
+$ 0.2832
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+---
+css: |
+  .ns-breadcrumb { margin:0 0 1rem; font-size:.85rem; }
+  .ns-breadcrumb__list { list-style:none; display:flex; flex-wrap:wrap; 
+align-items:center;
+    gap:.35rem; margin:0; padding:0; }
+  .ns-breadcrumb__item { display:inline-flex; align-items:center; gap:.35rem;
+    color:var(--ns-text-muted,rgba(255,255,255,.6)); }
+  .ns-breadcrumb__sep { color:var(--ns-border,rgba(255,255,255,.3)); }
+  .ns-breadcrumb a { color:var(--ns-text-muted,rgba(255,255,255,.6)); 
+text-decoration:none; }
+---AROUND 336---
+.ns-callout--warning  </h2>
+<aside class="ns-callout ns-callout--note" role="note">
+  <span class="ns-callout__icon" aria-hidden="true">ℹ</span>
+  <div class="ns-callout__body">
+<p class="ns-callout__title">Where we are</p>
+NetScript is in <strong>alpha</strong>. The API is subject to change. We're on 
+the path to beta by the end of 2026 — so build with us, but pin your versions.
+  </div>
+</aside>
+<h2 id="the-problem" tabindex="-1">The problem</h2>
+<p>A real TypeScript backend is rarely one decision. It's a dozen, made on 
+different days, by different libraries that were never designed to sit in the 
+same repo:</p>
+<ol>
+
+📁 Working directory: /home/runner/work/netscript/netscript/docs/site
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Front door css: leak lines
+
+$ grep -n "^css: \|^js: " _site/index.html _site/why/index.html 
+_site/quickstart/index.html | head -30
+
+Tokens: ↑ input 3.39M • cache hit 93.77% •  reasoning 1.42K • ↓ output 16.04K • 
+$ 0.2863
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+_site/index.html:243:css: |
+_site/index.html:296:css: |
+_site/index.html:329:css: |
+_site/index.html:357:css: |
+_site/index.html:377:js: |
+_site/index.html:457:css: |
+_site/index.html:464:css: |
+_site/index.html:487:css: |
+_site/index.html:510:css: |
+_site/index.html:533:css: |
+_site/index.html:556:css: |
+_site/index.html:579:css: |
+_site/index.html:607:css: |
+_site/index.html:614:css: |
+_site/index.html:637:css: |
+_site/index.html:660:css: |
+_site/index.html:688:css: |
+_site/index.html:727:css: |
+_site/index.html:734:css: |
+_site/index.html:757:css: |
+_site/index.html:780:css: |
+_site/index.html:807:css: |
+_site/why/index.html:243:css: |
+_site/why/index.html:844:css: |
+_site/quickstart/index.html:243:css: |
+_site/quickstart/index.html:586:css: |
+_site/quickstart/index.html:609:css: |
+_site/quickstart/index.html:632:css: |
+_site/quickstart/index.html:662:css: |
+_site/quickstart/index.html:685:css: |
+
+📁 Working directory: /home/runner/work/netscript/netscript/docs/site
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Context around line 243
+
+$ sed -n '240,250p' _site/why/index.html
+
+Tokens: ↑ input 3.44M • cache hit 93.84% •  reasoning 1.42K • ↓ output 16.11K • 
+$ 0.2893
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+<main class="ns-dashboard__content" id="main-content" tabindex="-1">
+
+---
+css: |
+  .ns-breadcrumb { margin:0 0 1rem; font-size:.85rem; }
+  .ns-breadcrumb__list { list-style:none; display:flex; flex-wrap:wrap; 
+align-items:center;
+    gap:.35rem; margin:0; padding:0; }
+  .ns-breadcrumb__item { display:inline-flex; align-items:center; gap:.35rem;
+    color:var(--ns-text-muted,rgba(255,255,255,.6)); }
+  .ns-breadcrumb__sep { color:var(--ns-border,rgba(255,255,255,.3)); }
+  .ns-breadcrumb a { color:var(--ns-text-muted,rgba(255,255,255,.6)); 
+text-decoration:none; }
+
+📁 Working directory: /home/runner/work/netscript/netscript/docs/site
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm sample location
+
+$ grep -n "samples" _plan/*.md 2>/dev/null | head -10 && echo "---" && ls 
+_plan/samples/ 2>/dev/null && echo "---" && ls _plan/ 2>/dev/null
+
+Tokens: ↑ input 3.49M • cache hit 93.91% •  reasoning 1.42K • ↓ output 16.21K • 
+$ 0.2923
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+_plan/00-README.md:6:It is a **plan, research synthesis, and samples** — NOT a 
+mass rewrite. No tutorial/how-to/
+_plan/00-README.md:28:8. [`samples/`](./samples/) — illustrative drafts (a 
+landing page and a callout component) showing the
+_plan/03-page-outlines.md:84:1. `netscript plugin add worker --samples`; 
+`generate plugins`.
+_plan/05-build-migration-plan.md:4:with the package READMEs as the source for 
+code samples. **No reference-lane pages are touched in any
+_plan/05-build-migration-plan.md:11:- Code samples are lifted from real `mod.ts`
+/ README quick-examples — never invented APIs.
+_plan/05-build-migration-plan.md:13:  anchors intact. Validate doc samples 
+compile where feasible (samples mirror published surfaces).
+_plan/05-build-migration-plan.md:27:  chrome-only preview; 
+pagefind/base_path/`--ns-*` intact (verified with `_plan/samples/`). Phase-1
+_plan/09-research-integration.md:26:- **Code samples lifted from real 
+`mod.ts`/READMEs, never invented** (`03`/`05` ↔ patterns §4).
+_plan/09-research-integration.md:89:| D-E2 | Syntax highlighting | Keep current 
+`codeHighlight` (Prism) | `lume/plugins/shiki.ts` (TextMate/VS Code grammar) | 
+**Adopt Shiki.** Strongest single DX lever for a TS-first framework: IDE-grade 
+token fidelity on `@netscript/sdk` samples. Verify it composes with pagefind + 
+base_path + the anti-flash theme before committing; fall back to Prism if it 
+breaks the chrome. |
+_plan/09-research-integration.md:140:| Code samples | Hono recipes, tRPC 
+autocomplete panels | zero-fat runnable snippets; side-by-side type-flow proof |
+---
+callout.vto  index.vto
+---
+00-README.md             02-information-architecture.md  
+04-engine-and-components.md  06-reference-site-teardown.md  
+08-decisions-locked.md      briefs    samples
+01-positioning-brief.md  03-page-outlines.md             
+05-build-migration-plan.md   07-questions-for-user.md       
+09-research-integration.md  research  worklog
+
+📁 Working directory: /home/runner/work/netscript/netscript/docs/site
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Compare sample to working component
+
+$ cat _plan/samples/callout.vto
+
+Tokens: ↑ input 3.54M • cache hit 93.98% •  reasoning 1.42K • ↓ output 16.27K • 
+$ 0.2954
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+{{# SAMPLE Lume component — docs/site/_components/callout.vto (illustrative, not
+wired)
+   Invoke from a .vto page:  {{ comp.callout({ type: "tip", title: "Heads up" })
+}}body{{ /comp }}
+   or via the markdown-it GitHub-callout shim from prose:  > [!TIP] ...
+   CSS is auto-collected by Lume and emitted only on pages that use the 
+component.
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the 
+chrome. #}}
+---
+css: |
+  .ns-callout { display:flex; gap:.75rem; padding:1rem 1.1rem; 
+border-radius:var(--ns-radius-md,8px);
+    border:1px solid var(--ns-border,rgba(255,255,255,.12)); margin:1.25rem 0;
+    background:var(--ns-surface-2,rgba(255,255,255,.03)); }
+  .ns-callout__icon { flex:0 0 auto; font-weight:600; }
+  .ns-callout__title { font-weight:600; margin:0 0 .25rem; }
+  .ns-callout__body > :first-child { margin-top:0; }
+  .ns-callout__body > :last-child { margin-bottom:0; }
+  .ns-callout--note    { border-left:3px solid var(--ns-accent,#5b8def); }
+  .ns-callout--tip     { border-left:3px solid var(--ns-success,#3fb950); }
+  .ns-callout--important { border-left:3px solid var(--ns-primary,#8957e5); }
+  .ns-callout--warning { border-left:3px solid var(--ns-warning,#d29922); }
+---
+{{ set icons = { note: "ℹ", tip: "✓", important: "★", warning: "⚠" } }}
+{{ set kind = type || "note" }}
+<aside class="ns-callout ns-callout--{{ kind }}" role="note">
+  <span class="ns-callout__icon" aria-hidden="true">{{ icons[kind] }}</span>
+  <div class="ns-callout__body">
+    {{ if title }}<p class="ns-callout__title">{{ title }}</p>{{ /if }}
+    {{ content }}
+  </div>
+</aside>
+
+📁 Working directory: /home/runner/work/netscript/netscript/docs/site
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Compare tail of components
+
+$ tail -20 _components/callout.vto && echo "---" && tail -20 
+_components/hero.vto
+
+Tokens: ↑ input 3.58M • cache hit 94.04% •  reasoning 1.42K • ↓ output 16.34K • 
+$ 0.2986
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+background:var(--ns-surface-2,var(--ns-card,rgba(255,255,255,.03))); }
+  .ns-callout__icon { flex:0 0 auto; font-weight:600; 
+line-height:var(--ns-leading-normal,1.5); }
+  .ns-callout__title { font-weight:600; margin:0 0 .25rem; }
+  .ns-callout__body { min-width:0; }
+  .ns-callout__body > :first-child { margin-top:0; }
+  .ns-callout__body > :last-child { margin-bottom:0; }
+  .ns-callout--note      { border-left:3px solid var(--ns-accent,#5b8def); }
+  .ns-callout--tip       { border-left:3px solid var(--ns-success,#3fb950); }
+  .ns-callout--important { border-left:3px solid var(--ns-primary,#8957e5); }
+  .ns-callout--warning   { border-left:3px solid var(--ns-warning,#d29922); }
+---
+{{ set icons = { note: "ℹ", tip: "✓", important: "★", warning: "⚠" } }}
+{{ set kind = type || "note" }}
+<aside class="ns-callout ns-callout--{{ kind }}" role="note">
+  <span class="ns-callout__icon" aria-hidden="true">{{ icons[kind] }}</span>
+  <div class="ns-callout__body">
+    {{ if title }}<p class="ns-callout__title">{{ title }}</p>{{ /if }}
+    {{ content }}
+  </div>
+</aside>
+---
+  .ns-hero__cta:hover { 
+border-color:var(--ns-border-hover,var(--ns-accent,#5b8def)); }
+  .ns-hero__cta:focus-visible { outline:2px solid var(--ns-accent,#5b8def); 
+outline-offset:2px; }
+  .ns-hero__cta--primary { background:var(--ns-primary,#8957e5);
+    border-color:var(--ns-primary-border,var(--ns-primary,#8957e5));
+    color:var(--ns-primary-fg,#fff); }
+  .ns-hero__cta--primary:hover { background:var(--ns-primary-hover,#7a48d6);
+    border-color:var(--ns-primary-hover,#7a48d6); }
+---
+{{ set buttons = ctas || [] }}
+<section class="ns-hero">
+  <h1 class="ns-hero__tagline">{{ tagline }}</h1>
+  {{ if subhead }}<p class="ns-hero__subhead">{{ subhead }}</p>{{ /if }}
+  {{ if buttons.length }}
+    <div class="ns-hero__ctas">
+      {{ for cta of buttons }}
+        <a class="ns-hero__cta{{ if cta.primary }} ns-hero__cta--primary{{ /if 
+}}" href="{{ cta.href |> url }}">{{ cta.label }}</a>
+      {{ /for }}
+    </div>
+  {{ /if }}
+</section>
+
+📁 Working directory: /home/runner/work/netscript/netscript/docs/site
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+{"asctime": "2026-06-19 00:52:44,851", "levelname": "ERROR", "name": "openhands.sdk.conversation.impl.local_conversation", "filename": "local_conversation.py", "lineno": 1336, "message": "Agent reached maximum iterations limit (100)."}
+{"asctime": "2026-06-19 00:52:44,852", "levelname": "WARNING", "name": "openhands.sdk.conversation.visualizer.default", "filename": "default.py", "lineno": 321, "message": "Event type ConversationErrorEvent is not registered in EVENT_VISUALIZATION_CONFIG. Skipping visualization."}
+{"asctime": "2026-06-19 00:52:44,853", "levelname": "ERROR", "name": "__main__", "filename": "agent_runner.py", "lineno": 195, "message": "Run ended at the iteration limit; reporting failure"}

@@ -1,0 +1,60 @@
+---
+layout: layouts/base.vto
+title: NetScript — type-safe services and durable workflows in one workspace
+---
+
+{{ comp.hero({
+  tagline: "From `netscript init` to a running, type-checked, OpenTelemetry-traced backend — services, durable workflows, and a design-system UI in one workspace.",
+  subhead: "A Deno-native backend framework where the contract is the product: type-safe services and durable workflows, observable by default, orchestrated with Aspire.",
+  ctas: [
+    { label: "Quickstart", href: "/quickstart/", primary: true },
+    { label: "Browse the reference", href: "/reference/" },
+    { label: "GitHub", href: "https://github.com/rickylabs/netscript" }
+  ]
+}) }}
+
+{{ comp callout { type: "note", title: "Alpha — API subject to change" } }}
+NetScript is a backend framework and workspace generator, not a hosted service — you run it on
+Deno and own all the generated code. We are on the path to beta, targeting late 2026, and the API
+is still moving.
+{{ /comp }}
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Define a service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC, service info, and health endpoints — instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
+  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts\n\n# Scaffold a complete, type-checked workspace\nnetscript init my-app\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --no-aspire" }
+] }) }}
+
+<h2>Build real systems, not just CRUD</h2>
+
+{{ comp.featureGrid({ items: [
+  { title: "Contract-first, type-safe end to end", body: "oRPC contracts flow from service to client to UI with no codegen drift. The type checker is your integration test.", href: "/capabilities/services/" },
+  { title: "Orchestrated with Aspire", body: "We borrow .NET Aspire for multi-resource local dev, deploy, and a real dashboard — unusual in TypeScript. One workspace wires it all; opt out with --no-aspire.", href: "/explanation/aspire/" },
+  { title: "Durable workflows by design", body: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence, compensation, and supervised crash boundaries — authored in plain TypeScript builders.", href: "/capabilities/durable-sagas/" },
+  { title: "Observable by default", body: "OpenTelemetry tracing and structured logs are wired into jobs, queues, RPC, and SSE from line one — not bolted on later.", href: "/explanation/observability/" },
+  { title: "Composable plugins", body: "Add workers, sagas, triggers, and streams in any combination. The host never changes.", href: "/capabilities/background-jobs/" },
+  { title: "You own your UI", body: "fresh-ui is copy-source: the CLI copies components into your repo, and after that the code is yours.", href: "/capabilities/fresh-ui/" }
+] }) }}
+
+<h2>Who it is for</h2>
+
+{{ comp.featureGrid({ items: [
+  { title: "Full-stack TypeScript engineers", body: "Stay in TypeScript from the database to the UI, with contracts that catch integration breaks before they ship." },
+  { title: "Platform engineers", body: "Standardize internal services on one coherent Deno baseline — multi-resource wiring, a real dashboard, and tracing already in place." },
+  { title: "Plugin authors", body: "Extend the framework by registering workers, sagas, triggers, and streams. No host edits, no forks." }
+] }) }}
+
+<h2>Start the learning path</h2>
+
+{{ comp.learningPath({ steps: [
+  { label: "Quickstart", href: "/quickstart/" },
+  { label: "Your first workspace", href: "/tutorials/first-workspace/" },
+  { label: "Build a service", href: "/tutorials/build-a-service/" },
+  { label: "Add background jobs", href: "/tutorials/background-jobs/" },
+  { label: "A durable workflow", href: "/tutorials/durable-workflow/" }
+] }) }}
+
+{{ comp.featureGrid({ items: [
+  { title: "API reference", body: "Generated from source via deno doc — every package, every public symbol.", href: "/reference/" },
+  { title: "Source on GitHub", body: "Read the framework, file issues, follow the road to beta.", href: "https://github.com/rickylabs/netscript" },
+  { title: "Packages on JSR", body: "The @netscript/* family, installable with deno add.", href: "https://jsr.io/@netscript" }
+] }) }}

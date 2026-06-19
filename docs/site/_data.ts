@@ -2,10 +2,16 @@
  * Site-wide data shared by every page (Lume merges `_data.*` into page data).
  *
  * `navSections` drives the SidebarShell navigation rendered in
- * `_includes/layouts/base.vto`. It mirrors the playground SidebarShell grouped
- * nav: the four Diátaxis sections, with Reference expanded to the 22 primary
- * units. The four `*-core` internal packages stay folded inside the reference
- * prose (US-8) and are intentionally NOT sidebar entries.
+ * `_includes/layouts/base.vto`. The top groups use plain-English labels (the
+ * approachable ladder) while Reference stays expanded to the 22 primary units.
+ * The four `*-core` internal packages stay folded inside the reference prose
+ * (US-8) and are intentionally NOT sidebar entries.
+ *
+ * Every href below resolves to a page that exists after the 0a authoring wave:
+ * `/`, `/quickstart/`, `/why/`, `/tutorials/`, `/how-to/`, `/explanation/`,
+ * `/reference/`, and the 22 reference-unit hrefs. Capability hubs, concept
+ * pages, tutorial sub-pages, and a glossary land in later phases and are
+ * deliberately omitted here so the 0a chrome preview never 404s.
  */
 
 export interface NavItem {
@@ -52,20 +58,80 @@ export const navSections: NavSection[] = [
   {
     label: "Start here",
     items: [
-      { href: "/", label: "Home", icon: "◫" },
+      { href: "/", label: "Home", icon: "\u25EB" },
+      { href: "/quickstart/", label: "Quickstart", icon: "\u25B8" },
+      { href: "/why/", label: "Why NetScript", icon: "\u25C8" },
     ],
   },
   {
-    label: "Diátaxis",
+    // Tutorials \u2014 learning-oriented ladder. Zone index first so deeper pages
+    // win the breadcrumb's deepest-prefix match.
+    label: "Learn",
     items: [
       { href: "/tutorials/", label: "Tutorials", icon: "T" },
+      { href: "/tutorials/first-workspace/", label: "1 \u00B7 Your first workspace", icon: "1" },
+      { href: "/tutorials/build-a-service/", label: "2 \u00B7 Build a service", icon: "2" },
+      { href: "/tutorials/background-jobs/", label: "3 \u00B7 Add background jobs", icon: "3" },
+      { href: "/tutorials/durable-workflow/", label: "4 \u00B7 A durable workflow", icon: "4" },
+      { href: "/tutorials/ingest-webhook/", label: "5 \u00B7 Ingest a webhook", icon: "5" },
+    ],
+  },
+  {
+    label: "How-to guides",
+    items: [
       { href: "/how-to/", label: "How-to guides", icon: "H" },
-      { href: "/reference/", label: "Reference", icon: "R" },
+      { href: "/how-to/add-a-plugin/", label: "Add a plugin", icon: "\u00B7" },
+      { href: "/how-to/add-a-service/", label: "Add a service", icon: "\u00B7" },
+      { href: "/how-to/database-migration/", label: "Database & migration", icon: "\u00B7" },
+      { href: "/how-to/queue-kv-cron/", label: "Queue / KV / cron", icon: "\u00B7" },
+      { href: "/how-to/add-opentelemetry/", label: "Add OpenTelemetry", icon: "\u00B7" },
+      { href: "/how-to/customize-fresh-ui/", label: "Customize Fresh UI", icon: "\u00B7" },
+      { href: "/how-to/deploy/", label: "Deploy", icon: "\u00B7" },
+      { href: "/how-to/author-a-plugin/", label: "Author a plugin", icon: "\u00B7" },
+    ],
+  },
+  {
+    label: "Core concepts",
+    items: [
       { href: "/explanation/", label: "Explanation", icon: "E" },
+      { href: "/explanation/architecture/", label: "Architecture", icon: "\u00B7" },
+      { href: "/explanation/contracts/", label: "Contracts & type flow", icon: "\u00B7" },
+      { href: "/explanation/plugin-model/", label: "The plugin model", icon: "\u00B7" },
+      { href: "/explanation/durable-workflows/", label: "Durable workflows", icon: "\u00B7" },
+      { href: "/explanation/observability/", label: "Observability", icon: "\u00B7" },
+      { href: "/explanation/aspire/", label: "Orchestration with Aspire", icon: "\u00B7" },
+    ],
+  },
+  {
+    label: "Capabilities",
+    items: [
+      { href: "/capabilities/", label: "Capabilities", icon: "\u25C9" },
+      { href: "/capabilities/services/", label: "Services & contracts", icon: "\u00B7" },
+      { href: "/capabilities/background-jobs/", label: "Background jobs", icon: "\u00B7" },
+      { href: "/capabilities/durable-sagas/", label: "Durable sagas", icon: "\u00B7" },
+      { href: "/capabilities/triggers/", label: "Triggers & ingress", icon: "\u00B7" },
+      { href: "/capabilities/streams/", label: "Durable streams", icon: "\u00B7" },
+      { href: "/capabilities/database/", label: "Database & Prisma", icon: "\u00B7" },
+      { href: "/capabilities/kv-queues-cron/", label: "KV, queues & cron", icon: "\u00B7" },
+      { href: "/capabilities/telemetry/", label: "Telemetry & logging", icon: "\u00B7" },
+      { href: "/capabilities/fresh-ui/", label: "Fresh UI & design", icon: "\u00B7" },
+    ],
+  },
+  {
+    label: "Reference",
+    items: [
+      { href: "/reference/", label: "Reference index", icon: "R" },
     ],
   },
   {
     label: "Reference units",
     items: referenceUnits,
+  },
+  {
+    label: "Resources",
+    items: [
+      { href: "/glossary/", label: "Glossary", icon: "G" },
+      { href: "/cli-reference/", label: "CLI reference", icon: "C" },
+    ],
   },
 ];

@@ -1,0 +1,150 @@
+# Worklog — docs/content-architecture implementation
+
+## Step-6 item 1 — Watchers + config intent coverage — 2026-06-19
+
+**Ground truth read before editing.** Loaded `AGENTS.md`, harness/PR/tools/doctrine skills,
+`doc-architecture-v2.md` §4-§5, `ground-truth.md`, `ground-truth-project-anatomy.md`,
+`docs/architecture/doctrine/{01,02}-*.md`, `deno doc --quiet packages/watchers/mod.ts`, and
+`deno doc --quiet packages/config/mod.ts`.
+
+**Change.** Added a grounded `File watchers` subsection to
+`docs/site/capabilities/triggers.md` covering `createWatcher`, `FileWatcher.watch()`,
+`WatchEvent`, strategy auto-selection, `forcePolling`, and the glob/stability/dedup filter
+pipeline, with a link to `/reference/watchers/`. Added `Configuration records intent before
+runtime wiring` to `docs/site/explanation/architecture.md`, explaining
+`defineConfig`/`defineConfigAsync`, `loadConfig`/`initConfig`/`getConfig`, plugin partial
+config contributions, appsettings/Aspire wiring, and runtime-config overrides.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files.
+Known pre-existing highlighter diagnostics for `no-highlight`/`prisma` remained; item 3 owns
+that chrome fix. No `TemplateError` or `TransformError`.
+
+## Step-6 item 2 — `--no-aspire` verification stopped for drift — 2026-06-19
+
+**Verification commands.** Ran `deno run -A packages/cli/bin/netscript-dev.ts init --help` and a
+throwaway scaffold:
+
+```bash
+deno run -A packages/cli/bin/netscript-dev.ts init no-aspire-app \
+  --path .llm/tmp/step6-no-aspire-verify \
+  --db postgres \
+  --service --service-name users --service-port 3001 \
+  --no-aspire --ci --yes --no-git --force --json
+```
+
+**Finding.** `--no-aspire` exists and the JSON result reports `aspire.enabled:false` with
+`resourceCount:0`; the generated project has no `aspire/`, no root `aspire.config.json`, and no
+`appsettings.json`. However the generated README and JSON `nextSteps` still claim Postgres is
+provisioned by Aspire/appsettings. This contradicts the docs/plan assumption that no-Aspire scaffold
+copy is coherent and verified.
+
+**Steering + docs-site action.** Supervisor clarified item 2 is docs-site accuracy only and the
+CLI/scaffold-template README/nextSteps bug is out of scope for PR #59. Scanned `docs/site/**` for
+`--no-aspire`, no-Aspire, appsettings, and Postgres/Aspire passages. Most no-Aspire docs-site copy
+was already accurate: without Aspire, the user provisions Postgres/cache and supplies
+`POSTGRES_URI` / `DATABASE_URL`. One docs-site passage was wrong:
+`docs/site/explanation/aspire.md` claimed the generated `--no-aspire` README was verified and
+coherent. Removed that claim and narrowed the docs to the verified behavior: no `aspire/` AppHost,
+no dashboard, no automatic infrastructure provisioning, start Deno processes directly and supply
+your own connection strings.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Known
+pre-existing highlighter diagnostics for `no-highlight`/`prisma` remained; item 3 owns that chrome
+fix. No `TemplateError` or `TransformError`.
+
+## Step-6 item 3 — Highlighter plaintext registration — 2026-06-19
+
+**Ground truth read before editing.** Inspected Lume's cached
+`lume@v2.5.4/plugins/code_highlight.ts`; the plugin supports a `languages` map of
+highlight.js language functions and registers each entry before processing pages. Scanned
+non-reference docs for `text`, `prisma`, and `no-highlight` code-fence usage.
+
+**Change.** Updated `docs/site/_config.ts` only. Added a tiny plaintext language function and
+registered `text`, `plaintext`, `no-highlight`, and `prisma` to it through
+`codeHighlight({ languages })`. This keeps existing `text` and Prisma fences unchanged while
+preventing highlight.js from falling back to the unregistered `no-highlight` mode.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Captured
+output contained no `Unknown language`, no `Could not find the language`, no
+`Falling back to no-highlight`, and no `Error highlighting code block` diagnostics. Root
+`deno.lock` was restored after Deno inspection touched it; no lockfile changes remain.
+
+## Step-6 item 4 — Alpha status badge — 2026-06-19
+
+**Change.** Added a small `Alpha` badge to the shared topbar in
+`docs/site/_includes/layouts/base.vto`, using the existing `ns-badge ns-badge--muted` class and
+the existing cluster layout. No CSS or component changes were needed.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Verified
+the generated landing page and a generated doc page include
+`<span class="ns-badge ns-badge--muted" title="NetScript is alpha software">Alpha</span>`.
+
+## Phase 0a — chrome + components + landing (GREEN build) — 2026-06-19
+
+**Generator:** Stage-4 wave-1 dynamic workflow (5 agents: components, chrome, index,
+why, quickstart). Supervisor persisted outputs (agents returned content as text;
+extracted + written via `parse_stage4.py`). why/quickstart staged to `_drafts/` (see
+drift.md). Supervisor corrected index.vto to the verified `comp` tag syntax in-lane.
+
+**Files landed (docs lane only — no packages/plugins):**
+- Components (7): `_components/{callout,card,featureGrid,hero,learningPath,apiTable,tabbedCode}.vto`
+- Chrome (4): `_data.ts`, `_includes/layouts/base.vto`, `_components/{breadcrumb,nextPrev}.vto`
+- Landing: `index.vto` (replaces `index.md`, removed via `git rm`)
+- B2 worklogs: `_plan/worklog/{index,why,quickstart}.md`
+- Staged for Phase-0b rework: `_drafts/{why,quickstart}.vto`
+
+**Build evidence.** `deno task --cwd docs/site build` → **80 files generated, 0 errors.**
+`index.html` renders: 17 `ns-hero`, 13 `ns-callout` (2 with `__title`), 21 `ns-tabbed`,
+6 `ns-feature`, 17 `ns-learning`, 3 real `<h2>` section headings. Literal-markdown
+leak check (`## `, `{{ /comp`, `comp.callout`, `**bold`): **empty**. Callout body text
+present.
+
+**Component CSS** keys off existing fresh-ui `--ns-*` tokens (verified against
+`docs/site/styles/{docs,tokens}.css`), auto-collected by Lume, emitted only on pages
+that use each component.
+
+**Lume `comp` syntax — authoritative (verified empirically):**
+- body: `{{ comp NAME { args } }}` … `{{ /comp }}` (body injected as `content`)
+- self-close: `{{ comp NAME { args } /}}`
+- no-body string form: `{{ comp.NAME({...}) }}`
+
+**Gate status.** Phase-0a build gate: PASS. Markdown/prose pages: deferred to Phase 0b
+(engine) + wave-1b (re-author) — see drift.md. IMPL-EVAL deferred until front door renders.
+
+## Step-6 item 5 — Footer edit links — 2026-06-19
+
+**Ground truth read before editing.** Inspected Lume's cached `page.ts` implementation and confirmed
+`page.sourcePath` is exposed to templates through `data.page`. Generated pages report
+`(generated)`, while authored docs expose their source path such as `/quickstart.vto` or
+`/explanation/aspire.md`.
+
+**Change.** Updated `docs/site/_includes/layouts/base.vto` only. Added a footer edit link after the
+existing previous/next navigation for authored non-reference pages. The link targets
+`https://github.com/rickylabs/netscript/edit/main/docs/site/<sourcePath>`, opens in a new tab, and
+skips generated pages and `/reference/**` sources.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Verified
+`docs/site/_site/index.html` links to `docs/site/index.vto`, `docs/site/_site/quickstart/index.html`
+links to `docs/site/quickstart.vto`, and `docs/site/_site/reference/config/index.html` contains no
+`Edit this page` link.
+
+## Step-6 completion — 2026-06-19
+
+All five Step-6 items were completed or handled per supervisor steering. Items 1, 3, 4, and 5 made
+docs-site/chrome changes. Item 2 made the only necessary docs-site correction after steering:
+no-Aspire docs now avoid claiming generated no-Aspire README/nextSteps coherence. The separate
+CLI/scaffold-template no-Aspire README/nextSteps contradiction remains recorded in `drift.md` for a
+future packages/cli PR.
+
+**Final slice evidence.** The last per-item build was item 5:
+`deno task --cwd docs/site build` exited 0 and generated 148 files.
+
+## Step-6 — supervisor dispatch proof + reconciliation (2026-06-19)
+
+- **Mobile-visible Codex thread:** `019edf0f-d9e6-7a12-aa97-e2fd94ab0e01` (turn `019edf0f-daaa-7962-88bb-81e487fc9957`)
+- **Daemon proof:** managed `codex app-server --remote-control --listen unix://` (user `codex`, PID 84476), status `running`, socket `/home/codex/.codex/app-server-control/app-server-control.sock`, v0.141.0
+- **Native worktree:** `/home/codex/repos/netscript-docs-content-arch` (branch `docs/content-architecture`, SSH remote)
+- **Launch:** `codex debug app-server send-message-v2` (single send); **steer:** `codex exec resume 019edf0f-d9e6-7a12-aa97-e2fd94ab0e01 "<follow-up>"`
+- **Steering event:** item 2 hit a real CLI/scaffold contradiction → Codex BLOCKED_FOR_STEERING per brief → supervisor steered: fix docs-site copy only; the `packages/cli` scaffold `--no-aspire` README/nextSteps Postgres-via-Aspire bug is DEFERRED to a separate CLI-fix PR (recorded in drift.md).
+- **Result:** all 5 items green (build exit 0, 148 files per slice), pushed to `445bfb13`, not merged.
+- **commits.md reconciled** by supervisor (Codex omitted the Step-6 commit lines).

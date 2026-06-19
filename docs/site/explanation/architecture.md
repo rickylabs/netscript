@@ -50,6 +50,32 @@ against each package's declared exports: the documentation describes the same su
 type checker and the JSR audit enforce, so there is one source of truth rather than prose
 that drifts from code.
 
+## Configuration records intent before runtime wiring
+
+NetScript keeps authored intent separate from the concrete runtime wiring that makes a
+workspace run. The project-level intent lives in `netscript.config.ts` and is authored with
+[`defineConfig`](/reference/config/) or `defineConfigAsync`. That object says what the
+project is — its name, paths, enabled plugins, services, apps, database declarations,
+saga groups, trigger groups, deployment settings, and runtime-config output paths. At
+startup, `loadConfig` and `initConfig` resolve that authored form into a validated
+`NetScriptConfig`; `getConfig` is the synchronous read path after initialization.
+
+The generated scaffold shows why this distinction matters. `netscript.config.ts` carries
+workspace intent such as `paths` and the plugin list (`./plugins/workers/mod.ts`,
+`./plugins/sagas/mod.ts`, `./plugins/triggers/mod.ts`, `./plugins/streams/mod.ts`), while
+the operational database and plugin resource details are carried by `appsettings.json`
+and the Aspire AppHost. Plugin packages can contribute partial config fragments through
+`@netscript/config/merge`, but those fragments merge into the already-validated project
+shape rather than replacing project identity. Runtime overrides are a third layer exposed
+by [`@netscript/runtime-config`](/reference/runtime-config/) for topics such as jobs,
+sagas, triggers, features, and tasks.
+
+Think of the model as three layers: `netscript.config.ts` declares project intent,
+plugin config contributions extend that intent, and appsettings/Aspire/runtime-config
+materialize the environment-specific wiring. This is why database docs call out the
+current scaffold reality: `databases.config` can be empty in `netscript.config.ts` while
+Postgres is still provisioned by Aspire and described in `appsettings.json`.
+
 Naming is part of the contract. Entry points follow fixed verbs so a caller can predict
 behavior from the name alone:
 

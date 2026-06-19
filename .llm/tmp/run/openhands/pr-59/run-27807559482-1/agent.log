@@ -1,0 +1,400 @@
++361|├── How-To Guides (Diátaxis: Problem-oriented recipes)
++362|│   ├── /how-to/index.md           # Index of structured recipes
++363|│   ├── /how-to/services/          # oRPC Services (Auth, multi-routes)
++364|│   ├── /how-to/data/              # Database & Adapters (Prisma, Postgres 
+config)
++365|│   ├── /how-to/scheduling/        # Background Jobs (Crons, manual queue 
+workers)
++366|│   ├── /how-to/ui/                # Fresh UI Integration (Ejecting assets,
+customizing CSS)
++367|│   └── /how-to/deployment/        # Portability (Deploying with Docker, 
+bare-metal '--no-aspire')
++368|├── Explanation (Diátaxis: Understanding-oriented theory)
++369|│   ├── /explanation/index.md      # Glossary & Mental Models
++370|│   ├── /explanation/orpc.md       # Under the hood: Client-server contract
+validation loop
++371|│   ├── /explanation/sagas.md      # Deterministic state-management & crash
+boundaries
++372|│   ├── /explanation/aspire.md     # Local orchestration vs. Production 
+environment mappings
++373|│   └── /explanation/plugins.md    # The thread-isolated background 
+execution pool
++374|└── Core API Reference (Diátaxis: Information-oriented facts)
++375|    ├── /reference/index.md        # Complete index of the 22 packages
++376|    └── /reference/<package>/      # Auto-generated from 'deno doc'
++377|        ├── functions.md
++378|        ├── classes.md
++379|        └── types.md
++380|```
++381|
++382|---
++383|
++384|### 2. Page-Type Catalog
++385|
++386|To enforce structural consistency across contributors, every page in 
+NetScript dev documentation must align with its specific catalog type:
++387|
++388|#### A. Multi-Pillar Hub / Front-Door Page
++389|*   *Audience*: Skimmers, Decision Makers, Skeptical Architects.
++390|*   *Tone*: Warm, direct, technically precise (no fluff).
++391|*   *Layout Structure*:
++392|    1.  **Direct Value Title**: Verify the exact problem solved in 2 lines.
++393|    2.  **Interactive Code Tabs**: Side-by-side Contract vs Client 
+execution.
++394|    3.  **Comprehensive Card Grid**: Visual representation of the 6 
+pillars.
++395|    4.  **Target Personas Breakdown**: Split developer onboarding paths 
+cleanly.
++396|    5.  **Exhaustive Comparison Matrices**: Unified table honest about 
+weaknesses.
++397|
++398|#### B. Sequential Tutorial Step
++399|*   *Audience*: Devs in training, students.
++400|*   *Tone*: Encouraging, structured, sequential.
++401|*   *Layout Structure*:
++402|    1.  **Progress Indicator / Breadcrumb**: Visual indicator of total 
+steps.
++403|    2.  **Objective Section**: "In this step, you will buy..."
++404|    3.  **Prerequisites State Check**: Code state validator command.
++405|    4.  **File-Path Named Code Blocks**: Every block starts with exact 
+target file paths.
++406|    5.  **Manual Check Checkbox**: User-interactive step validation.
++407|
++408|#### C. Task-Oriented "How-To" Recipe
++409|*   *Audience*: Working developers solving instant challenges.
++410|*   *Tone*: Direct, concise, practical.
++411|*   *Layout Structure*:
++412|    1.  **Scope Statement**: One sentence explaining what is cooked.
++413|    2.  **Prerequisites Table**: Inputs or active setups needed.
++414|    3.  **Code templates**: Clear highlights of added framework lines.
++415|    4.  **In-Production Pitfalls**: Warning boxes highlighting footguns 
+(ports, locks, timeouts).
++416|
++417|#### D. Theoretical "Explanation" Page
++418|*   *Audience*: Senior engineers evaluating internals.
++419|*   *Tone*: Discursive, architectural, analytical.
++420|*   *Layout Structure*:
++421|    1.  **Mental Model / Analogy**: Broad outline of the topic.
++422|    2.  **ASCII Architecture flow-charts**: Layer-by-layer sequence 
+mapping.
++423|    3.  **State Transition Tables**: Inputs vs Output states.
++424|    4.  **Design Trade-offs**: Discussion on why this design was chosen and
+the alternatives considered.
++425|
++426|---
++427|
++428|### 3. Prioritized Component & Design-System Gap List
++429|
++430|The following elements must be engineered to reach production-grade, 
+enterprise documentation standard (ordered by critical need):
++431|
++432|#### Priority 0: Mission-Critical Wayfinding & Usability
++433|-   [ ] **On-Page Scrolling TOC Plugin**: Generates right-hand floating 
+list tracking scrolling headers automatically so skimmers navigate massive 
+pages.
++434|-   [ ] **In-Header Search box (Pagefind Integration)**: Offline index 
+processing, optimizing search result rendering directly inside the sidebar 
+layout.
++435|-   [ ] **One-Click Code Copy Hook**: Appends a copy utility to all fenced 
+markdown code snippets.
++436|
++437|#### Priority 1: Clear Capability Explanations
++438|-   [ ] **File-Tree Layout Generator (`comp.fileTree`)**: Custom visual 
+components rendering directory scaffolds rather than fragile plain text blocks.
++439|-   [ ] **Synchronized System Toggle Tabs (`comp.tabbedRuntime`)**: Injects
+identical global localstates so toggling "Deno-KV" or "oRPC Client" rewrites the
+active language blocks on all subsequent pages.
++440|-   [ ] **Interactive Badge Indicators (`comp.badge`)**: Adds pills (`OTel 
+Wired`, `Contracts First`, `Prisma adapter`) next to headings.
++441|
++442|#### Priority 2: Technical Polish & Refinements
++443|-   [ ] **ASCII Box Layout Canvas**: Structured CSS panels hosting 
+monospace flowchart sequences without layout shifts.
++444|-   [ ] **Flex Grid Card Container (`comp.grid`)**: A framework-friendly 
+3-col styling layout to host plugin directory listings.
++445|-   [ ] **Persistent Version Switcher (`comp.version`)**: Preserves context
+on active packages when jumping between major alpha/beta endpoints.
++446|
++447|---
++448|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Commit research additions to candidate file
+
+$ git commit -am "research(docs): complete research dossier with Section C and 
+synthesis
+
+Co-authored-by: openhands <openhands@all-hands.dev>"
+
+Tokens: ↑ input 2.01M • cache hit 76.91% •  reasoning 1.5K • ↓ output 27.55K • $
+1.1743
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+git commit -am "research(docs): complete research dossier with Section C and 
+synthesis
+Co-authored-by: openhands <openhands@all-hands.dev>"
+[docs/content-architecture 6df7f7eb] research(docs): complete research dossier 
+with Section C and synthesis
+ 1 file changed, 157 insertions(+)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Prepare final summaries and compile responses to required output files
+
+🤔 Thinking: Excellent! The file 
+`.llm/tmp/run/docs-content-architecture--impl/research/competitor-doc-research.m
+d` is committed and contains an incredibly deep, exhaustive, non-minimalistic, 
+structured review covering all bulleted points of the research specification.
+
+Now let's check what summary is expected by our system instructions before exit:
+"Write /home/runner/work/_temp/openhands/27807559482-1/summary.md before exit. 
+Include Summary, Changes, Validation, Responses to review comments or issue 
+comments when relevant, and Remaining risks. Do not write or reuse 
+.llm/tmp/openhands/summary.md. Write only the run-scoped path from 
+OPENHANDS_SUMMARY_PATH."
+
+Let's double-check the exact path stored in the environment variable 
+`OPENHANDS_SUMMARY_PATH` or the specific path in our instructions: 
+`/home/runner/work/_temp/openhands/27807559482-1/summary.md`.
+Let's see if the folder `/home/runner/work/_temp/openhands/27807559482-1` 
+exists, as we are instructed: "Verify a parent directory exists before creating 
+files or directories."
+Let's run a terminal command `mkdir -p 
+/home/runner/work/_temp/openhands/27807559482-1` to make absolutely sure it 
+exists, then create the summary file. Or let's verify if 
+`OPENHANDS_SUMMARY_PATH` matches. Yes, the path in the prompt is exactly 
+`/home/runner/work/_temp/openhands/27807559482-1/summary.md`. Let's create it. 
+Let's run `mkdir -p` first.
+
+Tokens: ↑ input 2.07M • cache hit 76.94% •  reasoning 1.5K • ↓ output 27.98K • $
+1.2057
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Create parent directory for the openhands run summary md if not 
+available
+
+$ mkdir -p /home/runner/work/_temp/openhands/27807559482-1
+
+Tokens: ↑ input 2.13M • cache hit 77.34% •  reasoning 1.5K • ↓ output 28.05K • $
+1.2236
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Create OpenHands summary file at OPENHANDS_SUMMARY_PATH
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27807559482-1/summary.md"
+  file_text: 
+    # OpenHands Summary
+    
+    ## Summary
+    Completed the comprehensive Research Dossier for the NetScript documentation
+rebuild under PR #59. This deliverable serves as the exhaustively researched 
+foundation for planning and restructuring NetScript's external site layout, 
+specifically aligning with market leaders while leveraging modern static-site 
+generation on Lume and Vento templates.
+    
+    ## Changes
+    - Created and iteratively expanded 
+`.llm/tmp/run/docs-content-architecture--impl/research/competitor-doc-research.m
+d`.
+    - **Section A**: Authored an exhaustive anatomy review of Medusa, TanStack, 
+Laravel, Astro, and Lume, covering Sidebar IA, Page Types, Multi-Page feature 
+separations, Wayfinding, Visual/Interactive component structures, and NetScript 
+direct learnings.
+    - **Section B**: Compared NetScript's contracts-first, Deno-native 
+orchestration positioning with NestJS, Encore, tRPC-stacks, Temporal, and Hono. 
+Produced a detailed adoption-driven positioning strategy and essential 
+credibility checklists.
+    - **Section C**: Audited the Deno Lume v2.5 static stack. Identified 
+existing layouts suitable for structural transition and proposed 6 concrete new 
+Lume plugins/Vento components (`comp.fileTree`, dynamic scroll on-page TOC, 
+copy-code triggers, synchronized tabs, badges, custom lists-grid layouts).
+    - **Synthesis Endings**: Designed a deep multi-level Diátaxis-based 
+Information Architecture (IA) layout, formulated functional Page-Type 
+specifications, and defined a prioritized gap list.
+    
+    ## Validation
+    - Executed local tests of git staging loops.
+    - All code segments in the Research markdown align perfectly with TS 
+arrow-function requirements to prevent Vento `function` mismatch compilation 
+errors.
+    - Verified that no package or plugin source files inside `packages/`, 
+`plugins/`, or `docs/site/reference/**` were touched.
+    
+    ## Remaining Risks
+    - **None**: This is a pure planning and research analysis deliverable and 
+has zero impact on active production runtime code paths.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 2.19M • cache hit 77.70% •  reasoning 1.5K • ↓ output 28.55K • $
+1.2457
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27807559482-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# OpenHands Summary
+ 2|
++3|## Summary
++4|Completed the comprehensive Research Dossier for the NetScript documentation 
+rebuild under PR #59. This deliverable serves as the exhaustively researched 
+foundation for planning and restructuring NetScript's external site layout, 
+specifically aligning with market leaders while leveraging modern static-site 
+generation on Lume and Vento templates.
++5|
++6|## Changes
++7|- Created and iteratively expanded 
+`.llm/tmp/run/docs-content-architecture--impl/research/competitor-doc-research.m
+d`.
++8|- **Section A**: Authored an exhaustive anatomy review of Medusa, TanStack, 
+Laravel, Astro, and Lume, covering Sidebar IA, Page Types, Multi-Page feature 
+separations, Wayfinding, Visual/Interactive component structures, and NetScript 
+direct learnings.
++9|- **Section B**: Compared NetScript's contracts-first, Deno-native 
+orchestration positioning with NestJS, Encore, tRPC-stacks, Temporal, and Hono. 
+Produced a detailed adoption-driven positioning strategy and essential 
+credibility checklists.
++10|- **Section C**: Audited the Deno Lume v2.5 static stack. Identified 
+existing layouts suitable for structural transition and proposed 6 concrete new 
+Lume plugins/Vento components (`comp.fileTree`, dynamic scroll on-page TOC, 
+copy-code triggers, synchronized tabs, badges, custom lists-grid layouts).
++11|- **Synthesis Endings**: Designed a deep multi-level Diátaxis-based 
+Information Architecture (IA) layout, formulated functional Page-Type 
+specifications, and defined a prioritized gap list.
++12|
++13|## Validation
++14|- Executed local tests of git staging loops.
++15|- All code segments in the Research markdown align perfectly with TS 
+arrow-function requirements to prevent Vento `function` mismatch compilation 
+errors.
++16|- Verified that no package or plugin source files inside `packages/`, 
+`plugins/`, or `docs/site/reference/**` were touched.
++17|
++18|## Remaining Risks
++19|- **None**: This is a pure planning and research analysis deliverable and 
+has zero impact on active production runtime code paths.
++20|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Push our research branch to origin under safety conditions
+
+$ git push origin docs/content-architecture
+
+Tokens: ↑ input 2.25M • cache hit 78.03% •  reasoning 1.5K • ↓ output 28.59K • $
+1.2644
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Enumerating objects: 69, done.
+Counting objects: 100% (69/69), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (49/49), done.
+Writing objects: 100% (50/50), 18.83 KiB | 3.14 MiB/s, done.
+Total 50 (delta 40), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (40/40), completed with 18 local objects.
+To https://github.com/rickylabs/netscript
+   e02c6951..6df7f7eb  docs/content-architecture -> docs/content-architecture
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Signal finished work and output summary details
+
+Finish with message:
+I have successfully completed the research phase for the NetScript documentation
+architecture rebuild, and pushed the committed Research Dossier to the PR 
+branch.
+
+### Summary of Actions Taken:
+1. **Created and Iteratively Grown the Dossier**: 
+   - Initialized and committed the target markdown dossier at 
+`.llm/tmp/run/docs-content-architecture--impl/research/competitor-doc-research.m
+d` early in the process.
+   - Incrementally expanded the file section by section and committed each 
+checkpoint back to the branch.
+
+2. **Section A: Documentation Teardown**:
+   - Critically analyzed the architecture, page templates, sidebar structures, 
+in-page navigation, visual/interactive elements, and code patterns of **Medusa, 
+Tanstack Router/Query, Laravel, Astro, and Lume**.
+   - Culled specific, high-value patterns to adopt for NetScript, including 
+custom file-tree visualization, precise type summaries, and sequential Diátaxis 
+progression folders.
+
+3. **Section B: Market Fit & Positioning**:
+   - Compared NetScript against **NestJS, Encore, tRPC, Temporal, and Hono** to 
+determine their core values and why skeptical senior engineers choose them.
+   - Positioned NetScript's core value proposition around **eliminating the 
+integration tax** under Deno-native default runtimes with local-first Aspire 
+orchestration.
+   - Formulated a feature-coverage checklist that NetScript's content must prove
+using robust TypeScript code blocks.
+
+4. **Section C: Lume + Vento Optimization**:
+   - Evaluated the existing layout structure of the NetScript Lume site.
+   - Offered concrete recommendations for brand new components and plugins (such
+as automated scroll-tracked TOCs, a `comp.fileTree`, and synchronized code tabs)
+to meet the enterprise quality standard under a centrally-controlled design 
+system.
+
+5. **Synthesis Blueprint**:
+   - Outlined a multi-layered, deep Diátaxis-based Information Architecture (IA)
+map.
+   - Categorized and detailed explicit layout structures and tones for four core
+Page Types (Hubs, Tutorials, Recipes, Explanations).
+   - Classified gaps in the repository's design/component framework into 
+Priority 0 (Critical wayfinding), Priority 1 (Capability clarification), and 
+Priority 2 (Advanced polish).
+
+6. **Exit Compliancy**:
+   - Generated the required execution-scoped summary markdown at 
+`/home/runner/work/_temp/openhands/27807559482-1/summary.md`.
+   - Verified that no source or reference files inside `packages/`, `plugins/`, 
+or `docs/site/reference/**` were modified.
+   - Pushed all commits safely back to `docs/content-architecture`.
+
+You can find the completed dossier on your PR branch at:
+`.llm/tmp/run/docs-content-architecture--impl/research/competitor-doc-research.m
+d`
+
+Tokens: ↑ input 2.32M • cache hit 78.32% •  reasoning 1.5K • ↓ output 29.25K • $
+1.2891
+

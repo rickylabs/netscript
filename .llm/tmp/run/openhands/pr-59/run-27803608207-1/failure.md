@@ -1,0 +1,8 @@
+# OpenHands Run Failure
+
+The run failed before a valid task verdict could be trusted.
+
+- Bootstrap: success
+- Agent: skipped
+- Run: https://github.com/rickylabs/netscript/actions/runs/27803608207
+- Runtime artifact: openhands-agent-27803608207-1

@@ -1,0 +1,400 @@
+— DONE
+- Read primary plan files 00–09 in `docs/site/_plan/` — DONE
+- Spot-check ~5 packages via `deno doc` to validate inventory claims — IN 
+PROGRESS (~8 packages checked)
+- Build final PLAN-EVAL verdict (confirm/add/divergence mapping) — PENDING
+- Cross-check briefs dispatch and gate checklist — IN PROGRESS
+
+COMPLETED:
+- **Package inventory spot-checks (deno doc)** validating research prose claims:
+  - `@netscript/watchers` — CONFIRMED public (JSR install path, `createWatcher`,
+`FileWatcher`, strategies/filters/stability)
+  - `@netscript/sdk` v0.0.1-alpha.0 — CONFIRMED public; subpaths: `./cache`, 
+`./client`, `./collections`, `./discovery`, `./ports`, `./query`, 
+`./query-client`; L3 preset = `defineServices()`
+  - `@netscript/service` — CONFIRMED 3-layer: L1 primitives 
+(health/error/RPC/OpenAPI/Scalar), L2 `createService()` builder, L3 
+`defineService()` preset; Hono/oRPC wiring
+  - `@netscript/queue` — backends: **Deno KV, Redis, RabbitMQ** (DIVERGENCE from
+any "Redis/AMQP" prose; Nitro is NOT a queue adapter)
+  - `@netscript/kv` — adapters: **deno-kv, redis, memory** (DIVERGENCE: Nitro is
+NOT a KV adapter; kvdex/denokv-bridge are internal helpers)
+  - `@netscript/aspire` — CONFIRMED SDK-neutral diagnostics + TypeScript AppHost
+generation (`inspectAspire`); **NOT** a .NET Aspire server
+  - `@netscript/cli` — surfaces: `kernel | local | maintainer | public`; flags 
+`--no-aspire` and `--dry-run` CONFIRMED real
+  - `@netscript/fresh-ui` — has `interactive.ts`, `primitives.tsx`, `registry`, 
+`tokens`, `registry.manifest.ts` (fresh-ui component system)
+- Read `09 §4` phase-mapping table and `09 §5` competitor exemplars
+- Read `09` intro (Stage 2 supervisor synthesis framing: confirm/add/divergence 
+→ adversarial PLAN-EVAL)
+- Read `04` Lume `_components/` vs Vento `{{ include }}` decision (Lume primary,
+Vento acceptable fallback)
+- Read Plan-Gate protocol (`evaluator/plan-protocol.md` excerpt): hard stop, 
+separate session
+
+PENDING:
+- Complete remaining spot-checks (or decide budget is sufficient — ~8/5 done)
+- Verify SDK's `defineServices()` L3 composition claim against full SDK surface
+- Cross-check `08` Q4 "self-assembly" framing + one honest sibling table
+- Verify `04` P0 components list (code-tabs, shell-switcher, callouts) is 
+achievable
+- Confirm Nitro is referenced only in 3 files in `packages/kv` as code 
+reference, not adapter
+- Build final verdict document (confirm / add / divergence matrix with explicit 
+decision points)
+- Surface divergences as adversarial decision points per `09` framing
+
+CURRENT_STATE:
+- **Deno**: v2.8.3 (stable, x86_64-unknown-linux-gnu), v8 14.9.207.2-rusty, 
+TypeScript 6.0.3
+- **Repo packages** (`packages/`): aspire, cli, config, contracts, cron, 
+database, fresh, fresh-ui, kv, logger, plugin, plugin-sagas-core, 
+plugin-streams-core, plugin-triggers-core, plugin-workers-core, 
+prisma-adapter-mysql, queue, runtime-config, sdk, service, telemetry, watchers
+- **Repo plugins** (`plugins/`): sagas, streams, triggers, workers
+- **CWD**: `/home/runner/work/netscript/netscript`
+- **Python**: 3.13.14 at `/opt/hostedtoolcache/Python/3.13.14/x64/bin/python`
+
+KEY DIVERGENCES FLAGGED (for verdict):
+1. **Queue adapters**: prose should say "Deno KV, Redis, RabbitMQ" — not 
+"Redis/AMQP"; Nitro is NOT a queue adapter
+2. **KV adapters**: deno-kv, redis, memory only; Nitro is NOT a KV adapter (the 
+"may include it" qualifier in `09 §2b` is too soft)
+3. **aspire**: must be framed as SDK-neutral TypeScript AppHost gen, never as 
+.NET Aspire
+4. **watchers**: real published JSR surface, not internal/dev-tooling — deserves
+docs inclusion
+5. **Component mechanism**: `04` Lume `_components/` (global `comp.*`) is 
+primary; Vento `{{ include }}` is acceptable fallback (per `09`)
+
+PLAN-GATE STATUS: Evaluation in progress; verdict not yet issued. Per protocol, 
+no implementation commits permitted until PASS or user waiver.USER_CONTEXT: 
+Operating in NetScript Harness v2 mode, performing PLAN-EVAL (Stage 3) on 
+`docs/site/_plan/` (00–09) for the NetScript public docs site (Lume → GitHub 
+Pages). Authoring is parked; current scope is plan-gate evaluation against 
+research artifacts under `research/` and pre-locked decisions in `08`. 
+Implementation may not begin until PLAN-EVAL verdict = PASS or user waiver.
+
+TASK_TRACKING:
+- Explore `.llm/harness/` framework docs (archetypes, gates, evaluator protocol)
+— DONE
+- Read primary plan files 00–09 in `docs/site/_plan/` — DONE
+- Spot-check ~5 packages via `deno doc` to validate inventory claims — IN 
+PROGRESS (~8 packages checked)
+- Build final PLAN-EVAL verdict (confirm/add/divergence mapping) — PENDING
+- Cross-check briefs dispatch and gate checklist — IN PROGRESS
+
+COMPLETED:
+- **Package inventory spot-checks (deno doc)** validating research prose claims:
+  - `@netscript/watchers` — CONFIRMED public (JSR install path, `createWatcher`,
+`FileWatcher`, strategies/filters/stability)
+  - `@netscript/sdk` v0.0.1-alpha.0 — CONFIRMED public; subpaths: `./cache`, 
+`./client`, `./collections`, `./discovery`, `./ports`, `./query`, 
+`./query-client`; L3 preset = `defineServices()`
+  - `@netscript/service` — CONFIRMED 3-layer: L1 primitives 
+(health/error/RPC/OpenAPI/Scalar), L2 `createService()` builder, L3 
+`defineService()` preset; Hono/oRPC wiring
+  - `@netscript/queue` — backends: **Deno KV, Redis, RabbitMQ** (DIVERGENCE from
+any "Redis/AMQP" prose; Nitro is NOT a queue adapter)
+  - `@netscript/kv` — adapters: **deno-kv, redis, memory** (DIVERGENCE: Nitro is
+NOT a KV adapter; kvdex/denokv-bridge are internal helpers)
+  - `@netscript/aspire` — CONFIRMED SDK-neutral diagnostics + TypeScript AppHost
+generation (`inspectAspire`); **NOT** a .NET Aspire server
+  - `@netscript/cli` — surfaces: `kernel | local | maintainer | public`; flags 
+`--no-aspire` and `--dry-run` CONFIRMED real
+  - `@netscript/fresh-ui` — has `interactive.ts`, `primitives.tsx`, `registry`, 
+`tokens`, `registry.manifest.ts` (fresh-ui component system)
+- Read `09 §4` phase-mapping table and `09 §5` competitor exemplars
+- Read `09` intro (Stage 2 supervisor synthesis framing: confirm/add/divergence 
+→ adversarial PLAN-EVAL)
+- Read `04` Lume `_components/` vs Vento `{{ include }}` decision (Lume primary,
+Vento acceptable fallback)
+- Read Plan-Gate protocol (`evaluator/plan-protocol.md` excerpt): hard stop, 
+separate session
+
+PENDING:
+- Complete remaining spot-checks (or decide budget is sufficient — ~8/5 done)
+- Verify SDK's `defineServices()` L3 composition claim against full SDK surface
+- Cross-check `08` Q4 "self-assembly" framing + one honest sibling table
+- Verify `04` P0 components list (code-tabs, shell-switcher, callouts) is 
+achievable
+- Confirm Nitro is referenced only in 3 files in `packages/kv` as code 
+reference, not adapter
+- Build final verdict document (confirm / add / divergence matrix with explicit 
+decision points)
+- Surface divergences as adversarial decision points per `09` framing
+
+CURRENT_STATE:
+- **Deno**: v2.8.3 (stable, x86_64-unknown-linux-gnu), v8 14.9.207.2-rusty, 
+TypeScript 6.0.3
+- **Repo packages** (`packages/`): aspire, cli, config, contracts, cron, 
+database, fresh, fresh-ui, kv, logger, plugin, plugin-sagas-core, 
+plugin-streams-core, plugin-triggers-core, plugin-workers-core, 
+prisma-adapter-mysql, queue, runtime-config, sdk, service, telemetry, watchers
+- **Repo plugins** (`plugins/`): sagas, streams, triggers, workers
+- **CWD**: `/home/runner/work/netscript/netscript`
+- **Python**: 3.13.14 at `/opt/hostedtoolcache/Python/3.13.14/x64/bin/python`
+
+KEY DIVERGENCES FLAGGED (for verdict):
+1. **Queue adapters**: prose should say "Deno KV, Redis, RabbitMQ" — not 
+"Redis/AMQP"; Nitro is NOT a queue adapter
+2. **KV adapters**: deno-kv, redis, memory only; Nitro is NOT a KV adapter (the 
+"may include it" qualifier in `09 §2b` is too soft)
+3. **aspire**: must be framed as SDK-neutral TypeScript AppHost gen, never as 
+.NET Aspire
+4. **watchers**: real published JSR surface, not internal/dev-tooling — deserves
+docs inclusion
+5. **Component mechanism**: `04` Lume `_components/` (global `comp.*`) is 
+primary; Vento `{{ include }}` is acceptable fallback (per `09`)
+
+PLAN-GATE STATUS: Evaluation in progress; verdict not yet issued. Per protocol, 
+no implementation commits permitted until PASS or user waiver.
+
+
+Tokens: ↑ input 1.94M • cache hit 95.35% •  reasoning 1.01K • ↓ output 17.35K • 
+$ 0.1619
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check run dir
+
+$ ls .llm/tmp/run/openhands/pr-59/ 2>&1
+
+Tokens: ↑ input 1.97M • cache hit 94.42% •  reasoning 1.01K • ↓ output 17.42K • 
+$ 0.1685
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+run-27794466530-1  run-27795399851-1  run-27795772956-1
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check run dir contents
+
+$ ls .llm/tmp/run/openhands/pr-59/run-27795772956-1/ 2>&1
+
+Tokens: ↑ input 2M • cache hit 94.50% •  reasoning 1.01K • ↓ output 17.49K • $ 
+0.1704
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+request.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm last commit and hard-constraint compliance
+
+Thought:
+Good — durable trace metadata lives in 
+`.llm/tmp/run/openhands/pr-59/run-27795772956-1/`. The verdict and `09` 
+refinement are already in the repo and committed. The task says "Do not post 
+GitHub issue or PR comments directly. The workflow owns GitHub comments." So I 
+leave that to the workflow.
+
+Final state check + a small verification:
+
+$ cd /home/runner/work/netscript/netscript && git log --oneline -1 2>&1 && echo 
+"---" && git diff --stat HEAD~1 2>&1 && echo "---" && echo "CONSTRAINT CHECKS:" 
+&& echo "Did NOT edit packages/: $(git diff --name-only HEAD~1 | grep -c 
+'^packages/' || echo 0)" && echo "Did NOT edit plugins/: $(git diff --name-only 
+HEAD~1 | grep -c '^plugins/' || echo 0)" && echo "Did NOT merge: $(git log 
+--oneline | head -1 | grep -c 'Merge' || echo 0)"
+
+Tokens: ↑ input 2.03M • cache hit 94.57% •  reasoning 1.01K • ↓ output 17.77K • 
+$ 0.1726
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+27264998 (HEAD -> docs/content-architecture) docs(plan): PLAN-EVAL verdict 
+(FAIL_PLAN) + adversarial §8 hooks
+---
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+ .llm/tmp/run/docs-content-architecture--planeval/plan-eval.md | 127 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++
+ .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md     |   4 ++--
+ .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md     |  10 +++++-----
+ .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md     |   4 ++--
+ .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md     |   4 ++--
+ .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md     |   4 ++--
+ docs/site/_plan/09-research-integration.md                    |  38 
+++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 178 insertions(+), 13 deletions(-)
+---
+CONSTRAINT CHECKS:
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+Did NOT edit packages/: 0
+0
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+Did NOT edit plugins/: 0
+0
+Did NOT merge: 0
+0
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: List committed files only
+
+Thought:
+Hmm — `git diff --stat HEAD~1` shows *also* modifications to five other run 
+`request.md` files (PRs 25, 32, 35, 37). These are stale CRLF drift from prior 
+sessions, unrelated to my run. `git commit -a` would have swept them in, but I 
+used `git add <paths>` only — so they were *not* committed. Let me verify:
+
+$ cd /home/runner/work/netscript/netscript && git diff --name-only HEAD~1 HEAD 
+2>&1
+
+Tokens: ↑ input 2.07M • cache hit 94.59% •  reasoning 1.01K • ↓ output 17.94K • 
+$ 0.1750
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+.llm/tmp/run/docs-content-architecture--planeval/plan-eval.md
+docs/site/_plan/09-research-integration.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict FAIL_PLAN committed
+
+Thought:
+Only the two intended files are in the commit. Hard constraints satisfied:
+
+- ✅ **Docs/planning lane only** — only `docs/site/_plan/**` Markdown + the 
+verdict file under `.llm/tmp/run/`.
+- ✅ **Did NOT edit** `packages/`, `plugins/`, version pins, 
+`scaffold-versions.ts`, `aspire/src/public/mod.ts`, catalog, lock files.
+- ✅ **Did NOT run** `deno cache --reload`.
+- ✅ **Did NOT merge** or publish.
+- ✅ **Respected LOCKED `08`** decisions; surfaced watchers/B2/B3 as 
+blocking-gap fixes, not silent overrides.
+- ✅ **Committed** verdict file 
+(`.llm/tmp/run/docs-content-architecture--planeval/plan-eval.md`) + `09 §8` 
+refinement (committed as `27264998`).
+- ✅ **Run summary** written to 
+`/home/runner/work/_temp/openhands/27795772956-1/summary.md`.
+- ✅ **Did NOT post** GitHub comment directly.
+
+Finish with message:
+**Workflow run exit: 0 (FAIL_PLAN verdict committed).**
+
+**Single most important bar-raising change I demand:** every authored hub page 
+must contain at least one **annotated, runnable, JSR-import-realistic code 
+proof** inside `comp.tabbedCode` (verified against `deno doc`), not a prose 
+bullet pointing at an API name. This single rule (a) closes the B2 accuracy 
+guardrail by turning the §2c policy into a checkable artifact, (b) lifts the 
+docs from "matches the named exemplars" (Astro, Encore, TanStack, Medusa, 
+Laravel Sail, Hono, tRPC, Temporal, NestJS) to "beats them" because every named 
+competitor has a working code path per capability, and (c) directly serves the 
+user north-star — every public capability gets a reachable, intent-named home 
+*and* a working proof that it works.
+
+**Verdict front-loaded:** `PLAN-EVAL: FAIL_PLAN`. Three blocking gaps must close
+before authoring:
+
+- **B1 — watchers coverage.** `briefs/00-INDEX.md §Phase 3` misclassifies 
+`@netscript/watchers` as "internal/dev-tooling." Verified against 
+`packages/watchers/{mod.ts,README.md,deno.json}` it is a publish-configured, 
+README-instrumented, JSR-installable public package (`createWatcher`, 
+`FileWatcher`, stability/polling/stop). Conflicts with the §2a inventory and the
+user north-star.
+- **B2 — accuracy guardrail without teeth.** `09 §2c` + the briefs' Global 
+Acceptance Bar #1 are policy only. Required: a `.llm/tools/docs/api-cite.ts` 
+gate script + per-page worklog discipline.
+- **B3 — Phase 0 overloaded.** Components + nav + Shiki + toc + sitemap + 
+callout shim + breadcrumb + nextPrev block Phase 1. Split into Phase 0a 
+(chrome-only, shippable) / Phase 0b (engine config).
+
+**Engine decisions adjudicated:** D-E1 hybrid (caveat — `nav.ts` only on 
+Reference sub-tree), D-E2 adopt Shiki with Phase-0b acceptance line, D-E3/D-E4 
+adopt, D-E5 defer to wave 2. Non-blocking accuracy nit on §2b recorded for 
+authoring: Nitro is not a queue or KV adapter — queue adapters are Deno KV + 
+Redis + RabbitMQ; KV adapters are Deno KV + Redis + memory (kvdex/denokv-bridge 
+are internal helpers, not adapters).
+
+**Files changed (one commit `27264998` on branch `docs/content-architecture`):**
+- `docs/site/_plan/09-research-integration.md` — appended §8 "Adversarial 
+PLAN-EVAL hooks" recording the three blocking gaps, the watchers evidence, the 
+queue/KV adapter accuracy nit, and the recommended gate-script hardening.
+- `.llm/tmp/run/docs-content-architecture--planeval/plan-eval.md` — full verdict
+with per-challenge findings (1–7), Plan-Gate checklist pass/fail, refinements 
+made.
+
+**Hard constraints honored:** docs/planning lane only (no edits to `packages/`, 
+`plugins/`, version pins, lock files, or engine source); did NOT merge or 
+publish; respected all LOCKED `08` decisions (B1/B2/B3 surfaced as fixes, not 
+overrides); did NOT post GitHub comment directly (workflow owns that).
+
+**Run summary:** written to 
+`/home/runner/work/_temp/openhands/27795772956-1/summary.md`. Two `FAIL_PLAN` 
+cycles remain per `plan-protocol.md` before user escalation.
+
+Tokens: ↑ input 2.1M • cache hit 94.66% •  reasoning 1.01K • ↓ output 18.96K • $
+0.1782
+

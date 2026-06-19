@@ -1,0 +1,400 @@
+prayer," "drift between the API and the client," "durable workflows faked with 
+retries." This is a diagnosis, not marketing.
+
+2. **The answer is working TypeScript.** Three code-proof sections on `why.vto` 
+show `defineService`, `defineSaga`, and `withSpan` in idiomatic, commented TS. 
+Comments like "This replaces ~40 lines of Hono setup" do the competitive work 
+without naming competitors.
+
+3. **The comparison table is honest, not combative.** Names NestJS, Encore, 
+tRPC-style stacks, Temporal, and Hono — positions NetScript as the *fitted* 
+answer that wraps rather than replaces ("We wrap it, not replace it" for Hono, 
+"closer to Temporal than to a job queue" for sagas).
+
+4. **Objections are head-on:**
+   - **Alpha status** — visible callout on all three pages with "beta by end of 
+2026" and "pin your versions"
+   - **.NET Aspire** — named differentiator with `--no-aspire` escape hatch 
+visible in index hero, why page, and quickstart callout
+   - **Scope** — bounded in "NOT the right tool" callout: "not a React-style 
+frontend framework, and it does not host anything for you"
+
+5. **The "NOT the right tool" callout builds trust.** Telling a reader when 
+*not* to adopt is the fastest credibility signal.
+
+### Locked-08 compliance
+
+- Q1 hero/subhead — present verbatim
+- Q2 tone — warm "we", no hype adjectives, no body emoji
+- Q4 competitive framing — single honest table, no per-competitor sections
+- Q5 alpha — callout on all three pages
+- Q7 Aspire — hero-level, with `--no-aspire` opt-out
+- Q8 fresh-ui — USP card, not hero-level
+
+### Non-blocking observations
+
+- Quickstart has no framework-code snippet beyond `defineService` — a senior 
+engineer sees bash and URLs but not a saga or typed client until tutorial 2. The
+Stage-5 P0 was actioned; current `defineService` snippet partially addresses it.
+- The `.NET` footprint in the default path may spook a Linux/Mac TS-only shop. 
+The `--no-aspire` path is documented but not demo'd end-to-end.
+
+Neither blocks adoption judgment.
+
+## Responses to review comments
+
+Not applicable — this is a final adoption gate, not a response to specific 
+review comments.
+
+## Remaining risks
+
+**None blocking.** The front door is sufficient to convert a skeptical senior TS
+engineer who reads all three pages. No further changes are required to flip 
+"interesting" to "I'd try this on a real project."
+
+The Stage-6 commit `fb63d3b8` already actioned the P0s and most P1s from the 
+Stage-5 evaluation. This Stage-7 eval confirms the work is ready for user 
+presentation.
+EOF
+cat /home/runner/work/_temp/openhands/27799150037-1/summary.md
+
+Tokens: ↑ input 214.78K • cache hit 81.23% •  reasoning 573 • ↓ output 5.19K • $
+0.1135
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+❌ [An error occurred during execution.]
+Cannot execute multiple commands at once.
+Please run each command separately OR chain them into a single command via && or
+;
+Provided commands:
+(1) cd /home/runner/work/netscript/netscript && cat > 
+/home/runner/work/_temp/openhands/27799150037-1/summary.md << 'EOF'
+# Stage-7 Adoption Evaluation — PR #59 (docs/content-architecture)
+
+## Summary
+
+**VERDICT: ADOPTION-EVAL: PASS**
+
+**Decisive adoption factor:** The integration-tax framing on `why.vto` — six 
+named, real pains a senior TS engineer has lived — paired with concrete 
+TypeScript code proofs for each of the six pillars, makes the adoption case 
+concrete and believable rather than aspirational.
+
+This is a separate evaluator session (generator ≠ evaluator) performing the 
+final Stage-7 adoption gate for the NetScript docs front door.
+
+## Changes
+
+### Artifacts written
+- `.llm/tmp/run/docs-content-architecture--impl/adoption-eval.md` — verdict 
+artifact with full analysis (committed)
+
+### Evaluation scope
+Read only the six required files:
+- `docs/site/index.vto`
+- `docs/site/why.vto`
+- `docs/site/quickstart.vto`
+- `.llm/tmp/run/docs-content-architecture--impl/evaluate.md` (Stage-5 PASS 
+verdict)
+- `docs/site/_plan/01-positioning-brief.md`
+- `docs/site/_plan/08-decisions-locked.md`
+
+No external sites fetched. No build run (supervisor confirmed green, 85 files).
+
+## Validation
+
+### Question 1: Feature landscape coverage — PASS
+
+All six pillars are visible on the front-door path (index → why → quickstart):
+
+1. **Type-safe oRPC services** — Index feature grid #1; Why section #1 with 
+2-tab code proof (contract + typed client); Quickstart mentions "shared oRPC 
+contracts"
+2. **Durable workflows (sagas/triggers/jobs)** — Index feature grid #3; Why 
+section #2 with 2-tab code proof (saga state machine + effects); Quickstart 
+plugin registry mentions all four
+3. **Observability-by-default (OpenTelemetry)** — Index feature grid #4; Why 
+section #3 with 2-tab code proof (`withSpan`); Quickstart hero says 
+"OpenTelemetry-traced"
+4. **Plugin model (workers/sagas/triggers/streams)** — Index feature grid #5 
+("the host never changes"); Why section #5; Quickstart feature grid
+5. **.NET Aspire orchestration** — Index feature grid #2 (hero-level per Q7); 
+Why section #4; Quickstart Step 3 with dedicated `--no-aspire` opt-out callout
+6. **Copy-source fresh-ui** — Index feature grid #6; Why section #6; Quickstart 
+feature grid ("code is yours to change")
+
+No pillar is invisible, undersold, or buried.
+
+### Question 2: Adoption willingness — PASS
+
+A skeptical senior TS engineer choosing between NestJS / Encore / tRPC / 
+Temporal / Hono would convert because:
+
+1. **The pain is named accurately.** `why.vto` opens with six integration pains 
+a senior TS backend engineer has actually shipped through: "a queue here, a 
+tracer there," "a scaffold script that rots," "a docker-compose.yml and a 
+prayer," "drift between the API and the client," "durable workflows faked with 
+retries." This is a diagnosis, not marketing.
+
+2. **The answer is working TypeScript.** Three code-proof sections on `why.vto` 
+show `defineService`, `defineSaga`, and `withSpan` in idiomatic, commented TS. 
+Comments like "This replaces ~40 lines of Hono setup" do the competitive work 
+without naming competitors.
+
+3. **The comparison table is honest, not combative.** Names NestJS, Encore, 
+tRPC-style stacks, Temporal, and Hono — positions NetScript as the *fitted* 
+answer that wraps rather than replaces ("We wrap it, not replace it" for Hono, 
+"closer to Temporal than to a job queue" for sagas).
+
+4. **Objections are head-on:**
+   - **Alpha status** — visible callout on all three pages with "beta by end of 
+2026" and "pin your versions"
+   - **.NET Aspire** — named differentiator with `--no-aspire` escape hatch 
+visible in index hero, why page, and quickstart callout
+   - **Scope** — bounded in "NOT the right tool" callout: "not a React-style 
+frontend framework, and it does not host anything for you"
+
+5. **The "NOT the right tool" callout builds trust.** Telling a reader when 
+*not* to adopt is the fastest credibility signal.
+
+### Locked-08 compliance
+
+- Q1 hero/subhead — present verbatim
+- Q2 tone — warm "we", no hype adjectives, no body emoji
+- Q4 competitive framing — single honest table, no per-competitor sections
+- Q5 alpha — callout on all three pages
+- Q7 Aspire — hero-level, with `--no-aspire` opt-out
+- Q8 fresh-ui — USP card, not hero-level
+
+### Non-blocking observations
+
+- Quickstart has no framework-code snippet beyond `defineService` — a senior 
+engineer sees bash and URLs but not a saga or typed client until tutorial 2. The
+Stage-5 P0 was actioned; current `defineService` snippet partially addresses it.
+- The `.NET` footprint in the default path may spook a Linux/Mac TS-only shop. 
+The `--no-aspire` path is documented but not demo'd end-to-end.
+
+Neither blocks adoption judgment.
+
+## Responses to review comments
+
+Not applicable — this is a final adoption gate, not a response to specific 
+review comments.
+
+## Remaining risks
+
+**None blocking.** The front door is sufficient to convert a skeptical senior TS
+engineer who reads all three pages. No further changes are required to flip 
+"interesting" to "I'd try this on a real project."
+
+The Stage-6 commit `fb63d3b8` already actioned the P0s and most P1s from the 
+Stage-5 evaluation. This Stage-7 eval confirms the work is ready for user 
+presentation.
+EOF
+(2) cat /home/runner/work/_temp/openhands/27799150037-1/summary.md
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write summary.md to openhands temp path
+
+Reasoning:
+The heredoc approach is being split. Let me try a different approach - write the
+file in one command using printf/echo or use the file_editor tool.
+
+$ cd /home/runner/work/netscript/netscript && mkdir -p 
+/home/runner/work/_temp/openhands/27799150037-1 && printf '%s\n' '# Stage-7 
+Adoption Evaluation — PR #59' '' '**VERDICT: ADOPTION-EVAL: PASS**' '' 
+'**Decisive adoption factor:** The integration-tax framing on `why.vto` paired 
+with concrete TypeScript code proofs for each of the six pillars makes the 
+adoption case concrete and believable.' '' '## Summary' '' 'Separate evaluator 
+session (generator ≠ evaluator) performing the final Stage-7 adoption gate for 
+the NetScript docs front door.' '' '## Changes' '' '- 
+`.llm/tmp/run/docs-content-architecture--impl/adoption-eval.md` — verdict 
+artifact (committed)' '' '## Validation' '' '### Q1: Feature landscape coverage 
+— PASS' 'All six pillars visible on index→why→quickstart: type-safe oRPC 
+services, durable workflows, observability-by-default, plugin model, Aspire 
+orchestration, copy-source fresh-ui.' '' '### Q2: Adoption willingness — PASS' 
+'Pain named accurately, answer is working TypeScript, comparison table honest 
+not combative, objections (alpha, .NET, scope) handled head-on, "NOT the right 
+tool" callout builds trust.' '' '## Responses' '' 'Not applicable — final 
+adoption gate.' '' '## Remaining risks' '' '**None blocking.** Front door is 
+sufficient to convert a skeptical senior TS engineer.' > 
+/home/runner/work/_temp/openhands/27799150037-1/summary.md && echo "EXIT: $?"
+
+Tokens: ↑ input 247.1K • cache hit 70.60% •  reasoning 605 • ↓ output 5.62K • $ 
+0.1555
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+EXIT: 0
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check harness skill files
+
+Reasoning:
+I'm working on the Stage-7 adoption evaluation and have already written and 
+committed the verdict, but I realize the PR comment still needs to be drafted. 
+Let me clarify what output=pr-comment means here—it's asking me to write the 
+comment body, but the workflow system handles the actual posting, not me 
+directly. The summary.md I just wrote should serve as the PR comment content 
+since the harness will post that automatically. I'm thinking through the 
+standard harness workflow to make sure I'm following the right template and 
+conventions for this PR.
+
+Thought:
+Let me confirm the workflow owns GH comments and that summary.md will be posted 
+as the PR comment.
+
+
+
+$ cd /home/runner/work/netscript/netscript && find 
+.agents/skills/netscript-harness -type f -name "*.md" 2>/dev/null | head -5
+
+Tokens: ↑ input 279.91K • cache hit 73.62% •  reasoning 713 • ↓ output 5.83K • $
+0.1657
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+.agents/skills/netscript-harness/SKILL.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify commits
+
+Reasoning:
+The harness workflow owns the GH comment. The summary.md is the deliverable for 
+the PR comment. Let me verify the commit landed and confirm state.
+
+$ cd /home/runner/work/netscript/netscript && rtk git log --oneline -3 
+2>/dev/null || git --no-pager log --oneline -3
+
+Tokens: ↑ input 312.92K • cache hit 75.96% •  reasoning 743 • ↓ output 5.95K • $
+0.1758
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+29b66ffd (HEAD -> docs/content-architecture) docs: stage-7 adoption-eval PASS - 
+front door adoption gate cleared
+5497552d (origin/docs/content-architecture) chore(harness): record fb63d3b8 in 
+commits.md
+fb63d3b8 docs(site): Stage-6 polish — front-door P0/P1 from IMPL-EVAL PASS
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify summary.md content
+
+Reasoning:
+Good. I've:
+1. Read all six required files
+2. Written the verdict artifact 
+(`.llm/tmp/run/docs-content-architecture--impl/adoption-eval.md`)
+3. Committed it
+4. Written the summary.md to the openhands temp path
+
+The verdict is PASS. The instructions say "post this as a PR comment" but also 
+say "Do not post GitHub issue or PR comments directly. The workflow owns GitHub 
+comments." So I should not use `gh` to post a comment. The workflow will read my
+summary.md and post it as the PR comment.
+
+Let me verify my summary.md is complete.
+
+$ cat /home/runner/work/_temp/openhands/27799150037-1/summary.md
+
+Tokens: ↑ input 346.18K • cache hit 77.80% •  reasoning 875 • ↓ output 6.15K • $
+0.1865
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# Stage-7 Adoption Evaluation — PR #59
+
+**VERDICT: ADOPTION-EVAL: PASS**
+
+**Decisive adoption factor:** The integration-tax framing on `why.vto` paired 
+with concrete TypeScript code proofs for each of the six pillars makes the 
+adoption case concrete and believable.
+
+## Summary
+
+Separate evaluator session (generator ≠ evaluator) performing the final Stage-7 
+adoption gate for the NetScript docs front door.
+
+## Changes
+
+- `.llm/tmp/run/docs-content-architecture--impl/adoption-eval.md` — verdict 
+artifact (committed)
+
+## Validation
+
+### Q1: Feature landscape coverage — PASS
+All six pillars visible on index→why→quickstart: type-safe oRPC services, 
+durable workflows, observability-by-default, plugin model, Aspire orchestration,
+copy-source fresh-ui.
+
+### Q2: Adoption willingness — PASS
+Pain named accurately, answer is working TypeScript, comparison table honest not
+combative, objections (alpha, .NET, scope) handled head-on, "NOT the right tool"
+callout builds trust.
+
+## Responses
+
+Not applicable — final adoption gate.
+
+## Remaining risks
+
+**None blocking.** Front door is sufficient to convert a skeptical senior TS 
+engineer.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+Stage-7 adoption evaluation complete.
+
+**Exit status:** 0
+
+**ADOPTION-EVAL: PASS** — Integration-tax framing paired with concrete 
+TypeScript code proofs is the decisive adoption factor.
+
+**What was evaluated:**
+- Front-door path: index.vto → why.vto → quickstart.vto
+- All six NetScript pillars (type-safe oRPC, durable workflows, observability, 
+plugin model, Aspire orchestration, copy-source UI) are visible and credible
+- Skeptical senior TS engineer adoption case clears: pain is named accurately, 
+answer is working TypeScript, comparison table is honest not combative, 
+objections handled head-on
+
+**Verdict committed:** 29b66ffd
+
+**Remaining risks:** None blocking. Front door is ready for presentation.
+
+Tokens: ↑ input 379.84K • cache hit 79.23% •  reasoning 1.1K • ↓ output 6.54K • 
+$ 0.1984
+

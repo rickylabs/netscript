@@ -1,0 +1,102 @@
+{{# Lume component — docs/site/_components/tabbedCode.vto
+   Tabbed code block. Invoke:
+     {{ comp.tabbedCode({ tabs: [{ label: "Deno", lang: "ts", code: "…\n…" }, …] }) }}
+   Progressive enhancement: with JS disabled ALL panels render visible (no panel is hidden
+   until script.js confirms it can run and reveals the tab UI). CSP-safe: no inline handlers,
+   wired via data attributes + addEventListener. Vanilla JS, no React/islands.
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+---
+css: |
+  .ns-tabbed { margin:1.5rem 0; border:1px solid var(--ns-border,rgba(255,255,255,.12));
+    border-radius:var(--ns-radius-md,8px); overflow:hidden; }
+  .ns-tabbed__tablist { display:flex; flex-wrap:wrap; gap:.15rem; padding:.35rem .35rem 0;
+    background:var(--ns-surface-2,var(--ns-surface,rgba(255,255,255,.02)));
+    border-bottom:1px solid var(--ns-border,rgba(255,255,255,.12)); }
+  .ns-tabbed__tab { appearance:none; cursor:pointer; border:0; background:transparent;
+    padding:.45rem .85rem; border-radius:var(--ns-radius-sm,6px) var(--ns-radius-sm,6px) 0 0;
+    font:inherit; font-size:var(--ns-text-sm,.9rem); font-weight:500;
+    color:var(--ns-muted-fg,rgba(255,255,255,.7)); }
+  .ns-tabbed__tab:hover { color:var(--ns-fg,inherit); }
+  .ns-tabbed__tab:focus-visible { outline:2px solid var(--ns-accent,#5b8def); outline-offset:-2px; }
+  .ns-tabbed__tab.is-active { color:var(--ns-fg,inherit);
+    background:var(--ns-card,var(--ns-bg,rgba(0,0,0,.2)));
+    box-shadow:inset 0 -2px 0 0 var(--ns-primary,#8957e5); }
+  .ns-tabbed__panel { margin:0; }
+  .ns-tabbed__panel pre { margin:0; }
+  {{# Only collapse panels once JS marks the widget enhanced; without JS every panel shows. #}}
+  .ns-tabbed.is-enhanced .ns-tabbed__panel[hidden] { display:none; }
+  .ns-tabbed.is-enhanced .ns-tabbed__panel:not([hidden]) { display:block; }
+---
+js: |
+  (function () {
+    function setup(root) {
+      var tabs = Array.prototype.slice.call(root.querySelectorAll(".ns-tabbed__tab"));
+      var panels = Array.prototype.slice.call(root.querySelectorAll(".ns-tabbed__panel"));
+      if (!tabs.length || !panels.length) return;
+      function activate(index) {
+        tabs.forEach(function (tab, i) {
+          var on = i === index;
+          tab.classList.toggle("is-active", on);
+          tab.setAttribute("aria-selected", on ? "true" : "false");
+          tab.setAttribute("tabindex", on ? "0" : "-1");
+        });
+        panels.forEach(function (panel, i) {
+          if (i === index) panel.removeAttribute("hidden");
+          else panel.setAttribute("hidden", "");
+        });
+      }
+      tabs.forEach(function (tab, i) {
+        tab.addEventListener("click", function () { activate(i); });
+        tab.addEventListener("keydown", function (e) {
+          var next = null;
+          if (e.key === "ArrowRight" || e.key === "ArrowDown") next = (i + 1) % tabs.length;
+          else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = (i - 1 + tabs.length) % tabs.length;
+          else if (e.key === "Home") next = 0;
+          else if (e.key === "End") next = tabs.length - 1;
+          if (next === null) return;
+          e.preventDefault();
+          activate(next);
+          tabs[next].focus();
+        });
+      });
+      root.classList.add("is-enhanced");
+      activate(0);
+    }
+    function init() {
+      Array.prototype.slice.call(document.querySelectorAll(".ns-tabbed")).forEach(setup);
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+---
+{{ set items = tabs || [] }}
+{{ set gid = "nstab-" + Math.random().toString(36).slice(2, 9) }}
+<div class="ns-tabbed">
+  <div class="ns-tabbed__tablist" role="tablist" aria-label="Code examples">
+    {{ for index, tab of items }}
+      <button
+        type="button"
+        class="ns-tabbed__tab{{ if index === 0 }} is-active{{ /if }}"
+        role="tab"
+        id="{{ gid }}-tab-{{ index }}"
+        aria-controls="{{ gid }}-panel-{{ index }}"
+        aria-selected="{{ if index === 0 }}true{{ else }}false{{ /if }}"
+        tabindex="{{ if index === 0 }}0{{ else }}-1{{ /if }}"
+      >{{ tab.label }}</button>
+    {{ /for }}
+  </div>
+  {{ for index, tab of items }}
+    <div
+      class="ns-tabbed__panel"
+      role="tabpanel"
+      id="{{ gid }}-panel-{{ index }}"
+      aria-labelledby="{{ gid }}-tab-{{ index }}"
+      tabindex="0"
+    >
+      <pre><code class="language-{{ tab.lang }}">{{ tab.code }}</code></pre>
+    </div>
+  {{ /for }}
+</div>

@@ -1,0 +1,400 @@
+# NetScript Docs — Content Architecture Plan
+
+This directory is the **plan-first** content + IA rebuild for the NetScript 
+public docs site
+(`docs/site/`, Lume → GitHub Pages, live at 
+<https://rickylabs.github.io/netscript/>).
+
+It is a **plan, research synthesis, and samples** — NOT a mass rewrite. No 
+tutorial/how-to/
+explanation/landing pages are rewritten here. The generated **Reference** docs 
+(`docs/site/reference/`,
+produced from `deno doc`) are explicitly **KEPT** and out of scope for rewrite.
+
+## Read order
+
+1. [`01-positioning-brief.md`](./01-positioning-brief.md) — what NetScript is, 
+who for, core values,
+   USPs, the "why." Public/marketing-facing narrative.
+2. [`02-information-architecture.md`](./02-information-architecture.md) — full 
+nav tree, Diátaxis +
+   learning-curve layering, breadcrumb/learning path, and explicit **delete / 
+rewrite / keep** calls
+   on current content.
+3. [`03-page-outlines.md`](./03-page-outlines.md) — per-section content outlines
+for every major page
+   (landing, quickstart, concepts, each capability, advanced, examples): order, 
+callouts, code-sample
+   strategy.
+4. [`04-engine-and-components.md`](./04-engine-and-components.md) — Lume + Vento
+component plan
+   (callouts, tabbed code, API tables, hero, feature grid, cards), migration 
+cost, recommendation.
+5. [`05-build-migration-plan.md`](./05-build-migration-plan.md) — phased, 
+effort-sized rollout; what
+   each phase ships.
+6. [`06-reference-site-teardown.md`](./06-reference-site-teardown.md) — concrete
+IA/onboarding/
+   component patterns extracted from Laravel, Medusa, TanStack, Astro, Lume + 
+Vento, and which to steal.
+7. [`07-questions-for-user.md`](./07-questions-for-user.md) — crisp questions to
+lock tone, themes,
+   and market positioning before authoring begins.
+8. [`samples/`](./samples/) — illustrative drafts (a landing page and a callout 
+component) showing the
+   target bar. Samples, not final pages.
+
+## Verdict baseline (the problem we are solving)
+
+The site's **chrome and theme are excellent** (fresh-ui `--ns-*` tokens, 
+SidebarShell, dark/light,
+pagefind search) and the **22 generated reference units are stunning** — keep 
+both. The failure is
+**content scope, ambition, and marketing grade** in the non-reference lane:
+
+- **Landing (`index.md`)** — a bare Diátaxis directory. No hero, no "what is 
+NetScript," no "why,"
+  no audience, no feature grid, no social proof. This is the worst offender.
+- **Tutorials** — exactly **one** tutorial (getting-started). No learning path, 
+no second lesson.
+- **How-to** — exactly **one** guide (add-a-plugin). No real recipe library.
+- **Explanation** — **two** pages (architecture, plugin-model). These are 
+*genuinely good prose* and
+  are largely salvageable; they are just isolated and under-linked.
+
+So "placeholder garbage" = **thin coverage + no marketing-grade entry 
+experience**, not lorem ipsum.
+The plan treats the existing explanation prose as a quality floor to preserve 
+and build around, and
+targets the landing + tutorial + how-to lanes for the biggest lift.
+
+## Research provenance
+
+- **NetScript identity**: read `AGENTS.md`, the 10 doctrine files under
+  `docs/architecture/doctrine/`, and the READMEs + `mod.ts` quick-examples of 
+the full package set
+  (sdk, service, contracts, plugin, aspire, telemetry, fresh, fresh-ui, cli, 
+database, kv, cron,
+  queue, logger) plus the four plugin-core packages and four `plugins/*` 
+packages.
+- **Deliverable**: read the CLI scaffold pipeline 
+(`packages/cli/src/kernel/application/scaffold/
+  init-pipeline.ts`) and the scaffold asset templates
+  (`packages/cli/src/kernel/assets/app/**`, `.../aspire/**`, `.../database/**`).
+  **Path taken: template-reading.** Deno 2.8, .NET 10, and Node 22 are all 
+present, but the full
+  `scaffold.runtime` E2E (which restores + boots Aspire) is expensive and the 
+mission is plan-first;
+  the scaffold templates state precisely what ships, so a live boot was not 
+warranted for a plan.
+- **Reference sites**: fetched Laravel, Medusa, Astro, TanStack Query, Lume, and
+Vento docs; findings
+  in `06-reference-site-teardown.md`.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read IA file
+
+$ cd /home/runner/work/netscript/netscript && cat 
+docs/site/_plan/02-information-architecture.md | head -200
+
+Tokens: ↑ input 1.86M • cache hit 90.84% •  reasoning 872 • ↓ output 8.61K • $ 
+0.1625
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# Information Architecture
+
+Diátaxis remains the backbone (Tutorials / How-to / Reference / Explanation), 
+but the current site
+treats Diátaxis as the *top-level menu*, which is wrong for a marketing-grade 
+site: it forces a new
+visitor to self-diagnose their "documentation mode" before they know what 
+NetScript is. The reference
+sites we studied (Laravel, Astro, Medusa, TanStack) all front-load **product → 
+quickstart →
+concepts** and let Diátaxis organize the *body*, not the front door.
+
+## Target nav tree
+
+The sidebar (driven by `_data.ts` `navSections`) becomes a learning-curve 
+ladder. Diátaxis is
+preserved as the organizing principle of each zone but is no longer the first 
+decision.
+
+```
+Start here
+  Home / Overview              (landing — what / who / why / feature grid)      
+[REWRITE]
+  Why NetScript                (positioning + comparison; the "motivation" page)
+[NEW]
+  Quickstart (5 min)           (init → run → see it working; the happy path)    
+[REWRITE from getting-started]
+
+Learn  (Tutorials — learning-oriented, sequential)
+  1. Your first workspace      (deep version of quickstart; what each phase 
+made)  [REWRITE/EXPAND]
+  2. Build a service           (contract → service → typed client → island)     
+[NEW]
+  3. Add background jobs       (workers plugin: define a job, run it, trace it) 
+[NEW]
+  4. A durable workflow        (sagas: model a multi-step flow as a state 
+machine)  [NEW]
+  5. Ingest a webhook          (triggers: webhook → job, end to end)            
+[NEW — optional wave 2]
+
+Core concepts  (Explanation — understanding-oriented)
+  Architecture overview        (the published-surface thesis, archetypes)       
+[KEEP, relink]
+  Contracts & the type flow    (oRPC contract → client → query → island)        
+[NEW]
+  The plugin model             (plugins vs core; manifests; registries)         
+[KEEP, relink]
+  Durable workflows            (state machines, correlation, compensation)      
+[NEW]
+  Observability & telemetry    (OTel spans, structured logs, health)            
+[NEW]
+  Orchestration with Aspire    (AppHost, resources, the dashboard)              
+[NEW]
+
+Capabilities  (per-domain landing pages: concept + key API + links to 
+ref/how-to)
+  Services & contracts         (service, contracts, sdk)                        
+[NEW]
+  Background jobs (workers)                                                     
+[NEW]
+  Durable sagas                                                                 
+[NEW]
+  Triggers & ingress                                                            
+[NEW]
+  Durable streams                                                               
+[NEW]
+  Data: database & Prisma                                                       
+[NEW]
+  KV, queues & cron            (the integration trio)                           
+[NEW]
+  Telemetry & logging                                                           
+[NEW]
+  Fresh UI & design system                                                      
+[NEW]
+
+How-to guides  (task-oriented recipes)
+  Add a first-party plugin     (workers/sagas/triggers/streams)                 
+[KEEP]
+  Add an example service                                                        
+[NEW]
+  Add a database & run a migration                                              
+[NEW]
+  Wire a queue / KV / cron job                                                  
+[NEW]
+  Add OpenTelemetry to a service                                                
+[NEW]
+  Customize the Fresh UI (ui:init / ui:add)                                     
+[NEW]
+  Deploy a NetScript workspace                                                  
+[NEW]
+  Author your own plugin       (advanced)                                       
+[NEW — wave 2]
+
+Reference  (information-oriented — GENERATED, KEEP AS-IS)
+  Overview index
+  22 generated units (aspire … workers)                                         
+[KEEP — do not touch]
+
+Resources
+  CLI command reference        (curated companion to cli ref)                   
+[NEW — wave 2]
+  Glossary                     (saga, trigger, contribution, archetype, 
+contract)   [NEW]
+  Changelog / releases         (optional)                                       
+[optional]
+```
+
+## Learning-curve / breadcrumb ("fil d'Ariane")
+
+Two complementary devices, both proven on the reference sites:
+
+1. **Sequential next/prev** within Tutorials and the Capabilities lane (Lume, 
+Astro pattern). Each
+   tutorial ends with a "Next → …" link; the chain forms the guided learning 
+path.
+2. **Breadcrumb trail** at the top of every body page reflecting the nav 
+hierarchy
+   (`Learn / Build a service`, `Capabilities / Durable sagas`). Lume nav items 
+can carry a subtitle
+   describing intent (Lume's own docs do this) — adopt for the sidebar groups.
+
+A small **"learning path" card** on the landing + each tutorial index visually 
+orders the ladder
+(Quickstart → first workspace → service → jobs → workflow), mirroring Astro's 
+6-unit tutorial track.
+
+## Diátaxis mapping (preserved, demoted to organizing principle)
+
+| Zone in nav | Diátaxis mode | Why it sits here |
+| --- | --- | --- |
+| Quickstart, Learn | **Tutorial** | learning-oriented, sequential, 
+guaranteed-to-succeed |
+| How-to guides | **How-to** | task-oriented recipes for users who know the 
+basics |
+| Reference | **Reference** | information-oriented, generated, exhaustive |
+| Core concepts | **Explanation** | understanding-oriented prose |
+| Capabilities | **hybrid hub** | a thin per-domain landing that *routes* to the
+four modes |
+
+The Capabilities lane is the one deliberate departure from pure Diátaxis: it is 
+the "Medusa Commerce
+Modules / Astro features" pattern — a domain hub that gives a one-screen concept
++ the headline API +
+links into tutorial, how-to, and reference for that capability. This is what 
+makes a framework with
+~14 packages navigable by *intent* rather than by *package name*.
+
+## Explicit delete / rewrite / keep calls
+
+### KEEP (do not touch)
+- `docs/site/reference/**` — all 22 generated units. The crown jewel. Out of 
+scope.
+- `docs/site/_includes/layouts/base.vto`, `styles/`, theme, pagefind, 
+code-highlight, base_path,
+  markdown-it-anchor config — the chrome is excellent. (Augment with components;
+do not replace.)
+- The **prose** of `explanation/architecture.md` and 
+`explanation/plugin-model.md` — genuinely good.
+
+### REWRITE (content is thin or wrong altitude)
+- `index.md` (landing) — **highest priority.** Replace the bare Diátaxis 
+directory with a hero +
+  "what/who/why" + feature grid + learning-path card + quickstart CTA. (See 
+sample.)
+- `tutorials/getting-started.md` → split into **Quickstart (5 min)** (the lean 
+happy path) and
+  **Tutorial 1: Your first workspace** (the deep, explains-each-phase version). 
+The current content is
+  solid raw material for the deep version.
+- `tutorials/index.md`, `how-to/index.md`, `explanation/index.md` — re-skin as 
+zone landing pages
+  with the learning-path card and accurate cross-links once siblings exist. The 
+current
+  "Diátaxis-explainer" framing is too inward; lead with what you can learn/do 
+here.
+
+### RELINK / RE-HOME (good content, wrong isolation)
+- `explanation/architecture.md` → **Core concepts / Architecture overview**; 
+soften two doctrine
+  terms for a public reader ("fitness functions", "composition root") with a 
+one-line gloss or move
+  them behind a "for framework authors" aside.
+- `explanation/plugin-model.md` → **Core concepts / The plugin model** (largely 
+as-is).
+
+### NET-NEW (the bulk of the lift)
+- Everything marked `[NEW]` above: Why NetScript, 4–5 tutorials, 6 core-concept 
+pages, 9 capability
+  hubs, 6–7 how-to recipes, glossary, curated CLI reference.
+
+### Net assessment of "placeholder garbage"
+There is **no literal placeholder/lorem** content — the existing pages are real,
+competently written
+prose. The deficiency is **scope and front-door experience**: 4 body pages + a 
+directory-style
+landing cannot carry a framework of this size to the Laravel/Astro bar. The 
+rebuild is ~80%
+**net-new authoring** and ~20% **re-home/re-skin**, with **zero** rewriting of 
+the reference lane.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read plan-gate checklist
+
+$ cd /home/runner/work/netscript/netscript && cat 
+.llm/harness/gates/plan-gate.md
+
+Tokens: ↑ input 1.9M • cache hit 90.89% •  reasoning 872 • ↓ output 8.69K • $ 
+0.1660
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# Plan-Gate
+
+The Plan-Gate is the first of the two harness evaluator passes. It runs at the 
+end of Plan & Design,
+**before any implementation slice is committed**, and is a hard stop: 
+implementation may not begin
+until the verdict is `PASS` or the user waives it in writing. PLAN-EVAL runs in 
+a **separate
+session** using `evaluator/plan-protocol.md`.
+
+## Why this gate exists
+
+Package-quality Wave 0 skipped Plan & Design even though `run-loop.md` 
+documented a Design
+checkpoint, because Design was an evidence section inside `worklog.md` rather 
+than a gated
+deliverable. Decisions that should have been made before implementation were 
+made during it,
+producing avoidable drift. The Plan-Gate makes Plan & Design a deliverable with 
+its own verdict, so
+the cheap fix (change the plan) happens before the expensive one (rewrite the 
+code). The
+gold-standard reference is netscript-start PR #95.
+
+## Checklist
+
+A plan PASSES only if every box is checked. Any unchecked box → `FAIL_PLAN`.
+
+- [ ] **Research present and current.** `research.md` exists; any carried-in 
+plan/audit/run is
+      explicitly re-baselined against current `main`.
+- [ ] **Decisions locked.** Architecture decisions are stated with rationale.
+- [ ] **Open-decision sweep.** Every still-open decision is listed and marked 
+"safe to defer" or
+      "must resolve now." **If any open decision would force rework when 
+deferred → `FAIL_PLAN`.**
+- [ ] **Commit slices.** Enumerated, ordered, < 30. Each names what it proves, 
+the gate that proves
+      it, and the files it touches.
+- [ ] **Risk register.** Risks listed with mitigations.
+- [ ] **Gate set selected.** Required gates chosen from 
+`gates/archetype-gate-matrix.md` for this
+      surface, plus scope overlays.
+- [ ] **Deferred scope explicit.**
+- [ ] **jsr-audit (package/plugin waves).** The `jsr-audit` skill's 
+publishability rubric has been
+      applied to the PLANNED public surface and slow-type / surface risks are 
+named before slicing.
+      Mark `N/A` with a reason for non-package waves.
+
+## Verdict
+
+- `PASS` — every box checked; implementation may begin.
+- `FAIL_PLAN` — one or more boxes unchecked; return the plan with the specific 
+items and required
+  fixes. Two `FAIL_PLAN` cycles, then escalate to the user.
+
+## Phase A reporting
+
+Where a check has no script yet, PLAN-EVAL reports it as `PASS` with manual 
+evidence or
+`PENDING_SCRIPT` with manual evidence. Absence of a script is not permission to 
+omit the check.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+{"asctime": "2026-06-18 23:27:16,238", "levelname": "ERROR", "name": "openhands.sdk.conversation.impl.local_conversation", "filename": "local_conversation.py", "lineno": 1336, "message": "Agent reached maximum iterations limit (50)."}
+{"asctime": "2026-06-18 23:27:16,238", "levelname": "WARNING", "name": "openhands.sdk.conversation.visualizer.default", "filename": "default.py", "lineno": 321, "message": "Event type ConversationErrorEvent is not registered in EVENT_VISUALIZATION_CONFIG. Skipping visualization."}
+{"asctime": "2026-06-18 23:27:16,239", "levelname": "ERROR", "name": "__main__", "filename": "agent_runner.py", "lineno": 195, "message": "Run ended at the iteration limit; reporting failure"}

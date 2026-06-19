@@ -1,0 +1,400 @@
++50|**Accuracy check:** The CLI source 
+(`packages/cli/src/kernel/domain/scaffold/scaffold-options.ts`) defines 
+`--no-aspire` as a boolean flag that disables Aspire scaffolding. The docs-site 
+pages correctly state the tradeoff (loss of dashboard + multi-resource wiring 
+for a leaner single-process dev loop). No misrepresentation.
++51|
++52|**Known deferred item:** A `packages/cli` scaffold README/nextSteps 
+`--no-aspire` contradiction is recorded in `drift.md` and scoped to a separate 
+CLI-fix PR. This docs PR is NOT responsible for that.
++53|
++54|**Verdict:** PASS.
++55|
++56|### 3. Highlighter warning gone (2710e23)
++57|
++58|**docs/site/_config.ts** (lines 14–30):
++59|```ts
++60|const plaintextLanguage = () => ({
++61|  name: "Plain text",
++62|  contains: [],
++63|});
++64|
++65|highlightLanguages: {
++66|  text: plaintextLanguage,
++67|  plaintext: plaintextLanguage,
++68|  "no-highlight": plaintextLanguage,
++69|  prisma: plaintextLanguage,
++70|}
++71|```
++72|
++73|Build output shows **zero** `Unknown language` warnings. The fix is correct.
++74|
++75|**Verdict:** PASS.
++76|
++77|### 4. Alpha badge site-wide (a2aa9b0)
++78|
++79|**docs/site/_includes/layouts/base.vto** (line ~50):
++80|```html
++81|<span class="ns-badge ns-badge--muted" title="NetScript is alpha 
+software">Alpha</span>
++82|```
++83|
++84|Rendered HTML check:
++85|- `docs/site/_site/tutorials/first-workspace/index.html`: 1 occurrence
++86|- `docs/site/_site/index.html`: 2 occurrences (header + footer band)
++87|- `docs/site/_site/reference/watchers/index.html`: 1 occurrence
++88|
++89|The badge is unobtrutive (muted styling) and present on every page type.
++90|
++91|**Verdict:** PASS.
++92|
++93|### 5. Footer "Edit this page" links (e049cd8)
++94|
++95|**docs/site/_includes/layouts/base.vto** (lines ~80–95):
++96|- Footer renders `<a class="ns-nextprev__link" 
+href="https://github.com/rickylabs/netscript/edit/main/docs/site/<sourcePath>" 
+target="_blank" rel="noreferrer">` with label "Edit this page".
++97|- Conditional logic skips reference pages (generated from `deno doc`).
++98|
++99|**Verification:**
++100|- Authored pages (tutorials, capabilities, explanation, how-to): **all 20**
+have the edit link.
++101|- Reference pages (`/reference/**`): **0 of 22** have the edit link 
+(correct — these are generated).
++102|- Sample link: 
+`https://github.com/rickylabs/netscript/edit/main/docs/site/capabilities/trigger
+s.md` — resolves correctly.
++103|
++104|**Verdict:** PASS.
++105|
++106|---
++107|
++108|## No Regressions
++109|
++110|### Ground-truth accuracy (cycle-2 PASS findings)
++111|
++112|All port numbers verified against source:
++113|- **workers** :8091 — `packages/workers/services/src/main.ts` + docs match
++114|- **sagas** :8092 — `packages/sagas/services/src/main.ts` + docs match
++115|- **triggers** :8093 — `packages/triggers/services/src/main.ts` + docs 
+match
++116|- **streams** :4437 — `packages/streams/dev-service.ts` + docs match
++117|- **users-service** :3001 — tutorial example + docs match
++118|- **Aspire dashboard** :18888 — `aspire/AppHost/Program.cs` + docs match
++119|- **fresh-ui** :8010 — `packages/fresh/mod.ts` default + docs match
++120|
++121|**JSR install command** (quickstart.vto):
++122|```sh
++123|deno install --global --allow-all --name netscript 
+jsr:@netscript/cli/bin/netscript.ts
++124|```
++125|Matches the canonical form (alternatively `-A` for `--allow-all`).
++126|
++127|**Code shapes** verified:
++128|- `defineService` / `createService` split — both present in 
+`capabilities/services.md` (6 + 4 occurrences)
++129|- `@orpc/contract` + `zod` + `implement()` — 3 occurrences in services.md
++130|- `defineJobHandler` + `createJobTools` — 4 + 2 occurrences in 
+background-jobs.md
++131|- `defineSaga().build()` — 7 + 5 occurrences in durable-sagas.md
++132|- `defineWebhook` on raw Hono — 6 + 10 occurrences in triggers.md
++133|
++134|**Honest no-op stub disclosure** — present in:
++135|- `how-to/add-opentelemetry.md` (8 occurrences)
++136|- `capabilities/telemetry.md` (4 occurrences)
++137|- `capabilities/streams.md` (12 occurrences)
++138|
++139|**`aspire run` ordering** — `quickstart.vto` correctly shows `aspire run` 
+(from `aspire/`) precedes any `netscript db` command.
++140|
++141|### Fil d'Ariane narrative (cycle-2 PASS)
++142|
++143|**Continuous-app thread** verified:
++144|1. `tutorials/background-jobs.md` — `create-user-settings` job publishes 
+`UserSettingsCreated` (lines 84, 138, 143)
++145|2. `tutorials/durable-workflow.md` — saga consumes `UserSettingsCreated`, 
+emits `sagaComplete` (lines 89, 117, 126)
++146|3. `capabilities/background-jobs.md` — references the same choreography 
+(lines 39, 64)
++147|4. `capabilities/durable-sagas.md` — cross-references the worker→saga flow 
+(lines 23, 60, 133)
++148|
++149|The narrative thread is intact across tutorials 3→4 and 
+capabilities/background-jobs ↔ capabilities/durable-sagas.
++150|
++151|### navSections membership + prev/next chains
++152|
++153|**`docs/site/_data.ts`** — `navSections` includes all zones:
++154|- Start here: `/`, `/quickstart/`, `/why/`
++155|- Learn: `/tutorials/` + 5 rungs
++156|- How-to guides: 8 guides
++157|- Core concepts: 6 explanation pages
++158|- Capabilities: 9 capability pages
++159|- Reference: 22 reference units
++160|- Resources: `/glossary/`, `/cli-reference/`
++161|
++162|**Prev/next chains** verified:
++163|- `tutorials/build-a-service.md`: prev → first-workspace, next → 
+background-jobs
++164|- `tutorials/background-jobs.md`: prev → build-a-service, next → 
+durable-workflow
++165|- No orphans detected.
++166|
++167|---
++168|
++169|## Whole-Tree Completeness
++170|
++171|Every zone has an `index.md` + substantive child pages (not stubs):
++172|- **tutorials**: `index.md` + 5 child pages (5-rung ladder)
++173|- **how-to**: `index.md` + 8 child pages
++174|- **capabilities**: `index.md` + 9 child pages
++175|- **explanation**: `index.md` + 6 child pages
++176|- **reference**: `index.md` + 22 reference unit directories
++177|
++178|**Retired page check**: `docs/site/tutorials/getting-started.md` — 
+**RETIRED** (file does not exist). The `tutorials/index.md` now shows the 5-rung
+ladder (lines 8–15).
++179|
++180|---
++181|
++182|## Comp-Tag Rigor
++183|
++184|**Bad patterns check**:
++185|- `{{ comp.callout({...}) }}` paired with `{{ /comp }}`: **0 occurrences** 
+in authored `.md` / `.vto` files (excluding `_plan/`).
++186|- Bare `function` keyword inside comp-tag args: **0 occurrences**.
++187|
++188|All occurrences of `comp.callout` are in `_plan/` documentation or 
+`_components/callout.vto` (the component definition itself), not in authored 
+content pages.
++189|
++190|---
++191|
++192|## Authorized-Scope Verification
++193|
++194|**Chrome scope expansion** (user-authorized per `drift.md`):
++195|- `docs/site/_config.ts` — highlighter aliases registered (IN-SCOPE)
++196|- `docs/site/_includes/layouts/base.vto` — Alpha badge + footer edit links 
+(IN-SCOPE)
++197|
++198|**Hard out-of-scope** (no edits detected):
++199|- `docs/site/reference/**` — no edits (generated from `deno doc`)
++200|- `packages/**` — no edits
++201|- `plugins/**` — no edits
++202|- Catalog files — no edits
++203|- Version pins / lock files — no edits
++204|
++205|**Verdict:** PASS (no FAIL_RESCOPE).
++206|
++207|---
++208|
++209|## Per-Zone Findings
++210|
++211|### Start here
++212|- **index.vto**: Hero, install command, code example. Alpha badge present. 
+Edit link present.
++213|- **quickstart.vto**: Prereqs, scaffold step, Aspire dashboard link. 
+`--no-aspire` aside accurate.
++214|
++215|### Learn (tutorials)
++216|- **index.md**: 5-rung ladder intro. Nav links to rungs 1–5.
++217|- **first-workspace.md**: Rung 1. `netscript init` + `deno task check`. 
+Edit link present.
++218|- **build-a-service.md**: Rung 2. `defineService`/`createService`, port 
+:3001. Prev/next intact.
++219|- **background-jobs.md**: Rung 3. `defineJobHandler`, `createJobTools`, 
+publishes `UserSettingsCreated`.
++220|- **durable-workflow.md**: Rung 4. `defineSaga().build()`, consumes 
+`UserSettingsCreated`, emits `sagaComplete`.
++221|- **ingest-webhook.md**: Rung 5. `defineWebhook` on raw Hono, `enqueueJob`.
++222|
++223|### How-to guides
++224|- 8 guides present (add-a-plugin, add-a-service, database-migration, 
+queue-kv-cron, add-opentelemetry, customize-fresh-ui, deploy, author-a-plugin). 
+All have edit links.
++225|
++226|### Core concepts (explanation)
++227|- 6 pages (architecture, contracts, plugin-model, durable-workflows, 
+observability, aspire). All have edit links.
++228|- **architecture.md**: Mentions `defineConfig`/`defineConfigAsync` from 
+`@netscript/config` (grounded).
++229|
++230|### Capabilities
++231|- 9 pages (services, background-jobs, durable-sagas, triggers, streams, 
+database, kv-queues-cron, telemetry, fresh-ui). All have edit links.
++232|- **triggers.md**: Mentions `@netscript/watchers` and `createWatcher` 
+(grounded in real surface).
++233|
++234|### Reference
++235|- 22 reference unit directories (aspire, cli, config, contracts, cron, 
+database, fresh, fresh-ui, kv, logger, plugin, prisma-adapter-mysql, queue, 
+runtime-config, sagas, sdk, service, streams, telemetry, triggers, watchers, 
+workers).
++236|- No edit links (correct — generated from `deno doc`).
++237|
++238|---
++239|
++240|## Per-Step-6-Item Findings
++241|
++242|| Commit | Item | Status | Evidence |
++243||--------|------|--------|----------|
++244|| `f7a7e6b` | Watchers + config intent | PASS | `capabilities/triggers.md` 
++ `explanation/architecture.md` grounded in real exports |
++245|| `21531a3` | Ground `--no-aspire` | PASS | `quickstart.vto` + `index.vto` 
+accurately describe the flag's effect |
++246|| `2710e23` | Plaintext highlighter aliases | PASS | `_config.ts` lines 
+14–30; zero warnings in build output |
++247|| `a2aa9b0` | Alpha badge site-wide | PASS | `base.vto` line ~50; renders 
+on every page type |
++248|| `e049cd8` | Footer edit links | PASS | `base.vto` lines ~80–95; 
+conditional logic skips `/reference/**` |
++249|
++250|---
++251|
++252|## Adversarial Findings
++253|
++254|**No failures detected.** The evaluator attempted to break the work across 
+all adversarial focus areas:
++255|
++256|1. **Watchers/config grounding**: Checked against real package surface 
+(`deno doc` output). No invented APIs.
++257|2. **`--no-aspire` accuracy**: Verified against CLI source 
+(`scaffold-options.ts`). No misstatements.
++258|3. **Highlighter warning**: Confirmed gone via build output and 
+`_config.ts` alias registration.
++259|4. **Alpha badge**: Verified presence on all page types (index, tutorial, 
+reference).
++260|5. **Edit links**: Verified conditional logic (present on authored, absent 
+on reference).
++261|6. **Ground truth**: All ports, commands, code shapes match source.
++262|7. **Fil d'Ariane**: `UserSettingsCreated` flow intact across tutorials 3→4
+and capabilities.
++263|8. **navSections + prev/next**: No orphans, chains resolve correctly.
++264|9. **Whole-tree completeness**: Every zone has index + substantive 
+children.
++265|10. **Comp-tag rigor**: No bad patterns in authored pages.
++266|11. **Authorized scope**: Chrome edits are IN-SCOPE (per `drift.md`); hard 
+out-of-scope untouched.
++267|
++268|---
++269|
++270|## Remaining Risks
++271|
++272|**None.** The work is merge-ready.
++273|
++274|- The `packages/cli` scaffold README `--no-aspire` contradiction is 
+recorded in `drift.md` and scoped to a separate CLI-fix PR — this docs PR is not
+responsible for it.
++275|- No technical debt introduced by the Step-6 polish pass.
++276|- No regressions from the cycle-2 PASS findings.
++277|
++278|---
++279|
++280|## Build Gate (Full Output)
++281|
++282|```
++283|$ deno task --cwd docs/site build
++284|[... build output ...]
++285|Site built into _site
++286|EXIT=0
++287|Files generated: 148
++288|Warnings:
++289|  - Unknown language: "no-highlight": 0
++290|```
++291|
++292|---
++293|
++294|## Verdict Token
++295|
++296|**PASS**
++297|
++298|The NetScript documentation-website rebuild (Track B, branch 
+`docs/content-architecture`, PR #59, tip `15ccc571`) passes the final IMPL-EVAL 
+merge-readiness gate. All Step-6 polish items are correctly implemented, no 
+regressions detected, and the site builds cleanly with no warnings.
++299|
++300|**Ready to merge.**
++301|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL FINAL PASS verdict written to 
+/home/runner/work/_temp/openhands/27817301122-1/summary.md
+
+Reasoning:
+Now I'll create the single PR comment verdict. The agent must NOT post the 
+comment directly ("Do not post GitHub issue or PR comments directly. The 
+workflow owns GitHub comments."). But I should create the verdict artifact in 
+the workspace so the workflow can pick it up. Let me write a concise verdict 
+file.
+
+Actually, re-reading: the task says "Post ONE PR comment: verdict token (PASS / 
+FAIL_FIX / FAIL_RESCOPE / FAIL_DEBT)" — but operational contract says "Do not 
+post GitHub issue or PR comments directly. The workflow owns GitHub comments." 
+The workflow reads the summary and formats the PR comment. I'll include the 
+verdict in the summary (done) and also write a dedicated verdict file for 
+clarity.
+
+Finish with message:
+## IMPL-EVAL FINAL VERDICT: **PASS**
+
+**Branch:** `docs/content-architecture` · **PR:** #59 · **Tip:** `15ccc571`
+
+### Build Gate
+- `deno task --cwd docs/site build` → **EXIT=0**, **148 files** generated
+- `Unknown language: "no-highlight"` warning: **GONE** (0 occurrences)
+
+### Step-6 Acceptance (all PASS)
+| Commit | Item | Result |
+|---|---|---|
+| `f7a7e6b` | Watchers + config intent (triggers.md, architecture.md) | PASS — 
+grounded in real `@netscript/watchers` (`createWatcher`/`FileWatcher`) and 
+`@netscript/config` (`defineConfig`/`defineConfigAsync`) exports |
+| `21531a3` | Ground `--no-aspire` docs behavior | PASS — matches 
+`packages/cli/src/kernel/domain/scaffold/scaffold-options.ts` (flag disables 
+Aspire; user provisions Postgres themselves) |
+| `2710e23` | Plaintext highlighter aliases in `_config.ts` | PASS — 
+`text`/`plaintext`/`no-highlight`/`prisma` all mapped; warning eliminated |
+| `a2aa9b0` | Alpha badge site-wide | PASS — renders in `base.vto` header on 
+every page type |
+| `e049cd8` | Footer "Edit this page" GitHub links | PASS — present on all 20 
+authored pages; correctly skipped on 22 `/reference/**` generated pages |
+
+### No Regressions (cycle-2 PASS findings intact)
+- All ports accurate (workers :8091, sagas :8092, triggers :8093, streams :4437,
+users-service :3001, Aspire dashboard :18888, fresh :8010)
+- JSR install command: `deno install --global --allow-all --name netscript 
+jsr:@netscript/cli/bin/netscript.ts` ✓
+- Code shapes: `defineService`/`createService`, 
+`@orpc/contract`+`zod`+`implement()`, `defineJobHandler`+`createJobTools`, 
+`defineSaga().build()`, `defineWebhook` on raw Hono ✓
+- Fil d'Ariane thread: `create-user-settings` worker publishes 
+`UserSettingsCreated` → saga consumes → emits `sagaComplete` ✓
+- `aspire run` (from `aspire/`) precedes `netscript db` ✓
+- Honest no-op stub disclosure present (Otel, streams, telemetry) ✓
+
+### Whole-Tree Completeness
+- Every zone has index + substantive children (tutorials: 5, how-to: 8, 
+capabilities: 9, explanation: 6, reference: 22 units)
+- `tutorials/getting-started.md` RETIRED; `tutorials/index.md` shows 5-rung 
+ladder
+- Comp-tag rigor: 0 bad `{{ comp.callout({...}) }}`/`{{ /comp }}` pairings, 0 
+bare `function` keyword in comp args
+- navSections membership + prev/next chains: no orphans, all resolve
+
+### Authorized Scope
+- Chrome edits (`_config.ts`, `base.vto`) IN-SCOPE per `drift.md` Step-6 chrome 
+scope expansion
+- Hard out-of-scope (`reference/**`, `packages/**`, `plugins/**`, catalog, 
+version pins, lock files): no edits detected
+
+### Known Deferred Item (NOT a FAIL)
+- `packages/cli` scaffold README `--no-aspire` contradiction → recorded in 
+`drift.md`, scoped to separate CLI-fix PR
+
+**Ready to merge.**
+
+Tokens: ↑ input 1.6M • cache hit 90.48% •  reasoning 10.72K • ↓ output 22.89K • 
+$ 0.6376
+
