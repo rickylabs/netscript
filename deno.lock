@@ -129,6 +129,7 @@
     "npm:json-canon@^1.0.1": "1.0.1",
     "npm:jsonld@9": "9.0.0",
     "npm:mysql2@^3.22.5": "3.22.5_@types+node@25.9.3",
+    "npm:pg@^8.21.0": "8.21.0",
     "npm:pkijs@^3.2.5": "3.4.0",
     "npm:preact-render-to-string@^6.6.3": "6.7.0_preact@10.29.2",
     "npm:preact-render-to-string@^6.7.0": "6.7.0_preact@10.29.2",
@@ -2313,7 +2314,8 @@
           "jsr:@std/async@1",
           "jsr:@zod/zod@4.4.3",
           "npm:amqplib@^2.0.1",
-          "npm:ioredis@^5.11.1"
+          "npm:ioredis@^5.11.1",
+          "npm:pg@^8.21.0"
         ]
       },
       "packages/runtime-config": {
