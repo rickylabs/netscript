@@ -66,3 +66,4 @@ OTel span.
 | scoped lint | `rtk proxy deno run --no-lock --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-workers-core --ext ts,tsx` | PASS — 102 files, 0 diagnostics |
 | lock hygiene | `rtk git diff --stat origin/main -- deno.lock` | PASS — empty output |
 
+DONE 4cc5cee309d50dc530ad2e47cc72981b6bf32760 — gates PASS: affected executor test, scoped check, scoped lint, lock hygiene.
