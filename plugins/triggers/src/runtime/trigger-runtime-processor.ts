@@ -5,6 +5,7 @@ import type {
   TriggerActionResult,
   TriggerEvent,
 } from '@netscript/plugin-triggers-core/domain';
+import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
   TriggerDlqPort,
@@ -92,7 +93,10 @@ async function dispatchTriggerAction(
   queue: ReturnType<typeof createQueue<JobMessage>>,
 ): Promise<void> {
   if (action.kind === 'defer') {
-    return;
+    throw TriggersError.unsupportedOperation(
+      'trigger-action.defer',
+      `Deferred trigger action dispatch is not implemented for ${definition.id}; until=${action.until}.`,
+    );
   }
 
   await enqueueWorkerJob(action, event, definition, queue);
