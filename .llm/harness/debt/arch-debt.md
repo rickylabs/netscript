@@ -365,6 +365,24 @@ Seeded from
   `console.warn` is absent from
   `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
 
+## plugins/streams — durable topic publish/subscribe transport deferred
+
+- **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
+  Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
+  `createDurableStream`, which publishes State Protocol upsert/delete events through
+  `@durable-streams/client`; it does not expose a generic topic consumer/subscriber channel that can
+  deliver `StreamTopicDefinition<TPayload>` payloads. Building that durable topic transport requires
+  a new cross-package runtime contract and consumer SDK, which exceeds the S3 M-sized slice. S3
+  replaced the silent no-op helper behavior with typed unsupported-operation failures.
+- **Owner:** `@netscript/plugin-streams` / `@netscript/plugin-streams-core` maintainers.
+- **Target:** Runtime transport rescope before advertising generic plugin topic publish/subscribe.
+- **Linked plan:** `.llm/tmp/run/cap-s3-streams/brief.md`.
+- **Created:** 2026-06-19
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when a real durable topic transport exists with producer delivery, consumer
+  subscription/unsubscribe semantics, and runtime tests proving a published payload reaches a
+  subscribed handler without relying on manifest-layer no-ops.
+
 ## packages/watchers — AP-13 console.warn runtime reporting
 
 - **Reason:** `FileWatcher` and `HybridWatchStrategy` currently use `console.warn` for native
