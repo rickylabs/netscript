@@ -2,4 +2,4 @@
 
 - ecf8864f: docs(site): Phase 0a — chrome + components + landing (green Lume build)
 - 323a7a1a: docs(site): wave-1b — why + quickstart prose pages render (green build)
-- STAGE6: docs(site): Stage-6 polish — front-door P0/P1 from IMPL-EVAL PASS (green build, 85 files)
+- fb63d3b8: docs(site): Stage-6 polish — front-door P0/P1 from IMPL-EVAL PASS (green build, 85 files)
