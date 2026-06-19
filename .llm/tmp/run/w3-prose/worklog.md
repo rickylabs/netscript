@@ -40,3 +40,4 @@ Docs voice and structure pass with `SCOPE-docs`, narrowed per brief to prose onl
 | Markdown fmt, touched files | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --ext md --file docs/site/tutorials/index.md --file docs/site/how-to/index.md --file docs/site/explanation/index.md --file docs/site/explanation/architecture.md --file docs/site/explanation/plugin-model.md` | PASS | `filesSelected: 5`, `failedBatches: 0`, `findings: 0`. |
 | Diff scope review | `rtk git diff -- docs/site/tutorials/index.md docs/site/how-to/index.md docs/site/explanation/index.md docs/site/explanation/architecture.md docs/site/explanation/plugin-model.md` | PASS | Prose/structure and fmt wrapping only; no endpoint or called-out capability-status changes. |
 
+DONE eb181db — docs build PASS; touched-file Markdown fmt PASS; diff scope review PASS.
