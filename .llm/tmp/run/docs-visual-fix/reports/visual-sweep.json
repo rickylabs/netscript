@@ -1,0 +1,1958 @@
+[
+  {
+    "viewport": "desktop",
+    "route": "/",
+    "url": "http://127.0.0.1:4173/netscript/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-landing.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "NetScript — type-safe services and durable workflows in one workspace · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": {
+        "display": "flex",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/why/",
+    "url": "http://127.0.0.1:4173/netscript/why/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-why.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Why NetScript · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": {
+        "display": "flex",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/quickstart/",
+    "url": "http://127.0.0.1:4173/netscript/quickstart/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-quickstart.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Quickstart · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/tutorials/first-workspace/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/first-workspace/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-tutorial-first-workspace.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Your first workspace · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/tutorials/build-a-service/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/build-a-service/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-tutorial-build-a-service.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Build a service · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/tutorials/ingest-webhook/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/ingest-webhook/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-tutorial-ingest-webhook.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Ingest a webhook · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/tutorials/durable-workflow/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/durable-workflow/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-tutorial-durable-workflow.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "A durable workflow · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/tutorials/background-jobs/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/background-jobs/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-tutorial-background-jobs.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Add background jobs · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/how-to/",
+    "url": "http://127.0.0.1:4173/netscript/how-to/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-how-to.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "How-to guides · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            H",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/how-to/add-a-service/",
+    "url": "http://127.0.0.1:4173/netscript/how-to/add-a-service/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-how-to-add-a-service.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Add a service · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            A",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/how-to/deploy/",
+    "url": "http://127.0.0.1:4173/netscript/how-to/deploy/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-how-to-deploy.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Deploy · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            D",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/capabilities/",
+    "url": "http://127.0.0.1:4173/netscript/capabilities/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-capabilities.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Capabilities · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            C",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/capabilities/database/",
+    "url": "http://127.0.0.1:4173/netscript/capabilities/database/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-capabilities-database.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Database & Prisma · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            D",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/explanation/",
+    "url": "http://127.0.0.1:4173/netscript/explanation/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-explanation.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Explanation · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            E",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/explanation/architecture/",
+    "url": "http://127.0.0.1:4173/netscript/explanation/architecture/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-explanation-architecture.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "The NetScript architecture · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/reference/",
+    "url": "http://127.0.0.1:4173/netscript/reference/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-reference.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Reference · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            R",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": null,
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/glossary/",
+    "url": "http://127.0.0.1:4173/netscript/glossary/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-glossary.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Glossary · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "desktop",
+    "route": "/cli-reference/",
+    "url": "http://127.0.0.1:4173/netscript/cli-reference/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/desktop-cli-reference.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "CLI reference · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/",
+    "url": "http://127.0.0.1:4173/netscript/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-landing.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "NetScript — type-safe services and durable workflows in one workspace · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": {
+        "display": "flex",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/why/",
+    "url": "http://127.0.0.1:4173/netscript/why/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-why.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Why NetScript · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": {
+        "display": "flex",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/quickstart/",
+    "url": "http://127.0.0.1:4173/netscript/quickstart/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-quickstart.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Quickstart · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/tutorials/first-workspace/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/first-workspace/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-tutorial-first-workspace.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Your first workspace · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/tutorials/build-a-service/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/build-a-service/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-tutorial-build-a-service.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Build a service · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/tutorials/ingest-webhook/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/ingest-webhook/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-tutorial-ingest-webhook.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Ingest a webhook · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/tutorials/durable-workflow/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/durable-workflow/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-tutorial-durable-workflow.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "A durable workflow · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": null,
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/tutorials/background-jobs/",
+    "url": "http://127.0.0.1:4173/netscript/tutorials/background-jobs/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-tutorial-background-jobs.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Add background jobs · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/how-to/",
+    "url": "http://127.0.0.1:4173/netscript/how-to/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-how-to.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "How-to guides · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            H",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/how-to/add-a-service/",
+    "url": "http://127.0.0.1:4173/netscript/how-to/add-a-service/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-how-to-add-a-service.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Add a service · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            A",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/how-to/deploy/",
+    "url": "http://127.0.0.1:4173/netscript/how-to/deploy/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-how-to-deploy.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Deploy · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            D",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/capabilities/",
+    "url": "http://127.0.0.1:4173/netscript/capabilities/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-capabilities.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Capabilities · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            C",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/capabilities/database/",
+    "url": "http://127.0.0.1:4173/netscript/capabilities/database/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-capabilities-database.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Database & Prisma · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            D",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/explanation/",
+    "url": "http://127.0.0.1:4173/netscript/explanation/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-explanation.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Explanation · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            E",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/explanation/architecture/",
+    "url": "http://127.0.0.1:4173/netscript/explanation/architecture/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-explanation-architecture.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "The NetScript architecture · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            T",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/reference/",
+    "url": "http://127.0.0.1:4173/netscript/reference/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-reference.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Reference · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            R",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": null,
+      "callout": null,
+      "apiTable": null,
+      "tabbed": null,
+      "nextPrev": null,
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/glossary/",
+    "url": "http://127.0.0.1:4173/netscript/glossary/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-glossary.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "Glossary · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": null,
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  },
+  {
+    "viewport": "mobile",
+    "route": "/cli-reference/",
+    "url": "http://127.0.0.1:4173/netscript/cli-reference/",
+    "status": 200,
+    "screenshot": ".llm/tmp/run/docs-visual-fix/screenshots/mobile-cli-reference.png",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "requestFailures": [],
+    "audit": {
+      "title": "CLI reference · NetScript Docs",
+      "statusText": "\n          \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n      Home\n  \n\n\n          \n            \n",
+      "leaks": [],
+      "widthOverflow": 0,
+      "hero": null,
+      "card": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "callout": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "3px",
+        "backgroundColor": "rgb(255, 255, 255)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "apiTable": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "auto"
+      },
+      "tabbed": {
+        "display": "block",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "1px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "hidden"
+      },
+      "nextPrev": {
+        "display": "flex",
+        "borderTopWidth": "1px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "breadcrumb": {
+        "display": "block",
+        "borderTopWidth": "0px",
+        "borderLeftWidth": "0px",
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "oklch(0.135 0.006 85)",
+        "overflowX": "visible"
+      },
+      "stylesheetLoaded": true
+    }
+  }
+]

@@ -3,25 +3,6 @@
      {{ comp.learningPath({ steps: [{ label, href }, …] }) }}
    Rendered as a real ordered list for semantics; visually a horizontal stepper that wraps.
    All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
----
-css: |
-  .ns-learning-path { display:flex; flex-wrap:wrap; gap:.5rem; align-items:stretch;
-    list-style:none; counter-reset:ns-step; padding:0; margin:1.5rem 0; }
-  .ns-learning-path__step { display:flex; }
-  .ns-learning-path__link { counter-increment:ns-step; display:inline-flex; align-items:center;
-    gap:.55rem; padding:.55rem .9rem; border-radius:var(--ns-radius-md,8px);
-    border:1px solid var(--ns-border,rgba(255,255,255,.12));
-    background:var(--ns-card,var(--ns-surface,rgba(255,255,255,.02)));
-    color:inherit; text-decoration:none; font-size:var(--ns-text-sm,.92rem); font-weight:500;
-    transition:border-color .15s ease; }
-  .ns-learning-path__link:hover { border-color:var(--ns-border-hover,var(--ns-accent,#5b8def)); }
-  .ns-learning-path__link:focus-visible { outline:2px solid var(--ns-accent,#5b8def); outline-offset:2px; }
-  .ns-learning-path__link::before { content:counter(ns-step); flex:0 0 auto;
-    display:inline-flex; align-items:center; justify-content:center; width:1.4rem; height:1.4rem;
-    border-radius:999px; font-size:var(--ns-text-xs,.75rem); font-weight:700;
-    background:var(--ns-primary-subtle,rgba(137,87,229,.15));
-    color:var(--ns-primary,#8957e5); }
----
 {{ set items = steps || [] }}
 <ol class="ns-learning-path" aria-label="Learning path">
   {{ for step of items }}
