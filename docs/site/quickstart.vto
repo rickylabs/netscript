@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Quickstart
+templateEngine: [vento, md]
 ---
 
 {{ comp.breadcrumb() }}
@@ -11,14 +12,14 @@ From nothing to a running NetScript workspace you can watch boot — in about fi
 minutes. We'll install the CLI, scaffold a project, and start it under Aspire so
 you get a real dashboard and a handful of example routes on the first run.
 
-{{ comp.callout({ type: "note", title: "Prerequisites" }) }}
-You need **[Deno](https://docs.deno.com) 2.x** on your PATH (`deno --version`).
-The default path also uses **[.NET Aspire](https://learn.microsoft.com/dotnet/aspire/)**
-for orchestration — install the `aspire` CLI if you don't have it, or skip it with
-`--no-aspire` (see the aside below).
+{{ comp callout { type: "note", title: "Prerequisites" } }}
+You need <strong><a href="https://docs.deno.com">Deno</a> 2.x</strong> on your PATH (<code>deno --version</code>).
+The default path also uses <strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire</a></strong>
+for orchestration — install the <code>aspire</code> CLI if you don't have it, or skip it with
+<code>--no-aspire</code> (see the aside below).
 {{ /comp }}
 
-{{ comp.callout({ type: "important", title: "Alpha" }) }}
+{{ comp callout { type: "important", title: "Alpha" } }}
 NetScript is in alpha. The API is subject to change. We're on the path to beta.
 {{ /comp }}
 
@@ -40,9 +41,9 @@ The CLI is published to JSR as `@netscript/cli`. Install it globally for a tidy
   }
 ] }) }}
 
-{{ comp.callout({ type: "tip" }) }}
-The rest of this page assumes the global `netscript` command. If you went ad-hoc,
-swap `netscript` for `deno run -A jsr:@netscript/cli/bin/netscript.ts` in each step.
+{{ comp callout { type: "tip" } }}
+The rest of this page assumes the global <code>netscript</code> command. If you went ad-hoc,
+swap <code>netscript</code> for <code>deno run -A jsr:@netscript/cli/bin/netscript.ts</code> in each step.
 {{ /comp }}
 
 ## 2. Scaffold a workspace
@@ -54,9 +55,9 @@ contracts, a plugin registry, and the Aspire orchestration layer:
 netscript init my-app
 ```
 
-{{ comp.callout({ type: "tip" }) }}
-Want to see the plan before anything touches disk? Add `--dry-run` —
-`netscript init my-app --dry-run` previews every file it would create and writes
+{{ comp callout { type: "tip" } }}
+Want to see the plan before anything touches disk? Add <code>--dry-run</code> —
+<code>netscript init my-app --dry-run</code> previews every file it would create and writes
 nothing.
 {{ /comp }}
 
@@ -97,9 +98,9 @@ aspire restore   # one-time: downloads the AppHost SDK modules
 aspire run       # boots everything and opens the dashboard
 ```
 
-{{ comp.callout({ type: "note", title: "Prefer no orchestration?" }) }}
-Scaffold with `netscript init my-app --no-aspire` and start the Fresh app directly
-instead: `deno task --cwd apps/dashboard dev`. You trade the dashboard and
+{{ comp callout { type: "note", title: "Prefer no orchestration?" } }}
+Scaffold with <code>netscript init my-app --no-aspire</code> and start the Fresh app directly
+instead: <code>deno task --cwd apps/dashboard dev</code>. You trade the dashboard and
 multi-resource wiring for a leaner single-process dev loop.
 {{ /comp }}
 
@@ -117,10 +118,10 @@ Once `aspire run` settles, you have a live workspace to poke at:
 - **The `/examples` routes** — runnable end-to-end paths: `/examples/crud`,
   `/examples/service`, and `/examples/telemetry`, plus a `/health` check.
 
-{{ comp.callout({ type: "tip", title: "Start at /design" }) }}
-The scaffolded `/design` showcase is the fastest way to feel what you have: the
+{{ comp callout { type: "tip", title: "Start at /design" } }}
+The scaffolded <code>/design</code> showcase is the fastest way to feel what you have: the
 tokens are real CSS custom properties, and the components are source you own and
-can edit on the spot. Open [http://localhost:8000/design](http://localhost:8000/design).
+can edit on the spot. Open <a href="http://localhost:8000/design">http://localhost:8000/design</a>.
 {{ /comp }}
 
 ## You now have

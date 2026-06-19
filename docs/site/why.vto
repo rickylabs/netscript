@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.vto
 title: Why NetScript
+templateEngine: [vento, md]
 ---
 
 {{ comp.hero({
@@ -12,8 +13,8 @@ title: Why NetScript
   ]
 }) }}
 
-{{ comp.callout({ type: "note", title: "Where we are" }) }}
-NetScript is in **alpha**. The API is subject to change. We're on the path to beta by the end of 2026 — so build with us, but pin your versions.
+{{ comp callout { type: "note", title: "Where we are" } }}
+NetScript is in <strong>alpha</strong>. The API is subject to change. We're on the path to beta by the end of 2026 — so build with us, but pin your versions.
 {{ /comp }}
 
 ## The problem
@@ -73,7 +74,7 @@ A saga is an explicit state machine, not a retry loop. You declare its state, th
 Tracing isn't a follow-up ticket. Spans wrap the work itself: `withSpan` runs your handler inside a span, marks it OK or records the exception on throw, and closes it for you — so a service handler is traced the moment it exists.
 
 {{ comp.tabbedCode({ tabs: [
-  { label: "Trace a handler", lang: "ts", code: "// This replaces manual span start/end + try/catch/recordException boilerplate.\nimport { getTracer, withSpan } from '@netscript/telemetry/tracer';\n\nconst tracer = getTracer('users');\n\nexport async function chargeOrder(orderId: string) {\n  // The span is opened, status-tracked, and closed around your work.\n  return await withSpan(tracer, 'order.charge', async (span) => {\n    span.setAttribute('order.id', orderId);\n    const receipt = await processPayment(orderId);\n    return receipt; // span auto-marked OK; a throw is recorded + re-raised.\n  });\n}" },
+  { label: "Trace a handler", lang: "ts", code: "// This replaces manual span start/end + try/catch/recordException boilerplate.\nimport { getTracer, withSpan } from '@netscript/telemetry/tracer';\n\nconst tracer = getTracer('users');\n\nexport const chargeOrder = async (orderId: string) => {\n  // The span is opened, status-tracked, and closed around your work.\n  return await withSpan(tracer, 'order.charge', async (span) => {\n    span.setAttribute('order.id', orderId);\n    const receipt = await processPayment(orderId);\n    return receipt; // span auto-marked OK; a throw is recorded + re-raised.\n  });\n};" },
   { label: "Inside a service", lang: "ts", code: "// defineService wires CORS, logging, OpenAPI, RPC, and health in one call —\n// and your traced handlers run inside it with no extra plumbing.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\n// ... handlers like chargeOrder() above are already instrumented.\nawait service.stop();" }
 ] }) }}
 
@@ -89,12 +90,13 @@ Workers, sagas, triggers, and streams are plugins. You add them in any combinati
 
 fresh-ui is copy-source. The CLI copies the components into your repo, and from that moment the code is yours to read, fork, and evolve. There's no black-box component dependency to fight when you need a different border-radius.
 
-{{ comp.callout({ type: "tip", title: "When NetScript is NOT the right tool" }) }}
+{{ comp callout { type: "tip", title: "When NetScript is NOT the right tool" } }}
 We'd rather you pick the right tool than a regretful one.
-
-- **You need a stable, frozen API today.** We're alpha; surfaces still move. If churn is unacceptable, wait for beta or pin hard.
-- **You can't take a .NET dependency.** The default scaffold integrates .NET Aspire for orchestration. You can `--no-aspire`, but if even the option offends your platform constraints, weigh that first.
-- **You want a frontend framework or a hosted PaaS.** NetScript is backend-scoped: services, workflows, jobs, streams, and a generated workspace you run yourself. It ships a Fresh UI, but it is not a React-style frontend framework, and it does not host anything for you.
+<ul>
+<li><strong>You need a stable, frozen API today.</strong> We're alpha; surfaces still move. If churn is unacceptable, wait for beta or pin hard.</li>
+<li><strong>You can't take a .NET dependency.</strong> The default scaffold integrates .NET Aspire for orchestration. You can <code>--no-aspire</code>, but if even the option offends your platform constraints, weigh that first.</li>
+<li><strong>You want a frontend framework or a hosted PaaS.</strong> NetScript is backend-scoped: services, workflows, jobs, streams, and a generated workspace you run yourself. It ships a Fresh UI, but it is not a React-style frontend framework, and it does not host anything for you.</li>
+</ul>
 {{ /comp }}
 
 ## Compared to assembling it yourself

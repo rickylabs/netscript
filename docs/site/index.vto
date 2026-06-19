@@ -21,7 +21,7 @@ is still moving.
 
 {{ comp.tabbedCode({ tabs: [
   { label: "Define a service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC, service info, and health endpoints — instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
-  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli/bin\n\n# Scaffold a complete, type-checked workspace\nnetscript init my-app\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --no-aspire" }
+  { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts\n\n# Scaffold a complete, type-checked workspace\nnetscript init my-app\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --no-aspire" }
 ] }) }}
 
 <h2>Build real systems, not just CRUD</h2>

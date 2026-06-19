@@ -63,3 +63,48 @@ with two systematic defects:
 **IMPL-EVAL (Stage 5) sequencing note.** Benchmarking doc quality vs competitors is
 premature while the front door is only the landing page. Recommend dispatching
 Stage-5 IMPL-EVAL only after Phase 0b + wave-1b make why/quickstart render.
+
+---
+
+## Wave-1b — `function` keyword landmine in Vento `comp` tags (VERIFIED 2026-06-19)
+
+**Severity:** minor (authoring constraint, fixed in-lane).
+
+**Symptom.** `deno task --cwd docs/site build` aborted on `why.vto` with
+`Caused by: Error: Invalid function: comp.tabbedCode({ tabs: [ ...`. The landing
+(`index.vto`) and `why.vto` blocks 1–2 built fine; block 3 (the observability
+`tabbedCode`) failed.
+
+**Root cause (bisected in an isolated Lume build).** The literal keyword `function`
+appearing ANYWHERE inside a `comp` tag's argument text — even inside a double-quoted
+`code:` string — makes Vento's function-definition tag matcher mis-fire and try to
+parse the whole `comp.NAME({...})` call as a `{{ function … }}` definition. It is the
+keyword specifically: `import`, `export`, `const`, `if`, `for` inside the same code
+strings are all fine (blocks 1–2 use them). The self-closing tag form
+`{{ comp NAME { … } /}}` does NOT bypass it (tested — still fails). The only reliable
+fix is to **avoid the word `function` inside any `comp` tag argument**: write code
+samples with arrow/`const` form (`export const f = async (x) => { … }`) instead of
+`export async function f(x) { … }`. Page-level markdown prose is unaffected (Vento only
+scans inside `{{ }}` delimiters), so the word `function` in body copy is safe.
+
+**Fix applied.** `why.vto` block 3 tab 1 rewritten from
+`export async function chargeOrder(orderId: string) { … }` to
+`export const chargeOrder = async (orderId: string) => { … };` — semantically identical,
+same `getTracer`/`withSpan` symbols, no accuracy change. Build → GREEN, 85 files.
+
+**Authoring rule for future code samples (add to component usage notes / 0b brief):**
+in any `comp.tabbedCode` / `comp.apiTable` / callout argument, prefer arrow-`const`
+function expressions; never the `function` keyword. If a sample genuinely needs the
+`function` keyword, render it on a page-level fenced ```` ```ts ```` block (markdown),
+not inside a comp arg.
+
+## Wave-1b landed
+
+`why.vto` + `quickstart.vto` re-authored to the verified model (front matter
+`templateEngine: [vento, md]`; marketing comps in function-call form; callouts in
+`{{ comp callout { … } }}` tag form with INLINE-HTML bodies; all other prose markdown).
+Both render: 17 headings each, zero literal-markdown leak, callout HTML bodies rendered
+(`<strong>alpha</strong>`), accuracy markers intact (`localhost:18888`, JSR bin path).
+Also fixed `index.vto` install command `jsr:@netscript/cli/bin` →
+`jsr:@netscript/cli/bin/netscript.ts` (bin is not in the `exports` map, so the full file
+path is required to resolve). Front door is now COMPLETE → Stage-5 IMPL-EVAL unblocked.
