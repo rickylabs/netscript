@@ -32,3 +32,4 @@ Slice 2 blocks merge without green `scaffold.runtime`.
 
 - 43e8ea4: Slice 4a: finish local CLI scaffold improvements
 - f49af63: Slice 6: close CLI A6 gate sweep
+- edd2142: fix(cli): address Augment apphost review
