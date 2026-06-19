@@ -1,0 +1,123 @@
+---
+layout: layouts/base.vto
+title: Why NetScript
+---
+
+{{ comp.hero({
+  tagline: "You shouldn't have to assemble a backend from a dozen libraries that have never met.",
+  subhead: "NetScript is one coordinated workspace where the contract you define is the client you call, workflows survive crashes by design, and tracing is wired in from line one.",
+  ctas: [
+    { label: "Quickstart — 5 min", href: "/quickstart/", primary: true },
+    { label: "Browse the API reference", href: "/reference/" }
+  ]
+}) }}
+
+{{ comp.callout({ type: "note", title: "Where we are" }) }}
+NetScript is in **alpha**. The API is subject to change. We're on the path to beta by the end of 2026 — so build with us, but pin your versions.
+{{ /comp }}
+
+## The problem
+
+A real TypeScript backend is rarely one decision. It's a dozen, made on different days, by different libraries that were never designed to sit in the same repo:
+
+1. **A queue here, a tracer there.** You pick a job runner, then a separate OpenTelemetry setup, then glue them together so a job actually shows up in a trace. The glue is yours to maintain forever.
+2. **A scaffold script that rots.** Someone wrote a `create-app` once. Two refactors later it generates code nobody recognizes, and updating it is a project of its own.
+3. **A `docker-compose.yml` and a prayer.** Your database, your app, your worker, your dashboard — all hand-wired, all drifting from how you actually deploy.
+4. **A DI container you didn't want.** To make any of the above testable, you reach for a dependency-injection framework, and now wiring is a layer of indirection instead of a function call.
+5. **Drift between the API and the client.** The service returns one shape; the client believes another. You find out at runtime, in production, from a user. Codegen helps until the generated types and the hand-written ones disagree.
+6. **Durable workflows faked with retries.** "It'll just retry" is not a state machine. There's no correlation, no compensation, no record of where a multi-step flow actually stopped when the process died.
+
+None of these are hard problems individually. The cost is the **integration tax** — the standing maintenance of six unrelated tools pretending to be one system.
+
+## The NetScript answer
+
+We didn't invent new primitives. We made a set of opinions about how the boring parts fit together, and shipped them as one coordinated package family plus a CLI that scaffolds the whole workspace. Each value below is a direct answer to a pain above.
+
+{{ comp.apiTable({
+  caption: "What you'd hand-assemble → what NetScript gives you",
+  rows: [
+    { name: "Type-safe to the edges", type: "API ↔ client drift", desc: "The contract you import is designed, documented, and enforced. oRPC contracts flow from service to client to UI with no codegen step to drift." },
+    { name: "Approachable, not magic", type: "DI containers & glue", desc: "The 80% case is one chained call. Advanced needs unfold one method deeper — no indirection layer you didn't ask for." },
+    { name: "Standards-first", type: "bespoke abstractions", desc: "Built on fetch, URL, streams, and @std/* — skills you already have, not a private runtime to relearn." },
+    { name: "Durable by design", type: "retries pretending to be workflows", desc: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence, and compensation. They survive crashes; failure handling is named, not bolted on." },
+    { name: "Observable by default", type: "a tracer you wire yourself", desc: "OpenTelemetry tracing, structured logs, and health probes are wired into jobs, queues, RPC, and SSE from the first line." },
+    { name: "Orchestrated out of the box", type: "docker-compose & a prayer", desc: "One workspace, many resources, a real dashboard — local and deployed — via .NET Aspire integration. Opt out with --no-aspire." },
+    { name: "Composable", type: "a scaffold script that rots", desc: "Add workers, sagas, triggers, and streams in any combination. The host never changes; plugins register contributions." }
+  ]
+}) }}
+
+## What makes it different
+
+Prose is cheap. Here is a working code path for each claim — the kind of thing you'd actually write, lifted from the published package surface.
+
+### 1. Contract-first, type-safe end to end
+
+Define a contract once. The client is *derived* from it — no codegen, no second source of truth. Change the contract and the type checker becomes your integration test: every caller that no longer matches fails to compile.
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Define the contract", lang: "ts", code: "// This replaces a hand-maintained OpenAPI spec + generated client.\nimport {\n  baseContract,\n  OffsetPaginationMetaSchema,\n  OffsetPaginationQuerySchema,\n} from '@netscript/contracts';\nimport { z } from 'zod';\n\nexport const usersContract = {\n  list: baseContract\n    .route({ method: 'GET', path: '/users' })\n    .input(OffsetPaginationQuerySchema)\n    .output(z.object({\n      items: z.array(z.object({ id: z.string(), email: z.string() })),\n      pagination: OffsetPaginationMetaSchema,\n    })),\n};" },
+  { label: "Call the typed client", lang: "ts", code: "// The client is derived from the contract above — not generated, not duplicated.\nimport { defineServices } from '@netscript/sdk';\nimport { usersContract } from './contracts/users.ts';\n\nconst { clients } = defineServices({\n  users: { contract: usersContract },\n});\n\n// `result` is fully typed from the contract's output schema.\nconst result = await clients.users.list({ limit: 20, offset: 0 });\nconsole.log(result.items, result.pagination);" }
+] }) }}
+
+### 2. Durable workflows by design
+
+A saga is an explicit state machine, not a retry loop. You declare its state, the messages it reacts to, and what each handler emits — including completion and failure as first-class outcomes. It's authored in plain TypeScript builders, but the model is closer to Temporal than to a job queue.
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Define a saga", lang: "ts", code: "// This replaces an ad-hoc 'mark paid, then hope the retry fires' flow.\nimport { defineSaga, sagaComplete } from '@netscript/plugin-sagas-core';\n\nconst orderSaga = defineSaga('order')\n  .state({ paid: false })\n  .on('order.paid', (saga) => {\n    saga.state.paid = true;\n    // Completion is an explicit, recorded outcome — not a fall-through.\n    return sagaComplete({ orderId: saga.id });\n  })\n  .build();" },
+  { label: "Emit cascaded effects", lang: "ts", code: "// Handlers return named effects: send, schedule, complete, or fail.\nimport { defineSaga, send, sagaFail } from '@netscript/plugin-sagas-core';\n\nconst checkout = defineSaga('checkout')\n  .state({ attempts: 0 })\n  .on('payment.attempted', (saga) => {\n    saga.state.attempts += 1;\n    if (saga.state.attempts > 3) {\n      return sagaFail('payment retries exhausted');\n    }\n    // Fan out the next step as a correlated message.\n    return send('payment.charge', { orderId: saga.id });\n  })\n  .build();" }
+] }) }}
+
+### 3. Observable by default
+
+Tracing isn't a follow-up ticket. Spans wrap the work itself: `withSpan` runs your handler inside a span, marks it OK or records the exception on throw, and closes it for you — so a service handler is traced the moment it exists.
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Trace a handler", lang: "ts", code: "// This replaces manual span start/end + try/catch/recordException boilerplate.\nimport { getTracer, withSpan } from '@netscript/telemetry/tracer';\n\nconst tracer = getTracer('users');\n\nexport async function chargeOrder(orderId: string) {\n  // The span is opened, status-tracked, and closed around your work.\n  return await withSpan(tracer, 'order.charge', async (span) => {\n    span.setAttribute('order.id', orderId);\n    const receipt = await processPayment(orderId);\n    return receipt; // span auto-marked OK; a throw is recorded + re-raised.\n  });\n}" },
+  { label: "Inside a service", lang: "ts", code: "// defineService wires CORS, logging, OpenAPI, RPC, and health in one call —\n// and your traced handlers run inside it with no extra plumbing.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\n// ... handlers like chargeOrder() above are already instrumented.\nawait service.stop();" }
+] }) }}
+
+### 4. Orchestrated with Aspire
+
+Your database, services, workers, and a real dashboard come up together — locally and on the way to deploy — through NetScript's .NET Aspire integration. One workspace wires the resources; you get the Aspire dashboard for traces and logs without standing up your own. Don't want the .NET footprint? `netscript init --no-aspire` and it's gone.
+
+### 5. Composable plugins
+
+Workers, sagas, triggers, and streams are plugins. You add them in any combination and the host application never changes — each one registers its contributions rather than asking you to edit a central wiring file. The saga in proof #2 *is* a plugin contribution.
+
+### 6. You own your UI
+
+fresh-ui is copy-source. The CLI copies the components into your repo, and from that moment the code is yours to read, fork, and evolve. There's no black-box component dependency to fight when you need a different border-radius.
+
+{{ comp.callout({ type: "tip", title: "When NetScript is NOT the right tool" }) }}
+We'd rather you pick the right tool than a regretful one.
+
+- **You need a stable, frozen API today.** We're alpha; surfaces still move. If churn is unacceptable, wait for beta or pin hard.
+- **You can't take a .NET dependency.** The default scaffold integrates .NET Aspire for orchestration. You can `--no-aspire`, but if even the option offends your platform constraints, weigh that first.
+- **You want a frontend framework or a hosted PaaS.** NetScript is backend-scoped: services, workflows, jobs, streams, and a generated workspace you run yourself. It ships a Fresh UI, but it is not a React-style frontend framework, and it does not host anything for you.
+{{ /comp }}
+
+## Compared to assembling it yourself
+
+You can build all of this by hand — most teams have. The honest comparison isn't NetScript versus any one library; it's NetScript versus the standing cost of integrating several. We're deliberate about what we wrap and what we are *not*:
+
+{{ comp.apiTable({
+  caption: "The one honest comparison",
+  rows: [
+    { name: "vs. wiring it yourself", type: "the baseline", desc: "You keep full control but own every integration seam — queue↔tracer, scaffold, compose file, client drift — indefinitely. NetScript trades a slice of that control for those seams being pre-fitted and type-checked." },
+    { name: "NestJS / Encore", type: "opinionated backend frameworks", desc: "Kindred in ambition. NetScript is Deno-native and JSR-distributed, leads with oRPC contract-first typing end to end, and treats durable workflows as first-class — not a backend framework you bolt a workflow engine onto." },
+    { name: "tRPC-style stacks", type: "end-to-end typing", desc: "NetScript shares the typed-edge goal via oRPC, then adds the rest of the system around it: services, jobs, sagas, streams, orchestration, and observability in one workspace." },
+    { name: "Temporal", type: "durable workflow engine", desc: "Our sagas borrow the state-machine, correlation, and compensation ideas — authored in plain TS builders inside your app, not a separate cluster you operate." },
+    { name: "Hono", type: "HTTP foundation", desc: "We wrap it, not replace it. defineService stands up a Hono/oRPC runtime; you're never cut off from the underlying framework." }
+  ]
+}) }}
+
+NetScript is the opinion that these pieces should arrive already fitted — and the published surface is the product, so what you import is what's documented and type-checked.
+
+## Convinced enough to try it?
+
+The fastest way to feel the difference is to generate a workspace and watch it come up.
+
+{{ comp.nextPrev({
+  next: { label: "Quickstart — 5 minutes", href: "/quickstart/" }
+}) }}

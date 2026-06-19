@@ -127,9 +127,11 @@
         </header>
 
         <main class="ns-dashboard__content" id="main-content" tabindex="-1">
+          {{ comp.breadcrumb() }}
           <article class="ns-prose" data-pagefind-body>
             {{ content }}
           </article>
+          {{ comp.nextPrev({ prev, next }) }}
         </main>
       </div>
     </div>

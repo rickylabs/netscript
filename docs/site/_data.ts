@@ -2,10 +2,16 @@
  * Site-wide data shared by every page (Lume merges `_data.*` into page data).
  *
  * `navSections` drives the SidebarShell navigation rendered in
- * `_includes/layouts/base.vto`. It mirrors the playground SidebarShell grouped
- * nav: the four Diátaxis sections, with Reference expanded to the 22 primary
- * units. The four `*-core` internal packages stay folded inside the reference
- * prose (US-8) and are intentionally NOT sidebar entries.
+ * `_includes/layouts/base.vto`. The top groups use plain-English labels (the
+ * approachable ladder) while Reference stays expanded to the 22 primary units.
+ * The four `*-core` internal packages stay folded inside the reference prose
+ * (US-8) and are intentionally NOT sidebar entries.
+ *
+ * Every href below resolves to a page that exists after the 0a authoring wave:
+ * `/`, `/quickstart/`, `/why/`, `/tutorials/`, `/how-to/`, `/explanation/`,
+ * `/reference/`, and the 22 reference-unit hrefs. Capability hubs, concept
+ * pages, tutorial sub-pages, and a glossary land in later phases and are
+ * deliberately omitted here so the 0a chrome preview never 404s.
  */
 
 export interface NavItem {
@@ -52,16 +58,23 @@ export const navSections: NavSection[] = [
   {
     label: "Start here",
     items: [
-      { href: "/", label: "Home", icon: "◫" },
+      { href: "/", label: "Home", icon: "\u25EB" },
+      { href: "/quickstart/", label: "Quickstart", icon: "\u25B8" },
+      { href: "/why/", label: "Why NetScript", icon: "\u25C8" },
     ],
   },
   {
-    label: "Diátaxis",
+    label: "Learn",
     items: [
       { href: "/tutorials/", label: "Tutorials", icon: "T" },
       { href: "/how-to/", label: "How-to guides", icon: "H" },
-      { href: "/reference/", label: "Reference", icon: "R" },
       { href: "/explanation/", label: "Explanation", icon: "E" },
+    ],
+  },
+  {
+    label: "Reference",
+    items: [
+      { href: "/reference/", label: "Reference index", icon: "R" },
     ],
   },
   {
