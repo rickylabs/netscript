@@ -288,3 +288,160 @@ To win adopting teams, the NetScript documents must explicitly showcase the foll
 - [ ] **Copy-Source UI Ownership**: Prove that the Fresh-UI scaffolding operates via copy-source, ejecting code directly into their repository so the developer owns every pixel and logic flow.
 
 ---
+
+## Section C: Lume + Vento + Plugin Leverage
+
+NetScript structures its external documentation portal on Lume v2.5 accompanied by the Vento template engine. Since `base.vto` layout templates and core CSS stylesheet styles are centrally controlled, our strategy emphasizes leveraging existing components and recommending target components/plugins to match the benchmark.
+
+---
+
+### 1. Architectural Alignment with Existing Components
+
+Today's NetScript Lume stack features several high-quality components. Here is how they map directly to our retrieved competitor patterns to maximize reuse:
+
+-   **`comp.hero`**: Mirrors Medusa and TanStack landing patterns. Used on `/info` index entries to establish our contracts-first proposition above the fold.
+-   **`comp.featureGrid`**: Maps to Astro's feature highlights. Used to break down NetScript's 6 foundational pillars cleanly on the `/` page.
+-   **`comp.tabbedCode`**: Serves as our primary tool to showcase multi-environment commands (e.g., `Deno Run` vs `npm build`) or side-by-side contract vs client calls.
+-   **`comp.apiTable`**: Perfect for representing complex API properties of primary interfaces (`SagaContext`, `ServiceContext`). Matches TanStack's options tables.
+-   **`comp.callout`**: Replicates Astro's warning/tip cards. It features an HTML-safe inner container and is optimized for highlighting architectural invariants or alpha timeline constraints.
+-   **`comp.learningPath`**: Adapts Astro's tutorial progressions. Renders visual boxes guiding the reader through consecutive learning routes.
+-   **`comp.breadcrumb` & `comp.nextPrev`**: Leverages Lume auto-generators to build standard wayfinding paths dynamically.
+
+---
+
+### 2. High-Priority Component & Plugin Additions (Recommendations)
+
+To close the Gap with market-leading portals, the following new Lume/Vento elements and plugins should be introduced into the central repository template stack:
+
+1.  **File-Tree Visualizer (`comp.fileTree`)**:
+    *   *Need*: Showcase scaffold structures of NestScript projects without relying on fragile monospaced text.
+    *   *Implementation*: A Vento component converting nested JSON structures into an HTML list with distinct CSS classes and SVGs mimicking files/folders.
+2.  **On-This-Page TOC Generator (Plugin)**:
+    *   *Need*: Laravel/Astro dynamic scroll-tracking on-page navigators.
+    *   *Implementation*: A Lume build post-processor plugin or client-dev script that crawls output HTML headings (`h2`, `h3`), formats them into a sticky right-side list, and uses IntersectionObserver to highlight headings during scroll.
+3.  **Code-Block Copy Button (JS Script)**:
+    *   *Need*: Standard quick-copy of terminal directives and framework code.
+    *   *Implementation*: Vanilla JS injected into raw page footers. It iterates over `<pre>` nodes, wrapping them in containers with absolute-positioned hover copy-buttons.
+4.  **Synchronized Runtime/DB Selector Tabs (`comp.tabbedRuntime`)**:
+    *   *Need*: TanStack-style global code selectors.
+    *   *Implementation*: An extension of `tabbedCode` that syncs selection state via `localStorage` (changing tab "Deno KV" in one block automatically redirects all subsequent blocks on the page).
+5.  **Multi-Column Cards Grid (`comp.cardsGrid`)**:
+    *   *Need*: Medusa-style task-oriented grid layouts.
+    *   *Implementation*: A simple layout box rendering flexible container grid paths ensuring children cards reside in neat columns.
+6.  **Visual API Badges (`comp.badge`)**:
+    *   *Need*: Astro-style tag identifiers (`oRPC`, `Deno-Native`, `Prisma-Backed`).
+    *   *Implementation*: High-contrast inline pills featuring localized themes matching site tokens.
+
+---
+
+## End-of-Dossier Synthesis
+
+The final output synthesizes competitor teardowns, market analysis, and stack capabilities into an actionable blueprint for NetScript's architecture rebuild.
+
+---
+
+### 1. Recommended Deep Multi-Level Information Architecture (IA)
+
+We recommend a structural layout based on the Diátaxis framework, supplemented by explicit high-value focus portals:
+
+```
+netscript.dev/
+├── (Start Here / The Approachable Ladder)
+│   ├── /                          # Home/Hero: 6 USP cards, oRPC code proofs
+│   ├── /quickstart/               # 5-Min Walkthrough: Scaffold, run, check /design endpoints
+│   └── /why/                      # The Integration Tax, NestJS vs Hono comparison tables, "Not to adopt"
+├── Learn / Tutorials (Diátaxis: Learning-oriented)
+│   ├── /tutorials/index.md        # Map of progression paths
+│   └── /tutorials/checkout/       # Multi-step project: "Build an E-commerce Cart Checkout with Sagas"
+│       ├── 01-scaffold.md         # Inits Deno and boots local .NET Aspire environment
+│       ├── 02-contracts.md        # Defines oRPC contracts and types
+│       ├── 03-sagas.md            # Writes transactional sagas with compensation
+│       ├── 04-telemetry.md        # Wire traces and test via Fresh UI
+│       └── 05-deploy.md           # Deploying the setup to production
+├── How-To Guides (Diátaxis: Problem-oriented recipes)
+│   ├── /how-to/index.md           # Index of structured recipes
+│   ├── /how-to/services/          # oRPC Services (Auth, multi-routes)
+│   ├── /how-to/data/              # Database & Adapters (Prisma, Postgres config)
+│   ├── /how-to/scheduling/        # Background Jobs (Crons, manual queue workers)
+│   ├── /how-to/ui/                # Fresh UI Integration (Ejecting assets, customizing CSS)
+│   └── /how-to/deployment/        # Portability (Deploying with Docker, bare-metal '--no-aspire')
+├── Explanation (Diátaxis: Understanding-oriented theory)
+│   ├── /explanation/index.md      # Glossary & Mental Models
+│   ├── /explanation/orpc.md       # Under the hood: Client-server contract validation loop
+│   ├── /explanation/sagas.md      # Deterministic state-management & crash boundaries
+│   ├── /explanation/aspire.md     # Local orchestration vs. Production environment mappings
+│   └── /explanation/plugins.md    # The thread-isolated background execution pool
+└── Core API Reference (Diátaxis: Information-oriented facts)
+    ├── /reference/index.md        # Complete index of the 22 packages
+    └── /reference/<package>/      # Auto-generated from 'deno doc'
+        ├── functions.md
+        ├── classes.md
+        └── types.md
+```
+
+---
+
+### 2. Page-Type Catalog
+
+To enforce structural consistency across contributors, every page in NetScript dev documentation must align with its specific catalog type:
+
+#### A. Multi-Pillar Hub / Front-Door Page
+*   *Audience*: Skimmers, Decision Makers, Skeptical Architects.
+*   *Tone*: Warm, direct, technically precise (no fluff).
+*   *Layout Structure*:
+    1.  **Direct Value Title**: Verify the exact problem solved in 2 lines.
+    2.  **Interactive Code Tabs**: Side-by-side Contract vs Client execution.
+    3.  **Comprehensive Card Grid**: Visual representation of the 6 pillars.
+    4.  **Target Personas Breakdown**: Split developer onboarding paths cleanly.
+    5.  **Exhaustive Comparison Matrices**: Unified table honest about weaknesses.
+
+#### B. Sequential Tutorial Step
+*   *Audience*: Devs in training, students.
+*   *Tone*: Encouraging, structured, sequential.
+*   *Layout Structure*:
+    1.  **Progress Indicator / Breadcrumb**: Visual indicator of total steps.
+    2.  **Objective Section**: "In this step, you will buy..."
+    3.  **Prerequisites State Check**: Code state validator command.
+    4.  **File-Path Named Code Blocks**: Every block starts with exact target file paths.
+    5.  **Manual Check Checkbox**: User-interactive step validation.
+
+#### C. Task-Oriented "How-To" Recipe
+*   *Audience*: Working developers solving instant challenges.
+*   *Tone*: Direct, concise, practical.
+*   *Layout Structure*:
+    1.  **Scope Statement**: One sentence explaining what is cooked.
+    2.  **Prerequisites Table**: Inputs or active setups needed.
+    3.  **Code templates**: Clear highlights of added framework lines.
+    4.  **In-Production Pitfalls**: Warning boxes highlighting footguns (ports, locks, timeouts).
+
+#### D. Theoretical "Explanation" Page
+*   *Audience*: Senior engineers evaluating internals.
+*   *Tone*: Discursive, architectural, analytical.
+*   *Layout Structure*:
+    1.  **Mental Model / Analogy**: Broad outline of the topic.
+    2.  **ASCII Architecture flow-charts**: Layer-by-layer sequence mapping.
+    3.  **State Transition Tables**: Inputs vs Output states.
+    4.  **Design Trade-offs**: Discussion on why this design was chosen and the alternatives considered.
+
+---
+
+### 3. Prioritized Component & Design-System Gap List
+
+The following elements must be engineered to reach production-grade, enterprise documentation standard (ordered by critical need):
+
+#### Priority 0: Mission-Critical Wayfinding & Usability
+-   [ ] **On-Page Scrolling TOC Plugin**: Generates right-hand floating list tracking scrolling headers automatically so skimmers navigate massive pages.
+-   [ ] **In-Header Search box (Pagefind Integration)**: Offline index processing, optimizing search result rendering directly inside the sidebar layout.
+-   [ ] **One-Click Code Copy Hook**: Appends a copy utility to all fenced markdown code snippets.
+
+#### Priority 1: Clear Capability Explanations
+-   [ ] **File-Tree Layout Generator (`comp.fileTree`)**: Custom visual components rendering directory scaffolds rather than fragile plain text blocks.
+-   [ ] **Synchronized System Toggle Tabs (`comp.tabbedRuntime`)**: Injects identical global localstates so toggling "Deno-KV" or "oRPC Client" rewrites the active language blocks on all subsequent pages.
+-   [ ] **Interactive Badge Indicators (`comp.badge`)**: Adds pills (`OTel Wired`, `Contracts First`, `Prisma adapter`) next to headings.
+
+#### Priority 2: Technical Polish & Refinements
+-   [ ] **ASCII Box Layout Canvas**: Structured CSS panels hosting monospace flowchart sequences without layout shifts.
+-   [ ] **Flex Grid Card Container (`comp.grid`)**: A framework-friendly 3-col styling layout to host plugin directory listings.
+-   [ ] **Persistent Version Switcher (`comp.version`)**: Preserves context on active packages when jumping between major alpha/beta endpoints.
+
+---
