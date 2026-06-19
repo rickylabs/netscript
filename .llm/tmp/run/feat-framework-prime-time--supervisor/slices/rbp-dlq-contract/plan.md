@@ -163,9 +163,26 @@ No open decision would force rework if deferred. (Plan-gate open-decision sweep:
 - Per slice: `.llm/tools/run-deno-check.ts --root packages/queue --ext ts` (add `--unstable-kv` for KV slices),
   `.llm/tools/run-deno-lint.ts`, `.llm/tools/run-deno-fmt.ts --root packages/queue --ext ts`.
 - Targeted tests: `deno test --unstable-kv` on the new + touched `packages/queue/tests/*_test.ts`.
-- Fitness (ARCHETYPE-2): F-1, F-3, F-5 (public surface — new exports reviewed), F-6 (JSR publishability),
-  F-7 (doc-score on new exports), F-8, F-10 (test-shape: unit+failure-path present), F-12, F-14
-  (no stray console.log in shipped code — route logs through existing patterns), F-15.
+- **Fitness (ARCHETYPE-2 — the matrix requires the FULL set `F-1..F-12, F-14..F-18`; `F-13` is n/a for
+  Arch-2). Every required gate is enumerated below with its Phase-A disposition per
+  `gates/archetype-gate-matrix.md`:**
+  - **F-1** Build/type-check → PASS: `run-deno-check.ts --root packages/queue --ext ts` (`--unstable-kv` for KV slices) per slice.
+  - **F-2** Helper-reinvention scan → PENDING_SCRIPT + manual evidence: no new helper duplicates `_envelope.ts` / `@netscript/kv`; the new DLQ stores wrap existing primitives (`PostgresQueueClient`, Redis `commands`, `WatchableKv`).
+  - **F-3** Public-surface review → PASS: 7 new exports reviewed (see jsr-audit section).
+  - **F-4** Inheritance audit → PENDING_SCRIPT + manual evidence: each `*DeadLetterStore` `implements DeadLetterStorePort<T>` — no deep class hierarchies introduced.
+  - **F-5** Slow-type / JSR doc-lint on the FULL export map → PASS with explicit return annotations (jsr-audit section).
+  - **F-6** JSR publishability → PASS: `deno task publish:dry-run` (queue) in the README slice.
+  - **F-7** Doc-score on new exports → PASS: doc comments on every new public symbol.
+  - **F-8** Lint → PASS: `run-deno-lint.ts` per slice.
+  - **F-9** Permission declaration check → PASS: README slice declares `--allow-read`/`--allow-write` for the KV path and network for Postgres/Redis (AP-19).
+  - **F-10** Test-shape (unit + failure-path) → PASS: testPlan covers 9 scenarios across all 5 adapters + regression.
+  - **F-11** Forbidden-folder lint → PASS + manual evidence: new files land in `ports/`, `adapters/`, `testing/` only — no `interfaces/`, no nested `src/` inside `packages/queue/` (AP-17; store ships under `ports/dead-letter.ts`).
+  - **F-12** Format → PASS: `run-deno-fmt.ts --root packages/queue --ext ts` per slice.
+  - **F-14** No stray `console.log` in shipped code → PASS: DLQ append routes through existing adapter logging / `TracedQueue`; gate explicitly selected to catch a stray log.
+  - **F-15** Package metadata/version integrity → PASS: no version-pin or catalog edits; `deno.json` only gains subpath exports.
+  - **F-16** Folder-cardinality lint → PENDING_SCRIPT + manual evidence: folder count under `packages/queue/` unchanged; new files added to existing folders (`ports`, `adapters`, `testing`).
+  - **F-17** Abstract-derived co-location → PASS: `DeadLetterStorePort<T>` (port) co-located in `ports/`; `Kv/Postgres/RedisDeadLetterStore` (derived) co-located in `adapters/`, matching doctrine §archetype-2.
+  - **F-18** Sub-barrel lint → PASS: existing `ports/mod.ts` + `adapters/mod.ts` + `mod.ts` barrels carry the new exports; if a new subpath export crosses a sub-barrel boundary, add the `arch:barrel-ok` justification line per existing convention.
 - Package: `deno task publish:dry-run` (queue) in the README slice.
 - **No `e2e:cli`** — no scaffold output changes.
 
