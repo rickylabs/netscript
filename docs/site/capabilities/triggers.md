@@ -77,6 +77,39 @@ processor entrypoint at <code>plugins/triggers/src/runtime/trigger-processor.ts<
 both as resources (<code>triggers-api</code> and <code>triggers</code>) when you <code>aspire run</code>.
 {{ /comp }}
 
+## File watchers
+
+File-based triggers use the same runtime idea as webhooks: detect an external
+event, normalize it, and hand durable work to the rest of the system. The
+watching primitive itself lives in [`@netscript/watchers`](/reference/watchers/),
+not in the Hono API service. Its 80% path is `createWatcher(options)`, which
+returns a `FileWatcher`; `watch()` is an async generator that yields normalized
+`WatchEvent` objects until you stop it or abort its signal.
+
+```ts
+import { createWatcher } from "@netscript/watchers";
+
+const watcher = createWatcher({
+  paths: ["./incoming"],
+  patterns: ["*.csv"],
+  events: ["create", "modify"],
+  stabilityThreshold: { checkIntervalMs: 1000, stableChecks: 3 },
+});
+
+for await (const event of watcher.watch()) {
+  console.log(`${event.kind}: ${event.path}`);
+}
+```
+
+The watcher selects the strategy for you: native OS notifications for local
+paths with polling fallback, polling for network paths, or polling immediately
+when `forcePolling: true` is set. Events pass through a filter pipeline before
+you see them: `GlobFilter` limits filenames, `StabilityFilter` waits for files
+to stop growing, and `DedupFilter` skips repeated content hashes within its
+window. The concrete `NativeStrategy`, `PollingStrategy`, and `HybridStrategy`
+classes are internal; construct watchers with `createWatcher` or `new
+FileWatcher(...)` instead.
+
 ## Author a trigger
 
 The simple case is one webhook that fans an inbound request out to a single job.

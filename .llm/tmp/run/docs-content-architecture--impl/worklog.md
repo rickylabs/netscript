@@ -1,5 +1,24 @@
 # Worklog — docs/content-architecture implementation
 
+## Step-6 item 1 — Watchers + config intent coverage — 2026-06-19
+
+**Ground truth read before editing.** Loaded `AGENTS.md`, harness/PR/tools/doctrine skills,
+`doc-architecture-v2.md` §4-§5, `ground-truth.md`, `ground-truth-project-anatomy.md`,
+`docs/architecture/doctrine/{01,02}-*.md`, `deno doc --quiet packages/watchers/mod.ts`, and
+`deno doc --quiet packages/config/mod.ts`.
+
+**Change.** Added a grounded `File watchers` subsection to
+`docs/site/capabilities/triggers.md` covering `createWatcher`, `FileWatcher.watch()`,
+`WatchEvent`, strategy auto-selection, `forcePolling`, and the glob/stability/dedup filter
+pipeline, with a link to `/reference/watchers/`. Added `Configuration records intent before
+runtime wiring` to `docs/site/explanation/architecture.md`, explaining
+`defineConfig`/`defineConfigAsync`, `loadConfig`/`initConfig`/`getConfig`, plugin partial
+config contributions, appsettings/Aspire wiring, and runtime-config overrides.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files.
+Known pre-existing highlighter diagnostics for `no-highlight`/`prisma` remained; item 3 owns
+that chrome fix. No `TemplateError` or `TransformError`.
+
 ## Phase 0a — chrome + components + landing (GREEN build) — 2026-06-19
 
 **Generator:** Stage-4 wave-1 dynamic workflow (5 agents: components, chrome, index,
