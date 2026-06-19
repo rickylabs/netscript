@@ -164,9 +164,9 @@ so it can stitch the telemetry into it for free.
 
 Aspire is the default and the recommended path, but it is not mandatory. The `init` command takes
 a `--no-aspire` flag (`netscript init my-app --no-aspire`) that **skips scaffolding the Aspire
-orchestration layer entirely**. No `aspire/` folder is generated, and the generated README's Quick
-Start no longer mentions `aspire run` — instead it starts the Fresh app directly with
-`deno task --cwd apps/<app> dev`.
+orchestration layer entirely**. No `aspire/` folder is generated, no AppHost is available to
+provision infrastructure, and there is no Aspire dashboard. Start the generated Deno processes
+directly and provide your own infrastructure connection strings.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -189,8 +189,7 @@ Postgres/Garnet provisioning</strong> (you bring and start your own infrastructu
 wiring</strong> — you become responsible for handing every process its connection strings and its
 neighbours' endpoints by hand. The <code>netscript db</code> commands lose the AppHost they
 provision through, so the database workflow becomes your responsibility against your own database
-URL. The CLI even enforces this: the generated <code>--no-aspire</code> README is verified to
-contain <em>no</em> <code>aspire run</code> mention.
+URL.
 {{ /comp }}
 
 **When opting out is the right call:**

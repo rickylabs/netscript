@@ -307,3 +307,40 @@ alpha-status badge, and footer GitHub edit-links (`base.vto`/components), in add
 docs items (watchers/config intent surfaces, `--no-aspire` verification). Recorded here per
 the harness "drift is explicit" + "confirm before expanding scope" rules. Reference/** and
 packages/**/plugins/**/catalog/version-pins/lock-files remain hard out-of-scope.
+
+---
+
+## Drift — Step-6 item 2 `--no-aspire` verification contradiction — 2026-06-19
+
+Severity: significant (verified CLI behavior contradicts generated scaffold copy and parts of the
+docs narrative).
+
+Step-6 item 2 verified the real CLI before editing docs:
+
+```bash
+deno run -A packages/cli/bin/netscript-dev.ts init --help
+deno run -A packages/cli/bin/netscript-dev.ts init no-aspire-app \
+  --path .llm/tmp/step6-no-aspire-verify \
+  --db postgres \
+  --service --service-name users --service-port 3001 \
+  --no-aspire --ci --yes --no-git --force --json
+```
+
+Facts observed:
+
+- `init --help` exposes `--no-aspire` as `Skip Aspire orchestration layer`.
+- The JSON result reports `"aspire":{"enabled":false,"legacy":false,"resourceCount":0}`.
+- The generated project has no `aspire/` directory, no root `aspire.config.json`, and no
+  `appsettings.json`.
+- The generated README still includes `appsettings.json` in the project tree and says
+  `Primary database: PostgreSQL (key postgres in appsettings.json). The Aspire orchestration layer
+  provisions it on aspire run — no manual container setup required.`
+- The JSON `nextSteps` still includes `# Postgres provisioned by Aspire (see "Databases" in
+  appsettings.json)`.
+
+This contradicts the docs/plan assumption that the `--no-aspire` README is verified and contradicts
+site copy that can say `--no-aspire` simply removes Aspire while preserving an otherwise coherent
+Postgres path. The flag does skip Aspire, but the generated no-Aspire scaffold's README/next steps
+are stale for database/appsettings behavior. Per the Step-6 brief, implementation stopped here for
+supervisor steering instead of guessing whether PR #59 should document the broken no-Aspire scaffold
+copy, narrow the docs claim to the verified flag/file shape only, or route a separate CLI fix.

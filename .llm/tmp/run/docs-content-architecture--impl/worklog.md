@@ -19,6 +19,39 @@ config contributions, appsettings/Aspire wiring, and runtime-config overrides.
 Known pre-existing highlighter diagnostics for `no-highlight`/`prisma` remained; item 3 owns
 that chrome fix. No `TemplateError` or `TransformError`.
 
+## Step-6 item 2 — `--no-aspire` verification stopped for drift — 2026-06-19
+
+**Verification commands.** Ran `deno run -A packages/cli/bin/netscript-dev.ts init --help` and a
+throwaway scaffold:
+
+```bash
+deno run -A packages/cli/bin/netscript-dev.ts init no-aspire-app \
+  --path .llm/tmp/step6-no-aspire-verify \
+  --db postgres \
+  --service --service-name users --service-port 3001 \
+  --no-aspire --ci --yes --no-git --force --json
+```
+
+**Finding.** `--no-aspire` exists and the JSON result reports `aspire.enabled:false` with
+`resourceCount:0`; the generated project has no `aspire/`, no root `aspire.config.json`, and no
+`appsettings.json`. However the generated README and JSON `nextSteps` still claim Postgres is
+provisioned by Aspire/appsettings. This contradicts the docs/plan assumption that no-Aspire scaffold
+copy is coherent and verified.
+
+**Steering + docs-site action.** Supervisor clarified item 2 is docs-site accuracy only and the
+CLI/scaffold-template README/nextSteps bug is out of scope for PR #59. Scanned `docs/site/**` for
+`--no-aspire`, no-Aspire, appsettings, and Postgres/Aspire passages. Most no-Aspire docs-site copy
+was already accurate: without Aspire, the user provisions Postgres/cache and supplies
+`POSTGRES_URI` / `DATABASE_URL`. One docs-site passage was wrong:
+`docs/site/explanation/aspire.md` claimed the generated `--no-aspire` README was verified and
+coherent. Removed that claim and narrowed the docs to the verified behavior: no `aspire/` AppHost,
+no dashboard, no automatic infrastructure provisioning, start Deno processes directly and supply
+your own connection strings.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Known
+pre-existing highlighter diagnostics for `no-highlight`/`prisma` remained; item 3 owns that chrome
+fix. No `TemplateError` or `TransformError`.
+
 ## Phase 0a — chrome + components + landing (GREEN build) — 2026-06-19
 
 **Generator:** Stage-4 wave-1 dynamic workflow (5 agents: components, chrome, index,
