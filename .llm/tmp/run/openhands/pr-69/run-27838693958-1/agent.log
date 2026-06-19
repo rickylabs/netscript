@@ -1,0 +1,400 @@
+independently \u2014 exit code 0.\n- **142 files generated**, all pages 
+rendered.\n- No Vento parse errors (\"no `function` keyword inside comp-tag 
+args\" check \u2014 no such additions).\n- Highlight.js unescaped-HTML warnings 
+are pre-existing baseline noise, not introduced by this PR (visible on 
+`docs/user-site` as well).\n\n### \u2705 4. Markdown fmt is clean\n- `deno fmt 
+--check docs/site/tutorials/index.md docs/site/how-to/index.md 
+docs/site/explanation/index.md docs/site/explanation/architecture.md 
+docs/site/explanation/plugin-model.md` \u2192 exit code 0, all 5 files 
+clean.\n\n### \u2705 5. Voice improvements are real\n- Consistent 
+technical-writer voice across all 5 pages.\n- Less mechanical Di\u00e1taxis 
+scaffolding (\"learning-oriented: hands-on lessons that take a newcomer\u2026\")
+replaced with direct voice (\"Tutorials are for learning by building.\").\n- 
+Headings preserved, all internal links preserved (verified by 
+inspection).\n\n### \u2139\ufe0f Known limitation (documented, acceptable)\nThe 
+worklog notes: \"Component-heavy Vento Markdown pages were left unchanged in the
+final diff because `deno fmt` rewrites component arguments into syntax the 
+Lume/Vento build cannot parse.\"\n\nThis is the stated acceptable limitation 
+\u2014 component pages need a component-aware formatter policy (a separate 
+workstream item). Not an evaluator concern for W3.\n\n---\n\n## Verdict\n\n| 
+Check | Result |\n|---|---|\n| Prose/structure only | \u2705 PASS |\n| No 
+`/rpc`/`/api/rpc` edits | \u2705 PASS |\n| No trigger `defer` / streams 
+`publish`/`subscribe` / task telemetry / Postgres queue adapter claims altered |
+\u2705 PASS |\n| No W4/W5/W6 scope creep | \u2705 PASS |\n| Lume docs build 
+green | \u2705 PASS (142 files, exit 0) |\n| Markdown fmt clean (touched files) 
+| \u2705 PASS (exit 0) |\n| Voice improvements real | \u2705 PASS |\n| Component
+pages left unchanged (documented limitation) | \u2139\ufe0f ACCEPTABLE 
+|\n\n**Verdict: PASS** \u2014 Merge-ready for W3.\n"}
+
+Reasoning:
+The user hasn't provided any new requests. Looking at the task, I've been 
+evaluating the W3 prose/structure PR and have gathered the evidence needed to 
+make a verdict. Let me now write the summary file with my evaluation results.
+
+From my analysis:
+
+**Files Changed:** 5 docs files only
+- docs/site/explanation/architecture.md
+- docs/site/explanation/index.md  
+- docs/site/explanation/plugin-model.md
+- docs/site/how-to/index.md
+- docs/site/tutorials/index.md
+
+**Verification Results:**
+
+1. **Capability-claim changes**: NONE FOUND
+   - No `/rpc`→`/api/rpc` or vice versa edits
+   - No altered status text for: trigger `defer`, streams `publish`/`subscribe`,
+task/polyglot telemetry, Postgres queue adapter
+   - References to workers/sagas/triggers/streams are all in *architectural 
+descriptions* of the plugin model, not capability status claims
+
+2. **W4/W5/W6 scope creep**: NONE FOUND
+   - No new chapters
+   - No tutorial restructure
+   - No xref/link-system work
+   - Same 5 tutorial lessons listed
+
+3. **Lume docs build**: **GREEN** ✅
+   - Build completed with exit code 0
+   - Generated 142 files
+   - Highlight.js warnings are pre-existing (not introduced by this PR)
+   - No Vento parse errors
+
+4. **Markdown formatting**: **PASS** ✅
+   - `deno fmt --check` passes on all 5 touched files
+
+5. **Voice improvements**: **REAL** ✅
+   - "Tutorials are **learning-oriented**: hands-on lessons..." → "Tutorials are
+for learning by building."
+   - More direct, less mechanical phrasing
+   - Better line wrapping (80 chars)
+   - Improved flow and clarity
+
+6. **Headings/links**: INTACT ✅
+   - All links preserved (how-to, reference, explanation, tutorials)
+   - All headings preserved (## The tutorial ladder, etc.)
+
+**Verdict: PASS**
+
+All criteria met. The work is prose/structure only, no forbidden changes, build 
+passes, voice is better.
+
+Thought:
+Let me now write the evaluation verdict to the output path:
+
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27838693958-1/summary.md"
+  file_text: 
+    # IMPL-EVAL — W3 Prose/Structure Pass (docs workstream)
+    
+    **Evaluator Session**: adversarial (separate from docs implementation)  
+    **Model**: claude-opus-4.6  
+    **Branch**: `docs/w3-prose-structure` (base: `docs/user-site`)  
+    **Verdict**: ✅ **PASS**
+    
+    ---
+    
+    ## Summary
+    
+    The PR contains a voice and structure pass on the user documentation (W3).  
+    5 docs files changed, ~150 insertions, ~100 deletions. All changes are prose
+rewrites and line-wrap normalization — exactly the stated scope.
+    
+    **Files touched:**
+    - `docs/site/explanation/architecture.md`
+    - `docs/site/explanation/plugin-model.md`
+    - `docs/site/explanation/index.md`
+    - `docs/site/how-to/index.md`
+    - `docs/site/tutorials/index.md`
+    
+    **No changes to:** capabilities pages, how-to subpages, tutorial subpages, 
+component/tag Markdown, reference docs, CLI, packages, plugins, tooling, or CI.
+    
+    ---
+    
+    ## Changes
+    
+    ### Prose improvements (voice)
+    | Before | After |
+    |---|---|
+    | "Tutorials are **learning-oriented**: hands-on lessons that take a 
+newcomer from nothing to a first working NetScript result." | "Tutorials are for
+learning by building." |
+    | "This page explains *how* the framework is shaped and *why* it is shaped 
+that way. It is understanding-oriented: read it to build a mental model, not to 
+follow steps." | "This page gives you the architectural model: how the packages 
+are shaped, why the boundaries matter, and what the rules are trying to 
+protect." |
+    | "How-to guides are **task-oriented**: focused recipes that walk you 
+through solving a specific, real-world problem with NetScript." | "How-to guides
+are for getting a specific job done." |
+    | "Contract first" is the workflow that the thesis implies." | ""Contract 
+first" is the workflow that follows from that thesis." |
+    
+    The voice shift is consistent and real: the docs read like technical 
+writing, not LLM output. Less meta, more direct. Good.
+    
+    ### Structural change
+    - Line wraps normalized to ~80 characters via `deno fmt`, improving 
+readability in source view.
+    
+    ### Stylistic change
+    - `*emphasis*` → `_emphasis_` (italic style consistency)
+    
+    ---
+    
+    ## Verification
+    
+    ### ✅ 1. No capability-claim changes
+    - No `/rpc`↔`/api/rpc` endpoint path edits anywhere in the diff.
+    - No altered status text for: trigger `defer`, streams 
+`publish`/`subscribe`, task/polyglot telemetry, Postgres queue adapter.
+    - The plugin-model.md mentions "workers", "sagas", "triggers", "streams" in 
+its plugin *architecture* descriptions ("a workers plugin contributes worker job
+definitions"). These are architectural framing of the plugin contribution model 
+— unchanged conceptually, only rewritten for flow. Not capability claims.
+    - All 5 files are index/overview pages, not the capability/feature pages 
+where status claims live.
+    
+    ### ✅ 2. No W4/W5/W6 scope creep
+    - No new chapters or pages added (`git diff --stat` shows only the 5 
+existing docs files).
+    - No tutorial restructure: same 5 lessons, same order, same slugs.
+    - No xref/link-system work introduced (no new tooling, components, or 
+templating changes).
+    
+    ### ✅ 3. Lume docs build is green
+    - `deno task build` ran independently — exit code 0.
+    - **142 files generated**, all pages rendered.
+    - No Vento parse errors ("no `function` keyword inside comp-tag args" check 
+— no such additions).
+    - Highlight.js unescaped-HTML warnings are pre-existing baseline noise, not 
+introduced by this PR (visible on `docs/user-site` as well).
+    
+    ### ✅ 4. Markdown fmt is clean
+    - `deno fmt --check docs/site/tutorials/index.md docs/site/how-to/index.md 
+docs/site/explanation/index.md docs/site/explanation/architecture.md 
+docs/site/explanation/plugin-model.md` → exit code 0, all 5 files clean.
+    
+    ### ✅ 5. Voice improvements are real
+    - Consistent technical-writer voice across all 5 pages.
+    - Less mechanical Diátaxis scaffolding ("learning-oriented: hands-on lessons
+that take a newcomer…") replaced with direct voice ("Tutorials are for learning 
+by building.").
+    - Headings preserved, all internal links preserved (verified by inspection).
+    
+    ### ℹ️ Known limitation (documented, acceptable)
+    The worklog notes: "Component-heavy Vento Markdown pages were left unchanged
+in the final diff because `deno fmt` rewrites component arguments into syntax 
+the Lume/Vento build cannot parse."
+    
+    This is the stated acceptable limitation — component pages need a 
+component-aware formatter policy (a separate workstream item). Not an evaluator 
+concern for W3.
+    
+    ---
+    
+    ## Verdict
+    
+    | Check | Result |
+    |---|---|
+    | Prose/structure only | ✅ PASS |
+    | No `/rpc`/`/api/rpc` edits | ✅ PASS |
+    | No trigger `defer` / streams `publish`/`subscribe` / task telemetry / 
+Postgres queue adapter claims altered | ✅ PASS |
+    | No W4/W5/W6 scope creep | ✅ PASS |
+    | Lume docs build green | ✅ PASS (142 files, exit 0) |
+    | Markdown fmt clean (touched files) | ✅ PASS (exit 0) |
+    | Voice improvements real | ✅ PASS |
+    | Component pages left unchanged (documented limitation) | ℹ️ ACCEPTABLE |
+    
+    **Verdict: PASS** — Merge-ready for W3.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.37M • cache hit 89.69% •  reasoning 4.11K • ↓ output 9.85K • $
+0.5214
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27838693958-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL — W3 Prose/Structure Pass (docs workstream)
+ 2|
++3|**Evaluator Session**: adversarial (separate from docs implementation)  
++4|**Model**: claude-opus-4.6  
++5|**Branch**: `docs/w3-prose-structure` (base: `docs/user-site`)  
++6|**Verdict**: ✅ **PASS**
++7|
++8|---
++9|
++10|## Summary
++11|
++12|The PR contains a voice and structure pass on the user documentation (W3).  
++13|5 docs files changed, ~150 insertions, ~100 deletions. All changes are prose
+rewrites and line-wrap normalization — exactly the stated scope.
++14|
++15|**Files touched:**
++16|- `docs/site/explanation/architecture.md`
++17|- `docs/site/explanation/plugin-model.md`
++18|- `docs/site/explanation/index.md`
++19|- `docs/site/how-to/index.md`
++20|- `docs/site/tutorials/index.md`
++21|
++22|**No changes to:** capabilities pages, how-to subpages, tutorial subpages, 
+component/tag Markdown, reference docs, CLI, packages, plugins, tooling, or CI.
++23|
++24|---
++25|
++26|## Changes
++27|
++28|### Prose improvements (voice)
++29|| Before | After |
++30||---|---|
++31|| "Tutorials are **learning-oriented**: hands-on lessons that take a 
+newcomer from nothing to a first working NetScript result." | "Tutorials are for
+learning by building." |
++32|| "This page explains *how* the framework is shaped and *why* it is shaped 
+that way. It is understanding-oriented: read it to build a mental model, not to 
+follow steps." | "This page gives you the architectural model: how the packages 
+are shaped, why the boundaries matter, and what the rules are trying to 
+protect." |
++33|| "How-to guides are **task-oriented**: focused recipes that walk you 
+through solving a specific, real-world problem with NetScript." | "How-to guides
+are for getting a specific job done." |
++34|| "Contract first" is the workflow that the thesis implies." | ""Contract 
+first" is the workflow that follows from that thesis." |
++35|
++36|The voice shift is consistent and real: the docs read like technical 
+writing, not LLM output. Less meta, more direct. Good.
++37|
++38|### Structural change
++39|- Line wraps normalized to ~80 characters via `deno fmt`, improving 
+readability in source view.
++40|
++41|### Stylistic change
++42|- `*emphasis*` → `_emphasis_` (italic style consistency)
++43|
++44|---
++45|
++46|## Verification
++47|
++48|### ✅ 1. No capability-claim changes
++49|- No `/rpc`↔`/api/rpc` endpoint path edits anywhere in the diff.
++50|- No altered status text for: trigger `defer`, streams 
+`publish`/`subscribe`, task/polyglot telemetry, Postgres queue adapter.
++51|- The plugin-model.md mentions "workers", "sagas", "triggers", "streams" in 
+its plugin *architecture* descriptions ("a workers plugin contributes worker job
+definitions"). These are architectural framing of the plugin contribution model 
+— unchanged conceptually, only rewritten for flow. Not capability claims.
++52|- All 5 files are index/overview pages, not the capability/feature pages 
+where status claims live.
++53|
++54|### ✅ 2. No W4/W5/W6 scope creep
++55|- No new chapters or pages added (`git diff --stat` shows only the 5 
+existing docs files).
++56|- No tutorial restructure: same 5 lessons, same order, same slugs.
++57|- No xref/link-system work introduced (no new tooling, components, or 
+templating changes).
++58|
++59|### ✅ 3. Lume docs build is green
++60|- `deno task build` ran independently — exit code 0.
++61|- **142 files generated**, all pages rendered.
++62|- No Vento parse errors ("no `function` keyword inside comp-tag args" check 
+— no such additions).
++63|- Highlight.js unescaped-HTML warnings are pre-existing baseline noise, not 
+introduced by this PR (visible on `docs/user-site` as well).
++64|
++65|### ✅ 4. Markdown fmt is clean
++66|- `deno fmt --check docs/site/tutorials/index.md docs/site/how-to/index.md 
+docs/site/explanation/index.md docs/site/explanation/architecture.md 
+docs/site/explanation/plugin-model.md` → exit code 0, all 5 files clean.
++67|
++68|### ✅ 5. Voice improvements are real
++69|- Consistent technical-writer voice across all 5 pages.
++70|- Less mechanical Diátaxis scaffolding ("learning-oriented: hands-on lessons
+that take a newcomer…") replaced with direct voice ("Tutorials are for learning 
+by building.").
++71|- Headings preserved, all internal links preserved (verified by inspection).
++72|
++73|### ℹ️ Known limitation (documented, acceptable)
++74|The worklog notes: "Component-heavy Vento Markdown pages were left unchanged
+in the final diff because `deno fmt` rewrites component arguments into syntax 
+the Lume/Vento build cannot parse."
++75|
++76|This is the stated acceptable limitation — component pages need a 
+component-aware formatter policy (a separate workstream item). Not an evaluator 
+concern for W3.
++77|
++78|---
++79|
++80|## Verdict
++81|
++82|| Check | Result |
++83||---|---|
++84|| Prose/structure only | ✅ PASS |
++85|| No `/rpc`/`/api/rpc` edits | ✅ PASS |
++86|| No trigger `defer` / streams `publish`/`subscribe` / task telemetry / 
+Postgres queue adapter claims altered | ✅ PASS |
++87|| No W4/W5/W6 scope creep | ✅ PASS |
++88|| Lume docs build green | ✅ PASS (142 files, exit 0) |
++89|| Markdown fmt clean (touched files) | ✅ PASS (exit 0) |
++90|| Voice improvements real | ✅ PASS |
++91|| Component pages left unchanged (documented limitation) | ℹ️ ACCEPTABLE |
++92|
++93|**Verdict: PASS** — Merge-ready for W3.
++94|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+## PASS
+
+**W3 voice + structure pass is merge-ready.**
+
+### Changes
+5 files touched — all index/overview pages for explanations, how-to guides, and 
+tutorials. Prose rewrites only, line-wrap normalized to ~80 chars by `deno fmt`,
+`*italic*` → `_italic_` consistency pass. ~150 insertions, ~100 deletions.
+
+### Verification (adversarial, independent)
+
+| Check | Result |
+|---|---|
+| Prose/structure only — no capability-claim changes | ✅ |
+| No `/rpc`↔`/api/rpc` path edits | ✅ |
+| No trigger `defer` / streams `publish`/`subscribe` / task telemetry / Postgres
+queue adapter status text altered | ✅ |
+| No W4/W5/W6 scope creep (no new chapters, tutorial restructure, or 
+xref/link-system work) | ✅ |
+| Lume docs build green | ✅ `deno task build` exit 0, 142 files generated |
+| Markdown fmt clean (touched files) | ✅ `deno fmt --check` exit 0 |
+| Voice improvements real | ✅ technical-writer voice, less mechanical |
+
+**Build warnings** (highlight.js unescaped-HTML) are pre-existing baseline — 
+confirmed present on `docs/user-site` and not introduced by this PR.
+
+### Known limitation (documented, acceptable)
+Component-heavy Vento Markdown pages were left unchanged because `deno fmt` 
+rewrites component-argument syntax into forms the Lume/Vento build cannot parse.
+This is a separate formatting-policy work item, not a W3 scope failure, and is 
+explicitly documented in the worklog.
+
+**Verdict: `PASS`**
+
+Tokens: ↑ input 1.45M • cache hit 90.07% •  reasoning 4.16K • ↓ output 10.29K • 
+$ 0.5451
+
