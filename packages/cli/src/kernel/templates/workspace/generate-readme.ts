@@ -146,7 +146,7 @@ export function generateReadme(options: ReadmeOptions): string {
     lines.push(
       `The \`${options.serviceName}\` service is an oRPC handler wired to ` +
         `\`contracts/versions/v1/${options.serviceName}.contract.ts\`. It exposes` +
-        ` \`${options.serviceName}.health.check\` via \`/rpc\` and a plain \`/health\` endpoint.`,
+        ` \`${options.serviceName}.health.check\` via \`/api/rpc\` and a plain \`/health\` endpoint.`,
     );
     lines.push('');
     lines.push(

@@ -190,6 +190,20 @@ Seeded from
 - **Gate:** F-6; close when `packages/plugin-triggers-core` dry-run passes without
   `--allow-slow-types`.
 
+## plugins/triggers — deferred trigger action scheduler missing
+
+- **Reason:** `DeferAction` models `kind: 'defer'` with an `until` timestamp, but the runtime has no
+  one-shot scheduler/replay port that can re-dispatch the processed trigger action later. S2 now
+  rejects the action through `TriggersError.unsupportedOperation` and DLQ instead of silently
+  dropping it.
+- **Owner:** Capability caveats follow-up.
+- **Target:** Before advertising deferred trigger action dispatch as supported.
+- **Linked plan:** `.llm/tmp/run/cap-s2-defer/brief.md`
+- **Created:** 2026-06-19
+- **Status:** open
+- **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
+  scheduler/replay port is designed.
+
 ## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
 
 - **Reason:** `task-executor.ts` needs supervisor/executor/dispatcher split.
@@ -350,6 +364,24 @@ Seeded from
 - **Gate:** F-14, AP-13; close when `DurableStreamProducer` emits through a structured reporter and
   `console.warn` is absent from
   `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
+
+## plugins/streams — durable topic publish/subscribe transport deferred
+
+- **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
+  Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
+  `createDurableStream`, which publishes State Protocol upsert/delete events through
+  `@durable-streams/client`; it does not expose a generic topic consumer/subscriber channel that can
+  deliver `StreamTopicDefinition<TPayload>` payloads. Building that durable topic transport requires
+  a new cross-package runtime contract and consumer SDK, which exceeds the S3 M-sized slice. S3
+  replaced the silent no-op helper behavior with typed unsupported-operation failures.
+- **Owner:** `@netscript/plugin-streams` / `@netscript/plugin-streams-core` maintainers.
+- **Target:** Runtime transport rescope before advertising generic plugin topic publish/subscribe.
+- **Linked plan:** `.llm/tmp/run/cap-s3-streams/brief.md`.
+- **Created:** 2026-06-19
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when a real durable topic transport exists with producer delivery, consumer
+  subscription/unsubscribe semantics, and runtime tests proving a published payload reaches a
+  subscribed handler without relying on manifest-layer no-ops.
 
 ## packages/watchers — AP-13 console.warn runtime reporting
 

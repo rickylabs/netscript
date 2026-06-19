@@ -162,6 +162,7 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db generate');
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db seed');
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db status');
+  assertStringIncludes(md, '`users.health.check` via `/api/rpc`');
   assert(!md.includes('dotnet run'), 'TS AppHost README should not mention dotnet run');
 });
 

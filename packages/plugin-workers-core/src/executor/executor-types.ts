@@ -1,3 +1,5 @@
+import type { WorkerTelemetryStatus } from '../telemetry/mod.ts';
+
 /** Worker task runtime identifier supported by built-in adapters. */
 export type TaskType =
   | 'cmd'
@@ -121,7 +123,8 @@ export type TaskInstrumentationLike = Readonly<{
     span: TaskInstrumentationSpan,
     context: Readonly<{
       correlationId?: string;
-      status: string;
+      durationMs?: number;
+      status: WorkerTelemetryStatus;
       taskId: string;
     }>,
   ): void;
