@@ -1,0 +1,400 @@
++53|  - `stream-api.ts:28` empty publish and `:43` no-op unsubscribe confirmed.
++54|  - `create-durable-stream.ts:118` drops writes when `#connectError` set; 
+`:222` flush throws
++55|    (plan cites `:118`; `:222` is the secondary cite).
++56|  - `multi-runtime-task-executor.ts:147` in-memory `TaskExecutorSpan` 
+confirmed; reusable
++57|    `traceJobExecution` exists at 
+`packages/telemetry/src/instrumentation/worker.ts:202`.
++58|  - `create-queue.ts:221` rejects `QueueProvider.Postgres` with 
+`QueueConfigurationError`.
++59|- Confirmed doctrinal posture: `packages/queue` is already an `AP-16` debt 
+entry (mod.ts
++60|  shape) but does not overlap with S5 (Postgres adapter implementation). No 
+debt collisions.
++61|- Confirmed no overlapping open work for S3 in the run dir 
+(`DurableStreamConsumer` does
++62|  not yet exist in `packages/plugin-streams-core`); S3's plan self-flags 
+this with a
++63|  STOP-and-rescope escape hatch, which is appropriate and not a plan-gate 
+blocker.
++64|
++65|## Responses to review comments or issue comments when relevant
++66|
++67|The trigger is a `@openhands-agent ... run PLAN-EVAL` issue comment on PR 
+#65. The PR-comment
++68|output_mode means the workflow will post the verdict on the PR/issue. This 
+evaluator did not
++69|post the comment itself (per the operational contract: "Do not post GitHub 
+issue or PR
++70|comments directly. The workflow owns GitHub comments."). The verdict lives 
+in
++71|`.llm/tmp/run/fix-capability-caveats--w2fixes/plan-eval.md` and is 
+summarised here.
++72|
++73|No existing PR review-thread comments require reply 
+(`output_mode=pr-comment` does not
++74|imply `thread-replies`), so no `replies.json` was written.
++75|
++76|## Remaining risks
++77|
++78|- **S3 consumer scope risk (evaluator-flagged, plan-permitted).** 
+`defineStreamConsumer()
++79|  .subscribe` requires a real `DurableStreamConsumer` to satisfy the 
+integration-test
++80|  acceptance gate "publish to a topic → consumer receives". No such class 
+currently exists
++81|  in `packages/plugin-streams-core`. The plan permits either (a) introduce a
++82|  `DurableStreamConsumer` behind the existing 
+`StreamProducerPort`/`StreamConsumerPort`
++83|  interface, or (b) rescind S3 to "wire producer only, document consumer as 
+future work" and
++84|  add a debt entry under `.llm/harness/debt/arch-debt.md`. The IMPL-EVAL 
+pass will need to
++85|  enforce one of those paths. This is **not** a plan-gate blocker because 
+the plan already
++86|  self-flags it with "If the transport surface is larger than this plan 
+implies, STOP and
++87|  rescope (record in drift.md)."
++88|
++89|- **S2 defer semantics.** The plan leaves "implement vs reject-and-debt" 
+open with a
++90|  preference for implement given `DeferAction.until` and 
+`EnqueueOptions.delay`. IMPL-EVAL
++91|  will resolve in-place; not a re-doer if deferred.
++92|
++93|- **S5 dep review.** If maintainer review rejects the proposed Postgres dep,
+IMPL-EVAL must
++94|  fall back to debt entry and document Postgres as future work — already 
+accommodated by
++95|  the plan's catalog-only / do-not-de-catalog framing.
++96|
++97|- **Plan-cited line offsets are slightly stale.** `init-orchestrator.ts:112`
+→ `:120` and
++98|  `generate-readme.ts:140` → `:149` in current `main` (drift of +8 / +9 
+lines). Drift on
++99|  the cite numbers but not on the cited strings — references remain 
+unambiguous and the
++100|  drift does not change the verdict.
++101|
++102|- **Catalog/Option-A/LD-7 are vacuously compliant.** No slice touches 
+catalog/version pins/
++103|  lock files; S1 explicitly states "deno.lock unchanged." The plan's 
+compliance posture is
++104|  correct but relies on IMPL passes honouring the same constraints during 
+implementation.
++105|
++106|This evaluation did not run any implementation, deno check, deno test, 
+scaffold runtime
++107|E2E, or other runtime gates — per the protocol, IMPL-EVAL owns those.
++108|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm deliverables on disk
+
+$ ls -la /home/runner/work/_temp/openhands/27830366220-1/ 
+/home/runner/work/netscript/netscript/.llm/tmp/run/fix-capability-caveats--w2fix
+es/; echo "---wc---"; wc -l 
+/home/runner/work/_temp/openhands/27830366220-1/summary.md 
+/home/runner/work/netscript/netscript/.llm/tmp/run/fix-capability-caveats--w2fix
+es/plan-eval.md
+
+Tokens: ↑ input 11.59M • cache hit 95.17% •  reasoning 6.37K • ↓ output 70.35K •
+$ 0.9142
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+/home/runner/work/_temp/openhands/27830366220-1/:
+total 1332
+drwxr-xr-x 2 runner runner    4096 Jun 19 14:41 .
+drwxr-xr-x 3 runner runner    4096 Jun 19 14:04 ..
+-rw-r--r-- 1 runner runner 1322679 Jun 19 14:41 agent.log
+-rw-r--r-- 1 runner runner       2 Jun 19 14:04 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner    2055 Jun 19 14:04 bootstrap.log
+-rw-r--r-- 1 runner runner    5647 Jun 19 14:04 issue-comments.json
+-rw-r--r-- 1 runner runner       3 Jun 19 14:04 pr-review-comments.json
+-rw-r--r-- 1 runner runner    3444 Jun 19 14:04 request.md
+-rw------- 1 runner runner    6550 Jun 19 14:41 summary.md
+
+/home/runner/work/netscript/netscript/.llm/tmp/run/fix-capability-caveats--w2fix
+es/:
+total 36
+drwxr-xr-x  3 runner runner  4096 Jun 19 14:40 .
+drwxr-xr-x 42 runner runner  4096 Jun 19 14:04 ..
+drwxr-xr-x  2 runner runner  4096 Jun 19 14:04 audit
+-rw-------  1 runner runner 15679 Jun 19 14:40 plan-eval.md
+-rw-r--r--  1 runner runner  7126 Jun 19 14:04 plan.md
+---wc---
+  107 /home/runner/work/_temp/openhands/27830366220-1/summary.md
+  113 
+/home/runner/work/netscript/netscript/.llm/tmp/run/fix-capability-caveats--w2fix
+es/plan-eval.md
+  220 total
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify git state unchanged
+
+Thought:
+Both deliverables exist. Now let me confirm git state — the operational contract
+says uncommitted workspace files are committed back automatically. No code was 
+edited.
+
+$ cd /home/runner/work/netscript/netscript && git status --short 2>&1 | head 
+-20; echo "---branch:---"; git branch --show-current 2>/dev/null; echo "---log 
+(short):---"; git --no-pager log -1 --oneline 2>/dev/null
+
+Tokens: ↑ input 11.63M • cache hit 95.18% •  reasoning 6.37K • ↓ output 70.5K • 
+$ 0.9168
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+M .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+ M .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+ M .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+ M .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+ M deno.lock
+?? .llm/tmp/run/fix-capability-caveats--w2fixes/plan-eval.md
+?? .llm/tmp/run/openhands/pr-65/
+---branch:---
+fix/cap-caveats-plan
+---log (short):---
+17e59271 (HEAD -> fix/cap-caveats-plan, origin/fix/cap-caveats-plan) 
+chore(harness): capability-caveats fix-track plan + W2 audit evidence
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Condensation ───────────────────────────────────────────────────────────────────
+
+Auto Conversation Condensation Triggered.
+Forgetting 43 events
+
+[Summary of Events Being Forgotten]
+USER_CONTEXT: PLAN-EVAL evaluation (separate session) for "Capability Caveats 
+Fix Track (W2)" plan. Run-id: `fix-capability-caveats--w2fixes`, base `main`, 
+branch family `fix/cap-caveat-*`. Source of truth: 
+`.llm/tmp/run/docs-v2-audit/{capability-truth-matrix,caveats-and-gaps,missing-an
+d-miscategorized}.md`. Verdict required: PASS (or user waiver) before 
+implementation per `gates/plan-gate.md`. 5 real W2 caveats to fix in code (not 
+document-as-limitation). Implementation order after PASS: S1 → S2 → S4 → S5 → 
+S3.
+
+TASK_TRACKING:
+- PLAN-EVAL: in progress (verdict not yet rendered)
+- Verdict options: PASS / FAIL_PLAN (per `evaluator/verdict-definitions.md`)
+
+COMPLETED:
+- Read `gates/plan-gate.md`, `evaluator/plan-protocol.md`, 
+`evaluator/verdict-definitions.md`, plan template, plan header
+- Verified S1 code refs: `rpcPath = options?.rpcPath ?? '/api/rpc'` in 
+`service-rpc.ts:41` (plan cite correct); CLI drift sites at 
+`init-orchestrator.ts:120` (plan says 112, off by 8) and 
+`generate-readme.ts:149` (plan says 140, off by 9) — both real
+- Verified S2: `EnqueueOptions.delay?: number` exists in `envelope.ts`; defer 
+implementable via existing delay contract
+- Verified S3/S3a: `DurableStreamProducer` drain-on-connect logic confirmed
+- Verified S4: in-memory `TaskExecutorSpan` + `toTelemetryStatus` confirmed
+- Verified S5: QueueProvider switch (RabbitMQ/Redis/DenoKv) confirmed
+
+PENDING:
+- Render Plan-Gate checklist (PASS/FAIL per item) with evidence locations
+- Verify remaining plan claims (line-number drift noted for S1; need full 
+reconciliation)
+- Confirm research/worklog sourcing (no `research.md` or `worklog.md` in run dir
+— plan header indicates sources; need to cite accordingly)
+- Output final PLAN-EVAL verdict using `evaluator/plan-protocol.md` template
+
+CURRENT_STATE:
+- CWD: `/home/runner/work/netscript/netscript`
+- Plan: `.llm/tmp/run/fix-capability-caveats--w2fixes/plan.md` (read header + 
+line 100)
+- 5 slices (S1..S5) all structurally sound per code spot-checks; only minor 
+line-number drift in S1
+- LD-7 doctrine (CLI publishes last) not in local checkout but invoked 
+consistently with standard CLI archetype ordering
+
+CODE_STATE:
+- `packages/service/src/builder/service-rpc.ts`: `wireRpc()` with default 
+`rpcPath = '/api/rpc'`
+- `packages/cli/src/kernel/application/scaffold/init-orchestrator.ts:120`: stale
+`/rpc` doc string
+- `packages/cli/src/kernel/templates/workspace/generate-readme.ts:149`: stale 
+`/rpc` doc string
+- `packages/worker/.../envelope.ts`: `EnqueueOptions.delay?: number` contract 
+present
+- `packages/worker/.../durable-stream-producer.ts`: drain-on-connect logic 
+present
+- `packages/worker/.../telemetry.ts`: in-memory `TaskExecutorSpan` + 
+`toTelemetryStatus` mapping
+- `packages/queue/.../`: adapters for RabbitMQ, Redis, DenoKv
+
+VERSION_CONTROL_STATUS:
+- Base: `main`
+- Branch family: `fix/cap-caveat-*` (one branch per slice post-PASS)
+- No commits yet (pre-implementation gate)
+
+
+Tokens: ↑ input 11.63M • cache hit 95.15% •  reasoning 6.65K • ↓ output 71.6K • 
+$ 0.9193
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final consistency check
+
+Thought:
+The branch is `fix/cap-caveats-plan` (the planning branch) — not `main`. The 
+other modified files are pre-existing harness state (other PRs' request.md 
+files) and a pre-existing `deno.lock` change; not from this run. The only new 
+file from this evaluator session is 
+`.llm/tmp/run/fix-capability-caveats--w2fixes/plan-eval.md`. No code, plan, 
+manifest, or lock files were modified by this evaluator session.
+
+Final consistency check:
+
+$ cd /home/runner/work/netscript/netscript && git diff --stat HEAD 2>&1 | head 
+-10; echo "---untracked only this run:---"; git status --short --porcelain 2>&1 
+| grep -v "^.M \.llm/tmp/run/openhands/pr-" | grep -v "^.M deno.lock"
+
+Tokens: ↑ input 11.66M • cache hit 95.01% •  reasoning 6.65K • ↓ output 71.84K •
+$ 0.9254
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 
+'.llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md', CRLF will be 
+replaced by LF the next time Git touches it
+ .../openhands/pr-17/run-27493382997-1/request.md   |  54 ++--
+ .../openhands/pr-25/run-27305429810-1/request.md   |   4 +-
+ .../openhands/pr-32/run-27433712260-1/request.md   |  10 +-
+ .../openhands/pr-35/run-27454103300-1/request.md   |   4 +-
+---untracked only this run:---
+?? .llm/tmp/run/fix-capability-caveats--w2fixes/plan-eval.md
+?? .llm/tmp/run/openhands/pr-65/
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Rendered PASS verdict for W2 capability-caveats plan
+
+Thought:
+The only new file this run produced is `plan-eval.md`. The `pr-65/` directory is
+the run trace owned by the workflow harness.
+
+Finish with message:
+PLAN-EVAL verdict: **PASS** for `fix-capability-caveats--w2fixes` (Capability 
+Caveats Fix Track W2).
+
+**Deliverables produced (read-only plan review — no code, plan, manifest, or 
+lock file modified):**
+
+- `.llm/tmp/run/fix-capability-caveats--w2fixes/plan-eval.md` — full PLAN-EVAL 
+report (checklist, evidence spot-check, per-slice risk notes, open-decision 
+sweep, sequencing evaluation, doctrine-compliance posture, verdict).
+- `/home/runner/work/_temp/openhands/27830366220-1/summary.md` — run summary at 
+the workflow path.
+
+**Plan-Gate checklist: every box satisfied.**
+
+| Item | Result | Notes |
+| --- | --- | --- |
+| Research current | PASS | Audit directory 
+(`capability-truth-matrix`/`caveats-and-gaps`/`missing-and-miscategorized`) is 
+re-baselined against current `main`. All 11 cited code lines verified against 
+current `main` (see table in `plan-eval.md`). |
+| Decisions locked | PASS | S2's "implement vs reject" is contract-gated by 
+`DeferAction.until` and `EnqueueOptions.delay`, resolvable in-place by 
+IMPL-EVAL. |
+| Open-decision sweep | PASS | No deferred decision forces rework; S3's larger 
+consumer surface is self-flagged with STOP-and-rescope. |
+| Slice count (<30, gate+files) | PASS | 5 slices, each names files and gate. |
+| Risk register | PASS | Per slice; mitigations named. |
+| Gate set selected | PASS | Correctly mapped to mixed Archetype 1/2/6 + plugin 
+runtime. |
+| Deferred scope explicit | PASS | catalog/version-pin/lock and LD-7 constraints
+respected; S1 tutorial line deferred to W3 with owner. |
+| jsr-audit | N/A | Fix-track, no public-surface grow, no JSR publish. |
+
+**Key spot-check findings:**
+
+- S1 evidence is real: `rpcPath = options?.rpcPath ?? '/api/rpc'` in 
+`service-rpc.ts:36` (plan cites `:41` — same statement, one line after the 
+`??`); CLI template drift sources confirmed at `init-orchestrator.ts:120` and 
+`generate-readme.ts:149` (plan cites 112/140 — line offset drift of +8/+9, but 
+the cited strings are unambiguously the wrong `/rpc`).
+- S2 is contract-feasible: `DeferAction = Readonly<{ kind: 'defer'; until: 
+string }>` at `domain/trigger-action.ts:29-35` + `EnqueueOptions.delay?: number`
+at `message-queue.ts:120` together enable an implementable schedule-on-delay 
+path.
+- S3 evidence is real on the producer side (drop-on-connect at 
+`create-durable-stream.ts:118`, throw-on-flush at `:222`). **However**: no 
+`DurableStreamConsumer` currently exists in `packages/plugin-streams-core` 
+(`grep -rn "DurableStreamConsumer" packages/plugin-streams-core/src/` → no 
+matches). S3's plan already self-flags this with "If the transport surface is 
+larger than this plan implies, STOP and rescope (record in drift.md)." IMPL-EVAL
+will need to either (a) introduce a `DurableStreamConsumer` behind the existing 
+port interface, or (b) rescind S3 to "wire producer only, document consumer as 
+future work" and add a debt entry. The plan permits either path — not a 
+plan-gate blocker.
+- S4 evidence is real: in-memory `TaskExecutorSpan` at 
+`multi-runtime-task-executor.ts:147`; reusable `traceJobExecution` at 
+`packages/telemetry/src/instrumentation/worker.ts:202`.
+- S5 evidence is real: `create-queue.ts:221` rejects `QueueProvider.Postgres` 
+with `QueueConfigurationError`. Catalog-only / do-not-de-catalog framing is 
+correct.
+
+**Sequencing evaluation:** `S1 → S2 → S4 → S5 → S3` is correct — cheap + 
+observable first, S3 (transport service + new consumer) last. No anti-patterns.
+
+**Doctrine / constraint compliance:** No catalog/version-pin/lock changes except
+a reviewed S5 dep (compliant — vacuously held for S1–S4). Option-A catalog law 
+holds vacuously. LD-7 (CLI publishes last) and "No JSR publish here" are 
+explicit. S1 enforces "deno.lock unchanged." Contract-first holds for S2 (defer 
+contract), S3 (existing port interface), S4 (existing tracer), S5 (existing 
+provider selector). Drift is explicit (S3 STOP-and-rescope).
+
+Implementation may begin under the plan's sequencing, one branch off `main` per 
+slice, with PLAN-EVAL closing this gate. The IMPL-EVAL pass owns runtime 
+validation; this evaluator did not run any implementation, deno check/test, 
+scaffold runtime, or other runtime gates.
+
+Per the operational contract, this evaluator did not post any GitHub PR/issue 
+comments directly — the workflow owns those. No `replies.json` was written 
+(output_mode is `pr-comment`, not `thread-replies`).
+
+Tokens: ↑ input 11.69M • cache hit 95.02% •  reasoning 6.65K • ↓ output 73.03K •
+$ 0.9286
+
