@@ -43,5 +43,7 @@ export {
   type StreamsTelemetryContribution,
   type StreamTopicContribution,
   type StreamTopicDefinition,
+  StreamUnsupportedOperationError,
   type TelemetryContribution,
+  unsupportedStreamOperation,
 } from './src/public/mod.ts';
