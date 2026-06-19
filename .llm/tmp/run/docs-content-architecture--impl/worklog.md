@@ -69,6 +69,16 @@ output contained no `Unknown language`, no `Could not find the language`, no
 `Falling back to no-highlight`, and no `Error highlighting code block` diagnostics. Root
 `deno.lock` was restored after Deno inspection touched it; no lockfile changes remain.
 
+## Step-6 item 4 — Alpha status badge — 2026-06-19
+
+**Change.** Added a small `Alpha` badge to the shared topbar in
+`docs/site/_includes/layouts/base.vto`, using the existing `ns-badge ns-badge--muted` class and
+the existing cluster layout. No CSS or component changes were needed.
+
+**Build evidence.** `deno task --cwd docs/site build` exited 0 and generated 148 files. Verified
+the generated landing page and a generated doc page include
+`<span class="ns-badge ns-badge--muted" title="NetScript is alpha software">Alpha</span>`.
+
 ## Phase 0a — chrome + components + landing (GREEN build) — 2026-06-19
 
 **Generator:** Stage-4 wave-1 dynamic workflow (5 agents: components, chrome, index,
