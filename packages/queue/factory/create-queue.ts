@@ -10,7 +10,7 @@
  * @module
  */
 
-import { getServiceUrl, isServiceAvailable } from '@netscript/sdk/discovery';
+import { getPostgresUri, getServiceUrl, isServiceAvailable } from '@netscript/sdk/discovery';
 import { getRedisConnectionFromEnv } from '@netscript/kv';
 import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
 import { KvPollingAdapter } from '../adapters/kv-polling.adapter.ts';
@@ -219,13 +219,7 @@ function createQueueFactory<T>(
     case QueueProvider.DenoKv:
       return () => Promise.resolve(createDenoKvQueue<T>(name, connection));
     case QueueProvider.Postgres:
-      return () =>
-        Promise.reject(
-          new QueueConfigurationError(
-            'PostgreSQL queue adapter not yet implemented',
-            { provider },
-          ),
-        );
+      return () => createPostgresQueue<T>(name, connection);
     default:
       return () =>
         Promise.reject(
@@ -244,7 +238,8 @@ function getNativeRetrial(
     return !isKvConnect(kvPath);
   }
 
-  return provider === QueueProvider.Redis || provider === QueueProvider.RabbitMQ;
+  return provider === QueueProvider.Redis || provider === QueueProvider.RabbitMQ ||
+    provider === QueueProvider.Postgres;
 }
 
 /**
@@ -325,4 +320,27 @@ async function createRabbitMqQueue<T>(
   const queueName = connection?.rabbitmq?.queueName ?? name;
   const { AmqpAdapter } = await import('../adapters/amqp.adapter.ts');
   return new AmqpAdapter<T>(url, queueName);
+}
+
+/**
+ * Create PostgreSQL queue instance.
+ */
+async function createPostgresQueue<T>(
+  name: string,
+  connection?: QueueOptions['connection'],
+): Promise<MessageQueue<T>> {
+  const url = connection?.postgres?.url ?? getPostgresUri();
+
+  if (!url) {
+    throw new QueueConnectionError(
+      'PostgreSQL connection not found. Expected postgres connection options or Aspire PostgreSQL environment variables',
+    );
+  }
+
+  const { PostgresAdapter } = await import('../adapters/postgres.adapter.ts');
+  return new PostgresAdapter<T>({
+    url,
+    queueName: name,
+    tableName: connection?.postgres?.tableName,
+  });
 }
