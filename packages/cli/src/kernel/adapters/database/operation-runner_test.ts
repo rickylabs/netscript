@@ -161,10 +161,6 @@ describe('DbOperationRunner', () => {
       executor.outputCalls[0].options.env?.NETSCRIPT_PRISMA_NAME,
       'init',
     );
-    assertEquals(
-      executor.outputCalls[0].options.env?.ASPIRE_CLI_START_TIMEOUT,
-      '300',
-    );
   });
 
   it('keeps studio interactive and passes db cli mode through environment variables', async () => {

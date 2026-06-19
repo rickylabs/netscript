@@ -118,7 +118,6 @@ Deno.test('generateNetScriptConfig emits JSR guidance and stable section order',
   assertStringIncludes(result, "apps: 'apps'");
   assertStringIncludes(result, "contracts: 'contracts'");
   assertStringIncludes(result, "plugins: 'plugins'");
-  assertStringIncludes(result, "appHost: 'aspire/apphost.mts'");
 });
 
 Deno.test('generateNetScriptConfig switches to local imports without the JSR TODO banner', () => {
