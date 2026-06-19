@@ -35,3 +35,11 @@ Backlog for IMPL-EVAL / Codex pass: highlight-plugin plaintext registration (_co
 tutorials/getting-started.md retirement + tutorials/index.md relink; completeness-critic items
 (watchers/config intent surfaces, --no-aspire CLI verification, alpha badge, footer edit-links).
 -->
+
+<!-- Step-6 WSL Codex polish-to-bar (thread 019edf0f-d9e6-7a12-aa97-e2fd94ab0e01), build green per slice -->
+- f7a7e6be: docs(site): surface watchers and config intent
+- 21531a34: docs(site): ground no-aspire docs behavior
+- 2710e238: fix(site): register plaintext highlighter aliases
+- a2aa9b0b: feat(site): show alpha status in docs chrome
+- e049cd86: feat(site): add GitHub edit links
+- 445bfb13: chore(harness): record Step-6 completion

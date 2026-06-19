@@ -138,3 +138,13 @@ future packages/cli PR.
 
 **Final slice evidence.** The last per-item build was item 5:
 `deno task --cwd docs/site build` exited 0 and generated 148 files.
+
+## Step-6 — supervisor dispatch proof + reconciliation (2026-06-19)
+
+- **Mobile-visible Codex thread:** `019edf0f-d9e6-7a12-aa97-e2fd94ab0e01` (turn `019edf0f-daaa-7962-88bb-81e487fc9957`)
+- **Daemon proof:** managed `codex app-server --remote-control --listen unix://` (user `codex`, PID 84476), status `running`, socket `/home/codex/.codex/app-server-control/app-server-control.sock`, v0.141.0
+- **Native worktree:** `/home/codex/repos/netscript-docs-content-arch` (branch `docs/content-architecture`, SSH remote)
+- **Launch:** `codex debug app-server send-message-v2` (single send); **steer:** `codex exec resume 019edf0f-d9e6-7a12-aa97-e2fd94ab0e01 "<follow-up>"`
+- **Steering event:** item 2 hit a real CLI/scaffold contradiction → Codex BLOCKED_FOR_STEERING per brief → supervisor steered: fix docs-site copy only; the `packages/cli` scaffold `--no-aspire` README/nextSteps Postgres-via-Aspire bug is DEFERRED to a separate CLI-fix PR (recorded in drift.md).
+- **Result:** all 5 items green (build exit 0, 148 files per slice), pushed to `445bfb13`, not merged.
+- **commits.md reconciled** by supervisor (Codex omitted the Step-6 commit lines).
