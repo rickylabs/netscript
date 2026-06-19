@@ -21,15 +21,16 @@
       >{{ tab.label }}</button>
     {{ /for }}
   </div>
-  {{ for index, tab of items }}
-    <div
-      class="ns-tabbed__panel"
-      role="tabpanel"
-      id="{{ gid }}-panel-{{ index }}"
-      aria-labelledby="{{ gid }}-tab-{{ index }}"
-      tabindex="0"
-    >
-      <pre><code class="language-{{ tab.lang }}">{{ tab.code }}</code></pre>
-    </div>
-  {{ /for }}
+{{ for index, tab of items }}
+{{ set code = (tab.code || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
+<div
+  class="ns-tabbed__panel"
+  role="tabpanel"
+  id="{{ gid }}-panel-{{ index }}"
+  aria-labelledby="{{ gid }}-tab-{{ index }}"
+  tabindex="0"
+>
+<pre><code class="language-{{ tab.lang }}">{{ code }}</code></pre>
+</div>
+{{ /for }}
 </div>
