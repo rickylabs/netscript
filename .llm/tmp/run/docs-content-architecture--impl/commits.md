@@ -12,6 +12,9 @@
 - 55a6e734: docs(site): author Resources (glossary, cli-reference)
 - 6fee2e33: docs(site): wire nav contract + fix landing-page dead links
 - 47755efd: chore(harness): embed page inventory in doc-site authoring workflow
+- 9687f97f: chore(harness): record Step-4 authoring wave + build-gate reconciliation
+- 0821adf5: chore(openhands): record run trace 27812125012-1 (IMPL-EVAL minimax-m3)
+- 05f04513: docs(site): retire stale getting-started tutorial; relink index to the 5-rung ladder
 
 <!--
 Step-4 authoring wave: 27 pages authored via Claude workflow (run wtdd6daob, 27/27 authored,
