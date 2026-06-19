@@ -83,6 +83,14 @@ function addDatabaseSteps(steps: string[], dbCommand: string): void {
   steps.push(`${dbCommand} generate`);
   steps.push(`${dbCommand} seed`);
 }
+
+function databaseEnvVar(dbEngine: ValidatedInitOptions['dbEngine']): string {
+  if (dbEngine === 'postgres') return 'POSTGRES_URI';
+  if (dbEngine === 'mysql') return 'MYSQL_URI';
+  if (dbEngine === 'mssql') return 'MSSQL_URI';
+  return 'DATABASE_URL';
+}
+
 export function initNextSteps(options: ValidatedInitOptions): string[] {
   const steps: string[] = [`cd ${options.name}`];
   const dbCommand = options.importMode === 'local'
@@ -113,7 +121,12 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
   }
   if (options.dbEngine !== 'none') {
     const engineLabel = options.dbEngine.charAt(0).toUpperCase() + options.dbEngine.slice(1);
-    steps.push(`# ${engineLabel} provisioned by Aspire (see "Databases" in appsettings.json)`);
+    if (options.noAspire) {
+      const envVar = databaseEnvVar(options.dbEngine);
+      steps.push(`# Provision ${engineLabel} yourself and set ${envVar} or DATABASE_URL`);
+    } else {
+      steps.push(`# ${engineLabel} provisioned by Aspire (see "Databases" in appsettings.json)`);
+    }
   }
   return steps;
 }

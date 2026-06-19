@@ -35,6 +35,13 @@ const ENGINE_LABELS: Record<Exclude<DbEngineChoice, 'none'>, string> = {
   sqlite: 'SQLite',
 };
 
+const ENGINE_ENV_VARS: Record<Exclude<DbEngineChoice, 'none'>, string> = {
+  postgres: 'POSTGRES_URI',
+  mysql: 'MYSQL_URI',
+  mssql: 'MSSQL_URI',
+  sqlite: 'DATABASE_URL',
+};
+
 /**
  * Generate the `README.md` contents for a newly scaffolded project.
  *
@@ -91,7 +98,9 @@ export function generateReadme(options: ReadmeOptions): string {
     lines.push('│   ├── .aspire/      # Aspire SDK modules (aspire restore output)');
     lines.push('│   └── package.json  # tsx + vscode-jsonrpc (isolated from the Deno workspace)');
   }
-  lines.push('├── appsettings.json  # NetScript infrastructure config (Services/Databases/…)');
+  if (!options.noAspire) {
+    lines.push('├── appsettings.json  # NetScript infrastructure config (Services/Databases/…)');
+  }
   lines.push('├── deno.json         # Workspace root configuration');
   lines.push('└── netscript.config.ts  # NetScript framework configuration');
   lines.push('```');
@@ -151,12 +160,20 @@ export function generateReadme(options: ReadmeOptions): string {
     const engineLabel = ENGINE_LABELS[options.dbEngine];
     lines.push('## Database');
     lines.push('');
-    lines.push(
-      `Primary database: **${engineLabel}** (key \`${options.dbEngine}\` in ` +
-        '`appsettings.json`). The Aspire orchestration layer provisions it ' +
-        `on \`${options.legacyAspire ? 'dotnet run' : 'aspire run'}\` — no manual container ` +
-        'setup required.',
-    );
+    if (options.noAspire) {
+      const envVar = ENGINE_ENV_VARS[options.dbEngine];
+      lines.push(
+        `Primary database: **${engineLabel}**. Self-provision the database and expose ` +
+          `its connection string with \`${envVar}\` or \`DATABASE_URL\`.`,
+      );
+    } else {
+      lines.push(
+        `Primary database: **${engineLabel}** (key \`${options.dbEngine}\` in ` +
+          '`appsettings.json`). The Aspire orchestration layer provisions it ' +
+          `on \`${options.legacyAspire ? 'dotnet run' : 'aspire run'}\` — no manual container ` +
+          'setup required.',
+      );
+    }
     lines.push('');
     lines.push('Use the local contributor CLI for database commands in this workspace:');
     lines.push('');
@@ -167,19 +184,21 @@ export function generateReadme(options: ReadmeOptions): string {
     lines.push('deno run -A packages/cli/bin/netscript-dev.ts db status');
     lines.push('```');
     lines.push('');
-    if (options.dbEngine === 'sqlite') {
-      lines.push(
-        'SQLite is configured as a non-persistent file database; update ' +
-          '`Persistent: true` in `appsettings.json` to retain data across runs.',
-      );
-    } else {
-      lines.push(
-        'The container is persistent by default. Update `Persistent: false` ' +
-          'in `appsettings.json` if you prefer an ephemeral instance during ' +
-          'development.',
-      );
+    if (!options.noAspire) {
+      if (options.dbEngine === 'sqlite') {
+        lines.push(
+          'SQLite is configured as a non-persistent file database; update ' +
+            '`Persistent: true` in `appsettings.json` to retain data across runs.',
+        );
+      } else {
+        lines.push(
+          'The container is persistent by default. Update `Persistent: false` ' +
+            'in `appsettings.json` if you prefer an ephemeral instance during ' +
+            'development.',
+        );
+      }
+      lines.push('');
     }
-    lines.push('');
   }
 
   lines.push('## Learn More');

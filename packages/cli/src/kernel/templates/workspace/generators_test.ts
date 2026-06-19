@@ -191,6 +191,22 @@ Deno.test('generateReadme — no aspire points at app dev task', () => {
   assertStringIncludes(md, 'deno task --cwd apps/dashboard dev');
   assert(!md.includes('aspire run'), 'no-aspire README must not mention aspire run');
   assert(!md.includes('dotnet run'), 'no-aspire README must not mention dotnet run');
+  assert(!md.includes('appsettings.json'), 'no-aspire README must not list appsettings.json');
+});
+
+Deno.test('generateReadme — no aspire postgres asks for self-provisioning', () => {
+  const md = generateReadme({
+    name: 'no-aspire-app',
+    appName: 'dashboard',
+    noAspire: true,
+    legacyAspire: false,
+    dbEngine: 'postgres',
+  });
+  assertStringIncludes(md, 'Primary database: **PostgreSQL**.');
+  assertStringIncludes(md, 'Self-provision the database');
+  assertStringIncludes(md, '`POSTGRES_URI` or `DATABASE_URL`');
+  assert(!md.includes('Aspire orchestration layer provisions it'));
+  assert(!md.includes('appsettings.json'), 'no-aspire README must not mention appsettings.json');
 });
 
 Deno.test('generateReadme — sqlite gets non-persistent note', () => {
