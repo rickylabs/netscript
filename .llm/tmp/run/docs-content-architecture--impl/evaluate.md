@@ -31,3 +31,24 @@
 - Q11: hybrid markdown + .vto authoring — observed in frontmatter (`templateEngine: [vento, md]` on why/quickstart).
 - Q12: GitHub + JSR links present in index footer area — observed.
 - Q13/Q14: plain-English labels + planning-only posture — observed (nav not opened; brief mandates and front-door copy is plain).
+---
+
+## IMPL-EVAL — whole-tree authoring wave (Pipeline Step 5) — minimax-m3
+
+- **Cycle 1** (run 27812125012, comment 4749453645): **FAIL_FIX** — single item:
+  `tutorials/getting-started.md` stale plan-§4 orphan (truncated install line :32)
+  still linked from `tutorials/index.md`. All other zones PASS (build green 150 files;
+  accuracy vs ground-truth; fil d'Ariane; scope discipline; comp-tag rigor).
+- **Supervisor fix** (commit 05f04513): `git rm` getting-started.md; replaced index.md
+  stub with the real 5-rung continuous-app ladder. Build green, 148 files.
+- **Cycle 2** (run 27814275586): **PASS** — fix verified (file gone, index relinked,
+  no live refs), build green 148 files, all cycle-1 PASS zones reconfirmed. No further
+  eval needed (cycle 2 of 2).
+
+### Carried backlog → WSL Codex Step-6 (polish to bar)
+- Highlight-plugin plaintext registration (`docs/site/_config.ts`) — kills the non-fatal
+  `Unknown language: "no-highlight"` warning. Evaluator suggests tracking as DEBT if not done.
+- Watchers / config intent-surface coverage (completeness-critic gap).
+- `--no-aspire` CLI flag verification + doc grounding.
+- Alpha-badge guardrail; footer edit-links. (NOTE: these touch chrome/_config — the plan
+  scoped chrome OUT of the authoring run; confirm with user before Codex edits chrome.)

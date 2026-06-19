@@ -289,3 +289,21 @@ not every leaf). (3) §9 jsr-audit declared N/A (docs surface). (4) §9 notes st
 boxes are subsumed by the single `deno task --cwd docs/site build` gate. NOTE: the uncommitted
 `first-workspace.md` groundwork uses the BUILD-BREAKING `{{ comp.callout({...}) }}` form and will be
 fixed to tag-form during Wave B authoring/reconciliation. Authoring workflow launches next.
+
+---
+
+## Drift — Step-6 chrome scope expansion (user-authorized) — 2026-06-19
+
+Severity: significant (scope expansion vs PLAN-EVAL'd plan).
+
+The PLAN-EVAL'd `doc-architecture-v2.md` scoped site chrome (`docs/site/_config.ts`,
+`_includes/layouts/base.vto`, `_components/*.vto`) OUT of the authoring run ("component gaps
+are recommendations, not edits this run"). IMPL-EVAL (cycle 2 PASS) confirmed the wave is
+complete without them and suggested the `no-highlight` highlighter fix be tracked as DEBT.
+
+User explicitly chose "Full backlog (docs + chrome)" for the WSL Codex Step-6 polish pass,
+authorizing chrome edits this run: highlight-plugin plaintext registration (`_config.ts`),
+alpha-status badge, and footer GitHub edit-links (`base.vto`/components), in addition to the
+docs items (watchers/config intent surfaces, `--no-aspire` verification). Recorded here per
+the harness "drift is explicit" + "confirm before expanding scope" rules. Reference/** and
+packages/**/plugins/**/catalog/version-pins/lock-files remain hard out-of-scope.
