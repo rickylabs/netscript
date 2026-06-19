@@ -1,0 +1,259 @@
+---
+layout: layouts/base.vto
+title: Add a service
+templateEngine: [vento, md]
+prev: { label: "Add a plugin", href: "/how-to/add-a-plugin/" }
+next: { label: "Database & migration", href: "/how-to/database-migration/" }
+---
+
+# Add a service
+
+**Goal:** add a new typed oRPC service to an existing NetScript workspace — define
+its contract, implement the handlers, serve it with `defineService`, and confirm it
+answers on its own port and `/rpc` endpoint.
+
+This is a task-oriented recipe. It assumes you already have a NetScript workspace
+(created with `netscript init`) and that the `netscript` command is on your path. If
+you want the guided, build-up-from-scratch version that explains *why* each piece
+exists, follow the [Build a service tutorial](/tutorials/build-a-service/) instead.
+For the full generated API of the service runtime, see the
+[`@netscript/service` reference](/reference/service/).
+
+A NetScript service is contract-first: a service is the runtime that *implements* an
+`@orpc/contract` definition. You author the contract once (route + zod input/output),
+`implement()` it, bind `.handler()`s, then hand the resulting router to
+`defineService(...)`. The same contract object is what a typed client imports, so the
+service and its callers cannot drift.
+
+{{ comp callout { type: "note", title: "Two ways to construct a service" } }}
+Workspace services use <code>defineService(router, options)</code> — one call, an options
+object, the right default for the 80% case. NetScript <strong>plugin</strong> API services
+(workers, sagas) instead use the fluent <code>createService(router, options).withCors().withRPC().serve()</code>
+builder when they need to add CORS, OpenAPI, a database client, or custom context step by
+step. Both stand up the same Hono + oRPC runtime; this recipe uses <code>defineService</code>.
+{{ /comp }}
+
+## Before you start
+
+{{ comp.apiTable({
+  caption: "Prerequisites",
+  rows: [
+    { name: "A NetScript workspace", type: "netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first — see the tutorials. Run commands from the workspace root." },
+    { name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts — then confirm with netscript --help." },
+    { name: "A contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/ workspace exposed as the @<project>/contracts import alias. New services add their contract here so clients can import it." },
+    { name: "A free port", type: ":3001 by default", desc: "The example users service listens on :3001. Pick an unused port per service; it is read from the PORT env var with a literal fallback." }
+  ]
+}) }}
+
+This recipe adds a service named `users` on port `3001`, mirroring the example the
+scaffold ships, so every path and code shape below matches a real generated workspace.
+Substitute your own name and port where you see them.
+
+## Step 1 — Scaffold the service (or add one at init time)
+
+The fastest path is to let the CLI scaffold a service workspace for you. If you are
+creating a brand-new project, pass the service flags straight to `netscript init`:
+
+```bash
+netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes
+```
+
+To add a service to a workspace that already exists, run the service scaffold and pass
+the same name/port flags (run `netscript --help` for the exact subcommand spelling in
+your installed version):
+
+```bash
+# from the workspace root
+netscript generate service --service-name users --service-port 3001
+```
+
+Either path lays down a `services/users/` workspace member with this shape:
+
+```text
+services/users/
+├── deno.json              # workspace member; exports ./src/main.ts
+└── src/
+    ├── main.ts            # defineService(router, { name, version, port, openapi })
+    ├── router.ts          # version-namespaced router aggregation
+    └── routers/
+        ├── v1.ts          # binds the contract: v1.users.list.handler(...)
+        └── health.ts      # health.check handler
+```
+
+{{ comp callout { type: "tip", title: "Naming and the import alias" } }}
+The service name (<code>users</code>) becomes the workspace folder under <code>services/</code> and the
+service's reported <code>name</code>. Its contract lives in the shared <code>contracts/</code> workspace and is
+imported through the <code>@&lt;project&gt;/contracts</code> alias (for the example project that is
+<code>@my-app/contracts</code>) — never via a relative <code>../../contracts</code> path.
+{{ /comp }}
+
+## Step 2 — Define the contract
+
+A service implements a contract; define it first. Add a versioned contract module under
+`contracts/versions/v1/` using `@orpc/contract` + `zod`, then `implement()` it so the
+result is ready for `.handler()` binding.
+
+```ts
+// contracts/versions/v1/users.contract.ts
+import { z } from 'zod';
+import { oc } from '@orpc/contract';
+import { implement } from '@orpc/server';
+
+export const UsersListItemSchemaV1 = z.object({
+  id: z.number().int().positive(),
+  name: z.string().min(1),
+  summary: z.string().min(1),
+  status: z.enum(['active', 'suspended']),
+  createdAt: z.string().datetime(),
+});
+
+export const UsersContractV1 = {
+  health: {
+    check: oc.route({ method: 'GET' })
+      .input(z.object({}).optional())
+      .output(z.object({ status: z.literal('healthy'), service: z.string() })),
+  },
+  list: oc.route({ method: 'POST' })
+    .input(z.object({ limit: z.number().int().positive().optional() }))
+    .output(z.object({ items: z.array(UsersListItemSchemaV1) })),
+};
+
+// implement() turns the contract object into a .handler()-bindable surface.
+export const UsersV1 = implement(UsersContractV1);
+```
+
+Re-export it from the contracts barrel so callers and the service share one type source:
+
+```ts
+// contracts/versions/v1/mod.ts
+export { UsersContractV1, UsersV1 } from './users.contract.ts';
+export const v1 = { users: UsersV1 };
+```
+
+{{ comp callout { type: "important", title: "Contract is the source of truth" } }}
+Each route is <code>oc.route({ method }).input(zod).output(zod)</code>. Calling
+<code>implement(UsersContractV1)</code> produces the object whose <code>.handler()</code> the service
+binds — and the very same contract is what a typed client imports. Change the schema in one
+place and both the service handler and every caller fail to type-check until they agree.
+{{ /comp }}
+
+## Step 3 — Implement the handlers
+
+Bind handlers to the implemented contract. Import the contract through the project alias,
+not a relative path. At this scaffold stage handlers return seeded in-memory records — no
+database is wired yet, which keeps the contract↔client proof isolated.
+
+```ts
+// services/users/src/routers/v1.ts
+import { v1 } from '@my-app/contracts';
+
+const seeded = [
+  { id: 1, name: 'Ada Lovelace', summary: 'first programmer', status: 'active' as const, createdAt: new Date().toISOString() },
+];
+
+export const UsersV1 = {
+  list: v1.users.list.handler(async ({ input }) => ({
+    items: seeded.slice(0, input.limit ?? seeded.length),
+  })),
+};
+```
+
+```ts
+// services/users/src/routers/health.ts
+import { v1 } from '@my-app/contracts';
+
+export const health = {
+  check: v1.users.health.check.handler(async () => ({
+    status: 'healthy' as const,
+    service: 'users',
+  })),
+};
+```
+
+Aggregate the handlers into a version-namespaced router:
+
+```ts
+// services/users/src/router.ts
+import { UsersV1 } from './routers/v1.ts';
+import { health } from './routers/health.ts';
+
+export const v1 = { users: { ...UsersV1, health } };
+export const router = { v1 };
+```
+
+## Step 4 — Serve it with `defineService`
+
+The service entry point passes the router to `defineService(...)`. The port reads from
+the `PORT` env var with a literal fallback so the same code runs locally and under Aspire.
+
+```ts
+// services/users/src/main.ts
+import { defineService } from '@netscript/service';
+import { router } from './router.ts';
+
+await defineService(router, {
+  name: 'users',
+  version: '1.0.0',
+  port: parseInt(Deno.env.get('PORT') || '3001'),
+  openapi: { title: 'Users API', description: 'users service' },
+  debug: true,
+});
+```
+
+`defineService` stands up the Hono + oRPC runtime, mounting your router under both an
+OpenAPI surface (`/api/v1/users/*`) and the RPC surface (`/api/rpc/v1/...`).
+
+## Step 5 — Run and verify
+
+Start just this service workspace directly, or let `aspire run` orchestrate it alongside
+the rest of your resources:
+
+```bash
+# run only the users service
+deno task --cwd services/users dev
+```
+
+You should see it bind on `:3001`. Confirm the runtime answers — the health route over
+HTTP, and the RPC surface that typed clients call:
+
+```bash
+# OpenAPI / HTTP surface
+curl http://localhost:3001/api/v1/users/health
+
+# RPC surface (what the generated typed client uses)
+curl -X POST http://localhost:3001/api/rpc/v1/users/list \
+  -H 'content-type: application/json' -d '{"limit":10}'
+```
+
+A healthy service returns `{"status":"healthy","service":"users"}` from the health route
+and the seeded `items` array from `list`. A typed client imports `UsersContractV1` from
+`@my-app/contracts` and calls `.list(...)` with full input/output inference — no codegen,
+no drift.
+
+{{ comp callout { type: "warning", title: "Production pitfalls" } }}
+<strong>Port collisions.</strong> Every service needs a distinct port; the workers
+(<code>:8091</code>), sagas (<code>:8092</code>), and triggers (<code>:8093</code>) plugins already
+claim theirs. Read the port from <code>PORT</code> and let Aspire assign it in orchestrated runs
+rather than hard-coding.<br>
+<strong>Contracts before handlers.</strong> Edit the contract first, then the handler — never
+the reverse. The contract is the shared truth; a handler that out-runs its contract silently
+breaks every client.<br>
+<strong>Use the import alias.</strong> Import contracts via <code>@&lt;project&gt;/contracts</code>,
+not a relative path, so the service and its clients resolve the identical type.<br>
+<strong>No DB yet at this step.</strong> The scaffold handlers return seeded in-memory records.
+Wire persistence with the database recipe before you depend on durability.
+{{ /comp }}
+
+## See also
+
+{{ comp.featureGrid({ items: [
+  { title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/build-a-service/", icon: "→" },
+  { title: "Service API reference", body: "The full generated surface of defineService and createService — every option and return type.", href: "/reference/service/", icon: "◆" },
+  { title: "Contracts, explained", body: "How an oRPC contract flows from service to typed client to UI without a codegen step.", href: "/explanation/contracts/", icon: "◎" },
+  { title: "Database & migration", body: "Replace the seeded in-memory records with real Postgres persistence — init, generate, seed (Aspire up first).", href: "/how-to/database-migration/", icon: "▣" }
+] }) }}
+
+Manage the service over its lifetime by editing its contract under `contracts/versions/`
+and re-running your workspace gates (`deno task check`). For the concepts behind
+contract-first services, read the [contracts explanation](/explanation/contracts/); for
+the capability overview, see [Services](/capabilities/services/).
