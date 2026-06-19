@@ -104,6 +104,20 @@ instead: <code>deno task --cwd apps/dashboard dev</code>. You trade the dashboar
 multi-resource wiring for a leaner single-process dev loop.
 {{ /comp }}
 
+### See the framework code
+
+The scaffold is more than bash and URLs — it generates real, typed framework code
+for you. Here's the kind of code the scaffold generates for you: a single
+`defineService` call wires the cross-cutting concerns so you don't have to.
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "service.ts",
+    lang: "ts",
+    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nconst service = await defineService(router, { name: 'users', port: 3000 });"
+  }
+] }) }}
+
 ## What you see
 
 Once `aspire run` settles, you have a live workspace to poke at:
@@ -117,6 +131,14 @@ Once `aspire run` settles, you have a live workspace to poke at:
   examples. Click a token to copy it.
 - **The `/examples` routes** — runnable end-to-end paths: `/examples/crud`,
   `/examples/service`, and `/examples/telemetry`, plus a `/health` check.
+
+{{ comp callout { type: "warning", title: "If something doesn't come up" } }}
+<ul>
+<li>A port is already in use — <code>18888</code> (dashboard) or <code>8000</code> (Fresh app). Stop the other process or change the port.</li>
+<li>The first <code>aspire restore</code> downloads the AppHost SDK and can take a minute.</li>
+<li><code>deno: command not found</code> means Deno isn't on your PATH.</li>
+</ul>
+{{ /comp }}
 
 {{ comp callout { type: "tip", title: "Start at /design" } }}
 The scaffolded <code>/design</code> showcase is the fastest way to feel what you have: the
@@ -147,6 +169,11 @@ A complete, type-checked workspace — not a starter you have to assemble:
 ] }) }}
 
 ### Next steps
+
+{{ comp callout { type: "tip", title: "Start here" } }}
+New to NetScript? Work through <a href="/tutorials/first-workspace/">Your first workspace</a> —
+a guided track that takes this scaffold to a real feature.
+{{ /comp }}
 
 {{ comp.featureGrid({ items: [
   {

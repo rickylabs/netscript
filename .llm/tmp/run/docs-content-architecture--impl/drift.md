@@ -108,3 +108,23 @@ Both render: 17 headings each, zero literal-markdown leak, callout HTML bodies r
 Also fixed `index.vto` install command `jsr:@netscript/cli/bin` →
 `jsr:@netscript/cli/bin/netscript.ts` (bin is not in the `exports` map, so the full file
 path is required to resolve). Front door is now COMPLETE → Stage-5 IMPL-EVAL unblocked.
+
+## Stage-5 IMPL-EVAL = PASS; Stage-6 polish applied (severity: minor)
+
+Stage-5 IMPL-EVAL (OpenHands minimax-m3, run 27798713207, separate session) returned
+**PASS** — five A's + one B (code-proof credibility: quickstart had bash only, no framework
+snippet). Verdict + 8 prioritized items in `evaluate.md`. Cycle-1 (run 27798222833) was an
+INCOMPLETE iteration-limit timeout (not a verdict) caused by over-broad scope; re-run was
+narrowed (no rebuild, 5-file read set, knowledge-based competitor benchmark, single artifact).
+
+Stage-6 polish (Claude docs workflow per LD-DOCS-LANE, no packages/plugins touched) actioned
+the 2 P0 + 5 safe P1 items, persisted by supervisor:
+- index.vto: promoted "Orchestrated with Aspire" featureGrid card #3 → #2 (locked-08 Q7 hero-level).
+- why.vto: added 2-line value-prop under "The problem"; split combined "NestJS / Encore" honest-
+  table row into two named rows; linked first `--no-aspire` to /concepts/aspire/.
+- quickstart.vto: added "See the framework code" defineService proof (arrow/const, no `function`
+  keyword — landmine-safe); "If something doesn't come up" warning callout (port 18888/8000,
+  aspire-restore time, deno PATH); tutorial-link tip callout in Next steps.
+Skipped the one P1 that *removed* the index API/GitHub/JSR triplet (removing useful nav). Build
+GREEN (85 files); rendered HTML verified — no comp-tag leak, callout HTML rendered, Aspire ahead
+of Durable workflows, both competitors as separate rows. Next: Stage-7 Qwen adoption eval.
