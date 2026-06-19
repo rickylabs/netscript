@@ -62,3 +62,5 @@ transport infrastructure and a consumer SDK, so S3 did not half-build it. Debt w
 | Scoped check | PASS | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/streams --ext ts,tsx` — 21 files selected, 0 failed batches, 0 diagnostics |
 | Touched-scope lint | PASS | `rtk proxy deno lint plugins/streams/src/public/stream-api.ts plugins/streams/src/public/mod.ts plugins/streams/mod.ts plugins/streams/tests/public/stream-api_test.ts` — checked 4 files |
 | Lock hygiene | PASS | `git diff --stat origin/main -- deno.lock` — empty after restoring Deno resolution churn |
+
+DONE 03b77f2 — focused/runtime streams tests, scoped check, touched lint, and lock hygiene passed.
