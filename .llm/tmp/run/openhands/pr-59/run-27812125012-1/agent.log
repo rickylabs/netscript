@@ -1,0 +1,400 @@
+      `author-a-plugin`) are substantive, prev/next chained, and ground-truth
+      accurate. `database-migration.md` correctly requires `aspire run` first.
+      `add-opentelemetry.md` honestly discloses `createJobTools` trace/progress
+      stub status. `customize-fresh-ui.md` correctly states UI is copied source
+      under `apps/dashboard/components/ui/`. `add-a-plugin.md` has no
+      `templateEngine: [vento, md]` front matter but uses no comp blocks 
+(Markdown
+      tables only), so the build is correct without it.
+    
+    ### Explanation — PASS
+    - `contracts`, `durable-workflows`, `observability`, `aspire` all present,
+      substantive, accurate to ground-truth. `@orpc/{contract,server,client,zod,
+      tanstack-query}` ^1.14.6 + zod ^4.x called out in `contracts.md`.
+      `aspire.md` correctly identifies `aspire/apphost.mts` as the generated
+      Node/TS AppHost (not dotnet), names `aspire.config.json` keys
+      (`appHost.path="apphost.mts"`, `typescript/nodejs`, SDK 13.4.4,
+      `Aspire.Hosting.PostgreSQL`), and flags the `netscript.config.ts`
+      `aspire.appHost:'dotnet/AppHost'` divergence honestly per the plan §4 AM.
+    
+    ### Capabilities — PASS
+    - All 9 hubs (`services`, `background-jobs`, `durable-sagas`, `triggers`,
+      `streams`, `database`, `kv-queues-cron`, `telemetry`, `fresh-ui`) plus
+      `capabilities/index.md` capability matrix grid. Ports cited correctly
+      (services :3001, workers :8091, sagas :8092, triggers :8093, streams 
+:4437).
+      `services.md` correctly distinguishes the two-API split
+      (`defineService(router, options)` one-call vs the plugin fluent
+      `createService(...).withCors().withRPC().serve()` builder). `triggers.md`
+      correctly states Hono, not oRPC. `streams.md` honestly frames 
+producer/consumer
+      as stubs with deferred runtime. `database.md` correctly cites Prisma 7.8
+      `runtime="deno"` and per-plugin schema aggregation under
+      `database/postgres/schema/plugins/<plugin>/`.
+    
+    ### Resources — PASS
+    - `glossary.md` and `cli-reference.md` both present, substantive, and 
+grouped
+      with `apiTable` instances. Install lines correct.
+    
+    ### Chrome/wayfinding — PASS
+    - `_data.ts` `navSections` is updated: each zone index precedes its children
+so
+      breadcrumb deepest-prefix match resolves. Every authored body page is a
+      `navSections` item (verified). `index.vto`/`why.vto`/`quickstart.vto` dead
+      links fixed per the supervisor's pre-commit reconciliation.
+    
+    ### Scope discipline — PASS
+    - `docs/site/reference/**` untouched (22 generated units intact).
+    - `docs/site/_includes/layouts/base.vto`, `styles/`, `_components/*.vto` 
+source
+      files NOT edited (build diff confirms only authored Markdown + 
+`_data.ts`).
+    - Catalog / version pins / `packages/**` / `plugins/**` not edited.
+    
+    ### Comp-tag rigor — PASS
+    - Build green implicitly verifies no `{{ comp.callout({...}) }}` paired with
+      `{{ /comp }}` build-breaker exists. Spot-check: every paired comp opener 
+in
+      the authored wave uses the tag form `{{ comp callout { type, title } }}`.
+      The 158 function-form `comp.NAME(args)` openers in the tree are all
+      no-slot components (`breadcrumb`, `tabbedCode`, `apiTable`, `card`,
+      `featureGrid`, `nextPrev`, `learningPath`, `hero`) — explicitly permitted
+      by §5.
+    - The 3 prose `function` keyword hits in
+      `capabilities/background-jobs.md:16,53`,
+      `explanation/contracts.md:95`, `explanation/durable-workflows.md:43,101`,
+      `tutorials/background-jobs.md:102`, `tutorials/durable-workflow.md:141`,
+      `tutorials/ingest-webhook.md:94`, `explanation/architecture.md:42` are all
+      inside inline HTML body text of tag-form callouts, NOT in comp-tag args, 
+so
+      the Vento `function`-keyword landmine is not triggered (and the green 
+build
+      confirms it).
+    
+    ### Fil d'Ariane — PASS
+    - Tutorial ladder chain: `first-workspace → build-a-service → 
+background-jobs
+      → durable-workflow → ingest-webhook → how-to/index` all resolve via
+      `prev`/`next` front matter. The cross-plugin choreography (worker 
+publishes
+      `UserSettingsCreated` → saga handles → emits `sagaComplete` → trigger
+      `enqueueJob`s) is real and consistent across the four plugin-rung pages 
+and
+      the anatomy ground-truth.
+    
+    ## Required fix (the WSL Codex iteration backlog item)
+    
+    **Delete `docs/site/tutorials/getting-started.md` AND remove its link from
+    `docs/site/tutorials/index.md:14-15`.** This is the plan §4 scheduled 
+deletion
+    that was carried in the IMPL-EVAL backlog but not yet executed; leaving the
+    file in place preserves a contradicted install path on line 32.
+    
+    No other fixes required. Build is green; the remaining 26/27 authored pages
+    are accurate, well-chained, scope-respecting, and the wave is otherwise 
+ready.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 4.01M • cache hit 94.82% •  reasoning 728 • ↓ output 17.19K • $ 
+0.3108
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27812125012-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL — docs/content-architecture (PR #59)
+ 2|
++3|## Verdict
++4|
++5|**FAIL_FIX** (one minor item — a known-stale orphan scheduled for deletion in
+the
++6|plan but still present with a contradicted install line.)
++7|
++8|## Build gate
++9|
++10|- Command: `deno task --cwd docs/site build`
++11|- Exit: **0**
++12|- Files generated: **150**
++13|- Final Lume line: `🍾 Site built into _site  150 files generated in 3.25 
+seconds`
++14|- No `TemplateError` / `TransformError`.
++15|- Non-fatal `Unknown language: "no-highlight"` warning is the known 
+highlighter
++16|  backlog item flagged in `commits.md` — build still green, not a fail.
++17|
++18|## Findings (per zone)
++19|
++20|### Build gate — PASS
++21|- Lume build is clean and deterministic. 150 files matches the expected 
+count.
++22|
++23|### Start here — PASS
++24|- `index.vto`, `quickstart.vto`, `why.vto` install line `deno install 
+--global
++25|  --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts` is 
+correct.
++26|- `quickstart.vto` step ordering: install → `netscript init ...` → `cd 
+aspire &&
++27|  aspire restore && aspire run` (dashboard :18888) → `netscript db 
+init/generate/seed`
++28|  → hit users :3001 — Aspire is step 2, before any `netscript db` (hard rule
+1–2
++29|  satisfied).
++30|
++31|### Tutorials ladder — FAIL_FIX (single finding)
++32|- `first-workspace`, `build-a-service`, `background-jobs`, 
+`durable-workflow`,
++33|  `ingest-webhook` are all substantive, prev/next chained, and form one
++34|  continuous app narrative (worker `create-user-settings` publishes
++35|  `UserSettingsCreated` → saga handles it + emits `sagaComplete` → trigger
++36|  `enqueueJob`s a worker job). Port citations (:8091, :8092, :8093) correct;
++37|  code shapes (`defineJobHandler`+`createJobTools`, 
+`defineSaga(...).durability()
++38|  .state().on().build()`, `defineWebhook` on raw Hono routes — NOT oRPC) all
++39|  verified. Worker `trace`/`progress` no-op stub disclosure present in
++40|  `add-opentelemetry.md` and `capabilities/background-jobs.md`. ✅
++41|- **`tutorials/getting-started.md:32` STILL EXISTS** with contradicted 
+install
++42|  line: `deno install --global --allow-all --name netscript 
+jsr:@netscript/cli/bin`
++43|  (bare, missing `netscript.ts` suffix). Every other page in the tree uses 
+the
++44|  canonical full path. The plan §4 explicitly scheduled this file for 
+deletion
++45|  ("DELETE `tutorials/getting-started.md` — stale; content split into
++46|  quickstart + first-workspace"). `commits.md` tail lists it in the 
+IMPL-EVAL
++47|  backlog (`tutorials/getting-started.md retirement + tutorials/index.md
++48|  relink`). The file is **not** in `_data.ts` `navSections` (so it has no
++49|  breadcrumb), but it **is** still linked from `tutorials/index.md:14`.
++50|  → **Required fix**: delete `docs/site/tutorials/getting-started.md` AND 
+remove
++51|  the link at `docs/site/tutorials/index.md:14-15` to 
+`/tutorials/getting-started/`.
++52|    (Alternative, if kept: fix line 32 install path to the canonical
++53|    `jsr:@netscript/cli/bin/netscript.ts` AND remove the orphan link from
++54|    `tutorials/index.md`.)
++55|
++56|### How-to — PASS
++57|- All 8 pages (`add-a-plugin`, `add-a-service`, `database-migration`,
++58|  `queue-kv-cron`, `add-opentelemetry`, `customize-fresh-ui`, `deploy`,
++59|  `author-a-plugin`) are substantive, prev/next chained, and ground-truth
++60|  accurate. `database-migration.md` correctly requires `aspire run` first.
++61|  `add-opentelemetry.md` honestly discloses `createJobTools` trace/progress
++62|  stub status. `customize-fresh-ui.md` correctly states UI is copied source
++63|  under `apps/dashboard/components/ui/`. `add-a-plugin.md` has no
++64|  `templateEngine: [vento, md]` front matter but uses no comp blocks 
+(Markdown
++65|  tables only), so the build is correct without it.
++66|
++67|### Explanation — PASS
++68|- `contracts`, `durable-workflows`, `observability`, `aspire` all present,
++69|  substantive, accurate to ground-truth. `@orpc/{contract,server,client,zod,
++70|  tanstack-query}` ^1.14.6 + zod ^4.x called out in `contracts.md`.
++71|  `aspire.md` correctly identifies `aspire/apphost.mts` as the generated
++72|  Node/TS AppHost (not dotnet), names `aspire.config.json` keys
++73|  (`appHost.path="apphost.mts"`, `typescript/nodejs`, SDK 13.4.4,
++74|  `Aspire.Hosting.PostgreSQL`), and flags the `netscript.config.ts`
++75|  `aspire.appHost:'dotnet/AppHost'` divergence honestly per the plan §4 AM.
++76|
++77|### Capabilities — PASS
++78|- All 9 hubs (`services`, `background-jobs`, `durable-sagas`, `triggers`,
++79|  `streams`, `database`, `kv-queues-cron`, `telemetry`, `fresh-ui`) plus
++80|  `capabilities/index.md` capability matrix grid. Ports cited correctly
++81|  (services :3001, workers :8091, sagas :8092, triggers :8093, streams 
+:4437).
++82|  `services.md` correctly distinguishes the two-API split
++83|  (`defineService(router, options)` one-call vs the plugin fluent
++84|  `createService(...).withCors().withRPC().serve()` builder). `triggers.md`
++85|  correctly states Hono, not oRPC. `streams.md` honestly frames 
+producer/consumer
++86|  as stubs with deferred runtime. `database.md` correctly cites Prisma 7.8
++87|  `runtime="deno"` and per-plugin schema aggregation under
++88|  `database/postgres/schema/plugins/<plugin>/`.
++89|
++90|### Resources — PASS
++91|- `glossary.md` and `cli-reference.md` both present, substantive, and 
+grouped
++92|  with `apiTable` instances. Install lines correct.
++93|
++94|### Chrome/wayfinding — PASS
++95|- `_data.ts` `navSections` is updated: each zone index precedes its children
+so
++96|  breadcrumb deepest-prefix match resolves. Every authored body page is a
++97|  `navSections` item (verified). `index.vto`/`why.vto`/`quickstart.vto` dead
++98|  links fixed per the supervisor's pre-commit reconciliation.
++99|
++100|### Scope discipline — PASS
++101|- `docs/site/reference/**` untouched (22 generated units intact).
++102|- `docs/site/_includes/layouts/base.vto`, `styles/`, `_components/*.vto` 
+source
++103|  files NOT edited (build diff confirms only authored Markdown + 
+`_data.ts`).
++104|- Catalog / version pins / `packages/**` / `plugins/**` not edited.
++105|
++106|### Comp-tag rigor — PASS
++107|- Build green implicitly verifies no `{{ comp.callout({...}) }}` paired 
+with
++108|  `{{ /comp }}` build-breaker exists. Spot-check: every paired comp opener 
+in
++109|  the authored wave uses the tag form `{{ comp callout { type, title } }}`.
++110|  The 158 function-form `comp.NAME(args)` openers in the tree are all
++111|  no-slot components (`breadcrumb`, `tabbedCode`, `apiTable`, `card`,
++112|  `featureGrid`, `nextPrev`, `learningPath`, `hero`) — explicitly permitted
++113|  by §5.
++114|- The 3 prose `function` keyword hits in
++115|  `capabilities/background-jobs.md:16,53`,
++116|  `explanation/contracts.md:95`, `explanation/durable-workflows.md:43,101`,
++117|  `tutorials/background-jobs.md:102`, `tutorials/durable-workflow.md:141`,
++118|  `tutorials/ingest-webhook.md:94`, `explanation/architecture.md:42` are 
+all
++119|  inside inline HTML body text of tag-form callouts, NOT in comp-tag args, 
+so
++120|  the Vento `function`-keyword landmine is not triggered (and the green 
+build
++121|  confirms it).
++122|
++123|### Fil d'Ariane — PASS
++124|- Tutorial ladder chain: `first-workspace → build-a-service → 
+background-jobs
++125|  → durable-workflow → ingest-webhook → how-to/index` all resolve via
++126|  `prev`/`next` front matter. The cross-plugin choreography (worker 
+publishes
++127|  `UserSettingsCreated` → saga handles → emits `sagaComplete` → trigger
++128|  `enqueueJob`s) is real and consistent across the four plugin-rung pages 
+and
++129|  the anatomy ground-truth.
++130|
++131|## Required fix (the WSL Codex iteration backlog item)
++132|
++133|**Delete `docs/site/tutorials/getting-started.md` AND remove its link from
++134|`docs/site/tutorials/index.md:14-15`.** This is the plan §4 scheduled 
+deletion
++135|that was carried in the IMPL-EVAL backlog but not yet executed; leaving the
++136|file in place preserves a contradicted install path on line 32.
++137|
++138|No other fixes required. Build is green; the remaining 26/27 authored pages
++139|are accurate, well-chained, scope-respecting, and the wave is otherwise 
+ready.
++140|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Clean up scratch check scripts
+
+$ rm -f /tmp/check_landmine.py /tmp/check_landmine2.py
+
+Tokens: ↑ input 4.05M • cache hit 94.82% •  reasoning 728 • ↓ output 17.26K • $ 
+0.3138
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL final verdict FAIL_FIX
+
+Finish with message:
+## IMPL-EVAL verdict — docs/content-architecture (PR #59)
+
+**Verdict: `FAIL_FIX`** (one minor item — a known-stale orphan scheduled for 
+deletion in the plan but still present with a contradicted install line.)
+
+### Build gate
+`deno task --cwd docs/site build` → **exit 0**, **150 files** generated in 
+3.25s, final Lume line `🍾 Site built into _site`. No 
+`TemplateError`/`TransformError`. The non-fatal `Unknown language: 
+"no-highlight"` warning is the known highlighter backlog item flagged in 
+`commits.md` — not a fail.
+
+### Per-zone findings
+- **Start here** — PASS. Install line `deno install --global --allow-all --name 
+netscript jsr:@netscript/cli/bin/netscript.ts` correct; `quickstart.vto` honors 
+hard rule 1–2 (Aspire is step 2 before any `netscript db`).
+- **Tutorials ladder** — **FAIL_FIX (single finding)**. All five rungs 
+substantive, prev/next chained, continuous app narrative real (worker 
+`create-user-settings` publishes `UserSettingsCreated` → saga handles it + emits
+`sagaComplete` → trigger `enqueueJob`s). Port citations (:8091/:8092/:8093), 
+code shapes, and worker trace/progress no-op disclosures all correct. 
+**`tutorials/getting-started.md:32` STILL EXISTS** with the contradicted bare 
+install path `jsr:@netscript/cli/bin` (missing the `netscript.ts` suffix). Every
+other page in the tree uses the canonical full path. The file is **not** in 
+`_data.ts` `navSections` (so it has no breadcrumb), but it is still linked from 
+`docs/site/tutorials/index.md:14-15`. This is the plan §4 scheduled deletion 
+("DELETE `tutorials/getting-started.md` — stale; content split into quickstart +
+first-workspace") that `commits.md` carries as the IMPL-EVAL backlog item and 
+was not executed.
+- **How-to** — PASS. All 8 pages substantive, prev/next chained, ground-truth 
+accurate; `database-migration.md` correctly requires `aspire run` first; 
+`add-opentelemetry.md` honestly discloses the `createJobTools` trace/progress 
+stub status.
+- **Explanation** — PASS. `contracts`, `durable-workflows`, `observability`, 
+`aspire` all substantive. `contracts.md` cites `@orpc/*` ^1.14.6 + zod ^4.x. 
+`aspire.md` correctly identifies `aspire/apphost.mts` as the generated Node/TS 
+AppHost (not dotnet) and flags the `netscript.config.ts` 
+`aspire.appHost:'dotnet/AppHost'` divergence honestly.
+- **Capabilities** — PASS. All 9 hubs + index matrix. Two-API split 
+(`defineService` one-call vs plugin fluent `createService(...).withX().serve()`)
+correctly explained in `services.md`. `triggers.md` correctly states Hono, not 
+oRPC. `streams.md` honestly frames producer/consumer as stubs. Ports cited 
+correctly (services :3001, workers :8091, sagas :8092, triggers :8093, streams 
+:4437).
+- **Resources** — PASS. `glossary.md` and `cli-reference.md` both substantive, 
+install line correct.
+- **Chrome/wayfinding** — PASS. `_data.ts` `navSections` ordered correctly; 
+every body page is a `navSections` item; landing dead-link fixes applied.
+- **Scope discipline** — PASS. `reference/**` (22 generated units) untouched; 
+`base.vto` / `styles/` / `_components/*.vto` sources not edited; catalog / 
+version pins / `packages/**` / `plugins/**` not edited.
+- **Comp-tag rigor** — PASS. Build green implicitly confirms no 
+`comp.callout({...})` + `{{ /comp }}` pair (build-breaker). Every paired opener 
+in the wave uses the tag form `{{ comp callout { type, title } }}`. The 158 
+function-form `comp.NAME(args)` openers are all no-slot components 
+(`breadcrumb`, `tabbedCode`, `apiTable`, `card`, `featureGrid`, `nextPrev`, 
+`learningPath`, `hero`) — explicitly permitted by §5. The 3 prose `function` 
+keyword hits are all in inline HTML body text of tag-form callouts, not in 
+comp-tag args, so the Vento landmine is not triggered.
+
+### Fil d'Ariane
+Continuous tutorial chain `first-workspace → build-a-service → background-jobs →
+durable-workflow → ingest-webhook → how-to/index` resolves via `prev`/`next` 
+front matter. The cross-plugin choreography (worker publishes 
+`UserSettingsCreated` → saga handles → emits `sagaComplete` → trigger 
+`enqueueJob`s) is real and consistent across the four plugin-rung pages and the 
+project-anatomy ground-truth.
+
+### Required fix (WSL Codex iteration backlog item)
+**Delete `docs/site/tutorials/getting-started.md` AND remove its link from 
+`docs/site/tutorials/index.md:14-15`.** This is the plan §4 scheduled deletion 
+that `commits.md` carried as the IMPL-EVAL backlog item but was not yet 
+executed. Leaving the file in place preserves a contradicted install path on 
+line 32. No other fixes required — the remaining 26/27 pages are accurate, 
+well-chained, scope-respecting, and the wave is otherwise ready.
+
+### Eval artifacts
+- Run summary: `/home/runner/work/_temp/openhands/27812125012-1/summary.md`
+- Build log is in shell history; no scratch files left behind.
+
+This was an evaluator-only pass — no docs were authored or edited, no fixes were
+applied. Verdict token emitted for the docs workflow to post as the single PR 
+verdict comment.
+
+Tokens: ↑ input 4.09M • cache hit 94.87% •  reasoning 728 • ↓ output 18.55K • $ 
+0.3179
+
