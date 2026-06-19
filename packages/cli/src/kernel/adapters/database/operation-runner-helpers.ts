@@ -21,12 +21,15 @@ export const TERMINAL_RESOURCE_STATES: ReadonlySet<string> = new Set([
   'Stopped',
 ]);
 
+const DB_CLI_ASPIRE_START_TIMEOUT_SECONDS = '300';
+
 export function buildDbCliEnv(
   operation: DbOperationRequest['operation'],
   configKey: string,
   migrationName?: string,
 ): Record<string, string> {
   const env: Record<string, string> = {
+    ASPIRE_CLI_START_TIMEOUT: DB_CLI_ASPIRE_START_TIMEOUT_SECONDS,
     NETSCRIPT_PRISMA_OPERATION: operation,
     NETSCRIPT_PRISMA_TARGET: configKey,
   };
@@ -89,7 +92,9 @@ function parseAspireResourceStatuses(
   return apphost?.resources ? [...apphost.resources] : [];
 }
 
-function isObjectWithResources(value: unknown): value is { resources: readonly AspireResourceStatus[] } {
+function isObjectWithResources(
+  value: unknown,
+): value is { resources: readonly AspireResourceStatus[] } {
   return typeof value === 'object' && value !== null && Array.isArray(
     (value as { resources?: unknown }).resources,
   );

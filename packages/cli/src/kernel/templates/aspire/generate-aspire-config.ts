@@ -27,7 +27,7 @@ export interface AspireConfigOptions {
  */
 export function generateAspireConfig(options?: AspireConfigOptions): string {
   const config = {
-    appHostPath: options?.appHostPath ?? SCAFFOLD_DEFAULTS.ASPIRE_APPHOST_PATH,
+    appHostPath: options?.appHostPath ?? SCAFFOLD_DEFAULTS.ASPIRE_LEGACY_APPHOST_PATH,
   };
   return JSON.stringify(config, null, 2) + '\n';
 }
