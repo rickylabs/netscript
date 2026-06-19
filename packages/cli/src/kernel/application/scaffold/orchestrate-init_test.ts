@@ -97,3 +97,16 @@ Deno.test('initNextSteps tells no-Aspire Postgres users to self-provision', () =
     '# Provision Postgres yourself and set POSTGRES_URI or DATABASE_URL',
   ]);
 });
+
+Deno.test('initNextSteps reports the generated service oRPC endpoint under /api/rpc', () => {
+  const steps = initNextSteps(baseOptions({
+    includeExampleService: true,
+    serviceName: 'users',
+    servicePort: 3001,
+  }));
+
+  assertEquals(
+    steps.at(-1),
+    '# oRPC service "users" at http://localhost:3001/api/rpc',
+  );
+});
