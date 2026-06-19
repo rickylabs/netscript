@@ -1,0 +1,400 @@
+    
+    `white-space: pre` is present on `.ns-prose pre code`:
+    ```css
+    .ns-prose pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--ns-gray-2);
+      font-size: inherit;
+      white-space: pre;  /* ← key rule */
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+    ```
+    
+    ### `tabbedCode.vto` structure
+    
+    The fix:
+    1. Template body starts at column 0 (no leading whitespace leak from Vento)
+    2. Uses `replaceAll("\n", "&#10;")` to preserve newlines as HTML entities
+    3. Uses `replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", 
+"&gt;")` for safe HTML escaping
+    4. No indentation trimming or newline collapsing in the template
+    
+    ### Built HTML: indentation preserved
+    
+    `_site/tutorials/background-jobs/index.html`:
+    ```html
+    <pre><code class="language-ts hljs language-typescript"><span 
+class="hljs-keyword">import</span> {
+      createSuccessResult,
+      createFailureResult,
+      defineJobHandler,
+    } <span class="hljs-keyword">from</span> <span 
+class="hljs-string">'@netscript/plugin-workers-core'</span>;
+    ```
+    
+    2-space indentation on `createSuccessResult,`, `createFailureResult,`, 
+`defineJobHandler,` is preserved. Multi-line code blocks across all tabbed 
+panels retain their source indentation.
+    
+    ## Gate 4: Diff scope — ✅ PASS
+    
+    - 2 files changed, both under `docs/site/`
+    - 0 changes to `packages/`, `plugins/`, `deno.lock`
+    - 0 stray/junk files (only `.llm/tmp/run/openhands/pr-72/` is an untracked 
+agent artifact, not in the diff)
+    - No unrelated churn
+    
+    ## Remaining risks
+    
+    - None. The fix is scoped and correct. The `deno.lock` hygiene is preserved 
+(0 lock changes).
+    
+    ---
+    
+    _Evaluator: OpenHands Agent (separate adversarial session) | Branch: 
+`fix/docs-render-table-code` vs `origin/docs/user-site`_
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.22M • cache hit 75.15% •  reasoning 7.46K • ↓ output 21.65K • 
+$ 0.6900
+
+Agent Action (Not Executed) ────────────────────────────────────────────────────
+
+Function call:
+- task_tracker (call_088567c619ee45c9b40b8db6)
+
+
+Tokens: ↑ input 1.22M • cache hit 75.15% •  reasoning 7.46K • ↓ output 21.65K • 
+$ 0.6900
+
+Agent Error ────────────────────────────────────────────────────────────────────
+
+Error Details:
+Error validating tool 'task_tracker': 5 validation errors for TaskTrackerAction
+task_list.0.status
+  Input should be 'todo', 'in_progress' or 'done' [type=literal_error, 
+input_value='completed', input_type=str]
+    For further information visit 
+https://errors.pydantic.dev/2.13/v/literal_error
+task_list.1.status
+  Input should be 'todo', 'in_progress' or 'done' [type=literal_error, 
+input_value='completed', input_type=str]
+    For further information visit 
+https://errors.pydantic.dev/2.13/v/literal_error
+task_list.2.status
+  Input should be 'todo', 'in_progress' or 'done' [type=literal_error, 
+input_value='completed', input_type=str]
+    For further information visit 
+https://errors.pydantic.dev/2.13/v/literal_error
+task_list.3.status
+  Input should be 'todo', 'in_progress' or 'done' [type=literal_error, 
+input_value='completed', input_type=str]
+    For further information visit 
+https://errors.pydantic.dev/2.13/v/literal_error
+task_list.4.status
+  Input should be 'todo', 'in_progress' or 'done' [type=literal_error, 
+input_value='completed', input_type=str]
+    For further information visit 
+https://errors.pydantic.dev/2.13/v/literal_error. Parameters provided: 
+['command', 'task_list']
+
+Tokens: ↑ input 1.22M • cache hit 75.15% •  reasoning 7.46K • ↓ output 21.65K • 
+$ 0.6900
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27843178622-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# Evaluation Summary: PR #72 — fix(docs): restore api-table cell contrast + 
+preserve tabbed-code formatting
+ 2|
++3|## Verdict: **PASS**
++4|
++5|Branch `fix/docs-render-table-code` (base `origin/docs/user-site`) — 
+merge-ready.
++6|
++7|---
++8|
++9|## Commits evaluated
++10|
++11|- `17682183` fix(docs): restore api table cell contrast
++12|- `6db4096e` fix(docs): preserve tabbed code formatting
++13|
++14|## Changed files (diff scope: `docs/site/**` only)
++15|
++16|| File | Insertions | Deletions |
++17||------|-----------|-----------|
++18|| `docs/site/_components/tabbedCode.vto` | 24 | 8 |
++19|| `docs/site/styles/docs.css` | 29 | 0 |
++20|
++21|**Scope compliance:** ✅ No `packages/`, `plugins/`, `deno.lock`, or 
+unrelated churn. Two files, both under `docs/site/`.
++22|
++23|## Gate 1: Build — ✅ PASS
++24|
++25|`deno task build` (from `docs/site`): 142 files generated, exit 0, no 
+errors.
++26|
++27|## Gate 2: api-table cell contrast — ✅ PASS
++28|
++29|### Built HTML
++30|
++31|`_site/capabilities/background-jobs/index.html` contains real `<code>` 
+elements inside `<td>` cells:
++32|```html
++33|<td class="ns-api-table__name"><code>GET /health</code></td>
++34|<td class="ns-api-table__type"><code>liveness</code></td>
++35|<td class="ns-api-table__desc">Health probe for the workers API 
+service.</td>
++36|```
++37|
++38|Content is **present and legible** — the fix adds contrast, it doesn't hide 
+or remove anything.
++39|
++40|### Built CSS
++41|
++42|Two rule sets in `_site/styles/docs.css`:
++43|
++44|**Dark mode** (tokens resolve to ~88% gray text on ~18% gray bg):
++45|- `.ns-prose .ns-api-table__name code, .ns-prose .ns-api-table__type code` →
+`color: var(--ns-gray-1)` (#fcfaf6) on `color-mix(surface-raised 88%, 
+primary-subtle)` (~#1b1916)
++46|- `.ns-prose .ns-api-table__type code` → `color: var(--ns-teal-2)` (#94e8e2)
+— type chips get distinct teal
++47|
++48|**Light mode** (`[data-theme="light"]` overrides):
++49|- code chips → `color: var(--ns-gray-12)` (#090806) on 
+`color-mix(surface-raised 82%, primary-subtle)` (#ffffff)
++50|- type code → `color: var(--ns-teal-7)` (#026460)
++51|
++52|| Selector | Dark contrast | Light contrast | WCAG AA |
++53||----------|------|------|---------|
++54|| `name/type code` vs bg | 16.8:1 | 20.0:1 | ✅ (AAA) |
++55|| `type code` (teal) vs bg | 12.4:1 | 7.0:1 | ✅ |
++56|| `desc` (`ns-fg`) vs bg | ~18:1 | ~20:1 | ✅ |
++57|
++58|The base `.ns-prose code` rule uses `color: var(--ns-copper-3)` (brownish) 
+which could conflict with the api-table type chip color. The new rules use 
+`.ns-prose .ns-api-table__name code` — **two-class selector** — which correctly 
+overrides the base `.ns-prose code` rule by specificity.
++59|
++60|**Adversarial check: is this real contrast, not hidden content?**
++61|✅ HTML contains endpoint names (`GET /health`, `POST 
+/api/v1/workers/jobs/{id}/trigger`) and type classifications (`liveness`, 
+`enqueue`, `history`, `SSE`) — all rendered as `<code>` chips. Description cells
+show full sentences. Nothing is hidden.
++62|
++63|## Gate 3: Tabbed/fenced code indentation — ✅ PASS
++64|
++65|### Built CSS
++66|
++67|`white-space: pre` is present on `.ns-prose pre code`:
++68|```css
++69|.ns-prose pre code {
++70|  background: none;
++71|  border: none;
++72|  padding: 0;
++73|  color: var(--ns-gray-2);
++74|  font-size: inherit;
++75|  white-space: pre;  /* ← key rule */
++76|  overflow-wrap: normal;
++77|  word-break: normal;
++78|}
++79|```
++80|
++81|### `tabbedCode.vto` structure
++82|
++83|The fix:
++84|1. Template body starts at column 0 (no leading whitespace leak from Vento)
++85|2. Uses `replaceAll("\n", "&#10;")` to preserve newlines as HTML entities
++86|3. Uses `replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", 
+"&gt;")` for safe HTML escaping
++87|4. No indentation trimming or newline collapsing in the template
++88|
++89|### Built HTML: indentation preserved
++90|
++91|`_site/tutorials/background-jobs/index.html`:
++92|```html
++93|<pre><code class="language-ts hljs language-typescript"><span 
+class="hljs-keyword">import</span> {
++94|  createSuccessResult,
++95|  createFailureResult,
++96|  defineJobHandler,
++97|} <span class="hljs-keyword">from</span> <span 
+class="hljs-string">'@netscript/plugin-workers-core'</span>;
++98|```
++99|
++100|2-space indentation on `createSuccessResult,`, `createFailureResult,`, 
+`defineJobHandler,` is preserved. Multi-line code blocks across all tabbed 
+panels retain their source indentation.
++101|
++102|## Gate 4: Diff scope — ✅ PASS
++103|
++104|- 2 files changed, both under `docs/site/`
++105|- 0 changes to `packages/`, `plugins/`, `deno.lock`
++106|- 0 stray/junk files (only `.llm/tmp/run/openhands/pr-72/` is an untracked 
+agent artifact, not in the diff)
++107|- No unrelated churn
++108|
++109|## Remaining risks
++110|
++111|- None. The fix is scoped and correct. The `deno.lock` hygiene is preserved
+(0 lock changes).
++112|
++113|---
++114|
++115|_Evaluator: OpenHands Agent (separate adversarial session) | Branch: 
+`fix/docs-render-table-code` vs `origin/docs/user-site`_
++116|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Mark all evaluation tasks done
+
+Reasoning:
+The summary.md has been successfully written. All verification gates have 
+passed. Let me finalize the task tracking and deliver the verdict.
+
+
+📋 Update Task List (5 tasks)
+
+Tokens: ↑ input 1.26M • cache hit 75.72% •  reasoning 7.49K • ↓ output 21.83K • 
+$ 0.7038
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 5 done
+
+✅ 1. Build the site: deno task build from docs/site
+✅ 2. Verify apiTable contrast on capabilities/background-jobs
+✅ 3. Verify tabbed/fenced code indentation preservation
+✅ 4. Verify diff scope: only docs/site/** changed
+✅ 5. Write summary.md and deliver verdict
+
+Condensation ───────────────────────────────────────────────────────────────────
+
+Auto Conversation Condensation Triggered.
+Forgetting 37 events
+
+[Summary of Events Being Forgotten]
+USER_CONTEXT: Fix visual regressions in the Lume-based static docs site 
+(`docs/site`), specifically improving code highlighting, api-table contrast, and
+tabbed code whitespace preservation.
+
+TASK_TRACKING: 
+- 7 tasks tracked in task_tracker (exact IDs not explicitly returned). 
+- Note: Task statuses must be strictly 'todo', 'in_progress', or 'done'.
+- Current focus: Adversarial evaluation and verification of PR #72 (docs 
+render-fix).
+
+COMPLETED: 
+- Analyzed CSS token values (oklch/hex) and calculated contrast for dark mode 
+api-table code chips.
+- Verified `_site` build directory exists and reviewed worklogs/commits.
+- Inspected git history and diffs for branch `fix/docs-render-table-code`.
+- Identified modified files in PR: `tabbedCode.vto` and `docs.css`.
+
+PENDING: 
+- Successfully verify indentation/whitespace preservation in the built HTML 
+(`docs/site/_site/tutorials/background-jobs/index.html`).
+- Complete adversarial evaluation for PR #72.
+
+CURRENT_STATE: 
+- Evaluating PR #72. 
+- Previous terminal command to check built HTML failed due to a multi-command 
+syntax error; needs to be chained properly with `&&` or `;`.
+
+CODE_STATE: 
+- `docs/site/styles/docs.css`: 32 lines added (styling for code highlighting and
+table contrast).
+- `docs/site/_components/tabbedCode.vto`: 23 lines modified (panel rendering 
+loop refactored).
+
+TESTS: 
+- HTML verification script for `background-jobs/index.html` failed to execute 
+(terminal syntax error).
+
+CHANGES: 
+- `tabbedCode.vto`: Adjusted `{{ for }}` loop and panel divs to preserve 
+whitespace/formatting.
+- `docs.css`: Added rules for `.ns-prose code`, `.ns-prose pre code`, and 
+api-table contrast.
+
+DEPS: 
+- Lume, highlight.js, Playwright Chromium (per worklog).
+
+VERSION_CONTROL_STATUS: 
+- Branch: `fix/docs-render-table-code`
+- HEAD: `6db4096e` (fix(docs): preserve tabbed code formatting)
+- Parent: `17682183` (fix(docs): restore api table cell contrast)
+- Untracked: `.llm/tmp/run/openhands/pr-72/`
+
+
+Tokens: ↑ input 1.27M • cache hit 75.49% •  reasoning 8.74K • ↓ output 23.6K • $
+0.7153
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Deliver PR #72 evaluation verdict: PASS
+
+Reasoning:
+The user task is complete. Let me provide a final summary.
+
+Finish with message:
+## Verdict: **PASS**
+
+PR #72 `fix/docs-render-table-code` vs `origin/docs/user-site` is merge-ready.
+
+### Results
+
+| Gate | Status | Evidence |
+|------|--------|----------|
+| **1. Build** | ✅ PASS | `deno task build` → 142 files, exit 0 |
+| **2. apiTable contrast** | ✅ PASS | 6 CSS rules (dark + light), contrast 
+ratios 7:1–20:1, all content legible and present |
+| **3. Tabbed code indentation** | ✅ PASS | `white-space: pre` on `.ns-prose 
+pre code`, `tabbedCode.vto` template at col 0, newlines preserved via `&#10;` |
+| **4. Diff scope** | ✅ PASS | 2 files (`docs/site/styles/docs.css`, 
+`docs/site/_components/tabbedCode.vto`), 0 `packages/`/`plugins/`/`deno.lock` 
+changes |
+
+### Key findings (adversarial)
+
+- **Contrast is real**: `<code>` chips in api-table cells are rendered with 
+explicit colors — `var(--ns-gray-1)` (dark) / `var(--ns-gray-12)` (light) for 
+name; `var(--ns-teal-2)` (dark) / `var(--ns-teal-7)` (light) for type. 
+Description cells use `var(--ns-fg)`. All exceed WCAG AA (4.5:1) and most AAA 
+(7:1).
+- **Content not hidden**: Built HTML shows endpoint names (`GET /health`, `POST 
+/api/v1/workers/jobs/{id}/trigger`), type classifications (`liveness`, 
+`enqueue`, `SSE`), and full sentences — real content, not masked.
+- **Indentation preserved**: Built HTML in `background-jobs` tutorial shows 
+2-space indentation inside `import { }` blocks; Vento template escapes newlines 
+as `&#10;` and emits no leading whitespace.
+- **CSS specificity**: New `.ns-prose .ns-api-table__name code` (2-class) rules 
+correctly override base `.ns-prose code` (1-class) — no conflict.
+
+### Remaining risks
+
+None. The fix is scoped, correct, and preserves lock hygiene.
+
+**Summary written to:** 
+`/home/runner/work/_temp/openhands/27843178622-1/summary.md`
+
+Tokens: ↑ input 1.3M • cache hit 73.79% •  reasoning 8.76K • ↓ output 24.2K • $ 
+0.7540
+
