@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1-4 product code are implemented and validated. `KvSagaStore` provides durable Deno KV state; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core warns once per logger when composed store-less; the sagas service now starts with `createDurableSagaRuntime`, exposes the durable runtime in context, and returns a stop handle that stops the runtime and closes KV. Remaining approved work: durable standalone runner/supervisor wiring, restart integration tests, docs correction, and final validation sweep.
+Slices 1-5 product code are implemented and validated. `KvSagaStore` provides durable Deno KV state; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core warns once per logger when composed store-less; the sagas service starts with the durable runtime and closes KV on stop; the standalone supervisor now defaults native runtimes to durable KV unless a legacy adapter, custom engine, or store is injected, and the runner inherits that default. Remaining approved work: restart integration tests, docs correction, and final validation sweep.
 
 ## Completed
 
@@ -24,17 +24,18 @@ Slices 1-4 product code are implemented and validated. `KvSagaStore` provides du
 - Implemented and validated slice 2 durable runtime factory and runtime barrel exports.
 - Implemented and validated slice 3 core store-less warning.
 - Implemented and validated slice 4 service durable runtime wiring.
+- Implemented and validated slice 5 standalone supervisor/runner durable default.
 
 ## In Progress
 
-- Slice 4 commit/push/PR comment cadence.
+- Slice 5 commit/push/PR comment cadence.
 
 ## Next Steps
 
-1. Commit slice 4.
+1. Commit slice 5.
 2. Push with explicit refspec.
-3. Append `commits.md` and comment PR #74 with slice 4 evidence.
-4. Start slice 5 standalone runner/supervisor wiring.
+3. Append `commits.md` and comment PR #74 with slice 5 evidence.
+4. Start slice 6 cross-restart durability integration test.
 
 ## Key Decisions
 
@@ -60,14 +61,16 @@ Slices 1-4 product code are implemented and validated. `KvSagaStore` provides du
 | `packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts` | changed | Store-less warning seam. |
 | `packages/plugin-sagas-core/tests/runtime/create-saga-runtime_test.ts` | new | Warning regression tests. |
 | `plugins/sagas/services/src/main.ts` | changed | Durable runtime service composition and stop cleanup. |
+| `plugins/sagas/src/runtime/saga-supervisor.ts` | changed | Durable default runtime factory and KV cleanup. |
+| `plugins/sagas/src/runtime/saga-supervisor_test.ts` | new | Standalone durable default regression test. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1-4 PASS | Targeted tests, scoped checks, core package check, service check, and scoped fmt passed. |
+| Static | Slices 1-5 PASS | Targeted tests, scoped checks, core package check, service check, and scoped fmt passed. |
 | Fitness | Pending | Final manual/script sweep pending later slices. |
-| Runtime | Slices 1-3 PASS | KV store, durable factory, and store-less warning tests passed. |
+| Runtime | Slices 1-5 PASS | KV store, durable factory, store-less warning, and standalone durable default tests passed. |
 | Consumer | Slice 4 PASS | Sagas service check passed with durable runtime wiring. |
 
 ## Open Questions

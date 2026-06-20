@@ -6,6 +6,8 @@ import {
   type SagaRuntimeAdapter,
 } from '@netscript/plugin-sagas-core/runtime';
 
+import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
+
 /** Lifecycle status exposed by the saga runtime supervisor. */
 export type SagaRuntimeSupervisorStatus =
   | 'idle'
@@ -19,7 +21,9 @@ export type SagaRuntimeSupervisorStatus =
 export type SagaDefinitionRegistryLoader = () => Promise<readonly SagaDefinition[]>;
 
 /** Runtime factory boundary used by tests and composition roots. */
-export type SagaRuntimeFactory = (options: CreateSagaRuntimeOptions) => SagaRuntime;
+export type SagaRuntimeFactory = (
+  options: CreateSagaRuntimeOptions,
+) => SagaRuntime | Promise<SagaRuntime>;
 
 /** Supervisor construction options. */
 export type SagaRuntimeSupervisorOptions = Readonly<{
@@ -63,7 +67,7 @@ export class SagaRuntimeSupervisor {
 
     try {
       const definitions = await this.resolveDefinitions();
-      const runtime = (this.options.createRuntime ?? createDefaultRuntime)(
+      const runtime = await (this.options.createRuntime ?? createDefaultRuntime)(
         this.options.runtimeOptions ?? {},
       );
       await runtime.register(definitions);
@@ -118,8 +122,32 @@ function formatFailure(cause: unknown): string {
   return cause instanceof Error ? cause.message : String(cause);
 }
 
-function createDefaultRuntime(options: CreateSagaRuntimeOptions): SagaRuntime {
-  return options.adapter === 'legacy'
-    ? createSagaRuntime({ ...options, adapter: 'legacy' })
-    : createSagaRuntime({ ...options, adapter: 'native' });
+async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<SagaRuntime> {
+  if (options.adapter === 'legacy' || hasInjectedNativeRuntime(options)) {
+    return options.adapter === 'legacy'
+      ? createSagaRuntime({ ...options, adapter: 'legacy' })
+      : createSagaRuntime({ ...options, adapter: 'native' });
+  }
+
+  const durable = await createDurableSagaRuntime({ native: options.native });
+  let closed = false;
+  return Object.freeze({
+    ...durable.runtime,
+    stop: async (reason?: string): Promise<void> => {
+      try {
+        await durable.runtime.stop(reason);
+      } finally {
+        if (!closed) {
+          closed = true;
+          durable.kv.close();
+        }
+      }
+    },
+  });
+}
+
+function hasInjectedNativeRuntime(options: CreateSagaRuntimeOptions): boolean {
+  return options.native?.engine !== undefined ||
+    options.native?.store !== undefined ||
+    options.native?.engineOptions?.store !== undefined;
 }
