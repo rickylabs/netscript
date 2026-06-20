@@ -1,0 +1,400 @@
+    
+    ---
+    
+    ## Security Assessment
+    
+    | Control | Status | Notes |
+    |---------|--------|-------|
+    | PKCE S256 always-on | ✅ | `code_challenge_method: 'S256'` hardcoded in 
+`signIn`; `generateRandomCodeVerifier()` |
+    | Exact-state validation | ✅ | `validateAuthResponse(as, client, url, 
+txn.state)` from `@panva/oauth4webapi` |
+    | Single-use txn (atomic + CAS) | ✅ | `takeTxn` uses `kv.atomic()` with 
+versionstamp check → delete |
+    | RFC 9207 `iss` param check | ⚠️ DEBT | Authorization response `iss` query 
+param not validated against `txn.issuer`. Defense-in-depth gap; state + PKCE 
+bound the response. |
+    | OIDC nonce + id_token | ✅ impl | `generateRandomNonce()` for OIDC; 
+`expectedNonce` + `requireIdToken` passed to `processAuthorizationCodeResponse`;
+`getValidatedIdTokenClaims()` extracts claims |
+    | OIDC nonce test coverage | ⚠️ DEBT | **No test exercises OIDC mode.** 
+Tests use a stub `oauth`-kind provider (no issuer set). Nonce gen + validation 
+code is correctly wired via `@panva/oauth4webapi` but untested end-to-end. |
+    | AES-256-GCM at rest | ✅ | 32-byte key enforced; 
+`NETSCRIPT_AUTH_KV_OAUTH_KEY` env required; no silent plaintext fallback |
+    | Refresh token rotation | ✅ | New refresh token stored on successful 
+refresh; `refreshTokenHash` tracked |
+    | Refresh-token reuse detection | ✅ | Hash mismatch → session immediately 
+deleted → `kv_oauth_refresh_failed` (tested) |
+    | `__Host-` cookies | ✅ | Default `__Host-ns_session`; `assertCookiePolicy`
+enforces `Path=/`, no `Domain`, HTTPS |
+    | HTTPS enforcement | ✅ | `assertHttps` throws `https_required` unless 
+`allowInsecureRequests: true` (test-only) |
+    | Open redirect protection | ✅ | `validateReturnTo` with origin check + 
+`allowedReturnTo` allowlist (tested) |
+    
+    ### Noted Debt (non-blocking)
+    
+    1. **OIDC nonce/id_token test coverage** — The OIDC code path 
+(`generateRandomNonce`, `expectedNonce`, `requireIdToken`) is correctly 
+implemented via `@panva/oauth4webapi` but has zero direct end-to-end test 
+coverage. The test provider fixture is `kind: 'oauth'`, never exercising the 
+`kind: 'oidc'` branch. A follow-up test should add an OIDC-kind provider fixture
+(with issuer) validating nonce round-trip and `id_token` claim extraction.
+    
+    2. **RFC 9207 `iss` response parameter** — The callback URL's `iss` query 
+parameter (RFC 9207) is stored in the txn but never validated on callback. 
+`@panva/oauth4webapi`'s `validateAuthResponse` accepts an `expectedIssuer` 
+option that is not passed. State + PKCE bound the response in practice; this is 
+defense-in-depth.
+    
+    ---
+    
+    ## Summary
+    
+    AS2b lands a fully-implemented, security-first pure KV-backed OAuth2/OIDC 
+`AuthBackendPort` backend with zero HTTP framework coupling. All 6 quality gates
+exit 0. Boundary is clean: only `packages/auth-kv-oauth` and a minimal 
+`deno.lock` entry. PKCE, single-use txn, AES-256-GCM at rest, refresh rotation 
+with reuse detection, `__Host-` cookies, and HTTPS enforcement are all 
+implemented and exercised by tests. Two moderate debt items (OIDC nonce test 
+coverage and RFC 9207 `iss` validation) are noted for follow-up — neither blocks
+PASS given the code correctness and library-level delegation.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 686.13K • cache hit 74.40% •  reasoning 2.41K • ↓ output 8.79K •
+$ 0.3802
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27874924828-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL: AS2b — auth-kv-oauth pure KV-backed OAuth2/OIDC AuthBackendPort
+ 2|
++3|**PR #88** — `feat(auth-kv-oauth): pure KV-backed OAuth2/OIDC AuthBackendPort
+backend`
++4|
++5|## Verdict: **PASS** (with noted debt)
++6|
++7|---
++8|
++9|## Gate Results
++10|
++11|| Gate | Command | Exit Code |
++12||------|---------|-----------|
++13|| `deno check` (scoped) | `run-deno-check.ts --root packages/auth-kv-oauth 
+--ext ts,tsx` | **0** |
++14|| `deno lint` (scoped) | `run-deno-lint.ts --root packages/auth-kv-oauth 
+--ext ts,tsx` | **0** |
++15|| `deno fmt --check` (scoped) | `run-deno-fmt.ts --root 
+packages/auth-kv-oauth --ext ts,tsx` | **0** |
++16|| `deno test` | `deno test --unstable-kv --allow-all packages/auth-kv-oauth`
+| **0** (8 passed) |
++17|| `deno check mod.ts` | `deno check --unstable-kv 
+packages/auth-kv-oauth/mod.ts` | **0** |
++18|| `deno publish --dry-run` | `deno publish --dry-run --allow-dirty` | **0** 
+|
++19|
++20|**Tests (8/8 pass):**
++21|- provider presets normalize descriptors and enforce client auth shape
++22|- crypto seals and opens token payloads with a key id prefix
++23|- cookies use `__Host`, HttpOnly, Secure and proxy-derived HTTPS
++24|- KV store round-trips sessions, consumes txns once, and CAS-rotates
++25|- flow rejects open redirects before creating an authorization redirect
++26|- flow performs sign-in and callback with single-use state
++27|- backend implements providers, sessions, crypto, principal mapping, and 
+authenticate
++28|- backend refreshes near-expiry sessions and detects refresh-token reuse
++29|
++30|---
++31|
++32|## Boundary & Lock Hygiene
++33|
++34|| Check | Result |
++35||-------|--------|
++36|| All changes under `packages/auth-kv-oauth` | ✓ 13 files, +1838 lines (all 
+new) |
++37|| `deno.lock` change scope | ✓ Only new-workspace entry + 
+`@panva/oauth4webapi@3.8.6` |
++38|| Root `deno.json` / catalog untouched | ✓ No change |
++39|| `packages/aspire` untouched | ✓ |
++40|| `scaffold-versions.ts` untouched | ✓ |
++41|| `packages/plugin-auth-core` untouched | ✓ |
++42|| Engine dep is `jsr:` inline specifier | ✓ `jsr:@panva/oauth4webapi@^3.8.6`
+(not `catalog:`) |
++43|| No CRLF churn / junk files | ✓ All LF |
++44|
++45|---
++46|
++47|## Conformance & Rescope
++48|
++49|**AuthBackendPort surface:** `createKvOAuthBackend` returns a full port:
++50|- `name` ✓ (`'kv-oauth'`)
++51|- `providers` ✓ (registry with `listProviders` + `getProvider`)
++52|- `sessions` ✓ (`getSession`, `createSession`, `refreshSession`, 
+`revokeSession`)
++53|- `crypto` ✓ (`sealSessionToken`, `openSessionToken`)
++54|- `principalMapper` ✓ (`mapSessionToPrincipal`)
++55|- `authenticate` ✓ (cookie → session lookup → optional refresh → principal)
++56|
++57|**No unsupported-error stubs or no-ops** ✓ — confirmed via grep, no 
+`AuthBackendOperationUnsupportedError`.
++58|
++59|**NO-HTTP rescope** ✓:
++60|- No `hono` / `Hono` import anywhere in the package
++61|- No `mountKvOAuthHandler` or route handlers
++62|- Flow primitives (`signIn`, `handleCallback`, `signOut`) are plain async 
+functions returning `Response`
++63|- Comment-only mention of "routes" in `flow.ts` line 53 ("without mounting 
+HTTP routes") — not an import
++64|
++65|**Conformance harness:** `packages/plugin-auth-core/src/testing/mod.ts` 
+contains only fixture builders (`buildAuthUser`, `buildAuthSession`), no 
+`AuthBackendPort` conformance harness. The package's own test file covers all 
+port operations.
++66|
++67|---
++68|
++69|## Security Assessment
++70|
++71|| Control | Status | Notes |
++72||---------|--------|-------|
++73|| PKCE S256 always-on | ✅ | `code_challenge_method: 'S256'` hardcoded in 
+`signIn`; `generateRandomCodeVerifier()` |
++74|| Exact-state validation | ✅ | `validateAuthResponse(as, client, url, 
+txn.state)` from `@panva/oauth4webapi` |
++75|| Single-use txn (atomic + CAS) | ✅ | `takeTxn` uses `kv.atomic()` with 
+versionstamp check → delete |
++76|| RFC 9207 `iss` param check | ⚠️ DEBT | Authorization response `iss` query 
+param not validated against `txn.issuer`. Defense-in-depth gap; state + PKCE 
+bound the response. |
++77|| OIDC nonce + id_token | ✅ impl | `generateRandomNonce()` for OIDC; 
+`expectedNonce` + `requireIdToken` passed to `processAuthorizationCodeResponse`;
+`getValidatedIdTokenClaims()` extracts claims |
++78|| OIDC nonce test coverage | ⚠️ DEBT | **No test exercises OIDC mode.** 
+Tests use a stub `oauth`-kind provider (no issuer set). Nonce gen + validation 
+code is correctly wired via `@panva/oauth4webapi` but untested end-to-end. |
++79|| AES-256-GCM at rest | ✅ | 32-byte key enforced; 
+`NETSCRIPT_AUTH_KV_OAUTH_KEY` env required; no silent plaintext fallback |
++80|| Refresh token rotation | ✅ | New refresh token stored on successful 
+refresh; `refreshTokenHash` tracked |
++81|| Refresh-token reuse detection | ✅ | Hash mismatch → session immediately 
+deleted → `kv_oauth_refresh_failed` (tested) |
++82|| `__Host-` cookies | ✅ | Default `__Host-ns_session`; `assertCookiePolicy`
+enforces `Path=/`, no `Domain`, HTTPS |
++83|| HTTPS enforcement | ✅ | `assertHttps` throws `https_required` unless 
+`allowInsecureRequests: true` (test-only) |
++84|| Open redirect protection | ✅ | `validateReturnTo` with origin check + 
+`allowedReturnTo` allowlist (tested) |
++85|
++86|### Noted Debt (non-blocking)
++87|
++88|1. **OIDC nonce/id_token test coverage** — The OIDC code path 
+(`generateRandomNonce`, `expectedNonce`, `requireIdToken`) is correctly 
+implemented via `@panva/oauth4webapi` but has zero direct end-to-end test 
+coverage. The test provider fixture is `kind: 'oauth'`, never exercising the 
+`kind: 'oidc'` branch. A follow-up test should add an OIDC-kind provider fixture
+(with issuer) validating nonce round-trip and `id_token` claim extraction.
++89|
++90|2. **RFC 9207 `iss` response parameter** — The callback URL's `iss` query 
+parameter (RFC 9207) is stored in the txn but never validated on callback. 
+`@panva/oauth4webapi`'s `validateAuthResponse` accepts an `expectedIssuer` 
+option that is not passed. State + PKCE bound the response in practice; this is 
+defense-in-depth.
++91|
++92|---
++93|
++94|## Summary
++95|
++96|AS2b lands a fully-implemented, security-first pure KV-backed OAuth2/OIDC 
+`AuthBackendPort` backend with zero HTTP framework coupling. All 6 quality gates
+exit 0. Boundary is clean: only `packages/auth-kv-oauth` and a minimal 
+`deno.lock` entry. PKCE, single-use txn, AES-256-GCM at rest, refresh rotation 
+with reuse detection, `__Host-` cookies, and HTTPS enforcement are all 
+implemented and exercised by tests. Two moderate debt items (OIDC nonce test 
+coverage and RFC 9207 `iss` validation) are noted for follow-up — neither blocks
+PASS given the code correctness and library-level delegation.
++97|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+<attachment>
+<filename>summary.md</filename>
+<content>
+# IMPL-EVAL: AS2b — auth-kv-oauth pure KV-backed OAuth2/OIDC AuthBackendPort
+
+**PR #88** — `feat(auth-kv-oauth): pure KV-backed OAuth2/OIDC AuthBackendPort 
+backend`
+
+## Verdict: **PASS** (with noted debt)
+
+---
+
+## Gate Results
+
+| Gate | Command | Exit Code |
+|------|---------|-----------|
+| `deno check` (scoped) | `run-deno-check.ts --root packages/auth-kv-oauth --ext
+ts,tsx` | **0** |
+| `deno lint` (scoped) | `run-deno-lint.ts --root packages/auth-kv-oauth --ext 
+ts,tsx` | **0** |
+| `deno fmt --check` (scoped) | `run-deno-fmt.ts --root packages/auth-kv-oauth 
+--ext ts,tsx` | **0** |
+| `deno test` | `deno test --unstable-kv --allow-all packages/auth-kv-oauth` | 
+**0** (8 passed) |
+| `deno check mod.ts` | `deno check --unstable-kv packages/auth-kv-oauth/mod.ts`
+| **0** |
+| `deno publish --dry-run` | `deno publish --dry-run --allow-dirty` | **0** |
+
+**Tests (8/8 pass):**
+- provider presets normalize descriptors and enforce client auth shape
+- crypto seals and opens token payloads with a key id prefix
+- cookies use `__Host`, HttpOnly, Secure and proxy-derived HTTPS
+- KV store round-trips sessions, consumes txns once, and CAS-rotates
+- flow rejects open redirects before creating an authorization redirect
+- flow performs sign-in and callback with single-use state
+- backend implements providers, sessions, crypto, principal mapping, and 
+authenticate
+- backend refreshes near-expiry sessions and detects refresh-token reuse
+
+---
+
+## Boundary & Lock Hygiene
+
+| Check | Result |
+|-------|--------|
+| All changes under `packages/auth-kv-oauth` | ✓ 13 files, +1838 lines (all new)
+|
+| `deno.lock` change scope | ✓ Only new-workspace entry + 
+`@panva/oauth4webapi@3.8.6` |
+| Root `deno.json` / catalog untouched | ✓ No change |
+| `packages/aspire` untouched | ✓ |
+| `scaffold-versions.ts` untouched | ✓ |
+| `packages/plugin-auth-core` untouched | ✓ |
+| Engine dep is `jsr:` inline specifier | ✓ `jsr:@panva/oauth4webapi@^3.8.6` 
+(not `catalog:`) |
+| No CRLF churn / junk files | ✓ All LF |
+
+---
+
+## Conformance & Rescope
+
+**AuthBackendPort surface:** `createKvOAuthBackend` returns a full port:
+- `name` ✓ (`'kv-oauth'`)
+- `providers` ✓ (registry with `listProviders` + `getProvider`)
+- `sessions` ✓ (`getSession`, `createSession`, `refreshSession`, 
+`revokeSession`)
+- `crypto` ✓ (`sealSessionToken`, `openSessionToken`)
+- `principalMapper` ✓ (`mapSessionToPrincipal`)
+- `authenticate` ✓ (cookie → session lookup → optional refresh → principal)
+
+**No unsupported-error stubs or no-ops** ✓ — confirmed via grep, no 
+`AuthBackendOperationUnsupportedError`.
+
+**NO-HTTP rescope** ✓:
+- No `hono` / `Hono` import anywhere in the package
+- No `mountKvOAuthHandler` or route handlers
+- Flow primitives (`signIn`, `handleCallback`, `signOut`) are plain async 
+functions returning `Response`
+- Comment-only mention of "routes" in `flow.ts` line 53 ("without mounting HTTP 
+routes") — not an import
+
+**Conformance harness:** `packages/plugin-auth-core/src/testing/mod.ts` contains
+only fixture builders (`buildAuthUser`, `buildAuthSession`), no 
+`AuthBackendPort` conformance harness. The package's own test file covers all 
+port operations.
+
+---
+
+## Security Assessment
+
+| Control | Status | Notes |
+|---------|--------|-------|
+| PKCE S256 always-on | ✅ | `code_challenge_method: 'S256'` hardcoded in 
+`signIn`; `generateRandomCodeVerifier()` |
+| Exact-state validation | ✅ | `validateAuthResponse(as, client, url, 
+txn.state)` from `@panva/oauth4webapi` |
+| Single-use txn (atomic + CAS) | ✅ | `takeTxn` uses `kv.atomic()` with 
+versionstamp check → delete |
+| RFC 9207 `iss` param check | ⚠️ DEBT | Authorization response `iss` query 
+param not validated against `txn.issuer`. Defense-in-depth gap; state + PKCE 
+bound the response. |
+| OIDC nonce + id_token | ✅ impl | `generateRandomNonce()` for OIDC; 
+`expectedNonce` + `requireIdToken` passed to `processAuthorizationCodeResponse`;
+`getValidatedIdTokenClaims()` extracts claims |
+| OIDC nonce test coverage | ⚠️ DEBT | **No test exercises OIDC mode.** Tests 
+use a stub `oauth`-kind provider (no issuer set). Nonce gen + validation code is
+correctly wired via `@panva/oauth4webapi` but untested end-to-end. |
+| AES-256-GCM at rest | ✅ | 32-byte key enforced; `NETSCRIPT_AUTH_KV_OAUTH_KEY`
+env required; no silent plaintext fallback |
+| Refresh token rotation | ✅ | New refresh token stored on successful refresh; 
+`refreshTokenHash` tracked |
+| Refresh-token reuse detection | ✅ | Hash mismatch → session immediately 
+deleted → `kv_oauth_refresh_failed` (tested) |
+| `__Host-` cookies | ✅ | Default `__Host-ns_session`; `assertCookiePolicy` 
+enforces `Path=/`, no `Domain`, HTTPS |
+| HTTPS enforcement | ✅ | `assertHttps` throws `https_required` unless 
+`allowInsecureRequests: true` (test-only) |
+| Open redirect protection | ✅ | `validateReturnTo` with origin check + 
+`allowedReturnTo` allowlist (tested) |
+
+### Noted Debt (non-blocking)
+
+1. **OIDC nonce/id_token test coverage** — The OIDC code path 
+(`generateRandomNonce`, `expectedNonce`, `requireIdToken`) is correctly 
+implemented via `@panva/oauth4webapi` but has zero direct end-to-end test 
+coverage. The test provider fixture is `kind: 'oauth'`, never exercising the 
+`kind: 'oidc'` branch. A follow-up test should add an OIDC-kind provider fixture
+(with issuer) validating nonce round-trip and `id_token` claim extraction.
+
+2. **RFC 9207 `iss` response parameter** — The callback URL's `iss` query 
+parameter (RFC 9207) is stored in the txn but never validated on callback. 
+`@panva/oauth4webapi`'s `validateAuthResponse` accepts an `expectedIssuer` 
+option that is not passed. State + PKCE bound the response in practice; this is 
+defense-in-depth.
+
+---
+
+## Summary
+
+AS2b lands a fully-implemented, security-first pure KV-backed OAuth2/OIDC 
+`AuthBackendPort` backend with zero HTTP framework coupling. All 6 quality gates
+exit 0. Boundary is clean: only `packages/auth-kv-oauth` and a minimal 
+`deno.lock` entry. PKCE, single-use txn, AES-256-GCM at rest, refresh rotation 
+with reuse detection, `__Host-` cookies, and HTTPS enforcement are all 
+implemented and exercised by tests. Two moderate debt items (OIDC nonce test 
+coverage and RFC 9207 `iss` validation) are noted for follow-up — neither blocks
+PASS given the code correctness and library-level delegation.
+</content>
+</attachment>
+
+IMPL-EVAL complete for PR #88. 
+
+**Verdict: PASS (with noted debt)**
+
+All 6 quality gates passed (exit 0). The auth-kv-oauth package is a 
+fully-implemented AuthBackendPort with:
+- Zero HTTP framework coupling (NO-HTTP rescope verified)
+- Clean boundary (only packages/auth-kv-oauth + minimal deno.lock entry)
+- Strong security controls: PKCE S256, single-use txn, AES-256-GCM at rest, 
+refresh token reuse detection, __Host- cookies, HTTPS enforcement
+
+Two moderate debt items noted for follow-up:
+1. OIDC nonce/id_token test coverage (code correct, no end-to-end test)
+2. RFC 9207 iss parameter validation (defense-in-depth gap, state+PKCE bound 
+response)
+
+Full assessment written to [summary.md](cid:1).
+
+Tokens: ↑ input 723.41K • cache hit 75.22% •  reasoning 2.88K • ↓ output 11.22K 
+• $ 0.4022
+
