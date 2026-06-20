@@ -12,9 +12,12 @@ export {
   AuthStreamSessionSchema,
 } from './schema.ts';
 export type {
+  AuthSessionState,
   AuthStreamDefinition,
   AuthStreamEvent,
   AuthStreamEventType,
+  AuthStreamSchema,
+  AuthStreamSchemaResult,
   CollectionDefinition,
   CollectionEventHelpers,
   StateSchema,
