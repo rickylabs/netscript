@@ -40,7 +40,15 @@ export type {
   WorkflowStepKind,
 } from '../domain/mod.ts';
 export type { TaskExecutor } from '../executor/mod.ts';
-export type { JobStoragePort, SchedulerPort, WorkerPort } from '../ports/mod.ts';
+export type {
+  JobStoragePort,
+  SchedulerPort,
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+  WorkerPort,
+} from '../ports/mod.ts';
 export type { ShutdownManager, ShutdownManagerOptions } from '../shutdown/mod.ts';
 export type {
   StaticJobRegistry,

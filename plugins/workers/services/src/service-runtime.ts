@@ -5,6 +5,7 @@ import {
   type RegistryKvStore,
 } from '@netscript/plugin-workers-core/registry';
 import { KvExecutionState } from '@netscript/plugin-workers-core/state';
+import { KvWorkerIdempotencyStore } from '../../worker/worker-idempotency-store.ts';
 import type { WorkersServiceRuntime } from './routers/router-context.ts';
 
 /** Create explicitly scoped runtime dependencies for the workers service. */
@@ -15,5 +16,6 @@ export async function createWorkersServiceRuntime(): Promise<WorkersServiceRunti
     executionState: new KvExecutionState({ kv: store }),
     jobRegistry: new KvJobRegistry({ kv: store }),
     taskRegistry: new KvTaskRegistry({ kv: store }),
+    idempotency: new KvWorkerIdempotencyStore({ kv }),
   });
 }

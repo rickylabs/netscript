@@ -1,0 +1,400 @@
+`public-schema.ts`) \u2014 re-exports present.\n- 
+`plugins/workers/worker/worker-idempotency-store.ts` \u2014 
+`KvWorkerIdempotencyStore` over `@netscript/kv` using `atomic` with sequential 
+`has`/`set` fallback and `expireIn` TTL for both `active` and `applied` 
+key-spaces.\n- `plugins/workers/worker/job-dispatcher.ts` \u2014 
+`claim`/`markApplied`/`release` gating on both `processWorkerJob` and 
+`processWorkerTask`.\n- `plugins/workers/worker/worker-options.ts` \u2014 
+`WorkerDispatchContext.idempotency: WorkerIdempotencyPort` (required) and 
+`WorkerOptions.idempotency` (required).\n- 
+`plugins/workers/services/src/routers/router-context.ts` \u2014 
+`WorkersServiceRuntime.idempotency: KvWorkerIdempotencyStore` confirmed.\n- 
+`plugins/triggers/src/runtime/trigger-runtime-processor.ts` \u2014 producer 
+stamps `idempotencyKey` onto `JobMessage` body.\n\n## Validation\n\nAll required
+gates from the plan's `## Gates to run` section were executed as\nindependent 
+commands on this branch; each exited 0.\n\n| Gate | Command (exact) | Exit | 
+Result |\n|---|---|---|---|\n| deno check (scoped, unstable-kv on by default) | 
+`deno run -A .llm/tools/run-deno-check.ts --root packages/plugin-workers-core 
+--root plugins/workers --root plugins/triggers --ext ts --pretty` | 0 | 237 
+files, 2 batches, 0 occurrences |\n| deno lint (scoped) | `deno run -A 
+.llm/tools/run-deno-lint.ts --root packages/plugin-workers-core --root 
+plugins/workers --root plugins/triggers --ext ts --pretty` | 0 | 237 files, 0 
+occurrences |\n| deno fmt (scoped) | `deno run -A .llm/tools/run-deno-fmt.ts 
+--root packages/plugin-workers-core --root plugins/workers --root 
+plugins/triggers --ext ts --pretty` | 0 | 237 files, 0 findings |\n| deno test 
+(workers-core) | `deno test --allow-all --unstable-kv 
+packages/plugin-workers-core/` | 0 | 20 passed, 0 failed |\n| deno test (workers
+plugin) | `deno test --allow-all --unstable-kv plugins/workers/` | 0 | 12 
+passed, 0 failed |\n| deno test (triggers) | `deno test --allow-all 
+--unstable-kv plugins/triggers/` | 0 | 8 passed, 0 failed (12 E2E ignored, as 
+expected) |\n| deno test (dispatcher integration targeted) | `deno test 
+--allow-all plugins/workers/worker/job-dispatcher_test.ts` | 0 | 3 passed, 0 
+failed |\n| publish:dry-run (plugin-workers-core) | `cd 
+packages/plugin-workers-core && deno task publish:dry-run` | 0 | Success; one 
+pre-existing `unanalyzable-dynamic-import` warning on `job-dispatcher.ts:30` 
+(not new) |\n| arch:check (global) | `deno task arch:check` | 0 | Only 
+pre-existing findings (packages/cli A14 Jest globals; AP-19 export-default; 
+AP-23 any in exported decl). No new findings attributable to slice files |\n| 
+e2e:cli | \u2014 | \u2014 | Skipped per plan (`e2e:cli \u2014 N/A`, no 
+scaffold-output change) |\n\nProduction-bar checks verified independently:\n\n- 
+Durable persistence: KV-backed `KvWorkerIdempotencyStore` over shared `getKv()` 
+handle; no in-memory-only `Set`/`Map` used for dedup.\n- Idempotency under 
+retry: `claim \u2192 markApplied | release` with `expireIn` TTL on both `active`
+(15 min) and `applied` (24 h); explicit test `KvWorkerIdempotencyStore release 
+allows a failed delivery to retry` and dispatcher test `processWorkerJob 
+releases a failed claim so redelivery can re-run`.\n- Throw-on-non-durable: 
+`KvWorkerIdempotencyStore rejects incomplete KV implementations` test confirms 
+the constructor refuses silently-non-durable backends.\n- Structured 
+already-applied (skip, not failure): confirmed in dispatcher output (`[Worker 
+worker-test] Skipping duplicate job 'send-email' 
+(idempotency=job:send-email:msg-1, alreadyApplied=true)`).\n- Observability: 
+span events `worker.job.idempotent_skip` / `worker.task.idempotent_skip` + 
+claim-source tracking in `resolveWorkerIdempotencyKey`; unit-tested for 
+caller/message-id/payload-hash precedence and deterministic SHA-256 fallback.\n-
+Graceful shutdown: TTL-bounded active claims auto-release if a worker process 
+dies mid-effect.\n- Lock hygiene: `deno.lock` not modified during the run; no 
+stray files generated.\n\nAll locked contracts in `plan-meta.json.contracts[]` 
+and all items in\n`plan-meta.json.testPlan[]` are delivered and covered by 
+passing tests.\n\n## Remaining risks\n\n- **`any` in `public-schema.ts:41` 
+(AP-23).** Global arch:check flags this pre-existing warning on a core public 
+type; slice did not introduce or deepen it, but it survives this run. Tracked by
+the global arch-debt registry, not by this slice.\n- 
+**`unanalyzable-dynamic-import` on `job-dispatcher.ts:30`.** Pre-existing 
+`publish:dry-run` warning about the optional runtime `import(specifier)`; 
+non-blocking for dry-run but worth noting for the wider JSR publish hygiene run.
+Not introduced by this slice.\n- **Queue/DLQ adapter changes remain 
+out-of-scope** for this slice by plan decision (owned separately by 
+`rbp-dlq-contract`); `packages/queue` was left untouched as locked.\n- **No 
+`e2e:cli` run.** Excluded per plan (no scaffold-output change). If a later 
+supervisor sweep decides scaffold output was affected, an `e2e:cli` pass can be 
+added as supplementary evidence \u2014 none observed in this slice's commit 
+set.\n- **`fail_debt` not triggered.** No new doctrine violations attributable 
+to the slice's changed files; pre-existing warnings (A14 in `packages/cli`, 
+AP-19 export-default, AP-23 any) remain in the global registry and are not 
+deepened here.\n"}
+
+Reasoning:
+The user wants the formal run summary written to `OPENHANDS_SUMMARY_PATH` = 
+`/home/runner/work/_temp/openhands/27857743725-1/summary.md`. I should write 
+only what I actually did. No fictional items. The task was IMPL-EVAL and I 
+completed it successfully (PASS verdict posted as PR comment).
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27857743725-1/summary.md"
+  file_text: 
+    # IMPL-EVAL — `worker-applied-keys-dedup`
+    
+    ## Summary
+    
+    Ran the independent IMPL-EVAL pass for the `worker-applied-keys-dedup` slice
+    (prime-time framework blocker) on PR #79, branch
+    `feat/prime-time/worker-applied-keys-dedup`. Verified the implementation 
+against
+    the approved plan at
+    `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/worker-applied-ke
+ys-dedup/plan.md`,
+    `plan-meta.json`, and the generated evidence in
+    `.llm/tmp/run/feat-prime-time-worker-applied-keys-dedup--impl/`
+    (`worklog.md`, `context-pack.md`, `drift.md`, `commits.md`). Read the
+    evaluator protocol and verdict definitions first.
+    
+    **Final verdict: `PASS`.** Posted as PR comment:
+    https://github.com/rickylabs/netscript/pull/79#issuecomment-4756111135
+    
+    No implementation work was performed — read-only evaluation and gate 
+execution.
+    
+    ## Changes
+    
+    Only evaluation artifacts were written under the run directory; no source
+    files, config files, or `deno.lock` were modified.
+    
+    - `.llm/tmp/run/feat-prime-time-worker-applied-keys-dedup--impl/evaluate.md`
+— full IMPL-EVAL report with gate-evidence table, contracts verified, 
+production-bar assessment, and verdict rationale.
+    - 
+`.llm/tmp/run/feat-prime-time-worker-applied-keys-dedup--impl/pr-comment.md` — 
+the exact PR-comment body that was posted.
+    
+    Source verification (read-only, no edits):
+    
+    - `packages/plugin-workers-core/src/runtime/runtime-types.ts` — 
+`idempotencyKey?: string` on `JobMessage` and `TaskMessage` confirmed.
+    - `packages/plugin-workers-core/src/ports/worker-idempotency-port.ts` — full
+`WorkerIdempotencyPort` / `WorkerIdempotencyInput` / `WorkerIdempotencyClaim` / 
+`WorkerIdempotencySource` surface matches the plan contract.
+    - `packages/plugin-workers-core/src/ports/mod.ts` and `src/public/root.ts` 
+(via `public-schema.ts`) — re-exports present.
+    - `plugins/workers/worker/worker-idempotency-store.ts` — 
+`KvWorkerIdempotencyStore` over `@netscript/kv` using `atomic` with sequential 
+`has`/`set` fallback and `expireIn` TTL for both `active` and `applied` 
+key-spaces.
+    - `plugins/workers/worker/job-dispatcher.ts` — 
+`claim`/`markApplied`/`release` gating on both `processWorkerJob` and 
+`processWorkerTask`.
+    - `plugins/workers/worker/worker-options.ts` — 
+`WorkerDispatchContext.idempotency: WorkerIdempotencyPort` (required) and 
+`WorkerOptions.idempotency` (required).
+    - `plugins/workers/services/src/routers/router-context.ts` — 
+`WorkersServiceRuntime.idempotency: KvWorkerIdempotencyStore` confirmed.
+    - `plugins/triggers/src/runtime/trigger-runtime-processor.ts` — producer 
+stamps `idempotencyKey` onto `JobMessage` body.
+    
+    ## Validation
+    
+    All required gates from the plan's `## Gates to run` section were executed 
+as
+    independent commands on this branch; each exited 0.
+    
+    | Gate | Command (exact) | Exit | Result |
+    |---|---|---|---|
+    | deno check (scoped, unstable-kv on by default) | `deno run -A 
+.llm/tools/run-deno-check.ts --root packages/plugin-workers-core --root 
+plugins/workers --root plugins/triggers --ext ts --pretty` | 0 | 237 files, 2 
+batches, 0 occurrences |
+    | deno lint (scoped) | `deno run -A .llm/tools/run-deno-lint.ts --root 
+packages/plugin-workers-core --root plugins/workers --root plugins/triggers 
+--ext ts --pretty` | 0 | 237 files, 0 occurrences |
+    | deno fmt (scoped) | `deno run -A .llm/tools/run-deno-fmt.ts --root 
+packages/plugin-workers-core --root plugins/workers --root plugins/triggers 
+--ext ts --pretty` | 0 | 237 files, 0 findings |
+    | deno test (workers-core) | `deno test --allow-all --unstable-kv 
+packages/plugin-workers-core/` | 0 | 20 passed, 0 failed |
+    | deno test (workers plugin) | `deno test --allow-all --unstable-kv 
+plugins/workers/` | 0 | 12 passed, 0 failed |
+    | deno test (triggers) | `deno test --allow-all --unstable-kv 
+plugins/triggers/` | 0 | 8 passed, 0 failed (12 E2E ignored, as expected) |
+    | deno test (dispatcher integration targeted) | `deno test --allow-all 
+plugins/workers/worker/job-dispatcher_test.ts` | 0 | 3 passed, 0 failed |
+    | publish:dry-run (plugin-workers-core) | `cd packages/plugin-workers-core 
+&& deno task publish:dry-run` | 0 | Success; one pre-existing 
+`unanalyzable-dynamic-import` warning on `job-dispatcher.ts:30` (not new) |
+    | arch:check (global) | `deno task arch:check` | 0 | Only pre-existing 
+findings (packages/cli A14 Jest globals; AP-19 export-default; AP-23 any in 
+exported decl). No new findings attributable to slice files |
+    | e2e:cli | — | — | Skipped per plan (`e2e:cli — N/A`, no scaffold-output 
+change) |
+    
+    Production-bar checks verified independently:
+    
+    - Durable persistence: KV-backed `KvWorkerIdempotencyStore` over shared 
+`getKv()` handle; no in-memory-only `Set`/`Map` used for dedup.
+    - Idempotency under retry: `claim → markApplied | release` with `expireIn` 
+TTL on both `active` (15 min) and `applied` (24 h); explicit test 
+`KvWorkerIdempotencyStore release allows a failed delivery to retry` and 
+dispatcher test `processWorkerJob releases a failed claim so redelivery can 
+re-run`.
+    - Throw-on-non-durable: `KvWorkerIdempotencyStore rejects incomplete KV 
+implementations` test confirms the constructor refuses silently-non-durable 
+backends.
+    - Structured already-applied (skip, not failure): confirmed in dispatcher 
+output (`[Worker worker-test] Skipping duplicate job 'send-email' 
+(idempotency=job:send-email:msg-1, alreadyApplied=true)`).
+    - Observability: span events `worker.job.idempotent_skip` / 
+`worker.task.idempotent_skip` + claim-source tracking in 
+`resolveWorkerIdempotencyKey`; unit-tested for caller/message-id/payload-hash 
+precedence and deterministic SHA-256 fallback.
+    - Graceful shutdown: TTL-bounded active claims auto-release if a worker 
+process dies mid-effect.
+    - Lock hygiene: `deno.lock` not modified during the run; no stray files 
+generated.
+    
+    All locked contracts in `plan-meta.json.contracts[]` and all items in
+    `plan-meta.json.testPlan[]` are delivered and covered by passing tests.
+    
+    ## Remaining risks
+    
+    - **`any` in `public-schema.ts:41` (AP-23).** Global arch:check flags this 
+pre-existing warning on a core public type; slice did not introduce or deepen 
+it, but it survives this run. Tracked by the global arch-debt registry, not by 
+this slice.
+    - **`unanalyzable-dynamic-import` on `job-dispatcher.ts:30`.** Pre-existing 
+`publish:dry-run` warning about the optional runtime `import(specifier)`; 
+non-blocking for dry-run but worth noting for the wider JSR publish hygiene run.
+Not introduced by this slice.
+    - **Queue/DLQ adapter changes remain out-of-scope** for this slice by plan 
+decision (owned separately by `rbp-dlq-contract`); `packages/queue` was left 
+untouched as locked.
+    - **No `e2e:cli` run.** Excluded per plan (no scaffold-output change). If a 
+later supervisor sweep decides scaffold output was affected, an `e2e:cli` pass 
+can be added as supplementary evidence — none observed in this slice's commit 
+set.
+    - **`fail_debt` not triggered.** No new doctrine violations attributable to 
+the slice's changed files; pre-existing warnings (A14 in `packages/cli`, AP-19 
+export-default, AP-23 any) remain in the global registry and are not deepened 
+here.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.77M • cache hit 81.91% •  reasoning 7.58K • ↓ output 21.2K • $
+0.8425
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27857743725-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL — `worker-applied-keys-dedup`
+ 2|
++3|## Summary
++4|
++5|Ran the independent IMPL-EVAL pass for the `worker-applied-keys-dedup` slice
++6|(prime-time framework blocker) on PR #79, branch
++7|`feat/prime-time/worker-applied-keys-dedup`. Verified the implementation 
+against
++8|the approved plan at
++9|`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/worker-applied-key
+s-dedup/plan.md`,
++10|`plan-meta.json`, and the generated evidence in
++11|`.llm/tmp/run/feat-prime-time-worker-applied-keys-dedup--impl/`
++12|(`worklog.md`, `context-pack.md`, `drift.md`, `commits.md`). Read the
++13|evaluator protocol and verdict definitions first.
++14|
++15|**Final verdict: `PASS`.** Posted as PR comment:
++16|https://github.com/rickylabs/netscript/pull/79#issuecomment-4756111135
++17|
++18|No implementation work was performed — read-only evaluation and gate 
+execution.
++19|
++20|## Changes
++21|
++22|Only evaluation artifacts were written under the run directory; no source
++23|files, config files, or `deno.lock` were modified.
++24|
++25|- `.llm/tmp/run/feat-prime-time-worker-applied-keys-dedup--impl/evaluate.md`
+— full IMPL-EVAL report with gate-evidence table, contracts verified, 
+production-bar assessment, and verdict rationale.
++26|- 
+`.llm/tmp/run/feat-prime-time-worker-applied-keys-dedup--impl/pr-comment.md` — 
+the exact PR-comment body that was posted.
++27|
++28|Source verification (read-only, no edits):
++29|
++30|- `packages/plugin-workers-core/src/runtime/runtime-types.ts` — 
+`idempotencyKey?: string` on `JobMessage` and `TaskMessage` confirmed.
++31|- `packages/plugin-workers-core/src/ports/worker-idempotency-port.ts` — full
+`WorkerIdempotencyPort` / `WorkerIdempotencyInput` / `WorkerIdempotencyClaim` / 
+`WorkerIdempotencySource` surface matches the plan contract.
++32|- `packages/plugin-workers-core/src/ports/mod.ts` and `src/public/root.ts` 
+(via `public-schema.ts`) — re-exports present.
++33|- `plugins/workers/worker/worker-idempotency-store.ts` — 
+`KvWorkerIdempotencyStore` over `@netscript/kv` using `atomic` with sequential 
+`has`/`set` fallback and `expireIn` TTL for both `active` and `applied` 
+key-spaces.
++34|- `plugins/workers/worker/job-dispatcher.ts` — 
+`claim`/`markApplied`/`release` gating on both `processWorkerJob` and 
+`processWorkerTask`.
++35|- `plugins/workers/worker/worker-options.ts` — 
+`WorkerDispatchContext.idempotency: WorkerIdempotencyPort` (required) and 
+`WorkerOptions.idempotency` (required).
++36|- `plugins/workers/services/src/routers/router-context.ts` — 
+`WorkersServiceRuntime.idempotency: KvWorkerIdempotencyStore` confirmed.
++37|- `plugins/triggers/src/runtime/trigger-runtime-processor.ts` — producer 
+stamps `idempotencyKey` onto `JobMessage` body.
++38|
++39|## Validation
++40|
++41|All required gates from the plan's `## Gates to run` section were executed 
+as
++42|independent commands on this branch; each exited 0.
++43|
++44|| Gate | Command (exact) | Exit | Result |
++45||---|---|---|---|
++46|| deno check (scoped, unstable-kv on by default) | `deno run -A 
+.llm/tools/run-deno-check.ts --root packages/plugin-workers-core --root 
+plugins/workers --root plugins/triggers --ext ts --pretty` | 0 | 237 files, 2 
+batches, 0 occurrences |
++47|| deno lint (scoped) | `deno run -A .llm/tools/run-deno-lint.ts --root 
+packages/plugin-workers-core --root plugins/workers --root plugins/triggers 
+--ext ts --pretty` | 0 | 237 files, 0 occurrences |
++48|| deno fmt (scoped) | `deno run -A .llm/tools/run-deno-fmt.ts --root 
+packages/plugin-workers-core --root plugins/workers --root plugins/triggers 
+--ext ts --pretty` | 0 | 237 files, 0 findings |
++49|| deno test (workers-core) | `deno test --allow-all --unstable-kv 
+packages/plugin-workers-core/` | 0 | 20 passed, 0 failed |
++50|| deno test (workers plugin) | `deno test --allow-all --unstable-kv 
+plugins/workers/` | 0 | 12 passed, 0 failed |
++51|| deno test (triggers) | `deno test --allow-all --unstable-kv 
+plugins/triggers/` | 0 | 8 passed, 0 failed (12 E2E ignored, as expected) |
++52|| deno test (dispatcher integration targeted) | `deno test --allow-all 
+plugins/workers/worker/job-dispatcher_test.ts` | 0 | 3 passed, 0 failed |
++53|| publish:dry-run (plugin-workers-core) | `cd packages/plugin-workers-core 
+&& deno task publish:dry-run` | 0 | Success; one pre-existing 
+`unanalyzable-dynamic-import` warning on `job-dispatcher.ts:30` (not new) |
++54|| arch:check (global) | `deno task arch:check` | 0 | Only pre-existing 
+findings (packages/cli A14 Jest globals; AP-19 export-default; AP-23 any in 
+exported decl). No new findings attributable to slice files |
++55|| e2e:cli | — | — | Skipped per plan (`e2e:cli — N/A`, no scaffold-output 
+change) |
++56|
++57|Production-bar checks verified independently:
++58|
++59|- Durable persistence: KV-backed `KvWorkerIdempotencyStore` over shared 
+`getKv()` handle; no in-memory-only `Set`/`Map` used for dedup.
++60|- Idempotency under retry: `claim → markApplied | release` with `expireIn` 
+TTL on both `active` (15 min) and `applied` (24 h); explicit test 
+`KvWorkerIdempotencyStore release allows a failed delivery to retry` and 
+dispatcher test `processWorkerJob releases a failed claim so redelivery can 
+re-run`.
++61|- Throw-on-non-durable: `KvWorkerIdempotencyStore rejects incomplete KV 
+implementations` test confirms the constructor refuses silently-non-durable 
+backends.
++62|- Structured already-applied (skip, not failure): confirmed in dispatcher 
+output (`[Worker worker-test] Skipping duplicate job 'send-email' 
+(idempotency=job:send-email:msg-1, alreadyApplied=true)`).
++63|- Observability: span events `worker.job.idempotent_skip` / 
+`worker.task.idempotent_skip` + claim-source tracking in 
+`resolveWorkerIdempotencyKey`; unit-tested for caller/message-id/payload-hash 
+precedence and deterministic SHA-256 fallback.
++64|- Graceful shutdown: TTL-bounded active claims auto-release if a worker 
+process dies mid-effect.
++65|- Lock hygiene: `deno.lock` not modified during the run; no stray files 
+generated.
++66|
++67|All locked contracts in `plan-meta.json.contracts[]` and all items in
++68|`plan-meta.json.testPlan[]` are delivered and covered by passing tests.
++69|
++70|## Remaining risks
++71|
++72|- **`any` in `public-schema.ts:41` (AP-23).** Global arch:check flags this 
+pre-existing warning on a core public type; slice did not introduce or deepen 
+it, but it survives this run. Tracked by the global arch-debt registry, not by 
+this slice.
++73|- **`unanalyzable-dynamic-import` on `job-dispatcher.ts:30`.** Pre-existing 
+`publish:dry-run` warning about the optional runtime `import(specifier)`; 
+non-blocking for dry-run but worth noting for the wider JSR publish hygiene run.
+Not introduced by this slice.
++74|- **Queue/DLQ adapter changes remain out-of-scope** for this slice by plan 
+decision (owned separately by `rbp-dlq-contract`); `packages/queue` was left 
+untouched as locked.
++75|- **No `e2e:cli` run.** Excluded per plan (no scaffold-output change). If a 
+later supervisor sweep decides scaffold output was affected, an `e2e:cli` pass 
+can be added as supplementary evidence — none observed in this slice's commit 
+set.
++76|- **`fail_debt` not triggered.** No new doctrine violations attributable to 
+the slice's changed files; pre-existing warnings (A14 in `packages/cli`, AP-19 
+export-default, AP-23 any) remain in the global registry and are not deepened 
+here.
++77|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+Summary file written to 
+`/home/runner/work/_temp/openhands/27857743725-1/summary.md` with complete 
+IMPL-EVAL documentation including gate execution results, contract verification,
+production bar assessment, and remaining risks. Task complete.
+
+Tokens: ↑ input 1.81M • cache hit 82.09% •  reasoning 7.61K • ↓ output 21.29K • 
+$ 0.8576
+

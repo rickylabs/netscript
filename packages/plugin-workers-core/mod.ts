@@ -26,6 +26,12 @@ export { inspectJob, inspectTask, inspectWorkflow } from './src/public/root.ts';
 export type { JobId, TaskId } from './src/public/root.ts';
 export type { CronHelpers, PermissionPresets } from './src/public/root.ts';
 export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from './src/public/root.ts';
+export type {
   JobBuilder,
   JobDefinition,
   JobHandlerContext,

@@ -6,6 +6,7 @@
 
 import { delay } from '@std/async';
 import { createQueue, type MessageQueue } from '@netscript/queue';
+import type { WorkerIdempotencyPort } from '@netscript/plugin-workers-core/runtime';
 import type { JobMessage, TaskMessage } from '@netscript/plugin-workers-core/runtime';
 import { createWorkerPool, type WorkerPool } from './job-runner-pool.ts';
 import {
@@ -74,6 +75,7 @@ export class Worker {
   private readonly executionState: WorkerExecutionState;
   private readonly taskExecutor: WorkerTaskExecutor;
   private readonly taskRegistry: WorkerTaskRegistry;
+  private readonly idempotency: WorkerIdempotencyPort;
   private readonly workerPool: WorkerPool;
   private readonly jobsDir: string;
   private readonly queueTriggers: readonly QueueTriggerConfig[];
@@ -99,6 +101,7 @@ export class Worker {
     this.executionState = options.executionState;
     this.taskExecutor = options.taskExecutor;
     this.taskRegistry = options.taskRegistry;
+    this.idempotency = options.idempotency;
     this.jobsDir = options.jobsDir ?? './jobs';
     this.queueTriggers = [...DEFAULT_QUEUE_TRIGGERS, ...(options.queueTriggers ?? [])];
     this.listenerMaxRestarts = options.listenerMaxRestarts ?? 3;
@@ -254,6 +257,7 @@ export class Worker {
             await processWorkerJob(
               this.dispatchContext(),
               message,
+              context,
               context as TracedMessageContext,
             );
           } catch (error) {
@@ -315,6 +319,7 @@ export class Worker {
       executionState: this.executionState,
       taskExecutor: this.taskExecutor,
       taskRegistry: this.taskRegistry,
+      idempotency: this.idempotency,
       workerPool: this.workerPool,
       jobsDir: this.jobsDir,
       activeJobs: this.activeJobs,
@@ -333,7 +338,8 @@ export class Worker {
       listenerMaxRestarts: this.listenerMaxRestarts,
       listenerInitialBackoffMs: this.listenerInitialBackoffMs,
       listenerMaxBackoffMs: this.listenerMaxBackoffMs,
-      processJob: (message, context) => processWorkerJob(this.dispatchContext(), message, context),
+      processJob: (message, queueContext, context) =>
+        processWorkerJob(this.dispatchContext(), message, queueContext, context),
       setTaskQueue: (queue) => {
         this.taskQueue = queue;
       },

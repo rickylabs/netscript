@@ -174,6 +174,12 @@ const runtime = createWorkersRuntime({
 
 Each call creates a fresh runtime handle. There are no hidden global registries or reset hooks.
 
+Runtime message contracts carry optional `idempotencyKey` fields on `JobMessage` and `TaskMessage`.
+Tier 2 consumers use those keys, then queue message ids, then payload hashes to implement
+at-least-once delivery with idempotency keys. The resulting delivery guarantee is
+exactly-once-effective for handlers whose external effects are keyed by the same idempotency key.
+Duplicate applied keys should be reported as already-applied skips rather than worker failures.
+
 ## Presets
 
 `startWorkers(options)` is the root preset.
