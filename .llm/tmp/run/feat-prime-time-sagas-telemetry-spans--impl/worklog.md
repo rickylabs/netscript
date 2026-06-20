@@ -77,6 +77,8 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | 2026-06-20 | S5 | implementation | Added service publish trace-linkage and failure-path tests; fixed package-local JSR module tags and a local plugin CLI doctrine finding. |
 | 2026-06-20 | S5 | gates | Final scoped static gates, targeted tests, publish dry-run, doc lint, JSR audit, and scoped doctrine checks passed. Root `deno task arch:check` remains red on pre-existing repo-wide debt. |
 | 2026-06-20 | resume | rebase prep | User reported durable-store PR #74 plus #78/#79/#80 merged into umbrella and requested rebase onto `origin/feat/framework-prime-time`; pre-rebase artifact refresh will be committed before rebase. |
+| 2026-06-20 | resume | rebase | Rebased onto `origin/feat/framework-prime-time` at `5c4a4587`; resolved conflicts by preserving durable runtime `logger`/store contract and injecting telemetry through `createDurableSagaRuntime` native options. |
+| 2026-06-20 | resume | gates | Re-ran approved slice gate set after rebase: scoped check/lint/fmt PASS, targeted telemetry/runtime tests PASS (23 passed), publish dry-run PASS, doc lint PASS, JSR audit PASS with warnings only, scoped doctrine checks PASS with 0 FAIL. |
 
 ## Decisions
 
@@ -123,9 +125,16 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | Final scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 148 files selected; 0 findings. |
 | Final scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 148 files selected; 0 findings. |
 | Final targeted tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/telemetry packages/plugin-sagas-core/tests/runtime plugins/sagas/tests/telemetry` | PASS | 21 passed, 0 failed. |
+| Rebased scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 155 files selected; 0 findings. |
+| Rebased scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 155 files selected; 0 findings. |
+| Rebased scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 155 files selected; 0 findings. |
+| Rebased targeted tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/telemetry packages/plugin-sagas-core/tests/runtime plugins/sagas/tests/telemetry` | PASS | 23 passed, 0 failed. |
 | Publish dry-run | `cd packages/plugin-sagas-core && deno task publish:dry-run` | PASS | Exit 0; dry run complete. |
 | Telemetry doc lint | `cd packages/plugin-sagas-core && deno doc --lint src/telemetry/mod.ts` | PASS | Checked 1 file. |
 | JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/plugin-sagas-core --text` | PASS | Exit 0; warnings only for existing cardinality and slow-type banner text. |
+| Rebased publish dry-run | `cd packages/plugin-sagas-core && deno task publish:dry-run` | PASS | Exit 0; dry run complete. |
+| Rebased telemetry doc lint | `cd packages/plugin-sagas-core && deno doc --lint src/telemetry/mod.ts` | PASS | Checked 1 file. |
+| Rebased JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/plugin-sagas-core --text` | PASS | Exit 0; warnings only for existing cardinality and slow-type banner text. |
 | Root arch check | `deno task arch:check` | FAIL | Pre-existing repo-wide findings outside slice; see Drift. Scoped doctrine checks below are the slice verdict. |
 
 ### Fitness Gates
@@ -140,6 +149,7 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | F-13 saga/runtime invariants | PASS | One span per per-instance handle+persist unit; runtime tests still pass. | `saga-engine-spans_test.ts`, runtime tests. |
 | F-15/F-18 exports | PASS | OTel adapter not re-exported from package root; core telemetry subpath remains curated. | JSR audit and scoped doctrine checks. |
 | Scoped doctrine | PASS | `check-doctrine --root packages/plugin-sagas-core --text` and `--root plugins/sagas --text` both exit 0 with 0 FAIL. | Warnings are existing debt/non-slice cleanup. |
+| Rebased scoped doctrine | PASS | `check-doctrine --root packages/plugin-sagas-core --text` and `--root plugins/sagas --text` both exit 0 with 0 FAIL. | Warnings remain existing debt/non-slice cleanup. |
 
 ### Runtime Gates
 
@@ -161,7 +171,9 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 
 ## Final Verdict
 
-Slice `sagas-telemetry-spans` implementation is complete and ready for IMPL-EVAL. The approved scoped gates are green. The only non-green raw command is root `deno task arch:check`, which reports pre-existing repo-wide doctrine debt outside this slice; scoped doctrine checks for the touched roots exit 0 with 0 FAIL.
+READY FOR IMPL-EVAL (rebased onto umbrella)
+
+Slice `sagas-telemetry-spans` implementation is complete and rebased onto `origin/feat/framework-prime-time`. The approved scoped gates are green. The only non-green raw command remains root `deno task arch:check`, which reports pre-existing repo-wide doctrine debt outside this slice; scoped doctrine checks for the touched roots exit 0 with 0 FAIL.
 
 ## Handoff Notes
 

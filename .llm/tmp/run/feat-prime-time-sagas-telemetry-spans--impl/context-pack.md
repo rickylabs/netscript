@@ -12,9 +12,7 @@
 
 ## Current State
 
-S5 implementation is complete and pushed: the core telemetry seam and engine handle spans are wired, native runtime instrumentation reaches the engine, `plugins/sagas` has an OTel-backed saga tracer injected at native composition roots, and service publish trace headers are proven to parent `saga.handle` spans.
-
-Resume request: rebase `feat/prime-time/sagas-telemetry-spans` onto the updated umbrella `origin/feat/framework-prime-time` after durable-store PR #74 and sibling PRs #78/#79/#80 merged. Resolve conflicts by consuming the locked durable-store contract (`KvSagaStore`, `createDurableSagaRuntime`, `SagaStorePort`) instead of reintroducing a divergent store contract. Re-run the approved slice gate set, push with explicit force-with-lease refspec, append artifacts, write `READY FOR IMPL-EVAL (rebased onto umbrella)` in `worklog.md`, and do not comment on PR #76.
+S5 implementation is complete and rebased onto updated umbrella commit `5c4a4587` (`origin/feat/framework-prime-time`) after durable-store PR #74 and sibling PRs #78/#79/#80 merged. Conflict resolution consumes the locked durable-store contract (`KvSagaStore`, `createDurableSagaRuntime`, `SagaStorePort`) and injects saga telemetry through durable runtime `native` options instead of reintroducing a divergent runtime/store path.
 
 ## Completed
 
@@ -31,17 +29,17 @@ Resume request: rebase `feat/prime-time/sagas-telemetry-spans` onto the updated 
 - Implemented S5 service publish trace-linkage and failure-path tests.
 - Added missing package-local `@module` tags for existing `plugin-sagas-core` subpath barrels so JSR audit exits 0.
 - Cleared scoped `plugins/sagas` doctrine FAIL by making `SagasCliCommand` a concrete protected-constructor base wrapper instead of an abstract class with no abstract members.
+- Rebased onto `origin/feat/framework-prime-time`, preserving durable saga runtime defaults and routing telemetry through `createDurableSagaRuntime({ native: { instrumentation } })`.
+- Re-ran approved slice gates after rebase; all scoped gates are green.
 
 ## In Progress
 
-- Rebase onto updated umbrella and rerun slice gates.
+- Final artifact commit and explicit force-with-lease push.
 
 ## Next Steps
 
-1. Commit pre-rebase harness artifact refresh.
-2. Rebase onto `origin/feat/framework-prime-time`.
-3. Rerun slice gates from `plan.md`.
-4. Append artifacts, push explicit force-with-lease refspec, and stop without PR comments.
+1. Commit final rebased gate evidence.
+2. Push explicit force-with-lease refspec and stop without PR comments.
 
 ## Key Decisions
 
@@ -79,7 +77,7 @@ Resume request: rebase `feat/prime-time/sagas-telemetry-spans` onto the updated 
 | --- | --- | --- |
 | Static | PASS | Final scoped check/lint/fmt on `packages/plugin-sagas-core` + `plugins/sagas` passed. |
 | Fitness | PASS | Publish dry-run, doc lint, JSR audit, scoped doctrine checks, and manual F-gate evidence recorded. Root `arch:check` remains red on unrelated repo-wide debt. |
-| Runtime | PASS | Final targeted telemetry/runtime tests passed: 21 passed, 0 failed. |
+| Runtime | PASS | Final targeted telemetry/runtime tests passed after rebase: 23 passed, 0 failed. |
 | Consumer | PASS | `plugins/sagas` scoped check/tests passed. |
 
 ## Open Questions
@@ -99,3 +97,10 @@ Resume request: rebase `feat/prime-time/sagas-telemetry-spans` onto the updated 
 - 2c48496: feat(sagas): wire otel saga telemetry
 - f51af82c: feat(sagas): verify publish trace linkage
 - e0ce950: chore(sagas): finalize telemetry span evidence
+- 9803734: feat(sagas): extend telemetry span seam
+- c9cbfa1: feat(sagas): emit engine handle spans
+- 41ed44a: feat(sagas): thread runtime instrumentation
+- 64e6a5f: feat(sagas): wire otel saga telemetry
+- f7a897a: feat(sagas): verify publish trace linkage
+- ea80c51: chore(sagas): finalize telemetry span evidence
+- 666c844: chore(harness): refresh sagas telemetry run artifacts
