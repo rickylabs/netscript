@@ -47,6 +47,60 @@ Deno.test('authn middleware sets principal and calls next on success', async () 
   assertEquals(body, { subject: 'user:1' });
 });
 
+Deno.test('authn middleware exposes full headers and cookies to authenticators', async () => {
+  let observedHeader: string | undefined;
+  let observedCookie: string | undefined;
+  let observedHeaders: string | undefined;
+  const authenticator: AuthenticatorPort = {
+    authenticate: (request) => {
+      observedHeader = request.header('x-session-id');
+      observedCookie = request.cookie('sid');
+      observedHeaders = request.headers().get('x-session-id') ?? undefined;
+      return { ok: true, principal };
+    },
+  };
+  const app = new Hono<AuthTestEnv>();
+  app.use('*', createAuthnMiddleware({ authenticator }));
+  app.get('/api/users', (c) => c.json({ ok: true }));
+
+  const response = await app.request('/api/users', {
+    headers: {
+      cookie: 'sid=session-123; theme=dark',
+      'x-session-id': 'header-session',
+    },
+  });
+
+  assertEquals(response.status, 200);
+  assertEquals(observedHeader, 'header-session');
+  assertEquals(observedCookie, 'session-123');
+  assertEquals(observedHeaders, 'header-session');
+});
+
+Deno.test('authn middleware applies response headers and Set-Cookie values on success', async () => {
+  const authenticator: AuthenticatorPort = {
+    authenticate: () => ({
+      ok: true,
+      principal,
+      responseHeaders: { 'x-auth-refresh': 'rotated' },
+      setCookies: [
+        'sid=session-456; Path=/; HttpOnly',
+        'csrf=csrf-456; Path=/; SameSite=Lax',
+      ],
+    }),
+  };
+  const app = new Hono<AuthTestEnv>();
+  app.use('*', createAuthnMiddleware({ authenticator }));
+  app.get('/api/users', (c) => c.json({ ok: true }));
+
+  const response = await app.request('/api/users');
+
+  assertEquals(response.status, 200);
+  assertEquals(response.headers.get('x-auth-refresh'), 'rotated');
+  const setCookie = response.headers.get('set-cookie') ?? '';
+  assertEquals(setCookie.includes('sid=session-456'), true);
+  assertEquals(setCookie.includes('csrf=csrf-456'), true);
+});
+
 Deno.test('authn middleware bypasses anonymous health paths', async () => {
   let calls = 0;
   const authenticator: AuthenticatorPort = {

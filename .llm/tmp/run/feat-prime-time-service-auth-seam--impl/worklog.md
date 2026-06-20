@@ -79,6 +79,8 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | 2026-06-20 | 6 | gates | Static wrappers, publish dry-run, `deno doc`, filtered symbol docs, and auth doc lint passed. Dry-run retained the package's pre-existing `--allow-slow-types` warning and completed successfully. |
 | 2026-06-20 | 7 | implementation | Added `defineService({ auth })` opt-in wiring, README auth examples, README fixture checks, and preset integration tests. |
 | 2026-06-20 | 7 | gates | Targeted auth tests, full service tests, static wrappers, publish dry-run, docs, consumer checks, and service-scoped doctrine check passed. Root `deno task arch:check` failed on pre-existing repo-wide findings outside this slice; recorded in drift. |
+| 2026-06-20 | follow-up | implementation | Widened auth contracts for session/cookie and token-IdP adapters without adding provider dependencies: full headers, cookie lookup, success response headers/Set-Cookie, tenant/session/provider claims JSDoc, and external auth router README pattern. |
+| 2026-06-20 | follow-up | gates | Focused auth tests, full service tests, static wrappers, publish dry-run, docs, and service-scoped doctrine passed. |
 
 ## Decisions
 
@@ -135,6 +137,14 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | slice 7 docs | `deno doc packages/service/mod.ts`; `deno doc --filter createStaticCredentialAuthenticator packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0. |
 | root arch | `deno task arch:check` | FAIL | Exit 1; 58 FAIL, 143 WARN, 1 INFO on pre-existing repo-wide doctrine findings outside this slice, mostly CLI/plugin abstract bases and Jest/Vitest globals. |
 | service doctrine | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/service` | PASS | Exit 0; FAIL=0, WARN=1 (`docs/architecture.md` lacks archetype number). No service-auth findings. |
+| follow-up auth tests | `rtk proxy deno test --allow-all packages/service/tests/auth/` | PASS | Exit 0; 27 passed, 0 failed. |
+| follow-up full service tests | `rtk proxy deno test --allow-all packages/service/tests/` | PASS | Exit 0; 44 passed, 0 failed. |
+| follow-up check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 diagnostics. |
+| follow-up lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 findings. |
+| follow-up fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 findings. |
+| follow-up publish | `cd packages/service && rtk proxy deno publish --dry-run --allow-dirty --allow-slow-types` | PASS | Exit 0; dry run complete. Existing service slow-types warning remains under accepted `--allow-slow-types` carve-out. |
+| follow-up docs | `deno doc packages/service/mod.ts`; `deno doc --filter AuthnRequest/AuthnResult/Principal packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0. |
+| follow-up service doctrine | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/service` | PASS | Exit 0; FAIL=0, WARN=1 existing docs warning. |
 
 ### Fitness Gates
 
@@ -145,6 +155,7 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | F-6 publishability | PASS | `deno publish --dry-run --allow-dirty --allow-slow-types` from `packages/service`; exit 0. | Existing slow-types warning remains within accepted package carve-out. |
 | F-15 upstream re-export lint | PASS | Manual export review of `packages/service/src/auth/mod.ts`; no Hono, jose, or upstream auth library types exported. | Auth subpath exports package-owned types and factories only. |
 | F-1/F-3/F-11/F-14 service doctrine | PASS | `check-doctrine.ts --root packages/service` exit 0. | One existing docs warning, no failures. |
+| adapter-readiness surface | PASS | Manual review + docs + tests. | No better-auth/WorkOS dependency added; new fields are optional/backward-compatible. |
 
 ### Runtime Gates
 
@@ -152,6 +163,7 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | --- | --- | --- | --- |
 | auth behavior | NOT_RUN | Pending targeted tests. | Planned for slices 2-7. |
 | auth behavior | PASS | `packages/service/tests/auth/` and full `packages/service/tests/`. | 25 targeted auth tests and 42 full service tests passed. |
+| follow-up auth behavior | PASS | `packages/service/tests/auth/` and full `packages/service/tests/`. | 27 targeted auth tests and 44 full service tests passed. |
 
 ### Consumer Gates
 

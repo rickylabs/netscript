@@ -21,3 +21,13 @@ Drift is append-only. Record facts that diverge from the plan, RFC, doctrine, or
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** Worklog gate table records both commands and outcomes.
+
+## 2026-06-20 — Additive auth adapter-readiness widening
+
+- **What:** The auth contract was widened for future better-auth and WorkOS adapter slices without adding provider dependencies to `@netscript/service`.
+- **Source:** Supervisor-approved follow-up steer.
+- **Expected:** Original approved plan shipped dependency-free auth ports and default adapters, with third-party provider adapters deferred.
+- **Actual:** `AuthnRequest` now exposes full request `Headers` and cookie lookup, successful `AuthnResult` can carry response headers and Set-Cookie values, `Principal.claims` JSDoc documents tenant/session/provider-permission mapping, and README documents external auth router mounting via `allowAnonymous`.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** `packages/service/src/auth/types.ts`, `packages/service/src/auth/auth-middleware.ts`, `packages/service/README.md`, and auth middleware tests.

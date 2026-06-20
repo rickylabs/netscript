@@ -45,6 +45,7 @@ export function createAuthnMiddleware(options: AuthnOptions): MiddlewareHandler 
       }
 
       c.set('principal', result.principal);
+      applyAuthnResponse(c, result.responseHeaders, result.setCookies);
       await logAuthDecision(c, {
         stage: 'authn',
         decision: 'allow',
@@ -157,7 +158,33 @@ function toAuthnRequest(c: Context): AuthnRequest {
     method: c.req.method,
     path: c.req.path,
     header: (name) => c.req.header(name),
+    headers: () => new Headers(c.req.raw.headers),
+    cookie: (name) => readCookie(c.req.header('cookie'), name),
   };
+}
+
+function applyAuthnResponse(
+  c: Context,
+  headers: Readonly<Record<string, string>> | undefined,
+  setCookies: readonly string[] | undefined,
+): void {
+  for (const [name, value] of Object.entries(headers ?? {})) {
+    c.header(name, value);
+  }
+  for (const cookie of setCookies ?? []) {
+    c.header('Set-Cookie', cookie, { append: true });
+  }
+}
+
+function readCookie(cookieHeader: string | undefined, name: string): string | undefined {
+  if (!cookieHeader) return undefined;
+  for (const part of cookieHeader.split(';')) {
+    const [rawKey, ...rawValue] = part.trim().split('=');
+    if (rawKey === name) {
+      return rawValue.join('=');
+    }
+  }
+  return undefined;
 }
 
 function unauthorized(c: Context, message: string): Response {

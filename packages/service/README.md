@@ -186,6 +186,32 @@ const running = await defineService(router, {
 await running.stop();
 ```
 
+Provider auth systems often bring their own HTTP handler for login, callback, and session
+management routes. Mount the provider router in the host service and exempt that path with
+`allowAnonymous`; keep the rest of `/api` guarded:
+
+```ts
+import { createService } from '@netscript/service';
+
+const running = await createService(router, { name: 'orders' })
+  .withAuthn({
+    authenticator: sessionAuthenticator,
+    protect: ['/api'],
+    allowAnonymous: ['/api/auth', '/health'],
+  })
+  .route('get', '/api/auth/session', (context) => providerAuthHandler(context.req.raw))
+  .withRPC()
+  .withHealth()
+  .serve({ port: 3001 });
+
+await running.stop();
+```
+
+Session adapters can validate against the full request header set and cookies through the
+`AuthnRequest.headers()` and `AuthnRequest.cookie(name)` accessors. On successful authentication,
+they may return `responseHeaders` or `setCookies` so refresh-on-read session rotation can update the
+response without coupling `@netscript/service` to a provider SDK.
+
 ## Runtime Lifecycle
 
 `serve()` starts a Deno listener and returns:

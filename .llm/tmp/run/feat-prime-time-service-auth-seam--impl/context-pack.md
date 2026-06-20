@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slice 7 implementation is complete: auth contracts/adapters/middleware exist, builder and defineService opt-in auth are wired, README examples document the flow, and service-scoped tests/gates are green. Root `deno task arch:check` fails on pre-existing repo-wide doctrine findings outside this slice.
+Follow-up additive widening is complete: `AuthnRequest` now exposes full headers and cookies, successful auth can emit response headers and Set-Cookie, `Principal.claims` documents tenant/session/provider mapping, and README documents external auth router mounting with `allowAnonymous`. No provider dependency was added.
 
 ## Completed
 
@@ -27,16 +27,17 @@ Slice 7 implementation is complete: auth contracts/adapters/middleware exist, bu
 - Slice 6 `./auth` subpath added and static/publish/doc gates passed.
 - Slice 7 `defineService({ auth })`, README examples, and preset integration tests added.
 - Final service tests, publish/doc checks, consumer checks, and service-scoped doctrine check passed.
+- Follow-up adapter-readiness widening implemented and focused/full service gates passed.
 
 ## In Progress
 
-- Slice 7 commit/push/PR comment.
+- Follow-up commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit slice 7.
+1. Commit follow-up widening.
 2. Push with explicit refspec and comment on PR #77.
-3. Hand off to supervisor/IMPL-EVAL with root `arch:check` caveat.
+3. Stop for supervisor IMPL-EVAL with root `arch:check` caveat unchanged.
 
 ## Key Decisions
 
@@ -70,14 +71,19 @@ Slice 7 implementation is complete: auth contracts/adapters/middleware exist, bu
 | `packages/service/README.md` | changed | Added auth feature, subpath, builder, and preset examples. |
 | `packages/service/tests/_fixtures/readme-examples_test.ts` | changed | Added auth example assertions. |
 | `packages/service/tests/auth/define-service-auth_test.ts` | new | Preset auth-off and auth-on integration tests. |
+| `packages/service/src/auth/types.ts` | changed | Added full headers, cookie lookup, optional response headers/Set-Cookie, and claims mapping docs. |
+| `packages/service/src/auth/auth-middleware.ts` | changed | Applies successful auth response headers and Set-Cookie values. |
+| `packages/service/tests/auth/authenticators_test.ts` | changed | Updated request fixture for full headers/cookie access. |
+| `packages/service/tests/auth/middleware_test.ts` | changed | Added full-header/cookie and response-write tests. |
+| `packages/service/README.md` | changed | Added external auth router mounting pattern and session adapter notes. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Slice 1-7 check/lint/fmt wrappers passed. |
+| Static | PASS | Slice 1-7 plus follow-up check/lint/fmt wrappers passed. |
 | Fitness | PASS_WITH_CAVEAT | Publish/doc/service doctrine passed; root `deno task arch:check` failed on pre-existing repo-wide findings. |
-| Runtime | PASS | Targeted auth tests and full service tests passed. |
+| Runtime | PASS | Targeted auth tests and full service tests passed after follow-up widening. |
 | Consumer | PASS | workers/sagas/streams service checks passed. |
 
 ## Open Questions
@@ -86,7 +92,7 @@ Slice 7 implementation is complete: auth contracts/adapters/middleware exist, bu
 
 ## Drift and Debt
 
-- Drift: root `deno task arch:check` fails outside slice; service-scoped doctrine check passes.
+- Drift: root `deno task arch:check` fails outside slice; additive adapter-readiness widening recorded; service-scoped doctrine check passes.
 - Debt: none introduced.
 
 ## Commits

@@ -13,7 +13,10 @@
  *       scopes: ["orders:read"],
  *       roles: ["service"],
  *       scheme: "custom",
- *       claims: {},
+ *       claims: {
+ *         organizationId: "org_123",
+ *         sessionId: "sess_123",
+ *       },
  *     },
  *   }),
  * };
@@ -32,19 +35,36 @@ export interface Principal {
   readonly roles: readonly string[];
   /** Authentication scheme that established the principal. */
   readonly scheme: 'api-key' | 'bearer' | 'trusted-header' | 'custom';
-  /** Opaque verified claims for consumer-specific authorization. */
+  /**
+   * Opaque verified claims for consumer-specific authorization.
+   *
+   * Adapter packages should use `scheme: "custom"` plus this claim bag for
+   * provider-specific identity such as organization id, tenant id, session id,
+   * provider permissions, or normalized WorkOS/better-auth session metadata.
+   */
   readonly claims: Readonly<Record<string, unknown>>;
 }
 
 /** Result of an authentication attempt. */
 export type AuthnResult =
-  | { readonly ok: true; readonly principal: Principal }
+  | {
+    readonly ok: true;
+    readonly principal: Principal;
+    /** Response headers the authenticator wants written after successful auth. */
+    readonly responseHeaders?: Readonly<Record<string, string>>;
+    /** Set-Cookie header values emitted by refresh-on-read session authenticators. */
+    readonly setCookies?: readonly string[];
+  }
   | { readonly ok: false; readonly reason: string };
 
 /** Input handed to an authenticator. */
 export interface AuthnRequest {
   /** Reads a request header by lowercase or canonical name. */
   header(name: string): string | undefined;
+  /** Returns the full request headers for provider SDKs that validate sessions from header sets. */
+  headers(): Headers;
+  /** Reads a cookie value by name from the Cookie header. */
+  cookie(name: string): string | undefined;
   /** Request method. */
   readonly method: string;
   /** Request path. */

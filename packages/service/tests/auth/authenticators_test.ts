@@ -10,10 +10,20 @@ function request(headers: Record<string, string> = {}): AuthnRequest {
   const normalized = new Map(
     Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
   );
+  const fullHeaders = new Headers(headers);
   return {
     method: 'GET',
     path: '/api/users',
     header: (name) => normalized.get(name.toLowerCase()),
+    headers: () => new Headers(fullHeaders),
+    cookie: (name) => {
+      const cookie = normalized.get('cookie');
+      return cookie?.split(';')
+        .map((part) => part.trim())
+        .map((part) => part.split('='))
+        .find(([key]) => key === name)
+        ?.[1];
+    },
   };
 }
 
