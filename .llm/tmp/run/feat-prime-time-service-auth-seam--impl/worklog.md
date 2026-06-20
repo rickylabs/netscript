@@ -77,6 +77,8 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | 2026-06-20 | 5 | gates | Builder integration tests and check/lint/fmt wrappers passed. |
 | 2026-06-20 | 6 | implementation | Added `@netscript/service/auth` subpath export for auth contracts and default factory adapters. |
 | 2026-06-20 | 6 | gates | Static wrappers, publish dry-run, `deno doc`, filtered symbol docs, and auth doc lint passed. Dry-run retained the package's pre-existing `--allow-slow-types` warning and completed successfully. |
+| 2026-06-20 | 7 | implementation | Added `defineService({ auth })` opt-in wiring, README auth examples, README fixture checks, and preset integration tests. |
+| 2026-06-20 | 7 | gates | Targeted auth tests, full service tests, static wrappers, publish dry-run, docs, consumer checks, and service-scoped doctrine check passed. Root `deno task arch:check` failed on pre-existing repo-wide findings outside this slice; recorded in drift. |
 
 ## Decisions
 
@@ -89,7 +91,7 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| None | N/A | N/A |
+| Root `deno task arch:check` is not a usable slice-green verdict because it fails on pre-existing repo-wide findings outside `packages/service`. | minor | yes |
 
 ## Gate Results
 
@@ -124,6 +126,15 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | slice 6 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 28 files, 0 findings. |
 | slice 6 publish | `cd packages/service && rtk proxy deno publish --dry-run --allow-dirty --allow-slow-types` | PASS | Exit 0; checked `mod.ts` and `src/auth/mod.ts`; dry run complete. Slow-types warning is the accepted package baseline requiring `--allow-slow-types`. |
 | slice 6 docs | `deno doc packages/service/mod.ts`; `deno doc --filter <symbol> packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0; root docs readable, auth symbols visible with JSDoc, doc lint checked 1 file. |
+| slice 7 auth tests | `rtk proxy deno test --allow-all packages/service/tests/auth/` | PASS | Exit 0; 25 passed, 0 failed. |
+| slice 7 full service tests | `rtk proxy deno test --allow-all packages/service/tests/` | PASS | Exit 0; 42 passed, 0 failed. |
+| slice 7 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 diagnostics. |
+| slice 7 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 29 files, 0 findings. |
+| slice 7 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0 after formatting owned files; 29 files, 0 findings. |
+| slice 7 publish | `cd packages/service && rtk proxy deno publish --dry-run --allow-dirty --allow-slow-types` | PASS | Exit 0; dry run complete. Slow-types warning is the accepted service package baseline. |
+| slice 7 docs | `deno doc packages/service/mod.ts`; `deno doc --filter createStaticCredentialAuthenticator packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0. |
+| root arch | `deno task arch:check` | FAIL | Exit 1; 58 FAIL, 143 WARN, 1 INFO on pre-existing repo-wide doctrine findings outside this slice, mostly CLI/plugin abstract bases and Jest/Vitest globals. |
+| service doctrine | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/service` | PASS | Exit 0; FAIL=0, WARN=1 (`docs/architecture.md` lacks archetype number). No service-auth findings. |
 
 ### Fitness Gates
 
@@ -133,19 +144,25 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | F-5/F-7 auth docs | PASS | `deno doc --filter createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createScopeAuthorizer`, `Principal`; `deno doc --lint packages/service/src/auth/mod.ts`. | Auth subpath surface is documented. |
 | F-6 publishability | PASS | `deno publish --dry-run --allow-dirty --allow-slow-types` from `packages/service`; exit 0. | Existing slow-types warning remains within accepted package carve-out. |
 | F-15 upstream re-export lint | PASS | Manual export review of `packages/service/src/auth/mod.ts`; no Hono, jose, or upstream auth library types exported. | Auth subpath exports package-owned types and factories only. |
+| F-1/F-3/F-11/F-14 service doctrine | PASS | `check-doctrine.ts --root packages/service` exit 0. | One existing docs warning, no failures. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | auth behavior | NOT_RUN | Pending targeted tests. | Planned for slices 2-7. |
+| auth behavior | PASS | `packages/service/tests/auth/` and full `packages/service/tests/`. | 25 targeted auth tests and 42 full service tests passed. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | plugins service consumers | NOT_RUN | Pending final gate. | Planned for slice 7. |
+| workers services | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers/services --ext ts` | Exit 0; 13 files, 0 diagnostics. |
+| sagas services | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/services --ext ts` | Exit 0; 10 files, 0 diagnostics. |
+| streams services | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/streams/services --ext ts` | Exit 0; 1 file, 0 diagnostics. |
 
 ## Handoff Notes
 
 - Inspect `packages/service/src/auth/` first, then builder wiring in `service-builder-impl.ts`.
+- Root `deno task arch:check` is the only non-green named command; service-scoped doctrine evidence is green and the root failures pre-date/outside this slice.

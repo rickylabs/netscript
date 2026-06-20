@@ -15,3 +15,4 @@ Format:
 - dda6fb6: feat(service): add scope authorizer
 - cbfc40f: feat(service): add auth middleware
 - a51cb42: feat(service): wire auth into service builder
+- dbf8536: feat(service): expose auth subpath

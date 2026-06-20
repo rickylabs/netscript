@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slice 6 implementation is complete: auth contracts/adapters/middleware exist, builder methods wire auth deterministically during `build()`, and the new `@netscript/service/auth` subpath exports auth contracts and default factories.
+Slice 7 implementation is complete: auth contracts/adapters/middleware exist, builder and defineService opt-in auth are wired, README examples document the flow, and service-scoped tests/gates are green. Root `deno task arch:check` fails on pre-existing repo-wide doctrine findings outside this slice.
 
 ## Completed
 
@@ -25,16 +25,18 @@ Slice 6 implementation is complete: auth contracts/adapters/middleware exist, bu
 - Slice 4 authn/authz middleware added and targeted tests/static gates passed.
 - Slice 5 builder integration added and targeted integration/static gates passed.
 - Slice 6 `./auth` subpath added and static/publish/doc gates passed.
+- Slice 7 `defineService({ auth })`, README examples, and preset integration tests added.
+- Final service tests, publish/doc checks, consumer checks, and service-scoped doctrine check passed.
 
 ## In Progress
 
-- Slice 6 commit/push/PR comment.
+- Slice 7 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit slice 6.
+1. Commit slice 7.
 2. Push with explicit refspec and comment on PR #77.
-3. Start slice 7 `defineService` auth opt-in and README examples.
+3. Hand off to supervisor/IMPL-EVAL with root `arch:check` caveat.
 
 ## Key Decisions
 
@@ -64,15 +66,19 @@ Slice 6 implementation is complete: auth contracts/adapters/middleware exist, bu
 | `packages/service/tests/auth/builder-auth_test.ts` | new | Builder integration tests for 401/403/200, health bypass, and oRPC principal context. |
 | `packages/service/src/auth/mod.ts` | new | Public auth subpath manifest. |
 | `packages/service/deno.json` | changed | Added `./auth` export entry. |
+| `packages/service/src/presets/define-service.ts` | changed | Added optional auth pass-through. |
+| `packages/service/README.md` | changed | Added auth feature, subpath, builder, and preset examples. |
+| `packages/service/tests/_fixtures/readme-examples_test.ts` | changed | Added auth example assertions. |
+| `packages/service/tests/auth/define-service-auth_test.ts` | new | Preset auth-off and auth-on integration tests. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Slice 1-6 check/lint/fmt wrappers passed. |
-| Fitness | PASS | Slice 6 publish dry-run and auth doc checks passed; final publish/doc gates repeat in slice 7. |
-| Runtime | PASS | Slice 2-5 targeted auth tests passed. |
-| Consumer | NOT_RUN | Pending final gate. |
+| Static | PASS | Slice 1-7 check/lint/fmt wrappers passed. |
+| Fitness | PASS_WITH_CAVEAT | Publish/doc/service doctrine passed; root `deno task arch:check` failed on pre-existing repo-wide findings. |
+| Runtime | PASS | Targeted auth tests and full service tests passed. |
+| Consumer | PASS | workers/sagas/streams service checks passed. |
 
 ## Open Questions
 
@@ -80,7 +86,7 @@ Slice 6 implementation is complete: auth contracts/adapters/middleware exist, bu
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: root `deno task arch:check` fails outside slice; service-scoped doctrine check passes.
 - Debt: none introduced.
 
 ## Commits
@@ -90,3 +96,4 @@ Slice 6 implementation is complete: auth contracts/adapters/middleware exist, bu
 - dda6fb6: feat(service): add scope authorizer
 - cbfc40f: feat(service): add auth middleware
 - a51cb42: feat(service): wire auth into service builder
+- dbf8536: feat(service): expose auth subpath
