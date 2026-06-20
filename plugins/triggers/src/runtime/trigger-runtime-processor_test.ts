@@ -1,5 +1,7 @@
 import { assertEquals, assertStringIncludes } from '@std/assert';
-import { defineWebhook } from '@netscript/plugin-triggers-core/builders';
+import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';
+import { defineJob } from '@netscript/plugin-workers-core';
+import type { JobMessage } from '@netscript/plugin-workers-core/runtime';
 import type {
   TriggerEvent,
   TriggerEventId,
@@ -28,9 +30,43 @@ Deno.test('runtime processor rejects defer actions instead of silently dropping 
   assertEquals(result.status, 'dlq');
   assertEquals(result.actionsDispatched, 0);
   assertEquals(dlq.entries.length, 1);
-  assertStringIncludes(dlq.entries[0].reason, 'Deferred trigger action dispatch is not implemented');
+  assertStringIncludes(
+    dlq.entries[0].reason,
+    'Deferred trigger action dispatch is not implemented',
+  );
   assertEquals(idempotency.completed, ['evt_1']);
   assertEquals(idempotency.released.length, 0);
+});
+
+Deno.test('runtime processor stamps idempotency key onto enqueued worker job body', async () => {
+  const idempotency = new MemoryIdempotency();
+  const dlq = new MemoryDlq();
+  const queue = new RecordingJobQueue();
+  const processor = await createRuntimeTriggerProcessor({
+    idempotency,
+    dlq,
+    jobQueue: queue as never,
+  });
+  const job = defineJob('send-receipt')
+    .handler(() => ({ success: true }))
+    .build();
+  const definition = defineWebhook(
+    () =>
+      Promise.resolve([
+        enqueueJob(job, {
+          idempotencyKey: 'action-key',
+          payload: { receiptId: 'r_1' },
+        }),
+      ]),
+    { id: 'stripe-payments', path: '/webhooks/stripe', verifier: 'memory' },
+  );
+
+  const result = await processor.process(webhookEvent(), definition);
+
+  assertEquals(result.status, 'completed');
+  assertEquals(queue.messages.length, 1);
+  assertEquals(queue.messages[0].idempotencyKey, 'action-key');
+  assertEquals(queue.options[0]?.deduplicationId, 'action-key');
 });
 
 class MemoryIdempotency implements TriggerIdempotencyPort {
@@ -69,6 +105,17 @@ class MemoryDlq implements TriggerDlqPort {
   }
 
   replay(_eventId: TriggerEventId): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+class RecordingJobQueue {
+  readonly messages: JobMessage[] = [];
+  readonly options: { deduplicationId?: string }[] = [];
+
+  enqueue(message: JobMessage, options?: { deduplicationId?: string }): Promise<void> {
+    this.messages.push(message);
+    this.options.push(options ?? {});
     return Promise.resolve();
   }
 }
