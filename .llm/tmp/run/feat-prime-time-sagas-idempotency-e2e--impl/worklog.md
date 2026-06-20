@@ -80,6 +80,8 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | 2026-06-20 | 6 | KV stores | Added plugin-layer `KvSagaIdempotencyStore`, `KvSagaAppliedKeyStore`, and `openSagaRuntimeKv`. |
 | 2026-06-20 | 7 | wiring | Wired KV stores into service startup and default native runner/supervisor runtime creation; updated plugin README. |
 | 2026-06-20 | 8 | tests | Added KV store integration tests, service publish threading tests, and runtime applied-key wiring test. |
+| 2026-06-20 | 9 | final gates | Ran final scoped gates, root check/lint, publish dry-run, JSR audit, consumer import validation, and doctrine checks. |
+| 2026-06-20 | 9 | JSR docs | Added missing `@module` tags to existing `plugin-sagas-core` exported subpath barrels so JSR audit has no failures. |
 
 ## Decisions
 
@@ -93,7 +95,7 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| none | n/a | n/a |
+| Root `arch:check` and root `fmt:check` are red from unrelated baseline debt outside this slice. | minor | yes |
 
 ## Gate Results
 
@@ -127,25 +129,44 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | slice 8 core tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core` | PASS | 23 passed, 0 failed. |
 | slice 8 plugin tests | `deno test --unstable-kv --allow-all plugins/sagas` | PASS | 11 passed, 0 failed. |
 | slice 8 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts,md` | PASS | 160 files selected; 0 findings. |
+| final scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 150 files selected; 0 diagnostics. |
+| final scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 150 files selected; 0 findings. |
+| final scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts,md` | PASS | 160 files selected; 0 findings. |
+| root check | `deno task check` | PASS | 1,608 files selected; 0 diagnostics. |
+| root lint | `deno task lint` | PASS | 1,093 files selected; 0 findings. |
+| root fmt check | `deno task fmt:check` | FAIL_BASELINE | Unrelated existing finding in `plugins/triggers/src/runtime/trigger-runtime-processor_test.ts`; not touched by this slice. Scoped fmt for owned roots passed. |
+| publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/plugin-sagas-core` | PASS | Dry run complete. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/plugin-sagas-core --text` | PASS_WITH_WARNINGS | No FAIL findings after module docs fix; warnings remain for existing `src` cardinality and slow-type banner. |
+| consumer import | `deno eval --unstable-kv "... imports core/plugin runtime idempotency exports ..."` | PASS | Imported `SagaAppliedKeyStore`, `MemorySagaAppliedKeyStore`, `sagaIdempotencyKey`, `KvSagaAppliedKeyStore`, `KvSagaIdempotencyStore`, `openSagaRuntimeKv`. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-13 | NOT_RUN | pending | Manual invariant evidence after implementation. |
+| F-1 | PASS | Focused files are below hard fail thresholds. | Manual + scoped checks. |
+| F-3 | PASS | Core applied-key port in `ports`, memory implementation in `runtime`, plugin adapters in `plugins/sagas/src/runtime`. | No forbidden dependency direction introduced. |
+| F-5/F-7 | PASS_WITH_WARNINGS | JSR audit has no FAIL after adding `@module` tags; dry-run passes. | Existing slow-type warning remains as audit warning. |
+| F-6 | PASS | `deno publish --dry-run --allow-dirty` in `packages/plugin-sagas-core`. | No `Deno.openKv` added to published core. |
+| F-10 | PASS | Added focused tests; package-level tests pass. | Core 23, plugin 11. |
+| F-13 | PASS | Engine guard records applied key before handler effects and returns `alreadyApplied` duplicates without terminal-state changes. | Runtime invariant tests pass. |
+| F-14 | PASS | No new `console.*` in published runtime code. | Scoped lint clean. |
+| F-18 | PASS | Only package root/subpath barrels updated with explicit exports and `@module` docs. | No sub-barrel-only indirection added. |
+| root doctrine | FAIL_BASELINE | `deno task arch:check` reports pre-existing repo failures; scoped `packages/plugin-sagas-core` doctrine has 0 FAIL, scoped `plugins/sagas` has existing `SagasCliCommand`/size/default-export findings. | Recorded in drift; not introduced by this slice. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| targeted runtime tests | NOT_RUN | pending | Implementation in progress. |
+| targeted runtime tests | PASS | `deno test --unstable-kv --allow-all packages/plugin-sagas-core plugins/sagas` | 34 passed, 0 failed. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| consumer imports | NOT_RUN | pending | Implementation in progress. |
+| consumer imports | PASS | `deno eval --unstable-kv` import probe | Core and plugin runtime idempotency exports resolve. |
 
 ## Handoff Notes
 
 - Evaluator should inspect `SagaEngine.#handleEntry`, KV store atomic checks, and service publish threading first.
+- Do not treat root `fmt:check` or root `arch:check` as slice regressions without comparing baseline:
+  their current failures point to untouched triggers/CLI/plugin debt outside this slice.

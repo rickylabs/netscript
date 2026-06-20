@@ -12,8 +12,8 @@
 
 ## Current State
 
-Implementation has started from the PLAN-EVAL-passed `sagas-idempotency-e2e` plan. Branch and
-upstream are confirmed. Slice 8 code is ready to commit.
+Implementation is complete for the PLAN-EVAL-passed `sagas-idempotency-e2e` plan. Slice-owned gates
+are green; root-wide doctrine/fmt caveats are recorded as unrelated baseline debt.
 
 ## Completed
 
@@ -28,15 +28,17 @@ upstream are confirmed. Slice 8 code is ready to commit.
 - Wired service startup and default native runner/supervisor runtime creation to durable KV stores.
 - Documented plugin-layer delivery guarantees and `NETSCRIPT_SAGA_KV_PATH`.
 - Added and passed package-level unit/integration/failure-path tests.
+- Added missing `@module` tags to existing `plugin-sagas-core` subpath barrels so JSR audit has no failures.
+- Ran final gates and recorded root-wide baseline caveats.
 
 ## In Progress
 
-- Slice 8 commit/push/PR comment.
+- Final artifact/doc commit, push, and completion PR comment.
 
 ## Next Steps
 
-1. Commit, push with explicit refspec, append `commits.md`, and comment PR #75 for slice 8.
-2. Run final full gate set.
+1. Commit and push final artifacts/docs.
+2. Comment PR #75 with final gate table and IMPL-EVAL readiness.
 
 ## Key Decisions
 
@@ -70,17 +72,17 @@ upstream are confirmed. Slice 8 code is ready to commit.
 | `plugins/sagas/tests/runtime/kv-saga-runtime-stores_test.ts` | new | KV idempotency/applied-key integration tests. |
 | `plugins/sagas/tests/services/publish-message_test.ts` | new | Contract/service publish threading tests. |
 | `packages/plugin-sagas-core/tests/runtime/saga-runtime_applied_keys_test.ts` | new | Runtime factory applied-key wiring test. |
+| `packages/plugin-sagas-core/src/{abstracts,contracts/v1,integration,presets,streams,telemetry,testing}/mod.ts` | changed | `@module` JSDoc for existing exported subpaths. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS through slice 2 | Scoped check/lint/fmt passed. |
+| Static | PASS with baseline caveat | Scoped check/lint/fmt, root check, and root lint passed. Root fmt has unrelated triggers finding. |
 | Runtime | PASS through slice 2 | `deno test --unstable-kv packages/plugin-sagas-core/tests/runtime/saga-engine*` passed. |
 | Runtime | PASS through slice 8 | Package-level core and plugin tests passed. |
-| Fitness | pending | Not run yet. |
-| Runtime | pending | Not run yet. |
-| Consumer | pending | Not run yet. |
+| Fitness | PASS with baseline caveat | JSR dry-run/audit and core scoped doctrine pass/no-fail; root/plugin doctrine has unrelated existing findings. |
+| Consumer | PASS | Consumer import probe passed. |
 
 ## Open Questions
 
@@ -88,7 +90,7 @@ upstream are confirmed. Slice 8 code is ready to commit.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: root `arch:check` and root `fmt:check` have unrelated baseline failures; scoped slice gates passed.
 - Debt: none added.
 
 ## Commits
@@ -100,3 +102,4 @@ upstream are confirmed. Slice 8 code is ready to commit.
 - b8570e8: feat(sagas): thread service idempotency keys
 - 9f53a85: feat(sagas): add kv idempotency stores
 - 8290297: feat(sagas): wire durable idempotency roots
+- 2cb7908: test(sagas): cover durable idempotency flow
