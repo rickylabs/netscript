@@ -33,6 +33,7 @@ import type {
   ServiceHandler,
   ServiceMiddleware,
   ServiceRouter,
+  ShutdownHook,
 } from '../types.ts';
 import type { ServiceBuilder, ServiceConfig } from './service-builder.ts';
 import { wireRpc } from './service-rpc.ts';
@@ -56,6 +57,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   private docsConfigured = false;
   private healthConfigured = false;
   private startupHooks: Array<() => Promise<void>> = [];
+  private shutdownHooks: ShutdownHook[] = [];
   private contextFactory: ContextFactory = () => ({});
   private database: DbContext | null = null;
 
@@ -302,6 +304,28 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   }
 
   /**
+   * Registers an async teardown hook to run during graceful shutdown.
+   *
+   * Hooks run in reverse registration order when `RunningService.stop()` is
+   * called or when the listener receives a handled OS signal.
+   *
+   * @param hook - Async or sync teardown function to run on shutdown
+   *
+   * @example
+   * ```typescript
+   * createService(router, { name: 'users' })
+   *   .onShutdown(async () => {
+   *     await db.$disconnect();
+   *   })
+   *   .serve()
+   * ```
+   */
+  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter> {
+    this.shutdownHooks.push(hook);
+    return this;
+  }
+
+  /**
    * Configures health check endpoints.
    *
    * - /health - Comprehensive health check with all registered checks
@@ -403,6 +427,12 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     }
 
     const app = this.build();
-    return startServiceListener(app, this.config.name, this.config.port ?? 3000, options);
+    return startServiceListener(
+      app,
+      this.config.name,
+      this.config.port ?? 3000,
+      options,
+      this.shutdownHooks,
+    );
   }
 }
