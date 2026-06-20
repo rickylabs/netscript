@@ -4,11 +4,21 @@ import type {
   AuthnResult,
   AuthSession,
   AuthSessionPrincipalMapping,
+} from '../domain/mod.ts';
+export { AUTH_SESSION_STATES } from '../domain/mod.ts';
+
+export type {
+  AuthenticatorPort,
+  AuthnRequest,
+  AuthnResult,
+  AuthSession,
+  AuthSessionPrincipalMapping,
+  AuthSessionState,
   Principal,
 } from '../domain/mod.ts';
 
 /** Default backend registry key used when no explicit backend name is requested. */
-export const DEFAULT_AUTH_BACKEND_NAME = 'default' as const;
+export const DEFAULT_AUTH_BACKEND_NAME = 'default';
 
 /** Session query accepted by backend adapters. */
 export type AuthSessionLookup = Readonly<{
@@ -156,5 +166,3 @@ export function createAuthBackendRegistry(
     },
   };
 }
-
-export type { Principal };

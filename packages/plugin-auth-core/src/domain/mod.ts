@@ -17,7 +17,7 @@ export const AUTH_SESSION_STATES: Readonly<{
   active: 'active',
   expired: 'expired',
   revoked: 'revoked',
-} as const;
+};
 
 /** Auth account states shared by backend adapters and service contracts. */
 export const AUTH_ACCOUNT_STATES: Readonly<{
@@ -30,7 +30,7 @@ export const AUTH_ACCOUNT_STATES: Readonly<{
   disabled: 'disabled',
   pending: 'pending',
   deleted: 'deleted',
-} as const;
+};
 
 /** Lifecycle state for a user session. */
 export type AuthSessionState = (typeof AUTH_SESSION_STATES)[keyof typeof AUTH_SESSION_STATES];
@@ -87,19 +87,6 @@ export type AuthSessionPrincipalMapping = Readonly<{
   principal: Principal & { readonly scheme: 'custom' };
 }>;
 
-/** Result returned by auth domain schema validation. */
-export type AuthDomainSchemaResult<TOutput> =
-  | { readonly success: true; readonly data: TOutput }
-  | { readonly success: false; readonly error: unknown };
-
-/** Package-owned structural schema surface for auth domain validation. */
-export interface AuthDomainSchema<TOutput = unknown, TInput = unknown> {
-  /** Parse an input value or throw a validation error. */
-  parse(input: TInput): TOutput;
-  /** Parse an input value and return a result object instead of throwing. */
-  safeParse(input: TInput): AuthDomainSchemaResult<TOutput>;
-}
-
 const AuthUserZodSchema: z.ZodType<AuthUser> = z.object({
   id: z.string().min(1),
   displayName: z.string().optional(),
@@ -111,7 +98,7 @@ const AuthUserZodSchema: z.ZodType<AuthUser> = z.object({
 });
 
 /** Schema for normalized auth users. */
-export const AuthUserSchema: AuthDomainSchema<AuthUser> = AuthUserZodSchema;
+export const AuthUserSchema: z.ZodType<AuthUser> = AuthUserZodSchema;
 
 const AccountZodSchema: z.ZodType<Account> = z.object({
   id: z.string().min(1),
@@ -131,9 +118,10 @@ const AccountZodSchema: z.ZodType<Account> = z.object({
 });
 
 /** Schema for provider accounts linked to auth users. */
-export const AccountSchema: AuthDomainSchema<Account> = AccountZodSchema;
+export const AccountSchema: z.ZodType<Account> = AccountZodSchema;
 
-const AuthSessionZodSchema: z.ZodType<AuthSession> = z.object({
+/** Schema for normalized auth sessions. */
+export const AuthSessionSchema: z.ZodType<AuthSession> = z.object({
   id: z.string().min(1),
   userId: z.string().min(1),
   accountId: z.string().min(1).optional(),
@@ -154,6 +142,3 @@ const AuthSessionZodSchema: z.ZodType<AuthSession> = z.object({
   traceparent: z.string().optional(),
   tracestate: z.string().optional(),
 });
-
-/** Schema for normalized auth sessions. */
-export const AuthSessionSchema: AuthDomainSchema<AuthSession> = AuthSessionZodSchema;

@@ -2493,7 +2493,8 @@
         "dependencies": [
           "jsr:@std/assert@1",
           "jsr:@zod/zod@4.4.3",
-          "npm:@orpc/contract@^1.14.6"
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
         ]
       },
       "packages/plugin-sagas-core": {
