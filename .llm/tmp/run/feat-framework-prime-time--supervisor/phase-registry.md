@@ -73,6 +73,24 @@ scope (scope is still locked/approved). NOT worked around. Needs explicit user g
 sandbox-disabled generator-launch mechanism (or a Bash permission rule), OR the user launches the
 prepared `launch_track3.sh` themselves. Everything up to the launch is staged and idempotent.
 
+**Track-2 `service-auth-adapters` PLAN-EVAL = PASS (2026-06-20, run 27860702043, minimax-m3, cycle 1).**
+Verdict committed at `…/slices/service-auth-adapters/plan-eval.md` (3989e557; trace 695f34bb; no lock
+churn). Evaluator ratified all Plan-Gate checklist items (research current vs the MERGED #77 seam,
+9 locked decisions, clean open-decision sweep, 6 commit slices, risk register, gate set with `e2e:cli`
+correctly EXCLUDED, jsr-audit on both new package surfaces) and self-applied two small in-place fixes
+rather than failing: (1) tighten consumer-import validation from a silent gap to a named verify item;
+(2) drop the `@netscript/database` dep if the consumer-passes-`PrismaClient` precedent leaves it unused.
+Non-blocking follow-ups the implementer MUST honor: (a) Deno 2.8 node-compat smoke for `@workos-inc/node@10`
++ `better-auth@1.6` — on failure, rescope WorkOS to JWKS-only / surface the better-auth limitation;
+(b) isolated-declarations for both new packages or a documented carve-out in slice 6.
+
+**Both tracks now at the SAME launch gate.** Track-2 and Track-3 plans are both PLAN-EVAL PASS and
+scope-locked. Neither generator can be launched autonomously: both require the user to authorize the
+sandbox-disabled `codex exec` mechanism (or add a Bash permission rule), or to run the staged
+`launch_*.sh` themselves. No further autonomous IMPLEMENTATION progress is possible until that single
+decision. Track-2 worktree is NOT yet created (Track-3's is) — it will be staged identically once the
+launch mechanism is authorized, to avoid a stale worktree drifting off the umbrella in the meantime.
+
 **E2E gate (#81) — BOTH JOBS GREEN ON REAL CI (2026-06-20):** `scaffold-static`=success AND
 `scaffold-runtime`=success on `e2e-cli.yml` run for `7ed56049`. The green-up slice corrected the
 workflow to `setup-dotnet 10.0.x` + `dotnet tool install Aspire.Cli --version 13.4.4` (generic

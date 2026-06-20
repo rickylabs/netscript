@@ -11,3 +11,5 @@
 - df93baec: chore(harness): supervisor bookkeeping — #75 merged, #76/#77 re-rebased+re-eval, Track-3 PLAN-EVAL PASS
 - 47e6cd48: merge --no-ff: sagas-telemetry-spans (#76) [IMPL-EVAL PASS, run 27860143991] — OTel saga.handle spans + W3C propagation, integrates #75 applied-key guard inside span, 54 tests, lock untouched
 - 79f5840d: merge --no-ff: service-auth-seam (#77) [IMPL-EVAL PASS, run 27860144008] — two-port auth seam, composes with #78 graceful-shutdown, 58 service tests, zero new deps, lock untouched — BLOCKER BATCH COMPLETE (all 7 Wave-A slices merged)
+- 3989e557: eval(track-2): service-auth-adapters plan PASS (cycle 1, run 27860702043, minimax-m3) — Plan-Gate ratified; 2 self-applied in-place fixes; node-compat + isolated-declarations as non-blocking impl follow-ups [OpenHands commit, synced to local umbrella]
+- 695f34bb: chore(openhands): record run trace 27860702043-1 [OpenHands commit, no lock churn]
