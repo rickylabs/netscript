@@ -72,6 +72,8 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | 2026-06-20 | bootstrap | pre-flight | Branch and upstream confirmed; PLAN-EVAL summary records PASS. |
 | 2026-06-20 | 1 | applied-key contract | Added core `SagaAppliedKeyStore`, process-local memory implementation, and exported `sagaIdempotencyKey`. |
 | 2026-06-20 | 1 | gates | Scoped check/lint/fmt and targeted `deno check --unstable-kv` passed. |
+| 2026-06-20 | 2 | engine guard | Added engine applied-key short-circuit, `alreadyApplied` result, and raw `publish()` option threading. |
+| 2026-06-20 | 2 | tests | Added engine applied-key tests for duplicate, no-key, per-instance, publish-options, and memory store behavior. |
 
 ## Decisions
 
@@ -97,6 +99,10 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | slice 1 unstable check | `deno check --unstable-kv packages/plugin-sagas-core/mod.ts packages/plugin-sagas-core/src/ports/mod.ts packages/plugin-sagas-core/src/runtime/mod.ts packages/plugin-sagas-core/src/stores/mod.ts` | PASS | Public/core entrypoints type-check with unstable KV enabled. |
 | slice 1 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --ext ts` | PASS | 91 files selected; 0 findings. |
 | slice 1 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext ts` | PASS | 91 files selected; 0 findings after scoped write-format. |
+| slice 2 tests | `deno test --unstable-kv packages/plugin-sagas-core/tests/runtime/saga-engine*` | PASS | 5 passed, 0 failed. |
+| slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 diagnostics. |
+| slice 2 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 findings. |
+| slice 2 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 findings. |
 
 ### Fitness Gates
 

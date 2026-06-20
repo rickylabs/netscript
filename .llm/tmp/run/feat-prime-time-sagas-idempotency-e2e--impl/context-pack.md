@@ -13,22 +13,23 @@
 ## Current State
 
 Implementation has started from the PLAN-EVAL-passed `sagas-idempotency-e2e` plan. Branch and
-upstream are confirmed. Slice 1 code is ready to commit.
+upstream are confirmed. Slice 2 code is ready to commit.
 
 ## Completed
 
 - Loaded harness, doctrine, archetype, service overlay, plan, research, and plan metadata.
 - Created implementation run artifacts.
 - Implemented the core applied-key port, memory store, and exported idempotency key formatter.
+- Implemented the engine applied-key guard and targeted tests.
 
 ## In Progress
 
-- Slice 1 commit/push/PR comment.
+- Slice 2 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit, push with explicit refspec, append `commits.md`, and comment PR #75 for slice 1.
-2. Implement slice 2 engine guard.
+1. Commit, push with explicit refspec, append `commits.md`, and comment PR #75 for slice 2.
+2. Implement slice 3 README delivery guarantee.
 
 ## Key Decisions
 
@@ -48,12 +49,15 @@ upstream are confirmed. Slice 1 code is ready to commit.
 | `packages/plugin-sagas-core/src/ports/mod.ts` | changed | Port export. |
 | `packages/plugin-sagas-core/src/runtime/mod.ts` | changed | Runtime exports. |
 | `packages/plugin-sagas-core/src/stores/mod.ts` | changed | Store extension exports. |
+| `packages/plugin-sagas-core/src/runtime/saga-engine.ts` | changed | Engine applied-key guard and publish option threading. |
+| `packages/plugin-sagas-core/tests/runtime/saga-engine_applied_keys_test.ts` | new | Engine applied-key unit tests. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS for slice 1 | Scoped check/lint/fmt and targeted unstable check passed. |
+| Static | PASS through slice 2 | Scoped check/lint/fmt passed. |
+| Runtime | PASS through slice 2 | `deno test --unstable-kv packages/plugin-sagas-core/tests/runtime/saga-engine*` passed. |
 | Fitness | pending | Not run yet. |
 | Runtime | pending | Not run yet. |
 | Consumer | pending | Not run yet. |
@@ -68,3 +72,5 @@ upstream are confirmed. Slice 1 code is ready to commit.
 - Debt: none added.
 
 ## Commits
+
+- dc3d569: feat(sagas): add applied-key store contract
