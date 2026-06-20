@@ -1,0 +1,400 @@
+packages/auth-workos/mod.ts` | **0** |\n| 9 | `deno check --unstable-kv 
+packages/auth-better-auth/mod.ts` | **0** |\n| \u2014 | `deno task test` (full 
+repo) | **0** (805 passed, 0 failed, 12 ignored) |\n\nAll gates pass with exit 
+code 0.\n\n## Boundary + Lock Hygiene\n\n**Files changed (14 files, +841 / 
+\u2212215):**\n\n```\n.llm/tools/auth/gen-better-auth-prisma.ts          |  72 
+----  (DELETED)\ndeno.lock                                           |   1 
+-\npackages/auth-better-auth/README.md                 |  70 
+++---\npackages/auth-better-auth/deno.json                 |   2 
++-\npackages/auth-better-auth/mod.ts                    |  26 
++-\npackages/auth-better-auth/src/better-auth-backend.ts| 270 ++++ 
+(NEW)\npackages/auth-better-auth/src/better-auth.ts        |  41 
++-\npackages/auth-better-auth/tests/better-auth_test.ts |  83 
+++-\npackages/auth-better-auth/tests/mount_test.ts       |  48 --   
+(DELETED)\npackages/auth-workos/README.md                      |  23 
++-\npackages/auth-workos/deno.json                      |   1 
++\npackages/auth-workos/mod.ts                         |  21 
++-\npackages/auth-workos/src/workos-backend.ts          | 301 ++++ 
+(NEW)\npackages/auth-workos/tests/workos-authenticator_test.ts | 97 
+++-\n```\n\n**Boundary check:**\n- Changes are confined to 
+`packages/auth-workos`, `packages/auth-better-auth`, and the deleted 
+`.llm/tools/auth/gen-better-auth-prisma.ts`.\n- No changes to 
+`packages/plugin-auth-core`, root `deno.json` / catalog, `packages/aspire`, or 
+`scaffold-versions.ts`.\n- `deno.lock` delta is exactly the `hono-removal`: one 
+line removed (`\"jsr:@hono/hono@4.12.24\"` from `packages/auth-better-auth` 
+dependencies). Clean.\n- No CRLF\u2194LF churn detected (0 CR bytes in diff).\n-
+No junk files introduced.\n\n## Conformance\n\n**Factory pattern:** Both 
+packages export a pure `AuthBackendPort` factory:\n- `createWorkosBackend` in 
+`packages/auth-workos/src/workos-backend.ts`\n- `createBetterAuthBackend` in 
+`packages/auth-better-auth/src/better-auth-backend.ts`\n\n**AuthBackendPort 
+shape** (both return identical structural interface):\n- `name` \u2014 
+`'workos'` / `'better-auth'`\n- `providers` \u2014 `{ listProviders, getProvider
+}`\n- `sessions` \u2014 `{ getSession, createSession, refreshSession, 
+revokeSession }` \u2014 last 3 throw typed errors\n- `crypto` \u2014 `{ 
+sealSessionToken, openSessionToken }` \u2014 backend-owned HMAC token signing\n-
+`principalMapper` \u2014 `{ mapSessionToPrincipal }` \u2192 `{ session, 
+principal }` with enriched claims\n- `authenticate` \u2014 delegates to existing
+authenticator (`createWorkosAuthenticator` / 
+`createBetterAuthAuthenticator`)\n\n**Backward compatibility preserved:**\n- 
+WorkOS sealed-session + JWKS access-token path intact (existing authenticators 
+re-exported).\n- Better-auth `createNetscriptBetterAuth` `prismaAdapter` 
+wrapping intact.\n\n**Dropped symbols confirmed gone:**\n- 
+`mountBetterAuthHandler` \u2014 no references in codebase.\n- 
+`BetterAuthMountOptions` \u2014 no references.\n- 
+`packages/auth-better-auth/tests/mount_test.ts` \u2014 deleted.\n- `hono` / 
+`@hono` imports \u2014 zero occurrences in both packages.\n- 
+`.llm/tools/auth/gen-better-auth-prisma.ts` \u2014 deleted (directory gone).\n- 
+Removal rationale documented in commit message (`refactor(auth-backends): make 
+WorkOS and Better Auth pure 
+backends`).\n\n**AuthBackendOperationUnsupportedError pattern:**\n\nBoth 
+`AuthBackendOperationUnsupportedError` classes are:\n- Typed named errors (`name
+=== 'AuthBackendOperationUnsupportedError'`) with `backendName`, `operation`, 
+`reason` fields.\n- Thrown (not returning `undefined`, not silent) \u2014 
+verified by inspection of `sessions.createSession`, `sessions.refreshSession`, 
+`sessions.revokeSession` in both backends.\n- Asserted by tests:\n  - 
+`workos-authenticator_test.ts`: `\"createWorkosBackend throws typed errors for 
+unsupported managed-session operations\"` \u2014 asserts `instanceof 
+AuthBackendOperationUnsupportedError` for all 3 ops with backendName = 
+`'workos'`.\n  - `better-auth_test.ts`: `\"createBetterAuthBackend throws typed 
+errors for unsupported managed-session operations\"` \u2014 same assertions with
+backendName = `'better-auth'`.\n- Both backends also assert the provider 
+registry + session-token sealing via named tests (`\"createWorkosBackend exposes
+AuthBackendPort provider and session ports\"` / `\"createBetterAuthBackend 
+exposes AuthBackendPort provider and session ports\"`).\n\n**Note (minor):** 
+Each package defines its own `AuthBackendOperationUnsupportedError` class with 
+identical shape. This is a small duplication \u2014 likely intentional given 
+each package is independently publishable. Both are exported. Callers doing 
+`instanceof` checks must match against the per-package class. Not a blocker for 
+AS2a; if upstream `plugin-auth-core` eventually defines a shared class, 
+consolidation can be addressed in AS3.\n\n## Remaining Risks\n\n- Small 
+duplication in the two `AuthBackendOperationUnsupportedError` classes; consider 
+consolidating under `plugin-auth-core` in AS3.\n- The `signSessionToken` / 
+`verifySessionToken` helper pair is duplicated across the two backends 
+(`packages/auth-workos/src/workos-backend.ts` and 
+`packages/auth-better-auth/src/better-auth-backend.ts`). Could be lifted to a 
+shared helper in `plugin-auth-core` later.\n\n## Verdict\n\n**PASS**\n\nAll 9 
+gates exit 0. Boundary is clean (no forbidden package changes, no junk files, 
+clean lock delta = hono removal only). Conformance is complete: both backends 
+implement the full `AuthBackendPort` contract including typed 
+unsupported-operation errors asserted by tests. Dropped symbols are fully 
+removed with rationale in the commit message.\n"}
+
+Reasoning:
+Let me now write the summary.md file with the evaluation results. I need to 
+compile the gate results, boundary findings, and verdict.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27874783640-1/summary.md"
+  file_text: 
+    # IMPL-EVAL: AS2a — auth-workos + auth-better-auth → pure AuthBackendPort 
+backends
+    
+    ## Gate → Exit-Code Table
+    
+    | # | Gate Command | Exit Code |
+    |---|---|---|
+    | 1 | `run-deno-check.ts --root packages/auth-workos --ext ts,tsx` | **0** |
+    | 2 | `run-deno-check.ts --root packages/auth-better-auth --ext ts,tsx` | 
+**0** |
+    | 3 | `run-deno-lint.ts --root packages/auth-workos --ext ts,tsx` | **0** |
+    | 4 | `run-deno-lint.ts --root packages/auth-better-auth --ext ts,tsx` | 
+**0** |
+    | 5 | `run-deno-fmt.ts --root packages/auth-workos --ext ts,tsx` | **0** |
+    | 6 | `run-deno-fmt.ts --root packages/auth-better-auth --ext ts,tsx` | 
+**0** |
+    | 7 | `deno test --unstable-kv --allow-all packages/auth-workos 
+packages/auth-better-auth` | **0** (15 passed, 0 failed) |
+    | 8 | `deno check --unstable-kv packages/auth-workos/mod.ts` | **0** |
+    | 9 | `deno check --unstable-kv packages/auth-better-auth/mod.ts` | **0** |
+    | — | `deno task test` (full repo) | **0** (805 passed, 0 failed, 12 
+ignored) |
+    
+    All gates pass with exit code 0.
+    
+    ## Boundary + Lock Hygiene
+    
+    **Files changed (14 files, +841 / −215):**
+    
+    ```
+    .llm/tools/auth/gen-better-auth-prisma.ts          |  72 ----  (DELETED)
+    deno.lock                                           |   1 -
+    packages/auth-better-auth/README.md                 |  70 ++---
+    packages/auth-better-auth/deno.json                 |   2 +-
+    packages/auth-better-auth/mod.ts                    |  26 +-
+    packages/auth-better-auth/src/better-auth-backend.ts| 270 ++++ (NEW)
+    packages/auth-better-auth/src/better-auth.ts        |  41 +-
+    packages/auth-better-auth/tests/better-auth_test.ts |  83 ++-
+    packages/auth-better-auth/tests/mount_test.ts       |  48 --   (DELETED)
+    packages/auth-workos/README.md                      |  23 +-
+    packages/auth-workos/deno.json                      |   1 +
+    packages/auth-workos/mod.ts                         |  21 +-
+    packages/auth-workos/src/workos-backend.ts          | 301 ++++ (NEW)
+    packages/auth-workos/tests/workos-authenticator_test.ts | 97 ++-
+    ```
+    
+    **Boundary check:**
+    - Changes are confined to `packages/auth-workos`, 
+`packages/auth-better-auth`, and the deleted 
+`.llm/tools/auth/gen-better-auth-prisma.ts`.
+    - No changes to `packages/plugin-auth-core`, root `deno.json` / catalog, 
+`packages/aspire`, or `scaffold-versions.ts`.
+    - `deno.lock` delta is exactly the `hono-removal`: one line removed 
+(`"jsr:@hono/hono@4.12.24"` from `packages/auth-better-auth` dependencies). 
+Clean.
+    - No CRLF↔LF churn detected (0 CR bytes in diff).
+    - No junk files introduced.
+    
+    ## Conformance
+    
+    **Factory pattern:** Both packages export a pure `AuthBackendPort` factory:
+    - `createWorkosBackend` in `packages/auth-workos/src/workos-backend.ts`
+    - `createBetterAuthBackend` in 
+`packages/auth-better-auth/src/better-auth-backend.ts`
+    
+    **AuthBackendPort shape** (both return identical structural interface):
+    - `name` — `'workos'` / `'better-auth'`
+    - `providers` — `{ listProviders, getProvider }`
+    - `sessions` — `{ getSession, createSession, refreshSession, revokeSession 
+}` — last 3 throw typed errors
+    - `crypto` — `{ sealSessionToken, openSessionToken }` — backend-owned HMAC 
+token signing
+    - `principalMapper` — `{ mapSessionToPrincipal }` → `{ session, principal }`
+with enriched claims
+    - `authenticate` — delegates to existing authenticator 
+(`createWorkosAuthenticator` / `createBetterAuthAuthenticator`)
+    
+    **Backward compatibility preserved:**
+    - WorkOS sealed-session + JWKS access-token path intact (existing 
+authenticators re-exported).
+    - Better-auth `createNetscriptBetterAuth` `prismaAdapter` wrapping intact.
+    
+    **Dropped symbols confirmed gone:**
+    - `mountBetterAuthHandler` — no references in codebase.
+    - `BetterAuthMountOptions` — no references.
+    - `packages/auth-better-auth/tests/mount_test.ts` — deleted.
+    - `hono` / `@hono` imports — zero occurrences in both packages.
+    - `.llm/tools/auth/gen-better-auth-prisma.ts` — deleted (directory gone).
+    - Removal rationale documented in commit message (`refactor(auth-backends): 
+make WorkOS and Better Auth pure backends`).
+    
+    **AuthBackendOperationUnsupportedError pattern:**
+    
+    Both `AuthBackendOperationUnsupportedError` classes are:
+    - Typed named errors (`name === 'AuthBackendOperationUnsupportedError'`) 
+with `backendName`, `operation`, `reason` fields.
+    - Thrown (not returning `undefined`, not silent) — verified by inspection of
+`sessions.createSession`, `sessions.refreshSession`, `sessions.revokeSession` in
+both backends.
+    - Asserted by tests:
+      - `workos-authenticator_test.ts`: `"createWorkosBackend throws typed 
+errors for unsupported managed-session operations"` — asserts `instanceof 
+AuthBackendOperationUnsupportedError` for all 3 ops with backendName = 
+`'workos'`.
+      - `better-auth_test.ts`: `"createBetterAuthBackend throws typed errors for
+unsupported managed-session operations"` — same assertions with backendName = 
+`'better-auth'`.
+    - Both backends also assert the provider registry + session-token sealing 
+via named tests (`"createWorkosBackend exposes AuthBackendPort provider and 
+session ports"` / `"createBetterAuthBackend exposes AuthBackendPort provider and
+session ports"`).
+    
+    **Note (minor):** Each package defines its own 
+`AuthBackendOperationUnsupportedError` class with identical shape. This is a 
+small duplication — likely intentional given each package is independently 
+publishable. Both are exported. Callers doing `instanceof` checks must match 
+against the per-package class. Not a blocker for AS2a; if upstream 
+`plugin-auth-core` eventually defines a shared class, consolidation can be 
+addressed in AS3.
+    
+    ## Remaining Risks
+    
+    - Small duplication in the two `AuthBackendOperationUnsupportedError` 
+classes; consider consolidating under `plugin-auth-core` in AS3.
+    - The `signSessionToken` / `verifySessionToken` helper pair is duplicated 
+across the two backends (`packages/auth-workos/src/workos-backend.ts` and 
+`packages/auth-better-auth/src/better-auth-backend.ts`). Could be lifted to a 
+shared helper in `plugin-auth-core` later.
+    
+    ## Verdict
+    
+    **PASS**
+    
+    All 9 gates exit 0. Boundary is clean (no forbidden package changes, no junk
+files, clean lock delta = hono removal only). Conformance is complete: both 
+backends implement the full `AuthBackendPort` contract including typed 
+unsupported-operation errors asserted by tests. Dropped symbols are fully 
+removed with rationale in the commit message.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 320.77K • cache hit 68.71% •  reasoning 1.04K • ↓ output 5.07K •
+$ 0.1995
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27874783640-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL: AS2a — auth-workos + auth-better-auth → pure AuthBackendPort 
+backends
+ 2|
++3|## Gate → Exit-Code Table
++4|
++5|| # | Gate Command | Exit Code |
++6||---|---|---|
++7|| 1 | `run-deno-check.ts --root packages/auth-workos --ext ts,tsx` | **0** |
++8|| 2 | `run-deno-check.ts --root packages/auth-better-auth --ext ts,tsx` | 
+**0** |
++9|| 3 | `run-deno-lint.ts --root packages/auth-workos --ext ts,tsx` | **0** |
++10|| 4 | `run-deno-lint.ts --root packages/auth-better-auth --ext ts,tsx` | 
+**0** |
++11|| 5 | `run-deno-fmt.ts --root packages/auth-workos --ext ts,tsx` | **0** |
++12|| 6 | `run-deno-fmt.ts --root packages/auth-better-auth --ext ts,tsx` | 
+**0** |
++13|| 7 | `deno test --unstable-kv --allow-all packages/auth-workos 
+packages/auth-better-auth` | **0** (15 passed, 0 failed) |
++14|| 8 | `deno check --unstable-kv packages/auth-workos/mod.ts` | **0** |
++15|| 9 | `deno check --unstable-kv packages/auth-better-auth/mod.ts` | **0** |
++16|| — | `deno task test` (full repo) | **0** (805 passed, 0 failed, 12 
+ignored) |
++17|
++18|All gates pass with exit code 0.
++19|
++20|## Boundary + Lock Hygiene
++21|
++22|**Files changed (14 files, +841 / −215):**
++23|
++24|```
++25|.llm/tools/auth/gen-better-auth-prisma.ts          |  72 ----  (DELETED)
++26|deno.lock                                           |   1 -
++27|packages/auth-better-auth/README.md                 |  70 ++---
++28|packages/auth-better-auth/deno.json                 |   2 +-
++29|packages/auth-better-auth/mod.ts                    |  26 +-
++30|packages/auth-better-auth/src/better-auth-backend.ts| 270 ++++ (NEW)
++31|packages/auth-better-auth/src/better-auth.ts        |  41 +-
++32|packages/auth-better-auth/tests/better-auth_test.ts |  83 ++-
++33|packages/auth-better-auth/tests/mount_test.ts       |  48 --   (DELETED)
++34|packages/auth-workos/README.md                      |  23 +-
++35|packages/auth-workos/deno.json                      |   1 +
++36|packages/auth-workos/mod.ts                         |  21 +-
++37|packages/auth-workos/src/workos-backend.ts          | 301 ++++ (NEW)
++38|packages/auth-workos/tests/workos-authenticator_test.ts | 97 ++-
++39|```
++40|
++41|**Boundary check:**
++42|- Changes are confined to `packages/auth-workos`, 
+`packages/auth-better-auth`, and the deleted 
+`.llm/tools/auth/gen-better-auth-prisma.ts`.
++43|- No changes to `packages/plugin-auth-core`, root `deno.json` / catalog, 
+`packages/aspire`, or `scaffold-versions.ts`.
++44|- `deno.lock` delta is exactly the `hono-removal`: one line removed 
+(`"jsr:@hono/hono@4.12.24"` from `packages/auth-better-auth` dependencies). 
+Clean.
++45|- No CRLF↔LF churn detected (0 CR bytes in diff).
++46|- No junk files introduced.
++47|
++48|## Conformance
++49|
++50|**Factory pattern:** Both packages export a pure `AuthBackendPort` factory:
++51|- `createWorkosBackend` in `packages/auth-workos/src/workos-backend.ts`
++52|- `createBetterAuthBackend` in 
+`packages/auth-better-auth/src/better-auth-backend.ts`
++53|
++54|**AuthBackendPort shape** (both return identical structural interface):
++55|- `name` — `'workos'` / `'better-auth'`
++56|- `providers` — `{ listProviders, getProvider }`
++57|- `sessions` — `{ getSession, createSession, refreshSession, revokeSession 
+}` — last 3 throw typed errors
++58|- `crypto` — `{ sealSessionToken, openSessionToken }` — backend-owned HMAC 
+token signing
++59|- `principalMapper` — `{ mapSessionToPrincipal }` → `{ session, principal }`
+with enriched claims
++60|- `authenticate` — delegates to existing authenticator 
+(`createWorkosAuthenticator` / `createBetterAuthAuthenticator`)
++61|
++62|**Backward compatibility preserved:**
++63|- WorkOS sealed-session + JWKS access-token path intact (existing 
+authenticators re-exported).
++64|- Better-auth `createNetscriptBetterAuth` `prismaAdapter` wrapping intact.
++65|
++66|**Dropped symbols confirmed gone:**
++67|- `mountBetterAuthHandler` — no references in codebase.
++68|- `BetterAuthMountOptions` — no references.
++69|- `packages/auth-better-auth/tests/mount_test.ts` — deleted.
++70|- `hono` / `@hono` imports — zero occurrences in both packages.
++71|- `.llm/tools/auth/gen-better-auth-prisma.ts` — deleted (directory gone).
++72|- Removal rationale documented in commit message (`refactor(auth-backends): 
+make WorkOS and Better Auth pure backends`).
++73|
++74|**AuthBackendOperationUnsupportedError pattern:**
++75|
++76|Both `AuthBackendOperationUnsupportedError` classes are:
++77|- Typed named errors (`name === 'AuthBackendOperationUnsupportedError'`) 
+with `backendName`, `operation`, `reason` fields.
++78|- Thrown (not returning `undefined`, not silent) — verified by inspection of
+`sessions.createSession`, `sessions.refreshSession`, `sessions.revokeSession` in
+both backends.
++79|- Asserted by tests:
++80|  - `workos-authenticator_test.ts`: `"createWorkosBackend throws typed 
+errors for unsupported managed-session operations"` — asserts `instanceof 
+AuthBackendOperationUnsupportedError` for all 3 ops with backendName = 
+`'workos'`.
++81|  - `better-auth_test.ts`: `"createBetterAuthBackend throws typed errors for
+unsupported managed-session operations"` — same assertions with backendName = 
+`'better-auth'`.
++82|- Both backends also assert the provider registry + session-token sealing 
+via named tests (`"createWorkosBackend exposes AuthBackendPort provider and 
+session ports"` / `"createBetterAuthBackend exposes AuthBackendPort provider and
+session ports"`).
++83|
++84|**Note (minor):** Each package defines its own 
+`AuthBackendOperationUnsupportedError` class with identical shape. This is a 
+small duplication — likely intentional given each package is independently 
+publishable. Both are exported. Callers doing `instanceof` checks must match 
+against the per-package class. Not a blocker for AS2a; if upstream 
+`plugin-auth-core` eventually defines a shared class, consolidation can be 
+addressed in AS3.
++85|
++86|## Remaining Risks
++87|
++88|- Small duplication in the two `AuthBackendOperationUnsupportedError` 
+classes; consider consolidating under `plugin-auth-core` in AS3.
++89|- The `signSessionToken` / `verifySessionToken` helper pair is duplicated 
+across the two backends (`packages/auth-workos/src/workos-backend.ts` and 
+`packages/auth-better-auth/src/better-auth-backend.ts`). Could be lifted to a 
+shared helper in `plugin-auth-core` later.
++90|
++91|## Verdict
++92|
++93|**PASS**
++94|
++95|All 9 gates exit 0. Boundary is clean (no forbidden package changes, no junk
+files, clean lock delta = hono removal only). Conformance is complete: both 
+backends implement the full `AuthBackendPort` contract including typed 
+unsupported-operation errors asserted by tests. Dropped symbols are fully 
+removed with rationale in the commit message.
++96|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+Perfect. Summary written to 
+`/home/runner/work/_temp/openhands/27874783640-1/summary.md`.
+
+**Verdict: PASS**
+
+All gates pass, boundary is clean, conformance verified. The PR is ready to 
+merge.
+
+Tokens: ↑ input 355.9K • cache hit 70.82% •  reasoning 1.2K • ↓ output 5.29K • $
+0.2127
+
