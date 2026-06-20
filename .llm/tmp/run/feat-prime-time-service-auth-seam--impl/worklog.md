@@ -69,6 +69,8 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | 2026-06-20 | 1 | gates | Check/lint/fmt wrappers passed. Initial check invocation with explicit `--unstable-kv` failed because the wrapper passes it by default; reran supported form successfully. |
 | 2026-06-20 | 2 | implementation | Added static credential and trusted-header authenticators plus focused unit tests. |
 | 2026-06-20 | 2 | gates | Targeted authenticator tests and check/lint/fmt wrappers passed. Formatter adjusted one owned auth file before final fmt pass. |
+| 2026-06-20 | 3 | implementation | Added ordered scope/role authorizer with deny-by-default behavior and unit tests. |
+| 2026-06-20 | 3 | gates | Targeted authorizer tests and check/lint/fmt wrappers passed. |
 
 ## Decisions
 
@@ -99,6 +101,10 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 22 files, 0 diagnostics. |
 | slice 2 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 22 files, 0 findings. |
 | slice 2 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0 after formatting owned auth files; 22 files, 0 findings. |
+| slice 3 test | `rtk proxy deno test --allow-all packages/service/tests/auth/authorizer_test.ts` | PASS | Exit 0; 5 passed, 0 failed. |
+| slice 3 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 diagnostics. |
+| slice 3 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 findings. |
+| slice 3 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 findings. |
 
 ### Fitness Gates
 

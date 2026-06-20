@@ -11,3 +11,4 @@ Format:
 ## Log
 
 - 6699099: feat(service): auth port and principal types
+- 6f81290: feat(service): add default authenticators
