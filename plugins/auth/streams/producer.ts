@@ -4,8 +4,11 @@ import { type AuthSession, type AuthStreamEvent, authStreamSchema } from './sche
 export type { DurableStreamProducer, StreamProducerPort } from '@netscript/plugin-streams-core';
 export type {
   AuthSession,
+  AuthSessionState,
   AuthStreamDefinition,
   AuthStreamEvent,
+  AuthStreamSchema,
+  AuthStreamSchemaResult,
   StateSchema,
   StreamStateDefinition,
 } from './schema.ts';
@@ -55,12 +58,6 @@ export type AuthSessionRevokedInput =
     reason?: string;
     revokedAt?: string;
   }>;
-
-/** Options for bootstrapping auth state into durable streams. */
-export interface AuthStreamMirrorOptions {
-  /** Abort signal reserved for future paged reconciliation. */
-  readonly signal?: AbortSignal;
-}
 
 /** Get or create the auth session stream producer. */
 export function getAuthStreamProducer(): DurableStreamProducer<typeof authStreamSchema> {
@@ -141,14 +138,6 @@ export function emitSigninFailed(
   return event;
 }
 
-/** Mirror existing auth session snapshots into the durable streams server when a store is available. */
-export async function startAuthStreamMirror(
-  input?: AbortSignal | AuthStreamMirrorOptions,
-): Promise<void> {
-  normalizeMirrorOptions(input);
-  await Promise.resolve();
-}
-
 function publishAuthSession(
   session: AuthSession,
   event: AuthStreamEvent,
@@ -192,15 +181,6 @@ function authEvent(
   };
 }
 
-function normalizeMirrorOptions(
-  input?: AbortSignal | AuthStreamMirrorOptions,
-): AuthStreamMirrorOptions {
-  if (isAbortSignal(input)) {
-    return { signal: input };
-  }
-  return input ?? {};
-}
-
 function timestamp(options: AuthStreamEmitOptions): string {
   return (options.now?.() ?? new Date()).toISOString();
 }
@@ -225,9 +205,4 @@ function hasConfiguredStreamUrl(): boolean {
   } catch {
     return false;
   }
-}
-
-function isAbortSignal(value: unknown): value is AbortSignal {
-  return typeof value === 'object' && value !== null && 'aborted' in value &&
-    'addEventListener' in value;
 }

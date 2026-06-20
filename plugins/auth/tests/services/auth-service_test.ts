@@ -12,6 +12,7 @@ import {
 } from '../../services/src/backend-registry.ts';
 import { callback, me, session, signin, signout } from '../../services/src/routers/v1-handlers.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
+import { authTestUrl } from '../testing/auth-fixtures.ts';
 
 Deno.test('kv-oauth handlers complete signin callback session me signout round-trip', async () => {
   const registry = await createInMemoryKvOAuthRegistry({
@@ -33,7 +34,7 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   const started = await signin({ redirectTo: '/dashboard' }, {
     registry,
     request: {
-      url: 'https://app.example.test/v1/auth/signin',
+      url: authTestUrl('/v1/auth/signin'),
       headers: new Headers({ 'x-forwarded-proto': 'https' }),
     },
   });
@@ -47,7 +48,7 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   }, {
     registry,
     request: {
-      url: `https://app.example.test/v1/auth/callback?txn=${redirect.searchParams.get('txn')}`,
+      url: authTestUrl(`/v1/auth/callback?txn=${redirect.searchParams.get('txn')}`),
       headers: new Headers({ 'x-forwarded-proto': 'https' }),
     },
   });
@@ -62,7 +63,7 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   const currentUser = await me({
     registry,
     request: {
-      url: 'https://app.example.test/v1/auth/me',
+      url: authTestUrl('/v1/auth/me'),
       headers: new Headers({ cookie: `__Host-ns_session=${completed.sessionId}` }),
     },
   });

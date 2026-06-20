@@ -11,7 +11,6 @@ export {
   emitSigninStarted,
   emitTokenRefreshed,
   getAuthStreamProducer,
-  startAuthStreamMirror,
 } from './producer.ts';
 export type {
   AuthSessionRevokedInput,
@@ -19,7 +18,6 @@ export type {
   AuthSigninStartedInput,
   AuthStreamEmitOptions,
   AuthStreamEventSink,
-  AuthStreamMirrorOptions,
   AuthStreamProducerPort,
 } from './producer.ts';
 export {
@@ -30,8 +28,11 @@ export {
 } from './schema.ts';
 export type {
   AuthSession,
+  AuthSessionState,
   AuthStreamDefinition,
   AuthStreamEvent,
+  AuthStreamSchema,
+  AuthStreamSchemaResult,
   DurableStreamProducer,
   StateSchema,
   StreamProducerPort,

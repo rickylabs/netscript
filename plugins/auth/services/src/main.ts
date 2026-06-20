@@ -10,7 +10,6 @@ import '@netscript/kv/redis';
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createService } from '@netscript/service';
 import { AUTH_API_DEFAULT_PORT } from '../../src/constants.ts';
-import { startAuthStreamMirror } from '../../streams/server.ts';
 import { router } from './router.ts';
 import { initializeAuthService } from './init.ts';
 import type { AuthServiceRequest } from './routers/v1-types.ts';
@@ -37,9 +36,6 @@ export default async function createAuthService(
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? String(AUTH_API_DEFAULT_PORT));
   const dbClient = await ctx.db.getClient() as ServiceDatabaseClient;
   const registry = await initializeAuthService(ctx, dbClient);
-  void startAuthStreamMirror().catch((error) => {
-    console.warn('[Auth API] Durable stream hook skipped:', error);
-  });
 
   const running = await createService(router, {
     name: 'auth',

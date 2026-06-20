@@ -36,6 +36,22 @@ const PACKAGE_TO_JSR: Record<string, string> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]: 'jsr:@netscript/database@^1.0.0',
   [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]: 'jsr:@netscript/database@^1.0.0/scripts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]: 'jsr:@netscript/database@^1.0.0/tracing',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE]: 'jsr:@netscript/plugin-auth-core@^1.0.0',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONFIG]:
+    'jsr:@netscript/plugin-auth-core@^1.0.0/config',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1]:
+    'jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_DOMAIN]:
+    'jsr:@netscript/plugin-auth-core@^1.0.0/domain',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_PORTS]:
+    'jsr:@netscript/plugin-auth-core@^1.0.0/ports',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_STREAMS]:
+    'jsr:@netscript/plugin-auth-core@^1.0.0/streams',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_TESTING]:
+    'jsr:@netscript/plugin-auth-core@^1.0.0/testing',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_WORKOS]: 'jsr:@netscript/auth-workos@^1.0.0',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_BETTER_AUTH]: 'jsr:@netscript/auth-better-auth@^1.0.0',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH]: 'jsr:@netscript/auth-kv-oauth@^1.0.0',
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: 'jsr:@netscript/plugin-workers-core@^1.0.0',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE]: 'jsr:@netscript/plugin-sagas-core@^1.0.0',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN]:
@@ -73,6 +89,22 @@ const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]: 'packages/database/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]: 'packages/database/scripts/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]: 'packages/database/prisma-tracing.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE]: 'packages/plugin-auth-core/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONFIG]:
+    'packages/plugin-auth-core/src/config/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1]:
+    'packages/plugin-auth-core/src/contracts/v1/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_DOMAIN]:
+    'packages/plugin-auth-core/src/domain/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_PORTS]:
+    'packages/plugin-auth-core/src/ports/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_STREAMS]:
+    'packages/plugin-auth-core/src/streams/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_TESTING]:
+    'packages/plugin-auth-core/src/testing/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_WORKOS]: 'packages/auth-workos/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_BETTER_AUTH]: 'packages/auth-better-auth/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH]: 'packages/auth-kv-oauth/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: 'packages/plugin-workers-core/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE]: 'packages/plugin-sagas-core/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN]:

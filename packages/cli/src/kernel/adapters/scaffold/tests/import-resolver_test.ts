@@ -17,6 +17,9 @@ describe('resolveNetScriptImports', () => {
         expected: {
           '@netscript/config': 'jsr:@netscript/config',
           '@netscript/service': 'jsr:@netscript/service',
+          '@netscript/plugin-auth-core/contracts/v1':
+            'jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1',
+          '@netscript/auth-kv-oauth': 'jsr:@netscript/auth-kv-oauth@^1.0.0',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -27,6 +30,9 @@ describe('resolveNetScriptImports', () => {
         expected: {
           '@netscript/config': '../../../monorepo/packages/config/mod.ts',
           '@netscript/service': '../../../monorepo/packages/service/mod.ts',
+          '@netscript/plugin-auth-core/contracts/v1':
+            '../../../monorepo/packages/plugin-auth-core/src/contracts/v1/mod.ts',
+          '@netscript/auth-kv-oauth': '../../../monorepo/packages/auth-kv-oauth/mod.ts',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },
@@ -53,6 +59,11 @@ describe('resolveNetScriptImports', () => {
     const imports = resolveNetScriptImports('local');
     assertEquals(imports['@netscript/config'], '../../packages/config/mod.ts');
     assertEquals(imports['@netscript/service'], '../../packages/service/mod.ts');
+    assertEquals(
+      imports['@netscript/plugin-auth-core/contracts/v1'],
+      '../../packages/plugin-auth-core/src/contracts/v1/mod.ts',
+    );
+    assertEquals(imports['@netscript/auth-kv-oauth'], '../../packages/auth-kv-oauth/mod.ts');
     // External deps still use registry
     assertStringIncludes(imports['@std/path'], 'jsr:@std/path');
     assertStringIncludes(imports['zod'], 'npm:zod');

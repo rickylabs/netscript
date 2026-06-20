@@ -66,9 +66,9 @@ export function toAuthnRequest(
   return {
     method: serviceRequest?.method ?? 'GET',
     path: serviceRequest ? new URL(serviceRequest.url).pathname : '/v1/auth/session',
-    header: (name) => headers.get(name) ?? undefined,
+    header: (name: string) => headers.get(name) ?? undefined,
     headers: () => new Headers(headers),
-    cookie: (name) => readCookie(headers.get('cookie') ?? undefined, name),
+    cookie: (name: string) => readCookie(headers.get('cookie') ?? undefined, name),
   };
 }
 

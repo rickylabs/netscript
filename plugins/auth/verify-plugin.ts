@@ -5,7 +5,7 @@
  */
 
 import { type InspectionReport, inspectPlugin } from '@netscript/plugin';
-import { authPlugin } from './mod.ts';
+import { AUTH_PLUGIN_VERSION, authPlugin } from './mod.ts';
 
 export type { InspectionReport } from '@netscript/plugin';
 
@@ -28,8 +28,8 @@ export function verifyAuthPlugin(): AuthPluginVerificationResult {
     findings.push(`expected plugin name @netscript/plugin-auth, got ${authPlugin.name}`);
   }
 
-  if (authPlugin.version !== '0.1.0') {
-    findings.push(`expected version 0.1.0, got ${authPlugin.version}`);
+  if (authPlugin.version !== AUTH_PLUGIN_VERSION) {
+    findings.push(`expected version ${AUTH_PLUGIN_VERSION}, got ${authPlugin.version}`);
   }
 
   if (

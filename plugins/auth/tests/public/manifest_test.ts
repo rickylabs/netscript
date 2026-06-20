@@ -1,10 +1,10 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
-import { authPlugin, inspectAuth } from '../../mod.ts';
+import { AUTH_PLUGIN_VERSION, authPlugin, inspectAuth } from '../../mod.ts';
 import { verifyAuthPlugin } from '../../verify-plugin.ts';
 
 Deno.test('authPlugin manifest exposes service, contract, and config axes', () => {
   assertEquals(authPlugin.name, '@netscript/plugin-auth');
-  assertEquals(authPlugin.version, '0.1.0');
+  assertEquals(authPlugin.version, AUTH_PLUGIN_VERSION);
   assertEquals(authPlugin['type'], 'api');
 
   assert(authPlugin.contributions.services?.some((service) => service.name === 'auth-api'));
@@ -17,7 +17,7 @@ Deno.test('authPlugin manifest exposes service, contract, and config axes', () =
 
   const inspection = inspectAuth();
   assertEquals(inspection.name, '@netscript/plugin-auth');
-  assertEquals(inspection.version, '0.1.0');
+  assertEquals(inspection.version, AUTH_PLUGIN_VERSION);
   assertEquals(inspection.dependencies, []);
 
   const verification = verifyAuthPlugin();

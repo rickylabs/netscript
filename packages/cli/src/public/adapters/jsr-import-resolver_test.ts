@@ -19,6 +19,14 @@ describe('JsrImportResolver', () => {
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE),
       'jsr:@netscript/fresh-ui@^1.0.0/interactive',
     );
+    assertEquals(
+      resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1),
+      'jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1',
+    );
+    assertEquals(
+      resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH),
+      'jsr:@netscript/auth-kv-oauth@^1.0.0',
+    );
   });
 
   it('resolves external dependencies to registry imports', () => {
