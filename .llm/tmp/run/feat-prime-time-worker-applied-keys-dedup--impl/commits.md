@@ -14,3 +14,5 @@ Format:
 - 1a959dd: test(workers): cover worker idempotency key resolution
 - d68ae7c: feat(workers): add kv worker idempotency store
 - dc37d5b: feat(workers): gate worker effects by idempotency claims
+- 951c27b: feat(triggers): propagate worker idempotency keys
+- 8c33b8b: docs(workers): document worker idempotency guarantees

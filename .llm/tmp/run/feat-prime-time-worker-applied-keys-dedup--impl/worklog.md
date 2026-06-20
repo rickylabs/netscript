@@ -72,6 +72,12 @@ To extend worker delivery semantics, start at
 | Time | Slice | Step | Notes |
 | ---- | ----- | ---- | ----- |
 | 2026-06-20 | bootstrap | artifacts | Created implementation run artifacts after PLAN-EVAL-passed brief review. |
+| 2026-06-20 | 1 | core-contract | Added `idempotencyKey` message fields and core idempotency port exports. |
+| 2026-06-20 | 2 | core-resolver+tests | Added key resolver and precedence/hash tests. |
+| 2026-06-20 | 3 | plugin-store | Added `KvWorkerIdempotencyStore` over shared KV abstraction and store tests. |
+| 2026-06-20 | 4 | consumer-gate | Gated job/task effects before execution; composition wiring folded in to keep branch green. |
+| 2026-06-20 | 5 | producer-propagation | Trigger runtime now stamps idempotency key onto `JobMessage` body. |
+| 2026-06-20 | 7 | docs+surface | README delivery guarantee, module doc fix, JSR audit, publish dry-run, final gate run. |
 
 ## Decisions
 
@@ -85,7 +91,7 @@ To extend worker delivery semantics, start at
 
 | Drift | Severity | Logged in drift.md |
 | ----- | -------- | ------------------ |
-| none | N/A | N/A |
+| Composition wiring folded into consumer commit | minor | yes |
 
 ## Gate Results
 
@@ -93,27 +99,45 @@ To extend worker delivery semantics, start at
 
 | Gate | Command or check | Result | Notes |
 | ---- | ---------------- | ------ | ----- |
-| pending | pending | NOT_RUN | Implementation not started. |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-workers-core --root plugins/workers --root plugins/triggers --ext ts` | PASS | 237 files selected, 2 batches, 0 diagnostics. Wrapper passes `--unstable-kv` by default. |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-workers-core --root plugins/workers --root plugins/triggers --ext ts` | PASS | 237 files selected, 0 lint findings. |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-workers-core --root plugins/workers --root plugins/triggers --ext ts` | PASS | 237 files selected, 0 formatting findings. |
+| publish dry-run | `deno task publish:dry-run` in `packages/plugin-workers-core` | PASS | Dry run complete; existing `unanalyzable-dynamic-import` warning in `src/runtime/job-dispatcher.ts`. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/plugin-workers-core --text` | PASS | Exit 0 after adding missing `@module`; warnings remain for existing cardinality and tool slow-types text while dry-run is OK. |
+| doc lint | `deno doc --lint packages/plugin-workers-core/mod.ts` | PASS | Checked 1 file. |
+| architecture composite | `deno task arch:check` | FAIL_EXISTING | Reports 58 failures across pre-existing repo debt outside this slice, including CLI/plugin abstract classes and Jest/Vitest globals. No new slice-specific failure identified. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| pending | NOT_RUN | pending | Implementation not started. |
+| F-1 file-size | PASS | `wc -l`: new files 38, 43, 26, 209 LOC; changed dispatcher 297 LOC after helper split. | No new file exceeds 300/500 thresholds. |
+| F-3 layering | PASS | Port in workers-core `src/ports`; resolver in `src/runtime`; concrete KV store in plugin `worker/`; composition root injects store. | No `@netscript/kv` dependency added to workers-core. |
+| F-5/F-6 public surface/JSR | PASS | publish dry-run + JSR audit exit 0. | New exported port types are explicit type aliases/interfaces. |
+| F-10 test shape | PASS | New tests: resolver 45 LOC, store 83 LOC, dispatcher 219 LOC. | Below 500 LOC. |
+| F-13 runtime invariants | PASS | Targeted tests prove duplicate skip, release on failure, applied marker, TTL expiry. | Delivery guarantee documented in READMEs. |
+| F-14 console-log | PASS_WITH_EXISTING_STYLE | `rg console\\.` shows existing worker logging style; new skip log uses same worker logging path plus span events. | No console usage added to workers-core. |
+| F-15/F-17/F-18 barrels | PASS | `rg worker-idempotency|WorkerIdempotency` confirms exports only in root/subpath barrels. | New worker subpath export is intentional internal plugin surface. |
 
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
-| pending | NOT_RUN | pending | Implementation not started. |
+| worker applied-keys behavior | PASS | `deno test --allow-all --unstable-kv ...` combined targeted run passed 35 tests. | Includes store, dispatcher, workers plugin, workers-core, triggers producer tests. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | -------- | ------ | -------- | ----- |
-| pending | NOT_RUN | pending | Implementation not started. |
+| workers-core consumers | PASS | workers-core tests passed 20 tests. | Resolver included. |
+| workers plugin consumers | PASS | workers targeted/plugin tests passed 13 tests. | Worker constructor call sites compile with required idempotency. |
+| triggers producer | PASS | trigger runtime processor tests passed 2 tests. | Message body carries idempotency key. |
 
 ## Handoff Notes
 
-- Evaluator should inspect the worker dispatcher idempotency gate, KV store semantics, trigger
-  producer propagation, and final gate evidence first.
+- Evaluator should inspect `plugins/workers/worker/job-dispatcher.ts`,
+  `plugins/workers/worker/worker-idempotency-store.ts`,
+  `packages/plugin-workers-core/src/ports/worker-idempotency-port.ts`, and
+  `plugins/triggers/src/runtime/trigger-runtime-processor.ts` first.
+- `deno task arch:check` remains red due to broad pre-existing repository debt; slice-scoped static,
+  runtime, JSR, publish, and manual fitness evidence is green.

@@ -12,8 +12,9 @@
 
 ## Current State
 
-Implementation run initialized from the PLAN-EVAL-passed slice brief. Source changes have not yet
-started.
+Implementation is complete for worker consumer-side applied-keys dedup. The branch carries the core
+message/port contract, key resolver, KV store, dispatcher gates, trigger producer propagation,
+composition wiring, tests, docs, and gate evidence.
 
 ## Completed
 
@@ -21,16 +22,17 @@ started.
 - Confirmed branch `feat/prime-time/worker-applied-keys-dedup` tracks
   `origin/feat/prime-time/worker-applied-keys-dedup`.
 - Created implementation run artifacts.
+- Implemented all approved contracts and tests for this slice.
+- Ran scoped static gates, targeted runtime tests, JSR audit, doc lint, and publish dry-run.
 
 ## In Progress
 
-- Inspecting current worker, core, trigger, KV, and test surfaces before edits.
+- Final docs/evidence commit and PR completion comment.
 
 ## Next Steps
 
-1. Implement core contract and resolver.
-2. Implement KV store and dispatcher gates.
-3. Wire producer/composition, add tests, run gates, commit/push/comment by slice.
+1. Push final docs/evidence commit.
+2. Comment PR #79 ready for IMPL-EVAL.
 
 ## Key Decisions
 
@@ -45,24 +47,34 @@ started.
 | Path | Status | Notes |
 | ---- | ------ | ----- |
 | `.llm/tmp/run/feat-prime-time-worker-applied-keys-dedup--impl/*` | new | Harness implementation artifacts. |
+| `packages/plugin-workers-core/src/ports/worker-idempotency-port.ts` | new | Storage-agnostic worker idempotency port. |
+| `packages/plugin-workers-core/src/runtime/worker-idempotency.ts` | new | Key resolver and hash fallback. |
+| `plugins/workers/worker/worker-idempotency-store.ts` | new | KV-backed applied-keys store. |
+| `plugins/workers/worker/job-dispatcher.ts` | changed | Claim/skip/mark/release gate for job and task effects. |
+| `plugins/triggers/src/runtime/trigger-runtime-processor.ts` | changed | Stamps idempotency key on `JobMessage`. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | NOT_RUN | Source changes not yet implemented. |
-| Fitness | NOT_RUN | Source changes not yet implemented. |
-| Runtime | NOT_RUN | Source changes not yet implemented. |
-| Consumer | NOT_RUN | Source changes not yet implemented. |
+| Static | PASS | Scoped check/lint/fmt green for workers-core, workers, triggers. |
+| Fitness | PASS_WITH_EXISTING_ARCH_DEBT | JSR audit/doc lint/publish green; repo-wide `arch:check` fails on pre-existing unrelated debt. |
+| Runtime | PASS | Combined targeted run passed 35 tests. |
+| Consumer | PASS | workers-core, workers plugin, and triggers tests passed. |
 
 ## Open Questions
 
-- None currently.
+- None.
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: minor commit-order drift, composition wiring folded into consumer commit to preserve a
+  compiling branch after each push.
 - Debt: no new debt accepted.
 
 ## Commits
-
+- 7f1d011: feat(workers): add worker idempotency contract
+- 1a959dd: test(workers): cover worker idempotency key resolution
+- d68ae7c: feat(workers): add kv worker idempotency store
+- dc37d5b: feat(workers): gate worker effects by idempotency claims
+- 951c27b: feat(triggers): propagate worker idempotency keys
