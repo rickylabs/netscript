@@ -1,0 +1,81 @@
+{
+  "name": "@json-smoke/dashboard",
+  "version": "0.0.0",
+  "exports": "./main.ts",
+  "tasks": {
+    "check": "deno fmt --check . && deno lint . && deno check",
+    "dev": "deno run -A npm:vite --configLoader native",
+    "build": "deno run -A npm:vite build",
+    "serve": "deno run -A npm:vite preview",
+    "start": "deno serve -A _fresh/server.js",
+    "update": "deno run -A -r jsr:@fresh/update ."
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "fresh",
+        "recommended"
+      ]
+    }
+  },
+  "exclude": [
+    "**/_fresh/*"
+  ],
+  "imports": {
+    "@app/": "./",
+    "@json-smoke/contracts": "../../contracts/mod.ts",
+    "@netscript/fresh": "../../packages/fresh/mod.ts",
+    "@netscript/fresh/builders": "../../packages/fresh/src/application/builders/mod.ts",
+    "@netscript/fresh/query": "../../packages/fresh/src/application/query/mod.ts",
+    "@netscript/fresh/route": "../../packages/fresh/src/application/route/mod.ts",
+    "@netscript/fresh/server": "../../packages/fresh/src/runtime/server/mod.ts",
+    "@netscript/fresh/vite": "../../packages/fresh/src/application/vite/vite.ts",
+    "@netscript/fresh-ui": "../../packages/fresh-ui/mod.ts",
+    "@netscript/fresh-ui/interactive": "../../packages/fresh-ui/interactive.ts",
+    "@netscript/sdk": "../../packages/sdk/mod.ts",
+    "@netscript/sdk/client": "../../packages/sdk/client/mod.ts",
+    "@netscript/sdk/query": "../../packages/sdk/query/mod.ts",
+    "@netscript/sdk/query-client": "../../packages/sdk/query-client/mod.ts",
+    "fresh": "jsr:@fresh/core@^2.3.3",
+    "preact": "npm:preact@^10.29.2",
+    "preact/hooks": "npm:preact@^10.29.2/hooks",
+    "@preact/signals": "npm:@preact/signals@^2.9.1",
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.1.2",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.12",
+    "tailwindcss": "npm:tailwindcss@^4.2.2",
+    "vite": "npm:vite@7.2.2",
+    "vite/client": "npm:vite@7.2.2/client",
+    "clsx": "npm:clsx@^2.1.1",
+    "tailwind-merge": "npm:tailwind-merge@^3.5.0"
+  },
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.asynciterable",
+      "dom.iterable",
+      "deno.ns",
+      "deno.unstable"
+    ],
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img",
+      "source",
+      "body",
+      "html",
+      "head",
+      "title",
+      "meta",
+      "script",
+      "link",
+      "style",
+      "base",
+      "noscript",
+      "template"
+    ],
+    "types": [
+      "vite/client"
+    ]
+  }
+}
