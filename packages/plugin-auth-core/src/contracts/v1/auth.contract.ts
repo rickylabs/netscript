@@ -1,37 +1,9 @@
 import { oc } from '@orpc/contract';
+import { implement } from '@orpc/server';
 import { z } from 'zod';
 import { AUTH_SESSION_STATES } from '../../domain/mod.ts';
 
-/** Result returned by auth contract schema validation. */
-export type AuthContractSchemaResult<TOutput> =
-  | { readonly success: true; readonly data: TOutput }
-  | { readonly success: false; readonly error: unknown };
-
-/** Package-owned structural schema surface for auth contracts. */
-export interface AuthContractSchema<TOutput = unknown, TInput = unknown> {
-  /** Parse an input value or throw a validation error. */
-  parse(input: TInput): TOutput;
-  /** Parse an input value and return a result object instead of throwing. */
-  safeParse(input: TInput): AuthContractSchemaResult<TOutput>;
-}
-
-/** Structural Standard Schema reference used by contract metadata. */
-export type StandardSchemaLike<TInput = unknown, TOutput = TInput> = Readonly<{
-  '~standard': Readonly<{
-    types?: Readonly<{
-      input: TInput;
-      output: TOutput;
-    }>;
-  }>;
-}>;
-
-/** Structural oRPC procedure reference used by auth contracts. */
-export type AuthContractProcedureLike<TInput = unknown, TOutput = unknown> = Readonly<{
-  '~orpc': Readonly<{
-    inputSchema?: StandardSchemaLike<TInput>;
-    outputSchema?: StandardSchemaLike<unknown, TOutput>;
-  }>;
-}>;
+export { AUTH_SESSION_STATES } from '../../domain/mod.ts';
 
 /** Input accepted by the signin endpoint. */
 export type SigninInput = Readonly<{
@@ -126,7 +98,25 @@ export type MeResponse = Readonly<{
   session?: AuthSessionResponse;
 }>;
 
-const baseContract: ReturnType<typeof oc.errors> = oc.errors({
+/** Validation error payload returned by auth contract errors. */
+export type ValidationErrorData = Readonly<{
+  formErrors: string[];
+  fieldErrors: Record<string, string[] | undefined>;
+}>;
+
+type AuthErrorDefinition<TData> = Readonly<{
+  status: number;
+  message: string;
+  data: z.ZodType<TData>;
+}>;
+
+type AuthErrorMapDefinition = Readonly<{
+  UNAUTHORIZED: AuthErrorDefinition<{ reason: string }>;
+  AUTH_PROVIDER_ERROR: AuthErrorDefinition<{ providerId?: string; reason: string }>;
+  VALIDATION_ERROR: AuthErrorDefinition<ValidationErrorData>;
+}>;
+
+const authErrorMap: AuthErrorMapDefinition = {
   UNAUTHORIZED: {
     status: 401,
     message: 'Authentication required',
@@ -148,7 +138,9 @@ const baseContract: ReturnType<typeof oc.errors> = oc.errors({
       fieldErrors: z.record(z.string(), z.array(z.string()).optional()),
     }),
   },
-});
+};
+
+const baseContract: ReturnType<typeof oc.errors<typeof authErrorMap>> = oc.errors(authErrorMap);
 
 const SigninInputZodSchema: z.ZodType<SigninInput> = z.object({
   providerId: z.string().min(1).optional(),
@@ -159,7 +151,7 @@ const SigninInputZodSchema: z.ZodType<SigninInput> = z.object({
 });
 
 /** Schema for signin endpoint input. */
-export const SigninInputSchema: AuthContractSchema<SigninInput> = SigninInputZodSchema;
+export const SigninInputSchema: z.ZodType<SigninInput> = SigninInputZodSchema;
 
 const SigninResponseZodSchema: z.ZodType<SigninResponse> = z.object({
   started: z.boolean(),
@@ -169,7 +161,7 @@ const SigninResponseZodSchema: z.ZodType<SigninResponse> = z.object({
 });
 
 /** Schema for signin endpoint responses. */
-export const SigninResponseSchema: AuthContractSchema<SigninResponse> = SigninResponseZodSchema;
+export const SigninResponseSchema: z.ZodType<SigninResponse> = SigninResponseZodSchema;
 
 const CallbackInputZodSchema: z.ZodType<CallbackInput> = z.object({
   providerId: z.string().min(1).optional(),
@@ -181,7 +173,7 @@ const CallbackInputZodSchema: z.ZodType<CallbackInput> = z.object({
 });
 
 /** Schema for callback endpoint input. */
-export const CallbackInputSchema: AuthContractSchema<CallbackInput> = CallbackInputZodSchema;
+export const CallbackInputSchema: z.ZodType<CallbackInput> = CallbackInputZodSchema;
 
 const CallbackResponseZodSchema: z.ZodType<CallbackResponse> = z.object({
   completed: z.boolean(),
@@ -191,8 +183,7 @@ const CallbackResponseZodSchema: z.ZodType<CallbackResponse> = z.object({
 });
 
 /** Schema for callback endpoint responses. */
-export const CallbackResponseSchema: AuthContractSchema<CallbackResponse> =
-  CallbackResponseZodSchema;
+export const CallbackResponseSchema: z.ZodType<CallbackResponse> = CallbackResponseZodSchema;
 
 const SignoutInputZodSchema: z.ZodType<SignoutInput> = z.object({
   sessionId: z.string().optional(),
@@ -201,7 +192,7 @@ const SignoutInputZodSchema: z.ZodType<SignoutInput> = z.object({
 });
 
 /** Schema for signout endpoint input. */
-export const SignoutInputSchema: AuthContractSchema<SignoutInput> = SignoutInputZodSchema;
+export const SignoutInputSchema: z.ZodType<SignoutInput> = SignoutInputZodSchema;
 
 const SignoutResponseZodSchema: z.ZodType<SignoutResponse> = z.object({
   signedOut: z.boolean(),
@@ -210,14 +201,14 @@ const SignoutResponseZodSchema: z.ZodType<SignoutResponse> = z.object({
 });
 
 /** Schema for signout endpoint responses. */
-export const SignoutResponseSchema: AuthContractSchema<SignoutResponse> = SignoutResponseZodSchema;
+export const SignoutResponseSchema: z.ZodType<SignoutResponse> = SignoutResponseZodSchema;
 
 const SessionInputZodSchema: z.ZodType<SessionInput> = z.object({
   sessionId: z.string().optional(),
 });
 
 /** Schema for session endpoint input. */
-export const SessionInputSchema: AuthContractSchema<SessionInput> = SessionInputZodSchema;
+export const SessionInputSchema: z.ZodType<SessionInput> = SessionInputZodSchema;
 
 const AuthSessionResponseZodSchema: z.ZodType<AuthSessionResponse> = z.object({
   id: z.string(),
@@ -239,7 +230,7 @@ const AuthSessionResponseZodSchema: z.ZodType<AuthSessionResponse> = z.object({
 });
 
 /** Schema for public auth session responses. */
-export const AuthSessionResponseSchema: AuthContractSchema<AuthSessionResponse> =
+export const AuthSessionResponseSchema: z.ZodType<AuthSessionResponse> =
   AuthSessionResponseZodSchema;
 
 const SessionResponseZodSchema: z.ZodType<SessionResponse> = z.object({
@@ -248,7 +239,7 @@ const SessionResponseZodSchema: z.ZodType<SessionResponse> = z.object({
 });
 
 /** Schema for session endpoint responses. */
-export const SessionResponseSchema: AuthContractSchema<SessionResponse> = SessionResponseZodSchema;
+export const SessionResponseSchema: z.ZodType<SessionResponse> = SessionResponseZodSchema;
 
 const AuthUserResponseZodSchema: z.ZodType<AuthUserResponse> = z.object({
   id: z.string(),
@@ -260,8 +251,7 @@ const AuthUserResponseZodSchema: z.ZodType<AuthUserResponse> = z.object({
 });
 
 /** Schema for public auth user responses. */
-export const AuthUserResponseSchema: AuthContractSchema<AuthUserResponse> =
-  AuthUserResponseZodSchema;
+export const AuthUserResponseSchema: z.ZodType<AuthUserResponse> = AuthUserResponseZodSchema;
 
 const MeResponseZodSchema: z.ZodType<MeResponse> = z.object({
   authenticated: z.boolean(),
@@ -270,44 +260,79 @@ const MeResponseZodSchema: z.ZodType<MeResponse> = z.object({
 });
 
 /** Schema for me endpoint responses. */
-export const MeResponseSchema: AuthContractSchema<MeResponse> = MeResponseZodSchema;
+export const MeResponseSchema: z.ZodType<MeResponse> = MeResponseZodSchema;
 
-/** Explicit public contract shape for auth service clients. */
-export type AuthContractDefinition = Readonly<{
-  signin: AuthContractProcedureLike<SigninInput, SigninResponse>;
-  callback: AuthContractProcedureLike<CallbackInput, CallbackResponse>;
-  signout: AuthContractProcedureLike<SignoutInput, SignoutResponse>;
-  session: AuthContractProcedureLike<SessionInput, SessionResponse>;
-  me: AuthContractProcedureLike<undefined, MeResponse>;
-}>;
-
-function createAuthContractDefinition(): AuthContractDefinition {
-  return {
-    signin: baseContract
-      .route({ method: 'POST', path: '/signin' })
-      .input(SigninInputZodSchema)
-      .output(SigninResponseZodSchema),
-    callback: baseContract
-      .route({ method: 'POST', path: '/callback' })
-      .input(CallbackInputZodSchema)
-      .output(CallbackResponseZodSchema),
-    signout: baseContract
-      .route({ method: 'POST', path: '/signout' })
-      .input(SignoutInputZodSchema)
-      .output(SignoutResponseZodSchema),
-    session: baseContract
-      .route({ method: 'GET', path: '/session' })
-      .input(SessionInputZodSchema.optional())
-      .output(SessionResponseZodSchema),
-    me: baseContract
-      .route({ method: 'GET', path: '/me' })
-      .input(z.undefined().optional())
-      .output(MeResponseZodSchema),
-  } as unknown as AuthContractDefinition;
-}
+const authContractDefinition: Parameters<typeof implement>[0] = {
+  signin: baseContract
+    .route({ method: 'POST', path: '/signin' })
+    .input(SigninInputZodSchema)
+    .output(SigninResponseZodSchema),
+  callback: baseContract
+    .route({ method: 'POST', path: '/callback' })
+    .input(CallbackInputZodSchema)
+    .output(CallbackResponseZodSchema),
+  signout: baseContract
+    .route({ method: 'POST', path: '/signout' })
+    .input(SignoutInputZodSchema)
+    .output(SignoutResponseZodSchema),
+  session: baseContract
+    .route({ method: 'GET', path: '/session' })
+    .input(SessionInputZodSchema.optional())
+    .output(SessionResponseZodSchema),
+  me: baseContract
+    .route({ method: 'GET', path: '/me' })
+    .input(z.undefined().optional())
+    .output(MeResponseZodSchema),
+};
 
 /** oRPC contract definition for the auth service API. */
-export const authContract: AuthContractDefinition = createAuthContractDefinition();
+export const authContract: Record<string, unknown> = authContractDefinition;
+
+/** Factory exposed by oRPC for a defined auth contract error. */
+export type AuthContractErrorFactory<TData> = (
+  input: Readonly<{ message?: string; data: TData }>,
+) => Error;
+
+/** Defined oRPC errors shared by all v1 auth procedures. */
+export type AuthContractErrors = Readonly<{
+  UNAUTHORIZED: AuthContractErrorFactory<{ reason: string }>;
+  AUTH_PROVIDER_ERROR: AuthContractErrorFactory<{ providerId?: string; reason: string }>;
+  VALIDATION_ERROR: AuthContractErrorFactory<ValidationErrorData>;
+}>;
+
+/** Handler options supplied by a context-bound auth route. */
+export type AuthRouteHandlerOptions<TContext, TInput> = Readonly<{
+  input: TInput;
+  errors: AuthContractErrors;
+  context: TContext;
+  path: readonly string[] | undefined;
+  lastEventId?: string;
+  signal?: AbortSignal;
+}>;
+
+/** Structural oRPC route handler exposed after binding an auth handler context. */
+export type AuthRouteHandler<TContext, TInput, TOutput> = Readonly<{
+  handler<THandlerOutput extends TOutput | Promise<TOutput>>(
+    handler: (options: AuthRouteHandlerOptions<TContext, TInput>) => THandlerOutput,
+  ): THandlerOutput;
+}>;
+
+/** Real inferred auth router returned after binding a service context. */
+export type AuthRouter<TContext extends Record<PropertyKey, unknown> = Record<never, never>> =
+  Readonly<{
+    signin: AuthRouteHandler<TContext, SigninInput, SigninResponse>;
+    callback: AuthRouteHandler<TContext, CallbackInput, CallbackResponse>;
+    signout: AuthRouteHandler<TContext, SignoutInput, SignoutResponse>;
+    session: AuthRouteHandler<TContext, SessionInput | undefined, SessionResponse>;
+    me: AuthRouteHandler<TContext, undefined, MeResponse>;
+  }>;
+
+/** Context-binding contract wrapper for the v1 auth contract. */
+export type AuthContractV1 = Readonly<
+  { $context: <TContext extends Record<PropertyKey, unknown>>() => AuthRouter<TContext> }
+>;
 
 /** Versioned alias for the auth service API contract. */
-export const authContractV1: AuthContractDefinition = authContract;
+export const authContractV1: AuthContractV1 = implement(
+  authContractDefinition,
+) as unknown as AuthContractV1;

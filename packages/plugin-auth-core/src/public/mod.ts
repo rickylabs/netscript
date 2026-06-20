@@ -14,8 +14,6 @@ export {
 export type {
   Account,
   AccountState,
-  AuthDomainSchema,
-  AuthDomainSchemaResult,
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
@@ -47,17 +45,17 @@ export {
 export type {
   AuthConfig,
   AuthConfigInput,
-  AuthConfigSchemaLike,
-  AuthConfigSchemaResult,
   AuthProviderConfig,
   AuthSessionPolicy,
 } from '../config/mod.ts';
 export { authContract, authContractV1 } from '../contracts/v1/mod.ts';
 export type {
-  AuthContractDefinition,
-  AuthContractProcedureLike,
-  AuthContractSchema,
-  AuthContractSchemaResult,
+  AuthContractErrorFactory,
+  AuthContractErrors,
+  AuthContractV1,
+  AuthRouteHandler,
+  AuthRouteHandlerOptions,
+  AuthRouter,
   AuthSessionResponse,
   AuthUserResponse,
   CallbackInput,
@@ -69,7 +67,7 @@ export type {
   SigninResponse,
   SignoutInput,
   SignoutResponse,
-  StandardSchemaLike,
+  ValidationErrorData,
 } from '../contracts/v1/mod.ts';
 export { AUTH_PRESET_KINDS, createAuthPresetRegistry } from '../presets/mod.ts';
 export type {
@@ -89,8 +87,6 @@ export type {
   AuthStreamDefinition,
   AuthStreamEvent,
   AuthStreamEventType,
-  AuthStreamSchema,
-  AuthStreamSchemaResult,
   CollectionDefinition,
   CollectionEventHelpers,
   StateSchema,

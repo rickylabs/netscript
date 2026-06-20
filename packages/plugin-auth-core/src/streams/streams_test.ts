@@ -5,6 +5,15 @@ import {
   authStreamSchema,
   AuthStreamSessionSchema,
 } from './mod.ts';
+import { AuthSessionSchema } from '../domain/mod.ts';
+
+type Equal<TLeft, TRight> = (<T>() => T extends TLeft ? 1 : 2) extends
+  (<T>() => T extends TRight ? 1 : 2) ? true
+  : false;
+type Expect<T extends true> = T;
+type _AuthSessionSchemaIdentity = Expect<
+  Equal<typeof AuthStreamSessionSchema, typeof AuthSessionSchema>
+>;
 
 Deno.test('AuthStreamEventSchema validates known auth event names', () => {
   const parsed = AuthStreamEventSchema.parse({
@@ -18,6 +27,8 @@ Deno.test('AuthStreamEventSchema validates known auth event names', () => {
 });
 
 Deno.test('AuthStreamSessionSchema validates stream session entities', () => {
+  assertEquals(AuthStreamSessionSchema, AuthSessionSchema);
+
   const parsed = AuthStreamSessionSchema.parse({
     id: 'sess_1',
     userId: 'user_1',

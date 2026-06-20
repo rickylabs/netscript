@@ -5,6 +5,7 @@
  */
 
 export {
+  AUTH_SESSION_STATES,
   authContract,
   authContractV1,
   AuthSessionResponseSchema,
@@ -20,10 +21,12 @@ export {
   SignoutResponseSchema,
 } from './auth.contract.ts';
 export type {
-  AuthContractDefinition,
-  AuthContractProcedureLike,
-  AuthContractSchema,
-  AuthContractSchemaResult,
+  AuthContractErrorFactory,
+  AuthContractErrors,
+  AuthContractV1,
+  AuthRouteHandler,
+  AuthRouteHandlerOptions,
+  AuthRouter,
   AuthSessionResponse,
   AuthUserResponse,
   CallbackInput,
@@ -35,5 +38,5 @@ export type {
   SigninResponse,
   SignoutInput,
   SignoutResponse,
-  StandardSchemaLike,
+  ValidationErrorData,
 } from './auth.contract.ts';

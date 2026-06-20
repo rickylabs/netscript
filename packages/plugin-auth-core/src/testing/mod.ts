@@ -6,6 +6,9 @@
 
 import type { AuthSession, AuthUser } from '../domain/mod.ts';
 
+export { AUTH_SESSION_STATES } from '../domain/mod.ts';
+export type { AuthSession, AuthSessionState, AuthUser } from '../domain/mod.ts';
+
 /** Options accepted by {@link buildAuthUser}. */
 export type BuildAuthUserOptions = Partial<AuthUser>;
 
