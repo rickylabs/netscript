@@ -5,7 +5,7 @@ import {
   type SagaRuntime,
   type SagaRuntimeAdapter,
 } from '@netscript/plugin-sagas-core/runtime';
-
+import { createSagaTelemetry } from '../telemetry/otel-saga-tracer.ts';
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 import { openSagaRuntimeKv } from './kv-saga-store.ts';
 import { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
@@ -128,10 +128,14 @@ async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<
   if (options.adapter === 'legacy' || hasInjectedNativeEngine(options)) {
     return options.adapter === 'legacy'
       ? createSagaRuntime({ ...options, adapter: 'legacy' })
-      : createSagaRuntime({ ...options, adapter: 'native' });
+      : createSagaRuntime({
+        ...options,
+        adapter: 'native',
+        native: withDefaultTelemetry(options.native),
+      });
   }
 
-  const native = options.native ?? {};
+  const native = withDefaultTelemetry(options.native);
   const kv = await openSagaRuntimeKv();
   const durable = await createDurableSagaRuntime({
     kv,
@@ -167,4 +171,13 @@ function withKvClose(runtime: SagaRuntime, kv: Deno.Kv): SagaRuntime {
       }
     },
   });
+}
+
+function withDefaultTelemetry(
+  native: CreateSagaRuntimeOptions['native'],
+): NonNullable<CreateSagaRuntimeOptions['native']> {
+  return {
+    ...native,
+    instrumentation: native?.instrumentation ?? createSagaTelemetry(),
+  };
 }

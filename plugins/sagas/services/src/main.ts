@@ -28,6 +28,7 @@ import {
   KvSagaIdempotencyStore,
   openSagaRuntimeKv,
 } from '../../src/runtime/mod.ts';
+import { createSagaTelemetry } from '../../src/telemetry/otel-saga-tracer.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
 
@@ -75,6 +76,7 @@ export default async function createSagasService(
         kv,
         native: {
           idempotency: new KvSagaIdempotencyStore({ kv }),
+          instrumentation: createSagaTelemetry(),
           engineOptions: {
             appliedKeys: new KvSagaAppliedKeyStore({ kv }),
           },
