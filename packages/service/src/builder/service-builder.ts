@@ -40,6 +40,7 @@ import type {
   ServiceHandler,
   ServiceMiddleware,
   ServiceRouter,
+  ShutdownHook,
 } from '../types.ts';
 import { ServiceBuilderImpl } from './service-builder-impl.ts';
 
@@ -95,6 +96,22 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
 
   /** Registers an async startup hook. */
   onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter>;
+
+  /**
+   * Registers an async teardown hook run during graceful shutdown.
+   *
+   * @example
+   * ```typescript
+   * const running = await createService(router, { name: 'users' })
+   *   .onShutdown(async () => {
+   *     await db.$disconnect();
+   *   })
+   *   .serve({ port: 3000 });
+   *
+   * await running.stop();
+   * ```
+   */
+  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter>;
 
   /** Configures health check endpoints. */
   withHealth(
