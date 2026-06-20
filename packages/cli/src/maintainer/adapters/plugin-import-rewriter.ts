@@ -189,6 +189,26 @@ export function rewritePackagePathToJsr(target: string): string | null {
       return "jsr:@netscript/plugin-workers-core@^1.0.0/streams";
     }
   }
+  if (pkg === "plugin-auth-core") {
+    if (rest === "/src/config/mod.ts") {
+      return "jsr:@netscript/plugin-auth-core@^1.0.0/config";
+    }
+    if (rest === "/src/contracts/v1/mod.ts") {
+      return "jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1";
+    }
+    if (rest === "/src/domain/mod.ts") {
+      return "jsr:@netscript/plugin-auth-core@^1.0.0/domain";
+    }
+    if (rest === "/src/ports/mod.ts") {
+      return "jsr:@netscript/plugin-auth-core@^1.0.0/ports";
+    }
+    if (rest === "/src/streams/mod.ts") {
+      return "jsr:@netscript/plugin-auth-core@^1.0.0/streams";
+    }
+    if (rest === "/src/testing/mod.ts") {
+      return "jsr:@netscript/plugin-auth-core@^1.0.0/testing";
+    }
+  }
   const subpath = toJsrSubpath(rest);
   return `jsr:@netscript/${pkg}@^1.0.0${subpath}`;
 }
