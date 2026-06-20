@@ -16,3 +16,4 @@ Format:
 - cbfc40f: feat(service): add auth middleware
 - a51cb42: feat(service): wire auth into service builder
 - dbf8536: feat(service): expose auth subpath
+- 5bf5086: feat(service): add defineService auth opt-in
