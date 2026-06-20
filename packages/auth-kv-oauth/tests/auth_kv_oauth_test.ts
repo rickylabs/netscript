@@ -21,7 +21,8 @@ import {
   providers,
 } from '../mod.ts';
 
-const testKey = new Uint8Array(32).fill(7).buffer;
+const testKey = new ArrayBuffer(32);
+new Uint8Array(testKey).fill(7);
 
 function provider(): ReturnType<typeof defineOAuthProvider> {
   return defineOAuthProvider({
@@ -174,8 +175,11 @@ Deno.test('flow performs sign-in and callback with single-use state', async () =
   const signIn = await flow.signIn(
     request('https://app.example.test/auth/signin?returnTo=/dashboard'),
   );
-  const location = new URL(signIn.headers.get('location')!);
-  const txnCookie = signIn.headers.get('set-cookie')!;
+  const signInLocation = signIn.headers.get('location');
+  const txnCookie = signIn.headers.get('set-cookie');
+  assertExists(signInLocation);
+  assertExists(txnCookie);
+  const location = new URL(signInLocation);
   assertEquals(location.searchParams.get('code_challenge_method'), 'S256');
 
   await assertRejects(
@@ -193,8 +197,11 @@ Deno.test('flow performs sign-in and callback with single-use state', async () =
   const secondSignIn = await flow.signIn(
     request('https://app.example.test/auth/signin?returnTo=/dashboard'),
   );
-  const secondLocation = new URL(secondSignIn.headers.get('location')!);
-  const secondTxnCookie = secondSignIn.headers.get('set-cookie')!;
+  const secondSignInLocation = secondSignIn.headers.get('location');
+  const secondTxnCookie = secondSignIn.headers.get('set-cookie');
+  assertExists(secondSignInLocation);
+  assertExists(secondTxnCookie);
+  const secondLocation = new URL(secondSignInLocation);
 
   const callback = await flow.handleCallback(
     request(
@@ -205,7 +212,9 @@ Deno.test('flow performs sign-in and callback with single-use state', async () =
     ),
   );
   assertEquals(callback.response.status, 302);
-  assertEquals(new URL(callback.response.headers.get('location')!).pathname, '/dashboard');
+  const callbackLocation = callback.response.headers.get('location');
+  assertExists(callbackLocation);
+  assertEquals(new URL(callbackLocation).pathname, '/dashboard');
   assertExists(await store.getSession(callback.sessionId));
 
   await assertRejects(
@@ -307,7 +316,46 @@ Deno.test('backend refreshes near-expiry sessions and detects refresh-token reus
     session: { ...record.session, expiresAt: new Date(Date.now() + 1000).toISOString() },
   };
   await store.rotateSession(session.id, compromised);
-  const rejected = await backend.authenticate(authnRequest(`__Host-ns_session=${session.id}`));
-  assertEquals(rejected, { ok: false, reason: 'kv_oauth_refresh_failed' });
+  const reuse = await assertRejects(
+    async () => await backend.authenticate(authnRequest(`__Host-ns_session=${session.id}`)),
+    KvOAuthError,
+  );
+  assertEquals(reuse.code, 'refresh_reuse_detected');
   assertEquals(await store.getSession(session.id), null);
+});
+
+Deno.test('backend reports token endpoint refresh failures as typed errors', async () => {
+  const store = await createKvOAuthStore({ kv: new MemoryKvAdapter(), encryptionKey: testKey });
+  const backend = await createKvOAuthBackend({
+    provider: provider(),
+    store,
+    allowInsecureRequests: true,
+    fetch: () =>
+      Promise.resolve(
+        new Response(JSON.stringify({ error: 'invalid_grant' }), {
+          status: 400,
+          headers: { 'content-type': 'application/json' },
+        }),
+      ),
+  });
+  const session = await backend.sessions.createSession({
+    userId: 'user_test',
+    providerId: 'stub',
+    subject: 'user_test',
+    expiresAt: new Date(Date.now() + 1000).toISOString(),
+  });
+  await store.putSession({
+    session,
+    tokens: {
+      accessToken: 'access_test',
+      refreshToken: 'refresh_test',
+      expiresAt: session.expiresAt,
+    },
+  });
+
+  const failure = await assertRejects(
+    async () => await backend.authenticate(authnRequest(`__Host-ns_session=${session.id}`)),
+    KvOAuthError,
+  );
+  assertEquals(failure.code, 'refresh_failed');
 });

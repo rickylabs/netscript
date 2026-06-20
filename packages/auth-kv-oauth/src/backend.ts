@@ -1,3 +1,23 @@
+/**
+ * AuthBackendPort adapter that combines KV-backed OAuth sessions with interactive flow methods.
+ *
+ * @example
+ * ```ts
+ * import { createKvOAuthBackend, providers } from "@netscript/auth-kv-oauth";
+ *
+ * const backend = await createKvOAuthBackend({
+ *   provider: providers.google({
+ *     clientId: "client_test",
+ *     clientSecret: "secret_test",
+ *     redirectUri: "https://app.example.test/auth/callback",
+ *   }),
+ *   allowInsecureRequests: true,
+ * });
+ * ```
+ *
+ * @module
+ */
+
 import type {
   AuthBackendPort,
   AuthPrincipalMapperPort,
@@ -12,10 +32,54 @@ import type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/au
 import * as oauth from '@panva/oauth4webapi';
 import { buildCookieHeader } from './cookies.ts';
 import type { KvOAuthCookieOptions } from './cookies.ts';
-import type { CreateKvOAuthFlowOptions } from './flow.ts';
+import type { CreateKvOAuthFlowOptions, KvOAuthFlow } from './flow.ts';
 import { clientAuth, createKvOAuthFlow, discoveryRequestOptions, requestOptions } from './flow.ts';
-import { describeProvider, type OAuthProviderConfig } from './providers.ts';
+import { KvOAuthError } from './errors.ts';
+import { describeProvider, hasIssuerDiscovery, type OAuthProviderConfig } from './providers.ts';
 import { createKvOAuthStore, hashToken, type KvOAuthStore, type KvOAuthTokenSet } from './store.ts';
+
+export { AUTH_SESSION_STATES } from '@netscript/plugin-auth-core';
+export type {
+  AuthBackendPort,
+  AuthenticatorPort,
+  AuthPrincipalMapperPort,
+  AuthProviderCapability,
+  AuthProviderDescriptor,
+  AuthProviderRegistryPort,
+  AuthSession,
+  AuthSessionCreateInput,
+  AuthSessionCryptoPort,
+  AuthSessionLookup,
+  AuthSessionPrincipalMapping,
+  AuthSessionState,
+  AuthSessionStorePort,
+} from '@netscript/plugin-auth-core';
+export type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/auth';
+export type {
+  CreateKvOAuthFlowOptions,
+  KvOAuthCallbackResult,
+  KvOAuthFetch,
+  KvOAuthFlow,
+  KvOAuthJsonValidator,
+  KvOAuthPrincipal,
+  NormalizePrincipalContext,
+  OAuthCustomFetch,
+  OAuthEndpointProviderConfig,
+  OAuthIssuerProviderConfig,
+  OAuthProviderBaseConfig,
+  OAuthProviderClientAuthConfig,
+  OAuthProviderConfig,
+  OAuthTokenCustomFetch,
+} from './flow.ts';
+export type { KvOAuthCookieOptions } from './cookies.ts';
+export type {
+  KvOAuthCrypto,
+  KvOAuthEncryptedTokens,
+  KvOAuthSessionRecord,
+  KvOAuthStore,
+  KvOAuthTokenSet,
+  KvOAuthTxn,
+} from './store.ts';
 
 /** Refresh behavior for authenticate-on-read. */
 export type KvOAuthRefreshMode = 'never' | 'always';
@@ -29,10 +93,18 @@ export type CreateKvOAuthBackendOptions =
     refreshSkewMs?: number;
   }>;
 
-/** Creates a full `AuthBackendPort` backed by `@netscript/kv`. */
+/**
+ * Auth backend port plus interactive OAuth redirect primitives.
+ *
+ * The auth plugin service consumes the pure `AuthBackendPort` members for request authentication and
+ * the flow members for sign-in/callback HTTP handlers.
+ */
+export interface KvOAuthBackend extends AuthBackendPort, KvOAuthFlow {}
+
+/** Creates a full KV OAuth backend backed by `@netscript/kv`. */
 export async function createKvOAuthBackend(
   options: CreateKvOAuthBackendOptions,
-): Promise<AuthBackendPort> {
+): Promise<KvOAuthBackend> {
   const store = options.store ?? await createKvOAuthStore();
   const provider = options.provider;
   const cookie = options.cookie;
@@ -68,9 +140,6 @@ export async function createKvOAuthBackend(
         Date.parse(session.expiresAt) - now <= (options.refreshSkewMs ?? 5 * 60 * 1000)
       ) {
         const refreshed = await refreshRecord(provider, store, record, options);
-        if (!refreshed) {
-          return { ok: false, reason: 'kv_oauth_refresh_failed' };
-        }
         session = refreshed.session;
         setCookies = [buildCookieHeader(session.id, request, cookie)];
       }
@@ -82,7 +151,7 @@ export async function createKvOAuthBackend(
     handleCallback: flow.handleCallback,
     getSessionId: flow.getSessionId,
     signOut: flow.signOut,
-  } as AuthBackendPort & ReturnType<typeof createKvOAuthFlow>;
+  };
 }
 
 function createProviderRegistry(provider: OAuthProviderConfig): AuthProviderRegistryPort {
@@ -133,7 +202,7 @@ function createSessionStore(
     async refreshSession(sessionId: string): Promise<AuthSession> {
       const record = await store.getSession(sessionId);
       if (!record) {
-        throw new Error(`Session ${sessionId} was not found.`);
+        throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
       }
       const refreshed: AuthSession = {
         ...record.session,
@@ -148,7 +217,7 @@ function createSessionStore(
     async revokeSession(sessionId: string): Promise<AuthSession> {
       const record = await store.getSession(sessionId);
       if (!record) {
-        throw new Error(`Session ${sessionId} was not found.`);
+        throw new KvOAuthError('session_not_found', `Session ${sessionId} was not found.`);
       }
       const revoked: AuthSession = {
         ...record.session,
@@ -166,7 +235,7 @@ function createSessionCrypto(store: KvOAuthStore): AuthSessionCryptoPort {
     sealSessionToken: async (session: AuthSession): Promise<string> =>
       await store.crypto.seal({ sessionId: session.id }),
     openSessionToken: async (token: string): Promise<string> =>
-      (await store.crypto.open<{ sessionId: string }>(token)).sessionId,
+      (await store.crypto.open(token, validateSessionTokenPayload)).sessionId,
   };
 }
 
@@ -190,24 +259,30 @@ async function refreshRecord(
   store: KvOAuthStore,
   record: NonNullable<Awaited<ReturnType<KvOAuthStore['getSession']>>>,
   options: Pick<CreateKvOAuthBackendOptions, 'allowInsecureRequests' | 'fetch'>,
-): Promise<{ session: AuthSession } | undefined> {
+): Promise<{ session: AuthSession }> {
   const tokenSet = await store.openTokens(record.tokens);
   if (!tokenSet.refreshToken) {
-    return undefined;
+    throw new KvOAuthError(
+      'refresh_failed',
+      `Session ${record.session.id} has no refresh token.`,
+    );
   }
   const tokenHash = await hashToken(tokenSet.refreshToken);
   if (record.refreshTokenHash && record.refreshTokenHash !== tokenHash) {
     await store.deleteSession(record.session.id);
-    return undefined;
+    throw new KvOAuthError(
+      'refresh_reuse_detected',
+      `Session ${record.session.id} refresh token hash did not match the sealed token.`,
+    );
   }
   try {
-    const authorizationServer: oauth.AuthorizationServer = provider.issuer
+    const authorizationServer: oauth.AuthorizationServer = hasIssuerDiscovery(provider)
       ? await oauth.processDiscoveryResponse(
         new URL(provider.issuer),
         await oauth.discoveryRequest(new URL(provider.issuer), discoveryRequestOptions(options)),
       )
       : {
-        issuer: provider.issuer ?? new URL(provider.authorizationEndpoint!).origin,
+        issuer: new URL(provider.authorizationEndpoint).origin,
         authorization_endpoint: provider.authorizationEndpoint,
         token_endpoint: provider.tokenEndpoint,
         userinfo_endpoint: provider.userInfoEndpoint,
@@ -247,8 +322,32 @@ async function refreshRecord(
         ? await hashToken(nextTokens.refreshToken)
         : undefined,
     };
-    return await store.rotateSession(record.session.id, next) ? { session } : undefined;
-  } catch {
-    return undefined;
+    if (!await store.rotateSession(record.session.id, next)) {
+      throw new KvOAuthError(
+        'refresh_failed',
+        `Session ${record.session.id} could not be refreshed due to a concurrent update.`,
+      );
+    }
+    return { session };
+  } catch (cause) {
+    if (cause instanceof KvOAuthError) {
+      throw cause;
+    }
+    throw new KvOAuthError(
+      'refresh_failed',
+      `Session ${record.session.id} refresh failed.`,
+      { cause },
+    );
   }
+}
+
+function validateSessionTokenPayload(value: unknown): { readonly sessionId: string } {
+  if (!isRecord(value) || typeof value.sessionId !== 'string') {
+    throw new KvOAuthError('configuration_error', 'Sealed session token payload is invalid.');
+  }
+  return { sessionId: value.sessionId };
+}
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

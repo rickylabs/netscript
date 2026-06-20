@@ -1,3 +1,22 @@
+/**
+ * KV persistence adapter for OAuth transactions, sessions, and encrypted token sets.
+ *
+ * @example
+ * ```ts
+ * import { createKvOAuthStore } from "@netscript/auth-kv-oauth/store";
+ *
+ * const store = await createKvOAuthStore({ encryptionKey: new Uint8Array(32).buffer });
+ * const txn = await store.putTxn({
+ *   providerId: "google",
+ *   state: "state_test",
+ *   codeVerifier: "verifier_test",
+ *   returnTo: "https://app.example.test/",
+ * });
+ * ```
+ *
+ * @module
+ */
+
 import { getKv, type WatchableKv } from '@netscript/kv';
 import type { AuthSession } from '@netscript/plugin-auth-core';
 import { createKvOAuthCrypto, type KvOAuthCrypto, type KvOAuthKeyMaterial } from './crypto.ts';
@@ -5,6 +24,7 @@ import { KvOAuthError } from './errors.ts';
 
 export { AUTH_SESSION_STATES } from '@netscript/plugin-auth-core';
 export type { AuthSession, AuthSessionState } from '@netscript/plugin-auth-core';
+export type { KvOAuthCrypto, KvOAuthJsonValidator, KvOAuthKeyMaterial } from './crypto.ts';
 export type {
   AtomicCheck,
   AtomicMutation,
@@ -166,7 +186,7 @@ export async function createKvOAuthStore(options: KvOAuthStoreOptions = {}): Pro
       return { keyId: oauthCrypto.keyId, sealed: await oauthCrypto.seal(tokens) };
     },
     async openTokens(tokens): Promise<KvOAuthTokenSet> {
-      return await oauthCrypto.open<KvOAuthTokenSet>(tokens.sealed);
+      return await oauthCrypto.open(tokens.sealed, validateTokenSet);
     },
   };
 }
@@ -191,4 +211,43 @@ function requireAtomic(kv: WatchableKv): NonNullable<WatchableKv['atomic']> {
 
 function randomId(prefix: string): string {
   return `${prefix}_${crypto.randomUUID().replaceAll('-', '')}`;
+}
+
+function validateTokenSet(value: unknown): KvOAuthTokenSet {
+  if (!isRecord(value) || typeof value.accessToken !== 'string') {
+    throw new KvOAuthError('configuration_error', 'Sealed OAuth token payload is invalid.');
+  }
+  return {
+    accessToken: value.accessToken,
+    refreshToken: optionalString(value.refreshToken, 'refreshToken'),
+    idToken: optionalString(value.idToken, 'idToken'),
+    tokenType: optionalString(value.tokenType, 'tokenType'),
+    scope: optionalString(value.scope, 'scope'),
+    expiresAt: optionalString(value.expiresAt, 'expiresAt'),
+    claims: optionalClaims(value.claims),
+  };
+}
+
+function optionalString(value: unknown, field: string): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (typeof value !== 'string') {
+    throw new KvOAuthError('configuration_error', `Sealed OAuth token ${field} is invalid.`);
+  }
+  return value;
+}
+
+function optionalClaims(value: unknown): Readonly<Record<string, unknown>> | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!isRecord(value)) {
+    throw new KvOAuthError('configuration_error', 'Sealed OAuth token claims are invalid.');
+  }
+  return value;
+}
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

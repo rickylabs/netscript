@@ -3,12 +3,12 @@
  *
  * @example
  * ```ts
- * import { createKvOAuthBackend, providers } from "@netscript/auth-kv-oauth";
+ * import { createKvOAuthBackend, getRequiredEnv, providers } from "@netscript/auth-kv-oauth";
  *
  * const backend = await createKvOAuthBackend({
  *   provider: providers.google({
- *     clientId: Deno.env.get("GOOGLE_CLIENT_ID")!,
- *     clientSecret: Deno.env.get("GOOGLE_CLIENT_SECRET")!,
+ *     clientId: getRequiredEnv("GOOGLE_CLIENT_ID"),
+ *     clientSecret: getRequiredEnv("GOOGLE_CLIENT_SECRET"),
  *     redirectUri: "https://app.example.com/auth/callback",
  *   }),
  * });
@@ -20,6 +20,11 @@
 export {
   type ClientAuthMethod,
   defineOAuthProvider,
+  hasIssuerDiscovery,
+  type OAuthEndpointProviderConfig,
+  type OAuthIssuerProviderConfig,
+  type OAuthProviderBaseConfig,
+  type OAuthProviderClientAuthConfig,
   type OAuthProviderConfig,
   type OAuthProviderInput,
   type PresetOAuthProviderOptions,
@@ -41,6 +46,7 @@ export {
   createKvOAuthCrypto,
   getRequiredEnv,
   type KvOAuthCrypto,
+  type KvOAuthJsonValidator,
   type KvOAuthKeyMaterial,
 } from './src/crypto.ts';
 
@@ -56,12 +62,18 @@ export {
   createKvOAuthFlow,
   type CreateKvOAuthFlowOptions,
   type KvOAuthCallbackResult,
+  type KvOAuthFetch,
   type KvOAuthFlow,
+  type KvOAuthPrincipal,
+  type NormalizePrincipalContext,
+  type OAuthCustomFetch,
+  type OAuthTokenCustomFetch,
 } from './src/flow.ts';
 
 export {
   createKvOAuthBackend,
   type CreateKvOAuthBackendOptions,
+  type KvOAuthBackend,
   type KvOAuthRefreshMode,
 } from './src/backend.ts';
 

@@ -1,10 +1,20 @@
+/**
+ * Structured errors emitted by the KV OAuth backend.
+ *
+ * @example
+ * ```ts
+ * import { KvOAuthError } from "@netscript/auth-kv-oauth/errors";
+ *
+ * throw new KvOAuthError("refresh_failed", "Refresh token exchange failed.");
+ * ```
+ *
+ * @module
+ */
+
 /** Error code emitted by the KV OAuth backend. */
 export type KvOAuthErrorCode =
   | 'oauth_cookie_missing'
   | 'oauth_txn_not_found'
-  | 'state_mismatch'
-  | 'nonce_mismatch'
-  | 'id_token_invalid'
   | 'token_exchange_failed'
   | 'refresh_failed'
   | 'refresh_reuse_detected'
