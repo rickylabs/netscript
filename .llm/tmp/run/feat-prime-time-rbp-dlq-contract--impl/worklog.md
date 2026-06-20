@@ -72,6 +72,7 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | 2026-06-20 | 4 | KvPolling refactor | Replaced inline DLQ append/depth/reprocess with injected `DeadLetterStorePort`; added regression test. |
 | 2026-06-20 | 5 | Postgres/Redis wiring | Wired terminal nacks and Postgres max attempts to DLQ stores; added failure-path adapter tests. |
 | 2026-06-20 | 6 | DenoKv/AMQP wiring | Replaced no-op terminal nacks with DLQ appends through injected/default KV-backed stores; added context-level tests. |
+| 2026-06-20 | 7 | factory/typed/memory | Added `QueueOptions.deadLetterStore`, threaded factory defaults, added memory DLQ store, and validated typed-queue `validation_failed` DLQ path. |
 
 ## Decisions
 
@@ -115,6 +116,10 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | Slice 6 lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
 | Slice 6 fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
 | Slice 6 test | `rtk proxy deno test --unstable-kv --allow-env packages/queue/tests/fedify-adapter-dlq_test.ts` | PASS | 2 passed, 0 failed |
+| Slice 7 check | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/queue --ext ts` | PASS | `deno check --quiet --unstable-kv <files>`, 41 files, 0 findings |
+| Slice 7 lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
+| Slice 7 fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
+| Slice 7 test | `rtk proxy deno test --unstable-kv --allow-env packages/queue/tests/memory-queue_test.ts packages/queue/tests/options_test.ts packages/queue/tests/typed-queue_test.ts` | PASS | 9 passed, 0 failed |
 
 ### Fitness Gates
 
