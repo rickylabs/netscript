@@ -67,6 +67,8 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | 2026-06-20 | bootstrap | pre-flight | Loaded implement brief, plan, plan-meta, doctrine, archetype, scope overlay, gate matrix, and debt registry. |
 | 2026-06-20 | 1 | implementation | Added `Principal`, authn/authz result/request/port contracts, and builder option types. |
 | 2026-06-20 | 1 | gates | Check/lint/fmt wrappers passed. Initial check invocation with explicit `--unstable-kv` failed because the wrapper passes it by default; reran supported form successfully. |
+| 2026-06-20 | 2 | implementation | Added static credential and trusted-header authenticators plus focused unit tests. |
+| 2026-06-20 | 2 | gates | Targeted authenticator tests and check/lint/fmt wrappers passed. Formatter adjusted one owned auth file before final fmt pass. |
 
 ## Decisions
 
@@ -93,6 +95,10 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | slice 1 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; wrapper ran `deno check --quiet --unstable-kv <files>`; 19 files, 0 diagnostics. |
 | slice 1 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 19 files, 0 findings. |
 | slice 1 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 19 files, 0 findings. |
+| slice 2 test | `rtk proxy deno test --allow-all packages/service/tests/auth/authenticators_test.ts` | PASS | Exit 0; 8 passed, 0 failed. |
+| slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 22 files, 0 diagnostics. |
+| slice 2 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 22 files, 0 findings. |
+| slice 2 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0 after formatting owned auth files; 22 files, 0 findings. |
 
 ### Fitness Gates
 

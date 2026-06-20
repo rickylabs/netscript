@@ -10,4 +10,4 @@ Format:
 
 ## Log
 
-- 00771b4: feat(service): auth port and principal types
+- 6699099: feat(service): auth port and principal types

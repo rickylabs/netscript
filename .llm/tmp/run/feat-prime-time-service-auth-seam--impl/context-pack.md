@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slice 1 implementation is complete: auth principal, authn/authz request/result/port contracts, and builder option types exist under `packages/service/src/auth/`.
+Slice 2 implementation is complete: auth contracts exist, and the default static credential and trusted-header authenticators are implemented with unit tests.
 
 ## Completed
 
@@ -20,16 +20,17 @@ Slice 1 implementation is complete: auth principal, authn/authz request/result/p
 - Approved research, plan, plan metadata, doctrine, archetype, service overlay, gate matrix, and debt registry loaded.
 - Implementation run artifacts created.
 - Slice 1 auth contracts added and static gates passed.
+- Slice 2 authenticators added and targeted tests/static gates passed.
 
 ## In Progress
 
-- Slice 1 commit/push/PR comment.
+- Slice 2 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit slice 1.
+1. Commit slice 2.
 2. Push with explicit refspec and comment on PR #77.
-3. Start slice 2 default authenticators.
+3. Start slice 3 scope/role authorizer.
 
 ## Key Decisions
 
@@ -46,14 +47,17 @@ Slice 1 implementation is complete: auth principal, authn/authz request/result/p
 | `.llm/tmp/run/feat-prime-time-service-auth-seam--impl/*` | new | Implementation evidence artifacts. |
 | `packages/service/src/auth/types.ts` | new | Principal, authn/authz request/result, and port contracts. |
 | `packages/service/src/auth/options.ts` | new | Auth builder option contracts. |
+| `packages/service/src/auth/static-credential-authenticator.ts` | new | Static bearer/API-key authenticator with digest equality comparison. |
+| `packages/service/src/auth/trusted-header-authenticator.ts` | new | Trusted gateway header authenticator. |
+| `packages/service/tests/auth/authenticators_test.ts` | new | Unit and failure-path tests for default authenticators. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Slice 1 check/lint/fmt wrappers passed. |
+| Static | PASS | Slice 1 and 2 check/lint/fmt wrappers passed. |
 | Fitness | NOT_RUN | Pending export slices. |
-| Runtime | NOT_RUN | Pending auth tests. |
+| Runtime | PASS | Slice 2 authenticator unit tests passed. |
 | Consumer | NOT_RUN | Pending final gate. |
 
 ## Open Questions
@@ -67,4 +71,4 @@ Slice 1 implementation is complete: auth principal, authn/authz request/result/p
 
 ## Commits
 
-- 00771b4: feat(service): auth port and principal types
+- 6699099: feat(service): auth port and principal types
