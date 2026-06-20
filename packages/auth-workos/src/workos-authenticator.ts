@@ -4,6 +4,8 @@ import type {
   AuthnResult,
   Principal,
 } from '@netscript/service/auth';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
+import type { JWTPayload } from 'jose';
 
 /** Controls whether the authenticator refreshes the WorkOS sealed session after verification. */
 export type WorkosRefreshMode = 'never' | 'always';
@@ -102,6 +104,16 @@ export interface WorkosAuthenticatorOptions {
   readonly refresh?: WorkosRefreshMode;
 }
 
+/** Options for creating a WorkOS bearer access-token authenticator. */
+export interface WorkosAccessTokenAuthenticatorOptions {
+  /** WorkOS client ID used as the expected JWT audience and default JWKS URL suffix. */
+  readonly clientId: string;
+  /** WorkOS JWKS URL. Defaults to `https://api.workos.com/sso/jwks/<clientId>`. */
+  readonly jwksUrl?: string | URL;
+  /** Expected JWT issuer. Omit when a WorkOS environment uses a custom issuer. */
+  readonly issuer?: string;
+}
+
 const DEFAULT_COOKIE_NAME = 'wos-session';
 
 /** Creates a NetScript authenticator backed by WorkOS AuthKit sealed sessions.
@@ -157,6 +169,61 @@ export function createWorkosAuthenticator(
         ok: true,
         principal: principalFromWorkosSession(authenticated),
       };
+    },
+  };
+}
+
+/** Creates a NetScript authenticator backed by WorkOS bearer access tokens.
+ *
+ * @param options - WorkOS client ID, JWKS URL, and optional issuer constraint.
+ * @returns An `AuthenticatorPort` that verifies bearer JWTs before mapping them.
+ *
+ * @example
+ * ```ts
+ * const authenticator = createWorkosAccessTokenAuthenticator({
+ *   clientId: 'client_123',
+ * });
+ * ```
+ */
+export function createWorkosAccessTokenAuthenticator(
+  options: WorkosAccessTokenAuthenticatorOptions,
+): AuthenticatorPort {
+  const jwks = createRemoteJWKSet(
+    new URL(options.jwksUrl ?? `https://api.workos.com/sso/jwks/${options.clientId}`),
+  );
+
+  return {
+    async authenticate(request: AuthnRequest): Promise<AuthnResult> {
+      const token = bearerTokenFromRequest(request);
+      if (!token) {
+        return { ok: false, reason: 'workos_bearer_token_missing' };
+      }
+
+      let payload: JWTPayload;
+      try {
+        const verified = await jwtVerify(token, jwks, {
+          audience: options.clientId,
+          ...(options.issuer ? { issuer: options.issuer } : {}),
+        });
+        payload = verified.payload;
+      } catch (error) {
+        return {
+          ok: false,
+          reason: normalizeProviderError(error, 'workos_bearer_token_invalid'),
+        };
+      }
+
+      try {
+        return {
+          ok: true,
+          principal: principalFromAccessToken(payload),
+        };
+      } catch (error) {
+        return {
+          ok: false,
+          reason: normalizeProviderError(error, 'workos_bearer_token_invalid'),
+        };
+      }
     },
   };
 }
@@ -225,6 +292,60 @@ function collectRoles(
     roles.add(role);
   }
   return [...roles];
+}
+
+function principalFromAccessToken(payload: JWTPayload): Principal {
+  const subject = stringClaim(payload.sub);
+  if (!subject) {
+    throw new Error('missing subject claim');
+  }
+
+  return {
+    subject,
+    scopes: stringArrayClaim(payload.permissions),
+    roles: collectAccessTokenRoles(payload),
+    scheme: 'custom',
+    claims: {
+      organizationId: stringClaim(payload.org_id),
+      sessionId: stringClaim(payload.sid),
+      ...payload,
+    },
+  };
+}
+
+function collectAccessTokenRoles(payload: JWTPayload): readonly string[] {
+  const roles = new Set<string>();
+  const role = stringClaim(payload.role);
+  if (role) {
+    roles.add(role);
+  }
+  for (const value of stringArrayClaim(payload.roles)) {
+    roles.add(value);
+  }
+  return [...roles];
+}
+
+function bearerTokenFromRequest(request: AuthnRequest): string | undefined {
+  const header = request.header('authorization') ?? request.header('Authorization');
+  if (!header) {
+    return undefined;
+  }
+
+  const [scheme, token] = header.split(/\s+/, 2);
+  if (scheme?.toLowerCase() !== 'bearer' || !token) {
+    return undefined;
+  }
+  return token;
+}
+
+function stringClaim(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function stringArrayClaim(value: unknown): readonly string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
 }
 
 function serializeSessionCookie(

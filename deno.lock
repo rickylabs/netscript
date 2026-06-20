@@ -132,6 +132,7 @@
     "npm:esbuild@~0.25.5": "0.25.7",
     "npm:ioredis@^5.11.1": "5.11.1",
     "npm:ioredis@^5.8.2": "5.11.1",
+    "npm:jose@^6.2.3": "6.2.3",
     "npm:json-canon@^1.0.1": "1.0.1",
     "npm:jsonld@9": "9.0.0",
     "npm:mysql2@^3.22.5": "3.22.5_@types+node@25.9.3",
@@ -2340,7 +2341,8 @@
         ],
         "packageJson": {
           "dependencies": [
-            "npm:@workos-inc/node@^10.4.0"
+            "npm:@workos-inc/node@^10.4.0",
+            "npm:jose@^6.2.3"
           ]
         }
       },

@@ -43,3 +43,22 @@
   - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/auth-workos --ext ts,tsx` — PASS.
 - Required node-compat smoke:
   - `@workos-inc/node@10.4.0` imports and `new WorkOS(...).userManagement.loadSealedSession(...).authenticate()` runs under Deno 2.8.3 node compatibility.
+
+## Slice 3 — WorkOS JWKS access-token authenticator
+
+- Added `createWorkosAccessTokenAuthenticator({ clientId, jwksUrl?, issuer? })`.
+- Uses `jose` for real JWT signature verification against JWKS, with audience constrained to the
+  WorkOS client ID and optional issuer validation.
+- Principal mapping:
+  - `subject`: JWT `sub`.
+  - `scopes`: JWT `permissions`.
+  - `roles`: JWT `role` plus `roles`.
+  - `scheme`: `custom`.
+  - `claims`: camelCase `organizationId`/`sessionId` plus raw JWT claims (`org_id`, `sid`, etc.).
+- Validation:
+  - `deno check --unstable-kv packages/auth-workos/mod.ts packages/auth-workos/tests/` — PASS.
+  - `deno test --allow-net packages/auth-workos/tests/` — PASS, 6 tests.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/auth-workos --ext ts,tsx` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/auth-workos --ext ts,tsx --ignore-line-endings` — PASS.
+  - `deno task deps:latest` — PASS for `jose`, `better-auth`, and `@workos-inc/node`; none appeared in the behind list.
+  - `deno task deps:audit` — NON-BLOCKING EXISTING ADVISORIES: same unrelated `undici` and `vite` advisories as slice 1.

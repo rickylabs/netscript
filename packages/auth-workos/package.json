@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@workos-inc/node": "catalog:"
+    "@workos-inc/node": "catalog:",
+    "jose": "catalog:"
   }
 }

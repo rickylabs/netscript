@@ -17,7 +17,9 @@
  */
 
 export {
+  createWorkosAccessTokenAuthenticator,
   createWorkosAuthenticator,
+  type WorkosAccessTokenAuthenticatorOptions,
   type WorkosAuthenticatorOptions,
   type WorkosCookieOptions,
   type WorkosCookieSession,
