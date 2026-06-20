@@ -9,3 +9,4 @@ Append every commit created during the run immediately after creating it.
 - 9ad4ef5: docs(sagas): document idempotent delivery
 - dcfb49d: feat(sagas): accept publish idempotency keys
 - b8570e8: feat(sagas): thread service idempotency keys
+- 9f53a85: feat(sagas): add kv idempotency stores

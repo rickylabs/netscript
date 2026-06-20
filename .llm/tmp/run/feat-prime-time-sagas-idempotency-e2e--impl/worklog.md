@@ -78,6 +78,7 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | 2026-06-20 | 4 | contract | Added optional `idempotencyKey` to publish input type and Zod schema. |
 | 2026-06-20 | 5 | service threading | Threaded `idempotencyKey` through service runtime message and publish options. |
 | 2026-06-20 | 6 | KV stores | Added plugin-layer `KvSagaIdempotencyStore`, `KvSagaAppliedKeyStore`, and `openSagaRuntimeKv`. |
+| 2026-06-20 | 7 | wiring | Wired KV stores into service startup and default native runner/supervisor runtime creation; updated plugin README. |
 
 ## Decisions
 
@@ -119,6 +120,9 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | slice 6 runtime check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/src/runtime --ext ts` | PASS | 5 files selected; 0 diagnostics. |
 | slice 6 runtime lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas/src/runtime --ext ts` | PASS | 5 files selected; 0 findings. |
 | slice 6 runtime fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/src/runtime --ext ts` | PASS | 5 files selected; 0 findings after scoped write-format. |
+| slice 7 wiring check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/services --root plugins/sagas/src/runtime --ext ts` | PASS | 15 files selected; 0 diagnostics. |
+| slice 7 wiring lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas/services --root plugins/sagas/src/runtime --ext ts` | PASS | 15 files selected; 0 findings. |
+| slice 7 wiring fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/services --root plugins/sagas/src/runtime --file plugins/sagas/README.md --ext ts,md` | PASS | 16 files selected; 0 findings after scoped write-format. |
 
 ### Fitness Gates
 

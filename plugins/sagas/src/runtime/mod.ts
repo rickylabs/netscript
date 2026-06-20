@@ -7,10 +7,7 @@
 export { createSagaPublisher, HttpSagaPublisher } from './saga-publisher.ts';
 export { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
-export {
-  KvSagaAppliedKeyStore,
-  KvSagaIdempotencyStore,
-} from './kv-saga-runtime-stores.ts';
+export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 export { loadSagaRegistryModule, runSagaRunner, startSagaRunner } from './saga-runner.ts';
 export { SagaRuntimeSupervisor } from './saga-supervisor.ts';
 export {

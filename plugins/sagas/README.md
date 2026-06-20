@@ -48,6 +48,7 @@ const result = await publisher.publish({
   type: 'orders.created',
   payload: { orderId: 'ord_123' },
   correlationKey,
+  idempotencyKey: 'orders.created:ord_123',
 });
 
 if (!result.published) {
@@ -77,6 +78,18 @@ The default generated registry module is:
 ```
 
 Generate it through the CLI or scaffolding runtime manifest before starting the runner.
+
+## Delivery Guarantees
+
+The plugin runtime uses Deno KV-backed idempotency by default for native saga processes. The API
+service and `sagas-runner` open `NETSCRIPT_SAGA_KV_PATH` through `Deno.openKv()` and inject both
+`KvSagaIdempotencyStore` for transport reservations and `KvSagaAppliedKeyStore` for engine
+applied-key records.
+
+Saga delivery is at-least-once with idempotency keys. A retried publish with the same
+`idempotencyKey` is accepted as a non-failure duplicate: the transport reservation suppresses
+duplicate delivery where possible, and the engine applied-key guard returns `alreadyApplied: true`
+without re-running handler effects or persisting another transition.
 
 ```ts
 import { SagaRuntimeSupervisor } from '@netscript/plugin-sagas/runtime';
