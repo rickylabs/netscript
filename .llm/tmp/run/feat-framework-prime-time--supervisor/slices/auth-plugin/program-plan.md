@@ -166,9 +166,10 @@ Ordering: AS1 → {AS2a ∥ AS2b} → AS3 → AS4 → AS5 → AS6. AS2a and AS2b
    duplicate any saga-core streaming/registry primitive that should instead be promoted to a shared
    base package, or is per-plugin duplication the accepted house style? (Sagas re-implements its own
    streams; precedent suggests per-plugin is fine — confirm.)
-3. **Backend-selection granularity:** single active backend per app (env `NETSCRIPT_AUTH_BACKEND=
-   workos|better-auth|kv-oauth`) vs multiple concurrent backends (e.g. WorkOS + kv-oauth side by
-   side)? Plan v1 = single active backend; multi-backend deferred. Confirm acceptable.
+3. **Backend-selection granularity — RESOLVED (user-locked 2026-06-20):** **single active backend per
+   app** (env `NETSCRIPT_AUTH_BACKEND=workos|better-auth|kv-oauth`). Concurrent multi-backend is
+   **deferred** to a later slice (accepted scope boundary, not debt). The AS1 selection seam ships
+   single-active but must not foreclose a future multi-backend extension. Not an open item.
 4. **kv-oauth backend's flow HTTP surface:** confirm moving signIn/handleCallback HTTP handling up
    into the plugin oRPC service (AS3) — leaving the backend as pure non-HTTP logic — is the right cut,
    vs keeping a thin flow object in the backend that the service calls.
