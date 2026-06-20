@@ -60,6 +60,16 @@ Scope: contracts-only `@netscript/plugin-auth-core` (oRPC v1 + stream schema + A
 Map+default selection seam + config/presets). AS1 PR opens once it pushes; auth umbrella PR (#73 sub)
 opens once AS1 lands on the umbrella.
 
+**AS1 LANDED + PR open (2026-06-20 ~16:10 UTC).** Turn completed exit 0 (~12 min). Commit
+`f55bb180` "feat(plugin-auth-core): contracts, ports, stream schema, config for auth plugin (AS1)" —
+21 files, +1473, scoped strictly to `packages/plugin-auth-core/` (6 CRLF-drift `openhands/**/request.md`
+files correctly left uncommitted). Pushed to `refs/heads/feat/prime-time/auth-plugin-core`.
+Supervisor-verified gates in the worktree: `deno check --unstable-kv` exit 0; `deno test` 18/0;
+`deno publish --dry-run` Success (`@netscript/plugin-auth-core@0.0.1-alpha.0`, 13 files).
+**Leaf PR #85** (base `feat/prime-time/auth`, labels `type:sub-pr`/`area:plugins`/`status:impl-eval`).
+**IMPL-EVAL dispatched** (OpenHands qwen3.7-max, pr-comment) at #85 comment 4758395973. On PASS →
+merge AS1 into `feat/prime-time/auth`, then open the auth umbrella PR (#73 sub) and launch AS2a∥AS2b.
+
 **Launch mechanics that actually worked (verified 2026-06-20):**
 
 - `wsl.exe -u codex -- bash -lc 'cd /home/...; ...'` — the inner `cd` SILENTLY does not take effect
