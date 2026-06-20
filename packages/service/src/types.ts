@@ -40,13 +40,116 @@ export interface RunningService {
   stop(): Promise<void>;
 }
 
-/** Options for starting a service listener. */
+/**
+ * Reason a service shutdown was triggered.
+ *
+ * @example
+ * ```typescript
+ * const reason: ShutdownReason = 'manual';
+ * ```
+ */
+export type ShutdownReason = 'signal' | 'manual' | 'startup-failure';
+
+/**
+ * Context passed to shutdown hooks during graceful service drain.
+ *
+ * @example
+ * ```typescript
+ * createService(router, { name: 'users' })
+ *   .onShutdown(({ reason, signal }) => {
+ *     audit.record({ reason, signal });
+ *   });
+ * ```
+ */
+export interface ShutdownContext {
+  /** Why shutdown was triggered. */
+  readonly reason: ShutdownReason;
+
+  /** OS signal that triggered shutdown, when reason is `signal`. */
+  readonly signal?: Deno.Signal;
+}
+
+/**
+ * Async teardown hook registered with `ServiceBuilder.onShutdown()`.
+ *
+ * @example
+ * ```typescript
+ * const closeDatabase: ShutdownHook = async () => {
+ *   await db.$disconnect();
+ * };
+ * ```
+ */
+export type ShutdownHook = (
+  context: ShutdownContext,
+) => Promise<void> | void;
+
+/**
+ * Per-hook outcome captured during graceful drain.
+ *
+ * @example
+ * ```typescript
+ * const outcome: ShutdownHookOutcome = { ok: true };
+ * ```
+ */
+export interface ShutdownHookOutcome {
+  /** True when the hook completed without throwing. */
+  readonly ok: boolean;
+
+  /** Normalized failure message when the hook rejects or throws. */
+  readonly error?: string;
+}
+
+/**
+ * Result of a completed service shutdown.
+ *
+ * @example
+ * ```typescript
+ * const report: ShutdownReport = {
+ *   reason: 'manual',
+ *   timedOut: false,
+ *   hooks: [{ ok: true }],
+ * };
+ * ```
+ */
+export interface ShutdownReport {
+  /** Why shutdown was triggered. */
+  readonly reason: ShutdownReason;
+
+  /** True when the drain timeout elapsed before all work settled. */
+  readonly timedOut: boolean;
+
+  /** Per-hook outcomes in execution order. */
+  readonly hooks: readonly ShutdownHookOutcome[];
+}
+
+/**
+ * Options for starting a service listener.
+ *
+ * @example
+ * ```typescript
+ * const running = await createService(router, { name: 'users' })
+ *   .withHealth()
+ *   .serve({
+ *     port: 3000,
+ *     drainTimeoutMs: 10_000,
+ *     handleSignals: true,
+ *   });
+ *
+ * await running.stop();
+ * ```
+ */
 export interface ServeOptions {
   /** Preferred listener port; use `0` for an ephemeral port. */
   port?: number;
 
   /** External signal that stops the listener when aborted. */
   signal?: AbortSignal;
+
+  /** Max time to wait for in-flight requests and shutdown hooks. Defaults to `30_000`. */
+  drainTimeoutMs?: number;
+
+  /** Install SIGINT/SIGTERM or SIGBREAK handlers. Defaults to `true`. */
+  handleSignals?: boolean;
 }
 
 /** Result returned by oRPC-compatible fetch handlers. */

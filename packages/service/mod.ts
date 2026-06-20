@@ -111,6 +111,11 @@ export type {
   ServiceMiddleware,
   ServiceRequest,
   ServiceRouter,
+  ShutdownContext,
+  ShutdownHook,
+  ShutdownHookOutcome,
+  ShutdownReason,
+  ShutdownReport,
 } from './src/types.ts';
 
 // Layer 2: Builders
