@@ -42,6 +42,7 @@ interface Options {
   workersUrl: string;
   sagasUrl: string;
   triggersUrl: string;
+  authUrl: string;
 }
 
 interface CommandOptionValues {
@@ -66,6 +67,7 @@ interface CommandOptionValues {
   workersUrl?: string;
   sagasUrl?: string;
   triggersUrl?: string;
+  authUrl?: string;
 }
 
 interface CommandDetails {
@@ -208,7 +210,27 @@ function defaultOptions(): Options {
     workersUrl: 'http://localhost:8091',
     sagasUrl: 'http://localhost:8092',
     triggersUrl: 'http://localhost:8093',
+    authUrl: 'http://localhost:8094',
   };
+}
+
+function authSmokeEnv(): Record<string, string> {
+  return {
+    NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
+    NETSCRIPT_AUTH_CLIENT_ID: 'scaffold_runtime_smoke',
+    NETSCRIPT_AUTH_CLIENT_SECRET: 'scaffold_runtime_smoke_secret',
+    NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://issuer.example.test/oauth/authorize',
+    NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
+    NETSCRIPT_AUTH_REDIRECT_URI: 'http://localhost:8094/api/v1/auth/callback',
+    NETSCRIPT_AUTH_KV_OAUTH_TEST_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
+    NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
+  };
+}
+
+function authSmokeEnvLines(indent: string): string[] {
+  return Object.entries(authSmokeEnv()).map(([key, value]) =>
+    `${indent}await resource.withEnvironment(${JSON.stringify(key)}, ${JSON.stringify(value)});`
+  );
 }
 
 function normalizeCommandOptions(raw: CommandOptionValues): Options {
@@ -252,6 +274,7 @@ function normalizeCommandOptions(raw: CommandOptionValues): Options {
     workersUrl: (raw.workersUrl ?? defaults.workersUrl).replace(/\/+$/, ''),
     sagasUrl: (raw.sagasUrl ?? defaults.sagasUrl).replace(/\/+$/, ''),
     triggersUrl: (raw.triggersUrl ?? defaults.triggersUrl).replace(/\/+$/, ''),
+    authUrl: (raw.authUrl ?? defaults.authUrl).replace(/\/+$/, ''),
   };
 }
 
@@ -322,6 +345,9 @@ async function parseCliOptions(args: string[]): Promise<Options | null> {
     })
     .option('--triggers-url <url:string>', 'Triggers API base URL.', {
       default: 'http://localhost:8093',
+    })
+    .option('--auth-url <url:string>', 'Auth API base URL.', {
+      default: 'http://localhost:8094',
     })
     .example(
       'Default NDJSON run',
@@ -524,6 +550,7 @@ class SmokeRunner {
 
   #appendLog(message: string): void {
     const line = `[${new Date().toISOString()}] ${message}\n`;
+    Deno.mkdirSync(dirname(this.#options.logFile), { recursive: true });
     Deno.writeTextFileSync(this.#options.logFile, line, { append: true, create: true });
   }
 
@@ -761,6 +788,7 @@ class SmokeRunner {
       { id: 'plugin-add-sagas', kind: 'saga', name: 'sagas', args: [sampleFlag] },
       { id: 'plugin-add-triggers', kind: 'trigger', name: 'triggers', args: [sampleFlag] },
       { id: 'plugin-add-streams', kind: 'stream', name: 'streams', args: [sampleFlag] },
+      { id: 'plugin-add-auth', kind: 'auth', name: 'auth', args: [sampleFlag] },
     ];
 
     for (const plugin of plugins) {
@@ -779,6 +807,7 @@ class SmokeRunner {
             ...plugin.args,
             '--project-root',
             '.',
+            '--force',
           ),
         ],
       });
@@ -846,6 +875,132 @@ class SmokeRunner {
         ...this.#commandArgs('db', 'status', '--db', this.#options.db, '--project-root', '.'),
       ],
     });
+    await this.#runCommand({
+      id: 'generate-plugin-registry',
+      title: 'Generate plugin registry',
+      cwd: this.projectRoot,
+      command: ['deno', ...this.#commandArgs('generate', 'plugins', '--project-root', '.')],
+    });
+    await this.#validateAuthGeneratedWiring();
+    await this.#configureAuthSmokeEnvironment();
+  }
+
+  async #validateAuthGeneratedWiring(): Promise<void> {
+    await this.#ensureExists(
+      'auth-plugin-copied-manifest',
+      'Auth plugin manifest copied into generated workspace',
+      join(this.projectRoot, 'plugins', 'auth', 'scaffold.plugin.json'),
+    );
+    await this.#ensureExists(
+      'auth-plugin-copied-prisma',
+      'Auth plugin Prisma schema copied into generated workspace',
+      join(this.projectRoot, 'plugins', 'auth', 'database', 'auth.prisma'),
+    );
+    await this.#ensureExists(
+      'auth-db-contribution-generated',
+      'Auth Prisma contribution generated into database schema folder',
+      join(this.projectRoot, 'database', 'postgres', 'schema', 'plugins', 'auth', 'auth.prisma'),
+    );
+  }
+
+  async #configureAuthSmokeEnvironment(): Promise<void> {
+    const startedAt = performance.now();
+    const helperPath = join(this.projectRoot, 'aspire', '.helpers', 'register-plugins.mts');
+    this.#emitStart({
+      id: 'auth-smoke-env',
+      title: 'Wire auth smoke environment into generated Aspire helper',
+      kind: 'summary',
+      critical: true,
+      details: { path: helperPath },
+    });
+
+    if (this.#options.dryRun) {
+      this.#record({
+        ...createBaseStep(
+          'auth-smoke-env',
+          'Wire auth smoke environment into generated Aspire helper',
+          'summary',
+          true,
+          startedAt,
+        ),
+        status: 'skipped',
+        details: { path: helperPath },
+      });
+      return;
+    }
+
+    try {
+      const source = await Deno.readTextFile(helperPath);
+      const marker = '  // --- auth ---';
+      const markerIndex = source.indexOf(marker);
+      if (markerIndex < 0) {
+        this.#record({
+          ...createBaseStep(
+            'auth-smoke-env',
+            'Wire auth smoke environment into generated Aspire helper',
+            'summary',
+            true,
+            startedAt,
+          ),
+          status: 'failed',
+          details: { path: helperPath },
+          error: 'Generated register-plugins.mts does not contain the auth resource block.',
+        });
+        return;
+      }
+
+      const bootstrapLine =
+        "    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);";
+      const bootstrapIndex = source.indexOf(bootstrapLine, markerIndex);
+      if (bootstrapIndex < 0) {
+        this.#record({
+          ...createBaseStep(
+            'auth-smoke-env',
+            'Wire auth smoke environment into generated Aspire helper',
+            'summary',
+            true,
+            startedAt,
+          ),
+          status: 'failed',
+          details: { path: helperPath },
+          error: 'Generated auth resource block does not contain the bootstrap environment line.',
+        });
+        return;
+      }
+
+      const insertAt = bootstrapIndex + bootstrapLine.length;
+      const updated = [
+        source.slice(0, insertAt),
+        '\n',
+        ...authSmokeEnvLines('    ').map((line) => `${line}\n`),
+        source.slice(insertAt),
+      ].join('');
+      await Deno.writeTextFile(helperPath, updated);
+      this.#record({
+        ...createBaseStep(
+          'auth-smoke-env',
+          'Wire auth smoke environment into generated Aspire helper',
+          'summary',
+          true,
+          startedAt,
+        ),
+        status: 'passed',
+        details: { path: helperPath },
+      });
+    } catch (error: unknown) {
+      this.#record({
+        ...createBaseStep(
+          'auth-smoke-env',
+          'Wire auth smoke environment into generated Aspire helper',
+          'summary',
+          true,
+          startedAt,
+        ),
+        status: 'failed',
+        details: { path: helperPath },
+        error: unknownToMessage(error),
+      });
+    }
   }
 
   async #typeCheckGeneratedProject(): Promise<void> {
@@ -882,6 +1037,7 @@ class SmokeRunner {
         '--non-interactive',
         '--nologo',
       ],
+      env: authSmokeEnv(),
     });
     this.#startedAspire = !this.#options.dryRun;
   }
@@ -896,6 +1052,7 @@ class SmokeRunner {
       'sagas',
       'triggers-api',
       'triggers',
+      'auth',
     ];
 
     for (const resource of resources) {
@@ -935,6 +1092,12 @@ class SmokeRunner {
       cwd: this.projectRoot,
       command: ['aspire', 'logs', 'workers-api', '--apphost', this.appHost, '-n', '120'],
     });
+    await this.#runCommand({
+      id: 'aspire-logs-auth',
+      title: 'Read auth logs',
+      cwd: this.projectRoot,
+      command: ['aspire', 'logs', 'auth', '--apphost', this.appHost, '-n', '120'],
+    });
   }
 
   async #exerciseApis(): Promise<void> {
@@ -957,6 +1120,21 @@ class SmokeRunner {
       'http-triggers-health',
       'Triggers API health',
       `${this.#options.triggersUrl}/health`,
+    );
+    await this.#httpGet(
+      'http-auth-live',
+      'Auth API liveness',
+      `${this.#options.authUrl}/health/live`,
+    );
+    await this.#httpGet(
+      'http-auth-ready',
+      'Auth API readiness',
+      `${this.#options.authUrl}/health/ready`,
+    );
+    await this.#httpGet(
+      'http-auth-session',
+      'Resolve unauthenticated auth session',
+      `${this.#options.authUrl}/api/v1/auth/session`,
     );
 
     await this.#httpGet(
@@ -1103,6 +1281,7 @@ class SmokeRunner {
     title: string;
     cwd: string;
     command: string[];
+    env?: Record<string, string>;
     critical?: boolean;
   }): Promise<void> {
     const critical = options.critical ?? true;
@@ -1140,6 +1319,7 @@ class SmokeRunner {
           new Deno.Command(command, {
             args,
             cwd: options.cwd,
+            env: options.env,
             stdout: 'piped',
             stderr: 'piped',
             signal,
