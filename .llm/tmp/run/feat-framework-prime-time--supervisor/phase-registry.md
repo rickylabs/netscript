@@ -11,9 +11,49 @@ branch `feat/framework-prime-time`. Status legend: `planned` → `plan-eval` →
 | group | slice | sev | status | PLAN-EVAL | IMPL-EVAL | sub-PR |
 | --- | --- | --- | --- | --- | --- | --- |
 | A-G1 | sagas-durable-store | blocker | ✅ MERGED | PASS | PASS (42 tests) → merged aa03b4f7 | #74 |
-| A-G2 | sagas-idempotency-e2e | blocker | impl done — HELD (rebase now unblocked) | PASS | held → rebase onto merged #74, then IMPL-EVAL | #75 |
-| A-G3 | sagas-telemetry-spans | blocker | impl done — HELD (rebase now unblocked) | PASS | held → rebase onto merged #74, then IMPL-EVAL | #76 |
-| A-G4 | service-auth-seam | blocker | impl-eval RE-DISPATCHED | PASS | run interrupted pre-verdict → re-dispatched (pending) | #77 |
+| A-G2 | sagas-idempotency-e2e | blocker | REBASED onto umbrella `5c4a4587` (HEAD `4d0aae41`); IMPL-EVAL dispatched (issuecomment-4756288140) | PASS | dispatched 2026-06-20 — awaiting verdict → merge on PASS | #75 |
+| A-G3 | sagas-telemetry-spans | blocker | REBASED onto umbrella `5c4a4587` (HEAD `8ec18ccd`); IMPL-EVAL dispatched (issuecomment-4756285872) | PASS | dispatched 2026-06-20 — awaiting verdict → merge on PASS | #76 |
+| A-G4 | service-auth-seam | blocker | impl-eval RE-DISPATCHED (issuecomment-4756121577) | PASS | awaiting verdict → merge on PASS | #77 |
+
+**Autonomous run authorized (user, 2026-06-20, going off-shift):** complete all ongoing umbrella work
+fully autonomously; keep updating the PR/here. Supervisor interpretation of merge authority: merge
+IMPL-EVAL-PASS slices INTO the umbrella autonomously; **do NOT merge the umbrella → `main` without
+explicit go** (irreversible outward step; also blocked by main-red below). Track-2/Track-3 are already
+user-scope-locked, so their generators may launch post-PLAN-EVAL-PASS without a fresh present-step;
+any NEW scope still escalates.
+
+**#75 + #76 rebase complete (2026-06-20):** both force-pushed onto umbrella `5c4a4587`, conflicts
+resolved against the locked durable-store contract (`KvSagaStore`/`createDurableSagaRuntime`/
+`SagaStorePort`), slice gates green (#75: 46 tests + publish dry-run + JSR audit + check/lint;
+#76: 23 telemetry tests + publish dry-run + doc-lint + JSR audit + doctrine), worklogs signal READY.
+Codex threads launched via `setsid ... </dev/null &` (plain `nohup &` died on wsl-session teardown).
+
+**E2E gate (#81) — BOTH JOBS GREEN ON REAL CI (2026-06-20):** `scaffold-static`=success AND
+`scaffold-runtime`=success on `e2e-cli.yml` run for `7ed56049`. The green-up slice corrected the
+workflow to `setup-dotnet 10.0.x` + `dotnet tool install Aspire.Cli --version 13.4.4` (generic
+`aspire.dev/install.sh` 404s for linux-x64 13.4.4) + a `13.4.*` preflight guard, and validated locally
+(`scaffold.runtime` 41/0; service 4/0; contracts 4/0; plugins 9/0). PR diff clean (workflow + 4
+evidence files). Gate validated end-to-end → ready to promote both jobs to required checks. **#81 merge
+to main HELD for user** (main-red + outward merge).
+
+**⚠ MAIN IS RED (prime-time blocker) — ROOT CAUSE DIAGNOSED (2026-06-20):** `main` HEAD `f85da9c0`
+ci.yml run #115 = `check-test` (Repo-wide test) **failure** + `quality` (Format check) **failure**.
+#81's red checks are inherited from this base, NOT introduced by #81.
+
+- **`check-test` (REQUIRED gate) root cause = ONE stale test assertion.** `packages/queue/tests/
+  typed-queue_test.ts` on main asserts `assertEquals(queue.nativeRetrial, false)` for a
+  `QueueProvider.Postgres` queue, but `packages/queue/adapters/postgres.adapter.ts` sets
+  `readonly nativeRetrial = true` (identical on main AND umbrella — the adapter was flipped to `true`
+  but the test was never updated in lockstep). Result: `FAILED | 660 passed | 1 failed | 12 ignored`.
+  The umbrella **already carries the fix** — commit `5fcb4c7f` (#80 DLQ slice) corrected the
+  assertion to `true` (and added the DLQ-store test). ⇒ Merging the umbrella → main resolves
+  `check-test`. To make main's required check green BEFORE the umbrella merges (so the umbrella PR /
+  #81 can pass branch protection), a **one-line fix-to-main** (flip the assertion `false`→`true` in
+  `typed-queue_test.ts`) is the minimal unblock. **HELD for user** (main-trunk change, outside the
+  umbrella-merge autonomy grant) — recommend a tiny `fix/queue-native-retrial-test` PR to main.
+- **`quality` (Format check)** = repo-wide `deno fmt --check` over markdown/generated/line-endings.
+  Per CLAUDE.md this is NOT a package-quality verdict and the job is additive-until-green
+  (non-required), so it does not block branch protection by itself. Separate, lower priority.
 | A-G5 | service-graceful-shutdown | blocker | ✅ MERGED | PASS | PASS (31 tests) → merged into umbrella | #78 |
 | A-G6 | worker-applied-keys-dedup | blocker | ✅ MERGED | PASS | PASS (KV dedup) → merged into umbrella | #79 |
 | A-G7 | rbp-dlq-contract | blocker | ✅ MERGED | PASS (cycle-2) | PASS (DLQ KV/PG/Redis) → merged into umbrella | #80 |
@@ -110,6 +150,41 @@ dependency-free core are both preserved:
     `betterAuth()` / WorkOS client and hands it to a thin adapter factory
     (`createBetterAuthAuthenticator({ auth })`, `createWorkosAuthenticator({ workos })`) that maps
     the provider model → `Principal`. The framework does not own the auth instance lifecycle.
+
+## E2E CLI gating (user-directed 2026-06-20)
+
+User: gate the umbrella with the E2E CLI suite at merge-readiness; gate the CLI-touching
+(durable-store/Prisma) work too; if `e2e:cli` isn't in CI, branch from main to add it (plans likely
+in PR #53).
+
+**Investigation:** `e2e:cli`/`scaffold.runtime` is NOT in CI — `ci.yml` explicitly defers the
+"toolchain-heavy CLI runtime e2e (aspire + docker + postgres)" to a "Phase-2 repo process automation
+umbrella," and CI only triggers on `main` + `feat/package-quality`, so the umbrella branch and its
+sub-slice PRs got **no CI**. PR #53 (`release/jsr-readiness`, a *different* umbrella) Dimension E
+("doc gates + scanners wired into CI/arch:check") is the closest existing plan but covers doc-lint/
+scanners, **not** `e2e:cli` — so no concrete pre-existing plan; authored fresh. Note: #74 (durable
+store) merged as-is did NOT change scaffold output (its plan: "No scaffold output changes ⇒ e2e:cli
+NOT required"); the CLI-touching slice is Track-3 `sagas-prisma-store` (scaffold backend option).
+
+**Decision (user: "both" + trigger "on PR→main plus PR labeled `e2e-cli-gate`"):**
+
+1. **CI workflow (durable) — DONE.** New branch `ci/e2e-cli-gate` off `origin/main` (`f85da9c0`),
+   workflow `.github/workflows/e2e-cli.yml`, **draft PR #81 → main** (commit `66b8476c`). Two jobs:
+   `scaffold-static` (deno-only suites — reliably green, becomes required check once observed) and
+   `scaffold-runtime` (full aspire+docker+postgres — **additive until observed green**; Aspire-in-CI
+   bring-up unverified, needs a verification/debug pass before branch-protection promotion). Triggers:
+   every PR to main + any PR labeled `e2e-cli-gate` + `workflow_dispatch`. Label `e2e-cli-gate`
+   created. Worktree: `…/jobs/09e4d4aa/tmp/ci-e2e-wt`.
+2. **Process gate (immediate, binding now).** Until `scaffold-runtime` is confirmed green in CI, the
+   manual merge-readiness gate stands (per CLAUDE.md): run
+   `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` (locally or via OpenHands)
+   before merging `feat/framework-prime-time` → `main` (PR #73) AND on Track-3 `sagas-prisma-store`.
+   Track-3's PR MUST carry the `e2e-cli-gate` label so its scaffold-output change is exercised.
+
+**Rollout / follow-ups:** merge #81 → observe `scaffold-static` green → promote to required check;
+verify/debug `scaffold-runtime` Aspire bring-up (Codex pass or local run) → promote once green. To
+make #81's checks appear on the umbrella PR #73, the workflow must reach the PR's merge ref (lands
+once #81 merges to main and #73 re-syncs, or merge main → umbrella).
 
 ## Notes
 

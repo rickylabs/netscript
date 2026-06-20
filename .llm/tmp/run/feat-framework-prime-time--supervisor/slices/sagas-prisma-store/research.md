@@ -67,10 +67,71 @@ should also support it." → restore Prisma as a first-class durable backend.
 - `@netscript/prisma-adapter-mysql` — standalone Archetype-2 Prisma adapter package precedent.
 - #74 `KvSagaStore` + `createDurableSagaRuntime` — the sibling backend + selection seam this extends.
 
-## TODO (formal research, before plan.md)
+## Formal research — post-#74-merge findings (supervisor, 2026-06-20)
 
-- After #74 merges: read the merged `createDurableSagaRuntime` selection seam + `KvSagaStore` to mirror
-  surface exactly.
-- Confirm the `@netscript/database`/Prisma client wiring + connection-config surface (appsettings/env).
-- Inspect `@netscript/cli` saga scaffold to scope the backend-option addition + its E2E impact.
-- Decide schema reconciliation (durable store tables vs read-model/projection) with doctrine.
+#74 is merged into the umbrella; the seam + reference impl were read directly. Grounded facts:
+
+### The locked contract — `SagaStorePort` (`packages/plugin-sagas-core/src/ports/saga-store-port.ts`)
+8 methods, all keyed primarily on `instanceId`: `load(instanceId)`, `save(envelope,{expectedVersion?})`,
+`appendTransition(instanceId, record)`, `findByCorrelation(sagaId, correlationKey)`,
+`saveCorrelation(entry)`, `delete(instanceId)`, plus `readonly id: string`. The store subpath
+(`src/stores/mod.ts`) ALSO re-exports `SagaIdempotencyPort` (#75 work) — parity scope is the
+`SagaStorePort` (idempotency is a separate port; out of scope unless the Prisma idempotency store is
+explicitly added — recommend deferring to keep this slice additive).
+
+### Reference impl — `KvSagaStore` (`plugins/sagas/src/runtime/kv-saga-store.ts`)
+- Optimistic write: `save` reads current, compares `metadata.version` to `expectedVersion`, then a KV
+  `atomic().check({versionstamp}).set().commit()`; on conflict throws
+  `SagasError.validationFailed("Saga store version mismatch for <id>")`. **PrismaSagaStore must
+  reproduce this exact error shape.**
+- Beyond the port it also exposes `entries()`, `transitions(instanceId)`, and `close()` (closes the KV
+  handle). Mirror `close()` (dispose the Prisma resource the store owns) and the diagnostic
+  `entries()/transitions()` for test/parity.
+- Key layout: `['sagas','state',instanceId]`, `['sagas','correlation',sagaId,correlationKey]→instanceId`,
+  `['sagas','transition',instanceId,version]` → the three Prisma tables mirror these namespaces.
+
+### The selection seam — `createDurableSagaRuntime` (`plugins/sagas/src/runtime/create-durable-saga-runtime.ts`)
+- Already accepts an injectable `store?: SagaStorePort` (`store = options.store ?? options.native?.store
+  ?? new KvSagaStore({ kv })`). **No port change needed** — Prisma plugs in as `options.store`.
+- BUT it **unconditionally opens `Deno.Kv`** (`kv = options.kv ?? await openSagaRuntimeKv()`) and returns
+  `kv` as a REQUIRED field; `saga-supervisor.ts:142` and `services/src/main.ts:86` call
+  `durable.kv.close()` on stop. ⇒ Seam refactor needed: when a non-KV store is selected, do NOT
+  force-open KV; generalize teardown to `dispose()` (or `kv?.close()` + `store.close?.()`). This is the
+  one seam change this slice owns; it is additive/backward-compatible (KV path unchanged).
+
+### Prisma client wiring (`plugins/sagas/services/src/main.ts:44`)
+- The host provides the client via `ctx.db.getClient()` (`@netscript/database` / `PluginServiceContext.db`).
+  `main.ts` already holds `dbClient`. ⇒ Prisma backend path passes that same client into the store
+  (consumer-brings-the-instance idiom, same as queue/db providers). No new connection management in the
+  store; it receives a configured `PrismaClient`.
+
+### Schema reconciliation — RESOLVED recommendation
+`plugins/sagas/database/sagas.prisma` already has `SagaInstance` (with `version`, `correlationId`,
+`state Json`, composite PK `[sagaName, id]`) + `SagaExecutionHistory` + `SagaDefinition`, explicitly
+framed by #74 as a **read-model/projection**, NOT the durable write path. The port keys on `instanceId`
+alone, but `SagaInstance`'s PK is `[sagaName, id]` — a structural mismatch. **Recommend DEDICATED durable
+runtime tables** (e.g. `saga_runtime_state` keyed by `instanceId`, `saga_runtime_transition`
+`(instanceId, version)`, `saga_runtime_correlation` `unique(sagaId, correlationKey)`) mirroring the KV
+namespaces, leaving the projection tables untouched for API/analytics. This keeps durable-write and
+read-model concerns separate (matches #74's framing) and avoids overloading projection PK semantics.
+PLAN-EVAL to confirm dedicated-vs-shared.
+
+### Optimistic concurrency over Prisma
+`save(envelope,{expectedVersion})` → in a transaction: `updateMany where {instanceId, version:
+expectedVersion} data {…, version: expectedVersion+1}`; if `count === 0` and the row exists → throw
+`SagasError.validationFailed` (same shape as KV). First write (`expectedVersion` undefined / no row) →
+`create`. `delete` wraps state + transitions + correlation deletes in one `$transaction`.
+
+### Deps + CLI
+- `@prisma/client ^7.8.0` already cataloged; `@netscript/database` already a dep. No new third-party dep
+  into core `@netscript/plugin-sagas-core` (stays platform-neutral). Prisma store lives in the plugin
+  (`@netscript/plugin-sagas`), alongside `KvSagaStore`.
+- CLI scaffold backend option: the generated composition root (`services/src/main.ts` template) + its
+  appsettings get a `saga-store-backend` choice. **Confirmed E2E impact**: this changes scaffold output
+  ⇒ the slice PR MUST carry the `e2e-cli-gate` label and `deno task e2e:cli run scaffold.runtime` runs
+  at eval (per the E2E-gating decision). Exact `@netscript/cli` scaffold file paths to be enumerated in
+  the generator's implementation-research step.
+
+### Open items deferred to implementation-research (generator)
+- Exact `@netscript/cli` saga scaffold files for the backend prompt/flag + generated appsettings keys.
+- Whether to also surface `entries()/transitions()` on the Prisma store (recommended for test parity).
