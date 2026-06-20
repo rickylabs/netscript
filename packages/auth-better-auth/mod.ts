@@ -20,9 +20,18 @@ export {
   type BetterAuthAuthenticatorOptions,
   type BetterAuthInstance,
   type BetterAuthMountOptions,
+  type BetterAuthPrismaClient,
   type BetterAuthPrismaProvider,
+  type BetterAuthSessionPayload,
   createBetterAuthAuthenticator,
   createNetscriptBetterAuth,
   mountBetterAuthHandler,
   type NetscriptBetterAuthOptions,
 } from './src/better-auth.ts';
+
+export type {
+  AuthenticatorPort,
+  AuthnRequest,
+  AuthnResult,
+  Principal,
+} from '@netscript/service/auth';

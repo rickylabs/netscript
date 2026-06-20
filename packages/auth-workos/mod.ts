@@ -24,5 +24,17 @@ export {
   type WorkosCookieOptions,
   type WorkosCookieSession,
   type WorkosRefreshMode,
+  type WorkosSessionAuthenticationFailure,
+  type WorkosSessionAuthenticationResult,
+  type WorkosSessionAuthenticationSuccess,
   type WorkosSessionClient,
+  type WorkosSessionRefreshResult,
+  type WorkosSessionRefreshSuccess,
 } from './src/workos-authenticator.ts';
+
+export type {
+  AuthenticatorPort,
+  AuthnRequest,
+  AuthnResult,
+  Principal,
+} from '@netscript/service/auth';

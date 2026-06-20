@@ -110,3 +110,45 @@
   - `deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/auth/gen-better-auth-prisma.ts --help` — PASS.
   - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/auth-better-auth --ext ts,tsx` — PASS.
   - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/auth-better-auth --root .llm/tools/auth --ext ts,tsx --ignore-line-endings` — PASS.
+
+## Slice 6 — Public docs, export surface, and readiness gates
+
+- Added package READMEs for:
+  - `@netscript/auth-workos`
+  - `@netscript/auth-better-auth`
+- Public export surface:
+  - Both packages re-export the upstream `@netscript/service/auth` port/result/request/principal
+    types for consumer ergonomics without redefining them.
+  - WorkOS exports its session and access-token result/configuration types.
+  - better-auth exports its wrapper/authenticator/mount payload types.
+- Required named verify item:
+  - Consumer import validation — PASS. A standalone `deno eval --ext=ts` imported both new packages
+    plus `AuthenticatorPort` from `packages/service/src/auth/mod.ts`, assigned both authenticators to
+    that upstream port, and executed without type errors.
+- Isolated declarations / JSR readiness:
+  - `deno publish --dry-run --allow-dirty` in `packages/auth-workos` — PASS.
+  - `deno publish --dry-run --allow-dirty` in `packages/auth-better-auth` — PASS.
+  - Root `deno task publish:dry-run` — PASS.
+  - No isolated-declarations carve-out is carried.
+- Selected validation:
+  - `rtk proxy deno task check` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/auth-workos --root packages/auth-better-auth --ext ts,tsx` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/auth-workos --root packages/auth-better-auth --ext ts,tsx` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/auth-workos --root packages/auth-better-auth --root .llm/tools/auth --ext ts,tsx --ignore-line-endings` — PASS.
+  - `deno test --allow-net packages/auth-workos/tests/` — PASS, 6 tests.
+  - `deno test --allow-net --allow-env packages/auth-better-auth/tests/` — PASS, 7 tests.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/auth-workos --pretty` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/auth-better-auth --pretty` — PASS.
+  - `deno task deps:latest` — PASS for the new dependencies; `better-auth`, `@workos-inc/node`,
+    and `jose` do not appear in the behind list.
+  - `deno task deps:audit` — NON-BLOCKING EXISTING ADVISORIES: unchanged unrelated `undici` and
+    `vite` advisories.
+  - `deno task arch:check` — NON-BLOCKING PRE-EXISTING REPO DEBT: root command reports existing
+    repository-wide doctrine failures outside this slice; the new auth package paths are not in the
+    failure list after removing the schema tool's `Deno.exit` warning.
+- Lock hygiene:
+  - `deno.lock` changed only for legitimate new dependency graph resolution, including the exact
+    `npm:better-auth@1.6.20` resolver touched by the schema-generation wrapper smoke.
+
+READY FOR IMPL-EVAL — all six implementation slices are complete and pushed; selected slice gates
+are green except the recorded pre-existing repo-wide audit/architecture findings above.

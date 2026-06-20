@@ -2,7 +2,7 @@
 
 ## Current status
 
-Implementation is in progress on branch `feat/prime-time/service-auth-adapters`.
+Implementation is READY FOR IMPL-EVAL on branch `feat/prime-time/service-auth-adapters`.
 
 Completed:
 
@@ -11,6 +11,8 @@ Completed:
 - Slice 3 WorkOS JWKS access-token authenticator with signed-token integration tests.
 - Slice 4 better-auth Prisma adapter wrapper and authenticator with refresh-cookie capture.
 - Slice 5 better-auth Hono mount helper plus `.llm/tools/auth/gen-better-auth-prisma.ts`.
+- Slice 6 package docs, export-surface cleanup, consumer-import validation, isolated-declarations
+  readiness, and selected gate evidence.
 
 ## Invariants
 
@@ -25,5 +27,8 @@ Completed:
 ## Gate notes
 
 - `deps:latest` is the authority for provider version freshness.
-- Deno node-compat smoke remains required for WorkOS sealed sessions and better-auth.
-- Consumer import validation must be recorded as a named verify item before READY.
+- Deno node-compat smoke passed for WorkOS sealed sessions and better-auth construction.
+- Consumer import validation is recorded as a named verify item in `worklog.md`.
+- Root `deno task publish:dry-run` passed.
+- Root `deno task arch:check` and `deno task deps:audit` still surface known pre-existing
+  repository-wide findings outside this slice; see `drift.md`.

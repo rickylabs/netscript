@@ -22,43 +22,40 @@ const args = parseArgs(Deno.args, {
 
 if (args.help) {
   printHelp();
-  Deno.exit(0);
-}
-
-if (!args.config) {
+} else if (!args.config) {
   console.error('Missing required --config <path> option.');
   printHelp();
-  Deno.exit(2);
-}
+  Deno.exitCode = 2;
+} else {
+  const commandArgs = [
+    'run',
+    '--allow-read',
+    '--allow-write',
+    '--allow-env',
+    '--allow-net',
+    '--allow-run',
+    'npm:@better-auth/cli@1.6.20',
+    'generate',
+    '--config',
+    args.config,
+  ];
 
-const commandArgs = [
-  'run',
-  '--allow-read',
-  '--allow-write',
-  '--allow-env',
-  '--allow-net',
-  '--allow-run',
-  'npm:@better-auth/cli@1.6.20',
-  'generate',
-  '--config',
-  args.config,
-];
+  if (args.output) {
+    commandArgs.push('--output', args.output);
+  }
+  if (args.yes) {
+    commandArgs.push('--yes');
+  }
 
-if (args.output) {
-  commandArgs.push('--output', args.output);
+  const command = new Deno.Command(Deno.execPath(), {
+    args: commandArgs,
+    stdin: 'inherit',
+    stdout: 'inherit',
+    stderr: 'inherit',
+  });
+  const status = await command.spawn().status;
+  Deno.exitCode = status.code;
 }
-if (args.yes) {
-  commandArgs.push('--yes');
-}
-
-const command = new Deno.Command(Deno.execPath(), {
-  args: commandArgs,
-  stdin: 'inherit',
-  stdout: 'inherit',
-  stderr: 'inherit',
-});
-const status = await command.spawn().status;
-Deno.exit(status.code);
 
 function printHelp(): void {
   console.log(`Generate better-auth Prisma models for a NetScript database schema.

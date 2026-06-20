@@ -53,23 +53,37 @@ export interface WorkosCookieSession {
 
 /** Successful WorkOS sealed-session authentication result. */
 export interface WorkosSessionAuthenticationSuccess {
+  /** Indicates WorkOS accepted the sealed session. */
   readonly authenticated: true;
+  /** Verified WorkOS access token embedded in the sealed session. */
   readonly accessToken: string;
+  /** WorkOS authentication method used for the session. */
   readonly authenticationMethod?: string;
+  /** WorkOS session identifier. */
   readonly sessionId: string;
+  /** Active WorkOS organization identifier. */
   readonly organizationId?: string;
+  /** Active WorkOS role. */
   readonly role?: string;
+  /** WorkOS roles present on the token. */
   readonly roles?: readonly string[];
+  /** WorkOS permission strings present on the token. */
   readonly permissions?: readonly string[];
+  /** WorkOS entitlement strings present on the token. */
   readonly entitlements?: readonly string[];
+  /** WorkOS feature flags present on the token. */
   readonly featureFlags?: readonly string[];
+  /** WorkOS user object. */
   readonly user: { readonly id: string; readonly [key: string]: unknown };
+  /** WorkOS impersonator metadata when the session is impersonated. */
   readonly impersonator?: unknown;
 }
 
 /** Failed WorkOS sealed-session authentication result. */
 export interface WorkosSessionAuthenticationFailure {
+  /** Indicates WorkOS rejected the sealed session. */
   readonly authenticated: false;
+  /** WorkOS failure reason. */
   readonly reason: string;
 }
 
