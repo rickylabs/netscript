@@ -31,6 +31,48 @@ After #75 merged at `9b3bde45`, the two remaining blocker slices were re-based o
   mechanical rebase + explicit-refspec push. Log: `/home/codex/pt-service-auth-seam-rebase5.log`.
   Prior PASS was on stale base `fe89b6b4` (missing #78) → re-eval after.
 
+### Track-2 + Track-3 (re)launch (2026-06-20 ~11:14–11:15 UTC)
+
+After a daemon-unmanaged recovery (killed 3 stacked app-servers, removed stale socket, clean
+`codex remote-control start` → connected/YogaBook9i), both remaining generators were launched fresh
+via the **mobile-visible** path `codex debug app-server send-message-v2 "<brief>"`:
+
+| Slice | Thread id | Worktree | Branch / base |
+| --- | --- | --- | --- |
+| sagas-prisma-store (Track-3) | `019ee44f-740e-7372-9045-4bf11a1433f6` | /home/codex/repos/netscript-pt-sagas-prisma-store | feat/prime-time/sagas-prisma-store @ 4e2d3dd1 |
+| service-auth-adapters (Track-2) | `019ee450-0594-75c1-8c59-2d61194916aa` | /home/codex/repos/netscript-pt-service-auth-adapters | feat/prime-time/service-auth-adapters @ 20042fc7 |
+
+Both confirmed `approvalPolicy: never`, `sandbox: dangerFullAccess`, `model: gpt-5.5`, AGENTS.md
+loaded, turn active, session jsonl writing. Steer with `codex exec resume <id> "<msg>"`.
+
+### Track-5 auth-plugin — AS1 launch (2026-06-20 ~15:49 UTC)
+
+| Slice | Thread id | Worktree | Branch / base |
+| --- | --- | --- | --- |
+| AS1 plugin-auth-core (Track-5 foundation) | `019ee54a-badf-7a61-a374-c7ed5bf9a426` | /home/codex/repos/netscript-pt-auth-plugin-core | feat/prime-time/auth-plugin-core @ 5b2f89f1 (off feat/prime-time/auth) |
+
+Launched via `~/launch_slice.sh /home/codex/as1-launch-prompt.md` from `--cd` worktree (mobile-visible
+`send-message-v2`). approval=never, sandbox=danger-full-access, gpt-5.5. Upstream intentionally UNSET
+(push.default landmine) — brief mandates explicit refspec `git push origin
+HEAD:refs/heads/feat/prime-time/auth-plugin-core`. Steer: `codex exec resume
+019ee54a-badf-7a61-a374-c7ed5bf9a426 "<msg>"` from the worktree. Turn active (3400+ session lines).
+Scope: contracts-only `@netscript/plugin-auth-core` (oRPC v1 + stream schema + AuthBackendPort +
+Map+default selection seam + config/presets). AS1 PR opens once it pushes; auth umbrella PR (#73 sub)
+opens once AS1 lands on the umbrella.
+
+**Launch mechanics that actually worked (verified 2026-06-20):**
+
+- `wsl.exe -u codex -- bash -lc 'cd /home/...; ...'` — the inner `cd` SILENTLY does not take effect
+  (pwd stays at the inherited Windows `/mnt/c/...` cwd → git resolves a garbled
+  `/mnt/c/.../fw-prime-time/C:/...` gitdir). **Fix: `wsl.exe -u codex --cd <native-path> -- bash …`**
+  sets the start dir directly. There is no leaked `GIT_*` env (checked) — it's pure cwd inheritance.
+- Passing the brief inline as `msg=$(cat file)` inside a PowerShell→wsl `bash -lc '…'` one-liner gets
+  the brief **re-parsed as shell commands** (markdown backticks/parens → `harness: command not found`,
+  `syntax error near '('`). **Fix: a CR-stripped script FILE** (`tr -d '\015' < win.sh > ~/launch.sh`)
+  that does `msg="$(cat "$1")"; codex debug app-server send-message-v2 "$msg"`, invoked as
+  `wsl.exe -u codex --cd <wt> -- bash ~/launch.sh <prompt-path>` with plain-path args only — no
+  quoting exposure. Reusable launcher: `~/launch_slice.sh` (codex home).
+
 ### Steer-launch landmine (verified 2026-06-20)
 
 `codex exec resume <id> <prompt>` works **foreground** (prompt as arg) but the
