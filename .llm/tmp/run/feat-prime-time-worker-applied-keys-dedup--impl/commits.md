@@ -10,3 +10,4 @@ Format:
 
 ## Log
 
+- 7f1d011: feat(workers): add worker idempotency contract

@@ -9,6 +9,8 @@ import type { RuntimeJobKvKeyFactories } from './runtime-types.ts';
 
 export { DEFAULT_TOPIC, SSEEventTypes };
 export { createWorkersRuntime } from './composition-root.ts';
+export { resolveWorkerIdempotencyKey } from './worker-idempotency.ts';
+export type { WorkerResolvedIdempotencyKey } from './worker-idempotency.ts';
 export type {
   TaskRegistryPort,
   WorkersClock,
@@ -70,3 +72,9 @@ export type {
   WorkerInboundMessage,
   WorkerOutboundMessage,
 } from './messages.ts';
+export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from '../ports/worker-idempotency-port.ts';
