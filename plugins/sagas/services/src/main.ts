@@ -27,6 +27,8 @@ import {
   KvSagaAppliedKeyStore,
   KvSagaIdempotencyStore,
   openSagaRuntimeKv,
+  type PrismaSagaStoreClient,
+  resolveSagaStoreBackend,
 } from '../../src/runtime/mod.ts';
 import { createSagaTelemetry } from '../../src/telemetry/otel-saga-tracer.ts';
 import { router } from './router.ts';
@@ -35,6 +37,10 @@ import { registerSagas } from './init.ts';
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
 
 type ServiceDatabaseClient = Record<string, unknown>;
+type SagaServiceContextSettings = Readonly<{
+  sagas?: { store?: { backend?: string } };
+  Sagas?: { Store?: { Backend?: string } };
+}>;
 type PluginServiceBootstrap = {
   createPluginServiceContext(pluginName: string): Promise<PluginServiceContext>;
 };
@@ -49,6 +55,10 @@ export default async function createSagasService(
 ): Promise<RunningService> {
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8092');
   const dbClient = await ctx.db.getClient() as ServiceDatabaseClient;
+  const sagaStoreBackend = resolveSagaStoreBackend({
+    env: { ...Deno.env.toObject(), ...ctx.env },
+    appsettings: serviceAppsettings(ctx),
+  });
   let sagaRuntime: SagaRuntime | undefined;
   let durableRuntime: DurableSagaRuntime | undefined;
 
@@ -73,8 +83,11 @@ export default async function createSagasService(
       const definitions = await registerSagas();
       const kv = await openSagaRuntimeKv();
       durableRuntime = await createDurableSagaRuntime({
-        backend: 'kv',
+        backend: sagaStoreBackend,
         kv,
+        prisma: sagaStoreBackend === 'prisma'
+          ? dbClient as unknown as PrismaSagaStoreClient
+          : undefined,
         native: {
           idempotency: new KvSagaIdempotencyStore({ kv }),
           instrumentation: createSagaTelemetry(),
@@ -106,6 +119,15 @@ export default async function createSagasService(
       }
     },
   });
+}
+
+function serviceAppsettings(ctx: PluginServiceContext): SagaServiceContextSettings | undefined {
+  const candidate = ctx as PluginServiceContext & {
+    readonly appsettings?: SagaServiceContextSettings;
+    readonly settings?: SagaServiceContextSettings;
+    readonly config?: SagaServiceContextSettings;
+  };
+  return candidate.appsettings ?? candidate.settings ?? candidate.config;
 }
 
 async function loadSagasServiceContext(): Promise<PluginServiceContext> {

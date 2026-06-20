@@ -58,6 +58,7 @@
 | 2026-06-20 | Slice 1 added dedicated `SagaRuntimeState`, `SagaRuntimeTransition`, and `SagaRuntimeCorrelation` Prisma models in `plugins/sagas/database/sagas.prisma`. |
 | 2026-06-20 | Slice 2 added `PrismaSagaStore` plus parity tests for state round-trip, correlation lookup, transition ordering, stale-version error parity, and delete cascade. |
 | 2026-06-20 | Slice 3 refactored `createDurableSagaRuntime` to support KV/Prisma backend selection, optional `kv`, and `dispose()`; service and supervisor teardown now use `dispose()`. |
+| 2026-06-20 | Slice 4 added explicit saga-store backend resolution from `NETSCRIPT_SAGA_STORE` or appsettings `sagas.store.backend`, and wired service startup to choose KV or Prisma state storage. |
 
 ## Gate Evidence
 
@@ -70,3 +71,5 @@
 | 3 | Durable runtime tests | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts plugins/sagas/src/runtime/durable-saga-restart_test.ts` — 6 passed, 0 failed. |
 | 3 | Supervisor teardown test | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-supervisor_test.ts` — 1 passed, 0 failed. |
 | 3 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/create-durable-saga-runtime.ts plugins/sagas/src/runtime/mod.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/saga-supervisor.ts plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts` — passed. |
+| 4 | Backend resolver tests | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-store-backend_test.ts` — 5 passed, 0 failed. |
+| 4 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/saga-store-backend.ts plugins/sagas/src/runtime/saga-store-backend_test.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/mod.ts` — passed. |

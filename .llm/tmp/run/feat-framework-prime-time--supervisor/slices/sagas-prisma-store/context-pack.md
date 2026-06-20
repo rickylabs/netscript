@@ -7,7 +7,8 @@
 - Completed slice 1: dedicated durable Prisma models added to `plugins/sagas/database/sagas.prisma`.
 - Completed slice 2: `PrismaSagaStore` added with structural Prisma delegates and parity tests.
 - Completed slice 3: durable runtime factory supports `backend?: 'kv' | 'prisma'`, optional `kv`, and `dispose()`; service/supervisor teardown use `dispose()`.
-- Pushed slices 1-2 with explicit refspec to `origin/feat/prime-time/sagas-prisma-store`.
+- Completed slice 4: service startup resolves `NETSCRIPT_SAGA_STORE` / appsettings `sagas.store.backend` and selects KV or Prisma state storage explicitly.
+- Pushed slices 1-3 with explicit refspec to `origin/feat/prime-time/sagas-prisma-store`.
 
 ## Important Constraints
 
@@ -26,3 +27,5 @@
 - Slice 2: `deno check --unstable-kv plugins/sagas/src/runtime/prisma-saga-store.ts plugins/sagas/src/runtime/prisma-saga-store_test.ts` — PASS.
 - Slice 3: `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts plugins/sagas/src/runtime/durable-saga-restart_test.ts` — PASS, 6 tests.
 - Slice 3: `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-supervisor_test.ts` — PASS, 1 test.
+- Slice 4: `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-store-backend_test.ts` — PASS, 5 tests.
+- Slice 4: `deno check --unstable-kv plugins/sagas/src/runtime/saga-store-backend.ts plugins/sagas/src/runtime/saga-store-backend_test.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/mod.ts` — PASS.
