@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slice 4 implementation is complete: auth contracts, default authenticators, scope authorizer, and Hono auth middleware are implemented with targeted unit tests.
+Slice 5 implementation is complete: auth contracts/adapters/middleware exist, builder methods wire auth deterministically during `build()`, protected route/RPC/doc registration is deferred after auth, and oRPC context receives `principal`.
 
 ## Completed
 
@@ -23,16 +23,17 @@ Slice 4 implementation is complete: auth contracts, default authenticators, scop
 - Slice 2 authenticators added and targeted tests/static gates passed.
 - Slice 3 scope authorizer added and targeted tests/static gates passed.
 - Slice 4 authn/authz middleware added and targeted tests/static gates passed.
+- Slice 5 builder integration added and targeted integration/static gates passed.
 
 ## In Progress
 
-- Slice 4 commit/push/PR comment.
+- Slice 5 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit slice 4.
+1. Commit slice 5.
 2. Push with explicit refspec and comment on PR #77.
-3. Start slice 5 builder methods and principal context.
+3. Start slice 6 auth exports and package subpath.
 
 ## Key Decisions
 
@@ -56,14 +57,18 @@ Slice 4 implementation is complete: auth contracts, default authenticators, scop
 | `packages/service/tests/auth/authorizer_test.ts` | new | Unit tests for allow, missing scope/role, deny-by-default, and explicit allow-by-default. |
 | `packages/service/src/auth/auth-middleware.ts` | new | Hono authn/authz middleware with structured decisions and safe envelopes. |
 | `packages/service/tests/auth/middleware_test.ts` | new | Unit tests for middleware success and failure paths. |
+| `packages/service/src/builder/service-builder.ts` | changed | Added `withAuthn` and `withAuthz` builder methods. |
+| `packages/service/src/builder/service-builder-impl.ts` | changed | Deferred auth/RPC/route registration and principal context injection. |
+| `packages/service/src/types.ts` | changed | Added optional `ServiceContext.principal`. |
+| `packages/service/tests/auth/builder-auth_test.ts` | new | Builder integration tests for 401/403/200, health bypass, and oRPC principal context. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Slice 1-4 check/lint/fmt wrappers passed. |
+| Static | PASS | Slice 1-5 check/lint/fmt wrappers passed. |
 | Fitness | NOT_RUN | Pending export slices. |
-| Runtime | PASS | Slice 2-4 targeted auth tests passed. |
+| Runtime | PASS | Slice 2-5 targeted auth tests passed. |
 | Consumer | NOT_RUN | Pending final gate. |
 
 ## Open Questions
@@ -80,3 +85,4 @@ Slice 4 implementation is complete: auth contracts, default authenticators, scop
 - 6699099: feat(service): auth port and principal types
 - 6f81290: feat(service): add default authenticators
 - dda6fb6: feat(service): add scope authorizer
+- cbfc40f: feat(service): add auth middleware

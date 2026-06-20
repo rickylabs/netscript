@@ -4,6 +4,8 @@
  * @module
  */
 
+import type { Principal } from './auth/types.ts';
+
 /** Router definition accepted by the service builder and handler factories. */
 export type ServiceRouter = Record<string, unknown>;
 
@@ -204,6 +206,9 @@ export interface ServiceContext {
 
   /** Creates a response from an existing response or init object. */
   newResponse(data?: BodyInit | null, init?: Response | ResponseInit): Response;
+
+  /** Authenticated principal established by service auth middleware, when present. */
+  readonly principal?: Principal;
 
   /** Reads request-scoped middleware state. */
   get(key: string): unknown;

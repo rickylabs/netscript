@@ -73,6 +73,8 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | 2026-06-20 | 3 | gates | Targeted authorizer tests and check/lint/fmt wrappers passed. |
 | 2026-06-20 | 4 | implementation | Added authn/authz Hono middleware with guarded-prefix handling, 401/403 envelopes, principal injection, fail-closed authz errors, and structured auth decision logging. |
 | 2026-06-20 | 4 | gates | Middleware tests and check/lint/fmt wrappers passed after typing the bare-Hono test apps with the `principal` variable. |
+| 2026-06-20 | 5 | implementation | Added `withAuthn`/`withAuthz`, deferred protected route/RPC/doc registration until `build()`, and injected Hono principal into oRPC context. |
+| 2026-06-20 | 5 | gates | Builder integration tests and check/lint/fmt wrappers passed. |
 
 ## Decisions
 
@@ -111,6 +113,10 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | slice 4 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 diagnostics. |
 | slice 4 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 findings. |
 | slice 4 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 findings. |
+| slice 5 test | `rtk proxy deno test --allow-all packages/service/tests/auth/builder-auth_test.ts` | PASS | Exit 0; 3 passed, 0 failed. |
+| slice 5 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 diagnostics. |
+| slice 5 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 findings. |
+| slice 5 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 findings. |
 
 ### Fitness Gates
 

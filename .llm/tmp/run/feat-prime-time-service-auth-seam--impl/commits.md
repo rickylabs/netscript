@@ -13,3 +13,4 @@ Format:
 - 6699099: feat(service): auth port and principal types
 - 6f81290: feat(service): add default authenticators
 - dda6fb6: feat(service): add scope authorizer
+- cbfc40f: feat(service): add auth middleware
