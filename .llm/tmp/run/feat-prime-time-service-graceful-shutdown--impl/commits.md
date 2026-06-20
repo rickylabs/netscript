@@ -11,3 +11,4 @@ Format:
 ## Log
 
 - ce1e901: feat(service): add shutdown contracts
+- cb8936f: feat(service): add shutdown coordinator

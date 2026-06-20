@@ -65,6 +65,7 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | 2026-06-20 | bootstrap | pre-flight | Read brief, approved plan, plan-meta, harness/doctrine/profile/gate docs. Correct branch/tracking confirmed; unrelated OpenHands request files are dirty and left untouched. |
 | 2026-06-20 | 1 | contracts | Added shutdown contracts and extended `ServeOptions`; scoped check/lint/fmt passed. |
 | 2026-06-20 | 2 | coordinator | Added private shutdown coordinator and unit tests for LIFO order, failure collection, idempotency, and timeout handling. |
+| 2026-06-20 | 3 | listener | Wired listener stop/external abort/OS signals through the coordinator; added runtime tests for in-flight drain and signal listener hygiene. |
 
 ## Decisions
 
@@ -93,6 +94,9 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | slice 2 rerun exit 0; 19 files selected, 0 findings. |
 | lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | slice 2 rerun exit 0; 19 files selected, 0 findings. |
 | fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | slice 2 rerun exit 0; 19 files selected, 0 findings. |
+| check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | slice 3 rerun exit 0; 19 files selected, 0 findings. |
+| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | slice 3 rerun exit 0; 19 files selected, 0 findings. |
+| fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | slice 3 rerun exit 0; 19 files selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -106,6 +110,7 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | ---- | ------ | -------- | ----- |
 | listener lifecycle | NOT_RUN | Pending runtime tests. | No Aspire/scaffold gate per approved plan. |
 | coordinator unit | PASS | `rtk proxy deno test --allow-all packages/service/tests/shutdown-coordinator_test.ts` exit 0; 4 passed, 0 failed. | Covers LIFO, failure collection, idempotency, timeout. |
+| listener lifecycle | PASS | `rtk proxy deno test --allow-all packages/service/tests/runtime_test.ts` exit 0; 10 passed, 0 failed. | Covers in-flight drain, listener closure, external abort, signal install/remove, repeated serve/stop. |
 
 ### Consumer Gates
 

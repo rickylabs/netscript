@@ -12,7 +12,7 @@
 
 ## Current State
 
-Contract and coordinator slices are implemented: `ServeOptions` now carries `drainTimeoutMs`/`handleSignals`, shutdown contracts are exported from the root service surface, and the private coordinator handles LIFO hooks, failure collection, idempotency, and timeout reporting.
+Contract, coordinator, and listener slices are implemented: `ServeOptions` now carries `drainTimeoutMs`/`handleSignals`, shutdown contracts are exported from the root service surface, the private coordinator handles LIFO hooks/failure collection/idempotency/timeout reporting, and the listener routes manual stop, external abort, and OS signals through graceful `server.shutdown()`.
 
 ## Completed
 
@@ -20,15 +20,16 @@ Contract and coordinator slices are implemented: `ServeOptions` now carries `dra
 - Confirmed branch `feat/prime-time/service-graceful-shutdown` tracks `origin/feat/prime-time/service-graceful-shutdown`.
 - Added public shutdown contracts and serve option fields; scoped check/lint/fmt passed.
 - Added `ServiceShutdownCoordinator` and focused unit tests; scoped check/lint/fmt plus coordinator tests passed.
+- Wired `service-listener.ts` to the coordinator and added runtime tests; scoped check/lint/fmt plus runtime tests passed.
 
 ## In Progress
 
-- Listener graceful stop and signal wiring slice.
+- Builder `onShutdown` wiring slice.
 
 ## Next Steps
 
-1. Wire `ServiceShutdownCoordinator` into `service-listener.ts`.
-2. Add runtime tests for graceful in-flight drain, listener closure, signal-listener install/remove behavior, hook failure collection, and drain timeout.
+1. Add `ServiceBuilder.onShutdown()` to the public builder interface and implementation.
+2. Thread registered hooks into `startServiceListener()` and extend service builder tests.
 
 ## Key Decisions
 
@@ -50,6 +51,8 @@ Contract and coordinator slices are implemented: `ServeOptions` now carries `dra
 | `packages/service/mod.ts` | changed | Re-exported shutdown contracts. |
 | `packages/service/src/builder/service-shutdown.ts` | new | Private shutdown coordinator. |
 | `packages/service/tests/shutdown-coordinator_test.ts` | new | Unit and failure-path tests. |
+| `packages/service/src/builder/service-listener.ts` | changed | Coordinator-backed graceful stop and signal handling. |
+| `packages/service/tests/runtime_test.ts` | changed | Runtime lifecycle tests. |
 
 ## Gates
 
@@ -57,7 +60,7 @@ Contract and coordinator slices are implemented: `ServeOptions` now carries `dra
 | ----------- | -------------- | -------- |
 | Static | PASS | Coordinator slice check/lint/fmt exit 0. |
 | Fitness | IN_PROGRESS | Coordinator test-shape and failure-path coverage added. |
-| Runtime | IN_PROGRESS | Coordinator unit tests pass; listener integration pending. |
+| Runtime | PASS | Runtime listener tests pass for step 3; builder hook integration pending. |
 | Consumer | NOT_RUN | Pending implementation. |
 
 ## Open Questions
@@ -72,3 +75,4 @@ Contract and coordinator slices are implemented: `ServeOptions` now carries `dra
 ## Commits
 
 - ce1e901: feat(service): add shutdown contracts
+- cb8936f: feat(service): add shutdown coordinator
