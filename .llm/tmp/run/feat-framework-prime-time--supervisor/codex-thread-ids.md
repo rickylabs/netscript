@@ -67,8 +67,11 @@ files correctly left uncommitted). Pushed to `refs/heads/feat/prime-time/auth-pl
 Supervisor-verified gates in the worktree: `deno check --unstable-kv` exit 0; `deno test` 18/0;
 `deno publish --dry-run` Success (`@netscript/plugin-auth-core@0.0.1-alpha.0`, 13 files).
 **Leaf PR #85** (base `feat/prime-time/auth`, labels `type:sub-pr`/`area:plugins`/`status:impl-eval`).
-**IMPL-EVAL dispatched** (OpenHands qwen3.7-max, pr-comment) at #85 comment 4758395973. On PASS →
-merge AS1 into `feat/prime-time/auth`, then open the auth umbrella PR (#73 sub) and launch AS2a∥AS2b.
+**IMPL-EVAL:** run 1 (27873516222) incomplete read-through (no gates, no verdict — not a FAIL cycle);
+run 2 re-dispatched execution-first → **PASS** (27873830169, comment 4758451686): all gates green +
+consumer-import exit 0. **AS1 MERGED** into `feat/prime-time/auth` at `7c063240` (#85 closed).
+**Auth umbrella PR #86** opened draft (base #73, labels `type:umbrella`/`area:plugins`/`area:auth`)
+with AS1✅/AS2a/AS2b/AS3/AS4/AS5/AS6 checklist. Next: launch AS2a ∥ AS2b off `feat/prime-time/auth`.
 
 **Launch mechanics that actually worked (verified 2026-06-20):**
 
