@@ -12,8 +12,10 @@
 
 ## Current State
 
-Implementation is complete for the PLAN-EVAL-passed `sagas-idempotency-e2e` plan. Slice-owned gates
-are green; root-wide doctrine/fmt caveats are recorded as unrelated baseline debt.
+Implementation is complete for the PLAN-EVAL-passed `sagas-idempotency-e2e` plan. The branch has
+been rebased onto umbrella `origin/feat/framework-prime-time` at `5c4a45874a44` and consumes the
+merged durable-store contract (`KvSagaStore`, `createDurableSagaRuntime`, `SagaStorePort`).
+Slice-owned gates are green; root-wide doctrine caveats are recorded as unrelated baseline debt.
 
 ## Completed
 
@@ -30,15 +32,19 @@ are green; root-wide doctrine/fmt caveats are recorded as unrelated baseline deb
 - Added and passed package-level unit/integration/failure-path tests.
 - Added missing `@module` tags to existing `plugin-sagas-core` subpath barrels so JSR audit has no failures.
 - Ran final gates and recorded root-wide baseline caveats.
+- Rebased onto umbrella commit `5c4a45874a44` after #74/#78/#79/#80 landed.
+- Resolved conflicts by keeping the durable-store runtime contract and layering this slice's KV
+  idempotency/applied-key stores into `createDurableSagaRuntime`.
+- Re-ran the slice gate set after rebase and recorded results in `worklog.md`.
 
 ## In Progress
 
-- Final artifact/doc commit, push, and completion PR comment.
+- Final artifact commit and force-with-lease push.
 
 ## Next Steps
 
-1. Commit and push final artifacts/docs.
-2. Comment PR #75 with final gate table and IMPL-EVAL readiness.
+1. Commit and push final artifacts/docs with the required force-with-lease refspec.
+2. Stop for external IMPL-EVAL; do not comment PR #75 from this resume.
 
 ## Key Decisions
 
@@ -78,9 +84,9 @@ are green; root-wide doctrine/fmt caveats are recorded as unrelated baseline deb
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS with baseline caveat | Scoped check/lint/fmt, root check, and root lint passed. Root fmt has unrelated triggers finding. |
+| Static | PASS | Post-rebase scoped check/lint/fmt, root check, and root lint passed. |
 | Runtime | PASS through slice 2 | `deno test --unstable-kv packages/plugin-sagas-core/tests/runtime/saga-engine*` passed. |
-| Runtime | PASS through slice 8 | Package-level core and plugin tests passed. |
+| Runtime | PASS after rebase | `deno test --unstable-kv --allow-all packages/plugin-sagas-core plugins/sagas` passed 46 tests. |
 | Fitness | PASS with baseline caveat | JSR dry-run/audit and core scoped doctrine pass/no-fail; root/plugin doctrine has unrelated existing findings. |
 | Consumer | PASS | Consumer import probe passed. |
 
@@ -90,17 +96,18 @@ are green; root-wide doctrine/fmt caveats are recorded as unrelated baseline deb
 
 ## Drift and Debt
 
-- Drift: root `arch:check` and root `fmt:check` have unrelated baseline failures; scoped slice gates passed.
+- Drift: root `arch:check` has unrelated baseline failures; scoped slice gates passed.
 - Debt: none added.
 
 ## Commits
 
-- dc3d569: feat(sagas): add applied-key store contract
-- d6c1379: feat(sagas): guard engine applied keys
-- 9ad4ef5: docs(sagas): document idempotent delivery
-- dcfb49d: feat(sagas): accept publish idempotency keys
-- b8570e8: feat(sagas): thread service idempotency keys
-- 9f53a85: feat(sagas): add kv idempotency stores
-- 8290297: feat(sagas): wire durable idempotency roots
-- 2cb7908: test(sagas): cover durable idempotency flow
-- 8fdb186a: chore(sagas): record idempotency gate evidence
+- 48493f53: feat(sagas): add applied-key store contract
+- 0fac807f: feat(sagas): guard engine applied keys
+- a4394716: docs(sagas): document idempotent delivery
+- a5c459fc: feat(sagas): accept publish idempotency keys
+- 70cfa0cf: feat(sagas): thread service idempotency keys
+- a4f393c6: feat(sagas): add kv idempotency stores
+- 7d0bfded: feat(sagas): wire durable idempotency roots
+- b542f079: test(sagas): cover durable idempotency flow
+- 2ceb8423: chore(sagas): record idempotency gate evidence
+- 65aec0b7: chore(harness): record sagas idempotency final commit

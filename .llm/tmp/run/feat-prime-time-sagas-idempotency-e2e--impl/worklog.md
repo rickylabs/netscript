@@ -82,6 +82,10 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | 2026-06-20 | 8 | tests | Added KV store integration tests, service publish threading tests, and runtime applied-key wiring test. |
 | 2026-06-20 | 9 | final gates | Ran final scoped gates, root check/lint, publish dry-run, JSR audit, consumer import validation, and doctrine checks. |
 | 2026-06-20 | 9 | JSR docs | Added missing `@module` tags to existing `plugin-sagas-core` exported subpath barrels so JSR audit has no failures. |
+| 2026-06-20 | rebase | preflight | Committed owned harness artifact changes, restored/ignored unrelated OpenHands trace line-ending noise, and confirmed a clean tree before rebase. |
+| 2026-06-20 | rebase | umbrella sync | Rebased onto `origin/feat/framework-prime-time` at `5c4a45874a44` after #74/#78/#79/#80 landed. |
+| 2026-06-20 | rebase | durable-store conflicts | Resolved conflicts against the merged durable-store contract: consumed `KvSagaStore`, `createDurableSagaRuntime`, and `SagaStorePort`; removed the divergent `openSagaRuntimeKv` source from this slice's KV idempotency file. |
+| 2026-06-20 | rebase | post-rebase gates | Re-ran the slice gate set; scoped static gates, tests, JSR dry-run/audit, consumer import, root check, and root lint passed. Root doctrine remains baseline-red outside this slice. |
 
 ## Decisions
 
@@ -153,6 +157,23 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | F-18 | PASS | Only package root/subpath barrels updated with explicit exports and `@module` docs. | No sub-barrel-only indirection added. |
 | root doctrine | FAIL_BASELINE | `deno task arch:check` reports pre-existing repo failures; scoped `packages/plugin-sagas-core` doctrine has 0 FAIL, scoped `plugins/sagas` has existing `SagasCliCommand`/size/default-export findings. | Recorded in drift; not introduced by this slice. |
 
+### Post-Rebase Gate Results
+
+| Gate | Command | Exit | Result | Notes |
+| --- | --- | --- | --- | --- |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | 0 | PASS | 157 files selected in 2 batches; 0 diagnostics. |
+| scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | 0 | PASS | 157 files selected; 0 findings. |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | 0 | PASS | 157 files selected; 0 findings. |
+| package/plugin tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core plugins/sagas` | 0 | PASS | 46 passed, 0 failed. |
+| publish dry-run | `deno publish --dry-run --allow-dirty` from `packages/plugin-sagas-core` | 0 | PASS | Dry run complete. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env ../../.llm/tools/fitness/audit-jsr-package.ts --root . --text` from `packages/plugin-sagas-core` | 0 | PASS_WITH_WARNINGS | Dry-run OK; only `F-JSR-7 slow-types` warning banner reported. |
+| consumer import | `deno eval --unstable-kv "... import core/plugin runtime idempotency exports ..."` | 0 | PASS | Runtime/core idempotency exports resolved and had expected function/class shapes. |
+| root check | `deno task check` | 0 | PASS | 1,634 files selected in 14 batches; 0 diagnostics. |
+| root lint | `deno task lint` | 0 | PASS | 1,119 files selected in 6 batches; 0 findings. |
+| root doctrine | `deno task arch:check` | 1 | FAIL_BASELINE | 58 FAIL / 144 WARN / 1 INFO from known repo-wide baseline debt; not introduced by this slice. |
+| scoped core doctrine | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-sagas-core` | 0 | PASS_WITH_WARNINGS | 0 FAIL, 2 WARN, 1 INFO. |
+| scoped plugin doctrine | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/sagas` | 1 | FAIL_BASELINE | Existing `SagasCliCommand` A4 failure plus size/default-export warnings; not introduced by idempotency rebase. |
+
 ### Runtime Gates
 
 | Gate | Result | Evidence | Notes |
@@ -170,3 +191,5 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 - Evaluator should inspect `SagaEngine.#handleEntry`, KV store atomic checks, and service publish threading first.
 - Do not treat root `fmt:check` or root `arch:check` as slice regressions without comparing baseline:
   their current failures point to untouched triggers/CLI/plugin debt outside this slice.
+
+READY FOR IMPL-EVAL (rebased onto umbrella)
