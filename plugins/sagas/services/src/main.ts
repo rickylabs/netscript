@@ -9,7 +9,7 @@
  * - OpenAPI documentation
  * - SSE streaming for real-time saga updates
  * - OpenTelemetry tracing
- * - Durable KV-backed saga state store
+ * - Durable KV-backed saga state, idempotency, and applied-key stores
  *
  * @module
  */
@@ -21,7 +21,13 @@ import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createService, type RunningService } from '@netscript/service';
 import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
 import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
-import { createDurableSagaRuntime, type DurableSagaRuntime } from '../../src/runtime/mod.ts';
+import {
+  createDurableSagaRuntime,
+  type DurableSagaRuntime,
+  KvSagaAppliedKeyStore,
+  KvSagaIdempotencyStore,
+  openSagaRuntimeKv,
+} from '../../src/runtime/mod.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
 
@@ -64,7 +70,16 @@ export default async function createSagasService(
     .withServiceInfo()
     .onStartup(async () => {
       const definitions = await registerSagas();
-      durableRuntime = await createDurableSagaRuntime();
+      const kv = await openSagaRuntimeKv();
+      durableRuntime = await createDurableSagaRuntime({
+        kv,
+        native: {
+          idempotency: new KvSagaIdempotencyStore({ kv }),
+          engineOptions: {
+            appliedKeys: new KvSagaAppliedKeyStore({ kv }),
+          },
+        },
+      });
       sagaRuntime = durableRuntime.runtime;
       await sagaRuntime.register(definitions);
       await sagaRuntime.start();

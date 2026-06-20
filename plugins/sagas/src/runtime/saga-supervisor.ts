@@ -7,6 +7,8 @@ import {
 } from '@netscript/plugin-sagas-core/runtime';
 
 import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
+import { openSagaRuntimeKv } from './kv-saga-store.ts';
+import { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 
 /** Lifecycle status exposed by the saga runtime supervisor. */
 export type SagaRuntimeSupervisorStatus =
@@ -123,31 +125,46 @@ function formatFailure(cause: unknown): string {
 }
 
 async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<SagaRuntime> {
-  if (options.adapter === 'legacy' || hasInjectedNativeRuntime(options)) {
+  if (options.adapter === 'legacy' || hasInjectedNativeEngine(options)) {
     return options.adapter === 'legacy'
       ? createSagaRuntime({ ...options, adapter: 'legacy' })
       : createSagaRuntime({ ...options, adapter: 'native' });
   }
 
-  const durable = await createDurableSagaRuntime({ native: options.native });
+  const native = options.native ?? {};
+  const kv = await openSagaRuntimeKv();
+  const durable = await createDurableSagaRuntime({
+    kv,
+    native: {
+      ...native,
+      idempotency: native.idempotency ?? new KvSagaIdempotencyStore({ kv }),
+      engineOptions: {
+        ...native.engineOptions,
+        appliedKeys: native.engineOptions?.appliedKeys ?? new KvSagaAppliedKeyStore({ kv }),
+      },
+    },
+  });
+
+  return withKvClose(durable.runtime, durable.kv);
+}
+
+function hasInjectedNativeEngine(options: CreateSagaRuntimeOptions): boolean {
+  return options.native?.engine !== undefined;
+}
+
+function withKvClose(runtime: SagaRuntime, kv: Deno.Kv): SagaRuntime {
   let closed = false;
   return Object.freeze({
-    ...durable.runtime,
+    ...runtime,
     stop: async (reason?: string): Promise<void> => {
       try {
-        await durable.runtime.stop(reason);
+        await runtime.stop(reason);
       } finally {
         if (!closed) {
           closed = true;
-          durable.kv.close();
+          kv.close();
         }
       }
     },
   });
-}
-
-function hasInjectedNativeRuntime(options: CreateSagaRuntimeOptions): boolean {
-  return options.native?.engine !== undefined ||
-    options.native?.store !== undefined ||
-    options.native?.engineOptions?.store !== undefined;
 }

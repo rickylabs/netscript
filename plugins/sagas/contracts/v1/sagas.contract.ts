@@ -144,6 +144,7 @@ export type PublishMessageInput = Readonly<{
   type: string;
   payload?: Readonly<Record<string, unknown>>;
   correlationId?: string;
+  idempotencyKey?: string;
   topic?: string;
 }>;
 
@@ -315,6 +316,7 @@ const PublishMessageInputZodSchema: z.ZodType<PublishMessageInput> = z.object({
   type: z.string().describe('Message type identifier'),
   payload: z.record(z.string(), z.unknown()).optional().describe('Message payload JSON object'),
   correlationId: z.string().optional().describe('Optional correlation ID for routing'),
+  idempotencyKey: z.string().optional().describe('Client idempotency key for dedup on retry'),
   topic: z.string().optional().describe('Optional topic override'),
 });
 

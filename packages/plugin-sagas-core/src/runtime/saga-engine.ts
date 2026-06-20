@@ -14,12 +14,14 @@ import {
   type SagaStateEnvelope,
 } from '../domain/mod.ts';
 import type {
+  SagaAppliedKeyStore,
   SagaBusPort,
   SagaPublishOptions,
   SagaQueryDispatch,
   SagaSignalDispatch,
   SagaStorePort,
 } from '../ports/mod.ts';
+import { MemorySagaAppliedKeyStore } from './saga-applied-keys.ts';
 
 /** Registered handler target stored in the O(1) message dispatch index. */
 export type SagaEngineDispatchEntry = Readonly<{
@@ -36,6 +38,7 @@ export type SagaEngineHandleResult<TState extends SagaState = SagaState> = Reado
   state: TState;
   cascaded: readonly CascadedMessage[];
   completed: boolean;
+  alreadyApplied: boolean;
 }>;
 
 /** Retry classification used by the native engine before DLQ handoff. */
@@ -52,6 +55,7 @@ export type SagaEngineOptions = Readonly<{
   id?: string;
   defaultRetryPolicy?: RetryPolicy;
   store?: SagaStorePort;
+  appliedKeys?: SagaAppliedKeyStore;
 }>;
 
 type ConcurrencySlot = Readonly<{
@@ -65,6 +69,7 @@ export class SagaEngine implements SagaBusPort {
   readonly id: string;
   readonly #retryPolicy: RetryPolicy;
   readonly #store?: SagaStorePort;
+  readonly #appliedKeys: SagaAppliedKeyStore;
   readonly #definitions = new Map<SagaId, SagaDefinition<string, SagaState, SagaMessage>>();
   readonly #dispatchIndex = new Map<string, readonly SagaEngineDispatchEntry[]>();
   readonly #concurrency = new Map<string, ConcurrencySlot>();
@@ -75,6 +80,7 @@ export class SagaEngine implements SagaBusPort {
     this.id = options.id ?? 'saga-engine';
     this.#retryPolicy = options.defaultRetryPolicy ?? DEFAULT_RETRY_POLICY;
     this.#store = options.store;
+    this.#appliedKeys = options.appliedKeys ?? new MemorySagaAppliedKeyStore();
   }
 
   /** Start accepting saga messages. */
@@ -100,8 +106,8 @@ export class SagaEngine implements SagaBusPort {
   }
 
   /** Publish a message directly into the native handler pipeline. */
-  async publish(message: SagaMessage, _options: SagaPublishOptions = {}): Promise<void> {
-    await this.handle(message);
+  async publish(message: SagaMessage, options: SagaPublishOptions = {}): Promise<void> {
+    await this.handle(withPublishOptions(message, options));
   }
 
   /** Dispatch cascaded send messages through the native engine. */
@@ -209,6 +215,20 @@ export class SagaEngine implements SagaBusPort {
       const instanceId = await this.#resolveInstanceId(entry.sagaId, message, correlationKey);
       const loaded = await this.#store?.load(instanceId);
       const baseState = loaded?.state ?? entry.definition.initialState;
+      if (message.idempotencyKey) {
+        const outcome = await this.#appliedKeys.recordApplied(instanceId, message.idempotencyKey);
+        if (!outcome.applied) {
+          return Object.freeze({
+            sagaId: entry.sagaId,
+            instanceId,
+            message,
+            state: cloneState(baseState),
+            cascaded: Object.freeze([]),
+            completed: false,
+            alreadyApplied: true,
+          });
+        }
+      }
       const previousState = cloneState(baseState);
       const saga = { state: cloneState(baseState) };
       const context: SagaContext<SagaState, SagaMessage> = {
@@ -247,6 +267,7 @@ export class SagaEngine implements SagaBusPort {
         state,
         cascaded,
         completed,
+        alreadyApplied: false,
       });
     });
   }
@@ -364,6 +385,16 @@ function getErrorType(error: unknown): string {
 function resolveInstanceId(sagaId: SagaId, message: SagaMessage): SagaInstanceId {
   const key = message.correlationKey ?? message.id ?? `${sagaId}:${message.type}`;
   return `${sagaId}:${key}` as SagaInstanceId;
+}
+
+function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): SagaMessage {
+  return Object.freeze({
+    ...message,
+    idempotencyKey: options.idempotencyKey ?? message.idempotencyKey,
+    concurrencyKey: options.concurrencyKey ?? message.concurrencyKey,
+    traceparent: options.traceparent ?? message.traceparent,
+    tracestate: options.tracestate ?? message.tracestate,
+  });
 }
 
 function resolveCorrelationKey(sagaId: SagaId, message: SagaMessage): SagaCorrelationKey {

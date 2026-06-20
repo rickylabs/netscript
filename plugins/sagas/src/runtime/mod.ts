@@ -7,6 +7,7 @@
 export { createSagaPublisher, HttpSagaPublisher } from './saga-publisher.ts';
 export { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
 export { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
+export { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 export { loadSagaRegistryModule, runSagaRunner, startSagaRunner } from './saga-runner.ts';
 export { SagaRuntimeSupervisor } from './saga-supervisor.ts';
 export {
@@ -88,6 +89,11 @@ export type {
   SagaStorePort,
   SagaStoreWriteOptions,
 } from '@netscript/plugin-sagas-core/runtime';
+export type {
+  KvSagaAppliedKeyStoreOptions,
+  KvSagaIdempotencyStoreOptions,
+  SagaRuntimeKvStoreOptions,
+} from './kv-saga-runtime-stores.ts';
 export type {
   HttpSagaPublisherOptions,
   SagaPublisherEnvReader,

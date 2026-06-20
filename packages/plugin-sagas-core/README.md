@@ -157,6 +157,19 @@ Signal/query dispatch is also reserved. `defineSignal()`, `defineQuery()`, `.onS
 `.onQuery()` exist so userland code can stabilize around the public surface, but runtime dispatch
 throws `SagasError.notImplemented()` until Phase 7d.
 
+## Delivery Guarantees
+
+The native saga runtime is at-least-once with idempotency keys. Publishers should supply an
+`idempotencyKey` for retried messages and cascaded sends. The bus bridge reserves the message target
+and key before delivery, and the engine records an applied `(instanceId, idempotencyKey)` before
+handler effects run.
+
+Duplicate messages are not runtime failures. A duplicate applied key returns `alreadyApplied: true`
+from the engine result, skips the handler, and does not persist another transition. The default
+memory stores are real process-local implementations for tests and single-process development;
+production composition roots must inject durable `SagaIdempotencyPort` and `SagaAppliedKeyStore`
+implementations.
+
 ## More Documentation
 
 - [Authoring](./docs/authoring.md)
