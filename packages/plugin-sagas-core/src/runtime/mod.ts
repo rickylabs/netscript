@@ -51,6 +51,7 @@ export type {
   SagaStorePort,
   SagaStoreWriteOptions,
 } from '../ports/mod.ts';
+export type { SagaAppliedKeyOutcome, SagaAppliedKeyStore } from '../ports/mod.ts';
 export type {
   SagaBridgeCompensationResolver,
   SagaBusLegacyBus,
@@ -63,10 +64,12 @@ export type {
 export { createSagaEngine, SagaEngine } from './saga-engine.ts';
 export { createSagaScheduler, SagaScheduler } from './saga-scheduler.ts';
 export { createSagaCompensator, SagaCompensator } from './saga-compensator.ts';
+export { MemorySagaAppliedKeyStore } from './saga-applied-keys.ts';
 export {
   cascadedMessageIdempotencyTarget,
   MemorySagaIdempotencyStore,
   SagaIdempotencyDedupTable,
+  sagaIdempotencyKey,
   sagaMessageIdempotencyTarget,
 } from './saga-idempotency.ts';
 export { createSagaRuntime } from './create-saga-runtime.ts';
@@ -78,6 +81,7 @@ export type {
   SagaRuntimeNativeOptions,
 } from './create-saga-runtime.ts';
 export type { LoggerPort } from './logger.ts';
+export type { MemorySagaAppliedKeyStoreOptions } from './saga-applied-keys.ts';
 export type {
   SagaIdempotencyClock,
   SagaIdempotencyDedupTableOptions,

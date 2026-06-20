@@ -51,6 +51,7 @@ export type {
   SagaSignalDispatch,
 } from './saga-bus-port.ts';
 export type { SagaClockPort, SagaSleepOptions } from './saga-clock-port.ts';
+export type { SagaAppliedKeyOutcome, SagaAppliedKeyStore } from './saga-applied-key-port.ts';
 export type {
   SagaAgentConversationId,
   SagaAgentId,
