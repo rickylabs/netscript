@@ -72,6 +72,8 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | 2026-06-20 | bootstrap | pre-flight | Read implementation brief, approved research/plan/plan-meta, doctrine/archetype/service overlay, and current saga/triggers code paths. |
 | 2026-06-20 | 1 | implementation | Added `KvSagaStore` over raw `Deno.Kv` with optimistic saves, correlation lookup, transition log, delete cleanup, diagnostics/test read helpers, and close lifecycle. |
 | 2026-06-20 | 1 | validation | Targeted unit/failure-path tests, scoped check, and scoped fmt gate passed. |
+| 2026-06-20 | 2 | implementation | Added `createDurableSagaRuntime`, default `KvSagaStore` injection, injected store/KV support, and runtime barrel exports. |
+| 2026-06-20 | 2 | validation | Durable runtime factory tests, scoped check, and scoped fmt gate passed. |
 
 ## Decisions
 
@@ -97,6 +99,9 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | Slice 1 test | `deno test --unstable-kv --allow-all plugins/sagas/src/runtime/kv-saga-store_test.ts` | PASS | Exit 0; 5 passed, 0 failed. |
 | Slice 1 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/src/runtime --ext ts` | PASS | Exit 0; 6 files selected, 0 diagnostics. |
 | Slice 1 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/src/runtime --ext ts --include 'kv-saga-store'` | PASS | Exit 0; 2 files selected, 0 findings. |
+| Slice 2 test | `deno test --unstable-kv --allow-all plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts` | PASS | Exit 0; 2 passed, 0 failed. |
+| Slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/src/runtime --ext ts` | PASS | Exit 0; 8 files selected, 0 diagnostics. |
+| Slice 2 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/src/runtime --ext ts --include 'create-durable-saga-runtime\|mod.ts\|kv-saga-store'` | PASS | Exit 0; 5 files selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -109,6 +114,7 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Durable KV store unit/failure tests | PASS | `kv-saga-store_test.ts`: 5 passed, 0 failed | Covers state round-trip, correlation, transitions, stale expected version rejection, and delete cleanup. |
+| Durable runtime factory tests | PASS | `create-durable-saga-runtime_test.ts`: 2 passed, 0 failed | Covers default `KvSagaStore` injection and injected store/KV preservation. |
 
 ### Consumer Gates
 
