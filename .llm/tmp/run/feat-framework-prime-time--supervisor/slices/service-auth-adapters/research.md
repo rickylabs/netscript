@@ -46,15 +46,21 @@ WorkOS is identity-provider-side, so tier 2 (verify AuthKit session + access-tok
 needs; an optional webhook→DB sync (tier 1) is a value-add, not a prerequisite for the core feature
 set.
 
-## OPEN DESIGN QUESTIONS (resolve in plan → PLAN-EVAL)
+## DESIGN DECISIONS (user, 2026-06-20)
 
-1. **better-auth integration tier.** Ship (a) request-time verification adapter only, or (b) ALSO a
-   NetScript-backed storage adapter (better-auth on `@netscript/database`/Prisma) for the full
-   feature set? Recommendation: **(b)** — it's what "most features" demands; matches Convex.
-   Sub-question: does the storage adapter belong in `@netscript/auth-better-auth`, or does it pull in
-   a dependency on `@netscript/database` (still fine for an Archetype-2 package)?
-2. **WorkOS tier.** Verification-only, or also an optional webhook→DB sync surface? Recommendation:
-   **verification-first**, webhook-sync as a documented optional export or a fast-follow.
+1. **better-auth integration tier — RESOLVED: (b) Verify + Prisma storage adapter.**
+   `@netscript/auth-better-auth` ships BOTH the request-time verification adapter AND a
+   NetScript-backed **storage adapter** (better-auth tables on the consumer's
+   `@netscript/database`/Prisma/Postgres), unlocking the full feature set (orgs, admin, API keys,
+   2FA). The package may depend on `@netscript/database` — acceptable for an Archetype-2 package.
+   Study `@convex-dev/better-auth`'s `createApi` (`create/findOne/findMany/updateOne/updateMany/
+   deleteOne/deleteMany`) for the exact storage-adapter contract better-auth expects.
+2. **WorkOS tier — RESOLVED: verification-first.** `@netscript/auth-workos` ships AuthKit session +
+   access-token/JWKS verification → `Principal` (org+role). Webhook→DB user/org sync (Convex-style)
+   is DEFERRED to a documented optional export or a fast-follow slice — NOT in this slice's bar.
+
+## REMAINING DESIGN QUESTIONS (resolve in plan → PLAN-EVAL)
+
 3. **`Principal` mapping fidelity.** Map better-auth session/user/org/role/permissions and WorkOS
    organization/role → `Principal` (`subject`, `scopes`, `roles`, `claims`). Confirm the widened
    `Principal.claims` carries org/tenant id (it does, per #77 steer).
