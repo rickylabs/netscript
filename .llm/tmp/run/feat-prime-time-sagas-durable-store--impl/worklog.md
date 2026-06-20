@@ -84,6 +84,8 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | 2026-06-20 | 6 | validation | Restart integration test, scoped runtime check, and scoped fmt gate passed. |
 | 2026-06-20 | 7 | implementation | Corrected `sagas.prisma` comments to describe Postgres tables as API read-model/projection storage instead of the engine durable store. |
 | 2026-06-20 | 7 | validation | Plugin TS fmt gate passed; focused stale-promise search returned no matches in changed schema/service surfaces; manual diff reviewed comment-only schema change. |
+| 2026-06-20 | 8 | implementation | Added missing `@module` docs to public subpath entrypoints reported by the JSR audit and cleaned up lint-only test issues. |
+| 2026-06-20 | 8 | validation | Slice-owned checks/tests/lint/fmt/publish dry-runs/JSR audits passed. `deno task arch:check` remains red on pre-existing repo-wide doctrine debt outside this slice; recorded in drift. |
 
 ## Decisions
 
@@ -97,7 +99,7 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| None | N/A | N/A |
+| Repo-wide `arch:check` remains red on pre-existing debt outside this slice | significant | yes |
 
 ## Gate Results
 
@@ -127,12 +129,26 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | Slice 7 plugin fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --ext ts` | PASS | Exit 0; 60 files selected, 0 findings. |
 | Slice 7 stale promise search | `rg "PrismaSagaStore\|store-prisma\|Prisma store for durable saga state\|stored in Postgres for durable saga" plugins/sagas/database/sagas.prisma plugins/sagas/services/src/main.ts` | PASS | Exit 1; no matches. |
 | Slice 7 manual diff | `git diff -- plugins/sagas/database/sagas.prisma plugins/sagas/services/src/main.ts` | PASS | Comment-only `.prisma` change; service docstring already corrected in slice 4. |
+| Final plugin check | `deno task check` from `plugins/sagas` | PASS | Exit 0; all plugin entrypoints checked after module docs. |
+| Final core check | `deno task check` from `packages/plugin-sagas-core` | PASS | Exit 0; all core package entrypoints checked after module docs. |
+| Final plugin tests | `deno task test` from `plugins/sagas` | PASS | Exit 0; 15 passed, 0 failed. |
+| Final scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas/src --root plugins/sagas/services/src --root plugins/sagas/streams --root packages/plugin-sagas-core/src --ext ts` | PASS | Exit 0; 133 files selected, 0 findings. |
+| Final scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/src --root plugins/sagas/services/src --root plugins/sagas/streams --root packages/plugin-sagas-core/src --ext ts` | PASS | Exit 0; 133 files selected, 0 findings. |
+| Plugin publish dry-run | `deno task publish:dry-run` from `plugins/sagas` | PASS | Exit 0; raw dry-run success; existing unanalyzable dynamic import warnings remain. |
+| Core publish dry-run | `deno task publish:dry-run` from `packages/plugin-sagas-core` | PASS | Exit 0; raw dry-run success. |
+| Plugin JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root plugins/sagas --text` | PASS_WITH_WARNINGS | Exit 0; only warnings: directory cardinality 13>12 and slow-type banner parsing while raw dry-run passes. |
+| Core JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/plugin-sagas-core --text` | PASS_WITH_WARNINGS | Exit 0; only warnings: root `src` cardinality 18>12 and slow-type banner parsing while raw dry-run passes. |
+| Repo architecture check | `deno task arch:check` | FAIL_EXISTING | Exit 1; `FAIL=58 WARN=143 INFO=1`, dominated by pre-existing repo-wide doctrine debt outside this slice. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| F-5/F-13/F-15/F-16/F-18 | NOT_RUN | Pending implementation | Will record final manual/script evidence after slices land. |
+| F-5 public surface | PASS | JSR audits exit 0 after module docs were added | New runtime exports are documented and under the runtime subpath. |
+| F-6 JSR publishability | PASS_WITH_WARNINGS | Raw package dry-runs exit 0; audit helpers exit 0 with warnings only | Existing dynamic-import/cardinality warnings remain. |
+| F-13 saga/runtime invariants | PASS | Durable store and restart tests pass | State persists across correlated messages and runtime restart. |
+| F-15 upstream re-export lint | PASS | Manual surface review | No Deno or upstream package values are re-exported; Deno KV appears only as option/return types. |
+| F-16/F-18 folder and sub-barrel checks | PASS_WITH_WARNINGS | JSR audits exit 0; repo `arch:check` has unrelated broad debt | New files are role-scoped under existing runtime folder; no new sub-barrels. |
 
 ### Runtime Gates
 
@@ -153,3 +169,4 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 ## Handoff Notes
 
 - Evaluator should inspect `plugins/sagas/src/runtime/kv-saga-store.ts`, `create-durable-saga-runtime.ts`, the service/runner/supervisor wiring, and the restart/failure-path tests first.
+- Do not treat `deno task arch:check` as a slice regression without comparing to the branch baseline; the final run remains red on broad pre-existing doctrine debt outside this slice and is recorded in `drift.md`.

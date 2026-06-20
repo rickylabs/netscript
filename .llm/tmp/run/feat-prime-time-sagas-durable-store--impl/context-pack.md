@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1-7 are implemented and validated. `KvSagaStore` provides durable Deno KV state; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core warns once per logger when composed store-less; the sagas service starts with the durable runtime and closes KV on stop; the standalone supervisor/runner default native path is durable; cross-restart integration coverage proves a second runtime resumes persisted state/version over the same KV and stale expected-version writes fail; stale Prisma-store promises are corrected to describe Postgres tables as read-model/projection storage. Remaining approved work: final validation sweep.
+Slices 1-8 are implemented. `KvSagaStore` provides durable Deno KV state; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core warns once per logger when composed store-less; the sagas service starts with the durable runtime and closes KV on stop; the standalone supervisor/runner default native path is durable; cross-restart integration coverage proves a second runtime resumes persisted state/version over the same KV and stale expected-version writes fail; stale Prisma-store promises are corrected; JSR module docs were added for owned public subpaths. Slice-owned checks/tests/lint/fmt/publish dry-runs/JSR audits pass. Repo-wide `deno task arch:check` remains red on pre-existing debt outside this slice.
 
 ## Completed
 
@@ -27,17 +27,17 @@ Slices 1-7 are implemented and validated. `KvSagaStore` provides durable Deno KV
 - Implemented and validated slice 5 standalone supervisor/runner durable default.
 - Implemented and validated slice 6 cross-restart durability and stale-version integration tests.
 - Implemented and validated slice 7 Prisma/read-model promise correction.
+- Implemented slice 8 validation/docs cleanup; final sweep complete except repo-wide `arch:check` baseline failure.
 
 ## In Progress
 
-- Slice 7 commit/push/PR comment cadence.
+- Slice 8 commit/push/PR comment cadence.
 
 ## Next Steps
 
-1. Commit slice 7.
+1. Commit slice 8.
 2. Push with explicit refspec.
-3. Append `commits.md` and comment PR #74 with slice 7 evidence.
-4. Start slice 8 full validation sweep.
+3. Append `commits.md` and comment PR #74 with final validation evidence and arch-check caveat.
 
 ## Key Decisions
 
@@ -67,13 +67,14 @@ Slices 1-7 are implemented and validated. `KvSagaStore` provides durable Deno KV
 | `plugins/sagas/src/runtime/saga-supervisor_test.ts` | new | Standalone durable default regression test. |
 | `plugins/sagas/src/runtime/durable-saga-restart_test.ts` | new | Cross-restart durable runtime integration and stale-version failure test. |
 | `plugins/sagas/database/sagas.prisma` | changed | Comment-only read-model/projection correction. |
+| Public subpath `mod.ts` files in `plugins/sagas` and `packages/plugin-sagas-core` | changed | Added missing `@module` docs required by JSR audit. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1-7 PASS | Targeted tests, scoped checks, core package check, service check, plugin fmt, and scoped fmt passed. |
-| Fitness | Pending | Final manual/script sweep pending later slices. |
+| Static | PASS | Package checks, plugin tests, scoped lint/fmt, and publish dry-runs pass. |
+| Fitness | PASS_WITH_ARCH_BASELINE_FAIL | JSR audits pass with warnings; repo-wide `arch:check` fails on pre-existing broad debt. |
 | Runtime | Slices 1-6 PASS | KV store, durable factory, store-less warning, standalone durable default, and cross-restart tests passed. |
 | Consumer | Slice 4 PASS | Sagas service check passed with durable runtime wiring. |
 
@@ -83,9 +84,15 @@ Slices 1-7 are implemented and validated. `KvSagaStore` provides durable Deno KV
 
 ## Drift and Debt
 
-- Drift: none.
+- Drift: repo-wide `arch:check` remains red on pre-existing non-slice debt.
 - Debt: none created.
 
 ## Commits
 
-- None yet.
+- 60ffb74: feat(sagas): add durable kv saga store
+- 39e9bb2: feat(sagas): create durable saga runtime
+- 1edfea8: feat(sagas-core): warn on storeless native runtime
+- 2095f41: feat(sagas): wire durable runtime into service
+- b6e9c9b: feat(sagas): make standalone runner durable by default
+- 3f20f70: test(sagas): cover durable runtime restart
+- 3d8f8d7: docs(sagas): correct saga read model schema notes

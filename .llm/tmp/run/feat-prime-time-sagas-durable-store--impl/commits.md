@@ -16,3 +16,4 @@ Format:
 - 2095f41: feat(sagas): wire durable runtime into service
 - b6e9c9b: feat(sagas): make standalone runner durable by default
 - 3f20f70: test(sagas): cover durable runtime restart
+- 3d8f8d7: docs(sagas): correct saga read model schema notes

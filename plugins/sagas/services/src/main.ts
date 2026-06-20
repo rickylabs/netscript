@@ -10,6 +10,8 @@
  * - SSE streaming for real-time saga updates
  * - OpenTelemetry tracing
  * - Durable KV-backed saga state store
+ *
+ * @module
  */
 
 // Register Redis/Garnet KV adapter - must run before any getKv() call.

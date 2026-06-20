@@ -1,3 +1,9 @@
+/**
+ * Durable stream schemas for projected saga instance records.
+ *
+ * @module
+ */
+
 export { SagaInstanceSchema, sagasStreamSchema } from './schema.ts';
 export type {
   CollectionDefinition,

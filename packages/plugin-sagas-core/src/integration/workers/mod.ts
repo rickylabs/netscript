@@ -1,3 +1,9 @@
+/**
+ * Worker integration helpers that trigger jobs and tasks from saga cascades.
+ *
+ * @module
+ */
+
 export { createWorkerTriggers } from './triggers.ts';
 export { triggerJob } from './trigger-job.ts';
 export { triggerTask } from './trigger-task.ts';

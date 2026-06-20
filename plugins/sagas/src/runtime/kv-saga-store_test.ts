@@ -93,8 +93,9 @@ async function createStoreFixture(): Promise<StoreFixture> {
   const store = new KvSagaStore({ kv, prefix: ['test-sagas', crypto.randomUUID()] });
   return {
     store,
-    async [Symbol.asyncDispose](): Promise<void> {
+    [Symbol.asyncDispose](): Promise<void> {
       store.close();
+      return Promise.resolve();
     },
   };
 }

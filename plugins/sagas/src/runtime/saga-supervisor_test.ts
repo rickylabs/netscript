@@ -12,7 +12,7 @@ import { defineSaga } from '../../../../packages/plugin-sagas-core/mod.ts';
 import { SagaRuntimeSupervisor } from './saga-supervisor.ts';
 
 Deno.test('SagaRuntimeSupervisor default native runtime persists correlated state', async () => {
-  await using env = await withSagaKvPath();
+  await using _env = await withSagaKvPath();
   const observedCounts: number[] = [];
   const supervisor = new SagaRuntimeSupervisor({
     definitions: [createCounterSaga(observedCounts)],
