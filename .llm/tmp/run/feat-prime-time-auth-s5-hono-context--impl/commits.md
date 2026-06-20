@@ -9,3 +9,4 @@ Format:
 ```
 
 ## Log
+- 72e01477: feat(service): type hono context seam
