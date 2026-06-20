@@ -2327,7 +2327,6 @@
       },
       "packages/auth-better-auth": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
           "jsr:@std/assert@1"
         ],
         "packageJson": {

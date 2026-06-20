@@ -1,0 +1,67 @@
+.ns-skeleton {
+  display: block;
+}
+
+.ns-skeleton__block {
+  display: block;
+  width: 100%;
+  border-radius: var(--ns-radius-md);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ns-surface-raised) 92%, transparent) 0%,
+    color-mix(in srgb, var(--ns-card) 86%, var(--ns-surface-raised)) 45%,
+    color-mix(in srgb, var(--ns-surface-raised) 92%, transparent) 100%
+  );
+  background-size: 220% 100%;
+  animation: ns-skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+.ns-skeleton__line--xs {
+  height: 0.55rem;
+}
+
+.ns-skeleton__line--sm {
+  height: 0.7rem;
+}
+
+.ns-skeleton__line--md {
+  height: 0.9rem;
+}
+
+.ns-skeleton__line--lg {
+  height: 1.15rem;
+}
+
+.ns-skeleton__box {
+  min-height: 2.75rem;
+}
+
+.ns-skeleton__box--card {
+  min-height: 8.5rem;
+}
+
+.ns-skeleton__box--input {
+  min-height: 2.5rem;
+}
+
+.ns-skeleton__table-row {
+  display: grid;
+  gap: var(--ns-space-3);
+}
+
+@keyframes ns-skeleton-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* Reduced motion: shimmer becomes a static gradient. */
+@media (prefers-reduced-motion: reduce) {
+  .ns-skeleton__block {
+    animation: none;
+  }
+}

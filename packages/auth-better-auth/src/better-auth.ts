@@ -6,7 +6,6 @@ import type {
 } from '@netscript/service/auth';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import type { Hono } from 'hono';
 
 /** Prisma providers supported by better-auth's first-party Prisma adapter. */
 export type BetterAuthPrismaProvider =
@@ -83,12 +82,6 @@ export interface BetterAuthAuthenticatorOptions {
   readonly auth: BetterAuthInstance;
 }
 
-/** Options for mounting better-auth's own Fetch handler on a Hono app. */
-export interface BetterAuthMountOptions {
-  /** Route prefix for better-auth endpoints. Defaults to `/api/auth`. */
-  readonly basePath?: string;
-}
-
 /** Creates a better-auth server instance backed by better-auth's Prisma adapter.
  *
  * @param options - Consumer Prisma client, provider, and better-auth options.
@@ -162,30 +155,7 @@ export function createBetterAuthAuthenticator(
   };
 }
 
-/** Mounts better-auth's own handler on a Hono application.
- *
- * @param app - Hono application used by the NetScript service host.
- * @param auth - better-auth server instance.
- * @param options - Mount options, including the base path.
- * @returns The same Hono app for composition.
- *
- * @example
- * ```ts
- * mountBetterAuthHandler(app, auth, { basePath: '/api/auth' });
- * ```
- */
-export function mountBetterAuthHandler<T extends Hono>(
-  app: T,
-  auth: BetterAuthInstance,
-  options: BetterAuthMountOptions = {},
-): T {
-  const basePath = normalizeBasePath(options.basePath ?? '/api/auth');
-  app.all(`${basePath}/*`, (context) => auth.handler(context.req.raw));
-  app.all(basePath, (context) => auth.handler(context.req.raw));
-  return app;
-}
-
-function unwrapSessionResponse(
+export function unwrapSessionResponse(
   value: Awaited<ReturnType<BetterAuthInstance['api']['getSession']>>,
 ): { readonly session: BetterAuthSessionPayload | null; readonly headers?: Headers } {
   if (value && 'response' in value) {
@@ -194,14 +164,7 @@ function unwrapSessionResponse(
   return { session: value };
 }
 
-function normalizeBasePath(value: string): string {
-  const withLeadingSlash = value.startsWith('/') ? value : `/${value}`;
-  return withLeadingSlash.length > 1 && withLeadingSlash.endsWith('/')
-    ? withLeadingSlash.slice(0, -1)
-    : withLeadingSlash;
-}
-
-function principalFromBetterAuthSession(payload: BetterAuthSessionPayload): Principal {
+export function principalFromBetterAuthSession(payload: BetterAuthSessionPayload): Principal {
   const organizationId = stringValue(
     payload.session.activeOrganizationId ?? payload.session.organizationId,
   );

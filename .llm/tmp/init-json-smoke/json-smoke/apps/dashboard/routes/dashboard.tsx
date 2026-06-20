@@ -1,0 +1,45 @@
+import DashboardView from './(_components)/dashboard-view.tsx';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+
+export const dashboardPage = definePage()
+  .withRoute(appRoutes.dashboard)
+  .withMeta(() => ({
+    title: 'json-smoke — dashboard',
+    description: 'Operational dashboard scaffolded from app-owned fresh-ui components.',
+  }))
+  .withLayer('dashboard', DashboardView, () => ({
+    projectName: 'json-smoke',
+    appName: 'dashboard',
+    services: [
+      {
+        name: 'api-gateway',
+        owner: 'platform',
+        region: 'eu-west',
+        status: 'Live',
+        latency: '184ms',
+        updated: '2m ago',
+      },
+      {
+        name: 'billing-worker',
+        owner: 'finance',
+        region: 'us-east',
+        status: 'Queued',
+        latency: '321ms',
+        updated: '11m ago',
+      },
+      {
+        name: 'analytics-import',
+        owner: 'data',
+        region: 'ap-south',
+        status: 'Paused',
+        latency: '612ms',
+        updated: '1h ago',
+      },
+    ] as const,
+  }))
+  .withLayout((slots) => slots.dashboard())
+  .build();
+
+export const { default: page } = dashboardPage;
+export { page as default };
