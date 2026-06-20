@@ -19,8 +19,10 @@
 export {
   type BetterAuthAuthenticatorOptions,
   type BetterAuthInstance,
+  type BetterAuthMountOptions,
   type BetterAuthPrismaProvider,
   createBetterAuthAuthenticator,
   createNetscriptBetterAuth,
+  mountBetterAuthHandler,
   type NetscriptBetterAuthOptions,
 } from './src/better-auth.ts';

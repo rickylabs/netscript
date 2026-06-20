@@ -90,3 +90,23 @@
   - `deno test --allow-net --allow-env packages/auth-better-auth/tests/` — PASS, 5 tests.
   - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/auth-better-auth --ext ts,tsx` — PASS.
   - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/auth-better-auth --ext ts,tsx --ignore-line-endings` — PASS.
+
+## Slice 5 — better-auth mount helper + schema generation wrapper
+
+- Added `mountBetterAuthHandler(app, auth, { basePath = "/api/auth" })`.
+- SCOPE-service wiring invariant:
+  - better-auth owns `/api/auth/**` through its Fetch handler.
+  - Services must configure their NetScript auth exemption/`allowAnonymous` policy for that mounted
+    base path so the authenticator does not gate its own login/session endpoints.
+- Added `.llm/tools/auth/gen-better-auth-prisma.ts`.
+- Archetype-5 schema-contribution mechanic:
+  - The tool wraps `@better-auth/cli@1.6.20 generate`.
+  - It writes better-auth Prisma models to a consumer-selected schema contribution path.
+  - `@better-auth/cli` is not a runtime dependency and is not cataloged into either package.
+  - The consumer still owns applying the migration.
+- Validation:
+  - `deno check --unstable-kv packages/auth-better-auth/mod.ts packages/auth-better-auth/tests/ .llm/tools/auth/gen-better-auth-prisma.ts` — PASS.
+  - `deno test --allow-net --allow-env packages/auth-better-auth/tests/` — PASS, 7 tests.
+  - `deno run --allow-read --allow-write --allow-run --allow-env .llm/tools/auth/gen-better-auth-prisma.ts --help` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/auth-better-auth --ext ts,tsx` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/auth-better-auth --root .llm/tools/auth --ext ts,tsx --ignore-line-endings` — PASS.

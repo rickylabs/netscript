@@ -10,6 +10,7 @@ Completed:
 - Slice 2 WorkOS sealed-session authenticator with refresh-cookie emission and node-compat smoke.
 - Slice 3 WorkOS JWKS access-token authenticator with signed-token integration tests.
 - Slice 4 better-auth Prisma adapter wrapper and authenticator with refresh-cookie capture.
+- Slice 5 better-auth Hono mount helper plus `.llm/tools/auth/gen-better-auth-prisma.ts`.
 
 ## Invariants
 
