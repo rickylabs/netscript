@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slice 5 implementation is complete: auth contracts/adapters/middleware exist, builder methods wire auth deterministically during `build()`, protected route/RPC/doc registration is deferred after auth, and oRPC context receives `principal`.
+Slice 6 implementation is complete: auth contracts/adapters/middleware exist, builder methods wire auth deterministically during `build()`, and the new `@netscript/service/auth` subpath exports auth contracts and default factories.
 
 ## Completed
 
@@ -24,16 +24,17 @@ Slice 5 implementation is complete: auth contracts/adapters/middleware exist, bu
 - Slice 3 scope authorizer added and targeted tests/static gates passed.
 - Slice 4 authn/authz middleware added and targeted tests/static gates passed.
 - Slice 5 builder integration added and targeted integration/static gates passed.
+- Slice 6 `./auth` subpath added and static/publish/doc gates passed.
 
 ## In Progress
 
-- Slice 5 commit/push/PR comment.
+- Slice 6 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit slice 5.
+1. Commit slice 6.
 2. Push with explicit refspec and comment on PR #77.
-3. Start slice 6 auth exports and package subpath.
+3. Start slice 7 `defineService` auth opt-in and README examples.
 
 ## Key Decisions
 
@@ -61,13 +62,15 @@ Slice 5 implementation is complete: auth contracts/adapters/middleware exist, bu
 | `packages/service/src/builder/service-builder-impl.ts` | changed | Deferred auth/RPC/route registration and principal context injection. |
 | `packages/service/src/types.ts` | changed | Added optional `ServiceContext.principal`. |
 | `packages/service/tests/auth/builder-auth_test.ts` | new | Builder integration tests for 401/403/200, health bypass, and oRPC principal context. |
+| `packages/service/src/auth/mod.ts` | new | Public auth subpath manifest. |
+| `packages/service/deno.json` | changed | Added `./auth` export entry. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Slice 1-5 check/lint/fmt wrappers passed. |
-| Fitness | NOT_RUN | Pending export slices. |
+| Static | PASS | Slice 1-6 check/lint/fmt wrappers passed. |
+| Fitness | PASS | Slice 6 publish dry-run and auth doc checks passed; final publish/doc gates repeat in slice 7. |
 | Runtime | PASS | Slice 2-5 targeted auth tests passed. |
 | Consumer | NOT_RUN | Pending final gate. |
 
@@ -86,3 +89,4 @@ Slice 5 implementation is complete: auth contracts/adapters/middleware exist, bu
 - 6f81290: feat(service): add default authenticators
 - dda6fb6: feat(service): add scope authorizer
 - cbfc40f: feat(service): add auth middleware
+- a51cb42: feat(service): wire auth into service builder

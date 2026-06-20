@@ -14,3 +14,4 @@ Format:
 - 6f81290: feat(service): add default authenticators
 - dda6fb6: feat(service): add scope authorizer
 - cbfc40f: feat(service): add auth middleware
+- a51cb42: feat(service): wire auth into service builder

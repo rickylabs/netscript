@@ -75,6 +75,8 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | 2026-06-20 | 4 | gates | Middleware tests and check/lint/fmt wrappers passed after typing the bare-Hono test apps with the `principal` variable. |
 | 2026-06-20 | 5 | implementation | Added `withAuthn`/`withAuthz`, deferred protected route/RPC/doc registration until `build()`, and injected Hono principal into oRPC context. |
 | 2026-06-20 | 5 | gates | Builder integration tests and check/lint/fmt wrappers passed. |
+| 2026-06-20 | 6 | implementation | Added `@netscript/service/auth` subpath export for auth contracts and default factory adapters. |
+| 2026-06-20 | 6 | gates | Static wrappers, publish dry-run, `deno doc`, filtered symbol docs, and auth doc lint passed. Dry-run retained the package's pre-existing `--allow-slow-types` warning and completed successfully. |
 
 ## Decisions
 
@@ -117,12 +119,20 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | slice 5 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 diagnostics. |
 | slice 5 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 findings. |
 | slice 5 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 27 files, 0 findings. |
+| slice 6 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 28 files, 0 diagnostics. |
+| slice 6 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 28 files, 0 findings. |
+| slice 6 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 28 files, 0 findings. |
+| slice 6 publish | `cd packages/service && rtk proxy deno publish --dry-run --allow-dirty --allow-slow-types` | PASS | Exit 0; checked `mod.ts` and `src/auth/mod.ts`; dry run complete. Slow-types warning is the accepted package baseline requiring `--allow-slow-types`. |
+| slice 6 docs | `deno doc packages/service/mod.ts`; `deno doc --filter <symbol> packages/service/src/auth/mod.ts`; `deno doc --lint packages/service/src/auth/mod.ts` | PASS | Exit 0; root docs readable, auth symbols visible with JSDoc, doc lint checked 1 file. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-5/F-6/F-7/F-15 | NOT_RUN | Pending export slices. | Planned for slices 6-7. |
+| F-5/F-7 auth docs | PASS | `deno doc --filter createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, `createScopeAuthorizer`, `Principal`; `deno doc --lint packages/service/src/auth/mod.ts`. | Auth subpath surface is documented. |
+| F-6 publishability | PASS | `deno publish --dry-run --allow-dirty --allow-slow-types` from `packages/service`; exit 0. | Existing slow-types warning remains within accepted package carve-out. |
+| F-15 upstream re-export lint | PASS | Manual export review of `packages/service/src/auth/mod.ts`; no Hono, jose, or upstream auth library types exported. | Auth subpath exports package-owned types and factories only. |
 
 ### Runtime Gates
 
