@@ -22,6 +22,14 @@ import {
 import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts';
 import type { InteractiveAuthBackend } from './v1-types.ts';
 import { implement } from '@orpc/server';
+import type { AuthSession } from '@netscript/plugin-auth-core/domain';
+import {
+  emitOidcCompleted,
+  emitSessionRevoked,
+  emitSigninFailed,
+  emitSigninStarted,
+  emitTokenRefreshed,
+} from '../../../streams/server.ts';
 
 type AuthRouteOptions<TInput> = Readonly<{
   input: TInput;
@@ -105,13 +113,22 @@ export async function signin(
       { returnTo: input.redirectTo },
     );
     const redirectUrl = responseLocation(response);
-    return {
+    const output = {
       started: true,
       providerId: input.providerId ?? firstProviderId(backend),
       redirectUrl,
       state: redirectUrl ? new URL(redirectUrl).searchParams.get('state') ?? undefined : undefined,
     };
+    emitSigninStarted({
+      providerId: output.providerId,
+      state: output.state,
+    });
+    return output;
   } catch (error) {
+    emitSigninFailed({
+      providerId: input.providerId ?? backend.name,
+      reason: error instanceof Error ? error.message : undefined,
+    });
     throw providerFailure(error, input.providerId ?? backend.name);
   }
 }
@@ -141,12 +158,14 @@ export async function callback(
     const result = await backend.handleCallback(
       toRequest(context.request, '/v1/auth/callback', params),
     );
-    return {
+    const output = {
       completed: true,
       sessionId: result.sessionId,
       redirectTo: input.redirectTo ?? responseLocation(result.response),
       subject: result.principal.subject,
     };
+    void emitCallbackSessionCompleted(backend, result.sessionId);
+    return output;
   } catch (error) {
     throw providerFailure(error, input.providerId ?? backend.name);
   }
@@ -163,8 +182,9 @@ export async function signout(
   );
 
   try {
+    let revokedSession: AuthSession | undefined;
     if (sessionId) {
-      await backend.sessions.revokeSession(sessionId);
+      revokedSession = await backend.sessions.revokeSession(sessionId);
     } else if (!backend.signOut) {
       throw new AuthServiceHandlerError('UNAUTHORIZED', 'No active auth session was found.');
     }
@@ -173,11 +193,15 @@ export async function signout(
         revoke: !sessionId,
       });
     }
-    return {
+    const output = {
       signedOut: true,
       sessionId,
       redirectTo: input.redirectTo,
     };
+    if (revokedSession) {
+      emitSessionRevoked(revokedSession);
+    }
+    return output;
   } catch (error) {
     throw providerFailure(error, backend.name);
   }
@@ -196,10 +220,12 @@ export async function session(
   if (!resolved || resolved.state !== 'active') {
     return { authenticated: false };
   }
-  return {
+  const output = {
     authenticated: true,
     session: mapSession(resolved),
   };
+  emitObservedRefresh(resolved);
+  return output;
 }
 
 /** Resolve the current user and session through the active backend. */
@@ -219,11 +245,33 @@ export async function me(context: AuthServiceContext): Promise<MeResponse> {
   if (!resolved || resolved.state !== 'active') {
     return { authenticated: false };
   }
-  return {
+  const output = {
     authenticated: true,
     user: mapUserFromSession(resolved),
     session: mapSession(resolved),
   };
+  emitObservedRefresh(resolved);
+  return output;
+}
+
+async function emitCallbackSessionCompleted(
+  backend: InteractiveAuthBackend,
+  sessionId: string,
+): Promise<void> {
+  try {
+    const authSession = await backend.sessions.getSession({ sessionId });
+    if (authSession) {
+      emitOidcCompleted(authSession);
+    }
+  } catch (error) {
+    console.warn('[Auth Stream] Callback completion stream emit skipped:', error);
+  }
+}
+
+function emitObservedRefresh(authSession: AuthSession): void {
+  if (authSession.refreshedAt) {
+    emitTokenRefreshed(authSession);
+  }
 }
 
 function firstProviderId(backend: InteractiveAuthBackend): string | undefined {
