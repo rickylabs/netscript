@@ -22,6 +22,7 @@ import type {
   SagaStorePort,
 } from '../ports/mod.ts';
 import { MemorySagaAppliedKeyStore } from './saga-applied-keys.ts';
+import { SagaInstrumentation } from '../telemetry/mod.ts';
 
 /** Registered handler target stored in the O(1) message dispatch index. */
 export type SagaEngineDispatchEntry = Readonly<{
@@ -56,6 +57,7 @@ export type SagaEngineOptions = Readonly<{
   defaultRetryPolicy?: RetryPolicy;
   store?: SagaStorePort;
   appliedKeys?: SagaAppliedKeyStore;
+  instrumentation?: SagaInstrumentation;
 }>;
 
 type ConcurrencySlot = Readonly<{
@@ -70,6 +72,7 @@ export class SagaEngine implements SagaBusPort {
   readonly #retryPolicy: RetryPolicy;
   readonly #store?: SagaStorePort;
   readonly #appliedKeys: SagaAppliedKeyStore;
+  readonly #instrumentation: SagaInstrumentation;
   readonly #definitions = new Map<SagaId, SagaDefinition<string, SagaState, SagaMessage>>();
   readonly #dispatchIndex = new Map<string, readonly SagaEngineDispatchEntry[]>();
   readonly #concurrency = new Map<string, ConcurrencySlot>();
@@ -81,6 +84,7 @@ export class SagaEngine implements SagaBusPort {
     this.#retryPolicy = options.defaultRetryPolicy ?? DEFAULT_RETRY_POLICY;
     this.#store = options.store;
     this.#appliedKeys = options.appliedKeys ?? new MemorySagaAppliedKeyStore();
+    this.#instrumentation = options.instrumentation ?? new SagaInstrumentation();
   }
 
   /** Start accepting saga messages. */

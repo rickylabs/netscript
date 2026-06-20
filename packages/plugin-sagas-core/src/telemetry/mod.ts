@@ -45,4 +45,5 @@ export type {
   SagaTelemetrySpanKind,
   SagaTelemetryStatus,
   SagaTelemetryTracer,
+  SagaTraceParent,
 } from './instrumentation.ts';
