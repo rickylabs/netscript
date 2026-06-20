@@ -12,7 +12,7 @@
 
 ## Current State
 
-S2 implementation is complete locally: the core telemetry seam accepts parent trace context, `SagaEngineOptions` accepts optional instrumentation with a NOOP default, and `SagaEngine.#handleEntry` emits `saga.handle` spans around handler + persistence. S1 is committed and pushed; S2 is ready to commit.
+S3 implementation is complete locally: the core telemetry seam accepts parent trace context, `SagaEngineOptions` accepts optional instrumentation with a NOOP default, `SagaEngine.#handleEntry` emits `saga.handle` spans around handler + persistence, and `createSagaRuntime({ native: { instrumentation } })` threads instrumentation into the engine. S1/S2 are committed and pushed; S3 is ready to commit.
 
 ## Completed
 
@@ -21,16 +21,18 @@ S2 implementation is complete locally: the core telemetry seam accepts parent tr
 - Implemented S1 seam shape extension and focused telemetry seam test.
 - Committed and pushed S1 (`eeff38c`), with PR #76 progress comment.
 - Implemented S2 handle span lifecycle and tests.
+- Committed and pushed S2 (`9d2e6d2`), with PR #76 progress comment.
+- Implemented S3 runtime/bridge instrumentation threading and test.
 
 ## In Progress
 
-- S2 commit/push/PR comment.
+- S3 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit S2.
+1. Commit S3.
 2. Append `commits.md`, push explicit refspec, and comment PR #76.
-3. Start S3 instrumentation threading through bridge/runtime composition.
+3. Start S4 OTel adapter and composition-root injection.
 
 ## Key Decisions
 
@@ -48,6 +50,8 @@ S2 implementation is complete locally: the core telemetry seam accepts parent tr
 | `packages/plugin-sagas-core/src/telemetry/instrumentation.ts` | changed | Adds `SagaTraceParent`, tracer parent option, and start-handle forwarding. |
 | `packages/plugin-sagas-core/src/telemetry/mod.ts` | changed | Exports `SagaTraceParent`. |
 | `packages/plugin-sagas-core/src/runtime/saga-engine.ts` | changed | Adds optional engine instrumentation field with NOOP default. |
+| `packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts` | changed | Threads native instrumentation into engine construction and bridge options. |
+| `packages/plugin-sagas-core/src/adapters/saga-bus-bridge.ts` | changed | Accepts and holds bridge instrumentation for deferred cascade spans. |
 | `packages/plugin-sagas-core/tests/telemetry/instrumentation_test.ts` | new | Proves parent context forwards into tracer options. |
 | `packages/plugin-sagas-core/tests/telemetry/saga-engine-spans_test.ts` | new | Proves success and failure handle span lifecycle and duration metric. |
 
@@ -55,9 +59,9 @@ S2 implementation is complete locally: the core telemetry seam accepts parent tr
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S2 PASS | check/lint/fmt scoped to `packages/plugin-sagas-core` passed. |
-| Fitness | IN_PROGRESS | S1/S2 public-surface/runtime invariants covered by tests; full manual evidence pending final gate pass. |
-| Runtime | S2 PASS | telemetry seam and engine span tests passed; existing runtime tests passed. |
+| Static | S3 PASS | check/lint/fmt scoped to `packages/plugin-sagas-core` passed. |
+| Fitness | IN_PROGRESS | S1-S3 public-surface/runtime invariants covered by tests; full manual evidence pending final gate pass. |
+| Runtime | S3 PASS | telemetry seam, engine span, runtime injection, and existing runtime tests passed. |
 | Consumer | NOT_RUN | pending |
 
 ## Open Questions
@@ -72,3 +76,4 @@ S2 implementation is complete locally: the core telemetry seam accepts parent tr
 ## Commits
 
 - eeff38c: feat(sagas): extend telemetry span seam
+- 9d2e6d2: feat(sagas): emit engine handle spans

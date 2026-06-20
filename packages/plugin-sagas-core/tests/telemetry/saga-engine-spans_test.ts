@@ -2,7 +2,7 @@ import { assert, assertEquals, assertRejects } from '@std/assert';
 
 import { defineSaga, sagaComplete } from '../../mod.ts';
 import type { SagaCorrelationKey, SagaDefinition, SagaState } from '../../src/domain/mod.ts';
-import { createSagaEngine } from '../../src/runtime/mod.ts';
+import { createSagaEngine, createSagaRuntime } from '../../src/runtime/mod.ts';
 import {
   SagaAttributes,
   SagaInstrumentation,
@@ -119,6 +119,37 @@ Deno.test('SagaEngine records an ERROR span and rethrows when a handler throws',
     assert(telemetry.durations[0].value >= 0);
   } finally {
     await engine.stop('saga engine telemetry failure test complete');
+  }
+});
+
+Deno.test('createSagaRuntime threads native instrumentation into the saga engine', async () => {
+  const telemetry = new RecordingTelemetry();
+  const runtime = createSagaRuntime({
+    native: {
+      instrumentation: telemetry.instrumentation,
+    },
+  });
+  const definition = defineSaga('telemetry-runtime')
+    .state<SagaState>({})
+    .on('work.requested', () => [sagaComplete()])
+    .build() as SagaDefinition;
+
+  await runtime.register([definition]);
+  await runtime.start();
+  try {
+    await runtime.publish({
+      type: 'work.requested',
+      payload: {},
+      correlationKey: 'work-1' as SagaCorrelationKey,
+    });
+
+    assertEquals(telemetry.spans.length, 1);
+    assertEquals(telemetry.spans[0].name, SagaSpanNames.HANDLE);
+    assertEquals(telemetry.spans[0].attributes[SagaAttributes.SAGA_ID], 'telemetry-runtime');
+    assertEquals(telemetry.spans[0].attributes[SagaAttributes.OUTCOME], 'success');
+    assertEquals(telemetry.spans[0].ended, true);
+  } finally {
+    await runtime.stop('saga runtime telemetry test complete');
   }
 });
 

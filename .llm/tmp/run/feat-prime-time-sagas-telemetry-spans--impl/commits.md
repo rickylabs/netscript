@@ -11,3 +11,4 @@ Format:
 ## Log
 
 - eeff38c: feat(sagas): extend telemetry span seam
+- 9d2e6d2: feat(sagas): emit engine handle spans
