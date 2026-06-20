@@ -1,0 +1,400 @@
+expected `deno.lock` workspace dep block) — ✓ confirmed
+
+## Consumer import check
+- `deno eval 'import { authContract } from "@netscript/plugin-auth-core"'` → 
+exit 0, returned `object`
+- The publish dry-run verified all modules compile under `isolatedDeclarations` 
+(the "Checking for slow types in the public API..." step passed), confirming the
+export map resolves for consumers
+
+## Verdict: PASS
+All gates pass, all conformance checks satisfied, no boundary violations, no 
+lock hygiene issues.
+
+
+Thought:
+Now I have all the evidence. Let me write the verdict file and update the 
+summary.
+
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: 
+"/home/runner/work/netscript/netscript/.llm/tmp/run/openhands/pr-85/run-27873516
+222-1/evaluate.md"
+  file_text: 
+    # IMPL-EVAL Verdict — AS1: `@netscript/plugin-auth-core`
+    
+    **Verdict: `PASS`**
+    
+    Cycle 1, 2026-06-20, evaluator session (run 27873516222, 
+openrouter/qwen/qwen3.7-max).
+    Slice: `packages/plugin-auth-core/` (21 files, +1473). Commit: `f55bb180`.
+    Plan: `plan-eval.md` = PASS (cycle 1, run 27872109274). Cleared for AS1 
+implementation.
+    
+    ---
+    
+    ## Gate Results (verbatim exit codes)
+    
+    | # | Gate | Command | Exit | Evidence |
+    |---|------|---------|------|----------|
+    | 1 | Scoped check | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-check.ts --root packages/plugin-auth-core --ext ts,tsx` | 
+**0** | 17 files selected, 1 batch, 0 failed batches, 0 type errors |
+    | 2 | Per-export check | `deno task --cwd packages/plugin-auth-core check` |
+**0** | All 8 modules (mod.ts, domain, ports, contracts/v1, streams, config, 
+presets, testing) type-checked under `--unstable-kv` |
+    | 3 | Scoped lint | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-lint.ts --root packages/plugin-auth-core --ext ts,tsx` | 
+**0** | 17 files selected, 0 lint occurrences, 0 violations |
+    | 4 | Scoped fmt | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-fmt.ts --root packages/plugin-auth-core --ext ts,tsx` | 
+**0** | 17 files selected, 0 findings |
+    | 5 | In-package fmt | `deno fmt --check` (21 files) | **0** | All 21 files 
+formatted |
+    | 6 | Test | `deno test --allow-read --allow-env --allow-sys` | **0** | **18
+passed / 0 failed** (522ms), 7 test files across all 7 modules |
+    | 7 | Publish dry-run | `deno publish --dry-run --allow-dirty` | **0** | 
+`@netscript/plugin-auth-core@0.0.1-alpha.0`, **13 files**, "Checking for slow 
+types in the public API..." passed, `isolatedDeclarations` clean |
+    
+    **Pre-dispatch claims independently reproduced:** ✓ `deno check 
+--unstable-kv` exit 0; ✓ 18 passed / 0 failed; ✓ publish dry-run Success with 13
+files (matching claim).
+    
+    ---
+    
+    ## Conformance Checks Against Brief/Plan
+    
+    | # | Requirement (AS1 from program-plan.md) | Status | Evidence |
+    |---|----------------------------------------|--------|----------|
+    | 1 | `./domain` imports 
+`Principal`/`AuthnRequest`/`AuthnResult`/`AuthenticatorPort` from 
+`@netscript/service/auth` and does NOT redefine the #77 seam ports | **✓ PASS** 
+| `src/domain/mod.ts` line 10-18: imports and re-exports all four from 
+`@netscript/service/auth`; defines package-owned 
+`AuthSession`/`AuthUser`/`Account` types (non-overlapping with seam) |
+    | 2 | `./ports` defines a pure `AuthBackendPort` (no HTTP/mount) plus the 
+backend-selection seam | **✓ PASS** | `src/ports/mod.ts`: `AuthBackendPort` 
+extends `AuthenticatorPort` (no HTTP/mount surface); `AuthBackendRegistry = 
+Map<string, AuthBackendPort>`; `DEFAULT_AUTH_BACKEND_NAME` constant; 
+`resolveBackend(registry, name?)` accessor; `ResolvedAuthBackendRegistry` with 
+`.default` getter; `createAuthBackendRegistry()` factory |
+    | 3 | Single-active-per-app but multi-backend-capable shape | **✓ PASS** | 
+`resolveBackend()` resolves `name ?? DEFAULT_AUTH_BACKEND_NAME` (single-active 
+now); `AuthBackendRegistry` stores multiple named backends 
+(multi-backend-capable shape). Matches user-locked decision. |
+    | 4 | `./contracts/v1` is typed oRPC `auth.contract` v1 
+(`signin`/`callback`/`signout`/`session`/`me`) | **✓ PASS** | 
+`src/contracts/v1/auth.contract.ts`: `authContract` using 
+`oc.errors().route().input().output()` chain with all 5 procedures. Contract 
+definition only, no router/handler implementation. |
+    | 5 | `./streams` builds on `@netscript/plugin-streams-core` 
+`defineStreamSchema` | **✓ PASS** | `src/streams/mod.ts` line 7-11: imports 
+`defineStreamSchema` from `@netscript/plugin-streams-core`; `authStreamSchema` 
+uses it directly with `authSession` entity (line 111). Event types include 
+required `auth.token.refreshed`/`auth.session.revoked`/`auth.oidc.completed` + 
+`auth.signin.started`/`auth.signin.failed` |
+    | 6 | Boundaries held: NO edits outside `packages/plugin-auth-core/` | **✓ 
+PASS** | `git diff --name-only HEAD~1` shows 22 files: 21 under 
+`packages/plugin-auth-core/` + 1 `deno.lock` (expected workspace dep block, 7 
+lines added). Root `deno.json` workspace/catalog, 
+`packages/aspire/src/public/mod.ts`, `scaffold-versions.ts`, version pins — all 
+untouched (LD-8 satisfied) |
+    
+    ---
+    
+    ## Consumer-Import Check
+    
+    | Check | Result | Evidence |
+    |-------|--------|----------|
+    | Downstream module import resolves | **PASS** | `deno eval 'import { 
+authContract } from "@netscript/plugin-auth-core"'` → exit 0, returns `object` |
+    | `isolatedDeclarations` export map clean | **PASS** | `deno publish 
+--dry-run` "Checking for slow types in the public API..." passed for all 8 
+modules. No private-type-ref leaks detected across the entire export map (mod.ts
+→ 7 sub-modules → 13 publishable files) |
+    
+    ---
+    
+    ## Archetype Verification (plugin-core / contracts-only)
+    
+    | Claim | Status | Evidence |
+    |-------|--------|----------|
+    | No runtime behavior | **✓** | No HTTP servers, no mount handlers, no CLI 
+commands, no DB connections. Config parsing (`AuthConfigSchema.parse/safeParse`)
+is pure schema validation. `createAuthBackendRegistry()` and 
+`createAuthPresetRegistry()` are pure structural helpers. |
+    | No HTTP/mount surface | **✓** | Grep confirms zero references to Hono, 
+mount, or serve across the package. `AuthBackendPort` extends 
+`AuthenticatorPort` (per-request, not HTTP). |
+    | No CLI surface | **✓** | No `src/cli/` directory, no command definitions |
+    | No DB surface | **✓** | No Prisma schema, no database connections |
+    | Every export compiles under `isolatedDeclarations` | **✓** | Publish 
+dry-run passed. All public exports use package-owned structural interfaces 
+(`AuthDomainSchema<T>`, `AuthStreamSchema<T>`, `AuthConfigSchemaLike<T>`) with 
+explicit type annotations. Cast patterns (`as unknown as StateSchema<...>`) 
+decouple internal Zod/oRPC types from public surface. |
+    
+    ---
+    
+    ## Lock Hygiene
+    
+    | Item | Status | Evidence |
+    |------|--------|----------|
+    | `deno.lock` change | **Acceptable** | Only 7 lines added: new workspace 
+member dep block for `packages/plugin-auth-core` (deps: `jsr:@std/assert@1`, 
+`jsr:@zod/zod@4.4.3`, `npm:@orpc/contract@^1.14.6`). No re-resolution, no 
+version bumps on existing deps. Expected and correct for adding a new workspace 
+package. |
+    | CRLF↔LF churn | **None** | `deno fmt --check` passed on all 21 files (line
+ending violations would fail fmt) |
+    | Source churn | **None** | Clean PR commit: 21 new files + deno.lock dep 
+block |
+    
+    ---
+    
+    ## Test Coverage
+    
+    18 tests across 7 modules:
+    - `src/config/config_test.ts`: 2 tests (schema validation, defaults)
+    - `src/contracts/v1/auth.contract_test.ts`: 4 tests (contract routes, input 
+schemas, response schemas)
+    - `src/domain/domain_test.ts`: 1 test (session schema)
+    - `src/ports/ports_test.ts`: 4 tests (registry creation, default/named 
+resolution, error cases, contract-only async)
+    - `src/presets/presets_test.ts`: 2 tests (registry creation, duplicate 
+rejection)
+    - `src/streams/streams_test.ts`: 3 tests (event schema, session schema, 
+collection)
+    - `src/testing/testing_test.ts`: 2 tests (user/session builders with 
+overrides)
+    
+    ---
+    
+    ## Summary
+    
+    **`PASS`.** AS1 `@netscript/plugin-auth-core` satisfies all applicable gates
+from the program-plan (archetype-2: scoped run-deno-check/lint/fmt, deno test, 
+deno check, doc-lint full export map, `publish:dry-run`), all conformance checks
+against the AS1 brief, boundary compliance (LD-8), and lock hygiene. The 
+implementation mirrors the `@netscript/plugin-sagas-core` precedent, correctly 
+integrates the #77 seam, ships the `Map<string, AuthBackendPort>` + `default` 
+accessor selection seam, builds streams on `@netscript/plugin-streams-core`, and
+exposes a clean `isolatedDeclarations`-compliant public API. Foundation for 
+AS2a/AS2b/AS3 is solid.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.7M • cache hit 84.54% •  reasoning 13.71K • ↓ output 26.17K • 
+$ 0.7858
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File 
+/home/runner/work/netscript/netscript/.llm/tmp/run/openhands/pr-85/run-278735162
+22-1/evaluate.md edited with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Verdict — AS1: `@netscript/plugin-auth-core`
+ 2|
++3|**Verdict: `PASS`**
++4|
++5|Cycle 1, 2026-06-20, evaluator session (run 27873516222, 
+openrouter/qwen/qwen3.7-max).
++6|Slice: `packages/plugin-auth-core/` (21 files, +1473). Commit: `f55bb180`.
++7|Plan: `plan-eval.md` = PASS (cycle 1, run 27872109274). Cleared for AS1 
+implementation.
++8|
++9|---
++10|
++11|## Gate Results (verbatim exit codes)
++12|
++13|| # | Gate | Command | Exit | Evidence |
++14||---|------|---------|------|----------|
++15|| 1 | Scoped check | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-check.ts --root packages/plugin-auth-core --ext ts,tsx` | 
+**0** | 17 files selected, 1 batch, 0 failed batches, 0 type errors |
++16|| 2 | Per-export check | `deno task --cwd packages/plugin-auth-core check` |
+**0** | All 8 modules (mod.ts, domain, ports, contracts/v1, streams, config, 
+presets, testing) type-checked under `--unstable-kv` |
++17|| 3 | Scoped lint | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-lint.ts --root packages/plugin-auth-core --ext ts,tsx` | 
+**0** | 17 files selected, 0 lint occurrences, 0 violations |
++18|| 4 | Scoped fmt | `deno run --allow-read --allow-run 
+.llm/tools/run-deno-fmt.ts --root packages/plugin-auth-core --ext ts,tsx` | 
+**0** | 17 files selected, 0 findings |
++19|| 5 | In-package fmt | `deno fmt --check` (21 files) | **0** | All 21 files 
+formatted |
++20|| 6 | Test | `deno test --allow-read --allow-env --allow-sys` | **0** | **18
+passed / 0 failed** (522ms), 7 test files across all 7 modules |
++21|| 7 | Publish dry-run | `deno publish --dry-run --allow-dirty` | **0** | 
+`@netscript/plugin-auth-core@0.0.1-alpha.0`, **13 files**, "Checking for slow 
+types in the public API..." passed, `isolatedDeclarations` clean |
++22|
++23|**Pre-dispatch claims independently reproduced:** ✓ `deno check 
+--unstable-kv` exit 0; ✓ 18 passed / 0 failed; ✓ publish dry-run Success with 13
+files (matching claim).
++24|
++25|---
++26|
++27|## Conformance Checks Against Brief/Plan
++28|
++29|| # | Requirement (AS1 from program-plan.md) | Status | Evidence |
++30||---|----------------------------------------|--------|----------|
++31|| 1 | `./domain` imports 
+`Principal`/`AuthnRequest`/`AuthnResult`/`AuthenticatorPort` from 
+`@netscript/service/auth` and does NOT redefine the #77 seam ports | **✓ PASS** 
+| `src/domain/mod.ts` line 10-18: imports and re-exports all four from 
+`@netscript/service/auth`; defines package-owned 
+`AuthSession`/`AuthUser`/`Account` types (non-overlapping with seam) |
++32|| 2 | `./ports` defines a pure `AuthBackendPort` (no HTTP/mount) plus the 
+backend-selection seam | **✓ PASS** | `src/ports/mod.ts`: `AuthBackendPort` 
+extends `AuthenticatorPort` (no HTTP/mount surface); `AuthBackendRegistry = 
+Map<string, AuthBackendPort>`; `DEFAULT_AUTH_BACKEND_NAME` constant; 
+`resolveBackend(registry, name?)` accessor; `ResolvedAuthBackendRegistry` with 
+`.default` getter; `createAuthBackendRegistry()` factory |
++33|| 3 | Single-active-per-app but multi-backend-capable shape | **✓ PASS** | 
+`resolveBackend()` resolves `name ?? DEFAULT_AUTH_BACKEND_NAME` (single-active 
+now); `AuthBackendRegistry` stores multiple named backends 
+(multi-backend-capable shape). Matches user-locked decision. |
++34|| 4 | `./contracts/v1` is typed oRPC `auth.contract` v1 
+(`signin`/`callback`/`signout`/`session`/`me`) | **✓ PASS** | 
+`src/contracts/v1/auth.contract.ts`: `authContract` using 
+`oc.errors().route().input().output()` chain with all 5 procedures. Contract 
+definition only, no router/handler implementation. |
++35|| 5 | `./streams` builds on `@netscript/plugin-streams-core` 
+`defineStreamSchema` | **✓ PASS** | `src/streams/mod.ts` line 7-11: imports 
+`defineStreamSchema` from `@netscript/plugin-streams-core`; `authStreamSchema` 
+uses it directly with `authSession` entity (line 111). Event types include 
+required `auth.token.refreshed`/`auth.session.revoked`/`auth.oidc.completed` + 
+`auth.signin.started`/`auth.signin.failed` |
++36|| 6 | Boundaries held: NO edits outside `packages/plugin-auth-core/` | **✓ 
+PASS** | `git diff --name-only HEAD~1` shows 22 files: 21 under 
+`packages/plugin-auth-core/` + 1 `deno.lock` (expected workspace dep block, 7 
+lines added). Root `deno.json` workspace/catalog, 
+`packages/aspire/src/public/mod.ts`, `scaffold-versions.ts`, version pins — all 
+untouched (LD-8 satisfied) |
++37|
++38|---
++39|
++40|## Consumer-Import Check
++41|
++42|| Check | Result | Evidence |
++43||-------|--------|----------|
++44|| Downstream module import resolves | **PASS** | `deno eval 'import { 
+authContract } from "@netscript/plugin-auth-core"'` → exit 0, returns `object` |
++45|| `isolatedDeclarations` export map clean | **PASS** | `deno publish 
+--dry-run` "Checking for slow types in the public API..." passed for all 8 
+modules. No private-type-ref leaks detected across the entire export map (mod.ts
+→ 7 sub-modules → 13 publishable files) |
++46|
++47|---
++48|
++49|## Archetype Verification (plugin-core / contracts-only)
++50|
++51|| Claim | Status | Evidence |
++52||-------|--------|----------|
++53|| No runtime behavior | **✓** | No HTTP servers, no mount handlers, no CLI 
+commands, no DB connections. Config parsing (`AuthConfigSchema.parse/safeParse`)
+is pure schema validation. `createAuthBackendRegistry()` and 
+`createAuthPresetRegistry()` are pure structural helpers. |
++54|| No HTTP/mount surface | **✓** | Grep confirms zero references to Hono, 
+mount, or serve across the package. `AuthBackendPort` extends 
+`AuthenticatorPort` (per-request, not HTTP). |
++55|| No CLI surface | **✓** | No `src/cli/` directory, no command definitions |
++56|| No DB surface | **✓** | No Prisma schema, no database connections |
++57|| Every export compiles under `isolatedDeclarations` | **✓** | Publish 
+dry-run passed. All public exports use package-owned structural interfaces 
+(`AuthDomainSchema<T>`, `AuthStreamSchema<T>`, `AuthConfigSchemaLike<T>`) with 
+explicit type annotations. Cast patterns (`as unknown as StateSchema<...>`) 
+decouple internal Zod/oRPC types from public surface. |
++58|
++59|---
++60|
++61|## Lock Hygiene
++62|
++63|| Item | Status | Evidence |
++64||------|--------|----------|
++65|| `deno.lock` change | **Acceptable** | Only 7 lines added: new workspace 
+member dep block for `packages/plugin-auth-core` (deps: `jsr:@std/assert@1`, 
+`jsr:@zod/zod@4.4.3`, `npm:@orpc/contract@^1.14.6`). No re-resolution, no 
+version bumps on existing deps. Expected and correct for adding a new workspace 
+package. |
++66|| CRLF↔LF churn | **None** | `deno fmt --check` passed on all 21 files (line
+ending violations would fail fmt) |
++67|| Source churn | **None** | Clean PR commit: 21 new files + deno.lock dep 
+block |
++68|
++69|---
++70|
++71|## Test Coverage
++72|
++73|18 tests across 7 modules:
++74|- `src/config/config_test.ts`: 2 tests (schema validation, defaults)
++75|- `src/contracts/v1/auth.contract_test.ts`: 4 tests (contract routes, input 
+schemas, response schemas)
++76|- `src/domain/domain_test.ts`: 1 test (session schema)
++77|- `src/ports/ports_test.ts`: 4 tests (registry creation, default/named 
+resolution, error cases, contract-only async)
++78|- `src/presets/presets_test.ts`: 2 tests (registry creation, duplicate 
+rejection)
++79|- `src/streams/streams_test.ts`: 3 tests (event schema, session schema, 
+collection)
++80|- `src/testing/testing_test.ts`: 2 tests (user/session builders with 
+overrides)
++81|
++82|---
++83|
++84|## Summary
++85|
++86|**`PASS`.** AS1 `@netscript/plugin-auth-core` satisfies all applicable gates
+from the program-plan (archetype-2: scoped run-deno-check/lint/fmt, deno test, 
+deno check, doc-lint full export map, `publish:dry-run`), all conformance checks
+against the AS1 brief, boundary compliance (LD-8), and lock hygiene. The 
+implementation mirrors the `@netscript/plugin-sagas-core` precedent, correctly 
+integrates the #77 seam, ships the `Map<string, AuthBackendPort>` + `default` 
+accessor selection seam, builds streams on `@netscript/plugin-streams-core`, and
+exposes a clean `isolatedDeclarations`-compliant public API. Foundation for 
+AS2a/AS2b/AS3 is solid.
++87|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+IMPL-EVAL evaluation complete. **Verdict: PASS**
+
+I've run all required gates and conformance checks for AS1 
+`@netscript/plugin-auth-core`:
+
+**Gates (all exit 0):**
+- Scoped deno check, lint, fmt
+- Per-export type checking
+- Tests: 18 passed / 0 failed
+- Publish dry-run: Success (13 files, isolatedDeclarations clean)
+
+**Conformance (all pass):**
+- Domain correctly imports from `@netscript/service/auth` (#77 seam)
+- Ports implement pure `AuthBackendPort` with `Map<string>` + `default` accessor
+- Single-active-per-app, multi-backend-capable shape matches design
+- oRPC contract defines all 5 endpoints (signin/callback/signout/session/me)
+- Streams build on `@netscript/plugin-streams-core` (defineStreamSchema)
+- Boundary compliance verified (no edits outside packages/plugin-auth-core/)
+- Archetype compliance confirmed (contracts-only, no runtime/HTTP/CLI/DB)
+- Lock hygiene clean (acceptable deno.lock workspace dep block)
+
+Verdict file written to: 
+`.llm/tmp/run/openhands/pr-85/run-27873516222-1/evaluate.md`
+
+Tokens: ↑ input 1.74M • cache hit 84.65% •  reasoning 14.51K • ↓ output 27.24K •
+$ 0.8032
+
