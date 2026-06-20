@@ -1,6 +1,8 @@
 # Program Plan — Auth Plugin (Track-5, prime-time sub-program)
 
-Status: **DRAFT for user approval** → then PLAN-EVAL (OpenHands minimax-M3, separate session).
+Status: **PLAN-EVAL PASS (cycle 1, 2026-06-20, run 27872109274, minimax-m3)** → cleared for
+implementation on AS1. See `plan-eval.md`. All 4 open decisions ruled (3 by evaluator, 1 user-locked);
+slice-time follow-ups folded in below.
 Supersedes the standalone Track-4 `auth-kv-oauth` adapter lane (its PLAN-EVAL-PASS'd backend logic is
 **absorbed** here as one backend sub-PR, not discarded).
 Run dir: `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/`.
@@ -102,16 +104,23 @@ Production/enterprise bar throughout: no stubs/no-ops; real behavior, errors, te
   signout/session/me shapes), stream-event schema (`auth.token.refreshed`/`session.revoked`/
   `oidc.completed`/…), session + account domain model, `AuthBackendPort` interface, backend-selection
   seam, config schema, presets surface. No runtime behavior. Mirrors `@netscript/plugin-sagas-core`.
+  **[PLAN-EVAL] selection seam shape: `Map<string, AuthBackendPort>` + a single resolved `default`
+  accessor** — ships single-active (user-locked) but does not foreclose a future multi-backend
+  extension. Stream schema **builds on `@netscript/plugin-streams-core`** (`defineStreamSchema`); do
+  not re-invent stream primitives.
   Gate: `deno check --unstable-kv ./mod.ts`, doc-lint full export map, `publish:dry-run`.
   *Foundation — everything bases on this.*
 
 - **AS2a — backends → pure (`auth-workos`, `auth-better-auth` refactor).** Implement `AuthBackendPort`
-  for both; **remove** the per-adapter Hono mount helper and relocate `gen-better-auth-prisma`
-  responsibility out of the loose tool into the plugin's DB contribution (AS5). Keep the real WorkOS
-  sealed-session + JWKS logic and the better-auth `prismaAdapter` wrapping — only the contribution
-  surface moves. Back-compat: the old `mount*` exports become thin deprecated shims OR are dropped
-  (decide at PLAN-EVAL — these landed only on the umbrella, never shipped to JSR, so dropping is
-  low-risk). Depends on AS1. Gate: package check/test + node-compat tests stay green.
+  for both. **[PLAN-EVAL: DROP, not shim]** — remove `mountBetterAuthHandler`
+  (`packages/auth-better-auth/src/better-auth.ts:177`, re-export `mod.ts:28`, `tests/mount_test.ts`)
+  and the `.llm/tools/auth/gen-better-auth-prisma.ts` loose tool (zero in-tree importers), relocating
+  the DB-schema responsibility into the plugin's DB contribution (AS5). The umbrella never published
+  to JSR (`publish: false`, adapters `0.0.1-alpha.0`) so no external consumer can exist — drop cost <
+  shim cost; **AS2a commit message must state the removal rationale.** **Note: `auth-workos` has NO
+  mount** (only `workos-authenticator.ts`) — it gets the `AuthBackendPort` refactor only. Keep the
+  real WorkOS sealed-session + JWKS logic and the better-auth `prismaAdapter` wrapping — only the
+  contribution surface moves. Depends on AS1. Gate: package check/test + node-compat tests stay green.
 
 - **AS2b — `@netscript/auth-kv-oauth` backend (PAUSED sub-PR).** The pure kv-oauth backend: provider
   registry (`defineOAuthProvider` + presets), `KvOAuthStore` over `WatchableKv` (txn + session
@@ -128,7 +137,10 @@ Production/enterprise bar throughout: no stubs/no-ops; real behavior, errors, te
 
 - **AS4 — real-time streams (v1).** `plugins/auth/streams/` producer + schema wired to the AS1
   stream-event contracts; emit `token.refreshed`/`session.revoked`/`oidc.completed` to server
-  subscribers + client SDK. Mirror `plugins/sagas/streams/`. Depends on AS1 + AS3 (sequence after AS3;
+  subscribers + client SDK. **[PLAN-EVAL] build on `@netscript/plugin-streams-core`**
+  (`defineStreamSchema`/`createDurableStream`/`buildStreamUrl`) and mirror
+  `plugins/sagas/streams/schema.ts` structurally — own the `AuthSession` entity schema, do not
+  re-invent primitives. Depends on AS1 + AS3 (sequence after AS3;
   both touch `plugins/auth`). Gate: plugin check/test + a stream round-trip test.
 
 - **AS5 — CLI + DB + scaffold + Aspire contribution.** `plugins/auth/src/cli/` (`netscript auth`:
@@ -157,22 +169,21 @@ Ordering: AS1 → {AS2a ∥ AS2b} → AS3 → AS4 → AS5 → AS6. AS2a and AS2b
   `deno.json` catalog block, `aspire/src/public/mod.ts`, `scaffold-versions.ts`, version pins —
   **untouched** (LD-8). Confirm any new catalog need via `deno task deps:latest`.
 
-## Open questions for PLAN-EVAL to rule on
+## Open questions — ALL RESOLVED at PLAN-EVAL (run 27872109274)
 
-1. **AS2a back-compat:** drop the landed per-adapter `mount*`/schema-gen exports outright (never
-   shipped to JSR) vs keep thin deprecated shims for one cycle? Plan leans **drop** (umbrella-only,
-   low risk) but flags it.
-2. **`plugins/auth` ↔ `@netscript/plugin-sagas-core` shared abstractions:** does the auth core
-   duplicate any saga-core streaming/registry primitive that should instead be promoted to a shared
-   base package, or is per-plugin duplication the accepted house style? (Sagas re-implements its own
-   streams; precedent suggests per-plugin is fine — confirm.)
+1. **AS2a back-compat — RESOLVED: DROP.** Remove `mountBetterAuthHandler` + `mount_test.ts` +
+   `gen-better-auth-prisma.ts` (umbrella-only, `publish: false`, no external consumers). AS2a commit
+   states removal rationale. (`auth-workos` has no mount — refactor only.)
+2. **Shared abstractions — RESOLVED: per-plugin duplication is house style; the shared base already
+   exists.** AS4 builds on `@netscript/plugin-streams-core`; each plugin owns its entity schema
+   (auth = `AuthSession`). No new shared base needed.
 3. **Backend-selection granularity — RESOLVED (user-locked 2026-06-20):** **single active backend per
-   app** (env `NETSCRIPT_AUTH_BACKEND=workos|better-auth|kv-oauth`). Concurrent multi-backend is
-   **deferred** to a later slice (accepted scope boundary, not debt). The AS1 selection seam ships
-   single-active but must not foreclose a future multi-backend extension. Not an open item.
-4. **kv-oauth backend's flow HTTP surface:** confirm moving signIn/handleCallback HTTP handling up
-   into the plugin oRPC service (AS3) — leaving the backend as pure non-HTTP logic — is the right cut,
-   vs keeping a thin flow object in the backend that the service calls.
+   app** (env `NETSCRIPT_AUTH_BACKEND=workos|better-auth|kv-oauth`). Concurrent multi-backend deferred
+   (accepted scope boundary). AS1 seam = `Map<string, AuthBackendPort>` + `default` accessor:
+   single-active now, multi-backend-capable shape.
+4. **kv-oauth flow HTTP surface — RESOLVED: move up to AS3.** Backend stays pure non-HTTP; the plugin
+   oRPC service owns the single HTTP surface. Track-4 `S5 mountKvOAuthHandler` deleted; `api-design.md`
+   §"Dual surface" item 5 + `auth-kv-oauth/plan.md` S5 rewritten at AS2b slice-time.
 
 ## Generator handoff
 
