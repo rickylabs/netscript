@@ -23,8 +23,13 @@ succeeded as a job but was interrupted before emitting a verdict → re-dispatch
 -4756121577). Merges await explicit user authorization; #74 merges first. **Open scope question
 (user-raised):** the durable saga store (#74) is KV-only and its slice-7 docs change deliberately
 REMOVES the legacy `@saga-bus/store-prisma` promise rather than implementing a Prisma `SagaStorePort`.
-User wants Prisma parity with the old saga-bus impl → pending decision on a `sagas-prisma-store`
-fast-follow adapter slice (consumes the already-locked `SagaStorePort`, mirrors queue multi-adapter).
+User wants Prisma parity with the old saga-bus impl → **RESOLVED (user, 2026-06-20):** fast-follow
+additive slice `sagas-prisma-store` (Track 3, research seeded). `PrismaSagaStore implements
+SagaStorePort` (plugin layer, `@prisma/client` catalog + `@netscript/database`); #74 merges as-is.
+**Both backends first-class, explicit selection** — via env var, appsettings, AND a `@netscript/cli`
+scaffold backend option. Depends on #74 merging (consumes `createDurableSagaRuntime` selection seam);
+likely changes scaffold output → `e2e:cli` at eval. Flow: research → plan → PLAN-EVAL (minimax-M3) →
+present before generator launch.
 
 **IMPL-EVAL dispatch (2026-06-20):** all 7 generators FINISHED and posted ready/complete verdicts.
 IMPL-EVAL (OpenHands qwen3.7-max, one trigger per PR — different PRs, no per-PR concurrency-cancel)
