@@ -80,6 +80,8 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | 2026-06-20 | 4 | validation | Scoped service check and service fmt gate passed. |
 | 2026-06-20 | 5 | implementation | Made the standalone supervisor default to `createDurableSagaRuntime` for native runtimes without injected engine/store, with KV cleanup on stop; runner inherits this through the supervisor. |
 | 2026-06-20 | 5 | validation | Standalone supervisor durability test, scoped runtime check, and scoped fmt gate passed. |
+| 2026-06-20 | 6 | implementation | Added cross-restart durable runtime integration coverage over a shared in-memory KV plus stale expected-version failure coverage. |
+| 2026-06-20 | 6 | validation | Restart integration test, scoped runtime check, and scoped fmt gate passed. |
 
 ## Decisions
 
@@ -117,6 +119,9 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | Slice 5 supervisor test | `deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-supervisor_test.ts` | PASS | Exit 0; 1 passed, 0 failed. |
 | Slice 5 runtime check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/src/runtime --ext ts` | PASS | Exit 0; 9 files selected, 0 diagnostics. |
 | Slice 5 runtime fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/src/runtime --ext ts --include 'saga-supervisor\|saga-runner'` | PASS | Exit 0; 3 files selected, 0 findings. |
+| Slice 6 restart test | `deno test --unstable-kv --allow-all plugins/sagas/src/runtime/durable-saga-restart_test.ts` | PASS | Exit 0; 2 passed, 0 failed. |
+| Slice 6 runtime check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/src/runtime --ext ts` | PASS | Exit 0; 10 files selected, 0 diagnostics. |
+| Slice 6 runtime fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/src/runtime --ext ts --include 'durable-saga-restart'` | PASS | Exit 0; 1 file selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -132,6 +137,7 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | Durable runtime factory tests | PASS | `create-durable-saga-runtime_test.ts`: 2 passed, 0 failed | Covers default `KvSagaStore` injection and injected store/KV preservation. |
 | Store-less warning tests | PASS | `create-saga-runtime_test.ts`: 2 passed, 0 failed | Covers exactly one warning per injected logger and no warning when a store is present. |
 | Standalone durable runtime test | PASS | `saga-supervisor_test.ts`: 1 passed, 0 failed | Covers default native supervisor state persistence across repeated correlated messages; `startSagaRunner()` uses the same supervisor default. |
+| Cross-restart integration test | PASS | `durable-saga-restart_test.ts`: 2 passed, 0 failed | Covers second runtime resuming persisted state/version over same KV and stale expected-version rejection. |
 
 ### Consumer Gates
 

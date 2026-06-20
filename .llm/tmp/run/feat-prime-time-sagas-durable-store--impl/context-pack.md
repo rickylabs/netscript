@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1-5 product code are implemented and validated. `KvSagaStore` provides durable Deno KV state; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core warns once per logger when composed store-less; the sagas service starts with the durable runtime and closes KV on stop; the standalone supervisor now defaults native runtimes to durable KV unless a legacy adapter, custom engine, or store is injected, and the runner inherits that default. Remaining approved work: restart integration tests, docs correction, and final validation sweep.
+Slices 1-6 are implemented and validated. `KvSagaStore` provides durable Deno KV state; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core warns once per logger when composed store-less; the sagas service starts with the durable runtime and closes KV on stop; the standalone supervisor/runner default native path is durable; cross-restart integration coverage proves a second runtime resumes persisted state/version over the same KV and stale expected-version writes fail. Remaining approved work: docs correction and final validation sweep.
 
 ## Completed
 
@@ -25,17 +25,18 @@ Slices 1-5 product code are implemented and validated. `KvSagaStore` provides du
 - Implemented and validated slice 3 core store-less warning.
 - Implemented and validated slice 4 service durable runtime wiring.
 - Implemented and validated slice 5 standalone supervisor/runner durable default.
+- Implemented and validated slice 6 cross-restart durability and stale-version integration tests.
 
 ## In Progress
 
-- Slice 5 commit/push/PR comment cadence.
+- Slice 6 commit/push/PR comment cadence.
 
 ## Next Steps
 
-1. Commit slice 5.
+1. Commit slice 6.
 2. Push with explicit refspec.
-3. Append `commits.md` and comment PR #74 with slice 5 evidence.
-4. Start slice 6 cross-restart durability integration test.
+3. Append `commits.md` and comment PR #74 with slice 6 evidence.
+4. Start slice 7 Prisma/schema promise correction.
 
 ## Key Decisions
 
@@ -63,14 +64,15 @@ Slices 1-5 product code are implemented and validated. `KvSagaStore` provides du
 | `plugins/sagas/services/src/main.ts` | changed | Durable runtime service composition and stop cleanup. |
 | `plugins/sagas/src/runtime/saga-supervisor.ts` | changed | Durable default runtime factory and KV cleanup. |
 | `plugins/sagas/src/runtime/saga-supervisor_test.ts` | new | Standalone durable default regression test. |
+| `plugins/sagas/src/runtime/durable-saga-restart_test.ts` | new | Cross-restart durable runtime integration and stale-version failure test. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1-5 PASS | Targeted tests, scoped checks, core package check, service check, and scoped fmt passed. |
+| Static | Slices 1-6 PASS | Targeted tests, scoped checks, core package check, service check, and scoped fmt passed. |
 | Fitness | Pending | Final manual/script sweep pending later slices. |
-| Runtime | Slices 1-5 PASS | KV store, durable factory, store-less warning, and standalone durable default tests passed. |
+| Runtime | Slices 1-6 PASS | KV store, durable factory, store-less warning, standalone durable default, and cross-restart tests passed. |
 | Consumer | Slice 4 PASS | Sagas service check passed with durable runtime wiring. |
 
 ## Open Questions
