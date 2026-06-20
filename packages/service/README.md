@@ -24,7 +24,9 @@ layering rationale.
 - One-call `defineService()` preset for generated NetScript services.
 - Package-owned structural public types, so callers do not depend on Hono or oRPC type internals.
 - `build()` returns a non-listening `ServiceApp` for composition into another host.
-- `serve()` returns a `RunningService` with `addr` and `stop()` for tests and supervisors.
+- `serve()` returns a `RunningService` with `addr` and graceful `stop()` for tests and supervisors.
+- `onShutdown()` registers LIFO teardown hooks for database pools, workers, and other runtime
+  resources.
 - Offline Scalar docs through the bundled `assets/scalar.min.js` file.
 - Logger-backed startup diagnostics for database connectivity failures.
 
@@ -84,6 +86,9 @@ import { createService } from '@netscript/service';
 const running = await createService(router, { name: 'orders', version: '1.0.0' })
   .withCors({ origin: 'https://app.example.com' })
   .withLogger()
+  .onShutdown(async () => {
+    await db.$disconnect();
+  })
   .withOpenAPI({ title: 'Orders API' })
   .withDocs()
   .withRPC()
@@ -109,7 +114,8 @@ const running = await defineService(router, {
 ```
 
 The preset enables CORS, request logging, OpenAPI JSON, Scalar docs, RPC, service info, and health
-endpoints.
+endpoints. When the discovered health-check database client also exposes `$disconnect()`, the preset
+registers a shutdown hook that releases that client exactly once during `stop()`.
 
 ## Runtime Lifecycle
 
@@ -121,6 +127,36 @@ type RunningService = {
   addr: { hostname: string; port: number; transport: 'tcp' | 'unix' };
   stop(): Promise<void>;
 };
+```
+
+`stop()` is idempotent and graceful: it stops accepting new connections, lets in-flight requests
+drain through Deno's `server.shutdown()`, runs registered shutdown hooks in reverse registration
+order, and waits for the listener to finish. Hook failures are recorded and logged without blocking
+later hooks.
+
+Register teardown hooks with `onShutdown()`:
+
+```ts
+const running = await createService(router, { name: 'users' })
+  .onShutdown(async ({ reason }) => {
+    await audit.flush({ reason });
+  })
+  .onShutdown(async () => {
+    await db.$disconnect();
+  })
+  .withHealth()
+  .serve({ port: 3000, drainTimeoutMs: 10_000 });
+
+await running.stop();
+```
+
+`serve()` installs `SIGINT`/`SIGTERM` handlers by default (`SIGINT`/`SIGBREAK` on Windows). Disable
+that when another host owns process signals:
+
+```ts
+const running = await createService(router, { name: 'embedded' })
+  .withHealth()
+  .serve({ port: 0, handleSignals: false });
 ```
 
 Pass an external signal when a parent process owns cancellation:

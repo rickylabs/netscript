@@ -32,3 +32,13 @@ documentation.
 - **Severity:** minor
 - **Action:** accept
 - **Evidence:** `.llm/tmp/run/feat-framework-prime-time--supervisor/plan-eval-summary.md`
+
+## 2026-06-20 — Root architecture gate has unrelated pre-existing failures
+
+- **What:** `deno task arch:check` exits 1 on repo-wide doctrine findings outside this slice.
+- **Source:** `rtk proxy deno task arch:check`
+- **Expected:** Approved plan names `deno task arch:check` as a gate.
+- **Actual:** Root gate reports 58 FAIL / 143 WARN / 1 INFO, with failures in root metadata, `packages/cli`, `packages/plugin`, `packages/plugin-workers-core`, and plugin CLI/test files. Touched `packages/service` files are not listed as failures; `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/service` exits 0 with one pre-existing warning about `docs/architecture.md` archetype wording.
+- **Severity:** minor
+- **Action:** accept
+- **Evidence:** Root gate failed on unrelated existing repo debt; scoped service doctrine gate passed.

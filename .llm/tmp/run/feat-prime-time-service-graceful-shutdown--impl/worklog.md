@@ -68,6 +68,7 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | 2026-06-20 | 3 | listener | Wired listener stop/external abort/OS signals through the coordinator; added runtime tests for in-flight drain and signal listener hygiene. |
 | 2026-06-20 | 4 | builder wiring | Added `ServiceBuilder.onShutdown()`, threaded hooks into the listener, and covered stop/signal/failure/timeout behavior in service tests. |
 | 2026-06-20 | 5 | preset DB drain | `defineService()` now registers `$disconnect` for capable DB clients; focused preset tests cover capable and non-capable clients. |
+| 2026-06-20 | 6 | docs and final gates | Updated README lifecycle docs and ran final static, runtime, publish, JSR, consumer, doc-lint, and doctrine gates. |
 
 ## Decisions
 
@@ -83,6 +84,7 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | ----- | -------- | ------------------ |
 | `.claude/04-services.md` and `.claude/06-infrastructure.md` referenced by overlay are absent in this worktree. | minor | yes |
 | Slice-specific `plan-eval.md` is absent; supervisor `plan-eval-summary.md` records `service-graceful-shutdown` PASS. | minor | yes |
+| Root `deno task arch:check` fails on unrelated existing repo debt; scoped `packages/service` doctrine check exits 0. | minor | yes |
 
 ## Gate Results
 
@@ -105,12 +107,27 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | slice 5 rerun exit 0; 20 files selected, 0 findings. |
 | lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | slice 5 rerun exit 0; 20 files selected, 0 findings. |
 | fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | slice 5 rerun exit 0; 20 files selected, 0 findings. |
+| check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | final rerun exit 0; 20 files selected, 0 findings. |
+| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | final rerun exit 0; 20 files selected, 0 findings. |
+| fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | final rerun exit 0; 20 files selected, 0 findings. |
+| doc lint | `deno doc --lint packages/service/mod.ts` | PASS | exit 0; checked 1 file. |
+| publish dry-run | `rtk proxy deno task publish:dry-run` from `packages/service` | PASS | exit 0; dry run complete with pre-existing `--allow-slow-types` warning covered by accepted service debt. |
+| root arch check | `rtk proxy deno task arch:check` | FAIL | exit 1; unrelated repo-wide doctrine failures outside `packages/service`. See drift. |
+| scoped doctrine check | `deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/service` | PASS | exit 0; FAIL=0 WARN=1 INFO=0. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | F-1..F-18 applicable set | NOT_RUN | Pending final gate pass. | Manual evidence to be filled after implementation. |
+| F-1 file size | PASS | New/changed service source files are below the 500 LOC hard cap; scoped doctrine check has no service failures. | |
+| F-3 layering | PASS | New private coordinator stays under `src/builder`; no plugin dependency introduced. | |
+| F-5 public surface | PASS | Additive package-owned shutdown types and `onShutdown()` method only; no new subpath. | |
+| F-6 JSR publishability | DEBT_ACCEPTED | `packages/service` publish dry-run exits 0 with existing `--allow-slow-types`; debt entry `packages/service — T4 slow-type publish carve-out` remains open. | |
+| F-7 doc-score | PASS | New public types and `onShutdown()` have TSDoc examples; `deno doc --lint packages/service/mod.ts` exits 0. | |
+| F-10 test shape | PASS | Unit, runtime, failure-path, and preset tests added; `packages/service/tests/` exits 0 with 31 tests. | |
+| F-14 console-log lint | PASS | Scoped lint exits 0; new service code uses `@netscript/logger`, no `console.*`. | |
+| F-15/F-18 exports | PASS | No upstream re-export and no new sub-barrel/subpath; root export remains curated. | |
 
 ### Runtime Gates
 
@@ -121,6 +138,7 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | listener lifecycle | PASS | `rtk proxy deno test --allow-all packages/service/tests/runtime_test.ts` exit 0; 10 passed, 0 failed. | Covers in-flight drain, listener closure, external abort, signal install/remove, repeated serve/stop. |
 | service test suite | PASS | `rtk proxy deno test --allow-all packages/service/tests/` exit 0; 29 passed, 0 failed. | Covers builder hook stop/signal/failure/timeout behavior plus existing service tests. |
 | service test suite | PASS | `rtk proxy deno test --allow-all packages/service/tests/` exit 0; 31 passed, 0 failed. | Adds `defineService()` `$disconnect` capable/non-capable DB coverage. |
+| service final suite | PASS | `rtk proxy deno test --allow-all packages/service/tests/` final exit 0; 31 passed, 0 failed. | |
 
 ### Consumer Gates
 
@@ -128,7 +146,12 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | -------- | ------ | -------- | ----- |
 | `plugins/workers/services` | NOT_RUN | Pending final consumer check. | |
 | `plugins/sagas/services` | NOT_RUN | Pending final consumer check. | |
+| `plugins/workers/services` | PASS | `deno check --unstable-kv plugins/workers/services/src/main.ts plugins/sagas/services/src/main.ts` exit 0. | Checked with sagas entrypoint in one command. |
+| `plugins/sagas/services` | PASS | `deno check --unstable-kv plugins/workers/services/src/main.ts plugins/sagas/services/src/main.ts` exit 0. | Checked with workers entrypoint in one command. |
 
 ## Handoff Notes
 
 - Inspect `packages/service/src/builder/service-shutdown.ts` and listener tests first; those prove the runtime contract.
+- Root `deno task arch:check` remains non-green due unrelated existing repo debt; scoped `packages/service` doctrine gate passes and no touched service files are implicated.
+
+Final verdict: slice `service-graceful-shutdown` implementation is complete and ready for IMPL-EVAL, with the root architecture gate caveat recorded as unrelated existing repo debt.

@@ -14,3 +14,4 @@ Format:
 - cb8936f: feat(service): add shutdown coordinator
 - 7f66af2: feat(service): drain listener shutdown
 - f2cfc34: feat(service): wire shutdown hooks
+- add8bb2: feat(service): drain preset database clients
