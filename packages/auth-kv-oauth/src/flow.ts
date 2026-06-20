@@ -1,21 +1,66 @@
+/**
+ * OAuth/OIDC sign-in, callback, session-cookie, and sign-out flow primitives.
+ *
+ * @example
+ * ```ts
+ * import { createKvOAuthFlow } from "@netscript/auth-kv-oauth/flow";
+ *
+ * const flow = createKvOAuthFlow({ provider, store, allowInsecureRequests: true });
+ * const response = await flow.signIn(new Request("https://app.example.test/auth/signin"));
+ * ```
+ *
+ * @module
+ */
+
 import * as oauth from '@panva/oauth4webapi';
 import type { Principal } from '@netscript/service/auth';
 import { buildCookieHeader, clearCookieHeader, parseCookieHeader } from './cookies.ts';
 import type { KvOAuthCookieOptions } from './cookies.ts';
 import { KvOAuthError } from './errors.ts';
-import type { OAuthProviderConfig } from './providers.ts';
+import { hasIssuerDiscovery, type OAuthProviderConfig } from './providers.ts';
 import type { KvOAuthStore, KvOAuthTokenSet } from './store.ts';
 
-type OAuthCustomFetch = NonNullable<oauth.DiscoveryRequestOptions[typeof oauth.customFetch]>;
-type OAuthTokenCustomFetch = NonNullable<
+export type { Principal } from '@netscript/service/auth';
+export type { KvOAuthJsonValidator } from './crypto.ts';
+export type {
+  OAuthEndpointProviderConfig,
+  OAuthIssuerProviderConfig,
+  OAuthProviderBaseConfig,
+  OAuthProviderClientAuthConfig,
+  OAuthProviderConfig,
+} from './providers.ts';
+export type { KvOAuthCookieOptions } from './cookies.ts';
+export type {
+  KvOAuthCrypto,
+  KvOAuthEncryptedTokens,
+  KvOAuthSessionRecord,
+  KvOAuthStore,
+  KvOAuthTokenSet,
+  KvOAuthTxn,
+} from './store.ts';
+export type { AuthSession } from '@netscript/plugin-auth-core';
+export type { AuthSessionState } from '@netscript/plugin-auth-core';
+export { AUTH_SESSION_STATES } from '@netscript/plugin-auth-core';
+
+/** Fetch replacement compatible with oauth4webapi discovery requests. */
+export type OAuthCustomFetch = NonNullable<oauth.DiscoveryRequestOptions[typeof oauth.customFetch]>;
+
+/** Fetch replacement compatible with oauth4webapi token endpoint requests. */
+export type OAuthTokenCustomFetch = NonNullable<
   oauth.TokenEndpointRequestOptions[typeof oauth.customFetch]
 >;
+
+/** Fetch replacement compatible with oauth4webapi discovery and token requests. */
+export type KvOAuthFetch = OAuthCustomFetch & OAuthTokenCustomFetch;
+
+/** Principal shape emitted by the KV OAuth backend after a successful callback. */
+export type KvOAuthPrincipal = Principal & { readonly scheme: 'custom' };
 
 /** Result returned after a successful OAuth callback. */
 export type KvOAuthCallbackResult = Readonly<{
   response: Response;
   sessionId: string;
-  principal: Principal & { readonly scheme: 'custom' };
+  principal: KvOAuthPrincipal;
 }>;
 
 /** Plain OAuth redirect dance primitives consumed by the future auth plugin HTTP surface. */
@@ -38,8 +83,10 @@ export type CreateKvOAuthFlowOptions = Readonly<{
   allowedReturnTo?: readonly string[] | ((url: URL) => boolean);
   defaultReturnTo?: string;
   allowInsecureRequests?: boolean;
-  fetch?: typeof fetch;
-  normalizePrincipal?: (context: NormalizePrincipalContext) => Principal | Promise<Principal>;
+  fetch?: KvOAuthFetch;
+  normalizePrincipal?: (
+    context: NormalizePrincipalContext,
+  ) => KvOAuthPrincipal | Promise<KvOAuthPrincipal>;
 }>;
 
 /** Context passed to custom principal mappers. */
@@ -76,7 +123,9 @@ export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlo
         returnTo: returnTo.href,
         issuer: authorizationServer.issuer,
       });
-      const url = new URL(authorizationServer.authorization_endpoint!);
+      const url = new URL(
+        requiredEndpoint(authorizationServer.authorization_endpoint, 'authorization'),
+      );
       url.searchParams.set('client_id', options.provider.clientId);
       url.searchParams.set('redirect_uri', options.provider.redirectUri);
       url.searchParams.set('response_type', 'code');
@@ -99,7 +148,9 @@ export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlo
       if (requestUrl.searchParams.has('error')) {
         throw new KvOAuthError(
           'token_exchange_failed',
-          requestUrl.searchParams.get('error_description') ?? requestUrl.searchParams.get('error')!,
+          requestUrl.searchParams.get('error_description') ??
+            requestUrl.searchParams.get('error') ??
+            'OAuth provider returned an error.',
         );
       }
       const txnId = requestUrl.searchParams.get('txn') ??
@@ -148,7 +199,7 @@ export function createKvOAuthFlow(options: CreateKvOAuthFlowOptions): KvOAuthFlo
         sessionId,
         tokenSet,
         claims,
-      }) as Principal & { readonly scheme: 'custom' };
+      });
       const now = new Date();
       await options.store.putSession({
         session: {
@@ -210,7 +261,7 @@ async function resolveAuthorizationServer(
   options: CreateKvOAuthFlowOptions,
 ): Promise<oauth.AuthorizationServer> {
   const provider = options.provider;
-  if (provider.issuer) {
+  if (hasIssuerDiscovery(provider)) {
     const issuer = new URL(provider.issuer);
     const response = await oauth.discoveryRequest(issuer, discoveryRequestOptions(options));
     const discovered = await oauth.processDiscoveryResponse(issuer, response);
@@ -222,7 +273,7 @@ async function resolveAuthorizationServer(
     };
   }
   return {
-    issuer: provider.issuer ?? new URL(provider.authorizationEndpoint!).origin,
+    issuer: new URL(provider.authorizationEndpoint).origin,
     authorization_endpoint: provider.authorizationEndpoint,
     token_endpoint: provider.tokenEndpoint,
     userinfo_endpoint: provider.userInfoEndpoint,
@@ -242,9 +293,9 @@ export function clientAuth(provider: OAuthProviderConfig): oauth.ClientAuth {
     return oauth.None();
   }
   if (provider.clientAuthMethod === 'client_secret_post') {
-    return oauth.ClientSecretPost(provider.clientSecret!);
+    return oauth.ClientSecretPost(provider.clientSecret);
   }
-  return oauth.ClientSecretBasic(provider.clientSecret!);
+  return oauth.ClientSecretBasic(provider.clientSecret);
 }
 
 /** Builds oauth4webapi token request options. */
@@ -253,7 +304,7 @@ export function requestOptions(
 ): oauth.TokenEndpointRequestOptions {
   return {
     [oauth.allowInsecureRequests]: options.allowInsecureRequests === true,
-    [oauth.customFetch]: options.fetch as OAuthTokenCustomFetch | undefined,
+    [oauth.customFetch]: options.fetch,
   };
 }
 
@@ -263,7 +314,7 @@ export function discoveryRequestOptions(
 ): oauth.DiscoveryRequestOptions {
   return {
     [oauth.allowInsecureRequests]: options.allowInsecureRequests === true,
-    [oauth.customFetch]: options.fetch as OAuthCustomFetch | undefined,
+    [oauth.customFetch]: options.fetch,
   };
 }
 
@@ -303,7 +354,7 @@ function redirect(url: URL, setCookie: string): Response {
 
 function defaultPrincipal(
   context: NormalizePrincipalContext,
-): Principal & { readonly scheme: 'custom' } {
+): KvOAuthPrincipal {
   const subject = typeof context.claims.sub === 'string' ? context.claims.sub : context.sessionId;
   const scopes = context.tokenSet.scope?.split(/\s+/).filter(Boolean) ?? context.provider.scopes;
   return {
@@ -317,4 +368,14 @@ function defaultPrincipal(
       providerId: context.provider.id,
     },
   };
+}
+
+function requiredEndpoint(value: string | undefined, endpoint: string): string {
+  if (value === undefined) {
+    throw new KvOAuthError(
+      'configuration_error',
+      `OAuth provider did not resolve an ${endpoint} endpoint.`,
+    );
+  }
+  return value;
 }

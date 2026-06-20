@@ -1,25 +1,73 @@
+/**
+ * OAuth/OIDC provider configuration helpers and presets.
+ *
+ * @example
+ * ```ts
+ * import { providers } from "@netscript/auth-kv-oauth/providers";
+ *
+ * const google = providers.google({
+ *   clientId: "client_test",
+ *   clientSecret: "secret_test",
+ *   redirectUri: "https://app.example.test/auth/callback",
+ * });
+ * ```
+ *
+ * @module
+ */
+
 import type { AuthProviderDescriptor } from '@netscript/plugin-auth-core';
 import { KvOAuthError } from './errors.ts';
+
+export type { AuthProviderCapability, AuthProviderDescriptor } from '@netscript/plugin-auth-core';
 
 /** Client authentication method used at the token endpoint. */
 export type ClientAuthMethod = 'client_secret_basic' | 'client_secret_post' | 'none';
 
-/** Normalized OAuth/OIDC provider configuration consumed by the flow. */
-export type OAuthProviderConfig = Readonly<{
+/** Shared fields present on every normalized OAuth provider. */
+export type OAuthProviderBaseConfig = Readonly<{
   id: string;
   displayName: string;
   kind: 'oauth' | 'oidc';
   clientId: string;
-  clientSecret?: string;
-  issuer?: string;
-  authorizationEndpoint?: string;
-  tokenEndpoint?: string;
   userInfoEndpoint?: string;
   redirectUri: string;
   scopes: readonly string[];
-  clientAuthMethod: ClientAuthMethod;
   extraAuthParams: Readonly<Record<string, string>>;
 }>;
+
+/** Client-authentication shape for token endpoint requests. */
+export type OAuthProviderClientAuthConfig =
+  | Readonly<{
+    clientAuthMethod: 'none';
+    clientSecret?: string;
+  }>
+  | Readonly<{
+    clientAuthMethod: 'client_secret_basic' | 'client_secret_post';
+    clientSecret: string;
+  }>;
+
+/** Normalized OAuth/OIDC provider config resolved through issuer discovery. */
+export type OAuthIssuerProviderConfig =
+  & OAuthProviderBaseConfig
+  & OAuthProviderClientAuthConfig
+  & Readonly<{
+    issuer: string;
+    authorizationEndpoint?: string;
+    tokenEndpoint?: string;
+  }>;
+
+/** Normalized OAuth/OIDC provider config with explicit static endpoints. */
+export type OAuthEndpointProviderConfig =
+  & OAuthProviderBaseConfig
+  & OAuthProviderClientAuthConfig
+  & Readonly<{
+    issuer?: undefined;
+    authorizationEndpoint: string;
+    tokenEndpoint: string;
+  }>;
+
+/** Normalized OAuth/OIDC provider configuration consumed by the flow. */
+export type OAuthProviderConfig = OAuthIssuerProviderConfig | OAuthEndpointProviderConfig;
 
 /** Input accepted by {@link defineOAuthProvider}. */
 export type OAuthProviderInput = Readonly<{
@@ -90,21 +138,83 @@ export function defineOAuthProvider(input: OAuthProviderInput): OAuthProviderCon
     );
   }
 
-  return Object.freeze({
+  const base = {
     id: input.id,
     displayName: input.displayName ?? title(input.id),
     kind: input.kind ?? (input.issuer ? 'oidc' : 'oauth'),
     clientId: input.clientId,
-    clientSecret: input.clientSecret,
-    issuer: input.issuer,
-    authorizationEndpoint: input.authorizationEndpoint,
-    tokenEndpoint: input.tokenEndpoint,
     userInfoEndpoint: input.userInfoEndpoint,
     redirectUri: input.redirectUri,
     scopes,
     clientAuthMethod,
     extraAuthParams: Object.freeze({ ...(input.extraAuthParams ?? {}) }),
+  };
+  if (input.issuer !== undefined) {
+    if (clientAuthMethod === 'none') {
+      return Object.freeze({
+        ...base,
+        clientAuthMethod,
+        clientSecret: input.clientSecret,
+        issuer: input.issuer,
+        authorizationEndpoint: input.authorizationEndpoint,
+        tokenEndpoint: input.tokenEndpoint,
+      });
+    }
+    const clientSecret = input.clientSecret;
+    if (clientSecret === undefined) {
+      throw new KvOAuthError(
+        'configuration_error',
+        `Provider ${input.id} requires clientSecret for ${clientAuthMethod}.`,
+      );
+    }
+    return Object.freeze({
+      ...base,
+      clientAuthMethod,
+      clientSecret,
+      issuer: input.issuer,
+      authorizationEndpoint: input.authorizationEndpoint,
+      tokenEndpoint: input.tokenEndpoint,
+    });
+  }
+
+  const authorizationEndpoint = input.authorizationEndpoint;
+  const tokenEndpoint = input.tokenEndpoint;
+  if (authorizationEndpoint === undefined || tokenEndpoint === undefined) {
+    throw new KvOAuthError(
+      'configuration_error',
+      'OAuth provider requires explicit authorization and token endpoints without an issuer.',
+    );
+  }
+  if (clientAuthMethod === 'none') {
+    return Object.freeze({
+      ...base,
+      clientAuthMethod,
+      clientSecret: input.clientSecret,
+      authorizationEndpoint,
+      tokenEndpoint,
+    });
+  }
+  const clientSecret = input.clientSecret;
+  if (clientSecret === undefined) {
+    throw new KvOAuthError(
+      'configuration_error',
+      `Provider ${input.id} requires clientSecret for ${clientAuthMethod}.`,
+    );
+  }
+  return Object.freeze({
+    ...base,
+    clientAuthMethod,
+    clientSecret,
+    authorizationEndpoint,
+    tokenEndpoint,
   });
+}
+
+/** Returns true when a provider is resolved through issuer discovery. */
+export function hasIssuerDiscovery(
+  provider: OAuthProviderConfig,
+): provider is OAuthIssuerProviderConfig {
+  return provider.issuer !== undefined;
 }
 
 /** Converts a provider config into the AS1 descriptor shape. */

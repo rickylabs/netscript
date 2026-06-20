@@ -1,4 +1,22 @@
+/**
+ * Cookie helpers for KV OAuth transaction and session identifiers.
+ *
+ * @example
+ * ```ts
+ * import { buildCookieHeader } from "@netscript/auth-kv-oauth/cookies";
+ *
+ * const header = buildCookieHeader(
+ *   "sess_test",
+ *   new Request("https://app.example.test/"),
+ * );
+ * ```
+ *
+ * @module
+ */
+
 import type { AuthnRequest } from '@netscript/service/auth';
+
+export type { AuthnRequest } from '@netscript/service/auth';
 import { KvOAuthError } from './errors.ts';
 
 /** Cookie policy for the server-side session id. */
