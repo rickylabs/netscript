@@ -95,6 +95,26 @@ AS3). Design note carried for IMPL-EVAL: AS2a IdP-managed backends throw a typed
 kv-oauth implements all sub-ports for real. Steer: `codex exec resume <thread-id> "<msg>"` from each
 worktree. Background launch jobs: AS2a=btjrtg4cv, AS2b=bw722t4ps (notify on turn completion).
 
+**AS2a ∥ AS2b LANDED + leaf PRs open (2026-06-20 ~17:0x UTC).** Both turns completed exit 0.
+- **AS2a** `59372fdf` "refactor(auth-backends): make WorkOS and Better Auth pure backends" — 14 files
+  +841/-215; both packages expose pure `AuthBackendPort` factories; mount/gen-tool/hono dropped with
+  rationale in commit body; typed `AuthBackendOperationUnsupportedError` for IdP-managed sub-port ops.
+  Supervisor-verified gates: check 0/0, lint 0/0, fmt 0/0, mod.ts check 0/0, test **15/0**.
+  **Leaf PR #87** (base `feat/prime-time/auth`, labels type:sub-pr/area:plugins/area:auth/status:impl-eval).
+  **IMPL-EVAL dispatched** (qwen3.7-max, #87 comment 4758621866). git status only CRLF-drift noise.
+- **AS2b** `5f17ca9b` "feat(auth-kv-oauth): pure KV-backed OAuth2/OIDC AuthBackendPort backend" — 13
+  files +1838; new `packages/auth-kv-oauth`; full `AuthBackendPort` (all sub-ports real, no unsupported
+  throws — backend owns its store); `createKvOAuthFlow` plain non-HTTP primitives (panva/oauth4webapi);
+  both rescopes applied (full port + NO HTTP). `deno.lock` +10 = new-pkg workspace entry (expected).
+  Supervisor-verified gates: check 0, lint 0, fmt 0, test **8/0** (security baseline incl. refresh-reuse
+  detection certified), mod.ts 0, publish:dry-run 0. **Leaf PR #88** (same labels/base).
+  **IMPL-EVAL dispatched** (qwen3.7-max, #88 comment 4758645717) — flagged OIDC-nonce test-coverage
+  nuance for evaluator scrutiny. git status clean (no CRLF noise).
+
+Next: await both IMPL-EVAL verdicts → on PASS merge each into `feat/prime-time/auth` (independent;
+either may merge first) → update umbrella PR #86 checklist → AS3 (unified plugins/auth oRPC service)
+unblocked once both land. Two FAIL cycles per leaf → escalate.
+
 **Launch mechanics that actually worked (verified 2026-06-20):**
 
 - `wsl.exe -u codex -- bash -lc 'cd /home/...; ...'` — the inner `cd` SILENTLY does not take effect
