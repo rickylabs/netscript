@@ -1,5 +1,10 @@
-import { assertEquals } from '@std/assert';
-import { createWorkosAuthenticator, type WorkosSessionClient } from '../mod.ts';
+import { assert, assertEquals, assertRejects } from '@std/assert';
+import {
+  AuthBackendOperationUnsupportedError,
+  createWorkosAuthenticator,
+  createWorkosBackend,
+  type WorkosSessionClient,
+} from '../mod.ts';
 import type { AuthnRequest } from '@netscript/service/auth';
 import type {
   WorkosSessionAuthenticationResult,
@@ -118,6 +123,86 @@ Deno.test('createWorkosAuthenticator emits Set-Cookie when WorkOS refresh return
   });
 });
 
+Deno.test('createWorkosBackend exposes AuthBackendPort provider and session ports', async () => {
+  const backend = createWorkosBackend({
+    workos: workosClient({
+      authenticated: true,
+      accessToken: workosAccessToken({ iat: 1767225600, exp: 1767312000 }),
+      authenticationMethod: 'Password',
+      sessionId: 'sess_123',
+      organizationId: 'org_123',
+      role: 'admin',
+      permissions: ['users:read'],
+      user: { id: 'user_123', email: 'ada@example.com' },
+    }),
+    cookiePassword: 'x'.repeat(32),
+    providers: [{
+      id: 'workos-sso',
+      displayName: 'WorkOS SSO',
+      kind: 'saml',
+      capabilities: ['signin', 'callback', 'session'],
+    }],
+  });
+
+  assertEquals(backend.name, 'workos');
+  assertEquals(await backend.providers.listProviders(), [{
+    id: 'workos-sso',
+    displayName: 'WorkOS SSO',
+    kind: 'saml',
+    capabilities: ['signin', 'callback', 'session'],
+  }]);
+  assertEquals((await backend.providers.getProvider('workos-sso'))?.displayName, 'WorkOS SSO');
+
+  const authn = await backend.authenticate(requestWithCookie('sealed'));
+  assert(authn.ok);
+  assertEquals(authn.principal.subject, 'user_123');
+
+  const session = await backend.sessions.getSession({ token: 'sealed' });
+  assert(session);
+  assertEquals(session.id, 'sess_123');
+  assertEquals(session.userId, 'user_123');
+  assertEquals(session.scopes, ['users:read']);
+  assertEquals(session.issuedAt, '2026-01-01T00:00:00.000Z');
+
+  const mapping = backend.principalMapper.mapSessionToPrincipal(session);
+  assertEquals(mapping.principal.subject, 'user_123');
+  assertEquals(mapping.principal.claims.sessionId, 'sess_123');
+
+  const token = await backend.crypto.sealSessionToken(session);
+  assertEquals(await backend.crypto.openSessionToken(token), 'sess_123');
+});
+
+Deno.test('createWorkosBackend throws typed errors for unsupported managed-session operations', async () => {
+  const backend = createWorkosBackend({
+    workos: workosClient({ authenticated: false, reason: 'invalid_jwt' }),
+    cookiePassword: 'x'.repeat(32),
+  });
+
+  for (
+    const [operation, run] of [
+      [
+        'sessions.createSession',
+        () =>
+          backend.sessions.createSession({
+            userId: 'user_123',
+            subject: 'user_123',
+            expiresAt: '2026-01-02T00:00:00.000Z',
+          }),
+      ],
+      ['sessions.refreshSession', () => backend.sessions.refreshSession('sess_123')],
+      ['sessions.revokeSession', () => backend.sessions.revokeSession('sess_123')],
+    ] as const
+  ) {
+    const error = await assertRejects(async () => {
+      await run();
+    }, AuthBackendOperationUnsupportedError);
+    assertEquals(error.name, 'AuthBackendOperationUnsupportedError');
+    assertEquals(error.backendName, 'workos');
+    assertEquals(error.operation, operation);
+    assert(error.reason.length > 0);
+  }
+});
+
 function workosClient(
   authenticationResult: WorkosSessionAuthenticationResult,
   refreshResult: WorkosSessionRefreshResult = authenticationResult,
@@ -141,4 +226,12 @@ function requestWithCookie(value: string | undefined): AuthnRequest {
     method: 'GET',
     path: '/private',
   };
+}
+
+function workosAccessToken(claims: Record<string, unknown>): string {
+  return `header.${base64Url(JSON.stringify(claims))}.signature`;
+}
+
+function base64Url(value: string): string {
+  return btoa(value).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
 }
