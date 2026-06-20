@@ -1,13 +1,14 @@
 // Sagas Plugin Prisma Schema
 // This schema defines the database tables for the sagas plugin.
-// Saga state is stored in Postgres for persistence and querying via PrismaSagaStore.
+// Runtime saga state is persisted by the plugin KV store; these tables are a
+// Postgres read model/projection for API querying, analytics, and debugging.
 
 // ============================================================================
 // SAGA INSTANCE
 // ============================================================================
 
-/// Saga instance state - stored in Postgres for durable saga execution
-/// This is the required schema for @saga-bus/store-prisma PrismaSagaStore
+/// Saga instance read-model state projected into Postgres for API queries
+/// The native saga engine's durable write path is KvSagaStore, not Prisma
 model SagaInstance {
   /// Unique saga instance identifier (UUID)
   id            String   @db.VarChar(100)
@@ -31,7 +32,7 @@ model SagaInstance {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  // Composite primary key required by saga-bus store-prisma
+  // Composite primary key for stable API read-model lookups
   @@id([sagaName, id], name: "sagaName_id")
 
   // Index for correlation ID lookups (message routing)
@@ -145,4 +146,3 @@ model SagaExecutionHistory {
   @@index([outcome])
   @@map("saga_execution_history")
 }
-

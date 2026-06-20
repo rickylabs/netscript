@@ -82,6 +82,8 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | 2026-06-20 | 5 | validation | Standalone supervisor durability test, scoped runtime check, and scoped fmt gate passed. |
 | 2026-06-20 | 6 | implementation | Added cross-restart durable runtime integration coverage over a shared in-memory KV plus stale expected-version failure coverage. |
 | 2026-06-20 | 6 | validation | Restart integration test, scoped runtime check, and scoped fmt gate passed. |
+| 2026-06-20 | 7 | implementation | Corrected `sagas.prisma` comments to describe Postgres tables as API read-model/projection storage instead of the engine durable store. |
+| 2026-06-20 | 7 | validation | Plugin TS fmt gate passed; focused stale-promise search returned no matches in changed schema/service surfaces; manual diff reviewed comment-only schema change. |
 
 ## Decisions
 
@@ -122,6 +124,9 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | Slice 6 restart test | `deno test --unstable-kv --allow-all plugins/sagas/src/runtime/durable-saga-restart_test.ts` | PASS | Exit 0; 2 passed, 0 failed. |
 | Slice 6 runtime check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/src/runtime --ext ts` | PASS | Exit 0; 10 files selected, 0 diagnostics. |
 | Slice 6 runtime fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/src/runtime --ext ts --include 'durable-saga-restart'` | PASS | Exit 0; 1 file selected, 0 findings. |
+| Slice 7 plugin fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --ext ts` | PASS | Exit 0; 60 files selected, 0 findings. |
+| Slice 7 stale promise search | `rg "PrismaSagaStore\|store-prisma\|Prisma store for durable saga state\|stored in Postgres for durable saga" plugins/sagas/database/sagas.prisma plugins/sagas/services/src/main.ts` | PASS | Exit 1; no matches. |
+| Slice 7 manual diff | `git diff -- plugins/sagas/database/sagas.prisma plugins/sagas/services/src/main.ts` | PASS | Comment-only `.prisma` change; service docstring already corrected in slice 4. |
 
 ### Fitness Gates
 
