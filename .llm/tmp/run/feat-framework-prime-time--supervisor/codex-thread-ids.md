@@ -73,6 +73,28 @@ consumer-import exit 0. **AS1 MERGED** into `feat/prime-time/auth` at `7c063240`
 **Auth umbrella PR #86** opened draft (base #73, labels `type:umbrella`/`area:plugins`/`area:auth`)
 with AS1✅/AS2a/AS2b/AS3/AS4/AS5/AS6 checklist. Next: launch AS2a ∥ AS2b off `feat/prime-time/auth`.
 
+### Track-5 auth-plugin — AS2a ∥ AS2b launch (2026-06-20 ~16:42 UTC)
+
+Both worktrees added off `feat/prime-time/auth` @ `7c063240` (both see `packages/plugin-auth-core/`);
+upstream UNSET on both (push.default landmine defused); briefs mandate explicit refspec push anyway.
+Launched fresh threads via `~/launch_slice.sh <prompt>` (mobile-visible `send-message-v2`),
+approval=never, sandbox=danger-full-access, gpt-5.5, AGENTS.md loaded, turn active.
+
+| Slice | Thread id | Worktree | Branch / base | Brief bytes |
+| --- | --- | --- | --- | --- |
+| AS2a backends→pure | `019ee57b-8a42-7742-9fcb-ddb5fc6ddd51` | /home/codex/repos/netscript-pt-auth-backends-refactor | feat/prime-time/auth-backends-refactor @ 7c063240 | 9707 |
+| AS2b auth-kv-oauth | `019ee57c-2b73-7042-9024-97da32968b80` | /home/codex/repos/netscript-pt-auth-kv-oauth | feat/prime-time/auth-kv-oauth @ 7c063240 | 9869 |
+
+Briefs: `slices/auth-plugin/as2a-backends-refactor/implement.md` (refactor auth-workos+auth-better-auth
+to pure `AuthBackendPort`; DROP mountBetterAuthHandler+BetterAuthMountOptions+mount_test.ts+hono
+import+gen-better-auth-prisma.ts with committed rationale; auth-workos refactor-only) and
+`slices/auth-plugin/as2b-kv-oauth/implement.md` (new pure non-HTTP kv-oauth `AuthBackendPort` backend
+absorbing Track-4 plan; DROP S5 mountKvOAuthHandler — HTTP moves to AS3; expose flow primitives for
+AS3). Design note carried for IMPL-EVAL: AS2a IdP-managed backends throw a typed
+`AuthBackendOperationUnsupportedError` (not a no-op) for sub-port ops with no real upstream equivalent;
+kv-oauth implements all sub-ports for real. Steer: `codex exec resume <thread-id> "<msg>"` from each
+worktree. Background launch jobs: AS2a=btjrtg4cv, AS2b=bw722t4ps (notify on turn completion).
+
 **Launch mechanics that actually worked (verified 2026-06-20):**
 
 - `wsl.exe -u codex -- bash -lc 'cd /home/...; ...'` — the inner `cd` SILENTLY does not take effect
