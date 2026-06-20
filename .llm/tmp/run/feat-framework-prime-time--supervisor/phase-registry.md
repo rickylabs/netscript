@@ -57,6 +57,25 @@ could open). Each branch's remote was created with an explicit `HEAD:refs/heads/
   socket-removal procedure (user-authorized).
 - See memory `wsl-repo-push-default-upstream` for the push refspec rule.
 
+### Scope expansion — auth adapters (user-directed 2026-06-20)
+
+User requirement: the service auth seam must integrate well with **most better-auth features** and
+with **WorkOS**, via shipped **adapters**. Split into two tracks so the plan-gate and the
+dependency-free core are both preserved:
+
+- **Track 1 — live steer of #77 (additive, no re-PLAN-EVAL).** Steered thread
+  `019ee2b9-4a4a-…` to make the seam *adapter-ready*, WITHOUT adding any auth vendor dep to core
+  `@netscript/service`: `AuthnRequest.headers()/cookie()`, an optional response/`Set-Cookie`
+  channel on the authn success branch (refresh-on-read), `Principal.claims`/`scheme:'custom'`
+  multi-tenant fitness, and an external-auth-router mounting doc. Recorded as drift (additive) in
+  the slice's `drift.md`. Steer log: `/home/codex/pt-service-auth-seam-steer.log`.
+- **Track 2 — NEW gated slice `service-auth-adapters` (status: authoring → PLAN-EVAL).** Real
+  `better-auth` + `@workos-inc/*` adapters implementing `AuthenticatorPort`/`AuthorizerPort` against
+  the widened contract. Deps are npm → MUST be `catalog:`; placement (separate optional package(s)
+  vs subpath) is a doctrine decision resolved in research. Must go through research → plan →
+  PLAN-EVAL (OpenHands minimax-M3) and be presented to the user BEFORE any generator launch. Depends
+  on #77 merging first (consumes the widened seam).
+
 ## Notes
 
 - Each slice brief must mandate `use harness`, activate ALL relevant skills + ARCHETYPE + SCOPE,
