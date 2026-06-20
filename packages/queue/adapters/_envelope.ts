@@ -4,7 +4,8 @@
  * @module
  */
 
-import type { EnqueueOptions, MessageContext } from '../ports/message-queue.ts';
+import type { DeadLetterReason, DeadLetterRecord } from '../ports/dead-letter.ts';
+import type { EnqueueOptions, MessageContext, NackOptions } from '../ports/message-queue.ts';
 
 /**
  * Internal message envelope that preserves transport metadata.
@@ -24,6 +25,24 @@ export interface MessageEnvelope<T> {
   enqueuedAt: string;
   /** Delivery attempt counter. */
   deliveryCount: number;
+}
+
+/**
+ * Message metadata required to create a dead-letter record.
+ */
+export interface DeadLetterMessageMetadata<T> {
+  /** Provider or envelope message identifier. */
+  readonly messageId: string;
+  /** Queue namespace where the message was consumed. */
+  readonly queueName: string;
+  /** Original payload. */
+  readonly payload: T;
+  /** Message headers such as trace context. */
+  readonly headers: Record<string, string>;
+  /** Number of delivery attempts before terminal failure. */
+  readonly deliveryCount: number;
+  /** Original enqueue timestamp. */
+  readonly enqueuedAt: Date | string;
 }
 
 /**
@@ -66,7 +85,7 @@ export function createMessageContext(
   headers: Record<string, string>,
   deliveryCount: number,
   ack: () => Promise<void>,
-  nack: (options?: { requeue?: boolean }) => Promise<void>,
+  nack: (options?: NackOptions) => Promise<void>,
 ): MessageContext {
   return {
     messageId,
@@ -76,4 +95,30 @@ export function createMessageContext(
     ack,
     nack,
   };
+}
+
+/**
+ * Convert queue message metadata into a structured dead-letter record.
+ */
+export function toDeadLetterRecord<T>(
+  message: DeadLetterMessageMetadata<T>,
+  reason: DeadLetterReason,
+  options: Pick<NackOptions, 'errorCode' | 'errorMessage'> = {},
+): DeadLetterRecord<T> {
+  return {
+    messageId: message.messageId,
+    queueName: message.queueName,
+    payload: message.payload,
+    headers: message.headers,
+    deliveryCount: message.deliveryCount,
+    enqueuedAt: formatIso(message.enqueuedAt),
+    failedAt: new Date().toISOString(),
+    reason,
+    errorCode: options.errorCode,
+    errorMessage: options.errorMessage,
+  };
+}
+
+function formatIso(value: Date | string): string {
+  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 }
