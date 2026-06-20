@@ -103,3 +103,4 @@ are green; root-wide doctrine/fmt caveats are recorded as unrelated baseline deb
 - 9f53a85: feat(sagas): add kv idempotency stores
 - 8290297: feat(sagas): wire durable idempotency roots
 - 2cb7908: test(sagas): cover durable idempotency flow
+- 8fdb186a: chore(sagas): record idempotency gate evidence
