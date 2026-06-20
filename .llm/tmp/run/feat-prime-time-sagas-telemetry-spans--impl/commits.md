@@ -10,3 +10,4 @@ Format:
 
 ## Log
 
+- eeff38c: feat(sagas): extend telemetry span seam

@@ -12,23 +12,25 @@
 
 ## Current State
 
-S1 implementation is complete locally: the core telemetry seam accepts parent trace context, `SagaEngineOptions` accepts optional instrumentation with a NOOP default, and the focused S1 gates pass. No implementation commit has been created yet.
+S2 implementation is complete locally: the core telemetry seam accepts parent trace context, `SagaEngineOptions` accepts optional instrumentation with a NOOP default, and `SagaEngine.#handleEntry` emits `saga.handle` spans around handler + persistence. S1 is committed and pushed; S2 is ready to commit.
 
 ## Completed
 
 - Read required AGENTS, harness, doctrine, PR, tools, Deno toolchain, JSR, archetype, service overlay, gate matrix, debt, research, plan, and plan-meta artifacts.
 - Confirmed branch `feat/prime-time/sagas-telemetry-spans` tracks `origin/feat/prime-time/sagas-telemetry-spans`.
 - Implemented S1 seam shape extension and focused telemetry seam test.
+- Committed and pushed S1 (`eeff38c`), with PR #76 progress comment.
+- Implemented S2 handle span lifecycle and tests.
 
 ## In Progress
 
-- S1 commit/push/PR comment.
+- S2 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit S1.
+1. Commit S2.
 2. Append `commits.md`, push explicit refspec, and comment PR #76.
-3. Start S2 engine handle span lifecycle.
+3. Start S3 instrumentation threading through bridge/runtime composition.
 
 ## Key Decisions
 
@@ -47,14 +49,15 @@ S1 implementation is complete locally: the core telemetry seam accepts parent tr
 | `packages/plugin-sagas-core/src/telemetry/mod.ts` | changed | Exports `SagaTraceParent`. |
 | `packages/plugin-sagas-core/src/runtime/saga-engine.ts` | changed | Adds optional engine instrumentation field with NOOP default. |
 | `packages/plugin-sagas-core/tests/telemetry/instrumentation_test.ts` | new | Proves parent context forwards into tracer options. |
+| `packages/plugin-sagas-core/tests/telemetry/saga-engine-spans_test.ts` | new | Proves success and failure handle span lifecycle and duration metric. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S1 PASS | check/lint/fmt scoped to `packages/plugin-sagas-core` passed. |
-| Fitness | IN_PROGRESS | S1 public-surface additive seam covered by test; full manual evidence pending final gate pass. |
-| Runtime | S1 PASS | telemetry seam unit test passed. |
+| Static | S2 PASS | check/lint/fmt scoped to `packages/plugin-sagas-core` passed. |
+| Fitness | IN_PROGRESS | S1/S2 public-surface/runtime invariants covered by tests; full manual evidence pending final gate pass. |
+| Runtime | S2 PASS | telemetry seam and engine span tests passed; existing runtime tests passed. |
 | Consumer | NOT_RUN | pending |
 
 ## Open Questions
@@ -67,3 +70,5 @@ S1 implementation is complete locally: the core telemetry seam accepts parent tr
 - Debt: none created.
 
 ## Commits
+
+- eeff38c: feat(sagas): extend telemetry span seam

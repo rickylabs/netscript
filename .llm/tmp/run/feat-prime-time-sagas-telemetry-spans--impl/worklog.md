@@ -68,6 +68,8 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | 2026-06-20 | preflight | bootstrap | Read harness, doctrine, plan artifacts; branch tracks `origin/feat/prime-time/sagas-telemetry-spans`. |
 | 2026-06-20 | S1 | implementation | Added `SagaTraceParent`, tracer parent forwarding, exported type, and `SagaEngineOptions.instrumentation` with NOOP default. |
 | 2026-06-20 | S1 | gates | Scoped check/lint/fmt and focused telemetry test passed. |
+| 2026-06-20 | S2 | implementation | Added `saga.handle` span lifecycle around handler + persistence with state events, outcome, exception, and duration recording. |
+| 2026-06-20 | S2 | gates | Scoped check/lint/fmt, telemetry tests, and existing runtime tests passed. |
 
 ## Decisions
 
@@ -93,6 +95,11 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | S1 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --ext ts` | PASS | 90 files selected; 0 findings. |
 | S1 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext ts` | PASS | 90 files selected; 0 findings. |
 | S1 telemetry test | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/telemetry/instrumentation_test.ts` | PASS | 1 passed, 0 failed. |
+| S2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --ext ts` | PASS | 91 files selected; 0 findings. |
+| S2 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --ext ts` | PASS | 91 files selected; 0 findings. |
+| S2 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext ts` | PASS | 91 files selected; 0 findings. |
+| S2 telemetry tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/telemetry/instrumentation_test.ts packages/plugin-sagas-core/tests/telemetry/saga-engine-spans_test.ts` | PASS | 3 passed, 0 failed. |
+| S2 runtime tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/runtime` | PASS | 13 passed, 0 failed. |
 
 ### Fitness Gates
 
@@ -105,6 +112,7 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | Handle span behavior | NOT_RUN | pending targeted tests | Required by S2/S3/S5. |
+| S2 handle span behavior | PASS | `saga-engine-spans_test.ts` | Proves success and failure span lifecycle plus duration metric. |
 
 ### Consumer Gates
 
