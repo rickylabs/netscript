@@ -39,10 +39,33 @@ required summary artifacts keep local and cloud agents synchronized.
 | Thread replies   | Optional `OPENHANDS_REPLIES_PATH` review-comment replies.                                      |
 | Chainable token  | `PAT_TOKEN` or GitHub App token; required for cloud-created events to trigger more workflows.   |
 
+## Default tooling — the agentic suite (use this to dispatch and check status)
+
+`.llm/tools/agentic/` is the **default mechanism** for dispatching OpenHands runs and reading their
+verdict — reach for it before hand-writing a `gh`/REST PowerShell one-liner (note: `gh` is not on
+the Windows PATH here). See `.llm/tools/agentic/README.md` for full flags and exit codes.
+
+| Need | Tool |
+| ---- | ---- |
+| Validate the prompt contract → build the `@openhands-agent` trigger → POST it | `dispatch-openhands.ts` (`--dry-run` shows the exact comment, no token/network) |
+| Read the run verdict (committed trace by default, or the PR status comment) | `openhands-status.ts` (`--source local` \| `--source remote`) |
+
+`dispatch-openhands.ts` enforces the handoff contract in code (prompt MUST begin with `use harness`
+and carry a `## SKILL` chapter — see step 2 below) and reads the GitHub token only from an
+in-process env var (`--token-env`, default `GH_TOKEN`), never from a file or argv. It posts exactly
+one trigger comment, respecting the per-PR concurrency-cancel rule. `openhands-status.ts --source
+local` needs no token and reads the newest committed trace under `.llm/tmp/run/openhands/pr-<n>/`.
+
 ## Workflow
 
 1. Read `AGENTS-handoff.md` for trigger syntax and token rules.
 2. If the prompt says `use harness`, load `netscript-harness` and follow its evaluator separation.
+   **Every dispatch prompt you author MUST begin with `use harness` and include a `## SKILL`
+   chapter** — a bullet list naming each relevant repo skill for the cloud agent to activate
+   (`netscript-harness`, `netscript-doctrine`, `jsr-audit`, `netscript-tools`, `netscript-pr`,
+   `netscript-deno-toolchain`, etc.), each with a one-line note of why it applies. **Be generous:**
+   the more relevant skills you pass, the more efficient the agent. Skills are thin and the agents
+   use them appropriately, so under-listing is the failure mode, not over-listing.
 3. Choose the smallest trigger:
    - add `fix-me` or `openhands` for default model work,
    - add `agent:<profile>` for a model-label run,
@@ -90,6 +113,7 @@ required summary artifacts keep local and cloud agents synchronized.
 | `.openhands/microagents/repo.md`         | Updating OpenHands repo context            |
 | `ops/openhands/docker-compose.yml`       | Deploying or changing the VPS Web UI       |
 | `.llm/harness/workflow/agent-handoff.md` | Integrating OpenHands with harness phases  |
+| `.llm/tools/agentic/README.md`           | Dispatching/checking OpenHands via the suite |
 
 ## Checklist
 
