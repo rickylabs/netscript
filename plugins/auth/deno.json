@@ -8,7 +8,9 @@
     "./public": "./src/public/mod.ts",
     "./plugin": "./src/plugin/mod.ts",
     "./contracts": "./contracts.ts",
-    "./services": "./services/src/main.ts"
+    "./services": "./services/src/main.ts",
+    "./streams": "./streams/mod.ts",
+    "./streams/server": "./streams/server.ts"
   },
   "imports": {
     "@netscript/auth-better-auth": "../../packages/auth-better-auth/mod.ts",
@@ -20,7 +22,10 @@
     "@netscript/plugin-auth-core/contracts/v1": "../../packages/plugin-auth-core/src/contracts/v1/mod.ts",
     "@netscript/plugin-auth-core/domain": "../../packages/plugin-auth-core/src/domain/mod.ts",
     "@netscript/plugin-auth-core/ports": "../../packages/plugin-auth-core/src/ports/mod.ts",
+    "@netscript/plugin-auth-core/streams": "../../packages/plugin-auth-core/src/streams/mod.ts",
     "@netscript/plugin-auth-core/testing": "../../packages/plugin-auth-core/src/testing/mod.ts",
+    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
+    "@netscript/plugin-streams-core/testing": "../../packages/plugin-streams-core/src/testing/mod.ts",
     "@netscript/plugin/sdk": "../../packages/plugin/src/sdk/mod.ts",
     "@netscript/service": "../../packages/service/mod.ts",
     "@netscript/service/auth": "../../packages/service/src/auth/mod.ts",
@@ -28,10 +33,12 @@
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@workos-inc/node": "npm:@workos-inc/node@^10.4.0",
+    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
+    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db",
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
-    "check": "deno check --unstable-kv mod.ts src/public/mod.ts src/plugin/mod.ts contracts.ts services/src/main.ts",
+    "check": "deno check --unstable-kv mod.ts src/public/mod.ts src/plugin/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "test": "deno test --unstable-kv --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
@@ -47,7 +54,8 @@
       "contracts.ts",
       "verify-plugin.ts",
       "src/**/*.ts",
-      "services/**/*.ts"
+      "services/**/*.ts",
+      "streams/**/*.ts"
     ],
     "exclude": [
       "**/*_test.ts",
