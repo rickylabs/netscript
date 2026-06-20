@@ -74,6 +74,7 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | 2026-06-20 | 1 | gates | Scoped check/lint/fmt and targeted `deno check --unstable-kv` passed. |
 | 2026-06-20 | 2 | engine guard | Added engine applied-key short-circuit, `alreadyApplied` result, and raw `publish()` option threading. |
 | 2026-06-20 | 2 | tests | Added engine applied-key tests for duplicate, no-key, per-instance, publish-options, and memory store behavior. |
+| 2026-06-20 | 3 | README | Documented core at-least-once delivery with idempotency keys and durable production injection requirement. |
 
 ## Decisions
 
@@ -103,6 +104,9 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | slice 2 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 diagnostics. |
 | slice 2 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 findings. |
 | slice 2 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 findings. |
+| slice 3 doc lint | `deno doc --lint packages/plugin-sagas-core/mod.ts` | PASS | Checked 1 file. |
+| slice 3 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 diagnostics. |
+| slice 3 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext md,ts` | PASS | 98 files selected; 0 findings after scoped write-format. |
 
 ### Fitness Gates
 
