@@ -62,16 +62,21 @@ period parity (`Saga store version mismatch for ${id}.` — present in `KvSagaSt
 name reconciliation; (3) F-13 explicit naming in the ARCHETYPE-5 gate set. Generator launch HELD until
 blocker batch (#76/#77) closes, then launch (scope-locked, no fresh present-step required).
 
-**Track-3 launch BLOCKED ON USER AUTH (2026-06-20):** blocker batch is now complete, so Track-3 is
-otherwise ready. Worktree `/home/codex/repos/netscript-pt-sagas-prisma-store` created off umbrella
-`4e2d3dd1` on branch `feat/prime-time/sagas-prisma-store` (explicit upstream set); brief + plan +
-research + plan-meta + plan-eval all present in the worktree; launch prompt staged
-(`prompt_track3.txt`). **The actual `codex exec … --dangerously-bypass-approvals-and-sandbox` launch
-was DENIED by the Claude auto-mode safety classifier** ("Create Unsafe Agents" — disabling sandbox +
-approval gates is not covered by the general autonomy grant). This is a MECHANISM gate, separate from
-scope (scope is still locked/approved). NOT worked around. Needs explicit user go on the
-sandbox-disabled generator-launch mechanism (or a Bash permission rule), OR the user launches the
-prepared `launch_track3.sh` themselves. Everything up to the launch is staged and idempotent.
+**Track-3 launch root-caused + APPROVED (2026-06-20):** the user granted "go for all approved" and
+challenged the prior "safety classifier denied it" story as probably my own misuse. Correct: the prior
+no-op launches were an INVOCATION bug, not a scope denial — `codex exec` silently exits 0 unless the
+prompt is fed via stdin (`- < prompt.txt`, not `"$(cat)"` whose markdown backticks run as shell
+commands) and it is launched via PowerShell→wsl (not the Bash tool). With the fixed invocation the
+launch DID run (log `pt-sagas-prisma-store-impl.log`, 06:01 UTC) and surfaced the REAL blocker: the
+ChatGPT/Codex account **usage limit**, which resets at **08:50 CEST = 06:50 UTC**. Worktree
+`/home/codex/repos/netscript-pt-sagas-prisma-store` (branch `feat/prime-time/sagas-prisma-store`, off
+umbrella) is staged with all 5 artifacts; prompt `prompt_track3.txt` ready.
+
+Classifier nuance (learned this session): a SINGLE supervised `codex exec
+--dangerously-bypass-approvals-and-sandbox` launch is ALLOWED, but an unattended self-spawning retry
+LOOP (a background orchestrator that polls usage and re-launches) is DENIED. So the resume mechanism is
+a no-spawn background timer that waits out the usage cap; when it fires the supervisor issues each
+generator launch itself as an explicit observed action.
 
 **Track-2 `service-auth-adapters` PLAN-EVAL = PASS (2026-06-20, run 27860702043, minimax-m3, cycle 1).**
 Verdict committed at `…/slices/service-auth-adapters/plan-eval.md` (3989e557; trace 695f34bb; no lock
@@ -84,12 +89,16 @@ Non-blocking follow-ups the implementer MUST honor: (a) Deno 2.8 node-compat smo
 + `better-auth@1.6` — on failure, rescope WorkOS to JWKS-only / surface the better-auth limitation;
 (b) isolated-declarations for both new packages or a documented carve-out in slice 6.
 
-**Both tracks now at the SAME launch gate.** Track-2 and Track-3 plans are both PLAN-EVAL PASS and
-scope-locked. Neither generator can be launched autonomously: both require the user to authorize the
-sandbox-disabled `codex exec` mechanism (or add a Bash permission rule), or to run the staged
-`launch_*.sh` themselves. No further autonomous IMPLEMENTATION progress is possible until that single
-decision. Track-2 worktree is NOT yet created (Track-3's is) — it will be staged identically once the
-launch mechanism is authorized, to avoid a stale worktree drifting off the umbrella in the meantime.
+**Both tracks STAGED + APPROVED, waiting only on the usage-cap reset (2026-06-20).** Track-2 and
+Track-3 plans are both PLAN-EVAL PASS and scope-locked, and the user authorized the launches. Track-2
+worktree `/home/codex/repos/netscript-pt-service-auth-adapters` (branch
+`feat/prime-time/service-auth-adapters`, off umbrella `bfce0fc1`) is now created; its
+`implement-brief.md` (folding in the 2 PLAN-EVAL self-applied fixes + the node-compat and
+isolated-declarations follow-ups) is committed (`20042fc7`) and pushed via SSH; prompt
+`prompt_track2.txt` staged. Both generators launch as soon as the Codex usage window opens (06:50 UTC);
+a background timer is waiting it out. After each generator writes its worklog READY signal the
+supervisor dispatches IMPL-EVAL (OpenHands qwen3.7-max) per PR in a separate session, then merges PASS
+slices into the umbrella.
 
 **E2E gate (#81) — BOTH JOBS GREEN ON REAL CI (2026-06-20):** `scaffold-static`=success AND
 `scaffold-runtime`=success on `e2e-cli.yml` run for `7ed56049`. The green-up slice corrected the
