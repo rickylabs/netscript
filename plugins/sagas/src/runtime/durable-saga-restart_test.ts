@@ -40,7 +40,7 @@ Deno.test('createDurableSagaRuntime resumes saga state across runtime restart', 
     assertEquals(envelope?.metadata.version, 2);
   } finally {
     await second.runtime.stop('second durable runtime stopped');
-    kv.close();
+    await second.dispose();
   }
 });
 
@@ -60,7 +60,7 @@ Deno.test('createDurableSagaRuntime store rejects stale expected versions', asyn
     assertEquals(error.code, 'SAGA_VALIDATION_FAILED');
   } finally {
     await durable.runtime.stop('stale expected version test complete');
-    kv.close();
+    await durable.dispose();
   }
 });
 

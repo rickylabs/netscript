@@ -1,14 +1,85 @@
 // Sagas Plugin Prisma Schema
 // This schema defines the database tables for the sagas plugin.
-// Runtime saga state is persisted by the plugin KV store; these tables are a
-// Postgres read model/projection for API querying, analytics, and debugging.
+// Runtime saga state can be persisted by KV or the dedicated Prisma durable
+// runtime tables below. The existing SagaInstance/SagaExecutionHistory models
+// remain a Postgres read model/projection for API querying, analytics, and
+// debugging.
+
+// ============================================================================
+// DURABLE SAGA RUNTIME STATE
+// ============================================================================
+
+/// Durable saga state envelope keyed by native saga instance id
+model SagaRuntimeState {
+  /// Native saga runtime instance id (for example, "OrderSaga:order-123")
+  instanceId String   @id @map("instance_id") @db.VarChar(200)
+
+  /// Saga definition id/name
+  sagaId     String   @map("saga_id") @db.VarChar(100)
+
+  /// Optimistic concurrency version
+  version    Int
+
+  /// Full SagaStateEnvelope payload
+  envelope   Json
+
+  /// Record timestamps
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([sagaId])
+  @@index([updatedAt])
+  @@map("saga_runtime_state")
+}
+
+/// Durable saga transition history keyed by instance id and version
+model SagaRuntimeTransition {
+  /// Native saga runtime instance id
+  instanceId String   @map("instance_id") @db.VarChar(200)
+
+  /// Saga state version produced by this transition
+  version    Int
+
+  /// Full SagaTransitionRecord payload
+  record     Json
+
+  /// Record timestamps
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@id([instanceId, version], name: "saga_runtime_transition_instance_version")
+  @@index([instanceId])
+  @@map("saga_runtime_transition")
+}
+
+/// Durable saga correlation index for O(1) instance lookup
+model SagaRuntimeCorrelation {
+  /// Internal row id
+  id             String   @id @default(uuid()) @db.Uuid
+
+  /// Saga definition id/name
+  sagaId         String   @map("saga_id") @db.VarChar(100)
+
+  /// Correlation key from the inbound message
+  correlationKey String   @map("correlation_key") @db.VarChar(200)
+
+  /// Native saga runtime instance id
+  instanceId     String   @map("instance_id") @db.VarChar(200)
+
+  /// Record timestamps
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([sagaId, correlationKey], name: "saga_runtime_correlation_saga_key")
+  @@index([instanceId])
+  @@map("saga_runtime_correlation")
+}
 
 // ============================================================================
 // SAGA INSTANCE
 // ============================================================================
 
 /// Saga instance read-model state projected into Postgres for API queries
-/// The native saga engine's durable write path is KvSagaStore, not Prisma
+/// This projection is distinct from the native saga engine's durable write path
 model SagaInstance {
   /// Unique saga instance identifier (UUID)
   id            String   @db.VarChar(100)

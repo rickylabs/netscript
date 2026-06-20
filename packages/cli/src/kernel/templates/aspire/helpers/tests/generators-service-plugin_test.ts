@@ -247,6 +247,21 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
   });
 
+  it('should pass saga store backend appsettings to plugin env', () => {
+    const sagaPlugin = {
+      ...fixtures.MINIMAL_PLUGIN,
+      Sagas: { Store: { Backend: 'prisma' } },
+    } as PluginEntry;
+    const output = generateRegisterPlugins({
+      ...emptyOptions,
+      plugins: { 'sagas-api': sagaPlugin },
+    });
+    assertStringIncludes(
+      output,
+      "resource.withEnvironment('NETSCRIPT_SAGA_STORE', \"prisma\")",
+    );
+  });
+
   it('should handle empty plugins', () => {
     const output = generateRegisterPlugins(emptyOptions);
     assertStringIncludes(output, '// No plugins configured');

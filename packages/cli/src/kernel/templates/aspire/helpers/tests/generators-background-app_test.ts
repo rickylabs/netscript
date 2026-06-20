@@ -141,6 +141,21 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
   });
 
+  it('should pass saga store backend appsettings to background env', () => {
+    const sagaProcessor = {
+      ...fixtures.MINIMAL_BACKGROUND,
+      Sagas: { Store: { Backend: 'prisma' } },
+    } as BackgroundProcessorEntry;
+    const output = generateRegisterBackground({
+      ...emptyOptions,
+      processors: { sagas: sagaProcessor },
+    });
+    assertStringIncludes(
+      output,
+      "sagas.withEnvironment('NETSCRIPT_SAGA_STORE', \"prisma\")",
+    );
+  });
+
   it('should handle empty processors', () => {
     const output = generateRegisterBackground(emptyOptions);
     assertStringIncludes(output, '// No background processors configured');

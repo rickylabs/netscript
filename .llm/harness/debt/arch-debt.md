@@ -204,6 +204,19 @@ Seeded from
 - **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
   scheduler/replay port is designed.
 
+## plugins/sagas — deferred Prisma SagaIdempotencyPort parity
+
+- **Reason:** `PrismaSagaStore` now provides durable saga state persistence, but idempotency and
+  applied-key storage remain backed by KV (`KvSagaIdempotencyStore` / `KvSagaAppliedKeyStore`).
+  Prisma `SagaIdempotencyPort` parity is intentionally out of scope for the sagas-prisma-store slice.
+- **Owner:** Prime-time saga durability follow-up.
+- **Target:** Before advertising fully Prisma-only saga runtime persistence.
+- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`
+- **Created:** 2026-06-20
+- **Status:** open
+- **Gate:** F-13; add Prisma idempotency/applied-key adapter tests and a Prisma-backed duplicate
+  message runtime test.
+
 ## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
 
 - **Reason:** `task-executor.ts` needs supervisor/executor/dispatcher split.
@@ -752,3 +765,19 @@ Seeded from
   and green validation.
 - **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
   targeted package checks and `deno task publish:dry-run` pass after each migration.
+
+## plugins/sagas/src/runtime — saga runtime folder cardinality (`sagas-runtime-folder-cardinality`)
+
+- **Reason:** The `sagas-prisma-store` slice adds a Prisma durable state adapter and backend
+  resolver beside the existing saga runtime modules. The public runtime export remains stable, but
+  the folder now exceeds the doctrine cardinality warning threshold and needs a follow-up split of
+  store/backend implementation files into a role-named subfolder without changing the exported
+  runtime API.
+- **Owner:** saga runtime maintainers.
+- **Target:** before beta package-quality freeze.
+- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`.
+- **Created:** 2026-06-20.
+- **Status:** open, DEBT_ACCEPTED for `sagas-prisma-store`; no `SagaStorePort` or
+  `KvSagaStore` behavior changes are included in the debt.
+- **Gate:** F-16 folder cardinality is back under threshold and F-13 saga runtime invariants remain
+  green.

@@ -1,13 +1,18 @@
 import { join as joinPosix } from '@std/path/posix';
 import type { BackgroundProcessorEntry, PluginEntry } from '@netscript/aspire/types';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
-import type { PluginKindProvider, PluginScaffoldResult } from '../../domain/plugin-kind.ts';
+import type {
+  PluginKindProvider,
+  PluginScaffoldResult,
+  SagaStoreBackend,
+} from '../../domain/plugin-kind.ts';
 
 interface PluginWorkspaceMutationOptions {
   readonly enabled?: boolean;
   readonly serviceReferences?: readonly string[];
   readonly pluginReferences?: readonly string[];
   readonly description?: string;
+  readonly sagaStoreBackend?: SagaStoreBackend;
 }
 
 /** Build an appsettings plugin resource entry for a scaffolded plugin. */
@@ -17,6 +22,7 @@ export function buildPluginEntry(
   options: PluginWorkspaceMutationOptions,
 ): PluginEntry {
   const entry = buildBasePluginEntry(scaffoldResult, provider, options);
+  applySagaStoreBackend(entry, provider, options.sagaStoreBackend);
   if (options.description) {
     entry.Description = options.description;
   }
@@ -30,6 +36,7 @@ export function buildPluginServiceEntry(
   options: PluginWorkspaceMutationOptions,
 ): PluginEntry {
   const entry = buildBasePluginEntry(scaffoldResult, provider, options);
+  applySagaStoreBackend(entry, provider, options.sagaStoreBackend);
   if (options.description) {
     entry.Description = `${options.description} API`;
   }
@@ -75,6 +82,7 @@ export function buildBackgroundProcessorEntry(
   if (options.description) {
     entry.Description = options.description;
   }
+  applySagaStoreBackend(entry, provider, options.sagaStoreBackend);
 
   return entry;
 }
@@ -104,4 +112,18 @@ function buildBasePluginEntry(
   }
 
   return entry;
+}
+
+function applySagaStoreBackend(
+  entry: PluginEntry | BackgroundProcessorEntry,
+  provider: PluginKindProvider,
+  backend: SagaStoreBackend | undefined,
+): void {
+  if (provider.kind !== 'saga') {
+    return;
+  }
+  const mutable = entry as (PluginEntry | BackgroundProcessorEntry) & {
+    Sagas?: { Store: { Backend: SagaStoreBackend } };
+  };
+  mutable.Sagas = { Store: { Backend: backend ?? 'kv' } };
 }
