@@ -69,6 +69,7 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | 2026-06-20 | 1 | contract | Added public DLQ port/types, `NackOptions`, and `_envelope.ts` record conversion helper. |
 | 2026-06-20 | 2 | KV store | Added `KvDeadLetterStore`, subpath export, package check task coverage, and Deno KV-backed unit tests. |
 | 2026-06-20 | 3 | provider stores | Added `PostgresDeadLetterStore`, `RedisDeadLetterStore`, subpath exports, check task coverage, and fake-client tests. |
+| 2026-06-20 | 4 | KvPolling refactor | Replaced inline DLQ append/depth/reprocess with injected `DeadLetterStorePort`; added regression test. |
 
 ## Decisions
 
@@ -100,6 +101,10 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | Slice 3 lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 38 files, 0 findings |
 | Slice 3 fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 38 files, 0 findings |
 | Slice 3 test | `rtk proxy deno test --unstable-kv packages/queue/tests/provider-dead-letter-store_test.ts` | PASS | 2 passed, 0 failed |
+| Slice 4 check | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/queue --ext ts` | PASS | `deno check --quiet --unstable-kv <files>`, 39 files, 0 findings |
+| Slice 4 lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 39 files, 0 findings |
+| Slice 4 fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 39 files, 0 findings |
+| Slice 4 test | `rtk proxy deno test --unstable-kv --allow-env packages/queue/tests/kv-polling-dlq_test.ts packages/queue/tests/abort-cleanup_test.ts` | PASS | 4 passed, 0 failed; `--allow-env` required by existing AMQP/Redis transitive debug import in abort-cleanup test |
 
 ### Fitness Gates
 
