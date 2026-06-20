@@ -1,7 +1,7 @@
 {
   "name": "@netscript/plugin-auth",
-  "version": "0.0.1-alpha.0",
-  "description": "NetScript plugin for unified auth service endpoints and backend composition.",
+  "version": "1.0.0",
+  "description": "NetScript plugin for a unified auth API, single-active backend selection, auth database schema, and auth session streams.",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
@@ -42,6 +42,7 @@
     "test": "deno test --unstable-kv --allow-all",
     "dev": "deno run --allow-net --allow-env --allow-read --watch services/src/main.ts",
     "start": "deno run --allow-net --allow-env --allow-read services/src/main.ts",
+    "doc-lint": "deno doc --lint mod.ts src/public/mod.ts src/plugin/mod.ts contracts.ts services/src/main.ts streams/mod.ts streams/server.ts",
     "publish:dry-run": "deno publish --dry-run --allow-dirty",
     "verify": "deno run --allow-read verify-plugin.ts"
   },

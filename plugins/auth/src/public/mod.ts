@@ -5,7 +5,12 @@
  */
 
 import { definePlugin, type PluginManifest } from '@netscript/plugin';
-import { AUTH_API_DEFAULT_PORT, AUTH_API_SERVICE_NAME, AUTH_PLUGIN_ID } from '../constants.ts';
+import {
+  AUTH_API_DEFAULT_PORT,
+  AUTH_API_SERVICE_NAME,
+  AUTH_PLUGIN_ID,
+  AUTH_PLUGIN_VERSION,
+} from '../constants.ts';
 
 const AUTH_SERVICE_PERMISSIONS = [
   '--unstable-kv',
@@ -82,7 +87,7 @@ export interface AuthPluginInspection {
 
 const authManifest: PluginManifest = definePlugin(
   '@netscript/plugin-auth',
-  '0.1.0',
+  AUTH_PLUGIN_VERSION,
 )
   .withDisplayName('Auth')
   .withType('api')
@@ -100,7 +105,7 @@ const authManifest: PluginManifest = definePlugin(
   .withContractVersions([{ version: 'v1', loader: './contracts.ts' }])
   .withRuntimeConfigTopics([{ name: AUTH_PLUGIN_ID }])
   .withMetadata({
-    repository: 'https://github.com/rickylabs/netscript-start',
+    repository: 'https://github.com/rickylabs/netscript',
     documentation: 'https://netscript.dev/plugins/auth',
     features: [
       'Unified auth oRPC service',

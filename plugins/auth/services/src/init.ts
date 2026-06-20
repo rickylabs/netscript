@@ -5,6 +5,7 @@
  */
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
+import type { WatchableKv } from '@netscript/kv';
 import {
   type AuthServiceAppsettings,
   createAuthServiceBackendRegistry,
@@ -20,6 +21,7 @@ export async function initializeAuthService(
     env: { ...Deno.env.toObject(), ...ctx.env },
     appsettings: serviceAppsettings(ctx),
     dbClient,
+    kv: ctx.kv as WatchableKv,
   });
 }
 

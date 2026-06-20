@@ -73,17 +73,18 @@ async function createActiveBackend(
 ): Promise<AuthBackendPort> {
   const env = options.env ?? Deno.env.toObject();
   if (backendName === 'kv-oauth') {
+    const provider = resolveKvOAuthProviderEnv(env);
     return await createKvOAuthBackend({
       provider: defineOAuthProvider({
         id: env.NETSCRIPT_AUTH_PROVIDER_ID ?? 'default',
         displayName: env.NETSCRIPT_AUTH_PROVIDER_DISPLAY_NAME,
-        clientId: requiredEnv(env, 'NETSCRIPT_AUTH_CLIENT_ID'),
+        clientId: provider.clientId,
         clientSecret: env.NETSCRIPT_AUTH_CLIENT_SECRET,
         issuer: env.NETSCRIPT_AUTH_ISSUER,
-        authorizationEndpoint: env.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT,
-        tokenEndpoint: env.NETSCRIPT_AUTH_TOKEN_ENDPOINT,
+        authorizationEndpoint: provider.authorizationEndpoint,
+        tokenEndpoint: provider.tokenEndpoint,
         userInfoEndpoint: env.NETSCRIPT_AUTH_USERINFO_ENDPOINT,
-        redirectUri: requiredEnv(env, 'NETSCRIPT_AUTH_REDIRECT_URI'),
+        redirectUri: provider.redirectUri,
         scopes: env.NETSCRIPT_AUTH_SCOPES?.split(/\s+/).filter(Boolean),
       }),
       store: options.kv
@@ -93,10 +94,12 @@ async function createActiveBackend(
         })
         : undefined,
       fetch: options.fetch,
-      allowInsecureRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true',
+      allowInsecureRequests: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true' ||
+        provider.usesLocalDefaults,
       cookie: {
         name: env.NETSCRIPT_AUTH_COOKIE_NAME,
-        allowInsecureDev: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true',
+        allowInsecureDev: env.NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS === 'true' ||
+          provider.usesLocalDefaults,
       },
     });
   }
@@ -141,13 +144,40 @@ function betterAuthPrismaProvider(value: string | undefined) {
   return 'postgresql';
 }
 
+function resolveKvOAuthProviderEnv(
+  env: Readonly<Record<string, string | undefined>>,
+): Readonly<{
+  clientId: string;
+  redirectUri: string;
+  authorizationEndpoint?: string;
+  tokenEndpoint?: string;
+  usesLocalDefaults: boolean;
+}> {
+  const usesLocalDefaults = !env.NETSCRIPT_AUTH_CLIENT_ID || !env.NETSCRIPT_AUTH_REDIRECT_URI ||
+    (!env.NETSCRIPT_AUTH_ISSUER &&
+      (!env.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT || !env.NETSCRIPT_AUTH_TOKEN_ENDPOINT));
+  const port = env.PORT ?? '8094';
+  const origin = `http://localhost:${port}`;
+  return {
+    clientId: env.NETSCRIPT_AUTH_CLIENT_ID ?? 'netscript-auth-local',
+    redirectUri: env.NETSCRIPT_AUTH_REDIRECT_URI ?? `${origin}/api/v1/auth/callback`,
+    authorizationEndpoint: env.NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT ??
+      (env.NETSCRIPT_AUTH_ISSUER ? undefined : `${origin}/v1/auth/signin/not-configured`),
+    tokenEndpoint: env.NETSCRIPT_AUTH_TOKEN_ENDPOINT ??
+      (env.NETSCRIPT_AUTH_ISSUER ? undefined : `${origin}/v1/auth/token/not-configured`),
+    usesLocalDefaults,
+  };
+}
+
 function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): ArrayBuffer {
   const configured = env.NETSCRIPT_AUTH_KV_OAUTH_TEST_KEY;
-  if (!configured) {
-    return new Uint8Array(32).fill(7).buffer as ArrayBuffer;
+  if (configured) {
+    const bytes = Uint8Array.from(atob(configured), (char) => char.charCodeAt(0));
+    return bytes.buffer as ArrayBuffer;
   }
-  const bytes = Uint8Array.from(atob(configured), (char) => char.charCodeAt(0));
-  return bytes.buffer as ArrayBuffer;
+  const key = new Uint8Array(32);
+  crypto.getRandomValues(key);
+  return key.buffer as ArrayBuffer;
 }
 
 /** Creates a test-friendly kv-oauth registry using an in-memory KV adapter. */
@@ -163,7 +193,8 @@ export async function createInMemoryKvOAuthRegistry(
       NETSCRIPT_AUTH_CLIENT_SECRET: 'secret_test',
       NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://issuer.example.test/oauth/authorize',
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
-      NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/v1/auth/callback',
+      NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
+      NETSCRIPT_AUTH_KV_OAUTH_TEST_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
       NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
       ...(options.env ?? {}),
     },
