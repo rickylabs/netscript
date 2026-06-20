@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slice 3 implementation is complete: auth contracts and default authenticators exist, and ordered scope/role authorization is implemented with deny-by-default tests.
+Slice 4 implementation is complete: auth contracts, default authenticators, scope authorizer, and Hono auth middleware are implemented with targeted unit tests.
 
 ## Completed
 
@@ -22,16 +22,17 @@ Slice 3 implementation is complete: auth contracts and default authenticators ex
 - Slice 1 auth contracts added and static gates passed.
 - Slice 2 authenticators added and targeted tests/static gates passed.
 - Slice 3 scope authorizer added and targeted tests/static gates passed.
+- Slice 4 authn/authz middleware added and targeted tests/static gates passed.
 
 ## In Progress
 
-- Slice 3 commit/push/PR comment.
+- Slice 4 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit slice 3.
+1. Commit slice 4.
 2. Push with explicit refspec and comment on PR #77.
-3. Start slice 4 auth middleware.
+3. Start slice 5 builder methods and principal context.
 
 ## Key Decisions
 
@@ -53,14 +54,16 @@ Slice 3 implementation is complete: auth contracts and default authenticators ex
 | `packages/service/tests/auth/authenticators_test.ts` | new | Unit and failure-path tests for default authenticators. |
 | `packages/service/src/auth/scope-authorizer.ts` | new | Ordered scope/role authorizer. |
 | `packages/service/tests/auth/authorizer_test.ts` | new | Unit tests for allow, missing scope/role, deny-by-default, and explicit allow-by-default. |
+| `packages/service/src/auth/auth-middleware.ts` | new | Hono authn/authz middleware with structured decisions and safe envelopes. |
+| `packages/service/tests/auth/middleware_test.ts` | new | Unit tests for middleware success and failure paths. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | Slice 1-3 check/lint/fmt wrappers passed. |
+| Static | PASS | Slice 1-4 check/lint/fmt wrappers passed. |
 | Fitness | NOT_RUN | Pending export slices. |
-| Runtime | PASS | Slice 2 authenticator and slice 3 authorizer unit tests passed. |
+| Runtime | PASS | Slice 2-4 targeted auth tests passed. |
 | Consumer | NOT_RUN | Pending final gate. |
 
 ## Open Questions
@@ -76,3 +79,4 @@ Slice 3 implementation is complete: auth contracts and default authenticators ex
 
 - 6699099: feat(service): auth port and principal types
 - 6f81290: feat(service): add default authenticators
+- dda6fb6: feat(service): add scope authorizer

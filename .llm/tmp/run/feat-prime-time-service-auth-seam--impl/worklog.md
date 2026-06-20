@@ -71,6 +71,8 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | 2026-06-20 | 2 | gates | Targeted authenticator tests and check/lint/fmt wrappers passed. Formatter adjusted one owned auth file before final fmt pass. |
 | 2026-06-20 | 3 | implementation | Added ordered scope/role authorizer with deny-by-default behavior and unit tests. |
 | 2026-06-20 | 3 | gates | Targeted authorizer tests and check/lint/fmt wrappers passed. |
+| 2026-06-20 | 4 | implementation | Added authn/authz Hono middleware with guarded-prefix handling, 401/403 envelopes, principal injection, fail-closed authz errors, and structured auth decision logging. |
+| 2026-06-20 | 4 | gates | Middleware tests and check/lint/fmt wrappers passed after typing the bare-Hono test apps with the `principal` variable. |
 
 ## Decisions
 
@@ -105,6 +107,10 @@ To add an auth mechanism, implement `AuthenticatorPort` in one focused file unde
 | slice 3 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 diagnostics. |
 | slice 3 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 findings. |
 | slice 3 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 24 files, 0 findings. |
+| slice 4 test | `rtk proxy deno test --allow-all packages/service/tests/auth/middleware_test.ts` | PASS | Exit 0; 7 passed, 0 failed. |
+| slice 4 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 diagnostics. |
+| slice 4 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 findings. |
+| slice 4 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | Exit 0; 26 files, 0 findings. |
 
 ### Fitness Gates
 
