@@ -10,4 +10,4 @@ Format:
 
 ## Log
 
-- 5dfe353: feat(service): add shutdown contracts
+- ce1e901: feat(service): add shutdown contracts

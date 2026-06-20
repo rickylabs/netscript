@@ -12,22 +12,23 @@
 
 ## Current State
 
-Contract slice is implemented: `ServeOptions` now carries `drainTimeoutMs`/`handleSignals`, and shutdown contracts are exported from the root service surface.
+Contract and coordinator slices are implemented: `ServeOptions` now carries `drainTimeoutMs`/`handleSignals`, shutdown contracts are exported from the root service surface, and the private coordinator handles LIFO hooks, failure collection, idempotency, and timeout reporting.
 
 ## Completed
 
 - Read implementation brief, approved research, approved plan, plan metadata, harness workflow docs, doctrine profile, service overlay, gate matrix, and relevant package surface.
 - Confirmed branch `feat/prime-time/service-graceful-shutdown` tracks `origin/feat/prime-time/service-graceful-shutdown`.
 - Added public shutdown contracts and serve option fields; scoped check/lint/fmt passed.
+- Added `ServiceShutdownCoordinator` and focused unit tests; scoped check/lint/fmt plus coordinator tests passed.
 
 ## In Progress
 
-- Shutdown coordinator slice.
+- Listener graceful stop and signal wiring slice.
 
 ## Next Steps
 
-1. Implement `ServiceShutdownCoordinator` and focused unit tests.
-2. Run coordinator gates, commit, push with explicit refspec, append commits, and comment PR #78.
+1. Wire `ServiceShutdownCoordinator` into `service-listener.ts`.
+2. Add runtime tests for graceful in-flight drain, listener closure, signal-listener install/remove behavior, hook failure collection, and drain timeout.
 
 ## Key Decisions
 
@@ -47,14 +48,16 @@ Contract slice is implemented: `ServeOptions` now carries `drainTimeoutMs`/`hand
 | `.llm/tmp/run/feat-prime-time-service-graceful-shutdown--impl/drift.md` | new | Drift log. |
 | `packages/service/src/types.ts` | changed | Added shutdown contracts and serve options. |
 | `packages/service/mod.ts` | changed | Re-exported shutdown contracts. |
+| `packages/service/src/builder/service-shutdown.ts` | new | Private shutdown coordinator. |
+| `packages/service/tests/shutdown-coordinator_test.ts` | new | Unit and failure-path tests. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | PASS | Contract slice check/lint/fmt exit 0. |
-| Fitness | NOT_RUN | Pending implementation. |
-| Runtime | NOT_RUN | Pending implementation. |
+| Static | PASS | Coordinator slice check/lint/fmt exit 0. |
+| Fitness | IN_PROGRESS | Coordinator test-shape and failure-path coverage added. |
+| Runtime | IN_PROGRESS | Coordinator unit tests pass; listener integration pending. |
 | Consumer | NOT_RUN | Pending implementation. |
 
 ## Open Questions
@@ -68,4 +71,4 @@ Contract slice is implemented: `ServeOptions` now carries `drainTimeoutMs`/`hand
 
 ## Commits
 
-- 5dfe353: feat(service): add shutdown contracts
+- ce1e901: feat(service): add shutdown contracts
