@@ -10,13 +10,20 @@ branch `feat/framework-prime-time`. Status legend: `planned` → `plan-eval` →
 
 | group | slice | sev | status | PLAN-EVAL | IMPL-EVAL | sub-PR |
 | --- | --- | --- | --- | --- | --- | --- |
-| A-G1 | sagas-durable-store | blocker | impl (running) | PASS | — | #74 |
-| A-G2 | sagas-idempotency-e2e | blocker | impl (running) | PASS | — | #75 |
-| A-G3 | sagas-telemetry-spans | blocker | impl (running) | PASS | — | #76 |
-| A-G4 | service-auth-seam | blocker | impl (running) | PASS | — | #77 |
-| A-G5 | service-graceful-shutdown | blocker | impl (running) | PASS | — | #78 |
-| A-G6 | worker-applied-keys-dedup | blocker | impl (running) | PASS | — | #79 |
-| A-G7 | rbp-dlq-contract | blocker | impl (running) | PASS (cycle-2) | — | #80 |
+| A-G1 | sagas-durable-store | blocker | impl-eval (dispatched) | PASS | dispatched | #74 |
+| A-G2 | sagas-idempotency-e2e | blocker | impl done — HELD | PASS | held (post-#74 merge + rebase) | #75 |
+| A-G3 | sagas-telemetry-spans | blocker | impl done — HELD | PASS | held (post-#74 merge + rebase) | #76 |
+| A-G4 | service-auth-seam | blocker | impl-eval (dispatched) | PASS | dispatched | #77 |
+| A-G5 | service-graceful-shutdown | blocker | impl-eval (dispatched) | PASS | dispatched | #78 |
+| A-G6 | worker-applied-keys-dedup | blocker | impl-eval (dispatched) | PASS | dispatched | #79 |
+| A-G7 | rbp-dlq-contract | blocker | impl-eval (dispatched) | PASS (cycle-2) | dispatched | #80 |
+
+**IMPL-EVAL dispatch (2026-06-20):** all 7 generators FINISHED and posted ready/complete verdicts.
+IMPL-EVAL (OpenHands qwen3.7-max, one trigger per PR — different PRs, no per-PR concurrency-cancel)
+dispatched for the 5 independent slices #74/#77/#78/#79/#80. #75 + #76 HELD until #74 passes
+IMPL-EVAL and merges, then they rebase onto merged durable-store and eval. #77 absorbed the Track-1
+adapter-readiness widening (additive); its IMPL-EVAL trigger flags the better-auth/WorkOS adapters as
+out-of-scope (Track 2). Merges pause for explicit user authorization.
 
 The remaining ~67 Wave-A high/medium slices and Waves B/C/D are tracked in `register.md` and will be
 promoted into this registry as generator-lane capacity is allocated (per user sign-off on cadence).
