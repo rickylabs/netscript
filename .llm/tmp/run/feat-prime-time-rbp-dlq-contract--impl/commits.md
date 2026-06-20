@@ -12,3 +12,4 @@ Format:
 
 - `<sha>: <message>`
 - ba772b2: feat(queue): add dead letter store contract
+- f39dab7: feat(queue): add kv dead letter store

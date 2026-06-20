@@ -68,6 +68,7 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | --- | --- | --- | --- |
 | 2026-06-20 | 1 | contract | Added public DLQ port/types, `NackOptions`, and `_envelope.ts` record conversion helper. |
 | 2026-06-20 | 2 | KV store | Added `KvDeadLetterStore`, subpath export, package check task coverage, and Deno KV-backed unit tests. |
+| 2026-06-20 | 3 | provider stores | Added `PostgresDeadLetterStore`, `RedisDeadLetterStore`, subpath exports, check task coverage, and fake-client tests. |
 
 ## Decisions
 
@@ -95,6 +96,10 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | Slice 2 lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 35 files, 0 findings |
 | Slice 2 fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 35 files, 0 findings |
 | Slice 2 test | `rtk proxy deno test --unstable-kv packages/queue/tests/dead-letter-store_test.ts` | PASS | 2 passed, 0 failed |
+| Slice 3 check | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/queue --ext ts` | PASS | `deno check --quiet --unstable-kv <files>`, 38 files, 0 findings |
+| Slice 3 lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 38 files, 0 findings |
+| Slice 3 fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 38 files, 0 findings |
+| Slice 3 test | `rtk proxy deno test --unstable-kv packages/queue/tests/provider-dead-letter-store_test.ts` | PASS | 2 passed, 0 failed |
 
 ### Fitness Gates
 
@@ -111,6 +116,7 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | F-17 | PASS | Port and helper/adapter concerns co-located by role | Manual evidence |
 | F-18 | PASS | Root and `ports/mod.ts` barrels updated | Manual evidence |
 | F-18 | PASS | `adapters/mod.ts` and `deno.json` subpath export updated for `KvDeadLetterStore` | Slice 2 |
+| F-18 | PASS | `adapters/mod.ts` and `deno.json` subpath exports updated for Postgres/Redis DLQ stores | Slice 3 |
 
 ### Runtime Gates
 
