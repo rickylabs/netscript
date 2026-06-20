@@ -9,7 +9,8 @@
 - Completed slice 3: durable runtime factory supports `backend?: 'kv' | 'prisma'`, optional `kv`, and `dispose()`; service/supervisor teardown use `dispose()`.
 - Completed slice 4: service startup resolves `NETSCRIPT_SAGA_STORE` / appsettings `sagas.store.backend` and selects KV or Prisma state storage explicitly.
 - Completed slice 5: CLI plugin add accepts `--saga-store-backend kv|prisma` and writes explicit `Sagas.Store.Backend` appsettings for saga plugin service/background entries.
-- Pushed slices 1-4 with explicit refspec to `origin/feat/prime-time/sagas-prisma-store`.
+- Completed slice 6: docs now name `PrismaSagaStore` as implemented; plugin README documents dual durable state backends and KV idempotency deferral; arch debt records deferred Prisma idempotency parity.
+- Pushed slices 1-5 with explicit refspec to `origin/feat/prime-time/sagas-prisma-store`.
 
 ## Important Constraints
 
@@ -32,3 +33,4 @@
 - Slice 4: `deno check --unstable-kv plugins/sagas/src/runtime/saga-store-backend.ts plugins/sagas/src/runtime/saga-store-backend_test.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/mod.ts` — PASS.
 - Slice 5: `rtk proxy deno test --allow-all packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts packages/cli/src/public/features/plugins/add/add-plugin_test.ts` — PASS, 9 tests.
 - Slice 5: focused CLI `deno check --unstable-kv ...` over plugin add/appsettings files — PASS.
+- Slice 6: stale backend wording scan — PASS.

@@ -204,6 +204,19 @@ Seeded from
 - **Gate:** Replace the S2 DLQ rejection test with a deferred-dispatch test after a package-owned
   scheduler/replay port is designed.
 
+## plugins/sagas — deferred Prisma SagaIdempotencyPort parity
+
+- **Reason:** `PrismaSagaStore` now provides durable saga state persistence, but idempotency and
+  applied-key storage remain backed by KV (`KvSagaIdempotencyStore` / `KvSagaAppliedKeyStore`).
+  Prisma `SagaIdempotencyPort` parity is intentionally out of scope for the sagas-prisma-store slice.
+- **Owner:** Prime-time saga durability follow-up.
+- **Target:** Before advertising fully Prisma-only saga runtime persistence.
+- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`
+- **Created:** 2026-06-20
+- **Status:** open
+- **Gate:** F-13; add Prisma idempotency/applied-key adapter tests and a Prisma-backed duplicate
+  message runtime test.
+
 ## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
 
 - **Reason:** `task-executor.ts` needs supervisor/executor/dispatcher split.

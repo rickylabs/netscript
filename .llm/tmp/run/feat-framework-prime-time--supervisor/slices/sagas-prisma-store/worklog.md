@@ -60,6 +60,7 @@
 | 2026-06-20 | Slice 3 refactored `createDurableSagaRuntime` to support KV/Prisma backend selection, optional `kv`, and `dispose()`; service and supervisor teardown now use `dispose()`. |
 | 2026-06-20 | Slice 4 added explicit saga-store backend resolution from `NETSCRIPT_SAGA_STORE` or appsettings `sagas.store.backend`, and wired service startup to choose KV or Prisma state storage. |
 | 2026-06-20 | Slice 5 added `--saga-store-backend kv|prisma` to public/local plugin add commands and writes explicit saga backend appsettings for saga plugin entries. |
+| 2026-06-20 | Slice 6 reconciled saga durable backend docs and recorded deferred Prisma idempotency parity in drift/debt. |
 
 ## Gate Evidence
 
@@ -76,3 +77,16 @@
 | 4 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/saga-store-backend.ts plugins/sagas/src/runtime/saga-store-backend_test.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/mod.ts` — passed. |
 | 5 | Focused CLI tests | PASS | `rtk proxy deno test --allow-all packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts packages/cli/src/public/features/plugins/add/add-plugin_test.ts` — 9 passed, 0 failed. |
 | 5 | Focused CLI type check | PASS | `deno check --unstable-kv packages/cli/src/kernel/domain/plugin-kind.ts packages/cli/src/public/domain/plugin-add-plan.ts packages/cli/src/public/features/plugins/add/add-plugin-command.ts packages/cli/src/local/features/plugins/add/add-local-plugin-command.ts packages/cli/src/public/features/plugins/add/plan-plugin-add.ts packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts packages/cli/src/public/features/plugins/add/add-plugin.ts packages/cli/src/local/features/plugins/add/add-local-plugin.ts` — passed. |
+| 6 | Docs stale wording scan | PASS | `rtk rg -n "PostgresSagaStore|KV only|KV-only|durable write path is KvSagaStore|not Prisma|planned\\)" ...` found no stale saga backend wording in touched docs/schemas. |
+
+## F-13 Saga/runtime invariants
+
+F-13 is in scope because this slice changes saga runtime durable persistence and teardown. Evidence:
+
+- State round-trip and restart durability: `durable-saga-restart_test.ts`.
+- Store parity: `prisma-saga-store_test.ts` and existing `kv-saga-store_test.ts` cover save/load,
+  transition ordering, correlation lookup, delete cascade, and version mismatch parity.
+- Teardown invariant: `create-durable-saga-runtime_test.ts` and `saga-supervisor_test.ts` cover
+  `dispose()` and supervisor stop behavior.
+- CLI/runtime config invariant: `saga-store-backend_test.ts` and
+  `workspace-mutator_test.ts` cover explicit backend selection.
