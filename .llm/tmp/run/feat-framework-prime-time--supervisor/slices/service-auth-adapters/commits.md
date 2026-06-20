@@ -5,3 +5,4 @@
 - bd3e889b: Add WorkOS access token authenticator
 - 90fd97d4: Add better-auth Prisma authenticator
 - 76aa91da: Add better-auth mount and schema tooling
+- 104687e3: Document auth adapters and readiness
