@@ -5,6 +5,7 @@ import type {
   PluginKindProvider,
   PluginScaffoldResult,
   PluginSchemaCopyResult,
+  SagaStoreBackend,
 } from '../../kernel/domain/plugin-kind.ts';
 
 /** User request for adding one starter plugin workspace. */
@@ -32,6 +33,9 @@ export interface PluginAddRequest {
 
   /** Whether starter samples should be generated. */
   readonly includeSamples: boolean;
+
+  /** Durable saga state backend to write for saga plugins. */
+  readonly sagaStoreBackend?: SagaStoreBackend;
 
   /** Absolute project root. */
   readonly projectRoot: string;

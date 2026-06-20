@@ -59,6 +59,7 @@
 | 2026-06-20 | Slice 2 added `PrismaSagaStore` plus parity tests for state round-trip, correlation lookup, transition ordering, stale-version error parity, and delete cascade. |
 | 2026-06-20 | Slice 3 refactored `createDurableSagaRuntime` to support KV/Prisma backend selection, optional `kv`, and `dispose()`; service and supervisor teardown now use `dispose()`. |
 | 2026-06-20 | Slice 4 added explicit saga-store backend resolution from `NETSCRIPT_SAGA_STORE` or appsettings `sagas.store.backend`, and wired service startup to choose KV or Prisma state storage. |
+| 2026-06-20 | Slice 5 added `--saga-store-backend kv|prisma` to public/local plugin add commands and writes explicit saga backend appsettings for saga plugin entries. |
 
 ## Gate Evidence
 
@@ -73,3 +74,5 @@
 | 3 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/create-durable-saga-runtime.ts plugins/sagas/src/runtime/mod.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/saga-supervisor.ts plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts` — passed. |
 | 4 | Backend resolver tests | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-store-backend_test.ts` — 5 passed, 0 failed. |
 | 4 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/saga-store-backend.ts plugins/sagas/src/runtime/saga-store-backend_test.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/mod.ts` — passed. |
+| 5 | Focused CLI tests | PASS | `rtk proxy deno test --allow-all packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts packages/cli/src/public/features/plugins/add/add-plugin_test.ts` — 9 passed, 0 failed. |
+| 5 | Focused CLI type check | PASS | `deno check --unstable-kv packages/cli/src/kernel/domain/plugin-kind.ts packages/cli/src/public/domain/plugin-add-plan.ts packages/cli/src/public/features/plugins/add/add-plugin-command.ts packages/cli/src/local/features/plugins/add/add-local-plugin-command.ts packages/cli/src/public/features/plugins/add/plan-plugin-add.ts packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts packages/cli/src/public/features/plugins/add/add-plugin.ts packages/cli/src/local/features/plugins/add/add-local-plugin.ts` — passed. |

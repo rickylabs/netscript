@@ -61,6 +61,7 @@ export async function addPlugin(
     {
       serviceReferences: plan.serviceReferences,
       pluginReferences: plan.pluginReferences,
+      sagaStoreBackend: plan.sagaStoreBackend,
     },
   );
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(
