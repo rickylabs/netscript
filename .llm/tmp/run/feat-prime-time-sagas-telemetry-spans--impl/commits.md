@@ -14,3 +14,4 @@ Format:
 - 9d2e6d2: feat(sagas): emit engine handle spans
 - 24828ad: feat(sagas): thread runtime instrumentation
 - 2c48496: feat(sagas): wire otel saga telemetry
+- f51af82c: feat(sagas): verify publish trace linkage
