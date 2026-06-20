@@ -10,13 +10,19 @@ branch `feat/framework-prime-time`. Status legend: `planned` → `plan-eval` →
 
 | group | slice | sev | status | PLAN-EVAL | IMPL-EVAL | sub-PR |
 | --- | --- | --- | --- | --- | --- | --- |
-| A-G1 | sagas-durable-store | blocker | impl-eval **PASS** | PASS | PASS (42 tests; arch:check exit1 = pre-existing debt, no new) | #74 |
-| A-G2 | sagas-idempotency-e2e | blocker | impl done — HELD | PASS | held (post-#74 merge + rebase) | #75 |
-| A-G3 | sagas-telemetry-spans | blocker | impl done — HELD | PASS | held (post-#74 merge + rebase) | #76 |
-| A-G4 | service-auth-seam | blocker | impl-eval RE-DISPATCHED | PASS | run interrupted pre-verdict → re-dispatched | #77 |
-| A-G5 | service-graceful-shutdown | blocker | impl-eval **PASS** | PASS | PASS (31 tests, 6 gates green) | #78 |
-| A-G6 | worker-applied-keys-dedup | blocker | impl-eval **PASS** | PASS | PASS (KV dedup, claim/markApplied/release) | #79 |
-| A-G7 | rbp-dlq-contract | blocker | impl-eval **PASS** | PASS (cycle-2) | PASS (DLQ KV/PG/Redis real persistence) | #80 |
+| A-G1 | sagas-durable-store | blocker | ✅ MERGED | PASS | PASS (42 tests) → merged aa03b4f7 | #74 |
+| A-G2 | sagas-idempotency-e2e | blocker | impl done — HELD (rebase now unblocked) | PASS | held → rebase onto merged #74, then IMPL-EVAL | #75 |
+| A-G3 | sagas-telemetry-spans | blocker | impl done — HELD (rebase now unblocked) | PASS | held → rebase onto merged #74, then IMPL-EVAL | #76 |
+| A-G4 | service-auth-seam | blocker | impl-eval RE-DISPATCHED | PASS | run interrupted pre-verdict → re-dispatched (pending) | #77 |
+| A-G5 | service-graceful-shutdown | blocker | ✅ MERGED | PASS | PASS (31 tests) → merged into umbrella | #78 |
+| A-G6 | worker-applied-keys-dedup | blocker | ✅ MERGED | PASS | PASS (KV dedup) → merged into umbrella | #79 |
+| A-G7 | rbp-dlq-contract | blocker | ✅ MERGED | PASS (cycle-2) | PASS (DLQ KV/PG/Redis) → merged into umbrella | #80 |
+
+**MERGED into `feat/framework-prime-time` (2026-06-20):** #74 (foundation, `aa03b4f7`), then #78/#79/#80
+(`59c586fd` umbrella tip), each `--no-ff` (slice identity preserved), no conflicts, no deno.lock churn.
+GitHub marks all four merged=True/closed. Merged-in OpenHands eval trace scratch
+(`.llm/tmp/run/openhands/pr-7x/`) swept from the umbrella in a follow-up housekeeping commit. NEXT:
+rebase #75/#76 onto merged #74 → IMPL-EVAL; #77 awaiting re-eval verdict; Track-3 Prisma plan can start.
 
 **IMPL-EVAL verdicts (2026-06-20):** #74 PASS, #78 PASS, #79 PASS, #80 PASS. #77's first eval run
 succeeded as a job but was interrupted before emitting a verdict → re-dispatched (issuecomment
