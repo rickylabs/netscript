@@ -10,6 +10,11 @@ import { sagaIdempotencyKey } from '@netscript/plugin-sagas-core/runtime';
 
 const DEFAULT_SAGA_IDEMPOTENCY_TTL_MS = 24 * 60 * 60 * 1000;
 
+type SagaIdempotencyReservationRecord = Readonly<{
+  reservedAt: string;
+  expiresAt: string;
+}>;
+
 /** Shared options for Deno KV-backed saga runtime stores. */
 export type SagaRuntimeKvStoreOptions = Readonly<{
   kv: Deno.Kv;
@@ -55,10 +60,15 @@ export class KvSagaIdempotencyStore implements SagaIdempotencyPort {
     const key = sagaIdempotencyKey(target, idempotencyKey);
     const now = this.#now();
     const expiresAt = new Date(now.getTime() + this.#ttlMs);
+    const reservationKey = this.#reservationKey(key);
+    const current = await this.#kv.get<SagaIdempotencyReservationRecord>(reservationKey);
+    if (current.value && new Date(current.value.expiresAt) <= now) {
+      await this.#kv.delete(reservationKey);
+    }
     const result = await this.#kv.atomic()
-      .check({ key: this.#reservationKey(key), versionstamp: null })
+      .check({ key: reservationKey, versionstamp: null })
       .set(
-        this.#reservationKey(key),
+        reservationKey,
         Object.freeze({ reservedAt: now.toISOString(), expiresAt: expiresAt.toISOString() }),
         { expireIn: this.#ttlMs },
       )

@@ -13,7 +13,7 @@
 ## Current State
 
 Implementation has started from the PLAN-EVAL-passed `sagas-idempotency-e2e` plan. Branch and
-upstream are confirmed. Slice 7 code is ready to commit.
+upstream are confirmed. Slice 8 code is ready to commit.
 
 ## Completed
 
@@ -27,15 +27,16 @@ upstream are confirmed. Slice 7 code is ready to commit.
 - Added plugin-layer KV transport idempotency and applied-key stores.
 - Wired service startup and default native runner/supervisor runtime creation to durable KV stores.
 - Documented plugin-layer delivery guarantees and `NETSCRIPT_SAGA_KV_PATH`.
+- Added and passed package-level unit/integration/failure-path tests.
 
 ## In Progress
 
-- Slice 7 commit/push/PR comment.
+- Slice 8 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit, push with explicit refspec, append `commits.md`, and comment PR #75 for slice 7.
-2. Implement slice 8 full unit/integration/failure-path tests.
+1. Commit, push with explicit refspec, append `commits.md`, and comment PR #75 for slice 8.
+2. Run final full gate set.
 
 ## Key Decisions
 
@@ -66,6 +67,9 @@ upstream are confirmed. Slice 7 code is ready to commit.
 | `plugins/sagas/services/src/main.ts` | changed | Service composition root durable idempotency wiring. |
 | `plugins/sagas/src/runtime/saga-supervisor.ts` | changed | Default native runner/supervisor KV wiring. |
 | `plugins/sagas/README.md` | changed | Plugin delivery guarantee documentation. |
+| `plugins/sagas/tests/runtime/kv-saga-runtime-stores_test.ts` | new | KV idempotency/applied-key integration tests. |
+| `plugins/sagas/tests/services/publish-message_test.ts` | new | Contract/service publish threading tests. |
+| `packages/plugin-sagas-core/tests/runtime/saga-runtime_applied_keys_test.ts` | new | Runtime factory applied-key wiring test. |
 
 ## Gates
 
@@ -73,6 +77,7 @@ upstream are confirmed. Slice 7 code is ready to commit.
 | --- | --- | --- |
 | Static | PASS through slice 2 | Scoped check/lint/fmt passed. |
 | Runtime | PASS through slice 2 | `deno test --unstable-kv packages/plugin-sagas-core/tests/runtime/saga-engine*` passed. |
+| Runtime | PASS through slice 8 | Package-level core and plugin tests passed. |
 | Fitness | pending | Not run yet. |
 | Runtime | pending | Not run yet. |
 | Consumer | pending | Not run yet. |
@@ -94,3 +99,4 @@ upstream are confirmed. Slice 7 code is ready to commit.
 - dcfb49d: feat(sagas): accept publish idempotency keys
 - b8570e8: feat(sagas): thread service idempotency keys
 - 9f53a85: feat(sagas): add kv idempotency stores
+- 8290297: feat(sagas): wire durable idempotency roots
