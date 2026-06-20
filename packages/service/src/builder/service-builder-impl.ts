@@ -14,6 +14,7 @@ import { cors } from 'hono/cors';
 import { ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
+import '../auth/hono-context.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import {
   createHealthHandler,
@@ -89,7 +90,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * @param options - CORS configuration options
    */
   withCors(options?: CorsOptions): ServiceBuilder<TRouter> {
-    this.app.use('*', cors((options ?? { origin: '*' }) as never));
+    this.app.use('*', cors(options ?? { origin: '*' }));
     return this;
   }
 
@@ -242,7 +243,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * database handle and distributed-trace headers.
    */
   private buildRpcContext(c: Context, traceContext: boolean): Record<string, unknown> {
-    const ctx = this.contextFactory(c as unknown as Parameters<ContextFactory>[0]);
+    const ctx = this.contextFactory(c);
 
     // Add database to context if configured via withDatabase()
     if (this.database) {
@@ -371,7 +372,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * @param middleware - Service middleware handler
    */
   use(middleware: ServiceMiddleware): ServiceBuilder<TRouter> {
-    this.app.use('*', middleware as never);
+    this.app.use('*', middleware);
     return this;
   }
 
@@ -417,9 +418,9 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   build(): ServiceApp {
     this.installAuth();
     this.installDeferredRoutes();
-    this.app.notFound(createNotFoundHandler(this.config.name) as never);
-    this.app.onError(createErrorHandler(this.config.name) as never);
-    return this.app as unknown as ServiceApp;
+    this.app.notFound(createNotFoundHandler(this.config.name));
+    this.app.onError(createErrorHandler(this.config.name));
+    return this.app;
   }
 
   private installAuth(): void {
@@ -427,7 +428,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     this.authInstalled = true;
 
     if (this.authnOptions) {
-      this.app.use('*', createAuthnMiddleware(this.authnOptions) as never);
+      this.app.use('*', createAuthnMiddleware(this.authnOptions));
     }
 
     if (this.authzOptions) {
@@ -437,7 +438,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
           ...this.authzOptions,
           protect: this.authnOptions?.protect,
           allowAnonymous: this.authnOptions?.allowAnonymous,
-        }) as never,
+        }),
       );
     }
   }
@@ -480,7 +481,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     }
 
     for (const route of this.deferredRoutes) {
-      this.app[route.method](route.path, route.handler as never);
+      this.app[route.method](route.path, route.handler);
     }
   }
 

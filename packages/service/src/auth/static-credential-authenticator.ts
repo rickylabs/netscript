@@ -42,7 +42,7 @@ export interface StaticCredentialAuthenticatorOptions {
 }
 
 /** Compares two credential strings using Web Crypto digest equality. */
-export async function constantTimeCredentialEquals(
+async function constantTimeCredentialEquals(
   candidate: string,
   stored: string,
 ): Promise<boolean> {

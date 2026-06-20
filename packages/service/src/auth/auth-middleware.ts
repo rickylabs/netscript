@@ -13,6 +13,7 @@
 
 import type { Context, MiddlewareHandler } from 'hono';
 import { createLogger, type Logger } from '@netscript/logger';
+import './hono-context.ts';
 import type { AuthnOptions, AuthzOptions } from './options.ts';
 import type { AuthnRequest, Principal } from './types.ts';
 
@@ -82,7 +83,7 @@ export function createAuthzMiddleware(options: AuthzMiddlewareOptions): Middlewa
       return await next();
     }
 
-    const principal = c.get('principal') as Principal | undefined;
+    const principal = c.get('principal');
     if (!principal) {
       await logAuthDecision(c, {
         stage: 'authz',
@@ -225,7 +226,7 @@ async function logAuthDecision(
 }
 
 function readLogger(c: Context): Logger {
-  return (c.get('logger') as Logger | undefined) ?? AUTH_LOGGER;
+  return c.get('logger') ?? AUTH_LOGGER;
 }
 
 async function hashSubject(subject: string): Promise<string> {
