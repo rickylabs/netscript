@@ -115,6 +115,27 @@ Next: await both IMPL-EVAL verdicts → on PASS merge each into `feat/prime-time
 either may merge first) → update umbrella PR #86 checklist → AS3 (unified plugins/auth oRPC service)
 unblocked once both land. Two FAIL cycles per leaf → escalate.
 
+**AS2a ∥ AS2b IMPL-EVAL = PASS + MERGED (2026-06-20 ~17:3x UTC). AS2 PHASE COMPLETE.**
+- **AS2a** IMPL-EVAL **PASS** (qwen3.7-max run `27874783640`, #87 comment `4758622675`): 9 gates exit
+  0 + full-repo test 805/0; boundary clean; typed error asserted in both packages. Merged `0d144ffc`
+  (merge commit into `feat/prime-time/auth`, #87 closed). Debt `AS2-CONSOLIDATION` (dup error class +
+  `sign/verifySessionToken` helpers → lift into plugin-auth-core in AS3).
+- **AS2b** IMPL-EVAL **PASS-with-debt** (qwen3.7-max run `27874924828`, #88 comment `4758646474`): 6
+  gates exit 0 (test 8/0, publish:dry-run 0); full pure non-HTTP backend, all sub-ports real, security
+  baseline tested. Mergeable=clean (no lock conflict). Merged `6bc168e0` (UMBRELLA TIP, #88 closed).
+  Debt `AS2B-KV-OAUTH-DEBT` (OIDC nonce/id_token e2e + RFC 9207 `iss` validation → fold into AS3).
+- **Merged-tip validation** at `6bc168e0` (`git checkout -f origin/feat/prime-time/auth`): all 4 auth
+  pkgs present; scoped check exit 0; test **23/0** (15 backends + 8 kv-oauth); `deno.lock` clean (no
+  regeneration). Merge is semantically consistent, not just textually clean.
+- evaluate.md written for both slices (`slices/auth-plugin/as2{a,b}-*/evaluate.md`).
+- Umbrella PR #86 checklist: AS1✅ AS2a✅ AS2b✅.
+
+Next: **AS3** — unified `plugins/auth` oRPC service + streams (`auth.token.refreshed` /
+`auth.session.revoked` / `auth.oidc.completed`). Author the AS3 generator brief off umbrella tip
+`6bc168e0`; fold in the AS2 debt (shared `AuthBackendOperationUnsupportedError`/token helpers into
+plugin-auth-core; OIDC-kind e2e fixture exercising nonce+id_token; pass `expectedIssuer` for RFC 9207).
+Then AS4 → AS5 → AS6 (sequential).
+
 **Launch mechanics that actually worked (verified 2026-06-20):**
 
 - `wsl.exe -u codex -- bash -lc 'cd /home/...; ...'` — the inner `cd` SILENTLY does not take effect

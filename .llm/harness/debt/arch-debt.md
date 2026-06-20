@@ -781,3 +781,43 @@ Seeded from
   `KvSagaStore` behavior changes are included in the debt.
 - **Gate:** F-16 folder cardinality is back under threshold and F-13 saga runtime invariants remain
   green.
+
+## packages/auth-{workos,better-auth} — duplicated backend error + token helpers (`AS2-CONSOLIDATION`)
+
+- **Reason:** AS2a refactored `@netscript/auth-workos` and `@netscript/auth-better-auth` into pure
+  `AuthBackendPort` backends. Each package independently defines an identical
+  `AuthBackendOperationUnsupportedError` class (backendName/operation/reason) and a duplicated
+  `signSessionToken` / `verifySessionToken` helper pair. The shared shape belongs in
+  `@netscript/plugin-auth-core` so all backends (incl. kv-oauth and future tier-2) reference one
+  error type and one token-helper implementation.
+- **Owner:** Track-5 auth-plugin program; AS3 (unified `plugins/auth` oRPC service) is the
+  consolidation point.
+- **Target:** Lift the shared error class + token helpers into `@netscript/plugin-auth-core` during
+  AS3, then have AS2 backends import them.
+- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2a-backends-refactor/evaluate.md`.
+- **Created:** 2026-06-20.
+- **Status:** open, DEBT_ACCEPTED at AS2a PASS (qwen3.7-max run 27874783640, PR #87). Non-blocking;
+  both backends compile/test/lint/fmt clean with the duplicated definitions.
+- **Gate:** `AuthBackendOperationUnsupportedError` and `sign/verifySessionToken` are defined once in
+  `@netscript/plugin-auth-core` and imported by both backends; backend tests stay green.
+
+## packages/auth-kv-oauth — OIDC e2e coverage + RFC 9207 iss validation (`AS2B-KV-OAUTH-DEBT`)
+
+- **Reason:** AS2b landed `@netscript/auth-kv-oauth` as a pure KV-backed OAuth2/OIDC
+  `AuthBackendPort` backend. The OIDC branch (nonce + id_token via `@panva/oauth4webapi`) is correctly
+  wired but **untested end-to-end** — the test provider fixture is `kind:'oauth'` and never exercises
+  `kind:'oidc'`. Separately, the callback `iss` response param is stored in the txn but not passed as
+  `expectedIssuer` to `validateAuthResponse`, so RFC 9207 issuer validation is not enforced
+  (defense-in-depth; state + PKCE already bind the response).
+- **Owner:** Track-5 auth-plugin program. Item 1 (OIDC e2e) folds naturally into AS3, where the
+  unified oRPC service exercises the OIDC flow end-to-end.
+- **Target:** Add an OIDC-kind provider fixture (with issuer) validating nonce round-trip + id_token
+  claim extraction; pass `expectedIssuer` on callback validation. Address by/within AS3.
+- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2b-kv-oauth/evaluate.md`.
+- **Created:** 2026-06-20.
+- **Status:** open, DEBT_ACCEPTED at AS2b PASS (qwen3.7-max run 27874924828, PR #88). Non-blocking;
+  evaluator classified both items as good first follow-ups, not merge blockers. v1-deferred extras
+  (PAR/DPoP opt-in, active key-rotation, tier-2/generic presets, global-logout index) remain per
+  LD-12.
+- **Gate:** An OIDC-kind e2e test asserts nonce + id_token claims; callback passes `expectedIssuer`
+  to `validateAuthResponse`; package tests stay green.
