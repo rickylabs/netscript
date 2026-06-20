@@ -178,21 +178,27 @@ Deno.test('createWorkosBackend throws typed errors for unsupported managed-sessi
     cookiePassword: 'x'.repeat(32),
   });
 
-  for (
-    const [operation, run] of [
-      [
-        'sessions.createSession',
-        () =>
-          backend.sessions.createSession({
-            userId: 'user_123',
-            subject: 'user_123',
-            expiresAt: '2026-01-02T00:00:00.000Z',
-          }),
-      ],
-      ['sessions.refreshSession', () => backend.sessions.refreshSession('sess_123')],
-      ['sessions.revokeSession', () => backend.sessions.revokeSession('sess_123')],
-    ] as const
-  ) {
+  const unsupportedCases: readonly UnsupportedOperationCase[] = [
+    {
+      operation: 'sessions.createSession',
+      run: () =>
+        backend.sessions.createSession({
+          userId: 'user_123',
+          subject: 'user_123',
+          expiresAt: '2026-01-02T00:00:00.000Z',
+        }),
+    },
+    {
+      operation: 'sessions.refreshSession',
+      run: () => backend.sessions.refreshSession('sess_123'),
+    },
+    {
+      operation: 'sessions.revokeSession',
+      run: () => backend.sessions.revokeSession('sess_123'),
+    },
+  ];
+
+  for (const { operation, run } of unsupportedCases) {
     const error = await assertRejects(async () => {
       await run();
     }, AuthBackendOperationUnsupportedError);
@@ -202,6 +208,11 @@ Deno.test('createWorkosBackend throws typed errors for unsupported managed-sessi
     assert(error.reason.length > 0);
   }
 });
+
+type UnsupportedOperationCase = Readonly<{
+  operation: string;
+  run(): unknown;
+}>;
 
 function workosClient(
   authenticationResult: WorkosSessionAuthenticationResult,

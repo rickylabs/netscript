@@ -6,15 +6,20 @@ import type {
   AuthSessionLookup,
   AuthSessionPrincipalMapping,
 } from '@netscript/plugin-auth-core';
+import {
+  AuthBackendOperationUnsupportedError,
+  createHmacSessionTokenCrypto,
+} from '@netscript/plugin-auth-core';
 import type { AuthnRequest, AuthnResult } from '@netscript/service/auth';
 import {
   type BetterAuthAuthenticatorOptions,
-  type BetterAuthInstance,
   type BetterAuthSessionPayload,
   createBetterAuthAuthenticator,
   principalFromBetterAuthSession,
   unwrapSessionResponse,
 } from './better-auth.ts';
+
+export { AuthBackendOperationUnsupportedError } from '@netscript/plugin-auth-core';
 
 /** Configured better-auth provider exposed by the backend registry. */
 export interface BetterAuthProviderOptions {
@@ -34,25 +39,6 @@ export interface BetterAuthBackendOptions extends BetterAuthAuthenticatorOptions
   readonly providers?: readonly BetterAuthProviderOptions[];
   /** Secret used to sign backend-owned opaque session tokens. */
   readonly sessionTokenSecret: string;
-}
-
-/** Error thrown when a better-auth backend operation is outside better-auth's request API. */
-export class AuthBackendOperationUnsupportedError extends Error {
-  /** Backend that rejected the operation. */
-  readonly backendName: string;
-  /** Port operation that is not supported. */
-  readonly operation: string;
-  /** Short explanation of the upstream capability boundary. */
-  readonly reason: string;
-
-  /** Creates an unsupported-operation error. */
-  constructor(backendName: string, operation: string, reason: string) {
-    super(`${backendName} does not support ${operation}: ${reason}`);
-    this.name = 'AuthBackendOperationUnsupportedError';
-    this.backendName = backendName;
-    this.operation = operation;
-    this.reason = reason;
-  }
 }
 
 const BETTER_AUTH_BACKEND_NAME = 'better-auth';
@@ -75,6 +61,7 @@ const BETTER_AUTH_BACKEND_NAME = 'better-auth';
 export function createBetterAuthBackend(options: BetterAuthBackendOptions): AuthBackendPort {
   const authenticator = createBetterAuthAuthenticator(options);
   const providers = normalizeBetterAuthProviders(options.providers);
+  const sessionCrypto = createHmacSessionTokenCrypto(options.sessionTokenSecret);
 
   return {
     name: BETTER_AUTH_BACKEND_NAME,
@@ -116,11 +103,11 @@ export function createBetterAuthBackend(options: BetterAuthBackendOptions): Auth
       },
     },
     crypto: {
-      sealSessionToken(session: AuthSession): Promise<string> {
-        return signSessionToken(session.id, options.sessionTokenSecret);
+      async sealSessionToken(session: AuthSession): Promise<string> {
+        return await sessionCrypto.sealSessionToken(session);
       },
-      openSessionToken(token: string): Promise<string> {
-        return verifySessionToken(token, options.sessionTokenSecret);
+      async openSessionToken(token: string): Promise<string> {
+        return await sessionCrypto.openSessionToken(token);
       },
     },
     principalMapper: {
@@ -187,12 +174,7 @@ function mapAuthSessionToPrincipal(session: AuthSession): AuthSessionPrincipalMa
       scopes: session.scopes,
       roles: session.roles,
       scheme: 'custom',
-      claims: {
-        ...session.claims,
-        sessionId: session.id,
-        userId: session.userId,
-        providerId: session.providerId,
-      },
+      claims: session.claims,
     },
   };
 }
@@ -214,57 +196,3 @@ function unsupportedBetterAuthOperation(
 ): AuthBackendOperationUnsupportedError {
   return new AuthBackendOperationUnsupportedError(BETTER_AUTH_BACKEND_NAME, operation, reason);
 }
-
-async function signSessionToken(sessionId: string, secret: string): Promise<string> {
-  const payload = `${sessionId}.${crypto.randomUUID()}`;
-  const signature = await hmac(payload, secret);
-  return `${base64UrlEncode(payload)}.${signature}`;
-}
-
-async function verifySessionToken(token: string, secret: string): Promise<string> {
-  const [encodedPayload, signature, extra] = token.split('.');
-  if (!encodedPayload || !signature || extra !== undefined) {
-    throw new Error('Invalid better-auth backend session token.');
-  }
-  const payload = base64UrlDecode(encodedPayload);
-  const expected = await hmac(payload, secret);
-  if (signature !== expected) {
-    throw new Error('Invalid better-auth backend session token signature.');
-  }
-  return payload.split('.', 1)[0] ?? '';
-}
-
-async function hmac(value: string, secret: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(value));
-  return base64UrlEncode(new Uint8Array(signature));
-}
-
-function base64UrlEncode(value: string | Uint8Array): string {
-  const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : value;
-  let binary = '';
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
-}
-
-function base64UrlDecode(value: string): string {
-  const padded = value.replaceAll('-', '+').replaceAll('_', '/').padEnd(
-    Math.ceil(value.length / 4) * 4,
-    '=',
-  );
-  const binary = atob(padded);
-  return new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)));
-}
-
-type BetterAuthSessionLookupResult = Awaited<ReturnType<BetterAuthInstance['api']['getSession']>>;
-
-export type { BetterAuthSessionLookupResult };
