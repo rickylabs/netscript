@@ -10,13 +10,21 @@ branch `feat/framework-prime-time`. Status legend: `planned` → `plan-eval` →
 
 | group | slice | sev | status | PLAN-EVAL | IMPL-EVAL | sub-PR |
 | --- | --- | --- | --- | --- | --- | --- |
-| A-G1 | sagas-durable-store | blocker | impl-eval (dispatched) | PASS | dispatched | #74 |
+| A-G1 | sagas-durable-store | blocker | impl-eval **PASS** | PASS | PASS (42 tests; arch:check exit1 = pre-existing debt, no new) | #74 |
 | A-G2 | sagas-idempotency-e2e | blocker | impl done — HELD | PASS | held (post-#74 merge + rebase) | #75 |
 | A-G3 | sagas-telemetry-spans | blocker | impl done — HELD | PASS | held (post-#74 merge + rebase) | #76 |
-| A-G4 | service-auth-seam | blocker | impl-eval (dispatched) | PASS | dispatched | #77 |
-| A-G5 | service-graceful-shutdown | blocker | impl-eval (dispatched) | PASS | dispatched | #78 |
-| A-G6 | worker-applied-keys-dedup | blocker | impl-eval (dispatched) | PASS | dispatched | #79 |
-| A-G7 | rbp-dlq-contract | blocker | impl-eval (dispatched) | PASS (cycle-2) | dispatched | #80 |
+| A-G4 | service-auth-seam | blocker | impl-eval RE-DISPATCHED | PASS | run interrupted pre-verdict → re-dispatched | #77 |
+| A-G5 | service-graceful-shutdown | blocker | impl-eval **PASS** | PASS | PASS (31 tests, 6 gates green) | #78 |
+| A-G6 | worker-applied-keys-dedup | blocker | impl-eval **PASS** | PASS | PASS (KV dedup, claim/markApplied/release) | #79 |
+| A-G7 | rbp-dlq-contract | blocker | impl-eval **PASS** | PASS (cycle-2) | PASS (DLQ KV/PG/Redis real persistence) | #80 |
+
+**IMPL-EVAL verdicts (2026-06-20):** #74 PASS, #78 PASS, #79 PASS, #80 PASS. #77's first eval run
+succeeded as a job but was interrupted before emitting a verdict → re-dispatched (issuecomment
+-4756121577). Merges await explicit user authorization; #74 merges first. **Open scope question
+(user-raised):** the durable saga store (#74) is KV-only and its slice-7 docs change deliberately
+REMOVES the legacy `@saga-bus/store-prisma` promise rather than implementing a Prisma `SagaStorePort`.
+User wants Prisma parity with the old saga-bus impl → pending decision on a `sagas-prisma-store`
+fast-follow adapter slice (consumes the already-locked `SagaStorePort`, mirrors queue multi-adapter).
 
 **IMPL-EVAL dispatch (2026-06-20):** all 7 generators FINISHED and posted ready/complete verdicts.
 IMPL-EVAL (OpenHands qwen3.7-max, one trigger per PR — different PRs, no per-PR concurrency-cancel)
