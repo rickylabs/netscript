@@ -49,13 +49,15 @@
     "include": [
       "README.md",
       "deno.json",
+      "scaffold.plugin.json",
       "package.json",
       "mod.ts",
       "contracts.ts",
       "verify-plugin.ts",
       "src/**/*.ts",
       "services/**/*.ts",
-      "streams/**/*.ts"
+      "streams/**/*.ts",
+      "database/**/*.prisma"
     ],
     "exclude": [
       "**/*_test.ts",
