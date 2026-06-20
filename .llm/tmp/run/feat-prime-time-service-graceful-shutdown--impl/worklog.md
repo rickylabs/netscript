@@ -67,6 +67,7 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | 2026-06-20 | 2 | coordinator | Added private shutdown coordinator and unit tests for LIFO order, failure collection, idempotency, and timeout handling. |
 | 2026-06-20 | 3 | listener | Wired listener stop/external abort/OS signals through the coordinator; added runtime tests for in-flight drain and signal listener hygiene. |
 | 2026-06-20 | 4 | builder wiring | Added `ServiceBuilder.onShutdown()`, threaded hooks into the listener, and covered stop/signal/failure/timeout behavior in service tests. |
+| 2026-06-20 | 5 | preset DB drain | `defineService()` now registers `$disconnect` for capable DB clients; focused preset tests cover capable and non-capable clients. |
 
 ## Decisions
 
@@ -101,6 +102,9 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | slice 4 rerun exit 0; 19 files selected, 0 findings. |
 | lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | slice 4 rerun exit 0; 19 files selected, 0 findings. |
 | fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | slice 4 rerun exit 0; 19 files selected, 0 findings. |
+| check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts` | PASS | slice 5 rerun exit 0; 20 files selected, 0 findings. |
+| lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/service --ext ts` | PASS | slice 5 rerun exit 0; 20 files selected, 0 findings. |
+| fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/service --ext ts` | PASS | slice 5 rerun exit 0; 20 files selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -116,6 +120,7 @@ A developer adding another listener lifecycle feature starts at `packages/servic
 | coordinator unit | PASS | `rtk proxy deno test --allow-all packages/service/tests/shutdown-coordinator_test.ts` exit 0; 4 passed, 0 failed. | Covers LIFO, failure collection, idempotency, timeout. |
 | listener lifecycle | PASS | `rtk proxy deno test --allow-all packages/service/tests/runtime_test.ts` exit 0; 10 passed, 0 failed. | Covers in-flight drain, listener closure, external abort, signal install/remove, repeated serve/stop. |
 | service test suite | PASS | `rtk proxy deno test --allow-all packages/service/tests/` exit 0; 29 passed, 0 failed. | Covers builder hook stop/signal/failure/timeout behavior plus existing service tests. |
+| service test suite | PASS | `rtk proxy deno test --allow-all packages/service/tests/` exit 0; 31 passed, 0 failed. | Adds `defineService()` `$disconnect` capable/non-capable DB coverage. |
 
 ### Consumer Gates
 

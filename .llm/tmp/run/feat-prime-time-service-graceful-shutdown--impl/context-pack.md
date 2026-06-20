@@ -12,7 +12,7 @@
 
 ## Current State
 
-Contract, coordinator, listener, and builder-hook slices are implemented: `ServeOptions` now carries `drainTimeoutMs`/`handleSignals`, shutdown contracts are exported from the root service surface, the private coordinator handles LIFO hooks/failure collection/idempotency/timeout reporting, the listener routes manual stop/external abort/OS signals through graceful `server.shutdown()`, and `ServiceBuilder.onShutdown()` threads hooks into the runtime.
+Contract, coordinator, listener, builder-hook, and preset DB drain slices are implemented: `ServeOptions` now carries `drainTimeoutMs`/`handleSignals`, shutdown contracts are exported from the root service surface, the private coordinator handles LIFO hooks/failure collection/idempotency/timeout reporting, the listener routes manual stop/external abort/OS signals through graceful `server.shutdown()`, `ServiceBuilder.onShutdown()` threads hooks into the runtime, and `defineService()` disconnects capable DB clients on stop.
 
 ## Completed
 
@@ -22,15 +22,16 @@ Contract, coordinator, listener, and builder-hook slices are implemented: `Serve
 - Added `ServiceShutdownCoordinator` and focused unit tests; scoped check/lint/fmt plus coordinator tests passed.
 - Wired `service-listener.ts` to the coordinator and added runtime tests; scoped check/lint/fmt plus runtime tests passed.
 - Added `ServiceBuilder.onShutdown()` to interface/implementation and service tests; full `packages/service/tests/` passed.
+- Added `defineService()` `$disconnect` shutdown hook for capable health-check clients and focused preset tests; full `packages/service/tests/` passed.
 
 ## In Progress
 
-- Preset DB drain slice.
+- Docs, README, publish surface, final gates.
 
 ## Next Steps
 
-1. Update `defineService()` to register `$disconnect` shutdown hooks for capable database clients.
-2. Add focused preset tests for capable and non-capable DB contexts.
+1. Update README quick-start/docs for `onShutdown()`.
+2. Run publish dry-run, final service tests, consumer checks, arch check, and manual fitness evidence.
 
 ## Key Decisions
 
@@ -57,6 +58,8 @@ Contract, coordinator, listener, and builder-hook slices are implemented: `Serve
 | `packages/service/src/builder/service-builder.ts` | changed | Public `onShutdown()` builder method. |
 | `packages/service/src/builder/service-builder-impl.ts` | changed | Shutdown hook storage and listener threading. |
 | `packages/service/tests/service-builder_test.ts` | changed | Builder shutdown hook tests. |
+| `packages/service/src/presets/define-service.ts` | changed | DB `$disconnect` shutdown hook registration. |
+| `packages/service/tests/define-service_test.ts` | new | Preset DB drain tests. |
 
 ## Gates
 
@@ -64,7 +67,7 @@ Contract, coordinator, listener, and builder-hook slices are implemented: `Serve
 | ----------- | -------------- | -------- |
 | Static | PASS | Coordinator slice check/lint/fmt exit 0. |
 | Fitness | IN_PROGRESS | Coordinator test-shape and failure-path coverage added. |
-| Runtime | PASS | Full package service tests pass through step 4. |
+| Runtime | PASS | Full package service tests pass through step 5. |
 | Consumer | NOT_RUN | Pending implementation. |
 
 ## Open Questions
@@ -81,3 +84,4 @@ Contract, coordinator, listener, and builder-hook slices are implemented: `Serve
 - ce1e901: feat(service): add shutdown contracts
 - cb8936f: feat(service): add shutdown coordinator
 - 7f66af2: feat(service): drain listener shutdown
+- f2cfc34: feat(service): wire shutdown hooks
