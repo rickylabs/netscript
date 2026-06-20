@@ -28,7 +28,10 @@ Deno.test('runtime processor rejects defer actions instead of silently dropping 
   assertEquals(result.status, 'dlq');
   assertEquals(result.actionsDispatched, 0);
   assertEquals(dlq.entries.length, 1);
-  assertStringIncludes(dlq.entries[0].reason, 'Deferred trigger action dispatch is not implemented');
+  assertStringIncludes(
+    dlq.entries[0].reason,
+    'Deferred trigger action dispatch is not implemented',
+  );
   assertEquals(idempotency.completed, ['evt_1']);
   assertEquals(idempotency.released.length, 0);
 });
