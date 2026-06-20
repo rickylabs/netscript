@@ -13,7 +13,7 @@
 ## Current State
 
 Implementation has started from the PLAN-EVAL-passed `sagas-idempotency-e2e` plan. Branch and
-upstream are confirmed. Slice 3 code is ready to commit.
+upstream are confirmed. Slice 4 code is ready to commit.
 
 ## Completed
 
@@ -22,15 +22,16 @@ upstream are confirmed. Slice 3 code is ready to commit.
 - Implemented the core applied-key port, memory store, and exported idempotency key formatter.
 - Implemented the engine applied-key guard and targeted tests.
 - Documented the core delivery guarantee and production durable idempotency requirement.
+- Added optional `idempotencyKey` to the sagas publish contract type and schema.
 
 ## In Progress
 
-- Slice 3 commit/push/PR comment.
+- Slice 4 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit, push with explicit refspec, append `commits.md`, and comment PR #75 for slice 3.
-2. Implement slice 4 HTTP publish contract field.
+1. Commit, push with explicit refspec, append `commits.md`, and comment PR #75 for slice 4.
+2. Implement slice 5 service idempotency threading.
 
 ## Key Decisions
 
@@ -53,6 +54,7 @@ upstream are confirmed. Slice 3 code is ready to commit.
 | `packages/plugin-sagas-core/src/runtime/saga-engine.ts` | changed | Engine applied-key guard and publish option threading. |
 | `packages/plugin-sagas-core/tests/runtime/saga-engine_applied_keys_test.ts` | new | Engine applied-key unit tests. |
 | `packages/plugin-sagas-core/README.md` | changed | Delivery guarantee documentation. |
+| `plugins/sagas/contracts/v1/sagas.contract.ts` | changed | Publish `idempotencyKey` type/schema. |
 
 ## Gates
 
@@ -77,3 +79,4 @@ upstream are confirmed. Slice 3 code is ready to commit.
 
 - dc3d569: feat(sagas): add applied-key store contract
 - d6c1379: feat(sagas): guard engine applied keys
+- 9ad4ef5: docs(sagas): document idempotent delivery

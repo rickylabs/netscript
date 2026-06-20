@@ -75,6 +75,7 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | 2026-06-20 | 2 | engine guard | Added engine applied-key short-circuit, `alreadyApplied` result, and raw `publish()` option threading. |
 | 2026-06-20 | 2 | tests | Added engine applied-key tests for duplicate, no-key, per-instance, publish-options, and memory store behavior. |
 | 2026-06-20 | 3 | README | Documented core at-least-once delivery with idempotency keys and durable production injection requirement. |
+| 2026-06-20 | 4 | contract | Added optional `idempotencyKey` to publish input type and Zod schema. |
 
 ## Decisions
 
@@ -107,6 +108,9 @@ and `SagaAppliedKeyStore` for engine effects, then inject both through `createSa
 | slice 3 doc lint | `deno doc --lint packages/plugin-sagas-core/mod.ts` | PASS | Checked 1 file. |
 | slice 3 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --ext ts` | PASS | 92 files selected; 0 diagnostics. |
 | slice 3 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext md,ts` | PASS | 98 files selected; 0 findings after scoped write-format. |
+| slice 4 contract check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/contracts --ext ts` | PASS | 2 files selected; 0 diagnostics. |
+| slice 4 contract lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas/contracts --ext ts` | PASS | 2 files selected; 0 findings. |
+| slice 4 contract fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/contracts --ext ts` | PASS | 2 files selected; 0 findings after scoped write-format. |
 
 ### Fitness Gates
 
