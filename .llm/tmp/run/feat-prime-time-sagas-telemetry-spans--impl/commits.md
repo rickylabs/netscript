@@ -15,3 +15,4 @@ Format:
 - 24828ad: feat(sagas): thread runtime instrumentation
 - 2c48496: feat(sagas): wire otel saga telemetry
 - f51af82c: feat(sagas): verify publish trace linkage
+- e0ce950: chore(sagas): finalize telemetry span evidence

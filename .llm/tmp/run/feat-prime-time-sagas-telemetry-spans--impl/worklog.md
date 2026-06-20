@@ -76,6 +76,7 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | 2026-06-20 | S4 | gates | Scoped plugin check/lint/fmt and OTel adapter tests passed. |
 | 2026-06-20 | S5 | implementation | Added service publish trace-linkage and failure-path tests; fixed package-local JSR module tags and a local plugin CLI doctrine finding. |
 | 2026-06-20 | S5 | gates | Final scoped static gates, targeted tests, publish dry-run, doc lint, JSR audit, and scoped doctrine checks passed. Root `deno task arch:check` remains red on pre-existing repo-wide debt. |
+| 2026-06-20 | resume | rebase prep | User reported durable-store PR #74 plus #78/#79/#80 merged into umbrella and requested rebase onto `origin/feat/framework-prime-time`; pre-rebase artifact refresh will be committed before rebase. |
 
 ## Decisions
 

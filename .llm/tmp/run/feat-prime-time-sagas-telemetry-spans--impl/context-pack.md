@@ -12,7 +12,9 @@
 
 ## Current State
 
-S5 implementation is complete locally: the core telemetry seam and engine handle spans are wired, native runtime instrumentation reaches the engine, `plugins/sagas` has an OTel-backed saga tracer injected at native composition roots, and service publish trace headers are proven to parent `saga.handle` spans. S1-S4 are committed and pushed; S5 is ready to commit.
+S5 implementation is complete and pushed: the core telemetry seam and engine handle spans are wired, native runtime instrumentation reaches the engine, `plugins/sagas` has an OTel-backed saga tracer injected at native composition roots, and service publish trace headers are proven to parent `saga.handle` spans.
+
+Resume request: rebase `feat/prime-time/sagas-telemetry-spans` onto the updated umbrella `origin/feat/framework-prime-time` after durable-store PR #74 and sibling PRs #78/#79/#80 merged. Resolve conflicts by consuming the locked durable-store contract (`KvSagaStore`, `createDurableSagaRuntime`, `SagaStorePort`) instead of reintroducing a divergent store contract. Re-run the approved slice gate set, push with explicit force-with-lease refspec, append artifacts, write `READY FOR IMPL-EVAL (rebased onto umbrella)` in `worklog.md`, and do not comment on PR #76.
 
 ## Completed
 
@@ -32,12 +34,14 @@ S5 implementation is complete locally: the core telemetry seam and engine handle
 
 ## In Progress
 
-- S5 commit/push/PR comment and final PR readiness comment.
+- Rebase onto updated umbrella and rerun slice gates.
 
 ## Next Steps
 
-1. Commit S5.
-2. Append `commits.md`, push explicit refspec, and comment PR #76 with final readiness evidence.
+1. Commit pre-rebase harness artifact refresh.
+2. Rebase onto `origin/feat/framework-prime-time`.
+3. Rerun slice gates from `plan.md`.
+4. Append artifacts, push explicit force-with-lease refspec, and stop without PR comments.
 
 ## Key Decisions
 
@@ -94,3 +98,4 @@ S5 implementation is complete locally: the core telemetry seam and engine handle
 - 24828ad: feat(sagas): thread runtime instrumentation
 - 2c48496: feat(sagas): wire otel saga telemetry
 - f51af82c: feat(sagas): verify publish trace linkage
+- e0ce950: chore(sagas): finalize telemetry span evidence
