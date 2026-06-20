@@ -86,11 +86,56 @@ set.
 - Convex auth/authkit docs: https://docs.convex.dev/auth/authkit/
 - WorkOS blog (Convex AuthKit): https://workos.com/blog/convex-authkit
 
-## TODO (formal research phase, before locking plan.md)
+## RESOLVED FINDINGS — formal research (2026-06-20)
 
-- Read `@convex-dev/better-auth` adapter source/docs for the exact storage-adapter contract surface
-  better-auth expects (so the NetScript Prisma-backed adapter is faithful).
-- Inventory better-auth's feature list and tag each feature: verification-only vs requires-storage.
-- Confirm WorkOS Node SDK surface for AuthKit session validation + JWKS access-token verification.
-- Confirm catalog entries / versions for `better-auth` and `@workos-inc/node` via
-  `.llm/tools/deps/` (`deps:latest`), never `deno outdated --latest`.
+### F1. better-auth storage tier = WRAP better-auth's own Prisma adapter (key simplification)
+
+better-auth **already ships a first-party Prisma adapter** (`prismaAdapter` from
+`better-auth/adapters/prisma`, passed as `betterAuth({ database: prismaAdapter(prisma, { provider })
+})`). So the NetScript storage tier is NOT a hand-rolled Convex-`createApi`-style CRUD adapter — it is
+a thin wrapper that constructs `prismaAdapter` over the consumer's `@netscript/database` Prisma client
+(Operating Rule 3: wrap, don't reinvent). The Convex `createApi` study was the right diligence but the
+faithful NetScript path is better-auth's native Prisma adapter, not a bespoke store.
+
+- Version: `better-auth@1.6.20`; bundled `@better-auth/prisma-adapter@1.6.20`.
+- Prisma peer: `@prisma/client ^5 || ^6 || ^7` (optional) → **compatible with the cataloged Prisma
+  7.8.0** ✓. No version conflict.
+- Schema: better-auth **generates** Prisma models via its CLI (`@better-auth/cli generate`); it does
+  NOT auto-migrate. So this slice must ship/generate the better-auth Prisma models and route them
+  through NetScript's Prisma/migration flow (Archetype-5 schema-contribution analogue). Generation is
+  a build/tooling step, not a runtime dependency.
+- Feature inventory (verify-vs-storage): verification-only needs no tables; **orgs, admin, API keys,
+  2FA, persistent sessions all require the better-auth tables** → confirms the locked
+  "verify + Prisma storage" tier is the right call for "most better-auth features."
+
+### F2. WorkOS verification surface (confirmed)
+
+- Version: `@workos-inc/node@10.4.0` (deps inlined: `jose@6.2.3`, `iron-webcrypto`,
+  `uint8array-extras`; declares Node `>=22.11` — **Deno node-compat fitness is a plan verify item**).
+- Session verify: `workos.userManagement.loadSealedSession({ sessionData, cookiePassword })` →
+  `.authenticate()` returns `{ authenticated, sessionId, organizationId, role, permissions, user }`.
+  `cookiePassword` is required (consumer-provided secret/env).
+- Access-token path: token is a JWT, verifiable via JWKS `…/sso/jwks/<clientId>` using `jose`.
+- **Principal mapping (resolves Q3):** `subject = user.id`, `roles = [role]`,
+  `scopes = permissions`, `claims = { org_id: organizationId, sid: sessionId, ...token claims }`.
+  Widened `Principal.claims` carries the tenant/org id (from #77 steer) ✓.
+
+### F3. Catalog additions (versions to pin)
+
+- `better-auth`: `^1.6.20`
+- `@workos-inc/node`: `^10.4.0`
+- Declared ONLY in their own packages' import maps via `catalog:`; never in core `@netscript/service`.
+- `@better-auth/cli` (schema gen) is a dev/tooling concern — invoke via a `.llm/tools/` script, do not
+  add a runtime catalog entry unless the generator needs it pinned.
+- **Authority caveat:** these were read from the npm registry `latest` tag during research. Per repo
+  rule, confirm via `deno task deps:latest` AFTER the catalog entries exist (deps:latest reads the
+  catalog) — do NOT trust `deno outdated --latest`.
+
+### Remaining for plan.md (post-#77-merge)
+
+- Q4 session refresh: confirm the adapter writes `Set-Cookie` through the #77 response channel
+  (better-auth refresh-on-read; WorkOS session refresh). Surface exists per the #77 widening; wire it.
+- Q5 mounting better-auth's own `/api/auth/**` handler on the `@netscript/service` Hono app with an
+  `allowAnonymous` exemption — ship a documented helper.
+- Deno node-compat smoke for `@workos-inc/node@10` (Node>=22.11 declared) and `better-auth@1.6` under
+  the repo's Deno 2.8 toolchain.
