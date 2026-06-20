@@ -17,3 +17,4 @@ Format:
 - 5ed7f06: feat(queue): route kv polling dlq through store port
 - 592754b: feat(queue): dead letter postgres and redis nacks
 - 52e6b1b: feat(queue): dead letter fedify adapter nacks
+- 5fcb4c7: feat(queue): thread dead letter store through factory

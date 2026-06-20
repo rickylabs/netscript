@@ -79,6 +79,9 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Resolve the configured DLQ store or lazily create the KV-backed default.
+   */
   private ensureDeadLetterStore(): DeadLetterStorePort<T> {
     if (this.deadLetterStore) {
       return this.deadLetterStore;

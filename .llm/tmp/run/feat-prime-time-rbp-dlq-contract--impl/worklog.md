@@ -73,6 +73,7 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | 2026-06-20 | 5 | Postgres/Redis wiring | Wired terminal nacks and Postgres max attempts to DLQ stores; added failure-path adapter tests. |
 | 2026-06-20 | 6 | DenoKv/AMQP wiring | Replaced no-op terminal nacks with DLQ appends through injected/default KV-backed stores; added context-level tests. |
 | 2026-06-20 | 7 | factory/typed/memory | Added `QueueOptions.deadLetterStore`, threaded factory defaults, added memory DLQ store, and validated typed-queue `validation_failed` DLQ path. |
+| 2026-06-20 | 8 | README/final gates | Documented delivery guarantee, DLQ stores, extension point, permissions, and ran final package gates. |
 
 ## Decisions
 
@@ -85,7 +86,7 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 
 | Drift | Severity | Logged in drift.md |
 | --- | --- | --- |
-| none | n/a | n/a |
+| KvPolling `reprocessDlq()` resets provider-private fields to current defaults because `DeadLetterRecord<T>` is provider-neutral | minor | yes |
 
 ## Gate Results
 
@@ -120,6 +121,15 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | Slice 7 lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
 | Slice 7 fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
 | Slice 7 test | `rtk proxy deno test --unstable-kv --allow-env packages/queue/tests/memory-queue_test.ts packages/queue/tests/options_test.ts packages/queue/tests/typed-queue_test.ts` | PASS | 9 passed, 0 failed |
+| Final check | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/queue --ext ts` | PASS | `deno check --quiet --unstable-kv <files>`, 41 files, 0 findings |
+| Final lint | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
+| Final fmt | `rtk proxy deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/queue --ext ts` | PASS | 41 files, 0 findings |
+| Final targeted tests | `rtk proxy deno test --unstable-kv --allow-env packages/queue/tests/dead-letter-store_test.ts packages/queue/tests/provider-dead-letter-store_test.ts packages/queue/tests/kv-polling-dlq_test.ts packages/queue/tests/postgres-adapter_test.ts packages/queue/tests/redis-adapter-dlq_test.ts packages/queue/tests/fedify-adapter-dlq_test.ts packages/queue/tests/memory-queue_test.ts packages/queue/tests/options_test.ts packages/queue/tests/typed-queue_test.ts` | PASS | 22 passed, 0 failed |
+| Doc lint | `rtk proxy deno doc --lint packages/queue/mod.ts packages/queue/ports/mod.ts packages/queue/adapters/mod.ts` | PASS | Exit 0; npm Node type-resolution warnings only |
+| Publish dry-run | `(cd packages/queue && rtk proxy deno task publish:dry-run)` | PASS | Exit 0, dry run complete, no slow-type warning in raw publish output |
+| JSR audit | `rtk proxy deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/queue --text` | PASS_WITH_NOTE | Exit 0; reports `dry-run: OK`; single `F-JSR-7 slow-types` warning is the tool counting the publish banner line `Checking for slow types...` |
+| Scoped doctrine | `rtk proxy deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/queue` | PASS_WITH_WARNINGS | Exit 0; no failures; warnings are pre-existing file-size warnings for `kv-polling.adapter.ts` and `postgres.adapter.ts`, plus docs/architecture info |
+| Root arch check | `rtk proxy deno task arch:check` | FAIL_BASELINE | Exit 1 with 58 repo-wide failures in unrelated packages/tools; no new queue-specific failures beyond existing file-size warnings shown by scoped doctrine |
 
 ### Fitness Gates
 
@@ -137,6 +147,13 @@ To add a new provider store, implement `DeadLetterStorePort<T>` in `adapters/<te
 | F-18 | PASS | Root and `ports/mod.ts` barrels updated | Manual evidence |
 | F-18 | PASS | `adapters/mod.ts` and `deno.json` subpath export updated for `KvDeadLetterStore` | Slice 2 |
 | F-18 | PASS | `adapters/mod.ts` and `deno.json` subpath exports updated for Postgres/Redis DLQ stores | Slice 3 |
+| F-2 | PENDING_SCRIPT | Manual evidence: stores wrap `@netscript/kv`, `PostgresQueueClient`, and Redis list commands; no platform helper reinvention introduced | Final |
+| F-4 | PENDING_SCRIPT | Manual evidence: store classes implement `DeadLetterStorePort<T>` only; no inheritance hierarchy introduced | Final |
+| F-6 | PASS | Queue `publish:dry-run` exit 0 | Final |
+| F-9 | PASS | README documents KV file path, network, and env permissions | Final |
+| F-10 | PASS | Targeted unit/failure/integration tests cover all planned scenarios; 22 tests passed | Final |
+| F-11 | PASS | New files are in existing `ports/`, `adapters/`, `testing/`, and `tests/` role folders | Final |
+| F-16 | PENDING_SCRIPT | Manual evidence: no new role folder added; only existing queue folders used | Final |
 
 ### Runtime Gates
 

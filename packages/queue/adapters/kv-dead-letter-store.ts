@@ -121,6 +121,9 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
     return count;
   }
 
+  /**
+   * Resolve the configured KV adapter or lazily open the shared KV adapter.
+   */
   private async ensureKv(): Promise<WatchableKv> {
     if (this.kv) {
       return this.kv;
@@ -140,10 +143,16 @@ export class KvDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
     return this.kv;
   }
 
+  /**
+   * Key prefix used to list this queue's DLQ records.
+   */
   private get prefix(): KvKey {
     return [DLQ_PREFIX, this.queueName];
   }
 
+  /**
+   * Build the stable KV key for one DLQ record.
+   */
   private recordKey(record: DeadLetterRecord<T>): KvKey {
     return [DLQ_PREFIX, this.queueName, record.failedAt, record.messageId];
   }

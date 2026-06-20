@@ -154,6 +154,9 @@ export class PostgresDeadLetterStore<T = unknown> implements DeadLetterStorePort
     return Number(result.rows[0]?.count ?? 0);
   }
 
+  /**
+   * Create the DLQ table once per store instance.
+   */
   private async ensureSchema(): Promise<void> {
     if (!this.schemaReady) {
       this.schemaReady = this.createSchema();
@@ -161,6 +164,9 @@ export class PostgresDeadLetterStore<T = unknown> implements DeadLetterStorePort
     await this.schemaReady;
   }
 
+  /**
+   * Create the backing DLQ table when it does not exist.
+   */
   private async createSchema(): Promise<void> {
     await this.client.query(
       `CREATE TABLE IF NOT EXISTS ${this.tableIdentifier} (

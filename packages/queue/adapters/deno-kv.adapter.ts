@@ -150,6 +150,9 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     }
   }
 
+  /**
+   * Resolve the configured DLQ store or lazily create the KV-backed default.
+   */
   private async ensureDeadLetterStore(): Promise<DeadLetterStorePort<T>> {
     if (this.deadLetterStore) {
       return this.deadLetterStore;
