@@ -12,6 +12,7 @@
 import { createServiceLogger } from '@netscript/logger';
 import type {
   RunningService,
+  RunningServiceAddress,
   ServeOptions,
   ServiceApp,
   ShutdownHook,
@@ -145,10 +146,18 @@ export function startServiceListener(
 
   return {
     app,
-    addr: server.addr as RunningService['addr'],
+    addr: toRunningServiceAddress(server.addr),
     stop: async () => {
       await stopAndLog('manual');
     },
+  };
+}
+
+function toRunningServiceAddress(addr: Deno.NetAddr): RunningServiceAddress {
+  return {
+    hostname: addr.hostname,
+    port: addr.port,
+    transport: addr.transport === 'tcp' ? 'tcp' : 'unix',
   };
 }
 
