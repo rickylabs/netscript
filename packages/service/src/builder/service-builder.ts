@@ -28,6 +28,7 @@
  */
 
 import type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
+import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { HealthCheck } from '../primitives/health.ts';
 import type {
   ContextFactory,
@@ -90,6 +91,31 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
       traceContext?: boolean;
     },
   ): ServiceBuilder<TRouter>;
+
+  /**
+   * Enables authentication for guarded service paths.
+   *
+   * @example
+   * ```typescript
+   * createService(router, { name: 'users' })
+   *   .withAuthn({ authenticator })
+   *   .withRPC();
+   * ```
+   */
+  withAuthn(options: AuthnOptions): ServiceBuilder<TRouter>;
+
+  /**
+   * Enables authorization for authenticated requests.
+   *
+   * @example
+   * ```typescript
+   * createService(router, { name: 'users' })
+   *   .withAuthn({ authenticator })
+   *   .withAuthz({ authorizer })
+   *   .withRPC();
+   * ```
+   */
+  withAuthz(options: AuthzOptions): ServiceBuilder<TRouter>;
 
   /** Sets the per-request oRPC context factory. */
   withContext(factory: ContextFactory): ServiceBuilder<TRouter>;

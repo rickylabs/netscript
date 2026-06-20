@@ -4,9 +4,9 @@
 [![Deno](https://img.shields.io/badge/runtime-Deno-000000?logo=deno&logoColor=white)](https://deno.com/)
 [![License](https://img.shields.io/badge/license-MIT-0f172a)](https://opensource.org/licenses/MIT)
 
-Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript
-applications. The package gives generated services a small entrypoint while preserving direct
-access to the underlying mountable service app.
+Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.
+The package gives generated services a small entrypoint while preserving direct access to the
+underlying mountable service app.
 
 ## Package Role
 
@@ -29,6 +29,7 @@ layering rationale.
   resources.
 - Offline Scalar docs through the bundled `assets/scalar.min.js` file.
 - Logger-backed startup diagnostics for database connectivity failures.
+- Opt-in authentication and authorization through `@netscript/service/auth`.
 
 ## Install
 
@@ -56,22 +57,24 @@ await service.stop();
 
 ## Entry Points
 
-| Import | Purpose |
-| --- | --- |
-| `@netscript/service` | Root service primitives, builder, preset, and public structural types. |
+| Import                    | Purpose                                                                                                   |
+| ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `@netscript/service`      | Root service primitives, builder, preset, and public structural types.                                    |
+| `@netscript/service/auth` | Authn/authz ports plus dependency-free static-credential, trusted-header, and scope authorizer factories. |
 
-The package currently exposes one entrypoint. Additional subpaths are deferred until the alpha
-surface needs separate import graphs.
+Auth lives on a subpath so services that do not opt into auth avoid that surface in their import
+graph.
 
 ## Public Surface
 
 The root entrypoint exports three layers:
 
-| Layer | Exports |
-| --- | --- |
-| Primitives | `createHealthHandler`, `createRPCHandler`, `createOpenAPISpec`, Scalar docs handlers, not-found and error handlers. |
-| Builder | `createService`, `ServiceBuilder`, `ServiceConfig`, and structural runtime types. |
-| Preset | `defineService`, `DefineServiceOptions`. |
+| Layer        | Exports                                                                                                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Primitives   | `createHealthHandler`, `createRPCHandler`, `createOpenAPISpec`, Scalar docs handlers, not-found and error handlers.                                         |
+| Builder      | `createService`, `ServiceBuilder`, `ServiceConfig`, and structural runtime types.                                                                           |
+| Preset       | `defineService`, `DefineServiceOptions`.                                                                                                                    |
+| Auth subpath | `AuthenticatorPort`, `AuthorizerPort`, `Principal`, `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, and `createScopeAuthorizer`. |
 
 `LoggerMiddlewareOptions` is re-exported from `@netscript/logger/middleware` because it is a
 first-party sibling package contract.
@@ -98,6 +101,42 @@ const running = await createService(router, { name: 'orders', version: '1.0.0' }
 await running.stop();
 ```
 
+Add auth by importing the auth subpath and composing the middleware stages:
+
+```ts
+import { createService } from '@netscript/service';
+import {
+  createScopeAuthorizer,
+  createStaticCredentialAuthenticator,
+} from '@netscript/service/auth';
+
+const authenticator = createStaticCredentialAuthenticator({
+  credentials: {
+    'local-token': {
+      subject: 'service:orders',
+      scopes: ['orders:read'],
+      roles: ['service'],
+    },
+  },
+});
+
+const authorizer = createScopeAuthorizer({
+  rules: [{
+    match: (request) => request.path.startsWith('/api/orders'),
+    requireScopes: ['orders:read'],
+  }],
+});
+
+const running = await createService(router, { name: 'orders', version: '1.0.0' })
+  .withAuthn({ authenticator })
+  .withAuthz({ authorizer })
+  .withRPC()
+  .withHealth()
+  .serve({ port: 3001 });
+
+await running.stop();
+```
+
 ## Preset
 
 Use `defineService()` for generated service entrypoints:
@@ -116,6 +155,62 @@ const running = await defineService(router, {
 The preset enables CORS, request logging, OpenAPI JSON, Scalar docs, RPC, service info, and health
 endpoints. When the discovered health-check database client also exposes `$disconnect()`, the preset
 registers a shutdown hook that releases that client exactly once during `stop()`.
+
+Auth is off by default. Generated entrypoints can opt in by passing `auth`:
+
+```ts
+import { defineService } from '@netscript/service';
+import { createScopeAuthorizer, createTrustedHeaderAuthenticator } from '@netscript/service/auth';
+
+const running = await defineService(router, {
+  name: 'orders',
+  port: 3001,
+  auth: {
+    authn: {
+      authenticator: createTrustedHeaderAuthenticator({
+        subjectHeader: 'x-authenticated-user',
+        scopesHeader: 'x-authenticated-scopes',
+      }),
+    },
+    authz: {
+      authorizer: createScopeAuthorizer({
+        rules: [{
+          match: (request) => request.path.startsWith('/api/orders'),
+          requireScopes: ['orders:read'],
+        }],
+      }),
+    },
+  },
+});
+
+await running.stop();
+```
+
+Provider auth systems often bring their own HTTP handler for login, callback, and session
+management routes. Mount the provider router in the host service and exempt that path with
+`allowAnonymous`; keep the rest of `/api` guarded:
+
+```ts
+import { createService } from '@netscript/service';
+
+const running = await createService(router, { name: 'orders' })
+  .withAuthn({
+    authenticator: sessionAuthenticator,
+    protect: ['/api'],
+    allowAnonymous: ['/api/auth', '/health'],
+  })
+  .route('get', '/api/auth/session', (context) => providerAuthHandler(context.req.raw))
+  .withRPC()
+  .withHealth()
+  .serve({ port: 3001 });
+
+await running.stop();
+```
+
+Session adapters can validate against the full request header set and cookies through the
+`AuthnRequest.headers()` and `AuthnRequest.cookie(name)` accessors. On successful authentication,
+they may return `responseHeaders` or `setCookies` so refresh-on-read session rotation can update the
+response without coupling `@netscript/service` to a provider SDK.
 
 ## Runtime Lifecycle
 
@@ -190,11 +285,11 @@ This is the composition seam for hosts that mount multiple services into one run
 
 Health endpoints are added with `withHealth()`:
 
-| Route | Purpose |
-| --- | --- |
-| `/health` | Full health response with configured checks. |
-| `/health/live` | Liveness probe. |
-| `/health/ready` | Readiness probe. |
+| Route           | Purpose                                      |
+| --------------- | -------------------------------------------- |
+| `/health`       | Full health response with configured checks. |
+| `/health/live`  | Liveness probe.                              |
+| `/health/ready` | Readiness probe.                             |
 
 Custom checks use `withHealthCheck()`:
 
@@ -211,10 +306,10 @@ createService(router, { name: 'users' })
 
 `withRPC()` installs two handler paths:
 
-| Path | Purpose |
-| --- | --- |
-| `/api/rpc/*` | Type-safe RPC endpoint. |
-| `/api/*` | REST-style OpenAPI endpoint. |
+| Path         | Purpose                      |
+| ------------ | ---------------------------- |
+| `/api/rpc/*` | Type-safe RPC endpoint.      |
+| `/api/*`     | REST-style OpenAPI endpoint. |
 
 `withOpenAPI()` serves `/api/openapi.json`. `withDocs()` serves `/api/docs` and
 `/api/docs/scalar.js`.
@@ -241,12 +336,12 @@ variables, and suggested local checks without printing raw credentials.
 
 ## Required Permissions
 
-| Permission | Used by |
-| --- | --- |
-| `--allow-net` | `Deno.serve`, external health checks, TCP database diagnostics. |
-| `--allow-env` | environment-based database diagnostics and development error messages. |
-| `--allow-read` | serving bundled Scalar JavaScript. |
-| `--unstable-kv` | `healthChecks.kv()`. |
+| Permission      | Used by                                                                |
+| --------------- | ---------------------------------------------------------------------- |
+| `--allow-net`   | `Deno.serve`, external health checks, TCP database diagnostics.        |
+| `--allow-env`   | environment-based database diagnostics and development error messages. |
+| `--allow-read`  | serving bundled Scalar JavaScript.                                     |
+| `--unstable-kv` | `healthChecks.kv()`.                                                   |
 
 ## Testing
 

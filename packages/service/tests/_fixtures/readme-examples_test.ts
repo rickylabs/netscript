@@ -5,6 +5,9 @@ const readme = await Deno.readTextFile(new URL('../../README.md', import.meta.ur
 Deno.test('README examples use current service lifecycle APIs', () => {
   assertStringIncludes(readme, 'const service = await defineService');
   assertStringIncludes(readme, 'const running = await createService');
+  assertStringIncludes(readme, "from '@netscript/service/auth'");
+  assertStringIncludes(readme, '.withAuthn({ authenticator })');
+  assertStringIncludes(readme, 'auth: {');
   assertStringIncludes(readme, 'await service.stop();');
   assertStringIncludes(readme, 'await running.stop();');
 });
