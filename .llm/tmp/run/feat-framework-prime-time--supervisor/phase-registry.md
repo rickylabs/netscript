@@ -12,8 +12,15 @@ branch `feat/framework-prime-time`. Status legend: `planned` → `plan-eval` →
 | --- | --- | --- | --- | --- | --- | --- |
 | A-G1 | sagas-durable-store | blocker | ✅ MERGED | PASS | PASS (42 tests) → merged aa03b4f7 | #74 |
 | A-G2 | sagas-idempotency-e2e | blocker | ✅ MERGED into umbrella `9b3bde45` (`--no-ff`, clean, no lock churn) | PASS | PASS (46 tests, run 27859243308) → merged | #75 |
-| A-G3 | sagas-telemetry-spans | blocker | RE-REBASED onto live umbrella `9b3bde45` (tip `8084084632`); IMPL-EVAL RE-DISPATCHED (issuecomment-4756446426) | PASS | prior run wrote NO verdict; re-dispatched 2026-06-20 04:2x → merge on PASS | #76 |
-| A-G4 | service-auth-seam | blocker | RE-REBASED onto live umbrella `9b3bde45` (tip `2e90fa56`); IMPL-EVAL RE-DISPATCHED (issuecomment-4756446456) | PASS | prior PASS was on STALE base `fe89b6b4` (pre-#78); re-dispatched 2026-06-20 04:2x → merge on PASS | #77 |
+| A-G3 | sagas-telemetry-spans | blocker | ✅ MERGED into umbrella `47e6cd48` (`--no-ff`, clean, no lock churn) | PASS | PASS (54 tests, run 27860143991) → merged | #76 |
+| A-G4 | service-auth-seam | blocker | ✅ MERGED into umbrella `79f5840d` (`--no-ff`, clean, no lock churn) | PASS | PASS (58 service tests, run 27860144008) → merged | #77 |
+
+**🎉 BLOCKER BATCH COMPLETE (2026-06-20):** all 7 Wave-A slices merged into the umbrella
+(`feat/framework-prime-time` tip `79f5840d`). #74→aa03b4f7, #78, #79, #80→59c586fd, #75→9b3bde45,
+#76→47e6cd48, #77→79f5840d. #76+#77 verified PASS via committed `evaluate.md` (#77's at
+`.llm/tmp/run/feat-prime-time-service-auth-seam--impl/evaluate.md` — non-standard run-id dir). Combined
+umbrella type-checks clean across `packages/plugin-sagas-core` (96f/0), `plugins/sagas` (66f/0),
+`packages/service` (32f/0). Track-3 generator now UNBLOCKED to launch.
 
 **Autonomous run authorized (user, 2026-06-20, going off-shift):** complete all ongoing umbrella work
 fully autonomously; keep updating the PR/here. Supervisor interpretation of merge authority: merge
