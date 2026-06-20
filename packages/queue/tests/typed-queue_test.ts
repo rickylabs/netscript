@@ -10,7 +10,7 @@ Deno.test('createTypedQueue exposes the schema and native retrial flag', () => {
   });
 
   assertEquals(queue.schema, schema);
-  assertEquals(queue.nativeRetrial, false);
+  assertEquals(queue.nativeRetrial, true);
 });
 
 Deno.test('createTypedQueue rejects invalid messages before touching the backend', async () => {
