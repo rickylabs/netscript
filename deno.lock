@@ -2480,6 +2480,13 @@
           "jsr:@zod/zod@4.4.3"
         ]
       },
+      "packages/plugin-auth-core": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6"
+        ]
+      },
       "packages/plugin-sagas-core": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
