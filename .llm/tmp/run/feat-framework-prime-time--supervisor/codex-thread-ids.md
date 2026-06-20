@@ -136,6 +136,35 @@ Next: **AS3** — unified `plugins/auth` oRPC service + streams (`auth.token.ref
 plugin-auth-core; OIDC-kind e2e fixture exercising nonce+id_token; pass `expectedIssuer` for RFC 9207).
 Then AS4 → AS5 → AS6 (sequential).
 
+### Track-5 auth-plugin — AS3 launch (2026-06-20 ~18:49 UTC)
+
+| Slice | Thread id | Worktree | Branch / base | Brief bytes |
+| --- | --- | --- | --- | --- |
+| AS3 plugins/auth oRPC service | `019ee5f0-034c-7ca2-8f0b-40779f0493ce` | /home/codex/repos/netscript-pt-auth-plugin-service | feat/prime-time/auth-plugin-service @ 6bc168e0 (off feat/prime-time/auth) | 13671 |
+
+Brief: `slices/auth-plugin/as3-plugin-service/implement.md`. **Service-only scope** (corrected from the
+over-broad "service + streams" note above): `plugins/auth` unified `/auth/*` oRPC service implementing
+the AS1 `authContract` v1 (signin/callback/signout/session/me) over a single active backend resolved
+through `createAuthBackendRegistry`/`resolveBackend`, selected by env `NETSCRIPT_AUTH_BACKEND`; kv-oauth
+fully wired via `createKvOAuthFlow`; unsupported sub-port ops surfaced as typed oRPC errors. Mirrors
+`plugins/sagas` service layer. **OUT of AS3** (deferred to their lanes): streams producer = AS4,
+CLI/`database/auth.prisma`/scaffold/Aspire = AS5, e2e/docs/debt-consolidation = AS6. Worktree added off
+`origin/feat/prime-time/auth` @ `6bc168e0`, upstream UNSET (push.default landmine), pre-existing
+openhands CRLF drift restored before launch; brief mandates explicit refspec
+`git push origin HEAD:refs/heads/feat/prime-time/auth-plugin-service`. approval=never,
+sandbox=danger-full-access, gpt-5.5, mobile-visible `send-message-v2`. Launcher attached cleanly
+(CWD/BRANCH/HEAD verified, PROMPT_BYTES=13671). Steer: `codex exec resume
+019ee5f0-034c-7ca2-8f0b-40779f0493ce "<msg>"` from the worktree. Background launch job: `bmuh91wo3`
+(notify on turn completion). Launch unblocked via user-added `~/.claude/settings.json` `permissions.allow`
+`["PowerShell(wsl.exe -u codex*)","Bash(wsl.exe -u codex*)"]` (the summarized standing grant no longer
+cleared the tightened Create-Unsafe-Agents classifier through the compaction boundary).
+
+Next: await turn completion → supervisor-verify gates in worktree (plugin check/lint/fmt, plugin test,
+manifest test, plugin doctor, mod.ts check) → mirror **leaf PR** (base `feat/prime-time/auth`, labels
+`type:sub-pr`/`area:plugins`/`area:auth`/`status:impl-eval`) → dispatch **IMPL-EVAL** (qwen3.7-max) →
+on PASS merge into `feat/prime-time/auth` + update umbrella PR #86 checklist → **AS4** (streams runtime).
+Two FAIL cycles → escalate.
+
 **Launch mechanics that actually worked (verified 2026-06-20):**
 
 - `wsl.exe -u codex -- bash -lc 'cd /home/...; ...'` — the inner `cd` SILENTLY does not take effect
