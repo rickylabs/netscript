@@ -11,3 +11,4 @@ Format:
 ## Log
 
 - 7f1d011: feat(workers): add worker idempotency contract
+- 1a959dd: test(workers): cover worker idempotency key resolution
