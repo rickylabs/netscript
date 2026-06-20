@@ -2635,6 +2635,21 @@
           "jsr:@std/path@1"
         ]
       },
+      "plugins/auth": {
+        "dependencies": [
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6",
+          "npm:@workos-inc/node@^10.4.0"
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/contract@^1.14.6",
+            "npm:@orpc/server@^1.14.6",
+            "npm:@orpc/zod@^1.14.6"
+          ]
+        }
+      },
       "plugins/sagas": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
