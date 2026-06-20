@@ -39,9 +39,9 @@ export function createOtelSagaTracer(tracer: Tracer = getSagaTracer()): SagaTele
   };
 }
 
-/** Create saga instrumentation wired to the process OpenTelemetry saga tracer. */
-export function createSagaTelemetry(): SagaInstrumentation {
-  return createSagaInstrumentation({ tracer: createOtelSagaTracer() });
+/** Create saga instrumentation wired to an OpenTelemetry saga tracer. */
+export function createSagaTelemetry(tracer: Tracer = getSagaTracer()): SagaInstrumentation {
+  return createSagaInstrumentation({ tracer: createOtelSagaTracer(tracer) });
 }
 
 class OtelSagaTelemetrySpan implements SagaTelemetrySpan {

@@ -74,6 +74,8 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | 2026-06-20 | S3 | gates | Scoped check/lint/fmt, telemetry tests, and existing runtime tests passed. |
 | 2026-06-20 | S4 | implementation | Added OTel-backed saga tracer adapter and injected `createSagaTelemetry()` at service, runner, and supervisor native composition roots. |
 | 2026-06-20 | S4 | gates | Scoped plugin check/lint/fmt and OTel adapter tests passed. |
+| 2026-06-20 | S5 | implementation | Added service publish trace-linkage and failure-path tests; fixed package-local JSR module tags and a local plugin CLI doctrine finding. |
+| 2026-06-20 | S5 | gates | Final scoped static gates, targeted tests, publish dry-run, doc lint, JSR audit, and scoped doctrine checks passed. Root `deno task arch:check` remains red on pre-existing repo-wide debt. |
 
 ## Decisions
 
@@ -113,12 +115,30 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | S4 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas --ext ts` | PASS | 56 files selected; 0 findings. |
 | S4 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --ext ts` | PASS | 56 files selected; 0 findings. |
 | S4 adapter tests | `deno test --allow-all plugins/sagas/tests/telemetry/otel-saga-tracer_test.ts` | PASS | 2 passed, 0 failed. |
+| S5 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts` | PASS | 57 files selected; 0 findings. |
+| S5 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas --ext ts` | PASS | 57 files selected; 0 findings. |
+| S5 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --ext ts` | PASS | 57 files selected; 0 findings. |
+| Final scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 148 files selected; 0 findings. |
+| Final scoped lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 148 files selected; 0 findings. |
+| Final scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts` | PASS | 148 files selected; 0 findings. |
+| Final targeted tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/telemetry packages/plugin-sagas-core/tests/runtime plugins/sagas/tests/telemetry` | PASS | 21 passed, 0 failed. |
+| Publish dry-run | `cd packages/plugin-sagas-core && deno task publish:dry-run` | PASS | Exit 0; dry run complete. |
+| Telemetry doc lint | `cd packages/plugin-sagas-core && deno doc --lint src/telemetry/mod.ts` | PASS | Checked 1 file. |
+| JSR audit | `deno run --allow-read --allow-run --allow-env .llm/tools/fitness/audit-jsr-package.ts --root packages/plugin-sagas-core --text` | PASS | Exit 0; warnings only for existing cardinality and slow-type banner text. |
+| Root arch check | `deno task arch:check` | FAIL | Pre-existing repo-wide findings outside slice; see Drift. Scoped doctrine checks below are the slice verdict. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | F-1..F-18 | PENDING_SCRIPT | Manual evidence pending final gate pass | Required by plan. |
+| F-1 file-size | PENDING_SCRIPT | No new file exceeds 500 LOC; `plugins/sagas/tests/telemetry/*.ts` and adapter files are below cap. Existing warnings remain outside changed files. | Manual evidence. |
+| F-3 layering | PASS | Core imports only structural telemetry seam; OTel adapter stays in `plugins/sagas/src/telemetry`; no `@netscript/telemetry` import in `plugin-sagas-core`. | Scoped check/lint passed. |
+| F-5 public surface | PASS | Additive optional fields and `SagaTraceParent`; no removed/renamed exports. | `deno doc --lint src/telemetry/mod.ts` passed. |
+| F-6 JSR publishability | PASS | `packages/plugin-sagas-core` dry-run passed; JSR audit exit 0. | Warnings are existing cardinality/slow-type banner. |
+| F-13 saga/runtime invariants | PASS | One span per per-instance handle+persist unit; runtime tests still pass. | `saga-engine-spans_test.ts`, runtime tests. |
+| F-15/F-18 exports | PASS | OTel adapter not re-exported from package root; core telemetry subpath remains curated. | JSR audit and scoped doctrine checks. |
+| Scoped doctrine | PASS | `check-doctrine --root packages/plugin-sagas-core --text` and `--root plugins/sagas --text` both exit 0 with 0 FAIL. | Warnings are existing debt/non-slice cleanup. |
 
 ### Runtime Gates
 
@@ -128,6 +148,7 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | S2 handle span behavior | PASS | `saga-engine-spans_test.ts` | Proves success and failure span lifecycle plus duration metric. |
 | S3 runtime injection | PASS | `saga-engine-spans_test.ts` | Proves `createSagaRuntime({ native: { instrumentation } })` reaches the engine. |
 | S4 OTel adapter | PASS | `otel-saga-tracer_test.ts` | Proves kind/status/exception/end delegation and parent context extraction. |
+| S5 API trace linkage | PASS | `publish-trace-linkage_test.ts` | Proves service publish trace headers become `saga.handle` parent context and failure spans record ERROR + exception. |
 
 ### Consumer Gates
 
@@ -135,6 +156,11 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | --- | --- | --- | --- |
 | `plugins/sagas` | NOT_RUN | pending check/tests | Required by S4/S5. |
 | `plugins/sagas` S4 | PASS | scoped check/lint/fmt + adapter test | Composition roots compile with telemetry injection. |
+| `plugins/sagas` S5 | PASS | scoped check/lint/fmt + publish trace-linkage test | Service publish helper integration covered. |
+
+## Final Verdict
+
+Slice `sagas-telemetry-spans` implementation is complete and ready for IMPL-EVAL. The approved scoped gates are green. The only non-green raw command is root `deno task arch:check`, which reports pre-existing repo-wide doctrine debt outside this slice; scoped doctrine checks for the touched roots exit 0 with 0 FAIL.
 
 ## Handoff Notes
 

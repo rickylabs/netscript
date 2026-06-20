@@ -13,3 +13,4 @@ Format:
 - eeff38c: feat(sagas): extend telemetry span seam
 - 9d2e6d2: feat(sagas): emit engine handle spans
 - 24828ad: feat(sagas): thread runtime instrumentation
+- 2c48496: feat(sagas): wire otel saga telemetry
