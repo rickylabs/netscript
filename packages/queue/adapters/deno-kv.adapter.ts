@@ -7,9 +7,22 @@
  */
 
 import { DenoKvMessageQueue } from '@fedify/denokv';
-import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import type {
+  DeadLetterStorePort,
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  NackOptions,
+} from '../ports/mod.ts';
 import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
-import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
+import {
+  createEnvelope,
+  createMessageContext,
+  isMessageEnvelope,
+  toDeadLetterRecord,
+} from './_envelope.ts';
+import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -33,6 +46,10 @@ export interface DenoKvAdapterOptions {
    * Enables adapter debug hooks without emitting console output from published code.
    */
   verbose?: boolean;
+  /**
+   * Optional dead-letter store. Defaults to a KV-backed store using this adapter's KV instance.
+   */
+  deadLetterStore?: DeadLetterStorePort;
 }
 
 function getKvConnectionFromAspire(): string | undefined {
@@ -57,6 +74,8 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
   private readonly useShared: boolean;
   private readonly explicitKv?: Deno.Kv;
   private readonly verbose: boolean;
+  private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
+  private deadLetterStore: DeadLetterStorePort<T> | null = null;
 
   /**
    * Deno KV provides native retry support through Fedify's queue implementation.
@@ -73,6 +92,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
     this.useShared = options.useShared ?? true;
     this.explicitKv = options.kv;
     this.verbose = options.verbose ?? false;
+    this.explicitDeadLetterStore = options.deadLetterStore as DeadLetterStorePort<T> | undefined;
   }
 
   /**
@@ -128,6 +148,21 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
         error instanceof Error ? error : undefined,
       );
     }
+  }
+
+  private async ensureDeadLetterStore(): Promise<DeadLetterStorePort<T>> {
+    if (this.deadLetterStore) {
+      return this.deadLetterStore;
+    }
+    if (this.explicitDeadLetterStore) {
+      this.deadLetterStore = this.explicitDeadLetterStore;
+      return this.deadLetterStore;
+    }
+    this.deadLetterStore = new KvDeadLetterStore<T>({
+      queueName: this.queueName,
+      denoKv: await this.ensureKv(),
+    });
+    return this.deadLetterStore;
   }
 
   /**
@@ -235,7 +270,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
           deliveryCount = 1;
         }
 
-        const context = this.createContext(messageId, enqueuedAt, headers, deliveryCount);
+        const context = this.createContext(messageId, payload, enqueuedAt, headers, deliveryCount);
         await handler(payload, context);
       }, { signal: this.abortController.signal });
     } catch (error) {
@@ -290,6 +325,7 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
    */
   private createContext(
     messageId: string,
+    payload: T,
     enqueuedAt: Date,
     headers: Record<string, string>,
     deliveryCount: number,
@@ -300,7 +336,24 @@ export class DenoKvAdapter<T = unknown> implements MessageQueue<T> {
       headers,
       deliveryCount,
       async () => {},
-      async () => {},
+      async (options: NackOptions = {}) => {
+        if (options.requeue ?? true) {
+          return;
+        }
+        const store = await this.ensureDeadLetterStore();
+        await store.append(toDeadLetterRecord(
+          {
+            messageId,
+            queueName: this.queueName,
+            payload,
+            headers,
+            deliveryCount,
+            enqueuedAt,
+          },
+          options.reason ?? 'nack_without_requeue',
+          options,
+        ));
+      },
     );
   }
 }
