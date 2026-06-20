@@ -6,10 +6,7 @@ import type {
 import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
 
 import { KvSagaStore, openSagaRuntimeKv } from './kv-saga-store.ts';
-import {
-  PrismaSagaStore,
-  type PrismaSagaStoreClient,
-} from './prisma-saga-store.ts';
+import { PrismaSagaStore, type PrismaSagaStoreClient } from './prisma-saga-store.ts';
 
 /** Durable saga store backend variants supported by the plugin runtime. */
 export type DurableSagaStoreBackend = 'kv' | 'prisma';

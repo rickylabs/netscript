@@ -9,8 +9,9 @@
 - Completed slice 3: durable runtime factory supports `backend?: 'kv' | 'prisma'`, optional `kv`, and `dispose()`; service/supervisor teardown use `dispose()`.
 - Completed slice 4: service startup resolves `NETSCRIPT_SAGA_STORE` / appsettings `sagas.store.backend` and selects KV or Prisma state storage explicitly.
 - Completed slice 5: CLI plugin add accepts `--saga-store-backend kv|prisma` and writes explicit `Sagas.Store.Backend` appsettings for saga plugin service/background entries.
-- Completed slice 6: docs now name `PrismaSagaStore` as implemented; plugin README documents dual durable state backends and KV idempotency deferral; arch debt records deferred Prisma idempotency parity.
-- Pushed slices 1-5 with explicit refspec to `origin/feat/prime-time/sagas-prisma-store`.
+- Completed slice 6: docs now name `PrismaSagaStore` as implemented; plugin README documents dual durable state backends and KV idempotency deferral; arch debt records deferred Prisma idempotency parity and accepted runtime folder-cardinality debt.
+- Completed final repair: `@netscript/aspire` config parsing preserves saga-specific `Sagas.Store.Backend` metadata, and generated Aspire plugin/background helpers emit `NETSCRIPT_SAGA_STORE` for saga executables.
+- Pushed slices 1-6 with explicit refspec to `origin/feat/prime-time/sagas-prisma-store`.
 
 ## Important Constraints
 
@@ -34,3 +35,16 @@
 - Slice 5: `rtk proxy deno test --allow-all packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts packages/cli/src/public/features/plugins/add/add-plugin_test.ts` — PASS, 9 tests.
 - Slice 5: focused CLI `deno check --unstable-kv ...` over plugin add/appsettings files — PASS.
 - Slice 6: stale backend wording scan — PASS.
+- Final: scoped wrapper `run-deno-check.ts` over `plugins/sagas`, `packages/plugin-sagas-core`, and `packages/cli` — PASS.
+- Final: touched-file `deno fmt --check`, `deno lint`, and `deno check --unstable-kv` — PASS.
+- Final: `rtk proxy deno test --unstable-kv --allow-all packages/plugin-sagas-core plugins/sagas` — PASS, 66 tests.
+- Final: `plugins/sagas` and `packages/cli` publish dry-runs — PASS with existing dynamic-import warnings.
+- Final: `plugins/sagas` JSR audit — PASS with warnings; `packages/cli` JSR audit helper hit a JSONC parse limitation, with CLI publish dry-run used as publishability evidence.
+- Final: `rtk proxy deno task arch:check` — baseline-red for pre-existing repo-wide findings; new/deepened saga runtime folder-cardinality WARN is recorded as accepted debt.
+- Final repair: `rtk proxy deno test --allow-all packages/aspire/tests/config_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts` — PASS, 5 tests.
+- Final repair: focused `deno check --unstable-kv` over Aspire config and helper generator files — PASS.
+- Final: `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — PASS, 41 passed, 0 failed.
+
+## Ready Signal
+
+- `worklog.md` contains `READY for IMPL-EVAL` as of 2026-06-20.

@@ -78,6 +78,20 @@
 | 5 | Focused CLI tests | PASS | `rtk proxy deno test --allow-all packages/cli/src/kernel/adapters/plugin/workspace-mutator_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts packages/cli/src/public/features/plugins/add/add-plugin_test.ts` — 9 passed, 0 failed. |
 | 5 | Focused CLI type check | PASS | `deno check --unstable-kv packages/cli/src/kernel/domain/plugin-kind.ts packages/cli/src/public/domain/plugin-add-plan.ts packages/cli/src/public/features/plugins/add/add-plugin-command.ts packages/cli/src/local/features/plugins/add/add-local-plugin-command.ts packages/cli/src/public/features/plugins/add/plan-plugin-add.ts packages/cli/src/kernel/adapters/plugin/appsettings-entry-builders.ts packages/cli/src/kernel/adapters/plugin/workspace-mutator.ts packages/cli/src/public/features/plugins/add/add-plugin.ts packages/cli/src/local/features/plugins/add/add-local-plugin.ts` — passed. |
 | 6 | Docs stale wording scan | PASS | `rtk rg -n "PostgresSagaStore|KV only|KV-only|durable write path is KvSagaStore|not Prisma|planned\\)" ...` found no stale saga backend wording in touched docs/schemas. |
+| Final | Scoped package check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --root packages/plugin-sagas-core --root packages/cli --ext ts,tsx` — 681 files, 6 batches, 0 failures. |
+| Final | Touched-file format | PASS | `deno fmt --check` over touched TS/docs/schema files — passed for selected files under relevant package configs. |
+| Final | Touched-file lint | PASS | `deno lint` over touched TS files — passed. |
+| Final | Touched-file type check | PASS | `deno check --unstable-kv` over touched TS files — passed. |
+| Final | Saga/core runtime tests | PASS | `rtk proxy deno test --unstable-kv --allow-all packages/plugin-sagas-core plugins/sagas` — 66 passed, 0 failed. |
+| Final | `plugins/sagas` publish dry run | PASS_WITH_WARNINGS | `deno publish --dry-run --allow-dirty` from `plugins/sagas` passed; warnings were existing dynamic imports in service/runner files. |
+| Final | `packages/cli` publish dry run | PASS_WITH_WARNINGS | `deno publish --dry-run --allow-dirty --no-check=remote` from `packages/cli` passed; warnings were existing dynamic imports in registry files. |
+| Final | `plugins/sagas` JSR audit | PASS_WITH_WARNINGS | `.llm/tools/jsr/audit-jsr-package.ts --root plugins/sagas --text` exited 0 with cardinality and slow-type warnings only. |
+| Final | `packages/cli` JSR audit | TOOL_LIMITATION | `.llm/tools/jsr/audit-jsr-package.ts --root packages/cli --text` exited 2 because the helper cannot parse JSONC comments in `packages/cli/deno.json`; CLI publish dry-run passed. |
+| Final | Broad lint/fmt wrappers | INCONCLUSIVE | `run-deno-lint.ts` and `run-deno-fmt.ts` over scoped roots exited 1 with zero findings; touched-file lint/fmt gates above passed. |
+| Final | Doctrine arch check | BASELINE_RED_WITH_ACCEPTED_DEBT | `rtk proxy deno task arch:check` reported pre-existing repo-wide FAIL/WARN findings. The new/deepened saga runtime folder-cardinality WARN is recorded in `.llm/harness/debt/arch-debt.md`; no new slice-specific FAIL was identified. |
+| Final repair | Aspire config/helper generator tests | PASS | `rtk proxy deno test --allow-all packages/aspire/tests/config_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts` — 5 passed, 0 failed. |
+| Final repair | Aspire config/helper type check | PASS | `deno check --unstable-kv packages/aspire/config.ts packages/aspire/types.ts packages/aspire/tests/config_test.ts packages/cli/src/kernel/templates/aspire/helpers/_utils.ts packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-plugins.ts packages/cli/src/kernel/templates/aspire/helpers/register/generate-register-background.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-service-plugin_test.ts packages/cli/src/kernel/templates/aspire/helpers/tests/generators-background-app_test.ts` — passed. |
+| Final | `scaffold.runtime` E2E | PASS | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` — 41 passed, 0 failed. Includes F-13 runtime coverage through generated saga health/list/instances and plugin health checks. |
 
 ## F-13 Saga/runtime invariants
 
@@ -90,3 +104,20 @@ F-13 is in scope because this slice changes saga runtime durable persistence and
   `dispose()` and supervisor stop behavior.
 - CLI/runtime config invariant: `saga-store-backend_test.ts` and
   `workspace-mutator_test.ts` cover explicit backend selection.
+
+## Final Runtime Gate
+
+- First two E2E attempts failed at `behavior.sagas-health` after generated `sagas-api` readiness.
+  Root cause: appsettings `Sagas.Store.Backend` was emitted, but the Aspire config parser stripped
+  the saga-specific metadata before helper generation, so `NETSCRIPT_SAGA_STORE` was not passed to
+  generated saga executables.
+- Final repair preserves saga metadata in the Aspire config model and emits `NETSCRIPT_SAGA_STORE`
+  for saga plugin/background resources.
+- Final one-pass E2E passed: `Summary: passed=41 failed=0`.
+
+## READY
+
+READY for IMPL-EVAL as of 2026-06-20. Six implementation slices are complete and pushed; the final
+repair/evidence commit preserves generated saga backend env wiring and makes the selected gate set
+green. F-13 is explicitly covered by focused runtime tests plus the final generated
+`scaffold.runtime` saga behavior gates.

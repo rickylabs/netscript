@@ -765,3 +765,19 @@ Seeded from
   and green validation.
 - **Gate:** `deno task deps:latest --behind-only --pretty` returns only documented holds, then
   targeted package checks and `deno task publish:dry-run` pass after each migration.
+
+## plugins/sagas/src/runtime — saga runtime folder cardinality (`sagas-runtime-folder-cardinality`)
+
+- **Reason:** The `sagas-prisma-store` slice adds a Prisma durable state adapter and backend
+  resolver beside the existing saga runtime modules. The public runtime export remains stable, but
+  the folder now exceeds the doctrine cardinality warning threshold and needs a follow-up split of
+  store/backend implementation files into a role-named subfolder without changing the exported
+  runtime API.
+- **Owner:** saga runtime maintainers.
+- **Target:** before beta package-quality freeze.
+- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`.
+- **Created:** 2026-06-20.
+- **Status:** open, DEBT_ACCEPTED for `sagas-prisma-store`; no `SagaStorePort` or
+  `KvSagaStore` behavior changes are included in the debt.
+- **Gate:** F-16 folder cardinality is back under threshold and F-13 saga runtime invariants remain
+  green.

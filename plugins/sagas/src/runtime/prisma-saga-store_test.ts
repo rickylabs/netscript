@@ -150,9 +150,11 @@ class MemoryPrismaSagaClient implements PrismaSagaStoreClient {
     findUnique: (args: { where: { instanceId: string } }): Promise<StateRow | null> =>
       Promise.resolve(this.#states.get(args.where.instanceId) ?? null),
     findMany: (): Promise<readonly StateRow[]> =>
-      Promise.resolve([...this.#states.values()].sort((left, right) =>
-        left.instanceId.localeCompare(right.instanceId)
-      )),
+      Promise.resolve(
+        [...this.#states.values()].sort((left, right) =>
+          left.instanceId.localeCompare(right.instanceId)
+        ),
+      ),
     create: (args: { data: StateRow }): Promise<unknown> => {
       this.#states.set(args.data.instanceId, { ...args.data });
       return Promise.resolve(args.data);
