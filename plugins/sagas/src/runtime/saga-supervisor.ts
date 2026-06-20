@@ -138,6 +138,7 @@ async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<
   const native = withDefaultTelemetry(options.native);
   const kv = await openSagaRuntimeKv();
   const durable = await createDurableSagaRuntime({
+    backend: 'kv',
     kv,
     native: {
       ...native,
@@ -149,14 +150,14 @@ async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<
     },
   });
 
-  return withKvClose(durable.runtime, durable.kv);
+  return withDurableDispose(durable.runtime, durable.dispose);
 }
 
 function hasInjectedNativeEngine(options: CreateSagaRuntimeOptions): boolean {
   return options.native?.engine !== undefined;
 }
 
-function withKvClose(runtime: SagaRuntime, kv: Deno.Kv): SagaRuntime {
+function withDurableDispose(runtime: SagaRuntime, dispose: () => Promise<void>): SagaRuntime {
   let closed = false;
   return Object.freeze({
     ...runtime,
@@ -166,7 +167,7 @@ function withKvClose(runtime: SagaRuntime, kv: Deno.Kv): SagaRuntime {
       } finally {
         if (!closed) {
           closed = true;
-          kv.close();
+          await dispose();
         }
       }
     },

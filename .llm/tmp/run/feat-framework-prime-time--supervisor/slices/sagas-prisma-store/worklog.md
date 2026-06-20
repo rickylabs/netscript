@@ -57,6 +57,7 @@
 | 2026-06-20 | Rebased `feat/prime-time/sagas-prisma-store` from `4e2d3dd1` to umbrella tip `6e0346cf`. Pre-existing dirty OpenHands request artifacts are line-ending-only and intentionally excluded from slice commits. |
 | 2026-06-20 | Slice 1 added dedicated `SagaRuntimeState`, `SagaRuntimeTransition`, and `SagaRuntimeCorrelation` Prisma models in `plugins/sagas/database/sagas.prisma`. |
 | 2026-06-20 | Slice 2 added `PrismaSagaStore` plus parity tests for state round-trip, correlation lookup, transition ordering, stale-version error parity, and delete cascade. |
+| 2026-06-20 | Slice 3 refactored `createDurableSagaRuntime` to support KV/Prisma backend selection, optional `kv`, and `dispose()`; service and supervisor teardown now use `dispose()`. |
 
 ## Gate Evidence
 
@@ -66,3 +67,6 @@
 | 1 | Prisma schema fmt wrapper | NON_BLOCKING_UNSUPPORTED | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/database --ext prisma` selected 1 file but `deno fmt --check` exited 1 with no findings; Deno fmt is not useful evidence for `.prisma`. |
 | 2 | Focused unit test | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/prisma-saga-store_test.ts` — 5 passed, 0 failed. |
 | 2 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/prisma-saga-store.ts plugins/sagas/src/runtime/prisma-saga-store_test.ts` — passed. |
+| 3 | Durable runtime tests | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts plugins/sagas/src/runtime/durable-saga-restart_test.ts` — 6 passed, 0 failed. |
+| 3 | Supervisor teardown test | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/saga-supervisor_test.ts` — 1 passed, 0 failed. |
+| 3 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/create-durable-saga-runtime.ts plugins/sagas/src/runtime/mod.ts plugins/sagas/services/src/main.ts plugins/sagas/src/runtime/saga-supervisor.ts plugins/sagas/src/runtime/create-durable-saga-runtime_test.ts` — passed. |

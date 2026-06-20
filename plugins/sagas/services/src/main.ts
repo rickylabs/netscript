@@ -73,6 +73,7 @@ export default async function createSagasService(
       const definitions = await registerSagas();
       const kv = await openSagaRuntimeKv();
       durableRuntime = await createDurableSagaRuntime({
+        backend: 'kv',
         kv,
         native: {
           idempotency: new KvSagaIdempotencyStore({ kv }),
@@ -100,7 +101,7 @@ export default async function createSagasService(
       try {
         await sagaRuntime?.stop('sagas-service-stop');
       } finally {
-        durableRuntime?.kv.close();
+        await durableRuntime?.dispose();
         await running.stop();
       }
     },
