@@ -12,3 +12,4 @@ Format:
 
 - 7f1d011: feat(workers): add worker idempotency contract
 - 1a959dd: test(workers): cover worker idempotency key resolution
+- d68ae7c: feat(workers): add kv worker idempotency store
