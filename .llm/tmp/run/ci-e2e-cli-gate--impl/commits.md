@@ -1,0 +1,1 @@
+- this commit: align `e2e-cli` runtime setup with local .NET 10 + Aspire CLI 13.4.4 validation; includes local suite evidence and deterministic Aspire CLI install probe.
