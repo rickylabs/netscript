@@ -33,3 +33,9 @@
 Validated locally: full scaffold runtime and all requested Deno-only scaffold suites are green on the local toolchain.
 
 Needs CI confirmation: GitHub Actions `ubuntu-latest` execution of the updated `scaffold-runtime` job, especially .NET 10 setup plus `dotnet tool install Aspire.Cli --version 13.4.4`.
+
+## Push Evidence
+
+| Commit | Push | Notes |
+| --- | --- | --- |
+| `207c1112` | PASS | `git push origin HEAD:refs/heads/ci/e2e-cli-gate` advanced branch `66b8476c..207c1112`. |
