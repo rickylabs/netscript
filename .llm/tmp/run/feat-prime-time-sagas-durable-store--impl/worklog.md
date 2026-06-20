@@ -76,6 +76,8 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | 2026-06-20 | 2 | validation | Durable runtime factory tests, scoped check, and scoped fmt gate passed. |
 | 2026-06-20 | 3 | implementation | Added `SagaRuntimeNativeOptions.logger?` and a per-logger one-time warning when core composes a native engine without a store. |
 | 2026-06-20 | 3 | validation | Targeted warning tests, full core runtime tests, package check, and scoped fmt passed. |
+| 2026-06-20 | 4 | implementation | Rewired the sagas service startup to use `createDurableSagaRuntime`, expose the durable runtime in context, return a wrapped `RunningService`, and close KV on stop. |
+| 2026-06-20 | 4 | validation | Scoped service check and service fmt gate passed. |
 
 ## Decisions
 
@@ -108,6 +110,8 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 | Slice 3 runtime tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/runtime/` | PASS | Exit 0; 15 passed, 0 failed. |
 | Slice 3 package check | `deno task check` from `packages/plugin-sagas-core` | PASS | Exit 0; all package entrypoints checked. |
 | Slice 3 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core/src --root packages/plugin-sagas-core/tests/runtime --ext ts --include 'create-saga-runtime'` | PASS | Exit 0; 2 files selected, 0 findings. |
+| Slice 4 service check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas/services --ext ts` | PASS | Exit 0; 10 files selected, 0 diagnostics. |
+| Slice 4 service fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/services --ext ts --include 'main.ts'` | PASS | Exit 0; 1 file selected, 0 findings. |
 
 ### Fitness Gates
 
@@ -127,7 +131,7 @@ To add a new durable saga store, implement `SagaStorePort` in `plugins/sagas/src
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
-| Service composition | NOT_RUN | Pending implementation | Planned in slice 4. |
+| Service composition | PASS | Scoped service check passed with 0 diagnostics | Runtime health remains final/evaluator scope; no Aspire smoke required by plan. |
 
 ## Handoff Notes
 

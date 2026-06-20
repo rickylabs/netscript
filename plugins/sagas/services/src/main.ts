@@ -9,16 +9,17 @@
  * - OpenAPI documentation
  * - SSE streaming for real-time saga updates
  * - OpenTelemetry tracing
- * - Prisma store for durable saga state
+ * - Durable KV-backed saga state store
  */
 
 // Register Redis/Garnet KV adapter - must run before any getKv() call.
 import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
-import { createService } from '@netscript/service';
-import { createSagaRuntime, type SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
+import { createService, type RunningService } from '@netscript/service';
+import type { SagaRuntime } from '@netscript/plugin-sagas-core/runtime';
 import { type SagaStreamPrismaClient, startSagasStreamMirror } from '../../streams/server.ts';
+import { createDurableSagaRuntime, type DurableSagaRuntime } from '../../src/runtime/mod.ts';
 import { router } from './router.ts';
 import { registerSagas } from './init.ts';
 
@@ -36,12 +37,13 @@ type PluginServiceBootstrap = {
  */
 export default async function createSagasService(
   ctx: PluginServiceContext,
-): Promise<void> {
+): Promise<RunningService> {
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? '8092');
   const dbClient = await ctx.db.getClient() as ServiceDatabaseClient;
   let sagaRuntime: SagaRuntime | undefined;
+  let durableRuntime: DurableSagaRuntime | undefined;
 
-  await createService(router, {
+  const running = await createService(router, {
     name: 'sagas',
     version: '1.0.0',
     port,
@@ -60,7 +62,8 @@ export default async function createSagasService(
     .withServiceInfo()
     .onStartup(async () => {
       const definitions = await registerSagas();
-      sagaRuntime = createSagaRuntime({ adapter: 'native' });
+      durableRuntime = await createDurableSagaRuntime();
+      sagaRuntime = durableRuntime.runtime;
       await sagaRuntime.register(definitions);
       await sagaRuntime.start();
       void startSagasStreamMirror({ prisma: dbClient as unknown as SagaStreamPrismaClient })
@@ -71,6 +74,18 @@ export default async function createSagasService(
       console.log(`[Sagas API] Running on http://localhost:${port}`);
     })
     .serve();
+
+  return Object.freeze({
+    ...running,
+    stop: async () => {
+      try {
+        await sagaRuntime?.stop('sagas-service-stop');
+      } finally {
+        durableRuntime?.kv.close();
+        await running.stop();
+      }
+    },
+  });
 }
 
 async function loadSagasServiceContext(): Promise<PluginServiceContext> {

@@ -12,7 +12,7 @@
 
 ## Current State
 
-Slices 1-3 product code are implemented and validated. `KvSagaStore` provides a production Deno KV-backed `SagaStorePort`; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core `createSagaRuntime` now accepts `SagaRuntimeNativeOptions.logger?` and emits a per-logger one-time warning when core composes a native engine without a store. Remaining approved work: durable service/standalone runner wiring, restart integration tests, docs correction, and final validation sweep.
+Slices 1-4 product code are implemented and validated. `KvSagaStore` provides durable Deno KV state; `createDurableSagaRuntime` provides plugin-layer durable native runtime composition; core warns once per logger when composed store-less; the sagas service now starts with `createDurableSagaRuntime`, exposes the durable runtime in context, and returns a stop handle that stops the runtime and closes KV. Remaining approved work: durable standalone runner/supervisor wiring, restart integration tests, docs correction, and final validation sweep.
 
 ## Completed
 
@@ -23,17 +23,18 @@ Slices 1-3 product code are implemented and validated. `KvSagaStore` provides a 
 - Implemented and validated slice 1 `KvSagaStore`.
 - Implemented and validated slice 2 durable runtime factory and runtime barrel exports.
 - Implemented and validated slice 3 core store-less warning.
+- Implemented and validated slice 4 service durable runtime wiring.
 
 ## In Progress
 
-- Slice 3 commit/push/PR comment cadence.
+- Slice 4 commit/push/PR comment cadence.
 
 ## Next Steps
 
-1. Commit slice 3.
+1. Commit slice 4.
 2. Push with explicit refspec.
-3. Append `commits.md` and comment PR #74 with slice 3 evidence.
-4. Start slice 4 service composition wiring.
+3. Append `commits.md` and comment PR #74 with slice 4 evidence.
+4. Start slice 5 standalone runner/supervisor wiring.
 
 ## Key Decisions
 
@@ -58,15 +59,16 @@ Slices 1-3 product code are implemented and validated. `KvSagaStore` provides a 
 | `plugins/sagas/src/runtime/mod.ts` | changed | Runtime barrel exports for durable store/factory. |
 | `packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts` | changed | Store-less warning seam. |
 | `packages/plugin-sagas-core/tests/runtime/create-saga-runtime_test.ts` | new | Warning regression tests. |
+| `plugins/sagas/services/src/main.ts` | changed | Durable runtime service composition and stop cleanup. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | Slices 1-3 PASS | Targeted tests, scoped checks, core package check, and scoped fmt passed. |
+| Static | Slices 1-4 PASS | Targeted tests, scoped checks, core package check, service check, and scoped fmt passed. |
 | Fitness | Pending | Final manual/script sweep pending later slices. |
 | Runtime | Slices 1-3 PASS | KV store, durable factory, and store-less warning tests passed. |
-| Consumer | Pending | Pending implementation. |
+| Consumer | Slice 4 PASS | Sagas service check passed with durable runtime wiring. |
 
 ## Open Questions
 
