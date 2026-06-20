@@ -10,6 +10,7 @@ import {
   type SagaRuntimeSupervisorOptions,
   type SagaRuntimeSupervisorSnapshot,
 } from './saga-supervisor.ts';
+import { createSagaTelemetry } from '../telemetry/otel-saga-tracer.ts';
 
 /** Module importer boundary used by the runtime registry loader. */
 export type SagaRuntimeModuleImporter = (specifier: string) => Promise<unknown>;
@@ -59,13 +60,15 @@ export async function startSagaRunner(
   const registryModule = options.registryModule ?? readEnv('SAGAS_REGISTRY_MODULE') ??
     DEFAULT_REGISTRY_MODULE;
   const importer = options.importer ?? defaultImporter;
+  const runtimeOptions = adapter === 'legacy' ? { ...options.runtimeOptions, adapter } : {
+    ...options.runtimeOptions,
+    native: withDefaultTelemetry(options.runtimeOptions?.native),
+    adapter,
+  };
   const supervisor = new SagaRuntimeSupervisor({
     ...options.supervisor,
     loadDefinitions: () => loadSagaRegistryModule(resolveModuleSpecifier(registryModule), importer),
-    runtimeOptions: {
-      ...options.runtimeOptions,
-      adapter,
-    },
+    runtimeOptions,
   });
   await supervisor.start();
   return supervisor;
@@ -97,6 +100,15 @@ export async function loadSagaRegistryModule(
 
 function defaultImporter(specifier: string): Promise<unknown> {
   return import(specifier) as Promise<unknown>;
+}
+
+function withDefaultTelemetry(
+  native: CreateSagaRuntimeOptions['native'],
+): NonNullable<CreateSagaRuntimeOptions['native']> {
+  return {
+    ...native,
+    instrumentation: native?.instrumentation ?? createSagaTelemetry(),
+  };
 }
 
 function resolveModuleSpecifier(specifier: string): string {

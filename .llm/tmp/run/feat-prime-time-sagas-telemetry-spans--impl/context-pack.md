@@ -12,7 +12,7 @@
 
 ## Current State
 
-S3 implementation is complete locally: the core telemetry seam accepts parent trace context, `SagaEngineOptions` accepts optional instrumentation with a NOOP default, `SagaEngine.#handleEntry` emits `saga.handle` spans around handler + persistence, and `createSagaRuntime({ native: { instrumentation } })` threads instrumentation into the engine. S1/S2 are committed and pushed; S3 is ready to commit.
+S4 implementation is complete locally: the core telemetry seam and engine handle spans are wired, native runtime instrumentation reaches the engine, and `plugins/sagas` now has an OTel-backed saga tracer injected at service, runner, and supervisor native composition roots. S1-S3 are committed and pushed; S4 is ready to commit.
 
 ## Completed
 
@@ -23,16 +23,18 @@ S3 implementation is complete locally: the core telemetry seam accepts parent tr
 - Implemented S2 handle span lifecycle and tests.
 - Committed and pushed S2 (`9d2e6d2`), with PR #76 progress comment.
 - Implemented S3 runtime/bridge instrumentation threading and test.
+- Committed and pushed S3 (`24828ad`), with PR #76 progress comment.
+- Implemented S4 OTel adapter, composition-root injection, plugin import-map subpaths, and adapter tests.
 
 ## In Progress
 
-- S3 commit/push/PR comment.
+- S4 commit/push/PR comment.
 
 ## Next Steps
 
-1. Commit S3.
+1. Commit S4.
 2. Append `commits.md`, push explicit refspec, and comment PR #76.
-3. Start S4 OTel adapter and composition-root injection.
+3. Start S5 API publish trace linkage integration/failure-path tests and final gates.
 
 ## Key Decisions
 
@@ -54,15 +56,21 @@ S3 implementation is complete locally: the core telemetry seam accepts parent tr
 | `packages/plugin-sagas-core/src/adapters/saga-bus-bridge.ts` | changed | Accepts and holds bridge instrumentation for deferred cascade spans. |
 | `packages/plugin-sagas-core/tests/telemetry/instrumentation_test.ts` | new | Proves parent context forwards into tracer options. |
 | `packages/plugin-sagas-core/tests/telemetry/saga-engine-spans_test.ts` | new | Proves success and failure handle span lifecycle and duration metric. |
+| `plugins/sagas/deno.json` | changed | Adds local import-map subpaths for core telemetry and telemetry tracer plus test assert dependency. |
+| `plugins/sagas/src/telemetry/otel-saga-tracer.ts` | new | OTel-backed structural saga tracer adapter and instrumentation factory. |
+| `plugins/sagas/services/src/main.ts` | changed | Injects `createSagaTelemetry()` into the service native runtime. |
+| `plugins/sagas/src/runtime/saga-runner.ts` | changed | Supplies default native saga telemetry for the runner runtime options. |
+| `plugins/sagas/src/runtime/saga-supervisor.ts` | changed | Supplies default native saga telemetry in the default runtime factory. |
+| `plugins/sagas/tests/telemetry/otel-saga-tracer_test.ts` | new | Proves adapter mapping. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | S3 PASS | check/lint/fmt scoped to `packages/plugin-sagas-core` passed. |
-| Fitness | IN_PROGRESS | S1-S3 public-surface/runtime invariants covered by tests; full manual evidence pending final gate pass. |
-| Runtime | S3 PASS | telemetry seam, engine span, runtime injection, and existing runtime tests passed. |
-| Consumer | NOT_RUN | pending |
+| Static | S4 PASS | check/lint/fmt scoped to `packages/plugin-sagas-core` and `plugins/sagas` passed through S4. |
+| Fitness | IN_PROGRESS | S1-S4 public-surface/runtime invariants covered by tests; full manual evidence pending final gate pass. |
+| Runtime | S4 PASS | telemetry seam, engine span, runtime injection, OTel adapter, and existing runtime tests passed. |
+| Consumer | S4 PASS | `plugins/sagas` scoped check/test passed. |
 
 ## Open Questions
 
@@ -77,3 +85,4 @@ S3 implementation is complete locally: the core telemetry seam accepts parent tr
 
 - eeff38c: feat(sagas): extend telemetry span seam
 - 9d2e6d2: feat(sagas): emit engine handle spans
+- 24828ad: feat(sagas): thread runtime instrumentation

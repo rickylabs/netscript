@@ -72,6 +72,8 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | 2026-06-20 | S2 | gates | Scoped check/lint/fmt, telemetry tests, and existing runtime tests passed. |
 | 2026-06-20 | S3 | implementation | Threaded native runtime instrumentation through `createSagaRuntime` into engine construction and bridge options. |
 | 2026-06-20 | S3 | gates | Scoped check/lint/fmt, telemetry tests, and existing runtime tests passed. |
+| 2026-06-20 | S4 | implementation | Added OTel-backed saga tracer adapter and injected `createSagaTelemetry()` at service, runner, and supervisor native composition roots. |
+| 2026-06-20 | S4 | gates | Scoped plugin check/lint/fmt and OTel adapter tests passed. |
 
 ## Decisions
 
@@ -107,6 +109,10 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | S3 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/plugin-sagas-core --ext ts` | PASS | 91 files selected; 0 findings. |
 | S3 telemetry tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/telemetry/instrumentation_test.ts packages/plugin-sagas-core/tests/telemetry/saga-engine-spans_test.ts` | PASS | 4 passed, 0 failed. |
 | S3 runtime tests | `deno test --unstable-kv --allow-all packages/plugin-sagas-core/tests/runtime` | PASS | 13 passed, 0 failed. |
+| S4 check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts` | PASS | 56 files selected; 0 findings. |
+| S4 lint | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root plugins/sagas --ext ts` | PASS | 56 files selected; 0 findings. |
+| S4 fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas --ext ts` | PASS | 56 files selected; 0 findings. |
+| S4 adapter tests | `deno test --allow-all plugins/sagas/tests/telemetry/otel-saga-tracer_test.ts` | PASS | 2 passed, 0 failed. |
 
 ### Fitness Gates
 
@@ -121,12 +127,14 @@ To extend saga telemetry, start at `packages/plugin-sagas-core/src/telemetry/ins
 | Handle span behavior | NOT_RUN | pending targeted tests | Required by S2/S3/S5. |
 | S2 handle span behavior | PASS | `saga-engine-spans_test.ts` | Proves success and failure span lifecycle plus duration metric. |
 | S3 runtime injection | PASS | `saga-engine-spans_test.ts` | Proves `createSagaRuntime({ native: { instrumentation } })` reaches the engine. |
+| S4 OTel adapter | PASS | `otel-saga-tracer_test.ts` | Proves kind/status/exception/end delegation and parent context extraction. |
 
 ### Consumer Gates
 
 | Consumer | Result | Evidence | Notes |
 | --- | --- | --- | --- |
 | `plugins/sagas` | NOT_RUN | pending check/tests | Required by S4/S5. |
+| `plugins/sagas` S4 | PASS | scoped check/lint/fmt + adapter test | Composition roots compile with telemetry injection. |
 
 ## Handoff Notes
 
