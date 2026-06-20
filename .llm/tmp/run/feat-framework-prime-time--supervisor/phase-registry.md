@@ -62,6 +62,17 @@ period parity (`Saga store version mismatch for ${id}.` — present in `KvSagaSt
 name reconciliation; (3) F-13 explicit naming in the ARCHETYPE-5 gate set. Generator launch HELD until
 blocker batch (#76/#77) closes, then launch (scope-locked, no fresh present-step required).
 
+**Track-3 launch BLOCKED ON USER AUTH (2026-06-20):** blocker batch is now complete, so Track-3 is
+otherwise ready. Worktree `/home/codex/repos/netscript-pt-sagas-prisma-store` created off umbrella
+`4e2d3dd1` on branch `feat/prime-time/sagas-prisma-store` (explicit upstream set); brief + plan +
+research + plan-meta + plan-eval all present in the worktree; launch prompt staged
+(`prompt_track3.txt`). **The actual `codex exec … --dangerously-bypass-approvals-and-sandbox` launch
+was DENIED by the Claude auto-mode safety classifier** ("Create Unsafe Agents" — disabling sandbox +
+approval gates is not covered by the general autonomy grant). This is a MECHANISM gate, separate from
+scope (scope is still locked/approved). NOT worked around. Needs explicit user go on the
+sandbox-disabled generator-launch mechanism (or a Bash permission rule), OR the user launches the
+prepared `launch_track3.sh` themselves. Everything up to the launch is staged and idempotent.
+
 **E2E gate (#81) — BOTH JOBS GREEN ON REAL CI (2026-06-20):** `scaffold-static`=success AND
 `scaffold-runtime`=success on `e2e-cli.yml` run for `7ed56049`. The green-up slice corrected the
 workflow to `setup-dotnet 10.0.x` + `dotnet tool install Aspire.Cli --version 13.4.4` (generic
