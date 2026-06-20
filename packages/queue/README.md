@@ -16,6 +16,8 @@ root import focused on the core factories, types, errors, and validation helpers
 - **Lightweight root import** — Heavy Redis and RabbitMQ adapters stay behind explicit subpath
   imports.
 - **Native retry awareness** — Expose whether the selected backend handles retries for you.
+- **Durable dead-letter queue** — Terminal failures are recorded through `DeadLetterStorePort` on
+  every default adapter.
 - **KV Connect fallback** — Switch to the polling adapter automatically when native Deno KV queue
   APIs are unavailable.
 - **Tracing integration** — Auto-wrap queues with `@netscript/telemetry` when telemetry is enabled.
@@ -52,16 +54,19 @@ await queue.listen(async (message) => {
 
 ## Entry Points
 
-| Import                                 | Purpose                                                    | Key exports                                                               |
-| -------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `@netscript/queue`                     | Root factories, core types, errors, and validation helpers | `createQueue`, `createTypedQueue`, `createParallelQueue`, `QueueProvider` |
-| `@netscript/queue/types`               | Queue interfaces and option types                          | `MessageQueue`, `MessageContext`, `QueueOptions`, `TypedQueueOptions`     |
-| `@netscript/queue/errors`              | Stable queue error types                                   | `QueueError`, `QueueValidationError`, `QueueErrorCode`                    |
-| `@netscript/queue/validation`          | Schema validation helpers                                  | `ValidationSchema`, `safeValidate`, `validateOrThrow`, `withValidation`   |
-| `@netscript/queue/adapters/deno-kv`    | Direct Deno KV adapter access                              | `DenoKvAdapter`                                                           |
-| `@netscript/queue/adapters/kv-polling` | KV Connect and regular KV polling queue                    | `KvPollingAdapter`                                                        |
-| `@netscript/queue/adapters/redis`      | Direct Redis adapter access                                | `RedisAdapter`                                                            |
-| `@netscript/queue/adapters/amqp`       | Direct RabbitMQ adapter access                             | `AmqpAdapter`                                                             |
+| Import                                                 | Purpose                                                    | Key exports                                                               |
+| ------------------------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `@netscript/queue`                                     | Root factories, core types, errors, and validation helpers | `createQueue`, `createTypedQueue`, `createParallelQueue`, `QueueProvider` |
+| `@netscript/queue/ports`                               | Queue interfaces, option types, and DLQ contract           | `MessageQueue`, `MessageContext`, `QueueOptions`, `DeadLetterStorePort`   |
+| `@netscript/queue/errors`                              | Stable queue error types                                   | `QueueError`, `QueueValidationError`, `QueueErrorCode`                    |
+| `@netscript/queue/validation`                          | Schema validation helpers                                  | `ValidationSchema`, `safeValidate`, `validateOrThrow`, `withValidation`   |
+| `@netscript/queue/adapters/deno-kv`                    | Direct Deno KV adapter access                              | `DenoKvAdapter`                                                           |
+| `@netscript/queue/adapters/kv-polling`                 | KV Connect and regular KV polling queue                    | `KvPollingAdapter`                                                        |
+| `@netscript/queue/adapters/kv-dead-letter-store`       | KV-backed DLQ store                                        | `KvDeadLetterStore`                                                       |
+| `@netscript/queue/adapters/postgres-dead-letter-store` | PostgreSQL DLQ store                                       | `PostgresDeadLetterStore`                                                 |
+| `@netscript/queue/adapters/redis-dead-letter-store`    | Redis DLQ store                                            | `RedisDeadLetterStore`                                                    |
+| `@netscript/queue/adapters/redis`                      | Direct Redis adapter access                                | `RedisAdapter`                                                            |
+| `@netscript/queue/adapters/amqp`                       | Direct RabbitMQ adapter access                             | `AmqpAdapter`                                                             |
 
 ## Usage Examples
 
@@ -79,6 +84,17 @@ const NotificationSchema = z.object({
 
 const queue = createTypedQueue('notifications', NotificationSchema, {
   onValidationError: 'dlq',
+});
+```
+
+### Inject a dead-letter store
+
+```ts
+import { createQueue } from '@netscript/queue';
+import { KvDeadLetterStore } from '@netscript/queue/adapters/kv-dead-letter-store';
+
+const queue = createQueue('jobs', {
+  deadLetterStore: new KvDeadLetterStore({ queueName: 'jobs' }),
 });
 ```
 
@@ -184,6 +200,7 @@ interface QueueOptions {
   retryAttempts?: number;
   retryDelay?: number;
   connection?: QueueConnectionOptions;
+  deadLetterStore?: DeadLetterStorePort;
   disableAutoTracing?: boolean;
 }
 ```
@@ -217,6 +234,53 @@ interface QueueConnectionOptions {
 }
 ```
 
+## Delivery Guarantee and Dead Letters
+
+`@netscript/queue` provides at-least-once delivery. A handler may see a message more than once when
+a backend redelivers after failure or visibility timeout. Handlers should make side effects
+idempotent using application-level keys.
+
+Poison messages are never silently discarded by the default adapters. A terminal failure writes a
+`DeadLetterRecord<T>` before the adapter removes or releases the source message. Terminal failures
+include:
+
+- `nack({ requeue: false })` from a handler
+- max-attempts exhaustion on adapters that own retry counting
+- typed-queue validation failures when `onValidationError: 'dlq'`
+
+The `DeadLetterStorePort<T>` extension point is intentionally small:
+
+- `append(record)`
+- `list({ limit }?)`
+- `reprocess(reenqueue, { limit }?)`
+- `depth()`
+
+Default backing stores:
+
+| Adapter                 | Default DLQ store                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| Deno KV                 | `KvDeadLetterStore`                                                                             |
+| KV polling / KV Connect | `KvDeadLetterStore` using the adapter KV                                                        |
+| PostgreSQL              | `PostgresDeadLetterStore` using `<queue_table>_dlq`                                             |
+| Redis                   | `RedisDeadLetterStore` using `netscript:dlq:<queue>`                                            |
+| RabbitMQ / AMQP         | `KvDeadLetterStore`; RabbitMQ dead-letter exchanges remain an optional broker-side optimization |
+| Memory testing adapter  | `MemoryDeadLetterStore`                                                                         |
+
+`KvPollingAdapter.reprocessDlq(limit?)` remains available for callers that already use that adapter.
+Provider stores expose the transport-agnostic `reprocess()` method through `DeadLetterStorePort`.
+
+## Runtime Permissions
+
+Grant the permissions required by the selected provider and DLQ store:
+
+- Deno KV / KV polling DLQ: `--unstable-kv`; add `--allow-read` and `--allow-write` when opening a
+  file-backed KV path.
+- Remote KV Connect, Redis, PostgreSQL, and RabbitMQ: `--allow-net` for the backend endpoint.
+- Auto-discovery from Aspire or environment variables: `--allow-env`.
+
+RabbitMQ users can configure broker-side dead-letter exchanges for higher throughput or operational
+policy, but the package-level guarantee is the configured `DeadLetterStorePort` sink.
+
 ### `TypedQueueOptions`
 
 ```ts
@@ -229,9 +293,10 @@ interface TypedQueueOptions extends QueueOptions {
 
 ## Architecture
 
-The root module intentionally does not re-export Redis or RabbitMQ adapters. That keeps common
-imports like `createQueue()`, `MessageQueue`, and validation helpers usable without eagerly pulling
-backend-specific dependencies into every consumer's module graph.
+The root module intentionally does not re-export provider adapters. That keeps common imports like
+`createQueue()`, `MessageQueue`, and validation helpers usable without eagerly pulling
+backend-specific dependencies into every consumer's module graph. Adapter and dead-letter store
+classes are available from explicit subpaths.
 
 The public factory stays synchronous. Redis and RabbitMQ adapters are resolved lazily on first
 operational use, so existing consumers can keep treating `createQueue()` as a normal

@@ -7,6 +7,7 @@ import {
 } from '@std/assert';
 import { createQueue, QueueConnectionError, QueueProvider } from '../mod.ts';
 import { PostgresAdapter, type PostgresQueueClient } from '../adapters/postgres.adapter.ts';
+import type { DeadLetterRecord, DeadLetterStorePort } from '../ports/dead-letter.ts';
 
 interface StoredMessage {
   readonly queueName: string;
@@ -102,6 +103,27 @@ class FakePostgresClient implements PostgresQueueClient {
   }
 }
 
+class RecordingDeadLetterStore<T> implements DeadLetterStorePort<T> {
+  readonly records: DeadLetterRecord<T>[] = [];
+
+  append(record: DeadLetterRecord<T>): Promise<void> {
+    this.records.push(record);
+    return Promise.resolve();
+  }
+
+  list(): Promise<DeadLetterRecord<T>[]> {
+    return Promise.resolve([...this.records]);
+  }
+
+  reprocess(): Promise<number> {
+    return Promise.resolve(0);
+  }
+
+  depth(): Promise<number> {
+    return Promise.resolve(this.records.length);
+  }
+}
+
 Deno.test('PostgresAdapter publishes, consumes, and acknowledges with table-backed claims', async () => {
   const client = new FakePostgresClient();
   const queue = new PostgresAdapter<{ body: string }>({
@@ -150,6 +172,57 @@ Deno.test('PostgresAdapter nacks with requeue by releasing the claim', async () 
   const row = [...client.rows.values()][0];
   assertEquals(row.lockedAt, undefined);
   assertEquals(row.deliveryCount, 1);
+});
+
+Deno.test('PostgresAdapter dead-letters explicit terminal nacks before deleting the row', async () => {
+  const client = new FakePostgresClient();
+  const deadLetterStore = new RecordingDeadLetterStore<string>();
+  const queue = new PostgresAdapter<string>({
+    client,
+    deadLetterStore,
+    queueName: 'jobs',
+    pollInterval: 1,
+  });
+  await queue.enqueue('poison');
+
+  const controller = new AbortController();
+  await queue.listen(
+    async (_message, context) => {
+      await context.nack({ requeue: false, errorMessage: 'poison' });
+      controller.abort();
+    },
+    { signal: controller.signal },
+  );
+
+  assertEquals(client.rows.size, 0);
+  assertEquals(deadLetterStore.records.length, 1);
+  assertEquals(deadLetterStore.records[0].reason, 'nack_without_requeue');
+  assertEquals(deadLetterStore.records[0].payload, 'poison');
+  assertEquals(deadLetterStore.records[0].errorMessage, 'poison');
+});
+
+Deno.test('PostgresAdapter dead-letters requeued failures after max attempts', async () => {
+  const client = new FakePostgresClient();
+  const deadLetterStore = new RecordingDeadLetterStore<string>();
+  const queue = new PostgresAdapter<string>({
+    client,
+    deadLetterStore,
+    queueName: 'jobs',
+    pollInterval: 1,
+    maxRetries: 0,
+  });
+  await queue.enqueue('poison');
+
+  await assertRejects(
+    () => queue.listen(() => Promise.reject(new Error('boom'))),
+    Error,
+    'Queue listener failed',
+  );
+
+  assertEquals(client.rows.size, 0);
+  assertEquals(deadLetterStore.records.length, 1);
+  assertEquals(deadLetterStore.records[0].reason, 'max_attempts_exceeded');
+  assertEquals(deadLetterStore.records[0].deliveryCount, 1);
 });
 
 Deno.test('createQueue(Postgres) no longer returns the not-implemented stub', async () => {

@@ -7,9 +7,22 @@
  */
 
 import { Pool } from 'npm:pg@^8.21.0';
-import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import type {
+  DeadLetterStorePort,
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  NackOptions,
+} from '../ports/mod.ts';
 import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
-import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
+import {
+  createEnvelope,
+  createMessageContext,
+  isMessageEnvelope,
+  toDeadLetterRecord,
+} from './_envelope.ts';
+import { PostgresDeadLetterStore } from './postgres-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -74,9 +87,19 @@ export interface PostgresAdapterOptions {
    */
   visibilityTimeout?: number;
   /**
+   * Maximum retry attempts before a requeued failure is dead-lettered.
+   *
+   * @default 3
+   */
+  maxRetries?: number;
+  /**
    * Caller-owned PostgreSQL client or pool, primarily for tests.
    */
   client?: PostgresQueueClient;
+  /**
+   * Optional dead-letter store. Defaults to a PostgreSQL-backed store using the queue client.
+   */
+  deadLetterStore?: DeadLetterStorePort;
 }
 
 interface PostgresMessageRow extends Record<string, unknown> {
@@ -98,10 +121,13 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
   private readonly tableIdentifier: string;
   private readonly pollInterval: number;
   private readonly visibilityTimeout: number;
+  private readonly maxRetries: number;
   private readonly explicitClient?: PostgresQueueClient;
+  private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
   private readonly url?: string;
   private readonly consumerId = crypto.randomUUID();
   private client: PostgresQueueClient | null = null;
+  private deadLetterStore: DeadLetterStorePort<T> | null = null;
   private schemaReady: Promise<void> | null = null;
   private listening = false;
   private abortController?: AbortController;
@@ -122,7 +148,9 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     this.tableIdentifier = quoteQualifiedIdentifier(this.tableName);
     this.pollInterval = options.pollInterval ?? DEFAULT_POLL_INTERVAL_MS;
     this.visibilityTimeout = options.visibilityTimeout ?? DEFAULT_VISIBILITY_TIMEOUT_MS;
+    this.maxRetries = options.maxRetries ?? 3;
     this.explicitClient = options.client;
+    this.explicitDeadLetterStore = options.deadLetterStore as DeadLetterStorePort<T> | undefined;
     this.url = options.url;
   }
 
@@ -291,6 +319,24 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     await this.schemaReady;
   }
 
+  private async ensureDeadLetterStore(): Promise<DeadLetterStorePort<T>> {
+    if (this.deadLetterStore) {
+      return this.deadLetterStore;
+    }
+
+    if (this.explicitDeadLetterStore) {
+      this.deadLetterStore = this.explicitDeadLetterStore;
+      return this.deadLetterStore;
+    }
+
+    this.deadLetterStore = new PostgresDeadLetterStore<T>({
+      client: await this.ensureClient(),
+      queueName: this.queueName,
+      tableName: this.tableName,
+    });
+    return this.deadLetterStore;
+  }
+
   private async createSchema(client: PostgresQueueClient): Promise<void> {
     await client.query(
       `CREATE TABLE IF NOT EXISTS ${this.tableIdentifier} (
@@ -370,6 +416,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
     const context = this.createContext(
       row.message_id,
       messageId,
+      payload,
       enqueuedAt,
       headers,
       deliveryCount,
@@ -392,6 +439,7 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
   private createContext(
     storageMessageId: string,
     messageId: string,
+    payload: T,
     enqueuedAt: Date,
     headers: Record<string, string>,
     deliveryCount: number,
@@ -406,10 +454,20 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
         await this.ack(storageMessageId);
         markSettled();
       },
-      async (options) => {
-        if (options?.requeue ?? true) {
+      async (options: NackOptions = {}) => {
+        if ((options.requeue ?? true) && deliveryCount < this.maxRetries + 1) {
           await this.release(storageMessageId);
         } else {
+          await this.deadLetter(
+            storageMessageId,
+            messageId,
+            payload,
+            enqueuedAt,
+            headers,
+            deliveryCount,
+            deliveryCount >= this.maxRetries + 1 ? 'max_attempts_exceeded' : options.reason,
+            options,
+          );
           await this.ack(storageMessageId);
         }
         markSettled();
@@ -436,6 +494,31 @@ export class PostgresAdapter<T = unknown> implements MessageQueue<T> {
         WHERE queue_name = $1 AND message_id = $2`,
       [this.queueName, messageId],
     );
+  }
+
+  private async deadLetter(
+    _storageMessageId: string,
+    messageId: string,
+    payload: T,
+    enqueuedAt: Date,
+    headers: Record<string, string>,
+    deliveryCount: number,
+    reason: NackOptions['reason'],
+    options: NackOptions,
+  ): Promise<void> {
+    const store = await this.ensureDeadLetterStore();
+    await store.append(toDeadLetterRecord(
+      {
+        messageId,
+        queueName: this.queueName,
+        payload,
+        headers,
+        deliveryCount,
+        enqueuedAt,
+      },
+      reason ?? 'nack_without_requeue',
+      options,
+    ));
   }
 }
 
