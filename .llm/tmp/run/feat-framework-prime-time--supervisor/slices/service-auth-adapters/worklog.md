@@ -62,3 +62,31 @@
   - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/auth-workos --ext ts,tsx --ignore-line-endings` — PASS.
   - `deno task deps:latest` — PASS for `jose`, `better-auth`, and `@workos-inc/node`; none appeared in the behind list.
   - `deno task deps:audit` — NON-BLOCKING EXISTING ADVISORIES: same unrelated `undici` and `vite` advisories as slice 1.
+
+## Slice 4 — better-auth Prisma wrapper + authenticator
+
+- Added `createNetscriptBetterAuth({ prisma, provider, ...betterAuthOptions })`.
+- Storage tier wraps better-auth's first-party `prismaAdapter` from `better-auth/adapters/prisma`
+  over a consumer-owned Prisma client; no hand-rolled store was introduced.
+- Honored PLAN-EVAL layering fix:
+  - `@netscript/auth-better-auth` does not depend on `@netscript/database`.
+  - Consumers pass their Prisma client instance at the boundary.
+- Added `createBetterAuthAuthenticator({ auth })`.
+- Authenticator calls `auth.api.getSession({ headers: req.headers(), returnHeaders: true })`.
+- Refresh-cookie path:
+  - better-auth response headers are inspected.
+  - `Set-Cookie` values are emitted via `AuthnResult.setCookies`.
+  - Non-cookie response headers are emitted via `AuthnResult.responseHeaders`.
+- Principal mapping:
+  - `subject`: better-auth `user.id`.
+  - `scopes`: session/user permission arrays when present.
+  - `roles`: user role(s) plus active organization role(s).
+  - `scheme`: `custom`.
+  - `claims`: camelCase `organizationId`/`sessionId` plus raw session/user payloads.
+- Required node-compat smoke:
+  - `better-auth@1.6.20` imports and `betterAuth({ secret, baseURL })` constructs under Deno 2.8.3.
+- Validation:
+  - `deno check --unstable-kv packages/auth-better-auth/mod.ts packages/auth-better-auth/tests/` — PASS.
+  - `deno test --allow-net --allow-env packages/auth-better-auth/tests/` — PASS, 5 tests.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/auth-better-auth --ext ts,tsx` — PASS.
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/auth-better-auth --ext ts,tsx --ignore-line-endings` — PASS.
