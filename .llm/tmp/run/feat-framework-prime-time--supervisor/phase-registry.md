@@ -71,10 +71,19 @@ dependency-free core are both preserved:
   the slice's `drift.md`. Steer log: `/home/codex/pt-service-auth-seam-steer.log`.
 - **Track 2 — NEW gated slice `service-auth-adapters` (status: authoring → PLAN-EVAL).** Real
   `better-auth` + `@workos-inc/*` adapters implementing `AuthenticatorPort`/`AuthorizerPort` against
-  the widened contract. Deps are npm → MUST be `catalog:`; placement (separate optional package(s)
-  vs subpath) is a doctrine decision resolved in research. Must go through research → plan →
+  the widened contract. Deps are npm → MUST be `catalog:`. Must go through research → plan →
   PLAN-EVAL (OpenHands minimax-M3) and be presented to the user BEFORE any generator launch. Depends
   on #77 merging first (consumes the widened seam).
+  - **LOCKED placement (user, 2026-06-20): separate per-provider packages** — `@netscript/auth-better-auth`
+    and `@netscript/auth-workos`, mirroring the `@netscript/prisma-adapter-mysql` precedent (vs the
+    in-core subpath-adapter precedent of `@netscript/queue`). Rationale: cleanest dep isolation
+    (install only what you use), each independently publishable, core `@netscript/service` stays
+    dependency-free.
+  - **LOCKED injection idiom: consumer brings the configured instance.** Same as queue/db provider
+    injection (`createRedisQueue(url)`, Prisma driver adapter). The consumer constructs their own
+    `betterAuth()` / WorkOS client and hands it to a thin adapter factory
+    (`createBetterAuthAuthenticator({ auth })`, `createWorkosAuthenticator({ workos })`) that maps
+    the provider model → `Principal`. The framework does not own the auth instance lifecycle.
 
 ## Notes
 
