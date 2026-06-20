@@ -33,6 +33,7 @@
     "jsr:@logtape/logtape@2": "2.1.4",
     "jsr:@logtape/logtape@^2.0.5": "2.1.4",
     "jsr:@olli/kvdex@^3.6.7": "3.6.7",
+    "jsr:@panva/oauth4webapi@^3.8.6": "3.8.6",
     "jsr:@standard-schema/spec@1.1.0": "1.1.0",
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/assert@^1.0.19": "1.0.19",
@@ -388,6 +389,9 @@
         "jsr:@std/ulid",
         "npm:zod"
       ]
+    },
+    "@panva/oauth4webapi@3.8.6": {
+      "integrity": "37569071868714cee36c5df8be7939efcf68811e849a80b87d4be22aff331c50"
     },
     "@standard-schema/spec@1.1.0": {
       "integrity": "2ccd54513cd9c960bd155ab569b1a901bc99c6f9ad29559d3f38a28c91c1822d"
@@ -2335,6 +2339,12 @@
             "npm:better-auth@^1.6.20"
           ]
         }
+      },
+      "packages/auth-kv-oauth": {
+        "dependencies": [
+          "jsr:@panva/oauth4webapi@^3.8.6",
+          "jsr:@std/assert@1"
+        ]
       },
       "packages/auth-workos": {
         "dependencies": [
