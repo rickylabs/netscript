@@ -4,7 +4,7 @@ import type {
   AuthnResult,
   Principal,
 } from '@netscript/service/auth';
-import { betterAuth } from 'better-auth';
+import { betterAuth, type BetterAuthOptions } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 
 /** Prisma providers supported by better-auth's first-party Prisma adapter. */
@@ -20,20 +20,37 @@ export type BetterAuthPrismaProvider =
 export type BetterAuthPrismaClient = object;
 
 /** Options for constructing a better-auth instance backed by consumer-owned Prisma. */
-export type NetscriptBetterAuthOptions =
-  & {
-    /** Consumer-owned Prisma client. */
-    readonly prisma: BetterAuthPrismaClient;
-    /** Prisma provider name passed to better-auth's first-party Prisma adapter. */
-    readonly provider: BetterAuthPrismaProvider;
-    /** Enable better-auth Prisma adapter debug logs. */
-    readonly debugLogs?: boolean;
-    /** Use plural better-auth table names. */
-    readonly usePlural?: boolean;
-    /** Enable better-auth adapter transactions when supported by the provider. */
-    readonly transaction?: boolean;
-  }
-  & Record<string, unknown>;
+export interface NetscriptBetterAuthOptions {
+  /** Consumer-owned Prisma client. */
+  readonly prisma: BetterAuthPrismaClient;
+  /** Prisma provider name passed to better-auth's first-party Prisma adapter. */
+  readonly provider: BetterAuthPrismaProvider;
+  /** Enable better-auth Prisma adapter debug logs. */
+  readonly debugLogs?: boolean;
+  /** Use plural better-auth table names. */
+  readonly usePlural?: boolean;
+  /** Enable better-auth adapter transactions when supported by the provider. */
+  readonly transaction?: boolean;
+  /** better-auth application name. */
+  readonly appName?: string;
+  /** better-auth base URL. */
+  readonly baseURL?: string;
+  /** better-auth base path. */
+  readonly basePath?: string;
+  /** better-auth secret. */
+  readonly secret?: string;
+  /** Origins trusted by better-auth. */
+  readonly trustedOrigins?: string[];
+  /** better-auth advanced runtime options used by NetScript tests and local adapters. */
+  readonly advanced?: {
+    readonly disableCSRFCheck?: boolean;
+  };
+  /** better-auth telemetry options. */
+  readonly telemetry?: {
+    readonly enabled?: boolean;
+    readonly debug?: boolean;
+  };
+}
 
 /** Session shape returned by `auth.api.getSession`. */
 export interface BetterAuthSessionPayload {
@@ -60,21 +77,28 @@ export interface BetterAuthSessionPayload {
 export interface BetterAuthInstance {
   /** better-auth Fetch handler for `/api/auth/**` routes. */
   readonly handler: (request: Request) => Promise<Response>;
-  /** better-auth server API. */
+  /** better-auth session API consumed by NetScript adapters. */
   readonly api: {
-    readonly getSession: (input: {
-      readonly headers: Headers;
-      readonly returnHeaders?: boolean;
-    }) => Promise<
-      | BetterAuthSessionPayload
-      | null
-      | {
-        readonly headers?: Headers;
-        readonly response: BetterAuthSessionPayload | null;
-      }
-    >;
+    readonly getSession: (
+      input: BetterAuthGetSessionInput,
+    ) => Promise<BetterAuthSessionLookupResponse>;
   };
 }
+
+/** Input accepted by better-auth's `api.getSession` method. */
+export type BetterAuthGetSessionInput = Readonly<{
+  headers: Headers;
+  returnHeaders?: boolean;
+}>;
+
+/** Session lookup response shape consumed by NetScript better-auth adapters. */
+export type BetterAuthSessionLookupResponse =
+  | BetterAuthSessionPayload
+  | null
+  | {
+    readonly headers?: Headers;
+    readonly response: BetterAuthSessionPayload | null;
+  };
 
 /** Options for creating a better-auth-backed NetScript authenticator. */
 export interface BetterAuthAuthenticatorOptions {
@@ -100,17 +124,16 @@ export function createNetscriptBetterAuth(
   options: NetscriptBetterAuthOptions,
 ): BetterAuthInstance {
   const { prisma, provider, debugLogs, usePlural, transaction, ...betterAuthOptions } = options;
-  return betterAuth(
-    {
-      ...betterAuthOptions,
-      database: prismaAdapter(prisma, {
-        provider,
-        debugLogs,
-        usePlural,
-        transaction,
-      }),
-    } as Parameters<typeof betterAuth>[0],
-  ) as BetterAuthInstance;
+  const configuredOptions: BetterAuthOptions = {
+    ...betterAuthOptions,
+    database: prismaAdapter(prisma, {
+      provider,
+      debugLogs,
+      usePlural,
+      transaction,
+    }),
+  };
+  return betterAuth(configuredOptions);
 }
 
 /** Creates a NetScript authenticator backed by `auth.api.getSession`.
@@ -128,7 +151,7 @@ export function createBetterAuthAuthenticator(
 ): AuthenticatorPort {
   return {
     async authenticate(request: AuthnRequest): Promise<AuthnResult> {
-      let resolved: Awaited<ReturnType<BetterAuthInstance['api']['getSession']>>;
+      let resolved: unknown;
       try {
         resolved = await options.auth.api.getSession({
           headers: request.headers(),
@@ -156,12 +179,43 @@ export function createBetterAuthAuthenticator(
 }
 
 export function unwrapSessionResponse(
-  value: Awaited<ReturnType<BetterAuthInstance['api']['getSession']>>,
+  value: unknown,
 ): { readonly session: BetterAuthSessionPayload | null; readonly headers?: Headers } {
-  if (value && 'response' in value) {
-    return { session: value.response, headers: value.headers };
+  if (!value) {
+    return { session: null };
   }
-  return { session: value };
+  if (!isObject(value)) {
+    return { session: null };
+  }
+
+  if ('response' in value) {
+    const response = Reflect.get(value, 'response');
+    const headers = Reflect.get(value, 'headers');
+    return {
+      session: isBetterAuthSessionPayload(response) ? response : null,
+      ...(headers instanceof Headers ? { headers } : {}),
+    };
+  }
+
+  return {
+    session: isBetterAuthSessionPayload(value) ? value : null,
+  };
+}
+
+function isBetterAuthSessionPayload(value: unknown): value is BetterAuthSessionPayload {
+  if (!isObject(value)) {
+    return false;
+  }
+  const session = Reflect.get(value, 'session');
+  const user = Reflect.get(value, 'user');
+  return isObject(session) &&
+    isObject(user) &&
+    typeof Reflect.get(session, 'id') === 'string' &&
+    typeof Reflect.get(user, 'id') === 'string';
+}
+
+function isObject(value: unknown): value is object {
+  return typeof value === 'object' && value !== null;
 }
 
 export function principalFromBetterAuthSession(payload: BetterAuthSessionPayload): Principal {

@@ -1,6 +1,10 @@
 import { assertEquals, assertRejects, assertThrows } from '@std/assert';
 import type { AuthBackendPort } from './mod.ts';
-import { AuthBackendNotFoundError, createAuthBackendRegistry } from './mod.ts';
+import {
+  AuthBackendNotFoundError,
+  createAuthBackendRegistry,
+  createHmacSessionTokenCrypto,
+} from './mod.ts';
 
 const backend: AuthBackendPort = {
   name: 'default',
@@ -71,3 +75,73 @@ Deno.test('createAuthBackendRegistry throws for missing backends', () => {
 Deno.test('AuthBackendPort remains contract-only for async backends', async () => {
   await assertRejects(() => Promise.resolve(backend.sessions.refreshSession('sess_1')));
 });
+
+Deno.test('createHmacSessionTokenCrypto round-trips a signed session id', async () => {
+  const sessionCrypto = createHmacSessionTokenCrypto('x'.repeat(32));
+  const token = await sessionCrypto.sealSessionToken({
+    id: 'sess_1',
+    userId: 'user_1',
+    state: 'active',
+    subject: 'user_1',
+    scopes: [],
+    roles: [],
+    claims: {},
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2026-01-02T00:00:00.000Z',
+  });
+
+  assertEquals(await sessionCrypto.openSessionToken(token), 'sess_1');
+});
+
+Deno.test('createHmacSessionTokenCrypto binds the full payload without decorative entropy', async () => {
+  const sessionCrypto = createHmacSessionTokenCrypto('x'.repeat(32));
+  const token = await sessionCrypto.sealSessionToken({
+    id: 'sess_1',
+    userId: 'user_1',
+    state: 'active',
+    subject: 'user_1',
+    scopes: [],
+    roles: [],
+    claims: {},
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2026-01-02T00:00:00.000Z',
+  });
+  const [payload] = token.split('.');
+
+  assertEquals(decodeBase64UrlText(payload ?? ''), 'sess_1');
+});
+
+Deno.test('createHmacSessionTokenCrypto rejects same-length signature tampering', async () => {
+  const sessionCrypto = createHmacSessionTokenCrypto('x'.repeat(32));
+  const token = await sessionCrypto.sealSessionToken({
+    id: 'sess_1',
+    userId: 'user_1',
+    state: 'active',
+    subject: 'user_1',
+    scopes: [],
+    roles: [],
+    claims: {},
+    issuedAt: '2026-01-01T00:00:00.000Z',
+    expiresAt: '2026-01-02T00:00:00.000Z',
+  });
+  const [payload, signature] = token.split('.');
+  const tamperedSignature = signature?.startsWith('A')
+    ? `B${signature.slice(1)}`
+    : `A${signature?.slice(1) ?? ''}`;
+
+  await assertRejects(
+    async () => {
+      await sessionCrypto.openSessionToken(`${payload}.${tamperedSignature}`);
+    },
+    Error,
+    'Invalid auth backend session token.',
+  );
+});
+
+function decodeBase64UrlText(value: string): string {
+  const padded = value.replaceAll('-', '+').replaceAll('_', '/').padEnd(
+    Math.ceil(value.length / 4) * 4,
+    '=',
+  );
+  return atob(padded);
+}

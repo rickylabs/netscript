@@ -40,18 +40,21 @@ export {
 } from './src/workos-backend.ts';
 
 export type {
+  AUTH_SESSION_STATES,
   AuthBackendPort,
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthPrincipalMapperPort,
+  AuthProviderCapability,
   AuthProviderDescriptor,
+  AuthProviderRegistryPort,
   AuthSession,
+  AuthSessionCreateInput,
+  AuthSessionCryptoPort,
+  AuthSessionLookup,
+  AuthSessionPrincipalMapping,
+  AuthSessionState,
+  AuthSessionStorePort,
   Principal,
 } from '@netscript/plugin-auth-core';
-
-export type {
-  AuthenticatorPort as ServiceAuthenticatorPort,
-  AuthnRequest as ServiceAuthnRequest,
-  AuthnResult as ServiceAuthnResult,
-  Principal as ServicePrincipal,
-} from '@netscript/service/auth';

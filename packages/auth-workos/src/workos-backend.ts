@@ -6,6 +6,10 @@ import type {
   AuthSessionLookup,
   AuthSessionPrincipalMapping,
 } from '@netscript/plugin-auth-core';
+import {
+  AuthBackendOperationUnsupportedError,
+  createHmacSessionTokenCrypto,
+} from '@netscript/plugin-auth-core';
 import type { AuthnRequest, AuthnResult } from '@netscript/service/auth';
 import {
   createWorkosAuthenticator,
@@ -14,6 +18,8 @@ import {
   type WorkosSessionAuthenticationSuccess,
 } from './workos-authenticator.ts';
 import type { JWTPayload } from 'jose';
+
+export { AuthBackendOperationUnsupportedError } from '@netscript/plugin-auth-core';
 
 /** Configured WorkOS connection or access-token provider exposed by the backend. */
 export interface WorkosProviderOptions {
@@ -33,25 +39,6 @@ export interface WorkosBackendOptions extends WorkosAuthenticatorOptions {
   readonly providers?: readonly WorkosProviderOptions[];
   /** Secret used to sign backend-owned opaque session tokens. Defaults to `cookiePassword`. */
   readonly sessionTokenSecret?: string;
-}
-
-/** Error thrown when a WorkOS backend operation is outside WorkOS' managed-session model. */
-export class AuthBackendOperationUnsupportedError extends Error {
-  /** Backend that rejected the operation. */
-  readonly backendName: string;
-  /** Port operation that is not supported. */
-  readonly operation: string;
-  /** Short explanation of the upstream capability boundary. */
-  readonly reason: string;
-
-  /** Creates an unsupported-operation error. */
-  constructor(backendName: string, operation: string, reason: string) {
-    super(`${backendName} does not support ${operation}: ${reason}`);
-    this.name = 'AuthBackendOperationUnsupportedError';
-    this.backendName = backendName;
-    this.operation = operation;
-    this.reason = reason;
-  }
 }
 
 const DEFAULT_COOKIE_NAME = 'wos-session';
@@ -76,6 +63,7 @@ export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendP
   const authenticator = createWorkosAuthenticator(options);
   const providers = normalizeWorkosProviders(options.providers);
   const tokenSecret = options.sessionTokenSecret ?? options.cookiePassword;
+  const sessionCrypto = createHmacSessionTokenCrypto(tokenSecret);
 
   return {
     name: WORKOS_BACKEND_NAME,
@@ -120,11 +108,11 @@ export function createWorkosBackend(options: WorkosBackendOptions): AuthBackendP
       },
     },
     crypto: {
-      sealSessionToken(session: AuthSession): Promise<string> {
-        return signSessionToken(session.id, tokenSecret);
+      async sealSessionToken(session: AuthSession): Promise<string> {
+        return await sessionCrypto.sealSessionToken(session);
       },
-      openSessionToken(token: string): Promise<string> {
-        return verifySessionToken(token, tokenSecret);
+      async openSessionToken(token: string): Promise<string> {
+        return await sessionCrypto.openSessionToken(token);
       },
     },
     principalMapper: {
@@ -231,38 +219,6 @@ function unsupportedWorkosOperation(
   return new AuthBackendOperationUnsupportedError(WORKOS_BACKEND_NAME, operation, reason);
 }
 
-async function signSessionToken(sessionId: string, secret: string): Promise<string> {
-  const payload = `${sessionId}.${crypto.randomUUID()}`;
-  const signature = await hmac(payload, secret);
-  return `${base64UrlEncode(payload)}.${signature}`;
-}
-
-async function verifySessionToken(token: string, secret: string): Promise<string> {
-  const [encodedPayload, signature, extra] = token.split('.');
-  if (!encodedPayload || !signature || extra !== undefined) {
-    throw new Error('Invalid WorkOS backend session token.');
-  }
-  const payload = base64UrlDecode(encodedPayload);
-  const expected = await hmac(payload, secret);
-  if (signature !== expected) {
-    throw new Error('Invalid WorkOS backend session token signature.');
-  }
-  return payload.split('.', 1)[0] ?? '';
-}
-
-async function hmac(value: string, secret: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(value));
-  return base64UrlEncode(new Uint8Array(signature));
-}
-
 function decodeJwtPayload(token: string | undefined): JWTPayload {
   if (!token) {
     return {};
@@ -272,7 +228,8 @@ function decodeJwtPayload(token: string | undefined): JWTPayload {
     return {};
   }
   try {
-    return JSON.parse(base64UrlDecode(payload)) as JWTPayload;
+    const claims: JWTPayload = JSON.parse(base64UrlDecode(payload));
+    return claims;
   } catch {
     return {};
   }
@@ -280,15 +237,6 @@ function decodeJwtPayload(token: string | undefined): JWTPayload {
 
 function dateFromSecondsClaim(value: unknown): string | undefined {
   return typeof value === 'number' ? new Date(value * 1000).toISOString() : undefined;
-}
-
-function base64UrlEncode(value: string | Uint8Array): string {
-  const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : value;
-  let binary = '';
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte);
-  }
-  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '');
 }
 
 function base64UrlDecode(value: string): string {

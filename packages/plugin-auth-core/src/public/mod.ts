@@ -23,7 +23,14 @@ export type {
   AuthUser,
   Principal,
 } from '../domain/mod.ts';
-export { DEFAULT_AUTH_BACKEND_NAME, resolveBackend } from '../ports/mod.ts';
+export {
+  AuthBackendNotFoundError,
+  AuthBackendOperationUnsupportedError,
+  createAuthBackendRegistry,
+  createHmacSessionTokenCrypto,
+  DEFAULT_AUTH_BACKEND_NAME,
+  resolveBackend,
+} from '../ports/mod.ts';
 export type {
   AuthBackendPort,
   AuthBackendRegistry,
