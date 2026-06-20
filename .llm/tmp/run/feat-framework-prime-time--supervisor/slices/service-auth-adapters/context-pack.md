@@ -4,6 +4,11 @@
 
 Implementation is in progress on branch `feat/prime-time/service-auth-adapters`.
 
+Completed:
+
+- Slice 1 catalog + package scaffolding.
+- Slice 2 WorkOS sealed-session authenticator with refresh-cookie emission and node-compat smoke.
+
 ## Invariants
 
 - Both new packages consume `AuthenticatorPort`, `AuthnRequest`, `AuthnResult`, and `Principal` from
@@ -19,4 +24,3 @@ Implementation is in progress on branch `feat/prime-time/service-auth-adapters`.
 - `deps:latest` is the authority for provider version freshness.
 - Deno node-compat smoke remains required for WorkOS sealed sessions and better-auth.
 - Consumer import validation must be recorded as a named verify item before READY.
-

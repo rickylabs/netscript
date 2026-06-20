@@ -8,7 +8,6 @@
   },
   "imports": {
     "@netscript/service/auth": "../service/src/auth/mod.ts",
-    "@workos-inc/node": "npm:@workos-inc/node@catalog:",
     "@std/assert": "jsr:@std/assert@^1"
   },
   "tasks": {
