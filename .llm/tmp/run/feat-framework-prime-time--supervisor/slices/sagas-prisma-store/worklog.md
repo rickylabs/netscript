@@ -56,6 +56,7 @@
 | 2026-06-20 | Loaded brief, plan, research, plan-meta, PLAN-EVAL, doctrine, harness gates, and ground-truth saga/runtime/database/CLI files. |
 | 2026-06-20 | Rebased `feat/prime-time/sagas-prisma-store` from `4e2d3dd1` to umbrella tip `6e0346cf`. Pre-existing dirty OpenHands request artifacts are line-ending-only and intentionally excluded from slice commits. |
 | 2026-06-20 | Slice 1 added dedicated `SagaRuntimeState`, `SagaRuntimeTransition`, and `SagaRuntimeCorrelation` Prisma models in `plugins/sagas/database/sagas.prisma`. |
+| 2026-06-20 | Slice 2 added `PrismaSagaStore` plus parity tests for state round-trip, correlation lookup, transition ordering, stale-version error parity, and delete cascade. |
 
 ## Gate Evidence
 
@@ -63,3 +64,5 @@
 | --- | --- | --- | --- |
 | 1 | Diff scope | PASS | `rtk git diff -- plugins/sagas/database/sagas.prisma .../worklog.md` showed only the schema addition and harness worklog. |
 | 1 | Prisma schema fmt wrapper | NON_BLOCKING_UNSUPPORTED | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root plugins/sagas/database --ext prisma` selected 1 file but `deno fmt --check` exited 1 with no findings; Deno fmt is not useful evidence for `.prisma`. |
+| 2 | Focused unit test | PASS | `rtk proxy deno test --unstable-kv --allow-all plugins/sagas/src/runtime/prisma-saga-store_test.ts` — 5 passed, 0 failed. |
+| 2 | Focused type check | PASS | `deno check --unstable-kv plugins/sagas/src/runtime/prisma-saga-store.ts plugins/sagas/src/runtime/prisma-saga-store_test.ts` — passed. |
