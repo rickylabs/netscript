@@ -8,7 +8,7 @@
   (`kv-oauth`, `workos`, `better-auth`), and `NETSCRIPT_AUTH_KV_OAUTH_KEY`.
 - **Ports:** existing auth backend registry, `AuthBackendPort`, `InteractiveFlowPort`, KV store, and
   service request context.
-- **Constants:** version is single-sourced through `AUTH_PLUGIN_VERSION = 1.0.0`.
+- **Constants:** version is single-sourced through `AUTH_PLUGIN_VERSION = 0.0.1-alpha.0`.
 - **Commit slices:** version, stream-doc cleanup, security defaults, docs/metadata, kv-oauth CAS
   surface doc.
 - **Deferred scope:** per-preset `TenantOAuthProviderOptions` tightening and deep-subpath collapse
@@ -21,7 +21,7 @@
 
 | Item | Decision | Evidence |
 | ---- | -------- | -------- |
-| Version value | Keep `1.0.0` and route service version through `AUTH_PLUGIN_VERSION`. | Current branch already had `deno.json`, `definePlugin`, manifest tests, and verify-plugin on `1.0.0`. |
+| Version value | Keep `0.0.1-alpha.0` and route all derived sites through `AUTH_PLUGIN_VERSION`. | Supervisor override: sibling plugins pin `0.0.1-alpha.0`, and auth is brand-new/unpublished, so the earlier `1.0.0` note is superseded by sibling consistency and pre-release framework semantics. |
 | Stream mirror | Remove/keep-as-absent; only stale docs changed. | `rg` found no `startAuthStreamMirror`/satellites on branch; `producer.ts` only contains emit helpers. |
 | Kv-oauth enum prune | No code prune needed. | `rg` found no `state_mismatch`, `nonce_mismatch`, or `id_token_invalid`; `refresh_failed` and `refresh_reuse_detected` are live. |
 | Documentation URL | Use umbrella branch README URL. | `netscript.dev` did not resolve; GitHub umbrella README URL returned HTTP 200. |
@@ -42,6 +42,8 @@
 | `deno doc --lint mod.ts src/providers.ts src/store.ts src/crypto.ts src/cookies.ts src/flow.ts src/backend.ts src/errors.ts` in `packages/auth-kv-oauth` | PASS, checked 8 files. |
 | `rtk proxy deno publish --dry-run --allow-dirty` in `plugins/auth` | PASS, no slow-type warnings, file list scoped to intended package files. Existing warning: env-driven `NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE` dynamic import is unanalyzable at publish time. |
 | `rtk proxy deno publish --dry-run --allow-dirty` in `packages/auth-kv-oauth` | PASS, no slow-type warnings, clean file list. |
-| `deno run --allow-read plugins/auth/verify-plugin.ts` | PASS, `ok: true`, manifest version `1.0.0`, 0 findings. |
+| `deno run --allow-read plugins/auth/verify-plugin.ts` | PASS, `ok: true`, manifest version `1.0.0`, 0 findings. Superseded by the S7 version-correction gate below. |
+| `deno run --allow-read plugins/auth/verify-plugin.ts` after version correction | PASS, `ok: true`, manifest version `0.0.1-alpha.0`, 0 findings. |
+| `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/auth --ext ts,tsx` after version correction | PASS, 29 files, 0 occurrences. |
+| `deno test --unstable-kv --allow-all plugins/auth/tests/services/auth-service_test.ts plugins/auth/tests/streams/streams_test.ts` after version correction | PASS, 10 tests. |
 | `rtk git diff -- deno.lock` | PASS, empty diff. |
-

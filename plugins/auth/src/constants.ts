@@ -2,7 +2,7 @@
 export const AUTH_PLUGIN_ID = 'auth' as const;
 
 /** Plugin manifest version advertised to the NetScript host. */
-export const AUTH_PLUGIN_VERSION = '1.0.0' as const;
+export const AUTH_PLUGIN_VERSION = '0.0.1-alpha.0' as const;
 
 /** Service contribution name for the auth API process. */
 export const AUTH_API_SERVICE_NAME = 'auth-api' as const;
