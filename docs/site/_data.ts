@@ -97,6 +97,12 @@ export const navSections: NavSection[] = [
       { href: "/how-to/run-a-polyglot-task/", label: "Run a polyglot task", icon: "\u00B7" },
       { href: "/how-to/graceful-shutdown/", label: "Graceful shutdown", icon: "\u00B7" },
       { href: "/how-to/deploy-local-aspire/", label: "Deploy locally with Aspire", icon: "\u00B7" },
+      { href: "/how-to/roll-out-runtime-overrides/", label: "Roll out runtime overrides", icon: "\u00B7" },
+      { href: "/how-to/add-a-task-runtime-adapter/", label: "Add a task runtime adapter", icon: "\u00B7" },
+      { href: "/how-to/build-a-server-validated-form/", label: "Build a server-validated form", icon: "\u00B7" },
+      { href: "/how-to/build-a-validated-ingestion-queue/", label: "Build a validated ingestion queue", icon: "\u00B7" },
+      { href: "/how-to/publish-a-durable-stream/", label: "Publish a durable stream", icon: "\u00B7" },
+      { href: "/how-to/restrict-worker-task-permissions/", label: "Restrict worker task permissions", icon: "\u00B7" },
     ],
   },
   {

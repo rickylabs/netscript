@@ -105,6 +105,12 @@ export const xref: Record<string, XrefTarget> = {
   "howto:graceful-shutdown": { href: "/how-to/graceful-shutdown/", label: "Graceful shutdown" },
   "howto:tune-worker-runtime": { href: "/how-to/tune-worker-runtime/", label: "Tune the worker runtime" },
   "howto:deploy-local-aspire": { href: "/how-to/deploy-local-aspire/", label: "Deploy locally with Aspire" },
+  "howto:roll-out-runtime-overrides": { href: "/how-to/roll-out-runtime-overrides/", label: "Roll out runtime overrides" },
+  "howto:add-a-task-runtime-adapter": { href: "/how-to/add-a-task-runtime-adapter/", label: "Add a task runtime adapter" },
+  "howto:build-a-server-validated-form": { href: "/how-to/build-a-server-validated-form/", label: "Build a server-validated form" },
+  "howto:build-a-validated-ingestion-queue": { href: "/how-to/build-a-validated-ingestion-queue/", label: "Build a validated ingestion queue" },
+  "howto:publish-a-durable-stream": { href: "/how-to/publish-a-durable-stream/", label: "Publish a durable stream" },
+  "howto:restrict-worker-task-permissions": { href: "/how-to/restrict-worker-task-permissions/", label: "Restrict worker task permissions" },
 
   // ─── Tutorials (tut:) ──────────────────────────────────────────────────────
   "tut:index": { href: "/tutorials/", label: "Tutorials" },
