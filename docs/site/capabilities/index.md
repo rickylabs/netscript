@@ -78,7 +78,7 @@ surface — these hubs orient, the reference enumerates.
     { name: "Durable sagas", type: "plugin · :8092", desc: "defineSaga(id).durability('t1')...build(); durable store kv | prisma; list at /api/v1/sagas/sagas. Full API at /reference/sagas/." },
     { name: "Triggers & ingress", type: "plugin · :8093 (Hono)", desc: "defineWebhook → enqueueJob; POST /api/v1/webhooks/inbound/generic. defer throws + DLQs. Full API at /reference/triggers/." },
     { name: "Durable streams", type: "plugin · :4437", desc: "createDurableStream producer runtime is real; plugin-streams manifest helpers throw StreamUnsupportedOperationError. Full API at /reference/streams/." },
-    { name: "Authentication", type: "plugin · :8094", desc: "auth-api oRPC; /api/v1/auth/{signin,callback,signout,session,me}; one active backend (kv-oauth | workos | better-auth). Full API at /reference/plugin-auth-core/." },
+    { name: "Authentication", type: "plugin · :8094", desc: "auth-api oRPC; /api/v1/auth/{signin,callback,signout,session,me}; one active backend (kv-oauth | workos | better-auth). Full API at /capabilities/auth/." },
     { name: "Database & Prisma", type: "platform · Postgres", desc: "Prisma runtime=\"deno\", per-plugin schema aggregation. Full API at /reference/database/." },
     { name: "KV, queues & cron", type: "platform · primitives", desc: "Deno KV / queue (four backends incl. postgres) / cron behind unstable:[\"kv\"]. Full API at /reference/kv/, /reference/queue/, /reference/cron/." },
     { name: "Telemetry & logging", type: "platform · OTel", desc: "@opentelemetry/api spans + structured logs in handlers, RPC, and job dispatch. Full API at /reference/telemetry/ and /reference/logger/." },

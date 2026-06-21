@@ -56,13 +56,7 @@ processor/ingress runtime (`@netscript/plugin-triggers-core/runtime`).
   {
     title: "Learn — Ingest a webhook",
     body: "Storefront Track A, rung 05: scaffold the triggers plugin, author a webhook, POST to :8093, and watch it enqueue a job — closing the continuous-app ladder.",
-    href: "/tutorials/storefront/05-ingest-a-webhook/",
-    icon: "→"
-  },
-  {
-    title: "Learn — Watch a drop folder",
-    body: "ERP-sync Track C, rung 04: a defineFileWatch trigger that picks up product-import CSVs the moment they land and enqueues an import job per file.",
-    href: "/tutorials/erp-sync/04-watch-a-folder/",
+    href: "/tutorials/storefront/05-shipping-webhook/",
     icon: "→"
   },
   {

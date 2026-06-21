@@ -73,7 +73,7 @@ registries, ports, and docs all assume it.
     ["<code>worker</code>", "<code>workers</code>", "<code>@netscript/plugin-workers</code>", "8091", "<a href=\"/reference/workers/\">workers</a>"],
     ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "8092", "<a href=\"/reference/sagas/\">sagas</a>"],
     ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "8093", "<a href=\"/reference/triggers/\">triggers</a>"],
-    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "8094", "<a href=\"/reference/plugin-auth-core/\">auth</a>"],
+    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "8094", "<a href=\"/capabilities/auth/\">auth</a>"],
     ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "4437", "<a href=\"/reference/streams/\">streams</a>"]
   ]
 } /}}
@@ -237,7 +237,7 @@ Run `netscript plugin --help` for the complete, version-accurate command set.
     { title: "workers", body: "Background jobs, scheduling, task execution.", href: "/reference/workers/" },
     { title: "sagas", body: "Durable saga orchestration (kv | prisma store).", href: "/reference/sagas/" },
     { title: "triggers", body: "Trigger ingress, scheduling, file watching.", href: "/reference/triggers/" },
-    { title: "auth", body: "oRPC auth service with a selectable backend.", href: "/reference/plugin-auth-core/" },
+    { title: "auth", body: "oRPC auth service with a selectable backend.", href: "/capabilities/auth/" },
     { title: "streams", body: "Durable change-data stream producers.", href: "/reference/streams/" },
     { title: "All packages", body: "Browse the full package and plugin index.", href: "/reference/" }
   ]
