@@ -106,7 +106,8 @@ const authManifest: PluginManifest = definePlugin(
   .withRuntimeConfigTopics([{ name: AUTH_PLUGIN_ID }])
   .withMetadata({
     repository: 'https://github.com/rickylabs/netscript',
-    documentation: 'https://netscript.dev/plugins/auth',
+    documentation:
+      'https://github.com/rickylabs/netscript/tree/feat/prime-time/auth/plugins/auth#readme',
     features: [
       'Unified auth oRPC service',
       'Single active backend selection',
