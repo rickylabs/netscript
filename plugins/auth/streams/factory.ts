@@ -8,7 +8,6 @@
  */
 
 import { createStreamDB } from '@durable-streams/state/db';
-import type { StreamStateDefinition as DurableStreamStateDefinition } from '@durable-streams/state';
 import { buildStreamUrl, getStreamsAuth } from '@netscript/plugin-streams-core';
 import { type AuthSession, authStreamSchema } from './schema.ts';
 
@@ -46,12 +45,19 @@ export interface AuthStreamDB {
 export function createAuthStreamDB(options: { baseUrl?: string } = {}): AuthStreamDB {
   const baseUrl = options.baseUrl ?? 'http://localhost:4437';
 
-  return createStreamDB({
+  const streamDb = createStreamDB({
     streamOptions: {
       url: buildStreamUrl('/auth/sessions', baseUrl),
       contentType: 'application/json',
       headers: getStreamsAuth(),
     },
-    state: authStreamSchema as unknown as DurableStreamStateDefinition,
-  }) as unknown as AuthStreamDB;
+    state: authStreamSchema,
+  });
+  return {
+    collections: {
+      authSession: streamDb.collections.authSession,
+    },
+    preload: () => streamDb.preload(),
+    close: () => streamDb.close(),
+  };
 }

@@ -11,8 +11,6 @@ Deno.test('auth v1 handlers infer contract input context and errors', () => {
       message: 'provider failed',
       data: { reason: 'provider failed' },
     });
-    // @ts-expect-error signin input does not accept session lookup fields.
-    input.sessionId;
     return { started: true };
   });
 

@@ -148,7 +148,7 @@ function publishAuthSession(
     if (!streamProducer) {
       return;
     }
-    streamProducer.upsert('authSession', session as unknown as Record<string, unknown>);
+    streamProducer.upsert('authSession', session);
   } catch (error) {
     console.warn('[Auth Stream] Durable stream emit skipped:', error);
   } finally {

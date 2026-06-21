@@ -56,6 +56,10 @@ async function readText(p: string) {
   }
 }
 
+function stripStringLiterals(line: string) {
+  return line.replace(/(['"`])(?:\\.|(?!\1).)*\1/g, '""');
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // A1 / A2 — public types first, simple over easy at boundaries
 // (Mechanical proxy: mod.ts has @module + every export has explicit return type)
@@ -80,11 +84,17 @@ if (await exists(modPath)) {
     });
   }
   // Wildcard re-exports from internal layers
-  for (const m of text.matchAll(/^export\s+\*\s+from\s+['"](\.\/(?:src\/)?(?:internal|adapters|application|runtime|state|domain)\/[^'"]*)['"]/gm)) {
+  for (
+    const m of text.matchAll(
+      /^export\s+\*\s+from\s+['"](\.\/(?:src\/)?(?:internal|adapters|application|runtime|state|domain)\/[^'"]*)['"]/gm,
+    )
+  ) {
     findings.push({
       ref: 'A1',
       level: 'WARN',
-      message: `mod.ts wildcard re-exports internal layer ${m[1]} — curate via src/public/mod.ts instead`,
+      message: `mod.ts wildcard re-exports internal layer ${
+        m[1]
+      } — curate via src/public/mod.ts instead`,
       path: 'mod.ts',
     });
   }
@@ -107,7 +117,8 @@ if (readmeText) {
     findings.push({
       ref: 'A3',
       level: 'WARN',
-      message: `README has only ${codeFences} TS code fences — needs ≥ 2 (basic + advanced) for the 80% path`,
+      message:
+        `README has only ${codeFences} TS code fences — needs ≥ 2 (basic + advanced) for the 80% path`,
     });
   }
 }
@@ -122,7 +133,15 @@ const tsFiles: string[] = [];
 for await (
   const entry of walk(ROOT, {
     match: [/\.ts$/],
-    skip: [/node_modules/, /_test\.ts$/, /\.test\.ts$/, /tests\//, /examples\//, /_fresh/, /\.deploy/],
+    skip: [
+      /node_modules/,
+      /_test\.ts$/,
+      /\.test\.ts$/,
+      /tests\//,
+      /examples\//,
+      /_fresh/,
+      /\.deploy/,
+    ],
   })
 ) tsFiles.push(entry.path);
 
@@ -136,7 +155,8 @@ for (const f of tsFiles) {
       findings.push({
         ref: 'A4',
         level: 'FAIL',
-        message: `abstract class ${cls} declares no abstract members — bases are stub-only contracts`,
+        message:
+          `abstract class ${cls} declares no abstract members — bases are stub-only contracts`,
         path: relative(ROOT, f),
       });
     }
@@ -145,7 +165,8 @@ for (const f of tsFiles) {
       findings.push({
         ref: 'A4',
         level: 'WARN',
-        message: `abstract class ${cls} has a public mutable field — base classes should expose state via getter methods only`,
+        message:
+          `abstract class ${cls} has a public mutable field — base classes should expose state via getter methods only`,
         path: relative(ROOT, f),
       });
     }
@@ -177,7 +198,8 @@ for (const [cls, parent] of extendsMap) {
       findings.push({
         ref: 'A5/AP-1',
         level: 'WARN',
-        message: `class ${cls} sits ${depth}+ levels deep in inheritance chain — prefer composition`,
+        message:
+          `class ${cls} sits ${depth}+ levels deep in inheritance chain — prefer composition`,
       });
       break;
     }
@@ -201,7 +223,8 @@ for await (
     findings.push({
       ref: 'AP-7/F-DOCT-4',
       level: 'WARN',
-      message: `forbidden folder name '${seg}' — split into domain/, application/, or adapters/ aligned to a real concern`,
+      message:
+        `forbidden folder name '${seg}' — split into domain/, application/, or adapters/ aligned to a real concern`,
       path: relative(ROOT, entry.path),
     });
   }
@@ -209,7 +232,10 @@ for await (
 // AP-12 reinventing the wheel: detect handwritten Result/Option types when @netscript/shared exports them
 for (const f of tsFiles) {
   const text = await readText(f);
-  if (/export\s+type\s+(Result|Either|Option|Maybe)\b/.test(text) && !/from\s+['"]@netscript\/shared['"]/.test(text)) {
+  if (
+    /export\s+type\s+(Result|Either|Option|Maybe)\b/.test(text) &&
+    !/from\s+['"]@netscript\/shared['"]/.test(text)
+  ) {
     findings.push({
       ref: 'A7/AP-12',
       level: 'WARN',
@@ -298,7 +324,9 @@ for (const f of tsFiles) {
     findings.push({
       ref: 'A10/AP-22',
       level: 'FAIL',
-      message: `module-level \`export let ${m[1]}\` — global mutable state forbidden; use composition root`,
+      message: `module-level \`export let ${
+        m[1]
+      }\` — global mutable state forbidden; use composition root`,
       path: relative(ROOT, f),
     });
   }
@@ -313,7 +341,8 @@ if (/sagas?|workflow|triggers?|workers?/i.test(pkgName)) {
   findings.push({
     ref: 'A12',
     level: 'INFO',
-    message: 'package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md',
+    message:
+      'package implements durable workflow concepts — verify state machine model is documented in docs/architecture.md',
   });
 }
 
@@ -327,7 +356,8 @@ for (const f of tsFiles) {
     findings.push({
       ref: 'A13',
       level: 'WARN',
-      message: `Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead`,
+      message:
+        `Deno.exit/process.exit outside bin/ — crash boundaries must be explicit, throw a typed error instead`,
       path: relative(ROOT, f),
     });
   }
@@ -353,11 +383,14 @@ for (const f of testFiles) {
       path: relative(ROOT, f),
     });
   }
-  if (/Deno\.test\s*\(\s*["']\s*(?:should work|happy path|basic|works|test\s*\d+)["']/i.test(text)) {
+  if (
+    /Deno\.test\s*\(\s*["']\s*(?:should work|happy path|basic|works|test\s*\d+)["']/i.test(text)
+  ) {
     findings.push({
       ref: 'A14',
       level: 'WARN',
-      message: 'test name lacks behavioural specificity — name as "<symbol>: <condition> <expectation>"',
+      message:
+        'test name lacks behavioural specificity — name as "<symbol>: <condition> <expectation>"',
       path: relative(ROOT, f),
     });
   }
@@ -406,9 +439,11 @@ for (const f of tsFiles) {
   if (relative(ROOT, f).startsWith('src/internal/')) continue;
   const text = await readText(f);
   text.split(/\r?\n/).forEach((line, i) => {
-    if (/^export\s+(?:async\s+)?function[^{(]*:\s*any\b/.test(line) ||
-        /^export\s+(?:async\s+)?function[^{(]*\([^)]*:\s*any\b/.test(line) ||
-        /^export\s+(?:type|interface)\s+\w+[^=]*=[^=]*\bany\b/.test(line)) {
+    if (
+      /^export\s+(?:async\s+)?function[^{(]*:\s*any\b/.test(line) ||
+      /^export\s+(?:async\s+)?function[^{(]*\([^)]*:\s*any\b/.test(line) ||
+      /^export\s+(?:type|interface)\s+\w+[^=]*=[^=]*\bany\b/.test(line)
+    ) {
       findings.push({
         ref: 'AP-23',
         level: 'WARN',
@@ -418,6 +453,147 @@ for (const f of tsFiles) {
       });
     }
   });
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// AS7 auth doctrine gates — public surface, port factories, casts, and contracts.
+// These are intentionally scoped to the finished auth layer so broad historical
+// doctrine debt elsewhere in the repo does not redline this slice.
+// ─────────────────────────────────────────────────────────────────────────
+const AUTH_SURFACE_ROOTS = [
+  'packages/plugin-auth-core',
+  'packages/auth-workos',
+  'packages/auth-better-auth',
+  'packages/auth-kv-oauth',
+  'plugins/auth',
+  'packages/service/src/auth',
+];
+
+const AUTH_BACKEND_FACTORIES = [
+  {
+    path: 'packages/auth-workos/src/workos-backend.ts',
+    name: 'createWorkosBackend',
+    returnType: 'AuthBackendPort',
+  },
+  {
+    path: 'packages/auth-better-auth/src/better-auth-backend.ts',
+    name: 'createBetterAuthBackend',
+    returnType: 'AuthBackendPort',
+  },
+  {
+    path: 'packages/auth-kv-oauth/src/backend.ts',
+    name: 'createKvOAuthBackend',
+    returnType: 'Promise<KvOAuthBackend>',
+  },
+];
+
+const authScanFiles: string[] = [];
+for await (
+  const entry of walk(ROOT, {
+    match: [/\.ts$/],
+    skip: [/node_modules/, /_fresh/, /\.deploy/],
+  })
+) authScanFiles.push(entry.path);
+
+const authFiles = authScanFiles
+  .map((path) => ({ path, repoPath: relative('.', path) }))
+  .filter((file) => AUTH_SURFACE_ROOTS.some((root) => file.repoPath.startsWith(`${root}/`)));
+
+if (authFiles.length > 0) {
+  const contractTestPath = 'packages/plugin-auth-core/src/contracts/v1/auth.contract_test.ts';
+  if (!(await exists(contractTestPath))) {
+    findings.push({
+      ref: 'AS7/F-AUTH-CONTRACT',
+      level: 'FAIL',
+      message: 'auth oRPC contract compile-time regression test is missing',
+      path: contractTestPath,
+    });
+  }
+
+  for (const file of authFiles) {
+    const text = await readText(file.path);
+    const lines = text.split(/\r?\n/);
+    for (const [index, line] of lines.entries()) {
+      const lineNumber = index + 1;
+      const codeLine = stripStringLiterals(line.replace(/\/\/.*$/, ''));
+      const isAllowedContractCast = file.repoPath ===
+          'packages/plugin-auth-core/src/contracts/v1/auth.contract.ts' &&
+        /\bas\s+unknown\s+as\s+AuthContractV1\b/.test(codeLine);
+      const isAllowedRouterAny = file.repoPath === 'plugins/auth/services/src/router.ts' &&
+        (/\bas\s+any\b/.test(codeLine) || /:\s*any\b/.test(codeLine));
+      if (
+        !/^\s*(?:\*|\/\*|\/\/|import\b|export\s+\{)/.test(line) &&
+        !/^\s*(?:type\s+)?[A-Za-z0-9_]+\s+as\s+[A-Za-z0-9_]+,?\s*$/.test(line) &&
+        /\bas\s+(?!const\b)(?:unknown\s+as\s+|never\b|any\b|[A-Za-z_{[(])/.test(codeLine) &&
+        !isAllowedContractCast &&
+        !isAllowedRouterAny
+      ) {
+        findings.push({
+          ref: 'AS7/F-AUTH-CAST',
+          level: 'FAIL',
+          message:
+            'auth layer permits only the centralized contract cast and the router any exemplar',
+          path: file.repoPath,
+          line: lineNumber,
+        });
+      }
+      if (/@ts-(?:ignore|expect-error|nocheck|check)\b/.test(line)) {
+        findings.push({
+          ref: 'AS7/F-AUTH-CAST',
+          level: 'FAIL',
+          message: 'auth layer must not use @ts-* directives',
+          path: file.repoPath,
+          line: lineNumber,
+        });
+      }
+      if (/&\s*Record\s*<\s*string\s*,\s*unknown\s*>/.test(codeLine)) {
+        findings.push({
+          ref: 'AS7/F-AUTH-CAST',
+          level: 'FAIL',
+          message: 'auth layer must not widen contract types with & Record<string, unknown>',
+          path: file.repoPath,
+          line: lineNumber,
+        });
+      }
+      if (/from\s+['"]@netscript\/[^'"]+\/src\//.test(codeLine)) {
+        findings.push({
+          ref: 'AS7/F-AUTH-IMPORT',
+          level: 'FAIL',
+          message: 'auth layer must import internal packages through public entrypoints/subpaths',
+          path: file.repoPath,
+          line: lineNumber,
+        });
+      }
+      if (/\babstract\s+class\b/.test(codeLine)) {
+        findings.push({
+          ref: 'AS7/F-AUTH-INHERITANCE',
+          level: 'FAIL',
+          message: 'auth backend and port layer uses structural ports, not inheritance',
+          path: file.repoPath,
+          line: lineNumber,
+        });
+      }
+    }
+  }
+
+  for (const factory of AUTH_BACKEND_FACTORIES) {
+    const factoryText = await readText(factory.path);
+    const declaration = new RegExp(
+      `export\\s+(?:async\\s+)?function\\s+${factory.name}\\s*\\([^)]*\\)\\s*:\\s*${
+        factory.returnType.replace(/[()<>]/g, String.raw`\$&`)
+      }`,
+      's',
+    );
+    if (!declaration.test(factoryText)) {
+      findings.push({
+        ref: 'AS7/F-AUTH-BACKEND-FACTORY',
+        level: 'FAIL',
+        message:
+          `${factory.name} must declare : ${factory.returnType} so backend factories satisfy AuthBackendPort without return casts`,
+        path: factory.path,
+      });
+    }
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -441,9 +617,15 @@ if (args.out) {
 
 if (args.text || !args.out) {
   console.log(`# Doctrine readiness — ${pkgName}`);
-  console.log(`  FAIL=${summary.totals.fail} WARN=${summary.totals.warn} INFO=${summary.totals.info}`);
+  console.log(
+    `  FAIL=${summary.totals.fail} WARN=${summary.totals.warn} INFO=${summary.totals.info}`,
+  );
   for (const f of findings) {
-    console.log(`  ${f.level} ${f.ref}: ${f.message}${f.path ? ` (${f.path}${f.line ? ':' + f.line : ''})` : ''}`);
+    console.log(
+      `  ${f.level} ${f.ref}: ${f.message}${
+        f.path ? ` (${f.path}${f.line ? ':' + f.line : ''})` : ''
+      }`,
+    );
   }
 }
 

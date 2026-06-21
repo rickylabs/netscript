@@ -5,6 +5,7 @@
  */
 
 import type { StateSchema, StreamStateDefinition } from '@netscript/plugin-streams-core';
+import type { z } from 'zod';
 import {
   AUTH_STREAM_EVENT_TYPES as CORE_AUTH_STREAM_EVENT_TYPES,
   AuthStreamEventSchema as CoreAuthStreamEventSchema,
@@ -55,12 +56,7 @@ export type AuthStreamSchemaResult<TOutput> =
   | { readonly success: false; readonly error: unknown };
 
 /** Package-owned structural schema surface for auth stream validation. */
-export interface AuthStreamSchema<TOutput = unknown, TInput = unknown> {
-  /** Parse an input value or throw a validation error. */
-  parse(input: TInput): TOutput;
-  /** Parse an input value and return a result object instead of throwing. */
-  safeParse(input: TInput): AuthStreamSchemaResult<TOutput>;
-}
+export type AuthStreamSchema<TOutput = unknown, TInput = unknown> = z.ZodType<TOutput, TInput>;
 
 /** Auth stream event payload shared by the plugin service and subscribers. */
 export type AuthStreamEvent = Readonly<{
@@ -75,12 +71,10 @@ export type AuthStreamEvent = Readonly<{
 }>;
 
 /** Schema for auth session stream entities. */
-export const AuthStreamSessionSchema: AuthStreamSchema<AuthSession> =
-  CoreAuthStreamSessionSchema as unknown as AuthStreamSchema<AuthSession>;
+export const AuthStreamSessionSchema: AuthStreamSchema<AuthSession> = CoreAuthStreamSessionSchema;
 
 /** Schema for auth stream event payloads. */
-export const AuthStreamEventSchema: AuthStreamSchema<AuthStreamEvent> =
-  CoreAuthStreamEventSchema as unknown as AuthStreamSchema<AuthStreamEvent>;
+export const AuthStreamEventSchema: AuthStreamSchema<AuthStreamEvent> = CoreAuthStreamEventSchema;
 
 /** Durable stream schema definition for auth session entities. */
 export type AuthStreamDefinition = Readonly<{
@@ -92,5 +86,4 @@ export type AuthStreamDefinition = Readonly<{
 }>;
 
 /** Entity-based durable stream schema for auth sessions. */
-export const authStreamSchema: StateSchema<AuthStreamDefinition> =
-  coreAuthStreamSchema as unknown as StateSchema<AuthStreamDefinition>;
+export const authStreamSchema: StateSchema<AuthStreamDefinition> = coreAuthStreamSchema;
