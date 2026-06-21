@@ -7,9 +7,9 @@
 export { authV1, callback, me, session, signin, signout } from './v1-handlers.ts';
 export type {
   AuthServiceContext,
+  AuthServiceInitialContext,
   AuthServiceRequest,
   CallbackHandler,
-  InteractiveAuthBackend,
   MeHandler,
   SessionHandler,
   SigninHandler,

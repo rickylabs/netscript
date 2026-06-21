@@ -94,6 +94,8 @@ export type {
   AuthSessionPrincipalMapping,
   AuthSessionState,
   AuthSessionStorePort,
+  InteractiveCallbackResult,
+  InteractiveFlowPort,
 } from '@netscript/plugin-auth-core';
 export type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/auth';
 export type {
