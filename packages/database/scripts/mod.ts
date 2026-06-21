@@ -23,4 +23,13 @@ export {
   generateZodSchemas,
   generateZodSchemasCli,
 } from './generate-zod.ts';
-export { type MigrationOptions, runMigration, runMigrationCli } from './migrate.ts';
+export {
+  isRetriableMigrationFailure,
+  type MigrationOptions,
+  type PrismaSpawn,
+  type PrismaSpawnResult,
+  runMigration,
+  runMigrationCli,
+  runPrismaWithRetry,
+  type RunPrismaWithRetryOptions,
+} from './migrate.ts';
