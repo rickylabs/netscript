@@ -50,7 +50,7 @@ fourteen built-in presets.
   {
     label: "Advanced — explicit provider",
     lang: "ts",
-    code: "// Same factory, but define the OIDC provider yourself when your IdP\n// is not one of the built-in presets.\nimport { createKvOAuthBackend, defineOAuthProvider } from '@netscript/auth-kv-oauth';\n\nconst provider = defineOAuthProvider({\n  id: 'my-idp',\n  clientId: Deno.env.get('NETSCRIPT_AUTH_CLIENT_ID')!,\n  clientSecret: Deno.env.get('NETSCRIPT_AUTH_CLIENT_SECRET')!,\n  authorizationEndpoint: Deno.env.get('NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT')!,\n  tokenEndpoint: Deno.env.get('NETSCRIPT_AUTH_TOKEN_ENDPOINT')!,\n  userinfoEndpoint: Deno.env.get('NETSCRIPT_AUTH_USERINFO_ENDPOINT')!,\n  redirectUri: Deno.env.get('NETSCRIPT_AUTH_REDIRECT_URI')!,\n  scopes: ['openid', 'profile', 'email'],\n});\n\nexport const backend = await createKvOAuthBackend({ provider });"
+    code: "// Same factory, but define the OIDC provider yourself when your IdP\n// is not one of the built-in presets.\nimport { createKvOAuthBackend, defineOAuthProvider } from '@netscript/auth-kv-oauth';\n\nconst provider = defineOAuthProvider({\n  id: 'my-idp',\n  clientId: Deno.env.get('NETSCRIPT_AUTH_CLIENT_ID')!,\n  clientSecret: Deno.env.get('NETSCRIPT_AUTH_CLIENT_SECRET')!,\n  authorizationEndpoint: Deno.env.get('NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT')!,\n  tokenEndpoint: Deno.env.get('NETSCRIPT_AUTH_TOKEN_ENDPOINT')!,\n  userInfoEndpoint: Deno.env.get('NETSCRIPT_AUTH_USERINFO_ENDPOINT')!,\n  redirectUri: Deno.env.get('NETSCRIPT_AUTH_REDIRECT_URI')!,\n  scopes: ['openid', 'profile', 'email'],\n});\n\nexport const backend = await createKvOAuthBackend({ provider });"
   }
 ] }) }}
 
@@ -76,7 +76,7 @@ The plugin's service is named `auth-api` and is built with `@netscript/service`'
     { name: "callback", type: "POST", desc: "Completes the OAuth/OIDC redirect, mints the session, sets the session cookie. Interactive-only — same non-interactive caveat as signin." },
     { name: "signout", type: "POST", desc: "Revokes the current session and clears the cookie." },
     { name: "session", type: "GET", desc: "Resolves the current AuthSession from the cookie (active | expired | revoked), refreshing on read when policy allows." },
-    { name: "me", type: "GET", desc: "Returns the authenticated AuthUser for the current session, or UNAUTHORIZED (401) when there is none." }
+    { name: "me", type: "GET", desc: "Returns { authenticated: true, user, session } when a valid active session exists, or { authenticated: false } (HTTP 200) when there is none." }
   ]
 }) }}
 

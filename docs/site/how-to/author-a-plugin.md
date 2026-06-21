@@ -235,7 +235,7 @@ jobs registry (e.g. `.netscript/generated/plugin-<name>/jobs.registry.ts`) keyed
 `id`. Generate it:
 
 ```sh
-netscript generate
+netscript generate plugins
 ```
 
 If your plugin contributes runtime configuration schemas, also generate those:

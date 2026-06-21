@@ -239,7 +239,7 @@ When you need a primitive the scaffold didn't copy in, pull it from the
   caption: "Fresh UI CLI commands",
   rows: [
     { name: "netscript ui:init", type: "install the foundation", desc: "Installs the NetScript Fresh UI foundation set into an app workspace. Run once when setting up UI in an app that doesn't have it yet (the scaffold runs the equivalent for you)." },
-    { name: "netscript ui:add <name>", type: "add one item or collection", desc: "Copies a single registry item or a named collection into apps/dashboard/components/ui/, wires its CSS, and merges any required deno.json imports." }
+    { name: "netscript ui:add <name>", type: "add one item or collection", desc: "Copies a single registry item or a named collection into the app workspace — component files go to apps/dashboard/components/ui/, island files to islands/ui/, lib helpers to lib/, and assets to assets/ui/ — then wires the CSS and merges any required deno.json imports." }
   ]
 }) }}
 

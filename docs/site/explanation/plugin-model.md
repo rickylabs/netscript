@@ -89,15 +89,20 @@ reference page rather than as separate top-level entries. Application authors no
 core symbols *through* the public plugin, so the public plugin is the surface users consume.
 
 {{ comp callout { type: "tip", title: "One import path, two responsibilities" } }}
-The saga DSL is exported from <code>@netscript/plugin-sagas/runtime</code> even though it is
-authored in <code>@netscript/plugin-sagas-core</code>. The plugin re-exports the core contract
-and runtime, so consumers get one stable import path while the behavior/integration boundary
-stays intact in source.
+The saga DSL (`defineSaga`, `defineQuery`, `defineSignal`) is exported from
+<code>@netscript/plugin-sagas-core</code> (its root import), where the capability is authored.
+<code>@netscript/plugin-sagas/runtime</code> exports the runtime infrastructure instead — the
+publisher, the durable runtime, the saga stores, the runner, and the supervisor. The plugin
+package itself stays thin: its <code>mod.ts</code> re-exports only the manifest surface
+(<code>sagasPlugin</code>, <code>inspectSagas</code>) so the behavior/integration boundary stays
+intact in source.
 {{ /comp }}
 
-This is also why some plugin surfaces are deliberately thin or even fail loud. The
-`@netscript/plugin-streams` manifest helpers `defineStreamProducer`/`defineStreamConsumer`
-throw `StreamUnsupportedOperationError` and redirect you to the real producer runtime in
+This is also why some plugin surfaces are deliberately thin or even fail loud. In
+`@netscript/plugin-streams`, `defineStreamConsumer` throws `StreamUnsupportedOperationError`
+synchronously; `defineStreamProducer` returns a handle whose `.publish()` returns a rejected
+`Promise<void>` instead of throwing. Both ultimately surface a `StreamUnsupportedOperationError`,
+but the mechanism differs — they redirect you to the real producer runtime in
 `@netscript/plugin-streams-core` (`createDurableStream`). The *behavior* lives in core; the
 *plugin* only carries the manifest. The boundary is a feature, not an oversight — see
 [Streaming change data](/capabilities/streams/) for the producer-versus-manifest framing.
@@ -124,8 +129,7 @@ set of contribution shapes — among them service contributions, background-proc
 contributions, database-schema contributions, stream-topic contributions, contract-version
 contributions, runtime-config-topic contributions, and telemetry contributions. A workers
 plugin contributes worker job definitions; a sagas plugin contributes saga definitions; a
-streams plugin contributes stream topics and a service; an auth plugin contributes its oRPC
-service, a Prisma schema, and stream topics. The host never needs to know the internals of any
+streams plugin contributes stream topics and a service; an auth plugin contributes its oRPC service, contract versions, and a runtime-config topic. The host never needs to know the internals of any
 plugin — it only needs to understand these contribution shapes.
 
 This is the doctrine's principle of **registration over inheritance** for cross-package

@@ -67,7 +67,7 @@ NetScript's background capabilities arrive as plugins. Add the workers plugin wi
 so you have a working reference to read and adapt:
 
 ```sh
-netscript plugin add worker --samples
+netscript plugin add worker --name workers --samples
 ```
 
 This lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location
@@ -178,7 +178,7 @@ The Workers API addresses jobs by `id`, which means it needs a generated registr
 to its handler. Generate the plugin registries so the new jobs are discoverable:
 
 ```sh
-netscript generate
+netscript generate plugins
 ```
 
 This scans `plugins/workers/jobs` (and `plugins/triggers/jobs`) and writes a jobs registry the
@@ -264,7 +264,7 @@ because those helpers are no-op stubs today. To add your own spans that <em>do</
 <ul>
 <li><strong>Aspire isn't running</strong> — the background processor that drains the job queue is an
 Aspire resource. Start <code>aspire run</code> from <code>aspire/</code> and retry.</li>
-<li><strong>The job isn't registered</strong> — re-run <code>netscript generate</code> so
+<li><strong>The job isn't registered</strong> — re-run <code>netscript generate plugins</code> so
 <code>create-user-settings</code> is in the generated registry, then restart Aspire.</li>
 <li><strong>Wrong id</strong> — the trigger path uses the job's <code>id</code>
 (<code>create-user-settings</code>), not its filename. Check <code>GET /api/v1/workers/jobs</code>.</li>

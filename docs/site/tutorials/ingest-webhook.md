@@ -56,7 +56,7 @@ As on every rung, your database and cache only exist while <code>aspire run</cod
 From the project root, add the official triggers plugin with its sample modules:
 
 ```sh
-netscript plugin add trigger --samples
+netscript plugin add trigger --name triggers --samples
 ```
 
 This lands a new workspace at `plugins/triggers/` and registers it in `netscript.config.ts`

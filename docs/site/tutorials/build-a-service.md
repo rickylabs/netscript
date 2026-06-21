@@ -81,7 +81,7 @@ import { oc } from '@orpc/contract';
 import { implement } from '@orpc/server';
 
 // 1. Describe your data with Zod. These schemas are the contract's shape.
-export const UsersStatusSchemaV1 = z.enum(['active', 'invited', 'suspended']);
+export const UsersStatusSchemaV1 = z.enum(['active', 'draft', 'archived']);
 
 export const UsersListItemSchemaV1 = z.object({
   id: z.number().int().positive(),
@@ -92,13 +92,17 @@ export const UsersListItemSchemaV1 = z.object({
 });
 
 export const UsersListInputSchemaV1 = z.object({
-  status: UsersStatusSchemaV1.optional(),
-  limit: z.number().int().positive().max(100).default(20),
+  limit: z.number().int().positive(),
+  offset: z.number().int().nonnegative(),
+  search: z.string().min(1).optional(),
 });
 
 export const UsersListResponseSchemaV1 = z.object({
   items: z.array(UsersListItemSchemaV1),
   total: z.number().int().nonnegative(),
+  limit: z.number().int().positive(),
+  offset: z.number().int().nonnegative(),
+  hasMore: z.boolean(),
 });
 
 // 2. Declare routes: method + typed input + typed output. No implementation yet.
@@ -277,10 +281,7 @@ The <code>/api/rpc/*</code> endpoint is what an <code>@orpc/client</code> consum
 
 ## Securing a service later (a pointer)
 
-This tutorial serves an open service so you can focus on the contract seam. When you are ready to
-gate procedures, NetScript ships a **provider-agnostic service-layer authn/authz middleware seam**
-(`createAuthnMiddleware` / `createAuthzMiddleware` from `@netscript/service/auth`), wired through the
-builder's `.withAuthn()` / `.withAuthz()` steps or `defineService({ auth })`. It is distinct from the
+This tutorial serves an open service so you can focus on the contract seam. When you are ready to gate procedures, NetScript ships a **provider-agnostic service-layer authn/authz middleware seam**, wired through the builder's `.withAuthn()` / `.withAuthz()` steps or `defineService({ auth })`. You supply authenticator and authorizer factories imported from `@netscript/service/auth` (`createStaticCredentialAuthenticator` / `createTrustedHeaderAuthenticator` and `createScopeAuthorizer`); the builder installs the underlying Hono middleware for you. It is distinct from the
 auth *plugin* backends (kv-oauth, WorkOS, better-auth) covered under
 [the authentication capability](/capabilities/auth/) — the service seam authenticates requests *into*
 your own service. We do not teach it here; see

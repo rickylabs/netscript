@@ -39,7 +39,7 @@ scheduler.
 {{ comp.featureGrid({ items: [
   {
     title: "@netscript/kv",
-    body: "Reactive key-value storage. getKv() auto-detects Deno KV, Redis/Garnet, or memory; get/set/watch/atomic with per-key TTL.",
+    body: "Reactive key-value storage. getKv() auto-detects Deno KV or Redis/Garnet; use MemoryKvAdapter directly for tests. get/set/watch/atomic with per-key TTL.",
     href: "/reference/kv/",
     icon: "◆"
   },
@@ -71,7 +71,7 @@ auto-detection never selects it (see the callout below).
   caption: "Adapter × capability — supported backends and how they are selected",
   rows: [
     { name: "Deno KV", type: "kv · queue · cron", desc: "Default zero-config fallback. KV stores locally; the queue uses native Deno KV queue ops; cron shares the same local-first philosophy via Deno.cron(). No external service required." },
-    { name: "memory", type: "kv · cron", desc: "Process-local. MemoryKvAdapter for KV and the in-memory cron adapter (provider: 'memory') — the deterministic default for tests and local development." },
+    { name: "memory", type: "kv · cron", desc: "Process-local. MemoryKvAdapter for KV (must be constructed explicitly) and the in-memory cron adapter (provider: 'memory') — deterministic for tests. The KV default for local development without Redis is Deno KV (local file), not the in-memory adapter." },
     { name: "Redis / Garnet", type: "kv · queue", desc: "Production cache and queue backend. Selected when CACHE_PROVIDER=redis|garnet, REDIS_URI/GARNET_URI, or Aspire services__redis__*/services__garnet__* are present. Garnet is the Redis-compatible cache Aspire provisions." },
     { name: "RabbitMQ (AMQP)", type: "queue", desc: "Durable broker for high-throughput, multi-consumer queues. Chosen first by auto-detection when Aspire reports a rabbitmq service. Imported via @netscript/queue/adapters/amqp for direct access." },
     { name: "PostgreSQL", type: "queue", desc: "Durable SQL-backed queue (FOR UPDATE SKIP LOCKED row-claim, visibility timeout, ack/nack, DLQ). EXPLICIT-PROVIDER ONLY — set provider: 'postgres' / QueueProvider.Postgres; never auto-detected. Configure connection.postgres.{url,tableName}." },

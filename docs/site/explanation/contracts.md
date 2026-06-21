@@ -139,7 +139,7 @@ options.
 {{ comp callout { type: "tip", title: "Two service-construction APIs in one project" } }}
 Local services in <code>services/</code> use the one-shot <code>defineService(router, options)</code>
 form above. The framework's <strong>plugin</strong> API services (workers, sagas, triggers, auth) use a
-fluent builder instead — <code>createService(router, options).withCors().withLogger().withOpenAPI(...).withRPC(...).withHealth().serve()</code>.
+fluent builder instead — <code>createService(router, options).withCors().withLogger().withOpenAPI(...).withDocs().withRPC(...).withHealth().serve()</code>.
 Same contracts-first model underneath; the builder simply exposes each cross-cutting concern as
 an explicit, composable step. Reach for <code>defineService</code> when the defaults are what you want,
 and the builder when you need to add, remove, or reorder a concern. See
@@ -214,10 +214,10 @@ The honest trade-offs, because contracts-first is an opinion, not a free lunch:
   also the thing that makes the published OpenAPI document and the compile-time types trustworthy,
   because the wire is checked against the same shape the types describe.
 
-The dependencies that make this work are pinned in the workspace catalog: the oRPC family
-(`@orpc/contract`, `@orpc/server`, `@orpc/client`, `@orpc/zod`, `@orpc/tanstack-query`) at
-`^1.14.6`, and `zod` at `^4.x`. They are imported through the catalog, never de-catalogued, so
-the contract surface stays consistent across every workspace member.
+The oRPC family (`@orpc/contract`, `@orpc/server`, `@orpc/client`, `@orpc/zod`,
+`@orpc/tanstack-query`) at `^1.14.6` is pinned in the workspace catalog. `zod`
+(`jsr:@zod/zod@4.4.3`) is pinned per-package in each member's imports section, not in the
+catalog. So the contract surface stays consistent across every workspace member.
 
 ## How contracts-first shows up across the framework
 

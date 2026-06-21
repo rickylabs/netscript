@@ -60,8 +60,8 @@ Confirm it and inspect the command groups:
 netscript --help
 ```
 
-You should see the public groups: `init`, `contract`, `db`, `deploy`, `generate`, `plugin`, and
-`service`. If `netscript` is not found, make sure Deno's install directory (printed by
+You should see the public groups: `init`, `contract`, `db`, `deploy`, `generate`, `marketplace`,
+`plugin`, `service`, `ui:add`, and `ui:init`. If `netscript` is not found, make sure Deno's install directory (printed by
 `deno install`) is on your `PATH`, then open a fresh terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}

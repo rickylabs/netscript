@@ -65,7 +65,7 @@ createDurableStream({ streamPath, schema, producerId })   ── the producer (R
 durable-stream server on :4437  ──HTTP/SSE──▶  Fresh clients (consumption surface)
 ```
 
-Workers, sagas, and the auth service each run a thin `streams/producer.ts` that
+Workers, sagas, triggers, and the auth service each run a thin `streams/producer.ts` that
 calls `createDurableStream` to mirror their execution state — so the producer
 path is exercised by first-party plugins, not just sample code.
 
@@ -166,13 +166,13 @@ through it.
     ["Dev service port", "<code>:4437</code> (durable-stream Aspire service)"],
     ["provider.kind", "<code>stream</code> · category <code>plugin</code> · pluginType <code>utility</code>"],
     ["Requires DB / KV", "<code>false</code> / <code>false</code>"],
-    ["First-party producers", "workers, sagas, auth (each <code>streams/producer.ts</code> → <code>createDurableStream</code>)"],
+    ["First-party producers", "workers, sagas, triggers, auth (each <code>streams/producer.ts</code> → <code>createDurableStream</code>)"],
     ["Consumer surface", "HTTP/SSE from the <code>:4437</code> server (Fresh clients) — <strong>no</strong> in-process <code>subscribe()</code>"]
   ]
 }) }}
 
 The plugin is referenced from `netscript.config.ts` as
-`./plugins/streams/mod.ts`. Because workers, sagas, triggers, and auth each list
+`./plugins/streams/mod.ts`. Because workers, sagas, and triggers each list
 `streams` in their `dependencies`, it is installed first in the dependency graph
 and its `:4437` service comes up so dependent producers have somewhere to write.
 
@@ -187,7 +187,7 @@ and its `:4437` service comes up so dependent producers have somewhere to write.
   },
   {
     title: "Do — add the streams plugin",
-    body: "netscript plugin add stream --samples lands the plugin under plugins/streams/ with stream-schema samples.",
+    body: "netscript plugin add stream --name streams --samples lands the plugin under plugins/streams/ with stream-schema samples.",
     href: "/how-to/add-a-plugin/",
     icon: "→"
   },

@@ -122,7 +122,7 @@ Read the picture in three bands:
     ["Sagas", ":8092", "oRPC", "<code>@netscript/plugin-sagas</code>"],
     ["Triggers", ":8093", "raw Hono routes", "<code>@netscript/plugin-triggers</code>"],
     ["Auth", ":8094", "oRPC over <code>/api/rpc/v1/auth/*</code>", "<code>@netscript/plugin-auth</code>"],
-    ["Streams", ":4437", "durable-stream HTTP / SSE", "<code>@netscript/plugin-streams-core</code>"]
+    ["Streams", ":4437", "durable-stream HTTP / SSE", "<code>@netscript/plugin-streams</code>"]
   ]
 } /}}
 
@@ -359,7 +359,7 @@ a builder:
 {{ comp tabbedCode {
   tabs: [
     { label: "user-registration.saga.ts", language: "ts", code:
-"import { defineSaga } from \"@netscript/sagas\";\n\nconst saga = defineSaga(\"user-registration\")\n  .initially((s) => s.on(\"UserRegistered\").transitionTo(\"welcoming\"))\n  .during(\"welcoming\", (s) => s.on(\"WelcomeEmailSent\").complete())\n  .build();" }
+"import { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (saga, _message, _context) => {\n    saga.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (saga, _message, _context) => {\n    saga.state = { status: \"complete\" };\n  })\n  .build();" }
   ]
 } /}}
 

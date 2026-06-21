@@ -91,7 +91,7 @@ Next steps:
   1. cd my-app
   2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace
   3. aspire restore  # download TypeScript AppHost SDK modules (run once)
-  4. aspire run  # start TypeScript AppHost — boots Postgres, Garnet, services
+  4. aspire run  # start TypeScript AppHost
 ```
 
 If you see that success line and the numbered steps, the scaffold worked. The exact
@@ -145,9 +145,7 @@ served under `/api/rpc/*`.
 ] }) }}
 
 {{ comp callout { type: "tip", title: "Fluent alternative" } }}
-Prefer a builder? <code>createService(...).serve()</code> is the fluent equivalent of the one-shot
-<code>defineService(...)</code> — same wiring, same <code>/api/rpc/*</code> mount. See
-<a href="/tutorials/build-a-service/">Build a service</a>.
+Prefer a builder? The fluent equivalent of <code>defineService(...)</code> is the explicit chain <code>createService(router, config).withCors().withLogger().withOpenAPI().withDocs().withRPC().withServiceInfo().withHealth().serve()</code> — each <code>.withXxx()</code> adds one layer of the wiring that <code>defineService</code> bundles, including the <code>/api/rpc/*</code> mount (added by <code>.withRPC()</code>). Calling <code>createService(...).serve()</code> with no chaining produces a bare app: no RPC handler, no CORS, no health. See <a href="/tutorials/build-a-service/">Build a service</a>.
 {{ /comp }}
 
 ## What you see

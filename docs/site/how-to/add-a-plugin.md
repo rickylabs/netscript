@@ -109,47 +109,40 @@ its Prisma models. The active backend is selected at runtime with
 
 ## Step 2 — Add the plugin
 
-Run `netscript plugin add` with the kind. This scaffolds the plugin package under your
-workspace and updates your plugin registration:
+In the public `netscript` CLI, `plugin add` takes a published plugin package specifier and dispatches to that plugin's own JSR CLI — it is not a kind-based local scaffolding command. Add an official plugin by package name:
 
 ```bash
-netscript plugin add worker --name workers
+netscript plugin add @netscript/plugin-workers
 ```
 
-To add the other plugins, repeat with the matching kind:
+Repeat with the matching package for the other plugins: `@netscript/plugin-sagas`, `@netscript/plugin-triggers`, `@netscript/plugin-auth`, `@netscript/plugin-streams`. The only option the public `add` verb accepts is `--project-root <path>` (to target a workspace other than the current directory); it forwards any remaining arguments to the plugin's published CLI. Run `netscript plugin add --help` for the version-accurate surface.
 
-{{ comp tabbedCode { tabs: ["sagas", "triggers", "auth", "streams"] } }}
-```bash
-netscript plugin add saga --name sagas
-```
-```bash
-netscript plugin add trigger --name triggers
-```
-```bash
-netscript plugin add auth --name auth
-```
-```bash
-netscript plugin add stream --name streams
-```
-{{ /comp }}
+The kind-based form (`netscript plugin add worker --name workers` with `--name`, `--samples`/`--no-samples`, `--port`, `--service-refs`, `--plugin-refs`, `--db`/`--no-db`, `--force`) is available only in the local contributor binary `netscript-dev`, not in the public `netscript` binary.
 
 ### Useful options
 
-Run `netscript plugin add --help` for the full, version-accurate list. The common flags:
+Run `netscript plugin add --help` for the full, version-accurate list. The public
+`netscript plugin add` command takes the plugin package and forwards the verb to that
+plugin's own CLI; the only framework-level flag it accepts is:
 
 {{ comp apiTable {
-  caption: "netscript plugin add — common options",
+  caption: "netscript plugin add — options",
   columns: ["Option", "What it does"],
   rows: [
-    ["<code>--name &lt;name&gt;</code>", "Installed plugin name. Use the conventional name above unless you have a reason to differ."],
-    ["<code>--samples</code> / <code>--no-samples</code>", "Include or omit sample/example code in the scaffolded plugin."],
-    ["<code>--project-root &lt;path&gt;</code>", "Target a workspace other than the current directory."],
-    ["<code>--port &lt;port&gt;</code>", "Set the plugin service port where applicable (defaults to the conventional port)."],
-    ["<code>--service-refs &lt;refs&gt;</code> / <code>--plugin-refs &lt;refs&gt;</code>", "Wire references to existing services or plugins."],
-    ["<code>--db &lt;engine-or-key&gt;</code> / <code>--no-db</code>", "Configure or skip database wiring for plugins that contribute Prisma models."],
-    ["<code>--force</code>", "Overwrite existing files when re-running the command."]
+    ["<code>--project-root &lt;path&gt;</code>", "Target a workspace other than the current directory."]
   ]
 } /}}
+
+{{ comp callout { type: "note", title: "Scaffolding flags belong to the contributor CLI" } }}
+The richer scaffolding flags — <code>--name</code>, <code>--samples</code> /
+<code>--no-samples</code>, <code>--port</code>, <code>--service-refs</code> /
+<code>--plugin-refs</code>, <code>--db</code> / <code>--no-db</code>, and
+<code>--force</code> — are defined on the local contributor command
+<code>netscript-dev plugin add &lt;kind&gt;</code>, not on the public
+<code>netscript plugin add</code> binary. Always run
+<code>netscript plugin add --help</code> for the option list your installed version
+actually exposes.
+{{ /comp }}
 
 {{ comp callout { type: "warning", title: "auth needs a database and KV" } }}
 The auth plugin sets <code>requiresDb</code> and <code>requiresKv</code>, and contributes its
@@ -219,7 +212,7 @@ plugin is registered, wired, and ready to use.
 {{ comp tabbedCode { tabs: ["Inspect one plugin", "Run the service"] } }}
 ```bash
 # Detailed info for a single installed plugin
-netscript plugin info auth
+netscript plugin info @netscript/plugin-auth
 ```
 ```bash
 # Bring the whole stack up and exercise the plugin's service
@@ -248,7 +241,7 @@ Once a plugin is installed you can inspect, update, and remove it without re-sca
     ["<code>netscript plugin list</code>", "List installed plugins in the current workspace."],
     ["<code>netscript plugin info &lt;name&gt;</code>", "Show detailed metadata for one installed plugin."],
     ["<code>netscript plugin doctor</code>", "Health-check installed plugins and report wiring problems."],
-    ["<code>netscript plugin update &lt;name&gt;</code>", "Update an installed plugin's scaffolded wiring."],
+    ["<code>netscript plugin update &lt;pkg&gt;</code>", "Dispatches the <code>update</code> verb to the plugin's own published CLI (e.g. <code>netscript plugin update @netscript/plugin-workers</code>). The argument is a JSR package specifier, not an installed plugin name."],
     ["<code>netscript plugin remove &lt;name&gt;</code>", "Remove an installed plugin from the workspace."]
   ]
 } /}}

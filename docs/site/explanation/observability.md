@@ -87,10 +87,14 @@ Two layers, stated precisely so you never over- or under-claim:
 scheduler spans, subprocess <code>traceparent</code> propagation, and <code>task.execute</code>
 spans are live. A user gets job traces in Aspire <em>automatically</em>, with zero handler code.
 <br><br>
-<strong>Scaffold <code>createJobTools(ctx)</code> helpers = still no-op stubs.</strong> The
-<code>trace.addEvent</code>, <code>trace.withChildSpan</code>, and <code>progress(...)</code>
+<strong>Scaffold <code>createJobTools(ctx)</code> tracing helpers = still no-op stubs.</strong> The
+<code>trace.addEvent</code> and <code>trace.withChildSpan</code>
 helpers the generated sample hands <em>into your handler</em> are placeholders — your callback
-still runs and returns normally, but no extra span is exported from those calls. This is a
+still runs and returns normally, but no extra span is exported from those calls. (The
+<code>progress(...)</code> helper is <em>not</em> a stub: it delegates to
+<code>ctx.reportProgress</code> and logs via the worker pool, but it does not emit a
+<code>job.progress</code> OTel span event — use <code>recordJobProgress</code> from
+<code>@netscript/telemetry/instrumentation</code> for that.) This is a
 <strong>known, tracked limitation with a fix planned</strong> (debt
 <code>workers-scaffold-job-tools-noop</code>), not a permanent design choice. The honest
 workaround today: call <code>@netscript/telemetry</code> helpers directly from your handler for
@@ -106,7 +110,7 @@ custom spans.
   {
     label: "What is live vs stubbed",
     lang: "text",
-    code: "Framework / dispatcher layer (you write NO instrumentation):\n\n  traceJobExecution span                 LIVE  (job.started/completed/failed/exception)\n  addJobStepEvent -> job.step.*          LIVE\n  recordJobProgress -> job.progress      LIVE  (current/total/percentage)\n  scheduler start / dispatch / cron      LIVE\n  subprocess traceparent continuation    LIVE  (child run joins the same trace)\n  task.execute span (multi-runtime exec) LIVE\n\nScaffold createJobTools(ctx) helpers (called inside YOUR handler):\n\n  log.info / log.warn / log.error        LIVE  (structured logging)\n  progress(pct, message)                 NO-OP STUB in scaffold (fix planned)\n  trace.addEvent / withChildSpan / ...   NO-OP STUB in scaffold (fix planned)\n        -> callback runs; no extra span exported\n\nWorkaround for custom spans today: import from\n@netscript/telemetry/instrumentation directly (see other tab)."
+    code: "Framework / dispatcher layer (you write NO instrumentation):\n\n  traceJobExecution span                 LIVE  (job.started/completed/failed/exception)\n  addJobStepEvent -> job.step.*          LIVE\n  recordJobProgress -> job.progress      LIVE  (current/total/percentage)\n  scheduler start / dispatch / cron      LIVE\n  subprocess traceparent continuation    LIVE  (child run joins the same trace)\n  task.execute span (multi-runtime exec) LIVE\n\nScaffold createJobTools(ctx) helpers (called inside YOUR handler):\n\n  log.info / log.warn / log.error        LIVE  (structured logging)\n  progress(pct, message)                 LIVE  (delegates to ctx.reportProgress; produces a\n        console log via the worker pool, but does NOT emit a job.progress OTel span event\n        -> use recordJobProgress from @netscript/telemetry/instrumentation for OTel)\n  trace.addEvent / withChildSpan / ...   NO-OP STUB in scaffold (fix planned)\n        -> callback runs; no extra span exported\n\nWorkaround for custom spans today: import from\n@netscript/telemetry/instrumentation directly (see other tab)."
   }
 ] }) }}
 

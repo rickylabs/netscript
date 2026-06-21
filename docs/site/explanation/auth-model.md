@@ -91,7 +91,7 @@ speaks — API keys, bearer tokens, trusted headers. Auth backends are simply an
   {
     label: "The neutral shapes (@netscript/service/auth)",
     lang: "ts",
-    code: "// A backend never returns vendor types to your app. It returns these.\n\n// Who the request is, in framework-neutral terms.\ninterface Principal {\n  readonly subject: string;          // stable user id\n  readonly scheme: \"api-key\" | \"bearer\" | \"trusted-header\" | \"custom\";\n  readonly claims?: Record<string, unknown>;\n  // ...\n}\n\n// The result of authenticating a request: success xor typed failure.\ntype AuthnResult =\n  | { ok: true; principal: Principal; setCookies?: string[] }\n  | { ok: false; reason: string };"
+    code: "// A backend never returns vendor types to your app. It returns these.\n\n// Who the request is, in framework-neutral terms.\ninterface Principal {\n  readonly subject: string;          // stable user id\n  readonly scheme: \"api-key\" | \"bearer\" | \"trusted-header\" | \"custom\";\n  readonly claims: Readonly<Record<string, unknown>>;\n  // ...\n}\n\n// The result of authenticating a request: success xor typed failure.\ntype AuthnResult =\n  | { ok: true; principal: Principal; readonly setCookies?: readonly string[] }\n  | { ok: false; reason: string };"
   },
   {
     label: "What a backend produces",

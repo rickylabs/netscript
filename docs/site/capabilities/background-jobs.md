@@ -33,10 +33,12 @@ Add it to a scaffolded workspace with one command, which lands the plugin at
 netscript plugin add worker --samples
 ```
 
-The `--samples` flag ships two real, compiling job modules you can read and trigger
-immediately: `plugins/workers/jobs/health-check.ts` and
-`plugins/workers/jobs/create-user-settings.ts`. The plugin's API service comes up on
-**port 8091**.
+The `--samples` flag ships two real, compiling modules you can read and trigger
+immediately: `plugins/workers/jobs/health-check.ts` (a job handler) and
+`plugins/workers/tasks/validate-payload.ts` (a polyglot task). The
+`create-user-settings.ts` job is generated later by `netscript generate`
+(runtime-registry / official-sample generation) when both the workers and sagas
+plugins are present. The plugin's API service comes up on **port 8091**.
 
 {{ comp callout { type: "tip", title: "Use this when…" } }}
 Reach for a background job when the work is <strong>fire-and-forget or deferrable</strong>:
@@ -198,8 +200,10 @@ curl http://localhost:8091/api/v1/workers/executions?limit=10
 ```
 
 {{ comp callout { type: "note", title: "Where jobs come from" } }}
-The runtime scans <code>plugins/workers/jobs</code> (and <code>plugins/triggers/jobs</code>)
-for default-exported handlers and generates a registry at
+The runtime scans <code>workers/jobs</code> (the primary user jobs directory) for
+default-exported handlers, and also includes plugin-contributed handlers from
+<code>plugins/workers/jobs</code> (and <code>plugins/triggers/jobs</code> when present). The
+generated registry lands at
 <code>.netscript/generated/plugin-workers/jobs.registry.ts</code>, keyed by each handler's
 <code>id</code>. Background execution runs from <code>plugins/workers/bin/combined.ts</code>,
 which is a <em>separate</em> process from the <code>:8091</code> API service — the API

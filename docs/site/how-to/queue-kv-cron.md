@@ -100,12 +100,13 @@ for await (const item of kv.list({ prefix: ["users"] })) {
   console.log(item.key, item.value);
 }
 
-// watchPrefix() is reactive: the callback fires on every change beneath the prefix.
-const stop = kv.watchPrefix(["users"], (event) => {
+// watchPrefix() returns an AsyncIterable; iterate it with for-await, cancel via AbortSignal.
+const controller = new AbortController();
+for await (const event of kv.watchPrefix(["users"], { signal: controller.signal })) {
   console.log("changed:", event.key);
-});
-// …later
-stop();
+}
+// …to stop:
+controller.abort();
 ```
 
 {{ comp.apiTable({ caption: "KV adapters (@netscript/kv)", rows: [
@@ -293,10 +294,10 @@ const cleanup = async () => {
   await purgeExpiredSessions();
 };
 
-scheduler.schedule("session-cleanup", expr, cleanup);
+await scheduler.schedule("session-cleanup", expr, cleanup);
 
 // Or use a named preset instead of a raw expression.
-scheduler.schedule("nightly-report", CronPresets.EVERY_DAY, async () => {
+await scheduler.schedule("nightly-report", CronPresets.EVERY_DAY, async () => {
   await emitDailyReport();
 });
 ```

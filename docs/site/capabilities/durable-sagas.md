@@ -87,10 +87,12 @@ completion effect carrying a correlation-friendly payload.
 The builder above produces the <strong>runtime</strong> saga. There is also a
 <strong>config-time</strong> companion,
 <code>defineSagaConfig(id, entrypoint).name(...).description(...).topic(...).tags(...).build()</code>
-from <code>@netscript/plugin-sagas-core/config</code>, which the service uses to publish
-saga <em>metadata</em> into Deno KV (under <code>['saga','registry', id]</code>) so the
-API can list it. The runtime consumes <code>SagaDefinition</code> objects; the config
-describes them.
+from <code>@netscript/plugin-sagas-core/config</code>, used in <code>netscript.config.ts</code>
+to declare saga entries for the scaffolder and CLI. At runtime, the service calls
+<code>registerSagaDefinitions(definitions)</code> on the <code>SagaDefinition[]</code> objects
+produced by <code>defineSaga(...).build()</code> — those are what get stored in Deno KV under
+<code>['saga','registry', id]</code> so the API can list them. The runtime saga definition and
+the config-time entry are separate objects.
 {{ /comp }}
 
 ## Choosing a durable store backend
@@ -109,10 +111,7 @@ without one.
   path in your relational database alongside the rest of your data, with SQL-level
   inspection of in-flight state and transition history.
 
-You select the backend with the `NETSCRIPT_SAGA_STORE` environment variable
-(`kv` | `prisma`) or the appsettings key `sagas.store.backend`. If neither is set the
-runtime **throws** — there is no silent default, by design, so a deployment can never
-guess wrong about where durable state lands.
+You select the backend with the `NETSCRIPT_SAGA_STORE` environment variable (`kv` | `prisma`) or the appsettings key `sagas.store.backend`. The plugin service resolves this on startup via `resolveSagaStoreBackend(...)`, which **throws** if neither is set — there is no silent default in the resolver, by design, so a deployment can never guess wrong about where durable state lands. (Calling `createDurableSagaRuntime(...)` directly without a `backend` falls back to the KV store; the mandatory-selection guarantee comes from the resolver the service runs at startup.)
 
 {{ comp.apiTable({
   caption: "Durable saga store backends — trait matrix",

@@ -132,11 +132,11 @@ supply the strategy and the seam stays the same.
 {{ comp.apiTable({
   caption: "@netscript/service/auth surface",
   rows: [
-    { name: "createAuthnMiddleware", type: "middleware", desc: "Authentication gate; resolves a Principal from the request via an AuthenticatorPort. Protects /api by default, leaves /health anonymous." },
-    { name: "createAuthzMiddleware", type: "middleware", desc: "Authorization gate; turns a Principal into an AuthzDecision via an AuthorizerPort." },
     { name: "createStaticCredentialAuthenticator", type: "authenticator", desc: "Matches a configured static credential (e.g. API key / shared secret) → Principal." },
     { name: "createTrustedHeaderAuthenticator", type: "authenticator", desc: "Trusts an identity asserted by an upstream proxy header (e.g. behind a gateway)." },
-    { name: "createScopeAuthorizer", type: "authorizer", desc: "Allows/denies a request by checking the Principal's scopes against required scopes." }
+    { name: "createScopeAuthorizer", type: "authorizer", desc: "Allows/denies a request by checking the Principal's scopes against required scopes." },
+    { name: ".withAuthn({ authenticator })", type: "builder method", desc: "Installs the authentication gate on createService(); the authn middleware is created and wired internally. Protects /api by default, leaves /health anonymous." },
+    { name: ".withAuthz({ authorizer })", type: "builder method", desc: "Installs the authorization gate on createService(); the authz middleware is created and wired internally from the Principal." }
   ]
 }) }}
 

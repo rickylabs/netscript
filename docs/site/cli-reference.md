@@ -118,7 +118,7 @@ regenerate the registry so the project picks them up.
 {{ comp.apiTable({
   caption: "Add and manage plugins",
   rows: [
-    { name: "netscript plugin add", type: "netscript plugin add worker --samples", desc: "Add a plugin and register it in the workspace. Kinds: <code>worker</code> → <code>workers</code> (:8091), <code>saga</code> → <code>sagas</code> (:8092), <code>trigger</code> → <code>triggers</code> (:8093), <code>auth</code> → <code>auth</code> (:8094), <code>stream</code> → <code>streams</code> (:4437). <code>--samples</code> includes runnable example modules." },
+    { name: "netscript plugin add", type: "netscript plugin add worker --samples", desc: "Add a plugin and register it in the workspace. The published <code>netscript</code> CLI registers the <code>api</code> kind by default; the first-party kinds <code>worker</code> → <code>workers</code> (:8091), <code>saga</code> → <code>sagas</code> (:8092), <code>trigger</code> → <code>triggers</code> (:8093), and <code>stream</code> → <code>streams</code> (:4437) are contributor kinds scaffolded by the local-source CLI inside the monorepo checkout. Add the first-class <code>auth</code> plugin with <code>netscript plugin add auth</code> (see the row below). <code>--samples</code> includes runnable example modules." },
     { name: "netscript plugin add auth", type: "netscript plugin add auth", desc: "Add the first-class <code>auth</code> plugin — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> (migrated like any other plugin schema) and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/how-to/add-authentication/\">add authentication</a>." },
     { name: "plugin add (options)", type: "netscript plugin add saga --name sagas --port 8092 --service-refs users", desc: "Tune the install: <code>--name</code>, <code>--port</code>, <code>--service-refs</code>, <code>--plugin-refs</code>, <code>--db &lt;engine&gt;</code> / <code>--no-db</code>, <code>--samples</code> / <code>--no-samples</code>, <code>--force</code>." },
     { name: "netscript plugin list", type: "netscript plugin list", desc: "List the plugins registered in the current workspace." },
@@ -228,8 +228,8 @@ The frontend is copy-source: components are copied into your repo under
 {{ comp.apiTable({
   caption: "UI workspace tasks",
   rows: [
-    { name: "ui:init", type: "deno task --cwd apps/dashboard ui:init", desc: "Initialize the fresh-ui design system into the dashboard app (copy-source components + tokens)." },
-    { name: "ui:add", type: "deno task --cwd apps/dashboard ui:add", desc: "Copy an additional fresh-ui component into your repo — you own the copied source from that point." }
+    { name: "ui:init", type: "netscript ui:init --project-root apps/dashboard", desc: "Initialize the fresh-ui design system into the dashboard app (copy-source components + tokens)." },
+    { name: "ui:add", type: "netscript ui:add <item> --project-root apps/dashboard", desc: "Copy an additional fresh-ui component into your repo — you own the copied source from that point." }
   ]
 }) }}
 

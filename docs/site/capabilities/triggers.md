@@ -139,9 +139,12 @@ FileWatcher(...)` instead.
 ## Author a trigger
 
 The simple case is one webhook that fans an inbound request out to a single job.
-The advanced case validates the payload first, then enqueues. Both are lifted
-verbatim from the scaffold's `plugins/triggers/` samples and compile as-is. Note
-that every handler returns an array of `enqueueJob` effects — the only supported
+The advanced case validates the payload first, then enqueues. The simple case is
+adapted from the scaffold's `plugins/triggers/generic-webhook.ts` sample and
+compiles as-is; the advanced tab is an illustrative pattern, not scaffold code —
+the real `plugins/triggers/webhook-validate-data.ts` is an accept-and-drop sample
+(`() => Promise.resolve([])`) that imports no zod and enqueues no job. Note that
+every handler returns an array of `enqueueJob` effects — the only supported
 trigger action.
 
 {{ comp.tabbedCode({ tabs: [

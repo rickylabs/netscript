@@ -96,7 +96,7 @@ service the back end implements.
   rows: [
     { name: "main.ts", type: "entry", desc: "App entry: export const app = defineFreshApp<State>({ name: 'dashboard' }). Reads PORT (default 8010) and logs a startup banner." },
     { name: "router.ts", type: "routing", desc: "Stable route entrypoint. Re-exports generated routePatterns + routes and builds typed appRoutes via createRouteReference." },
-    { name: "routes/", type: "pages", desc: "File-system routes: index.tsx, dashboard.tsx, health.tsx, examples/users/, examples/telemetry/, the (design) system pages, plus _app.tsx / _layout.tsx shells." },
+    { name: "routes/", type: "pages", desc: "File-system routes: index.tsx, dashboard.tsx, health.tsx, examples/service/, examples/telemetry/, the (design) system pages, plus _app.tsx / _layout.tsx shells." },
     { name: "islands/", type: "interactivity", desc: "Client-hydrated Preact islands (e.g. ThemeToggle, SidebarToggle, Toast under islands/ui/)." },
     { name: "components/ui/", type: "design system", desc: "The copy-source component library you own (@netscript/fresh-ui): button, card, data-table, form-field, badge, and more (tsx + matching CSS in assets/ui/)." },
     { name: "lib/", type: "service wiring", desc: "example-service.ts builds a typed oRPC client + query factories from your contract; cn.ts, public-types.ts." },
@@ -147,7 +147,7 @@ hydration, optimistic mutations, and cache invalidation on the client.
 
 {{ comp.tabbedCode({ tabs: [
   {
-    label: "Route — routes/examples/users/index.tsx",
+    label: "Route — routes/examples/service/index.tsx",
     lang: "tsx",
     code: "// definePage() declares a typed page: route + server-loaded layers + telemetry.\nimport { appRoutes } from '@app/router.ts';\nimport { definePage } from '@app/utils.ts';\nimport { ServiceExampleLabPanel } from './(_components)/lab-panel.tsx';\nimport { loadServiceShowcaseData } from './(_shared)/service-showcase.ts';\n\nexport const serviceExamplePage = definePage()\n  .withRoute(appRoutes.serviceExample)\n  .withPolicy('balanced')\n  .withTelemetry({ enabled: true, spanName: 'scaffold.examples.users' })\n  .withMeta(() => ({ title: 'users example', description: 'Backed by the users service.' }))\n  .withLayer('lab', ServiceExampleLabPanel, { loader: loadServiceShowcaseData })\n  .build();\n\nexport const { default: page } = serviceExamplePage;\nexport { page as default };"
   },

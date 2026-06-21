@@ -25,10 +25,11 @@ The saga builder, its persisted state model, the message-handler effects, and th
 scaffold ships a working <code>defineSaga(...)</code> sample, a registry API at <code>:8092</code>,
 and a durable runtime that persists every transition to either <strong>Deno KV</strong> or
 <strong>Prisma/Postgres</strong>. Two narrow honesty notes apply, and this page is precise about
-both: (1) the scaffold worker job <em>tools</em> exposed inside a handler
-(<code>createJobTools(ctx)</code>'s <code>trace.addEvent</code>, <code>withChildSpan</code>,
-<code>progress</code>) are no-op stubs — a tracked limitation with a fix planned — even though
-job dispatch/execution itself emits real OpenTelemetry spans automatically; and (2) the
+both: (1) of the scaffold worker job <em>tools</em> exposed inside a handler
+(<code>createJobTools(ctx)</code>), <code>trace.addEvent</code> and <code>withChildSpan</code> are
+no-op stubs — a tracked limitation with a fix planned — while <code>progress</code> is not: it
+delegates to <code>ctx.reportProgress</code> when the runtime provides it; and either way job
+dispatch/execution itself emits real OpenTelemetry spans automatically; and (2) the
 <code>@netscript/plugin-streams</code> manifest helpers <code>defineStreamProducer</code> /
 <code>defineStreamConsumer</code> are stubs that <strong>fail loud</strong>, while the real
 producer runtime lives in <code>@netscript/plugin-streams-core</code>. Neither caveat touches the

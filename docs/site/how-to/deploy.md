@@ -77,7 +77,7 @@ every process you would deploy by hand — is described there. From a workspace 
 first-party plugins installed, the graph looks like this:
 
 {{ comp.apiTable({ caption: "Resources declared in appsettings.json (verified from a scaffolded workspace)", rows: [
-  { name: "users", type: "service · :3001", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>. RPC mounts under <code>/api/rpc/*</code>." },
+  { name: "users", type: "service · :3000 (the scaffold default; the exact port is OS-allocated from the SERVICE range starting at 3000)", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>. RPC mounts under <code>/api/rpc/*</code>." },
   { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 5." },
   { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
   { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
@@ -209,9 +209,9 @@ This is the real fork in the road. Pick based on whether your target understands
 <code>aspire/apphost.mts</code> is a generated <strong>TypeScript/Node</strong> AppHost
 (language <code>typescript/nodejs</code>, Aspire SDK 13.x, package
 <code>Aspire.Hosting.PostgreSQL</code>). It is intentionally isolated in <code>aspire/</code> so
-its Node dependency graph never leaks into the Deno root. Note that
-<code>netscript.config.ts</code> still records <code>aspire.appHost: 'dotnet/AppHost'</code> —
-that is stale metadata; the artifact you actually run is <code>aspire/apphost.mts</code>. The
+its Node dependency graph never leaks into the Deno root. <code>netscript.config.ts</code> records
+this same path under <code>aspire.appHost</code> (<code>'aspire/apphost.mts'</code>), so the
+config metadata and the artifact you actually run agree. The
 dashboard binds <code>:18888</code> and the OTLP collector listens on <code>:4318</code>.
 {{ /comp }}
 
