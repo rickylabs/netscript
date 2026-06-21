@@ -12,9 +12,11 @@ import {
 import { buildAuthSession } from '@netscript/plugin-auth-core/testing';
 import type { AuthnRequest, AuthnResult } from '@netscript/service/auth';
 import {
+  createAuthServiceBackendRegistry,
   createInMemoryKvOAuthRegistry,
   resolveActiveBackendName,
 } from '../../services/src/backend-registry.ts';
+import { MemoryKvAdapter } from '@netscript/kv';
 import { callback, me, session, signin, signout } from '../../services/src/routers/v1-handlers.ts';
 import { AuthServiceHandlerError } from '../../services/src/routers/v1-types.ts';
 import { authTestUrl } from '../testing/auth-fixtures.ts';
@@ -76,7 +78,13 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
   assertEquals(currentUser.session?.id, completed.sessionId);
   assertEquals(currentUser.user?.id, completed.sessionId);
 
-  const signedOut = await signout({ sessionId: completed.sessionId }, { registry });
+  const signedOut = await signout({ sessionId: completed.sessionId }, {
+    registry,
+    request: {
+      url: authTestUrl('/v1/auth/signout'),
+      headers: new Headers({ cookie: `__Host-ns_session=${completed.sessionId}` }),
+    },
+  });
   assertEquals(signedOut.signedOut, true);
   assertEquals(signedOut.sessionId, completed.sessionId);
 
@@ -99,6 +107,29 @@ Deno.test('backend selection reads NETSCRIPT_AUTH_BACKEND and reports unknown na
     },
     AuthBackendNotFoundError,
   );
+});
+
+Deno.test('kv-oauth backend registry requires a configured encryption key for real stores', async () => {
+  await assertRejects(
+    () =>
+      createAuthServiceBackendRegistry({
+        kv: new MemoryKvAdapter(),
+        env: {
+          NETSCRIPT_AUTH_BACKEND: 'kv-oauth',
+          NETSCRIPT_AUTH_CLIENT_ID: 'client_test',
+          NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://issuer.example.test/oauth/authorize',
+          NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
+          NETSCRIPT_AUTH_REDIRECT_URI: authTestUrl('/api/v1/auth/callback'),
+        },
+      }),
+    Error,
+    'NETSCRIPT_AUTH_KV_OAUTH_KEY',
+  );
+});
+
+Deno.test('in-memory kv-oauth test registry supplies its deterministic fixture key', async () => {
+  const registry = await createInMemoryKvOAuthRegistry();
+  assertEquals(registry.resolveBackend().name, 'kv-oauth');
 });
 
 Deno.test('unsupported interactive backend operation maps to typed auth service error', async () => {
@@ -143,7 +174,10 @@ Deno.test('signin routes through the typed interactive backend sub-port', async 
   };
   const registry = createAuthBackendRegistry(new Map([['kv-oauth', backend]]), 'kv-oauth');
 
-  const started = await signin({}, { registry });
+  const started = await signin({}, {
+    registry,
+    request: { url: authTestUrl('/v1/auth/signin') },
+  });
 
   assertEquals(signInCalls, 1);
   assertEquals(started.redirectUrl, 'https://issuer.example.test/authorize?state=state_test');

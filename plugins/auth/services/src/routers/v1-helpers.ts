@@ -42,15 +42,21 @@ export function toRequest(
   path: string,
   params: URLSearchParams,
 ): Request {
-  const base = serviceRequest?.url ?? `https://app.example.test${path}`;
+  if (!serviceRequest) {
+    throw new AuthServiceHandlerError(
+      'AUTH_PROVIDER_ERROR',
+      'Auth interactive flow requires a captured service request.',
+    );
+  }
+  const base = serviceRequest.url;
   const url = new URL(base);
   url.pathname = path;
   for (const [key, value] of params) {
     url.searchParams.set(key, value);
   }
   return new Request(url, {
-    method: serviceRequest?.method ?? 'GET',
-    headers: serviceRequest?.headers ?? new Headers({ 'x-forwarded-proto': 'https' }),
+    method: serviceRequest.method ?? 'GET',
+    headers: serviceRequest.headers ?? new Headers(),
   });
 }
 
