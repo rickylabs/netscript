@@ -20,3 +20,10 @@ Append-only. One line per commit on branch `docs/v3-ia-plan`.
 - 277015d2: docs: apply PLAN-EVAL PASS bookkeeping follow-ups to v3 IA plan (#105) — PLAN-EVAL (minimax-M3, run
   27908862931) returned **PASS**; corrected surface headline to verified 31 units / 210 subpaths, reconciled 7
   per-unit counts, reclassified createJobTools, S12/§5 gate asserts 210 live, Track B SCOPE verdict mandatory
+- deab24e2: docs: deepen v3 IA plan with competitor-dossier inspiration (#105) — additive post-PASS deepening per
+  user review note (~90% approved, "more inspiration from competitor-doc-research.md"); vendored the 350-line
+  dossier into `ground/`, added §0.5 front-door positioning (Integration-Tax/persona/5 credibility anchors/
+  comparison matrix), rewrote §8 into strict per-page-type section-order contracts + §8.1 code conventions,
+  prioritized + extended §5.1 components (tabbedCode/tabbedRuntime-synced/learningPath/line-highlight), per-engine
+  ERD diagrams (§5.3), §11 adoption matrix; wired WS4/WS8/S03/S18 + page-structure audit gate + hub structure
+  rule. No locked decision/slice/count changed (PASS not invalidated). Ready for user re-review.
