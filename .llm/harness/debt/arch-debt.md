@@ -821,3 +821,42 @@ Seeded from
   LD-12.
 - **Gate:** An OIDC-kind e2e test asserts nonce + id_token claims; callback passes `expectedIssuer`
   to `validateAuthResponse`; package tests stay green.
+
+## plugins/*/services — oRPC router-composition `any` (cross-plugin) (`plugin-service-router-composition-any`)
+
+- **Reason:** Every plugin service confines one-or-more `// deno-lint-ignore no-explicit-any`
+  casts to its **top-level router-composition file** (`plugins/<plugin>/services/src/router.ts`):
+  the `v1: any` version group, `os.prefix('/v1/<plugin>').router(<map> as any)`, and
+  `router: any = os.router({ v1 })`. The handler map in
+  `plugins/<plugin>/services/src/routers/v1-handlers.ts` is correspondingly typed
+  `Record<string, unknown>`. Root cause is the shared contract wrapper: `<plugin>ContractV1`
+  is built as `implement(<def>) as unknown as <Plugin>ContractV1`, whose `$context<T>()` exposes a
+  hand-rolled `.handler(fn): TOutput` that returns the handler **output** rather than a typed oRPC
+  *procedure*, so `os.router(map)` cannot type-check the map without `any`. This is the
+  consumer-side manifestation of the contract-side debt
+  `workers-contract-structural-server-export` (structural server-contract shim that weakens deep
+  handler-options inference). Confirmed present in the merged exemplar
+  `plugins/sagas/services/src/router.ts:39-44,71-75`; the same pattern exists (or is being made to
+  match it) in `workers`, `triggers`, `streams`, and `auth`.
+- **Owner:** Future cross-plugin oRPC-seam fix branch (one dedicated branch reworking the shared
+  `$context` contract wrapper to the native oRPC `implement(<contractDefinition>).$context<T>()`
+  builder so `.router({...})` returns properly-typed procedures and `os.router(map)` type-checks
+  with ZERO `as any`). NOT owned by any feature, quality-hardening, or auth slice.
+- **Target:** Post-framework-prime-time, before beta. All plugins migrate together so the contract
+  wrapper and every `router.ts` change in lock-step.
+- **Linked plan:** related contract-side debt `workers-contract-structural-server-export` (above).
+- **Created:** 2026-06-21.
+- **Status:** open, DEBT_ACCEPTED. **SANCTIONED for now** — matching the merged sagas exemplar
+  (casts confined to the top-level router-composition file, each with `deno-lint-ignore`, zero
+  casts elsewhere) is the conformant target for all current slices.
+- **Agent directive (read before failing a slice on this):** Do NOT attempt to remove these
+  composition `any` casts, un-widen the `Record<string, unknown>` handler maps, or change the
+  contract package, inside a feature / quality-hardening / auth slice. Mirroring the sagas exemplar
+  IS conformant and IMPL-EVAL must NOT FAIL a slice for retaining the sanctioned router-composition
+  casts. The only out-of-scope cast error is a NEW cast OUTSIDE `router.ts` (handlers, business
+  logic, contracts) — those remain strictly zero-cast. Auth S2/S6/S7 and AS7 explicitly mirror
+  sagas and leave this debt in place.
+- **Gate:** Close when the shared contract wrapper returns properly-typed procedures and every
+  `plugins/*/services/src/router.ts` type-checks under `deno check --unstable-kv` with zero
+  `as any` / `: any` / `deno-lint-ignore no-explicit-any`, and the per-plugin handler maps no longer
+  need `Record<string, unknown>` widening.
