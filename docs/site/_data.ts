@@ -118,6 +118,10 @@ export const navSections: NavSection[] = [
       { href: "/capabilities/telemetry/", label: "Telemetry & logging", icon: "\u00B7" },
       { href: "/capabilities/auth/", label: "Authentication", icon: "\u00B7" },
       { href: "/capabilities/fresh-ui/", label: "Fresh UI & design", icon: "\u00B7" },
+      { href: "/capabilities/fresh-framework/", label: "Fresh meta-framework", icon: "\u00B7" },
+      { href: "/capabilities/sdk/", label: "Typed SDK & client", icon: "\u00B7" },
+      { href: "/capabilities/polyglot-tasks/", label: "Polyglot tasks", icon: "\u00B7" },
+      { href: "/capabilities/runtime-config/", label: "Runtime configuration", icon: "\u00B7" },
     ],
   },
   {
