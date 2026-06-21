@@ -12,9 +12,11 @@ Deliverable: a locked, PLAN-EVAL-ready Information-Architecture plan. No prose a
   (`codex-panel-findings.md`; committed WSL-only as `1cbe1875`, never pushed, reproduced into this branch)
   back into the plan; added the harness artifacts, full surface inventory, tutorial
   proof plans, hub content contracts, locked foundation decisions, and an executable gate table. See `drift.md`.
-- **Plan-Gate** — PENDING. The first OpenHands minimax-M3 PLAN-EVAL **crashed** (workflow failure, not a
-  verdict; comment 4762333961, run 27907934927). Re-dispatch after this hardening commit. No authoring/build
-  before PASS.
+- **Plan-Gate** — RE-DISPATCHED. The first OpenHands minimax-M3 PLAN-EVAL **crashed** (workflow failure,
+  not a verdict; comment 4762333961, run 27907934927). After this hardening pass (branch head `f3ce9538`),
+  PLAN-EVAL was re-dispatched unoriented as PR-comment **4762426764**
+  (`@openhands-agent model=openrouter/minimax/minimax-m3`). Awaiting `plan-eval.md` PASS/FAIL_PLAN. No
+  authoring/build before PASS.
 
 ## Design
 
