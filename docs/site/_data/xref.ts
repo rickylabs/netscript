@@ -79,6 +79,11 @@ export const xref: Record<string, XrefTarget> = {
   "cap:auth": { href: "/capabilities/auth/", label: "Authentication" },
   "cap:fresh-ui": { href: "/capabilities/fresh-ui/", label: "Fresh UI & design" },
   "cap:index": { href: "/capabilities/", label: "Capabilities" },
+  // v3 NEW capability hubs
+  "cap:fresh-framework": { href: "/capabilities/fresh-framework/", label: "Fresh meta-framework" },
+  "cap:sdk": { href: "/capabilities/sdk/", label: "Typed SDK & client" },
+  "cap:polyglot-tasks": { href: "/capabilities/polyglot-tasks/", label: "Polyglot tasks" },
+  "cap:runtime-config": { href: "/capabilities/runtime-config/", label: "Runtime configuration" },
 
   // ─── How-to recipes (howto:) ───────────────────────────────────────────────
   "howto:index": { href: "/how-to/", label: "How-to guides" },
@@ -91,6 +96,15 @@ export const xref: Record<string, XrefTarget> = {
   "howto:customize-fresh-ui": { href: "/how-to/customize-fresh-ui/", label: "Customize Fresh UI" },
   "howto:deploy": { href: "/how-to/deploy/", label: "Deploy" },
   "howto:author-a-plugin": { href: "/how-to/author-a-plugin/", label: "Author a plugin" },
+  // v3 NEW how-to recipes
+  "howto:run-a-polyglot-task": { href: "/how-to/run-a-polyglot-task/", label: "Run a polyglot task" },
+  "howto:choose-a-queue-provider": { href: "/how-to/choose-a-queue-provider/", label: "Choose a queue provider" },
+  "howto:use-a-second-database": { href: "/how-to/use-a-second-database/", label: "Use a second database" },
+  "howto:discover-services": { href: "/how-to/discover-services/", label: "Discover services" },
+  "howto:expose-openapi-scalar": { href: "/how-to/expose-openapi-scalar/", label: "Expose OpenAPI & Scalar" },
+  "howto:graceful-shutdown": { href: "/how-to/graceful-shutdown/", label: "Graceful shutdown" },
+  "howto:tune-worker-runtime": { href: "/how-to/tune-worker-runtime/", label: "Tune the worker runtime" },
+  "howto:deploy-local-aspire": { href: "/how-to/deploy-local-aspire/", label: "Deploy locally with Aspire" },
 
   // ─── Tutorials (tut:) ──────────────────────────────────────────────────────
   "tut:index": { href: "/tutorials/", label: "Tutorials" },
@@ -99,16 +113,47 @@ export const xref: Record<string, XrefTarget> = {
   "tut:background-jobs": { href: "/tutorials/background-jobs/", label: "Add background jobs" },
   "tut:durable-workflow": { href: "/tutorials/durable-workflow/", label: "A durable workflow" },
   "tut:ingest-webhook": { href: "/tutorials/ingest-webhook/", label: "Ingest a webhook" },
+  // v3 tutorial tracks (D1/D2) + chapters
+  "tut:storefront": { href: "/tutorials/storefront/", label: "Storefront" },
+  "tut:storefront/01": { href: "/tutorials/storefront/01-scaffold/", label: "Storefront - Scaffold" },
+  "tut:storefront/02": { href: "/tutorials/storefront/02-catalog-service/", label: "Storefront - Catalog Service" },
+  "tut:storefront/03": { href: "/tutorials/storefront/03-cart-contracts/", label: "Storefront - Cart Contracts" },
+  "tut:storefront/04": { href: "/tutorials/storefront/04-checkout-saga/", label: "Storefront - Checkout Saga" },
+  "tut:storefront/05": { href: "/tutorials/storefront/05-shipping-webhook/", label: "Storefront - Shipping Webhook" },
+  "tut:storefront/06": { href: "/tutorials/storefront/06-deploy/", label: "Storefront - Deploy" },
+  "tut:workspace": { href: "/tutorials/workspace/", label: "Team Workspace" },
+  "tut:workspace/01": { href: "/tutorials/workspace/01-scaffold/", label: "Team Workspace - Scaffold" },
+  "tut:workspace/02": { href: "/tutorials/workspace/02-auth/", label: "Team Workspace - Auth" },
+  "tut:workspace/03": { href: "/tutorials/workspace/03-workspace-data/", label: "Team Workspace - Workspace Data" },
+  "tut:workspace/04": { href: "/tutorials/workspace/04-provision-job/", label: "Team Workspace - Provision Job" },
+  "tut:workspace/05": { href: "/tutorials/workspace/05-route-authz/", label: "Team Workspace - Route Authz" },
+  "tut:workspace/06": { href: "/tutorials/workspace/06-deploy/", label: "Team Workspace - Deploy" },
+  "tut:erp-sync": { href: "/tutorials/erp-sync/", label: "ERP Sync" },
+  "tut:erp-sync/01": { href: "/tutorials/erp-sync/01-scaffold/", label: "ERP Sync - Scaffold" },
+  "tut:erp-sync/02": { href: "/tutorials/erp-sync/02-import-job/", label: "ERP Sync - Import Job" },
+  "tut:erp-sync/03": { href: "/tutorials/erp-sync/03-polyglot-transform/", label: "ERP Sync - Polyglot Transform" },
+  "tut:erp-sync/04": { href: "/tutorials/erp-sync/04-queue-and-cron/", label: "ERP Sync - Queue And Cron" },
+  "tut:erp-sync/05": { href: "/tutorials/erp-sync/05-deploy/", label: "ERP Sync - Deploy" },
+  "tut:live-dashboard": { href: "/tutorials/live-dashboard/", label: "Live Dashboard" },
+  "tut:live-dashboard/01": { href: "/tutorials/live-dashboard/01-scaffold/", label: "Live Dashboard - Scaffold" },
+  "tut:live-dashboard/02": { href: "/tutorials/live-dashboard/02-contract-to-service/", label: "Live Dashboard - Contract To Service" },
+  "tut:live-dashboard/03": { href: "/tutorials/live-dashboard/03-sdk-cache-first-query/", label: "Live Dashboard - Sdk Cache First Query" },
+  "tut:live-dashboard/04": { href: "/tutorials/live-dashboard/04-definePage-QueryIsland/", label: "Live Dashboard - Definepage Queryisland" },
+  "tut:live-dashboard/05": { href: "/tutorials/live-dashboard/05-live-stream/", label: "Live Dashboard - Live Stream" },
+  "tut:live-dashboard/06": { href: "/tutorials/live-dashboard/06-deploy/", label: "Live Dashboard - Deploy" },
 
   // ─── Explanation essays (explain:) ─────────────────────────────────────────
   "explain:index": { href: "/explanation/", label: "Explanation" },
   "explain:architecture": { href: "/explanation/architecture/", label: "Architecture" },
   "explain:contracts": { href: "/explanation/contracts/", label: "Contracts & type flow" },
-  "explain:plugin-model": { href: "/explanation/plugin-model/", label: "The plugin model" },
+  "explain:plugin-model": { href: "/explanation/plugin-system/", label: "The plugin system" },
   "explain:auth-model": { href: "/explanation/auth-model/", label: "Auth model" },
-  "explain:durable-workflows": { href: "/explanation/durable-workflows/", label: "Durable workflows" },
+  "explain:durable-workflows": { href: "/explanation/durability-model/", label: "The durability model" },
   "explain:observability": { href: "/explanation/observability/", label: "Observability" },
   "explain:aspire": { href: "/explanation/aspire/", label: "Orchestration with Aspire" },
+  // v3 NEW / renamed explanation essays
+  "explain:plugin-system": { href: "/explanation/plugin-system/", label: "The plugin system" },
+  "explain:durability-model": { href: "/explanation/durability-model/", label: "The durability model" },
 
   // ─── Concept / mental-model pages (concept:) ───────────────────────────────
   "concept:contracts": { href: "/explanation/contracts/", label: "Contracts-first" },
@@ -117,6 +162,7 @@ export const xref: Record<string, XrefTarget> = {
   "concept:quickstart": { href: "/quickstart/", label: "Quickstart" },
   "concept:why": { href: "/why/", label: "Why NetScript" },
   "concept:home": { href: "/", label: "Home" },
+  "concept:concepts": { href: "/concepts/", label: "Core concepts" },
 
   // ─── CLI + glossary (cli: / glossary:) ─────────────────────────────────────
   "cli:reference": { href: "/cli-reference/", label: "CLI reference" },
