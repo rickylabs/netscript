@@ -39,10 +39,10 @@ import {
   buildOpenHandsComment,
   githubRequest,
   parseRepoSlug,
-  readTokenFromEnv,
   requireValue,
+  resolveGithubToken,
   validateHandoffContract,
-} from "./agentic-lib.ts";
+} from './agentic-lib.ts';
 
 interface Options {
   repo: string;
@@ -60,75 +60,80 @@ interface Options {
 
 function printHelp(): void {
   console.log([
-    "Usage:",
-    "  deno run --allow-read --allow-env --allow-net \\",
-    "    .llm/tools/agentic/dispatch-openhands.ts --repo owner/name (--pr N | --issue N) \\",
-    "    --prompt-file <win path> [options]",
-    "",
-    "Options:",
-    "  --repo <owner/name>   Target repo. Default: rickylabs/netscript.",
-    "  --pr <n>              Target PR number (checks out PR branch).",
-    "  --issue <n>           Target issue number (checks out default branch).",
-    "  --prompt-file <path>  Windows path to the dispatch prompt (validated for contract). Required.",
-    "  --model <id>          Literal LiteLLM model id (e.g. openrouter/qwen/qwen3.7-max).",
-    "  --output <mode>       pr-comment | respond-comments | thread-replies | summary-only.",
-    "  --iterations <n>      Max agent iterations (50-3000).",
-    "  --provider <name>     Provider gateway override (e.g. openrouter).",
-    "  --token-env <name>    Env var holding the GitHub token. Default: GH_TOKEN.",
-    "  --dry-run             Validate + print comment without posting (no token needed).",
-    "  --pretty              Human-readable output instead of JSON.",
-    "  --help                Show this help.",
-  ].join("\n"));
+    'Usage:',
+    '  deno run --allow-read --allow-env --allow-net \\',
+    '    .llm/tools/agentic/dispatch-openhands.ts --repo owner/name (--pr N | --issue N) \\',
+    '    --prompt-file <win path> [options]',
+    '',
+    'Options:',
+    '  --repo <owner/name>   Target repo. Default: rickylabs/netscript.',
+    '  --pr <n>              Target PR number (checks out PR branch).',
+    '  --issue <n>           Target issue number (checks out default branch).',
+    '  --prompt-file <path>  Windows path to the dispatch prompt (validated for contract). Required.',
+    '  --model <id>          Literal LiteLLM model id (e.g. openrouter/qwen/qwen3.7-max).',
+    '  --output <mode>       pr-comment | respond-comments | thread-replies | summary-only.',
+    '  --iterations <n>      Max agent iterations (50-3000).',
+    '  --provider <name>     Provider gateway override (e.g. openrouter).',
+    '  --token-env <name>    Env var holding the GitHub token. Default: GH_TOKEN.',
+    '  --dry-run             Validate + print comment without posting (no token needed).',
+    '  --pretty              Human-readable output instead of JSON.',
+    '  --help                Show this help.',
+  ].join('\n'));
 }
 
 function parseArgs(args: string[]): Options | null {
-  const o: Options = { repo: "rickylabs/netscript", tokenEnv: "GH_TOKEN", dryRun: false, pretty: false };
+  const o: Options = {
+    repo: 'rickylabs/netscript',
+    tokenEnv: 'GH_TOKEN',
+    dryRun: false,
+    pretty: false,
+  };
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     switch (a) {
-      case "--repo":
+      case '--repo':
         o.repo = requireValue(args, i, a);
         i++;
         break;
-      case "--pr":
+      case '--pr':
         o.pr = Number(requireValue(args, i, a));
         i++;
         break;
-      case "--issue":
+      case '--issue':
         o.issue = Number(requireValue(args, i, a));
         i++;
         break;
-      case "--prompt-file":
+      case '--prompt-file':
         o.promptFile = requireValue(args, i, a);
         i++;
         break;
-      case "--model":
+      case '--model':
         o.model = requireValue(args, i, a);
         i++;
         break;
-      case "--output":
+      case '--output':
         o.output = requireValue(args, i, a);
         i++;
         break;
-      case "--iterations":
+      case '--iterations':
         o.iterations = requireValue(args, i, a);
         i++;
         break;
-      case "--provider":
+      case '--provider':
         o.provider = requireValue(args, i, a);
         i++;
         break;
-      case "--token-env":
+      case '--token-env':
         o.tokenEnv = requireValue(args, i, a);
         i++;
         break;
-      case "--dry-run":
+      case '--dry-run':
         o.dryRun = true;
         break;
-      case "--pretty":
+      case '--pretty':
         o.pretty = true;
         break;
-      case "--help":
+      case '--help':
         printHelp();
         return null;
       default:
@@ -150,12 +155,12 @@ async function main(): Promise<void> {
   if (!o) return;
 
   if (!o.promptFile) {
-    console.error("--prompt-file is required. See --help.");
+    console.error('--prompt-file is required. See --help.');
     Deno.exit(2);
   }
   const number = o.pr ?? o.issue;
   if (!number || !Number.isFinite(number)) {
-    console.error("one of --pr or --issue (a number) is required. See --help.");
+    console.error('one of --pr or --issue (a number) is required. See --help.');
     Deno.exit(2);
   }
   let slug;
@@ -173,8 +178,8 @@ async function main(): Promise<void> {
   if (!check.ok) {
     console.log(
       o.pretty
-        ? `FAIL prompt contract: ${check.problems.join("; ")}`
-        : JSON.stringify({ stage: "validate", ok: false, problems: check.problems }),
+        ? `FAIL prompt contract: ${check.problems.join('; ')}`
+        : JSON.stringify({ stage: 'validate', ok: false, problems: check.problems }),
     );
     Deno.exit(3);
   }
@@ -187,26 +192,26 @@ async function main(): Promise<void> {
     provider: o.provider,
     prompt: content,
   });
-  const triggerLine = comment.split("\n")[0];
+  const triggerLine = comment.split('\n')[0];
   const endpoint = `/repos/${slug.owner}/${slug.repo}/issues/${number}/comments`;
 
   // 3a) Dry-run: print without posting; no token required.
   if (o.dryRun) {
     if (o.pretty) {
-      console.log("DRY-RUN ok");
-      console.log(`  target   : ${slug.owner}/${slug.repo} #${number} (${o.pr ? "pr" : "issue"})`);
+      console.log('DRY-RUN ok');
+      console.log(`  target   : ${slug.owner}/${slug.repo} #${number} (${o.pr ? 'pr' : 'issue'})`);
       console.log(`  trigger  : ${triggerLine}`);
       console.log(`  endpoint : POST ${endpoint}`);
       console.log(`  bytes    : ${new TextEncoder().encode(comment).length}`);
-      console.log("  --- comment body ---");
+      console.log('  --- comment body ---');
       console.log(comment);
     } else {
       console.log(JSON.stringify({
-        mode: "dry-run",
+        mode: 'dry-run',
         ok: true,
         repo: o.repo,
         number,
-        kind: o.pr ? "pr" : "issue",
+        kind: o.pr ? 'pr' : 'issue',
         triggerLine,
         endpoint,
         commentBytes: new TextEncoder().encode(comment).length,
@@ -216,17 +221,22 @@ async function main(): Promise<void> {
     Deno.exit(0);
   }
 
-  // 3b) Real post: token from env only; never logged.
-  const token = readTokenFromEnv(o.tokenEnv) ?? readTokenFromEnv("GITHUB_TOKEN");
-  if (!token) {
-    console.error(
-      `No token in env ${o.tokenEnv} (or GITHUB_TOKEN). Set it in-process before invoking; never pass it on argv or in a file.`,
-    );
+  // 3b) Real post: resolve a validated token from any healthy source; never logged.
+  let token: string;
+  try {
+    const resolved = await resolveGithubToken({ preferEnv: o.tokenEnv });
+    console.error(`[dispatch-openhands] token source: ${resolved.source}`);
+    token = resolved.token;
+  } catch (e) {
+    console.error((e as Error).message);
     Deno.exit(4);
+    return;
   }
-  const res = await githubRequest("POST", endpoint, token, { body: comment });
+  const res = await githubRequest('POST', endpoint, token, { body: comment });
   if (!res.ok) {
-    console.log(JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }));
+    console.log(
+      JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }),
+    );
     Deno.exit(1);
   }
   const url = res.body?.html_url ?? null;

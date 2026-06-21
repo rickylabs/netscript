@@ -48,12 +48,12 @@ import {
   parseEvalVerdict,
   parseOpenHandsStatusComment,
   parseRepoSlug,
-  readTokenFromEnv,
   requireValue,
+  resolveGithubToken,
   selectLatestOpenHandsComment,
-} from "./agentic-lib.ts";
+} from './agentic-lib.ts';
 
-type Sub = "create" | "verdict" | "merge";
+type Sub = 'create' | 'verdict' | 'merge';
 
 interface Options {
   sub: Sub;
@@ -77,83 +77,130 @@ interface Options {
 
 function printHelp(): void {
   console.log([
-    "Usage:",
-    "  gh-pr.ts create --head <branch> --base <branch> --title <t> (--body-file <path> | --body <s>) [--draft] [--allow-base-main]",
-    "  gh-pr.ts verdict --pr <n>",
-    "  gh-pr.ts merge  --pr <n> [--method merge|squash|rebase] [--title <t>] [--message <m>] [--no-eval-gate] [--force] [--allow-base-main]",
-    "",
-    "Common options:",
-    "  --repo <owner/name>   Default: rickylabs/netscript.",
-    "  --token-env <name>    Env var holding the GitHub token. Default: GH_TOKEN.",
-    "  --dry-run             Print the intended action without posting (no token needed).",
-    "  --pretty              Human-readable output instead of JSON.",
-    "  --help                Show this help.",
-    "",
-    "merge gates on an IMPL/PLAN-EVAL PASS by default; use --no-eval-gate to bypass.",
-  ].join("\n"));
+    'Usage:',
+    '  gh-pr.ts create --head <branch> --base <branch> --title <t> (--body-file <path> | --body <s>) [--draft] [--allow-base-main]',
+    '  gh-pr.ts verdict --pr <n>',
+    '  gh-pr.ts merge  --pr <n> [--method merge|squash|rebase] [--title <t>] [--message <m>] [--no-eval-gate] [--force] [--allow-base-main]',
+    '',
+    'Common options:',
+    '  --repo <owner/name>   Default: rickylabs/netscript.',
+    '  --token-env <name>    Env var holding the GitHub token. Default: GH_TOKEN.',
+    '  --dry-run             Print the intended action without posting (no token needed).',
+    '  --pretty              Human-readable output instead of JSON.',
+    '  --help                Show this help.',
+    '',
+    'merge gates on an IMPL/PLAN-EVAL PASS by default; use --no-eval-gate to bypass.',
+  ].join('\n'));
 }
 
 function parseArgs(args: string[]): Options | null {
   const raw = args[0];
-  if (raw === undefined || raw === "--help") {
+  if (raw === undefined || raw === '--help') {
     printHelp();
     return null;
   }
-  if (raw !== "create" && raw !== "verdict" && raw !== "merge") {
+  if (raw !== 'create' && raw !== 'verdict' && raw !== 'merge') {
     throw new Error(`Unknown subcommand '${raw}'. Expected create | verdict | merge.`);
   }
   const sub: Sub = raw;
   const o: Options = {
     sub,
-    repo: "rickylabs/netscript",
+    repo: 'rickylabs/netscript',
     draft: false,
-    method: "merge",
+    method: 'merge',
     evalGate: true,
     force: false,
     allowBaseMain: false,
-    tokenEnv: "GH_TOKEN",
+    tokenEnv: 'GH_TOKEN',
     dryRun: false,
     pretty: false,
   };
   for (let i = 1; i < args.length; i++) {
     const a = args[i];
     switch (a) {
-      case "--repo": o.repo = requireValue(args, i, a); i++; break;
-      case "--pr": o.pr = Number(requireValue(args, i, a)); i++; break;
-      case "--head": o.head = requireValue(args, i, a); i++; break;
-      case "--base": o.base = requireValue(args, i, a); i++; break;
-      case "--title": o.title = requireValue(args, i, a); i++; break;
-      case "--body": o.body = requireValue(args, i, a); i++; break;
-      case "--body-file": o.bodyFile = requireValue(args, i, a); i++; break;
-      case "--draft": o.draft = true; break;
-      case "--method": o.method = requireValue(args, i, a) as MergeMethod; i++; break;
-      case "--message": o.message = requireValue(args, i, a); i++; break;
-      case "--no-eval-gate": o.evalGate = false; break;
-      case "--force": o.force = true; break;
-      case "--allow-base-main": o.allowBaseMain = true; break;
-      case "--token-env": o.tokenEnv = requireValue(args, i, a); i++; break;
-      case "--dry-run": o.dryRun = true; break;
-      case "--pretty": o.pretty = true; break;
-      case "--help": printHelp(); return null;
-      default: throw new Error(`Unknown argument: ${a}`);
+      case '--repo':
+        o.repo = requireValue(args, i, a);
+        i++;
+        break;
+      case '--pr':
+        o.pr = Number(requireValue(args, i, a));
+        i++;
+        break;
+      case '--head':
+        o.head = requireValue(args, i, a);
+        i++;
+        break;
+      case '--base':
+        o.base = requireValue(args, i, a);
+        i++;
+        break;
+      case '--title':
+        o.title = requireValue(args, i, a);
+        i++;
+        break;
+      case '--body':
+        o.body = requireValue(args, i, a);
+        i++;
+        break;
+      case '--body-file':
+        o.bodyFile = requireValue(args, i, a);
+        i++;
+        break;
+      case '--draft':
+        o.draft = true;
+        break;
+      case '--method':
+        o.method = requireValue(args, i, a) as MergeMethod;
+        i++;
+        break;
+      case '--message':
+        o.message = requireValue(args, i, a);
+        i++;
+        break;
+      case '--no-eval-gate':
+        o.evalGate = false;
+        break;
+      case '--force':
+        o.force = true;
+        break;
+      case '--allow-base-main':
+        o.allowBaseMain = true;
+        break;
+      case '--token-env':
+        o.tokenEnv = requireValue(args, i, a);
+        i++;
+        break;
+      case '--dry-run':
+        o.dryRun = true;
+        break;
+      case '--pretty':
+        o.pretty = true;
+        break;
+      case '--help':
+        printHelp();
+        return null;
+      default:
+        throw new Error(`Unknown argument: ${a}`);
     }
   }
   return o;
 }
 
 function emit(pretty: boolean, prettyLines: string[], json: unknown): void {
-  console.log(pretty ? prettyLines.join("\n") : JSON.stringify(json));
+  console.log(pretty ? prettyLines.join('\n') : JSON.stringify(json));
 }
 
-function requireToken(o: Options): string {
-  const token = readTokenFromEnv(o.tokenEnv) ?? readTokenFromEnv("GITHUB_TOKEN");
-  if (!token) {
-    console.error(
-      `No token in env ${o.tokenEnv} (or GITHUB_TOKEN). Set it in-process before invoking; never pass it on argv or in a file.`,
-    );
+async function requireToken(o: Options): Promise<string> {
+  try {
+    const { token, source } = await resolveGithubToken({ preferEnv: o.tokenEnv });
+    console.error(`[gh-pr] token source: ${source}`);
+    return token;
+  } catch (e) {
+    console.error((e as Error).message);
     Deno.exit(4);
   }
-  return token;
+  // unreachable; Deno.exit never returns
+  throw new Error('unreachable');
 }
 
 async function fetchLatestVerdict(
@@ -161,20 +208,29 @@ async function fetchLatestVerdict(
   repo: string,
   pr: number,
   token: string,
-): Promise<{ comment: CommentLike | null; verdict: EvalVerdict; jobFinal: boolean; runUrl: string | null }> {
+): Promise<
+  { comment: CommentLike | null; verdict: EvalVerdict; jobFinal: boolean; runUrl: string | null }
+> {
   const res = await githubRequest(
-    "GET",
+    'GET',
     `/repos/${owner}/${repo}/issues/${pr}/comments?per_page=100`,
     token,
   );
   if (!res.ok) {
-    console.log(JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }));
+    console.log(
+      JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }),
+    );
     Deno.exit(1);
   }
   const comment = selectLatestOpenHandsComment(res.body as CommentLike[]);
-  const body = comment?.body ?? "";
+  const body = comment?.body ?? '';
   const status = parseOpenHandsStatusComment(body);
-  return { comment, verdict: parseEvalVerdict(body), jobFinal: status.isFinal, runUrl: status.runUrl };
+  return {
+    comment,
+    verdict: parseEvalVerdict(body),
+    jobFinal: status.isFinal,
+    runUrl: status.runUrl,
+  };
 }
 
 async function main(): Promise<void> {
@@ -199,31 +255,52 @@ async function main(): Promise<void> {
   const { owner, repo } = slug;
 
   // ---- create -------------------------------------------------------------
-  if (o.sub === "create") {
+  if (o.sub === 'create') {
     if (!o.head || !o.base || !o.title) {
-      console.error("create requires --head, --base, and --title. See --help.");
+      console.error('create requires --head, --base, and --title. See --help.');
       Deno.exit(2);
     }
-    if (o.base === "main" && !o.allowBaseMain) {
-      console.error("refusing base 'main' (leaves land on the umbrella). Pass --allow-base-main to override.");
+    if (o.base === 'main' && !o.allowBaseMain) {
+      console.error(
+        "refusing base 'main' (leaves land on the umbrella). Pass --allow-base-main to override.",
+      );
       Deno.exit(6);
     }
-    const body = o.bodyFile ? await Deno.readTextFile(o.bodyFile) : (o.body ?? "");
-    const payload = buildPullRequestBody({ title: o.title!, head: o.head!, base: o.base!, body, draft: o.draft });
+    const body = o.bodyFile ? await Deno.readTextFile(o.bodyFile) : (o.body ?? '');
+    const payload = buildPullRequestBody({
+      title: o.title!,
+      head: o.head!,
+      base: o.base!,
+      body,
+      draft: o.draft,
+    });
     if (o.dryRun) {
       emit(o.pretty, [
-        "DRY-RUN create",
+        'DRY-RUN create',
         `  repo  : ${owner}/${repo}`,
-        `  head  : ${o.head} -> base ${o.base}${o.draft ? " (draft)" : ""}`,
+        `  head  : ${o.head} -> base ${o.base}${o.draft ? ' (draft)' : ''}`,
         `  title : ${o.title}`,
         `  bytes : ${new TextEncoder().encode(body).length}`,
-      ], { mode: "dry-run", sub: "create", ok: true, repo: o.repo, payload: { ...payload, body: `<${body.length} chars>` } });
+      ], {
+        mode: 'dry-run',
+        sub: 'create',
+        ok: true,
+        repo: o.repo,
+        payload: { ...payload, body: `<${body.length} chars>` },
+      });
       Deno.exit(0);
     }
-    const token = requireToken(o);
-    const res = await githubRequest("POST", `/repos/${owner}/${repo}/pulls`, token, payload);
+    const token = await requireToken(o);
+    const res = await githubRequest('POST', `/repos/${owner}/${repo}/pulls`, token, payload);
     if (!res.ok) {
-      console.log(JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body, errors: res.body?.errors }));
+      console.log(
+        JSON.stringify({
+          ok: false,
+          status: res.status,
+          error: res.body?.message ?? res.body,
+          errors: res.body?.errors,
+        }),
+      );
       Deno.exit(1);
     }
     emit(o.pretty, [`CREATED PR #${res.body.number} -> ${res.body.html_url}`], {
@@ -243,9 +320,14 @@ async function main(): Promise<void> {
   }
 
   // ---- verdict ------------------------------------------------------------
-  if (o.sub === "verdict") {
-    const token = requireToken(o);
-    const { comment, verdict, jobFinal, runUrl } = await fetchLatestVerdict(owner, repo, o.pr!, token);
+  if (o.sub === 'verdict') {
+    const token = await requireToken(o);
+    const { comment, verdict, jobFinal, runUrl } = await fetchLatestVerdict(
+      owner,
+      repo,
+      o.pr!,
+      token,
+    );
     const json = {
       ok: true,
       pr: o.pr,
@@ -258,7 +340,9 @@ async function main(): Promise<void> {
       runUrl,
     };
     const lines = [
-      `PR #${o.pr}: ${comment ? (verdict.verdict ?? "(no verdict token)") : "no OpenHands comment yet"}`,
+      `PR #${o.pr}: ${
+        comment ? (verdict.verdict ?? '(no verdict token)') : 'no OpenHands comment yet'
+      }`,
       ...(runUrl ? [`  run: ${runUrl}`] : []),
     ];
     emit(o.pretty, lines, json);
@@ -269,61 +353,91 @@ async function main(): Promise<void> {
   }
 
   // ---- merge --------------------------------------------------------------
-  const token = requireToken(o);
-  const prRes = await githubRequest("GET", `/repos/${owner}/${repo}/pulls/${o.pr}`, token);
+  const token = await requireToken(o);
+  const prRes = await githubRequest('GET', `/repos/${owner}/${repo}/pulls/${o.pr}`, token);
   if (!prRes.ok) {
-    console.log(JSON.stringify({ ok: false, status: prRes.status, error: prRes.body?.message ?? prRes.body }));
+    console.log(
+      JSON.stringify({ ok: false, status: prRes.status, error: prRes.body?.message ?? prRes.body }),
+    );
     Deno.exit(1);
   }
-  const baseRef: string = prRes.body.base?.ref ?? "";
-  const headSha: string = prRes.body.head?.sha ?? "";
-  const mergeableState: string = prRes.body.mergeable_state ?? "unknown";
+  const baseRef: string = prRes.body.base?.ref ?? '';
+  const headSha: string = prRes.body.head?.sha ?? '';
+  const mergeableState: string = prRes.body.mergeable_state ?? 'unknown';
 
-  if (baseRef === "main" && !o.allowBaseMain) {
-    console.error(`PR #${o.pr} targets 'main'; refusing (leaves land on the umbrella). Pass --allow-base-main to override.`);
+  if (baseRef === 'main' && !o.allowBaseMain) {
+    console.error(
+      `PR #${o.pr} targets 'main'; refusing (leaves land on the umbrella). Pass --allow-base-main to override.`,
+    );
     Deno.exit(6);
   }
 
   if (o.evalGate) {
     const { comment, verdict, jobFinal } = await fetchLatestVerdict(owner, repo, o.pr!, token);
     if (!comment) {
-      emit(o.pretty, [`BLOCKED PR #${o.pr}: no OpenHands eval comment yet (use --no-eval-gate to bypass).`], {
-        ok: false, blocked: "no-eval-comment", pr: o.pr,
+      emit(o.pretty, [
+        `BLOCKED PR #${o.pr}: no OpenHands eval comment yet (use --no-eval-gate to bypass).`,
+      ], {
+        ok: false,
+        blocked: 'no-eval-comment',
+        pr: o.pr,
       });
       Deno.exit(12);
     }
     if (!verdict.isPass) {
       emit(o.pretty, [
-        `BLOCKED PR #${o.pr}: eval verdict is ${verdict.verdict ?? "(none/non-final)"}${jobFinal ? "" : " (run not final)"} — not PASS.`,
-        "  use --no-eval-gate to bypass deliberately.",
-      ], { ok: false, blocked: "eval-not-pass", pr: o.pr, verdict: verdict.verdict, jobFinal });
+        `BLOCKED PR #${o.pr}: eval verdict is ${verdict.verdict ?? '(none/non-final)'}${
+          jobFinal ? '' : ' (run not final)'
+        } — not PASS.`,
+        '  use --no-eval-gate to bypass deliberately.',
+      ], { ok: false, blocked: 'eval-not-pass', pr: o.pr, verdict: verdict.verdict, jobFinal });
       Deno.exit(verdict.isFail ? 10 : 11);
     }
   }
 
-  if (mergeableState !== "clean" && !o.force) {
+  if (mergeableState !== 'clean' && !o.force) {
     emit(o.pretty, [
       `NOT MERGEABLE PR #${o.pr}: mergeable_state='${mergeableState}' (expected 'clean'). Use --force to override.`,
-    ], { ok: false, blocked: "not-clean", pr: o.pr, mergeableState });
+    ], { ok: false, blocked: 'not-clean', pr: o.pr, mergeableState });
     Deno.exit(7);
   }
 
-  const mergeBody = buildMergeBody({ method: o.method, title: o.title, message: o.message, sha: headSha || undefined });
+  const mergeBody = buildMergeBody({
+    method: o.method,
+    title: o.title,
+    message: o.message,
+    sha: headSha || undefined,
+  });
   if (o.dryRun) {
     emit(o.pretty, [
-      "DRY-RUN merge",
+      'DRY-RUN merge',
       `  pr     : #${o.pr} (${baseRef})`,
       `  method : ${o.method}`,
       `  state  : ${mergeableState}`,
       `  sha    : ${headSha}`,
-      `  gate   : ${o.evalGate ? "eval-PASS required" : "bypassed (--no-eval-gate)"}`,
-    ], { mode: "dry-run", sub: "merge", ok: true, pr: o.pr, baseRef, mergeableState, body: mergeBody });
+      `  gate   : ${o.evalGate ? 'eval-PASS required' : 'bypassed (--no-eval-gate)'}`,
+    ], {
+      mode: 'dry-run',
+      sub: 'merge',
+      ok: true,
+      pr: o.pr,
+      baseRef,
+      mergeableState,
+      body: mergeBody,
+    });
     Deno.exit(0);
   }
 
-  const res = await githubRequest("PUT", `/repos/${owner}/${repo}/pulls/${o.pr}/merge`, token, mergeBody);
+  const res = await githubRequest(
+    'PUT',
+    `/repos/${owner}/${repo}/pulls/${o.pr}/merge`,
+    token,
+    mergeBody,
+  );
   if (!res.ok) {
-    console.log(JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }));
+    console.log(
+      JSON.stringify({ ok: false, status: res.status, error: res.body?.message ?? res.body }),
+    );
     Deno.exit(1);
   }
   emit(o.pretty, [`MERGED PR #${o.pr} -> ${res.body.sha}  (${baseRef})`], {

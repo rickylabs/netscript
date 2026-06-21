@@ -31,8 +31,8 @@
 /** Windows `C:\a\b` -> WSL `/mnt/c/a/b`; passthrough (normalized) for POSIX paths. */
 export function winToWsl(p: string): string {
   const m = p.match(/^([A-Za-z]):[\\/](.*)$/);
-  if (!m) return p.replace(/\\/g, "/");
-  return `/mnt/${m[1].toLowerCase()}/${m[2].replace(/\\/g, "/")}`;
+  if (!m) return p.replace(/\\/g, '/');
+  return `/mnt/${m[1].toLowerCase()}/${m[2].replace(/\\/g, '/')}`;
 }
 
 /** Single-quote a string for safe embedding inside a bash command. */
@@ -62,8 +62,8 @@ export async function runBin(
   const out = await new Deno.Command(bin, {
     args,
     cwd: opts.cwd,
-    stdout: "piped",
-    stderr: "piped",
+    stdout: 'piped',
+    stderr: 'piped',
   }).output();
   const dec = new TextDecoder();
   return {
@@ -79,7 +79,7 @@ export async function runBin(
  * structural fix for the reserved-`<` ParserError.
  */
 export function wsl(user: string, script: string): Promise<CommandResult> {
-  return runBin("wsl.exe", ["-u", user, "--", "bash", "-lc", script]);
+  return runBin('wsl.exe', ['-u', user, '--', 'bash', '-lc', script]);
 }
 
 /**
@@ -95,7 +95,7 @@ export function wsl(user: string, script: string): Promise<CommandResult> {
  * the ambient cwd.
  */
 export function wslCd(user: string, cwd: string, script: string): Promise<CommandResult> {
-  return runBin("wsl.exe", ["-u", user, "--cd", cwd, "--", "bash", "-lc", script]);
+  return runBin('wsl.exe', ['-u', user, '--cd', cwd, '--', 'bash', '-lc', script]);
 }
 
 // ---------------------------------------------------------------------------
@@ -127,12 +127,12 @@ export interface ContractCheck {
  * before the check so a CRLF brief never falsely fails.
  */
 export function validateHandoffContract(content: string): ContractCheck {
-  const normalized = content.replace(/\r/g, "");
+  const normalized = content.replace(/\r/g, '');
   const useHarness = /^\s*use harness\b/i.test(normalized);
   const skillChapter = /^##\s+SKILL\b/m.test(normalized);
   const problems: string[] = [];
-  if (!useHarness) problems.push("must begin with `use harness`");
-  if (!skillChapter) problems.push("must contain a `## SKILL` chapter");
+  if (!useHarness) problems.push('must begin with `use harness`');
+  if (!skillChapter) problems.push('must contain a `## SKILL` chapter');
   return {
     ok: useHarness && skillChapter,
     useHarness,
@@ -146,7 +146,7 @@ export function validateHandoffContract(content: string): ContractCheck {
 // Codex thread-log parsing (pure)
 // ---------------------------------------------------------------------------
 
-export const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+export const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
 export interface ThreadInfo {
   threadId: string | null;
@@ -216,19 +216,18 @@ export async function wslGitInfo(user: string, worktree: string): Promise<GitInf
     `echo "HEAD=$(git -C ${q} rev-parse --short HEAD 2>/dev/null)"`,
     `echo "UPSTREAM=$(git -C ${q} rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo NONE)"`,
     `echo "DIRTY=$(git -C ${q} status --porcelain 2>/dev/null | wc -l | tr -d ' ')"`,
-  ].join("; ");
+  ].join('; ');
   const r = await wsl(user, script);
-  if (r.stdout.includes("ERR_NO_WORKTREE")) {
-    return { found: false, branch: "", head: "", upstream: "", dirty: 0 };
+  if (r.stdout.includes('ERR_NO_WORKTREE')) {
+    return { found: false, branch: '', head: '', upstream: '', dirty: 0 };
   }
-  const get = (k: string) =>
-    r.stdout.match(new RegExp(`^${k}=(.*)$`, "m"))?.[1]?.trim() ?? "";
+  const get = (k: string) => r.stdout.match(new RegExp(`^${k}=(.*)$`, 'm'))?.[1]?.trim() ?? '';
   return {
     found: true,
-    branch: get("BRANCH"),
-    head: get("HEAD"),
-    upstream: get("UPSTREAM"),
-    dirty: Number(get("DIRTY") || "0"),
+    branch: get('BRANCH'),
+    head: get('HEAD'),
+    upstream: get('UPSTREAM'),
+    dirty: Number(get('DIRTY') || '0'),
   };
 }
 
@@ -251,10 +250,10 @@ export interface SafetyVerdict {
  */
 export function evaluateGitSafety(info: GitInfo, exp: SafetyExpectation): SafetyVerdict {
   if (!info.found) {
-    return { ok: false, code: 5, problems: ["worktree not found"] };
+    return { ok: false, code: 5, problems: ['worktree not found'] };
   }
   const problems: string[] = [];
-  if (info.upstream !== "NONE") {
+  if (info.upstream !== 'NONE') {
     problems.push(
       `worktree has upstream '${info.upstream}' — a bare push could corrupt it (push-safety requires NONE; push via explicit refspec)`,
     );
@@ -316,21 +315,21 @@ export interface DispatchOptions {
  * issue_comment trigger requires the literal `@openhands-agent` mention.
  */
 export function buildOpenHandsComment(o: DispatchOptions): string {
-  const tokens = ["@openhands-agent"];
+  const tokens = ['@openhands-agent'];
   if (o.model) tokens.push(`model=${o.model}`);
   if (o.provider) tokens.push(`provider=${o.provider}`);
   if (o.outputMode) tokens.push(`output=${o.outputMode}`);
-  if (o.iterations !== undefined && String(o.iterations) !== "") {
+  if (o.iterations !== undefined && String(o.iterations) !== '') {
     tokens.push(`iterations=${o.iterations}`);
   }
-  return `${tokens.join(" ")}\n\n${o.prompt.replace(/\r/g, "")}`;
+  return `${tokens.join(' ')}\n\n${o.prompt.replace(/\r/g, '')}`;
 }
 
 // ---------------------------------------------------------------------------
 // OpenHands status parsing (pure)
 // ---------------------------------------------------------------------------
 
-export const OPENHANDS_MARKER = "<!-- openhands-agent-summary -->";
+export const OPENHANDS_MARKER = '<!-- openhands-agent-summary -->';
 
 export interface OpenHandsStatus {
   heading: string | null;
@@ -354,12 +353,12 @@ export function parseOpenHandsStatusComment(body: string): OpenHandsStatus {
   const jobStatus = body.match(/^Job status:\s*(.+?)\s*$/m)?.[1]?.trim() ?? null;
   const runUrl = body.match(/Run:\s*(https?:\/\/\S+)/)?.[1] ?? null;
   const headingToVerdict: Record<string, string> = {
-    "Running": "running",
-    "Completed": "completed",
-    "Completed — no agent summary": "summary-missing",
-    "Agent failed": "agent-failed",
-    "Bootstrap failed": "bootstrap-failed",
-    "Did not run": "not-run",
+    'Running': 'running',
+    'Completed': 'completed',
+    'Completed — no agent summary': 'summary-missing',
+    'Agent failed': 'agent-failed',
+    'Bootstrap failed': 'bootstrap-failed',
+    'Did not run': 'not-run',
   };
   const verdict = heading ? (headingToVerdict[heading] ?? heading.toLowerCase()) : null;
   return {
@@ -369,7 +368,7 @@ export function parseOpenHandsStatusComment(body: string): OpenHandsStatus {
     provider,
     jobStatus,
     runUrl,
-    isFinal: heading !== null && heading !== "Running",
+    isFinal: heading !== null && heading !== 'Running',
   };
 }
 
@@ -396,7 +395,7 @@ export function buildPullRequestBody(s: PullRequestSpec): Record<string, unknown
   };
 }
 
-export type MergeMethod = "merge" | "squash" | "rebase";
+export type MergeMethod = 'merge' | 'squash' | 'rebase';
 
 export interface MergeSpec {
   method: MergeMethod;
@@ -421,7 +420,7 @@ export function buildMergeBody(s: MergeSpec): Record<string, unknown> {
 // ---------------------------------------------------------------------------
 
 export interface EvalVerdict {
-  kind: "IMPL" | "PLAN" | null;
+  kind: 'IMPL' | 'PLAN' | null;
   /** PASS | FAIL_FIX | FAIL_RESCOPE | FAIL_DEBT | FAIL_PLAN | … (null if absent). */
   verdict: string | null;
   isPass: boolean;
@@ -450,12 +449,12 @@ export interface EvalVerdict {
 export function parseEvalVerdict(body: string): EvalVerdict {
   // 1. Canonical kinded token.
   const canon = /(IMPL|PLAN)-EVAL:\s*(PASS|FAIL_[A-Z]+)/;
-  const cm = body.match(new RegExp(`Verdict[^\\n]*?${canon.source}`, "i")) ??
+  const cm = body.match(new RegExp(`Verdict[^\\n]*?${canon.source}`, 'i')) ??
     body.match(canon);
   if (cm) {
-    const kind = cm[1].toUpperCase() as "IMPL" | "PLAN";
+    const kind = cm[1].toUpperCase() as 'IMPL' | 'PLAN';
     const verdict = cm[2].toUpperCase();
-    return { kind, verdict, isPass: verdict === "PASS", isFail: verdict.startsWith("FAIL") };
+    return { kind, verdict, isPass: verdict === 'PASS', isFail: verdict.startsWith('FAIL') };
   }
   // 2. Standalone `VERDICT: <token>` (longest alternatives first so `PASS-WITH-NITS`
   //    and `FAIL_*` win over their bare prefixes; `(?!\s*\|)` skips the menu echo).
@@ -464,8 +463,8 @@ export function parseEvalVerdict(body: string): EvalVerdict {
   );
   if (bare) {
     const verdict = bare[1].toUpperCase();
-    const isPass = verdict === "PASS" || verdict === "PASS-WITH-NITS";
-    return { kind: null, verdict, isPass, isFail: verdict.startsWith("FAIL") };
+    const isPass = verdict === 'PASS' || verdict === 'PASS-WITH-NITS';
+    return { kind: null, verdict, isPass, isFail: verdict.startsWith('FAIL') };
   }
   return { kind: null, verdict: null, isPass: false, isFail: false };
 }
@@ -487,7 +486,7 @@ export interface CommentLike {
  * latest run's summary. Returns null when none is tagged yet (eval still pending).
  */
 export function selectLatestOpenHandsComment<T extends CommentLike>(comments: T[]): T | null {
-  const tagged = comments.filter((c) => (c.body ?? "").includes(OPENHANDS_MARKER));
+  const tagged = comments.filter((c) => (c.body ?? '').includes(OPENHANDS_MARKER));
   return tagged.length ? tagged[tagged.length - 1] : null;
 }
 
@@ -498,6 +497,182 @@ export function selectLatestOpenHandsComment<T extends CommentLike>(comments: T[
 /** Read a GitHub token from an env var the supervisor sets in-process. Never logged. */
 export function readTokenFromEnv(envName: string): string | null {
   return Deno.env.get(envName) ?? null;
+}
+
+/** Env vars, in priority order, that may carry a GitHub token in this environment. */
+export const GITHUB_TOKEN_ENV_CANDIDATES = [
+  'GH_TOKEN',
+  'GITHUB_TOKEN',
+  'GH_PAT',
+  'GITHUB_PAT',
+  'PAT_TOKEN',
+  'GITHUB_MCP_PAT',
+] as const;
+
+export interface ResolvedGithubToken {
+  /** The bearer token. Use in-process only; never log, print, or persist. */
+  token: string;
+  /** Human-readable provenance, e.g. `gh:wsl (rickylabs)`. Safe to log. */
+  source: string;
+}
+
+export interface ResolveTokenOptions {
+  /** Env var to try before the standard candidates. */
+  preferEnv?: string;
+  /** WSL user whose `gh` login to consult. Default: codex. */
+  wslUser?: string;
+  /** Validate each candidate against GET /user before accepting. Default: true. */
+  validate?: boolean;
+  /** Bound on the GCM `git credential fill` fallback (anti-hang). Default: 20000ms. */
+  gcmTimeoutMs?: number;
+  /** Skip subprocess sources (gh / GCM) — env-only. Default: false. */
+  envOnly?: boolean;
+}
+
+/**
+ * Confirm a candidate token actually works by calling GET /user. Returns the
+ * authenticated login on success, or null on any non-2xx / network error. The
+ * token is used only as the Authorization header.
+ */
+export async function validateGithubToken(token: string): Promise<string | null> {
+  try {
+    const res = await githubRequest('GET', '/user', token);
+    const login = res.ok && res.body && typeof res.body.login === 'string' ? res.body.login : null;
+    return login;
+  } catch {
+    return null;
+  }
+}
+
+/** Run a subprocess, returning trimmed stdout, or null on failure / missing --allow-run. */
+async function runCapture(cmd: string, args: string[]): Promise<string | null> {
+  try {
+    const status = await Deno.permissions.query({ name: 'run', command: cmd });
+    if (status.state !== 'granted') return null;
+    const out = await new Deno.Command(cmd, {
+      args,
+      stdout: 'piped',
+      stderr: 'null',
+      stdin: 'null',
+    }).output();
+    if (!out.success) return null;
+    const text = new TextDecoder().decode(out.stdout).trim();
+    return text.length ? text : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Bounded, non-interactive GCM credential fill. Never hangs; returns the password line or null. */
+async function gcmCredentialFill(timeoutMs: number): Promise<string | null> {
+  try {
+    const status = await Deno.permissions.query({ name: 'run', command: 'git' });
+    if (status.state !== 'granted') return null;
+    const child = new Deno.Command('git', {
+      args: [
+        '-c',
+        'credential.interactive=false',
+        '-c',
+        'credential.guiPrompt=false',
+        'credential',
+        'fill',
+      ],
+      stdin: 'piped',
+      stdout: 'piped',
+      stderr: 'null',
+      env: { GCM_INTERACTIVE: 'Never', GIT_TERMINAL_PROMPT: '0' },
+    }).spawn();
+    const w = child.stdin.getWriter();
+    await w.write(new TextEncoder().encode('protocol=https\nhost=github.com\n\n'));
+    await w.close();
+    const timer = setTimeout(() => {
+      try {
+        child.kill();
+      } catch { /* already exited */ }
+    }, timeoutMs);
+    const out = await child.output();
+    clearTimeout(timer);
+    if (!out.success) return null;
+    const text = new TextDecoder().decode(out.stdout);
+    const line = text.split(/\r?\n/).find((l) => l.startsWith('password='));
+    const pw = line ? line.slice('password='.length).trim() : '';
+    return pw.length ? pw : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Durably resolve a working GitHub token from whatever source is healthy in this
+ * environment, validating each candidate against GET /user before accepting it.
+ *
+ * Tried in order: preferEnv → standard env candidates → `gh auth token`
+ * (Windows, then WSL) → bounded GCM `git credential fill`. The first candidate
+ * that authenticates wins. `gh auth token` is the durable source: a one-time
+ * `gh auth login` yields a credential gh keeps fresh, so it survives token
+ * expiry that kills static PATs.
+ *
+ * Throws with a precise, secret-free message listing what was tried when nothing
+ * validates — the caller surfaces it so a human runs `gh auth login` once.
+ */
+export async function resolveGithubToken(
+  opts: ResolveTokenOptions = {},
+): Promise<ResolvedGithubToken> {
+  const validate = opts.validate ?? true;
+  const wslUser = opts.wslUser ?? 'codex';
+  const tried: string[] = [];
+
+  const accept = async (
+    token: string | null,
+    source: string,
+  ): Promise<ResolvedGithubToken | null> => {
+    if (!token) return null;
+    if (!validate) return { token, source };
+    const login = await validateGithubToken(token);
+    tried.push(login ? `${source} (valid)` : `${source} (401)`);
+    return login ? { token, source: `${source} (${login})` } : null;
+  };
+
+  const envOrder = [
+    ...(opts.preferEnv ? [opts.preferEnv] : []),
+    ...GITHUB_TOKEN_ENV_CANDIDATES,
+  ];
+  const seen = new Set<string>();
+  for (const name of envOrder) {
+    if (seen.has(name)) continue;
+    seen.add(name);
+    const r = await accept(readTokenFromEnv(name), `env:${name}`);
+    if (r) return r;
+  }
+
+  if (!opts.envOnly) {
+    const ghWin = await runCapture('gh', ['auth', 'token']);
+    let r = await accept(ghWin, 'gh:windows');
+    if (r) return r;
+
+    const ghWsl = await runCapture('wsl.exe', [
+      '-u',
+      wslUser,
+      '--',
+      'bash',
+      '-lc',
+      'export PATH="$HOME/.local/bin:$PATH"; gh auth token',
+    ]);
+    r = await accept(ghWsl, 'gh:wsl');
+    if (r) return r;
+
+    const gcm = await gcmCredentialFill(opts.gcmTimeoutMs ?? 20000);
+    r = await accept(gcm, 'gcm:windows');
+    if (r) return r;
+  }
+
+  const summary = tried.length ? tried.join(', ') : 'no candidate produced a token';
+  throw new Error(
+    `No valid GitHub token resolved (tried: ${summary}). ` +
+      `Authenticate once with \`gh auth login\` (WSL: \`wsl.exe -u ${wslUser} -- gh auth login\`) ` +
+      `so \`gh auth token\` can supply a self-refreshing credential, or store a PAT via ` +
+      `\`git credential approve\`, then retry.`,
+  );
 }
 
 export interface GitHubResponse {
@@ -521,11 +696,11 @@ export async function githubRequest(
   const res = await fetch(`https://api.github.com${path}`, {
     method,
     headers: {
-      "Authorization": `Bearer ${token}`,
-      "Accept": "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "netscript-agentic-suite",
-      ...(body ? { "Content-Type": "application/json" } : {}),
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'netscript-agentic-suite',
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
   });
