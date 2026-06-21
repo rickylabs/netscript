@@ -8,8 +8,9 @@ Deliverable: a locked, PLAN-EVAL-ready Information-Architecture plan. No prose a
   "auth packages missing" false positive (`research.md` §2). Produced `research.md`, `doc-architecture-v3.md`,
   and grounding (`ground/leakage-diagram-barraising.md`, `ground/playground-showcase-map.md`).
 - **Plan & Design** — `plan.md` v1 committed (`fc3ee159`).
-- **Plan hardening (this pass)** — folded the unoriented WSL Codex adversarial panel findings (`1cbe1875`,
-  `codex-panel-findings.md`) back into the plan; added the harness artifacts, full surface inventory, tutorial
+- **Plan hardening (this pass)** — folded the unoriented WSL Codex adversarial panel findings
+  (`codex-panel-findings.md`; committed WSL-only as `1cbe1875`, never pushed, reproduced into this branch)
+  back into the plan; added the harness artifacts, full surface inventory, tutorial
   proof plans, hub content contracts, locked foundation decisions, and an executable gate table. See `drift.md`.
 - **Plan-Gate** — PENDING. The first OpenHands minimax-M3 PLAN-EVAL **crashed** (workflow failure, not a
   verdict; comment 4762333961, run 27907934927). Re-dispatch after this hardening commit. No authoring/build

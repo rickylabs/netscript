@@ -10,7 +10,7 @@ is a later, separately-gated build run.
 `commits.md`.
 
 > **Hardening note (2026-06-21):** this plan was hardened against the unoriented WSL Codex adversarial panel
-> (`codex-panel-findings.md`, commit `1cbe1875`: 3 blockers / 6 majors / 1 minor) before re-dispatching
+> (`codex-panel-findings.md`: 3 blockers / 6 majors / 1 minor) before re-dispatching
 > PLAN-EVAL. The first OpenHands PLAN-EVAL run crashed (workflow failure, not a verdict). All panel
 > blockers/majors are resolved here and in the companion artifacts; see `drift.md` for the mapping.
 

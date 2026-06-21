@@ -9,8 +9,10 @@ Append-only. Records divergence between plan/intent and reality, and material pl
   discarded. See `research.md` §2.
 
 ## 2026-06-21 · adversarial hardening panel (severity: significant)
-- The unoriented WSL Codex panel (commit `1cbe1875`, `codex-panel-findings.md`) returned **"not ready to
-  drive a production-grade build"**: 3 blockers, 6 majors, 1 minor.
+- The unoriented WSL Codex panel (`codex-panel-findings.md`) returned **"not ready to
+  drive a production-grade build"**: 3 blockers, 6 majors, 1 minor. (The panel committed its findings as
+  `1cbe1875` inside the WSL worktree `/home/codex/repos/netscript-docs-v3-ia-plan`; that commit was never
+  pushed to this branch, so the findings file is reproduced into this branch by the hardening commit.)
 - The OpenHands minimax-M3 PLAN-EVAL run (comment 4762333961) **crashed** before rendering a verdict
   ("Agent failed … workflow failure, not a task verdict", run 27907934927). No PASS/FAIL_PLAN was
   produced; it must be re-dispatched after this hardening pass.
