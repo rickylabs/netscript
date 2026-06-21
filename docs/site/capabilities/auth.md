@@ -313,12 +313,10 @@ Aspire-first ordering every plugin schema follows.</li>
 
 ## Reference
 
-This hub is intentionally thin — the auth runtime is a `@netscript/service`, whose full generated
-API lives in the reference. The auth plugin packages
-(`@netscript/plugin-auth-core`, `@netscript/auth-kv-oauth`, `@netscript/auth-workos`,
-`@netscript/auth-better-auth`, `@netscript/plugin-auth`) ship `deno doc`-grade JSDoc on every
-export; browse them with `deno doc <package>` until their generated reference pages land.
+The auth runtime is a `@netscript/service`; the auth plugin, core contract package, and backend
+adapters now have dedicated generated reference pages.
 
+{{ comp.xref({ key: "ref:auth" }) }}
 {{ comp.xref({ key: "ref:service" }) }}
 
 {{ comp.featureGrid({ items: [

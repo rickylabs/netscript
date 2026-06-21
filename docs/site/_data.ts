@@ -3,13 +3,13 @@
  *
  * `navSections` drives the SidebarShell navigation rendered in
  * `_includes/layouts/base.vto`. The top groups use plain-English labels (the
- * approachable ladder) while Reference stays expanded to the 22 primary units.
+ * approachable ladder) while Reference stays expanded to the 28 primary units.
  * The four `*-core` internal packages stay folded inside the reference prose
  * (US-8) and are intentionally NOT sidebar entries.
  *
  * Every href below resolves to a page that exists after the 0a authoring wave:
  * `/`, `/quickstart/`, `/why/`, `/tutorials/`, `/how-to/`, `/explanation/`,
- * `/reference/`, and the 22 reference-unit hrefs. Capability hubs, concept
+ * `/reference/`, and the 28 reference-unit hrefs. Capability hubs, concept
  * pages, tutorial sub-pages, and a glossary land in later phases and are
  * deliberately omitted here so the 0a chrome preview never 404s.
  */
@@ -26,10 +26,14 @@ export interface NavSection {
 }
 
 /**
- * Reference units (22). The href is the section-root URL; `url` Lume filter
+ * Reference units (28). The href is the section-root URL; `url` Lume filter
  * applies the /netscript/ base path at render time.
  */
 const referenceUnits: NavItem[] = [
+  { href: "/reference/auth/", label: "auth", icon: "A" },
+  { href: "/reference/auth-better-auth/", label: "auth-better-auth", icon: "A" },
+  { href: "/reference/auth-kv-oauth/", label: "auth-kv-oauth", icon: "A" },
+  { href: "/reference/auth-workos/", label: "auth-workos", icon: "A" },
   { href: "/reference/aspire/", label: "aspire", icon: "A" },
   { href: "/reference/cli/", label: "cli", icon: "C" },
   { href: "/reference/config/", label: "config", icon: "C" },
@@ -41,6 +45,8 @@ const referenceUnits: NavItem[] = [
   { href: "/reference/kv/", label: "kv", icon: "K" },
   { href: "/reference/logger/", label: "logger", icon: "L" },
   { href: "/reference/plugin/", label: "plugin", icon: "P" },
+  { href: "/reference/plugin-auth/", label: "plugin-auth", icon: "P" },
+  { href: "/reference/plugin-auth-core/", label: "plugin-auth-core", icon: "P" },
   { href: "/reference/prisma-adapter-mysql/", label: "prisma-adapter-mysql", icon: "P" },
   { href: "/reference/queue/", label: "queue", icon: "Q" },
   { href: "/reference/runtime-config/", label: "runtime-config", icon: "R" },

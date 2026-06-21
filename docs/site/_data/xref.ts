@@ -32,8 +32,12 @@ export interface XrefTarget {
   label: string;
 }
 
-/** The 22 generated reference units (mirrors `referenceUnits` in `_data.ts`). */
+/** The 28 generated reference units (mirrors `referenceUnits` in `_data.ts`). */
 const REFERENCE_UNITS = [
+  "auth",
+  "auth-better-auth",
+  "auth-kv-oauth",
+  "auth-workos",
   "aspire",
   "cli",
   "config",
@@ -45,6 +49,8 @@ const REFERENCE_UNITS = [
   "kv",
   "logger",
   "plugin",
+  "plugin-auth",
+  "plugin-auth-core",
   "prisma-adapter-mysql",
   "queue",
   "runtime-config",
@@ -174,7 +180,7 @@ export const xref: Record<string, XrefTarget> = {
   "cli:reference": { href: "/cli-reference/", label: "CLI reference" },
   "glossary:": { href: "/glossary/", label: "Glossary" },
 
-  // ─── Reference index + the 22 generated units (ref:) ───────────────────────
+  // ─── Reference index + the 28 generated units (ref:) ───────────────────────
   "ref:index": { href: "/reference/", label: "Reference index" },
   ...refEntries(),
 };
