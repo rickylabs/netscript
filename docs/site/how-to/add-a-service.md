@@ -10,14 +10,17 @@ next: { label: "Database & migration", href: "/how-to/database-migration/" }
 
 **Goal:** add a new typed oRPC service to an existing NetScript workspace — define
 its contract, implement the handlers, serve it with `defineService`, and confirm it
-answers on its own port and `/rpc` endpoint.
+answers on its own port over both its OpenAPI surface and the `/api/rpc/*` RPC endpoint
+that typed clients call.
 
 This is a task-oriented recipe. It assumes you already have a NetScript workspace
 (created with `netscript init`) and that the `netscript` command is on your path. If
 you want the guided, build-up-from-scratch version that explains *why* each piece
-exists, follow the [Build a service tutorial](/tutorials/build-a-service/) instead.
-For the full generated API of the service runtime, see the
-[`@netscript/service` reference](/reference/service/).
+exists — contract to typed client to a Fresh island — follow the
+[Build a service tutorial](/tutorials/build-a-service/) instead. For the full generated
+API of the service runtime, see the [`@netscript/service` reference](/reference/service/);
+for the concept behind contract-first wiring, read
+[Contracts, explained](/explanation/contracts/).
 
 A NetScript service is contract-first: a service is the runtime that *implements* an
 `@orpc/contract` definition. You author the contract once (route + zod input/output),
@@ -28,9 +31,11 @@ service and its callers cannot drift.
 {{ comp callout { type: "note", title: "Two ways to construct a service" } }}
 Workspace services use <code>defineService(router, options)</code> — one call, an options
 object, the right default for the 80% case. NetScript <strong>plugin</strong> API services
-(workers, sagas) instead use the fluent <code>createService(router, options).withCors().withRPC().serve()</code>
-builder when they need to add CORS, OpenAPI, a database client, or custom context step by
-step. Both stand up the same Hono + oRPC runtime; this recipe uses <code>defineService</code>.
+(workers, sagas, triggers, auth) instead use the fluent
+<code>createService(router, options).withCors().withDatabase(db).withRPC().serve({ port })</code>
+builder when they need to layer CORS, OpenAPI, a database client, authn/authz, or custom
+context step by step. Both stand up the same Hono + oRPC runtime and advertise the identical
+<code>/api/rpc/*</code> endpoint; this recipe uses <code>defineService</code>.
 {{ /comp }}
 
 ## Before you start
@@ -41,7 +46,7 @@ step. Both stand up the same Hono + oRPC runtime; this recipe uses <code>defineS
     { name: "A NetScript workspace", type: "netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first — see the tutorials. Run commands from the workspace root." },
     { name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts — then confirm with netscript --help." },
     { name: "A contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/ workspace exposed as the @<project>/contracts import alias. New services add their contract here so clients can import it." },
-    { name: "A free port", type: ":3001 by default", desc: "The example users service listens on :3001. Pick an unused port per service; it is read from the PORT env var with a literal fallback." }
+    { name: "A free port", type: ":3001 by default", desc: "The example users service listens on :3001. Pick an unused port per service; it is read from the PORT env var with a literal fallback. Plugin API ports are already claimed (workers :8091, sagas :8092, triggers :8093, auth :8094)." }
   ]
 }) }}
 
@@ -58,13 +63,13 @@ creating a brand-new project, pass the service flags straight to `netscript init
 netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes
 ```
 
-To add a service to a workspace that already exists, run the service scaffold and pass
-the same name/port flags (run `netscript --help` for the exact subcommand spelling in
-your installed version):
+To add a service to a workspace that already exists, use the `netscript service add`
+subcommand with the `--name` and `--port` flags (the `service` group also has `list` and
+`generate` subcommands; `service generate` only regenerates Aspire helper files):
 
 ```bash
 # from the workspace root
-netscript generate service --service-name users --service-port 3001
+netscript service add --name users --port 3001
 ```
 
 Either path lays down a `services/users/` workspace member with this shape:
@@ -201,7 +206,25 @@ await defineService(router, {
 ```
 
 `defineService` stands up the Hono + oRPC runtime, mounting your router under both an
-OpenAPI surface (`/api/v1/users/*`) and the RPC surface (`/api/rpc/v1/...`).
+OpenAPI surface (`/api/v1/users/*`) and the RPC surface (`/api/rpc/v1/...`). The default
+RPC mount point is `/api/rpc` and the OpenAPI mount point is `/api`; both are overridable
+via the builder's `rpcPath` / `apiPath` options if you reach for `createService`.
+
+{{ comp callout { type: "note", title: "Need CORS, a database, or auth? Use createService" } }}
+When a service must layer cross-cutting concerns, swap <code>defineService</code> for the fluent
+builder. Each step returns the builder, so you compose only what you need before
+<code>.serve({ port })</code>:
+<pre><code>const app = createService(router, { name: 'users', version: '1.0.0' })
+  .withCors()
+  .withDatabase(db)
+  .withAuthn({ authenticator })
+  .withAuthz({ authorizer })
+  .withRPC();
+await app.serve({ port: 3001 });</code></pre>
+The authn/authz seam (<code>@netscript/service/auth</code>) is provider-agnostic — static-credential
+and trusted-header authenticators plus a scope authorizer ship built in. It is distinct from
+the auth <strong>plugin</strong> backends; see <a href="/capabilities/authentication/">Authentication</a>.
+{{ /comp }}
 
 ## Step 5 — Run and verify
 
@@ -232,9 +255,12 @@ no drift.
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
 <strong>Port collisions.</strong> Every service needs a distinct port; the workers
-(<code>:8091</code>), sagas (<code>:8092</code>), and triggers (<code>:8093</code>) plugins already
-claim theirs. Read the port from <code>PORT</code> and let Aspire assign it in orchestrated runs
-rather than hard-coding.<br>
+(<code>:8091</code>), sagas (<code>:8092</code>), triggers (<code>:8093</code>), and auth
+(<code>:8094</code>) plugins already claim theirs. Read the port from <code>PORT</code> and let
+Aspire assign it in orchestrated runs rather than hard-coding.<br>
+<strong>RPC lives under <code>/api/rpc/*</code>.</strong> The typed-client surface is
+<code>/api/rpc/&lt;version&gt;/&lt;router&gt;/&lt;procedure&gt;</code>, not a bare <code>/rpc</code>.
+The REST/OpenAPI surface is <code>/api/*</code>. Point clients and smoke tests at the right one.<br>
 <strong>Contracts before handlers.</strong> Edit the contract first, then the handler — never
 the reverse. The contract is the shared truth; a handler that out-runs its contract silently
 breaks every client.<br>
@@ -248,7 +274,7 @@ Wire persistence with the database recipe before you depend on durability.
 
 {{ comp.featureGrid({ items: [
   { title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/build-a-service/", icon: "→" },
-  { title: "Service API reference", body: "The full generated surface of defineService and createService — every option and return type.", href: "/reference/service/", icon: "◆" },
+  { title: "Service API reference", body: "The full generated surface of defineService and createService — every option, builder method, and return type.", href: "/reference/service/", icon: "◆" },
   { title: "Contracts, explained", body: "How an oRPC contract flows from service to typed client to UI without a codegen step.", href: "/explanation/contracts/", icon: "◎" },
   { title: "Database & migration", body: "Replace the seeded in-memory records with real Postgres persistence — init, generate, seed (Aspire up first).", href: "/how-to/database-migration/", icon: "▣" }
 ] }) }}

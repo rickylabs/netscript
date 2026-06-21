@@ -11,8 +11,8 @@ next: { label: "3 · Add background jobs", href: "/tutorials/background-jobs/" }
 This is the second rung of the ladder. In [Tutorial 1](/tutorials/first-workspace/) you scaffolded a
 workspace and watched it boot under Aspire. Now you will add a real, typed procedure to the `users`
 service: define an [oRPC contract](/explanation/contracts/) with Zod input/output schemas, implement
-it as a handler, serve it on port **3001**, and call it over the `/rpc` endpoint with full type
-safety from contract to client.
+it as a handler, serve it on port **3001**, and call it over the `/api/rpc/*` endpoint with full
+type safety from contract to client.
 
 By the end you will understand NetScript's central idea — **the contract is the single source of
 truth**. The schema you write once locks the types for both the server handler and any client, so a
@@ -39,7 +39,7 @@ contracts/versions/v1/users.contract.ts   →  implement()  →  services/users/
                                               services/users/src/main.ts  →  defineService(router, {...})
                                                                         │
                                                                         ▼
-                                              http://localhost:3001/rpc  (typed oRPC surface)
+                                http://localhost:3001/api/rpc/*  (typed oRPC surface)
 ```
 
 {{ comp callout { type: "note", title: "No database yet" } }}
@@ -51,8 +51,9 @@ The handler in this tutorial returns <strong>seeded, in-memory records</strong> 
 You should already have completed [Tutorial 1](/tutorials/first-workspace/), which means:
 
 - A `my-app/` workspace on disk with `services/users/` and `contracts/` directories.
-- `aspire run` running in a terminal (from the `aspire/` folder) so the dashboard at
-  [http://localhost:18888](http://localhost:18888) is live. You do not strictly need the database
+- Aspire running. From the `aspire/` folder, `aspire run` is up (this is **step 2** of every dev
+  loop — it brings Postgres and Garnet online before any `netscript db` command), so the dashboard
+  at [http://localhost:18888](http://localhost:18888) is live. You do not strictly need the database
   for this rung, but keeping Aspire up matches the real dev loop.
 - The CLI installed:
   `deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts`.
@@ -177,7 +178,8 @@ export const router = { v1 };
 ## Step 3 — Serve it with `defineService`
 
 The service entry point is `services/users/src/main.ts`. NetScript gives you **two ways** to stand a
-service up, and the scaffold uses the simpler one. Here is the scaffolded `defineService` form:
+service up, and the scaffold uses the simpler one. Here is the scaffolded `defineService` form
+side-by-side with the fluent `createService(...).serve()` builder:
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -196,7 +198,7 @@ service up, and the scaffold uses the simpler one. Here is the scaffolded `defin
 
 {{ comp.apiTable({ title: "Choosing a service builder", columns: ["API", "Shape", "Use it when"], rows: [
   ["defineService(router, { … })", "One call, one options object — CORS, logging, OpenAPI, RPC, and health are wired by sensible defaults.", "Most application services. It is what the scaffold generates and what you will use 90% of the time."],
-  ["createService(router, { … }).with*().serve()", "A fluent builder where each concern (`withCors`, `withLogger`, `withOpenAPI`, `withDatabase`, `withContext`, `withRPC`, `withHealth`, `onStartup`) is added explicitly, then `.serve()` boots it.", "You need to inject a database client, add custom request context, control middleware order, or run startup hooks — exactly what NetScript's own plugin API services (workers :8091, sagas :8092) do."]
+  ["createService(router, { … }).with*().serve()", "A fluent builder where each concern (`withCors`, `withLogger`, `withOpenAPI`, `withDatabase`, `withContext`, `withRPC`, `withHealth`, `withAuthn`, `withAuthz`, `onStartup`) is added explicitly, then `.serve()` boots it.", "You need to inject a database client, add custom request context, attach an authn/authz middleware, control middleware order, or run startup hooks — exactly what NetScript's own plugin API services (workers :8091, sagas :8092) do."]
 ] }) }}
 
 {{ comp callout { type: "important", title: "Two construction APIs, on purpose" } }}
@@ -206,10 +208,14 @@ Local application services use <code>defineService(...)</code>; the framework's 
 Either form binds the same router and exposes the same surface on port **3001**:
 
 {{ comp.apiTable({ title: "users service endpoints (port 3001)", columns: ["Path", "Method", "Purpose"], rows: [
-  ["/rpc", "POST", "The typed oRPC surface. Your typed client calls procedures (`v1.users.list`) here with end-to-end type safety."],
+  ["/api/rpc/*", "POST", "The typed oRPC surface. Your typed client calls procedures (`v1.users.list`) under this prefix with end-to-end type safety."],
   ["/api/v1/users/list", "POST", "The OpenAPI/REST projection of the same procedure, for tools and `curl`."],
   ["/health", "GET", "Liveness probe — the plain JSON health check you hit in Tutorial 1."]
 ] }) }}
+
+{{ comp callout { type: "note", title: "The RPC prefix is /api/rpc/*" } }}
+NetScript mounts the typed oRPC surface under <code>/api/rpc/*</code> — the service advertises exactly that path in its own metadata. If you have seen an older bare <code>/rpc</code> in notes or earlier docs, <code>/api/rpc/*</code> is the current, correct prefix. The typed <code>@orpc/client</code> reads the base URL from the service, so you almost never type this path by hand.
+{{ /comp }}
 
 ## Step 4 — Run the service
 
@@ -263,11 +269,22 @@ deno task check
 ```
 
 A clean check is the real verification: it proves the handler's return value satisfies the
-contract's output schema and that the typed `/rpc` surface is internally consistent.
+contract's output schema and that the typed `/api/rpc/*` surface is internally consistent.
 
-{{ comp callout { type: "tip", title: "Calling /rpc from a typed client" } }}
-The <code>/rpc</code> endpoint is what an <code>@orpc/client</code> consumer (your Fresh island, a CLI, another service) talks to — it gets the same Zod-derived types you wrote in the contract, with no codegen step. The <code>/api/v1/users/list</code> REST path you curl'd above is the OpenAPI projection of that same procedure. See <a href="/explanation/contracts/">Contracts &amp; type flow</a> for the client side.
+{{ comp callout { type: "tip", title: "Calling /api/rpc/* from a typed client" } }}
+The <code>/api/rpc/*</code> endpoint is what an <code>@orpc/client</code> consumer (your Fresh island, a CLI, another service) talks to — it gets the same Zod-derived types you wrote in the contract, with no codegen step. The <code>/api/v1/users/list</code> REST path you curl'd above is the OpenAPI projection of that same procedure. See <a href="/explanation/contracts/">Contracts &amp; type flow</a> for the client side.
 {{ /comp }}
+
+## Securing a service later (a pointer)
+
+This tutorial serves an open service so you can focus on the contract seam. When you are ready to
+gate procedures, NetScript ships a **provider-agnostic service-layer authn/authz middleware seam**
+(`createAuthnMiddleware` / `createAuthzMiddleware` from `@netscript/service/auth`), wired through the
+builder's `.withAuthn()` / `.withAuthz()` steps or `defineService({ auth })`. It is distinct from the
+auth *plugin* backends (kv-oauth, WorkOS, better-auth) covered under
+[the authentication capability](/capabilities/auth/) — the service seam authenticates requests *into*
+your own service. We do not teach it here; see
+[the services capability](/capabilities/services/) for the full middleware walkthrough.
 
 ## What you built
 
@@ -276,7 +293,7 @@ The <code>/rpc</code> endpoint is what an <code>@orpc/client</code> consumer (yo
   records, fully type-locked to the contract.
 - A running service via **`defineService(router, { … })`** on port **3001**, and you saw the
   alternative fluent **`createService(...).serve()`** builder and when to reach for it.
-- A verified `/rpc` typed surface plus its `/api/v1/users/*` OpenAPI projection, confirmed with
+- A verified `/api/rpc/*` typed surface plus its `/api/v1/users/*` OpenAPI projection, confirmed with
   `curl` and `deno task check`.
 
 You now own the contract-first loop that every NetScript service follows.

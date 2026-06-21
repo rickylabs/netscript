@@ -11,22 +11,28 @@ next: { label: "Observability", href: "/explanation/observability/" }
 # Durable workflows
 
 This page is **understanding-oriented**. It explains *what makes a NetScript workflow
-durable*, *how a saga keeps state across steps*, and *why* three capabilities — workers,
-sagas, and triggers — compose into a single long-running process rather than one monolithic
-handler. Read it to build the mental model; it is not a step-by-step guide. When you want to
-build the workflow with your own hands, follow the
+durable*, *how a saga keeps state across steps*, *where that state physically lives*, and *why*
+three capabilities — workers, sagas, and triggers — compose into a single long-running process
+rather than one monolithic handler. Read it to build the mental model; it is not a step-by-step
+guide. When you want to build the workflow with your own hands, follow the
 [durable workflow tutorial](/tutorials/durable-workflow/); when you want the headline API and
 ports, see the [durable sagas capability](/capabilities/durable-sagas/); when you want the
 exact exported symbols, follow [`reference/sagas/`](/reference/sagas/).
 
-{{ comp callout { type: "important", title: "Alpha honesty up front" } }}
-The saga builder, its state model, and the message-handler effects are <strong>real and
-they compile</strong> — the scaffold ships a working <code>defineSaga(...)</code> sample and
-a registry API at <code>:8092</code>. But two things are honest stubs you should not promise
-runtime for: the worker job <em>tools</em> (<code>createJobTools(ctx)</code>'s
-<code>trace</code> and <code>progress</code>) are <strong>no-ops</strong>, and the
-<code>streams</code> producer/consumer bodies are empty. This page is precise about which
-pieces are live so your mental model matches the running scaffold.
+{{ comp callout { type: "note", title: "What is genuinely live today" } }}
+The saga builder, its persisted state model, the message-handler effects, and the
+<strong>durable store</strong> behind them are all <strong>real and they compile</strong> — the
+scaffold ships a working <code>defineSaga(...)</code> sample, a registry API at <code>:8092</code>,
+and a durable runtime that persists every transition to either <strong>Deno KV</strong> or
+<strong>Prisma/Postgres</strong>. Two narrow honesty notes apply, and this page is precise about
+both: (1) the scaffold worker job <em>tools</em> exposed inside a handler
+(<code>createJobTools(ctx)</code>'s <code>trace.addEvent</code>, <code>withChildSpan</code>,
+<code>progress</code>) are no-op stubs — a tracked limitation with a fix planned — even though
+job dispatch/execution itself emits real OpenTelemetry spans automatically; and (2) the
+<code>@netscript/plugin-streams</code> manifest helpers <code>defineStreamProducer</code> /
+<code>defineStreamConsumer</code> are stubs that <strong>fail loud</strong>, while the real
+producer runtime lives in <code>@netscript/plugin-streams-core</code>. Neither caveat touches the
+saga durability described here.
 {{ /comp }}
 
 ## What "durable" actually means here
@@ -42,7 +48,8 @@ NetScript draws the durability boundary at the **saga**. A saga is a small, name
 machine whose state is persisted and whose transitions are driven by **messages** rather than
 by a function returning to its caller. Because the state lives outside the process and the
 inputs arrive as messages over time, a saga can span minutes, hours, or many process
-lifetimes — that is what the word *durable* buys you.
+lifetimes — that is what the word *durable* buys you. This is doctrine axiom A12 in practice:
+*durable workflows are state machines*, not long-lived call stacks.
 
 {{ comp callout { type: "note", title: "Durability is about the state, not the speed" } }}
 Durability does not mean "slow" or "queued forever". It means the workflow's
@@ -89,7 +96,7 @@ Each call in the chain has a precise job:
   caption: "The defineSaga(...) builder chain",
   rows: [
     { name: "defineSaga(id)", type: "(id: string) => Builder", desc: "Opens the builder and names the saga. The id is the registry key and shows up at GET /api/v1/sagas/sagas." },
-    { name: ".durability(tier)", type: "(tier: 't1') => Builder", desc: "Declares the durability tier the runtime persists this saga under. 't1' is the scaffolded tier — it is the contract for how aggressively state is written down." },
+    { name: ".durability(tier)", type: "(tier: 't1') => Builder", desc: "Declares the saga-definition durability TIER — the contract for how aggressively the runtime should persist this saga. This is a property of the definition, distinct from which physical store (kv or prisma) the runtime writes to." },
     { name: ".state<S>(initial)", type: "<S>(initial: S) => Builder", desc: "Declares the persisted state shape and its initial value. This object is what survives across messages and restarts." },
     { name: ".on<T,P>(type, handler)", type: "(type, (saga, msg, ctx) => Effect[]) => Builder", desc: "Registers a transition for one message type. The handler mutates saga.state and returns an array of effects (for example sagaComplete(...))." },
     { name: ".build()", type: "() => SagaDefinition", desc: "Freezes the chain into a SagaDefinition the runtime consumes. Nothing runs until build() and registration." }
@@ -104,10 +111,76 @@ falls off the end of a function — you are describing *which messages move the 
 {{ comp callout { type: "tip", title: "Why state lives on `saga.state`" } }}
 The handler receives the live <code>saga</code> object and mutates <code>saga.state</code> in
 place, then returns effects. Keeping state on the saga rather than in handler-local variables is
-exactly what makes it <strong>durable</strong>: the runtime owns that object, persists it under
-the declared <code>durability</code> tier, and rehydrates it before the next matching message.
-A local variable would vanish; <code>saga.state</code> does not.
+exactly what makes it <strong>durable</strong>: the runtime owns that object, persists it to the
+configured durable store, and rehydrates it before the next matching message. A local variable
+would vanish; <code>saga.state</code> does not.
 {{ /comp }}
+
+## Where the state physically lives: the durable store
+
+The builder describes *what* to persist. The **durable saga store** is *where* it goes. NetScript
+ships two interchangeable backends, and the runtime persists every transition to exactly one of
+them, chosen at startup:
+
+{{ comp.apiTable({
+  caption: "Durable saga store backends — NETSCRIPT_SAGA_STORE",
+  rows: [
+    { name: "kv", type: "KvSagaStore", desc: "Persists saga runtime state to Deno KV. The default scaffold backend — zero external dependencies, ideal for local development and KV-native deployments." },
+    { name: "prisma", type: "PrismaSagaStore", desc: "Persists saga runtime state through a Prisma client into Postgres, across three saga_runtime_* tables. Choose this when you already run Postgres (the Aspire stack does) and want saga state in your relational store. Requires a Prisma client at construction." }
+  ]
+}) }}
+
+You select the backend explicitly — it is **mandatory**, and the runtime throws at startup if
+neither source provides it. Two equivalent switches:
+
+- **Environment:** `NETSCRIPT_SAGA_STORE=kv` or `NETSCRIPT_SAGA_STORE=prisma`.
+- **App settings:** `sagas.store.backend: "kv" | "prisma"` (case-insensitive key paths such as
+  `Sagas.Store.Backend` are also recognized).
+
+The composition root is `createDurableSagaRuntime(...)`, exported from the
+`@netscript/plugin-sagas/runtime` subpath. When you ask for the Prisma backend you must hand it a
+client; the KV backend needs nothing:
+
+```ts
+// composition root — pick the backend once, at startup
+import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';
+
+const { runtime, store, dispose } = await createDurableSagaRuntime({
+  backend: 'prisma',     // or 'kv'
+  prisma: prismaClient,  // required when backend === 'prisma'; throws if omitted
+});
+// `runtime` registers SagaDefinitions and applies messages;
+// `store` is the KvSagaStore or PrismaSagaStore instance; `dispose` releases it.
+```
+
+{{ comp callout { type: "important", title: "Store backend is not the durability tier" } }}
+These are two different axes and it is worth keeping them apart in your head. The
+<strong>durability tier</strong> — <code>.durability('t1')</code> on the builder — is a property
+of the saga <em>definition</em> describing how aggressively the runtime should persist it. The
+<strong>store backend</strong> — <code>kv</code> or <code>prisma</code> — is the physical place
+those persisted writes land, chosen once at the composition root for the whole runtime. The same
+<code>t1</code> saga runs unchanged whether its state is written to Deno KV or to Postgres; you do
+not re-author the saga to switch stores.
+{{ /comp }}
+
+### How the Prisma store maps the runtime
+
+The `PrismaSagaStore` is a thin delegate over a Prisma client. The durable *write path* spans
+three `saga_runtime_*` tables, each capturing one facet of the persisted machine:
+
+{{ comp.apiTable({
+  caption: "Prisma durable write-path models",
+  rows: [
+    { name: "SagaRuntimeState", type: "saga_runtime_state", desc: "The current persisted state object for an instance — the durable 'position' the runtime rehydrates before the next message." },
+    { name: "SagaRuntimeTransition", type: "saga_runtime_transition", desc: "The applied transitions, so the durable workflow's history is recorded, not just its latest snapshot." },
+    { name: "SagaRuntimeCorrelation", type: "saga_runtime_correlation", desc: "The correlation index that maps a saga name plus correlation id back to its instance — how the runtime finds the right state to load." }
+  ]
+}) }}
+
+This is deliberately distinct from the read-model `SagaInstance` table that backs the listing API.
+The `saga_runtime_*` tables are the **durability mechanism**; `SagaInstance` is a projection used to
+*display* instances. Choosing the `prisma` backend opts the durable write path into Postgres; the
+`kv` backend keeps the same logical structure in Deno KV instead.
 
 ## Compensation is modeled as effects, not a `.step()/.compensate()` chain
 
@@ -150,8 +223,8 @@ like `['saga', 'registry', id]`, and the API service lists definitions and live 
 
 The thing to internalize: a saga's identity (`id`, registered via the builder) plus a
 correlation id is what lets the durable state survive being put down and picked back up. The
-runtime does not keep your workflow in memory; it looks the instance up by correlation, applies
-the message, and writes the new state back.
+runtime does not keep your workflow in memory; it looks the instance up by correlation, loads its
+state from the configured store, applies the message, and writes the new state back.
 
 ## The worked example: three capabilities, one durable workflow
 
@@ -170,15 +243,19 @@ rung. Follow one user-onboarding flow through three plugins:
        │                           │                      returns
        ▼                           ▼                      [ sagaComplete({...}) ]
   worker job enqueued        saga message published      workflow terminal
+                                                          (state persisted to
+                                                           kv | prisma store)
 ```
 
 Step by step, in the real code:
 
 1. **A trigger turns an inbound webhook into a job.** The triggers plugin exposes raw Hono
-   routes (not oRPC). `defineWebhook(...)` returns an array of `enqueueJob(jobRef, { payload,
+   routes (not oRPC). The webhook handler returns an array of `enqueueJob(jobRef, { payload,
    priority })` effects, so a `POST` to
    [`:8093/api/v1/webhooks/inbound/generic`](/capabilities/triggers/) enqueues a worker job.
-   The webhook is the *ingress* of the durable flow.
+   The webhook is the *ingress* of the durable flow. (`enqueueJob` is the one live trigger action;
+   the `defer` action is defined but unsupported — it throws and routes to the DLQ, so do not build
+   on deferred replay.)
 2. **A worker job publishes the saga message.** The workers plugin's
    `create-user-settings` sample is an ordinary `defineJobHandler(async (ctx) => ...)` that, on
    success, **publishes the `UserSettingsCreated` message** via a saga publisher. The job is the
@@ -186,7 +263,8 @@ Step by step, in the real code:
 3. **A saga consumes the message and emits `sagaComplete`.** The
    [sagas plugin](/capabilities/durable-sagas/) registers `userOnboardingSaga`, whose
    `.on('UserSettingsCreated', ...)` handler mutates `saga.state` and returns
-   `[ sagaComplete({...}) ]`. That terminal effect is the durable workflow finishing.
+   `[ sagaComplete({...}) ]`. That terminal effect is the durable workflow finishing — and the new
+   state is written to whichever store (`kv` or `prisma`) the runtime was configured with.
 
 ```ts
 // workers/jobs/create-user-settings.ts — the publish step, verbatim core
@@ -220,9 +298,14 @@ is what keeps each piece small and durable.
 The message-and-state shape is a deliberate set of trade-offs:
 
 - **Persisted state over in-memory closures.** Putting the workflow's position on
-  `saga.state` and persisting it under a `durability` tier is what survives restarts. The cost
+  `saga.state` and persisting it to a durable store is what survives restarts. The cost
   is that you think in transitions, not in straight-line code; the benefit is correctness across
   process lifetimes.
+- **A pluggable store over a hard-wired backend.** Pulling the persistence behind a single
+  `KvSagaStore` / `PrismaSagaStore` seam — selected by one explicit setting — lets the same saga
+  run on Deno KV in development and on Postgres in production without touching the workflow. The
+  cost is the one mandatory choice at startup; the benefit is that durability is a deployment
+  decision, not a code rewrite.
 - **Effects over imperative side-effects.** Returning `sagaComplete({...})` (and other effects)
   instead of calling out directly keeps handlers pure and replayable. The runtime decides
   *when* and *how* effects apply, which is what makes retries and compensation tractable.
@@ -230,10 +313,6 @@ The message-and-state shape is a deliberate set of trade-offs:
   wired by messages. Each can be added, tested, and scaled independently, and the
   [plugin model](/explanation/plugin-model/) is what lets a host assemble them without editing
   host code.
-- **Honest stubs over fake guarantees.** Worker trace/progress tools and stream
-  producer/consumer bodies are no-ops in the scaffold. The durable saga state and the
-  `sagaComplete` effect are the parts that are genuinely live today, and the docs say so rather
-  than promising spans the sample cannot draw.
 
 ## How this connects to the rest of NetScript
 
@@ -242,19 +321,23 @@ met or will meet:
 
 - It is delivered as **plugins** — workers, sagas, triggers — through the
   [plugin model](/explanation/plugin-model/)'s contribution/registry mechanism.
-- Its messages and effects are intended to be **observable**: see
-  [observability](/explanation/observability/) for which signals are live (and which job tools
-  are stubs) when you watch a workflow run.
-- Its API surfaces (`:8091`, `:8092`, `:8093`) and the Postgres/Garnet backing store are brought
-  up by [Aspire](/explanation/aspire/) — remember that `cd aspire && aspire run` is what makes
-  the durable infrastructure available before any database command.
+- Its messages and effects are **observable**: job dispatch and execution emit real OpenTelemetry
+  spans that show up in Aspire automatically. See [observability](/explanation/observability/) for
+  the full picture — including the one honest gap (the scaffold `createJobTools(ctx)` handler
+  helpers are no-op stubs, a tracked limitation; call `@netscript/telemetry` helpers directly for
+  custom spans).
+- Its API surfaces (`:8091`, `:8092`, `:8093`) and the Postgres/Garnet backing store — including
+  the Postgres tables behind the `prisma` saga store — are brought up by
+  [Aspire](/explanation/aspire/). Remember the ordering: `cd aspire && aspire run` is what makes
+  the durable infrastructure available **before** any `netscript db` command.
 
 ## Where to go next
 
 - **Do it:** [Build a durable workflow](/tutorials/durable-workflow/) — the hands-on tutorial
   that adds the saga and consumes `UserSettingsCreated` end to end.
 - **See the capability:** [Durable sagas](/capabilities/durable-sagas/) — the headline
-  `defineSaga` API, the `:8092` endpoints, and the Learn / Do / Reference triplet.
+  `defineSaga` API, the `:8092` endpoints, the `kv | prisma` store switch, and the
+  Learn / Do / Reference triplet.
 - **Look it up:** [`reference/sagas/`](/reference/sagas/) for the full generated API surface of
   `@netscript/plugin-sagas`.
 

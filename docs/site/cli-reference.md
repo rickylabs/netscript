@@ -23,11 +23,11 @@ just type <code>netscript</code>.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Database commands need Aspire running first" } }}
-The <code>netscript db ...</code> commands provision and talk to Postgres <strong>through Aspire</strong>. You must
-start the orchestration layer first — <code>cd aspire &amp;&amp; aspire run</code> brings up Postgres and Garnet
-via Docker — <strong>before</strong> any <code>db init</code>, <code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a
-<code>db</code> command with Aspire down and it fails to find the database. See the
-<a href="/how-to/database-migration/">database &amp; migration how-to</a>.
+The <code>netscript db ...</code> commands provision and talk to Postgres <strong>through Aspire</strong>. Aspire is
+step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire run</code> brings up Postgres and Garnet via Docker and
+opens the dashboard at <a href="http://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
+<code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a <code>db</code> command with Aspire down and it fails to
+find the database. See the <a href="/how-to/database-migration/">database &amp; migration how-to</a>.
 {{ /comp }}
 
 ## Install
@@ -61,7 +61,8 @@ Install the spec exactly as shown — <code>jsr:@netscript/cli/bin/netscript.ts<
 ## The everyday flow
 
 Most sessions follow the same shape: scaffold a workspace, bring up Aspire, run the
-database workflow, then iterate. The commands below are grouped to mirror that order.
+database workflow, then iterate. The commands below are grouped to mirror that order —
+and the order matters: **Aspire (step 2) must be up before any `db` command (step 3).**
 
 {{ comp.featureGrid({ items: [
   {
@@ -109,15 +110,16 @@ nothing — a safe way to inspect the scaffold plan first.
 
 ## Plugins
 
-Plugins add capabilities — background workers, durable sagas, webhook triggers, and
-streams. Each one lands as a canonical install under `plugins/<name>/` and registers its
-contributions; the host application never changes. After adding plugins, regenerate the
-registry so the project picks them up.
+Plugins add capabilities — background workers, durable sagas, webhook triggers, durable
+streams, and authentication. Each one lands as a canonical install under `plugins/<name>/`
+and registers its contributions; the host application never changes. After adding plugins,
+regenerate the registry so the project picks them up.
 
 {{ comp.apiTable({
   caption: "Add and manage plugins",
   rows: [
-    { name: "netscript plugin add", type: "netscript plugin add worker --samples", desc: "Add a plugin and register it in the workspace. Kinds: <code>worker</code> → <code>workers</code> (:8091), <code>saga</code> → <code>sagas</code> (:8092), <code>trigger</code> → <code>triggers</code> (:8093), <code>stream</code> → <code>streams</code>. <code>--samples</code> includes runnable example modules." },
+    { name: "netscript plugin add", type: "netscript plugin add worker --samples", desc: "Add a plugin and register it in the workspace. Kinds: <code>worker</code> → <code>workers</code> (:8091), <code>saga</code> → <code>sagas</code> (:8092), <code>trigger</code> → <code>triggers</code> (:8093), <code>auth</code> → <code>auth</code> (:8094), <code>stream</code> → <code>streams</code> (:4437). <code>--samples</code> includes runnable example modules." },
+    { name: "netscript plugin add auth", type: "netscript plugin add auth", desc: "Add the first-class <code>auth</code> plugin — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> (migrated like any other plugin schema) and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/how-to/add-authentication/\">add authentication</a>." },
     { name: "plugin add (options)", type: "netscript plugin add saga --name sagas --port 8092 --service-refs users", desc: "Tune the install: <code>--name</code>, <code>--port</code>, <code>--service-refs</code>, <code>--plugin-refs</code>, <code>--db &lt;engine&gt;</code> / <code>--no-db</code>, <code>--samples</code> / <code>--no-samples</code>, <code>--force</code>." },
     { name: "netscript plugin list", type: "netscript plugin list", desc: "List the plugins registered in the current workspace." },
     { name: "netscript plugin doctor", type: "netscript plugin doctor", desc: "Check the health of installed NetScript plugins — a fast wiring sanity check." },
@@ -127,20 +129,49 @@ registry so the project picks them up.
 }) }}
 
 {{ comp callout { type: "note", title: "Plugins live under plugins/<name>/" } }}
-A <code>plugin add</code> installs into <code>plugins/workers</code>, <code>plugins/sagas</code>, <code>plugins/triggers</code>, or
-<code>plugins/streams</code> — the canonical, config-referenced location. <code>netscript.config.ts</code> points only
-at <code>./plugins/&lt;name&gt;/mod.ts</code>. See the <a href="/how-to/add-a-plugin/">add-a-plugin how-to</a>.
+A <code>plugin add</code> installs into <code>plugins/workers</code>, <code>plugins/sagas</code>, <code>plugins/triggers</code>,
+<code>plugins/auth</code>, or <code>plugins/streams</code> — the canonical, config-referenced location.
+<code>netscript.config.ts</code> points only at <code>./plugins/&lt;name&gt;/mod.ts</code>. See the
+<a href="/how-to/add-a-plugin/">add-a-plugin how-to</a>.
+{{ /comp }}
+
+### Authentication plugin
+
+The `auth` plugin is a first-class official plugin scaffolded exactly like the others —
+`netscript plugin add auth` installs `plugins/auth/`, registers the `auth-api` service on
+port 8094, and contributes `plugins/auth/database/auth.prisma`, which is migrated by the
+standard `netscript db` workflow alongside every other plugin schema. It composes **one
+active backend** at a time, chosen at runtime by the `NETSCRIPT_AUTH_BACKEND` env var.
+
+{{ comp.apiTable({
+  caption: "Auth backend selection (NETSCRIPT_AUTH_BACKEND)",
+  rows: [
+    { name: "kv-oauth (default)", type: "NETSCRIPT_AUTH_BACKEND=kv-oauth", desc: "The default and the only interactive backend — full OAuth/OIDC redirect flow with KV-backed sessions. Needs provider env (<code>NETSCRIPT_AUTH_CLIENT_ID</code>, <code>NETSCRIPT_AUTH_CLIENT_SECRET</code>, <code>NETSCRIPT_AUTH_ISSUER</code>, <code>NETSCRIPT_AUTH_REDIRECT_URI</code>, …)." },
+    { name: "workos", type: "NETSCRIPT_AUTH_BACKEND=workos", desc: "Non-interactive AuthKit backend — set <code>WORKOS_API_KEY</code>, <code>WORKOS_CLIENT_ID</code>, <code>WORKOS_COOKIE_PASSWORD</code>. The <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error (no interactive flow)." },
+    { name: "better-auth", type: "NETSCRIPT_AUTH_BACKEND=better-auth", desc: "Non-interactive Prisma-backed backend — set <code>BETTER_AUTH_SECRET</code> and <code>DB_PROVIDER</code>. Like WorkOS, the interactive endpoints are unsupported." }
+  ]
+}) }}
+
+{{ comp callout { type: "note", title: "Auth migrates like any other plugin schema" } }}
+After <code>netscript plugin add auth</code>, run the normal database workflow with Aspire up:
+<code>netscript db generate</code> then <code>netscript db migrate</code> picks up <code>plugins/auth/database/auth.prisma</code>
+(the better-auth-shaped <code>auth_users</code>, <code>auth_sessions</code>, <code>auth_accounts</code>, <code>auth_verifications</code>
+tables) exactly like the other plugins. Only the <code>better-auth</code> backend reads these tables —
+<code>kv-oauth</code> stores sessions in KV and <code>workos</code> is stateless. Full env table and happy-path setup
+are in <a href="/how-to/add-authentication/">add authentication</a>; the architecture is in
+<a href="/explanation/auth-model/">the auth model</a>.
 {{ /comp }}
 
 ## Services & contracts
 
 A NetScript workspace is contract-first: you define an oRPC contract, then a service
-implements it. The example `users` service runs on port 3001.
+implements it. The example `users` service runs on port 3001 and serves its RPC surface
+at `/api/rpc/*`.
 
 {{ comp.apiTable({
   caption: "Services and contracts",
   rows: [
-    { name: "netscript service add", type: "netscript service add orders --service-port 3002", desc: "Add a new service workspace member and wire its contract. The example <code>users</code> service serves <code>/api/v1/users/*</code> on port 3001." },
+    { name: "netscript service add", type: "netscript service add orders --service-port 3002", desc: "Add a new service workspace member and wire its contract. The example <code>users</code> service serves <code>/api/v1/users/*</code> (and oRPC at <code>/api/rpc/*</code>) on port 3001." },
     { name: "netscript service list", type: "netscript service list", desc: "List the services configured in the workspace." },
     { name: "netscript service generate", type: "netscript service generate", desc: "Regenerate the Aspire helper files from your service configuration." },
     { name: "netscript contract add", type: "netscript contract add orders", desc: "Add a versioned oRPC contract (<code>oc.route().input(zod).output(zod)</code> + <code>implement()</code>) to the <code>contracts/</code> workspace." },
@@ -152,15 +183,16 @@ implements it. The example `users` service runs on port 3001.
 
 The database workflow uses Prisma with a Deno runtime. **All of these require Aspire to
 be running** — Aspire provisions Postgres, so start it first with `cd aspire && aspire
-run`. The full task walkthrough is in the
+run`. Plugin schemas (`workers`, `sagas`, `triggers`, **`auth`**) are picked up by the
+same `generate` / `migrate` pass. The full task walkthrough is in the
 [database & migration how-to](/how-to/database-migration/).
 
 {{ comp.apiTable({
   caption: "Database workflow (Aspire must be running)",
   rows: [
     { name: "netscript db init", type: "netscript db init --name init", desc: "Initialize database tooling and create the named migration. Requires Aspire up — it provisions Postgres through the AppHost." },
-    { name: "netscript db generate", type: "netscript db generate", desc: "Run database code generation — the Deno-runtime Prisma client (and zod) into <code>database/postgres/schema/.generated</code>." },
-    { name: "netscript db migrate", type: "netscript db migrate", desc: "Apply migrations against the provisioned database." },
+    { name: "netscript db generate", type: "netscript db generate", desc: "Run database code generation — the Deno-runtime Prisma client (and zod) into <code>database/postgres/schema/.generated</code>. Includes plugin schemas such as <code>auth.prisma</code>." },
+    { name: "netscript db migrate", type: "netscript db migrate", desc: "Apply migrations against the provisioned database — including each plugin's contributed schema (e.g. the <code>auth_*</code> tables from <code>auth.prisma</code>)." },
     { name: "netscript db seed", type: "netscript db seed", desc: "Run the workspace seed scripts to populate initial data." },
     { name: "netscript db status", type: "netscript db status", desc: "Show database migration / tooling status." },
     { name: "netscript db studio", type: "netscript db studio", desc: "Open the database studio tool for browsing data." },
@@ -258,6 +290,12 @@ flag — generated directly from the published package — see the reference:
     body: "The full db workflow, with the Aspire-up dependency spelled out step by step.",
     href: "/how-to/database-migration/",
     icon: "▤"
+  },
+  {
+    title: "Add authentication",
+    body: "Add the auth plugin, pick a backend via NETSCRIPT_AUTH_BACKEND, migrate auth.prisma, and wire the kv-oauth happy path.",
+    href: "/how-to/add-authentication/",
+    icon: "🔑"
   }
 ] }) }}
 

@@ -15,9 +15,9 @@ listener.
 
 You will install the `sagas` plugin and build a **durable workflow** — a long-lived, message-driven
 state machine that survives restarts. The saga subscribes to the exact message the worker publishes,
-advances its own state, and emits a `sagaComplete` effect. By the end the two plugins are wired
-end-to-end: a job runs, a message flows, a saga reacts, and you can see the completed instance over
-HTTP on port `:8092`.
+advances its own per-instance state, and emits a `sagaComplete` effect. By the end the two plugins
+are wired end-to-end: a job runs, a message flows, a saga reacts, and you can see the completed
+instance over HTTP on port `:8092`.
 
 This is the heart of the continuous app the ladder is building — the **fil d'Ariane** connecting
 worker output to saga input.
@@ -37,6 +37,8 @@ worker output to saga input.
 - Author a saga with the fluent builder: `defineSaga(id).durability().state().on().build()`.
 - Subscribe it to the `UserSettingsCreated` message the worker job publishes.
 - Emit a `sagaComplete` effect when the workflow finishes.
+- Choose where durable instance state lives — the `kv` or `prisma` store backend, selected with
+  `NETSCRIPT_SAGA_STORE`.
 - List your saga and inspect completed instances on the **Sagas API at `:8092`**.
 
 ## Prerequisites — check your state
@@ -46,11 +48,12 @@ This rung continues the same app. Before you start, confirm:
 - You finished [Tutorial 3](/tutorials/background-jobs/) and have a `plugins/workers/` directory
   containing the `create-user-settings` job that publishes `UserSettingsCreated`.
 - `aspire run` is still up in its own terminal (the dashboard answers at
-  `http://localhost:18888`). The saga registry and instance store both live in Deno KV, which the
-  Aspire-managed services depend on.
+  `http://localhost:18888`). The saga registry and instance store both depend on Aspire-managed
+  resources — Deno KV for the registry, and either Deno KV or Postgres (via Prisma) for durable
+  instance state, depending on the store backend you select below.
 
 {{ comp callout { type: "important", title: "Aspire must already be running" } }}
-The Sagas API service and its KV-backed registry come up as part of the orchestrated app. If you closed your <code>aspire run</code> terminal, restart it from the <code>aspire/</code> folder (<code>cd aspire &amp;&amp; aspire run</code>) <strong>before</strong> running any <code>netscript</code> command in this tutorial. Database and KV resources only exist while Aspire is up.
+The Sagas API service and its KV-backed registry come up as part of the orchestrated app. If you closed your <code>aspire run</code> terminal, restart it from the <code>aspire/</code> folder (<code>cd aspire &amp;&amp; aspire run</code>) <strong>before</strong> running any <code>netscript</code> command in this tutorial. Database and KV resources only exist while Aspire is up — and if you choose the <code>prisma</code> store backend, the Postgres instance Aspire provisions is what the durable saga tables live in.
 {{ /comp }}
 
 ## Step 1 — Add the sagas plugin
@@ -76,7 +79,7 @@ You should see `sagas` alongside the `workers` plugin from the previous rung. (A
 pulls in its `streams` dependency, which is how cross-plugin messages travel.)
 
 {{ comp callout { type: "note", title: "What landed on disk" } }}
-The <code>plugins/sagas/</code> tree includes <code>mod.ts</code> (the plugin manifest), <code>contracts/v1/</code>, <code>database/sagas.prisma</code>, an oRPC API service under <code>services/src/</code>, and the saga runtime under <code>src/runtime/</code> (<code>saga-runner.ts</code>, <code>saga-supervisor.ts</code>, <code>saga-publisher.ts</code>). The sample saga is emitted by the scaffolder template — it is the module you will edit next.
+The <code>plugins/sagas/</code> tree includes <code>mod.ts</code> (the plugin manifest), <code>contracts/v1/</code>, <code>database/sagas.prisma</code>, an oRPC API service under <code>services/src/</code>, and the saga runtime under <code>src/runtime/</code> (<code>saga-runner.ts</code>, <code>saga-supervisor.ts</code>, <code>saga-publisher.ts</code>, plus the durable store under <code>create-durable-saga-runtime.ts</code> and <code>prisma-saga-store.ts</code>). The sample saga is emitted by the scaffolder template — it is the module you will edit next.
 {{ /comp }}
 
 ## Step 2 — Read the saga builder
@@ -86,16 +89,17 @@ NetScript sagas are authored with a **fluent builder** imported from
 produces the definition the runtime consumes. The shape is:
 
 {{ comp.tabbedCode({ tabs: [
-  { label: "The builder chain", lang: "ts", code: "import { defineSaga, sagaComplete } from '@netscript/plugin-sagas-core';\n\nexport const exampleSaga = defineSaga('user-onboarding')\n  .durability('t1')           // persistence tier — survive restarts\n  .state({ status: 'pending' }) // initial state for each instance\n  .on('UserSettingsCreated', (saga, message, context) => {\n    // advance state + return effects\n    return [];\n  })\n  .build();" }
+  { label: "The builder chain", lang: "ts", code: "import { defineSaga, sagaComplete } from '@netscript/plugin-sagas-core';\n\nexport const exampleSaga = defineSaga('user-onboarding')\n  .durability('t1')           // durability TIER — checkpoint so the workflow survives restarts\n  .state({ status: 'pending' }) // initial state for each instance\n  .on('UserSettingsCreated', (saga, message, context) => {\n    // advance state + return effects\n    return [];\n  })\n  .build();" }
 ] }) }}
 
 Each link in the chain has a job:
 
 - **`defineSaga(id)`** — starts the builder with a stable saga id (used in the registry and instance
   keys).
-- **`.durability('t1')`** — selects the durability tier. `'t1'` is the persisted tier: instance
+- **`.durability('t1')`** — selects the durability **tier**. `'t1'` is the persisted tier: instance
   state is checkpointed so an in-flight workflow survives a process restart. This is what makes the
-  workflow _durable_ rather than a fire-and-forget callback.
+  workflow _durable_ rather than a fire-and-forget callback. (The tier is _what gets persisted_;
+  _where_ it persists is the store backend you pick in Step 4 — keep the two ideas distinct.)
 - **`.state<S>({...})`** — declares the per-instance state shape and its initial value. Every
   correlated workflow instance gets its own copy of this state.
 - **`.on<Type, Payload>(type, handler)`** — subscribes to a message type. The handler receives
@@ -123,7 +127,7 @@ So the saga must listen for the `UserSettingsCreated` type and read `payload.use
 sample body with this onboarding saga:
 
 {{ comp.tabbedCode({ tabs: [
-  { label: "plugins/sagas/.../user-onboarding.ts", lang: "ts", code: "import { defineSaga, sagaComplete } from '@netscript/plugin-sagas-core';\n\n// The state each onboarding instance carries.\ntype OnboardingState = Readonly<{\n  status: 'pending' | 'completed';\n  userId?: string;\n  processedAt?: string;\n}>;\n\n// The message published by the workers `create-user-settings` job.\ntype UserSettingsCreated = Readonly<{ userId: string }>;\n\nexport const userOnboardingSaga = defineSaga('user-onboarding')\n  .durability('t1')\n  .state<OnboardingState>({ status: 'pending' })\n  .on<'UserSettingsCreated', UserSettingsCreated>(\n    'UserSettingsCreated',\n    (saga, message, context) => {\n      const processedAt = context.now.toISOString();\n      saga.state = {\n        ...saga.state,\n        status: 'completed',\n        userId: message.payload.userId,\n        processedAt,\n      };\n      return [\n        sagaComplete({\n          messageType: message.type,\n          userId: message.payload.userId,\n          processedAt,\n        }),\n      ];\n    },\n  )\n  .build();\n\nexport default userOnboardingSaga;" }
+  { label: "plugins/sagas/.../user-onboarding.ts", lang: "ts", code: "import { defineSaga, sagaComplete } from '@netscript/plugin-sagas-core';\n\n// The state each onboarding instance carries.\ntype OnboardingState = Readonly<{\n  status: 'pending' | 'completed';\n  userId?: string;\n  processedAt?: string;\n}>;\n\n// The message published by the workers `create-user-settings` job.\ntype UserSettingsCreated = Readonly<{ userId: string }>;\n\nexport const userOnboardingSaga = defineSaga('user-onboarding')\n  .durability('t1')\n  .state<OnboardingState>({ status: 'pending' })\n  .on<'UserSettingsCreated', UserSettingsCreated>(\n    'UserSettingsCreated',\n    (saga, message, context) => {\n      // Idempotency guard — a redelivered message must not double-complete.\n      if (saga.state.status === 'completed') return [];\n\n      const processedAt = context.now.toISOString();\n      saga.state = {\n        ...saga.state,\n        status: 'completed',\n        userId: message.payload.userId,\n        processedAt,\n      };\n      return [\n        sagaComplete({\n          messageType: message.type,\n          userId: message.payload.userId,\n          processedAt,\n        }),\n      ];\n    },\n  )\n  .build();\n\nexport default userOnboardingSaga;" }
 ] }) }}
 
 What this does, line by line:
@@ -132,8 +136,12 @@ What this does, line by line:
 - `.on('UserSettingsCreated', …)` registers the handler for exactly the message type the worker
   publishes. The two plugins agree on the string `'UserSettingsCreated'`; that agreement _is_ the
   contract between them.
+- The handler first checks `saga.state.status` and returns early if the workflow already completed —
+  so a redelivered message is a no-op rather than a second completion (durability persists state, it
+  does not dedupe inbound messages for you).
 - Inside the handler, the saga reads `message.payload.userId`, stamps `context.now`, and assigns a
-  new `saga.state`. Because the saga is `durability('t1')`, this state is checkpointed.
+  new `saga.state`. Because the saga is `durability('t1')`, this state is checkpointed to whichever
+  store backend you selected.
 - The handler returns one effect, `sagaComplete({...})`, which signals the runtime that this
   workflow instance is finished. The completion metadata you pass is recorded on the instance.
 
@@ -141,7 +149,41 @@ What this does, line by line:
 There is no shared function call between the worker and the saga — they are isolated background processors in different threads. The worker <code>publish(... 'UserSettingsCreated' ...)</code> and the saga <code>.on('UserSettingsCreated', ...)</code> are joined only by the message type traveling through the streams transport. Keep the string identical on both sides.
 {{ /comp }}
 
-## Step 4 — Register the saga
+## Step 4 — Choose the durable store backend
+
+`.durability('t1')` says state should survive restarts. **Where** that state is written is a
+separate, mandatory decision: the durable saga runtime persists instance state to one of **two store
+backends** — `kv` (Deno KV) or `prisma` (Postgres via Prisma). You select it with the
+`NETSCRIPT_SAGA_STORE` environment variable, or with the `sagas.store.backend` key in
+`appsettings`. There is no implicit default; the runtime throws on startup if neither is set, so the
+backend is always an explicit choice.
+
+| Backend | Selected with | State store | When to use it |
+| --- | --- | --- | --- |
+| `kv` | `NETSCRIPT_SAGA_STORE=kv` | Deno KV (the same store as the registry) | Local dev, low-ceremony workflows, the default starting point |
+| `prisma` | `NETSCRIPT_SAGA_STORE=prisma` | Postgres, via the `saga_runtime_*` tables in `database/sagas.prisma` | Production durability with SQL-queryable, transactional instance state |
+
+For this tutorial the `kv` backend is the simplest path — it reuses the KV store Aspire already
+brings up, so there is nothing extra to provision:
+
+```sh
+export NETSCRIPT_SAGA_STORE=kv
+```
+
+If you later want SQL-backed durability, switch to `prisma`. The plugin exposes
+`createDurableSagaRuntime({ backend, prisma })` from `@netscript/plugin-sagas/runtime` — with
+`backend: 'prisma'` you pass a Prisma client and the runtime writes to the
+`SagaRuntimeState` / `SagaRuntimeTransition` / `SagaRuntimeCorrelation` tables:
+
+{{ comp.tabbedCode({ tabs: [
+  { label: "Prisma-backed durable runtime (optional)", lang: "ts", code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\n\n// backend resolves from NETSCRIPT_SAGA_STORE / appsettings sagas.store.backend.\nconst { runtime, store, dispose } = await createDurableSagaRuntime({\n  backend: 'prisma',     // or 'kv'\n  prisma: prismaClient,  // required when backend === 'prisma'\n});" }
+] }) }}
+
+{{ comp callout { type: "note", title: "Tier vs. store backend — two distinct dials" } }}
+Don't conflate them. <code>.durability('t1')</code> is the saga-definition <strong>tier</strong> — it decides <em>whether</em> instance state is checkpointed at all. <code>NETSCRIPT_SAGA_STORE</code> (<code>kv</code> | <code>prisma</code>) is the runtime <strong>store backend</strong> — it decides <em>where</em> the checkpointed state is written. A <code>t1</code> saga persists to whichever backend you chose; both must agree for durable state to actually land. See <a href="/explanation/durable-workflows/">Durable workflows</a> for the full model.
+{{ /comp }}
+
+## Step 5 — Register the saga
 
 The Sagas API service lists sagas from a **KV-backed registry** (`['saga','registry', <id>]`). The
 scaffold's saga runtime registers your built definition on startup, recording metadata of the form
@@ -158,10 +200,10 @@ deno task check
 A clean check means `defineSaga`, `.durability()`, `.state()`, `.on()`, and `.build()` all line up
 with the message and state types you declared.
 
-## Step 5 — Verify the workflow end-to-end
+## Step 6 — Verify the workflow end-to-end
 
-With Aspire up, exercise the full thread: trigger the worker job, let it publish, and watch the saga
-complete.
+With Aspire up and `NETSCRIPT_SAGA_STORE` set, exercise the full thread: trigger the worker job, let
+it publish, and watch the saga complete.
 
 First confirm the saga registered. Against the **Sagas API on `:8092`**:
 
@@ -183,7 +225,8 @@ curl -X POST http://localhost:8091/api/v1/workers/jobs/create-user-settings/trig
 
 The job parses the payload, publishes `{ type: 'UserSettingsCreated', payload: { userId: "u_1001" } }`,
 and returns a success result. The saga runner receives that message, runs your `.on()` handler,
-advances state to `completed`, and emits `sagaComplete`. Inspect the resulting instances:
+advances state to `completed`, checkpoints it to your chosen store backend, and emits
+`sagaComplete`. Inspect the resulting instances:
 
 ```sh
 curl http://localhost:8092/api/v1/sagas/instances
@@ -198,7 +241,7 @@ curl http://localhost:8092/health/live
 ```
 
 {{ comp callout { type: "warning", title: "Production pitfall — durability is not free correctness" } }}
-<code>durability('t1')</code> persists instance state so a workflow survives a restart, but it does <strong>not</strong> dedupe inbound messages for you. If the worker re-publishes <code>UserSettingsCreated</code> for the same <code>userId</code>, your handler runs again. Make handlers idempotent — check <code>saga.state.status</code> before re-applying side effects — so a redelivered message can't double-complete a workflow.
+<code>durability('t1')</code> persists instance state so a workflow survives a restart, but it does <strong>not</strong> dedupe inbound messages for you. If the worker re-publishes <code>UserSettingsCreated</code> for the same <code>userId</code>, your handler runs again — which is exactly why the handler above returns early when <code>saga.state.status === 'completed'</code>. Make handlers idempotent so a redelivered message can't double-complete a workflow, regardless of whether you store state in <code>kv</code> or <code>prisma</code>.
 {{ /comp }}
 
 ## What you built
@@ -209,6 +252,8 @@ The two halves of a durable choreography, joined by a single message:
 - A `user-onboarding` saga built with the fluent
   `defineSaga().durability().state().on().build()` chain, subscribed to the `UserSettingsCreated`
   message the worker publishes.
+- An explicit durable store backend (`NETSCRIPT_SAGA_STORE=kv` here; `prisma` for SQL-backed state),
+  so checkpointed instance state lands somewhere you chose on purpose.
 - A `sagaComplete` effect that records the finished workflow, observable as a completed instance on
   the Sagas API at `:8092`.
 
@@ -220,6 +265,7 @@ The worker produces; the saga consumes; the instance store remembers. That is a 
   `triggers` plugin and turn an inbound `POST` into a background job, closing the loop back to
   workers.
 - **Understand the model** → [Durable workflows](/explanation/durable-workflows/) — durability
-  tiers, correlation, instances, and why compensation is modeled as effects.
+  tiers, the `kv` vs `prisma` store backends, correlation, instances, and why compensation is
+  modeled as effects.
 - **Full generated API** → the [sagas reference](/reference/sagas/) — every route, type, and symbol
-  the `sagas` plugin exposes.
+  the `sagas` plugin exposes, including the `createDurableSagaRuntime` runtime entry point.

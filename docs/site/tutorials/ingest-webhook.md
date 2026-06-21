@@ -33,6 +33,7 @@ you can point any sender at. The full generated API lives at [`/reference/trigge
 
 - Add the **triggers** plugin to your workspace under `plugins/triggers/`.
 - Author a webhook with `defineWebhook(...)` that enqueues a worker job on each inbound request.
+- Learn which **trigger actions** are supported today (`enqueueJob` is live; `defer` is not).
 - Start the triggers API on `:8093` and `POST` a real payload to it.
 - Watch the webhook hand off to the worker job from Tutorial 3, completing the continuous app.
 
@@ -104,7 +105,31 @@ Three things to read off this:
 A webhook handler does not write an HTTP response itself — it returns the <em>effects</em> to run. Returning <code>[]</code> (as the sibling <code>webhook-validate-data.ts</code> sample does) accepts the request but enqueues nothing. Returning one or more <code>enqueueJob(...)</code> entries hands that many jobs to the workers runtime. This keeps inbound HTTP thin and pushes the real work onto the durable background queue.
 {{ /comp }}
 
-## Step 3 — Understand the route (Hono, not oRPC)
+## Step 3 — Know which trigger actions are supported
+
+A handler returns an array of **trigger actions** (effects). It is worth being precise about which
+ones the runtime actually dispatches today, so you do not author against a stub:
+
+{{ comp apiTable {
+  caption: "Trigger actions",
+  columns: ["Action", "Status", "What it does"],
+  rows: [
+    ["enqueueJob(jobRef, opts)", "Live", "Places a worker job on the queue. This is the supported way to turn an inbound event into durable background work."],
+    ["defer({ until })", "Defined, not yet supported", "The action type exists in the builder surface, but the runtime processor throws on dispatch and routes the event to the dead-letter queue. There is no deferred replay yet — do not rely on it."]
+  ]
+} /}}
+
+In other words: build with `enqueueJob(...)`. If you return a `defer(...)` action, the trigger
+runtime processor raises an unsupported-operation error and the event lands in the DLQ rather than
+being scheduled for later — so reach for the [scheduling features of the triggers
+capability](/capabilities/triggers/) (cron and file-watch triggers) when you need time-based work,
+not `defer`.
+
+{{ comp callout { type: "note", title: "Why this distinction matters" } }}
+NetScript fails loud rather than silently dropping work. A <code>defer(...)</code> action is not quietly ignored — the processor <strong>throws</strong> and the event is DLQ'd, so you will see it rather than wonder why nothing ran. When the deferred-replay path lands, this note will change; until then, treat <code>enqueueJob</code> as the one live action.
+{{ /comp }}
+
+## Step 4 — Understand the route (Hono, not oRPC)
 
 The triggers API service is built on **raw Hono**, which is why its routes look different from the
 oRPC services and the workers/sagas APIs. Inside `plugins/triggers/services/src/router.ts` the
@@ -126,7 +151,7 @@ The webhook router is a `new Hono()` with a `POST /:triggerId` handler. When a r
 oRPC gives services a typed contract shared with their clients. Webhooks have no NetScript client — the sender is a third party posting arbitrary JSON to a fixed path — so a contract would buy nothing. Triggers therefore expose ordinary Hono routes you can point any webhook source at. See <a href="/capabilities/triggers/">the triggers capability</a> for the full picture.
 {{ /comp }}
 
-## Step 4 — Start the triggers service
+## Step 5 — Start the triggers service
 
 If `aspire run` is up, it orchestrates the triggers API and its background processor for you (look for
 the `triggers-api` and `triggers` resources in the [dashboard](http://localhost:18888)). To run the
@@ -143,7 +168,7 @@ plugin's default port). Confirm it is alive:
 curl http://localhost:8093/health
 ```
 
-## Step 5 — Verify: POST a webhook and watch the job run
+## Step 6 — Verify: POST a webhook and watch the job run
 
 Send a real inbound request to your webhook's path. The body is plain JSON — this is a raw Hono route,
 so any HTTP client works:
@@ -177,6 +202,7 @@ Tutorial 4 wired to the `create-user-settings` job, that worker run is what publ
 <li>Make sure <code>aspire run</code> is up — the workers runtime and KV must be live for the enqueued job to execute.</li>
 <li>Confirm the job id in <code>enqueueJob(...)</code> matches a registered worker job (<code>workers-plugin-health-check</code> from <a href="/tutorials/background-jobs/">Tutorial 3</a>). An unknown id is accepted at the webhook but has nothing to run.</li>
 <li>Check the <code>triggers</code> processor resource in the Aspire <a href="http://localhost:18888">dashboard</a> for errors — the background processor, not the API, is what drains the effects.</li>
+<li>If you returned a <code>defer(...)</code> action by mistake, look in the dead-letter queue — that action is not yet supported and is DLQ'd rather than scheduled.</li>
 </ul>
 {{ /comp }}
 
@@ -215,3 +241,5 @@ You have finished the tutorials ladder. From here, branch into reference-style a
   `defineWebhook` surface, the Hono route table, and the events store.
 - **Understand the model** → [The plugin model](/explanation/plugin-model/) and
   [Durable workflows](/explanation/durable-workflows/).
+- **Add a user identity layer** → the new [Authentication capability](/capabilities/authentication/)
+  if your webhooks need to attribute inbound events to signed-in users.

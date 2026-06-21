@@ -44,7 +44,7 @@ strategy, and `tags`.
 {{ comp.apiTable({
   caption: "defineWebhook(handler, definition) — the definition object",
   items: [
-    { name: "handler", type: "() => Promise<Effect[]>", desc: "Receives the request context; returns an array of effects (typically enqueueJob calls). Return [] to accept-and-drop." },
+    { name: "handler", type: "(ctx) => Promise<Effect[]>", desc: "Receives the request context; returns an array of effects (typically enqueueJob calls). Return [] to accept-and-drop." },
     { name: "id", type: "string", desc: "Stable identifier for the webhook definition, e.g. 'generic-inbound-webhook'." },
     { name: "path", type: "string", desc: "The ingress sub-path the webhook answers on, e.g. 'inbound/generic'. Resolved as the :triggerId route segment." },
     { name: "verifier", type: "'memory' | …", desc: "Signature/verification strategy. The scaffold sample uses 'memory' (open, dev-friendly)." },
@@ -52,6 +52,32 @@ strategy, and `tags`.
     { name: "description", type: "string?", desc: "Human-readable summary surfaced by inspect/registry tooling." }
   ]
 }) }}
+
+## Supported trigger actions
+
+A trigger handler returns **effects** — declarative descriptions of what should
+happen after the request is accepted. The runtime processor reads each effect and
+dispatches it. Exactly one effect is wired end-to-end today; a second is *defined
+in the type surface* but not yet executable, and it now **fails loud** rather than
+silently dropping.
+
+{{ comp.apiTable({
+  caption: "Trigger effects — what the runtime processor actually does",
+  items: [
+    { name: "enqueueJob(job, opts)", type: "✅ live", desc: "Hands the payload to the workers plugin. This is the supported, end-to-end path — it closes the continuous-app loop (webhook → job → saga). Use this for all real ingress work." },
+    { name: "defer(...)", type: "⛔ unsupported", desc: "Defined in the builder surface but NOT executable. The runtime processor throws an unsupportedOperation error and routes the message to the dead-letter queue (DLQ). There is no deferred replay — do not author a trigger that relies on defer." }
+  ]
+}) }}
+
+{{ comp callout { type: "warning", title: "defer is defined-but-unsupported — it fails loud" } }}
+The <code>defer</code> action exists in the trigger builder types, but the runtime processor does
+<strong>not</strong> implement deferred replay. When a handler emits a <code>defer</code> effect, the
+processor throws an <code>unsupportedOperation</code> error and routes the message to the
+<strong>dead-letter queue (DLQ)</strong> — it does not silently swallow it. Build ingress flows on
+<code>enqueueJob</code> only; if you need delayed work, schedule it on the
+<a href="/capabilities/background-jobs/">workers</a> plugin from the enqueued job rather than deferring
+at the trigger edge.
+{{ /comp }}
 
 ## Endpoints & port
 
@@ -74,7 +100,7 @@ so a definition with `path: 'inbound/generic'` is reachable at
 The triggers API service (port <code>8093</code>) is the HTTP edge. The actual trigger
 processing — cron, file-watch, and KV-backed ingress — runs in a separate background
 processor entrypoint at <code>plugins/triggers/src/runtime/trigger-processor.ts</code>. Aspire wires
-both as resources (<code>triggers-api</code> and <code>triggers</code>) when you <code>aspire run</code>.
+both as resources (<code>triggers-api</code> and <code>trigger-processor</code>) when you <code>aspire run</code>.
 {{ /comp }}
 
 ## File watchers
@@ -114,7 +140,9 @@ FileWatcher(...)` instead.
 
 The simple case is one webhook that fans an inbound request out to a single job.
 The advanced case validates the payload first, then enqueues. Both are lifted
-verbatim from the scaffold's `plugins/triggers/` samples and compile as-is.
+verbatim from the scaffold's `plugins/triggers/` samples and compile as-is. Note
+that every handler returns an array of `enqueueJob` effects — the only supported
+trigger action.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -145,6 +173,8 @@ workers plugin.</li>
 <li><strong>The job reference must exist.</strong> <code>enqueueJob</code> targets a job by id; if no
 workers job with that id is registered, the enqueue resolves to nothing useful. Author the job in
 <code>plugins/workers/jobs/</code> first.</li>
+<li><strong>Don't reach for <code>defer</code>.</strong> It is defined-but-unsupported and throws +
+routes to the DLQ. Schedule delayed work from the enqueued workers job instead.</li>
 </ul>
 {{ /comp }}
 

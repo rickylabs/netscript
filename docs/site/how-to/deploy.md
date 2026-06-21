@@ -26,7 +26,7 @@ the Aspire AppHost (<code>aspire/apphost.mts</code>) for local orchestration.
 <strong>Manual / aspirational:</strong> there is <em>no</em> generated container image,
 compose file, or cloud deploy target. <code>netscript.config.ts</code> ships an empty
 <code>deploy: {}</code> block. You assemble the production target yourself from the primitives
-below.
+below — every one of which is a verified fact you can copy verbatim.
 {{ /comp }}
 
 ## Before you start
@@ -72,21 +72,30 @@ production:
 ## Step 1 — Know your deployable units (`appsettings.json`)
 
 `appsettings.json` is the single source of truth for *what runs*. The CLI writes it during
-`netscript init` and updates it as you `plugin add`. Every Aspire resource — and every
-process you would deploy by hand — is described there. From a workspace with the four
+`netscript init` and updates it as you `netscript plugin add`. Every Aspire resource — and
+every process you would deploy by hand — is described there. From a workspace with the four
 first-party plugins installed, the graph looks like this:
 
 {{ comp.apiTable({ caption: "Resources declared in appsettings.json (verified from a scaffolded workspace)", rows: [
-  { name: "users", type: "service · :3001", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>." },
-  { name: "streams", type: "plugin · :4437", desc: "durable-streams dev service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>." },
+  { name: "users", type: "service · :3001", desc: "Example oRPC service. Entrypoint <code>src/main.ts</code>, runtime <code>deno</code>. RPC mounts under <code>/api/rpc/*</code>." },
+  { name: "streams", type: "plugin · :4437", desc: "durable-streams runtime service. <code>RequiresDb=false</code>, <code>RequiresKv=false</code>. Real producer runtime — see Step 5." },
   { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
   { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
-  { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API (Hono). Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
+  { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API (raw Hono routes, not oRPC). Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
   { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Concurrency via <code>WORKER_CONCURRENCY</code> / <code>SAGA_CONCURRENCY</code>." },
   { name: "triggers", type: "background processor", desc: "Entrypoint <code>src/runtime/trigger-processor.ts</code>. Concurrency 10 via <code>TRIGGER_CONCURRENCY</code>." },
   { name: "dashboard", type: "app · :8010", desc: "Fresh frontend. References service <code>users</code>." },
   { name: "postgres / garnet", type: "infrastructure", desc: "<code>Mode=Container</code> in dev. <code>PrimaryDatabase=postgres</code>, <code>PrimaryCache=garnet</code>." }
 ] }) }}
+
+{{ comp callout { type: "note", title: "Auth service is opt-in (port :8094)" } }}
+If you add the auth plugin, a fifth API service — <code>auth-api</code> on <strong>:8094</strong>
+— joins the graph. It is an oRPC service exposing five endpoints under
+<code>/api/v1/auth/{signin,callback,signout,session,me}</code>, backed by one active backend
+selected via <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). Treat it as
+just another deployable unit: it has an entrypoint, a port, and a permission set in
+<code>appsettings.json</code> like every other process.
+{{ /comp }}
 
 Each entry carries the exact information a deploy needs: `Runtime`, `Port`, `Entrypoint`,
 `Workdir`, `RequiresDb`/`RequiresKv`, the Deno `Permissions` array, the concurrency env var,
@@ -123,18 +132,19 @@ boot.
   {
     label: "Pre-generate",
     lang: "bash",
-    code: "# Requires Aspire (and therefore Postgres) up first — see the DB workflow below.\n# Bake the Prisma client + plugin registries into the artifact so boot is deterministic.\nnetscript db generate\nnetscript generate plugins"
+    code: "# Requires Aspire (and therefore Postgres) up first — see the DB callout below.\n# Bake the Prisma client + plugin registries into the artifact so boot is deterministic.\nnetscript db generate\nnetscript generate plugins"
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Database commands need Aspire (and Postgres) up first" } }}
+{{ comp callout { type: "warning", title: "Aspire is step 2: Postgres comes up before any db command" } }}
 Every <code>netscript db &lt;cmd&gt;</code> talks to a live Postgres. In the scaffold that
 Postgres is provisioned <strong>by Aspire</strong>. So the order is always:
-<code>cd aspire &amp;&amp; aspire run</code> (which brings Postgres up) <strong>before</strong>
-any <code>netscript db init</code> / <code>db generate</code> / <code>db seed</code>. Running a
-DB command with no Postgres reachable — for example in an isolated CI container — fails fast.
-In production, point the same commands at your managed Postgres via <code>POSTGRES_URI</code>
-or <code>DATABASE_URL</code> instead of relying on Aspire.
+<code>cd aspire &amp;&amp; aspire run</code> (which brings Postgres and Garnet up)
+<strong>before</strong> any <code>netscript db init</code> / <code>db generate</code> /
+<code>db seed</code>. Running a DB command with no Postgres reachable — for example in an
+isolated CI container — fails fast. In production, point the same commands at your managed
+Postgres via <code>POSTGRES_URI</code> or <code>DATABASE_URL</code> instead of relying on
+Aspire. See <a href="/how-to/database-migration/">Database migration</a> for the full sequence.
 {{ /comp }}
 
 ## Step 3 — Provision backing services
@@ -150,6 +160,8 @@ handled in `database/postgres/prisma.config.ts`.
   { name: "GARNET / cache url", type: "string", desc: "Redis-compatible cache endpoint for the <code>garnet</code> KV/cache resource (managed Redis or Garnet in prod)." },
   { name: "PORT", type: "number", desc: "Per-process listen port. Each service reads it (e.g. <code>Deno.env.get('PORT') ?? '8091'</code>) and falls back to its default." },
   { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. Dev defaults to <code>http://localhost:4318</code> (http/protobuf) via the Aspire dashboard." },
+  { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
+  { name: "NETSCRIPT_AUTH_BACKEND", type: "string", desc: "Active auth backend if the auth plugin is installed. Default <code>kv-oauth</code>." },
   { name: "WORKER_CONCURRENCY", type: "number", desc: "Workers background processor concurrency (scaffold default 2)." },
   { name: "SAGA_CONCURRENCY", type: "number", desc: "Sagas background processor concurrency (default 2)." },
   { name: "TRIGGER_CONCURRENCY", type: "number", desc: "Triggers background processor concurrency (default 10)." }
@@ -160,6 +172,20 @@ The <code>Otel.HttpEndpoint</code>, <code>Databases.postgres</code>, <code>Cache
 and per-process <code>ConcurrencyEnvVar</code> values in <code>appsettings.json</code> tell you
 every knob to externalize. Treat that file as the contract between your infrastructure and the
 NetScript processes.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "Queue and saga durability backends are deploy-time choices" } }}
+Two stateful subsystems pick a backend at deploy time, so decide before you ship:
+<ul>
+<li><strong>Queue</strong> has four backends — Deno KV, Redis, RabbitMQ, and PostgreSQL.
+Auto-discovery probes RabbitMQ → Redis → Deno KV only; <strong>PostgreSQL is explicit-provider
+only</strong> (<code>provider: 'postgres'</code> with <code>connection.postgres.{url, tableName}</code>).</li>
+<li><strong>Sagas</strong> persist durable runtime state to <code>kv</code> or <code>prisma</code>,
+selected by <code>NETSCRIPT_SAGA_STORE</code> (or appsettings). The selection is mandatory —
+the runtime throws if it is unset. The Prisma path writes the <code>saga_runtime_*</code> tables.</li>
+</ul>
+See <a href="/capabilities/kv-queues-cron/">Queues &amp; cron</a> and
+<a href="/capabilities/durable-sagas/">Durable sagas</a> for the full backend matrices.
 {{ /comp }}
 
 ## Step 4 — Choose an orchestration path
@@ -218,13 +244,14 @@ deno run \
 Map this pattern across every enabled resource and you have a complete, container-free
 deployment. To containerize, each process becomes one image whose `CMD` is the matching
 `deno run` line; orchestrate them with compose or your platform of choice, honoring the
-`PluginReferences` start order (streams → workers → sagas/triggers).
+`PluginReferences` start order (streams → workers → sagas/triggers, plus auth-api when present).
 
 {{ comp callout { type: "warning", title: "Honest limits of the alpha scaffold" } }}
 <ul>
 <li>No <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest is generated. You write these from the <code>appsettings.json</code> facts above.</li>
 <li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block — there is no first-class deploy command yet.</li>
-<li>Streams producer/consumer are runtime stubs (topic APIs deferred); deploy the streams service as a dev/topic-schema host, not a production pub/sub broker.</li>
+<li>The <code>streams</code> service runs a <strong>real producer runtime</strong> (durable-streams over <code>@netscript/plugin-streams-core</code>, served on :4437) — deploy it as a first-class service. What is <em>not</em> production-ready is the manifest-helper layer: <code>@netscript/plugin-streams</code>'s <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> <strong>throw <code>StreamUnsupportedOperationError</code></strong> by design (use <code>@netscript/plugin-streams-core</code> directly), and there is no in-process consumer <code>subscribe()</code> — consumption is HTTP/SSE.</li>
+<li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
 </ul>
 {{ /comp }}
@@ -243,6 +270,7 @@ production host):
   { name: "GET /api/v1/sagas/sagas", type: ":8092", desc: "Lists registered sagas — proves saga metadata is in KV." },
   { name: "POST /api/v1/webhooks/inbound/generic", type: ":8093", desc: "Inbound webhook → enqueues the workers health-check job (end-to-end proof)." },
   { name: "GET /api/v1/events?limit=10", type: ":8093", desc: "Recent trigger events." },
+  { name: "GET /api/v1/auth/session", type: ":8094", desc: "Auth session probe (only if the auth plugin is installed)." },
   { name: "(dashboard)", type: "http://localhost:18888", desc: "Aspire dashboard: every resource, health, logs, distributed traces (Aspire path only)." }
 ] }) }}
 

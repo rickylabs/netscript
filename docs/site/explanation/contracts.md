@@ -46,7 +46,9 @@ A contract is built from [`@orpc/contract`](https://orpc.unnoq.com) plus
 [`zod`](https://zod.dev). `oc.route({ method })` declares the transport verb;
 `.input(...)` and `.output(...)` attach zod schemas that describe the request and response.
 The result is an inert *definition* — it owns no handler, opens no socket, and does no
-runtime work. It is pure shape.
+runtime work. It is pure shape. That inertness is the point: because a contract performs no
+side effects, it can be imported anywhere — by the server, by the client, by a test, by a
+codegen-free tool — without dragging runtime behavior along with it.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -66,6 +68,15 @@ workspace's `@<project>/contracts` alias (for the scaffolded `users` example, th
 `@my-app/contracts`). Versioning the contract directory — `versions/v1/`, later `v2/` — is
 deliberate: a contract is a long-lived promise, so its breaking changes are an explicit new
 version rather than an in-place mutation that silently breaks callers.
+
+{{ comp callout { type: "note", title: "zod is the shape; oRPC is the boundary" } }}
+A useful split to hold in your head: <strong>zod</strong> answers <em>"what does this data look like, and
+is a given value valid?"</em>, while <strong>oRPC</strong> (<code>@orpc/contract</code>) answers <em>"which route,
+which verb, what goes in, what comes out?"</em>. The contract is where the two meet — an
+<code>oc.route(...)</code> wrapping zod schemas in <code>.input()</code>/<code>.output()</code>. Neither library knows
+about the other's transport or persistence; together they describe the whole boundary and
+nothing else.
+{{ /comp }}
 
 ## `implement()`: from shape to a bindable server object
 
@@ -96,6 +107,12 @@ function automatically, so the handler body is pure business logic over already-
 already-validated data.
 {{ /comp }}
 
+The router tree mirrors the contract tree. Because the contract is a plain nested object —
+`{ v1: { users: { list, updateStatus, health } } }` — the handlers nest the same way, and the
+derived client later walks the *same* path (`client.users.list(...)`). There is no separate
+routing table to register, no decorator to remember, and no string key that can fall out of
+sync with the handler it names. The shape of your API *is* the shape of these objects.
+
 ## Serving the router: where the contract meets HTTP
 
 A local service hands the router to `defineService(...)`, which wires CORS, request logging,
@@ -114,14 +131,19 @@ two artifacts.
 The `users` service listens on **port 3001** and exposes two parallel transports from the same
 contract: REST-shaped routes under `/api/v1/users/*` (driven by `oc.route({ method, path })`
 and surfaced in OpenAPI) and a typed RPC channel under `/api/rpc/v1/...` that the derived client
-speaks. Both are the *same* contract; the difference is only the wire format.
+speaks. Both are the *same* contract; the difference is only the wire format. The RPC mount
+point is `/api/rpc/*` — not `/rpc` — and the derived client is configured to target exactly
+that base, so you rarely type the path yourself; it follows from the contract and the service
+options.
 
 {{ comp callout { type: "tip", title: "Two service-construction APIs in one project" } }}
 Local services in <code>services/</code> use the one-shot <code>defineService(router, options)</code>
-form above. The framework's <strong>plugin</strong> API services (workers, sagas, triggers) use a
+form above. The framework's <strong>plugin</strong> API services (workers, sagas, triggers, auth) use a
 fluent builder instead — <code>createService(router, options).withCors().withLogger().withOpenAPI(...).withRPC(...).withHealth().serve()</code>.
 Same contracts-first model underneath; the builder simply exposes each cross-cutting concern as
-an explicit, composable step. See <a href="/capabilities/services/">the services capability</a>.
+an explicit, composable step. Reach for <code>defineService</code> when the defaults are what you want,
+and the builder when you need to add, remove, or reorder a concern. See
+<a href="/capabilities/services/">the services capability</a>.
 {{ /comp }}
 
 ## The type pipeline, end to end (a diagram in prose)
@@ -149,6 +171,12 @@ whose handler sees `status` as a typed field on `input` and must return it corre
 output. The client — derived from the very same contract value — exposes `client.users.list(...)`
 whose argument type and result type are both projected straight from those schemas. A UI island
 that calls the client (optionally through `@orpc/tanstack-query`) inherits those types yet again.
+
+Crucially, no arrow in that diagram is a *copy*. Each hop is a *projection* of the previous
+one — TypeScript reading the contract's types, oRPC reading the contract's routes, zod reading
+the contract's schemas. Because every consumer reads from the same value rather than from a
+duplicated declaration, there is no place for the two to disagree. The contract is the only
+thing anyone authored by hand; everything to its right is inferred.
 
 Change `UsersStatusSchemaV1` and the ripple is immediate and compile-time: the handler that
 returns the old shape stops compiling, every client call site that reads the removed field stops
@@ -191,6 +219,25 @@ The dependencies that make this work are pinned in the workspace catalog: the oR
 `^1.14.6`, and `zod` at `^4.x`. They are imported through the catalog, never de-catalogued, so
 the contract surface stays consistent across every workspace member.
 
+## How contracts-first shows up across the framework
+
+The contract is not just a service idea — it is the *unifying* idea. The same model that types a
+service's RPC channel also types the plugin boundaries you compose into a NetScript app:
+
+- **Services** are the canonical case on this page — a contract, an `implement()`-bound router, and
+  a `defineService`/`createService` host. See [the services capability](/capabilities/services/).
+- **Workers and sagas** expose their own oRPC services built from contracts, served via the fluent
+  `createService(...).serve()` builder, so dispatching a job or driving a saga is a typed client
+  call rather than a hand-rolled `fetch`. See [background jobs](/capabilities/background-jobs/) and
+  [durable sagas](/capabilities/durable-sagas/).
+- **Triggers** are the deliberate exception: they expose *raw* Hono routes rather than an oRPC
+  contract, because they receive external webhooks whose shapes you do not control. That asymmetry
+  is itself instructive — contracts-first is for boundaries you *own*; an inbound webhook is a
+  boundary someone else owns. See [the plugin model](/explanation/plugin-model/).
+
+Holding those together: the contract is how NetScript makes the *internal* surfaces of a system
+type-safe end to end, and the framework is honest about where that model stops.
+
 ## Glossary
 
 - **Contract** — a single typed value declaring a route's method, input shape, and output shape.
@@ -199,6 +246,8 @@ the contract surface stays consistent across every workspace member.
 - **oRPC** — the contract-and-RPC library NetScript builds the boundary on (`@orpc/*`). It supplies
   `oc.route(...)`, `implement(...)`, and the derived typed client. See the
   [glossary](/glossary/#orpc).
+- **zod** — the schema library that describes and validates each shape. It is the runtime half of
+  the contract; oRPC is the routing half. See the [glossary](/glossary/#zod).
 
 ## Where to go next
 
@@ -206,6 +255,9 @@ the contract surface stays consistent across every workspace member.
   service → typed client → island path with this exact `users` example.
 - **Hub:** the [services capability](/capabilities/services/) covers `defineService` versus the
   fluent `createService(...).serve()` builder and the real ports.
+- **Architecture:** [the architecture overview](/explanation/architecture/) places contracts in the
+  larger picture, and [the plugin model](/explanation/plugin-model/) shows how plugins reuse the
+  same contracts-first seam.
 - **Reference:** the exact exported symbols live in [`reference/contracts/`](/reference/contracts/)
   and [`reference/service/`](/reference/service/).
 
