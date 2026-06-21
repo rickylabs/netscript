@@ -21,12 +21,16 @@ export const TERMINAL_RESOURCE_STATES: ReadonlySet<string> = new Set([
   'Stopped',
 ]);
 
+const DB_CLI_ASPIRE_START_TIMEOUT_SECONDS = '300';
+const ASPIRE_CLI_START_TIMEOUT_ENV = 'ASPIRE_CLI_START_TIMEOUT';
+
 export function buildDbCliEnv(
   operation: DbOperationRequest['operation'],
   configKey: string,
   migrationName?: string,
 ): Record<string, string> {
   const env: Record<string, string> = {
+    ASPIRE_CLI_START_TIMEOUT: resolveAspireCliStartTimeout(),
     NETSCRIPT_PRISMA_OPERATION: operation,
     NETSCRIPT_PRISMA_TARGET: configKey,
   };
@@ -34,6 +38,11 @@ export function buildDbCliEnv(
     env.NETSCRIPT_PRISMA_NAME = migrationName;
   }
   return env;
+}
+
+function resolveAspireCliStartTimeout(): string {
+  const configured = Deno.env.get(ASPIRE_CLI_START_TIMEOUT_ENV);
+  return configured && configured.length > 0 ? configured : DB_CLI_ASPIRE_START_TIMEOUT_SECONDS;
 }
 
 export function buildAspireArgs(
@@ -89,7 +98,9 @@ function parseAspireResourceStatuses(
   return apphost?.resources ? [...apphost.resources] : [];
 }
 
-function isObjectWithResources(value: unknown): value is { resources: readonly AspireResourceStatus[] } {
+function isObjectWithResources(
+  value: unknown,
+): value is { resources: readonly AspireResourceStatus[] } {
   return typeof value === 'object' && value !== null && Array.isArray(
     (value as { resources?: unknown }).resources,
   );

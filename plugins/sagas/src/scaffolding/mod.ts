@@ -1,3 +1,9 @@
+/**
+ * Scaffolding helpers for generated saga definitions and runtime registries.
+ *
+ * @module
+ */
+
 export {
   createSagaEntrypoint,
   isSagasScaffoldInput,

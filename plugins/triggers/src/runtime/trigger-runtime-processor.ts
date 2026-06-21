@@ -5,6 +5,7 @@ import type {
   TriggerActionResult,
   TriggerEvent,
 } from '@netscript/plugin-triggers-core/domain';
+import { TriggersError } from '@netscript/plugin-triggers-core/domain';
 import type {
   ProcessableTriggerDefinition,
   TriggerDlqPort,
@@ -28,6 +29,7 @@ export type RuntimeTriggerProcessorOptions = Readonly<{
   kv?: Deno.Kv;
   idempotency?: TriggerIdempotencyPort;
   dlq?: TriggerDlqPort;
+  jobQueue?: ReturnType<typeof createQueue<JobMessage>>;
 }>;
 
 /** Create the trigger processor used by plugin service and background runtimes. */
@@ -36,7 +38,7 @@ export async function createRuntimeTriggerProcessor(
 ): Promise<TriggerProcessorPort> {
   const needsKv = options.idempotency === undefined || options.dlq === undefined;
   const kv = needsKv ? options.kv ?? await openTriggerRuntimeKv() : options.kv;
-  const queue = createQueue<JobMessage>('jobs');
+  const queue = options.jobQueue ?? createQueue<JobMessage>('jobs');
   const processor = createTriggerProcessor({
     idempotency: options.idempotency ?? new KvTriggerIdempotencyStore({ kv: kv as Deno.Kv }),
     dlq: options.dlq ?? new KvTriggerDlqStore({ kv: kv as Deno.Kv }),
@@ -92,7 +94,10 @@ async function dispatchTriggerAction(
   queue: ReturnType<typeof createQueue<JobMessage>>,
 ): Promise<void> {
   if (action.kind === 'defer') {
-    return;
+    throw TriggersError.unsupportedOperation(
+      'trigger-action.defer',
+      `Deferred trigger action dispatch is not implemented for ${definition.id}; until=${action.until}.`,
+    );
   }
 
   await enqueueWorkerJob(action, event, definition, queue);
@@ -104,12 +109,14 @@ async function enqueueWorkerJob(
   definition: Readonly<{ id: string }>,
   queue: ReturnType<typeof createQueue<JobMessage>>,
 ): Promise<void> {
+  const idempotencyKey = action.options.idempotencyKey ?? event.idempotencyKey ?? event.id;
   const message: JobMessage = {
     jobId: action.jobId,
     topic: action.job.topic ?? DEFAULT_TOPIC,
     triggeredBy: 'event',
     triggeredAt: new Date().toISOString(),
     payload: normalizePayload(action.options.payload),
+    idempotencyKey,
     priority: action.options.priority ?? 50,
     correlationId: event.id,
   };
@@ -135,7 +142,7 @@ async function enqueueWorkerJob(
         },
         {
           priority: message.priority,
-          deduplicationId: action.options.idempotencyKey ?? event.idempotencyKey ?? event.id,
+          deduplicationId: idempotencyKey,
           headers: {
             ...headers,
             'trigger-id': String(definition.id),

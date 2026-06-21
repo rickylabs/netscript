@@ -76,6 +76,17 @@ export {
   type HealthStatus,
 } from './src/primitives/health.ts';
 
+export type { AuthnOptions, AuthzOptions } from './src/auth/options.ts';
+export type {
+  AuthenticatorPort,
+  AuthnRequest,
+  AuthnResult,
+  AuthorizerPort,
+  AuthzDecision,
+  AuthzRequest,
+  Principal,
+} from './src/auth/types.ts';
+
 export {
   createOpenAPISpec,
   createScalarDocs,
@@ -109,8 +120,14 @@ export type {
   ServiceHandler,
   ServiceHandlerPlugin,
   ServiceMiddleware,
+  ServiceNotFoundHandler,
   ServiceRequest,
   ServiceRouter,
+  ShutdownContext,
+  ShutdownHook,
+  ShutdownHookOutcome,
+  ShutdownReason,
+  ShutdownReport,
 } from './src/types.ts';
 
 // Layer 2: Builders

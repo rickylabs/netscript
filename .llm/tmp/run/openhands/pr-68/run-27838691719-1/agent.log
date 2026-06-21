@@ -1,0 +1,400 @@
+    
+    **Test result**: 4 passed, 0 failed (independent run confirmed).
+    
+    ---
+    
+    ### 3. In-Memory `TaskExecutorSpan` Preservation ✅
+    
+    **Claim**: Existing `TaskExecutorSpan` hook behavior preserved (no 
+regression to current callers).
+    
+    **Verification**:
+    - `#applyInstrumentation` still calls `new TaskExecutorSpan()` at L146 ✅
+    - Loop over `this.#instrumentations` still invokes 
+`instrumentation.applyTo(span, { correlationId, durationMs, status, taskId })` 
+at L147-L153 ✅
+    - **Only addition**: `span.copyTo(otelSpan)` at L155 (after the loop, no 
+mutation of existing logic) ✅
+    - Existing tests pass:
+      - `MultiRuntimeTaskExecutor dispatches to adapter by task type` ✅
+      - `MultiRuntimeTaskExecutor prefers custom adapters over built-ins` ✅
+      - `MultiRuntimeTaskExecutor returns failure result for unsupported 
+runtimes` ✅
+    
+    **No breaking change**: `TaskInstrumentationLike` signature updated in 
+`executor-types.ts` (L123-L128) to narrow `status` to `WorkerTelemetryStatus` 
+and add optional `durationMs`, but all existing instrumentations 
+(`TaskExecuteInstrumentation`, `WorkerStartInstrumentation`, etc.) already emit 
+`WorkerTelemetryStatus` values and do not require `durationMs`.
+    
+    ---
+    
+    ### 4. Diff Scope & Gates ✅
+    
+    **Claim**: Diff scoped to `packages/plugin-workers-core` (+ test, + harness 
+artifacts); `deno.lock` unchanged; check/lint green.
+    
+    **Verification**:
+    - **Changed files** (5 total):
+      1. `.llm/tmp/run/cap-s4-otel/worklog.md` (harness artifact) ✅
+      2. `.llm/tmp/run/cap-s4-otel/commits.md` (harness artifact) ✅
+      3. `packages/plugin-workers-core/src/executor/executor-types.ts` (narrow 
+status type, add `durationMs`) ✅
+      4. 
+`packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts` (OTel
+bridge) ✅
+      5. 
+`packages/plugin-workers-core/tests/executor/multi-runtime-task-executor_test.ts
+` (OTel test) ✅
+    - **Lock hygiene**: `git diff origin/main..HEAD -- deno.lock` returns empty 
+output ✅
+    - **Scoped check** (independent run): 102 files, 0 diagnostics ✅
+    - **Scoped lint** (independent run): 102 files, 0 diagnostics ✅
+    - **No out-of-scope changes**: No changes to `packages/telemetry`, no new 
+dependencies in `deno.json`, no plugin manifest updates, no S1/S2/S3/S5 surfaces
+touched ✅
+    
+    ---
+    
+    ## Validation Evidence
+    
+    | Gate | Command | Exit Code | Result |
+    |------|---------|-----------|--------|
+    | Affected tests | `deno test --no-lock --allow-all 
+packages/plugin-workers-core/tests/executor/multi-runtime-task-executor_test.ts`
+| 0 | 4 passed, 0 failed |
+    | Scoped check | `deno run --no-lock --allow-read --allow-run 
+.llm/tools/run-deno-check.ts --root packages/plugin-workers-core --ext ts,tsx 
+--deno-arg --no-lock` | 0 | 102 files, 0 diagnostics |
+    | Scoped lint | `deno run --no-lock --allow-read --allow-run 
+.llm/tools/run-deno-lint.ts --root packages/plugin-workers-core --ext ts,tsx` | 
+0 | 102 files, 0 diagnostics |
+    
+    **Note**: Independent evaluator re-ran all gates (not relying on worklog 
+claims).
+    
+    ---
+    
+    ## Adversarial Checks
+    
+    ### ✅ Span name resolution
+    `WorkerSpanNames.taskExecute` resolves to `'task.execute'` (verified in 
+`packages/plugin-workers-core/src/telemetry/attributes.ts` L23). Test assertion 
+on L43 uses the constant, ensuring the span name matches the claim.
+    
+    ### ✅ Attribute propagation path
+    1. Executor sets attributes via `withSpan` options (L90-L99) → OTel span 
+receives them at creation.
+    2. `#setTaskAttributes` (L161-L171) and `#setTaskResultAttributes` 
+(L173-L184) mutate the OTel span directly during execution.
+    3. `#applyInstrumentation` (L138-L156) populates `TaskExecutorSpan` 
+(in-memory) via existing instrumentation hooks, then `span.copyTo(otelSpan)` 
+(L155) merges in-memory attributes/events into the OTel span.
+    4. Test asserts both static attributes (from `withSpan` options) and dynamic
+attributes (from instrumentation + result).
+    
+    ### ✅ No double-span risk
+    The executor wraps the entire execution in a single `withSpan` call 
+(L84-L103). No nested `createSpan` or duplicate tracer invocations detected.
+    
+    ### ✅ Error handling preserved
+    If `adapter.execute` throws, `failedTaskResult` catches it (L88), and 
+`#setTaskResultAttributes` still sets `error.message` (L182). The OTel span will
+correctly reflect `status: 'failed'` and the error message.
+    
+    ---
+    
+    ## Remaining Risks
+    
+    ### 🟢 Low risk: No concerns identified
+    
+    1. **Type narrowing**: `TaskInstrumentationLike.status` narrowed from 
+`string` to `WorkerTelemetryStatus`. All existing instrumentations emit valid 
+`WorkerTelemetryStatus` values (verified in 
+`packages/plugin-workers-core/src/telemetry/instrumentation.ts` L77-L148). No 
+breaking change for external plugin authors (this is a **package** archetype, 
+not a plugin contract).
+    
+    2. **Optional `durationMs`**: Added to `TaskInstrumentationLike` context 
+(L126). Existing instrumentations do not require it, so no migration needed.
+    
+    3. **Test isolation**: The OTel test uses `trace.disable()` at start and end
+(L23, L53), ensuring no global state leakage between tests.
+    
+    ---
+    
+    ## Recommendation
+    
+    **Merge-ready**: S4 slice is implementation-complete, well-tested, and 
+low-risk. The OTel bridge correctly reuses telemetry infrastructure, the test is
+adversarial (would fail without the bridge), and no regressions to existing 
+behavior were detected.
+    
+    **Next steps**:
+    - ✅ Merge `fix/cap-caveat-s4-task-otel` into `main`
+    - ✅ Close issue #68 (S4 capability caveat resolved)
+    - ⏸️ Await S1/S2/S3/S5 slices for full capability-caveat coverage
+    
+    ---
+    
+    ## Verdict
+    
+    **✅ PASS** — Implementation matches claims. No fix required. No rescope 
+required. No debt incurred.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 590.95K • cache hit 88.55% •  reasoning 3.62K • ↓ output 9.62K •
+$ 0.2515
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27838691719-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Verdict — S4 Task-OTel Bridge
+ 2|
++3|**Branch**: `fix/cap-caveat-s4-task-otel`  
++4|**Commit**: `4cc5cee3` (feat) + `a5655450` (harness artifacts)  
++5|**Evaluator session**: `27838691719-1` (separate from implementation session)
++6|**Verdict**: ✅ **PASS**
++7|
++8|---
++9|
++10|## Summary
++11|
++12|S4 slice merges successfully through the task-executor OTel bridge. The 
+implementation correctly reuses `@netscript/telemetry` infrastructure (no 
+reinvented tracer), emits spans with the claimed name and attributes (verified 
+via in-memory exporter test), preserves existing `TaskExecutorSpan` behavior (no
+regression to current callers), and stays within declared scope 
+(`packages/plugin-workers-core` only).
++13|
++14|---
++15|
++16|## Evaluation Results
++17|
++18|### 1. Telemetry Reuse Pattern ✅
++19|
++20|**Claim**: Bridge reuses `getTracer`/`withSpan` from `@netscript/telemetry`,
+mirroring `traceJobExec` pattern.
++21|
++22|**Verification**:
++23|- Executor imports: `getTracer`, `withSpan`, `Span`, `SpanKind`, 
+`AttributeValue` from `@netscript/telemetry/tracer` ✅
++24|- Tracer instantiation: 
+`getTracer('@netscript/plugin-workers-core/task-executor')` ✅
++25|- Span creation: `withSpan(tracer, WorkerSpanNames.taskExecute, async (span)
+=> { ... }, { kind: SpanKind.INTERNAL, attributes })` ✅
++26|- Pattern match: Identical structure to 
+`packages/telemetry/src/instrumentation/worker.ts` L229-L286 (`traceJobExec`) ✅
++27|
++28|**No reinvention**: The executor does not construct a custom tracer or 
+bypass the telemetry package API.
++29|
++30|---
++31|
++32|### 2. OTel Span Emission Test ✅
++33|
++34|**Claim**: Test asserts span name (`task.execute`) and key attributes via 
+in-memory exporter.
++35|
++36|**Verification**:
++37|- Test file: `tests/executor/multi-runtime-task-executor_test.ts` L22-L55 ✅
++38|- Exporter setup: `InMemorySpanExporter` + `BasicTracerProvider` with 
+`SimpleSpanProcessor` ✅
++39|- Assertions:
++40|  - `spans.length === 1` ✅
++41|  - `span.name === WorkerSpanNames.taskExecute` (resolves to 
+`'task.execute'`) ✅
++42|  - `span.attributes[WorkerTelemetryAttributes.taskId] === 'task.fixture'` 
+✅
++43|  - `span.attributes[WorkerTelemetryAttributes.correlationId] === 
+'correlation.fixture'` ✅
++44|  - `span.attributes[WorkerTelemetryAttributes.status] === 'completed'` ✅
++45|  - `span.attributes[WorkerTelemetryAttributes.durationMs] === 12` ✅
++46|  - `span.attributes['task.runtime'] === 'deno'` ✅
++47|  - `span.attributes['task.executor.id'] === 'multi-runtime-task-executor'` 
+✅
++48|  - `span.attributes['task.adapter.id'] === 'fake-runtime-adapter'` ✅
++49|
++50|**Failure mode**: If `withSpan` wrapper were removed or broken, 
+`spans.length` would be 0, causing immediate `assertEquals` failure on L41.
++51|
++52|**Test result**: 4 passed, 0 failed (independent run confirmed).
++53|
++54|---
++55|
++56|### 3. In-Memory `TaskExecutorSpan` Preservation ✅
++57|
++58|**Claim**: Existing `TaskExecutorSpan` hook behavior preserved (no 
+regression to current callers).
++59|
++60|**Verification**:
++61|- `#applyInstrumentation` still calls `new TaskExecutorSpan()` at L146 ✅
++62|- Loop over `this.#instrumentations` still invokes 
+`instrumentation.applyTo(span, { correlationId, durationMs, status, taskId })` 
+at L147-L153 ✅
++63|- **Only addition**: `span.copyTo(otelSpan)` at L155 (after the loop, no 
+mutation of existing logic) ✅
++64|- Existing tests pass:
++65|  - `MultiRuntimeTaskExecutor dispatches to adapter by task type` ✅
++66|  - `MultiRuntimeTaskExecutor prefers custom adapters over built-ins` ✅
++67|  - `MultiRuntimeTaskExecutor returns failure result for unsupported 
+runtimes` ✅
++68|
++69|**No breaking change**: `TaskInstrumentationLike` signature updated in 
+`executor-types.ts` (L123-L128) to narrow `status` to `WorkerTelemetryStatus` 
+and add optional `durationMs`, but all existing instrumentations 
+(`TaskExecuteInstrumentation`, `WorkerStartInstrumentation`, etc.) already emit 
+`WorkerTelemetryStatus` values and do not require `durationMs`.
++70|
++71|---
++72|
++73|### 4. Diff Scope & Gates ✅
++74|
++75|**Claim**: Diff scoped to `packages/plugin-workers-core` (+ test, + harness 
+artifacts); `deno.lock` unchanged; check/lint green.
++76|
++77|**Verification**:
++78|- **Changed files** (5 total):
++79|  1. `.llm/tmp/run/cap-s4-otel/worklog.md` (harness artifact) ✅
++80|  2. `.llm/tmp/run/cap-s4-otel/commits.md` (harness artifact) ✅
++81|  3. `packages/plugin-workers-core/src/executor/executor-types.ts` (narrow 
+status type, add `durationMs`) ✅
++82|  4. 
+`packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts` (OTel
+bridge) ✅
++83|  5. 
+`packages/plugin-workers-core/tests/executor/multi-runtime-task-executor_test.ts
+` (OTel test) ✅
++84|- **Lock hygiene**: `git diff origin/main..HEAD -- deno.lock` returns empty 
+output ✅
++85|- **Scoped check** (independent run): 102 files, 0 diagnostics ✅
++86|- **Scoped lint** (independent run): 102 files, 0 diagnostics ✅
++87|- **No out-of-scope changes**: No changes to `packages/telemetry`, no new 
+dependencies in `deno.json`, no plugin manifest updates, no S1/S2/S3/S5 surfaces
+touched ✅
++88|
++89|---
++90|
++91|## Validation Evidence
++92|
++93|| Gate | Command | Exit Code | Result |
++94||------|---------|-----------|--------|
++95|| Affected tests | `deno test --no-lock --allow-all 
+packages/plugin-workers-core/tests/executor/multi-runtime-task-executor_test.ts`
+| 0 | 4 passed, 0 failed |
++96|| Scoped check | `deno run --no-lock --allow-read --allow-run 
+.llm/tools/run-deno-check.ts --root packages/plugin-workers-core --ext ts,tsx 
+--deno-arg --no-lock` | 0 | 102 files, 0 diagnostics |
++97|| Scoped lint | `deno run --no-lock --allow-read --allow-run 
+.llm/tools/run-deno-lint.ts --root packages/plugin-workers-core --ext ts,tsx` | 
+0 | 102 files, 0 diagnostics |
++98|
++99|**Note**: Independent evaluator re-ran all gates (not relying on worklog 
+claims).
++100|
++101|---
++102|
++103|## Adversarial Checks
++104|
++105|### ✅ Span name resolution
++106|`WorkerSpanNames.taskExecute` resolves to `'task.execute'` (verified in 
+`packages/plugin-workers-core/src/telemetry/attributes.ts` L23). Test assertion 
+on L43 uses the constant, ensuring the span name matches the claim.
++107|
++108|### ✅ Attribute propagation path
++109|1. Executor sets attributes via `withSpan` options (L90-L99) → OTel span 
+receives them at creation.
++110|2. `#setTaskAttributes` (L161-L171) and `#setTaskResultAttributes` 
+(L173-L184) mutate the OTel span directly during execution.
++111|3. `#applyInstrumentation` (L138-L156) populates `TaskExecutorSpan` 
+(in-memory) via existing instrumentation hooks, then `span.copyTo(otelSpan)` 
+(L155) merges in-memory attributes/events into the OTel span.
++112|4. Test asserts both static attributes (from `withSpan` options) and 
+dynamic attributes (from instrumentation + result).
++113|
++114|### ✅ No double-span risk
++115|The executor wraps the entire execution in a single `withSpan` call 
+(L84-L103). No nested `createSpan` or duplicate tracer invocations detected.
++116|
++117|### ✅ Error handling preserved
++118|If `adapter.execute` throws, `failedTaskResult` catches it (L88), and 
+`#setTaskResultAttributes` still sets `error.message` (L182). The OTel span will
+correctly reflect `status: 'failed'` and the error message.
++119|
++120|---
++121|
++122|## Remaining Risks
++123|
++124|### 🟢 Low risk: No concerns identified
++125|
++126|1. **Type narrowing**: `TaskInstrumentationLike.status` narrowed from 
+`string` to `WorkerTelemetryStatus`. All existing instrumentations emit valid 
+`WorkerTelemetryStatus` values (verified in 
+`packages/plugin-workers-core/src/telemetry/instrumentation.ts` L77-L148). No 
+breaking change for external plugin authors (this is a **package** archetype, 
+not a plugin contract).
++127|
++128|2. **Optional `durationMs`**: Added to `TaskInstrumentationLike` context 
+(L126). Existing instrumentations do not require it, so no migration needed.
++129|
++130|3. **Test isolation**: The OTel test uses `trace.disable()` at start and 
+end (L23, L53), ensuring no global state leakage between tests.
++131|
++132|---
++133|
++134|## Recommendation
++135|
++136|**Merge-ready**: S4 slice is implementation-complete, well-tested, and 
+low-risk. The OTel bridge correctly reuses telemetry infrastructure, the test is
+adversarial (would fail without the bridge), and no regressions to existing 
+behavior were detected.
++137|
++138|**Next steps**:
++139|- ✅ Merge `fix/cap-caveat-s4-task-otel` into `main`
++140|- ✅ Close issue #68 (S4 capability caveat resolved)
++141|- ⏸️ Await S1/S2/S3/S5 slices for full capability-caveat coverage
++142|
++143|---
++144|
++145|## Verdict
++146|
++147|**✅ PASS** — Implementation matches claims. No fix required. No rescope 
+required. No debt incurred.
++148|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+---
+
+**IMPL-EVAL Verdict: ✅ PASS**
+
+S4 task-otel bridge is merge-ready. The implementation correctly reuses 
+`@netscript/telemetry` (no reinvented tracer), emits spans with claimed 
+name/attributes (verified via in-memory exporter test), preserves existing 
+`TaskExecutorSpan` behavior (no regression), and stays within declared scope.
+
+**Validation**:
+- Telemetry reuse: `getTracer`/`withSpan` from `@netscript/telemetry/tracer`, 
+mirroring `traceJobExec` pattern ✅
+- Test coverage: `InMemorySpanExporter` + 8 assertions (name + 7 attributes), 
+would fail without bridge ✅
+- Regression check: All 4 existing tests pass, `TaskExecutorSpan` hook unchanged
+✅
+- Scope: 2 source files + 1 test in `packages/plugin-workers-core`, no lock 
+change, check/lint green ✅
+
+Full evaluation: `/home/runner/work/_temp/openhands/27838691719-1/summary.md`
+
+Tokens: ↑ input 624.6K • cache hit 83.78% •  reasoning 3.75K • ↓ output 9.97K • 
+$ 0.2949
+

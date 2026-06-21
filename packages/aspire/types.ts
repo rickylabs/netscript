@@ -31,6 +31,8 @@ import type {
   OtelConfig as OtelConfigValue,
   PluginEntry as PluginEntryConfig,
   ResourceMode as ResourceModeConfig,
+  SagaResourceConfig as SagaResourceConfigValue,
+  SagaStoreBackend as SagaStoreBackendValue,
   ServiceEntry as ServiceEntryConfig,
   ToolEntry as ToolEntryConfig,
 } from './config.ts';
@@ -81,6 +83,12 @@ export type ResourceMode = ResourceModeConfig;
 
 /** Application type variant. */
 export type AppType = AppTypeConfig;
+
+/** Saga durable state store backend variant. */
+export type SagaStoreBackend = SagaStoreBackendValue;
+
+/** Saga-specific resource metadata preserved for generated executable env. */
+export type SagaResourceConfig = SagaResourceConfigValue;
 
 // --- Generic Resource Name Extraction Utilities ---
 

@@ -82,3 +82,31 @@ Deno.test('initNextSteps includes local database preparation steps for maintaine
     '# Postgres provisioned by Aspire (see "Databases" in appsettings.json)',
   ]);
 });
+
+Deno.test('initNextSteps tells no-Aspire Postgres users to self-provision', () => {
+  const steps = initNextSteps(baseOptions({
+    noAspire: true,
+    dbEngine: 'postgres',
+  }));
+
+  assertEquals(steps, [
+    'cd smoke-test',
+    'netscript db generate  # generate database client after configuring DATABASE_URL',
+    'netscript db seed  # seed after the generated client exists',
+    'deno task --cwd apps/frontend dev  # start Fresh dev server',
+    '# Provision Postgres yourself and set POSTGRES_URI or DATABASE_URL',
+  ]);
+});
+
+Deno.test('initNextSteps reports the generated service oRPC endpoint under /api/rpc', () => {
+  const steps = initNextSteps(baseOptions({
+    includeExampleService: true,
+    serviceName: 'users',
+    servicePort: 3001,
+  }));
+
+  assertEquals(
+    steps.at(-1),
+    '# oRPC service "users" at http://localhost:3001/api/rpc',
+  );
+});

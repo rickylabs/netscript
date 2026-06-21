@@ -31,6 +31,6 @@ export function generateNetScriptConfig(options: NetScriptConfigGenOptions): str
     __slot7__: String(SCAFFOLD_DIRS.PLUGINS),
     __slot8__: String(SCAFFOLD_DEFAULTS.LOG_LEVEL),
     __slot9__: String(SCAFFOLD_DEFAULTS.LOG_FORMAT),
-    __slot10__: String(SCAFFOLD_DEFAULTS.ASPIRE_APPHOST_PATH),
+    __slot10__: String(SCAFFOLD_DEFAULTS.ASPIRE_TS_APPHOST_PATH),
   });
 }

@@ -64,7 +64,13 @@ export type {
   ListenOptions,
   MessageContext,
   MessageQueue,
+  NackOptions,
 } from './ports/message-queue.ts';
+export type {
+  DeadLetterReason,
+  DeadLetterRecord,
+  DeadLetterStorePort,
+} from './ports/dead-letter.ts';
 
 export {
   type QueueConnectionOptions,

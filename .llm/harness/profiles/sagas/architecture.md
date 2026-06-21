@@ -99,8 +99,8 @@ const runtime = createSagaRuntime({
   // transport
   transport: createRedisTransport({ url: env.REDIS_URL }),
 
-  // store
-  store: createKvSagaStore({ kv: Deno.openKv() }),
+  // store (explicit backend choice)
+  store: new KvSagaStore({ kv }), // or new PrismaSagaStore({ prisma })
 
   // discovery
   registry: sagaRegistry, // emitted by walker

@@ -12,6 +12,12 @@ import {
   createWorkersRuntime as createWorkersRuntimeImpl,
   type WorkersRuntimeOptions as RuntimeOptions,
 } from '../runtime/mod.ts';
+export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from '../ports/mod.ts';
 
 /** Branded worker job identifier. */
 export type JobId<TId extends string = string> = TId & { readonly __brand: 'JobId' };

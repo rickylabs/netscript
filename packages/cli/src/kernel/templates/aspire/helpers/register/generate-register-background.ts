@@ -16,7 +16,7 @@
  */
 
 import type { RegisterBackgroundOptions } from '../types.ts';
-import { fileHeader, safeIdentifier } from '../_utils.ts';
+import { extractSagaStoreBackend, fileHeader, safeIdentifier } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
 import { TEMPLATE_KEYS } from '../../../../assets/manifest.ts';
@@ -75,6 +75,13 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
     lines.push(
       `    await ${id}.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', ${id}_bootstrapModule);`,
     );
+
+    const sagaStoreBackend = extractSagaStoreBackend(entry);
+    if (sagaStoreBackend) {
+      lines.push(
+        `    await ${id}.withEnvironment('NETSCRIPT_SAGA_STORE', ${JSON.stringify(sagaStoreBackend)});`,
+      );
+    }
 
     // Telemetry env vars
     if (telemetry) {

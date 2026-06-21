@@ -4,7 +4,8 @@
   "description": "Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.",
   "license": "MIT",
   "exports": {
-    ".": "./mod.ts"
+    ".": "./mod.ts",
+    "./auth": "./src/auth/mod.ts"
   },
   "tasks": {
     "check": "deno check --unstable-kv ./mod.ts",
@@ -17,6 +18,7 @@
     "hono": "jsr:@hono/hono@4.12.24",
     "hono/cors": "jsr:@hono/hono@4.12.24/cors",
     "hono/logger": "jsr:@hono/hono@4.12.24/logger",
+    "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@orpc/openapi/fetch": "npm:@orpc/openapi@^1.14.6/fetch",
     "@orpc/server/fetch": "npm:@orpc/server@^1.14.6/fetch",
     "@orpc/server/plugins": "npm:@orpc/server@^1.14.6/plugins",

@@ -8,9 +8,22 @@
 
 import { AmqpMessageQueue } from '@fedify/amqp';
 import { connect } from 'npm:amqplib@^0.10.3';
-import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import type {
+  DeadLetterStorePort,
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  NackOptions,
+} from '../ports/mod.ts';
 import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
-import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
+import {
+  createEnvelope,
+  createMessageContext,
+  isMessageEnvelope,
+  toDeadLetterRecord,
+} from './_envelope.ts';
+import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -24,6 +37,8 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
   private readonly connection: Promise<unknown>;
   private listening = false;
   private abortController?: AbortController;
+  private deadLetterStore: DeadLetterStorePort<T> | null = null;
+  private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
 
   /**
    * RabbitMQ supports native redelivery through broker acknowledgements.
@@ -39,7 +54,9 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
   constructor(
     private readonly url: string,
     private readonly queueName = 'default',
+    explicitDeadLetterStore?: DeadLetterStorePort<T>,
   ) {
+    this.explicitDeadLetterStore = explicitDeadLetterStore;
     try {
       this.connection = connect(url);
       this.connection.then((connection) => {
@@ -60,6 +77,21 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
         error instanceof Error ? error : undefined,
       );
     }
+  }
+
+  /**
+   * Resolve the configured DLQ store or lazily create the KV-backed default.
+   */
+  private ensureDeadLetterStore(): DeadLetterStorePort<T> {
+    if (this.deadLetterStore) {
+      return this.deadLetterStore;
+    }
+    if (this.explicitDeadLetterStore) {
+      this.deadLetterStore = this.explicitDeadLetterStore;
+      return this.deadLetterStore;
+    }
+    this.deadLetterStore = new KvDeadLetterStore<T>({ queueName: this.queueName });
+    return this.deadLetterStore;
   }
 
   /**
@@ -157,7 +189,7 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
 
         await handler(
           payload,
-          this.createContext(messageId, enqueuedAt, headers, deliveryCount),
+          this.createContext(messageId, payload, enqueuedAt, headers, deliveryCount),
         );
       }, { signal: this.abortController.signal });
     } catch (error) {
@@ -206,6 +238,7 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
    */
   private createContext(
     messageId: string,
+    payload: T,
     enqueuedAt: Date,
     headers: Record<string, string>,
     deliveryCount: number,
@@ -216,7 +249,24 @@ export class AmqpAdapter<T = unknown> implements MessageQueue<T> {
       headers,
       deliveryCount,
       async () => {},
-      async () => {},
+      async (options: NackOptions = {}) => {
+        if (options.requeue ?? true) {
+          return;
+        }
+        const store = this.ensureDeadLetterStore();
+        await store.append(toDeadLetterRecord(
+          {
+            messageId,
+            queueName: this.queueName,
+            payload,
+            headers,
+            deliveryCount,
+            enqueuedAt,
+          },
+          options.reason ?? 'nack_without_requeue',
+          options,
+        ));
+      },
     );
   }
 }

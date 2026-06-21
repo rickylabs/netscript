@@ -17,7 +17,7 @@
  * @module
  */
 
-import type { ServiceContext, ServiceHandler } from '../types.ts';
+import type { ServiceHandler } from '../types.ts';
 
 /** Health status values emitted by service health handlers. */
 export const HEALTH_STATUS = {
@@ -86,7 +86,7 @@ export interface HealthHandlerOptions {
 export function createHealthHandler(options?: HealthHandlerOptions): ServiceHandler {
   const { checks = [], version, includeDetails = true } = options ?? {};
 
-  return (async (c: ServiceContext): Promise<Response> => {
+  return async (c): Promise<Response> => {
     const results = await Promise.allSettled(
       checks.map(async (check) => {
         const start = performance.now();
@@ -131,7 +131,7 @@ export function createHealthHandler(options?: HealthHandlerOptions): ServiceHand
     };
 
     return c.json(response, allHealthy ? 200 : 503);
-  }) as ServiceHandler;
+  };
 }
 
 /**
@@ -221,8 +221,7 @@ export const healthChecks = {
  * ```
  */
 export function createLivenessHandler(): ServiceHandler {
-  return ((c: ServiceContext): Response =>
-    c.json({ status: LIVENESS_STATUS_OK }, 200)) as ServiceHandler;
+  return (c): Response => c.json({ status: LIVENESS_STATUS_OK }, 200);
 }
 
 /**
@@ -238,7 +237,7 @@ export function createLivenessHandler(): ServiceHandler {
 export function createReadinessHandler(
   checks: Array<() => Promise<boolean>>,
 ): ServiceHandler {
-  return (async (c: ServiceContext): Promise<Response> => {
+  return async (c): Promise<Response> => {
     try {
       const results = await Promise.all(checks.map((check) => check()));
       const allReady = results.every((r) => r === true);
@@ -246,5 +245,5 @@ export function createReadinessHandler(
     } catch {
       return c.json({ ready: false }, 503);
     }
-  }) as ServiceHandler;
+  };
 }

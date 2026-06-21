@@ -1,10 +1,11 @@
-import type { MessageQueue } from '@netscript/queue';
+import type { MessageContext, MessageQueue } from '@netscript/queue';
 import type {
   JobDefinition,
   JobMessage,
   TaskDefinition,
   TaskExecutionOptions,
   TaskMessage,
+  WorkerIdempotencyPort,
 } from '@netscript/plugin-workers-core/runtime';
 import type { TracedMessageContext } from '@netscript/telemetry/instrumentation';
 import type { Span } from '@netscript/telemetry/tracer';
@@ -133,6 +134,8 @@ export interface WorkerOptions {
   taskExecutor: WorkerTaskExecutor;
   /** Task registry instance. */
   taskRegistry: WorkerTaskRegistry;
+  /** Durable applied-keys store for consumer-side idempotency. */
+  idempotency: WorkerIdempotencyPort;
   /** Base directory for job scripts. */
   jobsDir?: string;
   /** Additional queue triggers. */
@@ -184,6 +187,7 @@ export interface WorkerDispatchContext {
   readonly executionState: WorkerExecutionState;
   readonly taskExecutor: WorkerTaskExecutor;
   readonly taskRegistry: WorkerTaskRegistry;
+  readonly idempotency: WorkerIdempotencyPort;
   readonly workerPool: WorkerPool;
   readonly jobsDir: string;
   readonly activeJobs: Map<string, JobExecutionContext>;
@@ -199,6 +203,7 @@ export interface WorkerQueueContext {
   readonly abortController: AbortController | null;
   readonly processJob: (
     message: JobMessage,
+    queueContext?: MessageContext,
     context?: TracedMessageContext,
   ) => Promise<void>;
   setTaskQueue(queue: MessageQueue<TaskMessage> | null): void;

@@ -14,12 +14,16 @@ import {
   type SagaStateEnvelope,
 } from '../domain/mod.ts';
 import type {
+  SagaAppliedKeyStore,
   SagaBusPort,
   SagaPublishOptions,
   SagaQueryDispatch,
   SagaSignalDispatch,
   SagaStorePort,
 } from '../ports/mod.ts';
+import { MemorySagaAppliedKeyStore } from './saga-applied-keys.ts';
+import { SagaInstrumentation } from '../telemetry/mod.ts';
+import { type SagaTelemetryOutcome, SagaTelemetryOutcomes } from '../telemetry/mod.ts';
 
 /** Registered handler target stored in the O(1) message dispatch index. */
 export type SagaEngineDispatchEntry = Readonly<{
@@ -36,6 +40,7 @@ export type SagaEngineHandleResult<TState extends SagaState = SagaState> = Reado
   state: TState;
   cascaded: readonly CascadedMessage[];
   completed: boolean;
+  alreadyApplied: boolean;
 }>;
 
 /** Retry classification used by the native engine before DLQ handoff. */
@@ -52,6 +57,8 @@ export type SagaEngineOptions = Readonly<{
   id?: string;
   defaultRetryPolicy?: RetryPolicy;
   store?: SagaStorePort;
+  appliedKeys?: SagaAppliedKeyStore;
+  instrumentation?: SagaInstrumentation;
 }>;
 
 type ConcurrencySlot = Readonly<{
@@ -65,6 +72,8 @@ export class SagaEngine implements SagaBusPort {
   readonly id: string;
   readonly #retryPolicy: RetryPolicy;
   readonly #store?: SagaStorePort;
+  readonly #appliedKeys: SagaAppliedKeyStore;
+  readonly #instrumentation: SagaInstrumentation;
   readonly #definitions = new Map<SagaId, SagaDefinition<string, SagaState, SagaMessage>>();
   readonly #dispatchIndex = new Map<string, readonly SagaEngineDispatchEntry[]>();
   readonly #concurrency = new Map<string, ConcurrencySlot>();
@@ -75,6 +84,8 @@ export class SagaEngine implements SagaBusPort {
     this.id = options.id ?? 'saga-engine';
     this.#retryPolicy = options.defaultRetryPolicy ?? DEFAULT_RETRY_POLICY;
     this.#store = options.store;
+    this.#appliedKeys = options.appliedKeys ?? new MemorySagaAppliedKeyStore();
+    this.#instrumentation = options.instrumentation ?? new SagaInstrumentation();
   }
 
   /** Start accepting saga messages. */
@@ -100,8 +111,8 @@ export class SagaEngine implements SagaBusPort {
   }
 
   /** Publish a message directly into the native handler pipeline. */
-  async publish(message: SagaMessage, _options: SagaPublishOptions = {}): Promise<void> {
-    await this.handle(message);
+  async publish(message: SagaMessage, options: SagaPublishOptions = {}): Promise<void> {
+    await this.handle(withPublishOptions(message, options));
   }
 
   /** Dispatch cascaded send messages through the native engine. */
@@ -209,6 +220,20 @@ export class SagaEngine implements SagaBusPort {
       const instanceId = await this.#resolveInstanceId(entry.sagaId, message, correlationKey);
       const loaded = await this.#store?.load(instanceId);
       const baseState = loaded?.state ?? entry.definition.initialState;
+      if (message.idempotencyKey) {
+        const outcome = await this.#appliedKeys.recordApplied(instanceId, message.idempotencyKey);
+        if (!outcome.applied) {
+          return Object.freeze({
+            sagaId: entry.sagaId,
+            instanceId,
+            message,
+            state: cloneState(baseState),
+            cascaded: Object.freeze([]),
+            completed: false,
+            alreadyApplied: true,
+          });
+        }
+      }
       const previousState = cloneState(baseState);
       const saga = { state: cloneState(baseState) };
       const context: SagaContext<SagaState, SagaMessage> = {
@@ -222,32 +247,72 @@ export class SagaEngine implements SagaBusPort {
         traceparent: message.traceparent,
         tracestate: message.tracestate,
       };
-      const cascaded = handler(saga, message, context);
-      const completed = cascaded.some((item) => item.kind === 'complete');
-      const state = cloneState(saga.state);
-      const status = resolvePersistedStatus(cascaded, loaded?.metadata.status);
-
-      await this.#persistTransition({
-        definition: entry.definition,
-        instanceId,
-        correlationKey,
-        loaded,
-        previousState,
-        state,
-        message,
-        completed,
-        status,
-        now: context.now,
-      });
-
-      return Object.freeze({
+      const handleSpanInput = Object.freeze({
         sagaId: entry.sagaId,
         instanceId,
-        message,
-        state,
-        cascaded,
-        completed,
+        eventType: message.type,
+        attempt,
+        durabilityTier: entry.definition.durability,
+        correlationKey,
+        parent: {
+          traceparent: message.traceparent,
+          tracestate: message.tracestate,
+        },
       });
+      const startedAt = performance.now();
+      const span = this.#instrumentation.startHandleSpan(handleSpanInput);
+      this.#instrumentation.recordStateBefore(span, {
+        'saga.status': loaded?.metadata.status,
+      });
+
+      try {
+        const cascaded = handler(saga, message, context);
+        const completed = cascaded.some((item) => item.kind === 'complete');
+        const state = cloneState(saga.state);
+        const status = resolvePersistedStatus(cascaded, loaded?.metadata.status);
+
+        await this.#persistTransition({
+          definition: entry.definition,
+          instanceId,
+          correlationKey,
+          loaded,
+          previousState,
+          state,
+          message,
+          completed,
+          status,
+          now: context.now,
+        });
+
+        const outcome = telemetryOutcomeFromStatus(status);
+        this.#instrumentation.recordStateAfter(span, {
+          'saga.status': status,
+        });
+        this.#instrumentation.finishSpan(span, outcome);
+        this.#instrumentation.recordHandleDuration({
+          ...handleSpanInput,
+          outcome,
+          durationMs: performance.now() - startedAt,
+        });
+
+        return Object.freeze({
+          sagaId: entry.sagaId,
+          instanceId,
+          message,
+          state,
+          cascaded,
+          completed,
+          alreadyApplied: false,
+        });
+      } catch (error) {
+        this.#instrumentation.finishSpan(span, SagaTelemetryOutcomes.ERROR, error);
+        this.#instrumentation.recordHandleDuration({
+          ...handleSpanInput,
+          outcome: SagaTelemetryOutcomes.ERROR,
+          durationMs: performance.now() - startedAt,
+        });
+        throw error;
+      }
     });
   }
 
@@ -366,6 +431,16 @@ function resolveInstanceId(sagaId: SagaId, message: SagaMessage): SagaInstanceId
   return `${sagaId}:${key}` as SagaInstanceId;
 }
 
+function withPublishOptions(message: SagaMessage, options: SagaPublishOptions): SagaMessage {
+  return Object.freeze({
+    ...message,
+    idempotencyKey: options.idempotencyKey ?? message.idempotencyKey,
+    concurrencyKey: options.concurrencyKey ?? message.concurrencyKey,
+    traceparent: options.traceparent ?? message.traceparent,
+    tracestate: options.tracestate ?? message.tracestate,
+  });
+}
+
 function resolveCorrelationKey(sagaId: SagaId, message: SagaMessage): SagaCorrelationKey {
   return (message.correlationKey ?? message.id ??
     `${sagaId}:${message.type}`) as SagaCorrelationKey;
@@ -397,4 +472,10 @@ function resolvePersistedStatus(
 function isTerminalStatus(status: SagaInstanceStatus): boolean {
   return status === 'completed' || status === 'failed' || status === 'compensating' ||
     status === 'cancelled';
+}
+
+function telemetryOutcomeFromStatus(status: SagaInstanceStatus): SagaTelemetryOutcome {
+  if (status === 'failed') return SagaTelemetryOutcomes.ERROR;
+  if (status === 'compensating') return SagaTelemetryOutcomes.COMPENSATED;
+  return SagaTelemetryOutcomes.SUCCESS;
 }

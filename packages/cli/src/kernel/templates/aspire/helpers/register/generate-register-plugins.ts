@@ -19,7 +19,7 @@
  */
 
 import type { RegisterPluginsOptions } from '../types.ts';
-import { fileHeader, safeIdentifier } from '../_utils.ts';
+import { extractSagaStoreBackend, fileHeader, safeIdentifier } from '../_utils.ts';
 import { SCAFFOLD_ASPIRE_MODULES } from '../../../../constants/scaffold/scaffold-aspire.ts';
 import { SCAFFOLD_DIRS } from '../../../../constants/scaffold/scaffold-dirs.ts';
 import { RESOURCE_DEFAULTS } from '@netscript/aspire/constants';
@@ -79,6 +79,13 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
     lines.push(
       `    await resource.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', bootstrapModule);`,
     );
+
+    const sagaStoreBackend = extractSagaStoreBackend(entry);
+    if (sagaStoreBackend) {
+      lines.push(
+        `    await resource.withEnvironment('NETSCRIPT_SAGA_STORE', ${JSON.stringify(sagaStoreBackend)});`,
+      );
+    }
 
     // OTEL telemetry (full executable env set)
     lines.push(``);

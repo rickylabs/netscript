@@ -28,7 +28,7 @@ export class StaticSagasCliBackend implements SagasCliBackend {
 }
 
 /** Base command wrapper for sagas plugin CLI commands. */
-export abstract class SagasCliCommand {
+export class SagasCliCommand {
   /** Static command metadata used by the host CLI. */
   readonly definition: SagasCliCommandDefinition;
   /** Grouping category used by help and discovery output. */

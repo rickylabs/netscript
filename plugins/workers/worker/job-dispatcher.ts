@@ -2,7 +2,9 @@ import {
   DEFAULT_TOPIC,
   type JobMessage,
   type TaskMessage,
+  type WorkerIdempotencyClaim,
 } from '@netscript/plugin-workers-core/runtime';
+import type { MessageContext } from '@netscript/queue';
 import {
   addJobStepEvent,
   type TracedMessageContext,
@@ -12,11 +14,13 @@ import { getParentContextFromHeaders, getTraceContext } from '@netscript/telemet
 import { WorkerAttributes } from '@netscript/telemetry/attributes';
 import { executeWorkerJob } from './job-execution.ts';
 import type { JobExecutionContext, WorkerDispatchContext } from './worker-options.ts';
+import { recordIdempotentSkip } from './worker-idempotency-events.ts';
 
 /** Process a queued job message. */
 export async function processWorkerJob(
   context: WorkerDispatchContext,
   message: JobMessage,
+  queueContext?: MessageContext,
   tracedContext?: TracedMessageContext,
 ): Promise<void> {
   const { jobId, payload, correlationId } = message;
@@ -27,6 +31,7 @@ export async function processWorkerJob(
   console.log(`[Worker ${context.workerId}] Processing job '${jobId}' (trigger: ${triggeredBy})`);
 
   let executionId: string | undefined;
+  let claim: WorkerIdempotencyClaim | undefined;
 
   try {
     const jobDef = await context.registry.get(jobId);
@@ -38,6 +43,18 @@ export async function processWorkerJob(
     }
 
     const topic = jobDef.topic ?? message.topic ?? DEFAULT_TOPIC;
+    claim = await context.idempotency.claim({
+      concept: 'job',
+      targetId: jobId,
+      idempotencyKey: message.idempotencyKey,
+      messageId: queueContext?.messageId,
+      payload,
+    });
+    if (!claim.claimed) {
+      recordIdempotentSkip(context, 'job', jobId, claim, tracedContext);
+      return;
+    }
+
     const execution = await context.executionState.create({
       jobId,
       topic,
@@ -107,6 +124,11 @@ export async function processWorkerJob(
         );
 
         addJobStepEvent('state_update', { status: result.success ? 'completed' : 'failed' });
+        if (result.success) {
+          await context.idempotency.markApplied(claim!.key);
+        } else {
+          await context.idempotency.release(claim!.key);
+        }
         await context.executionState.complete(executionId!, {
           status: result.success ? 'completed' : 'failed',
           exitCode: result.exitCode ?? (result.success ? 0 : 1),
@@ -118,6 +140,9 @@ export async function processWorkerJob(
       },
     );
   } catch (error) {
+    if (claim?.claimed) {
+      await context.idempotency.release(claim.key);
+    }
     await recordJobFailure(context, message, executionId, error);
   } finally {
     if (executionId) {
@@ -130,10 +155,12 @@ export async function processWorkerJob(
 export async function processWorkerTask(
   context: WorkerDispatchContext,
   message: TaskMessage,
+  queueContext?: MessageContext,
 ): Promise<void> {
   const { taskId, payload, correlationId, triggeredBy } = message;
   const topic = message.topic ?? DEFAULT_TOPIC;
   let executionId: string | undefined;
+  let claim: WorkerIdempotencyClaim | undefined;
 
   console.log(`[Worker ${context.workerId}] Processing task '${taskId}' (trigger: ${triggeredBy})`);
 
@@ -141,6 +168,18 @@ export async function processWorkerTask(
     const taskDef = await context.taskRegistry.get(taskId);
     if (!taskDef) throw new Error(`Task '${taskId}' not found in registry`);
     if (!taskDef.enabled) throw new Error(`Task '${taskId}' is disabled`);
+
+    claim = await context.idempotency.claim({
+      concept: 'task',
+      targetId: taskId,
+      idempotencyKey: message.idempotencyKey,
+      messageId: queueContext?.messageId,
+      payload,
+    });
+    if (!claim.claimed) {
+      recordIdempotentSkip(context, 'task', taskId, claim);
+      return;
+    }
 
     const execution = await context.executionState.create({
       concept: 'task',
@@ -162,12 +201,19 @@ export async function processWorkerTask(
       timeout: taskDef.timeout,
     });
 
+    if (result.success) {
+      await context.idempotency.markApplied(claim.key);
+    }
+
     await context.executionState.complete(executionId, {
       status: result.success ? 'completed' : 'failed',
       exitCode: result.exitCode ?? (result.success ? 0 : 1),
       result: result.result ?? undefined,
       error: result.error ?? undefined,
     });
+    if (!result.success) {
+      await context.idempotency.release(claim.key);
+    }
 
     console.log(
       `[Worker ${context.workerId}] Task '${taskId}' ${
@@ -175,6 +221,9 @@ export async function processWorkerTask(
       } in ${result.duration}ms`,
     );
   } catch (error) {
+    if (claim?.claimed) {
+      await context.idempotency.release(claim.key);
+    }
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`[Worker ${context.workerId}] Task '${taskId}' failed:`, errorMessage);
 

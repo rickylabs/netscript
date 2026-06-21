@@ -26,8 +26,11 @@ export type {
   SagaIdempotencyTarget,
 } from '../runtime/saga-idempotency.ts';
 export type {
+  SagaAppliedKeyOutcome,
+  SagaAppliedKeyStore,
   SagaCorrelationIndexEntry,
   SagaIdempotencyPort,
   SagaStorePort,
   SagaStoreWriteOptions,
 } from '../ports/mod.ts';
+export { MemorySagaAppliedKeyStore } from '../runtime/mod.ts';

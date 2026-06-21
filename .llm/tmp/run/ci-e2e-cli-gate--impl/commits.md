@@ -1,0 +1,1 @@
+- `207c1112`: `ci: align e2e runtime toolchain` — aligns `e2e-cli` runtime setup with local .NET 10 + Aspire CLI 13.4.4 validation; includes local suite evidence and deterministic Aspire CLI install probe. Pushed with `git push origin HEAD:refs/heads/ci/e2e-cli-gate`.

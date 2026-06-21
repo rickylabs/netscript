@@ -40,6 +40,7 @@ export async function startWorkerProcess(options: StartWorkerProcessOptions = {}
     executionState: runtime.executionState,
     taskExecutor: createDefaultTaskExecutor(),
     taskRegistry: runtime.taskRegistry,
+    idempotency: runtime.idempotency,
     jobsDir: options.jobsDir ?? Deno.env.get('NETSCRIPT_JOBS_DIR') ?? './workers/jobs',
     workerPoolOptions: options.registry ? { registry: options.registry } : undefined,
   });
@@ -82,6 +83,7 @@ export async function startCombinedProcess(
     executionState: runtime.executionState,
     taskExecutor,
     taskRegistry: runtime.taskRegistry,
+    idempotency: runtime.idempotency,
     jobsDir: options.jobsDir ?? Deno.env.get('NETSCRIPT_JOBS_DIR') ?? './workers/jobs',
     workerPoolOptions: options.registry ? { registry: options.registry } : undefined,
   });

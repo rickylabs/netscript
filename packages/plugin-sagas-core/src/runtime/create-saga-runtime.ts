@@ -15,7 +15,9 @@ import type {
 import { createSagaEngine, type SagaEngine, type SagaEngineOptions } from './saga-engine.ts';
 import type { SagaCompensator } from './saga-compensator.ts';
 import type { SagaIdempotencyDedupTable } from './saga-idempotency.ts';
+import { type LoggerPort, NoopLogger } from './logger.ts';
 import type { SagaScheduler } from './saga-scheduler.ts';
+import type { SagaInstrumentation } from '../telemetry/mod.ts';
 
 /** Adapter selected by the saga runtime composition root. */
 export type SagaRuntimeAdapter = 'native' | 'legacy';
@@ -30,6 +32,8 @@ export type SagaRuntimeNativeOptions = Readonly<{
   store?: SagaStorePort;
   resolveCompensation?: SagaBridgeCompensationResolver;
   idempotency?: SagaIdempotencyPort | SagaIdempotencyDedupTable;
+  logger?: LoggerPort;
+  instrumentation?: SagaInstrumentation;
 }>;
 
 /** Options accepted by `createSagaRuntime()`. */
@@ -86,10 +90,18 @@ export function createSagaRuntime(
   return createRuntimeFacade('native', createNativeBus(options.native));
 }
 
+const storelessWarningLoggers = new WeakSet<LoggerPort>();
+
 function createNativeBus(options: SagaRuntimeNativeOptions = {}): SagaBusPort {
+  const store = options.store ?? options.engineOptions?.store;
+  if (options.engine === undefined && store === undefined) {
+    warnStorelessNativeRuntime(options.logger ?? new NoopLogger());
+  }
+
   const engine = options.engine ?? createSagaEngine({
     ...options.engineOptions,
-    store: options.store ?? options.engineOptions?.store,
+    store,
+    instrumentation: options.instrumentation ?? options.engineOptions?.instrumentation,
   });
   return createSagaBusBridge({
     id: options.id,
@@ -98,6 +110,18 @@ function createNativeBus(options: SagaRuntimeNativeOptions = {}): SagaBusPort {
     compensator: options.compensator,
     resolveCompensation: options.resolveCompensation,
     idempotency: options.idempotency,
+    instrumentation: options.instrumentation,
+  });
+}
+
+function warnStorelessNativeRuntime(logger: LoggerPort): void {
+  if (storelessWarningLoggers.has(logger)) {
+    return;
+  }
+  storelessWarningLoggers.add(logger);
+  logger.warn('Native saga runtime created without a durable SagaStorePort.', {
+    code: 'sagas.runtime.store_missing',
+    adapter: 'native',
   });
 }
 

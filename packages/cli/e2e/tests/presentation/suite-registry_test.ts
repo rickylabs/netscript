@@ -31,6 +31,7 @@ Deno.test('plugin suite includes all official plugin and generated-check gates',
     'scaffold.plugin.saga',
     'scaffold.plugin.trigger',
     'scaffold.plugin.stream',
+    'scaffold.plugin.auth',
     GATE.SCAFFOLD_PLUGIN_LIST,
     GATE.GENERATED_PLUGINS_CHECK,
     GATE.BEHAVIOR_PLUGINS_HEALTH,
@@ -44,6 +45,7 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_GENERATE), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.DATABASE_SEED), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.GENERATED_DENO_CHECK), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_AUTH_SMOKE_ENV), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.RUNTIME_ASPIRE_START), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_WORKERS_JOBS), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_WORKERS_SEED), true);
@@ -56,6 +58,9 @@ Deno.test('runtime suite includes full scaffold, database, runtime, and behavior
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_TRIGGERS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_TRIGGERS_WEBHOOK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_TRIGGERS_EVENTS), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_LIVE), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_READY), true);
+  assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_AUTH_SESSION), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_PLUGINS_HEALTH), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_WEBHOOK), true);
   assertEquals(runtime.gates.some((gate) => gate.id === GATE.BEHAVIOR_OTEL_TRACES), true);
