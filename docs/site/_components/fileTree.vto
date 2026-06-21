@@ -1,0 +1,29 @@
+{{# Lume component — docs/site/_components/fileTree.vto
+   Project file-tree rendering (Astro file-tree visualizer). Pure markup + CSS,
+   no JS. Accepts a nested structure of { name, children?, comment? }; a node with
+   `children` renders as a directory, a leaf as a file. Recurses by calling itself.
+   Invoke:
+     {{ comp.fileTree({ items: [
+          { name: "my-app/", children: [
+            { name: "plugins/", children: [
+              { name: "checkout/", comment: "saga plugin" },
+            ] },
+            { name: "deno.json", comment: "workspace config" },
+          ] },
+        ] }) }}
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{ set nodes = items || [] }}
+{{ set nested = nested || false }}
+<ul class="ns-file-tree{{ if !nested }} ns-file-tree--root{{ /if }}" role="{{ if nested }}group{{ else }}tree{{ /if }}">
+  {{ for node of nodes }}
+    {{ set isDir = node.children && node.children.length }}
+    <li class="ns-file-tree__item ns-file-tree__item--{{ if isDir }}dir{{ else }}file{{ /if }}" role="treeitem">
+      <span class="ns-file-tree__row">
+        <span class="ns-file-tree__icon" aria-hidden="true">{{ if isDir }}▸{{ else }}·{{ /if }}</span>
+        <span class="ns-file-tree__name">{{ node.name }}</span>
+        {{ if node.comment }}<span class="ns-file-tree__comment"># {{ node.comment }}</span>{{ /if }}
+      </span>
+      {{ if isDir }}{{ comp.fileTree({ items: node.children, nested: true }) }}{{ /if }}
+    </li>
+  {{ /for }}
+</ul>
