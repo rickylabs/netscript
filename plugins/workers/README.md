@@ -126,6 +126,12 @@ executes queued work. `workers-scheduler` only schedules due work.
 The wrappers exist so Aspire and process supervisors can launch concrete files instead of importing
 an export-only module.
 
+Worker consumers provide an at-least-once delivery model with idempotency keys, making job and task
+effects exactly-once-effective when handlers key their external writes on the message
+`idempotencyKey`. Trigger-produced jobs stamp that key onto the `JobMessage` body, and the worker
+runtime records durable applied keys in the same shared KV store used by execution state. Duplicate
+redeliveries are recorded as already-applied skips, not failures.
+
 ## 9. CLI
 
 The CLI subpath exports `WorkersCli` and command classes for:
@@ -219,6 +225,12 @@ The plugin manifest declares the permissions needed by service and background ru
 - `--allow-read`
 - `--allow-write`
 - `--allow-run`
+
+Worker idempotency uses the configured KV provider and reads optional
+`NETSCRIPT_WORKERS_IDEMPOTENCY_ACTIVE_TTL_MS` and
+`NETSCRIPT_WORKERS_IDEMPOTENCY_APPLIED_TTL_MS` environment overrides when the process has
+`--allow-env`. Without those variables, active claims default to 15 minutes and applied markers
+default to 24 hours.
 
 Narrower permissions can be supplied by process-specific launchers when the host owns command
 construction.

@@ -1,0 +1,17 @@
+{
+  "run_id": "27867781018",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/27867781018",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "84",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "feat/prime-time/sagas-prisma-store",
+  "summary_path": "/home/runner/work/_temp/openhands/27867781018-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-84/run-27867781018-1"
+}

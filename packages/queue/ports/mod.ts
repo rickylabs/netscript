@@ -12,7 +12,11 @@ export type {
   ListenOptions,
   MessageContext,
   MessageQueue,
+  NackOptions,
 } from './message-queue.ts';
+
+// Dead-letter queue contract
+export type { DeadLetterReason, DeadLetterRecord, DeadLetterStorePort } from './dead-letter.ts';
 
 // Configuration and options
 export {

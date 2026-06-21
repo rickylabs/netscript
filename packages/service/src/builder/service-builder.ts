@@ -28,6 +28,7 @@
  */
 
 import type { LoggerMiddlewareOptions } from '@netscript/logger/middleware';
+import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import type { HealthCheck } from '../primitives/health.ts';
 import type {
   ContextFactory,
@@ -40,6 +41,7 @@ import type {
   ServiceHandler,
   ServiceMiddleware,
   ServiceRouter,
+  ShutdownHook,
 } from '../types.ts';
 import { ServiceBuilderImpl } from './service-builder-impl.ts';
 
@@ -90,11 +92,52 @@ export interface ServiceBuilder<TRouter extends ServiceRouter> {
     },
   ): ServiceBuilder<TRouter>;
 
+  /**
+   * Enables authentication for guarded service paths.
+   *
+   * @example
+   * ```typescript
+   * createService(router, { name: 'users' })
+   *   .withAuthn({ authenticator })
+   *   .withRPC();
+   * ```
+   */
+  withAuthn(options: AuthnOptions): ServiceBuilder<TRouter>;
+
+  /**
+   * Enables authorization for authenticated requests.
+   *
+   * @example
+   * ```typescript
+   * createService(router, { name: 'users' })
+   *   .withAuthn({ authenticator })
+   *   .withAuthz({ authorizer })
+   *   .withRPC();
+   * ```
+   */
+  withAuthz(options: AuthzOptions): ServiceBuilder<TRouter>;
+
   /** Sets the per-request oRPC context factory. */
   withContext(factory: ContextFactory): ServiceBuilder<TRouter>;
 
   /** Registers an async startup hook. */
   onStartup(hook: () => Promise<void>): ServiceBuilder<TRouter>;
+
+  /**
+   * Registers an async teardown hook run during graceful shutdown.
+   *
+   * @example
+   * ```typescript
+   * const running = await createService(router, { name: 'users' })
+   *   .onShutdown(async () => {
+   *     await db.$disconnect();
+   *   })
+   *   .serve({ port: 3000 });
+   *
+   * await running.stop();
+   * ```
+   */
+  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter>;
 
   /** Configures health check endpoints. */
   withHealth(

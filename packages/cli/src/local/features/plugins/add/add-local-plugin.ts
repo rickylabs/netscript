@@ -129,6 +129,7 @@ export async function addLocalPlugin(
     {
       serviceReferences: mergeUniqueReferences(plan.serviceReferences, rendered.serviceReferences),
       pluginReferences: mergeUniqueReferences(plan.pluginReferences, rendered.pluginReferences),
+      sagaStoreBackend: plan.sagaStoreBackend,
     },
   );
   await dependencies.workspaceMutator.ensureNetScriptConfigPlugin(

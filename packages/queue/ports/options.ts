@@ -6,6 +6,8 @@
  * @module
  */
 
+import type { DeadLetterStorePort } from './dead-letter.ts';
+
 /**
  * Supported queue providers.
  */
@@ -73,6 +75,12 @@ export interface QueueOptions {
    * Provider-specific connection options.
    */
   connection?: QueueConnectionOptions;
+
+  /**
+   * Optional dead-letter store used for terminal message failures.
+   * When omitted, adapters use their provider-specific durable default.
+   */
+  deadLetterStore?: DeadLetterStorePort;
 
   /**
    * Disable automatic tracing wrapper.

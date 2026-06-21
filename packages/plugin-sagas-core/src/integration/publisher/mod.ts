@@ -1,3 +1,9 @@
+/**
+ * Publisher port contracts for submitting saga messages from plugin surfaces.
+ *
+ * @module
+ */
+
 export type { SagaCorrelationKey, SagaMessage, SagaMessageId } from '../../domain/mod.ts';
 export type {
   SagaPublisherBatchMode,

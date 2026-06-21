@@ -33,6 +33,40 @@ Codex Desktop/mobile -> SSH target codex-wsl -> WSL Ubuntu codex user -> codex a
   Desktop-sync only and never appears on mobile. Use it only for headless work you don't need to
   watch from the phone.
 
+### Default tooling — the agentic suite (use this before hand-rolling PowerShell)
+
+`.llm/tools/agentic/` is the **default mechanism** for staging, launching, watching, steering, and
+inspecting Codex slices. It defends every landmine below in code (PowerShell `<`/`$()` parse errors,
+CRLF-corrupted bash scripts, inherited-upstream push-to-main, rival concurrent sends) and is
+unit-tested. Reach for these before writing a fresh `ssh.exe`/`wsl.exe` one-liner. See
+`.llm/tools/agentic/README.md` for full flags and exit codes.
+
+| Need | Tool |
+| ---- | ---- |
+| Validate brief → push-safety gate → stage → launch a slice → record thread id | `launch-codex-slice.ts` (`--dry-run`, `--parse-log <log>`) |
+| Read-only daemon health, worktree git state, recent sessions | `codex-status.ts` |
+| Event-driven wait on a worktree's git activity (**run inside WSL**) | `codex-watch.ts` |
+| Steer an existing thread (never forks a rival) | `codex-resume.ts --thread-id <uuid> --message …` (`--dry-run`) |
+
+The suite enforces the one-active-send-per-worktree and explicit-refspec-push rules described in
+this skill; `codex-resume.ts` is the supported steering path (it issues exactly one
+`codex exec resume`, never a second `send-message-v2`).
+
+### Brief authoring (MANDATORY for every prompt file you hand to a Codex session)
+
+Every prompt/brief file passed to `send-message-v2` MUST:
+
+- Begin with `use harness` (harness is always-on for every agent).
+- Include a dedicated `## SKILL` chapter: a **bullet list naming each relevant repo skill** the
+  agent should activate, each with a one-line note of why/when it applies. **Be generous** — list
+  every plausibly-relevant skill (`netscript-harness`, `netscript-doctrine`, `jsr-audit`,
+  `netscript-tools`, `netscript-pr`, `netscript-deno-toolchain`, `netscript-cli`, `rtk`,
+  `codex-wsl-remote`, etc.). The rule: the more relevant skills you pass, the more efficient the
+  agent. Skills are thin and the agents are capable of using them appropriately, so under-listing is
+  the failure mode, not over-listing. There is no penalty for too many.
+- Strip CRLF before staging the file into WSL (`tr -d '\r' < src > dest`); CRLF in a brief or in a
+  `bash -lc` here-string breaks `cd`/redirects (see push-safety + line-ending landmines).
+
 ## Verified Baseline
 
 - WSL distro: `Ubuntu-24.04`
@@ -187,9 +221,13 @@ the supervisor turn is not blocked. Pattern (one per worktree, sequential):
 ssh.exe codex-wsl 'export PATH="$HOME/.local/bin:$PATH"; cd <native-worktree>; codex debug app-server send-message-v2 "<full self-contained brief: use harness, activate skills, pre-flight git fetch+reset, task, constraints, reporting>"' 2>&1 | Tee-Object <log>
 ```
 
-Supervise without polling: run `.llm/tools/watch-run.ts <run-dir>` as a background process — it
-wakes the supervisor when the sub-agent appends `commits.md`/`worklog.md`. Steer only with
-`codex exec resume <thread-id>`; never fire a second `send-message-v2` at the same worktree.
+Prefer the agentic suite: `launch-codex-slice.ts` validates the brief, runs the push-safety gate,
+stages with CRLF stripped, launches, and records the thread id for you (see the table above).
+
+Supervise without polling: run `.llm/tools/watch-run.ts <run-dir>` (run-artifact watcher), or
+`.llm/tools/agentic/codex-watch.ts --worktree <wsl path>` from inside WSL to wake on git activity.
+Steer only with `.llm/tools/agentic/codex-resume.ts` (or `codex exec resume <thread-id>`); never
+fire a second `send-message-v2` at the same worktree.
 
 For full CLI E2E, use the `netscript-cli` skill and run:
 

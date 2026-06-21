@@ -1,0 +1,400 @@
+`run-deno-check.ts --root packages/auth-workos --root packages/auth-better-auth 
+--ext ts,tsx` | **0** | 0 occurrences |\n| Scoped lint | `run-deno-lint.ts 
+--root packages/auth-workos --root packages/auth-better-auth --ext ts,tsx` | 
+**0** | 0 occurrences |\n| Scoped fmt | `run-deno-fmt.ts --root 
+packages/auth-workos --root packages/auth-better-auth --root .llm/tools/auth 
+--ext ts,tsx --ignore-line-endings` | **0** | 11 files, 0 findings |\n| WorkOS 
+tests | `deno test --allow-net packages/auth-workos/tests/` | **0** | 6 passed, 
+0 failed |\n| better-auth tests | `deno test --allow-net --allow-env 
+packages/auth-better-auth/tests/` | **0** | 7 passed, 0 failed |\n| WorkOS 
+doc-lint | `run-deno-doc-lint.ts --root packages/auth-workos --pretty` | **0** |
+0 missing JSDoc, 0 private-type-ref |\n| better-auth doc-lint | 
+`run-deno-doc-lint.ts --root packages/auth-better-auth --pretty` | **0** | 0 
+missing JSDoc, 0 private-type-ref |\n| publish:dry-run | `deno task 
+publish:dry-run` | **0** | Isolated declarations satisfied, no carve-out 
+|\n\n**All gates passed with raw exit code 0.**\n\n### Node-compat smoke 
+verification\n- **WorkOS**: `workos-node-compat_test.ts` imports 
+`@workos-inc/node@10.4.0` and constructs `new 
+WorkOS(...).userManagement.loadSealedSession(...).authenticate()` under Deno 
+2.8.3 node-compat \u2192 PASSED (16ms)\n- **better-auth**: 
+`better-auth-node-compat_test.ts` imports `better-auth@1.6.20` and constructs 
+`betterAuth({ secret, baseURL })` under Deno 2.8.3 \u2192 PASSED (20ms)\n\nBoth 
+provider SDKs resolve and execute under Deno's node-compatibility layer.\n\n## 
+Remaining Risks\n\n### Recorded deferrals (documented in drift.md, not gate 
+failures)\n1. **WorkOS webhook-to-database sync**: User/org sync from WorkOS 
+webhooks to database remains deferred (documented optional fast-follow per plan 
+\u00a71 out-of-scope)\n2. **CLI scaffold prompts**: Auth provider selection 
+prompts for CLI scaffold remain deferred (not in slice scope)\n3. **Pre-existing
+repo-wide findings**: `deno task arch:check` + `deps:audit` still report 
+pre-existing `undici`/`vite` advisories and repository-wide doctrine failures 
+outside the new auth adapter packages (per drift.md lines 14-17)\n\n### 
+Operational considerations\n- Consumer owns running `better-auth` Prisma 
+migration (plan \u00a71 out-of-scope + locked decision 9). Slice ships 
+generation + wiring; migration step is NOT a runtime dep\n- Services must 
+configure NetScript auth exemption/`allowAnonymous` policy for `/api/auth/**` 
+when using `mountBetterAuthHandler` (per worklog slice 5)\n- Catalog pins 
+`better-auth ^1.6.20` + `@workos-inc/node ^10.4.0` match `npm dist-tags.latest` 
+as of evaluation (verified in plan-eval)\n\n## Next Steps\n\nBranch 
+`feat/prime-time/service-auth-adapters` is ready to merge to umbrella branch 
+`feat/framework-prime-time`. All six implementation slices are complete, tested,
+documented, and gate-verified. The umbrella PR #83 can proceed with this slice 
+plus the already-merged `service-auth-seam` (#77).\n\n---\n\n**Evaluator 
+session**: Separate-session IMPL-EVAL, cycle 1, 2026-06-20  \n**Evaluation 
+artifacts**: 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/service-auth-adapters
+/evaluate.md`  \n**Raw gate logs**: `/tmp/eval-{check,lint,fmt}.{log,txt}` 
+(local to evaluator session)\n"}
+
+Reasoning:
+I am checking whether the summary writing has completed successfully, verifying 
+the file path and content to ensure there are no errors.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27867455720-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Summary — service-auth-adapters
+    
+    ## Summary
+    
+    Independent IMPL-EVAL completed for the `service-auth-adapters` prime-time 
+slice (`@netscript/auth-better-auth` + `@netscript/auth-workos`) on PR #83 
+branch `feat/prime-time/service-auth-adapters`.
+    
+    **Verdict: `PASS`**
+    
+    All production/enterprise bar requirements verified with file:line evidence.
+All required gates passed (exit code 0). No stubs, no no-ops, no contract 
+redefinition, no catalog violations.
+    
+    ## Changes Evaluated
+    
+    ### New packages
+    - `packages/auth-workos` — WorkOS AuthKit authenticators (sealed-session + 
+JWKS access-token)
+    - `packages/auth-better-auth` — better-auth integration (Prisma adapter 
+wrapper + authenticator + mount helper)
+    - `.llm/tools/auth/gen-better-auth-prisma.ts` — Schema generation wrapper 
+for better-auth Prisma models
+    
+    ### Key implementation details
+    - **WorkOS sealed-session**: `createWorkosAuthenticator` calls 
+`loadSealedSession().authenticate()` (line 159-166), maps WorkOS session to 
+`Principal`, refresh emits rotated session via `AuthnResult.setCookies` (line 
+267-274)
+    - **WorkOS access-token**: `createWorkosAccessTokenAuthenticator` uses REAL 
+`jose` JWKS signature verification with `createRemoteJWKSet` + `jwtVerify(token,
+jwks, { audience: clientId })` (line 205-218) — NOT a decode-only shim
+    - **better-auth Prisma wrapper**: `createNetscriptBetterAuth` wraps 
+better-auth's own first-party `prismaAdapter` from `better-auth/adapters/prisma`
+(line 113-118)
+    - **better-auth authenticator**: `createBetterAuthAuthenticator` calls 
+`auth.api.getSession({ headers, returnHeaders: true })` and captures 
+`Set-Cookie` via `headersFromBetterAuth` (line 140-272)
+    - **better-auth mount**: `mountBetterAuthHandler` mounts the Fetch handler 
+on Hono app (line 177-186)
+    - **PLAN-EVAL layering fix honored**: `@netscript/auth-better-auth` does NOT
+import `@netscript/database` (consumer brings Prisma client instance at 
+boundary)
+    
+    ### Additive-only contract consumption
+    - Both packages CONSUME 
+`AuthenticatorPort`/`AuthnRequest`/`AuthnResult`/`Principal` from 
+`@netscript/service/auth` (not redefined)
+    - Type re-exports in `mod.ts` are for consumer ergonomics (not redefinition)
+    
+    ### Catalog law compliance
+    - `packages/auth-workos/package.json` — `"@workos-inc/node": "catalog:"`, 
+`"jose": "catalog:"`
+    - `packages/auth-better-auth/package.json` — `"better-auth": "catalog:"`
+    - Workspace root `deno.json:96-114` — catalog block contains `better-auth: 
+"^1.6.20"`, `@workos-inc/node: "^10.4.0"`, `jose: "^5.9.2"`
+    - No de-catalog; `@prisma/client`/`jose` pins, 
+`packages/aspire/src/public/mod.ts`, and `scaffold-versions.ts` untouched
+    
+    ## Validation (independently re-run gates)
+    
+    | Gate | Command | Exit code | Result |
+    |------|---------|-----------|--------|
+    | Scoped type-check | `run-deno-check.ts --root packages/auth-workos --root 
+packages/auth-better-auth --ext ts,tsx` | **0** | 0 occurrences |
+    | Scoped lint | `run-deno-lint.ts --root packages/auth-workos --root 
+packages/auth-better-auth --ext ts,tsx` | **0** | 0 occurrences |
+    | Scoped fmt | `run-deno-fmt.ts --root packages/auth-workos --root 
+packages/auth-better-auth --root .llm/tools/auth --ext ts,tsx 
+--ignore-line-endings` | **0** | 11 files, 0 findings |
+    | WorkOS tests | `deno test --allow-net packages/auth-workos/tests/` | **0**
+| 6 passed, 0 failed |
+    | better-auth tests | `deno test --allow-net --allow-env 
+packages/auth-better-auth/tests/` | **0** | 7 passed, 0 failed |
+    | WorkOS doc-lint | `run-deno-doc-lint.ts --root packages/auth-workos 
+--pretty` | **0** | 0 missing JSDoc, 0 private-type-ref |
+    | better-auth doc-lint | `run-deno-doc-lint.ts --root 
+packages/auth-better-auth --pretty` | **0** | 0 missing JSDoc, 0 
+private-type-ref |
+    | publish:dry-run | `deno task publish:dry-run` | **0** | Isolated 
+declarations satisfied, no carve-out |
+    
+    **All gates passed with raw exit code 0.**
+    
+    ### Node-compat smoke verification
+    - **WorkOS**: `workos-node-compat_test.ts` imports `@workos-inc/node@10.4.0`
+and constructs `new 
+WorkOS(...).userManagement.loadSealedSession(...).authenticate()` under Deno 
+2.8.3 node-compat → PASSED (16ms)
+    - **better-auth**: `better-auth-node-compat_test.ts` imports 
+`better-auth@1.6.20` and constructs `betterAuth({ secret, baseURL })` under Deno
+2.8.3 → PASSED (20ms)
+    
+    Both provider SDKs resolve and execute under Deno's node-compatibility 
+layer.
+    
+    ## Remaining Risks
+    
+    ### Recorded deferrals (documented in drift.md, not gate failures)
+    1. **WorkOS webhook-to-database sync**: User/org sync from WorkOS webhooks 
+to database remains deferred (documented optional fast-follow per plan §1 
+out-of-scope)
+    2. **CLI scaffold prompts**: Auth provider selection prompts for CLI 
+scaffold remain deferred (not in slice scope)
+    3. **Pre-existing repo-wide findings**: `deno task arch:check` + 
+`deps:audit` still report pre-existing `undici`/`vite` advisories and 
+repository-wide doctrine failures outside the new auth adapter packages (per 
+drift.md lines 14-17)
+    
+    ### Operational considerations
+    - Consumer owns running `better-auth` Prisma migration (plan §1 out-of-scope
++ locked decision 9). Slice ships generation + wiring; migration step is NOT a 
+runtime dep
+    - Services must configure NetScript auth exemption/`allowAnonymous` policy 
+for `/api/auth/**` when using `mountBetterAuthHandler` (per worklog slice 5)
+    - Catalog pins `better-auth ^1.6.20` + `@workos-inc/node ^10.4.0` match `npm
+dist-tags.latest` as of evaluation (verified in plan-eval)
+    
+    ## Next Steps
+    
+    Branch `feat/prime-time/service-auth-adapters` is ready to merge to umbrella
+branch `feat/framework-prime-time`. All six implementation slices are complete, 
+tested, documented, and gate-verified. The umbrella PR #83 can proceed with this
+slice plus the already-merged `service-auth-seam` (#77).
+    
+    ---
+    
+    **Evaluator session**: Separate-session IMPL-EVAL, cycle 1, 2026-06-20  
+    **Evaluation artifacts**: 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/service-auth-adapters
+/evaluate.md`  
+    **Raw gate logs**: `/tmp/eval-{check,lint,fmt}.{log,txt}` (local to 
+evaluator session)
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 2.22M • cache hit 83.91% •  reasoning 13.82K • ↓ output 28.17K •
+$ 1.0199
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27867455720-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary — service-auth-adapters
+ 2|
++3|## Summary
++4|
++5|Independent IMPL-EVAL completed for the `service-auth-adapters` prime-time 
+slice (`@netscript/auth-better-auth` + `@netscript/auth-workos`) on PR #83 
+branch `feat/prime-time/service-auth-adapters`.
++6|
++7|**Verdict: `PASS`**
++8|
++9|All production/enterprise bar requirements verified with file:line evidence. 
+All required gates passed (exit code 0). No stubs, no no-ops, no contract 
+redefinition, no catalog violations.
++10|
++11|## Changes Evaluated
++12|
++13|### New packages
++14|- `packages/auth-workos` — WorkOS AuthKit authenticators (sealed-session + 
+JWKS access-token)
++15|- `packages/auth-better-auth` — better-auth integration (Prisma adapter 
+wrapper + authenticator + mount helper)
++16|- `.llm/tools/auth/gen-better-auth-prisma.ts` — Schema generation wrapper 
+for better-auth Prisma models
++17|
++18|### Key implementation details
++19|- **WorkOS sealed-session**: `createWorkosAuthenticator` calls 
+`loadSealedSession().authenticate()` (line 159-166), maps WorkOS session to 
+`Principal`, refresh emits rotated session via `AuthnResult.setCookies` (line 
+267-274)
++20|- **WorkOS access-token**: `createWorkosAccessTokenAuthenticator` uses REAL 
+`jose` JWKS signature verification with `createRemoteJWKSet` + `jwtVerify(token,
+jwks, { audience: clientId })` (line 205-218) — NOT a decode-only shim
++21|- **better-auth Prisma wrapper**: `createNetscriptBetterAuth` wraps 
+better-auth's own first-party `prismaAdapter` from `better-auth/adapters/prisma`
+(line 113-118)
++22|- **better-auth authenticator**: `createBetterAuthAuthenticator` calls 
+`auth.api.getSession({ headers, returnHeaders: true })` and captures 
+`Set-Cookie` via `headersFromBetterAuth` (line 140-272)
++23|- **better-auth mount**: `mountBetterAuthHandler` mounts the Fetch handler 
+on Hono app (line 177-186)
++24|- **PLAN-EVAL layering fix honored**: `@netscript/auth-better-auth` does NOT
+import `@netscript/database` (consumer brings Prisma client instance at 
+boundary)
++25|
++26|### Additive-only contract consumption
++27|- Both packages CONSUME 
+`AuthenticatorPort`/`AuthnRequest`/`AuthnResult`/`Principal` from 
+`@netscript/service/auth` (not redefined)
++28|- Type re-exports in `mod.ts` are for consumer ergonomics (not redefinition)
++29|
++30|### Catalog law compliance
++31|- `packages/auth-workos/package.json` — `"@workos-inc/node": "catalog:"`, 
+`"jose": "catalog:"`
++32|- `packages/auth-better-auth/package.json` — `"better-auth": "catalog:"`
++33|- Workspace root `deno.json:96-114` — catalog block contains `better-auth: 
+"^1.6.20"`, `@workos-inc/node: "^10.4.0"`, `jose: "^5.9.2"`
++34|- No de-catalog; `@prisma/client`/`jose` pins, 
+`packages/aspire/src/public/mod.ts`, and `scaffold-versions.ts` untouched
++35|
++36|## Validation (independently re-run gates)
++37|
++38|| Gate | Command | Exit code | Result |
++39||------|---------|-----------|--------|
++40|| Scoped type-check | `run-deno-check.ts --root packages/auth-workos --root 
+packages/auth-better-auth --ext ts,tsx` | **0** | 0 occurrences |
++41|| Scoped lint | `run-deno-lint.ts --root packages/auth-workos --root 
+packages/auth-better-auth --ext ts,tsx` | **0** | 0 occurrences |
++42|| Scoped fmt | `run-deno-fmt.ts --root packages/auth-workos --root 
+packages/auth-better-auth --root .llm/tools/auth --ext ts,tsx 
+--ignore-line-endings` | **0** | 11 files, 0 findings |
++43|| WorkOS tests | `deno test --allow-net packages/auth-workos/tests/` | **0**
+| 6 passed, 0 failed |
++44|| better-auth tests | `deno test --allow-net --allow-env 
+packages/auth-better-auth/tests/` | **0** | 7 passed, 0 failed |
++45|| WorkOS doc-lint | `run-deno-doc-lint.ts --root packages/auth-workos 
+--pretty` | **0** | 0 missing JSDoc, 0 private-type-ref |
++46|| better-auth doc-lint | `run-deno-doc-lint.ts --root 
+packages/auth-better-auth --pretty` | **0** | 0 missing JSDoc, 0 
+private-type-ref |
++47|| publish:dry-run | `deno task publish:dry-run` | **0** | Isolated 
+declarations satisfied, no carve-out |
++48|
++49|**All gates passed with raw exit code 0.**
++50|
++51|### Node-compat smoke verification
++52|- **WorkOS**: `workos-node-compat_test.ts` imports `@workos-inc/node@10.4.0`
+and constructs `new 
+WorkOS(...).userManagement.loadSealedSession(...).authenticate()` under Deno 
+2.8.3 node-compat → PASSED (16ms)
++53|- **better-auth**: `better-auth-node-compat_test.ts` imports 
+`better-auth@1.6.20` and constructs `betterAuth({ secret, baseURL })` under Deno
+2.8.3 → PASSED (20ms)
++54|
++55|Both provider SDKs resolve and execute under Deno's node-compatibility 
+layer.
++56|
++57|## Remaining Risks
++58|
++59|### Recorded deferrals (documented in drift.md, not gate failures)
++60|1. **WorkOS webhook-to-database sync**: User/org sync from WorkOS webhooks 
+to database remains deferred (documented optional fast-follow per plan §1 
+out-of-scope)
++61|2. **CLI scaffold prompts**: Auth provider selection prompts for CLI 
+scaffold remain deferred (not in slice scope)
++62|3. **Pre-existing repo-wide findings**: `deno task arch:check` + 
+`deps:audit` still report pre-existing `undici`/`vite` advisories and 
+repository-wide doctrine failures outside the new auth adapter packages (per 
+drift.md lines 14-17)
++63|
++64|### Operational considerations
++65|- Consumer owns running `better-auth` Prisma migration (plan §1 out-of-scope
++ locked decision 9). Slice ships generation + wiring; migration step is NOT a 
+runtime dep
++66|- Services must configure NetScript auth exemption/`allowAnonymous` policy 
+for `/api/auth/**` when using `mountBetterAuthHandler` (per worklog slice 5)
++67|- Catalog pins `better-auth ^1.6.20` + `@workos-inc/node ^10.4.0` match `npm
+dist-tags.latest` as of evaluation (verified in plan-eval)
++68|
++69|## Next Steps
++70|
++71|Branch `feat/prime-time/service-auth-adapters` is ready to merge to umbrella
+branch `feat/framework-prime-time`. All six implementation slices are complete, 
+tested, documented, and gate-verified. The umbrella PR #83 can proceed with this
+slice plus the already-merged `service-auth-seam` (#77).
++72|
++73|---
++74|
++75|**Evaluator session**: Separate-session IMPL-EVAL, cycle 1, 2026-06-20  
++76|**Evaluation artifacts**: 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/service-auth-adapters
+/evaluate.md`  
++77|**Raw gate logs**: `/tmp/eval-{check,lint,fmt}.{log,txt}` (local to 
+evaluator session)
++78|
+[end of edit 1 / 1]
+
+Message from Agent ─────────────────────────────────────────────────────────────
+
+IMPL-EVAL evaluation for the `service-auth-adapters` slice (PR #83) is complete.
+
+## Verification Results
+
+**Verdict: PASS**
+
+### Production Bar Verified (file:line evidence)
+- **WorkOS sealed-session**: Real call to `loadSealedSession().authenticate()` 
+at line 159-166, refresh emits rotated cookies via `setCookies` at line 267-274
+- **WorkOS access-token**: Real JWKS signature verification using 
+`jwtVerify(token, jwks, { audience: options.clientId })` at line 218 (not 
+decode-only shim)
+- **better-auth**: Wraps better-auth's own `prismaAdapter` (not redefined), no 
+`@netscript/database` import (PLAN-EVAL layering fix honored), calls real 
+`auth.api.getSession` and captures Set-Cookie
+- **Additive-only**: Both packages CONSUME 
+`AuthenticatorPort`/`AuthnRequest`/`AuthnResult`/`Principal` from 
+`@netscript/service/auth` (not redefined or modified)
+- **Catalog law**: Uses `catalog:` correctly, no de-catalog violation
+
+### Independently Re-run Gates (all passed, exit code 0)
+- `deno check` → 0 occurrences
+- `deno lint` → 0 occurrences  
+- `deno fmt --check` → 11 files, 0 findings
+- `deno test packages/auth-workos/tests/` → 6 tests passed
+- `deno test packages/auth-better-auth/tests/` → 7 tests passed
+- `run-deno-doc-lint.ts packages/auth-workos` → 0 missing JSDoc, 0 
+private-type-ref
+- `run-deno-doc-lint.ts packages/auth-better-auth` → 0 missing JSDoc, 0 
+private-type-ref
+- `deno task publish:dry-run` → isolated declarations satisfied, no carve-out
+
+### Node-Compat Smoke Verification
+- `@workos-inc/node@10.4.0` imports and loads session under Deno 2.8.3 ✓
+- `better-auth@1.6.20` imports and creates `betterAuth()` under Deno 2.8.3 ✓
+
+### Deferred Items (from drift.md, not gate failures)
+- WorkOS webhook-to-DB sync deferred
+- CLI scaffolding auth provider selection prompt deferred
+- Pre-existing repo-wide `arch:check` + `deps:audit` (`undici`/`vite`) issues 
+remain (unrelated to this slice)
+
+## Deliverables Created
+1. **Evaluation report**: 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/service-auth-adapters
+/evaluate.md`
+2. **Summary**: `/home/runner/work/_temp/openhands/27867455720-1/summary.md` 
+(required output location)
+
+All production standards met, all gates passed, no stubs/no-ops, additive-only 
+contract consumption, catalog compliant. The PR is ready for merge.
+
+Tokens: ↑ input 2.28M • cache hit 84.16% •  reasoning 14.22K • ↓ output 29.24K •
+$ 1.0391
+

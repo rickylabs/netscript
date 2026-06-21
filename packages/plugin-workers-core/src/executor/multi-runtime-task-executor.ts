@@ -1,4 +1,11 @@
 import { TaskExecutor } from '../abstracts/task-executor.ts';
+import {
+  type AttributeValue,
+  getTracer,
+  type Span,
+  SpanKind,
+  withSpan,
+} from '@netscript/telemetry/tracer';
 import type {
   ResolvedTaskExecutionOptions,
   TaskDefinition,
@@ -19,6 +26,15 @@ import {
   ShellRuntimeAdapter,
 } from './adapters/mod.ts';
 import { failedTaskResult } from './adapters/runtime-adapter-base.ts';
+import { WorkerSpanNames, WorkerTelemetryAttributes } from '../telemetry/mod.ts';
+
+const TASK_EXECUTOR_TRACER_NAME = '@netscript/plugin-workers-core/task-executor';
+
+const TaskExecutorTelemetryAttributes = {
+  adapterId: 'task.adapter.id',
+  executorId: 'task.executor.id',
+  runtime: 'task.runtime',
+} as const;
 
 /** Options for the default multi-runtime task executor. */
 export type MultiRuntimeTaskExecutorOptions = Readonly<{
@@ -68,12 +84,33 @@ export class MultiRuntimeTaskExecutor extends TaskExecutor {
     }
 
     const resolved = this.#resolveOptions(task, options);
-    this.#applyInstrumentation(task, resolved, 'running');
-    const result = await adapter.execute(task, resolved).catch((error) =>
-      failedTaskResult(task, error)
+    const tracer = getTracer(TASK_EXECUTOR_TRACER_NAME);
+    return await withSpan(
+      tracer,
+      WorkerSpanNames.taskExecute,
+      async (span) => {
+        this.#setTaskAttributes(span, task, adapter);
+        this.#applyInstrumentation(task, resolved, 'running', span);
+        const result = await adapter.execute(task, resolved).catch((error) =>
+          failedTaskResult(task, error)
+        );
+        this.#setTaskResultAttributes(span, result);
+        this.#applyInstrumentation(task, resolved, result.status, span, result.duration);
+        return result;
+      },
+      {
+        kind: SpanKind.INTERNAL,
+        attributes: {
+          [TaskExecutorTelemetryAttributes.adapterId]: adapter.id,
+          [TaskExecutorTelemetryAttributes.executorId]: this.id,
+          [TaskExecutorTelemetryAttributes.runtime]: task.type,
+          [WorkerTelemetryAttributes.taskId]: task.id,
+          ...(resolved.correlationId
+            ? { [WorkerTelemetryAttributes.correlationId]: resolved.correlationId }
+            : {}),
+        },
+      },
     );
-    this.#applyInstrumentation(task, resolved, result.status);
-    return result;
   }
 
   #resolveAdapter(task: TaskDefinition): TaskRuntimeAdapterLike | undefined {
@@ -101,15 +138,45 @@ export class MultiRuntimeTaskExecutor extends TaskExecutor {
     task: TaskDefinition,
     options: ResolvedTaskExecutionOptions,
     status: string,
+    otelSpan?: Span,
+    durationMs?: number,
   ): void {
     if (this.#instrumentations.length === 0) return;
     const span = new TaskExecutorSpan();
     for (const instrumentation of this.#instrumentations) {
       instrumentation.applyTo(span, {
         correlationId: options.correlationId,
+        durationMs,
         status: toTelemetryStatus(status),
         taskId: task.id,
       });
+    }
+    if (otelSpan) {
+      span.copyTo(otelSpan);
+    }
+  }
+
+  #setTaskAttributes(
+    span: Span,
+    task: TaskDefinition,
+    adapter: TaskRuntimeAdapterLike,
+  ): void {
+    span.setAttributes({
+      [TaskExecutorTelemetryAttributes.adapterId]: adapter.id,
+      [TaskExecutorTelemetryAttributes.executorId]: this.id,
+      [TaskExecutorTelemetryAttributes.runtime]: task.type,
+      [WorkerTelemetryAttributes.taskId]: task.id,
+    });
+  }
+
+  #setTaskResultAttributes(span: Span, result: TaskResult): void {
+    span.setAttributes({
+      [WorkerTelemetryAttributes.durationMs]: result.duration,
+      [WorkerTelemetryAttributes.status]: toTelemetryStatus(result.status),
+      [WorkerTelemetryAttributes.taskId]: result.taskId,
+    });
+    if (result.error) {
+      span.setAttribute('error.message', result.error);
     }
   }
 }
@@ -163,4 +230,31 @@ class TaskExecutorSpan {
   addEvent(name: string, attributes?: Readonly<Record<string, TelemetryAttributeValue>>): void {
     this.events.push({ name, attributes });
   }
+
+  copyTo(span: Span): void {
+    for (const [name, value] of this.attributes) {
+      span.setAttribute(name, toOtelAttributeValue(value));
+    }
+    for (const event of this.events) {
+      span.addEvent(event.name, toOtelAttributes(event.attributes));
+    }
+  }
+}
+
+function toOtelAttributes(
+  attributes: Readonly<Record<string, TelemetryAttributeValue>> | undefined,
+): Record<string, AttributeValue> | undefined {
+  if (!attributes) return undefined;
+  const otelAttributes: Record<string, AttributeValue> = {};
+  for (const [name, value] of Object.entries(attributes)) {
+    otelAttributes[name] = toOtelAttributeValue(value);
+  }
+  return otelAttributes;
+}
+
+function toOtelAttributeValue(value: TelemetryAttributeValue): AttributeValue {
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return value;
+  }
+  return [...value];
 }

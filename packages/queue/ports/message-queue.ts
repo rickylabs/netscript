@@ -7,6 +7,35 @@
  * @module
  */
 
+import type { DeadLetterReason } from './dead-letter.ts';
+
+/**
+ * Options for negative acknowledgement and terminal dead-letter metadata.
+ */
+export interface NackOptions {
+  /**
+   * Whether the message should be returned to the queue for another delivery attempt.
+   *
+   * @default true
+   */
+  requeue?: boolean;
+
+  /**
+   * Terminal failure reason to store when `requeue` is false.
+   */
+  reason?: DeadLetterReason;
+
+  /**
+   * Optional structured failure code for the dead-letter record.
+   */
+  errorCode?: string;
+
+  /**
+   * Optional human-readable failure summary for the dead-letter record.
+   */
+  errorMessage?: string;
+}
+
 /**
  * Message context provided to handlers during message processing.
  * Contains metadata and control methods for message acknowledgment.
@@ -43,9 +72,9 @@ export interface MessageContext {
    * Negative acknowledge - signal message processing failure.
    * Called automatically on handler error if native retry is supported.
    *
-   * @param options - Requeue options
+   * @param options - Requeue and dead-letter metadata options.
    */
-  nack(options?: { requeue?: boolean }): Promise<void>;
+  nack(options?: NackOptions): Promise<void>;
 }
 
 /**

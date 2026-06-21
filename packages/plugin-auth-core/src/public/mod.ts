@@ -1,0 +1,103 @@
+/**
+ * Curated root exports for `@netscript/plugin-auth-core`.
+ *
+ * @module
+ */
+
+export {
+  AccountSchema,
+  AUTH_ACCOUNT_STATES,
+  AUTH_SESSION_STATES,
+  AuthSessionSchema,
+  AuthUserSchema,
+} from '../domain/mod.ts';
+export type {
+  Account,
+  AccountState,
+  AuthenticatorPort,
+  AuthnRequest,
+  AuthnResult,
+  AuthSession,
+  AuthSessionPrincipalMapping,
+  AuthSessionState,
+  AuthUser,
+  Principal,
+} from '../domain/mod.ts';
+export {
+  AuthBackendNotFoundError,
+  AuthBackendOperationUnsupportedError,
+  createAuthBackendRegistry,
+  createHmacSessionTokenCrypto,
+  DEFAULT_AUTH_BACKEND_NAME,
+  resolveBackend,
+} from '../ports/mod.ts';
+export type {
+  AuthBackendPort,
+  AuthBackendRegistry,
+  AuthPrincipalMapperPort,
+  AuthProviderCapability,
+  AuthProviderDescriptor,
+  AuthProviderRegistryPort,
+  AuthSessionCreateInput,
+  AuthSessionCryptoPort,
+  AuthSessionLookup,
+  AuthSessionStorePort,
+  InteractiveCallbackResult,
+  InteractiveFlowPort,
+  ResolvedAuthBackendRegistry,
+} from '../ports/mod.ts';
+export {
+  AuthConfigSchema,
+  AuthProviderConfigSchema,
+  AuthSessionPolicySchema,
+} from '../config/mod.ts';
+export type {
+  AuthConfig,
+  AuthConfigInput,
+  AuthProviderConfig,
+  AuthSessionPolicy,
+} from '../config/mod.ts';
+export { authContract, authContractV1 } from '../contracts/v1/mod.ts';
+export type {
+  AuthContractErrorFactory,
+  AuthContractErrors,
+  AuthContractV1,
+  AuthRouteHandler,
+  AuthRouteHandlerOptions,
+  AuthRouter,
+  AuthSessionResponse,
+  AuthUserResponse,
+  CallbackInput,
+  CallbackResponse,
+  MeResponse,
+  SessionInput,
+  SessionResponse,
+  SigninInput,
+  SigninResponse,
+  SignoutInput,
+  SignoutResponse,
+  ValidationErrorData,
+} from '../contracts/v1/mod.ts';
+export { AUTH_PRESET_KINDS, createAuthPresetRegistry } from '../presets/mod.ts';
+export type {
+  AuthBackendPreset,
+  AuthPresetDefinition,
+  AuthPresetKind,
+  AuthPresetRegistry,
+  AuthProviderPreset,
+} from '../presets/mod.ts';
+export {
+  AUTH_STREAM_EVENT_TYPES,
+  AuthStreamEventSchema,
+  authStreamSchema,
+  AuthStreamSessionSchema,
+} from '../streams/mod.ts';
+export type {
+  AuthStreamDefinition,
+  AuthStreamEvent,
+  AuthStreamEventType,
+  CollectionDefinition,
+  CollectionEventHelpers,
+  StateSchema,
+  StreamStateDefinition,
+} from '../streams/mod.ts';

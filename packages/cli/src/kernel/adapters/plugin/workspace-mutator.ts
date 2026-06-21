@@ -10,6 +10,7 @@ import type {
   PluginConfigEntry,
   PluginKindProvider,
   PluginScaffoldResult,
+  SagaStoreBackend,
 } from '../../domain/plugin-kind.ts';
 import {
   buildBackgroundProcessorEntry,
@@ -28,6 +29,8 @@ export interface PluginWorkspaceMutationOptions {
   readonly pluginReferences?: readonly string[];
   /** Optional description for the generated appsettings entry. */
   readonly description?: string;
+  /** Saga durable state backend for saga plugin appsettings. */
+  readonly sagaStoreBackend?: SagaStoreBackend;
 }
 
 /** Summary of appsettings entries removed for a plugin. */

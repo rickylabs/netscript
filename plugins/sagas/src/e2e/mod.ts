@@ -1,3 +1,9 @@
+/**
+ * End-to-end gate metadata and probes for sagas plugin runtime validation.
+ *
+ * @module
+ */
+
 export { getSagasE2eGates } from './sagas-gates.ts';
 export type { SagasE2eGate } from './sagas-gates.ts';
 export {

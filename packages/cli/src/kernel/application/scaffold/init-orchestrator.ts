@@ -117,7 +117,7 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     steps.push(`deno task --cwd apps/${options.appName} dev  # start Fresh dev server`);
   }
   if (options.includeExampleService && options.serviceName) {
-    steps.push(`# oRPC service "${options.serviceName}" at http://localhost:${options.servicePort}/rpc`);
+    steps.push(`# oRPC service "${options.serviceName}" at http://localhost:${options.servicePort}/api/rpc`);
   }
   if (options.dbEngine !== 'none') {
     const engineLabel = options.dbEngine.charAt(0).toUpperCase() + options.dbEngine.slice(1);

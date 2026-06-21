@@ -5,6 +5,10 @@ import {
   type SagaRuntime,
   type SagaRuntimeAdapter,
 } from '@netscript/plugin-sagas-core/runtime';
+import { createSagaTelemetry } from '../telemetry/otel-saga-tracer.ts';
+import { createDurableSagaRuntime } from './create-durable-saga-runtime.ts';
+import { openSagaRuntimeKv } from './kv-saga-store.ts';
+import { KvSagaAppliedKeyStore, KvSagaIdempotencyStore } from './kv-saga-runtime-stores.ts';
 
 /** Lifecycle status exposed by the saga runtime supervisor. */
 export type SagaRuntimeSupervisorStatus =
@@ -19,7 +23,9 @@ export type SagaRuntimeSupervisorStatus =
 export type SagaDefinitionRegistryLoader = () => Promise<readonly SagaDefinition[]>;
 
 /** Runtime factory boundary used by tests and composition roots. */
-export type SagaRuntimeFactory = (options: CreateSagaRuntimeOptions) => SagaRuntime;
+export type SagaRuntimeFactory = (
+  options: CreateSagaRuntimeOptions,
+) => SagaRuntime | Promise<SagaRuntime>;
 
 /** Supervisor construction options. */
 export type SagaRuntimeSupervisorOptions = Readonly<{
@@ -63,7 +69,7 @@ export class SagaRuntimeSupervisor {
 
     try {
       const definitions = await this.resolveDefinitions();
-      const runtime = (this.options.createRuntime ?? createDefaultRuntime)(
+      const runtime = await (this.options.createRuntime ?? createDefaultRuntime)(
         this.options.runtimeOptions ?? {},
       );
       await runtime.register(definitions);
@@ -118,8 +124,61 @@ function formatFailure(cause: unknown): string {
   return cause instanceof Error ? cause.message : String(cause);
 }
 
-function createDefaultRuntime(options: CreateSagaRuntimeOptions): SagaRuntime {
-  return options.adapter === 'legacy'
-    ? createSagaRuntime({ ...options, adapter: 'legacy' })
-    : createSagaRuntime({ ...options, adapter: 'native' });
+async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<SagaRuntime> {
+  if (options.adapter === 'legacy' || hasInjectedNativeEngine(options)) {
+    return options.adapter === 'legacy'
+      ? createSagaRuntime({ ...options, adapter: 'legacy' })
+      : createSagaRuntime({
+        ...options,
+        adapter: 'native',
+        native: withDefaultTelemetry(options.native),
+      });
+  }
+
+  const native = withDefaultTelemetry(options.native);
+  const kv = await openSagaRuntimeKv();
+  const durable = await createDurableSagaRuntime({
+    backend: 'kv',
+    kv,
+    native: {
+      ...native,
+      idempotency: native.idempotency ?? new KvSagaIdempotencyStore({ kv }),
+      engineOptions: {
+        ...native.engineOptions,
+        appliedKeys: native.engineOptions?.appliedKeys ?? new KvSagaAppliedKeyStore({ kv }),
+      },
+    },
+  });
+
+  return withDurableDispose(durable.runtime, durable.dispose);
+}
+
+function hasInjectedNativeEngine(options: CreateSagaRuntimeOptions): boolean {
+  return options.native?.engine !== undefined;
+}
+
+function withDurableDispose(runtime: SagaRuntime, dispose: () => Promise<void>): SagaRuntime {
+  let closed = false;
+  return Object.freeze({
+    ...runtime,
+    stop: async (reason?: string): Promise<void> => {
+      try {
+        await runtime.stop(reason);
+      } finally {
+        if (!closed) {
+          closed = true;
+          await dispose();
+        }
+      }
+    },
+  });
+}
+
+function withDefaultTelemetry(
+  native: CreateSagaRuntimeOptions['native'],
+): NonNullable<CreateSagaRuntimeOptions['native']> {
+  return {
+    ...native,
+    instrumentation: native?.instrumentation ?? createSagaTelemetry(),
+  };
 }

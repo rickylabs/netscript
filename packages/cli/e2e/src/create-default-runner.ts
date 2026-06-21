@@ -55,7 +55,7 @@ export function defaultRunOptions(): RunOptions {
     projectName,
     database: DATABASE.POSTGRES,
     packageSource: PACKAGE_SOURCE.LOCAL,
-    plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM],
+    plugins: [PLUGIN.WORKER, PLUGIN.SAGA, PLUGIN.TRIGGER, PLUGIN.STREAM, PLUGIN.AUTH],
     samples: true,
     cleanup: false,
     format: REPORT_FORMAT.NDJSON,

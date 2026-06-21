@@ -173,7 +173,12 @@ export function createTypedQueue<T>(
 
               case 'dlq':
                 // Move to dead-letter queue (nack without requeue)
-                await context.nack({ requeue: false });
+                await context.nack({
+                  requeue: false,
+                  reason: 'validation_failed',
+                  errorCode: 'VALIDATION_ERROR',
+                  errorMessage,
+                });
                 return;
 
               case 'throw':

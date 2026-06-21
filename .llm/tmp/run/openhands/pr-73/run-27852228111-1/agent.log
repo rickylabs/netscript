@@ -1,0 +1,400 @@
+proving gate and files named.
+- Open-decision sweep: no deferred decision forces rework (the four "Open 
+Questions" are exploratory research questions, not implementation decisions; the
+plan commits to the unified `MessageContext.nack({ requeue: false, reason })` 
+contract and a single `reason` taxonomy that resolves the gap).
+- Production/enterprise bar: real durable persistence (DLQ writes to native 
+transport, no in-memory fallback), error handling & idempotency (transactional 
+envelope re-claim + correlation id), observability (DLQ-emit span), graceful 
+shutdown (no effect on this slice — DLQ writes are synchronous per-message, no 
+background drain), full unit + integration + failure-path tests included.
+
+## Verdict
+**`PLAN-EVAL rbp-dlq-contract: PASS`**
+
+## Responses to Review Comments / Issue Comments
+N/A — no prior PR review comments on this slice.
+
+## Remaining Risks
+- The plan correctly identifies that native adapter DLQ delivery is best-effort 
+and depends on broker semantics (e.g., AMQP DLX exchange, Redis Streams 
+consumer-group PEL, Postgres PG-native DLQ table). Implementation will need to 
+verify each broker's DLQ primitive maps cleanly to the unified 
+`MessageQueue.nack({ requeue: false, reason })` contract; the plan's Test Plan 
+addresses this with per-adapter integration tests.
+- The "Open Questions" section flags a couple of optional extensions (DLQ 
+inspector API, sampling, TTL). These are explicitly non-blocking for the 
+prime-time blocker.
+EOF
+(2) echo "summary written"; wc -l 
+/home/runner/work/_temp/openhands/27852228111-1/summary.md
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Make temp dir
+
+Reasoning:
+The error is because the heredoc syntax is being interpreted incorrectly when 
+there are multiple commands separated. Let me retry with a single approach.
+
+$ mkdir -p /home/runner/work/_temp/openhands/27852228111-1
+
+Tokens: ↑ input 1.18M • cache hit 0.02% •  reasoning 9.77K • ↓ output 14.91K • $
+0.7394
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write run summary file
+
+Reasoning:
+Let me write the summary file. I'll use file_editor instead of cat/heredoc which
+had issues.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27852228111-1/summary.md"
+  file_text: 
+    # PLAN-EVAL Cycle-2 — Slice: `rbp-dlq-contract`
+    
+    ## Summary
+    Read-only PLAN-EVAL evaluation of the `rbp-dlq-contract` slice on branch 
+`feat/framework-prime-time` (HEAD `f71b51c0`). All five protocol inputs were 
+read in order; every cited `file:line` finding in `research.md` was spot-checked
+against the real tree (`f85da9c0`-based) and confirmed accurate. The plan walks 
+every `plan-gate.md` box and satisfies them; the open-decision sweep found no 
+deferred decision that would force rework. Verdict: **PASS**.
+    
+    ## Inputs Reviewed
+    - `.llm/harness/evaluator/plan-protocol.md`
+    - `.llm/harness/gates/plan-gate.md`
+    - `.llm/harness/evaluator/verdict-definitions.md`
+    - `.llm/harness/gates/archetype-gate-matrix.md` + 
+`.llm/harness/archetypes/ARCHETYPE-2-integration.md`
+    - 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/rbp-dlq-contract/{res
+earch.md, plan.md, plan-meta.json}`
+    - `.llm/harness/debt/arch-debt.md` (no rbp-dlq entry; only the unrelated S2 
+defer-DLQ entry was verified — not applicable here)
+    
+    ## Re-baselining Spot-Checks (real tree, not the cc3b8731 label)
+    - `packages/queue/adapters/kv-polling.adapter.ts:521-528` — 
+`dlqKey(timestamp, id)` ✅
+    - `packages/queue/adapters/kv-polling.adapter.ts:471-489` — nack routes to 
+DLQ with `failedAt` + `reason` ✅
+    - `packages/queue/adapters/kv-polling.adapter.ts:674-689` — `getStats()` 
+returns `dlq` count ✅
+    - `packages/queue/adapters/postgres.adapter.ts:392-413` — 
+`createContext.nack` discards (no DLQ) ✅
+    - `packages/queue/adapters/redis.adapter.ts:317-338` — `createContext.nack` 
+no DLQ ✅
+    - `packages/queue/adapters/deno-kv.adapter.ts:291-305` — stubbed nack/ack ✅
+    - `packages/queue/adapters/amqp.adapter.ts:207-222` — stubbed nack/ack ✅
+    - `packages/queue/adapters/_envelope.ts:56-79` — `createMessageContext` 
+contract confirmed ✅
+    - `packages/queue/deno.json:12` — `@netscript/queue` exports include 
+`./adapters/kv-polling` (the only DLQ-bearing adapter) ✅
+    - `packages/queue/factory/create-queue.ts:113-136` — `createQueue` returns 
+`MessageQueue<T>` ✅
+    - `docs/architecture/doctrine/08-runtime-state-failure.md` — DLQ-durable 
+requirement cited ✅
+    
+    ## Changes
+    None — PLAN-EVAL is read-only by protocol; no repository files were modified
+or committed.
+    
+    ## Validation
+    - All `plan-gate.md` boxes satisfied (see per-box check table in the PR 
+comment).
+    - Commit slices are 5 numbered slices, each ≤ 30 files, ordered, each with 
+proving gate and files named.
+    - Open-decision sweep: no deferred decision forces rework. The four "Open 
+Questions" are exploratory research questions, not implementation decisions; the
+plan commits to the unified `MessageContext.nack({ requeue: false, reason })` 
+contract and a single `reason` taxonomy that resolves the gap.
+    - Production/enterprise bar: real durable persistence (DLQ writes to native 
+transport, no in-memory fallback), error handling & idempotency (transactional 
+envelope re-claim + correlation id), observability (DLQ-emit span), graceful 
+shutdown (no background drain effect on this slice), full unit + integration + 
+failure-path tests included.
+    
+    ## Verdict
+    **`PLAN-EVAL rbp-dlq-contract: PASS`**
+    
+    ## Responses to Review Comments / Issue Comments
+    N/A — no prior PR review comments on this slice.
+    
+    ## Remaining Risks
+    - The plan correctly identifies that native adapter DLQ delivery is 
+best-effort and depends on broker semantics (e.g., AMQP DLX exchange, Redis 
+Streams consumer-group PEL, Postgres native DLQ table). Implementation will need
+to verify each broker's DLQ primitive maps cleanly to the unified 
+`MessageContext.nack({ requeue: false, reason })` contract; the plan's Test Plan
+addresses this with per-adapter integration tests.
+    - The "Open Questions" section flags a couple of optional extensions (DLQ 
+inspector API, sampling, TTL). These are explicitly non-blocking for the 
+prime-time blocker.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.2M • cache hit 0.02% •  reasoning 9.79K • ↓ output 16.03K • $ 
+0.7545
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27852228111-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL Cycle-2 — Slice: `rbp-dlq-contract`
+ 2|
++3|## Summary
++4|Read-only PLAN-EVAL evaluation of the `rbp-dlq-contract` slice on branch 
+`feat/framework-prime-time` (HEAD `f71b51c0`). All five protocol inputs were 
+read in order; every cited `file:line` finding in `research.md` was spot-checked
+against the real tree (`f85da9c0`-based) and confirmed accurate. The plan walks 
+every `plan-gate.md` box and satisfies them; the open-decision sweep found no 
+deferred decision that would force rework. Verdict: **PASS**.
++5|
++6|## Inputs Reviewed
++7|- `.llm/harness/evaluator/plan-protocol.md`
++8|- `.llm/harness/gates/plan-gate.md`
++9|- `.llm/harness/evaluator/verdict-definitions.md`
++10|- `.llm/harness/gates/archetype-gate-matrix.md` + 
+`.llm/harness/archetypes/ARCHETYPE-2-integration.md`
++11|- 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/rbp-dlq-contract/{res
+earch.md, plan.md, plan-meta.json}`
++12|- `.llm/harness/debt/arch-debt.md` (no rbp-dlq entry; only the unrelated S2 
+defer-DLQ entry was verified — not applicable here)
++13|
++14|## Re-baselining Spot-Checks (real tree, not the cc3b8731 label)
++15|- `packages/queue/adapters/kv-polling.adapter.ts:521-528` — 
+`dlqKey(timestamp, id)` ✅
++16|- `packages/queue/adapters/kv-polling.adapter.ts:471-489` — nack routes to 
+DLQ with `failedAt` + `reason` ✅
++17|- `packages/queue/adapters/kv-polling.adapter.ts:674-689` — `getStats()` 
+returns `dlq` count ✅
++18|- `packages/queue/adapters/postgres.adapter.ts:392-413` — 
+`createContext.nack` discards (no DLQ) ✅
++19|- `packages/queue/adapters/redis.adapter.ts:317-338` — `createContext.nack` 
+no DLQ ✅
++20|- `packages/queue/adapters/deno-kv.adapter.ts:291-305` — stubbed nack/ack ✅
++21|- `packages/queue/adapters/amqp.adapter.ts:207-222` — stubbed nack/ack ✅
++22|- `packages/queue/adapters/_envelope.ts:56-79` — `createMessageContext` 
+contract confirmed ✅
++23|- `packages/queue/deno.json:12` — `@netscript/queue` exports include 
+`./adapters/kv-polling` (the only DLQ-bearing adapter) ✅
++24|- `packages/queue/factory/create-queue.ts:113-136` — `createQueue` returns 
+`MessageQueue<T>` ✅
++25|- `docs/architecture/doctrine/08-runtime-state-failure.md` — DLQ-durable 
+requirement cited ✅
++26|
++27|## Changes
++28|None — PLAN-EVAL is read-only by protocol; no repository files were modified
+or committed.
++29|
++30|## Validation
++31|- All `plan-gate.md` boxes satisfied (see per-box check table in the PR 
+comment).
++32|- Commit slices are 5 numbered slices, each ≤ 30 files, ordered, each with 
+proving gate and files named.
++33|- Open-decision sweep: no deferred decision forces rework. The four "Open 
+Questions" are exploratory research questions, not implementation decisions; the
+plan commits to the unified `MessageContext.nack({ requeue: false, reason })` 
+contract and a single `reason` taxonomy that resolves the gap.
++34|- Production/enterprise bar: real durable persistence (DLQ writes to native 
+transport, no in-memory fallback), error handling & idempotency (transactional 
+envelope re-claim + correlation id), observability (DLQ-emit span), graceful 
+shutdown (no background drain effect on this slice), full unit + integration + 
+failure-path tests included.
++35|
++36|## Verdict
++37|**`PLAN-EVAL rbp-dlq-contract: PASS`**
++38|
++39|## Responses to Review Comments / Issue Comments
++40|N/A — no prior PR review comments on this slice.
++41|
++42|## Remaining Risks
++43|- The plan correctly identifies that native adapter DLQ delivery is 
+best-effort and depends on broker semantics (e.g., AMQP DLX exchange, Redis 
+Streams consumer-group PEL, Postgres native DLQ table). Implementation will need
+to verify each broker's DLQ primitive maps cleanly to the unified 
+`MessageContext.nack({ requeue: false, reason })` contract; the plan's Test Plan
+addresses this with per-adapter integration tests.
++44|- The "Open Questions" section flags a couple of optional extensions (DLQ 
+inspector API, sampling, TTL). These are explicitly non-blocking for the 
+prime-time blocker.
++45|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL cycle-2 verdict for rbp-dlq-contract
+
+Reasoning:
+Now I have all the information I need. Let me finalize the verdict. The summary 
+is written, no files were modified, and the verdict is PASS. Let me call 
+`finish` with the full PR comment body.
+
+Thought:
+The PLAN-EVAL cycle-2 review is complete. All inputs were read in protocol 
+order, every cited `file:line` finding in `research.md` was spot-checked against
+the real tree (`f85da9c0`-based, not the stale `cc3b8731` label), every 
+`plan-gate.md` box is satisfied, and the open-decision sweep found no deferred 
+decision that would force rework. Summary written; no repository files modified 
+or committed.
+
+Finish with message:
+PLAN-EVAL rbp-dlq-contract: PASS
+
+## Per-box check (plan-gate.md)
+
+| # | Box | Plan location | Status |
+|---|-----|---------------|--------|
+| 1 | Slice alignment with blocking slice (`rbp-dlq-contract`) | 
+`plan-meta.json: slice=rbp-dlq-contract`, `plan.md` "Slice" header | ✅ |
+| 2 | Research exists, cited, current | `research.md` (10 sections: Current 
+state, Doctrine, Pain, Alternatives, Files touched, Backward-compat, Risks, Open
+Qs, Verification, Refs); spot-checked against real tree | ✅ |
+| 3 | Doctrine references correct & load-bearing | `plan.md:187-204` cites 
+doctrine 08-runtime-state-failure.md; verbatim quote of DLQ requirement | ✅ |
+| 4 | Design is inside `plan.md` `## Design` section | `plan.md:113-185` `## 
+Design` with subsections: Goal, Contract, Per-adapter mapping, Reason taxonomy, 
+Spans, Failure modes | ✅ |
+| 5 | Production/enterprise bar — no stub defaults | `plan.md:150-169` commits 
+to real DLQ writes per native transport; "no in-memory default"; "throw, never 
+silently drop" | ✅ |
+| 6 | Real error handling + idempotency | `plan.md:171-178` "Failure modes" — 
+transactional claim+DLQ, correlation id, idempotency key | ✅ |
+| 7 | Observability / spans | `plan.md:166-169` "Spans" — `queue.dlq.emit`, 
+`queue.dlq.replay`, attributes (queue, messageId, reason) | ✅ |
+| 8 | Graceful shutdown / drain (where relevant) | `plan.md:206-208` "Slice 4: 
+Drain & lifecycle" — DLQ writes are synchronous per-message so no drain needed; 
+explicit reasoning | ✅ |
+| 9 | Unit + integration + failure-path tests | `plan.md` Test Plan section — 
+Unit (DLQ contract, reason taxonomy), Integration (per-adapter, all 5), 
+Failure-path (broker outage, malformed payload, replay loop) | ✅ |
+| 10 | Commit slices ordered, sized (<30 files), each with proving gate + files 
+| `plan.md` "Commit slices" — 5 numbered slices, each ≤10 files, each names 
+"Files:" and "Proving gate:" | ✅ |
+| 11 | `plan-meta.json` complete | archetype=ARCHETYPE-2, 
+scopeOverlays=[A1,A2,A4,A5,A6,A7,A8,A9,A10,A11,A14], lockedDecisions=[5], 
+contracts={public,internal}, testPlan=[unit,integration,failure], 
+planGateSelfCheck={12 boxes all true}, openQuestions=[4 research, non-blocking],
+risks=[5] | ✅ |
+| 12 | Backward-compat covered | `plan.md:115-118` "Public contract additions 
+are non-breaking; nack signature is widened with optional fields"; 
+`plan-meta.json.lockedDecisions[0]` = preserve existing `requeue` flag | ✅ |
+| 13 | Open-decision sweep — no deferred decisions force rework | Plan commits 
+to: (a) unified `MessageContext.nack({ requeue: false, reason })` shape, (b) 
+reason taxonomy enum, (c) DLQ writes to native transport only, (d) correlation 
+id, (e) span names. All 4 "Open Questions" are explicitly research/exploration, 
+not implementation gating | ✅ |
+
+## Re-baselining spot-checks (against real tree, not cc3b8731 label)
+
+| Cited | Verified at | Result |
+|-------|-------------|--------|
+| `kv-polling.adapter.ts:521-528` `dlqKey` | confirmed `KvPrefixes.dlq = 
+'queue:dlq'`, `dlqKey(timestamp, id)` returns `[KvPrefixes.dlq, this.queueName, 
+ts, id]` | ✅ |
+| `kv-polling.adapter.ts:471-489` nack→DLQ | confirmed `nack()` writes 
+`dlqMessage` with `failedAt`, `reason` when `!requeue \|\| attempts >= 
+maxAttempts` | ✅ |
+| `kv-polling.adapter.ts:674-689` `getStats().dlq` | confirmed `dlq` count 
+iterates `[KvPrefixes.dlq, this.queueName]` prefix | ✅ |
+| `postgres.adapter.ts:392-413` no DLQ | confirmed `nack` either `release()` 
+(requeue) or `ack()` (drop) — no DLQ routing | ✅ |
+| `redis.adapter.ts:317-338` no DLQ | confirmed `nack` either `lrem` + `lpush` 
+(requeue) or `lrem` only (drop) — no DLQ routing | ✅ |
+| `deno-kv.adapter.ts:291-305` stubbed | confirmed `ack`/`nack` are no-op `async
+() => {}` | ✅ |
+| `amqp.adapter.ts:207-222` stubbed | confirmed `ack`/`nack` are no-op `async ()
+=> {}` | ✅ |
+| `adapters/_envelope.ts:56-79` `createMessageContext` | confirmed signature 
+`nack: (options?: { requeue?: boolean }) => Promise<void>` | ✅ |
+| `deno.json:12` exports `./adapters/kv-polling` | confirmed only DLQ-bearing 
+adapter in `@netscript/queue` public exports | ✅ |
+| `factory/create-queue.ts:113-136` returns `MessageQueue<T>` | confirmed 
+`createQueue<T>(name, options)` signature | ✅ |
+| `doctrine/08-runtime-state-failure.md` DLQ requirement | confirmed 286 LOC; 
+DLQ must be durable, broker-mediated | ✅ |
+
+## Open-decision sweep
+
+No decision the plan leaves open would force rework if deferred:
+- Contract shape: **locked** (`MessageContext.nack({ requeue?: boolean, reason?:
+DeadLetterReason })`).
+- Reason taxonomy: **locked** (closed enum, not free-form string).
+- DLQ storage: **locked** (native transport only; no in-memory default).
+- Correlation id: **locked** (envelope carries `correlationId`).
+- Span names: **locked** (`queue.dlq.emit`, `queue.dlq.replay`).
+
+The 4 "Open Questions" in `plan-meta.json` are research/exploration items (DLQ 
+inspector API, sampling policy, TTL, multi-region replication). All are 
+explicitly out of scope for this blocker slice and do not block implementation.
+
+## Commit-slice ordering & sizing
+
+| # | Slice | Files | Proving gate |
+|---|-------|-------|--------------|
+| 1 | Ports: extend `MessageContext.nack` + `DeadLetterReason` enum | 2 files 
+(`ports/message-queue.ts`, `ports/errors.ts`) | `deno check` + unit test |
+| 2 | Adapters: implement DLQ routing (kv-polling, postgres, redis, deno-kv, 
+amqp) | 5 files (one per adapter) | per-adapter integration test |
+| 3 | Spans + correlation id propagation | 1 file (`internal/telemetry.ts`) | 
+span assertion test |
+| 4 | Drain & lifecycle (no-op for DLQ, but document & confirm) | 0 files (only 
+doc comment update in ports) | `deno lint` |
+| 5 | Test suite: unit + integration + failure-path | 5 files (one test file per
+adapter + 1 shared) | full `deno test packages/queue` |
+
+All slices ≤ 10 files (well under 30-file limit), ordered from contract outward,
+each with explicit proving gate.
+
+## Production/enterprise bar
+
+- ✅ Real durable persistence — DLQ writes go through the native broker 
+transport (KV, PG, Redis, AMQP), not in-memory
+- ✅ Real error handling — `nack` throws on broker failure; `claimAndDlq` is 
+transactional (or compensating on best-effort transports)
+- ✅ Idempotency — every DLQ write carries the message id + a deterministic key;
+replay is idempotent
+- ✅ Observability — `queue.dlq.emit` and `queue.dlq.replay` spans with 
+queue/messageId/reason attributes
+- ✅ Graceful shutdown — DLQ writes are synchronous per-message, no background 
+drain; confirmed in plan Slice 4
+- ✅ Full unit + integration + failure-path tests — listed in Test Plan section
+- ✅ No stub / no-op / "reserved-for-future" advertised surface — all 5 adapters
+commit to real DLQ behavior or throw on unsupported
+
+**Verdict: PASS** — every checklist box satisfied; production bar met; no 
+deferred decisions.
+
+---
+
+_Summary, validation, and re-baselining trace written to 
+`OPENHANDS_SUMMARY_PATH`. No repository files modified or committed (PLAN-EVAL 
+is read-only by protocol)._
+
+Tokens: ↑ input 1.22M • cache hit 0.02% •  reasoning 9.84K • ↓ output 18.14K • $
+0.7728
+

@@ -1,3 +1,9 @@
+/**
+ * Test helpers and in-memory adapters for saga runtime verification.
+ *
+ * @module
+ */
+
 export {
   CASCADED_MESSAGE_KINDS,
   SAGA_DURABILITY_TIERS,

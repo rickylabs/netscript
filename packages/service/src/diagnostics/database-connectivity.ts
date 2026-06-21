@@ -194,10 +194,12 @@ async function verifyDatabaseConnectivity(
 }
 
 function getEngineConfig(): EngineConfig {
-  const provider = Deno.env.get('DB_PROVIDER') as DbEngine | null;
-  return provider && provider in ENGINE_CONFIGS
-    ? ENGINE_CONFIGS[provider]
-    : ENGINE_CONFIGS[DEFAULT_DB_ENGINE];
+  const provider = Deno.env.get('DB_PROVIDER');
+  return isDbEngine(provider) ? ENGINE_CONFIGS[provider] : ENGINE_CONFIGS[DEFAULT_DB_ENGINE];
+}
+
+function isDbEngine(value: string | null | undefined): value is DbEngine {
+  return value === 'mysql' || value === 'postgres' || value === 'mssql';
 }
 
 function resolveDatabaseEndpoint(engineCfg: EngineConfig): { host: string; port: number } {
@@ -373,20 +375,30 @@ function extractRootCause(error: unknown): string | undefined {
 }
 
 function readErrorMetadata(error: Error): string | undefined {
-  const meta = (error as { meta?: unknown }).meta;
-  if (!meta || typeof meta !== 'object') return undefined;
+  const meta = hasMeta(error) ? error.meta : undefined;
+  if (!isRecord(meta)) return undefined;
 
-  const record = meta as Record<string, unknown>;
-  return typeof record.cause === 'string' && record.cause
-    ? record.cause
-    : typeof record.message === 'string' && record.message
-    ? record.message
+  return typeof meta.cause === 'string' && meta.cause
+    ? meta.cause
+    : typeof meta.message === 'string' && meta.message
+    ? meta.message
     : undefined;
 }
 
 function readErrorCode(error: Error): string | undefined {
-  const code = (error as { code?: unknown }).code;
-  return typeof code === 'string' ? code : undefined;
+  return hasCode(error) && typeof error.code === 'string' ? error.code : undefined;
+}
+
+function hasMeta(error: Error): error is Error & { readonly meta?: unknown } {
+  return 'meta' in error;
+}
+
+function hasCode(error: Error): error is Error & { readonly code?: unknown } {
+  return 'code' in error;
+}
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function errorToMessage(error: unknown): string {

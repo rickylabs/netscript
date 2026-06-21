@@ -35,6 +35,9 @@ export type ScaffoldedPluginType = Extract<
 /** One infrastructure requirement item emitted by CLI plugin scaffolding. */
 export type PluginInfrastructureDependency = 'kv' | 'db' | 'cache';
 
+/** Durable saga state backend emitted for saga plugin appsettings. */
+export type SagaStoreBackend = 'kv' | 'prisma';
+
 /** Maps Aspire registration categories to appsettings config sections. */
 export const PLUGIN_CONFIG_SECTION_MAP: Record<PluginCategory, PluginConfigSection> = {
   plugin: 'Plugins',

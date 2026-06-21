@@ -25,8 +25,13 @@
  */
 
 import { createService, type ServiceConfig } from '../builder/service-builder.ts';
+import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import { createDatabaseConnectivityStartupHook } from '../diagnostics/database-connectivity.ts';
 import type { Database, DbContext, RunningService, ServiceRouter } from '../types.ts';
+
+interface DisconnectCapableDatabase extends Database {
+  $disconnect(): Promise<void>;
+}
 
 /**
  * Extract a `$queryRaw`-capable client from a db context object.
@@ -50,6 +55,10 @@ function isDatabase(value: unknown): value is Database {
     typeof (value as { $queryRaw?: unknown }).$queryRaw === 'function';
 }
 
+function isDisconnectCapableDatabase(value: Database): value is DisconnectCapableDatabase {
+  return typeof (value as { $disconnect?: unknown }).$disconnect === 'function';
+}
+
 /**
  * Options for defineService preset.
  */
@@ -70,6 +79,13 @@ export interface DefineServiceOptions extends ServiceConfig {
   };
   /** Enable debug mode for verbose oRPC logging (default: NETSCRIPT_DEBUG env var) */
   debug?: boolean;
+  /** Optional authentication and authorization stages for guarded service paths. */
+  auth?: {
+    /** Authentication middleware options. */
+    readonly authn: AuthnOptions;
+    /** Optional authorization middleware options. */
+    readonly authz?: AuthzOptions;
+  };
 }
 
 /**
@@ -106,6 +122,40 @@ export interface DefineServiceOptions extends ServiceConfig {
  * });
  * ```
  *
+ * @example
+ * ```typescript
+ * // With auth enabled for /api paths
+ * import { defineService } from '@netscript/service';
+ * import {
+ *   createScopeAuthorizer,
+ *   createStaticCredentialAuthenticator,
+ * } from '@netscript/service/auth';
+ *
+ * await defineService(router, {
+ *   name: 'users',
+ *   auth: {
+ *     authn: {
+ *       authenticator: createStaticCredentialAuthenticator({
+ *         credentials: {
+ *           'local-token': {
+ *             subject: 'service:local',
+ *             scopes: ['users:read'],
+ *           },
+ *         },
+ *       }),
+ *     },
+ *     authz: {
+ *       authorizer: createScopeAuthorizer({
+ *         rules: [{
+ *           match: (request) => request.path.startsWith('/api/users'),
+ *           requireScopes: ['users:read'],
+ *         }],
+ *       }),
+ *     },
+ *   },
+ * });
+ * ```
+ *
  * @param router - oRPC router with contract handlers
  * @param options - Service configuration options
  */
@@ -136,6 +186,19 @@ export async function defineService<T extends ServiceRouter>(
           database: healthCheckDb,
         }),
       );
+
+      if (isDisconnectCapableDatabase(healthCheckDb)) {
+        builder.onShutdown(async () => {
+          await healthCheckDb.$disconnect();
+        });
+      }
+    }
+  }
+
+  if (options.auth) {
+    builder.withAuthn(options.auth.authn);
+    if (options.auth.authz) {
+      builder.withAuthz(options.auth.authz);
     }
   }
 

@@ -1,0 +1,400 @@
+remains unresolved but is correctly deferred to a future slice. This PR does not
+touch `plugins/auth`.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.09M • cache hit 83.25% •  reasoning 2.61K • ↓ output 10.99K • 
+$ 0.4955
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File 
+/home/runner/work/netscript/netscript/.llm/tmp/run/openhands/pr-93/run-278836759
+15-1/evaluate.md edited with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Evaluation — auth-kv-oauth boundary hardening
+ 2|
++3|**Branch:** `feat/prime-time/auth-s3-kv-oauth`
++4|**Commits:** `9fd701ef`, `9e0d22fa`
++5|**Evaluator:** OpenHands (qwen 3.7 max)
++6|**Verdict:** PASS
++7|
++8|## Hard Check Results
++9|
++10|### 1. Zero-cast policy
++11|- **Command:** `grep -rn "as never|as any|as unknown as|as <PascalType>" 
+packages/auth-kv-oauth/src/`
++12|- **Result:** PASS — zero type assertions found in src or mod.ts
++13|- **Evidence:** `grep` returned exit code 1 (no matches)
++14|
++15|### 2. Structural-erasure cast gone
++16|- **Command:** `grep packages/auth-kv-oauth/src/backend.ts "as 
+AuthBackendPort"`
++17|- **Result:** PASS — backend.ts line 102 declares `export interface 
+KvOAuthBackend extends AuthBackendPort, KvOAuthFlow`
++18|- **Evidence:** Named interface replaces intersection cast; return type is 
+honest `Promise<KvOAuthBackend>`
++19|
++20|### 3. Error-taxonomy honesty
++21|- **Declared codes (errors.ts:14-24):**
++22|  - `oauth_cookie_missing` ✓ (flow.ts:159)
++23|  - `oauth_txn_not_found` ✓ (flow.ts:163)
++24|  - `token_exchange_failed` ✓ (flow.ts:149)
++25|  - `refresh_failed` ✓ (backend.ts:265, 326, 336)
++26|  - `refresh_reuse_detected` ✓ (backend.ts:273)
++27|  - `return_to_not_allowed` ✓ (flow.ts:331)
++28|  - `session_not_found` ✓ (backend.ts:205, 220)
++29|  - `configuration_error` ✓ (cookies:114, store:204/218/236/246, 
+providers:113/116/122/135/165/183/199, backend:346, crypto:42/70/96)
++30|  - `https_required` ✓ (cookies:120, flow:338)
++31|- **Tests assert typed refresh codes:**
++32|  - `auth_kv_oauth_test.ts:323` — `assertEquals(reuse.code, 
+'refresh_reuse_detected')`
++33|  - `auth_kv_oauth_test.ts:360` — `assertEquals(failure.code, 
+'refresh_failed')`
++34|- **Result:** PASS — all declared codes thrown on real paths; no dead codes 
+remain
++35|
++36|### 4. Non-null / discriminated-union narrowing
++37|- **Command:** `grep -rn "!\." packages/auth-kv-oauth/src/`
++38|- **Result:** PASS — zero non-null assertions found
++39|- **Evidence:**
++40|  - `normalizePrincipal` returns `KvOAuthPrincipal` (Principal & { scheme: 
+"custom" }) — flow.ts:356
++41|  - `customFetch` typed as `KvOAuthFetch` (intersection of oauth4webapi 
+fetch types) — flow.ts:54
++42|  - Crypto `open()` validator-backed, returns `unknown | TValue` — 
+crypto.ts:64
++43|  - Provider config discriminated union: `OAuthIssuerProviderConfig | 
+OAuthEndpointProviderConfig` with client-secret requirements encoded by 
+`clientAuthMethod` — providers.ts:40-70
++44|  - JSON.parse replaced by `validateTokenSet` and 
+`validateSessionTokenPayload` — store.ts:216, backend.ts:344
++45|
++46|### 5. Scoped gates
++47|- **Check:** `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts
+--root packages/auth-kv-oauth --ext ts,tsx`
++48|  - Result: **PASS** (exit 0) — 9 files, 0 occurrences
++49|- **Lint:** `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts 
+--root packages/auth-kv-oauth --ext ts,tsx`
++50|  - Result: **PASS** (exit 0) — 9 files, 0 findings
++51|- **Fmt:** `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts 
+--root packages/auth-kv-oauth --ext ts,tsx`
++52|  - Result: **PASS** (exit 0) — 9 files, 0 findings
++53|- **Test:** `deno test --unstable-kv --allow-all packages/auth-kv-oauth`
++54|  - Result: **PASS** (exit 0) — 9 passed, 0 failed
++55|
++56|### 6. JSR §5
++57|- **Doc lint (full export map):**
++58|  - `deno doc --lint packages/auth-kv-oauth/mod.ts` — PASS (exit 0)
++59|  - `deno doc --lint packages/auth-kv-oauth/src/providers.ts` — PASS (exit 
+0)
++60|  - `deno doc --lint packages/auth-kv-oauth/src/store.ts` — PASS (exit 0)
++61|  - `deno doc --lint packages/auth-kv-oauth/src/crypto.ts` — PASS (exit 0)
++62|  - `deno doc --lint packages/auth-kv-oauth/src/cookies.ts` — PASS (exit 0)
++63|  - `deno doc --lint packages/auth-kv-oauth/src/flow.ts` — PASS (exit 0)
++64|  - `deno doc --lint packages/auth-kv-oauth/src/backend.ts` — PASS (exit 0)
++65|  - `deno doc --lint packages/auth-kv-oauth/src/errors.ts` — PASS (exit 0)
++66|- **Publish dry-run:** `deno publish --dry-run --allow-dirty` from 
+`packages/auth-kv-oauth`
++67|  - Result: **PASS** (exit 0) — "Success Dry run complete", no slow-type 
+warnings
++68|  - Files: README.md, deno.json, mod.ts, src/**/*.ts (10 files total)
++69|
++70|### 7. Lock hygiene
++71|- **Command:** `git diff -- deno.lock`
++72|- **Result:** PASS — no changes to deno.lock
++73|
++74|### 8. Scope verification
++75|- **Files touched:**
++76|  - `packages/auth-kv-oauth/mod.ts`
++77|  - `packages/auth-kv-oauth/src/backend.ts`
++78|  - `packages/auth-kv-oauth/src/cookies.ts`
++79|  - `packages/auth-kv-oauth/src/crypto.ts`
++80|  - `packages/auth-kv-oauth/src/errors.ts`
++81|  - `packages/auth-kv-oauth/src/flow.ts`
++82|  - `packages/auth-kv-oauth/src/providers.ts`
++83|  - `packages/auth-kv-oauth/src/store.ts`
++84|  - `packages/auth-kv-oauth/tests/auth_kv_oauth_test.ts`
++85|  - 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-kv-oauth/*.md` 
+(4 harness artifacts)
++86|- **Result:** PASS — only `packages/auth-kv-oauth` + slice harness 
+artifacts; no `@netscript/cli` edits; no `plugins/auth` edits (AuthStreamSchema 
+export gap correctly deferred)
++87|
++88|## Drift Review
++89|
++90|Drift recorded in 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-kv-oauth/drift.m
+d`:
++91|
++92|1. **refresh failures now throw typed errors** (severity: significant)
++93|   - **Assessment:** Valid — behavioral change from `{ ok: false, reason: 
+"..." }` to typed `KvOAuthError` throws. Tests assert both codes. Drift 
+recorded.
++94|
++95|2. **consumer check blocked by unrelated stream-schema mismatch** (severity:
+minor)
++96|   - **Assessment:** Valid — `plugins/auth/streams/schema.ts` imports 
+`AuthStreamSchema` not exported by `packages/plugin-auth-core`. Out of scope for
+this slice. No `plugins/auth` files changed.
++97|
++98|3. **JSR runtime compatibility is not source-controllable** (severity: 
+minor)
++99|   - **Assessment:** Valid — JSR package settings control runtime compat, 
+not `deno.json`. Package remains Deno-oriented by API usage.
++100|
++101|## Verdict Rationale
++102|
++103|All hard checks pass:
++104|- Zero type assertions in source
++105|- Named backend boundary interface replaces structural cast
++106|- Error taxonomy honest (all codes thrown, tests assert refresh codes)
++107|- Non-null assertions replaced by real narrowing
++108|- Scoped gates green (check/lint/fmt/test)
++109|- JSR doc-lint and publish dry-run green (no slow types)
++110|- Lock hygiene clean
++111|- Scope restricted to `packages/auth-kv-oauth` + harness artifacts
++112|
++113|Drift is recorded and justified. No unrecorded doctrine violations 
+introduced.
++114|
++115|## Recommendations
++116|
++117|None. Implementation is complete and aligns with approved scope.
++118|
+[end of edit 1 / 1]
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27883675915-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary — auth-kv-oauth boundary hardening
+ 2|
++3|## Verdict: IMPL-EVAL: PASS
++4|
++5|**Branch:** `feat/prime-time/auth-s3-kv-oauth` → `feat/prime-time/auth`
++6|**Commits:** `9fd701ef`, `9e0d22fa`
++7|
++8|## Changes
++9|
++10|### packages/auth-kv-oauth (9 files)
++11|- **backend.ts:** Named `KvOAuthBackend` interface extends `AuthBackendPort,
+KvOAuthFlow`; replaced `as AuthBackendPort & ReturnType<...>` cast; refresh 
+failures now throw typed `KvOAuthError` codes
++12|- **providers.ts:** Discriminated union `OAuthIssuerProviderConfig | 
+OAuthEndpointProviderConfig`; client-secret requirements encoded by 
+`clientAuthMethod`; zero non-null assertions
++13|- **flow.ts:** `KvOAuthPrincipal` typed as `Principal & { scheme: "custom" 
+}`; `KvOAuthFetch` intersection typed at boundary; validator-backed crypto
++14|- **crypto.ts:** `open()` validator-backed, returns `unknown | TValue`; zero
+casts
++15|- **store.ts:** `validateTokenSet` validator; zero casts; hashToken for 
+refresh reuse detection
++16|- **cookies.ts:** Zero casts
++17|- **errors.ts:** 9 error codes, all thrown on real paths
++18|- **mod.ts:** Re-exports public surface; zero casts
++19|- **tests/auth_kv_oauth_test.ts:** 9 tests pass; asserts 
+`refresh_reuse_detected` and `refresh_failed` codes
++20|
++21|### Harness artifacts (4 files)
++22|- 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-kv-oauth/worklog
+.md`
++23|- 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-kv-oauth/drift.m
+d`
++24|- 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-kv-oauth/commits
+.md`
++25|- 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-kv-oauth/context
+-pack.md`
++26|
++27|## Validation
++28|
++29|| Gate | Command | Exit Code | Result |
++30||------|---------|-----------|--------|
++31|| Zero-cast | `grep -rn "as never\|as any\|as unknown as" 
+packages/auth-kv-oauth/src/` | 1 | PASS (0 matches) |
++32|| Non-null scan | `grep -rn "!\." packages/auth-kv-oauth/src/` | 1 | PASS (0
+matches) |
++33|| Scoped check | `deno run ... run-deno-check.ts --root 
+packages/auth-kv-oauth --ext ts,tsx` | 0 | PASS (9 files, 0 occurrences) |
++34|| Scoped lint | `deno run ... run-deno-lint.ts --root packages/auth-kv-oauth
+--ext ts,tsx` | 0 | PASS (9 files, 0 findings) |
++35|| Scoped fmt | `deno run ... run-deno-fmt.ts --root packages/auth-kv-oauth 
+--ext ts,tsx` | 0 | PASS (9 files, 0 findings) |
++36|| Package tests | `deno test --unstable-kv --allow-all 
+packages/auth-kv-oauth` | 0 | PASS (9 passed, 0 failed) |
++37|| JSR doc lint | `deno doc --lint` over mod.ts + 7 src files | 0 | PASS (all
+checked) |
++38|| JSR publish | `deno publish --dry-run --allow-dirty` | 0 | PASS (no slow 
+types) |
++39|| Lock hygiene | `git diff -- deno.lock` | 0 | PASS (no changes) |
++40|| Scope | `git diff --name-only 54d6550a..9e0d22fa` | 0 | PASS (only 
+auth-kv-oauth + harness) |
++41|
++42|## Drift Summary
++43|
++44|1. **Refresh failures throw typed errors** (significant) — behavioral change
+from returning `{ ok: false }` to throwing `KvOAuthError`. Tests assert both 
+`refresh_reuse_detected` and `refresh_failed` codes. Recorded in drift.md.
++45|2. **Consumer check blocked** (minor) — `plugins/auth/streams/schema.ts` 
+imports `AuthStreamSchema` not exported by `packages/plugin-auth-core`. Out of 
+scope.
++46|3. **JSR runtime compat** (minor) — configured in JSR package settings, not 
+source. Package remains Deno-oriented.
++47|
++48|## Remaining Risks
++49|
++50|None. Implementation is complete, aligns with approved scope, and all gates 
+pass.
++51|
++52|## Note
++53|
++54|`plugins/auth/streams/schema.ts` pre-existing `AuthStreamSchema` import gap 
+remains unresolved but is correctly deferred to a future slice. This PR does not
+touch `plugins/auth`.
++55|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Emit IMPL-EVAL PASS verdict for PR #93
+
+Reasoning:
+The `OPENHANDS_SUMMARY_PATH` environment variable is set to 
+`/home/runner/work/_temp/openhands/27883675915-1/summary.md`, and I have already
+created that file successfully. The task also says "Do not write or reuse 
+.llm/tmp/openhands/summary.md. Write only the run-scoped path from 
+OPENHANDS_SUMMARY_PATH." which I followed.
+
+Now looking at my task list, the final item "Write evaluate.md and summary.md, 
+emit verdict" is marked as done.
+
+Let me now summarize what has happened:
+1. I verified the branch is `feat/prime-time/auth-s3-kv-oauth` with the two 
+relevant commits `9fd701ef` and `9e0d22fa`.
+2. I checked the scope: files touched are only in `packages/auth-kv-oauth` and 
+slice harness artifacts; no `@netscript/cli`, no `plugins/auth`.
+3. I performed all 8 hard checks:
+   - Check 1 (zero-cast policy): ✅ PASS - no casts found
+   - Check 2 (structural-erasure cast gone): ✅ PASS - named `KvOAuthBackend` 
+interface, no `as` cast
+   - Check 3 (error-taxonomy honesty): ✅ PASS - all 9 declared codes throw on 
+real paths, tests assert `refresh_reuse_detected` and `refresh_failed`
+   - Check 4 (non-null / discriminated-union): ✅ PASS - no `!.` assertions, 
+proper narrowing
+   - Check 5 (scoped gates): ✅ PASS - check/lint/fmt/test all green
+   - Check 6 (JSR §5): ✅ PASS - doc lint green on all 8 files, publish dry-run 
+green, no slow types
+   - Check 7 (lock hygiene): ✅ PASS - deno.lock unchanged
+   - Check 8 (scope verification): ✅ PASS - only auth-kv-oauth + harness files
+4. Drift review: 3 drift entries, all justified.
+5. I have written:
+   - `.llm/tmp/run/openhands/pr-93/run-27883675915-1/evaluate.md`
+   - `/home/runner/work/_temp/openhands/27883675915-1/summary.md`
+
+Per the operational contract:
+- "If output_mode is thread-replies, optionally write .../replies.json as an 
+array of ... for PR review-thread replies." — Not applicable here since this is 
+a single PR comment, not thread replies.
+- The workflow will post my `summary.md` content as the PR comment 
+automatically.
+- I should NOT call `task_tracker` after the verdict since the verdict is being 
+emitted now.
+- The final action is `finish()`.
+
+Let me now emit the PR comment verdict via the `finish` tool. The summary.md 
+already contains all the data. The workflow owns GitHub comments, so I just need
+to include the verdict prominently in my final message.
+
+
+Thought:
+The implementation run artifacts for this slice live at 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-kv-oauth/` 
+(already written by the generator). The run-scoped evaluator artifacts written 
+by this session are:
+
+- `.llm/tmp/run/openhands/pr-93/run-27883675915-1/evaluate.md`
+- `/home/runner/work/_temp/openhands/27883675915-1/summary.md`
+
+Both files follow the paths prescribed by the operational contract.
+
+
+
+Finish with message:
+## OpenHands Agent — Completed
+
+**Verdict: IMPL-EVAL: PASS**
+
+Branch `feat/prime-time/auth-s3-kv-oauth` → umbrella `feat/prime-time/auth`. 
+Commits `9fd701ef`, `9e0d22fa`.
+
+### Hard Check Results
+
+| # | Check | Command | Exit | Result |
+|---|-------|---------|------|--------|
+| 1 | Zero-cast policy | `grep -rn "as never\|as any\|as unknown as\|as 
+<Pascal>" packages/auth-kv-oauth/src/` | 1 (no matches) | ✅ PASS |
+| 2 | Structural-erasure cast gone | inspected `src/backend.ts:102` | — | ✅ 
+PASS — `interface KvOAuthBackend extends AuthBackendPort, KvOAuthFlow`; no 
+intersection cast |
+| 3 | Error-taxonomy honesty | `grep -rn "new KvOAuthError(" 
+packages/auth-kv-oauth/src/` + tests | 0 | ✅ PASS — all 9 declared codes thrown
+on real paths; tests assert `refresh_reuse_detected` (test:323) + 
+`refresh_failed` (test:360); no dead codes |
+| 4 | Non-null / discriminated-union | `grep -rn "!\." 
+packages/auth-kv-oauth/src/` | 1 (no matches) | ✅ PASS — zero `!.` assertions |
+| 5 | Scoped check | `deno run …/run-deno-check.ts --root packages/auth-kv-oauth
+--ext ts,tsx` | 0 | ✅ PASS — 9 files / 0 occurrences |
+| 5 | Scoped lint | `deno run …/run-deno-lint.ts --root packages/auth-kv-oauth 
+--ext ts,tsx` | 0 | ✅ PASS — 9 files / 0 findings |
+| 5 | Scoped fmt | `deno run …/run-deno-fmt.ts --root packages/auth-kv-oauth 
+--ext ts,tsx` | 0 | ✅ PASS — 9 files / 0 findings |
+| 5 | Tests | `deno test --unstable-kv --allow-all packages/auth-kv-oauth` | 0 |
+✅ PASS — 9 passed / 0 failed |
+| 6 | `deno doc --lint` (full export map) | `mod.ts` + 
+`providers/store/crypto/cookies/flow/backend/errors` | all exit 0 | ✅ PASS — no
+slow types |
+| 6 | `deno publish --dry-run --allow-dirty` | from `packages/auth-kv-oauth` | 0
+| ✅ PASS — "Success Dry run complete", 10 files |
+| 7 | Lock hygiene | `git diff -- deno.lock` | 0 (empty) | ✅ PASS |
+| 8 | Scope | `git diff --name-only 54d6550a..9e0d22fa` | 0 | ✅ PASS — only 
+`packages/auth-kv-oauth` + slice harness; no `@netscript/cli`, no `plugins/auth`
+edits (`AuthStreamSchema` gap correctly NOT smuggled) |
+
+### Drift Review
+
+1. **refresh failures now throw typed errors** (significant) — behavior changed 
+from `{ ok: false, reason }` to typed `KvOAuthError` throws. Tests assert codes.
+Recorded in `drift.md` ✓
+2. **consumer check blocked** (minor) — pre-existing 
+`plugins/auth/streams/schema.ts` `AuthStreamSchema` gap; out of scope for this 
+slice ✓
+3. **JSR runtime-compat** (minor) — configured in JSR package settings, not 
+source; package remains Deno-oriented ✓
+
+### Verdict Rationale
+
+All hard checks pass. Drift is recorded and justified. No unrecorded doctrine 
+violations introduced. Evaluator is a separate session from the generator; 
+findings are independently reproduced.
+
+Tokens: ↑ input 1.16M • cache hit 83.94% •  reasoning 3.26K • ↓ output 12.68K • 
+$ 0.5226
+

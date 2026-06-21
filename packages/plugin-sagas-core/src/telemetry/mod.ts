@@ -1,3 +1,9 @@
+/**
+ * Telemetry attributes and instrumentation helpers for saga runtimes.
+ *
+ * @module
+ */
+
 export {
   SagaAttributes,
   SagaMetricNames,
@@ -39,4 +45,5 @@ export type {
   SagaTelemetrySpanKind,
   SagaTelemetryStatus,
   SagaTelemetryTracer,
+  SagaTraceParent,
 } from './instrumentation.ts';

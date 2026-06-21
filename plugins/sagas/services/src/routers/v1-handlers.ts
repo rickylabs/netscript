@@ -210,17 +210,19 @@ export async function publishSagaMessage(
   input: SagaPublishMessageInput,
   options: PublishSagaMessageOptions,
 ): Promise<SagaPublishMessageOutput> {
-  const { type, payload, correlationId } = input;
+  const { type, payload, correlationId, idempotencyKey } = input;
   const message: SagaRuntimeMessage = Object.freeze({
     type,
     payload: payload ?? {},
     correlationKey: correlationId,
+    idempotencyKey,
     occurredAt: new Date(),
     traceparent: options.traceHeaders?.traceparent,
     tracestate: options.traceHeaders?.tracestate,
   });
 
   await options.runtime.publish(message, {
+    idempotencyKey,
     traceparent: message.traceparent,
     tracestate: message.tracestate,
   });

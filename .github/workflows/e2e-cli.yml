@@ -1,0 +1,125 @@
+name: e2e-cli
+
+# Toolchain-heavy CLI runtime E2E gate. ci.yml deliberately defers this (see its
+# header: "the toolchain-heavy CLI runtime e2e ... which spawns aspire + docker +
+# postgres ... deferred Phase-2 repo process automation umbrella"). This workflow
+# is that gate, split into two tiers over `deno task e2e:cli`:
+#
+#   - scaffold-static — deno-only suites (scaffold.service, scaffold.contracts,
+#     scaffold.plugins): init, generated-surface discovery, registry generation,
+#     plugin doctor, and generated typecheck. No aspire / docker / postgres, so it
+#     runs green on a stock runner. This is the immediate scaffold-output
+#     regression gate and is intended to become a required check once observed
+#     green.
+#
+#   - scaffold-runtime — the full merge-readiness suite
+#     (`deno task e2e:cli run scaffold.runtime --cleanup`): scaffold + official
+#     plugins (workers/sagas/triggers/streams) + DB init/generate/seed + generated
+#     typecheck + Aspire AppHost boot + HTTP/OTEL behavior + cleanup. Needs the
+#     standalone `aspire` CLI, .NET, and Docker. ADDITIVE UNTIL OBSERVED GREEN
+#     (mirrors the `quality` lane rollout in ci.yml): the Aspire-in-CI bring-up is
+#     unverified and likely needs a debugging pass before this job is promoted to a
+#     required check via branch protection.
+#
+# Triggers: every PR to main, PLUS any PR carrying the `e2e-cli-gate` label (so the
+# durable-store / CLI-touching slices into the feat/framework-prime-time umbrella
+# can opt in before they reach main), PLUS manual dispatch.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-cli-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scaffold-static:
+    name: scaffold-static (deno-only)
+    # Run on every PR to main, on any PR labeled `e2e-cli-gate`, or manual dispatch.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.base.ref == 'main' ||
+      contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.8.3"
+
+      - name: Install workspace dependencies
+        run: deno install
+
+      - name: scaffold.service (init + generated discovery + typecheck)
+        run: deno task e2e:cli run scaffold.service --format pretty
+
+      - name: scaffold.contracts (init + contract discovery + typecheck)
+        run: deno task e2e:cli run scaffold.contracts --format pretty
+
+      - name: scaffold.plugins (official plugins + registry gen + plugin doctor)
+        run: deno task e2e:cli run scaffold.plugins --format pretty
+
+  scaffold-runtime:
+    name: scaffold-runtime (aspire + docker + postgres)
+    # Same gate condition as scaffold-static. Heavy; additive until observed green.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.base.ref == 'main' ||
+      contains(github.event.pull_request.labels.*.name, 'e2e-cli-gate')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.8.3"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install Aspire CLI
+        env:
+          ASPIRE_CLI_VERSION: "13.4.4"
+        run: |
+          dotnet tool install Aspire.Cli --tool-path "$HOME/.aspire/bin" --version "$ASPIRE_CLI_VERSION"
+          echo "$HOME/.aspire/bin" >> "$GITHUB_PATH"
+
+      - name: Aspire CLI preflight
+        run: |
+          aspire_version="$(aspire --version)"
+          echo "$aspire_version"
+          case "$aspire_version" in
+            13.4.*) ;;
+            *) echo "Expected Aspire CLI 13.4.x, got $aspire_version" >&2; exit 1 ;;
+          esac
+
+      - name: Install workspace dependencies
+        run: deno install
+
+      - name: Full scaffold runtime E2E (one pass, with cleanup)
+        run: deno task e2e:cli run scaffold.runtime --cleanup --format pretty
+
+      - name: Upload E2E report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-cli-scaffold-runtime-report
+          path: |
+            .llm/tmp/**/report*.json
+            .llm/tmp/**/report*.ndjson
+            **/e2e-report*.json
+          if-no-files-found: ignore

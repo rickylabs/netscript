@@ -8,6 +8,8 @@ import {
   type StreamPayloadSchema,
   type StreamProducerHandle,
   type StreamTopicDefinition,
+  StreamUnsupportedOperationError,
+  unsupportedStreamOperation,
 } from './stream-api.ts';
 
 const STREAMS_SERVICE_PERMISSIONS = [
@@ -144,6 +146,8 @@ export {
   type StreamPayloadSchema,
   type StreamProducerHandle,
   type StreamTopicDefinition,
+  StreamUnsupportedOperationError,
+  unsupportedStreamOperation,
 };
 export type {
   BackgroundProcessorContribution,

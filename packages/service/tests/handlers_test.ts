@@ -1,30 +1,11 @@
 import { assertEquals } from '@std/assert';
+import { Hono } from 'hono';
 import { createErrorHandler, createNotFoundHandler } from '../mod.ts';
-import type { ServiceContext } from '../mod.ts';
-
-function createContext(path = '/missing'): ServiceContext {
-  return {
-    req: {
-      raw: new Request(`http://localhost${path}`),
-      path,
-      header: () => undefined,
-    },
-    json: (data: unknown, status = 200) => Response.json(data, { status }),
-    html: (html: string, status = 200) =>
-      new Response(html, {
-        status,
-        headers: { 'content-type': 'text/html' },
-      }),
-    body: (data: BodyInit | null, status = 200, headers?: HeadersInit) =>
-      new Response(data, { status, headers }),
-    newResponse: (data?: BodyInit | null, init?: Response | ResponseInit) =>
-      new Response(data, init),
-    get: () => undefined,
-  };
-}
 
 Deno.test('createNotFoundHandler returns service-scoped not found response', async () => {
-  const response = await createNotFoundHandler('users')(createContext('/unknown'));
+  const app = new Hono();
+  app.notFound(createNotFoundHandler('users'));
+  const response = await app.request('/unknown');
   const body = await response.json();
 
   assertEquals(response.status, 404);
@@ -33,7 +14,12 @@ Deno.test('createNotFoundHandler returns service-scoped not found response', asy
 });
 
 Deno.test('createErrorHandler returns production-safe error response', async () => {
-  const response = await createErrorHandler('users')(new Error('boom'), createContext());
+  const app = new Hono();
+  app.onError(createErrorHandler('users'));
+  app.get('/boom', () => {
+    throw new Error('boom');
+  });
+  const response = await app.request('/boom');
   const body = await response.json();
 
   assertEquals(response.status, 500);
