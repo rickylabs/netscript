@@ -35,7 +35,7 @@ is split the way it is. If you want exact exports, jump to the
 ## The thesis: the published surface is the product
 
 NetScript treats publishing as the whole point. A package's `mod.ts` is not an
-implementation detail that happens to be exported â€” it is the contract the
+implementation detail that happens to be exported — it is the contract the
 framework makes with the outside world. The shape a caller sees through
 `deno doc`, the JSR doc score, and the type checker is the surface that
 everything else serves.
@@ -62,38 +62,38 @@ type flow](/explanation/contracts/).
 A NetScript workspace is not one process. It is a small constellation of
 single-purpose services, each owned by a plugin and each speaking a contract,
 brought up together by Aspire. The diagram below is the canonical shape of a
-fully-loaded workspace â€” workers, sagas, triggers, auth, and streams all
+fully-loaded workspace — workers, sagas, triggers, auth, and streams all
 enabled.
 
 ```text
-                              â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                              â”‚            Aspire AppHost          â”‚
-                              â”‚   dashboard  http://localhost:18888â”‚
-                              â”‚  provisions Postgres + Garnet (KV) â”‚
-                              â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                              â”‚ wires env, ports, resources
-            â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-            â”‚                                  â”‚                                 â”‚
-   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”                â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”               â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”
-   â”‚  example service â”‚                â”‚   PLUGIN SERVICES (oRPC / Hono) â”‚              â”‚
-   â”‚   users :3001    â”‚                â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤              â”‚
-   â”‚  /api/rpc/*      â”‚                â”‚  workers  :8091   (jobs/tasks)   â”‚              â”‚
-   â”‚  oRPC contract   â”‚                â”‚  sagas    :8092   (durable flows)â”‚              â”‚
-   â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                â”‚  triggers :8093   (raw Hono in)  â”‚              â”‚
-            â”‚                          â”‚  auth     :8094   (oRPC /api/rpc)â”‚              â”‚
-            â”‚ contracts                â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜              â”‚
-            â”‚ (@orpc/contract + zod)            â”‚                                        â”‚
-            â”‚                          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                              â”‚
-   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-   â”‚                            KERNEL  (@netscript/* platform packages)                   â”‚
-   â”‚  config Â· runtime-config Â· service Â· contracts Â· sdk Â· plugin Â· database Â· queue Â· kv â”‚
-   â”‚  cron Â· logger Â· telemetry Â· aspire                                                    â”‚
-   â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-            â”‚ produces durable change-data events                               â”‚
-   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                                              â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-   â”‚  streams  :4437   â”‚  durable-stream service (Aspire Deno svc)   â”‚  Postgres / Garnet  â”‚
-   â”‚  HTTP / SSE       â”‚  workers Â· auth Â· sagas mirror state here   â”‚  (relational + KV)  â”‚
-   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                              â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                              ┌───────────────────────────────────┐
+                              │            Aspire AppHost          │
+                              │   dashboard  http://localhost:18888│
+                              │  provisions Postgres + Garnet (KV) │
+                              └───────────────┬───────────────────┘
+                                              │ wires env, ports, resources
+            ┌─────────────────────────────────┼─────────────────────────────────┐
+            │                                  │                                 │
+   ┌────────▼────────┐                ┌────────▼────────┐               ┌────────▼────────┐
+   │  example service │                │   PLUGIN SERVICES (oRPC / Hono) │              │
+   │   users :3001    │                ├─────────────────────────────────┤              │
+   │  /api/rpc/*      │                │  workers  :8091   (jobs/tasks)   │              │
+   │  oRPC contract   │                │  sagas    :8092   (durable flows)│              │
+   └────────┬─────────┘                │  triggers :8093   (raw Hono in)  │              │
+            │                          │  auth     :8094   (oRPC /api/rpc)│              │
+            │ contracts                └────────┬────────────────────────┘              │
+            │ (@orpc/contract + zod)            │                                        │
+            │                          ┌────────▼─────────┐                              │
+   ┌────────▼──────────────────────────┴──────────────────┴──────────────────────────────┐
+   │                            KERNEL  (@netscript/* platform packages)                   │
+   │  config · runtime-config · service · contracts · sdk · plugin · database · queue · kv │
+   │  cron · logger · telemetry · aspire                                                    │
+   └────────┬──────────────────────────────────────────────────────────────────┬─────────┘
+            │ produces durable change-data events                               │
+   ┌────────▼─────────┐                                              ┌──────────▼─────────┐
+   │  streams  :4437   │  durable-stream service (Aspire Deno svc)   │  Postgres / Garnet  │
+   │  HTTP / SSE       │  workers · auth · sagas mirror state here   │  (relational + KV)  │
+   └───────────────────┘                                              └────────────────────┘
 ```
 
 Read the picture in three bands:
@@ -104,12 +104,12 @@ Read the picture in three bands:
   traces, logs, and resource health land. See [Aspire as the local
   control plane](/explanation/aspire/).
 - **Plugin services** sit in the middle. Each first-party plugin owns exactly one
-  service on a fixed port â€” workers on **:8091**, sagas on **:8092**, triggers on
+  service on a fixed port — workers on **:8091**, sagas on **:8092**, triggers on
   **:8093**, auth on **:8094**, and the streams durable-stream service on
   **:4437**. Your own services (the scaffolded `users` example service on
   **:3001**) sit alongside them, speaking the same contract machinery.
-- **The kernel** sits underneath. The platform packages â€” config, service,
-  database, queue, kv, telemetry, and the rest â€” are the shared substrate every
+- **The kernel** sits underneath. The platform packages — config, service,
+  database, queue, kv, telemetry, and the rest — are the shared substrate every
   plugin composes against. No plugin redefines them; each one _wires_ them.
 
 {{ comp apiTable {
@@ -140,12 +140,12 @@ the units that turn that substrate into workers, sagas, triggers, auth, and
 streams.
 
 A plugin never edits the host. It _registers_ named **contributions** against
-fixed **extension axes** â€” a service, a background processor, a Prisma schema
-fragment, a stream topic, a contract version, runtime-config topics â€” and the
+fixed **extension axes** — a service, a background processor, a Prisma schema
+fragment, a stream topic, a contract version, runtime-config topics — and the
 host validates and wires those registrations at composition time. Adding a plugin
 is therefore a manifest plus a regenerated registry, never a patch to kernel
-code. The full mechanics â€” public plugin versus sibling core package, manifests,
-contributions, and the generated registry â€” are the subject of [The plugin
+code. The full mechanics — public plugin versus sibling core package, manifests,
+contributions, and the generated registry — are the subject of [The plugin
 model](/explanation/plugin-model/).
 
 The first-party plugins, each its own publishable unit with its own reference
@@ -171,13 +171,13 @@ It is not a bolt-on or a middleware afterthought.
 ## The pure-backend seam: a port with interchangeable adapters
 
 The most important architectural _pattern_ to take away from auth is not specific
-to auth at all â€” it is the **pure-backend seam**, and it is how NetScript keeps a
+to auth at all — it is the **pure-backend seam**, and it is how NetScript keeps a
 capability open to multiple implementations without leaking any of them into the
 contract.
 
 The shape is always the same:
 
-1. A **core** package defines a **port** â€” a pure interface, no IO â€” that says
+1. A **core** package defines a **port** — a pure interface, no IO — that says
    what the capability must be able to do.
 2. **Adapter** packages implement that port against a concrete technology. They
    are _pure backends_: they depend on the port, never the other way around, and
@@ -187,7 +187,7 @@ The shape is always the same:
 
 Auth is the canonical instance. The core seam
 [`@netscript/plugin-auth-core`](/reference/plugin-auth-core/) defines `AuthBackendPort`; three
-pure adapters implement it â€”
+pure adapters implement it —
 [`@netscript/auth-kv-oauth`](/reference/plugin-auth-core/) (the only **interactive** backend,
 default),
 [`@netscript/auth-workos`](/reference/plugin-auth-core/), and
@@ -195,8 +195,8 @@ default),
 [`@netscript/plugin-auth`](/reference/plugin-auth-core/) composes the one backend named by
 `NETSCRIPT_AUTH_BACKEND`. Capabilities a given backend cannot honor fail loud
 through a typed `AuthBackendOperationUnsupportedError` rather than silently doing
-nothing. The full treatment â€” `InteractiveFlowPort`, the `Principal`/`AuthnResult`
-contract from `@netscript/service/auth`, and the per-backend capability matrix â€”
+nothing. The full treatment — `InteractiveFlowPort`, the `Principal`/`AuthnResult`
+contract from `@netscript/service/auth`, and the per-backend capability matrix —
 lives in [The auth model](/explanation/auth-model/).
 
 {{ comp callout { type: "tip", title: "The seam is the design, not the adapter" } }}
@@ -225,8 +225,8 @@ from twenty modules, or a compatibility shim layer.
 That is why the reference pages on this site are generated directly from
 `deno doc` against each package's declared exports. The docs describe the same
 surface the type checker and the JSR audit enforce, leaving one source of truth
-instead of prose that slowly drifts from code. The contract machinery itself â€”
-`@orpc/contract`, zod schemas, and `implement()` â€” is covered in [Contracts &
+instead of prose that slowly drifts from code. The contract machinery itself —
+`@orpc/contract`, zod schemas, and `implement()` — is covered in [Contracts &
 type flow](/explanation/contracts/).
 
 ## Configuration records intent before runtime wiring
@@ -234,7 +234,7 @@ type flow](/explanation/contracts/).
 NetScript keeps authored intent separate from the concrete runtime wiring that
 makes a workspace run. The project-level intent lives in `netscript.config.ts`
 and is authored with [`defineConfig`](/reference/config/) or
-`defineConfigAsync`. That object says what the project is â€” its name, paths,
+`defineConfigAsync`. That object says what the project is — its name, paths,
 enabled plugins, services, apps, database declarations, saga groups, trigger
 groups, deployment settings, and runtime-config output paths. At startup,
 `loadConfig` and `initConfig` resolve that authored form into a validated
@@ -266,7 +266,7 @@ provisioned by Aspire and described in `appsettings.json`.
 Naming is part of the contract. Entry points follow fixed verbs so a caller can
 predict behavior from the name alone:
 
-- `defineX(...)` returns a frozen _definition_ and does no runtime work â€” it is
+- `defineX(...)` returns a frozen _definition_ and does no runtime work — it is
   the builder verb.
 - `createX(...)` constructs a _runtime_ object that owns state and IO.
 - `startX(...)` constructs _and_ starts a runtime, returning a small
@@ -292,11 +292,11 @@ implementation inheritance is forbidden.
 The default everywhere is **composition over inheritance**: hold the would-be
 parent as a field, expose narrow methods, and replace the held instance to
 change behavior. A package wires its collaborators in a single **composition
-root** â€” a plain `createX()` factory that constructs the default adapters and
+root** — a plain `createX()` factory that constructs the default adapters and
 injects them. The framework escalates to a typed container only when many
 modules contribute providers, composition is ordered, or services are genuinely
 optional; decorator-driven dependency injection is not used. Equally,
-abstractions are introduced only once the axis of variation can be _named_ â€”
+abstractions are introduced only once the axis of variation can be _named_ —
 engine, transport, store, target, runtime. A `BaseRunner` invented before anyone
 can say what varies is treated as a smell.
 
@@ -307,12 +307,12 @@ APIs (`fetch`, `URL`, `Headers`, `ReadableStream`, `AbortSignal`,
 `structuredClone`, `crypto.subtle`, `Temporal`/`Date`, `Intl.*`), the `Deno.*`
 namespace, and the entire `@std/*` library are the baseline. A local helper is
 justified only if it introduces a real test seam, encodes a NetScript-specific
-policy, or hides a stable non-trivial computation â€” renaming a platform
+policy, or hides a stable non-trivial computation — renaming a platform
 primitive is not a justification.
 
 Structure follows the same discipline: one concern per folder, one reason per
 file, and tests living next to their subject. The framework's internal layering
-runs `domain` â†’ `ports` â†’ `application` â†’ `adapters` â†’ `presentation`, with each
+runs `domain` → `ports` → `application` → `adapters` → `presentation`, with each
 layer allowed to import only the layers above it. The aim is that a reader can
 navigate by folder name alone.
 
@@ -337,7 +337,7 @@ fragmenting across both.
 } /}}
 
 The archetype is not cosmetic. A Small Contract package has no base classes, no
-dependency injection, and no adapters â€” its value is the clarity of its types.
+dependency injection, and no adapters — its value is the clarity of its types.
 An Integration package owns the _port_ (not the adapter), wires a default
 adapter through a `createX(options)` factory, and exposes technology-specific
 adapters and in-memory testing helpers through their own subpaths. A
@@ -346,7 +346,7 @@ constructor-injected with its store, queue, and telemetry; a `defineX()` builder
 produces the frozen definition it consumes; long-running tasks return
 `{ stop() }` handles and thread `AbortSignal` through every async path. The
 pure-backend seam described above is the Integration archetype taken to its
-limit â€” a port with several shipped adapters.
+limit — a port with several shipped adapters.
 
 ## Durable behavior is modeled as state machines
 
@@ -363,8 +363,8 @@ a builder:
   ]
 } /}}
 
-Failure handling is just as explicit. Handlers throw rich errors; a supervisor â€”
-not a scatter of defensive `try/catch` blocks inside the handler â€” decides
+Failure handling is just as explicit. Handlers throw rich errors; a supervisor —
+not a scatter of defensive `try/catch` blocks inside the handler — decides
 whether to restart or escalate, and owns the telemetry for that decision. Crash
 boundaries are a named part of the design, not an afterthought. The durable
 runtime persists through a selectable `kv` or `prisma` store; the full flow is
@@ -373,13 +373,13 @@ covered in [Durable workflows](/explanation/durable-workflows/).
 ## Observability is built into the substrate
 
 Because every plugin composes the same kernel, observability is wired once and
-inherited everywhere. Aspire runs an OTLP collector, and the worker job path â€”
-dispatch, execution, scheduler, and subprocess continuation â€” emits **real
+inherited everywhere. Aspire runs an OTLP collector, and the worker job path —
+dispatch, execution, scheduler, and subprocess continuation — emits **real
 OpenTelemetry spans automatically**; job traces show up in the Aspire dashboard
 without any handler code. The honest caveat is narrow: the scaffold
 `createJobTools(ctx)` helpers exposed to your handler (`trace.addEvent`,
-`withChildSpan`, `progress`) are currently no-op stubs â€” a tracked limitation
-with a fix planned â€” so for custom handler spans you call `@netscript/telemetry`
+`withChildSpan`, `progress`) are currently no-op stubs — a tracked limitation
+with a fix planned — so for custom handler spans you call `@netscript/telemetry`
 helpers directly. The full picture is in
 [Observability](/explanation/observability/).
 
@@ -387,10 +387,10 @@ helpers directly. The full picture is in
 
 First-party plugins live under `plugins/*` and form their own archetype. A
 plugin package re-exports the contract types from its sibling framework package
-â€” a workers plugin uses the types from
+— a workers plugin uses the types from
 [`@netscript/workers`](/reference/workers/), a sagas plugin uses
 [`@netscript/sagas`](/reference/sagas/), an auth plugin composes
-[`@netscript/plugin-auth-core`](/reference/plugin-auth-core/) â€” rather than redefining them.
+[`@netscript/plugin-auth-core`](/reference/plugin-auth-core/) — rather than redefining them.
 The plugin's `mod.ts` stays small; most of its code lives in service
 entrypoints, runtime declarations (jobs, sagas, triggers, streams, auth flows),
 and a package-owned `verify-plugin.ts` validation gate. Schema contributions are
@@ -403,7 +403,7 @@ plugin-specific wiring in another.
 Tests are treated as fitness functions, and the publish gate is where the
 architecture is enforced rather than merely described. `deno publish --dry-run`,
 `deno doc`, the workspace type checks, the semantic tests, and an export/docs
-audit are not optional steps â€” they are the mechanism by which every axiom above
+audit are not optional steps — they are the mechanism by which every axiom above
 survives contact with real code. A surface that does not pass them is broken by
 definition, which is precisely why the public surface can be trusted as the
 product.
@@ -411,14 +411,14 @@ product.
 {{ comp callout { type: "note", title: "Alpha specifiers" } }}
 The auth packages are published at <code>0.0.1-alpha.0</code> today. Scaffold
 output pins forward-looking <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>
-specifiers, but those are not installable at <code>1.0</code> yet â€” treat the
+specifiers, but those are not installable at <code>1.0</code> yet — treat the
 auth zone as the framework's newest surface.
 {{ /comp }}
 
 ## Where to go next
 
-- **The vocabulary:** every term above â€” saga, trigger, stream, contract,
-  contribution, archetype, port, AppHost â€” is defined in the
+- **The vocabulary:** every term above — saga, trigger, stream, contract,
+  contribution, archetype, port, AppHost — is defined in the
   [glossary](/glossary/).
 - **The contract machinery:** how types flow from a contract to a client in
   [Contracts & type flow](/explanation/contracts/).

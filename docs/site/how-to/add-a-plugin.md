@@ -12,20 +12,20 @@ next:
 
 # Add a plugin
 
-**Goal:** add one of NetScript's official plugins â€” **workers**, **sagas**,
-**triggers**, **streams**, or **auth** â€” to an existing workspace, register it with the
+**Goal:** add one of NetScript's official plugins — **workers**, **sagas**,
+**triggers**, **streams**, or **auth** — to an existing workspace, register it with the
 runtime, and confirm it is wired up and healthy.
 
 This is a task-oriented recipe. It assumes you already have a NetScript workspace (created
 with `netscript init`) and that the `netscript` command is on your path. Each step is a
 single command you run from your workspace root; the [Verify](#step-4--verify-the-plugin-is-registered)
 step proves the plugin landed before you write a line of application code. For the exact
-APIs each plugin exposes, follow the [reference links](#reference) at the end â€” this guide
+APIs each plugin exposes, follow the [reference links](#reference) at the end — this guide
 adds the plugin; the reference documents its surface.
 
 {{ comp callout { type: "note", title: "Plugins compose; they do not replace your service" } }}
-A plugin is an <strong>installable capability</strong> â€” a background-job runtime, a saga
-orchestrator, an auth service â€” that scaffolds its own workspace folder, registers itself in
+A plugin is an <strong>installable capability</strong> — a background-job runtime, a saga
+orchestrator, an auth service — that scaffolds its own workspace folder, registers itself in
 your runtime, and (where applicable) runs as its own Aspire service on a dedicated port. Your
 application service and your plugins run side by side. See
 <a href="/explanation/plugin-model/">Plugin architecture</a> for the design behind the model.
@@ -36,7 +36,7 @@ application service and your plugins run side by side. See
 You need:
 
 - **An existing NetScript workspace.** If you do not have one yet, create it first with
-  `netscript init` â€” walk through [Your first workspace](/tutorials/first-workspace/) or the
+  `netscript init` — walk through [Your first workspace](/tutorials/first-workspace/) or the
   [tutorials index](/tutorials/).
 - **The `netscript` command on your path.** Run `netscript --help` to confirm it resolves,
   and `netscript plugin --help` for the exact option spelling in your installed version. If
@@ -54,21 +54,21 @@ netscript plugin --help
 
 - **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
   but several plugins (workers, sagas, auth) need Postgres and Garnet to actually run. Bring
-  the local stack up first â€” `cd aspire && aspire run` â€” exactly as in
+  the local stack up first — `cd aspire && aspire run` — exactly as in
   [Run the stack with Aspire](/explanation/aspire/). You do **not** need it up just to
   scaffold and register.
 
 {{ comp callout { type: "tip", title: "Run commands from the workspace root" } }}
 Every command below runs from your workspace root. To target a different project, pass
-<code>--project-root &lt;path&gt;</code> â€” it defaults to the current directory. Run
+<code>--project-root &lt;path&gt;</code> — it defaults to the current directory. Run
 <code>netscript plugin add --help</code> for the version-accurate option list before you rely
 on any flag.
 {{ /comp }}
 
-## Step 1 â€” Choose the plugin kind
+## Step 1 — Choose the plugin kind
 
 Each official plugin has a *kind* you pass to the command and a conventional installed
-*name*. Use the conventional name unless you have a specific reason to differ â€” generated
+*name*. Use the conventional name unless you have a specific reason to differ — generated
 registries, ports, and docs all assume it.
 
 {{ comp apiTable {
@@ -85,21 +85,21 @@ registries, ports, and docs all assume it.
 
 Pick the kind for the capability you need:
 
-- **workers** â€” background job scheduling, task execution, and worker API endpoints. Fully
-  traced through Aspire (scheduler â†’ queue â†’ worker â†’ subprocess). See
+- **workers** — background job scheduling, task execution, and worker API endpoints. Fully
+  traced through Aspire (scheduler → queue → worker → subprocess). See
   [Background jobs](/capabilities/background-jobs/).
-- **sagas** â€” durable saga orchestration and long-running workflow APIs, with a selectable
+- **sagas** — durable saga orchestration and long-running workflow APIs, with a selectable
   durable store (`kv` or `prisma`). See [Durable sagas](/capabilities/durable-sagas/).
-- **triggers** â€” trigger ingress, scheduling, and file watching over raw Hono routes. See
+- **triggers** — trigger ingress, scheduling, and file watching over raw Hono routes. See
   [Triggers](/capabilities/triggers/).
-- **auth** â€” an oRPC auth service (sign-in, callback, sign-out, session, me) backed by a
+- **auth** — an oRPC auth service (sign-in, callback, sign-out, session, me) backed by a
   single selectable backend (kv-oauth, WorkOS, or better-auth). See
   [Authentication](/capabilities/auth/).
-- **streams** â€” durable, change-data stream producers served as their own Aspire service.
+- **streams** — durable, change-data stream producers served as their own Aspire service.
   See [Streams](/capabilities/streams/).
 
 {{ comp callout { type: "note", title: "auth is a first-class official plugin" } }}
-Auth is now added the same way as workers, sagas, triggers, and streams â€” through
+Auth is now added the same way as workers, sagas, triggers, and streams — through
 <code>netscript plugin add auth</code>. It scaffolds a <code>plugins/auth/</code> workspace,
 registers the <code>auth-api</code> service on port <strong>8094</strong>, and contributes
 its Prisma models. The active backend is selected at runtime with
@@ -107,7 +107,7 @@ its Prisma models. The active backend is selected at runtime with
 <a href="/how-to/add-authentication/">Configure authentication</a> for the backend setup.
 {{ /comp }}
 
-## Step 2 â€” Add the plugin
+## Step 2 — Add the plugin
 
 Run `netscript plugin add` with the kind. This scaffolds the plugin package under your
 workspace and updates your plugin registration:
@@ -138,7 +138,7 @@ netscript plugin add stream --name streams
 Run `netscript plugin add --help` for the full, version-accurate list. The common flags:
 
 {{ comp apiTable {
-  caption: "netscript plugin add â€” common options",
+  caption: "netscript plugin add — common options",
   columns: ["Option", "What it does"],
   rows: [
     ["<code>--name &lt;name&gt;</code>", "Installed plugin name. Use the conventional name above unless you have a reason to differ."],
@@ -160,7 +160,7 @@ own Prisma models (<code>auth_users</code>, <code>auth_sessions</code>,
 before the service starts.
 {{ /comp }}
 
-## Step 3 â€” Generate registries and wire the database
+## Step 3 — Generate registries and wire the database
 
 After adding plugins, regenerate the plugin registries so the runtime can discover them:
 
@@ -193,11 +193,11 @@ netscript db seed
 {{ comp callout { type: "note", title: "Aspire is step 2, the database is step 3" } }}
 <code>netscript db</code> talks to the Postgres that Aspire provisions. Always
 <code>cd aspire &amp;&amp; aspire run</code> <strong>before</strong> any <code>db</code>
-command â€” see <a href="/explanation/aspire/">Run the stack with Aspire</a>. Skip these
+command — see <a href="/explanation/aspire/">Run the stack with Aspire</a>. Skip these
 database steps only when every plugin you added is stateless.
 {{ /comp }}
 
-## Step 4 â€” Verify the plugin is registered
+## Step 4 — Verify the plugin is registered
 
 List the registered plugins to confirm your new plugin appears:
 
@@ -205,7 +205,7 @@ List the registered plugins to confirm your new plugin appears:
 netscript plugin list
 ```
 
-You should see your plugin in the inventory â€” for example, `workers`, `sagas`, `triggers`,
+You should see your plugin in the inventory — for example, `workers`, `sagas`, `triggers`,
 `auth`, and `streams` if you added all five. Then run the health check:
 
 ```bash

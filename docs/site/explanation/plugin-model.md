@@ -34,7 +34,7 @@ Hold those three nouns and the rest of this page is detail.
 A NetScript plugin is a package under `plugins/` that contributes capability to a host
 workspace **without the host hard-coding any knowledge of that capability**. The host depends
 on a small, finite vocabulary of contribution shapes; the plugin speaks that vocabulary. Adding
-a plugin therefore never means editing host code â€” it means shipping a manifest and
+a plugin therefore never means editing host code — it means shipping a manifest and
 regenerating a registry.
 
 The first-party plugins are:
@@ -43,17 +43,17 @@ The first-party plugins are:
   caption: "First-party plugins and the capability each contributes",
   columns: ["Plugin", "JSR package", "Capability", "Reference"],
   rows: [
-    ["workers", "<code>@netscript/plugin-workers</code>", "Background job scheduling and task execution.", "<a href=\"/reference/workers/\">workers â†’</a>"],
-    ["sagas", "<code>@netscript/plugin-sagas</code>", "Durable saga orchestration and workflow APIs.", "<a href=\"/reference/sagas/\">sagas â†’</a>"],
-    ["triggers", "<code>@netscript/plugin-triggers</code>", "Trigger ingress, scheduling, and file watching.", "<a href=\"/reference/triggers/\">triggers â†’</a>"],
-    ["streams", "<code>@netscript/plugin-streams</code>", "Durable change-data stream services.", "<a href=\"/reference/streams/\">streams â†’</a>"],
-    ["auth", "<code>@netscript/plugin-auth</code>", "Authentication service composing one active backend.", "<a href=\"/reference/plugin-auth-core/\">auth â†’</a>"]
+    ["workers", "<code>@netscript/plugin-workers</code>", "Background job scheduling and task execution.", "<a href=\"/reference/workers/\">workers →</a>"],
+    ["sagas", "<code>@netscript/plugin-sagas</code>", "Durable saga orchestration and workflow APIs.", "<a href=\"/reference/sagas/\">sagas →</a>"],
+    ["triggers", "<code>@netscript/plugin-triggers</code>", "Trigger ingress, scheduling, and file watching.", "<a href=\"/reference/triggers/\">triggers →</a>"],
+    ["streams", "<code>@netscript/plugin-streams</code>", "Durable change-data stream services.", "<a href=\"/reference/streams/\">streams →</a>"],
+    ["auth", "<code>@netscript/plugin-auth</code>", "Authentication service composing one active backend.", "<a href=\"/reference/plugin-auth-core/\">auth →</a>"]
   ]
 } /}}
 
 Each is its own publishable unit with its own reference page. Plugins that run as services
-expose them on dedicated ports â€” workers on `:8091`, sagas on `:8092`, triggers on `:8093`,
-auth on `:8094`, and streams as an Aspire Deno service on `:4437` â€” but a host can compose any
+expose them on dedicated ports — workers on `:8091`, sagas on `:8092`, triggers on `:8093`,
+auth on `:8094`, and streams as an Aspire Deno service on `:4437` — but a host can compose any
 combination of them, because they all speak the same contribution vocabulary.
 
 ## Plugins versus their core packages
@@ -75,7 +75,7 @@ packages, not one*. Most public plugins have a sibling **core** package:
 
 The split follows the architecture doctrine's separation of *behavior* from *integration*:
 
-- The **core** package implements the capability itself â€” the authoring DSL (for example the
+- The **core** package implements the capability itself — the authoring DSL (for example the
   saga and trigger definition builders), the runtime, the ports it depends on, the adapters,
   telemetry helpers, and the versioned contract types. This is where the long-running behavior
   and state live.
@@ -99,7 +99,7 @@ This is also why some plugin surfaces are deliberately thin or even fail loud. T
 `@netscript/plugin-streams` manifest helpers `defineStreamProducer`/`defineStreamConsumer`
 throw `StreamUnsupportedOperationError` and redirect you to the real producer runtime in
 `@netscript/plugin-streams-core` (`createDurableStream`). The *behavior* lives in core; the
-*plugin* only carries the manifest. The boundary is a feature, not an oversight â€” see
+*plugin* only carries the manifest. The boundary is a feature, not an oversight — see
 [Streaming change data](/capabilities/streams/) for the producer-versus-manifest framing.
 
 ## Manifests and contributions
@@ -114,24 +114,24 @@ plugin makes along well-defined **extension axes**.
     {
       label: "definePlugin",
       language: "ts",
-      code: "import { definePlugin } from \"@netscript/plugin\";\n\n// A manifest is a declaration the host can read at composition time â€”\n// no behavior runs here, it only names contributions.\nexport const authPlugin = definePlugin(\"@netscript/plugin-auth\", \"0.0.1-alpha.0\")\n  // The builder is the only public surface: name + version, then chained axes.\n  // contributions: services, schemas, stream topics, contract versionsâ€¦\n  .withType(\"api\")\n  .withTags([\"auth\", \"oauth\", \"oidc\", \"sessions\"])\n  .build();"
+      code: "import { definePlugin } from \"@netscript/plugin\";\n\n// A manifest is a declaration the host can read at composition time —\n// no behavior runs here, it only names contributions.\nexport const authPlugin = definePlugin(\"@netscript/plugin-auth\", \"0.0.1-alpha.0\")\n  // The builder is the only public surface: name + version, then chained axes.\n  // contributions: services, schemas, stream topics, contract versions…\n  .withType(\"api\")\n  .withTags([\"auth\", \"oauth\", \"oidc\", \"sessions\"])\n  .build();"
     }
   ]
 } /}}
 
 Contributions are the vocabulary the host understands. The plugin contract defines a *fixed*
-set of contribution shapes â€” among them service contributions, background-processor
+set of contribution shapes — among them service contributions, background-processor
 contributions, database-schema contributions, stream-topic contributions, contract-version
 contributions, runtime-config-topic contributions, and telemetry contributions. A workers
 plugin contributes worker job definitions; a sagas plugin contributes saga definitions; a
 streams plugin contributes stream topics and a service; an auth plugin contributes its oRPC
 service, a Prisma schema, and stream topics. The host never needs to know the internals of any
-plugin â€” it only needs to understand these contribution shapes.
+plugin — it only needs to understand these contribution shapes.
 
 This is the doctrine's principle of **registration over inheritance** for cross-package
 extension: a plugin *registers* named contributions against open extension axes instead of
 subclassing host internals. Registration scales because the host can validate a registration at
-composition time, log it, and reject conflicts â€” for example, duplicate plugin names are
+composition time, log it, and reject conflicts — for example, duplicate plugin names are
 rejected with a structured error that references both contributors.
 
 {{ comp callout { type: "note", title: "Contributions are a closed set; plugins are an open set" } }}
@@ -152,21 +152,21 @@ properties of the loader matter for understanding the model:
   duplicate names across plugins are rejected.
 
 Between *declaring* a plugin and letting the *runtime* use it sits a generated **registry**.
-Rather than scanning the file system at runtime, NetScript emits static registry modules â€” one
-TypeScript module per contribution axis â€” that the runtime imports directly. The plugin package
+Rather than scanning the file system at runtime, NetScript emits static registry modules — one
+TypeScript module per contribution axis — that the runtime imports directly. The plugin package
 exposes the emitter and port types behind this on its [reference page](/reference/plugin/), and
 each plugin loads its definitions from the generated static registry module.
 
-{{ comp card { title: "The lifecycle in four steps", icon: "ðŸ”Œ" } }}
+{{ comp card { title: "The lifecycle in four steps", icon: "🔌" } }}
 <strong>1. Author</strong> capability in a <code>-core</code> package (DSL, runtime, ports).
 <strong>2. Declare</strong> a manifest in the plugin package via <code>definePlugin()</code>.
 <strong>3. Generate</strong> the static registry so the runtime can see the new contributions.
-<strong>4. Compose</strong> â€” the host loads registrations deterministically and rejects
+<strong>4. Compose</strong> — the host loads registrations deterministically and rejects
 duplicate names.
 {{ /comp }}
 
 Regenerating the registry is what makes a freshly added plugin visible to the runtime; the
-practical command sequence (`netscript plugin add â€¦` then the registry generation step) is
+practical command sequence (`netscript plugin add …` then the registry generation step) is
 covered in the [add-a-plugin how-to](/how-to/add-a-plugin/).
 
 ## Auth: the model at its richest
@@ -174,10 +174,10 @@ covered in the [add-a-plugin how-to](/how-to/add-a-plugin/).
 The **auth** plugin is the clearest single exemplar of every idea on this page, because it
 stretches the core/plugin split across *five* units instead of two:
 
-- `@netscript/plugin-auth-core` defines the **port** â€” `AuthBackendPort` â€” and nothing
+- `@netscript/plugin-auth-core` defines the **port** — `AuthBackendPort` — and nothing
   provider-specific. It is the seam.
 - Three pure **backend adapters** implement that port for different identity providers:
-  `@netscript/auth-kv-oauth` (the only interactive backend â€” full OAuth/OIDC redirect flow),
+  `@netscript/auth-kv-oauth` (the only interactive backend — full OAuth/OIDC redirect flow),
   `@netscript/auth-workos`, and `@netscript/auth-better-auth` (both non-interactive).
 - `@netscript/plugin-auth` is the **composing plugin**: it carries the manifest, runs the
   `auth-api` oRPC service on `:8094`, and selects exactly **one** active backend via
@@ -185,15 +185,15 @@ stretches the core/plugin split across *five* units instead of two:
 
 That is the whole model written large: behavior lives in core and adapters, the plugin only
 composes and declares, and the host sees one service contribution regardless of which backend
-is active. Where a backend cannot satisfy a capability â€” for instance, asking a non-interactive
-backend to run an interactive sign-in â€” the seam fails loud with a typed
+is active. Where a backend cannot satisfy a capability — for instance, asking a non-interactive
+backend to run an interactive sign-in — the seam fails loud with a typed
 `AuthBackendOperationUnsupportedError` rather than silently misbehaving. Read
 [The auth model](/explanation/auth-model/) for the full port-and-adapter walkthrough.
 
 {{ comp callout { type: "warning", title: "Auth packages are alpha" } }}
 The auth units are published at <code>0.0.1-alpha.0</code>. Scaffold-pinned
-<code>jsr:â€¦@^1.0.0</code> specifiers are <strong>forward-looking</strong> and not installable
-today. There is also no auth telemetry or audit surface yet â€” do not assume one exists.
+<code>jsr:…@^1.0.0</code> specifiers are <strong>forward-looking</strong> and not installable
+today. There is also no auth telemetry or audit surface yet — do not assume one exists.
 {{ /comp }}
 
 ## Why the model looks like this
@@ -201,11 +201,11 @@ today. There is also no auth telemetry or audit surface yet â€” do not assu
 The shape exists to keep three concerns from leaking into each other:
 
 1. **Capability authors** work in a core package and think only about behavior, ports, and
-   contracts â€” never about how a host discovers them.
+   contracts — never about how a host discovers them.
 2. **Plugin packages** stay small: they translate a capability into a manifest of
    contributions, which is the only thing a host has to understand.
 3. **Hosts** depend on a stable, finite set of contribution shapes and a deterministic loader,
-   so adding a plugin never requires editing host code â€” it requires a manifest and a
+   so adding a plugin never requires editing host code — it requires a manifest and a
    regenerated registry.
 
 The result is that capabilities compose. A host can add workers, sagas, triggers, streams, and
@@ -218,7 +218,7 @@ schemas, and topics through the same contribution vocabulary.
   title: "Continue with the plugin model",
   steps: [
     { label: "Add a first-party plugin", href: "/how-to/add-a-plugin/", description: "The task-oriented recipe: scaffold, register, regenerate, verify." },
-    { label: "The auth model", href: "/explanation/auth-model/", description: "The five-unit core/adapter/plugin split â€” the model at its richest." },
+    { label: "The auth model", href: "/explanation/auth-model/", description: "The five-unit core/adapter/plugin split — the model at its richest." },
     { label: "Plugin authoring contract", href: "/reference/plugin/", description: "definePlugin(), contribution shapes, and the registry emitter." },
     { label: "Durable workflows", href: "/explanation/durable-workflows/", description: "How saga and worker plugins keep long-running state durable." }
   ]
