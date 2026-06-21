@@ -83,6 +83,14 @@ function addDatabaseSteps(steps: string[], dbCommand: string): void {
   steps.push(`${dbCommand} generate`);
   steps.push(`${dbCommand} seed`);
 }
+
+function databaseEnvVar(dbEngine: ValidatedInitOptions['dbEngine']): string {
+  if (dbEngine === 'postgres') return 'POSTGRES_URI';
+  if (dbEngine === 'mysql') return 'MYSQL_URI';
+  if (dbEngine === 'mssql') return 'MSSQL_URI';
+  return 'DATABASE_URL';
+}
+
 export function initNextSteps(options: ValidatedInitOptions): string[] {
   const steps: string[] = [`cd ${options.name}`];
   const dbCommand = options.importMode === 'local'
@@ -109,11 +117,16 @@ export function initNextSteps(options: ValidatedInitOptions): string[] {
     steps.push(`deno task --cwd apps/${options.appName} dev  # start Fresh dev server`);
   }
   if (options.includeExampleService && options.serviceName) {
-    steps.push(`# oRPC service "${options.serviceName}" at http://localhost:${options.servicePort}/rpc`);
+    steps.push(`# oRPC service "${options.serviceName}" at http://localhost:${options.servicePort}/api/rpc`);
   }
   if (options.dbEngine !== 'none') {
     const engineLabel = options.dbEngine.charAt(0).toUpperCase() + options.dbEngine.slice(1);
-    steps.push(`# ${engineLabel} provisioned by Aspire (see "Databases" in appsettings.json)`);
+    if (options.noAspire) {
+      const envVar = databaseEnvVar(options.dbEngine);
+      steps.push(`# Provision ${engineLabel} yourself and set ${envVar} or DATABASE_URL`);
+    } else {
+      steps.push(`# ${engineLabel} provisioned by Aspire (see "Databases" in appsettings.json)`);
+    }
   }
   return steps;
 }

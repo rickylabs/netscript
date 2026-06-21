@@ -1,0 +1,33 @@
+import ExamplesView from './(_components)/examples-view.tsx';
+import { appRoutes } from '@app/router.ts';
+import { definePage } from '@app/utils.ts';
+
+export const examplesPage = definePage()
+  .withRoute(appRoutes.examples)
+  .withMeta(() => ({
+    title: 'json-smoke — examples',
+    description: 'Registry-only scaffold example pages.',
+  }))
+  .withLayer('examples', ExamplesView, () => ({
+    examples: [
+      {
+        title: 'CRUD directory',
+        href: appRoutes.crudExample.href(),
+        description: 'Filter form, responsive table, detail rail, and empty-state patterns.',
+        status: 'Ready',
+        owner: 'app',
+      },
+      {
+        title: 'Telemetry trace example',
+        href: '/examples/telemetry',
+        description: 'Reserved trace walkthrough for service, database, and frontend spans.',
+        status: 'Placeholder',
+        owner: 'platform',
+      },
+    ],
+  }))
+  .withLayout((slots) => slots.examples())
+  .build();
+
+export const { default: page } = examplesPage;
+export { page as default };

@@ -34,7 +34,7 @@ You need:
 
 - An existing NetScript workspace with the scaffolded `apps/dashboard/` Fresh app.
   If you do not have one yet, create it first (`netscript init`) — see the
-  [Quickstart](/quickstart/) or [Your first workspace](/tutorials/first-workspace/).
+  [Quickstart](/quickstart/) or the [Storefront tutorial](/tutorials/storefront/).
 - The `netscript` command on your path. Run `netscript --help` to confirm, and
   `netscript ui:init --help` / `netscript ui:add --help` for the exact option
   spelling in your installed version. If `netscript` is not found, install it with

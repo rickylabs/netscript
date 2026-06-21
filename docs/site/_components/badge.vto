@@ -1,0 +1,12 @@
+{{# Lume component — docs/site/_components/badge.vto
+   Status / feature badge (Astro "visual API badge"). Invoke:
+     {{ comp.badge({ status: "stable", label: "Stable" }) }}
+     {{ comp.badge({ status: "alpha" }) }}
+     {{ comp.badge({ status: "partial", label: "Partial — see notes" }) }}
+   `status` is one of stable|alpha|partial; any other value falls back to the
+   neutral "muted" styling, and `label` defaults to the status string.
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{ set variants = { stable: "ns-badge--stable", alpha: "ns-badge--alpha", partial: "ns-badge--partial" } }}
+{{ set kind = status || "muted" }}
+{{ set cls = variants[kind] || "ns-badge--muted" }}
+<span class="ns-badge {{ cls }}">{{ label || kind }}</span>

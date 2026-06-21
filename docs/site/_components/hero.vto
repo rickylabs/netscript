@@ -4,7 +4,7 @@
    All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
 {{ set buttons = ctas || [] }}
 <section class="ns-hero">
-  <h1 class="ns-hero__tagline">{{ tagline }}</h1>
+  <h1 class="ns-hero__tagline">{{ tagline |> ic }}</h1>
   {{ if subhead }}<p class="ns-hero__subhead">{{ subhead }}</p>{{ /if }}
   {{ if buttons.length }}
     <div class="ns-hero__ctas">

@@ -1,0 +1,56 @@
+{
+  "sliceId": "service-auth-seam",
+  "archetype": "ARCHETYPE-4 (Public DSL / Builder) \u2014 @netscript/service's primary product is the fluent `createService(...).withX()...serve()` builder; the auth seam is added as new `withAuthn()`/`withAuthz()` builder methods plus a port contract + default adapters, materialized into the existing Hono middleware lifecycle.",
+  "scopeOverlays": [
+    "SCOPE-service"
+  ],
+  "lockedDecisions": [
+    "Auth is added to @netscript/service as a two-port design: AuthenticatorPort (authn) + AuthorizerPort (authz), mirroring the repo's TriggerIdempotencyPort shape.",
+    "Two real dependency-free default authenticators ship: createStaticCredentialAuthenticator (constant-time compare via crypto.subtle) and createTrustedHeaderAuthenticator (upstream-verified identity headers).",
+    "One real default authorizer ships: createScopeAuthorizer with ordered rules and denyByDefault=true (fail closed).",
+    "Asymmetric JWT/OAuth verification is intentionally NOT bundled in-package (would require jose via npm catalog + risk F-15 upstream-type leak); consumers implement AuthenticatorPort for JWT. This is a locked scope boundary, not a deferred TODO.",
+    "Builder gains withAuthn(options) and withAuthz(options); middleware is registered deterministically via installAuth() at the top of build() so ordering is independent of fluent call order (after CORS/logger, before RPC/routes).",
+    "Principal is injected into the oRPC context as ctx.principal inside buildRpcContext (service-builder-impl.ts:240-258) and exposed as ServiceContext.principal.",
+    "Auth adapters + types are exported via a new ./auth subpath in packages/service/deno.json; mod.ts stays a builder manifest. No version/pin change; aspire mod.ts and scaffold-versions.ts untouched.",
+    "defineService gains an optional auth?: { authn; authz? } field, OFF by default, so existing generated services compile and behave unchanged.",
+    "401 UNAUTHORIZED / 403 FORBIDDEN responses reuse the existing { error, message } JSON envelope and align with @netscript/telemetry error-plugin classification.",
+    "Zero new third-party dependencies; only Web Platform crypto.subtle + Hono (already a dependency) are used."
+  ],
+  "contracts": [
+    "AuthenticatorPort interface: authenticate(AuthnRequest) => AuthnResult | Promise<AuthnResult>",
+    "AuthorizerPort interface: authorize(AuthzRequest) => AuthzDecision | Promise<AuthzDecision>",
+    "Principal type: { subject, scopes[], roles[], scheme, claims } (readonly)",
+    "AuthnResult discriminated union: {ok:true, principal} | {ok:false, reason}",
+    "AuthzDecision discriminated union: {allow:true} | {allow:false, reason}",
+    "AuthnOptions / AuthzOptions builder option types (protect/allowAnonymous prefixes; denyByDefault)",
+    "ServiceBuilder interface additions: withAuthn(AuthnOptions) and withAuthz(AuthzOptions)",
+    "ServiceContext.principal accessor + ctx.principal on the oRPC context",
+    "DefineServiceOptions.auth?: { authn: AuthnOptions; authz?: AuthzOptions }",
+    "packages/service/deno.json exports: new './auth' subpath -> ./src/auth/mod.ts"
+  ],
+  "testPlan": [
+    "unit: createStaticCredentialAuthenticator \u2014 valid Bearer token -> {ok:true, principal with subject/scopes/roles}; valid X-API-Key -> ok; missing credential -> {ok:false, reason:'missing-credential'}; wrong token -> {ok:false, reason:'invalid-credential'}; constant-time compare exercised (digest equality, length-independent).",
+    "unit: createTrustedHeaderAuthenticator \u2014 subject header present -> principal from headers; subject header absent -> {ok:false, reason:'missing-identity-header'}; scopes/roles parsed from configured headers.",
+    "unit: createScopeAuthorizer \u2014 matching rule with satisfied scopes -> {allow:true}; matching rule with missing scope -> {allow:false, reason}; no matching rule + denyByDefault=true -> deny; denyByDefault=false -> allow.",
+    "unit: createAuthnMiddleware \u2014 guarded path + ok:false -> 401 {error:'UNAUTHORIZED'}; ok:true -> next() called and c.get('principal') set; allowAnonymous/health path -> bypassed (no authenticator call).",
+    "unit: createAuthzMiddleware \u2014 principal missing on guarded path -> 401; authorizer deny -> 403 {error:'FORBIDDEN'}; allow -> next().",
+    "integration (built app via app.request): createService(...).withAuthn(static).withAuthz(scope).withRPC().build(); unauthenticated /api call -> 401; authenticated but insufficient scope -> 403; authorized -> 200 and principal observable in handler context; /health stays 200 without credentials.",
+    "integration: defineService(router, { name, auth:{authn,authz} }) -> serves and enforces 401/403/200 end-to-end; defineService WITHOUT auth -> unchanged behavior (no auth enforcement, existing tests green).",
+    "failure-path: malformed Authorization header -> 401 not 500; authorizer throwing -> mapped to safe 403/500 envelope, never silent allow; deny-by-default with empty rules + authz enabled -> all guarded requests 403.",
+    "regression: existing tests/service-builder_test.ts, tests/runtime_test.ts, tests/_fixtures/readme-examples_test.ts remain green (auth opt-in)."
+  ],
+  "planGateSelfCheck": "PASS on all eight boxes. (1) Research present & current: research.md re-baselines every cited file:line against main@cc3b8731; both gaps confirmed unresolved. (2) Decisions locked: 10 locked decisions with rationale (two-port design, ship-vs-defer JWT, deterministic installAuth ordering, ./auth subpath, deny-by-default). (3) Open-decision sweep: the one residual optionality (bundle JWT in-package?) is explicitly LOCKED as out-of-scope with rationale \u2014 deferring it forces no rework because the AuthenticatorPort seam absorbs it; no deferred decision causes rework. (4) Commit slices: 7 ordered, <30, each names what it proves + gate + files. (5) Risk register: provided with mitigations. (6) Gate set: ARCHETYPE-4 required gates + SCOPE-service consumer check selected; e2e:cli justified-excluded. (7) Deferred scope explicit: JWT/OAuth/session/cookie listed as out-of-scope future slices. (8) jsr-audit: applied to planned surface \u2014 new exports get JSDoc+@example, ./auth subpath keeps mod.ts a manifest, F-15 risk (no hono/jwt upstream type on surface) named and mitigated; publish:dry-run uses pre-existing --allow-slow-types baseline. Residual FAIL_PLAN risk: low \u2014 PLAN-EVAL could push to bundle JWT; mitigation is the explicit locked-scope rationale showing the port seam prevents rework.",
+  "openQuestions": [
+    "PLAN-EVAL acceptance of NOT bundling asymmetric JWT in-package (locked as port-extensible out-of-scope). If rejected, add an 8th slice: createJwtAuthenticator behind ./auth/jwt subpath using jose via npm catalog, with jose kept off mod.ts to satisfy F-15.",
+    "Whether the ./auth subpath should also be reflected in scaffold templates so generated services can opt in via defineService auth \u2014 left out of this slice to avoid scaffold/e2e:cli scope; can be a follow-up SCOPE-service slice."
+  ],
+  "risks": [
+    "F-15 upstream re-export leak: a JWT or hono type could leak onto mod.ts. Mitigation: ports are first-party interfaces; no jose/hono type is exported; publish:dry-run + F-15 lint gate at slice 6.",
+    "Middleware ordering bug: auth registered after RPC would leave /api unprotected. Mitigation: deterministic installAuth() at top of build(), with an integration test asserting unauthenticated /api -> 401.",
+    "Fail-open authz: an unconfigured-but-enabled authorizer could allow all. Mitigation: denyByDefault=true default + explicit deny-by-default test.",
+    "Timing side-channel in static credential compare. Mitigation: crypto.subtle digest-equality constant-time compare + unit test; no early-return string compare.",
+    "Breaking existing consumers: adding interface methods is additive; opt-in preset field keeps generated services unchanged. Mitigation: SCOPE-service consumer-compile gate on workers/sagas/streams services.",
+    "Surface-count creep past doctrine ~20 soft cap on mod.ts. Mitigation: ./auth subpath isolates adapters/types; mod.ts stays a manifest.",
+    "Credential/PII leakage in logs. Mitigation: log hashed subject + scheme + decision only, never the raw token; covered by middleware unit test asserting no raw credential in log payload."
+  ]
+}

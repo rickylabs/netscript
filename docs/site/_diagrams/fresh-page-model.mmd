@@ -1,0 +1,11 @@
+%% Source for assets/diagrams/fresh-page-model.svg
+%% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
+%% This file is NOT consumed by `deno task build`; the site ships the SVG only.
+flowchart LR
+  browser["Browser<br/>(island)"] --> route["Fresh route<br/>(definePage)"]
+  route --> handler["Server handler<br/>(loader)"]
+  handler --> client["SDK client<br/>(typed client)"]
+  client --> service["oRPC service"]
+  service --> db["Database<br/>(Prisma)"]
+  service -. "client | server: contract boundary" .- client
+  browser -. "island hydrates in browser" .-> handler

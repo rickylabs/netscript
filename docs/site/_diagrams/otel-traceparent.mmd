@@ -1,0 +1,18 @@
+%% otel-traceparent — trace context propagation (offline Mermaid source for otel-traceparent.svg)
+flowchart LR
+  In["Inbound<br/>traceparent"]
+
+  subgraph Trace["one trace id"]
+    SvcSpan["Service span<br/>handler"]
+    WorkerSpan["Worker span<br/>job"]
+    SagaSpan["Saga span<br/>step"]
+  end
+
+  In --> SvcSpan
+  SvcSpan -->|enqueue (propagated)| WorkerSpan
+  WorkerSpan -->|continued| SagaSpan
+
+  Otlp["OTLP collector"]
+  SvcSpan -.->|export spans| Otlp
+  WorkerSpan -.->|export spans| Otlp
+  SagaSpan -.->|export spans| Otlp

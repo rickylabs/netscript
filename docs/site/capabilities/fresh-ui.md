@@ -194,7 +194,7 @@ heavy customization in your own components. Full options live behind
 <a href="/reference/fresh-ui/">@netscript/fresh-ui reference</a>.
 {{ /comp }}
 
-## Honest scope
+## Scope
 
 The scaffolded dashboard is a working, contract-wired **showcase** — not a finished product UI. It
 ships the `users` example (server-prefetched list + optimistic status mutation), a telemetry
@@ -225,7 +225,7 @@ matches what you're doing.
   {
     title: "Learn — Build a service",
     body: "Guided tutorial: contract → users service on :3001 → typed client → the island that renders it in the dashboard.",
-    href: "/tutorials/build-a-service/",
+    href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   },
   {

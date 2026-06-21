@@ -1,4 +1,10 @@
-import { assertEquals } from '@std/assert';
+import { trace } from 'npm:@opentelemetry/api@^1.9.1';
+import {
+  BasicTracerProvider,
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from 'npm:@opentelemetry/sdk-trace-base@^2.5.0';
+import { assert, assertEquals } from '@std/assert';
 import { TaskRuntimeAdapter } from '../../src/abstracts/mod.ts';
 import type {
   ResolvedTaskExecutionOptions,
@@ -7,6 +13,46 @@ import type {
   TaskType,
 } from '../../src/executor/mod.ts';
 import { MultiRuntimeTaskExecutor } from '../../src/executor/mod.ts';
+import {
+  TaskExecuteInstrumentation,
+  WorkerSpanNames,
+  WorkerTelemetryAttributes,
+} from '../../src/telemetry/mod.ts';
+
+Deno.test('MultiRuntimeTaskExecutor exports task execution spans through telemetry tracer', async () => {
+  trace.disable();
+  const exporter = new InMemorySpanExporter();
+  const provider = new BasicTracerProvider({
+    spanProcessors: [new SimpleSpanProcessor(exporter)],
+  });
+  assert(trace.setGlobalTracerProvider(provider));
+
+  try {
+    const adapter = new FakeRuntimeAdapter('deno');
+    const executor = new MultiRuntimeTaskExecutor({
+      adapters: new Map([['deno', adapter]]),
+      instrumentations: [new TaskExecuteInstrumentation()],
+    });
+
+    await executor.execute(taskFixture('deno'), { correlationId: 'correlation.fixture' });
+    await provider.forceFlush();
+
+    const spans = exporter.getFinishedSpans();
+    assertEquals(spans.length, 1);
+    const [span] = spans;
+    assertEquals(span.name, WorkerSpanNames.taskExecute);
+    assertEquals(span.attributes[WorkerTelemetryAttributes.taskId], 'task.fixture');
+    assertEquals(span.attributes[WorkerTelemetryAttributes.correlationId], 'correlation.fixture');
+    assertEquals(span.attributes[WorkerTelemetryAttributes.status], 'completed');
+    assertEquals(span.attributes[WorkerTelemetryAttributes.durationMs], 12);
+    assertEquals(span.attributes['task.runtime'], 'deno');
+    assertEquals(span.attributes['task.executor.id'], 'multi-runtime-task-executor');
+    assertEquals(span.attributes['task.adapter.id'], 'fake-runtime-adapter');
+  } finally {
+    await provider.shutdown();
+    trace.disable();
+  }
+});
 
 Deno.test('MultiRuntimeTaskExecutor dispatches to adapter by task type', async () => {
   const adapter = new FakeRuntimeAdapter('deno');
@@ -64,7 +110,7 @@ class FakeRuntimeAdapter extends TaskRuntimeAdapter {
       exitCode: 0,
       stdout: '',
       stderr: '',
-      duration: 0,
+      duration: 12,
       success: true,
       error: null,
       result: { adapter: this.id },

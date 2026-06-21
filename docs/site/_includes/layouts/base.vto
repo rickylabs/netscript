@@ -129,9 +129,20 @@
 
         <main class="ns-dashboard__content" id="main-content" tabindex="-1">
           {{ comp.breadcrumb({ url, navSections, title }) }}
-          <article class="ns-prose" data-pagefind-body>
-            {{ content }}
-          </article>
+          <div class="ns-content-rail">
+            <article class="ns-prose" data-pagefind-body>
+              {{ content }}
+            </article>
+            {{# On-page TOC (right rail on desktop, collapsible on mobile). Built by JS
+               from the article's h2/h3 (markdown-it-anchor adds the slug ids). With JS
+               off the <nav> stays empty/hidden, so the layout degrades gracefully. #}}
+            <nav class="ns-toc" data-toc aria-label="On this page" hidden>
+              <button type="button" class="ns-toc__summary" data-toc-toggle aria-expanded="true">
+                On this page
+              </button>
+              <ol class="ns-toc__list" data-toc-list></ol>
+            </nav>
+          </div>
           {{ comp.nextPrev({ prev, next }) }}
           {{ set editSourcePath = page.sourcePath }}
           {{ if editSourcePath && editSourcePath !== "(generated)" && !editSourcePath.startsWith("/reference/") }}
@@ -206,6 +217,15 @@
           tabs.forEach(function (tab, i) {
             tab.addEventListener("click", function () {
               activate(i);
+              if (root.hasAttribute("data-ns-runtime-group")) {
+                var label = tab.getAttribute("data-ns-runtime");
+                if (label) {
+                  try {
+                    localStorage.setItem("ns-runtime", label);
+                  } catch (e) { /* storage unavailable: selection just won't persist */ }
+                  syncRuntimeGroups(label, root);
+                }
+              }
             });
             tab.addEventListener("keydown", function (e) {
               var next = null;
@@ -222,13 +242,163 @@
           });
 
           root.classList.add("is-enhanced");
+          root._nsActivate = activate;
           activate(0);
+        }
+
+        {{# Runtime selection (comp.tabbedRuntime) persists across navigation via the
+           `ns-runtime` localStorage key: on load, restore the saved runtime for every
+           group; on tab click, write it back and re-sync the other groups on the page. #}}
+        function syncRuntimeGroups(label, except) {
+          var groups = Array.prototype.slice.call(
+            document.querySelectorAll(".ns-tabbed[data-ns-runtime-group]"),
+          );
+          groups.forEach(function (group) {
+            if (group === except || typeof group._nsActivate !== "function") return;
+            var tabs = Array.prototype.slice.call(group.querySelectorAll(".ns-tabbed__tab"));
+            for (var i = 0; i < tabs.length; i++) {
+              if (tabs[i].getAttribute("data-ns-runtime") === label) {
+                group._nsActivate(i);
+                break;
+              }
+            }
+          });
+        }
+
+        function restoreRuntime() {
+          var label = null;
+          try {
+            label = localStorage.getItem("ns-runtime");
+          } catch (e) { return; }
+          if (!label) return;
+          syncRuntimeGroups(label, null);
         }
 
         function init() {
           Array.prototype.slice.call(document.querySelectorAll(".ns-tabbed")).forEach(setup);
+          restoreRuntime();
         }
 
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", init);
+        } else {
+          init();
+        }
+      })();
+    </script>
+
+    {{# Code-copy buttons: inject a "Copy" button into every <pre> in .ns-prose and
+       copy the code text. No-JS safe — the button is simply absent without script. #}}
+    <script>
+      (function () {
+        function copyText(text, btn) {
+          var done = function () {
+            var prev = btn.textContent;
+            btn.textContent = "Copied";
+            btn.classList.add("is-copied");
+            setTimeout(function () {
+              btn.textContent = prev;
+              btn.classList.remove("is-copied");
+            }, 1600);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, function () {});
+          }
+        }
+        function init() {
+          var pres = Array.prototype.slice.call(
+            document.querySelectorAll(".ns-prose pre, .ns-tabbed__panel pre"),
+          );
+          pres.forEach(function (pre) {
+            if (pre.querySelector(".ns-copy-btn")) return;
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "ns-copy-btn";
+            btn.textContent = "Copy";
+            btn.setAttribute("aria-label", "Copy code to clipboard");
+            pre.classList.add("ns-pre--copyable");
+            pre.appendChild(btn);
+            btn.addEventListener("click", function () {
+              var code = pre.querySelector("code");
+              copyText((code || pre).innerText, btn);
+            });
+          });
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", init);
+        } else {
+          init();
+        }
+      })();
+    </script>
+
+    {{# On-page TOC + scroll-spy: build the right-rail TOC from the article's h2/h3
+       (slug ids from markdown-it-anchor), highlight the section in view via
+       IntersectionObserver. No-JS safe — the <nav> stays hidden if never populated. #}}
+    <script>
+      (function () {
+        function init() {
+          var nav = document.querySelector("[data-toc]");
+          var list = document.querySelector("[data-toc-list]");
+          var article = document.querySelector(".ns-prose");
+          if (!nav || !list || !article) return;
+
+          var headings = Array.prototype.slice.call(
+            article.querySelectorAll("h2[id], h3[id]"),
+          );
+          if (headings.length < 2) return;
+
+          var byId = {};
+          headings.forEach(function (h) {
+            var li = document.createElement("li");
+            li.className = "ns-toc__item ns-toc__item--" + h.tagName.toLowerCase();
+            var a = document.createElement("a");
+            a.className = "ns-toc__link";
+            a.href = "#" + h.id;
+            a.textContent = h.textContent;
+            a.setAttribute("data-toc-target", h.id);
+            li.appendChild(a);
+            list.appendChild(li);
+            byId[h.id] = a;
+          });
+
+          nav.removeAttribute("hidden");
+
+          var toggle = nav.querySelector("[data-toc-toggle]");
+          if (toggle) {
+            toggle.addEventListener("click", function () {
+              var open = nav.classList.toggle("is-collapsed");
+              toggle.setAttribute("aria-expanded", open ? "false" : "true");
+            });
+          }
+
+          var current = null;
+          function setActive(id) {
+            if (id === current) return;
+            if (current && byId[current]) byId[current].classList.remove("is-active");
+            current = id;
+            if (id && byId[id]) byId[id].classList.add("is-active");
+          }
+
+          if (!("IntersectionObserver" in window)) return;
+          var visible = {};
+          var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+              visible[entry.target.id] = entry.isIntersecting;
+            });
+            var active = null;
+            for (var i = 0; i < headings.length; i++) {
+              if (visible[headings[i].id]) {
+                active = headings[i].id;
+                break;
+              }
+            }
+            if (active) setActive(active);
+          }, { rootMargin: "0px 0px -70% 0px", threshold: 0 });
+          headings.forEach(function (h) {
+            observer.observe(h);
+          });
+        }
         if (document.readyState === "loading") {
           document.addEventListener("DOMContentLoaded", init);
         } else {

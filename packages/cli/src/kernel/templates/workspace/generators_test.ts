@@ -118,6 +118,7 @@ Deno.test('generateNetScriptConfig emits JSR guidance and stable section order',
   assertStringIncludes(result, "apps: 'apps'");
   assertStringIncludes(result, "contracts: 'contracts'");
   assertStringIncludes(result, "plugins: 'plugins'");
+  assertStringIncludes(result, "appHost: 'aspire/apphost.mts'");
 });
 
 Deno.test('generateNetScriptConfig switches to local imports without the JSR TODO banner', () => {
@@ -161,6 +162,7 @@ Deno.test('generateReadme — TS AppHost with service + postgres', () => {
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db generate');
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db seed');
   assertStringIncludes(md, 'deno run -A packages/cli/bin/netscript-dev.ts db status');
+  assertStringIncludes(md, '`users.health.check` via `/api/rpc`');
   assert(!md.includes('dotnet run'), 'TS AppHost README should not mention dotnet run');
 });
 
@@ -190,6 +192,22 @@ Deno.test('generateReadme — no aspire points at app dev task', () => {
   assertStringIncludes(md, 'deno task --cwd apps/dashboard dev');
   assert(!md.includes('aspire run'), 'no-aspire README must not mention aspire run');
   assert(!md.includes('dotnet run'), 'no-aspire README must not mention dotnet run');
+  assert(!md.includes('appsettings.json'), 'no-aspire README must not list appsettings.json');
+});
+
+Deno.test('generateReadme — no aspire postgres asks for self-provisioning', () => {
+  const md = generateReadme({
+    name: 'no-aspire-app',
+    appName: 'dashboard',
+    noAspire: true,
+    legacyAspire: false,
+    dbEngine: 'postgres',
+  });
+  assertStringIncludes(md, 'Primary database: **PostgreSQL**.');
+  assertStringIncludes(md, 'Self-provision the database');
+  assertStringIncludes(md, '`POSTGRES_URI` or `DATABASE_URL`');
+  assert(!md.includes('Aspire orchestration layer provisions it'));
+  assert(!md.includes('appsettings.json'), 'no-aspire README must not mention appsettings.json');
 });
 
 Deno.test('generateReadme — sqlite gets non-persistent note', () => {

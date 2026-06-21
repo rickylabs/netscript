@@ -9,11 +9,11 @@ next: { label: "Author a plugin", href: "/how-to/author-a-plugin/" }
 # Deploy a NetScript workspace
 
 **Goal:** take the workspace you scaffolded with `netscript init` and run it somewhere
-other than your laptop — a container host, a VM, or a managed platform — with honest
+other than your laptop — a container host, a VM, or a managed platform — with clear
 expectations about what the scaffold wires for you and what you still own.
 
 This is a task recipe, not a one-click button. NetScript is in alpha, and the scaffold is
-deliberately honest about deployment: it gives you a single declarative description of every
+deliberately minimal about deployment: it gives you a single declarative description of every
 process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, and the
 Aspire AppHost that orchestrates them locally. It does **not** generate a `Dockerfile`, a
 `docker-compose.yml`, or a cloud target for you. Those are yours to add, and this page shows
@@ -33,7 +33,7 @@ below — every one of which is a verified fact you can copy verbatim.
 
 You need a working, type-checked workspace and a clear idea of where it is going. If you have
 not built one yet, start with [Quickstart](/quickstart/) and
-[Your first workspace](/tutorials/first-workspace/). Then confirm the workspace is healthy
+the [Storefront tutorial](/tutorials/storefront/). Then confirm the workspace is healthy
 locally before you try to move it:
 
 ```bash
@@ -82,7 +82,7 @@ first-party plugins installed, the graph looks like this:
   { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
   { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
   { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API (raw Hono routes, not oRPC). Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
-  { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Concurrency via <code>WORKER_CONCURRENCY</code> / <code>SAGA_CONCURRENCY</code>." },
+  { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Workers runtime pool via <code>WORKERS_CONCURRENCY</code>; sagas via <code>SAGA_CONCURRENCY</code>." },
   { name: "triggers", type: "background processor", desc: "Entrypoint <code>src/runtime/trigger-processor.ts</code>. Concurrency 10 via <code>TRIGGER_CONCURRENCY</code>." },
   { name: "dashboard", type: "app · :8010", desc: "Fresh frontend. References service <code>users</code>." },
   { name: "postgres / garnet", type: "infrastructure", desc: "<code>Mode=Container</code> in dev. <code>PrimaryDatabase=postgres</code>, <code>PrimaryCache=garnet</code>." }
@@ -162,7 +162,7 @@ handled in `database/postgres/prisma.config.ts`.
   { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. Dev defaults to <code>http://localhost:4318</code> (http/protobuf) via the Aspire dashboard." },
   { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
   { name: "NETSCRIPT_AUTH_BACKEND", type: "string", desc: "Active auth backend if the auth plugin is installed. Default <code>kv-oauth</code>." },
-  { name: "WORKER_CONCURRENCY", type: "number", desc: "Workers background processor concurrency (scaffold default 2)." },
+  { name: "WORKERS_CONCURRENCY", type: "number", desc: "Workers runtime process pool size. Current Aspire metadata also emits <code>WORKER_CONCURRENCY</code>, but the runtime honors <code>WORKERS_CONCURRENCY</code>; set the runtime var." },
   { name: "SAGA_CONCURRENCY", type: "number", desc: "Sagas background processor concurrency (default 2)." },
   { name: "TRIGGER_CONCURRENCY", type: "number", desc: "Triggers background processor concurrency (default 10)." }
 ] }) }}
@@ -235,7 +235,7 @@ entrypoint:
 
 ```bash
 # Workers + sagas background processors share bin/combined.ts; triggers uses its own.
-WORKER_CONCURRENCY=2 \
+WORKERS_CONCURRENCY=2 \
 deno run \
   --unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run \
   workers/bin/combined.ts
@@ -246,7 +246,7 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 `deno run` line; orchestrate them with compose or your platform of choice, honoring the
 `PluginReferences` start order (streams → workers → sagas/triggers, plus auth-api when present).
 
-{{ comp callout { type: "warning", title: "Honest limits of the alpha scaffold" } }}
+{{ comp callout { type: "warning", title: "Limits of the alpha scaffold" } }}
 <ul>
 <li>No <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest is generated. You write these from the <code>appsettings.json</code> facts above.</li>
 <li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block — there is no first-class deploy command yet.</li>

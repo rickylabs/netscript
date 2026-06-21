@@ -34,6 +34,7 @@ export function createPluginAddCommand(
     .option('--plugin-refs <refs:string>', 'Comma-separated plugin references')
     .option('--db <engine:string>', 'Database engine or config key to provision or target')
     .option('--no-db', 'Skip database provisioning and DB wiring')
+    .option('--saga-store-backend <backend:string>', 'Saga durable store backend: kv or prisma')
     .option('--samples', 'Scaffold plugin sample files', { default: true })
     .option('--no-samples', 'Skip plugin sample files')
     .option('--project-root <path:string>', 'Project root directory')
@@ -52,6 +53,7 @@ export function createPluginAddCommand(
         pluginReferences: parseList(options.pluginRefs),
         db: typeof options.db === 'string' ? options.db : undefined,
         noDb: options.db === false,
+        sagaStoreBackend: parseSagaStoreBackendOption(options.sagaStoreBackend),
         includeSamples: options.samples !== false,
         projectRoot,
         overwrite: options.force ?? false,
@@ -62,4 +64,11 @@ export function createPluginAddCommand(
       print(`Created ${plugin.scaffoldResult.filesCreated.length} plugin files.`);
       print(`Regenerated ${result.helperFiles.length} Aspire helper files.`);
     });
+}
+
+function parseSagaStoreBackendOption(value: string | undefined): 'kv' | 'prisma' | undefined {
+  if (value === undefined) return undefined;
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'kv' || normalized === 'prisma') return normalized;
+  throw new Error(`Invalid --saga-store-backend "${value}". Expected kv or prisma.`);
 }

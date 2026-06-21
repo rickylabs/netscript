@@ -1,0 +1,25 @@
+%% streams-pipeline — durable event streams (offline Mermaid source for streams-pipeline.svg)
+flowchart LR
+  subgraph Producers
+    Svc["Services"]
+    Saga["Sagas"]
+    Trig["Triggers"]
+  end
+
+  Log["Append-only log<br/>offset n, n+1, n+2"]
+  Store[("Durable store<br/>KV / Prisma")]
+
+  Svc -->|append| Log
+  Saga -->|append| Log
+  Trig -->|append| Log
+  Log --> Store
+
+  subgraph Subscriptions
+    A["Consumer A"]
+    B["Consumer B"]
+    C["Consumer C"]
+  end
+
+  Log -->|at-least-once| A
+  Log -->|at-least-once| B
+  Log -->|at-least-once| C

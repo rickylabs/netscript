@@ -16,9 +16,9 @@ title: NetScript — type-safe services and durable workflows in one workspace
 {{ comp callout { type: "note", title: "Alpha — API subject to change" } }}
 NetScript is a backend framework and workspace generator, not a hosted service — you run it on
 Deno and own all the generated code. We are on the path to beta, targeting late 2026, and the API
-is still moving. Some published packages (including the <code>@netscript/auth-*</code> family) are
-at <code>0.0.1-alpha.0</code>, so a few scaffolded <code>jsr:…@^1.0.0</code> specifiers are
-forward-looking rather than installable today.
+is still moving. Every <code>@netscript/*</code> package shares one aligned version
+(<code>0.0.1-alpha.0</code>) and releases move in lockstep, so pin your versions. A few scaffolded
+<code>jsr:…@^1.0.0</code> specifiers are forward-looking rather than installable today.
 {{ /comp }}
 
 {{ comp.tabbedCode({ tabs: [
@@ -32,7 +32,7 @@ forward-looking rather than installable today.
 {{ comp.featureGrid({ items: [
   { title: "Contract-first, type-safe end to end", body: "oRPC contracts flow from service to client to UI with no codegen drift. The type checker is your integration test. Services are served at /api/rpc/*.", href: "/capabilities/services/" },
   { title: "Orchestrated with Aspire", body: "We borrow .NET Aspire for multi-resource local dev, deploy, and a real dashboard — unusual in TypeScript. One workspace wires it all; opt out with --no-aspire.", href: "/explanation/aspire/" },
-  { title: "Durable workflows by design", body: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence (KV or Prisma), compensation, and supervised crash boundaries — authored in plain TypeScript builders.", href: "/capabilities/durable-sagas/" },
+  { title: "Durability model by design", body: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence (KV or Prisma), compensation, and supervised crash boundaries — authored in plain TypeScript builders.", href: "/capabilities/durable-sagas/" },
   { title: "Authentication, pluggable backend", body: "An auth-api service on :8094 with five endpoints. The core defines one port; swap between kv-oauth (interactive), WorkOS, or better-auth without touching your service code.", href: "/capabilities/auth/" },
   { title: "Observable by default", body: "OpenTelemetry tracing and structured logs are wired into jobs, queues, RPC, schedulers, and subprocess workers from line one — not bolted on later.", href: "/explanation/observability/" },
   { title: "Composable plugins", body: "Add workers, sagas, triggers, auth, and streams in any combination. The host never changes.", href: "/capabilities/background-jobs/" }
@@ -50,10 +50,9 @@ forward-looking rather than installable today.
 
 {{ comp.learningPath({ steps: [
   { label: "Quickstart", href: "/quickstart/" },
-  { label: "Your first workspace", href: "/tutorials/first-workspace/" },
-  { label: "Build a service", href: "/tutorials/build-a-service/" },
-  { label: "Add background jobs", href: "/tutorials/background-jobs/" },
-  { label: "A durable workflow", href: "/tutorials/durable-workflow/" }
+  { label: "Core concepts", href: "/concepts/" },
+  { label: "Build the Storefront", href: "/tutorials/storefront/" },
+  { label: "Explore capabilities", href: "/capabilities/" }
 ] }) }}
 
 {{ comp.featureGrid({ items: [

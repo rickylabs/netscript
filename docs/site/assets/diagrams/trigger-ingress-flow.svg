@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" role="img"
+     aria-label="Two trigger ingress lanes: webhook with HMAC verify and file-watch with debounce"
+     font-family="DM Sans, Segoe UI, system-ui, sans-serif">
+  <title>Trigger ingress flow</title>
+  <desc>Webhook lane: external POST to HMAC verify to defineWebhook handler to effect.
+        File-watch lane: filesystem change to debounce (stabilityThreshold) to defineFileWatch
+        handler to effect.</desc>
+  <!-- Theme-neutral: transparent background, mid-tone (#888) strokes + text.
+       Source: _diagrams/trigger-ingress-flow.mmd -->
+  <defs>
+    <marker id="ns-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+            markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888" />
+    </marker>
+  </defs>
+
+  <text x="410" y="26" fill="#888888" font-size="13" text-anchor="middle"
+        font-weight="600">Trigger ingress flow</text>
+
+  <g fill="none" stroke="#888888" stroke-width="1.5">
+    <!-- Webhook lane (top) -->
+    <rect x="20"  y="74"  width="150" height="48" rx="6" />
+    <rect x="210" y="74"  width="150" height="48" rx="6" />
+    <rect x="400" y="74"  width="170" height="48" rx="6" />
+    <rect x="610" y="74"  width="130" height="48" rx="6" />
+    <line x1="170" y1="98" x2="206" y2="98" marker-end="url(#ns-arrow)" />
+    <line x1="360" y1="98" x2="396" y2="98" marker-end="url(#ns-arrow)" />
+    <line x1="570" y1="98" x2="606" y2="98" marker-end="url(#ns-arrow)" />
+
+    <!-- File-watch lane (bottom) -->
+    <rect x="20"  y="190" width="150" height="48" rx="6" />
+    <rect x="210" y="190" width="150" height="48" rx="6" />
+    <rect x="400" y="190" width="170" height="48" rx="6" />
+    <rect x="610" y="190" width="130" height="48" rx="6" />
+    <line x1="170" y1="214" x2="206" y2="214" marker-end="url(#ns-arrow)" />
+    <line x1="360" y1="214" x2="396" y2="214" marker-end="url(#ns-arrow)" />
+    <line x1="570" y1="214" x2="606" y2="214" marker-end="url(#ns-arrow)" />
+  </g>
+
+  <!-- lane labels -->
+  <g fill="#888888" font-size="11" text-anchor="start" opacity="0.85">
+    <text x="20" y="64" font-weight="600">Webhook lane</text>
+    <text x="20" y="180" font-weight="600">File-watch lane</text>
+  </g>
+
+  <!-- box labels (primary) -->
+  <g fill="#888888" font-size="13" text-anchor="middle">
+    <text x="95"  y="103">External POST</text>
+    <text x="285" y="103">HMAC verify</text>
+    <text x="485" y="103">defineWebhook</text>
+    <text x="675" y="103">Effect</text>
+
+    <text x="95"  y="219">FS change</text>
+    <text x="285" y="219">Debounce</text>
+    <text x="485" y="219">defineFileWatch</text>
+    <text x="675" y="219">Effect</text>
+  </g>
+
+  <!-- secondary captions -->
+  <g fill="#888888" font-size="11" text-anchor="middle" opacity="0.85">
+    <text x="95"  y="117">inbound request</text>
+    <text x="285" y="117">signature check</text>
+    <text x="485" y="117">handler</text>
+
+    <text x="95"  y="233">filesystem event</text>
+    <text x="285" y="233">stabilityThreshold</text>
+    <text x="485" y="233">handler</text>
+  </g>
+</svg>

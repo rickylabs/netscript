@@ -1,0 +1,281 @@
+[
+  {
+    "id": "workers-core-no-retry-concurrency-on-dispatch",
+    "status": "still-real",
+    "recommendedSeverity": "high",
+    "recommendedCategory": "capability-gap-silent-noop",
+    "primeTimeDisposition": "implement",
+    "concreteImplOrErrorFound": "Neither a concrete implementation nor a loud unsupported-error throw exists. All three dispatch paths still execute handlers exactly once with no retry/delay/concurrency enforcement, and the fields are silently ignored.",
+    "currentEvidence": [
+      "packages/plugin-workers-core/src/runtime/job-dispatcher.ts:69-76 \u2014 dispatch() awaits resolve() then calls resolution.handler(context) exactly once; no retry loop, no retryDelay sleep, no concurrency semaphore.",
+      "packages/plugin-workers-core/src/runtime/in-process-job-runner.ts:24-34 \u2014 dispatch() only guards on #stopped then delegates to #dispatcher.dispatch once.",
+      "plugins/workers/worker/job-runner-pool.ts:46-65 \u2014 executeJob() generates an executionId and calls this.#runner.dispatch(jobDef, ...) a single time; no pool/concurrency limit honoring maxConcurrency.",
+      "plugins/workers/worker/job-dispatcher.ts:54-119 \u2014 processWorkerJob runs executeWorkerJob once inside traceJobExecution; maxRetries (line 61) is passed only as a trace attribute. The failure path recordJobFailure (lines 221-248) marks the execution failed/timeout and never re-attempts.",
+      "plugins/workers/worker/job-execution.ts:134-136 \u2014 copies maxRetries/retryDelay/maxConcurrency onto a synthesized TaskDefinition, but the consumer never reads them.",
+      "packages/plugin-workers-core/src/executor/multi-runtime-task-executor.ts:77-135 \u2014 execute() calls adapter.execute(task, resolved) once; #resolveOptions only resolves args/cwd/env/timeout \u2014 maxRetries/retryDelay/maxConcurrency are never consulted. TaskResult.attempt is hardcoded to 0 in adapters (runtime-adapter-base.ts:77, dax-process-runner.ts:174).",
+      "Public surface advertises these knobs: builders/job-builder.ts retry(maxRetries, options) with #maxRetries=3 default; domain/job-definition.ts schema defaults maxRetries:3, retryDelay:1000, maxConcurrency:1 \u2014 accepted, validated, persisted, and ignored at dispatch."
+    ],
+    "reasoning": "Re-read of current main confirms no behavioral change on any dispatch path. InProcessJobDispatcher.dispatch (job-dispatcher.ts:69-76) invokes the handler exactly once. The plugin worker path (processWorkerJob -> executeWorkerJob -> WorkerPool.executeJob/MultiRuntimeTaskExecutor.execute) likewise executes once; maxRetries appears solely as a telemetry attribute, and MultiRuntimeTaskExecutor.#resolveOptions never reads retry/concurrency fields. No loud unsupported-operation error (no notImplemented(), no WorkersUnsupportedOperationError) was introduced, so this is not a reframe-as-deliberate-limitation. Because maxRetries/retryDelay/maxConcurrency are first-class, defaulted, validated builder/schema knobs presented in the public API, silently no-oping them on every job run is a correctness gap that should be implemented (retry-with-delay loop plus a concurrency gate) rather than merely documented."
+  },
+  {
+    "id": "streams-core-no-consumer-or-subscribe-surface",
+    "status": "reframe-deliberate-limitation",
+    "reasoning": "Re-read all cited files on current main. attributes.ts:2-6 still declares stream.consume and stream.subscribe span names with no implementation (line numbers unchanged). public/mod.ts:8-32 exports only producer/schema/url-resolver/diagnostics surface \u2014 no consume, subscribe, or typed consumer SDK. The only port is src/ports/stream-producer-port.ts; no consumer/subscriber port exists. instrumentation.ts:21-27 setup() is a no-op (void STREAMS_SPAN_NAMES / void STREAMS_TELEMETRY_ATTRIBUTES), so the consume/subscribe spans are never emitted by any real code path. README \u00a716 (lines 121-124) explicitly states 'A typed consumer SDK is deferred.' There is NO concrete consume/subscribe implementation (not fixed-on-main). There is also NO loud error throw \u2014 no StreamUnsupportedOperationError, notImplemented(), or unsupportedOperation guard \u2014 because there is simply no consume/subscribe entry point or method to call; the package surface omits the capability entirely rather than stubbing+throwing. This is a producer-only package whose missing consumer surface is explicitly documented as deferred scope. It is not a silent stub that returns fake data; it is an absent capability with an honest README deferral. Classified as reframe-deliberate-limitation because the original 'silent stub' framing overstates it \u2014 the surface is honestly producer-only with documented deferral \u2014 but the underlying observation (no consumer/subscribe surface) is accurate and intentional.",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "deliberate-scope-boundary",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "No concrete consume/subscribe implementation and no loud unsupported-operation error. The capability is absent by design: producer-only public surface (public/mod.ts), only stream-producer-port.ts exists, instrumentation.setup() is a no-op that merely references the span-name constants. README \u00a716 documents the typed consumer SDK as deferred.",
+    "currentEvidence": [
+      "packages/plugin-streams-core/src/telemetry/attributes.ts:2-6 still lists stream.consume and stream.subscribe span names with no backing implementation",
+      "packages/plugin-streams-core/src/telemetry/instrumentation.ts:21-27 setup() is a no-op (void STREAMS_SPAN_NAMES; void STREAMS_TELEMETRY_ATTRIBUTES) \u2014 spans never emitted",
+      "packages/plugin-streams-core/src/public/mod.ts:8-32 exports producer/schema/url-resolver/diagnostics only; no consume/subscribe/consumer-SDK export",
+      "packages/plugin-streams-core/src/ports/ contains only stream-producer-port.ts \u2014 no consumer/subscriber port",
+      "packages/plugin-streams-core/README.md:121-124 \u00a716 Deferred Scope: 'A typed consumer SDK is deferred.'",
+      "No StreamUnsupportedOperationError / notImplemented() / unsupportedOperation throw exists in the package \u2014 capability is absent rather than stubbed"
+    ]
+  },
+  {
+    "id": "triggers-defer-action-not-implemented",
+    "status": "reframe-deliberate-limitation",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "deliberate-limitation",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "Loud error throw: plugins/triggers/src/runtime/trigger-runtime-processor.ts:95-100 throws TriggersError.unsupportedOperation('trigger-action.defer', `Deferred trigger action dispatch is not implemented for ${definition.id}; until=${action.until}.`). UnsupportedOperationError is a real Error subclass (packages/plugin-triggers-core/src/domain/errors.ts:136-149, code TRIGGER_UNSUPPORTED_OPERATION). No silent drop.</concreteImplOrErrorFound>\n<parameter name=\"currentEvidence\">[\"plugins/triggers/src/runtime/trigger-runtime-processor.ts:89-103 \u2014 dispatchTriggerAction throws TriggersError.unsupportedOperation('trigger-action.defer', ...) for action.kind === 'defer'; no scheduling/persistence/timer is wired (defer is genuinely not implemented)\",\"packages/plugin-triggers-core/src/domain/errors.ts:135-149 \u2014 UnsupportedOperationError extends TriggersError extends Error; sets code TRIGGER_UNSUPPORTED_OPERATION, retryable false \u2014 a genuine loud throw, not a renamed stub\",\"plugins/triggers/src/runtime/trigger-runtime-processor_test.ts:17-34 \u2014 test 'runtime processor rejects defer actions instead of silently dropping them' asserts result.status === 'dlq', actionsDispatched === 0, one DLQ entry whose reason includes 'Deferred trigger action dispatch is not implemented', idempotency completed and not released. The throw is caught by the processor and routed to DLQ, so defer is captured (not lost) but never dispatched\",\"packages/plugin-triggers-core/src/domain/trigger-action.ts:28-35 \u2014 DeferAction { kind: 'defer'; until: string } remains admitted in the exported TriggerActionResult union, so handlers can still emit it; it just always fails to dispatch\"]",
+    "reasoning": "The cited code still exists on current main and matches the gap's evidence. The behavior is a deliberate, honest 'unsupported' limitation, not a silent stub: dispatchTriggerAction throws TriggersError.unsupportedOperation (a real UnsupportedOperationError / TRIGGER_UNSUPPORTED_OPERATION Error subclass), and the processor routes that throw to the DLQ. The test explicitly verifies the action lands in the DLQ (status 'dlq', actionsDispatched 0, idempotency completed, not released) rather than being dropped. This is the reframe pattern: a former silent stub converted into a loud, traceable rejection. I did NOT find a concrete implementation (no scheduler, timer, or deferred-action persistence/re-enqueue), so it is not fixed-on-main. Disposition is document-as-limitation rather than implement: 'defer' is publicly emittable from handlers (it is in the exported union), so users can reach it, but every defer reliably fails loud and is DLQ-captured with a clear message. Building real deferred dispatch is a substantial capability (timer + persistence + replay). Shipping with the loud unsupported error plus a docs note that 'defer' is not yet dispatchable is acceptable for prime-time; severity downgraded to low because there is no data loss or silent failure."
+  },
+  {
+    "id": "triggers-file-import-sagamessage-dropped",
+    "status": "still-real",
+    "reasoning": "Re-read plugins/triggers/jobs/file-import.ts as it exists on current main. The gap is unchanged. The module doc comment (lines 4-6) still states the job \"cleans up the staged copy, then publishes a saga message with the parsed data.\" But the handler only embeds the saga message inside the returned success-result payload: lines 157-169 build a `sagaMessage: { type, payload }` object that is part of `createSuccessResult({...})`. Nothing dispatches it to a saga bus. `sagaMessageType` is read from the validated payload (line 32 schema, line 78 destructure) and used only to conditionally shape that result field. A repo-wide grep for `sagaMessage` finds no consumer that reads the job result's `sagaMessage` field and forwards it to the saga runtime; the only other matches are the unrelated `sagaMessageIdempotencyTarget` helper in packages/plugin-sagas-core. There is no loud unsupported-operation throw (no StreamUnsupportedOperationError / TriggersError.unsupportedOperation / TRIGGER_KIND_NOT_IMPLEMENTED / notImplemented) \u2014 so it is neither fixed-on-main nor reframed as a deliberate honest limitation. It remains a silent doc-vs-behavior mismatch: the doc over-promises 'publishes', the code merely 'embeds for the caller to dispatch'.",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "doc-behavior-mismatch",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "No implementation and no error throw. file-import.ts lines 157-169 embed sagaMessage in createSuccessResult; no saga-bus dispatch exists. Doc comment lines 4-6 still claim 'publishes a saga message'. sagaMessageType read at lines 32/78 but only shapes the result field.",
+    "currentEvidence": [
+      "plugins/triggers/jobs/file-import.ts:4-6 module doc still claims 'publishes a saga message with the parsed data'",
+      "plugins/triggers/jobs/file-import.ts:157-169 sagaMessage object is only embedded inside createSuccessResult payload, not dispatched",
+      "plugins/triggers/jobs/file-import.ts:32,78 sagaMessageType validated and destructured but only used to conditionally shape the result field",
+      "Repo-wide grep for 'sagaMessage' finds no consumer of the job-result field; other matches are the unrelated sagaMessageIdempotencyTarget helper in packages/plugin-sagas-core",
+      "No StreamUnsupportedOperationError / TriggersError.unsupportedOperation / TRIGGER_KIND_NOT_IMPLEMENTED / notImplemented throw present"
+    ]
+  },
+  {
+    "id": "workers-jobtools-trace-noop",
+    "status": "still-real",
+    "reasoning": "Re-read on current main confirms the gap is unchanged and unmitigated. plugins/workers/jobs/job-tools.ts:27-30 still defines `noopSpan` (setAttribute/addEvent are empty arrows) and :42-46 still returns a `trace` object whose three methods are silent no-ops: addEvent => {}, recordProgress => {}, withChildSpan => fn(noopSpan). traceContext (line 47-50) merely passes through ctx.traceparent/ctx.tracestate strings. JobHandlerContext at packages/plugin-workers-core/src/public/root.ts:124-132 still carries only traceparent/tracestate strings plus reportProgress \u2014 no tracer handle. health-check.ts still calls the trace API at 5 sites (addEvent line 55, withChildSpan lines 61/83/125/145, addEvent line 194) expecting real telemetry; all silently discarded. Notably the plugin DOES have a real, working tracer available (@netscript/telemetry/tracer + instrumentation, used by scheduler-tracing.ts and worker.ts:233 via real spans), so the capability is buildable \u2014 createJobTools simply never wires to it and never parses traceparent to establish a parent span. No loud-error reframe was introduced: there is no StreamUnsupportedOperationError / notImplemented() / unsupportedOperation throw anywhere near this code; it remains a silent stub, the worst of the three states. This is honest-telemetry-shaped: jobs believe they emit spans/events but produce nothing.",
+    "recommendedSeverity": "medium",
+    "primeTimeDisposition": "implement",
+    "concreteImplOrErrorFound": "Silent no-op stub still present: job-tools.ts:27-30 noopSpan; :42-46 trace.{addEvent,recordProgress,withChildSpan} all no-op against noopSpan. No loud error throw anywhere. Real tracer (@netscript/telemetry/tracer) exists and is wired in scheduler-tracing.ts/worker.ts but createJobTools does not use it.",
+    "currentEvidence": [
+      "plugins/workers/jobs/job-tools.ts:27-30 noopSpan (setAttribute/addEvent empty arrows)",
+      "plugins/workers/jobs/job-tools.ts:42-46 trace.addEvent/recordProgress/withChildSpan are silent no-ops returning fn(noopSpan)",
+      "plugins/workers/jobs/health-check.ts:55,61,83,125,145,194 call the trace API expecting real telemetry",
+      "packages/plugin-workers-core/src/public/root.ts:124-132 JobHandlerContext only carries traceparent/tracestate strings + reportProgress",
+      "plugins/workers/worker/scheduler-tracing.ts:1-14 real @netscript/telemetry/tracer Span + instrumentation exists and is used by scheduler/worker, proving the capability is buildable and unwired in createJobTools"
+    ],
+    "recommendedCategory": "observability-honesty"
+  },
+  {
+    "id": "streams-define-consumer-throws",
+    "status": "reframe-deliberate-limitation",
+    "recommendedSeverity": "low",
+    "primeTimeDisposition": "document-as-limitation",
+    "recommendedCategory": "deliberate-limitation",
+    "concreteImplOrErrorFound": "StreamUnsupportedOperationError (loud typed throw)",
+    "currentEvidence": [
+      "plugins/streams/src/public/stream-api.ts:60-69 defineStreamConsumer().subscribe throws unsupportedStreamOperation('stream.subscribe')",
+      "plugins/streams/src/public/stream-api.ts:17-31 StreamUnsupportedOperationError class with stable .operation id and message pointing to @netscript/plugin-streams-core runtime primitives",
+      "plugins/streams/src/public/stream-api.ts:33-36 unsupportedStreamOperation() factory",
+      "plugins/streams/src/public/mod.ts:11-12,149-151 StreamUnsupportedOperationError and unsupportedStreamOperation publicly exported",
+      "plugins/streams/src/public/mod.ts:71,137 defineConsumer wired to the throwing manifest helper",
+      "plugins/streams/src/public/mod.ts:119-124 manifest metadata still advertises 'SSE and long-poll consumers' as a plugin/service feature",
+      "git: 48ef1783 'fix(streams): reject publish/subscribe instead of silent no-op (S3) (#70)' \u2014 deliberate conversion of silent no-op to loud throw"
+    ],
+    "reasoning": "On current main the cited lines still throw, but the disposition has materially changed since the original audit. Commit 48ef1783 (S3, PR #70) deliberately converted the former silent no-op into a loud, typed StreamUnsupportedOperationError. The subscribe closure (stream-api.ts:65-67) now throws unsupportedStreamOperation('stream.subscribe'), and the matching producer publish (line 49-50) rejects with the same error class. The error class (lines 17-31) carries a stable .operation identifier and a message directing callers to @netscript/plugin-streams-core runtime primitives; both the class and factory are publicly exported from mod.ts (lines 11-12, 149-151). This is the canonical 'reframe-deliberate-limitation' pattern: defineStreamConsumer/defineStreamProducer are manifest-layer typing/wiring helpers, and runtime subscription/publish belongs to the streams-core service, not these helpers. The throw is honest and discoverable rather than a hidden stub. The one residual wrinkle is that the manifest metadata (mod.ts:119-124) still lists 'SSE and long-poll consumers' as a feature \u2014 but that describes the plugin's durable-stream HTTP service, not a promise that the manifest helper performs subscription, and any wording reconciliation is already tracked separately (memory W3b: 'durable streams = unsupported'). That is a docs concern, not a code blocker. Not fixed-on-main (no wired persistence/dispatch was added \u2014 subscribe still throws), so this is a deliberate, acceptable shipped limitation. Severity dropped from medium to low because the silent-no-op footgun is gone."
+  },
+  {
+    "id": "streams-service-uses-test-server",
+    "status": "reframe-deliberate-limitation",
+    "reasoning": "The cited evidence is stale. On current main, deno.json:94 pins '@durable-streams/server' to ^0.3.7 (not the older version that 'only exported DurableStreamTestServer' as an in-memory test backend). In 0.3.7, DurableStreamTestServer.store is typed `StreamStore | FileBackedStreamStore`, and TestServerOptions.dataDir is documented as: 'Data directory for file-backed storage. If provided, enables file-backed mode using LMDB and append-only logs. If omitted, uses in-memory storage.' The package now also exports FileBackedStreamStore, encodeStreamPath/decodeStreamPath, and createRegistryHooks \u2014 i.e. real durable persistence primitives, not a test-only stub. plugins/streams/services/src/main.ts NOW wires this: line 31 reads const dataDir = Deno.env.get('STREAMS_DATA_DIR'), and lines 40-44 pass dataDir into the constructor. The module docstring (lines 9-11) and plugins/streams/README.md:87 explicitly document the contract: set STREAMS_DATA_DIR for durable file-backed (LMDB + append-only log) persistence that survives restarts; omit it for in-memory development. So persistence is genuinely implemented and wired through a documented opt-in env var \u2014 real dispatch to a FileBackedStreamStore, verified via deno doc npm:@durable-streams/server@0.3.7, not a renamed stub. What remains true: the class is still named DurableStreamTestServer (line 40) and the DEFAULT when STREAMS_DATA_DIR is unset is in-memory (line 31 -> undefined dataDir). But that is now an honest, documented development-mode default rather than a silent production trap, and there is no longer a 'test-server-only / no durable option' problem. The original high-severity framing no longer holds.",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "durability/operational-default",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "@durable-streams/server@0.3.7 TestServerOptions.dataDir => 'enables file-backed mode using LMDB and append-only logs'; store typed StreamStore | FileBackedStreamStore. main.ts:31 reads STREAMS_DATA_DIR and main.ts:40-44 passes it as dataDir to DurableStreamTestServer. Documented in main.ts docstring lines 9-11 and plugins/streams/README.md:87.",
+    "currentEvidence": [
+      "plugins/streams/services/src/main.ts:31 \u2014 const dataDir = Deno.env.get('STREAMS_DATA_DIR')",
+      "plugins/streams/services/src/main.ts:40-44 \u2014 new DurableStreamTestServer({ port: internalPort, host: '127.0.0.1', dataDir })",
+      "plugins/streams/services/src/main.ts:9-11 \u2014 docstring: STREAMS_DATA_DIR => file-backed storage so events survive process restarts; omit => in-memory (development)",
+      "plugins/streams/README.md:87 \u2014 STREAMS_DATA_DIR for file-backed storage; omit for in-memory development",
+      "deno.json:94 \u2014 '@durable-streams/server': '^0.3.7'",
+      "deno doc npm:@durable-streams/server@0.3.7 \u2014 TestServerOptions.dataDir: 'enables file-backed mode using LMDB and append-only logs'; class field store: StreamStore | FileBackedStreamStore; also exports FileBackedStreamStore, encodeStreamPath, createRegistryHooks"
+    ]
+  },
+  {
+    "id": "streams-deferred-scope-block",
+    "status": "reframe-deliberate-limitation",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "documented-deferred-scope",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "StreamUnsupportedOperationError thrown/rejected by manifest helpers; CLI returns explicit non-zero not-implemented results; README Deferred Scope section documents the boundary",
+    "currentEvidence": [
+      "plugins/streams/src/public/stream-api.ts:17-36 \u2014 StreamUnsupportedOperationError class + unsupportedStreamOperation() factory, message points callers to @netscript/plugin-streams-core runtime primitives",
+      "plugins/streams/src/public/stream-api.ts:45-52 \u2014 defineStreamProducer.publish returns Promise.reject(unsupportedStreamOperation('stream.publish')) (loud, not silent)",
+      "plugins/streams/src/public/stream-api.ts:61-69 \u2014 defineStreamConsumer.subscribe THROWS unsupportedStreamOperation('stream.subscribe') (loud error, line numbers unchanged from audit)",
+      "plugins/streams/src/cli/streams-cli.ts:59-65 \u2014 list-topics returns {code:0, message:'Stream topic walker is not implemented yet.', data:{topics:[]}} (explicit honest empty result)",
+      "plugins/streams/src/cli/streams-cli.ts:67-70 \u2014 subscribe/publish/stats/clear return {code:1, message:'ns-streams <cmd> is not implemented until the streams runtime CLI is wired.'} (non-zero exit, explicit)",
+      "plugins/streams/README.md:119-122 \u2014 '14. Deferred Scope' explicitly lists typed consumer SDK, full topic walker, runtime CLI publish/subscribe, production Caddy integration, cross-plugin parity as deferred",
+      "plugins/streams/README.md:11-14 + 107-117 \u2014 package is Tier 2 Archetype 5 manifest plugin that by design does NOT own runtime stream primitives; those live in @netscript/plugin-streams-core",
+      "git log: cited files have only the 0ef13de3 'genesis eject' commit \u2014 no material change since the prior audit, so cited line ranges/behavior hold on current main"
+    ],
+    "reasoning": "Re-read all three cited files at current main; git shows no material change since genesis eject so the audit's line numbers hold (stream-api.ts subscribe throw at 61-69, producer reject at 45-52, CLI not-implemented at 59-70, README Deferred Scope at 119-122). This is NOT fixed-on-main: there is no wired runtime persistence or dispatch in this plugin, and by explicit architectural doctrine (README sections 1, 12) this Archetype 5 manifest plugin intentionally does not own runtime stream IO \u2014 that belongs to @netscript/plugin-streams-core. However it is also NOT a silent stub: every unsupported path is loud \u2014 defineStreamConsumer.subscribe throws a typed StreamUnsupportedOperationError, defineStreamProducer.publish rejects with the same typed error, the CLI returns non-zero exit codes with explicit 'not implemented until the streams runtime CLI is wired' messages, and list-topics returns an explicit walker-not-implemented result. The README documents the entire boundary in a dedicated Deferred Scope section. This is a deliberate, honestly-surfaced, documented limitation rather than a real correctness defect. Disposition is document-as-limitation, not implement: building runtime publish/subscribe into this manifest-tier plugin would violate the stated package boundary (runtime primitives belong in streams-core). Severity low because the limitation is already loud and documented; nothing silently misleads a caller."
+  },
+  {
+    "id": "queue-retry-options-unconsumed",
+    "status": "still-real",
+    "reasoning": "Re-read against current main. packages/queue/ports/options.ts:56-70 still declares QueueOptions.retryAttempts (line 62) and retryDelay (line 70) as public knobs documented \"Only applies when backend doesn't have native retry.\" In packages/queue/factory/create-queue.ts the createQueue destructure (lines 117-122) pulls only {provider, autoDiscover, connection, disableAutoTracing} -- retryAttempts/retryDelay are NOT read. getNativeRetrial (lines 231-243) only derives a boolean from provider/KV-connect detection; it does not consume the retry knobs. A repo-wide grep across packages/queue shows the ONLY references to retryAttempts/retryDelay are the type definitions in options.ts plus the README mirroring them (README.md:184-185) -- no adapter, factory branch, or lazy-queue wrapper reads them. The KV-polling and redis adapters use a DIFFERENT, nested set of knobs (connection.denoKv.maxRetries / retryBaseDelay), not the top-level QueueOptions retry fields. So the documented promise is unfulfilled: the values are silently accepted and discarded. Neither remedy exists: (a) no concrete wiring/dispatch of these options, and (b) no loud unsupported-operation throw converting the silent stub into an honest limitation.",
+    "recommendedSeverity": "medium",
+    "recommendedCategory": "silent-unimplemented-option",
+    "primeTimeDisposition": "implement",
+    "concreteImplOrErrorFound": "None. retryAttempts/retryDelay are defined only in ports/options.ts (62,70) and documented in README (184-185); no factory or adapter code path reads them, and no unsupported-operation/notImplemented throw guards them. Adapters use a separate connection.denoKv.maxRetries knob set instead.",
+    "currentEvidence": [
+      "packages/queue/ports/options.ts:56-70 retryAttempts (62) / retryDelay (70) public knobs, documented 'only applies when backend doesn't have native retry'",
+      "packages/queue/factory/create-queue.ts:117-122 createQueue destructures provider/autoDiscover/connection/disableAutoTracing only \u2014 retryAttempts/retryDelay never read",
+      "packages/queue/factory/create-queue.ts:231-243 getNativeRetrial only computes a boolean from provider + isKvConnect; does not consume retry knobs",
+      "grep across packages/queue: retryAttempts/retryDelay appear ONLY in ports/options.ts and README.md:184-185 \u2014 no consumer",
+      "adapters use distinct nested connection.denoKv.maxRetries/retryBaseDelay, not the top-level QueueOptions retry fields"
+    ]
+  },
+  {
+    "id": "database-shared-config-no-factory",
+    "status": "still-real",
+    "reasoning": "Re-read on current main. packages/database/ports/database-client.ts:132 still declares interface DatabaseAdapterFactory (with a create(provider, options) method signature) and line 147 still declares interface SharedDatabaseConfig (provider?: 'auto' documented as 'Auto-detect from environment (Aspire discovery)'). Both are pure type declarations re-exported via ports/mod.ts (lines 11,16) and mod.ts (lines 70,75). Repo-wide grep across packages/database finds ZERO implementors: no 'implements DatabaseAdapterFactory', no value/class typed as DatabaseAdapterFactory, no createSharedDatabase/getSharedDatabase/sharedDatabase function, and no factory create() method in the adapters (adapters expose only per-provider helpers like createPostgresAdapter, which is not the unified factory). mod.ts:13 JSDoc still advertises 'Auto-discovery from Aspire environment'; the only occurrences of 'auto-discovery'/'Aspire discovery' are JSDoc comments (mod.ts:13, database-client.ts:150,157,162) with no backing code \u2014 no env-reading discovery, no discoverFromAspire. There is also NO loud-error reframe: no StreamUnsupportedOperationError / unsupportedOperation / notImplemented() / throw was introduced. So this is neither fixed-on-main nor a deliberate-limitation reframe \u2014 it remains a silent unimplemented promise: exported types plus a feature claim with no implementation and no honest error.",
+    "recommendedSeverity": "medium",
+    "recommendedCategory": "unimplemented-promise",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "none \u2014 DatabaseAdapterFactory and SharedDatabaseConfig are interface-only with zero implementors; no factory function, no Aspire auto-discovery code, and no loud unsupported-operation throw exists on current main",
+    "currentEvidence": [
+      "packages/database/ports/database-client.ts:132 export interface DatabaseAdapterFactory \u2014 bare interface, zero implementors repo-wide",
+      "packages/database/ports/database-client.ts:147 export interface SharedDatabaseConfig \u2014 bare interface, no consuming factory function exists",
+      "packages/database/mod.ts:13 JSDoc 'Auto-discovery from Aspire environment' \u2014 no backing code; only JSDoc mentions of Aspire discovery (database-client.ts:150,157,162)",
+      "grep across packages/database: no createSharedDatabase/getSharedDatabase/sharedDatabase, no 'implements DatabaseAdapterFactory', no notImplemented()/unsupported-operation throw"
+    ]
+  },
+  {
+    "id": "database-executeraw-string-as-templatestrings",
+    "status": "still-real",
+    "recommendedSeverity": "high",
+    "recommendedCategory": "correctness-safety",
+    "primeTimeDisposition": "implement",
+    "concreteImplOrErrorFound": "No fix and no loud error. All three adapters still perform the unsafe cast `$queryRaw(query as unknown as TemplateStringsArray, ...params)`. Current-main line numbers (unchanged from audit): postgres.adapter.ts:156-163, mssql.adapter.ts:489-496, mysql.adapter.ts:426-433. Port contract database-client.ts:119 promises `executeRaw(query: string, ...params)`. The sibling `executeRawUnsafe` correctly routes to `$executeRawUnsafe`, but `executeRaw` does NOT route to `$queryRawUnsafe`.</concreteImplOrErrorFound>\n<parameter name=\"currentEvidence\">[\"packages/database/adapters/postgres.adapter.ts:156-163 \u2014 executeRaw still does `return $queryRaw(query as unknown as TemplateStringsArray, ...params)`\",\"packages/database/adapters/mssql.adapter.ts:489-496 \u2014 identical unsafe cast, unchanged\",\"packages/database/adapters/mysql.adapter.ts:426-433 \u2014 identical unsafe cast, unchanged\",\"packages/database/ports/database-client.ts:119 \u2014 interface contract: `executeRaw<T>(query: string, ...params: unknown[]): Promise<T>` (plain string + params, not a tagged template)\",\"No StreamUnsupportedOperationError / notImplemented() / unsupportedOperation throw anywhere in these methods \u2014 the silent broken cast remains\"]",
+    "reasoning": "Re-read on current main: the three cited methods are byte-for-byte the same as the audit described, at the exact same line numbers. Prisma's `$queryRaw` is a tagged-template function that reads `strings.raw` and interleaves `...values` as bound parameters. A plain string has no `.raw` (undefined) and indexes to characters, so the cast yields broken behavior; worse, the trailing `...params` are not bound as parameterized placeholders the way a genuine `$queryRaw` template binds them, so callers passing params get incorrect/unsafe queries. The correct primitive for a string-plus-params API is `$queryRawUnsafe(query, ...params)` (which the adapter already imports/uses pattern for executeRawUnsafe). There is no new concrete implementation fulfilling the promise and no loud unsupported-operation error converting this into an honest limitation. It is neither fixed-on-main nor a deliberate reframe \u2014 it remains a silent broken/unsafe stub."
+  },
+  {
+    "id": "database-sqlite-provider-no-adapter",
+    "status": "still-real",
+    "reasoning": "Re-read on current main confirms the gap persists. (a) The `DatabaseProvider` union still includes `'sqlite'` at packages/database/ports/database-client.ts:13. (b) packages/database/mod.ts:11 still advertises \"Multi-database support (PostgreSQL, MSSQL, MySQL, SQLite)\". (c) packages/database/deno.json exports only postgres/mssql/mysql adapters (lines 10-12); there is no `./adapters/sqlite` export. (d) The adapters directory (Glob) contains only mod.ts, mssql.adapter.ts, mysql.adapter.ts, postgres.adapter.ts \u2014 no sqlite.adapter.ts exists. (e) adapters/mod.ts re-exports only the Postgres adapter (and documents mssql/mysql sub-exports); nothing for sqlite. README.md:202 and docs/concepts.md:22 still list `sqlite` as a valid provider value, and scripts/migrate.ts:21 includes 'sqlite' in its provider union. No concrete SQLite adapter exists, and there is NO loud/honest unsupported-operation throw anywhere mapping a sqlite provider to an error \u2014 DatabaseAdapterFactory is only an interface (database-client.ts:132-142) with no concrete dispatch implementation. So this is neither fixed-on-main (no wired adapter) nor reframed as a deliberate limitation (no error throw). The type/docs advertise a capability that silently has no backing implementation.",
+    "recommendedSeverity": "medium",
+    "recommendedCategory": "overclaimed-capability",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "None. No sqlite.adapter.ts in packages/database/adapters/ (only mssql/mysql/postgres). No factory dispatch and no StreamUnsupportedOperationError/notImplemented-style throw for the 'sqlite' provider. DatabaseAdapterFactory is an interface-only contract.",
+    "currentEvidence": [
+      "packages/database/ports/database-client.ts:13 \u2014 DatabaseProvider union still includes 'sqlite'",
+      "packages/database/mod.ts:11 \u2014 feature list still claims 'SQLite' support",
+      "packages/database/deno.json:10-12 \u2014 exports only ./adapters/postgres, ./adapters/mssql, ./adapters/mysql; no ./adapters/sqlite",
+      "Glob packages/database/adapters/** \u2014 only mod.ts, mssql.adapter.ts, mysql.adapter.ts, postgres.adapter.ts (no sqlite adapter file)",
+      "packages/database/adapters/mod.ts:9-21 \u2014 re-exports Postgres only; documents mssql/mysql sub-exports; sqlite absent",
+      "packages/database/README.md:202 & docs/concepts.md:22 \u2014 both still advertise 'sqlite' as a valid provider",
+      "packages/database/scripts/migrate.ts:21 \u2014 provider union includes 'sqlite' but runner does no sqlite-specific handling/guard",
+      "No DatabaseAdapterFactory concrete implementation or unsupported-operation throw exists for 'sqlite'"
+    ]
+  },
+  {
+    "id": "database-postgres-no-env-discovery",
+    "status": "still-real",
+    "reasoning": "Re-read current main. packages/database/adapters/postgres.adapter.ts (full file, 226 lines) still contains ONLY PostgresAdapter + createPostgresAdapter and a private buildConnectionString(). There is no getPostgresConfigFromEnv / getPostgresConfig exported helper. By contrast mssql.adapter.ts still exports getMssqlConfigFromEnv (line 206) and getMssqlConfig (line 288), and mysql.adapter.ts exports getMysqlConfigFromEnv (line 155) and getMysqlConfig (line 205). A repo-wide grep for *ConfigFromEnv / getPostgresConfig confirms zero postgres equivalents. SharedDatabaseConfig still documents provider 'auto' = auto-detect from environment (Aspire discovery) with databaseName default 'postgresdb' for postgres (database-client.ts:147-178), so postgres remains the default-provider target for auto discovery yet lacks the env resolver its siblings have. No loud-error reframe was introduced (no StreamUnsupportedOperationError/notImplemented-style throw) and no concrete implementation now fulfills the promise. The 'auto' resolution path itself is also not wired anywhere in the package (grep for === 'auto' / createSharedDatabase finds only the interface definition and re-exports, no consumer), so the asymmetry is the concrete verifiable defect: postgres alone among the three adapters omits the Aspire env-discovery helpers.",
+    "recommendedSeverity": "medium",
+    "primeTimeDisposition": "implement",
+    "recommendedCategory": "database-adapter-parity",
+    "concreteImplOrErrorFound": "None. postgres.adapter.ts has no getPostgresConfigFromEnv/getPostgresConfig; mssql.adapter.ts:206/288 and mysql.adapter.ts:155/205 provide their equivalents.",
+    "currentEvidence": [
+      "packages/database/adapters/postgres.adapter.ts:1-226 (full file: only PostgresAdapter + createPostgresAdapter + private buildConnectionString; no env resolver export)",
+      "packages/database/adapters/mssql.adapter.ts:206 getMssqlConfigFromEnv; :288 getMssqlConfig",
+      "packages/database/adapters/mysql.adapter.ts:155 getMysqlConfigFromEnv; :205 getMysqlConfig",
+      "packages/database/ports/database-client.ts:147-178 SharedDatabaseConfig provider 'auto' (Aspire discovery), databaseName default 'postgresdb' for postgres",
+      "grep across packages/database for getPostgresConfig / *ConfigFromEnv: zero postgres matches; no === 'auto' consumer wired"
+    ]
+  },
+  {
+    "id": "config-saga-store-transport-providers-inert",
+    "status": "still-real",
+    "reasoning": "Re-read current main. Schema at packages/config/src/domain/schemas/netscript-config-schema.ts:71-72 still defines transportProvider enum [auto,redis,rabbitmq,inmemory] and storeProvider enum [auto,redis,postgres,inmemory]. Public types at packages/config/src/domain/config-section-types.ts:262-275 still advertise postgres/rabbitmq. Repo-wide grep for transportProvider|storeProvider matches only the config schema/types declaration, a duplicate declaration in packages/plugin-sagas-core/src/config/saga-config-schema.ts:130-147, and test files -- never a runtime consumer. plugins/sagas grep for the two field names returns NO matches (confirmed unchanged). create-saga-runtime.ts:79-102 selects backends solely by adapter (native|legacy); store is injected via options and defaults to in-memory (memory-saga-store/recording-saga-store are the only store impls). No postgres store and no rabbitmq transport exist anywhere under plugin-sagas-core (only redis-transport.ts plus list/in-memory transport; Glob for postgres* store returns none). The SagasError.notImplemented() throws in saga-engine/saga-bus-*/saga-compensator concern signal/query/spawn/cascade dispatch deferred to phase 7d, NOT an unsupported store/transport provider -- setting storeProvider:postgres or transportProvider:rabbitmq is silently validated then ignored, with no loud error. Neither a concrete adapter (fixed-on-main) nor a deliberate loud-unsupported rejection (reframe) exists.",
+    "recommendedSeverity": "medium",
+    "primeTimeDisposition": "implement",
+    "concreteImplOrErrorFound": "None. No postgres store, no rabbitmq transport, no provider-to-adapter dispatch, and no loud unsupported-error path. Config fields are inert: validated by zod then never read by any runtime/store/transport factory.",
+    "recommendedCategory": "config-surface-overpromise",
+    "currentEvidence": [
+      "packages/config/src/domain/schemas/netscript-config-schema.ts:71-72 transportProvider/storeProvider enums still advertise rabbitmq/postgres",
+      "packages/config/src/domain/config-section-types.ts:262-275 SagaStoreProvider/SagaTransportProvider public types still include postgres/rabbitmq",
+      "packages/plugin-sagas-core/src/config/saga-config-schema.ts:130-147 duplicate provider enums, declaration-only with no reader",
+      "packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts:79-102 branches on adapter only; store injected, defaults in-memory",
+      "Glob packages/plugin-sagas-core/src/**/postgres* -> no files; no rabbitmq transport exists",
+      "plugins/sagas grep transportProvider|storeProvider -> NO matches (confirmed)",
+      "SagasError.notImplemented() throws are for signal/query/spawn/cascade dispatch (phase 7d), not provider selection -> no loud unsupported error for postgres/rabbitmq"
+    ]
+  },
+  {
+    "id": "fresh-define-fresh-app-telemetry-dropped",
+    "status": "still-real",
+    "reasoning": "Re-read packages/fresh/src/runtime/server/define-fresh-app.ts on current main. The cited stub language is still present and the options remain unconsumed: line 32 name? is documented \"reserved for future logger/telemetry defaults\"; lines 78-81 telemetry?: boolean | FreshAppTelemetryOptions is the \"Reserved telemetry bootstrap seam\"; FreshAppTelemetryOptions (lines 11-17) and FreshAppTelemetryAttribute (line 9) are defined and re-exported via mod.ts (lines 16-17) but carry no implementation. The defineFreshApp body (lines 91-112) constructs/reuses the App, runs preConfigure, registers static files, middleware, configure, and fsRoutes \u2014 it never reads options.name or options.telemetry. A grep for options.name/options.telemetry/FreshAppTelemetry in packages/fresh/src found no consumption in this file: the only options.name hit is internal/package-telemetry/telemetry.ts:56 (an unrelated options object), and config.telemetry hits are in define-page (a separate builder), not defineFreshApp. There is NO loud-error throw (no StreamUnsupportedOperationError / unsupportedOperation / notImplemented) guarding these options \u2014 they are silently accepted and dropped. So this is neither fixed-on-main nor reframed as a deliberate loud limitation; it remains a silent accepted-but-ignored option surface.",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "silent-no-op-option",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "No implementation and no error throw. options.name (line 32) and options.telemetry (lines 78-81) are declared and re-exported but never read in the defineFreshApp body (lines 91-112).",
+    "currentEvidence": [
+      "packages/fresh/src/runtime/server/define-fresh-app.ts:32 name documented 'reserved for future logger/telemetry defaults'",
+      "packages/fresh/src/runtime/server/define-fresh-app.ts:78-81 telemetry option documented as 'Reserved telemetry bootstrap seam'",
+      "packages/fresh/src/runtime/server/define-fresh-app.ts:91-112 defineFreshApp body never reads options.name or options.telemetry",
+      "grep of packages/fresh/src: no consumption of options.name/options.telemetry within define-fresh-app.ts; no loud-error throw guarding these options"
+    ]
+  },
+  {
+    "id": "xcut-triggers-defer-action-unsupported-in-service",
+    "status": "reframe-deliberate-limitation",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "docs-vs-impl / honest-limitation",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "plugins/triggers/src/runtime/trigger-runtime-processor.ts:95-100 now throws TriggersError.unsupportedOperation('trigger-action.defer', ...) \u2014 a loud, non-retryable error (code TRIGGER_UNSUPPORTED_OPERATION, retryable:false per packages/plugin-triggers-core/src/domain/errors.ts:141-148).</concreteImplOrErrorFound>\n<parameter name=\"currentEvidence\">[\"plugins/triggers/src/runtime/trigger-runtime-processor.ts:95-100 \u2014 production dispatchTriggerAction throws TriggersError.unsupportedOperation for kind==='defer' (former silent stub now a deliberate loud throw)\",\"packages/plugin-triggers-core/src/domain/errors.ts:136-148 \u2014 UnsupportedOperationError sets code 'TRIGGER_UNSUPPORTED_OPERATION', retryable:false (genuine non-retryable failure, not a swallowed status)\",\"packages/plugin-triggers-core/src/runtime/trigger-processor.ts:162-170 \u2014 core dispatches EVERY action via #dispatchAction (line 162-164) BEFORE computing status; the status:'deferred' branch (line 168) only survives with a no-op/inline dispatcher, not the wired runtime where dispatchTriggerAction throws first\",\"docs/site/reference/triggers/index.md \u2014 CITED DOC NO LONGER EXISTS on current main; docs/ now contains only architecture/, user-site relocated to a separate branch. The 'DeferAction documented as published surface' evidence is stale\",\"packages/plugin-triggers-core/src/domain/trigger-action.ts:28-32 \u2014 DeferAction is still a publicly exported type but its doc-comment does not warn that runtime dispatch is unsupported (residual doc-honesty gap)\",\"Task #31 'S2 triggers defer slice' completed (added the throw); task #35 still pending: 'reconcile docs to caveat-fix reality (defer + durable streams = unsupported)'\"]",
+    "reasoning": "On current main the gap is reframed, not fixed by real capability. The former silent stub (core returning status:'deferred' with no scheduling) is now converted into a deliberate, loud, non-retryable throw in the deployed runtime: dispatchTriggerAction throws TriggersError.unsupportedOperation('trigger-action.defer'). There is NO wired persistence/scheduler for deferred actions \u2014 nothing actually re-dispatches at action.until \u2014 so this is not fixed-on-main; it is an honest 'unsupported' declaration. The core processor's status:'deferred' branch is dead in the real runtime because every action is dispatched (and thus throws) before status is computed. The cited doc path docs/site/reference/triggers/index.md no longer exists (docs overhaul moved user docs off this tree), so the specific docs-vs-impl mismatch evidence is stale. Throwing a loud non-retryable error for an unbuilt durable-scheduling capability is an acceptable shipped limitation; building a deferred-action scheduler is out of prime-time scope. Severity drops to low: the runtime is honest (loud throw), and the only residual is reconciling the published DeferAction doc-comment / docs to say 'defer dispatch is unsupported', which is tracked by pending task #35 \u2014 a documentation reconciliation, not a missing-implementation blocker."
+  },
+  {
+    "id": "xcut-workers-queueprovider-dropped-input",
+    "status": "still-real",
+    "reasoning": "Re-verified against current main. The gap holds on all three legs:\n\n(1) Config defines queueProvider but no runtime consumes it. packages/plugin-workers-core/src/config/workers-config.ts:34 declares QueueProviderData ('auto'|'deno-kv'|'redis'|'postgres'|'amqp'); :43 the WorkersConfigData.queueProvider field; :106 the zod schema binding. A repo-wide grep for `queueProvider` returns ONLY: this config file, two sample/test configs (plugins/workers/src/cli/official-sample-configuration.ts:212 'auto', packages/cli/.../plugin-loader_test.ts:138 'auto'), and the prime-time register backlog note. No runtime code reads it.\n\n(2) Every worker-runtime createQueue call drops the provider. plugins/workers/worker/worker.ts:174 `this.queue = createQueue<JobMessage>(this.queueName)`; scheduler.ts:94 identical; queue-consumer.ts:35 `createQueue<unknown>(config.queueName)` and :54 `createQueue<TaskMessage>('tasks')`; services router-context.ts:40,47 also bare. None pass the QueueOptions.provider field, so the configured backend is ignored and the queue falls through to auto-discovery.\n\n(3) Postgres is never auto-selected. packages/queue/factory/create-queue.ts:149-162 detectProvider() checks only RabbitMQ (isServiceAvailable) > Redis (getRedisConnectionFromEnv) > DenoKv default. Postgres has a full createPostgresQueue adapter (:328-346) and is handled in createQueueFactory (:221) and getNativeRetrial (:242), but it is reachable ONLY via an explicit options.provider \u2014 which no worker call site supplies. So a user setting queueProvider:'postgres' still silently gets DenoKv.\n\nNo StreamUnsupportedOperationError / unsupportedOperation / notImplemented() throw exists for this path \u2014 the config value is silently discarded, not loudly rejected. So this is neither fixed-on-main nor a reframed deliberate limitation. The .llm/tmp/framework-prime-time-register.md:320 backlog entry (\"Thread resolved workers queueProvider into createQueue and add Postgres auto-discovery\") confirms it remains unimplemented work.",
+    "recommendedSeverity": "medium",
+    "primeTimeDisposition": "implement",
+    "concreteImplOrErrorFound": "No implementation and no loud error. queueProvider config is accepted and silently ignored: worker.ts:174, scheduler.ts:94, queue-consumer.ts:35/54 all call createQueue(name) with no provider option; detectProvider (create-queue.ts:149-162) omits Postgres entirely.",
+    "recommendedCategory": "docs-vs-impl",
+    "currentEvidence": [
+      "packages/plugin-workers-core/src/config/workers-config.ts:34,43,106 \u2014 queueProvider type/field/schema defined; grep shows it is read by no runtime code (only sample + test configs reference it)",
+      "plugins/workers/worker/worker.ts:174, scheduler.ts:94, queue-consumer.ts:35,54 \u2014 every worker-runtime queue built via bare createQueue(name) with no QueueOptions.provider",
+      "packages/queue/factory/create-queue.ts:149-162 detectProvider checks RabbitMQ>Redis>DenoKv only; Postgres adapter exists (328-346) but is unreachable without an explicit provider that no caller passes",
+      "No StreamUnsupportedOperationError/unsupportedOperation/notImplemented throw on this path \u2014 value is silently dropped, not loudly rejected",
+      ".llm/tmp/framework-prime-time-register.md:320 backlog: 'Thread resolved workers queueProvider into createQueue and add Postgres auto-discovery'"
+    ]
+  },
+  {
+    "id": "xcut-triggers-reserved-kinds-inert-public-surface",
+    "status": "reframe-deliberate-limitation",
+    "reasoning": "Re-read current main. The cited lines are essentially stable: public/mod.ts:17,19,22 still re-export ManualTriggerDefinition/QueueTriggerDefinition/StreamTriggerDefinition; domain/constants.ts:12-16 defines TRIGGER_RESERVED_KINDS=['queue','stream','manual'] documented as 'reserved on the public surface but deferred at runtime'; runtime/trigger-processor.ts:59 builds RESERVED_KINDS set and process() at lines 92-93 throws `new TriggerKindNotImplementedError(definition.kind)` for any reserved kind BEFORE any work. The error class (domain/errors.ts:120-133) is a real, named, non-retryable TriggersError subclass with code TRIGGER_KIND_NOT_IMPLEMENTED and message 'Trigger kind is reserved but not implemented: <kind>'. This is not a silent inert stub: the runtime refuses reserved kinds loudly via the exact error marker the prompt names (TRIGGER_KIND_NOT_IMPLEMENTED). No concrete queue/stream/manual persistence or dispatch exists (so not fixed-on-main), but the gap's 'inert public surface' framing is inaccurate \u2014 the surface is honestly gated by an explicit unsupported-kind throw, with the type names and the constant both self-describing as reserved/deferred.",
+    "recommendedSeverity": "low",
+    "recommendedCategory": "docs-vs-impl",
+    "primeTimeDisposition": "document-as-limitation",
+    "concreteImplOrErrorFound": "TriggerKindNotImplementedError (code TRIGGER_KIND_NOT_IMPLEMENTED, retryable:false) thrown at packages/plugin-triggers-core/src/runtime/trigger-processor.ts:92-93; class at packages/plugin-triggers-core/src/domain/errors.ts:120-133",
+    "currentEvidence": [
+      "packages/plugin-triggers-core/src/public/mod.ts:17,19,22 \u2014 Manual/Queue/Stream TriggerDefinition types still re-exported on public surface",
+      "packages/plugin-triggers-core/src/domain/constants.ts:12-16 \u2014 TRIGGER_RESERVED_KINDS=['queue','stream','manual'] with doc-comment 'reserved on the public surface but deferred at runtime'",
+      "packages/plugin-triggers-core/src/runtime/trigger-processor.ts:59 \u2014 const RESERVED_KINDS = new Set(['queue','stream','manual'])",
+      "packages/plugin-triggers-core/src/runtime/trigger-processor.ts:92-93 \u2014 process() throws new TriggerKindNotImplementedError(definition.kind) for reserved kinds before any processing",
+      "packages/plugin-triggers-core/src/domain/errors.ts:120-133 \u2014 TriggerKindNotImplementedError extends TriggersError, code TRIGGER_KIND_NOT_IMPLEMENTED, retryable:false, message 'Trigger kind is reserved but not implemented: <kind>'"
+    ]
+  }
+]

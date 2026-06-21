@@ -4,107 +4,103 @@ title: Tutorials
 templateEngine: [vento, md]
 prev: null
 next:
-  label: "1 · Your first workspace"
-  href: "/tutorials/first-workspace/"
+  label: "Storefront"
+  href: "/tutorials/storefront/"
 ---
 
-Tutorials are for **learning by building**. Start here if NetScript is new to
-you: every lesson hands you a small, working result and leaves the workspace
-ready for the next one. You don't need to understand the whole framework before
-you begin — each rung introduces exactly one new capability and proves it with a
-real command or endpoint.
+Tutorials are for **learning by building**. Each one walks a fixed path from an
+empty directory to a running application — no step skipped, every rung proven by
+a real command or endpoint. You don't need to understand the whole framework
+before you start; each track introduces its capabilities in the order you'd
+actually reach for them.
 
 Unlike the [how-to guides](/how-to/), which assume you already know the shape of
-the task, tutorials follow a fixed path and never skip a step. By the time you
-reach the last rung you'll have a single application that scaffolds cleanly,
-serves a typed service, runs background jobs, coordinates a durable workflow, and
-ingests an external webhook — the spine of a real NetScript backend.
+the task, a tutorial follows one continuous example and never leaves you guessing
+what to do next.
 
 {{ comp callout { type: "tip", title: "How the four lanes fit together" } }}
-Tutorials teach you the path. When you already know the path and just need the
-recipe, use the <a href="/how-to/">how-to guides</a>. For exact symbols and
-signatures, go to the <a href="/reference/">reference</a>. For the design
+Tutorials teach you a path end to end. When you already know the path and just
+need the recipe, use the <a href="/how-to/">how-to guides</a>. For exact symbols
+and signatures, go to the <a href="/reference/">reference</a>. For the design
 reasoning behind durability, contracts, and plugins, read the
 <a href="/explanation/">explanation</a> pages.
 {{ /comp }}
 
-## One application, five rungs
+## Four tracks, four applications
 
-These five lessons build **one continuous application** — a user-onboarding
-backend. Start at the top and work down: each rung assumes the workspace, code,
-and running services from the one before it, so the value compounds instead of
-resetting between lessons.
-
-{{ comp.learningPath({ steps: [
-  { label: "1 · Your first workspace", href: "/tutorials/first-workspace/" },
-  { label: "2 · Build a service", href: "/tutorials/build-a-service/" },
-  { label: "3 · Add background jobs", href: "/tutorials/background-jobs/" },
-  { label: "4 · A durable workflow", href: "/tutorials/durable-workflow/" },
-  { label: "5 · Ingest a webhook", href: "/tutorials/ingest-webhook/" }
-] }) }}
-
-## What each rung adds
-
-Each lesson is short, ends with a verification step, and adds exactly one new
-capability to the same app. Follow them in order.
+There are four independent tracks. **Each builds one complete application** from a
+fresh `netscript init`, and each ends by running that application **locally
+under .NET Aspire** — so whichever you pick, you finish with something that boots,
+serves, and survives a restart. The tracks don't depend on each other; start with
+the one closest to what you're building.
 
 {{ comp.featureGrid({ items: [
   {
-    title: "1 · Your first workspace",
-    body: "Scaffold a NetScript workspace, tour every generated directory, bring up Postgres and Garnet with <code>cd aspire &amp;&amp; aspire run</code>, and type-check the project from zero. Ends at the Aspire dashboard on :18888.",
-    href: "/tutorials/first-workspace/"
+    title: "Storefront",
+    body: "Build an e-commerce backend: a typed catalog service, contract-first cart, a durable <code>checkout</code> saga with compensation, and an HMAC-verified shipping webhook. The track for <strong>services + durable workflows</strong>. 6 chapters.",
+    href: "/tutorials/storefront/"
   },
   {
-    title: "2 · Build a service",
-    body: "Add a typed <code>list</code> procedure to the <code>users</code> service through the contract &rarr; <code>implement()</code> &rarr; router flow, then call it over <code>/api/rpc/*</code> with a fully typed client.",
-    href: "/tutorials/build-a-service/"
+    title: "Team Workspace",
+    body: "Build an authenticated SaaS backend: add a pluggable auth backend and session, model per-plugin data across a second database, run a provisioning job, and protect routes with the <code>.withAuthz()</code> seam. The track for <strong>auth + access control</strong>. 6 chapters.",
+    href: "/tutorials/workspace/"
   },
   {
-    title: "3 · Add background jobs",
-    body: "Add the workers plugin and author a <code>create-user-settings</code> job that runs off the request path and publishes a <code>UserSettingsCreated</code> event. Dispatch and watch it on :8091.",
-    href: "/tutorials/background-jobs/"
+    title: "ERP Sync",
+    body: "Build a background-processing backend: watch for incoming data files, ingest them with durable jobs, add a queue provider and a cron schedule, and learn how polyglot (non-TypeScript) transform tasks are defined. The track for <strong>jobs, queues &amp; polyglot</strong>. 5 chapters.",
+    href: "/tutorials/erp-sync/"
   },
   {
-    title: "4 · A durable workflow",
-    body: "Handle that event in a saga with state, correlation, and compensation, then emit <code>sagaComplete</code>. Your onboarding flow survives restarts and partial failures.",
-    href: "/tutorials/durable-workflow/"
-  },
-  {
-    title: "5 · Ingest a webhook",
-    body: "Accept an external event on a raw Hono trigger route and <code>enqueueJob</code> a worker job to close the loop — wiring the outside world back into the durable core.",
-    href: "/tutorials/ingest-webhook/"
+    title: "Live Dashboard",
+    body: "Build a real-time UI: go from a typed contract to an SDK client, a cache-first query, a Fresh <code>definePage</code> with a hydrated <code>QueryIsland</code>, and finally a durable StreamDB feed that updates the table live. The track for <strong>the Fresh + SDK stack</strong>. 6 chapters.",
+    href: "/tutorials/live-dashboard/"
   }
 ] }) }}
 
+## Not sure which to pick?
+
+{{ comp.apiTable({
+  caption: "Choose by what you're building",
+  rows: [
+    { name: "An API with multi-step business logic", type: "Storefront", desc: "You need typed services and a workflow that can't half-complete — orders, payments, fulfillment. Teaches contracts, defineService, sagas, and webhooks." },
+    { name: "An app behind a login", type: "Team Workspace", desc: "You need authentication, sessions, and route-level access control before anything else. Teaches the auth backend, session crypto, and the .withAuthz() seam." },
+    { name: "Data pipelines and scheduled work", type: "ERP Sync", desc: "Your work happens off the request path — file ingestion, batch jobs, scheduled syncs, and tasks in other languages. Teaches triggers, jobs, queues, cron, and the task runtime." },
+    { name: "A live, reactive frontend", type: "Live Dashboard", desc: "You're rendering server data in a Fresh UI that stays current without a refresh. Teaches the SDK client, cache-first queries, the page builder, islands, and durable streams." }
+  ]
+}) }}
+
+New to NetScript entirely? Any track starts from zero, but **Storefront** is the
+broadest tour of the core ideas. To inspect the whole shape of a NetScript backend, start there.
+
 ## Before you start
 
-The tutorials assume a working local toolchain. If you have never run NetScript
-on this machine, the [quickstart](/quickstart/) installs the CLI and gets a
-project up in a few commands; the first rung then re-grounds you from the
-scaffold so you can start either place.
+Every track assumes a working local toolchain. If you have never run NetScript on
+this machine, the [quickstart](/quickstart/) installs the CLI and gets a project
+up in a few commands; each track's first chapter then re-grounds you from the
+scaffold, so you can start in either place.
 
 {{ comp callout { type: "note", title: "What you'll need" } }}
 A recent <a href="https://deno.com/">Deno</a> and the
 <a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire</a> CLI on your
 PATH. Install the NetScript CLI with
 <code>deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts</code>.
-Each rung lists its own prerequisite state so you always know which earlier
-lessons it builds on.
+Each chapter lists its own prerequisite state, so you always know which earlier
+chapters it builds on.
 {{ /comp }}
 
 ## When you finish
 
-Once you've walked the ladder, branch out into the rest of the docs:
+Once you've completed a track, branch out into the rest of the docs:
 
 {{ comp.featureGrid({ items: [
   {
     title: "How-to guides",
-    body: "Task-focused recipes for things the tutorials don't cover — adding plugins, wiring databases, configuring queue backends, and production pitfalls.",
+    body: "Task-focused recipes for things the tutorials don't cover — discovering services, exposing OpenAPI, choosing a queue provider, second databases, and production pitfalls.",
     href: "/how-to/"
   },
   {
     title: "Capabilities",
-    body: "One hub per capability (services, workers, sagas, triggers, streams, auth) with the headline API, ports, and endpoints in one screen.",
+    body: "One hub per capability (services, workers, sagas, triggers, streams, auth) with the headline API, ports, and endpoints on one screen.",
     href: "/capabilities/"
   },
   {
@@ -114,7 +110,7 @@ Once you've walked the ladder, branch out into the rest of the docs:
   },
   {
     title: "Explanation",
-    body: "The design reasoning behind contracts-first services, durable execution, and the plugin model.",
+    body: "The design reasoning behind contracts-first services, durable execution, the plugin model, and the local Aspire topology.",
     href: "/explanation/"
   }
 ] }) }}

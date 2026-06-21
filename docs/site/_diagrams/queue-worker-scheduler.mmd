@@ -1,0 +1,13 @@
+%% Source for assets/diagrams/queue-worker-scheduler.svg
+%% enqueueJob -> queue -> worker runtime selector (in-process / web-worker / subprocess)
+%% -> job result store; a cron scheduler feeds scheduled jobs into the same queue.
+flowchart LR
+    enqueue["enqueueJob"] --> queue["Queue"]
+    cron["Cron scheduler"] -->|scheduled jobs| queue
+
+    queue --> selector{"Worker runtime<br/>selector"}
+    selector --> inproc["in-process"]
+    selector --> webworker["web-worker"]
+    selector --> subprocess["subprocess"]
+
+    selector --> store["Job result store"]

@@ -1,0 +1,30 @@
+%% NetScript docs diagram: aspire-resource-graph
+%% The .NET Aspire AppHost orchestrates a NetScript app's process graph in local dev.
+%% Theme-neutral; hand-authored SVG sibling lives at assets/diagrams/aspire-resource-graph.svg
+flowchart TB
+  AppHost["Aspire AppHost\n(declares & starts resource graph)"]
+  Dashboard["Aspire Dashboard\n(telemetry / logs / traces)"]
+
+  subgraph Resources["Resource graph"]
+    Postgres[("Postgres\nresource")]
+
+    subgraph Orders["orders plugin"]
+      API["HTTP API service"]
+      Worker["worker\n(background processor)"]
+      Saga["saga-runner\n(background processor)"]
+    end
+  end
+
+  AppHost -->|starts| Postgres
+  AppHost -->|starts| API
+  AppHost -->|starts| Worker
+  AppHost -->|starts| Saga
+
+  Postgres -->|connection string / service discovery| API
+  Postgres -->|connection string / service discovery| Worker
+  Postgres -->|connection string / service discovery| Saga
+
+  Dashboard -.observes.- Postgres
+  Dashboard -.observes.- API
+  Dashboard -.observes.- Worker
+  Dashboard -.observes.- Saga

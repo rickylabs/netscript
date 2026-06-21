@@ -13,8 +13,8 @@ self-contained concern (defining a service, running background jobs, ingesting a
 webhook, authenticating a user, persisting state) that you add to a workspace
 without rewiring the host. Each capability owns one mental model, one headline
 authoring API, and — where it runs — one HTTP surface on a known port. You
-compose them the way you compose functions: add what the system needs, leave out
-what it doesn't, and the contracts keep the seams type-safe.
+compose them the way you compose small building blocks: add what the system
+needs, leave out what it doesn't, and the contracts keep the seams type-safe.
 
 This zone is the **hub of hubs**. Every page below is a capability hub built on
 the same shape — a one-screen concept, the headline API lifted verbatim from a
@@ -24,7 +24,13 @@ it, and the generated [API reference](/reference/) for the full surface. The
 hubs stay deliberately thin so they orient rather than duplicate the reference.
 
 {{ comp callout { type: "note", title: "Five composable plugins + the platform underneath them" } }}
-The capabilities you <em>add</em> are plugins — <code>netscript plugin add &lt;worker|saga|trigger|stream|auth&gt; --samples</code> lands each one under <code>plugins/&lt;name&gt;/</code>. The remaining five are <strong>platform capabilities</strong>: services, database, KV/queues/cron, telemetry, and the Fresh UI come from the scaffold itself. Plugins register their contributions through their manifest; the host application never changes.
+The capabilities you <em>add</em> are plugins. The public command dispatches to a plugin package
+(for example <code>netscript plugin add @netscript/plugin-workers</code>); local-source contributor
+samples use <code>deno run -A packages/cli/bin/netscript-dev.ts plugin add &lt;kind&gt; --name &lt;name&gt; --samples</code>.
+Each installed plugin lands under <code>plugins/&lt;name&gt;/</code>. The remaining five are
+<strong>platform capabilities</strong>: services, database, KV/queues/cron, telemetry, and the
+Fresh UI come from the scaffold itself. Plugins register their contributions through their manifest;
+the host application never changes.
 {{ /comp }}
 
 ## The five composable plugins
@@ -37,15 +43,15 @@ aspire run` provisions Postgres and Garnet and starts the dashboard at
 so the plugin services and their dependencies exist when you reach for them.
 
 {{ comp.featureGrid({ items: [
-  { title: "Background jobs", body: "Workers run thread-isolated jobs with defineJobHandler and createSuccessResult. Trigger one over HTTP on :8091. Job dispatch, execution, and scheduler spans are real OTel automatically.", href: "/capabilities/background-jobs/" },
-  { title: "Durable sagas", body: "Message-driven state machines authored with the fluent defineSaga(...).build() builder, correlated and listed on :8092. Durable store is kv or prisma.", href: "/capabilities/durable-sagas/" },
-  { title: "Triggers & ingress", body: "defineWebhook turns an inbound POST into an enqueued job (enqueueJob). Raw Hono routes (not oRPC) on :8093.", href: "/capabilities/triggers/" },
-  { title: "Durable streams", body: "createDurableStream gives you a real producer runtime served on :4437 and wired into workers, auth, and sagas. The plugin-streams manifest helpers stay stubbed and fail loud.", href: "/capabilities/streams/" },
-  { title: "Authentication", body: "auth-api oRPC service on :8094 with five endpoints. A pure-backend seam composing one active backend — kv-oauth (interactive), WorkOS, or better-auth.", href: "/capabilities/auth/" }
+  { title: "Background jobs", icon: "⚙️", body: "Workers run thread-isolated jobs with defineJobHandler and createSuccessResult. Trigger one over HTTP on :8091. Job dispatch, execution, and scheduler spans are real OTel automatically.", href: "/capabilities/background-jobs/" },
+  { title: "Durable sagas", icon: "🔁", body: "Message-driven state machines authored with the fluent defineSaga(...).build() builder, correlated and listed on :8092. Durable store is kv or prisma.", href: "/capabilities/durable-sagas/" },
+  { title: "Triggers & ingress", icon: "🪝", body: "defineWebhook turns an inbound POST into an enqueued job (enqueueJob). Raw Hono routes (not oRPC) on :8093.", href: "/capabilities/triggers/" },
+  { title: "Durable streams", icon: "🌊", body: "createDurableStream gives you a real producer runtime served on :4437 and wired into workers, auth, and sagas. The plugin-streams manifest helpers stay stubbed and fail loud.", href: "/capabilities/streams/" },
+  { title: "Authentication", icon: "🔐", body: "auth-api oRPC service on :8094 with five endpoints. A pure-backend seam composing one active backend — kv-oauth (interactive), WorkOS, or better-auth.", href: "/capabilities/auth/" }
 ] }) }}
 
-{{ comp callout { type: "important", title: "Honest about the alpha runtime" } }}
-A few seams are intentionally not-yet-live and the hubs say so plainly. The streams <strong>producer runtime is real</strong> via <code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>) — only the <code>@netscript/plugin-streams</code> manifest helpers (<code>defineStreamProducer</code>/<code>defineStreamConsumer</code>) fail loud but differently: <code>defineStreamConsumer.subscribe()</code> synchronously <strong>throws</strong> <code>StreamUnsupportedOperationError</code>; <code>defineStreamProducer.publish()</code> returns a <strong>rejected</strong> <code>Promise</code> with <code>StreamUnsupportedOperationError</code>. Worker <strong>job</strong> tracing is real — only the scaffold <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) remain no-op stubs (a tracked limitation with a fix planned). Trigger <code>enqueueJob</code> is live; <code>defer</code> is defined-but-unsupported (throws and routes to the DLQ). The auth packages are <code>0.0.1-alpha.0</code>; the scaffold's <code>jsr:...@^1.0.0</code> specifiers are forward-looking, not installable today.
+{{ comp callout { type: "important", title: "Alpha status" } }}
+A few seams are intentionally not-yet-live and the hubs say so plainly. The streams <strong>producer runtime is real</strong> via <code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>) — only the <code>@netscript/plugin-streams</code> manifest helpers (<code>defineStreamProducer</code>/<code>defineStreamConsumer</code>) fail loud but differently: <code>defineStreamConsumer.subscribe()</code> synchronously <strong>throws</strong> <code>StreamUnsupportedOperationError</code>; <code>defineStreamProducer.publish()</code> returns a <strong>rejected</strong> <code>Promise</code> with <code>StreamUnsupportedOperationError</code>. Worker <strong>job</strong> tracing is real — only the scaffold <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) remain no-op stubs (a tracked limitation with a fix planned). Trigger <code>enqueueJob</code> is live; <code>defer</code> is defined-but-unsupported (throws and routes to the DLQ). The scaffold's framework-wide <code>jsr:...@^1.0.0</code> specifiers are forward-looking, not installable today.
 {{ /comp }}
 
 ## The platform capabilities
@@ -55,11 +61,11 @@ are the backbone the five plugins lean on; the rest are the persistence,
 primitives, observability, and UI the whole workspace shares.
 
 {{ comp.featureGrid({ items: [
-  { title: "Services & contracts", body: "defineService(router, {...}) for one-shot services, or the fluent createService(...).serve() builder. oRPC + zod contracts via implement(); RPC mounts at /api/rpc/*. Example users service on :3001.", href: "/capabilities/services/" },
-  { title: "Database & Prisma", body: "Prisma 7.8 with runtime=\"deno\" over Postgres. Per-plugin .prisma files aggregate under database/postgres/schema/plugins/<plugin>/. Requires Aspire up first.", href: "/capabilities/database/" },
-  { title: "KV, queues & cron", body: "Deno KV, queue, and cron primitives behind the workspace's unstable:[\"kv\"] flag. The queue has four backends including Postgres — the durable substrate jobs and sagas build on.", href: "/capabilities/kv-queues-cron/" },
-  { title: "Telemetry & logging", body: "OpenTelemetry and structured logs are wired into handlers, RPC, job dispatch, and SSE from line one — observable by default, with traces visible in the Aspire dashboard.", href: "/capabilities/telemetry/" },
-  { title: "Fresh UI & design", body: "apps/dashboard is a Fresh + Preact + Tailwind v4 + Vite frontend. Copy-source: the CLI copies components into your repo and the code is yours.", href: "/capabilities/fresh-ui/" }
+  { title: "Services & contracts", icon: "🔌", body: "defineService(router, {...}) for one-shot services, or the fluent createService(...).serve() builder. oRPC + zod contracts via implement(); RPC mounts at /api/rpc/*. Example users service on :3001.", href: "/capabilities/services/" },
+  { title: "Database & Prisma", icon: "🗄️", body: "Prisma 7.8 with runtime=\"deno\" over Postgres. Per-plugin .prisma files aggregate under database/postgres/schema/plugins/<plugin>/. Requires Aspire up first.", href: "/capabilities/database/" },
+  { title: "KV, queues & cron", icon: "⏱️", body: "Deno KV, queue, and cron primitives behind the workspace's unstable:[\"kv\"] flag. The queue has four backends including Postgres — the durable substrate jobs and sagas build on.", href: "/capabilities/kv-queues-cron/" },
+  { title: "Telemetry & logging", icon: "🔭", body: "OpenTelemetry and structured logs are wired into handlers, RPC, job dispatch, and SSE from line one — observable by default, with traces visible in the Aspire dashboard.", href: "/capabilities/telemetry/" },
+  { title: "Fresh UI & design", icon: "🎨", body: "apps/dashboard is a Fresh + Preact + Tailwind v4 + Vite frontend. Copy-source: the CLI copies components into your repo and the code is yours.", href: "/capabilities/fresh-ui/" }
 ] }) }}
 
 ## The capability matrix
@@ -78,7 +84,7 @@ surface — these hubs orient, the reference enumerates.
     { name: "Durable sagas", type: "plugin · :8092", desc: "defineSaga(id).durability('t1')...build(); durable store kv | prisma; list at /api/v1/sagas/sagas. Full API at /reference/sagas/." },
     { name: "Triggers & ingress", type: "plugin · :8093 (Hono)", desc: "defineWebhook → enqueueJob; POST /api/v1/webhooks/inbound/generic. defer throws + DLQs. Full API at /reference/triggers/." },
     { name: "Durable streams", type: "plugin · :4437", desc: "createDurableStream producer runtime is real; plugin-streams manifest helpers throw StreamUnsupportedOperationError. Full API at /reference/streams/." },
-    { name: "Authentication", type: "plugin · :8094", desc: "auth-api oRPC; /api/v1/auth/{signin,callback,signout,session,me}; one active backend (kv-oauth | workos | better-auth). Full API at /reference/plugin-auth-core/." },
+    { name: "Authentication", type: "plugin · :8094", desc: "auth-api oRPC; /api/v1/auth/{signin,callback,signout,session,me}; one active backend (kv-oauth | workos | better-auth). Full API at /capabilities/auth/." },
     { name: "Database & Prisma", type: "platform · Postgres", desc: "Prisma runtime=\"deno\", per-plugin schema aggregation. Full API at /reference/database/." },
     { name: "KV, queues & cron", type: "platform · primitives", desc: "Deno KV / queue (four backends incl. postgres) / cron behind unstable:[\"kv\"]. Full API at /reference/kv/, /reference/queue/, /reference/cron/." },
     { name: "Telemetry & logging", type: "platform · OTel", desc: "@opentelemetry/api spans + structured logs in handlers, RPC, and job dispatch. Full API at /reference/telemetry/ and /reference/logger/." },
@@ -116,7 +122,7 @@ capabilities in sequence. If you have a task in hand, the
 [how-to recipes](/how-to/) ship each capability directly — including
 [adding authentication](/how-to/add-authentication/). For the *why* behind the
 design, the [core concepts](/explanation/) zone explains the contract type flow,
-the plugin model, durable workflows, the [auth model](/explanation/auth-model/),
+the plugin system, the durability model, the [auth model](/explanation/auth-model/),
 and the Aspire orchestration that ties it together.
 
 {{ comp callout { type: "tip", title: "Start with services" } }}

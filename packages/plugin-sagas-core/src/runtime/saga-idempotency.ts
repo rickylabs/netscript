@@ -162,6 +162,12 @@ function isCascadedMessage(message: SagaMessage | CascadedMessage): message is C
   return 'kind' in message;
 }
 
-function formatIdempotencyKey(target: SagaIdempotencyTarget, idempotencyKey: string): string {
+/** Format a saga idempotency target/key tuple for durable reservation adapters. */
+export function sagaIdempotencyKey(
+  target: SagaIdempotencyTarget,
+  idempotencyKey: string,
+): string {
   return `${target.kind}:${target.id}:${idempotencyKey}`;
 }
+
+const formatIdempotencyKey = sagaIdempotencyKey;

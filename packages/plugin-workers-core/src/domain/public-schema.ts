@@ -1,3 +1,9 @@
+/**
+ * Public structural schemas for worker definitions.
+ *
+ * @module
+ */
+
 import { z } from 'zod';
 
 /** Standard Schema compatible public schema surface. */

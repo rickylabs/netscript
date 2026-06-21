@@ -1,17 +1,47 @@
-# @netscript/service
+# `@netscript/service`
+
+[![JSR](https://jsr.io/badges/@netscript/service)](https://jsr.io/@netscript/service)
+[![Deno](https://img.shields.io/badge/runtime-Deno-000000?logo=deno&logoColor=white)](https://deno.com/)
+[![License](https://img.shields.io/badge/license-MIT-0f172a)](https://opensource.org/licenses/MIT)
 
 Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.
+The package gives generated services a small entrypoint while preserving direct access to the
+underlying mountable service app.
+
+## Package Role
+
+`@netscript/service` follows the Arch-4 DSL/builder archetype with Archetype 3 runtime behavior
+folded in: callers compose a service through the fluent `createService()` builder (or the
+`defineService()` preset), and the builder materializes a Hono/oRPC runtime. Public exports are
+curated through `mod.ts`; role-named source folders (`builder/`, `primitives/`, `presets/`,
+`diagnostics/`) are internal and not part of the import contract. See `docs/architecture.md` for the
+layering rationale.
+
+## Features
+
+- Fluent `createService()` builder for CORS, logging, OpenAPI, Scalar docs, RPC, health, and custom
+  routes.
+- One-call `defineService()` preset for generated NetScript services.
+- Package-owned structural public types, so callers do not depend on Hono or oRPC type internals.
+- `build()` returns a non-listening `ServiceApp` for composition into another host.
+- `serve()` returns a `RunningService` with `addr` and graceful `stop()` for tests and supervisors.
+- `onShutdown()` registers LIFO teardown hooks for database pools, workers, and other runtime
+  resources.
+- Offline Scalar docs through the bundled `assets/scalar.min.js` file.
+- Logger-backed startup diagnostics for database connectivity failures.
+- Opt-in authentication and authorization through `@netscript/service/auth`.
 
 ## Install
 
-```sh
-deno add jsr:@netscript/service
+```jsonc
+{
+  "imports": {
+    "@netscript/service": "jsr:@netscript/service@^0.0.1-alpha.0"
+  }
+}
 ```
 
-## Quick example
-
-Define a generated service entrypoint with the `defineService()` preset, which enables CORS,
-request logging, OpenAPI JSON, Scalar docs, RPC, service info, and health endpoints:
+## Quick Start
 
 ```ts
 import { defineService } from '@netscript/service';
@@ -25,10 +55,33 @@ const service = await defineService(router, {
 await service.stop();
 ```
 
-When a service needs explicit composition, use the fluent `createService()` builder. `serve()`
-starts a Deno listener and returns a `RunningService` handle; `build()` returns a non-listening
-`ServiceApp` for mounting into another host. Health primitives such as `createHealthHandler()` and
-`healthChecks` can also be used directly.
+## Entry Points
+
+| Import                    | Purpose                                                                                                   |
+| ------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `@netscript/service`      | Root service primitives, builder, preset, and public structural types.                                    |
+| `@netscript/service/auth` | Authn/authz ports plus dependency-free static-credential, trusted-header, and scope authorizer factories. |
+
+Auth lives on a subpath so services that do not opt into auth avoid that surface in their import
+graph.
+
+## Public Surface
+
+The root entrypoint exports three layers:
+
+| Layer        | Exports                                                                                                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Primitives   | `createHealthHandler`, `createRPCHandler`, `createOpenAPISpec`, Scalar docs handlers, not-found and error handlers.                                         |
+| Builder      | `createService`, `ServiceBuilder`, `ServiceConfig`, and structural runtime types.                                                                           |
+| Preset       | `defineService`, `DefineServiceOptions`.                                                                                                                    |
+| Auth subpath | `AuthenticatorPort`, `AuthorizerPort`, `Principal`, `createStaticCredentialAuthenticator`, `createTrustedHeaderAuthenticator`, and `createScopeAuthorizer`. |
+
+`LoggerMiddlewareOptions` is re-exported from `@netscript/logger/middleware` because it is a
+first-party sibling package contract.
+
+## Builder
+
+Use `createService()` when a service needs explicit composition:
 
 ```ts
 import { createService } from '@netscript/service';
@@ -36,6 +89,9 @@ import { createService } from '@netscript/service';
 const running = await createService(router, { name: 'orders', version: '1.0.0' })
   .withCors({ origin: 'https://app.example.com' })
   .withLogger()
+  .onShutdown(async () => {
+    await db.$disconnect();
+  })
   .withOpenAPI({ title: 'Orders API' })
   .withDocs()
   .withRPC()
@@ -45,9 +101,274 @@ const running = await createService(router, { name: 'orders', version: '1.0.0' }
 await running.stop();
 ```
 
-## Docs
+Add auth by importing the auth subpath and composing the middleware stages:
 
-- [API reference](https://rickylabs.github.io/netscript/reference/service/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
-- [Hono documentation](https://hono.dev/)
-- [oRPC documentation](https://orpc.unnoq.com/)
+```ts
+import { createService } from '@netscript/service';
+import {
+  createScopeAuthorizer,
+  createStaticCredentialAuthenticator,
+} from '@netscript/service/auth';
+
+const authenticator = createStaticCredentialAuthenticator({
+  credentials: {
+    'local-token': {
+      subject: 'service:orders',
+      scopes: ['orders:read'],
+      roles: ['service'],
+    },
+  },
+});
+
+const authorizer = createScopeAuthorizer({
+  rules: [{
+    match: (request) => request.path.startsWith('/api/orders'),
+    requireScopes: ['orders:read'],
+  }],
+});
+
+const running = await createService(router, { name: 'orders', version: '1.0.0' })
+  .withAuthn({ authenticator })
+  .withAuthz({ authorizer })
+  .withRPC()
+  .withHealth()
+  .serve({ port: 3001 });
+
+await running.stop();
+```
+
+## Preset
+
+Use `defineService()` for generated service entrypoints:
+
+```ts
+const running = await defineService(router, {
+  name: 'orders',
+  port: 3001,
+  openapi: {
+    title: 'Orders API',
+    description: 'Order management service',
+  },
+});
+```
+
+The preset enables CORS, request logging, OpenAPI JSON, Scalar docs, RPC, service info, and health
+endpoints. When the discovered health-check database client also exposes `$disconnect()`, the preset
+registers a shutdown hook that releases that client exactly once during `stop()`.
+
+Auth is off by default. Generated entrypoints can opt in by passing `auth`:
+
+```ts
+import { defineService } from '@netscript/service';
+import { createScopeAuthorizer, createTrustedHeaderAuthenticator } from '@netscript/service/auth';
+
+const running = await defineService(router, {
+  name: 'orders',
+  port: 3001,
+  auth: {
+    authn: {
+      authenticator: createTrustedHeaderAuthenticator({
+        subjectHeader: 'x-authenticated-user',
+        scopesHeader: 'x-authenticated-scopes',
+      }),
+    },
+    authz: {
+      authorizer: createScopeAuthorizer({
+        rules: [{
+          match: (request) => request.path.startsWith('/api/orders'),
+          requireScopes: ['orders:read'],
+        }],
+      }),
+    },
+  },
+});
+
+await running.stop();
+```
+
+Provider auth systems often bring their own HTTP handler for login, callback, and session
+management routes. Mount the provider router in the host service and exempt that path with
+`allowAnonymous`; keep the rest of `/api` guarded:
+
+```ts
+import { createService } from '@netscript/service';
+
+const running = await createService(router, { name: 'orders' })
+  .withAuthn({
+    authenticator: sessionAuthenticator,
+    protect: ['/api'],
+    allowAnonymous: ['/api/auth', '/health'],
+  })
+  .route('get', '/api/auth/session', (context) => providerAuthHandler(context.req.raw))
+  .withRPC()
+  .withHealth()
+  .serve({ port: 3001 });
+
+await running.stop();
+```
+
+Session adapters can validate against the full request header set and cookies through the
+`AuthnRequest.headers()` and `AuthnRequest.cookie(name)` accessors. On successful authentication,
+they may return `responseHeaders` or `setCookies` so refresh-on-read session rotation can update the
+response without coupling `@netscript/service` to a provider SDK.
+
+## Runtime Lifecycle
+
+`serve()` starts a Deno listener and returns:
+
+```ts
+type RunningService = {
+  app: ServiceApp;
+  addr: { hostname: string; port: number; transport: 'tcp' | 'unix' };
+  stop(): Promise<void>;
+};
+```
+
+`stop()` is idempotent and graceful: it stops accepting new connections, lets in-flight requests
+drain through Deno's `server.shutdown()`, runs registered shutdown hooks in reverse registration
+order, and waits for the listener to finish. Hook failures are recorded and logged without blocking
+later hooks.
+
+Register teardown hooks with `onShutdown()`:
+
+```ts
+const running = await createService(router, { name: 'users' })
+  .onShutdown(async ({ reason }) => {
+    await audit.flush({ reason });
+  })
+  .onShutdown(async () => {
+    await db.$disconnect();
+  })
+  .withHealth()
+  .serve({ port: 3000, drainTimeoutMs: 10_000 });
+
+await running.stop();
+```
+
+`serve()` installs `SIGINT`/`SIGTERM` handlers by default (`SIGINT`/`SIGBREAK` on Windows). Disable
+that when another host owns process signals:
+
+```ts
+const running = await createService(router, { name: 'embedded' })
+  .withHealth()
+  .serve({ port: 0, handleSignals: false });
+```
+
+Pass an external signal when a parent process owns cancellation:
+
+```ts
+const controller = new AbortController();
+const running = await createService(router, { name: 'users' }).serve({
+  port: 0,
+  signal: controller.signal,
+});
+
+controller.abort();
+await running.stop();
+```
+
+## Build Without Listening
+
+`build()` returns a `ServiceApp` and does not call `Deno.serve`:
+
+```ts
+const app = createService(router, { name: 'users' })
+  .withHealth()
+  .build();
+
+const response = await app.request('/health');
+```
+
+This is the composition seam for hosts that mount multiple services into one runtime.
+
+## Health
+
+Health endpoints are added with `withHealth()`:
+
+| Route           | Purpose                                      |
+| --------------- | -------------------------------------------- |
+| `/health`       | Full health response with configured checks. |
+| `/health/live`  | Liveness probe.                              |
+| `/health/ready` | Readiness probe.                             |
+
+Custom checks use `withHealthCheck()`:
+
+```ts
+createService(router, { name: 'users' })
+  .withHealthCheck({
+    name: 'search',
+    check: async () => ({ healthy: await searchClient.isReady() }),
+  })
+  .withHealth();
+```
+
+## RPC And OpenAPI
+
+`withRPC()` installs two handler paths:
+
+| Path         | Purpose                      |
+| ------------ | ---------------------------- |
+| `/api/rpc/*` | Type-safe RPC endpoint.      |
+| `/api/*`     | REST-style OpenAPI endpoint. |
+
+`withOpenAPI()` serves `/api/openapi.json`. `withDocs()` serves `/api/docs` and
+`/api/docs/scalar.js`.
+
+## Database Context
+
+`withDatabase()` injects a database context into oRPC handlers and optionally wires health checks:
+
+```ts
+createService(router, { name: 'users' })
+  .withDatabase({ primary: db }, db)
+  .withRPC()
+  .withHealth();
+```
+
+The preset accepts `db` and discovers the first `$queryRaw`-capable client for startup diagnostics
+and health probes.
+
+## Logging And Diagnostics
+
+The service package uses `@netscript/logger` for listener banners, request middleware, oRPC logging,
+and startup diagnostics. Database diagnostics name the selected engine, endpoint, environment
+variables, and suggested local checks without printing raw credentials.
+
+## Required Permissions
+
+| Permission      | Used by                                                                |
+| --------------- | ---------------------------------------------------------------------- |
+| `--allow-net`   | `Deno.serve`, external health checks, TCP database diagnostics.        |
+| `--allow-env`   | environment-based database diagnostics and development error messages. |
+| `--allow-read`  | serving bundled Scalar JavaScript.                                     |
+| `--unstable-kv` | `healthChecks.kv()`.                                                   |
+
+## Testing
+
+Use `build()` for in-memory route checks and `serve({ port: 0 })` for real listener checks:
+
+```ts
+const running = await createService(router, { name: 'users' })
+  .withHealth()
+  .serve({ port: 0 });
+
+const response = await fetch(`http://${running.addr.hostname}:${running.addr.port}/health`);
+await running.stop();
+```
+
+## Documentation
+
+- [`docs/getting-started.md`](./docs/getting-started.md)
+- [`docs/concepts.md`](./docs/concepts.md)
+- [`docs/architecture.md`](./docs/architecture.md)
+
+## See Also
+
+- [`@netscript/logger`](https://jsr.io/@netscript/logger)
+- [`@netscript/telemetry`](https://jsr.io/@netscript/telemetry)
+- [Hono](https://hono.dev/)
+- [oRPC](https://orpc.unnoq.com/)
+
+## License
+
+MIT

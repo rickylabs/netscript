@@ -28,7 +28,7 @@ A real TypeScript backend is rarely one decision. It's a dozen, made on differen
 3. **A `docker-compose.yml` and a prayer.** Your database, your app, your worker, your dashboard — all hand-wired, all drifting from how you actually deploy.
 4. **A DI container you didn't want.** To make any of the above testable, you reach for a dependency-injection framework, and now wiring is a layer of indirection instead of a function call.
 5. **Drift between the API and the client.** The service returns one shape; the client believes another. You find out at runtime, in production, from a user. Codegen helps until the generated types and the hand-written ones disagree.
-6. **Durable workflows faked with retries.** "It'll just retry" is not a state machine. There's no correlation, no compensation, no record of where a multi-step flow actually stopped when the process died.
+6. **Durability model faked with retries.** "It'll just retry" is not a state machine. There's no correlation, no compensation, no record of where a multi-step flow actually stopped when the process died.
 7. **Auth bolted on at the end.** You wire OAuth, sessions, and a provider SDK by hand, then discover the provider you chose is the one you now can't swap without a rewrite.
 
 None of these are hard problems individually. The cost is the **integration tax** — the standing maintenance of seven unrelated tools pretending to be one system.
@@ -41,7 +41,7 @@ We didn't invent new primitives. We made a set of opinions about how the boring 
   caption: "What you'd hand-assemble → what NetScript gives you",
   rows: [
     { name: "Type-safe to the edges", type: "API ↔ client drift", desc: "The contract you import is designed, documented, and enforced. oRPC contracts flow from service to client to UI with no codegen step to drift." },
-    { name: "Approachable, not magic", type: "DI containers & glue", desc: "The 80% case is one chained call. Advanced needs unfold one method deeper — no indirection layer you didn't ask for." },
+    { name: "Predictable builder surface", type: "DI containers & glue", desc: "The common path is one chained call. Advanced options live on named builder methods, without hidden container wiring." },
     { name: "Standards-first", type: "bespoke abstractions", desc: "Built on fetch, URL, streams, and @std/* — skills you already have, not a private runtime to relearn." },
     { name: "Durable by design", type: "retries pretending to be workflows", desc: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence, and compensation. They survive crashes; failure handling is named, not bolted on." },
     { name: "Observable by default", type: "a tracer you wire yourself", desc: "OpenTelemetry tracing, structured logs, and health probes are wired into jobs, queues, RPC, and SSE from the first line. Job dispatch, execution, scheduling, and subprocess spans appear in the dashboard automatically." },
@@ -53,7 +53,7 @@ We didn't invent new primitives. We made a set of opinions about how the boring 
 
 ## What makes it different
 
-Prose is cheap. Here is a working code path for each claim — the kind of thing you'd actually write, lifted from the published package surface.
+Each differentiator below is paired with a runnable TypeScript path from the public package surface.
 
 ### 1. Contract-first, type-safe end to end
 
@@ -64,7 +64,7 @@ Define a contract once. The client is *derived* from it — no codegen, no secon
   { label: "Call the typed client", lang: "ts", code: "// The client is derived from the contract above — not generated, not duplicated.\nimport { defineServices } from '@netscript/sdk';\nimport { usersContract } from './contracts/users.ts';\n\nconst { clients } = defineServices({\n  users: { contract: usersContract },\n});\n\n// `result` is fully typed from the contract's output schema.\nconst result = await clients.users.list({ limit: 20, offset: 0 });\nconsole.log(result.items, result.pagination);" }
 ] }) }}
 
-### 2. Durable workflows by design
+### 2. Durability model by design
 
 A saga is an explicit state machine, not a retry loop. You declare its state, the messages it reacts to, and what each handler emits — including completion and failure as first-class outcomes. It's authored in plain TypeScript builders, but the model is closer to Temporal than to a job queue. Runtime state persists to a durable store you choose — `kv` or `prisma` — so a saga in flight survives a process restart.
 
@@ -102,16 +102,16 @@ Authentication is a plugin like any other, and its defining opinion is that the 
   { label: "Pick a backend", lang: "ts", code: "// The interactive backend: a full OAuth/OIDC redirect flow with KV sessions.\nimport { createKvOAuthBackend, providers } from '@netscript/auth-kv-oauth';\n\nconst backend = await createKvOAuthBackend({\n  provider: providers.google({ clientId, clientSecret, redirectUri }),\n});\n\n// One active backend at a time; selected by NETSCRIPT_AUTH_BACKEND.\n// Swap to 'workos' or 'better-auth' without touching your service." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Auth is alpha — and honest about its edges" } }}
-The auth packages are <code>0.0.1-alpha.0</code>: the <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> specifier the scaffold writes is forward-looking, not installable today. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
+{{ comp callout { type: "note", title: "Framework alpha" } }}
+NetScript packages share the aligned <code>0.0.1-alpha.0</code> version, and the <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> specifier the scaffold writes is forward-looking, not installable today. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
 {{ /comp }}
 
 ## Compared to assembling it yourself
 
-You can build all of this by hand — most teams have. The honest comparison isn't NetScript versus any one library; it's NetScript versus the standing cost of integrating several. We're deliberate about what we wrap and what we are *not*:
+You can build all of this by hand — most teams have. The comparison that matters isn't NetScript versus any one library; it's NetScript versus the standing cost of integrating several. We're deliberate about what we wrap and what we are *not*:
 
 {{ comp.apiTable({
-  caption: "The one honest comparison",
+  caption: "How NetScript compares",
   rows: [
     { name: "vs. wiring it yourself", type: "the baseline", desc: "You keep full control but own every integration seam — queue↔tracer, scaffold, compose file, client drift, auth provider — indefinitely. NetScript trades a slice of that control for those seams being pre-fitted and type-checked." },
     { name: "NestJS", type: "opinionated backend framework", desc: "An opinionated, DI-first Node backend framework. NetScript is Deno-native and JSR-distributed, leads with oRPC contract-first typing end to end, and treats durable workflows as first-class — not a backend framework you bolt a workflow engine onto." },

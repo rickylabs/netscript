@@ -6,6 +6,7 @@ import anchor from "npm:markdown-it-anchor@9.2.0";
 import langBash from "npm:highlight.js@11.11.1/lib/languages/bash";
 import langJson from "npm:highlight.js@11.11.1/lib/languages/json";
 import langTypescript from "npm:highlight.js@11.11.1/lib/languages/typescript";
+import { resolveXref } from "./_data/xref.ts";
 
 /**
  * NetScript external user documentation site (Diátaxis IA).
@@ -24,6 +25,11 @@ import langTypescript from "npm:highlight.js@11.11.1/lib/languages/typescript";
  *
  * Heading IDs: markdown-it-anchor adds GitHub-style slug ids to h1–h4 on every
  * page so in-page `#anchor` links (per-page TOC, Internals sections) resolve.
+ *
+ * xref (OD2): the `xref` filter + `comp.xref` resolve stable keys from
+ * `_data/xref.ts` to hrefs and THROW on an unknown key, so the build is the link
+ * checker (it exits non-zero on a dead reference). `resolveXref` is also exposed
+ * as global data so `comp.xref` can resolve without importing inside Vento.
  */
 function slugify(str: string): string {
   return String(str)
@@ -51,6 +57,27 @@ const site = lume({
 // Copy CSS + favicon to _site verbatim; base_path prefixes their hrefs at build.
 site.copy("styles");
 site.copy("favicon.svg");
+
+// Committed static diagram SVGs (OD1) + other site assets; base_path prefixes hrefs.
+site.copy("assets");
+
+// xref (OD2/OD3): resolve a stable key -> href. Throws on an unknown key so the
+// Lume build exits non-zero (build = link checker). Filter form returns the href:
+//   {{ "cap:services" |> xref }}
+site.filter("xref", (key: string) => resolveXref(key).href);
+
+// Inline-code (ic): comp string args are emitted raw and are NOT markdown-
+// processed, so `code` spans authored with backticks render as literal backtick
+// characters. This filter converts backtick pairs to real <code> in component
+// fields that emit author text (apiTable caption/cells/desc), matching how the
+// markdown body already renders inline code. Leaves existing HTML untouched.
+site.filter("ic", (s: unknown) =>
+  typeof s === "string" ? s.replace(/`([^`]+)`/g, "<code>$1</code>") : (s ?? "")
+);
+
+// Expose the resolver + raw map as global data for `comp.xref` (so the component
+// resolves without an in-template import). Throws on unknown key inside the build.
+site.data("resolveXref", resolveXref);
 
 // Syntax highlighting for fenced code blocks (TD-6).
 site.use(codeHighlight({

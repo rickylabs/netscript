@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" role="img"
+     aria-label="Per-plugin Prisma schemas aggregate into one client that selects a database adapter"
+     font-family="DM Sans, Segoe UI, system-ui, sans-serif">
+  <title>Database schema aggregation</title>
+  <desc>Several per-plugin schema.prisma files fan in to one aggregated Prisma client,
+        which connects through an adapter selector (postgres, mssql, mysql) to the database.</desc>
+  <!-- Theme-neutral: transparent background, mid-tone (#888) strokes + text that
+       read on both light and dark. Source: _diagrams/database-schema-aggregation.mmd -->
+  <defs>
+    <marker id="ns-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+            markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888" />
+    </marker>
+  </defs>
+
+  <text x="380" y="26" fill="#888888" font-size="13" text-anchor="middle"
+        font-weight="600">Database schema aggregation</text>
+
+  <g fill="none" stroke="#888888" stroke-width="1.5">
+    <!-- per-plugin schema files (fan-in) -->
+    <rect x="24"  y="56"  width="150" height="44" rx="6" />
+    <rect x="24"  y="124" width="150" height="44" rx="6" />
+    <rect x="24"  y="192" width="150" height="44" rx="6" />
+
+    <!-- aggregated client -->
+    <rect x="300" y="120" width="160" height="56" rx="6" />
+
+    <!-- adapter selector -->
+    <rect x="540" y="120" width="160" height="56" rx="6" stroke-dasharray="5 3" />
+
+    <!-- database -->
+    <rect x="588" y="232" width="120" height="56" rx="28" />
+
+    <!-- fan-in connectors -->
+    <path d="M 174 78  C 240 78,  250 148, 300 148" marker-end="url(#ns-arrow)" />
+    <path d="M 174 146 C 230 146, 244 148, 300 148" marker-end="url(#ns-arrow)" />
+    <path d="M 174 214 C 240 214, 250 148, 300 148" marker-end="url(#ns-arrow)" />
+
+    <!-- client -> selector -->
+    <line x1="460" y1="148" x2="536" y2="148" marker-end="url(#ns-arrow)" />
+
+    <!-- selector -> database -->
+    <line x1="620" y1="176" x2="648" y2="228" marker-end="url(#ns-arrow)" />
+  </g>
+
+  <!-- box labels -->
+  <g fill="#888888" font-size="13" text-anchor="middle">
+    <text x="99"  y="83">workers.prisma</text>
+    <text x="99"  y="151">sagas.prisma</text>
+    <text x="99"  y="219">auth.prisma</text>
+    <text x="380" y="146">Aggregated</text>
+    <text x="380" y="164">Prisma client</text>
+    <text x="620" y="146">Adapter selector</text>
+    <text x="648" y="265">Database</text>
+  </g>
+
+  <!-- secondary captions -->
+  <g fill="#888888" font-size="11" text-anchor="middle" opacity="0.85">
+    <text x="99"  y="97">plugin schema</text>
+    <text x="99"  y="165">plugin schema</text>
+    <text x="99"  y="233">plugin schema</text>
+    <text x="620" y="180">postgres / mssql / mysql</text>
+  </g>
+
+  <text x="237" y="44" fill="#888888" font-size="11" text-anchor="middle"
+        opacity="0.85">fan-in</text>
+</svg>

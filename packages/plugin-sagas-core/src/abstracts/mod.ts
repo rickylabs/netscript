@@ -1,3 +1,9 @@
+/**
+ * Abstract saga runtime contracts and reserved extension-point base classes.
+ *
+ * @module
+ */
+
 export {
   CASCADED_MESSAGE_KINDS,
   SAGA_DURABILITY_TIERS,

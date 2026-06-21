@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" role="img"
+     aria-label="Typed SDK data flow: one contract object generates the typed client which runs a cache-first TanStack query feeding an island; the same contract object is imported by the oRPC service so caller and server cannot drift"
+     font-family="DM Sans, Segoe UI, system-ui, sans-serif">
+  <!-- Theme-neutral: transparent background, mid-tone (#888) strokes + text that read
+       on both light and dark. Committed static SVG (OD1) — no client-side Mermaid. -->
+  <defs>
+    <marker id="ns-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+            markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888" />
+    </marker>
+  </defs>
+  <text x="360" y="22" fill="#888888" font-size="13" text-anchor="middle"
+        font-weight="600">Typed SDK data flow</text>
+
+  <!-- nodes -->
+  <g fill="none" stroke="#888888" stroke-width="1.5">
+    <rect x="20"  y="92" width="120" height="56" rx="6" />
+    <rect x="200" y="92" width="128" height="56" rx="6" />
+    <rect x="388" y="92" width="128" height="56" rx="6" />
+    <rect x="576" y="92" width="128" height="56" rx="6" />
+    <!-- service node (top, shares contract) -->
+    <rect x="388" y="180" width="128" height="44" rx="6" />
+    <!-- forward arrows -->
+    <line x1="140" y1="120" x2="196" y2="120" marker-end="url(#ns-arrow)" />
+    <line x1="328" y1="120" x2="384" y2="120" marker-end="url(#ns-arrow)" />
+    <line x1="516" y1="120" x2="572" y2="120" marker-end="url(#ns-arrow)" />
+  </g>
+
+  <!-- same contract -> service (second arrow, dashed to mark shared import) -->
+  <g fill="none" stroke="#888888" stroke-width="1.4" stroke-dasharray="5 4">
+    <path d="M 80 148 C 80 200, 240 202, 384 202" marker-end="url(#ns-arrow)" />
+  </g>
+
+  <!-- node labels -->
+  <g fill="#888888" font-size="12.5" text-anchor="middle">
+    <text x="80"  y="114">Contract</text>
+    <text x="264" y="114">Typed client</text>
+    <text x="452" y="114">Cache-first query</text>
+    <text x="640" y="114">Island</text>
+    <text x="452" y="200">oRPC service</text>
+  </g>
+  <g fill="#888888" font-size="10.5" text-anchor="middle" opacity="0.85">
+    <text x="80"  y="131">contract object</text>
+    <text x="264" y="131">createClient</text>
+    <text x="452" y="131">TanStack Query</text>
+    <text x="640" y="131">component</text>
+    <text x="452" y="216">imports same contract</text>
+  </g>
+
+  <!-- annotation on shared-contract path -->
+  <text x="230" y="190" fill="#888888" font-size="10.5" text-anchor="middle"
+        opacity="0.9">one contract &mdash; caller + server cannot drift</text>
+</svg>

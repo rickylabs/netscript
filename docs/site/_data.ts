@@ -3,13 +3,13 @@
  *
  * `navSections` drives the SidebarShell navigation rendered in
  * `_includes/layouts/base.vto`. The top groups use plain-English labels (the
- * approachable ladder) while Reference stays expanded to the 22 primary units.
+ * approachable ladder) while Reference stays expanded to the 28 primary units.
  * The four `*-core` internal packages stay folded inside the reference prose
  * (US-8) and are intentionally NOT sidebar entries.
  *
  * Every href below resolves to a page that exists after the 0a authoring wave:
  * `/`, `/quickstart/`, `/why/`, `/tutorials/`, `/how-to/`, `/explanation/`,
- * `/reference/`, and the 22 reference-unit hrefs. Capability hubs, concept
+ * `/reference/`, and the 28 reference-unit hrefs. Capability hubs, concept
  * pages, tutorial sub-pages, and a glossary land in later phases and are
  * deliberately omitted here so the 0a chrome preview never 404s.
  */
@@ -26,10 +26,14 @@ export interface NavSection {
 }
 
 /**
- * Reference units (22). The href is the section-root URL; `url` Lume filter
+ * Reference units (28). The href is the section-root URL; `url` Lume filter
  * applies the /netscript/ base path at render time.
  */
 const referenceUnits: NavItem[] = [
+  { href: "/reference/auth/", label: "auth", icon: "A" },
+  { href: "/reference/auth-better-auth/", label: "auth-better-auth", icon: "A" },
+  { href: "/reference/auth-kv-oauth/", label: "auth-kv-oauth", icon: "A" },
+  { href: "/reference/auth-workos/", label: "auth-workos", icon: "A" },
   { href: "/reference/aspire/", label: "aspire", icon: "A" },
   { href: "/reference/cli/", label: "cli", icon: "C" },
   { href: "/reference/config/", label: "config", icon: "C" },
@@ -41,6 +45,8 @@ const referenceUnits: NavItem[] = [
   { href: "/reference/kv/", label: "kv", icon: "K" },
   { href: "/reference/logger/", label: "logger", icon: "L" },
   { href: "/reference/plugin/", label: "plugin", icon: "P" },
+  { href: "/reference/plugin-auth/", label: "plugin-auth", icon: "P" },
+  { href: "/reference/plugin-auth-core/", label: "plugin-auth-core", icon: "P" },
   { href: "/reference/prisma-adapter-mysql/", label: "prisma-adapter-mysql", icon: "P" },
   { href: "/reference/queue/", label: "queue", icon: "Q" },
   { href: "/reference/runtime-config/", label: "runtime-config", icon: "R" },
@@ -61,6 +67,7 @@ export const navSections: NavSection[] = [
       { href: "/", label: "Home", icon: "\u25EB" },
       { href: "/quickstart/", label: "Quickstart", icon: "\u25B8" },
       { href: "/why/", label: "Why NetScript", icon: "\u25C8" },
+      { href: "/concepts/", label: "Core concepts", icon: "\u25C7" },
     ],
   },
   {
@@ -69,11 +76,10 @@ export const navSections: NavSection[] = [
     label: "Learn",
     items: [
       { href: "/tutorials/", label: "Tutorials", icon: "T" },
-      { href: "/tutorials/first-workspace/", label: "1 \u00B7 Your first workspace", icon: "1" },
-      { href: "/tutorials/build-a-service/", label: "2 \u00B7 Build a service", icon: "2" },
-      { href: "/tutorials/background-jobs/", label: "3 \u00B7 Add background jobs", icon: "3" },
-      { href: "/tutorials/durable-workflow/", label: "4 \u00B7 A durable workflow", icon: "4" },
-      { href: "/tutorials/ingest-webhook/", label: "5 \u00B7 Ingest a webhook", icon: "5" },
+      { href: "/tutorials/storefront/", label: "Storefront", icon: "\u00B7" },
+      { href: "/tutorials/workspace/", label: "Team Workspace", icon: "\u00B7" },
+      { href: "/tutorials/erp-sync/", label: "ERP Sync", icon: "\u00B7" },
+      { href: "/tutorials/live-dashboard/", label: "Live Dashboard", icon: "\u00B7" },
     ],
   },
   {
@@ -89,6 +95,20 @@ export const navSections: NavSection[] = [
       { href: "/how-to/customize-fresh-ui/", label: "Customize Fresh UI", icon: "\u00B7" },
       { href: "/how-to/deploy/", label: "Deploy", icon: "\u00B7" },
       { href: "/how-to/author-a-plugin/", label: "Author a plugin", icon: "\u00B7" },
+      { href: "/how-to/discover-services/", label: "Discover services", icon: "\u00B7" },
+      { href: "/how-to/expose-openapi-scalar/", label: "Expose OpenAPI & Scalar", icon: "\u00B7" },
+      { href: "/how-to/use-a-second-database/", label: "Use a second database", icon: "\u00B7" },
+      { href: "/how-to/choose-a-queue-provider/", label: "Choose a queue provider", icon: "\u00B7" },
+      { href: "/how-to/tune-worker-runtime/", label: "Tune the worker runtime", icon: "\u00B7" },
+      { href: "/how-to/run-a-polyglot-task/", label: "Run a polyglot task", icon: "\u00B7" },
+      { href: "/how-to/graceful-shutdown/", label: "Graceful shutdown", icon: "\u00B7" },
+      { href: "/how-to/deploy-local-aspire/", label: "Deploy locally with Aspire", icon: "\u00B7" },
+      { href: "/how-to/roll-out-runtime-overrides/", label: "Roll out runtime overrides", icon: "\u00B7" },
+      { href: "/how-to/add-a-task-runtime-adapter/", label: "Add a task runtime adapter", icon: "\u00B7" },
+      { href: "/how-to/build-a-server-validated-form/", label: "Build a server-validated form", icon: "\u00B7" },
+      { href: "/how-to/build-a-validated-ingestion-queue/", label: "Build a validated ingestion queue", icon: "\u00B7" },
+      { href: "/how-to/publish-a-durable-stream/", label: "Publish a durable stream", icon: "\u00B7" },
+      { href: "/how-to/restrict-worker-task-permissions/", label: "Restrict worker task permissions", icon: "\u00B7" },
     ],
   },
   {
@@ -97,9 +117,9 @@ export const navSections: NavSection[] = [
       { href: "/explanation/", label: "Explanation", icon: "E" },
       { href: "/explanation/architecture/", label: "Architecture", icon: "\u00B7" },
       { href: "/explanation/contracts/", label: "Contracts & type flow", icon: "\u00B7" },
-      { href: "/explanation/plugin-model/", label: "The plugin model", icon: "\u00B7" },
+      { href: "/explanation/plugin-system/", label: "The plugin system", icon: "·" },
       { href: "/explanation/auth-model/", label: "Auth model", icon: "\u00B7" },
-      { href: "/explanation/durable-workflows/", label: "Durable workflows", icon: "\u00B7" },
+      { href: "/explanation/durability-model/", label: "Durability model", icon: "·" },
       { href: "/explanation/observability/", label: "Observability", icon: "\u00B7" },
       { href: "/explanation/aspire/", label: "Orchestration with Aspire", icon: "\u00B7" },
     ],
@@ -118,6 +138,10 @@ export const navSections: NavSection[] = [
       { href: "/capabilities/telemetry/", label: "Telemetry & logging", icon: "\u00B7" },
       { href: "/capabilities/auth/", label: "Authentication", icon: "\u00B7" },
       { href: "/capabilities/fresh-ui/", label: "Fresh UI & design", icon: "\u00B7" },
+      { href: "/capabilities/fresh-framework/", label: "Fresh meta-framework", icon: "\u00B7" },
+      { href: "/capabilities/sdk/", label: "Typed SDK & client", icon: "\u00B7" },
+      { href: "/capabilities/polyglot-tasks/", label: "Polyglot tasks", icon: "\u00B7" },
+      { href: "/capabilities/runtime-config/", label: "Runtime configuration", icon: "\u00B7" },
     ],
   },
   {

@@ -1,0 +1,51 @@
+{
+  "sliceId": "sagas-idempotency-e2e",
+  "archetype": "ARCHETYPE-3 (Runtime/Behavior) \u2014 primary unit packages/plugin-sagas-core owns saga runtime ports + engine + bridge dedup; the KV durable adapter and HTTP wiring land in plugins/sagas. F-13 saga/runtime invariants apply.",
+  "scopeOverlays": [
+    "SCOPE-service (plugins/sagas/services HTTP contract + composition root touched)"
+  ],
+  "lockedDecisions": [
+    "Durable backend = Deno KV via Deno.openKv (NETSCRIPT_SAGA_KV_PATH), mirroring KvTriggerIdempotencyStore \u2014 NOT Prisma/Postgres",
+    "KV adapters (KvSagaIdempotencyStore, KvSagaAppliedKeyStore, openSagaRuntimeKv) live in plugins/sagas/src/runtime, keeping packages/plugin-sagas-core JSR-clean (no Deno.openKv in published core)",
+    "New SagaAppliedKeyStore port added to core (interface only) with a real in-process MemorySagaAppliedKeyStore default \u2014 engine is never a silent no-op",
+    "Engine applied-key guard lives in SagaEngine.#handleEntry (so raw createSagaEngine consumers are also covered), returns alreadyApplied:true with no throw and no re-persist, per doctrine 08",
+    "Reuse the existing SagaIdempotencyPort/SagaIdempotencyReservation/SagaIdempotencyTarget contracts and formatIdempotencyKey (promoted to exported sagaIdempotencyKey) \u2014 no new transport-dedup interface",
+    "idempotencyKey added to PublishMessageInput contract (TS type + zod schema in lockstep) as optional; SagaMessage.idempotencyKey and native.idempotency seams already exist and are reused",
+    "Atomic first-wins reservation via kv.atomic().check({versionstamp:null}).set(...,{expireIn}); TTL default 24h matching DEFAULT_IDEMPOTENCY_TTL_MS",
+    "Composition roots wired: services/src/main.ts, saga-runner.ts, saga-supervisor.ts all inject durable idempotency + appliedKeys; main.ts header corrected (no false Prisma-durability claim)",
+    "No scaffold-output change \u2192 e2e:cli NOT in the gate set; aspire/version pins untouched; @netscript/cli unaffected"
+  ],
+  "contracts": [
+    "SagaAppliedKeyStore.recordApplied(instanceId, idempotencyKey): Promise<{ applied: boolean }> \u2014 NEW core port (saga-applied-key-port.ts), doctrine applied-keys store",
+    "SagaEngineOptions.appliedKeys?: SagaAppliedKeyStore + SagaEngineHandleResult.alreadyApplied: boolean \u2014 engine guard seam",
+    "PublishMessageInput.idempotencyKey?: string + PublishMessageInputZodSchema.idempotencyKey (z.string().optional()) \u2014 HTTP publish contract",
+    "SagaRuntimeMessage.idempotencyKey?, SagaRuntimePublishOptions.idempotencyKey?, SagaPublishMessageInput.idempotencyKey? \u2014 plugins/sagas/services v1-types seams",
+    "KvSagaIdempotencyStore implements SagaIdempotencyPort + KvSagaAppliedKeyStore implements SagaAppliedKeyStore + openSagaRuntimeKv() \u2014 plugin-layer durable adapters",
+    "Exported sagaIdempotencyKey(target, key) helper promoted from private formatIdempotencyKey for adapter reuse"
+  ],
+  "testPlan": [
+    "unit (core): MemorySagaAppliedKeyStore.recordApplied returns applied=true first call, applied=false on duplicate (same instanceId+key)",
+    "unit (core): SagaEngine with appliedKeys \u2014 first publish with idempotencyKey runs handler + persists; second identical publish short-circuits (alreadyApplied=true), handler NOT re-invoked (spy count==1), #persistTransition NOT called again (mock store save count==1)",
+    "unit (core): SagaEngine without idempotencyKey behaves unchanged (no guard); raw createSagaEngine consumer path covered",
+    "unit (core): publish with distinct idempotencyKeys both apply; distinct instanceId+same key both apply (scope is per-instance)",
+    "integration (plugin, --unstable-kv): KvSagaIdempotencyStore.reserve \u2014 accepted=true first, accepted=false within TTL, accepted=true after TTL expiry; survives a fresh store over the same Deno.openKv path (durability/replica-share)",
+    "integration (plugin, --unstable-kv): KvSagaAppliedKeyStore.recordApplied atomic first-wins across two concurrent calls (only one applied=true)",
+    "integration (service): publishSagaMessage threads idempotencyKey from SagaPublishMessageInput \u2192 runtime.publish options and onto the SagaRuntimeMessage; contract zod parse accepts/round-trips idempotencyKey",
+    "failure-path: duplicate publish returns published:true with already-applied semantics (no thrown error, supervisor-safe); KV open failure surfaces a structured SagasError not a silent fallback to memory in the deployed root",
+    "wiring: createSagaRuntime forwards engineOptions.appliedKeys to the engine (constructed engine has the injected store, not the memory default) \u2014 assert via injected spy store"
+  ],
+  "planGateSelfCheck": "PASS expected on all 8 boxes. Research present & re-baselined against main tip cc3b8731 with corrected file:line for every gap (none already resolved). Decisions locked with rationale (KV-not-Prisma, plugin-layer adapter, engine-layer guard, reuse existing seams). Open-decision sweep: TTL default and applied-key TTL marked safe-to-defer (configurable, no rework). Commit slices: 9, ordered, each names proof+gate+files (<30). Risk register present with mitigations. Gate set selected from archetype-gate-matrix (Arch 3 + F-13 + SCOPE-service, e2e:cli justified-excluded). Deferred scope explicit (durable SagaStorePort = sibling slice). jsr-audit applied: KV adapters kept OUT of JSR-published core; publish:dry-run gate named; no slow-type/permission surface added to plugin-sagas-core public exports. Residual FAIL_PLAN risk: low \u2014 only if PLAN-EVAL insists the durable SagaStorePort be in-slice, but evidence + sibling slice scoping justify the boundary.",
+  "openQuestions": [
+    "Applied-key KV TTL: unbounded vs long TTL (e.g. 7d). LOCKED default = unbounded (no expireIn) with a configurable activeTtlMs option; safe to defer, configurable, no rework.",
+    "Should bridge transport-dedup and engine applied-key share one KV namespace prefix? LOCKED: distinct prefixes (['sagas','idempotency'] vs ['sagas','applied']) under one Deno.Kv; safe to defer tuning.",
+    "Whether saga-runner/supervisor should lazily open KV only when adapter==='native'. LOCKED: yes, mirror triggers' needsKv gate; safe to defer refinement."
+  ],
+  "risks": [
+    "Promoting formatIdempotencyKey to a public sagaIdempotencyKey export widens core surface \u2014 mitigate: single well-doc'd helper, covered by F-5 surface audit + JSR dry-run.",
+    "Engine guard short-circuit must re-load current state for the alreadyApplied result so callers see consistent state \u2014 mitigate: reuse #store?.load(instanceId) path; test asserts returned state equals persisted/initial.",
+    "Deno.openKv in plugin layer requires --unstable-kv on check/test \u2014 mitigate: all check/test gates already pass --unstable-kv (deno.json tasks confirm).",
+    "Standalone runner/supervisor opening KV adds a startup dependency \u2014 mitigate: lazy open gated on native adapter + injectable for tests; KV path env-configurable.",
+    "PLAN-EVAL may demand durable SagaStorePort be bundled \u2014 mitigate: research explicitly scopes it to sibling slice sagas-durable-store and shows this slice is independently gate-able (idempotency != state envelope).",
+    "Contract field addition could ripple to generated registries \u2014 mitigate: field is additive/optional, no scaffold-output change; e2e:cli not required, consumer-import validation covers it."
+  ]
+}

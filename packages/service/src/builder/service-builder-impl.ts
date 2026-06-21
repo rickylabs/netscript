@@ -13,6 +13,9 @@ import { type Context, Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
+import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
+import '../auth/hono-context.ts';
+import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import {
   createHealthHandler,
   createLivenessHandler,
@@ -33,10 +36,17 @@ import type {
   ServiceHandler,
   ServiceMiddleware,
   ServiceRouter,
+  ShutdownHook,
 } from '../types.ts';
 import type { ServiceBuilder, ServiceConfig } from './service-builder.ts';
-import { wireRpc } from './service-rpc.ts';
+import { type RpcWiringOptions, wireRpc } from './service-rpc.ts';
 import { startServiceListener } from './service-listener.ts';
+
+interface DeferredRoute {
+  readonly method: 'get' | 'post' | 'put' | 'delete' | 'patch';
+  readonly path: string;
+  readonly handler: ServiceHandler;
+}
 
 /**
  * Internal builder implementation for creating Deno services with consistent patterns.
@@ -56,8 +66,17 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   private docsConfigured = false;
   private healthConfigured = false;
   private startupHooks: Array<() => Promise<void>> = [];
+  private shutdownHooks: ShutdownHook[] = [];
   private contextFactory: ContextFactory = () => ({});
   private database: DbContext | null = null;
+  private authnOptions: AuthnOptions | null = null;
+  private authzOptions: AuthzOptions | null = null;
+  private authInstalled = false;
+  private rpcOptions: (RpcWiringOptions & { traceContext?: boolean }) | null = null;
+  private openApiOptions: { title?: string; description?: string } | null = null;
+  private docsOptions: { specUrl?: string } | null = null;
+  private deferredRoutes: DeferredRoute[] = [];
+  private deferredRoutesInstalled = false;
 
   constructor(router: TRouter, config: ServiceConfig) {
     this.app = new Hono();
@@ -71,7 +90,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * @param options - CORS configuration options
    */
   withCors(options?: CorsOptions): ServiceBuilder<TRouter> {
-    this.app.use('*', cors((options ?? { origin: '*' }) as never));
+    this.app.use('*', cors(options ?? { origin: '*' }));
     return this;
   }
 
@@ -163,15 +182,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   withOpenAPI(options?: { title?: string; description?: string }): ServiceBuilder<TRouter> {
     if (this.openApiConfigured) return this;
     this.openApiConfigured = true;
-
-    this.app.get(
-      '/api/openapi.json',
-      createOpenAPISpec(this.router, {
-        title: options?.title ?? `${this.config.name} API`,
-        version: this.config.version ?? '1.0.0',
-        description: options?.description,
-      }),
-    );
+    this.openApiOptions = options ?? {};
     return this;
   }
 
@@ -184,16 +195,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     if (this.docsConfigured) return this;
     this.docsConfigured = true;
 
-    // Serve the bundled Scalar JS for offline usage
-    this.app.get('/api/docs/scalar.js', createScalarJs());
-
-    this.app.get(
-      '/api/docs',
-      createScalarDocs({
-        specUrl: options?.specUrl ?? '/api/openapi.json',
-        title: `${this.config.name} API`,
-      }),
-    );
+    this.docsOptions = options ?? {};
     return this;
   }
 
@@ -219,17 +221,20 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   ): ServiceBuilder<TRouter> {
     if (this.rpcConfigured) return this;
     this.rpcConfigured = true;
+    this.rpcOptions = options ?? {};
 
-    const traceContext = options?.traceContext !== false; // Default true
+    return this;
+  }
 
-    wireRpc(
-      this.app,
-      this.router,
-      this.config.name,
-      (c) => this.buildRpcContext(c, traceContext),
-      options,
-    );
+  /** Enables authentication middleware for guarded paths. */
+  withAuthn(options: AuthnOptions): ServiceBuilder<TRouter> {
+    this.authnOptions = options;
+    return this;
+  }
 
+  /** Enables authorization middleware for guarded paths. */
+  withAuthz(options: AuthzOptions): ServiceBuilder<TRouter> {
+    this.authzOptions = options;
     return this;
   }
 
@@ -238,7 +243,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * database handle and distributed-trace headers.
    */
   private buildRpcContext(c: Context, traceContext: boolean): Record<string, unknown> {
-    const ctx = this.contextFactory(c as unknown as Parameters<ContextFactory>[0]);
+    const ctx = this.contextFactory(c);
 
     // Add database to context if configured via withDatabase()
     if (this.database) {
@@ -252,6 +257,11 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
       if (traceparent || tracestate) {
         ctx.traceHeaders = { traceparent, tracestate };
       }
+    }
+
+    const principal = c.get('principal');
+    if (principal) {
+      ctx.principal = principal;
     }
 
     return ctx;
@@ -302,6 +312,28 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
   }
 
   /**
+   * Registers an async teardown hook to run during graceful shutdown.
+   *
+   * Hooks run in reverse registration order when `RunningService.stop()` is
+   * called or when the listener receives a handled OS signal.
+   *
+   * @param hook - Async or sync teardown function to run on shutdown
+   *
+   * @example
+   * ```typescript
+   * createService(router, { name: 'users' })
+   *   .onShutdown(async () => {
+   *     await db.$disconnect();
+   *   })
+   *   .serve()
+   * ```
+   */
+  onShutdown(hook: ShutdownHook): ServiceBuilder<TRouter> {
+    this.shutdownHooks.push(hook);
+    return this;
+  }
+
+  /**
    * Configures health check endpoints.
    *
    * - /health - Comprehensive health check with all registered checks
@@ -340,7 +372,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * @param middleware - Service middleware handler
    */
   use(middleware: ServiceMiddleware): ServiceBuilder<TRouter> {
-    this.app.use('*', middleware as never);
+    this.app.use('*', middleware);
     return this;
   }
 
@@ -356,7 +388,7 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     path: string,
     handler: ServiceHandler,
   ): ServiceBuilder<TRouter> {
-    this.app[method](path, handler as never);
+    this.deferredRoutes.push({ method, path, handler });
     return this;
   }
 
@@ -384,9 +416,73 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
    * Adds error handlers and returns the app for further customization.
    */
   build(): ServiceApp {
-    this.app.notFound(createNotFoundHandler(this.config.name) as never);
-    this.app.onError(createErrorHandler(this.config.name) as never);
-    return this.app as unknown as ServiceApp;
+    this.installAuth();
+    this.installDeferredRoutes();
+    this.app.notFound(createNotFoundHandler(this.config.name));
+    this.app.onError(createErrorHandler(this.config.name));
+    return this.app;
+  }
+
+  private installAuth(): void {
+    if (this.authInstalled) return;
+    this.authInstalled = true;
+
+    if (this.authnOptions) {
+      this.app.use('*', createAuthnMiddleware(this.authnOptions));
+    }
+
+    if (this.authzOptions) {
+      this.app.use(
+        '*',
+        createAuthzMiddleware({
+          ...this.authzOptions,
+          protect: this.authnOptions?.protect,
+          allowAnonymous: this.authnOptions?.allowAnonymous,
+        }),
+      );
+    }
+  }
+
+  private installDeferredRoutes(): void {
+    if (this.deferredRoutesInstalled) return;
+    this.deferredRoutesInstalled = true;
+
+    if (this.openApiConfigured) {
+      this.app.get(
+        '/api/openapi.json',
+        createOpenAPISpec(this.router, {
+          title: this.openApiOptions?.title ?? `${this.config.name} API`,
+          version: this.config.version ?? '1.0.0',
+          description: this.openApiOptions?.description,
+        }),
+      );
+    }
+
+    if (this.docsConfigured) {
+      this.app.get('/api/docs/scalar.js', createScalarJs());
+      this.app.get(
+        '/api/docs',
+        createScalarDocs({
+          specUrl: this.docsOptions?.specUrl ?? '/api/openapi.json',
+          title: `${this.config.name} API`,
+        }),
+      );
+    }
+
+    if (this.rpcConfigured) {
+      const traceContext = this.rpcOptions?.traceContext !== false;
+      wireRpc(
+        this.app,
+        this.router,
+        this.config.name,
+        (c) => this.buildRpcContext(c, traceContext),
+        this.rpcOptions ?? undefined,
+      );
+    }
+
+    for (const route of this.deferredRoutes) {
+      this.app[route.method](route.path, route.handler);
+    }
   }
 
   /**
@@ -403,6 +499,12 @@ export class ServiceBuilderImpl<TRouter extends ServiceRouter> implements Servic
     }
 
     const app = this.build();
-    return startServiceListener(app, this.config.name, this.config.port ?? 3000, options);
+    return startServiceListener(
+      app,
+      this.config.name,
+      this.config.port ?? 3000,
+      options,
+      this.shutdownHooks,
+    );
   }
 }

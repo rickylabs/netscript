@@ -7,3 +7,9 @@
 export type { JobStoragePort } from './job-storage-port.ts';
 export type { SchedulerPort } from './scheduler-port.ts';
 export type { WorkerPort } from './worker-port.ts';
+export type {
+  WorkerIdempotencyClaim,
+  WorkerIdempotencyInput,
+  WorkerIdempotencyPort,
+  WorkerIdempotencySource,
+} from './worker-idempotency-port.ts';

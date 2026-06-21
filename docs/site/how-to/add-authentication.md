@@ -30,12 +30,12 @@ graph.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Alpha surface — pin local sources, not jsr ^1.0.0" } }}
-The auth packages are <code>0.0.1-alpha.0</code> today. The CLI scaffold emits forward-looking
-specifiers such as <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those versions are
-<strong>not published yet</strong> — do not expect <code>jsr:...@^1.0.0</code> to install from the
-public registry. Add the plugin through <code>netscript plugin add auth</code> in a workspace whose
-auth sources are wired locally (the scaffold does this for you); treat the <code>^1.0.0</code> import
-specifiers as the shape the published packages <em>will</em> take, not an install you can run against
+The CLI scaffold emits forward-looking specifiers such as
+<code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those versions are <strong>not published
+yet</strong> — do not expect <code>jsr:...@^1.0.0</code> to install from the public registry. Add
+the plugin through <code>netscript plugin add @netscript/plugin-auth</code> in a workspace whose
+auth sources are wired locally (the scaffold does this for you); treat the <code>^1.0.0</code>
+import specifiers as the shape the published packages <em>will</em> take, not an install you can run against
 JSR today.
 {{ /comp }}
 
@@ -63,7 +63,7 @@ The `auth` plugin is a first-class official plugin installed the same way as `wo
 `triggers`, and `streams`. Add it with `plugin add`:
 
 ```sh
-netscript plugin add auth --name auth
+netscript plugin add @netscript/plugin-auth
 ```
 
 This scaffolds the unified `@netscript/plugin-auth` plugin into your workspace and registers it. The
@@ -92,7 +92,7 @@ The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment varia
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "Only kv-oauth is interactive — be honest about what you ship" } }}
+{{ comp callout { type: "warning", title: "Only kv-oauth is interactive — choose accordingly" } }}
 The <code>signin</code> and <code>callback</code> endpoints require a backend that implements the
 optional <code>InteractiveFlowPort</code>. <strong>Only <code>kv-oauth</code> does.</strong> On
 <code>workos</code> and <code>better-auth</code>, calling <code>POST /api/v1/auth/signin</code> or
@@ -258,7 +258,7 @@ migration is applied, and the provider credentials are correct.
 {{ comp callout { type: "tip", title: "Local smoke without real credentials" } }}
 If provider env is missing, the <code>kv-oauth</code> backend falls back to a non-functional
 local-default endpoint set so the service still boots and <code>/health</code>, <code>session</code>,
-and <code>me</code> answer (handy for scaffold smoke tests). Real <code>signin</code>/<code>callback</code>
+and <code>me</code> answer. The default is suitable for scaffold smoke tests. Real <code>signin</code>/<code>callback</code>
 require genuine provider credentials — the fallback is a stub path, not a working login.
 {{ /comp }}
 
@@ -277,9 +277,8 @@ v1. Plan your identity model around one provider path.</li>
 auth audit log or auth-specific telemetry API on main. Do not build dashboards against an auth audit
 stream that does not exist; the <code>defaultTelemetry</code> flag is generic OTLP plumbing, not an
 auth audit trail.</li>
-<li><strong>Alpha specifiers</strong> — the <code>jsr:...@^1.0.0</code> import specifiers the scaffold
-emits are forward-looking. The packages are <code>0.0.1-alpha.0</code>; do not assume a public JSR
-install resolves today.</li>
+<li><strong>Alpha specifiers</strong> — the <code>jsr:...@^1.0.0</code> import specifiers the
+scaffold emits are forward-looking. Do not assume a public JSR install resolves today.</li>
 <li><strong>Provider env is required for real login</strong> — without
 <code>NETSCRIPT_AUTH_CLIENT_ID</code>/<code>SECRET</code>/<code>REDIRECT_URI</code> the
 <code>kv-oauth</code> backend boots into a stub fallback; <code>session</code>/<code>me</code> answer

@@ -20,7 +20,7 @@ A NetScript plugin is a workspace member under **`plugins/<name>/`** whose `mod.
 lists `./plugins/<name>/mod.ts`, and it discovers the plugin's *contributions* (jobs, services,
 stream topics, DB schemas, e2e gates) through a generated **registry**. Get those three things right
 — location, manifest, registry — and the kernel wires the rest. The conceptual model behind that
-wiring lives in [The plugin model](/explanation/plugin-model/); the generated manifest and
+wiring lives in [The plugin system](/explanation/plugin-system/); the generated manifest and
 contribution types live in the [plugin reference](/reference/plugin/).
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
@@ -63,7 +63,7 @@ The fastest way to get a correct skeleton is to install a first-party plugin who
 yours, then read and adapt it:
 
 ```sh
-netscript plugin add worker --samples   # gives you plugins/workers/ to study
+deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
 ```
 
 A minimal hand-authored plugin needs only a `mod.ts` manifest (built with `definePlugin`) and a
@@ -99,7 +99,7 @@ plugin should pick the closest match:
 {{ comp.apiTable({
   caption: "provider.kind by archetype (from the official scaffold.plugin.json files)",
   rows: [
-    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKER_CONCURRENCY (default 2), servicePort 8091." },
+    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKER_CONCURRENCY (default 2) in current Aspire metadata; runtime entrypoints read WORKERS_CONCURRENCY, servicePort 8091." },
     { name: "saga", type: "background-processor", desc: "Durable message-driven sagas. defaultPermissions ['--unstable-kv','--allow-all'], concurrencyEnvVar SAGA_CONCURRENCY, servicePort 8092." },
     { name: "trigger", type: "ingress", desc: "Webhooks / schedules / file-watchers. defaultEntrypoint src/runtime/trigger-processor.ts, concurrencyEnvVar TRIGGER_CONCURRENCY (default 10), servicePort 8093." },
     { name: "stream", type: "utility / plugin", desc: "Infra/utility plugin. requiresDb=false, requiresKv=false, portRangeKey PLUGIN_API, servicePort 4437." }
@@ -197,7 +197,7 @@ API the official workers plugin uses — drop the file in `plugins/notifier/jobs
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Honest edges: triggers are Hono, stream helpers fail loud" } }}
+{{ comp callout { type: "warning", title: "Edges: triggers are Hono, stream helpers fail loud" } }}
 Two reality checks the official plugins make explicit. <strong>Triggers</strong> expose
 <strong>raw Hono routes</strong>, not oRPC — the triggers service mounts
 <code>app.route('/api/v1/webhooks', …)</code> and dispatches by trigger id; the supported action is
@@ -301,10 +301,9 @@ manifest small. Build the full thing in [Add authentication](/how-to/add-authent
 is the concrete walkthrough for the auth plugin specifically.
 
 {{ comp callout { type: "note", title: "Alpha specifiers are forward-looking" } }}
-The auth packages are published at <code>0.0.1-alpha.0</code>. CLI scaffolds may pin
-<code>jsr:@netscript/plugin-auth-core@^1.0.0</code> and siblings — those specifiers are
-forward-looking and are <strong>not installable at <code>1.0</code> today</strong>. Treat them as a
-target, not a current release.
+CLI scaffolds may pin <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> and siblings — those
+specifiers are forward-looking and are <strong>not installable at <code>1.0</code> today</strong>.
+Treat them as a target, not a current release.
 {{ /comp }}
 
 ## Production pitfalls
@@ -354,9 +353,9 @@ declare it with <code>.withDependencies({...})</code> on the manifest and in
 }) }}
 
 {{ comp.card({
-  title: "The plugin model",
+  title: "The plugin system",
   body: "Why plugins are thread-isolated background processors, and how the kernel loads them.",
-  href: "/explanation/plugin-model/",
+  href: "/explanation/plugin-system/",
   icon: "◆"
 }) }}
 

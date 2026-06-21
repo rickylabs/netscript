@@ -114,15 +114,26 @@ and registers its contributions; the host application never changes. After addin
 regenerate the registry so the project picks them up.
 
 {{ comp.apiTable({
-  caption: "Add and manage plugins",
+  caption: "Public plugin package dispatch (netscript)",
   rows: [
-    { name: "netscript plugin add", type: "netscript plugin add worker --samples", desc: "Add a plugin and register it in the workspace. The published <code>netscript</code> CLI registers the <code>api</code> kind by default; the first-party kinds <code>worker</code> → <code>workers</code> (:8091), <code>saga</code> → <code>sagas</code> (:8092), <code>trigger</code> → <code>triggers</code> (:8093), and <code>stream</code> → <code>streams</code> (:4437) are contributor kinds scaffolded by the local-source CLI inside the monorepo checkout. Add the first-class <code>auth</code> plugin with <code>netscript plugin add auth</code> (see the row below). <code>--samples</code> includes runnable example modules." },
-    { name: "netscript plugin add auth", type: "netscript plugin add auth", desc: "Add the first-class <code>auth</code> plugin — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> (migrated like any other plugin schema) and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/how-to/add-authentication/\">add authentication</a>." },
-    { name: "plugin add (options)", type: "netscript plugin add saga --name sagas --port 8092 --service-refs users", desc: "Tune the install: <code>--name</code>, <code>--port</code>, <code>--service-refs</code>, <code>--plugin-refs</code>, <code>--db &lt;engine&gt;</code> / <code>--no-db</code>, <code>--samples</code> / <code>--no-samples</code>, <code>--force</code>." },
+    { name: "netscript plugin add", type: "netscript plugin add <pkg> [args...] [--project-root <path>]", desc: "Run a plugin package's published add command and forward remaining arguments to that package. The public <code>netscript</code> add verb itself accepts only <code>--project-root</code>; package-specific flags belong to the plugin package CLI." },
+    { name: "netscript plugin add workers", type: "netscript plugin add @netscript/plugin-workers", desc: "Dispatch to the published workers plugin package. Use the package's own help for any forwarded arguments supported by that published plugin CLI." },
+    { name: "netscript plugin add auth", type: "netscript plugin add @netscript/plugin-auth", desc: "Dispatch to the published auth plugin package — the <code>auth-api</code> oRPC service on port 8094 exposing <code>/api/v1/auth/{signin,callback,signout,session,me}</code>. Pulls in <code>auth.prisma</code> and a single active backend selected by <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See <a href=\"/how-to/add-authentication/\">add authentication</a>." },
     { name: "netscript plugin list", type: "netscript plugin list", desc: "List the plugins registered in the current workspace." },
     { name: "netscript plugin doctor", type: "netscript plugin doctor", desc: "Check the health of installed NetScript plugins — a fast wiring sanity check." },
     { name: "netscript plugin info", type: "netscript plugin info workers", desc: "Run a plugin's published info command for details about a single plugin." },
     { name: "netscript plugin remove", type: "netscript plugin remove workers", desc: "Remove a configured plugin and update workspace registration." }
+  ]
+}) }}
+
+{{ comp.apiTable({
+  caption: "Local contributor plugin scaffolding (netscript-dev)",
+  rows: [
+    { name: "plugin add worker", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples", desc: "Local-source contributor path for first-party worker samples. The kind-based command is not part of the public <code>netscript</code> package-dispatch surface." },
+    { name: "plugin add saga", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add saga --name sagas --samples", desc: "Local-source contributor path for sagas samples." },
+    { name: "plugin add trigger", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add trigger --name triggers --samples", desc: "Local-source contributor path for triggers samples." },
+    { name: "plugin add stream", type: "deno run -A packages/cli/bin/netscript-dev.ts plugin add stream --name streams --samples", desc: "Local-source contributor path for streams samples." },
+    { name: "plugin add options", type: "--name --port --service-refs --plugin-refs --db/--no-db --samples/--no-samples --force", desc: "These flags belong to <code>netscript-dev plugin add &lt;kind&gt;</code>, not to public <code>netscript plugin add</code>." }
   ]
 }) }}
 

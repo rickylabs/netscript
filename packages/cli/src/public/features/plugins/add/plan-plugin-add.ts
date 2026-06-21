@@ -3,7 +3,7 @@ import { join } from '@std/path';
 import { validateResourceName } from '../../../../kernel/adapters/scaffold/workspace-writer.ts';
 import { detectPluginDbRequirement } from '../../../../kernel/adapters/plugin/db-integration.ts';
 import { PluginKindRegistry } from '../../../../kernel/application/registries/plugin-kind-registry.ts';
-import type { PluginKind } from '../../../../kernel/domain/plugin-kind.ts';
+import type { PluginKind, SagaStoreBackend } from '../../../../kernel/domain/plugin-kind.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
@@ -54,6 +54,7 @@ export async function planPluginAdd(
     { db: request.db, noDb: request.noDb },
     dependencies.fs,
   );
+  const sagaStoreBackend = resolveSagaStoreBackendOption(provider.kind, request.sagaStoreBackend);
 
   return {
     ...request,
@@ -61,6 +62,7 @@ export async function planPluginAdd(
     provider,
     projectName,
     dbDetection,
+    sagaStoreBackend,
   };
 }
 
@@ -73,6 +75,21 @@ function parsePluginKind(rawKind: string, registry: PluginKindRegistry): PluginK
   }
 
   return rawKind as PluginKind;
+}
+
+function resolveSagaStoreBackendOption(
+  kind: PluginKind,
+  backend: SagaStoreBackend | undefined,
+): SagaStoreBackend | undefined {
+  if (kind !== 'saga') {
+    if (backend !== undefined) {
+      throw new ScaffoldValidationError('--saga-store-backend can only be used with saga plugins.', {
+        kind,
+      });
+    }
+    return undefined;
+  }
+  return backend ?? 'kv';
 }
 
 async function assertPluginNameAvailable(

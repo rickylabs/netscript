@@ -35,7 +35,7 @@ Each lands real files under `plugins/` or your service tree and ends with a
 command you can run to confirm it works.
 
 {{ comp.featureGrid({ items: [
-  { title: "Add a plugin", body: "Install a first-party plugin — workers, sagas, triggers, or streams — with netscript plugin add <name> --samples. Lands under plugins/<name>/, regenerates the registry, and verifies the service answers on its port.", href: "/how-to/add-a-plugin/" },
+  { title: "Add a plugin", body: "Install a first-party plugin through public package dispatch, or use the local netscript-dev scaffolding path for sample modules. Lands under plugins/<name>/, regenerates the registry, and verifies the service answers on its port.", href: "/how-to/add-a-plugin/" },
   { title: "Add a service", body: "Stand up a new typed oRPC service: define an @orpc/contract + zod contract, implement() the handlers, serve it with defineService(...) one-shot or createService(...).serve() fluent, and confirm it answers on /api/rpc/*.", href: "/how-to/add-a-service/" },
   { title: "Add authentication", body: "Add the official auth plugin (auth-api on :8094, five endpoints under /api/v1/auth/*). Pick one active backend via NETSCRIPT_AUTH_BACKEND — kv-oauth (interactive, default), WorkOS, or better-auth — run the auth.prisma migration, and sign in.", href: "/how-to/add-authentication/" },
   { title: "Database & migration", body: "Initialize, generate, seed, and inspect the Postgres schema: netscript db init --name init → db generate → db seed → db status. Requires aspire run first so Postgres is provisioned.", href: "/how-to/database-migration/" }
@@ -72,7 +72,7 @@ Every how-to page follows the same contract so you always know where to look:
 - **Steps** — added-lines code blocks, annotated with the file path they belong
   in, using the public `netscript <cmd>` command form throughout.
 - **Production pitfalls** — the caveats that bite in real deployments, stated
-  honestly rather than glossed over.
+  plainly rather than glossed over.
 - **See also** — the capability hub, reference page, and related recipes that
   take the topic further.
 

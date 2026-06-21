@@ -64,6 +64,29 @@ Deno.test('config', async (t) => {
     assertEquals(workersApi.RequiresDb, true);
   });
 
+  await t.step('AppSettingsSchema: preserves saga store metadata', () => {
+    const result = AppSettingsSchema.parse({
+      NetScript: {
+        Name: 'saga-app',
+        Version: '1.0.0',
+        Plugins: {
+          'sagas-api': {
+            Port: 8092,
+            Sagas: { Store: { Backend: 'prisma' } },
+          },
+        },
+        BackgroundProcessors: {
+          sagas: {
+            Sagas: { Store: { Backend: 'kv' } },
+          },
+        },
+      },
+    });
+
+    assertEquals(result.NetScript.Plugins['sagas-api']?.Sagas?.Store?.Backend, 'prisma');
+    assertEquals(result.NetScript.BackgroundProcessors.sagas?.Sagas?.Store?.Backend, 'kv');
+  });
+
   await t.step('parseAppSettings: parses background processors', async () => {
     const { config } = await parseAppSettings(REAL_CONFIG_PATH);
 

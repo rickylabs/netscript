@@ -1,0 +1,558 @@
+# Framework Prime-Time Gap Register (auto-synthesized)
+Run: wf_08960ad9-c46 | baseline: main f85da9c0 | gaps: 210 | slices: 120 | blockers: 21
+
+## Summary
+
+NetScript is NOT prime-time ready: the synthesis collapses the proposals into 78 final slices covering all 210 gaps, with 21 blocker-severity gaps concentrated in the saga durability/cascade core, security-auth seam, graceful-shutdown lifecycle, queue reliability/back-pressure, and end-to-end idempotency. The single dominant root is saga store durability (G1): the saga service builds the runtime store-less, so dbClient is dropped, the SagaInstance table is dead storage, and spawn/schedule/compensate cascades plus trigger->saga and saga->worker dispatch (G2/G4/G5) are all meaningless until a concrete Prisma/KV SagaStorePort is instantiated and injected. The critical path runs through that store foundation into the engine/cascade-completion work and finally the cross-plugin trigger->saga dispatch action, which can only be honest once sagas durably persist and execute cascades. Cross-cutting hardening (auth seam, shutdown signals/hooks, queue DLQ + concurrency foundations, telemetry SDK bootstrap, supply-chain gates) is wave A and unblocks the heaviest downstream consumer-wiring slices. Phase-7d caveat remediation is represented across the saga, security, shutdown, reliability, idempotency, and observability cross-cutting clusters that must all close before a prime-time posture flip.
+
+## Counts
+
+```
+{
+  "stable": 135,
+  "deltaReverified": 0,
+  "deltaStillReal": 0,
+  "deltaDropped": 0,
+  "ccCandidates": 80,
+  "ccReal": 75,
+  "total": 210
+}
+```
+
+## DELTA RE-VERIFY RECONCILIATION (corrects deltaReverified:0 defect)
+
+The original synthesis carried 135 stable gaps judged against an older tree. 18 of those cited source files that changed on main; they were re-verified against current main (workflow wfwcq826v, 18 agents). Result: **0 fixed, 11 still-real, 7 reframe-as-deliberate-limitation**; by prime-time disposition **7 implement, 11 document-as-limitation**. None are blockers — the 21 blockers (saga durability/cascade, auth, shutdown, queue DLQ, idempotency) are untouched.
+
+**Net effect:** the buildable surface shrinks from 210 to **199 implement gaps**; **11 gaps move to a document-as-limitation track** (honest docs/type changes, no feature build). The streams consumer/subscribe surface and triggers `defer`/reserved-kinds already throw loud Unsupported errors by design — they are honest limitations to document, not silent stubs to fix.
+
+### Gaps moved to DOCUMENT-AS-LIMITATION (11)
+
+- **database-shared-config-no-factory** [medium] (still-real) — SharedDatabaseConfig + DatabaseAdapterFactory exported but never implemented (auto-discovery promised, absent)
+- **database-sqlite-provider-no-adapter** [medium] (still-real) — DatabaseProvider includes 'sqlite' and docs advertise SQLite, but no SQLite adapter exists
+- **fresh-define-fresh-app-telemetry-dropped** [low] (still-real) — defineFreshApp telemetry/name options accepted but never consumed
+- **streams-core-no-consumer-or-subscribe-surface** [low] (reframe-deliberate-limitation) — Producer-only package: consume/subscribe and typed consumer SDK explicitly deferred
+- **streams-deferred-scope-block** [low] (reframe-deliberate-limitation) — Documented deferred scope: typed consumer SDK, topic walker, runtime CLI, production transport, cross-plugin parity
+- **streams-define-consumer-throws** [low] (reframe-deliberate-limitation) — defineStreamConsumer().subscribe always throws (manifest-layer no-op)
+- **streams-service-uses-test-server** [low] (reframe-deliberate-limitation) — Production streams service runs DurableStreamTestServer with in-memory default storage
+- **triggers-defer-action-not-implemented** [low] (reframe-deliberate-limitation) — Trigger 'defer' action is exported/handler-returnable but dispatch throws not-implemented
+- **triggers-file-import-sagamessage-dropped** [low] (still-real) — file-import job advertises 'publishes a saga message' but only embeds it in the job result; nothing dispatches it
+- **xcut-triggers-defer-action-unsupported-in-service** [low] (reframe-deliberate-limitation) — Documented trigger defer() action throws unsupportedOperation in the deployed triggers runtime
+- **xcut-triggers-reserved-kinds-inert-public-surface** [low] (reframe-deliberate-limitation) — Queue/Stream/Manual trigger definitions are exported on the public surface but the runtime throws TRIGGER_KIND_NOT_IMPLE
+
+### Gaps confirmed IMPLEMENT among the 18 (7)
+
+- **config-saga-store-transport-providers-inert** [medium] — sagas.storeProvider / transportProvider accept redis|postgres|rabbitmq but no durable adapter exists
+- **database-executeraw-string-as-templatestrings** [high] — Adapter.executeRaw casts a plain string to TemplateStringsArray and calls $queryRaw — string queries are broken/unsafe
+- **database-postgres-no-env-discovery** [medium] — Postgres adapter lacks the getConfigFromEnv/getConfig Aspire helpers that mssql/mysql provide, breaking 'auto' discovery
+- **queue-retry-options-unconsumed** [medium] — QueueOptions.retryAttempts/retryDelay accepted but never read by any non-KV adapter or factory
+- **workers-core-no-retry-concurrency-on-dispatch** [high] — maxRetries / retryDelay / maxConcurrency accepted on job definitions but never enforced on the dispatch path
+- **workers-jobtools-trace-noop** [medium] — createJobTools trace API (addEvent/recordProgress/withChildSpan) is a no-op for migrated plugin jobs
+- **xcut-workers-queueprovider-dropped-input** [medium] — Workers queueProvider config (redis/postgres/amqp) is accepted but never consumed by the worker runtime queues
+
+### Pure document-as-limitation slices (drop from build waves)
+
+- **triggers-file-import-saga-dispatch** [D/low] — gaps ['triggers-file-import-sagamessage-dropped']
+- **streams-consumer-subscribe** [B/medium] — gaps ['streams-core-no-consumer-or-subscribe-surface', 'streams-define-consumer-throws']
+- **streams-deferred-scope-tracker** [D/medium] — gaps ['streams-deferred-scope-block']
+- **database-provider-and-factory-surface** [A/medium] — gaps ['database-shared-config-no-factory', 'database-sqlite-provider-no-adapter']
+- **fresh-defineapp-telemetry-wiring** [A/medium] — gaps ['fresh-define-fresh-app-telemetry-dropped']
+
+### Mixed slices (build slice stays; listed gaps become doc-as-limitation)
+
+- **triggers-defer** — doc-as-limit: ['triggers-defer-action-not-implemented', 'xcut-triggers-defer-action-unsupported-in-service']
+- **triggers-reserved-surface-and-manual-fire** — doc-as-limit: ['xcut-triggers-reserved-kinds-inert-public-surface']
+- **streams-production-transport** — doc-as-limit: ['streams-service-uses-test-server']
+
+---
+
+Critical path: sagas-durable-store -> sagas-cascade-runtime -> sagas-engine-dispatch-completion -> triggers-saga-dispatch-action
+
+## Slices by wave
+
+### Wave A (74 slices)
+- **rbp-dlq-contract** [blocker] (1 gaps)
+  - Uniform dead-letter-queue contract across default/native adapters
+  - units: ['packages/queue']
+  - gaps: ['reliability-backpressure-no-dlq-default-adapters']
+- **sagas-durable-store** [blocker] (8 gaps)
+  - Concrete durable SagaStorePort instantiated and wired through engine, service main.ts, and standalone runner (G1)
+  - units: ['packages/plugin-sagas-core', 'plugins/sagas', 'plugins/sagas/services']
+  - gaps: ['sagas-core-no-durable-store', 'sagas-core-storeless-engine-default', 'sagas-runtime-storeless-no-durability', 'xcut-saga-store-undurable-and-unwired', 'wiring-saga-service-storeless-engine', 'wiring-saga-dbclient-dropped-input', 'wiring-saga-prismastore-never-instantiated', 'wiring-saga-runner-supervisor-storeless-default']
+- **sagas-idempotency-e2e** [blocker] (5 gaps)
+  - Saga idempotencyKey end-to-end: HTTP contract, durable SagaIdempotencyPort, engine applied-key reservation
+  - units: ['packages/plugin-sagas-core', 'plugins/sagas']
+  - gaps: ['sagas-core-idempotency-memory-only', 'sagas-idempotency-memory-only-in-service', 'idempotency-e2e-saga-api-drops-idempotency-key', 'idempotency-e2e-saga-dedup-in-memory-default', 'idempotency-e2e-saga-engine-replay-no-applied-key']
+- **sagas-telemetry-spans** [blocker] (3 gaps)
+  - Saga telemetry seam + handle-path spans + API publish trace linkage
+  - units: ['plugins/sagas', 'packages/telemetry']
+  - gaps: ['observability-continuity-saga-runtime-no-telemetry-seam', 'observability-continuity-saga-engine-no-spans', 'observability-continuity-saga-publish-event-no-trace-linkage']
+- **service-auth-seam** [blocker] (2 gaps)
+  - Authentication + authorization (authn middleware + authz/RBAC) seam on @netscript/service
+  - units: ['packages/service']
+  - gaps: ['security-auth-no-authn-middleware', 'security-auth-no-authz-rbac']
+- **service-graceful-shutdown** [blocker] (2 gaps)
+  - Signal handlers + onShutdown/drain hook on the service front door
+  - units: ['packages/service']
+  - gaps: ['graceful-shutdown-no-signal-handlers-in-service-builder', 'graceful-shutdown-no-onshutdown-hook-on-service-builder']
+- **worker-applied-keys-dedup** [blocker] (2 gaps)
+  - Worker consumer-side applied-keys dedup + JobMessage idempotency propagation
+  - units: ['plugins/workers', 'packages/queue']
+  - gaps: ['idempotency-e2e-worker-consumer-no-dedup', 'idempotency-e2e-jobmessage-no-idempotency-field']
+- **aspire-production-composition-wiring** [high] (2 gaps)
+  - Wire composeAppHost into a real composition root and aggregate declareEnv/declareHealthChecks
+  - units: ['aspire']
+  - gaps: ['aspire-composeapphost-unwired-in-production', 'aspire-declareenv-declarehealthchecks-dropped']
+- **aspire-surface-honesty-and-inspection** [medium] (3 gaps)
+  - Resolve inert aspire surfaces: AspireRuntime port, inspectAspire path branch, resolveEnvSource placeholders
+  - units: ['aspire']
+  - gaps: ['aspire-runtime-port-no-impl', 'aspire-inspect-path-target-inert', 'aspire-resolveenvsource-silent-placeholder']
+- **boot-fail-fast-validation** [high] (1 gaps)
+  - Boot-time fail-fast env/secrets validation seam in composition roots
+  - units: ['packages/config', 'plugins/* service main.ts']
+  - gaps: ['config-secrets-boot-no-fail-fast-startup-validation']
+- **cli-doctor-runtime-config-branch** [low] (1 gaps)
+  - Fix plugin doctor runtime-config always-healthy dead branch
+  - units: ['packages/cli']
+  - gaps: ['cli-doctor-runtime-config-dead-branch']
+- **cli-marketplace-stubs-resolve** [medium] (2 gaps)
+  - Back or gate marketplace search and publish print-only stubs
+  - units: ['packages/cli']
+  - gaps: ['cli-marketplace-search-inert', 'cli-marketplace-publish-inert']
+- **contracts-pagination-and-prisma-helper-correctness** [medium] (3 gaps)
+  - Consolidate pagination schemas and fix paginatedQuery/buildPrismaWhere contract gaps
+  - units: ['contracts']
+  - gaps: ['contracts-duplicate-divergent-pagination-schemas', 'contracts-paginated-query-untyped-prisma-contract', 'contracts-buildprismawhere-mode-mismatch']
+- **cron-accurate-next-run-and-memory-cadence** [medium] (2 gaps)
+  - Real five-field cron evaluator for next-run + memory adapter cadence
+  - units: ['cron']
+  - gaps: ['cron-memory-cron-to-interval-coarse', 'cron-calculate-next-run-placeholder']
+- **cron-public-surface-honesty** [high] (3 gaps)
+  - Reconcile cron public surface: timezone, node/temporal providers, README types export
+  - units: ['cron']
+  - gaps: ['cron-timezone-unconsumed', 'cron-node-temporal-providers-throw', 'cron-readme-types-export-missing']
+- **cron-retry-and-attempt-tracking** [high] (2 gaps)
+  - Cron retry/backoff handling + real attempt counter
+  - units: ['cron']
+  - gaps: ['cron-retry-backoff-unconsumed', 'cron-job-context-attempt-always-zero']
+- **data-layer-migration-intents** [medium] (1 gaps)
+  - Migration runner: explicit deploy/status/resolve intents replacing env-var mode inference
+  - units: ['cross-cutting/data-layer-ops']
+  - gaps: ['data-layer-ops-migrate-forward-only-no-rollback']
+- **data-layer-postgres-pool-sizing** [medium] (1 gaps)
+  - Postgres adapter: forward poolSize/timeout into PrismaPg pool options
+  - units: ['cross-cutting/data-layer-ops']
+  - gaps: ['data-layer-ops-postgres-pool-timeout-dropped']
+- **database-provider-and-factory-surface** [medium] (2 gaps)
+  - Reconcile database provider surface: shared-config factory and SQLite provider
+  - units: ['database']
+  - gaps: ['database-shared-config-no-factory', 'database-sqlite-provider-no-adapter']
+- **database-raw-query-semantics** [high] (3 gaps)
+  - Correct executeRaw/executeRawUnsafe query-vs-command Prisma methods
+  - units: ['database', 'cross-cutting/data-layer-ops']
+  - gaps: ['database-executeraw-string-as-templatestrings', 'database-executerawunsafe-semantics-mismatch', 'data-layer-ops-executeraw-string-as-template']
+- **fresh-defineapp-telemetry-wiring** [medium] (1 gaps)
+  - Wire or remove defineFreshApp telemetry/name options
+  - units: ['fresh']
+  - gaps: ['fresh-define-fresh-app-telemetry-dropped']
+- **fresh-route-manifest-logging** [medium] (1 gaps)
+  - Implement logRouteManifestResult for changes/verbose logLevels
+  - units: ['fresh']
+  - gaps: ['fresh-vite-route-manifest-loglevel-inert']
+- **fresh-stream-db-typed-collections** [low] (1 gaps)
+  - Propagate per-collection Collection<T> types through NetScriptStreamDB.collections
+  - units: ['fresh']
+  - gaps: ['fresh-stream-db-collections-untyped']
+- **fresh-ui-datatable-interactive-prop** [low] (1 gaps)
+  - Document/forward or remove the DataTable interactive prop
+  - units: ['fresh-ui']
+  - gaps: ['fresh-ui-datatable-interactive-prop-undocumented-passthrough']
+- **gs-triggers-signal-drain** [high] (1 gaps)
+  - AbortSignal + signal handlers + drain on the triggers HTTP ingress service
+  - units: ['plugins/triggers']
+  - gaps: ['graceful-shutdown-triggers-http-service-no-signal-or-drain']
+- **kv-provider-surface-honesty** [medium] (1 gaps)
+  - Implement or remove the inert 'nitro' KvProvider
+  - units: ['kv']
+  - gaps: ['kv-nitro-provider-unimplemented']
+- **kv-redis-data-fidelity** [medium] (2 gaps)
+  - Fix Redis key roundtrip coercion and atomic sum/min/max accumulator semantics
+  - units: ['kv']
+  - gaps: ['kv-redis-key-roundtrip-coerces-numeric-strings', 'kv-atomic-sum-min-max-degrade-to-set']
+- **logger-honor-colors-and-timestamps** [medium] (1 gaps)
+  - Apply colors/timestamps in configureLogging console sink formatter
+  - units: ['logger']
+  - gaps: ['logger-config-drops-colors-timestamps']
+- **logger-public-surface-reconcile** [low] (2 gaps)
+  - Reconcile logger inert public options (logBody, LoggerOptions.level)
+  - units: ['packages/logger']
+  - gaps: ['logger-middleware-logbody-unimplemented', 'logger-options-type-inert']
+- **multi-tenancy-tenant-primitive** [high] (1 gaps)
+  - First-class TenantId primitive on ServiceContext
+  - units: ['packages/service', 'packages/contracts']
+  - gaps: ['multi-tenancy-x-tenant-id-decorative']
+- **mysql-field-metadata-and-row-detection** [high] (3 gaps)
+  - Real mysql2 field metadata + correct row-returning statement detection (single query() path)
+  - units: ['packages/prisma-adapter-mysql', 'cross-cutting/data-layer-ops']
+  - gaps: ['prisma-mysql-inferred-field-metadata-lossy', 'prisma-mysql-select-detection-heuristic', 'data-layer-ops-mysql-field-metadata-inferred-from-rows']
+- **plugin-filesystem-disk-adapter-and-host** [medium] (2 gaps)
+  - Deno-backed FileSystemPort adapter + real plugin host bootstrap/registry
+  - units: ['plugin']
+  - gaps: ['plugin-filesystemport-no-disk-adapter', 'plugin-host-bootstrap-and-registry-inert']
+- **plugin-walker-ast-and-watch** [high] (2 gaps)
+  - AST-based contribution walker + working Deno.watchFs watcher
+  - units: ['plugin']
+  - gaps: ['plugin-ast-extractor-closed-callee-set', 'plugin-watcher-noop']
+- **queue-listen-lifecycle-fidelity** [medium] (2 gaps)
+  - Honor ListenOptions.concurrency/prefetch and await genuine drain in stop()
+  - units: ['queue']
+  - gaps: ['queue-listen-concurrency-ignored', 'queue-denokv-stop-fixed-sleep']
+- **queue-priority-dedup** [medium] (1 gaps)
+  - Implement or scope-narrow EnqueueOptions.priority and deduplicationId per backend
+  - units: ['queue']
+  - gaps: ['queue-priority-dedup-dropped']
+- **queue-settlement-dlq** [high] (2 gaps)
+  - Real ack/nack settlement and dead-letter routing across adapters
+  - units: ['queue']
+  - gaps: ['queue-denokv-amqp-ack-nack-noop', 'queue-redis-no-dlq-infinite-retry']
+- **rbp-adapter-concurrency** [high] (1 gaps)
+  - Honor ListenOptions.concurrency in core queue adapters (bounded worker set)
+  - units: ['packages/queue']
+  - gaps: ['reliability-backpressure-adapters-ignore-concurrency']
+- **rbp-idempotency-envelope** [high] (1 gaps)
+  - Idempotency key on the queue envelope with handler/store-level dedup
+  - units: ['packages/queue', 'packages/plugin-workers-core']
+  - gaps: ['reliability-backpressure-no-idempotency-keys']
+- **release-jsr-analyzable-imports** [low] (1 gaps)
+  - Narrow or document unanalyzable dynamic imports for JSR analysis
+  - units: ['cross-cutting/release-jsr']
+  - gaps: ['release-jsr-unanalyzable-dynamic-imports']
+- **release-jsr-cli-publish-posture** [medium] (2 gaps)
+  - Re-enable isolatedDeclarations + valid JSON for @netscript/cli and restore it to quality gates
+  - units: ['packages/cli', 'cross-cutting/release-jsr']
+  - gaps: ['release-jsr-cli-jsonc-and-slow-types', 'release-jsr-cli-excluded-from-quality-gates']
+- **release-jsr-lock-reproducibility** [high] (1 gaps)
+  - Regenerate committed deno.lock for --frozen reproducibility
+  - units: ['deno.lock', 'cross-cutting/release-jsr']
+  - gaps: ['release-jsr-deno-lock-incomplete']
+- **release-jsr-slow-type-tightening** [medium] (1 gaps)
+  - Drop stale slow-type allowlist entries and enforce zero slow-types
+  - units: ['cross-cutting/release-jsr']
+  - gaps: ['release-jsr-stale-slow-type-allowlist']
+- **runtime-config-rollout-percentage** [medium] (1 gaps)
+  - Evaluate or drop FeatureFlag.rolloutPercentage
+  - units: ['runtime-config']
+  - gaps: ['runtime-config-rollout-percentage-unconsumed']
+- **runtime-config-watcher-options** [low] (2 gaps)
+  - Fix runtime-config watcher: unread prefix option and bypassed .json guard
+  - units: ['runtime-config']
+  - gaps: ['runtime-config-watcher-prefix-option-dropped', 'runtime-config-watcher-json-filter-bypassed']
+- **sagas-agent-runtime-surface** [medium] (1 gaps)
+  - Resolve defineAgent / SagaAgentRuntimePort reserved surface
+  - units: ['packages/plugin-sagas-core']
+  - gaps: ['sagas-core-agent-runtime-inert']
+- **sagas-engine-failure-paths** [medium] (2 gaps)
+  - Engine retry/backoff + DLQ wiring and nested cascaded compensation
+  - units: ['packages/plugin-sagas-core']
+  - gaps: ['sagas-core-engine-handle-no-retry-dlq', 'sagas-core-nested-compensation-notimpl']
+- **sdk-otel-middleware** [low] (1 gaps)
+  - Implement or rename the noop otelMiddleware
+  - units: ['sdk']
+  - gaps: ['sdk-otel-middleware-noop']
+- **sdk-service-client-options** [medium] (1 gaps)
+  - Honor or drop createServiceClient timeout/port options
+  - units: ['sdk']
+  - gaps: ['sdk-service-client-timeout-port-dropped']
+- **service-db-fail-fast** [medium] (1 gaps)
+  - Make DB connectivity startup hook fail-fast configurable (requireDatabase)
+  - units: ['service']
+  - gaps: ['service-db-connectivity-best-effort-silent']
+- **service-hardening-middleware** [high] (3 gaps)
+  - Secure-headers, rate-limiting, and safe CORS defaults on the service builder
+  - units: ['packages/service', 'packages/kv']
+  - gaps: ['security-auth-no-security-headers', 'security-auth-no-rate-limiting', 'security-auth-cors-wildcard-default']
+- **service-health-readiness-from-db** [medium] (2 gaps)
+  - Derive health/readiness from injected db context; treat zero-check readiness as degraded
+  - units: ['service']
+  - gaps: ['service-readiness-empty-reports-ready', 'service-withdatabase-name-implies-unwired-health']
+- **service-serve-bind-tls** [high] (1 gaps)
+  - Add hostname and TLS cert/key to ServeOptions and thread into Deno.serve
+  - units: ['service']
+  - gaps: ['service-serve-no-host-tls-bind']
+- **streams-instrumentation-spans** [medium] (1 gaps)
+  - Implement streamsInstrumentation.setup and open publish spans in the producer
+  - units: ['plugin-streams-core']
+  - gaps: ['streams-core-instrumentation-noop-setup']
+- **streams-producer-durability** [high] (2 gaps)
+  - Durable stream producer reconnect + typed-error/DLQ surfacing for dropped writes
+  - units: ['plugin-streams-core']
+  - gaps: ['streams-core-no-reconnect-silent-write-drop', 'streams-core-silent-write-drop-on-validation-errors']
+- **streams-production-transport** [high] (2 gaps)
+  - Replace DurableStreamTestServer with a production-grade durable transport
+  - units: ['plugin-streams-core', 'plugins/streams', 'plugins/streams/services']
+  - gaps: ['streams-service-uses-test-server', 'wiring-streams-service-inmemory-default-deployed']
+- **supply-chain-dependency-change-review** [low] (1 gaps)
+  - CODEOWNERS / dependency-change review enforcement
+  - units: ['CODEOWNERS', '.github/workflows']
+  - gaps: ['supply-chain-no-dependency-change-review']
+- **supply-chain-frozen-lockfile-ci** [high] (1 gaps)
+  - Enforce frozen lockfile integrity in CI install
+  - units: ['.github/workflows']
+  - gaps: ['supply-chain-no-frozen-lockfile-in-ci']
+- **supply-chain-license-compliance** [medium] (1 gaps)
+  - Third-party license-compliance gate and optional SBOM
+  - units: ['.github/workflows', '.llm/tools/deps']
+  - gaps: ['supply-chain-no-license-compliance-gate']
+- **supply-chain-required-audit-gate** [high] (2 gaps)
+  - Make dependency vulnerability audit a required, tiered (critical+high) merge gate
+  - units: ['.github/workflows', 'branch protection', '.llm/tools/deps']
+  - gaps: ['supply-chain-vuln-audit-not-required-gate', 'supply-chain-audit-level-critical-only']
+- **telemetry-sdk-bootstrap-and-config** [high] (2 gaps)
+  - Telemetry SDK bootstrap + wire resolved config fields
+  - units: ['telemetry']
+  - gaps: ['telemetry-no-otel-sdk-init', 'telemetry-config-fields-dropped']
+- **telemetry-surface-consistency** [low] (3 gaps)
+  - Reconcile inert telemetry surface (saga tracer, span-name constants, instrumentation registry)
+  - units: ['telemetry']
+  - gaps: ['telemetry-saga-tracer-orphaned', 'telemetry-span-names-without-producers', 'telemetry-instrumentation-registry-unwired']
+- **transport-producer-consumer-spans** [high] (3 gaps)
+  - PRODUCER/CONSUMER spans on Redis saga transport, HTTP saga publisher, and TracedQueue caller-context honoring
+  - units: ['plugins/sagas', 'packages/queue']
+  - gaps: ['observability-continuity-redis-transport-no-consumer-span', 'observability-continuity-http-saga-publisher-no-producer-span', 'observability-continuity-tracedqueue-strips-caller-traceparent']
+- **triggers-defer** [high] (3 gaps)
+  - Implement deferred trigger redelivery (DeferAction.until) via the cron scheduler
+  - units: ['plugin-triggers-core', 'plugins/triggers']
+  - gaps: ['triggers-core-defer-until-unconsumed', 'triggers-defer-action-not-implemented', 'xcut-triggers-defer-action-unsupported-in-service']
+- **triggers-enable-disable-consumption** [high] (1 gaps)
+  - Make triggers runtime/ingress honor enabled flag from runtime config
+  - units: ['plugins/triggers']
+  - gaps: ['triggers-enable-disable-unconsumed-by-runtime']
+- **triggers-sse-event-emitter** [low] (1 gaps)
+  - Implement an SSE event-stream emitter feeding subscribeEvents
+  - units: ['plugin-triggers-core']
+  - gaps: ['triggers-core-sse-subscribe-no-emitter']
+- **watchers-debounce** [major] (1 gaps)
+  - Per-path debounce filter
+  - units: ['watchers']
+  - gaps: ['watchers-debounce-dropped-input']
+- **watchers-stability-timeout** [medium] (1 gaps)
+  - Bound StabilityFilter wait with timeoutMs
+  - units: ['watchers']
+  - gaps: ['watchers-stability-no-timeout']
+- **watchers-startup-scan** [high] (2 gaps)
+  - processExisting startup scan with maxFileAge filtering
+  - units: ['watchers']
+  - gaps: ['watchers-process-existing-dropped-input', 'watchers-max-file-age-dropped-input']
+- **workers-admin-execution-persistence** [high] (1 gaps)
+  - Wire execution archive/cleanup admin endpoints to JobExecutionHistory Prisma model
+  - units: ['plugins/workers']
+  - gaps: ['workers-admin-archive-inert']
+- **workers-cron-field-validation** [low] (1 gaps)
+  - Validate cron field syntax/ranges instead of counting five fields
+  - units: ['plugin-workers-core']
+  - gaps: ['workers-core-cron-validate-shallow']
+- **workers-dispatch-attempt-management** [high] (4 gaps)
+  - Enforce retry/backoff, concurrency, and timeout on the worker dispatch path
+  - units: ['plugin-workers-core', 'plugins/workers']
+  - gaps: ['workers-core-no-retry-concurrency-on-dispatch', 'workers-core-job-timeout-not-enforced', 'workers-core-retry-options-delay-dropped', 'workers-retry-dropped-on-deno-path']
+- **workers-durable-default-runtime** [medium] (1 gaps)
+  - Durable default workers runtime preset wiring KvJobRegistry and execution persistence
+  - units: ['plugin-workers-core']
+  - gaps: ['workers-core-default-runtime-memory-only']
+- **workers-jobtools-telemetry** [medium] (1 gaps)
+  - Implement createJobTools trace API against the real telemetry tracer
+  - units: ['plugins/workers']
+  - gaps: ['workers-jobtools-trace-noop']
+- **workers-queueprovider-thread-through** [medium] (1 gaps)
+  - Thread resolved workers queueProvider into createQueue and add Postgres auto-discovery
+  - units: ['plugins/workers', 'packages/queue']
+  - gaps: ['xcut-workers-queueprovider-dropped-input']
+
+### Wave B (30 slices)
+- **gs-service-runtime-drain-wiring** [blocker] (2 gaps) deps=['service-graceful-shutdown']
+  - Wire workers & sagas HTTP services to drain their runtimes on shutdown
+  - units: ['packages/plugin-workers-core', 'plugins/sagas']
+  - gaps: ['graceful-shutdown-workers-runtime-stop-never-called-by-service', 'graceful-shutdown-saga-runtime-stop-never-called-by-service']
+- **rbp-max-delivery-and-postgres-cap** [blocker] (2 gaps) deps=['rbp-dlq-contract']
+  - Max-delivery cap routing poison messages to DLQ (native-retry + Postgres)
+  - units: ['packages/queue']
+  - gaps: ['reliability-backpressure-no-max-delivery-poison-loop', 'reliability-backpressure-postgres-deliverycount-not-persisted-to-context']
+- **rbp-runtime-concurrency-and-parallel-context** [blocker] (2 gaps) deps=['rbp-adapter-concurrency']
+  - Enforce scaling.concurrency on the job queue + real MessageContext in the parallel wrapper
+  - units: ['packages/queue', 'packages/plugin-workers-core']
+  - gaps: ['reliability-backpressure-concurrency-budget-unenforced-jobs', 'reliability-backpressure-parallel-wrapper-fake-context']
+- **sagas-compensator-wiring** [blocker] (1 gaps) deps=['sagas-durable-store']
+  - Wire SagaCompensator + resolveCompensation backed by the saga store
+  - units: ['plugins/sagas']
+  - gaps: ['sagas-runtime-no-compensator-wired']
+- **service-auth-consumer-wiring** [blocker] (2 gaps) deps=['service-auth-seam', 'service-hardening-middleware']
+  - Gate trigger admin/read and plugin management endpoints behind the auth seam
+  - units: ['packages/service', 'plugins/triggers', 'plugins/workers/services', 'plugins/sagas/services']
+  - gaps: ['security-auth-unauthenticated-admin-endpoints', 'security-auth-plugin-services-unauthenticated']
+- **boot-connectivity-and-config-secret-validation** [high] (4 gaps) deps=['boot-fail-fast-validation']
+  - Fail-fast on missing Redis/KV + DB connectivity and validate config/webhook secrets at boot
+  - units: ['packages/config', 'packages/kv', 'plugins/* service main.ts', 'cross-cutting/config-secrets-boot']
+  - gaps: ['config-secrets-boot-kv-redis-silent-localhost-fallback', 'config-secrets-boot-db-connectivity-hook-logs-not-aborts', 'config-secrets-boot-config-schema-validates-shape-not-secrets', 'config-secrets-boot-webhook-secret-undefined-at-boot']
+- **config-inspect-and-saga-provider-honesty** [medium] (2 gaps) deps=['sagas-durable-store']
+  - Deepen inspectConfig coverage and reconcile saga store/transport provider enums with wired adapters
+  - units: ['config']
+  - gaps: ['config-inspect-config-shallow', 'config-saga-store-transport-providers-inert']
+- **database-postgres-env-discovery** [medium] (1 gaps) deps=['database-provider-and-factory-surface']
+  - Add Postgres getConfigFromEnv/getConfig Aspire helpers
+  - units: ['database']
+  - gaps: ['database-postgres-no-env-discovery']
+- **multi-tenancy-context-enforcement** [high] (1 gaps) deps=['multi-tenancy-tenant-primitive']
+  - Structured validated tenant claim on per-request context with require-tenant guard
+  - units: ['packages/service']
+  - gaps: ['multi-tenancy-context-unenforced-opaque-record']
+- **mysql-connect-surface-and-pool** [high] (5 gaps) deps=['mysql-field-metadata-and-row-detection']
+  - Honor onConnectionError, connectionLimit/pool/TLS options, per-connection capabilities, and driver types
+  - units: ['packages/prisma-adapter-mysql', 'cross-cutting/data-layer-ops']
+  - gaps: ['prisma-mysql-onconnectionerror-dropped', 'prisma-mysql-capabilities-cached-on-factory', 'prisma-mysql-deno-driver-type-drift', 'data-layer-ops-mysql-pool-default-one', 'data-layer-ops-mysql-connectionlimit-dropped']
+- **mysql-execute-script** [medium] (2 gaps) deps=['mysql-field-metadata-and-row-detection']
+  - Implement MySQL executeScript multi-statement execution
+  - units: ['packages/prisma-adapter-mysql', 'cross-cutting/data-layer-ops']
+  - gaps: ['prisma-mysql-executescript-not-implemented', 'data-layer-ops-mysql-executescript-notimplemented']
+- **plugin-lifecycle-hook-invocation** [high] (1 gaps) deps=['plugin-filesystem-disk-adapter-and-host']
+  - Invoke plugin lifecycle hooks across the host/generate lifecycle
+  - units: ['plugin']
+  - gaps: ['plugin-lifecycle-hooks-dropped']
+- **plugin-manifest-contract-hardening** [medium] (2 gaps) deps=['plugin-walker-ast-and-watch']
+  - Type-strict plugin manifest schema + explicit registry id contract
+  - units: ['plugin']
+  - gaps: ['plugin-manifest-schema-shallow-contributions', 'plugin-registry-emitter-implicit-id-contract']
+- **queue-dedup-delivery-and-docs** [high] (2 gaps) deps=['worker-applied-keys-dedup']
+  - Relocate queue dedup guarantee to delivery path + document at-least-once + align trigger window
+  - units: ['packages/queue', 'cross-cutting/idempotency-e2e']
+  - gaps: ['idempotency-e2e-queue-dedup-enqueue-only', 'idempotency-e2e-trigger-completed-window-replay-gap']
+- **queue-retry-options-threading** [medium] (1 gaps) deps=['queue-settlement-dlq']
+  - Thread QueueOptions.retryAttempts/retryDelay into the adapter retry layer
+  - units: ['queue']
+  - gaps: ['queue-retry-options-unconsumed']
+- **rbp-backpressure-propagation** [high] (1 gaps) deps=['rbp-adapter-concurrency']
+  - Bounded in-flight budget and enqueue backpressure signal
+  - units: ['packages/queue']
+  - gaps: ['reliability-backpressure-no-backpressure-propagation']
+- **release-jsr-doc-lint-gate** [high] (2 gaps) deps=['release-jsr-lock-reproducibility']
+  - Add deno doc --lint over full export maps to the publish gate and fix queue doc-lint errors
+  - units: ['packages/queue', 'cross-cutting/release-jsr']
+  - gaps: ['release-jsr-publish-gate-misses-full-export-doc-lint', 'release-jsr-doc-lint-node-types-resolution-noise']
+- **runtime-config-consumer-wiring** [high] (1 gaps) deps=['triggers-enable-disable-consumption', 'workers-dispatch-attempt-management', 'sagas-durable-store']
+  - Wire runtime-config override accessors into triggers/workers/sagas runtimes
+  - units: ['runtime-config', 'plugins/triggers', 'plugins/workers', 'plugins/sagas']
+  - gaps: ['runtime-config-overrides-never-applied-by-any-consumer']
+- **sagas-durability-tiers-t2-t3** [high] (1 gaps) deps=['sagas-durable-store']
+  - Implement t2 outbox + t3 history-store durability tiers
+  - units: ['packages/plugin-sagas-core']
+  - gaps: ['sagas-core-t2-t3-durability-dropped']
+- **sagas-ingress-semantics** [medium] (1 gaps) deps=['sagas-durable-store']
+  - Durable ingress for unmatched message types instead of throwing sagaNotFound
+  - units: ['plugins/sagas']
+  - gaps: ['sagas-publish-no-handler-throws-saganotfound']
+- **sagas-scheduler-and-cron** [high] (3 gaps) deps=['sagas-durable-store']
+  - Durable SagaSchedulerStorePort + clock + cron driver consuming schedule()
+  - units: ['packages/plugin-sagas-core', 'plugins/sagas']
+  - gaps: ['sagas-core-scheduler-store-no-impl', 'sagas-core-cron-schedule-dropped', 'sagas-runtime-no-scheduler-wired']
+- **sagas-state-event-propagation** [medium] (2 gaps) deps=['sagas-durable-store']
+  - Emit live saga state-change events to SSE and the durable stream mirror
+  - units: ['plugins/sagas']
+  - gaps: ['sagas-sse-state-changed-never-emitted', 'sagas-stream-mirror-bootstrap-only-no-live-updates']
+- **sagas-workers-client** [high] (2 gaps) deps=['workers-dispatch-attempt-management']
+  - Concrete SagaWorkersClientPort over the workers trigger surface (G4)
+  - units: ['packages/plugin-sagas-core', 'plugins/sagas']
+  - gaps: ['sagas-core-workers-client-interface-only', 'sagas-workers-client-port-interface-only']
+- **streams-consumer-subscribe** [medium] (2 gaps) deps=['streams-producer-durability']
+  - Typed consumer/subscriber primitive + durable producer/consumer runtime over the streams client (G3)
+  - units: ['plugin-streams-core', 'plugins/streams']
+  - gaps: ['streams-core-no-consumer-or-subscribe-surface', 'streams-define-consumer-throws']
+- **supply-chain-release-publish-workflow** [medium] (1 gaps) deps=['supply-chain-required-audit-gate', 'supply-chain-frozen-lockfile-ci', 'supply-chain-license-compliance']
+  - Release/publish workflow gating on frozen-lock + full audit + license + readiness
+  - units: ['.github/workflows']
+  - gaps: ['supply-chain-no-publish-gate-workflow']
+- **supply-chain-scheduled-audit-and-drift** [medium] (2 gaps) deps=['supply-chain-required-audit-gate']
+  - Scheduled advisory audit and governed pinned-version drift signal
+  - units: ['.github/workflows', 'issue automation', '.llm/tools/deps']
+  - gaps: ['supply-chain-no-scheduled-advisory-audit', 'supply-chain-freshness-report-only']
+- **triggers-durable-stream-wiring** [high] (1 gaps) deps=['streams-consumer-subscribe']
+  - Wire the durable trigger-event stream producer into the live service (G3 consumer)
+  - units: ['plugins/triggers']
+  - gaps: ['triggers-durable-stream-producer-never-wired']
+- **triggers-persistent-scheduled** [medium] (1 gaps) deps=['triggers-defer']
+  - Persistent KV-backed scheduled triggers surviving restart
+  - units: ['plugins/triggers']
+  - gaps: ['triggers-persistent-scheduled-unsupported']
+- **triggers-reserved-surface-and-manual-fire** [medium] (3 gaps) deps=['streams-consumer-subscribe', 'workers-dispatch-attempt-management']
+  - Gate or implement reserved queue/stream/manual trigger kinds + manual-fire contract handlers
+  - units: ['plugin-triggers-core', 'plugins/triggers']
+  - gaps: ['triggers-core-reserved-kinds-inert-surface', 'triggers-core-manual-fire-contract-no-runtime', 'xcut-triggers-reserved-kinds-inert-public-surface']
+- **workers-lifecycle-dispatcher-impls** [medium] (1 gaps) deps=['workers-durable-default-runtime']
+  - Concrete JobScheduler/JobDispatcher/JobLifecycleAdapter implementations or retract the abstracts
+  - units: ['plugin-workers-core']
+  - gaps: ['workers-core-lifecycle-dispatcher-abstracts-no-impl']
+
+### Wave C (11 slices)
+- **rbp-worker-nack-and-retry-policy** [blocker] (2 gaps) deps=['rbp-max-delivery-and-postgres-cap']
+  - Worker dispatch nacks on failure and consumes jobDef.maxRetries/retryDelay
+  - units: ['packages/plugin-workers-core', 'packages/queue']
+  - gaps: ['reliability-backpressure-worker-never-nacks', 'reliability-backpressure-jobdef-maxretries-unconsumed']
+- **sagas-cascade-runtime** [blocker] (2 gaps) deps=['sagas-durable-store', 'sagas-scheduler-and-cron', 'sagas-compensator-wiring']
+  - Implement spawn cascade and wire scheduler/compensator for schedule/fail/compensate cascades in the service root
+  - units: ['plugins/sagas']
+  - gaps: ['xcut-saga-spawn-cascade-notimplemented', 'xcut-saga-schedule-compensate-inert-in-service']
+- **examples-orchestration-exemplar** [high] (2 gaps) deps=['mysql-field-metadata-and-row-detection', 'triggers-saga-dispatch-action', 'sagas-workers-client', 'streams-consumer-subscribe']
+  - Runnable end-to-end exemplar exercising trigger->saga->worker->stream as a real workspace member
+  - units: ['examples/', 'plugins/triggers', 'plugins/sagas', 'plugins/workers', 'plugins/streams']
+  - gaps: ['examples-apps-orchestration-matrix-exemplar-missing', 'examples-apps-no-workspace-members']
+- **gs-drain-window-and-readiness** [high] (2 gaps) deps=['gs-service-runtime-drain-wiring', 'service-graceful-shutdown']
+  - Bounded in-flight drain window and readiness-flip during shutdown
+  - units: ['packages/service', 'packages/plugin-workers-core']
+  - gaps: ['graceful-shutdown-no-in-flight-grace-period-or-drain-timeout', 'graceful-shutdown-readiness-not-flipped-on-drain']
+- **multi-tenancy-db-scoping** [high] (1 gaps) deps=['multi-tenancy-context-enforcement']
+  - Per-tenant database scoping layer (RLS / search_path / filter)
+  - units: ['packages/database']
+  - gaps: ['multi-tenancy-no-db-scoping']
+- **multi-tenancy-work-payload-propagation** [high] (1 gaps) deps=['multi-tenancy-context-enforcement']
+  - Thread tenant identity into queue/saga/trigger payload envelopes
+  - units: ['packages/contracts', 'plugins/workers', 'plugins/sagas', 'plugins/triggers']
+  - gaps: ['multi-tenancy-no-tenant-in-work-payloads']
+- **release-jsr-automated-publish** [high] (1 gaps) deps=['release-jsr-lock-reproducibility', 'release-jsr-doc-lint-gate', 'release-jsr-slow-type-tightening']
+  - Tag-triggered JSR publish workflow with OIDC + SLSA provenance
+  - units: ['cross-cutting/release-jsr', '.github/workflows']
+  - gaps: ['release-jsr-no-publish-job']
+- **runtime-config-shape-validation-and-version-exposure** [low] (1 gaps) deps=['runtime-config-consumer-wiring']
+  - Validate topic-file override shapes and expose loaded pointer version
+  - units: ['runtime-config']
+  - gaps: ['runtime-config-pointer-version-and-job-override-fields-unvalidated']
+- **sagas-engine-dispatch-completion** [high] (4 gaps) deps=['sagas-durable-store', 'sagas-scheduler-and-cron', 'sagas-compensator-wiring']
+  - Implement engine signal/query, spawn, and non-send dispatchCascaded
+  - units: ['packages/plugin-sagas-core', 'plugins/sagas']
+  - gaps: ['sagas-core-signal-query-notimpl', 'sagas-core-spawn-notimpl', 'sagas-engine-signal-query-notimplemented', 'sagas-engine-spawn-and-nonsend-cascade-notimplemented']
+- **streams-runtime-cli** [high] (1 gaps) deps=['streams-consumer-subscribe']
+  - Implement StreamsCli verbs (topic walker + publish/subscribe/stats/clear)
+  - units: ['plugins/streams']
+  - gaps: ['streams-cli-fully-stubbed']
+- **triggers-saga-dispatch-action** [medium] (2 gaps) deps=['sagas-durable-store', 'sagas-cascade-runtime']
+  - Add StartSagaAction trigger action + SagaTriggerClientPort (G2)
+  - units: ['plugin-triggers-core', 'plugins/triggers', 'plugins/sagas']
+  - gaps: ['triggers-core-no-saga-dispatch-action', 'xcut-trigger-action-union-no-saga-dispatch']
+
+### Wave D (5 slices)
+- **examples-apps-exemplar-and-ci-wiring** [medium] (2 gaps) deps=['examples-orchestration-exemplar']
+  - Repoint the scaffold main.ts template at the committed exemplar and wire examples into CI gates
+  - units: ['examples/', 'packages/cli']
+  - gaps: ['examples-apps-excluded-from-ci-gates', 'examples-apps-dangling-playground-reference']
+- **multi-tenancy-noisy-neighbor** [medium] (1 gaps) deps=['multi-tenancy-context-enforcement', 'multi-tenancy-work-payload-propagation']
+  - Per-tenant rate limiting, quota, and fair-share concurrency
+  - units: ['packages/service', 'plugins/workers']
+  - gaps: ['multi-tenancy-no-noisy-neighbor-protection']
+- **rbp-delivery-guarantee-declared-tested** [medium] (1 gaps) deps=['rbp-dlq-contract', 'rbp-max-delivery-and-postgres-cap', 'rbp-worker-nack-and-retry-policy']
+  - Make nativeRetrial truthful per adapter + delivery-guarantee fitness tests
+  - units: ['packages/queue']
+  - gaps: ['reliability-backpressure-delivery-guarantee-undeclared-untested']
+- **streams-deferred-scope-tracker** [medium] (1 gaps) deps=['streams-runtime-cli', 'streams-production-transport', 'streams-consumer-subscribe']
+  - Close streams deferred-scope backbone and set prime-time posture
+  - units: ['plugins/streams']
+  - gaps: ['streams-deferred-scope-block']
+- **triggers-file-import-saga-dispatch** [low] (1 gaps) deps=['triggers-saga-dispatch-action']
+  - Dispatch or downgrade the file-import saga message
+  - units: ['plugins/triggers']
+  - gaps: ['triggers-file-import-sagamessage-dropped']

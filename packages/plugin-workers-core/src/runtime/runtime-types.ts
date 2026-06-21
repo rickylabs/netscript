@@ -138,6 +138,7 @@ export type JobMessage = Readonly<
     readonly triggeredBy: string;
     readonly triggeredAt?: string;
     readonly payload?: Record<string, unknown>;
+    readonly idempotencyKey?: string;
     readonly priority?: number;
     readonly correlationId?: string;
     readonly traceparent?: string;
@@ -153,6 +154,7 @@ export type TaskMessage = Readonly<
     readonly triggeredBy: string;
     readonly triggeredAt?: string;
     readonly payload?: Record<string, unknown>;
+    readonly idempotencyKey?: string;
     readonly priority?: number;
     readonly correlationId?: string;
     readonly traceparent?: string;

@@ -1365,3 +1365,315 @@ a.ns-card:focus-visible {
     max-width: 160px;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   Docs v3 foundation components (S01–S03). All rules key off the
+   fresh-ui --ns-* token palette and are additive / backward-compatible.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── comp.diagram (S01): committed-SVG figure ───────────────────── */
+.ns-diagram {
+  margin: var(--ns-space-6) 0;
+  padding: var(--ns-space-4);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-surface);
+  text-align: center;
+}
+
+.ns-diagram__img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.ns-diagram__caption {
+  margin-top: var(--ns-space-3);
+  font-size: var(--ns-text-sm);
+  color: var(--ns-muted-fg);
+  line-height: var(--ns-leading-snug);
+}
+
+/* ─── comp.xref (S02): resolved cross-reference link ─────────────── */
+.ns-xref {
+  color: var(--ns-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.ns-xref:hover,
+.ns-xref:focus-visible {
+  color: var(--ns-primary-hover);
+}
+
+/* ─── comp.badge (S03): status badges ────────────────────────────── */
+.ns-badge--stable,
+.ns-badge--alpha,
+.ns-badge--partial {
+  padding: 0.125rem var(--ns-space-2);
+  border-radius: var(--ns-radius-sm);
+  border: 1px solid var(--ns-border);
+  font-family: var(--ns-font-mono);
+  font-size: 0.67rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--ns-tracking-wide);
+}
+
+.ns-badge--stable {
+  color: var(--ns-success);
+  background: var(--ns-success-subtle);
+  border-color: var(--ns-success-border);
+}
+
+.ns-badge--alpha {
+  color: var(--ns-warning);
+  background: var(--ns-warning-subtle);
+  border-color: var(--ns-warning-border);
+}
+
+.ns-badge--partial {
+  color: var(--ns-secondary);
+  background: var(--ns-secondary-subtle);
+  border-color: var(--ns-secondary-border);
+}
+
+/* ─── comp.cardsGrid (S03): Learn/Do/Reference triplet grid ──────── */
+.ns-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--ns-space-4);
+  margin: var(--ns-space-6) 0;
+}
+
+@media (min-width: 720px) {
+  .ns-cards-grid[data-columns="2"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ns-cards-grid[data-columns="3"],
+  .ns-cards-grid[data-columns="4"] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .ns-cards-grid[data-columns="3"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ns-cards-grid[data-columns="4"] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.ns-cards-grid__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-2);
+  padding: var(--ns-space-4);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-card);
+  color: var(--ns-card-fg);
+  text-decoration: none;
+}
+
+a.ns-cards-grid__card:hover,
+a.ns-cards-grid__card:focus-visible {
+  border-color: var(--ns-border-hover);
+  box-shadow: var(--ns-shadow-sm);
+}
+
+a.ns-cards-grid__card:focus-visible {
+  outline: 2px solid var(--ns-ring);
+  outline-offset: 2px;
+}
+
+.ns-cards-grid__eyebrow {
+  font-family: var(--ns-font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--ns-tracking-wide);
+  color: var(--ns-primary);
+}
+
+.ns-cards-grid__head {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ns-space-2);
+}
+
+.ns-cards-grid__icon {
+  color: var(--ns-muted-fg);
+}
+
+.ns-cards-grid__title {
+  font-weight: 600;
+  color: var(--ns-fg);
+}
+
+.ns-cards-grid__body {
+  margin: 0;
+  font-size: var(--ns-text-sm);
+  color: var(--ns-muted-fg);
+  line-height: var(--ns-leading-snug);
+}
+
+/* ─── comp.fileTree (S03): project file tree ─────────────────────── */
+.ns-file-tree {
+  list-style: none;
+  margin: var(--ns-space-4) 0;
+  padding: 0;
+  font-family: var(--ns-font-mono);
+  font-size: var(--ns-text-sm);
+  line-height: var(--ns-leading-relaxed);
+}
+
+.ns-file-tree--root {
+  padding: var(--ns-space-4);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+  background: var(--ns-surface);
+}
+
+.ns-file-tree .ns-file-tree {
+  margin: 0;
+  padding: 0 0 0 var(--ns-space-4);
+  border: 0;
+  background: transparent;
+  border-left: 1px solid var(--ns-border);
+  margin-left: var(--ns-space-2);
+}
+
+.ns-file-tree__row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ns-space-2);
+}
+
+.ns-file-tree__icon {
+  color: var(--ns-muted-fg);
+  flex: none;
+}
+
+.ns-file-tree__item--dir > .ns-file-tree__row > .ns-file-tree__name {
+  color: var(--ns-fg);
+  font-weight: 500;
+}
+
+.ns-file-tree__name {
+  color: var(--ns-card-fg);
+}
+
+.ns-file-tree__comment {
+  color: var(--ns-muted-fg);
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* ─── On-page TOC (S03): scroll-spy right rail / collapsible mobile ─ */
+.ns-toc__summary {
+  appearance: none;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-family: var(--ns-font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ns-muted-fg);
+  opacity: 0.7;
+  margin-bottom: var(--ns-space-3);
+}
+
+.ns-toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ns-space-1);
+}
+
+.ns-toc.is-collapsed .ns-toc__list {
+  display: none;
+}
+
+.ns-toc__item--h3 {
+  padding-left: var(--ns-space-3);
+  font-size: var(--ns-text-xs);
+}
+
+.ns-toc__link {
+  color: var(--ns-muted-fg);
+  text-decoration: none;
+  display: block;
+  padding: 2px 0 2px var(--ns-space-3);
+  border-left: 2px solid transparent;
+  line-height: var(--ns-leading-snug);
+}
+
+.ns-toc__link:hover {
+  color: var(--ns-fg);
+}
+
+.ns-toc__link.is-active {
+  color: var(--ns-primary);
+  border-left-color: var(--ns-primary);
+}
+
+/* On mobile the TOC renders as a collapsible block above the article
+   (the base .ns-toc rule hides at <1100px; override for the data-toc variant). */
+@media (max-width: 1099px) {
+  .ns-toc[data-toc]:not([hidden]) {
+    display: block;
+    position: static;
+    margin: 0 0 var(--ns-space-4);
+    padding: var(--ns-space-3) var(--ns-space-4);
+    border: 1px solid var(--ns-border);
+    border-radius: var(--ns-radius-md);
+    background: var(--ns-surface);
+  }
+}
+
+/* ─── Code-copy buttons (S03) ─────────────────────────────────────── */
+.ns-pre--copyable {
+  position: relative;
+}
+
+.ns-copy-btn {
+  position: absolute;
+  top: var(--ns-space-2);
+  right: var(--ns-space-2);
+  appearance: none;
+  cursor: pointer;
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-sm);
+  background: var(--ns-surface-raised);
+  color: var(--ns-muted-fg);
+  font-family: var(--ns-font-mono);
+  font-size: 0.67rem;
+  padding: 0.125rem var(--ns-space-2);
+  opacity: 0;
+  transition: opacity var(--ns-ease-normal), color var(--ns-ease-normal);
+}
+
+.ns-pre--copyable:hover .ns-copy-btn,
+.ns-copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.ns-copy-btn:hover {
+  color: var(--ns-fg);
+  border-color: var(--ns-border-hover);
+}
+
+.ns-copy-btn.is-copied {
+  color: var(--ns-success);
+  border-color: var(--ns-success-border);
+  opacity: 1;
+}

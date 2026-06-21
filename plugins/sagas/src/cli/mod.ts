@@ -1,3 +1,9 @@
+/**
+ * CLI commands and local project adapters for sagas plugin operations.
+ *
+ * @module
+ */
+
 export { LocalProjectFiles } from './adapters/local-project-files.ts';
 export type {
   PluginCli,

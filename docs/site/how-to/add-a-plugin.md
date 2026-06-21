@@ -28,7 +28,7 @@ A plugin is an <strong>installable capability</strong> — a background-job runt
 orchestrator, an auth service — that scaffolds its own workspace folder, registers itself in
 your runtime, and (where applicable) runs as its own Aspire service on a dedicated port. Your
 application service and your plugins run side by side. See
-<a href="/explanation/plugin-model/">Plugin architecture</a> for the design behind the model.
+<a href="/explanation/plugin-system/">Plugin architecture</a> for the design behind the model.
 {{ /comp }}
 
 ## Before you start
@@ -36,7 +36,7 @@ application service and your plugins run side by side. See
 You need:
 
 - **An existing NetScript workspace.** If you do not have one yet, create it first with
-  `netscript init` — walk through [Your first workspace](/tutorials/first-workspace/) or the
+  `netscript init` — walk through the [Quickstart](/quickstart/) or the
   [tutorials index](/tutorials/).
 - **The `netscript` command on your path.** Run `netscript --help` to confirm it resolves,
   and `netscript plugin --help` for the exact option spelling in your installed version. If
@@ -73,7 +73,7 @@ registries, ports, and docs all assume it.
     ["<code>worker</code>", "<code>workers</code>", "<code>@netscript/plugin-workers</code>", "8091", "<a href=\"/reference/workers/\">workers</a>"],
     ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "8092", "<a href=\"/reference/sagas/\">sagas</a>"],
     ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "8093", "<a href=\"/reference/triggers/\">triggers</a>"],
-    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "8094", "<a href=\"/reference/plugin-auth-core/\">auth</a>"],
+    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "8094", "<a href=\"/capabilities/auth/\">auth</a>"],
     ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "4437", "<a href=\"/reference/streams/\">streams</a>"]
   ]
 } /}}
@@ -237,7 +237,7 @@ Run `netscript plugin --help` for the complete, version-accurate command set.
     { title: "workers", body: "Background jobs, scheduling, task execution.", href: "/reference/workers/" },
     { title: "sagas", body: "Durable saga orchestration (kv | prisma store).", href: "/reference/sagas/" },
     { title: "triggers", body: "Trigger ingress, scheduling, file watching.", href: "/reference/triggers/" },
-    { title: "auth", body: "oRPC auth service with a selectable backend.", href: "/reference/plugin-auth-core/" },
+    { title: "auth", body: "oRPC auth service with a selectable backend.", href: "/capabilities/auth/" },
     { title: "streams", body: "Durable change-data stream producers.", href: "/reference/streams/" },
     { title: "All packages", body: "Browse the full package and plugin index.", href: "/reference/" }
   ]
@@ -248,7 +248,7 @@ Run `netscript plugin --help` for the complete, version-accurate command set.
 - **Build on the plugin you just added.** Next up:
   [Add a service](/how-to/add-a-service/) to give the plugin something to call, or
   [Configure authentication](/how-to/add-authentication/) if you added the auth plugin.
-- **Understand the model.** Read [Plugin architecture](/explanation/plugin-model/) for
+- **Understand the model.** Read [Plugin architecture](/explanation/plugin-system/) for
   the design behind installable capabilities, ports, and runtime registration.
 - **Browse capabilities.** The [capabilities](/capabilities/) section maps each plugin to the
   problem it solves, with runnable examples.

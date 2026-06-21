@@ -1,0 +1,10 @@
+{
+  "name": "@json-smoke/contracts",
+  "version": "0.1.0",
+  "exports": "./mod.ts",
+  "imports": {
+    "@orpc/contract": "npm:@orpc/contract@^1.14.6",
+    "@orpc/server": "npm:@orpc/server@^1.14.6",
+    "zod": "npm:zod@^4.3.6"
+  }
+}

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" role="img"
+     aria-label="enqueueJob to queue to worker runtime selector with three modes to result store, plus a cron scheduler"
+     font-family="DM Sans, Segoe UI, system-ui, sans-serif">
+  <title>Queue, worker runtime, and scheduler</title>
+  <desc>enqueueJob feeds a queue, a worker runtime selector chooses among in-process,
+        web-worker, and subprocess modes, results land in a job result store, and a cron
+        scheduler feeds scheduled jobs into the same queue.</desc>
+  <!-- Theme-neutral: transparent background, mid-tone (#888) strokes + text.
+       Source: _diagrams/queue-worker-scheduler.mmd -->
+  <defs>
+    <marker id="ns-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+            markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888" />
+    </marker>
+  </defs>
+
+  <text x="410" y="26" fill="#888888" font-size="13" text-anchor="middle"
+        font-weight="600">Queue, worker runtime, and scheduler</text>
+
+  <g fill="none" stroke="#888888" stroke-width="1.5">
+    <!-- enqueueJob -->
+    <rect x="20"  y="120" width="130" height="48" rx="6" />
+    <!-- queue -->
+    <rect x="210" y="120" width="130" height="48" rx="6" />
+    <!-- worker runtime selector -->
+    <rect x="400" y="116" width="170" height="56" rx="6" stroke-dasharray="5 3" />
+    <!-- job result store -->
+    <rect x="650" y="120" width="150" height="48" rx="6" />
+
+    <!-- enqueue -> queue -->
+    <line x1="150" y1="144" x2="206" y2="144" marker-end="url(#ns-arrow)" />
+    <!-- queue -> selector -->
+    <line x1="340" y1="144" x2="396" y2="144" marker-end="url(#ns-arrow)" />
+    <!-- selector -> result store -->
+    <line x1="570" y1="144" x2="646" y2="144" marker-end="url(#ns-arrow)" />
+
+    <!-- three runtime modes -->
+    <rect x="380" y="232" width="130" height="42" rx="6" />
+    <rect x="380" y="284" width="130" height="42" rx="6" />
+    <rect x="540" y="232" width="130" height="42" rx="6" />
+
+    <!-- selector -> modes -->
+    <path d="M 460 172 L 445 230" marker-end="url(#ns-arrow)" />
+    <path d="M 470 172 C 470 200, 445 256, 446 282" marker-end="url(#ns-arrow)" />
+    <path d="M 500 172 C 540 200, 590 210, 600 230" marker-end="url(#ns-arrow)" />
+
+    <!-- cron scheduler -->
+    <rect x="210" y="232" width="130" height="48" rx="6" />
+    <!-- scheduler -> queue (scheduled jobs) -->
+    <path d="M 275 232 L 275 170" marker-end="url(#ns-arrow)" />
+  </g>
+
+  <!-- primary labels -->
+  <g fill="#888888" font-size="13" text-anchor="middle">
+    <text x="85"  y="149">enqueueJob</text>
+    <text x="275" y="149">Queue</text>
+    <text x="485" y="141">Worker runtime</text>
+    <text x="485" y="157">selector</text>
+    <text x="725" y="149">Job result store</text>
+
+    <text x="445" y="258">in-process</text>
+    <text x="445" y="310">web-worker</text>
+    <text x="605" y="258">subprocess</text>
+
+    <text x="275" y="261">Cron scheduler</text>
+  </g>
+
+  <!-- secondary captions -->
+  <g fill="#888888" font-size="11" text-anchor="middle" opacity="0.85">
+    <text x="275" y="221">scheduled jobs</text>
+    <text x="640" y="200">runtime modes</text>
+  </g>
+</svg>

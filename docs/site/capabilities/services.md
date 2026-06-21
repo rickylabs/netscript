@@ -16,6 +16,12 @@ same object a typed client imports is the one the server implements, so caller a
 **cannot drift**. The example `users` service answers on port **3001** with both an
 OpenAPI surface (`/api/v1/users/*`) and a typed oRPC endpoint (`/api/rpc/*`).
 
+{{ comp.diagram({
+  src: "/assets/diagrams/request-lifecycle.svg",
+  alt: "A browser request flows into the service router, through middleware to the matched contract handler, optionally to the database, and back as a typed response.",
+  caption: "Request lifecycle: browser → service router → middleware → contract handler → database → typed response."
+}) }}
+
 {{ comp callout { type: "tip", title: "Use this when" } }}
 Reach for a service when you need a <strong>synchronous, request/response API</strong> with
 a versioned, type-locked contract shared between front end and back end — a CRUD surface,
@@ -27,6 +33,40 @@ off work</em> use a <a href="/capabilities/triggers/">trigger</a>; for
 <em>signed-in identity and sessions</em> compose the
 <a href="/capabilities/auth/">auth plugin</a>.
 {{ /comp }}
+
+## What it is
+
+A service is the **Layer 3 preset** (`defineService`) over a three-layer package. Layer 1 is
+small primitives — health, error, RPC, OpenAPI, and Scalar docs handlers you can mount in any
+Hono app. Layer 2 is `createService()`, a fluent builder that materializes a mountable
+`ServiceApp` (via `build()`) or starts a Deno listener (via `serve()`). Layer 3 is
+`defineService()`, the curated one-call preset used by generated service entrypoints. Every
+layer takes the oRPC router as its input, and the same contract the router implements is the
+one a typed client imports — so a renamed field is a compile error on both sides. The full
+type story is in [Contracts](/explanation/contracts/).
+
+## Learn → / Do →
+
+{{ comp.featureGrid({ items: [
+  {
+    title: "Learn — Build a service",
+    body: "Track A 02: author a contract, stand up the users service on :3001, call it from a typed client.",
+    href: "/tutorials/storefront/02-catalog-service/",
+    icon: "→"
+  },
+  {
+    title: "Do — Expose OpenAPI & Scalar",
+    body: "Recipe: turn on the generated OpenAPI spec and the Scalar docs UI for an existing service.",
+    href: "/how-to/expose-openapi-scalar/",
+    icon: "◆"
+  },
+  {
+    title: "Do — Graceful shutdown",
+    body: "Recipe: drain in-flight requests and run teardown hooks on SIGINT/SIGTERM before the process exits.",
+    href: "/how-to/graceful-shutdown/",
+    icon: "◆"
+  }
+] }) }}
 
 ## The contract is the source of truth
 
@@ -80,6 +120,25 @@ the same Hono + oRPC runtime; `defineService` is a curated preset over the same 
   }
 ] }) }}
 
+### `defineService(router, options)` — the preset options
+
+`DefineServiceOptions` extends the base `ServiceConfig` (`name`, `version`, `port`) and adds
+the preset-only keys below. These are the **complete** option keys confirmed against the
+package surface — nothing is omitted.
+
+{{ comp.apiTable({
+  caption: "DefineServiceOptions (extends ServiceConfig)",
+  rows: [
+    { name: "name", type: "string (required)", desc: "Service name used for logging, telemetry, and health-check labels." },
+    { name: "version", type: "string?", desc: "Service version (e.g. '1.0.0'); surfaced on /health and the OpenAPI spec." },
+    { name: "port", type: "number?", desc: "Default listener port if serve() is not passed an explicit port. The generated entrypoint reads Deno.env.get('PORT') || '3001'." },
+    { name: "db", type: "DbContext?", desc: "Database context injected as context.db. Accepts a single Prisma client (with $queryRaw) or a multi-db record like { netscript, mdb, prosco, prev }; the first value exposing $queryRaw is auto-wired as the /health and /health/ready probe client." },
+    { name: "openapi", type: "{ title?; description? }?", desc: "Turns on the generated OpenAPI spec endpoint and the Scalar docs UI with this title/description." },
+    { name: "debug", type: "boolean?", desc: "Enables verbose oRPC logging. Defaults to the NETSCRIPT_DEBUG env var." },
+    { name: "auth", type: "{ authn: AuthnOptions; authz?: AuthzOptions }?", desc: "Installs the authentication (and optional authorization) gate on guarded paths — the preset form of .withAuthn()/.withAuthz()." }
+  ]
+}) }}
+
 {{ comp callout { type: "note", title: "Handlers bind to the contract" } }}
 A router aggregates versioned handlers — <code>export const router = { v1: { users: { ...UsersV1, health } } }</code> —
 and each handler is bound from the implemented contract:
@@ -114,6 +173,138 @@ Services that touch the database need orchestration up first:
 but the real workflow expects Aspire running. See <a href="/explanation/aspire/">Aspire</a>.
 {{ /comp }}
 
+## OpenAPI spec & Scalar docs
+
+Passing `openapi` to `defineService` (or calling `.withOpenAPI().withDocs()` on the builder)
+turns on a REST surface generated from the same contract, a machine-readable OpenAPI JSON
+spec, and the **Scalar** interactive docs UI. Under the hood three Layer-1 primitives do the
+work, and you can mount them directly in any host Hono app when you need finer control:
+`createOpenAPISpec` serves the spec JSON, `createScalarDocs` serves the Scalar HTML page, and
+`createOpenAPIHandler` serves the REST routes themselves (it adds the `ZodSmartCoercionPlugin`
+so query-string values coerce to their schema types automatically).
+
+{{ comp.apiTable({
+  caption: "OpenAPI / Scalar primitives (@netscript/service)",
+  rows: [
+    { name: "createOpenAPISpec(router, config)", type: "→ ServiceHandler", desc: "Serves the OpenAPI JSON spec. config is OpenAPIConfig (see below). Mount at e.g. /api/openapi.json." },
+    { name: "createScalarDocs(options)", type: "→ ServiceHandler", desc: "Serves the Scalar docs UI HTML that loads the spec. options is ScalarDocsOptions (specUrl, title?, theme?)." },
+    { name: "createScalarJs()", type: "→ ServiceHandler", desc: "Serves the bundled Scalar JS so the docs UI works offline without CDN access." },
+    { name: "createOpenAPIHandler(router, config?)", type: "→ FetchHandler", desc: "The OpenAPI REST request handler (with ZodSmartCoercionPlugin). config is RPCHandlerConfig; mount under /api/*." }
+  ]
+}) }}
+
+{{ comp.apiTable({
+  caption: "OpenAPIConfig (createOpenAPISpec)",
+  rows: [
+    { name: "title", type: "string (required)", desc: "API title shown in the spec and docs." },
+    { name: "version", type: "string (required)", desc: "API version, e.g. '1.0.0'." },
+    { name: "description", type: "string?", desc: "Longer API description." },
+    { name: "servers", type: "Array<{ url; description? }>?", desc: "Server URLs advertised in the spec (e.g. staging vs. production base URLs)." }
+  ]
+}) }}
+
+{{ comp.apiTable({
+  caption: "ScalarDocsOptions (createScalarDocs)",
+  rows: [
+    { name: "specUrl", type: "string (required)", desc: "URL the docs UI fetches the OpenAPI spec from, e.g. '/api/openapi.json'." },
+    { name: "title", type: "string?", desc: "Docs page title." },
+    { name: "theme", type: "'default' | 'kepler' | 'moon' | 'purple' | 'saturn'", desc: "Scalar UI theme." }
+  ]
+}) }}
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "Preset — defineService({ openapi })",
+    lang: "ts",
+    code: "// services/users/src/main.ts\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// Turns on the OpenAPI spec + Scalar docs UI in one option.\nawait defineService(router, {\n  name: 'users',\n  version: '1.0.0',\n  port: 3001,\n  openapi: {\n    title: 'Users API',\n    description: 'User management service',\n  },\n});"
+  },
+  {
+    label: "Primitives — mount in a host app",
+    lang: "ts",
+    code: "// host/openapi-routes.ts — wire the primitives onto an existing Hono app\nimport {\n  createOpenAPISpec,\n  createScalarDocs,\n  createScalarJs,\n} from '@netscript/service';\nimport { router } from './router.ts';\n\napp.get('/api/openapi.json', createOpenAPISpec(router, {\n  title: 'Users API',\n  version: '1.0.0',\n  description: 'User management service',\n}));\n\napp.get('/api/docs', createScalarDocs({\n  specUrl: '/api/openapi.json',\n  title: 'Users API',\n  theme: 'kepler',\n}));\n\n// Serve Scalar offline (no CDN dependency)\napp.get('/api/docs/scalar.js', createScalarJs());"
+  }
+] }) }}
+
+## Health, readiness & liveness
+
+The preset wires `/health` automatically; the underlying primitives let you compose probes
+by hand or mount them in a host app. `createHealthHandler` runs every registered
+`HealthCheck` in parallel and returns an aggregate `HealthResponse`
+(`status` ∈ `healthy | degraded | unhealthy`). `createReadinessHandler` takes an array of
+async boolean checks and is the one to point an orchestrator's *readiness* probe at — it
+fails until dependencies (DB, caches) are reachable. `createLivenessHandler` is a bare
+"is the process up" probe that returns 200 with no dependency checks, for an orchestrator's
+*liveness* probe. The `healthChecks` namespace ships pre-built checks for the common
+dependencies so you don't hand-roll them.
+
+{{ comp.apiTable({
+  caption: "Health primitives & checks (@netscript/service)",
+  rows: [
+    { name: "createHealthHandler(options?)", type: "→ ServiceHandler", desc: "Runs all checks in parallel, returns an aggregate HealthResponse. options: HealthHandlerOptions { checks?, version?, includeDetails? (default true) }." },
+    { name: "createReadinessHandler(checks)", type: "→ ServiceHandler", desc: "Readiness probe: checks is Array<() => Promise<boolean>>; reports not-ready until every check resolves true. Mount at /health/ready." },
+    { name: "createLivenessHandler()", type: "→ ServiceHandler", desc: "Liveness probe: 200 OK while the process runs, no dependency checks. Mount at /health/live." },
+    { name: "healthChecks.database(db)", type: "→ HealthCheck", desc: "Pre-built DB probe; runs a $queryRaw `SELECT 1`-style ping against the Prisma client." },
+    { name: "healthChecks.kv()", type: "→ HealthCheck", desc: "Pre-built check for the KV store." },
+    { name: "healthChecks.service(name, baseUrl)", type: "→ HealthCheck", desc: "Probes another service's health endpoint by name + base URL." },
+    { name: "healthChecks.custom(name, fn)", type: "→ HealthCheck", desc: "Wraps your own async () => Promise<boolean> as a named check." }
+  ]
+}) }}
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "Compose probes by hand",
+    lang: "ts",
+    code: "// host/health-routes.ts — readiness + liveness + aggregate health\nimport {\n  createHealthHandler,\n  createLivenessHandler,\n  createReadinessHandler,\n  healthChecks,\n} from '@netscript/service';\nimport { db } from '@database';\n\n// Aggregate health (parallel checks + details)\napp.get('/health', createHealthHandler({\n  version: '1.0.0',\n  checks: [healthChecks.database(db)],\n}));\n\n// Liveness: is the process up?\napp.get('/health/live', createLivenessHandler());\n\n// Readiness: are dependencies reachable?\napp.get('/health/ready', createReadinessHandler([\n  async () => { await db.$queryRaw`SELECT 1`; return true; },\n]));"
+  }
+] }) }}
+
+{{ comp callout { type: "note", title: "Liveness vs. readiness" } }}
+Point an orchestrator's <strong>liveness</strong> probe at <code>/health/live</code> (restart
+the container only when the process is wedged) and its <strong>readiness</strong> probe at
+<code>/health/ready</code> (stop routing traffic until the DB and caches answer). Wiring both
+to the same dependency-checking endpoint is the classic footgun: a transient DB blip then
+triggers a <em>restart</em> instead of a brief traffic pause.
+{{ /comp }}
+
+## Graceful shutdown
+
+`serve()` installs SIGINT/SIGTERM (or SIGBREAK on Windows) handlers and drains in-flight
+requests before exiting. Register teardown work with `.onShutdown(hook)` on the builder — a
+`ShutdownHook` receives a `ShutdownContext` (`reason`, optional `signal`) and runs during the
+drain. The drain is bounded by `drainTimeoutMs` (default `30_000`); when it elapses the
+service stops anyway and the resulting `ShutdownReport` records `timedOut: true` plus a
+per-hook `ShutdownHookOutcome` for each registered hook. Calling `running.stop()` triggers
+the same drain manually (reason `'manual'`).
+
+{{ comp.apiTable({
+  caption: "Shutdown types (@netscript/service)",
+  rows: [
+    { name: "ShutdownHook", type: "(context: ShutdownContext) => Promise<void> | void", desc: "Async teardown callback registered via .onShutdown(). Run in registration order during the drain." },
+    { name: "ShutdownContext", type: "{ reason: ShutdownReason; signal?: Deno.Signal }", desc: "Passed to each hook. signal is set only when reason is 'signal'." },
+    { name: "ShutdownReason", type: "'signal' | 'manual' | 'startup-failure'", desc: "Why the drain started: an OS signal, a manual stop() call, or a failed startup hook." },
+    { name: "ShutdownHookOutcome", type: "{ ok: boolean; error?: string }", desc: "Per-hook result; error holds a normalized message when a hook throws or rejects." },
+    { name: "ShutdownReport", type: "{ reason; timedOut: boolean; hooks: readonly ShutdownHookOutcome[] }", desc: "Final result of a completed shutdown — the reason, whether the timeout elapsed, and every hook outcome in execution order." }
+  ]
+}) }}
+
+{{ comp.apiTable({
+  caption: "ServeOptions (serve()) — shutdown-relevant keys",
+  rows: [
+    { name: "port", type: "number?", desc: "Preferred listener port; use 0 for an ephemeral port." },
+    { name: "signal", type: "AbortSignal?", desc: "External signal that stops the listener when aborted (drives the drain)." },
+    { name: "drainTimeoutMs", type: "number?", desc: "Max time to wait for in-flight requests and shutdown hooks before forcing exit. Defaults to 30_000." },
+    { name: "handleSignals", type: "boolean?", desc: "Install SIGINT/SIGTERM (or SIGBREAK) handlers. Defaults to true." }
+  ]
+}) }}
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "onShutdown teardown",
+    lang: "ts",
+    code: "// services/users/src/main.ts — drain + teardown on signal or manual stop\nimport { createService } from '@netscript/service';\nimport { router } from './router.ts';\nimport { db } from '@database';\n\nconst running = await createService(router, { name: 'users', version: '1.0.0' })\n  .withRPC()\n  .withHealth()\n  .onShutdown(async ({ reason, signal }) => {\n    // reason: 'signal' | 'manual' | 'startup-failure'\n    audit.record({ event: 'shutdown', reason, signal });\n    await db.$disconnect();\n  })\n  .serve({\n    port: 3001,\n    drainTimeoutMs: 10_000, // wait up to 10s for in-flight work\n    handleSignals: true,    // SIGINT/SIGTERM/SIGBREAK\n  });\n\n// Later, in tests or a supervisor: trigger the same drain manually.\nawait running.stop();"
+  }
+] }) }}
+
 ## Service-layer authn / authz middleware
 
 The service builder ships a **provider-agnostic** authentication and authorization seam in
@@ -123,11 +314,11 @@ sign-in/session backend (kv-oauth, WorkOS, better-auth). Use this seam when a se
 to gate its own routes — verify a credential, trust an upstream identity header, or check a
 scope — without taking on an interactive identity provider.
 
-Two middlewares wrap the request: `createAuthnMiddleware` resolves a `Principal`
-(authentication), and `createAuthzMiddleware` makes an `AuthzDecision` from that principal
-(authorization). By default the `/api` surface is protected and `/health` is anonymous.
-Both are pluggable through small ports — `AuthenticatorPort`, `AuthorizerPort` — so you
-supply the strategy and the seam stays the same.
+Two stages wrap the request: `.withAuthn()` resolves a `Principal` (authentication) via an
+`AuthenticatorPort`, and `.withAuthz()` makes an `AuthzDecision` from that principal
+(authorization) via an `AuthorizerPort`. By default the `/api` surface is protected and
+`/health` is anonymous — both configurable through `AuthnOptions.protect` /
+`AuthnOptions.allowAnonymous`. The preset form is `defineService(router, { auth: { authn, authz } })`.
 
 {{ comp.apiTable({
   caption: "@netscript/service/auth surface",
@@ -135,8 +326,8 @@ supply the strategy and the seam stays the same.
     { name: "createStaticCredentialAuthenticator", type: "authenticator", desc: "Matches a configured static credential (e.g. API key / shared secret) → Principal." },
     { name: "createTrustedHeaderAuthenticator", type: "authenticator", desc: "Trusts an identity asserted by an upstream proxy header (e.g. behind a gateway)." },
     { name: "createScopeAuthorizer", type: "authorizer", desc: "Allows/denies a request by checking the Principal's scopes against required scopes." },
-    { name: ".withAuthn({ authenticator })", type: "builder method", desc: "Installs the authentication gate on createService(); the authn middleware is created and wired internally. Protects /api by default, leaves /health anonymous." },
-    { name: ".withAuthz({ authorizer })", type: "builder method", desc: "Installs the authorization gate on createService(); the authz middleware is created and wired internally from the Principal." }
+    { name: ".withAuthn({ authenticator, protect?, allowAnonymous? })", type: "builder method", desc: "Installs the authentication gate (AuthnOptions). protect defaults to ['/api']; allowAnonymous defaults to ['/health']." },
+    { name: ".withAuthz({ authorizer, denyByDefault? })", type: "builder method", desc: "Installs the authorization gate (AuthzOptions) from the Principal. denyByDefault fails closed and defaults to true." }
   ]
 }) }}
 
@@ -162,28 +353,43 @@ sign-in, OAuth callbacks, or session cookies. For <strong>signed-in human users<
 are complementary and can run together.
 {{ /comp }}
 
-## Where to go next
+## Production notes
 
-This hub is intentionally thin — the full generated API lives in the reference. Pick the
-lane that matches what you're doing.
+{{ comp callout { type: "warning", title: "Footguns before you ship" } }}
+<ul>
+<li><strong>Don't wire liveness to dependency checks.</strong> <code>/health/live</code> must
+stay dependency-free; only <code>/health/ready</code> should fail on an unreachable DB. Crossing
+them turns a transient DB blip into a container restart loop.</li>
+<li><strong>Set <code>drainTimeoutMs</code> below your platform's kill grace.</strong> The drain
+defaults to <code>30_000</code>; if your orchestrator sends SIGKILL sooner, in-flight requests
+are cut off — pick a timeout under the platform's termination grace period.</li>
+<li><strong>The served RPC path is <code>/api/rpc/*</code>, not <code>/rpc</code>.</strong>
+Point generated clients at the same path the runtime mounts.</li>
+<li><strong><code>denyByDefault</code> is <code>true</code>.</strong> With <code>.withAuthz()</code>
+installed, any request that reaches no matching rule is rejected — add an explicit allow rule for
+public-but-authenticated routes rather than relaxing the default.</li>
+<li><strong>Aspire first for DB-backed services.</strong> <code>aspire run</code> must bring up
+Postgres/Garnet before any <code>netscript db</code> command or the readiness probe will fail.</li>
+</ul>
+{{ /comp }}
+
+## Reference
+
+This hub is intentionally thin — the full generated API lives in the reference.
+
+{{ comp.xref({ key: "ref:service" }) }}
 
 {{ comp.featureGrid({ items: [
   {
-    title: "Learn — Build a service",
-    body: "Guided tutorial: contract → users service on :3001 → typed client → island, built from scratch.",
-    href: "/tutorials/build-a-service/",
-    icon: "→"
-  },
-  {
-    title: "Do — Add a service",
-    body: "Task recipe: add a new typed oRPC service to an existing workspace with defineService.",
-    href: "/how-to/add-a-service/",
-    icon: "◆"
-  },
-  {
-    title: "Look up — @netscript/service reference",
-    body: "The full generated API: defineService, createService, the fluent builder, the /auth middleware seam, and runtime options.",
+    title: "Look up — @netscript/service",
+    body: "The full generated API: defineService, createService, the fluent builder, the OpenAPI/Scalar and health primitives, the shutdown types, and the /auth middleware seam.",
     href: "/reference/service/",
+    icon: "≡"
+  },
+  {
+    title: "Look up — @netscript/contracts",
+    body: "Contract primitives plus the /crud, /query, and /transform helpers that generate CRUD contracts, paginated queries, and response transformers.",
+    href: "/reference/contracts/",
     icon: "≡"
   },
   {
@@ -191,6 +397,12 @@ lane that matches what you're doing.
     body: "The oRPC contract → implement → handler → typed client → query → island type flow, explained.",
     href: "/explanation/contracts/",
     icon: "◎"
+  },
+  {
+    title: "Learn — Build a service",
+    body: "Guided tutorial: contract → users service on :3001 → typed client → island, built from scratch.",
+    href: "/tutorials/storefront/02-catalog-service/",
+    icon: "→"
   }
 ] }) }}
 

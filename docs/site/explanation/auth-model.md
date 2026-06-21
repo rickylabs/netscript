@@ -2,8 +2,8 @@
 layout: layouts/base.vto
 title: The pure-backend auth model
 templateEngine: [vento, md]
-prev: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
-next: null
+prev: { label: "The plugin system", href: "/explanation/plugin-system/" }
+next: { label: "Durability model", href: "/explanation/durability-model/" }
 ---
 
 # The pure-backend auth model
@@ -15,11 +15,10 @@ understanding-oriented — read it to build the mental model before you wire aut
 project. When you want the headline API and endpoints, see the
 [auth capability](/capabilities/auth/); when you want to do the task, follow
 [Add authentication](/how-to/add-authentication/); when you want exact exported symbols, follow
-[`reference/service/`](/reference/service/) and the auth packages it references.
+[`reference/service/`](/reference/service/) and the auth adapter references it links to.
 
-{{ comp callout { type: "important", title: "Alpha honesty up front" } }}
-The auth layer is a <strong>net-new, flagship</strong> capability and the packages are published at
-<code>0.0.1-alpha.0</code>. The CLI scaffold pins forward-looking specifiers like
+{{ comp callout { type: "important", title: "Alpha status" } }}
+The CLI scaffold pins forward-looking specifiers like
 <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those <strong>do not install at 1.0
 today</strong> — they describe the intended stable surface. There is also <strong>no auth
 telemetry or audit surface yet</strong>: the model below is the authentication seam only, not an
@@ -35,7 +34,7 @@ project. Both extremes leak the *integration tax* NetScript exists to remove: th
 app to one identity vendor; the second makes you the integration.
 
 NetScript takes the same stance on authentication that it takes on
-[contracts](/explanation/contracts/) and [plugins](/explanation/plugin-model/): the cross-cutting
+[contracts](/explanation/contracts/) and [plugins](/explanation/plugin-system/): the cross-cutting
 concern belongs to a **typed boundary the framework owns**, and the concrete provider is an adapter
 that plugs into that boundary. The framework defines *the shape of an authenticator* — a port — and
 ships several **pure backends** that satisfy it. Your application depends on the port; it never
@@ -83,7 +82,7 @@ fills. This is the doctrine's <em>composition over inheritance</em> applied to i
 A backend's job is to turn *its* notion of an authenticated user into *NetScript's* notion. That
 neutral currency lives one layer down, in [`@netscript/service`](/reference/service/) under the
 `/auth` subpath, and it is the same authentication contract the rest of the framework already
-speaks — API keys, bearer tokens, trusted headers. Auth backends are simply another producer of it.
+speaks — API keys, bearer tokens, trusted headers. Auth backends produce the same `Principal` shape.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -107,7 +106,7 @@ service handlers, your contract middleware, your authorization checks — sees a
 ## Three backends, three different capability matrices
 
 The framework ships three pure backends. They satisfy the **same** `AuthBackendPort`, but they fill
-the **optional** `interactive` slot differently — and that single difference produces three honestly
+the **optional** `interactive` slot differently — and that single difference produces three genuinely
 different capability profiles. Only **kv-oauth** is a full interactive backend; WorkOS and
 better-auth are **non-interactive by design**.
 
@@ -202,7 +201,7 @@ v1 — do not design against them yet:
   ]
 }) }}
 
-Choosing one active backend keeps the model honest: a single `Principal` source, a single session
+Choosing one active backend keeps the model coherent: a single `Principal` source, a single session
 authority, and a single place to reason about who is signed in. Multi-backend identity is a hard
 problem (consistent logout, link reconciliation, conflicting session lifetimes); v1 declines it on
 purpose rather than ship a half-correct version.
@@ -221,7 +220,7 @@ variable.
 - **Your application** depends on `Principal` / `AuthnResult` with `scheme: "custom"` — so swapping
   GitHub OAuth for WorkOS is an env-var change and a redeploy, not a refactor.
 
-This is the same shape as the [plugin model](/explanation/plugin-model/) (a thin integration layer
+This is the same shape as the [plugin model](/explanation/plugin-system/) (a thin integration layer
 over a pure capability) and the [contracts model](/explanation/contracts/) (the framework owns the
 boundary, you own the logic) — authentication is just the identity-shaped instance of the pattern.
 
@@ -248,10 +247,10 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
   service on :8094, the five endpoints, and the backend matrix at a glance.
 - **Do it:** [Add authentication](/how-to/add-authentication/) — add the `auth` plugin, choose a
   backend with `NETSCRIPT_AUTH_BACKEND`, run the migration, and wire provider env.
-- **Related model:** [The plugin model](/explanation/plugin-model/) — why a thin plugin composes a
+- **Related model:** [The plugin system](/explanation/plugin-system/) — why a thin plugin composes a
   pure capability, the same shape this auth seam follows.
 - **Reference:** the neutral authentication contract lives in
   [`reference/service/`](/reference/service/) (the `/auth` subpath: `Principal`, `AuthnResult`,
   `AuthenticatorPort`).
 
-{{ comp.nextPrev({ prev: { label: "Orchestration with Aspire", href: "/explanation/aspire/" } }) }}
+{{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}

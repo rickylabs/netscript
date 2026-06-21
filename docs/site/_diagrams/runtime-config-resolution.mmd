@@ -1,0 +1,15 @@
+%% Source for assets/diagrams/runtime-config-resolution.svg
+%% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
+%% This file is NOT consumed by `deno task build`; the site ships the SVG only.
+%% Reality: two packages own two precedence rules. There is NO single frozen
+%% merge pipeline and no Object.freeze. The two layers are read separately.
+flowchart TB
+  subgraph cfg["@netscript/config &middot; defineConfig / loadConfig (build-time typed schema)"]
+    direction LR
+    defaults["Schema defaults<br/>(typed schema)"] --> values["Config values<br/>(defineConfig values)"]
+    values --> envread["Env readers<br/>(env readers)"]
+  end
+  subgraph rcfg["@netscript/runtime-config &middot; loadRuntimeConfig / watchRuntimeConfig (hot-reloadable overrides)"]
+    direction LR
+    load["loadRuntimeConfig<br/>(overrides applied at runtime)"] --> watch["watchRuntimeConfig<br/>(overrides watched / hot-reloaded)"]
+  end

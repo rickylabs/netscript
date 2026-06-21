@@ -23,7 +23,7 @@ For the generated API surface, follow the [`telemetry`](/reference/telemetry/) a
 [`logger`](/reference/logger/) reference pages, and the
 [Telemetry capability](/capabilities/telemetry/) hub for the Learn / Do / Reference triplet.
 
-{{ comp callout { type: "important", title: "What is real today, and the one honest gap" } }}
+{{ comp callout { type: "important", title: "What works today, and the one gap" } }}
 <strong>Worker tracing is built in and real.</strong> Job dispatch, job execution, the
 scheduler, and the task subprocess all emit real OpenTelemetry spans automatically — they
 appear in the Aspire dashboard with no code from you. <code>task.execute</code> spans are
@@ -242,7 +242,7 @@ helpers (<code>withChildSpan</code>, <code>recordJobProgress</code>,
 Spans are only collected while Aspire is running and the OTLP endpoint
 (<code>http://localhost:4318</code>) is reachable. Running a service standalone with
 <code>--no-aspire</code> means tracing has nowhere to export to. If the Traces tab is empty,
-check that <code>aspire run</code> is up first — it is step 2 of the workflow for a reason.
+check that <code>aspire run</code> is up first — Aspire provisions the collector and dashboard used by the examples.
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Set attributes, not log lines, for span data" } }}

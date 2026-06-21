@@ -1,0 +1,400 @@
+
+Summary: Write summary.md
+
+Thought:
+Now write the run summary at the run-scoped path:
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27859602970-1/summary.md"
+  file_text: 
+    # OpenHands Run Summary — run-27859602970-1
+    
+    ## Summary
+    
+    Read-only PLAN-EVAL evaluation of the `sagas-prisma-store` slice on
+    `feat/framework-prime-time` (umbrella PR #73). The plan proposes a
+    `PrismaSagaStore` that adds a Prisma-backed durable implementation of the
+    existing `SagaStorePort` interface (no port change), introduces a
+    backend-selection seam in `createDurableSagaRuntime`, adds dedicated durable
+    runtime tables in `sagas.prisma`, and touches the `@netscript/cli` scaffold 
+to
+    emit an explicit backend choice.
+    
+    **Verdict: PASS.** The plan is additive, contract-first, honors catalog law
+    (`@prisma/client` already cataloged at `deno.json:106`), commits to durable
+    Prisma parity with `KvSagaStore` (including byte-intended error-shape 
+parity),
+    makes the seam refactor backward-compatible, explicitly defers the
+    `SagaIdempotencyPort` Prisma impl (debt-logged, not silent), and selects the
+    right gate set for ARCHETYPE-2 + ARCHETYPE-5 + SCOPE-service including the
+    required `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
+    smoke + `e2e-cli-gate` label.
+    
+    Both open decisions the plan surfaced are ratified as proposed:
+    
+    1. **Dedicated durable runtime tables** (`saga_runtime_state` /
+       `saga_runtime_transition` / `saga_runtime_correlation`) over promoting 
+the
+       existing projection `SagaInstance`. Plan recommendation ratified.
+    2. **No-implicit-default vs back-compat reconciliation:** zero-arg
+       `createDurableSagaRuntime()` retains KV default for existing internal
+       callers; scaffold + multi-backend helper always require explicit choice;
+       multi-backend helper errors on unresolved. Plan reconciliation ratified.
+    
+    Three minor doc-precision notes (non-blocking) recorded in the verdict for 
+the
+    IMPL pass to fold in during slicing:
+    
+    1. Error-string trailing period (`Saga store version mismatch for ${id}.` —
+       the trailing period is present in both `KvSagaStore:185` and
+       `MemorySagaStore:48`).
+    2. `extension-axes.md:15` name reconciliation (`PostgresSagaStore (planned)`
+       vs plan's `PrismaSagaStore`).
+    3. F-13 (Saga/runtime invariants) explicit naming in the ARCHETYPE-5 gate 
+set.
+    
+    ## Changes
+    
+    - **Repo (workspace deliverable):** wrote
+      `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-st
+ore/plan-eval.md`
+      (verdict with per-box check table, anchor verification, and open-decision
+      ratification). This is a harness artifact, not a source change.
+    - **Repo (source):** none. Read-only PLAN-EVAL pass.
+    - **Workflow output:** wrote
+      `/home/runner/work/_temp/openhands/27859602970-1/pr-review-comments.json`
+      with the PR-comment body for the workflow to post.
+    
+    ## Validation
+    
+    - Walked `plan-gate.md` checklist box by box (8 boxes: research, decisions
+      locked, open-decision sweep, commit slices, risk register, gate set,
+      deferred scope, jsr-audit surface scan).
+    - Read `plan-protocol.md`, `verdict-definitions.md`,
+      `archetype-gate-matrix.md`, ARCHETYPE-2 + ARCHETYPE-5 profiles,
+      SCOPE-service overlay.
+    - Read `research.md`, `plan.md`, `plan-meta.json` in full.
+    - Re-verified ~10 load-bearing `file:line` anchors against the actual tree 
+on
+      `feat/framework-prime-time` (current SHA `54f97ac2`, post-#74-merge):
+      - `SagaStorePort` shape (7 methods + 1 readonly `id`)
+      - `kv-saga-store.ts:185` version-mismatch error string
+      - `create-durable-saga-runtime.ts:26` `options.kv ?? await 
+openSagaRuntimeKv()`
+      - `services/src/main.ts:44, 67, 86` — dbClient, zero-arg factory, kv.close
+teardown
+      - `saga-supervisor.ts:132, 142` — zero-arg factory + kv.close teardown
+      - `sagas.prisma:13` SagaInstance composite PK + schema header framing
+      - `extension-axes.md:15` — `PostgresSagaStore (planned)` (plan §4.5 
+covers)
+      - `deno.json:106` — `@prisma/client ^7.8.0` cataloged
+      - `packages/plugin-sagas-core/src/domain/errors.ts:38` —
+        `SagasError.validationFailed(message, cause?)` signature
+    - Confirmed both `KvSagaStore:185` AND `MemorySagaStore:48` use the trailing
+      period on the version-mismatch message; the plan's quoted spec string is
+      missing it (flagged as non-blocking doc-precision note).
+    
+    ## Responses to review comments or issue comments
+    
+    None to respond to (read-only PLAN-EVAL run).
+    
+    ## Remaining risks
+    
+    None for the plan gate. The three doc-precision notes are non-blocking and
+    fold cleanly into the plan at IMPL-EVAL time. The deferred
+    `SagaIdempotencyPort` Prisma impl is correctly debt-logged; if the follow-up
+    slice slips, native engine idempotency continues to use the in-memory or
+    engine-level dedup path with no regression to the durable state path.
+    
+    The IMPL pass should negative-proof slice 2 (`PrismaSagaStore` + parity 
+tests)
+    before slice 4 (multi-backend helper) lands so seam correctness is 
+established
+    before selector ergonomics.
+    
+    Run: https://github.com/rickylabs/netscript/actions/runs/27859602970
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 3.25M • cache hit 94.90% •  reasoning 1.5K • ↓ output 28.78K • $
+0.2690
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27859602970-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# OpenHands Run Summary — run-27859602970-1
+ 2|
++3|## Summary
++4|
++5|Read-only PLAN-EVAL evaluation of the `sagas-prisma-store` slice on
++6|`feat/framework-prime-time` (umbrella PR #73). The plan proposes a
++7|`PrismaSagaStore` that adds a Prisma-backed durable implementation of the
++8|existing `SagaStorePort` interface (no port change), introduces a
++9|backend-selection seam in `createDurableSagaRuntime`, adds dedicated durable
++10|runtime tables in `sagas.prisma`, and touches the `@netscript/cli` scaffold 
+to
++11|emit an explicit backend choice.
++12|
++13|**Verdict: PASS.** The plan is additive, contract-first, honors catalog law
++14|(`@prisma/client` already cataloged at `deno.json:106`), commits to durable
++15|Prisma parity with `KvSagaStore` (including byte-intended error-shape 
+parity),
++16|makes the seam refactor backward-compatible, explicitly defers the
++17|`SagaIdempotencyPort` Prisma impl (debt-logged, not silent), and selects the
++18|right gate set for ARCHETYPE-2 + ARCHETYPE-5 + SCOPE-service including the
++19|required `deno task e2e:cli run scaffold.runtime --cleanup --format pretty`
++20|smoke + `e2e-cli-gate` label.
++21|
++22|Both open decisions the plan surfaced are ratified as proposed:
++23|
++24|1. **Dedicated durable runtime tables** (`saga_runtime_state` /
++25|   `saga_runtime_transition` / `saga_runtime_correlation`) over promoting 
+the
++26|   existing projection `SagaInstance`. Plan recommendation ratified.
++27|2. **No-implicit-default vs back-compat reconciliation:** zero-arg
++28|   `createDurableSagaRuntime()` retains KV default for existing internal
++29|   callers; scaffold + multi-backend helper always require explicit choice;
++30|   multi-backend helper errors on unresolved. Plan reconciliation ratified.
++31|
++32|Three minor doc-precision notes (non-blocking) recorded in the verdict for 
+the
++33|IMPL pass to fold in during slicing:
++34|
++35|1. Error-string trailing period (`Saga store version mismatch for ${id}.` —
++36|   the trailing period is present in both `KvSagaStore:185` and
++37|   `MemorySagaStore:48`).
++38|2. `extension-axes.md:15` name reconciliation (`PostgresSagaStore (planned)`
++39|   vs plan's `PrismaSagaStore`).
++40|3. F-13 (Saga/runtime invariants) explicit naming in the ARCHETYPE-5 gate 
+set.
++41|
++42|## Changes
++43|
++44|- **Repo (workspace deliverable):** wrote
++45|  
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/pl
+an-eval.md`
++46|  (verdict with per-box check table, anchor verification, and open-decision
++47|  ratification). This is a harness artifact, not a source change.
++48|- **Repo (source):** none. Read-only PLAN-EVAL pass.
++49|- **Workflow output:** wrote
++50|  `/home/runner/work/_temp/openhands/27859602970-1/pr-review-comments.json`
++51|  with the PR-comment body for the workflow to post.
++52|
++53|## Validation
++54|
++55|- Walked `plan-gate.md` checklist box by box (8 boxes: research, decisions
++56|  locked, open-decision sweep, commit slices, risk register, gate set,
++57|  deferred scope, jsr-audit surface scan).
++58|- Read `plan-protocol.md`, `verdict-definitions.md`,
++59|  `archetype-gate-matrix.md`, ARCHETYPE-2 + ARCHETYPE-5 profiles,
++60|  SCOPE-service overlay.
++61|- Read `research.md`, `plan.md`, `plan-meta.json` in full.
++62|- Re-verified ~10 load-bearing `file:line` anchors against the actual tree 
+on
++63|  `feat/framework-prime-time` (current SHA `54f97ac2`, post-#74-merge):
++64|  - `SagaStorePort` shape (7 methods + 1 readonly `id`)
++65|  - `kv-saga-store.ts:185` version-mismatch error string
++66|  - `create-durable-saga-runtime.ts:26` `options.kv ?? await 
+openSagaRuntimeKv()`
++67|  - `services/src/main.ts:44, 67, 86` — dbClient, zero-arg factory, kv.close
+teardown
++68|  - `saga-supervisor.ts:132, 142` — zero-arg factory + kv.close teardown
++69|  - `sagas.prisma:13` SagaInstance composite PK + schema header framing
++70|  - `extension-axes.md:15` — `PostgresSagaStore (planned)` (plan §4.5 
+covers)
++71|  - `deno.json:106` — `@prisma/client ^7.8.0` cataloged
++72|  - `packages/plugin-sagas-core/src/domain/errors.ts:38` —
++73|    `SagasError.validationFailed(message, cause?)` signature
++74|- Confirmed both `KvSagaStore:185` AND `MemorySagaStore:48` use the trailing
++75|  period on the version-mismatch message; the plan's quoted spec string is
++76|  missing it (flagged as non-blocking doc-precision note).
++77|
++78|## Responses to review comments or issue comments
++79|
++80|None to respond to (read-only PLAN-EVAL run).
++81|
++82|## Remaining risks
++83|
++84|None for the plan gate. The three doc-precision notes are non-blocking and
++85|fold cleanly into the plan at IMPL-EVAL time. The deferred
++86|`SagaIdempotencyPort` Prisma impl is correctly debt-logged; if the follow-up
++87|slice slips, native engine idempotency continues to use the in-memory or
++88|engine-level dedup path with no regression to the durable state path.
++89|
++90|The IMPL pass should negative-proof slice 2 (`PrismaSagaStore` + parity 
+tests)
++91|before slice 4 (multi-backend helper) lands so seam correctness is 
+established
++92|before selector ergonomics.
++93|
++94|Run: https://github.com/rickylabs/netscript/actions/runs/27859602970
++95|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final verification
+
+Thought:
+Now confirm everything is in place:
+
+$ cd /home/runner/work/netscript/netscript && ls -la 
+/home/runner/work/_temp/openhands/27859602970-1/ && echo "---WORKSPACE 
+DELIVERABLE---" && ls -la 
+.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/ &&
+echo "---PR-COMMENT JSON---" && python3 -c "import json; d = 
+json.load(open('/home/runner/work/_temp/openhands/27859602970-1/pr-review-commen
+ts.json')); print('valid JSON,', len(d), 'entries; first 80 chars of body:'); 
+print(d[0]['body'][:80])"
+
+Tokens: ↑ input 3.28M • cache hit 94.91% •  reasoning 1.5K • ↓ output 28.99K • $
+0.2718
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+total 588
+drwxr-xr-x 2 runner runner   4096 Jun 20 04:11 .
+drwxr-xr-x 3 runner runner   4096 Jun 20 04:02 ..
+-rw-r--r-- 1 runner runner 457337 Jun 20 04:11 agent.log
+-rw-r--r-- 1 runner runner      2 Jun 20 04:02 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner   2215 Jun 20 04:02 bootstrap.log
+-rw-r--r-- 1 runner runner  92766 Jun 20 04:02 issue-comments.json
+-rw------- 1 runner runner  15286 Jun 20 04:11 pr-review-comments.json
+-rw-r--r-- 1 runner runner   5353 Jun 20 04:02 request.md
+-rw------- 1 runner runner   4816 Jun 20 04:11 summary.md
+---WORKSPACE DELIVERABLE---
+total 52
+drwxr-xr-x  2 runner runner  4096 Jun 20 04:10 .
+drwxr-xr-x 11 runner runner  4096 Jun 20 04:02 ..
+-rw-------  1 runner runner 10666 Jun 20 04:10 plan-eval.md
+-rw-r--r--  1 runner runner  7856 Jun 20 04:02 plan-meta.json
+-rw-r--r--  1 runner runner 10142 Jun 20 04:02 plan.md
+-rw-r--r--  1 runner runner  9747 Jun 20 04:02 research.md
+---PR-COMMENT JSON---
+valid JSON, 1 entries; first 80 chars of body:
+PLAN-EVAL sagas-prisma-store: PASS
+
+<!-- openhands-agent-summary -->
+## OpenHand
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL sagas-prisma-store verdict: PASS
+
+Thought:
+All three deliverables are in place:
+
+1. **Workspace deliverable:** 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/pl
+an-eval.md` (10,666 bytes) — full PLAN-EVAL verdict with per-box justification, 
+open-decision ratification, anchor verification table, commit-slice 
+ordering/sizing table, production/enterprise bar check, and the three 
+non-blocking doc-precision notes for IMPL-EVAL.
+
+2. **PR-comment output:** 
+`/home/runner/work/_temp/openhands/27859602970-1/pr-review-comments.json` 
+(15,286 bytes, valid JSON, 1 entry) — starts with `PLAN-EVAL sagas-prisma-store:
+PASS`, mirrors the Wave-A `sagas-durable-store` PLAN-EVAL comment format from 
+run-27850974960.
+
+3. **Run summary:** `/home/runner/work/_temp/openhands/27859602970-1/summary.md`
+(4,816 bytes) — Summary / Changes / Validation / Remaining risks.
+
+Finish with message:
+PLAN-EVAL for slice `sagas-prisma-store` (Track-3, durable saga store with 
+Prisma backend parity) is complete.
+
+**Verdict: PASS**
+
+Read-only PLAN-EVAL pass on `feat/framework-prime-time` (umbrella, 
+post-#74-merge). Walked `plan-gate.md` box-by-box, ratified both open decisions 
+the plan surfaced, and re-verified load-bearing `file:line` anchors against the 
+actual tree (current SHA `54f97ac2`).
+
+**Per-box check table (all ✅):**
+1. Research present and current — `research.md` re-baselined post-#74-merge; 
+cited `file:line` anchors confirmed against tree.
+2. Decisions locked — 9 locked decisions with rationale in `plan-meta.json` + 
+`plan.md` Design §4.1–§4.5.
+3. Open-decision sweep — 2 open items ratified (dedicated tables; back-compat 
+reconciliation); 1 explicit safe-deferral (SagaIdempotencyPort).
+4. Commit slices — 6 ordered slices, each < 30 files, each names files + gate.
+5. Risk register — 4 risks with mitigations (seam teardown, no-live-DB, 
+optimistic-write parity, scaffold output).
+6. Gate set — covers ARCHETYPE-2 + ARCHETYPE-5 + SCOPE-service + `e2e:cli 
+scaffold.runtime` + `e2e-cli-gate` label.
+7. Deferred scope explicit — idempotency-port parity debt-logged, not silently 
+dropped.
+8. jsr-audit surface scan — plugin-only delta; core `plugin-sagas-core` surface 
+unchanged → no core JSR delta.
+
+**Open-decision ratification:**
+1. **Dedicated runtime tables** (`saga_runtime_state` / 
+`saga_runtime_transition` / `saga_runtime_correlation`) over promoting 
+`SagaInstance` — **ratified**. Plan's PK-mismatch argument is sound; avoids 
+migration of existing rows and preserves #74's read-model/projection framing.
+2. **No-implicit-default vs back-compat reconciliation** (zero-arg 
+`createDurableSagaRuntime()` keeps KV; scaffold + multi-backend helper require 
+explicit choice; multi-backend helper errors on unresolved) — **ratified**. The 
+two functions are distinct (zero-arg = KV entrypoint; multi-backend = 
+env-reading selector); both can coexist without violating "no silent default" on
+the public surface.
+
+**Production/enterprise bar:**
+- Real durable persistence (no in-memory-only shipped default) — 
+`PrismaSagaStore` with optimistic-write parity to `KvSagaStore`.
+- Error-shape parity — `SagasError.validationFailed(\`Saga store version 
+mismatch for ${instanceId}.\`)` (matches `kv-saga-store.ts:185` + 
+`memory-saga-store.ts:48`).
+- Backend-selection seam is backward-compatible (`kv` becomes optional, new 
+`dispose()` replaces direct `kv.close()`).
+- Idempotency — engine `expectedVersion` per write; parity maintained.
+- Catalog law honored — `@prisma/client ^7.8.0` already cataloged at 
+`deno.json:106`; plan uses `catalog:`, no de-catalog / version-pin change.
+- Unit + integration + failure-path tests specified; `e2e:cli scaffold.runtime` 
+smoke required at eval.
+
+**Three non-blocking doc-precision notes for IMPL-EVAL** (in `plan-eval.md` + 
+the PR comment body; all to fold into the plan or apply during slicing):
+1. Error-string trailing period — plan quotes `Saga store version mismatch for 
+<instanceId>` (no period); both `KvSagaStore` and `MemorySagaStore` include the 
+trailing period.
+2. `extension-axes.md:15` name reconciliation — currently says 
+`PostgresSagaStore (planned)`; plan uses `PrismaSagaStore` throughout.
+3. F-13 (Saga/runtime invariants) explicit naming in the ARCHETYPE-5 gate set — 
+test-plan items cover it; just needs explicit listing.
+
+**Deliverables:**
+- Workspace: 
+`.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/pl
+an-eval.md` (10,666 bytes; harness artifact, committed by workflow).
+- PR-comment output: 
+`/home/runner/work/_temp/openhands/27859602970-1/pr-review-comments.json` 
+(15,286 bytes; valid JSON, 1 entry; body starts with `PLAN-EVAL 
+sagas-prisma-store: PASS`).
+- Run summary: `/home/runner/work/_temp/openhands/27859602970-1/summary.md` 
+(4,816 bytes).
+
+No source files modified or committed. Read-only evaluation.
+
+Tokens: ↑ input 3.32M • cache hit 94.95% •  reasoning 1.5K • ↓ output 30.25K • $
+0.2758
+

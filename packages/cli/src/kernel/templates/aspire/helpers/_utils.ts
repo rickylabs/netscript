@@ -27,6 +27,27 @@ export function safeIdentifier(name: string): string {
   return name.replace(/-/g, '_');
 }
 
+type SagaStoreBackendCarrier = {
+  readonly Sagas?: {
+    readonly Store?: {
+      readonly Backend?: unknown;
+    };
+  };
+};
+
+/**
+ * Reads the saga durable store backend from a raw appsettings entry.
+ *
+ * The Aspire package owns the common resource entry types, while saga-specific
+ * metadata is intentionally plugin-local. Generator code can use this helper to
+ * preserve that metadata into executable environment without widening the
+ * shared Aspire config contract.
+ */
+export function extractSagaStoreBackend(entry: unknown): string | undefined {
+  const backend = (entry as SagaStoreBackendCarrier).Sagas?.Store?.Backend;
+  return typeof backend === 'string' ? backend : undefined;
+}
+
 /**
  * Wraps a property key in quotes if it contains special characters.
  * Returns the key as-is if it's a valid unquoted identifier.
