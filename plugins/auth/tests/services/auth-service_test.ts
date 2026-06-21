@@ -9,6 +9,24 @@ import {
   type AuthBackendPort,
   createAuthBackendRegistry,
 } from '@netscript/plugin-auth-core/ports';
+import {
+  AuthAttributes,
+  AuthOutcome,
+  AuthSpanNames,
+  createAuthTelemetry,
+} from '@netscript/plugin-auth-core/telemetry';
+import type {
+  Attributes,
+  Context,
+  Exception,
+  Link,
+  Span,
+  SpanContext,
+  SpanOptions,
+  SpanStatus,
+  TimeInput,
+  Tracer,
+} from '@netscript/telemetry/tracer';
 import { buildAuthSession } from '@netscript/plugin-auth-core/testing';
 import type { AuthnRequest, AuthnResult } from '@netscript/service/auth';
 import {
@@ -90,6 +108,94 @@ Deno.test('kv-oauth handlers complete signin callback session me signout round-t
 
   const afterSignout = await session({ sessionId: completed.sessionId }, { registry });
   assertEquals(afterSignout.authenticated, false);
+});
+
+Deno.test('auth handlers emit audit-safe telemetry attributes per operation', async () => {
+  const tracer = new AuthHandlerRecordingTracer();
+  const telemetry = createAuthTelemetry({
+    tracer,
+    subjectHashSalt: 'deployment_salt',
+  });
+  const registry = await createInMemoryKvOAuthRegistry({
+    fetch: () =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            access_token: 'access_test',
+            refresh_token: 'refresh_test',
+            token_type: 'Bearer',
+            expires_in: 3600,
+            scope: 'profile email',
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      ),
+  });
+  const baseContext = {
+    registry,
+    telemetry,
+    request: {
+      url: authTestUrl('/v1/auth/signin'),
+      method: 'GET',
+      headers: new Headers({ 'x-forwarded-proto': 'https' }),
+    },
+  };
+
+  const started = await signin({ redirectTo: '/dashboard' }, baseContext);
+  const redirect = new URL(started.redirectUrl!);
+  const completed = await callback({
+    code: 'code_test',
+    state: redirect.searchParams.get('state') ?? undefined,
+  }, {
+    ...baseContext,
+    request: {
+      url: authTestUrl(`/v1/auth/callback?txn=${redirect.searchParams.get('txn')}`),
+      method: 'GET',
+      headers: new Headers({ 'x-forwarded-proto': 'https' }),
+    },
+  });
+  await session({ sessionId: completed.sessionId }, { registry, telemetry });
+  await me({
+    registry,
+    telemetry,
+    request: {
+      url: authTestUrl('/v1/auth/me'),
+      method: 'GET',
+      headers: new Headers({ cookie: `__Host-ns_session=${completed.sessionId}` }),
+    },
+  });
+  await signout({ sessionId: completed.sessionId }, {
+    registry,
+    telemetry,
+    request: {
+      url: authTestUrl('/v1/auth/signout'),
+      method: 'GET',
+      headers: new Headers({ cookie: `__Host-ns_session=${completed.sessionId}` }),
+    },
+  });
+
+  assertEquals(tracer.spans.map((span) => span.name), [
+    AuthSpanNames.SIGNIN,
+    AuthSpanNames.CALLBACK,
+    AuthSpanNames.SESSION,
+    AuthSpanNames.ME,
+    AuthSpanNames.SIGNOUT,
+  ]);
+  for (const span of tracer.spans) {
+    assertEquals(span.attributes[AuthAttributes.BACKEND], 'kv-oauth');
+    assert(span.attributes[AuthAttributes.METHOD]);
+    assert(span.attributes[AuthAttributes.OUTCOME]);
+  }
+  for (const span of tracer.spans.slice(1)) {
+    assertEquals(typeof span.attributes[AuthAttributes.SUBJECT_HASH], 'string');
+    assert(span.attributes[AuthAttributes.SUBJECT_HASH] !== completed.sessionId);
+  }
+  assertEquals(tracer.spans[0]?.attributes[AuthAttributes.OUTCOME], AuthOutcome.SUCCESS);
+  assertEquals(tracer.spans[3]?.attributes[AuthAttributes.PRINCIPAL_SCOPES_COUNT], 2);
+
+  const serialized = JSON.stringify(tracer.spans);
+  assert(!serialized.includes('access_test'));
+  assert(!serialized.includes('refresh_test'));
 });
 
 Deno.test('backend selection reads NETSCRIPT_AUTH_BACKEND and reports unknown names as backend errors', () => {
@@ -408,4 +514,109 @@ function authenticateThrowingBackend(name = 'kv-oauth'): AuthBackendPort {
       throw new Error('authenticate unavailable');
     },
   };
+}
+
+class AuthHandlerRecordingTracer implements Tracer {
+  readonly spans: AuthHandlerRecordingSpan[] = [];
+
+  startSpan(name: string, options: SpanOptions = {}, _context?: Context): Span {
+    const span = new AuthHandlerRecordingSpan(name, options.attributes ?? {});
+    this.spans.push(span);
+    return span;
+  }
+
+  startActiveSpan<T>(name: string, fn: (span: Span) => T): T;
+  startActiveSpan<T>(name: string, options: SpanOptions, fn: (span: Span) => T): T;
+  startActiveSpan<T>(
+    name: string,
+    options: SpanOptions,
+    context: Context,
+    fn: (span: Span) => T,
+  ): T;
+  startActiveSpan<T>(
+    name: string,
+    optionsOrFn: SpanOptions | ((span: Span) => T),
+    contextOrFn?: Context | ((span: Span) => T),
+    fn?: (span: Span) => T,
+  ): T {
+    if (typeof optionsOrFn === 'function') {
+      return optionsOrFn(this.startSpan(name));
+    }
+    if (typeof contextOrFn === 'function') {
+      return contextOrFn(this.startSpan(name, optionsOrFn));
+    }
+    if (fn) {
+      return fn(this.startSpan(name, optionsOrFn, contextOrFn));
+    }
+    throw new TypeError('startActiveSpan requires a callback.');
+  }
+}
+
+class AuthHandlerRecordingSpan implements Span {
+  readonly attributes: Attributes = {};
+  readonly links: Link[] = [];
+  status: SpanStatus | undefined;
+  ended = false;
+
+  constructor(
+    readonly name: string,
+    attributes: Attributes,
+  ) {
+    this.setAttributes(attributes);
+  }
+
+  spanContext(): SpanContext {
+    return {
+      traceId: '11111111111111111111111111111111',
+      spanId: '2222222222222222',
+      traceFlags: 1,
+    };
+  }
+
+  setAttribute(key: string, value: Exclude<Attributes[string], undefined>): this {
+    this.attributes[key] = value;
+    return this;
+  }
+
+  setAttributes(attributes: Attributes): this {
+    for (const [key, value] of Object.entries(attributes)) {
+      if (value !== undefined) {
+        this.attributes[key] = value;
+      }
+    }
+    return this;
+  }
+
+  addEvent(_name: string, _attributesOrStartTime?: Attributes | TimeInput): this {
+    return this;
+  }
+
+  addLink(link: Link): this {
+    this.links.push(link);
+    return this;
+  }
+
+  addLinks(links: Link[]): this {
+    this.links.push(...links);
+    return this;
+  }
+
+  setStatus(status: SpanStatus): this {
+    this.status = status;
+    return this;
+  }
+
+  updateName(_name: string): this {
+    return this;
+  }
+
+  isRecording(): boolean {
+    return true;
+  }
+
+  recordException(_exception: Exception, _time?: TimeInput): void {}
+
+  end(_endTime?: TimeInput): void {
+    this.ended = true;
+  }
 }

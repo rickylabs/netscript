@@ -9,6 +9,7 @@ import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createService, type DbContext } from '@netscript/service';
+import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { AUTH_API_DEFAULT_PORT, AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
 import { router } from './router.ts';
 import { initializeAuthService } from './init.ts';
@@ -55,6 +56,9 @@ export default async function createAuthService(
   const port = parseInt(ctx.env.PORT ?? Deno.env.get('PORT') ?? String(AUTH_API_DEFAULT_PORT));
   const dbClient = await ctx.db.getClient();
   const registry = await initializeAuthService(ctx, dbClient);
+  const telemetry = createAuthTelemetry({
+    subjectHashSalt: resolveAuditSalt(ctx),
+  });
 
   return await createService(router, {
     name: 'auth',
@@ -70,11 +74,26 @@ export default async function createAuthService(
     .withDocs()
     .withDatabase(toDbContext(dbClient))
     .use(withAuthRequest)
-    .withContext(() => ({ registry }))
+    .withContext(() => ({ registry, telemetry }))
     .withRPC({ traceContext: true })
     .withHealth()
     .withServiceInfo()
     .serve();
+}
+
+function resolveAuditSalt(ctx: PluginServiceContext): string | undefined {
+  const env = { ...Deno.env.toObject(), ...ctx.env };
+  return env.NETSCRIPT_AUTH_AUDIT_SALT ?? serviceAuditSalt(ctx);
+}
+
+function serviceAuditSalt(ctx: PluginServiceContext): string | undefined {
+  const candidate = ctx as PluginServiceContext & {
+    readonly appsettings?: {
+      readonly auth?: { readonly audit?: { readonly salt?: string } };
+      readonly Auth?: { readonly Audit?: { readonly Salt?: string } };
+    };
+  };
+  return candidate.appsettings?.auth?.audit?.salt ?? candidate.appsettings?.Auth?.Audit?.Salt;
 }
 
 function toDbContext(value: unknown): DbContext {

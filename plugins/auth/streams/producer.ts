@@ -1,4 +1,5 @@
 import { createDurableStream, type DurableStreamProducer } from '@netscript/plugin-streams-core';
+import { injectContext, type SerializedTraceContext } from '@netscript/telemetry/context';
 import { type AuthSession, type AuthStreamEvent, authStreamSchema } from './schema.ts';
 
 export type { DurableStreamProducer, StreamProducerPort } from '@netscript/plugin-streams-core';
@@ -35,6 +36,8 @@ export interface AuthStreamEmitOptions {
   readonly sink?: AuthStreamEventSink;
   /** Clock override for deterministic tests. */
   readonly now?: () => Date;
+  /** Trace context to persist on the auth stream event and session record. */
+  readonly traceContext?: SerializedTraceContext;
 }
 
 /** Input accepted by the sign-in started lifecycle helper. */
@@ -76,7 +79,11 @@ export function emitOidcCompleted(
   session: AuthSession,
   options: AuthStreamEmitOptions = {},
 ): AuthStreamEvent {
-  const activeSession: AuthSession = { ...session, state: 'active' };
+  const traceContext = resolveAuthTraceContext(options);
+  const activeSession: AuthSession = withSessionTraceContext(
+    { ...session, state: 'active' },
+    traceContext,
+  );
   const event = authEvent('auth.oidc.completed', activeSession, options);
   publishAuthSession(activeSession, event, options);
   return event;
@@ -88,7 +95,11 @@ export function emitTokenRefreshed(
   options: AuthStreamEmitOptions = {},
 ): AuthStreamEvent {
   const refreshedAt = session.refreshedAt ?? timestamp(options);
-  const refreshedSession: AuthSession = { ...session, state: 'active', refreshedAt };
+  const traceContext = resolveAuthTraceContext(options);
+  const refreshedSession: AuthSession = withSessionTraceContext(
+    { ...session, state: 'active', refreshedAt },
+    traceContext,
+  );
   const event = authEvent('auth.token.refreshed', refreshedSession, options);
   publishAuthSession(refreshedSession, event, options);
   return event;
@@ -100,7 +111,11 @@ export function emitSessionRevoked(
   options: AuthStreamEmitOptions = {},
 ): AuthStreamEvent {
   const revokedAt = session.revokedAt ?? timestamp(options);
-  const revokedSession: AuthSession = { ...session, state: 'revoked', revokedAt };
+  const traceContext = resolveAuthTraceContext(options);
+  const revokedSession: AuthSession = withSessionTraceContext(
+    { ...session, state: 'revoked', revokedAt },
+    traceContext,
+  );
   const event = authEvent('auth.session.revoked', revokedSession, options, session.reason);
   publishAuthSession(revokedSession, event, options);
   return event;
@@ -111,12 +126,15 @@ export function emitSigninStarted(
   input: AuthSigninStartedInput = {},
   options: AuthStreamEmitOptions = {},
 ): AuthStreamEvent {
+  const traceContext = resolveAuthTraceContext(options);
   const event = {
     type: 'auth.signin.started',
     timestamp: timestamp(options),
     providerId: input.providerId,
     subject: input.subject,
-    data: input.state ? { state: input.state } : undefined,
+    traceparent: traceContext?.traceparent,
+    tracestate: traceContext?.tracestate,
+    data: eventDataWithTrace(input.state ? { state: input.state } : undefined, traceContext),
   } satisfies AuthStreamEvent;
   publishEvent(event, options);
   return event;
@@ -127,12 +145,16 @@ export function emitSigninFailed(
   input: AuthSigninFailedInput = {},
   options: AuthStreamEmitOptions = {},
 ): AuthStreamEvent {
+  const traceContext = resolveAuthTraceContext(options);
   const event = {
     type: 'auth.signin.failed',
     timestamp: timestamp(options),
     providerId: input.providerId,
     subject: input.subject,
     reason: input.reason,
+    traceparent: traceContext?.traceparent,
+    tracestate: traceContext?.tracestate,
+    data: eventDataWithTrace(undefined, traceContext),
   } satisfies AuthStreamEvent;
   publishEvent(event, options);
   return event;
@@ -170,6 +192,7 @@ function authEvent(
   options: AuthStreamEmitOptions,
   reason?: string,
 ): AuthStreamEvent {
+  const traceContext = resolveAuthTraceContext(options);
   return {
     type,
     timestamp: timestamp(options),
@@ -178,7 +201,57 @@ function authEvent(
     providerId: session.providerId,
     subject: session.subject,
     reason,
+    traceparent: traceContext?.traceparent,
+    tracestate: traceContext?.tracestate,
+    data: eventDataWithTrace(undefined, traceContext),
   };
+}
+
+function resolveAuthTraceContext(
+  options: AuthStreamEmitOptions,
+): SerializedTraceContext | undefined {
+  if (options.traceContext) {
+    return options.traceContext;
+  }
+  const headers = injectContext({});
+  const traceparent = headers.traceparent;
+  if (!traceparent) {
+    return undefined;
+  }
+  return {
+    traceparent,
+    tracestate: headers.tracestate,
+  };
+}
+
+function withSessionTraceContext(
+  session: AuthSession,
+  traceContext: SerializedTraceContext | undefined,
+): AuthSession {
+  if (!traceContext) {
+    return session;
+  }
+  return {
+    ...session,
+    traceparent: traceContext.traceparent,
+    tracestate: traceContext.tracestate,
+  };
+}
+
+function eventDataWithTrace(
+  data: Readonly<Record<string, unknown>> | undefined,
+  traceContext: SerializedTraceContext | undefined,
+): Readonly<Record<string, unknown>> | undefined {
+  if (!traceContext) {
+    return data;
+  }
+  return Object.freeze({
+    ...(data ?? {}),
+    headers: Object.freeze({
+      traceparent: traceContext.traceparent,
+      ...(traceContext.tracestate ? { tracestate: traceContext.tracestate } : {}),
+    }),
+  });
 }
 
 function timestamp(options: AuthStreamEmitOptions): string {

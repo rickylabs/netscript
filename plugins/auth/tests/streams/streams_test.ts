@@ -1,5 +1,18 @@
-import { assertEquals } from 'jsr:@std/assert@^1';
+import { assert, assertEquals } from 'jsr:@std/assert@^1';
 import { buildAuthSession } from '@netscript/plugin-auth-core/testing';
+import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
+import type {
+  Attributes,
+  Context,
+  Exception,
+  Link,
+  Span,
+  SpanContext,
+  SpanOptions,
+  SpanStatus,
+  TimeInput,
+  Tracer,
+} from '@netscript/telemetry/tracer';
 import {
   AuthStreamEventSchema,
   AuthStreamSessionSchema,
@@ -109,3 +122,142 @@ Deno.test('auth stream emit helpers isolate producer failures from callers', () 
     console.warn = previousWarn;
   }
 });
+
+Deno.test('auth stream emit helpers persist active span trace context', async () => {
+  const producer = new MemoryStreamProducer();
+  const telemetry = createAuthTelemetry({
+    tracer: new TraceContextRecordingTracer(
+      'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      'bbbbbbbbbbbbbbbb',
+    ),
+    subjectHashSalt: 'deployment_salt',
+  });
+
+  const session = buildAuthSession({
+    id: 'sess_trace',
+    userId: 'user_trace',
+    providerId: 'oidc',
+    subject: 'user:trace',
+  });
+  let event: AuthStreamEvent | undefined;
+  await telemetry.traceOperation(
+    { operation: 'callback', backend: 'kv-oauth', method: 'GET', providerId: 'oidc' },
+    (recorder) => {
+      event = emitOidcCompleted(session, { producer, traceContext: recorder.traceContext() });
+    },
+  );
+
+  assert(event);
+  assertEquals(event.traceparent?.slice(3, 35), 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+  assertEquals(event.data?.headers, {
+    traceparent: '00-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-bbbbbbbbbbbbbbbb-01',
+  });
+
+  const persisted = producer.events().find((entry) => entry.operation === 'upsert')?.value;
+  const parsed = AuthStreamSessionSchema.parse(persisted);
+  assertEquals(parsed.traceparent, event.traceparent);
+});
+
+class TraceContextRecordingTracer implements Tracer {
+  constructor(
+    private readonly traceId: string,
+    private readonly spanId: string,
+  ) {}
+
+  startSpan(name: string, options: SpanOptions = {}, _context?: Context): Span {
+    return new TraceContextRecordingSpan(name, options.attributes ?? {}, this.traceId, this.spanId);
+  }
+
+  startActiveSpan<T>(name: string, fn: (span: Span) => T): T;
+  startActiveSpan<T>(name: string, options: SpanOptions, fn: (span: Span) => T): T;
+  startActiveSpan<T>(
+    name: string,
+    options: SpanOptions,
+    context: Context,
+    fn: (span: Span) => T,
+  ): T;
+  startActiveSpan<T>(
+    name: string,
+    optionsOrFn: SpanOptions | ((span: Span) => T),
+    contextOrFn?: Context | ((span: Span) => T),
+    fn?: (span: Span) => T,
+  ): T {
+    if (typeof optionsOrFn === 'function') {
+      return optionsOrFn(this.startSpan(name));
+    }
+    if (typeof contextOrFn === 'function') {
+      return contextOrFn(this.startSpan(name, optionsOrFn));
+    }
+    if (fn) {
+      return fn(this.startSpan(name, optionsOrFn, contextOrFn));
+    }
+    throw new TypeError('startActiveSpan requires a callback.');
+  }
+}
+
+class TraceContextRecordingSpan implements Span {
+  private readonly attributes: Attributes = {};
+  private readonly links: Link[] = [];
+
+  constructor(
+    private spanName: string,
+    attributes: Attributes,
+    private readonly traceId: string,
+    private readonly spanId: string,
+  ) {
+    this.setAttributes(attributes);
+  }
+
+  spanContext(): SpanContext {
+    return {
+      traceId: this.traceId,
+      spanId: this.spanId,
+      traceFlags: 1,
+    };
+  }
+
+  setAttribute(key: string, value: Exclude<Attributes[string], undefined>): this {
+    this.attributes[key] = value;
+    return this;
+  }
+
+  setAttributes(attributes: Attributes): this {
+    for (const [key, value] of Object.entries(attributes)) {
+      if (value !== undefined) {
+        this.attributes[key] = value;
+      }
+    }
+    return this;
+  }
+
+  addEvent(_name: string, _attributesOrStartTime?: Attributes | TimeInput): this {
+    return this;
+  }
+
+  addLink(link: Link): this {
+    this.links.push(link);
+    return this;
+  }
+
+  addLinks(links: Link[]): this {
+    this.links.push(...links);
+    return this;
+  }
+
+  setStatus(_status: SpanStatus): this {
+    return this;
+  }
+
+  updateName(name: string): this {
+    this.spanName = name;
+    return this;
+  }
+
+  isRecording(): boolean {
+    return true;
+  }
+
+  recordException(_exception: Exception, _time?: TimeInput): void {}
+
+  end(_endTime?: TimeInput): void {}
+}

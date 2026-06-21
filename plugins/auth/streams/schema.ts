@@ -67,6 +67,8 @@ export type AuthStreamEvent = Readonly<{
   providerId?: string;
   subject?: string;
   reason?: string;
+  traceparent?: string;
+  tracestate?: string;
   data?: Readonly<Record<string, unknown>>;
 }>;
 
