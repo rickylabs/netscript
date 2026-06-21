@@ -260,14 +260,9 @@ function resolveKvOAuthProviderEnv(
 }
 
 function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): ArrayBuffer {
-  const configured = env.NETSCRIPT_AUTH_KV_OAUTH_TEST_KEY;
-  if (configured) {
-    const bytes = Uint8Array.from(atob(configured), (char) => char.charCodeAt(0));
-    return copyArrayBuffer(bytes);
-  }
-  const key = new Uint8Array(32);
-  crypto.getRandomValues(key);
-  return copyArrayBuffer(key);
+  const configured = requiredEnv(env, 'NETSCRIPT_AUTH_KV_OAUTH_KEY');
+  const bytes = Uint8Array.from(atob(configured), (char) => char.charCodeAt(0));
+  return copyArrayBuffer(bytes);
 }
 
 function copyArrayBuffer(bytes: Uint8Array): ArrayBuffer {
@@ -290,7 +285,7 @@ export async function createInMemoryKvOAuthRegistry(
       NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: 'https://issuer.example.test/oauth/authorize',
       NETSCRIPT_AUTH_TOKEN_ENDPOINT: 'https://issuer.example.test/oauth/token',
       NETSCRIPT_AUTH_REDIRECT_URI: 'https://app.example.test/api/v1/auth/callback',
-      NETSCRIPT_AUTH_KV_OAUTH_TEST_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
+      NETSCRIPT_AUTH_KV_OAUTH_KEY: 'BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=',
       NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: 'true',
       ...(options.env ?? {}),
     },

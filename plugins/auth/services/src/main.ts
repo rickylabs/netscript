@@ -9,7 +9,7 @@ import '@netscript/kv/redis';
 
 import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createService, type DbContext } from '@netscript/service';
-import { AUTH_API_DEFAULT_PORT } from '../../src/constants.ts';
+import { AUTH_API_DEFAULT_PORT, AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
 import { router } from './router.ts';
 import { initializeAuthService } from './init.ts';
 import { withAuthRequest } from './request-context.ts';
@@ -58,7 +58,7 @@ export default async function createAuthService(
 
   return await createService(router, {
     name: 'auth',
-    version: '1.0.0',
+    version: AUTH_PLUGIN_VERSION,
     port,
   })
     .withCors()

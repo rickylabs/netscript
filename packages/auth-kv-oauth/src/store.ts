@@ -102,7 +102,7 @@ export interface KvOAuthStore {
   ): Promise<KvOAuthSessionRecord>;
   /** Reads a session record by id. */
   getSession(id: string): Promise<KvOAuthSessionRecord | null>;
-  /** Replaces a session record using optimistic concurrency. */
+  /** Replaces a session record using optimistic concurrency; `expectedVersionstamp` is the CAS guard. */
   rotateSession(
     id: string,
     next: KvOAuthSessionRecord,

@@ -1,5 +1,5 @@
 /**
- * Server-side stream mirror exports for the auth plugin read model.
+ * Server-side auth stream emit helpers and schema exports.
  *
  * @module
  */
