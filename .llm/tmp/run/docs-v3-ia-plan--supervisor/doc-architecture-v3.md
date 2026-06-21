@@ -72,7 +72,7 @@ accuracy dossiers.
 │  ├─ expose-openapi-scalar  ★NEW    createOpenAPISpec / createScalarDocs
 │  ├─ graceful-shutdown      ★NEW    ShutdownHook drain on deploy
 │  ├─ tune-worker-runtime    ★NEW    in-process vs web-worker vs subprocess
-│  ├─ deploy-to-production   ★NEW    Aspire → prod checklist (health, drain, env)
+│  ├─ deploy-local-aspire    ★NEW    local + Aspire topology, env/secrets/migrate/health (OD8)
 │  └─ … (existing recipes kept)
 │
 ├─ /explanation/                     UNDERSTANDING (concept essays)
@@ -80,13 +80,13 @@ accuracy dossiers.
 │  ├─ contracts-first                why contracts drive everything
 │  ├─ durability-model      ★NEW     sagas/streams/jobs durability + compensation semantics
 │  ├─ auth-model                     (existing, kept)
-│  ├─ plugin-system         ★NEW     plugin↔package boundary, archetypes (public-facing framing)
+│  ├─ plugin-system         ★NEW     plugin↔package boundary (plain terms; NO archetype taxonomy — OD6)
 │  └─ observability         ★NEW     OTel model end-to-end
 │
 ├─ /reference/                       GENERATED (deno doc) — linked only, never authored
 │
 ├─ /glossary
-└─ /cli-reference                    full CLI surface (add: db add, marketplace publish|search)
+└─ /cli-reference                    CLI surface (add: db add). marketplace publish|search = alpha STUB (OD7)
 ```
 
 `★NEW` = net-new page/zone vs deployed v3. Existing pages without a mark are kept (and may be enriched
@@ -121,16 +121,18 @@ emphasizing a different capability cluster. `/tutorials/index` is a "pick your p
 do **not** depend on each other; each starts from `netscript create`. (App rosters validated against
 the `netscript-start/apps/playground` showcase — see grounding `ground/playground-showcase-map.md`.)
 
-| Track | App | Capability focus | Chapters (proposed) |
-|-------|-----|------------------|---------------------|
-| **A — Storefront** | E-commerce checkout | Services, contracts, **durable sagas** (payment+inventory compensation), triggers (webhooks), auth (customer/admin) | 01-scaffold · 02-catalog-service · 03-cart-contracts · 04-checkout-saga · 05-shipping-webhook · 06-deploy |
-| **B — Team Workspace** | Multi-tenant SaaS | **Auth** (multi-backend, orgs), services, **database** (per-plugin schema, second DB), provisioning jobs | 01-scaffold · 02-auth-and-orgs · 03-workspace-data · 04-provision-job · 05-roles-and-middleware · 06-deploy |
-| **C — ERP Sync** | Back-office integration | **Background jobs** + **polyglot tasks** (python/shell/dotnet), queue providers, cron/triggers | 01-scaffold · 02-import-job · 03-polyglot-transform · 04-queue-and-cron · 05-deploy |
-| **D — Live Dashboard** | Internal ops dashboard | **Fresh meta-framework** (builders/route/form/query/defer/interactive) + **SDK** (client/discovery/cache/collections/query-client) + **durable streams** (live data) | 01-scaffold · 02-contract-to-service · 03-sdk-cache-first-query · 04-definePage-QueryIsland · 05-live-stream (`useLiveQuery`) · 06-deploy |
+| Track | App | Capability focus | Chapters (proposed) | Grounding |
+|-------|-----|------------------|---------------------|-----------|
+| **A — Storefront** | E-commerce checkout | Services, contracts, **durable sagas** (payment+inventory compensation), triggers (webhooks) | 01-scaffold · 02-catalog-service · 03-cart-contracts · 04-checkout-saga · 05-shipping-webhook · 06-deploy | playground-DIRECT |
+| **B — Team Workspace** | Authenticated SaaS | **Auth** (multi-backend, session, route authz), services, **database** (per-plugin schema, second DB), provisioning jobs | 01-scaffold · 02-auth · 03-workspace-data · 04-provision-job · 05-route-authz · 06-deploy | **proof-gated** (no auth in playground; org/RBAC framing only if backends expose it — `tutorial-proof-plans.md` Track B) |
+| **C — ERP Sync** | Back-office integration | **Background jobs**, queue providers, cron/triggers + **polyglot tasks** (python/shell) | 01-scaffold · 02-import-job · 03-polyglot-transform · 04-queue-and-cron · 05-deploy | TS spine DIRECT; **polyglot chapter proof-gated** (`tutorial-proof-plans.md` Track C) |
+| **D — Live Dashboard** | Internal ops dashboard | **Fresh meta-framework** (builders/route/form/query/defer/interactive) + **SDK** (client/discovery/cache/collections/query-client) + **durable streams** (live data) | 01-scaffold · 02-contract-to-service · 03-sdk-cache-first-query · 04-definePage-QueryIsland · 05-live-stream (`useLiveQuery`) · 06-deploy | playground-DIRECT |
 
 Each chapter is a **page-type B** (sequential tutorial step) with prev/next continuity, a result
-checkpoint, and a "you built" summary. Every track ends in a `deploy` chapter that links the
-production how-to + checklist.
+checkpoint, and a "you built" summary. Every track ends in a `deploy` chapter that documents the
+**local + Aspire** topology (env/secrets/migration/health per OD8) — **not** a cloud-production claim
+(deferred to debt). Tracks B and C must clear their `tutorial-proof-plans.md` proof gates on
+`origin/main` before any prose is authored; a gate that fails rescopes or cuts the track.
 
 ---
 
@@ -140,7 +142,7 @@ The IA explicitly assigns every verified gap a home so nothing is left as orphan
 
 | Gap (verified on origin/main) | Home in v3 IA |
 |-------------------------------|---------------|
-| `@netscript/fresh` 12-subpath meta-framework | `capabilities/fresh-framework` (hub) + Track D + explanation/architecture |
+| `@netscript/fresh` 11-subpath meta-framework (see `surface-inventory.md`) | `capabilities/fresh-framework` (hub) + Track D + explanation/architecture |
 | `@netscript/sdk` discovery/cache/collections/query-client | `capabilities/sdk` (hub) + `how-to/discover-services` + Track D |
 | Polyglot runtimes (cmd/powershell/dotnet/exe) + permissions model | `capabilities/polyglot-tasks` (hub) + `how-to/run-a-polyglot-task` + Track C |
 | Worker runtime modes (in-process/web-worker/subprocess) | `capabilities/background-jobs` (enrich) + `how-to/tune-worker-runtime` |
@@ -149,7 +151,8 @@ The IA explicitly assigns every verified gap a home so nothing is left as orphan
 | Service shutdown hooks / OpenAPI+Scalar / health primitives | `capabilities/services` (enrich) + `how-to/graceful-shutdown` + `how-to/expose-openapi-scalar` |
 | Queue providers (KV/Redis/RabbitMQ/Postgres) | `capabilities/kv-queues-cron` (enrich) + `how-to/choose-a-queue-provider` |
 | `runtime-config` package | `capabilities/runtime-config` (hub) + `explanation/architecture` |
-| CLI: `db add`, `marketplace publish\|search` | `cli-reference` (enrich) |
+| CLI: `db add` | `cli-reference` (enrich) |
+| CLI: `marketplace publish\|search` (**alpha stub**, OD7) | `cli-reference` with status badge + captured current behavior; excluded from "full CLI surface" claim |
 
 ---
 
@@ -172,8 +175,10 @@ All additions must be additive and backward-compatible with existing pages.
 | "Was this helpful" | lightweight feedback widget (optional, P2) | `_components/` |
 
 ### 5.2 Diagram system
-- **Tooling:** Mermaid (rendered client-side or at build), wrapped by `comp.diagram` with an accessible
-  static fallback. ASCII diagrams in current pages are replaced where they map to a §5.3 entry.
+- **Tooling (LOCKED, OD1):** Mermaid rendered **at build time to a committed static SVG**, wrapped by
+  `comp.diagram` as `<figure>` + `<figcaption>` alt text. **No client-side Mermaid JS** — diagrams are
+  visible with JavaScript off and are diffable assets. ASCII diagrams in current pages are replaced where
+  they map to a §5.3 entry.
 - Avoid the Vento `function`-keyword landmine in any code sample passed to comp tags
   ([[lume-vento-function-keyword-landmine]]): use arrow/const forms.
 
@@ -190,13 +195,14 @@ project file-tree (quickstart + tutorial 01s, via `comp.fileTree`).
 
 ## 6. Cross-reference system (W6 — auto-resolving xref)
 
-Replaces hand-maintained internal links. Design:
-- A single `xref` data source (`_data.ts` or a `_data/xref.ts`) maps stable **keys** →
-  canonical URLs (e.g. `cap:durable-sagas`, `howto:run-a-polyglot-task`, `tut:storefront/04`).
-- A `comp.xref` (or a Vento filter) resolves `key → <a href>` at build, failing the build on an
-  unknown key (no silent dead links).
-- Generated reference units are addressable by key (`ref:plugin-sagas-core/presets`) so capability
-  hubs link to reference without hardcoding paths.
+Replaces hand-maintained internal links. Design (LOCKED, OD2/OD3):
+- A **dedicated `_data/xref.ts`** (not `_data.ts`, which stays nav-only) maps stable **keys** →
+  canonical URLs. Locked key namespaces: `cap:` `howto:` `tut:` `explain:` `concept:` `ref:` `cli:`
+  `glossary:` (e.g. `cap:durable-sagas`, `howto:run-a-polyglot-task`, `tut:storefront/04`).
+- A **`comp.xref` Vento filter** resolves `key → <a href>` at build, **failing the build on an unknown
+  key** (no silent dead links).
+- Generated reference units are addressable by key `ref:<unit>/<subpath>` (matches `surface-inventory.md`,
+  e.g. `ref:plugin-sagas-core/presets`) so capability hubs link to reference without hardcoding paths.
 - Benefit: pages move without breaking links; the build is the link checker.
 
 ---
