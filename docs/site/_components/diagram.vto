@@ -8,5 +8,5 @@
    All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
 <figure class="ns-diagram">
   <img class="ns-diagram__img" src="{{ src |> url }}" alt="{{ alt }}" loading="lazy" />
-  {{ if caption }}<figcaption class="ns-diagram__caption">{{ caption }}</figcaption>{{ /if }}
+  {{ if caption }}<figcaption class="ns-diagram__caption">{{ caption |> ic }}</figcaption>{{ /if }}
 </figure>

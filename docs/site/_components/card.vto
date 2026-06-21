@@ -6,7 +6,7 @@
 <{{ tag }} class="ns-card"{{ if href }} href="{{ href |> url }}"{{ /if }}>
   <span class="ns-card__head">
     {{ if icon }}<span class="ns-card__icon" aria-hidden="true">{{ icon }}</span>{{ /if }}
-    <span class="ns-card__title">{{ title }}</span>
+    <span class="ns-card__title">{{ title |> ic }}</span>
   </span>
-  {{ if body }}<p class="ns-card__body">{{ body }}</p>{{ /if }}
+  {{ if body }}<p class="ns-card__body">{{ body |> ic }}</p>{{ /if }}
 </{{ tag }}>

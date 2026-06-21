@@ -20,7 +20,7 @@
 {{ set generic = columns ? true : false }}
 <div class="ns-api-table-wrap">
   <table class="ns-api-table">
-    {{ if cap }}<caption>{{ cap }}</caption>{{ /if }}
+    {{ if cap }}<caption>{{ cap |> ic }}</caption>{{ /if }}
     <thead>
       <tr>
         {{ for head of heads }}<th scope="col">{{ head }}</th>{{ /for }}
@@ -34,12 +34,12 @@
             {{ for entry of cells.entries() }}
               {{ set i = entry[0] }}
               {{ set last = i === cells.length - 1 }}
-              <td class="{{ last ? 'ns-api-table__desc' : (i === 0 ? 'ns-api-table__name' : 'ns-api-table__type') }}">{{ entry[1] }}</td>
+              <td class="{{ last ? 'ns-api-table__desc' : (i === 0 ? 'ns-api-table__name' : 'ns-api-table__type') }}">{{ entry[1] |> ic }}</td>
             {{ /for }}
           {{ else }}
             <td class="ns-api-table__name"><code>{{ row.name }}</code></td>
             <td class="ns-api-table__type"><code>{{ row.type }}</code></td>
-            <td class="ns-api-table__desc">{{ row.desc }}</td>
+            <td class="ns-api-table__desc">{{ row.desc |> ic }}</td>
           {{ /if }}
         </tr>
       {{ /for }}

@@ -8,7 +8,7 @@
 <aside class="ns-callout ns-callout--{{ kind }}" role="note">
   <span class="ns-callout__icon" aria-hidden="true">{{ icons[kind] }}</span>
   <div class="ns-callout__body">
-    {{ if title }}<p class="ns-callout__title">{{ title }}</p>{{ /if }}
+    {{ if title }}<p class="ns-callout__title">{{ title |> ic }}</p>{{ /if }}
     {{ content }}
   </div>
 </aside>

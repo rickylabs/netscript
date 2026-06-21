@@ -66,6 +66,15 @@ site.copy("assets");
 //   {{ "cap:services" |> xref }}
 site.filter("xref", (key: string) => resolveXref(key).href);
 
+// Inline-code (ic): comp string args are emitted raw and are NOT markdown-
+// processed, so `code` spans authored with backticks render as literal backtick
+// characters. This filter converts backtick pairs to real <code> in component
+// fields that emit author text (apiTable caption/cells/desc), matching how the
+// markdown body already renders inline code. Leaves existing HTML untouched.
+site.filter("ic", (s: unknown) =>
+  typeof s === "string" ? s.replace(/`([^`]+)`/g, "<code>$1</code>") : (s ?? "")
+);
+
 // Expose the resolver + raw map as global data for `comp.xref` (so the component
 // resolves without an in-template import). Throws on unknown key inside the build.
 site.data("resolveXref", resolveXref);
