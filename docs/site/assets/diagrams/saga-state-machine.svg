@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" role="img"
+     aria-label="Saga state machine with happy path, compensation branch, and checkpoint store"
+     font-family="DM Sans, Segoe UI, system-ui, sans-serif">
+  <title>Saga state machine</title>
+  <desc>States Pending, Reserving, Charging, Shipping, Completed with event-driven transitions,
+        a compensation branch Charging fail to Refunding to Failed, and a checkpoint store
+        (KV or Prisma) persisting state on each transition.</desc>
+  <!-- Theme-neutral: transparent background, mid-tone (#888) strokes + text.
+       Source: _diagrams/saga-state-machine.mmd -->
+  <defs>
+    <marker id="ns-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+            markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888" />
+    </marker>
+  </defs>
+
+  <text x="410" y="26" fill="#888888" font-size="13" text-anchor="middle"
+        font-weight="600">Saga state machine</text>
+
+  <g fill="none" stroke="#888888" stroke-width="1.5">
+    <!-- happy-path states -->
+    <rect x="20"  y="84" width="120" height="46" rx="10" />
+    <rect x="180" y="84" width="120" height="46" rx="10" />
+    <rect x="340" y="84" width="120" height="46" rx="10" />
+    <rect x="500" y="84" width="120" height="46" rx="10" />
+    <rect x="660" y="84" width="120" height="46" rx="10" />
+
+    <!-- happy-path transitions -->
+    <line x1="140" y1="107" x2="176" y2="107" marker-end="url(#ns-arrow)" />
+    <line x1="300" y1="107" x2="336" y2="107" marker-end="url(#ns-arrow)" />
+    <line x1="460" y1="107" x2="496" y2="107" marker-end="url(#ns-arrow)" />
+    <line x1="620" y1="107" x2="656" y2="107" marker-end="url(#ns-arrow)" />
+
+    <!-- compensation branch -->
+    <rect x="340" y="220" width="120" height="46" rx="10" stroke-dasharray="5 3" />
+    <rect x="180" y="220" width="120" height="46" rx="10" stroke-dasharray="5 3" />
+
+    <!-- Charging fail to Refunding -->
+    <path d="M 400 130 L 400 218" marker-end="url(#ns-arrow)" />
+    <!-- Refunding to Failed -->
+    <line x1="340" y1="243" x2="304" y2="243" marker-end="url(#ns-arrow)" />
+
+    <!-- checkpoint store -->
+    <rect x="560" y="218" width="220" height="56" rx="6" />
+    <!-- persistence link from happy path down to store -->
+    <path d="M 560 132 C 700 160, 700 180, 700 216" stroke-dasharray="3 3"
+          marker-end="url(#ns-arrow)" />
+  </g>
+
+  <!-- transition event labels -->
+  <g fill="#888888" font-size="10" text-anchor="middle" opacity="0.85">
+    <text x="158" y="100">reserve</text>
+    <text x="318" y="100">charge</text>
+    <text x="478" y="100">ship</text>
+    <text x="638" y="100">done</text>
+    <text x="430" y="180">fail</text>
+    <text x="320" y="237" text-anchor="end">compensate</text>
+  </g>
+
+  <!-- state names -->
+  <g fill="#888888" font-size="13" text-anchor="middle">
+    <text x="80"  y="112">Pending</text>
+    <text x="240" y="112">Reserving</text>
+    <text x="400" y="112">Charging</text>
+    <text x="560" y="112">Shipping</text>
+    <text x="720" y="112">Completed</text>
+    <text x="400" y="248">Refunding</text>
+    <text x="240" y="248">Failed</text>
+    <text x="670" y="244">Checkpoint store</text>
+  </g>
+
+  <g fill="#888888" font-size="11" text-anchor="middle" opacity="0.85">
+    <text x="670" y="260">KV / Prisma — persists on each transition</text>
+  </g>
+</svg>

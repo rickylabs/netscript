@@ -1,0 +1,18 @@
+%% Source for assets/diagrams/trigger-ingress-flow.svg
+%% Two trigger ingress lanes:
+%%   webhook:    external POST -> HMAC verify -> defineWebhook handler -> effect
+%%   file-watch: filesystem change -> debounce (stabilityThreshold) -> defineFileWatch -> effect
+flowchart LR
+    subgraph webhook["Webhook lane"]
+        direction LR
+        post["External POST<br/>inbound request"] --> hmac["HMAC verify<br/>signature check"]
+        hmac --> wh["defineWebhook<br/>handler"]
+        wh --> weff["Effect"]
+    end
+
+    subgraph filewatch["File-watch lane"]
+        direction LR
+        fs["FS change<br/>filesystem event"] --> debounce["Debounce<br/>stabilityThreshold"]
+        debounce --> fw["defineFileWatch<br/>handler"]
+        fw --> feff["Effect"]
+    end
