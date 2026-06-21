@@ -113,6 +113,43 @@ Deno.test('unsupported interactive backend operation maps to typed auth service 
   );
 });
 
+Deno.test('signin routes through the typed interactive backend sub-port', async () => {
+  let signInCalls = 0;
+  const backend: AuthBackendPort = {
+    ...fakeBackend('kv-oauth'),
+    interactive: {
+      signIn(): Promise<Response> {
+        signInCalls += 1;
+        return Promise.resolve(
+          Response.redirect('https://issuer.example.test/authorize?state=state_test'),
+        );
+      },
+      handleCallback(): Promise<{
+        readonly response: Response;
+        readonly sessionId: string;
+        readonly principal: { readonly subject: string };
+      }> {
+        return Promise.resolve({
+          response: Response.redirect('https://app.example.test/dashboard'),
+          sessionId: 'sess_test',
+          principal: { subject: 'user_test' },
+        });
+      },
+      getSessionId: () => Promise.resolve(undefined),
+      signOut(): Promise<Response> {
+        return Promise.resolve(new Response(null, { status: 204 }));
+      },
+    },
+  };
+  const registry = createAuthBackendRegistry(new Map([['kv-oauth', backend]]), 'kv-oauth');
+
+  const started = await signin({}, { registry });
+
+  assertEquals(signInCalls, 1);
+  assertEquals(started.redirectUrl, 'https://issuer.example.test/authorize?state=state_test');
+  assertEquals(started.state, 'state_test');
+});
+
 Deno.test('auth handler errors keep observable central oRPC envelopes', async () => {
   await assertProcedureEnvelope(
     'signin',

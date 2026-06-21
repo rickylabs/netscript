@@ -10,7 +10,12 @@ import {
   createKvOAuthStore,
   defineOAuthProvider,
 } from '@netscript/auth-kv-oauth';
-import { createWorkosBackend, type WorkosSessionClient } from '@netscript/auth-workos';
+import {
+  createWorkosBackend,
+  type WorkosCookieSession,
+  type WorkosSessionAuthenticationResult,
+  type WorkosSessionRefreshResult,
+} from '@netscript/auth-workos';
 import { MemoryKvAdapter, type WatchableKv } from '@netscript/kv';
 import { AuthConfigSchema } from '@netscript/plugin-auth-core/config';
 import {
@@ -36,6 +41,48 @@ export type CreateAuthServiceBackendRegistryOptions = Readonly<{
   dbClient?: unknown;
   kv?: WatchableKv;
   fetch?: typeof fetch;
+}>;
+
+type WorkosSdkAuthenticationFailure = Readonly<{
+  authenticated: false;
+  reason: string;
+}>;
+
+type WorkosSdkAuthenticationSuccess = Readonly<{
+  authenticated: true;
+  accessToken: string;
+  authenticationMethod?: string;
+  sessionId: string;
+  organizationId?: string;
+  role?: string;
+  roles?: readonly string[];
+  permissions?: readonly string[];
+  entitlements?: readonly string[];
+  featureFlags?: readonly string[];
+  user: { readonly id: string };
+  impersonator?: unknown;
+}>;
+
+type WorkosSdkAuthenticationResult =
+  | WorkosSdkAuthenticationSuccess
+  | WorkosSdkAuthenticationFailure;
+
+type WorkosSdkRefreshSuccess =
+  & Omit<WorkosSdkAuthenticationSuccess, 'accessToken'>
+  & Readonly<{
+    authenticated: true;
+    sealedSession?: string;
+    session?: unknown;
+  }>;
+
+type WorkosSdkRefreshResult = WorkosSdkRefreshSuccess | WorkosSdkAuthenticationFailure;
+
+type WorkosSdkCookieSession = Readonly<{
+  authenticate(): Promise<WorkosSdkAuthenticationResult>;
+  refresh(options?: {
+    readonly cookiePassword?: string;
+    readonly organizationId?: string;
+  }): Promise<WorkosSdkRefreshResult>;
 }>;
 
 /** Creates a single-active auth backend registry for the plugin service. */
@@ -105,10 +152,16 @@ async function createActiveBackend(
   }
   if (backendName === 'workos') {
     const { WorkOS } = await import('@workos-inc/node');
+    const workos = new WorkOS(requiredEnv(env, 'WORKOS_API_KEY'), {
+      clientId: requiredEnv(env, 'WORKOS_CLIENT_ID'),
+    });
     return createWorkosBackend({
-      workos: new WorkOS(requiredEnv(env, 'WORKOS_API_KEY'), {
-        clientId: requiredEnv(env, 'WORKOS_CLIENT_ID'),
-      }) as unknown as WorkosSessionClient,
+      workos: {
+        userManagement: {
+          loadSealedSession: (sessionOptions) =>
+            createWorkosCookieSession(workos.userManagement.loadSealedSession(sessionOptions)),
+        },
+      },
       cookiePassword: requiredEnv(env, 'WORKOS_COOKIE_PASSWORD'),
       providers: [{ id: 'workos', displayName: 'WorkOS' }],
     });
@@ -123,6 +176,43 @@ async function createActiveBackend(
     sessionTokenSecret: requiredEnv(env, 'BETTER_AUTH_SECRET'),
     providers: [{ id: 'better-auth', displayName: 'better-auth' }],
   });
+}
+
+function createWorkosCookieSession(
+  session: WorkosSdkCookieSession,
+): WorkosCookieSession {
+  return {
+    async authenticate(): Promise<WorkosSessionAuthenticationResult> {
+      return normalizeWorkosAuthentication(await session.authenticate());
+    },
+    async refresh(options): Promise<WorkosSessionRefreshResult> {
+      return normalizeWorkosRefresh(await session.refresh(options));
+    },
+  };
+}
+
+function normalizeWorkosAuthentication(
+  result: WorkosSdkAuthenticationResult,
+): WorkosSessionAuthenticationResult {
+  if (!result.authenticated) {
+    return result;
+  }
+  return {
+    ...result,
+    user: { id: result.user.id },
+  };
+}
+
+function normalizeWorkosRefresh(
+  result: WorkosSdkRefreshResult,
+): WorkosSessionRefreshResult {
+  if (!result.authenticated) {
+    return result;
+  }
+  return {
+    ...result,
+    user: { id: result.user.id },
+  };
 }
 
 function requiredEnv(env: Readonly<Record<string, string | undefined>>, name: string): string {
@@ -173,11 +263,17 @@ function resolveKvOAuthKey(env: Readonly<Record<string, string | undefined>>): A
   const configured = env.NETSCRIPT_AUTH_KV_OAUTH_TEST_KEY;
   if (configured) {
     const bytes = Uint8Array.from(atob(configured), (char) => char.charCodeAt(0));
-    return bytes.buffer as ArrayBuffer;
+    return copyArrayBuffer(bytes);
   }
   const key = new Uint8Array(32);
   crypto.getRandomValues(key);
-  return key.buffer as ArrayBuffer;
+  return copyArrayBuffer(key);
+}
+
+function copyArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const buffer = new ArrayBuffer(bytes.byteLength);
+  new Uint8Array(buffer).set(bytes);
+  return buffer;
 }
 
 /** Creates a test-friendly kv-oauth registry using an in-memory KV adapter. */

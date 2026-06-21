@@ -1,7 +1,4 @@
-import type {
-  AuthBackendPort,
-  ResolvedAuthBackendRegistry,
-} from '@netscript/plugin-auth-core/ports';
+import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
 import type { AuthnRequest, AuthSession } from '@netscript/plugin-auth-core/domain';
 import type {
   CallbackInput,
@@ -22,25 +19,14 @@ export type AuthServiceRequest = Readonly<{
   headers?: Headers;
 }>;
 
+/** Service-static context supplied before per-request oRPC middleware runs. */
+export type AuthServiceInitialContext = AuthServiceContext;
+
 /** Service context available to V1 auth route handlers. */
 export type AuthServiceContext = Readonly<{
   registry: ResolvedAuthBackendRegistry;
   request?: AuthServiceRequest;
 }>;
-
-/** Backend with optional interactive flow methods supplied by concrete adapters. */
-export type InteractiveAuthBackend =
-  & AuthBackendPort
-  & Partial<{
-    signIn(request: Request, options?: { returnTo?: string }): Promise<Response>;
-    handleCallback(request: Request): Promise<{
-      readonly response: Response;
-      readonly sessionId: string;
-      readonly principal: { readonly subject: string };
-    }>;
-    getSessionId(request: Request): Promise<string | undefined>;
-    signOut(request: Request, options?: { revoke?: boolean }): Promise<Response>;
-  }>;
 
 /** Error thrown by auth service handlers and normalized by the central oRPC error plugin. */
 export class AuthServiceHandlerError extends Error {

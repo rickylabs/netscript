@@ -62,6 +62,40 @@ Deno.test('createAuthBackendRegistry resolves named backends from the map seam',
   assertEquals(registry.resolveBackend('workos'), backend);
 });
 
+Deno.test('AuthBackendPort can expose an optional typed interactive sub-port', async () => {
+  const interactiveBackend: AuthBackendPort = {
+    ...backend,
+    interactive: {
+      signIn(): Promise<Response> {
+        return Promise.resolve(Response.redirect('https://issuer.example.test/authorize'));
+      },
+      handleCallback(): Promise<{
+        readonly response: Response;
+        readonly sessionId: string;
+        readonly principal: { readonly subject: string };
+      }> {
+        return Promise.resolve({
+          response: Response.redirect('https://app.example.test/dashboard'),
+          sessionId: 'sess_1',
+          principal: { subject: 'user_1' },
+        });
+      },
+      getSessionId: () => Promise.resolve('sess_1'),
+      signOut(): Promise<Response> {
+        return Promise.resolve(new Response(null, { status: 204 }));
+      },
+    },
+  };
+  const registry = createAuthBackendRegistry(new Map([['default', interactiveBackend]]));
+
+  const resolved = registry.resolveBackend();
+
+  assertEquals(
+    await resolved.interactive?.getSessionId(new Request('https://app.example.test')),
+    'sess_1',
+  );
+});
+
 Deno.test('createAuthBackendRegistry throws for missing backends', () => {
   const registry = createAuthBackendRegistry(new Map([['default', backend]]));
 

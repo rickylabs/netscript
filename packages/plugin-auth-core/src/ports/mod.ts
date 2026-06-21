@@ -88,6 +88,38 @@ export interface AuthSessionCryptoPort {
   openSessionToken(token: string): Promise<string> | string;
 }
 
+/** Result returned after an interactive backend completes an auth callback. */
+export type InteractiveCallbackResult = Readonly<{
+  response: Response;
+  sessionId: string;
+  principal: { readonly subject: string };
+}>;
+
+/**
+ * Interactive sign-in flow capability exposed by redirect-capable auth backends.
+ *
+ * @example
+ * ```ts
+ * const backend = registry.resolveBackend();
+ * if (backend.interactive) {
+ *   const response = await backend.interactive.signIn(
+ *     new Request("https://app.example.test/v1/auth/signin"),
+ *   );
+ *   console.log(response.headers.get("location"));
+ * }
+ * ```
+ */
+export interface InteractiveFlowPort {
+  /** Starts a provider sign-in flow and returns the backend redirect response. */
+  signIn(request: Request, options?: { returnTo?: string }): Promise<Response>;
+  /** Handles a provider callback and returns the created session plus redirect response. */
+  handleCallback(request: Request): Promise<InteractiveCallbackResult>;
+  /** Reads the backend session id from the request when the backend owns session cookies. */
+  getSessionId(request: Request): Promise<string | undefined>;
+  /** Ends an interactive backend session and returns the backend response. */
+  signOut(request: Request, options?: { revoke?: boolean }): Promise<Response>;
+}
+
 /** Error thrown when a backend operation is outside an adapter's upstream capability boundary.
  *
  * @example
@@ -175,6 +207,22 @@ export interface AuthBackendPort extends AuthenticatorPort {
   readonly crypto: AuthSessionCryptoPort;
   /** Session-to-principal mapper owned by the backend adapter. */
   readonly principalMapper: AuthPrincipalMapperPort;
+  /**
+   * Optional redirect/callback flow capability for interactive auth backends.
+   *
+   * @example
+   * ```ts
+   * const backend = registry.resolveBackend();
+   * if (!backend.interactive) {
+   *   throw new AuthBackendOperationUnsupportedError(
+   *     backend.name,
+   *     "interactive.signIn",
+   *     "The active backend authenticates sessions only.",
+   *   );
+   * }
+   * ```
+   */
+  readonly interactive?: InteractiveFlowPort;
   /** Authenticates a service request through the backend. */
   authenticate(request: AuthnRequest): Promise<AuthnResult> | AuthnResult;
 }

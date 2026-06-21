@@ -53,6 +53,8 @@ export type {
   AuthSessionPrincipalMapping,
   AuthSessionState,
   AuthSessionStorePort,
+  InteractiveCallbackResult,
+  InteractiveFlowPort,
 } from '@netscript/plugin-auth-core';
 export type { AuthnRequest, AuthnResult, Principal } from '@netscript/service/auth';
 export type {
@@ -118,6 +120,7 @@ export async function createKvOAuthBackend(
     sessions,
     crypto: createSessionCrypto(store),
     principalMapper,
+    interactive: flow,
     async authenticate(request: AuthnRequest): Promise<AuthnResult> {
       const sessionId = request.cookie(cookie?.name ?? '__Host-ns_session');
       if (!sessionId) {

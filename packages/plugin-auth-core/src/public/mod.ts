@@ -42,6 +42,8 @@ export type {
   AuthSessionCryptoPort,
   AuthSessionLookup,
   AuthSessionStorePort,
+  InteractiveCallbackResult,
+  InteractiveFlowPort,
   ResolvedAuthBackendRegistry,
 } from '../ports/mod.ts';
 export {

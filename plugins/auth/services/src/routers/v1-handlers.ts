@@ -20,8 +20,8 @@ import {
   unsupportedOperation,
 } from './v1-helpers.ts';
 import { type AuthServiceContext, AuthServiceHandlerError } from './v1-types.ts';
-import type { InteractiveAuthBackend } from './v1-types.ts';
 import type { AuthSession } from '@netscript/plugin-auth-core/domain';
+import type { AuthBackendPort, InteractiveFlowPort } from '@netscript/plugin-auth-core/ports';
 import {
   emitOidcCompleted,
   emitSessionRevoked,
@@ -46,17 +46,15 @@ export async function signin(
   input: SigninInput,
   context: AuthServiceContext,
 ): Promise<SigninResponse> {
-  const backend: InteractiveAuthBackend = context.registry.resolveBackend();
-  if (!backend.signIn) {
-    unsupportedOperation(backend.name, 'signin');
-  }
+  const backend = context.registry.resolveBackend();
+  const interactive = requireInteractive(backend, 'signin');
 
   try {
     const params = new URLSearchParams();
     if (input.providerId) params.set('providerId', input.providerId);
     if (input.loginHint) params.set('loginHint', input.loginHint);
     if (input.state) params.set('state', input.state);
-    const response = await backend.signIn(
+    const response = await interactive.signIn(
       toRequest(context.request, '/v1/auth/signin', params),
       { returnTo: input.redirectTo },
     );
@@ -86,7 +84,7 @@ export async function callback(
   input: CallbackInput,
   context: AuthServiceContext,
 ): Promise<CallbackResponse> {
-  const backend: InteractiveAuthBackend = context.registry.resolveBackend();
+  const backend = context.registry.resolveBackend();
   if (input.error) {
     throw new AuthServiceHandlerError(
       'AUTH_PROVIDER_ERROR',
@@ -94,16 +92,14 @@ export async function callback(
       { providerId: input.providerId ?? backend.name },
     );
   }
-  if (!backend.handleCallback) {
-    unsupportedOperation(backend.name, 'callback');
-  }
+  const interactive = requireInteractive(backend, 'callback');
 
   try {
     const params = new URLSearchParams();
     if (input.providerId) params.set('providerId', input.providerId);
     if (input.code) params.set('code', input.code);
     if (input.state) params.set('state', input.state);
-    const result = await backend.handleCallback(
+    const result = await interactive.handleCallback(
       toRequest(context.request, '/v1/auth/callback', params),
     );
     const output = {
@@ -124,8 +120,8 @@ export async function signout(
   input: SignoutInput,
   context: AuthServiceContext,
 ): Promise<SignoutResponse> {
-  const backend: InteractiveAuthBackend = context.registry.resolveBackend();
-  const sessionId = input.sessionId ?? await backend.getSessionId?.(
+  const backend = context.registry.resolveBackend();
+  const sessionId = input.sessionId ?? await backend.interactive?.getSessionId(
     toRequest(context.request, '/v1/auth/signout', new URLSearchParams()),
   );
 
@@ -133,13 +129,16 @@ export async function signout(
     let revokedSession: AuthSession | undefined;
     if (sessionId) {
       revokedSession = await backend.sessions.revokeSession(sessionId);
-    } else if (!backend.signOut) {
+    } else if (!backend.interactive) {
       throw new AuthServiceHandlerError('UNAUTHORIZED', 'No active auth session was found.');
     }
-    if (backend.signOut) {
-      await backend.signOut(toRequest(context.request, '/v1/auth/signout', new URLSearchParams()), {
-        revoke: !sessionId,
-      });
+    if (backend.interactive) {
+      await backend.interactive.signOut(
+        toRequest(context.request, '/v1/auth/signout', new URLSearchParams()),
+        {
+          revoke: !sessionId,
+        },
+      );
     }
     const output = {
       signedOut: true,
@@ -218,7 +217,7 @@ export async function me(context: AuthServiceContext): Promise<MeResponse> {
 }
 
 async function emitCallbackSessionCompleted(
-  backend: InteractiveAuthBackend,
+  backend: AuthBackendPort,
   sessionId: string,
 ): Promise<void> {
   try {
@@ -231,13 +230,20 @@ async function emitCallbackSessionCompleted(
   }
 }
 
+function requireInteractive(backend: AuthBackendPort, operation: string): InteractiveFlowPort {
+  if (!backend.interactive) {
+    unsupportedOperation(backend.name, operation);
+  }
+  return backend.interactive;
+}
+
 function emitObservedRefresh(authSession: AuthSession): void {
   if (authSession.refreshedAt) {
     emitTokenRefreshed(authSession);
   }
 }
 
-function firstProviderId(backend: InteractiveAuthBackend): string | undefined {
+function firstProviderId(backend: AuthBackendPort): string | undefined {
   const providers = backend.providers.listProviders();
   if (providers instanceof Promise) {
     return undefined;
