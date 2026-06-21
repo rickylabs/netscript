@@ -1,6 +1,9 @@
 import { assertEquals } from 'jsr:@std/assert@^1';
 import { buildAuthSession } from '@netscript/plugin-auth-core/testing';
-import { AuthStreamEventSchema } from '@netscript/plugin-auth-core/streams';
+import {
+  AuthStreamEventSchema,
+  AuthStreamSessionSchema,
+} from '@netscript/plugin-auth-core/streams';
 import { MemoryStreamProducer } from '@netscript/plugin-streams-core/testing';
 import { emitOidcCompleted, emitSessionRevoked, emitTokenRefreshed } from '../../streams/server.ts';
 import type { AuthSession, AuthStreamEvent } from '../../streams/mod.ts';
@@ -49,7 +52,7 @@ Deno.test('auth stream emit helpers project authSession lifecycle state', () => 
   const states: string[] = [];
   for (const event of producer.events()) {
     if (event.operation === 'upsert' && event.entityType === 'authSession' && event.value) {
-      const sessionEntity = event.value as unknown as AuthSession;
+      const sessionEntity = AuthStreamSessionSchema.parse(event.value);
       projection.set(sessionEntity.id, sessionEntity);
       states.push(sessionEntity.state);
     }

@@ -4,7 +4,7 @@
  * Public manifest and constants for the auth plugin package.
  */
 
-import { definePlugin, type PluginManifest } from '@netscript/plugin';
+import { definePlugin } from '@netscript/plugin';
 import {
   AUTH_API_DEFAULT_PORT,
   AUTH_API_SERVICE_NAME,
@@ -24,7 +24,6 @@ const AUTH_SERVICE_PERMISSIONS = [
 export type AuthPluginDependencyManifest = Readonly<{
   name?: string;
   version?: string;
-  [key: string]: unknown;
 }>;
 
 /** Typed dependencies consumed by the auth plugin manifest. */
@@ -65,12 +64,12 @@ export interface AuthPluginManifest {
   readonly name: string;
   /** Plugin semantic version. */
   readonly version: string;
+  /** Plugin category. */
+  readonly type?: string;
   /** Declared typed plugin dependencies. */
-  readonly dependencies: AuthPluginDependencies;
+  readonly dependencies?: AuthPluginDependencies;
   /** Declared contribution axes. */
   readonly contributions: AuthPluginContributions;
-  /** Additional manifest metadata carried by the plugin host. */
-  readonly [key: string]: unknown;
 }
 
 /** Inspection summary for the auth plugin manifest. */
@@ -85,7 +84,7 @@ export interface AuthPluginInspection {
   readonly axes: readonly string[];
 }
 
-const authManifest: PluginManifest = definePlugin(
+const authManifest: AuthPluginManifest = definePlugin(
   '@netscript/plugin-auth',
   AUTH_PLUGIN_VERSION,
 )
@@ -122,7 +121,7 @@ const authManifest: PluginManifest = definePlugin(
   .build();
 
 /** Plugin manifest for NetScript auth. */
-export const authPlugin: AuthPluginManifest = authManifest as unknown as AuthPluginManifest;
+export const authPlugin: AuthPluginManifest = authManifest;
 
 /** Inspect the auth plugin manifest without invoking lifecycle hooks. */
 export function inspectAuth(
@@ -131,7 +130,7 @@ export function inspectAuth(
   return Object.freeze({
     name: manifest.name,
     version: manifest.version,
-    dependencies: Object.freeze(Object.keys(manifest.dependencies)),
+    dependencies: Object.freeze(Object.keys(manifest.dependencies ?? {})),
     axes: Object.freeze(Object.keys(manifest.contributions)),
   });
 }
