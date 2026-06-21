@@ -12,11 +12,17 @@ Deliverable: a locked, PLAN-EVAL-ready Information-Architecture plan. No prose a
   (`codex-panel-findings.md`; committed WSL-only as `1cbe1875`, never pushed, reproduced into this branch)
   back into the plan; added the harness artifacts, full surface inventory, tutorial
   proof plans, hub content contracts, locked foundation decisions, and an executable gate table. See `drift.md`.
-- **Plan-Gate** — RE-DISPATCHED. The first OpenHands minimax-M3 PLAN-EVAL **crashed** (workflow failure,
-  not a verdict; comment 4762333961, run 27907934927). After this hardening pass (branch head `f3ce9538`),
-  PLAN-EVAL was re-dispatched unoriented as PR-comment **4762426764**
-  (`@openhands-agent model=openrouter/minimax/minimax-m3`). Awaiting `plan-eval.md` PASS/FAIL_PLAN. No
-  authoring/build before PASS.
+- **Plan-Gate** — **PASS** ✅. The first OpenHands minimax-M3 PLAN-EVAL **crashed** (workflow failure, not a
+  verdict; comment 4762333961, run 27907934927). The clean re-dispatch (PR-comment 4762426764, run
+  **27908862931**) rendered **`PASS`** — `plan-eval.md` committed to the branch. The evaluator independently
+  cross-checked the live repo (counted `packages/`+`plugins/` dirs, summed every `deno.json` exports map,
+  verified marketplace stubs, `TASK_TYPES`/`WORKER_RUNTIMES`) and confirmed all 10 panel findings
+  (B1/B2/B3/M4–M9/m10) genuinely closed. Verdict carried **5 non-blocking bookkeeping follow-ups**, all applied
+  in a post-PASS planning patch (see drift 2026-06-21 · PLAN-EVAL PASS): real surface count is **31 units /
+  210 subpaths** (was mis-headlined 32 / 242 — every subpath was still classified; only the totals were wrong),
+  `createJobTools` reclassified as a scaffold helper (not a published subpath), S12/§5 gate now asserts 210
+  read live from the export maps, and the Track B proof gate now emits a mandatory recorded SCOPE verdict.
+- **Implementation gate is now OPEN** — the build run may begin (separately, on the applied planning patch).
 
 ## Design
 
@@ -31,8 +37,9 @@ doctrine, removed from all public vocabulary**; marketplace CLI → **documented
 "full CLI surface" claim**; production deployment → **local + Aspire-orchestrated this run; cloud-prod deferred
 (debt)**.
 
-**Surface completeness:** `surface-inventory.md` classifies all **242** public export subpaths across **32**
-units into narrative / how-to / reference-only / testing-only / deferred. WS3 acceptance binds to it.
+**Surface completeness:** `surface-inventory.md` classifies all **210** public export subpaths across **31**
+units (26 packages + 5 plugins, verified against the live export maps 2026-06-21) into narrative / how-to /
+reference-only / testing-only / deferred. WS3 acceptance binds to it.
 
 **Tutorial grounding:** Tracks A/D are playground-direct; Tracks B/C are NOT (no auth, no demonstrated polyglot
 in the showcase) and each carries a pre-authoring proof-or-rescope gate (`tutorial-proof-plans.md`).

@@ -84,7 +84,7 @@ Each workstream is independently authorable in the later build run; this plan de
   runtime modes; mssql/mysql + db tracing; saga presets/middleware/transports/agent; service shutdown
   hooks + OpenAPI/Scalar + health; sdk discovery/cache/collections; queue providers; runtime-config;
   CLI `db add` + `marketplace`).
-- *Accept:* binds to `surface-inventory.md` — a build-run check enumerates all **242** export subpaths and
+- *Accept:* binds to `surface-inventory.md` — a build-run check enumerates all **210** export subpaths and
   asserts each has its matrix disposition realized (narrative subpath has a hub/explanation section; how-to
   subpath has a recipe/tutorial step; reference-only resolves to a `ref:` xref key; testing-only has a
   reference link; deferred has a status badge + caveat). Any unclassified/undiscoverable subpath fails.
@@ -158,7 +158,7 @@ foundation group (S01–S05) lands.
 | **S09** | enrich `services` + `database` | `capabilities/{services,database}.md` | shutdown/OpenAPI/health; mssql/mysql/tracing sections | contracts §7/§8 satisfied |
 | **S10** | enrich `durable-sagas` + `triggers` + `background-jobs` + `kv-queues-cron` | those 4 capability pages | extension points + runtime modes + 4 queue providers | contracts §3/§5/§6 satisfied; `createParallelQueue` shown |
 | **S11** | enrich `telemetry` + `auth`; rebuild `capabilities/index` | `capabilities/{telemetry,auth,index}.md` | card grid; auth diagram | index = Learn/Do/Reference card grid; auth flow diagram present |
-| **S12** | surface-completeness check | (check script + xref keys) | 242-subpath realization assertion | every `surface-inventory.md` subpath realized per its disposition; unclassified → fail |
+| **S12** | surface-completeness check | (check script + xref keys) | 210-subpath realization assertion (read live from export maps) | every `surface-inventory.md` subpath realized per its disposition; unclassified → fail |
 | **S13** | how-to recipes (8 ★NEW incl. deploy local+Aspire per OD8) | `how-to/*` | Type-R recipes | each recipe present; `marketplace` badged stub (OD7); CLI smoke captures output |
 | **S14** | explanation essays | `explanation/{architecture,plugin-system,durability-model,observability,aspire}.md` | Type-E essays + diagrams | leakage scanner = 0 on explanation zone; **no `archetype` taxonomy** (OD6); diagrams present |
 | **S15** | Track A (storefront) + Track D (live-dashboard) — playground-direct | `tutorials/{storefront,live-dashboard}/*`, `tutorials/index`, xref | 2 tracks + chooser | scaffold output type-checks; prev/next continuity; chooser links |
@@ -180,7 +180,7 @@ prior slogan list (panel #5).
 | Pagefind index | Pagefind build step | `_site/**` incl. `reference/**` | index generated; a reference term is findable | build |
 | **Leakage scan** | the deterministic scanner spec below | `docs/site/**` minus `_site/`, `reference/` | **0 hits** | docs |
 | Accuracy non-regression | re-check the 3 v3 dossiers under `…/docs-overhaul-v3/ground/` against the rewritten pages | capability/explanation pages | no reintroduced inaccuracy; fixed caveats not re-injected | docs |
-| Surface completeness | S12 enumeration check vs `surface-inventory.md` | export maps + pages/xref | all 242 subpaths realized | docs |
+| Surface completeness | S12 enumeration check vs `surface-inventory.md` | export maps + pages/xref | all 210 subpaths realized | docs |
 | `reference/**` untouched | `git diff --stat origin/docs/user-site -- docs/site/reference` | `docs/site/reference/**` | zero changes | docs |
 | Targeted fmt | `run-deno-fmt.ts --ext md` (scoped wrapper) | docs content roots only | clean; **not** raw root fmt over generated/legacy | docs |
 | Visual/structural | existing cross-ref (WF-2) + Playwright capstone, **desktop + mobile** | served `_site/` | screenshot matrix green; no layout breaks | docs |

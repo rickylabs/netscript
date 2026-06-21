@@ -3,7 +3,8 @@
 **Baseline:** `origin/main` @ `5f273355` (branch `docs/v3-ia-plan`).
 **Source:** every `deno.json` under `packages/**` and `plugins/**` with a `@netscript/*` name + `exports`
 map (read directly; full sweep). Closes Codex panel **blocker #2** ("public-surface inventory incomplete").
-**Totals:** 27 packages + 5 plugins = **32 published units**, **242 export subpaths** (`.` counted once per unit).
+**Totals:** 26 packages + 5 plugins = **31 published units**, **210 export subpaths** (`.` counted once per unit).
+(Counts verified against the live export maps 2026-06-21 — `Σ packages/*/deno.json.exports + plugins/*/deno.json.exports = 210`; the earlier "32 / 242" headline was a tally error corrected in the PLAN-EVAL follow-up patch.)
 
 This is the authoritative completeness contract: **every public subpath below is classified** into exactly
 one primary doc disposition. WS3 acceptance (`plan.md`) binds to this matrix — "no shipped public subpath
@@ -24,20 +25,20 @@ zones in parentheses. "Narrative home" is the single page a reader lands on firs
 
 ---
 
-## Packages (27)
+## Packages (26)
 
 | Unit | Narrative home | N (narrative) | H (how-to/tutorial) | R (reference-only) | T | D (deferred/stub) |
 |------|----------------|---------------|---------------------|--------------------|---|-------------------|
-| `@netscript/fresh` (11) | `capabilities/fresh-framework` ★NEW | `.`, `server`, `builders`, `route`, `defer`, `form`, `error`, `query`, `interactive`, `streams` | Track D (01–06); how-to/`forms-three-ways`, `tanstack-query` | `vite` (R; named in quickstart) | `testing` | — |
+| `@netscript/fresh` (12) | `capabilities/fresh-framework` ★NEW | `.`, `server`, `builders`, `route`, `defer`, `form`, `error`, `query`, `interactive`, `streams` | Track D (01–06); how-to/`forms-three-ways`, `tanstack-query` | `vite` (R; named in quickstart) | `testing` | — |
 | `@netscript/sdk` (10) | `capabilities/sdk` ★NEW | `.`, `client`, `discovery`, `cache`, `collections`, `query`, `query-client` | how-to/`discover-services`; Track D 03/05 | `streams`, `telemetry`, `ports` | — | — |
 | `@netscript/service` (2) | `capabilities/services` | `.` (incl. shutdown hooks, OpenAPI/Scalar, health primitives), `auth` | how-to/`graceful-shutdown`, `expose-openapi-scalar`; Track A 02 | — | — | — |
 | `@netscript/database` (10) | `capabilities/database` | `.`, `ports`, `adapters`, `adapters/postgres`, `adapters/mssql`, `adapters/mysql`, `tracing` | how-to/`use-a-second-database`; Track B 03 | `extensions`, `scripts` | `testing` | — |
-| `@netscript/plugin-workers-core` (15) | `capabilities/background-jobs` + `polyglot-tasks` ★NEW | `.`, `builders`, `workflow`, `executor`, `runtime`, `state`, `registry`, `presets`, `shutdown` | how-to/`tune-worker-runtime`, `run-a-polyglot-task`; Track C 02/03 | `contracts/v1`, `schemas`, `telemetry`, `abstracts`, `config` | `testing` | job-tools `createJobTools` no-op → badge+caveat (see WS7) |
-| `@netscript/plugin-sagas-core` (15) | `capabilities/durable-sagas` | `.`, `builders`, `runtime`, `stores`, `presets`, `middleware`, `transports`, `agent`, `integration/workers`, `integration/publisher` | Track A 04 | `domain`, `ports`, `adapters`, `telemetry`, `config`, `contracts/v1`, `streams`, `abstracts` | `testing` | — |
-| `@netscript/plugin-triggers-core` (10) | `capabilities/triggers` | `.`, `builders`, `runtime`, `adapters`, `public` | Track A 05; Track C 04 | `domain`, `ports`, `config`, `contracts/v1`, `telemetry` | `testing` | — |
-| `@netscript/plugin-auth-core` (8) | `capabilities/auth` (seam) | `.`, `domain`, `ports`, `presets` | how-to/`add-authentication`; Track B 02/05 | `contracts/v1`, `telemetry`, `streams`, `config` | `testing` | — |
+| `@netscript/plugin-workers-core` (16) | `capabilities/background-jobs` + `polyglot-tasks` ★NEW | `.`, `builders`, `workflow`, `executor`, `runtime`, `state`, `registry`, `presets`, `shutdown`, `streams` | how-to/`tune-worker-runtime`, `run-a-polyglot-task`; Track C 02/03 | `contracts/v1`, `schemas`, `telemetry`, `abstracts`, `config` | `testing` | — (`createJobTools` is a scaffold helper, NOT a published subpath → covered as a how-to caveat, see rollup) |
+| `@netscript/plugin-sagas-core` (19) | `capabilities/durable-sagas` | `.`, `builders`, `runtime`, `stores`, `presets`, `middleware`, `transports`, `agent`, `integration/workers`, `integration/publisher` | Track A 04 | `domain`, `ports`, `adapters`, `telemetry`, `config`, `contracts/v1`, `streams`, `abstracts` | `testing` | — |
+| `@netscript/plugin-triggers-core` (11) | `capabilities/triggers` | `.`, `builders`, `runtime`, `adapters`, `public` | Track A 05; Track C 04 | `domain`, `ports`, `config`, `contracts/v1`, `telemetry` | `testing` | — |
+| `@netscript/plugin-auth-core` (9) | `capabilities/auth` (seam) | `.`, `domain`, `ports`, `presets` | how-to/`add-authentication`; Track B 02/05 | `contracts/v1`, `telemetry`, `streams`, `config` | `testing` | — |
 | `@netscript/plugin-streams-core` (3) | `capabilities/streams` | `.` | Track D 05 | `telemetry` | `testing` | streams **consumer** manifest helpers throw (stub) → badge+caveat |
-| `@netscript/queue` (12) | `capabilities/kv-queues-cron` | `.`, `adapters/deno-kv`, `adapters/redis`, `adapters/amqp`, `adapters/postgres` | how-to/`choose-a-queue-provider`; Track C 04 | `adapters/kv-dead-letter-store`, `adapters/postgres-dead-letter-store`, `adapters/redis-dead-letter-store`, `adapters/kv-polling`, `ports`, `errors`, `validation` | `testing` | — |
+| `@netscript/queue` (13) | `capabilities/kv-queues-cron` | `.`, `adapters/deno-kv`, `adapters/redis`, `adapters/amqp`, `adapters/postgres` | how-to/`choose-a-queue-provider`; Track C 04 | `adapters/kv-dead-letter-store`, `adapters/postgres-dead-letter-store`, `adapters/redis-dead-letter-store`, `adapters/kv-polling`, `ports`, `errors`, `validation` | `testing` | — |
 | `@netscript/kv` (4) | `capabilities/kv-queues-cron` | `.`, `redis` | Track A 01 (KV adapter registration) | `kvdex` | `testing` | — |
 | `@netscript/cron` (4) | `capabilities/kv-queues-cron` | `.` | Track C 04 | `adapters`, `ports` | `testing` | — |
 | `@netscript/telemetry` (8) | `capabilities/telemetry` + `explanation/observability` ★NEW | `.`, `tracer`, `context`, `instrumentation` | — | `config`, `attributes`, `registry`, `orpc` | — | — |
@@ -61,7 +62,7 @@ zones in parentheses. "Narrative home" is the single page a reader lands on firs
 |------|----------------|---|---|--------------------|---|
 | `@netscript/plugin-workers` (9) | `capabilities/background-jobs` | `.` | `cli`, `scaffolding` (CLI ref); Track C | `aspire`, `contracts`, `services`, `streams`, `streams/server`, `worker` | — |
 | `@netscript/plugin-sagas` (12) | `capabilities/durable-sagas` | `.`, `public`, `runtime` | `cli`, `scaffolding`; Track A 04 | `plugin`, `e2e`, `aspire`, `contracts`, `services`, `streams`, `streams/server` | — |
-| `@netscript/plugin-triggers` (9) | `capabilities/triggers` | `.`, `public`, `runtime` | `cli`, `scaffolding`; Track A 05 | `plugin`, `aspire`, `services`, `streams`, `streams/server` | — |
+| `@netscript/plugin-triggers` (10) | `capabilities/triggers` | `.`, `public`, `runtime` | `cli`, `scaffolding`; Track A 05 | `plugin`, `aspire`, `services`, `streams`, `streams/server` | — |
 | `@netscript/plugin-streams` (5) | `capabilities/streams` | `.` | `cli`, `scaffolding`; Track D 05 | `e2e`, `aspire` | — |
 | `@netscript/plugin-auth` (7) | `capabilities/auth` | `.`, `public` | how-to/`add-authentication`; Track B | `plugin`, `contracts`, `services`, `streams`, `streams/server` | — |
 
@@ -78,9 +79,13 @@ zones in parentheses. "Narrative home" is the single page a reader lands on firs
   config/contracts/telemetry/abstracts` subpaths. Every R subpath must resolve to a `ref:<unit>/<subpath>` xref key
   (WS6) so a hub can link it without a hardcoded path.
 - **Testing-only (T)** subpaths get a single "Testing utilities → reference" link per hub.
-- **Deferred/stub (D)** — exactly three, each gets a status badge + one honest caveat (no hiding, no repetition):
-  `plugin-workers-core` job-tools `createJobTools` no-op; `plugin-streams-core` consumer manifest stub; CLI
-  `marketplace publish|search` "coming soon" stub.
+- **Deferred/stub (D)** — exactly two published-subpath stubs, each gets a status badge + one honest caveat (no
+  hiding, no repetition): `plugin-streams-core` consumer manifest stub; CLI `marketplace publish|search` "coming
+  soon" stub. The `plugin-workers-core` job-tools `createJobTools` no-op is **not a published export subpath** (it
+  is a scaffold-level helper), so it is covered as a one-line caveat in the `background-jobs` how-to rather than as
+  a D-classified subpath.
 
-**Acceptance (binds WS3):** a build-run check enumerates all 242 subpaths from the export maps and asserts each
-appears in this matrix with a disposition; any unclassified subpath fails the gate.
+**Acceptance (binds WS3):** a build-run check enumerates all **210** subpaths from the export maps and asserts each
+appears in this matrix with a disposition; any unclassified subpath fails the gate. The check reads the live
+`packages/*/deno.json` + `plugins/*/deno.json` `exports` maps (not this headline number), so the count is
+self-correcting if the surface grows.

@@ -47,6 +47,11 @@ track must be grounded in that surface + scaffold output, not the playground.
    session+route-authz only and the "orgs" framing is dropped to match reality.
 - **Rescope trigger:** if step 4 cannot demonstrate org-scoping, Track B becomes "Authenticated SaaS"
   (auth + session + route authz) and multi-tenant orgs move to a clearly-marked "advanced / extend" aside.
+- **Recorded decision (mandatory):** `proof/track-b.md` MUST end with an explicit verdict line —
+  `SCOPE: full-multitenant` (org-scoping demonstrated) or `SCOPE: authenticated-saas` (rescoped) — plus the
+  captured authenticated/unauthenticated responses that justify it. The build run reads this line to pick the
+  Track B outline; absent or unproven org-scoping is **not** allowed to default to the multi-tenant framing.
+  This makes the fallback an exercised branch, not a latent escape hatch.
 
 ## Track C — ERP Sync (jobs + polyglot tasks) · grounding: **partial → proof gate REQUIRED for polyglot**
 

@@ -182,7 +182,7 @@ These patterns ground WS2 (Track D especially) and the `fresh-framework` + `sdk`
   `…/docs-heavy-lifting/research/competitor-doc-research.md`; v2 audit
   `…/docs-v2-audit/{missing-and-miscategorized,caveats-and-gaps,capability-truth-matrix}.md`.
 - Locked-but-superseded IA: `…/docs-heavy-lifting/doc-architecture-v2.md`.
-- Full public-surface inventory: `surface-inventory.md` (32 units / 242 subpaths).
+- Full public-surface inventory: `surface-inventory.md` (31 units / 210 subpaths, verified vs live export maps).
 - Tutorial grounding gates: `tutorial-proof-plans.md`. Hub content contracts: `hub-content-contracts.md`.
 
 ## 9. Reproducibility (closes panel minor #10)
