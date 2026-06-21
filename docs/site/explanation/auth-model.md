@@ -2,8 +2,8 @@
 layout: layouts/base.vto
 title: The pure-backend auth model
 templateEngine: [vento, md]
-prev: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
-next: null
+prev: { label: "The plugin system", href: "/explanation/plugin-system/" }
+next: { label: "Durability model", href: "/explanation/durability-model/" }
 ---
 
 # The pure-backend auth model
@@ -35,7 +35,7 @@ project. Both extremes leak the *integration tax* NetScript exists to remove: th
 app to one identity vendor; the second makes you the integration.
 
 NetScript takes the same stance on authentication that it takes on
-[contracts](/explanation/contracts/) and [plugins](/explanation/plugin-model/): the cross-cutting
+[contracts](/explanation/contracts/) and [plugins](/explanation/plugin-system/): the cross-cutting
 concern belongs to a **typed boundary the framework owns**, and the concrete provider is an adapter
 that plugs into that boundary. The framework defines *the shape of an authenticator* — a port — and
 ships several **pure backends** that satisfy it. Your application depends on the port; it never
@@ -221,7 +221,7 @@ variable.
 - **Your application** depends on `Principal` / `AuthnResult` with `scheme: "custom"` — so swapping
   GitHub OAuth for WorkOS is an env-var change and a redeploy, not a refactor.
 
-This is the same shape as the [plugin model](/explanation/plugin-model/) (a thin integration layer
+This is the same shape as the [plugin model](/explanation/plugin-system/) (a thin integration layer
 over a pure capability) and the [contracts model](/explanation/contracts/) (the framework owns the
 boundary, you own the logic) — authentication is just the identity-shaped instance of the pattern.
 
@@ -248,10 +248,10 @@ boundary, you own the logic) — authentication is just the identity-shaped inst
   service on :8094, the five endpoints, and the backend matrix at a glance.
 - **Do it:** [Add authentication](/how-to/add-authentication/) — add the `auth` plugin, choose a
   backend with `NETSCRIPT_AUTH_BACKEND`, run the migration, and wire provider env.
-- **Related model:** [The plugin model](/explanation/plugin-model/) — why a thin plugin composes a
+- **Related model:** [The plugin system](/explanation/plugin-system/) — why a thin plugin composes a
   pure capability, the same shape this auth seam follows.
 - **Reference:** the neutral authentication contract lives in
   [`reference/service/`](/reference/service/) (the `/auth` subpath: `Principal`, `AuthnResult`,
   `AuthenticatorPort`).
 
-{{ comp.nextPrev({ prev: { label: "Orchestration with Aspire", href: "/explanation/aspire/" } }) }}
+{{ comp.nextPrev({ prev: { label: "The plugin system", href: "/explanation/plugin-system/" }, next: { label: "Durability model", href: "/explanation/durability-model/" } }) }}

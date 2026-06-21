@@ -28,7 +28,7 @@ A plugin is an <strong>installable capability</strong> — a background-job runt
 orchestrator, an auth service — that scaffolds its own workspace folder, registers itself in
 your runtime, and (where applicable) runs as its own Aspire service on a dedicated port. Your
 application service and your plugins run side by side. See
-<a href="/explanation/plugin-model/">Plugin architecture</a> for the design behind the model.
+<a href="/explanation/plugin-system/">Plugin architecture</a> for the design behind the model.
 {{ /comp }}
 
 ## Before you start
@@ -248,7 +248,7 @@ Run `netscript plugin --help` for the complete, version-accurate command set.
 - **Build on the plugin you just added.** Next up:
   [Add a service](/how-to/add-a-service/) to give the plugin something to call, or
   [Configure authentication](/how-to/add-authentication/) if you added the auth plugin.
-- **Understand the model.** Read [Plugin architecture](/explanation/plugin-model/) for
+- **Understand the model.** Read [Plugin architecture](/explanation/plugin-system/) for
   the design behind installable capabilities, ports, and runtime registration.
 - **Browse capabilities.** The [capabilities](/capabilities/) section maps each plugin to the
   problem it solves, with runnable examples.

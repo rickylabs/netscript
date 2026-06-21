@@ -20,7 +20,7 @@ A NetScript plugin is a workspace member under **`plugins/<name>/`** whose `mod.
 lists `./plugins/<name>/mod.ts`, and it discovers the plugin's *contributions* (jobs, services,
 stream topics, DB schemas, e2e gates) through a generated **registry**. Get those three things right
 — location, manifest, registry — and the kernel wires the rest. The conceptual model behind that
-wiring lives in [The plugin model](/explanation/plugin-model/); the generated manifest and
+wiring lives in [The plugin system](/explanation/plugin-system/); the generated manifest and
 contribution types live in the [plugin reference](/reference/plugin/).
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
@@ -354,9 +354,9 @@ declare it with <code>.withDependencies({...})</code> on the manifest and in
 }) }}
 
 {{ comp.card({
-  title: "The plugin model",
+  title: "The plugin system",
   body: "Why plugins are thread-isolated background processors, and how the kernel loads them.",
-  href: "/explanation/plugin-model/",
+  href: "/explanation/plugin-system/",
   icon: "◆"
 }) }}
 

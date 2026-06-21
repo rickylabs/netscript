@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 280" role="img"
+     aria-label="Three worker runtime modes side by side: in-process shares the same isolate, web-worker uses a separate V8 isolate, subprocess uses a separate OS process"
+     font-family="DM Sans, Segoe UI, system-ui, sans-serif">
+  <title>Worker runtime isolation modes</title>
+  <desc>NetScript workers run in one of three modes. In-process runs in the same isolate as the
+        host. Web-worker runs in a separate V8 isolate but the same process. Subprocess runs in a
+        separate OS process. Each mode shows the boundary it crosses and what it isolates.</desc>
+  <defs>
+    <marker id="ns-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7"
+            markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#888888" />
+    </marker>
+  </defs>
+  <text x="380" y="24" fill="#888888" font-size="13" text-anchor="middle"
+        font-weight="600">Worker runtime isolation modes</text>
+  <!-- mode 1: in-process -->
+  <g fill="none" stroke="#888888" stroke-width="1.6">
+    <rect x="24" y="58" width="216" height="180" rx="8" />
+    <rect x="44" y="118" width="176" height="100" rx="6" />
+    <rect x="60" y="156" width="144" height="48" rx="5" />
+  </g>
+  <g fill="#888888" font-size="12.5" text-anchor="middle">
+    <text x="132" y="80" font-weight="600">In-process</text>
+  </g>
+  <g fill="#888888" font-size="10.5" text-anchor="middle" opacity="0.85">
+    <text x="132" y="98">same isolate</text>
+  </g>
+  <g fill="#888888" font-size="11" text-anchor="middle">
+    <text x="132" y="138">isolate (host)</text>
+    <text x="132" y="184">worker</text>
+  </g>
+  <text x="132" y="232" fill="#888888" font-size="10" text-anchor="middle"
+        opacity="0.8">no boundary crossed</text>
+  <!-- mode 2: web-worker -->
+  <g fill="none" stroke="#888888" stroke-width="1.6">
+    <rect x="272" y="58" width="216" height="180" rx="8" />
+    <rect x="290" y="118" width="86" height="100" rx="6" />
+    <rect x="384" y="118" width="86" height="100" rx="6" />
+  </g>
+  <g fill="#888888" font-size="12.5" text-anchor="middle">
+    <text x="380" y="80" font-weight="600">Web-worker</text>
+  </g>
+  <g fill="#888888" font-size="10.5" text-anchor="middle" opacity="0.85">
+    <text x="380" y="98">separate V8 isolate</text>
+  </g>
+  <g fill="#888888" font-size="11" text-anchor="middle">
+    <text x="333" y="164">host</text>
+    <text x="333" y="180">isolate</text>
+    <text x="427" y="164">worker</text>
+    <text x="427" y="180">isolate</text>
+  </g>
+  <g fill="none" stroke="#888888" stroke-width="1.4">
+    <line x1="378" y1="168" x2="382" y2="168" marker-end="url(#ns-arrow)" />
+    <line x1="382" y1="168" x2="378" y2="168" marker-end="url(#ns-arrow)" />
+  </g>
+  <text x="380" y="232" fill="#888888" font-size="10" text-anchor="middle"
+        opacity="0.8">isolate boundary, same process</text>
+  <!-- mode 3: subprocess -->
+  <g fill="none" stroke="#888888" stroke-width="1.6">
+    <rect x="520" y="58" width="216" height="180" rx="8" />
+    <rect x="538" y="118" width="86" height="100" rx="6" />
+    <rect x="632" y="118" width="86" height="100" rx="6" stroke-dasharray="5 4" />
+  </g>
+  <g fill="#888888" font-size="12.5" text-anchor="middle">
+    <text x="628" y="80" font-weight="600">Subprocess</text>
+  </g>
+  <g fill="#888888" font-size="10.5" text-anchor="middle" opacity="0.85">
+    <text x="628" y="98">separate OS process</text>
+  </g>
+  <g fill="#888888" font-size="11" text-anchor="middle">
+    <text x="581" y="164">host</text>
+    <text x="581" y="180">process</text>
+    <text x="675" y="164">worker</text>
+    <text x="675" y="180">process</text>
+  </g>
+  <g fill="none" stroke="#888888" stroke-width="1.4">
+    <line x1="626" y1="168" x2="630" y2="168" marker-end="url(#ns-arrow)" />
+    <line x1="630" y1="168" x2="626" y2="168" marker-end="url(#ns-arrow)" />
+  </g>
+  <text x="628" y="232" fill="#888888" font-size="10" text-anchor="middle"
+        opacity="0.8">process boundary, IPC</text>
+</svg>

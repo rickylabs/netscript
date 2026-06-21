@@ -34,8 +34,8 @@ authentication seam.
 {{ comp.featureGrid({ items: [
   { title: "The NetScript architecture", icon: "🏛️", href: "/explanation/architecture/", body: "The published-surface thesis, the contracts-first workflow, the six package archetypes, and the publish gate that enforces all of it." },
   { title: "Contracts first", icon: "📜", href: "/explanation/contracts/", body: "How an oRPC contract flows from defineContract through implement() and a typed handler into a fully typed client, query layer, and island." },
-  { title: "The plugin model", icon: "🧩", href: "/explanation/plugin-model/", body: "How a plugin relates to its core package, what it contributes through its manifest, and how the host discovers it through generated registries." },
-  { title: "Durable workflows", icon: "🔁", href: "/explanation/durable-workflows/", body: "Sagas as explicit state machines: correlation, the kv or prisma durable store, and compensation modeled as message-handler effects." },
+  { title: "The plugin system", icon: "🧩", href: "/explanation/plugin-system/", body: "How a plugin relates to its core package, what it contributes through its manifest, and how the host discovers it through generated registries." },
+  { title: "Durability model", icon: "🔁", href: "/explanation/durability-model/", body: "Sagas as explicit state machines: correlation, the kv or prisma durable store, and compensation modeled as message-handler effects." },
   { title: "Observability", icon: "📡", href: "/explanation/observability/", body: "Where OpenTelemetry traces are real and automatic, where the scaffold handler helpers are still no-op stubs, and how Aspire collects it all." },
   { title: "The Aspire orchestrator", icon: "🛰️", href: "/explanation/aspire/", body: "The generated TypeScript AppHost, the resource graph (Postgres, Garnet, every *-api service), and the dashboard on :18888." },
   { title: "The pure-backend auth model", icon: "🔐", href: "/explanation/auth-model/", body: "Core defines the AuthBackendPort; backends are pure adapters; the plugin composes exactly one active backend. Why only kv-oauth is interactive." }
@@ -50,8 +50,8 @@ auth model is easiest to grasp once you already understand plugins and ports.
 {{ comp.learningPath({ steps: [
   { label: "Architecture", href: "/explanation/architecture/" },
   { label: "Contracts", href: "/explanation/contracts/" },
-  { label: "Plugin model", href: "/explanation/plugin-model/" },
-  { label: "Durable workflows", href: "/explanation/durable-workflows/" },
+  { label: "Plugin system", href: "/explanation/plugin-system/" },
+  { label: "Durability model", href: "/explanation/durability-model/" },
   { label: "Observability", href: "/explanation/observability/" },
   { label: "Aspire", href: "/explanation/aspire/" },
   { label: "Auth model", href: "/explanation/auth-model/" }
@@ -74,11 +74,11 @@ this zone read as one coherent argument rather than seven separate articles.
   is defined once in core and satisfied by three independent backends.
 - **Durable state is explicit.** Long-running behavior is a named state machine with a
   persistence backend, not an implicit ladder of callbacks. See
-  [durable workflows](/explanation/durable-workflows/) for sagas (`kv` or `prisma`
+  [durable workflows](/explanation/durability-model/) for sagas (`kv` or `prisma`
   store) and the [auth model](/explanation/auth-model/) for durable `auth.*` events.
 - **Plugins extend without redefining.** First-party plugins under `plugins/*` re-export
   their core package's contract and contribute service entrypoints, runtime declarations,
-  and schema fragments — covered in the [plugin model](/explanation/plugin-model/).
+  and schema fragments — covered in the [plugin model](/explanation/plugin-system/).
 - **Honesty about alpha reality.** Where the scaffold ships a stub — the worker handler
   trace helpers, the streams *manifest* helpers, the absent auth audit surface — these
   pages say so plainly. The [observability](/explanation/observability/) page draws the

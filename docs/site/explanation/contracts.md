@@ -3,7 +3,7 @@ layout: layouts/base.vto
 title: Contracts & type flow
 templateEngine: [vento, md]
 prev: { label: "Architecture", href: "/explanation/architecture/" }
-next: { label: "The plugin model", href: "/explanation/plugin-model/" }
+next: { label: "The plugin system", href: "/explanation/plugin-system/" }
 ---
 
 # Contracts & type flow
@@ -231,7 +231,7 @@ service's RPC channel also types the plugin boundaries you compose into a NetScr
 - **Triggers** are the deliberate exception: they expose *raw* Hono routes rather than an oRPC
   contract, because they receive external webhooks whose shapes you do not control. That asymmetry
   is itself instructive — contracts-first is for boundaries you *own*; an inbound webhook is a
-  boundary someone else owns. See [the plugin model](/explanation/plugin-model/).
+  boundary someone else owns. See [the plugin model](/explanation/plugin-system/).
 
 Holding those together: the contract is how NetScript makes the *internal* surfaces of a system
 type-safe end to end, and the framework is honest about where that model stops.
@@ -254,9 +254,9 @@ type-safe end to end, and the framework is honest about where that model stops.
 - **Hub:** the [services capability](/capabilities/services/) covers `defineService` versus the
   fluent `createService(...).serve()` builder and the real ports.
 - **Architecture:** [the architecture overview](/explanation/architecture/) places contracts in the
-  larger picture, and [the plugin model](/explanation/plugin-model/) shows how plugins reuse the
+  larger picture, and [the plugin model](/explanation/plugin-system/) shows how plugins reuse the
   same contracts-first seam.
 - **Reference:** the exact exported symbols live in [`reference/contracts/`](/reference/contracts/)
   and [`reference/service/`](/reference/service/).
 
-{{ comp.nextPrev({ prev: { label: "Architecture", href: "/explanation/architecture/" }, next: { label: "The plugin model", href: "/explanation/plugin-model/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Architecture", href: "/explanation/architecture/" }, next: { label: "The plugin system", href: "/explanation/plugin-system/" } }) }}

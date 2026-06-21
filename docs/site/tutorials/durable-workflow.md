@@ -107,7 +107,7 @@ Each link in the chain has a job:
 - **`.build()`** — finalizes the `SagaDefinition` the saga runner executes.
 
 {{ comp callout { type: "note", title: "Compensation is modeled as effects, not steps" } }}
-If you have used other saga frameworks you may expect a <code>.step()</code> / <code>.compensate()</code> chain. NetScript's scaffolded sample takes a different shape: each <code>.on()</code> message handler returns an array of <strong>effects</strong> (such as <code>sagaComplete(...)</code>). Compensation is just another effect you return from a handler, not a separate DSL. See <a href="/explanation/durable-workflows/">Durable workflows</a> for the reasoning behind this design.
+If you have used other saga frameworks you may expect a <code>.step()</code> / <code>.compensate()</code> chain. NetScript's scaffolded sample takes a different shape: each <code>.on()</code> message handler returns an array of <strong>effects</strong> (such as <code>sagaComplete(...)</code>). Compensation is just another effect you return from a handler, not a separate DSL. See <a href="/explanation/durability-model/">Durability model</a> for the reasoning behind this design.
 {{ /comp }}
 
 ## Step 3 — Subscribe to the worker's message
@@ -180,7 +180,7 @@ If you later want SQL-backed durability, switch to `prisma`. The plugin exposes
 ] }) }}
 
 {{ comp callout { type: "note", title: "Tier vs. store backend — two distinct dials" } }}
-Don't conflate them. <code>.durability('t1')</code> is the saga-definition <strong>tier</strong> — it decides <em>whether</em> instance state is checkpointed at all. <code>NETSCRIPT_SAGA_STORE</code> (<code>kv</code> | <code>prisma</code>) is the runtime <strong>store backend</strong> — it decides <em>where</em> the checkpointed state is written. A <code>t1</code> saga persists to whichever backend you chose; both must agree for durable state to actually land. See <a href="/explanation/durable-workflows/">Durable workflows</a> for the full model.
+Don't conflate them. <code>.durability('t1')</code> is the saga-definition <strong>tier</strong> — it decides <em>whether</em> instance state is checkpointed at all. <code>NETSCRIPT_SAGA_STORE</code> (<code>kv</code> | <code>prisma</code>) is the runtime <strong>store backend</strong> — it decides <em>where</em> the checkpointed state is written. A <code>t1</code> saga persists to whichever backend you chose; both must agree for durable state to actually land. See <a href="/explanation/durability-model/">Durability model</a> for the full model.
 {{ /comp }}
 
 ## Step 5 — Register the saga
@@ -264,7 +264,7 @@ The worker produces; the saga consumes; the instance store remembers. That is a 
 - **Continue the ladder** → [Tutorial 5 · Ingest a webhook](/tutorials/ingest-webhook/) — add the
   `triggers` plugin and turn an inbound `POST` into a background job, closing the loop back to
   workers.
-- **Understand the model** → [Durable workflows](/explanation/durable-workflows/) — durability
+- **Understand the model** → [Durability model](/explanation/durability-model/) — durability
   tiers, the `kv` vs `prisma` store backends, correlation, instances, and why compensation is
   modeled as effects.
 - **Full generated API** → the [sagas reference](/reference/sagas/) — every route, type, and symbol

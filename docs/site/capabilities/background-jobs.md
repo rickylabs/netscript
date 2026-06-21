@@ -29,7 +29,7 @@ automatically, so a queued run is observable end to end without wiring. The runn
 (how the handler is isolated) is a **user-tunable** — see the runtime-mode table below — and
 the same queue and scheduler also drive [polyglot tasks](/capabilities/polyglot-tasks/) when
 the work is owned by another runtime. The why-behind-the-choreography lives in
-[Durable workflows](/explanation/durable-workflows/).
+[Durability model](/explanation/durability-model/).
 
 {{ comp callout { type: "tip", title: "Jobs vs. tasks vs. sagas vs. services" } }}
 Reach for a <strong>background job</strong> when the work is <strong>fire-and-forget or
@@ -388,9 +388,9 @@ exported type and subpath) lives in the reference.
     icon: "≡"
   },
   {
-    title: "Understand — Durable workflows",
+    title: "Understand — Durability model",
     body: "How jobs compose with sagas: a job publishes a message a saga consumes. The why behind the choreography.",
-    href: "/explanation/durable-workflows/",
+    href: "/explanation/durability-model/",
     icon: "◎"
   }
 ] }) }}

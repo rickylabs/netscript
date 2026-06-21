@@ -295,4 +295,4 @@ no-op stubs today (tracked debt, fix planned) — use `@netscript/telemetry` dir
   [Observability](/explanation/observability/) — how the framework instruments jobs and how to add
   custom spans with `@netscript/telemetry`.
 - **Look up the full API** → the generated [`workers` reference](/reference/workers/) and the
-  [plugin model](/explanation/plugin-model/).
+  [plugin model](/explanation/plugin-system/).

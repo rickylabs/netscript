@@ -28,7 +28,7 @@ A real TypeScript backend is rarely one decision. It's a dozen, made on differen
 3. **A `docker-compose.yml` and a prayer.** Your database, your app, your worker, your dashboard — all hand-wired, all drifting from how you actually deploy.
 4. **A DI container you didn't want.** To make any of the above testable, you reach for a dependency-injection framework, and now wiring is a layer of indirection instead of a function call.
 5. **Drift between the API and the client.** The service returns one shape; the client believes another. You find out at runtime, in production, from a user. Codegen helps until the generated types and the hand-written ones disagree.
-6. **Durable workflows faked with retries.** "It'll just retry" is not a state machine. There's no correlation, no compensation, no record of where a multi-step flow actually stopped when the process died.
+6. **Durability model faked with retries.** "It'll just retry" is not a state machine. There's no correlation, no compensation, no record of where a multi-step flow actually stopped when the process died.
 7. **Auth bolted on at the end.** You wire OAuth, sessions, and a provider SDK by hand, then discover the provider you chose is the one you now can't swap without a rewrite.
 
 None of these are hard problems individually. The cost is the **integration tax** — the standing maintenance of seven unrelated tools pretending to be one system.
@@ -64,7 +64,7 @@ Define a contract once. The client is *derived* from it — no codegen, no secon
   { label: "Call the typed client", lang: "ts", code: "// The client is derived from the contract above — not generated, not duplicated.\nimport { defineServices } from '@netscript/sdk';\nimport { usersContract } from './contracts/users.ts';\n\nconst { clients } = defineServices({\n  users: { contract: usersContract },\n});\n\n// `result` is fully typed from the contract's output schema.\nconst result = await clients.users.list({ limit: 20, offset: 0 });\nconsole.log(result.items, result.pagination);" }
 ] }) }}
 
-### 2. Durable workflows by design
+### 2. Durability model by design
 
 A saga is an explicit state machine, not a retry loop. You declare its state, the messages it reacts to, and what each handler emits — including completion and failure as first-class outcomes. It's authored in plain TypeScript builders, but the model is closer to Temporal than to a job queue. Runtime state persists to a durable store you choose — `kv` or `prisma` — so a saga in flight survives a process restart.
 
