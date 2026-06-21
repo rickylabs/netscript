@@ -49,7 +49,7 @@ deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscr
 ```
 
 {{ comp callout { type: "note", title: "New to NetScript? Walk the main ladder first" } }}
-This track assumes you are comfortable with the contract-first service loop. If <code>defineService</code> and oRPC contracts are new, do <a href="/tutorials/first-workspace/">Your first workspace</a> and <a href="/tutorials/build-a-service/">Build a service</a> first — they move slower. This track moves faster and goes deeper on the Fresh consumer surface.
+This track assumes you are comfortable with the contract-first service loop. If <code>defineService</code> and oRPC contracts are new, do the <a href="/quickstart/">Quickstart</a> and the <a href="/tutorials/storefront/02-catalog-service/">Storefront catalog-service chapter</a> first — they move slower. This track moves faster and goes deeper on the Fresh consumer surface.
 {{ /comp }}
 
 ## The arc: contract → client → query → island → stream

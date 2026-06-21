@@ -13,7 +13,7 @@ long-running, message-driven work survive a process restart?* It builds the ment
 saga is, how its state is persisted, where that state physically lives, and how compensation and
 correlation fit — so you can reason about the running system. It is not a step-by-step guide. When
 you want to build a durable workflow with your own hands, follow the
-[durable workflow tutorial](/tutorials/durable-workflow/); for the headline API and ports see
+[durable workflow tutorial](/tutorials/storefront/04-checkout-saga/); for the headline API and ports see
 {{ comp.xref({ key: "cap:durable-sagas" }) }}; for the exact exported symbols see
 {{ comp.xref({ key: "ref:sagas" }) }}.
 
@@ -397,7 +397,7 @@ will meet:
 
 ## Where to go next
 
-- **Do it:** [Build a durable workflow](/tutorials/durable-workflow/) — the hands-on tutorial that
+- **Do it:** [Build a durable workflow](/tutorials/storefront/04-checkout-saga/) — the hands-on tutorial that
   adds the saga and consumes `UserSettingsCreated` end to end.
 - **See the capability:** {{ comp.xref({ key: "cap:durable-sagas" }) }} — the headline `defineSaga`
   API, the `:8092` endpoints, the `kv | prisma` store switch, and the Learn / Do / Reference triplet.

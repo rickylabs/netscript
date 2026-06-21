@@ -17,7 +17,7 @@ This is a task-oriented recipe. It assumes you already have a NetScript workspac
 (created with `netscript init`) and that the `netscript` command is on your path. If
 you want the guided, build-up-from-scratch version that explains *why* each piece
 exists — contract to typed client to a Fresh island — follow the
-[Build a service tutorial](/tutorials/build-a-service/) instead. For the full generated
+[Build a service tutorial](/tutorials/storefront/02-catalog-service/) instead. For the full generated
 API of the service runtime, see the [`@netscript/service` reference](/reference/service/);
 for the concept behind contract-first wiring, read
 [Contracts, explained](/explanation/contracts/).
@@ -273,7 +273,7 @@ Wire persistence with the database recipe before you depend on durability.
 ## See also
 
 {{ comp.featureGrid({ items: [
-  { title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/build-a-service/", icon: "→" },
+  { title: "Tutorial: Build a service", body: "The guided, learning-oriented version — contract to typed client to a Fresh island, explained step by step.", href: "/tutorials/storefront/02-catalog-service/", icon: "→" },
   { title: "Service API reference", body: "The full generated surface of defineService and createService — every option, builder method, and return type.", href: "/reference/service/", icon: "◆" },
   { title: "Contracts, explained", body: "How an oRPC contract flows from service to typed client to UI without a codegen step.", href: "/explanation/contracts/", icon: "◎" },
   { title: "Database & migration", body: "Replace the seeded in-memory records with real Postgres persistence — init, generate, seed (Aspire up first).", href: "/how-to/database-migration/", icon: "▣" }

@@ -111,7 +111,7 @@ The two directories this track lives in:
   these in chapter 2, then consume them from the Fresh app in chapters 3–5.
 
 For a guided walk through *every* generated directory, see
-[Your first workspace](/tutorials/first-workspace/) — this track keeps the tour short on purpose.
+the [Storefront scaffold chapter](/tutorials/storefront/01-scaffold/) — this track keeps the tour short on purpose.
 
 ## Step 4 — Look at the Fresh app entry point
 

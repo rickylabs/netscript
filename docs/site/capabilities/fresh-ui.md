@@ -225,7 +225,7 @@ matches what you're doing.
   {
     title: "Learn — Build a service",
     body: "Guided tutorial: contract → users service on :3001 → typed client → the island that renders it in the dashboard.",
-    href: "/tutorials/build-a-service/",
+    href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   },
   {

@@ -108,11 +108,11 @@ export const xref: Record<string, XrefTarget> = {
 
   // ─── Tutorials (tut:) ──────────────────────────────────────────────────────
   "tut:index": { href: "/tutorials/", label: "Tutorials" },
-  "tut:first-workspace": { href: "/tutorials/first-workspace/", label: "Your first workspace" },
-  "tut:build-a-service": { href: "/tutorials/build-a-service/", label: "Build a service" },
-  "tut:background-jobs": { href: "/tutorials/background-jobs/", label: "Add background jobs" },
-  "tut:durable-workflow": { href: "/tutorials/durable-workflow/", label: "A durable workflow" },
-  "tut:ingest-webhook": { href: "/tutorials/ingest-webhook/", label: "Ingest a webhook" },
+  "tut:first-workspace": { href: "/tutorials/storefront/", label: "Build the Storefront" },
+  "tut:build-a-service": { href: "/tutorials/storefront/02-catalog-service/", label: "Build a service" },
+  "tut:background-jobs": { href: "/tutorials/erp-sync/", label: "ERP Sync — background jobs" },
+  "tut:durable-workflow": { href: "/tutorials/storefront/04-checkout-saga/", label: "A durable checkout saga" },
+  "tut:ingest-webhook": { href: "/tutorials/storefront/05-shipping-webhook/", label: "Ingest a webhook" },
   // v3 tutorial tracks (D1/D2) + chapters
   "tut:storefront": { href: "/tutorials/storefront/", label: "Storefront" },
   "tut:storefront/01": { href: "/tutorials/storefront/01-scaffold/", label: "Storefront - Scaffold" },

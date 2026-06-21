@@ -57,15 +57,15 @@ the layer's partial. The contract type-flow that makes this safe end-to-end is e
     icon: "→"
   },
   {
-    title: "Do — Forms three ways",
-    body: "Task recipe: a server-only form, a client-enhanced form, and a hybrid form, all from one withForm() definition.",
-    href: "/how-to/forms-three-ways/",
+    title: "Do — Customize the Fresh UI",
+    body: "Recolor the design system, swap primitives, and extend the generated app shell — the hands-on Fresh UI customization recipe.",
+    href: "/how-to/customize-fresh-ui/",
     icon: "◆"
   },
   {
     title: "Do — TanStack Query in islands",
     body: "Wire an island to the same cache the page loader filled, so hydration is instant and invalidation is shared.",
-    href: "/how-to/tanstack-query/",
+    href: "/tutorials/live-dashboard/03-sdk-cache-first-query/",
     icon: "◆"
   },
   {

@@ -33,7 +33,7 @@ below — every one of which is a verified fact you can copy verbatim.
 
 You need a working, type-checked workspace and a clear idea of where it is going. If you have
 not built one yet, start with [Quickstart](/quickstart/) and
-[Your first workspace](/tutorials/first-workspace/). Then confirm the workspace is healthy
+the [Storefront tutorial](/tutorials/storefront/). Then confirm the workspace is healthy
 locally before you try to move it:
 
 ```bash

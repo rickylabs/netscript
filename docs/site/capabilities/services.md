@@ -51,7 +51,7 @@ type story is in [Contracts](/explanation/contracts/).
   {
     title: "Learn — Build a service",
     body: "Track A 02: author a contract, stand up the users service on :3001, call it from a typed client.",
-    href: "/tutorials/build-a-service/",
+    href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   },
   {
@@ -401,7 +401,7 @@ This hub is intentionally thin — the full generated API lives in the reference
   {
     title: "Learn — Build a service",
     body: "Guided tutorial: contract → users service on :3001 → typed client → island, built from scratch.",
-    href: "/tutorials/build-a-service/",
+    href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   }
 ] }) }}

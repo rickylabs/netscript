@@ -30,7 +30,7 @@ together under one `aspire run`, with the Aspire dashboard live on `:18888`.
 
 ## Before you begin
 
-You need the same local toolchain the [main tutorials](/tutorials/first-workspace/) use:
+You need the same local toolchain the [main tutorials](/tutorials/) use:
 
 - **[Deno](https://deno.com/) 2.x** on your `PATH` — check with `deno --version`.
 - The **[Aspire CLI](https://aspire.dev)** — check with `aspire --version`. Aspire provisions your

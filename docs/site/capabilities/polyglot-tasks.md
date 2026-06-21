@@ -46,7 +46,7 @@ spawn entirely.
   {
     title: "Learn — Workers track",
     body: "Tutorial Track C builds the worker plugin end to end; lesson 03 adds a polyglot task with explicit permissions.",
-    href: "/tutorials/workers/",
+    href: "/tutorials/erp-sync/",
     icon: "→"
   },
   {

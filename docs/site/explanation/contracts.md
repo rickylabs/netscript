@@ -15,7 +15,7 @@ understanding-oriented: read it to build a mental model. When you want exact sig
 follow the links to [`reference/contracts/`](/reference/contracts/) and
 [`reference/service/`](/reference/service/); when you want to build the thing, follow the
 [capability hub for services](/capabilities/services/) or the
-[Build a service tutorial](/tutorials/build-a-service/).
+[Build a service tutorial](/tutorials/storefront/02-catalog-service/).
 
 ## The thesis: the contract is the product
 
@@ -249,7 +249,7 @@ type-safe end to end, and the framework is honest about where that model stops.
 
 ## Where to go next
 
-- **Do it:** the [Build a service tutorial](/tutorials/build-a-service/) walks the contract →
+- **Do it:** the [Build a service tutorial](/tutorials/storefront/02-catalog-service/) walks the contract →
   service → typed client → island path with this exact `users` example.
 - **Hub:** the [services capability](/capabilities/services/) covers `defineService` versus the
   fluent `createService(...).serve()` builder and the real ports.

@@ -149,7 +149,7 @@ caller that triggered provisioning never waits for it.
 This chapter triggers the job over HTTP (Step 5) so you can watch it run. From inside another NetScript
 runtime — a trigger or a scheduled job — you enqueue work with the builder's
 <code>enqueueJob(...)</code> step rather than an HTTP call; that path is covered in the
-<a href="/tutorials/ingest-webhook/">webhook tutorial</a> and the
+<a href="/tutorials/storefront/05-shipping-webhook/">webhook tutorial</a> and the
 <a href="/capabilities/background-jobs/">background-jobs capability</a>. For this track, the HTTP
 trigger is the clearest way to prove the job ran.
 {{ /comp }}

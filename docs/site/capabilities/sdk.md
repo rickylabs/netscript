@@ -48,7 +48,7 @@ hydrate that same query key on the client.
   {
     title: "Learn — Build a service + client",
     body: "Track D walks contract → typed client → query factory → definePage layer → island, end to end.",
-    href: "/tutorials/build-a-service/",
+    href: "/tutorials/storefront/02-catalog-service/",
     icon: "→"
   },
   {

@@ -59,7 +59,7 @@ process and how effect-based outcomes differ from a retry loop.
   columns: 2,
   items: [
     { icon: "◆", title: "Learn — Build the checkout saga", body: "The storefront tutorial rung that adds the sagas plugin, correlates the order events, and compensates a failed payment step.", href: "/tutorials/storefront/04-checkout-saga/" },
-    { icon: "→", title: "Do — Wire a durable workflow", body: "Add the sagas plugin to a running app, consume a cross-plugin message, and emit sagaComplete end to end.", href: "/tutorials/durable-workflow/" }
+    { icon: "→", title: "Do — Wire a durable workflow", body: "Add the sagas plugin to a running app, consume a cross-plugin message, and emit sagaComplete end to end.", href: "/tutorials/storefront/04-checkout-saga/" }
   ]
 }) }}
 

@@ -59,7 +59,7 @@ changing hands: durable workflows and verified webhooks make checkout reliable i
 
 You are comfortable with TypeScript and have used Deno at least a little. You do not need prior
 NetScript experience — chapter 1 starts from an empty folder — but if you have never run the
-framework locally, skim [Tutorial 1 · Your first workspace](/tutorials/first-workspace/) first; it
+framework locally, skim the [Quickstart](/quickstart/) first; it
 covers the same scaffold at a gentler pace. This track moves faster and stays on the storefront
 domain the whole way.
 

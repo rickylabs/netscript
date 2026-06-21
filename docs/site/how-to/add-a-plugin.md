@@ -36,7 +36,7 @@ application service and your plugins run side by side. See
 You need:
 
 - **An existing NetScript workspace.** If you do not have one yet, create it first with
-  `netscript init` — walk through [Your first workspace](/tutorials/first-workspace/) or the
+  `netscript init` — walk through the [Quickstart](/quickstart/) or the
   [tutorials index](/tutorials/).
 - **The `netscript` command on your path.** Run `netscript --help` to confirm it resolves,
   and `netscript plugin --help` for the exact option spelling in your installed version. If
