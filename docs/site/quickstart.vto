@@ -143,7 +143,7 @@ served under `/api/rpc/*`.
 ] }) }}
 
 {{ comp callout { type: "tip", title: "Fluent alternative" } }}
-Prefer a builder? The fluent equivalent of <code>defineService(...)</code> is the explicit chain <code>createService(router, config).withCors().withLogger().withOpenAPI().withDocs().withRPC().withServiceInfo().withHealth().serve()</code> — each <code>.withXxx()</code> adds one layer of the wiring that <code>defineService</code> bundles, including the <code>/api/rpc/*</code> mount (added by <code>.withRPC()</code>). Calling <code>createService(...).serve()</code> with no chaining produces a bare app: no RPC handler, no CORS, no health. See <a href="/tutorials/build-a-service/">Build a service</a>.
+Prefer a builder? The fluent equivalent of <code>defineService(...)</code> is the explicit chain <code>createService(router, config).withCors().withLogger().withOpenAPI().withDocs().withRPC().withServiceInfo().withHealth().serve()</code> — each <code>.withXxx()</code> adds one layer of the wiring that <code>defineService</code> bundles, including the <code>/api/rpc/*</code> mount (added by <code>.withRPC()</code>). Calling <code>createService(...).serve()</code> with no chaining produces a bare app: no RPC handler, no CORS, no health. See <a href="/tutorials/storefront/02-catalog-service/">the Storefront catalog-service chapter</a>.
 {{ /comp }}
 
 ## What you see
@@ -206,21 +206,21 @@ A complete, type-checked workspace — not a starter you have to assemble:
 ### Next steps
 
 {{ comp callout { type: "tip", title: "Start here" } }}
-New to NetScript? Work through <a href="/tutorials/first-workspace/">Your first workspace</a> —
+New to NetScript? Work through <a href="/tutorials/storefront/">the Storefront tutorial</a> —
 a guided track that takes this scaffold to a real feature.
 {{ /comp }}
 
 {{ comp.featureGrid({ items: [
   {
-    title: "Build your first workspace",
-    body: "A guided track that walks you from this scaffold to a real feature.",
-    href: "/tutorials/first-workspace/",
+    title: "Build the Storefront",
+    body: "A guided, end-to-end track that takes this scaffold to a real storefront — services, a durable checkout, and a webhook.",
+    href: "/tutorials/storefront/",
     icon: "→"
   },
   {
     title: "Build a service",
     body: "Define an oRPC contract, implement it, and serve it under /api/rpc/* with one call.",
-    href: "/tutorials/build-a-service/",
+    href: "/tutorials/storefront/02-catalog-service/",
     icon: "◧"
   },
   {
@@ -237,4 +237,4 @@ a guided track that takes this scaffold to a real feature.
   }
 ] }) }}
 
-{{ comp.nextPrev({ next: { label: "Tutorial — Your first workspace", href: "/tutorials/first-workspace/" } }) }}
+{{ comp.nextPrev({ next: { label: "Tutorial — Build the Storefront", href: "/tutorials/storefront/" } }) }}

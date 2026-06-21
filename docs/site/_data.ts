@@ -61,6 +61,7 @@ export const navSections: NavSection[] = [
       { href: "/", label: "Home", icon: "\u25EB" },
       { href: "/quickstart/", label: "Quickstart", icon: "\u25B8" },
       { href: "/why/", label: "Why NetScript", icon: "\u25C8" },
+      { href: "/concepts/", label: "Core concepts", icon: "\u25C7" },
     ],
   },
   {
