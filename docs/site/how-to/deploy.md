@@ -82,7 +82,7 @@ first-party plugins installed, the graph looks like this:
   { name: "workers-api", type: "plugin · :8091", desc: "Workers API. Requires DB + KV. References <code>streams</code>." },
   { name: "sagas-api", type: "plugin · :8092", desc: "Sagas API. Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
   { name: "triggers-api", type: "plugin · :8093", desc: "Triggers API (raw Hono routes, not oRPC). Requires DB + KV. References <code>workers-api</code>, <code>streams</code>." },
-  { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Concurrency via <code>WORKER_CONCURRENCY</code> / <code>SAGA_CONCURRENCY</code>." },
+  { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Workers runtime pool via <code>WORKERS_CONCURRENCY</code>; sagas via <code>SAGA_CONCURRENCY</code>." },
   { name: "triggers", type: "background processor", desc: "Entrypoint <code>src/runtime/trigger-processor.ts</code>. Concurrency 10 via <code>TRIGGER_CONCURRENCY</code>." },
   { name: "dashboard", type: "app · :8010", desc: "Fresh frontend. References service <code>users</code>." },
   { name: "postgres / garnet", type: "infrastructure", desc: "<code>Mode=Container</code> in dev. <code>PrimaryDatabase=postgres</code>, <code>PrimaryCache=garnet</code>." }
@@ -162,7 +162,7 @@ handled in `database/postgres/prisma.config.ts`.
   { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. Dev defaults to <code>http://localhost:4318</code> (http/protobuf) via the Aspire dashboard." },
   { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
   { name: "NETSCRIPT_AUTH_BACKEND", type: "string", desc: "Active auth backend if the auth plugin is installed. Default <code>kv-oauth</code>." },
-  { name: "WORKER_CONCURRENCY", type: "number", desc: "Workers background processor concurrency (scaffold default 2)." },
+  { name: "WORKERS_CONCURRENCY", type: "number", desc: "Workers runtime process pool size. Current Aspire metadata also emits <code>WORKER_CONCURRENCY</code>, but the runtime honors <code>WORKERS_CONCURRENCY</code>; set the runtime var." },
   { name: "SAGA_CONCURRENCY", type: "number", desc: "Sagas background processor concurrency (default 2)." },
   { name: "TRIGGER_CONCURRENCY", type: "number", desc: "Triggers background processor concurrency (default 10)." }
 ] }) }}
@@ -235,7 +235,7 @@ entrypoint:
 
 ```bash
 # Workers + sagas background processors share bin/combined.ts; triggers uses its own.
-WORKER_CONCURRENCY=2 \
+WORKERS_CONCURRENCY=2 \
 deno run \
   --unstable-kv --allow-net --allow-env --allow-read --allow-write --allow-run \
   workers/bin/combined.ts

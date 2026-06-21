@@ -55,7 +55,7 @@ as a <a href="/capabilities/durable-sagas/">durable saga</a>; jobs and sagas com
   },
   {
     title: "Do — Tune the worker runtime",
-    body: "Recipe: pick the in-process / web-worker / subprocess runner, set WORKER_CONCURRENCY, and choose a queue provider for your deployment.",
+    body: "Recipe: pick the in-process / web-worker / subprocess runner, set WORKERS_CONCURRENCY, and choose a queue provider for your deployment.",
     href: "/how-to/tune-worker-runtime/",
     icon: "◆"
   },
@@ -69,17 +69,23 @@ as a <a href="/capabilities/durable-sagas/">durable saga</a>; jobs and sagas com
 
 ## Minimal example
 
-Add the workers plugin to a scaffolded workspace with one command, which lands the plugin
-at `plugins/workers/` and registers it in `netscript.config.ts`:
+Add the workers plugin to a published workspace with the public package dispatcher:
 
 ```bash
-netscript plugin add worker --samples
+netscript plugin add @netscript/plugin-workers
 ```
 
-The `--samples` flag ships real, compiling modules you can read and trigger immediately —
-including `plugins/workers/jobs/health-check.ts` (a job handler) and
-`plugins/workers/tasks/validate-payload.ts` (a polyglot task). The plugin's API service comes
-up on **port 8091**.
+For local-source contributor work inside this monorepo, use the maintainer binary when you need
+first-party samples:
+
+```bash
+deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
+```
+
+That local path lands real, compiling modules you can read and trigger immediately — including
+`plugins/workers/jobs/health-check.ts` (a job handler) and
+`plugins/workers/tasks/validate-payload.ts` (a polyglot task). The plugin's API service comes up
+on **port 8091**.
 
 A job handler is an async callable over a `ctx` object that returns a `JobResult`. Parse the
 payload with a Zod schema, do the work, and return `createSuccessResult(...)` or
@@ -164,22 +170,22 @@ two shapes are the contract you write against; read them before the option table
 
 How a handler is isolated from the API process is a tunable: `WORKER_RUNTIMES` enumerates the
 three runner modes the worker runtime supports. The scaffold default is **web-worker**, where
-each worker is its own V8 isolate sized by the `WORKER_CONCURRENCY` env var. Pick the mode
+each worker is its own V8 isolate sized by the `WORKERS_CONCURRENCY` env var. Pick the mode
 that matches your isolation, memory, and parallelism needs.
 
 {{ comp.apiTable({
   caption: "WORKER_RUNTIMES — runner isolation modes (WorkerRuntime type)",
   rows: [
     { name: "in-process", type: "WorkerRuntime", desc: "Runs the handler in the same process via the in-process runner (registry-first). Lowest overhead, no isolation — best for tests, compiled binaries, and single-tenant local composition." },
-    { name: "web-worker", type: "WorkerRuntime", desc: "Runs each worker in its own Web Worker / V8 isolate (~20-40 MB each). The scaffold default; WORKER_CONCURRENCY sets the pool size for parallel job execution. Keep it low to bound memory." },
-    { name: "subprocess", type: "WorkerRuntime", desc: "Runs the handler in a spawned subprocess. Strongest isolation; W3C traceparent / tracestate is propagated into the child so its spans link back to the dispatcher (the same seam polyglot tasks use)." }
+    { name: "web-worker", type: "WorkerRuntime", desc: "Runs each worker in its own Web Worker / V8 isolate (~20-40 MB each). The scaffold default; WORKERS_CONCURRENCY sets the process pool size for parallel job execution. Keep it low to bound memory." },
+    { name: "subprocess", type: "WorkerRuntime", desc: "Runs the handler in a spawned subprocess. Strongest process isolation; only Deno tasks get permission sandboxing through .permissions(). Python, .NET, shell, PowerShell, and cmd inherit the worker process's OS permissions." }
   ]
 }) }}
 
 {{ comp.apiTable({
   caption: "Deployment & scaling knobs (workers config)",
   rows: [
-    { name: "WORKER_CONCURRENCY", type: "env (number)", desc: "Default worker concurrency / Web Worker pool size. Each isolate costs ~20-40 MB. Default is 2." },
+    { name: "WORKERS_CONCURRENCY", type: "env (number)", desc: "Runtime worker process pool size. The entrypoint reads this plural variable; current Aspire metadata also emits WORKER_CONCURRENCY, but the runtime does not consume it." },
     { name: "concurrency", type: "number", desc: "Per-topic max concurrent workers (WorkersConfigData.concurrency / per-group scaling)." },
     { name: "mode", type: "'combined' | 'distributed'", desc: "Per-topic deployment mode: one combined runner vs. distributed runners. Defaults to 'combined'." },
     { name: "queueProvider", type: "'auto' | 'deno-kv' | 'redis' | 'postgres' | 'amqp'", desc: "Queue backend. 'auto' resolves a provider; see Choose a queue provider." },
@@ -191,7 +197,7 @@ that matches your isolation, memory, and parallelism needs.
 The runner mode and pool size are deployment settings, not handler concerns — the same
 <code>process-payment</code> handler runs unchanged under any
 <a href="/how-to/tune-worker-runtime/"><code>WORKER_RUNTIMES</code> mode</a>. Start on the
-<code>web-worker</code> default with a small <code>WORKER_CONCURRENCY</code>, move to
+<code>web-worker</code> default with a small <code>WORKERS_CONCURRENCY</code>, move to
 <code>subprocess</code> when you need hard isolation, and drop to <code>in-process</code> for
 tests and compiled single-binary deployments. Resolution precedence (schema default → config
 file → env → override) is covered in
@@ -300,8 +306,10 @@ generated registry lands at
 <code>.netscript/generated/plugin-workers/jobs.registry.ts</code>, keyed by each handler's
 <code>id</code>. Background execution runs from <code>plugins/workers/bin/combined.ts</code>,
 a <em>separate</em> process from the <code>:8091</code> API service — the API enqueues, the
-runner executes. Default concurrency is <code>2</code> via the <code>WORKER_CONCURRENCY</code>
-env var.
+runner executes. Set <code>WORKERS_CONCURRENCY</code> on the worker background process when you
+need a specific process pool size. Current Aspire metadata also emits
+<code>WORKER_CONCURRENCY</code>, but the runtime entrypoint does not consume it; use
+<a href="/how-to/tune-worker-runtime/">Tune the worker runtime</a> for the mismatch details.
 {{ /comp }}
 
 ## Observability: real job traces out of the box
@@ -377,7 +385,7 @@ exported type and subpath) lives in the reference.
   },
   {
     title: "Do — Tune the worker runtime",
-    body: "Pick the runner mode, set WORKER_CONCURRENCY, choose a queue provider, and wire graceful shutdown.",
+    body: "Pick the runner mode, set WORKERS_CONCURRENCY, choose a queue provider, and wire graceful shutdown.",
     href: "/how-to/tune-worker-runtime/",
     icon: "◆"
   },

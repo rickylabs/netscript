@@ -249,7 +249,7 @@ Zod validation on the Postgres-backed queue too.
 
 {{ comp callout { type: "important", title: "Production pitfalls" } }}
 <ul>
-<li><strong>Validate at the boundary.</strong> Prefer <code>createTypedQueue</code> over <code>createQueue</code> — an unvalidated queue happily transports malformed messages until a consumer throws deep in your handler. Validation at enqueue time fails fast at the producer.</li>
+<li><strong>Validate at the boundary.</strong> Prefer <code>createTypedQueue</code> over <code>createQueue</code> — an unvalidated queue can carry malformed messages until the consumer fails inside the handler. Validation at enqueue time fails fast at the producer.</li>
 <li><strong>Local default is Deno KV, not a broker.</strong> If you never start Aspire, your queue silently runs on the Deno KV fallback. That is fine for dev, but it is not RabbitMQ — don't assume broker-grade ordering or fan-out semantics until you've provisioned the real backend.</li>
 <li><strong>PostgreSQL is opt-in, never auto-selected.</strong> Auto-discovery is RabbitMQ → Redis → Deno KV; it will <strong>not</strong> fall through to Postgres even when a Postgres connection is present. If you want the SQL-durable queue you must pass <code>provider: 'postgres'</code> — otherwise you'll quietly land on the Deno KV adapter.</li>
 <li><strong>Handler throws are not free retries.</strong> A thrown <code>QueueHandlerError</code> follows the adapter's ack/retry policy, which differs per backend. Make handlers idempotent so a redelivery can't double-charge or double-send.</li>

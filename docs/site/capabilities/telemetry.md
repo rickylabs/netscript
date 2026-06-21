@@ -112,7 +112,7 @@ spans *inside* a job handler — and even there the `@netscript/telemetry` helpe
 
 Tracing turns on from the **environment** — `@netscript/telemetry/config` resolves a
 `TelemetryConfig` from the standard `OTEL_*` variables, and the Aspire AppHost already sets
-them for you. The fastest path is the cheapest: run `aspire run`, trigger any job, and the
+them for you. The fastest path is to run `aspire run`, trigger any job, and the
 runtime's automatic spans show up in the dashboard with no code change. The tab below adds a
 **custom** span on top of that automatic trace.
 
@@ -129,7 +129,7 @@ runtime's automatic spans show up in the dashboard with no code change. The tab 
   }
 ] }) }}
 
-{{ comp callout { type: "tip", title: "The cheapest observability win" } }}
+{{ comp callout { type: "tip", title: "Lowest-effort observability path" } }}
 Run <code>aspire run</code>, trigger a job, and open <code>:18888</code> → <strong>Traces</strong>.
 You will see the dispatch span, the execution span, progress and step events, and — for
 subprocess or polyglot tasks — a continued trace across the process boundary. None of that
@@ -334,7 +334,7 @@ same telemetry stream — there is no separate tool to configure.
 Reach for the dashboard whenever you need to answer <strong>"what happened and where"</strong>:
 which resource is unhealthy, what a service logged for a given request, why a job failed, or how
 a call fanned out across services and subprocesses. Because Aspire wires OTLP for you, the
-<em>cheapest</em> observability win is simply running <code>aspire run</code> and opening
+lowest-effort observability path is to run <code>aspire run</code> and open
 <code>:18888</code> — no extra dependency, no collector to deploy. When you outgrow the local
 dashboard, the same OTLP export (<code>http://localhost:4318</code>) is the seam you point at a
 hosted backend.

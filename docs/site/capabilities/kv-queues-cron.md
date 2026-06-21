@@ -320,7 +320,7 @@ the real backends (or until you opt in to the PostgreSQL queue explicitly).
 }) }}
 
 {{ comp callout { type: "important", title: "Production notes" } }}
-A few footguns worth internalizing before you ship: <strong>(1)</strong> the PostgreSQL queue is
+Review these production constraints before deploying: <strong>(1)</strong> the PostgreSQL queue is
 <em>never</em> auto-detected — if you forget <code>provider: QueueProvider.Postgres</code> you
 silently get the Deno KV fallback. <strong>(2)</strong> <code>retryAttempts</code> /
 <code>retryDelay</code> apply <em>only</em> when the backend lacks native retry; check

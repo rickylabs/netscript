@@ -242,7 +242,7 @@ helpers (<code>withChildSpan</code>, <code>recordJobProgress</code>,
 Spans are only collected while Aspire is running and the OTLP endpoint
 (<code>http://localhost:4318</code>) is reachable. Running a service standalone with
 <code>--no-aspire</code> means tracing has nowhere to export to. If the Traces tab is empty,
-check that <code>aspire run</code> is up first — it is step 2 of the workflow for a reason.
+check that <code>aspire run</code> is up first — Aspire provisions the collector and dashboard used by the examples.
 {{ /comp }}
 
 {{ comp callout { type: "tip", title: "Set attributes, not log lines, for span data" } }}

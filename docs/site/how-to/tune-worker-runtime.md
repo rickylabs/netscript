@@ -23,7 +23,7 @@ environment variable read by the worker entrypoint. See
 {{ comp.apiTable({
   caption: "What you need before tuning",
   rows: [
-    { name: "workers plugin", type: "plugins/workers/", desc: "Add it with: netscript plugin add worker --samples. The :8091 API enqueues; a separate background process executes." },
+    { name: "workers plugin", type: "plugins/workers/", desc: "Public install: netscript plugin add @netscript/plugin-workers. Local contributor samples: deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples. The :8091 API enqueues; a separate background process executes." },
     { name: "config/official-plugins/mod.ts", type: "defineWorkers(...)", desc: "The generated worker config block — where concurrency, queueProvider, and per-topic scaling live." },
     { name: "@netscript/plugin-workers-core/config", type: "import", desc: "defineWorkers, defineJobs, and the WorkersConfig / ScalingConfig / TaskConfig types." },
     { name: "Aspire up (for live runs)", type: "cd aspire && aspire run", desc: "The background runner needs Postgres + KV. Aspire injects the worker env vars; see Production pitfalls." }
@@ -220,7 +220,7 @@ scaffold default is the Web Worker isolate path (one V8 isolate per pool slot).
   rows: [
     { name: "in-process", type: "WorkerRuntime", desc: "Handler runs in the same process. Lowest overhead, no isolation. Best for tests, compiled single-binary deploys, single-tenant local composition." },
     { name: "web-worker", type: "WorkerRuntime", desc: "Each pool slot is its own Web Worker / V8 isolate (~20-40 MB). The scaffold default; pool size = concurrency. Keep it low to bound memory." },
-    { name: "subprocess", type: "WorkerRuntime", desc: "Handler runs in a spawned subprocess. Strongest isolation; W3C traceparent/tracestate is propagated into the child — the same seam polyglot tasks use." }
+    { name: "subprocess", type: "WorkerRuntime", desc: "Handler runs in a spawned subprocess. Strongest process isolation; only Deno tasks get permission sandboxing through .permissions(). Python, .NET, shell, PowerShell, and cmd inherit the worker process's OS permissions." }
   ]
 }) }}
 

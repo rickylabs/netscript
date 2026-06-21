@@ -63,7 +63,7 @@ The fastest way to get a correct skeleton is to install a first-party plugin who
 yours, then read and adapt it:
 
 ```sh
-netscript plugin add worker --samples   # gives you plugins/workers/ to study
+deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
 ```
 
 A minimal hand-authored plugin needs only a `mod.ts` manifest (built with `definePlugin`) and a
@@ -99,7 +99,7 @@ plugin should pick the closest match:
 {{ comp.apiTable({
   caption: "provider.kind by archetype (from the official scaffold.plugin.json files)",
   rows: [
-    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKER_CONCURRENCY (default 2), servicePort 8091." },
+    { name: "worker", type: "background-processor", desc: "Job handlers run by a worker processor. defaultEntrypoint bin/combined.ts, concurrencyEnvVar WORKER_CONCURRENCY (default 2) in current Aspire metadata; runtime entrypoints read WORKERS_CONCURRENCY, servicePort 8091." },
     { name: "saga", type: "background-processor", desc: "Durable message-driven sagas. defaultPermissions ['--unstable-kv','--allow-all'], concurrencyEnvVar SAGA_CONCURRENCY, servicePort 8092." },
     { name: "trigger", type: "ingress", desc: "Webhooks / schedules / file-watchers. defaultEntrypoint src/runtime/trigger-processor.ts, concurrencyEnvVar TRIGGER_CONCURRENCY (default 10), servicePort 8093." },
     { name: "stream", type: "utility / plugin", desc: "Infra/utility plugin. requiresDb=false, requiresKv=false, portRangeKey PLUGIN_API, servicePort 4437." }

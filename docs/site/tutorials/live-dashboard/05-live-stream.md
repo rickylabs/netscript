@@ -31,7 +31,7 @@ worked example is the **sagas** stream — the durable change-stream the showcas
 mechanism your order dashboard uses to go live.
 
 {{ comp callout { type: "note", title: "Why the example uses the sagas stream" } }}
-NetScript's durable-streams runtime mirrors execution state — saga instances, worker executions — into change-streams that the frontend can subscribe to. The showcase's canonical live table is the saga instance monitor, so that is what this chapter grounds in. The <code>createSagasStreamDB</code> → <code>useLiveQuery</code> pattern is identical for any StreamDB collection; once you have it, pointing a live table at your own stream is the same three moves. To follow this chapter against running data, the workspace needs the <strong>sagas</strong> plugin and its streams runtime — add it with <code>netscript plugin add sagas</code> if it is not already installed.
+NetScript's durable-streams runtime mirrors execution state — saga instances, worker executions — into change-streams that the frontend can subscribe to. The showcase's canonical live table is the saga instance monitor, so that is what this chapter grounds in. The <code>createSagasStreamDB</code> → <code>useLiveQuery</code> pattern is identical for any StreamDB collection; once you have it, pointing a live table at your own stream is the same three moves. To follow this chapter against running data, the workspace needs the <strong>sagas</strong> plugin and its streams runtime — add the published package with <code>netscript plugin add @netscript/plugin-sagas</code> if it is not already installed.
 {{ /comp }}
 
 ## Before you begin

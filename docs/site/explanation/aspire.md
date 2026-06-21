@@ -359,10 +359,8 @@ The remaining trade-offs of the default path:
   "what runtime is this?" having two answers in one repo.
 - **Docker is a hard dependency of the happy path.** No Docker daemon means the default workflow
   does not start — which is exactly when `--no-aspire` plus your own infrastructure earns its place.
-- **The wiring is powerful but implicit.** The two-pass reference resolution is invisible: you
-  declare resources and references, and trust the composer. When something does not connect, the
-  dashboard's resource list and console logs at `:18888` are the first place to look, not the
-  AppHost source.
+- **The wiring is implicit.** The two-pass reference resolution is invisible at authoring time, so
+  inspect generated environment variables and the resource graph when debugging service discovery.
 
 ## Glossary
 

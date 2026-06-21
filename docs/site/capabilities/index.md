@@ -24,7 +24,13 @@ it, and the generated [API reference](/reference/) for the full surface. The
 hubs stay deliberately thin so they orient rather than duplicate the reference.
 
 {{ comp callout { type: "note", title: "Five composable plugins + the platform underneath them" } }}
-The capabilities you <em>add</em> are plugins — <code>netscript plugin add &lt;worker|saga|trigger|stream|auth&gt; --samples</code> lands each one under <code>plugins/&lt;name&gt;/</code>. The remaining five are <strong>platform capabilities</strong>: services, database, KV/queues/cron, telemetry, and the Fresh UI come from the scaffold itself. Plugins register their contributions through their manifest; the host application never changes.
+The capabilities you <em>add</em> are plugins. The public command dispatches to a plugin package
+(for example <code>netscript plugin add @netscript/plugin-workers</code>); local-source contributor
+samples use <code>deno run -A packages/cli/bin/netscript-dev.ts plugin add &lt;kind&gt; --name &lt;name&gt; --samples</code>.
+Each installed plugin lands under <code>plugins/&lt;name&gt;/</code>. The remaining five are
+<strong>platform capabilities</strong>: services, database, KV/queues/cron, telemetry, and the
+Fresh UI come from the scaffold itself. Plugins register their contributions through their manifest;
+the host application never changes.
 {{ /comp }}
 
 ## The five composable plugins

@@ -61,7 +61,7 @@ processor/ingress runtime (`@netscript/plugin-triggers-core/runtime`).
   },
   {
     title: "Do — Add a plugin",
-    body: "The how-to recipe for netscript plugin add trigger --samples, which lands the canonical samples under plugins/triggers/.",
+    body: "The how-to recipe for public plugin package dispatch and the local netscript-dev contributor path that lands canonical trigger samples under plugins/triggers/.",
     href: "/how-to/add-a-plugin/",
     icon: "◆"
   }

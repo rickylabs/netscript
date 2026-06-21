@@ -83,7 +83,7 @@ fills. This is the doctrine's <em>composition over inheritance</em> applied to i
 A backend's job is to turn *its* notion of an authenticated user into *NetScript's* notion. That
 neutral currency lives one layer down, in [`@netscript/service`](/reference/service/) under the
 `/auth` subpath, and it is the same authentication contract the rest of the framework already
-speaks — API keys, bearer tokens, trusted headers. Auth backends are simply another producer of it.
+speaks — API keys, bearer tokens, trusted headers. Auth backends produce the same `Principal` shape.
 
 {{ comp.tabbedCode({ tabs: [
   {

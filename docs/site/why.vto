@@ -41,7 +41,7 @@ We didn't invent new primitives. We made a set of opinions about how the boring 
   caption: "What you'd hand-assemble → what NetScript gives you",
   rows: [
     { name: "Type-safe to the edges", type: "API ↔ client drift", desc: "The contract you import is designed, documented, and enforced. oRPC contracts flow from service to client to UI with no codegen step to drift." },
-    { name: "Approachable, not magic", type: "DI containers & glue", desc: "The 80% case is one chained call. Advanced needs unfold one method deeper — no indirection layer you didn't ask for." },
+    { name: "Predictable builder surface", type: "DI containers & glue", desc: "The common path is one chained call. Advanced options live on named builder methods, without hidden container wiring." },
     { name: "Standards-first", type: "bespoke abstractions", desc: "Built on fetch, URL, streams, and @std/* — skills you already have, not a private runtime to relearn." },
     { name: "Durable by design", type: "retries pretending to be workflows", desc: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence, and compensation. They survive crashes; failure handling is named, not bolted on." },
     { name: "Observable by default", type: "a tracer you wire yourself", desc: "OpenTelemetry tracing, structured logs, and health probes are wired into jobs, queues, RPC, and SSE from the first line. Job dispatch, execution, scheduling, and subprocess spans appear in the dashboard automatically." },
@@ -53,7 +53,7 @@ We didn't invent new primitives. We made a set of opinions about how the boring 
 
 ## What makes it different
 
-Prose is cheap. Here is a working code path for each claim — the kind of thing you'd actually write, lifted from the published package surface.
+Each differentiator below is paired with a runnable TypeScript path from the public package surface.
 
 ### 1. Contract-first, type-safe end to end
 

@@ -81,7 +81,7 @@ trigger progress live without polling a request/response API.
   },
   {
     title: "Do — add the streams plugin",
-    body: "netscript plugin add stream --name streams --samples lands the plugin under plugins/streams/ with stream-schema samples.",
+    body: "Public package dispatch installs the stream plugin; local netscript-dev scaffolding lands samples under plugins/streams/.",
     href: "/how-to/add-a-plugin/",
     icon: "◆"
   },

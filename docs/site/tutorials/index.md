@@ -70,8 +70,7 @@ the one closest to what you're building.
 }) }}
 
 New to NetScript entirely? Any track starts from zero, but **Storefront** is the
-broadest tour of the core ideas — start there if you just want to see the whole
-shape of a NetScript backend.
+broadest tour of the core ideas. To inspect the whole shape of a NetScript backend, start there.
 
 ## Before you start
 

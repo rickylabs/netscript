@@ -163,7 +163,7 @@ platform own lifecycle; that is the {{ comp.xref({ key: "howto:deploy", text: "D
 {{ comp callout { type: "warning", title: "Footguns when `aspire run` will not boot" } }}
 <ul>
 <li><strong>Docker not running.</strong> Aspire provisions Postgres + Garnet through Docker; no
-daemon means the happy path does not start. Start Docker, or use the <code>--no-aspire</code> path
+daemon means the default local workflow cannot start. Start Docker, or use the <code>--no-aspire</code> path
 with your own infrastructure.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire run</code> run
 from inside <code>aspire/</code>. <code>netscript db</code> commands run from the

@@ -33,7 +33,7 @@ graph.
 The auth packages are <code>0.0.1-alpha.0</code> today. The CLI scaffold emits forward-looking
 specifiers such as <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those versions are
 <strong>not published yet</strong> — do not expect <code>jsr:...@^1.0.0</code> to install from the
-public registry. Add the plugin through <code>netscript plugin add auth</code> in a workspace whose
+public registry. Add the plugin through <code>netscript plugin add @netscript/plugin-auth</code> in a workspace whose
 auth sources are wired locally (the scaffold does this for you); treat the <code>^1.0.0</code> import
 specifiers as the shape the published packages <em>will</em> take, not an install you can run against
 JSR today.
@@ -63,7 +63,7 @@ The `auth` plugin is a first-class official plugin installed the same way as `wo
 `triggers`, and `streams`. Add it with `plugin add`:
 
 ```sh
-netscript plugin add auth --name auth
+netscript plugin add @netscript/plugin-auth
 ```
 
 This scaffolds the unified `@netscript/plugin-auth` plugin into your workspace and registers it. The
@@ -258,7 +258,7 @@ migration is applied, and the provider credentials are correct.
 {{ comp callout { type: "tip", title: "Local smoke without real credentials" } }}
 If provider env is missing, the <code>kv-oauth</code> backend falls back to a non-functional
 local-default endpoint set so the service still boots and <code>/health</code>, <code>session</code>,
-and <code>me</code> answer (handy for scaffold smoke tests). Real <code>signin</code>/<code>callback</code>
+and <code>me</code> answer. The default is suitable for scaffold smoke tests. Real <code>signin</code>/<code>callback</code>
 require genuine provider credentials — the fallback is a stub path, not a working login.
 {{ /comp }}
 

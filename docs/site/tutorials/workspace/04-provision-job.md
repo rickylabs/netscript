@@ -52,11 +52,11 @@ plugin or trigger a job, and leave it running.
 Add the workers plugin with its sample jobs so you have a working reference to read and adapt:
 
 ```sh
-netscript plugin add worker --name workers --samples
+deno run -A packages/cli/bin/netscript-dev.ts plugin add worker --name workers --samples
 netscript plugin list
 ```
 
-This lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location —
+The local-source contributor command lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location —
 and registers it in `netscript.config.ts`. On disk you get a `jobs/` directory (the job-authoring
 surface), a `services/src/` API on `:8091`, and `bin/combined.ts` (the background processor
 entrypoint).

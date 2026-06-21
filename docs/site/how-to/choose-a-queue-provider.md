@@ -193,7 +193,7 @@ For CPU-bound work, prefer Web Workers over queue concurrency — see
 {{ comp callout { type: "important", title: "Validate at the boundary" } }}
 Prefer <code>createTypedQueue</code> (Zod-validated at enqueue and dequeue) over the
 untyped <code>createQueue</code> whenever the payload shape matters. An unvalidated queue
-happily transports malformed messages until a consumer throws deep in your handler;
+can carry malformed messages until the consumer fails inside the handler;
 validation at enqueue time fails fast at the producer, regardless of which provider you
 chose.
 {{ /comp }}
