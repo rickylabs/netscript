@@ -232,6 +232,29 @@ Deno.test("parseEvalVerdict returns null verdict when absent", () => {
   assertEquals(v.verdict, null);
   assert(!v.isPass && !v.isFail, "neither pass nor fail");
 });
+Deno.test("parseEvalVerdict reads a standalone VERDICT: PASS (no IMPL/PLAN kind)", () => {
+  // The shape OpenHands posted for PR #100 S6: bolded, kindless verdict line.
+  const v = parseEvalVerdict("## Verdict\n**VERDICT: PASS** — Certify S6 slice only.");
+  assertEquals(v.kind, null);
+  assertEquals(v.verdict, "PASS");
+  assert(v.isPass && !v.isFail, "is a pass");
+});
+Deno.test("parseEvalVerdict treats PASS-WITH-NITS as a pass", () => {
+  const v = parseEvalVerdict("VERDICT: PASS-WITH-NITS (doc polish only)");
+  assertEquals(v.verdict, "PASS-WITH-NITS");
+  assert(v.isPass && !v.isFail, "nits are non-blocking");
+});
+Deno.test("parseEvalVerdict reads a standalone FAIL_FIX without a kind", () => {
+  const v = parseEvalVerdict("VERDICT: FAIL_FIX — one cast remains");
+  assertEquals(v.verdict, "FAIL_FIX");
+  assert(v.isFail && !v.isPass, "is a fail");
+});
+Deno.test("parseEvalVerdict never parses a menu echo as a verdict", () => {
+  // The instruction line that lists the options must not register as PASS.
+  const v = parseEvalVerdict("Emit `VERDICT: PASS | FAIL | PASS-WITH-NITS` as a PR comment.");
+  assertEquals(v.verdict, null);
+  assert(!v.isPass && !v.isFail, "menu is not a verdict");
+});
 
 // --- selectLatestOpenHandsComment -----------------------------------------
 Deno.test("selectLatestOpenHandsComment picks the last tagged comment", () => {

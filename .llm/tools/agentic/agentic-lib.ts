@@ -429,19 +429,45 @@ export interface EvalVerdict {
 }
 
 /**
- * Extract an IMPL-EVAL / PLAN-EVAL verdict from an evaluator comment body. The
- * dispatch prompts instruct the evaluator to emit `**Verdict: IMPL-EVAL: PASS**`,
- * so a `Verdict:`-prefixed match wins; otherwise the first bare `…-EVAL: <v>`
- * token is used. The prompt text itself (which also contains the literal
- * `IMPL-EVAL: PASS`) is never the parse target — only the posted result comment is.
+ * Extract an IMPL-EVAL / PLAN-EVAL verdict from an evaluator comment body.
+ *
+ * Two accepted shapes, in priority order:
+ *   1. **Canonical** `(IMPL|PLAN)-EVAL: PASS|FAIL_*` — the form our dispatch
+ *      prompts request (`**Verdict: IMPL-EVAL: PASS**`). A `Verdict:`-prefixed
+ *      occurrence wins over an instructional echo elsewhere in the body, and the
+ *      `kind` (IMPL/PLAN) is recovered.
+ *   2. **Standalone** `VERDICT: PASS | PASS-WITH-NITS | FAIL | FAIL_*` — the form
+ *      some evaluator prompts request when they don't restate IMPL/PLAN. `kind`
+ *      is unknown (null). `PASS-WITH-NITS` counts as a pass (nits are
+ *      non-blocking by definition).
+ *
+ * Both shapes are guarded against a *menu echo* — an instruction line that lists
+ * the options (`VERDICT: PASS | FAIL | …`) is never parsed as a verdict, via a
+ * negative lookahead for a trailing `|`. The prompt text itself (which also
+ * contains `IMPL-EVAL: PASS`) is never the parse target — only the posted result
+ * comment is, since {@link selectLatestOpenHandsComment} isolates it first.
  */
 export function parseEvalVerdict(body: string): EvalVerdict {
-  const pat = /(IMPL|PLAN)-EVAL:\s*(PASS|FAIL_[A-Z]+)/;
-  const m = body.match(new RegExp(`Verdict[^\\n]*?${pat.source}`, "i")) ?? body.match(pat);
-  if (!m) return { kind: null, verdict: null, isPass: false, isFail: false };
-  const kind = m[1].toUpperCase() as "IMPL" | "PLAN";
-  const verdict = m[2].toUpperCase();
-  return { kind, verdict, isPass: verdict === "PASS", isFail: verdict.startsWith("FAIL") };
+  // 1. Canonical kinded token.
+  const canon = /(IMPL|PLAN)-EVAL:\s*(PASS|FAIL_[A-Z]+)/;
+  const cm = body.match(new RegExp(`Verdict[^\\n]*?${canon.source}`, "i")) ??
+    body.match(canon);
+  if (cm) {
+    const kind = cm[1].toUpperCase() as "IMPL" | "PLAN";
+    const verdict = cm[2].toUpperCase();
+    return { kind, verdict, isPass: verdict === "PASS", isFail: verdict.startsWith("FAIL") };
+  }
+  // 2. Standalone `VERDICT: <token>` (longest alternatives first so `PASS-WITH-NITS`
+  //    and `FAIL_*` win over their bare prefixes; `(?!\s*\|)` skips the menu echo).
+  const bare = body.match(
+    /VERDICT:\s*\**\s*(PASS-WITH-NITS|PASS|FAIL_[A-Z]+|FAIL)\b(?!\s*\|)/i,
+  );
+  if (bare) {
+    const verdict = bare[1].toUpperCase();
+    const isPass = verdict === "PASS" || verdict === "PASS-WITH-NITS";
+    return { kind: null, verdict, isPass, isFail: verdict.startsWith("FAIL") };
+  }
+  return { kind: null, verdict: null, isPass: false, isFail: false };
 }
 
 // ---------------------------------------------------------------------------
