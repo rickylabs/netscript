@@ -822,7 +822,13 @@ Seeded from
 - **Gate:** An OIDC-kind e2e test asserts nonce + id_token claims; callback passes `expectedIssuer`
   to `validateAuthResponse`; package tests stay green.
 
-## plugins/*/services — oRPC router-composition `any` (cross-plugin) (`plugin-service-router-composition-any`)
+## plugins/*/services — oRPC router-composition `any` + external-boundary casts (cross-plugin) (`plugin-service-router-composition-any`)
+
+This entry covers **two classes** of accepted, pre-existing, cross-plugin type drift that every
+current feature / quality-hardening / auth slice must LEAVE IN PLACE (they pre-date the slices and
+match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining either class.
+
+### Class A — oRPC router-composition `any` (top-level `router.ts`)
 
 - **Reason:** Every plugin service confines one-or-more `// deno-lint-ignore no-explicit-any`
   casts to its **top-level router-composition file** (`plugins/<plugin>/services/src/router.ts`):
@@ -838,10 +844,26 @@ Seeded from
   handler-options inference). Confirmed present in the merged exemplar
   `plugins/sagas/services/src/router.ts:39-44,71-75`; the same pattern exists (or is being made to
   match it) in `workers`, `triggers`, `streams`, and `auth`.
+
+### Class B — external-boundary `as unknown as` / `as <T>` casts (SDK adapters, KV/db clients, bootstrap)
+
+- **Reason:** Every plugin service carries pre-existing single-step boundary casts where an
+  **external or untyped surface** is narrowed to the plugin's internal port type. These are NOT in
+  handler business logic — they sit at the I/O seam between third-party SDKs / Deno KV / Prisma
+  clients / plugin-bootstrap context and the service's typed interior. They are arbitrary in the
+  sense that the external surface cannot be made to flow its own precise type to the port without a
+  dedicated adapter-typing pass. Confirmed in the merged exemplar:
+  `plugins/sagas/services/src/main.ts:89,102` (`dbClient as unknown as PrismaSagaStoreClient`,
+  `... as unknown as SagaStreamPrismaClient`), `v1-helpers.ts` (KV deserialization), and the same
+  class exists across `workers`, `triggers`, `streams`, and `auth`. In `auth` specifically:
+  `services/src/backend-registry.ts` (WorkOS SDK session client, `ArrayBuffer` views),
+  `services/src/init.ts` (`WatchableKv`, `PluginServiceContext`), `services/src/main.ts`
+  (`ServiceDatabaseClient`, the `AuthRunningService` builder return, `PluginServiceBootstrap`).
 - **Owner:** Future cross-plugin oRPC-seam fix branch (one dedicated branch reworking the shared
   `$context` contract wrapper to the native oRPC `implement(<contractDefinition>).$context<T>()`
   builder so `.router({...})` returns properly-typed procedures and `os.router(map)` type-checks
-  with ZERO `as any`). NOT owned by any feature, quality-hardening, or auth slice.
+  with ZERO `as any` — AND introducing per-adapter typed shims that retire the Class-B boundary
+  casts). NOT owned by any feature, quality-hardening, or auth slice.
 - **Target:** Post-framework-prime-time, before beta. All plugins migrate together so the contract
   wrapper and every `router.ts` change in lock-step.
 - **Linked plan:** related contract-side debt `workers-contract-structural-server-export` (above).
@@ -849,14 +871,19 @@ Seeded from
 - **Status:** open, DEBT_ACCEPTED. **SANCTIONED for now** — matching the merged sagas exemplar
   (casts confined to the top-level router-composition file, each with `deno-lint-ignore`, zero
   casts elsewhere) is the conformant target for all current slices.
-- **Agent directive (read before failing a slice on this):** Do NOT attempt to remove these
-  composition `any` casts, un-widen the `Record<string, unknown>` handler maps, or change the
-  contract package, inside a feature / quality-hardening / auth slice. Mirroring the sagas exemplar
-  IS conformant and IMPL-EVAL must NOT FAIL a slice for retaining the sanctioned router-composition
-  casts. The only out-of-scope cast error is a NEW cast OUTSIDE `router.ts` (handlers, business
-  logic, contracts) — those remain strictly zero-cast. Auth S2/S6/S7 and AS7 explicitly mirror
-  sagas and leave this debt in place.
-- **Gate:** Close when the shared contract wrapper returns properly-typed procedures and every
+- **Agent directive (read before failing a slice on this):** Do NOT attempt to remove the Class-A
+  composition `any` casts, un-widen the `Record<string, unknown>` handler maps, change the contract
+  package, OR rewrite the Class-B external-boundary `as unknown as` / `as <T>` casts, inside a
+  feature / quality-hardening / auth slice. Mirroring the sagas exemplar IS conformant and IMPL-EVAL
+  must NOT FAIL a slice for retaining EITHER the sanctioned router-composition casts (Class A) or the
+  pre-existing external-boundary casts (Class B) that match sagas. The only out-of-scope cast error
+  is a **NEW** cast a slice INTRODUCES in handler / business-logic / contract code (outside
+  `router.ts` and outside the established I/O-adapter seams) — those remain strictly zero-cast.
+  Auth S2/S6/S7 and AS7 explicitly mirror sagas and leave BOTH debt classes in place; each plugin
+  gets its arbitrary-types fix in the dedicated cross-plugin seam branch, not in these slices.
+- **Gate:** Close when (A) the shared contract wrapper returns properly-typed procedures and every
   `plugins/*/services/src/router.ts` type-checks under `deno check --unstable-kv` with zero
-  `as any` / `: any` / `deno-lint-ignore no-explicit-any`, and the per-plugin handler maps no longer
-  need `Record<string, unknown>` widening.
+  `as any` / `: any` / `deno-lint-ignore no-explicit-any` and the per-plugin handler maps no longer
+  need `Record<string, unknown>` widening, AND (B) every external-boundary surface (SDK / KV / db /
+  bootstrap) reaches its port through a typed adapter so the `as unknown as` / `as <T>` boundary
+  casts are gone across all plugin services.
