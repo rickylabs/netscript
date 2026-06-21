@@ -6,8 +6,6 @@ prev: { label: "Observability", href: "/explanation/observability/" }
 next: { label: "The pure-backend auth model", href: "/explanation/auth-model/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Orchestration with Aspire
 
 This page explains *what* [Aspire](https://aspire.dev) does in a NetScript project, *why* it

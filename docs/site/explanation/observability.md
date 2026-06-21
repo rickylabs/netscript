@@ -6,8 +6,6 @@ prev: { label: "Durable workflows", href: "/explanation/durable-workflows/" }
 next: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Observability
 
 This page explains *how* NetScript thinks about observability and *why* the model is built

@@ -42,15 +42,10 @@ You need:
   and `netscript plugin --help` for the exact option spelling in your installed version. If
   the command is missing, install it:
 
-{{ comp tabbedCode { tabs: ["Install the CLI", "Confirm it resolves"] } }}
-```bash
-deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts
-```
-```bash
-netscript --help
-netscript plugin --help
-```
-{{ /comp }}
+{{ comp.tabbedCode({ tabs: [
+  { label: "Install the CLI", lang: "bash", code: "deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts" },
+  { label: "Confirm it resolves", lang: "bash", code: "netscript --help\nnetscript plugin --help" }
+] }) }}
 
 - **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
   but several plugins (workers, sagas, auth) need Postgres and Garnet to actually run. Bring
@@ -171,17 +166,11 @@ Plugins that contribute Prisma models (workers, sagas, and **auth**) need their 
 created. With Aspire already running (`cd aspire && aspire run`), apply migrations and
 generate the client:
 
-{{ comp tabbedCode { tabs: ["Initialize + migrate", "Generate client", "Seed (optional)"] } }}
-```bash
-netscript db init --name add-plugin
-```
-```bash
-netscript db generate
-```
-```bash
-netscript db seed
-```
-{{ /comp }}
+{{ comp.tabbedCode({ tabs: [
+  { label: "Initialize + migrate", lang: "bash", code: "netscript db init --name add-plugin" },
+  { label: "Generate client", lang: "bash", code: "netscript db generate" },
+  { label: "Seed (optional)", lang: "bash", code: "netscript db seed" }
+] }) }}
 
 {{ comp callout { type: "note", title: "Aspire is step 2, the database is step 3" } }}
 <code>netscript db</code> talks to the Postgres that Aspire provisions. Always
@@ -209,18 +198,10 @@ netscript plugin doctor
 (missing registration, port collisions, absent database tables). A clean run means the
 plugin is registered, wired, and ready to use.
 
-{{ comp tabbedCode { tabs: ["Inspect one plugin", "Run the service"] } }}
-```bash
-# Detailed info for a single installed plugin
-netscript plugin info @netscript/plugin-auth
-```
-```bash
-# Bring the whole stack up and exercise the plugin's service
-cd aspire && aspire run
-# Aspire dashboard: http://localhost:18888
-# auth-api:         http://localhost:8094
-```
-{{ /comp }}
+{{ comp.tabbedCode({ tabs: [
+  { label: "Inspect one plugin", lang: "bash", code: "# Detailed info for a single installed plugin\nnetscript plugin info @netscript/plugin-auth" },
+  { label: "Run the service", lang: "bash", code: "# Bring the whole stack up and exercise the plugin's service\ncd aspire && aspire run\n# Aspire dashboard: http://localhost:18888\n# auth-api:         http://localhost:8094" }
+] }) }}
 
 {{ comp callout { type: "tip", title: "Confirm in the Aspire dashboard" } }}
 Service-bearing plugins appear as resources in the Aspire dashboard at

@@ -6,8 +6,6 @@ prev: { label: "KV, queues & cron", href: "/capabilities/kv-queues-cron/" }
 next: { label: "Fresh UI & design", href: "/capabilities/fresh-ui/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Telemetry & logging
 
 NetScript treats observability as a built-in, not a bolt-on. Every service and plugin

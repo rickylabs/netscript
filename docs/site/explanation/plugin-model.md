@@ -118,7 +118,7 @@ plugin makes along well-defined **extension axes**.
   tabs: [
     {
       label: "definePlugin",
-      language: "ts",
+      lang: "ts",
       code: "import { definePlugin } from \"@netscript/plugin\";\n\n// A manifest is a declaration the host can read at composition time —\n// no behavior runs here, it only names contributions.\nexport const authPlugin = definePlugin(\"@netscript/plugin-auth\", \"0.0.1-alpha.0\")\n  // The builder is the only public surface: name + version, then chained axes.\n  // contributions: services, schemas, stream topics, contract versions…\n  .withType(\"api\")\n  .withTags([\"auth\", \"oauth\", \"oidc\", \"sessions\"])\n  .build();"
     }
   ]

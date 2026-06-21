@@ -6,8 +6,6 @@ prev: { label: "Services & contracts", href: "/capabilities/services/" }
 next: { label: "Durable sagas", href: "/capabilities/durable-sagas/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Background jobs
 
 The **workers** plugin is NetScript's background-job capability: durable, KV-backed

@@ -5,8 +5,6 @@ templateEngine: [vento, md]
 prev: { label: "Glossary", href: "/glossary/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # CLI reference
 
 A curated, task-grouped tour of the `netscript` commands you reach for daily. It is

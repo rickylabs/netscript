@@ -6,8 +6,6 @@ prev: { label: "Background jobs", href: "/capabilities/background-jobs/" }
 next: { label: "Triggers & ingress", href: "/capabilities/triggers/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Durable sagas
 
 A saga is the answer to the question every retry loop dodges: *what happens between

@@ -6,8 +6,6 @@ prev: { label: "Architecture", href: "/explanation/architecture/" }
 next: { label: "The plugin model", href: "/explanation/plugin-model/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Contracts & type flow
 
 This page explains *why* NetScript is contracts-first and *how* a single type definition

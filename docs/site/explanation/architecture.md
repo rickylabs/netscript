@@ -10,8 +10,6 @@ next:
   href: /explanation/contracts/
 ---
 
-{{ comp.breadcrumb() }}
-
 # The NetScript architecture
 
 NetScript is a set of Deno-native framework packages published on
@@ -358,7 +356,7 @@ a builder:
 
 {{ comp tabbedCode {
   tabs: [
-    { label: "user-registration.saga.ts", language: "ts", code:
+    { label: "user-registration.saga.ts", lang: "ts", code:
 "import { defineSaga } from \"@netscript/plugin-sagas-core\";\n\ntype State = Readonly<{ status: string }>;\n\nconst saga = defineSaga(\"user-registration\")\n  .state<State>({ status: \"started\" })\n  .on(\"UserRegistered\", (saga, _message, _context) => {\n    saga.state = { status: \"welcoming\" };\n  })\n  .on(\"WelcomeEmailSent\", (saga, _message, _context) => {\n    saga.state = { status: \"complete\" };\n  })\n  .build();" }
   ]
 } /}}

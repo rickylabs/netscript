@@ -1,24 +1,46 @@
 {{# Lume component — docs/site/_components/apiTable.vto
-   Styled, responsive table for API rows / adapter matrices. Invoke:
-     {{ comp.apiTable({ caption: "Props", rows: [{ name, type, desc }, …] }) }}
+   Styled, responsive table for API rows / adapter matrices. Three invocation
+   forms are supported and normalized here so authored pages render regardless
+   of which convention they used:
+
+     1. Object rows (canonical API-surface form) — fixed Name/Type/Description:
+        {{ comp.apiTable({ caption: "Props", rows: [{ name, type, desc }, …] }) }}
+     2. `items` alias for the data array (same object-row shape):
+        {{ comp.apiTable({ caption: "…", items: [{ name, type, desc }, …] }) }}
+     3. Explicit headers + array (or object) rows — generic N-column; authors
+        supply their own inline <code> formatting in each cell:
+        {{ comp.apiTable({ title: "Options", columns: ["Option", "What it does"],
+                           rows: [["--flag", "what it does"], …] }) }}
+
+   `caption`/`title` are interchangeable; `rows`/`items` are interchangeable.
    All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
-{{ set items = rows || [] }}
+{{ set data = rows || items || [] }}
+{{ set cap = caption || title }}
+{{ set heads = columns || ["Name", "Type", "Description"] }}
+{{ set generic = columns ? true : false }}
 <div class="ns-api-table-wrap">
   <table class="ns-api-table">
-    {{ if caption }}<caption>{{ caption }}</caption>{{ /if }}
+    {{ if cap }}<caption>{{ cap }}</caption>{{ /if }}
     <thead>
       <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Type</th>
-        <th scope="col">Description</th>
+        {{ for head of heads }}<th scope="col">{{ head }}</th>{{ /for }}
       </tr>
     </thead>
     <tbody>
-      {{ for row of items }}
+      {{ for row of data }}
         <tr>
-          <td class="ns-api-table__name"><code>{{ row.name }}</code></td>
-          <td class="ns-api-table__type"><code>{{ row.type }}</code></td>
-          <td class="ns-api-table__desc">{{ row.desc }}</td>
+          {{ if generic }}
+            {{ set cells = Array.isArray(row) ? row : Object.values(row) }}
+            {{ for entry of cells.entries() }}
+              {{ set i = entry[0] }}
+              {{ set last = i === cells.length - 1 }}
+              <td class="{{ last ? 'ns-api-table__desc' : (i === 0 ? 'ns-api-table__name' : 'ns-api-table__type') }}">{{ entry[1] }}</td>
+            {{ /for }}
+          {{ else }}
+            <td class="ns-api-table__name"><code>{{ row.name }}</code></td>
+            <td class="ns-api-table__type"><code>{{ row.type }}</code></td>
+            <td class="ns-api-table__desc">{{ row.desc }}</td>
+          {{ /if }}
         </tr>
       {{ /for }}
     </tbody>

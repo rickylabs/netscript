@@ -6,8 +6,6 @@ prev: { label: "The plugin model", href: "/explanation/plugin-model/" }
 next: { label: "Observability", href: "/explanation/observability/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Durable workflows
 
 This page is **understanding-oriented**. It explains *what makes a NetScript workflow

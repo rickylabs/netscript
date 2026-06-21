@@ -6,8 +6,6 @@ prev: { label: "Durable sagas", href: "/capabilities/durable-sagas/" }
 next: { label: "Durable streams", href: "/capabilities/streams/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Triggers & ingress
 
 The **triggers** plugin is NetScript's front door for the outside world. It turns

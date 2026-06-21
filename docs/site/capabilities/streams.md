@@ -6,8 +6,6 @@ prev: { label: "Triggers & ingress", href: "/capabilities/triggers/" }
 next: { label: "Database & Prisma", href: "/capabilities/database/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Durable streams
 
 NetScript's streams capability is the typed, change-data backbone the other

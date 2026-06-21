@@ -6,8 +6,6 @@ prev: null
 next: { label: "CLI reference", href: "/cli-reference/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Glossary
 
 NetScript is a small framework with a handful of load-bearing words. Most of the

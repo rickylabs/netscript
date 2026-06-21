@@ -6,8 +6,6 @@ prev: { label: "Orchestration with Aspire", href: "/explanation/aspire/" }
 next: null
 ---
 
-{{ comp.breadcrumb() }}
-
 # The pure-backend auth model
 
 This page explains *what* NetScript authentication actually is, *why* it is designed as a
