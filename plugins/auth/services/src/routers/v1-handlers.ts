@@ -124,7 +124,7 @@ export async function signout(
   input: SignoutInput,
   context: AuthServiceContext,
 ): Promise<SignoutResponse> {
-  const backend = context.registry.resolveBackend() as InteractiveAuthBackend;
+  const backend: InteractiveAuthBackend = context.registry.resolveBackend();
   const sessionId = input.sessionId ?? await backend.getSessionId?.(
     toRequest(context.request, '/v1/auth/signout', new URLSearchParams()),
   );
