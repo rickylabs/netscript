@@ -1,3 +1,9 @@
+/**
+ * Version 1 saga API schemas and contract route types.
+ *
+ * @module
+ */
+
 export {
   InstanceFiltersSchema,
   OffsetPaginationQuerySchema,

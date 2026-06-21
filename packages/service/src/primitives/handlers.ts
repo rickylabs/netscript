@@ -28,12 +28,12 @@ import { LoggingPlugin } from '@netscript/logger/orpc';
 import { ErrorHandlingPlugin, TracingPlugin } from '@netscript/telemetry/orpc';
 import type {
   FetchHandler,
-  ServiceContext,
   ServiceErrorHandler,
-  ServiceHandler,
   ServiceHandlerPlugin,
+  ServiceNotFoundHandler,
   ServiceRouter,
 } from '../types.ts';
+import { isOrpcRouter } from './orpc-router.ts';
 
 /**
  * Configuration options for RPC handlers.
@@ -134,10 +134,12 @@ export function createRPCHandler<T extends ServiceRouter>(
   router: T,
   config?: RPCHandlerConfig,
 ): FetchHandler {
+  if (!isOrpcRouter(router)) {
+    throw new TypeError('Service router must be an object');
+  }
+
   const plugins = createRPCPlugins(config ?? {});
-  return new RPCHandler(router as never, {
-    plugins: plugins as never[],
-  }) as FetchHandler;
+  return new RPCHandler(router, { plugins });
 }
 
 /**
@@ -162,10 +164,12 @@ export function createOpenAPIHandler<T extends ServiceRouter>(
   router: T,
   config?: RPCHandlerConfig,
 ): FetchHandler {
+  if (!isOrpcRouter(router)) {
+    throw new TypeError('Service router must be an object');
+  }
+
   const plugins = [...createRPCPlugins(config ?? {}), new ZodSmartCoercionPlugin()];
-  return new OpenAPIHandler(router as never, {
-    plugins: plugins as never[],
-  }) as FetchHandler;
+  return new OpenAPIHandler(router, { plugins });
 }
 
 /**
@@ -176,8 +180,8 @@ export function createOpenAPIHandler<T extends ServiceRouter>(
  * app.notFound(createNotFoundHandler('users'));
  * ```
  */
-export function createNotFoundHandler(serviceName: string): ServiceHandler {
-  return ((c: ServiceContext): Response => {
+export function createNotFoundHandler(serviceName: string): ServiceNotFoundHandler {
+  return (c): Response => {
     return c.json(
       {
         error: 'NOT_FOUND',
@@ -186,7 +190,7 @@ export function createNotFoundHandler(serviceName: string): ServiceHandler {
       },
       404,
     );
-  }) as ServiceHandler;
+  };
 }
 
 /**
@@ -200,7 +204,7 @@ export function createNotFoundHandler(serviceName: string): ServiceHandler {
 export function createErrorHandler(serviceName: string): ServiceErrorHandler {
   const logger = createServiceLogger(serviceName);
 
-  return ((err: Error, c: ServiceContext): Response => {
+  return (err, c): Response => {
     logger.error('Unhandled service error', {
       error: err.message,
       stack: err.stack,
@@ -213,5 +217,5 @@ export function createErrorHandler(serviceName: string): ServiceErrorHandler {
       },
       500,
     );
-  }) as ServiceErrorHandler;
+  };
 }

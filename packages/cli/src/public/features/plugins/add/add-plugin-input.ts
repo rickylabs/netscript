@@ -7,6 +7,7 @@ export interface AddPluginCommandInput {
   readonly serviceRefs?: string;
   readonly pluginRefs?: string;
   readonly db?: string | false;
+  readonly sagaStoreBackend?: string;
   readonly samples?: boolean;
   readonly projectRoot?: string;
   readonly force?: boolean;

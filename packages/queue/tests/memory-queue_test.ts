@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertRejects } from '@std/assert';
 import { delay } from '@std/async';
 import type { MessageContext } from '../ports/mod.ts';
-import { MemoryQueueAdapter } from '../testing/mod.ts';
+import { MemoryDeadLetterStore, MemoryQueueAdapter } from '../testing/mod.ts';
 
 Deno.test('memory queue preserves requeued item settlement state', async () => {
   const queue = new MemoryQueueAdapter<string>({ pollInterval: 1 });
@@ -116,4 +116,28 @@ Deno.test('memory queue wait removes abort listeners after empty polls', async (
     AbortSignal.prototype.addEventListener = originalAdd;
     AbortSignal.prototype.removeEventListener = originalRemove;
   }
+});
+
+Deno.test('memory queue dead-letters terminal nacks into the configured store', async () => {
+  const deadLetters = new MemoryDeadLetterStore<string>();
+  const queue = new MemoryQueueAdapter<string>({
+    pollInterval: 1,
+    deadLetterStore: deadLetters,
+  });
+  await queue.enqueue('poison', { headers: { traceparent: '00-test' } });
+
+  const controller = new AbortController();
+  await queue.listen(
+    async (_message, context) => {
+      await context.nack({ requeue: false, reason: 'validation_failed' });
+      controller.abort();
+    },
+    { signal: controller.signal },
+  );
+
+  const records = await deadLetters.list();
+  assertEquals(records.length, 1);
+  assertEquals(records[0].reason, 'validation_failed');
+  assertEquals(records[0].payload, 'poison');
+  assertEquals(records[0].headers, { traceparent: '00-test' });
 });

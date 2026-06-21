@@ -29,6 +29,7 @@ export const PLUGIN = {
   SAGA: 'saga',
   TRIGGER: 'trigger',
   STREAM: 'stream',
+  AUTH: 'auth',
 } as const;
 
 /** Reporter formats emitted by the CLI. */

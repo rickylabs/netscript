@@ -103,6 +103,18 @@ export interface ReferenceEntry {
   PluginReferences?: string[];
 }
 
+/** Saga durable store backend variants used by generated saga resources. */
+export type SagaStoreBackend = 'kv' | 'prisma';
+
+/** Saga-specific resource metadata preserved for generated executable env. */
+export interface SagaResourceConfig {
+  /** Saga durable state store configuration. */
+  Store?: {
+    /** Durable saga state backend. */
+    Backend?: SagaStoreBackend;
+  };
+}
+
 /** Backend service resource entry. */
 export interface ServiceEntry extends BaseEntry, ReferenceEntry {
   /** Runtime used to launch the service. */
@@ -153,6 +165,8 @@ export interface PluginEntry extends BaseEntry, ReferenceEntry {
   RequiresKv: boolean;
   /** Whether the plugin requires database access. */
   RequiresDb: boolean;
+  /** Saga-specific metadata for saga plugin resources. */
+  Sagas?: SagaResourceConfig;
 }
 
 /** Background processor resource entry. */
@@ -177,6 +191,8 @@ export interface BackgroundProcessorEntry extends BaseEntry, ReferenceEntry {
   RequiresDb: boolean;
   /** Whether the processor requires Deno KV access. */
   RequiresKv: boolean;
+  /** Saga-specific metadata for saga background processors. */
+  Sagas?: SagaResourceConfig;
 }
 
 /** Database resource entry. */
@@ -352,6 +368,15 @@ const ReferenceFields = {
   PluginReferences: z.array(z.string()).optional(),
 } as const satisfies z.ZodRawShape;
 
+const SagaResourceConfigZod = z.object({
+  Store: z.object({
+    Backend: z.enum(['kv', 'prisma']).optional(),
+  }).optional(),
+}).meta({
+  title: 'SagaResourceConfig',
+  description: 'Saga-specific resource metadata preserved for generated executable env',
+});
+
 /** Service entry configuration. */
 const ServiceEntryZod = z.object({
   ...BaseEntryFields,
@@ -395,6 +420,7 @@ const PluginEntryZod = z.object({
   Workdir: z.string().optional(),
   RequiresKv: z.boolean().default(false),
   RequiresDb: z.boolean().default(false),
+  Sagas: SagaResourceConfigZod.optional(),
 }).meta({ title: 'PluginEntry', description: 'Configuration for a plugin service resource' });
 /** Plugin entry schema. */
 export const PluginEntrySchema: AspireSchema<PluginEntry> = PluginEntryZod;
@@ -413,6 +439,7 @@ const BackgroundProcessorEntryZod = z.object({
   WatchDirs: z.array(z.string()).optional(),
   RequiresDb: z.boolean().default(false),
   RequiresKv: z.boolean().default(false),
+  Sagas: SagaResourceConfigZod.optional(),
 }).meta({
   title: 'BackgroundProcessorEntry',
   description: 'Configuration for a background processor (worker, saga, trigger)',

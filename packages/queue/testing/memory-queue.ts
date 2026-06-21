@@ -5,6 +5,8 @@
  */
 
 import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import type { DeadLetterRecord, DeadLetterStorePort } from '../ports/dead-letter.ts';
+import { toDeadLetterRecord } from '../adapters/_envelope.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -26,6 +28,68 @@ export interface MemoryQueueAdapterOptions {
    * Delay in milliseconds between empty queue polls while listening.
    */
   pollInterval?: number;
+
+  /**
+   * Optional store for terminal nacks.
+   */
+  deadLetterStore?: DeadLetterStorePort;
+}
+
+/**
+ * In-memory dead-letter store for queue contract tests.
+ *
+ * @template T - Original message payload type.
+ */
+export class MemoryDeadLetterStore<T = unknown> implements DeadLetterStorePort<T> {
+  private readonly records: DeadLetterRecord<T>[] = [];
+
+  /**
+   * Append a dead-letter record.
+   *
+   * @param record - Record to append.
+   */
+  append(record: DeadLetterRecord<T>): Promise<void> {
+    this.records.push(record);
+    return Promise.resolve();
+  }
+
+  /**
+   * List stored records.
+   *
+   * @param options - Optional maximum number of records.
+   * @returns Stored records.
+   */
+  list(options: { limit?: number } = {}): Promise<DeadLetterRecord<T>[]> {
+    return Promise.resolve(this.records.slice(0, options.limit));
+  }
+
+  /**
+   * Re-enqueue records and remove successfully re-enqueued entries.
+   *
+   * @param reenqueue - Callback that requeues a record.
+   * @param options - Optional maximum number of records.
+   * @returns Number of records reprocessed.
+   */
+  async reprocess(
+    reenqueue: (record: DeadLetterRecord<T>) => Promise<void>,
+    options: { limit?: number } = {},
+  ): Promise<number> {
+    const selected = this.records.slice(0, options.limit);
+    for (const record of selected) {
+      await reenqueue(record);
+    }
+    this.records.splice(0, selected.length);
+    return selected.length;
+  }
+
+  /**
+   * Count stored records.
+   *
+   * @returns Number of stored records.
+   */
+  depth(): Promise<number> {
+    return Promise.resolve(this.records.length);
+  }
 }
 
 /**
@@ -42,6 +106,7 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
   private readonly pending: MemoryQueueItem<T>[] = [];
   private readonly pendingItems = new Set<MemoryQueueItem<T>>();
   private readonly pollInterval: number;
+  private readonly deadLetterStore: DeadLetterStorePort<T>;
   private listening = false;
   private abortController?: AbortController;
 
@@ -52,6 +117,8 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
    */
   constructor(options: MemoryQueueAdapterOptions = {}) {
     this.pollInterval = options.pollInterval ?? 5;
+    this.deadLetterStore = options.deadLetterStore as DeadLetterStorePort<T> | undefined ??
+      new MemoryDeadLetterStore<T>();
   }
 
   /**
@@ -187,12 +254,25 @@ export class MemoryQueueAdapter<T = unknown> implements MessageQueue<T> {
         item.settled = true;
         return Promise.resolve();
       },
-      nack: (options = {}) => {
+      nack: async (options = {}) => {
         item.settled = true;
         if (options.requeue ?? true) {
           this.requeue(item);
         }
-        return Promise.resolve();
+        if (!(options.requeue ?? true)) {
+          await this.deadLetterStore.append(toDeadLetterRecord(
+            {
+              messageId: item.id,
+              queueName: 'memory',
+              payload: item.message,
+              headers: item.headers,
+              deliveryCount: item.deliveryCount,
+              enqueuedAt: item.enqueuedAt,
+            },
+            options.reason ?? 'nack_without_requeue',
+            options,
+          ));
+        }
       },
     };
   }

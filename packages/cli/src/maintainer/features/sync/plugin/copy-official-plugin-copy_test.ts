@@ -439,6 +439,18 @@ Deno.test("official plugin import rewrite converts local package paths to JSR sp
     "jsr:@netscript/plugin-workers-core@^1.0.0/streams",
   );
   assertEquals(
+    _internal.rewritePackagePathToJsr(
+      "../../packages/plugin-auth-core/src/contracts/v1/mod.ts",
+    ),
+    "jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1",
+  );
+  assertEquals(
+    _internal.rewritePackagePathToJsr(
+      "../../packages/plugin-auth-core/src/ports/mod.ts",
+    ),
+    "jsr:@netscript/plugin-auth-core@^1.0.0/ports",
+  );
+  assertEquals(
     _internal.rewritePackagePathToJsr("../packages/plugin/mod.ts"),
     "jsr:@netscript/plugin@^1.0.0",
   );

@@ -44,6 +44,7 @@ export const GATE = {
   GENERATED_INFRASTRUCTURE_CHECK: 'generated.infrastructure-check',
   GENERATED_PLUGINS_CHECK: 'generated.plugins-check',
   GENERATED_DENO_CHECK: 'generated.deno-check',
+  RUNTIME_AUTH_SMOKE_ENV: 'runtime.auth-smoke-env',
   RUNTIME_ASPIRE_RESTORE: 'runtime.aspire-restore',
   RUNTIME_ASPIRE_START: 'runtime.aspire-start',
   RUNTIME_WAIT_POSTGRES: 'runtime.wait.postgres',
@@ -54,6 +55,7 @@ export const GATE = {
   RUNTIME_WAIT_SAGAS: 'runtime.wait.sagas',
   RUNTIME_WAIT_TRIGGERS_API: 'runtime.wait.triggers-api',
   RUNTIME_WAIT_TRIGGERS: 'runtime.wait.triggers',
+  RUNTIME_WAIT_AUTH: 'runtime.wait.auth',
   RUNTIME_ASPIRE_DESCRIBE: 'runtime.aspire-describe',
   BEHAVIOR_WORKERS_HEALTH: 'behavior.workers-health',
   BEHAVIOR_WORKERS_JOBS: 'behavior.workers-jobs',
@@ -67,6 +69,9 @@ export const GATE = {
   BEHAVIOR_TRIGGERS_HEALTH: 'behavior.triggers-health',
   BEHAVIOR_TRIGGERS_WEBHOOK: 'behavior.triggers-webhook',
   BEHAVIOR_TRIGGERS_EVENTS: 'behavior.triggers-events',
+  BEHAVIOR_AUTH_LIVE: 'behavior.auth-live',
+  BEHAVIOR_AUTH_READY: 'behavior.auth-ready',
+  BEHAVIOR_AUTH_SESSION: 'behavior.auth-session',
   BEHAVIOR_PLUGINS_HEALTH: 'behavior.plugins-health',
   BEHAVIOR_OTEL_WEBHOOK: 'behavior.otel.webhook',
   BEHAVIOR_OTEL_TRACES: 'behavior.otel.traces',
@@ -84,6 +89,7 @@ export const ASPIRE_RESOURCE = {
   SAGAS: 'sagas',
   TRIGGERS_API: 'triggers-api',
   TRIGGERS: 'triggers',
+  AUTH: 'auth',
 } as const;
 
 export type SuiteId = typeof SCAFFOLD[keyof typeof SCAFFOLD];

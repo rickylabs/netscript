@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "provider": {
+    "kind": "auth",
+    "displayName": "Auth",
+    "category": "plugin",
+    "portRangeKey": "PLUGIN_API",
+    "defaultPermissions": ["--unstable-kv", "--allow-net", "--allow-env", "--allow-read"],
+    "watchFlag": "--watch",
+    "defaultEntrypoint": "services/src/main.ts",
+    "defaultServiceEntrypoint": "services/src/main.ts",
+    "defaultRequiresDb": true,
+    "defaultRequiresKv": true,
+    "pluginType": "utility",
+    "supportsConcurrency": false,
+    "concurrencyEnvVar": null,
+    "defaultConcurrency": null,
+    "defaultTelemetry": true,
+    "infrastructureRequires": ["db", "kv"],
+    "infrastructureOptionalDeps": []
+  },
+  "officialSource": {
+    "canonicalName": "auth",
+    "pluginDir": "auth",
+    "serviceEntrypoint": "services/src/main.ts",
+    "serviceConfigKey": "auth",
+    "servicePort": 8094,
+    "backgroundPort": 8094,
+    "requiresDb": true,
+    "requiresKv": true,
+    "permissions": ["--unstable-kv", "--allow-net", "--allow-env", "--allow-read"]
+  }
+}

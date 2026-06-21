@@ -1,3 +1,9 @@
+/**
+ * Preset composition helpers for starting saga handlers and runtimes.
+ *
+ * @module
+ */
+
 export type { SagaDefinition } from '../domain/mod.ts';
 export type { SagaBusLegacyOptions } from '../adapters/mod.ts';
 export type {

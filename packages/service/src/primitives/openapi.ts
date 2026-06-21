@@ -19,7 +19,8 @@
 
 import { OpenAPIGenerator } from '@orpc/openapi';
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
-import type { ServiceContext, ServiceHandler, ServiceRouter } from '../types.ts';
+import type { ServiceHandler, ServiceRouter } from '../types.ts';
+import { isOrpcRouter } from './orpc-router.ts';
 
 const DEFAULT_OPENAPI_SERVER_URL = '/api';
 const DEFAULT_SCALAR_TITLE = 'API Documentation';
@@ -75,8 +76,12 @@ export function createOpenAPISpec<T extends ServiceRouter>(
   router: T,
   config: OpenAPIConfig,
 ): ServiceHandler {
-  return (async (c: ServiceContext): Promise<Response> => {
-    const spec = await openApiGenerator.generate(router as never, {
+  return async (c): Promise<Response> => {
+    if (!isOrpcRouter(router)) {
+      return c.json({ error: 'INVALID_ROUTER', message: 'Service router is not an object' }, 500);
+    }
+
+    const spec = await openApiGenerator.generate(router, {
       info: {
         title: config.title,
         version: config.version,
@@ -85,7 +90,7 @@ export function createOpenAPISpec<T extends ServiceRouter>(
       servers: config.servers ?? [{ url: DEFAULT_OPENAPI_SERVER_URL }],
     });
     return c.json(spec);
-  }) as ServiceHandler;
+  };
 }
 
 /**
@@ -108,7 +113,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
     theme = DEFAULT_SCALAR_THEME,
   } = options;
 
-  return ((c: ServiceContext): Response => {
+  return (c): Response => {
     // Serve Scalar UI with locally bundled JS (no CDN dependency)
     const html = `<!doctype html>
 <html>
@@ -133,7 +138,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
 </html>`;
 
     return c.html(html);
-  }) as ServiceHandler;
+  };
 }
 
 /**
@@ -146,7 +151,7 @@ export function createScalarDocs(options: ScalarDocsOptions): ServiceHandler {
  * ```
  */
 export function createScalarJs(): ServiceHandler {
-  return (async (c: ServiceContext): Promise<Response> => {
+  return async (c): Promise<Response> => {
     const scalarJs = scalarJsCache ?? await Deno.readTextFile(scalarJsUrl);
     scalarJsCache = scalarJs;
 
@@ -154,5 +159,5 @@ export function createScalarJs(): ServiceHandler {
       'Content-Type': 'application/javascript',
       'Cache-Control': SCALAR_JS_CACHE_CONTROL,
     });
-  }) as ServiceHandler;
+  };
 }

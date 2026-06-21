@@ -18,8 +18,18 @@
 
 import { delay } from '@std/async/delay';
 import { getKv, type KvKey, type WatchableKv } from '@netscript/kv';
-import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import type {
+  DeadLetterRecord,
+  DeadLetterStorePort,
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  NackOptions,
+} from '../ports/mod.ts';
 import { QueueError, QueueErrorCode } from '../ports/mod.ts';
+import { toDeadLetterRecord } from './_envelope.ts';
+import { KvDeadLetterStore } from './kv-dead-letter-store.ts';
 
 export type {
   AtomicCheck,
@@ -134,6 +144,11 @@ export interface KvPollingAdapterOptions {
    * If not provided, uses the shared KV from @netscript/kv.
    */
   kv?: WatchableKv;
+
+  /**
+   * Optional dead-letter store. Defaults to a KV-backed store using this adapter's KV instance.
+   */
+  deadLetterStore?: DeadLetterStorePort;
 }
 
 /**
@@ -188,6 +203,8 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
   private readonly workerId: string;
   private readonly verbose: boolean;
   private readonly explicitKv?: WatchableKv;
+  private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
+  private deadLetterStore: DeadLetterStorePort<T> | null = null;
 
   /**
    * This adapter handles retries manually with exponential backoff.
@@ -210,6 +227,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
     this.workerId = options.workerId ?? `worker-${crypto.randomUUID().slice(0, 8)}`;
     this.verbose = options.verbose ?? false;
     this.explicitKv = options.kv;
+    this.explicitDeadLetterStore = options.deadLetterStore as DeadLetterStorePort<T> | undefined;
   }
 
   /**
@@ -244,6 +262,26 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
   }
 
   /**
+   * Resolve the dead-letter store after KV is available.
+   */
+  private async ensureDeadLetterStore(): Promise<DeadLetterStorePort<T>> {
+    if (this.deadLetterStore) {
+      return this.deadLetterStore;
+    }
+
+    if (this.explicitDeadLetterStore) {
+      this.deadLetterStore = this.explicitDeadLetterStore;
+      return this.deadLetterStore;
+    }
+
+    this.deadLetterStore = new KvDeadLetterStore<T>({
+      queueName: this.queueName,
+      kv: await this.ensureKv(),
+    });
+    return this.deadLetterStore;
+  }
+
+  /**
    * Log a message if verbose mode is enabled.
    */
   private log(message: string, ...args: unknown[]): void {
@@ -275,13 +313,6 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
    */
   private processingKey(id: string): KvKey {
     return [KvPrefixes.processing, this.queueName, id];
-  }
-
-  /**
-   * Create a KV key for a DLQ message.
-   */
-  private dlqKey(timestamp: string, id: string): KvKey {
-    return [KvPrefixes.dlq, this.queueName, timestamp, id];
   }
 
   /**
@@ -470,28 +501,33 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
    */
   private async nack(
     message: QueueMessage<T>,
-    requeue: boolean,
+    options: NackOptions,
   ): Promise<void> {
     const kv = await this.ensureKv();
     const now = new Date();
+    const requeue = options.requeue ?? true;
 
     // Delete from processing
     await kv.delete(this.processingKey(message.id));
 
     if (!requeue || message.attempts >= message.maxAttempts) {
-      // Send to dead letter queue
-      const dlqMessage = {
-        ...message,
-        failedAt: now.toISOString(),
-        reason: message.attempts >= message.maxAttempts
-          ? 'max_attempts_exceeded'
-          : 'nack_without_requeue',
-      };
+      const store = await this.ensureDeadLetterStore();
+      const reason = message.attempts >= message.maxAttempts
+        ? 'max_attempts_exceeded'
+        : options.reason ?? 'nack_without_requeue';
 
-      await kv.set(
-        this.dlqKey(now.toISOString(), message.id),
-        dlqMessage,
-      );
+      await store.append(toDeadLetterRecord(
+        {
+          messageId: message.id,
+          queueName: this.queueName,
+          payload: message.payload,
+          headers: message.headers,
+          deliveryCount: message.attempts,
+          enqueuedAt: message.enqueuedAt,
+        },
+        reason,
+        options,
+      ));
 
       this.log(`Message ${message.id} sent to DLQ after ${message.attempts} attempts`);
     } else {
@@ -535,7 +571,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
 
       if (message.visibilityTimeout && new Date(message.visibilityTimeout) < now) {
         this.log(`Recovering timed-out message ${message.id}`);
-        await this.nack(message, true);
+        await this.nack(message, { requeue: true });
       }
     }
   }
@@ -553,7 +589,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
         await this.ack(message.id);
       },
       nack: async (options?: { requeue?: boolean }) => {
-        await this.nack(message, options?.requeue ?? true);
+        await this.nack(message, options ?? { requeue: true });
       },
     };
   }
@@ -627,7 +663,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
               error,
             );
             // Auto-nack with requeue on error
-            await this.nack(message, true);
+            await this.nack(message, { requeue: true });
           } finally {
             activeProcessing.delete(message.id);
           }
@@ -680,7 +716,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
 
     let pending = 0;
     let processing = 0;
-    let dlq = 0;
+    const deadLetters = await this.ensureDeadLetterStore();
 
     for await (const _ of kv.list({ prefix: [KvPrefixes.pending, this.queueName] })) {
       pending++;
@@ -690,11 +726,7 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
       processing++;
     }
 
-    for await (const _ of kv.list({ prefix: [KvPrefixes.dlq, this.queueName] })) {
-      dlq++;
-    }
-
-    return { pending, processing, dlq };
+    return { pending, processing, dlq: await deadLetters.depth() };
   }
 
   /**
@@ -725,21 +757,18 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
    */
   async reprocessDlq(limit?: number): Promise<number> {
     const kv = await this.ensureKv();
-    const now = new Date();
-    let count = 0;
-
-    for await (
-      const entry of kv.list<QueueMessage<T>>({
-        prefix: [KvPrefixes.dlq, this.queueName],
-        limit,
-      })
-    ) {
-      const message = entry.value;
-
-      // Reset attempts and requeue
+    const deadLetters = await this.ensureDeadLetterStore();
+    return await deadLetters.reprocess(async (record: DeadLetterRecord<T>) => {
+      const now = new Date();
       const requeuedMessage: QueueMessage<T> = {
-        ...message,
+        id: record.messageId,
+        payload: record.payload,
+        queue: this.queueName,
+        enqueuedAt: record.enqueuedAt,
         attempts: 0,
+        maxAttempts: this.maxRetries + 1,
+        priority: 50,
+        headers: record.headers,
         availableAt: now.toISOString(),
         claimedAt: undefined,
         claimedBy: undefined,
@@ -747,15 +776,9 @@ export class KvPollingAdapter<T = unknown> implements MessageQueue<T> {
       };
 
       await kv.set(
-        this.pendingKey(message.priority, now.toISOString(), message.id),
+        this.pendingKey(requeuedMessage.priority, now.toISOString(), record.messageId),
         requeuedMessage,
       );
-
-      await kv.delete(entry.key);
-      count++;
-    }
-
-    this.log(`Reprocessed ${count} messages from DLQ`);
-    return count;
+    }, { limit });
   }
 }

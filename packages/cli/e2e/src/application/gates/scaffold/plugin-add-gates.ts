@@ -9,6 +9,7 @@ import type { PluginSuiteState } from '../../builders/scaffold/plugin-suite-stat
 import { cli, commandGate } from './gate-factory.ts';
 
 function pluginName(kind: PluginKind): string {
+  if (kind === PLUGIN.AUTH) return 'auth';
   return `${kind}s`;
 }
 
@@ -38,7 +39,7 @@ function pluginAddCommand(
 
 function pluginAddCwd(kind: PluginKind): WorkingDirectoryFactory {
   return (context) =>
-    kind === PLUGIN.SAGA || kind === PLUGIN.TRIGGER
+    kind === PLUGIN.SAGA || kind === PLUGIN.TRIGGER || kind === PLUGIN.AUTH
       ? context.project.projectRoot
       : context.project.repoRoot;
 }

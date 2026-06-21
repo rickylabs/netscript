@@ -9,6 +9,9 @@
     "./adapters/redis": "./adapters/redis.adapter.ts",
     "./adapters/amqp": "./adapters/amqp.adapter.ts",
     "./adapters/postgres": "./adapters/postgres.adapter.ts",
+    "./adapters/kv-dead-letter-store": "./adapters/kv-dead-letter-store.ts",
+    "./adapters/postgres-dead-letter-store": "./adapters/postgres-dead-letter-store.ts",
+    "./adapters/redis-dead-letter-store": "./adapters/redis-dead-letter-store.ts",
     "./adapters/kv-polling": "./adapters/kv-polling.adapter.ts",
     "./ports": "./ports/mod.ts",
     "./errors": "./ports/errors.ts",
@@ -16,7 +19,7 @@
     "./testing": "./testing/mod.ts"
   },
   "tasks": {
-    "check": "deno check ./mod.ts ./ports/mod.ts ./ports/errors.ts ./validation/mod.ts ./testing/mod.ts ./adapters/deno-kv.adapter.ts ./adapters/redis.adapter.ts ./adapters/amqp.adapter.ts ./adapters/postgres.adapter.ts ./adapters/kv-polling.adapter.ts",
+    "check": "deno check ./mod.ts ./ports/mod.ts ./ports/errors.ts ./validation/mod.ts ./testing/mod.ts ./adapters/deno-kv.adapter.ts ./adapters/redis.adapter.ts ./adapters/amqp.adapter.ts ./adapters/postgres.adapter.ts ./adapters/kv-dead-letter-store.ts ./adapters/postgres-dead-letter-store.ts ./adapters/redis-dead-letter-store.ts ./adapters/kv-polling.adapter.ts",
     "test": "deno test ./tests/",
     "lint": "deno lint",
     "fmt": "deno fmt",

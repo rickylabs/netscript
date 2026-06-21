@@ -7,9 +7,22 @@
  */
 
 import { Redis } from 'ioredis';
-import type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
+import type {
+  DeadLetterStorePort,
+  EnqueueOptions,
+  ListenOptions,
+  MessageContext,
+  MessageQueue,
+  NackOptions,
+} from '../ports/mod.ts';
 import { QueueConnectionError, QueueError, QueueErrorCode } from '../ports/mod.ts';
-import { createEnvelope, createMessageContext, isMessageEnvelope } from './_envelope.ts';
+import {
+  createEnvelope,
+  createMessageContext,
+  isMessageEnvelope,
+  toDeadLetterRecord,
+} from './_envelope.ts';
+import { RedisDeadLetterStore } from './redis-dead-letter-store.ts';
 
 export type { EnqueueOptions, ListenOptions, MessageContext, MessageQueue } from '../ports/mod.ts';
 
@@ -46,7 +59,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   private listening = false;
   private abortController?: AbortController;
   private clients: RedisQueueClients | null = null;
+  private deadLetterStore: DeadLetterStorePort<T> | null = null;
   private delayedTimer?: ReturnType<typeof setInterval>;
+  private readonly explicitDeadLetterStore?: DeadLetterStorePort<T>;
 
   /**
    * Redis supports native retry-style redelivery through the processing list.
@@ -64,7 +79,9 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     private readonly url: string,
     private readonly queueName = 'default',
     private readonly options: Record<string, unknown> | undefined = undefined,
+    explicitDeadLetterStore?: DeadLetterStorePort<T>,
   ) {
+    this.explicitDeadLetterStore = explicitDeadLetterStore;
   }
 
   /**
@@ -225,6 +242,24 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
   }
 
   /**
+   * Resolve the configured DLQ store or lazily create the Redis-backed default.
+   */
+  private ensureDeadLetterStore(): DeadLetterStorePort<T> {
+    if (this.deadLetterStore) {
+      return this.deadLetterStore;
+    }
+    if (this.explicitDeadLetterStore) {
+      this.deadLetterStore = this.explicitDeadLetterStore;
+      return this.deadLetterStore;
+    }
+    this.deadLetterStore = new RedisDeadLetterStore<T>({
+      commands: this.ensureClients().commands,
+      queueName: this.queueName,
+    });
+    return this.deadLetterStore;
+  }
+
+  /**
    * Decode one Redis message and settle it around the handler call.
    */
   private async handleEncodedMessage(
@@ -254,6 +289,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
     let settled = false;
     const context = this.createContext(
       messageId,
+      payload,
       enqueuedAt,
       headers,
       deliveryCount,
@@ -316,6 +352,7 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
    */
   private createContext(
     messageId: string,
+    payload: T,
     enqueuedAt: Date,
     headers: Record<string, string>,
     deliveryCount: number,
@@ -331,10 +368,24 @@ export class RedisAdapter<T = unknown> implements MessageQueue<T> {
         await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
         markSettled();
       },
-      async (options) => {
-        await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
-        if (options?.requeue ?? true) {
+      async (options: NackOptions = {}) => {
+        if (options.requeue ?? true) {
+          await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
           await this.ensureClients().commands.lpush(this.queueKey, encoded);
+        } else {
+          await this.ensureDeadLetterStore().append(toDeadLetterRecord(
+            {
+              messageId,
+              queueName: this.queueName,
+              payload,
+              headers,
+              deliveryCount,
+              enqueuedAt,
+            },
+            options.reason ?? 'nack_without_requeue',
+            options,
+          ));
+          await this.ensureClients().commands.lrem(this.processingKey, 1, encoded);
         }
         markSettled();
       },

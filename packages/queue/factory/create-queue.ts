@@ -14,7 +14,7 @@ import { getPostgresUri, getServiceUrl, isServiceAvailable } from '@netscript/sd
 import { getRedisConnectionFromEnv } from '@netscript/kv';
 import { DenoKvAdapter } from '../adapters/deno-kv.adapter.ts';
 import { KvPollingAdapter } from '../adapters/kv-polling.adapter.ts';
-import type { MessageQueue } from '../ports/mod.ts';
+import type { DeadLetterStorePort, MessageQueue } from '../ports/mod.ts';
 import {
   QueueConfigurationError,
   QueueConnectionError,
@@ -118,11 +118,12 @@ export function createQueue<T = unknown>(
     provider,
     autoDiscover = true,
     connection,
+    deadLetterStore,
     disableAutoTracing = false,
   } = options;
 
   const selectedProvider = provider ?? (autoDiscover ? detectProvider() : QueueProvider.DenoKv);
-  const queueFactory = createQueueFactory<T>(name, selectedProvider, connection);
+  const queueFactory = createQueueFactory<T>(name, selectedProvider, connection, deadLetterStore);
   const withTelemetry = isTelemetryEnabled() && !disableAutoTracing;
   const nativeRetrial = getNativeRetrial(selectedProvider, connection);
 
@@ -210,16 +211,17 @@ function createQueueFactory<T>(
   name: string,
   provider: QueueProvider,
   connection?: QueueOptions['connection'],
+  deadLetterStore?: QueueOptions['deadLetterStore'],
 ): () => Promise<MessageQueue<T>> {
   switch (provider) {
     case QueueProvider.RabbitMQ:
-      return () => createRabbitMqQueue<T>(name, connection);
+      return () => createRabbitMqQueue<T>(name, connection, deadLetterStore);
     case QueueProvider.Redis:
-      return () => createRedisQueue<T>(name, connection);
+      return () => createRedisQueue<T>(name, connection, deadLetterStore);
     case QueueProvider.DenoKv:
-      return () => Promise.resolve(createDenoKvQueue<T>(name, connection));
+      return () => Promise.resolve(createDenoKvQueue<T>(name, connection, deadLetterStore));
     case QueueProvider.Postgres:
-      return () => createPostgresQueue<T>(name, connection);
+      return () => createPostgresQueue<T>(name, connection, deadLetterStore);
     default:
       return () =>
         Promise.reject(
@@ -248,6 +250,7 @@ function getNativeRetrial(
 function createDenoKvQueue<T>(
   name: string,
   connection?: QueueOptions['connection'],
+  deadLetterStore?: QueueOptions['deadLetterStore'],
 ): MessageQueue<T> {
   const explicitPath = connection?.denoKv?.path;
   const verbose = connection?.denoKv?.verbose ?? false;
@@ -260,6 +263,7 @@ function createDenoKvQueue<T>(
       pollInterval: connection?.denoKv?.pollInterval,
       visibilityTimeout: connection?.denoKv?.visibilityTimeout,
       maxRetries: connection?.denoKv?.maxRetries,
+      deadLetterStore,
     });
   }
 
@@ -267,6 +271,7 @@ function createDenoKvQueue<T>(
     queueName: name,
     useShared: !explicitPath,
     verbose,
+    deadLetterStore,
   });
 }
 
@@ -276,6 +281,7 @@ function createDenoKvQueue<T>(
 async function createRedisQueue<T>(
   name: string,
   connection?: QueueOptions['connection'],
+  deadLetterStore?: QueueOptions['deadLetterStore'],
 ): Promise<MessageQueue<T>> {
   const url = connection?.redis?.url ?? getRedisConnectionFromEnv();
   const options = url?.startsWith('rediss://')
@@ -294,7 +300,12 @@ async function createRedisQueue<T>(
   }
 
   const { RedisAdapter } = await import('../adapters/redis.adapter.ts');
-  return new RedisAdapter<T>(url, name, options);
+  return new RedisAdapter<T>(
+    url,
+    name,
+    options,
+    deadLetterStore as DeadLetterStorePort<T> | undefined,
+  );
 }
 
 /**
@@ -303,6 +314,7 @@ async function createRedisQueue<T>(
 async function createRabbitMqQueue<T>(
   name: string,
   connection?: QueueOptions['connection'],
+  deadLetterStore?: QueueOptions['deadLetterStore'],
 ): Promise<MessageQueue<T>> {
   const url = connection?.rabbitmq?.url ??
     (() => {
@@ -319,7 +331,7 @@ async function createRabbitMqQueue<T>(
 
   const queueName = connection?.rabbitmq?.queueName ?? name;
   const { AmqpAdapter } = await import('../adapters/amqp.adapter.ts');
-  return new AmqpAdapter<T>(url, queueName);
+  return new AmqpAdapter<T>(url, queueName, deadLetterStore as DeadLetterStorePort<T> | undefined);
 }
 
 /**
@@ -328,6 +340,7 @@ async function createRabbitMqQueue<T>(
 async function createPostgresQueue<T>(
   name: string,
   connection?: QueueOptions['connection'],
+  deadLetterStore?: QueueOptions['deadLetterStore'],
 ): Promise<MessageQueue<T>> {
   const url = connection?.postgres?.url ?? getPostgresUri();
 
@@ -342,5 +355,6 @@ async function createPostgresQueue<T>(
     url,
     queueName: name,
     tableName: connection?.postgres?.tableName,
+    deadLetterStore,
   });
 }

@@ -12,7 +12,7 @@
 | Axis              | Port interface         | Stub-only base                   | Current implementers                                                    | Status                                |
 | ----------------- | ---------------------- | -------------------------------- | ----------------------------------------------------------------------- | ------------------------------------- |
 | **Transport**     | `SagaTransportPort`    | `AbstractSagaTransport`          | `NetScriptRedisTransport`, `GarnetListTransport`, `MemorySagaTransport` | Three implementers → base allowed     |
-| **Store**         | `SagaStorePort`        | `AbstractSagaStore`              | `KvSagaStore`, `PostgresSagaStore` (planned), `MemorySagaStore`         | Two+ implementers → base allowed      |
+| **Store**         | `SagaStorePort`        | `AbstractSagaStore`              | `KvSagaStore`, `PrismaSagaStore`, `MemorySagaStore`                    | Three implementers → base allowed     |
 | **Bus**           | `SagaBusPort`          | `AbstractSagaBus`                | `SagaBusBridge` (native), `SagaBusLegacy` (`@saga-bus/core` wrap)       | Two implementers → base allowed       |
 | **Agent runtime** | `SagaAgentRuntimePort` | `AbstractAgentRuntime`           | Voltagent-wrapped runtime in `@netscript/plugin-ai-agent` (deferred)    | Reserved; base ships empty in Group E |
 | **Outbox** (T2)   | `SagaOutboxPort`       | `AbstractSagaOutbox`             | `PostgresOutbox` (Phase 7d)                                             | Port only in Group E; base deferred   |

@@ -1,0 +1,45 @@
+{
+  "sliceId": "sagas-durable-store",
+  "archetype": "ARCHETYPE-3 (Runtime/Behavior) for `@netscript/plugin-sagas-core` durability seam + ARCHETYPE-5 (Plugin Package) for `@netscript/plugin-sagas` where the concrete `KvSagaStore` and composition-root wiring live. Both packages are stateful saga runtime surfaces; the core defines the port/engine, the plugin owns the durable adapter + composition root, exactly mirroring the proven triggers pattern.",
+  "scopeOverlays": [
+    "SCOPE-service (composition root in plugins/sagas/services/src/main.ts wires runtime resources)"
+  ],
+  "lockedDecisions": [
+    "Durable store = `KvSagaStore implements SagaStorePort` backed by raw `Deno.Kv` (NOT @saga-bus/store-prisma, NOT Postgres/Prisma write path), mirroring the proven `KvTriggerEventStore` pattern 1:1.",
+    "Store + default wiring live in the PLUGIN package `@netscript/plugin-sagas` (`plugins/sagas/src/runtime/`), NOT in core `@netscript/plugin-sagas-core`, to keep core platform-neutral and KV-free \u2014 exactly as triggers keeps its KV stores in the plugin.",
+    "KV opener `openSagaRuntimeKv()` = `Deno.openKv(Deno.env.get('NETSCRIPT_SAGA_KV_PATH'))`; KV key layout prefix `['sagas']` with `state`/`correlation`/`transition` sub-namespaces.",
+    "New plugin factory `createDurableSagaRuntime()` is the durable-by-default composition entrypoint; `createSagaRuntime` core signature is unchanged (store-agnostic).",
+    "Service `main.ts:63` and standalone `saga-runner`/`saga-supervisor` default to `createDurableSagaRuntime`; injection seams preserved for tests.",
+    "Core `createNativeBus` emits a one-time warn via existing `LoggerPort` when built store-less (kills silent non-durability) instead of forcing a default store into core.",
+    "Optimistic `save({expectedVersion})` maps to an atomic Deno.Kv `check(versionstamp)`; stale write rejected with `SagasError.validationFailed`, matching MemorySagaStore.",
+    "`sagas.prisma` Postgres tables reclassified as API read-model/projection; dead `@saga-bus/store-prisma` references removed. No npm dep / catalog / version-pin changes.",
+    "Read-path reconciliation (v1-handlers Prisma/kvdex branches consuming the new store) is explicitly DEFERRED to a separate slice \u2014 deferred-safe."
+  ],
+  "contracts": [
+    "SagaStorePort (packages/plugin-sagas-core/src/ports/saga-store-port.ts:23) \u2014 REUSED unchanged; KvSagaStore is its first production implementor.",
+    "KvSagaStore class + KvSagaStoreOptions ({ kv: Deno.Kv; prefix?: readonly Deno.KvKeyPart[]; now?: () => Date }) \u2014 new plugin runtime surface.",
+    "openSagaRuntimeKv(): Promise<Deno.Kv> \u2014 new plugin runtime helper.",
+    "createDurableSagaRuntime(options?): { runtime: SagaRuntime<'native'>; store: SagaStorePort; kv: Deno.Kv } + DurableSagaRuntimeOptions \u2014 new plugin composition factory.",
+    "create-saga-runtime SagaRuntimeNativeOptions.logger? passthrough (optional) for the store-less warn seam \u2014 core."
+  ],
+  "testPlan": [
+    "unit: KvSagaStore round-trips SagaStateEnvelope (save\u2192load), correlation save\u2192findByCorrelation, appendTransition log ordering, delete clears state+transitions+correlation (over Deno.openKv(':memory:')).",
+    "unit failure-path: KvSagaStore.save with stale expectedVersion rejects with SagasError.validationFailed (parity with MemorySagaStore).",
+    "unit: createDurableSagaRuntime injects KvSagaStore by default, honors injected store/kv, and the returned kv is closeable.",
+    "unit: core createNativeBus emits exactly one warn via injected LoggerPort when store-less; emits none when a store is present.",
+    "integration (cross-restart durability): two sequential runtimes over the SAME in-memory Deno.Kv \u2014 second runtime resumes persisted saga state/version instead of initialState for a correlated message.",
+    "unit: standalone saga-runner/saga-supervisor default runtime is store-backed (assert engine has a store / state persists).",
+    "regression: existing packages/plugin-sagas-core/tests/runtime/saga-store_test.ts and saga-engine tests still pass (engine store-aware path unchanged)."
+  ],
+  "planGateSelfCheck": "Research present and current: PASS \u2014 every cited file:line re-verified on current main; one unverifiable docs-site sub-evidence explicitly dropped; read-path divergence verified. Decisions locked: PASS \u2014 9 locked decisions with rationale (KV-store-in-plugin mirroring triggers, no Prisma write path, warn-seam in core). Open-decision sweep: PASS \u2014 the only open decision (read-path reconciliation) is listed and marked deferred-safe with justification that it forces no rework. Commit slices: PASS \u2014 8 ordered slices, each names proof + gate + files. Risk register: PASS \u2014 R1-R4 with mitigations. Gate set: PASS \u2014 ARCHETYPE-3/5 F-gates named, scoped check/test/lint/fmt wrappers, e2e:cli correctly excluded (no scaffold change). Deferred scope explicit: PASS. jsr-audit: PASS \u2014 applied to planned surface, slow-type/Deno-re-export risks named and cleared. Residual FAIL_PLAN risk: LOW \u2014 only plausible challenge is whether the durable default belongs in core vs plugin; plan locks plugin with the triggers precedent as justification, pre-empting that objection.",
+  "openQuestions": [
+    "DEFERRED-SAFE: should the HTTP read path (v1-handlers Prisma `db.sagaInstance` branch + getSagaDb kvdex branch) be reconciled to read from KvSagaStore? Locked as a SEPARATE slice \u2014 it forces no rework of the store contract or engine wiring delivered here, so deferring is safe.",
+    "MINOR: whether to keep the legacy `sagas.prisma` SagaInstance/SagaExecutionHistory tables as a documented read-model projection (chosen) or remove them. Locked: keep as projection, comment-only correction, to avoid migration churn this slice."
+  ],
+  "risks": [
+    "KV optimistic-write semantics must match MemorySagaStore stale-version rejection exactly, or engine concurrency tests diverge \u2014 covered by parity tests.",
+    "Standalone runner now opens Deno.Kv by default; environments without KV permission could fail at startup \u2014 mitigated by env-path config + injection seam + :memory: in tests.",
+    "Core warn-on-storeless risks log noise \u2014 mitigated by one-time guard and NoopLogger default.",
+    "Read-path divergence means API list/get endpoints will NOT immediately reflect engine-written state until the deferred reconciliation slice lands; must be called out in the umbrella PR so it is not mistaken for a regression."
+  ]
+}

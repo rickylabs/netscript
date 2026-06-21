@@ -1,4 +1,4 @@
-import { createQueue } from '@netscript/queue';
+import { createQueue, type MessageContext } from '@netscript/queue';
 import {
   DEFAULT_TOPIC,
   type JobDefinition,
@@ -55,9 +55,9 @@ export function startTaskQueueListener(
   queueContext.setTaskQueue(taskQueue);
   const supervisor = createListenerSupervisor(queueContext, 'task:tasks', (signal) => {
     return taskQueue.listen(
-      async (message) => {
+      async (message, context) => {
         try {
-          await processWorkerTask(dispatchContext, message);
+          await processWorkerTask(dispatchContext, message, context);
         } catch (error) {
           console.error(
             `[Worker ${queueContext.workerId}] Unexpected error processing task '${message.taskId}':`,
@@ -121,7 +121,11 @@ async function listenToTriggerQueue(
         priority: 50,
       };
 
-      await context.processJob(jobMessage, queueContext as TracedMessageContext);
+      await context.processJob(
+        jobMessage,
+        queueContext as MessageContext,
+        queueContext as TracedMessageContext,
+      );
     },
     {
       concurrency: config.concurrency ?? 1,

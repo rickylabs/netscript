@@ -1,0 +1,400 @@
+| `run-deno-fmt.ts packages/plugin-auth-core` | 0 | 0 errors |
+| `run-deno-fmt.ts plugins/auth` | 0 | 0 errors |
+| `deno test` (13 tests) | 0 | All passed |
+
+**6. Hygiene** ✓
+- `deno.lock`: NO CHANGES (verified empty diff vs base)
+- Untracked: only `.llm/tmp/run/openhands/pr-100/` (run trace metadata, not 
+committed)
+- No junk files, no secrets, no stray artifacts
+
+---
+
+## Summary
+
+S6 scope fully achieved: InteractiveFlowPort replaces all 5 `as 
+InteractiveAuthBackend` casts with typed narrowing; AuthServiceContext declares 
+optional appsettings property (no probe); oRPC middleware cleanly separates 
+registry (static) from request (per-request). All backends remain 
+backward-compatible. Tests confirm no regressions.
+
+**Verdict: PASS** — Ready to merge to `feat/prime-time/auth`.
+
+Tokens: ↑ input 1.47M • cache hit 84.82% •  reasoning 9.12K • ↓ output 16.3K • $
+0.6514
+
+{"asctime": "2026-06-21 05:47:51,935", "levelname": "WARNING", "name": "__main__", "filename": "agent_runner.py", "lineno": 121, "message": "Agent did not write /home/runner/work/_temp/openhands/27894947146-1/summary.md; asking once more"}
+Message from User ──────────────────────────────────────────────────────────────
+
+You finished without writing the required run summary file at 
+/home/runner/work/_temp/openhands/27894947146-1/summary.md. Write that file now 
+as markdown with Summary, Changes, Validation, and Remaining risks sections, 
+then stop. Describe ONLY work you actually performed and files you actually 
+wrote in this run. If the task is incomplete, state that explicitly and list 
+what remains; never describe intended or planned work as if it were done.
+
+Tokens: ↑ input 1.47M • cache hit 84.82% •  reasoning 9.12K • ↓ output 16.3K • $
+0.6514
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Create parent dir for summary.md
+
+Reasoning:
+The user wants me to write the summary.md file at the specified path. Let me 
+ensure the parent directory exists, then write the file. I should describe only 
+what I actually did in this run — which was the IMPL-EVAL certification of PR 
+#100 for S6 composition seams.
+
+Let me also check if a replies.json is needed. The output_mode is `pr-comment`, 
+but the user specifically says to write summary.md now and stop. I'll focus on 
+that.
+
+
+$ mkdir -p /home/runner/work/_temp/openhands/27894947146-1
+
+Tokens: ↑ input 1.5M • cache hit 82.94% •  reasoning 9.22K • ↓ output 16.47K • $
+0.6937
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "create", "path": 
+"/home/runner/work/_temp/openhands/27894947146-1/summary.md", "file_text": "# 
+IMPL-EVAL Run Summary \u2014 PR #100 (S6 Composition Seams)\n\n## 
+Summary\nEvaluated PR #100 `feat/prime-time/auth-s6-composition` (head) vs 
+`feat/prime-time/auth` (base)\nas an independent certifier (IMPL-EVAL role). 
+Defaulted-to-FAIL posture per IMPL-EVAL protocol,\nchecking all six S6 
+certification checks against concrete file:line and exit-code 
+evidence.\n\nBranch confirmed at `feat/prime-time/auth-s6-composition`, tip 
+commit `ae16f93e`.\nNo code was authored or edited by this agent \u2014 the run 
+was read/verify only.\n\n## Changes\n- **None** in the repository tree. Agent 
+ran in evaluator role only.\n- Wrote only the run artifact `summary.md` at 
+`OPENHANDS_SUMMARY_PATH`.\n\n## Validation\nAll gates executed fresh in this 
+run, each with recorded exit codes:\n\n1. **Assertion removal** (Check 1):\n   
+`grep -n` over all S6-touched files for `as unknown as | as any | : any | as 
+never | @ts-ignore | @ts-nocheck | @ts-expect-error`.\n   Only hits: 
+`plugins/auth/services/src/router.ts:19, 22, 28` \u2014 the three sanctioned 
+top-level\n   router-composition `any`s, each with `// deno-lint-ignore 
+no-explicit-any`. **PASS**.\n\n2. **Composition-over-cast adoption** (Check 
+2):\n   - `packages/plugin-auth-core/src/ports/mod.ts:89-110`: 
+`InteractiveFlowPort` exported with JSDoc + `@example`.\n   - 
+`packages/plugin-auth-core/src/ports/mod.ts:216`: `AuthBackendPort.interactive?:
+InteractiveFlowPort` additive.\n   - 
+`plugins/auth/services/src/routers/v1-handlers.ts:243-248`: 
+`requireInteractive()` narrowing helper.\n   - 
+`plugins/auth/services/src/routers/v1-types.ts:5-7`: declared 
+`AuthServiceContext.appsettings?` (no cast).\n   - 
+`plugins/auth/services/src/init.ts:24`: typed property access, not speculative 
+probe.\n   - `plugins/auth/services/src/main.ts:57`: static `withContext({ 
+registry })` + typed oRPC middleware in `request-context.ts:14-16`.\n   - KV 
+OAuth (`packages/auth-kv-oauth/src/backend.ts`) populates `interactive`; WorkOS 
+and better-auth unchanged. **PASS**.\n\n3. **Wrap-don't-reinvent / boundary** 
+(Check 3):\n   `git --no-pager diff --name-status 
+origin/feat/prime-time/auth..HEAD` shows only\n   `packages/plugin-auth-core`, 
+`plugins/auth/**`, and minimal `packages/auth-kv-oauth` wiring.\n   No 
+`@netscript/cli`, no host SDK redesign, no silent public-symbol removal. 
+**PASS**.\n\n4. **Public-surface soundness** (Check 4):\n   - `deno doc --lint` 
+on full export set of `packages/plugin-auth-core` (8 files): exit 0.\n   - `deno
+doc --lint` on full export set of `plugins/auth` (7 files): exit 0 (warnings are
+pre-existing `@types/node@25.9.3` Deno resolution quirk, not S6-attributable).\n
+- `deno publish --dry-run --allow-dirty` for `packages/plugin-auth-core`: exit 
+0, \"Success\".\n   - `deno publish --dry-run --allow-dirty` for `plugins/auth`:
+exit 0, \"Success\". **PASS**.\n\n5. **Gates green** (Check 5):\n   | Gate | 
+Exit |\n   |------|------|\n   | `run-deno-check.ts --root 
+packages/plugin-auth-core --ext ts,tsx --unstable-kv` | 0 |\n   | 
+`run-deno-check.ts --root plugins/auth --ext ts,tsx` | 0 |\n   | 
+`run-deno-lint.ts` (both roots) | 0 |\n   | `run-deno-fmt.ts` (both roots) | 0 
+|\n   | `deno test --unstable-kv --allow-all ...ports_test.ts 
+...auth-service_test.ts` | 0 |\n   All 13 assertions pass. **PASS**.\n\n6. 
+**Hygiene** (Check 6):\n   - `deno.lock` diff vs base: empty (no churn).\n   - 
+Untracked files: only `.llm/tmp/run/openhands/pr-100/` (this run trace), no 
+junk.\n   - No secrets/tokens committed. **PASS**.\n\n## Verdict\n**VERDICT: 
+PASS** \u2014 Certify S6 slice only; ready to merge to 
+`feat/prime-time/auth`.\n\n## Remaining Risks\n- **Scope certification limited 
+to S6.** This evaluator did NOT review the broader umbrella\n  
+(`feat/prime-time/auth`) for S1\u2013S5 interaction regressions \u2014 that 
+remains the umbrella-merge\n  review surface.\n- **`@types/node@25.9.3` 
+warnings** in `plugins/auth` doc-lint are inherited Deno npm resolver\n  quirks 
+unrelated to S6, but worth noting when JSR publish hygiene hardens further.\n- 
+**No E2E (`scaffold.runtime`) run** \u2014 excluded per IMPL-EVAL protocol (out 
+of S6 scope). Should\n  still be re-run at umbrella merge time.\n"}
+
+Reasoning:
+Writing summary file.
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27894947146-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Run Summary — PR #100 (S6 Composition Seams)
+    
+    ## Summary
+    Evaluated PR #100 `feat/prime-time/auth-s6-composition` (head) vs 
+`feat/prime-time/auth` (base)
+    as an independent certifier (IMPL-EVAL role). Defaulted-to-FAIL posture per 
+IMPL-EVAL protocol,
+    checking all six S6 certification checks against concrete file:line and 
+exit-code evidence.
+    
+    Branch confirmed at `feat/prime-time/auth-s6-composition`, tip commit 
+`ae16f93e`.
+    No code was authored or edited by this agent — the run was read/verify only.
+    
+    ## Changes
+    - **None** in the repository tree. Agent ran in evaluator role only.
+    - Wrote only the run artifact `summary.md` at `OPENHANDS_SUMMARY_PATH`.
+    
+    ## Validation
+    All gates executed fresh in this run, each with recorded exit codes:
+    
+    1. **Assertion removal** (Check 1):
+       `grep -n` over all S6-touched files for `as unknown as | as any | : any |
+as never | @ts-ignore | @ts-nocheck | @ts-expect-error`.
+       Only hits: `plugins/auth/services/src/router.ts:19, 22, 28` — the three 
+sanctioned top-level
+       router-composition `any`s, each with `// deno-lint-ignore 
+no-explicit-any`. **PASS**.
+    
+    2. **Composition-over-cast adoption** (Check 2):
+       - `packages/plugin-auth-core/src/ports/mod.ts:89-110`: 
+`InteractiveFlowPort` exported with JSDoc + `@example`.
+       - `packages/plugin-auth-core/src/ports/mod.ts:216`: 
+`AuthBackendPort.interactive?: InteractiveFlowPort` additive.
+       - `plugins/auth/services/src/routers/v1-handlers.ts:243-248`: 
+`requireInteractive()` narrowing helper.
+       - `plugins/auth/services/src/routers/v1-types.ts:5-7`: declared 
+`AuthServiceContext.appsettings?` (no cast).
+       - `plugins/auth/services/src/init.ts:24`: typed property access, not 
+speculative probe.
+       - `plugins/auth/services/src/main.ts:57`: static `withContext({ registry 
+})` + typed oRPC middleware in `request-context.ts:14-16`.
+       - KV OAuth (`packages/auth-kv-oauth/src/backend.ts`) populates 
+`interactive`; WorkOS and better-auth unchanged. **PASS**.
+    
+    3. **Wrap-don't-reinvent / boundary** (Check 3):
+       `git --no-pager diff --name-status origin/feat/prime-time/auth..HEAD` 
+shows only
+       `packages/plugin-auth-core`, `plugins/auth/**`, and minimal 
+`packages/auth-kv-oauth` wiring.
+       No `@netscript/cli`, no host SDK redesign, no silent public-symbol 
+removal. **PASS**.
+    
+    4. **Public-surface soundness** (Check 4):
+       - `deno doc --lint` on full export set of `packages/plugin-auth-core` (8 
+files): exit 0.
+       - `deno doc --lint` on full export set of `plugins/auth` (7 files): exit 
+0 (warnings are pre-existing `@types/node@25.9.3` Deno resolution quirk, not 
+S6-attributable).
+       - `deno publish --dry-run --allow-dirty` for `packages/plugin-auth-core`:
+exit 0, "Success".
+       - `deno publish --dry-run --allow-dirty` for `plugins/auth`: exit 0, 
+"Success". **PASS**.
+    
+    5. **Gates green** (Check 5):
+       | Gate | Exit |
+       |------|------|
+       | `run-deno-check.ts --root packages/plugin-auth-core --ext ts,tsx 
+--unstable-kv` | 0 |
+       | `run-deno-check.ts --root plugins/auth --ext ts,tsx` | 0 |
+       | `run-deno-lint.ts` (both roots) | 0 |
+       | `run-deno-fmt.ts` (both roots) | 0 |
+       | `deno test --unstable-kv --allow-all ...ports_test.ts 
+...auth-service_test.ts` | 0 |
+       All 13 assertions pass. **PASS**.
+    
+    6. **Hygiene** (Check 6):
+       - `deno.lock` diff vs base: empty (no churn).
+       - Untracked files: only `.llm/tmp/run/openhands/pr-100/` (this run 
+trace), no junk.
+       - No secrets/tokens committed. **PASS**.
+    
+    ## Verdict
+    **VERDICT: PASS** — Certify S6 slice only; ready to merge to 
+`feat/prime-time/auth`.
+    
+    ## Remaining Risks
+    - **Scope certification limited to S6.** This evaluator did NOT review the 
+broader umbrella
+      (`feat/prime-time/auth`) for S1–S5 interaction regressions — that remains 
+the umbrella-merge
+      review surface.
+    - **`@types/node@25.9.3` warnings** in `plugins/auth` doc-lint are inherited
+Deno npm resolver
+      quirks unrelated to S6, but worth noting when JSR publish hygiene hardens 
+further.
+    - **No E2E (`scaffold.runtime`) run** — excluded per IMPL-EVAL protocol (out
+of S6 scope). Should
+      still be re-run at umbrella merge time.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.54M • cache hit 83.20% •  reasoning 9.23K • ↓ output 17.76K • 
+$ 0.7087
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27894947146-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Run Summary — PR #100 (S6 Composition Seams)
+ 2|
++3|## Summary
++4|Evaluated PR #100 `feat/prime-time/auth-s6-composition` (head) vs 
+`feat/prime-time/auth` (base)
++5|as an independent certifier (IMPL-EVAL role). Defaulted-to-FAIL posture per 
+IMPL-EVAL protocol,
++6|checking all six S6 certification checks against concrete file:line and 
+exit-code evidence.
++7|
++8|Branch confirmed at `feat/prime-time/auth-s6-composition`, tip commit 
+`ae16f93e`.
++9|No code was authored or edited by this agent — the run was read/verify only.
++10|
++11|## Changes
++12|- **None** in the repository tree. Agent ran in evaluator role only.
++13|- Wrote only the run artifact `summary.md` at `OPENHANDS_SUMMARY_PATH`.
++14|
++15|## Validation
++16|All gates executed fresh in this run, each with recorded exit codes:
++17|
++18|1. **Assertion removal** (Check 1):
++19|   `grep -n` over all S6-touched files for `as unknown as | as any | : any |
+as never | @ts-ignore | @ts-nocheck | @ts-expect-error`.
++20|   Only hits: `plugins/auth/services/src/router.ts:19, 22, 28` — the three 
+sanctioned top-level
++21|   router-composition `any`s, each with `// deno-lint-ignore 
+no-explicit-any`. **PASS**.
++22|
++23|2. **Composition-over-cast adoption** (Check 2):
++24|   - `packages/plugin-auth-core/src/ports/mod.ts:89-110`: 
+`InteractiveFlowPort` exported with JSDoc + `@example`.
++25|   - `packages/plugin-auth-core/src/ports/mod.ts:216`: 
+`AuthBackendPort.interactive?: InteractiveFlowPort` additive.
++26|   - `plugins/auth/services/src/routers/v1-handlers.ts:243-248`: 
+`requireInteractive()` narrowing helper.
++27|   - `plugins/auth/services/src/routers/v1-types.ts:5-7`: declared 
+`AuthServiceContext.appsettings?` (no cast).
++28|   - `plugins/auth/services/src/init.ts:24`: typed property access, not 
+speculative probe.
++29|   - `plugins/auth/services/src/main.ts:57`: static `withContext({ registry 
+})` + typed oRPC middleware in `request-context.ts:14-16`.
++30|   - KV OAuth (`packages/auth-kv-oauth/src/backend.ts`) populates 
+`interactive`; WorkOS and better-auth unchanged. **PASS**.
++31|
++32|3. **Wrap-don't-reinvent / boundary** (Check 3):
++33|   `git --no-pager diff --name-status origin/feat/prime-time/auth..HEAD` 
+shows only
++34|   `packages/plugin-auth-core`, `plugins/auth/**`, and minimal 
+`packages/auth-kv-oauth` wiring.
++35|   No `@netscript/cli`, no host SDK redesign, no silent public-symbol 
+removal. **PASS**.
++36|
++37|4. **Public-surface soundness** (Check 4):
++38|   - `deno doc --lint` on full export set of `packages/plugin-auth-core` (8 
+files): exit 0.
++39|   - `deno doc --lint` on full export set of `plugins/auth` (7 files): exit 
+0 (warnings are pre-existing `@types/node@25.9.3` Deno resolution quirk, not 
+S6-attributable).
++40|   - `deno publish --dry-run --allow-dirty` for `packages/plugin-auth-core`:
+exit 0, "Success".
++41|   - `deno publish --dry-run --allow-dirty` for `plugins/auth`: exit 0, 
+"Success". **PASS**.
++42|
++43|5. **Gates green** (Check 5):
++44|   | Gate | Exit |
++45|   |------|------|
++46|   | `run-deno-check.ts --root packages/plugin-auth-core --ext ts,tsx 
+--unstable-kv` | 0 |
++47|   | `run-deno-check.ts --root plugins/auth --ext ts,tsx` | 0 |
++48|   | `run-deno-lint.ts` (both roots) | 0 |
++49|   | `run-deno-fmt.ts` (both roots) | 0 |
++50|   | `deno test --unstable-kv --allow-all ...ports_test.ts 
+...auth-service_test.ts` | 0 |
++51|   All 13 assertions pass. **PASS**.
++52|
++53|6. **Hygiene** (Check 6):
++54|   - `deno.lock` diff vs base: empty (no churn).
++55|   - Untracked files: only `.llm/tmp/run/openhands/pr-100/` (this run 
+trace), no junk.
++56|   - No secrets/tokens committed. **PASS**.
++57|
++58|## Verdict
++59|**VERDICT: PASS** — Certify S6 slice only; ready to merge to 
+`feat/prime-time/auth`.
++60|
++61|## Remaining Risks
++62|- **Scope certification limited to S6.** This evaluator did NOT review the 
+broader umbrella
++63|  (`feat/prime-time/auth`) for S1–S5 interaction regressions — that remains 
+the umbrella-merge
++64|  review surface.
++65|- **`@types/node@25.9.3` warnings** in `plugins/auth` doc-lint are inherited
+Deno npm resolver
++66|  quirks unrelated to S6, but worth noting when JSR publish hygiene hardens 
+further.
++67|- **No E2E (`scaffold.runtime`) run** — excluded per IMPL-EVAL protocol (out
+of S6 scope). Should
++68|  still be re-run at umbrella merge time.
++69|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Complete IMPL-EVAL certification for PR #100
+
+Reasoning:
+The user is telling me that I didn't write the required summary file at 
+`/home/runner/work/_temp/openhands/27894947146-1/summary.md`. However, I just 
+created it successfully. Let me check if there's an issue with the path or if I 
+need to verify it exists.
+
+Actually, looking at the task_tracker output, it seems the system is 
+acknowledging that I created the file. The user's message might be a system 
+check that was triggered before my last action completed, or there's a timing 
+issue.
+
+Let me verify the file was actually written correctly and confirm completion.
+
+Thought:
+The file has been written successfully at 
+`/home/runner/work/_temp/openhands/27894947146-1/summary.md`.
+
+
+
+Finish with message:
+IMPL-EVAL run complete for PR #100 (S6 composition seams).
+
+**Verdict: PASS**
+
+All 6 certification checks passed with concrete evidence:
+1. ✓ Assertion removal (only 3 sanctioned `as any` in router.ts)
+2. ✓ Composition-over-cast adoption (InteractiveFlowPort, typed appsettings, 
+oRPC middleware)
+3. ✓ Boundary enforcement (only auth-core, plugins/auth, auth-kv-oauth touched)
+4. ✓ Public-surface soundness (deno doc --lint + publish --dry-run both clean)
+5. ✓ All gates green (check, lint, fmt, 13 tests pass)
+6. ✓ Hygiene (deno.lock unchanged, no junk files)
+
+Run summary written to 
+`/home/runner/work/_temp/openhands/27894947146-1/summary.md`.
+
+Tokens: ↑ input 1.57M • cache hit 83.37% •  reasoning 9.36K • ↓ output 18.17K • 
+$ 0.7220
+

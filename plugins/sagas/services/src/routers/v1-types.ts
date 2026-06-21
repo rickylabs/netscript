@@ -14,6 +14,8 @@ export type SagaRuntimeMessage = Readonly<{
   payload?: unknown;
   /** Optional saga correlation key. */
   correlationKey?: string;
+  /** Optional client idempotency key used to deduplicate retries. */
+  idempotencyKey?: string;
   /** Message occurrence timestamp. */
   occurredAt: Date;
   /** W3C traceparent header. */
@@ -24,6 +26,8 @@ export type SagaRuntimeMessage = Readonly<{
 
 /** Minimal runtime publish options used by the service publish endpoint. */
 export type SagaRuntimePublishOptions = Readonly<{
+  /** Optional client idempotency key used to deduplicate retries. */
+  idempotencyKey?: string;
   /** W3C traceparent header. */
   traceparent?: string;
   /** W3C tracestate header. */
@@ -82,6 +86,8 @@ export type SagaPublishMessageInput = Readonly<{
   payload?: Readonly<Record<string, unknown>>;
   /** Optional correlation identifier. */
   correlationId?: string;
+  /** Optional client idempotency key used to deduplicate retries. */
+  idempotencyKey?: string;
   /** Optional topic hint. */
   topic?: string;
 }>;

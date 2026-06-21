@@ -1,3 +1,9 @@
+/**
+ * Server-side stream mirror exports for the sagas plugin read model.
+ *
+ * @module
+ */
+
 export { getSagasStreamProducer, startSagasStreamMirror } from './producer.ts';
 export type {
   SagaInstanceRecord,

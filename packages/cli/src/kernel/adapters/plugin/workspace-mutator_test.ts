@@ -35,6 +35,13 @@ const backgroundProvider: PluginKindProvider = {
   infrastructureOptionalDeps: ['db'],
 };
 
+const sagaProvider: PluginKindProvider = {
+  ...backgroundProvider,
+  kind: 'saga',
+  displayName: 'Saga Orchestrator',
+  concurrencyEnvVar: 'SAGA_CONCURRENCY',
+};
+
 Deno.test('PluginWorkspaceMutator ensures plugins root and plugin packages are workspace members', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(
@@ -133,6 +140,50 @@ Deno.test('PluginWorkspaceMutator registers background plugins with companion AP
     Concurrency: 2,
     ConcurrencyEnvVar: 'BACKGROUND_CONCURRENCY',
     PluginReferences: ['billing-worker-api'],
+  });
+});
+
+Deno.test('PluginWorkspaceMutator writes saga store backend appsettings for saga plugins', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/appsettings.json',
+    JSON.stringify({ NetScript: {} }, null, 2) + '\n',
+  );
+
+  await new PluginWorkspaceMutator(fs).updateAppsettings(
+    '/project',
+    {
+      scaffoldResult: {
+        filesCreated: [],
+        directoriesCreated: [],
+        filesSkipped: [],
+        totalOperations: 0,
+        durationMs: 0,
+      },
+      pluginDir: '/project/plugins/sagas',
+      kind: 'saga',
+      port: 4400,
+      servicePort: 8092,
+      configSection: 'BackgroundProcessors',
+      configKey: 'sagas',
+      serviceConfigKey: 'sagas-api',
+    },
+    sagaProvider,
+    { sagaStoreBackend: 'prisma' },
+  );
+
+  const config = JSON.parse(await fs.readFile('/project/appsettings.json')) as {
+    NetScript: {
+      Plugins: Record<string, { Sagas?: unknown }>;
+      BackgroundProcessors: Record<string, { Sagas?: unknown }>;
+    };
+  };
+
+  assertEquals(config.NetScript.Plugins['sagas-api'].Sagas, {
+    Store: { Backend: 'prisma' },
+  });
+  assertEquals(config.NetScript.BackgroundProcessors.sagas.Sagas, {
+    Store: { Backend: 'prisma' },
   });
 });
 
