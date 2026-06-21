@@ -1,0 +1,240 @@
+---
+layout: layouts/base.vto
+title: Provision with a background job
+templateEngine: [vento, md]
+prev: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" }
+next: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" }
+---
+
+# Provision with a background job
+
+Provisioning a new member is real work — write a membership row, maybe warm a cache, maybe send a
+welcome email. None of it should block the request that triggered it. This chapter moves that work off
+the request path: you add the **workers** plugin and author a `defineJobHandler` job that provisions a
+member into the workspace database from chapter 3, then trigger it over the Workers API on `:8091`.
+
+{{ comp.learningPath({ steps: [
+  { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" },
+  { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" },
+  { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" },
+  { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" },
+  { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" },
+  { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" }
+] }) }}
+
+## What you will build
+
+A `provision-member` background job: a handler authored with `defineJobHandler` that parses a payload,
+creates a `Member` in the workspace datasource, and returns a success result. By the end you trigger
+it over the Workers API and watch its execution appear in the executions feed and its trace in the
+Aspire dashboard.
+
+## Before you begin
+
+You need the workspace database from [chapter 3](/tutorials/workspace/03-workspace-data/) with
+**Aspire running**. The workers plugin ships an API service and a background processor that Aspire
+orchestrates. Confirm the workspace datasource is ready:
+
+```sh
+# In my-workspace/, with `aspire run` up in another terminal
+netscript db status --db workspace   # the workspace datasource from chapter 3
+```
+
+{{ comp callout { type: "important", title: "Aspire first, then everything else" } }}
+The Workers API on <code>:8091</code> and its background processor are resources in the Aspire graph,
+and so is the <a href="http://localhost:18888">dashboard on <code>:18888</code></a> where you read job
+traces. Start <code>aspire run</code> from <code>aspire/</code> <strong>before</strong> you add the
+plugin or trigger a job, and leave it running.
+{{ /comp }}
+
+## Step 1 — Add the workers plugin
+
+Add the workers plugin with its sample jobs so you have a working reference to read and adapt:
+
+```sh
+netscript plugin add worker --name workers --samples
+netscript plugin list
+```
+
+This lands the plugin at **`plugins/workers/`** — the canonical, config-referenced install location —
+and registers it in `netscript.config.ts`. On disk you get a `jobs/` directory (the job-authoring
+surface), a `services/src/` API on `:8091`, and `bin/combined.ts` (the background processor
+entrypoint).
+
+{{ comp callout { type: "note", title: "Author jobs in plugins/workers/" } }}
+A scaffold may also create a slimmer top-level <code>workers/</code> directory that stages a subset of
+files for the background processor. The real, config-referenced plugin lives at
+<strong><code>plugins/workers/</code></strong> — that is what <code>netscript.config.ts</code> points
+at and where you author jobs.
+{{ /comp }}
+
+## Step 2 — Read the job-authoring API
+
+A job is a function wrapped by `defineJobHandler`, given a stable `id`, and exported as the module
+default. Inside the handler you receive a `ctx`, do the work, and return a result built with
+`createSuccessResult` or `createFailureResult`. The sample `plugins/workers/jobs/health-check.ts`
+shows the shape and the `createJobTools(ctx)` helper surface:
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "The job shape",
+    lang: "ts",
+    code: "import {\n  createSuccessResult,\n  createFailureResult,\n  defineJobHandler,\n} from '@netscript/plugin-workers-core';\nimport { createJobTools } from './job-tools.ts';\n\nconst handler = defineJobHandler(async (ctx) => {\n  const { log } = createJobTools(ctx);\n  log.info('doing work');\n\n  // ...do the work, return a result...\n  return createSuccessResult({ status: 'ok' });\n});\n\nexport default Object.assign(handler, { id: 'my-job' as const });"
+  },
+  {
+    label: "The tool surface",
+    lang: "ts",
+    code: "// createJobTools(ctx) returns three helpers:\n//\n//   log.info / log.warn / log.error  — structured logging (REAL)\n//   progress(percent, message)        — handler-side progress hook\n//   trace.addEvent / trace.withChildSpan\n//\n// `id` is attached to the handler with Object.assign so the runtime\n// registry can address the job by a stable string."
+  }
+] }) }}
+
+{{ comp callout { type: "tip", title: "How tracing actually works here (read this once)" } }}
+Two layers, and they behave differently. <strong>The framework instruments the job for you.</strong>
+When the background processor dispatches your handler it wraps the whole execution in real
+OpenTelemetry spans — dispatch, execution, duration, status — which show up in the
+<a href="http://localhost:18888">Aspire dashboard</a> automatically. What is <em>not</em> yet wired are
+the <code>createJobTools(ctx)</code> helpers you call <em>inside</em> the handler:
+<code>trace.addEvent</code>, <code>trace.withChildSpan</code>, and <code>progress(...)</code> are
+currently no-op stubs in the scaffold (tracked debt). They will not throw and your code keeps working;
+they just do not yet add custom spans. <code>log.*</code> emits real structured logs in every case. For
+custom spans today, import from <code>@netscript/telemetry</code> directly.
+{{ /comp }}
+
+## Step 3 — Author the provision-member job
+
+Add a new file in `plugins/workers/jobs/` that provisions a member into the workspace datasource from
+chapter 3. It parses its payload with Zod, writes a `Member` row, and returns a success result:
+
+```ts
+// plugins/workers/jobs/provision-member.ts
+import {
+  createFailureResult,
+  createSuccessResult,
+  defineJobHandler,
+} from '@netscript/plugin-workers-core';
+import { z } from 'zod';
+import { PrismaClient as WorkspacePrisma } from '../../../database/workspace/schema/.generated/client.server.ts';
+
+const ProvisionMemberPayloadSchema = z.object({
+  workspaceId: z.string().min(1),
+  // The auth Principal.subject from chapter 2 — the user being provisioned.
+  subject: z.string().min(1),
+  role: z.string().default('member'),
+});
+
+const workspaceDb = new WorkspacePrisma();
+
+const handler = defineJobHandler(async (ctx) => {
+  const parsed = ProvisionMemberPayloadSchema.safeParse(ctx.payload ?? {});
+  if (!parsed.success) {
+    return createFailureResult('invalid provision-member payload');
+  }
+
+  const { workspaceId, subject, role } = parsed.data;
+
+  const member = await workspaceDb.member.create({
+    data: { workspaceId, subject, role },
+  });
+
+  return createSuccessResult({ memberId: member.id, workspaceId, subject });
+});
+
+export default Object.assign(handler, { id: 'provision-member' as const });
+```
+
+This is the whole job — small on purpose. The membership write happens off the request path, so the
+caller that triggered provisioning never waits for it.
+
+{{ comp callout { type: "note", title: "Triggering a job from your own code" } }}
+This chapter triggers the job over HTTP (Step 5) so you can watch it run. From inside another NetScript
+runtime — a trigger or a scheduled job — you enqueue work with the builder's
+<code>enqueueJob(...)</code> step rather than an HTTP call; that path is covered in the
+<a href="/tutorials/ingest-webhook/">webhook tutorial</a> and the
+<a href="/capabilities/background-jobs/">background-jobs capability</a>. For this track, the HTTP
+trigger is the clearest way to prove the job ran.
+{{ /comp }}
+
+## Step 4 — Generate the runtime registry
+
+The Workers API addresses jobs by `id`, so it needs a generated registry mapping each id to its
+handler. Generate the plugin registries so `provision-member` is discoverable:
+
+```sh
+netscript generate plugins
+```
+
+This scans `plugins/workers/jobs` and writes a registry the running service loads. After this,
+`provision-member` is addressable over the API.
+
+{{ comp callout { type: "note", title: "Restart the processor if it was already running" } }}
+If <code>aspire run</code> was up before you generated the registry, restart it (or let it hot-reload)
+so the Workers API and its background processor pick up the new job.
+{{ /comp }}
+
+## Step 5 — Trigger the job
+
+With Aspire up, the Workers API is live on **`:8091`**. Confirm the service is healthy and the job is
+registered, then trigger it by its `id`. You need a real `workspaceId` — create a `Workspace` row
+first (or use one your seed created) and pass its id:
+
+```sh
+# Health, then confirm the job is registered
+curl http://localhost:8091/health
+curl http://localhost:8091/api/v1/workers/jobs   # provision-member should appear
+
+# Trigger it — the trigger enqueues an execution the background processor runs
+curl -X POST http://localhost:8091/api/v1/workers/jobs/provision-member/trigger \
+  -H 'content-type: application/json' \
+  -d '{ "payload": { "workspaceId": "ws-1", "subject": "user:alice", "role": "member" } }'
+```
+
+## Verify your progress
+
+A trigger returns quickly because the work runs in the background. Confirm it actually executed by
+reading the executions feed:
+
+```sh
+curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
+```
+
+You should see an execution record for `provision-member` with a succeeded status and a result payload
+carrying the new `memberId`. Then watch the same run in the Aspire **Traces** view at
+[http://localhost:18888](http://localhost:18888) — the framework emits the dispatch/execution span
+automatically.
+
+{{ comp.apiTable({
+  caption: "Workers API · :8091 (endpoints used here)",
+  rows: [
+    { name: "GET /health", type: "HTTP", desc: "Liveness check for the Workers API service." },
+    { name: "GET /api/v1/workers/jobs", type: "HTTP", desc: "List registered job handlers by id — provision-member appears after generate." },
+    { name: "POST /api/v1/workers/jobs/{id}/trigger", type: "HTTP", desc: "Enqueue an execution of a job by id." },
+    { name: "GET /api/v1/workers/executions?limit=10", type: "HTTP", desc: "Recent executions and their result payloads." }
+  ]
+}) }}
+
+- [ ] `netscript plugin list` shows the `workers` plugin.
+- [ ] `plugins/workers/jobs/provision-member.ts` exists and exports an `id`.
+- [ ] `GET /api/v1/workers/jobs` lists `provision-member`.
+- [ ] Triggering it returns quickly, and the executions feed shows it succeeded with a `memberId`.
+- [ ] The job-dispatch trace appears in the Aspire Traces view.
+
+{{ comp callout { type: "important", title: "If the execution never appears" } }}
+<ul>
+<li><strong>Aspire isn't running</strong> — the background processor that drains the queue is an Aspire
+resource. Start <code>aspire run</code> from <code>aspire/</code> and retry.</li>
+<li><strong>The job isn't registered</strong> — re-run <code>netscript generate plugins</code> so
+<code>provision-member</code> is in the registry, then restart Aspire.</li>
+<li><strong>Wrong id</strong> — the trigger path uses the job's <code>id</code>
+(<code>provision-member</code>), not its filename. Check <code>GET /api/v1/workers/jobs</code>.</li>
+</ul>
+{{ /comp }}
+
+## What you built
+
+A `provision-member` background job that writes a workspace membership off the request path, triggered
+over the Workers API on `:8091` and observable in the Aspire dashboard. Provisioning no longer blocks
+the caller. Next you close the loop: protect your service routes so only authenticated callers can
+reach them.
+
+{{ comp.nextPrev({ prev: { label: "3 · Workspace data", href: "/tutorials/workspace/03-workspace-data/" }, next: { label: "5 · Route authz", href: "/tutorials/workspace/05-route-authz/" } }) }}
+</content>
