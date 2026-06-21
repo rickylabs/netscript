@@ -12,23 +12,23 @@ next:
 
 # Add a plugin
 
-**Goal:** add one of NetScript's official plugins — **workers**, **sagas**,
-**triggers**, **streams**, or **auth** — to an existing workspace, register it with the
+**Goal:** add one of NetScript's official plugins â€” **workers**, **sagas**,
+**triggers**, **streams**, or **auth** â€” to an existing workspace, register it with the
 runtime, and confirm it is wired up and healthy.
 
 This is a task-oriented recipe. It assumes you already have a NetScript workspace (created
 with `netscript init`) and that the `netscript` command is on your path. Each step is a
 single command you run from your workspace root; the [Verify](#step-4--verify-the-plugin-is-registered)
 step proves the plugin landed before you write a line of application code. For the exact
-APIs each plugin exposes, follow the [reference links](#reference) at the end — this guide
+APIs each plugin exposes, follow the [reference links](#reference) at the end â€” this guide
 adds the plugin; the reference documents its surface.
 
 {{ comp callout { type: "note", title: "Plugins compose; they do not replace your service" } }}
-A plugin is an <strong>installable capability</strong> — a background-job runtime, a saga
-orchestrator, an auth service — that scaffolds its own workspace folder, registers itself in
+A plugin is an <strong>installable capability</strong> â€” a background-job runtime, a saga
+orchestrator, an auth service â€” that scaffolds its own workspace folder, registers itself in
 your runtime, and (where applicable) runs as its own Aspire service on a dedicated port. Your
 application service and your plugins run side by side. See
-<a href="/explanation/plugin-architecture/">Plugin architecture</a> for the design behind the model.
+<a href="/explanation/plugin-model/">Plugin architecture</a> for the design behind the model.
 {{ /comp }}
 
 ## Before you start
@@ -36,7 +36,7 @@ application service and your plugins run side by side. See
 You need:
 
 - **An existing NetScript workspace.** If you do not have one yet, create it first with
-  `netscript init` — walk through [Your first service](/tutorials/your-first-service/) or the
+  `netscript init` â€” walk through [Your first workspace](/tutorials/first-workspace/) or the
   [tutorials index](/tutorials/).
 - **The `netscript` command on your path.** Run `netscript --help` to confirm it resolves,
   and `netscript plugin --help` for the exact option spelling in your installed version. If
@@ -54,21 +54,21 @@ netscript plugin --help
 
 - **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
   but several plugins (workers, sagas, auth) need Postgres and Garnet to actually run. Bring
-  the local stack up first — `cd aspire && aspire run` — exactly as in
-  [Run the stack with Aspire](/how-to/run-with-aspire/). You do **not** need it up just to
+  the local stack up first â€” `cd aspire && aspire run` â€” exactly as in
+  [Run the stack with Aspire](/explanation/aspire/). You do **not** need it up just to
   scaffold and register.
 
 {{ comp callout { type: "tip", title: "Run commands from the workspace root" } }}
 Every command below runs from your workspace root. To target a different project, pass
-<code>--project-root &lt;path&gt;</code> — it defaults to the current directory. Run
+<code>--project-root &lt;path&gt;</code> â€” it defaults to the current directory. Run
 <code>netscript plugin add --help</code> for the version-accurate option list before you rely
 on any flag.
 {{ /comp }}
 
-## Step 1 — Choose the plugin kind
+## Step 1 â€” Choose the plugin kind
 
 Each official plugin has a *kind* you pass to the command and a conventional installed
-*name*. Use the conventional name unless you have a specific reason to differ — generated
+*name*. Use the conventional name unless you have a specific reason to differ â€” generated
 registries, ports, and docs all assume it.
 
 {{ comp apiTable {
@@ -78,36 +78,36 @@ registries, ports, and docs all assume it.
     ["<code>worker</code>", "<code>workers</code>", "<code>@netscript/plugin-workers</code>", "8091", "<a href=\"/reference/workers/\">workers</a>"],
     ["<code>saga</code>", "<code>sagas</code>", "<code>@netscript/plugin-sagas</code>", "8092", "<a href=\"/reference/sagas/\">sagas</a>"],
     ["<code>trigger</code>", "<code>triggers</code>", "<code>@netscript/plugin-triggers</code>", "8093", "<a href=\"/reference/triggers/\">triggers</a>"],
-    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "8094", "<a href=\"/reference/auth/\">auth</a>"],
+    ["<code>auth</code>", "<code>auth</code>", "<code>@netscript/plugin-auth</code>", "8094", "<a href=\"/reference/plugin-auth-core/\">auth</a>"],
     ["<code>stream</code>", "<code>streams</code>", "<code>@netscript/plugin-streams</code>", "4437", "<a href=\"/reference/streams/\">streams</a>"]
   ]
 } /}}
 
 Pick the kind for the capability you need:
 
-- **workers** — background job scheduling, task execution, and worker API endpoints. Fully
-  traced through Aspire (scheduler → queue → worker → subprocess). See
+- **workers** â€” background job scheduling, task execution, and worker API endpoints. Fully
+  traced through Aspire (scheduler â†’ queue â†’ worker â†’ subprocess). See
   [Background jobs](/capabilities/background-jobs/).
-- **sagas** — durable saga orchestration and long-running workflow APIs, with a selectable
+- **sagas** â€” durable saga orchestration and long-running workflow APIs, with a selectable
   durable store (`kv` or `prisma`). See [Durable sagas](/capabilities/durable-sagas/).
-- **triggers** — trigger ingress, scheduling, and file watching over raw Hono routes. See
+- **triggers** â€” trigger ingress, scheduling, and file watching over raw Hono routes. See
   [Triggers](/capabilities/triggers/).
-- **auth** — an oRPC auth service (sign-in, callback, sign-out, session, me) backed by a
+- **auth** â€” an oRPC auth service (sign-in, callback, sign-out, session, me) backed by a
   single selectable backend (kv-oauth, WorkOS, or better-auth). See
-  [Authentication](/capabilities/authentication/).
-- **streams** — durable, change-data stream producers served as their own Aspire service.
+  [Authentication](/capabilities/auth/).
+- **streams** â€” durable, change-data stream producers served as their own Aspire service.
   See [Streams](/capabilities/streams/).
 
 {{ comp callout { type: "note", title: "auth is a first-class official plugin" } }}
-Auth is now added the same way as workers, sagas, triggers, and streams — through
+Auth is now added the same way as workers, sagas, triggers, and streams â€” through
 <code>netscript plugin add auth</code>. It scaffolds a <code>plugins/auth/</code> workspace,
 registers the <code>auth-api</code> service on port <strong>8094</strong>, and contributes
 its Prisma models. The active backend is selected at runtime with
 <code>NETSCRIPT_AUTH_BACKEND</code> (default <code>kv-oauth</code>). See
-<a href="/how-to/configure-auth/">Configure authentication</a> for the backend setup.
+<a href="/how-to/add-authentication/">Configure authentication</a> for the backend setup.
 {{ /comp }}
 
-## Step 2 — Add the plugin
+## Step 2 â€” Add the plugin
 
 Run `netscript plugin add` with the kind. This scaffolds the plugin package under your
 workspace and updates your plugin registration:
@@ -138,7 +138,7 @@ netscript plugin add stream --name streams
 Run `netscript plugin add --help` for the full, version-accurate list. The common flags:
 
 {{ comp apiTable {
-  caption: "netscript plugin add — common options",
+  caption: "netscript plugin add â€” common options",
   columns: ["Option", "What it does"],
   rows: [
     ["<code>--name &lt;name&gt;</code>", "Installed plugin name. Use the conventional name above unless you have a reason to differ."],
@@ -160,7 +160,7 @@ own Prisma models (<code>auth_users</code>, <code>auth_sessions</code>,
 before the service starts.
 {{ /comp }}
 
-## Step 3 — Generate registries and wire the database
+## Step 3 â€” Generate registries and wire the database
 
 After adding plugins, regenerate the plugin registries so the runtime can discover them:
 
@@ -193,11 +193,11 @@ netscript db seed
 {{ comp callout { type: "note", title: "Aspire is step 2, the database is step 3" } }}
 <code>netscript db</code> talks to the Postgres that Aspire provisions. Always
 <code>cd aspire &amp;&amp; aspire run</code> <strong>before</strong> any <code>db</code>
-command — see <a href="/how-to/run-with-aspire/">Run the stack with Aspire</a>. Skip these
+command â€” see <a href="/explanation/aspire/">Run the stack with Aspire</a>. Skip these
 database steps only when every plugin you added is stateless.
 {{ /comp }}
 
-## Step 4 — Verify the plugin is registered
+## Step 4 â€” Verify the plugin is registered
 
 List the registered plugins to confirm your new plugin appears:
 
@@ -205,7 +205,7 @@ List the registered plugins to confirm your new plugin appears:
 netscript plugin list
 ```
 
-You should see your plugin in the inventory — for example, `workers`, `sagas`, `triggers`,
+You should see your plugin in the inventory â€” for example, `workers`, `sagas`, `triggers`,
 `auth`, and `streams` if you added all five. Then run the health check:
 
 ```bash
@@ -263,7 +263,7 @@ Run `netscript plugin --help` for the complete, version-accurate command set.
     { title: "workers", body: "Background jobs, scheduling, task execution.", href: "/reference/workers/" },
     { title: "sagas", body: "Durable saga orchestration (kv | prisma store).", href: "/reference/sagas/" },
     { title: "triggers", body: "Trigger ingress, scheduling, file watching.", href: "/reference/triggers/" },
-    { title: "auth", body: "oRPC auth service with a selectable backend.", href: "/reference/auth/" },
+    { title: "auth", body: "oRPC auth service with a selectable backend.", href: "/reference/plugin-auth-core/" },
     { title: "streams", body: "Durable change-data stream producers.", href: "/reference/streams/" },
     { title: "All packages", body: "Browse the full package and plugin index.", href: "/reference/" }
   ]
@@ -273,8 +273,8 @@ Run `netscript plugin --help` for the complete, version-accurate command set.
 
 - **Build on the plugin you just added.** Next up:
   [Add a service](/how-to/add-a-service/) to give the plugin something to call, or
-  [Configure authentication](/how-to/configure-auth/) if you added the auth plugin.
-- **Understand the model.** Read [Plugin architecture](/explanation/plugin-architecture/) for
+  [Configure authentication](/how-to/add-authentication/) if you added the auth plugin.
+- **Understand the model.** Read [Plugin architecture](/explanation/plugin-model/) for
   the design behind installable capabilities, ports, and runtime registration.
 - **Browse capabilities.** The [capabilities](/capabilities/) section maps each plugin to the
   problem it solves, with runnable examples.

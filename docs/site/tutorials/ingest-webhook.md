@@ -241,5 +241,5 @@ You have finished the tutorials ladder. From here, branch into reference-style a
   `defineWebhook` surface, the Hono route table, and the events store.
 - **Understand the model** → [The plugin model](/explanation/plugin-model/) and
   [Durable workflows](/explanation/durable-workflows/).
-- **Add a user identity layer** → the new [Authentication capability](/capabilities/authentication/)
+- **Add a user identity layer** → the new [Authentication capability](/capabilities/auth/)
   if your webhooks need to attribute inbound events to signed-in users.

@@ -1,10 +1,10 @@
 ---
 layout: layouts/base.vto
-title: NetScript — type-safe services and durable workflows in one workspace
+title: NetScript â€” type-safe services and durable workflows in one workspace
 ---
 
 {{ comp.hero({
-  tagline: "From `netscript init` to a running, type-checked, OpenTelemetry-traced backend — services, durable workflows, authentication, and a design-system UI in one workspace.",
+  tagline: "From `netscript init` to a running, type-checked, OpenTelemetry-traced backend â€” services, durable workflows, authentication, and a design-system UI in one workspace.",
   subhead: "A Deno-native backend framework where the contract is the product: type-safe services and durable workflows, observable by default, orchestrated with Aspire.",
   ctas: [
     { label: "Quickstart", href: "/quickstart/", primary: true },
@@ -13,16 +13,16 @@ title: NetScript — type-safe services and durable workflows in one workspace
   ]
 }) }}
 
-{{ comp callout { type: "note", title: "Alpha — API subject to change" } }}
-NetScript is a backend framework and workspace generator, not a hosted service — you run it on
+{{ comp callout { type: "note", title: "Alpha â€” API subject to change" } }}
+NetScript is a backend framework and workspace generator, not a hosted service â€” you run it on
 Deno and own all the generated code. We are on the path to beta, targeting late 2026, and the API
 is still moving. Some published packages (including the <code>@netscript/auth-*</code> family) are
-at <code>0.0.1-alpha.0</code>, so a few scaffolded <code>jsr:…@^1.0.0</code> specifiers are
+at <code>0.0.1-alpha.0</code>, so a few scaffolded <code>jsr:â€¦@^1.0.0</code> specifiers are
 forward-looking rather than installable today.
 {{ /comp }}
 
 {{ comp.tabbedCode({ tabs: [
-  { label: "Define a service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints —\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
+  { label: "Define a service", lang: "ts", code: "// One preset wires CORS, request logging, OpenAPI JSON, Scalar docs,\n// RPC (served at /api/rpc/*), service info, and health endpoints â€”\n// instead of ~40 lines of Hono setup.\nimport { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});\n\nawait service.stop();" },
   { label: "Install & scaffold", lang: "sh", code: "# Install the netscript command from JSR\ndeno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts\n\n# Scaffold a complete, type-checked workspace\nnetscript init my-app\n\n# Prefer to keep .NET Aspire out of the loop? Opt out:\nnetscript init my-app --no-aspire" },
   { label: "Bring it up", lang: "sh", code: "# Aspire is step 2: it brings up Postgres and Garnet first\ncd my-app/aspire && aspire run\n\n# Then, in the workspace root, initialize the database\nnetscript db init\n\n# Open the Aspire dashboard at http://localhost:18888 to see\n# every resource, service, trace, and log in one place." }
 ] }) }}
@@ -31,10 +31,10 @@ forward-looking rather than installable today.
 
 {{ comp.featureGrid({ items: [
   { title: "Contract-first, type-safe end to end", body: "oRPC contracts flow from service to client to UI with no codegen drift. The type checker is your integration test. Services are served at /api/rpc/*.", href: "/capabilities/services/" },
-  { title: "Orchestrated with Aspire", body: "We borrow .NET Aspire for multi-resource local dev, deploy, and a real dashboard — unusual in TypeScript. One workspace wires it all; opt out with --no-aspire.", href: "/explanation/aspire/" },
-  { title: "Durable workflows by design", body: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence (KV or Prisma), compensation, and supervised crash boundaries — authored in plain TypeScript builders.", href: "/capabilities/durable-sagas/" },
-  { title: "Authentication, pluggable backend", body: "An auth-api service on :8094 with five endpoints. The core defines one port; swap between kv-oauth (interactive), WorkOS, or better-auth without touching your service code.", href: "/capabilities/authentication/" },
-  { title: "Observable by default", body: "OpenTelemetry tracing and structured logs are wired into jobs, queues, RPC, schedulers, and subprocess workers from line one — not bolted on later.", href: "/explanation/observability/" },
+  { title: "Orchestrated with Aspire", body: "We borrow .NET Aspire for multi-resource local dev, deploy, and a real dashboard â€” unusual in TypeScript. One workspace wires it all; opt out with --no-aspire.", href: "/explanation/aspire/" },
+  { title: "Durable workflows by design", body: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence (KV or Prisma), compensation, and supervised crash boundaries â€” authored in plain TypeScript builders.", href: "/capabilities/durable-sagas/" },
+  { title: "Authentication, pluggable backend", body: "An auth-api service on :8094 with five endpoints. The core defines one port; swap between kv-oauth (interactive), WorkOS, or better-auth without touching your service code.", href: "/capabilities/auth/" },
+  { title: "Observable by default", body: "OpenTelemetry tracing and structured logs are wired into jobs, queues, RPC, schedulers, and subprocess workers from line one â€” not bolted on later.", href: "/explanation/observability/" },
   { title: "Composable plugins", body: "Add workers, sagas, triggers, auth, and streams in any combination. The host never changes.", href: "/capabilities/background-jobs/" }
 ] }) }}
 
@@ -42,7 +42,7 @@ forward-looking rather than installable today.
 
 {{ comp.featureGrid({ items: [
   { title: "Full-stack TypeScript engineers", body: "Stay in TypeScript from the database to the UI, with contracts that catch integration breaks before they ship." },
-  { title: "Platform engineers", body: "Standardize internal services on one coherent Deno baseline — multi-resource wiring, a real dashboard, pluggable auth, and tracing already in place." },
+  { title: "Platform engineers", body: "Standardize internal services on one coherent Deno baseline â€” multi-resource wiring, a real dashboard, pluggable auth, and tracing already in place." },
   { title: "Plugin authors", body: "Extend the framework by registering workers, sagas, triggers, auth backends, and streams. No host edits, no forks." }
 ] }) }}
 
@@ -57,7 +57,7 @@ forward-looking rather than installable today.
 ] }) }}
 
 {{ comp.featureGrid({ items: [
-  { title: "API reference", body: "Generated from source via deno doc — every package, every public symbol.", href: "/reference/" },
+  { title: "API reference", body: "Generated from source via deno doc â€” every package, every public symbol.", href: "/reference/" },
   { title: "Source on GitHub", body: "Read the framework, file issues, follow the road to beta.", href: "https://github.com/rickylabs/netscript" },
   { title: "Packages on JSR", body: "The @netscript/* family, installable with deno add.", href: "https://jsr.io/@netscript" }
 ] }) }}

@@ -223,7 +223,7 @@ builder. Each step returns the builder, so you compose only what you need before
 await app.serve({ port: 3001 });</code></pre>
 The authn/authz seam (<code>@netscript/service/auth</code>) is provider-agnostic — static-credential
 and trusted-header authenticators plus a scope authorizer ship built in. It is distinct from
-the auth <strong>plugin</strong> backends; see <a href="/capabilities/authentication/">Authentication</a>.
+the auth <strong>plugin</strong> backends; see <a href="/capabilities/auth/">Authentication</a>.
 {{ /comp }}
 
 ## Step 5 — Run and verify
