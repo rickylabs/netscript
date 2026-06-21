@@ -231,10 +231,9 @@ backend to run an interactive sign-in — the seam fails loud with a typed
 {{ comp.xref({ key: "explain:auth-model", text: "auth model" }) }} for the full port-and-adapter
 walkthrough.
 
-{{ comp callout { type: "warning", title: "Auth packages are alpha" } }}
-The auth units are published at <code>0.0.1-alpha.0</code>. Scaffold-pinned
-<code>jsr:…@^1.0.0</code> specifiers are <strong>forward-looking</strong> and not installable
-today. There is also no auth telemetry or audit surface yet — do not assume one exists.
+{{ comp callout { type: "warning", title: "Alpha specifiers are forward-looking" } }}
+Scaffold-pinned <code>jsr:…@^1.0.0</code> specifiers are <strong>forward-looking</strong> and not
+installable today. There is also no auth telemetry or audit surface yet — do not assume one exists.
 {{ /comp }}
 
 ## Why the model looks like this

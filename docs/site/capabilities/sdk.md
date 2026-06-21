@@ -187,8 +187,8 @@ island receives hydrated state and a <code>clientKey()</code> for invalidation o
 (<code>[resource, action, serializedInput]</code>); <code>clientKey(props?)</code> is the
 <strong>client</strong> TanStack key (prefix-matchable). Invalidate on the client with
 <code>clientKey()</code> / <code>toClientKeyPrefix(...)</code> — passing a server
-<code>key()</code> to <code>invalidateQueries</code> will silently match nothing. The package
-version is <code>0.0.1-alpha.0</code>; subpath barrels are stable but signatures may still move.
+<code>key()</code> to <code>invalidateQueries</code> will silently match nothing. NetScript is in
+alpha; subpath barrels are stable but signatures may still move.
 {{ /comp }}
 
 ## Reference →

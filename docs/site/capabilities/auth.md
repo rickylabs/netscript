@@ -102,11 +102,11 @@ fourteen built-in presets.
 ] }) }}
 
 {{ comp callout { type: "warning", title: "Alpha specifiers are forward-looking" } }}
-The auth packages are published at <code>0.0.1-alpha.0</code>. The scaffold pins
-<code>jsr:@netscript/plugin-auth-core@^1.0.0</code> (and siblings) as a <strong>forward-looking</strong>
-specifier — those <code>^1.0.0</code> ranges are <strong>not installable today</strong>. Add auth
-through <code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace correctly for the alpha,
-rather than hand-adding a <code>^1.0.0</code> import.
+The scaffold pins <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> (and siblings) as
+<strong>forward-looking</strong> specifiers — those <code>^1.0.0</code> ranges are
+<strong>not installable today</strong>. Add auth through
+<code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace correctly for
+the alpha, rather than hand-adding a <code>^1.0.0</code> import.
 {{ /comp }}
 
 ## Sign in, resolve the session, sign out

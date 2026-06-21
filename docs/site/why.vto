@@ -102,8 +102,8 @@ Authentication is a plugin like any other, and its defining opinion is that the 
   { label: "Pick a backend", lang: "ts", code: "// The interactive backend: a full OAuth/OIDC redirect flow with KV sessions.\nimport { createKvOAuthBackend, providers } from '@netscript/auth-kv-oauth';\n\nconst backend = await createKvOAuthBackend({\n  provider: providers.google({ clientId, clientSecret, redirectUri }),\n});\n\n// One active backend at a time; selected by NETSCRIPT_AUTH_BACKEND.\n// Swap to 'workos' or 'better-auth' without touching your service." }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Auth is alpha" } }}
-The auth packages are <code>0.0.1-alpha.0</code>: the <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> specifier the scaffold writes is forward-looking, not installable today. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
+{{ comp callout { type: "note", title: "Framework alpha" } }}
+NetScript packages share the aligned <code>0.0.1-alpha.0</code> version, and the <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> specifier the scaffold writes is forward-looking, not installable today. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
 {{ /comp }}
 
 ## Compared to assembling it yourself

@@ -83,6 +83,6 @@ from the package's public surface with `deno doc`.
 | `@netscript/plugin-auth-core/streams` | Auth stream schema and event types. |
 | `@netscript/plugin-auth-core/config` | Runtime config schemas and backend resolution helpers. |
 | `@netscript/plugin-auth-core/presets` | Backend preset registry helpers. |
-| `@netscript/plugin-auth-core/testing` | Testing primitives for auth packages. |
+| `@netscript/plugin-auth-core/testing` | Testing primitives for auth adapters and plugins. |
 
 Back to the [auth reference hub](/reference/auth/).

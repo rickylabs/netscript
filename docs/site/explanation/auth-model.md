@@ -15,11 +15,10 @@ understanding-oriented — read it to build the mental model before you wire aut
 project. When you want the headline API and endpoints, see the
 [auth capability](/capabilities/auth/); when you want to do the task, follow
 [Add authentication](/how-to/add-authentication/); when you want exact exported symbols, follow
-[`reference/service/`](/reference/service/) and the auth packages it references.
+[`reference/service/`](/reference/service/) and the auth adapter references it links to.
 
 {{ comp callout { type: "important", title: "Alpha status" } }}
-The auth layer is a <strong>net-new, flagship</strong> capability and the packages are published at
-<code>0.0.1-alpha.0</code>. The CLI scaffold pins forward-looking specifiers like
+The CLI scaffold pins forward-looking specifiers like
 <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those <strong>do not install at 1.0
 today</strong> — they describe the intended stable surface. There is also <strong>no auth
 telemetry or audit surface yet</strong>: the model below is the authentication seam only, not an

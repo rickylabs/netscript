@@ -301,10 +301,9 @@ manifest small. Build the full thing in [Add authentication](/how-to/add-authent
 is the concrete walkthrough for the auth plugin specifically.
 
 {{ comp callout { type: "note", title: "Alpha specifiers are forward-looking" } }}
-The auth packages are published at <code>0.0.1-alpha.0</code>. CLI scaffolds may pin
-<code>jsr:@netscript/plugin-auth-core@^1.0.0</code> and siblings — those specifiers are
-forward-looking and are <strong>not installable at <code>1.0</code> today</strong>. Treat them as a
-target, not a current release.
+CLI scaffolds may pin <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> and siblings — those
+specifiers are forward-looking and are <strong>not installable at <code>1.0</code> today</strong>.
+Treat them as a target, not a current release.
 {{ /comp }}
 
 ## Production pitfalls

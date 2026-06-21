@@ -75,11 +75,11 @@ cross-backend account linking in v1. You pick the backend in Step 2.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Alpha specifiers are forward-looking" } }}
-The auth packages are published at <code>0.0.1-alpha.0</code> today. The scaffold emits forward-looking
-specifiers such as <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those <code>^1.0.0</code>
-versions are <strong>not published yet</strong> — do not expect them to install from the public
-registry. Add auth through <code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace correctly
-for the alpha, rather than hand-adding a <code>^1.0.0</code> import.
+The scaffold emits forward-looking specifiers such as
+<code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those <code>^1.0.0</code> versions are
+<strong>not published yet</strong> — do not expect them to install from the public registry. Add
+auth through <code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace
+correctly for the alpha, rather than hand-adding a <code>^1.0.0</code> import.
 {{ /comp }}
 
 ## Step 2 — Choose a backend with `NETSCRIPT_AUTH_BACKEND`

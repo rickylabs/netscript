@@ -22,7 +22,7 @@ hub — read that first for the WHY (what a task is, how the subprocess seam wor
 {{ comp.apiTable({
   caption: "What you need before defining a task",
   rows: [
-    { name: "@netscript/plugin-workers-core", type: "package (alpha)", desc: "Provides defineTask (./builders) and createDefaultTaskExecutor (./executor). Version 0.0.1-alpha.x." },
+    { name: "@netscript/plugin-workers-core", type: "package (alpha)", desc: "Provides defineTask (./builders) and createDefaultTaskExecutor (./executor)." },
     { name: "The target toolchain", type: "host binary", desc: "The interpreter the task spawns must exist on the worker HOST: python3 (or a venv / py on Windows), bash, pwsh/powershell, the .NET SDK, or your prebuilt binary." },
     { name: "An entrypoint script", type: "file path", desc: "The script or executable to run, e.g. ./scripts/score.py. The task passes it input as argv + env, never stdin." },
     { name: "(deno tasks only) a permission set", type: "BuilderPermissions", desc: "net/read/write/env/run/ffi/import. Enforced ONLY for the deno runtime — see the sandbox note below." }
@@ -171,8 +171,7 @@ into the subprocess environment so cross-runtime spans stitch together; env prec
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "Alpha surface" } }}
-<code>@netscript/plugin-workers-core</code> is published at <code>0.0.1-alpha.x</code>; the
-polyglot task API can still shift. Treat the import subpaths
+NetScript is in alpha; the polyglot task API can still shift. Treat the import subpaths
 (<code>/builders</code>, <code>/executor</code>) and the runtime-specific
 <code>metadata</code> configs as the current shape, and pin the version you build against.
 {{ /comp }}

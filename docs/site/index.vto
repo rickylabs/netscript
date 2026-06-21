@@ -16,9 +16,9 @@ title: NetScript — type-safe services and durable workflows in one workspace
 {{ comp callout { type: "note", title: "Alpha — API subject to change" } }}
 NetScript is a backend framework and workspace generator, not a hosted service — you run it on
 Deno and own all the generated code. We are on the path to beta, targeting late 2026, and the API
-is still moving. Some published packages (including the <code>@netscript/auth-*</code> family) are
-at <code>0.0.1-alpha.0</code>, so a few scaffolded <code>jsr:…@^1.0.0</code> specifiers are
-forward-looking rather than installable today.
+is still moving. Every <code>@netscript/*</code> package shares one aligned version
+(<code>0.0.1-alpha.0</code>) and releases move in lockstep, so pin your versions. A few scaffolded
+<code>jsr:…@^1.0.0</code> specifiers are forward-looking rather than installable today.
 {{ /comp }}
 
 {{ comp.tabbedCode({ tabs: [

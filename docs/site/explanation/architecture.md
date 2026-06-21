@@ -346,10 +346,8 @@ them is broken by definition, which is precisely why the published surface can b
 trusted as the product.
 
 {{ comp callout { type: "note", title: "Alpha specifiers" } }}
-The auth packages are published at <code>0.0.1-alpha.0</code> today. Scaffold
-output pins forward-looking <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>
-specifiers, but those are not installable at <code>1.0</code> yet — treat the
-auth zone as the framework's newest surface.
+Scaffold output pins forward-looking <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>
+specifiers, but those are not installable at <code>1.0</code> yet.
 {{ /comp }}
 
 ## Where to go next
