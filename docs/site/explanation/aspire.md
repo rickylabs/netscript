@@ -283,7 +283,7 @@ stitch telemetry into that topology for free. Concretely, each resource is start
 subprocess task continuation all emit real OpenTelemetry spans that surface here with **no extra
 wiring** — the trace context propagates into worker subprocesses over W3C `traceparent`.
 
-{{ comp callout { type: "note", title: "The one honest gap" } }}
+{{ comp callout { type: "note", title: "Known gap" } }}
 The scaffold <code>createJobTools(ctx)</code> helpers you call <em>inside</em> a handler —
 <code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code> — are still no-op
 stubs. For custom <em>handler-level</em> spans, call <code>@netscript/telemetry</code> helpers
@@ -338,7 +338,7 @@ would be hand-rebuilding exactly the wiring the contributions generate for free.
 
 ## What Aspire does and does not cover for production
 
-Choosing Aspire as the default is an opinion, and an honest essay owns its boundaries.
+Choosing Aspire as the default is an opinion, and this essay states its boundaries.
 
 **Aspire is the local-development orchestration story.** Its job is to make `git clone` →
 `aspire run` produce a complete, observable, correctly-wired stack on one machine. It excels at
@@ -352,7 +352,7 @@ that. What it deliberately does **not** try to be:
   laptop is redundant under Kubernetes or a PaaS that already does discovery, health, and restarts.
   That is precisely why `--no-aspire` is a first-class exit, not an afterthought.
 
-The remaining honest trade-offs of the default path:
+The remaining trade-offs of the default path:
 
 - **A second runtime in the tree.** The AppHost is Node/TypeScript while your app is Deno — a
   deliberate isolation so the two dependency graphs never contaminate each other, at the cost of

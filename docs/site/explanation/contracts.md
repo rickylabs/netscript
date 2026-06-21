@@ -197,7 +197,7 @@ of step.
 
 ## Why this design, and what it costs
 
-The honest trade-offs, because contracts-first is an opinion, not a free lunch:
+The trade-offs, because contracts-first is an opinion, not a free lunch:
 
 - **You write the schema first.** For a trivial one-off endpoint, declaring a zod schema before
   writing the handler feels like ceremony. The payoff arrives the moment a *second* consumer exists
@@ -234,7 +234,7 @@ service's RPC channel also types the plugin boundaries you compose into a NetScr
   boundary someone else owns. See [the plugin model](/explanation/plugin-system/).
 
 Holding those together: the contract is how NetScript makes the *internal* surfaces of a system
-type-safe end to end, and the framework is honest about where that model stops.
+type-safe end to end, and the framework is explicit about where that model stops.
 
 ## Glossary
 

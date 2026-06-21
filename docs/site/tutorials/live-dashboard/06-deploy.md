@@ -11,7 +11,7 @@ next: { label: "How-to guides", href: "/how-to/" }
 You have built the full spine — contract, service, query layer, page, and live stream. This final
 chapter steps back and runs the entire graph as one system: the `orders` service, the Fresh
 dashboard, the durable-streams runtime, Postgres, and Garnet, all under a single `aspire run`. We
-will be honest about what local Aspire is — a development orchestrator — and what it is not.
+is precise about what local Aspire is — a development orchestrator — and what it is not.
 
 {{ comp.learningPath({ steps: [
   { label: "1 · Scaffold", href: "/tutorials/live-dashboard/01-scaffold/" },

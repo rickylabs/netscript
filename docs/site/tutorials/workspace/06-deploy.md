@@ -12,7 +12,7 @@ You have built every layer: scaffold, auth, workspace data, a provisioning job, 
 final chapter runs the whole thing as one coherent system. A single `aspire run` stands up Postgres,
 the Garnet cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers API on
 `:8091`, and every background processor — all wired together and visible in one dashboard. It is the
-**local** story, and this chapter is honest about exactly that: a complete observable stack on one
+**local** story, and this chapter is precise about exactly that: a complete observable stack on one
 machine, not a production deployer.
 
 {{ comp.learningPath({ steps: [

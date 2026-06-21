@@ -11,7 +11,7 @@ next: { label: "5 · Live stream", href: "/tutorials/live-dashboard/05-live-stre
 This is the heaviest chapter in the track, and the most rewarding. You will render the orders table
 with NetScript's `definePage` builder — its **layer / partial / island** triad — and hydrate a
 TanStack Query island so the table reads and mutates on the client. By the end the dashboard renders
-instantly from cache and refetches in the background. We will be honest where the surface is
+instantly from cache and refetches in the background. We flag where the surface is
 conceptually dense.
 
 {{ comp.learningPath({ steps: [

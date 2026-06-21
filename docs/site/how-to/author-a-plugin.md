@@ -197,7 +197,7 @@ API the official workers plugin uses — drop the file in `plugins/notifier/jobs
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Honest edges: triggers are Hono, stream helpers fail loud" } }}
+{{ comp callout { type: "warning", title: "Edges: triggers are Hono, stream helpers fail loud" } }}
 Two reality checks the official plugins make explicit. <strong>Triggers</strong> expose
 <strong>raw Hono routes</strong>, not oRPC — the triggers service mounts
 <code>app.route('/api/v1/webhooks', …)</code> and dispatches by trigger id; the supported action is

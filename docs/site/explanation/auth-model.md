@@ -17,7 +17,7 @@ project. When you want the headline API and endpoints, see the
 [Add authentication](/how-to/add-authentication/); when you want exact exported symbols, follow
 [`reference/service/`](/reference/service/) and the auth packages it references.
 
-{{ comp callout { type: "important", title: "Alpha honesty up front" } }}
+{{ comp callout { type: "important", title: "Alpha status" } }}
 The auth layer is a <strong>net-new, flagship</strong> capability and the packages are published at
 <code>0.0.1-alpha.0</code>. The CLI scaffold pins forward-looking specifiers like
 <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those <strong>do not install at 1.0
@@ -107,7 +107,7 @@ service handlers, your contract middleware, your authorization checks — sees a
 ## Three backends, three different capability matrices
 
 The framework ships three pure backends. They satisfy the **same** `AuthBackendPort`, but they fill
-the **optional** `interactive` slot differently — and that single difference produces three honestly
+the **optional** `interactive` slot differently — and that single difference produces three genuinely
 different capability profiles. Only **kv-oauth** is a full interactive backend; WorkOS and
 better-auth are **non-interactive by design**.
 
@@ -202,7 +202,7 @@ v1 — do not design against them yet:
   ]
 }) }}
 
-Choosing one active backend keeps the model honest: a single `Principal` source, a single session
+Choosing one active backend keeps the model coherent: a single `Principal` source, a single session
 authority, and a single place to reason about who is signed in. Multi-backend identity is a hard
 problem (consistent logout, link reconciliation, conflicting session lifetimes); v1 declines it on
 purpose rather than ship a half-correct version.

@@ -325,7 +325,7 @@ dispatch, execution, scheduler, and subprocess continuation — emits **real
 OpenTelemetry spans automatically**, so job traces appear in the Aspire dashboard
 without any handler code.
 
-{{ comp callout { type: "warning", title: "Honest limitation" } }}
+{{ comp callout { type: "warning", title: "Limitation" } }}
 The scaffold <code>createJobTools(ctx)</code> helpers handed to your job handler
 (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>)
 are currently no-op stubs — a tracked limitation with a fix planned. For custom

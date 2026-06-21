@@ -79,7 +79,7 @@ this zone read as one coherent argument rather than seven separate articles.
 - **Plugins extend without redefining.** First-party plugins under `plugins/*` re-export
   their core package's contract and contribute service entrypoints, runtime declarations,
   and schema fragments — covered in the [plugin model](/explanation/plugin-system/).
-- **Honesty about alpha reality.** Where the scaffold ships a stub — the worker handler
+- **Alpha reality stated plainly.** Where the scaffold ships a stub — the worker handler
   trace helpers, the streams *manifest* helpers, the absent auth audit surface — these
   pages say so plainly. The [observability](/explanation/observability/) page draws the
   exact line between real automatic traces and the no-op handler stubs.

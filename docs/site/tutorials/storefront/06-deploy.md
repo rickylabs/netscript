@@ -32,7 +32,7 @@ infrastructure, services, plugin APIs, and background processors — then gives 
 whole thing. You will read the live port map from the dashboard and confirm every resource is healthy.
 
 {{ comp callout { type: "warning", title: "This is the LOCAL story — not a production deployer" } }}
-<code>aspire run</code> exists to make one command produce a complete, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. NetScript does not ship a cloud deployer for your app; for a remote target you point processes at managed infrastructure yourself. This chapter teaches the honest local topology. See the <a href="/how-to/deploy/">Deploy</a> and <a href="/how-to/deploy-local-aspire/">Deploy locally with Aspire</a> how-to guides for the production-vs-local split.
+<code>aspire run</code> exists to make one command produce a complete, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. NetScript does not ship a cloud deployer for your app; for a remote target you point processes at managed infrastructure yourself. This chapter teaches the local topology. See the <a href="/how-to/deploy/">Deploy</a> and <a href="/how-to/deploy-local-aspire/">Deploy locally with Aspire</a> how-to guides for the production-vs-local split.
 {{ /comp }}
 
 ## Before you begin
@@ -169,7 +169,7 @@ curl http://localhost:8093/health
   sagas, and triggers plugin APIs plus their background processors.
 - A dashboard at `https://localhost:18888` giving you the live port map, per-resource console logs,
   and correlated traces across the whole app.
-- An honest mental model: this is the **local** topology Aspire stands up for development, not a
+- A precise mental model: this is the **local** topology Aspire stands up for development, not a
   production deployer for your app.
 
 You have built and run a complete NetScript storefront backend — contract-first throughout, durable

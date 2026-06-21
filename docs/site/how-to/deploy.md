@@ -9,11 +9,11 @@ next: { label: "Author a plugin", href: "/how-to/author-a-plugin/" }
 # Deploy a NetScript workspace
 
 **Goal:** take the workspace you scaffolded with `netscript init` and run it somewhere
-other than your laptop — a container host, a VM, or a managed platform — with honest
+other than your laptop — a container host, a VM, or a managed platform — with clear
 expectations about what the scaffold wires for you and what you still own.
 
 This is a task recipe, not a one-click button. NetScript is in alpha, and the scaffold is
-deliberately honest about deployment: it gives you a single declarative description of every
+deliberately minimal about deployment: it gives you a single declarative description of every
 process (`appsettings.json`), runnable Deno entrypoints with explicit permissions, and the
 Aspire AppHost that orchestrates them locally. It does **not** generate a `Dockerfile`, a
 `docker-compose.yml`, or a cloud target for you. Those are yours to add, and this page shows
@@ -246,7 +246,7 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 `deno run` line; orchestrate them with compose or your platform of choice, honoring the
 `PluginReferences` start order (streams → workers → sagas/triggers, plus auth-api when present).
 
-{{ comp callout { type: "warning", title: "Honest limits of the alpha scaffold" } }}
+{{ comp callout { type: "warning", title: "Limits of the alpha scaffold" } }}
 <ul>
 <li>No <code>Dockerfile</code>, <code>docker-compose.yml</code>, or Kubernetes manifest is generated. You write these from the <code>appsettings.json</code> facts above.</li>
 <li><code>netscript.config.ts</code> ships an empty <code>deploy: {}</code> block — there is no first-class deploy command yet.</li>

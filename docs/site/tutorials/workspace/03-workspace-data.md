@@ -222,7 +222,7 @@ exist.
 
 Your workspace now owns its data: a second, isolated Postgres datasource with `Workspace` and `Member`
 models, its own migration history, and its own typed client — cleanly separate from auth and the
-primary database. You also saw the honest boundary: org scoping is app-level, not a framework
+primary database. You also saw the boundary: org scoping is app-level, not a framework
 primitive. Next you provision new members off the request path with a background job.
 
 {{ comp.nextPrev({ prev: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" }, next: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" } }) }}

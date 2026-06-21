@@ -165,7 +165,7 @@ The seam produces three distinct responses, each a real assertion in the framewo
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Honest scope: this is route-level authz, not org/role RBAC" } }}
+{{ comp callout { type: "warning", title: "Scope: route-level authz, not org/role RBAC" } }}
 <code>.withAuthz()</code> decides from a <code>Principal</code>'s <strong>scopes</strong> on a matched
 route. It is <strong>not</strong> organization-aware or role-hierarchy-aware: there is no
 framework-managed notion of "this user belongs to that org" or "admins inherit member permissions."
@@ -191,7 +191,7 @@ scoped call must succeed:
 
 A guarded `workspace` service that resolves a `Principal` with `.withAuthn()` and authorizes by scope
 with `.withAuthz()` — proven by a `401` for an anonymous request, a `403` for the wrong scope, and a
-`200` for a correctly-scoped one. You also saw the honest boundary: this is route-level scope authz,
+`200` for a correctly-scoped one. You also saw the boundary: this is route-level scope authz,
 not org/role RBAC. The last chapter runs the whole authenticated workspace locally under Aspire.
 
 {{ comp.nextPrev({ prev: { label: "4 · Provision job", href: "/tutorials/workspace/04-provision-job/" }, next: { label: "6 · Deploy", href: "/tutorials/workspace/06-deploy/" } }) }}

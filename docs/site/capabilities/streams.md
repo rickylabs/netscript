@@ -25,7 +25,7 @@ typed stream schema with [`defineStreamSchema`](/reference/streams/), open a
 producer with `createDurableStream`, and `upsert`/`delete`/`flush` entity state
 over a durable-stream server that runs as an Aspire resource on port **:4437**.
 
-The honest line on this page is narrower than it used to be. The producer
+The scope on this page is narrower than it used to be. The producer
 runtime in `@netscript/plugin-streams-core` is genuine — it writes through
 `@durable-streams/client` with idempotent delivery. What is *not* live is the
 topic-centric **manifest sugar** in `@netscript/plugin-streams`

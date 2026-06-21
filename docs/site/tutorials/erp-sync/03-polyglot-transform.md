@@ -28,7 +28,7 @@ is real — the <code>defineTask</code> builder, the seven runtime types, and th
 adapters all ship today — and every shape below is grounded in that real surface. But running a
 <code>python</code> or <code>shell</code> task to completion depends on the target interpreter being
 installed and on your host OS, which is environment-specific. So this chapter teaches the
-<strong>shape, the permission model, and the runtime matrix</strong> honestly, and points you at the
+<strong>shape, the permission model, and the runtime matrix</strong> precisely, and points you at the
 hands-on <a href="/how-to/run-a-polyglot-task/">Run a polyglot task</a> recipe to wire one up on
 your own machine. The ERP sync's hands-on spine stays TypeScript jobs, queue, and cron.
 {{ /comp }}

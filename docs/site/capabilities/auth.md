@@ -261,7 +261,7 @@ the `AUTH_STREAM_EVENT_TYPES`: `auth.signin.started`, `auth.signin.failed`,
 is described by the `authStreamSchema` entity stream. For the streams runtime itself see
 {{ comp.xref({ key: "cap:streams", text: "Durable streams" }) }}.
 
-{{ comp callout { type: "warning", title: "Honest scope: events are best-effort, no audit surface" } }}
+{{ comp callout { type: "warning", title: "Scope: events are best-effort, no audit surface" } }}
 The <code>auth.*</code> events are <strong>best-effort</strong>: they are no-ops unless the
 durable-streams service is wired (<code>DURABLE_STREAMS_URL</code> /
 <code>services__streams__http__0</code> set), so they are <strong>not</strong> a guaranteed audit

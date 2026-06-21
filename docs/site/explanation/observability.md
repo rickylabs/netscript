@@ -109,7 +109,7 @@ is the whole point: in the dashboard you select a slow trace, and the log lines 
 spans are right there beside it, not in a separate searchable haystack you cross-reference by
 timestamp.
 
-This is also why the scaffold's `progress(...)` helper is honest but limited: it logs via the worker
+This is also why the scaffold's `progress(...)` helper is limited: it logs via the worker
 pool and delegates to `ctx.reportProgress`, but it does *not* by itself emit a `job.progress`
 OpenTelemetry span event. For an OTel-visible progress event, call `recordJobProgress` from
 `@netscript/telemetry/instrumentation` directly. The exact logging surface lives in
@@ -138,7 +138,7 @@ somewhere to land. Without it, handlers still execute; they simply export into t
   ]
 }) }}
 
-## The honest gap: scaffold job-tools helpers
+## Known gap: scaffold job-tools helpers
 
 Two layers, stated precisely so you never over- or under-claim.
 
@@ -151,7 +151,7 @@ live. A user gets job traces in Aspire <em>automatically</em>, with zero handler
 <code>trace.addEvent</code> and <code>trace.withChildSpan</code> helpers the generated sample hands
 <em>into your handler</em> are placeholders — your callback runs and returns normally, but no extra
 span is exported. This is a <strong>known, tracked limitation with a fix planned</strong> (debt
-<code>workers-scaffold-job-tools-noop</code>), not a permanent design choice. The honest workaround
+<code>workers-scaffold-job-tools-noop</code>), not a permanent design choice. The workaround
 today: call <code>@netscript/telemetry/instrumentation</code> helpers directly from your handler for
 custom spans — because the dispatcher already opened the parent job span, your child span nests
 under it automatically.
@@ -231,7 +231,7 @@ shaped, see {{ comp.xref({ key: "explain:auth-model" }) }} and the
 
 ## Why this design, and what it costs
 
-The honest trade-offs, because instrumentation-at-the-boundary is an opinion.
+The trade-offs, because instrumentation-at-the-boundary is an opinion.
 
 - **Telemetry follows the framework, not a side library.** Because the trace context rides the
   service boundary and the dispatcher opens the job span, you cannot accidentally instrument half

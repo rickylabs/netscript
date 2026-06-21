@@ -97,7 +97,7 @@ can check.
   },
   {
     title: "6 · Deploy",
-    body: "Run the whole storefront locally under one <code>aspire run</code> — every service, plugin API, and background processor in one resource graph, observable from the dashboard. The honest local topology, not a cloud deployer.",
+    body: "Run the whole storefront locally under one <code>aspire run</code> — every service, plugin API, and background processor in one resource graph, observable from the dashboard. The local topology, not a cloud deployer.",
     href: "/tutorials/storefront/06-deploy/"
   }
 ] }) }}

@@ -44,7 +44,7 @@ so the plugin services and their dependencies exist when you reach for them.
   { title: "Authentication", icon: "🔐", body: "auth-api oRPC service on :8094 with five endpoints. A pure-backend seam composing one active backend — kv-oauth (interactive), WorkOS, or better-auth.", href: "/capabilities/auth/" }
 ] }) }}
 
-{{ comp callout { type: "important", title: "Honest about the alpha runtime" } }}
+{{ comp callout { type: "important", title: "Alpha status" } }}
 A few seams are intentionally not-yet-live and the hubs say so plainly. The streams <strong>producer runtime is real</strong> via <code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>) — only the <code>@netscript/plugin-streams</code> manifest helpers (<code>defineStreamProducer</code>/<code>defineStreamConsumer</code>) fail loud but differently: <code>defineStreamConsumer.subscribe()</code> synchronously <strong>throws</strong> <code>StreamUnsupportedOperationError</code>; <code>defineStreamProducer.publish()</code> returns a <strong>rejected</strong> <code>Promise</code> with <code>StreamUnsupportedOperationError</code>. Worker <strong>job</strong> tracing is real — only the scaffold <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) remain no-op stubs (a tracked limitation with a fix planned). Trigger <code>enqueueJob</code> is live; <code>defer</code> is defined-but-unsupported (throws and routes to the DLQ). The auth packages are <code>0.0.1-alpha.0</code>; the scaffold's <code>jsr:...@^1.0.0</code> specifiers are forward-looking, not installable today.
 {{ /comp }}
 

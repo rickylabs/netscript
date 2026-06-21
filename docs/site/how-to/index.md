@@ -72,7 +72,7 @@ Every how-to page follows the same contract so you always know where to look:
 - **Steps** — added-lines code blocks, annotated with the file path they belong
   in, using the public `netscript <cmd>` command form throughout.
 - **Production pitfalls** — the caveats that bite in real deployments, stated
-  honestly rather than glossed over.
+  plainly rather than glossed over.
 - **See also** — the capability hub, reference page, and related recipes that
   take the topic further.
 

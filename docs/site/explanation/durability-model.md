@@ -205,7 +205,7 @@ the listing API. The `saga_runtime_*` tables are the **durability mechanism**; `
 projection used to *display* instances. Choosing the `prisma` backend opts the durable write path
 into Postgres; the `kv` backend keeps the same logical structure in Deno KV instead.
 
-## Compensation: two honest shapes
+## Compensation: two shapes
 
 If you have used other orchestration frameworks, you may expect a saga to be a list of forward steps
 each paired with a rollback. NetScript supports compensation in **two** shapes, and it is worth
@@ -341,7 +341,7 @@ Concretely, when the process dies mid-workflow:
   redelivered message does not double-apply a transition — important because at-least-once delivery
   means the same message can arrive twice across a restart.
 
-## Honest limitations (alpha)
+## Limitations (alpha)
 
 The durability story is real but young, and a few edges are worth naming so you do not over-trust it:
 
@@ -385,7 +385,7 @@ will meet:
   contribution/registry mechanism.
 - Its messages and effects are **observable**: job dispatch and execution emit real OpenTelemetry
   spans that show up in Aspire automatically. See [observability](/explanation/observability/) for
-  the full picture — including the one honest gap (the scaffold `createJobTools(ctx)` handler helpers
+  the full picture — including the one known gap (the scaffold `createJobTools(ctx)` handler helpers
   are no-op stubs, a tracked limitation; call `@netscript/telemetry` helpers directly for custom
   spans).
 - Its API surfaces (`:8091`, `:8092`, `:8093`) and the Postgres/Garnet backing store — including the

@@ -11,7 +11,7 @@ next: { label: "How-to guides", href: "/how-to/" }
 You have built the whole ERP sync: a file-watch import job, a queue, and a cron schedule, plus an
 understanding of polyglot transform tasks. This final chapter runs all of it together — workers,
 triggers, queue, and cron processors — on one machine under `aspire run`, and shows you how to read
-the running system from the dashboard. It is the honest **local** orchestration story: one command,
+the running system from the dashboard. It is the **local** orchestration story: one command,
 one observable stack, throwaway infrastructure.
 
 {{ comp.learningPath({ steps: [

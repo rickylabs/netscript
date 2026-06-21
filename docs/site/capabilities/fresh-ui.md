@@ -194,7 +194,7 @@ heavy customization in your own components. Full options live behind
 <a href="/reference/fresh-ui/">@netscript/fresh-ui reference</a>.
 {{ /comp }}
 
-## Honest scope
+## Scope
 
 The scaffolded dashboard is a working, contract-wired **showcase** — not a finished product UI. It
 ships the `users` example (server-prefetched list + optimistic status mutation), a telemetry

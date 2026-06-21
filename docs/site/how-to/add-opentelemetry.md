@@ -23,7 +23,7 @@ For the generated API surface, follow the [`telemetry`](/reference/telemetry/) a
 [`logger`](/reference/logger/) reference pages, and the
 [Telemetry capability](/capabilities/telemetry/) hub for the Learn / Do / Reference triplet.
 
-{{ comp callout { type: "important", title: "What is real today, and the one honest gap" } }}
+{{ comp callout { type: "important", title: "What works today, and the one gap" } }}
 <strong>Worker tracing is built in and real.</strong> Job dispatch, job execution, the
 scheduler, and the task subprocess all emit real OpenTelemetry spans automatically — they
 appear in the Aspire dashboard with no code from you. <code>task.execute</code> spans are

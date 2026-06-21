@@ -54,7 +54,7 @@ Three ideas carry the whole track, and each chapter adds exactly one:
 - **Session** — a successful sign-in mints a normalized `AuthSession` and sets a session cookie. Every
   later request resolves the current session from that cookie.
 - **Authz** — a service gates its own routes with `.withAuthn()` (resolve a `Principal`) and
-  `.withAuthz()` (decide from it). This is route-level authorization, honestly scoped — not org/role
+  `.withAuthz()` (decide from it). This is route-level authorization, scoped to route-level — not org/role
   RBAC.
 
 ## Who this is for
@@ -94,7 +94,7 @@ it assumes you can scaffold and boot, then layers authentication on top. If `net
   },
   {
     title: "6 · Deploy",
-    body: "Run the whole workspace locally under Aspire — including the :8094 auth service — and read it from one dashboard. Honest about local-vs-production topology.",
+    body: "Run the whole workspace locally under Aspire — including the :8094 auth service — and read it from one dashboard. Shows the local-vs-production topology clearly.",
     href: "/tutorials/workspace/06-deploy/"
   }
 ] }) }}

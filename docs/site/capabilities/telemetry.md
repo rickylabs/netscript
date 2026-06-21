@@ -25,7 +25,7 @@ AppHost provisions the OTLP collector and the dashboard for you.
 }) }}
 
 This page is the capability hub: what telemetry exists, how to emit it, where to view it,
-and — honestly — the one place that is still a scaffold stub. For the full generated API of
+and the one place that is still a scaffold stub. For the full generated API of
 each unit, follow the reference links: the telemetry primitives live at
 [`/reference/telemetry/`](/reference/telemetry/) and the structured logger at
 [`/reference/logger/`](/reference/logger/).
@@ -266,7 +266,7 @@ durations, status, and lifecycle events — no scaffold changes required.
 The two tabs below show the two emission paths a developer touches: structured logging
 through the framework logger, and **custom** spans inside a job handler. For custom spans,
 call the `@netscript/telemetry` helpers (`traceJobExecution`, `withChildSpan`,
-`recordJobProgress`) directly — they are the real, supported surface. Read the honesty
+`recordJobProgress`) directly — they are the real, supported surface. Read the
 callout under the tabs to understand why you reach for the telemetry package rather than the
 scaffold's `createJobTools(ctx)` trace helpers.
 
@@ -283,7 +283,7 @@ scaffold's `createJobTools(ctx)` trace helpers.
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Honest alpha reality: the scaffold createJobTools(ctx) trace/progress helpers are no-op stubs" } }}
+{{ comp callout { type: "warning", title: "Known gap: the scaffold createJobTools(ctx) trace/progress helpers are no-op stubs" } }}
 Job dispatch and execution are instrumented with <strong>real OTel spans</strong> — traces
 show up in Aspire automatically (<code>traceJobExecution</code>, <code>recordJobProgress</code>,
 scheduler spans, and subprocess traceparent propagation are all live in the runtime). The one

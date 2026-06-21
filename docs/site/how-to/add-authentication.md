@@ -92,7 +92,7 @@ The active backend is selected by the `NETSCRIPT_AUTH_BACKEND` environment varia
   ]
 }) }}
 
-{{ comp callout { type: "warning", title: "Only kv-oauth is interactive — be honest about what you ship" } }}
+{{ comp callout { type: "warning", title: "Only kv-oauth is interactive — choose accordingly" } }}
 The <code>signin</code> and <code>callback</code> endpoints require a backend that implements the
 optional <code>InteractiveFlowPort</code>. <strong>Only <code>kv-oauth</code> does.</strong> On
 <code>workos</code> and <code>better-auth</code>, calling <code>POST /api/v1/auth/signin</code> or
