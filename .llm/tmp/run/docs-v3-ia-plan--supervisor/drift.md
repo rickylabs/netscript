@@ -65,3 +65,36 @@ Append-only. Records divergence between plan/intent and reality, and material pl
      `SCOPE: authenticated-saas` verdict line, so the rescope fallback is an exercised branch, not a latent
      escape hatch; absent/unproven org-scoping may not default to the multi-tenant framing.
 - **Gate status:** Plan-Gate **PASS**; the implementation/build run is now unblocked (separately gated).
+
+## 2026-06-21 · competitor-inspiration deepening (post-PASS, user review note — severity: significant, additive)
+- **Trigger:** user reviewed the plan, **~90% approved**, but *"expected more inspiration taken from
+  competitor-doc-research.md"* and asked to adjust before re-review. The PASSed plan had absorbed the dossier's
+  *skeleton* (Diátaxis, hubs, multi-track, component names) but was thin on its *substance*: the per-page-type
+  section-order contracts, the per-competitor "what to steal" patterns, the market-fit positioning, and the
+  full prioritized component list. This deepening is **additive** — no locked decision (D1–D4, OD1–OD8) changed,
+  no slice removed; the surface counts and gates are untouched. So it does not invalidate the PLAN-EVAL PASS, but
+  it is re-submitted for the user's re-review per their request.
+- **Vendored** the 350-line dossier into the branch at `ground/competitor-doc-research.md` (verbatim from
+  `origin/docs/overhaul-v3`), so every plan reference resolves in-tree.
+- **`doc-architecture-v3.md` changes:**
+  - §0.5 NEW **front-door positioning contract** — "Eliminate the Integration Tax" lead, "skeptical senior TS
+    architect" persona, 5 proof-backed credibility anchors, honest comparison matrix vs
+    NestJS/Encore/tRPC/Temporal/Hono (research §B operationalized).
+  - §5.1 component table **prioritized (P0/P1/P2)** + each mapped to the competitor it adopts; added
+    `comp.tabbedCode`, `comp.tabbedRuntime` (localStorage-synced), `comp.learningPath`, and the code-render
+    line-highlight pipeline.
+  - §5.3 added **per-engine schema/ERD diagrams** (Medusa "module starts with its schema") + the OTel
+    `traceparent` propagation diagram (credibility anchor #3).
+  - §8 page-type catalog **rewritten from one-liners into strict section-order contracts** per type (F/H/B/R/E),
+    plus §8.1 **code-sample conventions** (file-path first-line comment, line-level diffing, types-before-usage).
+  - §11 NEW **competitor-pattern adoption matrix** — every dossier "what to steal" item traced to a concrete home.
+- **`plan.md` changes:** WS4 component list prioritized + new components; WS8 gained the §0.5 front-door
+  positioning + comparison matrix; S03 slice adds the new components + render-pipeline behaviors; S18 adds the
+  front-door positioning; new **page-structure audit gate** in §5 (asserts each page's §8 section order in order)
+  and added to S20; companion-docs list cites the vendored dossier.
+- **`hub-content-contracts.md`:** added a **structure rule** binding the Type-H section order to all 8 hubs
+  (schema/ERD opener, types-first table before example, file-path code comments, closing production-notes).
+- **`research.md` §6** rewritten to point at the vendored dossier and map each dossier theme to where it is now
+  operationalized.
+- **Status:** ready for user re-review. No re-dispatch of PLAN-EVAL initiated (additive, post-PASS); will
+  re-gate only if the user wants a fresh PLAN-EVAL on the deepened plan.

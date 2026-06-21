@@ -9,6 +9,15 @@ how-tos, and the generated reference links. APIs are sourced from `surface-inven
 
 > Authoring rule: every API named below must be confirmed via `deno doc <unit>` at author time; an option
 > table must enumerate the **actual** option keys, not a representative subset.
+>
+> **Structure rule (binds `doc-architecture-v3.md` §8 Type-H + the competitor teardown):** every hub follows
+> the locked Type-H section order. In particular: (1) the hub **opens with its architecture/schema diagram** —
+> for the stateful engines (sagas, background-jobs, triggers, database) this is the **ERD / state-machine** of
+> the engine's persisted model, drawn from the live Prisma schema (Medusa "module starts with its schema");
+> (2) the **primary interface(s)** are shown as a **types-first** `comp.apiTable` (fields/required/defaults)
+> **before** the runnable example (TanStack signature-first); (3) every code block carries a **file-path
+> first-line comment** and highlights added lines (§8.1); (4) the hub ends with a **"Production notes"**
+> callout of deploy/footgun caveats (Laravel per-feature gotchas) before the Reference links.
 
 ---
 

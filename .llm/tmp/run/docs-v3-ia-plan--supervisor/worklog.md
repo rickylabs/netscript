@@ -23,6 +23,15 @@ Deliverable: a locked, PLAN-EVAL-ready Information-Architecture plan. No prose a
   `createJobTools` reclassified as a scaffold helper (not a published subpath), S12/§5 gate now asserts 210
   read live from the export maps, and the Track B proof gate now emits a mandatory recorded SCOPE verdict.
 - **Implementation gate is now OPEN** — the build run may begin (separately, on the applied planning patch).
+- **Competitor-inspiration deepening (post-PASS, user review note 2026-06-21)** — user ~90%-approved the plan but
+  wanted more inspiration drawn from the competitor dossier. Applied an **additive** deepening (no locked decision
+  or slice changed): vendored `ground/competitor-doc-research.md`; added the §0.5 front-door positioning contract
+  (Integration-Tax / persona / 5 credibility anchors / comparison matrix), rewrote §8 into strict per-page-type
+  section-order contracts + §8.1 code conventions, prioritized + extended the §5.1 component set
+  (`comp.tabbedCode`/`comp.tabbedRuntime`-synced/`comp.learningPath`/line-highlight), added per-engine ERD
+  diagrams (§5.3), and a §11 competitor-pattern adoption matrix; wired the new components + a page-structure audit
+  gate into `plan.md` (WS4/WS8/S03/S18/S20/§5) and a hub structure rule into `hub-content-contracts.md`. See
+  `drift.md` 2026-06-21 · competitor-inspiration deepening. **Ready for user re-review.**
 
 ## Design
 

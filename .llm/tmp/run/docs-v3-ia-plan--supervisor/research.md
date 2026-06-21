@@ -117,18 +117,31 @@ BOTH the IA and the accuracy baseline.
 
 ---
 
-## 6. Competitor patterns (foundational research, retained)
+## 6. Competitor patterns (foundational research — now vendored in-tree)
 
-From `…/docs-heavy-lifting/research/competitor-doc-research.md` (Medusa/TanStack/Laravel/Astro/Lume
-teardown):
+The full Medusa/TanStack/Laravel/Astro/Lume teardown is **vendored into this branch** at
+`ground/competitor-doc-research.md` (verbatim copy from `origin/docs/overhaul-v3`), so every plan
+reference resolves in-tree. Per the user's review note (2026-06-21: *"expected more inspiration taken
+from competitor-doc-research.md"*), the dossier is now operationalized across `doc-architecture-v3.md`,
+not just summarized here. Mapping:
 
-- **Diátaxis** zones (Tutorials=learning, How-to=task, Explanation=understanding, Reference=generated)
-  + Medusa-style **capability hubs** that triangulate Learn/Do/Reference.
-- **Page-type catalog**: A multi-pillar hub · B sequential tutorial step · C how-to recipe · D explanation.
-- **Component gaps** (P0): on-page TOC, Pagefind search, code-copy. (P1): `comp.fileTree`,
-  `comp.tabbedRuntime`, `comp.badge`. (P2): ASCII→rendered diagrams, `comp.cardsGrid`, `comp.version`.
-- Tutorials should be **project-shaped and meaningful E2E**, not toy snippets. (D1 chooses *multiple*
-  such projects rather than one.)
+- **Diátaxis** zones + Medusa-style **capability hubs** → IA spine (§1) + hub triplet (§2).
+- **Page-type catalog** → expanded from one-liners into **strict section-order contracts** per page type
+  (F/H/B/R/E) in `doc-architecture-v3.md` §8, plus **code-sample conventions** (§8.1: file-path first-line
+  comment, line-level diffing, types-before-usage).
+- **"What to steal" per competitor** (Medusa schema-first + file-path comments; TanStack signature-first +
+  interactive runtime tabs; Laravel single-page deep-dives + per-feature prod gotchas; Astro file-tree +
+  badges + line-diffing + verify-your-progress; Lume Pagefind) → the **competitor-pattern adoption matrix**
+  (`doc-architecture-v3.md` §11), each pattern assigned a concrete home.
+- **Market-fit / §B** (the "Integration Tax" lead, the "skeptical senior TS architect" persona, the 5
+  credibility anchors, the NestJS/Encore/tRPC/Temporal/Hono comparison matrix) → the **front-door content
+  contract** (`doc-architecture-v3.md` §0.5) + WS8.
+- **Component gaps** (P0 TOC/Pagefind/code-copy · P1 `comp.fileTree`/`comp.tabbedRuntime` synced/
+  `comp.tabbedCode`/`comp.badge`/`comp.learningPath`/line-highlight · P2 grid/version/feedback) →
+  `doc-architecture-v3.md` §5.1 (prioritized) + plan WS4 / slice S03.
+- **Per-engine schema/ERD diagrams** (Medusa) → `doc-architecture-v3.md` §5.3 + hub Type-H step 2.
+- Tutorials are **project-shaped, meaningful E2E** — D1 chooses *multiple* such projects rather than the
+  dossier's single checkout walkthrough (a deliberate step *beyond* the dossier).
 
 ---
 

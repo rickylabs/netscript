@@ -6,8 +6,9 @@
 is a later, separately-gated build run.
 **Companion docs:** `research.md`, `doc-architecture-v3.md`, `surface-inventory.md`,
 `hub-content-contracts.md`, `tutorial-proof-plans.md`, `ground/leakage-diagram-barraising.md`,
-`ground/playground-showcase-map.md`. **Harness artifacts:** `worklog.md` (incl. `## Design`), `drift.md`,
-`commits.md`.
+`ground/playground-showcase-map.md`, `ground/competitor-doc-research.md` (vendored competitor teardown —
+source of the page-type catalog, §0.5 positioning, and §11 adoption matrix). **Harness artifacts:**
+`worklog.md` (incl. `## Design`), `drift.md`, `commits.md`.
 
 > **Hardening note (2026-06-21):** this plan was hardened against the unoriented WSL Codex adversarial panel
 > (`codex-panel-findings.md`: 3 blockers / 6 majors / 1 minor) before re-dispatching
@@ -91,10 +92,16 @@ Each workstream is independently authorable in the later build run; this plan de
   The 8 complex hubs additionally satisfy their `hub-content-contracts.md` content contract.
 
 ### WS4 — Design system & components (D3)
-- Add components from doc-architecture-v3 §5.1: in-site search (Pagefind), on-page TOC (scroll-spy),
-  code-copy buttons, `comp.diagram`, `comp.fileTree`, `comp.badge`, `comp.cardsGrid`, prev/next nav,
-  (P2) feedback widget.
-- *Accept:* components render on representative pages; existing pages unbroken; build green.
+- Add components from doc-architecture-v3 §5.1, by priority tier:
+  - **P0:** in-site search (Pagefind), on-page TOC (scroll-spy), code-copy buttons.
+  - **P1:** `comp.diagram`, `comp.fileTree`, `comp.badge`, `comp.cardsGrid`, `comp.tabbedCode`,
+    `comp.tabbedRuntime` (runtime/DB selector synced via `localStorage` site-wide), `comp.learningPath`
+    (tutorial progress + persona split), prev/next nav, and the code-render-pipeline behaviors
+    (file-path first-line comment + line-level highlighting, §8.1).
+  - **P2:** feedback widget, version pill.
+- *Accept:* components render on representative pages (incl. a synced `comp.tabbedRuntime` that preserves
+  the selected runtime across navigation, and a code block showing its file-path comment + highlighted
+  added lines); existing pages unbroken; build green.
 
 ### WS5 — Rendered-diagram system (D3)
 - Implement `comp.diagram` (Mermaid + accessible static fallback) and produce the 11 diagrams in
@@ -130,13 +137,19 @@ Drive the leakage count to **zero** (currently 19, per `ground/leakage-diagram-b
   public occurrences of `archetype`/`axiom A\d+`/`fitness function`/`the doctrine`; honest user caveats
   retained in product voice.
 
-### WS8 — Bar-raising affordances
+### WS8 — Bar-raising affordances + front-door positioning
 - From leakage-report Section C: per-capability **status badges** (stable/alpha/partial) replacing
   repeated prose caveats; **version pill/switcher**; **troubleshooting** blocks on capability/how-to
   pages; **examples gallery** surfacing the scaffold `/examples/*`; **API option tables** for
   `defineService`/`defineSaga`/`defineWebhook`/`createQueue`; **tabbed** polyglot + queue-provider
   variants; production-deploy **checklist** in `how-to/deploy`.
-- *Accept:* each affordance present on its target pages.
+- **Front-door positioning (doc-architecture-v3 §0.5):** `/` + `/why` lead with the **"Integration Tax"**
+  value prop for the **skeptical-senior-TS-architect** persona; `/why` carries the **honest comparison
+  matrix** vs NestJS/Encore/tRPC/Temporal/Hono (incl. where NetScript is weaker); the **5 credibility
+  anchors** each appear with a runnable/diagram proof (contract→client, saga compensation, OTel
+  `traceparent`, `--no-aspire` portability, copy-source UI).
+- *Accept:* each affordance present on its target pages; `/why` comparison matrix lists all 5 competitors
+  with an adoption-concern column; each of the 5 credibility anchors resolves to a proof on its page.
 
 ## 4. Ordered commit slices (for the later build run; not executed here)
 
@@ -149,7 +162,7 @@ foundation group (S01–S05) lands.
 |-------|-------|---------------------------|-------------------|--------------|
 | **S01** | `comp.diagram` + build-time Mermaid→static-SVG (OD1) | `_components/diagram.vto`, Lume build config, `styles/` | accessible diagram component | sample diagram renders to committed SVG with `<figcaption>`; build green; visible with JS off |
 | **S02** | xref system (OD2/OD3) | `_data/xref.ts`, `comp.xref` filter, build config | keyed link resolver; build = link checker | deliberate bad key **fails build**; valid `cap:`/`ref:` key resolves |
-| **S03** | design-system components | `_components/{cardsGrid,badge,fileTree}.vto`, `base.vto` (TOC, code-copy), `styles/` | shared components | render on a representative page; existing pages unbroken (visual diff); build green |
+| **S03** | design-system components | `_components/{cardsGrid,badge,fileTree,tabbedCode,tabbedRuntime,learningPath}.vto`, `base.vto` (TOC, code-copy), code-render pipeline (file-path comment + line-highlight, §8.1), `styles/` | shared components | render on a representative page; `comp.tabbedRuntime` selection persists across nav (localStorage); a code block shows file-path comment + highlighted added lines; existing pages unbroken (visual diff); build green |
 | **S04** | Pagefind search (OD4) | build config, `base.vto` header | in-site search over `_site/**` incl. `reference/**` | search returns a `reference/` hit; build green |
 | **S05** | alpha version pill (OD5) | `base.vto` | static alpha pill | renders on top pages |
 | **S06** | `fresh-framework` hub split from `fresh-ui` + nav | `capabilities/fresh-framework/*`, `capabilities/fresh-ui.md`, `_data.ts` | ★NEW hub | `hub-content-contracts.md` §1 satisfied; nav entry; fresh-ui retained as design-system |
@@ -164,9 +177,9 @@ foundation group (S01–S05) lands.
 | **S15** | Track A (storefront) + Track D (live-dashboard) — playground-direct | `tutorials/{storefront,live-dashboard}/*`, `tutorials/index`, xref | 2 tracks + chooser | scaffold output type-checks; prev/next continuity; chooser links |
 | **S16** | Track B (workspace/auth) | `tutorials/workspace/*` | track | **`tutorial-proof-plans.md` Track B proof gate passed first**; else rescope per that doc |
 | **S17** | Track C (erp-sync/polyglot) | `tutorials/erp-sync/*` | track | **Track C proof gate passed first**; polyglot chapter gated or rescoped |
-| **S18** | WS7 voice cleanup + WS8 affordances | explanation zone, capability pages, `glossary.md`, `_data.ts` | status badges, troubleshooting blocks, examples gallery, option/tabbed tables | leakage scanner = 0 site-wide; affordances on target pages |
+| **S18** | WS7 voice cleanup + WS8 affordances + front-door positioning (§0.5) | explanation zone, capability pages, `glossary.md`, `_data.ts`, `index.vto`, `why.vto` | status badges, troubleshooting blocks, examples gallery, option/tabbed tables, "Integration Tax" framing, `/why` comparison matrix, 5 proof-backed credibility anchors | leakage scanner = 0 site-wide; affordances on target pages; `/why` matrix lists 5 competitors; each credibility anchor resolves to a proof |
 | **S19** | xref migration | all migrated pages | internal links → keys | zero hardcoded internal hrefs in migrated pages; build link-check green |
-| **S20** | final build + audits | (no content) | merge-readiness verdict | gate table §5 all green (build, leakage, xref, accuracy, visual) |
+| **S20** | final build + audits | (no content) | merge-readiness verdict | gate table §5 all green (build, leakage, xref, accuracy, **page-structure**, visual) |
 
 ## 5. Gates / acceptance (build-run merge-readiness) — executable
 
@@ -181,6 +194,7 @@ prior slogan list (panel #5).
 | **Leakage scan** | the deterministic scanner spec below | `docs/site/**` minus `_site/`, `reference/` | **0 hits** | docs |
 | Accuracy non-regression | re-check the 3 v3 dossiers under `…/docs-overhaul-v3/ground/` against the rewritten pages | capability/explanation pages | no reintroduced inaccuracy; fixed caveats not re-injected | docs |
 | Surface completeness | S12 enumeration check vs `surface-inventory.md` | export maps + pages/xref | all 210 subpaths realized | docs |
+| **Page-structure audit** | a structure check asserting each page's required `doc-architecture-v3` §8 sections are present **in order** for its page type (F/H/B/R/E) | `docs/site/**` authored pages | every page conforms to its page-type section-order contract; hubs open with a schema/ERD diagram + types-first table; tutorial steps carry a "verify your progress" check | docs |
 | `reference/**` untouched | `git diff --stat origin/docs/user-site -- docs/site/reference` | `docs/site/reference/**` | zero changes | docs |
 | Targeted fmt | `run-deno-fmt.ts --ext md` (scoped wrapper) | docs content roots only | clean; **not** raw root fmt over generated/legacy | docs |
 | Visual/structural | existing cross-ref (WF-2) + Playwright capstone, **desktop + mobile** | served `_site/` | screenshot matrix green; no layout breaks | docs |
