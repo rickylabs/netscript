@@ -1,0 +1,400 @@
++24|concrete resolution paths in the planning artifacts. Open-decision sweep 
+resolves the rework-prone
++25|choices (diagram render mode, xref surface, Pagefind scope, version UI, 
+`archetype` removal,
++26|marketplace CLI stub status, deploy scope). 20 ordered commit slices (<30) 
+with files-touched
++27|and proving gates per slice; executable gate table + deterministic 
+leakage-scanner spec
++28|(replaces the prior slogan list); risk register + deferred-scope section + 
+SCOPE-docs overlay
++29|gates. No `packages/**`/`plugins/**` code, no `docs/site/**`, no `deno.lock`
+changes on this PR —
++30|planning-only as required.
++31|
++32|## Changes
++33|
++34|**Artifacts written**
++35|
++36|- `.llm/tmp/run/docs-v3-ia-plan--supervisor/plan-eval.md` — independent 
+verdict with
++37|  cross-check evidence + five non-blocking follow-up notes for the next 
+planning patch.
++38|
++39|**No source-code changes. No `deno.lock` modifications. No commits made on 
+this branch.**
++40|
++41|## Independent spot-checks (against the live repo)
++42|
++43|1. `packages/` contains **26** package dirs + `plugins/` has **5** plugin 
+dirs = **31 units**
++44|   (not the headline 32).
++45|2. Every `packages/*/deno.json` and `plugins/*/deno.json` `exports` map sums
+to **210 subpaths**
++46|   (not the headline 242; not the inventory-table sum of 200).
++47|3. 7 units are under-counted in the parenthetical but the inventory 
+classification per subpath is
++48|   essentially complete:
++49|   - `plugin-sagas-core` 15→19 (missing from totals: `abstracts`, `config`, 
+`streams`,
++50|     `transports`)
++51|   - `plugin-workers-core` 15→16 (`streams`)
++52|   - `plugin-auth-core` 8→9 (`streams`)
++53|   - `plugin-triggers-core` 10→11 (`streams`)
++54|   - `plugin-triggers` 9→10 (`streams`)
++55|   - `fresh` 11→12 (`streams`)
++56|   - `queue` 12→13
++57|4. Marketplace stubs verified: 
+`packages/cli/src/public/features/marketplace/{publish,search}/
++58|   *-command.ts` print "Plugin marketplace … coming soon." OD7 + WS7 
+alignment correct.
++59|5. No local `apps/`, `contracts/`, or `services/` — playground lives only in
++60|   `rickylabs/netscript-start` @ `6ba9ba0`. Tracks A/D "playground-direct" +
+Tracks B/C
++61|   proof-gated (`tutorial-proof-plans.md`) is honest.
++62|6. `plugin-workers-core/src/domain/constants.ts` `TASK_TYPES` (7 entries) + 
+`WORKER_RUNTIMES` (3
++63|   entries) match `hub-content-contracts.md` §3/§4 + `surface-inventory.md` 
+exactly.
++64|7. `archetype`/doctrine leakage treatment is consistent across the IA tree, 
+OD6/WS7/S14, and the
++65|   leakage-scanner deny patterns (`\barchetype\b`, `axiom A\d+`, `fitness 
+function`,
++66|   `the doctrine`). Removal, not relabeling.
++67|
++68|## Validation
++69|
++70|- Read-only evaluation pass. No `deno task` runs, no installs, no tests.
++71|- Tally of `packages/` directory entries: `ls packages/ | wc -l` → 26.
++72|- Tally of export subpaths: per-unit python3+json parser summing all 
+`packages/*/deno.json` and
++73|  `plugins/*/deno.json` `exports` maps → 210.
++74|- Tally of inventory-table sums: row-by-row count of parenthetical totals → 
+200.
++75|- Tally of 7-unit per-unit delta: manual diff of inventory row vs 
+`deno.json` exports.
++76|
++77|## Responses to review comments or issue comments
++78|
++79|This is a planning-PR evaluator pass; there are no review threads on PR #105
+to reply to.
++80|Output mode is `pr-comment`, so the workflow will post the verdict (this 
+summary) as a single
++81|PR comment.
++82|
++83|## Remaining risks (non-blocking bookkeeping — recommend next planning 
+patch)
++84|
++85|1. `surface-inventory.md:6` headline says "32 units / 242 subpaths"; reality
+is **31 / 210**. Fix
++86|   the headline and 7 per-unit parentheticals. **Not a Plan-Gate blocker** —
+the inventory
++87|   classifies every shipped subpath; the S12 surface-completeness check 
+should be written against
++88|   the real export maps, not the headline.
++89|2. `plugin-workers-core` row classifies `createJobTools` as D — but 
+`createJobTools` is a
++90|   scaffold-level helper, not a published subpath. Move that caveat to a 
+`how-to/` note. Cosmetic.
++91|3. The WSL Codex panel finding #2 ("public-surface inventory incomplete") is
+**partially** closed
++92|   by the hardening commit; the bookkeeping fixes above would close it 
+fully.
++93|4. The WSL Codex panel finding #3 ("Tracks B/C grounded in absent playground
+showcase") is
++94|   genuinely closed via `tutorial-proof-plans.md` proof-or-rescope gates. 
+Tracks A/D remain
++95|   playground-direct (correctly).
++96|
++97|## PR comment body (for the workflow to post as a single PR comment)
++98|
++99|```markdown
++100|## PLAN-EVAL — docs-v3-ia-plan — independent verdict
++101|
++102|**Verdict: `PASS`**
++103|
++104|Independent pass applying `.llm/harness/evaluator/plan-protocol.md` +
++105|`.llm/harness/gates/plan-gate.md`. Re-baselined to `origin/main` @ 
+`5f273355`; the prior
++106|minimax-M3 PLAN-EVAL (comment 4762333961, run 27907934927) crashed without 
+a verdict — this is
++107|the clean re-dispatch.
++108|
++109|### Checklist (every Plan-Gate box satisfied)
++110|
++111|- Research present and current (`research.md`, re-baselined to `5f273355`; 
+stale-worktree
++112|  "auth missing" finding discarded in §2)
++113|- Decisions locked (D1–D4; OD1–OD8 with rationale — diagram render mode, 
+xref surface,
++114|  Pagefind scope, version UI, `archetype` removal, marketplace CLI stub 
+status, deploy scope)
++115|- Open-decision sweep resolves every rework-prone choice
++116|- 20 ordered commit slices (<30), each with files-touched + proving gate
++117|- Mandatory run artifacts present (worklog.md `## Design`, drift.md, 
+commits.md, research.md,
++118|  plan.md, surface-inventory.md, hub-content-contracts.md, 
+tutorial-proof-plans.md)
++119|- Public-surface inventory classifies every shipped subpath (per-subpath 
+classification complete;
++120|  per-unit parenthetical counts and the headline number are wrong — see 
+notes below)
++121|- Tutorial-track grounding honest (A/D playground-direct; B/C proof-gated 
+via
++122|  `tutorial-proof-plans.md`)
++123|- Acceptance gates executable (Lume build, xref integrity, Pagefind, 
+deterministic leakage
++124|  scanner, accuracy non-regression, surface completeness, `reference/**` 
+untouched, scoped fmt,
++125|  visual/structural, SCOPE-docs overlay) — replaces prior slogan list
++126|- Public-voice plan internally consistent (`archetype` removed, not 
+relabeled; deterministic
++127|  scanner spec with deny patterns + allowlist; no term both flagged and 
+preserved)
++128|- jsr-audit = N/A (docs planning run; no `packages/**`/`plugins/**` code 
+change)
++129|
++130|### Cross-check against the live repo (independent spot-checks)
++131|
++132|- Actual `packages/` = 26 dirs; `plugins/` = 5 dirs = **31 units** (not 
+32).
++133|- Sum of every `deno.json` `exports` map = **210 subpaths** (not 242).
++134|- The inventory's per-subpath classifications are essentially complete, but
+the parenthetical
++135|  totals on 7 units and the headline number (32 / 242) are wrong.
++136|- Marketplace stubs verified 
+(`packages/cli/src/public/features/marketplace/{publish,search}/
++137|  *-command.ts` print "coming soon" — OD7 + WS7 correct).
++138|- No local `apps/`, `contracts/`, `services/` — playground lives only in 
+`rickylabs/netscript-start`
++139|  @ `6ba9ba0`. Tracks A/D "playground-direct" + Tracks B/C proof-gated is 
+honest.
++140|- `TASK_TYPES` (7) and `WORKER_RUNTIMES` (3) in 
+`plugin-workers-core/src/domain/constants.ts`
++141|  match `hub-content-contracts.md` §3/§4 and `surface-inventory.md` 
+exactly.
++142|- WSL Codex panel findings (B1/B2/B3/M4/M5/M6/M7/M8/M9/m10) are reproduced 
+into the branch via
++143|  `55be89da` and genuinely closed with concrete resolution paths (B2/B3 
+bookkeeping notes below
++144|  do not undo the closure).
++145|
++146|### Non-blocking follow-ups (next planning patch — recommend before S12)
++147|
++148|These are bookkeeping, not Plan-Gate failures. The build run should apply 
+them in its first
++149|slice so S12 asserts against the real numbers.
++150|
++151|1. `surface-inventory.md:6` headline → "**31 published units, 210 export 
+subpaths**" (not 32 /
++152|   242).
++153|2. 7 under-counted per-unit parentheticals: `plugin-sagas-core` 15→19, 
+`plugin-workers-core`
++154|   15→16, `plugin-auth-core` 8→9, `plugin-triggers-core` 10→11, 
+`plugin-triggers` 9→10, `fresh`
++155|   11→12, `queue` 12→13.
++156|3. `plugin-workers-core` row "createJobTools" D-badge → move to `how-to/` 
+(it is a scaffold
++157|   helper, not a published subpath).
++158|4. `plan.md:161, 183` S12 + §5 surface-completeness gate → assert against 
+210, not 242.
++159|5. Ensure the Track B proof gate (`tutorial-proof-plans.md` Track B) 
+actually exercises the
++160|   rescope fallback when the proof run reports no playground validation.
++161|
++162|### Lock hygiene
++163|
++164|- No `packages/**`/`plugins/**` code change, no `docs/site/**` change, no 
+`deno.lock` change on
++165|  this PR (planning-only). Verified via `commits.md`.
++166|- No edits or commits made in this evaluator session.
++167|
++168|`PASS` — implementation may begin the build run on a fresh planning patch 
+that first applies
++169|the five non-blocking follow-ups above.
++170|```
++171|
++172|## Workflow notes
++173|
++174|- Verdict file: `.llm/tmp/run/docs-v3-ia-plan--supervisor/plan-eval.md`
++175|- Re-dispatch reason (clean re-run after crashed prior minimax-M3 
+PLAN-EVAL): explicitly
++176|  documented in the verdict file's preamble.
++177|- Output mode `pr-comment` → single workflow-owned PR comment; no 
+`replies.json` to write.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify final workspace state
+
+Thought:
+Now let me verify the final state and check that the plan-eval.md was committed 
+back to the branch automatically (per the operational contract, "Uncommitted 
+workspace files are committed back to the branch automatically when the run 
+ends").
+
+$ cd /home/runner/work/netscript/netscript && git status --short 2>/dev/null | 
+head -10; echo ---; git --no-pager log --oneline -5 2>/dev/null; echo ---; ls 
+-la /home/runner/work/_temp/openhands/27908862931-1/summary.md; echo ---; head 
+-5 /home/runner/work/_temp/openhands/27908862931-1/summary.md
+
+Tokens: ↑ input 6.48M • cache hit 88.57% •  reasoning 1.51K • ↓ output 40.25K • 
+$ 0.6151
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+?? .llm/tmp/run/docs-v3-ia-plan--supervisor/plan-eval.md
+?? .llm/tmp/run/openhands/pr-105/run-27908862931-1/
+---
+f3ce9538 (HEAD -> docs/v3-ia-plan, origin/docs/v3-ia-plan) docs: reproduce 
+codex-panel-findings.md into branch + fix dangling SHA refs
+c6a0c453 chore(harness): reconcile commits.md with 55be89da SHA
+87bc455d docs: harden v3 IA plan against unoriented adversarial panel (#105)
+c5a6ff3d chore(openhands): record run trace 27907934927-1
+fc3ee159 docs: v3 IA plan — structural overhaul to production-grade public docs 
+(planning only)
+---
+-rw------- 1 runner runner 10063 Jun 21 15:49 
+/home/runner/work/_temp/openhands/27908862931-1/summary.md
+---
+# OpenHands Run — 27908862931-1 — docs-v3-ia-plan--supervisor — PLAN-EVAL
+
+- **PR**: #105 — `docs: v3 IA plan — production-grade public docs (planning, 
+draft)`
+- **Branch**: `docs/v3-ia-plan` (off `origin/main` @ `5f273355`)
+- **Run**: `.llm/tmp/run/docs-v3-ia-plan--supervisor/`
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Mark all tasks done
+
+Thought:
+All artifacts in place:
+- Verdict written to `.llm/tmp/run/docs-v3-ia-plan--supervisor/plan-eval.md`
+- Summary written to 
+`/home/runner/work/_temp/openhands/27908862931-1/summary.md`
+- No commits made; no `deno.lock` or source churn; planning-only PR preserved.
+- Untracked workspace files (`plan-eval.md`, `summary.md`) will be committed 
+back by the workflow when the run ends.
+
+📋 Update Task List (4 tasks)
+
+Tokens: ↑ input 6.52M • cache hit 88.27% •  reasoning 1.51K • ↓ output 40.77K • 
+$ 0.6235
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 4 done
+
+✅ 1. PLAN-EVAL: cross-check surface-inventory.md against repo export maps and 
+grounding
+   Notes: Done. Found: actual=31 units / 210 subpaths; inventory headline claims
+32/242; table sums to 200; 7 units under-counted in parentheses. Per-subpath 
+classifications are essentially complete.
+✅ 2. Verify design checkpoint + plan structure integrity
+   Notes: Done. Design checkpoint present in worklog.md; OD1-OD8 locked; 20 
+ordered slices (<30); executable gate table + deterministic leakage scanner 
+spec; risk register + scope overlays + deferred-scope explicit. jsr-audit = N/A 
+(docs run).
+✅ 3. Compile drift.md / codex-panel-findings review
+   Notes: Done. WSL Codex panel findings genuinely closed by hardening commit 
+(B1/B2/B3/M4/M5/M6/M7/M8/M9/m10) with the caveat that surface-inventory totals 
+need a bookkeeping fix.
+✅ 4. Render PLAN-EVAL verdict and write plan-eval.md + summary
+   Notes: Done. Verdict: PASS with five non-blocking follow-up notes for the 
+build run. plan-eval.md + summary.md written.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict: PASS with non-blocking notes
+
+Finish with message:
+## PLAN-EVAL — docs-v3-ia-plan — independent verdict: **`PASS`**
+
+Independent pass applying `.llm/harness/evaluator/plan-protocol.md` + 
+`.llm/harness/gates/plan-gate.md`. Re-baselined to `origin/main` @ `5f273355`; 
+the prior minimax-M3 PLAN-EVAL (comment 4762333961, run 27907934927) crashed 
+without a verdict — this is the clean re-dispatch.
+
+### Plan-Gate checklist (every box satisfied)
+
+- **Research current** — `research.md` present; stale-worktree "auth missing" 
+finding discarded in §2.
+- **Decisions locked** — D1–D4 + OD1–OD8 (diagram render mode, xref surface, 
+Pagefind scope, version UI, `archetype` removal, marketplace CLI stub status, 
+deploy scope) all resolved with rationale.
+- **Open-decision sweep** — resolves every rework-prone choice.
+- **20 commit slices** (<30), each with files-touched + proving gate.
+- **Mandatory artifacts present** — worklog.md `## Design`, drift.md, 
+commits.md, research.md, plan.md, surface-inventory.md, 
+hub-content-contracts.md, tutorial-proof-plans.md.
+- **Public-surface inventory** classifies every shipped subpath (per-subpath 
+complete; per-unit parentheticals + headline number are wrong — see notes).
+- **Tutorial-track grounding honest** — A/D playground-direct; B/C proof-gated 
+via `tutorial-proof-plans.md`.
+- **Acceptance gates executable** — Lume build, xref integrity, Pagefind, 
+deterministic leakage scanner, accuracy non-regression, surface completeness, 
+`reference/**` untouched, scoped fmt, visual/structural, SCOPE-docs overlay.
+- **Public-voice plan internally consistent** — `archetype` removed (not 
+relabeled); deterministic scanner spec with deny patterns + allowlist.
+- **jsr-audit = N/A** — docs planning run; no `packages/**`/`plugins/**` code 
+change.
+
+### Cross-check against live repo (independent spot-checks)
+
+- Actual `packages/` = 26 dirs + `plugins/` = 5 dirs = **31 units** (not 32).
+- Sum of every `deno.json` `exports` map = **210 subpaths** (not 242).
+- 7 under-counted per-unit parentheticals (e.g. `plugin-sagas-core` 15→19, 
+`plugin-workers-core` 15→16).
+- Marketplace stubs verified 
+(`packages/cli/src/public/features/marketplace/{publish,search}/*-command.ts` 
+print "coming soon" — OD7 + WS7 correct).
+- No local `apps/`, `contracts/`, `services/` — playground lives only in 
+`rickylabs/netscript-start` @ `6ba9ba0`. Tracks A/D "playground-direct" + Tracks
+B/C proof-gated is honest.
+- `TASK_TYPES` (7) and `WORKER_RUNTIMES` (3) in 
+`plugin-workers-core/src/domain/constants.ts` match `hub-content-contracts.md` 
+§3/§4 and `surface-inventory.md` exactly.
+
+### Non-blocking follow-ups (recommend next planning patch before S12)
+
+These are bookkeeping, not Plan-Gate failures. The build run should apply them 
+in its first slice so S12 asserts against the real numbers.
+
+1. `surface-inventory.md:6` headline → "**31 published units, 210 export 
+subpaths**" (not 32 / 242).
+2. 7 under-counted per-unit parentheticals (`plugin-sagas-core` 15→19, 
+`plugin-workers-core` 15→16, `plugin-auth-core` 8→9, `plugin-triggers-core` 
+10→11, `plugin-triggers` 9→10, `fresh` 11→12, `queue` 12→13).
+3. `plugin-workers-core` row "createJobTools" D-badge → move to `how-to/` (it is
+a scaffold helper, not a published subpath).
+4. `plan.md:161, 183` S12 + §5 surface-completeness gate → assert against 210, 
+not 242.
+5. Ensure Track B proof gate (`tutorial-proof-plans.md` Track B) actually 
+exercises the rescope fallback when the proof run reports no playground 
+validation.
+
+### Lock / hygiene
+
+- **Verdict file**: `.llm/tmp/run/docs-v3-ia-plan--supervisor/plan-eval.md` 
+(PASS with the 5 notes above).
+- **Run summary**: `/home/runner/work/_temp/openhands/27908862931-1/summary.md`.
+- No `packages/**`/`plugins/**` code change, no `docs/site/**` change, no 
+`deno.lock` change.
+- No commits made in this evaluator session (planning-only PR preserved).
+
+`PASS` — implementation may begin the build run on a fresh planning patch that 
+first applies the five non-blocking follow-ups above.
+
+Tokens: ↑ input 6.55M • cache hit 88.33% •  reasoning 1.51K • ↓ output 41.88K • 
+$ 0.6269
+
