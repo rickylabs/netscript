@@ -1,0 +1,20 @@
+%% auth-flow — auth request flow (offline Mermaid source for auth-flow.svg)
+flowchart LR
+  Client["Client<br/>browser / SDK"]
+  Auth["Auth service<br/>plugins/auth oRPC"]
+  Sel["Adapter selector<br/>backend select"]
+  IdP["Identity provider<br/>OIDC / OAuth"]
+
+  Client -->|sign-in request| Auth
+  Auth --> Sel
+  Sel --> IdP
+
+  subgraph Adapters["one adapter wins"]
+    WorkOS["WorkOS"]
+    BetterAuth["Better-Auth"]
+    KVOAuth["KV-OAuth"]
+  end
+  Sel --> Adapters
+
+  IdP -.->|issued session / Principal| Auth
+  Auth -.->|Principal| Down["Downstream<br/>withAuthn / withAuthz"]
