@@ -1,0 +1,236 @@
+---
+layout: layouts/base.vto
+title: Cart, contract-first
+templateEngine: [vento, md]
+prev: { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" }
+next: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" }
+---
+
+# Cart, contract-first
+
+In [chapter 2](/tutorials/storefront/02-catalog-service/) you built a typed catalog around a contract
+that was largely generated from Prisma. Now you design a domain that does **not** exist yet — a
+shopping `cart` — the other way round: contract first, then everything else. You write the cart's
+procedures and schemas as the single source of truth, then derive a fully typed client from them
+without a codegen step. This is the discipline that makes the checkout saga in the next chapter safe
+to build.
+
+{{ comp.learningPath({ steps: [
+  { label: "1 · Scaffold", href: "/tutorials/storefront/01-scaffold/" },
+  { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" },
+  { label: "3 · Cart contracts", href: "/tutorials/storefront/03-cart-contracts/" },
+  { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" },
+  { label: "5 · Shipping webhook", href: "/tutorials/storefront/05-shipping-webhook/" },
+  { label: "6 · Deploy", href: "/tutorials/storefront/06-deploy/" }
+] }) }}
+
+## What you will build
+
+You will add a new `cart` contract under `contracts/versions/v1/` with `list` / `getById` / `create`
+/ `update` procedures, Zod schemas for a cart and its line items, and typed errors inherited from
+`baseContract`. Then you will derive a typed `@orpc/client` from that contract and call it — proving
+that the contract alone, with no implementation written yet, is enough to give a client end-to-end
+type safety.
+
+{{ comp callout { type: "note", title: "Cart is a new domain — modeled on orders" } }}
+Be clear-eyed about what is happening: unlike <code>products</code>, there is no cart in the NetScript playground. You are designing a brand-new domain. To stay on proven ground, this chapter models the cart's contract on the playground's <strong>orders</strong> contract — same procedure set (<code>list</code>/<code>getById</code>/<code>create</code>/<code>update</code>), same <code>baseContract</code> typed-error pattern, same shape of paginated <code>list</code> output. Where orders has a database table behind it, your cart schemas here are hand-authored Zod; you can generate them from Prisma later if you add a cart table.
+{{ /comp }}
+
+## Before you begin
+
+You should have finished [chapter 2](/tutorials/storefront/02-catalog-service/), so:
+
+- `my-shop/` has a working `products` service on `:3001` and a `contracts/versions/v1/` directory
+  with `products.contract.ts` in it.
+- `aspire run` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)).
+
+Confirm the contracts workspace is where you left it:
+
+```sh
+ls contracts/versions/v1/
+```
+
+You should see `products.contract.ts` among the files. You will add `cart.contract.ts` next to it.
+
+## Step 1 — Define the cart schemas
+
+A cart holds line items, each referencing a product by id with a quantity, plus a status. Author the
+Zod schemas that describe it. Open a new file `contracts/versions/v1/cart.contract.ts`:
+
+```ts
+// contracts/versions/v1/cart.contract.ts
+import { z } from 'zod';
+import { implement } from '@orpc/server';
+import { baseContract } from '../../shared.ts';
+import {
+  IdQuerySchema,
+  nonNegativeInt,
+  OffsetPaginationQuerySchema,
+  paginationLimit,
+  paginationOffset,
+  positiveInt,
+} from '@shared/utils';
+
+// A single line in a cart.
+export const CartItemSchemaV1 = z.object({
+  productId: positiveInt({ description: 'Product being added' }),
+  quantity: z.number().int().positive().describe('How many'),
+});
+
+// The cart status lifecycle.
+export const CartStatusSchemaV1 = z.enum(['open', 'checking_out', 'ordered', 'abandoned']);
+
+// A cart, as returned by the API.
+export const CartSchemaV1 = z.object({
+  id: positiveInt({ description: 'Cart ID' }),
+  customerId: z.string().min(1).describe('Owner of the cart'),
+  status: CartStatusSchemaV1,
+  items: z.array(CartItemSchemaV1).describe('Line items'),
+  total: z.number().nonnegative().describe('Computed cart total'),
+  createdAt: z.string().datetime(),
+});
+```
+
+These hand-authored schemas play the same role the generated `@database/zod` schemas played for
+products: they are both the runtime validators and the TypeScript types every consumer derives.
+
+## Step 2 — Declare the procedures
+
+Now declare the cart's routes. Each is built from `baseContract`, so it inherits the typed errors
+(`NOT_FOUND`, `VALIDATION_ERROR`, …) you met in chapter 2 — exactly as the playground's `orders`
+contract does. Add this to the same file:
+
+```ts
+// contracts/versions/v1/cart.contract.ts (continued)
+export const CreateCartSchemaV1 = z.object({
+  customerId: z.string().min(1).describe('Owner of the cart'),
+  items: z.array(CartItemSchemaV1).describe('Initial line items'),
+});
+
+export const UpdateCartSchemaV1 = z.object({
+  id: positiveInt({ description: 'Cart ID to update' }),
+  status: CartStatusSchemaV1.optional(),
+  items: z.array(CartItemSchemaV1).optional().describe('Replaces existing items'),
+});
+
+export const cartContract = {
+  // List carts with pagination.
+  list: baseContract
+    .route({ method: 'GET' })
+    .input(OffsetPaginationQuerySchema.extend({ status: CartStatusSchemaV1.optional() }))
+    .output(z.object({
+      items: z.array(CartSchemaV1),
+      total: nonNegativeInt({ description: 'Total count' }),
+      limit: paginationLimit({ description: 'Results per page' }),
+      offset: paginationOffset({ description: 'Current offset' }),
+      hasMore: z.boolean(),
+    })),
+
+  // Fetch one cart. @throws NOT_FOUND when the id is unknown.
+  getById: baseContract.route({ method: 'GET' }).input(IdQuerySchema).output(CartSchemaV1),
+
+  // Create a cart. @throws VALIDATION_ERROR when input is invalid.
+  create: baseContract.route({ method: 'POST' }).input(CreateCartSchemaV1).output(CartSchemaV1),
+
+  // Update status or items. @throws NOT_FOUND, VALIDATION_ERROR.
+  update: baseContract.route({ method: 'PUT' }).input(UpdateCartSchemaV1).output(CartSchemaV1),
+};
+
+// implement() makes the contract `.handler()`-bindable, just like products.
+export const cartContractV1 = implement(cartContract);
+```
+
+The shape is intentionally the same as `products` and `orders`: a paginated `list`, a `getById` that
+can throw `NOT_FOUND`, a `create` that can throw `VALIDATION_ERROR`, and an `update`. Reusing the
+shape means anyone who has read one NetScript contract can read this one.
+
+{{ comp.apiTable({ caption: "The cart contract surface", rows: [
+  { name: "list", type: "GET → paginated CartSchemaV1[]", desc: "List carts, optionally filtered by status. Returns items + total + pagination metadata." },
+  { name: "getById", type: "GET → CartSchemaV1", desc: "Fetch one cart by id. Throws the typed NOT_FOUND error when the id is unknown." },
+  { name: "create", type: "POST → CartSchemaV1", desc: "Open a new cart for a customer with initial items. Throws VALIDATION_ERROR on bad input." },
+  { name: "update", type: "PUT → CartSchemaV1", desc: "Change cart status or replace items. The checkout saga (chapter 4) flips status to checking_out." }
+] }) }}
+
+## Step 3 — Register the contract in the version map
+
+A contract file is only reachable once it is wired into the versioned contract index that
+`@my-shop/contracts` exports. Open the v1 index and add the cart alongside products:
+
+```ts
+// contracts/versions/v1/index.ts
+import { productsContractV1 } from './products.contract.ts';
+import { cartContractV1 } from './cart.contract.ts';
+
+export const v1 = {
+  products: productsContractV1,
+  cart: cartContractV1,
+};
+```
+
+Now `@my-shop/contracts` exposes `v1.cart.*` to both services and clients.
+
+## Step 4 — Derive a typed client
+
+Here is the payoff of contract-first: a client needs **only the contract** to be fully typed — no
+running server, no generated SDK, no hand-written request types. Create a small script to prove it:
+
+```ts
+// scripts/cart-client.ts
+import { createORPCClient } from '@orpc/client';
+import { OpenAPILink } from '@orpc/openapi-client/fetch';
+import type { cartContract } from '@my-shop/contracts/versions/v1/cart.contract.ts';
+
+// The client's type comes entirely from the contract.
+const link = new OpenAPILink(cartContract, { url: 'http://localhost:3001/api/v1' });
+const client = createORPCClient<typeof cartContract>(link);
+
+// `created` is typed as CartSchemaV1 — the editor knows its fields before you run anything.
+const created = await client.create({
+  customerId: 'cust_1001',
+  items: [{ productId: 1, quantity: 2 }],
+});
+
+console.log(created.status, created.total);
+```
+
+Even with no cart service implemented yet, your editor types `created.status` as the
+`CartStatusSchemaV1` union and `created.items` as `CartItemSchemaV1[]`. Pass the wrong shape to
+`client.create(...)` and it is a compile error — the contract is enforcing the boundary from both
+sides.
+
+{{ comp callout { type: "tip", title: "Implementing the cart is the same loop as chapter 2" } }}
+This chapter stops at the contract and a typed client on purpose — the point is the design discipline. When you want a running cart service, the implementation is the exact same loop you used for products: <code>v1.cart.$context&lt;{ db }&gt;()</code>, bind <code>.handler(...)</code> functions, aggregate into a router, and serve with <code>defineService(...)</code>. See <a href="/tutorials/storefront/02-catalog-service/">chapter 2</a>.
+{{ /comp }}
+
+## Verify your progress
+
+The contract is code, so the real verification is that it type-checks and that the typed client
+compiles against it. From the workspace root:
+
+```sh
+deno task check
+```
+
+A clean check proves the cart schemas, routes, and the version-map registration all line up, and that
+the typed client in `scripts/cart-client.ts` is consistent with `cartContract`.
+
+- [ ] `contracts/versions/v1/cart.contract.ts` exists with `list` / `getById` / `create` / `update`.
+- [ ] Every route is built from `baseContract`, so it carries the shared typed errors.
+- [ ] `cartContractV1` is registered in the v1 index and reachable as `v1.cart`.
+- [ ] The typed client in `scripts/cart-client.ts` compiles — `created` is typed without a running
+      server.
+- [ ] `deno task check` passes.
+
+## What you built
+
+- A brand-new `cart` domain defined **contract-first** — schemas, a `list` / `getById` / `create` /
+  `update` procedure set, and `baseContract` typed errors — modeled on the playground's `orders`
+  contract.
+- The contract registered in the `@my-shop/contracts` version map as `v1.cart`.
+- A typed `@orpc/client` derived from the contract alone, fully type-locked with no codegen.
+
+You now have a cart whose every interaction is described by a contract. In the next chapter that
+contract becomes the input to the riskiest part of any shop — **checkout** — which you make reliable
+with a durable saga.
+
+{{ comp.nextPrev({ prev: { label: "2 · Catalog service", href: "/tutorials/storefront/02-catalog-service/" }, next: { label: "4 · Checkout saga", href: "/tutorials/storefront/04-checkout-saga/" } }) }}

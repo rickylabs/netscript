@@ -69,11 +69,10 @@ export const navSections: NavSection[] = [
     label: "Learn",
     items: [
       { href: "/tutorials/", label: "Tutorials", icon: "T" },
-      { href: "/tutorials/first-workspace/", label: "1 \u00B7 Your first workspace", icon: "1" },
-      { href: "/tutorials/build-a-service/", label: "2 \u00B7 Build a service", icon: "2" },
-      { href: "/tutorials/background-jobs/", label: "3 \u00B7 Add background jobs", icon: "3" },
-      { href: "/tutorials/durable-workflow/", label: "4 \u00B7 A durable workflow", icon: "4" },
-      { href: "/tutorials/ingest-webhook/", label: "5 \u00B7 Ingest a webhook", icon: "5" },
+      { href: "/tutorials/storefront/", label: "Storefront", icon: "\u00B7" },
+      { href: "/tutorials/workspace/", label: "Team Workspace", icon: "\u00B7" },
+      { href: "/tutorials/erp-sync/", label: "ERP Sync", icon: "\u00B7" },
+      { href: "/tutorials/live-dashboard/", label: "Live Dashboard", icon: "\u00B7" },
     ],
   },
   {
