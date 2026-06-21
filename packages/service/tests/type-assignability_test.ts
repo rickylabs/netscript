@@ -45,5 +45,7 @@ Deno.test('FetchHandler mirror accepts oRPC-style handler result', async () => {
   });
 
   assertEquals(result.matched, true);
-  assertEquals(await result.response.text(), 'ok');
+  if (result.matched) {
+    assertEquals(await result.response.text(), 'ok');
+  }
 });

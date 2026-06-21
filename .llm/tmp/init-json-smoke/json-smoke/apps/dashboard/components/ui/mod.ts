@@ -1,0 +1,38 @@
+/**
+ * App-owned UI barrel. These modules are installed with `netscript ui:init`
+ * from the @netscript/fresh-ui registry and are owned by the scaffolded app.
+ */
+export { Alert, type AlertVariant } from './alert.tsx';
+export { Badge, type BadgeVariant } from './badge.tsx';
+export { Breadcrumb, type BreadcrumbItem } from './breadcrumb.tsx';
+export { Button, type ButtonElementType, type ButtonSize, type ButtonVariant } from './button.tsx';
+export { Card } from './card.tsx';
+export { Checkbox, type CheckboxProps } from './checkbox.tsx';
+export { DataTable } from './data-table.tsx';
+export { DetailLayout } from './detail-layout.tsx';
+export { EmptyState } from './empty-state.tsx';
+export { FilterForm } from './filter-form.tsx';
+export { FormField } from './form-field.tsx';
+export { getInputProps, getSelectProps, getTextareaProps } from './control-props.ts';
+export { IconButton } from './icon-button.tsx';
+export { InlineNotice, type InlineNoticeVariant } from './inline-notice.tsx';
+export { Input } from './input.tsx';
+export { Label } from './label.tsx';
+export { PageHeader } from './page-header.tsx';
+export { Pagination } from './pagination.tsx';
+export { Panel, type PanelTone } from './panel.tsx';
+export { Progress, type ProgressSize, type ProgressVariant } from './progress.tsx';
+export {
+  ResponsiveTable,
+  type ResponsiveTableColumn,
+  type ResponsiveTableProps,
+} from './responsive-table.tsx';
+export { SectionDivider } from './section-divider.tsx';
+export { Select, type SelectOption } from './select.tsx';
+export { Separator } from './separator.tsx';
+export { type SidebarNavItem, type SidebarNavSection, SidebarShell } from './sidebar-shell.tsx';
+export { Skeleton } from './skeleton.tsx';
+export { Spinner, type SpinnerSize } from './spinner.tsx';
+export { StatsGrid } from './stats-grid.tsx';
+export { Switch, type SwitchProps } from './switch.tsx';
+export { Textarea } from './textarea.tsx';

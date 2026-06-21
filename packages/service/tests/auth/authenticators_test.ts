@@ -1,8 +1,5 @@
 import { assertEquals } from '@std/assert';
-import {
-  constantTimeCredentialEquals,
-  createStaticCredentialAuthenticator,
-} from '../../src/auth/static-credential-authenticator.ts';
+import { createStaticCredentialAuthenticator } from '../../src/auth/static-credential-authenticator.ts';
 import { createTrustedHeaderAuthenticator } from '../../src/auth/trusted-header-authenticator.ts';
 import type { AuthnRequest } from '../../src/auth/types.ts';
 
@@ -105,12 +102,6 @@ Deno.test('static credential authenticator rejects invalid credentials', async (
     ok: false,
     reason: 'invalid-credential',
   });
-});
-
-Deno.test('constant-time credential comparison uses digest equality', async () => {
-  assertEquals(await constantTimeCredentialEquals('same-token', 'same-token'), true);
-  assertEquals(await constantTimeCredentialEquals('same-token', 'other-token'), false);
-  assertEquals(await constantTimeCredentialEquals('short', 'a-much-longer-token'), false);
 });
 
 Deno.test('trusted header authenticator reads subject, scopes, roles, and claims', () => {

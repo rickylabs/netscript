@@ -41,6 +41,12 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       ],
     ),
     commandGate(
+      GATE.RUNTIME_AUTH_SMOKE_ENV,
+      'Wire auth smoke environment',
+      GATE_PHASE.RUNTIME,
+      (context) => ['deno', 'eval', AUTH_SMOKE_ENV_SCRIPT, context.project.projectRoot],
+    ),
+    commandGate(
       GATE.RUNTIME_ASPIRE_START,
       'Start generated Aspire AppHost',
       GATE_PHASE.RUNTIME,
@@ -143,6 +149,13 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       GATE_PHASE.BEHAVIOR,
       () => ['deno', 'eval', VALIDATE_TRIGGER_EVENTS_SCRIPT],
     ),
+    httpGate(GATE.BEHAVIOR_AUTH_LIVE, 'Auth API liveness', 'http://localhost:8094/health/live'),
+    httpGate(GATE.BEHAVIOR_AUTH_READY, 'Auth API readiness', 'http://localhost:8094/health/ready'),
+    httpGate(
+      GATE.BEHAVIOR_AUTH_SESSION,
+      'Read auth session route',
+      'http://localhost:8094/api/v1/auth/session',
+    ),
   ];
 }
 
@@ -154,6 +167,41 @@ const VALIDATE_TRIGGER_EVENTS_SCRIPT = [
   'if (!Array.isArray(body.events)) throw new Error("events response is missing events[]");',
   'if (typeof body.total !== "number") throw new Error("events response is missing total");',
   'if (body.total < 1) throw new Error("expected at least one trigger event after webhook gate");',
+].join('\n');
+
+const AUTH_SMOKE_ENV_SCRIPT = [
+  'const projectRoot = Deno.args[0];',
+  'if (!projectRoot) throw new Error("project root argument is required");',
+  'const helperPath = `${projectRoot}/aspire/.helpers/register-plugins.mts`;',
+  'const env = {',
+  '  NETSCRIPT_AUTH_BACKEND: "kv-oauth",',
+  '  NETSCRIPT_AUTH_CLIENT_ID: "scaffold_runtime_smoke",',
+  '  NETSCRIPT_AUTH_CLIENT_SECRET: "scaffold_runtime_smoke_secret",',
+  '  NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: "https://issuer.example.test/oauth/authorize",',
+  '  NETSCRIPT_AUTH_TOKEN_ENDPOINT: "https://issuer.example.test/oauth/token",',
+  '  NETSCRIPT_AUTH_REDIRECT_URI: "http://localhost:8094/api/v1/auth/callback",',
+  '  NETSCRIPT_AUTH_KV_OAUTH_TEST_KEY: "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=",',
+  '  NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: "true",',
+  '};',
+  'const source = await Deno.readTextFile(helperPath);',
+  'const marker = "  // --- auth ---";',
+  'const markerIndex = source.indexOf(marker);',
+  'if (markerIndex < 0) throw new Error("register-plugins.mts does not contain auth block");',
+  'const nextMarkerIndex = source.indexOf("  // ---", markerIndex + marker.length);',
+  'const blockEnd = nextMarkerIndex < 0 ? source.length : nextMarkerIndex;',
+  'const bootstrapLine = "    await resource.withEnvironment(\\\'NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE\\\', bootstrapModule);";',
+  'const bootstrapIndex = source.indexOf(bootstrapLine, markerIndex);',
+  'if (bootstrapIndex < 0) throw new Error("auth block does not contain bootstrap env line");',
+  'if (bootstrapIndex >= blockEnd) throw new Error("bootstrap env line was not in auth block");',
+  'const lines = Object.entries(env).map(([key, value]) =>',
+  '  `    await resource.withEnvironment(${JSON.stringify(key)}, ${JSON.stringify(value)});\\n`,',
+  ');',
+  'const insertAt = bootstrapIndex + bootstrapLine.length;',
+  'const updated = source.includes("NETSCRIPT_AUTH_BACKEND")',
+  '  ? source',
+  '  : source.slice(0, insertAt) + "\\n" + lines.join("") + source.slice(insertAt);',
+  'if (!updated.includes("NETSCRIPT_AUTH_BACKEND")) throw new Error("auth smoke env insert did not take effect");',
+  'await Deno.writeTextFile(helperPath, updated);',
 ].join('\n');
 
 const VALIDATE_WORKER_EXECUTIONS_SCRIPT = [

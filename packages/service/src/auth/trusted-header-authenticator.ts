@@ -70,11 +70,15 @@ function parseClaimsHeader(value: string | undefined): Readonly<Record<string, u
   if (!value) return {};
   try {
     const parsed: unknown = JSON.parse(value);
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      return parsed as Readonly<Record<string, unknown>>;
+    if (isRecord(parsed)) {
+      return parsed;
     }
   } catch {
     return {};
   }
   return {};
+}
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
 }

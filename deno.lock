@@ -33,6 +33,7 @@
     "jsr:@logtape/logtape@2": "2.1.4",
     "jsr:@logtape/logtape@^2.0.5": "2.1.4",
     "jsr:@olli/kvdex@^3.6.7": "3.6.7",
+    "jsr:@panva/oauth4webapi@^3.8.6": "3.8.6",
     "jsr:@standard-schema/spec@1.1.0": "1.1.0",
     "jsr:@std/assert@1": "1.0.19",
     "jsr:@std/assert@^1.0.19": "1.0.19",
@@ -388,6 +389,9 @@
         "jsr:@std/ulid",
         "npm:zod"
       ]
+    },
+    "@panva/oauth4webapi@3.8.6": {
+      "integrity": "37569071868714cee36c5df8be7939efcf68811e849a80b87d4be22aff331c50"
     },
     "@standard-schema/spec@1.1.0": {
       "integrity": "2ccd54513cd9c960bd155ab569b1a901bc99c6f9ad29559d3f38a28c91c1822d"
@@ -2327,7 +2331,6 @@
       },
       "packages/auth-better-auth": {
         "dependencies": [
-          "jsr:@hono/hono@4.12.24",
           "jsr:@std/assert@1"
         ],
         "packageJson": {
@@ -2335,6 +2338,12 @@
             "npm:better-auth@^1.6.20"
           ]
         }
+      },
+      "packages/auth-kv-oauth": {
+        "dependencies": [
+          "jsr:@panva/oauth4webapi@^3.8.6",
+          "jsr:@std/assert@1"
+        ]
       },
       "packages/auth-workos": {
         "dependencies": [
@@ -2480,6 +2489,14 @@
           "jsr:@zod/zod@4.4.3"
         ]
       },
+      "packages/plugin-auth-core": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "jsr:@zod/zod@4.4.3",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
+        ]
+      },
       "packages/plugin-sagas-core": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
@@ -2618,6 +2635,22 @@
           "jsr:@std/fs@1",
           "jsr:@std/path@1"
         ]
+      },
+      "plugins/auth": {
+        "dependencies": [
+          "jsr:@zod/zod@4.4.3",
+          "npm:@durable-streams/state@~0.3.1",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6",
+          "npm:@workos-inc/node@^10.4.0"
+        ],
+        "packageJson": {
+          "dependencies": [
+            "npm:@orpc/contract@^1.14.6",
+            "npm:@orpc/server@^1.14.6",
+            "npm:@orpc/zod@^1.14.6"
+          ]
+        }
       },
       "plugins/sagas": {
         "dependencies": [

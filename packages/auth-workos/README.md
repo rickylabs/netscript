@@ -1,9 +1,9 @@
 # @netscript/auth-workos
 
-WorkOS AuthKit authenticators for NetScript services.
+WorkOS AuthKit backend and authenticators for NetScript services.
 
 This is an Archetype-2 Integration package. It consumes the authentication port from
-`@netscript/service/auth` and maps verified WorkOS sessions or access tokens into NetScript
+`@netscript/plugin-auth-core` and maps verified WorkOS sessions or access tokens into NetScript
 principals.
 
 ## Install
@@ -12,6 +12,7 @@ principals.
 import {
   createWorkosAccessTokenAuthenticator,
   createWorkosAuthenticator,
+  createWorkosBackend,
 } from '@netscript/auth-workos';
 ```
 
@@ -20,7 +21,7 @@ import {
 ```ts
 import { WorkOS } from '@workos-inc/node';
 import { createService } from '@netscript/service';
-import { createWorkosAuthenticator } from '@netscript/auth-workos';
+import { createWorkosBackend } from '@netscript/auth-workos';
 
 const workos = new WorkOS(Deno.env.get('WORKOS_API_KEY')!, {
   clientId: Deno.env.get('WORKOS_CLIENT_ID')!,
@@ -28,16 +29,20 @@ const workos = new WorkOS(Deno.env.get('WORKOS_API_KEY')!, {
 
 const service = createService(router, { name: 'private-api' })
   .withAuthn({
-    authenticator: createWorkosAuthenticator({
+    authenticator: createWorkosBackend({
       workos,
       cookiePassword: Deno.env.get('WORKOS_COOKIE_PASSWORD')!,
       refresh: 'always',
+      providers: [{ id: 'workos', displayName: 'WorkOS' }],
     }),
   });
 ```
 
 ## Public Surface
 
+- `createWorkosBackend(options)` returns a pure `AuthBackendPort` named `workos`, with provider
+  registry, request-derived session lookup, backend-owned session-token crypto, principal mapping,
+  and authentication over WorkOS AuthKit sealed-session cookies.
 - `createWorkosAuthenticator(options)` verifies WorkOS AuthKit sealed-session cookies with
   `workos.userManagement.loadSealedSession(...).authenticate()`.
 - `createWorkosAccessTokenAuthenticator(options)` verifies bearer JWTs against a WorkOS JWKS.
@@ -46,7 +51,8 @@ const service = createService(router, { name: 'private-api' })
 - `WorkosAccessTokenAuthenticatorOptions` configures the WorkOS client ID, JWKS URL, and optional
   issuer constraint.
 
-Both authenticators return the upstream `AuthenticatorPort` from `@netscript/service/auth`.
+The backend is the composition entry for the unified auth plugin. The authenticator factories remain
+available for service-auth compatibility.
 
 ## Principal Mapping
 
@@ -58,6 +64,13 @@ Both authenticators return the upstream `AuthenticatorPort` from `@netscript/ser
 
 When `refresh: 'always'` is configured and WorkOS returns a refreshed sealed session, the adapter
 emits the rotated cookie through `AuthnResult.setCookies`.
+
+## Capability Boundaries
+
+WorkOS owns AuthKit session creation, refresh, and revocation. `createWorkosBackend().sessions`
+therefore resolves request-local sessions through the sealed-session cookie, but `createSession`,
+`refreshSession(sessionId)`, and `revokeSession(sessionId)` throw
+`AuthBackendOperationUnsupportedError` instead of fabricating local state.
 
 ## Required permissions
 

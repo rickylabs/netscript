@@ -217,6 +217,50 @@ Seeded from
 - **Gate:** F-13; add Prisma idempotency/applied-key adapter tests and a Prisma-backed duplicate
   message runtime test.
 
+## auth layer — AS7 documentation architecture metadata warnings
+
+- **Reason:** AS7's auth-scoped doctrine gate is hard-fail clean, but reports documentation warnings:
+  `packages/plugin-auth-core/README.md` has one TypeScript example instead of the doctrine proxy's
+  two-example target, `packages/plugin-auth-core/docs/architecture.md` does not include an explicit
+  `Archetype: <n>` token, and the auth backend packages/plugin omit package-local
+  `docs/architecture.md` files because their READMEs carry the public contract.
+- **Owner:** Auth architecture follow-up.
+- **Target:** Before auth beta documentation freeze.
+- **Linked plan:** `conformance-report.md`, `fitness-gates.md`, `jsr-scorecard.md` in branch
+  `feat/prime-time/auth-as7-fitness`.
+- **Created:** 2026-06-21
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task arch:check`; close when the auth-scoped doctrine warnings are zero or
+  explicitly demoted in the checker with documented rationale.
+
+## repo doctrine task — full historical scan remains red
+
+- **Reason:** Before AS7 wiring, `deno run --allow-read .llm/tools/fitness/check-doctrine.ts` from
+  the repository root exited nonzero on unrelated historical CLI/plugin doctrine debt. AS7 preserved
+  that full scan as `deno task arch:check:repo` and made `deno task arch:check` run the auth-owned
+  surfaces so the final auth slice has a green mechanical gate without refactoring out-of-scope
+  packages.
+- **Owner:** Architecture doctrine follow-up.
+- **Target:** 2026-Q3 doctrine remediation.
+- **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`.
+- **Created:** 2026-06-21
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** `deno task arch:check:repo`; close by reducing unrelated root failures or by replacing
+  the legacy root scan with debt-aware package selection.
+
+## release provenance — OIDC publish workflow deferred
+
+- **Reason:** JSR's provenance/SLSA score factor is publish-time only. The current CI workflow runs
+  publish dry-runs but explicitly states OIDC publish is deferred; AS7 therefore cannot assert a
+  wired provenance workflow without faking it.
+- **Owner:** Release process automation follow-up.
+- **Target:** Before first public auth package release.
+- **Linked plan:** `jsr-scorecard.md` in branch `feat/prime-time/auth-as7-fitness`.
+- **Created:** 2026-06-21
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** add a GitHub Actions publish workflow with `permissions: id-token: write` and JSR
+  provenance enabled; close when a dry-run/release rehearsal proves the workflow path.
+
 ## packages/workers — AP-1 / doctrine verdict Restructure (task-executor.ts 1,287 LOC)
 
 - **Reason:** `task-executor.ts` needs supervisor/executor/dispatcher split.

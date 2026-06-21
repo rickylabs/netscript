@@ -4,10 +4,10 @@
  * @example
  * ```ts
  * import { WorkOS } from '@workos-inc/node';
- * import { createWorkosAuthenticator } from '@netscript/auth-workos';
+ * import { createWorkosBackend } from '@netscript/auth-workos';
  *
  * const workos = new WorkOS('sk_test_123', { clientId: 'client_123' });
- * const authenticator = createWorkosAuthenticator({
+ * const backend = createWorkosBackend({
  *   workos,
  *   cookiePassword: Deno.env.get('WORKOS_COOKIE_PASSWORD')!,
  * });
@@ -32,9 +32,31 @@ export {
   type WorkosSessionRefreshSuccess,
 } from './src/workos-authenticator.ts';
 
+export {
+  AuthBackendOperationUnsupportedError,
+  createWorkosBackend,
+  type WorkosBackendOptions,
+  type WorkosProviderOptions,
+} from './src/workos-backend.ts';
+
 export type {
+  AUTH_SESSION_STATES,
+  AuthBackendPort,
   AuthenticatorPort,
   AuthnRequest,
   AuthnResult,
+  AuthPrincipalMapperPort,
+  AuthProviderCapability,
+  AuthProviderDescriptor,
+  AuthProviderRegistryPort,
+  AuthSession,
+  AuthSessionCreateInput,
+  AuthSessionCryptoPort,
+  AuthSessionLookup,
+  AuthSessionPrincipalMapping,
+  AuthSessionState,
+  AuthSessionStorePort,
+  InteractiveCallbackResult,
+  InteractiveFlowPort,
   Principal,
-} from '@netscript/service/auth';
+} from '@netscript/plugin-auth-core';

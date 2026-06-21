@@ -18,6 +18,7 @@
     "hono": "jsr:@hono/hono@4.12.24",
     "hono/cors": "jsr:@hono/hono@4.12.24/cors",
     "hono/logger": "jsr:@hono/hono@4.12.24/logger",
+    "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@orpc/openapi/fetch": "npm:@orpc/openapi@^1.14.6/fetch",
     "@orpc/server/fetch": "npm:@orpc/server@^1.14.6/fetch",
     "@orpc/server/plugins": "npm:@orpc/server@^1.14.6/plugins",
