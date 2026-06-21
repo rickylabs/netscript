@@ -42,16 +42,26 @@ export type InteractiveAuthBackend =
     signOut(request: Request, options?: { revoke?: boolean }): Promise<Response>;
   }>;
 
-/** Error used before handler-level mapping into contract-defined oRPC errors. */
+/** Error thrown by auth service handlers and normalized by the central oRPC error plugin. */
 export class AuthServiceHandlerError extends Error {
   /** Contract error code. */
   readonly code: 'UNAUTHORIZED' | 'AUTH_PROVIDER_ERROR' | 'VALIDATION_ERROR';
+  /** HTTP status emitted by the central oRPC error plugin. */
+  readonly status: 401 | 422 | 502;
   /** Provider id or backend name related to the failure. */
   readonly providerId?: string;
   /** Validation form errors. */
   readonly formErrors?: readonly string[];
   /** Validation field errors. */
   readonly fieldErrors?: Readonly<Record<string, readonly string[] | undefined>>;
+  /** Error payload emitted by the central oRPC error plugin. */
+  readonly data:
+    | Readonly<{ reason: string }>
+    | Readonly<{ providerId?: string; reason: string }>
+    | Readonly<{
+      formErrors: readonly string[];
+      fieldErrors: Readonly<Record<string, readonly string[] | undefined>>;
+    }>;
 
   /** Creates an auth handler error. */
   constructor(
@@ -66,10 +76,42 @@ export class AuthServiceHandlerError extends Error {
     super(message);
     this.name = 'AuthServiceHandlerError';
     this.code = code;
+    this.status = authErrorStatus(code);
     this.providerId = options.providerId;
     this.formErrors = options.formErrors;
     this.fieldErrors = options.fieldErrors;
+    this.data = authErrorData(code, message, options);
   }
+}
+
+function authErrorStatus(code: AuthServiceHandlerError['code']): AuthServiceHandlerError['status'] {
+  if (code === 'UNAUTHORIZED') return 401;
+  if (code === 'VALIDATION_ERROR') return 422;
+  return 502;
+}
+
+function authErrorData(
+  code: AuthServiceHandlerError['code'],
+  message: string,
+  options: {
+    readonly providerId?: string;
+    readonly formErrors?: readonly string[];
+    readonly fieldErrors?: Readonly<Record<string, readonly string[] | undefined>>;
+  },
+): AuthServiceHandlerError['data'] {
+  if (code === 'VALIDATION_ERROR') {
+    return {
+      formErrors: options.formErrors ?? [message],
+      fieldErrors: options.fieldErrors ?? {},
+    };
+  }
+  if (code === 'AUTH_PROVIDER_ERROR') {
+    return {
+      providerId: options.providerId,
+      reason: message,
+    };
+  }
+  return { reason: message };
 }
 
 /** Input and output pair for signin handler tests. */
