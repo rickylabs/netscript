@@ -1,4 +1,9 @@
+import { ORPCError } from '@orpc/contract';
 import { assert, assertEquals, assertRejects, assertThrows } from 'jsr:@std/assert@^1';
+import {
+  ErrorHandlingPlugin,
+  type GenericHandlerOptions,
+} from '../../../../packages/telemetry/src/orpc/mod.ts';
 import {
   AuthBackendNotFoundError,
   type AuthBackendPort,
@@ -108,6 +113,132 @@ Deno.test('unsupported interactive backend operation maps to typed auth service 
   );
 });
 
+Deno.test('auth handler errors keep observable central oRPC envelopes', async () => {
+  await assertProcedureEnvelope(
+    'signin',
+    () =>
+      signin({}, {
+        registry: createAuthBackendRegistry(
+          new Map([['workos', fakeBackend('workos')]]),
+          'workos',
+        ),
+      }),
+    {
+      code: 'AUTH_PROVIDER_ERROR',
+      status: 502,
+      data: {
+        providerId: 'workos',
+        reason: 'workos does not expose an interactive signin flow through its AS2 backend port.',
+      },
+    },
+  );
+  await assertProcedureEnvelope(
+    'callback',
+    () =>
+      callback({ error: 'access_denied', providerId: 'kv-oauth' }, {
+        registry: createAuthBackendRegistry(
+          new Map([['kv-oauth', fakeBackend('kv-oauth')]]),
+          'kv-oauth',
+        ),
+      }),
+    {
+      code: 'AUTH_PROVIDER_ERROR',
+      status: 502,
+      data: { providerId: 'kv-oauth', reason: 'access_denied' },
+    },
+  );
+  await assertProcedureEnvelope(
+    'signout',
+    () =>
+      signout({}, {
+        registry: createAuthBackendRegistry(
+          new Map([['kv-oauth', fakeBackend('kv-oauth')]]),
+          'kv-oauth',
+        ),
+      }),
+    {
+      code: 'UNAUTHORIZED',
+      status: 401,
+      data: { reason: 'No active auth session was found.' },
+    },
+  );
+  await assertProcedureEnvelope(
+    'session',
+    () =>
+      session(undefined, {
+        registry: createAuthBackendRegistry(
+          new Map([['kv-oauth', sessionThrowingBackend('kv-oauth')]]),
+          'kv-oauth',
+        ),
+      }),
+    {
+      code: 'AUTH_PROVIDER_ERROR',
+      status: 502,
+      data: { providerId: 'kv-oauth', reason: 'session store unavailable' },
+    },
+  );
+  await assertProcedureEnvelope(
+    'me',
+    () =>
+      me({
+        registry: createAuthBackendRegistry(
+          new Map([['kv-oauth', authenticateThrowingBackend('kv-oauth')]]),
+          'kv-oauth',
+        ),
+      }),
+    {
+      code: 'AUTH_PROVIDER_ERROR',
+      status: 502,
+      data: { providerId: 'kv-oauth', reason: 'authenticate unavailable' },
+    },
+  );
+});
+
+async function assertProcedureEnvelope(
+  procedure: string,
+  run: () => Promise<unknown>,
+  expected: {
+    readonly code: AuthServiceHandlerError['code'];
+    readonly status: AuthServiceHandlerError['status'];
+    readonly data: AuthServiceHandlerError['data'];
+  },
+): Promise<void> {
+  const error = await assertRejects(run, AuthServiceHandlerError);
+  assertEquals(error.code, expected.code);
+  assertEquals(error.status, expected.status);
+  assertEquals(error.data, expected.data);
+
+  const handlerOptions: GenericHandlerOptions = {};
+  const logs: unknown[] = [];
+  new ErrorHandlingPlugin({
+    serviceName: 'auth',
+    exposeInternalErrors: true,
+    logger: {
+      error: (context) => logs.push(context),
+      warn: (context) => logs.push(context),
+    },
+  }).init(handlerOptions);
+  const interceptor = handlerOptions.clientInterceptors?.[0];
+  assert(interceptor);
+
+  const mapped = await assertRejects(
+    () =>
+      interceptor({
+        path: ['v1', 'auth', procedure],
+        input: {},
+        next: () => {
+          throw error;
+        },
+      }),
+    ORPCError,
+    error.message,
+  );
+  assertEquals(mapped.code, expected.code);
+  assertEquals(mapped.status, expected.status);
+  assertEquals(mapped.data, expected.data);
+  assertEquals(logs.length, 1);
+}
+
 function fakeBackend(name = 'kv-oauth'): AuthBackendPort {
   const stored = new Map<string, ReturnType<typeof buildAuthSession>>();
   return {
@@ -139,9 +270,10 @@ function fakeBackend(name = 'kv-oauth'): AuthBackendPort {
       refreshSession: (sessionId) => stored.get(sessionId) ?? buildAuthSession({ id: sessionId }),
       revokeSession: (sessionId) => {
         const current = stored.get(sessionId) ?? buildAuthSession({ id: sessionId });
+        const revokedState: ReturnType<typeof buildAuthSession>['state'] = 'revoked';
         const revoked = {
           ...current,
-          state: 'revoked' as const,
+          state: revokedState,
           revokedAt: new Date().toISOString(),
         };
         stored.set(sessionId, revoked);
@@ -180,6 +312,29 @@ function fakeBackend(name = 'kv-oauth'): AuthBackendPort {
           claims: { sessionId: current.id },
         },
       };
+    },
+  };
+}
+
+function sessionThrowingBackend(name = 'kv-oauth'): AuthBackendPort {
+  const backend = fakeBackend(name);
+  return {
+    ...backend,
+    sessions: {
+      ...backend.sessions,
+      getSession: () => {
+        throw new Error('session store unavailable');
+      },
+    },
+  };
+}
+
+function authenticateThrowingBackend(name = 'kv-oauth'): AuthBackendPort {
+  const backend = fakeBackend(name);
+  return {
+    ...backend,
+    authenticate: () => {
+      throw new Error('authenticate unavailable');
     },
   };
 }

@@ -30,11 +30,11 @@ const healthContractV1 = implement(healthContract);
 /** Auth API health handlers. */
 export const health: Record<string, unknown> = {
   live: healthContractV1.live.handler(() => ({
-    status: 'ok' as const,
+    status: 'ok',
     timestamp: new Date().toISOString(),
   })),
   ready: healthContractV1.ready.handler(() => ({
-    status: 'ready' as const,
+    status: 'ready',
     timestamp: new Date().toISOString(),
   })),
 };
