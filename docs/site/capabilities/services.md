@@ -8,13 +8,13 @@ next: { label: "Background jobs", href: "/capabilities/background-jobs/" }
 
 # Services & contracts
 
-A NetScript **service** is a typed HTTP runtime that *implements* an `@orpc/contract`
-definition — you author the contract once (route + zod input/output), `implement()` it,
-bind `.handler()`s, and serve the resulting router. The contract object is the single
-source of truth: the same object a typed client imports is the one the server
-implements, so caller and server cannot drift. The example `users` service answers on
-port **3001** with both an OpenAPI surface (`/api/v1/users/*`) and an oRPC endpoint
-(`/rpc`).
+A NetScript **service** is a typed HTTP runtime that *implements* an
+[`@orpc/contract`](/explanation/contracts/) definition. You author the contract once
+(route + zod input/output), `implement()` it, bind `.handler()`s, and serve the resulting
+router on a Hono + oRPC runtime. The contract object is the single source of truth: the
+same object a typed client imports is the one the server implements, so caller and server
+**cannot drift**. The example `users` service answers on port **3001** with both an
+OpenAPI surface (`/api/v1/users/*`) and a typed oRPC endpoint (`/api/rpc/*`).
 
 {{ comp callout { type: "tip", title: "Use this when" } }}
 Reach for a service when you need a <strong>synchronous, request/response API</strong> with
@@ -23,7 +23,9 @@ an internal RPC boundary, or a public REST/OpenAPI endpoint. For <em>fire-and-fo
 work use a <a href="/capabilities/background-jobs/">background job</a>; for
 <em>message-driven, long-running</em> orchestration use a
 <a href="/capabilities/durable-sagas/">durable saga</a>; for <em>inbound HTTP that kicks
-off work</em> use a <a href="/capabilities/triggers/">trigger</a>.
+off work</em> use a <a href="/capabilities/triggers/">trigger</a>; for
+<em>signed-in identity and sessions</em> compose the
+<a href="/capabilities/auth/">auth plugin</a>.
 {{ /comp }}
 
 ## The contract is the source of truth
@@ -32,7 +34,8 @@ Before there is a service there is a contract. A contract is plain `@orpc/contra
 routes whose inputs and outputs are zod schemas, collected into an object and passed to
 `implement()` from `@orpc/server`. `implement()` returns a `.handler()`-bindable object
 the service router consumes. The example workspace versions its contracts under
-`contracts/versions/v1/` and re-exports them as `@<project>/contracts`.
+`contracts/versions/v1/` and re-exports them as `@<project>/contracts` — so a contract
+bump is an explicit, reviewable version directory, never an accidental break.
 
 ```ts
 // contracts/versions/v1/users.contract.ts
@@ -41,7 +44,7 @@ import { oc } from '@orpc/contract';
 import { implement } from '@orpc/server';
 
 export const UsersContractV1 = {
-  health: { check: oc.route({ method: 'GET' }).input(z.object({}).optional()).output(UsersHealthSchemaV1) },
+  health: oc.route({ method: 'GET' }).input(z.object({}).optional()).output(UsersHealthSchemaV1),
   list: oc.route({ method: 'POST' }).input(UsersListInputSchemaV1).output(UsersListResponseSchemaV1),
   updateStatus: oc.route({ method: 'POST' }).input(UsersUpdateStatusInputSchemaV1).output(UsersUpdateStatusResponseSchemaV1),
 };
@@ -50,14 +53,19 @@ export const UsersContractV1 = {
 export const UsersV1 = implement(UsersContractV1);
 ```
 
+The chain end-to-end — contract → `implement()` → `.handler()` → typed client → query →
+island — is laid out in [Contracts](/explanation/contracts/). The key property: the
+client imports the *same* contract object, so a renamed field or a changed output shape is
+a **compile error in both the handler and the caller** before it can ship.
+
 ## Headline API: two ways to construct a service
 
 NetScript ships **two** service-construction APIs, and the example project uses both.
 Workspace services use the one-call `defineService(router, options)` — the right default
-for the 80% case. Plugin API services (workers, sagas) use the fluent
+for the 80% case. Plugin API services (workers, sagas, auth) use the fluent
 `createService(router, options).with*().serve()` builder when they need to add CORS,
-OpenAPI, a database client, or custom context step by step. Both stand up the same
-Hono + oRPC runtime.
+OpenAPI, a database client, auth middleware, or custom context step by step. Both stand up
+the same Hono + oRPC runtime; `defineService` is a curated preset over the same builder.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -83,17 +91,17 @@ Prisma comes later; see <a href="/capabilities/database/">Database</a>.
 
 ## Endpoints & ports
 
-A `defineService` runtime exposes its OpenAPI routes, an oRPC `/rpc` endpoint, and a
-health check. The example `users` service is reachable once `aspire run` is up (Aspire
-provisions Postgres/Garnet first) or when you run it directly with
-`deno task --cwd services/users dev`.
+A `defineService` runtime exposes its OpenAPI routes, a typed oRPC endpoint mounted under
+`/api/rpc/*`, and a health check. The example `users` service is reachable once
+`aspire run` is up (Aspire provisions Postgres/Garnet first) or when you run it directly
+with `deno task --cwd services/users dev`.
 
 {{ comp.apiTable({
   caption: "Users service surface (port 3001)",
   rows: [
     { name: "/api/v1/users/*", type: "HTTP/OpenAPI", desc: "REST surface generated from the contract (list, updateStatus, health)." },
-    { name: "/api/rpc/v1/...", type: "oRPC", desc: "Typed RPC endpoint a generated client calls — same contract object, no drift." },
-    { name: "/rpc", type: "oRPC", desc: "Mounted oRPC handler entrypoint for the service router." },
+    { name: "/api/rpc/*", type: "oRPC", desc: "Typed RPC endpoint a generated client calls — same contract object, no drift. This is the served default path (not /rpc)." },
+    { name: "/health", type: "HTTP", desc: "Liveness/readiness check; anonymous by default (excluded from authn)." },
     { name: ":3001", type: "port", desc: "Default service port; read from Deno.env.get('PORT') || '3001'." }
   ]
 }) }}
@@ -104,6 +112,54 @@ Services that touch the database need orchestration up first:
 <a href="http://localhost:18888">http://localhost:18888</a>) <strong>before</strong> any
 <code>netscript db</code> command. The seeded-records example service runs without the DB,
 but the real workflow expects Aspire running. See <a href="/explanation/aspire/">Aspire</a>.
+{{ /comp }}
+
+## Service-layer authn / authz middleware
+
+The service builder ships a **provider-agnostic** authentication and authorization seam in
+`@netscript/service/auth`. It is a thin Hono-middleware layer over the request pipeline —
+deliberately **distinct from the [auth plugin](/capabilities/auth/)**, which composes a
+sign-in/session backend (kv-oauth, WorkOS, better-auth). Use this seam when a service needs
+to gate its own routes — verify a credential, trust an upstream identity header, or check a
+scope — without taking on an interactive identity provider.
+
+Two middlewares wrap the request: `createAuthnMiddleware` resolves a `Principal`
+(authentication), and `createAuthzMiddleware` makes an `AuthzDecision` from that principal
+(authorization). By default the `/api` surface is protected and `/health` is anonymous.
+Both are pluggable through small ports — `AuthenticatorPort`, `AuthorizerPort` — so you
+supply the strategy and the seam stays the same.
+
+{{ comp.apiTable({
+  caption: "@netscript/service/auth surface",
+  rows: [
+    { name: "createStaticCredentialAuthenticator", type: "authenticator", desc: "Matches a configured static credential (e.g. API key / shared secret) → Principal." },
+    { name: "createTrustedHeaderAuthenticator", type: "authenticator", desc: "Trusts an identity asserted by an upstream proxy header (e.g. behind a gateway)." },
+    { name: "createScopeAuthorizer", type: "authorizer", desc: "Allows/denies a request by checking the Principal's scopes against required scopes." },
+    { name: ".withAuthn({ authenticator })", type: "builder method", desc: "Installs the authentication gate on createService(); the authn middleware is created and wired internally. Protects /api by default, leaves /health anonymous." },
+    { name: ".withAuthz({ authorizer })", type: "builder method", desc: "Installs the authorization gate on createService(); the authz middleware is created and wired internally from the Principal." }
+  ]
+}) }}
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "Fluent — withAuthn / withAuthz",
+    lang: "ts",
+    code: "// Gate a service with a static credential + scope check\nimport { createService } from '@netscript/service';\nimport {\n  createStaticCredentialAuthenticator,\n  createScopeAuthorizer,\n} from '@netscript/service/auth';\nimport { router } from './router.ts';\n\nconst authenticator = createStaticCredentialAuthenticator({\n  credentials: {\n    [Deno.env.get('SERVICE_API_KEY') ?? '']: {\n      subject: 'service:ci',\n      scopes: ['users:write'],\n    },\n  },\n});\nconst authorizer = createScopeAuthorizer({\n  rules: [{ match: () => true, requireScopes: ['users:write'] }],\n  denyByDefault: true,\n});\n\nawait createService(router, { name: 'users', version: '1.0.0', port: 3001 })\n  .withRPC()\n  .withAuthn({ authenticator })\n  .withAuthz({ authorizer })\n  .withHealth() // /health stays anonymous\n  .serve();"
+  },
+  {
+    label: "Trusted-header (behind a gateway)",
+    lang: "ts",
+    code: "// Trust identity asserted by an upstream proxy/gateway\nimport { createTrustedHeaderAuthenticator } from '@netscript/service/auth';\n\n// The Principal is assembled internally from these header NAMES — point at the\n// headers your gateway sets; you do not map values yourself.\nconst authenticator = createTrustedHeaderAuthenticator({\n  subjectHeader: 'x-forwarded-user',\n  scopesHeader: 'x-forwarded-scopes', // optional; space/comma-separated\n});\n\n// then: .withAuthn({ authenticator })"
+  }
+] }) }}
+
+{{ comp callout { type: "note", title: "Service-auth seam vs. the auth plugin" } }}
+This middleware is for <strong>machine-to-machine and gateway-fronted</strong> gating: static
+credentials, trusted upstream headers, scope checks. It does <em>not</em> do interactive
+sign-in, OAuth callbacks, or session cookies. For <strong>signed-in human users</strong>
+(sign-in / callback / session / me), compose the
+<a href="/capabilities/auth/"><code>auth</code> plugin</a> backend instead — the two layers
+are complementary and can run together.
 {{ /comp }}
 
 ## Where to go next
@@ -126,7 +182,7 @@ lane that matches what you're doing.
   },
   {
     title: "Look up — @netscript/service reference",
-    body: "The full generated API: defineService, createService, the fluent builder, and runtime options.",
+    body: "The full generated API: defineService, createService, the fluent builder, the /auth middleware seam, and runtime options.",
     href: "/reference/service/",
     icon: "≡"
   },

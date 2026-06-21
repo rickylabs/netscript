@@ -3,23 +3,25 @@ layout: layouts/base.vto
 title: Author a plugin
 templateEngine: [vento, md]
 prev: { label: "Deploy", href: "/how-to/deploy/" }
-next: null
+next: { label: "Add authentication", href: "/how-to/add-authentication/" }
 ---
 
 # Author a plugin
 
 **Scope.** This recipe shows how to author a *new* custom plugin from scratch — its canonical
-location, the manifest it exports, the contribution shape the kernel reads, and the registry that
-makes its contributions discoverable at runtime. It is the advanced companion to
-[Add a first-party plugin](/how-to/add-a-plugin/), which only *installs* one of the four official
-plugins (`workers`, `sagas`, `triggers`, `streams`). If you just want a worker or a saga, install it
-there. Come here when you need a capability NetScript does not ship.
+location, the manifest it exports through `definePlugin(...)`, the contribution shape the kernel
+reads, and the generated registry that makes those contributions discoverable at runtime. It is the
+advanced companion to [Add a first-party plugin](/how-to/add-a-plugin/), which only *installs* one
+of the four official plugins (`workers`, `sagas`, `triggers`, `streams`). If you just want a worker
+or a saga, install it there. Come here when you need a capability NetScript does not ship.
 
 A NetScript plugin is a workspace member under **`plugins/<name>/`** whose `mod.ts` exports a plugin
-**manifest**. The framework discovers it because `netscript.config.ts` lists `./plugins/<name>/mod.ts`,
-and it discovers the plugin's *contributions* (jobs, webhooks, topics, services) through a generated
-**registry**. Get those three things right — location, manifest, registry — and the kernel wires the
-rest.
+**manifest** built with `definePlugin`. The framework discovers it because `netscript.config.ts`
+lists `./plugins/<name>/mod.ts`, and it discovers the plugin's *contributions* (jobs, services,
+stream topics, DB schemas, e2e gates) through a generated **registry**. Get those three things right
+— location, manifest, registry — and the kernel wires the rest. The conceptual model behind that
+wiring lives in [The plugin model](/explanation/plugin-model/); the generated manifest and
+contribution types live in the [plugin reference](/reference/plugin/).
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
 If your plugin contributes an API service or a background processor, those run as resources in the
@@ -34,14 +36,16 @@ first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the res
 
 You need an existing workspace and a clear idea of what your plugin *contributes*. The official
 plugins are the reference implementations — read one that resembles your goal before you write a
-line.
+line. The richest real-world exemplar is the **auth plugin**: a multi-package plugin (`plugins/auth/`
+plus `@netscript/plugin-auth-core` and three backend adapters) that composes a core seam, swappable
+adapters, and a single oRPC service. Study it when your plugin spans more than one package.
 
 {{ comp.apiTable({
   caption: "Prerequisites",
   rows: [
     { name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
     { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts. Confirm with netscript --help." },
-    { name: "A reference plugin", type: "plugins/<name>/", desc: "Install a first-party plugin with --samples and read its mod.ts + scaffold.plugin.json as your template." },
+    { name: "A reference plugin", type: "plugins/<name>/", desc: "Install a first-party plugin with --samples and read its mod.ts + scaffold.plugin.json as your template. The auth plugin is the best multi-package exemplar." },
     { name: "Provider kind", type: "worker | saga | trigger | stream | plugin", desc: "Decide which archetype your plugin is. Utility/infra plugins use kind 'stream' or the generic 'plugin'." }
   ]
 }) }}
@@ -62,18 +66,19 @@ yours, then read and adapt it:
 netscript plugin add worker --samples   # gives you plugins/workers/ to study
 ```
 
-A minimal hand-authored plugin needs only a `mod.ts` manifest and a `scaffold.plugin.json` manifest
-descriptor. A capability-bearing plugin adds contribution modules, a `deno.json`, and (optionally) a
-`services/`, `bin/`, `database/`, and `contracts/` tree:
+A minimal hand-authored plugin needs only a `mod.ts` manifest (built with `definePlugin`) and a
+`scaffold.plugin.json` manifest descriptor. A capability-bearing plugin adds contribution modules, a
+`deno.json`, and (optionally) a `services/`, `bin/`, `database/`, and `contracts/` tree:
 
 ```
 plugins/notifier/
-├── mod.ts                 # ← public manifest: exports the plugin object + an inspect fn
+├── mod.ts                 # ← public manifest: exports definePlugin(...).build() + an inspect fn
 ├── scaffold.plugin.json   # ← manifest descriptor read by the CLI/kernel (provider.kind, ports…)
 ├── deno.json              # workspace member: name, exports, import map
 ├── contracts/v1/          # (optional) oRPC contract re-exports, frontend-safe
 ├── database/notifier.prisma  # (optional) plugin's Prisma models, aggregated at db generate
 ├── services/src/          # (optional) the plugin's API service (main.ts, router.ts)
+├── jobs/                  # (optional) worker job-handler contributions
 └── bin/combined.ts        # (optional) background-processor entrypoint
 ```
 
@@ -109,7 +114,7 @@ A worker-archetype descriptor looks like this — copy the shape and change the 
   {
     label: "scaffold.plugin.json",
     lang: "json",
-    code: "{\n  \"provider\": {\n    \"kind\": \"worker\",\n    \"category\": \"background-processor\",\n    \"defaultEntrypoint\": \"bin/combined.ts\",\n    \"defaultServiceEntrypoint\": \"services/src/main.ts\",\n    \"defaultRequiresDb\": true,\n    \"defaultRequiresKv\": true,\n    \"concurrencyEnvVar\": \"WORKER_CONCURRENCY\"\n  },\n  \"officialSource\": {\n    \"canonicalName\": \"notifier\",\n    \"servicePort\": 8094,\n    \"dependencies\": [\"streams\"]\n  }\n}"
+    code: "{\n  \"provider\": {\n    \"kind\": \"worker\",\n    \"category\": \"background-processor\",\n    \"defaultEntrypoint\": \"bin/combined.ts\",\n    \"defaultServiceEntrypoint\": \"services/src/main.ts\",\n    \"defaultRequiresDb\": true,\n    \"defaultRequiresKv\": true,\n    \"concurrencyEnvVar\": \"WORKER_CONCURRENCY\"\n  },\n  \"officialSource\": {\n    \"canonicalName\": \"notifier\",\n    \"servicePort\": 8095,\n    \"dependencies\": [\"streams\"]\n  }\n}"
   },
   {
     label: "What the kernel reads it for",
@@ -120,35 +125,41 @@ A worker-archetype descriptor looks like this — copy the shape and change the 
 
 {{ comp callout { type: "warning", title: "Pick a free port" } }}
 The official plugins claim <code>:8091</code> (workers), <code>:8092</code> (sagas),
-<code>:8093</code> (triggers), and <code>:4437</code> (streams). Choose a
-<strong>different</strong> port for your custom plugin's service (for example <code>:8094</code>) so
-it does not collide in the Aspire graph.
+<code>:8093</code> (triggers), <code>:8094</code> (<strong>auth</strong>), and <code>:4437</code>
+(streams). Choose a <strong>different</strong> port for your custom plugin's service (for example
+<code>:8095</code>) so it does not collide in the Aspire graph.
 {{ /comp }}
 
 ## Step 3 — Export the manifest from `mod.ts`
 
-`mod.ts` is the plugin's public surface. It exports the **plugin object** (the manifest the kernel
-loads) plus an `inspect*` helper, mirroring the official plugins — for example workers'
-`mod.ts` exports `{ workersPlugin, inspectWorkers }`, sagas exports
-`{ sagasPlugin, inspectSagas, SAGAS_API_DEFAULT_PORT, SAGAS_PLUGIN_ID }`, and triggers exports
-`{ triggersPlugin, inspectTriggers, TRIGGERS_API_DEFAULT_PORT }`. Follow the same convention:
+`mod.ts` is the plugin's public surface. It exports the **manifest** — built with the
+`definePlugin(name, version)` fluent builder from `@netscript/plugin` — plus an `inspect*` helper,
+mirroring the official plugins. The builder is the doctrine-true way to assemble a manifest: each
+`withX(...)` method adds one contribution axis, and `.build()` validates the result against the
+manifest schema and freezes it. Follow the same convention the scaffold emits:
 
 {{ comp.tabbedCode({ tabs: [
   {
     label: "plugins/notifier/mod.ts",
     lang: "ts",
-    code: "// Public manifest for the notifier plugin.\n// Mirrors the official plugins: export the plugin object + an inspect helper.\nexport const NOTIFIER_PLUGIN_ID = 'notifier' as const;\nexport const NOTIFIER_PLUGIN_VERSION = '1.0.0' as const;\nexport const NOTIFIER_API_DEFAULT_PORT = 8094 as const;\n\nexport const notifierPlugin = Object.freeze({\n  id: NOTIFIER_PLUGIN_ID,\n  version: NOTIFIER_PLUGIN_VERSION,\n  kind: 'worker',\n  servicePort: NOTIFIER_API_DEFAULT_PORT,\n  dependencies: ['streams'],\n});\n\nexport const inspectNotifier = () => ({\n  id: NOTIFIER_PLUGIN_ID,\n  version: NOTIFIER_PLUGIN_VERSION,\n  port: NOTIFIER_API_DEFAULT_PORT,\n});\n\nexport default notifierPlugin;"
+    code: "// Public manifest for the notifier plugin.\n// Mirrors the official plugins: build the manifest with definePlugin(...),\n// then export it alongside an inspect helper.\nimport { definePlugin } from '@netscript/plugin';\n\nexport const NOTIFIER_PLUGIN_ID = 'notifier' as const;\nexport const NOTIFIER_API_DEFAULT_PORT = 8095 as const;\n\nexport const notifierPlugin = definePlugin('@notifier/plugin', '0.1.0')\n  .withDescription('Delivers user notifications via worker jobs.')\n  .withLicense('MIT')\n  .withAuthor('Acme Platform Team')\n  .withDependencies({ streams: true })\n  .withE2e([{ name: 'notifier.smoke', command: 'deno test --allow-all tests/' }])\n  .build();\n\nexport const inspectNotifier = () => ({\n  id: NOTIFIER_PLUGIN_ID,\n  version: notifierPlugin.version,\n  port: NOTIFIER_API_DEFAULT_PORT,\n});\n\nexport default notifierPlugin;"
+  },
+  {
+    label: "Contribution axes on the builder",
+    lang: "ts",
+    code: "// definePlugin(name, version) returns a PluginBuilder. Each axis is one\n// withX(...) call; .build() validates + freezes the manifest.\n//\n//   .withService(...)             -> an oRPC/API service contribution\n//   .withBackgroundProcessor(...) -> a worker/saga processor entrypoint\n//   .withStreamTopics([...])      -> durable stream topic schemas\n//   .withDbSchemas([...])         -> Prisma models aggregated at db generate\n//   .withContractVersions([...])  -> versioned oRPC contracts\n//   .withRuntimeConfigTopics([...]) -> runtime-config schemas\n//   .withMigrations([...])        -> DB migration contributions\n//   .withE2e([...])               -> merge-readiness gates\n//   .withDependencies({...})      -> plugins wired ahead of this one\n//   .withAspire(modulePath)       -> the Aspire contribution module\n//   .build()                      -> immutable, schema-validated manifest"
   },
   {
     label: "plugins/notifier/deno.json",
     lang: "json",
-    code: "{\n  \"name\": \"@notifier/plugin\",\n  \"version\": \"1.0.0\",\n  \"exports\": {\n    \".\": \"./mod.ts\",\n    \"./contracts\": \"./contracts/v1/mod.ts\"\n  },\n  \"imports\": {\n    \"@netscript/plugin-workers-core\": \"jsr:@netscript/plugin-workers-core\",\n    \"zod\": \"jsr:@zod/zod@4.4.3\"\n  }\n}"
+    code: "{\n  \"name\": \"@notifier/plugin\",\n  \"version\": \"0.1.0\",\n  \"exports\": {\n    \".\": \"./mod.ts\",\n    \"./contracts\": \"./contracts/v1/mod.ts\"\n  },\n  \"imports\": {\n    \"@netscript/plugin\": \"jsr:@netscript/plugin\",\n    \"@netscript/plugin-workers-core\": \"jsr:@netscript/plugin-workers-core\",\n    \"zod\": \"jsr:@zod/zod@4.4.3\"\n  }\n}"
   }
 ] }) }}
 
-The plugin object is data, not behavior: it declares *what* the plugin is (id, kind, port,
-dependencies). The actual capability lives in the contribution modules you write next, which the
-registry binds to the kernel.
+The manifest is data, not behavior: it declares *what* the plugin is (name, version, dependencies)
+and *which contribution axes* it owns. The actual capability lives in the contribution modules you
+write next, which the registry binds to the kernel. See the [plugin reference](/reference/plugin/)
+for the full builder surface and the manifest type it produces.
 
 ## Step 4 — Author a contribution
 
@@ -159,9 +170,9 @@ your `provider.kind`:
   caption: "Contribution authoring API by kind",
   rows: [
     { name: "worker", type: "defineJobHandler", desc: "A job: defineJobHandler(async (ctx) => …) + createSuccessResult/createFailureResult; id via Object.assign(handler, { id }). Lives in jobs/." },
-    { name: "saga", type: "defineSaga(id)…build()", desc: "Fluent builder: .durability('t1').state<S>({…}).on<Type,Payload>(type, fn).build(); effects via sagaComplete({…})." },
-    { name: "trigger", type: "defineWebhook", desc: "defineWebhook(handler, { id, path, verifier, tags }); handler returns enqueueJob(jobRef, { payload, priority })[]. Raw Hono routes, NOT oRPC." },
-    { name: "stream", type: "defineStreamTopic", desc: "defineStreamTopic(name, schema); producer/consumer (defineStreamProducer/Consumer) are stubs — topic-runtime is deferred." }
+    { name: "saga", type: "defineSaga(id)…build()", desc: "Fluent builder: .durability('t1').state<S>({…}).on<Type,Payload>(type, fn).build(); effects via sagaComplete({…}). Durable store is kv | prisma." },
+    { name: "trigger", type: "defineWebhook", desc: "defineWebhook(handler, { id, path, verifier, tags }); handler returns enqueueJob(jobRef, { payload, priority })[]. Raw Hono routes, NOT oRPC. enqueueJob is live; defer throws + routes to DLQ." },
+    { name: "stream", type: "createDurableStream / defineStreamSchema", desc: "Real producer runtime via @netscript/plugin-streams-core. The @netscript/plugin-streams manifest helpers (defineStreamProducer/Consumer) fail loud — they throw StreamUnsupportedOperationError." }
   ]
 }) }}
 
@@ -177,19 +188,29 @@ API the official workers plugin uses — drop the file in `plugins/notifier/jobs
   {
     label: "Trigger archetype (Hono, not oRPC)",
     lang: "ts",
-    code: "import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\n\n// A webhook contribution: returns an array of enqueueJob effects that\n// bind inbound HTTP to worker jobs. The triggers service mounts raw Hono\n// routes — there is no oRPC contract layer here.\nexport const inbound = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(jobRef, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  { id: 'notifier-inbound', path: 'inbound/notify', verifier: 'memory', tags: ['webhook'] },\n);\nexport default inbound;"
+    code: "import { defineWebhook, enqueueJob } from '@netscript/plugin-triggers-core/builders';\n\n// A webhook contribution: returns an array of enqueueJob effects that\n// bind inbound HTTP to worker jobs. The triggers service mounts raw Hono\n// routes — there is no oRPC contract layer here. enqueueJob is the only\n// live action; a defer action throws and routes to the DLQ.\nexport const inbound = defineWebhook(\n  () => Promise.resolve([\n    enqueueJob(jobRef, { payload: { verbose: false }, priority: 50 }),\n  ]),\n  { id: 'notifier-inbound', path: 'inbound/notify', verifier: 'memory', tags: ['webhook'] },\n);\nexport default inbound;"
+  },
+  {
+    label: "Stream producer (real runtime)",
+    lang: "ts",
+    code: "import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';\n\n// The producer runtime is REAL. createDurableStream serves a durable\n// stream (an Aspire service on :4437) you can upsert/delete/flush against.\nconst schema = defineStreamSchema({ /* topic entity schema */ });\nconst producer = createDurableStream({\n  streamPath: '/notifier/events',\n  schema,\n  producerId: 'notifier-service',\n});\nproducer.upsert('event', { id: 'evt-1', status: 'sent' });"
   }
 ] }) }}
 
-{{ comp callout { type: "warning", title: "Honest edges: triggers are Hono, streams are stubs" } }}
+{{ comp callout { type: "warning", title: "Honest edges: triggers are Hono, stream helpers fail loud" } }}
 Two reality checks the official plugins make explicit. <strong>Triggers</strong> expose
 <strong>raw Hono routes</strong>, not oRPC — the triggers service mounts
-<code>app.route('/api/v1/webhooks', …)</code> and dispatches by trigger id; do not expect an oRPC
-contract for them. <strong>Streams</strong> producer/consumer handles
-(<code>defineStreamProducer</code> / <code>defineStreamConsumer</code>) are
-<strong>no-op stubs today</strong> — topic-centric pub/sub is deferred. Author stream
-<em>topic schemas</em> with <code>@netscript/plugin-streams-core</code>; don't promise a live runtime
-yet.
+<code>app.route('/api/v1/webhooks', …)</code> and dispatches by trigger id; the supported action is
+<code>enqueueJob</code> (live), while <code>defer</code> is defined-but-unsupported (it
+<strong>throws</strong> and routes to the DLQ — no deferred replay). <strong>Streams</strong> are
+split: the <strong>producer runtime is real</strong> via
+<code>@netscript/plugin-streams-core</code>'s <code>createDurableStream</code> (served as an Aspire
+service on <code>:4437</code> and used by the workers, auth, and sagas plugins). Only the
+<code>@netscript/plugin-streams</code> manifest helpers
+(<code>defineStreamProducer</code> / <code>defineStreamConsumer</code>) are unsupported — they
+<strong>fail loud</strong>, throwing <code>StreamUnsupportedOperationError</code>, and redirect you
+to the core package. There is no in-process consumer <code>subscribe()</code>; consume over HTTP/SSE.
+See <a href="/capabilities/streams/">Streams</a> for the producer-vs-helper split.
 {{ /comp }}
 
 ## Step 5 — Register the plugin in `netscript.config.ts`
@@ -214,7 +235,7 @@ jobs registry (e.g. `.netscript/generated/plugin-<name>/jobs.registry.ts`) keyed
 `id`. Generate it:
 
 ```sh
-netscript generate
+netscript generate plugins
 ```
 
 If your plugin contributes runtime configuration schemas, also generate those:
@@ -242,13 +263,13 @@ netscript plugin doctor    # checks plugin health and reports wiring problems
 ```
 
 With Aspire running, your plugin's service is live on the port you chose. Confirm it and exercise a
-contribution — for the `notifier` worker example on `:8094`:
+contribution — for the `notifier` worker example on `:8095`:
 
 ```sh
-curl http://localhost:8094/health
-curl http://localhost:8094/api/v1/notifier/jobs
+curl http://localhost:8095/health
+curl http://localhost:8095/api/v1/notifier/jobs
 
-curl -X POST http://localhost:8094/api/v1/notifier/jobs/send-notification/trigger \
+curl -X POST http://localhost:8095/api/v1/notifier/jobs/send-notification/trigger \
   -H 'content-type: application/json' \
   -d '{ "payload": { "userId": "user-42" } }'
 ```
@@ -256,6 +277,35 @@ curl -X POST http://localhost:8094/api/v1/notifier/jobs/send-notification/trigge
 You should see the contribution registered in the jobs list and an execution recorded after you
 trigger it. Watch it live in the Aspire dashboard at
 [http://localhost:18888](http://localhost:18888) under your plugin's resource.
+
+## A real multi-package exemplar: the auth plugin
+
+When your plugin grows beyond a single package — a core seam plus swappable adapters plus one service
+— the **auth plugin** is the production reference to copy. It is built from five units:
+
+{{ comp.apiTable({
+  caption: "Auth plugin topology (a multi-package plugin)",
+  rows: [
+    { name: "@netscript/plugin-auth-core", type: "core seam", desc: "Defines AuthBackendPort, domain types, contracts/v1, and stream events. Adapters depend on it; it depends on no adapter." },
+    { name: "@netscript/auth-kv-oauth", type: "backend adapter", desc: "Interactive OAuth/OIDC backend (the only backend with an interactive sign-in flow). Default backend." },
+    { name: "@netscript/auth-workos", type: "backend adapter", desc: "Non-interactive WorkOS AuthKit backend; signin/callback return unsupported on this backend." },
+    { name: "@netscript/auth-better-auth", type: "backend adapter", desc: "Non-interactive better-auth backend; signin/callback return unsupported on this backend." },
+    { name: "@netscript/plugin-auth (plugins/auth/)", type: "unifying plugin", desc: "Composes ONE active backend (NETSCRIPT_AUTH_BACKEND, default kv-oauth) into one oRPC service (auth-api on :8094)." }
+  ]
+}) }}
+
+The pattern to copy: a **core package owns the port** (`AuthBackendPort`), each **adapter is pure**
+(implements the port, declares no service), and the **plugin under `plugins/<name>/`** composes one
+active adapter into a single service and registry. That keeps adapters swappable and the kernel-facing
+manifest small. Build the full thing in [Add authentication](/how-to/add-authentication/) — that page
+is the concrete walkthrough for the auth plugin specifically.
+
+{{ comp callout { type: "note", title: "Alpha specifiers are forward-looking" } }}
+The auth packages are published at <code>0.0.1-alpha.0</code>. CLI scaffolds may pin
+<code>jsr:@netscript/plugin-auth-core@^1.0.0</code> and siblings — those specifiers are
+forward-looking and are <strong>not installable at <code>1.0</code> today</strong>. Treat them as a
+target, not a current release.
+{{ /comp }}
 
 ## Production pitfalls
 
@@ -267,17 +317,21 @@ is almost always the cause. DB-backed plugins also need it up before <code>netsc
 <li><strong>Stale registry</strong> — the runtime reads a generated registry, not your source tree.
 Forgetting <code>netscript generate</code> after adding a contribution is the most common "my job
 isn't registered" bug. Regenerate, then restart Aspire.</li>
-<li><strong>Port collision</strong> — do not reuse <code>:8091</code>/<code>:8092</code>/<code>:8093</code>/<code>:4437</code>.
+<li><strong>Port collision</strong> — do not reuse <code>:8091</code>/<code>:8092</code>/<code>:8093</code>/<code>:8094</code>/<code>:4437</code>.
 Set a free <code>servicePort</code> in both <code>scaffold.plugin.json</code> and
 <code>mod.ts</code>.</li>
 <li><strong>Wrong canonical directory</strong> — author in <code>plugins/&lt;name&gt;/</code>, the
 directory <code>netscript.config.ts</code> references. Edits to a top-level staging copy are not the
 source of truth.</li>
 <li><strong>Mismatched archetype expectations</strong> — a <code>trigger</code> plugin serves raw
-Hono routes (no oRPC), and a <code>stream</code> plugin's producer/consumer runtime is stubbed.
-Match your plugin's behavior to its declared <code>provider.kind</code>.</li>
+Hono routes (no oRPC) and only the <code>enqueueJob</code> action is live; a <code>stream</code>
+plugin's real runtime is the <em>producer</em> in <code>@netscript/plugin-streams-core</code>, while
+the <code>@netscript/plugin-streams</code> manifest helpers throw
+<code>StreamUnsupportedOperationError</code>. Match your plugin's behavior to its declared
+<code>provider.kind</code>.</li>
 <li><strong>Unstated dependencies</strong> — if your plugin needs another plugin wired ahead of it,
-declare it in <code>officialSource.dependencies</code> so the Aspire graph orders them correctly.</li>
+declare it with <code>.withDependencies({...})</code> on the manifest and in
+<code>officialSource.dependencies</code> so the Aspire graph orders them correctly.</li>
 </ul>
 {{ /comp }}
 
@@ -293,6 +347,13 @@ declare it in <code>officialSource.dependencies</code> so the Aspire graph order
 }) }}
 
 {{ comp.card({
+  title: "Add authentication",
+  body: "Build the multi-package auth plugin — the production exemplar for a core seam plus swappable backends.",
+  href: "/how-to/add-authentication/",
+  icon: "→"
+}) }}
+
+{{ comp.card({
   title: "The plugin model",
   body: "Why plugins are thread-isolated background processors, and how the kernel loads them.",
   href: "/explanation/plugin-model/",
@@ -301,7 +362,7 @@ declare it in <code>officialSource.dependencies</code> so the Aspire graph order
 
 {{ comp.card({
   title: "plugin reference",
-  body: "The generated @netscript/plugin API — manifest types, contribution shapes, host surface.",
+  body: "The generated @netscript/plugin API — definePlugin builder, manifest type, contribution shapes.",
   href: "/reference/plugin/",
   icon: "§"
 }) }}

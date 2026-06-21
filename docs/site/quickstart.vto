@@ -4,24 +4,34 @@ title: Quickstart
 templateEngine: [vento, md]
 ---
 
-{{ comp.breadcrumb() }}
-
 # Quickstart
 
 From nothing to a running NetScript workspace you can watch boot — in about five
-minutes. We'll install the CLI, scaffold a project, and start it under Aspire so
-you get a real dashboard and a handful of example routes on the first run.
+minutes. Three commands: **install** the CLI, **scaffold** a project, then bring it
+up under **Aspire**, which starts Postgres and Garnet for you *before* anything else
+and hands you a real dashboard, distributed traces, and a handful of example routes
+on the very first run.
 
 {{ comp callout { type: "note", title: "Prerequisites" } }}
-You need <strong><a href="https://docs.deno.com">Deno</a> 2.x</strong> on your PATH (<code>deno --version</code>).
+You need <strong><a href="https://docs.deno.com">Deno</a> 2.x</strong> on your PATH (check with <code>deno --version</code>).
 The default path also uses <strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire</a></strong>
-for orchestration — install the <code>aspire</code> CLI if you don't have it, or skip it with
-<code>--no-aspire</code> (see the aside below).
+to orchestrate Postgres, Garnet, and your services — install the <code>aspire</code> CLI if you don't have it,
+or skip orchestration entirely with <code>--no-aspire</code> (see the aside in step 3).
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Alpha" } }}
-NetScript is in alpha. The API is subject to change. We're on the path to beta.
+NetScript is in alpha. Public package versions are <code>0.0.1-alpha.0</code> and the API is subject to
+change as we move toward beta. Pin versions in real projects.
 {{ /comp }}
+
+{{ comp.learningPath({
+  title: "The three steps",
+  steps: [
+    { label: "Install the CLI", detail: "One global install puts a netscript command on your PATH." },
+    { label: "Scaffold a workspace", detail: "netscript init lays down the whole opinionated repo." },
+    { label: "Start it under Aspire", detail: "cd aspire && aspire run brings up Postgres, Garnet, and the dashboard." }
+  ]
+}) }}
 
 ## 1. Install the CLI
 
@@ -32,18 +42,18 @@ The CLI is published to JSR as `@netscript/cli`. Install it globally for a tidy
   {
     label: "Global install",
     lang: "bash",
-    code: "# Installs a `netscript` command on your PATH\ndeno install -A --global --name netscript jsr:@netscript/cli/bin/netscript.ts\n\nnetscript --help"
+    code: "# Installs a `netscript` command on your PATH\ndeno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts\n\nnetscript --help"
   },
   {
     label: "Ad-hoc (no install)",
     lang: "bash",
-    code: "# Run the same CLI without installing anything\ndeno run -A jsr:@netscript/cli/bin/netscript.ts --help"
+    code: "# Run the same CLI without installing anything\ndeno run --allow-all jsr:@netscript/cli/bin/netscript.ts --help"
   }
 ] }) }}
 
 {{ comp callout { type: "tip" } }}
 The rest of this page assumes the global <code>netscript</code> command. If you went ad-hoc,
-swap <code>netscript</code> for <code>deno run -A jsr:@netscript/cli/bin/netscript.ts</code> in each step.
+swap <code>netscript</code> for <code>deno run --allow-all jsr:@netscript/cli/bin/netscript.ts</code> in each step.
 {{ /comp }}
 
 ## 2. Scaffold a workspace
@@ -86,44 +96,63 @@ If you see that success line and the numbered steps, the scaffold worked. The ex
 file count and the next steps adapt to the options you chose (a database, an example
 service, and so on) — on the strict happy path above, the four steps are all you need.
 
+{{ comp callout { type: "note", title: "Aspire comes before any database command" } }}
+On the default path, <strong>Aspire is step&nbsp;2 of running your app</strong>: <code>cd aspire &amp;&amp; aspire run</code>
+provisions Postgres and Garnet first. Any <code>netscript db</code> command (init, generate, seed) runs
+<em>after</em> Aspire is up, because it needs that database to exist. See
+<a href="/how-to/database-migration/">Database migrations</a> for the full flow.
+{{ /comp }}
+
 ## 3. Start it
 
 Follow the next steps the CLI just printed. The Aspire TypeScript AppHost lives in
 its own `aspire/` folder, isolated from the Deno workspace; restore its modules once,
-then run it:
+then run it. **This is the step that actually starts your stack** — Postgres, Garnet,
+and every wired service come up together:
 
 ```bash
 cd my-app/aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
-aspire run       # boots everything and opens the dashboard
+aspire run       # boots Postgres + Garnet + services, opens the dashboard
 ```
 
 {{ comp callout { type: "note", title: "Prefer no orchestration?" } }}
 Scaffold with <code>netscript init my-app --no-aspire</code> and start the Fresh app directly
-instead: <code>deno task --cwd apps/dashboard dev</code>. You trade the dashboard and
-multi-resource wiring for a leaner single-process dev loop.
+instead: <code>deno task --cwd apps/dashboard dev</code>. You trade the dashboard, Postgres/Garnet
+provisioning, and multi-resource wiring for a leaner single-process dev loop.
 {{ /comp }}
 
 ### See the framework code
 
 The scaffold is more than bash and URLs — it generates real, typed framework code
-for you. Here's the kind of code the scaffold generates for you: a single
-`defineService` call wires the cross-cutting concerns so you don't have to.
+for you. Here's the kind of code the scaffold writes: a single `defineService` call
+wires the cross-cutting concerns so you don't have to. Your RPC procedures are then
+served under `/api/rpc/*`.
 
 {{ comp.tabbedCode({ tabs: [
   {
     label: "service.ts",
     lang: "ts",
-    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC, and health endpoints.\nconst service = await defineService(router, { name: 'users', port: 3000 });"
+    code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\n// One call wires CORS, request logging, OpenAPI, RPC (/api/rpc/*), and health.\nconst service = await defineService(router, { name: 'users', port: 3001 });"
+  },
+  {
+    label: "call it",
+    lang: "bash",
+    code: "# oRPC procedures are served under /api/rpc/*\ncurl http://localhost:3001/api/rpc/users/list\n\n# Health and OpenAPI come for free\ncurl http://localhost:3001/health"
   }
 ] }) }}
+
+{{ comp callout { type: "tip", title: "Fluent alternative" } }}
+Prefer a builder? The fluent equivalent of <code>defineService(...)</code> is the explicit chain <code>createService(router, config).withCors().withLogger().withOpenAPI().withDocs().withRPC().withServiceInfo().withHealth().serve()</code> — each <code>.withXxx()</code> adds one layer of the wiring that <code>defineService</code> bundles, including the <code>/api/rpc/*</code> mount (added by <code>.withRPC()</code>). Calling <code>createService(...).serve()</code> with no chaining produces a bare app: no RPC handler, no CORS, no health. See <a href="/tutorials/build-a-service/">Build a service</a>.
+{{ /comp }}
 
 ## What you see
 
 Once `aspire run` settles, you have a live workspace to poke at:
 
 - **The Aspire dashboard** at [http://localhost:18888](http://localhost:18888) —
-  every resource, its health, logs, and distributed traces in one place.
+  every resource (Postgres, Garnet, your services), its health, logs, and distributed
+  traces in one place.
 - **The Fresh app** at [http://localhost:8000](http://localhost:8000) — your
   frontend, served by the `dashboard` app.
 - **The `/design` route** — a living token-and-component showcase: the `--ns-*`
@@ -136,6 +165,7 @@ Once `aspire run` settles, you have a live workspace to poke at:
 <ul>
 <li>A port is already in use — <code>18888</code> (dashboard) or <code>8000</code> (Fresh app). Stop the other process or change the port.</li>
 <li>The first <code>aspire restore</code> downloads the AppHost SDK and can take a minute.</li>
+<li>If a <code>netscript db</code> command can't connect, confirm <code>aspire run</code> is still up — Postgres lives inside Aspire.</li>
 <li><code>deno: command not found</code> means Deno isn't on your PATH.</li>
 </ul>
 {{ /comp }}
@@ -157,8 +187,13 @@ A complete, type-checked workspace — not a starter you have to assemble:
     icon: "▶"
   },
   {
+    title: "Postgres + Garnet, provisioned",
+    body: "Aspire stands up the database and cache for you — no docker-compose to babysit, no connection strings to copy.",
+    icon: "▦"
+  },
+  {
     title: "Contracts and a plugin registry",
-    body: "Shared, versioned oRPC contracts and a plugin registry ready for workers, sagas, triggers, and streams.",
+    body: "Shared, versioned oRPC contracts and a plugin registry ready for workers, sagas, triggers, auth, and streams.",
     icon: "◆"
   },
   {
@@ -183,8 +218,14 @@ a guided track that takes this scaffold to a real feature.
     icon: "→"
   },
   {
+    title: "Build a service",
+    body: "Define an oRPC contract, implement it, and serve it under /api/rpc/* with one call.",
+    href: "/tutorials/build-a-service/",
+    icon: "◧"
+  },
+  {
     title: "Capabilities",
-    body: "Durable workflows, observability, plugins, and Aspire integration — what NetScript does and why.",
+    body: "Durable workflows, background jobs, observability, auth, plugins, and Aspire integration — what NetScript does and why.",
     href: "/capabilities/",
     icon: "◎"
   },

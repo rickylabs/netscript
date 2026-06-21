@@ -11,10 +11,11 @@ next: { label: "Add OpenTelemetry", href: "/how-to/add-opentelemetry/" }
 **Scope:** three task recipes for the runtime primitives every NetScript app reaches
 for sooner or later — enqueueing and consuming a **queue** message, reading and writing
 **KV**, and scheduling a **cron** job. Each primitive is a small, provider-agnostic
-package (`@netscript/queue`, `@netscript/kv`, `@netscript/cron`) that auto-detects its
+package (`@netscript/queue`, `@netscript/kv`, `@netscript/cron`) that resolves its
 backend from the environment, so the same code runs against an in-memory adapter on your
 laptop and a real broker or store under Aspire. This page shows the minimal, copy-able
-shape for each, then points you at the full generated API.
+shape for each, calls out the one place where you must pick a backend by hand (the
+**PostgreSQL** queue provider), then points you at the full generated API.
 
 These primitives are lower-level than the [background-jobs](/capabilities/background-jobs/)
 plugin: a worker job is a managed handler with persistence, retries, and an HTTP trigger,
@@ -32,23 +33,26 @@ cron](/capabilities/kv-queues-cron/).
     desc: "Created per the Quickstart. Run these recipes from the workspace root or any workspace member."
   },
   {
+    name: "Aspire running (for real backends)",
+    type: "cd aspire && aspire run",
+    desc: "Aspire is step 2 of local dev — it provisions Postgres, Garnet (cache), and any broker BEFORE your service connects. In-memory and Deno KV adapters need nothing extra; Redis, RabbitMQ, and the Postgres queue all expect Aspire up first."
+  },
+  {
     name: "Deno KV unstable flag",
     type: "--unstable-kv",
     desc: "KV (and the KV-backed queue/cron fallbacks) use Deno KV. The scaffold's deno.json sets unstable: ['raw-imports', 'kv']; add --unstable-kv to any ad-hoc deno run/check that touches these packages."
-  },
-  {
-    name: "Aspire running (for real backends)",
-    type: "cd aspire && aspire run",
-    desc: "In-memory and Deno KV adapters need nothing extra. To exercise the Redis/Garnet or RabbitMQ backends, bring up orchestration first — aspire run provisions garnet (cache) and any broker before your service connects."
   }
 ] }) }}
 
-{{ comp callout { type: "note", title: "Backends auto-discover — you rarely pick one by hand" } }}
-Each package resolves its provider from the environment at first use. <strong>KV</strong>
+{{ comp callout { type: "note", title: "Backends auto-discover — with one deliberate exception" } }}
+Each package resolves its provider from the environment at first use, so you write
+provider-neutral code and let Aspire wire the connection strings. <strong>KV</strong>
 auto-detects across <code>'deno-kv'</code>, <code>'redis'</code>, <code>'nitro'</code>, or
-<code>'auto'</code>; <strong>queue</strong> probes RabbitMQ (AMQP), then Redis, then Deno KV;
-<strong>cron</strong> uses native <code>Deno.cron</code> with an in-memory scheduler for tests.
-You write provider-neutral code and let Aspire wire the connection strings.
+<code>'auto'</code>; <strong>queue</strong> probes RabbitMQ (AMQP) → Redis → Deno KV;
+<strong>cron</strong> uses native <code>Deno.cron</code> with an in-memory scheduler for
+tests. The one provider auto-discovery will <strong>never</strong> pick for you is the
+queue's <strong>PostgreSQL</strong> backend — it is selectable only via an explicit
+<code>provider: 'postgres'</code> (see Recipe 2, Step 4).
 {{ /comp }}
 
 ## Recipe 1 — KV: read and write durable state
@@ -96,12 +100,13 @@ for await (const item of kv.list({ prefix: ["users"] })) {
   console.log(item.key, item.value);
 }
 
-// watchPrefix() is reactive: the callback fires on every change beneath the prefix.
-const stop = kv.watchPrefix(["users"], (event) => {
+// watchPrefix() returns an AsyncIterable; iterate it with for-await, cancel via AbortSignal.
+const controller = new AbortController();
+for await (const event of kv.watchPrefix(["users"], { signal: controller.signal })) {
   console.log("changed:", event.key);
-});
-// …later
-stop();
+}
+// …to stop:
+controller.abort();
 ```
 
 {{ comp.apiTable({ caption: "KV adapters (@netscript/kv)", rows: [
@@ -129,8 +134,9 @@ See the full surface — `getRawKv`, `getActiveProvider`, `atomic` compare-and-s
 
 `@netscript/queue` wraps battle-tested adapters behind one `MessageQueue` interface with
 optional Zod validation. A queue has exactly two operations: `enqueue` (producer) and
-`listen` (consumer). Backend auto-discovery probes **RabbitMQ (AMQP)** first, then
-**Redis**, then **Deno KV**.
+`listen` (consumer). There are **four** backends — Deno KV, Redis, RabbitMQ (AMQP), and
+**PostgreSQL**. Backend auto-discovery probes **RabbitMQ (AMQP)** first, then **Redis**,
+then **Deno KV**; PostgreSQL is opt-in only (Step 4).
 
 ### Step 1 — Create a typed queue
 
@@ -183,21 +189,61 @@ await emailQueue.listen(async (message, context) => {
 });
 ```
 
-{{ comp.apiTable({ caption: "Queue adapters (@netscript/queue)", rows: [
+### Step 4 — Pin the PostgreSQL backend explicitly
+
+The PostgreSQL provider gives you a SQL-durable queue — useful when you already run
+Postgres (under Aspire) and want one fewer moving part than a dedicated broker, or when
+you want the queue and your application data to share a transactional store. Because
+auto-discovery is **RabbitMQ → Redis → Deno KV only**, Postgres never wins the probe;
+you must name it.
+
+```ts
+import { createQueue, QueueProvider } from "@netscript/queue";
+
+// provider: 'postgres' (or QueueProvider.Postgres) is the only way to select it.
+const jobs = createQueue("jobs", {
+  provider: QueueProvider.Postgres,
+  connection: {
+    postgres: {
+      // url is optional — when omitted it falls back to Aspire's getPostgresUri().
+      url: Deno.env.get("DATABASE_URL"),
+      // tableName defaults to 'message_queue'.
+      tableName: "message_queue",
+    },
+  },
+});
+
+await jobs.enqueue({ id: "job-1", kind: "reindex" });
+await jobs.listen(async (message, context) => {
+  await handle(message);
+});
+```
+
+The adapter uses row-claim semantics (`FOR UPDATE SKIP LOCKED`) with a visibility timeout
+plus ack/nack and a dead-letter store, so concurrent consumers don't double-claim a
+message. `createTypedQueue` accepts the same `provider`/`connection` options if you want
+Zod validation on the Postgres-backed queue too.
+
+{{ comp.apiTable({ caption: "Queue backends (@netscript/queue) — four selectable providers", rows: [
   {
     name: "Deno KV",
-    type: "QueueProvider — auto-discovery fallback",
-    desc: "Zero-dependency local default when no broker is present. Durable to the Deno KV store. Needs --unstable-kv."
+    type: "provider 'deno-kv' — auto-discovery fallback",
+    desc: "Zero-dependency local default when no broker is present. Durable to the Deno KV store. Last in the auto-discovery probe. Needs --unstable-kv."
   },
   {
     name: "Redis",
-    type: "QueueProvider — second probe",
-    desc: "Backed by the Redis/Garnet resource Aspire provisions. Used when a Redis connection is discoverable and no AMQP broker is."
+    type: "provider 'redis' — second probe",
+    desc: "Backed by the Redis/Garnet resource Aspire provisions. Selected when a Redis connection is discoverable and no AMQP broker is."
   },
   {
     name: "RabbitMQ (AMQP)",
-    type: "QueueProvider — first probe",
+    type: "provider 'rabbitmq' — first probe",
     desc: "Full broker semantics via Fedify's AMQP adapter (amqplib). Preferred when an AMQP connection is available. Use createParallelQueue for concurrent processing."
+  },
+  {
+    name: "PostgreSQL",
+    type: "provider 'postgres' — EXPLICIT only",
+    desc: "SQL-durable queue over npm:pg with FOR UPDATE SKIP LOCKED row-claim, visibility timeout, ack/nack, and a dead-letter store. connection.postgres.{url,tableName} (url optional → Aspire getPostgresUri(); tableName defaults to 'message_queue'). Never chosen by auto-discovery — you must set provider:'postgres'."
   }
 ] }) }}
 
@@ -205,13 +251,14 @@ await emailQueue.listen(async (message, context) => {
 <ul>
 <li><strong>Validate at the boundary.</strong> Prefer <code>createTypedQueue</code> over <code>createQueue</code> — an unvalidated queue happily transports malformed messages until a consumer throws deep in your handler. Validation at enqueue time fails fast at the producer.</li>
 <li><strong>Local default is Deno KV, not a broker.</strong> If you never start Aspire, your queue silently runs on the Deno KV fallback. That is fine for dev, but it is not RabbitMQ — don't assume broker-grade ordering or fan-out semantics until you've provisioned the real backend.</li>
+<li><strong>PostgreSQL is opt-in, never auto-selected.</strong> Auto-discovery is RabbitMQ → Redis → Deno KV; it will <strong>not</strong> fall through to Postgres even when a Postgres connection is present. If you want the SQL-durable queue you must pass <code>provider: 'postgres'</code> — otherwise you'll quietly land on the Deno KV adapter.</li>
 <li><strong>Handler throws are not free retries.</strong> A thrown <code>QueueHandlerError</code> follows the adapter's ack/retry policy, which differs per backend. Make handlers idempotent so a redelivery can't double-charge or double-send.</li>
 </ul>
 {{ /comp }}
 
-For `createParallelQueue`, the typed/parallel options, the `QueueError` hierarchy, and the
-standalone `safeValidate` / `validateOrThrow` helpers, see
-[`@netscript/queue`](/reference/queue/).
+For `createParallelQueue`, the typed/parallel options, the full `QueueProvider` enum, the
+`connection.postgres` shape, the `QueueError` hierarchy, and the standalone
+`safeValidate` / `validateOrThrow` helpers, see [`@netscript/queue`](/reference/queue/).
 
 ## Recipe 3 — Cron: schedule a recurring job
 
@@ -247,10 +294,10 @@ const cleanup = async () => {
   await purgeExpiredSessions();
 };
 
-scheduler.schedule("session-cleanup", expr, cleanup);
+await scheduler.schedule("session-cleanup", expr, cleanup);
 
 // Or use a named preset instead of a raw expression.
-scheduler.schedule("nightly-report", CronPresets.EVERY_DAY, async () => {
+await scheduler.schedule("nightly-report", CronPresets.EVERY_DAY, async () => {
   await emitDailyReport();
 });
 ```
@@ -272,7 +319,7 @@ adapter classes are documented in [`@netscript/cron`](/reference/cron/).
 {{ comp.featureGrid({ items: [
   {
     title: "Capabilities — KV, queues & cron",
-    body: "The concept-level tour of these primitives, when to reach for them, and how Aspire wires the backends.",
+    body: "The concept-level tour of these primitives, when to reach for them, and how Aspire wires the four queue backends.",
     href: "/capabilities/kv-queues-cron/",
     icon: "◎"
   },
@@ -284,7 +331,7 @@ adapter classes are documented in [`@netscript/cron`](/reference/cron/).
   },
   {
     title: "Reference — @netscript/queue",
-    body: "createQueue / createTypedQueue / createParallelQueue, the MessageQueue interface, and the validation helpers.",
+    body: "createQueue / createTypedQueue / createParallelQueue, the MessageQueue interface, the QueueProvider enum (incl. postgres), and the validation helpers.",
     href: "/reference/queue/",
     icon: "≡"
   },

@@ -3,10 +3,8 @@ layout: layouts/base.vto
 title: Orchestration with Aspire
 templateEngine: [vento, md]
 prev: { label: "Observability", href: "/explanation/observability/" }
-next: null
+next: { label: "The pure-backend auth model", href: "/explanation/auth-model/" }
 ---
-
-{{ comp.breadcrumb() }}
 
 # Orchestration with Aspire
 
@@ -22,10 +20,10 @@ model of how a NetScript app actually boots. When you want exact symbols, follow
 
 A NetScript project is not one process. It is a small fleet: an example oRPC service, a Fresh
 dashboard, a workers API and its background worker, a sagas API and its supervisor, a triggers
-API and its processor — plus the infrastructure they all depend on, a Postgres database and a
-Garnet (Redis-compatible) cache. Wiring that fleet up by hand — starting each process in the
-right order, handing each one the right connection strings, and tearing it all down again —
-is exactly the integration tax NetScript exists to remove.
+API and its processor, an auth API — plus the infrastructure they all depend on, a Postgres
+database and a Garnet (Redis-compatible) cache. Wiring that fleet up by hand — starting each
+process in the right order, handing each one the right connection strings, and tearing it all
+down again — is exactly the integration tax NetScript exists to remove.
 
 **Aspire is the conductor.** You describe the desired graph once, declaratively, and a single
 command stands the whole thing up with the wiring already resolved. The database URL the
@@ -60,7 +58,7 @@ and runs the resulting graph.
   {
     label: "aspire/aspire.config.json (generated)",
     lang: "json",
-    code: "{\n  \"appHost\": { \"path\": \"apphost.mts\", \"language\": \"typescript/nodejs\" },\n  \"sdk\": { \"version\": \"13.4.4\" },\n  \"packages\": [\"Aspire.Hosting.PostgreSQL\"],\n  \"profiles\": {\n    \"https\": { \"otlp\": \"http://localhost:4318\" }\n  }\n}"
+    code: "{\n  \"appHost\": { \"path\": \"apphost.mts\", \"language\": \"typescript/nodejs\" },\n  \"sdk\": { \"version\": \"13.4.4\" },\n  \"profiles\": {\n    \"https\": {\n      \"applicationUrl\": \"https://localhost:18888;http://localhost:18889\",\n      \"environmentVariables\": {\n        \"ASPIRE_DASHBOARD_OTLP_HTTP_ENDPOINT_URL\": \"http://localhost:4318\",\n        \"ASPIRE_ALLOW_UNSECURED_TRANSPORT\": \"true\",\n        \"ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS\": \"true\"\n      }\n    }\n  },\n  \"packages\": { \"Aspire.Hosting.PostgreSQL\": \"13.4.4\" }\n}"
   }
 ] }) }}
 
@@ -111,14 +109,15 @@ environment resolved from `appsettings.json`.
                               └─ garnet    (Container, cache)
                                  │
                                  ▼
-   ┌──────────────────────────────────────────────────────────────────────────┐
-   │ (5) plugin APIs (two-pass: create, then wire plugin→plugin / plugin→service │
-   │     refs via getEndpoint('http') + withEnvironment())                       │
-   │     workers-api :8091   sagas-api :8092   triggers-api :8093                │
-   │ (6) background processors:  workers, sagas (bin/combined.ts);                │
-   │     triggers (src/runtime/trigger-processor.ts)                             │
-   │ (7) apps:  dashboard (Fresh)        (8) tools                               │
-   └──────────────────────────────────────────────────────────────────────────┘
+   ┌──────────────────────────────────────────────────────────────────────────────┐
+   │ (5) plugin APIs (two-pass: create, then wire plugin→plugin / plugin→service     │
+   │     refs via getEndpoint('http') + withEnvironment())                           │
+   │     workers-api :8091   sagas-api :8092   triggers-api :8093   auth-api :8094   │
+   │     streams :4437                                                               │
+   │ (6) background processors:  workers, sagas (bin/combined.ts);                    │
+   │     triggers (src/runtime/trigger-processor.ts)                                 │
+   │ (7) apps:  dashboard (Fresh)        (8) tools                                   │
+   └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 The order is not arbitrary. Infrastructure (database + cache) comes up first because everything
@@ -135,13 +134,20 @@ its environment.
     { name: "aspire (dashboard)", type: "http://localhost:18888", desc: "The Aspire dashboard. `aspire run` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) all surface here." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. Engine Postgres, Persistent (DataPath .data/postgres). The PrimaryDatabase that `netscript db` commands target — only reachable once Aspire is up." },
     { name: "garnet", type: "Container (cache)", desc: "Redis-compatible cache. Engine Garnet, the PrimaryCache. Backs KV/queue workloads for the runtime plugins." },
-    { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and /api/rpc/v1/...." },
+    { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
     { name: "workers-api", type: ":8091", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}, trigger via POST /api/v1/workers/jobs/{id}/trigger." },
     { name: "sagas-api", type: ":8092", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
-    { name: "triggers-api", type: ":8093", desc: "Triggers plugin API (Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
+    { name: "triggers-api", type: ":8093", desc: "Triggers plugin API (raw Hono, not oRPC). POST /api/v1/webhooks/inbound/generic, GET /api/v1/events." },
+    { name: "auth-api", type: ":8094", desc: "Auth plugin oRPC service. /api/v1/auth/{signin,callback,signout,session,me} with one active backend (NETSCRIPT_AUTH_BACKEND)." },
+    { name: "streams", type: ":4437", desc: "Durable-streams producer runtime (@netscript/plugin-streams-core). Served as its own Aspire Deno service; workers/auth/sagas mirror execution state into it." },
     { name: "workers / sagas / triggers", type: "background processors", desc: "Separate from the APIs: workers & sagas run from bin/combined.ts; triggers from src/runtime/trigger-processor.ts. Declared under appsettings BackgroundProcessors." }
   ]
 }) }}
+
+The full port map for every NetScript runtime resource is consolidated under
+[`reference/aspire/`](/reference/aspire/) — treat that page as the canonical list and this table
+as the orientation. Auth's place in the graph (a pure-backend oRPC service composing one active
+adapter) is the subject of the next chapter, [The pure-backend auth model](/explanation/auth-model/).
 
 ## The dashboard at :18888
 
@@ -158,7 +164,13 @@ at `http://localhost:18888`. The dashboard is the single pane of glass over the 
 
 In other words, the dashboard is where the observability story (instrumentation in your code) and
 the orchestration story (Aspire knowing every resource) meet: Aspire already knows the topology,
-so it can stitch the telemetry into it for free.
+so it can stitch the telemetry into it for free. Concretely, job dispatch, job execution,
+scheduler runs, and subprocess task continuation all emit real OpenTelemetry spans that surface in
+this dashboard with **no extra wiring** — the trace context is propagated into worker subprocesses
+over W3C `traceparent`. (The one remaining gap is the scaffold `createJobTools(ctx)` helpers you
+call *inside* a handler — `trace.addEvent`, `withChildSpan`, `progress` — which are still no-op
+stubs; for custom handler spans, call `@netscript/telemetry` helpers directly. See
+[Observability](/explanation/observability/) for the precise framework-vs-scaffold boundary.)
 
 ## The `--no-aspire` escape hatch
 
@@ -167,6 +179,17 @@ a `--no-aspire` flag (`netscript init my-app --no-aspire`) that **skips scaffold
 orchestration layer entirely**. No `aspire/` folder is generated, no AppHost is available to
 provision infrastructure, and there is no Aspire dashboard. Start the generated Deno processes
 directly and provide your own infrastructure connection strings.
+
+{{ comp callout { type: "note", title: "Verified against the CLI scaffolder" } }}
+<code>--no-aspire</code> maps to <code>noAspire: options.aspire === false</code> in the init
+command, and the scaffold step short-circuits to an <strong>empty result</strong> (no
+<code>aspire/</code> directory, no <code>apphost.mts</code>, no <code>aspire.config.json</code>)
+when it is set. The default path generates the TypeScript AppHost shape; the separate
+<code>--legacy-aspire</code> flag generates the older C# <code>dotnet/AppHost</code> instead. The
+generated README is also Aspire-aware: with <code>--no-aspire</code> it omits any mention of
+<code>aspire run</code> and <code>appsettings.json</code>, because there is no orchestration layer
+to point at.
+{{ /comp }}
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -239,10 +262,13 @@ The honest trade-offs, because choosing Aspire as the default is an opinion:
 
 - **Do the database workflow:** [Database migration](/how-to/database-migration/) — `db init` →
   `generate` → `seed` → `status`, and why `aspire run` must come first.
+- **Understand the auth service in the graph:** [The pure-backend auth model](/explanation/auth-model/)
+  — how the `auth-api` resource at `:8094` composes one active backend behind the `AuthBackendPort`.
 - **Deploy without Aspire:** [Deploy](/how-to/deploy/) — the `--no-aspire` portability path,
   Docker, and bare-metal targets.
-- **Reference:** the exact exported symbols live in [`reference/aspire/`](/reference/aspire/).
+- **Reference:** the exact exported symbols and the full port map live in
+  [`reference/aspire/`](/reference/aspire/).
 - **Related:** [Observability](/explanation/observability/) explains the spans and logs the
   dashboard at `:18888` collects.
 
-{{ comp.nextPrev({ prev: { label: "Observability", href: "/explanation/observability/" } }) }}
+{{ comp.nextPrev({ prev: { label: "Observability", href: "/explanation/observability/" }, next: { label: "The pure-backend auth model", href: "/explanation/auth-model/" } }) }}

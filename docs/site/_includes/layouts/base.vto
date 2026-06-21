@@ -128,7 +128,7 @@
         </header>
 
         <main class="ns-dashboard__content" id="main-content" tabindex="-1">
-          {{ comp.breadcrumb() }}
+          {{ comp.breadcrumb({ url, navSections, title }) }}
           <article class="ns-prose" data-pagefind-body>
             {{ content }}
           </article>

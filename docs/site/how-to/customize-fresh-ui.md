@@ -11,9 +11,9 @@ next: { "label": "Deploy", "href": "/how-to/deploy/" }
 **Goal:** make the scaffolded frontend yours — edit a route, add an interactive
 island, restyle a component, install more UI primitives, and re-theme the app —
 without fighting the framework. NetScript scaffolds a real
-[Fresh](https://fresh.deno.dev) 2 application at `apps/dashboard/`, and the UI
-components live in *your* repository as copied source. After the copy, that code
-is yours to change.
+[Fresh](https://fresh.deno.dev) 2 application at `apps/dashboard/`, powered by the
+[`@netscript/fresh`](/reference/fresh/) meta-framework, and the UI components live
+in *your* repository as copied source. After the copy, that code is yours to change.
 
 This is a task-oriented recipe. It assumes you already have a NetScript workspace
 (created with `netscript init`) whose `apps/dashboard/` app type-checks and runs.
@@ -37,16 +37,19 @@ You need:
   [Quickstart](/quickstart/) or [Your first workspace](/tutorials/first-workspace/).
 - The `netscript` command on your path. Run `netscript --help` to confirm, and
   `netscript ui:init --help` / `netscript ui:add --help` for the exact option
-  spelling in your installed version.
+  spelling in your installed version. If `netscript` is not found, install it with
+  `deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts`.
 
-Run the app while you work so you can see each change live. Aspire orchestrates it
-for you, or you can run the Fresh app on its own:
+Run the app while you work so you can see each change live. Aspire is step 2 of the
+normal startup flow — it brings up Postgres and Garnet before any `netscript db`
+command and orchestrates the dashboard for you. You can also run the Fresh app on
+its own when you only need the UI loop:
 
 {{ comp.tabbedCode({ tabs: [
   {
     label: "Under Aspire (recommended)",
     lang: "bash",
-    code: "# Brings up Postgres + Garnet AND the dashboard; dashboard graph at http://localhost:18888\ncd aspire && aspire run"
+    code: "# Brings up Postgres + Garnet AND the dashboard; Aspire dashboard graph at http://localhost:18888\ncd aspire && aspire run"
   },
   {
     label: "Fresh app only",
@@ -56,7 +59,7 @@ for you, or you can run the Fresh app on its own:
 ] }) }}
 
 {{ comp callout { type: "tip", title: "Start at /design" } }}
-Before changing anything, open the scaffolded <a href="/design/components"><code>/design</code></a>
+Before changing anything, open the scaffolded <code>/design</code>
 showcase in the running app. It renders the live component gallery
 (<code>/design/components</code>), the token reference (<code>/design/tokens</code>),
 and composition rules (<code>/design/composition</code>) against the active theme —
@@ -95,11 +98,22 @@ and components:
 ] }) }}
 
 {{ comp callout { type: "note", title: "Two import roots, two jobs" } }}
-<code>@netscript/fresh</code> is the <strong>runtime</strong> (app bootstrap,
-route/query/server builders). <code>@netscript/fresh-ui</code> is the
+<code>@netscript/fresh</code> is the <strong>runtime meta-framework</strong>: it
+ships the app bootstrap (<code>/server</code>), route and page builders, and a typed
+data layer (<code>/query</code>), alongside <code>/builders</code>,
+<code>/route</code>, <code>/form</code>, <code>/defer</code>, and
+<code>/interactive</code> subpaths. <code>@netscript/fresh-ui</code> is the
 <strong>component registry</strong> the CLI copies from. You import the runtime
 directly; you import UI from your own <code>@app/components/ui/mod.ts</code> barrel,
 not from the registry package.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "Meta-framework vs scaffolded app" } }}
+Keep two ideas distinct: <code>@netscript/fresh</code> is the reusable
+<strong>meta-framework</strong> (server/islands/query primitives that any Fresh app
+can import), while <code>apps/dashboard/</code> is <strong>your scaffolded
+instance</strong> of it. The concept hub on <a href="/capabilities/fresh-ui/">Fresh UI</a>
+explains how the two relate and where each layer's responsibilities begin and end.
 {{ /comp }}
 
 ## Edit a route
@@ -137,6 +151,13 @@ without adding a path segment. Keep a page's view, loader, and demo islands besi
 the route file and the URL stays clean.
 {{ /comp }}
 
+{{ comp callout { type: "tip", title: "Add typed route references in router.ts" } }}
+When you add a permanent page, register it in <code>apps/dashboard/router.ts</code>
+so <code>appRoutes</code> exposes a typed <code>.href()</code> for it. Linking
+through <code>appRoutes</code> instead of hand-written strings means a renamed or
+removed route fails the type-check rather than 404-ing at runtime.
+{{ /comp }}
+
 ## Add interactivity with an island
 
 Server-rendered routes ship zero client JavaScript. When you need state in the
@@ -164,6 +185,15 @@ declare interactive event handlers with arrow functions, as in the scaffolded
 `ThemeToggle`. Anything that does not need browser state should stay a plain
 component in `components/` so it ships no JS.
 
+{{ comp callout { type: "note", title: "Fetch typed data with @netscript/fresh/query" } }}
+When an island or route needs server data, prefer the runtime's typed query layer
+(<code>@netscript/fresh/query</code>) over hand-rolled <code>fetch</code> calls — it
+carries the oRPC contract types through to the client so a renamed service field
+surfaces as a type error. See <a href="/reference/fresh/"><code>@netscript/fresh</code></a>
+for the query builders, and <a href="/how-to/add-a-service/">Add a service</a> for
+the backend half of that contract.
+{{ /comp }}
+
 ## Restyle: tokens, Tailwind, and component CSS
 
 NetScript styling has three layers, lightest-touch first:
@@ -182,6 +212,10 @@ NetScript styling has three layers, lightest-touch first:
   title: "3 · Component CSS (one primitive)",
   body: "Each copied primitive has its own stylesheet under assets/ui/ (button.css, card.css, badge.css, …). To restyle just one component everywhere, edit its file there — it is app-owned source, imported by assets/styles.css."
 }) }}
+
+Pick the lightest layer that does the job: reach for a **token** when the change
+should re-theme the whole app, a **Tailwind utility** for one-off element layout,
+and **component CSS** when one primitive should look different everywhere it appears.
 
 Theme switching is already wired: `routes/_app.tsx` seeds `data-theme` from the
 `ns-theme` localStorage key (falling back to the OS preference), and the
@@ -205,7 +239,7 @@ When you need a primitive the scaffold didn't copy in, pull it from the
   caption: "Fresh UI CLI commands",
   rows: [
     { name: "netscript ui:init", type: "install the foundation", desc: "Installs the NetScript Fresh UI foundation set into an app workspace. Run once when setting up UI in an app that doesn't have it yet (the scaffold runs the equivalent for you)." },
-    { name: "netscript ui:add <name>", type: "add one item or collection", desc: "Copies a single registry item or a named collection into apps/dashboard/components/ui/, wires its CSS, and merges any required deno.json imports." }
+    { name: "netscript ui:add <name>", type: "add one item or collection", desc: "Copies a single registry item or a named collection into the app workspace — component files go to apps/dashboard/components/ui/, island files to islands/ui/, lib helpers to lib/, and assets to assets/ui/ — then wires the CSS and merges any required deno.json imports." }
   ]
 }) }}
 
@@ -255,14 +289,23 @@ deno task --cwd apps/dashboard check
 That task runs `deno fmt --check`, `deno lint`, and `deno check` over the app, so a
 clean run means your routes, islands, and edited components still type and lint.
 
+{{ comp callout { type: "tip", title: "Type-check is your guardrail" } }}
+Because routes, islands, and UI primitives are all app-owned TypeScript, the
+<code>check</code> task is the single gate that proves a route rename, a changed
+island prop, or an edited primitive still composes. Run it before every commit —
+green here means the Fresh build will not break on a missing import or a drifted
+type.
+{{ /comp }}
+
 ## Next steps
 
 - Capability hub: [Fresh UI](/capabilities/fresh-ui/) — the concept, the headline
   API, and the Learn / Do / Reference triplet for the dashboard app.
 - Reference: the generated API for the UI registry and the Fresh runtime —
   [`@netscript/fresh-ui`](/reference/fresh-ui/) and
-  [`@netscript/fresh`](/reference/fresh/). These are the authority for every export;
-  this guide never duplicates them.
+  [`@netscript/fresh`](/reference/fresh/). These are the authority for every export
+  (the `/server`, `/query`, and sibling subpaths included); this guide never
+  duplicates them.
 - Related recipes: [Add a service](/how-to/add-a-service/) to give your UI a typed
   oRPC backend, and [Add OpenTelemetry](/how-to/add-opentelemetry/) to trace it.
 - Concepts: the [contracts](/explanation/contracts/) explanation shows how a typed

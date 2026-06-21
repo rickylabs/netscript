@@ -6,116 +6,173 @@ prev: { label: "Triggers & ingress", href: "/capabilities/triggers/" }
 next: { label: "Database & Prisma", href: "/capabilities/database/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Durable streams
 
 NetScript's streams capability is the typed, change-data backbone the other
-plugins lean on — workers, sagas, and triggers all declare `streams` as a
-dependency. The `streams` plugin lives at `plugins/streams/`, runs a
-durable-streams dev service on port **:4437**, and gives you a small,
-type-safe authoring surface for describing event topics.
+plugins lean on — workers, sagas, and the auth service all publish their live
+state through it. The producer half is **real and shipping today**: you define a
+typed stream schema with [`defineStreamSchema`](/reference/streams/), open a
+producer with `createDurableStream`, and `upsert`/`delete`/`flush` entity state
+over a durable-stream server that runs as an Aspire resource on port **:4437**.
 
-It is also the most honest page in this section. The topic *schema* surface is
-real and ships today; the *runtime* — actually publishing and consuming events
-through those topics — is still being built. The producer and consumer handles
-you get back are deliberate no-op **stubs**, and the topic-centric pub/sub APIs
-are deferred. This page draws that line clearly so you build against what
-exists, not against an aspiration.
+The honest line on this page is narrower than it used to be. The producer
+runtime in `@netscript/plugin-streams-core` is genuine — it writes through
+`@durable-streams/client` with idempotent delivery. What is *not* live is the
+topic-centric **manifest sugar** in `@netscript/plugin-streams`
+(`defineStreamProducer` / `defineStreamConsumer`): a producer's `publish()`
+returns a **rejected** promise and a consumer's `subscribe()` **throws**
+synchronously — both with `StreamUnsupportedOperationError`, pointing you at the
+core package. There is also no in-process consumer `subscribe()` yet —
+consumption is over the durable-stream server's HTTP/SSE protocol, which Fresh
+clients read. This page draws those lines precisely so you build against the
+producer surface that exists, not against the manifest helpers that don't.
 
-{{ comp callout { type: "warning", title: "Status — alpha, runtime stubbed" } }}
-<code>defineStreamTopic(...)</code> is real and type-safe today. But the handles from
-<code>defineStreamProducer(...)</code> and <code>defineStreamConsumer(...)</code> are
-<strong>no-op stubs</strong> in the scaffolded plugin: <code>publish()</code> resolves without
-emitting anything and <code>subscribe()</code> returns an unsubscribe callback that does nothing.
-The topic-centric pub/sub runtime is <strong>deferred</strong>. The plugin's own recipe doc says it
-plainly: <em>"Topic-centric APIs are deferred. Define entity-oriented stream schemas with
-<code>@netscript/plugin-streams-core</code> today."</em> Treat streams as the topic-schema authoring
-surface plus the durable-streams dev service on <code>:4437</code> — not a live pub/sub bus yet.
+{{ comp callout { type: "important", title: "Status — producer runtime real, manifest helpers fail loud" } }}
+The producer is real: <code>createDurableStream(...)</code> from
+<code>@netscript/plugin-streams-core</code> writes <code>upsert</code>/<code>delete</code>/<code>flush</code>
+through <code>@durable-streams/client</code> to the <code>:4437</code> Aspire service, and workers,
+sagas, and auth already mirror their state through it. What is <strong>not</strong> supported: the
+manifest helpers <code>defineStreamProducer</code>/<code>defineStreamConsumer</code> in
+<code>@netscript/plugin-streams</code> fail loud — a producer's <code>publish()</code> returns a
+<strong>rejected</strong> promise and a consumer's <code>subscribe()</code> <strong>throws</strong>
+synchronously, both with <code>StreamUnsupportedOperationError</code> — use
+<code>@netscript/plugin-streams-core</code> instead. There is also no
+in-process consumer <code>subscribe()</code>; consumption is via the durable-stream HTTP/SSE server
+(read by Fresh clients).
 {{ /comp }}
 
-## The intended model
+## The model
 
-Streams is designed around a familiar three-part shape: you **define a topic**
-(a name plus a payload schema), get a **producer** that publishes payloads onto
-it, and a **consumer** that subscribes to receive them. The topic definition is
-the type contract that locks producer and consumer to the same payload shape —
-contracts-first, the same instinct as oRPC services but for event flow instead
-of request/response.
+A NetScript stream is an **entity-oriented change log**. You describe a set of
+collections — each a named entity type with a primary key — and the producer
+publishes `upsert` and `delete` operations keyed by that primary key. Downstream
+readers materialize the latest value per key and observe a live, replayable view
+of your domain state. This is the same contracts-first instinct as oRPC services,
+but applied to *state replication* instead of request/response: the schema is the
+type contract that both producer and any HTTP/SSE consumer are locked to.
 
 ```text
-defineStreamTopic("orders", schema)   ── the typed contract (REAL today)
+defineStreamSchema({ execution: { primaryKey: "id" } })   ── the typed contract (REAL)
         │
-        ├── defineStreamProducer(topic).publish(payload)   ── runtime STUB
-        │
-        └── defineStreamConsumer(topic).subscribe(handler)  ── runtime STUB
+        ▼
+createDurableStream({ streamPath, schema, producerId })   ── the producer (REAL)
+        │  .upsert("execution", { id, status })
+        │  .delete("execution", id)
+        │  await .flush()
+        ▼
+durable-stream server on :4437  ──HTTP/SSE──▶  Fresh clients (consumption surface)
 ```
 
-When the runtime lands, the producer/consumer handles will drive real durable
-streams (change-data capture, replayable event logs) through the
-`:4437` service. Today, the contract half is what you can build on; the
-transport half is stubbed.
+Workers, sagas, triggers, and the auth service each run a thin `streams/producer.ts` that
+calls `createDurableStream` to mirror their execution state — so the producer
+path is exercised by first-party plugins, not just sample code.
 
-## Headline API — what actually exists
+## Headline API — the producer that ships
 
-The typed topic/producer/consumer helpers are exported from the plugin manifest
-root, `@netscript/plugin-streams`. `defineStreamTopic` is the load-bearing one:
-it freezes a `{ name, schema }` pair into a `StreamTopicDefinition`. The payload
-schema uses [Standard Schema](https://standardschema.dev) (the `~standard`
-contract), so it interops with zod and other Standard-Schema validators.
+The real surface lives in `@netscript/plugin-streams-core`. Two functions do the
+load-bearing work: `defineStreamSchema` freezes a typed collection map into a
+State-Protocol schema, and `createDurableStream` returns a singleton
+`DurableStreamProducer` for a stream path that you write entity state through.
 
 {{ comp.tabbedCode({ tabs: [
   {
-    label: "Define a topic (real)",
+    label: "Define a schema (real)",
     lang: "ts",
-    code: "// plugins/streams/ — author against the manifest root export.\nimport { defineStreamTopic } from '@netscript/plugin-streams';\nimport { z } from 'zod';\n\n// A topic is a name + a payload schema. This is the typed contract\n// the producer and consumer are locked to. This part is real today.\nexport const ordersTopic = defineStreamTopic('orders', z.object({\n  orderId: z.string().min(1),\n  total: z.number().nonnegative(),\n  placedAt: z.string().datetime(),\n}));\n\n// `ordersTopic` is a frozen { name, schema } StreamTopicDefinition."
+    code: "// Author against the core package — this is the live surface.\nimport { defineStreamSchema } from '@netscript/plugin-streams-core';\nimport { z } from 'zod';\n\n// Each collection is an entity type with a primary key. The schema is the\n// type contract producers and HTTP/SSE consumers are locked to.\nexport const executionsSchema = defineStreamSchema({\n  execution: {\n    schema: z.object({\n      id: z.string().min(1),\n      status: z.enum(['queued', 'running', 'succeeded', 'failed']),\n      updatedAt: z.string().datetime(),\n    }),\n    type: 'execution',\n    primaryKey: 'id',\n  },\n});"
   },
   {
-    label: "Producer / consumer (STUBS)",
+    label: "Open a producer & write (real)",
     lang: "ts",
-    code: "import {\n  defineStreamProducer,\n  defineStreamConsumer,\n} from '@netscript/plugin-streams';\nimport { ordersTopic } from './orders-topic.ts';\n\n// WARNING: in the scaffolded plugin these handles are no-op stubs.\nconst producer = defineStreamProducer(ordersTopic);\nconst consumer = defineStreamConsumer(ordersTopic);\n\n// publish() resolves but emits NOTHING yet (deferred runtime).\nawait producer.publish({ orderId: 'o-1', total: 42, placedAt: new Date().toISOString() });\n\n// subscribe() returns an unsubscribe fn that does NOTHING yet.\nconst unsubscribe = consumer.subscribe((_payload) => {\n  // never invoked in the current stub runtime\n});\nunsubscribe();"
+    code: "import { createDurableStream } from '@netscript/plugin-streams-core';\nimport { executionsSchema } from './executions-schema.ts';\n\n// createDurableStream returns a singleton producer per streamPath and begins\n// connecting to the :4437 durable-stream server immediately.\nconst producer = createDurableStream({\n  streamPath: '/workers/executions',\n  schema: executionsSchema,\n  producerId: 'workers-service',\n});\n\n// upsert/delete are synchronous enqueues keyed by the collection primary key.\nproducer.upsert('execution', {\n  id: 'exec-1',\n  status: 'running',\n  updatedAt: new Date().toISOString(),\n});\nproducer.delete('execution', 'exec-0');\n\n// flush before graceful shutdown; it rethrows the connect error if the\n// producer never connected (see known limitations).\nawait producer.flush();"
   },
   {
-    label: "Stub source (verbatim)",
+    label: "Manifest helpers (fail loud)",
     lang: "ts",
-    code: "// plugins/streams/src/public/stream-api.ts — the actual stub bodies.\nexport const defineStreamTopic = <TPayload>(\n  name: string,\n  schema: StreamPayloadSchema<TPayload>,\n): StreamTopicDefinition<TPayload> => Object.freeze({ name, schema });\n\n// publish is a no-op; the durable transport is deferred.\nexport const defineStreamProducer = <TPayload>(\n  _topic: StreamTopicDefinition<TPayload>,\n): StreamProducerHandle<TPayload> => Object.freeze({ publish: async (_p) => {} });\n\n// subscribe returns a no-op unsubscribe; consumption is deferred.\nexport const defineStreamConsumer = <TPayload>(\n  _topic: StreamTopicDefinition<TPayload>,\n): StreamConsumerHandle<TPayload> => Object.freeze({ subscribe: (_h) => () => {} });"
+    code: "// @netscript/plugin-streams (the manifest root) re-exports topic-centric\n// helpers that are NOT implemented. They fail loud, by design.\nimport {\n  defineStreamProducer,\n  defineStreamConsumer,\n} from '@netscript/plugin-streams';\n\n// The producer handle is returned, but publish() rejects.\nconst producer = defineStreamProducer(/* topic */);\n// await producer.publish(event) // -> rejects with StreamUnsupportedOperationError\n\n// The consumer's subscribe() throws synchronously the moment you call it.\nconst consumer = defineStreamConsumer(/* topic */);\n// consumer.subscribe(handler) // -> throws StreamUnsupportedOperationError\n\n// Correct path: import createDurableStream / defineStreamSchema from\n// '@netscript/plugin-streams-core' instead (see the other tabs)."
   }
 ] }) }}
 
-{{ comp callout { type: "important", title: "Use entity schemas today" } }}
-For event modelling you can ship now, define <strong>entity-oriented stream schemas</strong> with
-<code>@netscript/plugin-streams-core</code> rather than wiring topic-centric producers and consumers.
-The topic helpers above are the forward-looking contract surface; the core package is where the
-schema primitives the plugin builds on live.
+{{ comp callout { type: "warning", title: "Do not call the manifest topic helpers" } }}
+<code>defineStreamProducer</code> and <code>defineStreamConsumer</code> exported from
+<code>@netscript/plugin-streams</code> are <strong>not</strong> implemented: a producer's
+<code>publish()</code> returns a <strong>rejected</strong> promise and a consumer's
+<code>subscribe()</code> <strong>throws</strong> synchronously, both with
+<code>StreamUnsupportedOperationError</code> — they are not silent no-ops and they will not publish
+anything. Always reach
+for <code>createDurableStream</code> / <code>defineStreamSchema</code> from
+<code>@netscript/plugin-streams-core</code> for real producer work. See the
+<a href="/reference/streams/">streams reference</a> for the full export map.
+{{ /comp }}
+
+## Producer surface at a glance
+
+The `DurableStreamProducer` returned by `createDurableStream` exposes a small,
+synchronous-write surface with an async flush/close for shutdown.
+
+{{ comp.apiTable({
+  title: "DurableStreamProducer — methods",
+  columns: ["Member", "Shape", "Behavior"],
+  rows: [
+    ["<code>upsert(entityType, value)</code>", "<code>(K, Record) =&gt; void</code>", "Enqueue an upsert keyed by the collection <code>primaryKey</code>; skipped (warns) if the key is missing/empty."],
+    ["<code>delete(entityType, key)</code>", "<code>(K, string) =&gt; void</code>", "Enqueue a delete by primary key; skipped (warns) on an empty key."],
+    ["<code>flush()</code>", "<code>() =&gt; Promise&lt;void&gt;</code>", "Await pending writes before shutdown; <strong>rethrows</strong> the connect error if the producer never connected."],
+    ["<code>close()</code>", "<code>() =&gt; Promise&lt;void&gt;</code>", "Flush, close the underlying handle, and release the singleton for this <code>streamPath</code>."],
+    ["<code>closed</code>", "<code>boolean</code>", "Whether shutdown has begun; further <code>upsert</code>/<code>delete</code> calls are ignored."]
+  ]
+}) }}
+
+`createDurableStream` is a **singleton factory** keyed by `streamPath`: calling
+it twice with the same path returns the same live producer (a closed one is
+replaced). Writes are idempotent via `@durable-streams/client`'s
+`IdempotentProducer` (stable `producerId` + auto-claim), so duplicate enqueues
+do not double-apply downstream.
+
+## Known limitations
+
+Be deliberate about what the alpha producer does and does not guarantee.
+
+{{ comp callout { type: "warning", title: "Writes are dropped after a connect failure (no reconnect)" } }}
+If the producer cannot reach the <code>:4437</code> durable-stream server at startup, it logs a
+<code>console.warn</code> and then <strong>silently skips every subsequent <code>upsert</code>/<code>delete</code></strong>
+— there is no reconnect loop in the current alpha. <code>flush()</code> rethrows that connect error so a
+graceful shutdown surfaces the failure. Treat a healthy <code>:4437</code> service as a hard precondition
+for durable delivery; do not assume buffered writes will be replayed once the server returns.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "No in-process consumer — read over HTTP/SSE" } }}
+There is no in-process <code>subscribe()</code> handle. Consumption happens over the durable-stream
+server's HTTP/SSE protocol, which Fresh clients read to materialize the latest value per key. Model your
+read side as an HTTP/SSE consumer of the <code>:4437</code> stream, not as an in-process callback.
 {{ /comp }}
 
 ## Endpoints & manifest
 
 The streams plugin is registered as a utility/infra plugin — note it requires
 **neither a database nor KV** (`requiresDb=false`, `requiresKv=false`), unlike
-workers, sagas, and triggers. Its dev service listens on `:4437`.
+workers, sagas, and triggers. Its durable-stream service listens on `:4437` and
+is wired into the Aspire resource graph so workers, sagas, and auth can publish
+through it.
 
 {{ comp.apiTable({
   title: "Streams plugin — runtime facts",
   columns: ["Property", "Value"],
   rows: [
     ["Plugin location", "<code>plugins/streams/</code>"],
-    ["Manifest import", "<code>@netscript/plugin-streams</code> (topic/producer/consumer helpers)"],
-    ["Schema primitives", "<code>@netscript/plugin-streams-core</code>"],
-    ["Dev service port", "<code>:4437</code> (durable-streams dev service)"],
-    ["Service entry", "<code>plugins/streams/services/src/main.ts</code>"],
+    ["Real producer package", "<code>@netscript/plugin-streams-core</code> (<code>createDurableStream</code>, <code>defineStreamSchema</code>)"],
+    ["Manifest import", "<code>@netscript/plugin-streams</code> — topic helpers <strong>throw</strong> <code>StreamUnsupportedOperationError</code>"],
+    ["Transport client", "<code>@durable-streams/client</code> (<code>IdempotentProducer</code>)"],
+    ["Dev service port", "<code>:4437</code> (durable-stream Aspire service)"],
     ["provider.kind", "<code>stream</code> · category <code>plugin</code> · pluginType <code>utility</code>"],
     ["Requires DB / KV", "<code>false</code> / <code>false</code>"],
-    ["Topic API status", "<strong>Real</strong> — <code>defineStreamTopic</code>"],
-    ["Producer / consumer status", "<strong>Stub</strong> — <code>publish</code>/<code>subscribe</code> are no-ops; runtime deferred"]
+    ["First-party producers", "workers, sagas, triggers, auth (each <code>streams/producer.ts</code> → <code>createDurableStream</code>)"],
+    ["Consumer surface", "HTTP/SSE from the <code>:4437</code> server (Fresh clients) — <strong>no</strong> in-process <code>subscribe()</code>"]
   ]
 }) }}
 
 The plugin is referenced from `netscript.config.ts` as
-`./plugins/streams/mod.ts`, and its `appsettings.json` `Workdir` is
-`plugins/streams`. Because workers, sagas, and triggers each list `streams` in
-their `dependencies`, it is installed first in the dependency graph even though
-its public runtime is still stubbed.
+`./plugins/streams/mod.ts`. Because workers, sagas, and triggers each list
+`streams` in their `dependencies`, it is installed first in the dependency graph
+and its `:4437` service comes up so dependent producers have somewhere to write.
 
 ## Learn · Do · Reference
 
@@ -128,24 +185,26 @@ its public runtime is still stubbed.
   },
   {
     title: "Do — add the streams plugin",
-    body: "netscript plugin add stream --samples lands the plugin under plugins/streams/ with topic-schema samples.",
+    body: "netscript plugin add stream --name streams --samples lands the plugin under plugins/streams/ with stream-schema samples.",
     href: "/how-to/add-a-plugin/",
     icon: "→"
   },
   {
-    title: "Reference — @netscript/plugin-streams",
-    body: "The full generated API for the manifest, topic helpers, and the four integration sub-path exports.",
+    title: "Reference — @netscript/plugin-streams-core",
+    body: "The generated API for createDurableStream, defineStreamSchema, the URL/auth resolvers, and StreamProducerPort.",
     href: "/reference/streams/",
     icon: "≡"
   }
 ] }) }}
 
-{{ comp callout { type: "tip", title: "Where the topic helpers come from" } }}
-The manifest root export <code>@netscript/plugin-streams</code> re-exports
-<code>defineStreamTopic</code>, <code>defineStreamProducer</code>, and
-<code>defineStreamConsumer</code> alongside <code>streamsPlugin</code> and its contribution types.
-See the <a href="/reference/streams/">full reference</a> for every exported symbol and the
-<code>cli</code> / <code>scaffolding</code> / <code>e2e</code> / <code>aspire</code> sub-paths.
+{{ comp callout { type: "tip", title: "Where the real surface comes from" } }}
+The producer you build on lives in <code>@netscript/plugin-streams-core</code>:
+<code>createDurableStream</code>, <code>DurableStreamProducer</code>, <code>defineStreamSchema</code>,
+the <code>buildStreamUrl</code>/<code>getStreamsUrl</code>/<code>getStreamsAuth</code> resolvers,
+<code>inspectStreamTopic</code>, and the <code>StreamProducerPort</code> type. The
+<code>@netscript/plugin-streams</code> manifest re-exports <code>streamsPlugin</code> plus the
+fail-loud topic helpers. See the <a href="/reference/streams/">full reference</a> for every exported
+symbol and the <code>cli</code> / <code>scaffolding</code> / <code>e2e</code> / <code>aspire</code> sub-paths.
 {{ /comp }}
 
 {{ comp.nextPrev({ prev: { label: "Triggers & ingress", href: "/capabilities/triggers/" }, next: { label: "Database & Prisma", href: "/capabilities/database/" } }) }}

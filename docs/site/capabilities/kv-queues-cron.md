@@ -12,9 +12,9 @@ The integration trio. Most backends end up hand-assembling three boring-but-load
 seams: a **key-value store** for cache and session state, a **message queue** for
 fire-and-forget work, and a **cron scheduler** for time-driven jobs. NetScript ships all
 three as provider-agnostic packages — `@netscript/kv`, `@netscript/queue`, and
-`@netscript/cron` — each exposing one contract across several backends and **auto-detecting**
-the best available adapter from the Aspire environment, with a zero-config local fallback so
-the same code runs on a laptop and in production.
+`@netscript/cron` — each exposing one typed contract across several backends and
+**auto-detecting** the best available adapter from the Aspire environment, with a zero-config
+local fallback so the same code runs on a laptop and in production.
 
 {{ comp callout { type: "tip", title: "Use this when" } }}
 Reach for <strong>KV</strong> when you need fast, typed read/write state — caches, sessions,
@@ -32,19 +32,20 @@ work</em> use a <a href="/capabilities/triggers/">trigger</a>.
 Each package is built on the same NetScript opinion: a single typed contract, several adapters
 behind it, and provider selection that resolves automatically from the environment so you never
 branch on "is this local or Aspire?" in product code. KV unifies **Deno KV, Redis/Garnet, and
-in-memory**. Queue unifies **Deno KV, Redis, RabbitMQ (AMQP), and a KV-polling** fallback. Cron
-unifies **native `Deno.cron()` and an in-memory** scheduler.
+in-memory**. Queue unifies **Deno KV, Redis, RabbitMQ (AMQP), and PostgreSQL** (plus a KV-polling
+fallback for remote KV Connect endpoints). Cron unifies **native `Deno.cron()` and an in-memory**
+scheduler.
 
 {{ comp.featureGrid({ items: [
   {
     title: "@netscript/kv",
-    body: "Reactive key-value storage. getKv() auto-detects Deno KV, Redis/Garnet, or memory; get/set/watch/atomic with per-key TTL.",
+    body: "Reactive key-value storage. getKv() auto-detects Deno KV or Redis/Garnet; use MemoryKvAdapter directly for tests. get/set/watch/atomic with per-key TTL.",
     href: "/reference/kv/",
     icon: "◆"
   },
   {
     title: "@netscript/queue",
-    body: "Provider-agnostic message queues. createQueue() wraps Deno KV, Redis, RabbitMQ (AMQP), and KV-polling behind one MessageQueue<T> contract.",
+    body: "Provider-agnostic message queues. createQueue() wraps Deno KV, Redis, RabbitMQ (AMQP), and PostgreSQL behind one MessageQueue<T> contract.",
     href: "/reference/queue/",
     icon: "≡"
   },
@@ -62,19 +63,34 @@ Every capability degrades gracefully: with nothing configured you get a local ba
 or in-memory) and zero external dependencies; once Aspire provisions Redis/Garnet or RabbitMQ,
 the same `getKv()`/`createQueue()`/`createScheduler()` call upgrades to the production adapter
 automatically. The matrix below is the full provider surface — read across a capability to see
-which backends it supports and how each is chosen.
+which backends it supports and how each is chosen. Note one deliberate exception: the
+**PostgreSQL queue backend is explicit-provider only** — it is real and durable, but
+auto-detection never selects it (see the callout below).
 
 {{ comp.apiTable({
   caption: "Adapter × capability — supported backends and how they are selected",
   rows: [
-    { name: "Deno KV", type: "kv · queue · cron", desc: "Default zero-config fallback. KV stores locally; the queue uses native Deno KV queue ops; cron is unrelated to KV but shares the local-first philosophy. No external service required." },
-    { name: "memory", type: "kv · cron", desc: "Process-local. MemoryKvAdapter for KV and the in-memory cron adapter (provider: 'memory') — the deterministic default for tests and local development." },
+    { name: "Deno KV", type: "kv · queue · cron", desc: "Default zero-config fallback. KV stores locally; the queue uses native Deno KV queue ops; cron shares the same local-first philosophy via Deno.cron(). No external service required." },
+    { name: "memory", type: "kv · cron", desc: "Process-local. MemoryKvAdapter for KV (must be constructed explicitly) and the in-memory cron adapter (provider: 'memory') — deterministic for tests. The KV default for local development without Redis is Deno KV (local file), not the in-memory adapter." },
     { name: "Redis / Garnet", type: "kv · queue", desc: "Production cache and queue backend. Selected when CACHE_PROVIDER=redis|garnet, REDIS_URI/GARNET_URI, or Aspire services__redis__*/services__garnet__* are present. Garnet is the Redis-compatible cache Aspire provisions." },
-    { name: "RabbitMQ (AMQP)", type: "queue", desc: "Durable broker for high-throughput, multi-consumer queues. Selected first when Aspire reports a rabbitmq service. Imported via @netscript/queue/adapters/amqp for direct access." },
+    { name: "RabbitMQ (AMQP)", type: "queue", desc: "Durable broker for high-throughput, multi-consumer queues. Chosen first by auto-detection when Aspire reports a rabbitmq service. Imported via @netscript/queue/adapters/amqp for direct access." },
+    { name: "PostgreSQL", type: "queue", desc: "Durable SQL-backed queue (FOR UPDATE SKIP LOCKED row-claim, visibility timeout, ack/nack, DLQ). EXPLICIT-PROVIDER ONLY — set provider: 'postgres' / QueueProvider.Postgres; never auto-detected. Configure connection.postgres.{url,tableName}." },
     { name: "KV-polling", type: "queue", desc: "KvPollingAdapter — used automatically when the Deno KV path is a remote HTTP/HTTPS endpoint (KV Connect), where native queue ops are unavailable." },
     { name: "Deno.cron()", type: "cron", desc: "Native runtime scheduler. Used by createScheduler() whenever the runtime exposes Deno.cron(); falls back to the in-memory adapter otherwise." }
   ]
 }) }}
+
+{{ comp callout { type: "warning", title: "PostgreSQL queue is explicit-provider only" } }}
+The queue's auto-detection order is <strong>RabbitMQ → Redis → Deno KV</strong> — it never
+selects PostgreSQL. The Postgres backend is a real, durable adapter
+(<code>FOR UPDATE SKIP LOCKED</code> row-claiming, visibility timeout, ack/nack, dead-letter
+store), but you must opt in explicitly with <code>provider: 'postgres'</code> (or
+<code>QueueProvider.Postgres</code>). The <code>url</code> in
+<code>connection.postgres</code> is optional — when omitted, the adapter falls back to the
+Aspire-provisioned Postgres URI — and <code>tableName</code> defaults to
+<code>message_queue</code>. Reach for it when you want queue state to live in the same
+transactional database as your domain data.
+{{ /comp }}
 
 {{ comp callout { type: "important", title: "Aspire first — then the production adapters appear" } }}
 Auto-detection upgrades to Redis/Garnet and RabbitMQ only when those resources are
@@ -121,10 +137,11 @@ you ask for it.
 ## Headline API — queues: enqueue & consume
 
 `createQueue<T>(name, options?)` returns a `MessageQueue<T>` over the auto-detected backend.
-The factory stays synchronous; heavy Redis and RabbitMQ (AMQP) adapters resolve lazily on first
-use and never enter your module graph until then. Producers call `enqueue(message)`; consumers
-call `listen(handler)`. Wrap a schema with `createTypedQueue(name, schema, options?)` to validate
-on enqueue/dequeue, with a dead-letter (`'dlq'`) option for invalid payloads.
+The factory stays synchronous; heavy Redis, RabbitMQ (AMQP), and PostgreSQL adapters resolve
+lazily on first use and never enter your module graph until then. Producers call
+`enqueue(message)`; consumers call `listen(handler)`. Wrap a schema with
+`createTypedQueue(name, schema, options?)` to validate on enqueue/dequeue, with a dead-letter
+(`'dlq'`) option for invalid payloads.
 
 {{ comp.tabbedCode({ tabs: [
   {
@@ -143,7 +160,12 @@ on enqueue/dequeue, with a dead-letter (`'dlq'`) option for invalid payloads.
     code: "import { z } from 'zod';\nimport { createTypedQueue } from '@netscript/queue';\n\nconst NotificationSchema = z.object({\n  type: z.enum(['email', 'sms']),\n  to: z.string(),\n  body: z.string(),\n});\n\n// Invalid payloads route to a dead-letter queue instead of throwing.\nconst notifications = createTypedQueue('notifications', NotificationSchema, {\n  onValidationError: 'dlq',\n});"
   },
   {
-    label: "Pin a provider",
+    label: "PostgreSQL — durable, explicit",
+    lang: "ts",
+    code: "import { createQueue, QueueProvider } from '@netscript/queue';\n\n// PostgreSQL is never auto-detected — opt in explicitly.\nconst jobs = createQueue<{ orderId: string }>('order-jobs', {\n  provider: QueueProvider.Postgres,        // or provider: 'postgres'\n  connection: {\n    postgres: {\n      // url is optional — falls back to the Aspire-provisioned Postgres URI.\n      url: 'postgres://app:secret@localhost:5432/app',\n      tableName: 'message_queue',           // default table name\n    },\n  },\n});\n\nawait jobs.enqueue({ orderId: 'ord_123' });"
+  },
+  {
+    label: "Pin another provider",
     lang: "ts",
     code: "import { createQueue, QueueProvider } from '@netscript/queue';\n\n// Force Redis regardless of what auto-detection would pick.\nconst jobs = createQueue('jobs', { provider: QueueProvider.Redis });\n\n// Or tune the Deno KV / KV-polling adapter for a remote KV Connect endpoint.\nconst remote = createQueue('jobs', {\n  connection: {\n    denoKv: { path: 'https://kv.example.com', pollInterval: 500, visibilityTimeout: 60_000 },\n  },\n});"
   }
@@ -193,15 +215,15 @@ simple single-scheduler apps, `getScheduler()` returns a shared singleton.
 The trio is strongest together. A common pattern: a **cron** job wakes on a schedule and
 **enqueues** a batch of work; **queue** consumers process each message in parallel; and a **KV**
 store holds the cursor, dedupe keys, or rate-limit counters that keep the whole thing idempotent
-across restarts. None of these requires you to operate Redis or RabbitMQ during development —
-the local Deno KV / in-memory adapters carry the same code until Aspire provisions the real
-backends.
+across restarts. None of these requires you to operate Redis, RabbitMQ, or PostgreSQL during
+development — the local Deno KV / in-memory adapters carry the same code until Aspire provisions
+the real backends (or until you opt in to the PostgreSQL queue explicitly).
 
 {{ comp.apiTable({
   caption: "Picking the right primitive",
   rows: [
     { name: "Key-value state", type: "@netscript/kv", desc: "Synchronous-feeling read/write state: caches, sessions, flags, counters, cursors. Use TTL for ephemerality and watches for reactivity." },
-    { name: "Fire-and-forget work", type: "@netscript/queue", desc: "Decouple slow work from the request path. Fan out to multiple consumers; let the backend handle retries where nativeRetrial is true." },
+    { name: "Fire-and-forget work", type: "@netscript/queue", desc: "Decouple slow work from the request path. Fan out to multiple consumers; let the backend handle retries where nativeRetrial is true. Four backends: Deno KV, Redis, AMQP, PostgreSQL." },
     { name: "Time-driven work", type: "@netscript/cron", desc: "Run handlers on a schedule. Pair with a queue to fan a scheduled tick out into many parallel jobs." },
     { name: "Stateful orchestration", type: "@netscript/plugin-sagas-core", desc: "When work spans steps with correlation and compensation, a queue is not enough — model it as a durable saga instead." }
   ]
@@ -215,7 +237,7 @@ live in the reference. Pick the lane that matches what you're doing.
 {{ comp.featureGrid({ items: [
   {
     title: "Do — Wire a queue / KV / cron job",
-    body: "Task recipe: stand up each primitive in an existing workspace, with the Aspire-provisioned and local-fallback paths spelled out.",
+    body: "Task recipe: stand up each primitive in an existing workspace, with the Aspire-provisioned, local-fallback, and explicit-PostgreSQL paths spelled out.",
     href: "/how-to/queue-kv-cron/",
     icon: "◆"
   },
@@ -227,7 +249,7 @@ live in the reference. Pick the lane that matches what you're doing.
   },
   {
     title: "Look up — @netscript/queue reference",
-    body: "createQueue, createTypedQueue, createParallelQueue, QueueProvider, MessageQueue<T>, and the Deno KV / Redis / AMQP / KV-polling adapters.",
+    body: "createQueue, createTypedQueue, createParallelQueue, QueueProvider, MessageQueue<T>, and the Deno KV / Redis / AMQP / PostgreSQL / KV-polling adapters.",
     href: "/reference/queue/",
     icon: "≡"
   },

@@ -6,15 +6,13 @@ prev: { label: "Background jobs", href: "/capabilities/background-jobs/" }
 next: { label: "Triggers & ingress", href: "/capabilities/triggers/" }
 ---
 
-{{ comp.breadcrumb() }}
-
 # Durable sagas
 
 A saga is the answer to the question every retry loop dodges: *what happens between
 step three and step four when the process dies?* In NetScript a saga is an explicit,
 message-driven state machine — you declare the state it carries, the messages it
 reacts to, and the effects each handler emits. It is authored with a single fluent
-builder, persisted to a durability tier, and served by the **sagas plugin** on port
+builder, persisted to a durable store, and served by the **sagas plugin** on port
 `:8092`. The model is closer to Temporal than to a job queue, but it lives in plain
 TypeScript inside your workspace — no separate cluster to operate.
 
@@ -23,24 +21,41 @@ This is the third capability in the continuous-app thread. The
 `create-user-settings`, that publishes a `UserSettingsCreated` message. Here that
 message stops being fire-and-forget: a saga **consumes it**, advances its own state,
 and emits a `sagaComplete(...)` effect that the runtime records as a first-class
-outcome.
+outcome — and persists durably so the instance survives a process restart.
 
 {{ comp callout { type: "note", title: "Where it lives" } }}
 The plugin is installed at <code>plugins/sagas/</code> and referenced by
 <code>netscript.config.ts</code> as <code>./plugins/sagas/mod.ts</code>. The fluent
 builder and effect helpers come from <code>@netscript/plugin-sagas-core</code>; the
 config-time companion (<code>defineSagaConfig</code>) comes from
-<code>@netscript/plugin-sagas-core/config</code>. Add it to a workspace with
+<code>@netscript/plugin-sagas-core/config</code>; the durable runtime factory
+(<code>createDurableSagaRuntime</code>) comes from the
+<code>@netscript/plugin-sagas/runtime</code> subpath. Add it to a workspace with
 <code>netscript plugin add saga --samples</code>.
 {{ /comp }}
+
+{{ comp.featureGrid({
+  columns: 3,
+  items: [
+    { icon: "◆", title: "Fluent builder", body: "defineSaga(id).durability().state().on().build() — id, durability tier, typed state, message handlers, then build(). One chain, fully type-checked." },
+    { icon: "▣", title: "Durable store backend", body: "Runtime state persists to kv or prisma, chosen by NETSCRIPT_SAGA_STORE / appsettings. createDurableSagaRuntime({ backend, prisma }) owns the resources." },
+    { icon: "≋", title: "Effect-based outcomes", body: "Every handler returns an array of effects — advance, complete, fail, compensate are named outcomes returned from handlers, never a fall-through." },
+    { icon: "⊡", title: "Served on :8092", body: "An oRPC API lists registered sagas, inspects running instances, publishes messages, and streams activity over SSE." },
+    { icon: "⇄", title: "Cross-plugin choreography", body: "The workers create-user-settings job publishes UserSettingsCreated; this saga consumes it — one message crossing the plugin boundary, type-checked on both sides." },
+    { icon: "◷", title: "Crash-survivable", body: "State checkpoints between messages, so an instance picks up exactly where it left off after a restart. That survival is the entire point of a saga." }
+  ]
+}) }}
 
 ## The headline API
 
 A saga is built with `defineSaga(id)` and a chain of three load-bearing calls before
 `.build()`:
 
-- **`.durability('t1')`** picks the persistence tier the saga's state is checkpointed
-  to. `'t1'` is the tier the scaffolded sample uses.
+- **`.durability('t1')`** picks the persistence **tier** the saga's state is
+  checkpointed to. `'t1'` is the tier the scaffolded sample uses. This is the
+  saga-definition durability *tier* (`SAGA_DURABILITY_TIERS`) — a different concept
+  from the runtime **store backend** (`kv`/`prisma`) covered in the next section, so
+  keep the two straight.
 - **`.state<S>({ ... })`** declares the typed state object the saga carries across
   messages, seeded with its initial value.
 - **`.on<Type, Payload>(type, handler)`** registers a message handler. The handler
@@ -70,10 +85,80 @@ completion effect carrying a correlation-friendly payload.
 The builder above produces the <strong>runtime</strong> saga. There is also a
 <strong>config-time</strong> companion,
 <code>defineSagaConfig(id, entrypoint).name(...).description(...).topic(...).tags(...).build()</code>
-from <code>@netscript/plugin-sagas-core/config</code>, which the service uses to publish
-saga <em>metadata</em> into Deno KV (under <code>['saga','registry', id]</code>) so the
-API can list it. The runtime consumes <code>SagaDefinition</code> objects; the config
-describes them.
+from <code>@netscript/plugin-sagas-core/config</code>, used in <code>netscript.config.ts</code>
+to declare saga entries for the scaffolder and CLI. At runtime, the service calls
+<code>registerSagaDefinitions(definitions)</code> on the <code>SagaDefinition[]</code> objects
+produced by <code>defineSaga(...).build()</code> — those are what get stored in Deno KV under
+<code>['saga','registry', id]</code> so the API can list them. The runtime saga definition and
+the config-time entry are separate objects.
+{{ /comp }}
+
+## Choosing a durable store backend
+
+Authoring a saga decides *what* it does. The **durable store backend** decides *where
+its runtime state lives between messages and across crashes*. NetScript ships two
+backends, and the choice is **explicit and mandatory** — the runtime refuses to start
+without one.
+
+- **`kv`** — durable saga state in Deno KV (the orchestration store stood up by
+  Aspire). Zero extra schema; the natural default for a single-service app and for
+  local development.
+- **`prisma`** — durable saga state in Postgres via Prisma. The `PrismaSagaStore`
+  writes the dedicated runtime tables `saga_runtime_state`, `saga_runtime_transition`,
+  and `saga_runtime_correlation`. Reach for this when you want the saga's own write
+  path in your relational database alongside the rest of your data, with SQL-level
+  inspection of in-flight state and transition history.
+
+You select the backend with the `NETSCRIPT_SAGA_STORE` environment variable (`kv` | `prisma`) or the appsettings key `sagas.store.backend`. The plugin service resolves this on startup via `resolveSagaStoreBackend(...)`, which **throws** if neither is set — there is no silent default in the resolver, by design, so a deployment can never guess wrong about where durable state lands. (Calling `createDurableSagaRuntime(...)` directly without a `backend` falls back to the KV store; the mandatory-selection guarantee comes from the resolver the service runs at startup.)
+
+{{ comp.apiTable({
+  caption: "Durable saga store backends — trait matrix",
+  rows: [
+    { name: "kv", type: "Deno KV", desc: "Default for local/single-service. No extra schema. Provisioned by Aspire (Garnet/KV). Resolved via NETSCRIPT_SAGA_STORE=kv or sagas.store.backend=kv." },
+    { name: "prisma", type: "Postgres / Prisma", desc: "Writes saga_runtime_state, saga_runtime_transition, saga_runtime_correlation. Requires a Prisma client passed to createDurableSagaRuntime. SQL-inspectable in-flight state. Resolved via NETSCRIPT_SAGA_STORE=prisma or sagas.store.backend=prisma." },
+    { name: "selection", type: "mandatory", desc: "No implicit default. resolveSagaStoreBackend(...) throws when neither NETSCRIPT_SAGA_STORE nor sagas.store.backend is set." },
+    { name: "client requirement", type: "prisma only", desc: "backend: 'prisma' (or passing prisma) without a Prisma client throws 'Prisma saga store backend requires a Prisma client.'" }
+  ]
+}) }}
+
+The factory that owns these resources is `createDurableSagaRuntime(...)` from the
+`@netscript/plugin-sagas/runtime` subpath. It resolves a `SagaStorePort`, builds the
+native runtime over it, and hands you back a `dispose()` that closes the store (and the
+KV handle it opened).
+
+{{ comp.tabbedCode({ tabs: [
+  {
+    label: "kv backend",
+    lang: "ts",
+    code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\n\n// Deno KV durable store — the default for local/single-service apps.\n// Selected at deploy time by NETSCRIPT_SAGA_STORE=kv (or appsettings sagas.store.backend=kv).\nconst { runtime, store, dispose } = await createDurableSagaRuntime({\n  backend: 'kv',\n  // kv is opened for you if you don't inject one (openSagaRuntimeKv()).\n});\n\n// ... register saga definitions on `runtime`, process messages ...\n\nawait dispose(); // closes the KV-backed store + handle"
+  },
+  {
+    label: "prisma backend",
+    lang: "ts",
+    code: "import { createDurableSagaRuntime } from '@netscript/plugin-sagas/runtime';\nimport { PrismaClient } from './generated/prisma/client.ts';\n\n// Postgres/Prisma durable store — writes saga_runtime_* tables.\n// Selected at deploy time by NETSCRIPT_SAGA_STORE=prisma.\nconst prisma = new PrismaClient();\nconst { runtime, store, dispose } = await createDurableSagaRuntime({\n  backend: 'prisma',\n  prisma, // REQUIRED for prisma — omitting it throws.\n});\n\n// ... register saga definitions, process messages — transitions land in\n// saga_runtime_state / saga_runtime_transition / saga_runtime_correlation ...\n\nawait dispose();"
+  },
+  {
+    label: "resolve from env / appsettings",
+    lang: "ts",
+    code: "import {\n  createDurableSagaRuntime,\n  resolveSagaStoreBackend,\n} from '@netscript/plugin-sagas/runtime';\n\n// Read the backend from the environment (or appsettings) — throws if unset.\nconst backend = resolveSagaStoreBackend({\n  env: Deno.env.toObject(),\n  // appsettings: loadedAppsettings, // sagas.store.backend\n});\n\nconst runtime = await createDurableSagaRuntime({\n  backend,\n  prisma: backend === 'prisma' ? prismaClient : undefined,\n});"
+  }
+] }) }}
+
+{{ comp callout { type: "important", title: "Two durability concepts — don't conflate them" } }}
+<code>.durability('t1')</code> on the <strong>saga definition</strong> selects a
+<em>durability tier</em> (<code>SAGA_DURABILITY_TIERS</code>) — a property of the saga
+itself. The <strong>store backend</strong> (<code>kv</code> | <code>prisma</code>) is a
+<em>runtime/deployment</em> choice about <em>which database</em> holds durable state,
+resolved by <code>NETSCRIPT_SAGA_STORE</code> / <code>sagas.store.backend</code>. A
+saga keeps its declared tier regardless of which backend you deploy against.
+{{ /comp }}
+
+{{ comp callout { type: "note", title: "Read model vs. durable write path" } }}
+The Prisma backend's <code>saga_runtime_*</code> tables are the durable
+<strong>write path</strong> the engine checkpoints to. They are distinct from
+<code>saga_instances</code> (and <code>saga_execution_history</code>) — a
+<strong>read-model projection</strong> into Postgres for API queries, analytics, and
+debugging. The runtime persists to the former; the API surface lists from the latter.
 {{ /comp }}
 
 ## How completion and compensation work
@@ -114,8 +199,10 @@ The sagas service needs Postgres and Garnet up before it can persist and list
 instances. Bring orchestration up first — <code>cd aspire &amp;&amp; aspire run</code>
 (dashboard at <a href="http://localhost:18888"><code>http://localhost:18888</code></a>) —
 <em>before</em> any <code>netscript db</code> command or before you expect
-<code>/api/v1/sagas/instances</code> to return durable state. DB commands require
-Aspire running first.
+<code>/api/v1/sagas/instances</code> to return durable state. This holds for both
+backends: <code>kv</code> needs Garnet/KV up, and <code>prisma</code> needs Postgres up
+with the <code>saga_runtime_*</code> tables migrated. DB commands require Aspire running
+first.
 {{ /comp }}
 
 ## The continuous-app choreography
@@ -142,7 +229,9 @@ halves are type-checked against the same message type.
 After both plugins are running under Aspire, trigger the workers job
 (`POST :8091/api/v1/workers/jobs/create-user-settings/trigger`) and watch the saga
 appear at `GET :8092/api/v1/sagas/instances` — the message crossed the boundary and a
-durable instance recorded its completion.
+durable instance recorded its completion. Whether that durable instance lives in Deno
+KV or in your `saga_runtime_*` Postgres tables is exactly the `NETSCRIPT_SAGA_STORE`
+choice above.
 
 ## Learn · Do · Reference
 
@@ -154,15 +243,15 @@ durable instance recorded its completion.
 }) }}
 
 {{ comp.card({
-  title: "Do — Add a plugin",
-  body: "The task recipe for installing a saga (or any plugin) into a workspace with netscript plugin add saga --samples, where it lands under plugins/sagas/, and how the registry is generated.",
-  href: "/how-to/add-a-plugin/",
-  icon: "◎"
+  title: "Understand — Why durable workflows",
+  body: "The conceptual companion: why a saga's state must outlive the process, how effect-based outcomes differ from a retry loop, and where the kv vs prisma durable store backends fit the durability model.",
+  href: "/explanation/durable-workflows/",
+  icon: "✲"
 }) }}
 
 {{ comp.card({
   title: "Reference — sagas",
-  body: "The full generated @netscript/plugin-sagas API: the defineSaga builder, durability tiers, effect helpers (sagaComplete and friends), the SagaDefinition domain types, and every :8092 route.",
+  body: "The full generated @netscript/plugin-sagas API: the defineSaga builder, durability tiers, createDurableSagaRuntime, the kv/prisma store backends, effect helpers (sagaComplete and friends), the SagaDefinition domain types, and every :8092 route.",
   href: "/reference/sagas/",
   icon: "≡"
 }) }}
@@ -173,14 +262,16 @@ durable instance recorded its completion.
 You have a multi-step process where steps can fail independently and the
 <strong>state between steps must survive a crash</strong> — onboarding, checkout,
 provisioning. The correlation, persistence, and named completion/failure outcomes are
-exactly what a hand-rolled retry loop lacks.
+exactly what a hand-rolled retry loop lacks. Pick <code>prisma</code> as the store
+backend when you also want that in-flight state queryable in your relational database.
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Don't reach for a saga when…" } }}
 The work is a single idempotent unit with no inter-step state — that is a
 <a href="/capabilities/background-jobs/">background job</a>, not a saga. And remember
-the alpha reality: durability and the instance store depend on Postgres being up via
-Aspire, so a saga is not a substitute for a database transaction within one handler.
+the alpha reality: durability and the instance store depend on the orchestration stack
+being up via Aspire (Garnet/KV for <code>kv</code>, Postgres for <code>prisma</code>),
+so a saga is not a substitute for a database transaction within one handler.
 {{ /comp }}
 
 {{ comp.nextPrev({
