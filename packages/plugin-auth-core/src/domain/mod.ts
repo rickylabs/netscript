@@ -1,3 +1,16 @@
+/**
+ * Auth domain entities and schemas shared by backend adapters and services.
+ *
+ * @example
+ * ```ts
+ * import { AUTH_SESSION_STATES } from "@netscript/plugin-auth-core/domain";
+ *
+ * console.log(AUTH_SESSION_STATES.active);
+ * ```
+ *
+ * @module
+ */
+
 import { z } from 'zod';
 import type {
   AuthenticatorPort,

@@ -44,6 +44,8 @@ export type AuthStreamEvent = Readonly<{
   providerId?: string;
   subject?: string;
   reason?: string;
+  traceparent?: string;
+  tracestate?: string;
   data?: Readonly<Record<string, unknown>>;
 }>;
 
@@ -58,6 +60,8 @@ const AuthStreamEventZodSchema: z.ZodType<AuthStreamEvent> = z.object({
   providerId: z.string().optional(),
   subject: z.string().optional(),
   reason: z.string().optional(),
+  traceparent: z.string().optional(),
+  tracestate: z.string().optional(),
   data: z.record(z.string(), z.unknown()).optional(),
 });
 

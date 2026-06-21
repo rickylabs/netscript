@@ -1,3 +1,16 @@
+/**
+ * Auth backend, session, provider, crypto, and registry ports.
+ *
+ * @example
+ * ```ts
+ * import { DEFAULT_AUTH_BACKEND_NAME } from "@netscript/plugin-auth-core/ports";
+ *
+ * console.log(DEFAULT_AUTH_BACKEND_NAME);
+ * ```
+ *
+ * @module
+ */
+
 import type {
   AuthenticatorPort,
   AuthnRequest,

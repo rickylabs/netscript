@@ -16,4 +16,8 @@ export const SENSITIVE_FIELD_FRAGMENTS = [
   'auth',
   'credential',
   'apikey',
+  'sessionid',
+  'accesstoken',
+  'refreshtoken',
+  'jwttoken',
 ] as const;

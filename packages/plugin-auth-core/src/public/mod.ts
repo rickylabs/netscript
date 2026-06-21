@@ -78,6 +78,34 @@ export type {
   SignoutResponse,
   ValidationErrorData,
 } from '../contracts/v1/mod.ts';
+export {
+  AuthAttributes,
+  AuthErrorCode,
+  authErrorCodeForReason,
+  AuthOutcome,
+  authOutcomeForReason,
+  AuthSpanEvents,
+  AuthSpanNames,
+  createAuthTelemetry,
+  hashSubject,
+  redactAuthPrincipal,
+} from '../telemetry/mod.ts';
+export type {
+  AuthAttributeName,
+  AuthErrorCodeValue,
+  AuthOperationInput,
+  AuthOperationOutcome,
+  AuthOperationRecorder,
+  AuthOutcomeValue,
+  AuthSpanEventName,
+  AuthSpanName,
+  AuthTelemetry,
+  AuthTelemetryAttributes,
+  AuthTelemetryAttributeValue,
+  AuthTelemetryOperation,
+  AuthTelemetryOptions,
+  RedactedAuthPrincipal,
+} from '../telemetry/mod.ts';
 export { AUTH_PRESET_KINDS, createAuthPresetRegistry } from '../presets/mod.ts';
 export type {
   AuthBackendPreset,

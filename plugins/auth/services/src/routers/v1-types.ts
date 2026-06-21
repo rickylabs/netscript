@@ -1,5 +1,6 @@
 import type { ResolvedAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
 import type { AuthnRequest, AuthSession } from '@netscript/plugin-auth-core/domain';
+import type { AuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import type {
   CallbackInput,
   CallbackResponse,
@@ -25,7 +26,12 @@ export type AuthServiceInitialContext = AuthServiceContext;
 /** Service context available to V1 auth route handlers. */
 export type AuthServiceContext = Readonly<{
   registry: ResolvedAuthBackendRegistry;
+  telemetry?: AuthTelemetry;
   request?: AuthServiceRequest;
+  traceHeaders?: Readonly<{
+    traceparent?: string;
+    tracestate?: string;
+  }>;
 }>;
 
 /** Error thrown by auth service handlers and normalized by the central oRPC error plugin. */
