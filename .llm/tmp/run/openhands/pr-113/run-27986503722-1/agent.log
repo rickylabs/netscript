@@ -1,0 +1,400 @@
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/27986503722-1/pr-comment-body.md"
+  file_text: 
+    ## PLAN-EVAL — Verdict: FAIL_PLAN (cycle 1 of 2)
+    
+    **This is a hard gate: no implementation begins until this returns `PASS`.**
+    
+    ### Tier-by-tier verification (against the real surface)
+    
+    **T1 — pure 0-consumer aliases ✅**
+    - 8 cli `windows.ts` aliases (`SERVY_CLI_PATH`, `COMPILE_TARGET`, 
+`SERVICE_PREFIX`, `BUNDLE_EXTERNAL`, `BUNDLE_EXTERNAL_IMPORTS`, 
+`COMPILE_TIMEOUT_MS`, `BUNDLE_TIMEOUT_MS`, `V8_HEAP_MB`) — every call site uses 
+the canonical `DEFAULT_*`. 0 consumers.
+    - `buildConnectionString` re-export at `packages/database/mod.ts:256` — 0 
+import consumers (the 2 private class methods in mysql/postgres adapters are 
+unrelated, correctly flagged).
+    - `mssqlJsonExtension` — 0 consumers beyond the re-export chain.
+    - `packages/telemetry/src/context/job.ts` — 0 importers.
+    
+    **T2 — deprecated option fields ✅ (canonical exists, fold is safe)**
+    - mssql `trustedConnection` (`adapters/mssql.adapter.ts:26, 66, 416`) — 
+canonical `authentication.type='ntlm'` is wired in the same adapter.
+    - fresh `serveStaticFiles`/`registerFsRoutes` (`define-fresh-app.ts:50, 73`)
+— canonical `staticFiles`/`fsRoutes` are wired and exercised by tests.
+    
+    **T3 — deprecated subsystems: saga-side ✅, workers-side ❌**
+    
+    *`saga-bus-legacy` (S3a)* — wholesale removal is safe. The only caller of 
+`adapter: 'legacy'` is `plugins/sagas/src/runtime/saga-supervisor.ts:130` 
+forwarding user options into `createSagaRuntime({ adapter: 'legacy' })`. 
+Canonical `SagaBusBridge`/native runtime covers the surface.
+    
+    *Workers legacy `schedule()` plumbing (S3b)* — **unsound**. The plan's 
+pre-condition — that `defineScheduledTrigger().enqueueJob()` is the canonical 
+replacement for `defineJob().schedule(cron)` — is **false**. The two are 
+**parallel cron subsystems** with no functional equivalence:
+    
+    | | `defineJob().schedule()` (workers) | `defineScheduledTrigger()` 
+(triggers) |
+    |---|---|---|
+    | Runtime adapter | `plugins/workers/worker/scheduler.ts` (`Scheduler` 
+class) | `plugins/triggers/src/runtime/trigger-processor.ts` 
+(`CronTriggerSchedulerAdapter`) |
+    | Scaffold | `plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` | 
+`plugins/triggers/src/scaffolding/trigger-scaffolders.ts:86-88` |
+    | CLI flag | `plugins/workers/src/cli/workers-cli-backend.ts` (`--schedule`)
+| `plugins/triggers/src/cli/triggers-cli-backend-support.ts` |
+    | Cross-pkg dep | `plugins/workers/deno.json` has **no** 
+`@netscript/plugin-triggers-core` | — |
+    | Doc example | `plugin-workers-core/README.md:99`, 
+`docs/recipes/adding-a-job.md:22` | — |
+    
+    Wholesale S3b removal would orphan: the public `JobDefinition.schedule` 
+field (re-exported via `packages/plugin-workers-core/src/public/mod.ts`), 
+`JobBuilder.schedule()`, the in-process `Scheduler` class, the scaffold 
+emission, and the documented `.schedule(...)` recipes.
+    
+    ### Rulings on the two open PLAN-EVAL questions
+    
+    **Q3 — T3 wholesale retirement:**
+    - **S3a (saga legacy)**: ✅ safe — proceed.
+    - **S3b (workers-side)**: ❌ wholesale retirement is **not** safe — the 
+canonical replacement does not cover the functionality. Pick one of: (a) narrow 
+S3b to entry-point-only (drop the `@deprecated` annotation, keep the field), (b)
+defer S3b from this PR (file a separate subsystem-merge plan), or (c) rescope 
+PR-B to a subsystem-merge PR (fold workers-cron onto triggers-cron, then 
+remove).
+    
+    **Q4 — version policy:** ✅ PASS. Per-package minor bump (`0.0.1-alpha.0` → 
+`0.1.0-alpha.0`) with `BREAKING (alpha-1, zero-compat)` note is semver-correct 
+for the pre-1.0 series. A coordinated major bump would be over-engineered — 
+there is no `1.0` to move away from.
+    
+    ### Required fixes
+    
+    1. Re-scope S3b per the three options above. The current wholesale claim is 
+not supportable.
+    2. Run `jsr-audit` against the planned public surface of the 6 affected 
+packages (incl. `JobDefinition`, `JobBuilder`, v1 contract schemas, 
+`WorkerCronScheduler`).
+    3. If S3b proceeds, add these to its file list (currently absent): 
+`plugin-workers-core/README.md:99`, `docs/recipes/adding-a-job.md:22`, 
+`docs/site/capabilities/durable-sagas.md:191`, 
+`docs/site/explanation/durability-model.md:105`, 
+`plugins/workers/src/scaffolding/job-scaffolders.ts:64-65`, 
+`plugins/workers/src/cli/workers-cli-backend.ts` (`--schedule`).
+    4. Add `deno doc --lint` to the S3 gate set (per affected package) — the 
+publish bar for public-surface removals.
+    5. Convert "Codex must grep `templates/`, `docs/`, `plugins/*/templates`" 
+from a free-form open item into an explicit pre-S1 gate.
+    6. Re-run the open-decision sweep after the S3b fix; record the chosen S3b 
+alternative.
+    
+    ### Lock hygiene
+    
+    ✅ No `deno.lock` churn. ✅ No source edits. ✅ No `deno cache --reload`. 
+Verdict artifact at `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md`. 
+Drift + worklog updated.
+    
+    ### Note
+    
+    Cycle 2 budget: 1 remaining `FAIL_PLAN` cycle before escalation per 
+`gates/plan-gate.md`.
+    
+    ---
+    
+    _This comment was generated by an AI agent (OpenHands) on behalf of the 
+user, as part of the NetScript harness v2 PLAN-EVAL gate for PR-B 
+(`chore/alpha1-jsr-shim-removal`)._
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 4.32M • cache hit 90.68% •  reasoning 1.93K • ↓ output 36.88K • 
+$ 0.3998
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/27986503722-1/pr-comment-body.md edited 
+with 1 changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|## PLAN-EVAL — Verdict: FAIL_PLAN (cycle 1 of 2)
+ 2|
++3|**This is a hard gate: no implementation begins until this returns `PASS`.**
++4|
++5|### Tier-by-tier verification (against the real surface)
++6|
++7|**T1 — pure 0-consumer aliases ✅**
++8|- 8 cli `windows.ts` aliases (`SERVY_CLI_PATH`, `COMPILE_TARGET`, 
+`SERVICE_PREFIX`, `BUNDLE_EXTERNAL`, `BUNDLE_EXTERNAL_IMPORTS`, 
+`COMPILE_TIMEOUT_MS`, `BUNDLE_TIMEOUT_MS`, `V8_HEAP_MB`) — every call site uses 
+the canonical `DEFAULT_*`. 0 consumers.
++9|- `buildConnectionString` re-export at `packages/database/mod.ts:256` — 0 
+import consumers (the 2 private class methods in mysql/postgres adapters are 
+unrelated, correctly flagged).
++10|- `mssqlJsonExtension` — 0 consumers beyond the re-export chain.
++11|- `packages/telemetry/src/context/job.ts` — 0 importers.
++12|
++13|**T2 — deprecated option fields ✅ (canonical exists, fold is safe)**
++14|- mssql `trustedConnection` (`adapters/mssql.adapter.ts:26, 66, 416`) — 
+canonical `authentication.type='ntlm'` is wired in the same adapter.
++15|- fresh `serveStaticFiles`/`registerFsRoutes` (`define-fresh-app.ts:50, 73`)
+— canonical `staticFiles`/`fsRoutes` are wired and exercised by tests.
++16|
++17|**T3 — deprecated subsystems: saga-side ✅, workers-side ❌**
++18|
++19|*`saga-bus-legacy` (S3a)* — wholesale removal is safe. The only caller of 
+`adapter: 'legacy'` is `plugins/sagas/src/runtime/saga-supervisor.ts:130` 
+forwarding user options into `createSagaRuntime({ adapter: 'legacy' })`. 
+Canonical `SagaBusBridge`/native runtime covers the surface.
++20|
++21|*Workers legacy `schedule()` plumbing (S3b)* — **unsound**. The plan's 
+pre-condition — that `defineScheduledTrigger().enqueueJob()` is the canonical 
+replacement for `defineJob().schedule(cron)` — is **false**. The two are 
+**parallel cron subsystems** with no functional equivalence:
++22|
++23|| | `defineJob().schedule()` (workers) | `defineScheduledTrigger()` 
+(triggers) |
++24||---|---|---|
++25|| Runtime adapter | `plugins/workers/worker/scheduler.ts` (`Scheduler` 
+class) | `plugins/triggers/src/runtime/trigger-processor.ts` 
+(`CronTriggerSchedulerAdapter`) |
++26|| Scaffold | `plugins/workers/src/scaffolding/job-scaffolders.ts:64-65` | 
+`plugins/triggers/src/scaffolding/trigger-scaffolders.ts:86-88` |
++27|| CLI flag | `plugins/workers/src/cli/workers-cli-backend.ts` (`--schedule`)
+| `plugins/triggers/src/cli/triggers-cli-backend-support.ts` |
++28|| Cross-pkg dep | `plugins/workers/deno.json` has **no** 
+`@netscript/plugin-triggers-core` | — |
++29|| Doc example | `plugin-workers-core/README.md:99`, 
+`docs/recipes/adding-a-job.md:22` | — |
++30|
++31|Wholesale S3b removal would orphan: the public `JobDefinition.schedule` 
+field (re-exported via `packages/plugin-workers-core/src/public/mod.ts`), 
+`JobBuilder.schedule()`, the in-process `Scheduler` class, the scaffold 
+emission, and the documented `.schedule(...)` recipes.
++32|
++33|### Rulings on the two open PLAN-EVAL questions
++34|
++35|**Q3 — T3 wholesale retirement:**
++36|- **S3a (saga legacy)**: ✅ safe — proceed.
++37|- **S3b (workers-side)**: ❌ wholesale retirement is **not** safe — the 
+canonical replacement does not cover the functionality. Pick one of: (a) narrow 
+S3b to entry-point-only (drop the `@deprecated` annotation, keep the field), (b)
+defer S3b from this PR (file a separate subsystem-merge plan), or (c) rescope 
+PR-B to a subsystem-merge PR (fold workers-cron onto triggers-cron, then 
+remove).
++38|
++39|**Q4 — version policy:** ✅ PASS. Per-package minor bump (`0.0.1-alpha.0` → 
+`0.1.0-alpha.0`) with `BREAKING (alpha-1, zero-compat)` note is semver-correct 
+for the pre-1.0 series. A coordinated major bump would be over-engineered — 
+there is no `1.0` to move away from.
++40|
++41|### Required fixes
++42|
++43|1. Re-scope S3b per the three options above. The current wholesale claim is 
+not supportable.
++44|2. Run `jsr-audit` against the planned public surface of the 6 affected 
+packages (incl. `JobDefinition`, `JobBuilder`, v1 contract schemas, 
+`WorkerCronScheduler`).
++45|3. If S3b proceeds, add these to its file list (currently absent): 
+`plugin-workers-core/README.md:99`, `docs/recipes/adding-a-job.md:22`, 
+`docs/site/capabilities/durable-sagas.md:191`, 
+`docs/site/explanation/durability-model.md:105`, 
+`plugins/workers/src/scaffolding/job-scaffolders.ts:64-65`, 
+`plugins/workers/src/cli/workers-cli-backend.ts` (`--schedule`).
++46|4. Add `deno doc --lint` to the S3 gate set (per affected package) — the 
+publish bar for public-surface removals.
++47|5. Convert "Codex must grep `templates/`, `docs/`, `plugins/*/templates`" 
+from a free-form open item into an explicit pre-S1 gate.
++48|6. Re-run the open-decision sweep after the S3b fix; record the chosen S3b 
+alternative.
++49|
++50|### Lock hygiene
++51|
++52|✅ No `deno.lock` churn. ✅ No source edits. ✅ No `deno cache --reload`. 
+Verdict artifact at `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md`. 
+Drift + worklog updated.
++53|
++54|### Note
++55|
++56|Cycle 2 budget: 1 remaining `FAIL_PLAN` cycle before escalation per 
+`gates/plan-gate.md`.
++57|
++58|---
++59|
++60|_This comment was generated by an AI agent (OpenHands) on behalf of the 
+user, as part of the NetScript harness v2 PLAN-EVAL gate for PR-B 
+(`chore/alpha1-jsr-shim-removal`)._
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Final integrity check
+
+Thought:
+Let me do a final integrity check:
+
+$ cd /home/runner/work/netscript/netscript && echo "=== deno.lock unchanged from
+origin/main ==="; git --no-pager diff origin/main -- deno.lock | wc -l; echo 
+"=== deno.lock unchanged from HEAD ==="; git --no-pager diff HEAD -- deno.lock |
+wc -l; echo "=== git status ==="; git status --short; echo "=== HEAD vs origin 
+==="; git --no-pager log --oneline origin/chore/alpha1-jsr-shim-removal..HEAD; 
+echo "=== files in plan-eval run dir ==="; ls -la 
+/home/runner/work/_temp/openhands/27986503722-1/; echo "=== run trace dir ==="; 
+ls -la .llm/tmp/run/openhands/pr-113/run-27986503722-1/
+
+Tokens: ↑ input 4.35M • cache hit 90.67% •  reasoning 1.93K • ↓ output 37.12K • 
+$ 0.4030
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+=== deno.lock unchanged from origin/main ===
+0
+=== deno.lock unchanged from HEAD ===
+0
+=== git status ===
+?? .llm/tmp/run/openhands/pr-113/
+=== HEAD vs origin ===
+=== files in plan-eval run dir ===
+total 604
+drwxr-xr-x 2 runner runner   4096 Jun 22 22:08 .
+drwxr-xr-x 3 runner runner   4096 Jun 22 21:52 ..
+-rw-r--r-- 1 runner runner 557112 Jun 22 22:08 agent.log
+-rw-r--r-- 1 runner runner      2 Jun 22 21:53 bootstrap-exit-code.txt
+-rw-r--r-- 1 runner runner   2375 Jun 22 21:53 bootstrap.log
+-rw-r--r-- 1 runner runner   8760 Jun 22 21:52 issue-comments.json
+-rw------- 1 runner runner   5064 Jun 22 22:08 pr-comment-body.md
+-rw-r--r-- 1 runner runner      3 Jun 22 21:52 pr-review-comments.json
+-rw-r--r-- 1 runner runner   6539 Jun 22 21:52 request.md
+-rw------- 1 runner runner   4295 Jun 22 22:07 summary.md
+=== run trace dir ===
+total 16
+drwxr-xr-x 2 runner runner 4096 Jun 22 21:52 .
+drwxr-xr-x 3 runner runner 4096 Jun 22 21:52 ..
+-rw-r--r-- 1 runner runner 6539 Jun 22 21:52 request.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL FAIL_PLAN verdict emitted
+
+Thought:
+Everything is in order:
+
+- ✅ **`deno.lock` is unchanged** (0 diff lines vs origin/main, 0 diff lines vs 
+HEAD)
+- ✅ **No source edits** — only evaluator artifacts in `.llm/tmp/run/`
+- ✅ **HEAD matches origin** — commit pushed
+- ✅ **Run summary at the right path** — 
+`/home/runner/work/_temp/openhands/27986503722-1/summary.md`
+- ✅ **Run trace directory exists** — 
+`.llm/tmp/run/openhands/pr-113/run-27986503722-1/`
+- ✅ **PR comment body prepared** — 
+`/home/runner/work/_temp/openhands/27986503722-1/pr-comment-body.md` (workflow 
+owns posting; this is for the workflow's pickup)
+- ✅ **No GitHub comment posted** (per the operational contract — workflow owns 
+GitHub comments)
+
+Finish with message:
+## PLAN-EVAL verdict: `FAIL_PLAN` (cycle 1 of 2)
+
+Hard gate enforced. **No implementation begins until this returns `PASS`.** 
+Planning only — no source edits, no `deno.lock` churn, no `deno cache --reload`.
+Verdict artifact committed and pushed: `914ecaa9 chore(plan-eval): PLAN-EVAL 
+cycle 1 — FAIL_PLAN for PR-B shim removal`.
+
+### Tier-by-tier verification (against the real surface)
+
+| Tier | Result | Note |
+|---|---|---|
+| **T1** aliases (8 cli `windows.ts`, db `buildConnectionString`, 
+`mssqlJsonExtension`, telemetry `context/job.ts`) | ✅ VERIFIED | All genuine 
+`@deprecated`, 0 import consumers; same-name unrelated class methods correctly 
+flagged as false positives. |
+| **T2** option fields (mssql `trustedConnection`, fresh 
+`serveStaticFiles`/`registerFsRoutes`) | ✅ VERIFIED | Canonical 
+`authentication.type='ntlm'` and `staticFiles`/`fsRoutes` exist, are wired, and 
+have test coverage. |
+| **S3a** saga-side `saga-bus-legacy` + legacy runtime | ✅ VERIFIED | 0 
+external consumers (only `saga-supervisor.ts:130` forwards `adapter: 'legacy'`).
+Wholesale removal safe. |
+| **S3b** workers-side `schedule()` + `schedule` field plumbing | ❌ **UNSOUND**
+| Plan's claimed canonical replacement `defineScheduledTrigger().enqueueJob()` 
+is **false** — the two are parallel cron subsystems (separate scaffolds, CLI 
+flags, runtime adapters, doc examples). `plugins/workers/deno.json` has **no** 
+dependency on `@netscript/plugin-triggers-core`. |
+
+### Rulings on the two explicit PLAN-EVAL questions
+
+**Q3 — T3 wholesale retirement:**
+- **S3a (saga legacy)**: ✅ safe — proceed with wholesale removal.
+- **S3b (workers-side)**: ❌ **wholesale retirement is not safe**. The canonical
+replacement does not cover the functionality. Pick one of: (a) narrow S3b to 
+entry-point-only, (b) defer S3b from this PR + file separate subsystem-merge 
+plan, or (c) rescope PR-B to a subsystem-merge PR. **The current wholesale claim
+is not supportable against the tree.**
+
+**Q4 — version policy:** ✅ **PASS**. Per-package minor bump `0.0.1-alpha.0 → 
+0.1.0-alpha.0` with `BREAKING (alpha-1, zero-compat)` note is semver-correct for
+the pre-1.0 series. A coordinated major bump would be over-engineered — there is
+no `1.0` to move away from.
+
+### Required fixes (the FAIL_PLAN remediation list)
+
+1. **Re-scope S3b** per the three options above.
+2. **Run `jsr-audit`** against the planned public surface of the 6 affected 
+packages (incl. `JobDefinition`, `JobBuilder`, v1 contract schemas, 
+`WorkerCronScheduler`).
+3. **Doc/recipe updates must be in S3b's file list** (currently absent): 
+`plugin-workers-core/README.md:99`, `docs/recipes/adding-a-job.md:22`, 
+`docs/site/capabilities/durable-sagas.md:191`, 
+`docs/site/explanation/durability-model.md:105`, 
+`plugins/workers/src/scaffolding/job-scaffolders.ts:64-65`, 
+`plugins/workers/src/cli/workers-cli-backend.ts` (`--schedule`).
+4. **Add `deno doc --lint`** to the S3 gate set (per affected package).
+5. **Convert "Codex must grep `templates/`, `docs/`, `plugins/*/templates`"** 
+from a free-form open item into an explicit pre-S1 gate.
+6. **Re-run the open-decision sweep** after the S3b fix; record the chosen S3b 
+alternative.
+
+### Gate set + lock hygiene + zero-cast
+- Gates (T1/T2/S3a): sufficient (scoped check/lint/fmt + per-package test + 
+`arch:check` + `publish:dry-run` + `scaffold.runtime` at IMPL-EVAL).
+- Missing for S3b: `deno doc --lint`, `jsr-audit` on the planned surface, 
+scaffold-grep as a gate (not an open item).
+- Lock hygiene: ✅ `deno.lock` unchanged (0 diff lines vs origin/main).
+- Zero-cast: ✅ removal-only introduces no new casts.
+
+### Deliverables produced
+- **Verdict artifact (committed, pushed)**: 
+`.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md` — full tier-by-tier 
+findings, gate checklist, rulings on Q3/Q4, FAIL_PLAN remediation list.
+- **Drift log (committed)**: 
+`.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` — cycle-1 entry.
+- **Worklog (committed)**: 
+`.llm/tmp/run/chore-alpha1-jsr-shim-removal/worklog.md` — cycle-1 entry.
+- **Run summary**: `/home/runner/work/_temp/openhands/27986503722-1/summary.md`.
+- **PR comment body (for the workflow to post)**: 
+`/home/runner/work/_temp/openhands/27986503722-1/pr-comment-body.md`.
+- **Run trace**: `.llm/tmp/run/openhands/pr-113/run-27986503722-1/`.
+
+### Note on output_mode
+
+`output_mode: pr-comment` — the workflow owns posting the PR comment; this run 
+did not post to GitHub (per the operational contract). Cycle 2 budget: 1 
+remaining `FAIL_PLAN` cycle before escalation per `gates/plan-gate.md`.
+
+Tokens: ↑ input 4.38M • cache hit 90.73% •  reasoning 1.93K • ↓ output 38.6K • $
+0.4069
+
