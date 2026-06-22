@@ -1,0 +1,36 @@
+VERDICT: PASS
+
+Plan-evaluator verdict on PR #113 / branch chore/alpha1-jsr-shim-removal @ 5d1bee91.
+Cycle 2 of 2 (final).
+
+The revised plan correctly closes the cycle-1 unsoundness:
+- S3b (workers-side slice) cleanly DEFERRED per user-confirmed option (b). Every workers-side
+  surface (schedule field + scheduler port + builder method + scaffold + CLI flag + template
+  + 4 docs/recipe/site references) is intact and untouched by PR-B.
+- S3a (saga legacy) is self-contained: no dep on the deferred workers work;
+  saga-supervisor.ts:130 fold onto native default is correct.
+- V8_HEAP_MB fold verified: v8-profiles.ts:12,46,73 is the only live consumer of any of the
+  8 cli aliases; DEFAULT_V8_HEAP_MB is value-identical; other 7 aliases re-grepped = 0-consumer.
+- Gate set verified sufficient for the smaller breaking removal:
+  named S1 pre-delete grep gate + deno doc --lint per pkg + per-package test + arch:check +
+  publish:dry-run + scaffold.runtime at IMPL-EVAL.
+- Version policy + zero-cast re-confirmed for the reduced set.
+- Lock hygiene preserved (no deno.lock churn, no source edits).
+
+Non-blocking observations for the implementer / IMPL-EVAL:
+1. research.md Tier-1 line 15 uses COMPILE_TARGET / SERVICE_PREFIX / BUNDLE_EXTERNAL — actual
+   windows.ts names are WINDOWS_TARGET / WINDOWS_SERVICE_PREFIX / BUNDLE_EXTERNAL_PACKAGES.
+   Suggest updating research.md for accuracy (plan not affected).
+2. S3a narrative-doc references (not enumerated in plan's file list):
+   README.md:108,142 + docs/runtime-composition.md:27 + docs/site/reference/sagas/index.md:93.
+3. S3a barrel-file references (not enumerated): adapters/mod.ts:85,89, runtime/mod.ts:60-62,80,
+   presets/mod.ts:8,12, plugins/sagas/src/runtime/mod.ts:65-70,87. Mechanically caught by
+   deno doc --lint + arch:check + publish:dry-run.
+4. plugins/sagas/src/runtime/saga-runner.ts:118 parseAdapter must be normalized post-S3a
+   (SagaRuntimeAdapter union drops 'legacy').
+
+Next: implementation runs in a separate session (WSL Codex). Order: S1 -> S2 -> S3a. Then IMPL-EVAL.
+
+Full verdict: .llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md
+Drift notes: .llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md
+Worklog: .llm/tmp/run/chore-alpha1-jsr-shim-removal/worklog.md
