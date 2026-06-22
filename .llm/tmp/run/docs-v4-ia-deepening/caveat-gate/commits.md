@@ -1,0 +1,1 @@
+- bb1b6437: docs(gates): caveat-reference resolver gate
