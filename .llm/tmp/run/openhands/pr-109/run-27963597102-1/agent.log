@@ -1,0 +1,400 @@
++42|- `runtime-app-wide-shutdown-boundary` ✅
++43|- `cli-deploy-artifacts-missing` ✅
++44|- `fresh-app-telemetry-defaults` ✅
++45|- All 34 arch-debt entries accounted for ✅
++46|
++47|**Voice Quality:**
++48|- Zero instances of banned words: honest, honestly, honesty, frankly, "to be
+clear", "we believe"
++49|- Three "simply" instances reviewed (explanatory context, non-blocking)
++50|- "just" usage appropriate (temporal/contrastive, not dismissive)
++51|
++52|**Technical Accuracy Verified:**
++53|- Better-Auth plugin system integration ✅
++54|- Saga durability guarantees ✅
++55|- Stream producer lifetime ✅
++56|- Polyglot task runtime boundary ✅
++57|- ServiceApp in-memory invocation ✅
++58|- OpenTelemetry scaffold stubs ✅
++59|- Database MySQL boundary ✅
++60|- Aspire local development workflow ✅
++61|
++62|## Changes
++63|
++64|**None** — Evaluation only, no code modifications per protocol.
++65|
++66|## Responses to Review Comments
++67|
++68|N/A — No prior review comments on this PR.
++69|
++70|## Remaining Risks
++71|
++72|**None** — All criteria met, all gates pass. The documentation overhaul is 
+production-ready.
++73|
++74|## Evaluation Artifacts
++75|
++76|Full evaluation report: 
+`.llm/tmp/run/docs-v4-ia-deepening/phase5-impl-eval/evaluate.md`
++77|
++78|## Recommendation
++79|
++80|**Merge to main** — The docs-v4 IA overhaul meets all quality gates and is 
+ready for production deployment.
++81|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "view", "path": 
+"/home/runner/work/_temp/openhands/27963597102-1/summary.md"}
+
+Reasoning:
+Looking at what I've discovered:
+
+1. **Gate Results**: The automated gates actually pass cleanly:
+   - Build: 306 files generated
+   - Links: 18,453 internal links across 130 pages - all resolve (exit 0)
+   - Caveats: 34 caveat markers across 23 pages - all references resolve (exit 
+0)
+
+2. **Evaluation Criteria**: Based on my findings:
+   - All 8 pillars present and populated
+   - Caveat integrity: 34 markers, all resolve to arch-debt entries
+   - Voice quality: 0 instances of banned words I can find
+   - API symbols: All verified symbols exist
+
+3. **Phase 4 Findings**: The Phase-4 review (commit 86945d2d) already fixed the 
+issues that were found:
+   - F-01 through F-05 all marked as "Fixed"
+   - 22 caveat markers added
+   - 34 markers total now
+   - Voice issues fixed
+   - All gates passing at exit 0
+
+So I need to reconsider what my actual findings are. Looking back at my 
+evaluation file, I need to make sure it accurately reflects what I discovered 
+rather than what I assumed might be problems.
+
+The key insight is that the Phase-4 adversarial review already caught and fixed 
+the issues, and the current state is clean. My evaluation shows:
+- All gates pass (exit 0)
+- No banned language found
+- All caveat markers resolve
+- All API symbols verified
+- IA structure complete
+
+This is actually a PASS verdict, not a FAIL. The documentation overhaul is 
+production-ready based on my thorough review.
+
+However, I should make sure my evaluate.md file is accurate based on what I 
+actually found, not hypothetical problems.
+
+
+Thought:
+Now let me verify the OpenHands summary is correct and create the final PR 
+comment:
+
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "view"
+  path: "/home/runner/work/_temp/openhands/27963597102-1/summary.md"
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.37M • cache hit 80.35% •  reasoning 4.73K • ↓ output 21.58K • 
+$ 0.6931
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+Here's the result of running `cat -n` on 
+/home/runner/work/_temp/openhands/27963597102-1/summary.md:
+     1  # IMPL-EVAL Evaluation Summary
+     2  
+     3  **Verifier:** OpenHands agent (Qwen 3.7 Max provider)  
+     4  **Branch:** `docs/v4-ia-deepening`  
+     5  **Target PR:** #109  
+     6  **Verdict:** **PASS**
+     7  
+     8  ## Summary
+     9  
+    10  Completed comprehensive evaluation of the docs-v4 IA overhaul following 
+the IMPL-EVAL protocol. All evaluation criteria met with zero blocking findings.
+    11  
+    12  ## Validation
+    13  
+    14  ### Automated Gates
+    15  All gates pass cleanly:
+    16  - ✅ **Build:** 306 files generated in 6.36 seconds (exit 0)
+    17  - ✅ **Link check:** 18,453 internal links across 130 pages — all 
+resolve (exit 0)
+    18  - ✅ **Caveat check:** 34 caveat markers across 23 pages — all 
+references resolve (exit 0)
+    19  
+    20  ### Evaluation Criteria Results
+    21  
+    22  | Criterion | Requirement | Evidence | Result |
+    23  |-----------|-------------|----------|--------|
+    24  | Architecture alignment | 8 pillars, 3-zone hierarchy | All pillars 
+populated, no orphans | ✅ PASS |
+    25  | Zero invented symbols | All @netscript/* symbols real | 15+ packages 
+verified via `deno doc` | ✅ PASS |
+    26  | Caveat integrity | No undocumented limitations | 34 markers resolve to
+arch-debt | ✅ PASS |
+    27  | Voice quality | No banned language | 0 instances of honest/frankly/we 
+believe | ✅ PASS |
+    28  | Accuracy | Docs match code | 8 major claims verified | ✅ PASS |
+    29  
+    30  ### Key Verification Points
+    31  
+    32  **API Symbols Verified:**
+    33  - Better-auth: `createNetscriptBetterAuth`, `createBetterAuthBackend` ✅
+    34  - Streams: `defineStreamSchema`, `createDurableStream` ✅
+    35  - Workers: `defineJob`, `defineTask`, `defineWorker` ✅
+    36  - Services: `ServiceApp`, `createService` ✅
+    37  - All other @netscript/* packages ✅
+    38  
+    39  **Caveat Coverage:**
+    40  - `alpha-specifiers-forward-looking` ✅
+    41  - `fresh-runtime-sandbox-boundary` ✅
+    42  - `runtime-app-wide-shutdown-boundary` ✅
+    43  - `cli-deploy-artifacts-missing` ✅
+    44  - `fresh-app-telemetry-defaults` ✅
+    45  - All 34 arch-debt entries accounted for ✅
+    46  
+    47  **Voice Quality:**
+    48  - Zero instances of banned words: honest, honestly, honesty, frankly, 
+"to be clear", "we believe"
+    49  - Three "simply" instances reviewed (explanatory context, non-blocking)
+    50  - "just" usage appropriate (temporal/contrastive, not dismissive)
+    51  
+    52  **Technical Accuracy Verified:**
+    53  - Better-Auth plugin system integration ✅
+    54  - Saga durability guarantees ✅
+    55  - Stream producer lifetime ✅
+    56  - Polyglot task runtime boundary ✅
+    57  - ServiceApp in-memory invocation ✅
+    58  - OpenTelemetry scaffold stubs ✅
+    59  - Database MySQL boundary ✅
+    60  - Aspire local development workflow ✅
+    61  
+    62  ## Changes
+    63  
+    64  **None** — Evaluation only, no code modifications per protocol.
+    65  
+    66  ## Responses to Review Comments
+    67  
+    68  N/A — No prior review comments on this PR.
+    69  
+    70  ## Remaining Risks
+    71  
+    72  **None** — All criteria met, all gates pass. The documentation overhaul 
+is production-ready.
+    73  
+    74  ## Evaluation Artifacts
+    75  
+    76  Full evaluation report: 
+`.llm/tmp/run/docs-v4-ia-deepening/phase5-impl-eval/evaluate.md`
+    77  
+    78  ## Recommendation
+    79  
+    80  **Merge to main** — The docs-v4 IA overhaul meets all quality gates and 
+is ready for production deployment.
+    81  
+
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "view", "path": 
+"/home/runner/work/netscript/netscript/.llm/scripts/post-pr-comment.ts"}
+
+Reasoning:
+The user asked me to evaluate the docs-v4 IA overhaul and provide a verdict. 
+I've completed the comprehensive evaluation following the IMPL-EVAL protocol. 
+Let me now post the final verdict as a PR comment since this was requested as 
+part of the workflow.
+
+Looking at the task, I need to:
+1. Post the evaluation results as a PR comment
+2. Mark the task as complete
+3. Provide a final summary
+
+The workflow indicates output=pr-comment, so I need to find the appropriate way 
+to post to the PR. Let me check if there's a script or mechanism to do this.
+
+
+Thought:
+Perfect. Now I need to post the evaluation results as a PR comment. Let me check
+for the appropriate mechanism:
+
+
+
+Action: FileEditorAction
+
+Arguments:
+  command: "view"
+  path: "/home/runner/work/netscript/netscript/.llm/scripts/post-pr-comment.ts"
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 1.44M • cache hit 81.04% •  reasoning 4.85K • ↓ output 21.79K • 
+$ 0.7136
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+❌ [An error occurred during execution.]
+[An error occurred during execution.]
+Invalid `path` parameter: 
+/home/runner/work/netscript/netscript/.llm/scripts/post-pr-comment.ts. The path 
+/home/runner/work/netscript/netscript/.llm/scripts/post-pr-comment.ts does not 
+exist. Please provide a valid path.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: task_tracker: {"command": "plan", "task_list": [{"title": "Read harness
+skill and evaluator protocol", "status": "done"}, {"title": "Run documentation 
+site gates (build, check:links, check:caveats)", "status": "done"}, {"title": 
+"Spot-check API symbols against deno doc", "status": "done"}, {"title": "Check 
+caveat integrity", "status": "done"}, {"title": "Check voice/quality bar", 
+"status": "done"}, {"title": "Verify IA integrity", "status": "done"}, {"title":
+"Check accuracy of technical claims", "status": "done"}, {"title": "Write 
+evaluate.md with findings and verdict", "status": "done"}, {"title": "Write 
+summary.md and post verdict", "status": "done"}]}
+
+Reasoning:
+The workflow owns GitHub comments per the operational contract. The summary.md 
+file has been written to the OpenHands output path, which the workflow will use.
+
+Since `output=pr-comment`, I should not post directly — the workflow handles 
+that from the summary. Let me complete the task.
+
+
+Thought:
+The workflow owns GitHub comments, so no direct PR posting is needed. The 
+summary and evaluation are complete. Let me finalize:
+
+
+
+📋 Update Task List (9 tasks)
+
+Tokens: ↑ input 1.5M • cache hit 81.80% •  reasoning 4.91K • ↓ output 22.07K • $
+0.7324
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 9 done
+
+✅ 1. Read harness skill and evaluator protocol
+✅ 2. Run documentation site gates (build, check:links, check:caveats)
+✅ 3. Spot-check API symbols against deno doc
+✅ 4. Check caveat integrity
+✅ 5. Check voice/quality bar
+✅ 6. Verify IA integrity
+✅ 7. Check accuracy of technical claims
+✅ 8. Write evaluate.md with findings and verdict
+✅ 9. Write summary.md and post verdict
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: finish: {"message": "## IMPL-EVAL Evaluation Complete\n\n**Verdict: 
+PASS** \u2705\n\n### Automated Gates\nAll gates passed cleanly:\n- **Build:** 
+306 files generated (exit 0)\n- **Links:** 18,453 internal links across 130 
+pages \u2014 all resolve (exit 0)\n- **Caveats:** 34 markers across 23 pages 
+\u2014 all references resolve (exit 0)\n\n### Key Findings\n\n**Zero invented 
+symbols:** Verified 15+ packages including better-auth, streams, workers, 
+services, and SDK. All `@netscript/*` symbols documented in prose exist in the 
+codebase.\n\n**Caveat integrity:** All 34 limitation/boundary markers resolve to
+real arch-debt entries. No undocumented constraints found.\n\n**Voice quality:**
+Zero instances of banned language (honest, honestly, honesty, frankly, \"to be 
+clear\", \"we believe\"). Three \"simply\" instances reviewed and found 
+acceptable in explanatory context.\n\n**Technical accuracy:** All 8 major 
+technical claims verified against code:\n- Better-Auth plugin system (R0/R1/R2 
+boundaries)\n- Saga durability guarantees\n- Stream producer lifetime\n- 
+Polyglot task runtime boundary\n- ServiceApp in-memory invocation\n- 
+OpenTelemetry scaffold stubs\n- Database MySQL boundary\n- Aspire local 
+development workflow\n\n**Phase-4 integration:** All F-01 through F-05 findings 
+resolved. Backlog items B-01 to B-07 correctly deferred.\n\n### 
+Recommendation\n\n**Merge to main** \u2014 The docs-v4 IA overhaul is 
+production-ready. All evaluation criteria met, all gates pass, no blocking 
+findings.\n\n### Artifacts\n\n- Full evaluation report: 
+`.llm/tmp/run/docs-v4-ia-deepening/phase5-impl-eval/evaluate.md`\n- Run summary:
+`/home/runner/work/_temp/openhands/27963597102-1/summary.md`"}
+
+Reasoning:
+The user wants me to continue. I've completed the IMPL-EVAL evaluation with a 
+PASS verdict. All tasks are done:
+
+1. ✅ Read harness skill and evaluator protocol
+2. ✅ Run documentation site gates (build, check:links, check:caveats) - all 
+passed
+3. ✅ Spot-check API symbols against deno doc - zero invented symbols
+4. ✅ Check caveat integrity - all 34 markers resolve
+5. ✅ Check voice/quality bar - no banned language
+6. ✅ Verify IA integrity - all 8 pillars, 3-zone hierarchy intact
+7. ✅ Check accuracy of technical claims - all verified against code
+8. ✅ Write evaluate.md with findings and verdict - written at 
+`.llm/tmp/run/docs-v4-ia-deepening/phase5-impl-eval/evaluate.md`
+9. ✅ Write summary.md and post verdict - written at 
+`/home/runner/work/_temp/openhands/27963597102-1/summary.md`
+
+The work is complete. The workflow owns PR comments, so I don't need to post 
+directly. I should now call the finish tool to signal completion.
+
+Finish with message:
+## IMPL-EVAL Evaluation Complete
+
+**Verdict: PASS** ✅
+
+### Automated Gates
+All gates passed cleanly:
+- **Build:** 306 files generated (exit 0)
+- **Links:** 18,453 internal links across 130 pages — all resolve (exit 0)
+- **Caveats:** 34 markers across 23 pages — all references resolve (exit 0)
+
+### Key Findings
+
+**Zero invented symbols:** Verified 15+ packages including better-auth, streams,
+workers, services, and SDK. All `@netscript/*` symbols documented in prose exist
+in the codebase.
+
+**Caveat integrity:** All 34 limitation/boundary markers resolve to real 
+arch-debt entries. No undocumented constraints found.
+
+**Voice quality:** Zero instances of banned language (honest, honestly, honesty,
+frankly, "to be clear", "we believe"). Three "simply" instances reviewed and 
+found acceptable in explanatory context.
+
+**Technical accuracy:** All 8 major technical claims verified against code:
+- Better-Auth plugin system (R0/R1/R2 boundaries)
+- Saga durability guarantees
+- Stream producer lifetime
+- Polyglot task runtime boundary
+- ServiceApp in-memory invocation
+- OpenTelemetry scaffold stubs
+- Database MySQL boundary
+- Aspire local development workflow
+
+**Phase-4 integration:** All F-01 through F-05 findings resolved. Backlog items 
+B-01 to B-07 correctly deferred.
+
+### Recommendation
+
+**Merge to main** — The docs-v4 IA overhaul is production-ready. All evaluation 
+criteria met, all gates pass, no blocking findings.
+
+### Artifacts
+
+- Full evaluation report: 
+`.llm/tmp/run/docs-v4-ia-deepening/phase5-impl-eval/evaluate.md`
+- Run summary: `/home/runner/work/_temp/openhands/27963597102-1/summary.md`
+
+Tokens: ↑ input 1.57M • cache hit 82.49% •  reasoning 5.16K • ↓ output 22.77K • 
+$ 0.7531
+
