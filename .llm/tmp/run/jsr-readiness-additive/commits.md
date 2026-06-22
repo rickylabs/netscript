@@ -10,3 +10,4 @@ Format:
 
 ## Log
 
+- 0c57c93b: chore(jsr): add dependency hygiene tools

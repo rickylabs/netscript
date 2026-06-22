@@ -62,6 +62,9 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | --- | --- | --- | --- |
 | 2026-06-22 | setup | bootstrap | Created missing `worklog.md`, `context-pack.md`, `commits.md`, and `drift.md` before implementation; `research.md`, `plan.md`, and `plan-eval.md` already existed and PLAN-EVAL passed. |
 | 2026-06-22 | S1 | gate | `deno check --unstable-kv --no-lock` passed for the 7 deps-hygiene scripts plus the 2 root doc/readme checkers. |
+| 2026-06-22 | S2 | edit | Added dependency/doc task wiring to `deno.json`, appended `deps:check` to `ci:quality`, and prepended `deno task deps:check &&` to main's current multi-root `arch:check`. No stale Fresh dry-run task alias existed. |
+| 2026-06-22 | S2 | drift fix | `arch:check` exposed two main-era auth doctrine failures. Replaced one `@ts-expect-error` with a type-level key assertion and replaced one auth service appsettings cast with an explicit typed seam. |
+| 2026-06-22 | S2 | gate | `deno task deps:check` passed. `deno task arch:check` passed after the baseline auth doctrine repairs. |
 
 ## Decisions
 
@@ -85,6 +88,8 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | --- | --- | --- | --- |
 | PLAN-EVAL | OpenHands minimax-M3 run 27978098382 | PASS | Recorded in `plan-eval.md`. |
 | S1 focused check | `deno check --unstable-kv --no-lock .llm/tools/deps/census.ts .llm/tools/deps/scan-npm-catalog-compliance.ts .llm/tools/deps/scan-jsr-centralization.ts .llm/tools/deps/audit-file-link.ts .llm/tools/deps/bump-version.ts .llm/tools/deps/bump-version_test.ts .llm/tools/deps/workspace.ts .llm/tools/check-internal-doc-links.ts .llm/tools/check-readme-standard.ts` | PASS | Proves all S1 additions parse and type-check without lock churn. |
+| S2 deps check | `deno task deps:check` | PASS | Passed with existing `DEPS-NPM-CATALOG` warnings; no fail-on-violation failures. |
+| S2 arch check | `deno task arch:check` | PASS | Preserved main's auth multi-root doctrine wiring and `arch:check:repo`; passed after explicit auth appsettings/type-test repairs. |
 
 ### Fitness Gates
 

@@ -24,7 +24,7 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## In Progress
 
-- S1 deps-hygiene tools.
+- S2 deno task wiring is implemented and gated; S2 commit is pending.
 
 ## Next Steps
 
@@ -48,6 +48,10 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 | `.llm/tmp/run/jsr-readiness-additive/context-pack.md` | new | Resumable state. |
 | `.llm/tmp/run/jsr-readiness-additive/commits.md` | new | Commit tracking. |
 | `.llm/tmp/run/jsr-readiness-additive/drift.md` | new | Drift tracking. |
+| `deno.json` | changed | Added deps/doc task wiring and reconciled `arch:check`. |
+| `packages/auth-better-auth/tests/better-auth_test.ts` | changed | Baseline doctrine repair for `@ts-expect-error` under auth roots. |
+| `plugins/auth/services/src/backend-registry.ts` | changed | Declared auth audit appsettings shape. |
+| `plugins/auth/services/src/main.ts` | changed | Replaced appsettings cast with type guard. |
 
 ## Gates
 
@@ -64,7 +68,8 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## Drift and Debt
 
-- Drift: missing implementation tracking artifacts at generator start, recorded in `drift.md`.
+- Drift: missing implementation tracking artifacts at generator start; baseline auth doctrine failures
+  exposed by S2 `arch:check`, both recorded in `drift.md`.
 - Debt: none introduced.
 
 ## Commits
