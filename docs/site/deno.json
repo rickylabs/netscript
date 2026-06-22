@@ -2,6 +2,8 @@
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable-temporal -A -",
     "build": "deno task lume",
+    "check:links": "deno run --allow-read ../../.llm/tools/docs/check-internal-links.ts _site",
+    "verify": "deno task build && deno task check:links",
     "serve": "deno task lume -- -s",
     "diagrams:render": "deno run -A _diagrams/render.ts",
     "diagrams:check": "deno run -A _diagrams/render.ts --check"

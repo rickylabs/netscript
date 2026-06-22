@@ -30,6 +30,9 @@ jobs:
       - name: Build Lume site
         working-directory: docs/site
         run: deno task build
+      - name: Check internal links
+        working-directory: docs/site
+        run: deno task check:links
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
