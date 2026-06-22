@@ -20,7 +20,9 @@ PILLARS  (each: ▸ Overview & Concepts · Quickstart · How-To guides · API Re
 │     Overview & islands/SSR concepts        [./server]
 │     Pages & the define-page builder         [./builders · definePage]
 │     Routing & type-safe route contracts     [./route]
-│     Data loading & query/cache              [./query + cache helpers]
+│     Data loading & query/cache              [./query + root `.` cache helpers:
+│                                               hasAllCacheEntries · minCachedAt ·
+│                                               projectCachedItemFromList]
 │     Forms & validation                      [./form · Standard Schema]
 │     Deferred / streaming UI                 [./defer + ./streams SSE]
 │     Interactive islands & client query      [./interactive]

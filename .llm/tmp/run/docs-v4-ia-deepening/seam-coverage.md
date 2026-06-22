@@ -33,8 +33,13 @@ const backend = createBetterAuthBackend({
 - **Interactive caveat:** `magicLink` and `passkey` SIGN-IN are interactive flows better-auth
   owns. NetScript's better-auth backend is non-interactive (no `InteractiveFlowPort`), so
   `/signin` and `/callback` return `AUTH_PROVIDER_ERROR`; those flows must be driven against
-  better-auth's own handler with NetScript verifying the session. `organization`, `twoFactor`,
-  `admin`, `apiKey`, `bearer`, `jwt` work cleanly with no interactive dependency.
+  better-auth's own handler with NetScript verifying the session. `bearer` and `jwt` (stateless,
+  no own tables) work cleanly through the R0 passthrough with no further prerequisite. `organization`,
+  `twoFactor`, `admin`, and `apiKey` have **no interactive dependency** but ARE table-backed: they
+  only become runnable once their better-auth schema is generated and migrated (the R1 schema-gen
+  prerequisite). Until R1, enabling them through the R0 passthrough type-checks but fails at runtime
+  on the missing tables — so docs for these plugins MUST carry the R1 schema-gen caveat, not present
+  them as turnkey.
 - The `tutorials/workspace` track (about orgs/multi-tenancy) tells users to hand-roll an
   `orgId` column because "NetScript ships no organization primitive" — it COULD enable
   better-auth's `organization` plugin instead.

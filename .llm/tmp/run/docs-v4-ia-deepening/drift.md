@@ -52,20 +52,27 @@ Phase 2 of this run.
 **Found:** 2026-06-22, PLAN-EVAL cycle 1 (OpenHands minimax-M3) Required Fix #1.
 
 **What happened.** `seam-coverage.md` listed the saga runtime constructor as
-`createDurableSagaRuntime`. The real `@netscript/plugin-sagas-core` public export is
-`createSagaRuntime` (`packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts:73`,
-re-exported `packages/plugin-sagas-core/src/runtime/mod.ts:75` and `src/public/mod.ts`). The
-`createDurableSagaRuntime` name survives only in historical run artifacts under `.llm/tmp/run/`
-(`feat-prime-time-sagas-telemetry-spans--impl`, `feat-framework-prime-time--supervisor`) — it was
-renamed in a prior run and the v4 research drafted the seam matrix before re-spot-checking.
+`createDurableSagaRuntime`. The real `@netscript/plugin-sagas-core` export is `createSagaRuntime`
+(`packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts:73`, re-exported at
+`packages/plugin-sagas-core/src/runtime/mod.ts:75`). It is reachable ONLY via the **`./runtime`
+export subpath** — i.e. `import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime'`.
+`deno.json` maps `.` → `./mod.ts` and `./runtime` → `./src/runtime/mod.ts`; `createSagaRuntime` is
+NOT re-exported from the root `.` entry (`mod.ts`) and NOT from `src/public/mod.ts` (the PLAN-EVAL
+cycle-1 note claiming a `src/public/mod.ts` re-export was WRONG — verified against source
+2026-06-22). The `createDurableSagaRuntime` name survives only in historical run artifacts under
+`.llm/tmp/run/` (`feat-prime-time-sagas-telemetry-spans--impl`,
+`feat-framework-prime-time--supervisor`) — it was renamed in a prior run and the v4 research drafted
+the seam matrix before re-spot-checking.
 
 **Fix applied (this artifact).** `seam-coverage.md:61` renamed to `createSagaRuntime` (verified
 against source 2026-06-22). `ia-tree.md` pillar-4 does not name the symbol literally (it references
 "sagas tables"), so no edit needed there.
 
 **How to apply (carries into build).** W2 (IA page moves) and W6 (Durable-Workflows pillar prose +
-Reference leaf) MUST cite `createSagaRuntime`, never `createDurableSagaRuntime`. This drift entry is
-the tracked reference the **caveat-harvest gate** requires for that symbol.
+Reference leaf) MUST cite `createSagaRuntime` imported from `@netscript/plugin-sagas-core/runtime`,
+never `createDurableSagaRuntime` and never a bare root `@netscript/plugin-sagas-core` import for
+this symbol. This drift entry is the tracked reference the **caveat-harvest gate** requires for that
+symbol.
 
 ---
 
