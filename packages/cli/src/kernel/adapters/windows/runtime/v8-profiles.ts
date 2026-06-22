@@ -9,7 +9,7 @@ import { outputText } from '../../../presentation/output/default-output.ts';
  * and memory footprint for its workload type.
  */
 
-import { NO_SPARKPLUG_FLAG, V8_HEAP_MB } from '../../../constants/windows.ts';
+import { DEFAULT_V8_HEAP_MB, NO_SPARKPLUG_FLAG } from '../../../constants/windows.ts';
 import type { CompileTarget } from '../../../domain/deploy/compile-target.ts';
 
 /**
@@ -43,7 +43,7 @@ export interface V8Profile {
  * (causes a fatal V8 assertion). --jitless is also unsafe because Prisma uses WASM.
  */
 function buildV8FlagArray(type: CompileTarget['type']): string[] {
-  const maxMB = V8_HEAP_MB[type];
+  const maxMB = DEFAULT_V8_HEAP_MB[type];
   const flags = [
     '--optimize-for-size',
     `--max-old-space-size=${maxMB}`,
@@ -70,7 +70,7 @@ export function getV8Profile(target: Pick<CompileTarget, 'type'>): V8Profile {
   const flagsArray = buildV8FlagArray(target.type);
   return {
     type: target.type,
-    maxOldSpaceMB: V8_HEAP_MB[target.type],
+    maxOldSpaceMB: DEFAULT_V8_HEAP_MB[target.type],
     flags: flagsArray.join(' '),
     flagsArray,
   };

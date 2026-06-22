@@ -125,14 +125,12 @@ function formatFailure(cause: unknown): string {
 }
 
 async function createDefaultRuntime(options: CreateSagaRuntimeOptions): Promise<SagaRuntime> {
-  if (options.adapter === 'legacy' || hasInjectedNativeEngine(options)) {
-    return options.adapter === 'legacy'
-      ? createSagaRuntime({ ...options, adapter: 'legacy' })
-      : createSagaRuntime({
-        ...options,
-        adapter: 'native',
-        native: withDefaultTelemetry(options.native),
-      });
+  if (hasInjectedNativeEngine(options)) {
+    return createSagaRuntime({
+      ...options,
+      adapter: 'native',
+      native: withDefaultTelemetry(options.native),
+    });
   }
 
   const native = withDefaultTelemetry(options.native);

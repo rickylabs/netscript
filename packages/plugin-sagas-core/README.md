@@ -21,7 +21,7 @@ deno add jsr:@netscript/plugin-sagas-core
   and `sagaCompensate()`.
 - Domain vocabulary for saga IDs, states, messages, transitions, retry policy, and errors.
 - Runtime ports for bus, transport, store, clock, outbox, history, and agent-runtime boundaries.
-- Native and legacy bus adapters behind `SagaBusPort`.
+- Native bus adapter behind `SagaBusPort`.
 - Transport implementations for Redis Streams and Garnet-compatible LIST queues.
 - Hono/SSE middleware, worker trigger helpers, publisher ports, oRPC contracts, streams schema,
   telemetry instrumentation, deterministic testing helpers, and stub-only abstract bases.
@@ -101,12 +101,7 @@ await runtime.register([registrationSaga]);
 await runtime.start();
 ```
 
-`createSagaRuntime()` defaults to the native adapter. The legacy adapter is available only through
-an explicit option:
-
-```ts
-const legacyRuntime = createSagaRuntime({ adapter: 'legacy' });
-```
+`createSagaRuntime()` uses the native adapter.
 
 There are no saga bus or registry singletons. Do not add `getSagaBus`, `setSagaBus`, `resetSagaBus`,
 `getSagaRegistry`, or `resetSagaRegistry`. Applications should pass the runtime, bus, store,
@@ -139,7 +134,7 @@ environment variables. It is a small wrapper over `createSagaRuntime()` and expl
 | `./domain`                | Branded IDs, saga state/message/context/result/error vocabulary    |
 | `./ports`                 | Runtime, persistence, transport, durability, and agent boundaries  |
 | `./runtime`               | Native engine, scheduler, compensator, and runtime facade          |
-| `./adapters`              | Native `SagaBusBridge` and deprecated `SagaBusLegacy` wrapper      |
+| `./adapters`              | Native `SagaBusBridge` adapter                                     |
 | `./transports`            | Redis Streams and Garnet-compatible LIST transports                |
 | `./middleware`            | Hono request context and SSE event middleware                      |
 | `./integration/workers`   | Branded worker job/task trigger helpers                            |

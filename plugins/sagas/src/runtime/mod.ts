@@ -62,12 +62,6 @@ export type {
 export type {
   CreateSagaRuntimeOptions,
   SagaBridgeCompensationResolver,
-  SagaBusLegacyBus,
-  SagaBusLegacyDefinitionMapper,
-  SagaBusLegacyFactory,
-  SagaBusLegacyLogger,
-  SagaBusLegacyMachine,
-  SagaBusLegacyOptions,
   SagaBusPort,
   SagaCompensationRequest,
   SagaCompensationResult,

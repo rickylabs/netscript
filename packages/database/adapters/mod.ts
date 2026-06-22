@@ -10,6 +10,7 @@ export {
   createPostgresAdapter,
   PostgresAdapter,
   type PostgresConnectionOptions,
+  type PostgresDriverAdapter,
 } from './postgres.adapter.ts';
 
 // MSSQL and MySQL adapters are available as sub-exports to avoid pulling in

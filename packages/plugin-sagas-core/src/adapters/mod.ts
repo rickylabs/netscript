@@ -82,14 +82,5 @@ export type {
   SagaSchedulerOptions,
   SagaSchedulerStorePort,
 } from '../runtime/saga-scheduler.ts';
-export { createSagaBusLegacy, SagaBusLegacy } from './saga-bus-legacy.ts';
 export { createSagaBusBridge, SagaBusBridge } from './saga-bus-bridge.ts';
 export type { SagaBridgeCompensationResolver, SagaBusBridgeOptions } from './saga-bus-bridge.ts';
-export type {
-  SagaBusLegacyBus,
-  SagaBusLegacyDefinitionMapper,
-  SagaBusLegacyFactory,
-  SagaBusLegacyLogger,
-  SagaBusLegacyMachine,
-  SagaBusLegacyOptions,
-} from './saga-bus-legacy.ts';

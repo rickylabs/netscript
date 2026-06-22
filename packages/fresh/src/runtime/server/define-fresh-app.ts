@@ -43,12 +43,6 @@ export interface DefineFreshAppOptions<State> {
    */
   createApp?: FreshAppFactory<State>;
   /**
-   * Enable Fresh static file serving. Defaults to true.
-   *
-   * @deprecated Prefer `staticFiles: false` or a custom `staticFiles` middleware.
-   */
-  serveStaticFiles?: boolean;
-  /**
    * Adapter seam for static-file middleware. `false` disables static files.
    */
   staticFiles?: Middleware<State> | false;
@@ -65,16 +59,10 @@ export interface DefineFreshAppOptions<State> {
    */
   configure?: (app: App<State>) => void;
   /**
-   * Register Fresh file-system routes. Defaults to true and accepts an
-   * optional mount pattern.
-   *
-   * @deprecated Prefer `fsRoutes: false` or a custom `fsRoutes` adapter.
+   * Adapter seam for file-system route registration. `false` disables it; a
+   * string mounts default file-system routes at that pattern.
    */
-  registerFsRoutes?: boolean | string;
-  /**
-   * Adapter seam for file-system route registration. `false` disables it.
-   */
-  fsRoutes?: FreshAppFsRoutes<State> | false;
+  fsRoutes?: FreshAppFsRoutes<State> | false | string;
   /**
    * Reserved telemetry bootstrap seam for NetScript Fresh adapters.
    */
@@ -112,23 +100,17 @@ export function defineFreshApp<State>(options: DefineFreshAppOptions<State> = {}
 }
 
 function shouldRegisterStaticFiles<State>(options: DefineFreshAppOptions<State>): boolean {
-  if (options.staticFiles === false) {
-    return false;
-  }
-
-  return options.serveStaticFiles !== false;
+  return options.staticFiles !== false;
 }
 
 function registerFsRoutes<State>(app: App<State>, options: DefineFreshAppOptions<State>): void {
-  if (options.fsRoutes === false || options.registerFsRoutes === false) {
+  if (options.fsRoutes === false) {
     return;
   }
 
-  const pattern = typeof options.registerFsRoutes === 'string'
-    ? options.registerFsRoutes
-    : undefined;
+  const pattern = typeof options.fsRoutes === 'string' ? options.fsRoutes : undefined;
 
-  if (options.fsRoutes) {
+  if (typeof options.fsRoutes === 'function') {
     options.fsRoutes(app, pattern);
     return;
   }

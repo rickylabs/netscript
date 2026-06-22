@@ -2,7 +2,6 @@ import { assertEquals } from '@std/assert';
 
 import { defineSaga, send } from '../../mod.ts';
 import type { SagaMessage, SagaState } from '../../src/domain/mod.ts';
-import { SagaBusLegacy, type SagaBusLegacyBus } from '../../src/adapters/mod.ts';
 import type { SagaIdempotencyPort } from '../../src/ports/mod.ts';
 import {
   createSagaRuntime,
@@ -107,22 +106,6 @@ Deno.test('native runtime deduplicates cascaded sends by target and idempotency 
   }
 });
 
-Deno.test('legacy adapter deduplicates cascaded sends before publishing to upstream bus', async () => {
-  const bus = new RecordingLegacyBus();
-  const adapter = new SagaBusLegacy({ bus });
-
-  await adapter.dispatchCascaded([
-    send('roundtrip.triggered', {}, { idempotencyKey: 'same-key' }),
-    send('roundtrip.triggered', {}, { idempotencyKey: 'same-key' }),
-    send('roundtrip.other', {}, { idempotencyKey: 'same-key' }),
-  ]);
-
-  assertEquals(bus.publishedMessages().map((item) => readMessageType(item)), [
-    'roundtrip.triggered',
-    'roundtrip.other',
-  ]);
-});
-
 function defineCountingSaga(
   sagaId: string,
   eventType: string,
@@ -143,38 +126,6 @@ function message(type: string, idempotencyKey: string): SagaMessage<string, Reco
     payload: {},
     idempotencyKey,
   });
-}
-
-function readMessageType(value: unknown): string {
-  if (!isRecord(value) || typeof value.type !== 'string') {
-    throw new TypeError('Recorded legacy message did not include a string type.');
-  }
-  return value.type;
-}
-
-function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-class RecordingLegacyBus implements SagaBusLegacyBus {
-  readonly #published: unknown[] = [];
-
-  start(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  stop(): Promise<void> {
-    return Promise.resolve();
-  }
-
-  publish(message: unknown): Promise<void> {
-    this.#published.push(message);
-    return Promise.resolve();
-  }
-
-  publishedMessages(): readonly unknown[] {
-    return Object.freeze([...this.#published]);
-  }
 }
 
 class RecordingIdempotencyStore implements SagaIdempotencyPort {

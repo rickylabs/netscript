@@ -1,7 +1,7 @@
 # Runtime Composition
 
-Runtime composition is explicit. A process chooses its bus adapter, injects optional ports,
-registers definitions, and starts the runtime.
+Runtime composition is explicit. A process injects optional ports, registers definitions, and starts
+the runtime.
 
 ## Native Runtime
 
@@ -17,20 +17,6 @@ await runtime.start();
 
 The native runtime composes `SagaBusBridge` with `SagaEngine`. A scheduler and compensator can be
 injected when the process owns those responsibilities.
-
-## Legacy Runtime
-
-```ts
-import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
-
-const runtime = createSagaRuntime({
-  adapter: 'legacy',
-});
-```
-
-The legacy path wraps `@saga-bus/core` behind `SagaBusPort`. The upstream package is internal to the
-adapter and is not part of the public export surface. Use the legacy adapter only for migration and
-parity work.
 
 ## Preset Runtime
 
