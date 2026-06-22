@@ -41,7 +41,7 @@ function TabsContent({ children, value, ...props }: TabsContentProps): VNode {
   return <div {...tabs.getContentProps(value, props)}>{withChildren(children)}</div>;
 }
 
-type TabsNamespace = Readonly<{
+export type TabsNamespace = Readonly<{
   Content: typeof TabsContent;
   List: typeof TabsList;
   Root: typeof TabsRoot;

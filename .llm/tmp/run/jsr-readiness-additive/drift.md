@@ -49,3 +49,15 @@ documentation.
 - **Evidence:** S3 checkout intentionally omitted those auth README paths. S4 extended the same
   hand-reconcile approach to those five auth README files after aggregate `docs:readme:check` failed;
   `deno task docs:readme:check` now passes for all 31 package/plugin READMEs.
+
+## 2026-06-22 — Fresh UI umbrella casts hand-reconciled
+
+- **What:** The umbrella S5 TSX files added JSX prop casts while widening component prop types.
+- **Source:** Diff scan after checking out S5 files from `origin/release/jsr-readiness`.
+- **Expected:** PLAN-EVAL required fresh-ui fixes to introduce zero new casts.
+- **Actual:** Direct checkout introduced new `as JSX.*` lines in fresh-ui component implementations.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** Restored the existing component implementation shape, exported namespace types, and
+  adjusted public prop aliases to use component-specific JSX element prop types. Focused check/lint
+  passed and the final S5 diff scan reports no added `any` or `as` lines.

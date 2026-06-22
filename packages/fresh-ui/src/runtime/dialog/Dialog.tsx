@@ -53,7 +53,7 @@ function DialogClose({ children, ...props }: DialogCloseProps): VNode {
   return <button {...dialog.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
-type DialogNamespace = Readonly<{
+export type DialogNamespace = Readonly<{
   Close: typeof DialogClose;
   Content: typeof DialogContent;
   Description: typeof DialogDescription;

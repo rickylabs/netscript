@@ -29,6 +29,7 @@ type BetterAuthEscapeHatchKeys = keyof NonNullable<
   NetscriptBetterAuthOptions['betterAuthOptions']
 >;
 const databaseOverrideRejected: 'database' extends BetterAuthEscapeHatchKeys ? false : true = true;
+void databaseOverrideRejected;
 
 Deno.test('createBetterAuthAuthenticator maps getSession to Principal', async () => {
   const auth = authInstance({

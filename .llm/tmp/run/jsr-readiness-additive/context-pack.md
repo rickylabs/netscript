@@ -24,7 +24,7 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## In Progress
 
-- S4 drifted README hand reconciliation is implemented and gated; S4 commit is pending.
+- S5 fresh-ui doc-lint fixes are implemented and gated; S5 commit is pending.
 
 ## Next Steps
 
@@ -57,6 +57,8 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 | `.llm/tools/README.md` | changed | Internal README promoted from umbrella. |
 | 6 plan-listed drifted README paths | changed | Hand-reconciled US-9 anchors over current content. |
 | 5 auth README paths | changed | Current-main drift extension needed for aggregate README gate. |
+| `packages/fresh-ui/interactive.ts` and runtime prop/type files | changed | Additive public prop/type exports without new casts. |
+| `packages/fresh/deno.json` | changed | Umbrella package config update. |
 
 ## Gates
 

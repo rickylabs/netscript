@@ -77,7 +77,7 @@ function PopoverArrowTip({ children, ...props }: PopoverArrowTipProps): VNode {
   return <div {...popover.getArrowTipProps(props)}>{withChildren(children)}</div>;
 }
 
-type PopoverNamespace = Readonly<{
+export type PopoverNamespace = Readonly<{
   Anchor: typeof PopoverAnchor;
   Arrow: typeof PopoverArrow;
   ArrowTip: typeof PopoverArrowTip;

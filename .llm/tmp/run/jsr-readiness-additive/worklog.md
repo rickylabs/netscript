@@ -69,6 +69,8 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | 2026-06-22 | S3 | gate | README standard passed for the 20 touched package/plugin READMEs. Existing README/docs example tests passed for touched packages with fixtures. |
 | 2026-06-22 | S4 | edit | Hand-reconciled the six plan-listed drifted READMEs with US-9 anchors while preserving current content. Extended the same hand reconcile to five current-main auth README drifts so aggregate `docs:readme:check` can pass. |
 | 2026-06-22 | S4 | gate | Six-file README standard passed, queue/service README tests passed, plugin entrypoint checks passed, and aggregate `deno task docs:readme:check` passed for all 31 package/plugin READMEs. |
+| 2026-06-22 | S5 | edit | Applied fresh-ui interactive public prop/type exports from the umbrella, then hand-reconciled component implementations to avoid the umbrella's added JSX casts. |
+| 2026-06-22 | S5 | gate | Focused fresh-ui lint/check passed, root `deno task lint` passed, root `deno task check` passed, and scoped fmt check passed. Diff scan found no added `any` or `as` lines in S5 fresh-ui files. |
 
 ## Decisions
 
@@ -101,6 +103,12 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | S4 focused entrypoints | `deno check --unstable-kv --no-lock packages/plugin-sagas-core/mod.ts packages/plugin-workers-core/mod.ts plugins/sagas/mod.ts plugins/workers/mod.ts` | PASS | Focused check for the plugin/core surfaces referenced by the hand-reconciled README examples. |
 | S4 aggregate README standard | `deno task docs:readme:check` | PASS | 31 package/plugin READMEs conform after including the current-main auth README drift extension. |
 | S4 auth README surface check | `deno check --unstable-kv --no-lock packages/auth-better-auth/mod.ts packages/auth-kv-oauth/mod.ts packages/auth-workos/mod.ts packages/plugin-auth-core/mod.ts plugins/auth/mod.ts` | PASS | Focused check for auth README drift extension surfaces. |
+| S5 fresh-ui lint | `deno lint <15 S5 fresh-ui files>` | PASS | Checked 15 files. |
+| S5 root lint | `deno task lint` | PASS | Workspace lint wrapper reported 0 occurrences. |
+| S5 focused check | `deno check --unstable-kv --no-lock packages/fresh-ui/interactive.ts` | PASS | Proves the additive interactive export surface type-checks. |
+| S5 root check | `deno task check` | PASS | Workspace check wrapper selected 1730 files, 15 batches, 0 failures. |
+| S5 scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh-ui --root packages/fresh --ext ts,tsx --ignore-line-endings` | PASS | 233 files selected, 0 findings. |
+| S5 zero-cast scan | `git diff -U0 origin/main -- <S5 files> | rg "^\\+.*(\\bany\\b|\\bas\\s)"` | PASS | No added `any` or `as` lines in S5 fresh-ui diff. |
 
 ### Fitness Gates
 

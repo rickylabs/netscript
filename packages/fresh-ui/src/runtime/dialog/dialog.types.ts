@@ -1,5 +1,6 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
+import type { FreshUiChildren } from '../_internal/public-props.ts';
 
 export type DialogTriggerElementProps =
   & JSX.ButtonHTMLAttributes<HTMLButtonElement>
@@ -38,7 +39,18 @@ export interface UseDialogOptions {
   defaultOpen?: boolean;
   id?: string;
   modal?: boolean;
-  onOpenChange?: (open: boolean, details: DialogOpenChangeDetails) => void;
+  onOpenChange?: (
+    open: boolean,
+    details: {
+      reason:
+        | 'trigger'
+        | 'close-button'
+        | 'escape-key'
+        | 'interact-outside'
+        | 'native-close'
+        | 'programmatic';
+    },
+  ) => void;
   open?: boolean;
 }
 
@@ -62,30 +74,34 @@ export interface UseDialogReturn {
   setOpen: (open: boolean, reason?: DialogOpenChangeReason) => void;
 }
 
-export interface DialogRootProps extends UseDialogOptions {
-  children: ComponentChildren;
-}
+/** Props for the compound dialog root component. */
+export type DialogRootProps = UseDialogOptions & {
+  children: FreshUiChildren;
+};
 
-export interface DialogTriggerProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for the dialog trigger component. */
+export type DialogTriggerProps = DialogTriggerElementProps & {
+  children: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
 
-export interface DialogContentProps extends JSX.HTMLAttributes<HTMLDialogElement> {
-  children: ComponentChildren;
-}
+/** Props for the dialog content component. */
+export type DialogContentProps = DialogContentElementProps & {
+  children: FreshUiChildren;
+};
 
-export interface DialogTitleProps extends JSX.HTMLAttributes<HTMLHeadingElement> {
-  children: ComponentChildren;
-}
+/** Props for the dialog title component. */
+export type DialogTitleProps = DialogTitleElementProps & {
+  children: FreshUiChildren;
+};
 
-export interface DialogDescriptionProps extends JSX.HTMLAttributes<HTMLParagraphElement> {
-  children: ComponentChildren;
-}
+/** Props for the dialog description component. */
+export type DialogDescriptionProps = DialogDescriptionElementProps & {
+  children: FreshUiChildren;
+};
 
-export interface DialogCloseProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for the dialog close component. */
+export type DialogCloseProps = DialogCloseElementProps & {
+  children: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
