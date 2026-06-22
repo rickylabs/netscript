@@ -107,6 +107,7 @@ The scaffold pins <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> (and sibli
 <strong>not installable today</strong>. Add auth through
 <code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace correctly for
 the alpha, rather than hand-adding a <code>^1.0.0</code> import.
+<!-- caveat: arch-debt:alpha-specifiers-forward-looking -->
 {{ /comp }}
 
 ## Sign in, resolve the session, sign out
@@ -195,6 +196,7 @@ The service picks <strong>one</strong> active backend from <code>NETSCRIPT_AUTH_
 This is the <strong>single-active-backend</strong> boundary — there is no multi-active routing,
 cross-backend account linking, or global logout across backends in v1. Switching providers means
 changing the env var and the backend's credentials, not running two backends at once.
+<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 
 ## The three backends

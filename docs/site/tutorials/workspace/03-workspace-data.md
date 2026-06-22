@@ -198,6 +198,7 @@ and the route-authz seam in <a href="/tutorials/workspace/05-route-authz/">chapt
 <em>scopes</em>, not org membership. Multi-tenant isolation, role hierarchies, and per-org access
 control are <strong>application logic you own</strong> — treat any <code>orgId</code> here as a column
 you maintain, not a behavior the framework enforces.
+<!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
 ## Verify your progress

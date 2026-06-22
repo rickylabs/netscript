@@ -17,7 +17,7 @@ order things happen in.
 Every command here uses the public <code>netscript &lt;cmd&gt;</code> form backed by the published
 JSR package. The vendored <code>packages/cli/...</code> path you may see in a local-source checkout is a
 contributor-only shape — a normal install has no <code>packages/</code> tree. Install once (below), then
-just type <code>netscript</code>.
+use <code>netscript</code>.
 {{ /comp }}
 
 {{ comp callout { type: "important", title: "Database commands need Aspire running first" } }}

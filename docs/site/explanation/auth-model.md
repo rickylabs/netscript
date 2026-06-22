@@ -25,6 +25,7 @@ than shipped runtime. Auth telemetry, by contrast, is real: an opt-in, redacted 
 via <code>createAuthTelemetry</code>, enabled when a <code>subjectHashSalt</code> is configured. The
 model below is the authentication seam; for that audit surface and its salt requirement see
 {{ comp.xref({ key: "explain:observability" }) }}.
+<!-- caveat: arch-debt:alpha-specifiers-forward-looking -->
 {{ /comp }}
 
 ## The thesis: NetScript owns the seam, not the identity provider
@@ -135,6 +136,7 @@ and any direct session mutation throws <code>AuthBackendOperationUnsupportedErro
 read the session the hosted provider established. Choose kv-oauth when you want NetScript to drive
 the full redirect; choose WorkOS/better-auth when the provider owns sign-in and NetScript only
 verifies.
+<!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
 ## The capability boundary is a typed error, not a silent gap
@@ -207,6 +209,7 @@ Choosing one active backend keeps the model coherent: a single `Principal` sourc
 authority, and a single place to reason about who is signed in. Multi-backend identity is a hard
 problem (consistent logout, link reconciliation, conflicting session lifetimes); v1 declines it on
 purpose rather than ship a half-correct version.
+<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 
 ## Why this seam — the design in one sentence
 

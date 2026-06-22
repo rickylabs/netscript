@@ -84,6 +84,7 @@ shape over a `{ items: TItem[] }` payload.
 Hosted, one-click sandboxes for the Web Layer examples are a planned addition.
 Until they ship, clone the tutorial source and run it locally with the
 project's build task.
+<!-- caveat: arch-debt:fresh-hosted-example-sandboxes -->
 {{ /comp }}
 
 ## Related

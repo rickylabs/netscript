@@ -990,6 +990,84 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   to `BetterAuthOptions` with a green IMPL-EVAL; close the program when R1–R5 land under their own
   plan.
 
+## docs/runtime — alpha scaffold specifiers point at future stable ranges (`alpha-specifiers-forward-looking`)
+
+- **Reason:** Several generated/scaffolded examples pin future `jsr:@netscript/*@^1.0.0` ranges
+  while the currently published aligned package train is still `0.0.1-alpha.0`. The docs must keep
+  warning readers that the future stable specifiers describe the intended surface rather than a
+  public JSR install they can run today.
+- **Owner:** Release/publish readiness program.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when scaffolded public package specifiers resolve from JSR at the documented
+  stable range, or when scaffold output stops emitting forward-looking stable ranges.
+
+## plugins/auth — single active backend v1 boundary (`auth-single-active-backend-boundary`)
+
+- **Reason:** `@netscript/plugin-auth` composes exactly one backend selected by
+  `NETSCRIPT_AUTH_BACKEND`. It does not yet support multi-active routing, cross-backend account
+  linking, global logout across backend stores, or historical session replay. The docs should mark
+  this as a deliberate v1 boundary wherever the limitation is surfaced.
+- **Owner:** Auth layer follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when a planned auth design introduces multi-backend routing/account-linking
+  semantics, or the docs stop presenting provider swapping as anything beyond one active backend per
+  deployment.
+
+## packages/fresh — hosted example sandboxes missing (`fresh-hosted-example-sandboxes`)
+
+- **Reason:** The Web Layer examples page promises hosted, one-click sandboxes as planned, but the
+  current docs site only points readers to local tutorial source.
+- **Owner:** Docs experience follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the Web Layer examples page links to maintained hosted sandboxes or removes
+  the planned-sandbox statement.
+
+## runtime — app-wide shutdown orchestrator missing (`runtime-app-wide-shutdown-orchestrator`)
+
+- **Reason:** Services, worker runtimes, queues, and database teardown each expose their own drain
+  path, but there is no single top-level `host.shutdown()` that orchestrates all app resources under
+  one budget.
+- **Owner:** Runtime orchestration follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the runtime exposes a documented app-wide shutdown orchestrator and the
+  graceful-shutdown guide uses it as the primary path.
+
+## packages/cli — deployment artifacts are not generated (`cli-deploy-artifacts-missing`)
+
+- **Reason:** The scaffold records enough process and AppHost facts for manual deployment, but it
+  does not generate Dockerfiles, Docker Compose files, Kubernetes manifests, or a first-class deploy
+  command.
+- **Owner:** Deployment tooling follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `netscript deploy` or scaffold generation emits supported deployment
+  artifacts, or the deployment docs are rewritten to remove generated-artifact expectations.
+
+## packages/fresh — Fresh app telemetry defaults reserved (`fresh-app-telemetry-defaults`)
+
+- **Reason:** `defineFreshApp` accepts `telemetry` / `FreshAppTelemetryOptions` as a forward
+  compatibility seam, but Fresh app bootstrap telemetry defaults are not active yet.
+- **Owner:** Fresh telemetry follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when Fresh app bootstrap telemetry is implemented and the Web Layer server docs
+  describe emitted spans rather than reserved options.
+
+## packages/workers — non-Deno task runtimes are not permission-sandboxed (`workers-non-deno-task-sandbox-boundary`)
+
+- **Reason:** `.permissions(...)` compiles into Deno `--allow-*` flags only for `runtime("deno")`.
+  Python, .NET, shell, PowerShell, cmd, executable, and custom subprocess runtimes inherit the
+  worker host's OS privileges unless the caller adds an external sandbox.
+- **Owner:** Workers runtime hardening follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when non-Deno task runtimes have a documented, enforced per-task sandbox or the
+  public task runtime API explicitly models this as a permanent trust boundary.
+
 ## packages/workers — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
 
 - **Reason:** The scaffold-generated worker handler toolkit `createJobTools(ctx)` exposes

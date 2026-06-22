@@ -173,6 +173,7 @@ A scope is a flat string the authenticator attached to the principal. If you nee
 role hierarchies, that is the app-level logic from
 <a href="/tutorials/workspace/03-workspace-data/">chapter 3</a> — you filter your own queries by your
 own <code>orgId</code> and derive your own roles. The seam gates the route; the tenancy is yours.
+<!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
 ## Verify your progress

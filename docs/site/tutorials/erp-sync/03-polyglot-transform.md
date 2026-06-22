@@ -144,6 +144,7 @@ The <code>deno</code> runtime is the <strong>only</strong> one NetScript sandbox
 non-Deno task is a trust boundary: pin the entrypoint to a known script, prefer a pinned interpreter
 or venv over <code>$PATH</code> discovery, never interpolate untrusted input into <code>args</code>,
 and gate access at the OS layer.
+<!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
 {{ /comp }}
 
 For a `deno`-runtime task, permissions are real and you must set them — omitting `.permissions(...)`

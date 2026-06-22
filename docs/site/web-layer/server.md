@@ -77,6 +77,7 @@ app-level middleware through the `middleware` option above or directly with `app
 The `telemetry` option and `FreshAppTelemetryOptions` (`serviceName`, `attributes`) are reserved
 bootstrap seams for future Fresh app telemetry defaults. They are accepted today and wired for
 forward compatibility.
+<!-- caveat: arch-debt:fresh-app-telemetry-defaults -->
 {{ /comp }}
 
 ## Pages connect to typed route contracts

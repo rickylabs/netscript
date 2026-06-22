@@ -254,6 +254,9 @@ deployment. To containerize, each process becomes one image whose `CMD` is the m
 <li>The scaffold worker <code>createJobTools(ctx)</code> handler helpers (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>) are still no-op stubs (tracked debt, fix planned). Job dispatch/execution traces still appear in Aspire automatically; for custom handler spans call <code>@netscript/telemetry</code> helpers directly.</li>
 <li>DB commands assume a reachable Postgres — in CI/containers without Aspire, inject <code>POSTGRES_URI</code> yourself or the command fails fast.</li>
 </ul>
+<!-- caveat: arch-debt:cli-deploy-artifacts-missing -->
+<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
+<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
 ## Step 6 — Verify the deployment

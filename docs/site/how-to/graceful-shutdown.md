@@ -216,6 +216,7 @@ register every long-lived resource with the worker runtime's
 <code>runtime.shutdown</code>, and put service-owned teardown in <code>.onShutdown()</code>.
 Co-locating a service and workers in one process means wiring both drains in the same
 entrypoint by hand.
+<!-- caveat: arch-debt:runtime-app-wide-shutdown-orchestrator -->
 {{ /comp }}
 
 ## See also

@@ -72,6 +72,7 @@ a <em>backend adapter</em> — one of <code>@netscript/auth-kv-oauth</code>,
 <code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>. The plugin selects
 <strong>exactly one</strong> active backend at runtime; there is no multi-active routing or
 cross-backend account linking in v1. You pick the backend in Step 2.
+<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 
 {{ comp callout { type: "warning", title: "Alpha specifiers are forward-looking" } }}
@@ -80,6 +81,7 @@ The scaffold emits forward-looking specifiers such as
 <strong>not published yet</strong> — do not expect them to install from the public registry. Add
 auth through <code>netscript plugin add @netscript/plugin-auth</code>, which wires the workspace
 correctly for the alpha, rather than hand-adding a <code>^1.0.0</code> import.
+<!-- caveat: arch-debt:alpha-specifiers-forward-looking -->
 {{ /comp }}
 
 ## Step 2 — Choose a backend with `NETSCRIPT_AUTH_BACKEND`

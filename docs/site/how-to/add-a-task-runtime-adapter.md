@@ -129,6 +129,7 @@ if (!result.success) {
 - Permission sandboxing is Deno-specific. Python, .NET, shell, PowerShell, cmd, executable, and
   custom adapters inherit the worker process OS permissions unless your adapter adds its own
   sandbox.
+<!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
 
 ## Next steps
 

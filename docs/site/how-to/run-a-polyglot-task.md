@@ -168,6 +168,7 @@ untrusted input into <code>args</code> or the entrypoint path. Trace context
 (<code>TRACEPARENT</code>/<code>TRACESTATE</code>/<code>CORRELATION_ID</code>) is injected
 into the subprocess environment so cross-runtime spans stitch together; env precedence is
 <code>Deno.env</code> &lt; task <code>env</code> &lt; call <code>options.env</code>.
+<!-- caveat: arch-debt:workers-non-deno-task-sandbox-boundary -->
 {{ /comp }}
 
 {{ comp callout { type: "note", title: "Alpha surface" } }}

@@ -37,6 +37,7 @@ the plugin through <code>netscript plugin add @netscript/plugin-auth</code> in a
 auth sources are wired locally (the scaffold does this for you); treat the <code>^1.0.0</code>
 import specifiers as the shape the published packages <em>will</em> take, not an install you can run against
 JSR today.
+<!-- caveat: arch-debt:alpha-specifiers-forward-looking -->
 {{ /comp }}
 
 ## Before you start
@@ -76,6 +77,7 @@ in a <em>backend adapter</em> — one of <code>@netscript/auth-kv-oauth</code>,
 <code>@netscript/auth-workos</code>, or <code>@netscript/auth-better-auth</code>. The plugin selects
 <strong>exactly one</strong> active backend at runtime; there is no multi-active routing or
 cross-backend account linking in v1. You pick the backend in Step 2.
+<!-- caveat: arch-debt:auth-single-active-backend-boundary -->
 {{ /comp }}
 
 ## Step 2 — Choose a backend with `NETSCRIPT_AUTH_BACKEND`
@@ -101,6 +103,7 @@ explaining the backend "does not expose an interactive flow." Those backends are
 where sign-in already happened elsewhere and you only need NetScript to <em>validate</em> the session
 (<code>session</code>/<code>me</code>). If you need NetScript to drive the login redirect, use
 <code>kv-oauth</code>.
+<!-- caveat: arch-debt:seamless-auth-roadmap -->
 {{ /comp }}
 
 For the rest of this recipe we use the default, `kv-oauth`. You can make the choice explicit in your
