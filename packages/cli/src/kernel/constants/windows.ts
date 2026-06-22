@@ -208,25 +208,3 @@ export const COMPILE_CONFIG: { readonly content: string } = {
     2,
   ),
 } as const;
-
-// ============================================================================
-// LEGACY ALIASES
-// These preserve source compatibility for callers not yet migrated to DEFAULT_*
-// names. They will be removed once all consumers are updated.
-// ============================================================================
-/** @deprecated Use DEFAULT_SERVY_CLI_PATH */
-export const SERVY_CLI_PATH: string = DEFAULT_SERVY_CLI_PATH;
-/** @deprecated Use DEFAULT_COMPILE_TARGET */
-export const WINDOWS_TARGET: string = DEFAULT_COMPILE_TARGET;
-/** @deprecated Use DEFAULT_SERVICE_PREFIX */
-export const WINDOWS_SERVICE_PREFIX: string = DEFAULT_SERVICE_PREFIX;
-/** @deprecated Use DEFAULT_BUNDLE_EXTERNAL */
-export const BUNDLE_EXTERNAL_PACKAGES: readonly string[] = DEFAULT_BUNDLE_EXTERNAL;
-/** @deprecated Use DEFAULT_BUNDLE_EXTERNAL_IMPORTS */
-export const BUNDLE_EXTERNAL_IMPORTS: Record<string, string> = DEFAULT_BUNDLE_EXTERNAL_IMPORTS;
-/** @deprecated Use DEFAULT_COMPILE_TIMEOUT_MS */
-export const COMPILE_TIMEOUT_MS: number = DEFAULT_COMPILE_TIMEOUT_MS;
-/** @deprecated Use DEFAULT_BUNDLE_TIMEOUT_MS */
-export const BUNDLE_TIMEOUT_MS: number = DEFAULT_BUNDLE_TIMEOUT_MS;
-/** @deprecated Use DEFAULT_V8_HEAP_MB */
-export const V8_HEAP_MB: typeof DEFAULT_V8_HEAP_MB = DEFAULT_V8_HEAP_MB;

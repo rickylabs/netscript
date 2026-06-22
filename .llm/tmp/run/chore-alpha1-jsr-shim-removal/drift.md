@@ -97,3 +97,14 @@
   a self-verify-against-the-file instruction, so implementation is correct regardless of the artifact
   label the evaluator saw. (PLAN-EVAL cycle 2 independently flagged the same naming gap as
   non-blocking observation #1 — this entry is the applied correction.)
+
+## 2026-06-23 — S1 implementation version-policy tension
+
+- **Version/changelog drift:** PLAN-EVAL accepted the plan's alpha-1 minor-bump decision for breaking
+  removals, but repo standards still state a lockstep `0.0.1-alpha.0` invariant for the broader
+  alpha cadence, and the S1 packages have no `CHANGELOG` files to update. S1 therefore leaves
+  package versions unchanged and records the breaking note in the harness/PR comment path. IMPL-EVAL
+  or the maintainer should decide whether PR-B itself overrides the lockstep standard and bumps
+  affected `deno.json` files to `0.1.0`.
+- **No source-scope expansion:** this drift entry records release metadata policy only; S1 source
+  removals remain within the approved alias-shim scope.

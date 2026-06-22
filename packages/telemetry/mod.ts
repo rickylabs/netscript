@@ -34,5 +34,18 @@ export type {
   InstrumentationRegistration,
 } from './src/runtime/mod.ts';
 export { initJobTracing, runTracedJob } from './src/instrumentation/worker.ts';
+export type {
+  Attributes,
+  AttributeValue,
+  Context,
+  Exception,
+  Link,
+  Span,
+  SpanContext,
+  SpanStatus,
+  SpanStatusCode,
+  TimeInput,
+  TraceState,
+} from './src/core/types.ts';
 export { inspectTelemetry } from './src/diagnostics/inspect-telemetry.ts';
 export type { InspectionReport } from './src/diagnostics/inspect-telemetry.ts';

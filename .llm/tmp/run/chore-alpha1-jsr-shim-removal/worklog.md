@@ -13,6 +13,37 @@
 - Required fixes: re-scope S3b (workers-side), run `jsr-audit` on the planned surface, include doc/recipe updates in S3b file list, add `deno doc --lint` to gate set, convert "Codex must grep" to a gate, re-run open-decision sweep.
 - See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md` for full findings.
 - See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` for drift notes.
+
+## 2026-06-23 — S1 implementation: Tier 1 aliases
+
+- Scope:
+  - Folded the only live CLI alias consumer from `V8_HEAP_MB` to `DEFAULT_V8_HEAP_MB`.
+  - Removed the 8 deprecated Windows constants aliases from `packages/cli/src/kernel/constants/windows.ts`.
+  - Removed `buildConnectionString` and `mssqlJsonExtension` deprecated database exports and barrels.
+  - Deleted the deprecated telemetry `src/context/job.ts` re-export shim.
+  - Added type-only barrel exports needed for the S1 `deno doc --lint` public-surface gate:
+    `PostgresDriverAdapter` from database and core telemetry types referenced by root-exported job helpers.
+- S1 pre-delete grep gate: PASS. Zero hits for all S1 symbols across `templates/**`, `docs/**`,
+  `plugins/*/templates/**`, `plugins/*/src/scaffolding/templates/**`,
+  `packages/*/src/**/templates/**`, and `packages/cli/src/kernel/assets/**`.
+- Consumer proof after deletion:
+  - Removed CLI alias names have no live alias exports/imports; remaining hits are canonical `DEFAULT_*` names.
+  - `buildConnectionString` hits are only the unrelated private adapter methods in mysql/postgres.
+  - `mssqlJsonExtension` and `context/job` have zero package/plugin/doc hits.
+- Gates:
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --root packages/database --root packages/telemetry --ext ts,tsx --pretty` — PASS, 593 files, 5 batches, 0 occurrences.
+  - `deno lint packages/cli/src packages/database/adapters packages/database/extensions packages/database/ports packages/database/prisma-tracing.ts packages/database/mod.ts packages/telemetry/src packages/telemetry/mod.ts packages/telemetry/context.ts` — PASS, 55 files.
+  - `deno fmt --check packages/cli/src packages/database/adapters packages/database/extensions packages/database/ports packages/database/prisma-tracing.ts packages/database/mod.ts packages/telemetry/src packages/telemetry/mod.ts packages/telemetry/context.ts` — PASS, 55 files.
+  - `deno doc --lint packages/cli/mod.ts` — PASS.
+  - `deno doc --lint packages/database/mod.ts` — PASS, with npm `@types/node` unresolved-type warnings only.
+  - `deno doc --lint packages/telemetry/mod.ts` — PASS.
+  - `deno task --cwd packages/cli test` — PASS, 147 tests / 311 steps.
+  - `deno task --cwd packages/database test` — PASS, 5 tests / 7 steps.
+  - `deno task --cwd packages/telemetry test` — PASS, 12 tests.
+  - `rtk proxy deno task arch:check` — PASS exit 0; emitted existing dependency catalog warnings and doctrine warnings only.
+- Wrapper note: `run-deno-lint.ts` and `run-deno-fmt.ts` were invoked with the requested roots but returned nonzero with 0 parsed findings while selecting 593 files despite `--ext`/`--include`; direct scoped TS `deno lint`/`deno fmt --check` over the affected source set passed. Raw `deno fmt --check packages/cli packages/database packages/telemetry` only reported pre-existing Markdown wrapping in `packages/database/README.md`.
+- Version/changelog note: no `CHANGELOG` files exist for `packages/cli`, `packages/database`, or `packages/telemetry`. Package versions remain at the repo lockstep `0.0.1-alpha.0`; this conflicts with the run plan's minor-bump decision and the repo standards lockstep invariant, so the PR body must carry the breaking alpha note and IMPL-EVAL should rule on version timing.
+- Lock/cast hygiene: no `deno.lock` change; no new `as` casts in the diff.
 - Lock hygiene preserved — no `deno.lock` churn, no source edits, no implementation commits.
 ## 2026-06-23 — PLAN-EVAL cycle 2
 

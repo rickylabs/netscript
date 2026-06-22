@@ -84,6 +84,7 @@ export {
   createPostgresAdapter,
   PostgresAdapter,
   type PostgresConnectionOptions,
+  type PostgresDriverAdapter,
 } from './adapters/mod.ts';
 
 // MSSQL and MySQL adapters are available as sub-exports to avoid pulling in
@@ -97,7 +98,7 @@ export {
 // EXTENSIONS EXPORTS
 // ============================================================================
 
-export { jsonUtils, mssqlJsonExtension, registerJsonFields } from './extensions/mod.ts';
+export { jsonUtils, registerJsonFields } from './extensions/mod.ts';
 
 // ============================================================================
 // TRANSACTION HELPERS
@@ -247,11 +248,3 @@ export function buildMssqlConnectionString(parts: {
 
   return `sqlserver://${server};${params.join(';')}`;
 }
-
-/**
- * Backward-compatible alias for PostgreSQL connection string construction.
- *
- * @deprecated Use buildPostgresConnectionString instead
- */
-export const buildConnectionString: typeof buildPostgresConnectionString =
-  buildPostgresConnectionString;
