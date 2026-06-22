@@ -24,7 +24,8 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## In Progress
 
-- Final gate evidence is recorded; final harness evidence commit is pending.
+- User-directed S7 is being recorded and pushed after clearing the prior `docs:links` baseline
+  failure.
 
 ## Next Steps
 
@@ -62,26 +63,29 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 | Root docs, doctrine 01/04, selected `.agents/skills/*` | changed | S6 doc promotion and hand-reconciled OpenHands skill structure. |
 | `.claude/skills/*` mirrors | changed | Regenerated from `.agents/skills/`. |
 | `.llm/tmp/run/jsr-readiness-additive/worklog.md` | changed | Final gate evidence recorded. |
+| `.agents/skills/impeccable/SKILL.md` | deleted | User-directed S7 stale skill removal. |
+| `.claude/skills/impeccable/SKILL.md` | deleted | Removed by regenerating Claude mirrors from `.agents/skills/`. |
+| `.llm/tools/check-internal-doc-links.ts` | changed | Removed the obsolete `impeccable` broken-link example from checker docs. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | PASS | `deno task check`, `deno task lint`, scoped fmt, README doc-lint. |
+| Static | PASS | `deno task check`, `deno task lint`, scoped fmt, README doc-lint, `deno task docs:links`. |
 | Fitness | PASS | `deno task deps:check`, `deno task arch:check`, JSR rubric, zero-cast scan. |
 | Runtime | N/A | No runtime surface in PR-A. |
 | Consumer | N/A | No breaking public API removals in PR-A. |
 
 ## Open Questions
 
-- `deno task docs:links` remains blocked by unrelated `.agents/skills/impeccable/reference/*.md`
-  links; recorded as drift and not part of the final requested gate set.
+- None for S7. The previous `docs:links` blocker from
+  `.agents/skills/impeccable/reference/*.md` links is cleared.
 
 ## Drift and Debt
 
 - Drift: missing implementation tracking artifacts at generator start; baseline auth doctrine failures
   exposed by S2 `arch:check`; current-main README drift; S5 fresh-ui cast reconciliation; S6
-  docs-link baseline blocker. All recorded in `drift.md`.
+  docs-link baseline blocker; user-directed S7 stale skill removal. All recorded in `drift.md`.
 - Debt: none introduced.
 
 ## Commits

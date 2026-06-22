@@ -25,8 +25,7 @@
  * External links (http(s)://, mailto:) are skipped. Relative link targets are
  * always existence-checked regardless of whether the target lives under a scanned
  * root -- so a source doc that links to a never-created out-of-scope file IS
- * flagged as a broken link (e.g. the pre-existing `impeccable` skill's missing
- * reference/*.md subtree, tracked as arch-debt rather than silently skipped).
+ * flagged as a broken link rather than silently skipped.
  *
  * Usage:
  *   deno run --allow-read .llm/tools/check-internal-doc-links.ts --pretty

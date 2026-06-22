@@ -115,6 +115,9 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | S6 Claude surface | `deno task agentic:check-claude` | PASS | Claude surface valid; `.claude/skills` mirror check passed; hook lock check left `deno.lock` unchanged. |
 | S6 scoped fmt | `deno fmt --check <S6 touched Markdown/skill/run-artifact files>` | PASS | Passed after scoped `deno fmt` on those same touched files. |
 | S6 docs links | `deno task docs:links` | FAIL | Baseline failure in `.agents/skills/impeccable/SKILL.md` references to missing `reference/*.md`; not introduced by S6. |
+| S7 Claude surface | `deno task agentic:check-claude` | PASS | Claude surface remains valid after removing `impeccable`; `.claude/skills` reports 16 source skills and 16 mirrored files; hook lock check left `deno.lock` unchanged. |
+| S7 docs links | `deno task docs:links` | PASS | Previously recorded baseline `impeccable` broken-link failure is cleared: docs=97, broken-links=0, broken-anchors=0, orphans=0. |
+| S7 dangling reference scan | `rg -n "impeccable" AGENTS.md CLAUDE.md deno.json .agents .claude .llm/harness .llm/tools packages plugins --glob '!.llm/tmp/**'` plus `find .agents/skills .claude/skills -maxdepth 2 -path '*impeccable*' -print` | PASS | No non-run-artifact references or source/mirror paths remain. |
 | Final check | `deno task check` | PASS | Workspace check wrapper selected 1730 files, 15 batches, 0 failures. |
 | Final lint | `deno task lint` | PASS | Workspace lint wrapper selected 1215 files, 7 batches, 0 occurrences. |
 | Final scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings` | PASS | 1301 files selected, 7 batches, 0 findings. |

@@ -77,3 +77,17 @@ documentation.
 - **Action:** defer
 - **Evidence:** S6 required gates `agentic:check-claude` and scoped `deno fmt --check` passed; the
   docs-link blocker is recorded for a separate skill-assets cleanup.
+
+## 2026-06-22 — User-directed S7 stale skill removal
+
+- **What:** The user added S7 after the PLAN-EVAL'd six slices and directed removal of the stale
+  `impeccable` skill.
+- **Source:** User instruction after S6/final gate evidence.
+- **Expected:** The approved PR-A plan covered six additive slices and recorded `docs:links` as
+  blocked by missing `impeccable/reference/*.md` files.
+- **Actual:** S7 removes the unused source skill and regenerated Claude mirror, clearing the only
+  recorded red baseline gate without changing product code or task wiring.
+- **Severity:** minor
+- **Action:** fix
+- **Evidence:** `deno task agentic:check-claude` passes with 16 source skills and 16 mirrored files;
+  `deno task docs:links` passes with zero broken links, anchors, or orphans.
