@@ -60,7 +60,7 @@ export async function startSagaRunner(
   const registryModule = options.registryModule ?? readEnv('SAGAS_REGISTRY_MODULE') ??
     DEFAULT_REGISTRY_MODULE;
   const importer = options.importer ?? defaultImporter;
-  const runtimeOptions = adapter === 'legacy' ? { ...options.runtimeOptions, adapter } : {
+  const runtimeOptions = {
     ...options.runtimeOptions,
     native: withDefaultTelemetry(options.runtimeOptions?.native),
     adapter,
@@ -119,7 +119,7 @@ function parseAdapter(value: string | undefined): SagaRuntimeAdapter | undefined
   if (value === undefined || value.length === 0) {
     return undefined;
   }
-  if (value === 'native' || value === 'legacy') {
+  if (value === 'native') {
     return value;
   }
   throw SagasError.validationFailed(`Unsupported SAGAS_ADAPTER value: ${value}.`);

@@ -1,8 +1,8 @@
 # Runtime Processes
 
-The plugin runtime process is separate from the core runtime engine. Core owns `createSagaRuntime()`
-and the native/legacy adapter choice. The plugin owns the executable background process that loads a
-generated static registry and supervises the runtime lifecycle.
+The plugin runtime process is separate from the core runtime engine. Core owns `createSagaRuntime()`;
+the plugin owns the executable background process that loads a generated static registry and
+supervises the runtime lifecycle.
 
 ## Supervisor
 
@@ -74,7 +74,7 @@ The runner reads only two environment values:
 
 | Variable                | Purpose                                                  |
 | ----------------------- | -------------------------------------------------------- |
-| `SAGAS_ADAPTER`         | Optional `native` or `legacy` runtime adapter selection. |
+| `SAGAS_ADAPTER`         | Optional `native` runtime adapter selection.             |
 | `SAGAS_REGISTRY_MODULE` | Optional registry module specifier override.             |
 
 If `SAGAS_ADAPTER` is omitted, the core runtime default is native. Unsupported adapter values fail

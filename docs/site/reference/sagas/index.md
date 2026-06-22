@@ -91,7 +91,7 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 | --- | --- | --- |
 | `SagaRuntime` | interface | Runtime facade returned by the composition root. |
 | `SagaRuntimeAdapter` | type alias | Adapter selected by the saga runtime composition root. |
-| `SagaBusPort` | interface | Replaceable bus contract implemented by native and legacy saga adapters. |
+| `SagaBusPort` | interface | Replaceable bus contract implemented by the native saga adapter. |
 | `SagaStorePort` | interface | Persistent state store boundary for T1 saga runtime guarantees. |
 | `SagaPublisherPort` | interface | Explicit publisher boundary implemented by plugin-layer HTTP clients. |
 | `SagaIdempotencyPort` | interface | Durable idempotency boundary for saga publish and cascade deduplication. |
@@ -117,7 +117,7 @@ root wires together. It also re-exports the userland DSL types and cascaded-mess
 
 > The runtime entrypoint exports 95 symbols in total. The tables above list the primary surface.
 > Branded id aliases (`SagaId`, `SagaInstanceId`, `SagaMessageId`, `SagaCorrelationKey`), scheduler
-> records, legacy-adapter seams, and publisher receipt/JSON types are part of the published surface
+> records and publisher receipt/JSON types are part of the published surface
 > and resolve through `deno doc plugins/sagas/src/runtime/mod.ts`.
 
 ## API contract (`@netscript/plugin-sagas/contracts`)

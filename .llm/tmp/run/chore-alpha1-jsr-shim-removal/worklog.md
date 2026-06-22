@@ -44,6 +44,32 @@
 - Wrapper note: `run-deno-lint.ts` and `run-deno-fmt.ts` were invoked with the requested roots but returned nonzero with 0 parsed findings while selecting 593 files despite `--ext`/`--include`; direct scoped TS `deno lint`/`deno fmt --check` over the affected source set passed. Raw `deno fmt --check packages/cli packages/database packages/telemetry` only reported pre-existing Markdown wrapping in `packages/database/README.md`.
 - Version/changelog note: no `CHANGELOG` files exist for `packages/cli`, `packages/database`, or `packages/telemetry`. Package versions remain at the repo lockstep `0.0.1-alpha.0`; this conflicts with the run plan's minor-bump decision and the repo standards lockstep invariant, so the PR body must carry the breaking alpha note and IMPL-EVAL should rule on version timing.
 - Lock/cast hygiene: no `deno.lock` change; no new `as` casts in the diff.
+
+## 2026-06-23 — S3a implementation: saga legacy subsystem
+
+- Scope:
+  - Deleted `packages/plugin-sagas-core/src/adapters/saga-bus-legacy.ts`.
+  - Removed legacy runtime and preset option branches from `createSagaRuntime()`, `startSagas()`,
+    and `startSagaHandlers()`.
+  - Removed legacy adapter re-exports from core and plugin runtime barrels.
+  - Folded the plugin runner/supervisor onto native runtime selection only.
+  - Removed the legacy adapter idempotency test and retained native/direct/durable idempotency
+    coverage.
+  - Updated sagas docs that described native-vs-legacy runtime choice.
+  - Appended the deferred workers/triggers cron debt entry to `.llm/harness/debt/arch-debt.md`.
+- Consumer proof:
+  - `SagaBusLegacy`, `createSagaBusLegacy`, `saga-bus-legacy`, `adapter: 'legacy'`, `adapter:
+    "legacy"`, option-shaped `legacy?:`, `SAGAS_ADAPTER` legacy docs, and `native/legacy` have zero
+    hits across `packages/plugin-sagas-core`, `plugins/sagas`, and `docs/site/reference/sagas`.
+- Gates:
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/plugin-sagas-core --root plugins/sagas --ext ts,tsx --pretty` — PASS, 165 files, 2 batches, 0 occurrences.
+  - `deno lint packages/plugin-sagas-core/src packages/plugin-sagas-core/tests plugins/sagas/src plugins/sagas/tests` — PASS, 144 files.
+  - `deno fmt --check packages/plugin-sagas-core/src packages/plugin-sagas-core/tests plugins/sagas/src plugins/sagas/tests` — PASS, 144 files after formatting one touched barrel.
+  - `deno doc --lint packages/plugin-sagas-core/mod.ts` — PASS.
+  - `deno task --cwd packages/plugin-sagas-core test` — PASS, 28 tests.
+  - `deno task --cwd plugins/sagas test` — PASS, 37 tests (extra evidence for plugin runtime edits).
+  - `rtk proxy deno task arch:check` — PASS exit 0; emitted existing dependency catalog warnings and doctrine warnings only.
+- Lock/cast hygiene: no `deno.lock` change; no new `as` casts in the TypeScript diff.
 - Lock hygiene preserved — no `deno.lock` churn, no source edits, no implementation commits.
 ## 2026-06-23 — PLAN-EVAL cycle 2
 

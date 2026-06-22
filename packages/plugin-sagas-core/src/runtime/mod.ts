@@ -52,15 +52,7 @@ export type {
   SagaStoreWriteOptions,
 } from '../ports/mod.ts';
 export type { SagaAppliedKeyOutcome, SagaAppliedKeyStore } from '../ports/mod.ts';
-export type {
-  SagaBridgeCompensationResolver,
-  SagaBusLegacyBus,
-  SagaBusLegacyDefinitionMapper,
-  SagaBusLegacyFactory,
-  SagaBusLegacyLogger,
-  SagaBusLegacyMachine,
-  SagaBusLegacyOptions,
-} from '../adapters/mod.ts';
+export type { SagaBridgeCompensationResolver } from '../adapters/mod.ts';
 export { createSagaEngine, SagaEngine } from './saga-engine.ts';
 export { createSagaScheduler, SagaScheduler } from './saga-scheduler.ts';
 export { createSagaCompensator, SagaCompensator } from './saga-compensator.ts';

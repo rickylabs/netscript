@@ -1170,3 +1170,35 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close when the import-job tutorial step parses CSV via `@std/csv` (simple case) or
   in-memory DuckDB `read_csv` (analytical case) instead of hand-rolled string splitting, and the
   surrounding prose explains the choice.
+
+## plugin-workers-core + plugin-triggers-core — CRON-SUBSYSTEM-DUP (workers `.schedule()` vs triggers `defineScheduledTrigger`)
+
+- **Reason:** Two parallel cron subsystems exist with no unification. Workers
+  `defineJob().schedule(cron)` flows through `JobBuilder.schedule()` → `JobDefinition.schedule` field
+  → in-process `Scheduler` class → `@netscript/cron`. Triggers `defineScheduledTrigger()` flows
+  through `CronTriggerSchedulerAdapter` → `@netscript/cron`. They are NOT equivalent: separate runtime
+  adapters, separate scaffolds (`job-scaffolders.ts:64-65` vs `trigger-scaffolders.ts:86-88`),
+  separate CLI flags, separate docs, and `plugins/workers/deno.json` has NO dependency on
+  `@netscript/plugin-triggers-core`. The workers `.schedule()` builder method is marked
+  `@deprecated → defineScheduledTrigger(...).enqueueJob(...)`, but that path does NOT yet replace
+  in-process cron job scheduling — so `.schedule()` is a **live feature, not a removable shim**.
+- **Why it is debt:** PR-B slice S3b originally claimed the trigger path replaces `.schedule()`.
+  PLAN-EVAL cycle 1 (openhands-run-27986503722-1) proved that false against the tree. Removing the
+  workers `schedule` field/method/Scheduler/scaffold/CLI/docs with no replacement would orphan a
+  documented public capability. Correct sequencing: unify the two cron subsystems (or formally bless
+  one) FIRST, then retire the other's surface.
+- **Decision needed from maintainer (only user-blocking item):** which cron subsystem is canonical —
+  (a) keep workers in-process `Scheduler` and undeprecate `.schedule()`; (b) make
+  `defineScheduledTrigger` the single canonical path + build a real migration (workers depends on
+  triggers-core, scaffold/CLI/docs rewrite, working delegation shim) before any removal; or (c) keep
+  both as intentional distinct capabilities (in-process cron vs durable trigger) and drop the
+  `@deprecated` tag on `.schedule()`.
+- **Owner:** Framework architecture (maintainer call).
+- **Target:** Pre-1.0; must precede any workers `.schedule()` surface removal. EXCLUDED from PR-B
+  (#113) and PR-C (alpha-1 legacy purge).
+- **Linked plan:** `.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` (2026-06-22 cycle-1 +
+  2026-06-23 option-(b) deferral).
+- **Created:** 2026-06-23
+- **Status:** open, DECISION_PENDING — recorded under the overnight don't-block mandate so the alpha-1
+  zero-legacy / JSR-readiness program proceeds without halting on this redesign.
+- **Gate:** none (record-only until the maintainer decision; a future unification run selects gates).

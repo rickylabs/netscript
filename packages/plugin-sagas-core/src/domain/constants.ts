@@ -2,7 +2,7 @@
 export const SAGA_DURABILITY_TIERS: readonly ['t1', 't2', 't3'] = ['t1', 't2', 't3'];
 
 /** Runtime adapter kinds supported by `createSagaRuntime`. */
-export const SAGA_ADAPTER_KINDS: readonly ['native', 'legacy'] = ['native', 'legacy'];
+export const SAGA_ADAPTER_KINDS: readonly ['native'] = ['native'];
 
 /** Cascaded message kinds emitted by saga handlers. */
 export const CASCADED_MESSAGE_KINDS: readonly [

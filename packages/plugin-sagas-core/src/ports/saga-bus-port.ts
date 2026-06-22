@@ -29,7 +29,7 @@ export type SagaQueryDispatch<TResult = unknown, TName extends string = string> 
   query: QueryDefinition<TResult, TName>;
 }>;
 
-/** Replaceable bus contract implemented by native and legacy saga adapters. */
+/** Replaceable bus contract implemented by the native saga adapter. */
 export interface SagaBusPort {
   /** Stable adapter identifier used by runtime diagnostics and plugin registration. */
   readonly id: string;

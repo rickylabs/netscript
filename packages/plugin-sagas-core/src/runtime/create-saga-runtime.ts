@@ -2,7 +2,6 @@ import {
   createSagaBusBridge,
   type SagaBridgeCompensationResolver,
 } from '../adapters/saga-bus-bridge.ts';
-import { createSagaBusLegacy, type SagaBusLegacyOptions } from '../adapters/saga-bus-legacy.ts';
 import type { CascadedMessage, SagaDefinition, SagaMessage } from '../domain/mod.ts';
 import type {
   SagaBusPort,
@@ -20,7 +19,7 @@ import type { SagaScheduler } from './saga-scheduler.ts';
 import type { SagaInstrumentation } from '../telemetry/mod.ts';
 
 /** Adapter selected by the saga runtime composition root. */
-export type SagaRuntimeAdapter = 'native' | 'legacy';
+export type SagaRuntimeAdapter = 'native';
 
 /** Native runtime composition options. */
 export type SagaRuntimeNativeOptions = Readonly<{
@@ -40,7 +39,6 @@ export type SagaRuntimeNativeOptions = Readonly<{
 export type CreateSagaRuntimeOptions = Readonly<{
   adapter?: SagaRuntimeAdapter;
   native?: SagaRuntimeNativeOptions;
-  legacy?: SagaBusLegacyOptions;
 }>;
 
 /** Runtime façade returned by the composition root. */
@@ -74,19 +72,10 @@ export function createSagaRuntime(
   options?: CreateSagaRuntimeOptions & Readonly<{ adapter?: 'native' }>,
 ): SagaRuntime<'native'>;
 
-/** Create the opt-in deprecated legacy saga runtime. */
-export function createSagaRuntime(
-  options: CreateSagaRuntimeOptions & Readonly<{ adapter: 'legacy' }>,
-): SagaRuntime<'legacy'>;
-
 /** Create a saga runtime with explicit adapter selection. */
 export function createSagaRuntime(
   options: CreateSagaRuntimeOptions = {},
 ): SagaRuntime {
-  if (options.adapter === 'legacy') {
-    return createRuntimeFacade('legacy', createSagaBusLegacy(options.legacy));
-  }
-
   return createRuntimeFacade('native', createNativeBus(options.native));
 }
 

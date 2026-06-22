@@ -5,7 +5,6 @@
  */
 
 export type { SagaDefinition } from '../domain/mod.ts';
-export type { SagaBusLegacyOptions } from '../adapters/mod.ts';
 export type {
   CreateSagaRuntimeOptions,
   SagaRuntime,
