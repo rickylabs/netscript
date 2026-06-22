@@ -931,3 +931,61 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   need `Record<string, unknown>` widening, AND (B) every external-boundary surface (SDK / KV / db /
   bootstrap) reaches its port through a typed adapter so the `as unknown as` / `as <T>` boundary
   casts are gone across all plugin services.
+
+## packages/auth-better-auth — seamless better-auth integration roadmap
+
+- **Reason:** The audit (docs-v4 Phase-0, `.llm/tmp/run/docs-v4-ia-deepening/seam-coverage.md`)
+  found the only real build-seam gap in the framework: all 9 better-auth plugins
+  (`organization`, `twoFactor`, `magicLink`, `admin`, `passkey`, `multiSession`, `apiKey`,
+  `bearer`, `jwt`) are mountable today ONLY via the undocumented escape hatch
+  `createBetterAuthBackend({ auth: betterAuth({ plugins: [...] }) })`. The documented convenience
+  factory `createNetscriptBetterAuth` has a closed `NetscriptBetterAuthOptions` (no `plugins`
+  field), so the documented path can enable none of them. The Principal mapper already consumes
+  org/role/permission claims, so the wiring half is done — only the on-ramp and ergonomics are
+  missing.
+- **Owner:** Auth layer follow-up (docs-v4 run + a dedicated auth-DX program).
+- **Created:** 2026-06-22
+- **User directive (2026-06-22):** "build the passthrough and document in the harness what should
+  be planned to build (seams, additional adapters, helpers, fluent builder) to make it absolutely
+  seamless in NetScript." So the minimal passthrough ships now; the rest is this tracked roadmap.
+
+- **R0 — passthrough seam (BUILD NOW, this run, IMPL-EVAL-gated WSL Codex slice):** add a
+  `plugins` / `betterAuthOptions` passthrough to `createNetscriptBetterAuth` so the documented
+  factory can mount any better-auth plugin (forwarded into `BetterAuthOptions`). Status: planned.
+
+- **R1 — DB schema generation for plugins (REQUIRED for R0 to be usable):** plugins that need
+  tables (`organization` → org/member/invitation, `twoFactor`, `passkey`, `apiKey`) do nothing
+  until their Prisma models + migration exist. Wrap better-auth's schema-generation CLI through
+  `netscript db` / scaffold so enabling a plugin also generates its required schema. Without R1,
+  R0 enables the plugin at the better-auth layer but it fails at runtime on a missing table — docs
+  MUST state this honestly until R1 lands.
+
+- **R2 — interactive-flow seam (`InteractiveFlowPort`) for the better-auth backend:** today the
+  better-auth backend is non-interactive, so `/signin` and `/callback` return
+  `AUTH_PROVIDER_ERROR` and `magicLink`/`passkey` sign-in can't be driven through NetScript (only
+  kv-oauth implements `InteractiveFlowPort`). Implement the port over better-auth's own handler to
+  make magic-link/passkey/social interactive flows first-class. This is the largest item and the
+  blocker for full plugin parity.
+
+- **R3 — NetScript-native organization / multi-tenancy helpers:** typed org/tenant/role primitives
+  layered over the `organization` plugin (instead of reading raw claim string keys), so apps and
+  the `tutorials/workspace` track get a real framework org primitive. Resolves the "NetScript ships
+  no organization primitive" caveat at its root.
+
+- **R4 — fluent auth builder (`defineAuth()`):** a NetScript-idiomatic builder mirroring
+  `definePage`/`defineSaga`/`defineTask` that composes backend + plugins + principal mapping +
+  schema declaratively, replacing hand-wiring of `betterAuth()` + `createBetterAuthBackend` +
+  adapter. This is the "absolutely seamless" endpoint of the roadmap.
+
+- **R5 — plugin-aware Principal mapping + adapters:** typed accessors/mappers per plugin output
+  (`apiKey` permissions, `admin` roles, `multiSession`) plus any additional better-auth adapter
+  wiring beyond Prisma, and CLI support (e.g. `netscript auth add-plugin <name>`) to scaffold the
+  plugin + its schema + wiring in one step.
+
+- **Status:** OPEN — R0 scheduled in the docs-v4 run; R1–R5 tracked here as the seamless-auth
+  program for a dedicated future run (needs its own PLAN-EVAL). Docs authored in docs-v4 must (a)
+  document the R0 factory path, (b) state the R1 schema-generation requirement honestly, and (c)
+  reference this roadmap rather than silently omitting the gaps.
+- **Gate:** Close R0 when `createNetscriptBetterAuth({ plugins: [...] })` type-checks and forwards
+  to `BetterAuthOptions` with a green IMPL-EVAL; close the program when R1–R5 land under their own
+  plan.
