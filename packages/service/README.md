@@ -1,4 +1,4 @@
-# `@netscript/service`
+# @netscript/service
 
 [![JSR](https://jsr.io/badges/@netscript/service)](https://jsr.io/@netscript/service)
 [![Deno](https://img.shields.io/badge/runtime-Deno-000000?logo=deno&logoColor=white)](https://deno.com/)
@@ -32,6 +32,10 @@ layering rationale.
 - Opt-in authentication and authorization through `@netscript/service/auth`.
 
 ## Install
+
+```sh
+deno add jsr:@netscript/service
+```
 
 ```jsonc
 {
@@ -356,7 +360,7 @@ const response = await fetch(`http://${running.addr.hostname}:${running.addr.por
 await running.stop();
 ```
 
-## Documentation
+## Docs
 
 - [`docs/getting-started.md`](./docs/getting-started.md)
 - [`docs/concepts.md`](./docs/concepts.md)

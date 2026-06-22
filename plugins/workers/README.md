@@ -27,7 +27,11 @@ It contributes:
 It does not own the core job DSL, task runtime contracts, workflow state contracts, or memory
 testing adapters. Import those from `@netscript/plugin-workers-core`.
 
-## 2. Install
+## Install
+
+```sh
+deno add jsr:@netscript/plugin-workers
+```
 
 Use the workspace import while developing inside this repository:
 
@@ -38,7 +42,7 @@ import { workersPlugin } from '@netscript/plugin-workers';
 After publishing, consumers should use the published JSR package specifier with the same exported
 subpaths.
 
-## 3. Configure
+## Quick example
 
 Register the plugin in `netscript.config.ts`.
 
@@ -260,12 +264,12 @@ schemas, and stream producer primitives.
 Process wrappers now compose the plugin worker runtime through `@netscript/plugin-workers-core` and
 the plugin service runtime. Slice D32 removed the legacy worker package.
 
-## 18. See Also
+## Docs
 
 Read:
 
-- `docs/README.md`
-- `docs/architecture.md`
-- `docs/getting-started.md`
-- `docs/operations.md`
+- [Docs README](./docs/README.md)
+- [Architecture](./docs/architecture.md)
+- [Getting Started](./docs/getting-started.md)
+- [Operations](./docs/operations.md)
 - `@netscript/plugin-workers-core` for core definitions and runtime contracts

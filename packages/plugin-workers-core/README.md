@@ -48,7 +48,11 @@ those primitives to service processes, CLI verbs, generated registries, and host
 Workers core intentionally keeps dependencies narrow. It does not import `@netscript/config`,
 `@netscript/telemetry`, or non-core plugin packages.
 
-## Installation
+## Install
+
+```sh
+deno add jsr:@netscript/plugin-workers-core
+```
 
 In this workspace, import the package through the Deno workspace map:
 
@@ -64,7 +68,7 @@ deno test --allow-all --unstable-kv packages/plugin-workers-core/tests/
 deno fmt packages/plugin-workers-core
 ```
 
-## Quick Start
+## Quick example
 
 Define a job and start an in-process runtime:
 
@@ -326,13 +330,13 @@ D17 documentation audit checks:
 - examples use modern Deno/JSR package imports
 - no deprecated registry URL imports appear
 
-## See Also
+## Docs
 
 Read:
 
-- `docs/architecture.md`
-- `docs/concepts.md`
-- `docs/getting-started.md`
-- `docs/recipes/adding-a-job.md`
-- `docs/recipes/adding-a-task.md`
-- `docs/recipes/testing-locally.md`
+- [Architecture](./docs/architecture.md)
+- [Concepts](./docs/concepts.md)
+- [Getting Started](./docs/getting-started.md)
+- [Adding A Job](./docs/recipes/adding-a-job.md)
+- [Adding A Task](./docs/recipes/adding-a-task.md)
+- [Testing Locally](./docs/recipes/testing-locally.md)

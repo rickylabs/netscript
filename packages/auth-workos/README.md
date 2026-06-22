@@ -8,6 +8,10 @@ principals.
 
 ## Install
 
+```sh
+deno add jsr:@netscript/auth-workos
+```
+
 ```ts
 import {
   createWorkosAccessTokenAuthenticator,
@@ -81,3 +85,8 @@ therefore resolves request-local sessions through the sealed-session cookie, but
 WorkOS webhook-to-database user/org sync is intentionally not part of this package slice. Consumers
 that need local org/user mirrors should wire WorkOS webhooks in their application or use the planned
 fast-follow sync component when it lands.
+
+## Docs
+
+- [`@netscript/plugin-auth-core`](../plugin-auth-core/README.md)
+- [`@netscript/service` auth docs](../service/README.md)

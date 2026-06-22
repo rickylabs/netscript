@@ -24,7 +24,7 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## In Progress
 
-- S3 byte-clean README promotion is implemented and gated; S3 commit is pending.
+- S4 drifted README hand reconciliation is implemented and gated; S4 commit is pending.
 
 ## Next Steps
 
@@ -55,6 +55,8 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 | 20 package/plugin README paths | changed | Byte-clean S3 checkout from `origin/release/jsr-readiness`. |
 | `.llm/harness/README.md` | changed | Internal README promoted from umbrella. |
 | `.llm/tools/README.md` | changed | Internal README promoted from umbrella. |
+| 6 plan-listed drifted README paths | changed | Hand-reconciled US-9 anchors over current content. |
+| 5 auth README paths | changed | Current-main drift extension needed for aggregate README gate. |
 
 ## Gates
 

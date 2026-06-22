@@ -45,6 +45,7 @@ documentation.
   `packages/auth-workos`, `packages/plugin-auth-core`, `plugins/auth`) were excluded to avoid
   deleting or clobbering main-only auth documentation.
 - **Severity:** minor
-- **Action:** defer
-- **Evidence:** S3 checkout intentionally omitted those auth README paths; S4 still owns only the six
-  plan-listed drifted READMEs.
+- **Action:** fix
+- **Evidence:** S3 checkout intentionally omitted those auth README paths. S4 extended the same
+  hand-reconcile approach to those five auth README files after aggregate `docs:readme:check` failed;
+  `deno task docs:readme:check` now passes for all 31 package/plugin READMEs.

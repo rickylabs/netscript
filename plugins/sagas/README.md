@@ -9,6 +9,12 @@ contributes the plugin manifest, starts service and background resources, genera
 registries, and exposes cross-service publishing tools for applications that need to talk to the
 sagas API.
 
+## Install
+
+```sh
+deno add jsr:@netscript/plugin-sagas
+```
+
 ## What This Package Owns
 
 - The typed `sagasPlugin` manifest and plugin inspection helpers.
@@ -22,7 +28,7 @@ sagas API.
 - The V1 HTTP contract and service entrypoint in `./contracts` and `./services`.
 - Browser and server stream entrypoints for saga instance state.
 
-## Package Boundary
+## Quick example
 
 Userland saga definitions import the DSL from `@netscript/plugin-sagas-core`, not from this plugin
 package. Application services that need to publish messages to the sagas API import the HTTP SDK
@@ -216,7 +222,7 @@ not introduce saga bus or registry singletons, and uses composition-root owned r
 T1 durability is the shipped default. T2 outbox, T3 history/replay, and runtime signal/query
 dispatch remain reserved for the later durability phase.
 
-## More Documentation
+## Docs
 
 - [HTTP Publisher](./docs/http-publisher.md)
 - [Runtime Processes](./docs/runtime-processes.md)

@@ -8,6 +8,12 @@ This package is intentionally behavior-light. It does not mount HTTP handlers, c
 databases, run CLIs, or implement provider SDKs. Adapter packages implement the ports exported here
 and later plugin slices bind those adapters into services.
 
+## Install
+
+```sh
+deno add jsr:@netscript/plugin-auth-core
+```
+
 ## Exports
 
 | Export                                     | Purpose                                                                             |
@@ -45,11 +51,11 @@ console.log(config.backend, presets.size, backends.defaultName);
 
 None. This package contains contracts, schemas, and pure testing fixtures only.
 
-## See Also
+## Docs
 
-- `@netscript/service/auth` for the `Principal`, `AuthnRequest`, `AuthnResult`, and
+- [`@netscript/service`](../service/README.md) for the `Principal`, `AuthnRequest`, `AuthnResult`, and
   `AuthenticatorPort` seam consumed by service hosts.
-- `@netscript/plugin-streams-core` for the durable stream schema primitive used by the auth stream
+- [`@netscript/plugin-streams-core`](../plugin-streams-core/README.md) for the durable stream schema primitive used by the auth stream
   projection schema.
 
 ## License

@@ -67,6 +67,8 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | 2026-06-22 | S2 | gate | `deno task deps:check` passed. `deno task arch:check` passed after the baseline auth doctrine repairs. |
 | 2026-06-22 | S3 | edit | Checked out 20 byte-clean package/plugin READMEs plus `.llm/harness/README.md` and `.llm/tools/README.md` from `origin/release/jsr-readiness`. Skipped current-main auth README drift rather than deleting main-only files. |
 | 2026-06-22 | S3 | gate | README standard passed for the 20 touched package/plugin READMEs. Existing README/docs example tests passed for touched packages with fixtures. |
+| 2026-06-22 | S4 | edit | Hand-reconciled the six plan-listed drifted READMEs with US-9 anchors while preserving current content. Extended the same hand reconcile to five current-main auth README drifts so aggregate `docs:readme:check` can pass. |
+| 2026-06-22 | S4 | gate | Six-file README standard passed, queue/service README tests passed, plugin entrypoint checks passed, and aggregate `deno task docs:readme:check` passed for all 31 package/plugin READMEs. |
 
 ## Decisions
 
@@ -94,6 +96,11 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | S2 arch check | `deno task arch:check` | PASS | Preserved main's auth multi-root doctrine wiring and `arch:check:repo`; passed after explicit auth appsettings/type-test repairs. |
 | S3 README standard | `deno run --no-lock --allow-read .llm/tools/check-readme-standard.ts --pretty <20 S3 package/plugin README paths>` | PASS | Internal `.llm/*/README.md` files are outside this publishable README checker's contract. |
 | S3 README examples | `deno test --allow-all --no-lock packages/aspire/tests/_fixtures/readme-examples_test.ts packages/config/tests/_fixtures/readme-examples_test.ts packages/fresh/tests/_fixtures/docs-examples_test.ts packages/fresh-ui/tests/_fixtures/docs-examples_test.ts packages/plugin/tests/_fixtures/readme-examples_test.ts packages/sdk/tests/readme-doctest_test.ts packages/telemetry/tests/_fixtures/readme-examples_test.ts packages/watchers/tests/_fixtures/docs-examples_test.ts` | PASS | 17 tests passed. |
+| S4 README standard | `deno run --no-lock --allow-read .llm/tools/check-readme-standard.ts --pretty packages/plugin-sagas-core/README.md packages/plugin-workers-core/README.md packages/queue/README.md packages/service/README.md plugins/sagas/README.md plugins/workers/README.md` | PASS | The six plan-listed drifted READMEs conform after hand reconciliation. |
+| S4 README examples | `deno test --allow-all --no-lock packages/queue/tests/_fixtures/docs-examples_test.ts packages/service/tests/_fixtures/readme-examples_test.ts` | PASS | 3 tests passed; specifically covers current service lifecycle/auth examples and queue docs examples. |
+| S4 focused entrypoints | `deno check --unstable-kv --no-lock packages/plugin-sagas-core/mod.ts packages/plugin-workers-core/mod.ts plugins/sagas/mod.ts plugins/workers/mod.ts` | PASS | Focused check for the plugin/core surfaces referenced by the hand-reconciled README examples. |
+| S4 aggregate README standard | `deno task docs:readme:check` | PASS | 31 package/plugin READMEs conform after including the current-main auth README drift extension. |
+| S4 auth README surface check | `deno check --unstable-kv --no-lock packages/auth-better-auth/mod.ts packages/auth-kv-oauth/mod.ts packages/auth-workos/mod.ts packages/plugin-auth-core/mod.ts plugins/auth/mod.ts` | PASS | Focused check for auth README drift extension surfaces. |
 
 ### Fitness Gates
 

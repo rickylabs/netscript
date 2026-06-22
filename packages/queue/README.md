@@ -1,4 +1,4 @@
-# `@netscript/queue`
+# @netscript/queue
 
 [![JSR](https://jsr.io/badges/@netscript/queue)](https://jsr.io/@netscript/queue)
 [![Deno](https://img.shields.io/badge/runtime-Deno-000000?logo=deno&logoColor=white)](https://deno.com/)
@@ -302,12 +302,12 @@ The public factory stays synchronous. Redis and RabbitMQ adapters are resolved l
 operational use, so existing consumers can keep treating `createQueue()` as a normal
 constructor-style API.
 
-## Resources
+## Docs
 
-- https://jsr.io/@netscript/queue
-- https://jsr.io/@netscript/queue/doc
-- https://fedify.dev/manual/runtime#message-queue
-- https://docs.deno.com/deploy/kv/manual/queue_overview
+- [JSR package](https://jsr.io/@netscript/queue)
+- [JSR docs](https://jsr.io/@netscript/queue/doc)
+- [Fedify message queue runtime](https://fedify.dev/manual/runtime#message-queue)
+- [Deno KV queue overview](https://docs.deno.com/deploy/kv/manual/queue_overview)
 - `@netscript/cron`
 - `@netscript/telemetry`
 

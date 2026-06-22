@@ -7,6 +7,12 @@ OAuth flow functions for a caller-owned HTTP layer.
 There is no Hono mount, route handler, CLI, database generator, or project contribution surface in
 this package. The unified `/auth/*` HTTP surface belongs to `plugins/auth`.
 
+## Install
+
+```sh
+deno add jsr:@netscript/auth-kv-oauth
+```
+
 ## Quick Start
 
 ```ts
@@ -81,6 +87,11 @@ refresh-token hash mismatches as compromise.
 
 This package is RP-only for v1. It does not validate inbound bearer JWTs as a resource server. PAR,
 DPoP, active key rotation, and global logout indexing are deferred extension points.
+
+## Docs
+
+- [`@netscript/plugin-auth-core`](../plugin-auth-core/README.md)
+- [`plugins/auth`](../../plugins/auth/README.md)
 
 ## Attribution
 
