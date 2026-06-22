@@ -73,6 +73,55 @@ Do NOT churn root `deno.lock`; do NOT `deno cache --reload`. New `.llm/tools/dep
 imports already in the graph where possible; if a genuinely new import is required, record it and
 get approval before lock changes.
 
+## Archetype + surface
+Mixed, non-API-changing. Touched surfaces: repo tooling (`.llm/tools/deps/**`, doc/readme checkers)
+— no published surface; `deno.json` task graph — no published surface; package/plugin READMEs —
+docs only; `@netscript/fresh-ui` — restores/clarifies the EXISTING interactive JSX prop surface
+(net export additions of already-intended types, no removals). Closest archetype overlay:
+`SCOPE-docs` (READMEs/doctrine) + tooling; ARCHETYPE for fresh-ui is the UI package archetype but
+PR-A makes no breaking export change. **No public API is removed or renamed in PR-A** (all removals
+are deferred to PR-B).
+
+## Open-decision sweep
+- Pages workflow (`pages.yml`): DEFERRED — safe to defer (Pages deploys from `docs/user-site` today;
+  no rework, it's an independent follow-up requiring a docs-v4 rebaseline).
+- 6 drifted READMEs reconcile strategy: RESOLVED NOW — apply only the US-9 structural template over
+  main's current content, preserving main's substantive changes (deferring would force a re-do).
+- `arch:check` reconcile shape: RESOLVED NOW — prepend `deps:check &&` to main's current multi-root
+  `arch:check`; do not clobber `arch:check:repo` or per-auth-package wiring.
+- Whether fresh-ui export additions could collide with main's auth-era fresh-ui changes: must be
+  verified at impl time per-file (base==main was confirmed in research, so low risk) — not a
+  deferral that forces rework.
+- No open decision would force rework if deferred.
+
+## Risk register
+- **R1 fresh-ui export surface drift** — main may have touched fresh-ui since research. Mitigation:
+  re-confirm base==main per file before applying; if drifted, hand-reconcile like the 6 READMEs.
+- **R2 deno.json merge** — task block must land in an untouched region; `arch:check` is a CONFLICT.
+  Mitigation: targeted edit, then `deno task arch:check` + `deps:check` must be green on the branch.
+- **R3 lock churn** — new `.llm/tools/deps/*` imports could touch `deno.lock`. Mitigation: prefer
+  std imports already in the graph; if a new import is unavoidable, record it and get approval before
+  committing a lock change.
+- **R4 README type-fence** — the historical `Property 'users'` error. Mitigation: type-check every
+  touched README's TS fences; already resolved at umbrella tip, re-verify the 6 hand-reconciled ones.
+- **R5 doc-lint regressions** — the fresh-ui fixes target `no-explicit-any`/private-type-ref; verify
+  `deno task lint` is green and no NEW casts were introduced (zero-cast invariant).
+
+## Gate set (from archetype-gate-matrix + overlays)
+`deno task check` (+`--unstable-kv` for workspace code), `deno task lint`, scoped `fmt:check`
+(`--ext ts,tsx` via `.llm/tools/run-deno-fmt.ts`), `deno task deps:check`, `deno task arch:check`,
+README doc-lint (`check-readme-standard.ts`). `SCOPE-docs` overlay for the README/doctrine slices.
+Full `scaffold.runtime` e2e is NOT a required PR-A gate (no scaffold/DB/Aspire surface touched) but
+CI runs it anyway and is expected green.
+
+## jsr-audit rubric (applied to PLANNED surface)
+PR-A changes **no published surface**: tooling and `deno.json` tasks are not exported; READMEs are
+docs; the fresh-ui export additions are already-intended public types (clearing private-type-ref
+doc-lint = a publishability IMPROVEMENT, not a slow-type risk). No new slow-type / `any` surface is
+introduced (zero-cast invariant enforced). The breaking publish-surface reductions (removing compat
+shims / deprecated options) that materially change the JSR surface are all in **PR-B**, where the
+rubric will be applied to the removed symbols. PR-A is therefore jsr-audit-neutral-to-positive.
+
 ## Evaluator
 PLAN-EVAL: OpenHands minimax-M3 (separate session), before any impl slice. IMPL-EVAL: OpenHands
 qwen3.7-max (separate session), after impl. Generator: WSL Codex daemon-attached (mobile-visible).
