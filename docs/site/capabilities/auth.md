@@ -302,9 +302,13 @@ set. Use a real TLS origin in production.</li>
 <li><strong>Switching providers is an env-var + credentials change, not a runtime toggle.</strong>
 There is no multi-active routing, cross-backend account linking, or global logout across backends
 in v1 (single-active-backend).</li>
-<li><strong>The <code>auth.*</code> stream events are not an audit log.</strong> They are
-best-effort and no-op without the durable-streams service wired; there is no dedicated auth
-audit-observability surface yet. Do not rely on them for compliance trails.</li>
+<li><strong>Auth audit is opt-in, and not a compliance-grade ledger.</strong> A real, structured,
+redacted auth audit surface ships via <code>createAuthTelemetry</code>, but it only records when a
+<code>subjectHashSalt</code> is configured (resolved from <code>NETSCRIPT_AUTH_AUDIT_SALT</code>) —
+with no salt it runs as a no-op. The raw <code>auth.*</code> stream events are themselves best-effort
+and no-op until the durable-streams service is wired. Treat the audit surface as a strong, queryable
+trail for operational and security review, not a tamper-evident, write-once compliance log. See
+{{ comp.xref({ key: "explain:observability" }) }}.</li>
 <li><strong>Run the <code>auth.prisma</code> migration after Aspire is up.</strong> The
 better-auth backend's tables (and any DB-backed flow) need Postgres provisioned first — the same
 Aspire-first ordering every plugin schema follows.</li>

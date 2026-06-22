@@ -20,9 +20,11 @@ project. When you want the headline API and endpoints, see the
 {{ comp callout { type: "important", title: "Alpha status" } }}
 The CLI scaffold pins forward-looking specifiers like
 <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those <strong>do not install at 1.0
-today</strong> — they describe the intended stable surface. There is also <strong>no auth
-telemetry or audit surface yet</strong>: the model below is the authentication seam only, not an
-audit log. Treat both as forward roadmap, not shipped runtime.
+today</strong> — they describe the intended stable surface, so treat them as forward roadmap rather
+than shipped runtime. Auth telemetry, by contrast, is real: an opt-in, redacted audit surface ships
+via <code>createAuthTelemetry</code>, enabled when a <code>subjectHashSalt</code> is configured. The
+model below is the authentication seam; for that audit surface and its salt requirement see
+{{ comp.xref({ key: "explain:observability" }) }}.
 {{ /comp }}
 
 ## The thesis: NetScript owns the seam, not the identity provider
