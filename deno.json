@@ -42,7 +42,9 @@
     "arch:check": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-auth-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-workos && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-better-auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-kv-oauth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/auth",
     "arch:check:repo": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
   },
-  "imports": {},
+  "imports": {
+    "lume/": "https://deno.land/x/lume@v2.5.4/"
+  },
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,

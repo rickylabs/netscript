@@ -30,12 +30,14 @@ is still moving. Every <code>@netscript/*</code> package shares one aligned vers
 <h2>Build real systems, not just CRUD</h2>
 
 {{ comp.featureGrid({ items: [
-  { title: "Contract-first, type-safe end to end", body: "oRPC contracts flow from service to client to UI with no codegen drift. The type checker is your integration test. Services are served at /api/rpc/*.", href: "/capabilities/services/" },
-  { title: "Orchestrated with Aspire", body: "We borrow .NET Aspire for multi-resource local dev, deploy, and a real dashboard — unusual in TypeScript. One workspace wires it all; opt out with --no-aspire.", href: "/explanation/aspire/" },
-  { title: "Durability model by design", body: "Sagas, triggers, and jobs are explicit state machines with correlation, persistence (KV or Prisma), compensation, and supervised crash boundaries — authored in plain TypeScript builders.", href: "/capabilities/durable-sagas/" },
-  { title: "Authentication, pluggable backend", body: "An auth-api service on :8094 with five endpoints. The core defines one port; swap between kv-oauth (interactive), WorkOS, or better-auth without touching your service code.", href: "/capabilities/auth/" },
-  { title: "Observable by default", body: "OpenTelemetry tracing and structured logs are wired into jobs, queues, RPC, schedulers, and subprocess workers from line one — not bolted on later.", href: "/explanation/observability/" },
-  { title: "Composable plugins", body: "Add workers, sagas, triggers, auth, and streams in any combination. The host never changes.", href: "/capabilities/background-jobs/" }
+  { title: "Web Layer", body: "Fresh pages, route contracts, forms, islands, streaming, and UI integration.", href: "/web-layer/" },
+  { title: "Services & SDK", body: "oRPC services, shared contracts, OpenAPI, Scalar, and typed clients.", href: "/services-sdk/" },
+  { title: "Background Processing", body: "Workers, queues, cron, polyglot runtimes, and task permissions.", href: "/background-processing/" },
+  { title: "Durable Workflows", body: "Sagas, triggers, streams, retries, and stateful multi-step work.", href: "/durable-workflows/" },
+  { title: "Data & Persistence", body: "Database setup, migrations, multiple datasources, KV, and adapters.", href: "/data-persistence/" },
+  { title: "Identity & Access", body: "Principals, sessions, auth backends, roles, scopes, and claims.", href: "/identity-access/" },
+  { title: "Orchestration & Runtime", body: "Aspire AppHost, plugin resources, runtime config, deployment, and lifecycle.", href: "/orchestration-runtime/" },
+  { title: "Observability", body: "OpenTelemetry trace context, structured logs, and the Aspire dashboard.", href: "/observability/" }
 ] }) }}
 
 <h2>Who it is for</h2>
@@ -50,9 +52,9 @@ is still moving. Every <code>@netscript/*</code> package shares one aligned vers
 
 {{ comp.learningPath({ steps: [
   { label: "Quickstart", href: "/quickstart/" },
-  { label: "Core concepts", href: "/concepts/" },
-  { label: "Build the Storefront", href: "/tutorials/storefront/" },
-  { label: "Explore capabilities", href: "/capabilities/" }
+  { label: "Architecture overview", href: "/concepts/" },
+  { label: "Glossary", href: "/glossary/" },
+  { label: "Choose a pillar", href: "/web-layer/" }
 ] }) }}
 
 {{ comp.featureGrid({ items: [

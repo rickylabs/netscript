@@ -44,7 +44,7 @@ const plaintextLanguage = () => ({
   contains: [],
 });
 
-const site = lume({
+const site: ReturnType<typeof lume> = lume({
   location: new URL("https://rickylabs.github.io/netscript/"),
   src: ".",
   dest: "_site",

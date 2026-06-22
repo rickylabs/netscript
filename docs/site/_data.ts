@@ -2,16 +2,13 @@
  * Site-wide data shared by every page (Lume merges `_data.*` into page data).
  *
  * `navSections` drives the SidebarShell navigation rendered in
- * `_includes/layouts/base.vto`. The top groups use plain-English labels (the
- * approachable ladder) while Reference stays expanded to the 28 primary units.
- * The four `*-core` internal packages stay folded inside the reference prose
- * (US-8) and are intentionally NOT sidebar entries.
+ * `_includes/layouts/base.vto`. Docs-v4 uses the locked Capability-Hub IA:
+ * shallow START entries, eight product-area pillars with uniform
+ * Overview/Quickstart/How-To/Reference leaves, then Tutorials, Explanation,
+ * and a thin global Reference index.
  *
- * Every href below resolves to a page that exists after the 0a authoring wave:
- * `/`, `/quickstart/`, `/why/`, `/tutorials/`, `/how-to/`, `/explanation/`,
- * `/reference/`, and the 28 reference-unit hrefs. Capability hubs, concept
- * pages, tutorial sub-pages, and a glossary land in later phases and are
- * deliberately omitted here so the 0a chrome preview never 404s.
+ * Reference URLs stay stable. The four `*-core` internal packages remain folded
+ * inside reference prose unless they already have generated reference units.
  */
 
 export interface NavItem {
@@ -62,103 +59,161 @@ const referenceUnits: NavItem[] = [
 
 export const navSections: NavSection[] = [
   {
-    label: "Start here",
+    label: "Start",
     items: [
-      { href: "/", label: "Home", icon: "\u25EB" },
-      { href: "/quickstart/", label: "Quickstart", icon: "\u25B8" },
-      { href: "/why/", label: "Why NetScript", icon: "\u25C8" },
-      { href: "/concepts/", label: "Core concepts", icon: "\u25C7" },
+      { href: "/why/", label: "Why NetScript", icon: "?" },
+      { href: "/quickstart/", label: "Quickstart", icon: ">" },
+      { href: "/concepts/", label: "Architecture overview", icon: "A" },
+      { href: "/glossary/", label: "Glossary", icon: "G" },
     ],
   },
   {
-    // Tutorials \u2014 learning-oriented ladder. Zone index first so deeper pages
-    // win the breadcrumb's deepest-prefix match.
-    label: "Learn",
+    label: "Web Layer",
     items: [
-      { href: "/tutorials/", label: "Tutorials", icon: "T" },
-      { href: "/tutorials/storefront/", label: "Storefront", icon: "\u00B7" },
-      { href: "/tutorials/workspace/", label: "Team Workspace", icon: "\u00B7" },
-      { href: "/tutorials/erp-sync/", label: "ERP Sync", icon: "\u00B7" },
-      { href: "/tutorials/live-dashboard/", label: "Live Dashboard", icon: "\u00B7" },
+      { href: "/web-layer/", label: "Overview & Concepts", icon: "O" },
+      { href: "/tutorials/live-dashboard/", label: "Quickstart: live dashboard", icon: "Q" },
+      { href: "/how-to/customize-fresh-ui/", label: "How-To: customize Fresh UI", icon: "H" },
+      { href: "/how-to/build-a-server-validated-form/", label: "How-To: server-validated form", icon: "H" },
+      { href: "/web-layer/server/", label: "API: server & islands", icon: "R" },
+      { href: "/web-layer/builders/", label: "API: pages & builders", icon: "R" },
+      { href: "/web-layer/route/", label: "API: route contracts", icon: "R" },
+      { href: "/web-layer/query/", label: "API: data loading & cache", icon: "R" },
+      { href: "/web-layer/form/", label: "API: forms & validation", icon: "R" },
+      { href: "/web-layer/defer-streaming-ui/", label: "API: defer & streaming UI", icon: "R" },
+      { href: "/web-layer/interactive/", label: "API: interactive islands", icon: "R" },
+      { href: "/web-layer/vite/", label: "API: build & Vite", icon: "R" },
+      { href: "/web-layer/error/", label: "API: errors & diagnostics", icon: "R" },
+      { href: "/web-layer/testing/", label: "API: testing pages & islands", icon: "R" },
+      { href: "/web-layer/examples/", label: "Examples / sandbox", icon: "E" },
+      { href: "/reference/fresh/", label: "Reference: fresh", icon: "R" },
+      { href: "/reference/fresh-ui/", label: "Reference: fresh-ui", icon: "R" },
     ],
   },
   {
-    label: "How-to guides",
+    label: "Services & SDK",
     items: [
-      { href: "/how-to/", label: "How-to guides", icon: "H" },
-      { href: "/how-to/add-a-plugin/", label: "Add a plugin", icon: "\u00B7" },
-      { href: "/how-to/add-a-service/", label: "Add a service", icon: "\u00B7" },
-      { href: "/how-to/add-authentication/", label: "Add authentication", icon: "\u00B7" },
-      { href: "/how-to/database-migration/", label: "Database & migration", icon: "\u00B7" },
-      { href: "/how-to/queue-kv-cron/", label: "Queue / KV / cron", icon: "\u00B7" },
-      { href: "/how-to/add-opentelemetry/", label: "Add OpenTelemetry", icon: "\u00B7" },
-      { href: "/how-to/customize-fresh-ui/", label: "Customize Fresh UI", icon: "\u00B7" },
-      { href: "/how-to/deploy/", label: "Deploy", icon: "\u00B7" },
-      { href: "/how-to/author-a-plugin/", label: "Author a plugin", icon: "\u00B7" },
-      { href: "/how-to/discover-services/", label: "Discover services", icon: "\u00B7" },
-      { href: "/how-to/expose-openapi-scalar/", label: "Expose OpenAPI & Scalar", icon: "\u00B7" },
-      { href: "/how-to/use-a-second-database/", label: "Use a second database", icon: "\u00B7" },
-      { href: "/how-to/choose-a-queue-provider/", label: "Choose a queue provider", icon: "\u00B7" },
-      { href: "/how-to/tune-worker-runtime/", label: "Tune the worker runtime", icon: "\u00B7" },
-      { href: "/how-to/run-a-polyglot-task/", label: "Run a polyglot task", icon: "\u00B7" },
-      { href: "/how-to/graceful-shutdown/", label: "Graceful shutdown", icon: "\u00B7" },
-      { href: "/how-to/deploy-local-aspire/", label: "Deploy locally with Aspire", icon: "\u00B7" },
-      { href: "/how-to/roll-out-runtime-overrides/", label: "Roll out runtime overrides", icon: "\u00B7" },
-      { href: "/how-to/add-a-task-runtime-adapter/", label: "Add a task runtime adapter", icon: "\u00B7" },
-      { href: "/how-to/build-a-server-validated-form/", label: "Build a server-validated form", icon: "\u00B7" },
-      { href: "/how-to/build-a-validated-ingestion-queue/", label: "Build a validated ingestion queue", icon: "\u00B7" },
-      { href: "/how-to/publish-a-durable-stream/", label: "Publish a durable stream", icon: "\u00B7" },
-      { href: "/how-to/restrict-worker-task-permissions/", label: "Restrict worker task permissions", icon: "\u00B7" },
+      { href: "/services-sdk/", label: "Overview & Concepts", icon: "O" },
+      { href: "/tutorials/storefront/02-catalog-service/", label: "Quickstart: define a service", icon: "Q" },
+      { href: "/how-to/add-a-service/", label: "How-To: add a service", icon: "H" },
+      { href: "/how-to/discover-services/", label: "How-To: discover services", icon: "H" },
+      { href: "/how-to/expose-openapi-scalar/", label: "How-To: OpenAPI & Scalar", icon: "H" },
+      { href: "/reference/service/", label: "Reference: service", icon: "R" },
+      { href: "/reference/sdk/", label: "Reference: sdk", icon: "R" },
+      { href: "/reference/contracts/", label: "Reference: contracts", icon: "R" },
     ],
   },
   {
-    label: "Core concepts",
+    label: "Background Processing",
     items: [
-      { href: "/explanation/", label: "Explanation", icon: "E" },
-      { href: "/explanation/architecture/", label: "Architecture", icon: "\u00B7" },
-      { href: "/explanation/contracts/", label: "Contracts & type flow", icon: "\u00B7" },
-      { href: "/explanation/plugin-system/", label: "The plugin system", icon: "·" },
-      { href: "/explanation/auth-model/", label: "Auth model", icon: "\u00B7" },
-      { href: "/explanation/durability-model/", label: "Durability model", icon: "·" },
-      { href: "/explanation/observability/", label: "Observability", icon: "\u00B7" },
-      { href: "/explanation/aspire/", label: "Orchestration with Aspire", icon: "\u00B7" },
+      { href: "/background-processing/", label: "Overview & Concepts", icon: "O" },
+      { href: "/tutorials/erp-sync/03-polyglot-transform/", label: "Quickstart: polyglot task", icon: "Q" },
+      { href: "/how-to/queue-kv-cron/", label: "How-To: queue / KV / cron", icon: "H" },
+      { href: "/how-to/choose-a-queue-provider/", label: "How-To: choose a queue provider", icon: "H" },
+      { href: "/how-to/tune-worker-runtime/", label: "How-To: tune worker runtime", icon: "H" },
+      { href: "/how-to/run-a-polyglot-task/", label: "How-To: run a polyglot task", icon: "H" },
+      { href: "/how-to/add-a-task-runtime-adapter/", label: "How-To: add a task adapter", icon: "H" },
+      { href: "/how-to/restrict-worker-task-permissions/", label: "How-To: restrict task permissions", icon: "H" },
+      { href: "/reference/workers/", label: "Reference: workers", icon: "R" },
+      { href: "/reference/queue/", label: "Reference: queue", icon: "R" },
+      { href: "/reference/cron/", label: "Reference: cron", icon: "R" },
+      { href: "/reference/watchers/", label: "Reference: watchers", icon: "R" },
     ],
   },
   {
-    label: "Capabilities",
+    label: "Durable Workflows",
     items: [
-      { href: "/capabilities/", label: "Capabilities", icon: "\u25C9" },
-      { href: "/capabilities/services/", label: "Services & contracts", icon: "\u00B7" },
-      { href: "/capabilities/background-jobs/", label: "Background jobs", icon: "\u00B7" },
-      { href: "/capabilities/durable-sagas/", label: "Durable sagas", icon: "\u00B7" },
-      { href: "/capabilities/triggers/", label: "Triggers & ingress", icon: "\u00B7" },
-      { href: "/capabilities/streams/", label: "Durable streams", icon: "\u00B7" },
-      { href: "/capabilities/database/", label: "Database & Prisma", icon: "\u00B7" },
-      { href: "/capabilities/kv-queues-cron/", label: "KV, queues & cron", icon: "\u00B7" },
-      { href: "/capabilities/telemetry/", label: "Telemetry & logging", icon: "\u00B7" },
-      { href: "/capabilities/auth/", label: "Authentication", icon: "\u00B7" },
-      { href: "/capabilities/fresh-ui/", label: "Fresh UI & design", icon: "\u00B7" },
-      { href: "/capabilities/fresh-framework/", label: "Fresh meta-framework", icon: "\u00B7" },
-      { href: "/capabilities/sdk/", label: "Typed SDK & client", icon: "\u00B7" },
-      { href: "/capabilities/polyglot-tasks/", label: "Polyglot tasks", icon: "\u00B7" },
-      { href: "/capabilities/runtime-config/", label: "Runtime configuration", icon: "\u00B7" },
+      { href: "/durable-workflows/", label: "Overview & Concepts", icon: "O" },
+      { href: "/tutorials/storefront/04-checkout-saga/", label: "Quickstart: checkout saga", icon: "Q" },
+      { href: "/how-to/build-a-validated-ingestion-queue/", label: "How-To: validated ingestion queue", icon: "H" },
+      { href: "/how-to/publish-a-durable-stream/", label: "How-To: publish a durable stream", icon: "H" },
+      { href: "/reference/sagas/", label: "Reference: sagas", icon: "R" },
+      { href: "/reference/triggers/", label: "Reference: triggers", icon: "R" },
+      { href: "/reference/streams/", label: "Reference: streams", icon: "R" },
+    ],
+  },
+  {
+    label: "Data & Persistence",
+    items: [
+      { href: "/data-persistence/", label: "Overview & Concepts", icon: "O" },
+      { href: "/tutorials/storefront/03-cart-contracts/", label: "Quickstart: data contracts", icon: "Q" },
+      { href: "/how-to/database-migration/", label: "How-To: database & migration", icon: "H" },
+      { href: "/how-to/use-a-second-database/", label: "How-To: second database", icon: "H" },
+      { href: "/reference/database/", label: "Reference: database", icon: "R" },
+      { href: "/reference/kv/", label: "Reference: kv", icon: "R" },
+      { href: "/reference/prisma-adapter-mysql/", label: "Reference: prisma-adapter-mysql", icon: "R" },
+    ],
+  },
+  {
+    label: "Identity & Access",
+    items: [
+      { href: "/identity-access/", label: "Overview & Concepts", icon: "O" },
+      { href: "/tutorials/workspace/02-auth/", label: "Quickstart: workspace auth", icon: "Q" },
+      { href: "/how-to/add-authentication/", label: "How-To: add authentication", icon: "H" },
+      { href: "/identity-access/better-auth-plugins/", label: "How-To: better-auth plugins", icon: "H" },
+      { href: "/reference/auth/", label: "Reference: auth", icon: "R" },
+      { href: "/reference/auth-better-auth/", label: "Reference: auth-better-auth", icon: "R" },
+      { href: "/reference/auth-kv-oauth/", label: "Reference: auth-kv-oauth", icon: "R" },
+      { href: "/reference/auth-workos/", label: "Reference: auth-workos", icon: "R" },
+      { href: "/reference/plugin-auth/", label: "Reference: plugin-auth", icon: "R" },
+      { href: "/reference/plugin-auth-core/", label: "Reference: plugin-auth-core", icon: "R" },
+    ],
+  },
+  {
+    label: "Orchestration & Runtime",
+    items: [
+      { href: "/orchestration-runtime/", label: "Overview & Concepts", icon: "O" },
+      { href: "/quickstart/", label: "Quickstart: run the workspace", icon: "Q" },
+      { href: "/how-to/deploy-local-aspire/", label: "How-To: deploy locally with Aspire", icon: "H" },
+      { href: "/how-to/deploy/", label: "How-To: deploy", icon: "H" },
+      { href: "/how-to/roll-out-runtime-overrides/", label: "How-To: runtime overrides", icon: "H" },
+      { href: "/how-to/graceful-shutdown/", label: "How-To: graceful shutdown", icon: "H" },
+      { href: "/how-to/add-a-plugin/", label: "How-To: add a plugin", icon: "H" },
+      { href: "/how-to/author-a-plugin/", label: "How-To: author a plugin", icon: "H" },
+      { href: "/reference/aspire/", label: "Reference: aspire", icon: "R" },
+      { href: "/reference/config/", label: "Reference: config", icon: "R" },
+      { href: "/reference/runtime-config/", label: "Reference: runtime-config", icon: "R" },
+      { href: "/reference/plugin/", label: "Reference: plugin", icon: "R" },
+      { href: "/reference/cli/", label: "Reference: cli", icon: "R" },
+    ],
+  },
+  {
+    label: "Observability",
+    items: [
+      { href: "/observability/", label: "Overview & Concepts", icon: "O" },
+      { href: "/concepts/", label: "Quickstart: trace the model", icon: "Q" },
+      { href: "/how-to/add-opentelemetry/", label: "How-To: add OpenTelemetry", icon: "H" },
+      { href: "/reference/telemetry/", label: "Reference: telemetry", icon: "R" },
+      { href: "/reference/logger/", label: "Reference: logger", icon: "R" },
+    ],
+  },
+  {
+    label: "Tutorials",
+    items: [
+      { href: "/tutorials/", label: "Tutorials index", icon: "T" },
+      { href: "/tutorials/live-dashboard/", label: "Live dashboard", icon: "T" },
+      { href: "/tutorials/workspace/", label: "Workspace", icon: "T" },
+      { href: "/tutorials/storefront/", label: "Storefront", icon: "T" },
+      { href: "/tutorials/erp-sync/", label: "ERP sync", icon: "T" },
+    ],
+  },
+  {
+    label: "Explanation",
+    items: [
+      { href: "/explanation/", label: "Explanation index", icon: "E" },
+      { href: "/explanation/architecture/", label: "Architecture", icon: "E" },
+      { href: "/explanation/contracts/", label: "Contracts & type flow", icon: "E" },
+      { href: "/explanation/plugin-system/", label: "The plugin system", icon: "E" },
+      { href: "/explanation/auth-model/", label: "Auth model", icon: "E" },
+      { href: "/explanation/durability-model/", label: "Durability model", icon: "E" },
+      { href: "/explanation/observability/", label: "Observability", icon: "E" },
+      { href: "/explanation/aspire/", label: "Orchestration with Aspire", icon: "E" },
     ],
   },
   {
     label: "Reference",
     items: [
       { href: "/reference/", label: "Reference index", icon: "R" },
-    ],
-  },
-  {
-    label: "Reference units",
-    items: referenceUnits,
-  },
-  {
-    label: "Resources",
-    items: [
-      { href: "/glossary/", label: "Glossary", icon: "G" },
-      { href: "/cli-reference/", label: "CLI reference", icon: "C" },
+      ...referenceUnits,
     ],
   },
 ];
