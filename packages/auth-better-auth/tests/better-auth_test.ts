@@ -5,9 +5,35 @@ import {
   createBetterAuthAuthenticator,
   createBetterAuthBackend,
   createNetscriptBetterAuth,
+  type NetscriptBetterAuthOptions,
 } from '../mod.ts';
 import type { AuthnRequest } from '@netscript/service/auth';
-import type { BetterAuthSessionPayload } from '../src/better-auth.ts';
+import type { BetterAuthOptions } from 'better-auth';
+import {
+  type BetterAuthSessionPayload,
+  configureNetscriptBetterAuthOptions,
+} from '../src/better-auth.ts';
+
+const passthroughPlugin = {
+  id: 'netscript-test-plugin',
+} satisfies NonNullable<BetterAuthOptions['plugins']>[number];
+
+const pluginPassthroughAccepted = {
+  prisma: {},
+  provider: 'sqlite',
+  plugins: [passthroughPlugin],
+} satisfies NetscriptBetterAuthOptions;
+void pluginPassthroughAccepted;
+
+const databaseOverrideRejected = {
+  prisma: {},
+  provider: 'sqlite',
+  betterAuthOptions: {
+    // @ts-expect-error NetScript owns better-auth database configuration.
+    database: 'consumer-owned-database',
+  },
+} satisfies NetscriptBetterAuthOptions;
+void databaseOverrideRejected;
 
 Deno.test('createBetterAuthAuthenticator maps getSession to Principal', async () => {
   const auth = authInstance({
@@ -95,6 +121,37 @@ Deno.test('createNetscriptBetterAuth wraps better-auth prismaAdapter over a cons
 
   assertEquals(typeof auth.handler, 'function');
   assertEquals(typeof auth.api.getSession, 'function');
+});
+
+Deno.test('configureNetscriptBetterAuthOptions forwards dedicated plugins', () => {
+  const configured = configureNetscriptBetterAuthOptions({
+    prisma: {},
+    provider: 'sqlite',
+    plugins: [passthroughPlugin],
+  });
+
+  assertEquals(configured.plugins, [passthroughPlugin]);
+});
+
+Deno.test('configureNetscriptBetterAuthOptions forwards escape-hatch options under NetScript database', () => {
+  const configured = configureNetscriptBetterAuthOptions({
+    prisma: {},
+    provider: 'sqlite',
+    secret: 'explicit-secret',
+    baseURL: 'http://explicit.example.test',
+    betterAuthOptions: {
+      appName: 'NetScript Test Auth',
+      baseURL: 'http://escape.example.test',
+      secret: 'escape-secret',
+      telemetry: { enabled: false },
+    },
+  });
+
+  assertEquals(configured.appName, 'NetScript Test Auth');
+  assertEquals(configured.baseURL, 'http://explicit.example.test');
+  assertEquals(configured.secret, 'explicit-secret');
+  assertEquals(configured.telemetry, { enabled: false });
+  assert(configured.database);
 });
 
 Deno.test('createBetterAuthBackend exposes AuthBackendPort provider and session ports', async () => {
