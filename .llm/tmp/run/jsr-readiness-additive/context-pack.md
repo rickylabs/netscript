@@ -24,7 +24,7 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## In Progress
 
-- S2 deno task wiring is implemented and gated; S2 commit is pending.
+- S3 byte-clean README promotion is implemented and gated; S3 commit is pending.
 
 ## Next Steps
 
@@ -52,6 +52,9 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 | `packages/auth-better-auth/tests/better-auth_test.ts` | changed | Baseline doctrine repair for `@ts-expect-error` under auth roots. |
 | `plugins/auth/services/src/backend-registry.ts` | changed | Declared auth audit appsettings shape. |
 | `plugins/auth/services/src/main.ts` | changed | Replaced appsettings cast with type guard. |
+| 20 package/plugin README paths | changed | Byte-clean S3 checkout from `origin/release/jsr-readiness`. |
+| `.llm/harness/README.md` | changed | Internal README promoted from umbrella. |
+| `.llm/tools/README.md` | changed | Internal README promoted from umbrella. |
 
 ## Gates
 

@@ -65,6 +65,8 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | 2026-06-22 | S2 | edit | Added dependency/doc task wiring to `deno.json`, appended `deps:check` to `ci:quality`, and prepended `deno task deps:check &&` to main's current multi-root `arch:check`. No stale Fresh dry-run task alias existed. |
 | 2026-06-22 | S2 | drift fix | `arch:check` exposed two main-era auth doctrine failures. Replaced one `@ts-expect-error` with a type-level key assertion and replaced one auth service appsettings cast with an explicit typed seam. |
 | 2026-06-22 | S2 | gate | `deno task deps:check` passed. `deno task arch:check` passed after the baseline auth doctrine repairs. |
+| 2026-06-22 | S3 | edit | Checked out 20 byte-clean package/plugin READMEs plus `.llm/harness/README.md` and `.llm/tools/README.md` from `origin/release/jsr-readiness`. Skipped current-main auth README drift rather than deleting main-only files. |
+| 2026-06-22 | S3 | gate | README standard passed for the 20 touched package/plugin READMEs. Existing README/docs example tests passed for touched packages with fixtures. |
 
 ## Decisions
 
@@ -90,6 +92,8 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | S1 focused check | `deno check --unstable-kv --no-lock .llm/tools/deps/census.ts .llm/tools/deps/scan-npm-catalog-compliance.ts .llm/tools/deps/scan-jsr-centralization.ts .llm/tools/deps/audit-file-link.ts .llm/tools/deps/bump-version.ts .llm/tools/deps/bump-version_test.ts .llm/tools/deps/workspace.ts .llm/tools/check-internal-doc-links.ts .llm/tools/check-readme-standard.ts` | PASS | Proves all S1 additions parse and type-check without lock churn. |
 | S2 deps check | `deno task deps:check` | PASS | Passed with existing `DEPS-NPM-CATALOG` warnings; no fail-on-violation failures. |
 | S2 arch check | `deno task arch:check` | PASS | Preserved main's auth multi-root doctrine wiring and `arch:check:repo`; passed after explicit auth appsettings/type-test repairs. |
+| S3 README standard | `deno run --no-lock --allow-read .llm/tools/check-readme-standard.ts --pretty <20 S3 package/plugin README paths>` | PASS | Internal `.llm/*/README.md` files are outside this publishable README checker's contract. |
+| S3 README examples | `deno test --allow-all --no-lock packages/aspire/tests/_fixtures/readme-examples_test.ts packages/config/tests/_fixtures/readme-examples_test.ts packages/fresh/tests/_fixtures/docs-examples_test.ts packages/fresh-ui/tests/_fixtures/docs-examples_test.ts packages/plugin/tests/_fixtures/readme-examples_test.ts packages/sdk/tests/readme-doctest_test.ts packages/telemetry/tests/_fixtures/readme-examples_test.ts packages/watchers/tests/_fixtures/docs-examples_test.ts` | PASS | 17 tests passed. |
 
 ### Fitness Gates
 

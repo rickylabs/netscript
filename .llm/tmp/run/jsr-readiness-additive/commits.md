@@ -11,3 +11,4 @@ Format:
 ## Log
 
 - 0c57c93b: chore(jsr): add dependency hygiene tools
+- f68c5c23: chore(jsr): wire dependency quality tasks

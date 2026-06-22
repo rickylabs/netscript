@@ -31,3 +31,20 @@ documentation.
 - **Evidence:** Replaced the negative compile directive with a type-level key assertion, declared the
   auth audit appsettings shape in `plugins/auth/services/src/backend-registry.ts`, and narrowed via
   `hasAuthAppsettings()` instead of asserting a widened context.
+
+## 2026-06-22 — Additional auth README drift on current main
+
+- **What:** Current `origin/main` has auth package/plugin README files that are absent or materially
+  different on `origin/release/jsr-readiness`, so they are not byte-clean S3 files.
+- **Source:** Blob comparison for README paths between merge-base `cc3b8731`, `origin/main`, and
+  `origin/release/jsr-readiness`.
+- **Expected:** The evaluated plan expected 21 byte-clean package/plugin READMEs plus two internal
+  READMEs.
+- **Actual:** Current-tree classification yielded 20 byte-clean package/plugin READMEs plus two
+  internal READMEs. Auth READMEs (`packages/auth-better-auth`, `packages/auth-kv-oauth`,
+  `packages/auth-workos`, `packages/plugin-auth-core`, `plugins/auth`) were excluded to avoid
+  deleting or clobbering main-only auth documentation.
+- **Severity:** minor
+- **Action:** defer
+- **Evidence:** S3 checkout intentionally omitted those auth README paths; S4 still owns only the six
+  plan-listed drifted READMEs.
