@@ -1,0 +1,31 @@
+%% architecture-overview — NetScript layered architecture (offline Mermaid source)
+flowchart TB
+  subgraph App["App layer"]
+    Fresh["Fresh UI"]
+    SDK["SDK"]
+  end
+
+  subgraph Plugins["Plugin layer"]
+    direction LR
+    Services["services"]
+    Workers["workers"]
+    Sagas["sagas"]
+    Triggers["triggers"]
+    Streams["streams"]
+    Auth["auth"]
+  end
+
+  subgraph Base["Framework base"]
+    direction LR
+    Packages["packages"]
+    Runtime["runtime"]
+    DB["database adapters"]
+  end
+
+  App --> Plugins
+  Plugins --> Base
+
+  Aspire["Aspire<br/>orchestration"]
+  Aspire -.-> App
+  Aspire -.-> Plugins
+  Aspire -.-> Base

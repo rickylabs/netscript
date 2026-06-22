@@ -1,0 +1,21 @@
+{{# nextPrev.vto — prev/next pager rendered at the foot of the article. Pages
+   opt in by setting `prev` and/or `next` front-matter vars, each shaped
+   { label, href }. If neither is present nothing renders. Hrefs are authored
+   root-relative (e.g. /quickstart/) and base-prefixed here via the `url`
+   filter. Colors key off the existing fresh-ui --ns-* tokens. #}}
+{{ if prev || next }}
+<nav class="ns-nextprev" aria-label="Pagination">
+  {{ if prev }}
+    <a class="ns-nextprev__link ns-nextprev__link--prev" href="{{ prev.href |> url }}" rel="prev">
+      <span class="ns-nextprev__dir" aria-hidden="true">← Previous</span>
+      <span class="ns-nextprev__label">{{ prev.label }}</span>
+    </a>
+  {{ /if }}
+  {{ if next }}
+    <a class="ns-nextprev__link ns-nextprev__link--next" href="{{ next.href |> url }}" rel="next">
+      <span class="ns-nextprev__dir" aria-hidden="true">Next →</span>
+      <span class="ns-nextprev__label">{{ next.label }}</span>
+    </a>
+  {{ /if }}
+</nav>
+{{ /if }}

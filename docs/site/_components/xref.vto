@@ -1,0 +1,10 @@
+{{# Lume component — docs/site/_components/xref.vto
+   Auto-resolving cross-reference link (OD2/OD3). Resolves a stable KEY from
+   `_data/xref.ts` to an `<a href>`; THROWS on an unknown key so the build fails
+   (the build is the link checker — no silent dead links). `resolveXref` is the
+   global helper registered in `_config.ts`.
+   Invoke:  {{ comp.xref({ key: "cap:durable-sagas" }) }}
+            {{ comp.xref({ key: "ref:sagas", text: "saga reference" }) }}
+   `text` overrides the key's default label. Styling keys off --ns-* via .ns-xref. #}}
+{{ set target = resolveXref(key) }}
+<a class="ns-xref" href="{{ target.href |> url }}">{{ text || target.label }}</a>

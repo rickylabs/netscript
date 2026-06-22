@@ -1,0 +1,19 @@
+%% plugin-thread-isolation — worker runtime isolation modes (offline Mermaid source)
+flowchart TB
+  subgraph InProcess["In-process — same isolate"]
+    HostI["isolate (host)"]
+    WorkerI["worker"]
+    HostI --> WorkerI
+  end
+
+  subgraph WebWorker["Web-worker — separate V8 isolate"]
+    HostW["host isolate"]
+    WorkerW["worker isolate"]
+    HostW <-->|isolate boundary, same process| WorkerW
+  end
+
+  subgraph Subprocess["Subprocess — separate OS process"]
+    HostP["host process"]
+    WorkerP["worker process"]
+    HostP <-->|process boundary, IPC| WorkerP
+  end

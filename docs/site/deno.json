@@ -1,0 +1,20 @@
+{
+  "tasks": {
+    "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable-temporal -A -",
+    "build": "deno task lume",
+    "check:links": "deno run --allow-read ../../.llm/tools/docs/check-internal-links.ts _site",
+    "check:caveats": "deno run --allow-read ../../.llm/tools/docs/check-caveat-refs.ts .",
+    "verify": "deno task build && deno task check:links && deno task check:caveats",
+    "serve": "deno task lume -- -s",
+    "diagrams:render": "deno run -A _diagrams/render.ts",
+    "diagrams:check": "deno run -A _diagrams/render.ts --check"
+  },
+  "imports": {
+    "lume/": "https://deno.land/x/lume@v2.5.4/"
+  },
+  "compilerOptions": {
+    "types": ["lume/types.ts"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "npm:react@18.3.1"
+  }
+}
