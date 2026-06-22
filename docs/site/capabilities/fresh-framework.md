@@ -53,7 +53,7 @@ the layer's partial. The contract type-flow that makes this safe end-to-end is e
   {
     title: "Learn — Build a page (Track D)",
     body: "The guided tutorial track: route contract → definePage with a cache-first layer → its partial → a hydrated island, built from scratch.",
-    href: "/tutorials/",
+    href: "/tutorials/live-dashboard/",
     icon: "→"
   },
   {
@@ -65,7 +65,7 @@ the layer's partial. The contract type-flow that makes this safe end-to-end is e
   {
     title: "Do — TanStack Query in islands",
     body: "Wire an island to the same cache the page loader filled, so hydration is instant and invalidation is shared.",
-    href: "/tutorials/live-dashboard/03-sdk-cache-first-query/",
+    href: "/tutorials/live-dashboard/04-definePage-QueryIsland/",
     icon: "◆"
   },
   {
