@@ -14,3 +14,4 @@ Format:
 - f68c5c23: chore(jsr): wire dependency quality tasks
 - 9c964585: docs(jsr): promote clean readme templates
 - e0f606b1: docs(jsr): reconcile drifted readme templates
+- fa17d2ed: fix(fresh-ui): publish interactive prop types

@@ -9,14 +9,15 @@ Use `.agents/skills/netscript-cli` for CLI/scaffold/plugin/maintainer command wo
 `.agents/skills/netscript-tools` for repo tooling, validation evidence, OpenHands triggers, raw git
 verification, and lock-hygiene decisions.
 
-Use `.agents/skills/netscript-deno-toolchain` for any dependency, version, release, or API-inspection
-work — it maps the native Deno 2.8 toolchain (`outdated`, `why`, `audit`, `ci`/`ci --prod`,
-`bump-version`, `publish`, `doc`) and the repo's `.llm/tools/deps/` wrappers so you stop hand-rolling
-registry curls and version checks. Use `.agents/skills/netscript-pr` whenever creating a branch,
-opening/updating a PR, posting a phase summary comment, or applying labels.
+Use `.agents/skills/netscript-deno-toolchain` for any dependency, version, release, or
+API-inspection work — it maps the native Deno 2.8 toolchain (`outdated`, `why`, `audit`,
+`ci`/`ci --prod`, `bump-version`, `publish`, `doc`) and the repo's `.llm/tools/deps/` wrappers so
+you stop hand-rolling registry curls and version checks. Use `.agents/skills/netscript-pr` whenever
+creating a branch, opening/updating a PR, posting a phase summary comment, or applying labels.
 
 When the user says `use harness`, activate the harness workflow. The evaluator must be a separate
-session from the implementation session.
+session from the implementation session — the full evaluator protocol (PLAN-EVAL / IMPL-EVAL,
+required sessions and models) lives in `.agents/skills/netscript-harness` and `.llm/harness/`.
 
 ## Operating Rules
 
@@ -45,8 +46,11 @@ Read only what the task needs.
 
 For internal `@netscript/*` package APIs, prefer `deno doc <module>` and
 `deno doc --filter <symbol>` before broad implementation reads — **`deno doc` is your friend**: it
-is the cheapest way to learn a package's public surface without opening source. Likewise `deno why
-<pkg>` answers "what pulls this in" before you touch a dependency.
+is the cheapest way to learn a package's public surface without opening source. Likewise
+`deno why
+<pkg>` answers "what pulls this in" before you touch a dependency. The full inspection
+surface (`deno doc --lint` as the publish bar, npm rendering, filters) lives in
+`.agents/skills/netscript-deno-toolchain`.
 
 ## Tooling
 
@@ -68,17 +72,21 @@ Temporary scratch/output belongs in `.llm/tmp/`; reusable helper scripts belong 
 ### Dependency decisions (use the toolbelt, not curl loops)
 
 For any "is this the latest / is this outdated / is this import dead / does the published surface
-install" question, use the `.llm/tools/deps/` wrappers (`deno task deps:latest|outdated|why|audit|
-prod-install`) — they emit structured output and encode the gotchas. **Never decide "latest" from
-`deno outdated --latest`**: it ignores semver and reports pre-release tags as latest (it once
-reported `@fedify/fedify 2.3.0-dev.*` while stable was `2.2.5`). `deps:latest` reads the registry
-stable channel and is the authority. See `.agents/skills/netscript-deno-toolchain`.
+install" question, use the `.llm/tools/deps/` wrappers
+(`deno task deps:latest|outdated|why|audit|
+prod-install`) instead of hand-rolling registry curls.
+**Never decide "latest" from `deno outdated --latest`** — it ignores semver and surfaces pre-release
+tags as latest; `deps:latest` reads the registry stable channel and is the authority. The full
+command map, the trap rationale, the catalog law (`catalog:` is npm-only), and the `deno doc`
+inspection surface are documented once in `.agents/skills/netscript-deno-toolchain` — that skill is
+the canonical home; do not restate its gotchas elsewhere.
 
 ### Supervisor wake (token-free)
 
-When supervising sub-agents, do not poll. Run `.llm/tools/watch-run.ts <run-dir>` as a **background**
-process: it `Deno.watchFs`-es `commits.md`/`worklog.md` and exits 0 on the next change (re-waking the
-supervisor turn), or exits 2 on a `--timeout-seconds` heartbeat if a sub-agent hangs without writing.
+When supervising sub-agents, do not poll. Run `.llm/tools/watch-run.ts <run-dir>` as a
+**background** process: it `Deno.watchFs`-es `commits.md`/`worklog.md` and exits 0 on the next
+change (re-waking the supervisor turn), or exits 2 on a `--timeout-seconds` heartbeat if a sub-agent
+hangs without writing.
 
 ## Validation
 
@@ -96,7 +104,9 @@ avoiding raw CLI noise and shell glob expansion. Package-quality formatting gate
 TypeScript only (`--ext ts,tsx`) and exclude generated output, scratch workspaces, and future-wave
 packages. Do not treat raw root `deno fmt --check` across Markdown, generated files, or
 line-ending-only legacy drift as a package-quality verdict, and do not run the mutating root
-`deno task fmt` unless the user explicitly asks for repo-wide formatting changes.
+`deno task fmt` unless the user explicitly asks for repo-wide formatting changes. The wrapper
+invocations, gate-evidence rules, and lock hygiene are detailed once in
+`.agents/skills/netscript-tools`.
 
 Common commands:
 

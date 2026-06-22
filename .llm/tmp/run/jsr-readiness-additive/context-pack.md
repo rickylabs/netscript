@@ -24,7 +24,7 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## In Progress
 
-- S5 fresh-ui doc-lint fixes are implemented and gated; S5 commit is pending.
+- S6 doctrine/skill docs and Claude mirror regeneration are implemented and gated; S6 commit is pending.
 
 ## Next Steps
 
@@ -59,6 +59,8 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 | 5 auth README paths | changed | Current-main drift extension needed for aggregate README gate. |
 | `packages/fresh-ui/interactive.ts` and runtime prop/type files | changed | Additive public prop/type exports without new casts. |
 | `packages/fresh/deno.json` | changed | Umbrella package config update. |
+| Root docs, doctrine 01/04, selected `.agents/skills/*` | changed | S6 doc promotion and hand-reconciled OpenHands skill structure. |
+| `.claude/skills/*` mirrors | changed | Regenerated from `.agents/skills/`. |
 
 ## Gates
 

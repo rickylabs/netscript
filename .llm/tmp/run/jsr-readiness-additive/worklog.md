@@ -71,6 +71,8 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | 2026-06-22 | S4 | gate | Six-file README standard passed, queue/service README tests passed, plugin entrypoint checks passed, and aggregate `deno task docs:readme:check` passed for all 31 package/plugin READMEs. |
 | 2026-06-22 | S5 | edit | Applied fresh-ui interactive public prop/type exports from the umbrella, then hand-reconciled component implementations to avoid the umbrella's added JSX casts. |
 | 2026-06-22 | S5 | gate | Focused fresh-ui lint/check passed, root `deno task lint` passed, root `deno task check` passed, and scoped fmt check passed. Diff scan found no added `any` or `as` lines in S5 fresh-ui files. |
+| 2026-06-22 | S6 | edit | Promoted clean doctrine/root/skill docs from the umbrella, merged OpenHands trigger/output/token structure into main's newer agentic-suite skill, and regenerated `.claude/skills/` mirrors. |
+| 2026-06-22 | S6 | gate | `agentic:check-claude` passed and scoped `deno fmt --check` passed after formatting touched Markdown/skill files. `docs:links` failed on unrelated pre-existing `.agents/skills/impeccable/reference/*` links and was recorded as drift. |
 
 ## Decisions
 
@@ -109,6 +111,9 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | S5 root check | `deno task check` | PASS | Workspace check wrapper selected 1730 files, 15 batches, 0 failures. |
 | S5 scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/fresh-ui --root packages/fresh --ext ts,tsx --ignore-line-endings` | PASS | 233 files selected, 0 findings. |
 | S5 zero-cast scan | `git diff -U0 origin/main -- <S5 files> | rg "^\\+.*(\\bany\\b|\\bas\\s)"` | PASS | No added `any` or `as` lines in S5 fresh-ui diff. |
+| S6 Claude surface | `deno task agentic:check-claude` | PASS | Claude surface valid; `.claude/skills` mirror check passed; hook lock check left `deno.lock` unchanged. |
+| S6 scoped fmt | `deno fmt --check <S6 touched Markdown/skill/run-artifact files>` | PASS | Passed after scoped `deno fmt` on those same touched files. |
+| S6 docs links | `deno task docs:links` | FAIL | Baseline failure in `.agents/skills/impeccable/SKILL.md` references to missing `reference/*.md`; not introduced by S6. |
 
 ### Fitness Gates
 

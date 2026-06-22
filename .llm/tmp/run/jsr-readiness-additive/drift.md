@@ -61,3 +61,19 @@ documentation.
 - **Evidence:** Restored the existing component implementation shape, exported namespace types, and
   adjusted public prop aliases to use component-specific JSX element prop types. Focused check/lint
   passed and the final S5 diff scan reports no added `any` or `as` lines.
+
+## 2026-06-22 — S6 path and docs-link baseline discrepancies
+
+- **What:** `AGENTS-handoff.md` exists on current main but not on `origin/release/jsr-readiness`, so
+  it could not be checked out as an S6 clean umbrella file. `deno task docs:links` also fails on
+  unrelated `.agents/skills/impeccable/reference/*.md` links.
+- **Source:** `git ls-tree origin/release/jsr-readiness -- AGENTS-handoff.md` and
+  `deno task docs:links`.
+- **Expected:** The prompt listed `AGENTS-handoff.md` as a clean umbrella file, and PLAN-EVAL mapped
+  S6 to `docs:links`.
+- **Actual:** The file is main-only/current-state and was preserved. `docs:links` reports 26 broken
+  links, all under `.agents/skills/impeccable/SKILL.md`, outside S6 touched paths.
+- **Severity:** minor
+- **Action:** defer
+- **Evidence:** S6 required gates `agentic:check-claude` and scoped `deno fmt --check` passed; the
+  docs-link blocker is recorded for a separate skill-assets cleanup.

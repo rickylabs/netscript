@@ -455,6 +455,97 @@ deno publish
 
 ---
 
+## Learning the Publish Surface with `deno doc`
+
+`deno doc` renders a package's **public API surface** straight from its exports — the same surface
+JSR scores and publishes. It is the cheapest way to inspect what a unit actually exposes before you
+audit it, and the canonical internal-API tool: AGENTS.md instructs contributors to reach for
+`deno doc <module>` / `deno doc --filter <symbol>` before broad implementation reads — **"`deno doc`
+is your friend"** (see `AGENTS.md` Read Order). Use it to learn a surface; use `deno doc --lint` to
+hold it to the publish bar.
+
+### Inspect a surface
+
+```bash
+# Full public surface of a workspace package or entrypoint
+deno doc packages/cli/mod.ts
+
+# Narrow to a single symbol (fastest way to confirm a signature)
+deno doc --filter scaffoldProject packages/cli/mod.ts
+
+# A remote/JSR module also works
+deno doc jsr:@std/assert
+```
+
+`deno doc <module>` lists every exported symbol with its resolved type and JSDoc;
+`deno doc --filter
+<symbol>` prints just the matching declaration, which is the cheapest possible
+read for confirming a type contract without opening source.
+
+### npm-dependency rendering
+
+When a unit re-exports or returns types from an `npm:` dependency, `deno doc` follows the npm
+package's bundled type declarations and renders the resolved types inline — so the printed surface
+reflects what consumers see, npm types included. This is why an audit reads the real published shape
+rather than the local source signatures alone.
+
+#### npm-without-types workaround
+
+If an `npm:` dependency ships **no type declarations**, `deno doc` cannot resolve those types and
+renders them as `any` (and may warn about missing types), which understates or muddies the surface.
+Resolve it the same way you fix it for type-checking:
+
+- Add a typed shim via the `@types/<pkg>` companion in `imports` (e.g.
+  `"@types/node": "npm:@types/node@..."`), or
+- Pin a `// @deno-types="..."` reference to a local/declared `.d.ts` at the import site.
+
+With types resolved, `deno doc` (and `--lint`) render the real surface instead of `any`. Untyped npm
+deps that surface through your public exports are an audit finding, not just a doc cosmetic — they
+weaken the published `.d.ts` and the no-slow-types posture (see
+[Fixing Slow Types](#fixing-slow-types)).
+
+### JSX/TSX highlighting
+
+For `.tsx` units (the `@netscript/fresh-ui`-style Preact/Fresh component packages), `deno doc`
+parses and renders JSX/TSX entrypoints and highlights component and prop types in the emitted
+surface. You can point it at a `.tsx` entrypoint directly (e.g. `deno doc packages/fresh-ui/mod.ts`)
+to inspect exported components the same way you would a plain `.ts` module.
+
+### `deno doc --lint` — the publish-quality bar
+
+`deno doc --lint` is the **documentation-quality gate** for the publish surface. The bar is **0
+diagnostics on the FULL export surface of each unit** — the same bar the Group 3 user-site reference
+generation and the scorecard **A1** factor use. It flags two failure classes that block a clean
+publish:
+
+- `missing-jsdoc` — an exported symbol with no module/symbol documentation.
+- `private-type-ref` — a public export annotated with a non-exported (private) type, which leaks an
+  unrenderable type into the surface.
+
+```bash
+# Per-unit publish bar: must be 0 diagnostics across all entrypoints
+deno doc --lint packages/<unit>/mod.ts
+```
+
+When the raw output is too noisy to attribute per entrypoint or per file, use the structured runner
+`.llm/tools/run-deno-doc-lint.ts`, which auto-discovers a unit's exports from `deno.json` and emits
+grouped per-entrypoint / per-file counts:
+
+```bash
+deno run --allow-read --allow-run .llm/tools/run-deno-doc-lint.ts --root packages/<unit> --pretty
+```
+
+**Census (2026-06-18):** the canonical `deno task publish:dry-run` simulates **25** units and the
+real publish denominator is **26** (the 25 E-wave units plus `@netscript/cli`; `@netscript/cli-e2e`
+is `publish:false` and excluded). At baseline **25 / 26 units are already `deno doc --lint` clean**.
+The one current `--lint` debt is **`@netscript/fresh-ui`**, which fails with `private-type-ref`
+errors where public component consts (`Accordion`, `Dialog`, `Drawer`, `Popover`, `Sheet`, `Tabs`,
+`Tooltip`) are annotated with private `*Namespace` types. That is a **source/TypeScript fix**
+(export the namespace types), not a doc edit, and is **out of scope for this skill** — track it as
+framework debt.
+
+---
+
 ## Known Limitations (2024-2025)
 
 - **Private packages**: Not yet available (most requested feature)
