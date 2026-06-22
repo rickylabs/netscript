@@ -6,7 +6,7 @@
 | --- | --- |
 | Run ID | `jsr-readiness-additive` |
 | Branch | `chore/jsr-readiness-additive` |
-| Current phase | `implement` |
+| Current phase | `gate` |
 | Archetype | Mixed tooling/docs/fresh-ui additive surface |
 | Scope overlays | `SCOPE-docs` |
 
@@ -24,7 +24,7 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 
 ## In Progress
 
-- S6 doctrine/skill docs and Claude mirror regeneration are implemented and gated; S6 commit is pending.
+- Final gate evidence is recorded; final harness evidence commit is pending.
 
 ## Next Steps
 
@@ -61,24 +61,27 @@ additive, non-breaking slices from `origin/release/jsr-readiness` onto the branc
 | `packages/fresh/deno.json` | changed | Umbrella package config update. |
 | Root docs, doctrine 01/04, selected `.agents/skills/*` | changed | S6 doc promotion and hand-reconciled OpenHands skill structure. |
 | `.claude/skills/*` mirrors | changed | Regenerated from `.agents/skills/`. |
+| `.llm/tmp/run/jsr-readiness-additive/worklog.md` | changed | Final gate evidence recorded. |
 
 ## Gates
 
 | Gate family | Current status | Evidence |
 | --- | --- | --- |
-| Static | pending implementation | Per-slice gates will be recorded in `worklog.md`. |
-| Fitness | pending implementation | JSR rubric passed at plan-eval; fresh-ui/lint evidence pending. |
+| Static | PASS | `deno task check`, `deno task lint`, scoped fmt, README doc-lint. |
+| Fitness | PASS | `deno task deps:check`, `deno task arch:check`, JSR rubric, zero-cast scan. |
 | Runtime | N/A | No runtime surface in PR-A. |
 | Consumer | N/A | No breaking public API removals in PR-A. |
 
 ## Open Questions
 
-- None at implementation start.
+- `deno task docs:links` remains blocked by unrelated `.agents/skills/impeccable/reference/*.md`
+  links; recorded as drift and not part of the final requested gate set.
 
 ## Drift and Debt
 
 - Drift: missing implementation tracking artifacts at generator start; baseline auth doctrine failures
-  exposed by S2 `arch:check`, both recorded in `drift.md`.
+  exposed by S2 `arch:check`; current-main README drift; S5 fresh-ui cast reconciliation; S6
+  docs-link baseline blocker. All recorded in `drift.md`.
 - Debt: none introduced.
 
 ## Commits

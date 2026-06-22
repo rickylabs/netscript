@@ -73,6 +73,7 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | 2026-06-22 | S5 | gate | Focused fresh-ui lint/check passed, root `deno task lint` passed, root `deno task check` passed, and scoped fmt check passed. Diff scan found no added `any` or `as` lines in S5 fresh-ui files. |
 | 2026-06-22 | S6 | edit | Promoted clean doctrine/root/skill docs from the umbrella, merged OpenHands trigger/output/token structure into main's newer agentic-suite skill, and regenerated `.claude/skills/` mirrors. |
 | 2026-06-22 | S6 | gate | `agentic:check-claude` passed and scoped `deno fmt --check` passed after formatting touched Markdown/skill files. `docs:links` failed on unrelated pre-existing `.agents/skills/impeccable/reference/*` links and was recorded as drift. |
+| 2026-06-22 | final | gate | Final branch gates passed: `deno task check`, `deno task lint`, scoped package-quality fmt, `deno task deps:check`, `deno task arch:check`, and `deno task docs:readme:check`. |
 
 ## Decisions
 
@@ -114,6 +115,12 @@ Maintainers should start at `deno.json` for task entry points, `.llm/tools/deps/
 | S6 Claude surface | `deno task agentic:check-claude` | PASS | Claude surface valid; `.claude/skills` mirror check passed; hook lock check left `deno.lock` unchanged. |
 | S6 scoped fmt | `deno fmt --check <S6 touched Markdown/skill/run-artifact files>` | PASS | Passed after scoped `deno fmt` on those same touched files. |
 | S6 docs links | `deno task docs:links` | FAIL | Baseline failure in `.agents/skills/impeccable/SKILL.md` references to missing `reference/*.md`; not introduced by S6. |
+| Final check | `deno task check` | PASS | Workspace check wrapper selected 1730 files, 15 batches, 0 failures. |
+| Final lint | `deno task lint` | PASS | Workspace lint wrapper selected 1215 files, 7 batches, 0 occurrences. |
+| Final scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude "^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)" --ignore-line-endings` | PASS | 1301 files selected, 7 batches, 0 findings. |
+| Final deps check | `deno task deps:check` | PASS | Passed with warning-only `DEPS-NPM-CATALOG` findings. |
+| Final arch check | `deno task arch:check` | PASS | Exited 0; warning-only doctrine findings remain for auth README/docs architecture follow-up. |
+| Final README doc-lint | `deno task docs:readme:check` | PASS | 31 package/plugin READMEs conform. |
 
 ### Fitness Gates
 

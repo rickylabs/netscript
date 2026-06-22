@@ -15,3 +15,4 @@ Format:
 - 9c964585: docs(jsr): promote clean readme templates
 - e0f606b1: docs(jsr): reconcile drifted readme templates
 - fa17d2ed: fix(fresh-ui): publish interactive prop types
+- c50d30a1: docs(jsr): refresh doctrine and agent skills
