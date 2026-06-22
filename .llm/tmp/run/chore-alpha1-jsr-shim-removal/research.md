@@ -14,7 +14,11 @@
 - `packages/cli/src/kernel/constants/windows.ts` — 8 `@deprecated` aliases (lines ~217-231):
   `SERVY_CLI_PATH`, `COMPILE_TARGET`, `SERVICE_PREFIX`, `BUNDLE_EXTERNAL`,
   `BUNDLE_EXTERNAL_IMPORTS`, `COMPILE_TIMEOUT_MS`, `BUNDLE_TIMEOUT_MS`, `V8_HEAP_MB` → each aliases a
-  `DEFAULT_*` canonical. Repo-wide grep: every call site already uses the `DEFAULT_*` form. 0 consumers.
+  `DEFAULT_*` canonical. 7 of 8 have 0 consumers.
+  **CORRECTION (cycle 1):** `V8_HEAP_MB` HAS one live consumer —
+  `packages/cli/src/kernel/adapters/windows/runtime/v8-profiles.ts:12,46,73`. S1 folds those 3 lines
+  onto `DEFAULT_V8_HEAP_MB` (value-identical) before deleting the alias; the file stays (Windows V8
+  heap-sizing path). Mechanical fold, proven by the scoped check gate — not a blocker.
 - `packages/database/mod.ts:256` — `export const buildConnectionString = buildPostgresConnectionString`
   (`@deprecated`, line 254). 0 import consumers (the `buildConnectionString()` private methods on the
   mysql/postgres adapters are unrelated same-name class methods — keep them).
