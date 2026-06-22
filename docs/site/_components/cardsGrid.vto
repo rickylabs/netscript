@@ -1,0 +1,28 @@
+{{# Lume component — docs/site/_components/cardsGrid.vto
+   Responsive grid of cards, purpose-built for the hub "Learn / Do / Reference"
+   triplet and front-door capability grids. Relationship to comp.featureGrid:
+   featureGrid is the generic N-card wrapper; cardsGrid is the LABELLED-triplet
+   variant the hubs need — each card may carry an `eyebrow` (e.g. "Learn", "Do",
+   "Reference") above the title, and the grid takes a `columns` hint.
+   Invoke:
+     {{ comp.cardsGrid({ columns: 3, cards: [
+          { eyebrow: "Learn", title: "Tutorial", body: "…", href: "/tutorials/", icon: "▸" },
+          { eyebrow: "Do",    title: "Recipes",  body: "…", href: "/how-to/",   icon: "·" },
+          { eyebrow: "Reference", title: "API",  body: "…", href: "/reference/", icon: "R" },
+        ] }) }}
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{ set cells = cards || [] }}
+{{ set cols = columns || 3 }}
+<div class="ns-cards-grid" data-columns="{{ cols }}" role="list">
+  {{ for card of cells }}
+    {{ set tag = card.href ? "a" : "div" }}
+    <{{ tag }} class="ns-cards-grid__card" role="listitem"{{ if card.href }} href="{{ card.href |> url }}"{{ /if }}>
+      {{ if card.eyebrow }}<span class="ns-cards-grid__eyebrow">{{ card.eyebrow }}</span>{{ /if }}
+      <span class="ns-cards-grid__head">
+        {{ if card.icon }}<span class="ns-cards-grid__icon" aria-hidden="true">{{ card.icon }}</span>{{ /if }}
+        <span class="ns-cards-grid__title">{{ card.title }}</span>
+      </span>
+      {{ if card.body }}<p class="ns-cards-grid__body">{{ card.body }}</p>{{ /if }}
+    </{{ tag }}>
+  {{ /for }}
+</div>

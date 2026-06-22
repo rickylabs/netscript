@@ -1,0 +1,45 @@
+{{# Lume component — docs/site/_components/tabbedRuntime.vto
+   Runtime / DB selector that PERSISTS the chosen tab across navigation via
+   localStorage (key `ns-runtime`), so picking e.g. "postgres" or "Deno" once keeps
+   it selected site-wide. Like comp.tabbedCode but each tab carries a stable
+   `data-ns-runtime="<label>"` and the group is marked `data-ns-runtime-group`; the
+   restore/persist JS lives in base.vto. Invoke:
+     {{ comp.tabbedRuntime({ tabs: [
+          { label: "postgres", lang: "ts", code: "…" },
+          { label: "mssql",    lang: "ts", code: "…" },
+          { label: "mysql",    lang: "ts", code: "…" },
+        ] }) }}
+   Progressive enhancement: with JS off, ALL panels render visible (no panel is
+   hidden until the enhancement script runs). Reuses the .ns-tabbed CSS/markup.
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{ set items = tabs || [] }}
+{{ set gid = "nsrt-" + Math.random().toString(36).slice(2, 9) }}
+<div class="ns-tabbed" data-ns-runtime-group>
+  <div class="ns-tabbed__tablist" role="tablist" aria-label="Runtime examples">
+    {{ for index, tab of items }}
+      <button
+        type="button"
+        class="ns-tabbed__tab{{ if index === 0 }} is-active{{ /if }}"
+        role="tab"
+        id="{{ gid }}-tab-{{ index }}"
+        aria-controls="{{ gid }}-panel-{{ index }}"
+        aria-selected="{{ if index === 0 }}true{{ else }}false{{ /if }}"
+        tabindex="{{ if index === 0 }}0{{ else }}-1{{ /if }}"
+        data-ns-runtime="{{ tab.label }}"
+      >{{ tab.label }}</button>
+    {{ /for }}
+  </div>
+{{ for index, tab of items }}
+{{ set code = (tab.code || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "&#10;") }}
+<div
+  class="ns-tabbed__panel"
+  role="tabpanel"
+  id="{{ gid }}-panel-{{ index }}"
+  aria-labelledby="{{ gid }}-tab-{{ index }}"
+  tabindex="0"
+  data-ns-runtime="{{ tab.label }}"
+>
+<pre><code class="language-{{ tab.lang }}">{{ code }}</code></pre>
+</div>
+{{ /for }}
+</div>

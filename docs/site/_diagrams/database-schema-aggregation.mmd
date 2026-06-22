@@ -1,0 +1,11 @@
+%% Source for assets/diagrams/database-schema-aggregation.svg
+%% Per-plugin schema.prisma files fan in to one aggregated Prisma client,
+%% which selects a database adapter (postgres / mssql / mysql).
+flowchart LR
+    workers["workers.prisma<br/>plugin schema"] --> client
+    sagas["sagas.prisma<br/>plugin schema"] --> client
+    auth["auth.prisma<br/>plugin schema"] --> client
+
+    client["Aggregated<br/>Prisma client"] --> selector
+
+    selector{"Adapter selector<br/>postgres / mssql / mysql"} --> db[("Database")]

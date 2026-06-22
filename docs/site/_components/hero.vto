@@ -1,0 +1,16 @@
+{{# Lume component — docs/site/_components/hero.vto
+   Hero band: large tagline, optional subhead, CTA buttons (primary styled distinctly).
+   Invoke:  {{ comp.hero({ tagline: "…", subhead: "…", ctas: [{ label, href, primary? }] }) }}
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{ set buttons = ctas || [] }}
+<section class="ns-hero">
+  <h1 class="ns-hero__tagline">{{ tagline |> ic }}</h1>
+  {{ if subhead }}<p class="ns-hero__subhead">{{ subhead }}</p>{{ /if }}
+  {{ if buttons.length }}
+    <div class="ns-hero__ctas">
+      {{ for cta of buttons }}
+        <a class="ns-hero__cta{{ if cta.primary }} ns-hero__cta--primary{{ /if }}" href="{{ cta.href |> url }}">{{ cta.label }}</a>
+      {{ /for }}
+    </div>
+  {{ /if }}
+</section>

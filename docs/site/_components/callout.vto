@@ -1,0 +1,14 @@
+{{# Lume component — docs/site/_components/callout.vto
+   Slot/body component. Invoke from a .vto page:
+     {{ comp.callout({ type: "tip", title: "Heads up" }) }}body{{ /comp }}
+   type is one of note|tip|important|warning; body via {{ content }}.
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{ set icons = { note: "ℹ", tip: "✓", important: "★", warning: "⚠" } }}
+{{ set kind = type || "note" }}
+<aside class="ns-callout ns-callout--{{ kind }}" role="note">
+  <span class="ns-callout__icon" aria-hidden="true">{{ icons[kind] }}</span>
+  <div class="ns-callout__body">
+    {{ if title }}<p class="ns-callout__title">{{ title |> ic }}</p>{{ /if }}
+    {{ content }}
+  </div>
+</aside>

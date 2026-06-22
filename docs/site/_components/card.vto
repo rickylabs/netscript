@@ -1,0 +1,12 @@
+{{# Lume component — docs/site/_components/card.vto
+   A single card, linked when href is supplied. Reused by featureGrid as a grid item.
+   Invoke:  {{ comp.card({ title: "Quickstart", body: "Scaffold in one command.", href: "/quickstart/", icon: "⚡" }) }}
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+{{ set tag = href ? "a" : "div" }}
+<{{ tag }} class="ns-card"{{ if href }} href="{{ href |> url }}"{{ /if }}>
+  <span class="ns-card__head">
+    {{ if icon }}<span class="ns-card__icon" aria-hidden="true">{{ icon }}</span>{{ /if }}
+    <span class="ns-card__title">{{ title |> ic }}</span>
+  </span>
+  {{ if body }}<p class="ns-card__body">{{ body |> ic }}</p>{{ /if }}
+</{{ tag }}>

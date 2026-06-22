@@ -1,0 +1,8 @@
+%% Source for assets/diagrams/sdk-data-flow.svg
+%% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
+%% This file is NOT consumed by `deno task build`; the site ships the SVG only.
+flowchart LR
+  contract["Contract<br/>(contract object)"] --> client["Typed client<br/>(createClient)"]
+  client --> query["Cache-first query<br/>(TanStack Query)"]
+  query --> island["Island<br/>(component)"]
+  contract -. "one contract: caller + server cannot drift" .-> service["oRPC service<br/>(imports same contract)"]

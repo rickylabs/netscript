@@ -1,0 +1,7 @@
+%% Source for assets/diagrams/request-lifecycle.svg
+%% Rendered to a committed static SVG by the SEPARATE dev task in render.ts.
+%% This file is NOT consumed by `deno task build`; the site ships the SVG only.
+flowchart LR
+  contract["Contract<br/>(oRPC schema)"] --> handler["Handler<br/>(service)"]
+  handler --> client["Typed client<br/>(@netscript/sdk)"]
+  client --> island["UI island<br/>(Fresh)"]

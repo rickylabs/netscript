@@ -190,7 +190,7 @@ Seeded from
 - **Gate:** F-6; close when `packages/plugin-triggers-core` dry-run passes without
   `--allow-slow-types`.
 
-## plugins/triggers — deferred trigger action scheduler missing
+## plugins/triggers — deferred trigger action scheduler missing (`triggers-defer-unsupported`)
 
 - **Reason:** `DeferAction` models `kind: 'defer'` with an `until` timestamp, but the runtime has no
   one-shot scheduler/replay port that can re-dispatch the processed trigger action later. S2 now
@@ -422,7 +422,7 @@ Seeded from
   `console.warn` is absent from
   `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
 
-## plugins/streams — durable topic publish/subscribe transport deferred
+## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 
 - **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
   Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
@@ -931,3 +931,156 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   need `Record<string, unknown>` widening, AND (B) every external-boundary surface (SDK / KV / db /
   bootstrap) reaches its port through a typed adapter so the `as unknown as` / `as <T>` boundary
   casts are gone across all plugin services.
+
+## packages/auth-better-auth — seamless better-auth integration roadmap (`seamless-auth-roadmap`)
+
+- **Reason:** The audit (docs-v4 Phase-0, `.llm/tmp/run/docs-v4-ia-deepening/seam-coverage.md`)
+  found the only real build-seam gap in the framework: all 9 better-auth plugins
+  (`organization`, `twoFactor`, `magicLink`, `admin`, `passkey`, `multiSession`, `apiKey`,
+  `bearer`, `jwt`) are mountable today ONLY via the undocumented escape hatch
+  `createBetterAuthBackend({ auth: betterAuth({ plugins: [...] }) })`. The documented convenience
+  factory `createNetscriptBetterAuth` has a closed `NetscriptBetterAuthOptions` (no `plugins`
+  field), so the documented path can enable none of them. The Principal mapper already consumes
+  org/role/permission claims, so the wiring half is done — only the on-ramp and ergonomics are
+  missing.
+- **Owner:** Auth layer follow-up (docs-v4 run + a dedicated auth-DX program).
+- **Created:** 2026-06-22
+- **User directive (2026-06-22):** "build the passthrough and document in the harness what should
+  be planned to build (seams, additional adapters, helpers, fluent builder) to make it absolutely
+  seamless in NetScript." So the minimal passthrough ships now; the rest is this tracked roadmap.
+
+- **R0 — passthrough seam (BUILD NOW, this run, IMPL-EVAL-gated WSL Codex slice):** add a
+  `plugins` / `betterAuthOptions` passthrough to `createNetscriptBetterAuth` so the documented
+  factory can mount any better-auth plugin (forwarded into `BetterAuthOptions`). Status: planned.
+
+- **R1 — DB schema generation for plugins (REQUIRED for R0 to be usable):** plugins that need
+  tables (`organization` → org/member/invitation, `twoFactor`, `passkey`, `apiKey`) do nothing
+  until their Prisma models + migration exist. Wrap better-auth's schema-generation CLI through
+  `netscript db` / scaffold so enabling a plugin also generates its required schema. Without R1,
+  R0 enables the plugin at the better-auth layer but it fails at runtime on a missing table — docs
+  MUST state this honestly until R1 lands.
+
+- **R2 — interactive-flow seam (`InteractiveFlowPort`) for the better-auth backend:** today the
+  better-auth backend is non-interactive, so `/signin` and `/callback` return
+  `AUTH_PROVIDER_ERROR` and `magicLink`/`passkey` sign-in can't be driven through NetScript (only
+  kv-oauth implements `InteractiveFlowPort`). Implement the port over better-auth's own handler to
+  make magic-link/passkey/social interactive flows first-class. This is the largest item and the
+  blocker for full plugin parity.
+
+- **R3 — NetScript-native organization / multi-tenancy helpers:** typed org/tenant/role primitives
+  layered over the `organization` plugin (instead of reading raw claim string keys), so apps and
+  the `tutorials/workspace` track get a real framework org primitive. Resolves the "NetScript ships
+  no organization primitive" caveat at its root.
+
+- **R4 — fluent auth builder (`defineAuth()`):** a NetScript-idiomatic builder mirroring
+  `definePage`/`defineSaga`/`defineTask` that composes backend + plugins + principal mapping +
+  schema declaratively, replacing hand-wiring of `betterAuth()` + `createBetterAuthBackend` +
+  adapter. This is the "absolutely seamless" endpoint of the roadmap.
+
+- **R5 — plugin-aware Principal mapping + adapters:** typed accessors/mappers per plugin output
+  (`apiKey` permissions, `admin` roles, `multiSession`) plus any additional better-auth adapter
+  wiring beyond Prisma, and CLI support (e.g. `netscript auth add-plugin <name>`) to scaffold the
+  plugin + its schema + wiring in one step.
+
+- **Status:** OPEN — R0 scheduled in the docs-v4 run; R1–R5 tracked here as the seamless-auth
+  program for a dedicated future run (needs its own PLAN-EVAL). Docs authored in docs-v4 must (a)
+  document the R0 factory path, (b) state the R1 schema-generation requirement honestly, and (c)
+  reference this roadmap rather than silently omitting the gaps.
+- **Gate:** Close R0 when `createNetscriptBetterAuth({ plugins: [...] })` type-checks and forwards
+  to `BetterAuthOptions` with a green IMPL-EVAL; close the program when R1–R5 land under their own
+  plan.
+
+## docs/runtime — alpha scaffold specifiers point at future stable ranges (`alpha-specifiers-forward-looking`)
+
+- **Reason:** Several generated/scaffolded examples pin future `jsr:@netscript/*@^1.0.0` ranges
+  while the currently published aligned package train is still `0.0.1-alpha.0`. The docs must keep
+  warning readers that the future stable specifiers describe the intended surface rather than a
+  public JSR install they can run today.
+- **Owner:** Release/publish readiness program.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when scaffolded public package specifiers resolve from JSR at the documented
+  stable range, or when scaffold output stops emitting forward-looking stable ranges.
+
+## plugins/auth — single active backend v1 boundary (`auth-single-active-backend-boundary`)
+
+- **Reason:** `@netscript/plugin-auth` composes exactly one backend selected by
+  `NETSCRIPT_AUTH_BACKEND`. It does not yet support multi-active routing, cross-backend account
+  linking, global logout across backend stores, or historical session replay. The docs should mark
+  this as a deliberate v1 boundary wherever the limitation is surfaced.
+- **Owner:** Auth layer follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when a planned auth design introduces multi-backend routing/account-linking
+  semantics, or the docs stop presenting provider swapping as anything beyond one active backend per
+  deployment.
+
+## packages/fresh — hosted example sandboxes missing (`fresh-hosted-example-sandboxes`)
+
+- **Reason:** The Web Layer examples page promises hosted, one-click sandboxes as planned, but the
+  current docs site only points readers to local tutorial source.
+- **Owner:** Docs experience follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the Web Layer examples page links to maintained hosted sandboxes or removes
+  the planned-sandbox statement.
+
+## runtime — app-wide shutdown orchestrator missing (`runtime-app-wide-shutdown-orchestrator`)
+
+- **Reason:** Services, worker runtimes, queues, and database teardown each expose their own drain
+  path, but there is no single top-level `host.shutdown()` that orchestrates all app resources under
+  one budget.
+- **Owner:** Runtime orchestration follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the runtime exposes a documented app-wide shutdown orchestrator and the
+  graceful-shutdown guide uses it as the primary path.
+
+## packages/cli — deployment artifacts are not generated (`cli-deploy-artifacts-missing`)
+
+- **Reason:** The scaffold records enough process and AppHost facts for manual deployment, but it
+  does not generate Dockerfiles, Docker Compose files, Kubernetes manifests, or a first-class deploy
+  command.
+- **Owner:** Deployment tooling follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when `netscript deploy` or scaffold generation emits supported deployment
+  artifacts, or the deployment docs are rewritten to remove generated-artifact expectations.
+
+## packages/fresh — Fresh app telemetry defaults reserved (`fresh-app-telemetry-defaults`)
+
+- **Reason:** `defineFreshApp` accepts `telemetry` / `FreshAppTelemetryOptions` as a forward
+  compatibility seam, but Fresh app bootstrap telemetry defaults are not active yet.
+- **Owner:** Fresh telemetry follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when Fresh app bootstrap telemetry is implemented and the Web Layer server docs
+  describe emitted spans rather than reserved options.
+
+## packages/workers — non-Deno task runtimes are not permission-sandboxed (`workers-non-deno-task-sandbox-boundary`)
+
+- **Reason:** `.permissions(...)` compiles into Deno `--allow-*` flags only for `runtime("deno")`.
+  Python, .NET, shell, PowerShell, cmd, executable, and custom subprocess runtimes inherit the
+  worker host's OS privileges unless the caller adds an external sandbox.
+- **Owner:** Workers runtime hardening follow-up.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when non-Deno task runtimes have a documented, enforced per-task sandbox or the
+  public task runtime API explicitly models this as a permanent trust boundary.
+
+## packages/workers — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
+
+- **Reason:** The scaffold-generated worker handler toolkit `createJobTools(ctx)` exposes
+  `trace.addEvent`, `withChildSpan`, and `progress` helpers that are currently no-op stubs. Job-level
+  telemetry is real — dispatch, execution, step events, progress, scheduler runs, and subprocess
+  trace continuation emit OpenTelemetry spans visible in Aspire (OTLP `http://localhost:4318`). Only
+  these in-handler scaffold helpers do not yet emit; their signatures are stable, so handler code
+  written against them keeps compiling and will start emitting once the helpers are implemented. For
+  custom handler spans today, call `@netscript/telemetry` helpers directly.
+- **Owner:** `@netscript/plugin-workers-core` / scaffold telemetry follow-up.
+- **Target:** Before advertising in-handler `createJobTools` span/event/progress emission as supported.
+- **Linked plan:** `.llm/tmp/run/docs-v4-ia-deepening/caveat-inventory.md` (Cluster C).
+- **Created:** 2026-06-22
+- **Status:** open.
+- **Gate:** Close when `trace.addEvent` / `withChildSpan` / `progress` from `createJobTools(ctx)` emit
+  real spans/events and a runtime test proves a handler-emitted child span reaches the OTLP collector.

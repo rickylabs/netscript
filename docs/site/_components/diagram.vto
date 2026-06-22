@@ -1,0 +1,12 @@
+{{# Lume component — docs/site/_components/diagram.vto
+   Accessible rendered-diagram wrapper (OD1). `src` points at a COMMITTED static
+   SVG under `assets/diagrams/` (rendered from a Mermaid `.mmd` source in
+   `_diagrams/`; the render step is a separate dev task, while `deno task build`
+   validates that every referenced SVG exists). No client-side Mermaid JS: the
+   figure is visible with JavaScript off and the SVG is a diffable asset.
+   Invoke:  {{ comp.diagram({ src: "/assets/diagrams/request-lifecycle.svg", alt: "…", caption: "…" }) }}
+   All colors key off the existing fresh-ui --ns-* tokens so it matches the chrome. #}}
+<figure class="ns-diagram">
+  <img class="ns-diagram__img" src="{{ src |> url }}" alt="{{ alt }}" loading="lazy" />
+  {{ if caption }}<figcaption class="ns-diagram__caption">{{ caption |> ic }}</figcaption>{{ /if }}
+</figure>

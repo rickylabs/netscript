@@ -1,0 +1,19 @@
+%% Source for assets/diagrams/saga-state-machine.svg
+%% Saga state machine: happy path with event-driven transitions, a compensation
+%% branch, and a checkpoint store (KV / Prisma) persisting state on each transition.
+stateDiagram-v2
+    [*] --> Pending
+    Pending --> Reserving: reserve
+    Reserving --> Charging: charge
+    Charging --> Shipping: ship
+    Shipping --> Completed: done
+    Completed --> [*]
+
+    Charging --> Refunding: fail
+    Refunding --> Failed: compensate
+    Failed --> [*]
+
+    note right of Shipping
+        Each transition persists state to the
+        checkpoint store (KV / Prisma).
+    end note
