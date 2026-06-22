@@ -14,3 +14,19 @@
 - See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md` for full findings.
 - See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` for drift notes.
 - Lock hygiene preserved — no `deno.lock` churn, no source edits, no implementation commits.
+## 2026-06-23 — PLAN-EVAL cycle 2
+
+- Verdict: **PASS** (cycle 2 of 2; final). Run: openhands-run-27988081250-1.
+- S3b (workers-side slice) cleanly DEFERRED per user-confirmed option (b). Verified at tip `5d1bee91`:
+  all workers-side surface (schedule field + scheduler port + builder method + scaffold + CLI flag +
+  template + 4 docs/recipe/site references) is intact and untouched by PR-B.
+- S3a (saga legacy) verified self-contained: no dependency on deferred workers work;
+  `saga-supervisor.ts:130` fold onto native default is correct (native is the default in
+  `create-saga-runtime.ts:86-90`).
+- V8_HEAP_MB fold verified: `v8-profiles.ts:12,46,73` is the only live consumer; other 7 aliases
+  re-grepped = 0-consumer.
+- Gate set verified sufficient for the smaller breaking removal.
+- Version policy + zero-cast re-confirmed.
+- Lock hygiene preserved — no `deno.lock` churn, no source edits, no implementation commits.
+- See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md` for full findings.
+- See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` for drift notes.

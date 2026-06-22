@@ -40,3 +40,39 @@
 - **Gate additions for cycle 2:** named S1 pre-delete grep gate; `deno doc --lint` per affected
   package; jsr-audit surface-scan note (removal-only → surface shrinks; residual risk = dangling refs,
   mechanically gated).
+## 2026-06-23 — PLAN-EVAL cycle 2
+
+- Verdict: **PASS** (cycle 2 of 2; final). Run: openhands-run-27988081250-1.
+- S3b cleanly DEFERRED — verified at tip `5d1bee91`: every workers-side surface
+  (`runtime-types.ts:54,85,209-212` schedule field + `RuntimeSchedulerPort` + `JobBuilder.schedule()`
+  at `builders/job-builder.ts:50,131` + scaffold emission at `plugins/workers/src/scaffolding/job-scaffolders.ts:64-65`
+  + CLI `--schedule` flag + `job-builder.ts.template`) is intact and untouched by this PR. Plan's
+  `## Slices` explicitly excludes S3b; `## Deferred follow-up` records the workers-cron/triggers-cron
+  unification as out-of-PR-B scope.
+- S3a verified self-contained: saga-bus subsystem has no dep on deferred workers work;
+  `saga-supervisor.ts:130` folds cleanly onto the native default (`adapter: 'native'` or omitted
+  — both yield the native branch in `create-saga-runtime.ts:86-90`).
+- V8_HEAP_MB fold verified: `v8-profiles.ts:12,46,73` is the only live consumer of any of the 8 cli
+  aliases in `windows.ts:217-231`. `DEFAULT_V8_HEAP_MB` (line 35) is value-identical. Other 7 aliases
+  re-grepped: all 0-consumer.
+- Gate set verified sufficient for the (smaller) breaking removal: named S1 pre-delete grep gate +
+  `deno doc --lint` per pkg + per-package `test` + `arch:check` + `publish:dry-run` +
+  `e2e:cli run scaffold.runtime` at IMPL-EVAL. jsr-audit note correctly concludes removal-only ⇒
+  surface strictly shrinks; residual risk = dangling refs, mechanically gated.
+- Version policy + zero-cast re-confirmed for the reduced set.
+- Lock hygiene preserved — no `deno.lock` churn.
+- **Non-blocking observations** (for implementer / IMPL-EVAL):
+  1. research.md Tier-1 line 15 uses `COMPILE_TARGET` / `SERVICE_PREFIX` / `BUNDLE_EXTERNAL` —
+     actual `windows.ts` names are `WINDOWS_TARGET` / `WINDOWS_SERVICE_PREFIX` /
+     `BUNDLE_EXTERNAL_PACKAGES`. Canonical targets match. Plan not affected; suggest updating
+     research.md for accuracy.
+  2. S3a narrative-doc references (not enumerated in plan's file list): `README.md:108,142` +
+     `docs/runtime-composition.md:27` + `docs/site/reference/sagas/index.md:93`. Add a doc-prose
+     grep gate or update as part of S3a.
+  3. S3a barrel-file references (not enumerated): `adapters/mod.ts:85,89`, `runtime/mod.ts:60-62,80`,
+     `presets/mod.ts:8,12`, `plugins/sagas/src/runtime/mod.ts:65-70,87`. Mechanically caught by
+     `deno doc --lint` + `arch:check` + `publish:dry-run`.
+  4. `plugins/sagas/src/runtime/saga-runner.ts:118` `parseAdapter` must be normalized post-S3a
+     (`SagaRuntimeAdapter` union drops `'legacy'`).
+- Verdict artifact: `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md`.
+- **Next:** implementation runs in a separate session (WSL Codex). Order: S1 → S2 → S3a.
