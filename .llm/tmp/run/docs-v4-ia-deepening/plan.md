@@ -45,7 +45,10 @@ critique + a process failure. See `research.md`, `seam-coverage.md`, `ia-tree.md
 - **W4 — Auth pillar + R0 seam slice.** Codex builds the passthrough (R0); docs author the auth
   pillar incl. plugins leaf (R0 path + R1/R2 honesty); workspace tutorial reworked to the org
   plugin (per decision 2; gated on R0+R1 reality — if R1 not built this run, tutorial documents the
-  schema-gen requirement rather than silently assuming tables).
+  schema-gen requirement rather than silently assuming tables). If R0 ships without R1, the
+  auth-pillar **Plugins leaf** carries the R1 schema-gen caveat at the PAGE level (not only inside
+  the tutorial) — see risk `RR-2` in `drift.md`. The Durable-Workflows pillar (W6) cites
+  `createSagaRuntime` (not the legacy `createDurableSagaRuntime`) — see drift `D2`.
 - **W5 — Process gates** (caveat-harvest + seam-coverage discipline wired into CI/review).
 - **W6 — Pillar hub/landing pages + uniform internal sets** for the other pillars (Services & SDK,
   Background Processing, Durable Workflows, Data & Persistence, Orchestration & Runtime,
@@ -63,6 +66,8 @@ critique + a process failure. See `research.md`, `seam-coverage.md`, `ia-tree.md
 4. Reconcile lock → merge docs to `docs/user-site` → dispatch Pages deploy → verify live.
 5. R0 seam slice rides its own framework PR (auth-better-auth) → IMPL-EVAL → merge before docs that
    document the R0 path go live (ordering: seam green first, or docs state "shipping in <ref>").
+   This ordering hazard is tracked as risk `RR-1` in `drift.md`; IMPL-EVAL verifies mitigation
+   (a) hold-merge or (b) explicit "shipping in <ref>" callout before docs go live.
 
 ## Open IA questions delegated to the PLAN gate (panel + PLAN-EVAL rule on these)
 

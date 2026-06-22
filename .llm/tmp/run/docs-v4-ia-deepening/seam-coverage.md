@@ -58,7 +58,7 @@ magic-link/passkey carry the R2 interactive-flow caveat.
 | --- | --- | --- |
 | Web | fresh builders / route / defer / form / query / streams | seam present (definePage, defineRouteContract, …) |
 | Services | workers permissions + multi-runtime adapters | seam present |
-| Background | sagas Prisma store + durability tiers | seam present (createDurableSagaRuntime) |
+| Background | sagas Prisma store + durability tiers | seam present (createSagaRuntime) |
 | Background | streams producer | seam present (createDurableStream) |
 | Background | streams in-process consumer / replay / consumer-groups | absent — **already documented** (fail-loud, SSE only) |
 | Background | triggers cron + retry/DLQ | seam present (defineScheduledTrigger / createTriggerProcessor) |

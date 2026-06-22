@@ -43,3 +43,35 @@ other capability is already honestly seamed or honestly documented-as-limitation
 risk was process, not breadth. Per-feature build-vs-doc disposition surfaced to the user 2026-06-22.
 Remediation gates (caveat-harvest, link-integrity build gate, seam-coverage discipline) move into
 Phase 2 of this run.
+
+---
+
+## D2 — MINOR — Saga runtime symbol drift in planning artifacts
+
+**Severity:** minor (planning-artifact accuracy; would become a published-page defect if uncaught)
+**Found:** 2026-06-22, PLAN-EVAL cycle 1 (OpenHands minimax-M3) Required Fix #1.
+
+**What happened.** `seam-coverage.md` listed the saga runtime constructor as
+`createDurableSagaRuntime`. The real `@netscript/plugin-sagas-core` public export is
+`createSagaRuntime` (`packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts:73`,
+re-exported `packages/plugin-sagas-core/src/runtime/mod.ts:75` and `src/public/mod.ts`). The
+`createDurableSagaRuntime` name survives only in historical run artifacts under `.llm/tmp/run/`
+(`feat-prime-time-sagas-telemetry-spans--impl`, `feat-framework-prime-time--supervisor`) — it was
+renamed in a prior run and the v4 research drafted the seam matrix before re-spot-checking.
+
+**Fix applied (this artifact).** `seam-coverage.md:61` renamed to `createSagaRuntime` (verified
+against source 2026-06-22). `ia-tree.md` pillar-4 does not name the symbol literally (it references
+"sagas tables"), so no edit needed there.
+
+**How to apply (carries into build).** W2 (IA page moves) and W6 (Durable-Workflows pillar prose +
+Reference leaf) MUST cite `createSagaRuntime`, never `createDurableSagaRuntime`. This drift entry is
+the tracked reference the **caveat-harvest gate** requires for that symbol.
+
+---
+
+## Risk register
+
+| ID | Hazard | Trigger | Mitigation | Owner |
+| --- | --- | --- | --- | --- |
+| RR-1 | docs-v4 auth pillar documents the R0 plugin-passthrough path while the `packages/auth-better-auth` R0 (and R1 schema-gen) framework PR is not yet merged → published docs describe a path that does not yet install. | At docs-merge time, the auth-better-auth R0 PR is still red/open. | Either (a) hold the docs merge until the R0 (and, for the workspace tutorial, R1) PR is green; OR (b) every auth-pillar page that uses the R0 path carries an explicit "shipping in `<auth-PR-ref>`" / "awaiting R0" callout. IMPL-EVAL must verify one of (a)/(b) holds before docs go live. | Claude authoring workflow (supervisor) |
+| RR-2 | R0 ships without R1 (plugin DB-schema generation) → a documented plugin that needs tables fails at runtime. | Auth pillar "Plugins" leaf authored while only R0 is built. | Plugins leaf carries the R1 schema-gen caveat at the PAGE level (not buried in the workspace tutorial). See `plan.md` W4. Tracked by `arch-debt.md` R1. | Claude authoring workflow (supervisor) |
