@@ -296,6 +296,7 @@ permanent design choice. <strong>Workaround:</strong> for custom spans and progr
 <code>@netscript/telemetry</code> helpers directly (as in the tab above) rather than the scaffold
 <code>createJobTools</code> trace surface — those are real today. See
 <a href="/explanation/observability/">Observability</a> for the full framework-vs-scaffold map.
+<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
 ## Endpoints & ports

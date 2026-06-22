@@ -155,6 +155,7 @@ span is exported. This is a <strong>known, tracked limitation with a fix planned
 today: call <code>@netscript/telemetry/instrumentation</code> helpers directly from your handler for
 custom spans — because the dispatcher already opened the parent job span, your child span nests
 under it automatically.
+<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
 ```ts

@@ -80,6 +80,7 @@ in `@netscript/plugin-streams-core` (`createDurableStream`) by surfacing a
 the *plugin* only carries the manifest. The boundary is a feature, not an oversight — see
 {{ comp.xref({ key: "cap:streams", text: "durable streams" }) }} for the producer-versus-manifest
 framing.
+<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
 
 ## What a plugin contributes: the manifest
 

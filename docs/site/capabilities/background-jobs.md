@@ -366,6 +366,7 @@ and it is <em>only</em> in that scaffold-facing helper: job dispatch and executi
 emit real spans automatically (above). For custom handler spans today, call
 <code>@netscript/telemetry</code> helpers directly. Do not say "worker tracing is a no-op" —
 that is false for the framework layer.
+<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
 ## Reference →

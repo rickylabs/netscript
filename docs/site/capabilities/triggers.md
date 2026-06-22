@@ -344,6 +344,7 @@ processor throws an <code>unsupportedOperation</code> error and routes the messa
 <code>enqueueJob</code> only; if you need delayed work, schedule it on the
 <a href="/capabilities/background-jobs/">workers</a> plugin from the enqueued job, or use a
 <code>defineScheduledTrigger</code> cron rather than deferring at the trigger edge.
+<!-- caveat: arch-debt:triggers-defer-unsupported -->
 {{ /comp }}
 
 ## Runtime — ingress, processor, retry

@@ -355,6 +355,7 @@ The durability story is real but young, and a few edges are worth naming so you 
 
 None of these undermine the core guarantee — a built `defineSaga(...)` survives restarts on either
 store — but they shape what you should and should not design around right now.
+<!-- caveat: arch-debt:triggers-defer-unsupported -->
 
 ## Why the model looks like this — the design trade-offs
 

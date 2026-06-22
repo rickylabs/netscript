@@ -228,6 +228,7 @@ diagnostic report for a schema (handy in tests and CLI doctors).
 ## Known limitations
 
 Be deliberate about what the alpha producer does and does not guarantee.
+<!-- caveat: arch-debt:streams-manifest-helpers-unsupported -->
 
 {{ comp callout { type: "warning", title: "Writes are dropped after a connect failure (no reconnect)" } }}
 If the producer cannot reach the <code>:4437</code> durable-stream server at startup, it logs a

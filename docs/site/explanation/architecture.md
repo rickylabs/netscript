@@ -330,6 +330,7 @@ The scaffold <code>createJobTools(ctx)</code> helpers handed to your job handler
 (<code>trace.addEvent</code>, <code>withChildSpan</code>, <code>progress</code>)
 are currently no-op stubs — a tracked limitation with a fix planned. For custom
 handler spans today, call <code>@netscript/telemetry</code> helpers directly.
+<!-- caveat: arch-debt:workers-scaffold-job-tools-noop -->
 {{ /comp }}
 
 The full picture is in
