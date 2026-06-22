@@ -1136,3 +1136,37 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   in-package justification for each omission, with `deno task arch:check` green. Close (P) when the
   WorkOS feature-surface decision is recorded (either a parity program is planned or an explicit
   backend-only scope note lands in the package README + auth doctrine).
+
+
+## docs tutorials/erp-sync/02-import-job — hand-rolled CSV parsing instead of @std/csv or in-memory DuckDB (`TUTORIAL-CSV-PARSE`)
+
+- **Reason:** A user review (2026-06-22) flagged that the published ERP-sync tutorial step
+  `tutorials/erp-sync/02-import-job` (live at
+  `https://rickylabs.github.io/netscript/tutorials/erp-sync/02-import-job/`) demonstrates **manual,
+  hand-written CSV parsing** (e.g. `split('\n')` / `split(',')`-style field slicing). This models a
+  bad practice for readers: hand-rolled CSV parsing silently mishandles quoted fields, embedded
+  commas/newlines, escaped quotes, BOM, and delimiter variation. The tutorial is a teaching surface,
+  so the pattern propagates to user code.
+- **Recommended fix (depends on task complexity):**
+  - **Simple parse:** use the standard library — `@std/csv` (`parse` / `CsvParseStream`), which
+    correctly handles RFC-4180 quoting/escaping and streams. This is the "wrap, don't reinvent"
+    doctrine default (Web/`@std` first).
+  - **Heavier/analytical import:** use **in-memory DuckDB** via the Node-Neo client
+    (`@duckdb/node-api`) — `https://duckdb.org/docs/current/clients/node_neo/overview` and its CSV
+    reader `https://duckdb.org/docs/current/data/csv/overview` (`read_csv` auto-detects schema,
+    types, delimiters; runs SQL over the file). Appropriate when the import job does filtering,
+    typing, joins, or aggregation rather than a trivial row pass-through. An ERP "import job" that
+    validates/transforms rows is squarely in this category.
+- **Owner:** Docs tutorials track (ERP-sync tutorial author) + a follow-up decision on whether the
+  framework should offer a first-class CSV/file-import helper or recommend DuckDB-in-memory as the
+  canonical analytical-import path.
+- **Target:** Next docs tutorial-accuracy pass (alongside any tutorial code-quality sweep). Confirm
+  the exact source file under `docs/site/tutorials/erp-sync/02-import-job/` (deploy branch) when the
+  fix is scheduled — this entry records the observation; the precise code block is to be located at
+  fix time.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED — recorded at user direction during the JSR-readiness umbrella
+  merge/cleanup pass. Recording only; no tutorial edit in this pass.
+- **Gate:** Close when the import-job tutorial step parses CSV via `@std/csv` (simple case) or
+  in-memory DuckDB `read_csv` (analytical case) instead of hand-rolled string splitting, and the
+  surrounding prose explains the choice.
