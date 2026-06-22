@@ -11,14 +11,23 @@
 ## Removal manifest (verified against origin/main)
 
 ### Tier 1 — pure 0-consumer aliases (trivial; delete export + barrel line)
-- `packages/cli/src/kernel/constants/windows.ts` — 8 `@deprecated` aliases (lines ~217-231):
-  `SERVY_CLI_PATH`, `COMPILE_TARGET`, `SERVICE_PREFIX`, `BUNDLE_EXTERNAL`,
-  `BUNDLE_EXTERNAL_IMPORTS`, `COMPILE_TIMEOUT_MS`, `BUNDLE_TIMEOUT_MS`, `V8_HEAP_MB` → each aliases a
-  `DEFAULT_*` canonical. 7 of 8 have 0 consumers.
-  **CORRECTION (cycle 1):** `V8_HEAP_MB` HAS one live consumer —
-  `packages/cli/src/kernel/adapters/windows/runtime/v8-profiles.ts:12,46,73`. S1 folds those 3 lines
-  onto `DEFAULT_V8_HEAP_MB` (value-identical) before deleting the alias; the file stays (Windows V8
-  heap-sizing path). Mechanical fold, proven by the scoped check gate — not a blocker.
+- `packages/cli/src/kernel/constants/windows.ts` — 8 `@deprecated` aliases in the `LEGACY ALIASES`
+  block (lines 218-232). **EXACT alias identifiers (verified against the file 2026-06-23):**
+  `SERVY_CLI_PATH` (218), `WINDOWS_TARGET` (220), `WINDOWS_SERVICE_PREFIX` (222),
+  `BUNDLE_EXTERNAL_PACKAGES` (224), `BUNDLE_EXTERNAL_IMPORTS` (226), `COMPILE_TIMEOUT_MS` (228),
+  `BUNDLE_TIMEOUT_MS` (230), `V8_HEAP_MB` (232) → each aliases a `DEFAULT_*` canonical.
+  **NAME CORRECTION (2026-06-23):** an earlier draft of this manifest mislabeled 3 aliases by their
+  canonical suffix — it wrote `COMPILE_TARGET`/`SERVICE_PREFIX`/`BUNDLE_EXTERNAL`, but the actual
+  exported alias names are `WINDOWS_TARGET`/`WINDOWS_SERVICE_PREFIX`/`BUNDLE_EXTERNAL_PACKAGES`.
+  Implementation MUST target the exact identifiers above (the `@deprecated` block), not the canonical
+  suffixes. **Consumer proof (grep over `packages/` + `plugins/`, 2026-06-23):** the ONLY consumer of
+  any of the 8 aliases is `packages/cli/src/kernel/adapters/windows/runtime/v8-profiles.ts:12,46,73`
+  → `V8_HEAP_MB`. The other 7 are genuinely 0-consumer (only their definition lines match;
+  `plugins/` has zero matches). The user's cycle-1 "3 of 8 have consumers" concern traced to a stale
+  inventory mis-attribution (it wrongly listed v8-profiles importing `SERVY_CLI_PATH` +
+  `BUNDLE_EXTERNAL_IMPORTS`; the file imports only `NO_SPARKPLUG_FLAG` (a current, NON-deprecated
+  constant) and `V8_HEAP_MB`). S1 folds `V8_HEAP_MB`→`DEFAULT_V8_HEAP_MB` (value-identical) before
+  deleting the alias; the file stays (Windows V8 heap-sizing path). Mechanical, proven — not a blocker.
 - `packages/database/mod.ts:256` — `export const buildConnectionString = buildPostgresConnectionString`
   (`@deprecated`, line 254). 0 import consumers (the `buildConnectionString()` private methods on the
   mysql/postgres adapters are unrelated same-name class methods — keep them).

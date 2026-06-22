@@ -76,3 +76,24 @@
      (`SagaRuntimeAdapter` union drops `'legacy'`).
 - Verdict artifact: `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md`.
 - **Next:** implementation runs in a separate session (WSL Codex). Order: S1 → S2 → S3a.
+
+## 2026-06-23 — S1 alias-name correction + final consumer proof (pre-implementation)
+
+- **Manifest naming bug (clerical, significant for impl):** the T1 manifest listed 3 of the 8 cli
+  aliases by their canonical suffix instead of the real alias identifier —
+  `COMPILE_TARGET`→`WINDOWS_TARGET`, `SERVICE_PREFIX`→`WINDOWS_SERVICE_PREFIX`,
+  `BUNDLE_EXTERNAL`→`BUNDLE_EXTERNAL_PACKAGES`. Corrected in `research.md`. The exact 8 (windows.ts
+  218-232): `SERVY_CLI_PATH`, `WINDOWS_TARGET`, `WINDOWS_SERVICE_PREFIX`, `BUNDLE_EXTERNAL_PACKAGES`,
+  `BUNDLE_EXTERNAL_IMPORTS`, `COMPILE_TIMEOUT_MS`, `BUNDLE_TIMEOUT_MS`, `V8_HEAP_MB`.
+- **Final consumer proof (grep over `packages/` + `plugins/`):** the only alias consumer anywhere is
+  `v8-profiles.ts:12,46,73` → `V8_HEAP_MB`. Other 7 = 0-consumer (definition lines only); `plugins/`
+  has zero matches. Confirms the revised plan (fold V8_HEAP_MB, delete the rest). The user's cycle-1
+  "3 of 8 have consumers" concern was a stale-inventory false alarm (it wrongly attributed
+  `SERVY_CLI_PATH`/`BUNDLE_EXTERNAL_IMPORTS` imports to v8-profiles; that file imports only the
+  current `NO_SPARKPLUG_FLAG` + `V8_HEAP_MB`).
+- **No implementation drift** — verification only; no source edits, no `deno.lock` churn.
+- **Not pushed mid-eval:** correction made locally during the in-flight cycle-2 read of tip
+  `5d1bee91`; lands as a forward commit with the S1 slice. Codex S1 brief carries the exact names +
+  a self-verify-against-the-file instruction, so implementation is correct regardless of the artifact
+  label the evaluator saw. (PLAN-EVAL cycle 2 independently flagged the same naming gap as
+  non-blocking observation #1 — this entry is the applied correction.)
