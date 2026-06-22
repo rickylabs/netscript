@@ -1,0 +1,400 @@
++32|This is the exact class of untracked caveat `drift.md` D1 was opened to 
+prevent — fixed as
++33|Required Fix #1.
++34|
++35|## Changes
++36|
++37|### Deliverable artifacts written
++38|
++39|- `.llm/tmp/run/docs-v4-ia-deepening/plan-eval.md` — full PLAN-EVAL verdict 
+with 7 spot-checks,
++40|  checklist table, rulings on the 3 IA questions, and 3 required fixes.
++41|- `/home/runner/work/_temp/openhands/27936594391-1/summary.md` — this file.
++42|
++43|### Verdict comment (PR #107)
++44|
++45|Per the trigger contract (`output=pr-comment`), emit a PR-comment body for 
+the workflow to
++46|post. The PR-comment body follows the existing `docs-v3-ia-plan--supervisor`
+precedent
++47|format — a short verdict statement + link to `plan-eval.md` + the 3 required
+fixes + the
++48|3 IA-question rulings. See "PR-comment body" section below.
++49|
++50|### Source-tree / framework changes
++51|
++52|- **None.** This is a planning-only PR (per `plan.md` §"Build / eval / merge
+flow" step 1:
++53|  "No authoring/build before PASS"). No files under `packages/`, `plugins/`,
+`docs/site`,
++54|  or framework code were modified.
++55|- No commit was created in this run.
++56|
++57|## Validation
++58|
++59|- **No source code or docs modified** → no `deno check` / `deno task check` 
+/ `deno task e2e:cli`
++60|  needed. PLAN-EVAL is a planning verdict; validation lives in IMPL-EVAL 
+after the build branch
++61|  ships.
++62|- Spot-checks performed (read-only):
++63|  1. `packages/fresh/deno.json` exports map → 11 subpaths (`./server`, 
+`./builders`, `./route`,
++64|     `./defer`, `./form`, `./error`, `./streams`, `./query`, 
+`./interactive`, `./vite`,
++65|     `./testing`) — every IA-tree Web-Layer page maps to a real subpath.
++66|  2. `packages/fresh/src/application/builders/mod.ts:26` — `definePage` 
+exists.
++67|  3. `packages/fresh/src/application/route/mod.ts:99` — 
+`defineRouteContract` exists.
++68|  4. `packages/plugin-sagas-core/src/public/mod.ts` and 
+`src/runtime/create-saga-runtime.ts:73` —
++69|     `createSagaRuntime` is the live export; `createDurableSagaRuntime` is 
+only in historical
++70|     artifacts under 
+`.llm/tmp/run/feat-prime-time-sagas-telemetry-spans--impl/` etc.
++71|  5. `packages/auth-better-auth/src/better-auth.ts:23` — 
+`NetscriptBetterAuthOptions` fields:
++72|     `prisma`, `provider`, `debugLogs?`, `usePlural?`, `transaction?`, 
+`appName?`, `baseURL?`,
++73|     `basePath?`, `secret?` — **no `plugins` field.** Matches 
+`seam-coverage.md` headline.
++74|  6. `packages/auth-better-auth/src/better-auth.ts:77` — 
+`BetterAuthInstance` is a structural
++75|     `{ handler, api.getSession }` interface. `createBetterAuthBackend({ 
+auth })` accepts it
++76|     structurally (matches the escape-hatch code in 
+`seam-coverage.md:13`–`22`).
++77|  7. `packages/plugin-streams-core/src/public/mod.ts` — public exports are 
+producer-only
++78|     (`createDurableStream`, `DurableStreamProducer`, `defineStreamSchema`,
++79|     `inspectStreamTopic`, URL resolvers). No consumer / replay / 
+consumer-group export.
++80|     The "absent — already documented" verdict in `seam-coverage.md:63` is 
+correct.
++81|
++82|## Verdict (from `plan-eval.md`)
++83|
++84|```
++85|FAIL_PLAN
++86|```
++87|
++88|### Required fixes (file-referenced)
++89|
++90|1. **Symbol-name drift.** `seam-coverage.md:61` and `ia-tree.md` pillar-4 
+prose reference
++91|   `createDurableSagaRuntime`. Real export is `createSagaRuntime`
++92|   (`packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts:73`,
++93|   re-exported via `packages/plugin-sagas-core/src/public/mod.ts` and
++94|   `packages/plugin-sagas-core/src/runtime/mod.ts:75`). Fix in W2/W6 — and 
+record `D2` in
++95|   `drift.md` so the caveat-harvest gate has a reference.
++96|
++97|2. **Risk-register row for docs-vs-R0 ordering.** `plan.md:64`–`65` says "R0
+seam slice
++98|   rides its own framework PR — ordering: seam green first, or docs state 
+'shipping in
++99|   <ref>'". Convert to a named risk-register row (in `drift.md` or new
++100|   `risk-register.md`) so IMPL-EVAL can verify the auth-pillar pages carry 
+explicit
++101|   "shipping in <ref>" caveats if R0 is not green at docs-merge time.
++102|
++103|3. **(Minor, optional.) W4 scope — auth-pillar Plugins leaf must carry R1 
+schema-gen
++104|   caveat.** `plan.md:46`–`48` says the workspace tutorial documents the R1
+caveat "if R1
++105|   not built this run" — extend the same conditional to the auth-pillar 
+Plugins leaf itself
++106|   (page-level, not buried in the tutorial). One-line edit to W4.
++107|
++108|### Rulings on the 3 PLAN-EVAL-delegated IA questions
++109|
++110|| # | Question | Ruling |
++111||---|----------|--------|
++112|| 1 | Background-Processing vs Durable-Workflows split? | **SPLIT** 
+(pillars 3 and 4; `DurableStream` is a durability primitive, not a worker). |
++113|| 2 | Reference: pillar-local vs global catalog? | **PILLAR-LOCAL + THIN 
+GLOBAL INDEX** (matches `ia-tree.md:76`). |
++114|| 3 | Fresh Examples/sandbox: prose now, live StackBlitz? | **PROSE NOW, 
+STACKBLITZ BACKLOG** (no `@netscript/fresh` subpath backing for prose-only is 
+honest; defer avoids new external CI integration). |
++115|
++116|## PR-comment body
++117|
++118|The workflow will post this on PR #107 as the OpenHands status comment:
++119|
++120|````markdown
++121|## OpenHands PLAN-EVAL — docs-v4-ia-deepening
++122|
++123|**Verdict:** `FAIL_PLAN` (first cycle; per `evaluator/plan-protocol.md` 
+§"Loop limit", one
++124|`FAIL_PLAN` cycle is allowed; a second unfixed cycle escalates to the 
+user).
++125|
++126|**Evaluator:** OpenHands minimax-M3, separate session (not the Claude 
+author / not the
++127|WSL Codex implementer). Run-id: 27936594391-1. Branch: 
+`docs/v4-ia-deepening` @ `2db524bd`.
++128|
++129|**Full verdict:** `.llm/tmp/run/docs-v4-ia-deepening/plan-eval.md`
++130|
++131|### Required fixes
++132|
++133|1. **`createSagaRuntime` symbol-name drift** (`seam-coverage.md:61`, 
+`ia-tree.md` pillar-4).
++134|   The real export on this branch is `createSagaRuntime`
++135|   (`packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts:73`, 
+re-exported via
++136|   `packages/plugin-sagas-core/src/public/mod.ts`). Fix in W2 (IA 
+restructure) + W6 (pillar
++137|   rewrite), and carry a `D2` entry in `drift.md` so the caveat-harvest 
+gate has a reference.
++138|   This is the exact class of untracked caveat `drift.md` D1 was opened to 
+prevent.
++139|2. **Risk-register row for docs-vs-R0 ordering.** `plan.md:64`–`65` names 
+the policy
++140|   ("seam green first, or docs state 'shipping in <ref>'") but not as a 
+tracked risk. Add a
++141|   named row (in `drift.md` or new `risk-register.md`) so IMPL-EVAL can 
+verify the auth-pillar
++142|   pages carry the caveat if R0 is not green at docs-merge time.
++143|3. **(Minor.) W4 scope — auth-pillar Plugins leaf must carry R1 schema-gen 
+caveat.** Extend
++144|   the W4 conditional from the workspace tutorial to the auth-pillar 
+Plugins leaf itself
++145|   (one-line edit).
++146|
++147|### Rulings on the 3 delegated IA questions
++148|
++149|| # | Question | Ruling |
++150||---|----------|--------|
++151|| 1 | Background-Processing vs Durable-Workflows split? | **SPLIT** |
++152|| 2 | Reference: pillar-local vs global catalog? | **PILLAR-LOCAL + THIN 
+GLOBAL INDEX** |
++153|| 3 | Fresh Examples/sandbox: prose now, StackBlitz? | **PROSE NOW, 
+STACKBLITZ BACKLOG** |
++154|
++155|### Spot-checks (against the live tree)
++156|
++157|- `packages/fresh/deno.json` exports → all 11 subpaths exist; every IA-tree
+Web-Layer
++158|  page maps to a real export. ✓
++159|- `packages/fresh/src/application/builders/mod.ts:26` — `definePage` 
+exists. ✓
++160|- `packages/fresh/src/application/route/mod.ts:99` — `defineRouteContract` 
+exists. ✓
++161|- `packages/auth-better-auth/src/better-auth.ts:23` — 
+`NetscriptBetterAuthOptions` has no
++162|  `plugins` field (matches `seam-coverage.md` headline). ✓
++163|- `packages/auth-better-auth/src/better-auth.ts:77` — `BetterAuthInstance` 
+is structural;
++164|  `createBetterAuthBackend({ auth })` accepts it (escape-hatch code is 
+type-correct). ✓
++165|- `packages/plugin-streams-core/src/public/mod.ts` — producer-only exports 
+(no consumer /
++166|  replay / consumer-group); "absent — already documented" verdict in 
+`seam-coverage.md:63`
++167|  is correct. ✓
++168|
++169|### What was NOT changed
++170|
++171|- No source code, no `packages/**`, no `plugins/**`, no `docs/site`, no 
+framework churn.
++172|- No `deno.lock` mutation; no `git` commit; no push. This was a 
+planning-only evaluation
++173|  per the trigger contract.
++174|````
++175|
++176|## Responses to review comments or issue comments
++177|
++178|N/A — this is a planning-only PR with no review comments yet. The 
+PR-comment body above is
++179|the OpenHands status comment that the workflow will post.
++180|
++181|## Remaining risks
++182|
++183|- **`createSagaRuntime` drift may exist in other artifacts.** I only 
+spot-checked the docs
++184|  artifacts in this run dir. If other v4-era docs (under `docs/site/_plan/`
+or other
++185|  `ground/` scouts) reference `createDurableSagaRuntime`, the fix #1 should
+sweep those too.
++186|  The drift D2 entry should carry a list of all such locations.
++187|- **R0 seam ordering hazard is the largest residual risk** (see Required 
+Fix #2). The plan
++188|  says "seam green first, or docs state 'shipping in <ref>'" but does not 
+commit to which
++189|  branch holds if neither holds at merge time. IMPL-EVAL will need to check
+this explicitly.
++190|- **Caveat-harvest + link-integrity + seam-coverage gates** 
+(`plan.md:28`–`34`) are
++191|  correctly aimed at the systemic process failure (`drift.md` D1) but their
+exact CI wiring
++192|  is described as "wired into CI/review" without a named task or script. 
+This is the kind of
++193|  thing that drifts during implementation — IMPL-EVAL should verify the 
+gates actually fail
++194|  the build before they pass on paper. Marked PASS in this PLAN-EVAL pass 
+per Phase-A
++195|  reporting (`gates/plan-gate.md:42`–`45`) — "absence of a script is not 
+permission to omit
++196|  the check".
++197|
++198|## Files touched in this OpenHands run
++199|
++200|- `.llm/tmp/run/docs-v4-ia-deepening/plan-eval.md` (created — verdict)
++201|- `/home/runner/work/_temp/openhands/27936594391-1/summary.md` (created — 
+this file)
++202|
++203|No `deno.lock`, no source code, no commit. Lock hygiene preserved.
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify deliverable state and lock hygiene
+
+Thought:
+Let me also verify that the verdict file is well-formed and confirm no source 
+code has been changed:
+
+$ cd /home/runner/work/netscript/netscript && git status --short && echo "---" 
+&& git diff --stat HEAD 2>&1 | tail -5 && echo "---" && wc -l 
+.llm/tmp/run/docs-v4-ia-deepening/plan-eval.md 
+/home/runner/work/_temp/openhands/27936594391-1/summary.md
+
+Tokens: ↑ input 2.74M • cache hit 89.17% •  reasoning 1.03K • ↓ output 22.99K • 
+$ 0.2682
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+M .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+ M .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+ M .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+ M .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+?? .llm/tmp/run/docs-v4-ia-deepening/plan-eval.md
+?? .llm/tmp/run/openhands/pr-107/
+---
+ .../openhands/pr-32/run-27433712260-1/request.md   | 10 ++--
+ .../openhands/pr-35/run-27454103300-1/request.md   |  4 +-
+ .../openhands/pr-35/run-27454169329-1/request.md   |  4 +-
+ .../openhands/pr-37/run-27454273181-1/request.md   |  4 +-
+ 6 files changed, 40 insertions(+), 40 deletions(-)
+---
+  188 .llm/tmp/run/docs-v4-ia-deepening/plan-eval.md
+  202 /home/runner/work/_temp/openhands/27936594391-1/summary.md
+  390 total
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check pr-107 trace dir
+
+Thought:
+- ✓ The new plan-eval.md is untracked (`??`) — workspace deliverable.
+- ✓ Other modifications in `git status --short` are pre-existing untracked edits
+to other `request.md` files (PR 17, 25, 32, 35, 37) — not mine.
+- ✓ No `packages/**`, `plugins/**`, `docs/site/**`, framework code, or 
+`deno.lock` changes.
+- ✓ The `.llm/tmp/run/docs-v4-ia-deepening/plan-eval.md` file is the new verdict
+artifact and `/home/runner/work/_temp/openhands/27936594391-1/summary.md` is the
+run summary.
+
+Let me also check the pr-107/ directory exists as expected:
+
+$ cd /home/runner/work/netscript/netscript && ls .llm/tmp/run/openhands/pr-107/ 
+2>/dev/null && echo "---" && ls .llm/tmp/run/openhands/pr-107/run-27936594391-1/
+2>/dev/null
+
+Tokens: ↑ input 2.78M • cache hit 89.33% •  reasoning 1.03K • ↓ output 23.27K • 
+$ 0.2712
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+run-27936594391-1
+---
+request.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL verdict written (FAIL_PLAN, 3 fixes)
+
+Thought:
+The trace directory exists and contains `request.md`. The workflow owns writing 
+any other trace metadata (commits.md, worklog.md, etc.) — my role is to write 
+`plan-eval.md` and `summary.md`. Both are done.
+
+Let me give the final summary:
+
+Finish with message:
+## PLAN-EVAL verdict: `FAIL_PLAN` (first cycle)
+
+Deliverables written:
+- `.llm/tmp/run/docs-v4-ia-deepening/plan-eval.md` — full verdict with 7 
+live-tree spot-checks, checklist table, and 3 required fixes (188 lines).
+- `/home/runner/work/_temp/openhands/27936594391-1/summary.md` — run summary 
+with PR-comment body for the workflow to post.
+
+### Rulings on the 3 delegated IA questions
+1. **Background-Processing vs Durable-Workflows: SPLIT** (pillars 3 and 4; 
+`DurableStream` is a durability primitive, not a worker).
+2. **Reference layout: PILLAR-LOCAL + THIN GLOBAL INDEX** (matches 
+`ia-tree.md:76`).
+3. **Fresh Examples/sandbox: PROSE NOW, STACKBLITZ BACKLOG** (no subpath backing
+for prose-only is honest).
+
+### Required fixes
+1. **`createSagaRuntime` symbol-name drift** — `seam-coverage.md:61` and 
+`ia-tree.md` pillar-4 prose reference `createDurableSagaRuntime`, but the real 
+export is `createSagaRuntime` 
+(`packages/plugin-sagas-core/src/runtime/create-saga-runtime.ts:73`, re-exported
+via `packages/plugin-sagas-core/src/public/mod.ts`). Fix in W2/W6 and carry a 
+`D2` entry in `drift.md`. This is the exact class of untracked caveat D1 was 
+opened to prevent.
+2. **Risk-register row for docs-vs-R0 ordering** — `plan.md:64`–`65` names the 
+policy but not as a tracked risk. Add a named row so IMPL-EVAL can verify 
+auth-pillar pages carry the "shipping in `<ref>`" caveat if R0 is not green at 
+docs-merge time.
+3. **(Minor, optional.)** Extend the W4 R1 schema-gen caveat from the workspace 
+tutorial to the auth-pillar Plugins leaf itself (one-line edit).
+
+### Spot-checks confirmed against live tree (`origin/docs/v4-ia-deepening` @ 
+`2db524bd`)
+- ✓ `@netscript/fresh` exports map has all 11 subpaths; every IA-tree Web-Layer 
+page maps to a real subpath. `definePage` (`builders`), `defineRouteContract` 
+(`route`) both exist.
+- ✓ `NetscriptBetterAuthOptions` 
+(`packages/auth-better-auth/src/better-auth.ts:23`) has NO `plugins` field — 
+matches seam-coverage headline.
+- ✓ `createBetterAuthBackend({ auth })` accepts structural `BetterAuthInstance` 
+(`handler` + `api.getSession`); escape-hatch code is type-correct.
+- ✓ Streams public surface is producer-only; "absent — already documented" 
+verdict on consumer/replay/consumer-groups matches source.
+- ✓ `createSagaRuntime` is the current export; `createDurableSagaRuntime` only 
+exists in historical artifacts.
+
+### Lock hygiene preserved
+- No `packages/**`, `plugins/**`, `docs/site/**`, framework code, or `deno.lock`
+changes.
+- No `git` commit or push.
+- Planning-only evaluation per trigger contract.
+
+Per `evaluator/plan-protocol.md` §"Loop limit", one `FAIL_PLAN` cycle is 
+allowed; a second unfixed cycle escalates to the user. The PR-comment body is 
+included in `summary.md` for the workflow to post.
+
+Tokens: ↑ input 2.83M • cache hit 89.48% •  reasoning 1.03K • ↓ output 24.1K • $
+0.2749
+
