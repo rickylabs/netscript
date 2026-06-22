@@ -24,7 +24,7 @@
     "fmt": "deno fmt ./mod.ts ./src ./tests/_fixtures",
     "fmt:check": "deno fmt --check ./mod.ts ./src ./tests/_fixtures",
     "lint": "deno lint --rules-exclude=no-slow-types ./mod.ts ./src ./tests/_fixtures",
-    "dry-run": "deno publish --dry-run --allow-dirty"
+    "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
     "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",

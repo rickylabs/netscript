@@ -7,6 +7,12 @@ This package is intentionally framework-layer code. It owns types and compositio
 can be reused by the plugin package, applications, tests, and future extension packages without
 importing or re-exporting `@saga-bus/*` symbols.
 
+## Install
+
+```sh
+deno add jsr:@netscript/plugin-sagas-core
+```
+
 ## What This Package Owns
 
 - The userland saga DSL: `defineSaga(id).state().on().build()`.
@@ -44,7 +50,7 @@ Everything else is available through named subpaths. This keeps the root export 
 NetScript budget and prevents internal adapter, transport, and contract types from becoming ambient
 userland API.
 
-## Author A Saga
+## Quick example
 
 ```ts
 import { defineSaga, sagaComplete, send } from '@netscript/plugin-sagas-core';
@@ -170,7 +176,7 @@ memory stores are real process-local implementations for tests and single-proces
 production composition roots must inject durable `SagaIdempotencyPort` and `SagaAppliedKeyStore`
 implementations.
 
-## More Documentation
+## Docs
 
 - [Authoring](./docs/authoring.md)
 - [Runtime Composition](./docs/runtime-composition.md)

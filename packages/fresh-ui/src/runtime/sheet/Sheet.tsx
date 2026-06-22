@@ -53,7 +53,7 @@ function SheetClose({ children, ...props }: SheetCloseProps): VNode {
   return <button {...sheet.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
-type SheetNamespace = Readonly<{
+export type SheetNamespace = Readonly<{
   Close: typeof SheetClose;
   Content: typeof SheetContent;
   Description: typeof SheetDescription;

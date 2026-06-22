@@ -1,5 +1,6 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
+import type { FreshUiChildren } from '../_internal/public-props.ts';
 
 export type PopoverTriggerElementProps =
   & JSX.ButtonHTMLAttributes<HTMLButtonElement>
@@ -40,7 +41,17 @@ export interface UsePopoverOptions {
   defaultOpen?: boolean;
   id?: string;
   modal?: boolean;
-  onOpenChange?: (open: boolean, details: PopoverOpenChangeDetails) => void;
+  onOpenChange?: (
+    open: boolean,
+    details: {
+      reason:
+        | 'trigger'
+        | 'close-button'
+        | 'escape-key'
+        | 'interact-outside'
+        | 'programmatic';
+    },
+  ) => void;
   open?: boolean;
   placement?: string;
 }
@@ -70,46 +81,54 @@ export interface UsePopoverReturn {
   setOpen: (open: boolean, reason?: PopoverOpenChangeReason) => void;
 }
 
-export interface PopoverRootProps extends UsePopoverOptions {
-  children: ComponentChildren;
-}
+/** Props for the compound popover root component. */
+export type PopoverRootProps = UsePopoverOptions & {
+  children: FreshUiChildren;
+};
 
-export interface PopoverTriggerProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for the popover trigger component. */
+export type PopoverTriggerProps = PopoverTriggerElementProps & {
+  children: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
 
-export interface PopoverAnchorProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the optional popover anchor component. */
+export type PopoverAnchorProps = PopoverAnchorElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface PopoverPositionerProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the popover positioner component. */
+export type PopoverPositionerProps = PopoverPositionerElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface PopoverContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the popover content component. */
+export type PopoverContentProps = PopoverContentElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface PopoverTitleProps extends JSX.HTMLAttributes<HTMLHeadingElement> {
-  children?: ComponentChildren;
-}
+/** Props for the popover title component. */
+export type PopoverTitleProps = PopoverTitleElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface PopoverDescriptionProps extends JSX.HTMLAttributes<HTMLParagraphElement> {
-  children?: ComponentChildren;
-}
+/** Props for the popover description component. */
+export type PopoverDescriptionProps = PopoverDescriptionElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface PopoverCloseProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children?: ComponentChildren;
+/** Props for the popover close component. */
+export type PopoverCloseProps = PopoverCloseElementProps & {
+  children?: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
 
-export interface PopoverArrowProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the popover arrow component. */
+export type PopoverArrowProps = PopoverArrowElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface PopoverArrowTipProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the popover arrow tip component. */
+export type PopoverArrowTipProps = PopoverArrowTipElementProps & {
+  children?: FreshUiChildren;
+};

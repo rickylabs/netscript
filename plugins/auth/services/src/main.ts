@@ -12,7 +12,7 @@ import { createService, type DbContext } from '@netscript/service';
 import { createAuthTelemetry } from '@netscript/plugin-auth-core/telemetry';
 import { AUTH_API_DEFAULT_PORT, AUTH_PLUGIN_VERSION } from '../../src/constants.ts';
 import { router } from './router.ts';
-import { initializeAuthService } from './init.ts';
+import { type AuthPluginServiceContext, initializeAuthService } from './init.ts';
 import { withAuthRequest } from './request-context.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
@@ -87,13 +87,14 @@ function resolveAuditSalt(ctx: PluginServiceContext): string | undefined {
 }
 
 function serviceAuditSalt(ctx: PluginServiceContext): string | undefined {
-  const candidate = ctx as PluginServiceContext & {
-    readonly appsettings?: {
-      readonly auth?: { readonly audit?: { readonly salt?: string } };
-      readonly Auth?: { readonly Audit?: { readonly Salt?: string } };
-    };
-  };
-  return candidate.appsettings?.auth?.audit?.salt ?? candidate.appsettings?.Auth?.Audit?.Salt;
+  if (!hasAuthAppsettings(ctx)) {
+    return undefined;
+  }
+  return ctx.appsettings?.auth?.audit?.salt ?? ctx.appsettings?.Auth?.Audit?.Salt;
+}
+
+function hasAuthAppsettings(ctx: PluginServiceContext): ctx is AuthPluginServiceContext {
+  return 'appsettings' in ctx;
 }
 
 function toDbContext(value: unknown): DbContext {

@@ -25,19 +25,63 @@ required summary artifacts keep local and cloud agents synchronized.
 
 ## Key Concepts
 
-| Concept          | Meaning                                                                                         |
-| ---------------- | ----------------------------------------------------------------------------------------------- |
-| Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                             |
-| VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.           |
-| Model profile    | `sonnet`, `gpt`, or `gemini`; maps to a LiteLLM model id in the workflow.                       |
-| Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                       |
-| Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.          |
-| Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                          |
+| Concept          | Meaning                                                                                                                                                                      |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actions agent    | `.github/workflows/openhands-agent.yml`, used for short cloud runs.                                                                                                          |
+| VPS session      | Long-running OpenHands Web UI/SDK deployment from `ops/openhands/docker-compose.yml`.                                                                                        |
+| Model profile    | `sonnet`, `gpt`, or `gemini`; maps to a LiteLLM model id in the workflow.                                                                                                    |
+| Literal model    | Any LiteLLM-compatible `provider/model` string supplied with `model=...`.                                                                                                    |
+| Provider secret  | `LLM_API_KEY_<PROVIDER>`, inferred from the model prefix, with `LLM_API_KEY` fallback.                                                                                       |
+| Output mode      | `pr-comment`, `respond-comments`, `thread-replies`, or `summary-only`.                                                                                                       |
 | Iteration budget | `iterations=<n>` trigger token (default 500, clamped 50-3000); a run cut off at the limit reports `agent-failed` and keeps partial workspace files via the commit-back step. |
-| Summary artifact | `OPENHANDS_SUMMARY_PATH`, required before the workflow exits.                                   |
-| Status comment   | One workflow-owned PR/issue comment that starts as running and is edited with the final result. |
-| Thread replies   | Optional `OPENHANDS_REPLIES_PATH` review-comment replies.                                      |
-| Chainable token  | `PAT_TOKEN` or GitHub App token; required for cloud-created events to trigger more workflows.   |
+| Summary artifact | `OPENHANDS_SUMMARY_PATH`, required before the workflow exits.                                                                                                                |
+| Status comment   | One workflow-owned PR/issue comment that starts as running and is edited with the final result.                                                                              |
+| Thread replies   | Optional `OPENHANDS_REPLIES_PATH` review-comment replies.                                                                                                                    |
+| Chainable token  | `PAT_TOKEN` or GitHub App token; required for cloud-created events to trigger more workflows.                                                                                |
+
+## Trigger Syntax
+
+Use one of these from GitHub mobile, a local agent, or another cloud agent:
+
+- Add `fix-me` or `openhands` to an issue or PR.
+- Add a model label: `agent:sonnet`, `agent:gpt`, or `agent:gemini`.
+- Comment with `@openhands-agent ...` from an owner, member, or collaborator account.
+- Push a commit whose message contains `[openhands ...]`.
+- Run `OpenHands Agent` manually from Actions.
+
+Model selection is per run:
+
+```text
+@openhands-agent model=anthropic/claude-sonnet-4 use harness proceed to IMPL-EVAL
+@openhands-agent agent=gemini output=respond-comments fix the legitimate Augment comments
+[openhands model=openai/gpt-5.1 output=pr-comment] run a focused evaluator pass
+@openhands-agent provider=openrouter model=openai/gpt-5.1 run through OpenRouter
+```
+
+The workflow infers the provider from the selected model prefix unless `provider=...` is present.
+Provider-specific secrets follow the `LLM_API_KEY_<PROVIDER>` pattern and fall back to
+`LLM_API_KEY`.
+
+## Output Modes
+
+| Mode               | Behavior                                                                                |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| `pr-comment`       | Post one summary comment to the target issue or PR.                                     |
+| `respond-comments` | Post one summary comment that explicitly responds to relevant review or issue comments. |
+| `thread-replies`   | Post the summary and any review-thread replies from `OPENHANDS_REPLIES_PATH`.           |
+| `summary-only`     | Upload artifacts only; do not comment.                                                  |
+
+The agent must write `OPENHANDS_SUMMARY_PATH` before exit. The workflow gives each run a fresh
+`OPENHANDS_RUN_DIR` outside the repository checkout and mirrors compact trace metadata to
+`OPENHANDS_TRACE_DIR`; do not reuse legacy `.llm/tmp/openhands/summary.md`.
+
+## Token Rule
+
+GitHub does not trigger follow-up workflows from events created with the default `GITHUB_TOKEN`. Use
+a dedicated bot PAT or GitHub App token in `PAT_TOKEN` when cloud-emitted commits, comments, or
+labels should trigger another workflow.
+
+Local agents that push with your own credentials already produce chainable events.
 
 ## Default tooling — the agentic suite (use this to dispatch and check status)
 
@@ -45,16 +89,18 @@ required summary artifacts keep local and cloud agents synchronized.
 verdict — reach for it before hand-writing a `gh`/REST PowerShell one-liner (note: `gh` is not on
 the Windows PATH here). See `.llm/tools/agentic/README.md` for full flags and exit codes.
 
-| Need | Tool |
-| ---- | ---- |
+| Need                                                                          | Tool                                                                            |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | Validate the prompt contract → build the `@openhands-agent` trigger → POST it | `dispatch-openhands.ts` (`--dry-run` shows the exact comment, no token/network) |
-| Read the run verdict (committed trace by default, or the PR status comment) | `openhands-status.ts` (`--source local` \| `--source remote`) |
+| Read the run verdict (committed trace by default, or the PR status comment)   | `openhands-status.ts` (`--source local` \| `--source remote`)                   |
 
 `dispatch-openhands.ts` enforces the handoff contract in code (prompt MUST begin with `use harness`
 and carry a `## SKILL` chapter — see step 2 below) and reads the GitHub token only from an
 in-process env var (`--token-env`, default `GH_TOKEN`), never from a file or argv. It posts exactly
-one trigger comment, respecting the per-PR concurrency-cancel rule. `openhands-status.ts --source
-local` needs no token and reads the newest committed trace under `.llm/tmp/run/openhands/pr-<n>/`.
+one trigger comment, respecting the per-PR concurrency-cancel rule.
+`openhands-status.ts --source
+local` needs no token and reads the newest committed trace under
+`.llm/tmp/run/openhands/pr-<n>/`.
 
 ## Workflow
 
@@ -99,20 +145,20 @@ local` needs no token and reads the newest committed trace under `.llm/tmp/run/o
   artifacts; they do not call `gh issue comment` directly.
 - **Using Actions for long sessions**: move multi-step, human-in-the-loop work to the VPS Web UI.
 - **Oversized single-run tasks**: a research+design+plan mega-prompt can exhaust the iteration
-  budget during exploration, leaving zero artifacts. Split the task into sequential triggers
-  and/or raise `iterations=`, and require the agent to create deliverable files early and grow
-  them incrementally.
+  budget during exploration, leaving zero artifacts. Split the task into sequential triggers and/or
+  raise `iterations=`, and require the agent to create deliverable files early and grow them
+  incrementally.
 
 ## Reference Files
 
-| File                                     | Load when                                  |
-| ---------------------------------------- | ------------------------------------------ |
-| `AGENTS-handoff.md`                      | Any OpenHands trigger or handoff task      |
-| `.github/workflows/openhands-agent.yml`  | Debugging or changing the Actions workflow |
-| `.openhands/setup.sh`                    | Adjusting cloud bootstrap/toolchain setup  |
-| `.openhands/microagents/repo.md`         | Updating OpenHands repo context            |
-| `ops/openhands/docker-compose.yml`       | Deploying or changing the VPS Web UI       |
-| `.llm/harness/workflow/agent-handoff.md` | Integrating OpenHands with harness phases  |
+| File                                     | Load when                                    |
+| ---------------------------------------- | -------------------------------------------- |
+| `AGENTS-handoff.md`                      | Any OpenHands trigger or handoff task        |
+| `.github/workflows/openhands-agent.yml`  | Debugging or changing the Actions workflow   |
+| `.openhands/setup.sh`                    | Adjusting cloud bootstrap/toolchain setup    |
+| `.openhands/microagents/repo.md`         | Updating OpenHands repo context              |
+| `ops/openhands/docker-compose.yml`       | Deploying or changing the VPS Web UI         |
+| `.llm/harness/workflow/agent-handoff.md` | Integrating OpenHands with harness phases    |
 | `.llm/tools/agentic/README.md`           | Dispatching/checking OpenHands via the suite |
 
 ## Checklist

@@ -8,6 +8,12 @@ The auth contract, backend ports, domain types, config schema, and stream payloa
 contributes the plugin manifest, starts the auth service resource, provides the Prisma schema
 contribution, and exposes browser/server stream entrypoints for auth session state.
 
+## Install
+
+```sh
+deno add jsr:@netscript/plugin-auth
+```
+
 ## What This Package Owns
 
 - The typed `authPlugin` manifest and plugin inspection helpers.
@@ -18,7 +24,7 @@ contribution, and exposes browser/server stream entrypoints for auth session sta
 - Browser and server stream entrypoints for the `authSession` entity projection.
 - The plugin-owned `verify-plugin.ts` manifest gate.
 
-## Package Boundary
+## Quick example
 
 Applications select exactly one active auth backend per app with `NETSCRIPT_AUTH_BACKEND`. The v1
 values are `kv-oauth`, `workos`, and `better-auth`.
@@ -192,3 +198,10 @@ import only the layer they need.
 Auth v1 is intentionally single-active-backend. It does not provide multi-active backend routing,
 cross-backend account linking, a global logout index, historical event replay, or a paged session
 mirror. The durable streams surface is the current `authSession` projection only.
+
+## Docs
+
+- [`@netscript/plugin-auth-core`](../../packages/plugin-auth-core/README.md)
+- [`@netscript/auth-kv-oauth`](../../packages/auth-kv-oauth/README.md)
+- [`@netscript/auth-workos`](../../packages/auth-workos/README.md)
+- [`@netscript/auth-better-auth`](../../packages/auth-better-auth/README.md)

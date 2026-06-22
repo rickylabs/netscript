@@ -83,7 +83,7 @@ function AccordionItemContent({ children, ...props }: AccordionItemContentProps)
   return <div {...accordion.getItemContentProps(item, props)}>{withChildren(children)}</div>;
 }
 
-type AccordionNamespace = Readonly<{
+export type AccordionNamespace = Readonly<{
   Item: typeof AccordionItem;
   ItemContent: typeof AccordionItemContent;
   ItemIndicator: typeof AccordionItemIndicator;

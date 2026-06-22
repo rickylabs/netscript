@@ -53,7 +53,7 @@ function TooltipArrowTip({ children, ...props }: TooltipArrowTipProps): VNode {
   return <div {...tooltip.getArrowTipProps(props)}>{withChildren(children)}</div>;
 }
 
-type TooltipNamespace = Readonly<{
+export type TooltipNamespace = Readonly<{
   Arrow: typeof TooltipArrow;
   ArrowTip: typeof TooltipArrowTip;
   Content: typeof TooltipContent;

@@ -30,8 +30,14 @@ export type AuthPluginBackendName = 'kv-oauth' | 'workos' | 'better-auth';
 
 /** Appsettings shape inspected by the auth service composition root. */
 export type AuthServiceAppsettings = Readonly<{
-  auth?: { backend?: string };
-  Auth?: { Backend?: string };
+  auth?: {
+    backend?: string;
+    audit?: { salt?: string };
+  };
+  Auth?: {
+    Backend?: string;
+    Audit?: { Salt?: string };
+  };
 }>;
 
 /** Options accepted by auth backend registry construction. */

@@ -8,6 +8,10 @@ consumer-owned Prisma client.
 
 ## Install
 
+```sh
+deno add jsr:@netscript/auth-better-auth
+```
+
 ```ts
 import {
   createBetterAuthAuthenticator,
@@ -78,3 +82,8 @@ state.
 ## Required permissions
 
 - `--allow-net` for provider callbacks or better-auth plugins that call external services.
+
+## Docs
+
+- [`@netscript/plugin-auth-core`](../plugin-auth-core/README.md)
+- [`@netscript/service` auth docs](../service/README.md)

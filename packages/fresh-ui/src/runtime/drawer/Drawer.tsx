@@ -53,7 +53,7 @@ function DrawerClose({ children, ...props }: DrawerCloseProps): VNode {
   return <button {...drawer.getCloseProps(props)}>{withChildren(children)}</button>;
 }
 
-type DrawerNamespace = Readonly<{
+export type DrawerNamespace = Readonly<{
   Close: typeof DrawerClose;
   Content: typeof DrawerContent;
   Description: typeof DrawerDescription;

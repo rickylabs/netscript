@@ -1,5 +1,6 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
+import type { FreshUiChildren } from '../_internal/public-props.ts';
 
 export type TooltipTriggerElementProps =
   & JSX.ButtonHTMLAttributes<HTMLButtonElement>
@@ -30,7 +31,12 @@ export interface UseTooltipOptions {
   disabled?: boolean;
   id?: string;
   interactive?: boolean;
-  onOpenChange?: (open: boolean, details: TooltipOpenChangeDetails) => void;
+  onOpenChange?: (
+    open: boolean,
+    details: {
+      reason: 'pointer' | 'focus' | 'escape-key' | 'interact-outside' | 'programmatic';
+    },
+  ) => void;
   open?: boolean;
   openDelay?: number;
   placement?: string;
@@ -52,28 +58,33 @@ export interface UseTooltipReturn {
   setOpen: (open: boolean, reason?: TooltipOpenChangeReason) => void;
 }
 
-export interface TooltipRootProps extends UseTooltipOptions {
-  children: ComponentChildren;
-}
+/** Props for the compound tooltip root component. */
+export type TooltipRootProps = UseTooltipOptions & {
+  children: FreshUiChildren;
+};
 
-export interface TooltipTriggerProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for the tooltip trigger component. */
+export type TooltipTriggerProps = TooltipTriggerElementProps & {
+  children: FreshUiChildren;
   type?: 'button' | 'submit' | 'reset';
-}
+};
 
-export interface TooltipPositionerProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the tooltip positioner component. */
+export type TooltipPositionerProps = TooltipPositionerElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface TooltipContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the tooltip content component. */
+export type TooltipContentProps = TooltipContentElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface TooltipArrowProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the tooltip arrow component. */
+export type TooltipArrowProps = TooltipArrowElementProps & {
+  children?: FreshUiChildren;
+};
 
-export interface TooltipArrowTipProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children?: ComponentChildren;
-}
+/** Props for the tooltip arrow tip component. */
+export type TooltipArrowTipProps = TooltipArrowTipElementProps & {
+  children?: FreshUiChildren;
+};

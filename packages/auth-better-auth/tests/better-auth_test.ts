@@ -25,14 +25,10 @@ const pluginPassthroughAccepted = {
 } satisfies NetscriptBetterAuthOptions;
 void pluginPassthroughAccepted;
 
-const databaseOverrideRejected = {
-  prisma: {},
-  provider: 'sqlite',
-  betterAuthOptions: {
-    // @ts-expect-error NetScript owns better-auth database configuration.
-    database: 'consumer-owned-database',
-  },
-} satisfies NetscriptBetterAuthOptions;
+type BetterAuthEscapeHatchKeys = keyof NonNullable<
+  NetscriptBetterAuthOptions['betterAuthOptions']
+>;
+const databaseOverrideRejected: 'database' extends BetterAuthEscapeHatchKeys ? false : true = true;
 void databaseOverrideRejected;
 
 Deno.test('createBetterAuthAuthenticator maps getSession to Principal', async () => {

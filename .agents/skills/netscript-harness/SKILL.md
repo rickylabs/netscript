@@ -77,36 +77,32 @@ intent hint, not the final profile.
 
 For supervised NetScript work:
 
-- Claude is the supervisor/coordinator only. It may gather state, write prompts,
-  launch/check agents, and update handoff artifacts, but it must not perform the
-  heavy implementation or certify its own work.
-- PLAN-EVAL must run in OpenHands with minimax M3 unless the run artifact
-  explicitly records why that launch path is unavailable.
-- IMPL-EVAL must run in OpenHands with qwen 3.7 max unless the run artifact
-  explicitly records why that launch path is unavailable.
-- Implementation/fix work must run in WSL Codex subagents attached to the Codex
-  daemon so the user can monitor and steer the work from Desktop/mobile.
-- Claude plugin helpers such as `codex:rescue`, `codex:codex-rescue`,
-  `codex-companion.mjs`, and Claude internal `general-purpose` agents are not
-  valid implementation subagents for supervised runs. They are local Claude tool
-  surfaces unless WSL daemon status proves a mobile-visible Codex thread.
-- A Codex implementation slice is launched only when the run artifacts include
-  the WSL worktree path, concrete Codex thread id, daemon-managed
-  `remote-control` proof, and the follow-up command for steering that same
-  thread. Without those, record the launch as failed/not attached.
-- Every implementation slice must be independently trackable: branch/worktree
-  identity, agent/thread identity, files touched, tests run, commit hash, push
-  status, and PR comment/status.
-- Every slice must commit, push, and comment on the PR before the next slice is
-  considered complete.
-- Merge, publish, or release gates require all relevant tests to be green with
-  required features intact. For catalog-related work, do not delete, skip,
-  de-catalog, or bypass tests unless the evaluator verdict explicitly classifies
-  the test as stale/irrelevant and the PR comment records the rationale.
-- If an OpenHands launch is blocked, record the missing launch mechanism in
-  `worklog.md`/`drift.md`, then proceed only with the appropriate
-  daemon-attached Codex implementation slice if the user has authorized that
-  fallback.
+- Claude is the supervisor/coordinator only. It may gather state, write prompts, launch/check
+  agents, and update handoff artifacts, but it must not perform the heavy implementation or certify
+  its own work.
+- PLAN-EVAL must run in OpenHands with minimax M3 unless the run artifact explicitly records why
+  that launch path is unavailable.
+- IMPL-EVAL must run in OpenHands with qwen 3.7 max unless the run artifact explicitly records why
+  that launch path is unavailable.
+- Implementation/fix work must run in WSL Codex subagents attached to the Codex daemon so the user
+  can monitor and steer the work from Desktop/mobile.
+- Claude plugin helpers such as `codex:rescue`, `codex:codex-rescue`, `codex-companion.mjs`, and
+  Claude internal `general-purpose` agents are not valid implementation subagents for supervised
+  runs. They are local Claude tool surfaces unless WSL daemon status proves a mobile-visible Codex
+  thread.
+- A Codex implementation slice is launched only when the run artifacts include the WSL worktree
+  path, concrete Codex thread id, daemon-managed `remote-control` proof, and the follow-up command
+  for steering that same thread. Without those, record the launch as failed/not attached.
+- Every implementation slice must be independently trackable: branch/worktree identity, agent/thread
+  identity, files touched, tests run, commit hash, push status, and PR comment/status.
+- Every slice must commit, push, and comment on the PR before the next slice is considered complete.
+- Merge, publish, or release gates require all relevant tests to be green with required features
+  intact. For catalog-related work, do not delete, skip, de-catalog, or bypass tests unless the
+  evaluator verdict explicitly classifies the test as stale/irrelevant and the PR comment records
+  the rationale.
+- If an OpenHands launch is blocked, record the missing launch mechanism in `worklog.md`/`drift.md`,
+  then proceed only with the appropriate daemon-attached Codex implementation slice if the user has
+  authorized that fallback.
 
 ## Common Pitfalls
 
@@ -114,22 +110,20 @@ For supervised NetScript work:
   is a process failure.
 - **Self-evaluation** — The evaluator must be a separate session. The generator does not
   self-certify.
-- **Wrong evaluator surface** — Claude internal subagents are not PLAN-EVAL or
-  IMPL-EVAL. Use OpenHands with the required model, or record a blocked launch.
-- **Wrong implementation surface** — Claude should not do heavy implementation
-  during supervisor runs. Use WSL Codex daemon-attached subagents so the work is
-  mobile-visible and steerable.
-- **False attached-agent claims** — A Claude `codex:*` skill/helper is not a
-  WSL Codex daemon thread. Require daemon status plus thread id before claiming
-  the user can see or steer the subagent from phone/Desktop.
+- **Wrong evaluator surface** — Claude internal subagents are not PLAN-EVAL or IMPL-EVAL. Use
+  OpenHands with the required model, or record a blocked launch.
+- **Wrong implementation surface** — Claude should not do heavy implementation during supervisor
+  runs. Use WSL Codex daemon-attached subagents so the work is mobile-visible and steerable.
+- **False attached-agent claims** — A Claude `codex:*` skill/helper is not a WSL Codex daemon
+  thread. Require daemon status plus thread id before claiming the user can see or steer the
+  subagent from phone/Desktop.
 - **Carried-in plans as ground truth** — Re-baseline against current `main` before locking the plan.
 - **Monolithic commits** — Commit by slice, not by monolith. Each slice has its own gate.
-- **Raw root CLI noise as a verdict** — Package-quality check/lint/fmt evidence should use the
-  scoped wrappers `.llm/tools/run-deno-check.ts`, `.llm/tools/run-deno-lint.ts`, and
-  `.llm/tools/run-deno-fmt.ts`. They select explicit roots, file extensions, and excludes, then emit
-  compact structured output. Raw root `deno fmt --check` over Markdown, generated targets, or legacy
-  line-ending drift is not a package-quality verdict source unless the plan explicitly owns
-  repo-wide formatting.
+- **Raw root CLI noise as a verdict** — Package-quality check/lint/fmt evidence must come from the
+  scoped wrappers, not raw root `deno fmt --check` over Markdown, generated targets, or legacy
+  line-ending drift (which is not a package-quality verdict source unless the plan explicitly owns
+  repo-wide formatting). The wrapper invocations and verdict rules live in
+  `.agents/skills/netscript-tools`.
 
 ## Run Artifacts
 
@@ -273,8 +267,7 @@ User says "use harness"
 - [ ] PLAN-EVAL returned `PASS` before any implementation slice.
 - [ ] PLAN-EVAL used OpenHands/minimax M3, or the blocked launch was recorded.
 - [ ] Implementation slices used WSL Codex daemon-attached subagents.
-- [ ] Each Codex slice recorded WSL daemon-managed proof, thread id, worktree,
-      and steering command.
+- [ ] Each Codex slice recorded WSL daemon-managed proof, thread id, worktree, and steering command.
 - [ ] Commits are appended to `commits.md` immediately after creation.
 - [ ] Each implementation slice was committed, pushed, and commented on the PR.
 - [ ] IMPL-EVAL is a separate session from the generator.

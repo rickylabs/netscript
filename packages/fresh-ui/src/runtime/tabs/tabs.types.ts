@@ -1,5 +1,6 @@
-import type { ComponentChildren, JSX } from 'preact';
+import type { JSX } from 'preact';
 import type { MachineDataAttributes } from '../_internal/dom-types.ts';
+import type { FreshUiChildren } from '../_internal/public-props.ts';
 
 export type TabsRootElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
 export type TabsListElementProps = JSX.HTMLAttributes<HTMLDivElement> & MachineDataAttributes;
@@ -12,12 +13,12 @@ export type TabsOrientation = 'horizontal' | 'vertical';
 export type TabsActivationMode = 'automatic' | 'manual';
 
 export interface UseTabsOptions {
-  activationMode?: TabsActivationMode;
+  activationMode?: 'automatic' | 'manual';
   defaultValue?: string;
   id?: string;
   loop?: boolean;
   onValueChange?: (value: string) => void;
-  orientation?: TabsOrientation;
+  orientation?: 'horizontal' | 'vertical';
   value?: string;
 }
 
@@ -36,21 +37,24 @@ export interface UseTabsReturn {
   value: string;
 }
 
-export interface TabsRootProps extends UseTabsOptions {
-  children: ComponentChildren;
-}
+/** Props for the compound tabs root component. */
+export type TabsRootProps = UseTabsOptions & {
+  children: FreshUiChildren;
+};
 
-export interface TabsListProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children: ComponentChildren;
-}
+/** Props for the tabs list component. */
+export type TabsListProps = TabsListElementProps & {
+  children: FreshUiChildren;
+};
 
-export interface TabsTriggerProps
-  extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  children: ComponentChildren;
+/** Props for a tabs trigger component. */
+export type TabsTriggerProps = TabsTriggerElementProps & {
+  children: FreshUiChildren;
   value: string;
-}
+};
 
-export interface TabsContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
-  children: ComponentChildren;
+/** Props for a tabs content component. */
+export type TabsContentProps = TabsContentElementProps & {
+  children: FreshUiChildren;
   value: string;
-}
+};
