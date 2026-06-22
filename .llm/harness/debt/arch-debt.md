@@ -1084,3 +1084,55 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open.
 - **Gate:** Close when `trace.addEvent` / `withChildSpan` / `progress` from `createJobTools(ctx)` emit
   real spans/events and a runtime test proves a handler-emitted child span reaches the OTLP collector.
+
+
+## packages/auth-{better-auth,workos} — Archetype-2 folder layout + WorkOS feature-surface parity (`AUTH-ARCHETYPE-LAYOUT`)
+
+- **Reason:** A user review (2026-06-22) flagged two related gaps in the landed auth backends that
+  existing auth-debt entries do not cover:
+  - **(L) Archetype-2 folder layout non-conformance.** Both `@netscript/auth-better-auth` and
+    `@netscript/auth-workos` declare **Archetype-2 (Integration)** in their READMEs but do not
+    follow the canonical layout from `.llm/harness/archetypes/ARCHETYPE-2-integration.md` /
+    doctrine `04`/`05`:
+    - Composition-root factories (`createBetterAuthBackend`, `createWorkosBackend`,
+      `createNetscriptBetterAuth`, `createWorkos*Authenticator`) live directly in top-level
+      `src/better-auth-backend.ts` / `src/workos-backend.ts` / `src/workos-authenticator.ts`
+      instead of `src/application/create-*.ts`.
+    - Domain types (e.g. `BetterAuthSessionPayload`, `WorkosSessionAuthenticationSuccess`) are
+      inline in the backend files instead of `src/domain/types.ts`.
+    - No `src/testing/` test doubles are exported, so consumers must hand-mock
+      `BetterAuthInstance` / the WorkOS session client themselves.
+    - `src/ports/` is **legitimately** omitted (the consumed port `AuthBackendPort` lives in the
+      consuming `@netscript/plugin-auth-core`, per the doctrine "port lives in the consumer" rule),
+      and the one-adapter-per-package shape correctly skips an `adapters/` split — but neither
+      omission is documented in the package, which is what makes the layout read as "confusing."
+    This is the folder-layout dimension; it is distinct from (and complements) the existing
+    `auth layer — AS7 documentation architecture metadata` entry (missing `Archetype: <n>` token /
+    `docs/architecture.md`) and `AS2-CONSOLIDATION` (duplicated error/token helpers).
+  - **(P) WorkOS feature-surface parity.** The `seamless better-auth integration roadmap`
+    (R0–R5) gave `auth-better-auth` a `plugins`/`betterAuthOptions` passthrough (R0, commit
+    `539b808b`) plus a tracked program for schema-gen, interactive-flow, org primitives, and a
+    fluent `defineAuth()` builder. `auth-workos` received **no equivalent program**. The likely
+    justification is structural — WorkOS AuthKit is a managed hosted service with a fixed API and
+    no better-auth-style plugin ecosystem to pass through — so a 1:1 "plugins passthrough" is not
+    meaningful. **However**, WorkOS exposes rich product surface (organizations, SSO connections,
+    directory sync / SCIM, MFA, audit logs) that NetScript currently surfaces only as a pure
+    backend (sealed sessions + JWT/JWKS verification). Whether those warrant a parallel WorkOS
+    feature-surfacing / parity program (or an explicit "WorkOS is intentionally backend-only"
+    doctrine note) is an **open question to resolve**, not a settled non-gap.
+- **Owner:** Track-5 auth-plugin program / auth-layer doctrine follow-up.
+- **Target:** Fold (L) into the next auth-layer doctrine-conformance run (alongside
+  `AS2-CONSOLIDATION` and the AS7 metadata warnings — they share the same packages and a single
+  refactor pass can close all three). Resolve (P) as a user-facing parity decision before the auth
+  beta documentation freeze.
+- **Linked entries:** `seamless better-auth integration roadmap` (R0–R5),
+  `AS2-CONSOLIDATION`, `auth layer — AS7 documentation architecture metadata warnings`.
+- **Created:** 2026-06-22.
+- **Status:** open, DEBT_ACCEPTED — recorded at user direction ("record it in arch debt for now and
+  take care of that later") during the JSR-readiness umbrella merge/cleanup pass. Recording only; no
+  refactor in this pass. Both packages compile/test/lint/fmt clean with the current layout.
+- **Gate:** Close (L) when `auth-better-auth` and `auth-workos` either match the Archetype-2 layout
+  (`src/application/create-*.ts`, `src/domain/types.ts`, `src/testing/` fakes) or carry a documented
+  in-package justification for each omission, with `deno task arch:check` green. Close (P) when the
+  WorkOS feature-surface decision is recorded (either a parity program is planned or an explicit
+  backend-only scope note lands in the package README + auth doctrine).
