@@ -16,3 +16,4 @@ Format:
 - e0f606b1: docs(jsr): reconcile drifted readme templates
 - fa17d2ed: fix(fresh-ui): publish interactive prop types
 - c50d30a1: docs(jsr): refresh doctrine and agent skills
+- c105c90e: chore(agentic): remove stale impeccable skill
