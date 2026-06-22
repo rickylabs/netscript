@@ -61,3 +61,25 @@
 - Lock hygiene preserved — no `deno.lock` churn, no source edits, no implementation commits.
 - See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/plan-eval.md` for full findings.
 - See `.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` for drift notes.
+
+## 2026-06-23 — S2 implementation: Tier 2 option fields
+
+- Scope:
+  - Removed the deprecated MSSQL `trustedConnection` option and folded integrated security onto the canonical
+    `authentication.type = "ntlm"` path.
+  - Removed deprecated Fresh `serveStaticFiles` and `registerFsRoutes` options, using canonical
+    `staticFiles` and `fsRoutes` instead.
+  - Updated Fresh tests to use canonical options.
+- Consumer proof:
+  - `trustedConnection`, `serveStaticFiles`, and deprecated option-shaped `registerFsRoutes?:` have zero hits in
+    `packages/database` and `packages/fresh` after the edit.
+- Gates:
+  - `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/database --root packages/fresh --ext ts,tsx --pretty` — PASS, 167 files, 2 batches, 0 occurrences.
+  - `deno lint packages/database/adapters packages/database/extensions packages/database/ports packages/database/prisma-tracing.ts packages/database/mod.ts packages/fresh/src packages/fresh/mod.ts` — PASS, 150 files.
+  - `deno fmt --check packages/database/adapters packages/database/extensions packages/database/ports packages/database/prisma-tracing.ts packages/database/mod.ts packages/fresh/src packages/fresh/mod.ts` — PASS, 153 files.
+  - `deno doc --lint packages/database/mod.ts` — PASS, with npm `@types/node` unresolved-type warnings only.
+  - `deno doc --lint packages/fresh/mod.ts` — PASS.
+  - `deno task --cwd packages/database test` — PASS, 5 tests / 7 steps.
+  - `deno task --cwd packages/fresh test` — PASS, 141 tests.
+  - `rtk proxy deno task arch:check` — PASS exit 0; emitted existing dependency catalog warnings and doctrine warnings only.
+- Lock/cast hygiene: no `deno.lock` change; no new `as` casts in the diff.

@@ -18,7 +18,7 @@ class TrackingApp extends App<Record<string, never>> {
 
 Deno.test('defineFreshApp reuses a provided app instance', () => {
   const app = new TrackingApp();
-  const result = defineFreshApp({ app, serveStaticFiles: false, registerFsRoutes: false });
+  const result = defineFreshApp({ app, staticFiles: false, fsRoutes: false });
 
   assert(result === app, 'Expected defineFreshApp to return the provided app instance');
 });
@@ -35,7 +35,7 @@ Deno.test('defineFreshApp can construct through an adapter factory', () => {
       return app;
     },
     staticFiles: false,
-    registerFsRoutes: false,
+    fsRoutes: false,
   });
 
   assert(result === app, 'Expected defineFreshApp to return the factory app instance');
@@ -46,7 +46,7 @@ Deno.test('defineFreshApp applies lifecycle hooks before request middleware runs
   const lifecycle: string[] = [];
   const app = defineFreshApp<{ shared?: string }>({
     name: 'playground',
-    registerFsRoutes: false,
+    fsRoutes: false,
     staticFiles: false,
     preConfigure: () => {
       lifecycle.push('preConfigure');
@@ -79,7 +79,7 @@ Deno.test('defineFreshApp can override static middleware registration', async ()
   const customStatic: Middleware<Record<string, never>> = () => new Response('custom static');
   const app = defineFreshApp({
     staticFiles: customStatic,
-    registerFsRoutes: false,
+    fsRoutes: false,
   });
 
   const response = await app.handler()(new Request('http://localhost/asset.txt'));
@@ -92,7 +92,7 @@ Deno.test('defineFreshApp can override static middleware registration', async ()
 Deno.test('defineFreshApp can disable static middleware through the adapter seam', async () => {
   const app = defineFreshApp({
     staticFiles: false,
-    registerFsRoutes: false,
+    fsRoutes: false,
     configure: (configuredApp) => {
       configuredApp.get('/health', () => new Response('ok'));
     },
@@ -110,8 +110,8 @@ Deno.test('defineFreshApp can mount file-system routes at a pattern', () => {
 
   defineFreshApp({
     app,
-    serveStaticFiles: false,
-    registerFsRoutes: '/docs',
+    staticFiles: false,
+    fsRoutes: '/docs',
   });
 
   assert(app.fsRouteCalls.length === 1, 'Expected a single fsRoutes call');
@@ -126,7 +126,6 @@ Deno.test('defineFreshApp can override file-system route registration', () => {
   defineFreshApp({
     app,
     staticFiles: false,
-    registerFsRoutes: '/admin',
     fsRoutes: (target, pattern) => {
       receivedApp = target;
       receivedPattern = pattern;
@@ -134,6 +133,6 @@ Deno.test('defineFreshApp can override file-system route registration', () => {
   });
 
   assert(receivedApp === app, 'Expected fsRoutes override to receive the app');
-  assert(receivedPattern === '/admin', `Unexpected fsRoutes pattern: ${receivedPattern}`);
+  assert(receivedPattern === undefined, `Unexpected fsRoutes pattern: ${receivedPattern}`);
   assert(app.fsRouteCalls.length === 0, 'Expected default fsRoutes not to run');
 });
