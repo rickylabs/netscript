@@ -190,7 +190,7 @@ Seeded from
 - **Gate:** F-6; close when `packages/plugin-triggers-core` dry-run passes without
   `--allow-slow-types`.
 
-## plugins/triggers — deferred trigger action scheduler missing
+## plugins/triggers — deferred trigger action scheduler missing (`triggers-defer-unsupported`)
 
 - **Reason:** `DeferAction` models `kind: 'defer'` with an `until` timestamp, but the runtime has no
   one-shot scheduler/replay port that can re-dispatch the processed trigger action later. S2 now
@@ -422,7 +422,7 @@ Seeded from
   `console.warn` is absent from
   `packages/plugin-streams-core/src/application/create-durable-stream.ts`.
 
-## plugins/streams — durable topic publish/subscribe transport deferred
+## plugins/streams — durable topic publish/subscribe transport deferred (`streams-manifest-helpers-unsupported`)
 
 - **Reason:** `defineStreamProducer` and `defineStreamConsumer` are manifest-layer helpers in the
   Tier 2 plugin package. The existing real transport is `@netscript/plugin-streams-core`
@@ -989,3 +989,20 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Gate:** Close R0 when `createNetscriptBetterAuth({ plugins: [...] })` type-checks and forwards
   to `BetterAuthOptions` with a green IMPL-EVAL; close the program when R1–R5 land under their own
   plan.
+
+## packages/workers — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
+
+- **Reason:** The scaffold-generated worker handler toolkit `createJobTools(ctx)` exposes
+  `trace.addEvent`, `withChildSpan`, and `progress` helpers that are currently no-op stubs. Job-level
+  telemetry is real — dispatch, execution, step events, progress, scheduler runs, and subprocess
+  trace continuation emit OpenTelemetry spans visible in Aspire (OTLP `http://localhost:4318`). Only
+  these in-handler scaffold helpers do not yet emit; their signatures are stable, so handler code
+  written against them keeps compiling and will start emitting once the helpers are implemented. For
+  custom handler spans today, call `@netscript/telemetry` helpers directly.
+- **Owner:** `@netscript/plugin-workers-core` / scaffold telemetry follow-up.
+- **Target:** Before advertising in-handler `createJobTools` span/event/progress emission as supported.
+- **Linked plan:** `.llm/tmp/run/docs-v4-ia-deepening/caveat-inventory.md` (Cluster C).
+- **Created:** 2026-06-22
+- **Status:** open.
+- **Gate:** Close when `trace.addEvent` / `withChildSpan` / `progress` from `createJobTools(ctx)` emit
+  real spans/events and a runtime test proves a handler-emitted child span reaches the OTLP collector.
