@@ -1,8 +1,8 @@
 # Diagram sources (`_diagrams/`)
 
 Diagrams in the docs site are **committed static SVGs**, not client-side Mermaid
-(locked decision OD1). This folder is the underscore-prefixed source-of-truth that
-**Lume ignores** (it is never published).
+(locked decision OD1). This folder is the underscore-prefixed source-of-truth
+that **Lume ignores** (it is never published).
 
 ## How it works
 
@@ -18,23 +18,35 @@ Diagrams in the docs site are **committed static SVGs**, not client-side Mermaid
       }) }}
    ```
 
-The component emits `<figure><img …/><figcaption>…</figcaption></figure>`, so the
-diagram is visible with JavaScript off and is a diffable asset in review.
+The component emits `<figure><img …/><figcaption>…</figcaption></figure>`, so
+the diagram is visible with JavaScript off and is a diffable asset in review.
 
-## Rendering is a SEPARATE dev step
+## Render and check
 
-Rendering is **not** part of `deno task build`. The published site depends only on
-the committed SVGs under `assets/diagrams/`, keeping the build dependency-free and
-offline-safe. To (re)render after editing a `.mmd`:
+Rendering is **not** part of `deno task build`. The published site depends only
+on the committed SVGs under `assets/diagrams/`, keeping the build
+dependency-free and offline-safe. The build does validate that every
+`comp.diagram` reference points at an existing committed SVG.
+
+The pinned renderer is `@mermaid-js/mermaid-cli@10.9.1`. Local and CI installs
+should use the same pin:
 
 ```
-deno run -A docs/site/_diagrams/render.ts
+npx --yes @mermaid-js/mermaid-cli@10.9.1 --version
 ```
 
-`render.ts` shells out to `@mermaid-js/mermaid-cli` (`mmdc`) via `npx`. If that
-toolchain is unavailable it prints instructions and exits non-zero — it never
-breaks the site build.
+To re-render after editing a `.mmd`:
 
-> The sample `request-lifecycle.svg` shipped here is hand-authored (theme-neutral
-> mid-tone strokes that read on both light and dark) to prove the pipeline without
-> requiring the renderer to be installed.
+```
+deno task diagrams:render
+```
+
+To prove the committed SVGs match their Mermaid sources:
+
+```
+deno task diagrams:check
+```
+
+`render.ts` shells out to the pinned Mermaid CLI via `npx`. If that toolchain is
+unavailable it prints instructions and exits non-zero; it never runs implicitly
+inside the docs build.

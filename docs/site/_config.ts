@@ -7,6 +7,7 @@ import langBash from "npm:highlight.js@11.11.1/lib/languages/bash";
 import langJson from "npm:highlight.js@11.11.1/lib/languages/json";
 import langTypescript from "npm:highlight.js@11.11.1/lib/languages/typescript";
 import { resolveXref } from "./_data/xref.ts";
+import { assertDiagramAssetsExist } from "./_diagrams/validate.ts";
 
 /**
  * NetScript external user documentation site (Diátaxis IA).
@@ -61,6 +62,10 @@ site.copy("favicon.svg");
 // Committed static diagram SVGs (OD1) + other site assets; base_path prefixes hrefs.
 site.copy("assets");
 
+site.addEventListener("beforeBuild", async () => {
+  await assertDiagramAssetsExist();
+});
+
 // xref (OD2/OD3): resolve a stable key -> href. Throws on an unknown key so the
 // Lume build exits non-zero (build = link checker). Filter form returns the href:
 //   {{ "cap:services" |> xref }}
@@ -71,8 +76,12 @@ site.filter("xref", (key: string) => resolveXref(key).href);
 // characters. This filter converts backtick pairs to real <code> in component
 // fields that emit author text (apiTable caption/cells/desc), matching how the
 // markdown body already renders inline code. Leaves existing HTML untouched.
-site.filter("ic", (s: unknown) =>
-  typeof s === "string" ? s.replace(/`([^`]+)`/g, "<code>$1</code>") : (s ?? "")
+site.filter(
+  "ic",
+  (s: unknown) =>
+    typeof s === "string"
+      ? s.replace(/`([^`]+)`/g, "<code>$1</code>")
+      : (s ?? ""),
 );
 
 // Expose the resolver + raw map as global data for `comp.xref` (so the component

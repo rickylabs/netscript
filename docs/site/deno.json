@@ -2,7 +2,9 @@
   "tasks": {
     "lume": "echo \"import 'lume/cli.ts'\" | deno run --unstable-temporal -A -",
     "build": "deno task lume",
-    "serve": "deno task lume -- -s"
+    "serve": "deno task lume -- -s",
+    "diagrams:render": "deno run -A _diagrams/render.ts",
+    "diagrams:check": "deno run -A _diagrams/render.ts --check"
   },
   "imports": {
     "lume/": "https://deno.land/x/lume@v2.5.4/"

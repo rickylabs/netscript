@@ -9,7 +9,7 @@ flowchart LR
   end
 
   In --> SvcSpan
-  SvcSpan -->|enqueue (propagated)| WorkerSpan
+  SvcSpan -->|enqueue propagated| WorkerSpan
   WorkerSpan -->|continued| SagaSpan
 
   Otlp["OTLP collector"]
