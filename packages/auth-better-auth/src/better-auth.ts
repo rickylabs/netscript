@@ -50,6 +50,22 @@ export interface NetscriptBetterAuthOptions {
     readonly enabled?: boolean;
     readonly debug?: boolean;
   };
+  /**
+   * better-auth server plugins.
+   *
+   * Table-backed plugins such as organization, twoFactor, admin, and apiKey
+   * require their better-auth schema to be generated and migrated before they
+   * are runnable. Stateless plugins such as bearer and jwt can run through this
+   * passthrough alone.
+   */
+  readonly plugins?: BetterAuthOptions['plugins'];
+  /**
+   * Additional better-auth options not surfaced directly by NetScript.
+   *
+   * NetScript owns `database` through the Prisma adapter, and `plugins` should
+   * use the dedicated top-level field.
+   */
+  readonly betterAuthOptions?: Omit<BetterAuthOptions, 'database' | 'plugins'>;
 }
 
 /** Session shape returned by `auth.api.getSession`. */
@@ -113,19 +129,40 @@ export interface BetterAuthAuthenticatorOptions {
  *
  * @example
  * ```ts
+ * import { organization } from 'better-auth/plugins';
+ *
  * const auth = createNetscriptBetterAuth({
  *   prisma,
  *   provider: 'postgresql',
  *   secret: Deno.env.get('BETTER_AUTH_SECRET')!,
+ *   plugins: [organization()],
  * });
  * ```
  */
 export function createNetscriptBetterAuth(
   options: NetscriptBetterAuthOptions,
 ): BetterAuthInstance {
-  const { prisma, provider, debugLogs, usePlural, transaction, ...betterAuthOptions } = options;
-  const configuredOptions: BetterAuthOptions = {
+  return betterAuth(configureNetscriptBetterAuthOptions(options));
+}
+
+/** Compose better-auth options with NetScript-owned Prisma adapter precedence. */
+export function configureNetscriptBetterAuthOptions(
+  options: NetscriptBetterAuthOptions,
+): BetterAuthOptions {
+  const {
+    prisma,
+    provider,
+    debugLogs,
+    usePlural,
+    transaction,
+    plugins,
+    betterAuthOptions,
+    ...explicitBetterAuthOptions
+  } = options;
+  return {
     ...betterAuthOptions,
+    ...explicitBetterAuthOptions,
+    ...(plugins === undefined ? {} : { plugins }),
     database: prismaAdapter(prisma, {
       provider,
       debugLogs,
@@ -133,7 +170,6 @@ export function createNetscriptBetterAuth(
       transaction,
     }),
   };
-  return betterAuth(configuredOptions);
 }
 
 /** Creates a NetScript authenticator backed by `auth.api.getSession`.
