@@ -125,8 +125,6 @@ export interface ServiceEntry extends BaseEntry, ReferenceEntry {
   Entrypoint: string;
   /** Service working directory. */
   Workdir?: string;
-  /** Legacy service dependency names merged into service references. */
-  DependsOn?: string[];
 }
 
 /** Frontend, desktop, or task application entry. */
@@ -385,7 +383,6 @@ const ServiceEntryZod = z.object({
   Port: z.number().int().positive(),
   Entrypoint: z.string().default('src/main.ts'),
   Workdir: z.string().optional(),
-  DependsOn: z.array(z.string()).optional(),
 }).meta({ title: 'ServiceEntry', description: 'Configuration for a backend service resource' });
 /** Service entry schema. */
 export const ServiceEntrySchema: AspireSchema<ServiceEntry> = ServiceEntryZod;
@@ -543,7 +540,6 @@ export const AppSettingsSchema: AspireSchema<AppSettings> = AppSettingsZod;
  * Resolves default values that depend on the record key (resource name).
  *
  * - Resolves `Workdir` defaults based on section convention
- * - Merges legacy `DependsOn` into `ServiceReferences`
  * - Generates `ConcurrencyEnvVar` default from key name
  *
  * @param config - The parsed NetScript configuration
@@ -556,14 +552,6 @@ function resolveDefaults<T extends NetScriptConfig>(config: T): T {
   for (const [key, entry] of Object.entries(result.Services)) {
     if (!entry.Workdir) {
       entry.Workdir = `services/${key}`;
-    }
-    // Merge legacy DependsOn → ServiceReferences
-    if (entry.DependsOn?.length) {
-      const existing = new Set(entry.ServiceReferences ?? []);
-      for (const dep of entry.DependsOn) {
-        existing.add(dep);
-      }
-      entry.ServiceReferences = [...existing];
     }
   }
 

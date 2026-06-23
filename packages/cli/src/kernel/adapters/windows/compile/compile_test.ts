@@ -86,6 +86,21 @@ async function createCompileProject(): Promise<string> {
     resolve(projectRoot, 'dotnet', 'AppHost', 'appsettings.json'),
     JSON.stringify({
       NetScript: {
+        Services: {
+          users: {
+            Runtime: 'deno',
+            Port: 3001,
+            Entrypoint: 'src/main.ts',
+            Workdir: 'services/users',
+          },
+          orders: {
+            Runtime: 'deno',
+            Port: 3002,
+            Entrypoint: 'src/main.ts',
+            Workdir: 'services/orders',
+            ServiceReferences: ['users'],
+          },
+        },
         Plugins: {
           'workers-api': {
             Enabled: true,
@@ -171,5 +186,18 @@ Deno.test('extractCompileTargets emits metadata-driven background processor targ
   assert(
     triggerProcessor?.defaultConcurrency === 10,
     'trigger target should preserve plugin default concurrency',
+  );
+});
+
+Deno.test('loadDeployConfig maps service references to compile target dependencies', async () => {
+  const config = await getConfig();
+  const targets = extractCompileTargets(config);
+  const byName = new Map(targets.map((target) => [target.name, target]));
+
+  const orders = byName.get('orders');
+  assert(orders, 'orders service compile target should exist');
+  assert(
+    JSON.stringify(orders.dependsOn) === JSON.stringify(['users']),
+    'orders service should carry canonical ServiceReferences as dependsOn',
   );
 });

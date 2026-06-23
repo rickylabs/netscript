@@ -130,7 +130,7 @@ export function resolveServices(
         workspaceWorkdir,
         join(paths.services, name),
       ),
-      dependsOn: appSvc?.DependsOn ?? nsSvc.dependsOn,
+      dependsOn: appSvc?.ServiceReferences ?? nsSvc.dependsOn,
       permissions: appSvc?.Permissions ?? defaultPermissions,
       description: appSvc?.Description,
     };
@@ -146,7 +146,7 @@ export function resolveServices(
       port: appSvc.Port ?? 3000,
       entrypoint: appSvc.Entrypoint ?? 'src/main.ts',
       workdir: resolveWorkdir(appSvc.Workdir, workspaceWorkdir, join(paths.services, name)),
-      dependsOn: appSvc.DependsOn,
+      dependsOn: appSvc.ServiceReferences,
       permissions: appSvc.Permissions ?? defaultPermissions,
       description: appSvc.Description,
     };

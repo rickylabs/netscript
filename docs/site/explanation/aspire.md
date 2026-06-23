@@ -197,7 +197,7 @@ dependency from each entry:
 {{ comp.apiTable({
   caption: "Reference fields on a resource entry (resolved at compose time)",
   rows: [
-    { name: "ServiceReferences", type: "string[]", desc: "Other services this resource calls. `extractServiceReferences` also merges the legacy `DependsOn` alias and deduplicates." },
+    { name: "ServiceReferences", type: "string[]", desc: "Other services this resource calls. `extractServiceReferences` deduplicates repeated entries." },
     { name: "PluginReferences", type: "string[]", desc: "Plugin APIs this resource calls. `extractPluginReferences` returns them for endpoint wiring (e.g. workers-api → sagas-api)." },
     { name: "RequiresDb", type: "boolean", desc: "Whether the resource needs the Postgres connection. `extractDependencies` normalizes it (default false)." },
     { name: "RequiresKv", type: "boolean", desc: "Whether the resource needs the Garnet/KV connection. Normalized the same way (default false)." }

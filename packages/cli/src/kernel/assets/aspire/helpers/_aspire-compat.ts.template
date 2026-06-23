@@ -200,15 +200,11 @@ export function buildOtelEnvVars(
 export function extractServiceReferences(
   entry: {
     readonly ServiceReferences?: readonly string[];
-    readonly DependsOn?: readonly string[];
   },
 ): string[] {
   const refs = new Set<string>();
   if (entry.ServiceReferences) {
     for (const ref of entry.ServiceReferences) refs.add(ref);
-  }
-  if (entry.DependsOn) {
-    for (const ref of entry.DependsOn) refs.add(ref);
   }
   return [...refs];
 }

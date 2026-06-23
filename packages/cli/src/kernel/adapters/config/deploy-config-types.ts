@@ -27,7 +27,7 @@ export interface RawServiceConfig {
   Port?: number;
   Entrypoint?: string;
   Workdir?: string;
-  DependsOn?: string[];
+  ServiceReferences?: string[];
   Permissions?: string[];
   Description?: string;
 }
