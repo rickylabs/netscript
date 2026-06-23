@@ -4,14 +4,13 @@
  * @module
  */
 
-export { emitJobToStream, getWorkersStreamProducer, startWorkersStreamMirror } from './producer.ts';
+export { createStreamMutationHook, emitJobToStream, getWorkersStreamProducer } from './producer.ts';
 export type {
   ExecutionConcept,
   ExecutionMutationHook,
   ExecutionRecord,
   ExecutionStatus,
   ExecutionTriggerType,
-  WorkersStreamMirrorState,
   WorkersStreamProducer,
 } from './producer.ts';
 export {

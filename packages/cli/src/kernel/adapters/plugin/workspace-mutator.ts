@@ -1,4 +1,3 @@
-import { outputWarning } from '../../presentation/output/default-output.ts';
 import { join } from '@std/path';
 import type { BackgroundProcessorEntry, CacheEntry, PluginEntry } from '@netscript/aspire/types';
 import { addWorkspaceMember } from '../scaffold/workspace-writer.ts';
@@ -244,17 +243,4 @@ export class PluginWorkspaceMutator {
     return !hadCache;
   }
 
-  /**
-   * Deprecated no-op for legacy callers.
-   *
-   * Plugin registration is now sourced from `netscript.config.ts`; the framework
-   * no longer edits userland `plugins/registry.ts`.
-   *
-   * @deprecated Use `netscript.config.ts` plugin declarations instead.
-   */
-  async updatePluginRegistry(projectRoot: string, pluginName: string): Promise<void> {
-    outputWarning(
-      `Skipped legacy plugin registry update for "${pluginName}" in ${projectRoot}; declare plugins in netscript.config.ts instead.`,
-    );
-  }
 }

@@ -27,12 +27,6 @@ export type {
 
 let producer: WorkersStreamProducer | undefined;
 
-/** Execution-state surface needed to mirror worker changes into streams. */
-export interface WorkersStreamMirrorState {
-  /** Register the mutation hook invoked by execution-state writes. */
-  setMutationHook(hook: ExecutionMutationHook): void;
-}
-
 /**
  * Get (or create) the singleton workers execution stream producer.
  *
@@ -66,15 +60,4 @@ export function createStreamMutationHook(): ExecutionMutationHook {
  */
 export function emitJobToStream(job: WorkerJob): void {
   emitJobToCoreStream(getWorkersStreamProducer(), job);
-}
-
-/**
- * Wire the durable stream producer to the shared ExecutionState singleton.
- * Call once at service startup.
- *
- * This is synchronous — no KV watch loop, no async setup. The function name
- * is kept for backward compatibility with existing `main.ts` imports.
- */
-export function startWorkersStreamMirror(state: WorkersStreamMirrorState): void {
-  state.setMutationHook(createStreamMutationHook());
 }

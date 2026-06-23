@@ -20,7 +20,7 @@ import type { PluginServiceContext } from '@netscript/plugin/sdk';
 import { createService } from '@netscript/service';
 import { router } from './router.ts';
 import { registerPluginJobs } from './init.ts';
-import { startWorkersStreamMirror } from '../../streams/server.ts';
+import { createStreamMutationHook } from '../../streams/server.ts';
 import { createWorkersServiceRuntime } from './service-runtime.ts';
 
 export type { PluginServiceContext } from '@netscript/plugin/sdk';
@@ -64,7 +64,7 @@ export default async function createWorkersService(
     .withServiceInfo()
     .onStartup(async () => {
       await registerPluginJobs(runtime);
-      startWorkersStreamMirror(runtime.executionState);
+      runtime.executionState.setMutationHook(createStreamMutationHook());
 
       console.log(
         `Subscribe: http://localhost:${port}/api/v1/workers/subscribe (KV watch SSE)`,
