@@ -1,9 +1,8 @@
 # Architecture Debt Registry
 
-Seeded from
-`docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on
-2026-04-29. Entries track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts.
-`Keep` and `Defer` verdicts are not seeded here.
+Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2026-04-29. Entries
+track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
+verdicts are not seeded here.
 
 ## packages/runtime-config — doctrine verdict Refactor
 
@@ -40,9 +39,8 @@ Seeded from
 - **Target:** S1 alpha package-quality wave.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
 - **Created:** 2026-06-06
-- **Status:** closed 2026-06-06 — slice 11 renamed `helpers.ts` to
-  `src/domain/saga-inputs.ts` and kept the public `defineSagas`/input type exports stable through
-  `src/public/mod.ts`.
+- **Status:** closed 2026-06-06 — slice 11 renamed `helpers.ts` to `src/domain/saga-inputs.ts` and
+  kept the public `defineSagas`/input type exports stable through `src/public/mod.ts`.
 - **Gate:** F-11, AP-16, `deno check mod.ts`
 
 ## packages/config/src/domain/mod.ts — justified domain barrel
@@ -63,9 +61,8 @@ Seeded from
 - **Target:** S1 alpha package-quality wave.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave1-contracts--contracts/plan.md`
 - **Created:** 2026-06-06
-- **Status:** closed 2026-06-06 — slices 19 and 20 moved `paginated-query.ts` and
-  `transform.ts` into `src/application/` as role-named modules and removed the `helpers/`
-  directory.
+- **Status:** closed 2026-06-06 — slices 19 and 20 moved `paginated-query.ts` and `transform.ts`
+  into `src/application/` as role-named modules and removed the `helpers/` directory.
 - **Gate:** F-11, AP-16, `deno check mod.ts`
 
 ## packages/contracts/crud — accepted root subpath layout
@@ -93,10 +90,10 @@ Seeded from
 
 ## root toolchain — T5 deferred esbuild audit advisory
 
-- **Reason:** `deno audit` reports GHSA-gv7w-rqvm-qjhr for transitive `esbuild <0.28.1`.
-  The runtime-reachable critical `@orpc/client` advisory was remediated by moving ORPC imports to
-  `^1.14.6`; this remaining high advisory is deferred as approved toolchain debt because it is
-  tied to the Vite/esbuild stack rather than a NetScript runtime dependency path.
+- **Reason:** `deno audit` reports GHSA-gv7w-rqvm-qjhr for transitive `esbuild <0.28.1`. The
+  runtime-reachable critical `@orpc/client` advisory was remediated by moving ORPC imports to
+  `^1.14.6`; this remaining high advisory is deferred as approved toolchain debt because it is tied
+  to the Vite/esbuild stack rather than a NetScript runtime dependency path.
 - **Owner:** Toolchain upgrade T5 follow-up.
 - **Target:** Revisit when the Vite/esbuild dependency chain can move to `esbuild >=0.28.1`.
 - **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/plan.md` (A-9).
@@ -112,12 +109,11 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** closed 2026-06-07 — corrected during Wave 2c after the previous
-  2026-05-01 closure note was found to reference unrelated CLI permission
-  documentation while `packages/cron/interfaces/` still existed. Real evidence:
-  `packages/cron/interfaces/` was renamed to `packages/cron/ports/`, the public
-  `./types` export was replaced with `./ports`, and `tasks.check` now checks
-  `ports/mod.ts`.
+- **Status:** closed 2026-06-07 — corrected during Wave 2c after the previous 2026-05-01 closure
+  note was found to reference unrelated CLI permission documentation while
+  `packages/cron/interfaces/` still existed. Real evidence: `packages/cron/interfaces/` was renamed
+  to `packages/cron/ports/`, the public `./types` export was replaced with `./ports`, and
+  `tasks.check` now checks `ports/mod.ts`.
 - **Gate:** F-3, F-11
 
 ## packages/database — AP-17 / doctrine verdict Refactor
@@ -208,10 +204,12 @@ Seeded from
 
 - **Reason:** `PrismaSagaStore` now provides durable saga state persistence, but idempotency and
   applied-key storage remain backed by KV (`KvSagaIdempotencyStore` / `KvSagaAppliedKeyStore`).
-  Prisma `SagaIdempotencyPort` parity is intentionally out of scope for the sagas-prisma-store slice.
+  Prisma `SagaIdempotencyPort` parity is intentionally out of scope for the sagas-prisma-store
+  slice.
 - **Owner:** Prime-time saga durability follow-up.
 - **Target:** Before advertising fully Prisma-only saga runtime persistence.
-- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`
 - **Created:** 2026-06-20
 - **Status:** open
 - **Gate:** F-13; add Prisma idempotency/applied-key adapter tests and a Prisma-backed duplicate
@@ -219,10 +217,10 @@ Seeded from
 
 ## auth layer — AS7 documentation architecture metadata warnings
 
-- **Reason:** AS7's auth-scoped doctrine gate is hard-fail clean, but reports documentation warnings:
-  `packages/plugin-auth-core/README.md` has one TypeScript example instead of the doctrine proxy's
-  two-example target, `packages/plugin-auth-core/docs/architecture.md` does not include an explicit
-  `Archetype: <n>` token, and the auth backend packages/plugin omit package-local
+- **Reason:** AS7's auth-scoped doctrine gate is hard-fail clean, but reports documentation
+  warnings: `packages/plugin-auth-core/README.md` has one TypeScript example instead of the doctrine
+  proxy's two-example target, `packages/plugin-auth-core/docs/architecture.md` does not include an
+  explicit `Archetype: <n>` token, and the auth backend packages/plugin omit package-local
   `docs/architecture.md` files because their READMEs carry the public contract.
 - **Owner:** Auth architecture follow-up.
 - **Target:** Before auth beta documentation freeze.
@@ -361,17 +359,17 @@ Seeded from
 - **Target:** 2026-Q3 doctrine remediation.
 - **Linked plan:** `.llm/tmp/run/doc-harness-doctrine-refactor--harness-v2-plan/plan.md`
 - **Created:** 2026-04-29
-- **Status:** closed 2026-06-08 — Wave 3 `@netscript/plugin` host track verified the old
-  monolithic `types.ts` no longer exists. The package now exposes role-named `src/domain/`,
-  `src/ports/`, `src/config/`, `src/cli/`, `src/sdk/`, `src/testing/`, and diagnostics surfaces
-  through curated entrypoints. Remaining builder size debt is tracked separately below.
+- **Status:** closed 2026-06-08 — Wave 3 `@netscript/plugin` host track verified the old monolithic
+  `types.ts` no longer exists. The package now exposes role-named `src/domain/`, `src/ports/`,
+  `src/config/`, `src/cli/`, `src/sdk/`, `src/testing/`, and diagnostics surfaces through curated
+  entrypoints. Remaining builder size debt is tracked separately below.
 - **Gate:** F-1, F-3, F-5, F-11
 
 ## packages/plugin — T4 slow-type publish carve-out
 
-- **Reason:** Plugin manifest/builder generic helpers still require `deno publish --allow-slow-types`
-  under Deno 2.8 publish analysis. This is accepted score-impacting debt for the toolchain upgrade,
-  not a workspace default.
+- **Reason:** Plugin manifest/builder generic helpers still require
+  `deno publish --allow-slow-types` under Deno 2.8 publish analysis. This is accepted
+  score-impacting debt for the toolchain upgrade, not a workspace default.
 - **Owner:** Toolchain upgrade T4 follow-up.
 - **Target:** Reduce generic helper leakage behind explicit public plugin definition interfaces
   before beta.
@@ -409,9 +407,9 @@ Seeded from
 ## packages/plugin-streams-core — AP-13 console.warn runtime reporting
 
 - **Reason:** `DurableStreamProducer` currently uses `console.warn` for connection, pending-event,
-  serialization, and primary-key visibility in published runtime code. The warnings are intentionally
-  retained for alpha operator visibility; replacing them correctly requires a structured telemetry or
-  logger dependency that is outside Wave 4a's package-quality scope.
+  serialization, and primary-key visibility in published runtime code. The warnings are
+  intentionally retained for alpha operator visibility; replacing them correctly requires a
+  structured telemetry or logger dependency that is outside Wave 4a's package-quality scope.
 - **Owner:** `@netscript/plugin-streams-core` maintainers.
 - **Target:** Telemetry-integration wave before beta runtime stabilization.
 - **Linked plan:** `.llm/tmp/run/feat-package-quality-wave4-runtimes--4a-streams-watchers/plan.md`
@@ -780,9 +778,9 @@ Seeded from
 
 - **Reason:** `deno check` on the `@netscript/cli` public graph (task `check`, via `maintainer.ts`)
   reports 3 isolated-declarations slow-type errors (TS9016/TS9027) on the shorthand `_internal`
-  object export in
-  `packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin.ts:205`. The object needs
-  an explicit type annotation (or non-shorthand entries) to satisfy `--isolatedDeclarations`.
+  object export in `packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin.ts:205`.
+  The object needs an explicit type annotation (or non-shorthand entries) to satisfy
+  `--isolatedDeclarations`.
 - **Owner:** `@netscript/cli` maintainers / CLI doctrine track (Archetype 6).
 - **Target:** Next CLI package-quality wave; not the Wave 2c messaging sub-wave.
 - **Linked plan:** `.llm/tmp/run/refactor-cli-doctrine-rewrite/plan.md` (CLI track).
@@ -796,13 +794,14 @@ Seeded from
 
 ## root toolchain — R3 held dependency majors (`toolchain-r3-held-dependency-majors`)
 
-| Status | Package | Reason | Revisit |
-| ------ | ------- | ------ | ------- |
+| Status        | Package                     | Reason                                                            | Revisit                                                |
+| ------------- | --------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------ |
 | DEBT_ACCEPTED | `npm:vite` `7.2.2`→`8.0.16` | unvetted major; Vite 8 is outside R3's safe patch/minor bump rule | Fresh Vite integration and scaffold runtime validation |
 
 - **Owner:** Toolchain upgrade R3 follow-up.
 - **Target:** Before beta dependency freeze.
-- **Linked plan:** `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/sub-agent-briefs/R3.md`.
+- **Linked plan:**
+  `.llm/tmp/run/chore-deno-2.8-aspire-13.4-upgrade--research/sub-agent-briefs/R3.md`.
 - **Created:** 2026-06-16.
 - **Status:** open, DEBT_ACCEPTED. R3 follow-up removed `@fedify/amqp`, `@fedify/denokv`,
   `@fedify/redis`, `@durable-streams/state`, and `amqplib` from this debt after maintainer approval
@@ -819,10 +818,11 @@ Seeded from
   runtime API.
 - **Owner:** saga runtime maintainers.
 - **Target:** before beta package-quality freeze.
-- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`.
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/sagas-prisma-store/plan.md`.
 - **Created:** 2026-06-20.
-- **Status:** open, DEBT_ACCEPTED for `sagas-prisma-store`; no `SagaStorePort` or
-  `KvSagaStore` behavior changes are included in the debt.
+- **Status:** open, DEBT_ACCEPTED for `sagas-prisma-store`; no `SagaStorePort` or `KvSagaStore`
+  behavior changes are included in the debt.
 - **Gate:** F-16 folder cardinality is back under threshold and F-13 saga runtime invariants remain
   green.
 
@@ -838,7 +838,8 @@ Seeded from
   consolidation point.
 - **Target:** Lift the shared error class + token helpers into `@netscript/plugin-auth-core` during
   AS3, then have AS2 backends import them.
-- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2a-backends-refactor/evaluate.md`.
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2a-backends-refactor/evaluate.md`.
 - **Created:** 2026-06-20.
 - **Status:** open, DEBT_ACCEPTED at AS2a PASS (qwen3.7-max run 27874783640, PR #87). Non-blocking;
   both backends compile/test/lint/fmt clean with the duplicated definitions.
@@ -848,16 +849,17 @@ Seeded from
 ## packages/auth-kv-oauth — OIDC e2e coverage + RFC 9207 iss validation (`AS2B-KV-OAUTH-DEBT`)
 
 - **Reason:** AS2b landed `@netscript/auth-kv-oauth` as a pure KV-backed OAuth2/OIDC
-  `AuthBackendPort` backend. The OIDC branch (nonce + id_token via `@panva/oauth4webapi`) is correctly
-  wired but **untested end-to-end** — the test provider fixture is `kind:'oauth'` and never exercises
-  `kind:'oidc'`. Separately, the callback `iss` response param is stored in the txn but not passed as
-  `expectedIssuer` to `validateAuthResponse`, so RFC 9207 issuer validation is not enforced
-  (defense-in-depth; state + PKCE already bind the response).
+  `AuthBackendPort` backend. The OIDC branch (nonce + id_token via `@panva/oauth4webapi`) is
+  correctly wired but **untested end-to-end** — the test provider fixture is `kind:'oauth'` and
+  never exercises `kind:'oidc'`. Separately, the callback `iss` response param is stored in the txn
+  but not passed as `expectedIssuer` to `validateAuthResponse`, so RFC 9207 issuer validation is not
+  enforced (defense-in-depth; state + PKCE already bind the response).
 - **Owner:** Track-5 auth-plugin program. Item 1 (OIDC e2e) folds naturally into AS3, where the
   unified oRPC service exercises the OIDC flow end-to-end.
 - **Target:** Add an OIDC-kind provider fixture (with issuer) validating nonce round-trip + id_token
   claim extraction; pass `expectedIssuer` on callback validation. Address by/within AS3.
-- **Linked plan:** `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2b-kv-oauth/evaluate.md`.
+- **Linked plan:**
+  `.llm/tmp/run/feat-framework-prime-time--supervisor/slices/auth-plugin/as2b-kv-oauth/evaluate.md`.
 - **Created:** 2026-06-20.
 - **Status:** open, DEBT_ACCEPTED at AS2b PASS (qwen3.7-max run 27874924828, PR #88). Non-blocking;
   evaluator classified both items as good first follow-ups, not merge blockers. v1-deferred extras
@@ -874,20 +876,19 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ### Class A — oRPC router-composition `any` (top-level `router.ts`)
 
-- **Reason:** Every plugin service confines one-or-more `// deno-lint-ignore no-explicit-any`
-  casts to its **top-level router-composition file** (`plugins/<plugin>/services/src/router.ts`):
-  the `v1: any` version group, `os.prefix('/v1/<plugin>').router(<map> as any)`, and
+- **Reason:** Every plugin service confines one-or-more `// deno-lint-ignore no-explicit-any` casts
+  to its **top-level router-composition file** (`plugins/<plugin>/services/src/router.ts`): the
+  `v1: any` version group, `os.prefix('/v1/<plugin>').router(<map> as any)`, and
   `router: any = os.router({ v1 })`. The handler map in
   `plugins/<plugin>/services/src/routers/v1-handlers.ts` is correspondingly typed
-  `Record<string, unknown>`. Root cause is the shared contract wrapper: `<plugin>ContractV1`
-  is built as `implement(<def>) as unknown as <Plugin>ContractV1`, whose `$context<T>()` exposes a
+  `Record<string, unknown>`. Root cause is the shared contract wrapper: `<plugin>ContractV1` is
+  built as `implement(<def>) as unknown as <Plugin>ContractV1`, whose `$context<T>()` exposes a
   hand-rolled `.handler(fn): TOutput` that returns the handler **output** rather than a typed oRPC
-  *procedure*, so `os.router(map)` cannot type-check the map without `any`. This is the
-  consumer-side manifestation of the contract-side debt
-  `workers-contract-structural-server-export` (structural server-contract shim that weakens deep
-  handler-options inference). Confirmed present in the merged exemplar
-  `plugins/sagas/services/src/router.ts:39-44,71-75`; the same pattern exists (or is being made to
-  match it) in `workers`, `triggers`, `streams`, and `auth`.
+  _procedure_, so `os.router(map)` cannot type-check the map without `any`. This is the
+  consumer-side manifestation of the contract-side debt `workers-contract-structural-server-export`
+  (structural server-contract shim that weakens deep handler-options inference). Confirmed present
+  in the merged exemplar `plugins/sagas/services/src/router.ts:39-44,71-75`; the same pattern exists
+  (or is being made to match it) in `workers`, `triggers`, `streams`, and `auth`.
 
 ### Class B — external-boundary `as unknown as` / `as <T>` casts (SDK adapters, KV/db clients, bootstrap)
 
@@ -913,31 +914,31 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Linked plan:** related contract-side debt `workers-contract-structural-server-export` (above).
 - **Created:** 2026-06-21.
 - **Status:** open, DEBT_ACCEPTED. **SANCTIONED for now** — matching the merged sagas exemplar
-  (casts confined to the top-level router-composition file, each with `deno-lint-ignore`, zero
-  casts elsewhere) is the conformant target for all current slices.
+  (casts confined to the top-level router-composition file, each with `deno-lint-ignore`, zero casts
+  elsewhere) is the conformant target for all current slices.
 - **Agent directive (read before failing a slice on this):** Do NOT attempt to remove the Class-A
   composition `any` casts, un-widen the `Record<string, unknown>` handler maps, change the contract
   package, OR rewrite the Class-B external-boundary `as unknown as` / `as <T>` casts, inside a
   feature / quality-hardening / auth slice. Mirroring the sagas exemplar IS conformant and IMPL-EVAL
-  must NOT FAIL a slice for retaining EITHER the sanctioned router-composition casts (Class A) or the
-  pre-existing external-boundary casts (Class B) that match sagas. The only out-of-scope cast error
-  is a **NEW** cast a slice INTRODUCES in handler / business-logic / contract code (outside
-  `router.ts` and outside the established I/O-adapter seams) — those remain strictly zero-cast.
-  Auth S2/S6/S7 and AS7 explicitly mirror sagas and leave BOTH debt classes in place; each plugin
-  gets its arbitrary-types fix in the dedicated cross-plugin seam branch, not in these slices.
+  must NOT FAIL a slice for retaining EITHER the sanctioned router-composition casts (Class A) or
+  the pre-existing external-boundary casts (Class B) that match sagas. The only out-of-scope cast
+  error is a **NEW** cast a slice INTRODUCES in handler / business-logic / contract code (outside
+  `router.ts` and outside the established I/O-adapter seams) — those remain strictly zero-cast. Auth
+  S2/S6/S7 and AS7 explicitly mirror sagas and leave BOTH debt classes in place; each plugin gets
+  its arbitrary-types fix in the dedicated cross-plugin seam branch, not in these slices.
 - **Gate:** Close when (A) the shared contract wrapper returns properly-typed procedures and every
-  `plugins/*/services/src/router.ts` type-checks under `deno check --unstable-kv` with zero
-  `as any` / `: any` / `deno-lint-ignore no-explicit-any` and the per-plugin handler maps no longer
-  need `Record<string, unknown>` widening, AND (B) every external-boundary surface (SDK / KV / db /
+  `plugins/*/services/src/router.ts` type-checks under `deno check --unstable-kv` with zero `as any`
+  / `: any` / `deno-lint-ignore no-explicit-any` and the per-plugin handler maps no longer need
+  `Record<string, unknown>` widening, AND (B) every external-boundary surface (SDK / KV / db /
   bootstrap) reaches its port through a typed adapter so the `as unknown as` / `as <T>` boundary
   casts are gone across all plugin services.
 
 ## packages/auth-better-auth — seamless better-auth integration roadmap (`seamless-auth-roadmap`)
 
 - **Reason:** The audit (docs-v4 Phase-0, `.llm/tmp/run/docs-v4-ia-deepening/seam-coverage.md`)
-  found the only real build-seam gap in the framework: all 9 better-auth plugins
-  (`organization`, `twoFactor`, `magicLink`, `admin`, `passkey`, `multiSession`, `apiKey`,
-  `bearer`, `jwt`) are mountable today ONLY via the undocumented escape hatch
+  found the only real build-seam gap in the framework: all 9 better-auth plugins (`organization`,
+  `twoFactor`, `magicLink`, `admin`, `passkey`, `multiSession`, `apiKey`, `bearer`, `jwt`) are
+  mountable today ONLY via the undocumented escape hatch
   `createBetterAuthBackend({ auth: betterAuth({ plugins: [...] }) })`. The documented convenience
   factory `createNetscriptBetterAuth` has a closed `NetscriptBetterAuthOptions` (no `plugins`
   field), so the documented path can enable none of them. The Principal mapper already consumes
@@ -945,32 +946,32 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   missing.
 - **Owner:** Auth layer follow-up (docs-v4 run + a dedicated auth-DX program).
 - **Created:** 2026-06-22
-- **User directive (2026-06-22):** "build the passthrough and document in the harness what should
-  be planned to build (seams, additional adapters, helpers, fluent builder) to make it absolutely
+- **User directive (2026-06-22):** "build the passthrough and document in the harness what should be
+  planned to build (seams, additional adapters, helpers, fluent builder) to make it absolutely
   seamless in NetScript." So the minimal passthrough ships now; the rest is this tracked roadmap.
 
-- **R0 — passthrough seam (BUILD NOW, this run, IMPL-EVAL-gated WSL Codex slice):** add a
-  `plugins` / `betterAuthOptions` passthrough to `createNetscriptBetterAuth` so the documented
-  factory can mount any better-auth plugin (forwarded into `BetterAuthOptions`). Status: planned.
+- **R0 — passthrough seam (BUILD NOW, this run, IMPL-EVAL-gated WSL Codex slice):** add a `plugins`
+  / `betterAuthOptions` passthrough to `createNetscriptBetterAuth` so the documented factory can
+  mount any better-auth plugin (forwarded into `BetterAuthOptions`). Status: planned.
 
-- **R1 — DB schema generation for plugins (REQUIRED for R0 to be usable):** plugins that need
-  tables (`organization` → org/member/invitation, `twoFactor`, `passkey`, `apiKey`) do nothing
-  until their Prisma models + migration exist. Wrap better-auth's schema-generation CLI through
-  `netscript db` / scaffold so enabling a plugin also generates its required schema. Without R1,
-  R0 enables the plugin at the better-auth layer but it fails at runtime on a missing table — docs
-  MUST state this honestly until R1 lands.
+- **R1 — DB schema generation for plugins (REQUIRED for R0 to be usable):** plugins that need tables
+  (`organization` → org/member/invitation, `twoFactor`, `passkey`, `apiKey`) do nothing until their
+  Prisma models + migration exist. Wrap better-auth's schema-generation CLI through `netscript db` /
+  scaffold so enabling a plugin also generates its required schema. Without R1, R0 enables the
+  plugin at the better-auth layer but it fails at runtime on a missing table — docs MUST state this
+  honestly until R1 lands.
 
 - **R2 — interactive-flow seam (`InteractiveFlowPort`) for the better-auth backend:** today the
-  better-auth backend is non-interactive, so `/signin` and `/callback` return
-  `AUTH_PROVIDER_ERROR` and `magicLink`/`passkey` sign-in can't be driven through NetScript (only
-  kv-oauth implements `InteractiveFlowPort`). Implement the port over better-auth's own handler to
-  make magic-link/passkey/social interactive flows first-class. This is the largest item and the
-  blocker for full plugin parity.
+  better-auth backend is non-interactive, so `/signin` and `/callback` return `AUTH_PROVIDER_ERROR`
+  and `magicLink`/`passkey` sign-in can't be driven through NetScript (only kv-oauth implements
+  `InteractiveFlowPort`). Implement the port over better-auth's own handler to make
+  magic-link/passkey/social interactive flows first-class. This is the largest item and the blocker
+  for full plugin parity.
 
 - **R3 — NetScript-native organization / multi-tenancy helpers:** typed org/tenant/role primitives
-  layered over the `organization` plugin (instead of reading raw claim string keys), so apps and
-  the `tutorials/workspace` track get a real framework org primitive. Resolves the "NetScript ships
-  no organization primitive" caveat at its root.
+  layered over the `organization` plugin (instead of reading raw claim string keys), so apps and the
+  `tutorials/workspace` track get a real framework org primitive. Resolves the "NetScript ships no
+  organization primitive" caveat at its root.
 
 - **R4 — fluent auth builder (`defineAuth()`):** a NetScript-idiomatic builder mirroring
   `definePage`/`defineSaga`/`defineTask` that composes backend + plugins + principal mapping +
@@ -1071,20 +1072,22 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## packages/workers — scaffold createJobTools handler helpers are no-op stubs (`workers-scaffold-job-tools-noop`)
 
 - **Reason:** The scaffold-generated worker handler toolkit `createJobTools(ctx)` exposes
-  `trace.addEvent`, `withChildSpan`, and `progress` helpers that are currently no-op stubs. Job-level
-  telemetry is real — dispatch, execution, step events, progress, scheduler runs, and subprocess
-  trace continuation emit OpenTelemetry spans visible in Aspire (OTLP `http://localhost:4318`). Only
-  these in-handler scaffold helpers do not yet emit; their signatures are stable, so handler code
-  written against them keeps compiling and will start emitting once the helpers are implemented. For
-  custom handler spans today, call `@netscript/telemetry` helpers directly.
+  `trace.addEvent`, `withChildSpan`, and `progress` helpers that are currently no-op stubs.
+  Job-level telemetry is real — dispatch, execution, step events, progress, scheduler runs, and
+  subprocess trace continuation emit OpenTelemetry spans visible in Aspire (OTLP
+  `http://localhost:4318`). Only these in-handler scaffold helpers do not yet emit; their signatures
+  are stable, so handler code written against them keeps compiling and will start emitting once the
+  helpers are implemented. For custom handler spans today, call `@netscript/telemetry` helpers
+  directly.
 - **Owner:** `@netscript/plugin-workers-core` / scaffold telemetry follow-up.
-- **Target:** Before advertising in-handler `createJobTools` span/event/progress emission as supported.
+- **Target:** Before advertising in-handler `createJobTools` span/event/progress emission as
+  supported.
 - **Linked plan:** `.llm/tmp/run/docs-v4-ia-deepening/caveat-inventory.md` (Cluster C).
 - **Created:** 2026-06-22
 - **Status:** open.
-- **Gate:** Close when `trace.addEvent` / `withChildSpan` / `progress` from `createJobTools(ctx)` emit
-  real spans/events and a runtime test proves a handler-emitted child span reaches the OTLP collector.
-
+- **Gate:** Close when `trace.addEvent` / `withChildSpan` / `progress` from `createJobTools(ctx)`
+  emit real spans/events and a runtime test proves a handler-emitted child span reaches the OTLP
+  collector.
 
 ## packages/auth-{better-auth,workos} — Archetype-2 folder layout + WorkOS feature-surface parity (`AUTH-ARCHETYPE-LAYOUT`)
 
@@ -1092,32 +1095,32 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   existing auth-debt entries do not cover:
   - **(L) Archetype-2 folder layout non-conformance.** Both `@netscript/auth-better-auth` and
     `@netscript/auth-workos` declare **Archetype-2 (Integration)** in their READMEs but do not
-    follow the canonical layout from `.llm/harness/archetypes/ARCHETYPE-2-integration.md` /
-    doctrine `04`/`05`:
+    follow the canonical layout from `.llm/harness/archetypes/ARCHETYPE-2-integration.md` / doctrine
+    `04`/`05`:
     - Composition-root factories (`createBetterAuthBackend`, `createWorkosBackend`,
       `createNetscriptBetterAuth`, `createWorkos*Authenticator`) live directly in top-level
-      `src/better-auth-backend.ts` / `src/workos-backend.ts` / `src/workos-authenticator.ts`
-      instead of `src/application/create-*.ts`.
+      `src/better-auth-backend.ts` / `src/workos-backend.ts` / `src/workos-authenticator.ts` instead
+      of `src/application/create-*.ts`.
     - Domain types (e.g. `BetterAuthSessionPayload`, `WorkosSessionAuthenticationSuccess`) are
       inline in the backend files instead of `src/domain/types.ts`.
-    - No `src/testing/` test doubles are exported, so consumers must hand-mock
-      `BetterAuthInstance` / the WorkOS session client themselves.
+    - No `src/testing/` test doubles are exported, so consumers must hand-mock `BetterAuthInstance`
+      / the WorkOS session client themselves.
     - `src/ports/` is **legitimately** omitted (the consumed port `AuthBackendPort` lives in the
       consuming `@netscript/plugin-auth-core`, per the doctrine "port lives in the consumer" rule),
       and the one-adapter-per-package shape correctly skips an `adapters/` split — but neither
       omission is documented in the package, which is what makes the layout read as "confusing."
-    This is the folder-layout dimension; it is distinct from (and complements) the existing
-    `auth layer — AS7 documentation architecture metadata` entry (missing `Archetype: <n>` token /
-    `docs/architecture.md`) and `AS2-CONSOLIDATION` (duplicated error/token helpers).
-  - **(P) WorkOS feature-surface parity.** The `seamless better-auth integration roadmap`
-    (R0–R5) gave `auth-better-auth` a `plugins`/`betterAuthOptions` passthrough (R0, commit
-    `539b808b`) plus a tracked program for schema-gen, interactive-flow, org primitives, and a
-    fluent `defineAuth()` builder. `auth-workos` received **no equivalent program**. The likely
-    justification is structural — WorkOS AuthKit is a managed hosted service with a fixed API and
-    no better-auth-style plugin ecosystem to pass through — so a 1:1 "plugins passthrough" is not
+      This is the folder-layout dimension; it is distinct from (and complements) the existing
+      `auth layer — AS7 documentation architecture metadata` entry (missing `Archetype: <n>` token /
+      `docs/architecture.md`) and `AS2-CONSOLIDATION` (duplicated error/token helpers).
+  - **(P) WorkOS feature-surface parity.** The `seamless better-auth integration roadmap` (R0–R5)
+    gave `auth-better-auth` a `plugins`/`betterAuthOptions` passthrough (R0, commit `539b808b`) plus
+    a tracked program for schema-gen, interactive-flow, org primitives, and a fluent `defineAuth()`
+    builder. `auth-workos` received **no equivalent program**. The likely justification is
+    structural — WorkOS AuthKit is a managed hosted service with a fixed API and no
+    better-auth-style plugin ecosystem to pass through — so a 1:1 "plugins passthrough" is not
     meaningful. **However**, WorkOS exposes rich product surface (organizations, SSO connections,
-    directory sync / SCIM, MFA, audit logs) that NetScript currently surfaces only as a pure
-    backend (sealed sessions + JWT/JWKS verification). Whether those warrant a parallel WorkOS
+    directory sync / SCIM, MFA, audit logs) that NetScript currently surfaces only as a pure backend
+    (sealed sessions + JWT/JWKS verification). Whether those warrant a parallel WorkOS
     feature-surfacing / parity program (or an explicit "WorkOS is intentionally backend-only"
     doctrine note) is an **open question to resolve**, not a settled non-gap.
 - **Owner:** Track-5 auth-plugin program / auth-layer doctrine follow-up.
@@ -1125,8 +1128,8 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   `AS2-CONSOLIDATION` and the AS7 metadata warnings — they share the same packages and a single
   refactor pass can close all three). Resolve (P) as a user-facing parity decision before the auth
   beta documentation freeze.
-- **Linked entries:** `seamless better-auth integration roadmap` (R0–R5),
-  `AS2-CONSOLIDATION`, `auth layer — AS7 documentation architecture metadata warnings`.
+- **Linked entries:** `seamless better-auth integration roadmap` (R0–R5), `AS2-CONSOLIDATION`,
+  `auth layer — AS7 documentation architecture metadata warnings`.
 - **Created:** 2026-06-22.
 - **Status:** open, DEBT_ACCEPTED — recorded at user direction ("record it in arch debt for now and
   take care of that later") during the JSR-readiness umbrella merge/cleanup pass. Recording only; no
@@ -1136,7 +1139,6 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
   in-package justification for each omission, with `deno task arch:check` green. Close (P) when the
   WorkOS feature-surface decision is recorded (either a parity program is planned or an explicit
   backend-only scope note lands in the package README + auth doctrine).
-
 
 ## docs tutorials/erp-sync/02-import-job — hand-rolled CSV parsing instead of @std/csv or in-memory DuckDB (`TUTORIAL-CSV-PARSE`)
 
@@ -1174,12 +1176,13 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 ## plugin-workers-core + plugin-triggers-core — CRON-SUBSYSTEM-DUP (workers `.schedule()` vs triggers `defineScheduledTrigger`)
 
 - **Reason:** Two parallel cron subsystems exist with no unification. Workers
-  `defineJob().schedule(cron)` flows through `JobBuilder.schedule()` → `JobDefinition.schedule` field
-  → in-process `Scheduler` class → `@netscript/cron`. Triggers `defineScheduledTrigger()` flows
-  through `CronTriggerSchedulerAdapter` → `@netscript/cron`. They are NOT equivalent: separate runtime
-  adapters, separate scaffolds (`job-scaffolders.ts:64-65` vs `trigger-scaffolders.ts:86-88`),
-  separate CLI flags, separate docs, and `plugins/workers/deno.json` has NO dependency on
-  `@netscript/plugin-triggers-core`. The workers `.schedule()` builder method is marked
+  `defineJob().schedule(cron)` flows through `JobBuilder.schedule()` → `JobDefinition.schedule`
+  field → in-process `Scheduler` class → `@netscript/cron`. Triggers `defineScheduledTrigger()`
+  flows through `CronTriggerSchedulerAdapter` → `@netscript/cron`. They are NOT equivalent: separate
+  runtime adapters, separate scaffolds (`job-scaffolders.ts:64-65` vs
+  `trigger-scaffolders.ts:86-88`), separate CLI flags, separate docs, and
+  `plugins/workers/deno.json` has NO dependency on `@netscript/plugin-triggers-core`. The workers
+  `.schedule()` builder method is marked
   `@deprecated → defineScheduledTrigger(...).enqueueJob(...)`, but that path does NOT yet replace
   in-process cron job scheduling — so `.schedule()` is a **live feature, not a removable shim**.
 - **Why it is debt:** PR-B slice S3b originally claimed the trigger path replaces `.schedule()`.
@@ -1199,6 +1202,98 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Linked plan:** `.llm/tmp/run/chore-alpha1-jsr-shim-removal/drift.md` (2026-06-22 cycle-1 +
   2026-06-23 option-(b) deferral).
 - **Created:** 2026-06-23
-- **Status:** open, DECISION_PENDING — recorded under the overnight don't-block mandate so the alpha-1
-  zero-legacy / JSR-readiness program proceeds without halting on this redesign.
-- **Gate:** none (record-only until the maintainer decision; a future unification run selects gates).
+- **Status:** open, DECISION_PENDING — recorded under the overnight don't-block mandate so the
+  alpha-1 zero-legacy / JSR-readiness program proceeds without halting on this redesign.
+- **Gate:** none (record-only until the maintainer decision; a future unification run selects
+  gates).
+
+## repo-wide — RUN-ARTIFACT-ARCHIVAL-POLICY (`.llm/tmp/run/` evidence tonnage)
+
+- **Reason:** `.llm/tmp/run/` carries large tracked harness-evidence volume. The bulk is durable by
+  doctrine but dominated by completed or closed programs: OpenHands PR-eval traces, completed
+  package-quality wave run directories, and one-off evaluator archives. `.gitignore` ignores runtime
+  `.llm/tmp/openhands/` scratch but intentionally tracks `.llm/tmp/run/openhands/` as durable
+  evidence.
+- **Why it is debt:** this is doctrine-tracked evidence, not junk. Bulk removal needs a retention
+  policy, not a blind sweep. Candidate policies include pruning run dirs for PRs merged or closed
+  past a fixed age while keeping verdict artifacts, or moving historical run evidence to an archive
+  ref.
+- **Decision needed from maintainer:** define and apply a retention policy, move historical run
+  evidence to an archive branch/ref, or keep all run evidence tracked and accept the volume.
+- **Owner:** Harness/process.
+- **Target:** Before JSR publish slim-down / task #36 lock-hygiene pass.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** none until policy is chosen.
+
+## packages/fresh — PAGEBUILDER-LEGACY-COMPAT-TREE (`@netscript/fresh/builders` `PageBuilder`)
+
+- **Reason:** `packages/fresh/src/application/builders/define-page/page-compat.ts` plus
+  `page-compat/**` is a public "legacy page-builder compatibility types" tree kept beside the
+  successor `DefinePageBuilder`. It is re-exported through the builders surface and asserted in
+  surface tests.
+- **Why it is debt:** removing `PageBuilder` is a deliberate public API break, not mechanical
+  hygiene. It requires dropping the export, the compatibility tree, and the surface-test rows.
+- **Decision needed from maintainer:** deprecate now and schedule removal for a later alpha, break
+  now in the alpha zero-legacy sweep, or keep both as intentional parallel builder surfaces.
+- **Owner:** Fresh framework architecture.
+- **Target:** Pre-1.0.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** If removed, scoped check/lint/fmt plus `deno doc --lint` for Fresh, surface-test update,
+  `arch:check`, `publish:dry-run`, and a named grep over templates/docs/scaffold for `PageBuilder`.
+
+## packages/fresh — FORMPAGEPROPS-PLAYGROUND-MIGRATION (`FormPageProps` transitional type)
+
+- **Reason:** `FormPageProps` is a live transitional page-form props type consumed by playground
+  routes while they migrate from legacy page builders. It is not a removable shim while those routes
+  still depend on it.
+- **Decision needed from maintainer:** schedule and complete the playground form migration off
+  legacy page builders, then retire `FormPageProps`. Tie sequencing to
+  `PAGEBUILDER-LEGACY-COMPAT-TREE`.
+- **Owner:** Fresh framework architecture.
+- **Target:** Pre-1.0, after the page-builder decision.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** none until migration is scheduled.
+
+## packages/kv — REDIS-LEGACY-VALUE-FALLBACK (pre-`StoredValue` envelope read path)
+
+- **Reason:** `packages/kv/adapters/redis.adapter.ts` has a fallback for values stored before the
+  current `StoredValue<T>` envelope write path.
+- **Why it is debt:** removing the fallback can break reads of old un-enveloped Redis data. This is
+  a data-migration concern, not pure hygiene.
+- **Decision needed from maintainer:** keep the fallback, ship a one-time backfill that rewrites
+  legacy values into the envelope and remove the fallback later, or declare a hard pre-1.0 data
+  break and remove now.
+- **Owner:** KV package + data-migration.
+- **Target:** Pre-1.0.
+- **Created:** 2026-06-23.
+- **Status:** open, DECISION_PENDING.
+- **Gate:** If removed, scoped check/lint/fmt, `deno task test` for KV, and a Redis read-compat test
+  note.
+
+## repo-wide — DEBT-1 version timing (`0.0.1-alpha.0` lockstep)
+
+- **Reason:** PR-C removes public alpha-era compatibility surfaces, but per-package version bumps
+  would break the repository's lockstep package version scheme.
+- **Decision:** Hold all packages at `0.0.1-alpha.0` during this purge. The repo-wide breaking bump
+  lands once during JSR publish preparation instead of per package/per slice.
+- **Owner:** Release/JSR publish preparation.
+- **Target:** JSR publish prep / task #36.
+- **Created:** 2026-06-23.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the repo-wide lockstep alpha version bump lands with the release notes that
+  call out the PR-C breaking removals.
+
+## cli e2e — DEBT-2 db-init e2e flake (pre-existing)
+
+- **Reason:** The scaffold runtime/db-init lane has a known pre-existing flake observed during the
+  alpha/JSR readiness program. GitHub Actions scaffold-runtime evidence was green separately, so
+  this purge should not silently broaden scope to debug the flake.
+- **Owner:** CLI E2E / scaffold runtime maintainers.
+- **Target:** Follow-up stabilization task #68.
+- **Created:** 2026-06-23.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the db-init scaffold runtime E2E is deterministic across local WSL and GitHub
+  Actions, with raw exit-code evidence recorded on the follow-up task/PR.

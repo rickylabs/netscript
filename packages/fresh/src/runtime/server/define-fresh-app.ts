@@ -8,7 +8,7 @@ import '@netscript/sdk/cache';
 /** Attribute value accepted by Fresh app telemetry bootstrap options. */
 export type FreshAppTelemetryAttribute = string | number | boolean;
 
-/** Backward-compatible telemetry bootstrap options for `defineFreshApp`. */
+/** Telemetry bootstrap options reserved for `defineFreshApp` defaults. */
 export interface FreshAppTelemetryOptions {
   /** Service name used by future Fresh app telemetry defaults. */
   serviceName?: string;
