@@ -1,5 +1,0 @@
-.ns-alert {
-  border-radius: var(--ns-radius-lg);
-  padding: var(--ns-space-4);
-  background: color-mix(in srgb, var(--ns-card) 92%, var(--ns-surface-raised));
-}
