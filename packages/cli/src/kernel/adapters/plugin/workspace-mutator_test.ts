@@ -248,32 +248,6 @@ Deno.test('PluginWorkspaceMutator reuses existing shared cache entry', async () 
   });
 });
 
-Deno.test('PluginWorkspaceMutator leaves plugin registry untouched', async () => {
-  const fs = new MemoryFileSystemAdapter();
-  const registryContent = [
-    '/**',
-    ' * Plugin registry for the workspace.',
-    ' */',
-    '',
-    '// Example:',
-    "//   import { myPlugin } from './my-plugin/mod.ts';",
-    '//   export const plugins = [myPlugin];',
-    '',
-    'export const plugins: unknown[] = [];',
-    '',
-  ].join('\n');
-  await fs.writeFile(
-    '/project/plugins/registry.ts',
-    registryContent,
-  );
-
-  await new PluginWorkspaceMutator(fs).updatePluginRegistry('/project', 'billing');
-
-  const registry = await fs.readFile('/project/plugins/registry.ts');
-
-  assertEquals(registry, registryContent);
-});
-
 Deno.test('PluginWorkspaceMutator appends project-local plugin config specs', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(

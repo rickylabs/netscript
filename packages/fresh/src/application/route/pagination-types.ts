@@ -78,16 +78,6 @@ export interface PaginationSearchSchema<TShape extends Record<string, SchemaFiel
   ): PaginationSearchSchema<TShape & TAugmentation>;
 
   /**
-   * Alias for `extend()` retained for compatibility with Zod object APIs.
-   *
-   * @param shape - Additional Zod shape entries.
-   * @returns A new pagination schema with the extra fields.
-   */
-  safeExtend<TAugmentation extends Record<string, SchemaField>>(
-    shape: TAugmentation,
-  ): PaginationSearchSchema<TShape & TAugmentation>;
-
-  /**
    * Safely parse raw query params into typed pagination state.
    *
    * @param input - Raw search input.

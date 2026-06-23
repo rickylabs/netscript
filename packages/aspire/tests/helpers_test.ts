@@ -161,10 +161,9 @@ Deno.test('helpers/paths', async (t) => {
 });
 
 Deno.test('helpers/references', async (t) => {
-  await t.step('extractServiceReferences: merges refs + DependsOn', () => {
+  await t.step('extractServiceReferences: deduplicates service refs', () => {
     const result = extractServiceReferences({
-      ServiceReferences: ['users'],
-      DependsOn: ['users', 'products'],
+      ServiceReferences: ['users', 'products', 'users'],
     });
 
     assertEquals(result.sort(), ['products', 'users']);

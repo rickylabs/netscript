@@ -66,9 +66,8 @@ the callee's name to that resource's `ServiceReferences` array.
 }
 ```
 
-`ServiceReferences` is the live field; the older `DependsOn` array is still accepted as an
-alias and merged in. The names you list here must match the service resource keys under
-`NetScript.Services`.
+`ServiceReferences` is the live field. The names you list here must match the service
+resource keys under `NetScript.Services`.
 
 {{ comp callout { type: "note", title: "What the reference actually wires" } }}
 At generate time the Aspire helper does a two-pass registration: pass 1 creates every

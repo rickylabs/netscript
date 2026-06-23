@@ -199,15 +199,14 @@ Server-side wiring that mirrors execution-state changes into the durable stream 
 
 | Symbol | Kind | Description |
 | --- | --- | --- |
+| `createStreamMutationHook` | function | Create an ExecutionState mutation hook that publishes to the durable stream. |
 | `emitJobToStream` | function | Emit a job entity to the durable stream. |
 | `getWorkersStreamProducer` | function | Get (or create) the singleton workers execution stream producer. |
-| `startWorkersStreamMirror` | function | Wire the durable stream producer to the shared ExecutionState singleton. Call once at service startup. |
 | `ExecutionConcept` | type alias | Execution concept discriminator. |
 | `ExecutionMutationHook` | type alias | Hook invoked after execution state mutations. |
 | `ExecutionRecord` | type alias | Worker execution record stored in KV. |
 | `ExecutionStatus` | type alias | Execution status discriminator. |
 | `ExecutionTriggerType` | type alias | Execution trigger discriminator. |
-| `WorkersStreamMirrorState` | interface | Execution-state surface needed to mirror worker changes into streams. |
 | `WorkersStreamProducer` | type alias | Durable stream producer type for the workers stream schema. |
 | `WorkerExecutionSchema` | variable | Stream entity schema for worker executions. |
 | `WorkerJobSchema` | variable | Stream entity schema for worker jobs. |

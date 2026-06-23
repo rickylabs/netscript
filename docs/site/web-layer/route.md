@@ -130,8 +130,7 @@ and an optional `error`.
 one-based `page`, a `limit`, a derived zero-based `offset`, and the active
 `sortBy` / `sortOrder`.
 
-Extend the schema with additional fields through `extend(shape)` (or its
-compatibility alias `safeExtend(shape)`), and wrap a field in a default with
+Extend the schema with additional fields through `extend(shape)`, and wrap a field in a default with
 `fallback(schema, defaultValue)`, which applies a catch wrapper suitable for use
 inside `paginationSearchSchema().extend(...)`. Raw search values are typed as
 `SearchParamValue` (`string | string[] | undefined`).

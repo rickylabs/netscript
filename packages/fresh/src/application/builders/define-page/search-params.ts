@@ -73,12 +73,6 @@ export class PaginationSearchSchema<TShape extends PaginationSearchShape> implem
     );
   }
 
-  safeExtend<TAugmentation extends z.ZodRawShape>(
-    shape: TAugmentation,
-  ): PaginationSearchSchema<TShape & TAugmentation> {
-    return this.extend(shape);
-  }
-
   safeParse(input: Record<string, SearchParamValue>):
     | { success: true; data: PaginationSearchOutput<TShape> }
     | { success: false; error?: unknown } {

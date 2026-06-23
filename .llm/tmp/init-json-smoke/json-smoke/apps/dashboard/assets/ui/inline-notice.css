@@ -1,5 +1,0 @@
-.ns-inline-notice {
-  border-radius: var(--ns-radius-md);
-  padding: var(--ns-space-3) var(--ns-space-4);
-  background: color-mix(in srgb, var(--ns-surface) 92%, transparent);
-}

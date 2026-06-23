@@ -12,6 +12,7 @@ dist/
 
 .llm/tmp/claude/
 .llm/tmp/cli-e2e/
+.llm/tmp/init-json-smoke/
 
 # Runtime-only OpenHands Actions scratch space. Durable run evidence belongs under
 # .llm/tmp/run/openhands/<source>/run-<id>-<attempt>/ or GitHub Actions artifacts.

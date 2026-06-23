@@ -4,8 +4,7 @@
  * Resource reference extraction utilities.
  *
  * Extracts service references, plugin references, and infrastructure
- * dependency flags from config entries. Handles legacy `DependsOn` alias
- * merging and deduplication.
+ * dependency flags from config entries.
  */
 
 import type { ResourceDependencies } from '../../types.ts';
@@ -13,34 +12,24 @@ import type { ResourceDependencies } from '../../types.ts';
 /**
  * Extracts and deduplicates service references from a resource entry.
  *
- * Merges the current `ServiceReferences` array with the legacy `DependsOn`
- * field (which is an alias for service references from older config versions).
- *
  * @param entry - A config entry with optional service reference fields
  * @returns Deduplicated array of service reference names
  *
  * @example
  * ```ts
- * extractServiceReferences({ ServiceReferences: ['users'], DependsOn: ['users', 'products'] });
+ * extractServiceReferences({ ServiceReferences: ['users', 'products', 'users'] });
  * // ['users', 'products']
  * ```
  */
 export function extractServiceReferences(
   entry: {
     readonly ServiceReferences?: readonly string[];
-    readonly DependsOn?: readonly string[];
   },
 ): string[] {
   const refs = new Set<string>();
 
   if (entry.ServiceReferences) {
     for (const ref of entry.ServiceReferences) {
-      refs.add(ref);
-    }
-  }
-
-  if (entry.DependsOn) {
-    for (const ref of entry.DependsOn) {
       refs.add(ref);
     }
   }

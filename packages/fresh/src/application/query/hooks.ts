@@ -139,28 +139,28 @@ export function useLiveSuspenseQuery<TData = unknown>(
   };
 }
 
-/** Backward-compatible alias for `useIslandQuery`. */
+/** Run an island query through the canonical NetScript Fresh query surface. */
 export function useQuery<TData = unknown, TError = unknown, TSelected = TData>(
   options: IslandQueryOptions<TData, TError, TSelected>,
 ): IslandQueryResult<TSelected, TError> {
   return useIslandQuery(options);
 }
 
-/** Backward-compatible alias for `useIslandSuspenseQuery`. */
+/** Run an island suspense query through the canonical NetScript Fresh query surface. */
 export function useSuspenseQuery<TData = unknown, TError = unknown, TSelected = TData>(
   options: IslandQueryOptions<TData, TError, TSelected>,
 ): IslandSuspenseQueryResult<TSelected, TError> {
   return useIslandSuspenseQuery(options);
 }
 
-/** Backward-compatible alias for `useIslandInfiniteQuery`. */
+/** Run an island infinite query through the canonical NetScript Fresh query surface. */
 export function useInfiniteQuery<TData = unknown, TError = unknown, TPageParam = unknown>(
   options: IslandInfiniteQueryOptions<TData, TError, TPageParam>,
 ): IslandInfiniteQueryResult<TData, TError> {
   return useIslandInfiniteQuery(options);
 }
 
-/** Backward-compatible alias for `useIslandSuspenseInfiniteQuery`. */
+/** Run an island suspense infinite query through the canonical NetScript Fresh query surface. */
 export function useSuspenseInfiniteQuery<
   TData = unknown,
   TError = unknown,
@@ -171,7 +171,7 @@ export function useSuspenseInfiniteQuery<
   return useIslandSuspenseInfiniteQuery(options);
 }
 
-/** Backward-compatible alias for `useIslandMutation`. */
+/** Run an island mutation through the canonical NetScript Fresh query surface. */
 export function useMutation<TData = unknown, TError = unknown, TVariables = void>(
   options: IslandMutationOptions<TData, TError, TVariables>,
 ): IslandMutationResult<TData, TError, TVariables> {
