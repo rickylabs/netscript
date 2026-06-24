@@ -26,7 +26,6 @@
   "publish": {
     "include": [
       "README.md",
-      "docs/**/*.md",
       "deno.json",
       "mod.ts",
       "ports/**/*.ts",
