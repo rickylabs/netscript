@@ -1,42 +1,88 @@
 # @netscript/runtime-config
 
-Hot-reloadable NetScript runtime override types, loaders, watchers, and diagnostics.
+[![JSR](https://jsr.io/badges/@netscript/runtime-config)](https://jsr.io/@netscript/runtime-config)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Install
+**Hot-reloadable runtime overrides for NetScript services: load job, saga, trigger, feature-flag,
+and task overrides from a versioned config directory and reload them through a file watcher without
+restarting the process.**
 
-```sh
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/runtime-config
+
+# Node.js / Bun
+npx jsr add @netscript/runtime-config
+bunx jsr add @netscript/runtime-config
 ```
 
-## Quick example
+### Usage
 
-Load the active runtime override snapshot once, then resolve feature flags and per-unit
-overrides without recompiling the service:
-
-```ts
+```typescript
 import {
   getJobOverride,
   isFeatureEnabled,
   loadRuntimeConfig,
+  summarizeRuntimeConfig,
+  watchRuntimeConfig,
 } from '@netscript/runtime-config';
 
+// Load the active override snapshot from the runtime config directory.
+// Missing files resolve to empty defaults, so startup never blocks on config.
 const config = await loadRuntimeConfig();
 
-if (!isFeatureEnabled(config, 'email-worker', true)) {
-  // feature flag is off — skip the worker
+if (isFeatureEnabled(config, 'email-worker', true)) {
+  const cleanup = getJobOverride(config, 'cleanup');
+  if (cleanup?.enabled === false) {
+    // A runtime override has disabled the scheduled cleanup job.
+  }
 }
 
-const cleanup = getJobOverride(config, 'cleanup');
-if (cleanup?.enabled === false) {
-  // job override disables the scheduled cleanup
-}
+// Reload when operators roll out new overrides; the callback owns reporting.
+const controller = new AbortController();
+watchRuntimeConfig(async (next) => {
+  const summary = summarizeRuntimeConfig(next, '[runtime-config]');
+  for (const message of summary.messages) console.info(message);
+}, { signal: controller.signal });
 ```
 
-Missing runtime files produce empty defaults, so a process can start with no runtime directory and
-begin honoring overrides once deployment tooling creates them. Use `watchRuntimeConfig()` to reload
-after a file changes, and `summarizeRuntimeConfig()` for caller-owned diagnostics.
+---
 
-## Docs
+## 📦 Key Capabilities
 
-- [API reference](https://rickylabs.github.io/netscript/reference/runtime-config/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+- **Versioned snapshot loading**: `loadRuntimeConfig()` reads a `current` pointer file and resolves
+  the active job, saga, trigger, feature-flag, and task override files for that version.
+- **Empty-default startup**: a missing runtime directory, pointer, or topic file yields empty
+  defaults, so a service can boot before deployment tooling writes any overrides.
+- **Debounced hot reload**: `watchRuntimeConfig()` watches the config directory with `Deno.watchFs`
+  and invokes a consumer callback after debounced reloads, cancellable through an `AbortSignal`.
+- **Typed override accessors**: `getJobOverride`, `getSagaOverride`, `getTriggerOverride`,
+  `getRuntimeTask`, and `isFeatureEnabled` resolve overrides by ID against a typed `RuntimeConfig`
+  snapshot.
+- **Caller-owned diagnostics**: `summarizeRuntimeConfig()` returns a structured
+  `RuntimeConfigSummary` of active overrides without emitting any presentation output.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/runtime-config/](https://rickylabs.github.io/netscript/reference/runtime-config/)
+- **Orchestration & Runtime**:
+  [rickylabs.github.io/netscript/orchestration-runtime/](https://rickylabs.github.io/netscript/orchestration-runtime/)
+- **How-to — Roll out runtime overrides**:
+  [rickylabs.github.io/netscript/how-to/roll-out-runtime-overrides/](https://rickylabs.github.io/netscript/how-to/roll-out-runtime-overrides/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.

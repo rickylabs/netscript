@@ -28,7 +28,6 @@
   "publish": {
     "include": [
       "**/*.ts",
-      "docs/**/*.md",
       "deno.json",
       "README.md"
     ],

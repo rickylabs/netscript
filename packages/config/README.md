@@ -1,50 +1,91 @@
 # @netscript/config
 
-Typed NetScript project configuration: schemas, loaders, environment helpers, and scaffold constants.
+[![JSR](https://jsr.io/badges/@netscript/config)](https://jsr.io/@netscript/config)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Install
+**The typed project-configuration surface for NetScript: author a project config once with
+`defineConfig`, load and cache it at startup with `initConfig`, and read a validated
+`NetScriptConfig` that framework packages, the CLI, and generators consume.**
 
-```sh
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/config
+
+# Node.js / Bun
+npx jsr add @netscript/config
+bunx jsr add @netscript/config
 ```
 
-Schema-only APIs live on a focused subpath so the root surface does not leak Zod internals:
-
-```ts
-import { pluginEntrySchema } from '@netscript/config/schema/plugins';
-```
-
-## Quick example
+### Usage
 
 Define a project config once in `netscript.config.ts`:
 
-```ts
+```typescript
 import { defineConfig } from '@netscript/config';
 
 export default defineConfig({
   name: 'orders',
   version: '1.0.0',
+  databases: {
+    active: 'postgres',
+    config: [{ provider: 'postgres', schema: 'database/postgres/schema' }],
+  },
   services: {
     api: { port: 3000 },
   },
 });
 ```
 
-At runtime, read the validated config and inspect it:
+Load and cache it at process startup, then read the validated config synchronously:
 
-```ts
-import { getConfig, inspectConfig } from '@netscript/config';
+```typescript
+import { getConfig, initConfig, inspectConfig } from '@netscript/config';
 
+await initConfig();
 const config = getConfig();
-const report = inspectConfig(config);
 
+const report = inspectConfig(config);
 console.log(report.summary);
 ```
 
-Use `defineConfigAsync()` when configuration depends on the current command or environment mode, and
-`resolveEnv()` / `getEnv()` to read typed environment variables.
+---
 
-## Docs
+## 📦 Key Capabilities
 
-- [API reference](https://rickylabs.github.io/netscript/reference/config/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+- **Typed authoring**: `defineConfig` and `defineConfigAsync` validate a `NetScriptConfig` at
+  definition time; `defineConfigAsync` resolves topology that depends on the current command or
+  environment mode.
+- **Loader and runtime cache**: `loadConfig`, `initConfig`, `getConfig`, `isConfigLoaded`, and
+  `clearConfigCache` resolve the authored config once and serve the validated object synchronously
+  to the rest of the process.
+- **Environment helpers**: `resolveEnv`, `getEnv`, `hasEnv`, and the `getMode` / `isDev` / `isProd`
+  / `isTest` mode predicates read typed, coerced environment variables.
+- **Workspace discovery**: `discoverWorkspace`, `findWorkspaceRoot`, `findMember`, and
+  `getMemberEntrypoint` classify Deno workspace members for the CLI and generators.
+- **Subpath schemas without Zod leakage**: `@netscript/config/merge` folds plugin-contributed config
+  fragments, `@netscript/config/paths` exposes scaffold constants, and
+  `@netscript/config/schema/plugins` validates appsettings plugin entries — kept off the root
+  surface so it never leaks Zod internals.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/config/](https://rickylabs.github.io/netscript/reference/config/)
+- **Orchestration & Runtime**:
+  [rickylabs.github.io/netscript/orchestration-runtime/](https://rickylabs.github.io/netscript/orchestration-runtime/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.
