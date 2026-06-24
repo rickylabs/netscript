@@ -1,28 +1,30 @@
 # @netscript/auth-workos
 
-WorkOS AuthKit backend and authenticators for NetScript services.
+[![JSR](https://jsr.io/badges/@netscript/auth-workos)](https://jsr.io/@netscript/auth-workos)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-This is an Archetype-2 Integration package. It consumes the authentication port from
-`@netscript/plugin-auth-core` and maps verified WorkOS sessions or access tokens into NetScript
-principals.
+**A WorkOS AuthKit auth backend for NetScript that maps verified AuthKit sealed sessions and bearer
+JWTs into NetScript principals through the `@netscript/plugin-auth-core` port.**
 
-## Install
+---
 
-```sh
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/auth-workos
+
+# Node.js / Bun
+npx jsr add @netscript/auth-workos
+bunx jsr add @netscript/auth-workos
 ```
 
-```ts
-import {
-  createWorkosAccessTokenAuthenticator,
-  createWorkosAuthenticator,
-  createWorkosBackend,
-} from '@netscript/auth-workos';
-```
+### Usage
 
-## Quick Start
-
-```ts
+```typescript
 import { WorkOS } from '@workos-inc/node';
 import { createService } from '@netscript/service';
 import { createWorkosBackend } from '@netscript/auth-workos';
@@ -42,51 +44,37 @@ const service = createService(router, { name: 'private-api' })
   });
 ```
 
-## Public Surface
+---
 
-- `createWorkosBackend(options)` returns a pure `AuthBackendPort` named `workos`, with provider
-  registry, request-derived session lookup, backend-owned session-token crypto, principal mapping,
-  and authentication over WorkOS AuthKit sealed-session cookies.
-- `createWorkosAuthenticator(options)` verifies WorkOS AuthKit sealed-session cookies with
-  `workos.userManagement.loadSealedSession(...).authenticate()`.
-- `createWorkosAccessTokenAuthenticator(options)` verifies bearer JWTs against a WorkOS JWKS.
-- `WorkosAuthenticatorOptions` configures the WorkOS SDK client, cookie password, cookie attributes,
-  and refresh behavior.
-- `WorkosAccessTokenAuthenticatorOptions` configures the WorkOS client ID, JWKS URL, and optional
-  issuer constraint.
+## 📦 Key Capabilities
 
-The backend is the composition entry for the unified auth plugin. The authenticator factories remain
-available for service-auth compatibility.
+- **Backend port**: `createWorkosBackend(options)` returns a pure `AuthBackendPort` named `workos`
+  with a provider registry, request-derived session lookup, backend-owned session-token crypto, and
+  principal mapping.
+- **Sealed-session authenticator**: `createWorkosAuthenticator(options)` verifies WorkOS AuthKit
+  sealed-session cookies and is reusable directly through `@netscript/service` auth.
+- **Bearer JWT authenticator**: `createWorkosAccessTokenAuthenticator(options)` verifies access
+  tokens against a WorkOS JWKS, with an optional issuer constraint.
+- **Principal mapping**: maps the WorkOS user id or JWT `sub` to `subject`, WorkOS permissions to
+  `scopes`, and surfaces `organizationId` and `sessionId` as claims.
+- **Honored boundaries**: WorkOS owns session creation, refresh, and revocation, so `createSession`,
+  `refreshSession`, and `revokeSession` raise `AuthBackendOperationUnsupportedError` rather than
+  fabricating local state.
 
-## Principal Mapping
+---
 
-- `subject`: WorkOS user id or JWT `sub`.
-- `scopes`: WorkOS permissions.
-- `roles`: WorkOS role plus roles.
-- `scheme`: `custom`.
-- `claims`: camelCase `organizationId` and `sessionId`, plus raw provider claims where available.
+## 📖 Documentation
 
-When `refresh: 'always'` is configured and WorkOS returns a refreshed sealed session, the adapter
-emits the rotated cookie through `AuthnResult.setCookies`.
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/auth-workos/](https://rickylabs.github.io/netscript/reference/auth-workos/)
+- **Identity & Access**:
+  [rickylabs.github.io/netscript/identity-access/](https://rickylabs.github.io/netscript/identity-access/)
+- **Add authentication**:
+  [rickylabs.github.io/netscript/how-to/add-authentication/](https://rickylabs.github.io/netscript/how-to/add-authentication/)
 
-## Capability Boundaries
+---
 
-WorkOS owns AuthKit session creation, refresh, and revocation. `createWorkosBackend().sessions`
-therefore resolves request-local sessions through the sealed-session cookie, but `createSession`,
-`refreshSession(sessionId)`, and `revokeSession(sessionId)` throw
-`AuthBackendOperationUnsupportedError` instead of fabricating local state.
+## 📝 License
 
-## Required permissions
-
-- `--allow-net` when using the access-token JWKS authenticator.
-
-## Deferred Scope
-
-WorkOS webhook-to-database user/org sync is intentionally not part of this package slice. Consumers
-that need local org/user mirrors should wire WorkOS webhooks in their application or use the planned
-fast-follow sync component when it lands.
-
-## Docs
-
-- [`@netscript/plugin-auth-core`](../plugin-auth-core/README.md)
-- [`@netscript/service` auth docs](../service/README.md)
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.

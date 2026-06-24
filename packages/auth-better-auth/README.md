@@ -1,31 +1,34 @@
 # @netscript/auth-better-auth
 
-better-auth backend and integration helpers for NetScript services.
+[![JSR](https://jsr.io/badges/@netscript/auth-better-auth)](https://jsr.io/@netscript/auth-better-auth)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-This is an Archetype-2 Integration package. It consumes the authentication port from
-`@netscript/plugin-auth-core` and wraps better-auth's first-party Prisma adapter over a
-consumer-owned Prisma client.
+**A better-auth backend adapter for NetScript that implements the auth-core `AuthBackendPort` over a
+consumer-owned Prisma client, mapping better-auth sessions to NetScript principals without owning
+the database.**
 
-## Install
+---
 
-```sh
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/auth-better-auth
+
+# Node.js / Bun
+npx jsr add @netscript/auth-better-auth
+bunx jsr add @netscript/auth-better-auth
 ```
 
-```ts
-import {
-  createBetterAuthAuthenticator,
-  createBetterAuthBackend,
-  createNetscriptBetterAuth,
-} from '@netscript/auth-better-auth';
-```
+### Usage
 
-## Quick Start
-
-```ts
-import { createService } from '@netscript/service';
+```typescript
 import { createBetterAuthBackend, createNetscriptBetterAuth } from '@netscript/auth-better-auth';
 
+// 1. Build a better-auth instance over your own Prisma client.
 const auth = createNetscriptBetterAuth({
   prisma,
   provider: 'postgresql',
@@ -33,57 +36,50 @@ const auth = createNetscriptBetterAuth({
   baseURL: Deno.env.get('BETTER_AUTH_URL')!,
 });
 
-const service = createService(router, { name: 'private-api' })
-  .withAuthn({
-    authenticator: createBetterAuthBackend({
-      auth,
-      sessionTokenSecret: Deno.env.get('BETTER_AUTH_SECRET')!,
-      providers: [{ id: 'github', displayName: 'GitHub' }],
-    }),
-  });
+// 2. Wrap it as an AuthBackendPort that NetScript services consume.
+const backend = createBetterAuthBackend({
+  auth,
+  sessionTokenSecret: Deno.env.get('BETTER_AUTH_SECRET')!,
+  providers: [{ id: 'github', displayName: 'GitHub' }],
+});
+
+// `backend.authenticate(request)` resolves the better-auth session and
+// returns a NetScript principal; provider, session, and crypto ports
+// are exposed on the same backend.
 ```
 
-## Public Surface
+---
 
-- `createNetscriptBetterAuth(options)` calls
-  `betterAuth({ database: prismaAdapter(prisma, {
-  provider }), ...options })` using better-auth's
-  first-party Prisma adapter.
-- `createBetterAuthBackend(options)` returns a pure `AuthBackendPort` named `better-auth`, with
-  provider registry, request-derived session lookup, backend-owned session-token crypto, principal
-  mapping, and authentication over `auth.api.getSession`.
-- `createBetterAuthAuthenticator(options)` calls
-  `auth.api.getSession({ headers:
-  request.headers(), returnHeaders: true })` and maps the
-  better-auth session into a NetScript principal.
-- `NetscriptBetterAuthOptions` accepts a consumer-owned Prisma client and a better-auth Prisma
-  provider; the package does not depend on `@netscript/database`.
+## 📦 Key Capabilities
 
-## Principal Mapping
+- **AuthBackendPort adapter**: `createBetterAuthBackend` returns a pure `AuthBackendPort` named
+  `better-auth`, exposing provider registry, session lookup, backend-owned session-token crypto, and
+  principal mapping.
+- **Consumer-owned Prisma**: `createNetscriptBetterAuth` configures better-auth's first-party Prisma
+  adapter over a Prisma client you supply, so the package never depends on `@netscript/database`.
+- **Principal mapping**: better-auth sessions map to a NetScript `Principal` with `subject`,
+  `scopes`, `roles`, and camelCase `organizationId`/`sessionId` claims, forwarding any `Set-Cookie`
+  refresh through `AuthnResult.setCookies`.
+- **better-auth plugin passthrough**: a typed `plugins` option forwards better-auth server plugins
+  (bearer, jwt, organization, and more) while NetScript retains ownership of the database adapter.
+- **Explicit capability boundaries**: session creation, refresh, and revocation throw
+  `AuthBackendOperationUnsupportedError` rather than fabricating local state, because better-auth
+  owns those flows through its request APIs.
 
-- `subject`: better-auth user id.
-- `scopes`: session or user permission arrays when present.
-- `roles`: user roles plus active organization roles when present.
-- `scheme`: `custom`.
-- `claims`: camelCase `organizationId` and `sessionId`, plus the raw better-auth session and user
-  payloads.
+---
 
-If better-auth refreshes a session and returns `Set-Cookie`, the adapter forwards those values
-through `AuthnResult.setCookies`.
+## 📖 Documentation
 
-## Capability Boundaries
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/auth-better-auth/](https://rickylabs.github.io/netscript/reference/auth-better-auth/)
+- **Identity & Access**:
+  [rickylabs.github.io/netscript/identity-access/](https://rickylabs.github.io/netscript/identity-access/)
+- **better-auth plugins**:
+  [rickylabs.github.io/netscript/identity-access/better-auth-plugins/](https://rickylabs.github.io/netscript/identity-access/better-auth-plugins/)
 
-better-auth owns session creation, refresh, and revocation through its sign-in and request APIs.
-`createBetterAuthBackend().sessions` therefore resolves sessions from request headers or a
-session-token cookie, but `createSession`, `refreshSession(sessionId)`, and
-`revokeSession(sessionId)` throw `AuthBackendOperationUnsupportedError` instead of fabricating local
-state.
+---
 
-## Required permissions
+## 📝 License
 
-- `--allow-net` for provider callbacks or better-auth plugins that call external services.
-
-## Docs
-
-- [`@netscript/plugin-auth-core`](../plugin-auth-core/README.md)
-- [`@netscript/service` auth docs](../service/README.md)
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.
