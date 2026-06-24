@@ -170,3 +170,72 @@ The PR achieves its core objective: all 31 in-package READMEs are now from-scrat
 - `packages/fresh-ui/README.md` marginal on description format (code block vs bold line) — informational only
 
 **Re-evaluate**: After fixing the 2 publish-glob issues above, the verdict should be **PASS**.
+
+---
+
+## Re-check (a85d0fcd)
+
+**Evaluator**: IMPL-EVAL re-verification pass (separate session)
+**Commit under review**: `a85d0fcd` — `docs(readme-revamp): fix 2 publish-glob hygiene findings from IMPL-EVAL (Gate 7)`
+**Scope**: Gate 7 only (Gates 1–6, 8–10 unchanged from prior PASS)
+
+### Issue A — `packages/cli/deno.json`
+
+| Check | Result |
+|-------|--------|
+| Strict JSON (`python3 json.load`) | ✅ VALID |
+| `//` comment removed (grep for `^[[:space:]]*//`) | ✅ None found |
+| `deno check packages/cli/mod.ts` — "Unsupported compiler options" warning | ✅ No warning emitted |
+| `isolatedDeclarations: false` preserved in compilerOptions | ✅ |
+
+**Verdict: PASS** — fix confirmed.
+
+### Issue B — `packages/fresh-ui/deno.json`
+
+| Check | Result |
+|-------|--------|
+| Strict JSON (`python3 json.load`) | ✅ VALID |
+| `"!docs/**/*.md"` removed from publish.exclude (grep) | ✅ Not present |
+| Remaining exclude globs intact (`!**/*.tsx`, `!**/*.css`, etc.) | ✅ |
+
+**Verdict: PASS** — fix confirmed.
+
+### Regression Guard
+
+| Check | Result |
+|-------|--------|
+| `docs/**/*.md` include glob in any of 31 `deno.json` | ✅ None found (grep exit 1) |
+| Per-package `docs/` dirs under `packages/*/` and `plugins/*/` | ✅ 0 found; only `packages/plugin/src/templates/skeleton/docs` (expected template scaffold, not a per-package docs dir) |
+| All 31 `deno.json` files valid strict JSON | ✅ 31/31 VALID |
+| `deno task publish:dry-run` exit code | ✅ **0** — "Success Dry run complete" |
+| Lock churn | Not triggered (dry-run only, no re-resolution observed) |
+
+### Updated Gate 7 Verdict
+
+**Gate 7: Publish-Glob Correctness → PASS**
+
+All 3 issues resolved:
+- Issue A (cli `//` comment): FIXED in a85d0fcd
+- Issue B (fresh-ui orphan glob): FIXED in a85d0fcd
+- Issue C (24 `docs/**/*.md` includes already clear): Still clear ✅
+
+---
+
+## Updated Overall Verdict: **PASS**
+
+All 10 gates now PASS:
+
+| Gate | Check | Result |
+|------|-------|--------|
+| 1 | Cross-Ref Link Resolution (31/31) | PASS |
+| 2 | Cross-Ref Meaningfulness | PASS |
+| 3 | No Dead `./docs/*` Links (31/31) | PASS |
+| 4 | API Ground-Truth | PASS |
+| 5 | Voice Check (31/31) | PASS |
+| 6 | Industry-Standard Structure (30/31, 1 marginal) | PASS |
+| 7 | Publish-Glob Correctness | **PASS** (was FAIL_FIX) |
+| 8 | `/docs` Folders Gone | PASS |
+| 9 | Skill Repoint Integrity | PASS |
+| 10 | Publish Dry-Run (exit 0) | PASS |
+
+**Upgraded from FAIL_FIX → PASS** on the basis of commit `a85d0fcd` resolving the two Gate 7 config-hygiene issues. No further gate changes required. PR is ready to merge.
