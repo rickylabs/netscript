@@ -28,7 +28,6 @@
       "!**/*.tsx",
       "!**/*.css",
       "!registry/**/*.json",
-      "!docs/**/*.md",
       "!deno.json",
       "!README.md",
       "scripts/**",
