@@ -20,19 +20,22 @@ enterprise-grade, truthful meta-framework landing page. Branch `docs/root-readme
 
 ## Pipeline state
 
-1. **Deep search — DISPATCHED (awaiting).** OpenHands `openrouter/google/gemini-3.5-flash`,
-   1000 iters, output=pr-comment → PR #118 comment 4790810265. Brief: `deep-search-brief.md`
-   (harness-compliant, single-focus framework-landing, seeded by Track-2 in
-   `.llm/tmp/run/docs-readme-revamp/sota-readme-dossier.md`, grounded in the real 31-package map).
-   Expected output: `.llm/tmp/run/docs-root-readme/sota-landing-dossier.md` committed+pushed to the
-   branch. ON LANDING: verify file set (only the dossier under this run folder), no lock/source churn.
-2. Plan → PLAN-EVAL (OpenHands minimax-M3, separate session). Not started.
-3. Author root README (Claude documentation-authoring workflow). Not started.
+1. **Deep search — DONE.** OpenHands `gemini-3.5-flash`. Output landed:
+   `.llm/tmp/run/docs-root-readme/sota-landing-dossier.md` (347 lines, verified clean — dossier +
+   OpenHands trace only, no lock/source churn). Fast-forwarded to `96063906`.
+2. **Plan → PLAN-EVAL — DISPATCHED (awaiting).** `research.md` + `plan.md` authored + committed
+   (`4bdf9eea`). PLAN-EVAL dispatched to OpenHands `openrouter/minimax/minimax-m3`, 100 iters →
+   PR #118 comment 4793750208 (`plan-eval-dispatch.md`). ON LANDING: read `plan-eval.md`; need PASS
+   before any authoring slice. FAIL_PLAN → fix plan, re-dispatch (2 cycles then escalate).
+3. Author root README (Claude documentation-authoring exception). Not started — GATED on PLAN-EVAL
+   PASS. Locked design in `plan.md`: ASCII hero (A), ASCII arch canvas primary, grouped 6-layer
+   31-pkg map, badges/voice = shipped PR2 convention.
 4. IMPL-EVAL (OpenHands qwen3.7-max, separate session) → merge. Not started.
 
 ## Commits
 
 - `fda7f518`: docs(root-readme): PR3 deep-search brief (framework-landing research)
+- `4bdf9eea`: docs(root-readme): PR3 research + plan (locked design, pre-PLAN-EVAL)
 
 ## Decisions carried in
 
