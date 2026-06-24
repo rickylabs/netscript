@@ -10,10 +10,14 @@ doc-authoring exception) → OpenHands IMPL-EVAL. Branch `docs/readme-revamp`.
 - **D2 — One deep agent per README (31).** Depth over batching. Family agents (auth, plugins,
   data-persistence, services-sdk, web-layer, observability, background-processing) share a context
   brief so cross-package framing is consistent. Conventions come from `sota-readme-dossier.md`.
-- **D3 — Canonical package-README skeleton** (from dossier Track 1; adjust to its findings):
-  hero line (what it is, 1 sentence) → install (`deno add jsr:@netscript/<pkg>`, UNVERSIONED) →
-  60-second quickstart (runnable) → features → core API / usage (meaningful samples) → docs
-  cross-links section → license. No badge soup, no invented examples, no "honesty" framing.
+- **D3 — Canonical package-README skeleton** — now RECONCILED against the verified dossier in
+  `authoring-spec.md` (authoritative C1 contract). Skeleton: `# @netscript/<pkg>` h1 → 3-badge row
+  (JSR·CI·Docs) → ≤3-line technical value prop → Quick Start (3-runtime install, UNVERSIONED, +
+  grounded Usage) → Key Capabilities (3–5 bold-lead) → Documentation (D4 cross-refs) → License.
+  Three NetScript overrides vs. the dossier exemplar, flagged in `authoring-spec.md` for PLAN-EVAL:
+  unversioned imports (D6), D4's stricter 3-target Documentation section w/ no placeholder Discord,
+  and no per-package maturity callout (lives on root README). No badge soup, no invented examples,
+  no "honesty" framing.
 - **D4 — Cross-refs are absolute, verified, meaningful.** Every docs link is
   `https://rickylabs.github.io/netscript/<path>/`, MUST resolve, and MUST point at content that
   discusses the package (not a regex name-match). Each README links its reference page + its
@@ -30,8 +34,9 @@ doc-authoring exception) → OpenHands IMPL-EVAL. Branch `docs/readme-revamp`.
   docs; uses dossier Track 2 (framework-landing/visual design). Highest quality bar; own eval.
 
 ## Slices
-1. **C0 — deep search** (DONE: dispatched). Output `sota-readme-dossier.md`. Gate: dossier exists,
-   both tracks present, exemplars cited. Supervisor folds conventions into D3/skeleton before C1.
+1. **C0 — deep search** (DONE + verified: 63KB dossier, both tracks, exemplars cited, confirmed via
+   `git show origin/docs/readme-revamp:.llm/tmp/run/docs-readme-revamp/sota-readme-dossier.md`).
+   Conventions folded into `authoring-spec.md` (reconciled D3). Gate met.
 2. **C1 — authoring workflow** (Claude). One agent per README, grounded via `deno doc`/source, dossier
    conventions, cross-ref map. Each agent: rewrite README; remove dead `./docs/*.md` links; if its
    `deno.json` has `docs/**/*.md` in publish globs, remove it; emit the README body + a self-report of
