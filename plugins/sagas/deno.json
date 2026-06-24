@@ -50,7 +50,6 @@
   "publish": {
     "include": [
       "README.md",
-      "docs/**/*.md",
       "deno.json",
       "scaffold.plugin.json",
       "scaffold.runtime.json",

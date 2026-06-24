@@ -62,7 +62,6 @@
       "scaffold.runtime.json",
       "mod.ts",
       "bin/**/*.ts",
-      "docs/**/*.md",
       "src/**/*.ts",
       "src/scaffolding/templates/**/*",
       "contracts/**/*.ts",
