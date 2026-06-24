@@ -29,3 +29,17 @@ Deleted 26 `/docs` folders (162 files); relocated the 4 skill-load-bearing contr
 owning `.agents/skills/` dirs + repointed both `SKILL.md`; regenerated `.claude` mirror.
 Gates: `sync-claude-skills.ts --check` OK (16 skills, 20 mirrored), `validate-claude-surface.ts`
 ok:true (deno.lock unchanged after 3 hook runs). Pushed fast-forward `1ed18196..f92cee1b`.
+
+## C2 — IMPL-EVAL dispatched (awaiting verdict)
+
+- 590f4caf: docs(readme-revamp): record C1b /docs-removal commit + resolve drift D1
+- f17fbdc6: docs(readme-revamp): add C2 IMPL-EVAL dispatch prompt
+
+IMPL-EVAL dispatched to OpenHands qwen3.7-max (separate session) on PR #117 via
+`dispatch-openhands.ts` — comment
+`https://github.com/rickylabs/netscript/pull/117#issuecomment-4790408167`
+(model=openrouter/qwen/qwen3.7-max, provider=openrouter, output=pr-comment, iterations=1200).
+Prompt: `impl-eval-dispatch.md` — per-package verdict (31 READMEs) + HARD cross-ref link gate
+(resolve against `docs/site/**` + meaningfulness) + API ground-truth (`deno doc`) + voice check +
+publish-glob correctness + /docs-gone + skill-repoint integrity + `publish:dry-run`. Awaiting the
+verdict PR comment; on PASS → merge PR2, on FAIL_FIX → WSL Codex fix slice.
