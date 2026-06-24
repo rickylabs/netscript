@@ -34,7 +34,6 @@
       "src/**/*.ts",
       "assets/scalar.min.js",
       "README.md",
-      "docs/**/*.md",
       "deno.json"
     ],
     "exclude": [

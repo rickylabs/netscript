@@ -49,8 +49,7 @@
       "**/*.ts",
       "**/*.tsx",
       "deno.json",
-      "README.md",
-      "docs/**/*.md"
+      "README.md"
     ],
     "exclude": [
       "**/*_test.ts",

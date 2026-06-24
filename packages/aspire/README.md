@@ -1,36 +1,83 @@
 # @netscript/aspire
 
-SDK-neutral Aspire diagnostics, configuration parsing, and TypeScript AppHost helpers for NetScript plugin packages.
+[![JSR](https://jsr.io/badges/@netscript/aspire)](https://jsr.io/@netscript/aspire)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Install
+**SDK-neutral Aspire diagnostics, `appsettings.json` parsing, and AppHost composition ports for
+NetScript. It turns plain config data into validated resource graphs without leaking any Aspire SDK
+type into your signatures.**
 
-```sh
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/aspire
+
+# Node.js / Bun
+npx jsr add @netscript/aspire
+bunx jsr add @netscript/aspire
 ```
 
-Composition, config, schema, type, adapter, and testing APIs live on typed subpaths:
-`@netscript/aspire/application`, `@netscript/aspire/config`, `@netscript/aspire/schema`,
-`@netscript/aspire/types`, `@netscript/aspire/adapters`, and `@netscript/aspire/testing`.
+### Usage
 
-## Quick example
-
-The root entrypoint exposes the diagnostic contract. Inspect an Aspire target and render its
-JSON-stable report:
-
-```ts
+```typescript
 import { inspectAspire } from '@netscript/aspire';
 
+// Inspect an AppHost target and render a JSON-stable diagnostic report.
 const report = inspectAspire('./dotnet/AppHost');
 
 console.log(report.summary);
 console.log(report.details);
 ```
 
-`inspectAspire()` accepts a builder, a resource list, or a path-like label and returns an
-`InspectionReport` suitable for CLI rendering. No Aspire SDK types appear in any signature —
-every function takes plain data and returns plain data.
+Validating an `appsettings.json` file before composition uses the `config` subpath:
 
-## Docs
+```typescript
+import { parseAppSettings } from '@netscript/aspire/config';
 
-- [API reference](https://rickylabs.github.io/netscript/reference/aspire/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+const { config, warnings } = await parseAppSettings('dotnet/AppHost/appsettings.json');
+
+console.log(config.Name); // "test-app"
+for (const warning of warnings) console.warn(warning);
+```
+
+---
+
+## 📦 Key Capabilities
+
+- **SDK-neutral by contract**: Every function takes plain data and returns plain data. No Aspire SDK
+  type appears in any public signature, so diagnostics and composition stay testable.
+- **Validated config parsing**: `parseAppSettings` reads `appsettings.json`, validates it against
+  Zod schemas (`@netscript/aspire/schema`), resolves key-dependent defaults, and reports
+  cross-reference issues.
+- **AppHost composition ports**: `@netscript/aspire/application` exposes `composeAppHost`, the
+  `ContributionRegistry`, deterministic port allocation, and resolver helpers that turn config
+  entries into Aspire resources.
+- **Pluggable builder adapter**: `@netscript/aspire/adapters` provides the `AspireTypeScriptBuilder`
+  port that emits AppHost resources, plus environment-source resolution.
+- **First-class test surface**: `@netscript/aspire/testing` ships an in-memory builder, the
+  `AspireNSPluginContribution` base class, and deterministic fixtures for plugin authors writing
+  composition tests.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/aspire/](https://rickylabs.github.io/netscript/reference/aspire/)
+- **Orchestration & Runtime**:
+  [rickylabs.github.io/netscript/orchestration-runtime/](https://rickylabs.github.io/netscript/orchestration-runtime/)
+- **Deploy locally with Aspire**:
+  [rickylabs.github.io/netscript/how-to/deploy-local-aspire/](https://rickylabs.github.io/netscript/how-to/deploy-local-aspire/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.
