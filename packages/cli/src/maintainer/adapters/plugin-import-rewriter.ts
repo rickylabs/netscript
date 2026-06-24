@@ -1,6 +1,7 @@
 import { join } from "@std/path";
 import { parse as parseJsonc } from "@std/jsonc";
 
+import { netscriptJsrSpecifier } from "../../kernel/constants/jsr-specifiers.ts";
 import { SCAFFOLD_FILES } from "../../kernel/constants/scaffold/scaffold-files.ts";
 import type { PackageSourceMode } from "../../kernel/domain/scaffold/scaffold-options.ts";
 
@@ -180,37 +181,37 @@ export function rewritePackagePathToJsr(target: string): string | null {
   const rest = match?.groups?.rest ?? "";
   if (pkg === "plugin-workers-core") {
     if (rest === "/src/contracts/v1/mod.ts") {
-      return "jsr:@netscript/plugin-workers-core@^1.0.0/contracts";
+      return netscriptJsrSpecifier("plugin-workers-core", "/contracts");
     }
     if (rest === "/src/domain/public-schema.ts") {
-      return "jsr:@netscript/plugin-workers-core@^1.0.0/schemas";
+      return netscriptJsrSpecifier("plugin-workers-core", "/schemas");
     }
     if (rest === "/src/streams/mod.ts") {
-      return "jsr:@netscript/plugin-workers-core@^1.0.0/streams";
+      return netscriptJsrSpecifier("plugin-workers-core", "/streams");
     }
   }
   if (pkg === "plugin-auth-core") {
     if (rest === "/src/config/mod.ts") {
-      return "jsr:@netscript/plugin-auth-core@^1.0.0/config";
+      return netscriptJsrSpecifier("plugin-auth-core", "/config");
     }
     if (rest === "/src/contracts/v1/mod.ts") {
-      return "jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1";
+      return netscriptJsrSpecifier("plugin-auth-core", "/contracts/v1");
     }
     if (rest === "/src/domain/mod.ts") {
-      return "jsr:@netscript/plugin-auth-core@^1.0.0/domain";
+      return netscriptJsrSpecifier("plugin-auth-core", "/domain");
     }
     if (rest === "/src/ports/mod.ts") {
-      return "jsr:@netscript/plugin-auth-core@^1.0.0/ports";
+      return netscriptJsrSpecifier("plugin-auth-core", "/ports");
     }
     if (rest === "/src/streams/mod.ts") {
-      return "jsr:@netscript/plugin-auth-core@^1.0.0/streams";
+      return netscriptJsrSpecifier("plugin-auth-core", "/streams");
     }
     if (rest === "/src/testing/mod.ts") {
-      return "jsr:@netscript/plugin-auth-core@^1.0.0/testing";
+      return netscriptJsrSpecifier("plugin-auth-core", "/testing");
     }
   }
   const subpath = toJsrSubpath(rest);
-  return `jsr:@netscript/${pkg}@^1.0.0${subpath}`;
+  return netscriptJsrSpecifier(pkg, subpath);
 }
 
 export function toJsrSubpath(rest: string): string {
