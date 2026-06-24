@@ -1,0 +1,400 @@
+|
+| Drift log        | Material mismatch is recorded in run `drift.md`            
+|
+
+## False-Done States
+
+- Polished prose duplicates doctrine instead of referencing it.
+- A README declares compliance while `arch-debt.md` still has open entries.
+- Knowledge-base docs describe only current state and omit doctrine status.
+- Harness docs grow into a second doctrine.
+
+## Rescope Triggers
+
+- The doc cannot be accurate without a code audit.
+- A knowledge-base update discovers stale architecture claims.
+- A docs request reveals a doctrine conflict that needs a new plan.
+==PLAN-EVAL TEMPLATE==
+# PLAN-EVAL — <run-id>
+
+- Plan evaluator session: <id / date>
+- Run: <run-id>
+- Surface / archetype: <...>
+- Scope overlays: <...>
+
+## Checklist results
+
+| Plan-Gate item                          | Result            | Evidence / 
+location |
+| --------------------------------------- | ----------------- | 
+------------------- |
+| Research present and current            | PASS / FAIL       |                 
+|
+| Decisions locked                        | PASS / FAIL       |                 
+|
+| Open-decision sweep                     | PASS / FAIL       |                 
+|
+| Commit slices (< 30, gate + files each) | PASS / FAIL       |                 
+|
+| Risk register                           | PASS / FAIL       |                 
+|
+| Gate set selected                       | PASS / FAIL       |                 
+|
+| Deferred scope explicit                 | PASS / FAIL       |                 
+|
+| jsr-audit surface scan (pkg/plugin)     | PASS / FAIL / N/A |                 
+|
+
+## Open-decision sweep (evaluator-run)
+
+<decisions found that would force rework if deferred, or "none">
+
+## Verdict
+
+`PASS` | `FAIL_PLAN`
+
+### If FAIL_PLAN — required fixes
+
+1. <item> — <fix>
+
+## Notes
+
+<optional>
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read research.md
+
+$ cd /home/runner/work/netscript/netscript && cat 
+.llm/tmp/run/docs-readme-revamp/research.md | head -200
+
+Tokens: ↑ input 4.16M • cache hit 89.44% •  reasoning 7.29K • ↓ output 26.74K • 
+$ 0.4240
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# Research — package + framework README revamp (PR2/PR3)
+
+Run-id: `docs-readme-revamp`. Branch: `docs/readme-revamp` (off `origin/main` 
+`1b3c63c2`).
+Scope overlay: `SCOPE-docs.md` (doc-authoring lane — no `packages/`/`plugins/` 
+SOURCE edits;
+README.md + each package's `deno.json` `publish` glob only). This is the 
+CLAUDE.md
+documentation-authoring exception: Claude workflow authors prose, OpenHands 
+validates.
+
+## Ground truth
+
+### README inventory (31)
+26 packages + 5 plugins, each with a `README.md` (range 24–290 lines; mix of 
+stub and rich):
+
+```
+packages: aspire auth-better-auth auth-kv-oauth auth-workos cli config contracts
+cron database
+          fresh fresh-ui kv logger plugin plugin-auth-core plugin-sagas-core 
+plugin-streams-core
+          plugin-triggers-core plugin-workers-core prisma-adapter-mysql queue 
+runtime-config sdk
+          service telemetry watchers
+plugins:  auth sagas streams triggers workers
+```
+
+### Published docs site (cross-ref target)
+- Canonical base URL: `https://rickylabs.github.io/netscript/` 
+(`docs/site/_config.ts:49`).
+  Project Pages → all paths are under `/netscript/`. README links rendered on 
+JSR are NOT
+  site-relative, so cross-refs MUST be ABSOLUTE 
+`https://rickylabs.github.io/netscript/<path>/`.
+- 28 reference pages exist at `/reference/<name>/`:
+  aspire, auth, auth-better-auth, auth-kv-oauth, auth-workos, cli, config, 
+contracts, cron,
+  database, fresh, fresh-ui, kv, logger, plugin, plugin-auth, plugin-auth-core,
+  prisma-adapter-mysql, queue, runtime-config, sagas, sdk, service, streams, 
+telemetry, triggers,
+  watchers, workers. (`index.md` per dir under `docs/site/reference/`.)
+- Capability/explanation surface (pillars + Diátaxis):
+  `identity-access/`, `background-processing/`, `data-persistence/`, 
+`durable-workflows/`,
+  `observability/`, `orchestration-runtime/`, `services-sdk/`, `web-layer/`,
+  plus `capabilities/`, `how-to/`, `tutorials/`, `explanation/`.
+
+### Cross-ref map (package → PRIMARY reference page + pillar hub)
+Most packages have a same-name reference page. **Four exceptions have NO own 
+reference page** — their
+meaningful target is the sibling plugin reference + the capability pillar, NOT a
+name-match stub:
+
+| package | reference page | pillar hub (meaningful target) |
+| --- | --- | --- |
+| aspire | /reference/aspire/ | orchestration-runtime |
+| auth-better-auth / auth-kv-oauth / auth-workos | /reference/<same>/ | 
+identity-access |
+| plugin-auth-core | /reference/plugin-auth-core/ | identity-access |
+| plugins/auth | /reference/plugin-auth/ (or /auth/) | identity-access |
+| cli | /reference/cli/ | (cli-reference / tutorials) |
+| config / runtime-config | /reference/<same>/ | orchestration-runtime |
+| contracts / sdk / service | /reference/<same>/ | services-sdk |
+| cron / queue / watchers | /reference/<same>/ | background-processing |
+| database / kv / prisma-adapter-mysql | /reference/<same>/ | data-persistence |
+| fresh / fresh-ui | /reference/<same>/ | web-layer |
+| logger / telemetry | /reference/<same>/ | observability |
+| plugin | /reference/plugin/ | orchestration-runtime |
+| **plugin-workers-core** | ⛔ none — use /reference/workers/ | 
+background-processing |
+| **plugin-sagas-core** | ⛔ none — use /reference/sagas/ | durable-workflows |
+| **plugin-triggers-core** | ⛔ none — use /reference/triggers/ | 
+durable-workflows |
+| **plugin-streams-core** | ⛔ none — use /reference/streams/ | 
+background-processing |
+| plugins/sagas, plugins/streams, plugins/triggers, plugins/workers | 
+/reference/<same>/ | matching pillar |
+
+Authoring agents MUST verify each link resolves on the live site AND points at 
+content that
+actually discusses the package (not a regex name match). The 4 `-core` rows are 
+the highest risk.
+
+### `/docs` removal reality
+No in-package `/docs` FOLDERS exist on disk. "Remove /docs" resolves to two 
+concrete actions:
+1. Strip dangling `./docs/*.md` links from the ~6 READMEs that reference 
+non-existent files
+   (service, plugin-sagas-core, plugin-workers-core, plugin-auth-core, 
+plugins/workers,
+   plugins/sagas). Verify the exact set during authoring (dead-link scan).
+2. Remove `docs/**/*.md` entries from those packages' `deno.json` 
+`publish.include` globs so the
+   JSR publish surface matches reality.
+
+### Version literals in READMEs
+Only `packages/service/README.md` carries a version literal (`@^0.0.1-alpha.0`).
+PR1 aligns all
+members to `0.0.1-alpha.1`; READMEs should use UNVERSIONED install (`deno add 
+jsr:@netscript/<pkg>`)
+so they never drift — version pinning belongs to the consumer, not the README 
+sample.
+
+## Voice / doctrine constraints
+- No "honest/honesty/honestly" or candor-announcing framing (repo doctrine).
+- Alpha maturity stated factually (one clean callout), never apologetically.
+- Ground every code sample in real exported API (`deno doc jsr:@netscript/<pkg>`
+/ source) — no
+  invented signatures. Samples should be runnable or clearly snippet-marked.
+
+## Dependencies / sequencing
+- **C0 dossier** (`sota-readme-dossier.md`) = authoring-convention source; 
+dispatched 2026-06-24
+  (OpenHands `openrouter/google/gemini-3.5-flash`, PR#117). Plan locks 
+conventions FROM it.
+- PR2 must merge BEFORE the JSR release tag (READMEs are in the publish 
+surface).
+- PR3 (root README) authoring waits until PR2 lands so it bases on finished 
+package docs; its
+  research is Track 2 of the same dossier.
+
+## Open questions for the plan
+- Q1: For the 4 `-core` packages, is the pillar-hub the right primary cross-ref,
+or should the
+  reference index gain `-core` pages? (Plan decision: cross-ref pillar+plugin; 
+do NOT add ref pages
+  in this doc PR — that would be a docs-site change, separate scope.)
+- Q2: One Claude authoring agent per README (31), or grouped by family? (Lean: 
+one deep agent per
+  README for depth, families share a context brief.)
+- Q3: Link-verification gate mechanism — build the site and curl, or static 
+map-check? (Lean: static
+  resolve against `docs/site/**` tree + a live HEAD check in C2.)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm plugin-streams-core target in research.md
+
+$ cd /home/runner/work/netscript/netscript && grep -E 
+"plugin-streams-core|streams-core" .llm/tmp/run/docs-readme-revamp/research.md
+
+Tokens: ↑ input 4.2M • cache hit 88.60% •  reasoning 7.29K • ↓ output 26.84K • $
+0.4360
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+fresh fresh-ui kv logger plugin plugin-auth-core plugin-sagas-core 
+plugin-streams-core
+| **plugin-streams-core** | ⛔ none — use /reference/streams/ | 
+background-processing |
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Read sota dossier top
+
+$ cd /home/runner/work/netscript/netscript && head -80 
+.llm/tmp/run/docs-readme-revamp/sota-readme-dossier.md
+
+Tokens: ↑ input 4.24M • cache hit 88.57% •  reasoning 7.29K • ↓ output 26.92K • 
+$ 0.4399
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# SOTA README Dossier: NetScript README Revamp Blueprint
+
+## Track 1: Best-in-Class Package / Library READMEs
+
+### Exemplar Analysis
+
+#### 1. Hono
+- **Repository URL**: `https://github.com/honojs/hono/blob/main/README.md`
+- **Value Proposition (first 3 lines)**:
+  > Hono - *means flame🔥 in Japanese* - is a small, simple, and ultrafast web 
+framework built on Web Standards. It works on any JavaScript runtime: Cloudflare
+Workers, Fastly Compute, Deno, Bun, Vercel, AWS Lambda, Lambda@Edge, and 
+Node.js.
+- **Section Taxonomy & Order**:
+  1. Centered logo `<div align="center">...` + Banner image link
+  2. Horizontal rule `<hr />`
+  3. Badge block (12 badges: CI, License, NPM, Downloads, JSR, Bundle Size, 
+Commit Activity, Codecov, Discord, DeepWiki)
+  4. Short textual pitch + 8-line runnable-ready code snippet
+  5. Quick Start (`npm create hono@latest`)
+  6. Key Features (bulleted list)
+  7. Supported Runtimes (runtimes list)
+  8. Translation links
+  9. Footer / Credits / Sponsor links
+- **Code-Sample Conventions**: Exactly one highly scannable, runnable-like 
+8-line code example placed right after the first paragraph. No complex setups; 
+it demonstrates the core router API using standard imports and clean semantics.
+- **Install-Instructions Pattern**: Single command in Quick Start. It points 
+directly to the initializer scaffolding CLI rather than verbose command options.
+Version pinning is deferred to the scaffolding tool.
+- **Docs Linking**: Avoids duplicating API references in the README by keeping 
+them exceptionally concise and routing users to `hono.dev` via inline links and 
+beautiful badge graphics.
+- **Visual Devices & JSR Rendering**:
+  - Centered HTML layout used: `<div align="center">` holds the logo and links. 
+(Renders well on GitHub; JSR ignores centered alignments of some raw HTML 
+containers but keeps the image).
+  - Emoji signposts (`🔥`, `🚀`) are used sparingly and tastefully.
+  - Symmetrical layout using `<hr />`.
+- **Length Norms**: Concise, under 150 lines in total on the core file, omitting
+specific API references, middleware setups, and routing variations which reside 
+strictly on the docs site.
+
+#### 2. Zod
+- **Repository URL**: `https://github.com/colinhacks/zod/blob/master/README.md`
+- **Value Proposition (first 3 lines)**:
+  > Zod is a TypeScript-first schema declaration and validation library. I'm 
+using the term "schema" to broadly refer to any data type, from a simple 
+`string` to a complex nested object. Zod is designed to be as developer-friendly
+as possible.
+- **Section Taxonomy & Order**:
+  1. Plain text header `# Zod` (developer-first, no banner/logo image)
+  2. Extensive horizontally-wrapped badge inline row (7 badges for Version, 
+Downloads, Stars, Bundle size, Discord, etc.)
+  3. Interactive manual Table of Contents (25+ list items linking to main API 
+sections)
+  4. Introduction & Sponsor banner grid
+  5. Installation (npm, yarn, pnpm, bun, deno)
+  6. Eco-system (3rd-party community integrations)
+  7. API Reference (massive, deep tutorial-style catalog of all schemas)
+- **Code-Sample Conventions**: Shows high-quality, practical TS examples. 
+Explains schema declaration, parsing, safe-parsing (`safeParse`), and type 
+inference (`z.infer<typeof schema>`) in a single consolidated block of code 
+(about 18 lines).
+- **Install-Instructions Pattern**: Lists individual package managers in bullet 
+points rather than tabs, providing a direct copy-paste option for `npm`, `yarn`,
+`pnpm`, `bun`, and a Deno runtime import URL.
+- **Docs Linking**: Unique due to its "README-as-docs" approach. Zod contains 
+its entire documentation suite within the single README, which has led to 
+massive popularity but makes the file exceptionally long (over 2,500 lines).
+- **Visual Devices & JSR Rendering**:
+  - Very minimal use of HTML. Relying heavily on standard Markdown tables and 
+code snippets.
+  - Standard markdown anchors are utilized for the Table of Contents, which 
+renders perfectly on both GitHub and JSR, but the sheer size of the page can 
+degrade JSR page-load rendering metrics.
+- **Length Norms**: Hyper-detailed (2,500+ lines). While outstanding for a 
+standalone schema library, this length is an anti-pattern for large framework 
+repositories.
+
+#### 3. better-auth
+- **Repository URL**: 
+`https://github.com/better-auth/better-auth/blob/main/README.md`
+- **Value Proposition (first 3 lines)**:
+  > Better Auth is a comprehensive, framework-agnostic authentication library 
+for TypeScript. It provides a complete set of features out of the box, including
+session management, social logins, multi-factor authentication, and more.
+- **Section Taxonomy & Order**:
+  1. Centered logo `<p align="center">` using GitHub dark/light mode hashes 
+(`#gh-dark-mode-only`, `#gh-light-mode-only`).
+  2. Centered caption and links/buttons for Docs, Discord, and GitHub.
+  3. Feature Grid / Quick Highlights (2-column layout list).
+  4. Quick Start (Installing the package).
+  5. Concept Overview (Server instance setup + Client hooks example).
+  6. Sponsors grid.
+- **Code-Sample Conventions**: Separate, extremely clean blocks showing 
+Server-side initialization (`createAuth` with database source) and Client-side 
+hook initialization (`createAuthClient`). Demonstrates front-and-back 
+integration beautifully without being overly verbose.
+- **Install-Instructions Pattern**: Bulleted commands (`npm install 
+better-auth`, `npx better-auth init`). Points immediately to manual 
+configuration and references comprehensive guide pages for framework 
+integrations (Next.js, Remix, Astro).
+- **Docs Linking**: Avoids complex implementation details by using highly 
+visible visual buttons (`<a>` styled with dark background) redirecting to the 
+official site (`https://www.better-auth.com/`).
+- **Visual Devices & JSR Rendering**:
+  - Leverages GitHub `<picture>` tags with light/dark image mode media queries 
+(e.g. `<source media="(prefers-color-scheme: dark)" srcset="..." />`). This 
+works flawlessly on GitHub, but JSR's HTML renderer strips media queries, 
+falling back to the default `<img>` tag or alt text.
+  - Symmetrical visual headers.
+- **Length Norms**: Moderate (around 180 lines), focusing on core capabilities, 
+short setup examples, and immediate direction to framework-specific integration 
+guides.
+
+#### 4. Drizzle ORM
+- **Repository URL**: 
+`https://github.com/drizzle-team/drizzle-orm/blob/main/README.md`
+- **Value Proposition (first 3 lines)**:
+  > Drizzle ORM is a tiny, fast, client-side, TypeScript-first SQL ORM. It is 
+designed to look and feel like SQL, providing maximum efficiency, safety, and 
+performance for TypeScript-based backend applications.
+- **Section Taxonomy & Order**:
+  1. Centered logo `<div align="center">` using standard SVG or images.
+  2. Humorous / Memorable single-line slogan ("If Drizzle had a superpower, it 
+would be SQL...").
+  3. Standard social navigation links (Docs, Discord, Twitter).
+  4. Core design philosophy summary (No magical abstractions).
+  5. Short schema declaration + query usage code block.
+  6. Supported databases matrix (beautifully formatted table).
+- **Code-Sample Conventions**: Extremely powerful as they are designed to 
+showcase SQL similarity. It uses standard SQL keywords inside a Drizzle JS query
+(`select().from().where()`) next to its output to prove there is no complex 
+compiler overhead.
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+{"asctime": "2026-06-24 12:21:05,071", "levelname": "ERROR", "name": "openhands.sdk.conversation.impl.local_conversation", "filename": "local_conversation.py", "lineno": 1549, "message": "Agent reached maximum iterations limit (120)."}
+{"asctime": "2026-06-24 12:21:05,072", "levelname": "WARNING", "name": "openhands.sdk.conversation.visualizer.default", "filename": "default.py", "lineno": 321, "message": "Event type ConversationErrorEvent is not registered in EVENT_VISUALIZATION_CONFIG. Skipping visualization."}
+{"asctime": "2026-06-24 12:21:05,073", "levelname": "ERROR", "name": "__main__", "filename": "agent_runner.py", "lineno": 195, "message": "Run ended at the iteration limit; reporting failure"}

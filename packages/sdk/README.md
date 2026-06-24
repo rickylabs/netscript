@@ -1,55 +1,83 @@
 # @netscript/sdk
 
-Service discovery, oRPC clients, and cache-backed query factories for NetScript applications.
+[![JSR](https://jsr.io/badges/@netscript/sdk)](https://jsr.io/@netscript/sdk)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Install
+**The client-side surface of a NetScript app: typed oRPC service clients, cache-aware query
+factories, and TanStack Query utilities derived from one shared contract map, with service URLs
+resolved through Aspire discovery.**
 
-```sh
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/sdk
+
+# Node.js / Bun
+npx jsr add @netscript/sdk
+bunx jsr add @netscript/sdk
 ```
 
-Focused subpath imports are available when you only need part of the surface:
+### Usage
 
-```ts
-import { createServiceClient } from '@netscript/sdk/client';
-import { createQueryFactories } from '@netscript/sdk/query';
-import { createNetScriptQueryClient } from '@netscript/sdk/query-client';
-```
-
-```json
-{
-  "service": "orders"
-}
-```
-
-## Quick example
-
-Compose typed clients, server-side query factories, and TanStack Query utilities from a single
-contract map with the `defineServices()` preset:
-
-```ts
+```typescript
 import { defineServices } from '@netscript/sdk';
 import { ordersContract } from './contracts/orders.ts';
 
+// One contract map wires clients, server query factories, and frontend query utils.
 const { clients, queries, queryUtils } = defineServices({
   orders: { contract: ordersContract },
 });
 
-// Direct oRPC call through the typed service client.
-const order = await clients.orders.get({ id: '123' });
+// Direct oRPC call through the typed, discovery-aware service client.
+const order = await clients.orders.get({ id: 'ord_123' });
 
 // Cache-aware query factory for server or framework-neutral code.
-const orderQuery = queries.orders;
+const ordersQuery = queries.orders;
 
-// TanStack Query utilities for frontend / island consumers.
+// TanStack Query utilities for browser / island consumers.
 const ordersQueryUtils = queryUtils.orders;
 ```
 
-Each service entry defaults its `serviceName` and `queryPath` to the map key, so the one-liner above
+Each entry defaults its `serviceName` and TanStack query path to the map key, so the call above
 wires discovery, clients, and queries together. Drop to a focused subpath (`@netscript/sdk/client`,
 `@netscript/sdk/query`, `@netscript/sdk/query-client`) when an app only needs part of the surface.
 
-## Docs
+---
 
-- [API reference](https://rickylabs.github.io/netscript/reference/sdk/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+## 📦 Key Capabilities
+
+- **Typed service clients**: `createServiceClient` builds a fully inferred oRPC client from a shared
+  contract router — input/output types come from the contract, never duplicated.
+- **Aspire service discovery**: `@netscript/sdk/discovery` resolves service URLs and database/KV
+  connections from Aspire-injected environment variables, lazily at request time — no registry, no
+  hardcoded ports.
+- **Cache-aware query factories**: `createQueryFactory` and `createQueryFactories` generate
+  server-side query helpers backed by the shared KV cache with stale-while-revalidate semantics.
+- **TanStack Query integration**: `createNetScriptQueryClient` and `createServiceQueryUtils` give
+  browser and island code server-first defaults, invalidation bridging, and KV-backed persistence.
+- **Composition preset**: `defineServices` assembles clients, query factories, and query utils from
+  one service map, while focused subpaths keep narrow imports lean.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/sdk/](https://rickylabs.github.io/netscript/reference/sdk/)
+- **Services & SDK**:
+  [rickylabs.github.io/netscript/services-sdk/](https://rickylabs.github.io/netscript/services-sdk/)
+- **How-to — Discover services**:
+  [rickylabs.github.io/netscript/how-to/discover-services/](https://rickylabs.github.io/netscript/how-to/discover-services/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.

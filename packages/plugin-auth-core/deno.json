@@ -35,8 +35,7 @@
       "README.md",
       "deno.json",
       "mod.ts",
-      "src/**/*.ts",
-      "docs/**/*.md"
+      "src/**/*.ts"
     ],
     "exclude": [
       "**/*_test.ts",

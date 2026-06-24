@@ -1,342 +1,83 @@
 # @netscript/plugin-workers-core
 
-Core job, task, workflow, runtime, contract, telemetry, and testing primitives for NetScript workers
-plugins.
+[![JSR](https://jsr.io/badges/@netscript/plugin-workers-core)](https://jsr.io/@netscript/plugin-workers-core)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## What This Package Is
+**The reusable worker primitives for NetScript: typestate builders that define jobs, tasks, and
+workflows, plus the runtime that composes and drains them — the core that the deployable
+`@netscript/plugin-workers` plugin binds to the host.**
 
-`@netscript/plugin-workers-core` is the Tier 1 package for reusable workers primitives.
+---
 
-It owns the public definition DSL for:
+## 🚀 Quick Start
 
-- jobs
-- tasks
-- workflows
-- worker runtime composition
-- worker API contracts
-- worker configuration schemas
-- worker telemetry naming
-- test-time memory adapters
+### Installation
 
-It is designed for plugin authors, generated registries, service adapters, and tests that need to
-define or compose workers behavior without depending on the concrete `@netscript/plugin-workers`
-service plugin.
-
-## What This Package Is Not
-
-This package does not own the deployed workers service process.
-
-It does not provide:
-
-- CLI command registration
-- scaffolding command implementations
-- database migrations
-- Aspire resources
-- background processor binaries
-- plugin manifest registration
-- long-running service process code
-
-Those live in the Tier 2 workers plugin and later implementation slices.
-
-## Package Role
-
-The package follows the NetScript two-tier plugin pattern.
-
-Tier 1 core packages expose reusable definitions and runtime contracts. Tier 2 plugin packages bind
-those primitives to service processes, CLI verbs, generated registries, and host plugin manifests.
-
-Workers core intentionally keeps dependencies narrow. It does not import `@netscript/config`,
-`@netscript/telemetry`, or non-core plugin packages.
-
-## Install
-
-```sh
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/plugin-workers-core
+
+# Node.js / Bun
+npx jsr add @netscript/plugin-workers-core
+bunx jsr add @netscript/plugin-workers-core
 ```
 
-In this workspace, import the package through the Deno workspace map:
+### Usage
 
-```ts
-import { defineJob, startWorkers } from '@netscript/plugin-workers-core';
-```
+```typescript
+import {
+  createSuccessResult,
+  defineJob,
+  inspectJob,
+  startWorkers,
+} from '@netscript/plugin-workers-core';
 
-For direct package development, run checks from the repository root:
-
-```powershell
-deno check --unstable-kv packages/plugin-workers-core/mod.ts
-deno test --allow-all --unstable-kv packages/plugin-workers-core/tests/
-deno fmt packages/plugin-workers-core
-```
-
-## Quick example
-
-Define a job and start an in-process runtime:
-
-```ts
-import { createSuccessResult, defineJob, startWorkers } from '@netscript/plugin-workers-core';
-
+// Define a job with the typestate builder.
 const job = defineJob('send-email')
   .handler(() => createSuccessResult({ sent: true }))
   .topic('workers.mail')
-  .tags('email')
   .build();
 
+// Inspect the definition without starting a runtime.
+console.log(inspectJob(job)); // { id: "send-email", kind: "job" }
+
+// Start an in-process runtime, then drain and shut it down.
 const runtime = await startWorkers();
-await runtime.jobRegistry.saveJob(job);
+await runtime.stop('done');
 ```
 
-`startWorkers()` creates a fresh runtime with memory-backed defaults and starts it by default.
-
-## Define Jobs
-
-Use `defineJob(id)` for job definitions.
-
-```ts
-import { defineJob } from '@netscript/plugin-workers-core';
-
-const job = defineJob('sync-catalog')
-  .entrypoint('./workers/jobs/sync-catalog.ts')
-  .schedule('*/15 * * * *')
-  .timeout(120_000)
-  .retry(2)
-  .permissions({ net: true, read: true })
-  .build();
-```
-
-The builder is typestate-gated. `build()` is only useful after `.entrypoint(path)` or
-`.handler(fn)`.
-
-## Define Job Handlers
-
-Use `defineJobHandler()` when a handler should be exported and then referenced by a generated
-registry.
-
-```ts
-import { createSuccessResult, defineJobHandler } from '@netscript/plugin-workers-core';
-
-export const run = defineJobHandler(async (ctx) => {
-  return createSuccessResult({
-    jobId: ctx.job.id,
-    correlationId: ctx.correlationId,
-  });
-});
-```
-
-Generated registries can bind static handlers without enabling dynamic imports.
-
-## Define Tasks
-
-Use `defineTask(id)` for command-like units of work.
-
-```ts
-import { defineTask } from '@netscript/plugin-workers-core';
-
-const task = defineTask('build-assets')
-  .type('deno')
-  .entrypoint('./tasks/build-assets.ts')
-  .args('production')
-  .timeout(60_000)
-  .build();
-```
-
-Tasks model executable work. Concrete process execution is supplied by runtime adapters and the Tier
-2 workers plugin.
-
-## Define Workflows
-
-Use `defineWorkflow(id)` for ordered job and task steps.
-
-```ts
-import { defineWorkflow } from '@netscript/plugin-workers-core';
-
-const workflow = defineWorkflow('publish-release')
-  .job('sync-catalog')
-  .task('build-assets')
-  .build();
-```
-
-The core workflow engine treats workflows as state machines. Job and task step execution is injected
-through the runtime.
-
-## Runtime Composition
-
-Use `createWorkersRuntime(options)` when tests, generated code, or service adapters need explicit
-dependencies.
-
-```ts
-import { createWorkersRuntime } from '@netscript/plugin-workers-core';
-import { MemoryJobStorage, MemoryWorker } from '@netscript/plugin-workers-core/testing';
-
-const jobStorage = new MemoryJobStorage();
-const worker = new MemoryWorker();
-
-const runtime = createWorkersRuntime({
-  jobRegistry: jobStorage,
-  worker,
-});
-```
-
-Each call creates a fresh runtime handle. There are no hidden global registries or reset hooks.
-
-Runtime message contracts carry optional `idempotencyKey` fields on `JobMessage` and `TaskMessage`.
-Tier 2 consumers use those keys, then queue message ids, then payload hashes to implement
-at-least-once delivery with idempotency keys. The resulting delivery guarantee is
-exactly-once-effective for handlers whose external effects are keyed by the same idempotency key.
-Duplicate applied keys should be reported as already-applied skips rather than worker failures.
-
-## Presets
-
-`startWorkers(options)` is the root preset.
-
-```ts
-import { startWorkers } from '@netscript/plugin-workers-core';
-
-const runtime = await startWorkers({ autoStart: false });
-await runtime.start();
-await runtime.stop('test complete');
-```
-
-The preset delegates to `createWorkersRuntime(options)`.
-
-## Contracts
-
-The versioned contract subpath exports the workers API contract:
-
-```ts
-import { workersContract, workersContractV1 } from '@netscript/plugin-workers-core/contracts/v1';
-```
-
-Use `./contracts/v1` for all public contract imports. The unversioned `./contracts` alias is not
-exported in this alpha package.
-
-## Configuration
-
-Worker-owned config schemas live under `./config`.
-
-```ts
-import { JobConfigSchema, TaskConfigSchema } from '@netscript/plugin-workers-core/config';
-```
-
-These schemas are owned by workers core. They are not re-exported from `@netscript/config`.
-
-## Telemetry
-
-Telemetry naming and structural instrumentation contracts live under `./telemetry`.
-
-```ts
-import {
-  WorkerSpanNames,
-  WorkerTelemetryAttributes,
-} from '@netscript/plugin-workers-core/telemetry';
-```
-
-The package defines worker telemetry vocabulary without importing the platform telemetry package.
-
-## Testing
-
-Use `./testing` for memory-backed adapters and fixtures.
-
-```ts
-import { createJobFixture, createTestWorkersRuntime } from '@netscript/plugin-workers-core/testing';
-
-const runtime = createTestWorkersRuntime();
-const job = createJobFixture();
-
-await runtime.jobRegistry.saveJob(job);
-await runtime.worker.dispatch(job, {
-  id: 'execution-1',
-  job,
-  payload: {},
-});
-```
-
-Testing helpers create fresh instances. They do not depend on singleton state.
-
-## Subpaths
-
-Stable alpha subpaths:
-
-- `@netscript/plugin-workers-core`
-- `@netscript/plugin-workers-core/builders`
-- `@netscript/plugin-workers-core/contracts/v1`
-- `@netscript/plugin-workers-core/registry`
-- `@netscript/plugin-workers-core/state`
-- `@netscript/plugin-workers-core/executor`
-- `@netscript/plugin-workers-core/workflow`
-- `@netscript/plugin-workers-core/streams`
-- `@netscript/plugin-workers-core/presets`
-- `@netscript/plugin-workers-core/schemas`
-- `@netscript/plugin-workers-core/shutdown`
-- `@netscript/plugin-workers-core/telemetry`
-- `@netscript/plugin-workers-core/testing`
-- `@netscript/plugin-workers-core/config`
-- `@netscript/plugin-workers-core/runtime`
-
-The root barrel stays intentionally small. Use subpaths for specialized APIs.
-
-Subpath roles:
-
-- `./builders` contains the typestate job, task, and workflow builders.
-- `./contracts/v1` contains the versioned workers API contract and structural schema wrappers.
-- `./registry` contains job and task registry ports and KV-backed implementations.
-- `./state` contains execution state storage and query helpers.
-- `./executor` contains task execution adapters and process command builders.
-- `./workflow` contains workflow definitions, durable state, and step execution.
-- `./streams` contains stream schema integration with `@netscript/plugin-streams-core`.
-- `./presets` contains runtime construction presets such as `startWorkers`.
-- `./shutdown` contains graceful shutdown coordination.
-- `./schemas` contains package-owned public structural schemas.
-- `./telemetry` contains worker span names, attributes, events, and instrumentation contracts.
-- `./abstracts` contains extension-point contracts retained for alpha consumers.
-- `./testing` contains memory adapters and fixtures.
-- `./config` contains worker-owned job and task config schemas.
-- `./runtime` contains runtime composition contracts and `createWorkersRuntime`.
-
-## Permissions
-
-Definition-only imports require no Deno runtime permissions.
-
-Runtime execution depends on the adapters supplied by the caller or Tier 2 plugin. The in-process
-default job runner can execute in-memory handlers without filesystem, network, or subprocess
-permissions.
-
-Commands used during package development:
-
-```powershell
-deno check --unstable-kv packages/plugin-workers-core/mod.ts
-deno test --allow-all --unstable-kv packages/plugin-workers-core/tests/
-deno publish --dry-run --allow-dirty packages/plugin-workers-core
-```
-
-## Migration Notes
-
-Legacy worker-package consumers now import `@netscript/plugin-workers-core`.
-
-Expected movements:
-
-- definition DSL imports move to `@netscript/plugin-workers-core`
-- contract imports move to `@netscript/plugin-workers-core/contracts/v1`
-- worker-owned config schemas move to `@netscript/plugin-workers-core/config`
-- testing adapters move to `@netscript/plugin-workers-core/testing`
-- concrete service process imports remain in the Tier 2 workers plugin
-
-## Validation
-
-D17 documentation audit checks:
-
-- root README has more than 150 lines
-- README has at least 14 sections
-- docs directory includes architecture, concepts, getting-started, and recipe pages
-- examples use modern Deno/JSR package imports
-- no deprecated registry URL imports appear
-
-## Docs
-
-Read:
-
-- [Architecture](./docs/architecture.md)
-- [Concepts](./docs/concepts.md)
-- [Getting Started](./docs/getting-started.md)
-- [Adding A Job](./docs/recipes/adding-a-job.md)
-- [Adding A Task](./docs/recipes/adding-a-task.md)
-- [Testing Locally](./docs/recipes/testing-locally.md)
+---
+
+## 📦 Key Capabilities
+
+- **Definition builders**: `defineJob`, `defineTask`, and `defineWorkflow` are typestate-gated
+  builders — `build()` becomes available only after an entrypoint or handler is set, so invalid
+  definitions fail at compile time.
+- **Runtime composition**: `startWorkers()` and `createWorkersRuntime()` assemble a runtime from
+  injected registry, worker, and storage ports, with memory-backed defaults for tests and generated
+  code.
+- **Versioned contracts**: `./contracts/v1` exports the workers API contract and Standard Schema
+  wrappers that the Tier 2 service plugin and generated registries bind against.
+- **Pluggable adapters**: registry, state, executor, workflow, shutdown, and telemetry subpaths
+  expose ports and KV-backed implementations without pulling in `@netscript/config` or
+  `@netscript/telemetry`.
+- **Test primitives**: `./testing` ships memory adapters and fixtures so jobs, tasks, and workflows
+  can be exercised with no filesystem, network, or subprocess permissions.
+
+---
+
+## 📖 Documentation
+
+- **Reference** (workers family):
+  [rickylabs.github.io/netscript/reference/workers/](https://rickylabs.github.io/netscript/reference/workers/)
+- **Background Processing** (capability pillar):
+  [rickylabs.github.io/netscript/background-processing/](https://rickylabs.github.io/netscript/background-processing/)
+- **Background jobs** (how-to):
+  [rickylabs.github.io/netscript/capabilities/background-jobs/](https://rickylabs.github.io/netscript/capabilities/background-jobs/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE).

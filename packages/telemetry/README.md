@@ -1,39 +1,95 @@
 # @netscript/telemetry
 
-OpenTelemetry tracing primitives and NetScript instrumentation for jobs, queues, RPC, and SSE.
+[![JSR](https://jsr.io/badges/@netscript/telemetry)](https://jsr.io/@netscript/telemetry)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Install
+**OpenTelemetry tracing primitives for NetScript: domain tracers, W3C context propagation across job
+subprocesses, and an instrumentation registry that links scheduler, queue, worker, RPC, and SSE
+spans into one distributed trace.**
 
-```sh
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/telemetry
+
+# Node.js / Bun
+npx jsr add @netscript/telemetry
+bunx jsr add @netscript/telemetry
 ```
 
-Layered helpers live on typed subpaths so callers import only what they need:
+### Usage
 
-```ts
-import { getTelemetryConfig } from '@netscript/telemetry/config';
-import { withSpan } from '@netscript/telemetry/tracer';
-import { TracingPlugin } from '@netscript/telemetry/orpc';
+```typescript
+import { getJobTracer, withSpan } from '@netscript/telemetry/tracer';
+
+// Run async work inside a span on the job-domain tracer.
+const records = await withSpan(
+  getJobTracer(),
+  'job.import',
+  async (span) => {
+    span.setAttribute('job.source', 'erp-sync');
+    return await importRecords();
+  },
+);
 ```
 
-## Quick example
+To continue a worker's trace inside a spawned job subprocess, extract the propagated context at the
+start of the job script:
 
-Inspect an instrumentation registry to produce a JSON-stable diagnostic report:
+```typescript
+import { initJobTracing } from '@netscript/telemetry';
+import { getJobTracer, withSpan } from '@netscript/telemetry/tracer';
 
-```ts
-import { inspectTelemetry, InstrumentationRegistry } from '@netscript/telemetry';
+const parentContext = initJobTracing();
 
-const registry = new InstrumentationRegistry();
-registry.register({ name: 'queue' });
-
-const report = inspectTelemetry(registry);
-console.log(report.summary);
+await withSpan(
+  getJobTracer(),
+  'job.main',
+  async (span) => {
+    span.setAttribute('job.step', 'processing');
+    // ... job logic
+  },
+  { parentContext: parentContext ?? undefined },
+);
 ```
 
-Use `@netscript/telemetry/tracer` and `@netscript/telemetry/context` to create spans and propagate
-trace context across jobs, queues, and subprocesses.
+---
 
-## Docs
+## 📦 Key Capabilities
 
-- [API reference](https://rickylabs.github.io/netscript/reference/telemetry/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+- **Domain tracers**: `getQueueTracer`, `getWorkerTracer`, `getSchedulerTracer`, `getJobTracer`,
+  `getSagaTracer`, `getSSETracer`, and `getKVTracer` return cached, canonically named tracers so
+  spans group by NetScript subsystem.
+- **W3C context propagation**: `injectContext`/`extractContext` carry trace context through message
+  headers, and `createJobTraceEnv`/`extractJobTraceContext` thread it across `Deno.Command` job
+  subprocesses.
+- **Span helpers**: `withSpan`, `withSpanSync`, `createSpan`, and `addSpanEvent` wrap
+  OpenTelemetry-compatible `Span` and `Context` types so callers never touch the raw SDK.
+- **Instrumentation registry**: `InstrumentationRegistry` registers lifecycle hooks with
+  `setupAll`/`teardownAll`, and `inspectTelemetry` returns a JSON-stable `InspectionReport` for
+  diagnostics.
+- **oRPC tracing**: `createTracingPlugin` and `createErrorHandlingPlugin` (via
+  `@netscript/telemetry/orpc`) instrument the NetScript oRPC handler with handler-scoped trace
+  context.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/telemetry/](https://rickylabs.github.io/netscript/reference/telemetry/)
+- **Observability**:
+  [rickylabs.github.io/netscript/observability/](https://rickylabs.github.io/netscript/observability/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.

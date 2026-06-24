@@ -36,7 +36,6 @@
       "scaffold.plugin.json",
       "mod.ts",
       "src/**/*.ts",
-      "docs/**/*.md",
       "services/**/*.ts"
     ],
     "exclude": [

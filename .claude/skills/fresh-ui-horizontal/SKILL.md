@@ -12,9 +12,9 @@ silently.
 
 ## Authority chain
 
-1. `packages/fresh-ui/docs/l0-conventions.md` — the L0 contract (layers,
+1. `l0-conventions.md` (alongside this skill) — the L0 contract (layers,
    attributes, token rule, motion rule, copy fidelity).
-2. `packages/fresh-ui/docs/theme-authoring.md` — the theme contract.
+2. `theme-authoring.md` (alongside this skill) — the theme contract.
 3. `packages/fresh-ui/README.md` — surface, catalog, validation commands.
 4. The LOCKED slice table in the run's `plan.md` — never rescope a locked
    slice; out-of-scope findings become drift entries, not work.

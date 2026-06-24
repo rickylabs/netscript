@@ -1,53 +1,87 @@
 # @netscript/plugin-streams
 
-Durable Streams plugin for NetScript — declares the streams service manifest, CLI, Aspire, and E2E
-contributions, plus typed stream-topic helper definitions.
+[![JSR](https://jsr.io/badges/@netscript/plugin-streams)](https://jsr.io/@netscript/plugin-streams)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Install
+**The NetScript plugin manifest for the Durable Streams service. Registers a change-data stream
+service into your app and exposes typed topic, producer, and consumer authoring helpers — plus CLI,
+scaffolding, E2E, and Aspire integration entrypoints.**
 
-```sh
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/plugin-streams
+
+# Node.js / Bun
+npx jsr add @netscript/plugin-streams
+bunx jsr add @netscript/plugin-streams
 ```
 
-Focused subpath imports are available for the plugin's framework integrations:
+### Usage
 
-```ts
-import { StreamsCli } from '@netscript/plugin-streams/cli';
-import { StreamsAspireContribution } from '@netscript/plugin-streams/aspire';
-import { getStreamsE2eGates } from '@netscript/plugin-streams/e2e';
-import { streamsScaffolder } from '@netscript/plugin-streams/scaffolding';
-```
-
-## Quick example
-
-Add the plugin to your `netscript.config.ts` and inspect the manifest it contributes:
-
-```ts
-import { streamsPlugin } from '@netscript/plugin-streams';
-
-console.log(streamsPlugin.name);
-console.log(streamsPlugin.contributions.services?.[0]?.name);
-```
-
-Define a typed topic and derive producer and consumer handles at the manifest layer:
-
-```ts
+```typescript
 import {
   defineStreamConsumer,
   defineStreamProducer,
   defineStreamTopic,
+  streamsPlugin,
 } from '@netscript/plugin-streams';
 
-const topic = defineStreamTopic('orders', schema);
-const producer = defineStreamProducer(topic);
-const consumer = defineStreamConsumer(topic);
+// Register the Durable Streams service into your NetScript app config.
+export const plugins = [streamsPlugin];
+
+// Author a typed topic, then derive producer and consumer handles for it.
+const orderSchema = {
+  '~standard': {
+    version: 1,
+    vendor: 'app',
+    validate: (value: unknown) => ({ value }),
+  },
+} as const;
+
+const orders = defineStreamTopic('orders', orderSchema);
+const producer = defineStreamProducer(orders);
+const consumer = defineStreamConsumer(orders);
 ```
 
-Runtime stream primitives (`createDurableStream`, `defineStreamSchema`, producers, and consumers)
-live in `@netscript/plugin-streams-core`. The default streams service listens on port `4437`; set
-`STREAMS_PORT` or `PORT` to override it and `STREAMS_DATA_DIR` for file-backed storage.
+---
 
-## Docs
+## 📦 Key Capabilities
 
-- [API reference](https://rickylabs.github.io/netscript/reference/streams/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+- **Plugin manifest**: `streamsPlugin` contributes the Durable Streams development service,
+  telemetry, and E2E gates to a NetScript app through the standard plugin contribution contract.
+- **Typed topic authoring**: `defineStreamTopic`, `defineStreamProducer`, and `defineStreamConsumer`
+  produce typed `StreamTopicDefinition`, `StreamProducerHandle`, and `StreamConsumerHandle` values
+  at the manifest layer.
+- **Framework integration entrypoints**: dedicated sub-path exports for `/cli`, `/scaffolding`,
+  `/e2e`, and `/aspire` wire the plugin into the CLI command group, scaffolder, end-to-end gates,
+  and the Aspire AppHost.
+- **Telemetry-aware**: contributes stream publish, consume, and subscribe instrumentation through
+  the NetScript telemetry host.
+- **Core runtime separation**: schema, durable producers, and configuration primitives
+  (`createDurableStream`, `defineStreamSchema`) live in the supporting
+  `@netscript/plugin-streams-core` package.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/streams/](https://rickylabs.github.io/netscript/reference/streams/)
+- **Durable Workflows**:
+  [rickylabs.github.io/netscript/durable-workflows/](https://rickylabs.github.io/netscript/durable-workflows/)
+- **How-to: Publish a durable stream**:
+  [rickylabs.github.io/netscript/how-to/publish-a-durable-stream/](https://rickylabs.github.io/netscript/how-to/publish-a-durable-stream/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.
