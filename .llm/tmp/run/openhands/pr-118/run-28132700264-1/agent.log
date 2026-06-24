@@ -1,0 +1,400 @@
++31|- `@netscript/queue` reference page existence (link degrades gracefully).
++32|- `deno dx` CLI form deferred sweep (correctly absent).
++33|
++34|## Recommendation
++35|
++36|Merge PR #118 → main. Next steps per the plan's pipeline: `publish:dry-run` 
+green → release tag → OIDC `deno publish`.
++37|
++38|## Remaining risks
++39|
++40|None blocking. The root README closes the "road to JSR publish" topology 
+(PR1 #116 publish mechanics, PR2 #117 package READMEs, PR3 #118 root landing — 
+final docs PR before release).
++41|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "create", "file_text": "# IMPL-EVAL Summary 
+\u2014 PR #118 root README (docs/root-readme)\n\n**Evaluator session**: 
+OpenHands `openrouter/qwen3.7-max` (separate from generator)  \n**Verdict**: 
+`PASS`\n\n## Changes evaluated\n\n- **Commit**: `b6faf31b` \u2014 
+`docs(root-readme): author meta-framework landing README (PR3)`\n- **Scope**: 
+`/README.md` only (236 insertions, 5 deletions)\n- **Out of scope**: no source, 
+no `deno.json`, no `deno.lock`, no `packages/`/`plugins/` churn\n\n## 
+Validation\n\n**Per-criterion checklist (1\u20139)**: all PASS. See 
+`.llm/tmp/run/docs-root-readme/evaluate.md` for full evidence.\n\n### Criterion 
+1: Structure (D1) \u2014 10-chapter order \u2705\nAll 10 chapters present in 
+correct sequence: Title+hero+3 badges \u2192 value prop \u2192 \ud83e\udded What
+is NetScript \u2192 \ud83d\ude80 60-Second Quick Start \u2192 \ud83d\uddfa\ufe0f
+Architecture \u2192 \ud83d\udce6 Packages \u2192 \ud83d\udcd6 Documentation 
+\u2192 \ud83d\udcc5 Roadmap & Maturity \u2192 \ud83e\udd1d Contributing \u2192 
+\ud83d\udcdd License.\n\n### Criterion 2: Hero + badges (D2/D5) \u2705\nJSR-safe
+ASCII monospace banner (L10\u201316) rendering identically on GitHub + JSR. 
+Exactly 3 badges: JSR scope `jsr.io/badges/@netscript`, CI `ci.yml/badge.svg`, 
+Docs `rickylabs.github.io-blue`.\n\n### Criterion 3: Architecture (D3) 
+\u2705\nASCII four-layer canvas (L79\u2013104) is always visible. Mermaid under 
+`<details>` (L112\u2013123) with label \"Mermaid view (rendered on GitHub)\" 
+\u2014 stripped on JSR but not the sole diagram.\n\n### Criterion 4: Package map
+(D4) \u2705\nAll 31 packages present with exact names matching the authoritative
+map. Six layer sections: Foundation core (6), Data messaging & scheduling (6), 
+Plugin contracts `*-core` (6), Runtime plugins (5), Auth backends (3), 
+Application surface (5) = **31 total**. Columns: Package \u00b7 JSR \u00b7 
+Capability \u00b7 Reference. Zero drops, zero invented rows.\n\n### Criterion 5:
+Voice (D5) \u2705\n`grep -ioPn 'honest|transparent|apologeti'` returns zero 
+matches. Alpha signalled as factual noun-phrase: `> [!NOTE] > **Alpha 
+(0.0.1-alpha.1).**` with roadmap link. No candor-announcing or apologetic 
+framing.\n\n### Criterion 6: Links \u2705\nAll doc links absolute: 
+`https://rickylabs.github.io/netscript/...` or 
+`https://github.com/rickylabs/netscript/...`. Zero relative doc links.\n\n### 
+Criterion 7: Quick start truthfulness \u2705\nCLI install command matches 
+shipped `docs/site/cli-reference.md`: `deno install --global --allow-all --name 
+netscript jsr:@netscript/cli/bin/netscript.ts`. No-install form: `deno run -A 
+jsr:@netscript/cli/bin/netscript.ts`. Deferred `deno dx` form correctly absent 
+(recorded follow-up).\n\n### Criterion 8: deno fmt \u2705\n`deno fmt --check 
+README.md` \u2014 exit 0, output: \"Checked 1 file\". **Raw output 
+preserved.**\n\n### Criterion 9: Scope \u2705\n`git diff --stat 
+740c3312..b6faf31b`: 1 file changed \u2014 `README.md` only (236 insertions, 5 
+deletions). No source, no `deno.json`, no `deno.lock`.\n\n## Consistency with 
+PR2 package READMEs\n\nBadge style, voice, and cross-link convention match 
+merged PR2 package READMEs:\n- `packages/sdk/README.md` L3\u20135: identical 
+3-badge row\n- `packages/service/README.md` L3\u20135: identical 3-badge row  
+\n- `plugins/auth/README.md` L3\u20135: identical 3-badge row\n\n## Recorded 
+follow-ups (non-blocking, OUT of scope)\n\n1. **Brand/banner asset**: ASCII hero
+shipped; commissioned banner image is a future enhancement (not a PR3 
+blocker).\n2. **`@netscript/queue` reference page**: link points at published 
+site; if page 404s it degrades gracefully.\n3. **`deno dx` CLI form**: deferred 
+sweep \u2014 correctly absent from quick start.\n\n## Recommendation\n\n**Merge 
+PR #118 \u2192 main.** The root README is a clean, enterprise-grade landing page
+that renders on GitHub + JSR, documents the full 31-package surface, and closes 
+the \"road to JSR publish\" topology (PR1 #116 publish mechanics \u2713, PR2 
+#117 package READMEs \u2713, PR3 #118 root landing \u2713 \u2014 final docs PR 
+before release).\n\n**Next steps per the plan's pipeline**: `publish:dry-run` 
+green \u2192 release tag \u2192 OIDC `deno publish`.\n\n## Remaining 
+risks\n\nNone blocking. All 9 criteria satisfied. The deliverable is ready to 
+merge.\n", "path": "/home/runner/work/_temp/openhands/28132700264-1/summary.md"}
+
+Reasoning:
+The user has given me the system-hint about reasoning and the tool results. I'm 
+now in synthesis mode - I need to create the summary files and finalize the 
+verdict. The evaluation is complete with a PASS verdict.
+
+Let me create the final artifacts:
+1. Write the OpenHands summary to the specified path
+2. The evaluator verdict is already written to evaluate.md
+3. I should provide a clear completion message
+
+The summary path from the operational contract is: 
+`/home/runner/work/_temp/openhands/28132700264-1/summary.md`
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28132700264-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Summary — PR #118 root README (docs/root-readme)
+    
+    **Evaluator session**: OpenHands `openrouter/qwen3.7-max` (separate from 
+generator)  
+    **Verdict**: `PASS`
+    
+    ## Changes evaluated
+    
+    - **Commit**: `b6faf31b` — `docs(root-readme): author meta-framework landing
+README (PR3)`
+    - **Scope**: `/README.md` only (236 insertions, 5 deletions)
+    - **Out of scope**: no source, no `deno.json`, no `deno.lock`, no 
+`packages/`/`plugins/` churn
+    
+    ## Validation
+    
+    **Per-criterion checklist (1–9)**: all PASS. See 
+`.llm/tmp/run/docs-root-readme/evaluate.md` for full evidence.
+    
+    ### Criterion 1: Structure (D1) — 10-chapter order ✅
+    All 10 chapters present in correct sequence: Title+hero+3 badges → value 
+prop → 🧭 What is NetScript → 🚀 60-Second Quick Start → 🗺️ Architecture → 📦 
+Packages → 📖 Documentation → 📅 Roadmap & Maturity → 🤝 Contributing → 📝 
+License.
+    
+    ### Criterion 2: Hero + badges (D2/D5) ✅
+    JSR-safe ASCII monospace banner (L10–16) rendering identically on GitHub + 
+JSR. Exactly 3 badges: JSR scope `jsr.io/badges/@netscript`, CI 
+`ci.yml/badge.svg`, Docs `rickylabs.github.io-blue`.
+    
+    ### Criterion 3: Architecture (D3) ✅
+    ASCII four-layer canvas (L79–104) is always visible. Mermaid under 
+`<details>` (L112–123) with label "Mermaid view (rendered on GitHub)" — stripped
+on JSR but not the sole diagram.
+    
+    ### Criterion 4: Package map (D4) ✅
+    All 31 packages present with exact names matching the authoritative map. Six
+layer sections: Foundation core (6), Data messaging & scheduling (6), Plugin 
+contracts `*-core` (6), Runtime plugins (5), Auth backends (3), Application 
+surface (5) = **31 total**. Columns: Package · JSR · Capability · Reference. 
+Zero drops, zero invented rows.
+    
+    ### Criterion 5: Voice (D5) ✅
+    `grep -ioPn 'honest|transparent|apologeti'` returns zero matches. Alpha 
+signalled as factual noun-phrase: `> [!NOTE] > **Alpha (0.0.1-alpha.1).**` with 
+roadmap link. No candor-announcing or apologetic framing.
+    
+    ### Criterion 6: Links ✅
+    All doc links absolute: `https://rickylabs.github.io/netscript/...` or 
+`https://github.com/rickylabs/netscript/...`. Zero relative doc links.
+    
+    ### Criterion 7: Quick start truthfulness ✅
+    CLI install command matches shipped `docs/site/cli-reference.md`: `deno 
+install --global --allow-all --name netscript 
+jsr:@netscript/cli/bin/netscript.ts`. No-install form: `deno run -A 
+jsr:@netscript/cli/bin/netscript.ts`. Deferred `deno dx` form correctly absent 
+(recorded follow-up).
+    
+    ### Criterion 8: deno fmt ✅
+    `deno fmt --check README.md` — exit 0, output: "Checked 1 file". **Raw 
+output preserved.**
+    
+    ### Criterion 9: Scope ✅
+    `git diff --stat 740c3312..b6faf31b`: 1 file changed — `README.md` only (236
+insertions, 5 deletions). No source, no `deno.json`, no `deno.lock`.
+    
+    ## Consistency with PR2 package READMEs
+    
+    Badge style, voice, and cross-link convention match merged PR2 package 
+READMEs:
+    - `packages/sdk/README.md` L3–5: identical 3-badge row
+    - `packages/service/README.md` L3–5: identical 3-badge row  
+    - `plugins/auth/README.md` L3–5: identical 3-badge row
+    
+    ## Recorded follow-ups (non-blocking, OUT of scope)
+    
+    1. **Brand/banner asset**: ASCII hero shipped; commissioned banner image is 
+a future enhancement (not a PR3 blocker).
+    2. **`@netscript/queue` reference page**: link points at published site; if 
+page 404s it degrades gracefully.
+    3. **`deno dx` CLI form**: deferred sweep — correctly absent from quick 
+start.
+    
+    ## Recommendation
+    
+    **Merge PR #118 → main.** The root README is a clean, enterprise-grade 
+landing page that renders on GitHub + JSR, documents the full 31-package 
+surface, and closes the "road to JSR publish" topology (PR1 #116 publish 
+mechanics ✓, PR2 #117 package READMEs ✓, PR3 #118 root landing ✓ — final docs PR
+before release).
+    
+    **Next steps per the plan's pipeline**: `publish:dry-run` green → release 
+tag → OIDC `deno publish`.
+    
+    ## Remaining risks
+    
+    None blocking. All 9 criteria satisfied. The deliverable is ready to merge.
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 349.99K • cache hit 75.92% •  reasoning 3.11K • ↓ output 11.76K 
+• $ 0.2158
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28132700264-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary — PR #118 root README (docs/root-readme)
+ 2|
++3|**Evaluator session**: OpenHands `openrouter/qwen3.7-max` (separate from 
+generator)  
++4|**Verdict**: `PASS`
++5|
++6|## Changes evaluated
++7|
++8|- **Commit**: `b6faf31b` — `docs(root-readme): author meta-framework landing 
+README (PR3)`
++9|- **Scope**: `/README.md` only (236 insertions, 5 deletions)
++10|- **Out of scope**: no source, no `deno.json`, no `deno.lock`, no 
+`packages/`/`plugins/` churn
++11|
++12|## Validation
++13|
++14|**Per-criterion checklist (1–9)**: all PASS. See 
+`.llm/tmp/run/docs-root-readme/evaluate.md` for full evidence.
++15|
++16|### Criterion 1: Structure (D1) — 10-chapter order ✅
++17|All 10 chapters present in correct sequence: Title+hero+3 badges → value 
+prop → 🧭 What is NetScript → 🚀 60-Second Quick Start → 🗺️ Architecture → 📦 
+Packages → 📖 Documentation → 📅 Roadmap & Maturity → 🤝 Contributing → 📝 
+License.
++18|
++19|### Criterion 2: Hero + badges (D2/D5) ✅
++20|JSR-safe ASCII monospace banner (L10–16) rendering identically on GitHub + 
+JSR. Exactly 3 badges: JSR scope `jsr.io/badges/@netscript`, CI 
+`ci.yml/badge.svg`, Docs `rickylabs.github.io-blue`.
++21|
++22|### Criterion 3: Architecture (D3) ✅
++23|ASCII four-layer canvas (L79–104) is always visible. Mermaid under 
+`<details>` (L112–123) with label "Mermaid view (rendered on GitHub)" — stripped
+on JSR but not the sole diagram.
++24|
++25|### Criterion 4: Package map (D4) ✅
++26|All 31 packages present with exact names matching the authoritative map. Six
+layer sections: Foundation core (6), Data messaging & scheduling (6), Plugin 
+contracts `*-core` (6), Runtime plugins (5), Auth backends (3), Application 
+surface (5) = **31 total**. Columns: Package · JSR · Capability · Reference. 
+Zero drops, zero invented rows.
++27|
++28|### Criterion 5: Voice (D5) ✅
++29|`grep -ioPn 'honest|transparent|apologeti'` returns zero matches. Alpha 
+signalled as factual noun-phrase: `> [!NOTE] > **Alpha (0.0.1-alpha.1).**` with 
+roadmap link. No candor-announcing or apologetic framing.
++30|
++31|### Criterion 6: Links ✅
++32|All doc links absolute: `https://rickylabs.github.io/netscript/...` or 
+`https://github.com/rickylabs/netscript/...`. Zero relative doc links.
++33|
++34|### Criterion 7: Quick start truthfulness ✅
++35|CLI install command matches shipped `docs/site/cli-reference.md`: `deno 
+install --global --allow-all --name netscript 
+jsr:@netscript/cli/bin/netscript.ts`. No-install form: `deno run -A 
+jsr:@netscript/cli/bin/netscript.ts`. Deferred `deno dx` form correctly absent 
+(recorded follow-up).
++36|
++37|### Criterion 8: deno fmt ✅
++38|`deno fmt --check README.md` — exit 0, output: "Checked 1 file". **Raw 
+output preserved.**
++39|
++40|### Criterion 9: Scope ✅
++41|`git diff --stat 740c3312..b6faf31b`: 1 file changed — `README.md` only (236
+insertions, 5 deletions). No source, no `deno.json`, no `deno.lock`.
++42|
++43|## Consistency with PR2 package READMEs
++44|
++45|Badge style, voice, and cross-link convention match merged PR2 package 
+READMEs:
++46|- `packages/sdk/README.md` L3–5: identical 3-badge row
++47|- `packages/service/README.md` L3–5: identical 3-badge row  
++48|- `plugins/auth/README.md` L3–5: identical 3-badge row
++49|
++50|## Recorded follow-ups (non-blocking, OUT of scope)
++51|
++52|1. **Brand/banner asset**: ASCII hero shipped; commissioned banner image is 
+a future enhancement (not a PR3 blocker).
++53|2. **`@netscript/queue` reference page**: link points at published site; if 
+page 404s it degrades gracefully.
++54|3. **`deno dx` CLI form**: deferred sweep — correctly absent from quick 
+start.
++55|
++56|## Recommendation
++57|
++58|**Merge PR #118 → main.** The root README is a clean, enterprise-grade 
+landing page that renders on GitHub + JSR, documents the full 31-package 
+surface, and closes the "road to JSR publish" topology (PR1 #116 publish 
+mechanics ✓, PR2 #117 package READMEs ✓, PR3 #118 root landing ✓ — final docs PR
+before release).
++59|
++60|**Next steps per the plan's pipeline**: `publish:dry-run` green → release 
+tag → OIDC `deno publish`.
++61|
++62|## Remaining risks
++63|
++64|None blocking. All 9 criteria satisfied. The deliverable is ready to merge.
++65|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: All evaluation tasks complete
+
+Reasoning:
+...
+
+📋 Update Task List (6 tasks)
+
+Tokens: ↑ input 395.09K • cache hit 77.92% •  reasoning 3.12K • ↓ output 11.94K 
+• $ 0.2308
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 6 done
+
+✅ 1. Read harness skill files and plan artifacts
+✅ 2. Read authoritative sources (deep-search-brief, plan, commits)
+✅ 3. Read the PR deliverable: /README.md
+✅ 4. Check a few merged PR2 package READMEs for consistency
+✅ 5. Evaluate all 9 criteria
+✅ 6. Write evaluator verdict and PR comment
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL PASS for PR #118 root README
+
+Reasoning:
+The summary has been written to the OPENHANDS_SUMMARY_PATH. Now I need to finish
+the evaluation. The output_mode is pr-comment, so the workflow will 
+automatically post the comment based on the summary.md content. Let me call 
+finish to signal completion.
+
+Finish with message:
+## IMPL-EVAL Verdict: `PASS`
+
+**Evaluator**: OpenHands `openrouter/qwen/qwen3.7-max` (separate from generator)
+**Commit**: `b6faf31b` — `docs(root-readme): author meta-framework landing 
+README (PR3)`
+
+### Per-criterion checklist (1–9): all PASS
+
+| # | Criterion | Status |
+|---|-----------|--------|
+| 1 | Structure (D1) — 10-chapter order | ✅ PASS |
+| 2 | Hero + badges (D2/D5) — JSR-safe ASCII + 3 badges | ✅ PASS |
+| 3 | Architecture (D3) — ASCII canvas primary, mermaid optional | ✅ PASS |
+| 4 | Package map (D4) — all 31 packages, exact names, six layers | ✅ PASS |
+| 5 | Voice (D5) — zero banned tokens | ✅ PASS |
+| 6 | Links — absolute doc links only | ✅ PASS |
+| 7 | Quick start truthfulness | ✅ PASS |
+| 8 | `deno fmt --check README.md` — "Checked 1 file", exit 0 | ✅ PASS |
+| 9 | Scope — only README.md changed | ✅ PASS |
+
+### Evidence highlights
+
+- **31 packages verified**: `grep -oP` extracts exactly 31 unique `@netscript/*`
+names, all matching the authoritative map in `deep-search-brief.md` L60–92.
+- **Six layer groupings correct**: Foundation core (6), Data messaging & 
+scheduling (6), Plugin contracts `*-core` (6), Runtime plugins (5), Auth 
+backends (3), Application surface (5) = 31.
+- **Alpha callout**: factual noun-phrase `> [!NOTE] > **Alpha 
+(0.0.1-alpha.1).**` with roadmap link — no apologetic framing.
+- **CLI command ground-truthed**: `deno install --global --allow-all --name 
+netscript jsr:@netscript/cli/bin/netscript.ts` matches shipped 
+`docs/site/cli-reference.md` exactly.
+- **Consistency with PR2**: badge row, voice, and cross-link convention match 
+merged `packages/sdk/README.md`, `packages/service/README.md`, 
+`plugins/auth/README.md`.
+
+### Recorded follow-ups (non-blocking)
+
+1. Brand/banner asset (ASCII hero shipped; commissioned image is future)
+2. `@netscript/queue` reference page existence (link degrades gracefully)
+3. `deno dx` CLI form deferred sweep (correctly absent)
+
+### Recommendation
+
+**Merge PR #118 → main.** The root README closes the "road to JSR publish" 
+topology (PR1 #116 ✓, PR2 #117 ✓, PR3 #118 ✓). Next: `publish:dry-run` green → 
+release tag → OIDC `deno publish`.
+
+**Full verdict**: `.llm/tmp/run/docs-root-readme/evaluate.md`  
+**Run summary**: `.llm/tmp/run/openhands/pr-118/run-28132700264-1/summary.md`
+
+Tokens: ↑ input 440.39K • cache hit 79.96% •  reasoning 3.17K • ↓ output 12.73K 
+• $ 0.2461
+
