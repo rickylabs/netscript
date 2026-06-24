@@ -68,8 +68,8 @@ export interface PluginSettingsSchema<T> {
  * import { installedVersionSchema } from "@netscript/config/schema/plugins";
  *
  * const version = installedVersionSchema.parse({
- *   InstalledVersion: "0.0.1-alpha.0",
- *   InstalledFrom: "jsr:@netscript/plugin-workers@^0.0.1-alpha.0",
+ *   InstalledVersion: "0.0.1-alpha.1",
+ *   InstalledFrom: "jsr:@netscript/plugin-workers@0.0.1-alpha.1",
  * });
  * ```
  */
@@ -89,8 +89,8 @@ export interface InstalledVersionFields {
  *
  * const entry = pluginEntrySchema.parse({
  *   Port: 8091,
- *   InstalledVersion: "0.0.1-alpha.0",
- *   InstalledFrom: "jsr:@netscript/plugin-workers@^0.0.1-alpha.0",
+ *   InstalledVersion: "0.0.1-alpha.1",
+ *   InstalledFrom: "jsr:@netscript/plugin-workers@0.0.1-alpha.1",
  * });
  * ```
  */
@@ -127,7 +127,7 @@ export interface PluginEntry extends InstalledVersionFields {
  * import { backgroundProcessorEntrySchema } from "@netscript/config/schema/plugins";
  *
  * const processor = backgroundProcessorEntrySchema.parse({
- *   InstalledVersion: "0.0.1-alpha.0",
+ *   InstalledVersion: "0.0.1-alpha.1",
  *   InstalledFrom: "workspace:plugins/workers",
  * });
  * ```
@@ -171,7 +171,7 @@ export interface BackgroundProcessorEntry extends InstalledVersionFields {
  * @example
  * ```ts
  * const fields = installedVersionSchema.parse({
- *   InstalledVersion: "0.0.1-alpha.0",
+ *   InstalledVersion: "0.0.1-alpha.1",
  *   InstalledFrom: "local:../plugins/example",
  * });
  * ```
@@ -187,7 +187,7 @@ export const installedVersionSchema: PluginSettingsSchema<InstalledVersionFields
  * ```ts
  * const entry = pluginEntrySchema.parse({
  *   Port: 8091,
- *   InstalledVersion: "0.0.1-alpha.0",
+ *   InstalledVersion: "0.0.1-alpha.1",
  *   InstalledFrom: "jsr:@netscript/plugin-workers",
  * });
  * ```
@@ -200,7 +200,7 @@ export const pluginEntrySchema: PluginSettingsSchema<PluginEntry> = z.object(plu
  * @example
  * ```ts
  * const processor = backgroundProcessorEntrySchema.parse({
- *   InstalledVersion: "0.0.1-alpha.0",
+ *   InstalledVersion: "0.0.1-alpha.1",
  *   InstalledFrom: "jsr:@netscript/plugin-workers",
  * });
  * ```

@@ -14,8 +14,8 @@ import { pluginEntrySchema } from '@netscript/config/schema/plugins';
 
 const entry = pluginEntrySchema.parse({
   Port: 8091,
-  InstalledVersion: '0.0.1-alpha.0',
-  InstalledFrom: 'jsr:@netscript/plugin-workers@^0.0.1-alpha.0',
+  InstalledVersion: '0.0.1-alpha.1',
+  InstalledFrom: 'jsr:@netscript/plugin-workers@0.0.1-alpha.1',
 });
 ```
 

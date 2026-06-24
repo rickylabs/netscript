@@ -11,6 +11,7 @@ import { normalize as normalizePosix } from '@std/path/posix';
  * Also resolves NuGet references for the optional Aspire orchestration layer.
  */
 
+import { JSR_SPECIFIERS } from '../../constants/jsr-specifiers.ts';
 import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 
@@ -19,54 +20,61 @@ import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.t
  * Used when `importMode` is `'jsr'` for registry-based resolution.
  */
 const PACKAGE_TO_JSR: Record<string, string> = {
-  [SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG]: 'jsr:@netscript/config@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: 'jsr:@netscript/service@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN]: 'jsr:@netscript/plugin@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_CONTRACTS]: 'jsr:@netscript/contracts@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: 'jsr:@netscript/sdk@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT]: 'jsr:@netscript/sdk@^1.0.0/client',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_QUERY]: 'jsr:@netscript/sdk@^1.0.0/query',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_QUERY_CLIENT]: 'jsr:@netscript/sdk@^1.0.0/query-client',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_LOGGER]: 'jsr:@netscript/logger@^1.0.0',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_CONFIG]: JSR_SPECIFIERS.config,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_SERVICE]: JSR_SPECIFIERS.service,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN]: JSR_SPECIFIERS.plugin,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_CONTRACTS]: JSR_SPECIFIERS.contracts,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: JSR_SPECIFIERS.sdk,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT]: `${JSR_SPECIFIERS.sdk}/client`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_QUERY]: `${JSR_SPECIFIERS.sdk}/query`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_QUERY_CLIENT]: `${JSR_SPECIFIERS.sdk}/query-client`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_LOGGER]: JSR_SPECIFIERS.logger,
   // Subpaths resolve through each package's `exports` field on JSR — listing
   // them explicitly keeps `deno task check` symmetrical between modes.
-  [SCAFFOLD_PACKAGES.NETSCRIPT_LOGGER_MIDDLEWARE]: 'jsr:@netscript/logger@^1.0.0/middleware',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_LOGGER_ORPC]: 'jsr:@netscript/logger@^1.0.0/orpc',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_TELEMETRY]: 'jsr:@netscript/telemetry@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]: 'jsr:@netscript/database@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]: 'jsr:@netscript/database@^1.0.0/scripts',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]: 'jsr:@netscript/database@^1.0.0/tracing',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE]: 'jsr:@netscript/plugin-auth-core@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONFIG]:
-    'jsr:@netscript/plugin-auth-core@^1.0.0/config',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1]:
-    'jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_DOMAIN]:
-    'jsr:@netscript/plugin-auth-core@^1.0.0/domain',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_PORTS]:
-    'jsr:@netscript/plugin-auth-core@^1.0.0/ports',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_STREAMS]:
-    'jsr:@netscript/plugin-auth-core@^1.0.0/streams',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_TESTING]:
-    'jsr:@netscript/plugin-auth-core@^1.0.0/testing',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_WORKOS]: 'jsr:@netscript/auth-workos@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_BETTER_AUTH]: 'jsr:@netscript/auth-better-auth@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH]: 'jsr:@netscript/auth-kv-oauth@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: 'jsr:@netscript/plugin-workers-core@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE]: 'jsr:@netscript/plugin-sagas-core@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN]:
-    'jsr:@netscript/plugin-sagas-core@^1.0.0/domain',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_PRISMA_ADAPTER_MYSQL]: 'jsr:@netscript/prisma-adapter-mysql@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_ASPIRE]: 'jsr:@netscript/aspire@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH]: 'jsr:@netscript/fresh@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_BUILDERS]: 'jsr:@netscript/fresh@^1.0.0/builders',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_QUERY]: 'jsr:@netscript/fresh@^1.0.0/query',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_ROUTE]: 'jsr:@netscript/fresh@^1.0.0/route',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_SERVER]: 'jsr:@netscript/fresh@^1.0.0/server',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_VITE]: 'jsr:@netscript/fresh@^1.0.0/vite',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_KV]: 'jsr:@netscript/kv@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI]: 'jsr:@netscript/fresh-ui@^1.0.0',
-  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE]: 'jsr:@netscript/fresh-ui@^1.0.0/interactive',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_LOGGER_MIDDLEWARE]: `${JSR_SPECIFIERS.logger}/middleware`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_LOGGER_ORPC]: `${JSR_SPECIFIERS.logger}/orpc`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_TELEMETRY]: JSR_SPECIFIERS.telemetry,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]: JSR_SPECIFIERS.database,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]: `${JSR_SPECIFIERS.database}/scripts`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]: `${JSR_SPECIFIERS.database}/tracing`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE]: JSR_SPECIFIERS['plugin-auth-core'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONFIG]: `${
+    JSR_SPECIFIERS['plugin-auth-core']
+  }/config`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1]: `${
+    JSR_SPECIFIERS['plugin-auth-core']
+  }/contracts/v1`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_DOMAIN]: `${
+    JSR_SPECIFIERS['plugin-auth-core']
+  }/domain`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_PORTS]: `${
+    JSR_SPECIFIERS['plugin-auth-core']
+  }/ports`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_STREAMS]: `${
+    JSR_SPECIFIERS['plugin-auth-core']
+  }/streams`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_TESTING]: `${
+    JSR_SPECIFIERS['plugin-auth-core']
+  }/testing`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_WORKOS]: JSR_SPECIFIERS['auth-workos'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_BETTER_AUTH]: JSR_SPECIFIERS['auth-better-auth'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH]: JSR_SPECIFIERS['auth-kv-oauth'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: JSR_SPECIFIERS.workers,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE]: JSR_SPECIFIERS['plugin-sagas-core'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN]: `${
+    JSR_SPECIFIERS['plugin-sagas-core']
+  }/domain`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PRISMA_ADAPTER_MYSQL]: JSR_SPECIFIERS['prisma-adapter-mysql'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_ASPIRE]: JSR_SPECIFIERS.aspire,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH]: JSR_SPECIFIERS.fresh,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_BUILDERS]: `${JSR_SPECIFIERS.fresh}/builders`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_QUERY]: `${JSR_SPECIFIERS.fresh}/query`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_ROUTE]: `${JSR_SPECIFIERS.fresh}/route`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_SERVER]: `${JSR_SPECIFIERS.fresh}/server`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_VITE]: `${JSR_SPECIFIERS.fresh}/vite`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_KV]: JSR_SPECIFIERS.kv,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI]: JSR_SPECIFIERS['fresh-ui'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE]: `${JSR_SPECIFIERS['fresh-ui']}/interactive`,
   [SCAFFOLD_PACKAGES.STD_PATH]: 'jsr:@std/path@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_FS]: 'jsr:@std/fs@^1.0.0',
   [SCAFFOLD_PACKAGES.STD_ASSERT]: 'jsr:@std/assert@^1.0.0',
@@ -153,7 +161,7 @@ const EXTERNAL_DEPS: Readonly<Record<string, string>> = {
  * ```typescript
  * // JSR mode — all registry specifiers
  * const imports = resolveNetScriptImports('jsr');
- * // { '@netscript/config': 'jsr:@netscript/config@^1.0.0', ... }
+ * // { '@netscript/config': 'jsr:@netscript/config@0.0.1-alpha.1', ... }
  *
  * // Local mode — relative paths for NetScript, registry for externals
  * const imports = resolveNetScriptImports('local', '../..');

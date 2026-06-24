@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-sagas",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.1-alpha.1",
   "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
   "license": "MIT",
   "exports": {

@@ -1,0 +1,400 @@
+5. Q5 (Publish workflow) — OIDC, fail-fast dry-run, workspace publish, Deno 
+2.8.3 ✅
+6. Q6 (Lock) — No diff vs origin/main ✅
+7. Q7 (Gates) — publish:dry-run 0, check:scaffold-versions 0, CLI tests 11/11, 
+docs build 306 files 0 exit ✅
+8. Q8 (Casts) — Only pre-existing `as { ... }` in plugin-import-rewriter 
+(import-map parsing), no new casts ✅
+
+One concern I should double-check: the `publish:dry-run` output was truncated. 
+Let me see if all 32 packages actually passed. I saw `aspire`, 
+`auth-better-auth`, `auth-kv-oauth`, `auth-workos`, and then the output was 
+truncated. The command exited 0, and the tail showed plugins/workers finishing 
+with "Success Dry run complete". That confirms all packages were processed.
+
+Actually, I should also verify that the docs example `1.0.0` references are NOT 
+JSR pins like `@netscript/...@1.0.0` or `@netscript/...@^1.0.0`. Let me check 
+one more thing to be thorough.
+
+Looking at the rg output more carefully: the `1.0.0` hits are all in docs/site 
+files in `code:` YAML blocks and `.md` files, and the `version: '1.0.0'` strings
+are inside example code samples for defineService/createService — these are 
+user-service versions, not NetScript specifier pins. The grep for 
+`jsr:@netscript.*@1.0.0` or `@^1.0.0` came back empty. So this is correct.
+
+I also want to verify one claim: "no premature release-tag push embedded." The 
+workflow only has `deno publish` as its terminal step — no `git push`, no `gh 
+release create`. ✅
+
+The prisma-adapter-mysql addition to JSR_SPECIFIERS and NetscriptPackage union —
+I verified it's a real workspace member (packages/prisma-adapter-mysql/deno.json
+with matching name and version, covered by the "packages/*" glob in the root 
+workspace). So it's NOT scope creep, just a previously-missing member added to 
+the specifier map. ✅
+
+I'm confident in the PASS verdict. Let me commit.
+
+Thought:
+I'll commit the verdict and write the summary file.
+
+
+
+$ cd /home/runner/work/netscript/netscript && git --no-pager add 
+.llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md && git --no-pager commit 
+-m "eval: PASS — chore/jsr-alpha1-publish-prep JSR publish mechanics verified 
+($(date -u '+%Y%m%d-%H%M'))" --date=now
+
+Tokens: ↑ input 675.32K • cache hit 76.50% •  reasoning 11.46K • ↓ output 19.61K
+• $ 0.4011
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: empty ident name (for 
+<runner@runnervm7b5n9.zcgjtivxx0bezdo1xtk5c3ssug.gx.internal.cloudapp.net>) not 
+allowed
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+❌ Exit code: 128
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Commit IMPL-EVAL verdict after setting git ident
+
+Reasoning:
+The git config needs user identity set. Let me check if there's existing config 
+first.
+
+
+$ cd /home/runner/work/netscript/netscript && git --no-pager config user.email 
+openhands@all-hands.dev && git --no-pager config user.name "openhands" && git 
+--no-pager add .llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md && git 
+--no-pager commit -m "eval: PASS — JSR alpha-1 publish mechanics verified
+
+Co-authored-by: openhands <openhands@all-hands.dev>" --date=now
+
+Tokens: ↑ input 706.7K • cache hit 73.10% •  reasoning 11.48K • ↓ output 19.96K 
+• $ 0.4416
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Configure git identity and commit verdict
+
+$ cd /home/runner/work/netscript/netscript && git --no-pager config user.email 
+"openhands@all-hands.dev" && git --no-pager config user.name "openhands" && git 
+--no-pager add .llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md && git 
+--no-pager commit -m "eval: PASS — JSR alpha-1 publish mechanics verified
+
+Co-authored-by: openhands <openhands@all-hands.dev>" --date=now
+
+Tokens: ↑ input 706.7K • cache hit 73.10% •  reasoning 11.48K • ↓ output 19.96K 
+• $ 0.4416
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+cd /home/runner/work/netscript/netscript && git --no-pager config user.email 
+openhands@all-hands.dev && git --no-pager config user.name "openhands" && git 
+--no-pager add .llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md && git 
+--no-pager commit -m "eval: PASS — JSR alpha-1 publish mechanics verified
+Co-authored-by: openhands <openhands@all-hands.dev>" --date=now
+[chore/jsr-alpha1-publish-prep ffb569d4] eval: PASS — JSR alpha-1 publish 
+mechanics verified
+ Date: Wed Jun 24 13:04:37 2026 +0000
+ 1 file changed, 58 insertions(+)
+ create mode 100644 .llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+cd /home/runner/work/netscript/netscript && git --no-pager config user.email 
+"openhands@all-hands.dev" && git --no-pager config user.name "openhands" && git 
+--no-pager add .llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md && git 
+--no-pager commit -m "eval: PASS — JSR alpha-1 publish mechanics verified
+Co-authored-by: openhands <openhands@all-hands.dev>" --date=now
+On branch chore/jsr-alpha1-publish-prep
+Your branch is ahead of 'origin/chore/jsr-alpha1-publish-prep' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+        modified:   .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        .llm/tmp/run/openhands/pr-116/run-28100018347-1/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+❌ Exit code: 1
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify eval commit
+
+Reasoning:
+The first commit succeeded. The second attempt reported "no changes added" 
+because the file was already committed by the first attempt. The working tree 
+shows some pre-existing CRLF modified files (the 6 
+`.llm/tmp/run/openhands/pr-*/request.md` files mentioned in the task as 
+pre-existing) and a new untracked directory for this run's traces.
+
+Let me verify the commit and write the summary.
+
+Thought:
+The first commit succeeded (the second attempt just reported nothing to commit 
+since it's already done). Let me verify and write the summary.
+
+
+
+$ cd /home/runner/work/netscript/netscript && git --no-pager log --oneline -5
+
+Tokens: ↑ input 739.24K • cache hit 69.88% •  reasoning 11.56K • ↓ output 20.84K
+• $ 0.4856
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: file_editor: {"command": "create", "path": 
+"/home/runner/work/_temp/openhands/28100018347-1/summary.md", "file_text": "# 
+IMPL-EVAL Summary \u2014 PR #116: JSR alpha-1 publish mechanics\n\n## 
+Summary\nIMPL-EVAL (final certification pass) completed with verdict **PASS** 
+for PR #116. Evaluated all 8 hard questions against the live tree on branch 
+`chore/jsr-alpha1-publish-prep`.\n\n## Changes\nCommitted 
+`.llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md` (commit `ffb569d4`). No
+code changes \u2014 evaluator-only pass.\n\n## Validation (all gates pass)\n\n| 
+Gate | Exit | Evidence |\n|------|------|----------|\n| `deno task 
+publish:dry-run` | 0 | All 32 workspace members simulate-publish successfully 
+|\n| `deno task check:scaffold-versions` | 0 | 10 scaffold pins stable |\n| 5 
+named CLI test files | 0 | 11 tests passed, 0 failed |\n| `docs/site` build | 0 
+| 306 files in 6.54s |\n| Version alignment (Q1) | \u2705 | All 32 `deno.json` 
+at `0.0.1-alpha.1`, cross-refs exact |\n| No `^1.0.0` JSR pins in CLI src (Q2) |
+\u2705 | Single source via `cliPackageJson.version` |\n| JSONC\u2192JSON drift 
+(Q3) | \u2705 | One comment stripped; no config semantics lost |\n| Publish 
+workflow (Q5) | \u2705 | OIDC, tag-trigger, dry-run gate, deno 2.8.3, workspace 
+publish |\n| Lock hygiene (Q6) | \u2705 | `deno.lock` diff vs origin/main is 
+empty |\n| Casts (Q8) | \u2705 | Zero new casts added |\n\n## Responses to 
+adversarial review\nIndependently re-verified commit `1a21808f` fixes:\n- Root 
+`deno.json` \u2192 `0.0.1-alpha.1` \u2705\n- `release-eject-constants.ts` \u2192
+consumes shared `NETSCRIPT_RELEASE_VERSION` \u2705\n- 
+`packages/config/tests/_fixtures/readme-examples_test.ts` \u2192 `0.0.1-alpha.1`
+\u2705\n\n## Remaining risks (out-of-scope, documented)\n- **`0.0.1-alpha.0` in 
+plugin runtime constants** (`AUTH_PLUGIN_VERSION`, etc.) \u2014 internal plugin 
+self-identification strings, separate from publish `deno.json` versions. PR2 
+lane.\n- **`1.0.0` in docs/site example code** \u2014 example service `version` 
+fields (user-space, not NetScript package pins). Correct as-is.\n- **Per-package
+README files** still at `0.0.1-alpha.0` \u2014 deferred to PR2 per plan 
+(doc-authoring lane).\n"}
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28100018347-1/summary.md"
+  file_text: 
+    # IMPL-EVAL Summary — PR #116: JSR alpha-1 publish mechanics
+    
+    ## Summary
+    IMPL-EVAL (final certification pass) completed with verdict **PASS** for PR 
+#116. Evaluated all 8 hard questions against the live tree on branch 
+`chore/jsr-alpha1-publish-prep`.
+    
+    ## Changes
+    Committed `.llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md` (commit 
+`ffb569d4`). No code changes — evaluator-only pass.
+    
+    ## Validation (all gates pass)
+    
+    | Gate | Exit | Evidence |
+    |------|------|----------|
+    | `deno task publish:dry-run` | 0 | All 32 workspace members 
+simulate-publish successfully |
+    | `deno task check:scaffold-versions` | 0 | 10 scaffold pins stable |
+    | 5 named CLI test files | 0 | 11 tests passed, 0 failed |
+    | `docs/site` build | 0 | 306 files in 6.54s |
+    | Version alignment (Q1) | ✅ | All 32 `deno.json` at `0.0.1-alpha.1`, 
+cross-refs exact |
+    | No `^1.0.0` JSR pins in CLI src (Q2) | ✅ | Single source via 
+`cliPackageJson.version` |
+    | JSONC→JSON drift (Q3) | ✅ | One comment stripped; no config semantics 
+lost |
+    | Publish workflow (Q5) | ✅ | OIDC, tag-trigger, dry-run gate, deno 2.8.3, 
+workspace publish |
+    | Lock hygiene (Q6) | ✅ | `deno.lock` diff vs origin/main is empty |
+    | Casts (Q8) | ✅ | Zero new casts added |
+    
+    ## Responses to adversarial review
+    Independently re-verified commit `1a21808f` fixes:
+    - Root `deno.json` → `0.0.1-alpha.1` ✅
+    - `release-eject-constants.ts` → consumes shared `NETSCRIPT_RELEASE_VERSION`
+✅
+    - `packages/config/tests/_fixtures/readme-examples_test.ts` → 
+`0.0.1-alpha.1` ✅
+    
+    ## Remaining risks (out-of-scope, documented)
+    - **`0.0.1-alpha.0` in plugin runtime constants** (`AUTH_PLUGIN_VERSION`, 
+etc.) — internal plugin self-identification strings, separate from publish 
+`deno.json` versions. PR2 lane.
+    - **`1.0.0` in docs/site example code** — example service `version` fields 
+(user-space, not NetScript package pins). Correct as-is.
+    - **Per-package README files** still at `0.0.1-alpha.0` — deferred to PR2 
+per plan (doc-authoring lane).
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 739.24K • cache hit 69.88% •  reasoning 11.56K • ↓ output 20.84K
+• $ 0.4856
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+ffb569d4 (HEAD -> chore/jsr-alpha1-publish-prep) eval: PASS — JSR alpha-1 
+publish mechanics verified
+cdcf6eb3 (origin/chore/jsr-alpha1-publish-prep) chore(openhands): record run 
+trace 28096691481-1
+8ffb48fc chore(publish-prep): record adversarial review evidence (9 checks, 3 
+version-gap fixes)
+1a21808f fix(publish-prep): close alpha-1 version gaps
+e0d16661 chore(harness): PR1 run artifacts (worklog/drift/context-pack/commits)
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28100018347-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# IMPL-EVAL Summary — PR #116: JSR alpha-1 publish mechanics
+ 2|
++3|## Summary
++4|IMPL-EVAL (final certification pass) completed with verdict **PASS** for PR 
+#116. Evaluated all 8 hard questions against the live tree on branch 
+`chore/jsr-alpha1-publish-prep`.
++5|
++6|## Changes
++7|Committed `.llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md` (commit 
+`ffb569d4`). No code changes — evaluator-only pass.
++8|
++9|## Validation (all gates pass)
++10|
++11|| Gate | Exit | Evidence |
++12||------|------|----------|
++13|| `deno task publish:dry-run` | 0 | All 32 workspace members 
+simulate-publish successfully |
++14|| `deno task check:scaffold-versions` | 0 | 10 scaffold pins stable |
++15|| 5 named CLI test files | 0 | 11 tests passed, 0 failed |
++16|| `docs/site` build | 0 | 306 files in 6.54s |
++17|| Version alignment (Q1) | ✅ | All 32 `deno.json` at `0.0.1-alpha.1`, 
+cross-refs exact |
++18|| No `^1.0.0` JSR pins in CLI src (Q2) | ✅ | Single source via 
+`cliPackageJson.version` |
++19|| JSONC→JSON drift (Q3) | ✅ | One comment stripped; no config semantics 
+lost |
++20|| Publish workflow (Q5) | ✅ | OIDC, tag-trigger, dry-run gate, deno 2.8.3, 
+workspace publish |
++21|| Lock hygiene (Q6) | ✅ | `deno.lock` diff vs origin/main is empty |
++22|| Casts (Q8) | ✅ | Zero new casts added |
++23|
++24|## Responses to adversarial review
++25|Independently re-verified commit `1a21808f` fixes:
++26|- Root `deno.json` → `0.0.1-alpha.1` ✅
++27|- `release-eject-constants.ts` → consumes shared `NETSCRIPT_RELEASE_VERSION`
+✅
++28|- `packages/config/tests/_fixtures/readme-examples_test.ts` → 
+`0.0.1-alpha.1` ✅
++29|
++30|## Remaining risks (out-of-scope, documented)
++31|- **`0.0.1-alpha.0` in plugin runtime constants** (`AUTH_PLUGIN_VERSION`, 
+etc.) — internal plugin self-identification strings, separate from publish 
+`deno.json` versions. PR2 lane.
++32|- **`1.0.0` in docs/site example code** — example service `version` fields 
+(user-space, not NetScript package pins). Correct as-is.
++33|- **Per-package README files** still at `0.0.1-alpha.0` — deferred to PR2 
+per plan (doc-authoring lane).
++34|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: IMPL-EVAL complete: PASS verdict for PR #116
+
+Reasoning:
+The user wants me to take an action. Based on the summary I just created, I 
+should invoke the `finish` tool to complete the task. The evaluation is done, 
+the verdict is PASS, and everything is committed.
+
+
+Finish with message:
+## IMPL-EVAL Verdict: PASS
+
+Completed final certification pass for PR #116 (JSR alpha-1 publish mechanics).
+
+### Key Findings
+All 8 hard questions verified with evidence:
+
+✅ **Version alignment** — All 32 workspace members at exactly `0.0.1-alpha.1`, 
+cross-refs exact  
+✅ **Single version source** — `NETSCRIPT_RELEASE_VERSION` derived from 
+`cliPackageJson.version`, zero `^1.0.0` pins  
+✅ **JSONC→JSON drift** — One comment stripped from `packages/cli/deno.json`, no
+config semantics lost  
+✅ **Docs version + voice** — `docs/site/_data.ts` single-sources release 
+version, no banned framing  
+✅ **Publish workflow** — OIDC tag-push, dry-run gate, deno 2.8.3, 
+workspace-root publish  
+✅ **Lock hygiene** — `deno.lock` diff vs origin/main is empty  
+✅ **Gates pass** — `publish:dry-run` (exit 0), `check:scaffold-versions` (exit 
+0), CLI tests (11/11 pass), docs build (306 files)  
+✅ **Casts** — Zero new casts added
+
+### Deliverables
+- **Verdict file**: `.llm/tmp/run/chore-jsr-alpha1-publish-prep/evaluate.md` 
+(committed as `ffb569d4`)
+- **Summary**: `/home/runner/work/_temp/openhands/28100018347-1/summary.md`
+
+### Out-of-scope (documented, not regressions)
+- Plugin runtime version constants (`AUTH_PLUGIN_VERSION='0.0.1-alpha.0'`) — 
+internal plugin self-ID, separate from publish versions
+- Per-package README files — deferred to PR2 doc-authoring lane
+- `1.0.0` in docs/site example code — user service versions, not NetScript 
+package pins
+
+Tokens: ↑ input 772.83K • cache hit 66.85% •  reasoning 11.61K • ↓ output 21.36K
+• $ 0.5295
+

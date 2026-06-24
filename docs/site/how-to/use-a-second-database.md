@@ -239,7 +239,7 @@ The order is always: build the adapter, call <code>getDriverAdapter()</code>, pa
 <li><strong>Importing the wrong client.</strong> The primary is <code>database/postgres/schema/.generated/client.server.ts</code>; the second is <code>database/mysql/schema/.generated/client.server.ts</code>. They are distinct <code>PrismaClient</code>s — crossing the imports queries the wrong database.</li>
 <li><strong>Calling <code>getClient()</code> before <code>setClient()</code></strong> on a hand-wired adapter throws — see the callout above.</li>
 <li><strong>Docker down.</strong> A scaffolded (container-mode) second database is provisioned by Aspire; if Docker/Podman is not running, its resource never goes green. An external/hand-wired database does not need this.</li>
-<li><strong>Alpha surface.</strong> NetScript packages share the aligned <code>0.0.1-alpha.0</code> version, and public subpaths can still be renamed. Pin versions and re-check the import paths after upgrades.</li>
+<li><strong>Alpha surface.</strong> NetScript packages share the aligned <code>{{ releaseVersion }}</code> version, and public subpaths can still be renamed. Pin versions and re-check the import paths after upgrades.</li>
 </ul>
 {{ /comp }}
 

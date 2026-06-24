@@ -47,7 +47,7 @@ Deno.test('README examples: merge plugin contribution', () => {
 Deno.test('README examples: use paths and plugin schema fragments', () => {
   const plugin = pluginEntrySchema.parse({
     Port: 8091,
-    InstalledVersion: '0.0.1-alpha.0',
+    InstalledVersion: '0.0.1-alpha.1',
     InstalledFrom: 'jsr:@netscript/plugin-workers',
   });
 

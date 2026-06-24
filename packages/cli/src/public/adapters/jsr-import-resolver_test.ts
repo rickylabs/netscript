@@ -9,23 +9,23 @@ describe('JsrImportResolver', () => {
 
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH),
-      'jsr:@netscript/fresh@^1.0.0',
+      'jsr:@netscript/fresh@0.0.1-alpha.1',
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_VITE),
-      'jsr:@netscript/fresh@^1.0.0/vite',
+      'jsr:@netscript/fresh@0.0.1-alpha.1/vite',
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE),
-      'jsr:@netscript/fresh-ui@^1.0.0/interactive',
+      'jsr:@netscript/fresh-ui@0.0.1-alpha.1/interactive',
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1),
-      'jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1',
+      'jsr:@netscript/plugin-auth-core@0.0.1-alpha.1/contracts/v1',
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH),
-      'jsr:@netscript/auth-kv-oauth@^1.0.0',
+      'jsr:@netscript/auth-kv-oauth@0.0.1-alpha.1',
     );
   });
 
@@ -45,8 +45,8 @@ describe('JsrImportResolver', () => {
         SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT,
       ]),
       {
-        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: 'jsr:@netscript/sdk@^1.0.0',
-        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT]: 'jsr:@netscript/sdk@^1.0.0/client',
+        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: 'jsr:@netscript/sdk@0.0.1-alpha.1',
+        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT]: 'jsr:@netscript/sdk@0.0.1-alpha.1/client',
       },
     );
   });

@@ -10,7 +10,7 @@ order: 3
 Install the package:
 
 ```bash
-deno add jsr:@netscript/config@^0.0.1-alpha.0
+deno add jsr:@netscript/config@0.0.1-alpha.1
 ```
 
 Create `netscript.config.ts`:

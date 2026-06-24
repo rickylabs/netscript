@@ -94,7 +94,7 @@ chained `.with*()` call adds a **contribution** along a well-defined **extension
     {
       label: "workers manifest",
       lang: "ts",
-      code: "// plugins/workers/src/public/mod.ts (abridged)\nimport { definePlugin } from \"@netscript/plugin\";\n\n// definePlugin(name, version) returns a builder. No behavior runs here —\n// each .with*() call only NAMES a contribution against a fixed axis.\nexport const workersManifest = definePlugin(\"@netscript/plugin-workers\", \"0.0.1-alpha.0\")\n  .withType(\"background-processor\")\n  .withService({ name: \"workers-api\", entrypoint: \"./services/src/main.ts\", port: 8091 })\n  .withBackgroundProcessor({ name: \"workers-combined\", entrypoint: \"./bin/combined.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-worker\", entrypoint: \"./bin/worker.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-scheduler\", entrypoint: \"./bin/scheduler.ts\" })\n  .withDbSchemas([{ path: \"./database/workers.prisma\", engine: \"postgres\" }])\n  .withContractVersions([{ version: \"v1\", loader: \"./contracts/v1/mod.ts\" }])\n  .withRuntimeConfigTopics([{ name: \"workers\", schemaPath: \"./runtime/workers.schema.json\" }])\n  .withAspire(\"./src/aspire/mod.ts\")\n  .build();"
+      code: "// plugins/workers/src/public/mod.ts (abridged)\nimport { definePlugin } from \"@netscript/plugin\";\n\n// definePlugin(name, version) returns a builder. No behavior runs here —\n// each .with*() call only NAMES a contribution against a fixed axis.\nexport const workersManifest = definePlugin(\"@netscript/plugin-workers\", \"" + releaseVersion + "\")\n  .withType(\"background-processor\")\n  .withService({ name: \"workers-api\", entrypoint: \"./services/src/main.ts\", port: 8091 })\n  .withBackgroundProcessor({ name: \"workers-combined\", entrypoint: \"./bin/combined.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-worker\", entrypoint: \"./bin/worker.ts\", concurrency: 2 })\n  .withBackgroundProcessor({ name: \"workers-scheduler\", entrypoint: \"./bin/scheduler.ts\" })\n  .withDbSchemas([{ path: \"./database/workers.prisma\", engine: \"postgres\" }])\n  .withContractVersions([{ version: \"v1\", loader: \"./contracts/v1/mod.ts\" }])\n  .withRuntimeConfigTopics([{ name: \"workers\", schemaPath: \"./runtime/workers.schema.json\" }])\n  .withAspire(\"./src/aspire/mod.ts\")\n  .build();"
     }
   ]
 }) }}
@@ -232,9 +232,9 @@ backend to run an interactive sign-in — the seam fails loud with a typed
 {{ comp.xref({ key: "explain:auth-model", text: "auth model" }) }} for the full port-and-adapter
 walkthrough.
 
-{{ comp callout { type: "warning", title: "Alpha specifiers are forward-looking" } }}
-Scaffold-pinned <code>jsr:…@^1.0.0</code> specifiers are <strong>forward-looking</strong> and not
-installable today. There is also no auth telemetry or audit surface yet — do not assume one exists.
+{{ comp callout { type: "note", title: "Alpha package pins" } }}
+Scaffolded JSR imports use exact <code>{{ releaseSpecifier }}</code> pins for the aligned alpha
+train. There is also no auth telemetry or audit surface yet — do not assume one exists.
 {{ /comp }}
 
 ## Why the model looks like this

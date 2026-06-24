@@ -1,6 +1,6 @@
 {
   "name": "@netscript/cli",
-  "version": "0.0.1-alpha.0",
+  "version": "0.0.1-alpha.1",
   "description": "Public and maintainer command-line tooling for NetScript workspaces.",
   "license": "MIT",
   "exports": {
@@ -42,7 +42,6 @@
     "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    // DEBT_ACCEPTED: temporary Wave 6 CLI carve-out for Deno 2.8 isolatedDeclarations annotations.
     "isolatedDeclarations": false,
     "lib": [
       "deno.ns",
