@@ -227,6 +227,11 @@ verdicts are not seeded here.
 - **Linked plan:** `conformance-report.md`, `fitness-gates.md`, `jsr-scorecard.md` in branch
   `feat/prime-time/auth-as7-fitness`.
 - **Created:** 2026-06-21
+- **Update (2026-06-24, PR2 #117):** the `docs/architecture.md` `Archetype:`-token portion of this
+  warning is now moot — all per-package `docs/` folders (incl.
+  `packages/plugin-auth-core/docs/architecture.md`) were removed in PR2; package public contracts
+  live solely in the rewritten READMEs + the published docs site. The README two-example-target
+  portion remains the live, open part of this debt.
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** `deno task arch:check`; close when the auth-scoped doctrine warnings are zero or
   explicitly demoted in the checker with documented rationale.

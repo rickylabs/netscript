@@ -11,7 +11,7 @@ const SECTIONS = [
   { id: 'rules', label: 'Do / don’t' },
 ] as const;
 
-/** Source: packages/fresh-ui/docs/l0-conventions.md §Layer Rules. */
+/** Source: @netscript/fresh-ui L0 layer conventions (§Layer Rules). */
 const LAYERS = [
   {
     id: 'L0',

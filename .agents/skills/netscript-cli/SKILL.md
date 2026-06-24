@@ -140,7 +140,7 @@ implementation sources from the monorepo into an existing scaffold.
 
 Read these before updating command docs or diagnosing scaffold behavior:
 
-- `packages/cli/docs/commands.md`
-- `packages/cli/docs/maintainer-cli.md`
+- `commands.md` (alongside this skill) — the command contract
+- `maintainer-cli.md` (alongside this skill) — the maintainer CLI surface
 - `C:\Dev\repos\netscript\output\test-app\.claude\12-cli-scaffold.md` when available locally
 - `packages/cli/e2e/cli.ts` and related e2e source when the suite behavior itself is in question
