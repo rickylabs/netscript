@@ -105,22 +105,46 @@ shows the **most representative real exported primitive**, grounded in `deno doc
 - Never invent signatures. If `deno doc` shows the only export is types, show a type-usage snippet —
   do not fabricate a runnable demo.
 
-## Cross-ref map (from research.md — authoritative targets)
+## Cross-ref map (from research.md — authoritative targets, ground-truth-verified)
 
-Same-name `/reference/<pkg>/` for all except the **4 `-core` packages** (no own ref page → use sibling
-plugin reference + pillar hub):
+Targets below were verified against the actual `docs/site/reference/**` page set and the pillar-hub
+`index.md` card grids on this branch (2026-06-24). Same-name `/reference/<pkg>/` for all except the
+**4 `-core` packages** (no own ref page → use sibling plugin reference + pillar hub):
 
 | package | reference target | pillar hub |
 | --- | --- | --- |
 | plugin-workers-core | ⛔ none → /reference/workers/ | /background-processing/ |
 | plugin-sagas-core | ⛔ none → /reference/sagas/ | /durable-workflows/ |
 | plugin-triggers-core | ⛔ none → /reference/triggers/ | /durable-workflows/ |
-| plugin-streams-core | ⛔ none → /reference/streams/ | /background-processing/ |
+| plugin-streams-core | ⛔ none → /reference/streams/ | /durable-workflows/ |
 
 Pillars by family: orchestration-runtime (aspire, config, runtime-config, plugin), identity-access
 (auth-*, plugin-auth-core, plugins/auth), services-sdk (contracts, sdk, service), background-processing
-(cron, queue, watchers, workers, streams-core), data-persistence (database, kv, prisma-adapter-mysql),
-web-layer (fresh, fresh-ui), observability (logger, telemetry), durable-workflows (sagas, triggers).
+(cron, queue, watchers, workers), data-persistence (database, kv, prisma-adapter-mysql),
+web-layer (fresh, fresh-ui), observability (logger, telemetry), durable-workflows (sagas, triggers,
+**streams**, streams-core).
+
+### Cross-ref precision notes (PLAN-EVAL: confirm each against the live pages)
+
+- **[XREF-1] `streams` + `streams-core` → durable-workflows, NOT background-processing.** Verified:
+  `docs/site/durable-workflows/index.md` states the pillar "covers sagas, triggers, streams … publishes
+  a durable stream" and carries an `API Reference: triggers and streams → /reference/streams/` card.
+  `docs/site/background-processing/index.md` covers only workers/queue/cron/watchers (no streams). The
+  `streams` package Documentation section links `/reference/streams/` + `/durable-workflows/`. A
+  background-processing link for streams would resolve but be **non-meaningful** (anti-pattern).
+- **[XREF-2] `cli` has NO pillar hub.** `cli` sits in no pillar family. Its Documentation section links
+  (a) `/reference/cli/` (exists, 11KB) and (b) a **tutorial that actually scaffolds with the CLI**
+  (e.g. the getting-started/scaffold path, or the tutorials index) — NOT a forced pillar link. Same
+  treatment for any package the family list above doesn't place: reference page + a genuinely-using
+  how-to/tutorial, and omit the pillar row rather than invent one.
+- **[XREF-3] Hub-level family representation IS meaningful (meaningfulness gate clarification).** A
+  pillar hub links ONE representative `/reference/<pkg>/` per family in its card grid (e.g.
+  background-processing → `/reference/workers/` stands in for workers/queue/cron/watchers;
+  durable-workflows → `/reference/sagas/` + `/reference/triggers/` for sagas/triggers/streams). A
+  package's pillar-hub link therefore passes the meaningfulness check when the hub **discusses that
+  package's family**, even if the hub does not name the exact package or link its exact ref page. The
+  gate must NOT reject a pillar link merely because the hub card points at a sibling ref page in the
+  same family.
 
 ## `/docs` removal (D5) — per-agent action
 
@@ -140,7 +164,9 @@ verify exact set during authoring.
       invented signatures, no version literal.
 - [ ] Key Capabilities ≤ 5, bold lead terms.
 - [ ] Documentation links: reference + pillar (+ how-to where real), all absolute, all resolve, all
-      meaningful; no placeholder Discord; the 4 `-core` packages use sibling+pillar targets.
+      meaningful; no placeholder Discord; the 4 `-core` packages use sibling+pillar targets; streams +
+      streams-core target **durable-workflows** (XREF-1); cli (and any unplaced package) links a real
+      tutorial/how-to instead of a forced pillar (XREF-2); hub-level family ref is meaningful (XREF-3).
 - [ ] Zero relative `./docs/*.md` links; publish globs cleaned where the files don't exist.
 - [ ] Emoji only on `##` headers, never body.
 

@@ -8,8 +8,10 @@ doc-authoring exception) → OpenHands IMPL-EVAL. Branch `docs/readme-revamp`.
   derives the package's real public surface from `deno doc` / source before writing; existing prose
   is reference-only, never trusted.
 - **D2 — One deep agent per README (31).** Depth over batching. Family agents (auth, plugins,
-  data-persistence, services-sdk, web-layer, observability, background-processing) share a context
-  brief so cross-package framing is consistent. Conventions come from `sota-readme-dossier.md`.
+  data-persistence, services-sdk, web-layer, observability, background-processing, durable-workflows
+  [sagas/triggers/streams/*-core]) share a context brief so cross-package framing is consistent.
+  Conventions come from `sota-readme-dossier.md`; cross-ref targets from `authoring-spec.md` (the
+  ground-truth-verified map, incl. XREF-1 streams→durable-workflows, XREF-2 cli-has-no-pillar).
 - **D3 — Canonical package-README skeleton** — now RECONCILED against the verified dossier in
   `authoring-spec.md` (authoritative C1 contract). Skeleton: `# @netscript/<pkg>` h1 → 3-badge row
   (JSR·CI·Docs) → ≤3-line technical value prop → Quick Start (3-runtime install, UNVERSIONED, +
