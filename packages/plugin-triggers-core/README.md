@@ -1,27 +1,36 @@
 # @netscript/plugin-triggers-core
 
-Handler-first trigger DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript trigger plugins.
+[![JSR](https://jsr.io/badges/@netscript/plugin-triggers-core)](https://jsr.io/@netscript/plugin-triggers-core)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-This is framework-layer substrate for the `@netscript/plugin-triggers` family. It owns the stable
-trigger vocabulary and composition boundaries; HTTP wiring, CLI, scaffold, and process supervision
-live in the public plugin package.
+**The handler-first trigger DSL and runtime substrate for the NetScript `@netscript/plugin-triggers`
+family: define webhook, scheduled, and file-watch triggers, then process them through an
+ack-then-process ingress and a processor with idempotency, retry, DLQ, and circuit-breaker
+handling.**
 
-## Install
+---
 
-```sh
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/plugin-triggers-core
+
+# Node.js / Bun
+npx jsr add @netscript/plugin-triggers-core
+bunx jsr add @netscript/plugin-triggers-core
 ```
 
-Adapters, contracts, config schemas, telemetry, and testing fixtures are available through curated
-subpaths such as `@netscript/plugin-triggers-core/testing` and
-`@netscript/plugin-triggers-core/telemetry`.
-
-## Quick example
+### Usage
 
 Trigger definitions are handler-first: the handler is the first argument, the immutable spec is the
-second. Compose the processor and ingress runtime from explicit dependencies.
+second. Handlers return actions that the processor dispatches after the ingress acknowledges the
+request.
 
-```ts
+```typescript
 import {
   createTriggerIngress,
   createTriggerProcessor,
@@ -31,7 +40,7 @@ import {
 import { sendReceiptJob } from './jobs/send-receipt.ts';
 
 export const stripePayments = defineWebhook(
-  async (event) => [
+  (event) => [
     enqueueJob(sendReceiptJob, {
       payload: event.payload.body,
       idempotencyKey: event.idempotencyKey,
@@ -55,10 +64,40 @@ const ingress = createTriggerIngress({
 });
 ```
 
-Webhook ingress is ack-then-process: verification and persistence happen before the 202 response,
-and processor work is dispatched after acknowledgement.
+Webhook ingress is ack-then-process: verification and persistence complete before the `202`
+response, and handler actions are dispatched after acknowledgement.
 
-## Docs
+---
 
-- [API reference](https://rickylabs.github.io/netscript/reference/triggers/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+## 📦 Key Capabilities
+
+- **Handler-first authoring DSL**: `defineWebhook`, `defineScheduledTrigger`, and `defineFileWatch`
+  produce frozen, type-safe trigger definitions; handlers emit actions such as `enqueueJob` to hand
+  work to the worker pool.
+- **Ack-then-process ingress**: `createTriggerIngress` verifies and persists inbound webhook events
+  before responding, then dispatches handler work to the processor.
+- **Durable processor runtime**: `createTriggerProcessor` and the `TriggerProcessor` class apply
+  idempotency, retry policy, bounded concurrency, dead-letter queueing, and circuit-breaking around
+  handler dispatch.
+- **Explicit runtime ports**: ingress, processor, scheduler, event store, idempotency, DLQ, and
+  webhook-verifier boundaries (`TriggerIngressPort`, `TriggerProcessorPort`,
+  `TriggerEventStorePort`, and siblings) are injected, so adapters stay swappable.
+- **Curated sub-path surface**: `./builders`, `./config`, `./contracts/v1`, `./domain`, `./ports`,
+  `./runtime`, `./telemetry`, and `./testing` expose the schemas, branded ids, telemetry, and
+  deterministic in-memory test fixtures that back the public `@netscript/plugin-triggers` plugin.
+
+---
+
+## 📖 Documentation
+
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/triggers/](https://rickylabs.github.io/netscript/reference/triggers/)
+- **Durable Workflows**:
+  [rickylabs.github.io/netscript/durable-workflows/](https://rickylabs.github.io/netscript/durable-workflows/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.

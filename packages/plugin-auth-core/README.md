@@ -1,63 +1,83 @@
 # @netscript/plugin-auth-core
 
-`@netscript/plugin-auth-core` is the contract package for NetScript auth plugins. It publishes the
-domain types, backend adapter port, oRPC v1 contract schemas, durable stream schema, config schema,
-provider preset surface, and small contract-level testing fixtures used by the auth plugin program.
+[![JSR](https://jsr.io/badges/@netscript/plugin-auth-core)](https://jsr.io/@netscript/plugin-auth-core)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-This package is intentionally behavior-light. It does not mount HTTP handlers, create routers, open
-databases, run CLIs, or implement provider SDKs. Adapter packages implement the ports exported here
-and later plugin slices bind those adapters into services.
+**The contract layer for NetScript auth plugins: domain schemas, the `AuthBackendPort` adapter seam,
+the oRPC v1 contract, durable stream schemas, and Zod config that every auth backend implements and
+every service host wires.**
 
-## Install
+---
 
-```sh
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/plugin-auth-core
+
+# Node.js / Bun
+npx jsr add @netscript/plugin-auth-core
+bunx jsr add @netscript/plugin-auth-core
 ```
 
-## Exports
+### Usage
 
-| Export                                     | Purpose                                                                             |
-| ------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `@netscript/plugin-auth-core`              | Curated root surface for common domain, config, and preset contracts.               |
-| `@netscript/plugin-auth-core/domain`       | `AuthSession`, `Account`, `AuthUser`, state types, and the service auth seam types. |
-| `@netscript/plugin-auth-core/ports`        | `AuthBackendPort` and the backend selection registry seam.                          |
-| `@netscript/plugin-auth-core/contracts/v1` | oRPC `auth.contract` v1 schemas and contract definition.                            |
-| `@netscript/plugin-auth-core/streams`      | Durable stream schema for auth session projections and event payloads.              |
-| `@netscript/plugin-auth-core/config`       | Zod-backed auth plugin config schemas.                                              |
-| `@netscript/plugin-auth-core/presets`      | Provider and backend preset definition and registry types.                          |
-| `@netscript/plugin-auth-core/testing`      | Contract-level fixtures and builders for tests.                                     |
+```typescript
+import { AuthConfigSchema, createAuthBackendRegistry } from '@netscript/plugin-auth-core';
+import type { AuthBackendPort } from '@netscript/plugin-auth-core';
 
-## Quick Start
+// A backend adapter (kv-oauth, better-auth, WorkOS, ...) implements AuthBackendPort.
+declare const kvOAuthBackend: AuthBackendPort;
 
-```ts
-import { AuthConfigSchema, createAuthPresetRegistry } from '@netscript/plugin-auth-core';
-import { createAuthBackendRegistry } from '@netscript/plugin-auth-core/ports';
-import type { AuthBackendPort } from '@netscript/plugin-auth-core/ports';
-
-declare const backend: AuthBackendPort;
-
+// Parse app settings into a normalized, defaulted auth config.
 const config = AuthConfigSchema.parse({
   backend: 'kv-oauth',
-  session: { cookieName: 'ns_session' },
+  session: { cookieName: '__Host-netscript-auth', sameSite: 'lax' },
 });
 
-const presets = createAuthPresetRegistry([]);
-const backends = createAuthBackendRegistry(new Map([[config.backend, backend]]), config.backend);
+// Register backends and resolve the single active one at the composition root.
+const registry = createAuthBackendRegistry(
+  new Map([[config.backend, kvOAuthBackend]]),
+  config.backend,
+);
 
-console.log(config.backend, presets.size, backends.defaultName);
+// Service hosts authenticate requests through the resolved backend port.
+const backend = registry.resolveBackend();
+const session = await backend.sessions.getSession({ token: 'opaque-session-token' });
 ```
 
-## Required Permissions
+---
 
-None. This package contains contracts, schemas, and pure testing fixtures only.
+## 📦 Key Capabilities
 
-## Docs
+- **Backend port seam**: `AuthBackendPort` composes provider registry, session store, token crypto,
+  and principal-mapping sub-ports so adapters implement one stable contract.
+- **Backend registry**: `createAuthBackendRegistry` and `resolveBackend` select a single active
+  backend per composition root, with typed `AuthBackendNotFoundError` /
+  `AuthBackendOperationUnsupportedError` boundaries.
+- **Zod config**: `AuthConfigSchema`, `AuthSessionPolicySchema`, and `AuthProviderConfigSchema`
+  normalize app settings into a defaulted `AuthConfig` (secure `__Host-` cookies, TTL, refresh
+  window).
+- **oRPC v1 contract**: `authContract` / `authContractV1` define the signin, callback, session, me,
+  and signout routes that the auth service implements.
+- **Durable streams + telemetry**: `authStreamSchema` projects `auth.*` session events, and
+  `createAuthTelemetry` plus `redactAuthPrincipal` emit redacted spans for observability.
 
-- [`@netscript/service`](../service/README.md) for the `Principal`, `AuthnRequest`, `AuthnResult`, and
-  `AuthenticatorPort` seam consumed by service hosts.
-- [`@netscript/plugin-streams-core`](../plugin-streams-core/README.md) for the durable stream schema primitive used by the auth stream
-  projection schema.
+---
 
-## License
+## 📖 Documentation
 
-MIT
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/plugin-auth-core/](https://rickylabs.github.io/netscript/reference/plugin-auth-core/)
+- **Identity & Access pillar**:
+  [rickylabs.github.io/netscript/identity-access/](https://rickylabs.github.io/netscript/identity-access/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.

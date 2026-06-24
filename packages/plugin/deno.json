@@ -33,8 +33,7 @@
       "loader.ts",
       "mod.ts",
       "src/**/*.ts",
-      "src/templates/**/*.template",
-      "docs/**/*.md"
+      "src/templates/**/*.template"
     ],
     "exclude": [
       "**/*.test.ts",

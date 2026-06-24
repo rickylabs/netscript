@@ -1,44 +1,85 @@
 # @netscript/plugin-streams-core
 
-Schema, producer, configuration, telemetry, testing, and diagnostics primitives for NetScript durable streams.
+[![JSR](https://jsr.io/badges/@netscript/plugin-streams-core)](https://jsr.io/@netscript/plugin-streams-core)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-## Install
+**The schema, producer, and diagnostics primitives that the NetScript `@netscript/plugin-streams`
+plugin builds on: define a type-safe durable stream schema, then write change events to a State
+Protocol stream through an idempotent producer.**
 
-```sh
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/plugin-streams-core
+
+# Node.js / Bun
+npx jsr add @netscript/plugin-streams-core
+bunx jsr add @netscript/plugin-streams-core
 ```
 
-## Quick example
+### Usage
 
-Define a type-safe stream schema and create a durable producer that writes entities to a stream path:
-
-```ts
+```typescript
 import { createDurableStream, defineStreamSchema } from '@netscript/plugin-streams-core';
 
+// Declare the collections this stream carries.
 const schema = defineStreamSchema({
   execution: {
     schema: {
-      '~standard': { version: 1, vendor: 'example', validate: (value) => ({ value }) },
+      '~standard': { version: 1, vendor: 'workers', validate: (value) => ({ value }) },
     },
     type: 'execution',
     primaryKey: 'id',
   },
 });
 
+// Open (or reuse) a singleton producer for the stream path.
 const producer = createDurableStream({
   streamPath: '/workers/executions',
   schema,
   producerId: 'workers-service',
 });
 
+// Publish change events; flush before shutdown.
 producer.upsert('execution', { id: 'exec-1', status: 'running' });
+await producer.flush();
 ```
 
-`getStreamsUrl()` resolves the durable streams server base URL in both Deno and browser contexts, and
-`inspectStreamTopic()` produces a JSON-stable diagnostic report for a schema. Telemetry and testing
-primitives are available from the `./telemetry` and `./testing` subpath exports.
+---
 
-## Docs
+## 📦 Key Capabilities
 
-- [API reference](https://rickylabs.github.io/netscript/reference/plugin-streams-core/)
-- [Concepts & guides](https://rickylabs.github.io/netscript/)
+- **Type-safe schemas**: `defineStreamSchema` builds a State Protocol schema from
+  `~standard`-validated collections, keyed by collection name with a configured `primaryKey`.
+- **Idempotent producers**: `createDurableStream` returns a path-singleton `DurableStreamProducer`
+  that appends `upsert`/`delete` change events with idempotent, auto-claimed delivery and graceful
+  `flush`/`close`.
+- **Endpoint resolution**: `getStreamsUrl`, `getStreamsAuth`, and `buildStreamUrl` resolve the
+  durable streams server base URL and auth headers across Deno and browser contexts.
+- **Diagnostics**: `inspectStreamTopic` produces a JSON-stable inspection report for a schema and
+  optional producer metadata.
+- **Telemetry and testing subpaths**: `/telemetry` exposes span names, attribute keys, and the
+  instrumentation registration; `/testing` ships `MemoryStreamProducer` and
+  `createStreamTopicFixture` for socket-free tests.
+
+---
+
+## 📖 Documentation
+
+- **Reference (Streams family, Internals section)**:
+  [rickylabs.github.io/netscript/reference/streams/](https://rickylabs.github.io/netscript/reference/streams/)
+- **Durable Workflows pillar**:
+  [rickylabs.github.io/netscript/durable-workflows/](https://rickylabs.github.io/netscript/durable-workflows/)
+
+---
+
+## 📝 License
+
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.

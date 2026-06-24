@@ -1,78 +1,46 @@
 # @netscript/plugin-sagas-core
 
-Core saga authoring, runtime-port, adapter, telemetry, contract, and testing primitives for the
-NetScript sagas plugin family.
+[![JSR](https://jsr.io/badges/@netscript/plugin-sagas-core)](https://jsr.io/@netscript/plugin-sagas-core)
+[![CI](https://github.com/rickylabs/netscript/actions/workflows/ci.yml/badge.svg)](https://github.com/rickylabs/netscript/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/docs-rickylabs.github.io-blue)](https://rickylabs.github.io/netscript/)
 
-This package is intentionally framework-layer code. It owns types and composition boundaries that
-can be reused by the plugin package, applications, tests, and future extension packages without
-importing or re-exporting `@saga-bus/*` symbols.
+**The saga-authoring core for NetScript: a fluent DSL for defining durable, multi-step workflows
+plus the runtime ports, native engine, and deterministic testing primitives the
+`@netscript/plugin-sagas` plugin composes into a host application.**
 
-## Install
+---
 
-```sh
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Deno (recommended)
 deno add jsr:@netscript/plugin-sagas-core
+
+# Node.js / Bun
+npx jsr add @netscript/plugin-sagas-core
+bunx jsr add @netscript/plugin-sagas-core
 ```
 
-## What This Package Owns
+### Usage
 
-- The userland saga DSL: `defineSaga(id).state().on().build()`.
-- Reserved signal and query definition builders: `defineSignal()` and `defineQuery()`.
-- Cascaded message constructors: `send()`, `schedule()`, `spawn()`, `sagaComplete()`, `sagaFail()`,
-  and `sagaCompensate()`.
-- Domain vocabulary for saga IDs, states, messages, transitions, retry policy, and errors.
-- Runtime ports for bus, transport, store, clock, outbox, history, and agent-runtime boundaries.
-- Native bus adapter behind `SagaBusPort`.
-- Transport implementations for Redis Streams and Garnet-compatible LIST queues.
-- Hono/SSE middleware, worker trigger helpers, publisher ports, oRPC contracts, streams schema,
-  telemetry instrumentation, deterministic testing helpers, and stub-only abstract bases.
+Author a saga with the fluent DSL, then drive it through the native runtime:
 
-The plugin package (`@netscript/plugin-sagas`) owns CLI wiring, scaffolding, application
-integration, runtime processes, Aspire contribution, HTTP publisher clients, and generated project
-files.
-
-## Root Surface
-
-The root barrel is deliberately small and user-facing:
-
-```ts
-import {
-  defineQuery,
-  defineSaga,
-  defineSignal,
-  sagaComplete,
-  schedule,
-  send,
-  spawn,
-} from '@netscript/plugin-sagas-core';
-```
-
-Everything else is available through named subpaths. This keeps the root export count under the
-NetScript budget and prevents internal adapter, transport, and contract types from becoming ambient
-userland API.
-
-## Quick example
-
-```ts
+```typescript
 import { defineSaga, sagaComplete, send } from '@netscript/plugin-sagas-core';
+import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
 
-type RegistrationState = {
-  status: 'pending' | 'welcoming' | 'done';
-};
+type RegistrationState = { status: 'pending' | 'welcoming' | 'done' };
+type UserRegistered = { userId: string; email: string };
 
-type UserRegisteredPayload = {
-  userId: string;
-  email: string;
-};
-
-export const registrationSaga = defineSaga('user-registration')
+const registrationSaga = defineSaga('user-registration')
   .state<RegistrationState>({ status: 'pending' })
-  .on<'UserRegistered', UserRegisteredPayload>('UserRegistered', (saga, event) => {
+  .on<'UserRegistered', UserRegistered>('UserRegistered', (saga, event) => {
     saga.state.status = 'welcoming';
-
     return [
       send('send-welcome-email', { email: event.payload.email }, {
         idempotencyKey: `welcome:${event.payload.userId}`,
-        concurrencyKey: `user:${event.payload.userId}`,
       }),
     ];
   })
@@ -81,99 +49,48 @@ export const registrationSaga = defineSaga('user-registration')
     return [sagaComplete()];
   })
   .build();
-```
-
-The public authoring path is the fluent chain only. There is no public flat saga specification
-factory. The internal definition value produced by `.build()` is frozen and should be treated as a
-runtime artifact, not as a mutable authoring object.
-
-## Runtime Composition
-
-Runtime state is always owned by an explicit composition root:
-
-```ts
-import { createSagaRuntime } from '@netscript/plugin-sagas-core/runtime';
-import { registrationSaga } from './registration-saga.ts';
 
 const runtime = createSagaRuntime();
-
 await runtime.register([registrationSaga]);
 await runtime.start();
 ```
 
-`createSagaRuntime()` uses the native adapter.
+---
 
-There are no saga bus or registry singletons. Do not add `getSagaBus`, `setSagaBus`, `resetSagaBus`,
-`getSagaRegistry`, or `resetSagaRegistry`. Applications should pass the runtime, bus, store,
-transport, clock, and instrumentation dependencies through their own composition root.
+## 📦 Key Capabilities
 
-## Preset Startup
+- **Fluent saga DSL**: `defineSaga(id).state().on().build()` produces a frozen `SagaDefinition`;
+  cascaded effects are returned from handlers via `send`, `schedule`, `spawn`, `sagaComplete`,
+  `sagaFail`, and `sagaCompensate`.
+- **Composition-root runtime**: `createSagaRuntime()` wires the native engine, scheduler, and
+  compensator with no global bus or registry singletons — applications inject their own store,
+  transport, and clock ports.
+- **At-least-once delivery**: idempotency keys reserve a message target before delivery and record
+  applied `(instanceId, key)` pairs, so duplicate messages return `alreadyApplied` instead of
+  re-running handler effects.
+- **Pluggable runtime ports**: `SagaStorePort`, `SagaBusPort`, `SagaClockPort`,
+  `SagaIdempotencyPort`, and `SagaAppliedKeyStore` are the durability seams — swap the in-memory
+  defaults for durable backends in production.
+- **Deterministic testing surface**: the `./testing` subpath ships in-memory stores, a controllable
+  clock, and a runtime helper for unit-testing saga logic without external infrastructure.
 
-The `./presets` subpath contains the thin startup helper used by distributed handler processes:
+---
 
-```ts
-import { startSagas } from '@netscript/plugin-sagas-core/presets';
-import { registrationSaga } from './registration-saga.ts';
+## 📖 Documentation
 
-const started = await startSagas({
-  definitions: [registrationSaga],
-});
+- **Reference**:
+  [rickylabs.github.io/netscript/reference/sagas/](https://rickylabs.github.io/netscript/reference/sagas/)
+  — the sagas family reference; this core package is documented in its Internals section.
+- **Durable Workflows**:
+  [rickylabs.github.io/netscript/durable-workflows/](https://rickylabs.github.io/netscript/durable-workflows/)
+  — the capability pillar covering sagas, durability, retries, and DLQ behavior.
+- **Checkout saga tutorial**:
+  [rickylabs.github.io/netscript/tutorials/storefront/04-checkout-saga/](https://rickylabs.github.io/netscript/tutorials/storefront/04-checkout-saga/)
+  — build a multi-step saga end to end.
 
-await started.shutdown();
-```
+---
 
-The preset does not discover files, inspect registries, install process signal handlers, or read
-environment variables. It is a small wrapper over `createSagaRuntime()` and explicit definitions.
+## 📝 License
 
-## Subpaths
-
-| Subpath                   | Role                                                               |
-| ------------------------- | ------------------------------------------------------------------ |
-| `.`                       | Curated root DSL and cascaded message constructors                 |
-| `./builders`              | Userland builder types and reserved signal/query builders          |
-| `./domain`                | Branded IDs, saga state/message/context/result/error vocabulary    |
-| `./ports`                 | Runtime, persistence, transport, durability, and agent boundaries  |
-| `./runtime`               | Native engine, scheduler, compensator, and runtime facade          |
-| `./adapters`              | Native `SagaBusBridge` adapter                                     |
-| `./transports`            | Redis Streams and Garnet-compatible LIST transports                |
-| `./middleware`            | Hono request context and SSE event middleware                      |
-| `./integration/workers`   | Branded worker job/task trigger helpers                            |
-| `./integration/publisher` | Publisher port for plugin-layer HTTP clients                       |
-| `./telemetry`             | Structural tracing/metrics instrumentation facade                  |
-| `./config`                | Config-time `defineSagaConfig(id, entrypoint)` builder and schemas |
-| `./contracts/v1`          | Versioned oRPC/Zod contract surface                                |
-| `./streams`               | Saga instance stream schema                                        |
-| `./presets`               | `startSagas()` and `startSagaHandlers()` composition helpers       |
-| `./abstracts`             | Stub-only bases for named extension axes                           |
-| `./testing`               | Deterministic in-memory stores, bus, clock, and runtime helper     |
-| `./agent`                 | Reserved future AI-agent surface                                   |
-
-## Durability Scope
-
-Group E provides Tier 1 runtime primitives: durable saga state and transition vocabulary, explicit
-store ports, and injected clocks/transports. Tier 2 outbox and Tier 3 history/agent durability are
-reserved as ports in this package and implemented in later phases.
-
-Signal/query dispatch is also reserved. `defineSignal()`, `defineQuery()`, `.onSignal()`, and
-`.onQuery()` exist so userland code can stabilize around the public surface, but runtime dispatch
-throws `SagasError.notImplemented()` until Phase 7d.
-
-## Delivery Guarantees
-
-The native saga runtime is at-least-once with idempotency keys. Publishers should supply an
-`idempotencyKey` for retried messages and cascaded sends. The bus bridge reserves the message target
-and key before delivery, and the engine records an applied `(instanceId, idempotencyKey)` before
-handler effects run.
-
-Duplicate messages are not runtime failures. A duplicate applied key returns `alreadyApplied: true`
-from the engine result, skips the handler, and does not persist another transition. The default
-memory stores are real process-local implementations for tests and single-process development;
-production composition roots must inject durable `SagaIdempotencyPort` and `SagaAppliedKeyStore`
-implementations.
-
-## Docs
-
-- [Authoring](./docs/authoring.md)
-- [Runtime Composition](./docs/runtime-composition.md)
-- [Extension Axes](./docs/extension-axes.md)
-- [Testing](./docs/testing.md)
+MIT — see [LICENSE](https://github.com/rickylabs/netscript/blob/main/LICENSE). Published to JSR with
+cryptographically verified provenance.
