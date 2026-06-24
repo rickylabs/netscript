@@ -30,6 +30,17 @@ physical `/docs` folders from the tree. Blanket deletion is NOT uniformly safe:
 - Remaining ~20 folders appear orphaned (only run-trace artifacts reference them) and could be
   removed cleanly.
 
-Resolution pending user call (see supervisor message). C2 IMPL-EVAL is independent of the folder
-decision (it validates README cross-refs against `docs/site/**` + publish-glob correctness), but
-held until the folder decision lands so the eval covers the final tree state.
+**RESOLVED (2026-06-24, commit f92cee1b):** user chose "Delete ALL + repoint skills". Executed
+losslessly:
+- Deleted all 26 `/docs` folders (162 files) from `packages/*` + `plugins/*`.
+- The 4 skill-load-bearing contracts were RELOCATED into their owning skill dirs (not lost):
+  `fresh-ui-horizontal/{l0-conventions.md,theme-authoring.md}`,
+  `netscript-cli/{commands.md,maintainer-cli.md}`; both `SKILL.md` files repointed to the
+  skill-local copies; `.claude/skills` mirror regenerated (`sync-claude OK`,
+  `validate-claude-surface ok:true`, lock unchanged).
+- One scaffold-template comment (`composition-view.tsx.template`) repointed off the deleted path.
+- `arch-debt.md` AS7 doc-warning note updated to mark the `docs/architecture.md` portion moot.
+- Verified zero remaining load-bearing refs to `(packages|plugins)/*/docs/` (only the intentional
+  arch-debt historical note remains; `.llm/tmp/run` traces are frozen artifacts).
+
+Tree state is now final → C2 IMPL-EVAL can cover it.

@@ -20,3 +20,12 @@ app-surface = cli/aspire/service/fresh/fresh-ui/watchers/cron.
 Gates run before commit: `deno fmt --check` on all 31 READMEs (exit 0 after one fmt pass —
 repo config is single-quote + prose-wrap 80), `deno fmt --check` on the 24 edited `deno.json`
 (exit 0), strict `ConvertFrom-Json` parse on all 24 edited `deno.json` (all OK).
+
+## C1b — /docs removal + skill relocation (resolves drift D1)
+
+- f92cee1b: chore(jsr): remove superseded per-package /docs; relocate contract docs to skills
+
+Deleted 26 `/docs` folders (162 files); relocated the 4 skill-load-bearing contracts into their
+owning `.agents/skills/` dirs + repointed both `SKILL.md`; regenerated `.claude` mirror.
+Gates: `sync-claude-skills.ts --check` OK (16 skills, 20 mirrored), `validate-claude-surface.ts`
+ok:true (deno.lock unchanged after 3 hook runs). Pushed fast-forward `1ed18196..f92cee1b`.
