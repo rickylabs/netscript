@@ -79,7 +79,7 @@ Deno.test('PluginScaffolder includes sample jobs and tasks by default', async ()
   };
   assertEquals(
     denoJson.imports['@netscript/plugin-workers-core'],
-    'jsr:@netscript/plugin-workers-core@^1.0.0',
+    'jsr:@netscript/plugin-workers-core@0.0.1-alpha.1',
   );
   assertEquals(denoJson.imports['@netscript/plugin-sagas-core'], undefined);
   assertStringIncludes(denoJson.tasks.check, 'jobs/**/*.ts');

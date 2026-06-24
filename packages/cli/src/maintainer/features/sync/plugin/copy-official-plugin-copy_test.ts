@@ -184,15 +184,15 @@ Deno.test("copyOfficialPlugin copies plugin and background source workspaces", a
   ) as { imports: Record<string, string> };
   assertEquals(
     pluginDenoJson.imports["@netscript/plugin"],
-    "jsr:@netscript/plugin@^1.0.0",
+    "jsr:@netscript/plugin@0.0.1-alpha.1",
   );
   assertEquals(
     pluginDenoJson.imports["@netscript/plugin-workers-core/contracts/v1"],
-    "jsr:@netscript/plugin-workers-core@^1.0.0/contracts",
+    "jsr:@netscript/plugin-workers-core@0.0.1-alpha.1/contracts",
   );
   assertEquals(
     pluginDenoJson.imports["@netscript/contracts"],
-    "jsr:@netscript/contracts@^1.0.0",
+    "jsr:@netscript/contracts@0.0.1-alpha.1",
   );
 
   const workerDenoJson = JSON.parse(
@@ -201,7 +201,7 @@ Deno.test("copyOfficialPlugin copies plugin and background source workspaces", a
   assertEquals(workerDenoJson.name, "@sample-app/workers");
   assertEquals(
     workerDenoJson.imports["@netscript/plugin-workers-core"],
-    "jsr:@netscript/plugin-workers-core@^1.0.0",
+    "jsr:@netscript/plugin-workers-core@0.0.1-alpha.1",
   );
   assertEquals(
     workerDenoJson.imports["@netscript/plugin-workers"],
@@ -436,22 +436,22 @@ Deno.test("official plugin import rewrite converts local package paths to JSR sp
     _internal.rewritePackagePathToJsr(
       "../../packages/plugin-workers-core/src/streams/mod.ts",
     ),
-    "jsr:@netscript/plugin-workers-core@^1.0.0/streams",
+    "jsr:@netscript/plugin-workers-core@0.0.1-alpha.1/streams",
   );
   assertEquals(
     _internal.rewritePackagePathToJsr(
       "../../packages/plugin-auth-core/src/contracts/v1/mod.ts",
     ),
-    "jsr:@netscript/plugin-auth-core@^1.0.0/contracts/v1",
+    "jsr:@netscript/plugin-auth-core@0.0.1-alpha.1/contracts/v1",
   );
   assertEquals(
     _internal.rewritePackagePathToJsr(
       "../../packages/plugin-auth-core/src/ports/mod.ts",
     ),
-    "jsr:@netscript/plugin-auth-core@^1.0.0/ports",
+    "jsr:@netscript/plugin-auth-core@0.0.1-alpha.1/ports",
   );
   assertEquals(
     _internal.rewritePackagePathToJsr("../packages/plugin/mod.ts"),
-    "jsr:@netscript/plugin@^1.0.0",
+    "jsr:@netscript/plugin@0.0.1-alpha.1",
   );
 });

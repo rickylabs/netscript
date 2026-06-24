@@ -998,15 +998,18 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 
 ## docs/runtime — alpha scaffold specifiers point at future stable ranges (`alpha-specifiers-forward-looking`)
 
-- **Reason:** Several generated/scaffolded examples pin future `jsr:@netscript/*@^1.0.0` ranges
-  while the currently published aligned package train is still `0.0.1-alpha.0`. The docs must keep
-  warning readers that the future stable specifiers describe the intended surface rather than a
-  public JSR install they can run today.
+- **Reason:** Several generated/scaffolded examples previously pinned future
+  `jsr:@netscript/*@^1.0.0` ranges while the aligned package train was still pre-1.0. PR1 changes
+  scaffold/docs examples to exact alpha-1 pins; keep this debt open until publish dry-run evidence
+  confirms the corrected public package train.
 - **Owner:** Release/publish readiness program.
+- **Target:** PR1 (`chore/jsr-alpha1-publish-prep`) updates scaffold/docs examples to exact
+  `0.0.1-alpha.1` pins. Close only after `deno task publish:dry-run` passes post-merge against the
+  alpha-1 train.
 - **Created:** 2026-06-22.
 - **Status:** open, DEBT_ACCEPTED.
-- **Gate:** Close when scaffolded public package specifiers resolve from JSR at the documented
-  stable range, or when scaffold output stops emitting forward-looking stable ranges.
+- **Gate:** Close when `deno task publish:dry-run` passes for the alpha-1 train after PR1 merges, and
+  scaffold output no longer emits forward-looking stable ranges.
 
 ## plugins/auth — single active backend v1 boundary (`auth-single-active-backend-boundary`)
 

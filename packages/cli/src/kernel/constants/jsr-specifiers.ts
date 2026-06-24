@@ -2,6 +2,8 @@
  * JSR package specifiers used by public CLI scaffolding.
  */
 
+import cliPackageJson from '../../../deno.json' with { type: 'json' };
+
 /** NetScript package names that public scaffolds may import from JSR. */
 export type NetscriptPackage =
   | 'aspire'
@@ -19,32 +21,48 @@ export type NetscriptPackage =
   | 'auth-kv-oauth'
   | 'plugin-sagas-core'
   | 'plugin-triggers-core'
+  | 'prisma-adapter-mysql'
   | 'runtime-config'
   | 'sdk'
   | 'service'
   | 'telemetry'
   | 'workers';
 
+/** Release train version sourced from the CLI package manifest. */
+export const NETSCRIPT_RELEASE_VERSION: string = cliPackageJson.version;
+
+/** Exact JSR version suffix for NetScript prerelease package pins. */
+export const NETSCRIPT_RELEASE_TAG = `@${NETSCRIPT_RELEASE_VERSION}`;
+
+/** Build an exact JSR specifier for a NetScript package and optional export subpath. */
+export function netscriptJsrSpecifier(
+  packageName: string,
+  subpath: string = '',
+): string {
+  return `jsr:@netscript/${packageName}${NETSCRIPT_RELEASE_TAG}${subpath}`;
+}
+
 /** Published JSR specifiers for NetScript packages. */
 export const JSR_SPECIFIERS: Readonly<Record<NetscriptPackage, string>> = {
-  aspire: 'jsr:@netscript/aspire@^1.0.0',
-  config: 'jsr:@netscript/config@^1.0.0',
-  contracts: 'jsr:@netscript/contracts@^1.0.0',
-  database: 'jsr:@netscript/database@^1.0.0',
-  fresh: 'jsr:@netscript/fresh@^1.0.0',
-  'fresh-ui': 'jsr:@netscript/fresh-ui@^1.0.0',
-  kv: 'jsr:@netscript/kv@^1.0.0',
-  logger: 'jsr:@netscript/logger@^1.0.0',
-  plugin: 'jsr:@netscript/plugin@^1.0.0',
-  'plugin-auth-core': 'jsr:@netscript/plugin-auth-core@^1.0.0',
-  'auth-workos': 'jsr:@netscript/auth-workos@^1.0.0',
-  'auth-better-auth': 'jsr:@netscript/auth-better-auth@^1.0.0',
-  'auth-kv-oauth': 'jsr:@netscript/auth-kv-oauth@^1.0.0',
-  'plugin-sagas-core': 'jsr:@netscript/plugin-sagas-core@^1.0.0',
-  'plugin-triggers-core': 'jsr:@netscript/plugin-triggers-core@^1.0.0',
-  'runtime-config': 'jsr:@netscript/runtime-config@^1.0.0',
-  sdk: 'jsr:@netscript/sdk@^1.0.0',
-  service: 'jsr:@netscript/service@^1.0.0',
-  telemetry: 'jsr:@netscript/telemetry@^1.0.0',
-  workers: 'jsr:@netscript/plugin-workers-core@^1.0.0',
+  aspire: netscriptJsrSpecifier('aspire'),
+  config: netscriptJsrSpecifier('config'),
+  contracts: netscriptJsrSpecifier('contracts'),
+  database: netscriptJsrSpecifier('database'),
+  fresh: netscriptJsrSpecifier('fresh'),
+  'fresh-ui': netscriptJsrSpecifier('fresh-ui'),
+  kv: netscriptJsrSpecifier('kv'),
+  logger: netscriptJsrSpecifier('logger'),
+  plugin: netscriptJsrSpecifier('plugin'),
+  'plugin-auth-core': netscriptJsrSpecifier('plugin-auth-core'),
+  'auth-workos': netscriptJsrSpecifier('auth-workos'),
+  'auth-better-auth': netscriptJsrSpecifier('auth-better-auth'),
+  'auth-kv-oauth': netscriptJsrSpecifier('auth-kv-oauth'),
+  'plugin-sagas-core': netscriptJsrSpecifier('plugin-sagas-core'),
+  'plugin-triggers-core': netscriptJsrSpecifier('plugin-triggers-core'),
+  'prisma-adapter-mysql': netscriptJsrSpecifier('prisma-adapter-mysql'),
+  'runtime-config': netscriptJsrSpecifier('runtime-config'),
+  sdk: netscriptJsrSpecifier('sdk'),
+  service: netscriptJsrSpecifier('service'),
+  telemetry: netscriptJsrSpecifier('telemetry'),
+  workers: netscriptJsrSpecifier('plugin-workers-core'),
 } as const;
