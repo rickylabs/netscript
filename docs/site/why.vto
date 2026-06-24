@@ -103,7 +103,7 @@ Authentication is a plugin like any other, and its defining opinion is that the 
 ] }) }}
 
 {{ comp callout { type: "note", title: "Framework alpha" } }}
-NetScript packages share the aligned <code>0.0.1-alpha.0</code> version, and the <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> specifier the scaffold writes is forward-looking, not installable today. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
+NetScript packages share the aligned <code>{{ releaseVersion }}</code> version, and scaffolded JSR imports pin that exact alpha train. Only <strong>kv-oauth</strong> is fully interactive — on WorkOS and better-auth the <code>signin</code>/<code>callback</code> endpoints return a typed unsupported-operation error by design. It's one active backend at a time: no multi-active routing, cross-backend linking, or global logout yet. See <a href="/capabilities/auth/">the auth capability hub</a> for the full surface.
 {{ /comp }}
 
 ## Compared to assembling it yourself

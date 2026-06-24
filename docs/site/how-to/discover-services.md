@@ -207,7 +207,7 @@ services__users__http__0=http://localhost:3001 deno task --cwd web dev
 {{ comp callout { type: "warning", title: "Footguns before you ship" } }}
 <ul>
 <li><strong>Alpha surface.</strong> NetScript packages share the aligned
-<code>0.0.1-alpha.0</code> version; the discovery env-var convention and client option names are
+<code>{{ releaseVersion }}</code> version; the discovery env-var convention and client option names are
 stable in the scaffold but may shift before <code>1.0</code>. Pin the version you build on.</li>
 <li><strong>The reference must be declared, then generated.</strong> Adding a
 <code>ServiceReferences</code> entry does nothing until you re-run <code>netscript service

@@ -27,7 +27,7 @@ metadata constants, and a small manifest inspector.
 | Symbol | Value | Description |
 | --- | --- | --- |
 | `AUTH_PLUGIN_ID` | `"auth"` | Stable plugin id. |
-| `AUTH_PLUGIN_VERSION` | `"0.0.1-alpha.0"` | Auth plugin package version constant. |
+| `AUTH_PLUGIN_VERSION` | `"{{ releaseVersion }}"` | Auth plugin package version constant. |
 | `AUTH_API_SERVICE_NAME` | `"auth-api"` | Service name contributed by the auth plugin. |
 | `AUTH_API_DEFAULT_PORT` | `8094` | Default auth-api service port. |
 

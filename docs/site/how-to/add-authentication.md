@@ -29,15 +29,11 @@ Aspire running first. See <a href="/explanation/aspire/">the Aspire explanation<
 graph.
 {{ /comp }}
 
-{{ comp callout { type: "warning", title: "Alpha surface — pin local sources, not jsr ^1.0.0" } }}
-The CLI scaffold emits forward-looking specifiers such as
-<code>jsr:@netscript/plugin-auth-core@^1.0.0</code>, but those versions are <strong>not published
-yet</strong> — do not expect <code>jsr:...@^1.0.0</code> to install from the public registry. Add
-the plugin through <code>netscript plugin add @netscript/plugin-auth</code> in a workspace whose
-auth sources are wired locally (the scaffold does this for you); treat the <code>^1.0.0</code>
-import specifiers as the shape the published packages <em>will</em> take, not an install you can run against
-JSR today.
-<!-- caveat: arch-debt:alpha-specifiers-forward-looking -->
+{{ comp callout { type: "note", title: "Alpha package pins" } }}
+The CLI scaffold emits exact alpha specifiers such as
+<code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>. Add the plugin through
+<code>netscript plugin add @netscript/plugin-auth</code> so the workspace gets the matching auth
+sources, generated registry entries, and Aspire resources together.
 {{ /comp }}
 
 ## Before you start
@@ -280,8 +276,9 @@ v1. Plan your identity model around one provider path.</li>
 auth audit log or auth-specific telemetry API on main. Do not build dashboards against an auth audit
 stream that does not exist; the <code>defaultTelemetry</code> flag is generic OTLP plumbing, not an
 auth audit trail.</li>
-<li><strong>Alpha specifiers</strong> — the <code>jsr:...@^1.0.0</code> import specifiers the
-scaffold emits are forward-looking. Do not assume a public JSR install resolves today.</li>
+<li><strong>Alpha package pins</strong> — scaffolded <code>jsr:...</code> imports use exact
+<code>{{ releaseSpecifier }}</code> pins. Keep the generated workspace on one aligned NetScript
+version.</li>
 <li><strong>Provider env is required for real login</strong> — without
 <code>NETSCRIPT_AUTH_CLIENT_ID</code>/<code>SECRET</code>/<code>REDIRECT_URI</code> the
 <code>kv-oauth</code> backend boots into a stub fallback; <code>session</code>/<code>me</code> answer

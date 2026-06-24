@@ -300,10 +300,9 @@ active adapter into a single service and registry. That keeps adapters swappable
 manifest small. Build the full thing in [Add authentication](/how-to/add-authentication/) — that page
 is the concrete walkthrough for the auth plugin specifically.
 
-{{ comp callout { type: "note", title: "Alpha specifiers are forward-looking" } }}
-CLI scaffolds may pin <code>jsr:@netscript/plugin-auth-core@^1.0.0</code> and siblings — those
-specifiers are forward-looking and are <strong>not installable at <code>1.0</code> today</strong>.
-Treat them as a target, not a current release.
+{{ comp callout { type: "note", title: "Alpha package pins" } }}
+CLI scaffolds pin <code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code> and siblings
+at the exact aligned alpha version. Keep generated plugin workspaces on one NetScript release train.
 {{ /comp }}
 
 ## Production pitfalls

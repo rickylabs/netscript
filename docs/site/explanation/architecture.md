@@ -346,9 +346,9 @@ boundary rule above survives contact with real code. A surface that does not pas
 them is broken by definition, which is precisely why the published surface can be
 trusted as the product.
 
-{{ comp callout { type: "note", title: "Alpha specifiers" } }}
-Scaffold output pins forward-looking <code>jsr:@netscript/plugin-auth-core@^1.0.0</code>
-specifiers, but those are not installable at <code>1.0</code> yet.
+{{ comp callout { type: "note", title: "Alpha package pins" } }}
+Scaffold output pins exact alpha specifiers such as
+<code>jsr:@netscript/plugin-auth-core{{ releaseSpecifier }}</code>.
 {{ /comp }}
 
 ## Where to go next

@@ -11,6 +11,14 @@
  * inside reference prose unless they already have generated reference units.
  */
 
+import cliPackageJson from "../../packages/cli/deno.json" with { type: "json" };
+
+/** Current aligned NetScript release train version. */
+export const releaseVersion: string = cliPackageJson.version;
+
+/** Exact JSR suffix for current NetScript release train examples. */
+export const releaseSpecifier: string = `@${releaseVersion}`;
+
 export interface NavItem {
   href: string;
   label: string;

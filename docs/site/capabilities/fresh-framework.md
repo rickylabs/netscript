@@ -271,7 +271,7 @@ Deferred prewarm and durable-stream helpers touch the platform at runtime:
 stream settings resolve from the environment, and <code>--unstable-kv</code> for the SSE helpers
 that watch <code>Deno.Kv</code>. Type-check page entrypoints with <code>--unstable-kv</code> too —
 the streaming server helpers expose KV-aware types. NetScript is <strong>alpha</strong>
-(<code>0.0.1-alpha.0</code>); pin the version and expect surface churn.
+(<code>{{ releaseVersion }}</code>); pin the version and expect surface churn.
 {{ /comp }}
 
 ## Reference →

@@ -8,8 +8,8 @@ import {
 Deno.test('pluginEntrySchema: applies appsettings defaults for plugin services', () => {
   const entry = pluginEntrySchema.parse({
     Port: 8091,
-    InstalledVersion: '0.0.1-alpha.0',
-    InstalledFrom: 'jsr:@netscript/plugin-workers@^0.0.1-alpha.0',
+    InstalledVersion: '0.0.1-alpha.1',
+    InstalledFrom: 'jsr:@netscript/plugin-workers@0.0.1-alpha.1',
   });
 
   assertEquals(entry.Enabled, true);
@@ -21,7 +21,7 @@ Deno.test('pluginEntrySchema: applies appsettings defaults for plugin services',
 
 Deno.test('backgroundProcessorEntrySchema: applies appsettings defaults for processors', () => {
   const entry = backgroundProcessorEntrySchema.parse({
-    InstalledVersion: '0.0.1-alpha.0',
+    InstalledVersion: '0.0.1-alpha.1',
     InstalledFrom: 'workspace:plugins/workers',
   });
 
