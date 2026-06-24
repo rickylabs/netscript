@@ -23,9 +23,19 @@ npx jsr add @netscript/sdk
 bunx jsr add @netscript/sdk
 ```
 
+Or pin it directly in your import map:
+
+```json
+{
+  "imports": {
+    "@netscript/sdk": "jsr:@netscript/sdk@^0.0.1-alpha.1"
+  }
+}
+```
+
 ### Usage
 
-```typescript
+```ts
 import { defineServices } from '@netscript/sdk';
 import { ordersContract } from './contracts/orders.ts';
 

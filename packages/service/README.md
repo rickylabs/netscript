@@ -64,6 +64,74 @@ await service.stop();
 
 ---
 
+## ⚙️ Builder & auth
+
+Reach for `createService()` when a service needs explicit, stage-by-stage composition — and pull in
+`@netscript/service/auth` to guard it with authentication and authorization:
+
+```ts
+import { createService } from '@netscript/service';
+import {
+  createScopeAuthorizer,
+  createStaticCredentialAuthenticator,
+} from '@netscript/service/auth';
+
+const authenticator = createStaticCredentialAuthenticator({
+  credentials: {
+    'local-token': { subject: 'service:orders', scopes: ['orders:read'], roles: ['service'] },
+  },
+});
+
+const authorizer = createScopeAuthorizer({
+  rules: [{
+    match: (request) => request.path.startsWith('/api/orders'),
+    requireScopes: ['orders:read'],
+  }],
+});
+
+const running = await createService(router, { name: 'orders', version: '1.0.0' })
+  .withAuthn({ authenticator })
+  .withAuthz({ authorizer })
+  .withRPC()
+  .withHealth()
+  .serve({ port: 3001 });
+
+await running.stop();
+```
+
+Generated entrypoints stay on the `defineService()` preset and opt in by passing `auth`, so the same
+authn/authz ports apply without leaving the one-call surface:
+
+```ts
+import { defineService } from '@netscript/service';
+import { createScopeAuthorizer, createTrustedHeaderAuthenticator } from '@netscript/service/auth';
+
+const running = await defineService(router, {
+  name: 'orders',
+  port: 3001,
+  auth: {
+    authn: {
+      authenticator: createTrustedHeaderAuthenticator({
+        subjectHeader: 'x-authenticated-user',
+        scopesHeader: 'x-authenticated-scopes',
+      }),
+    },
+    authz: {
+      authorizer: createScopeAuthorizer({
+        rules: [{
+          match: (request) => request.path.startsWith('/api/orders'),
+          requireScopes: ['orders:read'],
+        }],
+      }),
+    },
+  },
+});
+
+await running.stop();
+```
+
+---
+
 ## 📖 Documentation
 
 - **Reference**:
