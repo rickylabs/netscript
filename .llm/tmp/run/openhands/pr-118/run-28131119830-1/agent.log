@@ -1,0 +1,400 @@
+
+- Read the plan, research, dossier, and deep-search brief in full.
+- Read the plan-gate checklist and plan-eval protocol.
+- Activated `netscript-harness`, `netscript-doctrine`, `jsr-audit` skills.
+- Verified filesystem package count: 26 in `packages/` + 5 in `plugins/` = 31, 
+matches the brief and the plan's claim.
+- Verified `packages/contracts/README.md` PR2 convention: exact 
+`docs-rickylabs.github.io-blue` badge, `ci.yml` workflow path, Deno-first 
+install with Node/Bun fallback, bold noun-phrase tagline - all match the plan's 
+D5 contract.
+- Verified dossier inaccuracies flagged in the plan: `docs-v1.0-blue` and 
+`docs-complete-blue` badges (lines 157, 171), illustrative 
+`(Better-Auth)/(Fedify Qs)/(Sagas/State)` captions (line 208) - all present and 
+correctly identified.
+- Verified `@netscript/queue` has a real shipped README + JSR badge, so linking 
+to the JSR scope page is safe; the docs-site reference-page risk is correctly 
+tracked as DOC-REF-1 follow-up.
+- Verified the `@netscript/cli` `init` command exists with description "Scaffold
+a new NetScript workspace" - the quickstart command the plan references is real.
+
+## Responses to review comments or issue comments
+
+This was a PLAN-EVAL pass; no review comments addressed. The post runs after 
+merge (verdict-driven).
+
+## Remaining risks
+
+- **No logo asset for the README hero**: correctly dispositioned as backlog (D2 
+ships ASCII; banner is follow-up).
+- **`@netscript/queue` reference page on the docs site** may not be published 
+yet: tracked as DOC-REF-1 follow-up; primary link is the JSR scope page which is
+real.
+- **Mermaid in `<details>` is optional**: author-discretion; if included, ASCII 
+canvas must precede it. The plan correctly leaves this open.
+- **Three minor hygiene notes** for the generator (none rework-forcing): pin the
+single authoring slice explicitly, mark the jsr-audit checkbox PASS, and use 
+"risks" terminology in the gate section.
+EOF
+(2) echo "summary written: $(wc -l < 
+/home/runner/work/_temp/openhands/28131119830-1/summary.md) lines"
+
+⏳ Process still running (soft timeout)
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Write run summary file
+
+Thought:
+The terminal is parsing the heredoc strangely. Let me use file_editor instead:
+
+Action: FileEditorAction
+
+Arguments:
+  command: "create"
+  path: "/home/runner/work/_temp/openhands/28131119830-1/summary.md"
+  file_text: 
+    # PLAN-EVAL Summary — PR3 Root README (PR #118, `docs/root-readme`)
+    
+    ## Summary
+    
+    PLAN-EVAL evaluator verdict on the generator's plan for the root README 
+(final docs PR of the
+    road-to-JSR topology, docs-only, no source / `deno.json` / `deno.lock`).
+    
+    **Verdict: `PASS`.** The plan is locked (D1–D5), scope-disciplined 
+(SCOPE-docs, single deliverable
+    `/README.md`), and ground-truthed against the shipped PR1/PR2 reality. The 
+dossier deltas the plan
+    flags are real and correctly identified: inaccurate `docs-v1.0-blue` / 
+`docs-complete-blue` badges
+    in the dossier → use the shipped `docs-rickylabs.github.io-blue`; 
+illustrative plugin captions in
+    the dossier ASCII canvas → use the real plugin names `auth, workers, sagas, 
+triggers, streams`;
+    aspirational "v1.0 / complete" blurbs → rewrite as a factual architecture 
+story. The locked
+    devices (D2 ASCII hero, D3 ASCII canvas + optional gated mermaid, D5 
+absolute URLs) all survive the
+    JSR scope-page renderer. The 31-package map is authoritative and complete 
+(26 in `packages/` + 5
+    in `plugins/` = 31, `@netscript/queue` included). The run gates (scoped 
+`deno fmt` on the README,
+    link sanity, package-map completeness, voice scan, dual GitHub + JSR render)
+are sufficient to
+    certify the authored output. Three non-blocking hygiene notes (single-slice 
+commit should be
+    explicit; jsr-audit checkbox should be marked PASS; risk register 
+terminology is labeled
+    "debt" rather than "risks") — none are rework-forcing.
+    
+    ## Changes
+    
+    - **Written**: `.llm/tmp/run/docs-root-readme/plan-eval.md` — the full 
+gate-by-gate verdict with
+      plan-claim spot-checks (filesystem 31-package ground truth, 
+`packages/contracts/README.md` PR2
+      convention comparison, dossier-delta confirmation, JSR-safety analysis of 
+D2/D3/D5, voice
+      doctrine check, run-gate sufficiency review, debt disposition).
+    
+    ## Validation
+    
+    - Read the plan, research, dossier, and deep-search brief in full.
+    - Read the plan-gate checklist and the plan-eval protocol.
+    - Activated `netscript-harness`, `netscript-doctrine`, `jsr-audit` skills.
+    - Verified filesystem package count: 26 in `packages/` + 5 in `plugins/` = 
+31, matches the brief
+      and the plan's claim.
+    - Verified `packages/contracts/README.md` PR2 convention: exact 
+`docs-rickylabs.github.io-blue`
+      badge, `ci.yml` workflow path, Deno-first install with Node/Bun fallback, 
+bold noun-phrase
+      tagline — all match the plan's D5 contract.
+    - Verified dossier inaccuracies flagged in the plan: `docs-v1.0-blue` and 
+`docs-complete-blue`
+      badges (lines 157, 171), illustrative `(Better-Auth)/(Fedify 
+Qs)/(Sagas/State)` captions
+      (line 208) — all present and correctly identified.
+    - Verified `@netscript/queue` has a real shipped README + JSR badge, so 
+linking to the JSR scope
+      page is safe; the docs-site reference-page risk is correctly tracked as 
+DOC-REF-1 follow-up.
+    - Verified the `@netscript/cli` `init` command exists with description 
+"Scaffold a new NetScript
+      workspace" (`packages/cli/src/public/features/init/init-command.ts`) — the
+quickstart command
+      the plan references is real.
+    
+    ## Responses to review comments or issue comments
+    
+    This was a PLAN-EVAL pass; no review comments addressed. PR comment will be 
+posted by the
+    workflow (per operational contract, the workflow owns GitHub comments).
+    
+    ## Remaining risks
+    
+    - **No logo asset for the README hero**: correctly dispositioned as backlog 
+(D2 ships ASCII;
+      banner is follow-up).
+    - **`@netscript/queue` reference page on the docs site** may not be 
+published yet: tracked as
+      DOC-REF-1 follow-up; primary link is the JSR scope page which is real.
+    - **Mermaid in `<details>` is optional**: author-discretion; if included, 
+ASCII canvas must
+      precede it. The plan correctly leaves this open.
+    - **Three minor hygiene notes** for the generator (none rework-forcing): pin
+the single
+      authoring slice explicitly in the plan, mark the jsr-audit checkbox PASS, 
+and use "risks"
+      terminology in the gate section rather than "debt".
+    
+
+  kind: "FileEditorAction"
+
+Tokens: ↑ input 3.18M • cache hit 87.82% •  reasoning 474 • ↓ output 19.22K • $ 
+0.3065
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: file_editor
+Result:
+[File /home/runner/work/_temp/openhands/28131119830-1/summary.md edited with 1 
+changes.]
+[begin of edit 1 / 1]
+(content before edit)
+ 1|
+(content after edit)
++1|# PLAN-EVAL Summary — PR3 Root README (PR #118, `docs/root-readme`)
+ 2|
++3|## Summary
++4|
++5|PLAN-EVAL evaluator verdict on the generator's plan for the root README 
+(final docs PR of the
++6|road-to-JSR topology, docs-only, no source / `deno.json` / `deno.lock`).
++7|
++8|**Verdict: `PASS`.** The plan is locked (D1–D5), scope-disciplined 
+(SCOPE-docs, single deliverable
++9|`/README.md`), and ground-truthed against the shipped PR1/PR2 reality. The 
+dossier deltas the plan
++10|flags are real and correctly identified: inaccurate `docs-v1.0-blue` / 
+`docs-complete-blue` badges
++11|in the dossier → use the shipped `docs-rickylabs.github.io-blue`; 
+illustrative plugin captions in
++12|the dossier ASCII canvas → use the real plugin names `auth, workers, sagas, 
+triggers, streams`;
++13|aspirational "v1.0 / complete" blurbs → rewrite as a factual architecture 
+story. The locked
++14|devices (D2 ASCII hero, D3 ASCII canvas + optional gated mermaid, D5 
+absolute URLs) all survive the
++15|JSR scope-page renderer. The 31-package map is authoritative and complete 
+(26 in `packages/` + 5
++16|in `plugins/` = 31, `@netscript/queue` included). The run gates (scoped 
+`deno fmt` on the README,
++17|link sanity, package-map completeness, voice scan, dual GitHub + JSR render)
+are sufficient to
++18|certify the authored output. Three non-blocking hygiene notes (single-slice 
+commit should be
++19|explicit; jsr-audit checkbox should be marked PASS; risk register 
+terminology is labeled
++20|"debt" rather than "risks") — none are rework-forcing.
++21|
++22|## Changes
++23|
++24|- **Written**: `.llm/tmp/run/docs-root-readme/plan-eval.md` — the full 
+gate-by-gate verdict with
++25|  plan-claim spot-checks (filesystem 31-package ground truth, 
+`packages/contracts/README.md` PR2
++26|  convention comparison, dossier-delta confirmation, JSR-safety analysis of 
+D2/D3/D5, voice
++27|  doctrine check, run-gate sufficiency review, debt disposition).
++28|
++29|## Validation
++30|
++31|- Read the plan, research, dossier, and deep-search brief in full.
++32|- Read the plan-gate checklist and the plan-eval protocol.
++33|- Activated `netscript-harness`, `netscript-doctrine`, `jsr-audit` skills.
++34|- Verified filesystem package count: 26 in `packages/` + 5 in `plugins/` = 
+31, matches the brief
++35|  and the plan's claim.
++36|- Verified `packages/contracts/README.md` PR2 convention: exact 
+`docs-rickylabs.github.io-blue`
++37|  badge, `ci.yml` workflow path, Deno-first install with Node/Bun fallback, 
+bold noun-phrase
++38|  tagline — all match the plan's D5 contract.
++39|- Verified dossier inaccuracies flagged in the plan: `docs-v1.0-blue` and 
+`docs-complete-blue`
++40|  badges (lines 157, 171), illustrative `(Better-Auth)/(Fedify 
+Qs)/(Sagas/State)` captions
++41|  (line 208) — all present and correctly identified.
++42|- Verified `@netscript/queue` has a real shipped README + JSR badge, so 
+linking to the JSR scope
++43|  page is safe; the docs-site reference-page risk is correctly tracked as 
+DOC-REF-1 follow-up.
++44|- Verified the `@netscript/cli` `init` command exists with description 
+"Scaffold a new NetScript
++45|  workspace" (`packages/cli/src/public/features/init/init-command.ts`) — the
+quickstart command
++46|  the plan references is real.
++47|
++48|## Responses to review comments or issue comments
++49|
++50|This was a PLAN-EVAL pass; no review comments addressed. PR comment will be 
+posted by the
++51|workflow (per operational contract, the workflow owns GitHub comments).
++52|
++53|## Remaining risks
++54|
++55|- **No logo asset for the README hero**: correctly dispositioned as backlog 
+(D2 ships ASCII;
++56|  banner is follow-up).
++57|- **`@netscript/queue` reference page on the docs site** may not be 
+published yet: tracked as
++58|  DOC-REF-1 follow-up; primary link is the JSR scope page which is real.
++59|- **Mermaid in `<details>` is optional**: author-discretion; if included, 
+ASCII canvas must
++60|  precede it. The plan correctly leaves this open.
++61|- **Three minor hygiene notes** for the generator (none rework-forcing): pin
+the single
++62|  authoring slice explicitly in the plan, mark the jsr-audit checkbox PASS, 
+and use "risks"
++63|  terminology in the gate section rather than "debt".
++64|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify deliverables exist
+
+$ ls -la /home/runner/work/_temp/openhands/28131119830-1/summary.md 
+.llm/tmp/run/docs-root-readme/plan-eval.md && echo --- && wc -l 
+/home/runner/work/_temp/openhands/28131119830-1/summary.md 
+.llm/tmp/run/docs-root-readme/plan-eval.md
+
+Tokens: ↑ input 3.2M • cache hit 87.93% •  reasoning 474 • ↓ output 19.35K • $ 
+0.3083
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+-rw------- 1 runner runner 11333 Jun 24 21:42 
+.llm/tmp/run/docs-root-readme/plan-eval.md
+-rw------- 1 runner runner  3968 Jun 24 21:42 
+/home/runner/work/_temp/openhands/28131119830-1/summary.md
+---
+   63 /home/runner/work/_temp/openhands/28131119830-1/summary.md
+  129 .llm/tmp/run/docs-root-readme/plan-eval.md
+  192 total
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check git status of evaluator session
+
+Thought:
+Both deliverables written. Final check: ensure no lock or source files were 
+touched, no `deno.lock` mutation, and the only file modifications are in the 
+run's tmp folder and the openhands summary path:
+
+$ git -C /home/runner/work/netscript/netscript status --short
+
+Tokens: ↑ input 3.23M • cache hit 88.03% •  reasoning 474 • ↓ output 19.46K • $ 
+0.3102
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+M .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+ M .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+ M .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+ M .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+?? .llm/tmp/run/docs-root-readme/plan-eval.md
+?? .llm/tmp/run/openhands/pr-118/run-28131119830-1/
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: PLAN-EVAL PASS verdict written
+
+Thought:
+Clean: no source, no `deno.json`/`deno.lock`, no `packages/`/`plugins/`. The 
+modified `request.md` files are from earlier openhands runs (not from this 
+evaluator), and the new files (`plan-eval.md` + the run folder) are exactly the 
+harness artifacts.
+
+Finish with message:
+## PLAN-EVAL verdict: `PASS` — PR3 Root README (PR #118, `docs/root-readme`)
+
+The plan in `.llm/tmp/run/docs-root-readme/plan.md` is **locked, ground-truthed,
+and scope-disciplined**. Author is cleared to proceed under the plan.
+
+### Gate-by-gate summary (12/12 pass, 3 with non-blocking hygiene notes)
+
+| Gate | Verdict | Notes |
+|---|---|---|
+| Research present and current | PASS | re-baselined against main @ f68fa916 |
+| Decisions locked (D1–D5) | PASS | architecture, hero, canvas+diagram, package 
+map, badges/links |
+| Open-decision sweep | PASS | 2 author-discretion items; none rework-forcing |
+| Commit slices | PASS-with-note | should explicitly say "single authoring 
+slice, one file" |
+| Risk register | PASS-with-note | labeled "debt" rather than "risks" — 
+terminology, not failure |
+| Gate set selected | PASS | scoped `deno fmt`, link sanity, map completeness, 
+voice, dual render |
+| Deferred scope explicit | PASS | per-package READMEs, docs site, logo asset, 
+publish config |
+| jsr-audit applied | PASS-with-note | D2/D3/D5 are the audit outputs; checkbox 
+not literally marked |
+| netscript-doctrine applied | PASS | 26 packages + 5 plugins mapped separately 
+|
+| netscript-deno-toolchain applied | PASS | `init` command verified: `Scaffold a
+new NetScript workspace` |
+| Voice doctrine enforced | PASS | banned tokens named; alpha as factual callout
++ roadmap link |
+| Scope discipline | PASS | SCOPE-docs, single deliverable `/README.md` |
+
+### Spot-check confirmations
+
+- **31-package map** authoritative: 26 in `packages/` + 5 in `plugins/` = 31, 
+exact match with `deep-search-brief.md`, `@netscript/queue` included.
+- **PR2 convention** (`packages/contracts/README.md`) matches plan D5: 
+`docs-rickylabs.github.io-blue` badge, `ci.yml` workflow path, Deno-first 
+install with Node/Bun fallback, bold noun-phrase tagline.
+- **Dossier deltas** all real: `docs-v1.0-blue` (line 157) and 
+`docs-complete-blue` (line 171) badges, illustrative `(Better-Auth)/(Fedify 
+Qs)/(Sagas/State)` captions (line 208), and aspirational blurbs — all present 
+and correctly flagged.
+- **JSR-safety of D2/D3/D5** confirmed: ASCII hero, ASCII canvas primary + 
+optional gated mermaid, absolute URLs all render on both GitHub and JSR scope 
+pages.
+- **`@netscript/cli init`** verified as a real command: 
+`packages/cli/src/public/features/init/init-command.ts` description "Scaffold a 
+new NetScript workspace".
+
+### Files written
+
+- `.llm/tmp/run/docs-root-readme/plan-eval.md` — full 129-line gate-by-gate 
+verdict
+- `/home/runner/work/_temp/openhands/28131119830-1/summary.md` — run summary
+
+### Lock hygiene
+
+No source, no `packages/`/`plugins/`, no `deno.json`, no `deno.lock` touched. 
+The only artifact written by this evaluator is the plan-eval verdict under the 
+run folder. The PR comment for #118 will be posted by the workflow per the 
+operational contract ("the workflow owns GitHub comments").
+
+Tokens: ↑ input 3.26M • cache hit 88.12% •  reasoning 474 • ↓ output 20.3K • $ 
+0.3130
+
