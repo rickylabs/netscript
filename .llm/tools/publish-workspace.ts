@@ -16,13 +16,6 @@ export interface PublishWorkspaceResult {
   readonly members: readonly PublishableMember[];
 }
 
-export const APPROVED_SLOW_TYPE_PACKAGES: ReadonlySet<string> = new Set([
-  'packages/contracts',
-  'packages/plugin-triggers-core',
-  'packages/service',
-  'packages/plugin',
-]);
-
 const PUBLISH_PARENT_DIRS = ['packages', 'plugins'];
 const JSR_SCOPE = '@netscript/';
 const JSR_LINK_BLOCK_START = '<!-- jsr-links:start -->';
@@ -46,31 +39,29 @@ export async function publishWorkspace(
       await Deno.writeTextFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
     }
 
-    const failures: string[] = [];
-    for (const member of members) {
-      const args = ['publish', '--allow-dirty'];
-      if (options.mode === 'dry-run') {
-        args.push('--dry-run');
-      }
-      if (APPROVED_SLOW_TYPE_PACKAGES.has(member.path)) {
-        args.push('--allow-slow-types');
-      }
-
-      const command = new Deno.Command('deno', {
-        args,
-        cwd: `${root}/${member.path}`,
-        stdout: 'inherit',
-        stderr: 'inherit',
-      });
-      const result = await command.output();
-      if (result.code !== 0) {
-        failures.push(`${member.path} (exit ${result.code})`);
-      }
+    // Atomic whole-workspace publish from the repo root. Deno publishes every
+    // workspace member in a single transaction and rewrites inter-member
+    // @netscript/* imports to jsr: specifiers. Publishing members individually
+    // (cd per member) breaks that resolution: a sibling's source files fall
+    // outside the member's own publish tarball, so the module graph fails with
+    // "Module not found". deno publish skips versions already on the registry,
+    // so re-running after a partial publish is safe and idempotent. Slow types
+    // are accepted workspace-wide.
+    const args = ['publish', '--allow-dirty', '--allow-slow-types'];
+    if (options.mode === 'dry-run') {
+      args.push('--dry-run');
     }
 
-    if (failures.length > 0) {
+    const command = new Deno.Command('deno', {
+      args,
+      cwd: root,
+      stdout: 'inherit',
+      stderr: 'inherit',
+    });
+    const result = await command.output();
+    if (result.code !== 0) {
       const action = options.mode === 'dry-run' ? 'Publish dry-run' : 'Publish';
-      throw new Error(`${action} failed for: ${failures.join(', ')}`);
+      throw new Error(`${action} failed (deno publish exit ${result.code}).`);
     }
 
     return { members };
