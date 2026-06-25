@@ -69,6 +69,7 @@ A developer adding release behavior starts in `.github/workflows/publish.yml`, t
 | 2026-06-25 | 2-3 | Validation | New actual publish path dry-run completed exit 0 for all 31 members. |
 | 2026-06-25 | 2-3 | Validation | Existing `deno task publish:dry-run` completed exit 0 through the refactored wrapper. |
 | 2026-06-25 | 3 | Root dry-run | Root `deno publish --dry-run` no longer reports Aspire TS2305; it reached the final dirty-worktree abort before commit. |
+| 2026-06-25 | 4 | Clean-tree validation | After committing implementation, root `deno publish --dry-run` completed exit 0. |
 
 ## Decisions
 
@@ -104,13 +105,14 @@ A developer adding release behavior starts in `.github/workflows/publish.yml`, t
 | Aspire fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/aspire --ext ts,tsx` | PASS | 45 files selected; 0 findings. |
 | Actual publish path dry-run | `deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --dry-run` | PASS | Exit 0 for all 31 publishable members. |
 | Repo publish gate | `deno task publish:dry-run` | PASS | Exit 0 through refactored dry-run wrapper. |
-| Root publish after Aspire cleanup | `deno publish --dry-run` | PARTIAL | TS2305 gone; command reached dirty-worktree abort before commit. Clean-tree rerun pending. |
+| Root publish after Aspire cleanup | `deno publish --dry-run` | PASS | Clean-tree rerun exited 0; Aspire TS2305 failure is gone. |
 
 ### Fitness Gates
 
 | Gate | Result | Evidence | Notes |
 | ---- | ------ | -------- | ----- |
 | F-6 | PASS | `deno task publish:dry-run`; `run-publish.ts --dry-run` | Existing gate and actual workflow dry-run path are green. |
+| F-6 root diagnostic | PASS | `deno publish --dry-run` | Root bare dry-run also exits 0 after Aspire direct re-export cleanup. |
 
 ### Runtime Gates
 

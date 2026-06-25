@@ -12,7 +12,7 @@
 
 ## Current State
 
-Implementation is complete and validation is in progress. The workflow now publishes from GitHub Release events using a per-member helper shared with the dry-run gate. Root `deno publish --dry-run` no longer reports the Aspire TS2305 failure; before commit it reached the final dirty-worktree abort.
+Implementation is complete and validation is green. The workflow now publishes from GitHub Release events using a per-member helper shared with the dry-run gate. Root `deno publish --dry-run` exits 0 after the Aspire direct re-export cleanup.
 
 ## Completed
 
@@ -25,17 +25,17 @@ Implementation is complete and validation is in progress. The workflow now publi
 - Ran second PLAN-EVAL fallback; verdict `PASS`.
 - Implemented shared publish helper, real publish runner, release-driven workflow release-note back-links, and Aspire direct re-export cleanup.
 - Validated `run-publish.ts --dry-run` and `deno task publish:dry-run` exit 0 for all 31 publishable members.
+- Validated clean-tree root `deno publish --dry-run` exits 0.
 
 ## In Progress
 
-- Commit split and clean-tree root publish dry-run.
+- Commit-log artifact update, IMPL-EVAL fallback, push, and PR/comment work.
 
 ## Next Steps
 
-1. Commit harness and implementation slices.
-2. Rerun clean-tree `deno publish --dry-run`.
-3. Run IMPL-EVAL fallback.
-4. Push explicit refspec, open/update PR, and post validation evidence.
+1. Commit this artifact update.
+2. Run IMPL-EVAL fallback.
+3. Push explicit refspec, open/update PR, and post validation evidence.
 
 ## Key Decisions
 
@@ -66,8 +66,8 @@ Implementation is complete and validation is in progress. The workflow now publi
 
 | Gate family | Current status | Evidence |
 | ----------- | -------------- | -------- |
-| Static | mostly green | Tooling check/lint/fmt, Aspire check/lint/fmt, YAML parse all pass; clean-tree root publish pending after commit. |
-| Fitness | green for F-6 actual path | `deno task publish:dry-run` and `run-publish.ts --dry-run` exit 0 for all 31 members. |
+| Static | green | Tooling check/lint/fmt, Aspire check/lint/fmt, YAML parse, and clean-tree root publish all pass. |
+| Fitness | green for F-6 | `deno task publish:dry-run`, `run-publish.ts --dry-run`, and root `deno publish --dry-run` exit 0. |
 | Runtime | N/A | No runtime behavior change planned. |
 | Consumer | pending | Publish dry-runs after implementation. |
 
@@ -82,4 +82,5 @@ Implementation is complete and validation is in progress. The workflow now publi
 
 ## Commits
 
-- None yet.
+- `4628e106`: chore(harness): plan jsr publish release slice
+- `0dc7cddb`: fix(publish): align jsr release publish path

@@ -10,3 +10,5 @@ Format:
 
 ## Log
 
+- 4628e106: chore(harness): plan jsr publish release slice
+- 0dc7cddb: fix(publish): align jsr release publish path
