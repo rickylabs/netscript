@@ -19,8 +19,21 @@
   ],
   "tasks": {
     "ci": "deno ci && deno task ci:quality && deno task coverage:functions && deno task publish:dry-run && deno task audit:critical",
-    "ci:quality": "deno run --allow-run .llm/tools/run-parallel-tasks.ts check lint fmt:check deps:check",
-    "check": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+    "ci:quality": {
+      "dependencies": ["check", "lint", "fmt:check", "deps:check"]
+    },
+    "check": {
+      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+      "files": [
+        "packages/**/*.ts",
+        "packages/**/*.tsx",
+        "plugins/**/*.ts",
+        "plugins/**/*.tsx",
+        "deno.json",
+        "deno.lock",
+        ".llm/tools/run-deno-check.ts"
+      ]
+    },
     "test": "deno test --allow-all",
     "coverage:functions": "rm -rf .llm/tmp/coverage/functions && deno test --allow-all --coverage=.llm/tmp/coverage/functions --coverage-raw-data-only packages/contracts/tests/errors_test.ts packages/service/tests/_fixtures/readme-examples_test.ts && deno run --allow-read --allow-write .llm/tools/report-function-coverage.ts --coverage .llm/tmp/coverage/functions --out .llm/tmp/coverage/function-report.json --package packages/contracts --package packages/plugin-triggers-core --package packages/service --package packages/plugin",
     "audit:critical": "deno audit --level critical",
@@ -46,8 +59,28 @@
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
     "e2e:cli": "deno run --allow-all packages/cli/e2e/cli.ts",
     "fmt": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --write",
-    "fmt:check": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
-    "lint": "deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+    "fmt:check": {
+      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\" --ignore-line-endings",
+      "files": [
+        "packages/**/*.ts",
+        "packages/**/*.tsx",
+        "plugins/**/*.ts",
+        "plugins/**/*.tsx",
+        "deno.json",
+        ".llm/tools/run-deno-fmt.ts"
+      ]
+    },
+    "lint": {
+      "command": "deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages --root plugins --ext ts,tsx --exclude \"^(packages/(fresh-ui|cli)|.*(?:^|/)\\.generated/|.*(?:^|/)node_modules/)\"",
+      "files": [
+        "packages/**/*.ts",
+        "packages/**/*.tsx",
+        "plugins/**/*.ts",
+        "plugins/**/*.tsx",
+        "deno.json",
+        ".llm/tools/run-deno-lint.ts"
+      ]
+    },
     "docs:readme:check": "deno run --no-lock --allow-read .llm/tools/check-readme-standard.ts --pretty",
     "arch:check": "deno task deps:check && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-auth-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-workos && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-better-auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-kv-oauth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/auth",
     "arch:check:repo": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
