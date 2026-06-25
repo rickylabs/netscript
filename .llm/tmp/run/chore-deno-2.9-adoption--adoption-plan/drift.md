@@ -35,4 +35,13 @@ cache SKIP path, and CI on `f4bded73` were all green; `deno.lock` unchanged (D6 
 Resolved by a one-line follow-up edit (Deno 2.8 → 2.9). No scope change to C0–C4. Re-dispatching a
 minimal IMPL-EVAL re-confirmation (generator does not self-certify).
 
+## D-5 (minor) — C0 toolchain pin extended to e2e-cli-prod.yml (post-#127 merge)
+
+After PR #127 merged to main it added a NEW workflow `.github/workflows/e2e-cli-prod.yml` pinned to
+`deno-version: '2.8.3'` — a file that did not exist when C0 was authored, so C0 never covered it.
+Merged main into the branch (forward merge, no rebase) and pinned the new workflow to `'2.9.0'` so
+main is not left with a split toolchain after #128 lands. Repo-wide grep confirms zero remaining
+`2.8.3` under `.github`. In-scope extension of the C0 toolchain-pin slice (supervisor lane: CI config
+only). No `packages/` source touched by this slice's own changes.
+
 No `significant` or `architectural` drift. Scope matches the PASSed plan (C0–C4).
