@@ -42,7 +42,7 @@ This is the first chapter, so the only prerequisites are a working local toolcha
 Install the NetScript CLI from JSR once:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts
+deno install --global --allow-all --name netscript jsr:@netscript/cli
 ```
 
 Confirm it resolves and inspect the command groups:
@@ -56,7 +56,7 @@ You should see the public groups: `init`, `contract`, `db`, `deploy`, `generate`
 directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad-hoc with <code>deno run -A jsr:@netscript/cli/bin/netscript.ts &lt;command&gt;</code>. The rest of this track assumes the installed <code>netscript</code> form.
+Run any command ad-hoc with <code>deno x jsr:@netscript/cli &lt;command&gt;</code>. The rest of this track assumes the installed <code>netscript</code> form.
 {{ /comp }}
 
 ## Step 1 — Preview the scaffold with a dry run

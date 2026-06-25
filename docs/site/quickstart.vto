@@ -42,18 +42,18 @@ The CLI is published to JSR as `@netscript/cli`. Install it globally for a tidy
   {
     label: "Global install",
     lang: "bash",
-    code: "# Installs a `netscript` command on your PATH\ndeno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts\n\nnetscript --help"
+    code: "# Installs a `netscript` command on your PATH\ndeno install --global --allow-all --name netscript jsr:@netscript/cli\n\nnetscript --help"
   },
   {
     label: "Ad-hoc (no install)",
     lang: "bash",
-    code: "# Run the same CLI without installing anything\ndeno run --allow-all jsr:@netscript/cli/bin/netscript.ts --help"
+    code: "# Run the same CLI without installing anything\ndeno x jsr:@netscript/cli --help"
   }
 ] }) }}
 
 {{ comp callout { type: "tip" } }}
 The rest of this page assumes the global <code>netscript</code> command. If you went ad-hoc,
-swap <code>netscript</code> for <code>deno run --allow-all jsr:@netscript/cli/bin/netscript.ts</code> in each step.
+swap <code>netscript</code> for <code>deno x jsr:@netscript/cli</code> in each step.
 {{ /comp }}
 
 ## 2. Scaffold a workspace

@@ -83,3 +83,41 @@ Notes:
   passed.
 - Reference-package `deno x` probes temporarily added entries to `deno.lock`; those probe-only
   entries were removed before staging and are not part of the slice.
+
+## S2 — Repo-wide Command Sweep
+
+### Residual Search
+
+Command:
+
+```sh
+rg -n "jsr:@netscript/cli/bin/netscript\\.ts" .
+```
+
+Result: exit 1 with no output. There are zero exact residual hits for the old
+`jsr:@netscript/cli/bin/netscript.ts` user-facing command.
+
+Broader check:
+
+```sh
+rg -n "jsr:@netscript/cli/bin|bin/netscript\\.ts|published file path|raw published-file|deno run (?:-A|--allow-all) jsr:@netscript/cli" README.md docs/site
+```
+
+Residual: one intended hit in `docs/site/_plan/worklog/quickstart.md`, saying no raw published-file
+path is required. Maintainer local-source forms such as `deno run -A packages/cli/bin/netscript-dev.ts`
+remain intentionally unchanged.
+
+### S2 Gate Evidence
+
+| Gate | Command | Exit | Evidence |
+| --- | --- | ---: | --- |
+| Residual exact grep | `rg -n "jsr:@netscript/cli/bin/netscript\\.ts" .` | 1 | No output; zero old exact command hits remain. |
+| Broader stale-prose grep | `rg -n "jsr:@netscript/cli/bin\|bin/netscript\\.ts\|published file path\|raw published-file\|deno run (?:-A\|--allow-all) jsr:@netscript/cli" README.md docs/site` | 0 | One acceptable current-state hit: the quickstart worklog says no raw published-file path is required. Maintainer `netscript-dev.ts` forms are excluded by scope and unchanged. |
+| Voice check | `rg -n -i "\\b(honest\|honesty\|honestly)\\b\|sorry\|apolog" README.md docs/site` | 0 for touched wording | Hits are pre-existing docs-site planning/explanation prose outside the edited command lines; S2 did not introduce banned voice terms. |
+| Whitespace | `git diff --check -- README.md docs/site .llm/tmp/run/cli-dx-runnable/commits.md .llm/tmp/run/cli-dx-runnable/worklog.md .llm/tmp/run/cli-dx-runnable/context-pack.md` | 0 | No whitespace errors. |
+| Docs fmt | `deno fmt --check --no-config --line-width 100 <touched docs>` | 1 | Fails on legacy Markdown/VTO formatting far outside this sweep, mostly component object layout reflow. Not mutated to avoid unrelated docs churn. |
+
+S2 changed 19 docs/planning files with 33 insertions and 33 deletions, limited to replacing the old
+published-file CLI invocation/proof text with the verified default-export form:
+`deno x jsr:@netscript/cli ...` for ad-hoc runs and
+`deno install --global --allow-all --name netscript jsr:@netscript/cli` for PATH installs.

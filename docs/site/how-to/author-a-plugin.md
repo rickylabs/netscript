@@ -44,7 +44,7 @@ adapters, and a single oRPC service. Study it when your plugin spans more than o
   caption: "Prerequisites",
   rows: [
     { name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
-    { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts. Confirm with netscript --help." },
+    { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli. Confirm with netscript --help." },
     { name: "A reference plugin", type: "plugins/<name>/", desc: "Install a first-party plugin with --samples and read its mod.ts + scaffold.plugin.json as your template. The auth plugin is the best multi-package exemplar." },
     { name: "Provider kind", type: "worker | saga | trigger | stream | plugin", desc: "Decide which archetype your plugin is. Utility/infra plugins use kind 'stream' or the generic 'plugin'." }
   ]
