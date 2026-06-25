@@ -7,6 +7,7 @@ import { PluginKindRegistry } from '../../application/registries/plugin-kind-reg
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
 import { PluginScaffolder } from './scaffolder.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
@@ -82,7 +83,7 @@ Deno.test('PluginScaffolder includes sample jobs and tasks by default', async ()
   };
   assertEquals(
     denoJson.imports['@netscript/plugin-workers-core'],
-    'jsr:@netscript/plugin-workers-core@0.0.1-alpha.2',
+    netscriptJsrSpecifier('plugin-workers-core'),
   );
   assertEquals(denoJson.imports['@netscript/plugin-sagas-core'], undefined);
   assertStringIncludes(denoJson.tasks.check, 'jobs/**/*.ts');

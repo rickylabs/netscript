@@ -1,6 +1,7 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertRejects } from 'jsr:@std/assert@^1';
 import { SCAFFOLD_PACKAGES } from '../../kernel/constants/scaffold/scaffold-packages.ts';
+import { netscriptJsrSpecifier } from '../../kernel/constants/jsr-specifiers.ts';
 import { JsrImportResolver } from './jsr-import-resolver.ts';
 
 describe('JsrImportResolver', () => {
@@ -9,23 +10,23 @@ describe('JsrImportResolver', () => {
 
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH),
-      'jsr:@netscript/fresh@0.0.1-alpha.2',
+      netscriptJsrSpecifier('fresh'),
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_VITE),
-      'jsr:@netscript/fresh@0.0.1-alpha.2/vite',
+      netscriptJsrSpecifier('fresh', '/vite'),
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_FRESH_UI_INTERACTIVE),
-      'jsr:@netscript/fresh-ui@0.0.1-alpha.2/interactive',
+      netscriptJsrSpecifier('fresh-ui', '/interactive'),
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1),
-      'jsr:@netscript/plugin-auth-core@0.0.1-alpha.2/contracts/v1',
+      netscriptJsrSpecifier('plugin-auth-core', '/contracts/v1'),
     );
     assertEquals(
       resolver.resolveImport(SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH),
-      'jsr:@netscript/auth-kv-oauth@0.0.1-alpha.2',
+      netscriptJsrSpecifier('auth-kv-oauth'),
     );
   });
 
@@ -45,8 +46,8 @@ describe('JsrImportResolver', () => {
         SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT,
       ]),
       {
-        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: 'jsr:@netscript/sdk@0.0.1-alpha.2',
-        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT]: 'jsr:@netscript/sdk@0.0.1-alpha.2/client',
+        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: netscriptJsrSpecifier('sdk'),
+        [SCAFFOLD_PACKAGES.NETSCRIPT_SDK_CLIENT]: netscriptJsrSpecifier('sdk', '/client'),
       },
     );
   });
