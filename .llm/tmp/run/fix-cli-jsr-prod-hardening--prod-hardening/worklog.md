@@ -111,3 +111,11 @@ dev bin, e2e, and any direct caller. Guard left unweakened.
 | Fix2 | `deno lint --no-config <file>` | 0 | Checked 1 file; clean. |
 
 Pushed `e5fafc38..4e252b80` to `origin/fix/cli-jsr-prod-hardening`.
+
+### CI re-trigger note
+
+After pushing `53754c4b`, GitHub's PR-head pointer desynced: the branch ref advanced to `53754c4b`
+but `pulls/127.head.sha` stayed at `e5fafc38`, so the `pull_request` synchronize event never fired
+and no `ci` / `e2e-cli` run was created for the fix (`gh pr checks` showed stale `e5fafc38`
+results). Advancing the branch ref with this note forces a fresh synchronize so CI runs against the
+real fix tip.
