@@ -45,3 +45,13 @@ IMPL-EVAL/post-publish rather than this implementation loop.
 | S2 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | Scoped wrapper selected 517 files across 5 batches; 0 type occurrences. |
 | S2 | `rtk proxy deno task --cwd packages/cli check` | 0 | CLI package entrypoints type-check with `--unstable-kv`. |
 | S2 | scoped lint/fmt wrappers | 1 | Same package-exclude behavior as S1: wrappers return nonzero with 0 findings because root config excludes `packages/cli`; no S2 TypeScript files were changed. |
+| S3 | `rtk proxy deno task check` | 0 | Root wrapper selected 1730 files across 15 batches; 0 type occurrences. |
+| S3 | `rtk proxy deno task --cwd packages/cli check` | 0 | CLI package entrypoints type-check with `--unstable-kv` after e2e wiring changes. |
+| S3 | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | Scoped wrapper selected 517 files across 5 batches; 0 type occurrences. |
+| S3 | `deno check --unstable-kv <10 touched e2e files>` | 0 | Focused e2e runner, gate, option, and suite files type-check. |
+| S3 | `deno lint --config /dev/null <10 touched e2e files>` | 0 | Touched e2e TypeScript files lint clean with direct no-config lint. |
+| S3 | `deno fmt --check <10 touched e2e files plus .github/workflows/e2e-cli-prod.yml>` | 0 | Touched TypeScript and workflow files are formatted. |
+| S3 | `python3 - <<'PY' ... yaml.safe_load('.github/workflows/e2e-cli-prod.yml') ... PY` | 0 | New production workflow parses as YAML; `ruby` was unavailable locally. |
+| S3 | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx` | 1 | Same package-exclude behavior as S1/S2: wrapper selected 517 files and returned 0 findings but nonzero due root config exclusion; direct touched-file lint above is the usable lint evidence. |
+| S3 | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | 1 | Same package-exclude behavior as S1/S2: wrapper selected 517 files and returned 0 findings but nonzero due root config exclusion; direct touched-file fmt above is the usable fmt evidence. |
+| S3 | full `scaffold.runtime` e2e | skipped | Intentionally not run in implementation per locked plan; reserved for IMPL-EVAL/post-publish. |

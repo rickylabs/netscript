@@ -9,6 +9,7 @@ export const PACKAGE_SOURCE = {
   AUTO: 'auto',
   STARTER: 'starter',
   LOCAL: 'local',
+  JSR: 'jsr',
 } as const;
 
 /** Runtime launcher used by generated projects. */

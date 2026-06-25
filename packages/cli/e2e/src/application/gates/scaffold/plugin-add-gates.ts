@@ -1,5 +1,5 @@
 import { GATE_PHASE } from '../../../domain/cli-surface.ts';
-import { PLUGIN, type PluginKind } from '../../../domain/extension-axes.ts';
+import { PACKAGE_SOURCE, PLUGIN, type PluginKind } from '../../../domain/extension-axes.ts';
 import type {
   CommandFactory,
   GateDefinition,
@@ -29,6 +29,8 @@ function pluginAddCommand(
       state.samples ? '--samples' : '--no-samples',
       '--force',
     ];
+
+    if (context.request.options.packageSource === PACKAGE_SOURCE.JSR) return cli(context, ...args);
 
     if (kind === PLUGIN.SAGA) {
       return ['deno', 'run', '-A', 'packages/cli/bin/netscript-dev.ts', ...args];
