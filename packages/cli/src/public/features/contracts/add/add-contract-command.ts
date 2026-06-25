@@ -15,6 +15,7 @@ import { DefaultContractTemplateRegistry } from '../../../../kernel/adapters/con
 import { DEFAULT_CONTRACT_VERSION } from '../../../../kernel/adapters/contracts/types.ts';
 import { ContractVersionRegistry } from '../../../../kernel/adapters/contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../../../../kernel/adapters/contracts/workspace-resolver.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
 import { SCAFFOLD_DIRS } from '../../../../kernel/constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../../../kernel/constants/scaffold/scaffold-files.ts';
@@ -71,6 +72,7 @@ export const contractAddCommand: Command<any, any, any, any, any, any, any, any>
   .option('--path <path:string>', 'Workspace path to search from')
   .option('--force', 'Overwrite an existing contract file', { default: false })
   .action(async (flags: AddContractInput, name: string): Promise<void> => {
+    await DEFAULT_TEMPLATE_REGISTRY.hydrate();
     assertContractName(name);
     if (flags.version !== DEFAULT_CONTRACT_VERSION) {
       throw new ScaffoldValidationError(

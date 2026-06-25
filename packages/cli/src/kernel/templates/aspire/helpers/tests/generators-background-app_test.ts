@@ -8,6 +8,12 @@ import type { BackgroundProcessorEntry } from '@netscript/aspire/types';
 import { generateRegisterBackground } from '../register/generate-register-background.ts';
 import { generateRegisterApps } from '../register/generate-register-apps.ts';
 import * as fixtures from './generators-test-support.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+
+// These generators read templates synchronously, which requires a previously-
+// awaited registry hydration. The tests exercise them directly (outside the CLI
+// dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateRegisterBackground', () => {
   const emptyOptions = {

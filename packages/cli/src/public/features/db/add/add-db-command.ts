@@ -1,6 +1,7 @@
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
 import { ScaffoldCommand } from '../../../../kernel/presentation/abstracts/scaffold-command.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { addDb, type AddDbDependencies } from './add-db.ts';
 import type { AddDbCommandInput } from './add-db-input.ts';
 
@@ -36,6 +37,7 @@ export class AddDbCommand extends ScaffoldCommand<AnyCliffyCommand> {
       .option('--project-root <path:string>', 'Project root directory')
       .option('--force', 'Overwrite existing database workspace files', { default: false })
       .action(async (options: AddDbCommandInput, engine: string): Promise<void> => {
+        await DEFAULT_TEMPLATE_REGISTRY.hydrate();
         const result = await addDb({
           engine,
           configKey: options.name,

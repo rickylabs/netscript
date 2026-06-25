@@ -144,6 +144,7 @@ export function createScaffoldCapabilitySuite(
       if (overrides.cliEntrypoint) next = next.withCliEntrypoint(overrides.cliEntrypoint);
       if (overrides.smokeRoot) next = next.withSmokeRoot(overrides.smokeRoot);
       if (overrides.projectName) next = next.withProjectName(overrides.projectName);
+      if (overrides.packageSource) next = next.withPackageSource(overrides.packageSource);
       if (overrides.cleanup !== undefined) next = next.withCleanup(overrides.cleanup);
       return next;
     })

@@ -13,6 +13,12 @@ import { ServiceScaffolder } from '../../../../kernel/adapters/service/scaffolde
 import { ServiceWorkspaceResolver } from '../../../../kernel/adapters/service/workspace-resolver.ts';
 import { addService } from './add-service.ts';
 import { planServiceAdd } from './plan-service-add.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+
+// This flow renders root project metadata via sync template generators, which
+// require a previously-awaited registry hydration. The test drives the flow
+// directly (outside the CLI dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('public add service flow', () => {
   it('plans a service add request from project metadata', async () => {

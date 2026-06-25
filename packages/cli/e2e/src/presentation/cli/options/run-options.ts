@@ -45,7 +45,7 @@ export function mapRunOptions(raw: RawRunOptions): Partial<RunOptions> {
 function parseSource(raw: string | undefined): RunOptions['packageSource'] | undefined {
   if (raw === undefined) return undefined;
   if (isOneOf(PACKAGE_SOURCE, raw)) return raw;
-  throw new Error('--source must be auto, starter, or local.');
+  throw new Error('--source must be auto, starter, local, or jsr.');
 }
 
 function parseFormat(raw: string | undefined): ReportFormat | undefined {

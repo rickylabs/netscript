@@ -10,6 +10,12 @@ import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import { addPlugin } from './add-plugin.ts';
 import { planPluginAdd } from './plan-plugin-add.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+
+// This flow renders plugin/workspace files via sync template generators, which
+// require a previously-awaited registry hydration. The test drives the flow
+// directly (outside the CLI dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('public add plugin flow', () => {
   it('plans a starter plugin request from project metadata', async () => {

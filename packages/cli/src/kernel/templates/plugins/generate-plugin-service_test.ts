@@ -6,7 +6,13 @@ import { assert, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { apiKindProvider } from '../../adapters/plugin/kinds/api.kind.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { generatePluginService } from './generate-plugin-service.ts';
+
+// `generatePluginService` reads templates synchronously, which requires a
+// previously-awaited registry hydration. Tests exercise the generator directly
+// (outside the CLI dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 const kvBackedProvider: PluginKindProvider = {
   kind: 'background',

@@ -13,11 +13,14 @@ import { DefaultContractTemplateRegistry } from '../contracts/templates/contract
 import { DEFAULT_CONTRACT_VERSION } from '../contracts/types.ts';
 import { ContractVersionRegistry } from '../contracts/version-registry.ts';
 import { ContractWorkspaceResolver } from '../contracts/workspace-resolver.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import { generateV1Mod } from '../contracts/templates/generate-v1-mod.ts';
 import { PortAllocator } from './port-allocator.ts';
 import { ServiceScaffolder } from './scaffolder.ts';
 import { ServiceWorkspaceResolver } from './workspace-resolver.ts';
+
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 function createHarness(): {
   readonly fs: MemoryFileSystemAdapter;

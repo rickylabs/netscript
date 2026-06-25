@@ -11,6 +11,12 @@ import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
 import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
 import { addLocalPlugin, resolveOfficialPluginSourceRoot } from './add-local-plugin.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+
+// This flow renders plugin/workspace files via sync template generators, which
+// require a previously-awaited registry hydration. The test drives the flow
+// directly (outside the CLI dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 const workerProvider: PluginKindProvider = {
   kind: 'worker',
