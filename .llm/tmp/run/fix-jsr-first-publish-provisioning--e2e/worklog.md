@@ -83,3 +83,58 @@
 `plugin-sagas-core`, `plugin-streams-core`, `plugin-triggers-core`, `plugin-workers-core`,
 `prisma-adapter-mysql`, `queue`, `runtime-config`, `sdk`, `service`, `telemetry`, `watchers`,
 `plugin-auth`, `plugin-sagas`, `plugin-streams`, `plugin-triggers`, `plugin-workers`.
+
+## Follow-up Fix Validation
+
+Reviewer request: make public `GET /scopes/{scope}/packages/{package}` unauthenticated, skip `PATCH`
+when the public package JSON already links to the target repo, require `JSR_API_TOKEN` only when a
+real write is needed, and avoid crashing on non-JSON error bodies.
+
+Public package shape inspected with `GET https://api.jsr.io/scopes/std/packages/assert`: response
+contains `githubRepository.owner` and `githubRepository.name`, e.g. `denoland/std`.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Targeted type check | PASS | `deno check --unstable-kv .llm/tools/jsr-provision-packages.ts .llm/tools/release.ts` exited 0 |
+| Format wrapper | PASS | `run-deno-fmt.ts --root .llm/tools --ext ts --include '^(\\.llm/tools/(jsr-provision-packages|release)\\.ts)$'` selected 2 files, 0 findings |
+| Lint | PASS | `deno lint --config /dev/null .llm/tools/jsr-provision-packages.ts .llm/tools/release.ts` checked 2 files |
+| No-token dry-run public GETs | PASS | `env -u JSR_API_TOKEN deno run --allow-net --allow-read --allow-env .llm/tools/jsr-provision-packages.ts --dry-run` exited 0 |
+| No-token real run public GETs | PASS | `env -u JSR_API_TOKEN deno run --allow-net --allow-read --allow-env .llm/tools/jsr-provision-packages.ts` exited 1 with `write needed but no token` failures and no writes attempted |
+
+No-token dry-run output:
+
+```text
+discovered 31 workspace members: aspire, auth-better-auth, auth-kv-oauth, auth-workos, cli, config, contracts, cron, database, fresh, fresh-ui, kv, logger, plugin, plugin-auth-core, plugin-sagas-core, plugin-streams-core, plugin-triggers-core, plugin-workers-core, prisma-adapter-mysql, queue, runtime-config, sdk, service, telemetry, watchers, plugin-auth, plugin-sagas, plugin-streams, plugin-triggers, plugin-workers
+aspire: created + would-link
+auth-better-auth: created + would-link
+auth-kv-oauth: created + would-link
+auth-workos: created + would-link
+cli: created + would-link
+config: created + would-link
+contracts: created + would-link
+cron: created + would-link
+database: created + would-link
+fresh: created + would-link
+fresh-ui: created + would-link
+kv: created + would-link
+logger: created + would-link
+plugin: created + would-link
+plugin-auth-core: created + would-link
+plugin-sagas-core: created + would-link
+plugin-streams-core: created + would-link
+plugin-triggers-core: created + would-link
+plugin-workers-core: created + would-link
+prisma-adapter-mysql: created + would-link
+queue: created + would-link
+runtime-config: created + would-link
+sdk: created + would-link
+service: created + would-link
+telemetry: created + would-link
+watchers: created + would-link
+plugin-auth: created + would-link
+plugin-sagas: created + would-link
+plugin-streams: created + would-link
+plugin-triggers: created + would-link
+plugin-workers: created + would-link
+provisioned 31/31 (created 31, linked 0), failures 0
+```

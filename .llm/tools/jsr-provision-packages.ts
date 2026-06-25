@@ -21,7 +21,12 @@ interface PackageFailure {
 interface PackageResult {
   readonly packageName: string;
   readonly state: 'exists' | 'created';
-  readonly linked: boolean;
+  readonly linkState: 'already-linked' | 'linked' | 'would-link';
+}
+
+interface NonJsonResponse {
+  readonly nonJsonResponse: true;
+  readonly preview: string;
 }
 
 type ApiResult =
@@ -45,11 +50,8 @@ const packageNames = members.map((member) => packageSegment(member.name));
 console.log(`discovered ${packageNames.length} workspace members: ${packageNames.join(', ')}`);
 
 const token = Deno.env.get('JSR_API_TOKEN')?.trim();
-if (!token) {
-  console.log(
-    'JSR_API_TOKEN not set — skipping provisioning (assuming packages already provisioned)',
-  );
-  Deno.exit(0);
+if (!token && !options.dryRun) {
+  console.log('JSR_API_TOKEN not set — running public checks before deciding if writes are needed');
 }
 
 const results: PackageResult[] = [];
@@ -62,13 +64,13 @@ for (const packageName of packageNames) {
     continue;
   }
   results.push(result.result);
-  const state = result.result.state;
-  const linkState = result.result.linked ? 'linked' : 'link-pending';
-  console.log(`${packageName}: ${state} + ${linkState}`);
+  console.log(`${packageName}: ${result.result.state} + ${result.result.linkState}`);
 }
 
 const created = results.filter((result) => result.state === 'created').length;
-const linked = results.filter((result) => result.linked).length;
+const linked =
+  results.filter((result) => result.linkState === 'linked' || result.linkState === 'already-linked')
+    .length;
 console.log(
   `provisioned ${results.length}/${packageNames.length} (created ${created}, linked ${linked}), failures ${failures.length}`,
 );
@@ -80,24 +82,38 @@ if (failures.length > 0) {
   Deno.exit(1);
 }
 
+if (!token && !options.dryRun) {
+  console.log('JSR_API_TOKEN not set — no writes needed (packages already provisioned)');
+}
+
 async function provisionPackage(
   packageName: string,
   provisionOptions: Options,
-  tokenValue: string,
+  tokenValue: string | undefined,
 ): Promise<{ readonly result: PackageResult } | { readonly failure: PackageFailure }> {
   const existing = await requestApi(
     'GET',
     `/scopes/${provisionOptions.scope}/packages/${packageName}`,
-    tokenValue,
   );
   let state: PackageResult['state'] = 'exists';
 
   if (existing.kind === 'ok') {
     state = 'exists';
+    if (isLinkedToRepo(existing.body, provisionOptions.repo)) {
+      return { result: { packageName, state, linkState: 'already-linked' } };
+    }
   } else if (existing.status === 404) {
     if (provisionOptions.dryRun) {
-      console.log(`${packageName}: would create + would link`);
-      return { result: { packageName, state: 'created', linked: true } };
+      return { result: { packageName, state: 'created', linkState: 'would-link' } };
+    }
+    if (!tokenValue) {
+      return {
+        failure: {
+          packageName,
+          action: 'create',
+          reason: 'write needed but no token',
+        },
+      };
     }
     const created = await requestApi(
       'POST',
@@ -129,8 +145,17 @@ async function provisionPackage(
   }
 
   if (provisionOptions.dryRun) {
-    console.log(`${packageName}: ${state} + would link`);
-    return { result: { packageName, state, linked: true } };
+    return { result: { packageName, state, linkState: 'would-link' } };
+  }
+
+  if (!tokenValue) {
+    return {
+      failure: {
+        packageName,
+        action: 'link',
+        reason: 'write needed but no token',
+      },
+    };
   }
 
   const linked = await requestApi(
@@ -141,7 +166,7 @@ async function provisionPackage(
   );
 
   if (linked.kind === 'ok' || isAlreadyLinked(linked)) {
-    return { result: { packageName, state, linked: true } };
+    return { result: { packageName, state, linkState: 'linked' } };
   }
 
   return {
@@ -156,15 +181,17 @@ async function provisionPackage(
 async function requestApi(
   method: 'GET' | 'POST' | 'PATCH',
   path: string,
-  tokenValue: string,
+  tokenValue?: string,
   body?: unknown,
 ): Promise<ApiResult> {
+  const headers = new Headers({ 'content-type': 'application/json' });
+  if (tokenValue) {
+    headers.set('authorization', `Bearer ${tokenValue}`);
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method,
-    headers: {
-      authorization: `Bearer ${tokenValue}`,
-      'content-type': 'application/json',
-    },
+    headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
@@ -185,7 +212,7 @@ async function requestApi(
   return {
     kind: 'error',
     status: response.status,
-    message: response.statusText || 'JSR API request failed.',
+    message: response.statusText || summarizeNonJson(parsed) || 'JSR API request failed.',
   };
 }
 
@@ -197,7 +224,11 @@ async function readJsonResponse(response: Response): Promise<unknown> {
   if (text.trim().length === 0) {
     return undefined;
   }
-  return JSON.parse(text);
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { nonJsonResponse: true, preview: text.trim().slice(0, 200) };
+  }
 }
 
 function parseArgs(args: readonly string[]): Options {
@@ -260,6 +291,22 @@ function isJsonObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function isLinkedToRepo(value: unknown, repo: GitHubRepo): boolean {
+  if (!isJsonObject(value)) {
+    return false;
+  }
+  const githubRepository = value.githubRepository;
+  if (!isJsonObject(githubRepository)) {
+    return false;
+  }
+  return stringEqualsInsensitive(githubRepository.owner, repo.owner) &&
+    stringEqualsInsensitive(githubRepository.name, repo.name);
+}
+
+function stringEqualsInsensitive(value: unknown, expected: string): boolean {
+  return typeof value === 'string' && value.toLowerCase() === expected.toLowerCase();
+}
+
 function isAlreadyExists(result: ApiResult): boolean {
   return result.kind === 'error' && benignMatch(result, ['already', 'exists']);
 }
@@ -274,6 +321,19 @@ function benignMatch(
 ): boolean {
   const haystack = `${result.code ?? ''} ${result.message}`.toLowerCase();
   return terms.every((term) => haystack.includes(term));
+}
+
+function summarizeNonJson(value: unknown): string | undefined {
+  if (!isNonJsonResponse(value)) {
+    return undefined;
+  }
+  return value.preview.length > 0
+    ? `non-JSON response body: ${value.preview}`
+    : 'non-JSON response body';
+}
+
+function isNonJsonResponse(value: unknown): value is NonJsonResponse {
+  return isJsonObject(value) && value.nonJsonResponse === true && typeof value.preview === 'string';
 }
 
 function formatApiError(result: ApiResult): string {
