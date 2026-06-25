@@ -32,6 +32,7 @@
  * @module
  */
 
+export type { ServiceEnv, ServiceVariables } from './hono-context.ts';
 export type { AuthnOptions, AuthzOptions } from './options.ts';
 export {
   createScopeAuthorizer,
