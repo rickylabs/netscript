@@ -19,7 +19,7 @@ that govern *when* to reach for these tools. For those, see:
 | Subtree | Purpose | Detail |
 | ------- | ------- | ------ |
 | `.llm/tools/` (root) | Scoped check/lint/fmt wrappers, text/import/symbol scanners, export inventory, the supervisor watch utility, and the CLI E2E smoke. | This README + [`entry.md`](./entry.md). |
-| `.llm/tools/deps/` | Structured wrappers over the Deno 2.8 dependency commands (`latest`/`outdated`/`why`/`audit`/`prod-install`) plus the centralization/catalog/file-link scan gates. | [Dependency toolbelt](#dependency-toolbelt-llmtoolsdeps) below and the `netscript-deno-toolchain` skill. |
+| `.llm/tools/deps/` | Structured wrappers over the Deno 2.9 dependency commands (`latest`/`outdated`/`why`/`audit`/`prod-install`) plus the centralization/catalog/file-link scan gates. | [Dependency toolbelt](#dependency-toolbelt-llmtoolsdeps) below and the `netscript-deno-toolchain` skill. |
 | `.llm/tools/agentic/` | Claude Code surface validation, skill-mirror sync, hook event logging, and remote-control smoke. | [Agentic tooling](#agentic-tooling-llmtoolsagentic) below. |
 | `.llm/tools/fitness/` | Doctrine and package-readiness gates. Do not duplicate these under the `.llm/tools/` root. | The `netscript-doctrine` skill + `docs/architecture/doctrine/`. |
 
@@ -79,7 +79,7 @@ TypeScript only and exclude generated output).
 
 ## Dependency toolbelt (`.llm/tools/deps/`)
 
-Thin, structured wrappers over the Deno 2.8 dependency commands. They emit JSON by default
+Thin, structured wrappers over the Deno 2.9 dependency commands. They emit JSON by default
 (`--pretty` for human output) so agents read versions/advisories without scraping human tables or
 re-querying registries by hand. The `netscript-deno-toolchain` skill is the canonical command map;
 [`entry.md`](./entry.md#dependency-toolbelt-deps) carries the per-script detail. The full registry of
