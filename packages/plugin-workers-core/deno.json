@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-workers-core",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins.",
   "license": "MIT",
   "exports": {
@@ -23,7 +23,6 @@
   },
   "imports": {
     "@david/dax": "jsr:@david/dax@^0.48",
-    "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
     "@std/path": "jsr:@std/path@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",

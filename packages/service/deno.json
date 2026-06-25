@@ -1,6 +1,6 @@
 {
   "name": "@netscript/service",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Service bootstrap builders, health probes, and Hono/oRPC runtime wiring for NetScript applications.",
   "license": "MIT",
   "exports": {
@@ -24,8 +24,6 @@
     "@orpc/server/plugins": "npm:@orpc/server@^1.14.6/plugins",
     "@orpc/client/plugins": "npm:@orpc/client@^1.14.6/plugins",
     "@orpc/zod/zod4": "npm:@orpc/zod@^1.14.6/zod4",
-    "@netscript/telemetry": "../telemetry/mod.ts",
-    "@netscript/logger": "../logger/mod.ts",
     "@std/assert": "jsr:@std/assert@^1"
   },
   "publish": {

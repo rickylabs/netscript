@@ -1,6 +1,6 @@
 {
   "name": "@netscript/cli-e2e",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "exports": {
     ".": "./mod.ts"
   },
@@ -19,7 +19,6 @@
     "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
-    // DEBT_ACCEPTED: temporary Wave 6 CLI E2E carve-out for Deno 2.8 isolatedDeclarations annotations.
     "isolatedDeclarations": false,
     "lib": [
       "deno.ns",

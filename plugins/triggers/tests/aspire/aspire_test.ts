@@ -1,5 +1,5 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
-import { createContributionContextFixture, MemoryAspireBuilder } from '@netscript/aspire';
+import { createContributionContextFixture, MemoryAspireBuilder } from '@netscript/aspire/public';
 import {
   TRIGGERS_API_DEFAULT_PORT,
   TRIGGERS_API_SERVICE_NAME,

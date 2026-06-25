@@ -1,6 +1,6 @@
 {
   "name": "@netscript/database",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Database adapter contracts, Prisma driver helpers, tracing, and schema tooling for NetScript packages.",
   "license": "MIT",
   "exports": {
@@ -22,7 +22,6 @@
     "fmt": "deno fmt --check",
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
-  "imports": {},
   "publish": {
     "include": [
       "README.md",

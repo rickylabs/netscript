@@ -5,7 +5,7 @@
  */
 
 export { WorkersAspireContribution } from './workers-contribution.ts';
-export { AspireNSPluginContribution } from '@netscript/aspire';
+export { AspireNSPluginContribution } from '@netscript/aspire/public';
 export type {
   AspireBuilder,
   AspireResource,
@@ -18,4 +18,4 @@ export type {
   DenoServiceSpec,
   EnvSource,
   HealthCheckSpec,
-} from '@netscript/aspire';
+} from '@netscript/aspire/public';

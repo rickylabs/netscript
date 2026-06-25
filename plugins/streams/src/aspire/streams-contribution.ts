@@ -5,7 +5,7 @@ import {
   type ContributionContext,
   type EnvSource,
   type HealthCheckSpec,
-} from '@netscript/aspire';
+} from '@netscript/aspire/public';
 
 /** Aspire contribution for the Durable Streams development service. */
 export class StreamsAspireContribution extends AspireNSPluginContribution {

@@ -1,6 +1,6 @@
 {
   "name": "@netscript/aspire",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Config parsing, contribution ports, and SDK-agnostic helpers for Aspire TypeScript AppHost.",
   "license": "MIT",
   "exports": {
@@ -11,7 +11,8 @@
     "./constants": "./constants.ts",
     "./application": "./src/application/mod.ts",
     "./adapters": "./src/adapters/mod.ts",
-    "./testing": "./src/testing/mod.ts"
+    "./testing": "./src/testing/mod.ts",
+    "./public": "./src/public/mod.ts"
   },
   "imports": {
     "zod": "jsr:@zod/zod@4.4.3",

@@ -5,7 +5,7 @@ import {
   type ContributionContext,
   type EnvSource,
   type HealthCheckSpec,
-} from '@netscript/aspire';
+} from '@netscript/aspire/public';
 
 const WORKERS_PLUGIN_VERSION = '0.0.1-alpha.0';
 

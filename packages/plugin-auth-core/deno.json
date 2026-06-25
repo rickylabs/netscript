@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-auth-core",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Auth plugin contracts, backend ports, stream schemas, config schemas, and testing primitives for NetScript auth plugins.",
   "license": "MIT",
   "exports": {
@@ -15,11 +15,6 @@
     "./testing": "./src/testing/mod.ts"
   },
   "imports": {
-    "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
-    "@netscript/service/auth": "../service/src/auth/mod.ts",
-    "@netscript/telemetry": "../telemetry/mod.ts",
-    "@netscript/telemetry/context": "../telemetry/context.ts",
-    "@netscript/telemetry/tracer": "../telemetry/tracer.ts",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@std/assert": "jsr:@std/assert@^1",

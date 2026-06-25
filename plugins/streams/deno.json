@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-streams",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Durable Streams service, CLI, Aspire, E2E, and scaffolding plugin for NetScript.",
   "license": "MIT",
   "exports": {
@@ -11,11 +11,6 @@
     "./aspire": "./src/aspire/mod.ts"
   },
   "imports": {
-    "@netscript/plugin": "../../packages/plugin/mod.ts",
-    "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
-    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
-    "@netscript/service": "../../packages/service/mod.ts",
-    "@netscript/telemetry": "../../packages/telemetry/mod.ts",
     "@std/net": "jsr:@std/net@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "hono": "jsr:@hono/hono@4.12.24",

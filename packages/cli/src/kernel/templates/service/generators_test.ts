@@ -35,7 +35,7 @@ describe('generateServiceDenoJson', () => {
     assertEquals(config.name, '@test-project/team-members');
     assertEquals(config.exports, './src/main.ts');
     assertEquals(config.imports['@test-project/contracts'], '../../contracts/mod.ts');
-    assertEquals(config.imports['@netscript/service'], 'jsr:@netscript/service@0.0.1-alpha.1');
+    assertEquals(config.imports['@netscript/service'], 'jsr:@netscript/service@0.0.1-alpha.2');
     assert(!('@netscript/telemetry' in config.imports));
   });
 

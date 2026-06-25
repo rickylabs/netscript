@@ -18,8 +18,8 @@ describe('resolveNetScriptImports', () => {
           '@netscript/config': 'jsr:@netscript/config',
           '@netscript/service': 'jsr:@netscript/service',
           '@netscript/plugin-auth-core/contracts/v1':
-            'jsr:@netscript/plugin-auth-core@0.0.1-alpha.1/contracts/v1',
-          '@netscript/auth-kv-oauth': 'jsr:@netscript/auth-kv-oauth@0.0.1-alpha.1',
+            'jsr:@netscript/plugin-auth-core@0.0.1-alpha.2/contracts/v1',
+          '@netscript/auth-kv-oauth': 'jsr:@netscript/auth-kv-oauth@0.0.1-alpha.2',
           '@std/path': 'jsr:@std/path',
           zod: 'npm:zod',
         },

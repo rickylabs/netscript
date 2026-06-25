@@ -1,6 +1,6 @@
 {
   "name": "@netscript/sdk",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Service discovery, oRPC clients, and cache-backed query factories for NetScript.",
   "license": "MIT",
   "exports": {
@@ -23,9 +23,6 @@
     "publish:dry-run": "deno publish --dry-run --allow-dirty"
   },
   "imports": {
-    "@netscript/kv": "../kv/mod.ts",
-    "@netscript/plugin-streams-core": "../plugin-streams-core/mod.ts",
-    "@netscript/telemetry": "../telemetry/mod.ts",
     "@std/assert": "jsr:@std/assert@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "@orpc/client/fetch": "npm:@orpc/client@^1.14.6/fetch",
