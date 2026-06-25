@@ -25,4 +25,14 @@ authoritative 2.9.0 verdict is the GitHub Actions CI run after push (which uses 
 `setup-deno`). No drift in behavior was observed between the side-by-side binary and the documented
 2.9 semantics.
 
+## D-4 (minor) — C3 missed AGENTS.md:13 (caught by IMPL-EVAL)
+
+The C3 docs-refresh slice (3d18cd13) updated the `netscript-deno-toolchain` SKILL + regenerated
+`.claude` mirror + `AGENTS.md`-adjacent docs, but the C3 plan also listed `AGENTS.md:13`
+("native Deno 2.8 toolchain") which was not edited. IMPL-EVAL (run 28191642204) returned FAIL_FIX
+on this single cosmetic line — every functional gate, `deno task ci`, `publish:dry-run`, the C2
+cache SKIP path, and CI on `f4bded73` were all green; `deno.lock` unchanged (D6 not triggered).
+Resolved by a one-line follow-up edit (Deno 2.8 → 2.9). No scope change to C0–C4. Re-dispatching a
+minimal IMPL-EVAL re-confirmation (generator does not self-certify).
+
 No `significant` or `architectural` drift. Scope matches the PASSed plan (C0–C4).
