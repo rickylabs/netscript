@@ -10,7 +10,7 @@ Use `.agents/skills/netscript-cli` for CLI/scaffold/plugin/maintainer command wo
 verification, and lock-hygiene decisions.
 
 Use `.agents/skills/netscript-deno-toolchain` for any dependency, version, release, or
-API-inspection work — it maps the native Deno 2.8 toolchain (`outdated`, `why`, `audit`,
+API-inspection work — it maps the native Deno 2.9 toolchain (`outdated`, `why`, `audit`,
 `ci`/`ci --prod`, `bump-version`, `publish`, `doc`) and the repo's `.llm/tools/deps/` wrappers so
 you stop hand-rolling registry curls and version checks. Use `.agents/skills/netscript-pr` whenever
 creating a branch, opening/updating a PR, posting a phase summary comment, or applying labels.

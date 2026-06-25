@@ -1,15 +1,15 @@
 ---
 name: netscript-deno-toolchain
-description: The Deno 2.8 native dependency, release, and inspection toolchain (deno outdated/update/why/info/add/remove/audit/ci/bump-version/publish/pack/doc, catalogs, isolatedDeclarations). Use BEFORE hand-rolling dependency bumps, version checks, registry curls, publish scripting, or doc generation in the NetScript workspace — these built-ins replace most ad hoc tooling and the per-dep curl loops that burn tokens. Pairs with the .llm/tools/deps toolbelt and the netscript-tools skill.
+description: The Deno 2.9 native dependency, release, and inspection toolchain (deno outdated/update/why/info/add/remove/audit/ci/bump-version/publish/pack/doc, catalogs, isolatedDeclarations, task dependencies + input caching). Use BEFORE hand-rolling dependency bumps, version checks, registry curls, publish scripting, or doc generation in the NetScript workspace — these built-ins replace most ad hoc tooling and the per-dep curl loops that burn tokens. Pairs with the .llm/tools/deps toolbelt and the netscript-tools skill.
 ---
 
-# NetScript Deno Toolchain (2.8)
+# NetScript Deno Toolchain (2.9)
 
-Deno 2.8.x ships a full first-class dependency + release toolchain. **Prefer it over reinventing.**
+Deno 2.9.x ships a full first-class dependency + release toolchain. **Prefer it over reinventing.**
 This skill is the command map; the repo wraps the noisy ones in `.llm/tools/deps/` (structured
 JSON). Use the wrappers for agent decisions, the raw commands for one-off interactive work.
 
-Repo is on **Deno 2.8.3** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
+Repo is on **Deno 2.9.0** (Windows + WSL). Targeted `deno check` must pass `--unstable-kv`.
 
 ## The one trap that matters
 
@@ -44,13 +44,14 @@ the import-map entry is safe to delete.
 
 Never pass a reload flag (`--reload` / `deno cache --reload`) or delete lock files without approval.
 
-## Catalogs (2.8, member resolution needs 2.8.3)
+## Catalogs (2.9; member resolution needs ≥ 2.8.3)
 
 - A root `deno.json` `catalog` block centralizes versions; members reference `"<pkg>": "catalog:"`.
 - **`catalog:` is npm-only.** `npm:<pkg>@catalog:` works; bare `"<pkg>": "catalog:"` works for npm.
 - **JSR deps cannot use catalog.** `jsr:pkg@catalog:` is rejected (`Invalid package specifier`) and a
   `jsr:`-valued catalog entry warns `Invalid version requirement`. Keep JSR deps as inline `jsr:`
-  specifiers with explicit ranges. (Verified on 2.8.3 — this is a Deno constraint, not repo choice.)
+  specifiers with explicit ranges. (Verified on 2.8.3 and re-verified on 2.9.0 — this is a Deno
+  constraint, not repo choice.)
 - Catalog values are bare version requirements (e.g. `"^10.29.2"`), not full specifiers.
 - `publish:dry-run` materializes `catalog:` → `npm:<pkg>@<version>` per member before dry-run; mirror
   that when reasoning about what consumers receive.
@@ -77,11 +78,25 @@ plugin); everything else must satisfy `isolatedDeclarations`. Prefer fixing slow
 `deno doc` / `deno doc --filter` are the cheapest way to learn an internal package API — far cheaper
 than reading the whole module. Reach for them first.
 
-## TypeScript surface (2.8)
+## TypeScript surface (2.9)
 
 - `isolatedDeclarations: true` is on workspace-wide — annotate explicit return/declaration types on
   exported symbols; this is what makes fast `deno publish` type-checking and `deno doc` reliable.
-- `lib.node` is default-on in 2.8; `--unstable-kv` still required for KV-touching `deno check`.
+- `lib.node` is default-on in 2.9; `--unstable-kv` still required for KV-touching `deno check`.
+
+## Task runner (2.9)
+
+Deno 2.9 makes two `deno task` features first-class; the repo uses both in root `deno.json`:
+
+- **Dependency tasks** — a task with `{ "dependencies": [...] }` runs its named tasks concurrently
+  (capped at CPU count; `--jobs N` / `-j` / `DENO_JOBS` / `1` = sequential) and exits nonzero if any
+  dependency fails. `ci:quality` uses this (`check`, `lint`, `fmt:check`, `deps:check`), replacing
+  the former hand-rolled `Promise.all` runner.
+- **Input-based caching** — object-form `{ "command": "...", "files": [...], "output": [...] }`
+  (both are arrays, not `{include}` maps). An unchanged `files` set SKIPs (`cached, inputs
+  unchanged`); an edited/added input — or a previously **failed** run — always re-runs, so a stale
+  or failing result is never masked. `check`/`lint`/`fmt:check` declare `files`; the win is the
+  local dev loop (CI runners start cold, so they always run).
 
 ## When to use which
 

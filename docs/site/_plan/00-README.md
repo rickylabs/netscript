@@ -54,7 +54,7 @@ targets the landing + tutorial + how-to lanes for the biggest lift.
 - **Deliverable**: read the CLI scaffold pipeline (`packages/cli/src/kernel/application/scaffold/
   init-pipeline.ts`) and the scaffold asset templates
   (`packages/cli/src/kernel/assets/app/**`, `.../aspire/**`, `.../database/**`).
-  **Path taken: template-reading.** Deno 2.8, .NET 10, and Node 22 are all present, but the full
+  **Path taken: template-reading.** Deno 2.9, .NET 10, and Node 22 are all present, but the full
   `scaffold.runtime` E2E (which restores + boots Aspire) is expensive and the mission is plan-first;
   the scaffold templates state precisely what ships, so a live boot was not warranted for a plan.
 - **Reference sites**: fetched Laravel, Medusa, Astro, TanStack Query, Lume, and Vento docs; findings
