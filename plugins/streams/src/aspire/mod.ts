@@ -18,4 +18,4 @@ export type {
   DenoServiceSpec,
   EnvSource,
   HealthCheckSpec,
-} from '@netscript/aspire';
+} from '@netscript/aspire/public';

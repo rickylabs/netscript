@@ -1,6 +1,6 @@
 {
   "name": "@netscript/kv",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Reactive key-value abstraction for Redis, Deno KV, and in-memory backends.",
   "license": "MIT",
   "exports": {
@@ -22,7 +22,6 @@
     "@std/assert": "jsr:@std/assert@^1",
     "@std/ulid": "jsr:@std/ulid@^1",
     "@std/collections": "jsr:@std/collections@^1",
-    "@netscript/logger": "../logger/mod.ts",
     "@olli/kvdex": "jsr:@olli/kvdex@^3.6.7"
   },
   "publish": {

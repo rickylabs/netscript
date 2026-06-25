@@ -161,7 +161,7 @@ const EXTERNAL_DEPS: Readonly<Record<string, string>> = {
  * ```typescript
  * // JSR mode — all registry specifiers
  * const imports = resolveNetScriptImports('jsr');
- * // { '@netscript/config': 'jsr:@netscript/config@0.0.1-alpha.1', ... }
+ * // { '@netscript/config': 'jsr:@netscript/config@0.0.1-alpha.2', ... }
  *
  * // Local mode — relative paths for NetScript, registry for externals
  * const imports = resolveNetScriptImports('local', '../..');

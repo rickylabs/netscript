@@ -1,6 +1,6 @@
 {
   "name": "@netscript/cli",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "Public and maintainer command-line tooling for NetScript workspaces.",
   "license": "MIT",
   "exports": {
@@ -32,11 +32,7 @@
     "@std/semver": "jsr:@std/semver@^1",
     "@cliffy/prompt": "jsr:@cliffy/prompt@^1.0.0",
     "@david/dax": "jsr:@david/dax@^0.48",
-    "zod": "jsr:@zod/zod@4.4.3",
-    "@netscript/aspire": "../aspire/mod.ts",
-    "@netscript/config": "../config/mod.ts",
-    "@netscript/plugin": "../plugin/mod.ts",
-    "@netscript/logger": "../logger/mod.ts"
+    "zod": "jsr:@zod/zod@4.4.3"
   },
   "compilerOptions": {
     "strict": true,

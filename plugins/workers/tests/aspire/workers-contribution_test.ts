@@ -1,5 +1,5 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
-import { createContributionContextFixture, MemoryAspireBuilder } from '@netscript/aspire';
+import { createContributionContextFixture, MemoryAspireBuilder } from '@netscript/aspire/public';
 import { WorkersAspireContribution } from '../../src/aspire/mod.ts';
 
 Deno.test('WorkersAspireContribution registers API and background resources', () => {

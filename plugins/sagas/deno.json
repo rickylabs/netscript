@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-sagas",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
   "license": "MIT",
   "exports": {
@@ -18,22 +18,6 @@
     "./streams/server": "./streams/server.ts"
   },
   "imports": {
-    "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
-    "@netscript/fresh/streams": "../../packages/fresh/src/runtime/streams/mod.ts",
-    "@netscript/plugin-streams": "../streams/mod.ts",
-    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
-    "@netscript/plugin-workers": "../workers/mod.ts",
-    "@netscript/plugin": "../../packages/plugin/mod.ts",
-    "@netscript/plugin-sagas-core/domain": "../../packages/plugin-sagas-core/src/domain/mod.ts",
-    "@netscript/plugin-sagas-core/runtime": "../../packages/plugin-sagas-core/src/runtime/mod.ts",
-    "@netscript/plugin-sagas-core/telemetry": "../../packages/plugin-sagas-core/src/telemetry/mod.ts",
-    "@netscript/kv": "../../packages/kv/mod.ts",
-    "@netscript/queue": "../../packages/queue/mod.ts",
-    "@netscript/telemetry": "../../packages/telemetry/mod.ts",
-    "@netscript/telemetry/context": "../../packages/telemetry/context.ts",
-    "@netscript/telemetry/tracer": "../../packages/telemetry/tracer.ts",
-    "@netscript/service": "../../packages/service/mod.ts",
-    "@netscript/contracts": "../../packages/contracts/mod.ts",
     "@std/async": "jsr:@std/async@^1",
     "hono": "jsr:@hono/hono@4.12.24",
     "zod": "jsr:@zod/zod@4.4.3",

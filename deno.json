@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "workspace": [
     "packages/*",
     "packages/cli/e2e",
@@ -52,7 +52,6 @@
     "arch:check": "deno task deps:check && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/plugin-auth-core && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-workos && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-better-auth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root packages/auth-kv-oauth && deno run --allow-read .llm/tools/fitness/check-doctrine.ts --root plugins/auth",
     "arch:check:repo": "deno run --allow-read .llm/tools/fitness/check-doctrine.ts"
   },
-  "imports": {},
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,

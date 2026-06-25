@@ -1,5 +1,5 @@
 import { assert, assertEquals } from 'jsr:@std/assert@^1';
-import { createContributionContextFixture, MemoryAspireBuilder } from '@netscript/aspire';
+import { createContributionContextFixture, MemoryAspireBuilder } from '@netscript/aspire/public';
 import { SagasAspireContribution } from '../../src/aspire/mod.ts';
 import type { SagasAspireBuilder } from '../../src/aspire/mod.ts';
 

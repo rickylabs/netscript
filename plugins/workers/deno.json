@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-workers",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "NetScript plugin for background job scheduling, task execution, and worker API endpoints.",
   "license": "MIT",
   "exports": {
@@ -15,24 +15,6 @@
     "./worker": "./worker/mod.ts"
   },
   "imports": {
-    "@netscript/fresh/streams": "../../packages/fresh/src/runtime/streams/mod.ts",
-    "@netscript/aspire": "../../packages/aspire/src/public/mod.ts",
-    "@netscript/plugin-streams": "../streams/mod.ts",
-    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
-    "@netscript/plugin-workers-core": "../../packages/plugin-workers-core/mod.ts",
-    "@netscript/plugin-workers-core/contracts/v1": "../../packages/plugin-workers-core/src/contracts/v1/mod.ts",
-    "@netscript/plugin-workers-core/executor": "../../packages/plugin-workers-core/src/executor/mod.ts",
-    "@netscript/plugin-workers-core/registry": "../../packages/plugin-workers-core/src/registry/mod.ts",
-    "@netscript/plugin-workers-core/runtime": "../../packages/plugin-workers-core/src/runtime/mod.ts",
-    "@netscript/plugin-workers-core/state": "../../packages/plugin-workers-core/src/state/mod.ts",
-    "@netscript/plugin-workers-core/streams": "../../packages/plugin-workers-core/src/streams/mod.ts",
-    "@netscript/plugin": "../../packages/plugin/mod.ts",
-    "@netscript/kv": "../../packages/kv/mod.ts",
-    "@netscript/queue": "../../packages/queue/mod.ts",
-    "@netscript/cron": "../../packages/cron/mod.ts",
-    "@netscript/telemetry": "../../packages/telemetry/mod.ts",
-    "@netscript/service": "../../packages/service/mod.ts",
-    "@netscript/contracts": "../../packages/contracts/mod.ts",
     "@std/async": "jsr:@std/async@^1",
     "@std/path": "jsr:@std/path@^1",
     "@orpc/server/fetch": "npm:@orpc/server@^1.14.6/fetch",

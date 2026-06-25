@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-auth",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "description": "NetScript plugin for a unified auth API, single-active backend selection, auth database schema, and auth session streams.",
   "license": "MIT",
   "exports": {
@@ -13,25 +13,6 @@
     "./streams/server": "./streams/server.ts"
   },
   "imports": {
-    "@netscript/auth-better-auth": "../../packages/auth-better-auth/mod.ts",
-    "@netscript/auth-kv-oauth": "../../packages/auth-kv-oauth/mod.ts",
-    "@netscript/auth-workos": "../../packages/auth-workos/mod.ts",
-    "@netscript/plugin": "../../packages/plugin/mod.ts",
-    "@netscript/plugin-auth-core": "../../packages/plugin-auth-core/mod.ts",
-    "@netscript/plugin-auth-core/config": "../../packages/plugin-auth-core/src/config/mod.ts",
-    "@netscript/plugin-auth-core/contracts/v1": "../../packages/plugin-auth-core/src/contracts/v1/mod.ts",
-    "@netscript/plugin-auth-core/domain": "../../packages/plugin-auth-core/src/domain/mod.ts",
-    "@netscript/plugin-auth-core/ports": "../../packages/plugin-auth-core/src/ports/mod.ts",
-    "@netscript/plugin-auth-core/streams": "../../packages/plugin-auth-core/src/streams/mod.ts",
-    "@netscript/plugin-auth-core/telemetry": "../../packages/plugin-auth-core/src/telemetry/mod.ts",
-    "@netscript/plugin-auth-core/testing": "../../packages/plugin-auth-core/src/testing/mod.ts",
-    "@netscript/plugin-streams-core": "../../packages/plugin-streams-core/mod.ts",
-    "@netscript/plugin-streams-core/testing": "../../packages/plugin-streams-core/src/testing/mod.ts",
-    "@netscript/plugin/sdk": "../../packages/plugin/src/sdk/mod.ts",
-    "@netscript/service": "../../packages/service/mod.ts",
-    "@netscript/service/auth": "../../packages/service/src/auth/mod.ts",
-    "@netscript/telemetry/context": "../../packages/telemetry/context.ts",
-    "@netscript/kv": "../../packages/kv/mod.ts",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@workos-inc/node": "npm:@workos-inc/node@^10.4.0",
