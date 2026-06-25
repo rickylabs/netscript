@@ -55,3 +55,59 @@ IMPL-EVAL/post-publish rather than this implementation loop.
 | S3 | `deno run --allow-read --allow-run .llm/tools/run-deno-lint.ts --root packages/cli --ext ts,tsx` | 1 | Same package-exclude behavior as S1/S2: wrapper selected 517 files and returned 0 findings but nonzero due root config exclusion; direct touched-file lint above is the usable lint evidence. |
 | S3 | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts,tsx` | 1 | Same package-exclude behavior as S1/S2: wrapper selected 517 files and returned 0 findings but nonzero due root config exclusion; direct touched-file fmt above is the usable fmt evidence. |
 | S3 | full `scaffold.runtime` e2e | skipped | Intentionally not run in implementation per locked plan; reserved for IMPL-EVAL/post-publish. |
+
+## Regression fix (commit e5fafc38) — supervisor-direct, authorized
+
+IMPL-EVAL PASS was a FALSE POSITIVE: the pre-merge CI gate found CI RED with 20 failures, all
+`Error: Template registry not hydrated — await DEFAULT_TEMPLATE_REGISTRY.hydrate() before sync
+template reads`. The eval had run only touched-file tests, not the repo-wide suite. S1's
+fetch-based registry requires `hydrate()` to have been awaited before any `readTemplateAssetSync`.
+
+Root-cause split:
+
+- Production paths: the database & service scaffolders already `await readTemplateAsset(...)` (which
+  self-hydrates) before their sync generators run; `PluginScaffolder` was the only adapter with no
+  async read. Fixes: hydrate once at `runPublicCli` (covers every dispatched command + the bin/e2e
+  path) and hydrate at `PluginScaffolder.scaffold()` entry.
+- Tests: 14 modules drive sync generators/orchestration directly (below the dispatch path) and so
+  never hit the dispatch hydration. Fixed by a module-level top-level-await `hydrate()` (Deno
+  completes a module's TLA before running its registered tests; `hydrate()` is memoized).
+
+The F-CLI-15/16 hydration guard was deliberately left unweakened — no sync-FS fallback was added,
+because that would re-mask the original https asset-read production failure (CLI-PROD-01).
+
+| Gate | Command | Exit | Summary |
+| --- | --- | ---: | --- |
+| Fix | `deno test --allow-all --unstable-kv` (full `packages/cli` suite) | — | 0 hydration failures remain; the only 2 locally-red tests are proven Windows-only artifacts (below). |
+| Fix | `deno test … orchestrate-init_test.ts` under WSL/Linux Deno | 0 | 5 passed / 0 failed — confirms the local red is `@std/path` `join()` backslash on Windows; Linux CI uses `/`. |
+| Fix | `route-templates_test.ts` after LF-normalizing `_layout.tsx.template` | 0 | 1 passed (18 steps) — confirms the local red is a CRLF working-tree vs LF blob artifact; CI checks out LF. |
+| Fix | `run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | 517 files / 5 batches; 0 type occurrences. |
+| Fix | `deno lint packages/cli` | 0 | Checked 73 files; clean (scoped wrappers still exit 1 / 0 findings per the documented root-exclude behavior). |
+| Fix | `deno publish --dry-run --allow-dirty` from `packages/cli` | 0 | `Success Dry run complete`. |
+
+Pushed `d0e1bf7a..e5fafc38` to `origin/fix/cli-jsr-prod-hardening`.
+
+## Regression fix part 2 (commit 4e252b80) — second composition root
+
+CI stayed RED after e5fafc38: the `scaffold-static` job's `scaffold.plugin.worker` gate failed with
+the same `Template registry not hydrated` error. Root cause via the e2e `--report` JSON: the failing
+command is `deno run -A packages/cli/bin/netscript-dev.ts plugin add worker ...`. `netscript-dev.ts`
+dispatches through `createLocalContributorCli(...).parse()`, a SECOND composition root distinct from
+`runPublicCli` (bin `netscript.ts`). e5fafc38 only hydrated `runPublicCli` + `PluginScaffolder`; the
+local-contributor root never hydrated, and the local plugin-add flow performs a sync template read
+before reaching `PluginScaffolder.scaffold()`. (`init` passed because its scaffolders self-hydrate
+via async `readTemplateAsset`.)
+
+Fix: `createLocalContributorCli` now wraps the composed command's `parse()` with
+`await DEFAULT_TEMPLATE_REGISTRY.hydrate()` before dispatch, mirroring `runPublicCli`. Covers the
+dev bin, e2e, and any direct caller. Guard left unweakened.
+
+| Gate | Command | Exit | Summary |
+| --- | --- | ---: | --- |
+| Fix2 | `deno task e2e:cli run scaffold.plugins --format pretty` | 0 | passed=10 failed=0 — worker/saga/trigger/stream/auth plugin adds all green. |
+| Fix2 | `run-deno-check.ts --root packages/cli --ext ts,tsx` | 0 | 517 files / 5 batches; 0 type occurrences. |
+| Fix2 | `deno test --unstable-kv packages/cli/src/local/` | 0 | 2 passed (4 steps) / 0 failed — local-contributor add-plugin flow green. |
+| Fix2 | `deno fmt --no-config --line-width 100 --single-quote --check <file>` | 0 | Checked 1 file; formatted. |
+| Fix2 | `deno lint --no-config <file>` | 0 | Checked 1 file; clean. |
+
+Pushed `e5fafc38..4e252b80` to `origin/fix/cli-jsr-prod-hardening`.
