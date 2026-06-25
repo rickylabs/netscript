@@ -1,0 +1,17 @@
+{
+  "run_id": "28132700264",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28132700264",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "success",
+  "verdict": "completed",
+  "summary_source": "agent",
+  "model": "openrouter/qwen/qwen3.7-max",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "118",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "docs/root-readme",
+  "summary_path": "/home/runner/work/_temp/openhands/28132700264-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-118/run-28132700264-1"
+}
