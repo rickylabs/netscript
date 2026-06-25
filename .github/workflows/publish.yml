@@ -52,7 +52,7 @@ jobs:
           echo "dry_run=$dry_run" >> "$GITHUB_OUTPUT"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ steps.release.outputs.tag || github.ref }}
 
@@ -60,6 +60,11 @@ jobs:
         uses: denoland/setup-deno@v2
         with:
           deno-version: "2.8.3"
+
+      - name: Ensure JSR packages exist
+        env:
+          JSR_API_TOKEN: ${{ secrets.JSR_TOKEN }}
+        run: deno run --allow-net --allow-read --allow-env .llm/tools/jsr-provision-packages.ts
 
       - name: Publish dry-run
         run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --dry-run
