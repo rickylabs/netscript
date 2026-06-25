@@ -1,0 +1,32 @@
+{
+  "$comment": "Centralized JSR per-package presentation settings, reconciled on every publish by .llm/tools/jsr-set-package-settings.ts. These are server-side JSR settings (NOT carried in the tarball, cannot be set from deno.json) and persist across versions. Keys under 'packages' are the segment after '@netscript/'. 'defaults' applies to every publishable member; a 'packages' entry overrides per field. 'description' is omitted everywhere so it is derived dynamically from each package README tagline; set it here only to override. runtimeCompat keys: browser, deno, node, workerd (Cloudflare Workers), bun — true=supported, false=not compatible, omitted=unknown.",
+  "defaults": {
+    "readmeSource": "readme",
+    "runtimeCompat": {
+      "deno": true
+    }
+  },
+  "packages": {
+    "sdk": {
+      "$note": "Client surface: oRPC clients + TanStack Query utilities run in browser islands.",
+      "runtimeCompat": {
+        "deno": true,
+        "browser": true
+      }
+    },
+    "fresh": {
+      "$note": "Fresh meta-framework integration: server on Deno, islands hydrate in the browser.",
+      "runtimeCompat": {
+        "deno": true,
+        "browser": true
+      }
+    },
+    "fresh-ui": {
+      "$note": "Design-system Preact components rendered server-side and hydrated in the browser.",
+      "runtimeCompat": {
+        "deno": true,
+        "browser": true
+      }
+    }
+  }
+}
