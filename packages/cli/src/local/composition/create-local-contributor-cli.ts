@@ -1,6 +1,7 @@
 import { CliRoot } from '../../kernel/application/abstracts/cli-root.ts';
 import type { CliCommand } from '../../kernel/application/abstracts/cli-command.ts';
 import type { MaintainerCliHost } from '../../maintainer/composition/create-maintainer-cli.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../kernel/application/registries/template-registry.ts';
 import { composeLocalContributorCommandTree } from './local-contributor-command-tree.ts';
 
 /** Local contributor command tree returned by `createLocalContributorCli`. */
@@ -29,5 +30,14 @@ export class LocalContributorCli extends CliRoot<LocalContributorCliCommand> {
 /** Create the local contributor CLI used inside the monorepo checkout. */
 export function createLocalContributorCli(host: MaintainerCliHost): LocalContributorCliCommand {
   const root = new LocalContributorCli(host);
-  return root.define(root.commands());
+  const command = root.define(root.commands());
+  // Mirror `runPublicCli`: hydrate the template registry once at the composition
+  // root so every dispatched command runs after async hydration, before any sync
+  // template read. `hydrate()` is memoized, so repeat calls are free.
+  return {
+    parse: async (args?: string[]) => {
+      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+      return await command.parse(args);
+    },
+  };
 }
