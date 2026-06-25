@@ -86,38 +86,58 @@ Notes:
 
 ## S2 — Repo-wide Command Sweep
 
-### Residual Search
+### Scope
 
-Command:
+Replaced user-facing `jsr:@netscript/cli/bin/netscript.ts` install/run examples with the verified
+default-export forms:
 
-```sh
-rg -n "jsr:@netscript/cli/bin/netscript\\.ts" .
-```
+- Global/PATH install: `deno install --global --allow-all --name netscript jsr:@netscript/cli`
+- No-install execution: `deno x jsr:@netscript/cli ...`
 
-Result: exit 1 with no output. There are zero exact residual hits for the old
-`jsr:@netscript/cli/bin/netscript.ts` user-facing command.
+Maintainer local-source forms such as `packages/cli/bin/netscript-dev.ts`, `maintainer.ts`, and
+`deno task dev` were not changed.
 
-Broader check:
+Touched user-facing docs:
 
-```sh
-rg -n "jsr:@netscript/cli/bin|bin/netscript\\.ts|published file path|raw published-file|deno run (?:-A|--allow-all) jsr:@netscript/cli" README.md docs/site
-```
+- `README.md`
+- `docs/site/index.vto`
+- `docs/site/quickstart.vto`
+- `docs/site/cli-reference.md`
+- `docs/site/how-to/add-a-plugin.md`
+- `docs/site/how-to/add-a-service.md`
+- `docs/site/how-to/add-authentication.md`
+- `docs/site/how-to/author-a-plugin.md`
+- `docs/site/how-to/customize-fresh-ui.md`
+- `docs/site/how-to/database-migration.md`
+- `docs/site/how-to/use-a-second-database.md`
+- `docs/site/tutorials/index.md`
+- `docs/site/tutorials/erp-sync/01-scaffold.md`
+- `docs/site/tutorials/live-dashboard/index.md`
+- `docs/site/tutorials/storefront/01-scaffold.md`
+- `docs/site/tutorials/workspace/01-scaffold.md`
 
-Residual: one intended hit in `docs/site/_plan/worklog/quickstart.md`, saying no raw published-file
-path is required. Maintainer local-source forms such as `deno run -A packages/cli/bin/netscript-dev.ts`
-remain intentionally unchanged.
+Touched run/planning evidence that contained user-facing command copy:
+
+- `docs/site/_plan/samples/index.vto`
+- `docs/site/_plan/worklog/index.md`
+- `docs/site/_plan/worklog/quickstart.md`
 
 ### S2 Gate Evidence
 
 | Gate | Command | Exit | Evidence |
 | --- | --- | ---: | --- |
-| Residual exact grep | `rg -n "jsr:@netscript/cli/bin/netscript\\.ts" .` | 1 | No output; zero old exact command hits remain. |
-| Broader stale-prose grep | `rg -n "jsr:@netscript/cli/bin\|bin/netscript\\.ts\|published file path\|raw published-file\|deno run (?:-A\|--allow-all) jsr:@netscript/cli" README.md docs/site` | 0 | One acceptable current-state hit: the quickstart worklog says no raw published-file path is required. Maintainer `netscript-dev.ts` forms are excluded by scope and unchanged. |
-| Voice check | `rg -n -i "\\b(honest\|honesty\|honestly)\\b\|sorry\|apolog" README.md docs/site` | 0 for touched wording | Hits are pre-existing docs-site planning/explanation prose outside the edited command lines; S2 did not introduce banned voice terms. |
-| Whitespace | `git diff --check -- README.md docs/site .llm/tmp/run/cli-dx-runnable/commits.md .llm/tmp/run/cli-dx-runnable/worklog.md .llm/tmp/run/cli-dx-runnable/context-pack.md` | 0 | No whitespace errors. |
-| Docs fmt | `deno fmt --check --no-config --line-width 100 <touched docs>` | 1 | Fails on legacy Markdown/VTO formatting far outside this sweep, mostly component object layout reflow. Not mutated to avoid unrelated docs churn. |
+| Residual old-path grep | `rg --hidden -n "jsr:@netscript/cli/bin/netscript\\.ts" README.md docs packages plugins --glob '!.git/**'` | 1 | No matches in source docs, package docs, or plugin docs. |
+| Full hidden residual audit | `rg --hidden -n "jsr:@netscript/cli/bin/netscript\\.ts" . --glob '!.git/**'` | 0 | Remaining matches are historical run/evaluator artifacts only; see residual classification below. |
+| Command form audit | `rg -n "deno install[^\\n]+jsr:@netscript/cli\|deno run[^\\n]+jsr:@netscript/cli\|deno x[^\\n]+jsr:@netscript/cli" README.md docs/site packages plugins` | 0 | User-facing CLI install examples now use `deno install ... jsr:@netscript/cli`; no-install examples use `deno x jsr:@netscript/cli ...`; no `deno run ... jsr:@netscript/cli/bin/netscript.ts` examples remain. |
+| Whitespace check | `git diff --check -- <touched S2 files>` | 0 | No whitespace errors in the S2 patch. |
+| Voice sweep | `rg -n "honest\|honesty\|honestly\|candor\|apolog\|sorry" README.md docs/site --glob '!_plan/**'` | 0 for S2 diff | Hits are pre-existing `_plan` research plus one unrelated `docs/site/explanation/auth-model.md` line outside the S2 diff. S2 added no banned voice terms. |
+| Docs fmt check | `deno fmt --check ... <touched docs>` | 1 | Not accepted as a docs-source verdict for this slice: Deno formatter rewrites large pre-existing VTO/component blocks and Markdown tables unrelated to the command sweep. The S2 patch is one-line command-copy changes, and `git diff --check` is clean. |
 
-S2 changed 19 docs/planning files with 33 insertions and 33 deletions, limited to replacing the old
-published-file CLI invocation/proof text with the verified default-export form:
-`deno x jsr:@netscript/cli ...` for ad-hoc runs and
-`deno install --global --allow-all --name netscript jsr:@netscript/cli` for PATH installs.
+Residual classification:
+
+- `.llm/tmp/run/cli-dx-runnable/research.md`, `plan.md`, `plan-eval.md`: locked historical plan and
+  evaluator artifacts that intentionally describe the old path as the pre-S1 problem.
+- `.llm/tmp/run/cli-dx-runnable/worklog.md`, `context-pack.md`: current implementation artifacts that
+  mention the old path only to describe the sweep target and residual gate.
+- `.llm/tmp/run/openhands/pr-120/run-28135291668-1/*`: OpenHands PLAN-EVAL request/log/summary
+  records; immutable evaluator evidence, not user-facing docs.
