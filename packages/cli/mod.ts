@@ -13,4 +13,10 @@
  * });
  * ```
  */
+import { runNetscriptCli } from './bin/netscript.ts';
+
 export * from './src/public/public-api.ts';
+
+if (import.meta.main) {
+  await runNetscriptCli();
+}
