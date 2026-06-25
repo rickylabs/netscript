@@ -73,6 +73,17 @@ jobs:
         if: steps.release.outputs.dry_run != 'true'
         run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts
 
+      # JSR presentation settings (readmeSource, description, runtimeCompat) are
+      # server-side and not carried in the tarball, so they cannot be baked into
+      # a version. Reconcile them on every publish so the README renders on each
+      # package's main page, the description stays in sync with the README
+      # tagline, and Deno shows as the supported runtime. Idempotent.
+      - name: Apply JSR package settings
+        if: steps.release.outputs.dry_run != 'true'
+        env:
+          JSR_API_TOKEN: ${{ secrets.JSR_TOKEN }}
+        run: deno run --allow-net --allow-read --allow-env .llm/tools/jsr-set-package-settings.ts
+
       - name: Update GitHub Release with JSR links
         if: steps.release.outputs.dry_run != 'true'
         env:
