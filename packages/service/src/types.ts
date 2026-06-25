@@ -6,7 +6,6 @@
 
 import type { Context, ErrorHandler, Handler, MiddlewareHandler, NotFoundHandler } from 'hono';
 import type { cors } from 'hono/cors';
-import './auth/hono-context.ts';
 
 /** Router definition accepted by the service builder and handler factories. */
 export type ServiceRouter = Record<string, unknown>;

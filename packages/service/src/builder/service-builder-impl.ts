@@ -14,7 +14,6 @@ import { cors } from 'hono/cors';
 import { ensureLogging } from '@netscript/logger';
 import { loggerMiddleware, type LoggerMiddlewareOptions } from '@netscript/logger/middleware';
 import { createAuthnMiddleware, createAuthzMiddleware } from '../auth/auth-middleware.ts';
-import '../auth/hono-context.ts';
 import type { AuthnOptions, AuthzOptions } from '../auth/options.ts';
 import {
   createHealthHandler,

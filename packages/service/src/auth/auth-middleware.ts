@@ -13,7 +13,6 @@
 
 import type { Context, MiddlewareHandler } from 'hono';
 import { createLogger, type Logger } from '@netscript/logger';
-import './hono-context.ts';
 import type { AuthnOptions, AuthzOptions } from './options.ts';
 import type { AuthnRequest, Principal } from './types.ts';
 
