@@ -5,15 +5,8 @@
  */
 
 import type { ContractTemplateRegistry } from '../types.ts';
-
-const CONTRACT_TEMPLATE = new URL(
-  '../../../assets/service/contract.ts.template',
-  import.meta.url,
-);
-const CONTRACTS_MOD_TEMPLATE = new URL(
-  '../../../assets/workspace/contracts/mod.ts.template',
-  import.meta.url,
-);
+import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
+import { readTemplateAssetSync } from '../../templates/template-asset.ts';
 
 export { generateContractsDenoJson } from './generate-deno-json.ts';
 export { generateV1Mod } from './generate-v1-mod.ts';
@@ -23,11 +16,11 @@ export type { GenerateV1ModOptions } from './generate-v1-mod.ts';
 export class DefaultContractTemplateRegistry implements ContractTemplateRegistry {
   /** Get the service contract template. */
   getContractTemplate(): string {
-    return Deno.readTextFileSync(CONTRACT_TEMPLATE);
+    return readTemplateAssetSync(TEMPLATE_KEYS.serviceContract);
   }
 
   /** Get the root contracts/mod.ts template. */
   getRootModTemplate(): string {
-    return Deno.readTextFileSync(CONTRACTS_MOD_TEMPLATE);
+    return readTemplateAssetSync(TEMPLATE_KEYS.workspaceContractsMod);
   }
 }

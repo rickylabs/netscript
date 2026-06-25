@@ -8,7 +8,10 @@ import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { MemoryFileSystemAdapter } from '../../adapters/scaffold/memory-fs.ts';
 import { Scaffolder } from '../../adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../adapters/scaffold/template-adapter.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { DatabaseScaffolder } from './scaffolder.ts';
+
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('DatabaseScaffolder', () => {
   it('renders database script wrappers with concrete schema and generated paths', async () => {

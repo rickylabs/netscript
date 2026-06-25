@@ -1,5 +1,6 @@
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { addPlugin, type AddPluginDependencies } from './add-plugin.ts';
 import {
   parseList,
@@ -40,6 +41,7 @@ export function createPluginAddCommand(
     .option('--project-root <path:string>', 'Project root directory')
     .option('--force', 'Overwrite generated files if they already exist', { default: false })
     .action(async (options: AddPluginCommandInput, kind: string): Promise<void> => {
+      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
       const projectRoot = await requireProjectRoot(
         dependencies.resolveProjectRoot,
         options.projectRoot,
