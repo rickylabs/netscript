@@ -46,7 +46,7 @@ both Postgres and KV (Garnet) must be in the Aspire graph.
   caption: "Prerequisites",
   rows: [
     { name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
-    { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts. Confirm with netscript --help." },
+    { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli. Confirm with netscript --help." },
     { name: "Aspire", type: "aspire run", desc: "Postgres + Garnet up via the AppHost before any db command or endpoint call (cd aspire && aspire run)." },
     { name: "OAuth credentials", type: "client id / secret", desc: "For the default kv-oauth backend you need a real OAuth/OIDC app (e.g. a Google client id + secret + redirect URI). Without provider env, signin/callback are non-functional stubs." }
   ]

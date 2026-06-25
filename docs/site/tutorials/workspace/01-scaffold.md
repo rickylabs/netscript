@@ -46,7 +46,7 @@ docker info        # prints engine details, not a connection error
 Install the NetScript CLI from JSR once, then confirm it is on your `PATH`:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts
+deno install --global --allow-all --name netscript jsr:@netscript/cli
 netscript --help
 ```
 
@@ -55,7 +55,7 @@ netscript --help
 Deno's install directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad-hoc with <code>deno run -A jsr:@netscript/cli/bin/netscript.ts &lt;command&gt;</code>.
+Run any command ad-hoc with <code>deno x jsr:@netscript/cli &lt;command&gt;</code>.
 The rest of this track assumes the installed <code>netscript</code> form.
 {{ /comp }}
 

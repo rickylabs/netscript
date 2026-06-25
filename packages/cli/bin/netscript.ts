@@ -5,10 +5,13 @@ import { formatError } from '../src/kernel/domain/errors.ts';
 import { CliExitError } from '../src/kernel/domain/errors/cli-exit-error.ts';
 import { runPublicCli } from '../src/public/composition/run-public-cli.ts';
 
-if (import.meta.main) {
+/**
+ * Run the public NetScript CLI binary entry.
+ */
+export async function runNetscriptCli(args: readonly string[] = Deno.args): Promise<void> {
   try {
     await runPublicCli({
-      args: Deno.args,
+      args,
       cwd: () => Deno.cwd(),
       resolvePath: (path) => resolve(Deno.cwd(), path ?? '.'),
       error: outputError,
@@ -19,4 +22,8 @@ if (import.meta.main) {
     }
     Deno.exit(error instanceof CliExitError ? error.exitCode : 1);
   }
+}
+
+if (import.meta.main) {
+  await runNetscriptCli();
 }

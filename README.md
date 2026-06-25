@@ -49,7 +49,7 @@ orchestrated path you also need the [.NET Aspire CLI](https://learn.microsoft.co
 
 ```bash
 # 1. Install the NetScript CLI on your PATH
-deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts
+deno install --global --allow-all --name netscript jsr:@netscript/cli
 
 # 2. Scaffold a workspace: contracts + an example service + Postgres + Aspire orchestration
 netscript init my-app --db postgres --service --yes
@@ -62,7 +62,7 @@ aspire run                           # Aspire dashboard → http://localhost:188
 Prefer not to install anything globally? Run the CLI straight from JSR:
 
 ```bash
-deno run -A jsr:@netscript/cli/bin/netscript.ts init my-app
+deno x jsr:@netscript/cli init my-app
 ```
 
 Run `netscript --help` or see the

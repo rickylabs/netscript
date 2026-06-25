@@ -44,7 +44,7 @@ context step by step. Both stand up the same Hono + oRPC runtime and advertise t
   caption: "Prerequisites",
   rows: [
     { name: "A NetScript workspace", type: "netscript init", desc: "An existing project on disk. If you do not have one, scaffold it first — see the tutorials. Run commands from the workspace root." },
-    { name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli/bin/netscript.ts — then confirm with netscript --help." },
+    { name: "The netscript CLI", type: "on your PATH", desc: "Install globally with: deno install --global --allow-all --name netscript jsr:@netscript/cli — then confirm with netscript --help." },
     { name: "A contracts workspace", type: "contracts/", desc: "The init scaffold ships a shared contracts/ workspace exposed as the @<project>/contracts import alias. New services add their contract here so clients can import it." },
     { name: "A free port", type: ":3001 by default", desc: "The example users service listens on :3001. Pick an unused port per service; it is read from the PORT env var with a literal fallback. Plugin API ports are already claimed (workers :8091, sagas :8092, triggers :8093, auth :8094)." }
   ]

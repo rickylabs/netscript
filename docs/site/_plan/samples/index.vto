@@ -20,7 +20,7 @@ title: NetScript — durable, observable TypeScript backends
 
 {{ comp.tabbedCode({ tabs: [
   { label: "Define a service", lang: "ts", code: "import { defineService } from '@netscript/service';\nimport { router } from './router.ts';\n\nconst service = await defineService(router, {\n  name: 'users',\n  port: 3000,\n});" },
-  { label: "Install the CLI", lang: "sh", code: "deno install --global --allow-all --name netscript jsr:@netscript/cli/bin\nnetscript init my-app" }
+  { label: "Install the CLI", lang: "sh", code: "deno install --global --allow-all --name netscript jsr:@netscript/cli\nnetscript init my-app" }
 ] }) }}
 
 {{ comp.callout({ type: "note" }) }}
