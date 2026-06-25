@@ -1305,3 +1305,25 @@ match the merged exemplars). IMPL-EVAL must not FAIL a slice for retaining eithe
 - **Status:** open, DEBT_ACCEPTED.
 - **Gate:** Close when the db-init scaffold runtime E2E is deterministic across local WSL and GitHub
   Actions, with raw exit-code evidence recorded on the follow-up task/PR.
+
+## packages/cli — scaffolded `aspire/package.json` ships no companion lock (`scaffold-aspire-npm-island-no-lock`)
+
+- **Reason:** The CLI scaffold's TypeScript AppHost generator
+  (`packages/cli/src/kernel/.../render-ts-apphost.ts:51-77`) emits an `aspire/package.json` npm
+  island into generated projects with no companion lockfile (`package-lock.json` / `deno.lock`).
+  Consumers must run a manual `npm install` in `aspire/` before the AppHost resolves, and the
+  install is unpinned. This is a pre-existing generated-project DX gap, unrelated to the Deno 2.9
+  toolchain adoption — Deno 2.9's lock/install changes do not seed a lock for an emitted npm
+  package that has no foreign lock to import. The Deno 2.9 adoption plan (D5) decided this gap
+  out-of-scope; this entry makes that "pre-existing arch-debt" citation verifiable per PLAN-EVAL
+  finding F-3.
+- **Owner:** CLI scaffold / Aspire AppHost generator maintainers.
+- **Target:** Before advertising the generated TS AppHost as zero-manual-step; revisit alongside the
+  generated-project task DX follow-up (Deno 2.9 plan C6).
+- **Linked plan:** `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/plan.md` (D5);
+  `.llm/tmp/run/chore-deno-2.9-adoption--adoption-plan/research.md` (npm-island note).
+- **Created:** 2026-06-25.
+- **Status:** open, DEBT_ACCEPTED.
+- **Gate:** Close when the scaffolded `aspire/package.json` ships with a pinned companion lock (or
+  the npm island is removed) so a generated AppHost resolves without an unpinned manual
+  `npm install`.
