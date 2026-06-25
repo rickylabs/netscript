@@ -9,6 +9,12 @@ import { DatabaseScaffolder } from '../../../../kernel/adapters/database/scaffol
 import { DatabaseWorkspaceMutator } from '../../../../kernel/adapters/database/workspace-mutator.ts';
 import { addDb } from './add-db.ts';
 import { planDbAdd } from './plan-db-add.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
+
+// This flow renders root project metadata via sync template generators, which
+// require a previously-awaited registry hydration. The test drives the flow
+// directly (outside the CLI dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('public add database flow', () => {
   it('plans a database add request from project metadata', async () => {

@@ -11,6 +11,7 @@ import {
   type PluginScaffoldResult,
 } from '../../domain/plugin-kind.ts';
 import { PluginKindRegistry } from '../../application/registries/plugin-kind-registry.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { PORT_RANGES } from '../../constants/port-ranges.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
@@ -49,6 +50,10 @@ export class PluginScaffolder {
 
   /** Scaffold the plugin workspace. */
   async scaffold(options: PluginScaffoldOptions): Promise<PluginScaffoldResult> {
+    // Unlike the database/service scaffolders, this adapter renders entirely via
+    // sync generators (`generatePlugin*`) with no awaited template read to trigger
+    // hydration, so it must hydrate the registry itself before rendering.
+    await DEFAULT_TEMPLATE_REGISTRY.hydrate();
     const start = performance.now();
     const filesCreated: string[] = [];
     const directoriesCreated: string[] = [];

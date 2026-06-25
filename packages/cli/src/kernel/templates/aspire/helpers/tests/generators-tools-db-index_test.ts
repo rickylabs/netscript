@@ -9,6 +9,12 @@ import { generateRegisterTools } from '../register/generate-register-tools.ts';
 import { generateDbCliMode } from '../generate-db-cli-mode.ts';
 import { generateIndex } from '../generate-index.ts';
 import * as fixtures from './generators-test-support.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+
+// These generators read templates synchronously, which requires a previously-
+// awaited registry hydration. The tests exercise them directly (outside the CLI
+// dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateRegisterTools', () => {
   it('should return a non-empty string', () => {

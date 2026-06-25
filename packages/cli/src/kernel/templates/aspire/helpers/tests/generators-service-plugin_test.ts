@@ -8,6 +8,12 @@ import type { PluginEntry } from '@netscript/aspire/types';
 import { generateRegisterServices } from '../register/generate-register-services.ts';
 import { generateRegisterPlugins } from '../register/generate-register-plugins.ts';
 import * as fixtures from './generators-test-support.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+
+// These generators read templates synchronously, which requires a previously-
+// awaited registry hydration. The tests exercise them directly (outside the CLI
+// dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateRegisterServices', () => {
   const emptyOptions = {

@@ -7,6 +7,12 @@ import { assert, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { generateConfigSchema } from '../generate-config-schema.ts';
 import { generateRegisterInfrastructure } from '../register/generate-register-infrastructure.ts';
 import * as fixtures from './generators-test-support.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../application/registries/template-registry.ts';
+
+// These generators read templates synchronously, which requires a previously-
+// awaited registry hydration. The tests exercise them directly (outside the CLI
+// dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateConfigSchema', () => {
   const emptyOptions = {
