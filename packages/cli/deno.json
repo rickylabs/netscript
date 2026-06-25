@@ -8,6 +8,9 @@
     "./scaffolding": "./scaffolding.ts",
     "./testing": "./testing.ts"
   },
+  "bin": {
+    "netscript": "./bin/netscript.ts"
+  },
   "tasks": {
     "dev": "deno run --allow-all bin/netscript.ts",
     "build": "deno compile --allow-all --target=x86_64-pc-windows-msvc --output=../../.deploy/windows/scripts/deploy-cli bin/netscript.ts",
