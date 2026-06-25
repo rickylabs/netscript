@@ -59,7 +59,7 @@ jobs:
       - name: Install published CLI from JSR
         run: |
           echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
-          deno install -g -A -n netscript "jsr:@netscript/cli@${{ steps.version.outputs.version }}"
+          deno install -g -A --minimum-dependency-age=0 -n netscript "jsr:@netscript/cli@${{ steps.version.outputs.version }}"
           netscript --help
 
       - name: Install workspace dependencies

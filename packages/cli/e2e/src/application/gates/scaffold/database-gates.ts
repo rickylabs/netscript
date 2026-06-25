@@ -1,6 +1,6 @@
 import { GATE, GATE_PHASE } from '../../../domain/cli-surface.ts';
 import type { GateDefinition } from '../../../domain/gate-definition.ts';
-import { cli, commandGate } from './gate-factory.ts';
+import { cli, commandGate, denoCommand } from './gate-factory.ts';
 
 /** Create database workflow gates for a generated project. */
 export function createDatabaseGates(): readonly GateDefinition[] {
@@ -62,47 +62,49 @@ export function createGeneratedCheckGates(): readonly GateDefinition[] {
       GATE.GENERATED_SERVICE_CHECK,
       'Type-check generated service workspace',
       GATE_PHASE.DATABASE,
-      () => ['deno', 'check', '--unstable-kv', './packages', './services'],
+      (context) => denoCommand(context, 'check', '--unstable-kv', './packages', './services'),
       (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.GENERATED_CONTRACTS_CHECK,
       'Type-check generated contracts',
       GATE_PHASE.DATABASE,
-      () => ['deno', 'check', '--unstable-kv', './contracts'],
+      (context) => denoCommand(context, 'check', '--unstable-kv', './contracts'),
       (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.GENERATED_INFRASTRUCTURE_CHECK,
       'Type-check generated infrastructure workspace',
       GATE_PHASE.DATABASE,
-      () => [
-        'deno',
-        'check',
-        '--unstable-kv',
-        './packages',
-        './services',
-        './contracts',
-        './database',
-      ],
+      (context) =>
+        denoCommand(
+          context,
+          'check',
+          '--unstable-kv',
+          './packages',
+          './services',
+          './contracts',
+          './database',
+        ),
       (context) => context.project.projectRoot,
     ),
     commandGate(
       GATE.GENERATED_DENO_CHECK,
       'Type-check generated workspaces',
       GATE_PHASE.DATABASE,
-      () => [
-        'deno',
-        'check',
-        '--unstable-kv',
-        './packages',
-        './plugins',
-        './workers',
-        './sagas',
-        './triggers',
-        './services',
-        './database',
-      ],
+      (context) =>
+        denoCommand(
+          context,
+          'check',
+          '--unstable-kv',
+          './packages',
+          './plugins',
+          './workers',
+          './sagas',
+          './triggers',
+          './services',
+          './database',
+        ),
       (context) => context.project.projectRoot,
     ),
   ];
