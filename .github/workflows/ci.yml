@@ -44,7 +44,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.8.3"
+          deno-version: "2.9.0"
 
       - name: Install workspace dependencies
         run: deno install
@@ -65,7 +65,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.8.3"
+          deno-version: "2.9.0"
 
       - name: Install workspace dependencies
         run: deno install
@@ -95,7 +95,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: "2.8.3"
+          deno-version: "2.9.0"
 
       - name: Install workspace dependencies
         run: deno install
