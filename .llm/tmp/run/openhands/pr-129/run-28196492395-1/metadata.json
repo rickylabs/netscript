@@ -1,0 +1,17 @@
+{
+  "run_id": "28196492395",
+  "run_attempt": "1",
+  "run_url": "https://github.com/rickylabs/netscript/actions/runs/28196492395",
+  "bootstrap_outcome": "success",
+  "agent_outcome": "failure",
+  "verdict": "agent-failed",
+  "summary_source": "none",
+  "model": "openrouter/minimax/minimax-m3",
+  "provider": "OPENROUTER",
+  "output_mode": "pr-comment",
+  "issue_number": "129",
+  "checkout_repo": "rickylabs/netscript",
+  "checkout_ref": "chore/release-prep-alpha3",
+  "summary_path": "/home/runner/work/_temp/openhands/28196492395-1/summary.md",
+  "trace_dir": ".llm/tmp/run/openhands/pr-129/run-28196492395-1"
+}
