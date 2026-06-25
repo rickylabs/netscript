@@ -7,6 +7,12 @@ import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { SCAFFOLD_APP_IMPORTS } from '../../constants/scaffold/scaffold-app-catalog.ts';
 import { generateAppDenoJson } from '../../adapters/templates/app/generate-app-deno-json.ts';
 import { generateAppViteConfig } from '../../adapters/templates/app/generate-vite-config.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+
+// These generators read templates synchronously, which requires a previously-
+// awaited registry hydration. The tests exercise them directly (outside the CLI
+// dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('generateAppDenoJson', () => {
   it('should produce valid JSON with scoped name', () => {

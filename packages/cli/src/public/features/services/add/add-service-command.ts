@@ -1,5 +1,6 @@
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { addService, type AddServiceDependencies } from './add-service.ts';
 import {
   parseList,
@@ -33,6 +34,7 @@ export function createServiceAddCommand(
     .option('--project-root <path:string>', 'Project root directory')
     .option('--force', 'Overwrite generated files if they already exist', { default: false })
     .action(async (options: AddServiceCommandInput): Promise<void> => {
+      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
       const projectRoot = await requireProjectRoot(
         dependencies.resolveProjectRoot,
         options.projectRoot,

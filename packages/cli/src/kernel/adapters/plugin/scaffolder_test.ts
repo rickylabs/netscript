@@ -4,8 +4,11 @@ import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { Scaffolder } from '../scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../scaffold/template-adapter.ts';
 import { PluginKindRegistry } from '../../application/registries/plugin-kind-registry.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
 import { PluginScaffolder } from './scaffolder.ts';
+
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 const backgroundProvider: PluginKindProvider = {
   kind: 'background',

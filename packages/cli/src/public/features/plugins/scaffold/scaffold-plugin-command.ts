@@ -7,6 +7,7 @@
 import { isAbsolute, join } from '@std/path';
 import { Command } from '@cliffy/command';
 
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { type ProjectRootResolver, requireProjectRoot } from '../../../presentation/support.ts';
 import {
@@ -51,6 +52,7 @@ export function createPluginScaffoldCommand(
     .option('--project-root <path:string>', 'Project root directory')
     .option('--force', 'Overwrite generated files if they already exist', { default: false })
     .action(async (options: PluginScaffoldCommandInput, name: string): Promise<void> => {
+      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
       const projectRoot = await requireProjectRoot(
         dependencies.resolveProjectRoot,
         options.projectRoot,

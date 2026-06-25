@@ -5,15 +5,8 @@
  */
 
 import { toCamelCase, toPascalCase } from '@std/text';
-
-const EMPTY_V1_MOD_TEMPLATE = new URL(
-  '../../../assets/workspace/contracts/v1-empty.ts.template',
-  import.meta.url,
-);
-const AGGREGATE_V1_MOD_TEMPLATE = new URL(
-  '../../../assets/workspace/contracts/v1-aggregate.ts.template',
-  import.meta.url,
-);
+import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
+import { readTemplateAssetSync } from '../../templates/template-asset.ts';
 
 /** Options for generating the v1 aggregate module. */
 export interface GenerateV1ModOptions {
@@ -31,7 +24,7 @@ export function generateV1Mod(options: GenerateV1ModOptions = {}): string {
   const serviceNames = [...(options.serviceNames ?? [])].sort();
 
   if (serviceNames.length === 0) {
-    return Deno.readTextFileSync(EMPTY_V1_MOD_TEMPLATE);
+    return readTemplateAssetSync(TEMPLATE_KEYS.workspaceContractsV1Empty);
   }
 
   const imports = serviceNames.map((serviceName) => {
@@ -61,7 +54,7 @@ export function generateV1Mod(options: GenerateV1ModOptions = {}): string {
     return `  ${toCamelCase(serviceName)}: ${pascal}V1,`;
   });
 
-  return Deno.readTextFileSync(AGGREGATE_V1_MOD_TEMPLATE)
+  return readTemplateAssetSync(TEMPLATE_KEYS.workspaceContractsV1Aggregate)
     .replace('{{imports}}', imports.join('\n'))
     .replace('{{exports}}', exports.join('\n'))
     .replace('{{typeExports}}', typeExports.join('\n'))

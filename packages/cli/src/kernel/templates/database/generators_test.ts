@@ -6,10 +6,16 @@ import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { DbEngineRegistry } from '../../application/registries/db-engine-registry.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
 import { generateDatabaseDenoJson } from './generate-db-deno-json.ts';
 import { generateDatabaseFacadeMod } from './generate-db-mod.ts';
 import { generateEngineMod } from './generate-engine-mod.ts';
 import { generatePrismaConfig } from './generate-prisma-config.ts';
+
+// These generators read templates synchronously, which requires a previously-
+// awaited registry hydration. The tests exercise them directly (outside the CLI
+// dispatch path), so hydrate at module load.
+await DEFAULT_TEMPLATE_REGISTRY.hydrate();
 
 describe('database template generators', () => {
   const registry = new DbEngineRegistry();

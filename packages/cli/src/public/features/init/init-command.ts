@@ -2,6 +2,7 @@ import { Command } from '@cliffy/command';
 import { DB_ENGINE_CHOICES, type DbEngineChoice } from '../../../kernel/domain/db-engine.ts';
 import type { EditorChoice } from '../../../kernel/domain/scaffold/workspace-config.ts';
 import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../kernel/application/registries/template-registry.ts';
 import { executeInit } from '../../../kernel/application/scaffold/orchestrate-init.ts';
 import { PresetRegistry } from '../../../kernel/application/registries/preset-registry.ts';
 import type { ProjectNameResolver } from '../../presentation/support.ts';
@@ -60,6 +61,7 @@ export function createInitCommand(
     .option('--json', 'Emit a single machine-readable JSON result', { default: false })
     .option('--from <preset:string>', 'Apply a named scaffold preset')
     .action(async (options: InitCommandInput, nameArg?: string): Promise<void> => {
+      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
       if (options.from !== undefined) {
         const presets = new PresetRegistry();
         if (presets.entries().length === 0) {

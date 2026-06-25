@@ -11,7 +11,7 @@ function timestampName(date = new Date()): string {
 }
 
 /** Build default run options from the current process. */
-export function defaultRunOptions(): RunOptions {
+export function defaultRunOptions(overrides: Partial<RunOptions> = {}): RunOptions {
   const repoRoot = resolve('.');
   const projectName = timestampName();
   return {
@@ -20,7 +20,7 @@ export function defaultRunOptions(): RunOptions {
     smokeRoot: join(repoRoot, '.llm', 'tmp', 'cli-e2e'),
     projectName,
     database: DATABASE.POSTGRES,
-    packageSource: PACKAGE_SOURCE.LOCAL,
+    packageSource: overrides.packageSource ?? PACKAGE_SOURCE.LOCAL,
     plugins: [
       PLUGIN.WORKER,
       PLUGIN.SAGA,

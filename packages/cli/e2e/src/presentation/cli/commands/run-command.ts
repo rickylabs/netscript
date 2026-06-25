@@ -15,7 +15,9 @@ export function createRunCommand(createRunner: CliRunnerFactory) {
     .option('--smoke-root <path:string>', 'Generated project parent directory')
     .option('--name <name:string>', 'Generated project name')
     .option('--db <engine:string>', 'Database engine: postgres or mysql', { default: 'postgres' })
-    .option('--source <mode:string>', 'Package source: auto, starter, local', { default: 'local' })
+    .option('--source <mode:string>', 'Package source: auto, starter, local, or jsr', {
+      default: 'local',
+    })
     .option('--plugins <list:string>', 'Comma-separated plugin kinds')
     .option('--samples', 'Include generated samples', { default: true })
     .option('--no-samples', 'Skip generated samples')

@@ -1,5 +1,6 @@
 import { outputText } from '../../../../kernel/presentation/output/default-output.ts';
 import { Command } from '@cliffy/command';
+import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
 import {
   generateAspire,
   type GenerateAspireDependencies,
@@ -26,6 +27,7 @@ export function createServiceGenerateCommand(
     .description('Regenerate Aspire helper files from service configuration')
     .option('--project-root <path:string>', 'Project root directory')
     .action(async (options): Promise<void> => {
+      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
       const projectRoot = await requireProjectRoot(
         dependencies.resolveProjectRoot,
         options.projectRoot,

@@ -13,6 +13,7 @@ export class TemplateRegistry extends Manifest<TemplateKey, TemplateValue> {
   readonly id = 'template-registry';
 
   readonly #entries = new Map<TemplateKey, TemplateValue>();
+  #hydratePromise: Promise<void> | undefined;
 
   constructor(
     manifest: readonly { readonly key: TemplateKey; readonly path: TemplateKey }[] =
@@ -45,6 +46,23 @@ export class TemplateRegistry extends Manifest<TemplateKey, TemplateValue> {
       throw new Error(`Template asset is not registered: ${key}`);
     }
     return Promise.resolve(value.content);
+  }
+
+  /** Hydrate every registered template asset into memory. */
+  hydrate(): Promise<void> {
+    if (this.#hydratePromise) {
+      return this.#hydratePromise;
+    }
+    this.#hydratePromise = this.#hydrate();
+    return this.#hydratePromise;
+  }
+
+  async #hydrate(): Promise<void> {
+    for (const [key, value] of this.entries()) {
+      const response = await fetch(value.url);
+      const content = await response.text();
+      this.#entries.set(key, { ...value, content });
+    }
   }
 
   load(_root = ''): Promise<readonly ManifestEntry<TemplateKey, TemplateValue>[]> {
