@@ -1,21 +1,60 @@
 name: publish
 
 on:
-  push:
-    tags:
-      - "v*"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish and update, for example v0.0.1-alpha.1."
+        required: false
+        type: string
+      dry_run:
+        description: "Run the publish path without publishing or editing release notes."
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # Human release flow:
+      # 1. The supervisor drafts one GitHub Release for v0.0.1-alpha.1.
+      # 2. Publishing that Release creates/uses the v* tag and triggers this workflow.
+      # 3. The workflow publishes every @netscript workspace member to JSR with OIDC provenance.
+      # 4. After publish succeeds, the workflow appends managed JSR package links to the Release.
+      - name: Resolve release inputs
+        id: release
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          tag="${RELEASE_TAG:-${INPUT_TAG:-}}"
+          if [ -z "$tag" ]; then
+            tag="${GITHUB_REF_NAME:-}"
+          fi
+          version="${tag#v}"
+          dry_run="${INPUT_DRY_RUN:-false}"
+          if [ "$EVENT_NAME" = "release" ]; then
+            dry_run="false"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "dry_run=$dry_run" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag || github.ref }}
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
@@ -23,7 +62,29 @@ jobs:
           deno-version: "2.8.3"
 
       - name: Publish dry-run
-        run: deno task publish:dry-run
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --dry-run
 
       - name: Publish
-        run: deno publish
+        if: steps.release.outputs.dry_run != 'true'
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts
+
+      - name: Update GitHub Release with JSR links
+        if: steps.release.outputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TAG" ]; then
+            echo "No release tag resolved; cannot update GitHub Release notes." >&2
+            exit 1
+          fi
+          mkdir -p .llm/tmp
+          gh release view "$TAG" --json body --jq '.body // ""' > .llm/tmp/release-body.md
+          deno run --allow-read --allow-write .llm/tools/run-publish.ts \
+            --update-release-body \
+            --version "$VERSION" \
+            --body-file .llm/tmp/release-body.md \
+            --out .llm/tmp/release-body-updated.md
+          gh release edit "$TAG" --notes-file .llm/tmp/release-body-updated.md
