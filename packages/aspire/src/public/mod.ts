@@ -52,7 +52,7 @@ export { AspireTypeScriptBuilder, resolveEnvSource } from '../adapters/mod.ts';
 export type { ResolveEnvSourceOptions } from '../adapters/mod.ts';
 export { inspectAspire } from '../diagnostics/inspect-aspire.ts';
 export type { InspectionReport } from '../diagnostics/inspect-aspire.ts';
-export { AspireError, DuplicateContributionError } from '../domain/mod.ts';
+export { AspireError, DuplicateContributionError } from '../domain/errors.ts';
 export { AspireNSPluginContribution, ContributionRegistry } from '../runtime/mod.ts';
 export type {
   AspireResource,
@@ -65,9 +65,10 @@ export type {
   DenoServiceSpec,
   EnvSource,
   HealthCheckSpec,
-  ReferenceSpec,
 } from '../domain/mod.ts';
-export type { AspireBuilder, AspireRuntime } from '../ports/mod.ts';
+export type { ReferenceSpec } from '../domain/reference-spec.ts';
+export type { AspireBuilder } from '../ports/mod.ts';
+export type { AspireRuntime } from '../ports/aspire-runtime-port.ts';
 export {
   createContributionContextFixture,
   ExampleAspireContribution,
