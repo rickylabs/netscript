@@ -32,18 +32,35 @@ export interface MigrationOptions {
    * preflight (engine binary first-touch / AV scan / cold cache). That failure
    * occurs before any migration SQL is written, so re-running is idempotent.
    * Only that transient signature is retried; every other failure returns
-   * immediately so real schema/SQL errors are never masked.
+   * immediately so real schema/SQL errors are never masked. The default
+   * budget allows cold Windows engine startup / antivirus first-touch delays
+   * to clear without making permanent failures look successful.
    *
-   * @default 4
+   * @default 5
    */
   maxAttempts?: number;
   /**
    * Base delay in milliseconds between transient-failure retries. Backoff is
-   * linear in the attempt index (`baseRetryDelayMs * attempt`).
+   * exponential in the attempt index and capped by `maxRetryDelayMs`.
    *
-   * @default 750
+   * @default 1000
    */
   baseRetryDelayMs?: number;
+  /**
+   * Maximum delay in milliseconds between transient-failure retries.
+   *
+   * @default 15000
+   */
+  maxRetryDelayMs?: number;
+  /**
+   * Maximum duration in milliseconds for one non-interactive Prisma child
+   * process attempt before it is killed and treated as a transient engine
+   * lifecycle failure. This prevents Aspire db-init executables from sitting
+   * in a non-terminal state until the outer operation timeout expires.
+   *
+   * @default 45000
+   */
+  attemptTimeoutMs?: number;
 }
 
 /**
@@ -52,7 +69,8 @@ export interface MigrationOptions {
  * with a premature stream close before establishing connectivity, which is
  * non-deterministic and clears on a fresh spawn.
  */
-const TRANSIENT_ENGINE_FAILURE = /ERR_STREAM_PREMATURE_CLOSE|Premature close|Schema engine exited/i;
+const TRANSIENT_ENGINE_FAILURE =
+  /ERR_STREAM_PREMATURE_CLOSE|Premature close|Schema engine exited|schema-engine(?:-[\w]+)?(?:\.exe)?\s+cli\s+can-connect-to-database|Timed out waiting for Prisma schema engine/i;
 
 /** Determine whether a failed Prisma invocation matches the transient, retriable signature. */
 export function isRetriableMigrationFailure(stderr: string): boolean {
@@ -63,8 +81,11 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-interface PrismaInvocation {
+/** A single Prisma CLI command invocation managed by the retry runner. */
+export interface PrismaInvocation {
+  /** Human-readable command label used in diagnostics. */
   readonly label: string;
+  /** Prisma CLI arguments passed after `deno run -A npm:prisma`. */
   readonly args: readonly string[];
 }
 
@@ -76,10 +97,17 @@ export interface PrismaSpawnResult {
   readonly stderr: string;
 }
 
+/** Per-attempt execution controls passed to a Prisma spawner. */
+export interface PrismaSpawnOptions {
+  /** Optional timeout for non-interactive child processes, in milliseconds. */
+  readonly timeoutMs?: number;
+}
+
 /** Spawns a single `deno run -A npm:prisma <args>` invocation. */
 export type PrismaSpawn = (
   args: readonly string[],
   interactive: boolean,
+  options: PrismaSpawnOptions,
 ) => Promise<PrismaSpawnResult>;
 
 /**
@@ -88,13 +116,16 @@ export type PrismaSpawn = (
  * parent process so logs are never swallowed. Interactive runs inherit stderr so
  * Prisma prompts surface immediately.
  */
-const defaultPrismaSpawn: PrismaSpawn = async (args, interactive) => {
+const defaultPrismaSpawn: PrismaSpawn = async (args, interactive, options) => {
   const command = new Deno.Command('deno', {
     args: ['run', '-A', 'npm:prisma', ...args],
     stdin: 'inherit',
     stdout: 'inherit',
     stderr: interactive ? 'inherit' : 'piped',
   });
+  if (!interactive && options.timeoutMs !== undefined && options.timeoutMs > 0) {
+    return await runCommandWithTimeout(command, options.timeoutMs);
+  }
   const { code, stderr } = await command.output();
   if (!interactive && stderr.byteLength > 0) {
     await writeAllToStderr(stderr);
@@ -102,11 +133,57 @@ const defaultPrismaSpawn: PrismaSpawn = async (args, interactive) => {
   return { code, stderr: interactive ? '' : new TextDecoder().decode(stderr) };
 };
 
+async function runCommandWithTimeout(
+  command: Deno.Command,
+  timeoutMs: number,
+): Promise<PrismaSpawnResult> {
+  const child = command.spawn();
+  const outputPromise = child.output();
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<'timeout'>((resolve) => {
+    timeoutId = setTimeout(() => resolve('timeout'), timeoutMs);
+  });
+  const result = await Promise.race([outputPromise, timeoutPromise]);
+  if (result !== 'timeout') {
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId);
+    }
+    if (result.stderr.byteLength > 0) {
+      await writeAllToStderr(result.stderr);
+    }
+    return { code: result.code, stderr: new TextDecoder().decode(result.stderr) };
+  }
+
+  try {
+    child.kill();
+  } catch {
+    // The child may have exited after the timeout fired but before kill landed.
+  }
+
+  const { stderr } = await outputPromise.catch(() => ({ stderr: new Uint8Array() }));
+  const decodedStderr = new TextDecoder().decode(stderr);
+  const timeoutMessage = `Timed out waiting for Prisma schema engine after ${timeoutMs}ms; ` +
+    'killed the Prisma CLI child so db-init can retry a fresh engine process.';
+  await writeAllToStderr(new TextEncoder().encode(`${timeoutMessage}\n`));
+  if (stderr.byteLength > 0) {
+    await writeAllToStderr(stderr);
+  }
+  return { code: 124, stderr: `${timeoutMessage}\n${decodedStderr}` };
+}
+
 /** Options governing a bounded, signature-scoped Prisma retry. */
 export interface RunPrismaWithRetryOptions {
+  /** Whether the invocation may prompt and therefore must not be retried. */
   readonly interactive: boolean;
+  /** Maximum number of attempts for a non-interactive transient failure. */
   readonly maxAttempts: number;
+  /** Base retry delay in milliseconds. */
   readonly baseRetryDelayMs: number;
+  /** Maximum retry delay in milliseconds after exponential backoff. */
+  readonly maxRetryDelayMs: number;
+  /** Timeout for one non-interactive Prisma subprocess attempt, in milliseconds. */
+  readonly attemptTimeoutMs: number;
+  /** Diagnostic sink for retry and exhaustion messages. */
   readonly log: (message: string) => void;
   /** Injectable spawner (defaults to a real `Deno.Command`). */
   readonly spawn?: PrismaSpawn;
@@ -125,22 +202,33 @@ export async function runPrismaWithRetry(
   invocation: PrismaInvocation,
   options: RunPrismaWithRetryOptions,
 ): Promise<number> {
-  const { interactive, maxAttempts, baseRetryDelayMs, log } = options;
+  const { interactive, maxAttempts, baseRetryDelayMs, maxRetryDelayMs, attemptTimeoutMs, log } =
+    options;
   const spawn = options.spawn ?? defaultPrismaSpawn;
   const sleep = options.sleep ?? delay;
   const attempts = interactive ? 1 : Math.max(1, maxAttempts);
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    const { code, stderr } = await spawn(invocation.args, interactive);
+    const { code, stderr } = await spawn(invocation.args, interactive, {
+      timeoutMs: interactive ? undefined : attemptTimeoutMs,
+    });
 
     if (code === 0) {
       return 0;
     }
-    if (interactive || attempt >= attempts || !isRetriableMigrationFailure(stderr)) {
+    const retriable = isRetriableMigrationFailure(stderr);
+    if (interactive || !retriable) {
+      return code;
+    }
+    if (attempt >= attempts) {
+      log(
+        `Prisma ${invocation.label} exhausted ${attempts} attempts after ` +
+          'transient schema-engine failures; surfacing the last exit code.',
+      );
       return code;
     }
 
-    const backoff = baseRetryDelayMs * attempt;
+    const backoff = calculateRetryDelay(attempt, baseRetryDelayMs, maxRetryDelayMs);
     log(
       `⚠️  Prisma ${invocation.label} hit a transient schema-engine failure ` +
         `(attempt ${attempt}/${attempts}); retrying in ${backoff}ms...`,
@@ -149,6 +237,16 @@ export async function runPrismaWithRetry(
   }
 
   return 1;
+}
+
+function calculateRetryDelay(
+  attempt: number,
+  baseRetryDelayMs: number,
+  maxRetryDelayMs: number,
+): number {
+  const safeBase = Math.max(0, baseRetryDelayMs);
+  const safeMax = Math.max(safeBase, maxRetryDelayMs);
+  return Math.min(safeMax, safeBase * 2 ** (attempt - 1));
 }
 
 async function writeAllToStderr(bytes: Uint8Array): Promise<void> {
@@ -170,8 +268,10 @@ export async function runMigration(options: MigrationOptions): Promise<number> {
     configPath = 'prisma.config.ts',
     migrationName: requestedMigrationName,
     verbose = true,
-    maxAttempts = 4,
-    baseRetryDelayMs = 750,
+    maxAttempts = 5,
+    baseRetryDelayMs = 1_000,
+    maxRetryDelayMs = 15_000,
+    attemptTimeoutMs = 45_000,
   } = options;
   const log = verbose ? console.log.bind(console) : () => {};
 
@@ -197,7 +297,14 @@ export async function runMigration(options: MigrationOptions): Promise<number> {
         label: 'migrate dev',
         args: ['migrate', 'dev', '--config', configPath, '--name', migrationName],
       },
-      { interactive: !nonInteractive, maxAttempts, baseRetryDelayMs, log },
+      {
+        interactive: !nonInteractive,
+        maxAttempts,
+        baseRetryDelayMs,
+        maxRetryDelayMs,
+        attemptTimeoutMs,
+        log,
+      },
     );
   }
 
@@ -206,7 +313,7 @@ export async function runMigration(options: MigrationOptions): Promise<number> {
     log(`🔄 Non-interactive mode (Aspire: ${hasDbUri}, CI: ${isCI}), using migrate deploy...`);
     return await runPrismaWithRetry(
       { label: 'migrate deploy', args: ['migrate', 'deploy', '--config', configPath] },
-      { interactive: false, maxAttempts, baseRetryDelayMs, log },
+      { interactive: false, maxAttempts, baseRetryDelayMs, maxRetryDelayMs, attemptTimeoutMs, log },
     );
   }
 
@@ -214,7 +321,7 @@ export async function runMigration(options: MigrationOptions): Promise<number> {
   log('🔄 Running interactive migration...');
   return await runPrismaWithRetry(
     { label: 'migrate dev', args: ['migrate', 'dev', '--config', configPath] },
-    { interactive: true, maxAttempts, baseRetryDelayMs, log },
+    { interactive: true, maxAttempts, baseRetryDelayMs, maxRetryDelayMs, attemptTimeoutMs, log },
   );
 }
 

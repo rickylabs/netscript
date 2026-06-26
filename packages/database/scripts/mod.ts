@@ -26,7 +26,9 @@ export {
 export {
   isRetriableMigrationFailure,
   type MigrationOptions,
+  type PrismaInvocation,
   type PrismaSpawn,
+  type PrismaSpawnOptions,
   type PrismaSpawnResult,
   runMigration,
   runMigrationCli,
