@@ -48,20 +48,16 @@ export async function publishWorkspace(
     // so re-running after a partial publish is safe and idempotent. Slow types
     // are accepted workspace-wide.
     //
-    // --unstable-raw-imports enables the `with { type: 'text' }` asset imports
-    // (JSR-safe asset embedding) inside the publish module-graph builder. A
-    // member deno.json cannot carry `unstable` (Deno only honors it in the
-    // workspace-root config), and the root config's `unstable` does not
-    // propagate into per-member publish graph builds, so the feature must be
-    // enabled explicitly on the CLI or publish fails with "The import attribute
-    // type of 'text' is unsupported". The dry-run path does not enforce this, so
-    // the flag must travel with the real publish.
-    const args = [
-      'publish',
-      '--allow-dirty',
-      '--allow-slow-types',
-      '--unstable-raw-imports',
-    ];
+    // Bundled assets are inlined as plain string constants in the *.generated.ts
+    // barrels (see .llm/tools/generate-cli-assets-barrel.ts), NOT imported via
+    // `with { type: 'text' }`. `deno publish`'s module-graph build never enables
+    // `unstable_text_imports`, so text-attribute imports fail at real publish
+    // ("The import attribute type of 'text' is unsupported") even though they
+    // type-check, run, and pass `publish --dry-run`. No `--unstable-*` flag fixes
+    // this: text imports are stable (no flag exists) and `--unstable-raw-imports`
+    // only toggles `bytes` imports, which this workspace does not use. Plain
+    // string constants publish cleanly with no flag.
+    const args = ['publish', '--allow-dirty', '--allow-slow-types'];
     if (options.mode === 'dry-run') {
       args.push('--dry-run');
     }
