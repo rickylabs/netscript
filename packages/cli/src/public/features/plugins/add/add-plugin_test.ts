@@ -8,6 +8,7 @@ import { PluginKindRegistry } from '../../../../kernel/application/registries/pl
 import { PluginRegistryScaffolder } from '../../../../kernel/adapters/plugin/registry-scaffolder.ts';
 import { PluginScaffolder } from '../../../../kernel/adapters/plugin/scaffolder.ts';
 import { PluginWorkspaceMutator } from '../../../../kernel/adapters/plugin/workspace-mutator.ts';
+import type { PluginKindProvider } from '../../../../kernel/domain/plugin-kind.ts';
 import { addPlugin } from './add-plugin.ts';
 import { planPluginAdd } from './plan-plugin-add.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/registries/template-registry.ts';
@@ -16,6 +17,32 @@ import { DEFAULT_TEMPLATE_REGISTRY } from '../../../../kernel/application/regist
 // require a previously-awaited registry hydration. The test drives the flow
 // directly (outside the CLI dispatch path), so hydrate at module load.
 await DEFAULT_TEMPLATE_REGISTRY.hydrate();
+
+const workerProvider: PluginKindProvider = {
+  kind: 'worker',
+  displayName: 'Background Worker',
+  category: 'background-processor',
+  portRangeKey: 'INFRA_PLUGIN',
+  defaultPermissions: [
+    '--allow-net',
+    '--allow-env',
+    '--allow-read',
+    '--allow-write',
+    '--allow-run',
+  ],
+  watchFlag: '--watch',
+  defaultEntrypoint: 'bin/combined.ts',
+  defaultServiceEntrypoint: 'services/src/main.ts',
+  defaultRequiresDb: true,
+  defaultRequiresKv: true,
+  pluginType: 'background-processor',
+  supportsConcurrency: true,
+  concurrencyEnvVar: 'WORKER_CONCURRENCY',
+  defaultConcurrency: 2,
+  defaultTelemetry: true,
+  infrastructureRequires: ['kv'],
+  infrastructureOptionalDeps: ['db'],
+};
 
 describe('public add plugin flow', () => {
   it('plans a starter plugin request from project metadata', async () => {
@@ -79,6 +106,63 @@ describe('public add plugin flow', () => {
     assertEquals(rootDenoJson.workspace.includes('./plugins/*'), true);
     assertFalse(await fs.exists('/workspace/alpha/plugins/registry.ts'));
     assertEquals(result.helperFiles.length, 1);
+  });
+
+  it('keeps canonical plugin add on the JSR stub path without copying official source', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const registry = new PluginKindRegistry();
+    registry.register(workerProvider.kind, workerProvider);
+
+    await addPlugin({
+      kind: 'worker',
+      pluginName: 'workers',
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: true,
+      includeSamples: false,
+      projectRoot: '/workspace/alpha',
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter,
+      registry,
+      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+      workspaceMutator: new PluginWorkspaceMutator(fs),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+    });
+
+    const pluginDenoJson = JSON.parse(
+      await fs.readFile('/workspace/alpha/plugins/workers/deno.json'),
+    );
+    const pluginMod = await fs.readFile('/workspace/alpha/plugins/workers/mod.ts');
+
+    assertStringIncludes(pluginDenoJson.imports['@netscript/plugin'], 'jsr:@netscript/plugin');
+    assertStringIncludes(pluginMod, "import { definePlugin } from '@netscript/plugin';");
+    assertFalse(pluginMod.includes('./src/public/mod.ts'));
+    assertFalse(await fs.exists('/workspace/alpha/plugins/workers/src/public/mod.ts'));
+    assertFalse(await fs.exists('/workspace/alpha/plugins/workers/worker/worker.ts'));
+    assertFalse(await fs.exists('/workspace/alpha/plugins/workers/scaffold.plugin.json'));
+    assertFalse(await fs.exists('/workspace/alpha/workers'));
+  });
+
+  it('does not import maintainer copy helpers from the public plugin add feature', async () => {
+    const publicFeatureFiles = [
+      'packages/cli/src/public/features/plugins/add/add-plugin.ts',
+      'packages/cli/src/public/features/plugins/add/add-plugin-command.ts',
+      'packages/cli/src/public/features/plugins/add/render-plugin.ts',
+    ];
+
+    for (const path of publicFeatureFiles) {
+      const source = await Deno.readTextFile(path);
+      assertFalse(source.includes('copyOfficialPlugin'), path);
+      assertFalse(/\bcopyPlugin\s*\(/.test(source), path);
+      assertFalse(source.includes('maintainer-api'), path);
+    }
   });
 });
 

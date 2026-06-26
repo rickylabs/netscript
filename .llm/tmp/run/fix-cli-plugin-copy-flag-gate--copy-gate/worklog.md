@@ -71,3 +71,24 @@
 Invalid attempt: `run-deno-check.ts --root packages/cli --ext ts,tsx -- --unstable-kv` failed by
 trying to spawn `--unstable-kv`; rerun correctly because the wrapper passes `--unstable-kv` by
 default.
+
+## S2 — public prod no-copy regression lock
+
+### Changes
+
+- Added a public canonical `worker`/`workers` plugin-add regression.
+- Asserted public output remains the JSR stub shape: `@netscript/plugin` resolves to JSR and
+  generated `mod.ts` imports `definePlugin`.
+- Asserted official source-only files are absent from `plugins/workers/`, including
+  `src/public/mod.ts`, `worker/worker.ts`, and `scaffold.plugin.json`.
+- Asserted public plugin-add feature files do not reference `copyOfficialPlugin`, direct
+  `copyPlugin(...)`, or `maintainer-api`.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| plugin-add units | `deno test --allow-all packages/cli/src/public/features/plugins/add/add-plugin_test.ts packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts` | pass; 2 suites, 8 steps |
+| publish dry-run | `deno task publish:dry-run` from `packages/cli` | pass; existing dynamic-import warnings in `plugin-registry.ts` and UI registry, dry run complete |
+| focused lint | `deno lint --no-config --rules-exclude=no-explicit-any packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | pass |
+| focused fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | pass |
