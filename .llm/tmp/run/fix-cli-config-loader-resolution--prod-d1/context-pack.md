@@ -2,7 +2,7 @@
 
 ## Current State
 
-Run artifacts are initialized under
+Implementation slice S1 is committed as `a5e95ad8` under
 `.llm/tmp/run/fix-cli-config-loader-resolution--prod-d1/`.
 
 ## Locked Plan
