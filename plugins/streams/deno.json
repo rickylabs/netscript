@@ -11,10 +11,19 @@
     "./aspire": "./src/aspire/mod.ts"
   },
   "imports": {
+    "@durable-streams/client": "npm:@durable-streams/client@^0.2.6",
+    "@durable-streams/server": "npm:@durable-streams/server@^0.3.7",
+    "@netscript/aspire": "jsr:@netscript/aspire@0.0.1-alpha.4",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.4",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.4",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-alpha.4",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.4",
+    "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@std/net": "jsr:@std/net@^1",
     "@standard-schema/spec": "jsr:@standard-schema/spec@1.1.0",
     "hono": "jsr:@hono/hono@4.12.24",
-    "hono/cors": "jsr:@hono/hono@4.12.24/cors"
+    "hono/cors": "jsr:@hono/hono@4.12.24/cors",
+    "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/cli/composition/main.ts src/scaffolding/mod.ts src/e2e/mod.ts src/e2e/probes/*.ts src/aspire/mod.ts verify-plugin.ts services/src/main.ts",

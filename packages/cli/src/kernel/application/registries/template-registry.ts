@@ -1,29 +1,27 @@
 import { Manifest, type ManifestEntry } from '../abstracts/manifest.ts';
 import { isTemplateKey, TEMPLATE_MANIFEST, type TemplateKey } from '../../assets/manifest.ts';
+import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 
 export interface TemplateValue {
   readonly path: TemplateKey;
-  readonly url: URL;
-  readonly content?: string;
+  readonly content: string;
 }
-
-const ASSET_ROOT_URL = new URL('../../assets/', import.meta.url);
 
 export class TemplateRegistry extends Manifest<TemplateKey, TemplateValue> {
   readonly id = 'template-registry';
 
   readonly #entries = new Map<TemplateKey, TemplateValue>();
-  #hydratePromise: Promise<void> | undefined;
 
   constructor(
     manifest: readonly { readonly key: TemplateKey; readonly path: TemplateKey }[] =
       TEMPLATE_MANIFEST,
+    content: Readonly<Record<TemplateKey, string>> = EMBEDDED_TEMPLATE_CONTENT,
   ) {
     super();
     for (const item of manifest) {
       this.register(item.key, {
         path: item.path,
-        url: new URL(item.path, ASSET_ROOT_URL),
+        content: content[item.key],
       });
     }
   }
@@ -42,27 +40,15 @@ export class TemplateRegistry extends Manifest<TemplateKey, TemplateValue> {
 
   read(key: TemplateKey): Promise<string> {
     const value = this.get(key);
-    if (!value?.content) {
+    if (!value) {
       throw new Error(`Template asset is not registered: ${key}`);
     }
     return Promise.resolve(value.content);
   }
 
-  /** Hydrate every registered template asset into memory. */
+  /** Preserve the previous startup hook; embedded assets are already loaded. */
   hydrate(): Promise<void> {
-    if (this.#hydratePromise) {
-      return this.#hydratePromise;
-    }
-    this.#hydratePromise = this.#hydrate();
-    return this.#hydratePromise;
-  }
-
-  async #hydrate(): Promise<void> {
-    for (const [key, value] of this.entries()) {
-      const response = await fetch(value.url);
-      const content = await response.text();
-      this.#entries.set(key, { ...value, content });
-    }
+    return Promise.resolve();
   }
 
   load(_root = ''): Promise<readonly ManifestEntry<TemplateKey, TemplateValue>[]> {

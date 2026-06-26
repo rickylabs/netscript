@@ -16,6 +16,7 @@ import {
   deriveContainerDbResourceName,
   deriveSqliteDbFileName,
 } from '../../templates/aspire/generate-appsettings.ts';
+import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
 import {
   generateDatabaseDenoJson,
   generateDatabaseFacadeMod,
@@ -24,36 +25,7 @@ import {
 } from '../../templates/database/database-generators.ts';
 import { DbEngineRegistry } from '../../application/registries/db-engine-registry.ts';
 import type { DatabaseScaffoldOptions, DatabaseScaffoldResult } from '../../domain/db-engine.ts';
-import { readTemplateAsset } from '../templates/template-asset.ts';
-
-const SCHEMA_TEMPLATE = new URL(
-  '../../assets/database/schema.prisma.template',
-  import.meta.url,
-);
-const SEED_TEMPLATE = new URL(
-  '../../assets/database/seed.ts.template',
-  import.meta.url,
-);
-const FIX_ZOD_IMPORTS_TEMPLATE = new URL(
-  '../../assets/database/scripts/fix-zod-imports.ts.template',
-  import.meta.url,
-);
-const GENERATE_ZOD_TEMPLATE = new URL(
-  '../../assets/database/scripts/generate-zod.ts.template',
-  import.meta.url,
-);
-const MIGRATE_TEMPLATE = new URL(
-  '../../assets/database/scripts/migrate.ts.template',
-  import.meta.url,
-);
-const PATCH_PRISMA_CLIENT_TEMPLATE = new URL(
-  '../../assets/database/scripts/patch-prisma-client.ts.template',
-  import.meta.url,
-);
-const ZOD_GENERATOR_CONFIG_TEMPLATE = new URL(
-  '../../assets/database/zod-generator.config.json.template',
-  import.meta.url,
-);
+import { renderTemplateAssetSync } from '../templates/template-asset.ts';
 
 function generatePlaceholderPrismaClient(): string {
   return `// This file is seeded by netscript init and replaced by Prisma generation.
@@ -102,7 +74,7 @@ export class DatabaseScaffolder {
   constructor(
     private readonly scaffolder: ScaffolderPort,
     private readonly fs: FileSystemPort,
-    private readonly templateAdapter: TemplatePort,
+    private readonly _templateAdapter: TemplatePort,
     private readonly registry: DbEngineRegistry = new DbEngineRegistry(),
   ) {}
 
@@ -156,23 +128,6 @@ export class DatabaseScaffolder {
       configKey,
       databaseName,
     };
-    const [
-      schemaTemplate,
-      seedTemplate,
-      fixZodImportsTemplate,
-      generateZodTemplate,
-      migrateTemplate,
-      patchPrismaClientTemplate,
-      zodGeneratorConfigTemplate,
-    ] = await Promise.all([
-      readTemplateAsset(SCHEMA_TEMPLATE),
-      readTemplateAsset(SEED_TEMPLATE),
-      readTemplateAsset(FIX_ZOD_IMPORTS_TEMPLATE),
-      readTemplateAsset(GENERATE_ZOD_TEMPLATE),
-      readTemplateAsset(MIGRATE_TEMPLATE),
-      readTemplateAsset(PATCH_PRISMA_CLIENT_TEMPLATE),
-      readTemplateAsset(ZOD_GENERATOR_CONFIG_TEMPLATE),
-    ]);
 
     await write(
       join(workspaceDir, SCAFFOLD_FILES.DENO_JSON),
@@ -193,7 +148,7 @@ export class DatabaseScaffolder {
     await write(join(workspaceDir, SCAFFOLD_FILES.MOD), generateEngineMod(provider, { configKey }));
     await write(
       join(schemaDir, 'schema.prisma'),
-      await this.templateAdapter.render(schemaTemplate, templateVars),
+      renderTemplateAssetSync(TEMPLATE_KEYS.databaseSchema, templateVars),
     );
     await write(
       join(generatedDir, provider.capabilities.clientEntrypoint),
@@ -201,34 +156,34 @@ export class DatabaseScaffolder {
     );
     await write(
       join(scriptsDir, 'seed.ts'),
-      await this.templateAdapter.render(seedTemplate, templateVars),
+      renderTemplateAssetSync(TEMPLATE_KEYS.databaseSeed, templateVars),
     );
     await write(
       join(scriptsDir, 'fix-zod-imports.ts'),
-      await this.templateAdapter.render(fixZodImportsTemplate, templateVars),
+      renderTemplateAssetSync(TEMPLATE_KEYS.databaseScriptsFixZodImports, templateVars),
     );
     await write(
       join(scriptsDir, 'migrate.ts'),
-      await this.templateAdapter.render(migrateTemplate, templateVars),
+      renderTemplateAssetSync(TEMPLATE_KEYS.databaseScriptsMigrate, templateVars),
     );
     await write(join(scriptsDir, 'clear-seeded-client.ts'), generateClearSeededPrismaClient());
 
     if (provider.capabilities.hasZodGeneration) {
-      const zodGeneratorConfig = await this.templateAdapter.render(
-        zodGeneratorConfigTemplate,
+      const zodGeneratorConfig = renderTemplateAssetSync(
+        TEMPLATE_KEYS.databaseZodGeneratorConfig,
         templateVars,
       );
       await write(join(workspaceDir, 'zod-generator.config.json'), zodGeneratorConfig);
       await write(join(schemaDir, 'zod-generator.config.json'), zodGeneratorConfig);
       await write(
         join(scriptsDir, 'generate-zod.ts'),
-        await this.templateAdapter.render(generateZodTemplate, templateVars),
+        renderTemplateAssetSync(TEMPLATE_KEYS.databaseScriptsGenerateZod, templateVars),
       );
     }
 
     await write(
       join(scriptsDir, 'patch-prisma-client.ts'),
-      await this.templateAdapter.render(patchPrismaClientTemplate, templateVars),
+      renderTemplateAssetSync(TEMPLATE_KEYS.databaseScriptsPatchPrismaClient, templateVars),
     );
 
     const scaffoldResult: ScaffoldResult = {

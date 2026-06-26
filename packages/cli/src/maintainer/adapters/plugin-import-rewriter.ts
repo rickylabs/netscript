@@ -69,15 +69,66 @@ function rewriteImports(
     : imports;
 
   if (importMode === "local") {
-    return materializeCatalogImports(localImports, catalog);
+    return normalizeRegistrySubpathImports(
+      materializeCatalogImports(localImports, catalog),
+    );
   }
 
-  return Object.fromEntries(
-    Object.entries(localImports).map(([specifier, target]) => [
-      specifier,
-      rewritePackagePathToJsr(target) ?? target,
-    ]),
+  return normalizeRegistrySubpathImports(
+    Object.fromEntries(
+      Object.entries(localImports).map(([specifier, target]) => [
+        specifier,
+        rewritePackagePathToJsr(target) ?? target,
+      ]),
+    ),
   );
+}
+
+function normalizeRegistrySubpathImports(
+  imports: Record<string, string>,
+): Record<string, string> {
+  const normalized: Record<string, string> = {};
+  for (const [specifier, target] of Object.entries(imports)) {
+    const match = parseRegistrySubpathTarget(target);
+    if (!match || specifier !== `${match.packageName}${match.subpath}`) {
+      normalized[specifier] = target;
+      continue;
+    }
+
+    const rootTarget = `${match.scheme}:${match.packageName}@${match.version}`;
+    const existingRoot = imports[match.packageName];
+    if (existingRoot && existingRoot !== rootTarget) {
+      normalized[specifier] = target;
+      continue;
+    }
+
+    normalized[match.packageName] ??= rootTarget;
+  }
+  return normalized;
+}
+
+function parseRegistrySubpathTarget(target: string): {
+  readonly scheme: "npm" | "jsr";
+  readonly packageName: string;
+  readonly version: string;
+  readonly subpath: string;
+} | null {
+  const match =
+    /^(?<scheme>npm|jsr):(?<packageName>@[^/]+\/[^@/]+|[^@/]+)@(?<version>[^/]+)(?<subpath>\/.+)$/
+      .exec(target);
+  if (!match?.groups) {
+    return null;
+  }
+  const scheme = match.groups.scheme;
+  if (scheme !== "npm" && scheme !== "jsr") {
+    return null;
+  }
+  return {
+    scheme,
+    packageName: match.groups.packageName,
+    version: match.groups.version,
+    subpath: match.groups.subpath,
+  };
 }
 
 function materializeCatalogImports(

@@ -209,7 +209,7 @@ export interface DispatchPluginVerbOptions {
   };
 }
 
-/** Dispatch a framework plugin verb through `deno dx jsr:<pkg>/cli`. */
+/** Dispatch a framework plugin verb through `deno x -A jsr:<pkg>/cli`. */
 export function dispatchPluginVerb(
   verb: FrameworkVerb,
   pkg: string,
@@ -233,10 +233,10 @@ export interface PluginScaffoldOptions {
   readonly pluginName: string;
   /** Directory that receives generated files. */
   readonly targetPath: string;
-  /** Directory containing plugin skeleton templates. */
-  readonly templateRoot: string;
   /** Optional template path registry. */
   readonly templateRegistry?: readonly string[];
+  /** Optional embedded template content keyed by registry path. */
+  readonly templateContent?: Readonly<Record<string, string>>;
   /** Whether existing files may be overwritten. */
   readonly overwrite?: boolean;
 }

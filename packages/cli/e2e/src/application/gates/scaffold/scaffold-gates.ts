@@ -25,9 +25,11 @@ export function createPreflightGates(): readonly GateDefinition[] {
 function scaffoldInitCommand(context: RunContext): readonly string[] {
   if (
     context.request.options.packageSource === PACKAGE_SOURCE.JSR &&
-    !context.project.cliEntrypoint.startsWith('jsr:@netscript/cli@')
+    !isJsrCompatibleCliEntrypoint(context.project.cliEntrypoint)
   ) {
-    throw new Error('--source jsr requires --cli jsr:@netscript/cli@<version>.');
+    throw new Error(
+      '--source jsr requires --cli jsr:@netscript/cli@<version> or --cli packages/cli/bin/netscript.ts.',
+    );
   }
 
   return cli(
@@ -48,6 +50,12 @@ function scaffoldInitCommand(context: RunContext): readonly string[] {
     '--no-git',
     '--force',
   );
+}
+
+function isJsrCompatibleCliEntrypoint(cliEntrypoint: string): boolean {
+  const normalized = cliEntrypoint.replaceAll('\\', '/');
+  return normalized.startsWith('jsr:@netscript/cli@') ||
+    normalized.endsWith('packages/cli/bin/netscript.ts');
 }
 
 /** Create scaffold-phase gates for the generated project and plugins. */

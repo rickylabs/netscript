@@ -79,27 +79,31 @@ export function createRuntimeGates(): readonly GateDefinition[] {
         'Json',
       ],
     ),
-    httpGate(GATE.BEHAVIOR_WORKERS_HEALTH, 'Workers API health', 'http://localhost:8091/health'),
+    httpGate(
+      GATE.BEHAVIOR_WORKERS_HEALTH,
+      'Workers API health',
+      'http://127.0.0.1:8091/health/live',
+    ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_JOBS,
       'List worker jobs',
-      'http://localhost:8091/api/v1/workers/jobs',
+      'http://127.0.0.1:8091/api/v1/workers/jobs',
     ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_TASKS,
       'List worker tasks',
-      'http://localhost:8091/api/v1/workers/tasks',
+      'http://127.0.0.1:8091/api/v1/workers/tasks',
     ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_SEED,
       'Seed worker demo data through API',
-      'http://localhost:8091/api/v1/workers/seed',
+      'http://127.0.0.1:8091/api/v1/workers/seed',
       'POST',
     ),
     httpGate(
       GATE.BEHAVIOR_WORKERS_TRIGGER_HEALTH_JOB,
       'Trigger workers plugin health job',
-      'http://localhost:8091/api/v1/workers/jobs/workers-plugin-health-check/trigger',
+      'http://127.0.0.1:8091/api/v1/workers/jobs/workers-plugin-health-check/trigger',
       'POST',
     ),
     commandGate(
@@ -108,16 +112,16 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       GATE_PHASE.BEHAVIOR,
       () => ['deno', 'eval', VALIDATE_WORKER_EXECUTIONS_SCRIPT],
     ),
-    httpGate(GATE.BEHAVIOR_SAGAS_HEALTH, 'Sagas API health', 'http://localhost:8092/health/live'),
+    httpGate(GATE.BEHAVIOR_SAGAS_HEALTH, 'Sagas API health', 'http://127.0.0.1:8092/health/live'),
     httpGate(
       GATE.BEHAVIOR_SAGAS_LIST,
       'List saga definitions',
-      'http://localhost:8092/api/v1/sagas/sagas',
+      'http://127.0.0.1:8092/api/v1/sagas/sagas',
     ),
     httpGate(
       GATE.BEHAVIOR_SAGAS_INSTANCES,
       'List saga instances',
-      'http://localhost:8092/api/v1/sagas/instances',
+      'http://127.0.0.1:8092/api/v1/sagas/instances',
     ),
     httpGate(
       GATE.BEHAVIOR_TRIGGERS_HEALTH,
@@ -149,12 +153,12 @@ export function createRuntimeGates(): readonly GateDefinition[] {
       GATE_PHASE.BEHAVIOR,
       () => ['deno', 'eval', VALIDATE_TRIGGER_EVENTS_SCRIPT],
     ),
-    httpGate(GATE.BEHAVIOR_AUTH_LIVE, 'Auth API liveness', 'http://localhost:8094/health/live'),
-    httpGate(GATE.BEHAVIOR_AUTH_READY, 'Auth API readiness', 'http://localhost:8094/health/ready'),
+    httpGate(GATE.BEHAVIOR_AUTH_LIVE, 'Auth API liveness', 'http://127.0.0.1:8094/health/live'),
+    httpGate(GATE.BEHAVIOR_AUTH_READY, 'Auth API readiness', 'http://127.0.0.1:8094/health/ready'),
     httpGate(
       GATE.BEHAVIOR_AUTH_SESSION,
       'Read auth session route',
-      'http://localhost:8094/api/v1/auth/session',
+      'http://127.0.0.1:8094/api/v1/auth/session',
     ),
   ];
 }
@@ -179,7 +183,7 @@ const AUTH_SMOKE_ENV_SCRIPT = [
   '  NETSCRIPT_AUTH_CLIENT_SECRET: "scaffold_runtime_smoke_secret",',
   '  NETSCRIPT_AUTH_AUTHORIZATION_ENDPOINT: "https://issuer.example.test/oauth/authorize",',
   '  NETSCRIPT_AUTH_TOKEN_ENDPOINT: "https://issuer.example.test/oauth/token",',
-  '  NETSCRIPT_AUTH_REDIRECT_URI: "http://localhost:8094/api/v1/auth/callback",',
+  '  NETSCRIPT_AUTH_REDIRECT_URI: "http://127.0.0.1:8094/api/v1/auth/callback",',
   '  NETSCRIPT_AUTH_KV_OAUTH_KEY: "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=",',
   '  NETSCRIPT_AUTH_ALLOW_INSECURE_REQUESTS: "true",',
   '};',
@@ -205,15 +209,15 @@ const AUTH_SMOKE_ENV_SCRIPT = [
 ].join('\n');
 
 const VALIDATE_WORKER_EXECUTIONS_SCRIPT = [
-  'const url = "http://localhost:8091/api/v1/workers/executions?limit=10";',
-  'for (let attempt = 1; attempt <= 10; attempt++) {',
+  'const url = "http://127.0.0.1:8091/api/v1/workers/executions?limit=10";',
+  'for (let attempt = 1; attempt <= 30; attempt++) {',
   '  const response = await fetch(url);',
   '  if (!response.ok) throw new Error("HTTP " + response.status + " from " + url);',
   '  const body = await response.json() as { executions?: unknown[]; total?: number };',
   '  if (!Array.isArray(body.executions)) throw new Error("executions response is missing executions[]");',
   '  if (typeof body.total !== "number") throw new Error("executions response is missing total");',
   '  if (body.total >= 1) break;',
-  '  if (attempt === 10) throw new Error("expected at least one worker execution after trigger gate");',
+  '  if (attempt === 30) throw new Error("expected at least one worker execution after trigger gate");',
   '  await new Promise((resolve) => setTimeout(resolve, 1_000));',
   '}',
 ].join('\n');

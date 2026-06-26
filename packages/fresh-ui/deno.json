@@ -7,12 +7,12 @@
   "exports": {
     ".": "./mod.ts",
     "./interactive": "./interactive.ts",
-    "./primitives": "./primitives.tsx"
+    "./primitives": "./primitives.tsx",
+    "./registry": "./registry.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
-    "preact/hooks": "npm:preact@^10.29.2/hooks",
-    "preact/jsx-runtime": "npm:preact@^10.29.2/jsx-runtime"
+    "preact": "npm:preact@^10.29.2"
   },
   "publish": {
     "include": [

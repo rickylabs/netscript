@@ -9,29 +9,16 @@ import {
   type TemplateValue,
 } from '../../application/registries/template-registry.ts';
 import type { TemplateKey } from '../../assets/manifest.ts';
-
-const TEMPLATE_REGISTRY_NOT_HYDRATED =
-  'Template registry not hydrated — await DEFAULT_TEMPLATE_REGISTRY.hydrate() before sync template reads';
+import { renderTemplate } from '../scaffold/template-adapter.ts';
 
 /** Read a scaffold template asset shipped with the CLI package. */
-export async function readTemplateAsset(template: URL | TemplateKey): Promise<string> {
-  if (typeof template === 'string') {
-    const asset = getTemplateAsset(template);
-    if (asset.content === undefined) {
-      await DEFAULT_TEMPLATE_REGISTRY.hydrate();
-    }
-    return getHydratedTemplateContent(template);
-  }
-  const response = await fetch(template);
-  return await response.text();
+export function readTemplateAsset(template: TemplateKey): Promise<string> {
+  return Promise.resolve(readTemplateAssetSync(template));
 }
 
 /** Synchronously read a scaffold template asset shipped with the CLI package. */
-export function readTemplateAssetSync(template: URL | TemplateKey): string {
-  if (typeof template === 'string') {
-    return getHydratedTemplateContent(template);
-  }
-  throw new Error(TEMPLATE_REGISTRY_NOT_HYDRATED);
+export function readTemplateAssetSync(template: TemplateKey): string {
+  return getTemplateAsset(template).content;
 }
 
 /** Synchronously read and interpolate a scaffold template asset. */
@@ -39,11 +26,7 @@ export function renderTemplateAssetSync(
   template: TemplateKey,
   variables: Readonly<Record<string, string>>,
 ): string {
-  let content = readTemplateAssetSync(template);
-  for (const [key, value] of Object.entries(variables)) {
-    content = content.replaceAll(`{{${key}}}`, value);
-  }
-  return content;
+  return renderTemplate(readTemplateAssetSync(template), { ...variables });
 }
 
 /** Resolve a registered scaffold template asset. */
@@ -53,13 +36,4 @@ export function getTemplateAsset(template: TemplateKey): TemplateValue {
     throw new Error(`Template asset is not registered: ${template}`);
   }
   return asset;
-}
-
-function getHydratedTemplateContent(template: TemplateKey): string {
-  const asset = getTemplateAsset(template);
-  const content = asset.content;
-  if (content === undefined) {
-    throw new Error(TEMPLATE_REGISTRY_NOT_HYDRATED);
-  }
-  return content;
 }

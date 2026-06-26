@@ -66,7 +66,7 @@ describe('public add database flow', () => {
     assertEquals(appsettings.NetScript.Databases.primary.Engine, 'Sqlite');
     assertEquals(denoJson.workspace.includes('./database/sqlite'), true);
     assertStringIncludes(
-      dbDenoJson.imports['@netscript/database/scripts'],
+      dbDenoJson.imports['@netscript/database'],
       'jsr:@netscript/database',
     );
   });

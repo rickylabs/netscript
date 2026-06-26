@@ -1,6 +1,7 @@
 import type { GateId, GatePhase } from '../../../domain/cli-surface.ts';
 import { GATE_PHASE } from '../../../domain/cli-surface.ts';
 import { PACKAGE_SOURCE } from '../../../domain/extension-axes.ts';
+import { resolve } from '@std/path';
 import type {
   CommandFactory,
   GateDefinition,
@@ -18,7 +19,10 @@ export function cli(context: RunContext, ...args: string[]): readonly string[] {
   const denoFlags = context.project.cliEntrypoint.startsWith('jsr:@netscript/cli@')
     ? ['-A', '--minimum-dependency-age=0']
     : ['-A'];
-  return ['deno', 'run', ...denoFlags, context.project.cliEntrypoint, ...args];
+  const cliEntrypoint = context.project.cliEntrypoint.startsWith('jsr:')
+    ? context.project.cliEntrypoint
+    : resolve(context.project.repoRoot, context.project.cliEntrypoint);
+  return ['deno', 'run', ...denoFlags, cliEntrypoint, ...args];
 }
 
 /**

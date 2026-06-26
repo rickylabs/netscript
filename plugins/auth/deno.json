@@ -13,11 +13,20 @@
     "./streams/server": "./streams/server.ts"
   },
   "imports": {
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.4",
+    "@netscript/auth-better-auth": "jsr:@netscript/auth-better-auth@0.0.1-alpha.4",
+    "@netscript/auth-kv-oauth": "jsr:@netscript/auth-kv-oauth@0.0.1-alpha.4",
+    "@netscript/auth-workos": "jsr:@netscript/auth-workos@0.0.1-alpha.4",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.4",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.4",
+    "@netscript/plugin-auth-core": "jsr:@netscript/plugin-auth-core@0.0.1-alpha.4",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-alpha.4",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.4",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-alpha.4",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
     "@workos-inc/node": "npm:@workos-inc/node@^10.4.0",
     "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
-    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db",
     "zod": "jsr:@zod/zod@4.4.3"
   },
   "tasks": {

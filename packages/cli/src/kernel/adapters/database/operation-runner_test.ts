@@ -144,6 +144,44 @@ describe('DbOperationRunner', () => {
     });
   });
 
+  it('keeps polling when Aspire describe returns empty output during startup', async () => {
+    await withAspireStartTimeout(undefined, async () => {
+      const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');
+      const executor = new FakeAspireExecutor([
+        { code: 0, stdout: '{"appHostPid":123}', stderr: '' },
+        { code: 0, stdout: '', stderr: '' },
+        {
+          code: 0,
+          stdout: JSON.stringify([
+            {
+              appHostPath: apphostPath,
+              resources: [
+                {
+                  displayName: 'prisma-migrate-postgres',
+                  resourceType: 'Executable',
+                  state: 'Finished',
+                  exitCode: 0,
+                },
+              ],
+            },
+          ]),
+          stderr: '',
+        },
+        { code: 0, stdout: 'Migration applied.', stderr: '' },
+        { code: 0, stdout: 'stopped', stderr: '' },
+      ]);
+      const runner = createFastRunner(executor);
+
+      const code = await runner.execute(
+        createRequest('migrate', { migrationName: 'init' }),
+      );
+
+      assertEquals(code, 0);
+      assertEquals(executor.outputCalls[1].args[0], 'describe');
+      assertEquals(executor.outputCalls[2].args[0], 'describe');
+    });
+  });
+
   it('uses the default Aspire CLI start timeout when the operator value is empty', async () => {
     await withAspireStartTimeout('', async () => {
       const apphostPath = join(PROJECT_ROOT, 'aspire', 'apphost.mts');

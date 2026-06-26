@@ -32,12 +32,10 @@
     "@std/path": "jsr:@std/path@^1",
     "@std/text": "jsr:@std/text@^1",
     "fresh": "jsr:@fresh/core@^2.3.3",
-    "preact/compat": "npm:preact@^10.29.2/compat",
-    "preact/hooks": "npm:preact@^10.29.2/hooks",
-    "preact/jsx-runtime": "npm:preact@^10.29.2/jsx-runtime",
-    "preact-render-to-string/stream": "npm:preact-render-to-string@^6.7.0/stream",
+    "preact": "npm:preact@^10.29.2",
+    "preact-render-to-string": "npm:preact-render-to-string@^6.7.0",
     "zod": "jsr:@zod/zod@4.4.3",
-    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db"
+    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1"
   },
   "publish": {
     "include": [

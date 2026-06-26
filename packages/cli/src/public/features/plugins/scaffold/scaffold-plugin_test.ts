@@ -1,7 +1,9 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
 import { assert, assertEquals, assertStringIncludes, assertThrows } from 'jsr:@std/assert@^1';
-import { join } from '@std/path';
-import { PLUGIN_SKELETON_TEMPLATES } from '@netscript/plugin/templates';
+import {
+  PLUGIN_SKELETON_TEMPLATES,
+  type PluginSkeletonTemplatePath,
+} from '@netscript/plugin/templates';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
 import {
@@ -14,12 +16,11 @@ import { expandTemplate } from './template-substitution.ts';
 describe('plugin scaffold use case', () => {
   it('writes registered plugin skeleton templates with semantic substitutions', async () => {
     const fs = new MemoryFileSystemAdapter();
-    await writeTemplateFiles(fs, '/templates/plugin');
 
     const result = await scaffoldPluginPackage({
       pluginName: '@acme/plugin-billing',
       targetPath: '/workspace/alpha/plugins/plugin-billing',
-      templateRoot: '/templates/plugin',
+      templateContent: buildTemplateContentMap(),
       overwrite: false,
     }, { fs });
 
@@ -44,13 +45,12 @@ describe('plugin scaffold use case', () => {
 
   it('skips existing files unless overwrite is enabled', async () => {
     const fs = new MemoryFileSystemAdapter();
-    await writeTemplateFiles(fs, '/templates/plugin');
     await fs.writeFile('/workspace/alpha/plugins/plugin-billing/README.md', 'kept');
 
     const result = await scaffoldPluginPackage({
       pluginName: '@acme/plugin-billing',
       targetPath: '/workspace/alpha/plugins/plugin-billing',
-      templateRoot: '/templates/plugin',
+      templateContent: buildTemplateContentMap(),
       overwrite: false,
     }, { fs });
 
@@ -86,13 +86,13 @@ describe('plugin scaffold use case', () => {
   });
 });
 
-async function writeTemplateFiles(
-  fs: MemoryFileSystemAdapter,
-  templateRoot: string,
-): Promise<void> {
-  for (const templatePath of PLUGIN_SKELETON_TEMPLATES) {
-    await fs.writeFile(join(templateRoot, templatePath), buildTemplateContent(templatePath));
-  }
+function buildTemplateContentMap(): Record<PluginSkeletonTemplatePath, string> {
+  return Object.fromEntries(
+    PLUGIN_SKELETON_TEMPLATES.map((templatePath) => [
+      templatePath,
+      buildTemplateContent(templatePath),
+    ]),
+  ) as Record<PluginSkeletonTemplatePath, string>;
 }
 
 function buildTemplateContent(templatePath: string): string {
