@@ -36,17 +36,44 @@ Codex Desktop/mobile -> SSH target codex-wsl -> WSL Ubuntu codex user -> codex a
 ### Default tooling — the agentic suite (use this before hand-rolling PowerShell)
 
 `.llm/tools/agentic/` is the **default mechanism** for staging, launching, watching, steering, and
-inspecting Codex slices. It defends every landmine below in code (PowerShell `<`/`$()` parse errors,
-CRLF-corrupted bash scripts, inherited-upstream push-to-main, rival concurrent sends) and is
-unit-tested. Reach for these before writing a fresh `ssh.exe`/`wsl.exe` one-liner. See
-`.llm/tools/agentic/README.md` for full flags and exit codes.
+inspecting Codex slices (and dispatching/reading OpenHands). It defends every landmine below in code
+(PowerShell `<`/`$()` parse errors, CRLF-corrupted bash scripts, inherited-upstream push-to-main,
+rival concurrent sends, leaked tokens) and is unit-tested. Reach for these before writing a fresh
+`ssh.exe`/`wsl.exe` one-liner. **Used together they fully cover the supervision loop** — launch,
+progress, finish, steer, evaluate, merge — so you should rarely need a raw shell call. Full flags and
+exit codes: `.llm/tools/agentic/README.md`.
 
-| Need | Tool |
-| ---- | ---- |
-| Validate brief → push-safety gate → stage → launch a slice → record thread id | `launch-codex-slice.ts` (`--dry-run`, `--parse-log <log>`) |
-| Read-only daemon health, worktree git state, recent sessions | `codex-status.ts` |
-| Event-driven wait on a worktree's git activity (**run inside WSL**) | `codex-watch.ts` |
-| Steer an existing thread (never forks a rival) | `codex-resume.ts --thread-id <uuid> --message …` (`--dry-run`) |
+| Phase | Need | Tool |
+| ----- | ---- | ---- |
+| **Launch** | Validate brief → push-safety gate → stage (CRLF-stripped) → launch a slice → record thread id | `launch-codex-slice.ts` (`--dry-run`, `--parse-log <log>`) |
+| **Inspect** | Read-only daemon health, worktree git state + logs path, recent session rollouts | `codex-status.ts` (`--worktree`, `--pretty`) |
+| **Watch — progress** | Wake on the worktree's next **git** event (commit/ref) — *slice made progress* | `codex-watch.ts --worktree <wt>` (**run inside WSL**) |
+| **Watch — finish** | Wake when the agent's **turn finishes** (rollout `task_complete`) — *agent is idle/done* | `codex-watch.ts --mode turn --thread-id <uuid>` (**run inside WSL**) |
+| **Steer** | Continue/correct an existing thread (never forks a rival) | `codex-resume.ts --thread-id <uuid> --message …` (`--dry-run`) |
+| **Evaluate** | Dispatch an `@openhands-agent` PLAN/IMPL-EVAL; read its verdict | `dispatch-openhands.ts`, `openhands-status.ts` |
+| **Merge** | Eval-gated, clean-gated, base-guarded leaf-PR lifecycle | `gh-pr.ts create\|verdict\|merge` |
+
+**The watch distinction is the one that bites you.** `codex-watch` has two signals and they answer
+different questions:
+
+- `--mode git` (default) watches the worktree's gitdir `logs` and fires on the next commit/ref write.
+  It tells you the slice *progressed* — it does **not** tell you the agent stopped. A turn can commit
+  mid-flight and keep working, or finish a whole turn with no commit at all. Re-arm it after each
+  event to keep surfacing commits as the slice runs.
+- `--mode turn` watches the thread's session rollout `.jsonl` (`rollout-<ts>-<uuid>.jsonl` under
+  `~/.codex/sessions`, resolved from `--thread-id`) and fires when the latest record is
+  `task_complete` — the daemon's end-of-turn marker. This is the **"agent finished / is idle"** signal.
+  If the thread is already idle when armed it returns at once with `alreadyIdle:true`. Use this to
+  know when a steered turn is actually done (vs. just having committed), and before deciding whether
+  the thread is free to steer again.
+
+Run **both** in parallel when supervising: git-mode to narrate commits, turn-mode to detect idle.
+Both exit `0` on their event, `2` on the `--timeout-seconds` heartbeat (re-arm; a hung agent still
+re-wakes you), `1` on bad args / unresolved worktree|rollout. Determine a thread's live state any
+time with `codex-status.ts` (daemon proc count + newest rollouts) — and remember its non-login shell
+may not resolve `~`/PATH; a one-off `wsl.exe --cd /home/codex -u codex -- bash -lc '…'` with a literal
+absolute sessions path is the fallback (avoid `$`/`@{}`/`~` inside a PowerShell-wrapped bash string —
+PowerShell expands them before WSL sees them).
 
 The suite enforces the one-active-send-per-worktree and explicit-refspec-push rules described in
 this skill; `codex-resume.ts` is the supported steering path (it issues exactly one
@@ -225,9 +252,11 @@ Prefer the agentic suite: `launch-codex-slice.ts` validates the brief, runs the 
 stages with CRLF stripped, launches, and records the thread id for you (see the table above).
 
 Supervise without polling: run `.llm/tools/watch-run.ts <run-dir>` (run-artifact watcher), or
-`.llm/tools/agentic/codex-watch.ts --worktree <wsl path>` from inside WSL to wake on git activity.
-Steer only with `.llm/tools/agentic/codex-resume.ts` (or `codex exec resume <thread-id>`); never
-fire a second `send-message-v2` at the same worktree.
+`.llm/tools/agentic/codex-watch.ts` from inside WSL — `--worktree <wsl path>` to wake on git
+activity (progress), and `--mode turn --thread-id <uuid>` to wake when the turn finishes (idle). The
+git event alone does not mean the agent stopped; pair the two. Steer only with
+`.llm/tools/agentic/codex-resume.ts` (or `codex exec resume <thread-id>`); never fire a second
+`send-message-v2` at the same worktree.
 
 For full CLI E2E, use the `netscript-cli` skill and run:
 

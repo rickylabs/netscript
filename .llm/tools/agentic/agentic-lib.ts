@@ -187,6 +187,57 @@ export function parseThreadInfo(log: string): ThreadInfo {
 }
 
 // ---------------------------------------------------------------------------
+// Codex rollout turn-state parsing (pure)
+// ---------------------------------------------------------------------------
+
+/**
+ * Rollout records that are post-turn bookkeeping and do NOT change idle/busy
+ * state. A `token_count` event is emitted both mid-turn and as a trailing line
+ * after `task_complete`, so it must be skipped when deciding the terminal event.
+ */
+const ROLLOUT_BOOKKEEPING = new Set(['token_count']);
+
+export interface TurnState {
+  /** Event type of the latest *meaningful* record (bookkeeping skipped), or null. */
+  lastEvent: string | null;
+  /** True when the thread's latest turn has completed (idle) — terminal `task_complete`. */
+  turnComplete: boolean;
+}
+
+/**
+ * Decide whether a Codex thread's latest turn has completed, from the TAIL of its
+ * session rollout `.jsonl`. The daemon writes one JSON record per line; a turn
+ * ends with a `task_complete` event (carried as `payload.type`, sometimes the
+ * top-level `type`), optionally followed by a trailing `token_count` bookkeeping
+ * line. We scan the tail bottom-up, skip bookkeeping, and report the first
+ * meaningful event: `task_complete` ⇒ idle/done; anything else (`agent_message`,
+ * `function_call`, `reasoning`, `response_item`, …) ⇒ a turn is still in flight.
+ *
+ * This is the finish signal `codex-watch.ts --mode turn` keys off — git refs only
+ * tell you a commit landed, not that the agent stopped working. `tail` is the last
+ * chunk of the file: a truncated leading line is tolerated (unparseable lines are
+ * skipped). Pure and allocation-light so it is unit-testable without fs access.
+ */
+export function parseTurnComplete(tail: string): TurnState {
+  const lines = tail.split('\n').map((l) => l.trim()).filter(Boolean);
+  for (let i = lines.length - 1; i >= 0; i--) {
+    let ev: string | null = null;
+    try {
+      // deno-lint-ignore no-explicit-any
+      const o = JSON.parse(lines[i]) as any;
+      ev = (o?.payload && typeof o.payload === 'object' && typeof o.payload.type === 'string'
+        ? o.payload.type
+        : null) ?? (typeof o?.type === 'string' ? o.type : null);
+    } catch {
+      continue; // truncated/partial line (e.g. the first sliced line) — skip it
+    }
+    if (!ev || ROLLOUT_BOOKKEEPING.has(ev)) continue;
+    return { lastEvent: ev, turnComplete: ev === 'task_complete' };
+  }
+  return { lastEvent: null, turnComplete: false };
+}
+
+// ---------------------------------------------------------------------------
 // Git info (impure read) + push-safety (pure eval)
 // ---------------------------------------------------------------------------
 

@@ -86,14 +86,31 @@ Reports daemon version + app-server proc count, worktree git state + logs path (
 and recent session rollouts. Exit: `0` ok · `2` daemon unreachable · `5` worktree not found.
 
 ### `codex-watch.ts`  (run INSIDE WSL)
-Token-free event-driven wait — wakes the supervisor when a slice writes git activity.
+Token-free event-driven wait. Two modes — pick by **which signal you need**:
+
+- **`--mode git` (default)** — wakes on the worktree's next git activity (commit / branch update /
+  reflog write). This means *the slice made progress*; it does **not** mean the agent stopped — a
+  turn can commit mid-flight, or finish with no commit at all.
+- **`--mode turn`** — wakes when the agent's current **turn finishes**, by watching the thread's
+  session rollout `.jsonl` for its terminal `task_complete` marker (the daemon's end-of-turn event).
+  This is the real *agent is idle / done* signal that git-ref watching misses. If the thread is
+  already idle when armed, it returns immediately with `alreadyIdle:true`.
 
 ```bash
+# progress — wake on the next commit/ref event:
 deno run --allow-read --allow-run .llm/tools/agentic/codex-watch.ts \
   --worktree <wsl path> --timeout-seconds 1800
+
+# finish — wake when the steered/launched turn completes (resolve rollout by thread id):
+deno run --allow-read --allow-env --allow-run .llm/tools/agentic/codex-watch.ts \
+  --mode turn --thread-id <uuid> --timeout-seconds 1800
+# (or pass --rollout <path> directly; --sessions-dir defaults to $HOME/.codex/sessions)
 ```
 fs events only fire natively on ext4, so this must run inside WSL (not from Windows over `/mnt`).
-Exit: `0` on first git change · `2` on `--timeout-seconds` heartbeat (slice may be hung) · `1` bad args.
+**Use both together:** `--mode git` to surface each commit as the slice works, `--mode turn` to know
+when the agent has actually stopped (idle, awaiting your next steer). Exit: `0` on the awaited event
+(git change | turn complete) · `2` on `--timeout-seconds` heartbeat (slice may be hung) · `1` bad
+args / worktree, logs dir, or rollout not found.
 
 ### `codex-resume.ts`
 Steer an existing thread. Never fires a second send at a worktree.
@@ -166,7 +183,7 @@ pending/not-final · `12` no eval comment found.
 ## Tests & validation
 
 ```powershell
-deno test --allow-read .llm/tools/agentic/agentic-lib_test.ts      # 30 unit tests
+deno test --allow-read .llm/tools/agentic/agentic-lib_test.ts      # 39 unit tests
 deno check --unstable-kv .llm/tools/agentic/*.ts                   # type-check (clean)
 deno lint  --no-config   .llm/tools/agentic/*.ts                   # lint (repo excludes .llm/)
 ```
