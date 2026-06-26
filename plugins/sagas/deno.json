@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-sagas",
-  "version": "0.0.1-alpha.6",
+  "version": "0.0.1-alpha.7",
   "description": "NetScript plugin for durable saga orchestration, workflow APIs, and saga runtime metadata.",
   "license": "MIT",
   "exports": {
@@ -19,13 +19,13 @@
   },
   "imports": {
     "@std/async": "jsr:@std/async@^1",
-    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.6",
-    "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.6",
-    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.6",
-    "@netscript/plugin-sagas-core": "jsr:@netscript/plugin-sagas-core@0.0.1-alpha.6",
-    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-alpha.6",
-    "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.6",
-    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-alpha.6",
+    "@netscript/contracts": "jsr:@netscript/contracts@0.0.1-alpha.7",
+    "@netscript/kv": "jsr:@netscript/kv@0.0.1-alpha.7",
+    "@netscript/plugin": "jsr:@netscript/plugin@0.0.1-alpha.7",
+    "@netscript/plugin-sagas-core": "jsr:@netscript/plugin-sagas-core@0.0.1-alpha.7",
+    "@netscript/plugin-streams-core": "jsr:@netscript/plugin-streams-core@0.0.1-alpha.7",
+    "@netscript/service": "jsr:@netscript/service@0.0.1-alpha.7",
+    "@netscript/telemetry": "jsr:@netscript/telemetry@0.0.1-alpha.7",
     "hono": "jsr:@hono/hono@4.12.24",
     "zod": "jsr:@zod/zod@4.4.3",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
