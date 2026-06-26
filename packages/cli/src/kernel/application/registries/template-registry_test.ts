@@ -1,5 +1,6 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { fromFileUrl, join, relative } from '@std/path';
+import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 import { TEMPLATE_MANIFEST } from '../../assets/manifest.ts';
 import { TemplateRegistry } from './template-registry.ts';
 
@@ -40,5 +41,6 @@ Deno.test('TemplateRegistry manifest matches checked-in template assets', async 
 Deno.test('TemplateRegistry reads registered template content', () => {
   const registry = new TemplateRegistry();
   const asset = registry.get('workspace/gitignore.template');
-  assertStringIncludes(asset?.url.href ?? '', 'workspace/gitignore.template');
+  assertEquals(asset?.content, EMBEDDED_TEMPLATE_CONTENT['workspace/gitignore.template']);
+  assertStringIncludes(asset?.content ?? '', '# Dependencies');
 });

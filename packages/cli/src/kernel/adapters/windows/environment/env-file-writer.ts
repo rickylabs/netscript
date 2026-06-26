@@ -2,10 +2,8 @@ import { join } from '@std/path';
 import type { InfrastructureConfig } from '../../../domain/infrastructure-config.ts';
 import type { CompileTarget } from '../../../domain/deploy/compile-target.ts';
 import { generateEnvFileContent } from './env-file-content.ts';
-import { readTemplateAsset } from '../../templates/template-asset.ts';
-
-/** Write Windows deployment environment files to the deploy root. */
-const ENV_TEMPLATE = new URL('../../assets/windows/env.template', import.meta.url);
+import { TEMPLATE_KEYS } from '../../../assets/manifest.ts';
+import { readTemplateAssetSync } from '../../templates/template-asset.ts';
 
 // ============================================================================
 // FILE WRITERS
@@ -58,7 +56,7 @@ export async function writeEnvFile(
 export async function writeEnvTemplate(
   deployDir: string,
 ): Promise<string> {
-  const content = await readTemplateAsset(ENV_TEMPLATE);
+  const content = readTemplateAssetSync(TEMPLATE_KEYS.windowsEnv);
   const templatePath = join(deployDir, '.env.template');
   await Deno.writeTextFile(templatePath, content);
   return templatePath;
