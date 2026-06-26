@@ -54,17 +54,15 @@ export async function publishWorkspace(
     // so re-running after a partial publish is safe and idempotent. Slow types
     // are accepted workspace-wide.
     //
-    // Bundled assets travel as `with { type: 'text' }` imports in the
-    // *.generated.ts barrels (see .llm/tools/generate-cli-assets-barrel.ts) so the
-    // asset content is embedded in the module graph and resolves over https from
-    // JSR (no `Deno.readTextFile` of an import.meta path, which throws "Must be a
-    // file URL" when installed from the registry). Text imports are runtime-stable
-    // in Deno 2.8+ and the publish-graph build accepts them; the `Publish
-    // preflight` mode below runs the real publish graph build (no upload) so any
-    // graph rejection reds CI before the real Publish step, preventing a partial
-    // half-publish. (A transient alpha.5 CI rejection of these text imports was
-    // not reproducible locally or in CI on the same Deno 2.9.0 — see the
-    // jsr-safe-asset-embedding note — and the preflight is the durable guard.)
+    // Bundled assets are inlined as plain string constants in the *.generated.ts
+    // barrels (see .llm/tools/generate-cli-assets-barrel.ts), NOT imported via
+    // `with { type: 'text' }`. `deno publish`'s module-graph build never enables
+    // `unstable_text_imports`, so text-attribute imports fail at real publish
+    // ("The import attribute type of 'text' is unsupported") even though they
+    // type-check, run, and pass `publish --dry-run`. No `--unstable-*` flag fixes
+    // this: text imports are stable (no flag exists) and `--unstable-raw-imports`
+    // only toggles `bytes` imports, which this workspace does not use. Plain
+    // string constants publish cleanly with no flag.
     const baseArgs = ['publish', '--allow-dirty', '--allow-slow-types'];
 
     if (options.mode === 'preflight') {

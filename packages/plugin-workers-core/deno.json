@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-workers-core",
-  "version": "0.0.1-alpha.6",
+  "version": "0.0.1-alpha.5",
   "description": "Job, task, workflow, runtime, config, and testing primitives for NetScript workers plugins.",
   "license": "MIT",
   "exports": {

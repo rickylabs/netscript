@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1-alpha.6",
+  "version": "0.0.1-alpha.5",
   "workspace": [
     "packages/*",
     "packages/cli/e2e",
@@ -14,8 +14,7 @@
     "kv",
     "temporal",
     "tsgo",
-    "worker-options",
-    "raw-imports"
+    "worker-options"
   ],
   "tasks": {
     "ci": "deno ci && deno task ci:quality && deno task coverage:functions && deno task publish:dry-run && deno task audit:critical",
@@ -55,7 +54,7 @@
     "docs:links": "deno run --no-lock --allow-read .llm/tools/check-internal-doc-links.ts --pretty",
     "docs:maintenance": "deno task docs:links && deno task agentic:sync-claude:check && deno task agentic:check-claude",
     "agentic:smoke-claude-remote": "deno run --no-lock --allow-read --allow-run .llm/tools/agentic/claude-remote-smoke.ts --env-aware --pretty",
-    "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write .llm/tools/generate-cli-assets-barrel.ts",
+    "gen:assets-barrel": "deno run --no-lock --allow-read --allow-write --allow-run=deno .llm/tools/generate-cli-assets-barrel.ts",
     "check:assets-barrel": "deno task gen:assets-barrel && git diff --exit-code -- packages/cli/src/kernel/assets/embedded.generated.ts packages/plugin/src/kernel/assets/embedded.generated.ts packages/fresh-ui/registry.generated.ts",
     "check:scaffold-versions": "deno run .llm/tools/check-scaffold-versions.ts --pretty",
     "publish:dry-run": "deno run --allow-read --allow-write --allow-run .llm/tools/run-publish-dry-run.ts",
