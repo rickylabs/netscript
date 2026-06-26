@@ -1,4 +1,5 @@
 import { resolve } from '@std/path';
+import { normalize as posixNormalize } from '@std/path/posix';
 
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type { UiRegistryItem, UiRegistryManifest } from './registry.ts';
@@ -48,7 +49,7 @@ function readRegistryContent(
   registryContent: Readonly<Record<string, string>>,
   source: string,
 ): string {
-  const content = registryContent[source];
+  const content = registryContent[posixNormalize(source)];
   if (content === undefined) {
     throw new Error(`Fresh UI registry content is missing: ${source}`);
   }
