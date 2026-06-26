@@ -74,3 +74,4 @@
 | Full scaffold runtime proof | PASS | Five consecutive `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` runs passed with `Summary: passed=47 failed=0`; db-init durations: 30857ms, 33324ms, 32995ms, 36449ms, 33083ms. |
 | Fitness evidence | PASS | LOC: `migrate.ts` 369, `migrate-retry_test.ts` 196. No touched classes/extends. Only existing `console.log.bind(console)` remains as CLI/script edge reporter; no new `console.*` added. |
 | Focused db-init proof | PASS | Five generated-project `db init` runs passed with no db-init failures; Aspire ports were clear afterward (`aspire ps` returned `[]`). |
+| Architecture gate | FAIL / PRE-EXISTING | `deno task arch:check` still fails before doctrine fitness on pre-existing `DEPS-JSR-CENTRALIZATION` drift for `@netscript/aspire` and `@netscript/plugin` ranges; this slice does not edit dependency declarations. |
