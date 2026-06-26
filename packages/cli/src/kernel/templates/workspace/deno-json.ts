@@ -47,8 +47,7 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
         imports: {
           '@netscript/contracts': netscriptJsrSpecifier('contracts'),
           '@netscript/kv': netscriptJsrSpecifier('kv'),
-          '@netscript/plugin/loader': netscriptJsrSpecifier('plugin', '/loader'),
-          '@netscript/plugin/sdk': netscriptJsrSpecifier('plugin', '/sdk'),
+          '@netscript/plugin': netscriptJsrSpecifier('plugin'),
         },
       }
       : {}),

@@ -5,7 +5,6 @@ import type { UiRegistryItem } from './registry.ts';
 
 const PREACT_IMPORTS: Readonly<Record<string, string>> = {
   preact: 'npm:preact@^10.27.2',
-  'preact/hooks': 'npm:preact@^10.27.2/hooks',
 };
 
 /** Merge UI dependency imports into the target app's deno.json. */

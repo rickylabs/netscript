@@ -30,8 +30,7 @@
     "zod": "jsr:@zod/zod@4.4.3",
     "@orpc/contract": "npm:@orpc/contract@^1.14.6",
     "@orpc/server": "npm:@orpc/server@^1.14.6",
-    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1",
-    "@durable-streams/state/db": "npm:@durable-streams/state@^0.3.1/db"
+    "@durable-streams/state": "npm:@durable-streams/state@^0.3.1"
   },
   "tasks": {
     "check": "deno check --unstable-kv mod.ts src/public/mod.ts src/plugin/mod.ts src/cli/mod.ts src/scaffolding/mod.ts src/e2e/mod.ts src/aspire/mod.ts src/runtime/mod.ts contracts/v1/mod.ts services/src/main.ts streams/mod.ts streams/server.ts",

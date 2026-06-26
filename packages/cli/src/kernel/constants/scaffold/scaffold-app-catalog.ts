@@ -18,11 +18,9 @@ export const SCAFFOLD_APP_CATALOG = {
 export const SCAFFOLD_APP_IMPORTS = {
   fresh: SCAFFOLD_APP_CATALOG.FRESH_CORE,
   'preact': `npm:preact@${SCAFFOLD_APP_CATALOG.PREACT}`,
-  'preact/hooks': `npm:preact@${SCAFFOLD_APP_CATALOG.PREACT}/hooks`,
   '@preact/signals': `npm:@preact/signals@${SCAFFOLD_APP_CATALOG.PREACT_SIGNALS}`,
   '@fresh/plugin-vite': SCAFFOLD_APP_CATALOG.FRESH_PLUGIN_VITE,
   '@tailwindcss/vite': `npm:@tailwindcss/vite@${SCAFFOLD_APP_CATALOG.TAILWINDCSS_VITE}`,
   'tailwindcss': `npm:tailwindcss@${SCAFFOLD_APP_CATALOG.TAILWINDCSS}`,
   'vite': `npm:vite@${SCAFFOLD_APP_CATALOG.VITE}`,
-  'vite/client': `npm:vite@${SCAFFOLD_APP_CATALOG.VITE}/client`,
 } as const;

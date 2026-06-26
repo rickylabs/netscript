@@ -68,6 +68,12 @@ describe('database template generators', () => {
       'deno run -A --minimum-dependency-age=0 scripts/patch-prisma-client.ts',
     );
     assertEquals(config.imports['@prisma/adapter-pg'], undefined);
+    assertEquals(
+      config.imports['@netscript/database'],
+      'jsr:@netscript/database@0.0.1-alpha.4',
+    );
+    assertEquals(config.imports['@netscript/database/scripts'], undefined);
+    assertEquals(config.imports['@netscript/database/tracing'], undefined);
   });
 
   it('generates zod and patch-client tasks for mysql', () => {

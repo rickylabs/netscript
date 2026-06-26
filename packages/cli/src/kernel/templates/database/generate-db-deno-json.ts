@@ -83,6 +83,16 @@ export function generateDatabaseDenoJson(
   }
   tasks['db:patch-client'] = `${DENO_SCRIPT_RUN} scripts/patch-prisma-client.ts`;
   tasks['db:fix-zod'] = `${DENO_SCRIPT_RUN} scripts/fix-zod-imports.ts`;
+  const databaseImports = options.importMode === 'local'
+    ? {
+      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]:
+        imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS],
+      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]:
+        imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING],
+    }
+    : {
+      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE]: imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE],
+    };
 
   const config = {
     name: `@${options.projectName}/database-${provider.engine}`,
@@ -99,10 +109,7 @@ export function generateDatabaseDenoJson(
       '@opentelemetry/api': 'npm:@opentelemetry/api@^1.9.0',
       dotenv: 'npm:dotenv@^16.4.7',
       zod: 'npm:zod@^4.3.6',
-      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS]:
-        imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_SCRIPTS],
-      [SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING]:
-        imports[SCAFFOLD_PACKAGES.NETSCRIPT_DATABASE_TRACING],
+      ...databaseImports,
       [SCAFFOLD_PACKAGES.NETSCRIPT_SDK]: imports[SCAFFOLD_PACKAGES.NETSCRIPT_SDK],
       ...adapterImports(provider.engine, imports),
     },

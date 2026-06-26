@@ -25,8 +25,9 @@ workspace dependencies resolved from JSR.
 
 ## Status
 
-Blocked before commit/push. The requested harness changes are implemented in the worktree, but the
-required prod-local validation is red at `scaffold.plugin.worker`.
+Import-map hygiene slice complete in the worktree. The requested root-only import-map changes,
+scaffold generator hygiene, and required validation are green. Commit and push are pending in the
+current Codex slice.
 
 ## Evidence Summary
 
@@ -37,3 +38,18 @@ required prod-local validation is red at `scaffold.plugin.worker`.
   reports `Module not found ".../dx"`.
 - PASS: `deno.lock` unchanged.
 - NOT RUN: actionlint unavailable.
+
+## Import-Map Hygiene Slice Summary
+
+- Checked-in `deno.json` audit is clean: no same-package registry sub-path import-map entries remain.
+- Updated scaffold generators so JSR-mode/generated registry import maps use root package mappings
+  only; local-mode file-path subpaths are preserved.
+- PASS: scoped checks for `plugins/auth`, `plugins/sagas`, `plugins/workers`, `plugins/triggers`,
+  `packages/sdk`, `packages/service`, `packages/logger`, `packages/fresh`, `packages/fresh-ui`, and
+  `packages/cli`.
+- PASS: `rtk proxy deno task publish:dry-run` (raw exit code 0).
+- PASS: `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` with `passed=47 failed=0`.
+- PASS: `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` with
+  `passed=47 failed=0`.
+- `deno.lock` changed naturally during validation: 655 insertions, 3 deletions; one new top-level
+  specifier `npm:style-dictionary@5.4.4` and 96 npm transitive entries.

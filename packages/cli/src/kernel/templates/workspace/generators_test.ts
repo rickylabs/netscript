@@ -27,8 +27,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   assertEquals(result.imports, {
     '@netscript/contracts': 'jsr:@netscript/contracts@0.0.1-alpha.4',
     '@netscript/kv': 'jsr:@netscript/kv@0.0.1-alpha.4',
-    '@netscript/plugin/loader': 'jsr:@netscript/plugin@0.0.1-alpha.4/loader',
-    '@netscript/plugin/sdk': 'jsr:@netscript/plugin@0.0.1-alpha.4/sdk',
+    '@netscript/plugin': 'jsr:@netscript/plugin@0.0.1-alpha.4',
   });
   assertEquals(result.nodeModulesDir, 'auto');
   assertEquals(result.unstable, ['raw-imports', 'kv']);
@@ -63,8 +62,7 @@ Deno.test('generateDenoJson emits shared plugin service-context imports in JSR m
   assertEquals(result.imports, {
     '@netscript/contracts': 'jsr:@netscript/contracts@0.0.1-alpha.4',
     '@netscript/kv': 'jsr:@netscript/kv@0.0.1-alpha.4',
-    '@netscript/plugin/loader': 'jsr:@netscript/plugin@0.0.1-alpha.4/loader',
-    '@netscript/plugin/sdk': 'jsr:@netscript/plugin@0.0.1-alpha.4/sdk',
+    '@netscript/plugin': 'jsr:@netscript/plugin@0.0.1-alpha.4',
   });
 });
 

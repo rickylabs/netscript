@@ -162,3 +162,97 @@ Notes:
 - Package-wide lint/fmt wrappers returned exit code 1 with zero reported findings after one touched
   file was formatted. The final green wrapper verdict used explicit changed TS files, which is the
   scoped source surface for this slice.
+
+## Import-Map Hygiene Slice
+
+Scope:
+
+- Removed redundant same-package registry sub-path import-map entries from checked-in package and
+  plugin `deno.json` files.
+- Added missing root import-map entries before deleting sub-path entries where the audit found no
+  root mapping.
+- Updated scaffold generators so JSR-mode/root registry import maps emit root package mappings only.
+  Local-mode file-path mappings are unchanged.
+
+Removed checked-in package/plugin entries:
+
+- `plugins/auth/deno.json`: `@netscript/plugin/sdk`,
+  `@netscript/plugin-auth-core/config`, `@netscript/plugin-auth-core/contracts/v1`,
+  `@netscript/plugin-auth-core/domain`, `@netscript/plugin-auth-core/ports`,
+  `@netscript/plugin-auth-core/streams`, `@netscript/plugin-auth-core/telemetry`,
+  `@netscript/service/auth`, `@netscript/telemetry/context`, `@durable-streams/state/db`.
+- `plugins/sagas/deno.json`: `@durable-streams/state/db`.
+- `plugins/workers/deno.json`: `@orpc/server/fetch`, `@orpc/server/plugins`,
+  `@orpc/openapi/fetch`, `@orpc/zod/zod4`, `@durable-streams/state/db`.
+- `plugins/triggers/deno.json`: `@durable-streams/state/db`.
+- `packages/sdk/deno.json`: `@orpc/client/fetch`, `@orpc/client/plugins`,
+  `@orpc/client/standard`.
+- `packages/service/deno.json`: `@orpc/openapi/fetch`, `@orpc/server/fetch`,
+  `@orpc/server/plugins`, `@orpc/client/plugins`, `@orpc/zod/zod4`.
+- `packages/logger/deno.json`: `@orpc/server/plugins`.
+- `packages/fresh/deno.json`: `preact/compat`, `preact/hooks`, `preact/jsx-runtime`,
+  `preact-render-to-string/stream`, `@durable-streams/state/db`.
+- `packages/fresh-ui/deno.json`: `preact/hooks`, `preact/jsx-runtime`.
+
+Roots added:
+
+- `plugins/workers/deno.json`: `@orpc/openapi`, `@orpc/zod`, `@durable-streams/state`.
+- `plugins/triggers/deno.json`: `@durable-streams/state`.
+- `packages/sdk/deno.json`: `@orpc/client`.
+- `packages/service/deno.json`: `@orpc/openapi`, `@orpc/client`, `@orpc/zod`.
+- `packages/logger/deno.json`: `@orpc/server`.
+- `packages/fresh/deno.json`: `preact`, `preact-render-to-string`,
+  `@durable-streams/state`.
+- `packages/fresh-ui/deno.json`: `preact`.
+- Scaffold generators now emit/ensure roots for `@netscript/plugin`, `@netscript/database`,
+  same-package NetScript subpaths, `preact`, `vite`, and copied official plugin registry
+  subpaths.
+
+Generator/template hygiene:
+
+- `packages/cli/src/kernel/constants/scaffold/scaffold-app-catalog.ts`: removed generated
+  `preact/hooks` and `vite/client` import-map entries; root `preact` and `vite` remain.
+- `packages/cli/src/kernel/adapters/templates/app/generate-app-deno-json.ts`: JSR mode now emits
+  root `@netscript/fresh`, `@netscript/fresh-ui`, and `@netscript/sdk` mappings only; local mode
+  keeps explicit file-path subpaths.
+- `packages/cli/src/kernel/templates/workspace/deno-json.ts`: root JSR map now emits
+  `@netscript/plugin` instead of `@netscript/plugin/loader` and `@netscript/plugin/sdk`.
+- `packages/cli/src/kernel/templates/database/generate-db-deno-json.ts`: JSR mode now emits
+  `@netscript/database` instead of `@netscript/database/scripts` and
+  `@netscript/database/tracing`; local mode keeps explicit file-path subpaths.
+- `packages/cli/src/kernel/application/ui/registry-deno-json.ts`: UI merge now adds only root
+  `preact`.
+- `packages/cli/src/maintainer/adapters/plugin-import-rewriter.ts`: copied official plugin
+  workspaces normalize same-package `npm:`/`jsr:` sub-path import-map entries to root mappings.
+
+Evidence:
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Import-map audit | `deno eval <checked-in-deno-json-audit>` | PASS: no same-package registry sub-path import-map entries in checked-in `deno.json` files |
+| Focused generator tests | `deno test --allow-all packages/cli/src/kernel/templates/app/generators-config_test.ts packages/cli/src/kernel/templates/workspace/generators_test.ts packages/cli/src/kernel/templates/database/generators_test.ts packages/cli/src/maintainer/features/sync/plugin/copy-official-plugin-copy_test.ts` | PASS: 20 passed, 22 steps, raw exit code 0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/auth --ext ts,tsx` | PASS: filesSelected=29, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/sagas --ext ts,tsx` | PASS: filesSelected=70, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/workers --ext ts,tsx` | PASS: filesSelected=77, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root plugins/triggers --ext ts,tsx` | PASS: filesSelected=55, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/sdk --ext ts,tsx` | PASS: filesSelected=57, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/service --ext ts,tsx` | PASS: filesSelected=34, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/logger --ext ts,tsx` | PASS: filesSelected=12, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh --ext ts,tsx` | PASS: filesSelected=147, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/fresh-ui --ext ts,tsx` | PASS: filesSelected=86, failedBatches=0, totalOccurrences=0 |
+| Scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS: filesSelected=520, failedBatches=0, totalOccurrences=0 |
+| Publish dry-run | `rtk proxy deno task publish:dry-run` | PASS: raw exit code 0; pre-existing slow-type/dynamic-import warnings printed |
+| Prod-local runtime smoke | `rtk proxy deno task e2e:cli:prod --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+| Maintainer runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS: Summary passed=47 failed=0, raw exit code 0 |
+| Whitespace diff check | `git diff --check -- . ':!.llm/tmp/run/openhands'` | PASS: raw exit code 0 |
+| Formatter wrapper | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --file <touched-ts> --ext ts,tsx` | TOOL ANOMALY: exit code 1 with filesSelected=9, failedBatches=1, findings=0 |
+
+Lock delta:
+
+- `deno.lock`: 655 insertions, 3 deletions.
+- Added one top-level specifier: `npm:style-dictionary@5.4.4`.
+- Added 96 npm package lock entries, all transitive resolution for `style-dictionary` and its
+  dependency graph.
+- No added or removed JSR/remote/workspace lock keys.
+- The three deleted dependency references were unqualified dependency names replaced by qualified
+  package keys: `inherits`, `lru-cache`, and `commander`.
