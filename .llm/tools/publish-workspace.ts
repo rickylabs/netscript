@@ -47,7 +47,21 @@ export async function publishWorkspace(
     // "Module not found". deno publish skips versions already on the registry,
     // so re-running after a partial publish is safe and idempotent. Slow types
     // are accepted workspace-wide.
-    const args = ['publish', '--allow-dirty', '--allow-slow-types'];
+    //
+    // --unstable-raw-imports enables the `with { type: 'text' }` asset imports
+    // (JSR-safe asset embedding) inside the publish module-graph builder. A
+    // member deno.json cannot carry `unstable` (Deno only honors it in the
+    // workspace-root config), and the root config's `unstable` does not
+    // propagate into per-member publish graph builds, so the feature must be
+    // enabled explicitly on the CLI or publish fails with "The import attribute
+    // type of 'text' is unsupported". The dry-run path does not enforce this, so
+    // the flag must travel with the real publish.
+    const args = [
+      'publish',
+      '--allow-dirty',
+      '--allow-slow-types',
+      '--unstable-raw-imports',
+    ];
     if (options.mode === 'dry-run') {
       args.push('--dry-run');
     }
