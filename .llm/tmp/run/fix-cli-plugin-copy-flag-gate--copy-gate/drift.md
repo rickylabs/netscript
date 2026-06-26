@@ -52,3 +52,16 @@ Rationale:
   hardcoded to `importMode: 'jsr'` and adding a regression lock.
 - Default-off plus a replacement runtime reader/scaffold path can be requested later as its own
   scoped task.
+
+## 2026-06-26 — minor — parallel scaffold runtime run contended on Aspire control-plane port
+
+During S3 validation, the first `scaffold.runtime` attempt reached the workers behavior gates and
+then failed `behavior.workers-executions` with `Connection refused` after the generated AppHost was
+no longer running. A follow-up rerun with a unique suite name also hit
+`https://127.0.0.1:18891` already in use while another scaffold runtime suite was active.
+
+The user noted this may have come from a parallel thread using `aspire stop` and asked to check the
+CLI docs / parallel mode. Aspire and CLI help confirmed the e2e runtime path already launches
+Aspire with `--isolated`; that isolates generated resources, but Aspire's control-plane port can
+still collide when another suite is active. After the parallel run released `18891`, a raw
+`scaffold.runtime` rerun from the WSL ext4 worktree passed with `passed=47 failed=0`.

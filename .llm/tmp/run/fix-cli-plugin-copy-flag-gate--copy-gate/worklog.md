@@ -108,9 +108,16 @@ default.
 | native worktree check | `pwd && df -T .` | `/home/codex/repos/netscript-cli-plugin-copy`, filesystem `ext4` |
 | e2e plugins | `rtk proxy deno task e2e:cli run scaffold.plugins --cleanup --format pretty` | pass; summary `passed=11 failed=0` |
 | e2e runtime first attempt | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | failed one gate: `behavior.workers-executions`; summary `passed=34 failed=1`; cleanup passed |
-| e2e runtime clean rerun | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` after confirming no 8091/8092/8093/8094/18891 listeners or plugin-smoke runtimes | pass; summary `passed=47 failed=0` |
+| e2e runtime parallel-mode check | `aspire start --help`; `deno task e2e:cli run --help`; process/port inspection | confirmed the CLI e2e runner already launches Aspire with `--isolated`; a concurrent scaffold runtime run can still contend on Aspire's control-plane port `18891` |
+| e2e runtime raw rerun | `deno task e2e:cli run scaffold.runtime --name plugin-copy-flag-runtime-20260626103409-raw --cleanup --format pretty --report .llm/tmp/run/fix-cli-plugin-copy-flag-gate--copy-gate/scaffold-runtime-raw-report.json --log-file .llm/tmp/run/fix-cli-plugin-copy-flag-gate--copy-gate/scaffold-runtime-raw.ndjson` after the parallel AppHost released `18891` | pass; summary `passed=47 failed=0` |
 
 First runtime attempt failure detail: the workers health/job/task/trigger endpoints passed, then
 `behavior.workers-executions` received `Connection refused` from `http://localhost:8091` and cleanup
 reported no AppHost was running. Nearby Aspire logs showed apphost instability/port conflict noise
-from generated runs. A clean rerun from the same WSL ext4 worktree passed all runtime gates.
+from generated runs.
+
+User follow-up noted a likely parallel `aspire stop` / Aspire interaction and asked to check CLI
+docs for parallel launch mode. The Aspire and CLI help confirmed the e2e path already uses
+`aspire start --isolated`; the observed remaining collision was Aspire's control-plane port
+`18891` while another scaffold runtime suite was active. After that run released the port, a raw
+rerun from the same WSL ext4 worktree passed all runtime gates.
