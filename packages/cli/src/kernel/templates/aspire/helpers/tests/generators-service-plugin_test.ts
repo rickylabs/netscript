@@ -186,6 +186,7 @@ describe('generateRegisterPlugins', () => {
       plugins: { auth: fixtures.MINIMAL_PLUGIN },
     });
     assertStringIncludes(output, "builder.addExecutable('auth', 'deno', workdir,");
+    assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, '.withHttpEndpoint({ port: 4400');
     assertStringIncludes(output, "plugins.set('auth'");
   });
@@ -251,6 +252,13 @@ describe('generateRegisterPlugins', () => {
     assertStringIncludes(output, '// KV cache dependency');
     assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
+    assertStringIncludes(output, "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(
+      output,
+      'infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort)',
+    );
+    assertStringIncludes(output, "withEnvironment('GARNET_URI', cacheEndpoint)");
+    assertStringIncludes(output, "withEnvironment('REDIS_URI', cacheEndpoint)");
   });
 
   it('should pass saga store backend appsettings to plugin env', () => {

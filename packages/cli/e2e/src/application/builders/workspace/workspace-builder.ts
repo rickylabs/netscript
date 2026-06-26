@@ -1,6 +1,7 @@
 import type { RunOptions } from '../../../domain/run-context.ts';
 import type { PackageSource } from '../../../domain/extension-axes.ts';
 import { withRepoRootOption } from './workspace-options.ts';
+import { resolve } from '@std/path';
 
 /** Fluent builder for generated-project workspace options. */
 export interface WorkspaceBuilder {
@@ -22,7 +23,8 @@ export function createWorkspaceBuilder(initial: RunOptions): WorkspaceBuilder {
       return this;
     },
     withCliEntrypoint(path) {
-      options = { ...options, cliEntrypoint: path };
+      const cliEntrypoint = path.startsWith('jsr:') ? path : resolve(options.repoRoot, path);
+      options = { ...options, cliEntrypoint };
       return this;
     },
     withSmokeRoot(path) {

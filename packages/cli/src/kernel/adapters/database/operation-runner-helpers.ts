@@ -79,6 +79,10 @@ function parseAspireResourceStatuses(
   statusJson: string,
   apphostPath: string,
 ): AspireResourceStatus[] {
+  if (statusJson.trim().length === 0) {
+    return [];
+  }
+
   const parsed = JSON.parse(statusJson) as unknown;
   if (!Array.isArray(parsed)) {
     if (isObjectWithResources(parsed)) {

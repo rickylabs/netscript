@@ -9,7 +9,7 @@ export type {
   PluginCliResult,
 } from '@netscript/plugin/cli';
 
-/** Default CLI instance used by `deno dx jsr:@netscript/plugin-streams/cli`. */
+/** Default CLI instance used by `deno x -A jsr:@netscript/plugin-streams/cli`. */
 export const streamsCli: StreamsCli = new StreamsCli();
 
 if (import.meta.main) {

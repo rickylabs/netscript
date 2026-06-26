@@ -71,7 +71,7 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
 
     // Register via addExecutable with HTTP endpoint
     lines.push(
-      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
+      `    const resource = builder.addExecutable('${name}', 'deno', workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', ...perms, '${entrypoint}'])`,
     );
     lines.push(
       `      .withHttpEndpoint({ port: ${entry.Port}, env: '${RESOURCE_DEFAULTS.PortEnvVar}' });`,
@@ -123,6 +123,11 @@ export function generateRegisterPlugins(options: RegisterPluginsOptions): string
       lines.push(`    if (infrastructure.primaryCache) {`);
       lines.push(`      if (infrastructure.primaryCacheEndpoint) {`);
       lines.push(`        await resource.withReference(infrastructure.primaryCacheEndpoint);`);
+      lines.push(
+        `        const cacheEndpoint = infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort);`,
+      );
+      lines.push(`        await resource.withEnvironment('GARNET_URI', cacheEndpoint);`);
+      lines.push(`        await resource.withEnvironment('REDIS_URI', cacheEndpoint);`);
       lines.push(`      } else {`);
       lines.push(`        await resource.withReference(infrastructure.primaryCache);`);
       lines.push(`      }`);

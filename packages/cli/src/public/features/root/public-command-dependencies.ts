@@ -112,6 +112,7 @@ export interface PublicCommandDependencies {
     readonly pluginScaffolder: PluginScaffolder;
     readonly registryScaffolder: PluginRegistryScaffolder;
     readonly workspaceMutator: PluginWorkspaceMutator;
+    readonly sourceRootStartDir?: string;
   };
   /** Dependencies for host-side plugin loading. */
   readonly pluginHostDependencies: {
@@ -226,6 +227,7 @@ export function createPublicCommandDependencies(
       pluginScaffolder: new PluginScaffolder(scaffolder, fs, pluginRegistry),
       registryScaffolder: new PluginRegistryScaffolder(scaffolder),
       workspaceMutator: new PluginWorkspaceMutator(fs),
+      sourceRootStartDir: host.cwd(),
     },
     pluginHostDependencies: {
       resolveProjectRoot,

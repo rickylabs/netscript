@@ -6,6 +6,7 @@
 
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateDenoJson } from './deno-json.ts';
 import { generateNetScriptConfig } from './netscript-config.ts';
 import { generateReadme } from './generate-readme.ts';
@@ -24,6 +25,11 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   }));
 
   assertEquals(result.workspace, ['./contracts', './plugins']);
+  assertEquals(result.imports, {
+    '@netscript/contracts': netscriptJsrSpecifier('contracts'),
+    '@netscript/kv': netscriptJsrSpecifier('kv'),
+    '@netscript/plugin': netscriptJsrSpecifier('plugin'),
+  });
   assertEquals(result.nodeModulesDir, 'auto');
   assertEquals(result.unstable, ['raw-imports', 'kv']);
   assertEquals(result.exclude, [
@@ -47,14 +53,18 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   ]);
 });
 
-Deno.test('generateDenoJson omits imports in JSR mode', () => {
+Deno.test('generateDenoJson emits shared plugin service-context imports in JSR mode', () => {
   const result = JSON.parse(generateDenoJson({
     name: 'test-project',
     appName: 'dashboard',
     workspaceMembers: ['contracts', 'plugins'],
     importMode: 'jsr',
   }));
-  assert(!('imports' in result), 'root deno.json must not carry import maps');
+  assertEquals(result.imports, {
+    '@netscript/contracts': netscriptJsrSpecifier('contracts'),
+    '@netscript/kv': netscriptJsrSpecifier('kv'),
+    '@netscript/plugin': netscriptJsrSpecifier('plugin'),
+  });
 });
 
 Deno.test('generateDenoJson keeps the same root-only shape in local mode', () => {

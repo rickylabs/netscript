@@ -85,21 +85,17 @@ describe('generateAppDenoJson', () => {
       importMode: 'jsr',
     }));
     assert(config.imports['@netscript/fresh']);
-    assert(config.imports['@netscript/fresh/builders']);
-    assert(config.imports['@netscript/fresh/query']);
-    assert(config.imports['@netscript/fresh/route']);
-    assert(config.imports['@netscript/fresh/server']);
-    assert(config.imports['@netscript/fresh/vite']);
     assert(config.imports['@netscript/fresh-ui']);
-    assert(config.imports['@netscript/fresh-ui/interactive']);
     assert(config.imports['@test/contracts']);
     assert(config.imports['@netscript/sdk']);
-    assert(config.imports['@netscript/sdk/client']);
-    assert(config.imports['@netscript/sdk/query']);
-    assert(config.imports['@netscript/sdk/query-client']);
     assert(config.imports['@fresh/plugin-vite']);
     assert(config.imports['@tailwindcss/vite']);
     assert(config.imports['vite']);
+    assertEquals(config.imports['@netscript/fresh/route'], undefined);
+    assertEquals(config.imports['@netscript/fresh-ui/interactive'], undefined);
+    assertEquals(config.imports['@netscript/sdk/client'], undefined);
+    assertEquals(config.imports['preact/hooks'], undefined);
+    assertEquals(config.imports['vite/client'], undefined);
   });
 
   it('should end with trailing newline', () => {
@@ -125,13 +121,13 @@ describe('generateAppDenoJson', () => {
       '@app/',
       '@my-project/contracts',
       '@netscript/fresh',
-      '@netscript/fresh/builders',
-      '@netscript/fresh/query',
-      '@netscript/fresh/route',
+      '@netscript/fresh-ui',
+      '@netscript/sdk',
+      'fresh',
     ]);
     assertEquals(config.imports['@app/'], './');
     assertEquals(config.imports['@my-project/contracts'], '../../contracts/mod.ts');
-    assertEquals(config.imports['vite/client'], SCAFFOLD_APP_IMPORTS['vite/client']);
+    assertEquals(config.imports.vite, SCAFFOLD_APP_IMPORTS.vite);
   });
 
   it('should resolve @netscript/fresh/vite in local mode', () => {
@@ -191,7 +187,7 @@ describe('generateAppDenoJson', () => {
     );
     assertEquals(config.imports['@test/contracts'], '../../contracts/mod.ts');
     assertEquals(config.imports['tailwindcss'], SCAFFOLD_APP_IMPORTS.tailwindcss);
-    assertEquals(config.imports['vite/client'], SCAFFOLD_APP_IMPORTS['vite/client']);
+    assertEquals(config.imports.vite, SCAFFOLD_APP_IMPORTS.vite);
     assertEquals(config.compilerOptions.types, ['vite/client']);
   });
 

@@ -209,7 +209,7 @@ export interface DispatchPluginVerbOptions {
   };
 }
 
-/** Dispatch a framework plugin verb through `deno dx jsr:<pkg>/cli`. */
+/** Dispatch a framework plugin verb through `deno x -A jsr:<pkg>/cli`. */
 export function dispatchPluginVerb(
   verb: FrameworkVerb,
   pkg: string,

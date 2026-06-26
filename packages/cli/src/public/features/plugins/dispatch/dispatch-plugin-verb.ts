@@ -38,7 +38,7 @@ export function resolvePluginCliSpecifier(pkg: string): string {
   return spec.endsWith('/cli') ? spec : `${spec}/cli`;
 }
 
-/** Dispatch a framework plugin verb through `deno dx jsr:<pkg>/cli`. */
+/** Dispatch a framework plugin verb through `deno x -A jsr:<pkg>/cli`. */
 export async function dispatchPluginVerb(
   verb: FrameworkVerb,
   pkg: string,
@@ -47,7 +47,7 @@ export async function dispatchPluginVerb(
 ): Promise<PluginDispatchResult> {
   const result = await options.processRunner.exec(
     'deno',
-    ['dx', resolvePluginCliSpecifier(pkg), verb, ...args],
+    ['x', '-A', resolvePluginCliSpecifier(pkg), verb, ...args],
     { cwd: options.projectRoot },
   );
 

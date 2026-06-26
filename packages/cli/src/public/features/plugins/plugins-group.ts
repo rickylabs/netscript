@@ -3,6 +3,7 @@ import { Command } from '@cliffy/command';
 import { FRAMEWORK_VERBS } from './dispatch/dispatch-plugin-verb.ts';
 import { createPluginVerbCommand } from './dispatch/plugin-verb-command.ts';
 import type { FrameworkVerb } from './dispatch/dispatch-plugin-verb.ts';
+import { createPluginAddCommand } from './add/add-plugin-command.ts';
 import { createDoctorPluginCommand } from './doctor/doctor-plugin-command.ts';
 import { createHostPluginCommand } from './host/host-plugin-command.ts';
 import { createInfoPluginCommand } from './info/info-plugin-command.ts';
@@ -12,7 +13,7 @@ import { createPluginScaffoldCommand } from './scaffold/scaffold-plugin-command.
 import { createUpdatePluginCommand } from './update/update-plugin-command.ts';
 import type { PublicCommandDependencies } from '../root/public-command-dependencies.ts';
 
-const CONCRETE_VERBS = new Set<FrameworkVerb>(['sync', 'info', 'update', 'remove', 'doctor']);
+const CONCRETE_VERBS = new Set<FrameworkVerb>(['add', 'sync', 'info', 'update', 'remove', 'doctor']);
 
 /** Create the public plugin command group. */
 export function createPluginCommand(
@@ -29,6 +30,13 @@ export function createPluginCommand(
       'scaffold',
       createPluginScaffoldCommand({
         scaffoldDependencies: dependencies.pluginScaffoldDependencies,
+        resolveProjectRoot: dependencies.resolveProjectRoot,
+      }),
+    )
+    .command(
+      'add',
+      createPluginAddCommand({
+        addPluginDependencies: dependencies.pluginAddDependencies,
         resolveProjectRoot: dependencies.resolveProjectRoot,
       }),
     )

@@ -54,6 +54,7 @@ describe('generateRegisterBackground', () => {
       processors: { workers: fixtures.MINIMAL_BACKGROUND },
     });
     assertStringIncludes(output, "builder.addExecutable('workers', 'deno', workers_workdir,");
+    assertStringIncludes(output, "'--minimum-dependency-age=0'");
     assertStringIncludes(output, "backgroundProcessors.set('workers'");
   });
 
@@ -145,6 +146,13 @@ describe('generateRegisterBackground', () => {
     assertStringIncludes(output, '// KV cache dependency');
     assertStringIncludes(output, 'infrastructure.primaryCacheEndpoint');
     assertStringIncludes(output, 'withReference(infrastructure.primaryCacheEndpoint)');
+    assertStringIncludes(output, "import { EndpointProperty } from '../.aspire/modules/aspire.mjs'");
+    assertStringIncludes(
+      output,
+      'infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort)',
+    );
+    assertStringIncludes(output, "withEnvironment('GARNET_URI', triggers_cacheEndpoint)");
+    assertStringIncludes(output, "withEnvironment('REDIS_URI', triggers_cacheEndpoint)");
   });
 
   it('should pass saga store backend appsettings to background env', () => {

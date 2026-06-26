@@ -37,7 +37,7 @@ engine and the test fixtures:
 
 | Symbol | Signature | Description |
 | --- | --- | --- |
-| `dispatchPluginVerb` | `function dispatchPluginVerb(verb: FrameworkVerb, pkg: string, args: readonly string[], options: DispatchPluginVerbOptions): Promise<PluginDispatchProcessResult>` | Dispatch a framework plugin verb through `deno dx jsr:<pkg>/cli`. |
+| `dispatchPluginVerb` | `function dispatchPluginVerb(verb: FrameworkVerb, pkg: string, args: readonly string[], options: DispatchPluginVerbOptions): Promise<PluginDispatchProcessResult>` | Dispatch a framework plugin verb through `deno x -A jsr:<pkg>/cli`. |
 | `isFrameworkVerb` | `function isFrameworkVerb(value: string): value is FrameworkVerb` | Return whether a value is a framework-owned plugin verb. |
 | `FRAMEWORK_VERBS` | `const FRAMEWORK_VERBS: readonly FrameworkVerb[]` | Framework-owned plugin verb constants. |
 | `FrameworkVerb` | `type FrameworkVerb = "add" \| "remove" \| "enable" \| "disable" \| "sync" \| "setup" \| "update" \| "doctor" \| "info"` | Framework-owned plugin verbs. |
