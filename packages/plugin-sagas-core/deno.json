@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-sagas-core",
-  "version": "0.0.1-alpha.3",
+  "version": "0.0.1-alpha.4",
   "description": "Saga DSL, runtime ports, adapters, telemetry, config, and testing primitives for NetScript sagas plugins.",
   "license": "MIT",
   "exports": {
