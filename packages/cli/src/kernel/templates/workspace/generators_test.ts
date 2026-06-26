@@ -6,6 +6,7 @@
 
 import { assert, assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateDenoJson } from './deno-json.ts';
 import { generateNetScriptConfig } from './netscript-config.ts';
 import { generateReadme } from './generate-readme.ts';
@@ -25,9 +26,9 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
 
   assertEquals(result.workspace, ['./contracts', './plugins']);
   assertEquals(result.imports, {
-    '@netscript/contracts': 'jsr:@netscript/contracts@0.0.1-alpha.4',
-    '@netscript/kv': 'jsr:@netscript/kv@0.0.1-alpha.4',
-    '@netscript/plugin': 'jsr:@netscript/plugin@0.0.1-alpha.4',
+    '@netscript/contracts': netscriptJsrSpecifier('contracts'),
+    '@netscript/kv': netscriptJsrSpecifier('kv'),
+    '@netscript/plugin': netscriptJsrSpecifier('plugin'),
   });
   assertEquals(result.nodeModulesDir, 'auto');
   assertEquals(result.unstable, ['raw-imports', 'kv']);
@@ -60,9 +61,9 @@ Deno.test('generateDenoJson emits shared plugin service-context imports in JSR m
     importMode: 'jsr',
   }));
   assertEquals(result.imports, {
-    '@netscript/contracts': 'jsr:@netscript/contracts@0.0.1-alpha.4',
-    '@netscript/kv': 'jsr:@netscript/kv@0.0.1-alpha.4',
-    '@netscript/plugin': 'jsr:@netscript/plugin@0.0.1-alpha.4',
+    '@netscript/contracts': netscriptJsrSpecifier('contracts'),
+    '@netscript/kv': netscriptJsrSpecifier('kv'),
+    '@netscript/plugin': netscriptJsrSpecifier('plugin'),
   });
 });
 

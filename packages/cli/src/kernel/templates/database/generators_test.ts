@@ -7,6 +7,7 @@ import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
 
 import { DbEngineRegistry } from '../../application/registries/db-engine-registry.ts';
 import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import { generateDatabaseDenoJson } from './generate-db-deno-json.ts';
 import { generateDatabaseFacadeMod } from './generate-db-mod.ts';
 import { generateEngineMod } from './generate-engine-mod.ts';
@@ -70,7 +71,7 @@ describe('database template generators', () => {
     assertEquals(config.imports['@prisma/adapter-pg'], undefined);
     assertEquals(
       config.imports['@netscript/database'],
-      'jsr:@netscript/database@0.0.1-alpha.4',
+      netscriptJsrSpecifier('database'),
     );
     assertEquals(config.imports['@netscript/database/scripts'], undefined);
     assertEquals(config.imports['@netscript/database/tracing'], undefined);

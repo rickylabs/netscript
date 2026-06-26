@@ -256,3 +256,27 @@ Lock delta:
 - No added or removed JSR/remote/workspace lock keys.
 - The three deleted dependency references were unqualified dependency names replaced by qualified
   package keys: `inherits`, `lru-cache`, and `commander`.
+
+## Check-Test Drift Fix Slice
+
+Scope:
+
+- Updated stale CLI unit-test expectations only.
+- `packages/cli/src/kernel/templates/workspace/generators_test.ts` now derives expected root JSR
+  specifiers with `netscriptJsrSpecifier`.
+- `packages/cli/src/kernel/templates/database/generators_test.ts` now derives the expected database
+  root JSR specifier with `netscriptJsrSpecifier` while keeping the removed sub-path assertions.
+- `packages/cli/src/public/features/db/add/add-db_test.ts` now reads the generated root
+  `@netscript/database` import instead of the removed `@netscript/database/scripts` sub-path key.
+- No generator/source `.ts` files changed; no `as` casts introduced.
+
+Evidence:
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| Targeted workspace generator test | `deno test --allow-all packages/cli/src/kernel/templates/workspace/generators_test.ts` | PASS: `ok \| 13 passed \| 0 failed (10ms)` |
+| Targeted database generator test | `deno test --allow-all packages/cli/src/kernel/templates/database/generators_test.ts` | PASS: `ok \| 1 passed (7 steps) \| 0 failed (15ms)` |
+| Targeted add-db flow test | `deno test --allow-all packages/cli/src/public/features/db/add/add-db_test.ts` | PASS: `ok \| 1 passed (2 steps) \| 0 failed (16ms)` |
+| Version-drift guard | `deno test --allow-all packages/cli/src/kernel/constants/version-drift_test.ts` | PASS: `ok \| 1 passed \| 0 failed (179ms)` |
+| Scoped CLI check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | PASS: `filesSelected=520`, `failedBatches=0`, `totalOccurrences=0` |
+| Repo-wide tests | `rtk proxy deno task test` | PASS: `ok \| 885 passed (370 steps) \| 0 failed \| 12 ignored (37s)` |
