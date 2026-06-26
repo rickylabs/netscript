@@ -6,13 +6,15 @@
 
 import { join, resolve } from '@std/path';
 import { toFileUrl } from '@std/path/to-file-url';
-import { loadConfig, type NetScriptConfig, type PathsConfig } from '@netscript/config';
+import type { NetScriptConfig, PathsConfig } from '@netscript/config';
 import type { PluginManifest } from '@netscript/plugin';
 import type {
   RegisteredPluginConfig,
   RegisteredPluginEnvironmentVariableValue,
 } from '../../domain/resolved-config.ts';
 import { ConfigError } from '../../domain/errors/cli-exit-error.ts';
+import { loadProjectConfig } from './project-config-loader.ts';
+import { DenoProcess } from '../runtime/process/deno-process.ts';
 
 const PLUGIN_DEPENDENCY_MISSING_EXIT_CODE = 76;
 
@@ -110,7 +112,10 @@ export async function loadRegisteredPlugins(
   projectRoot: string,
   config?: NetScriptConfig,
 ): Promise<Record<string, RegisteredPluginConfig>> {
-  const resolvedConfig = config ?? await loadConfig({ cwd: projectRoot });
+  const resolvedConfig = config ??
+    await loadProjectConfig({ cwd: projectRoot }, {
+      process: new DenoProcess(),
+    });
   const definitions = await resolvePluginConfigSnapshot(projectRoot, resolvedConfig);
 
   return Object.fromEntries(
@@ -216,7 +221,7 @@ function hasHostContribution(manifest: PluginManifest): boolean {
 
 function resolveRegisteredPluginSnapshot(
   definition: PluginManifest,
-  config?: NetScriptConfig,
+  _config?: NetScriptConfig,
 ): RegisteredPluginSnapshot {
   const service = definition.contributions.services?.[0];
   return {

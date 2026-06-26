@@ -14,12 +14,14 @@ import { outputWarning } from '../../presentation/output/default-output.ts';
  */
 
 import { join, resolve } from '@std/path';
-import { discoverWorkspace, loadConfig as loadNetScriptConfig } from '@netscript/config';
+import { discoverWorkspace, type NetScriptConfig } from '@netscript/config';
 import { DEFAULT_DEPLOY_OUTPUT_DIR } from '../../constants/runtime.ts';
 import { ConfigInvalidError, ConfigNotFoundError } from '../../domain/errors.ts';
 import { detectInfrastructure, type RawInfrastructureEntries } from './infrastructure.ts';
 import { loadRegisteredPlugins } from './plugin-registry.ts';
 import type { ResolvedConfig } from '../../domain/resolved-config.ts';
+import { loadProjectConfig } from './project-config-loader.ts';
+import { DenoProcess } from '../runtime/process/deno-process.ts';
 
 import type { AppSettingsJson } from './deploy-config-types.ts';
 import {
@@ -98,6 +100,8 @@ export interface LoadDeployConfigOptions {
   deployDir?: string;
   /** Suppress warnings about missing optional files. */
   quiet?: boolean;
+  /** Project-rooted config loader override. */
+  loadNetScriptConfig?: (options: { cwd: string }) => Promise<NetScriptConfig>;
 }
 
 /**
@@ -122,6 +126,8 @@ export async function loadDeployConfig(options?: LoadDeployConfigOptions): Promi
     ]);
   }
 
+  const loadNetScriptConfig = options?.loadNetScriptConfig ??
+    ((options) => loadProjectConfig(options, { process: new DenoProcess() }));
   const netscriptConfig = await loadNetScriptConfig({ cwd: projectRoot }).catch((err: unknown) => {
     throw new ConfigInvalidError(
       `netscript.config.ts validation failed: ${(err as Error).message}`,

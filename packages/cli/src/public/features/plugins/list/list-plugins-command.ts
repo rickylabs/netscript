@@ -6,7 +6,7 @@ import { outputText } from '../../../../kernel/presentation/output/default-outpu
  */
 
 import { Command } from '@cliffy/command';
-import { loadConfig } from '@netscript/config';
+import type { NetScriptConfig } from '@netscript/config';
 import { AstExtractor, FilesystemWalker } from '@netscript/plugin/sdk';
 import { resolve } from '@std/path';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
@@ -15,14 +15,23 @@ import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import type { ListPluginsInput, PluginListEntry } from './list-plugins-input.ts';
 
+/** Dependencies for the public plugin list command. */
+export interface ListPluginsCommandDependencies {
+  /** Load the project configuration from the supplied project root. */
+  readonly loadConfig: (options: { cwd: string }) => Promise<NetScriptConfig>;
+}
+
 const CONTRIBUTION_AXIS_BY_PLUGIN: Readonly<Record<string, string>> = {
   workers: 'jobs',
   sagas: 'sagas',
   triggers: 'triggers',
 };
 
-async function discoverPlugins(projectRoot: string): Promise<readonly PluginListEntry[]> {
-  const config = await loadConfig({ cwd: projectRoot });
+async function discoverPlugins(
+  projectRoot: string,
+  dependencies: ListPluginsCommandDependencies,
+): Promise<readonly PluginListEntry[]> {
+  const config = await dependencies.loadConfig({ cwd: projectRoot });
   const [registeredPlugins, contributionCounts] = await Promise.all([
     loadRegisteredPlugins(projectRoot, config),
     discoverContributionCounts(projectRoot),
@@ -72,31 +81,35 @@ function resolvePluginLocalName(pluginName: string): string {
     : packageSegment;
 }
 
-/** `netscript plugin list` command. */
-export const pluginListCommand: Command<any, any, any, any, any, any, any, any> = new Command()
-  .name('list')
-  .description('List configured NetScript plugins')
-  .option('--project-root <path:string>', 'Project root directory')
-  .action(async (flags: ListPluginsInput): Promise<void> => {
-    const projectRoot = flags.projectRoot ? resolve(flags.projectRoot) : await findProjectRoot();
+/** Create the `netscript plugin list` command. */
+export function createPluginListCommand(
+  dependencies: ListPluginsCommandDependencies,
+) {
+  return new Command()
+    .name('list')
+    .description('List configured NetScript plugins')
+    .option('--project-root <path:string>', 'Project root directory')
+    .action(async (flags: ListPluginsInput): Promise<void> => {
+      const projectRoot = flags.projectRoot ? resolve(flags.projectRoot) : await findProjectRoot();
 
-    if (!projectRoot) {
-      throw new ScaffoldValidationError(
-        'Could not find a NetScript project root from the current directory.',
-      );
-    }
+      if (!projectRoot) {
+        throw new ScaffoldValidationError(
+          'Could not find a NetScript project root from the current directory.',
+        );
+      }
 
-    const plugins = await discoverPlugins(projectRoot);
+      const plugins = await discoverPlugins(projectRoot, dependencies);
 
-    if (plugins.length === 0) {
-      outputText('No plugins configured.');
-      return;
-    }
+      if (plugins.length === 0) {
+        outputText('No plugins configured.');
+        return;
+      }
 
-    outputText('Name\tDisplayName\tType\tEnabled\tWorkdir\tService\tPort\tAxis\tContributions');
-    for (const plugin of plugins) {
-      outputText(
-        `${plugin.name}\t${plugin.displayName}\t${plugin.type}\t${plugin.enabled}\t${plugin.workdir}\t${plugin.service}\t${plugin.port}\t${plugin.contributionAxis}\t${plugin.contributions}`,
-      );
-    }
-  });
+      outputText('Name\tDisplayName\tType\tEnabled\tWorkdir\tService\tPort\tAxis\tContributions');
+      for (const plugin of plugins) {
+        outputText(
+          `${plugin.name}\t${plugin.displayName}\t${plugin.type}\t${plugin.enabled}\t${plugin.workdir}\t${plugin.service}\t${plugin.port}\t${plugin.contributionAxis}\t${plugin.contributions}`,
+        );
+      }
+    });
+}
