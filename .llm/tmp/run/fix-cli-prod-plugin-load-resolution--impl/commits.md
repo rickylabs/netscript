@@ -1,1 +1,2 @@
 - 6cdfe39c: fix(cli): inject plugin core imports on add
+- dcf4e0dc: fix(cli): list plugins from scaffold metadata
