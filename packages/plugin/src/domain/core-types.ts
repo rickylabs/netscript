@@ -1,13 +1,4 @@
-import type { CONTRIBUTION_AXES, LIFECYCLE_HOOK_NAMES, PLUGIN_TYPES } from './constants.ts';
-
-/** Supported plugin contribution axes. */
-export type ContributionAxis = (typeof CONTRIBUTION_AXES)[number];
-
-/** Supported plugin categories. */
-export type PluginType = (typeof PLUGIN_TYPES)[number];
-
-/** Supported plugin lifecycle hook names. */
-export type LifecycleHookName = (typeof LIFECYCLE_HOOK_NAMES)[number];
+export type { ContributionAxis, LifecycleHookName, PluginType } from './constants.ts';
 
 /** Stable plugin identifier. */
 export type PluginName = `@${string}/${string}` | string;

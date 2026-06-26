@@ -150,15 +150,18 @@ path to `TEMPLATE_KEYS`, run `deno task gen:assets-barrel`, then run
 | cli publish dry-run | `cd packages/cli && deno task publish:dry-run` | PASS — generated CLI assets listed; existing dynamic-import warnings remain |
 | plugin publish dry-run | `cd packages/plugin && deno task publish:dry-run` | PASS — generated plugin assets listed; existing slow-type/dynamic-import warnings remain |
 | fresh-ui publish dry-run | `cd packages/fresh-ui && deno publish --dry-run --allow-dirty` | PASS — `registry.generated.ts`, `registry.ts`, manifest, and registry files listed |
-| scaffold runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | FAIL — first run exposed unrendered service template pipes, fixed in `template-asset.ts`; rerun reached clean scaffold init and all plugin gates, then failed `database.init` due external Aspire dashboard port `127.0.0.1:18891` already held by `/home/codex/repos/netscript-cli-plugin-copy/.llm/tmp/cli-e2e/plugin-smoke-20260626-101742/aspire/apphost.mts` |
+| scaffold runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS — 47 passed, 0 failed after the stale external Aspire AppHost was stopped |
 
 ### Notes
 
 - The first runtime smoke run was useful evidence: scaffold init reported unrendered
   `{{serviceName | ...}}` placeholders in service files. `renderTemplateAssetSync` now delegates to
   the established `renderTemplate` helper, and the rerun's scaffold init stderr was clean.
-- The remaining runtime smoke failure is an external Aspire lifecycle conflict, not an asset output
-  difference. The conflicting process is outside this worktree, so it was not stopped from this
-  implementation session.
+- An intermediate runtime smoke rerun reached clean scaffold init and all plugin gates, then failed
+  `database.init` due an external Aspire dashboard port conflict with
+  `/home/codex/repos/netscript-cli-plugin-copy/.llm/tmp/cli-e2e/plugin-smoke-20260626-101742/aspire/apphost.mts`.
+  After that stale AppHost was stopped, the full `scaffold.runtime` suite passed.
 - `deno.lock` was touched by validation/publish dry-runs and reverted; S3 has no intended lock
   churn.
+- Branch push succeeded with `git push origin HEAD:refs/heads/fix/cli-jsr-asset-embedding`.
+  GitHub API still returned no PR for the branch, so there was no PR comment target for S3.

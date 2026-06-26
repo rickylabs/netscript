@@ -28,7 +28,27 @@ export { startWatcher } from './presets/start-watcher.ts';
 export { createInstrumentationBridge } from './runtime/instrumentation-bridge.ts';
 export type { InstrumentationBridge } from './runtime/instrumentation-bridge.ts';
 export { createPluginContext } from './runtime/plugin-context.ts';
+export type { PluginContext, PluginLogger } from '../domain/mod.ts';
 export { createPluginHostBootstrap } from './runtime/plugin-host-bootstrap.ts';
 export type { PluginHostBootstrap } from './runtime/plugin-host-bootstrap.ts';
+export type {
+  BackgroundProcessorContribution,
+  ContractVersionContribution,
+  DbSchemaContribution,
+  E2eContribution,
+  MigrationContribution,
+  PluginContributions,
+  PluginDependencies,
+  PluginLifecycleHooks,
+  PluginManifest,
+  PluginMetadata,
+  PluginMetadataValue,
+  PluginType,
+  RuntimeConfigTopicContribution,
+  ServiceContribution,
+  StreamTopicContribution,
+  TelemetryContribution,
+} from '../config/mod.ts';
 export type { PluginServiceContext } from './runtime/plugin-service-context.ts';
 export { runDoctorReport } from './runtime/doctor-runner.ts';
+export type { DoctorCheck, DoctorReport } from '../cli/mod.ts';
