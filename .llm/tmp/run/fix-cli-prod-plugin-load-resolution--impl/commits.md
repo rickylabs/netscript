@@ -1,0 +1,1 @@
+- 6cdfe39c: fix(cli): inject plugin core imports on add
