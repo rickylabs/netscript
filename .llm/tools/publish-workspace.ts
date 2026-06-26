@@ -1,6 +1,12 @@
 type JsonObject = Record<string, unknown>;
 
-export type PublishMode = 'dry-run' | 'publish';
+export type PublishMode = 'dry-run' | 'publish' | 'preflight';
+
+// A deliberately invalid bearer token. The preflight runs the REAL `deno publish`
+// (not `--dry-run`) so it exercises the real publish module-graph build, but this
+// token guarantees the run fails at the auth boundary BEFORE any upload — so
+// nothing is ever published by a preflight.
+const PREFLIGHT_INVALID_TOKEN = 'jsr-preflight-no-upload-invalid-token';
 
 export interface PublishableMember {
   readonly path: string;
@@ -57,11 +63,14 @@ export async function publishWorkspace(
     // this: text imports are stable (no flag exists) and `--unstable-raw-imports`
     // only toggles `bytes` imports, which this workspace does not use. Plain
     // string constants publish cleanly with no flag.
-    const args = ['publish', '--allow-dirty', '--allow-slow-types'];
-    if (options.mode === 'dry-run') {
-      args.push('--dry-run');
+    const baseArgs = ['publish', '--allow-dirty', '--allow-slow-types'];
+
+    if (options.mode === 'preflight') {
+      await runPublishPreflight(baseArgs, root);
+      return { members };
     }
 
+    const args = options.mode === 'dry-run' ? [...baseArgs, '--dry-run'] : baseArgs;
     const command = new Deno.Command('deno', {
       args,
       cwd: root,
@@ -80,6 +89,67 @@ export async function publishWorkspace(
       await Deno.writeTextFile(path, source);
     }
   }
+}
+
+/**
+ * Real-publish-equivalent preflight: run the actual `deno publish` (NOT
+ * `--dry-run`) with an invalid token so it builds every member's publish module
+ * graph in the real code path, then fails at the auth boundary before any
+ * upload. This closes the `deno publish --dry-run` blind spot — dry-run can pass
+ * while the real publish-graph build rejects a module, which is how the alpha.5
+ * release produced a partial/half publish (23 of 31 members) before this gate
+ * existed.
+ *
+ * Classification (the run never uploads, because the token is invalid):
+ *  - reached the auth boundary (invalid-bearer-token) => the full graph built
+ *    for every member => PASS.
+ *  - exited 0 => every member is already published at this version (registry
+ *    skip), so there is nothing to build => PASS (no-op).
+ *  - failed before the auth boundary => a graph/check error the real publish
+ *    would also hit => FAIL, so the release stops before uploading anything.
+ */
+async function runPublishPreflight(
+  baseArgs: readonly string[],
+  root: string,
+): Promise<void> {
+  const args = [...baseArgs, '--no-provenance', '--token', PREFLIGHT_INVALID_TOKEN];
+  const command = new Deno.Command('deno', {
+    args,
+    cwd: root,
+    stdout: 'piped',
+    stderr: 'piped',
+  });
+  const result = await command.output();
+  // Surface the real publish output in the CI log.
+  await Deno.stdout.write(result.stdout);
+  await Deno.stderr.write(result.stderr);
+  const decoder = new TextDecoder();
+  const combined = `${decoder.decode(result.stdout)}\n${decoder.decode(result.stderr)}`;
+
+  if (reachedAuthBoundary(combined)) {
+    console.log(
+      '\n[preflight] PASS: real `deno publish` graph built for every member; ' +
+        'stopped at the auth boundary with no upload.',
+    );
+    return;
+  }
+  if (result.code === 0) {
+    console.log(
+      '\n[preflight] PASS: every member already published at this version ' +
+        '(registry skip); nothing to build.',
+    );
+    return;
+  }
+  throw new Error(
+    'Publish preflight FAILED: the real `deno publish` graph build errored before ' +
+      'the auth boundary, so a real publish would fail and could half-publish. ' +
+      `deno publish exit ${result.code}. See the output above for the failing module.`,
+  );
+}
+
+function reachedAuthBoundary(output: string): boolean {
+  return /invalidBearerToken|provided bearer token is invalid|unauthorized|HTTP 401/i
+    .test(output);
 }
 
 export async function discoverWorkspaceMembers(

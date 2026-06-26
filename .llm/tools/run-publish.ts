@@ -7,6 +7,7 @@ import {
 
 interface Options {
   readonly dryRun: boolean;
+  readonly preflight: boolean;
   readonly printJsrLinks: boolean;
   readonly updateReleaseBody: boolean;
   readonly version?: string;
@@ -29,12 +30,15 @@ if (options.printJsrLinks) {
   const members = await discoverWorkspaceMembers();
   const updated = updateReleaseBodyWithJsrLinks(body, members, version);
   await Deno.writeTextFile(options.outFile, updated);
+} else if (options.preflight) {
+  await publishWorkspace({ mode: 'preflight' });
 } else {
   await publishWorkspace({ mode: options.dryRun ? 'dry-run' : 'publish' });
 }
 
 function parseArgs(args: readonly string[]): Options {
   let dryRun = false;
+  let preflight = false;
   let printJsrLinks = false;
   let updateReleaseBody = false;
   let version: string | undefined;
@@ -45,6 +49,8 @@ function parseArgs(args: readonly string[]): Options {
     const arg = args[index];
     if (arg === '--dry-run') {
       dryRun = true;
+    } else if (arg === '--preflight') {
+      preflight = true;
     } else if (arg === '--print-jsr-links') {
       printJsrLinks = true;
     } else if (arg === '--update-release-body') {
@@ -66,8 +72,11 @@ function parseArgs(args: readonly string[]): Options {
   if (printJsrLinks && updateReleaseBody) {
     throw new Error('--print-jsr-links and --update-release-body cannot be combined.');
   }
+  if (preflight && dryRun) {
+    throw new Error('--preflight and --dry-run cannot be combined.');
+  }
 
-  return { dryRun, printJsrLinks, updateReleaseBody, version, bodyFile, outFile };
+  return { dryRun, preflight, printJsrLinks, updateReleaseBody, version, bodyFile, outFile };
 }
 
 function readValue(args: readonly string[], index: number, flag: string): string {
