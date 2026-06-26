@@ -121,3 +121,26 @@ docs for parallel launch mode. The Aspire and CLI help confirmed the e2e path al
 `aspire start --isolated`; the observed remaining collision was Aspire's control-plane port
 `18891` while another scaffold runtime suite was active. After that run released the port, a raw
 rerun from the same WSL ext4 worktree passed all runtime gates.
+
+## S4 — public copy opt-out gate after main merge
+
+### Changes
+
+- Gated the public official-plugin copy path on `plan.noCopySource === true` before probing
+  `canCopyPlugin`.
+- Exposed public `plugin add --no-copy-source` and mapped Cliffy `copySource === false` to the
+  existing `PluginAddRequest.noCopySource` field.
+- Replaced the stale static maintainer-import guard with a behavioral public add test that wires
+  copy-capable dependencies, passes `noCopySource: true`, and asserts the canonical JSR stub is
+  rendered without adding the copied background workspace.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| public add unit | `deno test --allow-all packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | pass; `ok \| 1 passed (5 steps) \| 0 failed (34ms)` |
+| local add regression | `deno test --allow-all packages/cli/src/local/features/plugins/add/add-local-plugin_test.ts` | pass; `ok \| 1 passed (4 steps) \| 0 failed (35ms)` |
+| version drift guard | `deno test --allow-all packages/cli/src/kernel/constants/version-drift_test.ts` | pass; `ok \| 1 passed \| 0 failed (106ms)` |
+| scoped CLI check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` | pass; `summary.totalOccurrences=0`, `failedBatches=0` |
+| repo test | `rtk proxy deno task test` | pass; `ok \| 892 passed (373 steps) \| 0 failed \| 12 ignored (37s)` |
+| scaffold runtime | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | pass; raw exit code 0; `Summary: passed=47 failed=0` |

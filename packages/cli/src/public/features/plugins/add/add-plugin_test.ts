@@ -150,19 +150,83 @@ describe('public add plugin flow', () => {
     assertFalse(await fs.exists('/workspace/alpha/workers'));
   });
 
-  it('does not import maintainer copy helpers from the public plugin add feature', async () => {
-    const publicFeatureFiles = [
-      'packages/cli/src/public/features/plugins/add/add-plugin.ts',
-      'packages/cli/src/public/features/plugins/add/add-plugin-command.ts',
-      'packages/cli/src/public/features/plugins/add/render-plugin.ts',
-    ];
+  it('respects --no-copy-source by rendering the JSR stub instead of copying official source', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const registry = new PluginKindRegistry();
+    registry.register(workerProvider.kind, workerProvider);
 
-    for (const path of publicFeatureFiles) {
-      const source = await Deno.readTextFile(path);
-      assertFalse(source.includes('copyOfficialPlugin'), path);
-      assertFalse(/\bcopyPlugin\s*\(/.test(source), path);
-      assertFalse(source.includes('maintainer-api'), path);
-    }
+    await addPlugin({
+      kind: 'worker',
+      pluginName: 'workers',
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: true,
+      includeSamples: false,
+      noCopySource: true,
+      projectRoot: '/workspace/alpha',
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter,
+      registry,
+      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+      workspaceMutator: new PluginWorkspaceMutator(fs),
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+      findSourceRoot: () => Promise.resolve('/repo'),
+      canCopyPlugin: () => Promise.resolve(true),
+      copyPlugin: async () => {
+        await fs.writeFile('/workspace/alpha/plugins/workers/mod.ts', 'export {};\n');
+        await fs.writeFile('/workspace/alpha/workers/mod.ts', 'export {};\n');
+        return {
+          scaffoldResult: {
+            filesCreated: [
+              '/workspace/alpha/plugins/workers/mod.ts',
+              '/workspace/alpha/workers/mod.ts',
+            ],
+            directoriesCreated: ['/workspace/alpha/plugins/workers', '/workspace/alpha/workers'],
+            filesSkipped: [],
+            totalOperations: 4,
+            durationMs: 0,
+          },
+          pluginName: 'workers',
+          pluginDir: '/workspace/alpha/plugins/workers',
+          backgroundDir: '/workspace/alpha/workers',
+          serviceConfigKey: 'workers-api',
+          servicePort: 8091,
+          serviceEntrypoint: 'services/src/main.ts',
+          backgroundPort: 8091,
+          backgroundEntrypoint: 'bin/combined.ts',
+          dependencies: [],
+          pluginReferences: [],
+          workspaceMembers: ['workers'],
+        };
+      },
+      getSource: () =>
+        Promise.resolve({
+          kind: 'worker',
+          canonicalName: 'workers',
+          pluginDir: 'workers',
+          backgroundDir: 'workers',
+          serviceEntrypoint: 'services/src/main.ts',
+          backgroundEntrypoint: 'bin/combined.ts',
+          serviceConfigKey: 'workers-api',
+          servicePort: 8091,
+          backgroundPort: 8091,
+          dependencies: [],
+          pluginReferences: [],
+        }),
+    });
+
+    assertFalse(await fs.exists('/workspace/alpha/workers/mod.ts'));
+    const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
+    assertEquals(rootDenoJson.workspace.includes('./workers'), false);
+    const pluginMod = await fs.readFile('/workspace/alpha/plugins/workers/mod.ts');
+    assertStringIncludes(pluginMod, "import { definePlugin } from '@netscript/plugin';");
   });
 
   it('registers copied official background workspaces as Deno workspace members', async () => {
