@@ -15,13 +15,8 @@ import { renderTemplateAssetSync } from '../../adapters/templates/template-asset
  * @returns A string containing valid TypeScript source code for `netscript.config.ts`.
  */
 export function generateNetScriptConfig(options: NetScriptConfigGenOptions): string {
-  const jsrComment = options.importMode === 'jsr'
-    ? `// TODO: When @netscript packages are published to JSR, this import will resolve.\n` +
-      `// For local monorepo development, re-run with: netscript init workspace-source\n`
-    : '';
-
   return renderTemplateAssetSync(TEMPLATE_KEYS.generatedWorkspaceNetscriptConfig1, {
-    __slot0__: String(jsrComment),
+    __slot0__: '',
     __slot1__: "'@netscript/config'",
     __slot2__: String(options.name),
     __slot3__: String(SCAFFOLD_DEFAULTS.VERSION),

@@ -1,16 +1,6 @@
-import {
-  dirname,
-  isAbsolute,
-  join,
-  normalize,
-  relative,
-  resolve,
-  toFileUrl,
-} from '@std/path';
-import {
-  FRESH_UI_REGISTRY_CONTENT,
-  freshUiRegistryManifest,
-} from '@netscript/fresh-ui/registry';
+import { dirname, isAbsolute, join, normalize, relative, resolve, toFileUrl } from '@std/path';
+import { normalize as posixNormalize } from '@std/path/posix';
+import { FRESH_UI_REGISTRY_CONTENT, freshUiRegistryManifest } from '@netscript/fresh-ui/registry';
 
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { mergeDenoJsonImports } from './registry-deno-json.ts';
@@ -199,7 +189,7 @@ function planFiles(
   const files = new Map<string, PlannedFile>();
   for (const item of items) {
     for (const file of item.files) {
-      const source = registryRoot === undefined ? normalize(file.source) : resolve(registryRoot, file.source);
+      const source = registryRoot === undefined ? file.source : resolve(registryRoot, file.source);
       const target = resolveTarget(projectRoot, file.target);
       files.set(normalize(source), { source, target });
     }
@@ -272,7 +262,7 @@ function readRegistryContent(
   registryContent: Readonly<Record<string, string>>,
   source: string,
 ): string {
-  const content = registryContent[normalize(source)];
+  const content = registryContent[posixNormalize(source)];
   if (content === undefined) {
     throw new Error(`Fresh UI registry content is missing: ${source}`);
   }

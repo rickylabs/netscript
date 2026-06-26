@@ -26,6 +26,7 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
 
   assertEquals(result.workspace, ['./contracts', './plugins']);
   assertEquals(result.imports, {
+    '@netscript/config': netscriptJsrSpecifier('config'),
     '@netscript/contracts': netscriptJsrSpecifier('contracts'),
     '@netscript/kv': netscriptJsrSpecifier('kv'),
     '@netscript/plugin': netscriptJsrSpecifier('plugin'),
@@ -61,6 +62,7 @@ Deno.test('generateDenoJson emits shared plugin service-context imports in JSR m
     importMode: 'jsr',
   }));
   assertEquals(result.imports, {
+    '@netscript/config': netscriptJsrSpecifier('config'),
     '@netscript/contracts': netscriptJsrSpecifier('contracts'),
     '@netscript/kv': netscriptJsrSpecifier('kv'),
     '@netscript/plugin': netscriptJsrSpecifier('plugin'),
@@ -114,13 +116,13 @@ Deno.test('generateDenoJson expands copied workspace packages in stable order', 
   assertEquals(result.workspace[result.workspace.length - 1], './packages/prisma-adapter-mysql');
 });
 
-Deno.test('generateNetScriptConfig emits JSR guidance and stable section order', () => {
+Deno.test('generateNetScriptConfig emits the JSR import and stable section order', () => {
   const result = generateNetScriptConfig({
     name: 'test-project',
     importMode: 'jsr',
   });
 
-  assertStringIncludes(result, '// TODO: When @netscript packages are published to JSR');
+  assert(!result.includes('// TODO: When @netscript packages are published to JSR'));
   assertStringIncludes(result, "import { defineConfig } from '@netscript/config';");
   assert(
     result.indexOf("import { defineConfig } from '@netscript/config';") <
