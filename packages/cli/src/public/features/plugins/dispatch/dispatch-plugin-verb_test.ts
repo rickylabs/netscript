@@ -11,7 +11,7 @@ import {
 } from './dispatch-plugin-verb.ts';
 
 describe('plugin verb dispatch', () => {
-  it('routes framework verbs through deno dx and the plugin cli subpath', async () => {
+  it('routes framework verbs through deno x and the plugin cli subpath', async () => {
     const processRunner = new RecordingProcess(0);
 
     const result = await dispatchPluginVerb('add', '@example/plugin-alpha', ['--yes'], {
@@ -22,7 +22,7 @@ describe('plugin verb dispatch', () => {
     assertEquals(result.stdout, 'plugin output');
     assertEquals(processRunner.commands, [{
       command: 'deno',
-      args: ['dx', 'jsr:@example/plugin-alpha/cli', 'add', '--yes'],
+      args: ['x', '-A', 'jsr:@example/plugin-alpha/cli', 'add', '--yes'],
       cwd: '/workspace/app',
     }]);
   });
