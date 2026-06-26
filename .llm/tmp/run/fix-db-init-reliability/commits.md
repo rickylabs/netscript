@@ -3,3 +3,5 @@
 - `9a8b3664` — `fix(database): harden Prisma db-init retries`
 - `42a5cff8` — `docs(harness): record db-init reliability commit`
 - `d745be60` — `docs(harness): record db-init runtime proof`
+- `3a09d1a6` — `docs(harness): finalize db-init proof artifacts`
+- `31a8c0cd` — `fix(database): narrow db-init retry signatures`
