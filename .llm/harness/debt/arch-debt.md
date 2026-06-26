@@ -4,6 +4,22 @@ Seeded from `docs/architecture/doctrine/10-codebase-verdict-and-handoff.md` on 2
 track packages with `Refactor`, `Restructure`, or `Rewrite` doctrine verdicts. `Keep` and `Defer`
 verdicts are not seeded here.
 
+## packages/cli — PLUGIN-USERLAND-SOURCE-COPY
+
+- **Reason:** Maintainer/local `plugin add` copied full first-party plugin source into generated
+  userland by default, and the public/prod path needed a regression lock proving it never copies
+  source.
+- **Owner:** CLI plugin copy flag gate.
+- **Target:** PR #133.
+- **Linked plan:** `.llm/tmp/run/fix-cli-plugin-copy-flag-gate--copy-gate/plan.md`
+- **Created:** 2026-06-26
+- **Status:** closed 2026-06-26 — local maintainer copy is now explicitly flag-gated with
+  `--no-copy-source` as the opt-out while preserving runtime e2e's default first-party behavior;
+  public `netscript plugin add` remains hardcoded to JSR stub generation and has a no-copy
+  regression test.
+- **Gate:** plugin-add unit tests, `packages/cli` publish dry-run, `scaffold.plugins`, and
+  `scaffold.runtime`.
+
 ## packages/runtime-config — doctrine verdict Refactor
 
 - **Reason:** Split single-file `mod.ts`; add subpaths if exports grow.

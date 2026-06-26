@@ -164,6 +164,10 @@ async function maybeCopyOfficialPlugin(
     return null;
   }
 
+  if (plan.noCopySource === true) {
+    return null;
+  }
+
   const canCopyPlugin = dependencies.canCopyPlugin ?? canCopyOfficialPlugin;
   if (!await canCopyPlugin(sourceRoot, plan.kind, plan.pluginName)) {
     return null;
