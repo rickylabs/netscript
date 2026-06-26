@@ -16,6 +16,7 @@ export type { MigrationContribution } from './domain/migration-contribution.ts';
 export type { PluginContributions } from './domain/plugin-contributions.ts';
 export type { PluginDependencies } from './domain/plugin-dependencies.ts';
 export type { PluginLifecycleHooks } from './domain/plugin-lifecycle-hooks.ts';
+export type { ContributionAxis, PluginContext, PluginLogger } from '../domain/mod.ts';
 export type { PluginType } from '../domain/mod.ts';
 export type { PluginManifest } from './domain/plugin-manifest.ts';
 export type { PluginMetadata } from './domain/plugin-metadata.ts';

@@ -5,7 +5,11 @@
  */
 
 import { dirname, join } from '@std/path';
-import { PLUGIN_SKELETON_TEMPLATES } from '@netscript/plugin/templates';
+import {
+  PLUGIN_SKELETON_TEMPLATE_CONTENT,
+  PLUGIN_SKELETON_TEMPLATES,
+  type PluginSkeletonTemplatePath,
+} from '@netscript/plugin/templates';
 
 import { TEMPLATE_CONVENTIONS } from '../../../../kernel/constants/template-conventions.ts';
 import { IoError, UsageError } from '../../../../kernel/domain/errors/cli-exit-error.ts';
@@ -28,10 +32,10 @@ export interface PluginScaffoldOptions {
   readonly pluginName: string;
   /** Directory that receives scaffolded files. */
   readonly targetPath: string;
-  /** Directory containing plugin skeleton `.template` files. */
-  readonly templateRoot: string;
-  /** Template paths relative to `templateRoot`. */
-  readonly templateRegistry?: readonly string[];
+  /** Template paths in the embedded skeleton content map. */
+  readonly templateRegistry?: readonly PluginSkeletonTemplatePath[];
+  /** Embedded template content keyed by skeleton path. */
+  readonly templateContent?: Readonly<Record<PluginSkeletonTemplatePath, string>>;
   /** Whether existing files may be overwritten. */
   readonly overwrite?: boolean;
 }
@@ -86,6 +90,7 @@ export async function scaffoldPluginPackage(
 ): Promise<PluginScaffoldResult> {
   const substitution = dependencies.substitution ?? createTemplateSubstitutionPort();
   const templateRegistry = options.templateRegistry ?? PLUGIN_SKELETON_TEMPLATES;
+  const templateContent = options.templateContent ?? PLUGIN_SKELETON_TEMPLATE_CONTENT;
   const variables = resolveTemplateVariables(options.pluginName);
   const filesCreated: string[] = [];
   const filesSkipped: string[] = [];
@@ -101,7 +106,6 @@ export async function scaffoldPluginPackage(
     );
 
     for (const templatePath of templateRegistry) {
-      const sourcePath = join(options.templateRoot, templatePath);
       const outputPath = resolveTemplateOutputPath(options.targetPath, templatePath, variables);
 
       if (hasTemplateVariables(outputPath)) {
@@ -122,7 +126,7 @@ export async function scaffoldPluginPackage(
         createdDirectories,
         directoriesCreated,
       );
-      const template = await dependencies.fs.readFile(sourcePath);
+      const template = templateContent[templatePath];
       const content = substitution.expand(template, variables);
       await dependencies.fs.writeFile(outputPath, content);
       filesCreated.push(outputPath);

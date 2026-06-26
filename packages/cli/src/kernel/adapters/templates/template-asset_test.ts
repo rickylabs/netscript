@@ -1,8 +1,8 @@
 import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
-import { fromFileUrl, join, normalize } from '@std/path';
-import { DEFAULT_TEMPLATE_REGISTRY } from '../../application/registries/template-registry.ts';
+import { fromFileUrl, join } from '@std/path';
+import { EMBEDDED_TEMPLATE_CONTENT } from '../../assets/embedded.generated.ts';
 import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
-import { readTemplateAssetSync } from './template-asset.ts';
+import { readTemplateAsset, readTemplateAssetSync, renderTemplateAssetSync } from './template-asset.ts';
 
 const PACKAGE_ROOT = fromFileUrl(new URL('../../../../', import.meta.url));
 const ASSET_ROOT = join(PACKAGE_ROOT, 'src/kernel/assets');
@@ -25,30 +25,24 @@ Deno.test('package asset adapters do not perform direct Deno.read template reads
   }
 });
 
-Deno.test('TemplateRegistry hydrates HTTP assets for sync template reads', async () => {
+Deno.test('template asset adapter reads embedded content without hydration', async () => {
   const templateKey = TEMPLATE_KEYS.workspaceGitignore;
-  const expected = await Deno.readTextFile(join(ASSET_ROOT, templateKey));
-  const server = Deno.serve({ port: 0, onListen: () => undefined }, async (request) => {
-    const url = new URL(request.url);
-    const relativePath = normalize(decodeURIComponent(url.pathname).replace(/^\/+/, ''));
-    const content = await Deno.readTextFile(join(ASSET_ROOT, relativePath));
-    return new Response(content, {
-      headers: { 'content-type': 'text/plain; charset=utf-8' },
-    });
+  const expected = EMBEDDED_TEMPLATE_CONTENT[templateKey];
+  const checkedIn = await Deno.readTextFile(join(ASSET_ROOT, templateKey));
+
+  assertEquals(expected, checkedIn);
+  assertEquals(readTemplateAssetSync(templateKey), expected);
+  assertEquals(await readTemplateAsset(templateKey), expected);
+  assertStringIncludes(expected, '# Dependencies');
+});
+
+Deno.test('template asset adapter renders existing template pipes', () => {
+  const content = renderTemplateAssetSync(TEMPLATE_KEYS.serviceRouter, {
+    projectName: 'my-app',
+    serviceName: 'user-profiles',
+    servicePort: '3001',
   });
 
-  try {
-    DEFAULT_TEMPLATE_REGISTRY.register(templateKey, {
-      path: templateKey,
-      url: new URL(`http://localhost:${server.addr.port}/${templateKey}`),
-    });
-
-    await DEFAULT_TEMPLATE_REGISTRY.hydrate();
-
-    const actual = readTemplateAssetSync(templateKey);
-    assertEquals(actual, expected);
-    assertStringIncludes(actual, '# Dependencies');
-  } finally {
-    await server.shutdown();
-  }
+  assertStringIncludes(content, 'UserProfilesV1');
+  assertStringIncludes(content, 'v1.userProfiles.health');
 });

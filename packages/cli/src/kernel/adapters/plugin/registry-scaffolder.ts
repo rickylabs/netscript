@@ -11,12 +11,8 @@ import type { ScaffolderPort } from '../../ports/template-port.ts';
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import type { PluginRegistryScaffoldOptions } from '../../domain/plugin-kind.ts';
 import { generatePluginsDenoJson } from '../../templates/workspace/plugins/deno-json.ts';
-import { readTemplateAsset } from '../templates/template-asset.ts';
-
-const PLUGINS_MOD_TEMPLATE = new URL(
-  '../../assets/workspace/plugins/mod.ts.template',
-  import.meta.url,
-);
+import { TEMPLATE_KEYS } from '../../assets/manifest.ts';
+import { readTemplateAssetSync } from '../templates/template-asset.ts';
 
 function adjustLocalBase(localBase: string, depth: number): string {
   return '../'.repeat(depth) + localBase;
@@ -51,7 +47,7 @@ export class PluginRegistryScaffolder {
       filesSkipped.push(denoJsonPath);
     }
 
-    const pluginsModTemplate = await readTemplateAsset(PLUGINS_MOD_TEMPLATE);
+    const pluginsModTemplate = readTemplateAssetSync(TEMPLATE_KEYS.workspacePluginsMod);
     const modPath = join(pluginsRoot, SCAFFOLD_FILES.MOD);
     if (await this.scaffolder.writeFile(modPath, pluginsModTemplate, options.force)) {
       filesCreated.push(modPath);

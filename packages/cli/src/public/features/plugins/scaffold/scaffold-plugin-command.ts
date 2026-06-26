@@ -19,10 +19,7 @@ import {
 /** Dependencies for the public plugin scaffold command. */
 export interface PluginScaffoldCommandDependencies {
   /** Use case dependencies for scaffolding plugin packages. */
-  readonly scaffoldDependencies: PluginScaffoldDependencies & {
-    /** Directory containing plugin skeleton template files. */
-    readonly templateRoot: string;
-  };
+  readonly scaffoldDependencies: PluginScaffoldDependencies;
   /** Resolve the project root from flags or environment. */
   readonly resolveProjectRoot: ProjectRootResolver;
   /** Print completion lines. */
@@ -61,7 +58,6 @@ export function createPluginScaffoldCommand(
       const result = await scaffoldPluginPackage({
         pluginName: name,
         targetPath,
-        templateRoot: dependencies.scaffoldDependencies.templateRoot,
         overwrite: options.force ?? false,
       }, {
         fs: dependencies.scaffoldDependencies.fs,

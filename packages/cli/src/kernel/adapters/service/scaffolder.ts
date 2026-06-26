@@ -12,24 +12,8 @@ import type { ScaffolderPort, TemplatePort } from '../../ports/template-port.ts'
 import type { ScaffoldResult } from '../../domain/core-types.ts';
 import { generateServiceDenoJson } from '../../templates/service/generate-service-deno-json.ts';
 import type { ServiceScaffoldOptions, ServiceScaffoldResult } from '../../domain/service-shape.ts';
-import { readTemplateAsset } from '../templates/template-asset.ts';
-
-const SERVICE_MAIN_TEMPLATE = new URL(
-  '../../assets/service/main.ts.template',
-  import.meta.url,
-);
-const SERVICE_ROUTER_TEMPLATE = new URL(
-  '../../assets/service/router.ts.template',
-  import.meta.url,
-);
-const SERVICE_HEALTH_ROUTER_TEMPLATE = new URL(
-  '../../assets/service/routers/health.ts.template',
-  import.meta.url,
-);
-const SERVICE_V1_ROUTER_TEMPLATE = new URL(
-  '../../assets/service/routers/v1.ts.template',
-  import.meta.url,
-);
+import { TEMPLATE_KEYS, type TemplateKey } from '../../assets/manifest.ts';
+import { renderTemplateAssetSync } from '../templates/template-asset.ts';
 
 /** Creates a complete service workspace under `services/<name>/`. */
 export class ServiceScaffolder {
@@ -37,7 +21,7 @@ export class ServiceScaffolder {
   constructor(
     private readonly scaffolder: ScaffolderPort,
     private readonly _fs: FileSystemPort,
-    private readonly templateAdapter: TemplatePort,
+    private readonly _templateAdapter: TemplatePort,
   ) {}
 
   /**
@@ -69,18 +53,6 @@ export class ServiceScaffolder {
       projectName: options.projectName,
       servicePort: String(options.servicePort),
     };
-    const [
-      serviceMainTemplate,
-      serviceRouterTemplate,
-      serviceHealthRouterTemplate,
-      serviceV1RouterTemplate,
-    ] = await Promise.all([
-      readTemplateAsset(SERVICE_MAIN_TEMPLATE),
-      readTemplateAsset(SERVICE_ROUTER_TEMPLATE),
-      readTemplateAsset(SERVICE_HEALTH_ROUTER_TEMPLATE),
-      readTemplateAsset(SERVICE_V1_ROUTER_TEMPLATE),
-    ]);
-
     await this.writeGenerated(
       join(serviceDir, SCAFFOLD_FILES.DENO_JSON),
       generateServiceDenoJson({
@@ -95,7 +67,7 @@ export class ServiceScaffolder {
       filesSkipped,
     );
     await this.writeRendered(
-      serviceMainTemplate,
+      TEMPLATE_KEYS.serviceMain,
       join(srcDir, SCAFFOLD_FILES.MAIN),
       templateVars,
       options.force,
@@ -103,7 +75,7 @@ export class ServiceScaffolder {
       filesSkipped,
     );
     await this.writeRendered(
-      serviceRouterTemplate,
+      TEMPLATE_KEYS.serviceRouter,
       join(srcDir, 'router.ts'),
       templateVars,
       options.force,
@@ -111,7 +83,7 @@ export class ServiceScaffolder {
       filesSkipped,
     );
     await this.writeRendered(
-      serviceHealthRouterTemplate,
+      TEMPLATE_KEYS.serviceRoutersHealth,
       join(routersDir, 'health.ts'),
       templateVars,
       options.force,
@@ -119,7 +91,7 @@ export class ServiceScaffolder {
       filesSkipped,
     );
     await this.writeRendered(
-      serviceV1RouterTemplate,
+      TEMPLATE_KEYS.serviceRoutersV1,
       join(routersDir, 'v1.ts'),
       templateVars,
       options.force,
@@ -158,14 +130,14 @@ export class ServiceScaffolder {
   }
 
   private async writeRendered(
-    template: string,
+    template: TemplateKey,
     path: string,
     vars: Record<string, string>,
     force: boolean,
     filesCreated: string[],
     filesSkipped: string[],
   ): Promise<void> {
-    const content = await this.templateAdapter.render(template, vars);
+    const content = renderTemplateAssetSync(template, vars);
     await this.writeGenerated(path, content, force, filesCreated, filesSkipped);
   }
 

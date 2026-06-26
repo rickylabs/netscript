@@ -233,10 +233,10 @@ export interface PluginScaffoldOptions {
   readonly pluginName: string;
   /** Directory that receives generated files. */
   readonly targetPath: string;
-  /** Directory containing plugin skeleton templates. */
-  readonly templateRoot: string;
   /** Optional template path registry. */
   readonly templateRegistry?: readonly string[];
+  /** Optional embedded template content keyed by registry path. */
+  readonly templateContent?: Readonly<Record<string, string>>;
   /** Whether existing files may be overwritten. */
   readonly overwrite?: boolean;
 }

@@ -5,7 +5,6 @@ import {
   ModuleManifestResolver,
   RegistryEmitter,
 } from '@netscript/plugin/sdk';
-import { fromFileUrl } from '@std/path';
 
 import {
   findProjectRoot as findDeployProjectRoot,
@@ -128,9 +127,7 @@ export interface PublicCommandDependencies {
   /** Dependencies for host-side plugin diagnostics. */
   readonly pluginDoctorDependencies: Pick<DoctorPluginCommandDependencies, 'doctor'>;
   /** Dependencies for plugin package scaffolding. */
-  readonly pluginScaffoldDependencies: PluginScaffoldDependencies & {
-    readonly templateRoot: string;
-  };
+  readonly pluginScaffoldDependencies: PluginScaffoldDependencies;
   /** Dependencies for runtime config schema generation. */
   readonly generateRuntimeSchemasCommandDependencies: GenerateRuntimeSchemasCommandDependencies;
   /** Dependencies for plugin registry generation. */
@@ -174,10 +171,6 @@ export function createPublicCommandDependencies(
       emitter: new RegistryEmitter(),
       fs,
     });
-  const pluginTemplateRoot = fromFileUrl(
-    new URL('./src/templates/skeleton/', import.meta.resolve('@netscript/plugin')),
-  );
-
   const serviceAddDependencies = {
     fs,
     scaffolder,
@@ -256,7 +249,6 @@ export function createPublicCommandDependencies(
     },
     pluginScaffoldDependencies: {
       fs,
-      templateRoot: pluginTemplateRoot,
     },
     generateRuntimeSchemasCommandDependencies: {
       resolveProjectRoot,

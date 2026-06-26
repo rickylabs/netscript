@@ -1,11 +1,32 @@
 /** Current alpha package version for plugin platform packages. */
 export const PLUGIN_ALPHA_VERSION = '0.0.1-alpha.0';
 
+/** Supported plugin category value. */
+export type PluginType = 'background-processor' | 'api' | 'frontend' | 'utility';
+
 /** Supported plugin categories. */
-export const PLUGIN_TYPES = ['background-processor', 'api', 'frontend', 'utility'] as const;
+export const PLUGIN_TYPES: readonly PluginType[] = [
+  'background-processor',
+  'api',
+  'frontend',
+  'utility',
+] as const;
+
+/** Supported plugin contribution axis value. */
+export type ContributionAxis =
+  | 'service'
+  | 'background-processor'
+  | 'stream-topic'
+  | 'database-schema'
+  | 'runtime-config-topic'
+  | 'contract-version'
+  | 'e2e'
+  | 'telemetry'
+  | 'migration'
+  | 'aspire';
 
 /** Supported plugin contribution axes. */
-export const CONTRIBUTION_AXES = [
+export const CONTRIBUTION_AXES: readonly ContributionAxis[] = [
   'service',
   'background-processor',
   'stream-topic',
@@ -18,8 +39,11 @@ export const CONTRIBUTION_AXES = [
   'aspire',
 ] as const;
 
+/** Supported plugin lifecycle hook name value. */
+export type LifecycleHookName = 'setup' | 'beforeGenerate' | 'afterGenerate' | 'teardown';
+
 /** Supported plugin lifecycle hook names. */
-export const LIFECYCLE_HOOK_NAMES = [
+export const LIFECYCLE_HOOK_NAMES: readonly LifecycleHookName[] = [
   'setup',
   'beforeGenerate',
   'afterGenerate',

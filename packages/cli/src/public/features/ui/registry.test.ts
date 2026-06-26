@@ -1,9 +1,11 @@
 import {
   DEFAULT_UI_INIT_ITEMS,
+  installUiRegistryItems,
   registryManifestModuleUrl,
   resolveRegistryItems,
   type UiRegistryManifest,
 } from './registry.ts';
+import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
 
 const manifest: UiRegistryManifest = {
   items: [
@@ -95,5 +97,56 @@ Deno.test('registryManifestModuleUrl resolves manifest outside the copy payload'
 Deno.test('DEFAULT_UI_INIT_ITEMS installs the scaffold foundation and floating styles', () => {
   if (DEFAULT_UI_INIT_ITEMS.join(',') !== 'foundation,floating-styles,control-props') {
     throw new Error(`Unexpected ui:init defaults: ${DEFAULT_UI_INIT_ITEMS.join(',')}`);
+  }
+});
+
+Deno.test('installUiRegistryItems uses embedded content by default', async () => {
+  const writes = new Map<string, string>();
+  const fs: FileSystemPort = {
+    readFile(path: string): Promise<string> {
+      throw new Error(`Unexpected registry filesystem read: ${path}`);
+    },
+    writeFile(path: string, content: string): Promise<void> {
+      writes.set(path.replaceAll('\\', '/'), content);
+      return Promise.resolve();
+    },
+    exists(): Promise<boolean> {
+      return Promise.resolve(false);
+    },
+    stat(): Promise<never> {
+      return Promise.reject(new Error('stat not used'));
+    },
+    createDir(): Promise<void> {
+      return Promise.resolve();
+    },
+    readDir(): Promise<never> {
+      return Promise.reject(new Error('readDir not used'));
+    },
+    remove(): Promise<void> {
+      return Promise.resolve();
+    },
+    copy(): Promise<void> {
+      return Promise.resolve();
+    },
+    async *walk(): AsyncIterable<never> {
+    },
+  };
+
+  const result = await installUiRegistryItems({
+    projectRoot: '/workspace/app',
+    names: ['cn'],
+    overwrite: true,
+  }, { fs });
+
+  const cnPath = '/workspace/app/lib/cn.ts';
+  const stylesPath = '/workspace/app/assets/styles.css';
+  if (!writes.get(cnPath)?.includes('export const cn')) {
+    throw new Error(`Expected embedded cn.ts content at ${cnPath}`);
+  }
+  if (!writes.get(stylesPath)?.includes('App-specific custom styles below.')) {
+    throw new Error(`Expected embedded styles aggregator at ${stylesPath}`);
+  }
+  if (!result.copiedFiles.map((path) => path.replaceAll('\\', '/')).includes(cnPath)) {
+    throw new Error(`Expected copiedFiles to include ${cnPath}`);
   }
 });
