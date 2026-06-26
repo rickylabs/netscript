@@ -51,6 +51,11 @@
 | 1 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 1 | `database.init` passed. Suite failed later at `runtime.aspire-start` with Aspire exit 2; unrelated to db-init. |
 | 2 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | Full suite passed, `Summary: passed=47 failed=0`; `database.init` passed in ~30.6s. |
 | 3 | Loop run 2 of `for i in 2 3 4 5; do rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty || exit $?; done` | 1 | Residual flake captured: `database.init` failed after 309069ms with stderr `Error: Timed out waiting for Aspire resource prisma-init-postgres to complete.` |
+| Proof 1 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | `Summary: passed=47 failed=0`; `database.init` passed in 30857ms. |
+| Proof 2 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | `Summary: passed=47 failed=0`; `database.init` passed in 33324ms. |
+| Proof 3 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | `Summary: passed=47 failed=0`; `database.init` passed in 32995ms. |
+| Proof 4 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | `Summary: passed=47 failed=0`; `database.init` passed in 36449ms. |
+| Proof 5 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 0 | `Summary: passed=47 failed=0`; `database.init` passed in 33083ms. |
 | 4 | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | 1 | After fix: `database.init` passed in 51293ms, `database.generate` passed, `database.seed` passed; suite failed later at `runtime.aspire-start` exit 2 with discarded detached AppHost diagnostics. |
 | 5 | Focused generated-project `db init` loop | 0 | Five focused `db init` runs passed: `db-init-loop-1.log`, `db-init-loop-2.log`, `db-init-loop-3.log`, `db-init-loop-4-final.log`, `db-init-loop-5-final.log`; each reached `Applying migration ...` and `db init completed successfully.` |
 
@@ -66,6 +71,6 @@
 | Public surface doc | PASS | `deno doc packages/database/scripts/mod.ts` rendered the updated `MigrationOptions` / retry option docs. |
 | Script doc lint | PASS | `deno doc --lint packages/database/scripts/mod.ts` — `Checked 1 file`. |
 | Publish dry-run | PASS | `deno publish --dry-run --allow-dirty` from `packages/database` — dry run complete, no slow-type failure. |
+| Full scaffold runtime proof | PASS | Five consecutive `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` runs passed with `Summary: passed=47 failed=0`; db-init durations: 30857ms, 33324ms, 32995ms, 36449ms, 33083ms. |
 | Fitness evidence | PASS | LOC: `migrate.ts` 369, `migrate-retry_test.ts` 196. No touched classes/extends. Only existing `console.log.bind(console)` remains as CLI/script edge reporter; no new `console.*` added. |
-| Full scaffold runtime | PARTIAL / ENV BLOCKED | One full post-fix suite passed completely (`plugin-smoke-20260626-225254.log`, summary `passed=47 failed=0`). A later proof loop was blocked after db gates passed by unrelated Aspire runtime startup (`runtime.aspire-start` exit 2) and prior dashboard port `18891` conflicts. |
 | Focused db-init proof | PASS | Five generated-project `db init` runs passed with no db-init failures; Aspire ports were clear afterward (`aspire ps` returned `[]`). |
