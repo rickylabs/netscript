@@ -1,0 +1,410 @@
+## run 3 project=.llm/tmp/db-init-loop/db-init-loop-3-225910
+╔═════════════════════════════════════════════════════════════╗
+║              NetScript — Scaffold New Project               ║
+╚═════════════════════════════════════════════════════════════╝
+
+📁 Creating project "db-init-loop-3-225910"...
+   ✓ Project root (deno.json, netscript.config.ts, .gitignore, README.md)
+   ✓ Aspire orchestration (TypeScript AppHost, .helpers/, package.json)
+   ✓ Database workspace (postgres)
+   ✓ Frontend app "dashboard" (Fresh framework)
+   ✓ Contracts (v1 with users stub)
+   ✓ Example service "users" (oRPC handler on port 3001)
+   ✓ Plugins (empty registry)
+   ✓ Output formatted (deno fmt)
+
+✅ Project scaffolded successfully in 0.3s
+
+  Created: 161 files, 44 directories
+
+Next steps:
+  1. cd db-init-loop-3-225910
+  2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace
+  3. aspire restore  # download TypeScript AppHost SDK modules (run once)
+  4. cd ..
+  5. deno run -A packages/cli/bin/netscript-dev.ts db init --name init
+  6. deno run -A packages/cli/bin/netscript-dev.ts db generate
+  7. deno run -A packages/cli/bin/netscript-dev.ts db seed
+  8. cd aspire
+  9. aspire run  # start TypeScript AppHost
+  10. # oRPC service "users" at http://localhost:3001/api/rpc
+  11. # Postgres provisioned by Aspire (see "Databases" in appsettings.json)
+
+Maintainer scaffold root: /home/codex/repos/netscript-cli-dbinit-reliability/.llm/tmp/db-init-loop/db-init-loop-3-225910
+Monorepo root: /home/codex/repos/netscript-cli-dbinit-reliability
+Copied 25 local packages.
+Added worker plugin "workers" on port 8091.
+Created 188 plugin files.
+Regenerated 12 Aspire helper files.
+Added saga plugin "sagas" on port 8092.
+Created 144 plugin files.
+Regenerated 12 Aspire helper files.
+Added trigger plugin "triggers" on port 8093.
+Created 124 plugin files.
+Regenerated 12 Aspire helper files.
+Added stream plugin "streams" on port 4437.
+Created 20 plugin files.
+Regenerated 12 Aspire helper files.
+Added auth plugin "auth" on port 8094.
+Created 28 plugin files.
+Regenerated 12 Aspire helper files.
+Name	DisplayName	Type	Enabled	Workdir	Service	Port	Axis	Contributions
+@netscript/plugin-auth	Auth	api	true	plugins/auth	./services/src/main.ts	8094	-	0
+@netscript/plugin-sagas	Saga Orchestration	background-processor	true	plugins/sagas	./services/src/main.ts	8092	sagas	0
+@netscript/plugin-streams	Durable Streams	utility	true	plugins/streams	./services/src/main.ts	4437	-	0
+@netscript/plugin-triggers	Triggers	background-processor	true	plugins/triggers	./services/src/main.ts	8093	triggers	0
+@netscript/plugin-workers	Background Workers	background-processor	true	plugins/workers	./services/src/main.ts	8091	jobs	0
+Starting db init for postgres...
+Getting logs...
+[prisma-init-postgres] Waiting for resource 'postgres' to enter the 'Running' state.
+[prisma-init-postgres] Waiting for resource 'db-init-loop-3-225910-db' to enter the 'Running' state.
+[prisma-init-postgres] Waiting for resource 'db-init-loop-3-225910-db' to become healthy.
+[prisma-init-postgres] Waiting for resource 'postgres' to become healthy.
+[prisma-init-postgres] Waiting for resource ready to execute for 'postgres'.
+[prisma-init-postgres] Finished waiting for resource 'postgres'.
+[prisma-init-postgres] Waiting for resource ready to execute for 'db-init-loop-3-225910-db'.
+[prisma-init-postgres] Finished waiting for resource 'db-init-loop-3-225910-db'.
+[prisma-init-postgres] [sys] Starting process...: Cmd = /usr/local/bin/deno, Args = ["task", "db:init:postgres"]
+[prisma-init-postgres] Initialize @durable-streams/client@0.2.6
+[prisma-init-postgres] Initialize @tanstack/db@0.6.10
+[prisma-init-postgres] Initialize @orpc/zod@1.14.6
+[prisma-init-postgres] Initialize @orpc/openapi@1.14.6
+[prisma-init-postgres] Initialize @preact/signals@2.9.2
+[prisma-init-postgres] Initialize @tanstack/react-db@0.1.88
+[prisma-init-postgres] Initialize dotenv@16.6.1
+[prisma-init-postgres] Initialize ioredis@5.11.1
+[prisma-init-postgres] Initialize jose@6.2.3
+[prisma-init-postgres] Initialize amqplib@2.0.1
+[prisma-init-postgres] Initialize @tanstack/query-core@5.101.1
+[prisma-init-postgres] Initialize @prisma/adapter-pg@7.8.0
+[prisma-init-postgres] Initialize @opentelemetry/api@1.9.1
+[prisma-init-postgres] Initialize @prisma/instrumentation-contract@7.8.0
+[prisma-init-postgres] Initialize @workos-inc/node@10.7.0
+[prisma-init-postgres] Initialize @tailwindcss/vite@4.3.1
+[prisma-init-postgres] Initialize vite@7.2.2
+[prisma-init-postgres] Initialize better-auth@1.6.20
+[prisma-init-postgres] Initialize @durable-streams/state@0.3.1
+[prisma-init-postgres] Initialize tailwind-merge@3.6.0
+[prisma-init-postgres] Initialize @prisma/adapter-mssql@7.8.0
+[prisma-init-postgres] Initialize preact-render-to-string@6.7.0
+[prisma-init-postgres] Initialize @tanstack/preact-query@5.101.1
+[prisma-init-postgres] Initialize @orpc/tanstack-query@1.14.6
+[prisma-init-postgres] Initialize @durable-streams/server@0.3.7
+[prisma-init-postgres] Initialize @prisma/client@7.8.0
+[prisma-init-postgres] Initialize @orpc/contract@1.14.6
+[prisma-init-postgres] Initialize prisma@7.8.0
+[prisma-init-postgres] Initialize pg@8.22.0
+[prisma-init-postgres] Initialize preact@10.29.2
+[prisma-init-postgres] Initialize @orpc/server@1.14.6
+[prisma-init-postgres] Initialize @tanstack/query-db-collection@1.0.42
+[prisma-init-postgres] Initialize @saga-bus/core@0.2.2
+[prisma-init-postgres] Initialize zod@4.4.3
+[prisma-init-postgres] Initialize tailwindcss@4.3.1
+[prisma-init-postgres] Initialize clsx@2.1.1
+[prisma-init-postgres] Initialize @orpc/client@1.14.6
+[prisma-init-postgres] Initialize fastq@1.20.1
+[prisma-init-postgres] Initialize @microsoft/fetch-event-source@2.0.1
+[prisma-init-postgres] Initialize @standard-schema/spec@1.1.0
+[prisma-init-postgres] Initialize typescript@6.0.3
+[prisma-init-postgres] Initialize @tanstack/pacer-lite@0.2.2
+[prisma-init-postgres] Initialize @tanstack/db-ivm@0.1.18
+[prisma-init-postgres] Initialize @orpc/shared@1.14.6
+[prisma-init-postgres] Initialize wildcard-match@5.1.4
+[prisma-init-postgres] Initialize @orpc/json-schema@1.14.6
+[prisma-init-postgres] Initialize escape-string-regexp@5.0.0
+[prisma-init-postgres] Initialize @orpc/openapi-client@1.14.6
+[prisma-init-postgres] Initialize @orpc/interop@1.14.6
+[prisma-init-postgres] Initialize @orpc/standard-server@1.14.6
+[prisma-init-postgres] Initialize rou3@0.7.12
+[prisma-init-postgres] Initialize json-schema-typed@8.0.2
+[prisma-init-postgres] Initialize @preact/signals-core@1.14.3
+[prisma-init-postgres] Initialize react@19.2.7
+[prisma-init-postgres] Initialize use-sync-external-store@1.6.0
+[prisma-init-postgres] Initialize cluster-key-slot@1.1.1
+[prisma-init-postgres] Initialize denque@2.1.0
+[prisma-init-postgres] Initialize redis-parser@3.0.0
+[prisma-init-postgres] Initialize standard-as-callback@2.1.0
+[prisma-init-postgres] Initialize debug@4.4.3
+[prisma-init-postgres] Initialize @ioredis/commands@1.10.0
+[prisma-init-postgres] Initialize redis-errors@1.2.0
+[prisma-init-postgres] Initialize @prisma/driver-adapter-utils@7.8.0
+[prisma-init-postgres] Initialize @types/pg@8.20.0
+[prisma-init-postgres] Initialize postgres-array@3.0.4
+[prisma-init-postgres] Initialize @tailwindcss/oxide@4.3.1
+[prisma-init-postgres] Initialize @tailwindcss/node@4.3.1
+[prisma-init-postgres] Initialize esbuild@0.25.12
+[prisma-init-postgres] Initialize fdir@6.5.0
+[prisma-init-postgres] Initialize postcss@8.5.15
+[prisma-init-postgres] Initialize rollup@4.62.2
+[prisma-init-postgres] Initialize tinyglobby@0.2.17
+[prisma-init-postgres] Initialize picomatch@4.0.4
+[prisma-init-postgres] Initialize react-dom@19.2.7
+[prisma-init-postgres] Initialize kysely@0.29.2
+[prisma-init-postgres] Initialize @better-auth/memory-adapter@1.6.20
+[prisma-init-postgres] Initialize @better-auth/utils@0.4.2
+[prisma-init-postgres] Initialize better-call@1.3.6
+[prisma-init-postgres] Initialize defu@6.1.7
+[prisma-init-postgres] Initialize @better-auth/mongo-adapter@1.6.20
+[prisma-init-postgres] Initialize nanostores@1.3.0
+[prisma-init-postgres] Initialize @better-auth/kysely-adapter@1.6.20
+[prisma-init-postgres] Initialize @better-fetch/fetch@1.3.1
+[prisma-init-postgres] Initialize @noble/ciphers@2.2.0
+[prisma-init-postgres] Initialize @better-auth/prisma-adapter@1.6.20
+[prisma-init-postgres] Initialize @better-auth/telemetry@1.6.20
+[prisma-init-postgres] Initialize @better-auth/drizzle-adapter@1.6.20
+[prisma-init-postgres] Initialize @better-auth/core@1.6.20
+[prisma-init-postgres] Initialize @noble/hashes@2.2.0
+[prisma-init-postgres] Initialize async-mutex@0.5.0
+[prisma-init-postgres] Initialize mssql@12.6.0
+[prisma-init-postgres] Initialize lmdb@3.5.6
+[prisma-init-postgres] Initialize @neophi/sieve-cache@1.5.0
+[prisma-init-postgres] Initialize @prisma/client-runtime-utils@7.8.0
+[prisma-init-postgres] Initialize openapi-types@12.1.3
+[prisma-init-postgres] Initialize postgres@3.4.7
+[prisma-init-postgres] Initialize mysql2@3.15.3
+[prisma-init-postgres] Initialize @prisma/engines@7.8.0
+[prisma-init-postgres] Initialize @prisma/studio-core@0.27.3
+[prisma-init-postgres] Initialize @prisma/dev@0.24.3
+[prisma-init-postgres] Initialize @prisma/config@7.8.0
+[prisma-init-postgres] Initialize pg-protocol@1.15.0
+[prisma-init-postgres] Initialize pg-types@2.2.0
+[prisma-init-postgres] Initialize pg-cloudflare@1.4.0
+[prisma-init-postgres] Initialize pg-connection-string@2.14.0
+[prisma-init-postgres] Initialize pg-pool@3.14.0
+[prisma-init-postgres] Initialize pgpass@1.0.5
+[prisma-init-postgres] Initialize @orpc/standard-server-fastify@1.14.6
+[prisma-init-postgres] Initialize @orpc/standard-server-fetch@1.14.6
+[prisma-init-postgres] Initialize @orpc/standard-server-node@1.14.6
+[prisma-init-postgres] Initialize @orpc/standard-server-peer@1.14.6
+[prisma-init-postgres] Initialize cookie@1.1.1
+[prisma-init-postgres] Initialize @orpc/standard-server-aws-lambda@1.14.6
+[prisma-init-postgres] Initialize reusify@1.1.0
+[prisma-init-postgres] Initialize sorted-btree@1.8.1
+[prisma-init-postgres] Initialize fractional-indexing@3.4.0
+[prisma-init-postgres] Initialize type-fest@5.7.0
+[prisma-init-postgres] Initialize radash@12.1.1
+[prisma-init-postgres] Initialize ms@2.1.3
+[prisma-init-postgres] Initialize @prisma/debug@7.8.0
+[prisma-init-postgres] Initialize @types/node@26.0.1
+[prisma-init-postgres] Initialize @tailwindcss/oxide-linux-x64-gnu@4.3.1
+[prisma-init-postgres] Initialize @tailwindcss/oxide-linux-x64-musl@4.3.1
+[prisma-init-postgres] Initialize jiti@2.7.0
+[prisma-init-postgres] Initialize enhanced-resolve@5.21.6
+[prisma-init-postgres] Initialize magic-string@0.30.21
+[prisma-init-postgres] Initialize @jridgewell/remapping@2.3.5
+[prisma-init-postgres] Initialize source-map-js@1.2.1
+[prisma-init-postgres] Initialize lightningcss@1.32.0
+[prisma-init-postgres] Initialize @esbuild/linux-x64@0.25.12
+[prisma-init-postgres] Initialize picocolors@1.1.1
+[prisma-init-postgres] Initialize nanoid@3.3.15
+[prisma-init-postgres] Initialize @types/estree@1.0.9
+[prisma-init-postgres] Initialize @rollup/rollup-linux-x64-gnu@4.62.2
+[prisma-init-postgres] Initialize @rollup/rollup-linux-x64-musl@4.62.2
+[prisma-init-postgres] Initialize scheduler@0.27.0
+[prisma-init-postgres] Initialize set-cookie-parser@3.1.1
+[prisma-init-postgres] Initialize @opentelemetry/semantic-conventions@1.41.1
+[prisma-init-postgres] Initialize tslib@2.8.1
+[prisma-init-postgres] Initialize @tediousjs/connection-string@1.1.0
+[prisma-init-postgres] Initialize commander@11.1.0
+[prisma-init-postgres] Initialize tarn@3.0.2
+[prisma-init-postgres] Initialize tedious@19.2.1
+[prisma-init-postgres] Initialize node-gyp-build-optional-packages@5.2.2
+[prisma-init-postgres] Initialize @harperfast/extended-iterable@1.0.3
+[prisma-init-postgres] Initialize ordered-binary@1.6.1
+[prisma-init-postgres] Initialize @lmdb/lmdb-linux-x64@3.5.6
+[prisma-init-postgres] Initialize msgpackr@1.12.1
+[prisma-init-postgres] Initialize node-addon-api@6.1.0
+[prisma-init-postgres] Initialize weak-lru-cache@1.2.2
+[prisma-init-postgres] Initialize sqlstring@2.3.3
+[prisma-init-postgres] Initialize iconv-lite@0.7.2
+[prisma-init-postgres] Initialize aws-ssl-profiles@1.1.2
+[prisma-init-postgres] Initialize generate-function@2.3.1
+[prisma-init-postgres] Initialize named-placeholders@1.1.6
+[prisma-init-postgres] Initialize lru.min@1.1.4
+[prisma-init-postgres] Initialize long@5.3.2
+[prisma-init-postgres] Initialize seq-queue@0.0.5
+[prisma-init-postgres] Initialize @prisma/fetch-engine@7.8.0
+[prisma-init-postgres] Initialize @prisma/engines-version@7.8.0-6.3c6e192761c0362d496ed980de936e2f3cebcd3a
+[prisma-init-postgres] Initialize @prisma/get-platform@7.8.0
+[prisma-init-postgres] Initialize @types/react@19.2.17
+[prisma-init-postgres] Initialize @radix-ui/react-toggle@1.1.10
+[prisma-init-postgres] Initialize chart.js@4.5.1
+[prisma-init-postgres] Initialize @electric-sql/pglite-tools@0.3.1
+[prisma-init-postgres] Initialize @electric-sql/pglite-socket@0.1.1
+[prisma-init-postgres] Initialize get-port-please@3.2.0
+[prisma-init-postgres] Initialize hono@4.12.27
+[prisma-init-postgres] Initialize proper-lockfile@4.1.2
+[prisma-init-postgres] Initialize @prisma/streams-local@0.1.2
+[prisma-init-postgres] Initialize http-status-codes@2.3.0
+[prisma-init-postgres] Initialize foreground-child@3.3.1
+[prisma-init-postgres] Initialize @hono/node-server@1.19.11
+[prisma-init-postgres] Initialize zeptomatch@2.1.0
+[prisma-init-postgres] Initialize @prisma/get-platform@7.2.0
+[prisma-init-postgres] Initialize pathe@2.0.3
+[prisma-init-postgres] Initialize std-env@3.10.0
+[prisma-init-postgres] Initialize remeda@2.33.4
+[prisma-init-postgres] Initialize valibot@1.2.0
+[prisma-init-postgres] Initialize @prisma/query-plan-executor@7.2.0
+[prisma-init-postgres] Initialize @electric-sql/pglite@0.4.1
+[prisma-init-postgres] Initialize empathic@2.0.0
+[prisma-init-postgres] Initialize c12@3.3.4
+[prisma-init-postgres] Initialize effect@3.20.0
+[prisma-init-postgres] Initialize deepmerge-ts@7.1.5
+[prisma-init-postgres] Initialize postgres-date@1.0.7
+[prisma-init-postgres] Initialize postgres-bytea@1.0.1
+[prisma-init-postgres] Initialize pg-int8@1.0.1
+[prisma-init-postgres] Initialize postgres-array@2.0.0
+[prisma-init-postgres] Initialize postgres-interval@1.2.0
+[prisma-init-postgres] Initialize split2@4.2.0
+[prisma-init-postgres] Initialize tagged-tag@1.0.0
+[prisma-init-postgres] Initialize undici-types@8.3.0
+[prisma-init-postgres] Initialize graceful-fs@4.2.11
+[prisma-init-postgres] Initialize tapable@2.3.3
+[prisma-init-postgres] Initialize @jridgewell/sourcemap-codec@1.5.5
+[prisma-init-postgres] Initialize @jridgewell/trace-mapping@0.3.31
+[prisma-init-postgres] Initialize @jridgewell/gen-mapping@0.3.13
+[prisma-init-postgres] Initialize lightningcss-linux-x64-gnu@1.32.0
+[prisma-init-postgres] Initialize lightningcss-linux-x64-musl@1.32.0
+[prisma-init-postgres] Initialize detect-libc@2.1.2
+[prisma-init-postgres] Initialize @azure/core-auth@1.10.1
+[prisma-init-postgres] Initialize js-md4@0.3.2
+[prisma-init-postgres] Initialize @js-joda/core@5.7.0
+[prisma-init-postgres] Initialize bl@6.1.6
+[prisma-init-postgres] Initialize @azure/keyvault-keys@4.10.2
+[prisma-init-postgres] Initialize @azure/identity@4.13.1
+[prisma-init-postgres] Initialize native-duplexpair@1.0.0
+[prisma-init-postgres] Initialize sprintf-js@1.1.3
+[prisma-init-postgres] Initialize msgpackr-extract@3.0.4
+[prisma-init-postgres] Initialize safer-buffer@2.1.2
+[prisma-init-postgres] Initialize is-property@1.0.2
+[prisma-init-postgres] Initialize csstype@3.2.3
+[prisma-init-postgres] Initialize @radix-ui/primitive@1.1.3
+[prisma-init-postgres] Initialize @radix-ui/react-use-controllable-state@1.2.2
+[prisma-init-postgres] Initialize @radix-ui/react-primitive@2.1.3
+[prisma-init-postgres] Initialize @kurkle/color@0.3.4
+[prisma-init-postgres] Initialize retry@0.12.0
+[prisma-init-postgres] Initialize signal-exit@3.0.7
+[prisma-init-postgres] Initialize better-result@2.9.2
+[prisma-init-postgres] Initialize ajv@8.20.0
+[prisma-init-postgres] Initialize env-paths@3.0.0
+[prisma-init-postgres] Initialize signal-exit@4.1.0
+[prisma-init-postgres] Initialize cross-spawn@7.0.6
+[prisma-init-postgres] Initialize grammex@3.1.12
+[prisma-init-postgres] Initialize graphmatch@1.1.1
+[prisma-init-postgres] Initialize @prisma/debug@7.2.0
+[prisma-init-postgres] Initialize dotenv@17.4.2
+[prisma-init-postgres] Initialize giget@3.3.0
+[prisma-init-postgres] Initialize ohash@2.0.11
+[prisma-init-postgres] Initialize confbox@0.2.4
+[prisma-init-postgres] Initialize perfect-debounce@2.1.0
+[prisma-init-postgres] Initialize chokidar@5.0.0
+[prisma-init-postgres] Initialize pkg-types@2.3.1
+[prisma-init-postgres] Initialize rc9@3.0.1
+[prisma-init-postgres] Initialize exsolve@1.1.0
+[prisma-init-postgres] Initialize fast-check@3.23.2
+[prisma-init-postgres] Initialize xtend@4.0.2
+[prisma-init-postgres] Initialize @jridgewell/resolve-uri@3.1.2
+[prisma-init-postgres] Initialize @azure/core-util@1.13.1
+[prisma-init-postgres] Initialize @azure/abort-controller@2.1.2
+[prisma-init-postgres] Initialize @types/readable-stream@4.0.23
+[prisma-init-postgres] Initialize buffer@6.0.3
+[prisma-init-postgres] Initialize inherits@2.0.4
+[prisma-init-postgres] Initialize readable-stream@4.7.0
+[prisma-init-postgres] Initialize @azure/core-paging@1.6.2
+[prisma-init-postgres] Initialize @azure-rest/core-client@2.7.0
+[prisma-init-postgres] Initialize @azure/core-tracing@1.3.1
+[prisma-init-postgres] Initialize @azure/keyvault-common@2.1.0
+[prisma-init-postgres] Initialize @azure/core-rest-pipeline@1.24.0
+[prisma-init-postgres] Initialize @azure/logger@1.3.0
+[prisma-init-postgres] Initialize @azure/core-lro@2.7.2
+[prisma-init-postgres] Initialize @azure/core-client@1.10.2
+[prisma-init-postgres] Initialize @azure/msal-browser@5.15.0
+[prisma-init-postgres] Initialize @azure/msal-node@5.3.0
+[prisma-init-postgres] Initialize open@10.2.0
+[prisma-init-postgres] Initialize @msgpackr-extract/msgpackr-extract-linux-x64@3.0.4
+[prisma-init-postgres] Initialize @radix-ui/react-use-effect-event@0.0.2
+[prisma-init-postgres] Initialize @radix-ui/react-use-layout-effect@1.1.1
+[prisma-init-postgres] Initialize @radix-ui/react-slot@1.2.3
+[prisma-init-postgres] Initialize fast-deep-equal@3.1.3
+[prisma-init-postgres] Initialize fast-uri@3.1.2
+[prisma-init-postgres] Initialize require-from-string@2.0.2
+[prisma-init-postgres] Initialize json-schema-traverse@1.0.0
+[prisma-init-postgres] Initialize which@2.0.2
+[prisma-init-postgres] Initialize shebang-command@2.0.0
+[prisma-init-postgres] Initialize path-key@3.1.1
+[prisma-init-postgres] Initialize readdirp@5.0.0
+[prisma-init-postgres] Initialize destr@2.0.5
+[prisma-init-postgres] Initialize pure-rand@6.1.0
+[prisma-init-postgres] Initialize @typespec/ts-http-runtime@0.3.6
+[prisma-init-postgres] Initialize ieee754@1.2.1
+[prisma-init-postgres] Initialize base64-js@1.5.1
+[prisma-init-postgres] Initialize abort-controller@3.0.0
+[prisma-init-postgres] Initialize events@3.3.0
+[prisma-init-postgres] Initialize string_decoder@1.3.0
+[prisma-init-postgres] Initialize process@0.11.10
+[prisma-init-postgres] Initialize @azure/msal-common@16.10.0
+[prisma-init-postgres] Initialize jsonwebtoken@9.0.3
+[prisma-init-postgres] Initialize define-lazy-prop@3.0.0
+[prisma-init-postgres] Initialize wsl-utils@0.1.0
+[prisma-init-postgres] Initialize default-browser@5.5.0
+[prisma-init-postgres] Initialize is-inside-container@1.0.0
+[prisma-init-postgres] Initialize @radix-ui/react-compose-refs@1.1.2
+[prisma-init-postgres] Initialize isexe@2.0.0
+[prisma-init-postgres] Initialize shebang-regex@3.0.0
+[prisma-init-postgres] Initialize https-proxy-agent@7.0.6
+[prisma-init-postgres] Initialize http-proxy-agent@7.0.2
+[prisma-init-postgres] Initialize event-target-shim@5.0.1
+[prisma-init-postgres] Initialize safe-buffer@5.2.1
+[prisma-init-postgres] Initialize jws@4.0.1
+[prisma-init-postgres] Initialize lodash.includes@4.3.0
+[prisma-init-postgres] Initialize lodash.isboolean@3.0.3
+[prisma-init-postgres] Initialize lodash.isnumber@3.0.3
+[prisma-init-postgres] Initialize lodash.once@4.1.1
+[prisma-init-postgres] Initialize lodash.isplainobject@4.0.6
+[prisma-init-postgres] Initialize semver@7.8.5
+[prisma-init-postgres] Initialize lodash.isinteger@4.0.4
+[prisma-init-postgres] Initialize lodash.isstring@4.0.1
+[prisma-init-postgres] Initialize is-wsl@3.1.1
+[prisma-init-postgres] Initialize default-browser-id@5.0.1
+[prisma-init-postgres] Initialize bundle-name@4.1.0
+[prisma-init-postgres] Initialize is-docker@3.0.0
+[prisma-init-postgres] Initialize agent-base@7.1.4
+[prisma-init-postgres] Initialize jwa@2.0.1
+[prisma-init-postgres] Initialize run-applescript@7.1.0
+[prisma-init-postgres] Initialize buffer-equal-constant-time@1.0.1
+[prisma-init-postgres] Initialize ecdsa-sig-formatter@1.0.11
+[prisma-init-postgres] ╭ Warning
+[prisma-init-postgres] │
+[prisma-init-postgres] │  Ignored build scripts for packages:
+[prisma-init-postgres] │  npm:@prisma/engines@7.8.0
+[prisma-init-postgres] │  npm:lmdb@3.5.6
+[prisma-init-postgres] │  npm:prisma@7.8.0
+[prisma-init-postgres] │  npm:msgpackr-extract@3.0.4
+[prisma-init-postgres] │
+[prisma-init-postgres] │  Run "deno approve-scripts" to run build scripts.
+[prisma-init-postgres] ╰─
+[prisma-init-postgres] Task db:init:postgres deno task db:init
+[prisma-init-postgres] Task db:init deno run -A --minimum-dependency-age=0 scripts/migrate.ts --name=init
+[prisma-init-postgres] --- ENV VARS FOR PRISMA MIGRATION ---
+[prisma-init-postgres] DATABASE_URL: Host=localhost;Port=43265;Username=postgres;Password=WGbeHMpx+(D+dk14G6v*4S;Database=db-init-loop-3-225910-db
+[prisma-init-postgres] *_URI: (detected)
+[prisma-init-postgres] CI: false
+[prisma-init-postgres] Provider: postgres
+[prisma-init-postgres] -------------------------------------
+[prisma-init-postgres] 🔄 Creating migration with name: init
+[prisma-init-postgres] Datasource "db": PostgreSQL database "db-init-loop-3-225910-db", schema "public" at "localhost:43265"
+[prisma-init-postgres] 
+[prisma-init-postgres] Applying migration `20260626205954_init`
+[prisma-init-postgres] 
+[prisma-init-postgres] The following migration(s) have been created and applied from new schema changes:
+[prisma-init-postgres] 
+[prisma-init-postgres] migrations/
+[prisma-init-postgres]   └─ 20260626205954_init/
+[prisma-init-postgres]     └─ migration.sql
+[prisma-init-postgres] 
+[prisma-init-postgres] Your database is now in sync with your schema.
+[prisma-init-postgres] 
+[prisma-init-postgres] Loaded Prisma config from prisma.config.ts.
+[prisma-init-postgres] 
+[prisma-init-postgres] Prisma schema loaded from schema.
+db init completed successfully.
