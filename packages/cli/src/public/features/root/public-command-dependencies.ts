@@ -1,4 +1,3 @@
-import { loadConfig } from '@netscript/config';
 import {
   AstExtractor,
   FilesystemWalker,
@@ -11,6 +10,7 @@ import {
   loadDeployConfig,
 } from '../../../kernel/adapters/config/deploy-config.ts';
 import { loadRegisteredPlugins } from '../../../kernel/adapters/config/plugin-registry.ts';
+import { createProjectConfigLoader } from '../../../kernel/adapters/config/project-config-loader.ts';
 import { createContractScaffolder } from '../../../kernel/adapters/contracts/contract-scaffolder.ts';
 import { DefaultContractTemplateRegistry } from '../../../kernel/adapters/contracts/templates/contract-template-registry.ts';
 import { ContractVersionRegistry } from '../../../kernel/adapters/contracts/version-registry.ts';
@@ -63,6 +63,8 @@ export interface PublicCommandDependencies {
   readonly pluginRegistry: PluginKindRegistry;
   /** Database engine registry. */
   readonly dbRegistry: DbEngineRegistry;
+  /** Load project config under the project's own Deno config. */
+  readonly loadConfig: ReturnType<typeof createProjectConfigLoader>;
   /** Resolve a project root from an optional flag. */
   readonly resolveProjectRoot: (projectRoot?: string) => Promise<string | undefined>;
   /** Dependencies for public init. */
@@ -157,6 +159,7 @@ export function createPublicCommandDependencies(
   const scaffolder = new Scaffolder(templateAdapter, fs);
   const pluginRegistry = new PluginKindRegistry();
   const dbRegistry = new DbEngineRegistry();
+  const loadConfig = createProjectConfigLoader({ process });
   const resolveProjectRoot = async (projectRoot?: string) =>
     projectRoot ? host.resolvePath(projectRoot) : await findDeployProjectRoot(host.cwd()) ??
       undefined;
@@ -195,6 +198,7 @@ export function createPublicCommandDependencies(
     scaffolder,
     pluginRegistry,
     dbRegistry,
+    loadConfig,
     resolveProjectRoot,
     initCommandDependencies: {
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
@@ -274,7 +278,9 @@ export function createPublicCommandDependencies(
       emitter: new RegistryEmitter(),
       fs,
     },
-    deployBuildDependencies: { loadConfig: loadDeployConfig },
+    deployBuildDependencies: {
+      loadConfig: (options) => loadDeployConfig({ ...options, loadNetScriptConfig: loadConfig }),
+    },
     manifestPort: {
       async resolve(options) {
         const resolved = await resolveManifest(options);

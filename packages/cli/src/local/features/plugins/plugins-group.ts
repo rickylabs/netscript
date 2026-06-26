@@ -2,7 +2,7 @@ import { Command } from '@cliffy/command';
 
 import { createDoctorPluginCommand } from '../../../public/features/plugins/doctor/doctor-plugin-command.ts';
 import { createInfoPluginCommand } from '../../../public/features/plugins/info/info-plugin-command.ts';
-import { pluginListCommand } from '../../../public/features/plugins/list/list-plugins-command.ts';
+import { createPluginListCommand } from '../../../public/features/plugins/list/list-plugins-command.ts';
 import { createRemovePluginCommand } from '../../../public/features/plugins/remove/remove-plugin-command.ts';
 import { createUpdatePluginCommand } from '../../../public/features/plugins/update/update-plugin-command.ts';
 import { type PublicCommandDependencies } from '../../../public/features/root/public-command-dependencies.ts';
@@ -12,7 +12,7 @@ import { createLocalPluginAddCommand } from './add/add-local-plugin-command.ts';
 export function createLocalPluginCommand(
   dependencies: PublicCommandDependencies,
   sourceRootStartDir: string,
-): Command<any, any, any, any, any, any, any, any> {
+) {
   return new Command()
     .name('plugin')
     .description('Manage NetScript plugins in a local contributor workspace')
@@ -35,7 +35,7 @@ export function createLocalPluginCommand(
         },
       }),
     )
-    .command('list', pluginListCommand)
+    .command('list', createPluginListCommand({ loadConfig: dependencies.loadConfig }))
     .command(
       'info',
       createInfoPluginCommand({
