@@ -92,3 +92,25 @@ default.
 | publish dry-run | `deno task publish:dry-run` from `packages/cli` | pass; existing dynamic-import warnings in `plugin-registry.ts` and UI registry, dry run complete |
 | focused lint | `deno lint --no-config --rules-exclude=no-explicit-any packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | pass |
 | focused fmt | `deno fmt --no-config --single-quote --line-width 100 --check packages/cli/src/public/features/plugins/add/add-plugin_test.ts` | pass |
+
+## S3 — e2e confirmation and debt close
+
+### Changes
+
+- Added and immediately closed `PLUGIN-USERLAND-SOURCE-COPY` in `.llm/harness/debt/arch-debt.md`.
+- Preserved the default maintainer e2e shape: local official plugin add still copies first-party
+  plugin source unless `--no-copy-source` is passed.
+
+### Validation
+
+| Gate | Command | Result |
+| ---- | ------- | ------ |
+| native worktree check | `pwd && df -T .` | `/home/codex/repos/netscript-cli-plugin-copy`, filesystem `ext4` |
+| e2e plugins | `rtk proxy deno task e2e:cli run scaffold.plugins --cleanup --format pretty` | pass; summary `passed=11 failed=0` |
+| e2e runtime first attempt | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | failed one gate: `behavior.workers-executions`; summary `passed=34 failed=1`; cleanup passed |
+| e2e runtime clean rerun | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` after confirming no 8091/8092/8093/8094/18891 listeners or plugin-smoke runtimes | pass; summary `passed=47 failed=0` |
+
+First runtime attempt failure detail: the workers health/job/task/trigger endpoints passed, then
+`behavior.workers-executions` received `Connection refused` from `http://localhost:8091` and cleanup
+reported no AppHost was running. Nearby Aspire logs showed apphost instability/port conflict noise
+from generated runs. A clean rerun from the same WSL ext4 worktree passed all runtime gates.
