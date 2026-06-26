@@ -1,6 +1,5 @@
 import {
   dirname,
-  fromFileUrl,
   isAbsolute,
   join,
   normalize,
@@ -8,6 +7,10 @@ import {
   resolve,
   toFileUrl,
 } from '@std/path';
+import {
+  FRESH_UI_REGISTRY_CONTENT,
+  freshUiRegistryManifest,
+} from '@netscript/fresh-ui/registry';
 
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import { mergeDenoJsonImports } from './registry-deno-json.ts';
@@ -82,18 +85,16 @@ export const DEFAULT_UI_INIT_ITEMS: readonly string[] = [
   'control-props',
 ];
 
-/** Resolve the source registry root when the CLI runs from the monorepo. */
-export function defaultFreshUiRegistryRoot(): string {
-  return normalize(fromFileUrl(new URL('../../../../../fresh-ui/', import.meta.url)));
-}
-
 export async function installUiRegistryItems(
   input: UiInstallInput,
   dependencies: UiInstallDependencies,
 ): Promise<UiInstallResult> {
-  const registryRoot = resolve(input.registryRoot ?? defaultFreshUiRegistryRoot());
+  const registryRoot = input.registryRoot === undefined ? undefined : resolve(input.registryRoot);
   const projectRoot = resolve(input.projectRoot);
-  const manifest = await loadRegistryManifest(registryRoot);
+  const manifest = registryRoot === undefined
+    ? freshUiRegistryManifest
+    : await loadRegistryManifest(registryRoot);
+  const registryContent = registryRoot === undefined ? FRESH_UI_REGISTRY_CONTENT : undefined;
   const items = resolveRegistryItems(manifest, input.names, input.theme);
   const plannedFiles = planFiles(registryRoot, projectRoot, items);
   const sourceToTarget = new Map(plannedFiles.map((file) => [normalize(file.source), file.target]));
@@ -103,7 +104,9 @@ export async function installUiRegistryItems(
     if (!input.overwrite && await dependencies.fs.exists(file.target)) {
       continue;
     }
-    const content = await dependencies.fs.readFile(file.source);
+    const content = registryContent
+      ? readRegistryContent(registryContent, file.source)
+      : await dependencies.fs.readFile(file.source);
     const next = isTypeScriptLike(file.source)
       ? rewriteRegistryImports(content, file.source, file.target, registryRoot, sourceToTarget)
       : content;
@@ -113,6 +116,7 @@ export async function installUiRegistryItems(
 
   const stylesPath = await writeStylesAggregator({
     registryRoot,
+    registryContent,
     projectRoot,
     manifest,
     items,
@@ -188,14 +192,14 @@ export function resolveRegistryItems(
 }
 
 function planFiles(
-  registryRoot: string,
+  registryRoot: string | undefined,
   projectRoot: string,
   items: readonly UiRegistryItem[],
 ): readonly PlannedFile[] {
   const files = new Map<string, PlannedFile>();
   for (const item of items) {
     for (const file of item.files) {
-      const source = resolve(registryRoot, file.source);
+      const source = registryRoot === undefined ? normalize(file.source) : resolve(registryRoot, file.source);
       const target = resolveTarget(projectRoot, file.target);
       files.set(normalize(source), { source, target });
     }
@@ -220,7 +224,7 @@ function rewriteRegistryImports(
   content: string,
   sourceFile: string,
   targetFile: string,
-  registryRoot: string,
+  registryRoot: string | undefined,
   sourceToTarget: ReadonlyMap<string, string>,
 ): string {
   const rewrite = (specifier: string): string => {
@@ -248,17 +252,31 @@ function rewriteRegistryImports(
 
 function resolveSpecifierSource(
   sourceFile: string,
-  registryRoot: string,
+  registryRoot: string | undefined,
   specifier: string,
 ): string | undefined {
   if (specifier.startsWith('./') || specifier.startsWith('../')) {
-    return resolve(dirname(sourceFile), specifier);
+    return registryRoot === undefined
+      ? normalize(join(dirname(sourceFile), specifier))
+      : resolve(dirname(sourceFile), specifier);
   }
   const packagePrefix = '@netscript/fresh-ui/';
   if (specifier.startsWith(packagePrefix)) {
-    return resolve(registryRoot, specifier.slice(packagePrefix.length));
+    const source = specifier.slice(packagePrefix.length);
+    return registryRoot === undefined ? normalize(source) : resolve(registryRoot, source);
   }
   return undefined;
+}
+
+function readRegistryContent(
+  registryContent: Readonly<Record<string, string>>,
+  source: string,
+): string {
+  const content = registryContent[normalize(source)];
+  if (content === undefined) {
+    throw new Error(`Fresh UI registry content is missing: ${source}`);
+  }
+  return content;
 }
 
 function toImportSpecifier(path: string): string {

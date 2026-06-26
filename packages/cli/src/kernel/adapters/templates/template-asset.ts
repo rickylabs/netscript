@@ -9,6 +9,7 @@ import {
   type TemplateValue,
 } from '../../application/registries/template-registry.ts';
 import type { TemplateKey } from '../../assets/manifest.ts';
+import { renderTemplate } from '../scaffold/template-adapter.ts';
 
 /** Read a scaffold template asset shipped with the CLI package. */
 export function readTemplateAsset(template: TemplateKey): Promise<string> {
@@ -25,11 +26,7 @@ export function renderTemplateAssetSync(
   template: TemplateKey,
   variables: Readonly<Record<string, string>>,
 ): string {
-  let content = readTemplateAssetSync(template);
-  for (const [key, value] of Object.entries(variables)) {
-    content = content.replaceAll(`{{${key}}}`, value);
-  }
-  return content;
+  return renderTemplate(readTemplateAssetSync(template), { ...variables });
 }
 
 /** Resolve a registered scaffold template asset. */

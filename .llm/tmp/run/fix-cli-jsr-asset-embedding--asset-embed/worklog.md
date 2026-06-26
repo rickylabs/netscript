@@ -117,3 +117,48 @@ path to `TEMPLATE_KEYS`, run `deno task gen:assets-barrel`, then run
   excluded by the repo lint config. The raw scoped lint excludes `no-explicit-any` because the
   touched command file follows the existing Cliffy `Command<any,...>` baseline pattern.
 - `deno.lock` was touched by validation and reverted; S2 has no intended lock churn.
+- Branch push succeeded with `git push origin HEAD:refs/heads/fix/cli-jsr-asset-embedding`.
+  GitHub API still returned no PR for the branch, so there was no PR comment target for S2.
+
+## S3 — Fresh UI embedded registry
+
+### Implementation
+
+- Extended `.llm/tools/generate-cli-assets-barrel.ts` so `deno task gen:assets-barrel` also
+  generates `packages/fresh-ui/registry.generated.ts`.
+- Added `@netscript/fresh-ui/registry` as a public subpath exporting
+  `freshUiRegistryManifest` and `FRESH_UI_REGISTRY_CONTENT`.
+- Rewrote the CLI UI registry installer to use embedded fresh-ui manifest/content by default, while
+  keeping `--registry-root` as the explicit filesystem override path.
+- Removed the default `fromFileUrl(new URL('../../../../../fresh-ui/', import.meta.url))` registry
+  root and added embedded-content test coverage.
+- Reused the existing template renderer for `renderTemplateAssetSync`, preserving existing template
+  pipes such as `camelCase` and `pascalCase`.
+
+### Validation
+
+| Gate | Command | Result |
+| --- | --- | --- |
+| assets barrel | `deno task check:assets-barrel` | PASS — CLI + plugin + fresh-ui generated barrels diff clean |
+| focused tests | `deno test --allow-read --allow-write packages/cli/src/kernel/adapters/templates/template-asset_test.ts packages/cli/src/kernel/adapters/service/scaffolder_test.ts packages/cli/src/public/features/ui/registry.test.ts` | PASS — 18 tests |
+| scoped check | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --root packages/plugin --root packages/fresh-ui --ext ts,tsx` | PASS — 712 files, 6 batches, 0 diagnostics |
+| scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root <S3 files> --ext ts,tsx` | PASS — 8 files, 0 findings |
+| scoped lint | `deno lint --rules-exclude=no-import-prefix,no-explicit-any <S3 files>` | PASS |
+| plugin doc-lint full export map | `deno doc --lint packages/plugin/mod.ts packages/plugin/src/abstracts/mod.ts packages/plugin/src/config/mod.ts packages/plugin/src/cli/mod.ts packages/plugin/loader.ts packages/plugin/src/sdk/mod.ts packages/plugin/src/testing/mod.ts packages/plugin/src/templates/mod.ts` | PASS — 8 files |
+| fresh-ui registry doc-lint | `deno doc --lint packages/fresh-ui/registry.ts` | PASS — 1 file |
+| fresh-ui full export-map doc-lint | `deno doc --lint packages/fresh-ui/mod.ts packages/fresh-ui/interactive.ts packages/fresh-ui/primitives.tsx packages/fresh-ui/registry.ts` | FAIL — 87 existing runtime public-surface doc/private-type findings; no registry findings |
+| cli publish dry-run | `cd packages/cli && deno task publish:dry-run` | PASS — generated CLI assets listed; existing dynamic-import warnings remain |
+| plugin publish dry-run | `cd packages/plugin && deno task publish:dry-run` | PASS — generated plugin assets listed; existing slow-type/dynamic-import warnings remain |
+| fresh-ui publish dry-run | `cd packages/fresh-ui && deno publish --dry-run --allow-dirty` | PASS — `registry.generated.ts`, `registry.ts`, manifest, and registry files listed |
+| scaffold runtime smoke | `rtk proxy deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | FAIL — first run exposed unrendered service template pipes, fixed in `template-asset.ts`; rerun reached clean scaffold init and all plugin gates, then failed `database.init` due external Aspire dashboard port `127.0.0.1:18891` already held by `/home/codex/repos/netscript-cli-plugin-copy/.llm/tmp/cli-e2e/plugin-smoke-20260626-101742/aspire/apphost.mts` |
+
+### Notes
+
+- The first runtime smoke run was useful evidence: scaffold init reported unrendered
+  `{{serviceName | ...}}` placeholders in service files. `renderTemplateAssetSync` now delegates to
+  the established `renderTemplate` helper, and the rerun's scaffold init stderr was clean.
+- The remaining runtime smoke failure is an external Aspire lifecycle conflict, not an asset output
+  difference. The conflicting process is outside this worktree, so it was not stopped from this
+  implementation session.
+- `deno.lock` was touched by validation/publish dry-runs and reverted; S3 has no intended lock
+  churn.

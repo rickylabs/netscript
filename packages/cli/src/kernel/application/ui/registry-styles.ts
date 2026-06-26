@@ -5,7 +5,8 @@ import type { UiRegistryItem, UiRegistryManifest } from './registry.ts';
 
 /** Write the target app's Fresh UI stylesheet aggregator. */
 export async function writeStylesAggregator(input: {
-  readonly registryRoot: string;
+  readonly registryRoot?: string;
+  readonly registryContent?: Readonly<Record<string, string>>;
   readonly projectRoot: string;
   readonly manifest: UiRegistryManifest;
   readonly items: readonly UiRegistryItem[];
@@ -16,8 +17,10 @@ export async function writeStylesAggregator(input: {
   if (!themeItem) {
     throw new Error('Fresh UI registry manifest does not declare a theme item.');
   }
-  const themeStylesPath = themeEntryStylesSource(input.registryRoot, themeItem);
-  const themeStyles = await input.fs.readFile(themeStylesPath);
+  const themeStylesSource = themeEntryStylesSource(themeItem);
+  const themeStyles = input.registryContent
+    ? readRegistryContent(input.registryContent, themeStylesSource)
+    : await input.fs.readFile(resolve(input.registryRoot ?? '', themeStylesSource));
   const cssImports = [
     ...new Set(
       input.items.flatMap((item) =>
@@ -33,12 +36,23 @@ export async function writeStylesAggregator(input: {
   return target;
 }
 
-function themeEntryStylesSource(registryRoot: string, themeItem: UiRegistryItem): string {
+function themeEntryStylesSource(themeItem: UiRegistryItem): string {
   const entry = themeItem.files.find((file) => file.target.endsWith('styles.css'));
   if (!entry) {
     throw new Error(`Fresh UI theme "${themeItem.name}" does not ship a styles.css entry file.`);
   }
-  return resolve(registryRoot, entry.source);
+  return entry.source;
+}
+
+function readRegistryContent(
+  registryContent: Readonly<Record<string, string>>,
+  source: string,
+): string {
+  const content = registryContent[source];
+  if (content === undefined) {
+    throw new Error(`Fresh UI registry content is missing: ${source}`);
+  }
+  return content;
 }
 
 function composeStylesAggregator(themeStyles: string, cssImports: readonly string[]): string {
