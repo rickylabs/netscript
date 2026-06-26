@@ -1,6 +1,6 @@
 {
   "name": "@netscript/plugin-streams-core",
-  "version": "0.0.1-alpha.3",
+  "version": "0.0.1-alpha.4",
   "description": "Schema, producer, config, telemetry, testing, and diagnostics primitives for NetScript streams.",
   "license": "MIT",
   "exports": {
