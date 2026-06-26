@@ -38,8 +38,14 @@ describe('database template generators', () => {
       'deno run --allow-write=schema/.generated/client.server.ts scripts/clear-seeded-client.ts',
     );
     assertStringIncludes(config.tasks['db:generate'], 'npm:prisma@^7.4.2 generate');
-    assertEquals(config.tasks['db:init'], 'deno run -A scripts/migrate.ts --name=init');
-    assertEquals(config.tasks['db:migrate'], 'deno run -A scripts/migrate.ts');
+    assertEquals(
+      config.tasks['db:init'],
+      'deno run -A --minimum-dependency-age=0 scripts/migrate.ts --name=init',
+    );
+    assertEquals(
+      config.tasks['db:migrate'],
+      'deno run -A --minimum-dependency-age=0 scripts/migrate.ts',
+    );
     assertEquals(
       config.imports['@netscript/database/scripts'],
       '../../packages/database/scripts/mod.ts',
@@ -57,7 +63,10 @@ describe('database template generators', () => {
     );
 
     assertEquals(config.tasks['db:status:sqlite'], 'deno task db:status');
-    assertEquals(config.tasks['db:patch-client'], 'deno run -A scripts/patch-prisma-client.ts');
+    assertEquals(
+      config.tasks['db:patch-client'],
+      'deno run -A --minimum-dependency-age=0 scripts/patch-prisma-client.ts',
+    );
     assertEquals(config.imports['@prisma/adapter-pg'], undefined);
   });
 
@@ -74,9 +83,12 @@ describe('database template generators', () => {
     assertStringIncludes(config.tasks['db:generate'], 'scripts/fix-zod-imports.ts');
     assertEquals(
       config.tasks['db:zod'],
-      'deno run -A scripts/generate-zod.ts',
+      'deno run -A --minimum-dependency-age=0 scripts/generate-zod.ts',
     );
-    assertEquals(config.tasks['db:patch-client'], 'deno run -A scripts/patch-prisma-client.ts');
+    assertEquals(
+      config.tasks['db:patch-client'],
+      'deno run -A --minimum-dependency-age=0 scripts/patch-prisma-client.ts',
+    );
   });
 
   it('generates zod and patch-client tasks for mssql', () => {
@@ -91,9 +103,12 @@ describe('database template generators', () => {
     assertStringIncludes(config.tasks['db:generate'], 'scripts/generate-zod.ts');
     assertEquals(
       config.tasks['db:zod'],
-      'deno run -A scripts/generate-zod.ts',
+      'deno run -A --minimum-dependency-age=0 scripts/generate-zod.ts',
     );
-    assertEquals(config.tasks['db:patch-client'], 'deno run -A scripts/patch-prisma-client.ts');
+    assertEquals(
+      config.tasks['db:patch-client'],
+      'deno run -A --minimum-dependency-age=0 scripts/patch-prisma-client.ts',
+    );
   });
 
   it('generates Prisma config with Aspire env key and sqlite fallback URL', () => {

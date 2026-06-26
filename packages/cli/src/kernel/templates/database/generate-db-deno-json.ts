@@ -7,6 +7,8 @@ import { resolveNetScriptImports } from '../../adapters/scaffold/import-resolver
 import type { PackageSourceMode } from '../../domain/scaffold/scaffold-options.ts';
 import type { DbEngineProvider } from '../../domain/db-engine.ts';
 
+const DENO_SCRIPT_RUN = 'deno run -A --minimum-dependency-age=0';
+
 /** Options for generating `database/<engine>/deno.json`. */
 export interface DatabaseDenoJsonOptions {
   /** Scoped project name. */
@@ -31,12 +33,12 @@ export function generateDatabaseDenoJson(
   const imports = resolveNetScriptImports(options.importMode, options.localBase);
   const scriptTasks = [
     'deno task db:clear-seeded-client',
-    'deno run -A npm:prisma@^7.4.2 generate --generator client --config prisma.config.ts',
+    `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 generate --generator client --config prisma.config.ts`,
   ];
   if (provider.capabilities.hasZodGeneration) {
-    scriptTasks.push('deno run -A scripts/generate-zod.ts');
+    scriptTasks.push(`${DENO_SCRIPT_RUN} scripts/generate-zod.ts`);
   }
-  scriptTasks.push('deno run -A scripts/fix-zod-imports.ts');
+  scriptTasks.push(`${DENO_SCRIPT_RUN} scripts/fix-zod-imports.ts`);
 
   const tasks: Record<string, string> = {
     'db:generate': scriptTasks.join(' && '),
@@ -44,40 +46,43 @@ export function generateDatabaseDenoJson(
     'db:generate:all': 'deno task db:generate',
     'db:clear-seeded-client':
       'deno run --allow-write=schema/.generated/client.server.ts scripts/clear-seeded-client.ts',
-    'db:init': 'deno run -A scripts/migrate.ts --name=init',
+    'db:init': `${DENO_SCRIPT_RUN} scripts/migrate.ts --name=init`,
     [`db:init:${provider.engine}`]: 'deno task db:init',
     'db:init:all': 'deno task db:init',
-    'db:migrate': 'deno run -A scripts/migrate.ts',
+    'db:migrate': `${DENO_SCRIPT_RUN} scripts/migrate.ts`,
     [`db:migrate:${provider.engine}`]: 'deno task db:migrate',
     'db:migrate:all': 'deno task db:migrate',
-    'db:migrate:deploy': 'deno run -A npm:prisma@^7.4.2 migrate deploy --config prisma.config.ts',
-    'db:push': 'deno run -A npm:prisma@^7.4.2 db push --config prisma.config.ts',
-    'db:studio': 'deno run -A npm:prisma@^7.4.2 studio --config prisma.config.ts --port 5555',
+    'db:migrate:deploy':
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 migrate deploy --config prisma.config.ts`,
+    'db:push': `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 db push --config prisma.config.ts`,
+    'db:studio':
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 studio --config prisma.config.ts --port 5555`,
     [`db:studio:${provider.engine}`]: 'deno task db:studio',
     'db:studio:all': 'deno task db:studio',
-    'db:seed': 'deno run -A ./scripts/seed.ts',
+    'db:seed': `${DENO_SCRIPT_RUN} ./scripts/seed.ts`,
     [`db:seed:${provider.engine}`]: 'deno task db:seed',
     'db:seed:all': 'deno task db:seed',
-    'db:introspect': 'deno run -A npm:prisma@^7.4.2 db pull --config prisma.config.ts',
+    'db:introspect': `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 db pull --config prisma.config.ts`,
     [`db:introspect:${provider.engine}`]: 'deno task db:introspect',
     'db:introspect:all': 'deno task db:introspect',
-    'db:reset': 'deno run -A npm:prisma@^7.4.2 migrate reset --force --config prisma.config.ts',
+    'db:reset':
+      `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 migrate reset --force --config prisma.config.ts`,
     [`db:reset:${provider.engine}`]: 'deno task db:reset',
     'db:reset:all': 'deno task db:reset',
-    'db:status': 'deno run -A npm:prisma@^7.4.2 migrate status --config prisma.config.ts',
+    'db:status': `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 migrate status --config prisma.config.ts`,
     [`db:status:${provider.engine}`]: 'deno task db:status',
     'db:status:all': 'deno task db:status',
-    'db:validate': 'deno run -A npm:prisma@^7.4.2 validate --schema schema/schema.prisma',
+    'db:validate': `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 validate --schema schema/schema.prisma`,
   };
 
   if (provider.capabilities.hasPrismaFormat) {
-    tasks['db:format'] = 'deno run -A npm:prisma@^7.4.2 format --schema schema/schema.prisma';
+    tasks['db:format'] = `${DENO_SCRIPT_RUN} npm:prisma@^7.4.2 format --schema schema/schema.prisma`;
   }
   if (provider.capabilities.hasZodGeneration) {
-    tasks['db:zod'] = 'deno run -A scripts/generate-zod.ts';
+    tasks['db:zod'] = `${DENO_SCRIPT_RUN} scripts/generate-zod.ts`;
   }
-  tasks['db:patch-client'] = 'deno run -A scripts/patch-prisma-client.ts';
-  tasks['db:fix-zod'] = 'deno run -A scripts/fix-zod-imports.ts';
+  tasks['db:patch-client'] = `${DENO_SCRIPT_RUN} scripts/patch-prisma-client.ts`;
+  tasks['db:fix-zod'] = `${DENO_SCRIPT_RUN} scripts/fix-zod-imports.ts`;
 
   const config = {
     name: `@${options.projectName}/database-${provider.engine}`,

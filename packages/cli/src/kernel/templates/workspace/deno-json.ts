@@ -14,6 +14,7 @@ import {
   SCAFFOLD_ENGINE_WORKSPACE_PACKAGES,
   SCAFFOLD_WORKSPACE_PACKAGES,
 } from '../../constants/scaffold/scaffold-workspace-packages.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 import type { WorkspaceDenoJsonOptions } from '../../domain/scaffold/scaffold-options.ts';
 
 /**
@@ -41,6 +42,16 @@ export function generateDenoJson(options: WorkspaceDenoJsonOptions): string {
 
   const config: Record<string, unknown> = {
     workspace: [...userMembers, ...packageMembers],
+    ...(options.importMode === 'jsr'
+      ? {
+        imports: {
+          '@netscript/contracts': netscriptJsrSpecifier('contracts'),
+          '@netscript/kv': netscriptJsrSpecifier('kv'),
+          '@netscript/plugin/loader': netscriptJsrSpecifier('plugin', '/loader'),
+          '@netscript/plugin/sdk': netscriptJsrSpecifier('plugin', '/sdk'),
+        },
+      }
+      : {}),
     // Single workspace-root node_modules shared across all members.
     nodeModulesDir: 'auto',
     // Deno unstable features used by generated NetScript workspaces:

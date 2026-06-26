@@ -2641,6 +2641,16 @@
       },
       "plugins/auth": {
         "dependencies": [
+          "jsr:@netscript/auth-better-auth@0.0.1-alpha.4",
+          "jsr:@netscript/auth-kv-oauth@0.0.1-alpha.4",
+          "jsr:@netscript/auth-workos@0.0.1-alpha.4",
+          "jsr:@netscript/contracts@0.0.1-alpha.4",
+          "jsr:@netscript/kv@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-auth-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin@0.0.1-alpha.4",
+          "jsr:@netscript/service@0.0.1-alpha.4",
+          "jsr:@netscript/telemetry@0.0.1-alpha.4",
           "jsr:@zod/zod@4.4.3",
           "npm:@durable-streams/state@~0.3.1",
           "npm:@orpc/contract@^1.14.6",
@@ -2658,9 +2668,18 @@
       "plugins/sagas": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/contracts@0.0.1-alpha.4",
+          "jsr:@netscript/kv@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-sagas-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin@0.0.1-alpha.4",
+          "jsr:@netscript/service@0.0.1-alpha.4",
+          "jsr:@netscript/telemetry@0.0.1-alpha.4",
           "jsr:@std/async@1",
           "jsr:@zod/zod@4.4.3",
-          "npm:@durable-streams/state@~0.3.1"
+          "npm:@durable-streams/state@~0.3.1",
+          "npm:@orpc/contract@^1.14.6",
+          "npm:@orpc/server@^1.14.6"
         ],
         "packageJson": {
           "dependencies": [
@@ -2677,8 +2696,17 @@
       "plugins/streams": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/aspire@0.0.1-alpha.4",
+          "jsr:@netscript/contracts@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin@0.0.1-alpha.4",
+          "jsr:@netscript/service@0.0.1-alpha.4",
           "jsr:@standard-schema/spec@1.1.0",
-          "jsr:@std/net@1"
+          "jsr:@std/net@1",
+          "jsr:@zod/zod@4.4.3",
+          "npm:@durable-streams/client@~0.2.6",
+          "npm:@durable-streams/server@~0.3.7",
+          "npm:@orpc/server@^1.14.6"
         ],
         "packageJson": {
           "dependencies": [
@@ -2690,6 +2718,14 @@
       "plugins/triggers": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/contracts@0.0.1-alpha.4",
+          "jsr:@netscript/kv@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-triggers-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-workers-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin@0.0.1-alpha.4",
+          "jsr:@netscript/queue@0.0.1-alpha.4",
+          "jsr:@netscript/service@0.0.1-alpha.4",
+          "jsr:@netscript/telemetry@0.0.1-alpha.4",
           "jsr:@std/assert@1",
           "jsr:@std/path@1",
           "jsr:@zod/zod@4.4.3",
@@ -2706,6 +2742,15 @@
       "plugins/workers": {
         "dependencies": [
           "jsr:@hono/hono@4.12.24",
+          "jsr:@netscript/contracts@0.0.1-alpha.4",
+          "jsr:@netscript/cron@0.0.1-alpha.4",
+          "jsr:@netscript/kv@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-streams-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin-workers-core@0.0.1-alpha.4",
+          "jsr:@netscript/plugin@0.0.1-alpha.4",
+          "jsr:@netscript/queue@0.0.1-alpha.4",
+          "jsr:@netscript/service@0.0.1-alpha.4",
+          "jsr:@netscript/telemetry@0.0.1-alpha.4",
           "jsr:@standard-schema/spec@1.1.0",
           "jsr:@std/async@1",
           "jsr:@std/path@1",

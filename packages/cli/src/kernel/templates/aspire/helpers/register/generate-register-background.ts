@@ -70,7 +70,7 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
 
     // Register via addExecutable
     lines.push(
-      `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['run', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, '${entrypoint}']);`,
+      `    const ${id} = builder.addExecutable('${name}', 'deno', ${id}_workdir, ['run', '--minimum-dependency-age=0', '${RESOURCE_DEFAULTS.NodeModulesDirNoneFlag}', '${RESOURCE_DEFAULTS.UnstableWorkerOptionsFlag}', ...${id}_perms, '${entrypoint}']);`,
     );
     lines.push(
       `    await ${id}.withEnvironment('NETSCRIPT_PLUGIN_SERVICE_BOOTSTRAP_MODULE', ${id}_bootstrapModule);`,
@@ -134,6 +134,11 @@ export function generateRegisterBackground(options: RegisterBackgroundOptions): 
       lines.push(`    if (infrastructure.primaryCache) {`);
       lines.push(`      if (infrastructure.primaryCacheEndpoint) {`);
       lines.push(`        await ${id}.withReference(infrastructure.primaryCacheEndpoint);`);
+      lines.push(
+        `        const ${id}_cacheEndpoint = infrastructure.primaryCacheEndpoint.property(EndpointProperty.HostAndPort);`,
+      );
+      lines.push(`        await ${id}.withEnvironment('GARNET_URI', ${id}_cacheEndpoint);`);
+      lines.push(`        await ${id}.withEnvironment('REDIS_URI', ${id}_cacheEndpoint);`);
       lines.push(`      } else {`);
       lines.push(`        await ${id}.withReference(infrastructure.primaryCache);`);
       lines.push(`      }`);

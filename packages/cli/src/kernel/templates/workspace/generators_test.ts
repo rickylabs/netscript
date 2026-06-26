@@ -24,6 +24,12 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   }));
 
   assertEquals(result.workspace, ['./contracts', './plugins']);
+  assertEquals(result.imports, {
+    '@netscript/contracts': 'jsr:@netscript/contracts@0.0.1-alpha.4',
+    '@netscript/kv': 'jsr:@netscript/kv@0.0.1-alpha.4',
+    '@netscript/plugin/loader': 'jsr:@netscript/plugin@0.0.1-alpha.4/loader',
+    '@netscript/plugin/sdk': 'jsr:@netscript/plugin@0.0.1-alpha.4/sdk',
+  });
   assertEquals(result.nodeModulesDir, 'auto');
   assertEquals(result.unstable, ['raw-imports', 'kv']);
   assertEquals(result.exclude, [
@@ -47,14 +53,19 @@ Deno.test('generateDenoJson emits the expected root workspace shape in JSR mode'
   ]);
 });
 
-Deno.test('generateDenoJson omits imports in JSR mode', () => {
+Deno.test('generateDenoJson emits shared plugin service-context imports in JSR mode', () => {
   const result = JSON.parse(generateDenoJson({
     name: 'test-project',
     appName: 'dashboard',
     workspaceMembers: ['contracts', 'plugins'],
     importMode: 'jsr',
   }));
-  assert(!('imports' in result), 'root deno.json must not carry import maps');
+  assertEquals(result.imports, {
+    '@netscript/contracts': 'jsr:@netscript/contracts@0.0.1-alpha.4',
+    '@netscript/kv': 'jsr:@netscript/kv@0.0.1-alpha.4',
+    '@netscript/plugin/loader': 'jsr:@netscript/plugin@0.0.1-alpha.4/loader',
+    '@netscript/plugin/sdk': 'jsr:@netscript/plugin@0.0.1-alpha.4/sdk',
+  });
 });
 
 Deno.test('generateDenoJson keeps the same root-only shape in local mode', () => {
