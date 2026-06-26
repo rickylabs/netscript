@@ -25,6 +25,16 @@
  * (the OIDC publish token is publish-scoped and cannot edit settings). Without a
  * token the tool runs read-only and reports the diff it would apply.
  *
+ * WIRE CONTRACT: the JSR backend's `PATCH /scopes/{scope}/packages/{package}`
+ * route deserializes the body into the externally-tagged Rust enum
+ * `ApiUpdatePackageRequest` (jsr-io/jsr api/src/api/types.rs), whose variants are
+ * `description` (string), `runtimeCompat` (object), `readmeSource`
+ * ("readme" | "jsdoc"), `githubRepository`, `isFeatured`, `isArchived`. An
+ * externally-tagged enum accepts EXACTLY ONE field per request — a merged
+ * multi-field body fails server-side with HTTP 400 `malformedRequest`
+ * ("expected value at line 1 column N"). This tool therefore issues a separate
+ * PATCH per changed field. Content-Type is application/json.
+ *
  * Usage:
  *   deno run --allow-net --allow-read --allow-env \
  *     .llm/tools/jsr-set-package-settings.ts \
@@ -156,21 +166,37 @@ for (const member of members) {
     continue;
   }
 
-  const updated = await requestApi(
-    'PATCH',
-    `/scopes/${options.scope}/packages/${packageName}`,
-    token,
-    patch,
-  );
-  if (updated.kind === 'ok') {
+  // The JSR update endpoint deserializes the body into an externally-tagged
+  // enum (`ApiUpdatePackageRequest`) that accepts EXACTLY ONE field per
+  // request. A merged multi-field body fails to parse server-side with
+  // HTTP 400 `malformedRequest` ("expected value ..."). Send one PATCH per
+  // changed field.
+  const applied: string[] = [];
+  let packageFailed = false;
+  for (const field of fields) {
+    const singleFieldBody = { [field]: patch[field] };
+    const updated = await requestApi(
+      'PATCH',
+      `/scopes/${options.scope}/packages/${packageName}`,
+      token,
+      singleFieldBody,
+    );
+    if (updated.kind === 'ok') {
+      applied.push(field);
+    } else {
+      packageFailed = true;
+      failures.push({
+        packageName,
+        action: `update ${field}`,
+        reason: formatApiError(updated),
+      });
+    }
+  }
+  if (applied.length > 0) {
     changed += 1;
-    console.log(`${packageName}: updated ${fields.join(', ')}`);
-  } else {
-    failures.push({
-      packageName,
-      action: 'update',
-      reason: formatApiError(updated),
-    });
+    console.log(`${packageName}: updated ${applied.join(', ')}`);
+  } else if (!packageFailed) {
+    unchanged += 1;
   }
 }
 
