@@ -70,6 +70,49 @@ Deno.test('PluginWorkspaceMutator ensures plugins root and plugin packages are w
   ]);
 });
 
+Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into root deno config', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/deno.json',
+    JSON.stringify(
+      {
+        workspace: ['./plugins/*'],
+        imports: {
+          '@netscript/plugin': 'jsr:@netscript/plugin@0.0.1-alpha.9',
+        },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+
+  const mutator = new PluginWorkspaceMutator(fs);
+  await mutator.ensureRootImportsForPluginKind('/project', 'worker');
+  await mutator.ensureRootImportsForPluginKind('/project', 'worker');
+  await mutator.ensureRootImportsForPluginKind('/project', 'saga');
+  await mutator.ensureRootImportsForPluginKind('/project', 'trigger');
+  await mutator.ensureRootImportsForPluginKind('/project', 'auth');
+
+  const config = JSON.parse(await fs.readFile('/project/deno.json'));
+
+  assertEquals(
+    config.imports['@netscript/plugin-workers-core/schemas'],
+    'jsr:@netscript/plugin-workers-core@0.0.1-alpha.9/schemas',
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-sagas-core/domain'],
+    'jsr:@netscript/plugin-sagas-core@0.0.1-alpha.9/domain',
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-triggers-core/builders'],
+    'jsr:@netscript/plugin-triggers-core@0.0.1-alpha.9/builders',
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-auth-core/contracts/v1'],
+    'jsr:@netscript/plugin-auth-core@0.0.1-alpha.9/contracts/v1',
+  );
+});
+
 Deno.test('PluginWorkspaceMutator registers background plugins with companion API service', async () => {
   const fs = new MemoryFileSystemAdapter();
   await fs.writeFile(

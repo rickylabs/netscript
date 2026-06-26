@@ -60,10 +60,34 @@ const PACKAGE_TO_JSR: Record<string, string> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_BETTER_AUTH]: JSR_SPECIFIERS['auth-better-auth'],
   [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH]: JSR_SPECIFIERS['auth-kv-oauth'],
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: JSR_SPECIFIERS.workers,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME]: `${JSR_SPECIFIERS.workers}/runtime`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS]: `${JSR_SPECIFIERS.workers}/schemas`,
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE]: JSR_SPECIFIERS['plugin-sagas-core'],
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN]: `${
     JSR_SPECIFIERS['plugin-sagas-core']
   }/domain`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE]: JSR_SPECIFIERS['plugin-triggers-core'],
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_ADAPTERS]: `${
+    JSR_SPECIFIERS['plugin-triggers-core']
+  }/adapters`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_BUILDERS]: `${
+    JSR_SPECIFIERS['plugin-triggers-core']
+  }/builders`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_CONFIG]: `${
+    JSR_SPECIFIERS['plugin-triggers-core']
+  }/config`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_CONTRACTS_V1]: `${
+    JSR_SPECIFIERS['plugin-triggers-core']
+  }/contracts/v1`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_DOMAIN]: `${
+    JSR_SPECIFIERS['plugin-triggers-core']
+  }/domain`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_PORTS]: `${
+    JSR_SPECIFIERS['plugin-triggers-core']
+  }/ports`,
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_RUNTIME]: `${
+    JSR_SPECIFIERS['plugin-triggers-core']
+  }/runtime`,
   [SCAFFOLD_PACKAGES.NETSCRIPT_PRISMA_ADAPTER_MYSQL]: JSR_SPECIFIERS['prisma-adapter-mysql'],
   [SCAFFOLD_PACKAGES.NETSCRIPT_ASPIRE]: JSR_SPECIFIERS.aspire,
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH]: JSR_SPECIFIERS.fresh,
@@ -114,9 +138,27 @@ const PACKAGE_TO_LOCAL_PATH: Readonly<Record<string, string>> = {
   [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_BETTER_AUTH]: 'packages/auth-better-auth/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_AUTH_KV_OAUTH]: 'packages/auth-kv-oauth/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS]: 'packages/plugin-workers-core/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME]: 'packages/plugin-workers-core/src/runtime/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS]:
+    'packages/plugin-workers-core/src/domain/public-schema.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE]: 'packages/plugin-sagas-core/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN]:
     'packages/plugin-sagas-core/src/domain/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE]: 'packages/plugin-triggers-core/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_ADAPTERS]:
+    'packages/plugin-triggers-core/src/adapters/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_BUILDERS]:
+    'packages/plugin-triggers-core/src/builders/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_CONFIG]:
+    'packages/plugin-triggers-core/src/config/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_CONTRACTS_V1]:
+    'packages/plugin-triggers-core/src/contracts/v1/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_DOMAIN]:
+    'packages/plugin-triggers-core/src/domain/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_PORTS]:
+    'packages/plugin-triggers-core/src/ports/mod.ts',
+  [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_RUNTIME]:
+    'packages/plugin-triggers-core/src/runtime/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_PRISMA_ADAPTER_MYSQL]: 'packages/prisma-adapter-mysql/src/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_ASPIRE]: 'packages/aspire/mod.ts',
   [SCAFFOLD_PACKAGES.NETSCRIPT_FRESH]: 'packages/fresh/mod.ts',
