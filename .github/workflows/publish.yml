@@ -69,6 +69,17 @@ jobs:
       - name: Publish dry-run
         run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --dry-run
 
+      # Real-publish-equivalent preflight. `deno publish --dry-run` is a blind
+      # spot: it can pass while the REAL publish module-graph build rejects a
+      # module — exactly how alpha.5 produced a partial/half publish (23 of 31
+      # members). This step runs the real `deno publish` (not --dry-run) with an
+      # invalid token, so it builds every member's publish graph in the real code
+      # path and then fails at the auth boundary BEFORE any upload. A graph/check
+      # error here fails the job before the Publish step below, so a release can
+      # never half-publish. It never uploads (the token is invalid by design).
+      - name: Publish preflight (real graph build, no upload)
+        run: deno run --allow-read --allow-write --allow-run .llm/tools/run-publish.ts --preflight
+
       # Deno 2.9 publish resilience (relied on by the atomic whole-workspace
       # publish in .llm/tools/publish-workspace.ts):
       #   - skip-already-published (denoland/deno#35134): members already on the
