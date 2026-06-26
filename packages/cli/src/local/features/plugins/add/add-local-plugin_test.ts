@@ -1,5 +1,5 @@
 import { describe, it } from 'jsr:@std/testing@^1/bdd';
-import { assertEquals, assertStringIncludes } from 'jsr:@std/assert@^1';
+import { assertEquals, assertFalse, assertStringIncludes } from 'jsr:@std/assert@^1';
 import { dirname, resolve } from '@std/path';
 
 import { MemoryFileSystemAdapter } from '../../../../kernel/adapters/scaffold/memory-fs.ts';
@@ -167,6 +167,58 @@ describe('local contributor add plugin flow', () => {
     assertEquals(appsettings.NetScript.Plugins.streams.Port, 4437);
     assertEquals(appsettings.NetScript.Plugins['workers-api'].PluginReferences, ['streams']);
     assertEquals(rootDenoJson.workspace.includes('./workers'), true);
+  });
+
+  it('writes thin local-import stubs for canonical plugins when source copy is disabled', async () => {
+    const fs = new MemoryFileSystemAdapter();
+    await writeProjectFiles(fs);
+    const templateAdapter = new StringTemplateAdapter(fs);
+    const scaffolder = new Scaffolder(templateAdapter, fs);
+    const registry = new PluginKindRegistry();
+    registry.register(workerProvider.kind, workerProvider);
+
+    const result = await addLocalPlugin({
+      kind: 'worker',
+      pluginName: 'workers',
+      serviceReferences: [],
+      pluginReferences: [],
+      noDb: true,
+      includeSamples: false,
+      noCopySource: true,
+      projectRoot: '/workspace/alpha',
+      overwrite: false,
+    }, {
+      fs,
+      scaffolder,
+      templateAdapter,
+      registry,
+      pluginScaffolder: new PluginScaffolder(scaffolder, fs, registry),
+      registryScaffolder: new PluginRegistryScaffolder(scaffolder),
+      workspaceMutator: new PluginWorkspaceMutator(fs),
+      findSourceRoot: () => Promise.resolve('/repo'),
+      canCopyPlugin: () => {
+        throw new Error('canCopyPlugin should not run when noCopySource is true.');
+      },
+      copyPlugin: () => {
+        throw new Error('copyPlugin should not run when noCopySource is true.');
+      },
+      regenerateHelpers: () => Promise.resolve(['/workspace/alpha/aspire/apphost.mts']),
+    });
+
+    const pluginDenoJson = JSON.parse(
+      await fs.readFile('/workspace/alpha/plugins/workers/deno.json'),
+    );
+    const appsettings = JSON.parse(await fs.readFile('/workspace/alpha/appsettings.json'));
+    const rootDenoJson = JSON.parse(await fs.readFile('/workspace/alpha/deno.json'));
+
+    assertStringIncludes(
+      pluginDenoJson.imports['@netscript/plugin'],
+      '../../packages/plugin/mod.ts',
+    );
+    assertEquals(result.plugin.configKey, 'workers');
+    assertEquals(appsettings.NetScript.BackgroundProcessors.workers.Workdir, 'plugins/workers');
+    assertFalse(rootDenoJson.workspace.includes('./workers'));
+    assertFalse(await fs.exists('/workspace/alpha/workers'));
   });
 
   it('skips the target generated project when discovering the official plugin source root', async () => {

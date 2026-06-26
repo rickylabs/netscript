@@ -34,6 +34,9 @@ export interface PluginAddRequest {
   /** Whether starter samples should be generated. */
   readonly includeSamples: boolean;
 
+  /** Maintainer-only: generate a thin local stub instead of copying official source. */
+  readonly noCopySource?: boolean;
+
   /** Durable saga state backend to write for saga plugins. */
   readonly sagaStoreBackend?: SagaStoreBackend;
 
