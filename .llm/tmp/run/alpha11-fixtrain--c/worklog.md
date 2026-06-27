@@ -108,4 +108,4 @@ Resolved PR #159 against `origin/main` after first fast-forwarding to
 | ---- | ------ | -------- |
 | CLI check | PASS | `deno run --allow-read --allow-run .llm/tools/run-deno-check.ts --root packages/cli --ext ts,tsx` exited 0; 527 files selected, 5 batches, 0 findings. |
 | Root/init regression tests | PASS | `deno test --unstable-kv --allow-all packages/cli/src/public/features/root/public-command-tree_test.ts packages/cli/src/public/features/init/init-command_test.ts` exited 0; 5 passed / 0 failed. |
-| Cast check | PASS | `git diff origin/main...HEAD -- '*.ts' '*.tsx' | grep -E "as unknown|as any"` reports only the pre-existing PR test fixture cast `} as unknown as InitPipelineContext;`; no new merge-resolution casts and no `as any` additions. |
+| Cast check | PASS | Pre-commit PR-side comparison reported only the pre-existing test fixture cast `} as unknown as InitPipelineContext;`. Final pushed-HEAD check `git diff origin/main...HEAD -- '*.ts' '*.tsx' | grep -E "as unknown|as any"` returned no matches (`grep` exit 1). No new merge-resolution casts and no `as any` additions. |
