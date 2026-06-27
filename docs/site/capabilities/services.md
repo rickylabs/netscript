@@ -152,7 +152,7 @@ Prisma comes later; see <a href="/capabilities/database/">Database</a>.
 
 A `defineService` runtime exposes its OpenAPI routes, a typed oRPC endpoint mounted under
 `/api/rpc/*`, and a health check. The example `users` service is reachable once
-`aspire start` is up (Aspire provisions Postgres/Garnet first) or when you run it directly
+`aspire start` is up (Aspire provisions Postgres/Redis first) or when you run it directly
 with `deno task --cwd services/users dev`.
 
 {{ comp.apiTable({
@@ -167,7 +167,7 @@ with `deno task --cwd services/users dev`.
 
 {{ comp callout { type: "important", title: "Aspire first, then hit the endpoint" } }}
 Services that touch the database need orchestration up first:
-<code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Garnet (dashboard at
+<code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis (dashboard at
 <a href="http://localhost:18888">http://localhost:18888</a>) <strong>before</strong> any
 <code>netscript db</code> command. The seeded-records example service runs without the DB,
 but the real workflow expects aspire startning. See <a href="/explanation/aspire/">Aspire</a>.
@@ -369,7 +369,7 @@ Point generated clients at the same path the runtime mounts.</li>
 installed, any request that reaches no matching rule is rejected — add an explicit allow rule for
 public-but-authenticated routes rather than relaxing the default.</li>
 <li><strong>Aspire first for DB-backed services.</strong> <code>aspire start</code> must bring up
-Postgres/Garnet before any <code>netscript db</code> command or the readiness probe will fail.</li>
+Postgres/Redis before any <code>netscript db</code> command or the readiness probe will fail.</li>
 </ul>
 {{ /comp }}
 

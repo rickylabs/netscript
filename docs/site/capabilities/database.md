@@ -34,7 +34,7 @@ Reach for the database layer when you need <strong>durable, relational state</st
 records that survive restarts, are queried with a typed client, and are shared across your
 service and its plugins. For <em>ephemeral or high-throughput</em> state (counters, locks,
 work queues, scheduled triggers) reach for <a href="/capabilities/kv-queues-cron/">KV,
-queues &amp; cron</a> instead; the scaffold uses both — Postgres for records, Garnet/KV for
+queues &amp; cron</a> instead; the scaffold uses both — Postgres for records, Redis/KV for
 execution state. Postgres can <em>also</em> back the work queue itself — see <a
 href="/capabilities/kv-queues-cron/">the Postgres queue backend</a> below.
 {{ /comp }}
@@ -311,7 +311,7 @@ Aspire resources and the connection-string env vars the workspace resolves.
   caption: "Database surface (provisioned by Aspire)",
   rows: [
     { name: "postgres", type: "Aspire resource", desc: "The Postgres container Aspire provisions from appsettings.json NetScript.Databases.postgres. Watch it go green in the dashboard." },
-    { name: "garnet", type: "Aspire resource", desc: "Garnet cache backing KV/queues — a separate concern from Postgres; see KV, queues & cron." },
+    { name: "redis", type: "Aspire resource", desc: "Redis cache — the default `--cache-backend`; Redis-compatible — backing KV/queues. A separate concern from Postgres; see KV, queues & cron. (`garnet` and `deno-kv` are alternative backends.)" },
     { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire start`) — confirm the postgres resource is healthy." },
     { name: "POSTGRES_URI / DATABASE_URL", type: "env", desc: "Connection string resolved by prisma.config.ts and normalized to a URL. Set these yourself under --no-aspire." }
   ]
@@ -324,7 +324,7 @@ Aspire resources and the connection-string env vars the workspace resolves.
 <li><strong>Stale client after a schema change.</strong> Editing a <code>.prisma</code> file without re-running <code>netscript db generate</code> leaves your code typed against the old model.</li>
 <li><strong>Calling getClient() before setClient().</strong> A second-database adapter throws until you hand it the constructed <code>PrismaClient</code> via <code>setClient()</code>.</li>
 <li><strong>Tracing wired too late.</strong> <code>enablePrismaTracing()</code> must run <em>before</em> the first <code>PrismaClient</code> is constructed, or early query spans are lost.</li>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres and Garnet as containers; if Docker/Podman is down the <code>postgres</code> resource never goes green.</li>
+<li><strong>Docker not running.</strong> Aspire provisions Postgres and Redis as containers; if Docker/Podman is down the <code>postgres</code> resource never goes green.</li>
 </ul>
 {{ /comp }}
 
@@ -370,7 +370,7 @@ lane that matches what you're doing.
   },
   {
     title: "Understand — Orchestration with Aspire",
-    body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Garnet, and how the resource graph fits together.",
+    body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Redis, and how the resource graph fits together.",
     href: "/explanation/aspire/",
     icon: "◎"
   },

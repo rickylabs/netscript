@@ -20,7 +20,7 @@ contracts-first, what "durable" means, how Aspire wires dependencies — read th
 and reference that go deeper.
 
 {{ comp callout { tone: "info", title: "One prerequisite spans almost every recipe" } }}
-Anything that touches Postgres, Garnet/Redis, or a plugin service expects Aspire
+Anything that touches Postgres, Redis/Garnet, or a plugin service expects Aspire
 to be running first. From your workspace: <code>cd aspire &amp;&amp; aspire start</code>
 brings up the dependencies and the dashboard on <a href="http://localhost:18888"><code>http://localhost:18888</code></a>
 <strong>before</strong> any <code>netscript db</code> command or service call. The
@@ -58,7 +58,7 @@ the Aspire-free portability path.
 
 {{ comp.featureGrid({ items: [
   { title: "Customize the Fresh UI", body: "Bring in and own the dashboard UI with the ui:init / ui:add tasks. The scaffold uses copy-source ownership — the components land in your workspace, so you edit them directly rather than depending on a hidden package.", href: "/how-to/customize-fresh-ui/" },
-  { title: "Deploy", body: "Take a workspace to production: Docker and bare-metal targets, the raw deno task entry points behind each service, and the --no-aspire portability escape hatch when you provision Postgres and Garnet yourself.", href: "/how-to/deploy/" },
+  { title: "Deploy", body: "Take a workspace to production: Docker and bare-metal targets, the raw deno task entry points behind each service, and the --no-aspire portability escape hatch when you provision Postgres and Redis (or Garnet) yourself.", href: "/how-to/deploy/" },
   { title: "Author a plugin", body: "Advanced: build a custom plugin from scratch. Defines the scaffold.plugin.json provider kind, the manifest exports, and the mod.ts contract the host discovers — the same shape the first-party plugins use.", href: "/how-to/author-a-plugin/" }
 ] }) }}
 

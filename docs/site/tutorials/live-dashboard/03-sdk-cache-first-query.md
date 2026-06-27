@@ -99,7 +99,7 @@ each a small object of typed helpers. The four you will use across the next chap
 }) }}
 
 {{ comp callout { type: "tip", title: "Why KV, and why cache-first" } }}
-The cache is backed by KV (Garnet in your Aspire stack — the Redis adapter you saw registered at the top of <code>main.ts</code> in chapter 1). Cache-first means a page render does not block on the service: <code>getCachedEntry</code> returns immediately from KV when warm, and the stale entry refreshes in the background. A cold cache returns <code>undefined</code>, which the page handles with a skeleton — you wire that in chapter 4.
+The cache is backed by KV (Redis in your Aspire stack — the default <code>--cache-backend</code>, registered at the top of <code>main.ts</code> in chapter 1; <code>garnet</code> and <code>deno-kv</code> are alternatives). Cache-first means a page render does not block on the service: <code>getCachedEntry</code> returns immediately from KV when warm, and the stale entry refreshes in the background. A cold cache returns <code>undefined</code>, which the page handles with a skeleton — you wire that in chapter 4.
 {{ /comp }}
 
 ## Step 3 — Understand the calling shapes

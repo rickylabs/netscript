@@ -85,7 +85,7 @@ aspire start
 ```
 
 Open the dashboard at [http://localhost:18888](http://localhost:18888) and confirm the new
-`workspace` resource goes green alongside the existing `postgres` and `garnet`.
+`workspace` resource goes green alongside the existing `postgres` and `redis`.
 
 {{ comp callout { type: "warning", title: "Restart is not optional" } }}
 The new container only appears because <code>db add</code> <strong>regenerated the Aspire helpers</strong>.

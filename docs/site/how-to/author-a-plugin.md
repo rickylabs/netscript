@@ -25,7 +25,7 @@ contribution types live in the [plugin reference](/reference/plugin/).
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
 If your plugin contributes an API service or a background processor, those run as resources in the
-Aspire graph alongside Postgres and Garnet. Bring orchestration up <strong>before</strong> you run
+Aspire graph alongside Postgres and Redis. Bring orchestration up <strong>before</strong> you run
 any <code>netscript db</code> command or exercise your plugin's endpoints: from the project root,
 <code>cd aspire &amp;&amp; aspire start</code> (dashboard at
 <a href="http://localhost:18888">http://localhost:18888</a>). DB commands require aspire startning
@@ -119,7 +119,7 @@ A worker-archetype descriptor looks like this — copy the shape and change the 
   {
     label: "What the kernel reads it for",
     lang: "ts",
-    code: "// provider.kind          -> which contribution category to scan for\n// defaultEntrypoint       -> the background processor aspire starts\n// defaultServiceEntrypoint-> the API service aspire starts (if any)\n// defaultRequiresDb / Kv  -> whether to provision Postgres / Garnet for it\n// concurrencyEnvVar       -> env var that caps processor concurrency\n// officialSource.servicePort -> the HTTP port the service binds\n// officialSource.dependencies -> plugins wired BEFORE this one in the graph"
+    code: "// provider.kind          -> which contribution category to scan for\n// defaultEntrypoint       -> the background processor aspire starts\n// defaultServiceEntrypoint-> the API service aspire starts (if any)\n// defaultRequiresDb / Kv  -> whether to provision Postgres / Redis for it\n// concurrencyEnvVar       -> env var that caps processor concurrency\n// officialSource.servicePort -> the HTTP port the service binds\n// officialSource.dependencies -> plugins wired BEFORE this one in the graph"
   }
 ] }) }}
 

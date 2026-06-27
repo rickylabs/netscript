@@ -151,7 +151,7 @@ first-party plugin enabled.
                               ┌───────────────────────────────────┐
                               │            Aspire AppHost          │
                               │   dashboard  http://localhost:18888│
-                              │  provisions Postgres + Garnet (KV) │
+                              │  provisions Postgres + Redis (KV)  │
                               └───────────────┬───────────────────┘
                                               │ wires env, ports, resources
             ┌─────────────────────────────────┼─────────────────────────────────┐
@@ -173,13 +173,13 @@ first-party plugin enabled.
    └────────┬──────────────────────────────────────────────────────────┬──────────┘
             │ produces durable change-data events                       │
    ┌────────▼─────────┐                                      ┌──────────▼─────────┐
-   │  streams  :4437   │  durable-stream service             │  Postgres / Garnet  │
+   │  streams  :4437   │  durable-stream service             │  Postgres / Redis   │
    │  HTTP / SSE       │  workers · auth · sagas mirror here  │  (relational + KV)  │
    └───────────────────┘                                      └────────────────────┘
 ```
 
 Read the picture in three bands. **Aspire** sits on top as the local
-orchestrator: `cd aspire && aspire start` brings up Postgres and Garnet and starts
+orchestrator: `cd aspire && aspire start` brings up Postgres and Redis (the default cache backend; `garnet` or `deno-kv` are selectable via `--cache-backend`) and starts
 every service *before* any `netscript db` command runs, with traces, logs, and
 health landing in the dashboard at `http://localhost:18888`. **Plugin services**
 sit in the middle, each owning exactly one service on a fixed port; your own

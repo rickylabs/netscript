@@ -41,7 +41,7 @@ You need:
   `deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}`.
 
 Run the app while you work so you can see each change live. Aspire is step 2 of the
-normal startup flow — it brings up Postgres and Garnet before any `netscript db`
+normal startup flow — it brings up Postgres and Redis before any `netscript db`
 command and orchestrates the dashboard for you. You can also run the Fresh app on
 its own when you only need the UI loop:
 
@@ -49,7 +49,7 @@ its own when you only need the UI loop:
   {
     label: "Under Aspire (recommended)",
     lang: "bash",
-    code: "# Brings up Postgres + Garnet AND the dashboard; Aspire dashboard graph at http://localhost:18888\ncd aspire && aspire start"
+    code: "# Brings up Postgres + Redis AND the dashboard; Aspire dashboard graph at http://localhost:18888\ncd aspire && aspire start"
   },
   {
     label: "Fresh app only",

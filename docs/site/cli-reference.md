@@ -22,7 +22,7 @@ use <code>netscript</code>.
 
 {{ comp callout { type: "important", title: "Database commands need aspire startning first" } }}
 The <code>netscript db ...</code> commands provision and talk to Postgres <strong>through Aspire</strong>. Aspire is
-step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Garnet via Docker and
+step 2 of the everyday flow: <code>cd aspire &amp;&amp; aspire start</code> brings up Postgres and Redis via Docker and
 opens the dashboard at <a href="http://localhost:18888">:18888</a> — <strong>before</strong> any <code>db init</code>,
 <code>db generate</code>, <code>db seed</code>, or <code>db status</code>. Run a <code>db</code> command with Aspire down and it fails to
 find the database. See the <a href="/how-to/database-migration/">database &amp; migration how-to</a>.
@@ -70,7 +70,7 @@ and the order matters: **Aspire (step 2) must be up before any `db` command (ste
   },
   {
     title: "2 · Orchestrate",
-    body: "cd aspire && aspire start brings up Postgres and Garnet and opens the dashboard at :18888. Do this before any db command.",
+    body: "cd aspire && aspire start brings up Postgres and Redis and opens the dashboard at :18888. Do this before any db command.",
     icon: "▶"
   },
   {
@@ -96,7 +96,7 @@ Aspire orchestration files. The flags below match the verified scaffold run.
   rows: [
     { name: "netscript init", type: "netscript init my-app", desc: "Create a NetScript workspace in <code>my-app/</code> — contracts, plugin registry, Fresh app, a default Redis cache, and the Aspire layer. On a terminal it prompts for anything you omit (name, database, service, cache); add <code>--dry-run</code> to preview every file without writing." },
     { name: "init (full happy path)", type: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes", desc: "The fully-specified, non-interactive form (<code>--yes</code>): Postgres database support, an example oRPC <code>users</code> service on port 3001, and the default Redis cache resource." },
-    { name: "init --cache / --cache-backend", type: "netscript init my-app --cache-backend garnet", desc: "The shared cache is on by default. Pick the backend with <code>--cache-backend</code>: <code>redis</code> (default) or <code>garnet</code> are provisioned as Aspire container resources; <code>deno-kv</code> is app-level and needs no container. Pass <code>--no-cache</code> to scaffold without a cache." },
+    { name: "init --cache / --cache-backend", type: "netscript init my-app --cache-backend garnet", desc: "The shared cache is on by default with the <code>redis</code> backend. Pick another with <code>--cache-backend</code>: <code>redis</code> (default) or <code>garnet</code> are provisioned as Aspire container resources; <code>deno-kv</code> is app-level and needs no container. Pass <code>--cache=false</code> to scaffold without a cache." },
     { name: "init --no-aspire", type: "netscript init my-app --no-aspire", desc: "Scaffold without the .NET Aspire footprint. You start the Fresh app directly with <code>deno task --cwd apps/dashboard dev</code> and lose the dashboard + multi-resource wiring." },
     { name: "init --path / --editor", type: "netscript init my-app --path ./apps --editor zed", desc: "Place the project under a different directory and emit editor settings (<code>none</code> | <code>zed</code> | <code>vscode</code>)." }
   ]
@@ -109,11 +109,12 @@ nothing — a safe way to inspect the scaffold plan first.
 
 {{ comp callout { type: "note", title: "Interactive vs non-interactive" } }}
 On a terminal, <code>netscript init</code> prompts for any option you do not pass on the command line —
-the project name, database engine, example service, and the two cache questions (enable the cache,
-then choose <code>redis</code> | <code>garnet</code> | <code>deno-kv</code>). For scripts and CI, pass
-<code>--yes</code> (accept defaults) or <code>--ci</code> (non-interactive) to skip every prompt; the
-defaults are a Postgres-ready workspace with a Redis cache. Run <code>netscript --version</code> to print
-the installed CLI version.
+the project name, database engine, example service (and its name), the frontend application name, and
+the two cache questions (enable the cache, then choose <code>redis</code> | <code>garnet</code> |
+<code>deno-kv</code>). For scripts and CI, pass <code>--yes</code> (accept defaults) or <code>--ci</code>
+(non-interactive) to skip every prompt — both also engage automatically when stdin is not a terminal.
+The defaults scaffold a Fresh + Aspire workspace with a <code>redis</code> cache and <strong>no database</strong>
+unless you pass <code>--db</code>. Run <code>netscript --version</code> to print the installed CLI version.
 {{ /comp }}
 
 ## Plugins
@@ -202,7 +203,7 @@ at `/api/rpc/*`.
 
 The database workflow uses Prisma with a Deno runtime. **All of these require Aspire to
 be running** — Aspire provisions Postgres, so start it first with `cd aspire && aspire
-run`. Plugin schemas (`workers`, `sagas`, `triggers`, **`auth`**) are picked up by the
+start`. Plugin schemas (`workers`, `sagas`, `triggers`, **`auth`**) are picked up by the
 same `generate` / `migrate` pass. The full task walkthrough is in the
 [database & migration how-to](/how-to/database-migration/).
 

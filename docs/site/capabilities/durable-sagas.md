@@ -300,7 +300,7 @@ You select the backend with the `NETSCRIPT_SAGA_STORE` environment variable (`kv
 {{ comp.apiTable({
   caption: "Durable saga store backends — trait matrix",
   rows: [
-    { name: "kv", type: "Deno KV", desc: "Default for local/single-service. No extra schema. Provisioned by Aspire (Garnet/KV). Resolved via NETSCRIPT_SAGA_STORE=kv or sagas.store.backend=kv." },
+    { name: "kv", type: "Deno KV", desc: "Default for local/single-service. No extra schema. Provisioned by Aspire (Redis/KV). Resolved via NETSCRIPT_SAGA_STORE=kv or sagas.store.backend=kv." },
     { name: "prisma", type: "Postgres / Prisma", desc: "Writes saga_runtime_state, saga_runtime_transition, saga_runtime_correlation. Requires a Prisma client passed to createDurableSagaRuntime. SQL-inspectable in-flight state. Resolved via NETSCRIPT_SAGA_STORE=prisma or sagas.store.backend=prisma." },
     { name: "selection", type: "mandatory", desc: "No implicit default. resolveSagaStoreBackend(...) throws when neither NETSCRIPT_SAGA_STORE nor sagas.store.backend is set." },
     { name: "client requirement", type: "prisma only", desc: "backend: 'prisma' (or passing prisma) without a Prisma client throws 'Prisma saga store backend requires a Prisma client.'" }
@@ -450,12 +450,12 @@ choice above.
 ## Production notes
 
 {{ comp callout { type: "warning", title: "Aspire first, then anything stateful" } }}
-The sagas service needs Postgres and Garnet up before it can persist and list
+The sagas service needs Postgres and Redis up before it can persist and list
 instances. Bring orchestration up first — <code>cd aspire &amp;&amp; aspire start</code>
 (dashboard at <a href="http://localhost:18888"><code>http://localhost:18888</code></a>) —
 <em>before</em> any <code>netscript db</code> command or before you expect
 <code>/api/v1/sagas/instances</code> to return durable state. This holds for both
-backends: <code>kv</code> needs Garnet/KV up, and <code>prisma</code> needs Postgres up
+backends: <code>kv</code> needs Redis/KV up, and <code>prisma</code> needs Postgres up
 with the <code>saga_runtime_*</code> tables migrated. DB commands require aspire startning
 first.
 {{ /comp }}
@@ -484,7 +484,7 @@ store backend when you also want that in-flight state queryable in your relation
 The work is a single idempotent unit with no inter-step state — that is a
 <a href="/capabilities/background-jobs/">background job</a>, not a saga. And remember
 the alpha reality: durability and the instance store depend on the orchestration stack
-being up via Aspire (Garnet/KV for <code>kv</code>, Postgres for <code>prisma</code>),
+being up via Aspire (Redis/KV for <code>kv</code>, Postgres for <code>prisma</code>),
 so a saga is not a substitute for a database transaction within one handler.
 {{ /comp }}
 

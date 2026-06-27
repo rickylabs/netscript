@@ -37,7 +37,7 @@ work</em> use a <a href="/capabilities/triggers/">trigger</a>.
 
 Each package is built on the same NetScript opinion: a single typed contract, several adapters
 behind it, and provider selection that resolves automatically from the environment so you never
-branch on "is this local or Aspire?" in product code. KV unifies **Deno KV, Redis/Garnet, and
+branch on "is this local or Aspire?" in product code. KV unifies **Deno KV and Redis-compatible caches (`redis` by default, or `garnet` via `--cache-backend`), plus
 in-memory**; the queue unifies **Deno KV, Redis, RabbitMQ (AMQP), and PostgreSQL** (plus a
 KV-polling fallback for remote KV Connect endpoints); cron unifies **native `Deno.cron()` and an
 in-memory** scheduler. None of the three requires you to operate Redis, RabbitMQ, or PostgreSQL
@@ -77,7 +77,7 @@ for you with no manual instrumentation.
   },
   {
     title: "Understand — Orchestration with Aspire",
-    body: "How the scaffold wires Garnet (Redis) and message brokers as resources, and why auto-detection just works once aspire start is up.",
+    body: "How the scaffold wires Redis (the default cache backend; or Garnet via --cache-backend) and message brokers as resources, and why auto-detection just works once aspire start is up.",
     href: "/explanation/aspire/",
     icon: "◎"
   }
@@ -96,7 +96,7 @@ and durable, but auto-detection never selects it (see the callout below).
   rows: [
     { name: "Deno KV", type: "kv · queue · cron", desc: "Default zero-config fallback. KV stores locally; the queue uses native Deno KV queue ops; cron shares the same local-first philosophy via Deno.cron(). No external service required." },
     { name: "memory", type: "kv · cron", desc: "Process-local. MemoryKvAdapter for KV (must be constructed explicitly) and the in-memory cron adapter (provider: 'memory') — deterministic for tests. The KV default for local development without Redis is Deno KV (local file), not the in-memory adapter." },
-    { name: "Redis / Garnet", type: "kv · queue", desc: "Production cache and queue backend. Selected when CACHE_PROVIDER=redis|garnet, REDIS_URI/GARNET_URI, or Aspire services__redis__*/services__garnet__* are present. Garnet is the Redis-compatible cache Aspire provisions." },
+    { name: "Redis / Garnet", type: "kv · queue", desc: "Production cache and queue backend. Selected when CACHE_PROVIDER=redis|garnet, REDIS_URI/GARNET_URI, or Aspire services__redis__*/services__garnet__* are present. Redis is the default cache Aspire provisions; Garnet is the Redis-compatible alternative via --cache-backend garnet." },
     { name: "RabbitMQ (AMQP)", type: "queue", desc: "Durable broker for high-throughput, multi-consumer queues. Chosen first by auto-detection when Aspire reports a rabbitmq service. Imported via @netscript/queue/adapters/amqp for direct access." },
     { name: "PostgreSQL", type: "queue", desc: "Durable SQL-backed queue (FOR UPDATE SKIP LOCKED row-claim, visibility timeout, ack/nack, DLQ). EXPLICIT-PROVIDER ONLY — set provider: QueueProvider.Postgres; never auto-detected. Configure connection.postgres.{url,tableName}." },
     { name: "KV-polling", type: "queue", desc: "KvPollingAdapter — used automatically when the Deno KV path is a remote HTTP/HTTPS endpoint (KV Connect), where native queue ops are unavailable. Tunable via connection.denoKv.{pollInterval,visibilityTimeout,maxRetries}." },
@@ -119,7 +119,7 @@ transactional database as your domain data.
 {{ comp callout { type: "important", title: "Aspire first — then the production adapters appear" } }}
 Auto-detection upgrades to Redis/Garnet and RabbitMQ only when those resources are
 <strong>running</strong>. Bring orchestration up first:
-<code>cd aspire &amp;&amp; aspire start</code> provisions Postgres, Garnet, and any message broker
+<code>cd aspire &amp;&amp; aspire start</code> provisions Postgres, Redis, and any message broker
 (dashboard at <a href="http://localhost:18888">http://localhost:18888</a>)
 <strong>before</strong> any <code>netscript db</code> command or service that expects those
 backends. Without Aspire, KV falls back to local Deno KV, the queue falls back to Deno KV, and
@@ -363,7 +363,7 @@ for business-hours schedules. <strong>(5)</strong> always <code>await scheduler.
   },
   {
     title: "Understand — Orchestration with Aspire",
-    body: "How the scaffold wires Garnet (Redis) and message brokers as resources, and why auto-detection just works once aspire start is up.",
+    body: "How the scaffold wires Redis (the default cache backend; or Garnet via --cache-backend) and message brokers as resources, and why auto-detection just works once aspire start is up.",
     href: "/explanation/aspire/",
     icon: "◎"
   },

@@ -9,14 +9,14 @@ next: { label: "How-to guides", href: "/how-to/" }
 # Deploy locally with Aspire
 
 **Goal:** run your whole NetScript workspace on one machine under .NET Aspire — scaffold the
-AppHost, bring up the resource graph (Postgres, Garnet, every service and background processor),
+AppHost, bring up the resource graph (Postgres, Redis, every service and background processor),
 and watch it from the Aspire dashboard. This is the **local** orchestration companion to the
 [Deploy](/how-to/deploy/) recipe (which covers shipping to a remote target); for *why* the
 AppHost works the way it does, read [Orchestration with Aspire](/explanation/aspire/).
 
 {{ comp callout { type: "important", title: "The order is: scaffold → orchestrate → database" } }}
 Aspire is <strong>step 2</strong>, before any database command. <code>netscript init</code> writes
-the <code>aspire/</code> AppHost; <code>aspire start</code> provisions Postgres and Garnet and starts
+the <code>aspire/</code> AppHost; <code>aspire start</code> provisions Postgres and Redis and starts
 every process; <strong>only then</strong> do <code>netscript db init/generate/seed</code> work,
 because those commands migrate the database <em>through</em> the running AppHost. Run a db command
 with no Aspire up and it fails — there is no Postgres for it to reach. See
@@ -29,7 +29,7 @@ with no Aspire up and it fails — there is no Postgres for it to reach. See
   caption: "What you need before you start",
   rows: [
     { name: "A scaffolded workspace", type: "netscript init", desc: "Created WITHOUT --no-aspire, so the aspire/ AppHost folder exists. See the CLI reference for init flags." },
-    { name: "Docker daemon running", type: "container engine", desc: "Aspire provisions Postgres and Garnet as local Docker containers. No daemon = the default workflow does not start." },
+    { name: "Docker daemon running", type: "container engine", desc: "Aspire provisions Postgres and Redis as local Docker containers. No daemon = the default workflow does not start." },
     { name: "The Aspire CLI", type: "aspire (external)", desc: "The aspire restore / aspire start commands are the external .NET Aspire CLI, run from inside aspire/ — not netscript subcommands." },
     { name: "A reachable port range", type: "ports", desc: "Dashboard :18888 (HTTPS) / :18889 (HTTP), OTLP :4318, services from :3000, plugin APIs :8091–8099, the Fresh app :8010." }
   ]
@@ -98,7 +98,7 @@ graph a single run stands up:
     { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "The Aspire dashboard. Live resource list, console logs, structured logs and traces. A login token is printed on start." },
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint (http/protobuf) the dashboard runs; framework spans and structured logs land here automatically." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database `netscript db` commands target — reachable only once Aspire is up." },
-    { name: "garnet", type: "Container (cache)", desc: "Redis-compatible cache. Backs KV/queue workloads for the runtime plugins." },
+    { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap it for `garnet` (also a container) or app-level `deno-kv` via `--cache-backend`." },
     { name: "users (example service)", type: ":3000+ (SERVICE range, OS-allocated from 3000)", desc: "The scaffolded oRPC service, when you init with --service. OpenAPI at /api/v1/users/* and RPC at /api/rpc/*." },
     { name: "plugin APIs", type: ":8091–8099 (PLUGIN_API range)", desc: "Each installed runtime plugin's HTTP API (workers, sagas, triggers, auth). Ports are allocated from the plugin range, not hardcoded." },
     { name: "background processors", type: "executables (no port)", desc: "Each plugin's isolated runners (workers, sagas, triggers) — separate processes, not threads inside the API." },
@@ -154,7 +154,7 @@ for the framework-vs-scaffold span boundary.
 
 {{ comp callout { type: "warning", title: "Aspire is the LOCAL story — not a production deployer" } }}
 <code>aspire start</code> exists to make <code>git clone</code> → one command produce a complete,
-observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it
+observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it
 starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production
 database or cache. For a remote target you point processes at managed infrastructure and let your
 platform own lifecycle; that is the {{ comp.xref({ key: "howto:deploy", text: "Deploy" }) }} recipe.
@@ -162,7 +162,7 @@ platform own lifecycle; that is the {{ comp.xref({ key: "howto:deploy", text: "D
 
 {{ comp callout { type: "warning", title: "Footguns when `aspire start` will not boot" } }}
 <ul>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres + Garnet through Docker; no
+<li><strong>Docker not running.</strong> Aspire provisions Postgres + Redis through Docker; no
 daemon means the default local workflow cannot start. Start Docker, or use the <code>--no-aspire</code> path
 with your own infrastructure.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run

@@ -13,7 +13,7 @@ all, *how* the orchestrator's resource graph is generated from your plugins rath
 hand-wired, and *what* a single `aspire start` actually stands up — so you can reason about the
 running system instead of treating it as a black box.
 
-{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost resource graph: appsettings.json and plugin contributions feed createNetScriptAppHost, which registers infrastructure (Postgres, Garnet), services, plugin APIs, and background processors, with cross-references resolved into injected environment variables, all observed by the dashboard at :18888.", caption: "One `aspire start` derives a coherent resource graph from your plugins, resolves the wiring between resources, and surfaces the whole thing in a dashboard." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The Aspire AppHost resource graph: appsettings.json and plugin contributions feed createNetScriptAppHost, which registers infrastructure (Postgres, Redis), services, plugin APIs, and background processors, with cross-references resolved into injected environment variables, all observed by the dashboard at :18888.", caption: "One `aspire start` derives a coherent resource graph from your plugins, resolves the wiring between resources, and surfaces the whole thing in a dashboard." }) }}
 
 ## Why an orchestrator at all
 
@@ -26,8 +26,8 @@ single server. It is a small fleet:
   `triggers-api` (`:8093`), `auth-api` (`:8094`), the durable-`streams` runtime (`:4437`).
 - Each plugin's **isolated background processors** — the workers and sagas runners, the triggers
   processor — running as separate executables, not threads inside the API.
-- The **infrastructure** all of those depend on: a Postgres database and a Garnet
-  (Redis-compatible) cache.
+- The **infrastructure** all of those depend on: a Postgres database and a shared cache —
+  `redis` by default, or `garnet` / `deno-kv` via `--cache-backend`.
 
 Standing that up by hand is the integration tax: start each process in dependency order, hand
 each one the right connection strings, teach each one where its neighbours live, and tear it all
@@ -53,7 +53,7 @@ runtime.
 {{ comp callout { type: "important", title: "Aspire is step 2 — before any database command" } }}
 The canonical workflow is <strong>scaffold → orchestrate → database</strong>. After
 <code>netscript init</code>, you run <code>cd aspire &amp;&amp; aspire restore</code> once, then
-<code>aspire start</code>. That command provisions Postgres and Garnet through Docker and brings up
+<code>aspire start</code>. That command provisions Postgres and Redis through Docker and brings up
 every service. <strong>Only then</strong> do <code>netscript db init</code>,
 <code>db generate</code>, and <code>db seed</code> work — because those commands provision and
 migrate the database <em>through</em> the running AppHost. Run a db command with no Aspire up and
@@ -200,7 +200,7 @@ dependency from each entry:
     { name: "ServiceReferences", type: "string[]", desc: "Other services this resource calls. `extractServiceReferences` deduplicates repeated entries." },
     { name: "PluginReferences", type: "string[]", desc: "Plugin APIs this resource calls. `extractPluginReferences` returns them for endpoint wiring (e.g. workers-api → sagas-api)." },
     { name: "RequiresDb", type: "boolean", desc: "Whether the resource needs the Postgres connection. `extractDependencies` normalizes it (default false)." },
-    { name: "RequiresKv", type: "boolean", desc: "Whether the resource needs the Garnet/KV connection. Normalized the same way (default false)." }
+    { name: "RequiresKv", type: "boolean", desc: "Whether the resource needs the Redis/KV connection. Normalized the same way (default false)." }
   ]
 }) }}
 
@@ -225,7 +225,7 @@ is exactly why there is no service-registry client in your handler code.
    ▼                             ▼                                       ▼
 (1) dashboard OTLP        (2) infrastructure                   (4) services
     :18888 + :4318            ├─ postgres  (Container)              └─ users  :3001
-                              └─ garnet    (Container, cache)
+                              └─ redis     (Container, cache)
                                  │
                                  ▼  pass 2: resolve references → inject env
    ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -247,7 +247,7 @@ treat that as canonical and this essay as the orientation.
   rows: [
     { name: "aspire (dashboard)", type: "http://localhost:18888", desc: "The Aspire dashboard. `aspire start` prints a login token. Live resource list, logs, structured traces, and the OTLP collector (:4318) surface here." },
     { name: "postgres", type: "Container", desc: "Provisioned via Docker. Engine Postgres, persistent (DataPath .data/postgres). The database that `netscript db` commands target — reachable only once Aspire is up." },
-    { name: "garnet", type: "Container (cache)", desc: "Redis-compatible cache. Engine Garnet, the primary cache. Backs KV/queue workloads for the runtime plugins." },
+    { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins. Swap to `garnet` (also a Container) or app-level `deno-kv` via `--cache-backend`." },
     { name: "users", type: ":3001", desc: "Example oRPC service (defineService). Routes /api/v1/users/* and the RPC surface at /api/rpc/*." },
     { name: "workers-api", type: ":8091", desc: "Workers plugin API. /api/v1/workers/{jobs,executions,tasks,seed}; trigger via POST /api/v1/workers/jobs/{id}/trigger." },
     { name: "sagas-api", type: ":8092", desc: "Sagas plugin API. /api/v1/sagas/{sagas,instances,publish} plus liveness at /health/live." },
@@ -304,7 +304,7 @@ connection strings.
   {
     label: "Default — with Aspire",
     lang: "bash",
-    code: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes\n\n# Step 2: orchestration brings up Postgres + Garnet + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at http://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
+    code: "netscript init my-app --db postgres --service --service-name users --service-port 3001 --yes\n\n# Step 2: orchestration brings up Postgres + Redis + every process.\ncd aspire && aspire restore   # once\naspire start                    # dashboard at http://localhost:18888\n\n# Step 3: database commands now work (provisioned through Aspire).\nnetscript db init --name init"
   },
   {
     label: "Escape hatch — --no-aspire",
@@ -316,7 +316,7 @@ connection strings.
 {{ comp callout { type: "warning", title: "What you lose when you opt out" } }}
 <code>--no-aspire</code> trades convenience for control. Without the orchestration layer there is
 <strong>no AppHost</strong> (<code>aspire/apphost.mts</code> is not generated), <strong>no automatic
-Postgres/Garnet provisioning</strong>, <strong>no dashboard</strong> at <code>:18888</code>, and
+Postgres/Redis provisioning</strong>, <strong>no dashboard</strong> at <code>:18888</code>, and
 <strong>no automatic cross-process wiring</strong> — you become responsible for handing every
 process its connection strings and its neighbours' endpoints by hand. The <code>netscript db</code>
 commands lose the AppHost they provision through, so the database workflow becomes your
@@ -344,7 +344,7 @@ Choosing Aspire as the default is an opinion, and this essay states its boundari
 `aspire start` produce a complete, observable, correctly-wired stack on one machine. It excels at
 that. What it deliberately does **not** try to be:
 
-- **A production deployment system.** The AppHost provisions Postgres and Garnet as local Docker
+- **A production deployment system.** The AppHost provisions Postgres and Redis as local Docker
   containers for dev convenience. It is not your production database, not your production cache,
   and not a cluster scheduler. In production you point processes at managed/clustered
   infrastructure and let your platform own lifecycle and scaling.
@@ -368,7 +368,7 @@ The remaining trade-offs of the default path:
   generated TypeScript `aspire/apphost.mts`, configured by `aspire.config.json`.
 - **Contribution** — a plugin's declaration of the resources it adds to the graph, expressed by
   extending `AspireNSPluginContribution` and returning `AspireResource[]` from `contribute(...)`.
-- **Resource** — any node Aspire manages: a `container` (Postgres, Garnet), a `database`, a
+- **Resource** — any node Aspire manages: a `container` (Postgres, Redis), a `database`, a
   `cache`, a `deno-service`, or a `deno-background` processor.
 - **OTLP** — the OpenTelemetry protocol endpoint (`http://localhost:4318`) aspire starts so the
   dashboard can collect the spans and structured logs your handlers emit.

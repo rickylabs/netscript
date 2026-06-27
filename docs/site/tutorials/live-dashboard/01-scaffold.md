@@ -174,7 +174,7 @@ aspire restore   # once: restores the Aspire SDK modules into .aspire/
 aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up the Postgres database, the Garnet cache, your `orders` service, and the Fresh
+`aspire start` brings up the Postgres database, the Redis cache, your `orders` service, and the Fresh
 app together, then prints a URL and login token for the **Aspire dashboard**:
 
 ```
@@ -206,12 +206,12 @@ A clean check confirms the scaffold, contracts, and service line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-dashboard/` exists with `apps/dashboard/`, `contracts/`, and `services/orders/`.
-- [ ] `aspire start` is up; the dashboard at `:18888` lists `postgres`, `garnet`, and `orders`.
+- [ ] `aspire start` is up; the dashboard at `:18888` lists `postgres`, `redis`, and `orders`.
 - [ ] `curl http://localhost:3002/health` returns a healthy response.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with <code>postgres</code> and <code>garnet</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code> so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service is still starting — wait a few seconds and retry.
+Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with <code>postgres</code> and <code>redis</code> healthy in the <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code> so it found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service is still starting — wait a few seconds and retry.
 {{ /comp }}
 
 ## What you built

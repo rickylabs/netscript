@@ -57,7 +57,7 @@ when you do not pin one:
 ] }) }}
 
 For the ERP sync, the right default is to let the environment decide: write provider-neutral config
-and you get Deno KV locally, Redis once Garnet is up under Aspire. The auto-discovery probe order is
+and you get Deno KV locally, and the Aspire cache once it is up — `redis` by default, or `garnet` via `--cache-backend`. The auto-discovery probe order is
 **RabbitMQ → Redis → Deno KV**.
 
 {{ comp callout { type: "note", title: "PostgreSQL is the deliberate exception" } }}
@@ -81,7 +81,7 @@ import { defineWorkers } from '@netscript/plugin-workers-core/config';
 export const workers = defineWorkers({
   jobsDir: './workers/jobs',
   tasksDir: './workers/tasks',
-  queueProvider: 'auto', // Deno KV locally; Redis once Garnet is up under Aspire.
+  queueProvider: 'auto', // Deno KV locally; the Aspire cache once up (redis default, garnet alt).
   queueName: 'jobs',
   concurrency: 4, // pool size: 4 isolates → ~80–160 MB. Raise for throughput, lower to bound memory.
   enabled: true,

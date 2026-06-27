@@ -389,7 +389,7 @@ will meet:
   the full picture — including the one known gap (the scaffold `createJobTools(ctx)` handler helpers
   are no-op stubs, a tracked limitation; call `@netscript/telemetry` helpers directly for custom
   spans).
-- Its API surfaces (`:8091`, `:8092`, `:8093`) and the Postgres/Garnet backing store — including the
+- Its API surfaces (`:8091`, `:8092`, `:8093`) and the Postgres/Redis backing store — including the
   Postgres tables behind the `prisma` saga store — are brought up by Aspire. Remember the ordering:
   `cd aspire && aspire start` is what makes the durable infrastructure available **before** any
   `netscript db` command. See {{ comp.xref({ key: "cap:kv-queues-cron" }) }} for the KV/queue

@@ -110,7 +110,7 @@ The dashboard's own dev server reads <code>PORT</code> and defaults to <strong>8
 (<code>http://localhost:8010</code>, health at <code>/health</code>). That is distinct from the
 <strong>Aspire dashboard</strong> at <a href="http://localhost:18888">http://localhost:18888</a>,
 which orchestrates the whole resource graph. Bring the platform up first with
-<code>cd aspire &amp;&amp; aspire start</code> (Postgres/Garnet + every service), or run the app
+<code>cd aspire &amp;&amp; aspire start</code> (Postgres/Redis + every service), or run the app
 standalone with <code>deno task --cwd apps/dashboard dev</code>.
 {{ /comp }}
 

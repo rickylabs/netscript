@@ -40,7 +40,7 @@ on disk and applied, a generated Prisma client (with matching zod schemas) under
 Aspire is keeping alive in a second terminal.
 
 {{ comp.apiTable({ caption: "The migration workflow at a glance", rows: [
-  { name: "aspire start", type: "from aspire/", desc: "Provisions the Postgres + Garnet containers. Must be up first and stay running." },
+  { name: "aspire start", type: "from aspire/", desc: "Provisions the Postgres + Redis containers. Must be up first and stay running." },
   { name: "netscript db init --name init", type: "from workspace root", desc: "Initializes tooling, creates the first migration from schema.prisma, applies it to Postgres." },
   { name: "netscript db generate", type: "from workspace root", desc: "Generates the Deno-runtime Prisma client + zod schemas into .generated. Re-run after every schema edit." },
   { name: "netscript db seed", type: "from workspace root", desc: "Runs database/postgres/scripts/seed.ts to populate baseline rows." },
@@ -52,7 +52,7 @@ Aspire is keeping alive in a second terminal.
 {{ comp.apiTable({ caption: "Prerequisites", rows: [
   { name: "NetScript workspace", type: "netscript init …", desc: "A workspace scaffolded with a database. The default --db postgres lays down database/postgres/ with a Prisma schema, prisma.config.ts, and seed scripts." },
   { name: "netscript CLI", type: "on PATH", desc: "Install with deno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + " — then netscript --help should print." },
-  { name: "Aspire CLI", type: "aspire", desc: "Used to provision Postgres and Garnet as containers via Docker. Confirm with aspire --version. Docker/Podman must be running." },
+  { name: "Aspire CLI", type: "aspire", desc: "Used to provision Postgres and Redis as containers via Docker. Confirm with aspire --version. Docker/Podman must be running." },
   { name: "Deno", type: "2.x", desc: "deno --version. Prisma generation runs under the Deno runtime (the schema sets runtime=\"deno\")." }
 ] }) }}
 
@@ -123,17 +123,17 @@ separate from the Deno workspace, so the commands run from there:
 ```bash
 cd aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
-aspire start       # provisions Postgres + Garnet containers and starts the resource graph
+aspire start       # provisions Postgres + Redis containers and starts the resource graph
 ```
 
 Leave `aspire start` running in this terminal. It provisions both the Postgres database and
-the Garnet cache (your KV/queue backend) as Docker containers — no manual `docker run` and
+the Redis cache (your KV/queue backend) as Docker containers — no manual `docker run` and
 no local Postgres install required. When it settles you'll have:
 
 - The **Aspire dashboard** at [http://localhost:18888](http://localhost:18888) — the access
   token is printed in the `aspire start` output. Open it and confirm the `postgres` and
-  `garnet` resources are green.
-- Resources named `postgres`, `garnet`, and the per-capability services/processors
+  `redis` resources are green.
+- Resources named `postgres`, `redis`, and the per-capability services/processors
   (`workers-api`, `workers`, `sagas-api`, `sagas`, `triggers-api`, `triggers`). If you also
   scaffolded auth and streams, you'll see `auth-api` (:8094) and the streams service
   (:4437) join the graph.
@@ -222,7 +222,7 @@ import the generated client in a service or worker and read the rows the seed wr
 <li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire start</code> up. Start Aspire first.</li>
 <li><strong>Wrong directory.</strong> Run <code>aspire start</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace root (or pass <code>--project-root</code>).</li>
 <li><strong>Stale client after a schema change.</strong> Editing a <code>.prisma</code> file without re-running <code>netscript db generate</code> leaves your code typed against the old shape. Generate after every schema change.</li>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres and Garnet as containers; if Docker/Podman is down, the <code>postgres</code> resource never goes green.</li>
+<li><strong>Docker not running.</strong> Aspire provisions Postgres and Redis as containers; if Docker/Podman is down, the <code>postgres</code> resource never goes green.</li>
 <li><strong>Treating <code>db reset</code> as routine.</strong> It is destructive — it drops the database. Keep it to local dev.</li>
 </ul>
 {{ /comp }}
@@ -242,7 +242,7 @@ rest of the workspace stands on.
 
 {{ comp.card({ title: "Capability — Database & Prisma", body: "How NetScript wires Prisma 7 + Postgres, per-plugin schema aggregation, and the appsettings-driven datasource.", href: "/capabilities/database/", icon: "◎" }) }}
 
-{{ comp.card({ title: "Orchestration with Aspire", body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Garnet, and how the resource graph fits together.", href: "/explanation/aspire/", icon: "◆" }) }}
+{{ comp.card({ title: "Orchestration with Aspire", body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Redis, and how the resource graph fits together.", href: "/explanation/aspire/", icon: "◆" }) }}
 
 {{ comp.card({ title: "Queue / KV / cron", body: "The next recipe: use the KV and queue backends — including the PostgreSQL queue provider that shares this datasource.", href: "/how-to/queue-kv-cron/", icon: "→" }) }}
 

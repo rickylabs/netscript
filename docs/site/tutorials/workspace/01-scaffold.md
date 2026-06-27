@@ -26,7 +26,7 @@ chapters that follow.
 ## What you will build
 
 A working `my-workspace/` directory: a typed `workspace` service on its own port, a Postgres database,
-the Aspire orchestration that provisions Postgres and the Garnet cache, and a clean
+the Aspire orchestration that provisions Postgres and the Redis cache, and a clean
 `deno task check`. By the end you will have the Aspire dashboard open on `:18888` showing your
 service, database, and cache running together — the control plane you keep up for the rest of the
 track.
@@ -35,7 +35,7 @@ track.
 
 This is the first chapter, so there is no prior project state to check — but your local toolchain must
 be ready. You need **[Deno](https://deno.com/) 2.x**, the **[Aspire CLI](https://aspire.dev)**, and
-**Docker** running so Aspire can start the Postgres and Garnet containers. Verify all three:
+**Docker** running so Aspire can start the Postgres and Redis containers. Verify all three:
 
 ```sh
 deno --version     # Deno 2.x
@@ -134,7 +134,7 @@ aspire restore   # once per machine: restores the Aspire SDK modules
 aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up the Postgres database, the Garnet cache, and your `workspace` service together,
+`aspire start` brings up the Postgres database, the Redis cache, and your `workspace` service together,
 then prints the **Aspire dashboard** URL and a one-time login token. Open it:
 
 ```
@@ -166,13 +166,13 @@ the scaffold, contracts, and service all line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-workspace/` exists with `services/workspace/`, `plugins/`, `database/`, and `aspire/`.
-- [ ] `aspire start` is up; `postgres` and `garnet` are green in the dashboard on `:18888`.
+- [ ] `aspire start` is up; `postgres` and `redis` are green in the dashboard on `:18888`.
 - [ ] `curl http://localhost:3001/health` returns a healthy response.
 - [ ] `deno task check` passes.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
 Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with
-<code>postgres</code> and <code>garnet</code> healthy in the dashboard? (2) is Docker running
+<code>postgres</code> and <code>redis</code> healthy in the dashboard? (2) is Docker running
 (<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it
 found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished
 starting — wait a few seconds and retry.
@@ -181,7 +181,7 @@ starting — wait a few seconds and retry.
 ## What you built
 
 A real NetScript workspace at `my-workspace/`: a typed `workspace` service on `:3001`, shared
-contracts, a Postgres database, and a Garnet cache — all orchestrated by Aspire and visible in one
+contracts, a Postgres database, and a Redis cache — all orchestrated by Aspire and visible in one
 dashboard. This is the base. Next you add authentication on top of it.
 
 {{ comp.nextPrev({ prev: { label: "Team Workspace", href: "/tutorials/workspace/" }, next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" } }) }}

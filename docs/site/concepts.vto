@@ -20,7 +20,7 @@ This is the five-minute mental model. Every capability hub, tutorial, and refere
 
 NetScript is a Deno-native backend framework that generates a workspace you own and run yourself. It is not a hosted service and not a single library — it is a coordinated package family plus a CLI that wires the boring seams together. To reason about *any* part of it, you only need three ideas.
 
-{{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services, workers, sagas, triggers, streams, and auth plugins register against a host; the AppHost materializes each as an Aspire resource alongside Postgres, Garnet, and the dashboard.", caption: "The whole system in one picture: contracts at the center, plugins contributing to a host, and the AppHost bringing every resource up together." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/architecture-overview.svg", alt: "A NetScript workspace: contracts define services; services, workers, sagas, triggers, streams, and auth plugins register against a host; the AppHost materializes each as an Aspire resource alongside Postgres, Redis, and the dashboard.", caption: "The whole system in one picture: contracts at the center, plugins contributing to a host, and the AppHost bringing every resource up together." }) }}
 
 ## Idea 1 — The contract is the source of truth
 
@@ -49,11 +49,11 @@ The full walkthrough — core/plugin split, the contribution axes, and why the r
 
 ## Idea 3 — One runtime, many resources
 
-The third idea is what turns a pile of packages into a system you can *run*. NetScript is Deno-native and distributed on JSR — you import from `jsr:@netscript/*` and use Web Platform APIs you already know. But a real backend is never one process, so the generated workspace ships an **AppHost** that brings every resource up together through .NET Aspire: your database, your cache, each plugin's service and background processors, and a real dashboard — locally and on the way to deploy.
+The third idea is what turns a pile of packages into a system you can *run*. NetScript is Deno-native and distributed on JSR — you import from `jsr:@netscript/*` and use Web Platform APIs you already know. But a real backend is never one process, so the generated workspace ships an **AppHost** that brings every resource up together through .NET Aspire: your database, your cache (`redis` by default, or `garnet` / `deno-kv` via `--cache-backend`), each plugin's service and background processors, and a real dashboard — locally and on the way to deploy.
 
-{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The AppHost graph: Postgres and Garnet at the base; service, workers-api, sagas, triggers, auth-api, and streams resources above them; the Aspire dashboard observing all of them.", caption: "One command brings up the whole graph: data stores first, then every service and background resource, with the dashboard wired in for traces and logs." }) }}
+{{ comp.diagram({ src: "/assets/diagrams/aspire-resource-graph.svg", alt: "The AppHost graph: Postgres and Redis at the base; service, workers-api, sagas, triggers, auth-api, and streams resources above them; the Aspire dashboard observing all of them.", caption: "One command brings up the whole graph: data stores first, then every service and background resource, with the dashboard wired in for traces and logs." }) }}
 
-The flow is two commands — `cd aspire && aspire start` brings up Postgres and Garnet *before* any `netscript db` command touches the database — and you watch the result in the Aspire dashboard at `:18888`.
+The flow is two commands — `cd aspire && aspire start` brings up Postgres and Redis *before* any `netscript db` command touches the database — and you watch the result in the Aspire dashboard at `:18888`.
 
 {{ comp.apiTable({
   caption: "What comes up when you run the workspace (ports are range-allocated conventions; the dashboard is the authority)",
@@ -61,7 +61,7 @@ The flow is two commands — `cd aspire && aspire start` brings up Postgres and 
     { name: "Aspire dashboard", type: ":18888", desc: "Every resource, trace, and log in one place — you don't stand up your own observability stack." },
     { name: "Your service", type: ":3000", desc: "The oRPC API the contract drives, served at /api/rpc/* with OpenAPI and health wired in." },
     { name: "Plugin services", type: ":8091–:8094", desc: "Each plugin's API runs as its own resource — workers :8091, sagas :8092, triggers :8093, auth :8094." },
-    { name: "Data stores", type: "Postgres · Garnet", desc: "Brought up first, before migrations run; provisioned by the AppHost, not a hand-written compose file." }
+    { name: "Data stores", type: "Postgres · Redis", desc: "Brought up first, before migrations run; provisioned by the AppHost, not a hand-written compose file." }
   ]
 }) }}
 

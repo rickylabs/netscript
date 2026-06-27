@@ -48,7 +48,7 @@ You need:
 ] }) }}
 
 - **Aspire up if you plan to run the plugin.** Adding and registering a plugin is offline,
-  but several plugins (workers, sagas, auth) need Postgres and Garnet to actually run. Bring
+  but several plugins (workers, sagas, auth) need Postgres and Redis to actually run. Bring
   the local stack up first — `cd aspire && aspire start` — exactly as in
   [Run the stack with Aspire](/explanation/aspire/). You do **not** need it up just to
   scaffold and register.

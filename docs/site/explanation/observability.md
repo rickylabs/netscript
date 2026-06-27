@@ -123,7 +123,7 @@ OpenTelemetry Protocol). The generated Aspire AppHost configures an OTLP receive
 `http://localhost:4318` and a dashboard UI at `http://localhost:18888`; resources started under
 Aspire are handed the OTLP endpoint through environment variables, so they export telemetry without
 per-service configuration. This is why {{ comp.xref({ key: "explain:aspire", text: "Aspire is step two" }) }} of the dev flow, not an afterthought: `cd aspire && aspire start` brings the receiver up —
-along with Postgres and Garnet — *before* the first handler runs, so the very first request has
+along with Postgres and Redis — *before* the first handler runs, so the very first request has
 somewhere to land. Without it, handlers still execute; they simply export into the void.
 
 {{ comp.apiTable({

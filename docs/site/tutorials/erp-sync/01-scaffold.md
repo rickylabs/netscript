@@ -35,7 +35,7 @@ You need the same local toolchain the [main tutorials](/tutorials/) use:
 - **[Deno](https://deno.com/) 2.x** on your `PATH` — check with `deno --version`.
 - The **[Aspire CLI](https://aspire.dev)** — check with `aspire --version`. Aspire provisions your
   database and cache locally so you do not wire up Docker by hand.
-- **Docker** running, so Aspire can start the Postgres and Garnet containers — confirm with
+- **Docker** running, so Aspire can start the Postgres and Redis containers — confirm with
   `docker info`.
 
 Install the NetScript CLI from JSR once, then confirm it:
@@ -150,7 +150,7 @@ aspire restore   # once per machine: restores the Aspire SDK modules into .aspir
 aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire start` brings up Postgres, the Garnet cache, the workers API + processor, and the triggers API
+`aspire start` brings up Postgres, the Redis cache, the workers API + processor, and the triggers API
 + processor together, then prints a URL and a one-time login token for the **Aspire dashboard**:
 
 ```
@@ -190,13 +190,13 @@ line up.
 
 - [ ] `my-erp/` exists with `plugins/workers/` and `plugins/triggers/` on disk.
 - [ ] `netscript plugin list` shows both `workers` and `triggers`.
-- [ ] `aspire start` is up; the dashboard on `:18888` lists `postgres`, `garnet`, and both plugin APIs.
+- [ ] `aspire start` is up; the dashboard on `:18888` lists `postgres`, `redis`, and both plugin APIs.
 - [ ] `curl :8091/health` and `curl :8093/health` both return healthy.
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
 Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with
-<code>postgres</code> and <code>garnet</code> healthy in the
+<code>postgres</code> and <code>redis</code> healthy in the
 <a href="/explanation/aspire/">dashboard</a>? (2) is Docker running (<code>docker info</code>)?
 (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it found
 <code>apphost.mts</code>? A failed <code>curl</code> usually means a service is still starting —
@@ -206,7 +206,7 @@ give it a few seconds and retry.
 ## What you built
 
 A real NetScript workspace, `my-erp/`, with the **workers** and **triggers** plugins installed and
-the whole stack — Postgres, Garnet, both plugin APIs and their background processors — running under
+the whole stack — Postgres, Redis, both plugin APIs and their background processors — running under
 one `aspire start` and visible in the dashboard. Next, you give it something to do.
 
 {{ comp.nextPrev({ prev: { label: "ERP Sync", href: "/tutorials/erp-sync/" }, next: { label: "2 · Import job", href: "/tutorials/erp-sync/02-import-job/" } }) }}

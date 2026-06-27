@@ -43,7 +43,7 @@ deno task test
 ```
 
 For the orchestration model that underpins everything below — why the AppHost lives in its
-own `aspire/` folder, and how it provisions Postgres and Garnet — read the
+own `aspire/` folder, and how it provisions Postgres and Redis — read the
 [Aspire explanation](/explanation/aspire/) alongside this recipe.
 
 ## The mental model: three layers
@@ -54,7 +54,7 @@ production:
 {{ comp.featureGrid({ items: [
   {
     title: "1. Backing services",
-    body: "Postgres (primary database) and Garnet (KV/cache). In dev, Aspire provisions both as containers. In production you bring your own — managed Postgres, managed Redis-compatible cache.",
+    body: "Postgres (primary database) and Redis (KV/cache — the default `--cache-backend`; `garnet` and `deno-kv` are alternatives). In dev, Aspire provisions both as containers. In production you bring your own — managed Postgres, managed Redis-compatible cache.",
     icon: "▣"
   },
   {
@@ -85,7 +85,7 @@ first-party plugins installed, the graph looks like this:
   { name: "workers / sagas", type: "background processor", desc: "Entrypoint <code>bin/combined.ts</code>. Watch mode + telemetry on. Workers runtime pool via <code>WORKERS_CONCURRENCY</code>; sagas via <code>SAGA_CONCURRENCY</code>." },
   { name: "triggers", type: "background processor", desc: "Entrypoint <code>src/runtime/trigger-processor.ts</code>. Concurrency 10 via <code>TRIGGER_CONCURRENCY</code>." },
   { name: "dashboard", type: "app · :8010", desc: "Fresh frontend. References service <code>users</code>." },
-  { name: "postgres / garnet", type: "infrastructure", desc: "<code>Mode=Container</code> in dev. <code>PrimaryDatabase=postgres</code>, <code>PrimaryCache=garnet</code>." }
+  { name: "postgres / redis", type: "infrastructure", desc: "<code>Mode=Container</code> in dev. <code>PrimaryDatabase=postgres</code>, <code>PrimaryCache=redis</code> (the default; <code>garnet</code> via <code>--cache-backend garnet</code>)." }
 ] }) }}
 
 {{ comp callout { type: "note", title: "Auth service is opt-in (port :8094)" } }}
@@ -139,7 +139,7 @@ boot.
 {{ comp callout { type: "warning", title: "Aspire is step 2: Postgres comes up before any db command" } }}
 Every <code>netscript db &lt;cmd&gt;</code> talks to a live Postgres. In the scaffold that
 Postgres is provisioned <strong>by Aspire</strong>. So the order is always:
-<code>cd aspire &amp;&amp; aspire start</code> (which brings Postgres and Garnet up)
+<code>cd aspire &amp;&amp; aspire start</code> (which brings Postgres and Redis up)
 <strong>before</strong> any <code>netscript db init</code> / <code>db generate</code> /
 <code>db seed</code>. Running a DB command with no Postgres reachable — for example in an
 isolated CI container — fails fast. In production, point the same commands at your managed
@@ -149,7 +149,7 @@ Aspire. See <a href="/how-to/database-migration/">Database migration</a> for the
 
 ## Step 3 — Provision backing services
 
-In production you do **not** run Postgres and Garnet as throwaway Aspire containers. You
+In production you do **not** run Postgres and Redis as throwaway Aspire containers. You
 provision them as durable, managed resources and hand their connection details to NetScript
 through environment variables. NetScript reads the database URL from `POSTGRES_URI` (falling
 back to `DATABASE_URL`) and normalizes engine-specific connection strings to a URL — this is
@@ -157,7 +157,7 @@ handled in `database/postgres/prisma.config.ts`.
 
 {{ comp.apiTable({ caption: "Production environment a NetScript deployment expects", rows: [
   { name: "POSTGRES_URI", type: "string (url)", desc: "Primary Postgres connection. <code>DATABASE_URL</code> is the accepted fallback. Read by Prisma config." },
-  { name: "GARNET / cache url", type: "string", desc: "Redis-compatible cache endpoint for the <code>garnet</code> KV/cache resource (managed Redis or Garnet in prod)." },
+  { name: "REDIS_URI / cache url", type: "string", desc: "Redis-compatible cache endpoint for the <code>redis</code> KV/cache resource (the default backend). With <code>--cache-backend garnet</code> the key is <code>GARNET_URI</code> for the <code>garnet</code> resource (managed Redis or Garnet in prod)." },
   { name: "PORT", type: "number", desc: "Per-process listen port. Each service reads it (e.g. <code>Deno.env.get('PORT') ?? '8091'</code>) and falls back to its default." },
   { name: "OTEL_EXPORTER_OTLP_ENDPOINT", type: "string (url)", desc: "OTLP collector. Dev defaults to <code>http://localhost:4318</code> (http/protobuf) via the Aspire dashboard." },
   { name: "NETSCRIPT_SAGA_STORE", type: "kv | prisma", desc: "Durable saga store backend (mandatory when sagas run). Also settable via appsettings <code>sagas.store.backend</code>." },
@@ -168,7 +168,7 @@ handled in `database/postgres/prisma.config.ts`.
 ] }) }}
 
 {{ comp callout { type: "tip", title: "appsettings.json is your config map" } }}
-The <code>Otel.HttpEndpoint</code>, <code>Databases.postgres</code>, <code>Cache.garnet</code>,
+The <code>Otel.HttpEndpoint</code>, <code>Databases.postgres</code>, <code>Cache.redis</code> (or <code>Cache.garnet</code> when scaffolded with <code>--cache-backend garnet</code>),
 and per-process <code>ConcurrencyEnvVar</code> values in <code>appsettings.json</code> tell you
 every knob to externalize. Treat that file as the contract between your infrastructure and the
 NetScript processes.
@@ -196,7 +196,7 @@ This is the real fork in the road. Pick based on whether your target understands
   {
     label: "Keep Aspire",
     lang: "bash",
-    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Garnet and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at http://localhost:18888\n\n# Aspire 13.x can also publish a deployment manifest from the same AppHost\n# (e.g. `aspire publish`). The scaffold wires the AppHost graph; it does NOT\n# pre-select a cloud target for you — you point publish at your platform."
+    code: "# The AppHost is a TypeScript/Node project under aspire/ (apphost.mts).\n# Locally it provisions Postgres + Redis and wires every process.\ncd aspire\naspire restore   # one-time: restore the TS AppHost SDK\naspire start       # boots the full graph; dashboard at http://localhost:18888\n\n# Aspire 13.x can also publish a deployment manifest from the same AppHost\n# (e.g. `aspire publish`). The scaffold wires the AppHost graph; it does NOT\n# pre-select a cloud target for you — you point publish at your platform."
   },
   {
     label: "Drop Aspire (--no-aspire)",

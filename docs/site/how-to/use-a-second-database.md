@@ -102,7 +102,7 @@ aspire start
 
 Open the Aspire dashboard at [http://localhost:18888](http://localhost:18888) (the access
 token is printed by `aspire start`) and confirm the new resource — `mysql`, `analytics`, or
-whatever your config key is — goes green alongside the existing `postgres` and `garnet`.
+whatever your config key is — goes green alongside the existing `postgres` and `redis`.
 
 {{ comp callout { type: "warning", title: "If you skipped db add and only edited appsettings" } }}
 The container only appears because <code>db add</code> <strong>regenerated the Aspire

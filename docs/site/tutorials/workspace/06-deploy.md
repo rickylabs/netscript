@@ -10,7 +10,7 @@ next: { label: "How-to guides", href: "/how-to/" }
 
 You have built every layer: scaffold, auth, workspace data, a provisioning job, and route guards. This
 final chapter runs the whole thing as one coherent system. A single `aspire start` stands up Postgres,
-the Garnet cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers API on
+the Redis cache, your `workspace` service, the `auth-api` service on `:8094`, the Workers API on
 `:8091`, and every background processor — all wired together and visible in one dashboard. It is the
 **local** story, and this chapter is precise about exactly that: a complete observable stack on one
 machine, not a production deployer.
@@ -46,7 +46,7 @@ deno task check
 
 {{ comp callout { type: "important", title: "The order is: scaffold → orchestrate → database" } }}
 Aspire is <strong>step 2</strong>, before any database command. <code>netscript init</code> wrote the
-<code>aspire/</code> AppHost; <code>aspire start</code> provisions Postgres and Garnet and starts every
+<code>aspire/</code> AppHost; <code>aspire start</code> provisions Postgres and Redis and starts every
 process; <strong>only then</strong> do <code>netscript db</code> commands work, because they migrate
 <em>through</em> the running AppHost. The graph is derived from your installed plugins — adding the
 <code>auth</code> and <code>workers</code> plugins in earlier chapters is exactly why their services and
@@ -84,7 +84,7 @@ graph your complete app stands up:
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint; framework spans (job dispatch/execution, scheduler runs) land here automatically." },
     { name: "postgres", type: "Container", desc: "The primary datasource — the auth.prisma migration from chapter 2 lives here." },
     { name: "workspace (second db)", type: "Container", desc: "The isolated workspace datasource from chapter 3, provisioned alongside the primary." },
-    { name: "garnet", type: "Container (cache)", desc: "Redis-compatible cache; backs KV/queue workloads and the kv-oauth session store." },
+    { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads and the kv-oauth session store." },
     { name: "workspace (service)", type: ":3001", desc: "Your guarded oRPC service from chapter 5 — /api/workspace requires a scoped principal, /health stays public." },
     { name: "auth-api", type: ":8094", desc: "The auth plugin's service from chapter 2 — /api/v1/auth/* (signin, callback, signout, session, me)." },
     { name: "workers-api", type: ":8091", desc: "The Workers API from chapter 4 — triggers and inspects the provision-member job." },
@@ -133,14 +133,14 @@ curl http://localhost:8091/api/v1/workers/jobs         # provision-member appear
 ```
 
 - [ ] `aspire restore` and `aspire start` succeed from inside `aspire/`.
-- [ ] The dashboard on `:18888` lists `postgres`, `workspace` (db), `garnet`, `workspace` (service), `auth-api`, and `workers-api` — all green.
+- [ ] The dashboard on `:18888` lists `postgres`, `workspace` (db), `redis`, `workspace` (service), `auth-api`, and `workers-api` — all green.
 - [ ] `curl http://localhost:8094/health/ready` succeeds.
 - [ ] An anonymous `GET /api/workspace` returns `401`; `Bearer read` returns `200`.
 - [ ] `GET /api/v1/workers/jobs` lists `provision-member`.
 
 {{ comp callout { type: "warning", title: "Aspire is the LOCAL story — not a production deployer" } }}
 <code>aspire start</code> exists to make <code>git clone</code> &rarr; one command produce a complete,
-observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it starts
+observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts
 are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or
 cache, and the <code>kv-oauth</code> session store and auth credentials here are local-dev values. For
 a remote target you point processes at managed infrastructure and let your platform own lifecycle;
@@ -149,7 +149,7 @@ that is the <a href="/how-to/deploy/">Deploy</a> recipe.
 
 {{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
 <ul>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres + Garnet (and the second workspace
+<li><strong>Docker not running.</strong> Aspire provisions Postgres + Redis (and the second workspace
 db) through Docker; no daemon means the happy path does not start.</li>
 <li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from
 inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root.</li>
@@ -164,7 +164,7 @@ ranges. A stale prior run holding a port blocks boot.</li>
 ## What you built
 
 The complete authenticated team-workspace backend, running locally as one orchestrated system:
-Postgres, an isolated workspace database, Garnet, the guarded `workspace` service, the `auth-api`
+Postgres, an isolated workspace database, Redis, the guarded `workspace` service, the `auth-api`
 service on `:8094`, and the Workers API and its processor — all in one Aspire resource graph,
 observable from one dashboard. You walked the whole arc: a pluggable auth backend, a session, workspace
 data, off-path provisioning, and a real route-authz seam — single-tenant by design, with org scoping an

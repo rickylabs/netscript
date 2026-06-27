@@ -38,7 +38,7 @@ the host application never changes.
 These are the slices you bolt on with `netscript plugin add`. Each is an isolated
 background processor or service that exposes its own HTTP API on a dedicated
 port, wired into Aspire automatically. Bring Aspire up first — `cd aspire &&
-aspire start` provisions Postgres and Garnet and starts the dashboard at
+aspire start` provisions Postgres and a shared cache — `redis` by default, or `garnet` / `deno-kv` via `--cache-backend` — and starts the dashboard at
 `http://localhost:18888` — **before** any `netscript db` command or plugin call,
 so the plugin services and their dependencies exist when you reach for them.
 

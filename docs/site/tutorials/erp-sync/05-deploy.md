@@ -25,14 +25,14 @@ one observable stack, throwaway infrastructure.
 ## What you will build
 
 By the end of this chapter you will bring the full `my-erp/` resource graph up with a single
-`aspire start` — Postgres, Garnet, the workers API + processor, and the triggers API + processor (which
+`aspire start` — Postgres, Redis, the workers API + processor, and the triggers API + processor (which
 runs your file-watch and cron triggers) — initialize the database through the running AppHost, and
 read the live import pipeline in the Aspire dashboard: resources, console logs, and the traces that
 stitch a file drop to its job execution.
 
 {{ comp callout { type: "important", title: "Aspire is the LOCAL story — not a production deployer" } }}
 <code>aspire start</code> exists to make <code>git clone</code> → one command produce a complete,
-observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it starts
+observable, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts
 are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or
 cache. Shipping to a remote target (managed infrastructure, your own process lifecycle) is the
 <a href="/how-to/deploy/">Deploy</a> recipe; this chapter is the local companion. The full local
@@ -44,7 +44,7 @@ walkthrough lives in <a href="/how-to/deploy-local-aspire/">Deploy locally with 
 You need the complete `my-erp/` workspace from [Chapter 4](/tutorials/erp-sync/04-queue-and-cron/):
 the workers and triggers plugins, the `import-products` job, the `product-import-trigger` file watch,
 and the `daily-resync-schedule` cron. Docker must be running so Aspire can provision Postgres and
-Garnet. Confirm the AppHost was scaffolded (it is a TypeScript/Node program, not C#):
+Redis. Confirm the AppHost was scaffolded (it is a TypeScript/Node program, not C#):
 
 ```sh
 ls aspire/apphost.mts aspire/aspire.config.json
@@ -64,7 +64,7 @@ plugin and its API plus background processor appear; remove it and they vanish, 
     { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "Live resource list, console logs, structured logs and traces. A login token is printed on start." },
     { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
     { name: "postgres", type: "Container", desc: "Throwaway Docker Postgres. The database netscript db commands target — reachable only while Aspire is up." },
-    { name: "garnet", type: "Container (cache)", desc: "Redis-compatible cache. Backs the KV/queue workloads — this is what auto-discovery resolves the queue to once it is up." },
+    { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs the KV/queue workloads — this is what auto-discovery resolves the queue to once it is up." },
     { name: "workers API + processor", type: ":8091 (PLUGIN_API range) + executable", desc: "The :8091 API enqueues; a separate background processor drains the queue and runs your import job." },
     { name: "triggers API + processor", type: ":8093 (PLUGIN_API range) + executable", desc: "The :8093 API plus the processor that runs your file-watch and cron triggers." }
   ]
@@ -131,7 +131,7 @@ dashboard surfaces:
 {{ comp.apiTable({
   caption: "Reading the running ERP sync in the Aspire dashboard",
   rows: [
-    { name: "Resources", type: "tab", desc: "Every container and executable with status and the port it bound. Confirm workers, triggers, postgres, and garnet are all green." },
+    { name: "Resources", type: "tab", desc: "Every container and executable with status and the port it bound. Confirm workers, triggers, postgres, and redis are all green." },
     { name: "Console logs", type: "tab", desc: "stdout/stderr per resource. Open the workers processor to read your import job's log lines; the triggers processor shows the file-watch event." },
     { name: "Structured logs + Traces", type: "tab", desc: "Spans correlated by traceparent. The framework instruments job dispatch and execution automatically, so a file drop → job run trace appears with no extra wiring." }
   ]
@@ -166,14 +166,14 @@ curl 'http://localhost:8091/api/v1/workers/executions?limit=10'
 Expected: both health checks return healthy JSON, and the executions feed shows a completed
 `import-products` run for `products_live.csv`.
 
-- [ ] `aspire start` is up; the dashboard lists `postgres`, `garnet`, workers, and triggers all green.
+- [ ] `aspire start` is up; the dashboard lists `postgres`, `redis`, workers, and triggers all green.
 - [ ] `netscript db init/generate` succeeded against the Aspire Postgres.
 - [ ] `curl :8091/health` and `curl :8093/health` both return healthy.
 - [ ] A file drop produced an `import-products` execution and a dispatch/execution trace in the dashboard.
 
 {{ comp callout { type: "warning", title: "Footguns when aspire start will not boot" } }}
 <ul>
-<li><strong>Docker not running</strong> — Aspire provisions Postgres + Garnet through Docker; no
+<li><strong>Docker not running</strong> — Aspire provisions Postgres + Redis through Docker; no
 daemon means the happy path does not start.</li>
 <li><strong>Wrong directory</strong> — <code>aspire restore</code>/<code>aspire start</code> run from
 <code>aspire/</code>; <code>netscript db</code> runs from the workspace root.</li>

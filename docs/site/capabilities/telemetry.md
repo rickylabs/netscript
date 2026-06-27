@@ -34,7 +34,7 @@ each unit, follow the reference links: the telemetry primitives live at
 The dashboard, the OTLP collector, and the per-resource trace/log views all come up with the
 orchestrator — they are not separate processes you start by hand. Run
 <code>cd aspire &amp;&amp; aspire start</code> <strong>before</strong> any <code>netscript db</code>
-command (Aspire provisions Postgres and Garnet first), then open the dashboard URL printed in
+command (Aspire provisions Postgres and Redis first), then open the dashboard URL printed in
 the console (<code>http://localhost:18888</code>, with a one-time auth token). Until Aspire is
 running there is no <code>:18888</code> surface to view traces or logs on. See
 <a href="/how-to/database-migration/">Database &amp; migration</a> for the full startup order.
@@ -324,7 +324,7 @@ same telemetry stream — there is no separate tool to configure.
 {{ comp.apiTable({
   caption: "Aspire dashboard views (http://localhost:18888)",
   rows: [
-    { name: "Resources", type: "graph", desc: "Live state of every app-graph resource: postgres, garnet, workers-api, workers, sagas-api, sagas, triggers-api, triggers, auth-api. Health probes drive the status colour." },
+    { name: "Resources", type: "graph", desc: "Live state of every app-graph resource: postgres, redis, workers-api, workers, sagas-api, sagas, triggers-api, triggers, auth-api. Health probes drive the status colour." },
     { name: "Console logs", type: "stream", desc: "Per-resource stdout/stderr — the framework logger's text/JSON output lands here in real time." },
     { name: "Structured logs", type: "OTLP", desc: "Structured log records exported over OTLP, filterable by resource, level, and attributes." },
     { name: "Traces", type: "OTLP", desc: "Distributed traces collected from the OTLP endpoint (http://localhost:4318) — job dispatch/execution/scheduler/task spans and cross-service request spans as trace context propagates." }

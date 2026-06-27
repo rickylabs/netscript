@@ -35,7 +35,7 @@ cron](/capabilities/kv-queues-cron/).
   {
     name: "aspire startning (for real backends)",
     type: "cd aspire && aspire start",
-    desc: "Aspire is step 2 of local dev — it provisions Postgres, Garnet (cache), and any broker BEFORE your service connects. In-memory and Deno KV adapters need nothing extra; Redis, RabbitMQ, and the Postgres queue all expect Aspire up first."
+    desc: "Aspire is step 2 of local dev — it provisions Postgres, Redis (cache), and any broker BEFORE your service connects. In-memory and Deno KV adapters need nothing extra; Redis, RabbitMQ, and the Postgres queue all expect Aspire up first."
   },
   {
     name: "Deno KV unstable flag",
@@ -123,7 +123,7 @@ controller.abort();
   {
     name: "Redis adapter",
     type: "@netscript/kv/redis (provider 'redis')",
-    desc: "Importing the sub-path self-registers the 'redis' provider. Backed by the Garnet/Redis resource Aspire provisions. Reads its connection via getRedisConnectionFromEnv()."
+    desc: "Importing the sub-path self-registers the 'redis' provider. Backed by the Redis/Garnet resource Aspire provisions. Reads its connection via getRedisConnectionFromEnv()."
   }
 ] }) }}
 
