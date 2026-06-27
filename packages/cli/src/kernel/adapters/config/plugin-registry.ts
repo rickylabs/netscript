@@ -4,7 +4,7 @@
  * Helpers for loading and normalizing the local plugin registry.
  */
 
-import { join, resolve } from '@std/path';
+import { dirname, join, resolve } from '@std/path';
 import { toFileUrl } from '@std/path/to-file-url';
 import type { NetScriptConfig, PathsConfig } from '@netscript/config';
 import type { PluginManifest } from '@netscript/plugin';
@@ -12,11 +12,13 @@ import type {
   RegisteredPluginConfig,
   RegisteredPluginEnvironmentVariableValue,
 } from '../../domain/resolved-config.ts';
+import type { PluginInfrastructureDependency } from '../../domain/plugin-kind.ts';
 import { ConfigError } from '../../domain/errors/cli-exit-error.ts';
 import { loadProjectConfig } from './project-config-loader.ts';
 import { DenoProcess } from '../runtime/process/deno-process.ts';
 
 const PLUGIN_DEPENDENCY_MISSING_EXIT_CODE = 76;
+const SCAFFOLD_PLUGIN_MANIFEST = 'scaffold.plugin.json';
 
 type RegisteredPluginSnapshot = Pick<
   RegisteredPluginConfig,
@@ -34,6 +36,28 @@ type RegisteredPluginSnapshot = Pick<
 type NetScriptConfigWithPlugins = NetScriptConfig & {
   readonly plugins?: readonly string[];
 };
+
+interface ScaffoldPluginMetadata {
+  readonly provider: {
+    readonly displayName?: string;
+    readonly defaultPermissions?: readonly string[];
+    readonly defaultEntrypoint?: string;
+    readonly defaultServiceEntrypoint?: string | null;
+    readonly pluginType?: string;
+    readonly infrastructureRequires?: readonly string[];
+    readonly infrastructureOptionalDeps?: readonly string[];
+    readonly concurrencyEnvVar?: string | null;
+    readonly defaultConcurrency?: number | null;
+  };
+  readonly officialSource?: {
+    readonly canonicalName?: string;
+    readonly pluginDir?: string;
+    readonly serviceEntrypoint?: string;
+    readonly servicePort?: number;
+    readonly backgroundPort?: number;
+    readonly permissions?: readonly string[];
+  };
+}
 
 function normalizePath(path: string): string {
   return path.replace(/\\/g, '/');
@@ -131,8 +155,106 @@ export async function loadRegisteredPlugins(
   );
 }
 
+/** Load registered plugin metadata without importing plugin modules into the CLI process. */
+export async function loadRegisteredPluginMetadata(
+  projectRoot: string,
+  config: NetScriptConfig,
+): Promise<Record<string, RegisteredPluginConfig>> {
+  const plugins: Record<string, RegisteredPluginConfig> = {};
+  for (const spec of resolvePluginSpecs(config)) {
+    const metadata = await resolveScaffoldPluginMetadata(projectRoot, spec);
+    if (!metadata) {
+      continue;
+    }
+
+    const plugin = normalizeScaffoldPluginMetadata(projectRoot, metadata, config.paths);
+    plugins[resolvePluginLocalName(plugin.name)] = plugin;
+  }
+  return plugins;
+}
+
 function resolvePluginSpecs(config?: NetScriptConfig): readonly string[] {
   return (config as NetScriptConfigWithPlugins | undefined)?.plugins ?? [];
+}
+
+async function resolveScaffoldPluginMetadata(
+  projectRoot: string,
+  spec: string,
+): Promise<ScaffoldPluginMetadata | null> {
+  if (!spec.startsWith('.') && !spec.startsWith('/')) {
+    return null;
+  }
+
+  const resolved = resolve(projectRoot, spec);
+  const manifestPath = join(dirname(resolved), SCAFFOLD_PLUGIN_MANIFEST);
+  const raw = JSON.parse(await Deno.readTextFile(manifestPath));
+  return isScaffoldPluginMetadata(raw) ? raw : null;
+}
+
+function normalizeScaffoldPluginMetadata(
+  projectRoot: string,
+  metadata: ScaffoldPluginMetadata,
+  paths?: Pick<PathsConfig, 'plugins'>,
+): RegisteredPluginConfig {
+  const name = metadata.officialSource?.canonicalName ?? metadata.officialSource?.pluginDir;
+  if (!name) {
+    throw new Error(`${SCAFFOLD_PLUGIN_MANIFEST} is missing officialSource.canonicalName.`);
+  }
+
+  const serviceEntrypoint = metadata.officialSource?.serviceEntrypoint ??
+    metadata.provider.defaultServiceEntrypoint ??
+    metadata.provider.defaultEntrypoint;
+  const workdir = normalizePath(join(paths?.plugins ?? 'plugins', name));
+  const permissions = metadata.officialSource?.permissions ?? metadata.provider.defaultPermissions;
+  const infrastructureRequires = normalizeInfrastructureDependencies(
+    metadata.provider.infrastructureRequires,
+  );
+  const infrastructureOptionalDeps = normalizeInfrastructureDependencies(
+    metadata.provider.infrastructureOptionalDeps,
+  );
+
+  return {
+    name,
+    displayName: metadata.provider.displayName,
+    type: metadata.provider.pluginType === 'background-processor' ? 'background-processor' : 'utility',
+    workdir,
+    rootDir: resolve(projectRoot, workdir),
+    permissions: permissions ? [...permissions] : undefined,
+    service: serviceEntrypoint
+      ? {
+        entrypoint: serviceEntrypoint,
+        port: metadata.officialSource?.servicePort ?? metadata.officialSource?.backgroundPort,
+      }
+      : undefined,
+    infrastructure: infrastructureRequires.length > 0
+      ? {
+        requires: infrastructureRequires,
+        optionalDeps: infrastructureOptionalDeps.length > 0
+          ? infrastructureOptionalDeps
+          : undefined,
+        concurrencyEnvVar: metadata.provider.concurrencyEnvVar ?? undefined,
+        defaultConcurrency: metadata.provider.defaultConcurrency ?? undefined,
+      }
+      : undefined,
+  };
+}
+
+function normalizeInfrastructureDependencies(
+  values: readonly string[] | undefined,
+): PluginInfrastructureDependency[] {
+  return (values ?? []).filter(isPluginInfrastructureDependency);
+}
+
+function isPluginInfrastructureDependency(value: string): value is PluginInfrastructureDependency {
+  return value === 'kv' || value === 'db' || value === 'cache';
+}
+
+function isScaffoldPluginMetadata(value: unknown): value is ScaffoldPluginMetadata {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const provider = Reflect.get(value, 'provider');
+  return !!provider && typeof provider === 'object';
 }
 
 async function resolvePluginManifest(

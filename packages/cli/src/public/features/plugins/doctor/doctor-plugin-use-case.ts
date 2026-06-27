@@ -3,7 +3,7 @@ import type { NetScriptConfig } from '@netscript/config';
 
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import type { FileSystemPort } from '../../../../kernel/ports/file-system-port.ts';
-import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
 
 /** Health status for one plugin doctor check. */
 export type PluginDoctorCheckStatus = 'healthy' | 'warning' | 'error';
@@ -66,7 +66,7 @@ export async function doctorPlugin(
 
   let plugins: Record<string, RegisteredPluginConfig>;
   try {
-    const loadPlugins = dependencies.loadRegisteredPlugins ?? loadRegisteredPlugins;
+    const loadPlugins = dependencies.loadRegisteredPlugins ?? loadRegisteredPluginMetadata;
     plugins = await loadPlugins(input.projectRoot, config);
   } catch (error) {
     return [workspaceErrorReport('manifest-resolution', 'Could not resolve plugin manifests.', error)];

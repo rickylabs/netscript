@@ -3,6 +3,7 @@ import type { BackgroundProcessorEntry, CacheEntry, PluginEntry } from '@netscri
 import { addWorkspaceMember } from '../scaffold/workspace-writer.ts';
 import { SCAFFOLD_DIRS } from '../../constants/scaffold/scaffold-dirs.ts';
 import { SCAFFOLD_FILES } from '../../constants/scaffold/scaffold-files.ts';
+import { SCAFFOLD_PACKAGES } from '../../constants/scaffold/scaffold-packages.ts';
 import { ScaffoldValidationError } from '../../domain/errors.ts';
 import type { FileSystemPort } from '../../ports/file-system-port.ts';
 import type {
@@ -17,6 +18,7 @@ import {
   buildPluginServiceEntry,
 } from './appsettings-entry-builders.ts';
 import { insertPluginSpecifier } from './netscript-config-plugin.ts';
+import { resolveNetScriptImports } from '../scaffold/import-resolver.ts';
 
 /** Optional overrides when mutating workspace plugin config. */
 export interface PluginWorkspaceMutationOptions {
@@ -51,7 +53,42 @@ interface AppsettingsShape {
 
 interface WorkspaceDenoConfig {
   workspace?: string[];
+  imports?: Record<string, string>;
 }
+
+const PLUGIN_KIND_ROOT_IMPORTS: Readonly<Record<string, readonly string[]>> = {
+  auth: [
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONFIG,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_CONTRACTS_V1,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_DOMAIN,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_PORTS,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_STREAMS,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_AUTH_CORE_TESTING,
+  ],
+  saga: [
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_SAGAS_CORE_DOMAIN,
+  ],
+  stream: [SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN],
+  trigger: [
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_ADAPTERS,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_BUILDERS,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_CONFIG,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_CONTRACTS_V1,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_DOMAIN,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_PORTS,
+    SCAFFOLD_PACKAGES.NETSCRIPT_PLUGIN_TRIGGERS_CORE_RUNTIME,
+    SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS,
+    SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME,
+  ],
+  worker: [
+    SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS,
+    SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_RUNTIME,
+    SCAFFOLD_PACKAGES.NETSCRIPT_WORKERS_SCHEMAS,
+  ],
+};
 
 /** Mutates root config files after scaffolding a plugin workspace. */
 export class PluginWorkspaceMutator {
@@ -131,6 +168,39 @@ export class PluginWorkspaceMutator {
 
       await addWorkspaceMember(projectRoot, memberPath, this.fs);
       members.add(normalized);
+    }
+  }
+
+  /** Ensure root `deno.json` can resolve packages used by an added first-party plugin kind. */
+  async ensureRootImportsForPluginKind(projectRoot: string, pluginKind: string): Promise<void> {
+    const denoJsonPath = join(projectRoot, SCAFFOLD_FILES.DENO_JSON);
+    if (!await this.fs.exists(denoJsonPath)) {
+      throw new ScaffoldValidationError(
+        `Cannot update plugin import mappings because ${SCAFFOLD_FILES.DENO_JSON} was not found.`,
+        { projectRoot, pluginKind },
+      );
+    }
+
+    const requiredSpecifiers = PLUGIN_KIND_ROOT_IMPORTS[pluginKind] ?? [];
+    if (requiredSpecifiers.length === 0) {
+      return;
+    }
+
+    const raw = JSON.parse(await this.fs.readFile(denoJsonPath)) as WorkspaceDenoConfig;
+    raw.imports ??= {};
+    const resolvedImports = resolveNetScriptImports('jsr');
+    let changed = false;
+    for (const specifier of requiredSpecifiers) {
+      const target = resolvedImports[specifier];
+      if (target === undefined || raw.imports[specifier] === target) {
+        continue;
+      }
+      raw.imports[specifier] = target;
+      changed = true;
+    }
+
+    if (changed) {
+      await this.fs.writeFile(denoJsonPath, JSON.stringify(raw, null, 2) + '\n');
     }
   }
 

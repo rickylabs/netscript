@@ -8,6 +8,7 @@ import { assertEquals } from 'jsr:@std/assert@^1';
 import { MemoryFileSystemAdapter } from '../scaffold/memory-fs.ts';
 import { PluginWorkspaceMutator } from './workspace-mutator.ts';
 import type { PluginKindProvider } from '../../domain/plugin-kind.ts';
+import { netscriptJsrSpecifier } from '../../constants/jsr-specifiers.ts';
 
 const backgroundProvider: PluginKindProvider = {
   kind: 'background',
@@ -68,6 +69,49 @@ Deno.test('PluginWorkspaceMutator ensures plugins root and plugin packages are w
     './plugins',
     './plugins/*',
   ]);
+});
+
+Deno.test('PluginWorkspaceMutator injects first-party plugin core imports into root deno config', async () => {
+  const fs = new MemoryFileSystemAdapter();
+  await fs.writeFile(
+    '/project/deno.json',
+    JSON.stringify(
+      {
+        workspace: ['./plugins/*'],
+        imports: {
+          '@netscript/plugin': netscriptJsrSpecifier('plugin'),
+        },
+      },
+      null,
+      2,
+    ) + '\n',
+  );
+
+  const mutator = new PluginWorkspaceMutator(fs);
+  await mutator.ensureRootImportsForPluginKind('/project', 'worker');
+  await mutator.ensureRootImportsForPluginKind('/project', 'worker');
+  await mutator.ensureRootImportsForPluginKind('/project', 'saga');
+  await mutator.ensureRootImportsForPluginKind('/project', 'trigger');
+  await mutator.ensureRootImportsForPluginKind('/project', 'auth');
+
+  const config = JSON.parse(await fs.readFile('/project/deno.json'));
+
+  assertEquals(
+    config.imports['@netscript/plugin-workers-core/schemas'],
+    netscriptJsrSpecifier('plugin-workers-core', '/schemas'),
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-sagas-core/domain'],
+    netscriptJsrSpecifier('plugin-sagas-core', '/domain'),
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-triggers-core/builders'],
+    netscriptJsrSpecifier('plugin-triggers-core', '/builders'),
+  );
+  assertEquals(
+    config.imports['@netscript/plugin-auth-core/contracts/v1'],
+    netscriptJsrSpecifier('plugin-auth-core', '/contracts/v1'),
+  );
 });
 
 Deno.test('PluginWorkspaceMutator registers background plugins with companion API service', async () => {

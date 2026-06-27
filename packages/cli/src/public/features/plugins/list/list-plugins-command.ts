@@ -10,7 +10,7 @@ import type { NetScriptConfig } from '@netscript/config';
 import { AstExtractor, FilesystemWalker } from '@netscript/plugin/sdk';
 import { resolve } from '@std/path';
 import { findProjectRoot } from '../../../../kernel/adapters/config/deploy-config.ts';
-import { loadRegisteredPlugins } from '../../../../kernel/adapters/config/plugin-registry.ts';
+import { loadRegisteredPluginMetadata } from '../../../../kernel/adapters/config/plugin-registry.ts';
 import { ScaffoldValidationError } from '../../../../kernel/domain/errors.ts';
 import type { RegisteredPluginConfig } from '../../../../kernel/domain/resolved-config.ts';
 import type { ListPluginsInput, PluginListEntry } from './list-plugins-input.ts';
@@ -33,7 +33,7 @@ async function discoverPlugins(
 ): Promise<readonly PluginListEntry[]> {
   const config = await dependencies.loadConfig({ cwd: projectRoot });
   const [registeredPlugins, contributionCounts] = await Promise.all([
-    loadRegisteredPlugins(projectRoot, config),
+    loadRegisteredPluginMetadata(projectRoot, config),
     discoverContributionCounts(projectRoot),
   ]);
 

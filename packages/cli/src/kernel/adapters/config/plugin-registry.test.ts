@@ -1,6 +1,6 @@
 import { resolve } from '@std/path';
 import { loadConfig } from '@netscript/config';
-import { loadRegisteredPlugins } from './plugin-registry.ts';
+import { loadRegisteredPluginMetadata, loadRegisteredPlugins } from './plugin-registry.ts';
 
 Deno.test('loadRegisteredPlugins returns normalized background processor metadata', async () => {
   const projectRoot = await createPluginRegistryProject();
@@ -69,6 +69,60 @@ Deno.test('loadRegisteredPlugins preserves registry output shape from explicit c
 
   if (workers.service?.entrypoint !== './services/src/main.ts') {
     throw new Error('Expected plugin service contribution to preserve entrypoint metadata');
+  }
+});
+
+Deno.test('loadRegisteredPluginMetadata reads scaffold manifests without importing plugin modules', async () => {
+  const projectRoot = await Deno.makeTempDir();
+  const pluginRoot = resolve(projectRoot, 'plugins/workers');
+  await Deno.mkdir(pluginRoot, { recursive: true });
+  await Deno.writeTextFile(
+    resolve(projectRoot, 'netscript.config.ts'),
+    `export default {
+  name: 'fixture-app',
+  databases: { config: [] },
+  plugins: ['./plugins/workers/mod.ts'],
+};
+`,
+  );
+  await Deno.writeTextFile(
+    resolve(pluginRoot, 'mod.ts'),
+    `throw new Error('plugin module should not be imported by metadata loader');`,
+  );
+  await Deno.writeTextFile(
+    resolve(pluginRoot, 'scaffold.plugin.json'),
+    JSON.stringify({
+      schemaVersion: 1,
+      provider: {
+        displayName: 'Background Worker',
+        defaultPermissions: ['--allow-read'],
+        defaultEntrypoint: 'bin/combined.ts',
+        defaultServiceEntrypoint: 'services/src/main.ts',
+        pluginType: 'background-processor',
+        infrastructureRequires: ['kv'],
+        infrastructureOptionalDeps: ['db'],
+        concurrencyEnvVar: 'WORKER_CONCURRENCY',
+        defaultConcurrency: 2,
+      },
+      officialSource: {
+        canonicalName: 'workers',
+        pluginDir: 'workers',
+        serviceEntrypoint: 'services/src/main.ts',
+        servicePort: 8091,
+        permissions: ['--allow-read'],
+      },
+    }, null, 2),
+  );
+
+  const config = await loadConfig({ cwd: projectRoot });
+  const plugins = await loadRegisteredPluginMetadata(projectRoot, config);
+
+  if (plugins.workers?.displayName !== 'Background Worker') {
+    throw new Error('Expected scaffold manifest metadata to drive plugin display metadata');
+  }
+
+  if (plugins.workers.infrastructure?.requires.join(',') !== 'kv') {
+    throw new Error('Expected scaffold manifest infrastructure metadata to be normalized');
   }
 });
 

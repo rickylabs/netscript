@@ -129,6 +129,7 @@ export async function addPlugin(
     plan.projectRoot,
     plan.pluginName,
   );
+  await dependencies.workspaceMutator.ensureRootImportsForPluginKind(plan.projectRoot, plan.kind);
   const provisionedCache = plan.provider.defaultRequiresKv
     ? await dependencies.workspaceMutator.ensureSharedCache(plan.projectRoot)
     : false;
