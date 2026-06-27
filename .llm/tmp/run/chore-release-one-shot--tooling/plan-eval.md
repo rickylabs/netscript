@@ -1,4 +1,4 @@
-# PLAN-EVAL — chore-release-one-shot--tooling
+# PLAN-EVAL — chore-release-one-shot--tooling — CYCLE 2
 
 - Plan evaluator session: openhands / minimax-M3 / 2026-06-29
 - Run: `chore-release-one-shot--tooling`
@@ -7,270 +7,187 @@
   tooling (NOT package/plugin framework code).
 - Scope overlays: WSL Codex daemon-attached implementation lane; harness evaluator separation.
 - Baseline: alpha.11 shipped (verified against current `main`).
-- Trigger metadata: action_run `28304587059`, PR `#164`, output_mode `pr-comment`,
-  model `openrouter/minimax/minimax-m3`.
+- Trigger metadata: action_run `28305083715` (this run), prior cycle-1 action_run `28304587059`,
+  PR `#164`, output_mode `pr-comment`, model `openrouter/minimax/minimax-m3`.
+- Cycle 1 verdict: `FAIL_PLAN` (sole blocker D3 — pattern set both over-broad and under-broad).
+- Cycle 2 verdict: TBD below.
 
-## Spot-checks against current `main` (research.md re-baseline)
+## What was re-baselined vs cycle-1 plan
 
-| Claim (research.md)                                                                     | Verified |
-| --------------------------------------------------------------------------------------- | -------- |
-| `.llm/tools/deps/bump-version.ts` is a thin shim over native `deno bump-version`         | ✓        |
-| `.llm/tools/deps/prod-install.ts:28` builds `['ci','--prod','--frozen']`                | ✓        |
-| Deno 2.9.0 rejects `deno ci --frozen` with `unexpected argument '--frozen' found`        | ✓ (live) |
-| Both `publish.yml` and `e2e-cli-prod.yml` trigger on `release: types:[published]`       | ✓        |
-| `agentic:sync-claude` regenerates `.claude/skills/` from `.agents/skills/`               | ✓ (deno.json:51–52) |
-| `deno bump-version prerelease` at workspace root bumps 32 members (27 pkg + 5 plugin)   | ✓ (live, copy of main) |
-| `deno bump-version` at workspace root does **NOT** update root `deno.json` `"version"`    | ✓ (live) |
-| `deno bump-version` does NOT update `deno.lock` `@netscript/*` ranges                     | ✓ (live) |
-| `deno.lock` v5 is JSON; sed `0.0.1-alpha.11` → `0.0.1-alpha.12` leaves it valid for `deno ci` (exit 0) | ✓ (live) |
+| Cycle-1 required fix                                                        | Cycle-2 status           | Evidence                                                                                |
+| --------------------------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------- |
+| 1. Narrow pattern set to `Deno.readTextFile(<arg>)` / `Deno.readFile(<arg>)` only; drop the other 3 | **ADDRESSED** | D3 line 53: "match ONLY `Deno.readTextFile(` and `Deno.readFile(` call sites. Do **NOT** flag `fromFileUrl(`, `import.meta.resolve(`, or bare `new URL(..., import.meta.url)`" |
+| 2. Lock cross-line detection approach (two-pass scan) + cross-line positive fixture | **ADDRESSED** | D3 lines 58–63: explicit Pass 1 (collect `const <name> = new URL(<literal>, import.meta.url)` and direct `fromFileUrl(new URL(..., import.meta.url))`) + Pass 2 (flag `<name>` references AND inline `Deno.readTextFile(new URL(..., import.meta.url))`). Lines 64–65: "POSITIVE fixture mirroring `openapi.ts:29→155` (URL declared one line, read another) — the tool MUST flag it". |
+| 3. Add D3 cross-line miss class to risk register                              | **ADDRESSED** | "Risks / debt / follow-ups" section lines 130–132: "D3 cross-line miss class (e.g. `openapi.ts:29 → 155`): mitigated by the two-pass scan + the cross-line positive fixture. If a future read indirects through more than one assignment hop, the resolver may miss it — fixture coverage is the guardrail; record any escape as debt." |
+| Optional 4. Pin D4 version handoff (no ref-parse fragility)                  | **ADDRESSED** | D4 lines 84–88: `actions/upload-artifact` `version.txt` in publish.yml + `actions/download-artifact` keyed on `github.event.workflow_run.id` in e2e-cli-prod.yml. `workflow_dispatch` path keeps `inputs.published-version`. Non-racy by construction. |
+| Optional 5. D5 wording: `agentic:sync-claude` (+`:check`), never hand-edit mirror | **ADDRESSED** | D5 lines 92–93: "regenerate the mirror with `deno task agentic:sync-claude`** and gate it with `deno task agentic:sync-claude:check` (NEVER hand-edit `.claude/skills/` — it is generated)". `deno.json:51-52` confirms both tasks exist. |
+| Optional 6. D2 exact edit sites named                                         | **ADDRESSED (with minor line-ref drift)** | D2 line 43 names `prod-install.ts:28` (arg array) + `prod-install.ts:6–7` (rationale comment) + `.llm/tools/README.md:99` (drop `--frozen` mention). The `:6–7` ref points to the rationale block but the explicit `--frozen` mentions in that block are actually on lines 4 and 11; the IMPL session will read the file and fix the right lines. Not a Plan-Gate fail (IMPL-discoverable). |
 
-## Per-decision findings (D1–D6)
+## Spot-checks against current `main` (re-baseline for cycle 2)
 
-### D1 — `deno task release:cut` orchestrator (issue #122) — **PASS**
+| Claim                                                                            | Verified                                                                                                 |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `prod-install.ts:28` is `const cmdArgs = ['ci', '--prod', '--frozen'];`           | ✓ (line 28 confirmed)                                                                                    |
+| `prod-install.ts` rationale block lines 4 & 11 mention `--frozen`                 | ✓ (line 4: "frozen install"; line 11: "`--frozen` (implied by `ci`)") — plan's `:6–7` ref is approximate |
+| `.llm/tools/README.md:99` mentions `--frozen` in the `deps:prod-install` row      | ✓ (line 99 confirmed: "Proves the production (non-dev) surface installs against a frozen lock (`deno ci --prod --frozen`)") |
+| `.llm/tools/entry.md:59-60` also mentions `--frozen` (NOT in plan edit list)      | ✓ (line 59: "`deno ci --prod --frozen`"; line 60: "frozen lock") — see IMPL nit below                   |
+| `openapi.ts:29` is `const scalarJsUrl = new URL('../../assets/scalar.min.js', import.meta.url);` | ✓ (line 29 confirmed)                                                                                    |
+| `openapi.ts:155` is `const scalarJs = scalarJsCache ?? await Deno.readTextFile(scalarJsUrl);` | ✓ (line 155 confirmed)                                                                                   |
+| `deno task agentic:sync-claude` + `agentic:sync-claude:check` exist              | ✓ (deno.json:51–52)                                                                                      |
+| `.github/workflows/e2e-cli-prod.yml` currently triggers on `release: types:[published]` AND `workflow_dispatch` | ✓ (cycle-1 verified; still current)                                                                      |
+| `cli-e2e` is the only workspace member with `"publish": false`                   | ✓ (all other packages/plugins publishable)                                                               |
 
-The plan's "two gaps" framing is **empirically confirmed**:
-- `deno bump-version prerelease` at the workspace root updates the 32 member `deno.json` files but
-  **does not** update the root `deno.json` `"version"` field (live-confirmed on a copy of main;
-  root stayed at `0.0.1-alpha.11` after the bump, members went to `0.0.1-alpha.12`).
-- `deno.lock` `@netscript/*` ranges are **not** touched by `bump-version` either (live: 43
-  `@netscript/*` refs in the lockfile, all stayed `0.0.1-alpha.11`).
+## Per-decision findings (D1–D6) — cycle 2
 
-The plan's fill-in (root `deno.json` write + sed-rewrite `deno.lock` `@netscript/*` ranges) is the
-right call. The lock-rewrite safety claim (no `deno cache --reload`, no lock deletion — AGENTS.md
-rule 6) is **empirically sound**: after sed-rewriting the version string in a copy of the live lock,
-`deno ci` exits 0 (only unrelated npm build-script warnings).
+### D1 — `deno task release:cut` orchestrator (issue #122) — **PASS** (carried from cycle 1)
 
-The residue check (step 3: `git grep -nE '<old-version>'` across `*.json` + `deno.lock`) is
-defense-in-depth for sed misses and is correct.
+Cycle-1 evidence still holds. No regression in cycle 2 (D1 not revised; only D2–D5 had clarifications).
 
-No additional members would be missed by the plan's `packages/*` + `plugins/*` globbing (verified
-27 packages + 5 plugins = 32 members, matches live count). The plan's "27 + 5 = 32" math is correct
-once you accept that `cli-e2e` is a workspace member too (the plan does not miscount; the table in
-research.md does not enumerate, but the live count matches the workspace array).
+### D2 — Drop `--frozen` from `deps:prod-install` (issue #146) — **PASS** (revised for edit-site clarity)
 
-### D2 — Drop `--frozen` from `deps:prod-install` (issue #146) — **PASS**
+Cycle-2 plan now enumerates the three edit sites by file:line. The arg-array change (`['ci', '--prod']`) is
+uncontroversial. The rationale comment + README are doc-consistency items. **IMPL nit:** `entry.md:59-60`
+also contains the `--frozen` mention (the per-script detail page referenced from `README.md:21,85,157` and
+from `netscript-deno-toolchain/SKILL.md:111`). The plan does not list it. A thorough IMPL session will grep
+for `--frozen` after the slice to verify completeness and find the gap; an over-zealous one might not. Logged
+as a follow-up note (not a Plan-Gate fail — this is a doc-consistency gap discoverable in a 5-second grep at
+IMPL time, not a design decision the plan needs to pre-answer).
 
-Empirically verified on Deno 2.9.0 at `/opt/hosted-toolchain/deno/2.9.0/x64/deno`:
-- `deno ci --frozen` → `error: unexpected argument '--frozen' found` (exit 1)
-- `deno task deps:prod-install` → same error in 10ms
+### D3 — Text-import preflight gate (issue #133) — **PASS** (REVISED cycle 2)
 
-Single source location: `.llm/tools/deps/prod-install.ts:28`. Plan correctly identifies the only
-fix site. The doc comment at lines 6–7 of `prod-install.ts` also says `--frozen` is implied by `ci`
-and desired — this comment must be **replaced** (not just removed), since the new behavior is
-"remove the flag entirely, rely on `deno ci` being implicitly frozen" — i.e., the rationale survives
-but the flag doesn't. The plan does not explicitly call out the doc-comment rewrite; it is implied
-by "remove `--frozen` from the args" but worth pinning in the slice.
+Three cycle-1 blockers all addressed. Re-assessment:
 
-`.llm/tools/README.md:99` mentions `--frozen` in passing — must update for consistency. (Plan
-implies; not explicit.)
+**(a) Pattern scope — NARROWED correctly.**
+The pattern set is now ONLY `Deno.readTextFile(` and `Deno.readFile(` (plus their `<arg>` resolutions via
+the two-pass resolver). `fromFileUrl(`, `import.meta.resolve(`, and bare `new URL(..., import.meta.url)`
+are explicitly excluded as URL/path constructors. The ~21 constructor hits on `main` are no longer in
+the scan set.
 
-### D3 — Text-import preflight gate (issue #133) — **FAIL_PLAN** (root cause)
+Cross-line coverage: every `Deno.readTextFile(<arg>)` / `Deno.readFile(<arg>)` site in publishable source
+files on `main` uses an identifier (`scalarJsUrl`, `path`, `entry.path`, `manifestPath`, `xmlPath`, etc.)
+or an inline `new URL(..., import.meta.url)`. Of those:
+- `openapi.ts:155` `Deno.readTextFile(scalarJsUrl)` — `scalarJsUrl` is in the URL set (line 29).
+  **Pass 2 FLAGS this.** ✓
+- `readme-examples_test.ts:3` inline form — test file, excluded by the "publishable members" + source filter
+  (test files in `tests/` are not in the publishable surface for JSR — even if scanned, this is the inline
+  case the plan's Pass 2 explicitly flags; but the source-only filter on publishable members excludes `tests/`
+  by intent). Either way, no false negative on the production case.
+- All other read sites use plain `path`/`entry.path`/etc. — NOT in the URL set. **No flag.** ✓
 
-The plan's pattern set:
-> `Deno.readTextFile(`/`Deno.readFile(` and `fromFileUrl(`/`import.meta.resolve(`/new URL(..., import.meta.url)` used to READ shipped asset files
+The narrowed pattern + two-pass resolver catches exactly the production defect class while ignoring the
+21 URL constructors and the dozens of legitimate runtime-FS reads (which use `Deno.readFileSync`/`readTextFileSync`
+or non-URL string args).
 
-This has **two distinct problems** that would force rework at IMPL time:
+**(b) Cross-line detection — PINNED correctly.**
+Pass 1 collects `const <name> = new URL(<literal>, import.meta.url)` and direct `fromFileUrl(new URL(...,
+import.meta.url))` chains. Pass 2 flags both identifier-form reads and inline-form reads. The
+`openapi.ts:29 → 155` case is the load-bearing fixture. The plan also requires a NEGATIVE fixture (bare
+`new URL(...,import.meta.url)` for HTTP/module-id composition + text-import `with { type: 'text' }` read)
+to prove the tool doesn't over-flag. This is correct test design (positive + negative).
 
-**(a) Over-broad — flags non-reads.** `fromFileUrl(`, `import.meta.resolve(`, and bare
-`new URL(..., import.meta.url)` are not reads. They are URL/path constructors and resolvers. On the
-current tree:
-- `new URL(..., import.meta.url)`: **21 hits** across `packages/` + `plugins/` source — most are
-  HTTP URL composition (openapi), fresh route module IDs, test-fixture path constants, and
-  `fromFileUrl(new URL(...))` chains (not reads).
-- `fromFileUrl(`, `import.meta.resolve(`: similarly common in worker/import composition paths.
+**(c) Allowlist — TIGHT, no broad ignore globs.**
+Inline `// preflight-allow: <reason>` annotation per line. The narrowed pattern set should make the
+allowlist nearly empty (the few legitimate non-asset FS reads in publishable surface, if any, get annotated).
+No broad file-class globs that would mask the same defect elsewhere.
 
-Including them turns a single false-positive into ~21+ flagged lines, none of which are actual
-bundled-asset reads. The plan's "allowlist legitimate runtime FS use in CLI scaffold I/O via an
-explicit ignore list / annotation" mitigation is **vague and unbounded**: it does not pin which uses
-are legitimate, so the IMPL session would either ship a giant noisy baseline or ship a false-
-positive-prone filter.
+**(d) Risk register entries present.**
+- "D3 cross-line miss class" (multi-hop indirection): fixture coverage is the guardrail; record escapes as debt.
+- "D3 false-positive risk": if CI noise appears, tighten the resolver, do NOT widen broad ignore globs.
 
-**(b) Under-broad — misses the historical prod-CLI break class.** The locked rule "JSR-safe asset
-embedding = text imports" was authored because of failures like `openapi.ts:29 → 155`:
+**(e) Wiring — BOTH `cut.ts` (step 4) AND `publish.yml` (a step before "Publish dry-run").** ✓ Double-gated:
+local bump dry-run + CI publish both run the preflight. No single point of failure.
 
-```ts
-// line 29
-const scalarJsUrl = new URL('../../assets/scalar.min.js', import.meta.url);
-// line 155 (different line)
-const scalarJs = scalarJsCache ?? await Deno.readTextFile(scalarJsUrl);
-```
+**Residual miss class check:** the two-pass resolver is one assignment hop. A read that flows through two
+hops (e.g., `const x = new URL(...); const y = x; readTextFile(y)`) would NOT be caught — `y` is not in
+the URL set. The plan acknowledges this in the risk register and relies on fixture coverage as the
+guardrail. This is acceptable: the production case is one hop (`scalarJsUrl`); multi-hop is hypothetical.
+If a future bug introduces multi-hop, the IMPL session will see it in code review and add a hop counter
+or AST scan. For now, the cost/benefit favors the simpler regex scan.
 
-A line-by-line scan cannot connect `scalarJsUrl` (assigned on line 29) to `Deno.readTextFile(
-scalarJsUrl)` (used on line 155). The plan's pattern set catches only the **inline** form:
-`Deno.readTextFile(new URL(...))` on a single line. There is exactly **one** such match in the tree
-(`packages/service/tests/_fixtures/readme-examples_test.ts:3`, in a test file), which is the wrong
-file class and the trivial case. The real production violation (`openapi.ts:29 → 155`) is not
-caught.
+### D4 — `workflow_run` gate on `e2e-cli-prod` (issue #123) — **PASS** (with version handoff pinned)
 
-**Required fixes before PASS**:
+Cycle-1 verdict holds. Cycle-2 revision pins the version handoff:
+- `publish.yml` writes `version.txt` and `actions/upload-artifact`s it.
+- `e2e-cli-prod.yml` `actions/download-artifact`s from the triggering run via `github.event.workflow_run.id`,
+  reads the version, uses it for the install/check. Non-racy by construction (artifact is keyed on the run ID,
+  not on tag/release lookup).
+- `workflow_dispatch` path keeps `inputs.published-version` for the manual lane.
 
-1. Narrow the pattern set to actual reads only: `Deno.readTextFile(<arg>)` and
-   `Deno.readFile(<arg>)` where `<arg>` resolves to a `new URL(..., import.meta.url)`-derived
-   value. Drop `fromFileUrl(`, `import.meta.resolve(`, and bare `new URL(..., import.meta.url)`.
-2. Lock the cross-line detection approach in the plan. Two viable patterns:
-   - **Two-pass scan**: pass 1 collects `const <name> = new URL(..., import.meta.url)` assignments;
-     pass 2 flags `Deno.readTextFile(<name>)` / `Deno.readFile(<name>)` references. Simple,
-     regex-only, catches the `openapi.ts:29 → 155` case.
-   - **AST scan** via Deno's `ts-morph` or `deno_ast`. More robust but heavier. Likely overkill.
-   Recommend the two-pass scan; pin it in the plan.
-3. Add a unit-test fixture that mimics the cross-line `openapi.ts:29 → 155` pattern (variable
-   assigned to a URL, then read in a different function) — this is the **real** positive fixture.
-4. Add D3 false-negative (cross-line) to the plan's risk register with mitigation = two-pass scan.
+This is the canonical GitHub Actions pattern for cross-workflow data passing; it sidesteps the ref-parse
+fragility flagged in cycle 1. ✓
 
-Without these, S2 will either ship a tool that floods CI with false positives on every run, or
-ship a tool that misses the exact class of bug it was written to catch. Either outcome undoes the
-intent of #133.
+### D5 — New `netscript-release` skill — **PASS** (wording fixed)
 
-### D4 — `workflow_run` gate on `e2e-cli-prod` (issue #123) — **PASS** (with IMPL-level nit)
-
-- `REPLACE` (not "ADD") the `release: types:[published]` trigger on `e2e-cli-prod.yml` is the right
-  call — confirmed against current `main`: `e2e-cli-prod.yml` currently has both `release:` and
-  `workflow_dispatch:` triggers. After the change, only `workflow_run: workflows:["publish"],
-  types:[completed]` + `workflow_dispatch` remain. **No double-fire.**
-- Job-level guard `if: github.event_name == 'workflow_dispatch' || github.event.
-  workflow_run.conclusion == 'success'` correctly skips publish failures.
-- `workflow_dispatch` manual path is preserved with `published-version` input.
-- Concurrency group `e2e-cli-prod-${{ github.workflow }}-${{ github.ref }}` + the new
-  `workflow_run` trigger handle re-runs correctly (cancel-in-progress is false but the group still
-  serializes per-ref runs).
-- **Race-free**: `workflow_run: completed` only fires AFTER the publish run ends. Combined with
-  the `conclusion == 'success'` guard, e2e-cli-prod runs only after a successful publish — no JSR
-  race. ✓
-
-**IMPL-level nit (not a Plan-Gate fail)**: the plan says "resolve the version from the publish run's
-release tag (`github.event.workflow_run.head_branch` / associated release)". The `workflow_run`
-event payload does NOT expose `inputs` or job outputs from the triggering run. Realistic options
-for the IMPL session:
-
-- `gh api repos/:owner/:repo/releases/tags/<tag>` — but you need the tag first.
-- Parse `github.event.workflow_run.display_title` (often the release title, e.g. "v0.0.1-alpha.11")
-  — fragile.
-- `gh api repos/:owner/:repo/actions/runs/<id>` to fetch the resolved `tag` from a step output —
-  not exposed in the API; step outputs are not queryable post-hoc.
-- Look up the release by querying `gh release list --json tagName --limit 1` (only the latest, racey
-  on concurrent releases).
-
-The cleanest option is for the publish job to **also** emit an artifact (e.g., a `version.txt` file
-with the resolved version) that e2e-cli-prod downloads via `actions/download-artifact`. But this
-requires `actions/upload-artifact` in `publish.yml`, which the plan does not call out. Worth
-flagging at IMPL time so the version-resolution step has a concrete, non-racy implementation.
-
-### D5 — New `netscript-release` skill — **PASS** (with wording nit)
-
-Plan: "New `.agents/skills/netscript-release/SKILL.md` (and mirror to `.claude/skills/` per the
-generated-mirror rule)".
-
-The wording "mirror to `.claude/skills/`" suggests a hand-edit step. The repo's operating rule
-(per `.llm/tools/README.md` and `CLAUDE.md`) is:
-> edit `.agents/skills/` source, never hand-edit the `.claude/skills/` mirror
-
-`.claude/skills/` is regenerated by `deno task agentic:sync-claude` and gated by
-`deno task agentic:sync-claude:check`. The IMPL session must add the skill to `.agents/skills/`,
-run `agentic:sync-claude`, and verify with `agentic:sync-claude:check` (which is in turn gated by
-`docs:maintenance`). A hand-mirror would either be silently overwritten at next sync, or fail
-`agentic:sync-claude:check` drift detection.
-
-This is a wording-level nit, not a Plan-Gate fail — the IMPL session will see `CLAUDE.md` and the
-README and do the right thing. But for clarity, the plan should explicitly say "add to
-`.agents/skills/` and run `agentic:sync-claude` (gated by `agentic:sync-claude:check`)". S5 should
-list `agentic:sync-claude:check` as one of its slice gates.
+Cycle-1 wording nit resolved: the plan now explicitly says "add to `.agents/skills/`, run `deno task
+agentic:sync-claude`, gate via `deno task agentic:sync-claude:check`". `deno.json:51–52` confirms both
+tasks exist. The `.claude/skills/` mirror is generated, never hand-edited.
 
 ### D6 — Non-goals — **PASS**
 
-Keeping the GitHub-Release-triggered OIDC publish (not a local `deno publish`) is the correct call
-for two reasons:
-1. The current `publish.yml` already has OIDC provenance (`id-token: write`, `contents: write`).
-   Local `deno publish` would lose this.
-2. The e2e-cli-prod race fix (D4) explicitly relies on `workflow_run` chaining off the publish
-   workflow — moving publish local breaks the chain.
+Carried from cycle 1 (no local publish, no auto-tag, no new casts). ✓
 
-No auto-tag (so the merge gate stays explicit) and no new type casts are consistent with the
-repo's discipline.
+## Scope / lane / slice verdict (cycle 2)
 
-## Scope / lane / slice verdict
-
-- **Scope**: `.llm/tools/` + `.github/workflows/` + new skill is harness tooling, not
-  `packages/`/`plugins/` framework code → WSL Codex implementation lane is correct.
-- **Slices** (5 total, well under the 30 limit):
-  - S1 (D2): smallest, unblocks gate. ✓
-  - S2 (D3): preflight + wiring + test. **Needs rework per D3 fixes above before implementation.**
+- **Scope**: harness tooling only. No `packages/`/`plugins/` framework code. WSL Codex implementation
+  lane is correct.
+- **Slices** (5 total, well under the 30 limit). Independently committable:
+  - S1 (D2): smallest. ✓
+  - S2 (D3): preflight + fixtures + wiring. ✓ (now self-contained with positive+negative fixtures)
   - S3 (D1): orchestrator + dry-run proof. ✓
   - S4 (D4): workflow change + actionlint. ✓
   - S5 (D5): skill + AGENTS.md + sync-claude. ✓
-- **Gates**: lint + fmt + run-deno-check + unit tests + `release:cut --dry-run` proof +
-  actionlint. Includes the explicit `--dry-run` proof of the bump path (S3), which is the right
-  gate for D1.
-- **Slices are independently committable**: each slice's diff is scoped to its decision (S1: 1 file;
-  S2: 1 tool + 1 task + 1 workflow line; S3: 1 tool + 1 task; S4: 1 workflow; S5: 1 skill + 1
-  AGENTS.md line). ✓
+- **Gates**: lint + fmt + run-deno-check + unit tests + `release:cut --dry-run` proof + actionlint +
+  IMPL-EVAL. ✓
+- **No regressions** on cycle-1 PASS items (D1/D2/D4/D5/D6 + scope/lane/slices/gates).
 
-## Open-decision sweep (evaluator-run)
+## Open-decision sweep (evaluator-run, cycle 2)
 
-| Decision the plan left open                                                                                         | Forces rework if deferred? | Required fix                                                                                                                                                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| D3 pattern scope (over-broad — `fromFileUrl`/`import.meta.resolve`/bare `new URL`)                                  | **YES**                    | Lock the scan to `Deno.readTextFile(<arg>)` and `Deno.readFile(<arg>)` only; drop the other three from the pattern set. The IMPL session would otherwise ship a tool that flags 21+ non-reads in the current tree.                                                                                                                                                                          |
-| D3 cross-line detection (under-broad — misses `openapi.ts:29 → 155`)                                                | **YES**                    | Pin the two-pass scan (collect `const <name> = new URL(..., import.meta.url)`; flag `Deno.readTextFile(<name>)` / `Deno.readFile(<name>)`). Add a positive fixture that mirrors the production case. The IMPL session would otherwise ship a tool that misses the exact class of bug #133 was authored to catch.                                                                                  |
-| D4 version resolution from `workflow_run` event (no concrete API endpoint)                                         | NO (workable at IMPL)      | Suggest `actions/upload-artifact` in `publish.yml` (e.g., `version.txt`) + `actions/download-artifact` in `e2e-cli-prod.yml`. Pin in the plan or leave for IMPL; either way, NOT a Plan-Gate fail.                                                                                                                                                                                          |
-| D5 "mirror to `.claude/skills/`" wording                                                                            | NO (correctable at IMPL)   | Plan should explicitly say "add to `.agents/skills/`, run `agentic:sync-claude`, gate via `agentic:sync-claude:check`". Correctable in S5; not a Plan-Gate fail.                                                                                                                                                                                                                              |
-| D2 doc-comment + README rewrites for `--frozen`                                                                     | NO                         | Plan implies but does not enumerate. Slice S1 should explicitly include `.llm/tools/README.md:99` and the doc comment at `prod-install.ts:6–7`. Not a Plan-Gate fail; harmless if discovered at IMPL.                                                                                                                                                                                       |
-| Risk register — D3 false-negative risk                                                                              | **YES**                    | Add a risk entry: "D3 cross-line miss class (e.g. `openapi.ts:29 → 155`); mitigation = two-pass scan + cross-line positive fixture". The gate item is "Risk register. Risks listed with mitigations."                                                                                                                                                                                         |
+| Decision the plan left open                                                                              | Forces rework if deferred? | Required fix                                                                                                                                                                                                                                                                              |
+| -------------------------------------------------------------------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D3 file-selection filter: how to scope the scan to the JSR-publishable surface (exports-based vs all source vs source-minus-tests) | NO (IMPL-discoverable) | The plan says "publishable members (name set, `publish !== false`; source `.ts`/`.tsx` only)". If the IMPL session implements "source = anything in `src/`/`mod.ts`/etc., exclude `tests/`" then the test fixture `readme-examples_test.ts:3` is naturally excluded. If "all source `.ts`/`.tsx`" then it would be flagged; the IMPL session would either tighten the filter or rely on the inline form being a legitimate use (and the plan's narrow pattern set + allowlist handles it). Either way, the IMPL session can resolve this without going back to PLAN. Not a Plan-Gate fail. |
+| D2 doc-consistency: `entry.md:59-60` also mentions `--frozen` and is not in the plan's edit list          | NO (IMPL-discoverable)     | The IMPL session should grep `git grep -nF -- '--frozen'` after the slice to confirm zero remaining mentions in `.llm/tools/`. A 5-second sanity check. If they miss it, the next doc audit will catch it; the design itself is unaffected. Logged as an IMPL nit, not a Plan-Gate fail. |
+| D3 multi-hop indirection (read via intermediate identifier, not direct `const <name> = new URL(...)`)     | NO (risk-registered)       | Plan's risk register explicitly calls this out: "If a future read indirects through more than one assignment hop, the resolver may miss it — fixture coverage is the guardrail; record any escape as debt." Acceptable for the production case (which is one hop). |
+| D4 artifact versioning on re-runs / re-publishes (does the `version.txt` artifact on a re-run overwrite the original?) | NO | GitHub artifacts are immutable per run; a re-run produces a new artifact with a new run ID, and the `workflow_run.id` lookup points to the new run. ✓ The `conclusion == 'success'` guard ensures only successful publishes trigger e2e-cli-prod. |
 
-## Checklist results
+No open decisions force rework at IMPL time. ✓
 
-| Plan-Gate item                          | Result     | Evidence / location                                                                                |
-| --------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------- |
-| Research present and current            | **PASS**   | `.llm/tmp/run/chore-release-one-shot--tooling/research.md` (62 lines), re-baselined vs main (line 4). Spot-checks above. |
-| Decisions locked                        | **PASS**   | D1–D6 all present with rationale.                                                                  |
-| Open-decision sweep                     | **FAIL**   | D3 pattern scope + D3 cross-line detection are unaddressed open decisions that force rework.       |
-| Commit slices (< 30, gate + files each) | **PASS**   | 5 slices; each names files + proving gate.                                                          |
-| Risk register                           | **FAIL**   | D3 false-negative risk (cross-line miss class) not enumerated; mitigation missing.                  |
-| Gate set selected                       | **PASS**   | run-deno-check, run-deno-lint, run-deno-fmt, unit tests, `release:cut --dry-run`, actionlint.      |
-| Deferred scope explicit                 | **PASS**   | D6 non-goals enumerated (no local publish, no auto-tag, no new casts).                              |
-| jsr-audit surface scan (pkg/plugin)     | **N/A**    | This is SCOPE-tools (harness/repo tooling), not a package/plugin wave. The preflight tool's *output* gates JSR publishability, which is what F-6 covers for downstream cuts — but the plan itself doesn't change package surfaces. |
+## Checklist results (cycle 2)
+
+| Plan-Gate item                          | Result     | Evidence / location                                                                                                                  |
+| --------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Research present and current            | **PASS**   | `.llm/tmp/run/chore-release-one-shot--tooling/research.md` re-baselined vs main. Spot-checks above.                                  |
+| Decisions locked                        | **PASS**   | D1–D6 all present; D3 REVISED cycle 2 narrows pattern + pins two-pass resolver; D2 names exact edit sites; D4 pins artifact handoff; D5 names `agentic:sync-claude` tasks. |
+| Open-decision sweep                     | **PASS**   | Only residual gaps are IMPL-discoverable (`entry.md:59-60` doc nit; source-root filter). Risk register covers multi-hop indirection. |
+| Commit slices (< 30, gate + files each) | **PASS**   | 5 slices; S2 expanded to enumerate fixtures and pattern narrowing.                                                                   |
+| Risk register                           | **PASS**   | D3 cross-line miss class + D3 false-positive risk + alpha.12 live-verification follow-up.                                            |
+| Gate set selected                       | **PASS**   | run-deno-check + run-deno-lint + run-deno-fmt + unit tests + `release:cut --dry-run` + actionlint + IMPL-EVAL.                       |
+| Deferred scope explicit                 | **PASS**   | D6 non-goals enumerated.                                                                                                              |
+| jsr-audit surface scan (pkg/plugin)     | **N/A**    | SCOPE-tools; the preflight tool's *output* gates JSR publishability of downstream cuts but the plan itself doesn't change package surfaces. |
 
 ## Verdict
 
-`FAIL_PLAN`
+`PASS`
 
-### Required fixes (cycle 1 of 2)
+## IMPL notes (not blocking, but worth flagging)
 
-1. **D3 pattern scope — narrow to reads only.** Rewrite the plan's pattern list to scan only
-   `Deno.readTextFile(<arg>)` and `Deno.readFile(<arg>)` calls. Drop `fromFileUrl(`,
-   `import.meta.resolve(`, and bare `new URL(..., import.meta.url)` from the scan. Update the unit
-   tests to reflect the narrower pattern (the only inline `new URL(...)+readTextFile` case in the
-   tree is `packages/service/tests/_fixtures/readme-examples_test.ts:3`, which is a test file and
-   may be excluded by the "publishable members" filter — if so, the inline fixture must be
-   synthetic).
-2. **D3 cross-line detection — pin the two-pass approach.** Specify that the tool collects
-   `const <name> = new URL(..., import.meta.url)` assignments first, then flags `Deno.readTextFile
-   (<name>)` / `Deno.readFile(<name>)` references. Add a positive fixture that mimics
-   `openapi.ts:29 → 155` (URL declared on one line, read on another). This is the load-bearing
-   fixture for #133; without it, the preflight can be silently green on a real violation.
-3. **D3 risk register entry.** Add an explicit risk: "D3 cross-line miss class (e.g.
-   `openapi.ts:29 → 155`); mitigation = two-pass scan + cross-line positive fixture".
-
-### Optional clarifications (non-blocking)
-
-4. **D4 version resolution** — either pin a concrete approach (recommend `actions/upload-artifact`
-   in `publish.yml` + `actions/download-artifact` in `e2e-cli-prod.yml`) or explicitly defer to
-   IMPL. Either way, the IMPL session should not have to invent the lookup strategy.
-5. **D5 `.claude/skills/` wording** — replace "mirror to `.claude/skills/`" with "add to
-   `.agents/skills/`, run `deno task agentic:sync-claude`, gate via `deno task agentic:sync-claude
-   :check`".
-6. **D2 doc-comment + README** — explicitly list `.llm/tools/README.md:99` and
-   `prod-install.ts:6–7` in S1's file list (replace the `--frozen` claim in the rationale, since
-   the rationale — frozen is desired — survives, but the flag does not).
-
-After the plan addresses fixes 1–3, I will issue `PASS` on cycle 2.
+1. **D2 doc nit** — After dropping `--frozen`, grep `git grep -nF -- '--frozen' .llm/tools/` to confirm zero
+   remaining mentions. Likely catches `entry.md:59-60` (also a documentation file in the same set as
+   `README.md:99`).
+2. **D3 source-root filter** — Decide whether "source `.ts`/`.tsx` only" means (a) files reachable from
+   `exports:` in deno.json, (b) all `.ts`/`.tsx` outside `tests/`, or (c) all `.ts`/`.tsx`. The IMPL
+   session should pick the option that excludes test fixtures with inline-form `Deno.readTextFile(new
+   URL(...))` (e.g., `readme-examples_test.ts:3`).
+3. **D3 multi-hop test** — The positive fixture mirrors `openapi.ts:29→155` (one hop). Consider also a
+   negative fixture for the multi-hop case (`const x = new URL(...); const y = x; readTextFile(y)`) that
+   the tool should NOT flag, documenting the known limitation in code rather than only in the plan.
+4. **D4 artifact name** — Use a versioned artifact name like `netscript-published-version-<run-id>` to
+   avoid collision with other artifacts if the workflow grows.
 
 ## Notes
 
-- The plan is **substantively correct** for D1, D2, D4, D5, D6 and the scope/lane. The single
-  decision that blocks PASS is D3's scan-pattern design — and D3 is the gate the rest of the
-  release flow depends on, so getting it right at PLAN level (not IMPL level) is the right place
-  to pay the cost.
-- D1's lock-rewrite safety is **empirically verified** on a live copy of main (32-member bump +
-  sed + `deno ci` exit 0). The plan's confidence here is justified.
-- D4's race analysis is correct. The version-resolution nit is the only thing I'd flag for IMPL
-  ergonomics; it does not affect Plan-Gate.
-- Two `FAIL_PLAN` cycles allowed; this is cycle 1.
+- Cycle-1 verdict (`FAIL_PLAN`) was correct in identifying D3 as the sole blocker. The cycle-2 revision
+  correctly addresses all three required fixes (narrowed pattern, two-pass resolver, risk register) and
+  folds all three optional clarifications (D4 artifact handoff, D5 `agentic:sync-claude`, D2 edit sites).
+- The two-pass resolver is correct for the production defect class (`openapi.ts:29 → 155`). The risk
+  register is honest about its limits (multi-hop indirection, false-positive drift).
+- The plan is now ready for IMPL. Two `FAIL_PLAN` cycles allowed; only one was needed.
