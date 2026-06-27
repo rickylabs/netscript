@@ -20,6 +20,7 @@ import { DatabaseWorkspaceMutator } from '../../../kernel/adapters/database/work
 import { resolveManifest } from '../../../kernel/adapters/deploy/commands/manifest-command.ts';
 import { DenoProcess } from '../../../kernel/adapters/runtime/process/deno-process.ts';
 import { DenoFileSystem } from '../../../kernel/adapters/runtime/file-system/deno-file-system.ts';
+import { DryRunFileSystemAdapter } from '../../../kernel/adapters/scaffold/dry-run-fs.ts';
 import { Scaffolder } from '../../../kernel/adapters/scaffold/scaffolder.ts';
 import { StringTemplateAdapter } from '../../../kernel/adapters/scaffold/template-adapter.ts';
 import { PluginRegistryScaffolder } from '../../../kernel/adapters/plugin/registry-scaffolder.ts';
@@ -37,6 +38,8 @@ import { ServyCliAdapter } from '../../adapters/servy-cli.ts';
 import type { ServiceManifest } from '../../ports/service-manifest-port.ts';
 import type { GeneratePluginRegistriesCommandDependencies } from '../generate/plugins/generate-plugin-registries-command.ts';
 import type { GenerateRuntimeSchemasCommandDependencies } from '../generate/runtime-schemas/generate-runtime-schemas-command.ts';
+import type { InitPipelineContext } from '../../../kernel/application/scaffold/context.ts';
+import type { FileSystemPort } from '../../../kernel/ports/file-system-port.ts';
 import { createPluginDispatchPort } from '../plugins/dispatch/dispatch-plugin-verb.ts';
 import type { PluginDispatchPort } from '../plugins/dispatch/plugin-dispatch-port.ts';
 import type { DoctorPluginCommandDependencies } from '../plugins/doctor/doctor-plugin-command.ts';
@@ -70,17 +73,8 @@ export interface PublicCommandDependencies {
   /** Dependencies for public init. */
   readonly initCommandDependencies: {
     readonly defaultProjectName: () => string;
-    readonly initContext: {
-      readonly scaffolder: Scaffolder;
-      readonly fs: DenoFileSystem;
-      readonly templateAdapter: StringTemplateAdapter;
-      readonly process: DenoProcess;
-      readonly jsrResolver: JsrImportResolver;
-      readonly cwd: () => string;
-      readonly resolveModeFields: () => Record<string, never>;
-      readonly packagesAsWorkspaceMembers: () => false;
-      readonly scaffoldWorkspacePackages: () => Promise<ReturnType<typeof emptyScaffoldResult>>;
-    };
+    readonly initContext: InitPipelineContext;
+    readonly createInitContext: (options: { readonly dryRun: boolean }) => InitPipelineContext;
   };
   /** Dependencies for Fresh UI registry installation commands. */
   readonly uiInstallDependencies: {
@@ -190,6 +184,22 @@ export function createPublicCommandDependencies(
     }),
     serviceScaffolder: new ServiceScaffolder(scaffolder, fs, templateAdapter),
   };
+  const createInitContext = (initFs: FileSystemPort): InitPipelineContext => {
+    const initTemplateAdapter = new StringTemplateAdapter(initFs);
+    const initScaffolder = new Scaffolder(initTemplateAdapter, initFs);
+    return {
+      scaffolder: initScaffolder,
+      fs: initFs,
+      templateAdapter: initTemplateAdapter,
+      process,
+      jsrResolver: new JsrImportResolver(),
+      cwd: host.cwd,
+      resolveModeFields: () => ({}),
+      packagesAsWorkspaceMembers: () => false,
+      scaffoldWorkspacePackages: () => Promise.resolve(emptyScaffoldResult()),
+    };
+  };
+  const initContext = createInitContext(fs);
 
   return {
     fs,
@@ -202,17 +212,9 @@ export function createPublicCommandDependencies(
     resolveProjectRoot,
     initCommandDependencies: {
       defaultProjectName: () => host.cwd().split(/[/\\]/).pop() ?? 'my-app',
-      initContext: {
-        scaffolder,
-        fs,
-        templateAdapter,
-        process,
-        jsrResolver: new JsrImportResolver(),
-        cwd: host.cwd,
-        resolveModeFields: () => ({}),
-        packagesAsWorkspaceMembers: () => false,
-        scaffoldWorkspacePackages: () => Promise.resolve(emptyScaffoldResult()),
-      },
+      initContext,
+      createInitContext: ({ dryRun }) =>
+        dryRun ? createInitContext(new DryRunFileSystemAdapter(fs)) : initContext,
     },
     uiInstallDependencies: { fs },
     dbOperationDependencies: { cwd: host.cwd },
