@@ -9,3 +9,5 @@ Format:
 ```
 
 ## Log
+
+- 92c0468b: Add scaffold service health e2e probe
