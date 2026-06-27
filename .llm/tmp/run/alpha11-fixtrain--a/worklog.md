@@ -36,7 +36,7 @@
 
 | Item | Result | Notes |
 | --- | --- | --- |
-| Merge commit | `fdd1b58a5b4b16bbbe4976fe06c1f2a39fbc9148` | Reconciled `fix/cli-core-alpha11-a` with `origin/main`. |
+| Merge commit | `0d9760dd18b06d65597436163bdcc34ac7f96483` | Reconciled `fix/cli-core-alpha11-a` with `origin/main`. |
 | Harness conflicts | Resolved | Kept branch content for `.llm/tmp/run/alpha11-fixtrain--a/drift.md`, `plan.md`, and `research.md`. |
 | `init-command.ts` | Resolved | Kept main's interactive init/cache option flow and Slice A's dry-run context selection before `executeInit`. |
 | `public-command-dependencies.ts` | Resolved | Kept main's `CliffyPrompt` dependency and Slice A's `createInitContext({ dryRun })` `DryRunFileSystemAdapter` swap. |
