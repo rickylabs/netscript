@@ -14,6 +14,8 @@ const EDITOR_CHOICES: readonly EditorChoice[] = ['none', 'zed', 'vscode'];
 export interface InitCommandDependencies {
   /** Application context for the scaffold pipeline. */
   readonly initContext: InitPipelineContext;
+  /** Create the scaffold pipeline context for a parsed init invocation. */
+  readonly createInitContext?: (options: { readonly dryRun: boolean }) => InitPipelineContext;
   /** Default name when the command is invoked without an argument. */
   readonly defaultProjectName: ProjectNameResolver;
 }
@@ -74,7 +76,9 @@ export function createInitCommand(
       const includeService = options.service === true ||
         options.serviceName !== undefined ||
         options.servicePort !== undefined;
-      await executeInit(dependencies.initContext, {
+      const dryRun = options.dryRun ?? false;
+      const initContext = dependencies.createInitContext?.({ dryRun }) ?? dependencies.initContext;
+      await executeInit(initContext, {
         name: nameArg ?? dependencies.defaultProjectName(),
         appName: options.appName,
         path: options.path,
@@ -83,7 +87,7 @@ export function createInitCommand(
         force: options.force ?? false,
         ci: options.ci ?? false,
         yes: options.yes ?? false,
-        dryRun: options.dryRun ?? false,
+        dryRun,
         json: options.json ?? false,
         from: options.from,
         noGit: options.git === false,
