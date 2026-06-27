@@ -1,0 +1,400 @@
++123|| 
+-------------------------------------------------------------------------- | 
+------ |
++124|| `deno bump-version prerelease` updates 32 members                        
+| ✓      |
++125|| `deno bump-version` does NOT update root `deno.json` `"version"`         
+| ✓      |
++126|| `deno bump-version` does NOT update `deno.lock` `@netscript/*` ranges    
+| ✓      |
++127|| `sed '0.0.1-alpha.11/0.0.1-alpha.12/' deno.lock` + `deno ci` → exit 0    
+| ✓      |
++128|| `deno ci --frozen` on 2.9.0 → `unexpected argument '--frozen' found`     
+| ✓      |
++129|| `publish.yml` + `e2e-cli-prod.yml` both trigger on `release: 
+types:[published]` | ✓      |
++130|| `new URL(..., import.meta.url)` in `packages/`+`plugins/`                
+| 21 hits |
++131|| `Deno.readTextFile(new URL(...))` on a single line                       
+| 1 hit (test fixture) |
++132|| Cross-line `new URL` decl + `readTextFile` use (e.g. `openapi.ts:29 → 
+155`)  | ✓ found |
++133|
++134|## Responses to PR comments
++135|
++136|No PR comments were addressed by this evaluator pass. The verdict is 
+directed at the plan author
++137|for cycle 2.
++138|
++139|## Remaining risks
++140|
++141|- **D3 false-positives** if the plan is not narrowed: ~21+ false positives 
+per run on the current
++142|  tree. CI noise → ignores → missed real violations.
++143|- **D3 false-negatives** if the cross-line case is not addressed: the 
+historical prod-CLI break
++144|  class slips through. The preflight tool is then silently green on a real 
+violation, defeating
++145|  #133's purpose.
++146|- **D4 version lookup fragility** (non-blocking at PLAN level; flag for 
+IMPL ergonomics).
++147|
+[end of edit 1 / 1]
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify outputs exist
+
+Thought:
+Now let me verify the plan-eval.md file was written correctly and the summary.md
+is the workflow-consumed file:
+
+$ cd /home/runner/work/netscript/netscript && wc -l 
+.llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md 
+/home/runner/work/_temp/openhands/28304587059-1/summary.md
+
+Tokens: ↑ input 7.21M • cache hit 94.85% •  reasoning 4.12K • ↓ output 64.2K • $
+0.5984
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+276 .llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md
+  146 /home/runner/work/_temp/openhands/28304587059-1/summary.md
+  422 total
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Confirm verdict header in eval artifact
+
+$ cd /home/runner/work/netscript/netscript && head -3 
+.llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md && echo "---verdict 
+line:" && grep -n "^## Verdict" 
+.llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md && sed -n '198,210p' 
+.llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md
+
+Tokens: ↑ input 7.24M • cache hit 94.87% •  reasoning 4.12K • ↓ output 64.35K • 
+$ 0.6010
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+# PLAN-EVAL — chore-release-one-shot--tooling
+
+- Plan evaluator session: openhands / minimax-M3 / 2026-06-29
+---verdict line:
+231:## Verdict
+  - S4 (D4): workflow change + actionlint. ✓
+  - S5 (D5): skill + AGENTS.md + sync-claude. ✓
+- **Gates**: lint + fmt + run-deno-check + unit tests + `release:cut --dry-run` 
+proof +
+  actionlint. Includes the explicit `--dry-run` proof of the bump path (S3), 
+which is the right
+  gate for D1.
+- **Slices are independently committable**: each slice's diff is scoped to its 
+decision (S1: 1 file;
+  S2: 1 tool + 1 task + 1 workflow line; S3: 1 tool + 1 task; S4: 1 workflow; 
+S5: 1 skill + 1
+  AGENTS.md line). ✓
+
+## Open-decision sweep (evaluator-run)
+
+| Decision the plan left open                                                   
+| Forces rework if deferred? | Required fix                                     
+|
+| 
+--------------------------------------------------------------------------------
+----------------------------------- | -------------------------- | 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+------------------------------------------------------------|
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: View verdict block
+
+$ cd /home/runner/work/netscript/netscript && sed -n '231,245p' 
+.llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md
+
+Tokens: ↑ input 7.28M • cache hit 94.90% •  reasoning 4.12K • ↓ output 64.44K • 
+$ 0.6035
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+## Verdict
+
+`FAIL_PLAN`
+
+### Required fixes (cycle 1 of 2)
+
+1. **D3 pattern scope — narrow to reads only.** Rewrite the plan's pattern list 
+to scan only
+   `Deno.readTextFile(<arg>)` and `Deno.readFile(<arg>)` calls. Drop 
+`fromFileUrl(`,
+   `import.meta.resolve(`, and bare `new URL(..., import.meta.url)` from the 
+scan. Update the unit
+   tests to reflect the narrower pattern (the only inline `new 
+URL(...)+readTextFile` case in the
+   tree is `packages/service/tests/_fixtures/readme-examples_test.ts:3`, which 
+is a test file and
+   may be excluded by the "publishable members" filter — if so, the inline 
+fixture must be
+   synthetic).
+2. **D3 cross-line detection — pin the two-pass approach.** Specify that the 
+tool collects
+   `const <name> = new URL(..., import.meta.url)` assignments first, then flags 
+`Deno.readTextFile
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check trace dir creation
+
+Thought:
+Now let me also create a small trace metadata artifact per the contract: "The 
+workflow records durable trace metadata under 
+.llm/tmp/run/openhands/pr-164/run-28304587059-1." Let me check if the workflow 
+creates it or if I should:
+
+$ cd /home/runner/work/netscript/netscript && grep -B 1 -A 5 
+"RUN_DIR\|trace_dir\|run-.*-\$\{" .github/workflows/openhands-agent.yml | head 
+-30
+
+Tokens: ↑ input 7.32M • cache hit 94.92% •  reasoning 4.12K • ↓ output 64.6K • $
+0.6061
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+grep: Unmatched \{
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check trace dir creation
+
+$ cd /home/runner/work/netscript/netscript && grep -n 
+"OPENHANDS_TRACE_DIR\|trace_dir" .github/workflows/openhands-agent.yml | head 
+-10
+
+Tokens: ↑ input 7.36M • cache hit 94.94% •  reasoning 4.12K • ↓ output 64.69K • 
+$ 0.6087
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+302:          
+trace_dir=".llm/tmp/run/openhands/${safe_scope}/run-${GITHUB_RUN_ID}-${GITHUB_RU
+N_ATTEMPT}"
+305:          mkdir -p "$run_dir" "$trace_dir"
+312:            echo "trace_dir=$trace_dir"
+326:            echo "OPENHANDS_TRACE_DIR=$trace_dir"
+351:          mkdir -p "$OPENHANDS_RUN_DIR" "$OPENHANDS_TRACE_DIR"
+376:          - The workflow records durable trace metadata under 
+${OPENHANDS_TRACE_DIR}.
+387:          cp "$OPENHANDS_REQUEST_PATH" "$OPENHANDS_TRACE_DIR/request.md"
+514:          mkdir -p "$OPENHANDS_RUN_DIR" "$OPENHANDS_TRACE_DIR"
+597:              "trace_dir": os.environ["OPENHANDS_TRACE_DIR"],
+603:          cp "$OPENHANDS_SUMMARY_PATH" "$OPENHANDS_TRACE_DIR/summary.md"
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Verify no source changes
+
+Thought:
+OK — the workflow itself creates the trace dir and copies summary.md into it. I 
+don't need to write there. Good.
+
+Let me also ensure I haven't accidentally committed anything (I haven't — I only
+created two new files: the plan-eval.md and the summary.md, and modified 
+nothing):
+
+$ cd /home/runner/work/netscript/netscript && git status --short 2>/dev/null | 
+head -20
+
+Tokens: ↑ input 7.4M • cache hit 94.96% •  reasoning 4.12K • ↓ output 64.82K • $
+0.6113
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+M .llm/tmp/run/openhands/pr-17/run-27493382997-1/request.md
+ M .llm/tmp/run/openhands/pr-25/run-27305429810-1/request.md
+ M .llm/tmp/run/openhands/pr-32/run-27433712260-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454103300-1/request.md
+ M .llm/tmp/run/openhands/pr-35/run-27454169329-1/request.md
+ M .llm/tmp/run/openhands/pr-37/run-27454273181-1/request.md
+?? .llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+✅ Exit code: 0
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Check bump test sandbox
+
+Thought:
+Untracked file `.llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md` is 
+the only file I created in the repo workspace (the `M` entries are pre-existing 
+from prior runs). No source changes. Per the contract: "Uncommitted workspace 
+files are committed back to the branch automatically when the run ends, even if 
+you run out of budget."
+
+Let me also quickly verify the bump-test sandbox I created earlier isn't in the 
+repo workspace:
+
+$ ls -d /tmp/netscript-bump-test 2>/dev/null && echo "sandbox exists outside 
+repo workspace"
+
+Tokens: ↑ input 7.44M • cache hit 94.99% •  reasoning 4.12K • ↓ output 65K • $ 
+0.6140
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: terminal
+Result:
+
+📁 Working directory: /home/runner/work/netscript/netscript
+🐍 Python interpreter: /opt/hostedtoolcache/Python/3.13.14/x64/bin/python
+❌ Exit code: 2
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Mark all tasks done
+
+Thought:
+OK — sandbox already cleaned up (or wasn't created in this session, doesn't 
+matter; it's outside the repo workspace anyway). 
+
+Let me update the task tracker and finish:
+
+📋 Update Task List (10 tasks)
+
+Tokens: ↑ input 7.48M • cache hit 95.01% •  reasoning 4.12K • ↓ output 65.51K • 
+$ 0.6171
+
+Observation ────────────────────────────────────────────────────────────────────
+
+Tool: task_tracker
+Result:
+✅ Task list updated: 10 done
+
+✅ 1. D1 (release:cut, #122) — judge
+✅ 2. D2 (drop --frozen, #146) — judge
+✅ 3. D3 (text-import preflight, #133) — judge
+✅ 4. D4 (workflow_run gate, #123) — judge
+✅ 5. D5 (release skill) — judge
+✅ 6. D6 (non-goals) — judge
+✅ 7. Scope/lane — judge
+✅ 8. Plan-Gate checklist tally
+✅ 9. Write plan-eval.md verdict artifact
+   Notes: Wrote .llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md (276 
+lines) with verdict FAIL_PLAN, per-decision findings, required fixes.
+✅ 10. Post pr-comment summary
+   Notes: Wrote /home/runner/work/_temp/openhands/28304587059-1/summary.md (146 
+lines). Workflow owns posting to GitHub.
+
+Agent Action ───────────────────────────────────────────────────────────────────
+
+Summary: Plan-EVAL FAIL_PLAN cycle 1 verdict emitted
+
+Finish with message:
+## PLAN-EVAL complete — `FAIL_PLAN` (cycle 1 of 2)
+
+I read `research.md` + `plan.md`, ground-truthed every claim against current 
+`main` (Deno 2.9.0, post-alpha.11), and produced the verdict.
+
+### Verdict: `FAIL_PLAN`
+
+D1, D2, D4, D5, D6 are sound and the scope/lane is correct. **The single blocker
+is D3 (text-import preflight, #133)** — it has two independent defects:
+
+1. **Over-broad** — `fromFileUrl(`, `import.meta.resolve(`, and bare `new 
+URL(..., import.meta.url)` are URL/path constructors, not reads. Including them 
+flags ~21 non-reads in the current tree (`packages/` + `plugins/`); the 
+"allowlist via annotation" mitigation is unbounded.
+2. **Under-broad** — the historical prod-CLI break class 
+(`packages/service/src/primitives/openapi.ts:29 → 155`: URL declared on one 
+line, `Deno.readTextFile(scalarJsUrl)` on another) is invisible to a single-line
+regex. The only inline `new URL(...)+readTextFile` hit is a test fixture.
+
+### Live verifications (against current main)
+
+- `deno bump-version prerelease` updates 32 members but **not** root `deno.json`
+`"version"` and **not** `deno.lock` `0.0.1-alpha.11` refs (43 of them). D1's 
+framing is correct.
+- `sed '0.0.1-alpha.11/0.0.1-alpha.12/' deno.lock` + `deno ci` → exit 0. 
+Lock-rewrite is safe without `--reload`.
+- `deno ci --frozen` on 2.9.0 → `unexpected argument '--frozen' found`. 
+`prod-install.ts:28` is the only fix site.
+- Both `publish.yml` and `e2e-cli-prod.yml` trigger on `release: 
+types:[published]` concurrently. The race is real.
+
+### Required fixes (cycle 2 will issue `PASS` if all are addressed)
+
+1. **D3 — narrow the pattern set** to `Deno.readTextFile(<arg>)` / 
+`Deno.readFile(<arg>)` only.
+2. **D3 — pin the cross-line detection** (recommend two-pass scan: collect 
+`const <name> = new URL(..., import.meta.url)`; flag `Deno.readTextFile(<name>)`
+/ `Deno.readFile(<name>)`). Add a positive fixture mirroring `openapi.ts:29 → 
+155`.
+3. **D3 — add the risk to the risk register** (cross-line miss class; mitigation
+= two-pass scan + cross-line fixture).
+
+Optional clarifications (non-blocking at PLAN level, flagged for IMPL 
+ergonomics): pin D4's version-resolution API (recommend 
+`actions/upload-artifact` + `download-artifact`); reword D5 ("add to 
+`.agents/skills/`, run `agentic:sync-claude`, gate via 
+`agentic:sync-claude:check`"); enumerate D2 file list (README line 99 + 
+doc-comment at `prod-install.ts:6–7`).
+
+### Deliverables
+
+- `.llm/tmp/run/chore-release-one-shot--tooling/plan-eval.md` — full verdict 
+artifact (276 lines, per-decision findings, open-decision sweep, risk register 
+notes).
+- `/home/runner/work/_temp/openhands/28304587059-1/summary.md` — 
+workflow-consumed PR-comment body (146 lines).
+- **No source changes.** Plan evaluation only.
+
+### Workflow handles
+
+- The workflow reads `summary.md` and posts it as the PR comment on PR #164 
+(with model + trace headers per `openhands-agent.yml:751–757`).
+- Trace metadata (summary.md copy, metadata.json) is written by the workflow 
+into `.llm/tmp/run/openhands/pr-164/run-28304587059-1/` per 
+`openhands-agent.yml:302–351`.
+
+Plan author can take cycle 1 fixes back; this evaluator session is complete.
+
+Tokens: ↑ input 7.52M • cache hit 95.03% •  reasoning 4.12K • ↓ output 66.45K • 
+$ 0.6208
+
