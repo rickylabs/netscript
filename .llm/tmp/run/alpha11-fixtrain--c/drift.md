@@ -21,3 +21,4 @@
 - **Severity:** minor
 - **Action:** defer and record architecture debt.
 - **Evidence:** `.llm/harness/debt/arch-debt.md`, focused generator tests.
+

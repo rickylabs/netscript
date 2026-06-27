@@ -58,3 +58,4 @@ missing values, and scaffold Redis/Garnet/Deno KV cache config without changing 
 | 4 | Scoped fmt | `deno run --allow-read --allow-run .llm/tools/run-deno-fmt.ts --root packages/cli --ext ts --batch-size 1000` | PASS |
 | 5 | Unit tests | focused init, appsettings, register-infrastructure, Aspire schema tests | PASS |
 | 6 | E2E | `deno task e2e:cli run scaffold.runtime --cleanup --format pretty` | PASS before PR |
+
