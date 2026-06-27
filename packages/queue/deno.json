@@ -1,6 +1,6 @@
 {
   "name": "@netscript/queue",
-  "version": "0.0.1-alpha.10",
+  "version": "0.0.1-alpha.11",
   "description": "Provider-agnostic message queue abstraction wrapping Fedify adapters for Deno KV, Redis, and RabbitMQ.",
   "license": "MIT",
   "exports": {
