@@ -22,7 +22,7 @@ are aggregated into a single generated client over one primary datasource.
 {{ comp callout { type: "important", title: "Aspire is step 2 — before any db command" } }}
 Every <code>netscript db</code> command talks to Postgres <strong>through Aspire</strong>.
 In the default layout Postgres is a container that <strong>Aspire</strong> provisions, so
-<code>cd aspire &amp;&amp; aspire run</code> must be up <strong>before</strong> you run
+<code>cd aspire &amp;&amp; aspire start</code> must be up <strong>before</strong> you run
 <code>netscript db init</code>. Run a <code>db</code> command against a stopped AppHost and
 it fails with <code>aspire start failed: … Project file does not exist</code>. That is the
 dependency, not a bug — bring orchestration up first, then run the db workflow from the
@@ -32,9 +32,11 @@ workspace root. See <a href="/explanation/aspire/">Orchestration with Aspire</a>
 {{ comp callout { type: "tip", title: "Use this when" } }}
 Reach for the database layer when you need <strong>durable, relational state</strong> —
 records that survive restarts, are queried with a typed client, and are shared across your
-service and its plugins. For <em>ephemeral or high-throughput</em> state (counters, locks,
+service and its plugins. The engine is polyglot: pick it at scaffold time with
+<code>--db</code> — Postgres (the default; or <code>mysql</code> / <code>mssql</code> /
+<code>sqlite</code>). For <em>ephemeral or high-throughput</em> state (counters, locks,
 work queues, scheduled triggers) reach for <a href="/capabilities/kv-queues-cron/">KV,
-queues &amp; cron</a> instead; the scaffold uses both — Postgres for records, Garnet/KV for
+queues &amp; cron</a> instead; the scaffold uses both — Postgres for records, Redis/KV for
 execution state. Postgres can <em>also</em> back the work queue itself — see <a
 href="/capabilities/kv-queues-cron/">the Postgres queue backend</a> below.
 {{ /comp }}
@@ -48,9 +50,14 @@ href="/capabilities/kv-queues-cron/">the Postgres queue backend</a> below.
 
 ## How persistence is wired
 
-The default `--db postgres` scaffold lays down a `database/postgres/` workspace. A few
-facts are worth internalizing before you run anything, because they differ from a typical
-single-file Prisma setup.
+The scaffold engine is chosen with the `--db` flag —
+`netscript init my-app --db postgres|mysql|mssql|sqlite`. Postgres is the recommended
+default (and what every tutorial uses); `mysql`, `mssql`, and `sqlite` are first-class
+alternatives. `postgres` / `mysql` / `mssql` provision an Aspire container; `sqlite` is
+file-backed with **no** Aspire container resource. The default `--db postgres` scaffold
+lays down a `database/postgres/` workspace (a different engine lays down
+`database/<engine>/`). A few facts are worth internalizing before you run anything, because
+they differ from a typical single-file Prisma setup.
 
 ```text
 my-app/
@@ -116,7 +123,7 @@ the matching migration.
 
 ## The database workflow
 
-With `aspire run` up (Postgres reachable), run the public `netscript db` commands from the
+With `aspire start` up (Postgres reachable), run the public `netscript db` commands from the
 workspace root in this order. The first three are the create-and-fill cycle; `status`
 confirms it landed and `migrate` evolves the schema later.
 
@@ -311,20 +318,20 @@ Aspire resources and the connection-string env vars the workspace resolves.
   caption: "Database surface (provisioned by Aspire)",
   rows: [
     { name: "postgres", type: "Aspire resource", desc: "The Postgres container Aspire provisions from appsettings.json NetScript.Databases.postgres. Watch it go green in the dashboard." },
-    { name: "garnet", type: "Aspire resource", desc: "Garnet cache backing KV/queues — a separate concern from Postgres; see KV, queues & cron." },
-    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire run`) — confirm the postgres resource is healthy." },
+    { name: "redis", type: "Aspire resource", desc: "Redis cache — the default `--cache-backend`; Redis-compatible — backing KV/queues. A separate concern from Postgres; see KV, queues & cron. (`garnet` and `deno-kv` are alternative backends.)" },
+    { name: "http://localhost:18888", type: "dashboard", desc: "Aspire dashboard (token printed by `aspire start`) — confirm the postgres resource is healthy." },
     { name: "POSTGRES_URI / DATABASE_URL", type: "env", desc: "Connection string resolved by prisma.config.ts and normalized to a URL. Set these yourself under --no-aspire." }
   ]
 }) }}
 
 {{ comp callout { type: "warning", title: "Production pitfalls" } }}
 <ul>
-<li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire run</code> up. Start orchestration first, from the <code>aspire/</code> folder.</li>
-<li><strong>Wrong directory.</strong> Run <code>aspire run</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace <strong>root</strong> (or pass <code>--project-root</code>).</li>
+<li><strong>Forgetting Aspire.</strong> The most common failure: running <code>netscript db init</code> with no <code>aspire start</code> up. Start orchestration first, from the <code>aspire/</code> folder.</li>
+<li><strong>Wrong directory.</strong> Run <code>aspire start</code> from <code>aspire/</code>, but run the <code>netscript db</code> commands from the workspace <strong>root</strong> (or pass <code>--project-root</code>).</li>
 <li><strong>Stale client after a schema change.</strong> Editing a <code>.prisma</code> file without re-running <code>netscript db generate</code> leaves your code typed against the old model.</li>
 <li><strong>Calling getClient() before setClient().</strong> A second-database adapter throws until you hand it the constructed <code>PrismaClient</code> via <code>setClient()</code>.</li>
 <li><strong>Tracing wired too late.</strong> <code>enablePrismaTracing()</code> must run <em>before</em> the first <code>PrismaClient</code> is constructed, or early query spans are lost.</li>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres and Garnet as containers; if Docker/Podman is down the <code>postgres</code> resource never goes green.</li>
+<li><strong>Docker not running.</strong> Aspire provisions Postgres and Redis as containers; if Docker/Podman is down the <code>postgres</code> resource never goes green.</li>
 </ul>
 {{ /comp }}
 
@@ -370,7 +377,7 @@ lane that matches what you're doing.
   },
   {
     title: "Understand — Orchestration with Aspire",
-    body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Garnet, and how the resource graph fits together.",
+    body: "Why the AppHost (aspire/apphost.mts) provisions Postgres and Redis, and how the resource graph fits together.",
     href: "/explanation/aspire/",
     icon: "◎"
   },

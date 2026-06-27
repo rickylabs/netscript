@@ -9,7 +9,8 @@ next: { label: "1 · Scaffold", href: "/tutorials/workspace/01-scaffold/" }
 # Team Workspace
 
 This track builds an **authenticated team-workspace backend** from an empty folder to a running,
-session-protected app under Aspire. You will scaffold a workspace, sign users in through a pluggable
+session-protected app under Aspire. You will scaffold a workspace (Postgres by default, swappable to
+`mysql`, `mssql`, or `sqlite` via `--db`), sign users in through a pluggable
 auth backend, give the workspace its own isolated database, provision new members with a background
 job, and gate your service routes with the real `.withAuthz()` seam. It is one continuous app — your
 `my-workspace/` grows with every chapter.
@@ -26,7 +27,7 @@ job, and gate your service routes with the real `.withAuthz()` seam. It is one c
 ## What you will build
 
 By the end of this track you will have a NetScript workspace that signs a real user in through an
-OAuth/OIDC provider, mints a session cookie, stores workspace records in their own isolated Postgres,
+OAuth/OIDC provider, mints a session cookie, stores workspace records in their own isolated Postgres (the default; or `mysql` / `mssql` / `sqlite` via `--db`),
 provisions a new member off the request path with a background job, and rejects unauthenticated
 requests to its guarded routes with a `401` — all running locally under one Aspire dashboard. The
 central idea: **authentication in NetScript is a pluggable backend, a session, and a route-authz
@@ -62,7 +63,7 @@ Three ideas carry the whole track, and each chapter adds exactly one:
 You should be comfortable with the basics from the [core tutorial ladder](/tutorials/) — scaffolding
 a workspace, the contract → service flow, and bringing up Aspire. This track does not re-teach those;
 it assumes you can scaffold and boot, then layers authentication on top. If `netscript init` and
-`aspire run` are new to you, walk the [Quickstart](/quickstart/) first.
+`aspire start` are new to you, walk the [Quickstart](/quickstart/) first.
 
 ## The six chapters
 

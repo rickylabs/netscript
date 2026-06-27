@@ -28,9 +28,9 @@ factory resolves. This recipe is about making that choice deliberately.
     desc: "Created per the Quickstart. Import @netscript/queue from any workspace member."
   },
   {
-    name: "Aspire running (for real backends)",
-    type: "cd aspire && aspire run",
-    desc: "Aspire provisions Postgres, Garnet/Redis, and any AMQP broker BEFORE your service connects. The in-memory and Deno KV adapters need nothing extra; Redis, RabbitMQ, and the Postgres queue all expect Aspire up first."
+    name: "aspire startning (for real backends)",
+    type: "cd aspire && aspire start",
+    desc: "Aspire provisions Postgres, Redis/Garnet, and any AMQP broker BEFORE your service connects. The in-memory and Deno KV adapters need nothing extra; Redis, RabbitMQ, and the Postgres queue all expect Aspire up first."
   },
   {
     name: "Deno KV unstable flag",

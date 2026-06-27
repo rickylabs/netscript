@@ -8,14 +8,14 @@ templateEngine: [vento, md]
 
 From nothing to a running NetScript workspace you can watch boot — in about five
 minutes. Three commands: **install** the CLI, **scaffold** a project, then bring it
-up under **Aspire**, which starts Postgres and Garnet for you *before* anything else
+up under **Aspire**, which starts Postgres and a shared cache (`redis` by default, or `garnet` / `deno-kv` via `--cache-backend`) for you *before* anything else
 and hands you a real dashboard, distributed traces, and a handful of example routes
 on the very first run.
 
 {{ comp callout { type: "note", title: "Prerequisites" } }}
 You need <strong><a href="https://docs.deno.com">Deno</a> 2.x</strong> on your PATH (check with <code>deno --version</code>).
 The default path also uses <strong><a href="https://learn.microsoft.com/dotnet/aspire/">.NET Aspire</a></strong>
-to orchestrate Postgres, Garnet, and your services — install the <code>aspire</code> CLI if you don't have it,
+to orchestrate Postgres, Redis, and your services — install the <code>aspire</code> CLI if you don't have it,
 or skip orchestration entirely with <code>--no-aspire</code> (see the aside in step 3).
 {{ /comp }}
 
@@ -29,7 +29,7 @@ change as we move toward beta. Pin versions in real projects.
   steps: [
     { label: "Install the CLI", detail: "One global install puts a netscript command on your PATH." },
     { label: "Scaffold a workspace", detail: "netscript init lays down the whole opinionated repo." },
-    { label: "Start it under Aspire", detail: "cd aspire && aspire run brings up Postgres, Garnet, and the dashboard." }
+    { label: "Start it under Aspire", detail: "cd aspire && aspire start brings up Postgres, Redis, and the dashboard." }
   ]
 }) }}
 
@@ -42,18 +42,18 @@ The CLI is published to JSR as `@netscript/cli`. Install it globally for a tidy
   {
     label: "Global install",
     lang: "bash",
-    code: "# Installs a `netscript` command on your PATH\ndeno install --global --allow-all --name netscript jsr:@netscript/cli\n\nnetscript --help"
+    code: "# Installs a `netscript` command on your PATH\ndeno install --global --allow-all --name netscript jsr:@netscript/cli" + releaseSpecifier + "\n\nnetscript --help"
   },
   {
     label: "Ad-hoc (no install)",
     lang: "bash",
-    code: "# Run the same CLI without installing anything\ndeno x jsr:@netscript/cli --help"
+    code: "# Run the same CLI without installing anything\ndeno x jsr:@netscript/cli" + releaseSpecifier + " --help"
   }
 ] }) }}
 
 {{ comp callout { type: "tip" } }}
 The rest of this page assumes the global <code>netscript</code> command. If you went ad-hoc,
-swap <code>netscript</code> for <code>deno x jsr:@netscript/cli</code> in each step.
+swap <code>netscript</code> for <code>deno x jsr:@netscript/cli{{ releaseSpecifier }}</code> in each step.
 {{ /comp }}
 
 ## 2. Scaffold a workspace
@@ -62,12 +62,16 @@ One command lays down the whole opinionated workspace — a Fresh 2 app, shared 
 contracts, a plugin registry, and the Aspire orchestration layer:
 
 ```bash
-netscript init my-app
+netscript init my-app --db postgres
 ```
+
+{{ comp callout { type: "note", title: "Pick your database engine" } }}
+Postgres is the recommended default shown throughout these docs. The database is polyglot — swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, or <code>sqlite</code> to scaffold a Prisma-backed schema for that engine instead. (<code>postgres</code> / <code>mysql</code> / <code>mssql</code> run as an Aspire container resource; <code>sqlite</code> is file-backed with no container.)
+{{ /comp }}
 
 {{ comp callout { type: "tip" } }}
 Want to see the plan before anything touches disk? Add <code>--dry-run</code> —
-<code>netscript init my-app --dry-run</code> previews every file it would create and writes
+<code>netscript init my-app --db postgres --dry-run</code> previews every file it would create and writes
 nothing.
 {{ /comp }}
 
@@ -89,7 +93,7 @@ Next steps:
   1. cd my-app
   2. cd aspire  # TS AppHost lives here, isolated from the Deno workspace
   3. aspire restore  # download TypeScript AppHost SDK modules (run once)
-  4. aspire run  # start TypeScript AppHost
+  4. aspire start  # start TypeScript AppHost
 ```
 
 If you see that success line and the numbered steps, the scaffold worked. The exact
@@ -97,8 +101,8 @@ file count and the next steps adapt to the options you chose (a database, an exa
 service, and so on) — on the strict happy path above, the four steps are sufficient.
 
 {{ comp callout { type: "note", title: "Aspire comes before any database command" } }}
-On the default path, <strong>Aspire is step&nbsp;2 of running your app</strong>: <code>cd aspire &amp;&amp; aspire run</code>
-provisions Postgres and Garnet first. Any <code>netscript db</code> command (init, generate, seed) runs
+On the default path, <strong>Aspire is step&nbsp;2 of running your app</strong>: <code>cd aspire &amp;&amp; aspire start</code>
+provisions Postgres and Redis first. Any <code>netscript db</code> command (init, generate, seed) runs
 <em>after</em> Aspire is up, because it needs that database to exist. See
 <a href="/how-to/database-migration/">Database migrations</a> for the full flow.
 {{ /comp }}
@@ -107,18 +111,18 @@ provisions Postgres and Garnet first. Any <code>netscript db</code> command (ini
 
 Follow the next steps the CLI just printed. The Aspire TypeScript AppHost lives in
 its own `aspire/` folder, isolated from the Deno workspace; restore its modules once,
-then run it. **This is the step that actually starts your stack** — Postgres, Garnet,
+then run it. **This is the step that actually starts your stack** — Postgres, Redis,
 and every wired service come up together:
 
 ```bash
 cd my-app/aspire
 aspire restore   # one-time: downloads the AppHost SDK modules
-aspire run       # boots Postgres + Garnet + services, opens the dashboard
+aspire start       # boots Postgres + Redis + services, opens the dashboard
 ```
 
 {{ comp callout { type: "note", title: "Prefer no orchestration?" } }}
 Scaffold with <code>netscript init my-app --no-aspire</code> and start the Fresh app directly
-instead: <code>deno task --cwd apps/dashboard dev</code>. You trade the dashboard, Postgres/Garnet
+instead: <code>deno task --cwd apps/dashboard dev</code>. You trade the dashboard, Postgres/Redis
 provisioning, and multi-resource wiring for a leaner single-process dev loop.
 {{ /comp }}
 
@@ -148,10 +152,10 @@ Prefer a builder? The fluent equivalent of <code>defineService(...)</code> is th
 
 ## What you see
 
-Once `aspire run` settles, you have a live workspace to poke at:
+Once `aspire start` settles, you have a live workspace to poke at:
 
 - **The Aspire dashboard** at [http://localhost:18888](http://localhost:18888) —
-  every resource (Postgres, Garnet, your services), its health, logs, and distributed
+  every resource (Postgres, Redis, your services), its health, logs, and distributed
   traces in one place.
 - **The Fresh app** at [http://localhost:8000](http://localhost:8000) — your
   frontend, served by the `dashboard` app.
@@ -165,7 +169,7 @@ Once `aspire run` settles, you have a live workspace to poke at:
 <ul>
 <li>A port is already in use — <code>18888</code> (dashboard) or <code>8000</code> (Fresh app). Stop the other process or change the port.</li>
 <li>The first <code>aspire restore</code> downloads the AppHost SDK and can take a minute.</li>
-<li>If a <code>netscript db</code> command can't connect, confirm <code>aspire run</code> is still up — Postgres lives inside Aspire.</li>
+<li>If a <code>netscript db</code> command can't connect, confirm <code>aspire start</code> is still up — Postgres lives inside Aspire.</li>
 <li><code>deno: command not found</code> means Deno isn't on your PATH.</li>
 </ul>
 {{ /comp }}
@@ -187,8 +191,8 @@ A complete, type-checked workspace — not a starter you have to assemble:
     icon: "▶"
   },
   {
-    title: "Postgres + Garnet, provisioned",
-    body: "Aspire stands up the database and cache for you — no docker-compose to babysit, no connection strings to copy.",
+    title: "A database + Redis, provisioned",
+    body: "Aspire stands up the database (Postgres by default; or mysql / mssql / sqlite via --db) and cache for you — no docker-compose to babysit, no connection strings to copy.",
     icon: "▦"
   },
   {

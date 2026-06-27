@@ -72,7 +72,7 @@ can check.
 {{ comp.featureGrid({ items: [
   {
     title: "1 · Scaffold",
-    body: "Create <code>my-shop/</code> with the <code>netscript</code> CLI and boot it under Aspire. Postgres, the Garnet cache, and your service come up together; the dashboard answers on :18888.",
+    body: "Create <code>my-shop/</code> with the <code>netscript</code> CLI and boot it under Aspire. Postgres (the default; swap <code>--db postgres</code> for <code>mysql</code>, <code>mssql</code>, or <code>sqlite</code>), the Redis cache, and your service come up together; the dashboard answers on :18888.",
     href: "/tutorials/storefront/01-scaffold/"
   },
   {
@@ -97,7 +97,7 @@ can check.
   },
   {
     title: "6 · Deploy",
-    body: "Run the whole storefront locally under one <code>aspire run</code> — every service, plugin API, and background processor in one resource graph, observable from the dashboard. The local topology, not a cloud deployer.",
+    body: "Run the whole storefront locally under one <code>aspire start</code> — every service, plugin API, and background processor in one resource graph, observable from the dashboard. The local topology, not a cloud deployer.",
     href: "/tutorials/storefront/06-deploy/"
   }
 ] }) }}

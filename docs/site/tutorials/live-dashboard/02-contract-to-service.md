@@ -32,7 +32,7 @@ read-model every later chapter consumes — the rows that will eventually update
 ## Before you begin
 
 You should have completed [chapter 1](/tutorials/live-dashboard/01-scaffold/): `my-dashboard/` on
-disk and `aspire run` up. Confirm the `orders` service is reachable before you change anything — in a
+disk and `aspire start` up. Confirm the `orders` service is reachable before you change anything — in a
 second terminal:
 
 ```sh
@@ -191,7 +191,7 @@ The scaffold uses <code>defineService(router, { … })</code> — one call, sens
 ## Step 4 — Initialize the database
 
 The `list` handler reads from Postgres, so the database needs its schema and some rows. With
-`aspire run` still up (Postgres is only live while Aspire is), run these from the **workspace root**
+`aspire start` still up (Postgres is only live while Aspire is), run these from the **workspace root**
 in a second terminal:
 
 ```sh
@@ -238,7 +238,7 @@ deno task check
 - [ ] `deno task check` is clean.
 
 {{ comp callout { type: "tip", title: "Empty items array?" } }}
-If <code>items</code> comes back empty, the seed step did not run or the database is fresh. Re-run <code>netscript db seed</code> from the workspace root (with <code>aspire run</code> still up), then retry the curl.
+If <code>items</code> comes back empty, the seed step did not run or the database is fresh. Re-run <code>netscript db seed</code> from the workspace root (with <code>aspire start</code> still up), then retry the curl.
 {{ /comp }}
 
 ## What you built

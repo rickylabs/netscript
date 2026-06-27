@@ -25,10 +25,10 @@ contribution types live in the [plugin reference](/reference/plugin/).
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
 If your plugin contributes an API service or a background processor, those run as resources in the
-Aspire graph alongside Postgres and Garnet. Bring orchestration up <strong>before</strong> you run
+Aspire graph alongside Postgres and Redis. Bring orchestration up <strong>before</strong> you run
 any <code>netscript db</code> command or exercise your plugin's endpoints: from the project root,
-<code>cd aspire &amp;&amp; aspire run</code> (dashboard at
-<a href="http://localhost:18888">http://localhost:18888</a>). DB commands require Aspire running
+<code>cd aspire &amp;&amp; aspire start</code> (dashboard at
+<a href="http://localhost:18888">http://localhost:18888</a>). DB commands require aspire startning
 first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource graph.
 {{ /comp }}
 
@@ -119,7 +119,7 @@ A worker-archetype descriptor looks like this — copy the shape and change the 
   {
     label: "What the kernel reads it for",
     lang: "ts",
-    code: "// provider.kind          -> which contribution category to scan for\n// defaultEntrypoint       -> the background processor Aspire runs\n// defaultServiceEntrypoint-> the API service Aspire runs (if any)\n// defaultRequiresDb / Kv  -> whether to provision Postgres / Garnet for it\n// concurrencyEnvVar       -> env var that caps processor concurrency\n// officialSource.servicePort -> the HTTP port the service binds\n// officialSource.dependencies -> plugins wired BEFORE this one in the graph"
+    code: "// provider.kind          -> which contribution category to scan for\n// defaultEntrypoint       -> the background processor aspire starts\n// defaultServiceEntrypoint-> the API service aspire starts (if any)\n// defaultRequiresDb / Kv  -> whether to provision Postgres / Redis for it\n// concurrencyEnvVar       -> env var that caps processor concurrency\n// officialSource.servicePort -> the HTTP port the service binds\n// officialSource.dependencies -> plugins wired BEFORE this one in the graph"
   }
 ] }) }}
 
@@ -249,7 +249,7 @@ After generation, your contribution is discoverable by its `id` (a job at
 
 {{ comp callout { type: "note", title: "Regenerate after every contribution change" } }}
 The registry is a build artifact, not a live scan. Any time you add, rename, or remove a
-contribution module, re-run <code>netscript generate</code> and restart <code>aspire run</code> (or
+contribution module, re-run <code>netscript generate</code> and restart <code>aspire start</code> (or
 let it hot-reload) so the service and its background processor pick up the new registry.
 {{ /comp }}
 
@@ -262,7 +262,7 @@ netscript plugin list      # your plugin should appear in the registry
 netscript plugin doctor    # checks plugin health and reports wiring problems
 ```
 
-With Aspire running, your plugin's service is live on the port you chose. Confirm it and exercise a
+With aspire startning, your plugin's service is live on the port you chose. Confirm it and exercise a
 contribution — for the `notifier` worker example on `:8095`:
 
 ```sh
@@ -310,7 +310,7 @@ at the exact aligned alpha version. Keep generated plugin workspaces on one NetS
 {{ comp callout { type: "warning", title: "Read before you ship a custom plugin" } }}
 <ul>
 <li><strong>Aspire not running</strong> — a plugin's API service and background processor are Aspire
-resources. If endpoints 404 or jobs never execute, <code>aspire run</code> from <code>aspire/</code>
+resources. If endpoints 404 or jobs never execute, <code>aspire start</code> from <code>aspire/</code>
 is almost always the cause. DB-backed plugins also need it up before <code>netscript db</code>.</li>
 <li><strong>Stale registry</strong> — the runtime reads a generated registry, not your source tree.
 Forgetting <code>netscript generate</code> after adding a contribution is the most common "my job

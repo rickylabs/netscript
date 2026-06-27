@@ -39,12 +39,12 @@ completion and watch a failure compensate, all observable on the Sagas API at `:
 You should have finished [chapter 3](/tutorials/storefront/03-cart-contracts/), so:
 
 - `my-shop/` has the `products` service and the `cart` contract.
-- `aspire run` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)).
+- `aspire start` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)).
   The saga registry and durable instance store both depend on Aspire-managed resources — Deno KV for
   the registry, and either KV or Postgres for instance state.
 
 {{ comp callout { type: "important", title: "Aspire must already be running" } }}
-The Sagas API service and its KV-backed registry come up as part of the orchestrated app. If you closed your <code>aspire run</code> terminal, restart it from the <code>aspire/</code> folder (<code>cd aspire &amp;&amp; aspire run</code>) <strong>before</strong> running any <code>netscript</code> command in this chapter — the durable store and registry only exist while Aspire is up.
+The Sagas API service and its KV-backed registry come up as part of the orchestrated app. If you closed your <code>aspire start</code> terminal, restart it from the <code>aspire/</code> folder (<code>cd aspire &amp;&amp; aspire start</code>) <strong>before</strong> running any <code>netscript</code> command in this chapter — the durable store and registry only exist while Aspire is up.
 {{ /comp }}
 
 ## Step 1 — Add the sagas plugin
@@ -266,7 +266,7 @@ Keep the strings identical on both sides.
 ## Step 5 — Type-check the workflow
 
 The Sagas API service lists sagas from a KV-backed registry, and the scaffold's saga runtime
-registers your built definition on startup. Because `aspire run` already brings the sagas processor
+registers your built definition on startup. Because `aspire start` already brings the sagas processor
 and API up together, you do not start anything by hand — your saga is picked up when the orchestrated
 app (re)starts. First, prove it compiles against the builder's generic signatures:
 

@@ -21,11 +21,12 @@ This is the task-oriented companion to the [authentication capability hub](/capa
 the *how*, stay here.
 
 {{ comp callout { type: "important", title: "Aspire is the control plane — start it first" } }}
-The <code>auth-api</code> service and its Postgres/KV dependencies run as resources in the Aspire
-graph. Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
-or hit an auth endpoint: from the project root, <code>cd aspire &amp;&amp; aspire run</code>
+The <code>auth-api</code> service and its database/KV dependencies run as resources in the Aspire
+graph (the database is Postgres by default; <code>mysql</code> / <code>mssql</code> run as Aspire
+containers too, while <code>sqlite</code> is file-backed — pick one at scaffold with <code>--db</code>). Bring orchestration up <strong>before</strong> you run any <code>netscript db</code> command
+or hit an auth endpoint: from the project root, <code>cd aspire &amp;&amp; aspire start</code>
 (dashboard at <a href="http://localhost:18888">http://localhost:18888</a>). DB commands require
-Aspire running first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
+aspire startning first. See <a href="/explanation/aspire/">the Aspire explanation</a> for the resource
 graph.
 {{ /comp }}
 
@@ -40,14 +41,17 @@ sources, generated registry entries, and Aspire resources together.
 
 You need an existing workspace with a database, because the `kv-oauth` and `better-auth` backends
 persist sessions and accounts. The `auth` plugin sets `requiresDb: true` and `requiresKv: true`, so
-both Postgres and KV (Garnet) must be in the Aspire graph.
+both a database and KV (Redis) must be in the Aspire graph. The database is polyglot — Postgres is
+the recommended default, but `mysql`, `mssql`, or `sqlite` are first-class alternatives selected at
+scaffold time with `netscript init --db <engine>`. (Postgres/MySQL/SQL Server run as an Aspire
+container resource; SQLite is file-backed with no container.)
 
 {{ comp.apiTable({
   caption: "Prerequisites",
   rows: [
     { name: "Workspace", type: "netscript init", desc: "An existing project. If you have none, scaffold one first — see the tutorials." },
     { name: "netscript CLI", type: "on PATH", desc: "Installed globally: deno install --global --allow-all --name netscript jsr:@netscript/cli. Confirm with netscript --help." },
-    { name: "Aspire", type: "aspire run", desc: "Postgres + Garnet up via the AppHost before any db command or endpoint call (cd aspire && aspire run)." },
+    { name: "Aspire", type: "aspire start", desc: "Postgres + Redis up via the AppHost before any db command or endpoint call (cd aspire && aspire start)." },
     { name: "OAuth credentials", type: "client id / secret", desc: "For the default kv-oauth backend you need a real OAuth/OIDC app (e.g. a Google client id + secret + redirect URI). Without provider env, signin/callback are non-functional stubs." }
   ]
 }) }}
@@ -112,11 +116,12 @@ export NETSCRIPT_AUTH_BACKEND=kv-oauth
 ## Step 3 — Run the auth database migration
 
 The `auth` plugin contributes a Prisma schema, **`plugins/auth/database/auth.prisma`**, which is
-aggregated into your project's Postgres schema at `db generate`. It defines four better-auth-shaped
-models mapped to these tables:
+aggregated into your project's database schema at `db generate` (Postgres by default; or `mysql` /
+`mssql` / `sqlite` — the auth models persist through Prisma, so they follow whichever engine you
+scaffolded with `--db`). It defines four better-auth-shaped models mapped to these tables:
 
 {{ comp.apiTable({
-  caption: "auth.prisma models → Postgres tables",
+  caption: "auth.prisma models → your database tables",
   rows: [
     { name: "User", type: "auth_users", desc: "Authenticated principals. Populated by backends that persist users (better-auth)." },
     { name: "Session", type: "auth_sessions", desc: "Server-side session records. kv-oauth keeps sessions in KV; this table backs the Prisma-persisting backend." },
@@ -134,7 +139,7 @@ through Prisma. The migration runs regardless; it is the persistence path for th
 backend.
 {{ /comp }}
 
-With Aspire running (Step 0), generate and apply the migration the same way you do for any plugin
+With aspire startning (Step 0), generate and apply the migration the same way you do for any plugin
 schema:
 
 ```sh
@@ -206,7 +211,7 @@ architecture behind this, read [the authentication model](/explanation/auth-mode
 
 ## Step 6 — Start the service and the auth endpoints
 
-With Aspire running, the `auth-api` service binds **port 8094** and mounts five endpoints under the
+With aspire startning, the `auth-api` service binds **port 8094** and mounts five endpoints under the
 public REST prefix **`/api/v1/auth/*`** (the oRPC surface is mirrored at `/api/rpc/v1/auth/*`):
 
 {{ comp.apiTable({
@@ -285,7 +290,7 @@ version.</li>
 but no real sign-in is possible.</li>
 <li><strong>Aspire down</strong> — a 404 on <code>:8094</code> or a DB error during
 <code>netscript db</code> almost always means orchestration is not running. <code>cd aspire &amp;&amp;
-aspire run</code> first.</li>
+aspire start</code> first.</li>
 </ul>
 {{ /comp }}
 

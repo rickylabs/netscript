@@ -26,7 +26,7 @@ chapters that follow.
 ## What you will build
 
 A working `my-workspace/` directory: a typed `workspace` service on its own port, a Postgres database,
-the Aspire orchestration that provisions Postgres and the Garnet cache, and a clean
+the Aspire orchestration that provisions Postgres and the Redis cache, and a clean
 `deno task check`. By the end you will have the Aspire dashboard open on `:18888` showing your
 service, database, and cache running together — the control plane you keep up for the rest of the
 track.
@@ -35,7 +35,7 @@ track.
 
 This is the first chapter, so there is no prior project state to check — but your local toolchain must
 be ready. You need **[Deno](https://deno.com/) 2.x**, the **[Aspire CLI](https://aspire.dev)**, and
-**Docker** running so Aspire can start the Postgres and Garnet containers. Verify all three:
+**Docker** running so Aspire can start the Postgres and Redis containers. Verify all three:
 
 ```sh
 deno --version     # Deno 2.x
@@ -46,7 +46,7 @@ docker info        # prints engine details, not a connection error
 Install the NetScript CLI from JSR once, then confirm it is on your `PATH`:
 
 ```sh
-deno install --global --allow-all --name netscript jsr:@netscript/cli
+deno install --global --allow-all --name netscript jsr:@netscript/cli{{ releaseSpecifier }}
 netscript --help
 ```
 
@@ -55,7 +55,7 @@ netscript --help
 Deno's install directory (printed by `deno install`) is on your `PATH`, then open a fresh terminal.
 
 {{ comp callout { type: "tip", title: "Prefer not to install globally?" } }}
-Run any command ad-hoc with <code>deno x jsr:@netscript/cli &lt;command&gt;</code>.
+Run any command ad-hoc with <code>deno x jsr:@netscript/cli{{ releaseSpecifier }} &lt;command&gt;</code>.
 The rest of this track assumes the installed <code>netscript</code> form.
 {{ /comp }}
 
@@ -70,6 +70,10 @@ netscript init my-workspace --service --service-name workspace --service-port 30
 
 A clean dry run validates your flag combination — it rejects bad mixes (an unknown `--db` engine, for
 example) here, before any files exist. Treat a clean plan as a green light to scaffold for real.
+
+This track uses `--db postgres`, the recommended default. The database is polyglot, so you can swap
+`--db postgres` for `mysql`, `mssql`, or `sqlite` and follow along the same way (sqlite is file-backed,
+so it has no Aspire container).
 
 ## Step 2 — Create `my-workspace/`
 
@@ -131,21 +135,21 @@ Run it from the `aspire/` subfolder so the CLI finds `apphost.mts`:
 ```sh
 cd aspire
 aspire restore   # once per machine: restores the Aspire SDK modules
-aspire run       # starts the AppHost and every declared resource
+aspire start       # starts the AppHost and every declared resource
 ```
 
-`aspire run` brings up the Postgres database, the Garnet cache, and your `workspace` service together,
+`aspire start` brings up the Postgres database, the Redis cache, and your `workspace` service together,
 then prints the **Aspire dashboard** URL and a one-time login token. Open it:
 
 ```
 http://localhost:18888
 ```
 
-Leave `aspire run` running in this terminal — it is your app's control plane for the entire track. The
+Leave `aspire start` running in this terminal — it is your app's control plane for the entire track. The
 dashboard's resource list is the authority for the exact port each resource bound.
 
 {{ comp callout { type: "important", title: "Aspire is step 2 — database commands need it running" } }}
-The Postgres container only exists while <code>aspire run</code> is up. So
+The Postgres container only exists while <code>aspire start</code> is up. So
 <code>netscript db init</code>, <code>db generate</code>, and <code>db seed</code> — which you use from
 chapter 2 onward — must run <strong>after</strong> Aspire has started, never before. A db command with
 no Aspire up fails fast: there is no Postgres for it to reach.
@@ -153,7 +157,7 @@ no Aspire up fails fast: there is no Postgres for it to reach.
 
 ## Verify your progress
 
-In a second terminal (leave `aspire run` going in the first), confirm the `workspace` service is up
+In a second terminal (leave `aspire start` going in the first), confirm the `workspace` service is up
 and the workspace type-checks:
 
 ```sh
@@ -166,14 +170,14 @@ the scaffold, contracts, and service all line up.
 
 - [ ] `netscript --help` lists the public command groups.
 - [ ] `my-workspace/` exists with `services/workspace/`, `plugins/`, `database/`, and `aspire/`.
-- [ ] `aspire run` is up; `postgres` and `garnet` are green in the dashboard on `:18888`.
+- [ ] `aspire start` is up; `postgres` and `redis` are green in the dashboard on `:18888`.
 - [ ] `curl http://localhost:3001/health` returns a healthy response.
 - [ ] `deno task check` passes.
 
 {{ comp callout { type: "tip", title: "If something is not green" } }}
-Three checks cover most first-run snags: (1) is <code>aspire run</code> still up, with
-<code>postgres</code> and <code>garnet</code> healthy in the dashboard? (2) is Docker running
-(<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire run</code>, so it
+Three checks cover most first-run snags: (1) is <code>aspire start</code> still up, with
+<code>postgres</code> and <code>redis</code> healthy in the dashboard? (2) is Docker running
+(<code>docker info</code>)? (3) did you <code>cd aspire</code> before <code>aspire start</code>, so it
 found <code>apphost.mts</code>? A failed <code>curl</code> usually means the service has not finished
 starting — wait a few seconds and retry.
 {{ /comp }}
@@ -181,7 +185,7 @@ starting — wait a few seconds and retry.
 ## What you built
 
 A real NetScript workspace at `my-workspace/`: a typed `workspace` service on `:3001`, shared
-contracts, a Postgres database, and a Garnet cache — all orchestrated by Aspire and visible in one
+contracts, a Postgres database, and a Redis cache — all orchestrated by Aspire and visible in one
 dashboard. This is the base. Next you add authentication on top of it.
 
 {{ comp.nextPrev({ prev: { label: "Team Workspace", href: "/tutorials/workspace/" }, next: { label: "2 · Auth", href: "/tutorials/workspace/02-auth/" } }) }}

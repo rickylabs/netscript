@@ -42,7 +42,7 @@ You should have finished [chapter 2](/tutorials/storefront/02-catalog-service/),
 
 - `my-shop/` has a working `products` service on `:3001` and a `contracts/versions/v1/` directory
   with `products.contract.ts` in it.
-- `aspire run` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)).
+- `aspire start` is up (the dashboard answers at [http://localhost:18888](http://localhost:18888)).
 
 Confirm the contracts workspace is where you left it:
 

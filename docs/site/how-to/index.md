@@ -20,8 +20,8 @@ contracts-first, what "durable" means, how Aspire wires dependencies — read th
 and reference that go deeper.
 
 {{ comp callout { tone: "info", title: "One prerequisite spans almost every recipe" } }}
-Anything that touches Postgres, Garnet/Redis, or a plugin service expects Aspire
-to be running first. From your workspace: <code>cd aspire &amp;&amp; aspire run</code>
+Anything that touches Postgres, Redis/Garnet, or a plugin service expects Aspire
+to be running first. From your workspace: <code>cd aspire &amp;&amp; aspire start</code>
 brings up the dependencies and the dashboard on <a href="http://localhost:18888"><code>http://localhost:18888</code></a>
 <strong>before</strong> any <code>netscript db</code> command or service call. The
 recipes call this out where it matters, but it is the single most common missing
@@ -38,7 +38,7 @@ command you can run to confirm it works.
   { title: "Add a plugin", body: "Install a first-party plugin through public package dispatch, or use the local netscript-dev scaffolding path for sample modules. Lands under plugins/<name>/, regenerates the registry, and verifies the service answers on its port.", href: "/how-to/add-a-plugin/" },
   { title: "Add a service", body: "Stand up a new typed oRPC service: define an @orpc/contract + zod contract, implement() the handlers, serve it with defineService(...) one-shot or createService(...).serve() fluent, and confirm it answers on /api/rpc/*.", href: "/how-to/add-a-service/" },
   { title: "Add authentication", body: "Add the official auth plugin (auth-api on :8094, five endpoints under /api/v1/auth/*). Pick one active backend via NETSCRIPT_AUTH_BACKEND — kv-oauth (interactive, default), WorkOS, or better-auth — run the auth.prisma migration, and sign in.", href: "/how-to/add-authentication/" },
-  { title: "Database & migration", body: "Initialize, generate, seed, and inspect the Postgres schema: netscript db init --name init → db generate → db seed → db status. Requires aspire run first so Postgres is provisioned.", href: "/how-to/database-migration/" }
+  { title: "Database & migration", body: "Initialize, generate, seed, and inspect the Postgres schema: netscript db init --name init → db generate → db seed → db status. Requires aspire start first so Postgres is provisioned.", href: "/how-to/database-migration/" }
 ] }) }}
 
 ## Wire primitives & observability
@@ -58,7 +58,7 @@ the Aspire-free portability path.
 
 {{ comp.featureGrid({ items: [
   { title: "Customize the Fresh UI", body: "Bring in and own the dashboard UI with the ui:init / ui:add tasks. The scaffold uses copy-source ownership — the components land in your workspace, so you edit them directly rather than depending on a hidden package.", href: "/how-to/customize-fresh-ui/" },
-  { title: "Deploy", body: "Take a workspace to production: Docker and bare-metal targets, the raw deno task entry points behind each service, and the --no-aspire portability escape hatch when you provision Postgres and Garnet yourself.", href: "/how-to/deploy/" },
+  { title: "Deploy", body: "Take a workspace to production: Docker and bare-metal targets, the raw deno task entry points behind each service, and the --no-aspire portability escape hatch when you provision Postgres and Redis (or Garnet) yourself.", href: "/how-to/deploy/" },
   { title: "Author a plugin", body: "Advanced: build a custom plugin from scratch. Defines the scaffold.plugin.json provider kind, the manifest exports, and the mod.ts contract the host discovers — the same shape the first-party plugins use.", href: "/how-to/author-a-plugin/" }
 ] }) }}
 
@@ -68,7 +68,7 @@ Every how-to page follows the same contract so you always know where to look:
 
 - **Goal** — one sentence stating exactly what you will have when you finish.
 - **Prerequisites** — the workspace state and running dependencies the recipe
-  assumes (almost always including a live `aspire run`).
+  assumes (almost always including a live `aspire start`).
 - **Steps** — added-lines code blocks, annotated with the file path they belong
   in, using the public `netscript <cmd>` command form throughout.
 - **Production pitfalls** — the caveats that bite in real deployments, stated

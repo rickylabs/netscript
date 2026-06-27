@@ -11,7 +11,7 @@ next: { label: "How-to guides", href: "/how-to/" }
 Across the last five chapters you built the storefront one piece at a time, usually starting a single
 service in its own terminal. This final chapter zooms out: you run the **entire** `my-shop/` — the
 products service, the cart contract's consumers, the checkout saga, the shipping webhook, Postgres,
-and the cache — as one coherent system under a single `aspire run`, and watch all of it from one
+and the cache — as one coherent system under a single `aspire start`, and watch all of it from one
 dashboard. This is NetScript's local topology: `git clone` → one command → a complete, observable
 stack.
 
@@ -26,13 +26,13 @@ stack.
 
 ## What you will build
 
-You will bring the complete storefront up under one orchestrator: `aspire run` translates your
+You will bring the complete storefront up under one orchestrator: `aspire start` translates your
 `appsettings.json` plus the installed plugins into a single resource graph and boots all of it —
 infrastructure, services, plugin APIs, and background processors — then gives you a dashboard over the
 whole thing. You will read the live port map from the dashboard and confirm every resource is healthy.
 
 {{ comp callout { type: "warning", title: "This is the LOCAL story — not a production deployer" } }}
-<code>aspire run</code> exists to make one command produce a complete, correctly-wired stack on <strong>one machine</strong>. The Postgres and Garnet it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. NetScript does not ship a cloud deployer for your app; for a remote target you point processes at managed infrastructure yourself. This chapter teaches the local topology. See the <a href="/how-to/deploy/">Deploy</a> and <a href="/how-to/deploy-local-aspire/">Deploy locally with Aspire</a> how-to guides for the production-vs-local split.
+<code>aspire start</code> exists to make one command produce a complete, correctly-wired stack on <strong>one machine</strong>. The Postgres and Redis it starts are throwaway Docker containers for dev convenience — <strong>not</strong> your production database or cache. NetScript does not ship a cloud deployer for your app; for a remote target you point processes at managed infrastructure yourself. This chapter teaches the local topology. See the <a href="/how-to/deploy/">Deploy</a> and <a href="/how-to/deploy-local-aspire/">Deploy locally with Aspire</a> how-to guides for the production-vs-local split.
 {{ /comp }}
 
 ## Before you begin
@@ -49,7 +49,7 @@ Confirm the full plugin set is installed:
 netscript plugin list
 ```
 
-You should see `sagas`, `streams` (its dependency), and `triggers`. If `aspire run` from earlier
+You should see `sagas`, `streams` (its dependency), and `triggers`. If `aspire start` from earlier
 chapters is still up, you can stop it now — this chapter starts the whole graph fresh.
 
 ## Step 1 — Confirm the AppHost was scaffolded
@@ -84,23 +84,23 @@ aspire restore
 
 ## Step 3 — Start the whole resource graph
 
-A single `aspire run` translates `appsettings.json` plus the plugin contributions into a coherent
+A single `aspire start` translates `appsettings.json` plus the plugin contributions into a coherent
 resource graph and boots all of it — infrastructure first, then services, plugin APIs, and background
 processors, with cross-references resolved into injected environment variables:
 
 ```sh
 # Still inside aspire/. Boots the whole graph; prints the dashboard URL + a login token.
-aspire run
+aspire start
 ```
 
-When boot finishes, `aspire run` prints the dashboard address and a one-time login token. Here is the
+When boot finishes, `aspire start` prints the dashboard address and a one-time login token. Here is the
 graph a single run stands up for the storefront:
 
-{{ comp.apiTable({ caption: "What `aspire run` brings up for my-shop/", rows: [
+{{ comp.apiTable({ caption: "What `aspire start` brings up for my-shop/", rows: [
   { name: "aspire (dashboard)", type: "https://localhost:18888 / http://localhost:18889", desc: "Live resource list, console logs, structured logs and traces. A login token is printed on start." },
   { name: "OTLP collector", type: "http://localhost:4318", desc: "OpenTelemetry endpoint the dashboard runs; framework spans and structured logs land here automatically." },
   { name: "postgres", type: "Container", desc: "Provisioned via Docker. The database your products handlers and saga store target — reachable only while Aspire is up." },
-  { name: "garnet", type: "Container (cache)", desc: "Redis-compatible cache. Backs KV/queue workloads for the runtime plugins." },
+  { name: "redis", type: "Container (cache)", desc: "Redis cache — the default `--cache-backend`; Redis-compatible. Backs KV/queue workloads for the runtime plugins." },
   { name: "products (service)", type: ":3001 (SERVICE range, from :3000)", desc: "Your catalog service. OpenAPI at /api/v1/products/* and RPC at /api/rpc/*." },
   { name: "sagas API", type: ":8092 (PLUGIN_API range)", desc: "Lists sagas and instances — where you watched CheckoutSaga in chapter 4." },
   { name: "triggers API", type: ":8093 (PLUGIN_API range)", desc: "The Hono webhook ingress from chapter 5 — /api/v1/webhooks/shipping/status." },
@@ -115,7 +115,7 @@ The runtime plugins publish their APIs from the <code>:8091–8099</code> <stron
 
 ## Step 4 — Use the dashboard
 
-Open `https://localhost:18888`, paste the login token `aspire run` printed, and you have a single pane
+Open `https://localhost:18888`, paste the login token `aspire start` printed, and you have a single pane
 over the running storefront:
 
 {{ comp.apiTable({ caption: "Aspire dashboard surfaces", rows: [
@@ -132,7 +132,7 @@ correlated traces in one place.
 ## Verify your progress
 
 With the graph up, confirm the whole storefront is live from one terminal. The dashboard resource list
-should show `postgres`, `garnet`, `products`, and the `workers` / `sagas` / `triggers` APIs all
+should show `postgres`, `redis`, `products`, and the `workers` / `sagas` / `triggers` APIs all
 healthy. Spot-check a few endpoints:
 
 ```sh
@@ -147,17 +147,17 @@ curl http://localhost:8093/health
 ```
 
 - [ ] `ls aspire/apphost.mts aspire/aspire.config.json` shows both files.
-- [ ] `aspire run` boots and prints a dashboard URL + login token.
-- [ ] The dashboard at `https://localhost:18888` lists `postgres`, `garnet`, `products`, and the
+- [ ] `aspire start` boots and prints a dashboard URL + login token.
+- [ ] The dashboard at `https://localhost:18888` lists `postgres`, `redis`, `products`, and the
       `workers` / `sagas` / `triggers` plugin APIs, all healthy.
 - [ ] `curl` against `:3001`, `:8092`, and `:8093` all answer.
 - [ ] A checkout and a webhook fire show up as correlated traces in the dashboard.
 
-{{ comp callout { type: "warning", title: "Footguns when `aspire run` will not boot" } }}
+{{ comp callout { type: "warning", title: "Footguns when `aspire start` will not boot" } }}
 <ul>
-<li><strong>Docker not running.</strong> Aspire provisions Postgres + Garnet through Docker; no daemon means the happy path does not start.</li>
-<li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire run</code> run from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root. Mixing them up is the most common first-run error.</li>
-<li><strong>db command before <code>aspire run</code>.</strong> Every <code>netscript db</code> command needs a live Postgres. Bring the graph up first.</li>
+<li><strong>Docker not running.</strong> Aspire provisions Postgres + Redis through Docker; no daemon means the happy path does not start.</li>
+<li><strong>Wrong directory.</strong> <code>aspire restore</code> and <code>aspire start</code> run from inside <code>aspire/</code>; <code>netscript db</code> commands run from the workspace root. Mixing them up is the most common first-run error.</li>
+<li><strong>db command before <code>aspire start</code>.</strong> Every <code>netscript db</code> command needs a live Postgres. Bring the graph up first.</li>
 <li><strong>Ports in use.</strong> A stale prior run holding <code>:18888</code>, <code>:3001</code>, or an <code>:8091–8099</code> port blocks boot — check the dashboard resource list (or your process table) and free it.</li>
 </ul>
 {{ /comp }}
@@ -165,7 +165,7 @@ curl http://localhost:8093/health
 ## What you built
 
 - The entire `my-shop/` storefront running as one orchestrated resource graph under a single
-  `aspire run` — Postgres, Garnet, the `products` service, the streams transport, and the workers,
+  `aspire start` — Postgres, Redis, the `products` service, the streams transport, and the workers,
   sagas, and triggers plugin APIs plus their background processors.
 - A dashboard at `https://localhost:18888` giving you the live port map, per-resource console logs,
   and correlated traces across the whole app.

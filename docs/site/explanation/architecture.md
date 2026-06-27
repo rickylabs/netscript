@@ -151,7 +151,7 @@ first-party plugin enabled.
                               ┌───────────────────────────────────┐
                               │            Aspire AppHost          │
                               │   dashboard  http://localhost:18888│
-                              │  provisions Postgres + Garnet (KV) │
+                              │  provisions Postgres + Redis (KV)  │
                               └───────────────┬───────────────────┘
                                               │ wires env, ports, resources
             ┌─────────────────────────────────┼─────────────────────────────────┐
@@ -173,13 +173,13 @@ first-party plugin enabled.
    └────────┬──────────────────────────────────────────────────────────┬──────────┘
             │ produces durable change-data events                       │
    ┌────────▼─────────┐                                      ┌──────────▼─────────┐
-   │  streams  :4437   │  durable-stream service             │  Postgres / Garnet  │
+   │  streams  :4437   │  durable-stream service             │  Postgres / Redis   │
    │  HTTP / SSE       │  workers · auth · sagas mirror here  │  (relational + KV)  │
    └───────────────────┘                                      └────────────────────┘
 ```
 
 Read the picture in three bands. **Aspire** sits on top as the local
-orchestrator: `cd aspire && aspire run` brings up Postgres and Garnet and starts
+orchestrator: `cd aspire && aspire start` brings up Postgres and Redis (the default cache backend; `garnet` or `deno-kv` are selectable via `--cache-backend`) and starts
 every service *before* any `netscript db` command runs, with traces, logs, and
 health landing in the dashboard at `http://localhost:18888`. **Plugin services**
 sit in the middle, each owning exactly one service on a fixed port; your own
@@ -239,8 +239,10 @@ capability hub is [Authentication]({{ comp.xref({ key: "cap:auth" }) }}).
 You will see the same port-and-adapter shape everywhere: the
 <a href="/reference/queue/"><code>queue</code></a> defines one port behind four
 backends (Deno&nbsp;KV, Redis, RabbitMQ, and PostgreSQL), the
-<a href="/reference/database/"><code>database</code></a> wraps Postgres behind a
-port, and durable sagas persist through a <code>kv</code> or <code>prisma</code>
+<a href="/reference/database/"><code>database</code></a> wraps a relational engine
+behind a port — Postgres (the default; or <code>mysql</code> / <code>mssql</code> /
+<code>sqlite</code> via <code>--db</code> at scaffold time) — and durable sagas persist
+through a <code>kv</code> or <code>prisma</code>
 store. Auth simply makes the pattern most visible because it ships three adapters
 in the box.
 {{ /comp }}
@@ -277,8 +279,10 @@ This is also where the capability switches live — the saga durable store
 (`NETSCRIPT_SAGA_STORE=kv|prisma`), the queue provider, and the active auth
 backend (`NETSCRIPT_AUTH_BACKEND`) are all selected here rather than in code. It
 is also why the database docs note a scaffold reality: `databases.config` can be
-empty in `netscript.config.ts` while Postgres is still provisioned by Aspire and
-described in `appsettings.json`. See
+empty in `netscript.config.ts` while the chosen engine — Postgres by default, or
+`mysql` / `mssql` / `sqlite` selected with `--db` at scaffold time — is still
+provisioned by Aspire (sqlite is file-backed, so it has no Aspire container
+resource) and described in `appsettings.json`. See
 [Runtime configuration]({{ comp.xref({ key: "cap:runtime-config" }) }}).
 
 ### Naming is part of the contract
@@ -320,7 +324,7 @@ persists through a selectable `kv` or `prisma` store. The full flow is covered i
 ## Observability is built into the substrate
 
 Because every plugin composes the same packages, observability is wired once and
-inherited everywhere. Aspire runs an OTLP collector, and the worker job path —
+inherited everywhere. aspire starts an OTLP collector, and the worker job path —
 dispatch, execution, scheduler, and subprocess continuation — emits **real
 OpenTelemetry spans automatically**, so job traces appear in the Aspire dashboard
 without any handler code.
