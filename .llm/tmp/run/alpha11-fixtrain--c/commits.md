@@ -2,3 +2,4 @@
 
 ## Log
 
+- 12a050d6: feat(cli): add interactive init cache options

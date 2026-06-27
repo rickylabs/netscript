@@ -41,4 +41,4 @@ Appsettings and TS AppHost helper generation now emit cache config from the reso
 
 ## Commits
 
-- pending
+- 12a050d6: feat(cli): add interactive init cache options
