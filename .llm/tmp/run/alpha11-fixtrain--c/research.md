@@ -25,4 +25,3 @@
 ## Open questions
 
 - Deno KV has no managed Aspire cache container emission in this slice; recorded as accepted debt.
-

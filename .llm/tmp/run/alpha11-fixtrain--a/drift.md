@@ -7,4 +7,3 @@
 - 2026-06-27: Worktree drift, minor. Pre-flight branch was correct, but unrelated modified
   OpenHands request files already existed under `.llm/tmp/run/openhands/**/request.md`. They are
   left untouched and unstaged.
-

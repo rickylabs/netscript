@@ -42,4 +42,3 @@
 
 - Full `scaffold.runtime` e2e is explicitly out of scope for Slice A.
 - Archetype 6 restructuring debt is out of scope.
-
